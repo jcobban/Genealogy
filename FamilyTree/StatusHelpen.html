@@ -1,0 +1,98 @@
+<!DOCTYPE HTML >
+<html>
+  <head>
+    <title>Status Master List: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *    History:                                                          *
+ *	    2010/12/08	    created                                         *
+ *	    2014/02/10	    eliminate use of tables for layout              *
+ *		2018/02/04		update header/footer links						*
+ *		2018/11/19      change Help.html to Helpen.html                 *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+</head>
+<body>
+<div class="topcrumbs">
+		<a href="/indexHelpen.html">Home</a>: 
+		<a href="/genealogyHelpen.html">Genealogy</a>: 
+		<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+</div>
+<div class="help">
+<h1>Status Master list: Help</h1>
+<p>Every source that is referenced by a citation in the family tree is
+recorded in the Status Master List.  This way all of the information
+collected about a particular source is in a central record.  This,
+in particular facilitates ensuring that particular sources are always
+identified in the same way.
+</p>
+<p>You get to the Status Master List from the Family Tree
+<a href="/FamilyTree/ServicesHelpen.html">Top Level Services</a> web page.
+When you first enter the Status Master List web page it displays the first
+20 sources in the list in alphabetical order.  You can scroll through the
+complete list by clicking on the forward and backward arrows
+at the top of the list.
+</p>
+<p>You use the "Pattern" field to search for sources based upon their
+textual representation.  Technically the value you enter in this field
+is a <a href="http://en.wikipedia.org/wiki/Regular_expression">
+regular expression</a> pattern.
+The following are just some of the ways you can use this pattern.
+<ul>
+  <li>Ordinary text, particularly text containing only letters, digits,
+		and spaces, matches anywhere in the source.  For example
+		entering "Michigan" will match all sources that contain the
+		text "Michigan".  The match ignores the case, so this will also
+		match "michigan" and "MICHIGAN".
+  <li>The period '.' matches any single character.  You can use this
+		any time you do not know, or care, about what character is present
+		at a particular spot in the source.
+  <li>The caret '^' (shift-6 on American keyboards) matches to the
+		beginning of the source.  For example to find sources that
+		start with "New" enter "^New", as just entering "New" matches 
+		sources that contain the word "New" anywhere in the text.
+  <li>The dollar sign '$' (shift-4 on American keyboards) matches to the
+		end of the source.  For example to find sources that end with
+		"USA" enter "USA$".
+  <li>The asterisk '*' (shift-8 on American keyboards) causes the
+		immediately preceding character to match zero or more repetitions.
+		This is most commonly used with the period to skip over any number
+		of characters that do not match.  For example the pattern "Mi.*USA"
+		matches any source that has the text "Mi" and later on the text "USA"
+		with any number of arbitrary characters in between.  For example it
+		will match sources containing "MI, USA" and "Michigan, USA", as
+		well as "Mississippi, USA".
+  <li>There are many more options which you can experiment with.
+</ul>
+</p>
+<p>Each of the sources displayed on this web page shows:
+<ul>
+  <li>a button displaying the unique numeric key of the source,
+  <li>the type or category to which this source belongs,
+  <li>the source name as it is displayed in reports, 
+  <li>the number of citations that reference this source. 
+</ul>
+<p>For example:
+<img src="SourceEntry.png" alt="Source Entry in List">
+<p>The button displaying the numeric key of the source is a link to a
+<a href="/FamilyTree/SourceHelpen.html">web page</a> 
+that displays the details recorded
+about the source, and if you are authorized to do so, permits you to edit
+those details.
+</div>
+<div class="botcrumbs">
+    <span class="right">
+		<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+    </span>
+		<a href="/contactAuthor.php?subject=StatusHelpen.html" target="_blank">Contact Author</a>
+		<br/>
+		<a href="/indexHelpen.html">Home</a>: 
+		<a href="/genealogyHelpen.html">Genealogy</a>: 
+		<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+    <div style="clear: both;"></div>
+</div>
+</body>
+</html>

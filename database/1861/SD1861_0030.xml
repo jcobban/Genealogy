@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="30">
+    <option value="333">
+        Alfred
+    </option>
+    <option value="334">
+        Caledonia
+    </option>
+    <option value="335">
+        Hawkesbury E.
+    </option>
+    <option value="336">
+        Hawkesbury W. And Goal
+    </option>
+    <option value="337">
+        Hawkesbury Village
+    </option>
+    <option value="338">
+        Longeuil
+    </option>
+    <option value="339">
+        Plantagenet N.
+    </option>
+    <option value="340">
+        Plantagenet S.
+    </option>
+</select>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148225">
+    <option value="191_H">
+        Témiscouata: Nôtre-Dame du Portage
+        <div id="" reel="148225" frame="0" count="12"/>
+    </option>
+    <option value="191_I">
+        Témiscouata: Randot &amp; St. Jean de Dieu
+        <div id="" reel="148225" frame="12" count="25"/>
+    </option>
+    <option value="191_J">
+        Témiscouata: Rivière du Loup
+        <div id="" reel="148225" frame="37" count="17"/>
+    </option>
+    <option value="191_K">
+        Témiscouata: St. Antoine
+        <div id="" reel="148225" frame="54" count="23"/>
+    </option>
+    <option value="191_L">
+        Témiscouata: St. Arsène
+        <div id="" reel="148225" frame="77" count="27"/>
+    </option>
+    <option value="191_M">
+        Témiscouata: St. Clément
+        <div id="" reel="148225" frame="104" count="18"/>
+    </option>
+    <option value="191_N">
+        Témiscouata: St. Cyprien Hocquart
+        <div id="" reel="148225" frame="122" count="13"/>
+    </option>
+    <option value="191_O">
+        Témiscouata: St. Eloi
+        <div id="" reel="148225" frame="135" count="20"/>
+    </option>
+    <option value="191_P">
+        Témiscouata: St. Épiphane
+        <div id="" reel="148225" frame="155" count="25"/>
+    </option>
+    <option value="191_Q">
+        Témiscouata: Ste. Françoise
+        <div id="" reel="148225" frame="180" count="15"/>
+    </option>
+    <option value="191_R">
+        Témiscouata: St. François-Xavier &amp; St. Hubert
+        <div id="1" reel="148225" frame="195" count="10"/>
+        <div id="2" reel="148225" frame="205" count="10"/>
+    </option>
+    <option value="191_S">
+        Témiscouata: St. Honoré
+        <div id="" reel="148225" frame="215" count="7"/>
+    </option>
+    <option value="191_T">
+        Témiscouata: St. Jean de Dieu
+        <div id="" reel="148225" frame="222" count="0"/>
+    </option>
+    <option value="191_U">
+        Témiscouata: St. Louis du Ha! Ha!
+        <div id="" reel="148225" frame="222" count="17"/>
+    </option>
+    <option value="191_V">
+        Témiscouata: Ste. Modeste
+        <div id="" reel="148225" frame="239" count="17"/>
+    </option>
+    <option value="191_W">
+        Témiscouata: St. Paul de la Croix
+        <div id="" reel="148225" frame="256" count="16"/>
+    </option>
+    <option value="191_X">
+        Témiscouata: Ste. Rose du Dégelé
+        <div id="" reel="148225" frame="272" count="18"/>
+    </option>
+    <option value="191_Y">
+        Témiscouata: Trois Pistoles
+        <div id="" reel="148225" frame="290" count="51"/>
+    </option>
+    <option value="192_A">
+        Terrebonne: New Glasgow Villags
+        <div id="" reel="148225" frame="341" count="5"/>
+    </option>
+    <option value="192_B">
+        Terrebonne: Ste. Adèle
+        <div id="" reel="148225" frame="346" count="31"/>
+    </option>
+    <option value="192_C">
+        Terrebonne: Ste. Agathe
+        <div id="" reel="148225" frame="377" count="35"/>
+    </option>
+    <option value="192_D">
+        Terrebonne: Ste. Anne des Plaines
+        <div id="" reel="148225" frame="412" count="35"/>
+    </option>
+    <option value="192_E">
+        Terrebonne: St. Faustin
+        <div id="" reel="148225" frame="447" count="15"/>
+    </option>
+    <option value="192_F">
+        Terrebonne: St. Hypolite
+        <div id="" reel="148225" frame="462" count="19"/>
+    </option>
+    <option value="192_G">
+        Terrebonne: St. Janvier
+        <div id="" reel="148225" frame="481" count="22"/>
+    </option>
+    <option value="192_H">
+        Terrebonne: St. Jérôme
+        <div id="" reel="148225" frame="503" count="40"/>
+    </option>
+    <option value="192_I">
+        Terrebonne: St. Jérôme Town
+        <div id="1" reel="148225" frame="543" count="26"/>
+        <div id="2" reel="148225" frame="569" count="36"/>
+    </option>
+    <option value="192_J">
+        Terrebonne: St. Jovite
+        <div id="" reel="148225" frame="605" count="24"/>
+    </option>
+    <option value="192_K">
+        Terrebonne: St. Louis
+        <div id="" reel="148225" frame="629" count="16"/>
+    </option>
+    <option value="192_L">
+        Terrebonne: Ste. Lucie
+        <div id="" reel="148225" frame="645" count="15"/>
+    </option>
+    <option value="192_M">
+        Terrebonne: Ste. Marguerite
+        <div id="" reel="148225" frame="660" count="15"/>
+    </option>
+    <option value="192_N">
+        Terrebonne: St. Sauveur
+        <div id="" reel="148225" frame="675" count="30"/>
+    </option>
+    <option value="192_O">
+        Terrebonne: Ste. Sophie
+        <div id="" reel="148225" frame="705" count="26"/>
+    </option>
+    <option value="192_P">
+        Terrebonne: Ste. Thérèse
+        <div id="" reel="148225" frame="731" count="34"/>
+    </option>
+    <option value="192_Q">
+        Terrebonne: Ste. Thérèse Village
+        <div id="" reel="148225" frame="765" count="34"/>
+    </option>
+</select>

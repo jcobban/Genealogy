@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="23">
+    <option value="251">
+        Charlotteville
+    </option>
+    <option value="252">
+        Houghton
+    </option>
+    <option value="253">
+        Middleton
+    </option>
+    <option value="254">
+        Simcoe Town
+    </option>
+    <option value="255">
+        Townsend
+    </option>
+    <option value="256">
+        Walsingham
+    </option>
+    <option value="257">
+        Windham
+    </option>
+    <option value="258">
+        Woodhouse &amp; Gore
+    </option>
+    <option value="258A">
+        Agricultural Census
+    </option>
+</select>

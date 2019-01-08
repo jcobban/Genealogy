@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148129">
+    <option value="50_C">
+        Brockville: Brockville City, North Ward
+        <div id="" reel="148129" frame="0" count="36"/>
+    </option>
+    <option value="50_D">
+        Brockville: Brockville City, South Ward
+        <div id="" reel="148129" frame="36" count="27"/>
+    </option>
+    <option value="50_E">
+        Brockville: Brockville City, West Ward
+        <div id="1" reel="148129" frame="63" count="27"/>
+        <div id="2" reel="148129" frame="90" count="22"/>
+    </option>
+    <option value="50_F">
+        Brockville: Elizabethtown
+        <div id="1" reel="148129" frame="112" count="28"/>
+        <div id="2" reel="148129" frame="140" count="23"/>
+        <div id="3" reel="148129" frame="163" count="14"/>
+        <div id="4" reel="148129" frame="177" count="14"/>
+        <div id="5" reel="148129" frame="191" count="21"/>
+    </option>
+    <option value="50_G">
+        Brockville: Kitley
+        <div id="1" reel="148129" frame="212" count="15"/>
+        <div id="2" reel="148129" frame="227" count="18"/>
+        <div id="3" reel="148129" frame="245" count="17"/>
+    </option>
+    <option value="51_A">
+        Bruce East: Brant
+        <div id="1" reel="148129" frame="262" count="47"/>
+        <div id="2" reel="148129" frame="309" count="55"/>
+    </option>
+    <option value="51_B">
+        Bruce East: Carrick
+        <div id="1" reel="148129" frame="364" count="44"/>
+        <div id="2" reel="148129" frame="408" count="37"/>
+        <div id="3" reel="148129" frame="445" count="33"/>
+    </option>
+    <option value="51_C">
+        Bruce East: Culross
+        <div id="1" reel="148129" frame="478" count="19"/>
+        <div id="2" reel="148129" frame="497" count="27"/>
+        <div id="3" reel="148129" frame="524" count="25"/>
+    </option>
+    <option value="51_D">
+        Bruce East: Greenock
+        <div id="1" reel="148129" frame="549" count="34"/>
+        <div id="2" reel="148129" frame="583" count="36"/>
+    </option>
+    <option value="51_E">
+        Bruce East: Teeswater Village
+        <div id="" reel="148129" frame="619" count="24"/>
+    </option>
+</select>

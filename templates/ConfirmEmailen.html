@@ -1,0 +1,53 @@
+<!--*********************************************************************
+ *  ConfirmEmailen.html													*
+ *																		*
+ *  This script handles the confirmation of a new user as an			*
+ *  authorized user of the web site.									*
+ *																		*
+ *  History:															*
+ *		2018/01/28		converted to template							*
+ *																		*
+ *  Copyright &copy; 2017 James A. Cobban								*
+ **********************************************************************-->
+<link rel="stylesheet" type="text/css" href="/ConfirmEmail.css"/>
+  <div class='hidden' id='breadcrumbs'>
+    <a href='/genealogy.php?lang=$LANG'>Genealogy</a>:
+  </div>
+ <div class='body'>
+    <h1>
+	Confirmation of New User
+      <span class='right'>
+	<a href='ConfirmEmailHelpen.html' target='help'>? Help</a>
+      </span>
+      <div style='clear: both;'></div>
+  </h1>
+    $TRACE
+    $MSG
+    <div id='confirmation'>
+      <p>New user '$USERID' confirmed.
+      </p>
+      <p>This site is a cooperative resource for genealogy research.
+	By adding your own information to the site you help everyone.
+	You are now authorized to update the transcriptions of census and
+	vital statistics records, and to post blog entries against any
+	individual in the family tree.
+	You may also apply for access to the private data of your family,
+	in particular the information about individuals who still are or may
+	be living.  You may also update those individuals to whom you are
+	granted access. 
+      </p>
+      <p>To request access to view the private data of and to update your
+	family <a href='/Signon.php?lang=$LANG'>sign on</a> and then use the
+	<a href='/FamilyTree/nominalIndex.php?lang=$LANG'>
+	  Nominal Index of the Family Tree
+	</a>
+	to select a common ancestor of your family.  Once you are 
+	viewing the page for that common ancestor, you will be shown how
+	to request to be granted access to the family.
+      </p>
+    </div> <!-- confirmed registration -->
+  </div> <!-- class='body' -->
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/ConfirmEmail.js" type="text/javaScript">
+    </script>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148224">
+    <option value="189_C">
+        Soulanges: Coteau Station Village
+        <div id="" reel="148224" frame="0" count="10"/>
+    </option>
+    <option value="189_D">
+        Soulanges: Rivière Beaudette Village
+        <div id="" reel="148224" frame="10" count="6"/>
+    </option>
+    <option value="189_E">
+        Soulanges: St. Clet
+        <div id="" reel="148224" frame="16" count="21"/>
+    </option>
+    <option value="189_F">
+        Soulanges: St. Ignace
+        <div id="1" reel="148224" frame="37" count="15"/>
+        <div id="2" reel="148224" frame="52" count="12"/>
+    </option>
+    <option value="189_G">
+        Soulanges: St. Joseph
+        <div id="1" reel="148224" frame="64" count="17"/>
+        <div id="2" reel="148224" frame="81" count="14"/>
+    </option>
+    <option value="189_H">
+        Soulanges: St. Polycarpe
+        <div id="1" reel="148224" frame="95" count="21"/>
+        <div id="2" reel="148224" frame="116" count="16"/>
+    </option>
+    <option value="189_I">
+        Soulanges: St. Polycarpe Village
+        <div id="" reel="148224" frame="132" count="11"/>
+    </option>
+    <option value="189_J">
+        Soulanges: St. Télesphore
+        <div id="1" reel="148224" frame="143" count="11"/>
+        <div id="2" reel="148224" frame="154" count="10"/>
+        <div id="3" reel="148224" frame="164" count="10"/>
+    </option>
+    <option value="189_K">
+        Soulanges: St. Zotique
+        <div id="1" reel="148224" frame="174" count="12"/>
+        <div id="2" reel="148224" frame="186" count="11"/>
+    </option>
+    <option value="190_A">
+        Stanstead: Barford
+        <div id="1" reel="148224" frame="197" count="21"/>
+        <div id="2" reel="148224" frame="218" count="15"/>
+    </option>
+    <option value="190_B">
+        Stanstead: Barnston
+        <div id="1" reel="148224" frame="233" count="26"/>
+        <div id="2" reel="148224" frame="259" count="30"/>
+    </option>
+    <option value="190_C">
+        Stanstead: Beebe Plains Village
+        <div id="" reel="148224" frame="289" count="9"/>
+    </option>
+    <option value="190_D">
+        Stanstead: Coaticook Town
+        <div id="1" reel="148224" frame="298" count="28"/>
+        <div id="2" reel="148224" frame="326" count="37"/>
+    </option>
+    <option value="190_E">
+        Stanstead: Dixville Village
+        <div id="" reel="148224" frame="363" count="11"/>
+    </option>
+    <option value="190_F">
+        Stanstead: Hatley
+        <div id="1" reel="148224" frame="374" count="24"/>
+        <div id="2" reel="148224" frame="398" count="31"/>
+    </option>
+    <option value="190_G">
+        Stanstead: Magog
+        <div id="1" reel="148224" frame="429" count="6"/>
+        <div id="2" reel="148224" frame="435" count="11"/>
+    </option>
+    <option value="190_H">
+        Stanstead: Magog Village
+        <div id="" reel="148224" frame="446" count="44"/>
+    </option>
+    <option value="190_I">
+        Stanstead: Stanstead
+        <div id="1" reel="148224" frame="490" count="30"/>
+        <div id="2" reel="148224" frame="520" count="32"/>
+        <div id="3" reel="148224" frame="552" count="15"/>
+    </option>
+    <option value="190_J">
+        Stanstead: Stanstead Plain Village
+        <div id="" reel="148224" frame="567" count="13"/>
+    </option>
+    <option value="191_A">
+        Témiscouata: Cabano, Packington &amp; Unorganized Territories
+        <div id="" reel="148224" frame="580" count="8"/>
+    </option>
+    <option value="191_B">
+        Témiscouata: Cacouna
+        <div id="" reel="148224" frame="588" count="20"/>
+    </option>
+    <option value="191_C">
+        Témiscouata: Cacouna Village
+        <div id="" reel="148224" frame="608" count="13"/>
+    </option>
+    <option value="191_D">
+        Témiscouata: Fraserville Town
+        <div id="" reel="148224" frame="621" count="87"/>
+    </option>
+    <option value="191_E">
+        Témiscouata: Ile Verte
+        <div id="" reel="148224" frame="708" count="50"/>
+    </option>
+    <option value="191_F">
+        Témiscouata: Nôtre-Dame des Sept Douleurs
+        <div id="" reel="148224" frame="758" count="7"/>
+    </option>
+    <option value="191_G">
+        Témiscouata: Nôtre-Dame du Lac
+        <div id="" reel="148224" frame="765" count="29"/>
+    </option>
+</select>

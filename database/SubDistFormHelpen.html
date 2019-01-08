@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Census Administration: Sub-Districts Table Help</title>
+    <meta http-equiv=Content-Type content="text/html; charset=utf8">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+	2010/11/23	created
+ *		2011/04/04  	document keyboard shortcuts                     *
+ *		2011/06/06  	document hiding columns                         *
+ *		2013/07/17  	checking for duplicates is now performed by     *
+ *                      script                                          *
+ *		2013/08/30  	document special keystrokes in spreadsheet      *
+ *                      emulation                                       *
+ *		2015/03/17  	document mouse click actions on column headers  *
+ *		2016/01/22  	add censuses table to hierarchy                 *
+ *      2018/11/08      rename to ...Helpen.html                        *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  
+  <body>
+    <div class="topcrumbs">
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+    	<a href="/database/genCensusesHelpen.html">Censuses</a>:
+    	<a href="/database/EditCensusesHelpen.html">Censuses Admin</a>: 
+    	<a href="/database/DistFormHelpen.html">Districts Admin</a>:
+    	<a href="/database/ReqUpdateSubDistsHelpen.html">Select Sub-District</a>: 
+    </div>
+    <div class="help">
+        <h1>Census Administration: Sub-Districts Table Help</h1>
+      <p>Each district of a census of Canada is divided into sub-districts.
+        Generally a sub-district corresponds to a township, town, large village,
+        or a ward in a city.  The 6 character identifier of the census, and  
+        the name and numeric identifier of the district containing the
+        sub-districts are displayed at the bottom and top of the table.
+      </p>
+      <p>All of the information that the application requires to know about a
+        sub-district (or enumeration division) is collected in the Sub-District
+        Table.
+      </p>
+      <p>This form presents the information on all of the sub-districts and
+        enumeration divisions in a requested district as a table that can be
+        manipulated like a spreadsheet.  If authorized you can alter the value
+        of any fields in the table, and can add and delete rows from the table.
+        If you hold the cursor over any field in
+        the form, or over one of the buttons, context specific help pops up.
+      </p>
+      <p>The column headers of the table respond to mouse clicks.  If you click
+        on the left button of the mouse the column header and the contents of the
+        column are hidden from view, permitting you to shrink the horizontal
+        space required to display the contents of the table.  If you then click
+        the left button of the mouse while holding it over the narrow space where
+        the column header was previously, the header and contents of the column
+        are displayed.
+      </p>
+      <p>If you click the right button of the mouse while holding it over a
+        column header, then the space used to display the contents of that column
+        is increased by 50%.  This is useful when the description of the
+        subdistrict is unusually long, for example in the Prairie Provinces.
+      </p>
+      <p>The body of the form functions like a spreadsheet, particularly with
+        respect to special key strokes.
+      </p>
+      <ul>
+        <li>The forward and backward tab keys, and the left and right arrow keys,
+    	change the selected input field in the table
+    	to the left or the right. Motion wraps around at the left and right
+    	edges of the table.
+        <li>The up and down arrows change the selected input field in the table 
+    	up or down one row at a time.
+    	Motion wraps around at the bottom and top of the table.
+        <li>The "Home" key repositions the text cursor at the beginning of the
+    	current input field.  The "End" key repositions the text cursor
+    	after the last character in the current input field.
+        <li>The "Ctl-Home" key combination selects the first input field in the row.
+    	The "Ctl-End" key combination selects the last input field in the row.
+        <li>The "Ctl-Z" key combination discards whatever you have typed in the
+    	current input field, and restores the value to what it was when the
+    	page was first displayed.
+        <li>The "Enter" key changes the selected cell in the table down
+    	one row at a time, rather than submitting the form as happens on
+    	simpler forms.
+      </ul>
+      </p>
+      <p>The columns of the table represent:
+      </p>
+        <ul>
+          <li>The identifier of the sub-district within the district.  For some
+    	censuses (1851, 1861, 1906, 1911, 1921) this is a number.  For others it
+    	is an alphabetic code, such as a letter, a combination of letters,
+    	or a letter followed by a roman numeral exponent.
+    	<p>This is part of the unique key of the sub-district.  Caution must 
+    	be taken in changing it to ensure that the combination of
+    	sub-district and division remains unique within the district.
+    	</p>
+          <li>The division number if the sub-district is divided into divisions.
+    	There is a separate record in this table for each division.
+    	<p>This is part of the unique key of the sub-district.  Caution must 
+    	be taken in changing it to ensure that the combination of
+    	sub-district and division remains unique within the district.
+    	</p>
+          <li>The name of the sub-district.
+    	This does not have to be the same in
+    	all divisions of the sub-district, although that is normally the case.
+          <li>The number of pages in the population (enumeration of the living)
+    	schedule.
+    	This is a decimal number.
+          <li>The first page number in the division.  In most cases this is 1.
+    	However in the 1851 and 1861 censuses the pages were not 
+    	consistently numbered by the enumerators, and the pages were 
+    	subsequently numbered sequentially through the entire sub-district
+    	when the original documents were microfilmed (and the originals
+    	destroyed!).
+          <li>The page increment within the division.  In a few cases when the
+    	1851 and 1861 census pages were numbered, during the microfilming
+    	process, the technician incremented the page number twice for
+    	each leaf of the schedule of the living because information about
+    	the individuals was recorded on both the <i>recto</i> and the 
+    	</i>verso</i> of
+    	each leaf.  In this case the application has to know that only the
+    	odd page numbers are used to identify the page[s] containing
+    	information on an individual.
+          <li>The total number of individuals in the division. 
+    	This is a decimal number.  This is used
+    	by the web pages that track the progress of the transcription.
+    	It is initialized to to assume that the last page of the division
+    	is half-full.  In many censuses the actual number of individuals in
+    	the division is written on the last page of the census.
+          <li>Library &amp; Archives of Canada (LAC) microfilm reel identifier.
+          <li>Church of Latter Day Saints (LDS) Family History Library (FHL) 
+    	microfilm reel number.
+          <li>The "Image Base", and "Relative Frame" fields identify the crucial
+    	numeric values that are used to compute the Uniform Record Locator
+    	(URL) of the image of the first page of the population schedule.
+    	The exact meaning of these two fields depends upon the census.
+    	These are decimal numbers.
+          <li>The number of images for this division on the web site.
+    	This is a decimal number.
+          <li>A column of descriptive remarks.
+          <li>A button to add a division after the current row.  
+    	The new row is added with the same
+    	sub-district identifier, name, LAC Reel identifier, and LDS Reel
+    	identifier as the current row.  The division number is set to
+    	one higher than the division number of the current row.
+    	Note that the application does not ensure uniqueness of the
+    	record key. 
+          <li>A button to delete a sub-district or enumeration division 
+    	from the table.
+          <li>A link to the form for editting the Page table for the division.
+          <li>For some censuses a button to display the first image in the 
+    	division.
+        </ul>
+      </p>
+      <p>Once you have made all of the changes to the data you apply the
+        changes to the database by using the mouse to click on the 
+        <span class="button"><u>U</u>pdate Database</span> button.
+        Alternatively you can use the keyboard shortcuts Ctrl-S or Alt-U.
+        If you have accidentally created divisions with duplicate identification
+        fields they are flagged and you must resolve the duplication before
+        submitting the changes.
+      </p>
+    </div>
+    <div class="botcrumbs">
+    	<a href="/contactAuthor.php?subject=SubDistFormHelpen.html" target="_blank">Contact Author</a>
+    	<br/>
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+    	<a href="/database/genCensusesHelpen.html">Censuses</a>: 
+    	<a href="/database/EditCensusesHelpen.html">Censuses Admin</a>:
+    	<a href="/database/DistFormHelpen.html">Districts Admin</a>:
+    	<a href="/database/ReqUpdateSubDistsHelpen.html">Select Sub-District</a>: 
+          <span class="right">
+            <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+          </span>
+      <span style="clear: both;"></span>
+    </div>
+  </body>
+</html>

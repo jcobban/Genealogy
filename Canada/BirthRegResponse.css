@@ -1,0 +1,36 @@
+/************************************************************************
+ *  BirthRegResponse.css						*
+ *									*
+ *  Stylesheet for the scripts BirthRegResponse.php			*
+ *									*
+ *  History:								*
+ *	2015/05/01	created						*
+ *									*
+ *  Copyright &copy; 2015 James A. Cobban				*
+ ************************************************************************/
+
+    td.oddDate {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:#F8F8F8;
+		border-right:	thin solid black;
+		border-bottom:	thin solid black;
+		padding:	2px 2px 2px 1.2em;
+		text-indent:	-1em;
+		color:		black;
+		empty-cells:	show;
+		width:		95px;
+		}
+
+    td.evenDate {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:#E0E0E0;
+		border-right:	thin solid black;
+		border-bottom:	thin solid black;
+		padding:	2px 2px 2px 1.2em;
+		text-indent:	-1em;
+		color:		black;
+		empty-cells:	show;
+		width:		95px;
+		}

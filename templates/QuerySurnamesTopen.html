@@ -1,0 +1,98 @@
+<!--*********************************************************************
+ *  QuerySurnamesTop.php												*
+ *																		*
+ *  Top index of surnames display.  Lists letters of the alphabet		*
+ *  and number of surnames for each.									*
+ *																		*
+ *  History:															*
+ *		2019/11/10		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+      <a href="/database/genCensuses.php?cc=CA&amp;lang=$LANG">Censuses</a>:
+      <a href="/database/QueryDetail.php?Census=$CENSUSID&Province=$PROVINCE&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&lang=$LANG">
+  	        $CENSUSYEAR	 Census Search
+      </a>: 
+      <a href="/database/ReqUpdate.php?Census=$CENSUSID&Province=$PROVINCE&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&lang=$LANG">
+  	        $CENSUSYEAR	 Census Select Page
+      </a>:
+      <a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&lang=$LANG">
+  	        Summary
+      </a>:
+      <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTID&lang=$LANG">
+  	        District $DISTID $DNAME Summary
+      </a>:
+      <span id="crumbSubdist">
+        <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&amp;Division=$DIVISION&lang=$LANG">
+  	        Division Details
+        </a>:
+      </span>
+    </div>
+    <div class='body'>
+      <h1>
+        <span class='right'>
+  		<a href='QuerySurnamesTopHelpen.html' target='help'>? Help</a>
+        </span>
+            $CENSUSYEAR Census of $COUNTRYNAME: District $DISTID $DNAME: 
+            <span id="titleSubdist">SubDistrict '$SUBDISTID' $SDNAME:
+            <span id="titleDivision">Division $DIVISION:</span></span>
+  	        Surname Top Index
+         <div style='clear: both;'></div>
+      </h1>
+      $TRACE
+      $MSG
+	  <!--- Put out the response as a table -->
+	  <table class='summary' id="results" cellspacing='0px'>
+	    <thead>
+	      <!--- Put out the column headers -->
+	      <!--- Note that you can customize the number of columns by
+	            adding or deleting pairs of columns from this header row -->
+	      <tr id="headerRow">
+			<th class='colhead'>
+			    Initial
+			</th>
+			<th class='colhead'>
+			    Count
+			</th>
+			<th class='colhead'>
+			    Initial
+			</th>
+			<th class='colhead'>
+			    Count
+			</th>
+			<th class='colhead'>
+			    Initial
+			</th>
+			<th class='colhead'>
+			    Count
+			</th>
+			<th class='colhead'>
+			    Initial
+			</th>
+			<th class='colhead'>
+			    Count
+			</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr id="row">
+			<td class='$CLASS center' id="initialCell">
+			    <a href='QuerySurnames.php$NPURI&Surname=$PATTERN&lang=$LANG'>
+			    $INITIAL
+			    </a>
+			</td>
+			<td class='$CLASS right' id="statsCell">
+			    $NUMBER
+			</td>
+	      </tr>
+	      </tr>
+	    </tbody>
+	  </table>
+    </div> <!-- class="body" -->
+    <script src="/jscripts/js20/http.js" type="application/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javaScript">
+    </script>

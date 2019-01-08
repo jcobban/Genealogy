@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148154">
+    <option value="89_D">
+        London City: Ward 4
+        <div id="7" reel="148154" frame="0" count="21"/>
+        <div id="8" reel="148154" frame="21" count="9"/>
+    </option>
+    <option value="90_A">
+        Middlesex East: Dorchester N.
+        <div id="1" reel="148154" frame="30" count="25"/>
+        <div id="2" reel="148154" frame="55" count="27"/>
+        <div id="3" reel="148154" frame="82" count="27"/>
+    </option>
+    <option value="90_B">
+        Middlesex East: Dorchester S.
+        <div id="1" reel="148154" frame="109" count="18"/>
+        <div id="2" reel="148154" frame="127" count="16"/>
+    </option>
+    <option value="90_C">
+        Middlesex East: London Twp.
+        <div id="1" reel="148154" frame="143" count="25"/>
+        <div id="2" reel="148154" frame="168" count="22"/>
+        <div id="3" reel="148154" frame="190" count="23"/>
+        <div id="4" reel="148154" frame="213" count="23"/>
+        <div id="5" reel="148154" frame="236" count="16"/>
+        <div id="6" reel="148154" frame="252" count="27"/>
+        <div id="7" reel="148154" frame="279" count="50"/>
+    </option>
+    <option value="90_D">
+        Middlesex East: London East
+        <div id="1" reel="148154" frame="329" count="58"/>
+        <div id="2" reel="148154" frame="387" count="52"/>
+    </option>
+    <option value="90_E">
+        Middlesex East: London West
+        <div id="" reel="148154" frame="439" count="39"/>
+    </option>
+    <option value="90_F">
+        Middlesex East: Nissouri West
+        <div id="1" reel="148154" frame="478" count="28"/>
+        <div id="2" reel="148154" frame="506" count="22"/>
+        <div id="3" reel="148154" frame="528" count="21"/>
+    </option>
+    <option value="90_G">
+        Middlesex East: Springfield Village
+        <div id="" reel="148154" frame="549" count="10"/>
+    </option>
+    <option value="91_A">
+        Middlesex North: Ailsa Craig
+        <div id="" reel="148154" frame="559" count="17"/>
+    </option>
+    <option value="91_B">
+        Middlesex North: Biddulph
+        <div id="1" reel="148154" frame="576" count="19"/>
+        <div id="2" reel="148154" frame="595" count="18"/>
+        <div id="3" reel="148154" frame="613" count="18"/>
+    </option>
+    <option value="91_C">
+        Middlesex North: Exeter Village
+        <div id="1" reel="148154" frame="631" count="23"/>
+        <div id="2" reel="148154" frame="654" count="15"/>
+    </option>
+    <option value="91_D">
+        Middlesex North: Lucan
+        <div id="" reel="148154" frame="669" count="20"/>
+    </option>
+    <option value="91_E">
+        Middlesex North: McGillivray
+        <div id="1" reel="148154" frame="689" count="24"/>
+        <div id="2" reel="148154" frame="713" count="24"/>
+        <div id="3" reel="148154" frame="737" count="25"/>
+    </option>
+    <option value="91_F">
+        Middlesex North: Parkhill
+        <div id="1" reel="148154" frame="762" count="19"/>
+        <div id="2" reel="148154" frame="781" count="18"/>
+    </option>
+</select>

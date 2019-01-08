@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148221">
+    <option value="183_A">
+        Rouville: Canrobert Village
+        <div id="" reel="148221" frame="0" count="7"/>
+    </option>
+    <option value="183_B">
+        Rouville: L'Ange Gardien
+        <div id="" reel="148221" frame="7" count="38"/>
+    </option>
+    <option value="183_C">
+        Rouville: Marieville Village
+        <div id="" reel="148221" frame="45" count="26"/>
+    </option>
+    <option value="183_D">
+        Rouville: Nôtre-Dame de Bonsecours
+        <div id="" reel="148221" frame="71" count="12"/>
+    </option>
+    <option value="183_E">
+        Rouville: Richelieu Village
+        <div id="" reel="148221" frame="83" count="12"/>
+    </option>
+    <option value="183_F">
+        Rouville: Ste. Angèle
+        <div id="" reel="148221" frame="95" count="27"/>
+    </option>
+    <option value="183_G">
+        Rouville: St. Césaire
+        <div id="" reel="148221" frame="122" count="33"/>
+    </option>
+    <option value="183_H">
+        Rouville: St. Césaire Village
+        <div id="" reel="148221" frame="155" count="22"/>
+    </option>
+    <option value="183_I">
+        Rouville: St. Hilaire
+        <div id="" reel="148221" frame="177" count="26"/>
+    </option>
+    <option value="183_J">
+        Rouville: St. Jean Baptiste
+        <div id="" reel="148221" frame="203" count="34"/>
+    </option>
+    <option value="183_K">
+        Rouville: Ste. Marie de Monnoir
+        <div id="" reel="148221" frame="237" count="31"/>
+    </option>
+    <option value="183_L">
+        Rouville: St. Mathias
+        <div id="" reel="148221" frame="268" count="16"/>
+    </option>
+    <option value="183_M">
+        Rouville: St. Michel de Rougemont
+        <div id="" reel="148221" frame="284" count="18"/>
+    </option>
+    <option value="183_N">
+        Rouville: St. Paul d'Abbotsford
+        <div id="1" reel="148221" frame="302" count="8"/>
+        <div id="2" reel="148221" frame="310" count="32"/>
+    </option>
+    <option value="184_A">
+        St. Hyacinthe: La Présentation
+        <div id="1" reel="148221" frame="342" count="11"/>
+        <div id="2" reel="148221" frame="353" count="16"/>
+    </option>
+    <option value="184_B">
+        St. Hyacinthe: Nôtre-Dame de St. Hyacinthe
+        <div id="" reel="148221" frame="369" count="58"/>
+    </option>
+    <option value="184_C">
+        St. Hyacinthe: St. Barnabé
+        <div id="" reel="148221" frame="427" count="21"/>
+    </option>
+    <option value="184_D">
+        St. Hyacinthe: St. Charles
+        <div id="" reel="148221" frame="448" count="22"/>
+    </option>
+    <option value="184_E">
+        St. Hyacinthe: St. Damase
+        <div id="" reel="148221" frame="470" count="37"/>
+    </option>
+    <option value="184_F">
+        St. Hyacinthe: St. Dénis
+        <div id="1" reel="148221" frame="507" count="26"/>
+        <div id="2" reel="148221" frame="533" count="21"/>
+    </option>
+    <option value="184_G">
+        St. Hyacinthe: St. Hyacinthe City
+        <div id="1" reel="148221" frame="554" count="17"/>
+        <div id="2" reel="148221" frame="571" count="30"/>
+        <div id="3" reel="148221" frame="601" count="20"/>
+        <div id="4" reel="148221" frame="621" count="33"/>
+        <div id="5" reel="148221" frame="654" count="23"/>
+        <div id="6" reel="148221" frame="677" count="23"/>
+    </option>
+    <option value="184_H">
+        St. Hyacinthe: St. Hyacinthe le Confesseur
+        <div id="" reel="148221" frame="700" count="20"/>
+    </option>
+    <option value="184_I">
+        St. Hyacinthe: St. Jude
+        <div id="1" reel="148221" frame="720" count="26"/>
+        <div id="2" reel="148221" frame="746" count="20"/>
+    </option>
+    <option value="184_J">
+        St. Hyacinthe: St. Louis de Bonsecours
+        <div id="" reel="148221" frame="766" count="6"/>
+    </option>
+    <option value="184_K">
+        St. Hyacinthe: Ste. Marie Madeleine
+        <div id="" reel="148221" frame="772" count="20"/>
+    </option>
+</select>

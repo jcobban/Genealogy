@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148197">
+    <option value="152_HH">
+        Drummond &amp; Arthabaska: Wickham East
+        <div id="" reel="148197" frame="0" count="11"/>
+    </option>
+    <option value="152_II">
+        Drummond &amp; Arthabaska: Wickham West
+        <div id="" reel="148197" frame="11" count="23"/>
+    </option>
+    <option value="153_A">
+        Gaspé: Basin
+        <div id="" reel="148197" frame="34" count="18"/>
+    </option>
+    <option value="153_B">
+        Gaspé: Cap Chat
+        <div id="" reel="148197" frame="52" count="26"/>
+    </option>
+    <option value="153_C">
+        Gaspé: Cap Rosier
+        <div id="" reel="148197" frame="78" count="18"/>
+    </option>
+    <option value="153_D">
+        Gaspé: Chlorydorme
+        <div id="" reel="148197" frame="96" count="14"/>
+    </option>
+    <option value="153_E">
+        Gaspé: Douglas
+        <div id="1" reel="148197" frame="110" count="22"/>
+        <div id="2" reel="148197" frame="132" count="11"/>
+    </option>
+    <option value="153_F">
+        Gaspé: Étang du Nord
+        <div id="" reel="148197" frame="143" count="41"/>
+    </option>
+    <option value="153_G">
+        Gaspé: Fox &amp; Sydenham North
+        <div id="" reel="148197" frame="184" count="29"/>
+    </option>
+    <option value="153_H">
+        Gaspé: Gaspé Bay North &amp; Sydenham South
+        <div id="1" reel="148197" frame="213" count="14"/>
+        <div id="2" reel="148197" frame="227" count="12"/>
+    </option>
+    <option value="153_I">
+        Gaspé: Gaspé Village
+        <div id="" reel="148197" frame="239" count="8"/>
+    </option>
+    <option value="153_J">
+        Gaspé: Grande Vallée des Monts
+        <div id="" reel="148197" frame="247" count="12"/>
+    </option>
+    <option value="153_K">
+        Gaspé: Grosse Île, Isle Bryon, &amp; Bird Rocks
+        <div id="" reel="148197" frame="259" count="9"/>
+    </option>
+    <option value="153_L">
+        Gaspé: Havre Aubert
+        <div id="" reel="148197" frame="268" count="13"/>
+    </option>
+    <option value="153_M">
+        Gaspé: Havre aux Maisons
+        <div id="" reel="148197" frame="281" count="24"/>
+    </option>
+    <option value="153_N">
+        Gaspé: La Grande Rivière
+        <div id="" reel="148197" frame="305" count="49"/>
+    </option>
+    <option value="153_O">
+        Gaspé: L'Anse aux Griffons
+        <div id="" reel="148197" frame="354" count="23"/>
+    </option>
+    <option value="153_P">
+        Gaspé: L'Anse du Cap
+        <div id="" reel="148197" frame="377" count="31"/>
+    </option>
+    <option value="153_Q">
+        Gaspé: Malbaie
+        <div id="1" reel="148197" frame="408" count="19"/>
+        <div id="2" reel="148197" frame="427" count="19"/>
+    </option>
+    <option value="153_R">
+        Gaspé: Mont Louis
+        <div id="" reel="148197" frame="446" count="19"/>
+    </option>
+    <option value="153_S">
+        Gaspé: Newport
+        <div id="" reel="148197" frame="465" count="32"/>
+    </option>
+    <option value="153_T">
+        Gaspé: Pabos
+        <div id="" reel="148197" frame="497" count="29"/>
+    </option>
+    <option value="153_U">
+        Gaspé: Percé
+        <div id="" reel="148197" frame="526" count="37"/>
+    </option>
+    <option value="153_V">
+        Gaspé: Ste. Anne des Monts
+        <div id="" reel="148197" frame="563" count="37"/>
+    </option>
+    <option value="153_W">
+        Gaspé: York
+        <div id="" reel="148197" frame="600" count="9"/>
+    </option>
+    <option value="154_A">
+        Hochelaga: Côte des Neiges Village
+        <div id="" reel="148197" frame="609" count="9"/>
+    </option>
+    <option value="154_B">
+        Hochelaga: Côte St. Antoine Village
+        <div id="1" reel="148197" frame="618" count="29"/>
+        <div id="2" reel="148197" frame="647" count="35"/>
+    </option>
+    <option value="154_C">
+        Hochelaga: Côte St. Louis Town
+        <div id="1" reel="148197" frame="682" count="21"/>
+        <div id="2" reel="148197" frame="703" count="41"/>
+    </option>
+    <option value="154_D">
+        Hochelaga: Côte St. Paul
+        <div id="" reel="148197" frame="744" count="11"/>
+    </option>
+    <option value="154_E">
+        Hochelaga: Côte St. Paul Village
+        <div id="" reel="148197" frame="755" count="18"/>
+    </option>
+    <option value="154_F">
+        Hochelaga: Côte Visitation Village
+        <div id="" reel="148197" frame="773" count="17"/>
+    </option>
+</select>

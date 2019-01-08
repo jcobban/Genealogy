@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+  <head>
+    <title>Ontario: Birth Registration Details: Help</title>
+    <META HTTP-EQUIV='CONTENT-TYPE' CONTENT='text/html; charset=utf-8'>
+    <META http-equiv='Content-Style-Type' content='text/css'>
+    <meta name='author' content='James A. Cobban'>
+    <meta name='copyright' content='&copy; 2015 James A. Cobban'>
+<!--*********************************************************************
+ *  History:															*
+ *		2012/03/31		created											*
+ *		2014/01/02		replace tables with CSS							*
+ *		2015/05/11		use contactAuthor.php to contact administrator	*
+ *						style was not cleared in page footer			*
+ *      2018/11/23      change xxxxHelpen.html to xxxxHelpen.html         *
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='/styles.css'/>
+  </head>
+  <body>
+    <div class='topcrumbs'>
+      <a href='/indexHelpen.html'>Home</a>: 
+      <a href='/genealogyHelpen.html'>Genealogy</a>: 
+      <a href='/Canada/genCanadaHelpen.html'>Canada</a>:
+      <a href='/Ontario/genOntarioHelpen.html'>Ontario</a>:
+      <a href='/Canada/BirthRegQueryHelpen.html'>Birth Query</a>:
+    </div>
+    <div class='help'>
+      <h1>Birth Registration Details: Help
+      </h1>
+    <p>The associated panel permits updating the database of
+    Ontario Birth Registrations.
+    <p><span class='label'>Navigation:</span>
+    There are three navigation buttons at the top of the page:
+    <ul>
+        <li>Clicking on <span class='button'><u>P</u>revious</span> 
+    	displays the registration with the next lower registration
+    	number within the current year.
+    	You may also use the keyboard shortcut Alt-P.
+        <li>Clicking on<span class='button'><u>N</u>ext</span> 
+    	displays the registration with the next higher registration
+    	number within the current year.
+    	You may also use the keyboard shortcut Alt-N.
+        <li>Clicking on<span class='button'>New <u>Q</u>uery</span> 
+    	displays the <a href='BirthRegQueryHelpen.html'>Birth Registration
+    	Query</a> dialog.
+    	You may also use the keyboard shortcut Alt-Q.
+    </ul>
+    <p><span class='label'>Identification:</span>
+    This row of the display identifies the specific registration
+    by specifying the year of 
+    registration and the number assigned by the Ontario Registrar when the records
+    were indexed.
+    <p><span class='label'>Registration: County:</span>
+    This is a selection listing all of the counties and districts in Ontario.
+    For an existing record the county specified in that record is selected.
+    For a new record the county specified in the existing record with the
+    highest registration number less than the current record is selected.
+    This is because registrations from a particular county, or district, always
+    have contiguous registration numbers.
+    <p><span class='label'>
+    Registration: Township:
+    </span>
+    This is usually a selection list of all of the villages, towns, townships, 
+    and cities within the county that at some period had a clerk collecting
+    registrations.  If a county is not selected 
+    or if the township name is misspelled in the existing record 
+    then this is a text input field.
+    For an existing record the township specified in that record is selected.
+    For a new record the township specified in the existing record with the
+    highest registration number less than the current record is selected.
+    This is because registrations from a particular clerk generally
+    have contiguous registration numbers.
+    Clicking on this button performs the query.  This may also be requested by
+    pressing the Enter key while the input focus is in a text field.
+    <p><span class='label'>Given Name:</span>
+    <p>
+    The given names of the the child.
+    </p>
+    <p><span class='label'>Surname</span>
+    <p>
+    The family name of the the child.
+    </p>
+    <p><span class='label'>Sex</span>
+    <p>
+    The sex of the child.  This is a selection list.
+    </p>
+    <p><span class='label'>Parents Married</span>
+    <p>
+    This indicates whether the child's parents were married, in other words
+    whether the child is legitimate or not.  This is a checkbox.
+    </p>
+    <p><span class='label'>Birth Place:</span>
+    <p>
+    The place where the child was born.  This defaults to the
+    township.
+    </p>
+    <p><span class='label'>Birth Date:</span>
+    <p>
+    The date of birth.
+    It is recommended that, for consistency, this should be entered as 
+    day, month name or abbreviation, and year.  Month abbreviations are expanded,
+    as documented by the popup help balloon.
+    </p>
+    <p><span class='label'>Link:</span>
+    <p>
+    If this registration has been cited in the family tree as documentation for
+    a birth, then a hyperlink is provided to the family tree page for the
+    child.  Otherwise if possible a selection list of entries in the family
+    tree that resemble this birth are displayed so you can choose one.  Choosing
+    an entry adds a citation to this birth registration onto the child's record
+    in the family tree.
+    </p>
+    <p><span class='label'>Father:</span>
+    <p>
+    The name of the Father of the child.
+    </p>
+    <p><span class='label'>Occupation:</span>
+    <p>
+    The occupation of the father.
+    </p>
+    <p><span class='label'>Place of Work</span>
+    <p>
+    The place of work or residence of the father.
+    </p>
+    <p><span class='label'>Mother:</span>
+    <p>
+    The name of the Mother of the child.
+    </p>
+    <p><span class='label'>Occupation:</span>
+    <p>
+    The occupation of the mother.
+    </p>
+    <p><span class='label'>Place of Work</span>
+    <p>
+    The place of work or residence of the mother.
+    </p>
+    <p><span class='label'>Attendant</span>
+    <p>
+    The name of the doctor or midwife who assisted with the birth.
+    </p>
+    <p><span class='label'>Marriage Place</span>
+    <p>
+    In some registrations the place of marriage of the parents was required.
+    </p>
+    <p><span class='label'>Marriage Date</span>
+    <p>
+    In some registrations the date of marriage of the parents was required.
+    </p>
+    <p><span class='label'>Informant: Name:</span>
+    <p>
+    The name of the person who informed the township clerk of the birth.
+    </p>
+    <p><span class='label'>Residence:</span>
+    <p>
+    The residence of the informant to the birth.
+    </p>
+    <p><span class='label'>Relation:</span>
+    <p>
+    The relationship of the informant to the child.  This is a combination of
+    a selection list for the most typical values and a text field for others.
+    </p>
+    <p><span class='label'>Remarks</span>
+    <p>This field is used to record any comments by the registrar or clerk.
+    You may use this field to record your own comments by enclosing them in
+    editorial square brackets.
+    </p>
+    <p><span class='label'>Image</span>
+    <p>This field is used to specify the uniform record location (URL)
+    that displays the image of the original registration.
+    </p>
+    <p>Clicking on <span class='button'><u>U</u>pdate</span>
+    commits the changes you have made to the database.
+    The page also supports the keyboard short-cuts Ctrl-S and Alt-U.
+    </div>
+    <p>Clicking on <span class='button'><u>C</u>lear Form</span>
+    resets the values of some fields to their defaults.
+    The page also supports the keyboard short-cut Alt-C.
+    </div>
+    <div class='botcrumbs'>
+      <span class='right'>
+    	<img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+      </span>
+      <a href='/contactAuthor.php?subject=BirthRegDetailHelpen.html'
+    	target='_blank'>
+    	Contact Author</a>
+      <br/>
+      <a href='/indexHelpen.html'>Home</a>: 
+      <a href='/genealogyHelpen.html'>Genealogy</a>: 
+      <a href='/Canada/genCanadaHelpen.html'>Canada</a>:
+      <a href='/Ontario/genOntarioHelpen.html'>Ontario</a>:
+      <a href='/Canada/BirthRegQueryHelpen.html'>Birth Query</a>:
+      <div style='clear: both;'></div> 
+    </div>
+  </body>
+</html>

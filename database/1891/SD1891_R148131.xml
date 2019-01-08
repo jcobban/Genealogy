@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148131">
+    <option value="53_C">
+        Bruce West: Kincardine
+        <div id="1" reel="148131" frame="0" count="37"/>
+        <div id="2" reel="148131" frame="37" count="38"/>
+    </option>
+    <option value="53_D">
+        Bruce West: Kincardine Town
+        <div id="1" reel="148131" frame="75" count="27"/>
+        <div id="2" reel="148131" frame="102" count="28"/>
+    </option>
+    <option value="53_E">
+        Bruce West: Kinloss
+        <div id="1" reel="148131" frame="130" count="23"/>
+        <div id="2" reel="148131" frame="153" count="37"/>
+    </option>
+    <option value="53_F">
+        Bruce West: Lucknow Village
+        <div id="1" reel="148131" frame="190" count="17"/>
+        <div id="2" reel="148131" frame="207" count="10"/>
+    </option>
+    <option value="53_G">
+        Bruce West: Saugeen
+        <div id="" reel="148131" frame="217" count="37"/>
+    </option>
+    <option value="53_H">
+        Bruce West: Tiverton Village
+        <div id="" reel="148131" frame="254" count="12"/>
+    </option>
+    <option value="54_A">
+        Cardwell: Adjala
+        <div id="1" reel="148131" frame="266" count="18"/>
+        <div id="2" reel="148131" frame="284" count="17"/>
+        <div id="3" reel="148131" frame="301" count="17"/>
+    </option>
+    <option value="54_B">
+        Cardwell: Albion
+        <div id="1" reel="148131" frame="318" count="17"/>
+        <div id="2" reel="148131" frame="335" count="14"/>
+        <div id="3" reel="148131" frame="349" count="14"/>
+        <div id="4" reel="148131" frame="363" count="22"/>
+    </option>
+    <option value="54_C">
+        Cardwell: Bolton Village
+        <div id="" reel="148131" frame="385" count="16"/>
+    </option>
+    <option value="54_D">
+        Cardwell: Caledon
+        <div id="" reel="148131" frame="401" count="16"/>
+    </option>
+    <option value="53_C">
+        Bruce West: Kincardine
+        <div id="1" reel="148131" frame="418" count="38"/>
+        <div id="2" reel="148131" frame="456" count="38"/>
+    </option>
+    <option value="53_D">
+        Bruce West: Kincardine Town
+        <div id="1" reel="148131" frame="494" count="27"/>
+        <div id="2" reel="148131" frame="521" count="28"/>
+    </option>
+    <option value="53_E">
+        Bruce West: Kinloss
+        <div id="1" reel="148131" frame="549" count="23"/>
+        <div id="2" reel="148131" frame="572" count="37"/>
+    </option>
+    <option value="53_F">
+        Bruce West: Lucknow Village
+        <div id="1" reel="148131" frame="609" count="17"/>
+        <div id="2" reel="148131" frame="626" count="10"/>
+    </option>
+    <option value="53_G">
+        Bruce West: Saugeen
+        <div id="" reel="148131" frame="636" count="37"/>
+    </option>
+    <option value="53_H">
+        Bruce West: Tiverton Village
+        <div id="" reel="148131" frame="673" count="12"/>
+    </option>
+    <option value="54_A">
+        Cardwell: Adjala
+        <div id="1" reel="148131" frame="685" count="18"/>
+        <div id="2" reel="148131" frame="703" count="17"/>
+        <div id="3" reel="148131" frame="720" count="17"/>
+    </option>
+    <option value="54_B">
+        Cardwell: Albion
+        <div id="1" reel="148131" frame="737" count="17"/>
+        <div id="2" reel="148131" frame="754" count="14"/>
+        <div id="3" reel="148131" frame="768" count="14"/>
+        <div id="4" reel="148131" frame="782" count="22"/>
+    </option>
+    <option value="54_C">
+        Cardwell: Bolton Village
+        <div id="" reel="148131" frame="804" count="16"/>
+    </option>
+    <option value="54_D">
+        Cardwell: Caledon
+        <div id="1" reel="148131" frame="820" count="42"/>
+        <div id="2" reel="148131" frame="862" count="27"/>
+        <div id="3" reel="148131" frame="889" count="21"/>
+        <div id="4" reel="148131" frame="910" count="24"/>
+    </option>
+    <option value="54_E">
+        Cardwell: Mono
+        <div id="1" reel="148131" frame="934" count="16"/>
+        <div id="2" reel="148131" frame="950" count="19"/>
+        <div id="3" reel="148131" frame="969" count="19"/>
+        <div id="4" reel="148131" frame="988" count="19"/>
+    </option>
+    <option value="55_A">
+        Carleton: Goulbourn
+        <div id="1" reel="148131" frame="1007" count="20"/>
+        <div id="2" reel="148131" frame="1027" count="26"/>
+        <div id="3" reel="148131" frame="1053" count="12"/>
+    </option>
+    <option value="55_B">
+        Carleton: March
+        <div id="1" reel="148131" frame="1065" count="14"/>
+        <div id="2" reel="148131" frame="1079" count="13"/>
+    </option>
+    <option value="55_C">
+        Carleton: Marlborough
+        <div id="1" reel="148131" frame="1092" count="21"/>
+        <div id="2" reel="148131" frame="1113" count="15"/>
+    </option>
+</select>

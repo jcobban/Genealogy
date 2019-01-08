@@ -1,0 +1,117 @@
+/************************************************************************
+ *  Location.css							*
+ *									*
+ *  Stylesheet for the script Location.php				*
+ *									*
+ *  History:								*
+ *	2014/03/12	created						*
+ *	2017/09/09	renamed to Location.css				*
+ *									*
+ *  Copyright &copy; 2017 James A. Cobban				*
+ ************************************************************************/
+
+/*	column containers */
+    div.row {	white-space:	nowrap; }
+
+    div.column1	{float:		left;
+		margin-top:	1px;
+		margin-right:	3px;
+		width:		285px;
+		}
+
+/*	labels of various widths */
+    label.column1 {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		font-size:	smaller;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		margin-top:	1px;
+		float:		left;
+		width:		9em;
+		}
+    input.left {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		black;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		39em;
+		margin-bottom:	2px;
+		}
+    input.lefterror {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		red;
+		text-transform: capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		39em;
+		margin-bottom:	2px;
+		}
+    input.leftdate {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		black;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		8em;
+		margin-bottom:	2px;
+		}
+    input.leftdateerror {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		red;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		8em;
+		margin-bottom:	2px;
+		}
+    input.leftloc {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		black;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		32em;
+		margin-bottom:	2px;
+		}
+    input.leftnc {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		black;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		39em;
+		margin-bottom:	2px;
+		}
+    select.leftwide {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		black;
+		padding:	0px;
+		width:		39em;
+		margin-bottom:	2px;
+		}

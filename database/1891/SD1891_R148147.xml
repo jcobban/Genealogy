@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148147">
+    <option value="77_C">
+        Huron South: Hullett
+        <div id="3" reel="148147" frame="0" count="28"/>
+    </option>
+    <option value="77_D">
+        Huron South: McKillop
+        <div id="1" reel="148147" frame="28" count="23"/>
+        <div id="2" reel="148147" frame="51" count="21"/>
+        <div id="3" reel="148147" frame="72" count="20"/>
+    </option>
+    <option value="77_E">
+        Huron South: Seaforth Town
+        <div id="1" reel="148147" frame="92" count="34"/>
+        <div id="2" reel="148147" frame="126" count="24"/>
+    </option>
+    <option value="77_F">
+        Huron South: Stanley
+        <div id="1" reel="148147" frame="150" count="16"/>
+        <div id="2" reel="148147" frame="166" count="21"/>
+        <div id="3" reel="148147" frame="187" count="17"/>
+    </option>
+    <option value="77_G">
+        Huron South: Tuckersmith
+        <div id="1" reel="148147" frame="204" count="22"/>
+        <div id="2" reel="148147" frame="226" count="24"/>
+        <div id="3" reel="148147" frame="250" count="15"/>
+    </option>
+    <option value="78_A">
+        Huron West: Ashfield
+        <div id="1" reel="148147" frame="265" count="28"/>
+        <div id="2" reel="148147" frame="293" count="28"/>
+        <div id="3" reel="148147" frame="321" count="26"/>
+    </option>
+    <option value="78_B">
+        Huron West: Clinton Town
+        <div id="1" reel="148147" frame="347" count="28"/>
+        <div id="2" reel="148147" frame="375" count="26"/>
+    </option>
+    <option value="78_C">
+        Huron West: Colborne
+        <div id="1" reel="148147" frame="401" count="24"/>
+        <div id="2" reel="148147" frame="425" count="22"/>
+    </option>
+    <option value="78_D">
+        Huron West: Wawanosh East
+        <div id="1" reel="148147" frame="447" count="24"/>
+        <div id="2" reel="148147" frame="471" count="22"/>
+    </option>
+    <option value="78_E">
+        Huron West: Goderich
+        <div id="1" reel="148147" frame="493" count="21"/>
+        <div id="2" reel="148147" frame="514" count="23"/>
+        <div id="3" reel="148147" frame="537" count="20"/>
+    </option>
+    <option value="78_F">
+        Huron West: Goderich Town
+        <div id="1" reel="148147" frame="557" count="29"/>
+        <div id="2" reel="148147" frame="586" count="26"/>
+        <div id="3" reel="148147" frame="612" count="32"/>
+    </option>
+    <option value="78_G">
+        Huron West: Wawanosh West
+        <div id="1" reel="148147" frame="644" count="30"/>
+        <div id="2" reel="148147" frame="674" count="26"/>
+    </option>
+    <option value="79_A">
+        Kent: Blenheim Town
+        <div id="1" reel="148147" frame="700" count="20"/>
+        <div id="2" reel="148147" frame="720" count="16"/>
+    </option>
+    <option value="79_B">
+        Kent: Chatham Town
+        <div id="1" reel="148147" frame="736" count="40"/>
+        <div id="2" reel="148147" frame="776" count="47"/>
+    </option>
+</select>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148152">
+    <option value="86_C">
+        Leeds South: Crosby North
+        <div id="1" reel="148152" frame="0" count="5"/>
+        <div id="2" reel="148152" frame="5" count="39"/>
+    </option>
+    <option value="86_D">
+        Leeds South: Crosby South
+        <div id="1" reel="148152" frame="44" count="33"/>
+        <div id="2" reel="148152" frame="77" count="6"/>
+    </option>
+    <option value="86_E">
+        Leeds South: Gananoque Town
+        <div id="1" reel="148152" frame="83" count="51"/>
+        <div id="2" reel="148152" frame="134" count="24"/>
+    </option>
+    <option value="86_F">
+        Leeds South: Lansdowne Front
+        <div id="1" reel="148152" frame="158" count="20"/>
+        <div id="2" reel="148152" frame="178" count="24"/>
+        <div id="3" reel="148152" frame="202" count="28"/>
+    </option>
+    <option value="86_G">
+        Leeds South: Lansdowne Rear
+        <div id="1" reel="148152" frame="230" count="24"/>
+        <div id="2" reel="148152" frame="254" count="0"/>
+    </option>
+    <option value="86_H">
+        Leeds South: Newboro Village
+        <div id="" reel="148152" frame="254" count="38"/>
+    </option>
+    <option value="86_I">
+        Leeds South: Yonge &amp; Escott Front
+        <div id="1" reel="148152" frame="292" count="34"/>
+        <div id="2" reel="148152" frame="326" count="25"/>
+    </option>
+    <option value="86_J">
+        Leeds South: Yonge &amp; Escott Rear
+        <div id="" reel="148152" frame="351" count="29"/>
+    </option>
+    <option value="87_A">
+        Lennox: Adolphustown
+        <div id="" reel="148152" frame="380" count="15"/>
+    </option>
+    <option value="87_B">
+        Lennox: Amherst Island
+        <div id="" reel="148152" frame="395" count="20"/>
+    </option>
+    <option value="87_C">
+        Lennox: Bath Village
+        <div id="" reel="148152" frame="415" count="12"/>
+    </option>
+    <option value="87_D">
+        Lennox: Ernestown
+        <div id="1" reel="148152" frame="427" count="33"/>
+        <div id="2" reel="148152" frame="460" count="42"/>
+    </option>
+    <option value="87_E">
+        Lennox: Fredericksburg North
+        <div id="1" reel="148152" frame="502" count="18"/>
+        <div id="2" reel="148152" frame="520" count="18"/>
+    </option>
+    <option value="87_F">
+        Lennox: Fredericksburg South
+        <div id="1" reel="148152" frame="538" count="13"/>
+        <div id="2" reel="148152" frame="551" count="12"/>
+    </option>
+    <option value="87_G">
+        Lennox: Napanee Town
+        <div id="1" reel="148152" frame="563" count="28"/>
+        <div id="2" reel="148152" frame="591" count="29"/>
+        <div id="3" reel="148152" frame="620" count="16"/>
+    </option>
+    <option value="87_H">
+        Lennox: Richmond
+        <div id="1" reel="148152" frame="636" count="26"/>
+        <div id="2" reel="148152" frame="662" count="36"/>
+    </option>
+    <option value="88_A">
+        Lincoln &amp; Niagara: Beamsville Village
+        <div id="" reel="148152" frame="698" count="19"/>
+    </option>
+    <option value="88_B">
+        Lincoln &amp; Niagara: Clinton
+        <div id="1" reel="148152" frame="717" count="22"/>
+        <div id="2" reel="148152" frame="739" count="23"/>
+    </option>
+    <option value="88_C">
+        Lincoln &amp; Niagara: Grantham
+        <div id="1" reel="148152" frame="762" count="17"/>
+        <div id="2" reel="148152" frame="779" count="25"/>
+    </option>
+</select>

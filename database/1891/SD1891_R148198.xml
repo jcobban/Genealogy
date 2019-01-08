@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148198">
+    <option value="154_G">
+        Hochelaga: Hochelaga Ward (Montréal)
+        <div id="1" reel="148198" frame="0" count="59"/>
+        <div id="2" reel="148198" frame="59" count="56"/>
+        <div id="3" reel="148198" frame="115" count="62"/>
+    </option>
+    <option value="154_H">
+        Hochelaga: Longue Pointe
+        <div id="" reel="148198" frame="177" count="50"/>
+    </option>
+    <option value="154_I">
+        Hochelaga: Maisonneuve Town
+        <div id="" reel="148198" frame="227" count="26"/>
+    </option>
+    <option value="154_J">
+        Hochelaga: Mile End Village
+        <div id="1" reel="148198" frame="253" count="51"/>
+        <div id="2" reel="148198" frame="304" count="21"/>
+    </option>
+    <option value="154_K">
+        Hochelaga: Nôtre-Dame de Grace Village
+        <div id="" reel="148198" frame="325" count="50"/>
+    </option>
+    <option value="154_L">
+        Hochelaga: Nôtre-Dame des Neiges West
+        <div id="" reel="148198" frame="375" count="20"/>
+    </option>
+    <option value="154_M">
+        Hochelaga: Outremont Village
+        <div id="" reel="148198" frame="395" count="9"/>
+    </option>
+    <option value="154_N">
+        Hochelaga: Pointe aux Trembles
+        <div id="" reel="148198" frame="404" count="19"/>
+    </option>
+    <option value="154_O">
+        Hochelaga: Sault au Récollet
+        <div id="" reel="148198" frame="423" count="37"/>
+    </option>
+    <option value="154_P">
+        Hochelaga: Ste. Cunégonde Town
+        <div id="1" reel="148198" frame="460" count="39"/>
+        <div id="2" reel="148198" frame="499" count="55"/>
+        <div id="3" reel="148198" frame="554" count="55"/>
+        <div id="4" reel="148198" frame="609" count="43"/>
+    </option>
+    <option value="154_Q">
+        Hochelaga: St. Gabriel Ward (Montréal)
+        <div id="1" reel="148198" frame="652" count="3"/>
+        <div id="2" reel="148198" frame="655" count="70"/>
+        <div id="3" reel="148198" frame="725" count="38"/>
+    </option>
+</select>

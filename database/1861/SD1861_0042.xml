@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="42">
+    <option value="478">
+        Algoma District
+    </option>
+    <option value="479">
+        Sault Ste Marie Village
+    </option>
+</select>

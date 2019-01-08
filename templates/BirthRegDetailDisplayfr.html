@@ -1,0 +1,696 @@
+<!--*********************************************************************
+ *  BirthRegDetailDisplayfr.html										*
+ *																		*
+ *  Template for a web page containing details of an particular			*
+ *  birth registration transcription configured for display.            *
+ *																		*
+ * History:																*
+ *		2018/10/02		created                                         *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <link rel="stylesheet" type="text/css" href="/Canada/BirthRegDetail.css">
+  <div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Accueil</a>:
+    <a href="/genealogy.php?lang=fr">
+	    Généalogie
+    </a>:
+    <a href='/Canada/CountriesEdit.php?lang=fr'>
+	    Liste des Pays Soutenus
+    </a>:
+    <a href="/genCountry.php?cc=$cc&amp;lang=fr">
+		$countryName
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=$domain&amp;lang=fr">
+		$domainName
+    </a>:
+  	<a href="BirthRegQuery.php?domain=$domain&amp;lang=fr">
+	    Nouvelle requête
+	</a>:
+	<a href="BirthRegStats.php?RegDomain=$domain&amp;lang=fr">
+    	$domainName statut de transcription
+	</a>:
+	<a href="BirthRegYearStats.php?RegDomain=$domain&amp;RegYear=$regYear&amp;lang=fr">
+    	$domainName Statut $regYear
+	</a>:
+	<a href="BirthRegYearStats.php?RegDomain=$domain&amp;RegYear=$regYear&amp;County=$regCounty&amp;lang=fr">
+	    Statut $regYear $countyName
+	</a>:
+	<a href="BirthRegResponse.php?RegDomain=$domain&amp;RegYear=$regYear&amp;RegCounty=$regCounty&amp;RegTownship=$regTownship&amp;lang=fr">
+    	Statut $regYear Canton $regTownship
+	</a>:
+  </div>
+  <div class="body">
+    <h1>
+      <span class="right">
+    	<a href="/Canada/BirthRegDetailHelpfr.html" target="help">? Aide</a>
+      </span>
+        $domainName Enregistrement de la Naissance: Montre
+      <div style="clear: both;"></div>
+    </h1>
+  $TRACE
+  $MSG
+    <form action="BirthRegUpdate.php" method="post" 
+	    	name="distForm" id="distForm"
+	    	enctype="multipart/form-data">
+      <p>
+		<button type="button" id="Previous">
+		    <u>P</u>récédent
+		</button>
+		&nbsp;
+		<button type="button" id="Next">
+		    Prochai<u>N</u>
+		</button>
+		&nbsp;
+		<button type="button" id="NewQuery">
+		    Nouvelle re<u>q</u>uête
+		</button>
+		<input type="hidden" name="lang" id="lang"
+				value="$LANG"/>
+		<input type="hidden" name="RegDomain" id="RegDomain"
+				value="$domain"/>
+		<!-- the following stores the textual value of the county name in
+		     the web page so it can be used by the Javascript code 
+		     to initialize the RegCounty selection list -->
+		<input type="hidden" name="RegCountyTxt" id="RegCountyTxt" 
+				disabled="disabled" value="$regCounty"/>
+		<!-- the following stores the textual value of the county name in
+		     the web page so it can be used by the Javascript code 
+		     to initialize the RegTownship selection list -->
+		<input type="hidden" name="RegTownshipTxt" id="RegTownshipTxt" 
+				disabled="disabled" value="$regTownship"/>
+		<!-- the following stores the textual value of the person's gender in
+		     the web page so it can be used by the Javascript code 
+		     to initialize the Sex selection list -->
+		<input type="hidden" name="Debug" id="Debug"
+					value="$DEBUG"/>
+      </p>
+      <div class="row" id="IdentificationRow">
+		<div class="column1">
+		  <label class="labelSmall" for="RegId">
+		    Identification:
+		  </label>
+		  <input name="RegId" id="RegId" type="text" class="ina rightnc"
+				size="10" maxlength="12" readonly="readonly"
+				value="$regYear-$paddedRegNum"/>
+		  <input name="RegYear" id="RegYear" type="hidden"
+				value="$regYear"/>
+		  <input name="RegNum" id="RegNum" type="hidden"
+				value="$regNum"/>
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="MsVol">
+		    MS 929 Bobine:
+		  </label>
+		  <input name="MsVol" id="MsVol" type="text" readonly="readonly"
+				size="4" maxlength="4" class="ina white rightnc" 
+				value="$msvol"/>
+		</div>
+		<div style="clear: both;"></div>
+      </div> <!-- id="IdentificationRow" -->
+      <div class="row" id="explicitVolPageItem">
+		<div class="column1">
+		  <label class="labelSmall" for="OriginalVolume">Volume:</label>
+      	  <input name="OriginalVolume" id="OriginalVolume"
+				type="text" class="ina white rightnc"
+				size="3" maxlength="3"  readonly="readonly"
+				value="$originalVolume"/>
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="OriginalPage">Page:</label>
+      	  <input name="OriginalPage" id="OriginalPage"
+				type="text" class="ina white rightnc"
+				size="3" maxlength="3"  readonly="readonly"
+				value="$originalPage"/>
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="OriginalItem">Article:</label>
+      	  <input name="OriginalItem" id="OriginalItem"
+				type="text" class="ina white rightnc"
+				size="3" maxlength="3"  readonly="readonly"
+				value="$originalItem"/>
+		</div>
+		<div style="clear: both;"></div>
+      </div> <!-- id="explicitVolPageItem" -->
+      <div class="row" id="hiddenVolPageItem">
+      	  <input name="OriginalVolume" id="OriginalVolume"
+				type="hidden"
+				value="$originalVolume"/>
+      	  <input name="OriginalPage" id="OriginalPage"
+				type="hidden"
+				value="$originalPage"/>
+      	  <input name="OriginalItem" id="OriginalItem"
+				type="hidden"
+				value="$originalItem"/> 
+      </div> <!-- id="hiddenVolPageItem" -->
+      <div class="row" id="CountyTownshipRow">
+		<div class="column1">
+		  <label class="labelSmall" for="RegCounty">
+		    Lieu: Comté:
+		  </label>
+		  <select name="RegCounty" id="RegCounty" size="1" 
+				class="ina white leftwide" readonly="readonly">
+		  </select>
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="RegTownship">
+		    Canton:
+		  </label>
+		  <select name="RegTownship" id="RegTownship" size="0"
+				class="ina white leftwide" readonly="readonly">
+		    <option value="$regTownship"> 
+				$regTownship 
+		  </select>
+		</div>
+		<div style="clear: both;"></div>
+      </div> <!-- id="CountyTownshipRow" -->
+      <div class="row" id="NamesRow">
+		<div class="column1">
+		  <label class="labelSmall" for="GivenNames">
+		    Nom: Prenom:
+		  </label>
+		  <input name="GivenNames" id="GivenNames"
+				type="text" size="24" maxlength="48"
+				class="ina white left" readonly="readonly"
+				value="$givenNames">
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="Surname">
+		    Surnom:
+		  </label>
+		  <input name="Surname" id="Surname"
+				type="text" size="24" maxlength="32" 
+				class="ina white left" readonly="readonly"
+				value="$qsurname">
+		</div>
+		<div style="clear: both;"></div>
+      </div> <!-- id="NamesRow" -->
+      <div class="row" id="SexMarriedRow">
+		<div class="column1">
+		  <label class="labelSmall" for="Sex">
+		    Sexe:
+		  </label>
+		  <select name="Sex" id="Sex" size="1"
+				class="ina white left" readonly="readonly">
+		    <option class="male" $sexmaleselected
+					value="M">Mâle</option>
+		    <option class="female" $sexfemaleselected
+					value="F">Femelle</option>
+		    <option class="unknown" $sexotherselected
+					value="?">Non Rapporté</option>
+		  </select>
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="ParentsMarried">
+		    Parents mariés:
+		  </label>
+		  <input type="checkbox" name="ParentsMarried" id="ParentsMarried"
+				$marriedChecked readonly="readonly">
+		</div>
+		<div style="clear: both;"></div>
+      </div> <!-- id="SexMarriedRow" -->
+      <div class="row" id="BirthPlaceRow">
+		<div class="column1">
+		  <label class="labelSmall" for="BirthPlace">
+		    Lieu de naissance:
+		  </label>
+		  <input name="BirthPlace" id="BirthPlace"
+				type="text" size="24" maxlength="128" 
+				class="ina white leftnc"
+				value="$birthPlace"  readonly="readonly"
+				/>
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="BirthDate">
+		    Date de naissance:
+		  </label>
+		  <input name="BirthDate" id="BirthDate"
+				type="text" size="10" maxlength="16"
+				class="ina white left"
+				value="$birthDate" readonly="readonly"
+				/>
+		</div>
+		<div style="clear: both;"></div>
+      </div> <!-- id="BirthPlaceRow" -->
+      <div class="row" id="IdirRow">
+		<div class="column2">
+		  <label class="labelSmall" for="IDIR">
+		    Lien:
+		  </label>
+		  <a href="/FamilyTree/Person.php?idir=$idir"
+				id="showLink" class="$genderClass"
+				target="_blank">
+		    $linkedName
+		  </a>
+		  <input type="hidden" id="IDIR" name="IDIR" 
+				value="$idir">
+		</div>
+		<button id="clearIdir" type="button">Clear</button>
+		<div style="clear: both;"></div>
+      </div> <!-- id="IdirRow" -->
+      <div class="row" id="LinkRow">
+		<div class="column1">
+		  <label class="labelSmall" for="IDIR">
+		    Lien:
+		  </label>
+		  <select name="IDIR" id="IDIR"
+				rows="1" class="ina white leftwide" readonly="readonly">
+		    <option value="0" class="unknown">
+			    Correspondances possibles à cette inscription:
+            </option>
+		    <option id="match$idir" value="$idir"
+					class="$sexclass">
+				$iname
+            </option>
+		  </select>
+		</div>
+		<div style="clear: both;"></div>
+      </div> <!-- id="LinkRow" -->
+      <div class="row" id="FatherNameRow">
+		<div class="column1">
+		  <label class="labelSmall" for="FatherName">
+		    Nom:&nbsp;de&nbsp;pere:
+		  </label>
+		  <input name="FatherName" id="FatherName"
+				type="text" size="24" maxlength="48" 
+				class="ina white left"
+				value="$fatherName" readonly="readonly">
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="FatherOccupation">
+		    Occupation:
+		  </label>
+		  <input name="FatherOccupation" id="FatherOccupation" 
+				type="text" size="24" maxlength="32" 
+				class="ina white leftnc"
+				value="$fatherOccupation" readonly="readonly">
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row" id="FatherOccPlaceRow">
+		<div class="column1">
+		  <label class="labelSmall" for="FatherOccPlace">
+		    Lieu de travail:
+		  </label>
+		  <input name="FatherOccPlace" id="FatherOccPlace"
+				type="text" size="24" maxlength="128" 
+				class="ina white leftnc"
+				value="$fatherOccPlace" readonly="readonly">
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row" id="MotherNameRow">
+		<div class="column1">
+		  <label class="labelSmall" for="MotherName`">
+		    Nom:&nbsp;de&nbsp;mere:
+		  </label>
+		  <input name="MotherName" id="MotherName"
+				type="text" size="24" maxlength="48" 
+				class="ina white left"
+				value="$motherName" readonly="readonly">
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="MotherOccupation">
+		    Occupation:
+		  </label>
+		  <input name="MotherOccupation" id="MotherOccupation"
+				type="text" size="24" maxlength="32" 
+				class="ina white leftnc"
+				value="$motherOccupation" readonly="readonly">
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row" id="MotherOccPlaceRow">
+		<div class="column1">
+		  <label class="labelSmall" for="MotherOccPlace">
+		    Lieu de travail:
+		  </label>
+		  <input name="MotherOccPlace" id="MotherOccPlace"
+				type="text" size="24" maxlength="128" 
+				class="ina white leftnc"
+				value="$motherOccPlace" readonly="readonly">
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row" id="FormerHusbandRow">
+		<div class="column1">
+		  <label class="labelSmall" for="FormerHusband">
+		    Ancien&nbsp;mari:
+		  </label>
+		  <input name="FormerHusband" id="FormerHusband"
+				type="text" size="24" maxlength="48" 
+				class="ina white left"
+				value="$formerHusband" readonly="readonly">
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row" id="AccoucheurRow">
+		<div class="column1">
+		  <label class="labelSmall" for="Accoucheur">
+		    Accoucheur:
+		  </label>
+		  <input name="Accoucheur" id="Accoucheur"
+				type="text" size="24" maxlength="48"
+				class="ina white left"
+				value="$accoucheur" readonly="readonly">
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row" id="MarriageRow">
+		<div class="column1">
+		  <label class="labelSmall" for="MarriagePlace">
+		    Lieu&nbsp;de&nbsp;Mariage:
+		  </label>
+		  <input name="MarriagePlace" id="MarriagePlace"
+				type="text" size="24" maxlength="128"
+				class="ina white leftnc"
+				value="$marriagePlace" readonly="readonly">
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="MarriageDate">
+		    Date:
+		  </label>
+		  <input name="MarriageDate" id="MarriageDate"
+				type="text" size="16" maxlength="16" 
+				class="ina white left"
+				value="$marriageDate"  readonly="readonly">
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row" id="InformantRow">
+		<div class="column1">
+		  <label class="labelSmall" for="Informant">
+		    Nom de l'Informateur:
+		  </label>
+		  <input name="Informant" id="Informant"
+				type="text" size="24" maxlength="48" 
+				class="ina white left"
+				value="$informant" readonly="readonly">
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="InformantRes">
+		    Residence:
+		  </label>
+		  <input name="InformantRes" id="InformantRes"
+				type="text" size="24" maxlength="128"
+				class="ina white leftnc" readonly="readonly"
+				value="$informantRes">
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row" id="InformantRelRow">
+		<div class="column1">
+		  <label class="labelSmall" for="InformantRel">
+		    Parenté de l'Informateur:
+		  </label>
+		  <input name="InformantRel" id="InformantRel" type="text" 
+				class="ina white left" 
+				size="16" maxlength="16" readonly="readonly" 
+				value="$informantRel"> 
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row" id="RegistrarRow">
+		<div class="column1">
+		  <label class="labelSmall" for="RegDate">
+		    Date de l'enregistrement:
+		  </label>
+		  <input name="RegDate" id="RegDate"
+				type="text" size="16" maxlength="16"
+				value="$regDate" readonly="readonly"
+				class="ina white left">
+		</div>
+		<div class="column2">
+		  <label class="labelSmall" for="Registrar">
+		    Greffier:
+		  </label>
+		  <input name="Registrar" id="Registrar"
+				type="text" size="24" maxlength="128"
+				value="$registrar" readonly="readonly"
+				class="ina white left">
+		</div>
+		<div style="clear: both;"></div>
+      </div>
+      <div class='row' id='RemarksRow'>
+		<div>
+		  <span class='labelSmall'>
+		    Remarques:
+		  </span>
+		</div>
+		$remarks
+		<div style='clear: both;'></div>
+      </div> <!-- id="RemarksRow" -->
+      <div class="row" id="ImageRow">
+		<div class="column2">
+		  <label class="labelSmall" for="Image">
+		    Image:
+		  </label>
+		  <button type="button" id="ShowImage">Montre l'<u>I</u>mage</button>
+				$image
+		</div>
+		<div style="clear: both;"></div>
+      </div> <!-- id="ImageRow" -->
+    </form>
+ </div> <!-- end of <div id="body"> -->
+<!--  The remainder of the web page consists of divisions containing
+context specific help.  Including this information here ensures
+that the language of the help balloons matches the language of the
+input form.
+-->
+	<div class="balloon" id="HelprightTop">
+		Click on this button to signon to access extended features of the
+        web-site or to manage your account with the web-site.
+	</div>
+	<div class="balloon" id="HelpRegYear">
+		The year the birth was registered.
+	</div>
+	<div class="balloon" id="HelpRegNum">
+		The registration number assigned by the Ontario Registrar
+        within the year.
+	</div>
+	<div class="balloon" id="HelpRegId">
+		The registration year and number assigned by the Ontario Registrar.
+	</div>
+	<div class="balloon" id="HelpMsVol">
+		The microfilm reel number within MS 929 which is used to borrow
+        a copy of the microfilm containing the image of the original
+        birth registration from the 
+	    <a href="http://www.archives.gov.on.ca/">Ontario Archives</a>.
+	</div>
+	<div class="balloon" id="HelpOriginalVolume">
+		This field contains the identification of the original bound volume
+		containing the marriage registrations or certificates.
+	</div>
+	<div class="balloon" id="HelpOriginalPage">
+		This field contains the page number containing the original
+		marriage registrations or certificate.
+	</div>
+	<div class="balloon" id="HelpOriginalItem">
+		Where there are more than one marriage registration on the page
+        this field contains the ordinal position of the specific
+        registration on the page.
+	</div>
+	<div class="balloon" id="HelpRegCounty">
+		This field is used to specify the name of the county in which the
+		birth was registered.  This is a selection list of the counties within
+		Ontario.
+	</div>
+	<div class="balloon" id="HelpRegTownship">
+		This field is used to specify the name of the municipality in which
+		the birth was registered.  Usually this is a selection list of the
+		municipalities within the selected county.
+	</div>
+	<div class="balloon" id="HelpGivenNames">
+		This field is used to specify the given names of the child.
+	</div>
+	<div class="balloon" id="HelpSurname">
+	    This field is used to specify the surname of the child.
+	</div>
+	<div class="balloon" id="HelpSex">
+	    Set the sex of the child.
+	</div>
+	<div class="balloon" id="HelpIDIR">
+	    This field defines a link to the record in the family tree database
+		for the individual whose birth is registered in this record.
+	</div>
+	<div class="balloon" id="HelpclearIdir">
+	 <p>This button is used to unlink this birth record from its current
+		association with a record in the family tree database. Clicking on the
+		button does not update the database, it merely changes the appearance
+        and state of the displayed birth registration so that when you click
+        on the Update button the database record is appropriately changed.
+     </p>
+	 <p>Note that an association between a birth registration record and an
+		individual in the family tree may be established by adding a citation
+        from the birth event of the individual to the birth registration
+        record.  This appears in this dialog as if the link were already
+        recorded in the birth registration record but this sort of link
+        cannot be cleared by clicking on this button because the link
+        only exists in the citation record in the family tree. 
+        In that case clicking on this button will appear to make the link
+		go away, but as soon as you redisplay this birth registration
+        the logical link is visually reestablished. 
+        You must delete or correct the citation.
+     </p>
+	</div>
+	<div class="balloon" id="HelpFatherOccupation">
+	<p>This option is used to update births with the
+		occupation of the Father of the child. 
+	</div>
+	<div class="balloon" id="HelpFatherOccPlace">
+		This option is used to update birth registrations with the
+		place of work (in some years the residence) of the father of the child.
+	</div>
+	<div class="balloon" id="HelpMotherOccupation">
+	    This option is used to update births with the
+		occupation of the Mother of the child. 
+	</div>
+	<div class="balloon" id="HelpMotherOccPlace">
+		This option is used to update birth registrations with the
+		place of work (in some years the residence) of the mother of the child.
+	</div>
+	<div class="balloon" id="HelpBirthPlace">
+	    This option is used to specify where the individual was born.  
+	</div>
+	<div class="balloon" id="HelpBirthDate">
+	    This field is used to specify the date of birth.
+		It is suggested that this be consistently entered as day
+        month-abbreviation, year.  For example "23 Aug 1874".
+	</div>
+	<div class="balloon" id="HelpIDIR">
+  	  <p>
+		This selection list offers a list of individuals in the family tree
+        database who may correspond to this birth registration. 
+        Selecting an entry in this list will cause a citation to this
+        registration to be added to that individual.
+	 </p>
+	</div>
+	<div class="balloon" id="HelpPhys">
+		This field is used to update individuals with the name of the
+		attending physician.
+	</div>
+	<div class="balloon" id="HelpFormerHusband">
+		This field is used to update birth registrations with the name of
+		the former husband of the mother.
+	</div>
+	<div class="balloon" id="HelpAccoucheur">
+		This field is used to update birth registrations with the name of
+		the midwife or doctor who assisted with the delivery.
+	</div>
+	<div class="balloon" id="HelpInformant">
+		This field is used to update birth registrations with the name of
+		the person who reported the birth.
+	</div>
+	<div class="balloon" id="HelpInformantRes">
+		This field is used to update birth registrations with the
+		address of the informant.
+	</div>
+	<div class="balloon" id="HelpInformantRel">
+		This field is used to update birth registrations with the
+		relationship of the person reporting the birth to the 
+		child.  For example
+	"Father" or "Brother" or "Aunt".
+	</div>
+	<div class="balloon" id="HelpInfRelTxt">
+		This field is used to enter a specific relationship that is not
+		covered by the selection list.
+	</div>
+	<div class="balloon" id="HelpInfOcc">
+		This field is used to update birth registrations with the
+		occupation of the person reporting the birth.
+	</div>
+	<div class="balloon" id="HelpReligion">
+	<p>This option is used to update individuals with their
+		religious affiliation.  
+	</div>
+	<div class="balloon" id="HelpFatherName">
+		This option is used to update birth registrations with the
+		name of the father of the child.
+	</div>
+	<div class="balloon" id="HelpFatherBPlce">
+		This option is used to update birth registrations with the
+		birth place of the father of the child.
+	</div>
+	<div class="balloon" id="HelpMotherName">
+		This option is used to update birth registrations with the
+		name of the mother of the child.
+	</div>
+	<div class="balloon" id="HelpMotherBPlce">
+		This option is used to update birth registrations with the
+		birth place of the mother of the child.
+	</div>
+	<div class="balloon" id="HelpMarriagePlace">
+	<p>This option is used to update individuals with where the parents were
+		married.  
+	</div>
+	<div class="balloon" id="HelpMarriageDate">
+	<p>This field is used to update individual records with the date
+		on which the parents were married.
+	</div>
+	<div class="balloon" id="HelpParentsMarried">
+	<p>This field is used to specify if the birth registration indicated
+		that the parents were married at the time of the birth.  It defaults to
+		checked but should be cleared if the registration indicates the child
+		is illegitimate.
+	</div>
+	<div class="balloon" id="HelpRegDate">
+	<p>
+		Date of registration with municipality.
+		It is suggested that dates be entered consistently as day, 
+		abbreviation of name of month, and year.
+	</p>
+	</div>
+	<div class="balloon" id="HelpRegistrar">
+	<p>
+		Name of municipal registrar/clerk.
+	</p>
+	</div>
+	<div class="balloon" id="HelpRemarks">
+	<p>This field is used to record any comments by the registrar or clerk.
+		You may use this field to record your own comments by enclosing them in
+		editorial square brackets.
+	</div>
+	<div class="balloon" id="HelpSubmit">
+		Clicking on this button, or alternately using the key short-cuts Ctrl-S
+		or Alt-U, commits the changes you have made to the database.
+	</div>
+	<div class="balloon" id="Helpreset">
+		Clicking on this button resets the values of some fields to their defaults.
+	</div>
+	<div class="balloon" id="HelpShowImage">
+		Clicking on this button, or alternately using the key short-cut Alt-I, 
+		displays the image associated with this
+		registration in another window.
+	</div>
+	<div class="balloon" id="HelpImage">
+		This field contains the location of the image of the associated original
+		document.  This can be an absolute URL, starting with "http:" or a URL 
+		relative to the
+		http://$_SERVER['SERVER_NAME']/Ontario/Images/ folder.
+	</div>
+	<div class="balloon" id="HelpPrevious">
+		Clicking on this button, or using the keyboard short-cut Alt-P, 
+		displays the registration with registration number
+		one less than the current registration.
+	</div>
+	<div class="balloon" id="HelpNext">
+		Clicking on this button, or using the keyboard short-cut Alt-N, 
+		displays the registration with registration number
+		one greater than the current registration.
+	</div>
+	<div class="balloon" id="HelpSkip5">
+		Clicking on this button displays the registration with registration number
+		five greater than the current registration.
+	</div>
+	<div class="balloon" id="HelpNewQuery">
+		Clicking on this button, or using the keyboard short-cut Alt-Q, 
+		displays a new query dialog for selecting
+		birth registrations.
+	</div>
+	<script src="/jscripts/js20/http.js" type="text/javascript"></script>
+	<script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+	<script src="/jscripts/Ontario.js" type="text/javascript"></script>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/jscripts/locationCommon.js" type="text/javascript"></script>
+	<script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript"></script>
+	<script src="BirthRegDetail.js" type="text/javascript"></script>

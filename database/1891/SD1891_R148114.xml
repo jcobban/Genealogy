@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148114">
+    <option value="30_L">
+        Cumberland: River Philip
+        <div id="" reel="148114" frame="0" count="23"/>
+    </option>
+    <option value="30_M">
+        Cumberland: River Herbert
+        <div id="1" reel="148114" frame="23" count="24"/>
+        <div id="2" reel="148114" frame="47" count="32"/>
+    </option>
+    <option value="30_N">
+        Cumberland: Springhill Town
+        <div id="" reel="148114" frame="79" count="97"/>
+    </option>
+    <option value="30_O">
+        Cumberland: Springhill
+        <div id="" reel="148114" frame="176" count="9"/>
+    </option>
+    <option value="30_P">
+        Cumberland: Victoria
+        <div id="" reel="148114" frame="185" count="19"/>
+    </option>
+    <option value="30_Q">
+        Cumberland: Westchester
+        <div id="" reel="148114" frame="204" count="20"/>
+    </option>
+    <option value="30_R">
+        Cumberland: Wallace
+        <div id="" reel="148114" frame="224" count="34"/>
+    </option>
+    <option value="30_S">
+        Cumberland: Wentworth
+        <div id="" reel="148114" frame="258" count="16"/>
+    </option>
+    <option value="31_A">
+        Digby: Cheticamp
+        <div id="" reel="148114" frame="274" count="10"/>
+    </option>
+    <option value="31_B">
+        Digby: Church Point
+        <div id="" reel="148114" frame="284" count="20"/>
+    </option>
+    <option value="31_C">
+        Digby: Comeauville
+        <div id="" reel="148114" frame="304" count="20"/>
+    </option>
+    <option value="31_D">
+        Digby: Culloden
+        <div id="" reel="148114" frame="324" count="14"/>
+    </option>
+    <option value="31_E">
+        Digby: Digby
+        <div id="" reel="148114" frame="338" count="29"/>
+    </option>
+    <option value="31_F">
+        Digby: Freeport
+        <div id="" reel="148114" frame="367" count="16"/>
+    </option>
+    <option value="31_G">
+        Digby: Grosses Coques
+        <div id="" reel="148114" frame="383" count="14"/>
+    </option>
+    <option value="31_H">
+        Digby: Hillsburg
+        <div id="" reel="148114" frame="397" count="27"/>
+    </option>
+    <option value="31_I">
+        Digby: Little River
+        <div id="" reel="148114" frame="424" count="9"/>
+    </option>
+    <option value="31_J">
+        Digby: Marshall Town
+        <div id="" reel="148114" frame="433" count="22"/>
+    </option>
+    <option value="31_K">
+        Digby: Metaghan
+        <div id="" reel="148114" frame="455" count="22"/>
+    </option>
+    <option value="31_L">
+        Digby: Metaghan River
+        <div id="" reel="148114" frame="477" count="21"/>
+    </option>
+    <option value="31_M">
+        Digby: New Tuskett
+        <div id="" reel="148114" frame="498" count="13"/>
+    </option>
+    <option value="31_N">
+        Digby: Plympton
+        <div id="" reel="148114" frame="511" count="32"/>
+    </option>
+    <option value="31_O">
+        Digby: Rossway
+        <div id="" reel="148114" frame="543" count="10"/>
+    </option>
+    <option value="31_P">
+        Digby: Salmon River
+        <div id="" reel="148114" frame="553" count="28"/>
+    </option>
+    <option value="31_Q">
+        Digby: Sandy Cove
+        <div id="" reel="148114" frame="581" count="15"/>
+    </option>
+    <option value="31_R">
+        Digby: Smith Cove
+        <div id="" reel="148114" frame="596" count="9"/>
+    </option>
+    <option value="31_S">
+        Digby: St. Barnard
+        <div id="" reel="148114" frame="605" count="26"/>
+    </option>
+    <option value="31_T">
+        Digby: Tiverton
+        <div id="" reel="148114" frame="631" count="12"/>
+    </option>
+    <option value="31_U">
+        Digby: Westport
+        <div id="" reel="148114" frame="643" count="16"/>
+    </option>
+</select>

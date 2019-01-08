@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148160">
+    <option value="100_K">
+        Ontario North: Rama
+        <div id="" reel="148160" frame="1" count="36"/>
+    </option>
+    <option value="100_L">
+        Ontario North: Ridout
+        <div id="" reel="148160" frame="37" count="5"/>
+    </option>
+    <option value="100_M">
+        Ontario North: Ryde
+        <div id="" reel="148160" frame="42" count="13"/>
+    </option>
+    <option value="100_N">
+        Ontario North: Scott
+        <div id="1" reel="148160" frame="55" count="27"/>
+        <div id="2" reel="148160" frame="82" count="22"/>
+    </option>
+    <option value="100_O">
+        Ontario North: Scugog
+        <div id="1" reel="148160" frame="104" count="8"/>
+        <div id="2" reel="148160" frame="112" count="7"/>
+    </option>
+    <option value="100_P">
+        Ontario North: Thorah
+        <div id="1" reel="148160" frame="119" count="14"/>
+        <div id="2" reel="148160" frame="133" count="21"/>
+    </option>
+    <option value="101_A">
+        Ontario South: Oshawa Town
+        <div id="1" reel="148160" frame="154" count="23"/>
+        <div id="2" reel="148160" frame="177" count="23"/>
+        <div id="3" reel="148160" frame="200" count="18"/>
+        <div id="4" reel="148160" frame="218" count="22"/>
+    </option>
+    <option value="101_B">
+        Ontario South: Port Perry Village
+        <div id="1" reel="148160" frame="240" count="16"/>
+        <div id="2" reel="148160" frame="256" count="10"/>
+        <div id="3" reel="148160" frame="266" count="11"/>
+    </option>
+    <option value="101_C">
+        Ontario South: Reach
+        <div id="1" reel="148160" frame="277" count="13"/>
+        <div id="2" reel="148160" frame="290" count="15"/>
+        <div id="3" reel="148160" frame="305" count="15"/>
+        <div id="4" reel="148160" frame="320" count="14"/>
+        <div id="5" reel="148160" frame="334" count="9"/>
+        <div id="6" reel="148160" frame="343" count="16"/>
+        <div id="7" reel="148160" frame="359" count="9"/>
+    </option>
+    <option value="101_D">
+        Ontario South: Whitby East
+        <div id="1" reel="148160" frame="368" count="32"/>
+        <div id="2" reel="148160" frame="400" count="10"/>
+        <div id="3" reel="148160" frame="410" count="22"/>
+    </option>
+    <option value="101_E">
+        Ontario South: Whitby West
+        <div id="1" reel="148160" frame="432" count="25"/>
+        <div id="2" reel="148160" frame="457" count="21"/>
+        <div id="3" reel="148160" frame="478" count="9"/>
+    </option>
+    <option value="101_F">
+        Ontario South: Whitby Town
+        <div id="1" reel="148160" frame="487" count="26"/>
+        <div id="2" reel="148160" frame="513" count="22"/>
+        <div id="3" reel="148160" frame="535" count="11"/>
+    </option>
+    <option value="102_A">
+        Ontario West: Newmarket Town
+        <div id="1" reel="148160" frame="546" count="12"/>
+        <div id="2" reel="148160" frame="558" count="16"/>
+        <div id="3" reel="148160" frame="574" count="18"/>
+    </option>
+    <option value="102_B">
+        Ontario West: Pickering
+        <div id="1" reel="148160" frame="592" count="24"/>
+        <div id="2" reel="148160" frame="616" count="11"/>
+        <div id="3" reel="148160" frame="627" count="16"/>
+        <div id="4" reel="148160" frame="643" count="16"/>
+        <div id="5" reel="148160" frame="659" count="18"/>
+        <div id="6" reel="148160" frame="677" count="14"/>
+        <div id="7" reel="148160" frame="691" count="19"/>
+        <div id="8" reel="148160" frame="710" count="15"/>
+    </option>
+    <option value="102_C">
+        Ontario West: Stouffville Village
+        <div id="" reel="148160" frame="725" count="25"/>
+    </option>
+    <option value="102_D">
+        Ontario West: Uxbridge
+        <div id="1" reel="148160" frame="750" count="25"/>
+        <div id="2" reel="148160" frame="775" count="11"/>
+    </option>
+</select>

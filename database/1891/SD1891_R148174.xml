@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148174">
+    <option value="119_G">
+        Toronto City: St. Patricks Ward
+        <div id="4" reel="148174" frame="0" count="57"/>
+        <div id="5" reel="148174" frame="57" count="63"/>
+        <div id="6" reel="148174" frame="120" count="57"/>
+        <div id="7" reel="148174" frame="177" count="63"/>
+        <div id="8" reel="148174" frame="240" count="66"/>
+        <div id="9" reel="148174" frame="306" count="60"/>
+        <div id="10" reel="148174" frame="366" count="13"/>
+    </option>
+    <option value="119_H">
+        Toronto City: St. Stephens Ward &amp; St. Marks Ward (part)
+        <div id="1" reel="148174" frame="379" count="52"/>
+        <div id="2" reel="148174" frame="431" count="67"/>
+        <div id="3" reel="148174" frame="498" count="53"/>
+        <div id="4" reel="148174" frame="551" count="86"/>
+        <div id="5" reel="148174" frame="637" count="48"/>
+        <div id="6" reel="148174" frame="685" count="72"/>
+        <div id="7" reel="148174" frame="757" count="26"/>
+    </option>
+</select>

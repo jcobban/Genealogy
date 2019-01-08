@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="18">
+    <option value="189">
+        Bathurst
+    </option>
+    <option value="190">
+        Beckwith
+    </option>
+    <option value="191">
+        Burgess
+    </option>
+    <option value="192">
+        Dalhousie
+    </option>
+    <option value="193">
+        Darlington
+    </option>
+    <option value="194">
+        Drummond
+    </option>
+    <option value="195">
+        Elmsley
+    </option>
+    <option value="196">
+        Lanark
+    </option>
+    <option value="197">
+        Lavant
+    </option>
+    <option value="198">
+        Montague
+    </option>
+    <option value="199">
+        Packenham
+    </option>
+    <option value="200">
+        Perth Town
+    </option>
+    <option value="201">
+        Ramsay
+    </option>
+    <option value="202">
+        Sherbrooke N.
+    </option>
+    <option value="203">
+        Sherbrooke S.
+    </option>
+    <option value="204">
+        Smith's Falls Village
+    </option>
+    <option value="204A">
+        Agricultural Census
+    </option>
+</select>

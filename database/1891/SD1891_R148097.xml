@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148097">
+    <option value="9_B">
+        Selkirk: Arthur
+        <div id="" reel="148097" frame="0" count="14"/>
+    </option>
+    <option value="9_C">
+        Selkirk: Brandon City
+        <div id="1" reel="148097" frame="14" count="40"/>
+        <div id="2" reel="148097" frame="54" count="37"/>
+    </option>
+    <option value="9_D">
+        Selkirk: Brenda
+        <div id="" reel="148097" frame="91" count="22"/>
+    </option>
+    <option value="9_E">
+        Selkirk: Carleton
+        <div id="" reel="148097" frame="113" count="31"/>
+    </option>
+    <option value="9_F">
+        Selkirk: Cornwallis
+        <div id="" reel="148097" frame="144" count="29"/>
+    </option>
+    <option value="9_G">
+        Selkirk: Daly
+        <div id="" reel="148097" frame="173" count="20"/>
+    </option>
+    <option value="9_H">
+        Selkirk: Deloraine
+        <div id="" reel="148097" frame="193" count="40"/>
+    </option>
+    <option value="9_I">
+        Selkirk: Derby
+        <div id="" reel="148097" frame="233" count="26"/>
+    </option>
+    <option value="9_J">
+        Selkirk: Douglas
+        <div id="" reel="148097" frame="259" count="91"/>
+    </option>
+    <option value="9_K">
+        Selkirk: Dufferin North
+        <div id="1" reel="148097" frame="350" count="32"/>
+        <div id="2" reel="148097" frame="382" count="21"/>
+    </option>
+    <option value="9_L">
+        Selkirk: Dufferin South
+        <div id="1" reel="148097" frame="403" count="31"/>
+        <div id="2" reel="148097" frame="434" count="13"/>
+        <div id="3" reel="148097" frame="447" count="7"/>
+    </option>
+    <option value="9_M">
+        Selkirk: Elton
+        <div id="" reel="148097" frame="454" count="33"/>
+    </option>
+    <option value="9_N">
+        Selkirk: Glenwood
+        <div id="" reel="148097" frame="487" count="31"/>
+    </option>
+    <option value="9_O">
+        Selkirk: Inchiquin
+        <div id="" reel="148097" frame="518" count="17"/>
+    </option>
+    <option value="9_P">
+        Selkirk: Lorne
+        <div id="" reel="148097" frame="535" count="52"/>
+    </option>
+    <option value="9_Q">
+        Selkirk: Louise
+        <div id="1" reel="148097" frame="587" count="42"/>
+        <div id="2" reel="148097" frame="629" count="13"/>
+    </option>
+    <option value="9_R">
+        Selkirk: Medora
+        <div id="" reel="148097" frame="642" count="17"/>
+    </option>
+</select>

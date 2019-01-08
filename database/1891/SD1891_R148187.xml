@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148187">
+    <option value="136_F">
+        Argenteuil: Grenville Village
+        <div id="" reel="148187" frame="0" count="11"/>
+    </option>
+    <option value="136_G">
+        Argenteuil: Harrington
+        <div id="" reel="148187" frame="11" count="15"/>
+    </option>
+    <option value="136_H">
+        Argenteuil: Howard
+        <div id="" reel="148187" frame="26" count="10"/>
+    </option>
+    <option value="136_I">
+        Argenteuil: Lachute
+        <div id="" reel="148187" frame="36" count="37"/>
+    </option>
+    <option value="136_J">
+        Argenteuil: Mille Isles
+        <div id="" reel="148187" frame="73" count="11"/>
+    </option>
+    <option value="136_K">
+        Argenteuil: Morin
+        <div id="" reel="148187" frame="84" count="10"/>
+    </option>
+    <option value="136_L">
+        Argenteuil: St. Andrews
+        <div id="" reel="148187" frame="94" count="35"/>
+    </option>
+    <option value="136_M">
+        Argenteuil: St. Jerusalem
+        <div id="" reel="148187" frame="129" count="22"/>
+    </option>
+    <option value="136_N">
+        Argenteuil: Wentworth &amp; Montcalm
+        <div id="" reel="148187" frame="151" count="20"/>
+    </option>
+    <option value="137_A">
+        Bagot: Acton Town
+        <div id="" reel="148187" frame="171" count="29"/>
+    </option>
+    <option value="137_B">
+        Bagot: St. André d'Acton
+        <div id="" reel="148187" frame="200" count="44"/>
+    </option>
+    <option value="137_C">
+        Bagot: St. Dominique
+        <div id="" reel="148187" frame="244" count="42"/>
+    </option>
+    <option value="137_D">
+        Bagot: St. Ephrem d'Upton
+        <div id="" reel="148187" frame="286" count="27"/>
+    </option>
+    <option value="137_E">
+        Bagot: St. Ephrem d'Upton Village
+        <div id="" reel="148187" frame="313" count="22"/>
+    </option>
+    <option value="137_F">
+        Bagot: Ste. Hélène
+        <div id="" reel="148187" frame="335" count="35"/>
+    </option>
+    <option value="137_G">
+        Bagot: St. Hughes
+        <div id="" reel="148187" frame="370" count="41"/>
+    </option>
+    <option value="137_H">
+        Bagot: St. Liboire
+        <div id="" reel="148187" frame="411" count="50"/>
+    </option>
+    <option value="137_I">
+        Bagot: St. Pie
+        <div id="" reel="148187" frame="461" count="69"/>
+    </option>
+    <option value="137_J">
+        Bagot: Ste. Rosalie
+        <div id="" reel="148187" frame="530" count="31"/>
+    </option>
+    <option value="137_K">
+        Bagot: St. Simon
+        <div id="" reel="148187" frame="561" count="40"/>
+    </option>
+    <option value="137_L">
+        Bagot: St. Théodore d'Acton
+        <div id="" reel="148187" frame="601" count="37"/>
+    </option>
+    <option value="138_A">
+        Beauce: Adstock
+        <div id="" reel="148187" frame="638" count="15"/>
+    </option>
+    <option value="138_B">
+        Beauce: Ditchfield
+        <div id="" reel="148187" frame="653" count="18"/>
+    </option>
+    <option value="138_C">
+        Beauce: Dorset
+        <div id="" reel="148187" frame="671" count="8"/>
+    </option>
+    <option value="138_D">
+        Beauce: St. Benoit Labre
+        <div id="" reel="148187" frame="679" count="16"/>
+    </option>
+    <option value="138_E">
+        Beauce: St. Samuel de Gayhurst
+        <div id="" reel="148187" frame="695" count="19"/>
+    </option>
+    <option value="138_F">
+        Beauce: St. Martin
+        <div id="" reel="148187" frame="714" count="19"/>
+    </option>
+    <option value="138_G">
+        Beauce: St. Côme de Kennebec
+        <div id="1" reel="148187" frame="733" count="19"/>
+        <div id="2" reel="148187" frame="752" count="8"/>
+    </option>
+    <option value="138_H">
+        Beauce: St. Théophile
+        <div id="" reel="148187" frame="760" count="7"/>
+    </option>
+    <option value="138_I">
+        Beauce: Sacre-Coeur de Jésus
+        <div id="" reel="148187" frame="767" count="38"/>
+    </option>
+</select>

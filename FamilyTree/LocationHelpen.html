@@ -1,0 +1,168 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+   <title>Display/Edit Location: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  LocationHelpen.html                                                 *
+ *                                                                      *
+ *  History:															*
+ *		2010/12/04		created											*
+ *		2012/05/06		add documentation of map support				*
+ *		2013/04/19		add documentation of boundary support			*
+ *		2014/02/10		eliminate use of tables for layout				*
+ *		2017/09/09		rename to LocationHelpen.html					*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+</head>
+<body>
+<div class="topcrumbs">
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+	<a href="/FamilyTree/LocationsHelpen.html">Locations</a>:
+</div>
+<div class="help">
+<h1>Display/Edit Location: Help</h1>
+<p>Every location that is referenced by an event or fact in the database is
+recorded in the Locations Master List.  This way all of the information
+collected about a particular location is centralized.  This,
+in particular, facilitates ensuring that particular locations are always
+identified in the same way.
+</p>
+<p>You get to this web page by clicking on the link on the numeric
+key field on the
+<a href="/FamilyTree/LocationsHelpen.html">Locations Master List</a> web page.
+If you are authorized the text and other fields on this page permit you to
+modify the characteristics of the location.  Otherwise the fields are
+all protected.  The following information is displayed:
+</p>
+<ul>
+  <li>The unique numeric key of the location record, called the IDLR.
+  <li>The location name as it appears in reports.  The only way to
+	modify the appearance of the name is through this field.  In
+	particular if you attempt to change the case of any letters in
+	the location name as it appears in the description of any fact
+	that change is ignored.  If you make any more substantive change
+	to the location name in a fact,
+	for example expanding an abbreviation, you create, or refer to, 
+	a <b>new</b>
+	location, distinct from the original.
+    <li>The short name is used only on input.  If you enter a short name when
+	editing a fact it is expanded to the full location name.
+	For example you could define "Chicago" as a short name for the
+	location "Chicago, Illinois, USA".
+    <li>The sort key is normally the same as the location name, but can be
+	used to change how the location names are present in the
+	<a href="/FamilyTree/LocationsHelpen.html">locations master list</a>.
+	For example if you define "Saint Louis, Missouri, USA" as the
+	sort key for "St Louis, MO, USA" then the location will sort in
+	a more intuitive way.
+    <li>FS Place Id is not currently supported, but may be set for
+	use by Legacy Family Tree software.
+    <li>The Latitude and Longitude of the location.
+	These values are shown and entered in degrees with decimal
+	fractions. 
+	These fields are normally set by manipulating the map
+	displayed by the <span class="button">Show&nbsp;Map</span>
+	button.
+    <li>Clicking on the <span class="button">Show&nbsp;Map</span>
+	button pops up a map based on the supplied longitude and latitude,
+	or if those have not yet been determined the Google maps 
+	geo-coder is used to attempt to interpret the name of the location.
+	You can manipulate this map to focus on the actual location based
+	upon your knowledge.  See <a href="#map">Manipulating the Map</a>
+	below for further details.
+    <li>The preposition field permits explicitly defining the preposition
+	used before the location name in reports.  The default is "at" but,
+	for example in English the preposition "in" is normally used with
+	geographically extensive locations, such as countries, states,
+	provinces, and counties.
+    <li>The Zoom field is used to determine the area covered by the
+	map displayed by on the <span class="button">Show&nbsp;Map</span>
+	button.  The higher the value, the smaller the area.  Level 1
+	shows the entire world.  Level 12 covers a whole township or medium
+	sized city. Level 20 shows an individual house.
+	This field is normally set by manipulating the map
+	displayed by the <span class="button">Show&nbsp;Map</span>
+	button.
+    <li>The <span class="button">Get&nbsp;Map&nbsp;Info</span> button
+	adjusts the values of latitude, longitude, zoom,
+	and the region boundary to correspond 
+	to the displayed map as you have manipulated it.
+    <li>The notes field can be used to explain the usage of a location
+	or for any other purpose you choose.
+    <li>The "Used" flag is used by Legacy.
+    <li>The "Tag1" flag is used by Legacy Family Tree software.
+    <li>The "Verified" flag is used by Legacy Family Tree software.
+    <li>The "FSResolved" field is used by Legacy Family Tree software.
+	It has the values 0=no, 1=yes, 2=could not be resolved.
+    <li>The "VEResolved" field is used by Legacy.
+	It has the values 0=no, 1=yes, 2=could not be resolved.
+    <li>The "qsTag" flag is used by Legacy Family Tree software.
+    <li>As a result of editing location names it may happen that two or more
+	locations end up with the same Location text.  This normally means
+	that they are in fact two references to the same real location.
+	When this occurs editing one of the locations results 
+	in the display of a list
+	of all higher numbered locations with the same location text,
+	together with a <span class="button">Merge&nbsp;Duplicates</span> 
+	button.  Clicking on this
+	button merges all references to the higher numbered instances
+	and deletes the higher numbered instances from the table.
+    <li>If you are authorized to update locations click on
+	the <span class="button"><u>U</u>pdate Location</span> to apply	
+	changes you have made to the fields.
+    <li>The
+	<span class="button">Display&nbsp;Individuals&nbsp;using&nbsp;this&nbsp;Location</span>
+	button displays
+	a <a href="/FamilyTree/getIndividualsByLocationHelpen.html">
+	list of individuals and marriages</a> that reference
+	this location.  You cannot delete a location that has any events 
+	referring to it.  To delete a location you first select this hyperlink.
+	If there are no references you are given the option of deleting
+	the location.
+</ul>
+<h2 id="#map">Manipulating the Map</h2>
+<p>Clicking on the <span class="button">Show&nbsp;Map</span> button opens
+a view-port on a Google map.  This has a marker identifying the center of the
+map.  If this is not located on the most appropriate geographical position
+to represent the location name, then use the mouse to drag the map so the
+desired position is in the center of the map window.  Do this by holding
+down the left mouse button while you move the mouse.  Zoom the map to the
+most appropriate level of detail using the map controls.
+</p>
+<p>If the location represents a geographical region, such as a township, county,
+state, province, or country, then the boundary of the region should be defined.
+Identify successive points around the boundary of the region and click on
+them.  You can go either clockwise or counter-clockwise around the region.
+Do not close the boundary; leave the last side open; it is closed
+off when the boundary is displayed to visitors.  If you find that a point
+on the boundary has been misplaced, you can drag that point to the correct
+position with the mouse.  You can also insert a new vertex between two existing
+positions by grabbing the dot at the middle of the line between them.
+Remember that clicking anywhere on the map adds a new line segment to the
+boundary starting at the current last position and going to the place you
+click.  There is currently no method for deleting a vertex from the list, only
+for dragging it to a new position.  
+</p>
+</div>
+<div class="botcrumbs">
+    <span class="right">
+	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+    </span>
+	<a href="/contactAuthor.php?subject=LocationHelpen.html" target="_blank">Contact Author</a>
+	<br/>
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+	<a href="/FamilyTree/LocationsHelpen.html">Locations</a>:
+    <div style="clear: both;"></div>
+</div>
+</body>
+</html>

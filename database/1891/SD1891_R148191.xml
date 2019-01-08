@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148191">
+    <option value="143_E">
+        Brome: Potton
+        <div id="1" reel="148191" frame="0" count="26"/>
+        <div id="2" reel="148191" frame="26" count="22"/>
+    </option>
+    <option value="143_F">
+        Brome: Sutton
+        <div id="1" reel="148191" frame="48" count="13"/>
+        <div id="2" reel="148191" frame="61" count="20"/>
+        <div id="3" reel="148191" frame="81" count="36"/>
+    </option>
+    <option value="144_A">
+        Chambly: Boucherville
+        <div id="" reel="148191" frame="117" count="20"/>
+    </option>
+    <option value="144_B">
+        Chambly: Boucherville Village
+        <div id="" reel="148191" frame="137" count="17"/>
+    </option>
+    <option value="144_C">
+        Chambly: Chambly
+        <div id="" reel="148191" frame="154" count="20"/>
+    </option>
+    <option value="144_D">
+        Chambly: Chambly Basin Village
+        <div id="" reel="148191" frame="174" count="18"/>
+    </option>
+    <option value="144_E">
+        Chambly: Chambly Canton Village
+        <div id="" reel="148191" frame="192" count="16"/>
+    </option>
+    <option value="144_F">
+        Chambly: Longueuil
+        <div id="" reel="148191" frame="208" count="25"/>
+    </option>
+    <option value="144_G">
+        Chambly: Longueuil Town
+        <div id="1" reel="148191" frame="233" count="27"/>
+        <div id="2" reel="148191" frame="260" count="31"/>
+    </option>
+    <option value="144_H">
+        Chambly: St. Basile le Grand
+        <div id="" reel="148191" frame="291" count="14"/>
+    </option>
+    <option value="144_I">
+        Chambly: St. Bruno
+        <div id="" reel="148191" frame="305" count="13"/>
+    </option>
+    <option value="144_J">
+        Chambly: St. Hubert
+        <div id="" reel="148191" frame="318" count="20"/>
+    </option>
+    <option value="144_K">
+        Chambly: St. Lambert
+        <div id="" reel="148191" frame="338" count="19"/>
+    </option>
+    <option value="145_A">
+        Champlain: Cap de la Magdeleine
+        <div id="" reel="148191" frame="357" count="27"/>
+    </option>
+    <option value="145_B">
+        Champlain: La Visitation
+        <div id="1" reel="148191" frame="384" count="15"/>
+        <div id="2" reel="148191" frame="399" count="17"/>
+    </option>
+    <option value="145_C">
+        Champlain: Nôtre Dame du Mont Carmel
+        <div id="" reel="148191" frame="416" count="41"/>
+    </option>
+    <option value="145_D">
+        Champlain: St. Adolphe
+        <div id="" reel="148191" frame="457" count="8"/>
+    </option>
+    <option value="145_E">
+        Champlain: Ste. Anne de la Pérade
+        <div id="1" reel="148191" frame="465" count="18"/>
+        <div id="2" reel="148191" frame="483" count="19"/>
+        <div id="3" reel="148191" frame="502" count="21"/>
+    </option>
+    <option value="145_F">
+        Champlain: Ste. Flore
+        <div id="2" reel="148191" frame="523" count="1"/>
+        <div id="1" reel="148191" frame="524" count="21"/>
+        <div id="2" reel="148191" frame="545" count="18"/>
+    </option>
+    <option value="145_G">
+        Champlain: St. François Xavier de Batiscan
+        <div id="" reel="148191" frame="563" count="21"/>
+    </option>
+    <option value="145_H">
+        Champlain: Ste. Geneviève
+        <div id="1" reel="148191" frame="584" count="21"/>
+        <div id="2" reel="148191" frame="605" count="21"/>
+    </option>
+    <option value="145_I">
+        Champlain: St. Jacques des Piles
+        <div id="" reel="148191" frame="626" count="17"/>
+    </option>
+    <option value="145_J">
+        Champlain: St. Luc
+        <div id="" reel="148191" frame="643" count="16"/>
+    </option>
+    <option value="145_I">
+        Champlain: St. Jacques des Piles
+        <div id="" reel="148191" frame="659" count="1"/>
+    </option>
+    <option value="145_J">
+        Champlain: St. Maurice
+        <div id="1" reel="148191" frame="660" count="28"/>
+        <div id="2" reel="148191" frame="688" count="36"/>
+    </option>
+    <option value="145_L">
+        Champlain: St. Narcisse
+        <div id="" reel="148191" frame="724" count="43"/>
+    </option>
+</select>

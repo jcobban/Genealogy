@@ -1,0 +1,106 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+   <title>Individuals by Location: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  getIndividualsByLocationHelpen.html                                 *
+ *                                                                      *
+ *    History:															*
+ *		2010/12/04		created											*
+ *		2011/02/12		document process for deleting locations			*
+ *		2014/02/10		eliminate use of tables for layout				*
+ *		2014/11/30		describe additional information					*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+</head>
+<body>
+<div class="topcrumbs">
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Family Tree Services</a>:
+	<a href="/FamilyTree/LocationsHelpen.html">Locations</a>:
+	<a href="/FamilyTree/LocationHelpen.html">Location</a>:
+</div>
+<div class="help">
+  <h1>Individuals by Location: Help</h1>
+    <p>This web page displays a list of each of the individuals
+      and/or families that contain events that reference the current location
+      along with a description of the nature of the event or fact.
+      If you are authorized to modify the family tree these are links to
+      the edit page for the associated record.  Otherwise they are links to
+      the normal web page for the individual or family.  If there are no events
+      that reference this location then a button is presented permitting you to
+      delete the location from the database.
+    </p>
+    <p>
+      This script supports the following parameters:
+      <table>
+	<thead>
+	  <tr>
+	    <th class="label center">Parameter</th>
+	    <th class="label center">Interpretation</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr>
+	    <th class="label">IDLR</th>
+	    <td class="left">
+	      The unique internal identification number of the Location record.
+	    </th>
+	  </tr>
+	  <tr>
+	    <th class="label">Limit</th>
+	    <td class="left">
+	      To avoid generating an extremely large response the script limits
+	      the number of instances of each of the three kinds of events
+	      that it reports to a default of 25.  This parameter permits
+	      overriding that default.
+	    </th>
+	  </tr>
+	</tbody>
+      </table>
+    </p>
+    <h2>Procedure for Deleting Locations</h2>
+    <p>If an administrator wishes to delete a location the administrator
+      must first re-direct all existing references to another location.
+    </p>
+    <ol>
+    <li>Select one of the existing references to the location.  
+	Selecting the reference displays either the
+	<a href="/FamilyTree/editIndividHelpen.html">edit page for the individual</a> or
+	<a href="/FamilyTree/editMarriageHelpen.html">edit page for the family</a>.
+    <li>Locate the current reference in the individual or family.  The 
+	location is contained in an event.
+    <li>Edit the location text in the event to refer to another location.
+    <li>When you have applied the update click on the browser 
+	"Go back one page" icon one or more times
+	to get back to the list of individuals and
+	families referencing the location.  If there are no more references
+	then a button is presented to delete the location.  Otherwise repeat
+	the process for the next reference.
+</ol>
+<p>You get to this web page by clicking on the link on the 
+<a href="/FamilyTree/LocationHelpen.html">Display/Edit Location</a> web page.
+</p>
+</div>
+<div class="botcrumbs">
+    <span class="right">
+	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+    </span>
+	<a href="/contactAuthor.php?subject=getIndividualsByLocationHelpen.html" target="_blank">Contact Author</a>
+	<br/>
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Family Tree Services</a>:
+	<a href="/FamilyTree/LocationsHelpen.html">Locations</a>:
+	<a href="/FamilyTree/LocationHelpen.html">Location</a>:
+    <div style="clear: both;"></div>
+</div>
+</body>
+</html>

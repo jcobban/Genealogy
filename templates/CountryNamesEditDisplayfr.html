@@ -1,0 +1,128 @@
+<!--*********************************************************************
+ *  CountryNamesEditDisplayfr.html					*
+ *									*
+ *  Display form for editting information about country names		*
+ *  for a country.							*
+ *									*
+ *  History:								*
+ *	2017/10/25	created						*
+ *	2018/01/04	remove Template from template file names	*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+<div id='breadcrumbs' class='hidden'>
+  <a href="/genealogy.php?lang=fr">Généalogie</a>:
+  <a href="/FamilyTree/Services.php?lang=fr">Services</a>:
+  <a href='/Canada/CountriesEdit.php?lang=fr'>Liste des Pays Soutenus</a>:
+</div> <!-- id='breadcrumbs' -->
+<div class='body'>
+  <h1>
+    <span class='right'>
+	<a href='/Canada/CountryNamesEditHelpfr.html' target='help'>? Help</a>
+    </span>
+	$COUNTRYNAME: Montrer la Table des Noms
+    <div style='clear: both;'></div>
+  </h1>
+  $TRACE
+  $MSG
+<!--- Put out the response as a table -->
+<form name='countryForm'
+	action='CountryNamesEdit.php' 
+	method='post' 
+	autocomplete='off' 
+	enctype='multipart/form-data'>
+    <input type='hidden' name='Debug' id='Debug' value='$DEBUG'>
+    <input type='hidden' name='CC' id='CC' value='$CC'>
+    <input type='hidden' name='lang' id='lang' value='$LANG'>
+  <table class='form' id='dataTbl'>
+    <!--- Put out the column headers -->
+    <thead>
+      <tr id='hdrRow'>
+	<th class='colhead'>
+	Langage
+	</th>
+	<th class='colhead'>
+	Nom
+	</th>
+	<th class='colhead'>
+	Article
+	</th>
+	<th class='colhead'>
+	Possessive
+	</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id='Row$code639_1'>
+	<td class='center'>
+	    <input type='text' name='Code$code639_1' id='Code$code639_1'
+			value='$code639_1'
+			class='ina codenc' 
+			size='2' maxlength='2' readonly='readonly'>
+	</td>
+	<td class='left'>
+	    <input type='text' name='Name$code639_1' id='Name$code639_1' 
+			value='$name' 
+			class='ina leftnc' readonly='readonly'
+			size='28' maxlength='64'>
+	</td>
+	<td class='left'>
+	    <input type='text' name='Article$code639_1' id='Article$code639_1' 
+			value='$article' 
+			class='ina leftnc' readonly='readonly'
+			size='12' maxlength='32'>
+	</td>
+	<td class='left'>
+	    <input type='text' name='Possessive$code639_1' id='Possessive$code639_1' 
+			value='$possessive' 
+			class='ina leftnc' readonly='readonly'
+			size='12' maxlength='32'>
+	</td>
+      </tr>
+    </tbody>
+  </table>
+    <button type='submit' id='Submit'>Mise a Jour la Base des Données</button>
+    &nbsp;
+    <button type='button' id='Add'>Ajouter un Nom</button>
+</form>
+<!-- The remainder of the page consists of context specific help text. -->
+<div class='balloon' id='HelpCode'>
+<p>This field contains a 3-character abbreviation for the country which
+is used to refer to this record.
+Except when adding a new country this is a read-only field.
+</p>
+</div>
+<div class='balloon' id='HelpName'>
+<p>The name of the country.
+</p>
+</div>
+<div class='balloon' id='Helppattern'>
+<p>Enter text to search for in the country names.
+</p>
+</div>
+<div class='balloon' id='HelpDelete'>
+<p>This button is used to delete a country record from the list.
+</p>
+</div>
+<div class='balloon' id='HelpEditDomains'>
+<p>This button is used to display a dialog for editing the lower level
+administrative units of the country, that is the states or provinces.
+</p>
+</div>
+<div class='balloon' id='HelpAdd'>
+Click on this button to add another country into the list.
+</div>
+<div class='balloon' id='HelpSubmit'>
+Click on this button to update the database to include the changes you
+have made to the countries list.
+</div>
+<div class='balloon' id='HelprightTop'>
+Click on this button to signon to access extended features of the web-site
+or to manage your account with the web-site.
+</div>
+    <script src='/jscripts/CommonForm.js' type='text/javascript'>
+    </script>
+    <script src='/jscripts/util.js' type='text/javascript'>
+    </script>
+    <script src='/Canada/CountryNamesEdit.js' type='text/javascript'>
+    </script>

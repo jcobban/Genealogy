@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="31">
+    <option value="341">
+        Ameliasburgh
+    </option>
+    <option value="342">
+        Athol
+    </option>
+    <option value="343">
+        Hallowell
+    </option>
+    <option value="344">
+        Hillier
+    </option>
+    <option value="345">
+        Marysburgh
+    </option>
+    <option value="346">
+        Picton Town
+    </option>
+    <option value="347">
+        Sophiasburgh
+    </option>
+</select>

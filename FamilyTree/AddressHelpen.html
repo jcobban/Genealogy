@@ -1,0 +1,179 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+   <title>Display/Edit Address: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name='author' content='James A. Cobban'>
+    <meta name='copyright' content='&copy; 2018 James A. Cobban'>
+<!--*********************************************************************
+ *  AddressHelpen.html                                                  *
+ *                                                                      *
+ *  History:															*
+ *		2010/12/04		created											*
+ *		2014/02/10		eliminate use of tables for layout				*
+ *		2017/08/13		document rich text editor						*
+ *						document preposition							*
+ *						document map support							*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='/styles.css'/>
+</head>
+<body>
+<div class='topcrumbs'>
+    <a href='/indexHelpen.html'>Home</a>: 
+    <a href='/genealogyHelpen.html'>Genealogy</a>: 
+    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>: 
+    <a href='/FamilyTree/AddressesHelpen.html'>Addresses</a>:
+</div>
+<div class='help'>
+<h1>Display/Edit Address: Help</h1>
+<p>Every address that is referenced in the family tree is
+recorded in the Addresses Master List.  This way all of the information
+collected about a particular address is centralized.  This,
+in particular, facilitates ensuring that particular addresses are always
+identified in the same way.
+</p>
+<p>An Address record can be used for one of three purposes:
+<ol>
+<li>As a more detailed alternative to a Location record.  A Location
+record contains an unstructured line of text identifying the place where
+an event took place, or a fact was observed.  An Address record breaks
+the identification of the place into its hierarchical component parts.
+<li>To record contact information for an individual in the family tree.
+This should be used cautiously.  For example using a separate contact list
+or "Rolodex"&trade;
+application provides advantages, such as integration with address label or
+bulk mail creation applications.  Furthermore placing personal information
+of this sort in the family tree may expose it to an unintended audience.
+<li>To record contact information for a repository, such as a library or
+archive, which provides public access to source documents that are
+referenced by the family tree.
+</ol>
+<p>You get to this web page by clicking on the link on the numeric
+key field on the
+<a href='AddressesHelpen.html'>Addresses Master List</a> web page,
+or by clicking on the button associated with "Address" on the
+<a href='editIndividHelpen.html'>edit Individual page</a>.
+If you are authorized the text and other fields on this page permit you to
+modify the characteristics of the address.  Otherwise the fields are
+all protected.  The following information is displayed:
+</p>
+<p>
+  <ul>
+    <li>The unique numeric key of the address record, called the IDAR.
+    <li>A selection list for the 'kind' of address.  Mailing address records
+	are used to record the mailing address of individuals in the
+	family tree.  Event address records are used in place of location 
+	records to represent the place where an event took place or
+	a fact was observed with more details than a location record
+	can contain.  A repository address record is used to record the
+	physical (or electronic) location of a copy of a source document.
+    <li>The style field indicates whether this address should use the
+	North American style of postal addresses or the European style.
+    <li>The address name as it appears in reports.  The only way to
+	modify the appearance of the name is through this field.
+	Note that when you first add a mailing Address onto an individual
+	the address name is initialized to the name of the individual.
+	In most cases that is desirable, but for very common names
+	such as "Donald McDonald" you may end up with two Address
+	entries with the same name, which will cause endless confusion.
+    <li>The sort key is normally omitted, but can be
+	used to change how the address names are present in the
+	  <a href='AddressesHelpen.html'>addresses master list</a>.
+	For example if you define "Saint Louis, Missouri, USA" as the
+	sort key for "St Louis, MO, USA" then the address will sort in
+	a more intuitive way.
+    <li>The components of the address as it would be used for surface
+	mail.
+    <li>Two phone numbers associated with the address record.
+    <li>An electronic mail address associated with the address record.
+    <li>A web-site uniform record locator associated with the address record.
+    <li>The Latitude and Longitude of a address are normally filled in
+	by a geo-location service. The format is degrees including a decimal
+	fraction.
+    <li>The <span style='button'>Show Map</span> button pops up a map
+	showing the location.
+    <li>The <span style='button'>Get Map Info</span> button copies information
+	from the displayed map into the record.  This avoids going to the
+	external geo-location service every time the
+	<span style='button'>Get Map Info</span> button is clicked.
+    <li>The Zoom specification defines the level of detail of the displayed
+	map.
+    <li>You can define a preposition to use when presenting the address as
+	part of another web-page.
+    <li>The notes field can be used to explain the usage of a address
+	or for any other purpose you choose.  This is a
+<a href='https://www.tinymce.com/'>"What You See is What You Get"</a> 
+editor that you can use like a
+word processor.  You can highlight text as <b>bold</b>, <i>italic</i>, 
+or <u>underlined</u>.
+You can change the <span style='color:red;'>color</span>,
+<span style='background-color: yellow'>background</span>,
+<span style='font-size: smaller;'>size</span>,
+and even the
+<span style='font-family: courier monospace sans-serif; font-size: larger'>font
+ for text</span>.
+You can use pre-defined styles which combine a set of features.
+You can insert numbered or unnumbered lists.  You can define
+<a href='https://en.wikipedia.org/wiki/Hyperlink'>hyper-links</a> 
+to other locations anywhere on the World-Wide Web.  You can insert images
+by referencing their location on the web and control how they are presented
+within the page.
+    <li>The "List 1" through "List 6" flags are used by Legacy.
+    <li>The "Used" flag is used by Legacy.
+    <li>The "Tag1" flag is used by Legacy.
+    <li>The "Verified" flag is used by Legacy.
+    <li>The "FSResolved" field is used by Legacy.
+	It has the values 0=no, 1=yes, 2=could not be resolved.
+    <li>The "VEResolved" field is used by Legacy.
+	It has the values 0=no, 1=yes, 2=could not be resolved.
+    <li>The "qsTag" flag is used by Legacy.
+  </ul>
+</p>
+<p>As a result of editing address names it may happen that two or more
+	addresses end up with the same Address Name text
+	and the same 'kind' of address.  This normally means
+	that they are in fact two references to the same real address.
+	When this occurs editing one of the addresses results 
+	in the display of a list
+	of all higher numbered addresses with the same address name,
+	together with a "Merge Duplicates" button.  Clicking on this
+	button merges all references to the higher numbered instances
+	and deletes the higher numbered instances from the table.
+</p>
+<p>There are four buttons at the bottom of the page:
+  <ul>
+    <li>If you are authorized to update addresses click on
+	the "Update Address" to apply changes you have made to the
+	fields.
+    <li>If you are authorized to update the address click on the
+	"Delete Address" to remove the record.  If you are editing the
+	Address associated with an individual then this also updates the
+	individual, and the "Edit Address" button in the page for updating
+	the individual changes to read "Add Address".  Note that to clear
+	the reference from the Individual to the Address you need to
+	update the individual.
+    <li>You can click on "Close without Updating" to no apply any changes
+	to the database.
+    <li>The "Pictures" button opens a page displaying the associated
+	media documents associated with this address.
+  </ul>
+</p>
+</div>
+<div class='botcrumbs'>
+    <span class='right'>
+	<img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+    </span>
+    <a href='/contactAuthor.php?subject=AddressHelpen.html' target='_blank'>
+	Contact Author</a>
+    <br/>
+    <a href='/indexHelpen.html'>Home</a>: 
+    <a href='/genealogyHelpen.html'>Genealogy</a>: 
+    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>: 
+    <a href='/FamilyTree/AddressesHelpen.html'>Addresses</a>:
+    <div style='clear: both;'></div>
+  </div>
+</body>
+</html>

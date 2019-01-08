@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="8">
+    <option value="72">
+        Barrie &amp; Clarendon
+    </option>
+    <option value="73">
+        Bedford
+    </option>
+    <option value="74">
+        Hinchinbrooke
+    </option>
+    <option value="75">
+        Kennebec
+    </option>
+    <option value="76">
+        Kingston
+    </option>
+    <option value="77">
+        Loughborough
+    </option>
+    <option value="78">
+        Miller &amp; Canonto
+    </option>
+    <option value="79">
+        Olden
+    </option>
+    <option value="80">
+        Oso
+    </option>
+    <option value="81">
+        Palmerson
+    </option>
+    <option value="82">
+        Pittsburgh
+    </option>
+    <option value="83">
+        Portland
+    </option>
+    <option value="84">
+        Portsmouth Village
+    </option>
+    <option value="85">
+        Storrington
+    </option>
+    <option value="86">
+        Wolfe Island
+    </option>
+    <option value="87">
+        Provincial Penitentiary
+    </option>
+    <option value="87A">
+        Criminal lunatic Asylum
+    </option>
+    <option value="87B">
+        Forts Henry &amp; Frederick
+    </option>
+    <option value="87C">
+        Agricultural Census
+    </option>
+</select>

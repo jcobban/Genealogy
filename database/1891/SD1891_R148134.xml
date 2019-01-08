@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148134">
+    <option value="57_G">
+        Dundas: Winchester
+        <div id="1" reel="148134" frame="0" count="19"/>
+        <div id="2" reel="148134" frame="19" count="23"/>
+        <div id="3" reel="148134" frame="42" count="15"/>
+        <div id="4" reel="148134" frame="57" count="21"/>
+    </option>
+    <option value="57_H">
+        Dundas: Winchester Village
+        <div id="" reel="148134" frame="78" count="20"/>
+    </option>
+    <option value="58_A">
+        Durham East: Cavan
+        <div id="1" reel="148134" frame="98" count="21"/>
+        <div id="2" reel="148134" frame="119" count="22"/>
+        <div id="3" reel="148134" frame="141" count="0"/>
+    </option>
+    <option value="58_B">
+        Durham East: Hope
+        <div id="1" reel="148134" frame="141" count="55"/>
+        <div id="2" reel="148134" frame="196" count="27"/>
+        <div id="3" reel="148134" frame="223" count="23"/>
+    </option>
+    <option value="58_C">
+        Durham East: Manvers
+        <div id="1" reel="148134" frame="246" count="35"/>
+        <div id="2" reel="148134" frame="281" count="23"/>
+        <div id="3" reel="148134" frame="304" count="27"/>
+    </option>
+    <option value="58_D">
+        Durham East: Millbrook Village
+        <div id="" reel="148134" frame="331" count="22"/>
+    </option>
+    <option value="58_E">
+        Durham East: Port Hope Town
+        <div id="1" reel="148134" frame="353" count="37"/>
+        <div id="2" reel="148134" frame="390" count="35"/>
+        <div id="3" reel="148134" frame="425" count="33"/>
+    </option>
+    <option value="59_A">
+        Durham West: Bowmanville Town
+        <div id="1" reel="148134" frame="458" count="33"/>
+        <div id="2" reel="148134" frame="491" count="37"/>
+    </option>
+    <option value="59_B">
+        Durham West: Cartwright
+        <div id="1" reel="148134" frame="528" count="18"/>
+        <div id="2" reel="148134" frame="546" count="17"/>
+        <div id="3" reel="148134" frame="563" count="11"/>
+    </option>
+    <option value="59_C">
+        Durham West: Clarke
+        <div id="1" reel="148134" frame="574" count="33"/>
+        <div id="2" reel="148134" frame="607" count="22"/>
+        <div id="3" reel="148134" frame="629" count="21"/>
+        <div id="4" reel="148134" frame="650" count="18"/>
+    </option>
+</select>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select>
+    <option value="1">
+        Brant
+    </option>
+    <option value="2">
+        Bruce
+    </option>
+    <option value="3">
+        Carleton
+    </option>
+    <option value="4">
+        Dundas
+    </option>
+    <option value="5">
+        Durham
+    </option>
+    <option value="6">
+        Elgin
+    </option>
+    <option value="7">
+        Essex
+    </option>
+    <option value="8">
+        Frontenac
+    </option>
+    <option value="9">
+        Glengarry
+    </option>
+    <option value="10">
+        Grenville
+    </option>
+    <option value="11">
+        Grey
+    </option>
+    <option value="12">
+        Haldimand
+    </option>
+    <option value="13">
+        Halton
+    </option>
+    <option value="14">
+        Hastings
+    </option>
+    <option value="15">
+        Huron
+    </option>
+    <option value="16">
+        Kent
+    </option>
+    <option value="17">
+        Lambton
+    </option>
+    <option value="18">
+        Lanark
+    </option>
+    <option value="19">
+        Leeds
+    </option>
+    <option value="20">
+        Lennox &amp; Addington
+    </option>
+    <option value="21">
+        Lincoln
+    </option>
+    <option value="22">
+        Middlesex
+    </option>
+    <option value="23">
+        Norfolk
+    </option>
+    <option value="24">
+        Northumberland
+    </option>
+    <option value="25">
+        Ontario
+    </option>
+    <option value="26">
+        Oxford
+    </option>
+    <option value="27">
+        Peel
+    </option>
+    <option value="28">
+        Perth
+    </option>
+    <option value="29">
+        Peterborough
+    </option>
+    <option value="30">
+        Prescott
+    </option>
+    <option value="31">
+        Prince Edward
+    </option>
+    <option value="32">
+        Renfrew
+    </option>
+    <option value="33">
+        Russell
+    </option>
+    <option value="34">
+        Simcoe
+    </option>
+    <option value="35">
+        Stormont
+    </option>
+    <option value="36">
+        Victoria
+    </option>
+    <option value="37">
+        Waterloo
+    </option>
+    <option value="38">
+        Welland
+    </option>
+    <option value="39">
+        Wellington
+    </option>
+    <option value="40">
+        Wentworth
+    </option>
+    <option value="41">
+        York
+    </option>
+    <option value="42">
+        Algoma District
+    </option>
+    <option value="43">
+        Nipissing District
+    </option>
+    <option value="44">
+        Hamilton City
+    </option>
+    <option value="45">
+        Kingston City
+    </option>
+    <option value="46">
+        London City
+    </option>
+    <option value="47">
+        Ottawa City
+    </option>
+    <option value="48">
+        Toronto City
+    </option>
+</select>

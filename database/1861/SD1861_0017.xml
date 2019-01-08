@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="17">
+    <option value="178">
+        Bosanquet
+    </option>
+    <option value="179">
+        Brooke
+    </option>
+    <option value="180">
+        Dawn
+    </option>
+    <option value="181">
+        Enniskillen
+    </option>
+    <option value="182">
+        Euphemia
+    </option>
+    <option value="183">
+        Moore
+    </option>
+    <option value="184">
+        Plymton
+    </option>
+    <option value="185">
+        Sarnia
+    </option>
+    <option value="186">
+        Sarnia Town
+    </option>
+    <option value="187">
+        Sombra
+    </option>
+    <option value="188">
+        Warwick
+    </option>
+    <option value="188A">
+        Agricultural Census
+    </option>
+</select>

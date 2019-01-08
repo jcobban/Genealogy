@@ -1,0 +1,288 @@
+<!--*********************************************************************
+ *  Registeren.html														*
+ *																		*
+ *  This template provides a common interface for registering as an		*
+ *  authorized user of the web site.									*
+ *																		*
+ *  History:															*
+ *		2018/02/05		Created											*
+ *		2018/02/28		add "Generate Password" button					*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+ <link rel="stylesheet" type="text/css" href="/Register.css">
+  <div id='breadcrumbs' style='hidden'>
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+  </div>
+  <div class='body'>
+    <h1>
+      <span id="titleNew">
+		    Register a New User
+      </span>
+      <span id="titleComplete">
+		    Registration Complete
+      </span>
+      <span id="titleAlready">
+		    Already Registered
+      </span>
+      <span class='right'>
+		<a href='RegisterHelpen.html' target='help'>? Help</a>
+      </span>
+      <div style='clear: both;'></div>
+    </h1>
+    $TRACE
+    <p>By registering you are agreeing to accept the use of "cookies"
+		that are used to keep track of your session and validate your
+		authorization to access services which are only available to
+		registered users.
+    </p>
+    <p id='okmsgRespond' class='label'> 
+		Respond to the e-mail which is sent to you to confirm this registration.
+    </p>
+    <p id='okmsgAlready' class='label'> 
+		You are already registered with that user name and E-mail address.
+    </p>
+
+    <!-- error messages -->
+    <span id="shortUsername" class="message">
+		User identifier must be at least 6 characters long.
+    </span>
+    <span id="badUsername" class="message">
+		User identifier '$newuserid' may not contain '&lt;', '&gt;', '@', or '&amp;'.
+    </span>
+    <span id="shortPassword" class="message">
+		Password must be at least 6 characters long.
+    </span>
+    <span id="passwordMismatch" class="message">
+		Passwords do not match.
+    </span>
+    <span id="badEmail" class="message">
+		A valid e-mail address is required for registration.
+    </span>
+    <span id="initialPrompt" class="warning">
+		Enter registration.
+    </span>
+    <span id="emailInUse" class="message">
+		Requested email '$email' already in use for userid.
+    </span>
+    <span id="useridInUse" class="message">
+		Requested userid '$newuserid' already in use.  Try something different.
+    </span>
+
+    <form action='Register.php'
+		  name='signonForm' id='signonForm'
+		  method='post'  
+		  enctype='multipart/form-data'>
+		<p class='clear' id='useridRow'>
+		    <label class='label' for='userid'>User Identifier:
+		    </label>
+		    <input type='text' size='32' maxlength='64'
+					name='userid' id='userid' autocomplete='off' 
+					class='black white leftnc'
+					value='$NEWUSERID'>
+		</p>
+		<p class='clear' id='passRow'>
+		    <label class='label' for='password'>Password:
+		    </label>
+		    <input type='password' size='32' name='password' id='password'
+					class='white leftnc'
+					autocomplete='off'>
+		    <span id='passwordPoor' style='color:#e00000; display:none'>
+			Your password is poor.
+		    </span>
+		    <span id='passwordWeak' style='color:#a89800; display:none'>
+			Your password is weak.
+		    </span>
+		    <span id='passwordGood' style='color:#60d800; display:none'>
+			Your password is good.
+		    </span>
+		    <span id='passwordStrong' style='color:#11ff10; display:none'>
+			Your password is strong.
+		    </span>
+		</p>
+		<p class='clear' id='pass2Row'>
+		    <label class='label' for='password2'>Repeat Password:
+		    </label>
+		    <input type='password' size='32' name='password2' id='password2'
+					class='black white leftnc'
+					autocomplete='off'>
+		    <button type="button" id="generatePassword">
+			Generate Random Password
+		    </button>
+		    <input type="text" size="32" value=""
+			name="randomPassword" id="randomPassword"
+			class="white leftnc" readonly="readonly">
+		    </p>
+		<p class='clear' id='emailRow'>
+		    <label class='label' for='email'>E-mail Address:
+		    </label>
+		    <input type='text' size='64' name='email' id='email'
+					class='black white leftnc'
+					value='$EMAIL'>
+		</p>
+		<p class='clear' id='useEmailRow'>
+		    <label class='label' for='usemail'>Send Notices to E-mail:
+		    </label>
+		    <input type='checkbox' name='usemail' id='usemail'
+				$CHKUSEMAIl>
+		</p>
+		<p class='clear' id='noHelpRow'>
+		    <label class='label' for='nohelp'>Suppress Help Popups:
+		    </label>
+		    <input type='checkbox' name='nohelp' id='nohelp'
+				$CHKNOHELP>
+		</p>
+      <p class='clear'>
+		<input type='hidden' name='debug' value='$DEBUG'>
+		<input type='hidden' name='lang' value='$LANG'>
+		<span class='pad'>
+		    <button type='submit' id='submit'>
+			<u>R</u>egister
+		    </button>
+		</span>
+		<span class='pad'>
+		    <button type='button' id='close'>
+			<u>C</u>lose
+		    </button>
+		</span>
+		<span class='button'>
+		  <a href='ContactAuthor.php?subject=Sign On'>
+			Contact Administrator</a>
+		</span>
+      </p>
+    </form>
+		
+    $MSG
+  </div>
+  <div class='hidden'>
+    <span id="emailSubject">
+		[JamesCobban.net] Thank You for Registering as User '$newuserid'
+    </span>
+    <span id="emailBody">
+		Please complete your registration for user name '$newuserid'
+		by verifying your e-mail address by clicking on the following link:  .
+		<a href="https://$servername/ConfirmEmail.php?userid=$newuserid&id=$id&hash=$shapassword">Confirm</a>
+		Thank you.
+		<br>
+		<i>Administrator</i>
+    </span>
+  </div>
+  <div class='balloon' id='matchDiv'>
+      <form name='matchForm' id='matchForm'>
+		<p class='message'>The two password values must match</p>
+		<p>
+		  <button type='button' id='closeDlgMatch'>
+    	OK
+		  </button>
+		</p>
+      </form>
+  </div>
+  <div class='balloon' id='Helpuserid'>
+    <p>
+		In this field enter the user name by which you wish to be known to the
+		service.  You will use this name each time you sign on
+		to contribute to or access private contents of the
+		web site.  This should be something that is easy for you to remember,
+		but that does not reveal private information about yourself such as
+		your e-mail address.  Your user name must be at least 6 characters long.
+		It may not contain  '&lt;', '&gt;', '@', or '&amp;'.
+		It may contain any other characters including spaces.  Spaces
+		entered at the beginning or end of the user name are ignored.
+		For example "Αλεξανδρος Μεγαλος" is a valid user name
+		as is "Ива́н Гро́зный"
+    </p>
+  </div>
+  <div class='balloon' id='Helppassword'>
+    <p>
+		Enter the password you wish to use to verify your identity when you
+		sign on to contribute to the web site.  This should be something that it
+		would be difficult for someone else to guess so it should not contain
+		information that is publicly known about you.  Your browser will
+		probably assist you to remember this value. 
+		The password must be at least 6 characters
+		long and may be up to 64 characters long and can contain
+		any characters including spaces that you can enter.
+		As you enter the password a running score will be displayed of the
+		strength of the password.  
+		It is up to you to protect your privacy.
+		The value of the password is not displayed.
+    </p>
+  </div>
+  <div class='balloon' id='Helppassword2'>
+    <p>
+		You must enter the password for the user name
+		twice to avoid possible typing errors which would make the user name
+		inaccessable.
+		The value of the new password is not displayed.
+    </p>
+  </div>
+ <div class="balloon" id="HelpgeneratePassword">
+    <p>
+		Click on this button to generate a random password constructed from the
+		95 printable ASCII characters including space.
+		The value of this generated password is displayed in the
+		following field from
+		which you can copy it to the New and Repeat New Password fields.
+    </p>
+ </div>
+ <div class="balloon" id="HelprandomPassword">
+    <p>
+		This is where the Generate Password button displays the generated
+		password which you can copy to the New and Repeat New Password fields.
+    </p>
+ </div>
+  <div class='balloon' id='Helpemail'>
+    <p>
+		Specify the e-mail address associated with the account.
+		This e-mail address
+		is used only for communicating with you with regard to your account.
+		Under no circumstances will your e-mail address be given to any
+		third party without your express permission.
+    </p>
+  </div>
+  <div class='balloon' id='Helpusemail'>
+    <p>
+		If this is checked then messages will be sent to the associated e-mail
+		address regarding changes in the web-site such as new features and
+		capabilities.
+		Generally this will be no more frequently than once a month.
+		These notices will also be posted to the web-site so if you do not wish
+		to receive e-mail notices,
+		you will still have access to the information.
+		If you clear this checkbox then the only e-mail you will receive
+		will be the
+		one used to verify the existence of your e-mail address.
+    </p>
+  </div>
+  <div class='balloon' id='Helpnohelp'>
+    <p>
+		If this option is checked then the feature to pop up element specific
+		help if the mouse if held over a button or input field for more than 2
+		seconds is turned off.
+    </p>
+  </div>
+  <div class='balloon' id='Helpsubmit'>
+    <p>
+		Clicking on this button with the mouse registers the new account.
+		You may also apply the changes by pressing the Enter key while the
+		focus is in any input text field in the form,
+		or by pressing the key combinations ctrl-S or alt-R.
+    </p>
+  </div>
+  <div class='balloon' id='Helpclose'>
+    <p>
+		Clicking on this button with the mouse closes the dialog without making
+		any changes to the account.
+		As a short-cut you may also close the dialog by pressing the
+		key combination alt-C.
+    </p>
+  </div>
+  <div class='balloon' id='HelpcloseDlgMatch'>
+    <p>
+		Clicking on this button with the mouse closes the error dialog.
+    </p>
+  </div>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/Register.js" type="text/javaScript">
+    </script>

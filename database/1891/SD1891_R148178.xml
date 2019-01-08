@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148178">
+    <option value="124_E">
+        Welland: Humberstone
+        <div id="3" reel="148178" frame="23" count="15"/>
+    </option>
+    <option value="124_F">
+        Welland: Niagara Falls Town
+        <div id="1" reel="148178" frame="38" count="36"/>
+        <div id="2" reel="148178" frame="74" count="34"/>
+    </option>
+    <option value="124_G">
+        Welland: Niagara Falls Village
+        <div id="" reel="148178" frame="108" count="25"/>
+    </option>
+    <option value="124_H">
+        Welland: Port Colborne Village
+        <div id="" reel="148178" frame="133" count="24"/>
+    </option>
+    <option value="124_I">
+        Welland: Stamford
+        <div id="1" reel="148178" frame="157" count="21"/>
+        <div id="2" reel="148178" frame="178" count="24"/>
+    </option>
+    <option value="124_J">
+        Welland: Thorold
+        <div id="1" reel="148178" frame="202" count="25"/>
+        <div id="2" reel="148178" frame="227" count="23"/>
+    </option>
+    <option value="124_K">
+        Welland: Thorold Town
+        <div id="1" reel="148178" frame="250" count="27"/>
+        <div id="2" reel="148178" frame="277" count="21"/>
+    </option>
+    <option value="124_L">
+        Welland: Welland Town
+        <div id="" reel="148178" frame="298" count="42"/>
+    </option>
+    <option value="124_M">
+        Welland: Willoughby
+        <div id="" reel="148178" frame="340" count="23"/>
+    </option>
+    <option value="125_A">
+        Wellington Centre: Drayton Village
+        <div id="" reel="148178" frame="363" count="17"/>
+    </option>
+    <option value="125_B">
+        Wellington Centre: Elora Village
+        <div id="" reel="148178" frame="380" count="28"/>
+    </option>
+    <option value="125_C">
+        Wellington Centre: Fergus Village
+        <div id="" reel="148178" frame="408" count="34"/>
+    </option>
+    <option value="125_D">
+        Wellington Centre: Garafraxa East
+        <div id="" reel="148178" frame="" count="0"/>
+    </option>
+    <option value="125_E">
+        Wellington Centre: Garafraxa West
+        <div id="1" reel="148178" frame="" count="0"/>
+        <div id="2" reel="148178" frame="442" count="17"/>
+        <div id="3" reel="148178" frame="" count="0"/>
+        <div id="4" reel="148178" frame="" count="0"/>
+    </option>
+    <option value="125_F">
+        Wellington Centre: ?
+        <div id="" reel="148178" frame="" count="0"/>
+    </option>
+    <option value="125_G">
+        Wellington Centre: Nichol
+        <div id="1" reel="148178" frame="459" count="11"/>
+        <div id="2" reel="148178" frame="470" count="17"/>
+        <div id="3" reel="148178" frame="" count="0"/>
+    </option>
+    <option value="125_H">
+        Wellington Centre: Orangeville Town
+        <div id="1" reel="148178" frame="" count="0"/>
+        <div id="2" reel="148178" frame="487" count="13"/>
+        <div id="3" reel="148178" frame="500" count="0"/>
+        <div id="4" reel="148178" frame="500" count="18"/>
+        <div id="5" reel="148178" frame="518" count="20"/>
+    </option>
+    <option value="125_I">
+        Wellington Centre: Peel
+        <div id="1" reel="148178" frame="538" count="21"/>
+        <div id="2" reel="148178" frame="" count="0"/>
+        <div id="3" reel="148178" frame="" count="0"/>
+        <div id="4" reel="148178" frame="" count="0"/>
+        <div id="5" reel="148178" frame="" count="0"/>
+    </option>
+    <option value="125_J">
+        Wellington Centre: Pilkington
+        <div id="1" reel="148178" frame="559" count="16"/>
+        <div id="2" reel="148178" frame="575" count="19"/>
+    </option>
+    <option value="126_A">
+        Wellington North: Amaranth
+        <div id="1" reel="148178" frame="594" count="27"/>
+        <div id="2" reel="148178" frame="621" count="32"/>
+    </option>
+    <option value="126_B">
+        Wellington North: Arthur
+        <div id="1" reel="148178" frame="653" count="35"/>
+        <div id="2" reel="148178" frame="688" count="33"/>
+    </option>
+    <option value="126_C">
+        Wellington North: Arthur Village
+        <div id="" reel="148178" frame="721" count="27"/>
+    </option>
+    <option value="126_D">
+        Wellington North: Clifford Village
+        <div id="" reel="148178" frame="748" count="14"/>
+    </option>
+    <option value="126_E">
+        Wellington North: Harriston Town
+        <div id="" reel="148178" frame="762" count="35"/>
+    </option>
+</select>

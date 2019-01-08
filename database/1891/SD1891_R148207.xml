@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148207">
+    <option value="170_I">
+        Montmagny: St. Thomas
+        <div id="1" reel="148207" frame="0" count="36"/>
+        <div id="2" reel="148207" frame="36" count="23"/>
+    </option>
+    <option value="171_A">
+        Montmorency: Château Richer
+        <div id="" reel="148207" frame="59" count="33"/>
+    </option>
+    <option value="171_B">
+        Montmorency: L'Ange Gardien
+        <div id="" reel="148207" frame="92" count="24"/>
+    </option>
+    <option value="171_C">
+        Montmorency: Ste. Anne
+        <div id="" reel="148207" frame="116" count="33"/>
+    </option>
+    <option value="171_D">
+        Montmorency: Ste. Brigitte de Laval
+        <div id="" reel="148207" frame="149" count="14"/>
+    </option>
+    <option value="171_E">
+        Montmorency: Ste. Famille
+        <div id="" reel="148207" frame="163" count="17"/>
+    </option>
+    <option value="171_F">
+        Montmorency: St. Féréol
+        <div id="" reel="148207" frame="180" count="22"/>
+    </option>
+    <option value="171_G">
+        Montmorency: St. François
+        <div id="" reel="148207" frame="202" count="11"/>
+    </option>
+    <option value="171_H">
+        Montmorency: St. Jean
+        <div id="" reel="148207" frame="213" count="27"/>
+    </option>
+    <option value="171_I">
+        Montmorency: St. Joachim
+        <div id="" reel="148207" frame="240" count="19"/>
+    </option>
+    <option value="171_J">
+        Montmorency: St. Laurent
+        <div id="" reel="148207" frame="259" count="17"/>
+    </option>
+    <option value="171_K">
+        Montmorency: Ste. Petronille de Beaulieu Village
+        <div id="" reel="148207" frame="276" count="7"/>
+    </option>
+    <option value="171_L">
+        Montmorency: St. Pierre
+        <div id="" reel="148207" frame="283" count="16"/>
+    </option>
+    <option value="171_M">
+        Montmorency: St. Tite des Caps
+        <div id="" reel="148207" frame="299" count="20"/>
+    </option>
+    <option value="172_A">
+        Montréal City: Centre Ward
+        <div id="1" reel="148207" frame="319" count="8"/>
+        <div id="2" reel="148207" frame="327" count="8"/>
+    </option>
+    <option value="172_B">
+        Montréal City: East Ward
+        <div id="1" reel="148207" frame="335" count="21"/>
+        <div id="2" reel="148207" frame="356" count="31"/>
+        <div id="3" reel="148207" frame="387" count="21"/>
+    </option>
+    <option value="172_C">
+        Montréal City: Ste. Anne Ward
+        <div id="1" reel="148207" frame="408" count="3"/>
+        <div id="2" reel="148207" frame="411" count="23"/>
+        <div id="3" reel="148207" frame="434" count="24"/>
+        <div id="4" reel="148207" frame="458" count="14"/>
+        <div id="5" reel="148207" frame="472" count="29"/>
+        <div id="6" reel="148207" frame="501" count="19"/>
+        <div id="7" reel="148207" frame="520" count="26"/>
+        <div id="8" reel="148207" frame="546" count="25"/>
+        <div id="9" reel="148207" frame="571" count="57"/>
+        <div id="10" reel="148207" frame="628" count="33"/>
+        <div id="11" reel="148207" frame="661" count="21"/>
+        <div id="12" reel="148207" frame="682" count="29"/>
+        <div id="13" reel="148207" frame="711" count="15"/>
+        <div id="14" reel="148207" frame="726" count="21"/>
+        <div id="15" reel="148207" frame="747" count="13"/>
+        <div id="16" reel="148207" frame="760" count="24"/>
+        <div id="17" reel="148207" frame="784" count="25"/>
+    </option>
+</select>

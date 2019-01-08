@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Test Problem with Select Element in FF40</title>
+    <meta http-equiv='content-TYPE' content='text/html; charset=UTF-8'>
+    <meta http-equiv='default-style' content='text/css'>
+    <meta name='Author' content='James Cobban'>
+    <meta name='Copyright' content='&copy; 2015 James Cobban'>
+<!--*********************************************************************
+ *  PopupDialogTest.html						*
+ *									*
+ *  Display every field from a page of the 1881 census in tabular form	*
+ *  so it can be editted.						*
+ *									*
+ *	2015/08/15	created						*
+ *									*
+ *  Copyright &copy; 2015 James A. Cobban				*
+ **********************************************************************-->
+    <script language='JavaScript'>
+window.onload	= onLoad;
+
+function onLoad()
+{
+    document.getElementById('popup').onclick	= showDialog;
+}		// onLoad
+
+function showDialog()
+{
+    var form	= document.getElementById('idirChooserForm$sub').outerHTML;
+    form	= form.replace(/\$sub/g,'');
+    var div	= document.createElement('DIV');
+    div.innerHTML		= form;
+    var dialog	= document.getElementById('IdirDialog');
+    dialog.appendChild(div.firstChild);
+    var select	= document.getElementById('chooseIdir');
+    var option	= document.createElement('option');
+    option.text	= 'Dynamic Option';
+    option.value= 3;
+    select.add(option);
+    select.onchange		= chooseOption;
+    dialog.style.display	= 'block';
+    dialog.style.visibility	= 'visible';
+	
+}
+
+function chooseOption()
+{
+    var select	= this;
+    var button	= document.getElementById('choose');
+    if (select.value == '0')
+	button.innerHTML	= 'Cancel';
+    else
+	button.innerHTML	= "Option Chosen";
+}
+    </script>
+    <style>
+   /*********************************************************************
+    *	div class='balloon' is used to display context specific help.	*
+    *	It is intended to look like a yellow "sticky" note.		*
+    *********************************************************************/
+    div.balloon {
+		display:	none;
+		background-color:#FFFFA0;
+		font-family:	sans-serif;
+		position:	absolute;
+		top:		10%;
+		left:		10%;
+		width:		50%;
+		height:		auto;
+		padding:	2px;
+		border:		thin solid black
+		}
+   /*********************************************************************
+    *	div class='hidden' is used to hold templates which are never	*
+    *	displayed inline to the user.					*
+    *********************************************************************/
+    div.hidden {
+		display:	none;
+		background-color:white;
+		font-family:	sans-serif;
+		position:	absolute;
+		width:		auto;
+		height:		auto;
+		}
+    </style>
+</head>
+<body>
+  <h1>Test Problem with Select Element in FF40</h1>
+  <p>
+  <form>
+    <button type='button' id='popup'>Popup</button>
+  </form>
+<!-- popup to display dialog for IDIR -->
+<div class='balloon' id='IdirDialog'>
+</div>
+<div class='hidden' id='templates'>
+  <!-- select matching names dialog -->
+  <form name='idirChooserForm$sub' id='idirChooserForm$sub'>
+    <p class='label'>$surname, $givenname born $birthyear
+    <p>
+    <select name='chooseIdir' id='chooseIdir$sub' size='5'>
+      <option value='0'>Choose from the following partial matches:</option>
+      <option value='1'>Option 1</option>
+    </select>
+    <p>
+      <button type='button' id='choose$sub'>Cancel</button>
+    </p>
+  </form>
+  </div>
+</body>
+</html>

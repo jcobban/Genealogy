@@ -1,0 +1,181 @@
+<!--*********************************************************************
+ *  Locationsen.html													*
+ *																		*
+ *  Display a web page containing all of the locations matching a		*
+ *  pattern.															*
+ *																		*
+ *  History:															*
+ *		2018/11/06      created                                         *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+  </div>
+  <div class="body">
+    <h1>
+	    <span class="right">
+	      <a href="LocationsHelpen.html" target="help">? Help</a>
+	    </span>
+	    Locations Master List
+    </h1>
+    $TRACE
+    $MSG
+	<form name="locForm" action="Locations.php">
+	  <div class="row">
+		<label class="label" for="pattern" style="width: 11em;">
+		    Pattern:
+		</label>
+		<input name="pattern" id="pattern" type="text" size="64"
+				    class="white leftnc" value="$PATTERN">
+	  </div>
+	  <div class="row">
+		<label class="label" for="namefld" style="width: 11em;">
+		    Name:
+		</label>
+		<input name="namefld" id="namefld" type="text" size="64"
+				    class="white leftnc" value="">
+	  </div>
+	  <p class="label">
+		<button type="button" class="button" id="Search" accesskey="s">
+		    <u>S</u>earch
+		</button>
+		&nbsp;
+		<button type="button" class="button" id="Close" accesskey="c">
+		    <u>C</u>lose
+		</button>
+		&nbsp;
+		<button type="button" class="button" id="New" accesskey="n">
+		    Create <u>N</u>ew
+		</button>
+	  </p>
+	</form>
+	<p class="label" id="nomatches">
+		No Locations match the specified pattern.
+    </p>
+    <div id="somematches">
+	  <p class="label" id="countmatches">
+		  $COUNT Locations match the specified pattern.
+	  </p>
+	  <div class="center">
+	    <div class="left" id="npprev">
+	        <a href="Locations.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET&amp;lang=$LANG">&lt;---</a>
+	    </div>
+	    <div class="right" id="npnext"> 
+	        <a href="Locations.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG">---&gt;</a>
+	    </div>
+		  rows $OFFSET to $LAST of $COUNT 
+        <div style="clear: both;"></div>
+	  </div> <!-- class="center" -->
+	  <!--- Put out the response as a table -->
+	  <table class="details">
+		<!--- Put out the column headers -->
+		<thead>
+		  <tr>
+			<th class="colhead">
+			  IDLR
+			</th>
+			<th class="colhead">
+			  Location
+			</th>
+			<th class="colhead">
+			  Coords
+			</th>
+			<th class="colhead">
+			  Notes
+			</th>
+			<th class="colhead">
+			  Boundary
+			</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr id="location">
+			<td class="odd right">
+			    <a href="Location.php?id=$IDLR&amp;lang=$LANG">
+					$IDLR 
+			    </a>
+			</td>
+			<td class="odd left">
+			    $LOCATION
+			</td>
+			<td class="odd center">
+	            $LOCPRESENT
+			</td>
+			<td class="odd center">
+				$NOTESPRESENT
+			</td>
+			<td class="odd center">
+			    $BOUNDPRESENT
+			</td>
+		  </tr>
+		</tbody>
+        </table>
+      </div> <!-- id="somematches"-->
+	</div>	<!-- end of id="body" -->
+	<div class="balloon" id="Helppattern">
+	<p>
+		This is a regular expression, as supported by MySQL, which is used to limit
+		the locations to be displayed. See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer&quote;s regex page</a>.
+	<ul>
+	<li>If the pattern contains no special 
+		characters then only locations containing that string will be included.
+		For example the pattern "London" will match locations containing the string
+	"London".  Note that the search ignores case, so that pattern will also match
+	"LONDON" and "london".
+	<li>If the pattern begins with a caret '^' then only locations that
+	<b>begin</b> with the remainder of the pattern are included.  
+		For example the pattern
+	"^Ba" displays locations starting with "Ba" (or "ba" or "BA").
+	<li>If the pattern ends with a dollar sign '$', then only locations that
+	<b>end</b> with the remainder of the pattern are included.  
+		For example the pattern
+	"CA$" matches locations that end with "CA" (or "ca" or "Ca").
+	<li>In a pattern a period '.' matches any single character.  For example
+		the pattern "B.b" matches any location that contains two letter Bs separated
+		by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
+		anywhere in the location name.
+	<li>In a pattern an asterisk '*' matches zero or more of the preceding
+		character; "bo*b" matches "bb", "bob", and "boob"
+		anywhere in the location name.
+	</p>
+	</div>
+	<div class="balloon" id="Helpnamefld">
+	<p>Enter an actual location name in this field.  When you click on the
+	<span class="button">Search</span> button the dialog for displaying or
+		editing the details of the location pops up.  If you are authorised to 
+		update the database then this dialog permits you to create a new location,
+		otherwise only existing locations can be viewed in this way.
+	</p>
+	</div>
+	<div class="balloon" id="HelpSearch">
+	<p>Clicking on this button refreshes the displayed list of locations
+		based upon the pattern.  You may also hit the "enter" key to perform the
+		same function.
+	</p>
+	</div>
+	<!-- balloons to pop up when mouse moves over forward and back links -->
+	<div class="popup" id="mousenpprev">
+	    <p class="label">
+		    Go to Row $PREVOFFSET&nbsp;
+	    </p>
+	</div>
+	<div class="popup" id="mousenpnext">
+	    <p class="label">
+		    Go to Row $NEXTOFFSET&nbsp;
+	    </p>
+	</div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+	<script src="/jscripts/locationCommon.js" type="application/javascript">
+    </script>
+	<script src="Locations.js" type="application/javascript">
+    </script>

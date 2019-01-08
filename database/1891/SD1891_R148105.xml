@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148105">
+    <option value="18_H">
+        Queens: Petersville
+        <div id="2" reel="148105" frame="0" count="19"/>
+    </option>
+    <option value="18_I">
+        Queens: Waterborough
+        <div id="" reel="148105" frame="19" count="29"/>
+    </option>
+    <option value="18_J">
+        Queens: Wickham
+        <div id="" reel="148105" frame="48" count="20"/>
+    </option>
+    <option value="19_A">
+        Restigouche: Addington
+        <div id="1" reel="148105" frame="68" count="20"/>
+        <div id="2" reel="148105" frame="88" count="37"/>
+    </option>
+    <option value="19_B">
+        Restigouche: Colborne
+        <div id="1" reel="148105" frame="125" count="10"/>
+        <div id="2" reel="148105" frame="135" count="10"/>
+    </option>
+    <option value="19_C">
+        Restigouche: Dalhousie
+        <div id="1" reel="148105" frame="145" count="11"/>
+        <div id="2" reel="148105" frame="156" count="15"/>
+        <div id="3" reel="148105" frame="171" count="28"/>
+    </option>
+    <option value="19_D">
+        Restigouche: Durham
+        <div id="1" reel="148105" frame="199" count="18"/>
+        <div id="2" reel="148105" frame="217" count="23"/>
+    </option>
+    <option value="19_E">
+        Restigouche: Eldon &amp; Restigouche River
+        <div id="" reel="148105" frame="240" count="4"/>
+    </option>
+    <option value="20_A">
+        St. John City: Albert Ward
+        <div id="" reel="148105" frame="244" count="27"/>
+    </option>
+    <option value="20_B">
+        St. John City: Brooks Ward
+        <div id="" reel="148105" frame="271" count="26"/>
+    </option>
+    <option value="20_C">
+        St. John City: Dukes
+        <div id="" reel="148105" frame="297" count="62"/>
+    </option>
+    <option value="20_D">
+        St. John City: Guys Ward
+        <div id="" reel="148105" frame="359" count="38"/>
+    </option>
+    <option value="20_E">
+        St. John City: Kings Ward
+        <div id="1" reel="148105" frame="397" count="28"/>
+        <div id="2" reel="148105" frame="425" count="29"/>
+    </option>
+    <option value="20_F">
+        St. John City: Prince Ward
+        <div id="1" reel="148105" frame="454" count="38"/>
+        <div id="2" reel="148105" frame="492" count="51"/>
+    </option>
+    <option value="20_G">
+        St. John City: Queens Ward
+        <div id="1" reel="148105" frame="543" count="26"/>
+        <div id="2" reel="148105" frame="569" count="49"/>
+    </option>
+    <option value="20_H">
+        St. John City: Sydney Ward
+        <div id="" reel="148105" frame="618" count="46"/>
+    </option>
+</select>

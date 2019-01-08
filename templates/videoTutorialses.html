@@ -1,0 +1,44 @@
+<!--*********************************************************************
+ *  videoTutorialses.html												*
+ *																		*
+ *  This template provides access to a selection of video tutorials.	*
+ *																		*
+ *    History:															*
+ *		2018/01/29		Created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+    <a href="/genealogy.php?lang=es">Genealogia</a>:
+  </div>	
+<div class="body">
+  <h1>
+    <span class="right">
+	<a href="/videoTutorialsHelpes.html" target="help">? Help</a>
+    </span>
+	Tutorials en Video
+  </h1>
+  <ul id="listOfVideos">
+    <li id="$filename">
+      <span style="text-decoration: underline; color: blue;">
+	  <span id="Show$filename">Mostrar</span>
+	  <span id="Hide$filename" style="display: none">Esconder</span>
+	  $description
+      </span>
+      <div class="hidden" id="display$filename">
+        <video controls>
+          <source src="/Videos/$filename.webm" type="video/webm">
+          <source src="/Videos/$filename.mp4" type="video/mp4">
+	    Desolado, su navegador no es compatible con los videos integrados, 
+	    usted poder
+	    <a href="/Videos/$filename.webm">lo descargar</a>
+	    y lo verlar en tu visor de videos favorito!
+        </video>
+      </div>
+    </li>
+  </ul>
+</div> <!-- body -->
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/videoTutorials.js" type="text/javaScript">
+    </script>

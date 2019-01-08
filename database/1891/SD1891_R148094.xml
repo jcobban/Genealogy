@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148094">
+    <option value="4_A">
+        Victoria: James Bay Ward (Victoria City)
+        <div id="2" reel="148094" frame="0" count="25"/>
+        <div id="3" reel="148094" frame="25" count="24"/>
+    </option>
+    <option value="4_B">
+        Victoria: Johnson Street Ward (Victoria City)
+        <div id="1" reel="148094" frame="49" count="48"/>
+        <div id="2" reel="148094" frame="97" count="48"/>
+        <div id="3" reel="148094" frame="145" count="32"/>
+        <div id="4" reel="148094" frame="177" count="51"/>
+    </option>
+    <option value="4_C">
+        Victoria: Yates Street Ward (Victoria City)
+        <div id="1" reel="148094" frame="228" count="29"/>
+        <div id="2" reel="148094" frame="257" count="16"/>
+        <div id="3" reel="148094" frame="273" count="43"/>
+    </option>
+    <option value="4_D">
+        Victoria: Esquimault
+        <div id="" reel="148094" frame="316" count="16"/>
+    </option>
+    <option value="4_E">
+        Victoria: Metchosen
+        <div id="" reel="148094" frame="332" count="5"/>
+    </option>
+    <option value="4_F">
+        Victoria: Victoria
+        <div id="" reel="148094" frame="337" count="16"/>
+    </option>
+    <option value="5_A">
+        Yale: Cache Creek
+        <div id="" reel="148094" frame="353" count="15"/>
+    </option>
+    <option value="5_B">
+        Yale: Douglas Lake
+        <div id="" reel="148094" frame="368" count="7"/>
+    </option>
+    <option value="5_C">
+        Yale: Grand Prairie
+        <div id="" reel="148094" frame="375" count="21"/>
+    </option>
+    <option value="5_D">
+        Yale: Hope
+        <div id="" reel="148094" frame="396" count="17"/>
+    </option>
+    <option value="5_E">
+        Yale: Kamloops
+        <div id="" reel="148094" frame="413" count="35"/>
+    </option>
+    <option value="5_F">
+        Yale: Kootenay Lower
+        <div id="1" reel="148094" frame="448" count="18"/>
+        <div id="2" reel="148094" frame="466" count="9"/>
+    </option>
+    <option value="5_G">
+        Yale: Kootenay Upper
+        <div id="1" reel="148094" frame="475" count="18"/>
+        <div id="2" reel="148094" frame="493" count="15"/>
+        <div id="3" reel="148094" frame="508" count="10"/>
+    </option>
+    <option value="5_H">
+        Yale: Lytton
+        <div id="" reel="148094" frame="518" count="28"/>
+    </option>
+    <option value="5_I">
+        Yale: Nicola
+        <div id="" reel="148094" frame="546" count="16"/>
+    </option>
+    <option value="5_J">
+        Yale: Okanagan Mission
+        <div id="" reel="148094" frame="562" count="8"/>
+    </option>
+    <option value="5_K">
+        Yale: Osoyoos
+        <div id="" reel="148094" frame="570" count="15"/>
+    </option>
+    <option value="5_L">
+        Yale: Priests Valley
+        <div id="" reel="148094" frame="585" count="16"/>
+    </option>
+    <option value="5_M">
+        Yale: Princeton
+        <div id="" reel="148094" frame="601" count="5"/>
+    </option>
+    <option value="5_N">
+        Yale: Spallumcheen
+        <div id="1" reel="148094" frame="606" count="6"/>
+        <div id="2" reel="148094" frame="612" count="10"/>
+        <div id="3" reel="148094" frame="622" count="14"/>
+    </option>
+    <option value="5_O">
+        Yale: Spences Bridge
+        <div id="" reel="148094" frame="636" count="7"/>
+    </option>
+    <option value="5_P">
+        Yale: Yale
+        <div id="" reel="148094" frame="643" count="9"/>
+    </option>
+    <option value="6_A">
+        Lisgar: Assiniboia
+        <div id="" reel="148094" frame="652" count="27"/>
+    </option>
+    <option value="6_B">
+        Lisgar: Belcourt
+        <div id="" reel="148094" frame="679" count="22"/>
+    </option>
+    <option value="6_C">
+        Lisgar: East Selkirk Town (&amp; subdist R Varennes)
+        <div id="" reel="148094" frame="701" count="11"/>
+    </option>
+    <option value="6_D">
+        Lisgar: Fairford (&amp; subdist I Posen)
+        <div id="" reel="148094" frame="712" count="7"/>
+    </option>
+</select>

@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tag>
+  <parms>
+    <userid>jcobban</userid>
+    <gedname>RobertCobban</gedname>
+    <line>0 _PLAC_DEFN </line>
+    <line>1 PLAC Laborer, J. Hayman &amp; Sons, London, ON, CA</line>
+    <line>2 ABBR Laborer, J. Hayman &amp; Sons, London, ON, CA</line>
+  </parms>
+    <warn><p class="message">Unsupported tag '0 _PLAC_DEFN ', </p>
+<p class="message">Unimplemented tag '1 PLAC Laborer, J. Hayman & Sons, London, ON, CA',  under '0  _PLAC_DEFN ', </p>
+</warn>
+</tag>

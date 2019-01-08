@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="38">
+    <option value="1">
+        Chippawa Village
+    </option>
+    <option value="2">
+        Clifton Town
+    </option>
+    <option value="3">
+        Crowland
+    </option>
+    <option value="4">
+        Fort Erie Village
+    </option>
+    <option value="5">
+        Humberstone
+    </option>
+    <option value="6">
+        Pelham
+    </option>
+    <option value="7">
+        Stamford
+    </option>
+    <option value="8">
+        Thorold
+    </option>
+    <option value="9">
+        Thorold Village
+    </option>
+    <option value="10">
+        Wainfleet
+    </option>
+    <option value="11">
+        Welland Village and Gaol
+    </option>
+    <option value="12">
+        Willoughby
+    </option>
+</select>

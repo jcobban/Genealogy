@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148123">
+    <option value="42_C">
+        Shelburne: Cape Sable Island
+        <div id="" reel="148123" frame="0" count="22"/>
+    </option>
+    <option value="42_D">
+        Shelburne: Cape Sable Island Centre
+        <div id="" reel="148123" frame="22" count="23"/>
+    </option>
+    <option value="42_E">
+        Shelburne: Church-over
+        <div id="" reel="148123" frame="45" count="14"/>
+    </option>
+    <option value="42_F">
+        Shelburne: Green Harbour
+        <div id="" reel="148123" frame="59" count="15"/>
+    </option>
+    <option value="42_G">
+        Shelburne: Jordan Bay West
+        <div id="" reel="148123" frame="74" count="9"/>
+    </option>
+    <option value="42_H">
+        Shelburne: Jordan Falls
+        <div id="" reel="148123" frame="83" count="13"/>
+    </option>
+    <option value="42_I">
+        Shelburne: Louis Head
+        <div id="" reel="148123" frame="96" count="21"/>
+    </option>
+    <option value="42_J">
+        Shelburne: Lockport
+        <div id="" reel="148123" frame="117" count="25"/>
+    </option>
+    <option value="42_K">
+        Shelburne: North-East Harbour
+        <div id="" reel="148123" frame="142" count="19"/>
+    </option>
+    <option value="42_L">
+        Shelburne: Ohio
+        <div id="" reel="148123" frame="161" count="8"/>
+    </option>
+    <option value="42_M">
+        Shelburne: Port Clyde
+        <div id="" reel="148123" frame="169" count="21"/>
+    </option>
+    <option value="42_N">
+        Shelburne: Port la Tour
+        <div id="" reel="148123" frame="190" count="22"/>
+    </option>
+    <option value="42_O">
+        Shelburne: Sandy Point
+        <div id="" reel="148123" frame="212" count="11"/>
+    </option>
+    <option value="42_P">
+        Shelburne: Shag Harbour
+        <div id="" reel="148123" frame="223" count="14"/>
+    </option>
+    <option value="42_Q">
+        Shelburne: Shelburne
+        <div id="" reel="148123" frame="237" count="27"/>
+    </option>
+    <option value="42_R">
+        Shelburne: Woods Harbour
+        <div id="" reel="148123" frame="264" count="24"/>
+    </option>
+    <option value="43_A">
+        Victoria: Baddeck
+        <div id="" reel="148123" frame="288" count="27"/>
+    </option>
+    <option value="43_B">
+        Victoria: Bay St. Lawrence
+        <div id="" reel="148123" frame="315" count="12"/>
+    </option>
+    <option value="43_C">
+        Victoria: Big Baddeck
+        <div id="" reel="148123" frame="327" count="15"/>
+    </option>
+    <option value="43_D">
+        Victoria: Boularderie
+        <div id="1" reel="148123" frame="342" count="17"/>
+        <div id="2" reel="148123" frame="359" count="11"/>
+    </option>
+    <option value="43_E">
+        Victoria: Cape North
+        <div id="" reel="148123" frame="370" count="22"/>
+    </option>
+    <option value="43_F">
+        Victoria: Englishtown
+        <div id="" reel="148123" frame="392" count="11"/>
+    </option>
+    <option value="43_G">
+        Victoria: Grand Narrows
+        <div id="1" reel="148123" frame="403" count="18"/>
+        <div id="2" reel="148123" frame="421" count="10"/>
+    </option>
+    <option value="43_H">
+        Victoria: Ingonish
+        <div id="" reel="148123" frame="431" count="27"/>
+    </option>
+    <option value="43_I">
+        Victoria: Little Narrows North
+        <div id="" reel="148123" frame="458" count="8"/>
+    </option>
+    <option value="43_J">
+        Victoria: Little Narrows South
+        <div id="" reel="148123" frame="466" count="13"/>
+    </option>
+    <option value="43_K">
+        Victoria: Middle River
+        <div id="1" reel="148123" frame="479" count="9"/>
+        <div id="2" reel="148123" frame="488" count="11"/>
+    </option>
+    <option value="43_L">
+        Victoria: New Campbellton
+        <div id="" reel="148123" frame="499" count="9"/>
+    </option>
+    <option value="43_M">
+        Victoria: New Haven
+        <div id="" reel="148123" frame="508" count="10"/>
+    </option>
+    <option value="43_N">
+        Victoria: North Shore
+        <div id="" reel="148123" frame="518" count="13"/>
+    </option>
+    <option value="43_O">
+        Victoria: North River
+        <div id="" reel="148123" frame="531" count="13"/>
+    </option>
+    <option value="43_P">
+        Victoria: South Gut
+        <div id="1" reel="148123" frame="544" count="7"/>
+        <div id="2" reel="148123" frame="551" count="8"/>
+    </option>
+    <option value="44_A">
+        Yarmouth: Arcadia
+        <div id="" reel="148123" frame="559" count="30"/>
+    </option>
+    <option value="44_B">
+        Yarmouth: Argyle
+        <div id="" reel="148123" frame="589" count="21"/>
+    </option>
+    <option value="44_C">
+        Yarmouth: Belleville
+        <div id="" reel="148123" frame="610" count="26"/>
+    </option>
+    <option value="44_D">
+        Yarmouth: Carleton
+        <div id="" reel="148123" frame="636" count="16"/>
+    </option>
+    <option value="44_E">
+        Yarmouth: Centre Town
+        <div id="" reel="148123" frame="652" count="22"/>
+    </option>
+    <option value="44_F">
+        Yarmouth: Chegoggin
+        <div id="" reel="148123" frame="674" count="22"/>
+    </option>
+</select>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148149">
+    <option value="80_E">
+        Kingston City: St. Lawrence Ward
+        <div id="2" reel="148149" frame="0" count="12"/>
+    </option>
+    <option value="80_F">
+        Kingston City: Sydenham ward
+        <div id="" reel="148149" frame="12" count="46"/>
+    </option>
+    <option value="80_G">
+        Kingston City: Victoria Ward
+        <div id="1" reel="148149" frame="58" count="21"/>
+        <div id="2" reel="148149" frame="79" count="36"/>
+    </option>
+    <option value="81_A">
+        Lambton East: Alvinston Village
+        <div id="" reel="148149" frame="115" count="23"/>
+    </option>
+    <option value="81_B">
+        Lambton East: Arkona Village
+        <div id="" reel="148149" frame="138" count="10"/>
+    </option>
+    <option value="81_C">
+        Lambton East: Bosanquet
+        <div id="1" reel="148149" frame="148" count="39"/>
+        <div id="2" reel="148149" frame="187" count="23"/>
+    </option>
+    <option value="81_D">
+        Lambton East: Brooke
+        <div id="1" reel="148149" frame="210" count="18"/>
+        <div id="2" reel="148149" frame="228" count="46"/>
+        <div id="3" reel="148149" frame="274" count="20"/>
+    </option>
+    <option value="81_E">
+        Lambton East: Enniskillen
+        <div id="1" reel="148149" frame="294" count="47"/>
+        <div id="2" reel="148149" frame="341" count="42"/>
+        <div id="3" reel="148149" frame="383" count="23"/>
+    </option>
+    <option value="81_F">
+        Lambton East: Oil Springs Village
+        <div id="1" reel="148149" frame="406" count="15"/>
+        <div id="2" reel="148149" frame="421" count="10"/>
+    </option>
+    <option value="81_G">
+        Lambton East: Petrolia Town
+        <div id="1" reel="148149" frame="431" count="52"/>
+        <div id="2" reel="148149" frame="483" count="42"/>
+    </option>
+    <option value="81_H">
+        Lambton East: Thedford Village
+        <div id="" reel="148149" frame="525" count="15"/>
+    </option>
+    <option value="81_I">
+        Lambton East: Warwick
+        <div id="1" reel="148149" frame="540" count="43"/>
+        <div id="2" reel="148149" frame="583" count="42"/>
+    </option>
+    <option value="81_J">
+        Lambton East: Watford Village
+        <div id="" reel="148149" frame="625" count="27"/>
+    </option>
+    <option value="82_A">
+        Lambton West: Forest Town
+        <div id="" reel="148149" frame="652" count="46"/>
+    </option>
+    <option value="82_B">
+        Lambton West: Moore
+        <div id="1" reel="148149" frame="698" count="30"/>
+        <div id="2" reel="148149" frame="728" count="23"/>
+        <div id="3" reel="148149" frame="751" count="31"/>
+        <div id="4" reel="148149" frame="782" count="27"/>
+    </option>
+    <option value="82_C">
+        Lambton West: Plympton
+        <div id="1" reel="148149" frame="809" count="25"/>
+        <div id="2" reel="148149" frame="834" count="23"/>
+    </option>
+</select>

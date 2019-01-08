@@ -1,0 +1,225 @@
+<!--*********************************************************************
+ *  BirthRegResponsefr.html										        *
+ *																		*
+ *  Template to display the results of a query of the birth             *
+ *  registrations table in French.	                                    *
+ *																		*
+ *  History:															*
+ *		2018/10/09		created                                   		*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=fr">
+		Genealogie
+    </a>:
+    <a href="/Canada/CountriesEdit.php?lang=fr">
+	    Liste des Pays Soutenus
+    </a>:
+    <a href="/genCountry.php?cc=$CC&amp;lang=fr">
+		$COUNTRYNAME
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=$DOMAIN&amp;lang=fr">
+		$DOMAINNAME
+    </a>:
+  	<a href="BirthRegQuery.php?domain=$DOMAIN&amp;lang=fr">
+	    Nouvelle requête
+	</a>:
+	<a href="BirthRegStats.php?RegDomain=$DOMAIN&amp;lang=fr">
+    	$DOMAINNAME  statut de transcription
+	</a>:
+    <span id="yearStats">
+	<a href="BirthRegYearStats.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;lang=fr">
+    	$DOMAINNAME statut $REGYEAR
+	</a>:
+    </span>
+    <span id="countyStats">
+        <a href="BirthRegYearStats.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;County=$REGCOUNTY&amp;lang=fr">
+	    Statut $REGYEAR $COUNTYNAME
+	</a>:
+    </span>
+  </div>
+
+    <div class="body">
+      <h1>
+        <span class="right">
+    		<a href="BirthRegResponseHelpfr.html" target="_blank">Help?</a>
+        </span>
+        $DOMAINNAME: Inscriptions de Naissance $ACTION
+        <div style="clear: both;"></div>
+      </h1>
+        $TRACE
+        $MSG
+      <!--- Put out a line with links to previous and next section of table -->
+      <div class="center" id="topBrowse">
+        <span class="left" id="topPrev">
+		  <a href="$NPURI$NPAND$NPPREV">&lt;---</a>
+        </span>
+        <span class="right" id="topNext">
+		  <a href="$NPURI$NPAND$NPNEXT">---&gt;</a>
+        </span>
+		montrer rangs ${OFFSET1} à
+		${OFFSETNUMROWS} de $TOTALROWS
+        <div style="clear: both;"></div>
+	  </div> <!-- end of top page scroll -->
+	  <!--- Put out the response as a table -->
+	  <form id="respform">
+        <div>
+            <input type="hidden" id="RegDomain" name="RegDomain"
+		            value="$DOMAIN">
+        </div>
+        <table class="form">
+          <thead>
+    		<!--- Put out the column headers -->
+    		<tr>
+    		  <th class="colhead">
+        		Actions
+    		  </th>
+    		  <th class="colhead">
+        		Année
+    		  </th>
+    		  <th class="colhead">
+        		No.
+    		  </th>
+			  <th class="colhead">
+			Nom
+			  </th>
+			  <th class="colhead">
+			Date
+			  </th>
+			  <th class="colhead">
+			Lieu de Naissance
+			  </th>
+			</tr>
+	      </thead>
+	      <tbody>
+	       <tr id="birthRow$regyear$regnum">
+			 <!-- link to update action -->
+			 <td class="left" style="white-space: nowrap;">
+			     <button type="button" id="Action$regyear$regnum">
+					  $action 
+			     </button>
+			    <button type="button" id="Delete$regyear$regnum">
+			Ecraser
+			    </button>
+			 </td>
+			 <td class="$rowclass right">
+			     $regyear 
+			 </td>
+			 <td class="$rowclass right">
+			     $regnum 
+			 </td>
+			 <td class="$rowclass $sexclass">
+			   <a href="/FamilyTree/Person.php?idir=$idir&lang=$lang" 
+	                id="link$regyear$regnum"
+		        	target="_blank" class="$sexclass">
+			     <strong>$surname</strong>, $givennames 
+			   </a>
+	           <span id="name$regyear$regnum">
+			     <strong>$surname</strong>, $givennames 
+	           </span>
+			 </td>
+	         <td class="$rowclass right" style="min-width: 110px;">
+			     $birthdate 
+			 </td>
+			 <td class="$rowclass">
+			     $birthplace 
+			 </td>
+	       </tr>
+	      </tbody>
+	    </table>
+	</form>
+	<!--- Put out a line with links to previous and next section of response -->
+	<div class="center" id="botBrowse">
+    <span class="left" id="botPrev">
+		  <a href="$NPURI$NPAND$NPPREV">&lt;---</a>
+    </span>
+    <span class="right" id="botNext">
+		  <a href="$NPURI$NPAND$NPNEXT">---&gt;
+		  </a>
+    </span>
+		&nbsp;
+    <div style="clear: both;"></div>
+	</div> <!-- end of bottom page scroll -->
+  </div> <!-- end of <div id="body"> -->
+
+ <div id="templates" class="hidden">
+	<!-- template for confirming the deletion of a citation-->
+	<form name="RegDel$TEMPLATE" id="RegDel$TEMPLATE">
+      <p class="message">$MSG</p>
+      <p>
+        <button type="button" id="confirmDelete$REGNUM">
+		OK
+        </button>
+        <input type="hidden" id="regdomain$TEMPLATE" name="regdomain$TEMPLATE"
+		        value="$REGDOMAIN">
+        <input type="hidden" id="regyear$TEMPLATE" name="regyear$TEMPLATE"
+		        value="$REGYEAR">
+        <input type="hidden" id="formname$TEMPLATE" name="formname$TEMPLATE"
+		        value="$FORMNAME">
+		&nbsp;
+        <button type="button" id="cancelDelete$REGNUM">
+		  Cancel
+        </button>
+      </p>
+	</form>
+
+      <span id="badDomain">
+          Le domaine '$domain' doit être un code de pays à deux caractères 
+          pris en charge suivi d'un code d'état ou de province 
+          à 2 ou 3 caractères.
+      </span>
+      <span id="yearNot4Digits">
+        Année d'inscription $regyear doit être un numéro à 4 chiffres. 
+      </span>
+      <span id="yearOutOfRange">
+        Année d'inscription $regyear hors de portée. 
+      </span>
+      <span id="regnumNotNumber">
+        Numero d'inscription $regnum  doit être un numéro. 
+      </span>
+      <span id="badLimit">
+        Nombre de lignes $limit doit être un numéro entre 1 et 99. 
+      </span>
+      <span id="badOffset">
+        Décalage de ligne $offset doit être un entier positif. 
+      </span>
+      <span id="needRegYear">
+        Numero d'inscription $regnum peut uniquement être spécifié avec
+        Année d'inscription. 
+      </span>
+    </div> <!-- end of <div id="templates"> -->
+    <div class="balloon" id="HelprightTop">
+    	Click on this button to signon to access extended features of the
+        web-site or to manage your account with the web-site.
+    </div>
+    <div class="balloon" id="HelpRegYear">
+    	This field contains the year in which the event was registered.
+    </div>
+    <div class="balloon" id="HelpRegNum">
+    	This field contains the registration number as assigned by the
+</div> <!-- end of <div id="templates"> -->
+	<div class="balloon" id="HelprightTop">
+		Click on this button to signon to access extended features of the
+        web-site or to manage your account with the web-site.
+	</div>
+	<div class="balloon" id="HelpRegYear">
+		This field contains the year in which the event was registered.
+	</div>
+	<div class="balloon" id="HelpRegNum">
+		This field contains the registration number as assigned by the
+        Registrar of Ontario.
+	</div>
+	<div class="balloon" id="HelpAction">
+		Click on this button to display the page of detail information from the
+		registration, with the ability to update the information
+        if you are authorized.
+	</div>
+    <div id="tranTab" class="hidden">
+		<span data-key="Update">Mise à jour</span>
+		<span data-key="Display">Montrer</span>
+    </div>
+	<script src="/jscripts/js20/http.js" type="text/javascript"></script>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/Canada/BirthRegResponse.js" type="text/javascript"></script>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1400" height="800" id="svg2" version="1.1">
+  <defs id="defs4"/>
+  <metadata id="metadata7">
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+	<dc:format>image/svg+xml</dc:format>
+	<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+	<dc:title/>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g id="layer1">
+      <text id="text3879" y="80" x="200" style="font-size:18px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="80" x="200" id="tspan3886">Click on a name to re-center tree.</tspan>
+      </text>
+    <rect style="fill:#c0c0ff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" id="rect2985" width="200" height="100" x="290" y="100"/>
+    <a xlink:href="getIndivSvg.php?id=6683">
+      <text id="text3779" y="125" x="305" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="125" x="305" id="tspan3781">Joseph Adair</tspan>
+	<tspan id="tspan3785" y="140" x="305">b: 17 Dec 1797</tspan>
+	<tspan id="tspan3785" y="155" x="305">d: 19 Apr 1874</tspan>
+      </text>
+    </a>
+    <rect style="fill:#ffc0c0;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" id="rect2985" width="200" height="100" x="590" y="100"/>
+    <a xlink:href="getIndivSvg.php?id=6684">
+      <text id="text3779" y="125" x="605" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="125" x="605" id="tspan3781">Susannah London</tspan>
+	<tspan id="tspan3785" y="140" x="605">b: about 1804</tspan>
+	<tspan id="tspan3785" y="155" x="605">d: 12 Jan 1889</tspan>
+      </text>
+    </a>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 490,150 100,0 0,0" id="path3855"/>
+      <text id="text3785" y="140" x="" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="140" x="500" id="tspan3786">1824</tspan>
+      </text>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 540,150 0,150 0,0" id="path3856"/>
+    <rect style="fill:#c0c0ff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" id="rect2985" width="200" height="100" x="440" y="290"/>
+    <a xlink:href="getIndivSvg.php?id=6663">
+      <text id="text3779" y="315" x="455" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="315" x="455" id="tspan3781">Phillip L. Adair</tspan>
+	<tspan id="tspan3785" y="330" x="455">b: 8 Apr 1825</tspan>
+	<tspan id="tspan3785" y="345" x="455">d: 27 Oct 1901</tspan>
+      </text>
+    </a>
+    <rect style="fill:#ffc0c0;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" id="rect2985" width="200" height="100" x="140" y="300"/>
+    <a xlink:href="getIndivSvg.php?id=6686">
+      <text id="text3779" y="325" x="155" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="325" x="155" id="tspan3781">Mary Corman</tspan>
+	<tspan id="tspan3785" y="340" x="155">b: 5 Jun 1830</tspan>
+	<tspan id="tspan3785" y="355" x="155">d: 3 Oct 1874</tspan>
+      </text>
+    </a>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 340,350 100,0 0,0" id="path3850"/>
+      <text id="text3780" y="340" x="" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="340" x="350" id="tspan3786">before 1850</tspan>
+      </text>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 390,350 0,100 0,0" id="path3851"/>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 240,450 500,0 0,0" id="path3852"/>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 240,450 0,50 0,0" id="path3851"/>
+    <rect style="fill:#c0c0ff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" id="rect2985" width="200" height="100" x="140" y="500"/>
+    <a xlink:href="getIndivSvg.php?id=6687">
+      <text id="text3779" y="525" x="155" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="525" x="155" id="tspan3781">Alpheus Adair</tspan>
+	<tspan id="tspan3785" y="540" x="155">b: about 1850</tspan>
+      </text>
+    </a>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 490,450 0,50 0,0" id="path3851"/>
+    <rect style="fill:#c0c0ff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" id="rect2985" width="200" height="100" x="390" y="500"/>
+    <a xlink:href="getIndivSvg.php?id=6688">
+      <text id="text3779" y="525" x="405" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="525" x="405" id="tspan3781">Joseph Adair</tspan>
+	<tspan id="tspan3785" y="540" x="405">b: Feb 1855</tspan>
+	<tspan id="tspan3785" y="555" x="405">d: 27 Jan 1925</tspan>
+      </text>
+    </a>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 740,450 0,50 0,0" id="path3851"/>
+    <rect style="fill:#c0c0ff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" id="rect2985" width="200" height="100" x="640" y="500"/>
+    <a xlink:href="getIndivSvg.php?id=6689">
+      <text id="text3779" y="525" x="655" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="525" x="655" id="tspan3781">David Adair</tspan>
+	<tspan id="tspan3785" y="540" x="655">b: about 1856</tspan>
+      </text>
+    </a>
+    <rect style="fill:#ffc0c0;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" id="rect2985" width="200" height="100" x="1190" y="300"/>
+    <a xlink:href="getIndivSvg.php?id=6394">
+      <text id="text3779" y="325" x="1205" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="325" x="1205" id="tspan3781">Francis A. Robinson</tspan>
+	<tspan id="tspan3785" y="340" x="1205">b: about 1848</tspan>
+	<tspan id="tspan3785" y="355" x="1205">d: between 1881 and 1900</tspan>
+      </text>
+    </a>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 640,350 550,0 0,0" id="path3850"/>
+      <text id="text3780" y="340" x="" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="340" x="650" id="tspan3786">22 Mar 1877</tspan>
+      </text>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 1140,350 0,100 0,0" id="path3851"/>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 990,450 150,0 0,0" id="path3852"/>
+    <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="m 990,450 0,50 0,0" id="path3851"/>
+    <rect style="fill:#ffc0c0;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" id="rect2985" width="200" height="100" x="890" y="500"/>
+    <a xlink:href="getIndivSvg.php?id=9841">
+      <text id="text3779" y="525" x="905" style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans" xml:space="preserve">
+	<tspan y="525" x="905" id="tspan3781">Stillborn Adair</tspan>
+	<tspan id="tspan3785" y="540" x="905">b: 12 Oct 1879</tspan>
+	<tspan id="tspan3785" y="555" x="905">d: 12 Oct 1879</tspan>
+      </text>
+    </a>
+  </g>
+</svg>

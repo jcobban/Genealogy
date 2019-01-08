@@ -1,0 +1,256 @@
+<!--*********************************************************************
+ *  editSourceUpdateen.html   											*
+ *																		*
+ *  Display a web page for editing a specific source					*
+ *																		*
+ *  History:															*
+ *		2018/11/30		Created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+<div id="breadcrumbs" class="hidden">
+  <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+  <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+  <a href="/FamilyTree/Sources.php?lang=$LANG">Sources</a>:
+</div> <!-- id="breadcrumbs" -->
+    <div class="body">
+      <h1>
+        <span class="right">
+	      <a href="editSourceHelpen.html" target="help">? Help</a>
+        </span>
+	        $ACTION Source Record $IDSR
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <form name="srcForm" id="srcForm" action="updateSource.php" method="post">
+        <div class="row" id="srcNameRow">
+      	<label  class="column1" for="SrcName">
+      	  Name:
+      	</label>
+      	<input type="text" name="SrcName" id="SrcName"
+      			size="64" class="white leftnc"
+      			value="$SRCNAME">
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="srcClassRow">
+      	<label  class="column1" for="IDST">
+      	  Class:
+      	</label>
+      	<select name="IDST" id="IDST" size="1" class="white left">
+      	      <option id="IDSTOpt$idst" value="$idst"
+      					      $selected>
+      			  $srctype 
+      	      </option>
+      	</select>
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="srcTitleRow">
+      	<label  class="column1" for="SrcTitle">
+      	  Title:
+      	</label>
+      	<input type="text" name="SrcTitle" id="SrcTitle"
+      			size="64" class="white leftnc"
+      			value="$SRCTITLE">
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="srcAuthorRow">
+      	<label  class="column1" for="SrcAuthor">
+      	  Author:
+      	</label>
+      	<select name="SrcAuthor" id="SrcAuthor"
+      			size="1" class="white left">
+      	  <option id="author$i"value="$author"
+      			  $selected>
+      			$author
+      	  </option> 
+      	</select>
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="newAuthorRow">
+      	<label  class="column1" for="NewAuthor">
+      	  New Author:
+      	</label>
+      	<input type="text" name="NewAuthor" id="NewAuthor"
+      			size="64" class="white left" value="">
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="srcPublRow">
+      	<label  class="column1" for="SrcPubl">
+      	  Publisher:
+      	</label>
+      	<input type="text" name="SrcPubl" id="SrcPubl"
+      			size="64" class="white leftnc"
+      			value="$SRCPUBLISHER">
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="srcTextRow">
+      	<label  class="column1" for="SrcText">
+      	  Text:
+      	</label>
+      	<textarea name="SrcText" id="SrcText" cols="60" rows="4"
+      			>$SRCTEXT</textarea>
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="srcNoteRow">
+      	<label  class="column1" for="SrcNote">
+      	  Note:
+      	</label>
+      	<textarea name="SrcNote" id="SrcNote" cols="60" rows="4"
+      			>$SRCNOTE</textarea>
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="repoAddrRow">
+      	<label  class="column1" for="IDAR">
+      	  Repository:
+      	</label>
+      	<select name="IDAR" id="IDAR" size="1" class="white left">
+      	  <option id="IDAROption$idar" value="$idar" $selected>
+      			$name 
+      	  </option>
+      	</select>
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="newRepoRow">
+      	<label  class="column1" for="newRepo">
+      			New Repository:
+      	</label>
+      	<input type="text" name="newRepo" id="newRepo"
+      					size="64" class="white leftnc"
+      					value="">
+      	<div style="clear: both;"></div>
+        </div>
+        <div class="row" id="srcCallNumRow">
+      	<label  class="column1" for="SrcCallNum">
+      	  Call Number:
+      	</label>
+      	<input type="text" name="SrcCallNum" id="SrcCallNum"
+      			size="64" class="white leftnc"
+      			value="$SRCCALLNUM">
+      	<div style="clear: both;"></div>
+        </div>
+        <p id="ButtonRow">
+        	<input type="hidden" name="idsr" id="idsr"
+        			value="$IDSR">
+        	<input type="hidden" name="Debug" id="Debug" value="$DEBUG">
+        	<input type="hidden" name="PicIdType" id="PicIdType" 
+        			value="40">
+            <span id="submitDebug">
+        	<button type="submit" id="Submit" accessKey="U">
+        	  <u>U</u>pdate Source
+        	</button>
+            </span>
+            <span id="submitNormal">
+        	<button type="button" id="updSource" accessKey="U">
+        	  <u>U</u>pdate Source
+        	</button>
+            </span>
+        	&nbsp;
+        	<button type="button" id="Close" accessKey="C">
+        	  <u>C</u>lose Without Updating
+        	</button>
+        	&nbsp;
+        	<button type="button" id="Pictures" accessKey="P">
+        	  <u>P</u>ictures
+        	</button>
+        </p>
+      </form>
+    </div> <!-- body -->
+    <div class="hidden" id="messages">`
+        <span id="Display">Display</span>
+        <span id="Edit">Edit</span>
+        <span id="Create">Create New</span>
+        <span id="InvalidIDSR">Invalid value idsr='$idsr'. </span>
+        <span id="noParms">Missing parameter to identify Source. </span>
+    </div><!-- id="messages" -->
+    <div class="hidden" id="srcTypes">`
+		<span data-key="1"></span>
+		<span data-key="2">Bible</span>
+		<span data-key="3">Book</span>
+		<span data-key="4">Census/Tax records</span>
+		<span data-key="5">Church records</span>
+		<span data-key="6">Court records</span>
+		<span data-key="7">Interview</span>
+		<span data-key="8">Personal Journal</span>
+		<span data-key="9">Land records</span>
+		<span data-key="10">Letter</span>
+		<span data-key="11">Military records</span>
+		<span data-key="12">Newspaper</span>
+		<span data-key="13">Periodical</span>
+		<span data-key="14">Personal Communication</span>
+		<span data-key="15">Vital Statistics</span>
+		<span data-key="16">Web Site</span>
+    </div><!-- id="srcTypes" -->
+    <div class="balloon" id="HelpSrcName">
+        Enter the name of the source as you would like it to appear
+        n the menu of sources.
+    </div>
+    <div class="balloon" id="HelpSrcTitle">
+		Enter the title of the document that is referenced by this source.
+		The default value for this field is to make it the same as the Name.
+    </div>
+    </div>
+    <div class="balloon" id="HelpIDST">
+		Use this selection list to choose the most appropriate class of
+		documentary source.
+    </div>
+    <div class="balloon" id="HelpSrcAuthor">
+		Select the entry for the name of the author of the source document.
+		If no entry is suitable, enter the name in the "New Author" input field.
+    </div>
+    <div class="balloon" id="HelpNewAuthor">
+		If the author of the source document has never been used before use
+		this field to provide the name of the author of the source document.
+    </div>
+    <div class="balloon" id="HelpSrcPubl">
+		Enter the name of the publisher of the source document.
+    </div>
+    <div class="balloon" id="HelpSrcText">
+        This extended text area is used to record key text extracted from 
+        the source
+		document.
+    </div>
+    <div class="balloon" id="HelpSrcNote">
+        This extended text area is used to record notes about the source 
+        document.
+    </div>
+    <div class="balloon" id="HelpIDAR">
+        Use this selection list to identify a repository where this
+        source document
+		is available.  This may be a web site, a library, or an archive, but
+		is ideally a public resource. 
+    </div>
+    <div class="balloon" id="HelpnewRepo">
+		If the document is not available from any existing repository you can
+        create a new repository by entering its name in this field. 
+        As soon as you
+		leave this input text field a dialog opens to permit you to enter
+		information about the new repository.
+    </div>
+    <div class="balloon" id="HelpSrcCallNum">
+		Enter the call number by which the source document is identified
+		within the repository.  For physical documents in a library this will
+		typically be a Dewey Decimal Number or a Library of Congress Number.
+		For a web site this field should contain the specific URL for accessing
+		the source document.
+    </div>
+    <div class="balloon" id="HelpupdSource">
+		Click this button to apply the changes you have made to the description
+		of the source document.
+    </div>
+    <div class="balloon" id="HelpPictures">
+		Click this button to open a dialog for managing the pictures associated
+		with the source document.
+    </div>
+    <div class="balloon" id="HelpPictures">
+		Click this button to open a dialog for managing the pictures associated
+		with the master source document.
+    </div>
+    <script src="/jscripts/js20/http.js" type="application/javaScript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+    <script src="editSource.js" type="application/javaScript">
+    </script>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148133">
+    <option value="56_D">
+        Cornwall &amp; Stormont: Cornwall City, West Ward
+        <div id="1" reel="148133" frame="0" count="28"/>
+        <div id="2" reel="148133" frame="28" count="25"/>
+    </option>
+    <option value="56_E">
+        Cornwall &amp; Stormont: Finch
+        <div id="1" reel="148133" frame="53" count="42"/>
+        <div id="2" reel="148133" frame="95" count="30"/>
+    </option>
+    <option value="56_F">
+        Cornwall &amp; Stormont: Osnabruck
+        <div id="1" reel="148133" frame="125" count="32"/>
+        <div id="2" reel="148133" frame="157" count="34"/>
+        <div id="3" reel="148133" frame="191" count="19"/>
+        <div id="4" reel="148133" frame="210" count="25"/>
+    </option>
+    <option value="56_G">
+        Cornwall &amp; Stormont: Roxborough
+        <div id="1" reel="148133" frame="235" count="28"/>
+        <div id="2" reel="148133" frame="263" count="36"/>
+        <div id="3" reel="148133" frame="299" count="34"/>
+    </option>
+    <option value="57_A">
+        Dundas: Chesterville Village
+        <div id="" reel="148133" frame="333" count="16"/>
+    </option>
+    <option value="57_B">
+        Dundas: Iroquois Village
+        <div id="" reel="148133" frame="349" count="22"/>
+    </option>
+    <option value="57_C">
+        Dundas: Matilda
+        <div id="1" reel="148133" frame="371" count="15"/>
+        <div id="2" reel="148133" frame="386" count="16"/>
+        <div id="3" reel="148133" frame="402" count="15"/>
+        <div id="4" reel="148133" frame="417" count="13"/>
+        <div id="5" reel="148133" frame="430" count="14"/>
+        <div id="6" reel="148133" frame="444" count="15"/>
+    </option>
+    <option value="57_D">
+        Dundas: Morrisburg Village
+        <div id="1" reel="148133" frame="459" count="20"/>
+        <div id="2" reel="148133" frame="479" count="19"/>
+    </option>
+    <option value="57_E">
+        Dundas: Mountain
+        <div id="1" reel="148133" frame="498" count="18"/>
+        <div id="2" reel="148133" frame="516" count="16"/>
+        <div id="3" reel="148133" frame="532" count="13"/>
+        <div id="4" reel="148133" frame="545" count="15"/>
+        <div id="5" reel="148133" frame="560" count="14"/>
+    </option>
+    <option value="57_F">
+        Dundas: Williamsburg
+        <div id="1" reel="148133" frame="574" count="14"/>
+        <div id="2" reel="148133" frame="588" count="16"/>
+        <div id="3" reel="148133" frame="604" count="17"/>
+        <div id="4" reel="148133" frame="621" count="16"/>
+        <div id="5" reel="148133" frame="637" count="18"/>
+        <div id="6" reel="148133" frame="655" count="13"/>
+    </option>
+</select>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148204">
+    <option value="164_D">
+        L'Islet: St. Aubert
+        <div id="2" reel="148204" frame="0" count="15"/>
+    </option>
+    <option value="164_E">
+        L'Islet: St. Cyrille
+        <div id="" reel="148204" frame="15" count="28"/>
+    </option>
+    <option value="164_F">
+        L'Islet: St. Eugène
+        <div id="" reel="148204" frame="43" count="31"/>
+    </option>
+    <option value="164_G">
+        L'Islet: St. Jean Port Joli
+        <div id="1" reel="148204" frame="74" count="23"/>
+        <div id="2" reel="148204" frame="97" count="23"/>
+    </option>
+    <option value="164_H">
+        L'Islet: Ste. Louise
+        <div id="1" reel="148204" frame="120" count="11"/>
+        <div id="2" reel="148204" frame="131" count="11"/>
+    </option>
+    <option value="164_I">
+        L'Islet: St. Pamphile
+        <div id="" reel="148204" frame="142" count="22"/>
+    </option>
+    <option value="164_J">
+        L'Islet: St. Roch des Aulnaies
+        <div id="" reel="148204" frame="164" count="36"/>
+    </option>
+    <option value="165_A">
+        Lotbinière: St. Agapit
+        <div id="" reel="148204" frame="200" count="21"/>
+    </option>
+    <option value="165_B">
+        Lotbinière: Ste. Agathe
+        <div id="" reel="148204" frame="221" count="21"/>
+    </option>
+    <option value="165_C">
+        Lotbinière: St. Antoine de Tilly
+        <div id="" reel="148204" frame="242" count="31"/>
+    </option>
+    <option value="165_D">
+        Lotbinière: St. Apollinaire
+        <div id="" reel="148204" frame="273" count="38"/>
+    </option>
+    <option value="165_E">
+        Lotbinière: Ste. Croix
+        <div id="" reel="148204" frame="311" count="47"/>
+    </option>
+    <option value="165_F">
+        Lotbinière: St. Édouard
+        <div id="" reel="148204" frame="358" count="29"/>
+    </option>
+    <option value="165_G">
+        Lotbinière: Ste. Émélie &amp; Leclercville
+        <div id="" reel="148204" frame="387" count="25"/>
+    </option>
+    <option value="165_H">
+        Lotbinière: St. Flavien
+        <div id="" reel="148204" frame="412" count="36"/>
+    </option>
+    <option value="165_I">
+        Lotbinière: St. Gilles
+        <div id="" reel="148204" frame="448" count="14"/>
+    </option>
+    <option value="165_J">
+        Lotbinière: St. Jean Deschaillons
+        <div id="" reel="148204" frame="462" count="47"/>
+    </option>
+    <option value="165_K">
+        Lotbinière: St. Louis
+        <div id="" reel="148204" frame="509" count="39"/>
+    </option>
+    <option value="165_L">
+        Lotbinière: St. Narcisse
+        <div id="" reel="148204" frame="548" count="17"/>
+    </option>
+    <option value="165_M">
+        Lotbinière: St. Patrice de Beaurivage
+        <div id="" reel="148204" frame="565" count="21"/>
+    </option>
+    <option value="165_N">
+        Lotbinière: Ste. Philomène
+        <div id="" reel="148204" frame="586" count="19"/>
+    </option>
+    <option value="165_O">
+        Lotbinière: St. Sylvestre
+        <div id="" reel="148204" frame="605" count="34"/>
+    </option>
+    <option value="166_A">
+        Maskinonge: Hunterstown
+        <div id="" reel="148204" frame="639" count="16"/>
+    </option>
+    <option value="166_B">
+        Maskinonge: Louiseville Town
+        <div id="1" reel="148204" frame="655" count="16"/>
+        <div id="2" reel="148204" frame="671" count="20"/>
+    </option>
+    <option value="166_C">
+        Maskinonge: Mastigoche
+        <div id="" reel="148204" frame="691" count="13"/>
+    </option>
+    <option value="166_D">
+        Maskinonge: Rivière du Loup
+        <div id="1" reel="148204" frame="704" count="24"/>
+        <div id="2" reel="148204" frame="728" count="21"/>
+    </option>
+    <option value="166_E">
+        Maskinonge: St. Alexis des Monts
+        <div id="" reel="148204" frame="749" count="25"/>
+    </option>
+    <option value="166_F">
+        Maskinonge: St. Didace
+        <div id="1" reel="148204" frame="774" count="26"/>
+    </option>
+</select>

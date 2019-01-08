@@ -1,0 +1,1265 @@
+/************************************************************************
+ *  DeathRegDetail.js													*
+ *																		*
+ *  Javascript code to implement dynamic functionality of the			*
+ *  page DeathRegDetail.php.											*
+ *																		*
+ *  History:															*
+ *		2011/04/07		support keyboard shortcuts						*
+ *		2011/04/23		change name of file								*
+ *						add code to compute birth date from age			*
+ *		2011/07/15		expand abbreviations for locations				*
+ *		2011/08/13		use switch on field names to make the code		*
+ *						independent of which fields the designed chose	*
+ *						to include in the form.							*
+ *		2011/09/04		support month name abbreviations in date of		*
+ *						death											*
+ *						use real buttons for next, previous, and		*
+ *						new query										*
+ *						assign Alt-key combos to the buttons			*
+ *		2011/11/06		use <button> in place of links					*
+ *						support mouseover help							*
+ *		2012/05/15		correct spelling error in field name InfoOccn	*
+ *		2012/06/06		handle age 0 correctly							*
+ *						support age in hours							*
+ *		2012/06/15		correct spelling of father's and mother's birth	*
+ *						place fields									*
+ *		2012/07/01		support 1/2 and ½ in numeric portions of ages	*
+ *		2012/10/06		support month abbreviations in birth and		*
+ *						burial dates									*
+ *		2012/11/01		validate individual fields						*
+ *		2012/11/13		expand abbreviations in death cause field		*
+ *		2013/03/23		expand abbreviations in cause duration field	*
+ *		2013/06/27		use tinyMCE for editing remarks					*
+ *						remove use of Select for informant relationship	*
+ *						replacing with abbreviation support				*
+ *		2013/08/01		defer facebook initialization until after load	*
+ *		2013/10/13		correct action of Ctl-S							*
+ *		2013/12/14		use common age abbreviations table				*
+ *		2014/03/08		sex select statement initialized by PHP			*
+ *						marital status select initialized by PHP		*
+ *						keyboard Alt-I did not work						*
+ *		2014/04/07		set default for husband's name if married		*
+ *						set default for father's name if informant		*
+ *						is father										*
+ *		2014/05/10		changeAge did not invoke checkFunction			*
+ *						if calculated birth date is only year			*
+ *		2014/08/07		add support for clearing IDIR association		*
+ *		2014/09/11		update marital status based on occupation		*
+ *						and age											*
+ *		2014/09/22		fraction "1/2" replaced with "½" in age and		*
+ *						duration of fatal illness						*
+ *		2014/10/11		get counties list using domain					*
+ *		2015/05/01		use new dialog DisplayImage.php to show image	*
+ *						in right side of window if the image is on the	*
+ *						web site.										*
+ *						new parameter ShowImage directs the script		*
+ *						to immediately display the image				*
+ *						the previous and next registration buttons		*
+ *						pass the ShowImage flag							*
+ *						pass RegDomain parameter when going to new		*
+ *						registration									*
+ *		2015/06/11		correct too small font in rich-text editor		*
+ *		2015/10/06		support image URL with https					*
+ *		2015/11/18		display "hours" for abbreviation "h"			*
+ *						all standard durations words made singular		*
+ *						after "1".										*
+ *		2015/01/09		add "or" abbreviation for duration				*
+ *		2016/05/20		counties list script moved to folder Canada		*
+ *		2016/05/30		use common function dateChanged					*
+ *		2017/07/12		use function locationChanged					*
+ *																		*
+ *  Copyright &copy; 2017 James A. Cobban								*
+ ************************************************************************/
+
+/************************************************************************
+ *  daysinmonth															*
+ *																		*
+ *  Array containing the number of days in each month.					*
+ *		daysinmonth[0] is for December of the preceding year			*
+ *		daysinmonth[1] is for January									*
+ *		...																*
+ *		daysinmonth[12] is for December									*
+ ************************************************************************/
+
+var daysinmonth		= [31, 31, 28, 31, 30, 31, 30,
+						   31, 31, 30, 31, 30, 31];
+
+
+/************************************************************************
+ *  monthIndex															*
+ *																		*
+ *  object translating month names to month numbers						*
+ ************************************************************************/
+
+var monthIndex	= {"jan"	        : 1,
+				   "jany"			: 1,
+				   "january"		: 1,
+				   "feb"			: 2,
+				   "feby"			: 2,
+				   "february"		: 2,
+				   "mar"			: 3,
+				   "march"			: 3,
+				   "apr"			: 4,
+				   "apl"			: 4,
+				   "april"			: 4,
+				   "may"			: 5,
+				   "jun"			: 6,
+				   "june"			: 6,
+				   "jul"			: 7,
+				   "july"			: 7,
+				   "aug"			: 8,
+				   "augt"			: 8,
+				   "august"			: 8,
+				   "sep"			: 9,
+				   "sept"			: 9,
+				   "september"		: 9,
+				   "oct"			: 10,
+				   "october"		: 10,
+				   "nov"			: 11,
+				   "november"		: 11,
+				   "dec"			: 12,
+				   "december"		: 12};
+
+/************************************************************************
+ *  monthNames															*
+ *																		*
+ *  Array containing the name of each month.							*
+ ************************************************************************/
+
+var monthNames	= ["Dec",
+				   "Jan",
+				   "Feb",
+				   "Mar",
+				   "Apr",
+				   "May",
+				   "Jun",
+				   "Jul",
+				   "Aug",
+				   "Sep",
+				   "Oct",
+				   "Nov",
+				   "Dec"];
+
+/************************************************************************
+ *	DurationAbbrs														*
+ *																		*
+ *  Table for expanding abbreviations for age to standardize			*
+ *  representation of fractional ages.									*
+ ************************************************************************/
+var	DurationAbbrs = {
+					"1/4" :					"¼",
+					"1/2" :					"½",
+					"3/4" :					"¾",
+					"Abt" :					"about",
+					"About" :				"about",
+					"After" :				"after",
+					"Before" :				"before",
+					"D" :					"days",
+					"Day" :					"day",
+					"Days" :				"days",
+					"Few" :					"few",
+					"H" :					"hours",
+					"Hour" :				"hour",
+					"Hours" :				"hours",
+					"M" :					"months",
+					"Month" :				"month",
+					"Months" :				"months",
+					"Of" :					"of",
+					"One" :					"one",
+					"Or" :					"or",
+					"Sev" :					"several",
+					"Sev." :				"several",
+					"Several" :				"several",
+					"Some" :				"some",
+					"W" :					"weeks",
+					"Week" :				"week",
+					"Weeks" :				"weeks",
+					"Y" :					"years",
+					"Year" :				"year",
+					"Years" :				"years",
+					"[" :					"[blank]"
+					};
+
+/************************************************************************
+ *  Invoke initialization once the entire page is loaded				*
+ ************************************************************************/
+window.onload	= onLoadDeath;
+
+/************************************************************************
+ * specify style for tinyMCE editing									*
+ ************************************************************************/
+tinyMCE.init({
+		mode			: "textareas",
+		theme			: "advanced",
+		plugins 		: "spellchecker,advhr,preview", 
+
+		// Theme options - button# indicated the row# only
+		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
+		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
+		theme_advanced_buttons3 : "",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "left",
+		theme_advanced_statusbar_location : "bottom",
+		theme_advanced_resizing : true,
+		forced_root_block	: false,
+		forced_root_block	: false,
+		content_css		: "/styles.css"
+
+});
+
+/************************************************************************
+ *  onLoadDeath															*
+ *																		*
+ *  This function is called when the web page has been loaded into the	*
+ *  browser.  Initialize dynamic functionality of elements.				*
+ ************************************************************************/
+function onLoadDeath()
+{
+    pageInit();
+
+    document.body.onkeydown		= ddKeyDown;
+
+    // activate handling of key strokes in text input fields
+    // including support for context specific help
+    for(var i = 0; i < document.forms.length; i++)
+    {		// loop through all forms
+		var form	= document.forms[i];
+		form.onsubmit 	= validateForm;
+		form.onreset 	= resetForm;
+
+		for(var j = 0; j < form.elements.length; j++)
+		{	// loop through all elements of a form
+		    var element		        = form.elements[j];
+
+		    element.onkeydown	    = keyDown;
+		    element.onchange	    = change;	// default handling
+
+		    // pop up help balloon if the mouse hovers over a field
+		    // for more than 2 seconds
+		    element.onmouseover		= eltMouseOver;
+		    element.onmouseout		= eltMouseOut;
+
+		    // an element whose value is passed with the update
+		    // request to the server is identified by a name= attribute
+		    // but elements which are used only by this script are
+		    // identified by an id= attribute
+		    var	name	            = element.name;
+		    if (name.length == 0)
+				name	            = element.id;
+
+		    // set up dynamic functionality based on the name of the element
+		    switch(name)
+		    {		// act on specific fields
+				case 'RegCounty':
+				{
+				    var	domain		= form.RegDomain.value;
+				    // get the counties information file
+				    HTTP.getXML("/Canada/CountiesListXml.php?Domain=" + domain,
+							gotCountiesFile,
+							noCountiesFile);
+				    break;
+				}
+
+				case 'Surname':
+				{
+				    element.abbrTbl	    = SurnAbbrs;
+				    element.onchange	= changeSurname;
+				    element.onkeydown	= keyDown;	// special key handling
+				    element.checkfunc	= checkName;
+				    element.checkfunc();
+				    break;
+				}	// surname field
+
+				case 'GivenNames':
+				{
+				    element.abbrTbl	    = GivnAbbrs;
+				    element.onkeydown	= keyDown;	// special key handling
+				    element.onchange	= change;	// default handler
+				    element.checkfunc	= checkName;
+				    element.checkfunc();
+				    // give focus to the given names field if present
+				    element.focus();
+				    break;
+				}	// given names field
+
+				case 'FatherName':
+				case 'MotherName':
+				case 'HusbandName':
+				case 'Informant':
+				case 'Phys':
+				case 'Registrar':
+				{
+				    element.abbrTbl	    = GivnAbbrs;
+				    element.onkeydown	= keyDown;	// special key handling
+				    element.onchange	= change;	// default handler
+				    element.checkfunc	= checkName;
+				    element.checkfunc();
+				    break;
+				}	// other names
+
+				case 'Sex':
+				{
+				    element.disabled	= form.Surname.readOnly;
+				    break;
+				}	// Sex field
+
+				case 'BirthPlace':
+				case 'FatherBPlce':
+				case 'MotherBPlce':
+				{
+				    element.abbrTbl	    = BpAbbrs;
+				    element.onkeydown	= keyDown;	// special key handling
+				    element.onchange	= locationChanged;
+				    element.checkfunc	= checkAddress;
+				    element.checkfunc();
+				    break;
+				}	// birthplace fields
+
+				case 'Place':
+				case 'PhysAddr':
+				case 'InfRes':
+				case 'BurPlace':
+				case 'UndertkrAddr':
+				{
+				    element.abbrTbl	    = LocAbbrs;
+				    element.onkeydown	= keyDown;	// special key handling
+				    element.onchange	= locationChanged;
+				    element.checkfunc	= checkAddress;
+				    element.checkfunc(); 
+				    break;
+				}	// location fields
+
+				case 'Occupation':
+				case 'InfOcc':
+				{
+				    element.abbrTbl	    = OccAbbrs;
+				    element.onkeydown	= keyDown;	// special key handling
+				    element.onchange	= changeOccupation;
+				    element.checkfunc	= checkOccupation;
+				    element.checkfunc();
+				    break;
+				}	// occupation field
+
+				case 'MarStat':
+				{
+				    element.disabled	= form.Surname.readOnly;
+				    element.onchange	= changeMarStat;
+				    break;
+				}	// marital status field
+
+				case 'RegTownshipTxt':
+				{
+				    element.onchange	= changeTownship;
+				    element.onkeydown	= keyDown;	// special key handling
+				    break;
+				}	// township name as text field
+
+				case 'Age':
+				{
+				    element.abbrTbl	    = AgeAbbrs;
+				    element.onchange	= changeAge;
+				    element.checkfunc	= checkAge;
+				    element.checkfunc();
+				    break;
+				}	// age field
+
+				case 'BirthDate':
+				{
+				    element.abbrTbl	    = MonthAbbrs;
+				    element.onchange	= dateChanged;
+				    if (element.value.length == 0)
+						form.Age.onchange();
+				    element.checkfunc	= checkDate;
+				    element.checkfunc();
+				    break;
+				}	// age field
+
+				case 'Religion':
+				{
+				    element.abbrTbl	    = RlgnAbbrs;
+				    element.onkeydown	= keyDown;	// special key handling
+				    element.onchange	= change;	// default handler
+				    element.checkfunc	= checkName;
+				    element.checkfunc();
+				    break;
+				}	// religion field
+
+				case 'InfRel':
+				{
+				    element.abbrTbl	    = RelAbbrs;
+				    element.onchange	= changeInfRel;
+				    element.checkfunc	= checkName;
+				    element.checkfunc();
+				    element.disabled	= form.Surname.readOnly;
+				    break;
+				}	// marital status field
+
+				case 'Reset':
+				{
+				    element.onclick	    = resetForm;
+				    break;
+				}	// reset button
+
+				case 'Date':
+				case 'RegDate':
+				case 'BurDate':
+				{
+				    element.abbrTbl	    = MonthAbbrs;
+				    element.onchange	= dateChanged;	// default handler
+				    element.checkfunc	= checkDate;
+				    element.checkfunc();
+				    break;
+				}
+
+				case 'Cause':
+				{
+				    element.abbrTbl	    = CauseAbbrs;
+				    element.onchange	= change;	// default handler
+				    element.checkfunc	= checkText;
+				    element.checkfunc();
+				    break;
+				}
+
+				case 'Duration':
+				{
+				    element.abbrTbl	    = DurationAbbrs;
+				    element.onchange	= changeDuration;
+				    element.checkfunc	= checkText;
+				    element.checkfunc();
+				    break;
+				}
+
+				case 'Image':
+				{
+				    element.checkfunc	= checkURL;
+				    element.checkfunc();
+				    break;
+				}		// Image URL
+
+				case 'clearIdir':
+				{	// clear IDIR association
+				    element.onclick	    = clearIdir;
+				    break;
+				}	// clearIDIR association
+
+				case 'ShowImage':
+				{	// display image button
+				    element.onclick	    = showImage;
+				    if (typeof(args.showimage) == 'string' &&
+						args.showimage.toLowerCase() == 'yes')
+						element.onclick();
+				    break;
+				}	// display image button
+
+				case 'Previous':
+				{	// display previous registration button
+				    element.onclick	    = showPrevious;
+				    break;
+				}	// display previous registration button
+
+				case 'Next':
+				{	// display next registration button
+				    element.onclick	    = showNext;
+				    break;
+				}	// display next registration button
+
+				case 'Skip5':
+				{	// skip 5 registrations button
+				    element.onclick	    = showSkip5;
+				    break;
+				}	// skip 5 registrations button
+
+				case 'NewQuery':
+				{	// display query dialog button
+				    element.onclick	    = showNewQuery;
+				    break;
+				}	// display query dialog button
+
+				default:
+				{
+				    element.onkeydown	= keyDown;	// special key handling
+				    element.onchange	= change;	// default handler
+				    element.checkfunc	= checkText;
+				    element.checkfunc();
+				    break;
+				}	// other fields
+		    }		// act on specific fields
+		}		    // loop through all elements in the form
+    }			    // loop through forms in the page
+
+}		// onLoadDeath
+
+/************************************************************************
+ *  changeSurname														*
+ *																		*
+ *  Take action when the surname of the deceased is changed.			*
+ *  The surname is capitalized, and abbreviations are expanded and		*
+ *  the default value of the father's name is set.						*
+ *																		*
+ *  Input:																*
+ *		this			<input name='Surname'>							*
+ ************************************************************************/
+function changeSurname()
+{
+    // expand abbreviations
+    expAbbr(this,
+		    this.abbrTbl);
+
+    var	form		= this.form;
+    var fatherName	= form.FatherName;
+    if (this.value.length > 0 && fatherName.value.length == 0)
+    {		// father's name not set yet
+		// default to surname of deceased
+		fatherName.value	=  "[" + this.value + "]";
+    }		// father's name not set yet
+
+    this.checkfunc();	// validate
+}		// changeSurname
+
+/************************************************************************
+ *  changeMarStat														*
+ *																		*
+ *  Act when the marital status of the deceased is changed.				*
+ *  Set defaults for the father's name and the husband's name.				*
+ *																		*
+ *  Input:																*
+ *		this				<input name='MarStat'>								*
+ ************************************************************************/
+function changeMarStat()
+{
+
+    var	form		= this.form;
+    var surname		= form.Surname;
+    var sex		= form.Sex;
+    var fatherName	= form.FatherName;
+    var husbandName	= form.HusbandName;
+    if (this.value == 'S')
+    {
+		if (fatherName && fatherName.value.length == 0)
+		    fatherName.value	=  "[" + surname.value + "]";
+		if (husbandName)
+		    husbandName.value	=  '';
+    }		// single
+    else
+    if (sex.value == 'F' && (this.value == 'M' || this.value == 'W'))
+    {		// married
+		if (husbandName && husbandName.value.length == 0)
+		    husbandName.value	=  "[" + surname.value + "]";
+		if (fatherName)
+		    fatherName.value	=  '';
+    }		// married
+}		// changeMarStat
+
+/************************************************************************
+ *  changeInfRel														*
+ *																		*
+ *  Take action when the informant's relation to the deceased changes.	*
+ *																		*
+ *  Input:																*
+ *		this			<input name='InfRel'>							*
+ ************************************************************************/
+function changeInfRel()
+{
+    // expand abbreviations
+    expAbbr(this,
+		    this.abbrTbl);
+
+    var	form		= this.form;
+    var informantName	= form.Informant;
+    if (this.value == 'Father')
+		form.FatherName.value	= informantName.value;
+    else
+    if (this.value == 'Mother')
+		form.MotherName.value	= informantName.value;
+    else
+    if (this.value == 'Husband')
+		form.HusbandName.value	= informantName.value;
+
+    this.checkfunc();	// validate
+}		// changeInfRel
+
+/************************************************************************
+ *  changeFatherName													*
+ *																		*
+ *  Take action when the user changes the name of the father			*
+ *  of the deceased.													*
+ *  Note that this function is not currently referenced.				*
+ *																		*
+ *  Input:																*
+ *		this			<input name='FatherName'>						*
+ ************************************************************************/
+function changeFatherName()
+{
+    // expand abbreviations
+    expAbbr(this,
+		    this.abbrTbl);
+
+    var	form		= this.form;
+    var informant	= form.Informant;
+    if (informant.value.length == 0)
+    {	// informant name has not yet been set
+		// set informant name default to father's name
+		informant.value		= this.value;
+		// set informant relation default to Father
+		form.InformantRel.value	= "Father";
+    }	// informant name has not yet been set
+
+    this.checkfunc();	// validate
+}		// changeFatherName
+
+/************************************************************************
+ *  changeAge															*
+ *																		*
+ *  Take action when the user changes the age at death.					*
+ *  Compute the birth date.												*
+ *																		*
+ *  Input:																*
+ *		this				<input name='Age'>							*
+ ************************************************************************/
+function changeAge()
+{
+    // expand abbreviations
+    expAbbr(this,
+		    this.abbrTbl);
+
+    // replace 1/2 with symbol ½
+    var	form		= this.form;
+    var age		= form.Age.value.replace('1/2','½');
+    form.Age.value	= age;
+
+    this.checkfunc();	// validate
+
+    var birthDate	= form.BirthDate;
+    if (birthDate.value.length == 0 ||
+		birthDate.value.substr(0,1) == '[')
+    {		// birth date not explicitly set
+		age		= age.toLowerCase();
+
+		// extract the components of the age
+		var num		= 0;
+		var days	= 0;
+		var weeks	= 0;
+		var months	= 0;
+		var years	= 0;
+
+		for(var i = 0; i < age.length; i++)
+		{
+		    var	c	= age.charAt(i);
+		    switch(c)
+		    {		// act on character
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+				{		// numeric digit
+				    num		= (num * 10) + (c - '0');
+				    break;
+				}		// numeric digit
+
+				case '½':
+				{		// half
+				    num		+= 0.5;
+				    break;
+				}		// half
+
+				case ' ':
+				case '\t':
+				{		// space delimiter of value
+				    if (num > 0)
+				    {	// accumulating a number
+						years		= num;
+						num		= 0;
+				    }	// accumulating a number
+				    break;
+				}		// space
+
+				case 'y':
+				{		// year delimiter
+				    if (num > 0)
+				    {	// accumulating a number
+						years		= num;
+						num		= 0;
+				    }	// accumulating a number
+				    break;
+				}		// year delimiter
+
+				case 'm':
+				{		// month delimiter
+				    if (num > 0)
+				    {	// accumulating a number
+						months		= num;
+						num		= 0;
+				    }	// accumulating a number
+				    break;
+				}		// month delimiter
+
+				case 'd':
+				{		// day delimiter
+				    if (num > 0)
+				    {	// accumulating a number
+						days		= num;
+						num		= 0;
+				    }	// accumulating a number
+				    break;
+				}		// day delimiter
+
+				case 'w':
+				{		// week delimiter
+				    if (num > 0)
+				    {	// accumulating a number
+						weeks		= num;
+						num		= 0;
+				    }	// accumulating a number
+				    break;
+				}		// week delimiter
+
+				case 'h':
+				{		// hours delimiter
+				    if (num > 0)
+				    {	// accumulating a number
+						days		= Math.floor((num + 12)/24);
+						num		= 0;
+				    }	// accumulating a number
+				    break;
+				}		// hours delimiter
+
+		    }
+		}		// scan the age
+
+		if (num > 0)
+		{	// accumulating a number at end of value
+		    years	= num;
+		    num		= 0;
+		}	// accumulating a number
+
+		// include the number of weeks and any fractional portion of
+		// the months in the days portion
+		// For Example:
+		//	"1½m" is interpreted as 1m15d
+		//	"1½w" is interpreted as 10d
+		//	"1½y" is interpreted as 1y6m
+		days	= Math.floor(days + 7 * weeks +
+							30 * (months - Math.floor(months)));
+		months	= Math.floor(months +
+							12 * (years - Math.floor(years)));
+		years	= Math.floor(years);
+
+		// extract the components of the death date
+		var deathDate	= form.elements["Date"].value.toLowerCase();
+		var day		= 0;
+		var month	= 0;
+		var name	= "";	// name of month
+		var year	= 0;
+
+		for(var i = 0; i < deathDate.length; i++)
+		{
+		    var	c	= deathDate.charAt(i);
+		    switch(c)
+		    {		// act on character
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+				{		// numeric digit
+				    num	= (num * 10) + (c - '0');
+				    break;
+				}		// numeric digit
+
+				case ' ':
+				case '\t':
+				{		// space
+				    if (num > 31)
+				    {	// must be year
+						year	= num;
+						num		= 0;
+				    }	// must be year
+				    else
+				    if (num > 0)
+				    {	// must be day of month
+						day		= num;
+						num		= 0;
+				    }	// must be day of month
+				    break;
+				}		// space
+
+				default:
+				{		// part of name of month
+				    name	+= c;
+				    break;
+				}		// part of name of month
+		    }
+		}		// scan the date
+
+		if (num > 31)
+		{	// must be year
+		    year	= num;
+		    num		= 0;
+		}	// must be year
+		else
+		if (num > 0)
+		{	// must be day of month
+		    day		= num;
+		    num		= 0;
+		}	// must be day of month
+
+		// interpret the month name
+		month		= monthIndex[name];
+		if (month === undefined || month === null)
+		    month	= 0;
+
+		// handle missing year in date (e.g. date given as "21 mar")
+		if (year == 0)
+		    year	= form.RegYear.value - 0;
+
+		// subtract age from death date to get birth date
+		var	bDay	= day - days;
+		var	bMon	= month - months;
+		var	bYear	= year - years;
+
+		// if necessary carry from year
+		while(bMon < 1)
+		{		// carry from year
+		    bMon	+= 12;
+		    bYear	--;
+		}		// carry from year
+
+		// if necessary carry from month column
+		while(bDay < 1)
+		{		// carry from months
+		    bMon --;
+		    if (bMon < 1)
+		    {
+				bMon	+= 12;
+				bYear	--;	// carry from year
+		    }	// from previous year
+		    bDay	+= daysinmonth[bMon];
+		}		// carry from months
+
+		if (month == 0 || (years != 0 && months == 0 && days == 0))
+		{		// only show year of birth
+		    birthDate.value	= "[" + bYear + "]";
+		}		// only show year of birth
+		else
+		{		// show calculated date of birth
+		    // display calculated birth date
+		    birthDate.value	= "[" + bDay + " " +
+							  monthNames[bMon] + " " + 
+							  bYear + "]";
+		}		// show calculated date of birth
+
+		// also set internal calculated birth date
+		if (form.CalcBirth)
+		    form.CalcBirth.value= bYear + '-' + bMon + '-' + bDay;
+
+		var marStat	= form.MarStat;
+		var optIndex	= MarStat.selectedIndex;
+		var marStatVal	= '?';
+		if (optIndex >= 0)
+		{
+		    var option	= marStat.options[optIndex];
+		    marStatVal	= option.value;
+		}
+
+		// adjust marital status based on age
+		if (age.length > 0 && marStatVal == '?' && years < 16)
+		{		// too young to be married
+		    marStat.value	= 'S';
+		    // apply changes implied by change in marital status
+		    marStat.onchange();
+		}		// too young to be married
+    }		// birth date not explicitly set
+}		// changeAge
+
+/************************************************************************
+ *  changeDuration														*
+ *																		*
+ *  Take action when the user changes the duration of illness.			*
+ *  Compute the birth date.												*
+ *																		*
+ *  Input:																*
+ *		this			<input name='Duration'>							*
+ ************************************************************************/
+function changeDuration()
+{
+    // expand abbreviations
+    expAbbr(this,
+		    this.abbrTbl);
+
+    var	val		= this.value;
+    val			= val.replace(/\b1\shours/i,'1 hour');
+    val			= val.replace(/\b1\sdays/i,'1 day');
+    val			= val.replace(/\b1\sweeks/i,'1 week');
+    val			= val.replace(/\b1\smonths/i,'1 month');
+    val			= val.replace(/\b1\syears/i,'1 year');
+    val			= val.replace(/\bone\shours/i,'1 hour');
+    val			= val.replace(/\bone\sdays/i,'1 day');
+    val			= val.replace(/\bone\sweeks/i,'1 week');
+    val			= val.replace(/\bone\smonths/i,'1 month');
+    this.value		= val.replace(/\bone\syears/i,'1 year');
+    this.checkfunc();	// validate
+}		// changeDuration
+
+/************************************************************************
+ *  changeOccupation													*
+ *																		*
+ *  Take action when the user changes the occupation of the deceased.	*
+ *																		*
+ *  Input:																*
+ *		this			<input name='Occupation'>						*
+ ************************************************************************/
+function changeOccupation()
+{
+    // expand abbreviations
+    expAbbr(this,
+		    this.abbrTbl);
+
+    this.checkfunc();	// validate entered value
+
+    // some values suggest
+    var	form		= this.form;
+    var	occupation	= this.value;
+    var marStat		= form.MarStat;
+    var optIndex	= marStat.selectedIndex;
+    var	marStatVal	= '?';
+    if (optIndex >= 0)
+    {
+		var option	= marStat.options[optIndex];
+		marStatVal	= option.value;
+    }
+    if (marStatVal == '?')
+    {			// check for occupation that implies status
+		if (occupation.indexOf('Spinster') >= 0 ||
+		    occupation.indexOf('Son') >= 0 ||
+		    occupation.indexOf('Daughter') >= 0 ||
+		    occupation.indexOf('Infant') >= 0 ||
+		    occupation.indexOf('Baby') >= 0 ||
+		    occupation.indexOf('Child') >= 0)
+		{
+		    marStat.value	= 'S';
+		}
+		else
+		if (occupation.indexOf('Wife') >= 0 ||
+		    occupation.indexOf('wife') >= 0 ||
+		    occupation.indexOf('Matron') >= 0)
+		{
+		    marStat.value	= 'M';
+		}
+		else
+		if (occupation.indexOf('Widow') >= 0)
+		{
+		    marStat.value	= 'W';
+		}
+
+		// apply changes implied by change in marital status
+		marStat.onchange();
+    }			// check for occupation that implies status
+
+}		// changeOccupation
+
+/************************************************************************
+ *  validate Form														*
+ *																		*
+ *  Ensure that the data entered by the user has been minimally			*
+ *  validated before submitting the form.								*
+ *																		*
+ *  Input:																*
+ *		this			instance of <form>								*
+ ************************************************************************/
+function validateForm()
+{
+    var	form		= this;
+    var yearPat		= /^\d{4}$/;
+    var numPat		= /^\d{1,8}$/;
+    var countPat	= /^\d{1,2}$/;
+
+    var	msg	= "";
+    if ((form.RegYear.value.length > 0) && 
+		form.RegYear.value.search(yearPat) == -1)
+		msg	= "Year is not 4 digit number. ";
+    if ((form.RegNum.value.length > 0) &&
+		form.RegNum.value.search(numPat) == -1)
+		msg	+= "Number is not a valid number. ";
+    var	Count	= form.Count;
+    if (Count &&
+		(Count.value.length > 0) &&
+		(Count.value.search(countPat) == -1))
+		msg	+= "Count is not a 1 or 2 digit number. ";
+
+    if (msg != "")
+    {
+		alert(msg);
+		return false;
+    }
+    return true;
+}		// validateForm
+
+/************************************************************************
+ *  resetForm															*
+ *																		*
+ *  This method is called when the user requests the form				*
+ *  to be reset to default values.										*
+ *  This is required because the browser does not call the				*
+ *  onchange method for form elements that have one.					*
+ *																		*
+ *  Input:																*
+ *		this			instance of <form>								*
+ ************************************************************************/
+function resetForm()
+{
+    changeTownship();
+    return true;
+}	// resetForm
+
+/************************************************************************
+ *  clearIdir															*
+ *																		*
+ *  This function is called when the user selects the clearIdir button	*
+ *  with the mouse.														*
+ *																		*
+ *  Input:																*
+ *		$this			<button id='clearIdir'>							*
+ ************************************************************************/
+function clearIdir()
+{
+    var	form		= this.form;
+    var	idirElement	= document.getElementById('IDIR');
+    var	showElement	= document.getElementById('showLink');
+    if (idirElement)
+    {			// have IDIR element
+		var	parentNode	= idirElement.parentNode;
+		if (showElement)
+		    parentNode.removeChild(showElement);// remove old <a href=''>
+		idirElement.value	= 0;
+		parentNode.appendChild(document.createTextNode("Cleared"));
+		this.parentNode.removeChild(this);	// remove the button
+    }			// have IDIR element
+    return false;
+}		// clearIdir
+
+/************************************************************************
+ *  showImage															*
+ *																		*
+ *  This function is called when the user clicks the ShowImage button	*
+ *  with the mouse or types Alt-I.										*
+ *																		*
+ *  Input:																*
+ *		this			<button id='ShowImage'>							*
+ ************************************************************************/
+function showImage()
+{
+    var	form		= this.form;
+    if (form.Image)
+    {		// Image field defined
+		args.showimage	= 'yes';	// previous and next request image
+		var imageUrl	= form.Image.value;
+		if (imageUrl.length == 0)
+		    alert("DeathRegDetail.js: showImage: " +
+				  "no image defined for this registration");
+		else
+		if (imageUrl.length > 5 &&
+		    (imageUrl.substring(0,5) == "http:" ||
+		     imageUrl.substring(0,6) == "https:"))
+		    openFrame("Images",
+				      imageUrl,
+				      "right");
+		else
+		    openFrame("Images",
+				      '../Canada/DisplayImage.php?src=Images/' + imageUrl,
+				      "right");
+    }		// Image field defined
+    return false;
+}		// showImage
+
+/************************************************************************
+ *  showPrevious														*
+ *																		*
+ *  This function is called when the user clicks the Previous			*
+ *  button with the mouse or types Alt-P.								*
+ *																		*
+ *  Input:																*
+ *		this			<button id='Previous'>							*
+ ************************************************************************/
+function showPrevious()
+{
+    var	form		= this.form;
+    var regDomain	= form.RegDomain.value;
+    var regYear		= form.RegYear.value;
+    var regNum		= Number(form.RegNum.value) - 1;
+    var	lang		= 'en';
+    if ('lang' in args)
+		lang		= args['lang'];
+    var	prevUrl		= "DeathRegDetail.php?RegDomain=" + regDomain +
+						  "&RegYear=" + regYear +
+						  "&RegNum=" + regNum + '&lang=' + lang;
+    if (typeof(args.showimage) == 'string' &&
+		args.showimage.toLowerCase() == 'yes')
+		prevUrl		+= "&ShowImage=Yes";
+    location		= prevUrl;
+    return false;
+}		// showPrevious
+
+/************************************************************************
+ *  showNext															*
+ *																		*
+ *  This function is called when the user selects the Next button		*
+ *  with the mouse or types Alt-N.										*
+ *																		*
+ *  Input:																*
+ *		this			<button id='Next'>								*
+ ************************************************************************/
+function showNext()
+{
+    var	form		= this.form;
+    var regDomain	= form.RegDomain.value;
+    var regYear		= form.RegYear.value;
+    var regNum		= 1 + Number(form.RegNum.value);
+    var	lang		= 'en';
+    if ('lang' in args)
+		lang		= args['lang'];
+    var	nextUrl		= "DeathRegDetail.php?RegDomain=" + regDomain +
+						  "&RegYear=" + regYear +
+						  "&RegNum=" + regNum + '&lang=' + lang;
+    if (typeof(args.showimage) == 'string' &&
+		args.showimage.toLowerCase() == 'yes')
+		nextUrl		+= "&ShowImage=Yes";
+    location		= nextUrl;
+    return false;
+}		// showNext
+
+/************************************************************************
+ *  showSkip5															*
+ *																		*
+ *  This function is called when the user selects the Skip5 button		*
+ *  with the mouse.														*
+ *  This is not currently referenced.									*
+ *																		*
+ *  Input:																*
+ *		this			<button id='Skip5'>								*
+ ************************************************************************/
+function showSkip5()
+{
+    var	form		= this.form;
+    var regDomain	= form.RegDomain.value;
+    var regYear		= form.RegYear.value;
+    var regNum		= 5 + Number(form.RegNum.value);
+    var	lang		= 'en';
+    if ('lang' in args)
+		lang		= args['lang'];
+    var	nextUrl		= "DeathRegDetail.php?RegDomain=" + regDomain +
+						  "&RegYear=" + regYear +
+						  "&RegNum=" + regNum + '&lang=' + lang;
+    if (typeof(args.showimage) == 'string' &&
+		args.showimage.toLowerCase() == 'yes')
+		nextUrl		+= "&ShowImage=Yes";
+    location		= nextUrl;
+    return false;
+}		// showSkip5
+
+/************************************************************************
+ *  showNewQuery														*
+ *																		*
+ *  This function is called when the user clicks the NewQuery			*
+ *  button with the mouse or types Alt-Q.								*
+ *																		*
+ *  Input:																*
+ *		this			<button id='NewQuery'>							*
+ ************************************************************************/
+function showNewQuery()
+{
+    var	lang		= 'en';
+    if ('lang' in args)
+		lang		= args['lang'];
+    location	= "DeathRegQuery.php?lang=" + lang;
+    return false;
+}		// showNewQuery
+
+/************************************************************************
+ *  ddKeyDown															*
+ *																		*
+ *  Handle key strokes that apply to the entire dialog window.  For		*
+ *  example the key combinations Ctrl-S and Alt-U are interpreted to	*
+ *  apply the update, as shortcut alternatives to using the mouse to 	*
+ *  click the Update Individual button.									*
+ *																		*
+ *  Parameters:															*
+ *		e		W3C compliant browsers pass an event as a parameter		*
+ ************************************************************************/
+function ddKeyDown(e)
+{
+    if (!e)
+    {		// browser is not W3C compliant
+		e	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    var	form	= document.distForm;
+    var	code	= e.keyCode;
+
+    // take action based upon code
+    if (e.ctrlKey)
+    {		// ctrl key shortcuts
+		if (code == 83)
+		{		// letter 'S'
+		    form.submit();
+		    return false;	// do not perform standard action
+		}		// letter 'S'
+    }		// ctrl key shortcuts
+
+    if (e.altKey)
+    {		// alt key shortcuts
+		switch (code)
+		{
+		    case 67:
+		    {		// letter 'C'
+				form.Reset.onclick();
+				break;
+		    }		// letter 'C'
+
+		    case 73:
+		    {		// letter 'I'
+				if (form.ShowImage)
+				    form.ShowImage.onclick();
+				break;
+		    }		// letter 'I'
+
+		    case 78:
+		    {		// letter 'N'
+				form.Next.onclick();
+				break;
+		    }		// letter 'N'
+
+		    case 80:
+		    {		// letter 'P'
+				form.Previous.onclick();
+				break;
+		    }		// letter 'P'
+
+		    case 81:
+		    {		// letter 'Q'
+				form.NewQuery.onclick();
+				break;
+		    }		// letter 'Q'
+
+		    case 85:
+		    {		// letter 'U'
+				form.submit();
+				break;
+		    }		// letter 'U'
+
+		}	    // switch on key code
+    }		// alt key shortcuts
+
+    return;
+}		// ddKeyDown
+

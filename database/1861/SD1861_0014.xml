@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="14">
+    <option value="134">
+        Belleville Town
+    </option>
+    <option value="135">
+        Elzevir
+    </option>
+    <option value="136">
+        Hastings Road
+    </option>
+    <option value="137">
+        Hungerford
+    </option>
+    <option value="138">
+        Huntingdon
+    </option>
+    <option value="139">
+        Madoc
+    </option>
+    <option value="140">
+        Marmora &amp; Lake
+    </option>
+    <option value="141">
+        Rawdon
+    </option>
+    <option value="142">
+        Sterling Villae
+    </option>
+    <option value="143">
+        Sydney
+    </option>
+    <option value="144">
+        Thurlow
+    </option>
+    <option value="144A">
+        Belleville Seminary
+    </option>
+    <option value="145">
+        Trenton Village
+    </option>
+    <option value="146">
+        Tudor &amp; Lake
+    </option>
+    <option value="147">
+        Tyendinaga
+    </option>
+    <option value="147A">
+        Agricultural Census
+    </option>
+</select>

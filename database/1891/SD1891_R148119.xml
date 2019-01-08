@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148119">
+    <option value="36_K">
+        Inverness: Margarie South-West
+        <div id="2" reel="148119" frame="0" count="12"/>
+    </option>
+    <option value="36_L">
+        Inverness: North Mountain
+        <div id="1" reel="148119" frame="12" count="12"/>
+        <div id="2" reel="148119" frame="24" count="6"/>
+    </option>
+    <option value="36_M">
+        Inverness: Pleasant Bay
+        <div id="" reel="148119" frame="30" count="6"/>
+    </option>
+    <option value="36_N">
+        Inverness: Poplar Grove
+        <div id="1" reel="148119" frame="36" count="12"/>
+        <div id="2" reel="148119" frame="48" count="12"/>
+    </option>
+    <option value="36_O">
+        Inverness: Port Hastings
+        <div id="1" reel="148119" frame="60" count="14"/>
+        <div id="2" reel="148119" frame="74" count="14"/>
+        <div id="3" reel="148119" frame="88" count="9"/>
+    </option>
+    <option value="36_P">
+        Inverness: Port Hood
+        <div id="1" reel="148119" frame="97" count="16"/>
+        <div id="2" reel="148119" frame="113" count="19"/>
+    </option>
+    <option value="36_Q">
+        Inverness: River Dennis
+        <div id="1" reel="148119" frame="132" count="13"/>
+        <div id="2" reel="148119" frame="145" count="11"/>
+    </option>
+    <option value="36_R">
+        Inverness: River Inhabitants
+        <div id="" reel="148119" frame="156" count="24"/>
+    </option>
+    <option value="36_S">
+        Inverness: Strathlorn
+        <div id="1" reel="148119" frame="180" count="12"/>
+        <div id="2" reel="148119" frame="192" count="10"/>
+        <div id="3" reel="148119" frame="202" count="11"/>
+    </option>
+    <option value="36_T">
+        Inverness: Whycocomagh
+        <div id="1" reel="148119" frame="213" count="15"/>
+        <div id="2" reel="148119" frame="228" count="17"/>
+    </option>
+    <option value="36_U">
+        Inverness: Whycocomagh South
+        <div id="" reel="148119" frame="245" count="17"/>
+    </option>
+    <option value="37_A">
+        Kings: Canning
+        <div id="1" reel="148119" frame="262" count="19"/>
+        <div id="2" reel="148119" frame="281" count="16"/>
+        <div id="3" reel="148119" frame="297" count="17"/>
+        <div id="4" reel="148119" frame="314" count="12"/>
+    </option>
+    <option value="37_B">
+        Kings: Canard
+        <div id="1" reel="148119" frame="326" count="10"/>
+        <div id="2" reel="148119" frame="336" count="19"/>
+    </option>
+    <option value="37_C">
+        Kings: Centreville
+        <div id="1" reel="148119" frame="355" count="13"/>
+        <div id="2" reel="148119" frame="368" count="12"/>
+        <div id="3" reel="148119" frame="380" count="13"/>
+        <div id="4" reel="148119" frame="393" count="10"/>
+    </option>
+    <option value="37_D">
+        Kings: Lakeville
+        <div id="1" reel="148119" frame="403" count="16"/>
+        <div id="2" reel="148119" frame="419" count="12"/>
+    </option>
+    <option value="37_E">
+        Kings: Somerset
+        <div id="1" reel="148119" frame="431" count="10"/>
+        <div id="2" reel="148119" frame="441" count="10"/>
+    </option>
+    <option value="37_F">
+        Kings: Kentville &amp; Canaan
+        <div id="1" reel="148119" frame="451" count="35"/>
+        <div id="2" reel="148119" frame="486" count="18"/>
+    </option>
+    <option value="37_G">
+        Kings: Gaspereaux
+        <div id="" reel="148119" frame="504" count="33"/>
+    </option>
+    <option value="37_H">
+        Kings: Wolfville
+        <div id="1" reel="148119" frame="537" count="22"/>
+        <div id="2" reel="148119" frame="559" count="22"/>
+    </option>
+    <option value="37_I">
+        Kings: Lower Horton
+        <div id="1" reel="148119" frame="581" count="14"/>
+        <div id="2" reel="148119" frame="595" count="17"/>
+    </option>
+    <option value="37_J">
+        Kings: Aylesford South
+        <div id="1" reel="148119" frame="612" count="16"/>
+    </option>
+</select>

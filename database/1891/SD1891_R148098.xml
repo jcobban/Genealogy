@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148098">
+    <option value="9_S">
+        Selkirk: Morden Town
+        <div id="" reel="148098" frame="0" count="25"/>
+    </option>
+    <option value="9_T">
+        Selkirk: Oakland
+        <div id="" reel="148098" frame="25" count="30"/>
+    </option>
+    <option value="9_U">
+        Selkirk: Pipestone
+        <div id="" reel="148098" frame="55" count="18"/>
+    </option>
+    <option value="9_V">
+        Selkirk: Rhineland
+        <div id="" reel="148098" frame="73" count="103"/>
+    </option>
+    <option value="9_W">
+        Selkirk: Riverside
+        <div id="" reel="148098" frame="176" count="28"/>
+    </option>
+    <option value="9_X">
+        Selkirk: Sifton
+        <div id="1" reel="148098" frame="204" count="14"/>
+        <div id="2" reel="148098" frame="218" count="19"/>
+    </option>
+    <option value="9_Y">
+        Selkirk: Turtle Mountain
+        <div id="" reel="148098" frame="237" count="33"/>
+    </option>
+    <option value="9_Z">
+        Selkirk: Virden Town
+        <div id="" reel="148098" frame="270" count="13"/>
+    </option>
+    <option value="9_AA">
+        Selkirk: Wallace
+        <div id="" reel="148098" frame="283" count="31"/>
+    </option>
+    <option value="9_BB">
+        Selkirk: Whitehead
+        <div id="1" reel="148098" frame="314" count="9"/>
+        <div id="2" reel="148098" frame="323" count="22"/>
+    </option>
+    <option value="9_CC">
+        Selkirk: Whitewater
+        <div id="" reel="148098" frame="345" count="36"/>
+    </option>
+    <option value="9_DD">
+        Selkirk: Woodworth
+        <div id="" reel="148098" frame="381" count="31"/>
+    </option>
+    <option value="10_A">
+        Winnipeg City: Ward 1
+        <div id="" reel="148098" frame="412" count="20"/>
+    </option>
+    <option value="10_B">
+        Winnipeg City: Ward 2
+        <div id="1" reel="148098" frame="432" count="67"/>
+        <div id="2" reel="148098" frame="499" count="57"/>
+    </option>
+    <option value="10_C">
+        Winnipeg City: Ward 3
+        <div id="" reel="148098" frame="556" count="41"/>
+    </option>
+    <option value="10_D">
+        Winnipeg City: Ward 4
+        <div id="1" reel="148098" frame="597" count="45"/>
+    </option>
+</select>

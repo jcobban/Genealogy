@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148104">
+    <option value="17_C">
+        Northumberland: Blissfield
+        <div id="1" reel="148104" frame="0" count="9"/>
+        <div id="2" reel="148104" frame="9" count="11"/>
+    </option>
+    <option value="17_D">
+        Northumberland: Chatham
+        <div id="1" reel="148104" frame="20" count="25"/>
+        <div id="2" reel="148104" frame="45" count="33"/>
+        <div id="3" reel="148104" frame="78" count="24"/>
+        <div id="4" reel="148104" frame="102" count="24"/>
+        <div id="5" reel="148104" frame="126" count="13"/>
+    </option>
+    <option value="17_E">
+        Northumberland: Derby
+        <div id="" reel="148104" frame="139" count="18"/>
+    </option>
+    <option value="17_F">
+        Northumberland: Glenelg
+        <div id="1" reel="148104" frame="157" count="10"/>
+        <div id="2" reel="148104" frame="167" count="9"/>
+        <div id="3" reel="148104" frame="176" count="13"/>
+    </option>
+    <option value="17_G">
+        Northumberland: Hardwick
+        <div id="1" reel="148104" frame="189" count="11"/>
+        <div id="2" reel="148104" frame="200" count="10"/>
+        <div id="3" reel="148104" frame="210" count="6"/>
+    </option>
+    <option value="17_H">
+        Northumberland: Ludlow
+        <div id="1" reel="148104" frame="216" count="9"/>
+        <div id="2" reel="148104" frame="225" count="10"/>
+    </option>
+    <option value="17_I">
+        Northumberland: Nelson
+        <div id="1" reel="148104" frame="235" count="19"/>
+        <div id="2" reel="148104" frame="254" count="22"/>
+    </option>
+    <option value="17_J">
+        Northumberland: Newcastle
+        <div id="1" reel="148104" frame="276" count="21"/>
+        <div id="2" reel="148104" frame="297" count="14"/>
+        <div id="3" reel="148104" frame="311" count="21"/>
+        <div id="4" reel="148104" frame="332" count="19"/>
+        <div id="5" reel="148104" frame="351" count="10"/>
+    </option>
+    <option value="17_K">
+        Northumberland: North Esk
+        <div id="1" reel="148104" frame="361" count="21"/>
+        <div id="2" reel="148104" frame="382" count="12"/>
+    </option>
+    <option value="17_L">
+        Northumberland: Rogerville
+        <div id="1" reel="148104" frame="394" count="14"/>
+        <div id="2" reel="148104" frame="408" count="17"/>
+    </option>
+    <option value="17_M">
+        Northumberland: South Esk
+        <div id="1" reel="148104" frame="425" count="11"/>
+        <div id="2" reel="148104" frame="436" count="13"/>
+    </option>
+    <option value="18_A">
+        Queens: Brunswick
+        <div id="" reel="148104" frame="449" count="11"/>
+    </option>
+    <option value="18_B">
+        Queens: Cambridge
+        <div id="" reel="148104" frame="460" count="31"/>
+    </option>
+    <option value="18_C">
+        Queens: Canning
+        <div id="" reel="148104" frame="491" count="17"/>
+    </option>
+    <option value="18_D">
+        Queens: Chipman
+        <div id="" reel="148104" frame="508" count="34"/>
+    </option>
+    <option value="18_E">
+        Queens: Gagetown
+        <div id="" reel="148104" frame="542" count="23"/>
+    </option>
+    <option value="18_F">
+        Queens: Hampstead
+        <div id="" reel="148104" frame="565" count="25"/>
+    </option>
+    <option value="18_G">
+        Queens: Johnston
+        <div id="" reel="148104" frame="590" count="33"/>
+    </option>
+    <option value="18_H">
+        Queens: Petersville
+        <div id="1" reel="148104" frame="623" count="22"/>
+    </option>
+</select>

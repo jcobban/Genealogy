@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148200">
+    <option value="157_I">
+        Jacques Cartier: St. Laurent
+        <div id="" reel="148200" frame="1" count="41"/>
+    </option>
+    <option value="157_J">
+        Jacques Cartier: St. Laurent Village
+        <div id="" reel="148200" frame="42" count="26"/>
+    </option>
+    <option value="157_K">
+        Jacques Cartier: St. Raphaël de l'Ile Bizard
+        <div id="1" reel="148200" frame="68" count="9"/>
+        <div id="2" reel="148200" frame="77" count="7"/>
+    </option>
+    <option value="158_A">
+        Joliette: Joliette Town
+        <div id="" reel="148200" frame="84" count="69"/>
+    </option>
+    <option value="158_B">
+        Joliette: St. Alphonse de Rodriguez
+        <div id="" reel="148200" frame="153" count="27"/>
+    </option>
+    <option value="158_C">
+        Joliette: St. Ambroise de Kildare
+        <div id="" reel="148200" frame="180" count="38"/>
+    </option>
+    <option value="158_D">
+        Joliette: Ste. Beatrix
+        <div id="" reel="148200" frame="218" count="24"/>
+    </option>
+    <option value="158_E">
+        Joliette: St. Charles Borromée
+        <div id="" reel="148200" frame="242" count="21"/>
+    </option>
+    <option value="158_F">
+        Joliette: St. Côme
+        <div id="" reel="148200" frame="263" count="23"/>
+    </option>
+    <option value="158_G">
+        Joliette: Ste. Elizabeth
+        <div id="1" reel="148200" frame="286" count="30"/>
+        <div id="2" reel="148200" frame="316" count="30"/>
+    </option>
+    <option value="158_H">
+        Joliette: Ste. Émélie de l'Énergie
+        <div id="" reel="148200" frame="346" count="22"/>
+    </option>
+    <option value="158_I">
+        Joliette: St. Félix de Valois
+        <div id="1" reel="148200" frame="368" count="38"/>
+        <div id="2" reel="148200" frame="406" count="25"/>
+    </option>
+    <option value="158_J">
+        Joliette: St. Jean de Martha
+        <div id="" reel="148200" frame="431" count="55"/>
+    </option>
+    <option value="158_K">
+        Joliette: Ste. Mélanie
+        <div id="" reel="148200" frame="486" count="28"/>
+    </option>
+    <option value="158_L">
+        Joliette: St. Pacôme, St. Paul
+        <div id="" reel="148200" frame="514" count="31"/>
+    </option>
+    <option value="158_M">
+        Joliette: St. Thomas
+        <div id="" reel="148200" frame="545" count="44"/>
+    </option>
+    <option value="159_A">
+        Kamouraska: Kamouraska Village
+        <div id="" reel="148200" frame="589" count="13"/>
+    </option>
+    <option value="159_B">
+        Kamouraska: Kamouraska Village
+        <div id="" reel="148200" frame="602" count="22"/>
+    </option>
+    <option value="159_C">
+        Kamouraska: Rivière Ouelle
+        <div id="" reel="148200" frame="624" count="41"/>
+    </option>
+    <option value="159_D">
+        Kamouraska: St. Alexandre
+        <div id="" reel="148200" frame="665" count="36"/>
+    </option>
+    <option value="159_E">
+        Kamouraska: Ste. Anne de la Pocatière
+        <div id="" reel="148200" frame="701" count="56"/>
+    </option>
+    <option value="159_F">
+        Kamouraska: St. André &amp; part Nôtre-Dame du Portage
+        <div id="" reel="148200" frame="757" count="30"/>
+    </option>
+    <option value="159_G">
+        Kamouraska: St. Denis
+        <div id="" reel="148200" frame="787" count="19"/>
+    </option>
+</select>

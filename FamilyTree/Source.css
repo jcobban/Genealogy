@@ -1,0 +1,26 @@
+/************************************************************************
+ *  Source.css								*
+ *									*
+ *  Stylesheet for the script Source.php				*
+ *									*
+ *  History:								*
+ *	2014/03/12	created						*
+ *									*
+ *  Copyright &copy; 2014 James A. Cobban				*
+ ************************************************************************/
+
+    div.row {	white-space:	nowrap;
+		padding:	3px 3px 3px 3px; }
+		
+    div.labelRight {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		margin-top:	1px;
+		float:		left;
+		width:		11em;
+		}
+
+    div.data {	margin-left:	12em; }

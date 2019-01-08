@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148222">
+    <option value="185_A">
+        St. Jean: St. Bernard de Lacolle
+        <div id="1" reel="148222" frame="0" count="22"/>
+        <div id="2" reel="148222" frame="22" count="31"/>
+    </option>
+    <option value="185_B">
+        St. Jean: St. Jean l'Evangelist
+        <div id="" reel="148222" frame="53" count="18"/>
+    </option>
+    <option value="185_C">
+        St. Jean: St. Jean Town
+        <div id="1" reel="148222" frame="71" count="16"/>
+        <div id="2" reel="148222" frame="87" count="43"/>
+        <div id="3" reel="148222" frame="130" count="21"/>
+        <div id="4" reel="148222" frame="151" count="18"/>
+    </option>
+    <option value="185_D">
+        St. Jean: St. Luc
+        <div id="" reel="148222" frame="169" count="17"/>
+    </option>
+    <option value="185_E">
+        St. Jean: Ste. Marguerite de Blairfindie de l'Acadie
+        <div id="" reel="148222" frame="186" count="32"/>
+    </option>
+    <option value="185_F">
+        St. Jean: St. Valentin
+        <div id="" reel="148222" frame="218" count="37"/>
+    </option>
+    <option value="186_A">
+        St. Maurice: Pointe du Lac
+        <div id="" reel="148222" frame="255" count="29"/>
+    </option>
+    <option value="186_B">
+        St. Maurice: St. Barnabé
+        <div id="1" reel="148222" frame="284" count="23"/>
+        <div id="2" reel="148222" frame="307" count="19"/>
+    </option>
+    <option value="186_C">
+        St. Maurice: St. Boniface
+        <div id="" reel="148222" frame="326" count="31"/>
+    </option>
+    <option value="186_D">
+        St. Maurice: St. Elie de Caxton
+        <div id="" reel="148222" frame="357" count="18"/>
+    </option>
+    <option value="186_E">
+        St. Maurice: St. Étienne des Gres
+        <div id="" reel="148222" frame="375" count="45"/>
+    </option>
+    <option value="186_F">
+        St. Maurice: St. Mathieu
+        <div id="" reel="148222" frame="420" count="6"/>
+    </option>
+    <option value="186_G">
+        St. Maurice: St. Sévère
+        <div id="" reel="148222" frame="426" count="22"/>
+    </option>
+    <option value="186_H">
+        St. Maurice: Trois Rivières (Part)
+        <div id="" reel="148222" frame="448" count="9"/>
+    </option>
+    <option value="186_I">
+        St. Maurice: Missing
+        <div id="" reel="148222" frame="457" count="0"/>
+    </option>
+    <option value="186_J">
+        St. Maurice: Yamachiche
+        <div id="1" reel="148222" frame="457" count="12"/>
+        <div id="2" reel="148222" frame="469" count="16"/>
+        <div id="3" reel="148222" frame="485" count="21"/>
+    </option>
+    <option value="186_K">
+        St. Maurice: Yamachiche Village
+        <div id="" reel="148222" frame="506" count="19"/>
+    </option>
+    <option value="187_A">
+        Shefford: Ely
+        <div id="" reel="148222" frame="525" count="35"/>
+    </option>
+    <option value="187_B">
+        Shefford: Ely North
+        <div id="" reel="148222" frame="560" count="21"/>
+    </option>
+</select>

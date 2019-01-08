@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148208">
+    <option value="172_C">
+        Montréal City: Ste. Anne Ward
+        <div id="18" reel="148208" frame="0" count="52"/>
+        <div id="19" reel="148208" frame="52" count="31"/>
+    </option>
+    <option value="172_D">
+        Montréal City: St. Antoine Ward
+        <div id="1" reel="148208" frame="83" count="19"/>
+        <div id="2" reel="148208" frame="102" count="39"/>
+        <div id="3" reel="148208" frame="141" count="48"/>
+        <div id="4" reel="148208" frame="189" count="59"/>
+        <div id="5" reel="148208" frame="248" count="67"/>
+        <div id="6" reel="148208" frame="315" count="90"/>
+        <div id="7" reel="148208" frame="405" count="0"/>
+        <div id="8" reel="148208" frame="405" count="128"/>
+        <div id="9" reel="148208" frame="533" count="34"/>
+        <div id="10" reel="148208" frame="567" count="38"/>
+        <div id="11" reel="148208" frame="605" count="23"/>
+        <div id="12" reel="148208" frame="628" count="55"/>
+        <div id="13" reel="148208" frame="683" count="19"/>
+        <div id="14" reel="148208" frame="702" count="27"/>
+        <div id="15" reel="148208" frame="729" count="11"/>
+        <div id="16" reel="148208" frame="740" count="25"/>
+    </option>
+</select>

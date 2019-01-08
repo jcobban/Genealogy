@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<names>
+  <parms>
+    <Surname>%z</Surname>
+    <GivenName></GivenName>
+    <birthmin>-10000</birthmin>
+    <birthmax>3000</birthmax>
+    <includeParents>Y</includeParents>
+    <includeSpouse>Y</includeSpouse>
+    <treename>Royals</treename>
+    <limit>50</limit>
+    <LastSurname>& </LastSurname>
+  </parms>
+<cmd>SELECT tblIR.*, EBirth.EventD AS EBirthD, EDeath.EventD AS EDeathD, tblNX.Surname AS indexsurname, tblNX.GivenName AS indexgivenname, tblNX.`Order` AS indextype FROM tblIR JOIN tblNX ON tblNX.IDIR=tblIR.IDIR LEFT JOIN tblER AS EBirth ON (EBirth.IDIR=tblIR.IDIR AND EBirth.IDType=0 AND EBirth.IDET=3 AND EBirth.Preferred=1) LEFT JOIN tblER AS EDeath ON (EDeath.IDIR=tblIR.IDIR AND EDeath.IDType=0 AND EDeath.IDET=6 AND EDeath.Preferred=1) WHERE (FLOOR(tblIR.BirthSD/10000)&gt;='-10000' OR FLOOR(EBirth.EventSD/10000)&gt;='-10000') AND (FLOOR(tblIR.BirthSD/10000)&lt;=3000 OR FLOOR(EBirth.EventSD/10000)&lt;=3000) AND tblNX.Surname&gt;'?' AND tblNX.Surname&lt;='&amp; ' AND tblNX.TreeName='Royals' AND tblNX.`Order`&gt;=0 GROUP BY tblIR.IDIR, tblIR.ID, EBirth.EventD, EDeath.EventD, tblNX.Surname, tblNX.GivenName, tblNX.`Order`, EBirth.EventSD, tblIR.BirthSD ORDER BY tblNX.`Surname`, tblNX.`GivenName`, COALESCE(EBirth.`EventSD`,tblIR.`BirthSD`) LIMIT 50</cmd>
+</names>

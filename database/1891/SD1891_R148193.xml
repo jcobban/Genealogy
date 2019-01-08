@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148193">
+    <option value="147_E">
+        Chateauguay: St. Malachi d'Ormstown
+        <div id="1" reel="148193" frame="0" count="16"/>
+        <div id="2" reel="148193" frame="16" count="23"/>
+        <div id="3" reel="148193" frame="39" count="18"/>
+    </option>
+    <option value="147_F">
+        Chateauguay: Ste. Martine
+        <div id="1" reel="148193" frame="57" count="22"/>
+        <div id="2" reel="148193" frame="79" count="19"/>
+    </option>
+    <option value="147_G">
+        Chateauguay: Ste. Philomène
+        <div id="" reel="148193" frame="98" count="27"/>
+    </option>
+    <option value="147_H">
+        Chateauguay: St. Urbain Premier
+        <div id="" reel="148193" frame="125" count="30"/>
+    </option>
+    <option value="147_I">
+        Chateauguay: Très Saint Sacrement
+        <div id="1" reel="148193" frame="155" count="19"/>
+        <div id="2" reel="148193" frame="174" count="23"/>
+    </option>
+    <option value="148_A">
+        Chicoutimi &amp; Saguenay: Chicoutimi
+        <div id="1" reel="148193" frame="197" count="23"/>
+        <div id="2" reel="148193" frame="220" count="22"/>
+    </option>
+    <option value="148_B">
+        Chicoutimi &amp; Saguenay: Chicoutimi Town
+        <div id="" reel="148193" frame="242" count="47"/>
+    </option>
+    <option value="148_C">
+        Chicoutimi &amp; Saguenay: Harvey, St. Germain, Durocher, Labrosse
+        <div id="" reel="148193" frame="289" count="5"/>
+    </option>
+    <option value="148_D">
+        Chicoutimi &amp; Saguenay: L'Anse St. Jean
+        <div id="" reel="148193" frame="294" count="17"/>
+    </option>
+    <option value="148_E">
+        Chicoutimi &amp; Saguenay: Normandin, Albanel, Parent
+        <div id="" reel="148193" frame="311" count="13"/>
+    </option>
+    <option value="148_F">
+        Chicoutimi &amp; Saguenay: Nôtre-Dame de Laterrière
+        <div id="" reel="148193" frame="324" count="21"/>
+    </option>
+    <option value="148_G">
+        Chicoutimi &amp; Saguenay: Nôtre-Dame d'Hébertville
+        <div id="" reel="148193" frame="345" count="39"/>
+    </option>
+    <option value="148_H">
+        Chicoutimi &amp; Saguenay: Nôtre-Dame d'Hébertville Village
+        <div id="" reel="148193" frame="384" count="11"/>
+    </option>
+    <option value="148_I">
+        Chicoutimi &amp; Saguenay: Nôtre-Dame du Lac St. Jean &amp; Roberval
+        <div id="" reel="148193" frame="395" count="22"/>
+    </option>
+    <option value="148_J">
+        Chicoutimi &amp; Saguenay: Racine, Dalmas, Taillon, Delisle
+        <div id="" reel="148193" frame="417" count="14"/>
+    </option>
+    <option value="148_K">
+        Chicoutimi &amp; Saguenay: Indian Reserve
+        <div id="" reel="148193" frame="431" count="10"/>
+    </option>
+    <option value="148_L">
+        Chicoutimi &amp; Saguenay: Roberval Village
+        <div id="" reel="148193" frame="441" count="17"/>
+    </option>
+    <option value="148_M">
+        Chicoutimi &amp; Saguenay: St. Alexis
+        <div id="" reel="148193" frame="458" count="35"/>
+    </option>
+    <option value="148_N">
+        Chicoutimi &amp; Saguenay: St. Alphonse &amp; Bagotville Village
+        <div id="1" reel="148193" frame="493" count="27"/>
+        <div id="2" reel="148193" frame="520" count="11"/>
+    </option>
+    <option value="148_O">
+        Chicoutimi &amp; Saguenay: Ste. Anne
+        <div id="1" reel="148193" frame="531" count="17"/>
+        <div id="2" reel="148193" frame="548" count="20"/>
+    </option>
+    <option value="148_P">
+        Chicoutimi &amp; Saguenay: St. Bruno
+        <div id="" reel="148193" frame="568" count="13"/>
+    </option>
+    <option value="148_Q">
+        Chicoutimi &amp; Saguenay: St. Charles &amp; St. Ambroise
+        <div id="" reel="148193" frame="581" count="9"/>
+    </option>
+    <option value="148_R">
+        Chicoutimi &amp; Saguenay: St. Cyriac
+        <div id="" reel="148193" frame="590" count="13"/>
+    </option>
+    <option value="148_S">
+        Chicoutimi &amp; Saguenay: St. Dominique
+        <div id="1" reel="148193" frame="603" count="19"/>
+        <div id="2" reel="148193" frame="622" count="13"/>
+    </option>
+    <option value="148_T">
+        Chicoutimi &amp; Saguenay: St. Felicien, Ashuapmonchouan North, Desmeules, Dufferin
+        <div id="" reel="148193" frame="635" count="21"/>
+    </option>
+    <option value="148_U">
+        Chicoutimi &amp; Saguenay: St. Fulgence
+        <div id="" reel="148193" frame="656" count="19"/>
+    </option>
+    <option value="148_V">
+        Chicoutimi &amp; Saguenay: St. Gédeon
+        <div id="" reel="148193" frame="675" count="20"/>
+    </option>
+    <option value="148_W">
+        Chicoutimi &amp; Saguenay: St. Hilaire, Dequen, Dablon, part Métabetchouan
+        <div id="" reel="148193" frame="695" count="25"/>
+    </option>
+    <option value="148_X">
+        Chicoutimi &amp; Saguenay: St. Jérôme
+        <div id="" reel="148193" frame="720" count="38"/>
+    </option>
+    <option value="148_Y">
+        Chicoutimi &amp; Saguenay: St. Joseph d'Alma
+        <div id="" reel="148193" frame="758" count="22"/>
+    </option>
+</select>

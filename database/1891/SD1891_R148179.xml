@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148179">
+    <option value="126_F">
+        Wellington North: Luther East &amp; West
+        <div id="1" reel="148179" frame="0" count="22"/>
+        <div id="2" reel="148179" frame="22" count="28"/>
+        <div id="3" reel="148179" frame="50" count="11"/>
+        <div id="4" reel="148179" frame="61" count="24"/>
+        <div id="5" reel="148179" frame="85" count="10"/>
+    </option>
+    <option value="126_G">
+        Wellington North: Minto
+        <div id="1" reel="148179" frame="95" count="41"/>
+        <div id="2" reel="148179" frame="136" count="34"/>
+    </option>
+    <option value="126_H">
+        Wellington North: Mount Forest Town
+        <div id="" reel="148179" frame="170" count="45"/>
+    </option>
+    <option value="126_I">
+        Wellington North: Palmerston Village
+        <div id="" reel="148179" frame="215" count="41"/>
+    </option>
+    <option value="126_J">
+        Wellington North: Wallace
+        <div id="1" reel="148179" frame="256" count="34"/>
+        <div id="2" reel="148179" frame="290" count="34"/>
+    </option>
+    <option value="127_A">
+        Wellington South: Eramosa
+        <div id="1" reel="148179" frame="324" count="21"/>
+        <div id="2" reel="148179" frame="345" count="16"/>
+        <div id="3" reel="148179" frame="361" count="15"/>
+        <div id="4" reel="148179" frame="376" count="15"/>
+    </option>
+    <option value="127_B">
+        Wellington South: Erin
+        <div id="1" reel="148179" frame="391" count="17"/>
+        <div id="2" reel="148179" frame="408" count="82"/>
+        <div id="3" reel="148179" frame="428" count="20"/>
+        <div id="4" reel="148179" frame="448" count="18"/>
+        <div id="5" reel="148179" frame="466" count="11"/>
+    </option>
+    <option value="127_C">
+        Wellington South: Erin Village
+        <div id="" reel="148179" frame="477" count="13"/>
+    </option>
+    <option value="127_D">
+        Wellington South: Guelph
+        <div id="1" reel="148179" frame="490" count="19"/>
+        <div id="2" reel="148179" frame="509" count="20"/>
+        <div id="3" reel="148179" frame="529" count="14"/>
+    </option>
+    <option value="127_E">
+        Wellington South: Guelph City
+        <div id="1" reel="148179" frame="543" count="33"/>
+        <div id="2" reel="148179" frame="576" count="38"/>
+        <div id="3" reel="148179" frame="614" count="33"/>
+        <div id="4" reel="148179" frame="647" count="34"/>
+        <div id="5" reel="148179" frame="681" count="44"/>
+        <div id="6" reel="148179" frame="725" count="38"/>
+    </option>
+    <option value="127_F">
+        Wellington South: Puslinch
+        <div id="1" reel="148179" frame="763" count="17"/>
+    </option>
+</select>

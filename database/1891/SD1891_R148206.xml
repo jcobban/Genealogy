@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148206">
+    <option value="168_D">
+        Missisquoi: Dunham Village
+        <div id="" reel="148206" frame="0" count="8"/>
+    </option>
+    <option value="168_E">
+        Missisquoi: Farnham Town
+        <div id="1" reel="148206" frame="8" count="26"/>
+        <div id="2" reel="148206" frame="34" count="32"/>
+    </option>
+    <option value="168_F">
+        Missisquoi: Farnham West
+        <div id="" reel="148206" frame="66" count="31"/>
+    </option>
+    <option value="168_G">
+        Missisquoi: Frelighsburg
+        <div id="" reel="148206" frame="97" count="6"/>
+    </option>
+    <option value="168_H">
+        Missisquoi: Nôtre-Dame des Anges
+        <div id="" reel="148206" frame="103" count="9"/>
+    </option>
+    <option value="168_I">
+        Missisquoi: Nôtre-Dame de Stanbridge Village
+        <div id="" reel="148206" frame="112" count="26"/>
+    </option>
+    <option value="168_J">
+        Missisquoi: Philipsburg Village
+        <div id="" reel="148206" frame="138" count="6"/>
+    </option>
+    <option value="168_K">
+        Missisquoi: St. Armand East
+        <div id="1" reel="148206" frame="144" count="16"/>
+        <div id="2" reel="148206" frame="160" count="7"/>
+    </option>
+    <option value="168_L">
+        Missisquoi: St. Armand West
+        <div id="1" reel="148206" frame="167" count="10"/>
+        <div id="2" reel="148206" frame="177" count="12"/>
+    </option>
+    <option value="168_M">
+        Missisquoi: St. George de Clarenceville
+        <div id="1" reel="148206" frame="189" count="15"/>
+        <div id="2" reel="148206" frame="204" count="10"/>
+    </option>
+    <option value="168_N">
+        Missisquoi: St. Thomas
+        <div id="" reel="148206" frame="214" count="15"/>
+    </option>
+    <option value="168_O">
+        Missisquoi: Stanbridge Station
+        <div id="" reel="148206" frame="229" count="18"/>
+    </option>
+    <option value="168_P">
+        Missisquoi: Stanbridge
+        <div id="" reel="148206" frame="247" count="20"/>
+    </option>
+    <option value="168_Q">
+        Missisquoi: Sweetsburg Village
+        <div id="" reel="148206" frame="267" count="7"/>
+    </option>
+    <option value="168_R">
+        Missisquoi: St. Ignace
+        <div id="1" reel="148206" frame="274" count="10"/>
+        <div id="2" reel="148206" frame="284" count="14"/>
+    </option>
+    <option value="169_A">
+        Montcalm: St. Alexis
+        <div id="" reel="148206" frame="298" count="28"/>
+    </option>
+    <option value="169_B">
+        Montcalm: St. Calixte Village
+        <div id="" reel="148206" frame="326" count="21"/>
+    </option>
+    <option value="169_C">
+        Montcalm: St. Donat &amp; Chilton
+        <div id="" reel="148206" frame="347" count="8"/>
+    </option>
+    <option value="169_D">
+        Montcalm: St. Émile &amp; Wexford
+        <div id="" reel="148206" frame="355" count="9"/>
+    </option>
+    <option value="169_E">
+        Montcalm: St. Esprit
+        <div id="" reel="148206" frame="364" count="29"/>
+    </option>
+    <option value="169_F">
+        Montcalm: St. Jacques
+        <div id="1" reel="148206" frame="393" count="27"/>
+        <div id="2" reel="148206" frame="420" count="27"/>
+    </option>
+    <option value="169_G">
+        Montcalm: St. Julienne
+        <div id="" reel="148206" frame="447" count="24"/>
+    </option>
+    <option value="169_H">
+        Montcalm: St. Liguori
+        <div id="" reel="148206" frame="471" count="27"/>
+    </option>
+    <option value="169_I">
+        Montcalm: Ste. Marie Salomée
+        <div id="" reel="148206" frame="498" count="14"/>
+    </option>
+    <option value="169_J">
+        Montcalm: St. Patrick de Rawdon
+        <div id="" reel="148206" frame="512" count="25"/>
+    </option>
+    <option value="169_K">
+        Montcalm: St. Théodore de Chertsey
+        <div id="" reel="148206" frame="537" count="24"/>
+    </option>
+    <option value="170_A">
+        Montmagny: Cap St. Ignace
+        <div id="1" reel="148206" frame="561" count="43"/>
+        <div id="2" reel="148206" frame="604" count="32"/>
+    </option>
+    <option value="170_B">
+        Montmagny: L'Assomption de Berthier
+        <div id="" reel="148206" frame="636" count="24"/>
+    </option>
+    <option value="170_C">
+        Montmagny: Montminy, Rolette, Panet &amp; Tallon
+        <div id="" reel="148206" frame="660" count="30"/>
+    </option>
+    <option value="170_D">
+        Montmagny: Montmagny Town
+        <div id="" reel="148206" frame="690" count="35"/>
+    </option>
+    <option value="170_E">
+        Montmagny: Patton &amp; Ashburton
+        <div id="" reel="148206" frame="725" count="13"/>
+    </option>
+    <option value="170_F">
+        Montmagny: St. Antoine de l'Isle aux Grues
+        <div id="" reel="148206" frame="738" count="13"/>
+    </option>
+    <option value="170_G">
+        Montmagny: St. François de la Rivière du Sud
+        <div id="1" reel="148206" frame="751" count="17"/>
+        <div id="2" reel="148206" frame="768" count="16"/>
+    </option>
+    <option value="170_H">
+        Montmagny: St. Pierre
+        <div id="" reel="148206" frame="784" count="28"/>
+    </option>
+</select>

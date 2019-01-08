@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148101">
+    <option value="13_L">
+        Charlotte: St. George (Town &amp; Parish)
+        <div id="1" reel="148101" frame="0" count="17"/>
+        <div id="2" reel="148101" frame="17" count="16"/>
+        <div id="3" reel="148101" frame="33" count="16"/>
+        <div id="4" reel="148101" frame="49" count="11"/>
+    </option>
+    <option value="13_M">
+        Charlotte: St. James
+        <div id="1" reel="148101" frame="60" count="18"/>
+        <div id="2" reel="148101" frame="78" count="14"/>
+        <div id="3" reel="148101" frame="92" count="17"/>
+    </option>
+    <option value="13_N">
+        Charlotte: St. Patrick
+        <div id="" reel="148101" frame="109" count="19"/>
+    </option>
+    <option value="13_O">
+        Charlotte: St. Stephen
+        <div id="" reel="148101" frame="128" count="16"/>
+    </option>
+    <option value="13_P">
+        Charlotte: St. Stephen (Town)
+        <div id="1" reel="148101" frame="144" count="24"/>
+        <div id="2" reel="148101" frame="168" count="17"/>
+        <div id="3" reel="148101" frame="185" count="16"/>
+    </option>
+    <option value="13_Q">
+        Charlotte: Upper Mills Town
+        <div id="" reel="148101" frame="201" count="7"/>
+    </option>
+    <option value="13_R">
+        Charlotte: West Isles (Deer Island)
+        <div id="1" reel="148101" frame="208" count="16"/>
+        <div id="2" reel="148101" frame="224" count="19"/>
+    </option>
+    <option value="14_A">
+        Gloucester: Bathurst
+        <div id="1" reel="148101" frame="243" count="13"/>
+        <div id="2" reel="148101" frame="256" count="17"/>
+        <div id="3" reel="148101" frame="273" count="25"/>
+        <div id="4" reel="148101" frame="298" count="21"/>
+        <div id="5" reel="148101" frame="319" count="27"/>
+    </option>
+    <option value="14_B">
+        Gloucester: Beresford
+        <div id="1" reel="148101" frame="346" count="28"/>
+        <div id="2" reel="148101" frame="374" count="27"/>
+        <div id="3" reel="148101" frame="401" count="36"/>
+    </option>
+    <option value="14_C">
+        Gloucester: Caraquet
+        <div id="1" reel="148101" frame="437" count="29"/>
+        <div id="2" reel="148101" frame="466" count="26"/>
+        <div id="3" reel="148101" frame="492" count="21"/>
+        <div id="4" reel="148101" frame="513" count="22"/>
+    </option>
+    <option value="14_D">
+        Gloucester: Inkerman
+        <div id="1" reel="148101" frame="535" count="13"/>
+        <div id="2" reel="148101" frame="548" count="16"/>
+        <div id="3" reel="148101" frame="564" count="17"/>
+    </option>
+    <option value="14_E">
+        Gloucester: New Bandon
+        <div id="1" reel="148101" frame="581" count="19"/>
+        <div id="2" reel="148101" frame="600" count="21"/>
+    </option>
+</select>

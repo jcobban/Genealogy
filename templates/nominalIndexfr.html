@@ -1,0 +1,248 @@
+<!--*********************************************************************
+ *  nominalIndexfr.html													*
+ *																		*
+ *  Primary dialog for searching for individuals in the family tree.	*
+ *																		*
+ *  History:															*
+ *		2017/10/29		created											*
+ *		2018/01/04		remove Template from template file names		*
+ *		2018/02/03		change breadcrumbs to new standard				*
+ *      2018/11/01      pass language to Surnames script                *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+<link rel="stylesheet" type="text/css" href="/FamilyTree/nominalIndex.css">
+<div class="hidden" id="breadcrumbs">
+	<a href="/index.html">Accueil</a>:
+    <a href="/genealogy.php?lang=fr">Généalogie</a>:
+    <a href="/genCountry.php?cc=CA&amp;lang=fr">Canada</a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=fr">Ontario</a>:
+    <a href="/FamilyTree/Services.php?lang=fr">Services</a>:
+</div>
+<div class="body">
+  <h1>
+    <span class="right">
+	<a href="/FamilyTree/nominalIndexHelpfr.html" target="help">? Aide</a>
+    </span>
+    <span id="title">
+      Familles de $TREENAME
+    </span>
+    <div style="clear: both;"></div>
+  </h1>
+    $TRACE
+    $MSG
+ <form name="nameForm" id="nameForm" action="Names.php">
+      <div class="row" id="nameRow">
+	<label class="label" for="Name">
+	  <u>N</u>om (Surnom, Prenom type="text/javascript>
+    </script>
+	</label>
+	  <input type="text" name="Name" id="Name" size="44" 
+		class="white left" value="" accessKey="N">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="birthYearAndSexRow">
+       <div class="column1">
+	<label class="label" for="birthmin">Gamme de Naissance:</label>
+	<input class="white rightnc" size="4" name="birthmin" id="birthmin"
+		value="$birthmin" accessKey="B">
+	<span class="label" for="birthmax">a</span>
+	<input class="white rightnc" size="4" name="birthmax" id="birthmax"
+		value="$birthmax">
+       </div>
+       <div class="column1">
+	<label class="label" for="Sex">
+	    Se<u>x</u>e:
+	</label>
+	<select name="Sex" size="1" class="white left" accessKey="X">
+	    <option class="male" value="M">Mâle</option>
+	    <option class="female" value="F">Femelle</option>
+	    <option class="unknown" value="" selected="selected">Chaque</option>
+	</select>
+       </div>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="marriedAndUnrelatedRow">
+	<label class="label" for="incMarried">
+	    Inclure Noms <u>M</u>ariés:
+	</label>
+	<input type="checkbox" name="incMarried" id="incMarried"
+		value="Y" class="em10" accessKey="M">
+	<button type="button" id="addUnrelated" accessKey="A">
+		<u>A</u>jouter une Nouvelle Personne Non-Apparenté
+	</button>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="infoIncludeRow">
+	<label class="label" for="includeParents">
+	    Inclure <u>P</u>arents:
+	</label>
+	<input type="checkbox" name="includeParents" id="includeParents"
+		accessKey="P"
+		value="Y" class="em10" checked="checked">
+	<label class="label" for="includeSpouse">
+	    Inclure Épouse:
+	</label>
+	<input type="checkbox" name="includeSpouse" id="includeSpouse"
+		accessKey="S"
+		value="Y" class="em10" checked="checked">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="treeNameRow">
+	<label class="label" for="treeName">
+	    Nom de l'Arbre:
+	</label>
+	<select id="treeName" name="treeName" size="1" class="white left"
+		accessKey="T">
+	  <option id="createNewTree" value="[new]">Créer un Arbre Neuf</option>
+	  <option value="*">Inclure toutes Arbres</option>
+	  <option id="treeOpt" value="$code" $selected>
+	    $atree 
+	  </option>
+	</select>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="selectionRow">
+	<label class="label" for="individ">
+	  Choisir:
+	</label>
+	<select name="individ" id="individ" size="10" class="nameSelect">
+	    <option value="0" class="unknown">choisir une personne</option>
+	</select>
+        <div style="clear: both;"></div>
+      </div>
+  </form>
+
+    <p class="label">ou Choisir la premiere lettre du Surnom:
+	</p>
+    <p class="label" id="specialSurnamesRow">
+	  <a href="/FamilyTree/Names.php?Surname=&lang=$LANG">&lt;Aucun Surnom&gt;</a>
+	  <a href="/FamilyTree/Surnames.php?initial=_&lang=$LANG">&lt;Surnom Inconnu&gt;</a>
+    <p class="label" id="AtoIRow">
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=A&lang=$LANG">A</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=B&lang=$LANG">B</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=C&lang=$LANG">C</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=D&lang=$LANG">D</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=E&lang=$LANG">E</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=F&lang=$LANG">F</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=G&lang=$LANG">G</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=H&lang=$LANG">H</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=I&lang=$LANG">I</a>
+    </p>
+    <p class="label" id="JtoQRow">
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=J&lang=$LANG">J</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=K&lang=$LANG">K</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=L&lang=$LANG">L</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=M&lang=$LANG">M</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=Mc&lang=$LANG">Mc</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=N&lang=$LANG">N</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=O&lang=$LANG">O</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=P&lang=$LANG">P</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=Q&lang=$LANG">Q</a>
+    </p>
+    <p class="label" id="RtoZRow">
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=R&lang=$LANG">R</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=S&lang=$LANG">S</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=T&lang=$LANG">T</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=U&lang=$LANG">U</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=V&lang=$LANG">V</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=W&lang=$LANG">W</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=Y&lang=$LANG">Y</a>
+	  <a class="em4" href="/FamilyTree/Surnames.php?initial=Z&lang=$LANG">Z</a>
+    </p>
+    <div style="clear: both;"></div>
+</div> <!-- end of <div id="body"> -->
+<div class="hidden" id="templates">
+  <!-- template for dialog for creating new tree -->
+  <form name="CreateTree$template" id="CreateTree$template"
+	onsubmit="return false;">
+    <h2>Créer un Arbre Neuf dans la Base de Données</h2>
+    <input id="newTreeName$template" name="newTreeName$template"
+	class="white left" size="50">
+    <p>
+      <button type="button" id="closeCreate$template">
+	Annuller
+      </button>
+    </p>
+  </form> <!-- end of CreateTree$template -->
+</div> <!-- id="templates" -->
+<div class="balloon" id="HelpName">
+<p>Type a name, starting with the surname, a comma, and the given names.  
+As you type the text you have entered is used to select the individuals to list,
+starting with the first individual whose name begins with the text
+you have entered.  For example if you enter "Smith, Ma" the listing will 
+begin with the first individual with surname Smith and a given name starting
+with "Ma" and continuing through the Smiths, and any subsequent surnames if
+required, until 50 names have been displayed.
+</p>
+<p>If you enter more than one value for given name, for example "Mary Jane",
+then, for the supplied surname, only individuals who match <em>both</em>
+values match anywhere in the given name.  
+This is useful for popular surnames where, for example, just "Mary" would
+return more than 50 responses.  In this format the supplied values match
+anywhere in the given name, not just at the beginning.  So "Ma Jane" would
+match "Emma Jane", "Jane Maria", "Janet Margaret", and so on.  You can force
+a match anywhere by supplying two values that overlap.  For example "M Mary"
+will match only individuals with "mary" anywhere in their given name, not just
+at the beginning.
+</p>
+</div>
+<div class="balloon" id="Helpindivid">
+This selection list displays a list of individuals in alphabetical order,
+by surname, and then by given name, that starts with the individual
+in the database who is the first to come after the text entered in the
+name field.  Click on an individual in this list to display the information
+known about that individual.
+</div>
+<div class="balloon" id="HelpincMarried">
+If this option is checked then the list of individuals will include
+individuals selected by married names as well as birth names.
+</div>
+<div id="Helpbirthmin" class="balloon">
+<p>This field specifies the lowest birth year to use in matching individuals.
+If this field is blank there is no lower limit.
+</div>
+<div id="Helpbirthmax" class="balloon">
+<p>This field specifies the highest birth year to use in matching individuals.
+If this field is blank there is no upper limit.
+</div>
+<div id="HelpSex" class="balloon">
+<p>Select an option in this selection list to limit the list of matching
+individuals by sex.
+</div>
+<div id="HelpincludeParents" class="balloon">
+<p>Select this checkbox to include information about the parents of all
+matching individuals in the display.
+</div>
+<div id="HelpincludeSpouse" class="balloon">
+<p>Select this checkbox to include information about the spouses of all
+matching individuals in the display.
+</div>
+<div id="HelpaddUnrelated" class="balloon">
+<p>Click on this button to add a new unrelated individual to the family tree.
+You can do this to start a new family tree.
+</div>
+<div id="HelptreeName" class="balloon">
+<p>Use this selection list to choose which family tree database to display,
+or to
+start a new family tree database.  Each family tree database is used to organize
+families which are likely to be related to each other, but not to families
+in other family tree databases. 
+This does not mean that the trees are never related.  When looking for links
+you can always choose to search all of the trees for a match.  However by
+default the application searches only within the last tree that you looked at.
+The original family tree database is for families of South-Western Ontario.
+</div>
+<div class="popup" id="loading">
+Loading...
+</div>
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/Cookie.js" type="text/javascript">
+    </script>
+    <script src="/FamilyTree/nominalIndex.js" type="text/javascript">
+    </script>

@@ -1,0 +1,788 @@
+<!--*********************************************************************
+ *  DeathRegDetailDisplayfr.html										*
+ *																		*
+ *  Display the contents of an Ontario death registration as a detail	*
+ *  form with optional ability to update the record.					*
+ *																		*
+ *  History:															*
+ *		2018/05/28		convert to template								*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=fr">
+	Généalogie
+    </a>:
+    <a href='/Canada/CountriesEdit.php?lang=fr'>
+	Liste des Pays Soutenus
+    </a>:
+    <a href="/genCountry.php?cc=$CC&lang=fr">
+	$COUNTRYNAME
+    </a>:
+    <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=fr">
+	$DOMAINNAME
+    </a>:
+    <a href="DeathRegQuery.php?lang=fr">
+	Nouvelle requête
+    </a>: 
+    <a href="DeathRegStats.php?RegDomain=$DOMAIN&lang=fr">
+	$DOMAINNAME statut de transcription
+    </a>: 
+    <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&regyear=$REGYEAR&lang=fr">
+	$DOMAINNAME Statut $REGYEAR
+    </a>: 
+    <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&regyear=$REGYEAR&regCounty=$REGCOUNTY&lang=fr">
+	Statut $REGYEAR $COUNTYNAME
+    </a>: 
+    <a href="DeathRegResponse.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&RegCounty=$REGCOUNTY&RegTownship=$REGTOWNSHIP&lang=fr">
+	Statut $REGYEAR Canton $REGTOWNSHIP
+    </a>:
+  </div> 
+  <div class="body">
+    <h1>
+      <span class="right">
+	<a href="DeathRegDetailHelpfr.html" target="help">? Help</a>
+      </span>
+      Ontario Enregistrement de Décès: Montre
+    </h1>
+    $MSG
+    $TRACE
+  <form action="donothing.php"
+		method="post" 
+		name="distForm" id="distForm"
+		enctype="multipart/form-data">
+    <p>
+      <button type="button" id="Previous"><u>P</u>récédent</button>
+	&nbsp;
+      <button type="button" id="Next">Prochai<u>n</u></button>
+	&nbsp;
+      <button type="button" id="NewQuery">Nouvelle re<u>q</u>uête</button>
+	<input type="hidden" name="RegDomain" id="RegDomain"
+		value="$DOMAIN"/>
+	<!-- the following stores the textual value of the county name in
+	     the web page so it can be used by the Javascript code 
+	     to initialize the RegCounty selection list -->
+	<input type="hidden" name="RegCountyTxt" id="RegCountyTxt" 
+		disabled="disabled" value="$REGCOUNTY"/>
+	<!-- the following stores the textual value of the county name in
+	     the web page so it can be used by the Javascript code 
+	     to initialize the RegTownship selection list -->
+	<input type="hidden" name="RegTownshipTxt" id="RegTownshipTxt" 
+		disabled="disabled" value="$REGTOWNSHIP"/>
+	<input type="hidden" name="Debug" id="Debug"
+			value="Y"/>
+    </p>
+    <div class="row" id="RegYearNumRow">
+      <div class="column1">
+	  <label class="labelSmall" for="RegId">Identification:</label>
+	  <input name="RegId" id="RegId" type="text"
+		class="ina rightnc" size="10" maxlength="12"
+		readonly="readonly" 
+		value="$REGYEAR-$PADDEDREGNUM"/>
+	  <input name="RegYear" id="RegYear" type="hidden"
+		value="$REGYEAR">
+	  <input name="RegNum" id="RegNum" type="hidden"
+		value="$REGNUM">
+      </div>
+      <div class="column2">
+	  <label class="labelSmall" for="MsVol">
+	    MS 935 Bobine:
+	  </label>
+	  <input name="MsVol" id="MsVol" type="text"
+		size="4" maxlength="4" class="ina rightnc" 
+		value="$MSVOL"/>
+      </div>
+      <div style="clear: both"></div>
+      <input name="OriginalVolume" id="OriginalVolume"
+		type="hidden"
+		value="$ORIGINALVOLUME"/>
+      <input name="OriginalPage" id="OriginalPage"
+		type="hidden"
+		value="$ORIGINALPAGE"/>
+      <input name="OriginalItem" id="OriginalItem"
+		type="hidden"
+		value="$ORIGINALITEM"/>
+    </div>
+    <div class="row" id="CountyTownshipRow">
+      <div class="column1">
+	<label class="labelSmall" for="RegCounty">Lieu: Comté:</label>
+	<select name="RegCounty" id="RegCounty" size="1"
+		class="ina left">
+	</select>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="RegTownship">Canton:</label>
+	<input name="RegTownship" id="RegTownship"
+		type="text" size="20" maxlength="40" 
+		value="$REGTOWNSHIP" 
+		class="ina left" 
+		readonly="readonly"/>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="NameRow">
+      <div class="column1">
+	<label class="labelSmall" for="GivenNames">Nom: Prenom:</label>
+	<input name="GivenNames" id="GivenNames"
+		type="text" size="32" maxlength="40"
+		value="$GIVENNAMES" 
+		class="ina left" 
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="Surname">Surnom:</label>
+	<input name="Surname" id="Surname"
+		type="text" size="20" maxlength="40" 
+		value="$SURNAME" 
+		class="ina left" 
+		readonly="readonly"/>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="SexMarStatRow">
+      <div class="column1">
+	<label class="labelSmall" for="Sex">Sexe:</label>
+	<!-- enable the selection for input only if updating -->
+	<select name="Sex" id="Sex" size="1"
+		class="white left">
+	    <option id="SexM" class="male white" value="M" $selected>
+	    	Mâle
+	    </option>
+	    <option id="SexF" class="female white" value="F" $selected>
+	    	Femelle
+	    </option>
+	    <option id="SexU" class="unknown white" value="?" $selected>
+	    	Non Rapporté
+	    </option>
+	</select>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="MarStat">État civil:</label>
+	<!-- enable the selection for input only if updating -->
+	<select name="MarStat" id="MarStat" size="1"
+		class="ina left">
+	  <option id="MarStatS" value="S" $selected>Célibataire</option>
+	  <option id="MarStatM" value="M" $selected>Marié[e]</option>
+	  <option id="MarStatW" value="W" $selected>Veuf/ve</option>
+	  <option id="MarStatD" value="D" $selected>Divorcé[e]</option>
+	  <option id="MarStatU" value="?" $selected>Non Rapporté</option>
+	</select>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="DeathDatePlaceRow">
+      <div class="column1">
+	<label class="labelSmall" for="Date">Date&nbsp;de&nbsp;mort:</label>
+	<input name="Date" id="Date"
+		type="text" size="12" maxlength="32"
+		value="$DATE"
+		class="ina left"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="Place">Lieu&nbsp;de&nbsp;mort:</label>
+	<input name="Place" id="Place"
+		type="text" size="20" maxlength="128"
+		value="$PLACE"
+		class="ina leftnc"
+		readonly="readonly"/>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="LinkRowSet">
+      <div class="column2">
+	<label class="labelSmall" for="IDIR">Lien:</label>
+	<a href="/FamilyTree/Person.php?idir=$idir"
+		id="showLink" class="$genderClass"
+		target="_blank">
+	    $linkedName
+	</a>
+	  <input type="hidden" id="IDIR" name="IDIR" 
+		value="$IDIR">
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="LinkRowMatch">
+      <div class="column2">
+	<label class="labelSmall" for="IDIR">Lien:</label>
+	<select name="IDIR" id="IDIR" rows="1"
+		class="ina left">
+	    <option value="0">Correspondances possibles à cette inscription:
+	    <option value="$idir" class="$sexclass white">
+		$name
+	    </option>
+	</select>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="OccupationAgeRow">
+      <div class="column1">
+	<label class="labelSmall" for="Occupation">Occupation:</label>
+	<input name="Occupation" id="Occupation"
+		type="text" size="20" maxlength="64"
+		value="$OCCUPATION"
+		class="ina leftnc'"
+		readonly="readonly"/>
+      </div>
+      <div class="column1">
+	<label class="labelSmall" for="Age">Âge au décès:</label>
+	<input name="Age" id="Age"
+		type="text" size="10" maxlength="16"
+		value="$AGE"
+		class="ina leftnc"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="BirthDatePlaceRow">
+      <div class="column1">
+	<label class="labelSmall" for="BirthDate">Date&nbsp;de&nbsp;naissance:</label>
+	<input name="BirthDate" id="BirthDate"
+		type="text" size="10" maxlength="32"
+		value="$BIRTHDATE"
+		class="ina left"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="BirthPlace">Lieu&nbsp;de&nbsp;naissance:</label>
+	<input name="BirthPlace" id="BirthPlace"
+		type="text" size="20" maxlength="128"
+		value="$BIRTHPLACE"
+		class="ina leftnc"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="ResLengthRow">
+      <div class="column2">
+	<label class="labelSmall" for="ResPlace">Résidence:<br>a&nbsp;lieu:</label>
+	<input name="ResPlace" id="ResPlace"
+		type="text" size="5" maxlength="16"
+		value="$RESPLACE"
+		class="ina rightnc"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall6em" for="ResOnt">en&nbsp;Ontario:</label>
+	<input name="ResOnt" id="ResOnt" 
+		type="text" size="5" maxlength="16"
+		value="$RESONT"
+		class="ina rightnc"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall6em" for="ResCan">au&nbsp;Canada:</label>
+	<input name="ResCan" id="ResCan" 
+		type="text" size="5" maxlength="16"
+		value="$RESCAN"
+		class="ina rightnc"
+		readonly="readonly"/>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="DeathCauseRow">
+      <div class="column1">
+	<label class="labelSmall" for="Cause">Cause:</label>
+	<input name="Cause" id="Cause"
+		type="text" size="32" maxlength="255"
+		value="$CAUSE" 
+		class="ina leftnc" 
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="Duration">Duration:</label>
+	<input name="Duration" id="Duration"
+		type="text" size="16" maxlength="64"
+		value="$DURATION"
+		class="ina leftnc"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="PhysicianRow">
+      <div class="column1">
+	<label class="labelSmall" for="Phys">Médecin:</label>
+	<input name="Phys" id="Phys"
+		type="text" size="20" maxlength="48"
+		value="$PHYS"
+		class="ina left"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="PhysAddr">Addresse:</label>
+	<input name="PhysAddr" id="PhysAddr"
+		type="text" size="20" maxlength="128"
+		value="$PHYSADDR"
+		class="ina leftnc"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="InformantRow">
+      <div class="column1">
+	<label class="labelSmall" for="Informant">Informateur:&nbsp;Nom:</label>
+	<input name="Informant" id="Informant"
+		type="text" size="32" maxlength="48"
+		value="$INFORMANT"
+		class="ina left"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="InfRel">Relation:</label>
+	<input name="InfRel" id="InfRel" type="text"
+		class="ina left" 
+		size="16" maxlength="16" 
+		readonly="readonly"
+		value="$INFREL"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="InformantOccRow">
+      <div class="column1">
+	<label class="labelSmall" for="InfOcc">Informateur:&nbsp;Occupation:</label>
+	<input name="InfOcc" id="InfOcc"
+		type="text" size="16" maxlength="32"
+		value="$INFOCC"
+		class="ina leftnc"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="InfRes">Résidence:</label>
+	<input name="InfRes" id="InfRes"
+		type="text" size="20" maxlength="128"
+		value="$INFRES"
+		class="ina leftnc"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="ReligionRow">
+      <div class="column1">
+	<label class="labelSmall" for="Religion">Religion:</label>
+	<input name="Religion" id="Religion"
+		type="text" size="20" maxlength="32"
+		value="$RELIGION"
+		class="ina leftnc"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="FatherNameRow">
+      <div class="column1">
+	<label class="labelSmall" for="FatherName">Nom&nbsp;du&nbsp;père:</label>
+	<input name="FatherName" id="FatherName"
+		type="text" size="32" maxlength="48"
+		value="$FATHERNAME"
+		class="ina left"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="FatherBPlce">Lieu&nbsp;de&nbsp;naissance:</label>
+	<input name="FatherBPlce" id="FatherBPlce"
+		type="text" size="20" maxlength="128"
+		value="$FATHERBPLCE"
+		class="ina leftnc"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="MotherNameRow">
+      <div class="column1">
+	<label class="labelSmall" for="MotherName">Nom&nbsp;du&nbsp;mère:</label>
+	<input name="MotherName" id="MotherName"
+		type="text" size="32" maxlength="48"
+		value="$MOTHERNAME"
+		class="ina left"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="MotherBPlce">Lieu&nbsp;de&nbsp;naissance:</label>
+	<input name="MotherBPlce" id="MotherBPlce"
+		type="text" size="20" maxlength="128"
+		value="$MOTHERBPLCE"
+		class="ina leftnc"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="HusbandNameRow">
+      <div class="column1">
+	<label class="labelSmall" for="HusbandName">Nom&nbsp;d'Époux:</label>
+	<input name="HusbandName" id="HusbandName"
+		type="text" size="32" maxlength="48"
+		value="$HUSBANDNAME"
+		class="ina left"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="BurialRow">
+      <div class="column1">
+	<label class="labelSmall" for="BurPlace">Lieu de sépulture:</label>
+	<input name="BurPlace" id="BurPlace"
+		type="text" size="32" maxlength="128"
+		value="$BURPLACE"
+		class="ina leftnc"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="BurDate">Date:</label>
+	<input name="BurDate" id="BurDate"
+		type="text" size="16" maxlength="16"
+		value="$BURDATE"
+		class="ina left"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="UndertakerRow">
+      <div class="column1">
+	<label class="labelSmall" for="Undertkr">Pompes funèbres:</label>
+	<input name="Undertkr" id="Undertkr"
+		type="text" size="20" maxlength="48"
+		value="$UNDERTKR"
+		class="ina left"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="UndertkrAddr">Addresse:</label>
+	<input name="UndertkrAddr" id="UndertkrAddr"
+		type="text" size="20" maxlength="128"
+		value="$UNDERTKRADDR"
+		class="ina leftnc"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="RegistrationDateRow">
+      <div class="column1">
+	<label class="labelSmall" for="RegDate">Date d'enreg't:</label>
+	<input name="RegDate" id="RegDate"
+		type="text" size="16" maxlength="16"
+		value="$REGDATE"
+		class="ina left"
+		readonly="readonly"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="Registrar">Greffier:</label>
+	<input name="Registrar" id="Registrar"	
+		type="text" size="20" maxlength="128"
+		value="$REGISTRAR"
+		class="ina left"
+		readonly="readonly"/>
+	</div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row" id="RemarksRow">
+      <div class="column1">
+	<label class="labelSmall">Remarques:</label>
+	$REMARKS
+      </div>
+    <div style="clear: both"></div>
+    </div>
+    <div class="row" id="ImageRow">
+      <div class="column2">
+	<label class="labelSmall" for="Image">Image:</label>
+	<button type="button" id="ShowImage">Montrez Image</button>
+	<input name="Image" id="Image"
+		type="text" size="50" maxlength="256"
+		value="$IMAGE"
+		class="same ina leftnc40em" 
+		readonly="readonly" />
+       </div>
+      <div style="clear: both"></div>
+    </div>
+  </form>
+ </div> <!-- end of <div id="body"> -->
+<div class="hidden" id="templates">
+$DIALOGS
+</div> <!-- id="templates" -->
+<!--  The remainder of the web page consists of divisions containing
+context specific help.  These divisions are only displayed if the user
+requests help by pressing F1.  Including this information here ensures
+that the language of the help balloons matches the language of the
+input form.
+-->
+  <div class="balloon" id="HelpOriginalVolume">
+    This field contains the identification of the original bound volume
+    containing the marriage registrations or certificates.
+  </div>
+  <div class="balloon" id="HelpOriginalPage">
+    This field contains the page number containing the original
+    marriage registrations or certificate.
+  </div>
+  <div class="balloon" id="HelpOriginalItem">
+    Where there are more than one marriage registration on the page this field 
+    contains the ordinal position of the specific registration on the page.
+  </div>
+  <div class="balloon" id="HelpRegCounty">
+  <p>
+    This is a selection list for identifying the county within which the
+    death was registered.
+  </p>
+  </div>
+  <div class="balloon" id="HelpRegTownship">
+  <p>
+    The Township field is used to identify the city, town, or township where the
+    death was registered.  For some counties this is a selection list of all
+    municipalities within the county.  However such a list has not been accumulated
+    for all counties, and for those counties where it has not, this is a text 
+    input field.
+  </p>
+  </div>
+  <div class="balloon" id="HelpGivenNames">
+  <p>
+    The Given Names of the deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpSurname">
+  <p>
+    The Surname of the deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpSex">
+  <p>
+    Sex of the deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpMarStat">
+  <p>
+    Marital status of the deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpDate">
+  <p>
+    Date of death.
+    It is suggested that dates be entered consistently as day, 
+    abbreviation of name of month, and year.
+  </p>
+  </div>
+  <div class="balloon" id="HelpPlace">
+  <p>
+    Place of death.
+  </p>
+  </div>
+  <div class="balloon" id="HelpIDIR">
+  <p>
+    This selection list offers a list of individuals in the family tree database
+    who may correspond to this death registration.  Selecting an entry in this
+    list will cause a citation to this registration to be added to that individual.
+  </p>
+  </div>
+  <div class="balloon" id="HelpAge">
+  <p>
+    Age at death.  This is specified as a number of years, months, weeks, days, or hours, or a combination of these.  A number is an integer, optionally followed
+    by a '½', which may be entered as '1/2', with no intervening space. 
+    The interpretation of each number is specified by the first letter of the unit
+    of time.  Subsequent letters are ignored to permit making the age more
+    readable, for example '7days' is interpreted the same as '7d'. 
+    If a number is not followed by a letter then it is interpreted as a number
+    of years.
+  </p>
+  </div>
+  <div class="balloon" id="HelpOccupation">
+  <p>
+    Occupation of deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpBirthPlace">
+  <p>
+    Birth place of deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpBirthDate">
+  <p>
+    Birth date of deceased.
+    It is suggested that dates be entered consistently as day, 
+    abbreviation of name of month, and year.
+    If no birth date is provided by the original, it is recommended that an
+    approximate birth date be calculated using the age and date of death, 
+    and enclosed in square brackets to mark it as an editorial comment.
+  </p>
+  </div>
+  <div class="balloon" id="HelpResPlace">
+  <p>
+    Length of time the deceased lived at the place of death.
+  </p>
+  </div>
+  <div class="balloon" id="HelpResOnt">
+  <p>
+    Length of time the deceased lived in Ontario.
+  </p>
+  </div>
+  <div class="balloon" id="HelpResCan">
+  <p>
+    Length of time the deceased lived in Canada.
+  </p>
+  </div>
+  <div class="balloon" id="HelpCause">
+  <p>
+    Cause of death.
+  </p>
+  </div>
+  <div class="balloon" id="HelpDuration">
+  <p>
+    Duration of cause of death.
+  </p>
+  </div>
+  <div class="balloon" id="HelpPhys">
+  <p>
+    Attending Physician's name.
+  </p>
+  </div>
+  <div class="balloon" id="HelpPhysAddr">
+  <p>
+    Attending Physician's address.
+  </p>
+  </div>
+  <div class="balloon" id="HelpInformant">
+  <p>
+    Informant's name.
+  </p>
+  </div>
+  <div class="balloon" id="HelpInfRel">
+  <p>
+    Informant's relation to deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpInfRelTxt">
+  <p>
+    Informant's relation to deceased if not one of the values available in the
+    selection list.
+  </p>
+  </div>
+  <div class="balloon" id="HelpInfOcc">
+  <p>
+    Informant's occupation if specified.
+  </p>
+  </div>
+  <div class="balloon" id="HelpInfRes">
+  <p>
+    Informant's address if specified.
+  </p>
+  </div>
+  <div class="balloon" id="HelpReligion">
+  <p>
+    Religious affiliation of the deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpFatherName">
+  <p>
+    Name of father of deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpFatherBPlce">
+  <p>
+    Birth place of father of deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpMotherName">
+  <p>
+    Name of mother of deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpMotherBPlce">
+  <p>
+    Birth place of mother of deceased.
+  </p>
+  </div>
+  <div class="balloon" id="HelpHusbandName">
+  <p>
+    For married women, the name of her husband.
+  </p>
+  </div>
+  <div class="balloon" id="HelpBurPlace">
+  <p>
+    Place of burial.
+  </p>
+  </div>
+  <div class="balloon" id="HelpBurDate">
+  <p>
+    Date of burial.
+    It is suggested that dates be entered consistently as day, 
+    abbreviation of name of month, and year.
+  </p>
+  </div>
+  <div class="balloon" id="HelpUndertkr">
+  <p>
+    Name of undertaker/mortician.
+  </p>
+  </div>
+  <div class="balloon" id="HelpUndertkrAddr">
+  <p>
+    Address of undertaker/mortician.
+  </p>
+  </div>
+  <div class="balloon" id="HelpRegDate">
+  <p>
+    Date of registration with municipality.
+    It is suggested that dates be entered consistently as day, 
+    abbreviation of name of month, and year.
+  </p>
+  </div>
+  <div class="balloon" id="HelpRegistrar">
+  <p>
+    Name of municipal registrar/clerk.
+  </p>
+  </div>
+  <div class="balloon" id="HelpRemarks">
+  <p>
+    Remarks by the municipal registrar/clerk.
+    Any comments by the transcriber may be entered here if enclosed in 
+    square brackets.
+  </p>
+  </div>
+  <div class="balloon" id="HelpRegYear">
+    The year the death was registered.
+  </div>
+  <div class="balloon" id="HelpRegNum">
+    The registration number within the year of this death registration.
+  </div>
+  <div class="balloon" id="HelpRegId">
+    This field displays the combination of the year of registration and the
+    identification number within the year of this death registration.
+  </div>
+  <div class="balloon" id="HelpMsVol">
+    The microfilm reel number within MS 929 which is used to borrow a copy of
+    the microfilm containing the image of the original death registration from the 
+  <a href="http://www.archives.gov.on.ca/">Ontario Archives</a>.
+  </div>
+  <div class="balloon" id="HelpSubmit">
+    Clicking on this button commits the changes you have made to the database.
+  </div>
+  <div class="balloon" id="HelpReset">
+    Clicking on this button resets the values of some fields to their defaults.
+  </div>
+  <div class="balloon" id="HelpImage">
+    This field contains the location of the image of the associated original
+    document.  This can be an absolute URL, starting with "http:" or a URL 
+    relative to the /Ontario/Images folder.
+  </div>
+  <div class="balloon" id="HelpShowImage">
+    Click on this button to see the original image of the registration.
+  </div>
+  <div class="balloon" id="HelpNext">
+    Click on this button to see the registration with the next higher
+    registration number.
+  </div>
+  <div class="balloon" id="HelpPrevious">
+    Click on this button to see the registration with the next lower
+    registration number.
+  </div>
+  <div class="balloon" id="HelpNewQuery">
+    Click on this button to issue a new query of the database.
+  </div>
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/Ontario.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/locationCommon.js" type="text/javascript">
+    </script>
+    <script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript">
+    </script>
+    <script src="DeathRegDetail.js" type="text/javascript">
+    </script>

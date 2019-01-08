@@ -1,0 +1,102 @@
+<?php
+namespace Genealogy;
+use \PDO;
+use \Exception;
+/************************************************************************
+ *  deleteBirthRegXml.php						*
+ *									*
+ *  Delete an existing death registration record from Births.		*
+ *  This generates an XML file with response information so that it may	*
+ *  be invoked using AJAX.						*
+ *									*
+ *  History:								*
+ *	2014/08/28	created						*
+ *	2015/07/02	access PHP includes using include_path		*
+ *									*
+ *  Copyright &copy; 2015 James A. Cobban				*
+ ************************************************************************/
+require_once __NAMESPACE__ . '/Birth.inc';
+require_once __NAMESPACE__ . '/common.inc';
+
+    // emit the XML header
+    header('Content-Type: text/xml');
+    print "<?xml version='1.0' encoding='UTF-8'?>\n";
+    print "<deleted>\n";
+
+    // include info on parameters
+    print "    <parms>\n";
+    $domain		= 'CAON';
+    $rownum		= null;
+    $regYear		= null;
+    $regNum		= null;
+    foreach($_POST as $key => $value)
+    {			// loop through all parameters
+	print "\t<$key>$value</$key>\n";
+	switch(strtolower($key))
+	{		// act on specific keys
+	    case 'domain':
+	    {
+		$domain		= $value;
+		break;
+	    }		// registration domain
+
+	    case 'regyear':
+	    {
+		$regYear	= $value;
+		break;
+	    }		// registration year
+
+	    case 'regnum':
+	    {
+		$regNum		= $value;
+		break;
+	    }		// registration num
+
+	    case 'rownum':
+	    {
+		$rownum		= $value;
+		break;
+	    }		// rownum in input form
+
+	}		// act on specific keys
+    }			// loop through all parameters
+    print "    </parms>\n";
+
+    // validate parameters
+    if (is_null($rownum))
+	$msg	.= 'Missing mandatory parameter rownum. ';
+    if (is_null($regYear))
+	$msg	.= 'Missing mandatory parameter RegYear. ';
+    if (is_null($regNum))
+	$msg	.= 'Missing mandatory parameter RegNum. ';
+    
+    // current user must be authorized to update the database
+    if (!canUser('edit'))
+    {		// take no action
+	$msg	.= 'User not authorized to update database. ';
+    }		// take no action
+
+    // try to get birth registration
+    try
+    {
+	$birthreg	= new Birth($domain, $regYear, $regNum);
+    }		// try
+    catch(Exception $e)
+    {		// catch failure of new Birth
+	$msg	.= $e->getMessage();
+    }		// catch failure of new Birth
+
+    if (strlen($msg) > 0)
+    {		// problems detected
+	print "    <msg>\n\t" . 
+	      xmlentities($msg) . 
+	      "\n    </msg>\n";
+    }		// problems detected
+    else
+    {		// OK to delete marriage
+	$birthreg->delete(true);
+    }		// OK to delete marriage
+     
+    print "</deleted>\n";
+
+?>

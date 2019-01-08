@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148205">
+    <option value="166_F">
+        Maskinonge: St. Didace
+        <div id="2" reel="148205" frame="0" count="15"/>
+    </option>
+    <option value="166_G">
+        Maskinonge: St. Joseph
+        <div id="1" reel="148205" frame="15" count="12"/>
+        <div id="2" reel="148205" frame="27" count="17"/>
+        <div id="3" reel="148205" frame="44" count="15"/>
+    </option>
+    <option value="166_H">
+        Maskinonge: St. Justin
+        <div id="1" reel="148205" frame="59" count="23"/>
+        <div id="2" reel="148205" frame="82" count="13"/>
+    </option>
+    <option value="166_I">
+        Maskinonge: St. Léon
+        <div id="1" reel="148205" frame="95" count="23"/>
+        <div id="2" reel="148205" frame="118" count="17"/>
+    </option>
+    <option value="166_J">
+        Maskinonge: St. Paulin
+        <div id="" reel="148205" frame="135" count="31"/>
+    </option>
+    <option value="166_K">
+        Maskinonge: St. Ursule
+        <div id="1" reel="148205" frame="166" count="23"/>
+        <div id="2" reel="148205" frame="189" count="17"/>
+        <div id="3" reel="148205" frame="206" count="12"/>
+    </option>
+    <option value="166_L">
+        Maskinonge: Unorganized Territory
+        <div id="" reel="148205" frame="218" count="2"/>
+    </option>
+    <option value="167_A">
+        Mégantic: Halifax North
+        <div id="1" reel="148205" frame="220" count="19"/>
+        <div id="2" reel="148205" frame="239" count="13"/>
+    </option>
+    <option value="167_B">
+        Mégantic: Halifax South
+        <div id="1" reel="148205" frame="252" count="37"/>
+        <div id="2" reel="148205" frame="289" count="10"/>
+    </option>
+    <option value="167_C">
+        Mégantic: Inverness
+        <div id="1" reel="148205" frame="299" count="15"/>
+        <div id="2" reel="148205" frame="314" count="21"/>
+    </option>
+    <option value="167_D">
+        Mégantic: Ireland North
+        <div id="" reel="148205" frame="335" count="25"/>
+    </option>
+    <option value="167_E">
+        Mégantic: Ireland South &amp; Coleraine
+        <div id="" reel="148205" frame="360" count="20"/>
+    </option>
+    <option value="167_F">
+        Mégantic: Leeds East
+        <div id="" reel="148205" frame="380" count="15"/>
+    </option>
+    <option value="167_G">
+        Mégantic: Leeds West
+        <div id="1" reel="148205" frame="395" count="9"/>
+        <div id="2" reel="148205" frame="404" count="15"/>
+        <div id="3" reel="148205" frame="419" count="15"/>
+    </option>
+    <option value="167_H">
+        Mégantic: Nelson
+        <div id="" reel="148205" frame="434" count="9"/>
+    </option>
+    <option value="167_I">
+        Mégantic: Plessisville
+        <div id="" reel="148205" frame="443" count="28"/>
+    </option>
+    <option value="167_J">
+        Mégantic: Somerset North
+        <div id="1" reel="148205" frame="471" count="16"/>
+        <div id="2" reel="148205" frame="487" count="19"/>
+    </option>
+    <option value="167_K">
+        Mégantic: Somerset South
+        <div id="1" reel="148205" frame="506" count="21"/>
+        <div id="2" reel="148205" frame="527" count="11"/>
+    </option>
+    <option value="167_L">
+        Mégantic: Ste. Anastasie de Nelson
+        <div id="" reel="148205" frame="538" count="28"/>
+    </option>
+    <option value="167_M">
+        Mégantic: St. Pierre Baptiste
+        <div id="" reel="148205" frame="566" count="20"/>
+    </option>
+    <option value="167_N">
+        Mégantic: Thetford North
+        <div id="" reel="148205" frame="586" count="28"/>
+    </option>
+    <option value="167_O">
+        Mégantic: Thetford South
+        <div id="" reel="148205" frame="614" count="8"/>
+    </option>
+    <option value="167_P">
+        Mégantic: Thetford Mines, Black Lake Mines &amp; Coleraine
+        <div id="1" reel="148205" frame="622" count="45"/>
+        <div id="2" reel="148205" frame="667" count="27"/>
+    </option>
+    <option value="168_A">
+        Missisquoi: Bedford Town
+        <div id="" reel="148205" frame="694" count="32"/>
+    </option>
+    <option value="168_B">
+        Missisquoi: Cowansville Village
+        <div id="" reel="148205" frame="726" count="16"/>
+    </option>
+    <option value="168_C">
+        Missisquoi: Dunham
+        <div id="1" reel="148205" frame="742" count="11"/>
+        <div id="2" reel="148205" frame="753" count="22"/>
+        <div id="3" reel="148205" frame="775" count="20"/>
+    </option>
+</select>

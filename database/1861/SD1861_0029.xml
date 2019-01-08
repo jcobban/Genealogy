@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="29">
+    <option value="319">
+        Ashburnham Village
+    </option>
+    <option value="320">
+        Asphodel
+    </option>
+    <option value="321">
+        Belmont
+    </option>
+    <option value="322">
+        Douro
+    </option>
+    <option value="323">
+        Dummer
+    </option>
+    <option value="324">
+        Ennismore
+    </option>
+    <option value="325">
+        Galway
+    </option>
+    <option value="326">
+        Harvey
+    </option>
+    <option value="327">
+        Minden, Stanhope, and Dysart
+    </option>
+    <option value="328">
+        Monaghan N.
+    </option>
+    <option value="329">
+        Otonabee
+    </option>
+    <option value="330">
+        Peterborough Town
+    </option>
+    <option value="331">
+        Smith
+    </option>
+    <option value="332">
+        Snowden
+    </option>
+</select>

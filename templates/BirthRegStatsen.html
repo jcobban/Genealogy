@@ -1,0 +1,142 @@
+<!--*********************************************************************
+ *  BirthRegStatsen.html												*
+ *																		*
+ *  Layout for display statistics about the transcription of birth      *
+ *  registrations in English.                                           *
+ *																		*
+ *  History:															*
+ *		2018/10/06  created                                             *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+<link rel="stylesheet" type="text/css" href="/Canada/BirthRegQuery.css">
+<div id="breadcrumbs" class="hidden">
+    <a href="/genealogy.php?lang=$LANG">
+        Genealogy</a>:
+    <a href='/Canada/CountriesEdit.php?lang=$LANG'>
+	    List of Supported Countries
+    </a>:
+    <a href="/genCountry.php?code=$CC&lang=$LANG">
+		$COUNTRYNAME</a>:
+    <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG" id="stateCrumb">
+		$STATENAME</a>:
+	<a href="/Canada/BirthRegQuery.php?domain=$DOMAIN&lang=$LANG">New Birth Query</a>:
+</div>
+ <div class='body'>
+   <h1>$DOMAINNAME: Birth Registration Status
+      <span class='right'>
+		<a href='BirthRegStatsHelpen.html' target='_blank'>Help?</a>
+      </span>
+      <span style='clear: both;'></span>
+  </h1>
+    $TRACE
+    $MSG
+
+  <form id='display' action='donothing.php' method='get'>
+    <!--- Put out the response as a table -->
+    <table class='details'>
+      <!--- Put out the column headers -->
+      <thead>
+		<tr id="thRow">
+		  <th class='colhead'>
+		RegYear
+		  </th>
+		  <th class='colhead'>
+		Done
+		  </th>
+		  <th class='colhead'>
+		Linked
+		  </th>
+		  <th class='colhead'>
+		View
+		  </th>
+		  <th>
+		  </th>
+		  <th class='colhead'>
+		RegYear
+		  </th>
+		  <th class='colhead'>
+		Done
+		  </th>
+		  <th class='colhead'>
+		Linked
+		  </th>
+		  <th class='colhead'>
+		View
+		  </th>
+		  <th>
+		  </th>
+		  <th class='colhead'>
+		RegYear
+		  </th>
+		  <th class='colhead'>
+		Done
+		  </th>
+		  <th class='colhead'>
+		Linked
+		  </th>
+		  <th class='colhead'>
+		View
+		  </th>
+		  <th>
+		  </th>
+		  <th class='colhead'>
+		RegYear
+		  </th>
+		  <th class='colhead'>
+		Done
+		  </th>
+		  <th class='colhead'>
+		Linked
+		  </th>
+		  <th class='colhead'>
+		View
+		  </th>
+		</tr>
+      </thead>
+      <tbody>
+      <tr id="dataRow">
+		  <td class='$YEARCLASS'>
+		      $REGYEAR
+		  </td>
+		  <td class='$YEARCLASS'>
+		      $COUNT
+		  </td>
+		  <td class='$PCTLINKED'>
+		      $LINKED
+		  </td>
+		  <td class='center'>
+		      <button type='button'
+					id='YearStats$DOMAIN$REGYEAR'>
+				View
+		      </button>
+		  </td>
+      </tr>
+      </tbody>
+      <tfoot>
+		<tr>
+		  <td class='right'>
+		    Totals
+		  </td>
+		  <td class='dataright'>
+		      $TOTAL
+		  </td>
+		  <td class='dataright'>
+		      $TOTALLINKED
+		  </td>
+		</tr>
+      </tfoot>
+    </table>
+  </form>
+  </div> <!-- end of <div id='body'> -->
+	<div class='balloon' id='HelprightTop'>
+	    Click on this button to signon to access extended features of the
+        web-site or to manage your account with the web-site.
+	</div>
+	<div class='balloon' id='HelpYearStats'>
+	    Click on this button to display the geographical breakdown of the
+	    transcription for the specific year.
+	</div>
+	<script src="/jscripts/http.js" type="text/javascript"></script>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/Canada/BirthRegStats.js" type="text/javascript"></script>

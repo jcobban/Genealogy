@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  <title>1851 Census of Canada: Nominal Search Help</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf8">
+  <meta name="author" content="James A. Cobban">
+  <meta name="copyright" content="&copy; 2014 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+ *          															*
+	2010/11/21	new format
+	2011/03/08	document keyboard short-cuts
+	2013/02/27	correct documentation of birth year search
+ *	2014/01/06	replace tables with CSS for layout		*
+ *      2018/11/08      rename to ...Helpen.html                        *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  <body>
+    <div class="topcrumbs">
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/database/genCensusesHelpen.html">Censuses</a>: 
+    </div>
+    <div class="help">
+        <h1>1851 Census: Nominal Search Help</h1>
+    <p>This form permits you to specify the characteristics of individuals that
+    you are looking for in the 1851 Census of Canada.  This Census was originally 
+    intended to be held in 1851, simultaneous with the Census in Britain and other
+    parts of the British Empire.  However in 1851 there was a major administrative
+    reorganization of the administration of British North America as the existing
+    colonies of Upper and Lower Canada were joined to form a single Colony of 
+    Canada.  
+    <p>As part of this reorganization Upper Canada became the Canada West
+    division, and the militia districts, which had provided the
+    main administrative framework for much of the province, were eliminated and
+    the counties, which until now had largely existed only on paper, were
+    established across the board. Whole new counties, for example Elgin,
+    were created by adjusting the boundaries.  Existing townships, for example
+    Nissouri and Dorchester, were split by new county boundaries. 
+    A census in 1851 would have caught this makeover in mid-stream.
+    Therefore the census was postponed until 1852, permitting it to provide
+    the statistical baseline for the new administrative structure. 
+    <p>Once you have made all of your desired selections, click on the
+    <span class="button">Query</span>
+    button at the top of the form.  
+    You may also use the keyboard short-cuts Ctrl-S or Alt-Q to perform a query.
+    <p>The <span class="button">Coverage</span> 
+    button performs a search of the database to report on which
+    Districts and Sub-Districts are included in the current database
+    and the progress of the transcription effort for each area.
+    You may also use the keyboard short-cut Alt-C to invoke this function.	
+    <p class="label">Province</p>
+    <p>The Census of 1851/2 covered the Colony of Canada, which was divided into
+    two provinces: Canada East and Canada West, often referred to anachronistically as Lower Canada and Upper Canada, the names they used when they were separate
+    colonies.  The choice of province, if desired, is made using the selection list.
+    <p class="label">District</p>
+    <p>Each of the provinces was divided into Census Districts which corresponded
+    to the cities and counties into which the provinces were divided.  
+    Note that for Canada
+    West the counties did not become administrative units until shortly after 
+    this census was completed, and even then there were some exceptions.
+    For example Lennox and Addington were two separate Districts for this census;
+    they were united as a single county when the administrative reforms came into
+    effect later in 1852.
+    <p>If a Province is selected then the District selection list is populated with
+    an alphabetical list of the census Districts.
+    <p class="label">Count</p>
+    <p>The Count field permits specifying how many records are to be displayed at
+    at a time.  The default is 20 records.
+    <p class="label">Sub-District</p>
+    <p>Each census District, generally the same as a County, was divided into 
+    census Sub-Districts, each conforming generally to a City Ward, Town, 
+    or Township.  The selection list of sub-districts is populated when you
+    select a District.
+    <p class="label">Division</p>
+    <p>Larger census sub-districts were further divided into enumeration divisions
+    or wards to try and balance out the workload for the enumerators.
+    The selection list of divisions is populated when you select a sub-district.
+    <p class="label">Page</p>
+    <p>Each page of the population census contained room for 50 individuals.
+    It is anticipated that the user will choose to search an individual page only
+    for the situation when the entire page, all 50 individuals, are the desired
+    target set.  Therefore selecting a specific page within a specific enumeration 
+    division ignores the Count field so that all rows of the page are displayed
+    and changes the default sort order to display the records in the order they
+    appear in the original.
+    <p class="label">Given Names</p>
+    <p>This field is used to specify text which is matched against the given names
+    of individuals in the database.  This search is done as a 
+    case-insensitive pattern match, not a simple comparison. 
+    <p>Specifying simple text, comprising letters and spaces, matches against
+    any names containing that text.  "John" or "john" or "JOHN" will match
+    "Johnathan" and "William John" as well as the simple "John".
+    <p>The text may be a 
+        <a href="http://en.wikipedia.org/wiki/Regular_expression">
+    	regular expression</a>.
+    There are too many options to enumerate here, but a few examples include:
+    <ul>
+        <li>If you want to match just the name "John", excluding names that include
+    	"John" as part of them, enter "^John$".
+        <li>Enumerators often use unusual spellings of names.  For example if you
+    	to match names including both "Henry" and "Henery", enter "Hen.*ry".
+    </ul>
+    <p class="label">Surname</p>
+    <p>This field is used to specify text to look for in the surname of individuals
+    to look for.
+    If the value contains only letters and spaces then only names that match
+    exactly (except for case) are found.  Otherwise this
+    uses the same pattern matching as described for Given Names.
+    For example to match surnames starting with "McL..." and ending with ".n",
+    such as "McLean", "McLain", "McLennan", or "McLellan" you could specify 
+    "^McL.*n$".
+    <p>The meaning of this field changes if the Soundex option is selected.
+    <p class="label">Soundex</p>
+    <p>The Soundex code has been used for decades to attempt to match names that
+    sound similar.  For example it is used by police forces to perform a rough
+    match for the names of drivers.  It is a problematic tool, as it
+    is based upon the phonetics of British surnames.
+    If you select this option along with a
+    complete surname, not a pattern match, in the Surname field, then the search
+    is made for surnames that "sound like" the given surname.  For example
+    specifying Soundex together with "McLean" will match all of the surnames in
+    the pattern match example under "Surname", but many other names as well, such
+    "McCallum", "McAllan", "McClain", and "McWilliams". 
+    <p class="label">Sex</p>
+    <p>Select this option if you only want to look for male or female individuals.
+    <p class="label">Marital Status</p>
+    <p>Select this option if you wish to restrict the search based upon the
+    marital status of the individuals.
+    <p class="label">Occupation</p>
+    <p>This option is used to search for individuals based upon their listed
+    occupations.  This is again a pattern match.  For example searching for 
+    "Labo[u]{0,1}rer" will match any occupation that contains either "Laborer" or
+    "Labourer", including "Farm Labourer" and "R'y Laborer".
+    <p class="label">Birth Place</p>
+    <p>This option is used to search for individuals based upon where they were
+    born.  This is a pattern match.  For example searching for "Canada" will 
+    also match "Canada East", "Canada West", "Lower Canada", and "Upper Canada".
+    <p class="label">Religion</p>
+    <p>This option is used to search for individuals based upon their
+    religious affiliation.  This is a pattern match.  For example searching for
+    "Meth" will match any religion containing that string, including 
+    "Wesleyan Methodist", "C. Meth.", "New Connexion Methodist", 
+    and "Methodist Episcopal".
+    <p class="label">Residence</p>
+    <p>This option is used to search for individuals based upon the text in the
+    column labeled "Residence if out of bounds".  This is a pattern match.  This
+    field is understandably very infrequently used by the enumerators since it is
+    defined for members of a family who are not currently residing with their
+    family.  To minimize wasting this column I have added information from
+    schedule B about the address of the property on the line for the head of
+    household.  This information is enclosed in square brackets to indicate that
+    it is not present in the original population census image.  Note that if you
+    wish to search for lines containing square brackets you have to escape them
+    because square brackets are part of the regular expression language.  For
+    example to search for records where the Residence field contains "[con 2" you
+    need to specify "\[con 2" in this option.
+    <p class="label">Birth Year &amp; Range</p>
+    <p>The Birth Year and Range fields are used to search for individuals based
+    upon their approximate birth year calculated from their age at their
+    next birthday after the census in spring 1852.  
+    </p>
+    </div>
+    <div class="botcrumbs">
+        <span class="right">
+    	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+        </span>
+        <a href="/contactAuthor.php?subject=QueryDetail1851Helpen.html" target="_blank">Contact Author</a>
+        <br/>
+        <a href="/indexHelpen.html">Home</a>: 
+        <a href="/genealogyHelpen.html">Genealogy</a>: 
+        <a href="/database/genCensusesHelpen.html">Censuses</a>: 
+      <div style="clear: both;"></div>
+    </div>
+  </body>
+</html>

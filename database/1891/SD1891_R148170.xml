@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148170">
+    <option value="116_I">
+        Simcoe East: Orillia Town
+        <div id="2" reel="148170" frame="0" count="49"/>
+    </option>
+    <option value="116_J">
+        Simcoe East: Oro
+        <div id="1" reel="148170" frame="49" count="25"/>
+        <div id="2" reel="148170" frame="74" count="21"/>
+        <div id="3" reel="148170" frame="95" count="25"/>
+        <div id="4" reel="148170" frame="120" count="21"/>
+    </option>
+    <option value="116_K">
+        Simcoe East: Penetanguishene Town
+        <div id="" reel="148170" frame="141" count="43"/>
+    </option>
+    <option value="116_L">
+        Simcoe East: Tay
+        <div id="1" reel="148170" frame="184" count="31"/>
+        <div id="2" reel="148170" frame="215" count="38"/>
+        <div id="3" reel="148170" frame="253" count="28"/>
+    </option>
+    <option value="116_M">
+        Simcoe East: Tiny
+        <div id="1" reel="148170" frame="281" count="36"/>
+        <div id="2" reel="148170" frame="317" count="28"/>
+        <div id="3" reel="148170" frame="345" count="30"/>
+        <div id="4" reel="148170" frame="375" count="6"/>
+    </option>
+    <option value="117_A">
+        Simcoe North: Barrie Town
+        <div id="1" reel="148170" frame="381" count="47"/>
+        <div id="2" reel="148170" frame="428" count="68"/>
+    </option>
+    <option value="117_B">
+        Simcoe North: Collingwood Town
+        <div id="1" reel="148170" frame="496" count="43"/>
+        <div id="2" reel="148170" frame="539" count="58"/>
+    </option>
+    <option value="117_C">
+        Simcoe North: Creemore Village
+        <div id="" reel="148170" frame="597" count="15"/>
+    </option>
+    <option value="117_D">
+        Simcoe North: Flos
+        <div id="1" reel="148170" frame="612" count="26"/>
+        <div id="2" reel="148170" frame="638" count="22"/>
+        <div id="3" reel="148170" frame="660" count="31"/>
+    </option>
+    <option value="117_E">
+        Simcoe North: Nottawasaga
+        <div id="1" reel="148170" frame="691" count="30"/>
+        <div id="2" reel="148170" frame="721" count="32"/>
+        <div id="3" reel="148170" frame="753" count="33"/>
+        <div id="4" reel="148170" frame="786" count="33"/>
+    </option>
+</select>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148150">
+    <option value="82_C">
+        Lambton West: Plympton
+        <div id="3" reel="148150" frame="0" count="21"/>
+        <div id="4" reel="148150" frame="21" count="18"/>
+    </option>
+    <option value="82_D">
+        Lambton West: Point Edwards Village
+        <div id="" reel="148150" frame="39" count="39"/>
+    </option>
+    <option value="82_E">
+        Lambton West: Sarnia
+        <div id="1" reel="148150" frame="78" count="20"/>
+        <div id="2" reel="148150" frame="98" count="17"/>
+        <div id="3" reel="148150" frame="115" count="16"/>
+        <div id="4" reel="148150" frame="131" count="9"/>
+    </option>
+    <option value="82_F">
+        Lambton West: Sarnia Town
+        <div id="1" reel="148150" frame="140" count="46"/>
+        <div id="2" reel="148150" frame="186" count="34"/>
+        <div id="3" reel="148150" frame="220" count="30"/>
+        <div id="4" reel="148150" frame="250" count="28"/>
+    </option>
+    <option value="82_G">
+        Lambton West: Wyoming Village
+        <div id="" reel="148150" frame="278" count="18"/>
+    </option>
+    <option value="83_A">
+        Lanark North: Almonte Town
+        <div id="1" reel="148150" frame="296" count="24"/>
+        <div id="2" reel="148150" frame="320" count="19"/>
+        <div id="3" reel="148150" frame="339" count="22"/>
+    </option>
+    <option value="83_B">
+        Lanark North: Dalhousie &amp; Sherbrooke North
+        <div id="1" reel="148150" frame="361" count="24"/>
+        <div id="2" reel="148150" frame="385" count="12"/>
+        <div id="3" reel="148150" frame="397" count="10"/>
+    </option>
+    <option value="83_C">
+        Lanark North: Darling
+        <div id="" reel="148150" frame="407" count="16"/>
+    </option>
+    <option value="83_D">
+        Lanark North: Fitzroy
+        <div id="1" reel="148150" frame="423" count="14"/>
+        <div id="2" reel="148150" frame="437" count="16"/>
+        <div id="3" reel="148150" frame="453" count="19"/>
+        <div id="4" reel="148150" frame="472" count="14"/>
+    </option>
+    <option value="83_E">
+        Lanark North: Huntley
+        <div id="1" reel="148150" frame="486" count="13"/>
+        <div id="2" reel="148150" frame="499" count="20"/>
+        <div id="3" reel="148150" frame="519" count="8"/>
+        <div id="4" reel="148150" frame="527" count="10"/>
+    </option>
+    <option value="83_F">
+        Lanark North: Lanark
+        <div id="1" reel="148150" frame="537" count="20"/>
+        <div id="2" reel="148150" frame="557" count="20"/>
+    </option>
+    <option value="83_G">
+        Lanark North: Lanark Village
+        <div id="" reel="148150" frame="577" count="18"/>
+    </option>
+    <option value="83_H">
+        Lanark North: Lavant
+        <div id="" reel="148150" frame="595" count="15"/>
+    </option>
+    <option value="83_I">
+        Lanark North: Pakenham
+        <div id="1" reel="148150" frame="610" count="23"/>
+        <div id="2" reel="148150" frame="633" count="19"/>
+    </option>
+    <option value="83_J">
+        Lanark North: Ramsay
+        <div id="1" reel="148150" frame="652" count="15"/>
+        <div id="2" reel="148150" frame="667" count="14"/>
+        <div id="3" reel="148150" frame="681" count="13"/>
+        <div id="4" reel="148150" frame="694" count="15"/>
+    </option>
+</select>

@@ -1,0 +1,28 @@
+/************************************************************************
+ *  CensusUpdateStatus.css						*
+ *									*
+ *  Stylesheet for the CensusUpdateStatus.php				*
+ *									*
+ *  History:								*
+ *	2014/05/30	created						*
+ *									*
+ *  Copyright &copy; 2014 James A. Cobban				*
+ ************************************************************************/
+
+    input.inaright {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		text-align:	right;
+		color:		black;
+		padding:	0px;
+		border:		0px;
+		}
+    input.inaleftnc {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		text-align:	left;
+		color:		black;
+		padding:	0px;
+		border:		0px;
+		}
+

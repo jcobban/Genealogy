@@ -1,0 +1,106 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+    <title>Request Report on Individuals: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  reqReportIndividsHelpen.html                                        *
+ *                                                                      *
+ *  History:															*
+ *		2011/02/05		created											*
+ *		2012/02/13		updated for enhanced functionality				*
+ *		2014/02/10		eliminate use of tables for layout				*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+</head>
+<body>
+<div class="topcrumbs">
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+</div>
+<div class="help">
+<h1>Request Report on Individuals: Help</h1>
+<p>This page permits you to search the database for individuals matching
+specified conditions, and present them in a basic report
+as described by the
+<a href="/FamilyTree/reportIndividsHelpen.html">report results page</a>.
+</p>
+<p>At present there are only minimal options for modifying the appearance of
+this report.
+</p>
+<p>There is a selection list which lists all of the fields that can be
+displayed in the resulting report.  Each time you use the mouse to click
+on an item in this list, the item is moved from this list to the list of
+chosen fields below it.  The contents of the fields will be displayed in
+the order you chose them.  There is currently no method to change the order of
+the fields once you have chosen them, except to refresh the page and start over again.  
+</p>
+<p>There is a selection list which permits you to specify the fields to be
+used to sort the resulting report.  Each time you use the mouse to click
+on an item in this list, the item is moved from this list to the list of
+chosen fields below it.  The fields will be used to sort the report in
+the order you chose them.  There is currently no method to change the order of
+the fields once you have chosen them, except to refresh the page and start over again.  
+</p>
+<p>There are only a few fields that you can use to select the
+records to be included in the report.
+</p>
+<ul>
+    <li>For most fields if the specified text appears anywhere in the value
+	of the field, then the record is included.  For example specifying
+	a Surname of 'Smith' will include any individuals whose surnames
+	include the text 'smith'.  It will match against
+	"Smithson" and "Sexsmith".  The supplied value is
+	actually interpreted as a
+	<a href="http://en.wikipedia.org/wiki/Regular_expression">regular expression</a>.
+	The pattern "Sm[aeiouy]th" matches any string that contains "sm" 
+	followed by any vowel followed by the characters "th".  For example
+	it will match "Smythe" and "Smothers".
+	If you want an exact match to the field, for example only surnames
+	that are equal to "Smith" then you must start the pattern with
+	a caret "^" and end it with a dollar sign "$", for example "^Smith$"
+	will match values that are equal to "Smith" and nothing else.
+	If you do not
+	supply any text then the field is not used for selection.
+    <li>The above consideration applies to locations particularly.  Since
+	a location is represented internally as the numeric key of a
+	location record when you specify a pattern to search for that is
+	expanded to a check for every location record key that matches the
+	supplied pattern.  This may be hundreds, or even thousands, of values
+	if you look for a string that is part of a very large number of
+	location values, for example a county name.  The pattern "Middlesex",
+	for example, currently matches against 7,685 location records, only
+	12 of which are not Middlesex county in Ontario.
+	So when identifying a 
+	location be as specific as possible.  In particular if you expect
+	the specified string to match at the beginning of the location 
+	text make sure you include the caret "^" that constrains the
+	pattern to only match at the beginning of the location text.
+    <li>For date fields only the year portion of the date is used to
+	select records.  Any additional information, such as a month, 
+	is ignored.
+    <li>For fields whose value is given as a list of specific values, if
+	a selection is not made, then the field is not used for selection,
+	otherwise only individuals who match the specified value are
+	included.  An example is Gender.
+</ul>
+</div>
+<div class="botcrumbs">
+    <span class="right">
+	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+    </span>
+	<a href="/contactAuthor.php?subject=reqReportIndividsHelpen.html" target="_blank">Contact Author</a>
+	<br/>
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+    <div style="clear: both;"></div>
+</div>
+</body>
+</html>

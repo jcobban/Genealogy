@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148126">
+    <option value="46_II">
+        Algoma: Neebing South
+        <div id="" reel="148126" frame="0" count="7"/>
+    </option>
+    <option value="46_JJ">
+        Algoma: Nipigon
+        <div id="" reel="148126" frame="7" count="4"/>
+    </option>
+    <option value="46_KK">
+        Algoma: Pays Plat
+        <div id="" reel="148126" frame="11" count="16"/>
+    </option>
+    <option value="46_LL">
+        Algoma: Norman
+        <div id="1" reel="148126" frame="27" count="12"/>
+        <div id="2" reel="148126" frame="39" count="6"/>
+    </option>
+    <option value="46_MM">
+        Algoma: Port Arthur Centre
+        <div id="" reel="148126" frame="45" count="20"/>
+    </option>
+    <option value="46_NN">
+        Algoma: Port Arthur North
+        <div id="" reel="148126" frame="65" count="19"/>
+    </option>
+    <option value="46_OO">
+        Algoma: Port Arthur South
+        <div id="" reel="148126" frame="84" count="17"/>
+    </option>
+    <option value="46_PP">
+        Algoma: Rainy River
+        <div id="1" reel="148126" frame="101" count="8"/>
+        <div id="2" reel="148126" frame="109" count="12"/>
+    </option>
+    <option value="46_QQ">
+        Algoma: Rat Portage East
+        <div id="" reel="148126" frame="121" count="23"/>
+    </option>
+    <option value="46_RR">
+        Algoma: Rat Portage West
+        <div id="" reel="148126" frame="144" count="15"/>
+    </option>
+    <option value="46_SS">
+        Algoma: Savanne, Ignace, Barclay, Vermilion
+        <div id="1" reel="148126" frame="159" count="3"/>
+        <div id="2" reel="148126" frame="162" count="4"/>
+        <div id="3" reel="148126" frame="166" count="3"/>
+        <div id="4" reel="148126" frame="169" count="3"/>
+    </option>
+    <option value="46_TT">
+        Algoma: Allan
+        <div id="" reel="148126" frame="172" count="8"/>
+    </option>
+    <option value="46_UU">
+        Algoma: Assiquinack
+        <div id="" reel="148126" frame="180" count="18"/>
+    </option>
+    <option value="46_VV">
+        Algoma: Barry Island
+        <div id="" reel="148126" frame="198" count="6"/>
+    </option>
+    <option value="46_WW">
+        Algoma: Bidwell
+        <div id="" reel="148126" frame="204" count="11"/>
+    </option>
+    <option value="46_XX">
+        Algoma: Billings
+        <div id="" reel="148126" frame="215" count="14"/>
+    </option>
+    <option value="46_YY">
+        Algoma: Burpee
+        <div id="" reel="148126" frame="229" count="5"/>
+    </option>
+    <option value="46_ZZ">
+        Algoma: Campbell
+        <div id="" reel="148126" frame="234" count="13"/>
+    </option>
+    <option value="46_AAA">
+        Algoma: Carnarvon
+        <div id="" reel="148126" frame="247" count="11"/>
+    </option>
+    <option value="46_BBB">
+        Algoma: Cockburn Island
+        <div id="" reel="148126" frame="258" count="6"/>
+    </option>
+    <option value="46_CCC">
+        Algoma: Dawson
+        <div id="" reel="148126" frame="264" count="3"/>
+    </option>
+    <option value="46_DDD">
+        Algoma: Duck Island
+        <div id="" reel="148126" frame="267" count="3"/>
+    </option>
+    <option value="46_EEE">
+        Algoma: Gordon
+        <div id="" reel="148126" frame="270" count="11"/>
+    </option>
+    <option value="46_FFF">
+        Algoma: Gore Bay Town
+        <div id="" reel="148126" frame="281" count="11"/>
+    </option>
+    <option value="46_GGG">
+        Algoma: Howland &amp; Little Current Town
+        <div id="" reel="148126" frame="292" count="27"/>
+    </option>
+    <option value="46_HHH">
+        Algoma: Mills
+        <div id="" reel="148126" frame="319" count="5"/>
+    </option>
+    <option value="46_III">
+        Algoma: Robinson
+        <div id="" reel="148126" frame="324" count="8"/>
+    </option>
+    <option value="46_JJJ">
+        Algoma: Sandfield
+        <div id="" reel="148126" frame="332" count="7"/>
+    </option>
+    <option value="46_KKK">
+        Algoma: Sheguiandah
+        <div id="" reel="148126" frame="339" count="9"/>
+    </option>
+    <option value="46_LLL">
+        Algoma: Tehkummah
+        <div id="" reel="148126" frame="348" count="9"/>
+    </option>
+    <option value="46_MMM">
+        Algoma: Wikwemikong
+        <div id="1" reel="148126" frame="357" count="11"/>
+        <div id="2" reel="148126" frame="368" count="13"/>
+        <div id="3" reel="148126" frame="381" count="6"/>
+    </option>
+    <option value="47_A">
+        Bothwell: Bothwell Town
+        <div id="" reel="148126" frame="387" count="7"/>
+    </option>
+    <option value="47_B">
+        Bothwell: Camden
+        <div id="1" reel="148126" frame="406" count="4"/>
+        <div id="2" reel="148126" frame="420" count="16"/>
+        <div id="3" reel="148126" frame="434" count="12"/>
+        <div id="4" reel="148126" frame="452" count="6"/>
+    </option>
+    <option value="47_C">
+        Bothwell: Chatham Twp
+        <div id="1" reel="148126" frame="471" count="20"/>
+        <div id="2" reel="148126" frame="498" count="19"/>
+        <div id="3" reel="148126" frame="514" count="17"/>
+        <div id="4" reel="148126" frame="534" count="8"/>
+        <div id="5" reel="148126" frame="559" count="12"/>
+        <div id="6" reel="148126" frame="579" count="23"/>
+    </option>
+    <option value="47_D">
+        Bothwell: Dawn
+        <div id="1" reel="148126" frame="601" count="7"/>
+        <div id="2" reel="148126" frame="620" count="4"/>
+    </option>
+</select>

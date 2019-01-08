@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Vital Statistics: Birth Registration Query: Help</title>
+    <META HTTP-EQUIV='CONTENT-TYPE' CONTENT='text/html; charset=utf-8'>
+    <META http-equiv='Content-Style-Type' content='text/css'>
+    <meta name='author' content='James A. Cobban'>
+    <meta name='copyright' content='&copy; 2015 James A. Cobban'>
+<!--*********************************************************************
+ *  History:															*
+ *		2014/01/02		replace tables with CSS							*
+ *		2015/05/11		use contactAuthor.php to contact administrator	*
+ *						style was not cleared in page footer			*
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='/styles.css'/>
+</head>
+<body>
+<div class='topcrumbs'>
+  <a href='/indexHelpen.html'>Home</a>: 
+  <a href='/genealogyHelpen.html'>Genealogy</a>: 
+  <a href='/Canada/genCanadaHelpen.html'>Canada</a>:
+  <a href='/Ontario/genOntarioHelpen.html'>Ontario</a>: 
+</div>
+<div class='help'>
+    <h1>Birth Registration Query: Help
+    </h1>
+<p>The associated panel permits searching a database of Birth Registrations,
+focussing on Middlesex County in Ontario, Canada.
+</p>
+<p>
+	<img src='Images/BirthRegQuery.png'
+		alt='Birth Registration Query'>
+</p>
+<p>The title includes the name of the province or state whose birth
+registrations are to be searched.  This cannot be altered through this
+dialog.  It is determined by the page from which you came to get to this
+dialog.
+</p>
+<p><span class='label'>Identification:</span>
+Permits searching for birth registrations by specifying the year of 
+registration and the number assigned by the provincial or state Registrar 
+when the records were indexed and microfilmed in the 1950s. 
+Specifying the registration year
+and number limits responses to the records with registration number between the
+specified value, and that number plus the value of Count minus one. 
+</p>
+<p><span class='label'>Limit:</span>
+Permits specifying the maximum number of matching entries to display at a time.
+The default is 20 at a time. 
+</p>
+<p><span class='label'>Registration: County:</span>
+If specified limits the response to births registered in the specified county.
+</p>
+<p><span class='label'>
+Registration: Township:
+</span>
+If specified limits the response to births registered in the specified city,
+town, or township.  For some counties this item is presented as a selection
+list.
+</p>
+<p><span class='label'>Name: Given:</span>
+If specified limits the response to births of individuals whose given name
+matches the specified pattern.
+The value is a regular expression.  In particular if a simple string is
+given it matches all names that contain the string.  For example 'fred'
+matches 'frederick', 'freddie', and 'alfred', among other names.
+</p>
+<p><span class='label'>Name: Family:</span>
+If specified limits the response to births of individuals whose family name
+matches the specified pattern. The type of search depends upon the value specified
+here and if the Soundex option is selected. In particular if the value is composed
+of letters of the alphabet and spaces then only names that match exactly will be
+included, except if the Soundex option is specified.
+However if the value contains characters that have a special meaning
+in regular expressions
+then a pattern match it performed.   For example 'smith$'
+matches names that end in 'smith'.
+</p>
+<p><span class='label'>Soundex:</span>
+If this option is checked then the Soundex algorithm is used to make the 
+surname search based on sound rather than an exact match.
+</p>
+<p><span class='label'>Sex:</span>
+If specified limits the response to births of individuals whose sex matches the
+specified value.
+</p>
+<p><span class='label'>Birth Date:</span>
+If specified limits the response to births of individuals whose birth date 
+matches the specified pattern.
+The value is a regular expression.  In particular if a simple string is
+given it matches all dates that contain the string.  For example 
+specifying '1882' will match all dates in 1882.
+</p>
+<p><span class='label'>Birth Place:</span>
+If specified limits the response to births of individuals whose birth place 
+matches the specified pattern.
+The value is a regular expression.  In particular if a simple string is
+given it matches all birth places that contain the string.  For example 
+'m.*x' matches places whose name contains the letter 'm' or 'M' and where somewhere
+later in the place name there is a letter 'x' or 'X', for example 'middlesex', 'msx', and 'mexico', among others.
+</p>
+<p><span class='label'>Father: Name:</span>
+If specified limits the response to births of individuals whose 
+Father's name matches the specified pattern.
+The value is a regular expression.  In particular if a simple string is
+given it matches all names that contain the string.
+</p>
+<p><span class='label'>Father: Occupation:</span>
+If specified limits the response to births of individuals whose 
+Father's occupation matches the specified pattern.
+The value is a regular expression.  In particular if a simple string is
+given it matches all places that contain the string.
+</p>
+<p><span class='label'>Mother: Name:</span>
+If specified limits the response to births of individuals whose 
+Mother's name matches the specified pattern.
+The value is a regular expression.  In particular if a simple string is
+given it matches all names that contain the string.
+</p>
+<p><span class='label'>Mother: Occupation:</span>
+If specified limits the response to births of individuals whose 
+Mother's occupation matches the specified pattern.
+The value is a regular expression.  In particular if a simple string is
+given it matches all places that contain the string.
+</p>
+<p><span class='label'>Attendant:</span>
+If specified limits the response to births of individuals whose 
+attending physician's or midwife's name
+matches the specified pattern.
+The value is a regular expression.  In particular if a simple string is
+given it matches all names that contain the string.
+</p>
+<p><span class='label'>Informant: Name:</span>
+If specified limits the response to births of individuals whose 
+attending informant's name
+matches the specified pattern.
+The value is a regular expression.  In particular if a simple string is
+given it matches all names that contain the string.
+</p>
+<p><span class='label'>Relation:</span>
+If specified limits the response to births of individuals for which the
+relation of the informant to the deceased matches the specified value.
+</p>
+<p><span class='button'>Query</span>
+Clicking on this button performs the query.  This may also be requested by
+pressing the Enter key while the input focus is in a text field.
+</p>
+<p><span class='button'>Clear Form</span>
+Clicking on this button resets the input fields to their default values.
+</p>
+<p><span class='button'>Status</span>
+Clicking on this link displays a 
+<a href='BirthRegStatsHelpen.html'>page</a> with a high-level summary of the
+transcription effort.
+</p>
+</div>
+<div class='botcrumbs'>
+  <span class='right'>
+	<img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+  </span>
+  <a href='/contactAuthor.php?subject=BirthRegQueryHelpen.html'
+	target='_blank'>
+	Contact Author</a>
+  <br/>
+  <a href='/indexHelpen.html'>Home</a>: 
+  <a href='/Canada/genCanadaHelpen.html'>Canada</a>:
+  <a href='/Ontario/genOntarioHelpen.html'>Ontario</a>:
+  <div style='clear: both;'></div> 
+</div>
+</body>
+</html>

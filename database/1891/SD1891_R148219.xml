@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148219">
+    <option value="180_G">
+        Richelieu: St. Ours
+        <div id="" reel="148219" frame="1" count="35"/>
+    </option>
+    <option value="180_H">
+        Richelieu: St. Ours Town
+        <div id="" reel="148219" frame="36" count="19"/>
+    </option>
+    <option value="180_I">
+        Richelieu: St. Pierre de Sorel
+        <div id="" reel="148219" frame="55" count="14"/>
+    </option>
+    <option value="180_J">
+        Richelieu: St. Robert
+        <div id="" reel="148219" frame="69" count="40"/>
+    </option>
+    <option value="180_K">
+        Richelieu: St. Roch
+        <div id="" reel="148219" frame="109" count="22"/>
+    </option>
+    <option value="180_L">
+        Richelieu: Ste. Victoire
+        <div id="" reel="148219" frame="131" count="34"/>
+    </option>
+    <option value="181_A">
+        Richmond &amp; Wolfe: Brompton &amp; St. François-Xavier
+        <div id="1" reel="148219" frame="165" count="20"/>
+        <div id="2" reel="148219" frame="185" count="18"/>
+    </option>
+    <option value="181_B">
+        Richmond &amp; Wolfe: Cleveland
+        <div id="" reel="148219" frame="203" count="26"/>
+    </option>
+    <option value="181_C">
+        Richmond &amp; Wolfe: Danville
+        <div id="" reel="148219" frame="229" count="19"/>
+    </option>
+    <option value="181_D">
+        Richmond &amp; Wolfe: Dudswell
+        <div id="1" reel="148219" frame="248" count="19"/>
+        <div id="2" reel="148219" frame="267" count="27"/>
+    </option>
+    <option value="181_E">
+        Richmond &amp; Wolfe: Garthby &amp; d'Israeli
+        <div id="1" reel="148219" frame="294" count="16"/>
+        <div id="2" reel="148219" frame="310" count="22"/>
+    </option>
+    <option value="181_F">
+        Richmond &amp; Wolfe: Ham North
+        <div id="1" reel="148219" frame="332" count="17"/>
+        <div id="2" reel="148219" frame="349" count="18"/>
+    </option>
+    <option value="181_G">
+        Richmond &amp; Wolfe: Ham South
+        <div id="" reel="148219" frame="367" count="13"/>
+    </option>
+    <option value="181_H">
+        Richmond &amp; Wolfe: Melbourne, Brompton, Gore &amp; New Rockland Village
+        <div id="1" reel="148219" frame="380" count="25"/>
+        <div id="2" reel="148219" frame="405" count="19"/>
+        <div id="3" reel="148219" frame="424" count="10"/>
+    </option>
+    <option value="181_I">
+        Richmond &amp; Wolfe: Melbourne Village
+        <div id="" reel="148219" frame="434" count="7"/>
+    </option>
+    <option value="181_J">
+        Richmond &amp; Wolfe: Richmond
+        <div id="" reel="148219" frame="441" count="43"/>
+    </option>
+    <option value="181_K">
+        Richmond &amp; Wolfe: Shipton
+        <div id="1" reel="148219" frame="484" count="29"/>
+        <div id="2" reel="148219" frame="513" count="19"/>
+    </option>
+    <option value="181_L">
+        Richmond &amp; Wolfe: Stoke
+        <div id="" reel="148219" frame="532" count="24"/>
+    </option>
+    <option value="181_M">
+        Richmond &amp; Wolfe: Stratford
+        <div id="" reel="148219" frame="556" count="15"/>
+    </option>
+    <option value="181_N">
+        Richmond &amp; Wolfe: St. Adrien
+        <div id="" reel="148219" frame="571" count="11"/>
+    </option>
+    <option value="181_O">
+        Richmond &amp; Wolfe: St. Camille
+        <div id="" reel="148219" frame="582" count="20"/>
+    </option>
+    <option value="181_P">
+        Richmond &amp; Wolfe: St. Fortunat de Wolfeston
+        <div id="" reel="148219" frame="602" count="23"/>
+    </option>
+    <option value="181_Q">
+        Richmond &amp; Wolfe: St. George de Windsor
+        <div id="" reel="148219" frame="625" count="34"/>
+    </option>
+    <option value="181_R">
+        Richmond &amp; Wolfe: St. Julien
+        <div id="" reel="148219" frame="659" count="32"/>
+    </option>
+    <option value="181_S">
+        Richmond &amp; Wolfe: Weedon Lake
+        <div id="1" reel="148219" frame="691" count="13"/>
+        <div id="2" reel="148219" frame="704" count="22"/>
+        <div id="3" reel="148219" frame="726" count="12"/>
+    </option>
+</select>

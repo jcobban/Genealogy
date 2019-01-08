@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>
+	Canada: Ontario: Wesleyan Methodist Baptisms Query: Help
+    </title>
+    <meta http-equiv="content-type" CONTENT="text/html; charset=UTF-8">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+ *                                                                      *
+ *  	2014/01/02	    replace <table> with CSS                        *
+ *      2018/11/08      rename to ...Helpen.html                        *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  <body>
+     <div class="topcrumbs">
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+    	<a href="/Canada/genCanadaHelpen.html">Canada</a>:
+    	<a href="/Ontario/genOntarioHelpen.html">Ontario</a>: 
+    </div>
+    <div class="help">
+        <h1>Wesleyan Methodist Baptisms Query: Help
+        </h1>
+    <p>The associated panel permits searching my private copy of the database of 
+    Ontario Wesleyan Methodist Baptisms.
+    <p>About 1996 Ida Reed decided she would like to have something to do at home in her spare
+    time, so she purchased the four reels containing the Wesleyan Methodist Baptismal
+    Register. It took her at least two years of continually transcribing from the machine to
+    the computer, at all hours of the day. She bought her own microfilm reader in order
+    to do this.
+    <p>The data are © Ida Reed, 2001. The information may be copied for personal use only, 
+    not for resale.
+    <p>Source for the 4 reels of film was:
+    
+    <p>Victoria University Archives
+    <br>73 Queen's Park Cresent
+    <br>Toronto, Ontario
+    <br>M5S 1K7
+    <p>Telephone (416) 585-4563
+    
+    <p><a href="/Ontario/http://www.united-church.ca/local/archives/on/holdings/loan" target="_blank">
+    United Church Archives</a>.
+    <br>email <a href="/Ontario/mailto:archives@united-church.ca">Archives</a>
+    
+    
+    <p>The 4 reels of film that comprise the source of Ida's work can also be
+    obtained from the LDS church using the following film numbers:-
+    
+    <p>Vol. 1, baptisms, 1825-ca. 1860                 FHL #1759292
+    <p>Vol. 2, baptisms, 1840's-ca. 1870               FHL #1759293
+    <p>Vol. 3, baptisms, 1850's-1870's                 FHL #1759294
+    <p>[Locality index to vol. 3]                      FHL #1698106 Item 3
+    <p>Vol. 4, baptisms, 1860's-1910 	                FHL #1759295
+    
+    <h2>The Query Dialog</h2>
+    <p>The input fields on the panel permit you to restrict the response to
+    baptisms that match any combination of the following criteria:
+    <p><span class="label">Count:</span>
+    Permits specifying the maximum number of matching entries to display at a time.
+    The default is 20 at a time. 
+    <p><span class="label">District:</span>
+    If specified limits the response to baptisms registered within a particular
+    district.  The arrangement of districts changed from time to time since after
+    all the political administration of the province or UpperCanada / Canada West /
+    Ontario also changed over the years covered by the database. 
+    The value
+    entered here is a string that matches against part of the name of the district.
+    So entering 'Middlesex' matches against any district name that contains the
+    text 'Middlesex'.
+    <p><span class="label">
+    Area:
+    </span>
+    If specified limits the response to baptisms recorded in the specific
+    lower level geographical area, typically a township.
+    The value
+    entered here is a string that matches against part of the name of the area.
+    So entering 'West' matches against any district name that contains the
+    text 'West'.
+    <p><span class="label">Name: Given:</span>
+    If specified limits the response to baptisms of individuals whose given name
+    matches the specified pattern.
+    The value is a regular expression.  In particular if a simple string is
+    given it matches all names that contain the string.  For example "fred"
+    matches "frederick", "freddie", and "alfred", among other names.
+    <p><span class="label">Name: Surname:</span>
+    If specified limits the response to baptisms of individuals whose family name
+    matches the specified pattern.
+    The type of search depends upon the value specified
+    here and if the Soundex option is selected. In particular if the value is
+    composed
+    of letters of the alphabet and spaces then only names that match exactly will be
+    included, except if the Soundex option is specified.
+    However if value contains characters that have a special meaning in
+    regular expressions
+    then a pattern match it performed.   For example ".*smith$"
+    matches names that end in "smith".
+    <p><span class="label">Soundex:</span>
+    If this option is checked then the Soundex algorithm is used to make the 
+    surname search based on sound rather than an exact match.
+    <p><span class="label">Father:</span>
+    If specified limits the response to baptisms of individuals whose 
+    Father's name matches the specified pattern.
+    The value is a regular expression.  In particular if a simple string is
+    given it matches all names that contain the string.
+    <p><span class="label">Mother:</span>
+    If specified limits the response to baptisms of individuals whose 
+    Mother's name matches the specified pattern.
+    The value is a regular expression.  In particular if a simple string is
+    given it matches all names that contain the string.
+    <p><span class="label">Residence:</span>
+    If specified limits the response to baptisms of individuals whose 
+    parent's residence matches the specified pattern.
+    The value is a regular expression.  In particular if a simple string is
+    given it matches all places that contain the string.
+    <p><span class="label">Birth Place:</span>
+    If specified limits the response to baptisms of individuals whose birth place 
+    matches the specified pattern.
+    The value is a regular expression.  In particular if a simple string is
+    given it matches all birth places that contain the string.  For example 
+    "m.*x" matches "middlesex", "msx", and "msex", among others.
+    <p><span class="label">Birth Date:</span>
+    If specified limits the response to baptisms of individuals whose birth date 
+    matches the specified value.  The date is expressed in the form "yyyy-mm-dd".
+    For example entering "1863" will match births in 1863.
+    <p><span class="label">Baptism Place:</span>
+    If specified limits the response to baptisms of individuals whose baptism place 
+    matches the specified pattern.
+    The value is a regular expression.  In particular if a simple string is
+    given it matches all baptism places that contain the string.  For example 
+    "m.*x" matches "middlesex", "msx", and "msex", among others.
+    <p><span class="label">Baptism Date:</span>
+    If specified limits the response to baptisms of individuals whose baptism date 
+    matches the specified value.  The date is expressed in the form "yyyy-mm-dd".
+    For example entering "1863" will match births in 1863.
+    <p><span class="label">Minister:</span>
+    If specified limits the response to baptisms of individuals by
+    a minister whose name
+    matches the specified pattern.
+    The value is a regular expression.  In particular if a simple string is
+    given it matches all names that contain the string.
+    <p><span class="button">Query</span>
+    Clicking on this button performs the query.  This may also be requested by
+    pressing the Enter key while the input focus is in a text field.
+    <p><span class="button">Clear Form</span>
+    Clicking on this button resets the input fields to their default values.
+    <p><span class="button">Status</span>
+    Clicking on this link displays a 
+    <a href="/Ontario/DeathRegStatsHelpen.html">page</a> with a high-level summary of the
+    transcription effort.
+    </div>
+    <div class="botcrumbs">
+      <span class="right">
+        <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+      </span>
+      <a href="/contactAuthor.php?subject=WmbQueryHelpen.html" target="_blank">
+    		Contact Author</a>
+      <br/>
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/Canada/genCanadaHelpen.html">Canada</a>:
+      <a href="/Ontario/genOntarioHelpen.html">Ontario</a>: 
+    </div>
+  </body>
+</html>

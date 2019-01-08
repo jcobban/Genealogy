@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148168">
+    <option value="114_A">
+        Renfrew South: Admaston
+        <div id="1" reel="148168" frame="0" count="30"/>
+        <div id="2" reel="148168" frame="30" count="26"/>
+    </option>
+    <option value="114_B">
+        Renfrew South: Arnprior Village
+        <div id="" reel="148168" frame="56" count="68"/>
+    </option>
+    <option value="114_C">
+        Renfrew South: Bagot &amp; Blythfield
+        <div id="" reel="148168" frame="124" count="33"/>
+    </option>
+    <option value="114_D">
+        Renfrew South: Brougham
+        <div id="" reel="148168" frame="157" count="12"/>
+    </option>
+    <option value="114_E">
+        Renfrew South: Brudenell
+        <div id="" reel="148168" frame="169" count="24"/>
+    </option>
+    <option value="114_F">
+        Renfrew South: Eganville Village (part)
+        <div id="" reel="148168" frame="193" count="19"/>
+    </option>
+    <option value="114_G">
+        Renfrew South: Grattan
+        <div id="" reel="148168" frame="212" count="35"/>
+    </option>
+    <option value="114_H">
+        Renfrew South: Griffith
+        <div id="" reel="148168" frame="247" count="6"/>
+    </option>
+    <option value="114_I">
+        Renfrew South: Hagerty &amp; Jones
+        <div id="" reel="148168" frame="253" count="34"/>
+    </option>
+    <option value="114_J">
+        Renfrew South: Horton
+        <div id="" reel="148168" frame="287" count="33"/>
+    </option>
+    <option value="114_K">
+        Renfrew South: Lyndock
+        <div id="" reel="148168" frame="320" count="8"/>
+    </option>
+    <option value="114_L">
+        Renfrew South: Matawatchan
+        <div id="" reel="148168" frame="328" count="11"/>
+    </option>
+    <option value="114_M">
+        Renfrew South: McNab
+        <div id="1" reel="148168" frame="339" count="25"/>
+        <div id="2" reel="148168" frame="364" count="47"/>
+    </option>
+    <option value="114_N">
+        Renfrew South: Raglan &amp; Radcliff
+        <div id="" reel="148168" frame="411" count="23"/>
+    </option>
+    <option value="114_O">
+        Renfrew South: Renfrew Village
+        <div id="" reel="148168" frame="434" count="54"/>
+    </option>
+    <option value="114_P">
+        Renfrew South: Sebastopol
+        <div id="" reel="148168" frame="488" count="15"/>
+    </option>
+    <option value="114_Q">
+        Renfrew South: Sherwood, Richards, Burns
+        <div id="" reel="148168" frame="503" count="13"/>
+    </option>
+    <option value="115_A">
+        Russell: Cambridge
+        <div id="1" reel="148168" frame="516" count="24"/>
+        <div id="2" reel="148168" frame="540" count="28"/>
+        <div id="3" reel="148168" frame="568" count="35"/>
+    </option>
+    <option value="115_B">
+        Russell: Clarence
+        <div id="1" reel="148168" frame="603" count="32"/>
+        <div id="2" reel="148168" frame="635" count="50"/>
+        <div id="3" reel="148168" frame="685" count="17"/>
+    </option>
+    <option value="115_C">
+        Russell: Cumberland
+        <div id="1" reel="148168" frame="702" count="48"/>
+        <div id="2" reel="148168" frame="750" count="34"/>
+    </option>
+</select>

@@ -1,0 +1,99 @@
+/************************************************************************
+ *  nominalIndex.css							*
+ *									*
+ *  Stylesheet for the script nominalIndex.php				*
+ *									*
+ *  History:								*
+ *	2013/12/08	created						*
+ *	2014/11/25	widen main select				*
+ *	2015/02/02	change name of main select style class		*
+ *			remove unused styles				*
+ *									*
+ *  Copyright &copy; 2015 James A. Cobban				*
+ ************************************************************************/
+
+    div.block { display: block; }
+    .clear { 	clear: both;
+		margin-bottom: 2px; }
+
+   /*********************************************************************
+    *	div.row								*
+    *	Display information in columnar format without using table	*
+    *********************************************************************/
+    div.row {	white-space:	nowrap; 
+		margin-top: 0;
+		margin-bottom: 0.5ex;
+		}
+
+   /*********************************************************************
+    *	div.column1							*
+    *	Display information in columnar format without using table	*
+    *********************************************************************/
+    div.column1 {white-space:	nowrap; 
+		width:		400px;
+		float:		left;
+		}
+
+    /**
+     *	p class='label'
+     **/
+    p.label {	font-family: sans-serif;
+		font-size: larger;
+		font-weight: bold;
+		margin-left: 6em;
+		text-indent: -3em;
+		clear: both;
+		margin-top: 0;
+		margin-bottom: 0.5ex;
+		}
+
+    label.label {font-family: sans-serif;
+		font-weight: bold;
+		text-align: right;
+		vertical-align: top;
+		padding: 0px 3px 0px 3px;
+		float: left;
+		width: 15em;
+		}
+
+    span.right {float: right;
+		font-weight: bold;
+		font-family: sans-serif;
+		font-size: 12px;
+		width: 100px;
+		padding: 0px 4px 0px 4px;
+		}
+
+    a.em4 { 	float: left;
+		width: 4em;
+		text-align: center;
+		font-weight: bold;
+		}
+
+    input.left {font-family: sans-serif;
+		color: black;
+		text-transform: capitalize;
+		padding: 0px;
+		border-top: 1px solid black;
+		border-left: 1px solid black;
+		border-bottom: 1px solid white;
+		border-right: 1px solid white;
+		float: left;
+		vertical-align: top;
+		width: 45em;
+		}
+
+    select.nameSelect {font-family: sans-serif;
+		background-color: white;
+		color: black;
+		float: left;
+		vertical-align: top;
+		width: 65em;
+		}
+
+    input.em10 {font-family: sans-serif;
+		text-align: center;
+		color: black;
+		float: left;
+		width: 10em;
+		}

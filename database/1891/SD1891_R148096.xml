@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148096">
+    <option value="7_V">
+        Marquette: Osprey
+        <div id="" reel="148096" frame="0" count="14"/>
+    </option>
+    <option value="7_W">
+        Marquette: Portage la Prairie
+        <div id="" reel="148096" frame="14" count="76"/>
+    </option>
+    <option value="7_X">
+        Marquette: Portage la Prairie Town
+        <div id="" reel="148096" frame="90" count="68"/>
+    </option>
+    <option value="7_Y">
+        Marquette: Rapids City (Town)
+        <div id="" reel="148096" frame="158" count="12"/>
+    </option>
+    <option value="7_Z">
+        Marquette: Riding Mountain
+        <div id="" reel="148096" frame="170" count="20"/>
+    </option>
+    <option value="7_AA">
+        Marquette: Rosedale
+        <div id="" reel="148096" frame="190" count="33"/>
+    </option>
+    <option value="7_BB">
+        Marquette: Rossburn
+        <div id="" reel="148096" frame="223" count="9"/>
+    </option>
+    <option value="7_CC">
+        Marquette: Russell (&amp; subdist GG Silver Creek)
+        <div id="" reel="148096" frame="232" count="27"/>
+    </option>
+    <option value="7_DD">
+        Marquette: Saskatchewan
+        <div id="" reel="148096" frame="259" count="15"/>
+    </option>
+    <option value="7_EE">
+        Marquette: Shell River
+        <div id="" reel="148096" frame="" count="0"/>
+    </option>
+    <option value="7_FF">
+        Marquette: Shoal Lake (&amp; subdist HH Strathclair)
+        <div id="" reel="148096" frame="274" count="32"/>
+    </option>
+    <option value="7_GG">
+        Marquette: Silver Creek
+        <div id="" reel="148096" frame="232" count="27"/>
+    </option>
+    <option value="7_HH">
+        Marquette: Strathclair
+        <div id="" reel="148096" frame="274" count="32"/>
+    </option>
+    <option value="7_II">
+        Marquette: Westbourne
+        <div id="1" reel="148096" frame="306" count="21"/>
+        <div id="2" reel="148096" frame="327" count="16"/>
+    </option>
+    <option value="8_A">
+        Provencher: Cartier
+        <div id="" reel="148096" frame="343" count="20"/>
+    </option>
+    <option value="8_B">
+        Provencher: Salaberry
+        <div id="" reel="148096" frame="363" count="25"/>
+    </option>
+    <option value="8_C">
+        Provencher: Emerson Town
+        <div id="" reel="148096" frame="388" count="14"/>
+    </option>
+    <option value="8_D">
+        Provencher: Franklin
+        <div id="" reel="148096" frame="402" count="26"/>
+    </option>
+    <option value="8_E">
+        Provencher: Hanover
+        <div id="" reel="148096" frame="428" count="25"/>
+    </option>
+    <option value="8_F">
+        Provencher: Hespeler
+        <div id="" reel="148096" frame="453" count="24"/>
+    </option>
+    <option value="8_G">
+        Provencher: La Broquerie
+        <div id="" reel="148096" frame="477" count="8"/>
+    </option>
+    <option value="8_H">
+        Provencher: Montcalm
+        <div id="" reel="148096" frame="485" count="36"/>
+    </option>
+    <option value="8_I">
+        Provencher: Morris
+        <div id="" reel="148096" frame="521" count="16"/>
+    </option>
+    <option value="8_J">
+        Provencher: Morris Town
+        <div id="" reel="148096" frame="537" count="7"/>
+    </option>
+    <option value="8_K">
+        Provencher: Ste. Anne
+        <div id="" reel="148096" frame="544" count="32"/>
+    </option>
+    <option value="8_L">
+        Provencher: St. Boniface
+        <div id="" reel="148096" frame="576" count="6"/>
+    </option>
+    <option value="8_M">
+        Provencher: St. Boniface Town
+        <div id="" reel="148096" frame="582" count="32"/>
+    </option>
+    <option value="8_N">
+        Provencher: St. Norbert
+        <div id="" reel="148096" frame="614" count="21"/>
+    </option>
+    <option value="8_O">
+        Provencher: Tache
+        <div id="" reel="148096" frame="635" count="19"/>
+    </option>
+    <option value="8_P">
+        Provencher: Youville
+        <div id="" reel="148096" frame="654" count="10"/>
+    </option>
+    <option value="9_A">
+        Selkirk: Argyle
+        <div id="" reel="148096" frame="664" count="46"/>
+    </option>
+</select>

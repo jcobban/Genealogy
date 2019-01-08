@@ -1,0 +1,59 @@
+<!--*********************************************************************
+ *  uploadGedcomen.html													*
+ *																		*
+ *  English language template for the page for merging a GEDCOM 5.5     *
+ *  document into the family tree.                                      *
+ *																		*
+ *  History:															*
+ *		2018/11/29		Created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+    <a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+    <a href='/Canada/CountriesEdit.php?lang=$LANG'>
+	    List of Supported Countries
+    </a>:
+    <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+    <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+			Nominal Index
+    </a>:
+  </div>	
+  <div class="body">
+    <h1 class="clear">Merge GEDCOM into Family Tree
+      <span class="right">
+		<a href="/Blogs.php?lang=fr">Français</a>
+		<a href="/BlogsHelpen.html" target="help">?&nbsp;Help</a>
+      </span>
+    </h1>
+    $TRACE
+    $MSG
+    <form id="aform" name="aform"
+        enctype="multipart/form-data" action="/FamilyTree/gedcomAdd.php" 
+        method="post">
+      <input type="hidden" id="userid" name="userid" value="$USERID">
+      <div class="row">
+        <label for="fileItem" class="label" style="text-align: center;">
+            <span class="button">Choose GEDCOM:</span>
+          <input id="fileItem" type="file" accept=".ged"  
+                    style="visibility:hidden; display: none;">
+        </label>
+        <span id="chosen"></span>
+        <div style="clear: both;"></div>
+      </div>
+    </form>
+    <br/>
+    <div id="status">
+        <p id="current">
+            Waiting for file selection
+        </p>
+    </div>
+  </div>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="text/javaScript">
+    </script>
+    <script src="/FamilyTree/uploadGedcom.js" type="text/javaScript">
+    </script>

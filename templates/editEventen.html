@@ -1,0 +1,1074 @@
+<!--*********************************************************************
+ *  editEventen.html    												*
+ *																		*
+ *  Display a web page for editting one event for an					*
+ *  individual from the Legacy database which is represented			*
+ *  by an instance of Event (a record in table tblER).					*
+ *																		*
+ *  History: 															*
+ *      2018/11/30      created                                         *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="body">
+    <h1>
+      <span class="right">
+		<a href="editEventHelpen.html" target="help">? Help</a>
+      </span>
+      $heading
+    </h1>
+        $TRACE
+        $MSG
+  <form name="evtForm" id="evtForm" action="donothing" method="post">
+      <button type="button" id="close">
+		Close
+      </button>
+  </form>
+    <div id="debugInput" class="hidden">
+	  <p>
+		debug:
+		    $etype = '$etypetext'
+		    $idet = $idettext
+		    $ider = $idertext
+		    $idir = $idirtext
+		    $idmr = $idmrtext
+		    $date = '$datetext'
+		    $order = $ordertext
+		    $notes = '$notestext'
+		    $descn = '$descntext'
+		    $idlr = $idlrtextt
+		    $location ='$locationtext'
+	  </p>
+    </div>
+    <div id="hidden">
+		<input type="hidden" name="idir" id="idir"
+				value="$idir">
+		<input type="hidden" name="idmr" id="idmr"
+				value="$idmr">
+		<input type="hidden" name="ider" id="ider"
+				value="$ider">
+		<input type="hidden" name="idet" id="idet"
+				value="$idet">
+		<input type="hidden" name="idcr" id="idcr"
+				value="$idcr">
+		<input type="hidden" name="rownum" id="rownum"
+				value="$rownum">
+		<input type="hidden" name="type" id="type" 
+				value="$type">
+    </div> <!-- id="hidden" -->
+    <div class="row" id="typeRow">
+      <label class="column1" for="etype">
+		Event Type:
+      </label>
+		<select name="etype" id="etype" class="white left">
+				<option value="$et" $selected>
+				    $mtype 
+				</option>
+				<option value="$et" $selected>
+				    $mtype 
+				</option>
+		    </select>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="dateRow">
+      <label class="column1" for="date">
+		    Date:
+      </label>
+		<input type="text" size="24" name="date" id="date" class="white left"
+		    $readonly value="$date">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="descRow">
+      <label class="column1" for="occupation">
+		Occupation:
+      </label>
+		<textarea name="occupation" id="occupation"
+		    maxlength="255" class="white leftnc" cols="64" rows="4"
+		    $readonly>$edescn</textarea>
+      <label class="column1" for="description">
+		Description:
+      </label>
+		<textarea name="description" id="description"
+		    maxlength="255" class="white leftnc" cols="64" rows="4"
+		    $readonly>$edescn</textarea>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="locationRow">
+      <label class="column1" for="temple">
+		Temple:
+      </label>
+		<select name="temple" id="temple" class="white left">
+				<option value="0" $selected;?>>
+				    Choose a Temple:
+				</option>
+				<option value="$oidtr" selected="selected">
+				    $templeName;?> 
+				</option>
+				<option value="$oidtr">
+				    $templeName;?> 
+				</option>
+		</select>
+      <label class="column1" for="location">
+		Location:
+      </label>
+		<input type="text" name="location" id="location"
+				class="white leftnc" size="64" maxlength="255"
+				$readonly value="$locName">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="kindRow">
+		    Temple:
+		    <input type="radio" name="kind" id="kind" value="1"
+				    checked="checked">
+		    Live:
+		    <input type="radio" name="kind" id="kind" value="0"
+				    checked="checked">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="templeReadyRow">
+      <label class="column1" for="templeReady">
+		    Temple Ready:
+      </label>
+		<input type="checkbox" name="templeReady" id="templeReady"
+				$checked
+		    value="1">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="SurnameRow">
+      <label class="column1" for="surname">
+		    Surname:
+      </label>
+		<input type="text" name="surname" id="surname" size="32"
+		    maxlength="120" class="white left"
+		    value="$surname">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="GivenRow">
+      <label class="column1" for="givenName">
+		    Given Name:
+      </label>
+		<input type="text" name="givenName" id="givenName" size="50"
+		    maxlength="120" class="white left"
+		    value="$given">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="namePrefixRow">
+      <label class="column1" for="prefix">
+		Name Prefix:
+      </label>
+		<input type="text" name="prefix" id="prefix" size="16" class="white left"
+		    maxlength="120"
+		    $readonly value="$prefix">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="nameSuffixRow">
+      <label class="column1" for="title">
+		Name Suffix:
+      </label>
+		<input type="text" name="title" id="title"
+				size="16" class="white left" maxlength="120"
+		    $readonly value="$nametitle">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="crematedRow">
+      <label class="column1" for="cremated">
+		    Cremated:
+      </label>
+		<select name="cremated" id="cremated" size="1" class="white left">
+		  <option value="0"
+		    selected="selected">
+		    Buried
+		  </option>
+		  <option value="1"
+		    selected="selected">
+		    Cremated
+		  </option>
+		</select>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="notesRow">
+      <label class="column1" for="note">
+		    Notes:
+      </label>
+      <textarea name="note" id="note" 
+				cols="64" rows="10" class="$notesClass">
+		    $notes</textarea>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="orderRow">
+      <label class="column1" for="order">
+		    Order:
+      </label>
+		<input type="text" size="3" name="order" id="order"
+				    class="white leftnc"
+				    value="$order">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="preferredRow">
+      <label class="column1" for="preferred">
+		    Preferred:
+      </label>
+		<input type="checkbox" size="3" name="preferred" id="preferred"
+				class="white leftnc" $checked value="1">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="notMarRow">
+      <label class="column1" for="notmarried">
+		    Partners are not married:
+      </label>
+		<input type="checkbox" name="notmarried" id="notmarried"
+				$checked value="1">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="noKidsRow">
+      <label class="column1" for="nochildren">
+		    Partners had no children:
+      </label>
+		<input type="checkbox" name="nochildren" id="nochildren"
+				$checked value="1">
+      <div style="clear: both;"></div>
+    </div>
+    <table id="citTable">
+      <thead>
+		<tr>
+		    <th class="left">
+				<input type="hidden" name="idime" id="idime"
+						value="$idime">
+				<input type="hidden" name="citType" id="citType"
+						value="$type">
+				Citations:
+		    </th>
+		    <th class="center">
+				Source Name
+		    </th>
+		    <th class="center">
+				Details (Page)
+		    </th>
+		</tr>
+      </thead>
+      <tbody>
+		<tr id="sourceRow$idsx" >
+		  <td id="firstButton$idsx">
+		    <button type="button"
+						id="editCitation$idsx">
+				Edit Citation
+		    </button>
+		  </td>
+		  <td id="sourceCell$idsx">
+		    <input type="text" name="Source$idsx"
+						id="Source$idsx"
+						class="ina leftnc"
+						value="$title"
+						readonly="readonly"
+						size="40">
+		    <input type="hidden" name="IDSR$idsx"
+						id="IDSR$idsx"
+						value="$idsr">
+		  </td>
+		  <td>
+		    <input type="text" name="Page$idsx"
+						id="Page$idsx"
+						class="white leftnc"
+						value="$detail"
+						size="37">
+		  </td>
+		  <td>
+		    <button type="button"
+						id="delCitation$idsx">
+				Delete Citation
+		    </button>
+		  </td>
+		</tr>
+      </tbody>
+      <tfoot>
+		<tr>
+		  <td>
+		    <button type="button" id="AddCitation">
+				<u>A</u>dd Citation
+		    </button>
+		</tr>
+      </tfoot>
+    </table>
+		<fieldset class="other" id="altNameSet">
+		  <legend class="labelSmall">Alternate Names</legend>
+    <div class="row" id="altNamesRow$idnx">
+      <label class="column1">
+		    Alternate Name:
+      </label>
+      <div class="column1" id="altNameText$idnx">
+		    $altName->getName()
+      </div>
+      <button type="button" id="editName$idnx">
+		    Details
+      </button>
+		&nbsp;
+      <button type="button" id="delName$idnx">
+		    Delete Name
+      </button>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="addAltSurnameRow">
+      <label class="column1" for="newAltSurname">
+		    New Surname:
+      </label>
+		<input type="text" name="newAltSurname" id="newAltSurname"
+				size="32" maxlength="120" class="white left">
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="addAltGivenRow">
+      <label class="column1" for="newAltGivenName">
+		    New Given Name:
+      </label>
+		<input type="text" name="newAltGivenName" id="newAltGivenName"
+				size="50" maxlength="120" class="white left">
+      <div style="clear: both;"></div>
+    </div>
+		</fieldset>
+		<fieldset class="other" id="deathCauseSet">
+		  <legend class="labelSmall">Cause of Death</legend>
+    <div class="row" id="deathCauseRow">
+      <label class="column1" for="deathCause">
+		    Cause of Death:
+      </label>
+      <input type="text" name="deathCause" id="deathCause"
+				class="white leftnc" size="64" maxlength="255"
+				value="$eDeathCause">
+      <div style="clear: both;"></div>
+    </div>
+    <table id="DcCitTable">
+      <thead>
+		<tr>
+		  <th class="left">
+		    Citations:
+		  </th>
+		  <th class="center">
+		    Source Name
+		  </th>
+		  <th class="center">
+		    Details (Page)
+		  </th>
+		</tr>
+      </thead>
+      <tbody>
+		<tr id="sourceRow$idsx" >
+		  <td>
+		    <button type="button"
+				id="editCitation$idsx">
+		   Edit Citation
+		    </button>
+		  </td>
+		  <td>
+		    <input type="text" name="Source$idsx" 
+				id="Source$idsx"
+				class="ina leftnc"
+				value="$title"
+				readonly="readonly"
+				size="40">
+		  </td>
+		  <td>
+		    <input type="text" name="Page$idsx"
+				id="Page$idsx"
+				class="white leftnc"
+				value="$detail"
+				size="37">
+		  </td>
+		  <td>
+		    <button type="button" id="delCitation$idsx">
+				Delete Citation
+		    </button>
+		  </td>
+		  <td>
+		</tr>
+		<tr>
+		  <td>
+		    <button type="button"
+				id="addCitationDeathCause">
+		      <u>A</u>dd Citation
+		    </button>
+		  </td>
+		</tr>
+      </tbody>
+    </table>
+		</fieldset>
+    <p id="buttonRow">
+      <button type="button" id="updEvent">
+		<u>U</u>pdate Event
+      </button>
+		&nbsp;
+      <button id="raw" type="button">
+		$notesText;?>
+      </button>
+		&nbsp;
+      <button type="button" id="close">
+		Close
+      </button>
+		&nbsp;
+      <button type="button" id="Clear">
+		<u>C</u>lear&nbsp;Notes
+      </button>
+		&nbsp;
+      <button type="button" id="Pictures">
+		<u>P</u>ictures
+      </button>
+      <input type="hidden" name="PicIdType" id="PicIdType" 
+				value="$picIdType">
+    </p>
+  </form>
+ </div> <!-- id="body" -->
+	<div id="cittemplates" class="hidden">
+	    <table>
+			<!-- The following is the template for what a new citation looks
+			*    like before the user enters the citation description
+			-->
+			<tr id="sourceRow$rownum" >
+			  <th>
+			  </th>
+			  <td>
+			    <select name="Source$rownum" id="Source$rownum"
+							class="white leftcit">
+					<option value="$idsr" selected="selected">
+					    $sourceName
+					</option>
+			    </select>
+			  </td>
+			  <td>
+					<input type="text" name="Page$rownum" id="Page$rownum"
+							class="white leftnc" value="$detail" size="37">
+					<input type="hidden" name="idime$rownum" id="idime$rownum"
+							value="$idime">
+					<input type="hidden" name="type$rownum" id="type$rownum" 
+							value="$type">
+			  </td>
+			</tr>
+			<!-- The following is the template for what a citation looks
+			*    like after the user enters the citation description
+			*    This should match exactly the layout for existing citations
+			*    as formatted by PHP above.
+			-->
+			<tr id="sourceRow$idsx" >
+			  <td>
+			    <button type="button"
+					    id="editCitation$idsx">
+					Edit Citation
+			    </button>
+			  </td>
+			  <td>
+			    <input type="text" name="Source$idsx" id="Source$idsx"
+					    class="ina leftnc"
+					    value="$title"
+					    readonly="readonly"
+					    size="40">
+			  </td>
+			  <td>
+			    <input type="text" name="Page$idsx" id="Page$idsx"
+					    class="white leftnc"
+					    value="$page"
+					    size="37">
+			  </td>
+			  <td>
+			    <button type="button"
+					    id="delCitation$idsx">
+					Delete Citation
+			    </button>
+			  </td>
+			</tr>
+	    </table>
+	  <!-- template for confirming the deletion of a citation-->
+	  <form name="CitDel$template" id="CitDel$template">
+	    <p class="message">$msg</p>
+	    <p>
+	      <button type="button" id="confirmDelete$idsx">
+			OK
+	      </button>
+	      <input type="hidden" id="rownum$idsx" name="rownum$idsx"
+					value="$rownum">
+	      <input type="hidden" id="formname$idsx" name="formname$idsx"
+					value="$formname">
+			&nbsp;
+	      <button type="button" id="cancelDelete$idsx">
+			Cancel
+	      </button>
+	    </p>
+	  </form>
+	</div> <!-- end of <div id="cittemplates"> -->
+	<div class="hidden" id="internationalization">
+	    <!--*****************************************************************
+	     *  $typeText														*
+	     *																	*
+	     *  Events which are implemented by fields inside a record other	*
+	     *  than an instance of Event (tblER), are distinguished			*
+	     *	by the citation type, passed as parameter type.  This table		*
+	     *	is used to modify the title of the dialog based upon the type.	*
+	     ******************************************************************-->
+	    <div id="typeText">
+			<span id="type0">Generic Fact</span>
+			<span id="type1">Name Fact</span>
+			<span id="type2">Birth Event</span>
+			<span id="type3">Christening Event</span>
+			<span id="type4">Death Event</span>
+			<span id="type5">Buried Event</span>
+			<span id="type6">General Notes</span>
+			<span id="type7">Research Notes</span>
+			<span id="type8">Medical Notes</span>
+			<span id="type9">Cause of Death</span>
+			<span id="type10"></span>
+			<span id="type11">Child Status</span>
+			<span id="type12">Relationship to Father</span>
+			<span id="type13">Relationship to Mother</span>
+			<span id="type15">LDS Baptism Event</span>
+			<span id="type16">LDS Endowment Event</span>
+			<span id="type17">LDS Sealed to Parents Event</span>
+			<span id="type18">LDS Sealed to Spouse Event</span>
+			<span id="type19">Person Never Married Fact</span>
+			<span id="type20">Marriage Event</span>
+			<span id="type21">Marriage Note</span>
+			<span id="type22">Never Married Fact</span>
+			<span id="type23">This Couple had no Children Fact</span>
+			<span id="type24">Marriage Ended</span>
+			<span id="type26">LDS Confirmation Event</span>
+			<span id="type27">LDS Initiatory Event</span>
+	    </div>
+	
+	    <!--*****************************************************************
+	     *  $eventText														*
+	     *																	*
+	     *  This table provides a translation from an event type to the text*
+	     *  to display to the user.  This is ordered alphabetically for use	*
+	     *	constructing a select element in a web page.					*
+	     ******************************************************************-->
+	    <div id="eventText">
+			<span data-key="2">was adopted</span>
+			<span data-key="63">also worked as a </span>
+			<span data-key="17">appeared in court</span>
+			<span data-key="56">attended school</span>
+			<span data-key="15000">was baptized (LDS)</span>
+			<span data-key="8">was baptized (LDS)</span>
+			<span data-key="9">had his Bar Mitzvah</span>
+			<span data-key="10">had her Bat Mitzvah</span>
+			<span data-key="14">became a citizen</span>
+			<span data-key="41">belonged to</span>
+			<span data-key="71">birth was registered</span>
+			<span data-key="11">was blessed (LDS)</span>
+			<span data-key="2000">was born</span>
+			<span data-key="3">was born</span>
+			<span data-key="5000">was buried</span>
+			<span data-key="4">was buried</span>
+			<span data-key="3000">was christened</span>
+			<span data-key="5">was christened</span>
+			<span data-key="13">was circumcized</span>
+			<span data-key="15">was confirmed</span>
+			<span data-key="26000">was confirmed (LDS)</span>
+			<span data-key="16">was confirmed (LDS)</span>
+			<span data-key="18">was cremated</span>
+			<span data-key="72">death was registered</span>
+			<span data-key="50">was described as </span>
+			<span data-key="4000">died</span>
+			<span data-key="6">died</span>
+			<span data-key="20">was divorced </span>
+			<span data-key="22">had education </span>
+			<span data-key="68">was elected as</span>
+			<span data-key="23">emigrated from </span>
+			<span data-key="24">was employed as</span>
+			<span data-key="16000">was endowed (LDS)</span>
+			<span data-key="74">was endowed (LDS)</span>
+			<span data-key="25">got engaged</span>
+			<span data-key="36">entered marriage contract</span>
+			<span data-key="12">was enumerated in a census</span>
+			<span data-key="66">identified with ethnicity</span>
+			<span data-key="65">belonged to family group</span>
+			<span data-key="21">filed for a divorce </span>
+			<span data-key="26">had first communion</span>
+			<span data-key="67">had a funeral</span>
+			<span data-key="27">graduated from</span>
+			<span data-key="28">had a hobby of</span>
+			<span data-key="29">was honored as</span>
+			<span data-key="31">was ill with</span>
+			<span data-key="32">immigrated</span>
+			<span data-key="30">in hospital</span>
+			<span data-key="60">in the military</span>
+			<span data-key="27000">initiatory (LDS)</span>
+			<span data-key="75">initiatory (LDS)</span>
+			<span data-key="33">was interviewed</span>
+			<span data-key="54">lived</span>
+			<span data-key="35">marriage banns issued</span>
+			<span data-key="37">got a marriage license</span>
+			<span data-key="39">got a marriage settlement</span>
+			<span data-key="7">marriage was annulled</span>
+			<span data-key="73">marriage was registered</span>
+			<span data-key="38">was married</span>
+			<span data-key="69">married</span>
+			<span data-key="20000">married</span>
+			<span data-key="70"></span>
+			<span data-key="59">had a medical condition</span>
+			<span data-key="40">had a medical event</span>
+			<span data-key="42">served in the military</span>
+			<span data-key="43">went on mission</span>
+			<span data-key="44">was named for</span>
+			<span data-key="64">had a nationality </span>
+			<span data-key="45">was naturalized</span>
+			<span data-key="1">null event 1</span>
+			<span data-key="46">an obituary was published</span>
+			<span data-key="49">was ordained as</span>
+			<span data-key="48">ordinance (LDS)</span>
+			<span data-key="34">owned land</span>
+			<span data-key="52">owned property</span>
+			<span data-key="61">had a photo</span>
+			<span data-key="19">received a degree</span>
+			<span data-key="53">belonged to the religious affiliation </span>
+			<span data-key="55">retired</span>
+			<span data-key="76">sealed to spouse</span>
+			<span data-key="18000">sealed to spouse</span>	// obsolete
+			<span data-key="57">had Social Security Number</span>
+			<span data-key="62">had Social Security Number (62)</span>
+			<span data-key="51">will was probated</span>
+			<span data-key="58">wrote a will</span>
+			<span data-key="47">worked as a </span>
+			<span data-key="0">unused 0</span>
+		</div>
+	
+	    <!--*****************************************************************
+	     *  $personidualEvents												*
+	     *																	*
+	     *  This table is used to create the selection list for				*
+	     *	events specific to an individual.  Where the event type			*
+	     *	is greater than 999 it indicates an event recorded in the		*
+	     *	Person record itself, and the code is the citation				*
+	     *	type times 1000.												*
+	     ******************************************************************-->
+	    <div id="personidualEvents">
+			<span data-key="0">Choose an event type:</span>
+			<span data-key="1"></span>
+			<span data-key="2">Adoption</span>
+			<span data-key="3">Birth</span>
+			<span data-key="4">Burial</span>
+			<span data-key="5">Christening</span>
+			<span data-key="16">Confirmation (LDS)</span>
+			<span data-key="6">Death</span>
+			<span data-key="8">Baptism</span>
+			<span data-key="15000">Baptism (LDS)</span>
+			<span data-key="9">BarMitzvah</span>
+			<span data-key="10">BasMitzvah</span>
+			<span data-key="71">Birth Registration</span>
+			<span data-key="11">Blessing</span>
+			<span data-key="12">Census</span>
+			<span data-key="13">Circumcision</span>
+			<span data-key="14">Citizenship</span>
+			<span data-key="15">Confirmation</span>
+			<span data-key="26000">Confirmation (LDS)</span>
+			<span data-key="17">Court</span>
+			<span data-key="18">Cremation</span>
+			<span data-key="72">Death Registration</span>
+			<span data-key="19">Degree</span>
+			<span data-key="22">Education</span>
+			<span data-key="68">Election</span>
+			<span data-key="23">Emigration</span>
+			<span data-key="24">Employment</span>
+			<span data-key="16000">Endowment (LDS)</span>
+			<span data-key="66">Ethnicity</span>
+			<span data-key="65">Family Group</span>
+			<span data-key="26">First Communion</span>
+			<span data-key="67">Funeral</span>
+			<span data-key="27">Graduation</span>
+			<span data-key="28">Hobbies</span>
+			<span data-key="29">Honours</span>
+			<span data-key="30">Hospital</span>
+			<span data-key="31">Illness</span>
+			<span data-key="27000">Initiatory (LDS)</span>
+			<span data-key="32">Immigration</span>
+			<span data-key="33">Interview</span>
+			<span data-key="34">Land</span>
+			<span data-key="40">Medical</span>
+			<span data-key="59">Medical Condition</span>
+			<span data-key="41">Membership</span>
+			<span data-key="60">Military</span>
+			<span data-key="42">Military Service</span>
+			<span data-key="43">Mission</span>
+			<span data-key="44">Namesake</span>
+			<span data-key="64">Nationality</span>
+			<span data-key="45">Naturalization</span>
+			<span data-key="46">Obituary</span>
+			<span data-key="47">Occupation</span>
+			<span data-key="63">Occupation 1</span>
+			<span data-key="48">Ordinance</span>
+			<span data-key="49">Ordination</span>
+			<span data-key="61">Photo</span>
+			<span data-key="50">Physical Description</span>
+			<span data-key="51">Probate</span>
+			<span data-key="52">Property</span>
+			<span data-key="53">Religion</span>
+			<span data-key="54">Residence</span>
+			<span data-key="55">Retirement</span>
+			<span data-key="56">School</span>
+			<span data-key="57">Social Security Number</span>
+			<span data-key="62">Soc Sec Num</span>
+			<span data-key="58">Will</span>
+	    </div>
+	
+	    <!--*****************************************************************
+	     *  $marriageEvents													*
+	     *																	*
+	     *  This table is used to create the selection list for				*
+	     *	events specific to a marriage.  Where the event type			*
+	     *	is greater than 999 it indicates an event recorded in the		*
+	     *	Family record itself, and the code is the citation		        *
+	     *	type times 1000.												*
+	     ******************************************************************-->
+	    <div id="marriageEvents">
+			<span data-key="0">Choose an event type:</span>
+			<span data-key="69">Marriage</span>
+			<span data-key="7">Annulment</span>
+			<span data-key="20">Divorce</span>
+			<span data-key="25">Engagement</span>
+			<span data-key="21">Filed for Divorce</span>
+			<span data-key="36">Marriage Contract</span>
+			<span data-key="24000">Marriage Ended</span>
+			<span data-key="37">Marriage License</span>
+			<span data-key="38">Marriage Notice</span>
+			<span data-key="72">Marriage Registered</span>
+			<span data-key="39">Marriage Settlement</span>
+			<span data-key="22000">Never Married</span>
+			<span data-key="23000">No Children</span>
+			<span data-key="70">Other Marriage Fact</span>
+			<span data-key="76">sealed to spouse</span>
+			<span data-key="18000">Sealed to Spouse (LDS)</span>
+	    </div>
+		
+	    <!--*****************************************************************
+	     *  $idetTitleText													*
+	     *																	*
+	     *  This table is used to construct a customized title for events	*
+	     *	represented by a row in table tblER.							*
+	     ******************************************************************-->
+	    <div id="idetTitleText">
+			<span data-key="0"></span>
+			<span data-key="1"></span>
+			<span data-key="2">Adoption</span>
+			<span data-key="3">Birth</span>
+			<span data-key="4">Burial</span>
+			<span data-key="5">Christening</span>
+			<span data-key="6">Death</span>
+			<span data-key="7">Annulment</span>
+			<span data-key="8">LDS Baptism</span>
+			<span data-key="9">Bar Mitzvah</span>
+			<span data-key="10">Bas Mitzvah</span>
+			<span data-key="11">LDS Blessing</span>
+			<span data-key="12">Census Enumeration</span>
+			<span data-key="13">Circumcision</span>
+			<span data-key="14">Citizenship</span>
+			<span data-key="15">Confirmation</span>
+			<span data-key="16">LDS Confirmation</span>
+			<span data-key="17">Court</span>
+			<span data-key="18">Cremation</span>
+			<span data-key="19">Degree</span>
+			<span data-key="20">Divorce</span>
+			<span data-key="21">Divorce Filing</span>
+			<span data-key="22">Education</span>
+			<span data-key="23">Emigration</span>
+			<span data-key="24">Employment</span>
+			<span data-key="25">Engagement</span>
+			<span data-key="26">First Communion</span>
+			<span data-key="27">Graduation</span>
+			<span data-key="28">Hobbies</span>
+			<span data-key="29">Honours</span>
+			<span data-key="30">Hospital</span>
+			<span data-key="31">Illness</span>
+			<span data-key="32">Immigration</span>
+			<span data-key="33">Interview</span>
+			<span data-key="34">Land</span>
+			<span data-key="35">Marriage Banns</span>
+			<span data-key="36">Marriage Contract</span>
+			<span data-key="37">Marriage License</span>
+			<span data-key="38">Marriage Notice</span>
+			<span data-key="39">Marriage Settlement</span>
+			<span data-key="40">Medical</span>
+			<span data-key="41">Membership</span>
+			<span data-key="42">Military Service</span>
+			<span data-key="43">Mission</span>
+			<span data-key="44">Namesake</span>
+			<span data-key="45">Naturalization</span>
+			<span data-key="46">Obituary</span>
+			<span data-key="47">Occupation</span>
+			<span data-key="48">Ordinance</span>
+			<span data-key="49">Ordination</span>
+			<span data-key="50">Physical Description</span>
+			<span data-key="51">Probate</span>
+			<span data-key="52">Property</span>
+			<span data-key="53">Religion</span>
+			<span data-key="54">Residence</span>
+			<span data-key="55">Retirement</span>
+			<span data-key="56">School</span>
+			<span data-key="57">Social Security Number</span>
+			<span data-key="59">Will</span>
+			<span data-key="59">Medical Condition</span>
+			<span data-key="60">Military</span>
+			<span data-key="61">Photo</span>
+			<span data-key="62">Social Security Number</span>
+			<span data-key="63">Other Occupation</span>
+			<span data-key="64">Nationality</span>
+			<span data-key="65">Family Group</span>
+			<span data-key="66">Ethnicity</span>
+			<span data-key="67">Funeral</span>
+			<span data-key="68">Election</span>
+			<span data-key="69">Marriage</span>
+			<span data-key="70">Marriage Fact</span>
+			<span data-key="71">Birth Registration</span>
+			<span data-key="72">Death Registration</span>
+			<span data-key="73">Marriage Registration</span>
+			<span data-key="74">LDS Endowed</span>
+			<span data-key="75">LDS Initiatory</span>
+			<span data-key="76">LDS Sealed</span>
+			<span data-key="77">Marriage End</span>
+			<span data-key="78">LDS Child Sealed to Parents</span>
+       </div>
+    </div>
+	<div class="balloon" id="Helpdate">
+	  <p>Enter the date on which the event took place or 
+        the fact was observed.  The recommended format for entering dates
+        is day of
+		the month, month name or supported abbreviation thereof, and year.
+		For example "12 July 1879" or "17 Nov 1906".
+		However the month name, day, year format is also supported.  
+		For example "Feb 23 1764".
+		If you enter the date as three decimal numbers separated by slashes, for
+		example "11/4/1887" the first number is normally interpreted as 
+		the day of the month and the second number as the month number,  except:
+	<ul>
+	  <li>If the first number is greater than 31 the value is interpreted as
+		year, month, day.
+	  <li>if the second number is greater than 12 and therefore cannot be
+		a month number, and the first number is less than or equal to 12		        then the first number is interpreted as the month, and the
+		second as the day of the month.  
+	</ul>
+      <p>For example "11/4/1887" and "1887/4/11" are interpreted
+        as "11 April 1887",
+		while "11/18/1887" is interpreted as "18 November 1887".  Note that this
+		default interpretation is that used in almost every country on earth
+	    <b>except</b> the United States of America where the 
+        standard interpretation of such dates is mm/dd/yyyy.
+	</p>
+	  <p>The day and the day and the month may be omitted if they are not known.
+		For example the following are valid dates: "Oct 1913", "1927".
+		The following abbreviations for month names are recognized in addition
+		to the full month names:
+	  </p>
+	<ul>
+	    <li>J, Ja, Jan, Jany
+	    <li>F, Feb, Feby
+	    <li>M, Mr, Mar
+	    <li>A, Ap, Apr, Aprl
+	    <li>Ma, My, May, Y 
+	    <li>Jn, Jun
+	    <li>Jl, Jul
+	    <li>Au, Aug, Augt, G
+	    <li>S, Sep, Sept
+	    <li>O, Oct, Octr 
+	    <li>N, Nov, Novr
+	    <li>D, Dec, Decr
+	</ul>
+	  <p>The following prefixes may be applied to the date:
+        In, On, Abt, About, Cir, Circa, Bef, Before, Aft, After,
+        WFT Est, Est, From,
+	  </p>
+	  <p>A range of dates can be expressed as:
+		Between &lt;begin date&gt; and &lt;end date&gt;,
+		From &lt;begin date&gt; to &lt;end date&gt; or
+	    &lt;begin date&gt;-&lt;end date&gt;.
+	  </p>
+	</div>
+	<div class="balloon" id="Helpnote">
+	  <p>This is a multiple line text area in which you can record extended
+		comments about the
+		$typeText[$type].
+	  </p>
+	</div>
+	<div class="balloon" id="Helpprefix">
+	  <p>This field is used to supply a name prefix, such as an honorific or
+		indicator of rank or profession.  Typical examples include:
+		Capt., Col., Dr., Elder, Father, Lord, Lt. Col., Major, Miss, Mr., Mrs.,
+		Rev'd, or Sister.
+	  </p>
+	</div>
+	<div class="balloon" id="Helptitle">
+	  <p>This field is used to supply a name suffix.  Typical examples include:
+		J'r, Jr., Jun., S'r, Sen., Sr., III, IV, K.C., M.D.
+	  </p>
+	</div>
+	<div class="balloon" id="Helpsurname">
+	  <p>This field is used to update the primary surname of an individual.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpgivenName">
+	  <p>This field is used to update the primary given name of an individual.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpnewAltSurname">
+	  <p>This field is used to supply a new alternate surname to handle the case
+        where the individual was known by more than one surname. 
+        For example when a child is adopted, the child generally takes
+        the family name of the adopting parents.
+		If you do not fill in an alternate given name in the following row, 
+		then the primary given name is assumed to be used with the new surname.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpnewAltGivenName">
+	  <p>This field is used to supply a new alternate given name to handle 
+		the case where the individual was known by different given names. 
+		For example when a child is adopted frequently
+		the adopting parents choose to use a different
+		given name than the one given by the biological parents.
+		This field works together with the Alternate Surname field.
+		Filling in both fields and applying the update creates an alternate name
+		that has both a different given name and a different surname.  
+	  </p>
+	</div>
+	<div class="balloon" id="Helpetype">
+	  <p>Select the specific type of event.
+	  </p>
+	</div>
+	<div class="balloon" id="Helpdescription">
+	  <p>Text which more precisely explains the nature of the event and which
+		is not part of the location information.  For example for events which
+        contain a description this field contains the details
+        of the description.
+	  </p>
+	</div>
+	<div class="balloon" id="Helpoccupation">
+	  <p>Text which describes the occupation of the individual and 
+		is not part of the location information. 
+	  </p>
+	</div>
+	<div class="balloon" id="Helpdesc">
+	  <p>Notes of a more general nature, including your own comments about the
+		event.
+	  </p>
+	</div>
+	<div class="balloon" id="Helplocation">
+	  <p>Enter the location associated with the event or fact.
+	  </p>
+	</div>
+	<div class="balloon" id="Helptemple">
+	  <p>Select the Latter Day Saints temple at which the sacrament took place.
+	  </p>
+	</div>
+	<div class="balloon" id="Helpcremated">
+	  <p>This selection list is used to specify whether the individual was
+		buried or cremated.
+	  </p>
+	</div>
+	<div class="balloon" id="Helporder">
+	  <p>Temporarily the application supports explicitly setting the order
+		index number for this event within the set of existing events for the
+		individual or family.  However once you have added the event it is
+		recommended that you request the "Order Events by Date" function of the
+		Events dialog to calculate the appropriate value of this field.
+	</p>
+	</div>
+	<div class="balloon" id="HelpSource">
+	  <p>Read-only field displaying one of the master sources
+		cited for this fact or event.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpSourceSel">
+	  <p>This is a selection list used to identify a source which documents
+        this event.  If you need to reference a source which has not 
+        previously been referenced in the database you can scroll up
+        to the first entry in the selection list which says "Add New Source".
+        A short cut for this is pressing
+		the letter "A" while the focus is in this selection list.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpPage">
+	  <p>Field displaying the page number within the master source
+		that documents this fact or event.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpeditCitation">
+	  <p>Clicking on this button pops up a dialog to edit the details of the
+		citation.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpdelCitation">
+	  <p>Clicking on this button deletes this citation.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpAddCitation">
+	  <p>Clicking on this button adds a row to the citation table that permits
+		selecting the master source and specifying the page within that source
+		that documents the current fact or event.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpaddCitation">
+	  <p>Clicking on this button adds a row to the citation table that permits
+		selecting the master source and specifying the page within that source
+		that documents the current fact or event.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpdeathCause">
+	  <p>
+		The cause of death as provided by the coroner or medical attendant, 
+		usually from the death certificate.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpaddCitationDeathCause">
+	  <p>Clicking on this button adds a row to the citation table
+		for the cause of death that permits
+		selecting the master source and specifying the page within that source
+		that documents the cause of death.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpeditName">
+	  <p>Clicking on this button opens a dialog to modify the details of the
+		associated name record.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpdelName">
+	  <p>Clicking on this button deletes the associated name record.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpupdEvent">
+	  <p>Clicking on this button applies all of the changes made to this fact
+		or event and closes the dialog.  Note that pressing the Enter key while
+		editting any text field in this dialog also performs this function.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpSubmit">
+	  <p>Clicking on this button applies all of the changes made to this fact
+		or event and closes the dialog.  Note that pressing the Enter key while
+		editting any text field in this dialog also performs this function.
+	  </p>
+	</div>
+	<div class="balloon" id="Helpraw">
+	  <p>Clicking on this button changes the way that the notes portion of the
+        dialog is displayed between the normal rich text editor and
+        a raw textarea.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpClear">
+	  <p>Clicking on this button, or alternatively using the keyboard shortcut
+        Alt-C, clears all of the text from the notes field associated 
+        with this event.
+	  </p>
+	</div>
+    <div class="balloon" id="HelpPictures">
+	  <p>Clicking on this button, or alternatively using the keyboard shortcut
+		Alt-P, pops up a dialog to manage the set of pictures associated with
+		this event.
+    </p>
+    </div>
+    <div id="loading" class="popup">
+		Loading...
+    </div>
+	<script src="/jscripts/js20/http.js" type="application/javaScript">
+    </script>
+	<script src="/jscripts/CommonForm.js" type="application/javaScript">
+    </script>
+	<script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+	<script src="/jscripts/Cookie.js" type="application/javaScript">
+    </script>
+	<script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="application/javaScript">
+    </script>
+	<script src="/jscripts/locationCommon.js" type="application/javaScript">
+    </script>
+	<script src="editEvent.js" type="application/javaScript">
+    </script>

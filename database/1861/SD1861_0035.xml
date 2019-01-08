@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="35">
+    <option value="394">
+        Cornwall Town
+    </option>
+    <option value="395">
+        Cornwall
+    </option>
+    <option value="396">
+        Finch
+    </option>
+    <option value="397">
+        Osnabruck
+    </option>
+    <option value="398">
+        Roxborough
+    </option>
+</select>

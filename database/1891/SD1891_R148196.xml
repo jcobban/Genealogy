@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148196">
+    <option value="152_F">
+        Drummond &amp; Arthabaska: Drummondville
+        <div id="" reel="148196" frame="0" count="40"/>
+    </option>
+    <option value="152_G">
+        Drummond &amp; Arthabaska: Grantham
+        <div id="" reel="148196" frame="40" count="19"/>
+    </option>
+    <option value="152_H">
+        Drummond &amp; Arthabaska: Kingsey
+        <div id="1" reel="148196" frame="59" count="22"/>
+        <div id="2" reel="148196" frame="81" count="11"/>
+    </option>
+    <option value="152_I">
+        Drummond &amp; Arthabaska: Kingsey Falls
+        <div id="" reel="148196" frame="92" count="20"/>
+    </option>
+    <option value="152_J">
+        Drummond &amp; Arthabaska: L'Avenir
+        <div id="" reel="148196" frame="112" count="27"/>
+    </option>
+    <option value="152_K">
+        Drummond &amp; Arthabaska: Princeville Village
+        <div id="" reel="148196" frame="139" count="19"/>
+    </option>
+    <option value="152_L">
+        Drummond &amp; Arthabaska: Stanfold
+        <div id="1" reel="148196" frame="158" count="23"/>
+        <div id="2" reel="148196" frame="181" count="22"/>
+    </option>
+    <option value="152_M">
+        Drummond &amp; Arthabaska: St. Albert de Warwick
+        <div id="" reel="148196" frame="203" count="16"/>
+    </option>
+    <option value="152_N">
+        Drummond &amp; Arthabaska: Ste. Anne des Saults
+        <div id="" reel="148196" frame="219" count="13"/>
+    </option>
+    <option value="152_O">
+        Drummond &amp; Arthabaska: St. Bonaventure de Upton
+        <div id="" reel="148196" frame="232" count="26"/>
+    </option>
+    <option value="152_P">
+        Drummond &amp; Arthabaska: Ste. Clothilde d'Horton
+        <div id="1" reel="148196" frame="258" count="12"/>
+        <div id="2" reel="148196" frame="270" count="13"/>
+    </option>
+    <option value="152_Q">
+        Drummond &amp; Arthabaska: St. Christophe d'Arthabaska
+        <div id="" reel="148196" frame="283" count="24"/>
+    </option>
+    <option value="152_R">
+        Drummond &amp; Arthabaska: Ste. Elizabeth de Warwick
+        <div id="" reel="148196" frame="307" count="12"/>
+    </option>
+    <option value="152_S">
+        Drummond &amp; Arthabaska: St. Eugène de Grantham
+        <div id="" reel="148196" frame="319" count="22"/>
+    </option>
+    <option value="152_T">
+        Drummond &amp; Arthabaska: St. Germain de Grantham
+        <div id="1" reel="148196" frame="341" count="20"/>
+        <div id="2" reel="148196" frame="361" count="43"/>
+    </option>
+    <option value="152_U">
+        Drummond &amp; Arthabaska: St. Guillaume d'Upton
+        <div id="" reel="148196" frame="404" count="58"/>
+    </option>
+    <option value="152_V">
+        Drummond &amp; Arthabaska: Ste. Helène
+        <div id="1" reel="148196" frame="462" count="31"/>
+        <div id="2" reel="148196" frame="493" count="4"/>
+    </option>
+    <option value="152_W">
+        Drummond &amp; Arthabaska: St. Louis de Blanford
+        <div id="" reel="148196" frame="497" count="13"/>
+    </option>
+    <option value="152_X">
+        Drummond &amp; Arthabaska: St. Norbert d'Arthabaska
+        <div id="" reel="148196" frame="510" count="18"/>
+    </option>
+    <option value="152_Y">
+        Drummond &amp; Arthabaska: St. Paul
+        <div id="1" reel="148196" frame="528" count="27"/>
+        <div id="2" reel="148196" frame="555" count="12"/>
+    </option>
+    <option value="152_Z">
+        Drummond &amp; Arthabaska: St. Rémi de Tingwick
+        <div id="" reel="148196" frame="567" count="22"/>
+    </option>
+    <option value="152_AA">
+        Drummond &amp; Arthabaska: St. Valére de Bulstrode
+        <div id="1" reel="148196" frame="589" count="16"/>
+        <div id="2" reel="148196" frame="605" count="18"/>
+    </option>
+    <option value="152_BB">
+        Drummond &amp; Arthabaska: Ste. Victoire
+        <div id="" reel="148196" frame="623" count="20"/>
+    </option>
+    <option value="152_CC">
+        Drummond &amp; Arthabaska: Tingwick
+        <div id="" reel="148196" frame="643" count="21"/>
+    </option>
+    <option value="152_DD">
+        Drummond &amp; Arthabaska: Victoriaville Town
+        <div id="" reel="148196" frame="664" count="28"/>
+    </option>
+    <option value="152_EE">
+        Drummond &amp; Arthabaska: Warwick
+        <div id="" reel="148196" frame="692" count="32"/>
+    </option>
+    <option value="152_FF">
+        Drummond &amp; Arthabaska: Warwick Village
+        <div id="" reel="148196" frame="724" count="18"/>
+    </option>
+    <option value="152_GG">
+        Drummond &amp; Arthabaska: Wendover &amp; Simpson
+        <div id="1" reel="148196" frame="742" count="26"/>
+        <div id="2" reel="148196" frame="768" count="22"/>
+    </option>
+</select>

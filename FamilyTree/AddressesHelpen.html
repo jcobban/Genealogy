@@ -1,0 +1,119 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+   <title>Addresses Master List: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name='author' content='James A. Cobban'>
+    <meta name='copyright' content='&copy; 2018 James A. Cobban'>
+<!--*********************************************************************
+ *  AddressesHelpen.html                                                *
+ *                                                                      *
+ *  History:															*
+ *		2010/12/04		created											*
+ *		2014/02/10		eliminate use of tables for layout				*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to addChdHelpen.html                  *
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='/styles.css'/>
+</head>
+<body>
+<div class='topcrumbs'>
+    <a href='/indexHelpen.html'>Home</a>: 
+    <a href='/genealogyHelpen.html'>Genealogy</a>: 
+    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>: 
+</div>
+<div class='help'>
+<h1>Addresses Master list: Help</h1>
+<p>Every address that is referenced in the family tree is
+recorded in the Addresses Master List.  This way all of the information
+collected about a particular address is in a central record.  This,
+in particular facilitates ensuring that particular addresses are always
+identified in the same way.
+</p>
+<p>An Address record can be used for one of three purposes:
+<ol>
+<li>As a more detailed alternative to a Location record.  A Location
+record contains an unstructured line of text identifying the place where
+an event took place, or a fact was observed.  An Address record breaks
+the identification of the place into its hierarchical component parts, and
+also permits associating additional contact information, such as telephone
+numbers and e-mail addresses.
+<li>To record contact information for an individual in the family tree.
+This should be used cautiously.  For example using a formal contact list
+application provides advantages, such as integration with address label or
+bulk mail creation applications.  Furthermore placing personal information
+of this sort in the family tree may expose it to an unintended audience.
+<li>To record contact information for a repository, such as a library or
+archive, which provides public access to source documents that are
+referenced by the family tree.
+</ol>
+<p>You get to the Addresses Master List from the Family Tree
+<a href='ServicesHelpen.html'>Top Level Services</a> web page.
+When you first enter the Addresses Master List web page the display
+is empty, because you have not defined yet which kinds of addresses to
+display.
+</p>
+<p>You use the "Pattern" field to search for addresses based upon their
+textual representation.  Technically the value you enter in this field
+is a <a href="http://en.wikipedia.org/wiki/Regular_expression">
+	regular expression</a> pattern.
+The following are just some of the ways you can use this pattern.
+<ul>
+  <li>Ordinary text, particularly text containing only letters, digits,
+	and spaces, matches anywhere in the address.  For example
+	entering "Michigan" will match all addresses that contain the
+	text "Michigan".  The match ignores the case, so this will also
+	match "michigan" and "MICHIGAN".
+  <li>The period '.' matches any single character.  You can use this
+	any time you do not know, or care, about what character is present
+	at a particular spot in the address.
+  <li>The caret '^' (shift-6 on American keyboards) matches to the
+	beginning of the address.  For example to find addresses that
+	start with "New" enter "^New", as just entering "New" matches 
+	addresses that contain the word "New" anywhere in the text.
+  <li>The dollar sign '$' (shift-4 on American keyboards) matches to the
+	end of the address.  For example to find addresses that end with
+	"USA" enter "USA$".
+  <li>The asterisk '*' (shift-8 on American keyboards) causes the
+	immediately preceding character to match zero or more repetitions.
+	This is most commonly used with the period to skip over any number
+	of characters that do not match.  For example the pattern "Mi.*USA"
+	matches any address that has the text "Mi" and later on the text "USA"
+	with any number of arbitrary characters in between.  For example it
+	will match addresses containing "MI, USA" and "Michigan, USA", as
+	well as "Mississippi, USA".
+  <li>There are many more options which you can experiment with.
+</ul>
+</p>
+<p>You must also specify which kinds of address records are to be
+displayed, by clicking on the checkboxes associated with the three
+kinds of addresses.  Note that unless you are the master administrator
+of the family tree you cannot view mailing address records from this dialog,
+in order to preserve the privacy of the individuals.  However if you are
+an owner of the associated individual you can view and edit the address
+record for that individual from the
+<a href='editIndividHelpen.html'>edit Individual page</a>.
+<p>Each of the addresses displayed on this web page shows the unique numeric
+key of the address, and the address text as it is displayed in reports. 
+The numeric key is a link to a
+<a href='AddressHelpen.html'>web page</a> 
+that displays the details recorded
+about the address, and if you are authorized to do so, permits you to edit
+those details.
+</div>
+<div class='botcrumbs'>
+    <span class='right'>
+	<img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+    </span>
+    <a href='/contactAuthor.php?subject=AddressesHelpen.html' target='_blank'>
+	Contact Author</a>
+    <br/>
+    <a href='/indexHelpen.html'>Home</a>: 
+    <a href='/genealogyHelpen.html'>Genealogy</a>: 
+    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>: 
+    <div style='clear: both;'></div>
+  </div>
+</body>
+</html>

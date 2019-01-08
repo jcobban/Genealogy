@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148153">
+    <option value="88_D">
+        Lincoln &amp; Niagara: Louth
+        <div id="1" reel="148153" frame="0" count="19"/>
+        <div id="2" reel="148153" frame="19" count="18"/>
+    </option>
+    <option value="88_E">
+        Lincoln &amp; Niagara: Merritton Village
+        <div id="" reel="148153" frame="37" count="37"/>
+    </option>
+    <option value="88_F">
+        Lincoln &amp; Niagara: Niagara
+        <div id="1" reel="148153" frame="74" count="23"/>
+        <div id="2" reel="148153" frame="97" count="16"/>
+    </option>
+    <option value="88_G">
+        Lincoln &amp; Niagara: Niagara Town
+        <div id="1" reel="148153" frame="113" count="11"/>
+        <div id="2" reel="148153" frame="124" count="9"/>
+        <div id="3" reel="148153" frame="133" count="10"/>
+    </option>
+    <option value="88_H">
+        Lincoln &amp; Niagara: Port Dalhousie Village
+        <div id="" reel="148153" frame="143" count="19"/>
+    </option>
+    <option value="88_I">
+        Lincoln &amp; Niagara: St. Catharines City
+        <div id="1" reel="148153" frame="162" count="21"/>
+        <div id="2" reel="148153" frame="183" count="42"/>
+        <div id="3" reel="148153" frame="225" count="26"/>
+        <div id="4" reel="148153" frame="251" count="38"/>
+        <div id="5" reel="148153" frame="289" count="42"/>
+        <div id="6" reel="148153" frame="331" count="30"/>
+    </option>
+    <option value="89_A">
+        London City: Ward 1
+        <div id="1" reel="148153" frame="361" count="7"/>
+        <div id="2" reel="148153" frame="368" count="18"/>
+        <div id="3" reel="148153" frame="386" count="18"/>
+        <div id="4" reel="148153" frame="404" count="9"/>
+        <div id="5" reel="148153" frame="413" count="21"/>
+        <div id="6" reel="148153" frame="434" count="22"/>
+    </option>
+    <option value="89_B">
+        London City: Ward 2
+        <div id="1" reel="148153" frame="456" count="16"/>
+        <div id="2" reel="148153" frame="472" count="32"/>
+        <div id="3" reel="148153" frame="504" count="17"/>
+        <div id="4" reel="148153" frame="521" count="11"/>
+        <div id="5" reel="148153" frame="532" count="11"/>
+        <div id="6" reel="148153" frame="543" count="16"/>
+        <div id="7" reel="148153" frame="559" count="10"/>
+    </option>
+    <option value="89_C">
+        London City: Ward 3
+        <div id="1" reel="148153" frame="569" count="22"/>
+        <div id="2" reel="148153" frame="591" count="18"/>
+        <div id="3" reel="148153" frame="609" count="18"/>
+        <div id="4" reel="148153" frame="627" count="19"/>
+        <div id="5" reel="148153" frame="646" count="20"/>
+        <div id="6" reel="148153" frame="666" count="24"/>
+        <div id="7" reel="148153" frame="690" count="19"/>
+    </option>
+    <option value="89_D">
+        London City: Ward 4
+        <div id="1" reel="148153" frame="709" count="15"/>
+        <div id="2" reel="148153" frame="724" count="23"/>
+        <div id="3" reel="148153" frame="747" count="21"/>
+        <div id="4" reel="148153" frame="768" count="14"/>
+        <div id="5" reel="148153" frame="782" count="12"/>
+        <div id="6" reel="148153" frame="794" count="18"/>
+    </option>
+</select>

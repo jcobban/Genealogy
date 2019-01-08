@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148137">
+    <option value="62_E">
+        Essex North: Sandwich West
+        <div id="1" reel="148137" frame="0" count="34"/>
+        <div id="2" reel="148137" frame="34" count="21"/>
+    </option>
+    <option value="62_F">
+        Essex North: Sandwich Town
+        <div id="1" reel="148137" frame="55" count="18"/>
+        <div id="2" reel="148137" frame="73" count="11"/>
+    </option>
+    <option value="62_G">
+        Essex North: Tilbury West
+        <div id="1" reel="148137" frame="84" count="59"/>
+        <div id="2" reel="148137" frame="143" count="45"/>
+    </option>
+    <option value="62_H">
+        Essex North: Tilbury Centre Village
+        <div id="" reel="148137" frame="188" count="5"/>
+    </option>
+    <option value="62_I">
+        Essex North: Walkerville Town
+        <div id="" reel="148137" frame="193" count="20"/>
+    </option>
+    <option value="62_J">
+        Essex North: Windsor Town
+        <div id="1" reel="148137" frame="213" count="27"/>
+        <div id="2" reel="148137" frame="240" count="48"/>
+        <div id="3" reel="148137" frame="288" count="22"/>
+        <div id="4" reel="148137" frame="310" count="27"/>
+        <div id="5" reel="148137" frame="337" count="47"/>
+        <div id="6" reel="148137" frame="384" count="43"/>
+    </option>
+    <option value="63_A">
+        Essex South: Amherstburg Town
+        <div id="1" reel="148137" frame="427" count="30"/>
+        <div id="2" reel="148137" frame="457" count="18"/>
+    </option>
+    <option value="63_B">
+        Essex South: Anderdon
+        <div id="1" reel="148137" frame="475" count="23"/>
+        <div id="2" reel="148137" frame="498" count="25"/>
+    </option>
+    <option value="63_C">
+        Essex South: Colchester North
+        <div id="1" reel="148137" frame="523" count="19"/>
+        <div id="2" reel="148137" frame="542" count="18"/>
+    </option>
+    <option value="63_D">
+        Essex South: Colchester South
+        <div id="1" reel="148137" frame="560" count="25"/>
+        <div id="2" reel="148137" frame="585" count="18"/>
+        <div id="3" reel="148137" frame="603" count="18"/>
+    </option>
+    <option value="63_E">
+        Essex South: Essex Centre Village
+        <div id="1" reel="148137" frame="621" count="18"/>
+        <div id="2" reel="148137" frame="639" count="18"/>
+    </option>
+    <option value="63_F">
+        Essex South: Gosfield
+        <div id="1" reel="148137" frame="657" count="20"/>
+        <div id="2" reel="148137" frame="677" count="26"/>
+        <div id="3" reel="148137" frame="703" count="20"/>
+    </option>
+</select>

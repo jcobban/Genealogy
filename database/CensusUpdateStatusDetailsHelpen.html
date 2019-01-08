@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Census Transcription Status: Help</title>
+    <meta http-equiv=Content-Type content="text/html; charset=utf8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  History:			                                                *
+ *                                                                      *
+ *	    2011/05/18	    created			                                *
+ *	    2011/12/17	    minor revision			                        *
+ *	        		    document optional display of proofreader id		*
+ *	    2012/07/31	    document display of linkages to family tree		*
+ *	    2013/12/28	    use CSS for layout			                    *
+ *      2018/11/08      document parameters                             *
+ *                      standardize help links                          *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  <body>
+	<div class="topcrumbs">
+	  <a href="/indexHelpen.html">Home</a>: 
+	  <a href="/genealogyHelpen.html">Genealogy</a>: 
+	  <a href="/Canada/genCanadaHelpen.html">Canada</a>: 
+	  <a href="/database/genCensusesHelpen.html">Censuses</a>: 
+	  <a href="/database/CensusUpdateStatusHelpen.html">Status</a>: 
+	  <a href="/database/CensusUpdateStatusDistHelpen.html">District</a>: 
+	</div>
+	<div class="help">
+	  <h1>Census Transcription Status: Division Level Help</h1>
+	  <p>This page displays a summary of progress on the
+	transcription of a particular division of a census of Canada.
+      <p>The specific division is identified by parameters passed
+        as part of the URL.  The following parameters are supported:
+        <table>
+		  <tr>
+              <th class="left">Census</th>
+              <td>
+                  The identifier of the census, including the country code.
+                  For example Census=CA1881 for the 1881 census of 
+                  Canada.
+              </td>
+          </tr>
+		  <tr>
+              <th class="left">Province</th>
+              <td>If the census identifier specifies a country level
+                  identifier for a census which was performed separately 
+                  for each component province then the identifier of the 
+                  province must be specified.  For example Census=CA1861
+                  identifies the British Imperial Census of 1861 as it
+                  applies to the colonies in British North America
+                  and therefore the individual colony must be identified
+                  by this parameter, for example Province=CE for Canada East.
+                  Census=CW1861 identifies explicitly the census of
+                  Canada West and therefore does not require the
+                  Province parameter, and it it is specified it is ignored.
+              </td>
+          </tr>
+		  <tr>
+              <th class="left">District</th>
+              <td>The district number within the census.
+              </td>
+          </tr>
+		  <tr>
+              <th class="left">SubDistrict</th>
+              <td>The sub-district letter or number within the district.
+              </td>
+          </tr>
+		  <tr>
+              <th class="left">Division</th>
+              <td>The enumeration division within the sub-district
+                  if the sub-district is divided.
+              </td>
+          </tr>
+		  <tr>
+              <th class="left">ShowProofreader</th>
+              <td>If 'true' show the user identifier of the page proofreader
+                  in a column
+              </td>
+          </tr>
+		  <tr>
+              <th class="left">lang</th>
+              <td>The ISO code for the preferred language of the client,
+                  for example "en".
+              </td>
+          </tr>
+        </table>
+	  <p>For each page in the division this displays:
+	  <p><img src="PageStatus.png" alt="Status of an individual census page">
+	  <ol>
+	    <li>The page number.
+	    <li>The number of individuals transcribed so far within the page.
+	    <li>The percentage completion.  This field is color-coded running
+            from dark red for no work done so far through to bright green
+            for 100% completion.
+		    This percentage incorporates more than one column of the
+            transcription.  A page for which only the first part
+		    of the line, including the name of the individual,
+            has been transcribed will show 50% complete even though
+            the total done count shows that every line has been transcribed.
+	    <li>The percentage of entries linked to the family tree.  This is
+		    also color-coded in the same way.
+	    <li>The user identifier of the transcriber.
+	    <li>If requested the user identifier of the proofreader.
+	    <li>A button to display the form for "View"ing, or "Update"ing 
+            if you are authorized, all of the fields in the specific page.
+	  </ol>
+	  <p>At the bottom of the table the total number of individuals transcribed
+	    in this district is displayed, along with the total number
+        of individuals enumerated within the district, and
+	    the color-coded percentage completion for the district.
+	  </p>
+	  <p>A button to enable or disable the optional display of
+        the user identifier of the proofreader.
+	  </p>
+	</div> <!-- body -->
+	<div class="botcrumbs">
+	  <span class="right">
+	    <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+	  </span>
+	  <a href="/contactAuthor.php?subject=QueryDetail1861Helpen.html" target="_blank">
+		Contact Author</a>
+	  <br/>
+	  <a href="/indexHelpen.html">Home</a>: 
+	  <a href="/genealogyHelpen.html">Genealogy</a>: 
+	  <a href="/database//genCensusesHelpen.html">Censuses</a>: 
+	  <a href="/database/CensusUpdateStatusHelpen.html">Status</a>: 
+	  <a href="/database/CensusUpdateStatusDistHelpen.html">District</a>: 
+	  <span style="clear: both;"></span>
+	</div>
+  </body>
+</html>

@@ -1,0 +1,317 @@
+<!--*********************************************************************
+ *  DeathRegQueryen.html												*
+ *																		*
+ *  Template for displaying a Death Registration Query.					*
+ *																		*
+ *  History:															*
+ *		2017/11/24		created											*
+ *		2018/02/03		change breadcrumbs to new standard				*
+ *		2018/02/18		change heading to <h1> so class FtTemplate		*
+ *						picks up the heading							*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ ************************************************************************-->
+<link rel="stylesheet" type="text/css" href="/Ontario/DeathRegQuery.css">
+<div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php">Genealogy</a>: 
+    <a href='/Canada/CountriesEdit.php?lang=$LANG'>
+		    List of Supported Countries
+    </a>:
+    <a href="/genCountry.php?cc=CA">Canada</a>:
+    <a href="/Canada/genProvince.php?Domain=CAON">Ontario</a>:
+</div>
+<div class="body">
+  <h1>
+		$COUNTRYNAME: $PROVINCENAME: Death Registration Query
+      <span class="right">
+		<a href="/Ontario/DeathRegQueryHelpen.html" target="help">? Help</a>
+      </span>
+    <div style="clear: both;"></div>
+  </h1>
+  <p class="message" id="msgCell"></p>
+  <form action="/Ontario/DeathRegResponse.php" method="GET"
+		  name="distForm" id="distForm">
+    <div class="row">
+      <div class="column1">
+       <div style="float: left;">
+		<label class="labelSmall" for="RegYear">
+		  Identification: Year:
+		</label>
+		<input name="RegYear" id="RegYear" type="text" value="$REGYEAR"
+			  class="white right" size="3" maxlength="4"/>
+       </div>
+       <div style="float: left;">
+		<label class="labelSmall5em" for="RegNum">
+		  Number:
+		</label>
+		<input name="RegNum" id="RegNum" type="text" value="$REGNUM"
+			  class="white right" size="4" maxlength="6"/>
+       </div>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="Limit">
+		  Limit:
+		</label>
+		<input name="Limit" id="Limit" type="text"
+			  class="white right" size="6" maxlength="6" value="20"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="RegRow">
+      <div class="column1">
+		<label class="labelSmall" for="RegCounty">
+		  Registration: County:
+		</label>
+		<select name="RegCounty" id="RegCounty" size="1" class="white leftwide">
+		</select>
+      </div>
+      <div class="column2" id="TwpCell">
+		<label class="labelSmall8em" for="RegTownship">	
+		  Township:
+		</label>
+		<!-- the  following is replaced by a selection if the XML file 
+		  for the county exists -->
+		<input name="RegTownship" id="RegTownship" type="text"
+			  class="white left" size="20" maxlength="40"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="GivenNames">
+		  Name: Given:
+		</label>
+		<input name="GivenNames" id="GivenNames" type="text"
+			  class="white left" size="20" maxlength="48"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="Surname">
+		  Family:
+		</label>
+		<input name="Surname" id="Surname" type="text"
+			  class="white left" size="20" maxlength="32"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall5em" for="SurnameSoundex">
+		  Soundex:
+		</label>
+		<input type="checkbox" name="SurnameSoundex" id="SurnameSoundex" 
+			  value="yes"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="Sex">
+		  Sex:
+		</label>
+		    <select name="Sex" id="Sex" size="1" class="white left">
+		  <option value="M">Male</option>
+		  <option value="F">Female</option>
+		  <option value="?" selected="yes">Unreported</option>
+		</select>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="MarStat">
+		  Marital Status:
+		</label>
+		    <select name="MarStat" id="MarStat" size="1" class="white left">
+		  <option value="S">Single</option>
+		  <option value="M">Married</option>
+		  <option value="W">Widowed</option>
+		  <option value="D">Divorced</option>
+		  <option value="?" selected="yes">Unreported</option>
+		</select>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="Date">
+		  Death Date:
+		</label>
+		<input name="Date" id="Date" type="text"
+			  class="white left" size="10" maxlength="16"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="Place">
+		  Death Place:
+		</label>
+		<input name="Place" id="Place" type="text"
+			  class="white left" size="10" maxlength="16"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="Occupation">
+		  Occupation:
+		</label>
+		<input name="Occupation" id="Occupation" type="text"
+			  class="white left" size="20" maxlength="60"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="Religion">
+		  Religion:
+		</label>
+		<input name="Religion" id="Religion" type="text"
+			  class="white left" size="20" maxlength="32"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="BirthPlace">
+		  Birth Place:
+		</label>
+		<input name="BirthPlace" id="BirthPlace" type="text"
+			  class="white left" size="20" maxlength="60"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="BirthDate">
+		  Birth Date:
+		</label>
+		<input name="BirthDate" id="BirthDate" type="text"
+			  class="white left" size="10" maxlength="16"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="Cause">
+		  Cause:
+		</label>
+		<input name="Cause" id="Cause" type="text"
+			  class="white left" size="20" maxlength="64"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="Duration">
+		  Duration:
+		</label>
+		<input name="Duration" id="Duration" type="text"
+			  class="white left" size="10" maxlength="16"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="Phys">
+		  Physician:
+		</label>
+		<input name="Phys" id="Phys" type="text"
+			  class="white left" size="10" maxlength="48"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="Informant">
+		  Informant: Name:
+		</label>
+		<input name="Informant" id="Informant" type="text"
+			  class="white left" size="20" maxlength="48"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="InfRel">
+		  Relation:
+		</label>
+		<select name="InfRel" id="InfRel" size="1" class="white leftwide">
+		  <option value="Physician">Physician</option>
+		  <option value="Father">Father</option>
+		  <option value="Mother">Mother</option>
+		  <option value="Son">Son</option>
+		  <option value="Daughter">Daughter</option>
+		  <option value="Uncle">Uncle</option>
+		  <option value="Aunt">Aunt</option>
+		  <option value="Grand-Father">Grand-Father</option>
+		  <option value="Grand-Mother">Grand-Mother</option>
+		  <option value="Nephew">Nephew</option>
+		  <option value="Niece">Niece</option>
+		  <option value="?" selected="yes">Other/Unrelated</option>
+		</select>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="InfOcc">
+		  Informant: Occupation:
+		</label>
+		<input name="InfOcc" id="InfOcc" type="text"
+			  class="white left" size="20" maxlength="16"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="InfRes">
+		  Residence:
+		</label>
+		<input name="InfRes" id="InfRes" type="text"
+			  class="white left" size="20" maxlength="32"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="FatherName">
+		  Father: Name:
+		</label>
+		<input name="FatherName" id="FatherName" type="text"
+			  class="white left" size="20" maxlength="48"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="FatherBPlce">
+		  Birth place:
+		</label>
+		<input name="FatherBPlce" id="FatherBPlce" type="text"
+			  class="white left" size="20" maxlength="32"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="MotherName">
+		  Mother: Name:
+		</label>
+		<input name="MotherName" id="MotherName" type="text"
+			  class="white left" size="20" maxlength="48"/>
+      </div>
+      <div class="column2">
+		<label class="labelSmall8em" for="MotherBPlce">
+		  Birth place:
+		</label>
+		<input name="MotherBPlce" id="MotherBPlce" type="text"
+			  class="white left" size="20" maxlength="32"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+		<label class="labelSmall" for="HusbandName">
+		  Husband's Name:
+		</label>
+		<input name="HusbandName" id="HusbandName" type="text"
+			  class="white left" size="20" maxlength="48"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <p>
+      <button type="submit" id="Query">Query</button>
+		  &nbsp;
+      <button type="reset" id="Reset">Clear Form</button>
+		  &nbsp;
+      <button type="button" id="ShowStatus">Transcription Status</button>
+      <!-- Specify to query death registrations from Ontario, Canada -->
+		<input name="RegDomain" id="RegDomain" type="hidden" value="$DOMAIN">
+		<input name="Offset" id="Offset" type="hidden" value="0">
+    </p>
+  </form>
+</div>
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/Ontario.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="/Ontario/DeathRegQuery.js" type="text/javascript">
+    </script>

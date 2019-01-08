@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148157">
+    <option value="95_M">
+        Muskoka &amp; Parry Sound: Humphrey, Watt, &amp; Cardwell
+        <div id="" reel="148157" frame="0" count="38"/>
+    </option>
+    <option value="95_N">
+        Muskoka &amp; Parry Sound: Huntsville Village
+        <div id="" reel="148157" frame="38" count="25"/>
+    </option>
+    <option value="95_O">
+        Muskoka &amp; Parry Sound: Joly, Strong, &amp; Sundridge Village
+        <div id="" reel="148157" frame="63" count="34"/>
+    </option>
+    <option value="95_P">
+        Muskoka &amp; Parry Sound: Laurier, Machar, &amp; Lount
+        <div id="" reel="148157" frame="97" count="25"/>
+    </option>
+    <option value="95_Q">
+        Muskoka &amp; Parry Sound: McDougall, Parry Island &amp; Parry Sound Town
+        <div id="" reel="148157" frame="122" count="48"/>
+    </option>
+    <option value="95_R">
+        Muskoka &amp; Parry Sound: McKellar &amp; Hagerman
+        <div id="" reel="148157" frame="170" count="25"/>
+    </option>
+    <option value="95_S">
+        Muskoka &amp; Parry Sound: Monteith, Spence, &amp; Christie
+        <div id="" reel="148157" frame="195" count="21"/>
+    </option>
+    <option value="95_T">
+        Muskoka &amp; Parry Sound: Stisted &amp; McMurrich
+        <div id="" reel="148157" frame="216" count="28"/>
+    </option>
+    <option value="95.5_A">
+        Nipissing: Cambden, Deacon, &amp; Fitzgerald
+        <div id="" reel="148157" frame="244" count="6"/>
+    </option>
+    <option value="95.5_B">
+        Nipissing: Mattawa Village
+        <div id="" reel="148157" frame="250" count="32"/>
+    </option>
+    <option value="95.5_C">
+        Nipissing: Papineau &amp; Mattawa
+        <div id="" reel="148157" frame="282" count="15"/>
+    </option>
+    <option value="95.5_D">
+        Nipissing: Calvin, Lauder, Ballantyne, Wilkes, Pentland, Paxton, Biggar, Olser, Lyster, &amp; Boyd
+        <div id="" reel="148157" frame="297" count="12"/>
+    </option>
+    <option value="95.5_E">
+        Nipissing: Bonfield, Chisholom, Boulter, &amp; Ferris
+        <div id="" reel="148157" frame="309" count="47"/>
+    </option>
+    <option value="95.5_F">
+        Nipissing: North Bay Town, Widdifield, Phelps, &amp; Olrig
+        <div id="" reel="148157" frame="356" count="45"/>
+    </option>
+    <option value="95.5_G">
+        Nipissing: Nipissing, Nipissing Reserbe, Springer, Field, Badgerow, &amp; Caldwell
+        <div id="" reel="148157" frame="401" count="31"/>
+    </option>
+    <option value="95.5_H">
+        Nipissing: Kirkpatrick, Hugel, Ratter, &amp; Dunnett
+        <div id="" reel="148157" frame="432" count="12"/>
+    </option>
+    <option value="95.5_I">
+        Nipissing: Appleby, hagar, Awrey, Hawley, Dryden, Dill, &amp; Nelson
+        <div id="" reel="148157" frame="444" count="5"/>
+    </option>
+    <option value="95.5_J">
+        Nipissing: Blezard, McKin, Sudbury, &amp; Broder
+        <div id="" reel="148157" frame="449" count="50"/>
+    </option>
+    <option value="95.5_K">
+        Nipissing: Finlayson &amp; Peck
+        <div id="" reel="148157" frame="499" count="5"/>
+    </option>
+    <option value="95.5_L">
+        Nipissing: Unorganized territory
+        <div id="" reel="148157" frame="504" count="9"/>
+    </option>
+    <option value="96_A">
+        Norfolk North: Dereham
+        <div id="1" reel="148157" frame="513" count="21"/>
+        <div id="2" reel="148157" frame="534" count="19"/>
+        <div id="3" reel="148157" frame="553" count="18"/>
+        <div id="4" reel="148157" frame="571" count="26"/>
+    </option>
+    <option value="96_B">
+        Norfolk North: Middleton
+        <div id="1" reel="148157" frame="597" count="15"/>
+        <div id="2" reel="148157" frame="612" count="30"/>
+        <div id="3" reel="148157" frame="642" count="27"/>
+    </option>
+    <option value="96_C">
+        Norfolk North: Tilsonburg Town
+        <div id="" reel="148157" frame="669" count="44"/>
+    </option>
+    <option value="96_D">
+        Norfolk North: Townsend
+        <div id="1" reel="148157" frame="713" count="21"/>
+        <div id="2" reel="148157" frame="734" count="25"/>
+        <div id="3" reel="148157" frame="759" count="23"/>
+        <div id="4" reel="148157" frame="782" count="24"/>
+    </option>
+</select>

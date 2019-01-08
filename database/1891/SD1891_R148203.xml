@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148203">
+    <option value="162_C">
+        Laval: St. Martin
+        <div id="2" reel="148203" frame="0" count="20"/>
+        <div id="3" reel="148203" frame="20" count="19"/>
+    </option>
+    <option value="162_D">
+        Laval: Ste. Rose
+        <div id="1" reel="148203" frame="39" count="15"/>
+        <div id="2" reel="148203" frame="54" count="17"/>
+    </option>
+    <option value="162_E">
+        Laval: Ste. Rose Village
+        <div id="" reel="148203" frame="71" count="22"/>
+    </option>
+    <option value="162_F">
+        Laval: St. Vincent de Paul
+        <div id="1" reel="148203" frame="93" count="28"/>
+        <div id="2" reel="148203" frame="121" count="12"/>
+        <div id="3" reel="148203" frame="133" count="13"/>
+    </option>
+    <option value="163_A">
+        Lévis: Bienville Village
+        <div id="" reel="148203" frame="146" count="18"/>
+    </option>
+    <option value="163_B">
+        Lévis: Lauzon Village
+        <div id="1" reel="148203" frame="164" count="34"/>
+        <div id="2" reel="148203" frame="198" count="39"/>
+    </option>
+    <option value="163_C">
+        Lévis: Lévis City
+        <div id="1" reel="148203" frame="237" count="83"/>
+        <div id="2" reel="148203" frame="320" count="44"/>
+        <div id="3" reel="148203" frame="364" count="24"/>
+    </option>
+    <option value="163_D">
+        Lévis: Nôtre-Dame de la Victoire
+        <div id="" reel="148203" frame="388" count="31"/>
+    </option>
+    <option value="163_E">
+        Lévis: St. David de l'Auberivière
+        <div id="" reel="148203" frame="419" count="14"/>
+    </option>
+    <option value="163_F">
+        Lévis: St. Étienne de Lauzon
+        <div id="" reel="148203" frame="433" count="18"/>
+    </option>
+    <option value="163_G">
+        Lévis: St. Henri de Lauzon
+        <div id="1" reel="148203" frame="451" count="34"/>
+        <div id="2" reel="148203" frame="485" count="13"/>
+    </option>
+    <option value="163_H">
+        Lévis: St. Jean Chrysostôme
+        <div id="1" reel="148203" frame="498" count="19"/>
+        <div id="2" reel="148203" frame="517" count="19"/>
+    </option>
+    <option value="163_I">
+        Lévis: St. Joseph
+        <div id="" reel="148203" frame="536" count="8"/>
+    </option>
+    <option value="163_J">
+        Lévis: St. Lambert de Lauzon
+        <div id="1" reel="148203" frame="544" count="16"/>
+        <div id="2" reel="148203" frame="560" count="15"/>
+    </option>
+    <option value="163_K">
+        Lévis: St. Nicholas
+        <div id="" reel="148203" frame="575" count="37"/>
+    </option>
+    <option value="163_L">
+        Lévis: St. Romuald d'Étchemin
+        <div id="" reel="148203" frame="612" count="72"/>
+    </option>
+    <option value="163_M">
+        Lévis: St. Télesphore
+        <div id="" reel="148203" frame="684" count="6"/>
+    </option>
+    <option value="164_A">
+        L'Islet: St. Damase
+        <div id="" reel="148203" frame="690" count="13"/>
+    </option>
+    <option value="164_B">
+        L'Islet: Elgin &amp; Taché
+        <div id="" reel="148203" frame="703" count="12"/>
+    </option>
+    <option value="164_C">
+        L'Islet: L'Islet
+        <div id="1" reel="148203" frame="715" count="18"/>
+        <div id="2" reel="148203" frame="733" count="35"/>
+    </option>
+    <option value="164_D">
+        L'Islet: St. Aubert
+        <div id="1" reel="148203" frame="768" count="19"/>
+    </option>
+</select>

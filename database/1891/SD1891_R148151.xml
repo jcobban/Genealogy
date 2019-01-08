@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148151">
+    <option value="84_A">
+        Lanark South: Bathurst
+        <div id="1" reel="148151" frame="0" count="20"/>
+        <div id="2" reel="148151" frame="20" count="18"/>
+        <div id="3" reel="148151" frame="38" count="10"/>
+        <div id="4" reel="148151" frame="48" count="12"/>
+    </option>
+    <option value="84_B">
+        Lanark South: Beckwith
+        <div id="1" reel="148151" frame="60" count="17"/>
+        <div id="2" reel="148151" frame="77" count="18"/>
+    </option>
+    <option value="84_C">
+        Lanark South: Burgess North
+        <div id="" reel="148151" frame="95" count="23"/>
+    </option>
+    <option value="84_D">
+        Lanark South: Carleton Place Village
+        <div id="1" reel="148151" frame="118" count="34"/>
+        <div id="2" reel="148151" frame="152" count="31"/>
+        <div id="3" reel="148151" frame="183" count="27"/>
+    </option>
+    <option value="84_E">
+        Lanark South: Drummond
+        <div id="1" reel="148151" frame="210" count="10"/>
+        <div id="2" reel="148151" frame="220" count="12"/>
+        <div id="3" reel="148151" frame="232" count="12"/>
+        <div id="4" reel="148151" frame="244" count="12"/>
+    </option>
+    <option value="84_F">
+        Lanark South: Elmsley North
+        <div id="" reel="148151" frame="256" count="25"/>
+    </option>
+    <option value="84_G">
+        Lanark South: Montague
+        <div id="1" reel="148151" frame="281" count="15"/>
+        <div id="2" reel="148151" frame="296" count="20"/>
+        <div id="3" reel="148151" frame="316" count="14"/>
+    </option>
+    <option value="84_H">
+        Lanark South: Perth Town
+        <div id="1" reel="148151" frame="330" count="25"/>
+        <div id="2" reel="148151" frame="355" count="18"/>
+        <div id="3" reel="148151" frame="373" count="22"/>
+    </option>
+    <option value="84_I">
+        Lanark South: Sherbrooke South
+        <div id="1" reel="148151" frame="395" count="9"/>
+        <div id="2" reel="148151" frame="404" count="13"/>
+    </option>
+    <option value="85_A">
+        Leeds &amp; Grenville: Elmsley South
+        <div id="" reel="148151" frame="417" count="21"/>
+    </option>
+    <option value="85_B">
+        Leeds &amp; Grenville: Gower South
+        <div id="" reel="148151" frame="438" count="20"/>
+    </option>
+    <option value="85_C">
+        Leeds &amp; Grenville: Kemptville Village
+        <div id="" reel="148151" frame="458" count="26"/>
+    </option>
+    <option value="85_D">
+        Leeds &amp; Grenville: Merrickville Village
+        <div id="" reel="148151" frame="484" count="22"/>
+    </option>
+    <option value="85_E">
+        Leeds &amp; Grenville: Oxford
+        <div id="1" reel="148151" frame="506" count="22"/>
+        <div id="2" reel="148151" frame="528" count="29"/>
+        <div id="3" reel="148151" frame="557" count="24"/>
+    </option>
+    <option value="85_F">
+        Leeds &amp; Grenville: Smiths Falls Town
+        <div id="1" reel="148151" frame="581" count="36"/>
+        <div id="2" reel="148151" frame="617" count="45"/>
+    </option>
+    <option value="85_G">
+        Leeds &amp; Grenville: Wolford
+        <div id="1" reel="148151" frame="662" count="17"/>
+        <div id="2" reel="148151" frame="679" count="30"/>
+    </option>
+    <option value="86_A">
+        Leeds South: Athens Village
+        <div id="" reel="148151" frame="709" count="19"/>
+    </option>
+    <option value="86_B">
+        Leeds South: Bastard &amp; Burgess South
+        <div id="1" reel="148151" frame="728" count="18"/>
+        <div id="2" reel="148151" frame="746" count="29"/>
+        <div id="3" reel="148151" frame="775" count="25"/>
+    </option>
+</select>

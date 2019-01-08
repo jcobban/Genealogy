@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148199">
+    <option value="154_Q">
+        Hochelaga: St. Gabriel Ward (Montréal)
+        <div id="4" reel="148199" frame="0" count="57"/>
+        <div id="5" reel="148199" frame="57" count="36"/>
+    </option>
+    <option value="154_R">
+        Hochelaga: St. Henri Town
+        <div id="1" reel="148199" frame="93" count="47"/>
+        <div id="2" reel="148199" frame="140" count="57"/>
+        <div id="3" reel="148199" frame="197" count="59"/>
+        <div id="4" reel="148199" frame="256" count="44"/>
+        <div id="5" reel="148199" frame="300" count="69"/>
+    </option>
+    <option value="154_S">
+        Hochelaga: St. Jean Baptiste Ward (Montréal)
+        <div id="1" reel="148199" frame="369" count="29"/>
+        <div id="2" reel="148199" frame="398" count="43"/>
+        <div id="3" reel="148199" frame="441" count="38"/>
+        <div id="4" reel="148199" frame="479" count="51"/>
+        <div id="5" reel="148199" frame="530" count="53"/>
+        <div id="6" reel="148199" frame="583" count="54"/>
+        <div id="7" reel="148199" frame="637" count="46"/>
+    </option>
+</select>

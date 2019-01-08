@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148190">
+    <option value="141_H">
+        Berthier: St. Damien
+        <div id="" reel="148190" frame="0" count="24"/>
+    </option>
+    <option value="141_I">
+        Berthier: St. Gabriel de Brandon
+        <div id="" reel="148190" frame="24" count="65"/>
+    </option>
+    <option value="141_J">
+        Berthier: St. Michel des Saints
+        <div id="" reel="148190" frame="89" count="13"/>
+    </option>
+    <option value="141_K">
+        Berthier: St. Norbert
+        <div id="" reel="148190" frame="102" count="31"/>
+    </option>
+    <option value="141_L">
+        Berthier: Visitation de l'Ile Dupas
+        <div id="" reel="148190" frame="133" count="28"/>
+    </option>
+    <option value="142_A">
+        Bonaventure: Carleton
+        <div id="" reel="148190" frame="161" count="23"/>
+    </option>
+    <option value="142_C">
+        Bonaventure: Hamilton East
+        <div id="" reel="148190" frame="184" count="24"/>
+    </option>
+    <option value="142_D">
+        Bonaventure: Hamilton West
+        <div id="" reel="148190" frame="208" count="25"/>
+    </option>
+    <option value="142_E">
+        Bonaventure: Hope East
+        <div id="" reel="148190" frame="233" count="27"/>
+    </option>
+    <option value="142_F">
+        Bonaventure: Hope West
+        <div id="" reel="148190" frame="260" count="18"/>
+    </option>
+    <option value="142_G">
+        Bonaventure: Mann &amp; Indian River
+        <div id="" reel="148190" frame="278" count="18"/>
+    </option>
+    <option value="142_H">
+        Bonaventure: Maria East
+        <div id="" reel="148190" frame="296" count="30"/>
+    </option>
+    <option value="142_I">
+        Bonaventure: Maria West
+        <div id="" reel="148190" frame="326" count="21"/>
+    </option>
+    <option value="142_J">
+        Bonaventure: Métapédia, Melekek &amp; Patapédia
+        <div id="" reel="148190" frame="347" count="27"/>
+    </option>
+    <option value="142_K">
+        Bonaventure: New Carlisle East &amp; West
+        <div id="" reel="148190" frame="374" count="21"/>
+    </option>
+    <option value="142_M">
+        Bonaventure: New Richmond East
+        <div id="" reel="148190" frame="395" count="17"/>
+    </option>
+    <option value="142_N">
+        Bonaventure: New Richmond West
+        <div id="" reel="148190" frame="412" count="27"/>
+    </option>
+    <option value="142_O">
+        Bonaventure: Nouvelle &amp; Shoolbred East
+        <div id="" reel="148190" frame="439" count="28"/>
+    </option>
+    <option value="142_P">
+        Bonaventure: Nouvelle &amp; Shoolbred West
+        <div id="" reel="148190" frame="467" count="17"/>
+    </option>
+    <option value="142_Q">
+        Bonaventure: Paspébiac East
+        <div id="" reel="148190" frame="484" count="18"/>
+    </option>
+    <option value="142_R">
+        Bonaventure: Paspébiac West
+        <div id="" reel="148190" frame="502" count="19"/>
+    </option>
+    <option value="142_S">
+        Bonaventure: Port Daniel East
+        <div id="" reel="148190" frame="521" count="27"/>
+    </option>
+    <option value="142_T">
+        Bonaventure: Port Daniel West
+        <div id="" reel="148190" frame="548" count="14"/>
+    </option>
+    <option value="142_U">
+        Bonaventure: Restigouche
+        <div id="" reel="148190" frame="562" count="13"/>
+    </option>
+    <option value="142_V">
+        Bonaventure: St. Charles de Caplan
+        <div id="1" reel="148190" frame="575" count="13"/>
+        <div id="2" reel="148190" frame="588" count="15"/>
+    </option>
+    <option value="143_A">
+        Brome: Bolton East
+        <div id="1" reel="148190" frame="603" count="12"/>
+        <div id="2" reel="148190" frame="615" count="20"/>
+        <div id="3" reel="148190" frame="635" count="20"/>
+    </option>
+    <option value="143_B">
+        Brome: Bolton West
+        <div id="" reel="148190" frame="655" count="19"/>
+    </option>
+    <option value="143_C">
+        Brome: Brome
+        <div id="1" reel="148190" frame="674" count="19"/>
+        <div id="2" reel="148190" frame="693" count="29"/>
+        <div id="3" reel="148190" frame="722" count="32"/>
+    </option>
+    <option value="143_D">
+        Brome: Farnham East
+        <div id="1" reel="148190" frame="754" count="25"/>
+        <div id="2" reel="148190" frame="779" count="20"/>
+    </option>
+</select>

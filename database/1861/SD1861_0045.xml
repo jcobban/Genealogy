@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="45">
+    <option value="482E">
+        St. Lawrence Ward
+    </option>
+    <option value="482A">
+        Cataraqui Ward
+    </option>
+    <option value="482B">
+        Frontenac Ward
+    </option>
+    <option value="482C">
+        Rideau Ward
+    </option>
+    <option value="482D">
+        Victoria Ward
+    </option>
+    <option value="482E">
+        Sydenham Ward
+    </option>
+    <option value="482F">
+        Congregational Nunnery
+    </option>
+</select>

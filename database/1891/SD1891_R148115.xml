@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148115">
+    <option value="31_V">
+        Digby: Weymouth
+        <div id="1" reel="148115" frame="0" count="17"/>
+        <div id="2" reel="148115" frame="17" count="26"/>
+    </option>
+    <option value="32_A">
+        Guysborough: Caledonia
+        <div id="" reel="148115" frame="43" count="6"/>
+    </option>
+    <option value="32_B">
+        Guysborough: Canso
+        <div id="" reel="148115" frame="49" count="37"/>
+    </option>
+    <option value="32_C">
+        Guysborough: Country Harbour
+        <div id="" reel="148115" frame="86" count="10"/>
+    </option>
+    <option value="32_D">
+        Guysborough: Crow Harbour
+        <div id="" reel="148115" frame="96" count="17"/>
+    </option>
+    <option value="32_E">
+        Guysborough: Forks St. Marys
+        <div id="" reel="148115" frame="113" count="18"/>
+    </option>
+    <option value="32_F">
+        Guysborough: Guysborough
+        <div id="" reel="148115" frame="131" count="32"/>
+    </option>
+    <option value="32_G">
+        Guysborough: Guysborough Intervale
+        <div id="" reel="148115" frame="163" count="20"/>
+    </option>
+    <option value="32_H">
+        Guysborough: Goshen
+        <div id="" reel="148115" frame="183" count="10"/>
+    </option>
+    <option value="32_I">
+        Guysborough: Indian Harbour
+        <div id="" reel="148115" frame="193" count="15"/>
+    </option>
+    <option value="32_J">
+        Guysborough: Isaacs Harbour
+        <div id="" reel="148115" frame="208" count="24"/>
+    </option>
+    <option value="32_K">
+        Guysborough: Larrys River
+        <div id="" reel="148115" frame="232" count="20"/>
+    </option>
+    <option value="32_L">
+        Guysborough: Liscombe
+        <div id="" reel="148115" frame="252" count="10"/>
+    </option>
+    <option value="32_M">
+        Guysborough: Manchester
+        <div id="" reel="148115" frame="262" count="27"/>
+    </option>
+    <option value="32_N">
+        Guysborough: Marie Joseph
+        <div id="" reel="148115" frame="289" count="13"/>
+    </option>
+    <option value="32_O">
+        Guysborough: Melford
+        <div id="" reel="148115" frame="302" count="33"/>
+    </option>
+    <option value="32_P">
+        Guysborough: New Harbour
+        <div id="" reel="148115" frame="335" count="8"/>
+    </option>
+    <option value="32_Q">
+        Guysborough: Salmon River
+        <div id="" reel="148115" frame="343" count="6"/>
+    </option>
+    <option value="32_R">
+        Guysborough: Sherbrooke
+        <div id="" reel="148115" frame="349" count="23"/>
+    </option>
+    <option value="32_S">
+        Guysborough: Tracadie
+        <div id="" reel="148115" frame="372" count="10"/>
+    </option>
+    <option value="32_T">
+        Guysborough: White Head
+        <div id="" reel="148115" frame="382" count="24"/>
+    </option>
+    <option value="33_A">
+        Halifax City: Ward 1
+        <div id="1" reel="148115" frame="406" count="39"/>
+        <div id="2" reel="148115" frame="445" count="37"/>
+        <div id="3" reel="148115" frame="482" count="37"/>
+        <div id="4" reel="148115" frame="519" count="18"/>
+        <div id="5" reel="148115" frame="537" count="47"/>
+    </option>
+    <option value="33_B">
+        Halifax City: Ward 2
+        <div id="1" reel="148115" frame="584" count="28"/>
+        <div id="2" reel="148115" frame="612" count="26"/>
+        <div id="3" reel="148115" frame="638" count="24"/>
+    </option>
+</select>

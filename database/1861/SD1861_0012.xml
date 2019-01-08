@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="12">
+    <option value="117">
+        Canboro
+    </option>
+    <option value="118">
+        Cayuga North
+    </option>
+    <option value="119">
+        Cayuga South
+    </option>
+    <option value="120">
+        Dunn
+    </option>
+    <option value="121">
+        Dunnville Village
+    </option>
+    <option value="122">
+        Moulton &amp; Shrebrooke
+    </option>
+    <option value="123">
+        Oneida
+    </option>
+    <option value="124">
+        Rainham
+    </option>
+    <option value="125">
+        Seneca
+    </option>
+    <option value="126">
+        Walpole
+    </option>
+</select>

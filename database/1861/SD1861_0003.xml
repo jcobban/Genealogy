@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="3">
+    <option value="23">
+        Southampton Village
+    </option>
+    <option value="24">
+        Fitzroy
+    </option>
+    <option value="25">
+        Gloucester
+    </option>
+    <option value="26">
+        Goulbourne
+    </option>
+    <option value="27">
+        North Gower
+    </option>
+    <option value="28">
+        Huntley
+    </option>
+    <option value="29">
+        Marlborough
+    </option>
+    <option value="30">
+        March
+    </option>
+    <option value="31">
+        Nepean
+    </option>
+    <option value="32">
+        Osgoode
+    </option>
+    <option value="33">
+        Richmond Village
+    </option>
+    <option value="34">
+        Torbolton
+    </option>
+</select>

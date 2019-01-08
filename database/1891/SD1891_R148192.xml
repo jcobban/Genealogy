@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148192">
+    <option value="145_M">
+        Champlain: St. Prosper
+        <div id="" reel="148192" frame="0" count="28"/>
+    </option>
+    <option value="145_N">
+        Champlain: St. Sévérin
+        <div id="" reel="148192" frame="28" count="22"/>
+    </option>
+    <option value="145_O">
+        Champlain: St. Stanislas
+        <div id="1" reel="148192" frame="50" count="22"/>
+        <div id="2" reel="148192" frame="72" count="34"/>
+    </option>
+    <option value="145_P">
+        Champlain: Ste. Thècle
+        <div id="1" reel="148192" frame="106" count="13"/>
+        <div id="2" reel="148192" frame="119" count="11"/>
+    </option>
+    <option value="145_Q">
+        Champlain: St. Tite
+        <div id="" reel="148192" frame="130" count="52"/>
+    </option>
+    <option value="145_R">
+        Champlain: Unorganized Territory
+        <div id="1" reel="148192" frame="182" count="10"/>
+        <div id="2" reel="148192" frame="192" count="7"/>
+        <div id="3" reel="148192" frame="199" count="5"/>
+    </option>
+    <option value="146_A">
+        Charlevoix: Baie St. Paul
+        <div id="1" reel="148192" frame="204" count="23"/>
+        <div id="2" reel="148192" frame="227" count="12"/>
+        <div id="3" reel="148192" frame="239" count="15"/>
+        <div id="4" reel="148192" frame="254" count="16"/>
+        <div id="5" reel="148192" frame="270" count="14"/>
+    </option>
+    <option value="146_B">
+        Charlevoix: Isle aux Coudres
+        <div id="" reel="148192" frame="284" count="19"/>
+    </option>
+    <option value="146_C">
+        Charlevoix: Les Éboulements
+        <div id="1" reel="148192" frame="303" count="15"/>
+        <div id="2" reel="148192" frame="318" count="22"/>
+        <div id="3" reel="148192" frame="340" count="18"/>
+    </option>
+    <option value="146_D">
+        Charlevoix: Malbaie
+        <div id="1" reel="148192" frame="358" count="29"/>
+        <div id="2" reel="148192" frame="387" count="24"/>
+        <div id="3" reel="148192" frame="411" count="15"/>
+    </option>
+    <option value="146_E">
+        Charlevoix: Petite Rivière
+        <div id="" reel="148192" frame="426" count="19"/>
+    </option>
+    <option value="146_F">
+        Charlevoix: Point au Pic Village
+        <div id="" reel="148192" frame="445" count="10"/>
+    </option>
+    <option value="146_G">
+        Charlevoix: Ste. Agnes
+        <div id="1" reel="148192" frame="455" count="17"/>
+        <div id="2" reel="148192" frame="472" count="21"/>
+    </option>
+    <option value="146_H">
+        Charlevoix: Ste. Fidèle
+        <div id="" reel="148192" frame="493" count="22"/>
+    </option>
+    <option value="146_I">
+        Charlevoix: St. Hilarion
+        <div id="" reel="148192" frame="515" count="23"/>
+    </option>
+    <option value="146_J">
+        Charlevoix: St. Irenée
+        <div id="" reel="148192" frame="538" count="24"/>
+    </option>
+    <option value="146_K">
+        Charlevoix: St. Simeon
+        <div id="" reel="148192" frame="562" count="20"/>
+    </option>
+    <option value="146_L">
+        Charlevoix: St. Urbain
+        <div id="" reel="148192" frame="582" count="24"/>
+    </option>
+    <option value="147_A">
+        Chateauguay: St. Antoine Abbé
+        <div id="" reel="148192" frame="606" count="14"/>
+    </option>
+    <option value="147_B">
+        Chateauguay: St. Clothilde
+        <div id="" reel="148192" frame="620" count="18"/>
+    </option>
+    <option value="147_C">
+        Chateauguay: St. Jean Chrysostôme
+        <div id="" reel="148192" frame="638" count="55"/>
+    </option>
+    <option value="147_D">
+        Chateauguay: St. Joachim
+        <div id="" reel="148192" frame="693" count="37"/>
+    </option>
+</select>

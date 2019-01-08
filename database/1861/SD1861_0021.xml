@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="21">
+    <option value="228">
+        Caistor
+    </option>
+    <option value="229">
+        Clinton
+    </option>
+    <option value="230">
+        Gainsborough
+    </option>
+    <option value="231">
+        Grantham
+    </option>
+    <option value="232">
+        Grimsby
+    </option>
+    <option value="233">
+        Louth
+    </option>
+    <option value="234">
+        Niagara
+    </option>
+    <option value="235">
+        Niagara Town
+    </option>
+    <option value="236">
+        St. Catharines Town
+    </option>
+    <option value="236A">
+        Agricultural Census
+    </option>
+</select>

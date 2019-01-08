@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148117">
+    <option value="34_J">
+        Halifax County: Hammonds Plains
+        <div id="" reel="148117" frame="0" count="14"/>
+    </option>
+    <option value="34_K">
+        Halifax County: Sackville
+        <div id="" reel="148117" frame="14" count="19"/>
+    </option>
+    <option value="34_L">
+        Halifax County: Waverley
+        <div id="" reel="148117" frame="33" count="21"/>
+    </option>
+    <option value="34_M">
+        Halifax County: Gays River
+        <div id="" reel="148117" frame="54" count="15"/>
+    </option>
+    <option value="34_N">
+        Halifax County: Meaghers Grant
+        <div id="" reel="148117" frame="69" count="11"/>
+    </option>
+    <option value="34_O">
+        Halifax County: Musquodoboit Middle
+        <div id="" reel="148117" frame="80" count="22"/>
+    </option>
+    <option value="34_P">
+        Halifax County: Upper Musquodoboit
+        <div id="" reel="148117" frame="102" count="25"/>
+    </option>
+    <option value="34_Q">
+        Halifax County: Lower Prospect
+        <div id="" reel="148117" frame="127" count="12"/>
+    </option>
+    <option value="34_R">
+        Halifax County: Smiths Cove
+        <div id="" reel="148117" frame="139" count="16"/>
+    </option>
+    <option value="34_S">
+        Halifax County: Sheet Harbour
+        <div id="" reel="148117" frame="155" count="32"/>
+    </option>
+    <option value="34_T">
+        Halifax County: Spry Bay
+        <div id="" reel="148117" frame="187" count="17"/>
+    </option>
+    <option value="34_U">
+        Halifax County: Tangiers Bay
+        <div id="" reel="148117" frame="204" count="21"/>
+    </option>
+    <option value="34_V">
+        Halifax County: Ship Harbour
+        <div id="" reel="148117" frame="225" count="16"/>
+    </option>
+    <option value="34_W">
+        Halifax County: Jeddore
+        <div id="" reel="148117" frame="241" count="23"/>
+    </option>
+    <option value="34_X">
+        Halifax County: Chezzetcook West
+        <div id="" reel="148117" frame="264" count="26"/>
+    </option>
+    <option value="34_Y">
+        Halifax County: Seaforth
+        <div id="" reel="148117" frame="290" count="7"/>
+    </option>
+    <option value="34_Z">
+        Halifax County: Lawrencetown
+        <div id="" reel="148117" frame="297" count="9"/>
+    </option>
+    <option value="34_AA">
+        Halifax County: Preston
+        <div id="" reel="148117" frame="306" count="18"/>
+    </option>
+    <option value="34_BB">
+        Halifax County: Dartmouth Town
+        <div id="1" reel="148117" frame="324" count="29"/>
+        <div id="2" reel="148117" frame="353" count="28"/>
+        <div id="3" reel="148117" frame="381" count="41"/>
+        <div id="4" reel="148117" frame="422" count="11"/>
+        <div id="5" reel="148117" frame="433" count="24"/>
+    </option>
+    <option value="34_CC">
+        Halifax County: Ingram River
+        <div id="" reel="148117" frame="457" count="14"/>
+    </option>
+    <option value="34_DD">
+        Halifax County: Hubbards Cove
+        <div id="" reel="148117" frame="471" count="11"/>
+    </option>
+    <option value="34_EE">
+        Halifax County: Eastern Passage
+        <div id="" reel="148117" frame="482" count="20"/>
+    </option>
+    <option value="34_FF">
+        Halifax County: Salmon River
+        <div id="" reel="148117" frame="502" count="19"/>
+    </option>
+    <option value="34_GG">
+        Halifax County: Little River
+        <div id="" reel="148117" frame="521" count="7"/>
+    </option>
+    <option value="34_HH">
+        Halifax County: Chezzetcook East
+        <div id="" reel="148117" frame="528" count="21"/>
+    </option>
+    <option value="34_II">
+        Halifax County: Musquodoboit Harbour
+        <div id="" reel="148117" frame="549" count="18"/>
+    </option>
+    <option value="34_JJ">
+        Halifax County: Dover
+        <div id="" reel="148117" frame="567" count="14"/>
+    </option>
+    <option value="34_KK">
+        Halifax County: Porters Lake
+        <div id="" reel="148117" frame="581" count="6"/>
+    </option>
+    <option value="35_A">
+        Hants: Avondale
+        <div id="" reel="148117" frame="587" count="18"/>
+    </option>
+    <option value="35_B">
+        Hants: Brooklyn
+        <div id="" reel="148117" frame="605" count="22"/>
+    </option>
+    <option value="35_C">
+        Hants: Burlington
+        <div id="" reel="148117" frame="627" count="14"/>
+    </option>
+    <option value="35_D">
+        Hants: Currys Corner
+        <div id="" reel="148117" frame="641" count="19"/>
+    </option>
+    <option value="35_E">
+        Hants: Falmouth
+        <div id="" reel="148117" frame="660" count="18"/>
+    </option>
+</select>

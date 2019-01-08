@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.1.4  (Win32)">
+	<META NAME="AUTHOR" CONTENT="James Cobban">
+	<META NAME="CREATED" CONTENT="20050730;16302299">
+	<META NAME="CHANGEDBY" CONTENT="James Cobban">
+	<META NAME="CHANGED" CONTENT="20050731;13034706">
+	<STYLE>
+	<!--
+		P.sdfootnote { margin-left: 0.2in; text-indent: -0.2in; margin-bottom: 0in; font-size: 10pt }
+		A.sdfootnoteanc { font-size: 57% }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P>There are several characteristics which determine the suitability
+of a physical layer implementation to a particular application.</P>
+<H2>Delay</H2>
+<P>Delay is the time it takes for each bit of information to reach
+the other end of the medium. For example if you send the information
+by surface mail the delay is typically two to three days within North
+America. If you send the information by courier the delay is several
+hours. If you use sound to transmit the message, as has been done by
+the yodelers of Switzerland or the whistling shepherds of the Canary
+Islands, the delay is about 3 seconds per kilometer. If you use
+electromagnetic radiation, including signals in an electrically
+conductive wire, radio waves, or optical signals, then the delay is 3
+to 5 microseconds per kilometer, plus delays through electronic
+components along the route.</P>
+<P>The delay increases with distance. For example the delay in a
+copper wire stretching 5,000 km is about 25 milliseconds. The delay
+in a radio signal sent between two ground stations via a satellite in
+geo-synchronous orbit is about <FONT FACE="Times New Roman, serif">&frac14;</FONT>
+second.</P>
+<H2>Bandwidth</H2>
+<P>Bandwidth, expressed in Hz (sec<SUP>-1</SUP>), is the range of
+frequencies which the transmission channel can carry. This
+restriction may be a consequence of the physical nature of the media,
+or may be imposed technically to prevent the information in one
+channel from interfering with another channel, or may be as a result
+of regulations dividing up the total available bandwidth. For example
+a telephone circuit is designed to carry a 3kHz range of frequencies.
+An FM radio station, to provide higher quality stereophonic audio,
+has a bandwidth of 200kHz. A NTSC television channel has a bandwidth of
+about 3MHz to be able to represent an analog video image changing 30 times a
+second, as well as an analog FM audio channel. The bandwidth of a copper
+wire or fibre-optic cable is limited by distortion, which increases
+with distance, and, for copper, to prevent the generation of electromagnetic
+interference.</P>
+<H2>Signal/Noise Ratio</H2>
+<P><FONT SIZE=3>The signal to noise ratio, usually expressed in
+decibels, is a measure of the quality of the channel.  <B>Signal</B>
+is a transmission that carries the desired information.  <B>Noise</B>
+is any transmission that is either meaningless or carries undesired
+information.  Noise is introduced in transmitters and receivers
+primarily as a result of the motion of molecules in the equipment due
+to temperature.  In highly sensitive equipment, for example as used
+in radio astrononomy, the receivers are chilled to within a few
+degrees of absolute zero to minimize this.  In transmission through
+space, including terrestrial microwave transmission, noise also comes
+from the environment. </FONT> All information signals are carried
+through a noisy environment.  In 1948 <A HREF="http://www.nyu.edu/pages/linguistics/courses/v610003/shan.html" target="footnote"><B>Claude
+Shannon</B></A> developed the fundamental theorem of information
+theory that the maximum capacity of of a channel depends upon the
+bandwidth and the signal to noise ratio.  Increasing the capacity
+requires either increasing the signal strength or bandwidth, which in
+many cases is prohibited, or reducing the strength of the noise.  For
+example noise can be reduced in a copper wire by shielding it from
+external signals, for example in a coaxial cable.  One of the big
+advantages of fiber optical transmission is that it is so easy to
+reduce noise.</P>
+<H2>Error Rate</H2>
+<P><FONT SIZE=3>Error Rate is expressed as the fraction of bits which
+are typically modified by the transmission channel.  </FONT><A HREF="http://cm.bell-labs.com/cm/ms/what/shannonday/paper.html" target="footnote">Shannon's
+Law</A> shows that as you try to increase capacity beyond the maximum
+capacity permitted by the signal/noise ratio, the error rate
+increases so that the amount of information getting through goes
+down.  Modern terrestrial transmission systems have typical error
+rates of 1 bit error in a hundred million or a billion (10<SPAN STYLE="background: transparent"><SUP>-8</SUP></SPAN>
+or 10<SUP>-9</SUP>).</P>
+<H2>Capacity</H2>
+<P>The capacity of a channel is the number of information bits it can
+carry in a second, expressed in Hz (sec<SUP>-1</SUP>or b/sec).  For
+example a dial-up modem may support 56Kb/sec<A CLASS="sdfootnoteanc" NAME="sdfootnote1anc" HREF="#sdfootnote1sym"><SUP>1</SUP></A>,
+an ADSL high speed &ldquo;modem&rdquo; may support 1Mb/sec, and an
+Ethernet Local Area Network may support 100Mb/sec.</P>
+<P>Note that occasionally the capacity may be expressed in terms of
+<B>Baud</B>.  Baud, from the early French telegrapher
+<A HREF="http://www.britannica.com/eb/article?tocId=9013803" target="footnote">Jean-Maurice-Emile
+Baudot</A> (1845-1903), properly represents the number of signal
+transitions per second.  Since there may either be multiple signal
+transitions per bit transmitted, or alternatively multiple bits
+carried per signal transition, this terminology is misleading and has
+gone out of fashion.</P>
+<P><BR><BR>
+</P>
+<DIV ID="sdfootnote1">
+	<P CLASS="sdfootnote"><A CLASS="sdfootnotesym" NAME="sdfootnote1sym" HREF="#sdfootnote1anc">1</A>Note
+	that all telephone systems carry &ldquo;voice&rdquo; circuits over a
+	digital multiplexed network.  In telephone networks based upon North
+	American standards the backbone carries a voice channel using a
+	56Kb/s data channel and an 8Kb/s control channel.  In telephone
+	networks based upon European standards the voice channel uses 64Kb/s
+	and shares a 64Kb/s control channel with 29 other voice channels.</P>
+</DIV>
+</BODY>
+</HTML>

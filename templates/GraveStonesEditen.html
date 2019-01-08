@@ -1,0 +1,261 @@
+<!--*********************************************************************
+ *  GraveStonesEditen.html						*
+ *									*
+ *  Display form for editting grave stone information.			*
+ *  administered records						*
+ *									*
+ *  History:								*
+ *	2018/02/17	created						*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+  <link rel="stylesheet" type="text/css" href="/Ontario/GraveStonesEdit.css">
+  <div id="breadcrumbs" class="hidden">
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>:
+  </div>	
+  <div class="body">
+    <h1>Canada: Ontario: Grave Stones Update
+      <span class="right">
+	<a href="GraveStonesEditHelpen.html" target="help">? Help</a>
+      </span>
+      <div style="clear: both;"></div>
+    </h1>
+    $MSG
+    $TRACE
+    <!--- Put out the response as a table -->
+    <form name="gravesForm"
+	action="GraveStonesEdit.php" 
+	method="post" 
+	enctype="multipart/form-data">
+    <div class="row">
+      <div class="column1">
+	<label class="label">County:</label>
+	<select name="County" size="1" class="white">
+	  <option value="$code" id="County$code" $selected>$name</option>
+	</select>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Township:</label>
+	<select name="Township" id="TownshipSelect" size="1" class="white">
+	    <option value='$code' id='Township$code' $selected>$name</option>
+	</select>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Cemetery:</label>
+	<select name="Cemetery" id="CemeterySelect" size="1" class="white">
+	    <option value=''>New Cemetery</option>
+	    <option value='$name' id='Cemetery$i' $selected>$name</option>
+	</select>
+      </div>
+	<div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Section:</label>
+	<select name="ZoneSelect" id="ZoneSelect" size="1" class="white">
+	    <option value=''>New Section</option>
+	    <option value='$name' id='Zone$i' $selected>$name</option>
+	</select>
+	<input name="Zone" id="Zone" value="$ZONE" type="hidden">
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Row:</label>
+	<input type="text" size="3" maxlength="3"
+		class="black white left"
+		name="NewRow" value="$ROW">
+	<input name="Row" id="Row" value="$ROW" type="hidden">
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Plot:</label>
+	<input type="text" size="3" maxlength="3"
+		class="black white left"
+		name="newPlot" value="$PLOT">
+	<input name="Plot" id="Plot" value="$PLOT" type="hidden">
+      </div>
+      <div class="column1">
+	<label class="label" for="Files">
+	    Select Images:
+	    <input type="file" name="Files" accept="image/*"
+		multiple="multiple"> 
+	</label>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+  <table class="form" id="dataTbl">
+    <!--- Put out the column headers -->
+    <thead>
+      <tr id="hdrRow">
+	<th class="colhead">
+	Side
+	</th>
+	<th class="colhead">
+	Given Names
+	</th>
+	<th class="colhead">
+	Surname
+	</th>
+	<th class="colhead">
+	Birth Date
+	</th>
+	<th class="colhead">
+	Death Date
+	</th>
+	<th class="colhead">
+	Text
+	</th>
+	<th class="colhead" colspan="3">
+	Actions
+	</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="Row$i">
+	<td class="left">
+	    <input type="hidden" name="Index$i" value="$gs_index">
+	    <input type="text" name="Side$i"
+			value="$side"
+			class="$rowclass left" 
+			size="2" maxlength="8">
+	</td>
+	<td class="left">
+	    <input type="text" name="GivenName$i"
+			value="$givenname"
+			class="$rowclass left" 
+			size="16" maxlength="64">
+	</td>
+	<td class="left">
+	    <input type="text" name="Surname$i"
+			value="$surname"
+			class="$rowclass left" 
+			size="12" maxlength="64">
+	</td>
+	<td class="left">
+	    <input type="text" name="BirthDate$i"
+			value="$birthdate"
+			class="$rowclass left" 
+			size="8" maxlength="16">
+	</td>
+	<td class="left">
+	    <input type="text" name="DeathDate$i"
+			value="$deathdate"
+			class="$rowclass left" 
+			size="8" maxlength="16">
+	</td>
+	<td class="left">
+	    <input type="text" name="Text$i" 
+			value="$text" 
+			class="$rowclass leftnc"
+			size="50" maxlength="512">
+	</td>
+	<td class="center">
+	    <button type="button" id="Delete$i">
+		Delete
+	    </button> 
+	</td>
+	  </tr>
+	<tbody>
+      </table>
+      <p id="showImage$i">
+	<a id="image$i" href="$image" target="_blank">Image $i</a>
+      </p>
+      <p>
+	<input type="hidden" name="Index999999999" value="">
+	<input type="hidden" name="debug" value="$DEBUG">
+	<button type="submit" id="Submit">Update</button>
+	&nbsp;
+	<button type="button" id="Add">Add</button>
+      </p>
+    </form>
+  </div>
+    <!-- The remainder of the page consists of context specific help text.
+	-->
+    <div class="balloon" id="HelpCounty">
+	This field is used to select the county to be searched.
+    </div>
+    <div class="balloon" id="HelpTownship">
+	The name of the township.
+    </div>
+    <div class="balloon" id="HelpCemetery">
+	The name of the Cemetery.
+    </div>
+    <div class="balloon" id="HelpZone">
+	The identifier of the zone for large cemeteries which are
+	divided into distinct areas.
+    </div>
+    <div class="balloon" id="HelpRow">
+	The identifier of the row.
+    </div>
+    <div class="balloon" id="HelpPlot">
+	The identifier of the plot within the row.
+    </div>
+    <div class="balloon" id="HelpSurname">
+	The surname of an individual commemorated on the monument.
+    </div>
+    <div class="balloon" id="HelpGivenName">
+	The given name of an individual commemorated on the monument.
+    </div>
+    <div class="balloon" id="HelpText">
+	Additional text on the monument.
+    </div>
+    <div class="balloon" id="HelpBirthDate">
+	The birth date if it is explicitly specified or can be computed from
+	the age and date of death.
+    </div>
+    <div class="balloon" id="HelpDeathDate">
+	The death date if it is explicitly specified or can be computed from
+	the age and date of death.
+    </div>
+    <div class="balloon" id="HelpDelete">
+    <p>This button is used to delete a county record from the list.
+    </p>
+    </div>
+    <div class="balloon" id="HelpAddPlotBefore">
+	Click on this button to add a new plot before the first plot in the
+	existing data.
+    </div>
+    <div class="balloon" id="HelpAddPlot">
+	Click on this button to add a new plot after the current plot.
+    </div>
+    <div class="balloon" id="HelpAddRow">
+	Click on this button to add a new row after the last line of 
+	the current plot.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+	Click on this button to update the database to include the changes you
+	have made to the counties list for the current province.
+    </div>
+    <div class="balloon" id="HelprightTop">
+	Click on this button to signon to access extended features of
+	the web-site or to manage your account with the web-site.
+    </div>
+    <div id='phpFileUploadErrors' class="hidden">
+      <span>There is no error, the file uploaded with success</span>
+      <span>The uploaded file exceeds the upload_max_filesize directive in php.ini</span>
+      <span>The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form</span>
+      <span>The uploaded file was only partially uploaded</span>
+      <span>No file was uploaded</span>
+      <span>Undefined code 5</span>
+      <span>Missing a temporary folder</span>
+      <span>Failed to write file to disk.</span>
+      <span>A PHP extension stopped the file upload.</span>
+    </div>
+    <script src="/jscripts/CommonForm.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/Ontario/GraveStonesEdit.js" type="text/javaScript">
+    </script>

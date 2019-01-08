@@ -1,0 +1,182 @@
+<!DOCTYPE HTML >
+<html>
+  <head>
+   <title>Individual Web Page: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  PersonHelpen.html                                                   *
+ *                                                                      *
+ *  History:															*
+ *		2010/11/04		created											*
+ *		2011/01/16		add buttons for ancestor report, descendant		*
+ *						report and relationship calculator				*
+ *		2013/04/05		document extended support for locations			*
+ *		2014/02/10		eliminate use of tables for layout				*
+ *		2015/01/23		buttons now split window						*
+ *						add more keyboard shortcuts						*
+ *						add more examples								*
+ *		2017/08/16		renamed to PersonHelpen.html					*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  <body>
+    <div class="topcrumbs">
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+    	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+    	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>:
+    </div>
+    <div class="help">
+    <h1>Individual Web Page: Help</h1>
+    <p>This page displays the information collected in the family tree database 
+    about an individual and the family or families for which they are a parent
+    in a textual form for easy reference.
+    </p>
+    <p>The title of the page contains the name and
+    birth and death dates of the individual.  Note that if you are not an
+    "owner" of the record for the individual and the person is still living, or
+    lived recently, the dates are privatized and most other details about
+    the individual are suppressed.
+    </p>
+    <p>The body of the page consists of four sections, two of which are only
+    displayed if the the current user is authorized to access those functions
+        <ol>
+    	<li>A textual report on the individual.  This contains:
+    	    <ul>
+    		<li>The names of the parents of the individual, if known,
+    		which are displayed as links to the individual web pages
+    		of the parents.
+    		<li>A list of known facts about the individual starting with
+    		when and where the person was born, events during their life,
+    		and ending with their death and burial.
+    		<li>For each spouse or partner the name of the spouse is a 
+    		link to the spouse's web page presented along with information
+    		about their relationship including the date and place of 
+    		marriage if known. 
+    		<li>A list of known facts about the spouse in the same format
+    		as for the current individual.
+    		If known the names of the parents of the
+    		spouse are presented, also as links.  
+    		<li>A list of the children from the relationship, if any, 
+    		with their birth and death
+    		dates.  The entry for each child is a link to the page for
+    		details about that child.
+    	    </ul>
+    	    <p>Each link to another individual in the tree is also a
+    		mouse "hot-spot".  If you hold the mouse over the name 
+    		of the individual for two seconds, a bubble pops up with
+    		additional information about the individual.  This avoids
+    		the requirement to actually follow the link to further
+    		identify the individual.
+    	    </p>
+    	    <br>
+    		<img src="/Images/IndivPopup.png" alt="Individual Popup">
+    	    <p>Extended support is provided for any location addresses that
+    		appear as part of the description of an event.  
+    		If you hold the mouse
+    		cursor over any location address a dialog pops up that
+    		contains additional information about the location, and
+    		a button that you can click on to view a map of the location.
+    	    </p>
+    	    <br>
+    		<img src="/Images/MapPopup.png" alt="Location Popup">
+    	    <p>Extended support is provided for any cause of death
+    		descriptions that
+    		appear as part of the description of a death.  
+    		If you hold the mouse
+    		cursor over a a cause of death a dialog pops up that
+    		contains additional information about the cause of death
+    		such as explanations of unfamiliar or obsolete medical terms.
+    	    </p>
+    	    <br>
+    		<img src="/Images/CausePopup.png" alt="Cause of Death Popup">
+    	<li>A <span class="button"><u>D</u>escendant Report</span> button
+    		is provided that permits you to view an outline report on the
+    		<a href="/FamilyTree/descendantReportHelpen.html">
+    		    descendants of this individual</a>.
+    		This report is presented in the right half of the window.
+    		The keyboard shortcuts for this are Alt-D and Alt-Shift-D.
+    	    <br>
+    		<img src="/Images/DescendantTreeSplit.png" 
+    			alt="Descendant Report">
+    	<li>An <span class="button"><u>A</u>ncestor Report</span> button
+    		is provided that permits you to view an outline
+    		report on the
+    		<a href="/FamilyTree/ancestorReportHelpen.html">
+    		    ancestors of this individual</a>.
+    		This report is presented in the right half of the window.
+    		The keyboard shortcuts for this are Alt-A and Alt-Shift-A.
+    	<li>A <span class="button"><u>R</u>elationship Calculator</span> button
+    		is provided to a tool to determine the
+    		<a href="/FamilyTree/chooseRelativeHelpen.html">
+    		family relationship
+    		</a>
+    		between the current individual and any other individual
+    		in the database.
+    		This report is presented in the right half of the window.
+    		The keyboard shortcuts for this are Alt-R and Alt-Shift-R.
+    	<li>A <span class="button" style="height: 35px; padding: 16px 8px 0px 8px;">
+    	<img SRC="/logobutton.gif" height="25" width="81" alt="James Cobban Logo"></span> button
+    		is provided to display a graphical representation of three
+    		generations of the family to which this individual belongs
+    		including his/her parents and children
+    		This is presented in a new browser tab.
+    	    <br>
+    		<img src="/Images/FamilyTreeSVG.png" 
+    			alt="Family Tree">
+    	<li>If you are signed on, and you are an authorized owner of the
+    		individual record, there is a
+    		<span class="button"><u>E</u>dit this individual</span>
+    		button to present a dialog for
+    		<a href="/FamilyTree/editIndividHelpen.html">editing</a>
+    		the individual record.
+    		This is presented in a new browser tab.
+    		The keyboard shortcut for this is Alt-Shift-E.
+    	<li>A list of blog entries, if any, revealing any thoughts other
+    		visitors have had about this individual.  If you are signed
+    		on to the site, then you are given the opportunity to add
+    		a message to the blog, by entering it in the 
+    		WYSIWYG editor field and clicking on the 
+    		<span class="button">Post <u>B</u>log</span> button.
+    		This editor field permits you to control the presentation
+    		of the information you enter, to include images, and to
+    		specify hyperlinks.
+    		The keyboard shortcuts for this are Alt-B and Alt-Shift-B.
+    	<li>Footnotes documenting the sources from which the information
+    		on this web page was collected.  References to these
+    		footnotes are indicated by superscript numbers in the
+    		body text.  In many cases the page number information is
+    		itself a hyperlink to a transcription of the original
+    		document, which may in turn include the ability to see
+    		an image of the original document.
+    	    <br>
+    	    Each link to a master source is also a
+    		mouse "hot-spot".  If you hold the mouse over the name 
+    		of the source for two seconds, a bubble pops up with
+    		additional information about the source.  This avoids
+    		the requirement to actually follow the link to further
+    		identify the individual.
+    	    <br>
+    		<img src="/Images/SourcePopup.png" alt="Source Popup">
+        </ol>
+    </p>
+    </div>
+    <div class="botcrumbs">
+        <span class="right">
+    	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+        </span>
+    	<a href="/contactAuthor.php?subject=PersonHelpen.html" target="_blank">Contact Author</a>
+    	<br/>
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+    	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+    	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>:
+        <div style="clear: both;"></div>
+    </div>
+  </body>
+</html>

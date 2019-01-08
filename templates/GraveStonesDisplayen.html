@@ -1,0 +1,213 @@
+<!--*********************************************************************
+ *  GraveStonesDisplayen.html						*
+ *									*
+ *  Display form for editting grave stone information.			*
+ *  administered records						*
+ *									*
+ *  History:								*
+ *	2018/02/17	created						*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>:
+  </div>	
+  <div class="body">
+    <h1>Canada: Ontario: Grave Stones Update
+      <span class="right">
+	<a href="GraveStonesEditHelpen.html" target="help">? Help</a>
+      </span>
+      <div style="clear: both;"></div>
+    </h1>
+    $MSG
+    $TRACE
+    <!--- Put out the response as a table -->
+    <form name="gravesForm"
+	action="GraveStonesEdit.php" 
+	method="get"> 
+    <div class="row">
+      <div class="column1">
+	<label class="label">County:</label>
+	<select name="County" size="1" class="white">
+	  <option value="$code" id="County$code">$name</option>
+	</select>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Township:</label>
+	<input type="text" size="16" maxlength="32"
+		class="black white left"
+		name="Township" value="$TOWNSHIP">
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Cemetery:</label>
+	<input type="text" size="16" maxlength="32"
+		class="black white left"
+		name="Cemetery" value="$CEMETERY">
+      </div>
+	<div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Zone:</label>
+	<input type="text" size="3" maxlength="3"
+		class="black white left"
+		name="Zone" value="$ZONE">
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Row:</label>
+	<input type="text" size="3" maxlength="3"
+		class="black white left"
+		name="Row" value="$ROW">
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="label">Plot:</label>
+	<input type="text" size="3" maxlength="3"
+		class="black white left"
+		name="Plot" value="$PLOT">
+      </div>
+      <div style="clear: both"></div>
+    </div>
+      <table class="form" id="dataTbl">
+	<!--- Put out the column headers -->
+	<thead>
+	  <tr id="hdrRow">
+	    <th class="colhead">
+		Side
+	    </th>
+	    <th class="colhead">
+		Given Names
+	    </th>
+	    <th class="colhead">
+		Surname
+	    </th>
+	    <th class="colhead">
+		Birth Date
+	    </th>
+	    <th class="colhead">
+		Death Date
+	    </th>
+	    <th class="colhead">
+		Text
+	    </th>
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr id="Row$i">
+	    <td class="left">
+		<input type="text" name="Side$i"
+			value="$side" readonly="readonly"
+			class="$rowclass left" 
+			size="2" maxlength="8">
+	    </td>
+	    <td class="left">
+		<input type="text" name="Plot$i"
+			value="$givenname" readonly="readonly"
+			class="$rowclass left" 
+			size="16" maxlength="64">
+	    </td>
+	    <td class="left">
+		<input type="text" name="Surname$i"
+			value="$surname" readonly="readonly"
+			class="$rowclass left" 
+			size="12" maxlength="64">
+	    </td>
+	    <td class="left">
+		<input type="text" name="BirthDate$i"
+			value="$birthdate" readonly="readonly"
+			class="$rowclass right" 
+			size="8" maxlength="16">
+	    </td>
+	    <td class="left">
+		<input type="text" name="DeathDate$i"
+			value="$deathdate" readonly="readonly"
+			class="$rowclass right" 
+			size="8" maxlength="16">
+	    </td>
+	    <td class="left">
+		<input type="text" name="Text$i" 
+			value="$text"  readonly="readonly"
+			class="$rowclass leftnc"
+			size="80" maxlength="512">
+	    </td>
+	  </tr>
+	<tbody>
+      </table>
+    </form>
+  </div>
+    <!-- The remainder of the page consists of context specific help text.
+	-->
+    <div class="balloon" id="HelpCounty">
+	This field is used to select the county to be searched.
+    </div>
+    <div class="balloon" id="HelpTownship">
+	The name of the township.
+    </div>
+    <div class="balloon" id="HelpCemetery">
+	The name of the Cemetery.
+    </div>
+    <div class="balloon" id="HelpZone">
+	The identifier of the zone for large cemeteries which are
+	divided into distinct areas.
+    </div>
+    <div class="balloon" id="HelpRow">
+	The identifier of the row.
+    </div>
+    <div class="balloon" id="HelpPlot">
+	The identifier of the plot within the row.
+    </div>
+    <div class="balloon" id="HelpSurname">
+	The surname of an individual commemorated on the monument.
+    </div>
+    <div class="balloon" id="HelpGivenName">
+	The given name of an individual commemorated on the monument.
+    </div>
+    <div class="balloon" id="HelpText">
+	Additional text on the monument.
+    </div>
+    <div class="balloon" id="HelpBirthDate">
+	The birth date if it is explicitly specified or can be computed from
+	the age and date of death.
+    </div>
+    <div class="balloon" id="HelpDeathDate">
+	The death date if it is explicitly specified or can be computed from
+	the age and date of death.
+    </div>
+    <div class="balloon" id="HelpDelete">
+    <p>This button is used to delete a line from the database.
+    </p>
+    </div>
+    <div class="balloon" id="HelpAddPlot">
+	Click on this button to add a new plot after the current plot.
+    </div>
+    <div class="balloon" id="HelpAddRow">
+	Click on this button to add a new row after the last line of 
+	the current plot.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+	Click on this button to update the database to include the changes you
+	have made to the counties list for the current province.
+    </div>
+    <div class="balloon" id="HelprightTop">
+	Click on this button to signon to access extended features of
+	the web-site or to manage your account with the web-site.
+    </div>
+    <script src="/jscripts/CommonForm.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/Ontario/GraveStonesEdit.js" type="text/javaScript">
+    </script>

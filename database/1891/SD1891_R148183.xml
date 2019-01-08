@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148183">
+    <option value="132_E">
+        York West: Vaughan
+        <div id="8" reel="148183" frame="0" count="10"/>
+        <div id="9" reel="148183" frame="10" count="15"/>
+    </option>
+    <option value="132_F">
+        York West: Weston Village
+        <div id="" reel="148183" frame="25" count="25"/>
+    </option>
+    <option value="132_G">
+        York West: Woodbridge Village
+        <div id="" reel="148183" frame="50" count="16"/>
+    </option>
+    <option value="132_H">
+        York West: York West
+        <div id="1" reel="148183" frame="66" count="28"/>
+        <div id="2" reel="148183" frame="94" count="32"/>
+        <div id="3" reel="148183" frame="126" count="20"/>
+        <div id="4" reel="148183" frame="146" count="61"/>
+        <div id="5" reel="148183" frame="207" count="21"/>
+        <div id="6" reel="148183" frame="" count="0"/>
+        <div id="7" reel="148183" frame="228" count="18"/>
+        <div id="8" reel="148183" frame="246" count="18"/>
+        <div id="9" reel="148183" frame="264" count="24"/>
+        <div id="10" reel="148183" frame="288" count="38"/>
+        <div id="11" reel="148183" frame="326" count="7"/>
+        <div id="12" reel="148183" frame="333" count="20"/>
+        <div id="13" reel="148183" frame="353" count="10"/>
+        <div id="14" reel="148183" frame="363" count="13"/>
+        <div id="15" reel="148183" frame="376" count="24"/>
+    </option>
+    <option value="133_A">
+        Kings: Georgetown &amp; Royalty
+        <div id="" reel="148183" frame="400" count="22"/>
+    </option>
+    <option value="133_B">
+        Kings: Lot 38
+        <div id="" reel="148183" frame="422" count="21"/>
+    </option>
+</select>

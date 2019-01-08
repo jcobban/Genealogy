@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Date and Time</title>
+    <meta http-equiv='content-TYPE' content='text/html; charset=UTF-8'>
+    <meta http-equiv='default-style' content='text/css'>
+    <meta name='Author' content='James Cobban'>
+    <meta name='Copyright' content='&copy; 2015 James Cobban'>
+<!--*********************************************************************
+ *  History:								*
+ *	2011/08/10	created						*
+ *	2011/12/12	merge javascript into page			*
+ *	2012/01/08	set initial focus in message text field		*
+ *	2015/05/11	use contactAuthor.php to contact administrator	*
+ **********************************************************************-->
+  <style type="text/css">
+    body      { background-color: #FEFEE0;
+		margin: 0px;
+		padding: 0px;
+		}
+    div.body  { background-color: #FEFEE0;
+		padding: 4px;
+		font-family: sans-serif;
+		}
+    h1.big{ font-family: sans-serif;
+	    font-size: 160px;
+		}
+  </style>
+    <script src='jscripts/js20/http.js' language='JavaScript'>
+    </script>
+    <script language='JavaScript'>
+
+window.onload	= onLoad;
+var	timer	= null;
+
+/**
+ *  onLoad
+ *
+ *  Perform initialization after page is loaded
+ *
+ **/
+function onLoad()
+{
+    update();	// set initial date and time
+    document.dispmsg.msg.focus();
+}		// onLoad
+
+/**
+ *  update
+ *
+ *  This function is called when the timer pops.
+ **/
+function update()
+{
+    var	time	= new Date();
+    var	heading	= document.getElementById('time');
+
+    // remove all existing children
+    while(heading.firstChild != null)
+	heading.removeChild(heading.firstChild);
+
+    var	hh	= time.getHours();
+    if (hh < 10)
+	hh	= '0' + hh;
+    var mm	= time.getMinutes();
+    if (mm < 10)
+	mm	= '0' + mm;
+    var ss	= time.getSeconds();
+    if (ss == 0)
+    {		// once a minute poke the network
+	HTTP.getXML("http://www.jamescobban.net/FamilyTree/getRecordXml.php?idlr=1",
+		gotLoc,
+		noLoc);
+    }		// once a minute poke the network
+    if (ss < 10)
+	ss	= '0' + ss;
+    var	dateTimeStr	= 'Time: ' + hh + ':' + mm + ':' + ss;
+			  
+    heading.appendChild(document.createTextNode(dateTimeStr));
+
+    // also post a message if required
+    var	args	= getArgs();	// get args from location search
+    heading	= document.getElementById('msg');
+    if (args['msg'] !== undefined && heading !== undefined)
+    {
+	// remove all existing children
+	while(heading.firstChild != null)
+	    heading.removeChild(heading.firstChild);
+    
+	heading.appendChild(document.createTextNode(args['msg']));
+    }		// display posted message
+
+    timer	= setTimeout(update, 1000);
+}
+
+/**
+ *  gotLoc
+ *
+ *  This method is called when the XML file representing
+ *  a record is retrieved from the server.
+ **/
+function gotLoc(xmlDoc)
+{
+}	// gotLoc
+
+/**
+ *  noLoc
+ *
+ *  This method is called if there is no AJAX response
+ *  file.
+ **/
+function noLoc()
+{
+    alert("noLoc");
+}		// noLoc
+
+/**
+ *  marrDel
+
+/**
+ *  getArgs
+ *
+ *  Get search arguments from location
+ **/
+function getArgs()
+{
+    var args	= new Object();
+
+    if (location.search.length > 1)
+    {
+	var	query	= location.search.substring(1);
+	var	pairs	= query.split("&");
+	for(var i = 0; i < pairs.length; i++)
+	{
+	    var	pos	= pairs[i].indexOf('=');
+	    if (pos == -1)
+		continue;
+	    var	argname	= pairs[i].substring(0, pos);
+	    var	value	= pairs[i].substring(pos + 1);
+	    value	= decodeURIComponent(value);
+	    value	= value.replace(/\+/g, " ");
+	    args[argname]	= value;
+	}	// loop through all parameters
+    }		// examine the search string
+    return args;
+}		// getArgs
+    </script>
+</head>
+<body>
+<div class='body'>
+<h1 id='time' class='big'></h1>
+<h1 id='msg' class='big'></h1>
+<form name='dispmsg' action='DateTime.html' type='get'>
+   <input type='text' name='msg' size='80' value=''>
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148188">
+    <option value="138_J">
+        Beauce: St. Honoré de Shenley
+        <div id="" reel="148188" frame="0" count="33"/>
+    </option>
+    <option value="138_K">
+        Beauce: St. Anges
+        <div id="" reel="148188" frame="33" count="21"/>
+    </option>
+    <option value="138_L">
+        Beauce: St. Elzear
+        <div id="" reel="148188" frame="54" count="26"/>
+    </option>
+    <option value="138_M">
+        Beauce: St. Ephrem de Tring
+        <div id="" reel="148188" frame="80" count="49"/>
+    </option>
+    <option value="138_N">
+        Beauce: St. Evariste de Forsyth
+        <div id="" reel="148188" frame="129" count="26"/>
+    </option>
+    <option value="138_O">
+        Beauce: St. François
+        <div id="1" reel="148188" frame="155" count="42"/>
+        <div id="2" reel="148188" frame="197" count="40"/>
+    </option>
+    <option value="138_P">
+        Beauce: St. Frédéric
+        <div id="" reel="148188" frame="237" count="37"/>
+    </option>
+    <option value="138_Q">
+        Beauce: St. Georges
+        <div id="1" reel="148188" frame="274" count="38"/>
+        <div id="2" reel="148188" frame="312" count="26"/>
+    </option>
+    <option value="138_R">
+        Beauce: St. Joseph
+        <div id="1" reel="148188" frame="338" count="27"/>
+        <div id="2" reel="148188" frame="365" count="18"/>
+    </option>
+    <option value="138_S">
+        Beauce: St. Joseph Village
+        <div id="" reel="148188" frame="383" count="24"/>
+    </option>
+    <option value="138_T">
+        Beauce: Ste. Marie
+        <div id="1" reel="148188" frame="407" count="48"/>
+        <div id="2" reel="148188" frame="455" count="12"/>
+    </option>
+    <option value="138_U">
+        Beauce: St. Pierre de Broughton
+        <div id="" reel="148188" frame="467" count="17"/>
+    </option>
+    <option value="138_V">
+        Beauce: St. Sébastien d'Aylmer
+        <div id="" reel="148188" frame="484" count="18"/>
+    </option>
+    <option value="138_W">
+        Beauce: St. Severin
+        <div id="" reel="148188" frame="502" count="17"/>
+    </option>
+    <option value="138_X">
+        Beauce: St. Victor de Tring
+        <div id="" reel="148188" frame="519" count="52"/>
+    </option>
+    <option value="138_Y">
+        Beauce: St. Vitâl de Lambton
+        <div id="" reel="148188" frame="571" count="37"/>
+    </option>
+    <option value="138_Z">
+        Beauce: Spaulding &amp; Risborough
+        <div id="" reel="148188" frame="608" count="5"/>
+    </option>
+    <option value="138_AA">
+        Beauce: Woburn &amp; Clinton
+        <div id="" reel="148188" frame="613" count="5"/>
+    </option>
+    <option value="139_A">
+        Beauharnois: Beauharnois Town
+        <div id="" reel="148188" frame="618" count="33"/>
+    </option>
+    <option value="139_B">
+        Beauharnois: Salaberry de Valleyfield Town
+        <div id="1" reel="148188" frame="651" count="33"/>
+        <div id="2" reel="148188" frame="684" count="44"/>
+        <div id="3" reel="148188" frame="728" count="37"/>
+    </option>
+    <option value="139_C">
+        Beauharnois: Ste. Cécile
+        <div id="" reel="148188" frame="765" count="27"/>
+    </option>
+</select>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148182">
+    <option value="131_D">
+        York North: Gwillimbury East
+        <div id="3" reel="148182" frame="0" count="19"/>
+        <div id="4" reel="148182" frame="19" count="15"/>
+        <div id="5" reel="148182" frame="34" count="19"/>
+    </option>
+    <option value="131_E">
+        York North: Gwillimbury North &amp; Snake Island
+        <div id="1" reel="148182" frame="53" count="20"/>
+        <div id="2" reel="148182" frame="73" count="20"/>
+    </option>
+    <option value="131_F">
+        York North: Gwillimbury West
+        <div id="1" reel="148182" frame="93" count="18"/>
+        <div id="2" reel="148182" frame="111" count="17"/>
+        <div id="3" reel="148182" frame="128" count="19"/>
+    </option>
+    <option value="131_G">
+        York North: Holland Landing Village
+        <div id="" reel="148182" frame="147" count="10"/>
+    </option>
+    <option value="131_H">
+        York North: King
+        <div id="1" reel="148182" frame="157" count="26"/>
+        <div id="2" reel="148182" frame="183" count="22"/>
+        <div id="3" reel="148182" frame="205" count="21"/>
+        <div id="4" reel="148182" frame="226" count="20"/>
+        <div id="5" reel="148182" frame="246" count="17"/>
+        <div id="6" reel="148182" frame="263" count="22"/>
+    </option>
+    <option value="131_I">
+        York North: Sutton Village
+        <div id="" reel="148182" frame="285" count="15"/>
+    </option>
+    <option value="132_A">
+        York West: Etobicoke
+        <div id="1" reel="148182" frame="300" count="14"/>
+        <div id="2" reel="148182" frame="314" count="31"/>
+        <div id="3" reel="148182" frame="345" count="49"/>
+    </option>
+    <option value="132_B">
+        York West: Richmond Hill Village
+        <div id="" reel="148182" frame="394" count="17"/>
+    </option>
+    <option value="132_C">
+        York West: St. Albans Ward
+        <div id="1" reel="148182" frame="411" count="29"/>
+        <div id="2" reel="148182" frame="440" count="20"/>
+        <div id="3" reel="148182" frame="460" count="14"/>
+        <div id="4" reel="148182" frame="474" count="21"/>
+        <div id="5" reel="148182" frame="495" count="31"/>
+        <div id="6" reel="148182" frame="526" count="40"/>
+    </option>
+    <option value="132_D">
+        York West: St. Marks Ward
+        <div id="1" reel="148182" frame="566" count="28"/>
+        <div id="2" reel="148182" frame="594" count="35"/>
+        <div id="3" reel="148182" frame="629" count="15"/>
+        <div id="4" reel="148182" frame="644" count="23"/>
+        <div id="5" reel="148182" frame="667" count="13"/>
+    </option>
+    <option value="132_E">
+        York West: Vaughan
+        <div id="1" reel="148182" frame="680" count="13"/>
+        <div id="2" reel="148182" frame="693" count="13"/>
+        <div id="3" reel="148182" frame="706" count="11"/>
+        <div id="4" reel="148182" frame="717" count="20"/>
+        <div id="5" reel="148182" frame="737" count="9"/>
+        <div id="6" reel="148182" frame="746" count="11"/>
+        <div id="7" reel="148182" frame="757" count="13"/>
+    </option>
+</select>

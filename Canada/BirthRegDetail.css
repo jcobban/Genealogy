@@ -1,0 +1,195 @@
+/************************************************************************
+ *  BirthRegDetail.css							*
+ *									*
+ *  Stylesheet for the scripts BirthRegDetail.php			*
+ *									*
+ *  History:								*
+ *	2013/12/21	created						*
+ *	2015/02/01	add input.actlefterror and input.actleftncerror	*
+ *	2015/09/28	add input.actleftncerror and			*
+ *			input.inaleftncerror				*
+ *	2018/03/17	increase width of labelSmall to 12em		* 
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ ************************************************************************/
+
+/*	column containers */
+    div.column1	{float:		left;
+		width:		26em;
+		margin-top:	1px;
+		margin-right:	3px;
+		}
+    div.column2	{float:	left;
+		margin-top:	1px;
+		margin-right:	3px;
+		}
+    div.column3	{float:	left;
+		margin-top:	1px;
+		margin-right:	3px;
+		}
+/*	labels of various widths */
+    label.labelSmall {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		font-size:	smaller;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		margin-top:	1px;
+		float:		left;
+		width:		12em;
+		}
+    label.labelSmall6em {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		font-size:	smaller;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		margin-top:	1px;
+		float:		left;
+		width:		6em;
+		}
+
+    input.actleft {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:white;
+		color:		black;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    input.actleftnc {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:white;
+		color:		black;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    input.actleftvar {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:white;
+		color:		black;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		margin-bottom:	2px;
+		}
+    input.inaleft {font-family:	sans-serif;
+		text-align:	left;
+		background-color:#F0F0F0;	/* bright gray */
+		color:		black;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black; 
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    input.inaleftnc {font-family:	sans-serif;
+		text-align:	left;
+		background-color:#F0F0F0;	/* bright gray */
+		color:		black;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black; 
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    input.inaleftncerror {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:#F0F0F0;	/* bright gray */
+		color:		red;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		}
+    input.inarightnc {
+		font-family:	sans-serif;
+		text-align:	right;
+		background-color:#F0F0F0;	/* bright gray */
+		color:		black;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		float:		left;
+		}
+    input.actlefterror {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:white;
+		color:		red;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    input.actleftncerror {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:white;
+		color:		red;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+
+    select.actleftwide {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:white;
+		color:		black;
+		padding:	0px;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    select.inaleftwide {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:#F0F0F0;	/* bright gray */
+		color:		black;
+		padding:	0px;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    select.actleft {
+		font-family:	sans-serif;
+		text-align:	left;
+		background-color:white;
+		color:		black;
+		padding:	0px;
+		margin-bottom:	2px;
+		}

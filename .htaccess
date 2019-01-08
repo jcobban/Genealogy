@@ -1,0 +1,6 @@
+ErrorDocument 403 /errors/403page.php
+ErrorDocument 404 /errors/404page.php
+AddDefaultCharset utf-8
+
+
+

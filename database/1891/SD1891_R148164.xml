@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148164">
+    <option value="106_E">
+        Peel: Toronto Gore
+        <div id="2" reel="148164" frame="0" count="14"/>
+    </option>
+    <option value="107_A">
+        Perth North: Ellice
+        <div id="1" reel="148164" frame="14" count="26"/>
+        <div id="2" reel="148164" frame="40" count="26"/>
+        <div id="3" reel="148164" frame="66" count="19"/>
+    </option>
+    <option value="107_B">
+        Perth North: Elma
+        <div id="1" reel="148164" frame="85" count="25"/>
+        <div id="2" reel="148164" frame="110" count="36"/>
+        <div id="3" reel="148164" frame="146" count="28"/>
+    </option>
+    <option value="107_C">
+        Perth North: Listowel Town
+        <div id="1" reel="148164" frame="174" count="25"/>
+        <div id="2" reel="148164" frame="199" count="30"/>
+    </option>
+    <option value="107_D">
+        Perth North: Logan
+        <div id="1" reel="148164" frame="229" count="19"/>
+        <div id="2" reel="148164" frame="248" count="23"/>
+        <div id="3" reel="148164" frame="271" count="24"/>
+    </option>
+    <option value="107_E">
+        Perth North: Milverton Village
+        <div id="" reel="148164" frame="295" count="13"/>
+    </option>
+    <option value="107_F">
+        Perth North: Mornington
+        <div id="1" reel="148164" frame="308" count="24"/>
+        <div id="2" reel="148164" frame="332" count="24"/>
+        <div id="3" reel="148164" frame="356" count="27"/>
+    </option>
+    <option value="107_G">
+        Perth North: Stratford City
+        <div id="1" reel="148164" frame="383" count="34"/>
+        <div id="2" reel="148164" frame="417" count="21"/>
+        <div id="3" reel="148164" frame="438" count="23"/>
+        <div id="4" reel="148164" frame="461" count="38"/>
+        <div id="5" reel="148164" frame="499" count="32"/>
+        <div id="6" reel="148164" frame="531" count="26"/>
+        <div id="7" reel="148164" frame="557" count="27"/>
+    </option>
+    <option value="108_A">
+        Perth South: Blanchard
+        <div id="1" reel="148164" frame="584" count="17"/>
+        <div id="2" reel="148164" frame="601" count="19"/>
+        <div id="3" reel="148164" frame="620" count="14"/>
+        <div id="4" reel="148164" frame="634" count="12"/>
+    </option>
+    <option value="108_B">
+        Perth South: Downie
+        <div id="1" reel="148164" frame="646" count="14"/>
+        <div id="2" reel="148164" frame="660" count="17"/>
+        <div id="3" reel="148164" frame="677" count="13"/>
+        <div id="4" reel="148164" frame="690" count="13"/>
+        <div id="5" reel="148164" frame="703" count="13"/>
+        <div id="4" reel="148164" frame="716" count="13"/>
+        <div id="5" reel="148164" frame="729" count="14"/>
+    </option>
+    <option value="108_C">
+        Perth South: Fullarton
+        <div id="1" reel="148164" frame="743" count="18"/>
+        <div id="2" reel="148164" frame="761" count="17"/>
+        <div id="3" reel="148164" frame="778" count="18"/>
+    </option>
+    <option value="108_D">
+        Perth South: Hibbert
+        <div id="1" reel="148164" frame="796" count="20"/>
+    </option>
+</select>

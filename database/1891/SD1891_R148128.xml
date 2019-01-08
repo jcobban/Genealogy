@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148128">
+    <option value="49_A">
+        Brant South: Brantford West
+        <div id="2" reel="148128" frame="0" count="17"/>
+        <div id="3" reel="148128" frame="17" count="20"/>
+    </option>
+    <option value="49_B">
+        Brant South: Brantford City
+        <div id="1" reel="148128" frame="37" count="33"/>
+        <div id="2" reel="148128" frame="70" count="31"/>
+        <div id="3" reel="148128" frame="101" count="27"/>
+        <div id="4" reel="148128" frame="128" count="19"/>
+        <div id="5" reel="148128" frame="147" count="8"/>
+        <div id="6" reel="148128" frame="155" count="14"/>
+        <div id="7" reel="148128" frame="169" count="15"/>
+        <div id="8" reel="148128" frame="184" count="24"/>
+        <div id="9" reel="148128" frame="208" count="26"/>
+        <div id="10" reel="148128" frame="234" count="30"/>
+        <div id="11" reel="148128" frame="264" count="21"/>
+        <div id="12" reel="148128" frame="285" count="21"/>
+    </option>
+    <option value="49_C">
+        Brant South: Onondaga
+        <div id="1" reel="148128" frame="306" count="14"/>
+        <div id="2" reel="148128" frame="320" count="18"/>
+    </option>
+    <option value="49_D">
+        Brant South: Paris Town
+        <div id="1" reel="148128" frame="338" count="25"/>
+        <div id="2" reel="148128" frame="363" count="39"/>
+    </option>
+    <option value="49_E">
+        Brant South: Tuscarora
+        <div id="1" reel="148128" frame="402" count="17"/>
+        <div id="2" reel="148128" frame="419" count="28"/>
+        <div id="3" reel="148128" frame="447" count="24"/>
+    </option>
+    <option value="50_A">
+        Brockville: Brockville City, Centre Ward
+        <div id="" reel="148128" frame="471" count="30"/>
+    </option>
+    <option value="50_B">
+        Brockville: Brockville City, East Ward
+        <div id="1" reel="148128" frame="501" count="21"/>
+        <div id="2" reel="148128" frame="522" count="22"/>
+    </option>
+</select>

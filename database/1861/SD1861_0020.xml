@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="20">
+    <option value="217">
+        Adolphustown
+    </option>
+    <option value="218">
+        Amherst Island
+    </option>
+    <option value="219">
+        Anglesea
+    </option>
+    <option value="220">
+        Camden
+    </option>
+    <option value="221">
+        Denbigh &amp; abinger
+    </option>
+    <option value="222">
+        Ernestown
+    </option>
+    <option value="223">
+        Fredericksburgh
+    </option>
+    <option value="224">
+        Kaladar
+    </option>
+    <option value="225">
+        Napanee Village
+    </option>
+    <option value="226">
+        Richmond
+    </option>
+    <option value="227">
+        Sheffield
+    </option>
+    <option value="227A">
+        Agricultural Census
+    </option>
+</select>

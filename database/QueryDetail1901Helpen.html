@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>1901 Census of Canada: Nominal Search Help</title>
+    <meta http-equiv=Content-Type content="text/html; charset=utf8">
+    <meta http-equiv="default-style" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2013 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+ *          															*
+	2010/11/21	new format
+	2013/02/27	add search by address
+ *	2014/01/06	use CSS for layout instead of <table>		*
+-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  
+  <body>
+    <div class="topcrumbs">
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/database/genCensusesHelpen.html">Censuses</a>: 
+    </div>
+    <div class="help">
+        <h1>1901 Census: Nominal Search Help</h1>
+    <p>This form permits you to specify the characteristics of individuals that
+    you are looking for in the 1901 Census of Canada.
+    <p>Once you have made all of your desired selections, click on the 
+    <span class="button">Query</span> button centered at the top of the form.	
+    <p>The 
+    <span class="button">Coverage</span> button displays a report on which
+    Districts and Sub-Districts are included in the current database and the
+    degree of completion of the transcription.	
+    <p class="label">Province</p>
+    <p>The Census of 1901 covered the Dominion of Canada, which was divided into
+    seven provinces: New Brunswick, Nova Scotia, Prince Edward Island, Quebec, Ontario, Manitoba, 
+    and British Columbia, as well as the North-West Territories.
+    If you wish to limit the search to a specific province the choice is made
+    using the selection list.
+    <p>At present the only data entered is for part of Ontario.
+    <p class="label">District</p>
+    <p>The country was divided into Census Districts which corresponded
+    approximately to electoral districts or ridings.
+    Although some of these Districts have the same name as Counties, they
+    do not generally have the same boundaries as the Counties with the same name.
+    <p>Initially this selection list includes all Districts in the country.
+    If a Province is selected then the District selection list is populated with
+    an alphabetical list of the census Districts in that Province.
+    <p class="label">Count</p>
+    <p>The Count field permits specifying how many records are to be displayed at
+    at a time.  The default is 20 records.
+    <p class="label">Sub-District</p>
+    <p>Each census District, generally the same as a County, was divided into 
+    census Sub-Districts, each conforming generally to a City Ward, Town, 
+    or Township.  The selection list of sub-districts is populated when you
+    select a District.
+    <p class="label">Division</p>
+    <p>Larger census sub-districts were further divided into enumeration divisions
+    or wards to try and balance out the workload for the enumerators.
+    The selection list of divisions is populated when you select a sub-district.
+    <p class="label">Page</p>
+    <p>Each page of the population census contained room for 50 individuals.
+    It is anticipated that the user will choose to search an individual page only
+    for the situation when the entire page, all 50 individuals, are the desired
+    target set.  Therefore selecting a specific page within a specific enumeration 
+    division ignores the Count field so that all rows of the page are displayed
+    and changes the default sort order to display the records in the order they
+    appear in the original.
+    <p class="label">Given Names</p>
+    <p>This field is used to specify text which is matched against the given names
+    of individuals in the database.  This search is done as a 
+    case-insensitive pattern match, not a simple comparison. 
+    <p>Specifying simple text, comprising letters and spaces, matches against
+    any names containing that text.  "John" or "john" or "JOHN" will match
+    "Johnathan" and "William John" as well as the simple "John".
+    <p>The text may be a 
+        <a href="http://en.wikipedia.org/wiki/Regular_expression">
+    	regular expression</a>.
+    There are too many options to enumerate here, but a few examples include:
+    <ul>
+        <li>If you want to match just the name "John", excluding names that include
+    	"John" as part of them, enter "^John$".
+        <li>Enumerators often use unusual spellings of names.  For example if you
+    	to match names including both "Henry" and "Henery", enter "Hen.*ry".
+    </ul>
+    <p class="label">Surname</p>
+    <p>This field is used to specify text to look for in the surname of individuals.
+    If the value contains only letters and spaces then only names that match
+    exactly (except for case) are found.  Otherwise this
+    uses the same pattern matching as described for Given Names.
+    For example to match surnames starting with "McL..." and ending with ".n",
+    such as "McLean", "McLain", "McLennan", or "McLellan" you could specify 
+    "^McL.*n$".
+    <p>The meaning of this field changes if the Soundex option is selected.
+    <p class="label">Soundex</p>
+    <p>The Soundex code has been used for decades to attempt to match names that
+    sound similar.  For example it is used by police forces to perform a rough
+    match for the names of drivers.  It is a problematic tool, as it
+    is based upon the phonetics of British surnames.
+    If you select this option along with a
+    complete surname, not a pattern match, in the Surname field, then the search
+    is made for surnames that "sound like" the given surname.  For example
+    specifying Soundex together with "McLean" will match all of the surnames in
+    the pattern match example under "Surname", but many other names as well, such
+    "McCallum", "McAllan", "McClain", and "McWilliams". 
+    <p class="label">Sex</p>
+    <p>Select this option if you only want to look for male or female individuals.
+    <p class="label">Marital Status</p>
+    <p>Select this option if you wish to restrict the search based upon the
+    marital status of the individuals.
+    <p class="label">Occupation</p>
+    <p>This option is used to search for individuals based upon their listed
+    occupations.  This is again a pattern match.  For example searching for 
+    "Labo[u]{0,1}rer" will match any occupation that contains either "Laborer" or
+    "Labourer", including "Farm Labourer" and "R'y Laborer".
+    <p class="label">Birth Place</p>
+    <p>This option is used to search for individuals based upon where they were
+    born.  This is a pattern match.  For example searching for "Canada" will 
+    also match "Canada East", "Canada West", "Lower Canada", and "Upper Canada".
+    <p class="label">Father"s Birth Place</p>
+    <p>This option is used to search for individuals based upon
+    where their Father was born.  This is a pattern match.
+    <p class="label">Mother"s Birth Place</p>
+    <p>This option is used to search for individuals based upon
+    where their Mother was born.  This is a pattern match.
+    </p>
+    <p class="label">Religion</p>
+    <p>This option is used to search for individuals based upon their
+    religious affiliation.  This is a pattern match.  For example searching for
+    "Meth" will match any religion containing that string, including
+    "Wesleyan Methodist", "C. Meth.", "New Connexion Methodist", 
+    and "Methodist Episcopal".
+    </p>
+    <p class="label">Address</p>
+    <P>This option is used to
+    search for individuals based upon their address as recorded in
+    schedule 2. This is a pattern match. For example searching for
+    &quot;Dundas St&quot; will match any address containing that string,
+    including &quot;137 Dundas St&quot;, &quot;cor of Queen St &amp;
+    Dundas St&quot; and &quot;Dundas Station&quot;. 
+    </p>
+    <p class="label">Birth Year &amp; Range</p>
+    <p>The Birth Year and Range fields are used to search for individuals based upon 
+    their approximate birth year calculated from their age at the time of the census
+    in spring 1901.  
+    </div>
+    <div class="botcrumbs">
+        <span class="right">
+    	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+        </span>
+      <a href="/contactAuthor.php?subject=QueryDetail1901Helpen.html" target="_blank">Contact Author</a>
+      <br/>
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/database/genCensusesHelpen.html">Censuses</a>: 
+      <div style="clear: both;"></div>
+    </div>
+  </body>
+</html>

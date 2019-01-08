@@ -1,0 +1,142 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+   <title>Given Names Table Edit: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  NicknamesHelpen.html                                                *
+ *                                                                      *
+ *  History:															*
+ *		2017/12/10		created											*
+ *		2018/01/10		add screenshot of dialog						*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+</head>
+<body>
+<div class="topcrumbs">
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>:
+	<a href="/FamilyTree/NamesHelpen.html">List of Names</a>:
+</div>
+<div class="help">
+<h1>Given Names Table Edit: Help</h1>
+  <p>This page is used for editing the table of alternate Given Names.
+  </p>
+  <p>Original documents frequently have unusual spellings for given names which,
+    if taken literally, would not match to the appropriate individuals in the
+    family tree.
+  </p>
+  <p>
+    For example a document contains information about an individual where
+    the given name was spelled "Arthereld".  To ensure that this will match an
+    individual in the family tree named "Ethelred" the alternate given names 
+    table defines a search prefix "Ethel" to use when searching with
+    "Arthereld" so, in addition to searching for individuals whose
+    given name startes with the prefix "Ar" the results of the
+    search will also include individuals who has a given name
+    starting with "Ethel".
+  </p>
+  <p>The alternate given names is used to define a prefix, or list of prefixes,
+    which are used to match the beginning of each given name in the family 
+    tree based upon a literal given name from an original document.  
+    For information purposes it also has a field which displays the
+    "normal" spelling of the given name or names which it appears
+    the author of the original document intended. 
+  </p>
+  <p>
+    All name searches include gender if the original document contained a
+    gender.
+    For example most vital statistics (birth, marriage, and death) contain a
+    gender, as well as censuses.  However the Wesleyan Methodist baptisms for
+    Ontario and Quebec do not, and the British vital statistic registry indices
+    do not.
+  </p>
+  <p>
+    When searching for a match on given name if the search value consists of
+    multiple names then the search is done for each of the names and is compared
+    to each of the parts of the given name of each individual in the
+    family tree.
+    For example if the search value, from the original document, is 
+    "George William" then it will be match against anyone who has a given
+    name matching either "George" or "William".
+  </p>
+  <p>
+    When comparing a given name component to a given name component the
+    comparison is usually done in a "loose" manner to tolerate normal
+    variations.  The current procedure is:
+  </p>
+  <ul>
+    <li>if the given name matches an entry in the alternate names table
+	then the search is done using the list of prefixes defined in the
+	table. 
+	The table can be used to reduce the number of matches for extremely
+	common names, for example "Mary", by requiring a match on more then
+	the default 2 characters.
+	Otherwise ...
+    <li>If the given name component is a single letter or a single letter
+	followed by a period, that is an "initial", the single letter
+	matches against any given name starting with that letter.
+	For example "G." will match "George", "Grace", "Gordon", or "Gertrude".
+	Otherwise ...
+    <li>If the given name is at least 2 characters long it matches all
+	given names starting with the first 2 characters.  For example "John"
+	or "Joan" or "Jonathan" or "Joanna" will all match any given name
+	starting with "Jo".
+  </ul>
+  <img src="/Images/Nicknames.png" alt="Alternate Names Dialog">
+  <p>
+    When entered with no parameters the dialog displays the first 20
+    entries from the table, and you can scroll through the entire table
+    using the left and right arrow hyperlinks.  When you hold the cursor
+    over these hyperlinks the application displays an explanation of what
+    clicking on the hyperlink will do.
+    You can enter text into the "Pattern" field to limit the display to entries
+    whose "nickname" field matches the pattern.  This is a regular expression.
+    For example if you enter "th" only entries whose "nickname" field
+    <em>contains</em> the string "th" are displayed. 
+    If you enter "^g" then only entries whose "nickname" field
+    <em>starts</em> with the letter "g" are displayed.
+    If you enter "s$" then only entries whose "nickname" field
+    <em>ends</em> with the letter "s" are displayed.
+  </p>
+  <p>The first column displays the value that matches exactly to a given name
+    as found in a transcriptions of an original document.
+  </p>
+  <p>The second contains a given name prefix, or a comma-separated list of
+    given name prefixes that will be used to search the family tree for
+    a match.  The first entry will match against given names such as "Betrice",
+    or "Beatrice", or "Trisha".
+  </p>
+  <p>The third column is a comment indicating the most popular "standard"
+    spelling of the given name.
+  <p>
+    Administrators have the ability to modify entries in this table and to 
+    add new entries.  All contributors can view the contents of this table.
+    To add a new entry click on <span class="button">Add a Given Name</span>.
+    To apply all of the changes entered on the page click on 
+    <span class="button">Update Database</span> or press the Enter key while
+    the cursor is in any input field.
+  </p>
+</div>
+<div class="botcrumbs">
+    <span class="right">
+	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+    </span>
+	<a href="/contactAuthor.php?subject=NickamesHelpen.html" target="_blank">Contact Author</a>
+	<br/>
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>:
+	<a href="/FamilyTree/NamesHelpen.html">List of Names</a>:
+    <div style="clear: both;"></div>
+</div>
+</body>
+</html>

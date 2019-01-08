@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148106">
+    <option value="20_I">
+        St. John City: Wellington Ward
+        <div id="1" reel="148106" frame="0" count="36"/>
+        <div id="2" reel="148106" frame="36" count="42"/>
+    </option>
+    <option value="21_A">
+        St. John: Dufferin Ward, Portland Town
+        <div id="1" reel="148106" frame="78" count="40"/>
+        <div id="2" reel="148106" frame="118" count="41"/>
+    </option>
+    <option value="21_B">
+        St. John: Lansdowne Ward, Portland Town
+        <div id="" reel="148106" frame="159" count="75"/>
+    </option>
+    <option value="21_C">
+        St. John: Lorne Ward, Portland Town
+        <div id="" reel="148106" frame="234" count="63"/>
+    </option>
+    <option value="21_D">
+        St. John: Stanley Ward, Portland Town
+        <div id="" reel="148106" frame="297" count="20"/>
+    </option>
+    <option value="21_E">
+        St. John: Victoria Ward, Portland Town
+        <div id="" reel="148106" frame="317" count="69"/>
+    </option>
+    <option value="21_F">
+        St. John: Lancaster
+        <div id="1" reel="148106" frame="386" count="68"/>
+        <div id="2" reel="148106" frame="454" count="19"/>
+    </option>
+    <option value="21_G">
+        St. John: Musquash
+        <div id="" reel="148106" frame="473" count="17"/>
+    </option>
+    <option value="21_H">
+        St. John: St. Martins
+        <div id="" reel="148106" frame="490" count="49"/>
+    </option>
+    <option value="21_I">
+        St. John: Simonds
+        <div id="1" reel="148106" frame="539" count="40"/>
+        <div id="2" reel="148106" frame="579" count="23"/>
+    </option>
+    <option value="22_A">
+        Sunbury: Blissville
+        <div id="1" reel="148106" frame="602" count="10"/>
+        <div id="2" reel="148106" frame="612" count="8"/>
+    </option>
+    <option value="22_B">
+        Sunbury: Burton
+        <div id="1" reel="148106" frame="620" count="22"/>
+    </option>
+</select>

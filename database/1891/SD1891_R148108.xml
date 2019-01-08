@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148108">
+    <option value="24_B">
+        Westmoreland: Dorchester
+        <div id="4" reel="148108" frame="0" count="35"/>
+    </option>
+    <option value="24_C">
+        Westmoreland: Moncton City
+        <div id="1" reel="148108" frame="35" count="52"/>
+        <div id="2" reel="148108" frame="87" count="50"/>
+        <div id="3" reel="148108" frame="137" count="36"/>
+        <div id="4" reel="148108" frame="173" count="41"/>
+    </option>
+    <option value="24_D">
+        Westmoreland: Moncton
+        <div id="1" reel="148108" frame="214" count="35"/>
+        <div id="2" reel="148108" frame="249" count="31"/>
+        <div id="3" reel="148108" frame="280" count="40"/>
+    </option>
+    <option value="24_E">
+        Westmoreland: Sackville
+        <div id="1" reel="148108" frame="320" count="30"/>
+        <div id="2" reel="148108" frame="350" count="37"/>
+        <div id="3" reel="148108" frame="387" count="36"/>
+    </option>
+    <option value="24_F">
+        Westmoreland: Salisbury
+        <div id="1" reel="148108" frame="423" count="41"/>
+        <div id="2" reel="148108" frame="464" count="38"/>
+    </option>
+    <option value="24_G">
+        Westmoreland: Shediac
+        <div id="1" reel="148108" frame="502" count="33"/>
+        <div id="2" reel="148108" frame="535" count="28"/>
+        <div id="3" reel="148108" frame="563" count="33"/>
+        <div id="4" reel="148108" frame="596" count="33"/>
+    </option>
+    <option value="24_H">
+        Westmoreland: Westmoreland
+        <div id="1" reel="148108" frame="629" count="23"/>
+    </option>
+</select>

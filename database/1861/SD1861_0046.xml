@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="46">
+    <option value="483G">
+        Ward 1
+    </option>
+    <option value="483A">
+        Ward 2
+    </option>
+    <option value="483B">
+        Ward 3
+    </option>
+    <option value="483C">
+        Ward 4
+    </option>
+    <option value="483D">
+        Ward 5
+    </option>
+    <option value="483E">
+        Ward 6
+    </option>
+    <option value="483F">
+        Ward 7
+    </option>
+    <option value="483G">
+        Ward 8
+    </option>
+    <option value="483H">
+        Ward 9
+    </option>
+    <option value="483I">
+        Ward 10
+    </option>
+    <option value="483J">
+        Ward 11
+    </option>
+    <option value="483K">
+        Ward 12
+    </option>
+</select>

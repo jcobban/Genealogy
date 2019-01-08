@@ -1,0 +1,90 @@
+<!DOCTYPE HTML >
+<html lang="$LANG">
+  <head>
+    <title>
+	$TITLE
+    </title>
+<!--*********************************************************************
+ *  pagefr.html															*
+ *																		*
+ *  HTML template used for pages which are not dialogs.					*
+ *																		*
+ *  History:															*
+ *		2018/11/28		Created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+    <meta charset='utf-8'>
+    <meta name='author' content='James A. Cobban'>
+    <meta name='copyright' content='&copy; 2018 James A. Cobban'>
+    <meta name='keywords' content='genealogy, family, tree, ontario, canada $KEYWORDS'>
+    <link rel='stylesheet' type='text/css' href='/styles.css'>
+    <link rel='stylesheet' type='text/css' href='$filename.css'
+            id="otherStylesheets">
+  </head>
+  <body>
+  <header>
+  <div class='topcrumbs'> <!-- start of page header -->
+    <span class='right'>
+      <button id='rightTop' type='button'>
+	    $BLOGFLAG$USERID$CONTRIBUTE
+      </button>
+    </span>
+    <span class='right368'>
+      <iframe id='advertFrame' class='advert' $IECRAP src='$ADURL'>
+      </iframe>
+    </span>
+    $BREADCRUMBS
+    <div style='clear: both;'></div>
+    </div> <!-- end of page header -->
+  </header>
+  <main>
+<noscript>
+  <p class="warning">
+    Pour utiliser toutes les fonctionnalités de ce site, 
+    il faut d'activer EcmaScript/JavaScript.
+    Voici <a href="https://www.enable-javascript.com/" target="_blank">
+    les instructions pour activer JavaScript dans votre navigateur Web</a>.
+  </p>
+</noscript>
+$MAIN
+  </main>
+  <footer>
+    <div class='botcrumbs'>
+      <span class='right450'>
+	<iframe id='facebookFrame' class='facebook' $IECRAP>
+	</iframe>
+	&nbsp;
+	<img src='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+      </span>
+	<a href='/contactAuthor.php?lang=fr&idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
+	  Contacter l'auteur</a>
+	<br>
+    $BREADCRUMBS
+      <div style='clear: both;'></div>
+    </div> <!-- end of page footer -->
+  </footer>
+    <div class='hidden' id='UserInfo'>
+      <span id='UserInfoUserid'>$USERID</span>
+      <span id='UserInfoAuthorized'>$AUTHORIZED</span>
+      <span id='UserInfoOptions'>$OPTIONS</span>
+    </div>
+    <div class='balloon' id='HelprightTop'>
+    Cliquez sur ce bouton pour vous connecter pour accéder aux fonctionnalités
+    étendues du site Web ou pour gérer votre compte sur le site Web.
+    </div>
+    <div class='balloon' id='msgDiv'>
+    </div>
+    <div id='hideMsgTemplate' class='hidden'>
+      <!-- template for dialog reporting error -->
+      <form name='Msg\$template' id='Msg\$template'>
+	    <p class='message'>\$msg</p>
+	    <p>
+	      <button type='button' id='closeDlg\$template'>
+        	d'Accord
+	      </button>
+	    </p>
+      </form>
+    </div>		<!-- id='hideMsgTemplate'-->
+  </body>
+</html>

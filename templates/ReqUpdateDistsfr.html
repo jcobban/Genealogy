@@ -1,0 +1,87 @@
+<!--*********************************************************************
+ *  ReqUpdateDistsfr.html						*
+ *									*
+ *  Census of Canada							*
+ *									*
+ *  History:								*
+ *	2017/10/23	created						*
+ *	2018/01/04	remove Template from template file names	*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+  <div class='hidden' id='breadcrumbs'>
+    <a href='/genealogy.php?lang=fr'>Généalogie</a>:
+    <a href='/genCountry.php?cc=CA&amp;lang=fr'>Canada</a>:
+    <a href='/database/genCensuses.php?lang=fr'>Recensements</a>:
+    <a href='/database/EditCensuses.php?lang=fr'>Administration des Recensements</a>:
+  </div>
+<div class='body'>
+  <h1>
+    <span class='right'>
+	<a href='/database/ReqUpdateDistsHelpfr.html' target='help'>? Help</a>
+    </span>
+    Administration des Recensements: $COUNTRYNAME: Recensement $CENSUSYEAR : Choisir la Table des Districts
+    <div style='clear: both;'></div>
+  </h1>
+
+  $TRACE
+  $MSG
+  <form action='DistForm.php' name='distForm' id='distForm'>
+    <div id='formTable'>
+      <div class='row' id='distRow'>
+	<div class='left'>
+          <label class='labelSmall' style='width: 6em;' for='Census'>
+	    Census:
+	  </label>
+	  <select size='8' name='Census' id='Census' class='white left'>
+	    <option value=''>Choisire un Recensement:</option>
+	    <option id='censusOpt' value='$id' $selected>
+		$name:
+	    </option>
+	  </select> 
+	</div>
+	<div class='left'>
+          <label class='labelSmall' style='width: 6em;' for='Province'>
+	    Province:
+	  </label>
+  	  <select size='8' name='Province' id='Province' class='white left'>
+	    <option id='allProvincesOpt' value='' $selected>
+		Toutes Provinces
+	    </option>
+	    <option id='provinceOpt' value='$pc' $selected>
+		$name
+	    </option>
+	  </select> 
+        </div>
+	<div style='clear: both;'></div>
+      </div>
+    </div>
+    <p>
+      <button type='submit' id='Submit'>Voir Détails</button>
+    </p>
+  </form>
+  </div> <!-- end of <div id='body'> -->
+  <!-- The remainder of the page consists of context specific help text.
+  -->
+  <div class='balloon' id='HelpCensus'>
+    The Census selection list is used to specify the year of the
+    census enumeration for which you wish to update a District description.
+  </div>
+  <div class='balloon' id='HelpProvince'>
+    The Province selection list is an alphabetical list of the
+    provinces in the specified census.  It is used if you wish to limit the 
+    displayed list of districts to a specific province.
+    The list of districts in the province is displayed as soon as you select
+    an entry from this list.
+  </div>
+  <div class='balloon' id='HelpSubmit'>
+    Click on this button to request the display of the list of districts.
+  </div>
+    <script src= '/jscripts/CommonForm.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= '/database/ReqUpdateDists.js' type="text/javascript">
+    </script>

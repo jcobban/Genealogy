@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148158">
+    <option value="96_E">
+        Norfolk North: Waterford Village
+        <div id="" reel="148158" frame="0" count="26"/>
+    </option>
+    <option value="96_F">
+        Norfolk North: Windham
+        <div id="1" reel="148158" frame="26" count="22"/>
+        <div id="2" reel="148158" frame="48" count="25"/>
+        <div id="3" reel="148158" frame="73" count="22"/>
+        <div id="4" reel="148158" frame="95" count="21"/>
+    </option>
+    <option value="97_A">
+        Norfolk South: Charlotteville
+        <div id="1" reel="148158" frame="116" count="35"/>
+        <div id="2" reel="148158" frame="151" count="46"/>
+    </option>
+    <option value="97_B">
+        Norfolk South: Houghton
+        <div id="1" reel="148158" frame="197" count="14"/>
+        <div id="2" reel="148158" frame="211" count="28"/>
+    </option>
+    <option value="97_C">
+        Norfolk South: Port Dover Village
+        <div id="" reel="148158" frame="239" count="25"/>
+    </option>
+    <option value="97_D">
+        Norfolk South: Port Rowan Village
+        <div id="" reel="148158" frame="264" count="15"/>
+    </option>
+    <option value="97_E">
+        Norfolk South: Simcoe Town
+        <div id="" reel="148158" frame="279" count="55"/>
+    </option>
+    <option value="97_F">
+        Norfolk South: Walsingham
+        <div id="1" reel="148158" frame="334" count="27"/>
+        <div id="2" reel="148158" frame="361" count="27"/>
+        <div id="3" reel="148158" frame="388" count="21"/>
+        <div id="4" reel="148158" frame="409" count="26"/>
+    </option>
+    <option value="97_G">
+        Norfolk South: Woodhouse
+        <div id="1" reel="148158" frame="435" count="21"/>
+        <div id="2" reel="148158" frame="456" count="33"/>
+    </option>
+    <option value="98_A">
+        Northumberland East: Brighton
+        <div id="1" reel="148158" frame="489" count="0"/>
+        <div id="2" reel="148158" frame="489" count="28"/>
+        <div id="3" reel="148158" frame="517" count="14"/>
+        <div id="4" reel="148158" frame="531" count="9"/>
+        <div id="5" reel="148158" frame="540" count="15"/>
+    </option>
+    <option value="98_B">
+        Northumberland East: Brighton Village
+        <div id="1" reel="148158" frame="555" count="13"/>
+        <div id="2" reel="148158" frame="568" count="11"/>
+        <div id="3" reel="148158" frame="579" count="9"/>
+    </option>
+    <option value="98_C">
+        Northumberland East: Campbellford Village
+        <div id="1" reel="148158" frame="588" count="22"/>
+        <div id="2" reel="148158" frame="610" count="17"/>
+        <div id="3" reel="148158" frame="627" count="13"/>
+    </option>
+    <option value="98_D">
+        Northumberland East: Colborne Village
+        <div id="" reel="148158" frame="640" count="23"/>
+    </option>
+    <option value="98_E">
+        Northumberland East: Cramahe
+        <div id="1" reel="148158" frame="663" count="13"/>
+        <div id="2" reel="148158" frame="676" count="11"/>
+        <div id="3" reel="148158" frame="687" count="14"/>
+        <div id="4" reel="148158" frame="701" count="16"/>
+        <div id="5" reel="148158" frame="717" count="15"/>
+    </option>
+    <option value="98_F">
+        Northumberland East: Hastings Village
+        <div id="" reel="148158" frame="732" count="18"/>
+    </option>
+    <option value="98_G">
+        Northumberland East: Murray
+        <div id="1" reel="148158" frame="750" count="13"/>
+        <div id="2" reel="148158" frame="763" count="12"/>
+        <div id="3" reel="148158" frame="775" count="18"/>
+        <div id="4" reel="148158" frame="793" count="16"/>
+    </option>
+</select>

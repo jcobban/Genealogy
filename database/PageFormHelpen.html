@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Census of Canada: Update Pages Table Help</title>
+      <meta http-equiv=Content-Type content="text/html; charset=utf-8">
+      <meta name="author" content="James A. Cobban">
+      <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *   History:															*
+ *          															*
+ *		2011/06/03		renamed and updated								*
+ *		2013/09/04		updated with new functionality					*
+ *		2014/01/06		replace tables with CSS for layout				*
+ *		2015/05/24		point header at help pages not action pages		*
+ *						add documentation of image display				*
+ *      2018/11/08      rename to ...Helpen.html                        *
+ **********************************************************************-->
+  <link rel="stylesheet" type="text/css" href="/styles.css"/>
+      <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  <body>
+  <div class="topcrumbs">
+    <a href="/genealogyHelpen.html">Genealogy</a>: 
+    <a href="/Canada/genCanadaHelpen.html">Canada</a>:
+    <a href="/database/genCensusesHelpen.html">Censuses</a>:
+    <a href="/database/ReqUpdatePagesHelpen.html">Edit Pages Table</a>:
+  </div>
+  <div class="help">
+    <h1>How to Update the Pages Table</h1>
+    <p>
+      The <b>Pages</b> table is intended to provide information on each page 
+      of each division of the enumeration of living individuals of all of
+      the censuses, starting with the 1851/2 and 1861 censuses of the 
+      Colony of Canada, and including the 1871, 1881, 1891, 1901, 1911
+      and 1921 censuses of the Dominion of Canada, and
+      the 1906 and 1916 censuses of the prairie provinces.
+      The table is not complete because there is no automated way to
+      collect all of the necessary information.  The  
+      <a href="ReqUpdatePagesHelpen.html" target="_blank">Edit Pages Table</a>
+      page is used to manage the collection of this information.
+    </p>
+    <p>Further information on the use of each of the fields on this page
+      is available by holding the mouse over any field or button on the page.
+    </p>
+    <p>This page prompts for the complete identification of an enumeration
+      division.  When you first enter this page it appears like:
+    </p>
+    <img class="figure" SRC="ReqUpdatePages.png" alt="Screenshot">
+    <p id="Census">
+      The Census selection list is used to specify the year of the
+      census enumeration for which you wish to update a Sub-District description.
+      Until you select a year the selection list of provinces and 
+      the selection list of census districts are not populated.
+    </p>
+    <p id="Province">
+      The Province selection list is an alphabetical list of the
+      provinces in the specified census.  It is filled in when you select
+      a specific census year.  This selection list is used if you wish to
+      limit the 
+      displayed list of districts to a specific province.  Pre-Confederation
+      censuses were administered independently in each of the colonies, and in 
+      Canada East and Canada West.  For these censuses it is necessary to select
+      the colony/province, and the application initially selects Canada West 
+      (later re-named Ontario).
+    </p>
+    <p id="District">
+      The District selection list is an alphabetical list of census
+      districts, roughly equivalent to federal electoral ridings in 
+      Post-Confederation censuses, and to counties in Pre-Confederation censuses.
+      When you first select a post-Confederation census year this is initialized 
+      with a list of all districts in the selected census.  For pre-Confederation
+      censuses it is initialized with a list of all counties in Canada West
+      (Ontario).
+    </p>
+    <p id="SubDistrict">
+      The Sub-District selection list is an alphabetical list of census
+      sub-districts within a district.  Generally they correspond to
+      city wards, towns, or townships.
+      This selection list is not populated until you select an individual
+      district.
+    </p>
+    <p id="Division">
+      The Division selection list does not appear until you select a Sub-District.
+      If there is more than one division in the Sub-District, you must
+      select the division before submitting the request.
+    </p>
+    <p>Once you have selected the desired division the dialogue should
+      look something like this:
+    </p>
+    <img class="figure" SRC="ReqUpdatePages2.png" alt="Screenshot">
+    <p id="Submit">
+      The "Request Form" button is used to request that the edit page for the
+      pages within the individual enumeration schedule of the identified
+      sub-district be displayed.  This result can also be achieved by pressing
+      the Enter key.
+    </p>
+    <p>When you submit the request a form displaying the contents of the portion
+      of the Pages table for the requested enumeration division is displayed
+      to permit you to edit the fields.
+    </p>
+    <img class="figure" SRC="PageForm.png" alt="Screenshot">
+    <p>At the top and the bottom of the table of fields there is a line with three
+      components:
+    <ul>
+      <li>An arrow pointing left.  This is a hyperlink to the preceding division
+      	within the current district.  If you click on this hyperlink any
+      	changes you have made to the page descriptions of the current division
+      	are discarded.
+      	You must click on the "Update Database" button at the bottom of the
+      	form to apply changes.
+      <li>A description of the current division being editted.
+      <li>An arrow pointing right.  This is a hyperlink to the next division
+      	within the current district.  If you click on this hyperlink any
+      	changes you have made to the page descriptions of the current division
+      	are discarded.
+      	You must click on the "Update Database" button at the bottom of the
+      	form to apply changes.
+    </ul>
+    </p>
+    <p>The body of the form functions like a spreadsheet.
+     <ul>
+      <li>The forward and backward tab keys and the left and right arrow keys
+  	change the selected cell in the table
+      	to the left or the right. Motion wraps around at the left and right
+      	edges of the table.
+      <li>The up and down arrows change the selected cell in the table up or down
+      	one row at a time.
+      	Motion wraps around at the bottom and top of the table.
+      <li>The enter (return) key changes the selected cell in the table down
+      	one row at a time, rather than submitting the form as happens on
+      	simpler pages.
+     </ul>
+    </p>
+    <p>Note that you can hide any column by clicking on the column header with
+      the mouse.  You can subsequently display the column by clicking on the
+      narrow place holder in the column header.
+    </p>
+    <p>
+      The Page number field is a sequential number from the first to
+      the last page number defined for the current division.  It is not editable.
+    </p>
+    <p>
+      The Count field contains the count of the number of individuals
+      enumerated in the image of the original. 
+      For most pages it is the number of rows on the original form.
+      This is a decimal number.
+    </p>
+    <p>
+      The Transcriber field contains the user identifier of the individual 
+      responsible for transcribing this page.  It is set to the first user
+      to edit the page.  Once set the page is edittable only by that user,
+      all other users, including the proofreader, can only comment on the 
+      transcription.
+    </p>
+    <p>
+      The Proofreader field contains the user identifier of the individual 
+      who first entered comments on this page.
+    </p>
+    <p>
+      The Image field contains the URL of the original census image as
+      it is available from the Library and Archives of Canada web-site.
+      The first time a division is accessed this field is initialized 
+      in each row from
+      information in the Sub-District table, assuming the most common pattern
+      for page images within the particular census.  
+      The Sub-District table contains information on the
+      first image URL in a division.
+    </p>
+    <p>
+      The <span class="button">View</span> button causes the browser window
+      to be split in two so the
+      image identified by the Image URL column is visible.  If the displayed
+      image does not show the correct page from the original census then the
+      backward and forward arrows (<span class="male"><u>&lt;---</u></span> and
+      <span class="male"><u>---&gt;</u></span>) may be used to move through
+      the image set.  As you change the displayed image in this way the
+      value of the URL Image field in the table is changed so it always
+      reflects the currently displayed image.
+    </p>
+    <img class="figure" SRC="PageFormWithImage.png" alt="Screenshot">
+    <p>Further information on the use of each of the fields on this page
+      is available by holding the cursor over the field or button.
+    </p>
+    <p>
+      You must click on the 
+    <span class="button"><u>U</u>pdate Database</span> button at the bottom of the
+      form to apply changes.  
+      If you click on the left or right arrow hyperlinks to the preceding and
+      following divisions in the web browser tool line
+      any changes you made to the table are discarded.
+      Observe that unlike simpler forms you cannot
+      submit this form by pressing the Enter key, because this simply moves
+      the selected cell down one row in the table.
+    </p>
+    <p>Once the database has been updated a page like the following is displayed.
+    </p>
+    <img class="figure" SRC="/database/PageUpdate.png" alt="Screenshot">
+    <p>There are usually three buttons displayed:
+    <ul>
+      <li>The first button takes you back to the Pages table update request
+      	page just as it was immediately before you clicked on 
+      	<span class="button">Request Form</span>.
+      	You can then select any other census division to work on.
+      	Note that the last item in the trail of breadcrumbs in the page
+      	header and trailer is a hyperlink to that same page.
+      <li>If you were not editting the very first division in the district there
+      	is a button to request editting the division preceding the division
+      	you just editted.
+      <li>If you were not editting the very last division in the district there
+      	is a button to request editting the division following the division
+      	you just editted.
+    </ul>
+    </p>
+  </div>
+  <div class="botcrumbs">
+      <span class="right">		
+  	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+      </span>
+    <a href="/contactAuthor.php?subject=PageFormHelpen.html" target="_blank">
+    	Contact Author</a>
+    <br/>
+    <a href="/genealogyHelpen.html">Genealogy</a>: 
+    <a href="/Canada/genCanadaHelpen.html">Canada</a>:
+    <a href="/database/genCensusesHelpen.html">Censuses</a>:
+    <a href="/database/ReqUpdatePagesHelpen.html">Edit Pages Table</a>:
+    <div style="clear: both;"></div>
+  </div>
+  </body>
+</html>

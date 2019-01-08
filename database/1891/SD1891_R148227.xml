@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148227">
+    <option value="196_B">
+        Yamaska: Pierreville &amp; Abenakis Villages
+        <div id="2" reel="148227" frame="0" count="8"/>
+    </option>
+    <option value="196_C">
+        Yamaska: St. David
+        <div id="" reel="148227" frame="8" count="49"/>
+    </option>
+    <option value="196_D">
+        Yamaska: St. Elphège
+        <div id="" reel="148227" frame="57" count="16"/>
+    </option>
+    <option value="196_E">
+        Yamaska: St. François
+        <div id="" reel="148227" frame="73" count="47"/>
+    </option>
+    <option value="196_F">
+        Yamaska: St. Michel
+        <div id="" reel="148227" frame="120" count="14"/>
+    </option>
+    <option value="196_G">
+        Yamaska: St. Pie de Guire
+        <div id="" reel="148227" frame="134" count="27"/>
+    </option>
+    <option value="196_H">
+        Yamaska: St. Thomas de Pierreville
+        <div id="" reel="148227" frame="161" count="43"/>
+    </option>
+    <option value="196_I">
+        Yamaska: St. Zéphirin de Courval
+        <div id="" reel="148227" frame="204" count="34"/>
+    </option>
+    <option value="196_J">
+        Yamaska: Yamaska Village
+        <div id="" reel="148227" frame="238" count="37"/>
+    </option>
+    <option value="197_A">
+        Alberta: Calgary &amp; Red Deer
+        <div id="1" reel="148227" frame="275" count="7"/>
+        <div id="2" reel="148227" frame="282" count="10"/>
+        <div id="3" reel="148227" frame="292" count="7"/>
+        <div id="4" reel="148227" frame="299" count="5"/>
+        <div id="5" reel="148227" frame="304" count="9"/>
+        <div id="6" reel="148227" frame="313" count="4"/>
+        <div id="7" reel="148227" frame="317" count="9"/>
+        <div id="8" reel="148227" frame="326" count="10"/>
+        <div id="9" reel="148227" frame="336" count="10"/>
+        <div id="10" reel="148227" frame="346" count="9"/>
+        <div id="11" reel="148227" frame="355" count="5"/>
+        <div id="12" reel="148227" frame="360" count="21"/>
+        <div id="13" reel="148227" frame="381" count="18"/>
+        <div id="14" reel="148227" frame="399" count="11"/>
+        <div id="15" reel="148227" frame="410" count="13"/>
+        <div id="16" reel="148227" frame="423" count="9"/>
+        <div id="17" reel="148227" frame="432" count="33"/>
+    </option>
+    <option value="197_B">
+        Alberta: Edmonton
+        <div id="1" reel="148227" frame="465" count="24"/>
+        <div id="2" reel="148227" frame="489" count="22"/>
+        <div id="3" reel="148227" frame="511" count="13"/>
+        <div id="4" reel="148227" frame="524" count="18"/>
+        <div id="5" reel="148227" frame="542" count="27"/>
+    </option>
+    <option value="197_C">
+        Alberta: McLeod
+        <div id="1" reel="148227" frame="569" count="58"/>
+        <div id="2" reel="148227" frame="627" count="13"/>
+        <div id="3" reel="148227" frame="640" count="19"/>
+    </option>
+    <option value="198_A">
+        Assiniboia East: Broadview
+        <div id="1" reel="148227" frame="659" count="44"/>
+        <div id="2" reel="148227" frame="703" count="13"/>
+        <div id="3" reel="148227" frame="716" count="11"/>
+        <div id="4" reel="148227" frame="727" count="11"/>
+        <div id="5" reel="148227" frame="738" count="6"/>
+        <div id="6" reel="148227" frame="744" count="9"/>
+        <div id="7" reel="148227" frame="753" count="10"/>
+        <div id="8" reel="148227" frame="763" count="15"/>
+        <div id="9" reel="148227" frame="778" count="18"/>
+    </option>
+</select>

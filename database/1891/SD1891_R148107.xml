@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148107">
+    <option value="22_B">
+        Sunbury: Burton
+        <div id="2" reel="148107" frame="0" count="4"/>
+    </option>
+    <option value="22_C">
+        Sunbury: Gladstone
+        <div id="" reel="148107" frame="4" count="19"/>
+    </option>
+    <option value="22_D">
+        Sunbury: Lincoln
+        <div id="" reel="148107" frame="23" count="18"/>
+    </option>
+    <option value="22_E">
+        Sunbury: Maugerville
+        <div id="" reel="148107" frame="41" count="10"/>
+    </option>
+    <option value="22_F">
+        Sunbury: Northfield
+        <div id="" reel="148107" frame="51" count="14"/>
+    </option>
+    <option value="22_G">
+        Sunbury: Sheffield
+        <div id="" reel="148107" frame="65" count="15"/>
+    </option>
+    <option value="23_A">
+        Victoria: Andover
+        <div id="" reel="148107" frame="80" count="26"/>
+    </option>
+    <option value="23_B">
+        Victoria: Drummond
+        <div id="1" reel="148107" frame="106" count="30"/>
+        <div id="2" reel="148107" frame="136" count="13"/>
+    </option>
+    <option value="23_C">
+        Victoria: Gordon
+        <div id="" reel="148107" frame="149" count="16"/>
+    </option>
+    <option value="23_D">
+        Victoria: Grand Falls
+        <div id="" reel="148107" frame="165" count="33"/>
+    </option>
+    <option value="23_E">
+        Victoria: Lorne
+        <div id="" reel="148107" frame="198" count="7"/>
+    </option>
+    <option value="23_F">
+        Victoria: Madawaska
+        <div id="" reel="148107" frame="205" count="35"/>
+    </option>
+    <option value="23_G">
+        Victoria: Perth
+        <div id="1" reel="148107" frame="240" count="22"/>
+        <div id="2" reel="148107" frame="262" count="16"/>
+    </option>
+    <option value="23_H">
+        Victoria: Ste. Anne
+        <div id="" reel="148107" frame="278" count="20"/>
+    </option>
+    <option value="23_I">
+        Victoria: St. Basil
+        <div id="" reel="148107" frame="298" count="33"/>
+    </option>
+    <option value="23_J">
+        Victoria: St. Francis
+        <div id="" reel="148107" frame="331" count="42"/>
+    </option>
+    <option value="23_K">
+        Victoria: St. Hilaire
+        <div id="" reel="148107" frame="373" count="21"/>
+    </option>
+    <option value="23_L">
+        Victoria: St. Jacques
+        <div id="" reel="148107" frame="394" count="19"/>
+    </option>
+    <option value="23_M">
+        Victoria: St. Leonard
+        <div id="1" reel="148107" frame="413" count="25"/>
+        <div id="2" reel="148107" frame="438" count="25"/>
+    </option>
+    <option value="24_A">
+        Westmoreland: Botsford
+        <div id="1" reel="148107" frame="463" count="24"/>
+        <div id="2" reel="148107" frame="487" count="33"/>
+        <div id="3" reel="148107" frame="520" count="30"/>
+    </option>
+    <option value="24_B">
+        Westmoreland: Dorchester
+        <div id="1" reel="148107" frame="550" count="28"/>
+        <div id="2" reel="148107" frame="578" count="31"/>
+        <div id="3" reel="148107" frame="609" count="38"/>
+    </option>
+</select>

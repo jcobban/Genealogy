@@ -1,0 +1,64 @@
+<!--*********************************************************************
+ *  Surnames.php														*
+ *																		*
+ *  Display a web page containing all of the surnames starting with a	*
+ *  given letter or sharing a Soundex code.								*
+ *																		*
+ *  History:															*
+ *      2018/10/31      created                                         *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">
+			Genealogy
+    </a>:
+    <a href="/genCountry.php?cc=CA&lang=$LANG">
+			Canada
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&lang=$LANG">
+			Ontario
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">
+			Services
+    </a>:
+    <a href="/FamilyTree/nominalIndex.php?name=&treename=$TREENAME&lang=$LANG">
+			Nominal Index
+    </a>:
+  </div>
+  <div class="body">
+    <h1>
+		<span class="right">
+  	  <a href="/FamilyTree/SurnamesHelpen.html" target="help">? Help</a>
+		</span>
+		$TITLE
+    </h1>
+    $TRACE
+    $MSG
+    <!--- Put out the response as a table -->
+    <table id="namesTable">
+      <tr id="row">
+		<td class="button" id="asurname">
+		    <a href="/FamilyTree/Names.php?Surname=$USURNAME&lang=$LANG">
+				$SURNAME 
+		    </a>
+		</td>
+      </tr>
+    </table>
+    <p class="label" id="nomatches">No surnames matched</p>
+  </div> <!-- class="body" -->
+  <div class="hidden" id="templates">
+	<span id="missing">Missing Surnames</span>
+	<span id="nosurname">Individuals with No Surname</span>
+	<span id="starting">Surnames Starting with '$INITIAL'</span>
+	<span id="invalid">Invalid Surnames</span>
+	<span id="soundex">Surnames with Soundex '$VALUE'</span>
+	<span id="pattern">Surnames with Pattern '$VALUE'</span>
+  </div>
+	<script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+	<script src="/jscripts/util.js" type="text/javascript">
+    </script>
+	<script src="/FamilyTree/Surnames.js" type="text/javascript">
+    </script>

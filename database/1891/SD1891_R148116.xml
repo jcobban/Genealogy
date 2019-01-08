@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148116">
+    <option value="33_C">
+        Halifax City: Ward 3
+        <div id="1" reel="148116" frame="0" count="23"/>
+        <div id="2" reel="148116" frame="23" count="26"/>
+    </option>
+    <option value="33_D">
+        Halifax City: Ward 4
+        <div id="" reel="148116" frame="49" count="36"/>
+    </option>
+    <option value="33_E">
+        Halifax City: Ward 5
+        <div id="1" reel="148116" frame="85" count="31"/>
+        <div id="2" reel="148116" frame="116" count="22"/>
+        <div id="3" reel="148116" frame="138" count="34"/>
+        <div id="4" reel="148116" frame="172" count="49"/>
+        <div id="5" reel="148116" frame="221" count="23"/>
+        <div id="6" reel="148116" frame="244" count="44"/>
+        <div id="7" reel="148116" frame="288" count="35"/>
+        <div id="8" reel="148116" frame="323" count="33"/>
+        <div id="9" reel="148116" frame="356" count="28"/>
+    </option>
+    <option value="33_F">
+        Halifax City: Ward 6
+        <div id="1" reel="148116" frame="384" count="23"/>
+        <div id="2" reel="148116" frame="407" count="19"/>
+        <div id="3" reel="148116" frame="426" count="27"/>
+        <div id="4" reel="148116" frame="453" count="23"/>
+        <div id="5" reel="148116" frame="476" count="26"/>
+        <div id="6" reel="148116" frame="502" count="28"/>
+        <div id="7" reel="148116" frame="530" count="21"/>
+    </option>
+    <option value="34_A">
+        Halifax County: Fergusons Cove
+        <div id="" reel="148116" frame="551" count="15"/>
+    </option>
+    <option value="34_B">
+        Halifax County: Portuguese Cove
+        <div id="" reel="148116" frame="566" count="11"/>
+    </option>
+    <option value="34_C">
+        Halifax County: Sambro
+        <div id="" reel="148116" frame="577" count="12"/>
+    </option>
+    <option value="34_D">
+        Halifax County: Prospect
+        <div id="" reel="148116" frame="589" count="14"/>
+    </option>
+    <option value="34_E">
+        Halifax County: Hacketts Cove or Indian Harbour
+        <div id="" reel="148116" frame="603" count="17"/>
+    </option>
+    <option value="34_F">
+        Halifax County: French Village
+        <div id="" reel="148116" frame="620" count="17"/>
+    </option>
+    <option value="34_G">
+        Halifax County: Spryfield
+        <div id="" reel="148116" frame="637" count="9"/>
+    </option>
+    <option value="34_H">
+        Halifax County: North West Arm
+        <div id="" reel="148116" frame="646" count="11"/>
+    </option>
+    <option value="34_I">
+        Halifax County: Bedford
+        <div id="" reel="148116" frame="657" count="11"/>
+    </option>
+</select>

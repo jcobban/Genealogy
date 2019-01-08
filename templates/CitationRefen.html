@@ -1,0 +1,78 @@
+<!--*********************************************************************
+ *  CitationRefen.html													*
+ *																		*
+ *  English language template for displaying a citation as HTML.        *
+ *																		*
+ *  History:															*
+ *		2018/12/03		Created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <i>
+    <a href="/FamilyTree/Source.php?id=$IDSR&amp;lang=$LANG" target="_blank" id="title">
+		$TITLE 
+    </a>
+  </i>:
+    <a href="/Canada/BirthRegDetail.php?RegDomain=CAON&RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG"
+				target="_blank" id="sourceBirth">
+		$DETAIL 
+    </a>
+    <a href="/Canada/BirthRegDetail.php?RegDomain=CAON&RegYear=$REGYEAR&amp;OriginalVolume=$VOLUME&amp;OriginalPage=$PAGE&amp;OriginalItem=$ITEM&amp;lang=$LANG"
+			    target="_blank" id="sourceBirthVolume">
+		$DETAIL
+    </a>
+    <a href="/Ontario/MarriageRegDetail.php?RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG"
+				target="_blank" id="sourceMarriage">
+		$DETAIL 
+    </a>
+	<a href="/Ontario/MarriageRegDetail.php?RegDomain=CAON&RegYear=$REGYEAR&amp;OriginalVolume=$VOLUME&amp;OriginalPage=$PAGE&amp;OriginalItem=$ITEM&amp;lang=$LANG"
+				target="_blank" id="sourceMarriageVolume">
+		$DETAIL
+    </a>
+    <a href="/Ontario/CountyMarriagesEdit.php?Volume=$VOLUME&amp;ReportNo=$REPORT&amp;ItemNo=$ITEM&amp;lang=$LANG"
+				target="_blank" id="sourceMarriageCounty">
+		$DETAIL
+    </a>
+    <a href="$DETAIL" target="_blank" id="hyperlink">
+		$DETAIL
+    </a>
+    <a href="/Ontario/DistrictMarriagesEdit.php?Volume=$VOLUME&amp;ReportNo=$REPORT&amp;ItemNo=$ITEM&amp;lang=$LANG"
+				target="_blank" id="sourceMarriageDistrict">
+		$DETAIL
+    </a>
+    <a href="/Ontario/DeathRegDetail.php?RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG"
+				target="_blank" id="sourceDeath">
+		$DETAIL 
+    </a>
+    <a href="/Canada/DeathRegDetail.php?RegDomain=CAON&RegYear=$REGYEAR&amp;OriginalVolume=$VOLUME&amp;OriginalPage=$PAGE&amp;OriginalItem=$ITEM&amp;lang=$LANG"
+				    target="_blank" id="sourceDeathVolume">
+		$DETAIL
+    </a>
+    <a href="/database/CensusResponse.php?Census=CA$CENYEAR&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&amp;Division=$DIVISION&amp;Page=$PAGE&amp;OrderBy=Line&amp;lang=$LANG"
+		    target="_blank" id="sourceCensus">
+		$DETAIL 
+    </a>
+    <a href="/database/CensusResponse.php?Census=$PROVINCE$CENYEAR&amp;Province=$PROVINCE&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&amp;Division=$DIVISION&amp;Page=$PAGE&amp;OrderBy=Line&amp;lang=$LANG"
+				target="_blank" id="sourceCensusPreConfed">
+		$DETAIL 
+    </a>
+    <a href="/Ontario/WmbDoQuery.php?Volume=$VOLUME&amp;Page=$PAGENUM&amp;lang=$LANG"
+				target="_blank" id="sourceWesleyanBaptism">
+		$DETAIL 
+    </a>
+    <a href="http://www.bac-lac.gc.ca/eng/discover/postal-heritage-philately/post-offices-postmasters/Pages/item.aspx?IdNumber=$ITEM&amp;lang=$LANG"
+				target="_blank" id="sourcePostOffices">
+		$DETAIL 
+    </a>
+    <a href="/FamilyTree/CemeteryReference.php?IDSR=$IDSR&amp;Plot=$DETAIL&amp;lang=$LANG"
+				target="_blank" id="sourceCemetery">
+		$DETAIL
+    </a>
+    <span id="detail">$DETAIL</span>
+	<p id="unrecTitle">Citation.inc: $LINE Unrecognized source title '$TITLE'.</p>
+    <div id="showText">
+		$TEXT 
+    </div>
+    <div id="showNote">>
+		Note: $NOTE 
+    </div>

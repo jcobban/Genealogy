@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="22">
+    <option value="237">
+        Adelaide
+    </option>
+    <option value="238">
+        Caradoc
+    </option>
+    <option value="239">
+        Delaware
+    </option>
+    <option value="240">
+        Dorchester N.
+    </option>
+    <option value="241">
+        Ekfrid
+    </option>
+    <option value="242">
+        Lobo
+    </option>
+    <option value="243">
+        London
+    </option>
+    <option value="244">
+        Metcalfe
+    </option>
+    <option value="245">
+        Mosa
+    </option>
+    <option value="246">
+        Nissouri W.
+    </option>
+    <option value="247">
+        Strathroy Village
+    </option>
+    <option value="248">
+        Williams E.
+    </option>
+    <option value="249">
+        Williams W.
+    </option>
+    <option value="250">
+        Westminster
+    </option>
+    <option value="250A">
+        Agricultural Census
+    </option>
+</select>

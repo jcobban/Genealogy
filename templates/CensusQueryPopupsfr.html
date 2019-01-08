@@ -1,0 +1,153 @@
+<!--*********************************************************************
+ *  CensusQueryPopupsfr.html						*
+ *									*
+ *  Shared popups to explain use of fields in census query forms.	*
+ *									*
+ *  History:								*
+ *	2018/05/20	created						*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+    <div class='balloon' id='HelpQuery'>
+	Cliquez sur ce bouton pour effectuer la requête de la base de
+	données du recensement.
+    </div>
+    <div class='balloon' id='HelpCoverage'>
+	Cliquez sur ce bouton pour obtenir un affichage des statistiques
+	de premier niveau sur l'effort de transcription sur ce recensement.
+    </div>
+    <div class='balloon' id='HelpProvince'>
+	Ceci est une liste de sélection des provinces qui sont couvertes par
+	recensement. Sélectionnez l'une des provinces si vous souhaitez
+	restreindre recherche dans une province spécifique.
+	La valeur par défaut est de rechercher tous provinces.
+    </div>
+    <div class='balloon' id='HelpDistrict'>
+	Ceci est une liste de sélection de tous les districts de recensement.
+	Dans les recensements antérieurs à la confédération, chacun d'entre
+	eux est un comté.  Dans les recensements post-confédération,
+	chacun d'entre eux est un circonscription électorale.
+	Le contenu de cette liste reflète le choix de la province.
+	Vous pouvez sélectionner un ou plusieurs districts d'énumération.
+    </div>
+    <div class='balloon' id='HelpCount'>
+	Utilisez ce champ pour contrôler le nombre maximal de réponses à
+	afficher à la fois.
+    </div>
+    <div class='balloon' id='HelpSubDistrict'>
+	Si vous avez sélectionné un ou plusieurs districts de recensement,
+	alors liste de sélection vous permet de restreindre davantage
+	la recherche à un sous-district spécifique dans les districts
+	sélectionnés.  Un sous-district est généralement une ville,
+	un village, un canton, ou un quartier d'une ville.
+    </div>
+    <div class='balloon' id='HelpDivision'>
+	Si vous avez sélectionné un sous-district, cette liste de sélection
+	vous permet de restreindre davantage la recherche à une énumération 
+	spécifique division dans le sous-district. Il y a plusieurs
+	divisions de recensement dans un sous-district si le nombre de
+	résidents requis d'assigner plusieurs recenseurs.
+    </div>
+    <div class='balloon' id='HelpPage'>
+	Vous pouvez limiter la recherche à un individu correspondant à un
+	numéro de page. Cela n'a normalement de sens que si vous avez 
+	sélectionné un district spécifique, un sous-district, et une division.
+    </div>
+    <div class='balloon' id='HelpGivenNames'>
+     <p>
+	Indiquez un ou plusieurs prénoms à associer. Les personnes qui
+	correspondent l'un des noms spécifiés est inclus. Par exemple
+	si vous recherchez "Jean Richard" le résultat inclura les individus
+	qui ont soit "Jean" ou "Richard" comme l'un de leurs prénoms.
+	Si la valeur est texte simple, il est utilisé pour faire correspondre
+	les prénoms qui commencent par ce texte. Par exemple, "Je"
+	correspondra aux personnes qui ont un prénom commençant par "Je"
+	comme "Jean" ou "Jeannette".
+     </p>
+     <p>
+	Une valeur de recherche peut également être un <a href="https://dev.mysql.com/doc/refman/8.0/en/regexp.html">expression régulière</a>
+	ce qui permet un match plus compliqué. Par exemple "^ M. * l"
+	correspond à prénoms commençant par un "M" et contenant un "l"
+	n'importe où.  Cela comprend "Michel", ou "Millicent".
+	Le motif "^ R. * [Td] $" correspond aux prénoms commençant par
+	"R" et se terminant par "t" ou "d", comme "Robert" ou "Richard".
+     </p>
+    </div>
+    <div class='balloon' id='HelpSurname'>
+     <p>
+	L'interprétation de ce champ de saisie dépend de si
+	l'option SOUNDEX a été sélectionnée.
+     </p>
+     <p>
+	Si SOUNDEX n'a pas été choisi, la valeur est interprétée comme
+	un nom de famille complet et la recherche est effectuée en utilisant 
+	la recherche modèle défini pour le nom de famille dans la table des
+	noms de famille qui peut être atteint à partir du panneau de
+	recherche d'index nominal. Par exemple
+	le nom de famille "Smith" a un motif d'expression régulière de
+	"^sm[eiy]*th?e?$"
+	ce qui signifie qu'il correspond à tout nom commençant par "Sm",
+	suivi par zéro ou plusieurs voyelles avant, suivies de "t", 
+	optionnellement suivi d'un "h" et éventuellement d'un "e". C'est le
+	la recherche ne correspondra pas seulement à "Smith" mais aussi à 
+	"Smythe" et "Smet". Si le nom de famille n'a pas de motif spécifié
+	alors le nom de famille doit correspondre exactement à l'exception du
+	cas.
+     </p>
+     <p>
+	Si SOUNDEX a été spécifié, une recherche libre est effectuée en
+	utilisant algorithme de correspondance sonore inventé par AT&amp;T
+	pour son service d'assistance-annuaire et aussi couramment utilisé
+	par les forces de l'ordre par exemple pour vérifier les permis
+	de conduire. Dans ce cas, vous pouvez entrez soit un code soundex
+	littéral, composé d'une lettre suivie par trois digitis,
+	ou plus communément un nom de famille qui est utilisé pour
+	générer un code SOUNDEX pour la recherche.
+     </p>
+    </div>
+    <div class='balloon' id='HelpSurnameSoundex'>
+	La sélection de cette option modifie la façon dont la valeur dans le
+	champ de nom est interprété.
+    </div>
+    <div class='balloon' id='HelpSex'>
+	Sélectionnez une option pour restreindre la recherche aux personnes
+	ayant un sexe particulier.
+    </div>
+    <div class='balloon' id='HelpMStat'>
+	Sélectionnez une option pour restreindre la recherche aux personnes
+	ayant un état matrimonial particulier.
+    </div>
+    <div class='balloon' id='HelpOccupation'>
+	Entrez une valeur pour restreindre la recherche aux individus ayant un
+	occupation particulière. La valeur fournie est utilisée pour rechercher
+	chaque domaine d'occupation. Par exemple, une recherche de "Ferm"
+	retourner les individus dont la profession inclut le texte "Ferm" 
+	tel que «Fermier», «Travailleur a ferme», «Fermier à la retraite» ou 
+	«Gestionnaire de ferme».
+    </div>
+    <div class='balloon' id='HelpBPlace'>
+	Entrez une valeur pour restreindre la recherche aux individus ayant un
+	lieu de naissance particulier. La valeur fournie est utilisée pour 
+	rechercher chaque champ de lieu de naissance. Par exemple,
+	une recherche pour "France" renverra les individus qui
+	lieu de naissance comprend le texte "France" y compris
+	"Normandie France".
+    </div>
+    <div class='balloon' id='HelpReligion'>
+	Entrez une valeur pour restreindre la recherche aux individus ayant un
+	religion particulière. La valeur fournie est utilisée pour rechercher
+	chaque domaine de la religion. Par exemple, une recherche de 
+	"methodist" retourner les individus dont la religion comprend
+	le texte "methodist" y compris "Wesleyan Methodist" et
+	"Methodist Episcopal".
+    </div>
+    <div class='balloon' id='HelpBYear'>
+	Entrez un numéro d'année pour restreindre la recherche aux individus
+	né à propos d'une année spécifique. La gamme de chaque côté de la
+	l'année spécifiée est contrôlée par le champ "Gamme".
+    </div>
+    <div class='balloon' id='HelpRange'>
+	Entrez un nombre compris entre 1 et 20 pour contrôler la perte du
+	match l'année de naissance est. La valeur par défaut est 2 ans de
+	chaque côté de la valeur spécifiée dans le champ "Année de naissance".
+    </div>

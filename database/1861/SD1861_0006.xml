@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="6">
+    <option value="50">
+        Aldborough
+    </option>
+    <option value="51">
+        Bayham
+    </option>
+    <option value="52">
+        Dorchester S.
+    </option>
+    <option value="53">
+        Dunwich
+    </option>
+    <option value="54">
+        Malahide
+    </option>
+    <option value="55">
+        Southwold
+    </option>
+    <option value="56">
+        St. Thomas Town
+    </option>
+    <option value="57">
+        Vienna Village
+    </option>
+    <option value="58">
+        Yarmouth
+    </option>
+    <option value="58A">
+        Agricultural Census
+    </option>
+</select>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148122">
+    <option value="39_Y">
+        Pictou: River John West Branch
+        <div id="" reel="148122" frame="0" count="18"/>
+    </option>
+    <option value="39_Z">
+        Pictou: Stellarton
+        <div id="" reel="148122" frame="18" count="49"/>
+    </option>
+    <option value="39_AA">
+        Pictou: Westville
+        <div id="1" reel="148122" frame="67" count="27"/>
+        <div id="2" reel="148122" frame="94" count="40"/>
+    </option>
+    <option value="40_A">
+        Queens: Brookfield
+        <div id="" reel="148122" frame="134" count="20"/>
+    </option>
+    <option value="40_B">
+        Queens: Brooklyn
+        <div id="" reel="148122" frame="154" count="14"/>
+    </option>
+    <option value="40_C">
+        Queens: Caledonia
+        <div id="" reel="148122" frame="168" count="22"/>
+    </option>
+    <option value="40_D">
+        Queens: Eagle Head
+        <div id="" reel="148122" frame="190" count="14"/>
+    </option>
+    <option value="40_E">
+        Queens: Greenfield
+        <div id="" reel="148122" frame="204" count="12"/>
+    </option>
+    <option value="40_F">
+        Queens: Hunts Point
+        <div id="" reel="148122" frame="216" count="10"/>
+    </option>
+    <option value="40_G">
+        Queens: Kempt
+        <div id="" reel="148122" frame="226" count="11"/>
+    </option>
+    <option value="40_H">
+        Queens: Liverpool
+        <div id="1" reel="148122" frame="237" count="26"/>
+        <div id="2" reel="148122" frame="263" count="25"/>
+    </option>
+    <option value="40_I">
+        Queens: Mill Village
+        <div id="" reel="148122" frame="288" count="16"/>
+    </option>
+    <option value="40_J">
+        Queens: Milton
+        <div id="" reel="148122" frame="304" count="21"/>
+    </option>
+    <option value="40_K">
+        Queens: Port Medway
+        <div id="" reel="148122" frame="325" count="20"/>
+    </option>
+    <option value="40_L">
+        Queens: Port Mouton
+        <div id="" reel="148122" frame="345" count="16"/>
+    </option>
+    <option value="41_A">
+        Richmond: Arichat
+        <div id="" reel="148122" frame="361" count="14"/>
+    </option>
+    <option value="41_B">
+        Richmond: Arichat East
+        <div id="" reel="148122" frame="375" count="22"/>
+    </option>
+    <option value="41_C">
+        Richmond: Black River
+        <div id="" reel="148122" frame="397" count="13"/>
+    </option>
+    <option value="41_D">
+        Richmond: Descousse
+        <div id="1" reel="148122" frame="410" count="17"/>
+        <div id="2" reel="148122" frame="427" count="17"/>
+    </option>
+    <option value="41_E">
+        Richmond: Framboise
+        <div id="" reel="148122" frame="444" count="14"/>
+    </option>
+    <option value="41_F">
+        Richmond: Grand River
+        <div id="" reel="148122" frame="458" count="18"/>
+    </option>
+    <option value="41_G">
+        Richmond: Loch Lomond
+        <div id="" reel="148122" frame="476" count="9"/>
+    </option>
+    <option value="41_H">
+        Richmond: Lower l'Ardoise
+        <div id="" reel="148122" frame="485" count="19"/>
+    </option>
+    <option value="41_I">
+        Richmond: Petit de Grat
+        <div id="" reel="148122" frame="504" count="14"/>
+    </option>
+    <option value="41_J">
+        Richmond: Red Islands
+        <div id="" reel="148122" frame="518" count="26"/>
+    </option>
+    <option value="41_K">
+        Richmond: River Bourgeois
+        <div id="" reel="148122" frame="544" count="23"/>
+    </option>
+    <option value="41_L">
+        Richmond: River Inhabitants
+        <div id="" reel="148122" frame="567" count="30"/>
+    </option>
+    <option value="41_M">
+        Richmond: St. Peters
+        <div id="" reel="148122" frame="597" count="25"/>
+    </option>
+    <option value="41_N">
+        Richmond: Upper l'Ardoise
+        <div id="" reel="148122" frame="622" count="26"/>
+    </option>
+    <option value="41_O">
+        Richmond: West Arichat
+        <div id="" reel="148122" frame="648" count="25"/>
+    </option>
+    <option value="42_A">
+        Shelburne: Barrington
+        <div id="" reel="148122" frame="673" count="19"/>
+    </option>
+    <option value="42_B">
+        Shelburne: Barrington Passage
+        <div id="" reel="148122" frame="692" count="14"/>
+    </option>
+</select>

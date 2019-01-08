@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148226">
+    <option value="192_R">
+        Terrebonne: Terrebonne Town
+        <div id="" reel="148226" frame="0" count="30"/>
+    </option>
+    <option value="193_A">
+        Trois-Rivières: Nôtre-Dame Ward (Trois-Rivières City)
+        <div id="" reel="148226" frame="30" count="54"/>
+    </option>
+    <option value="193_B">
+        Trois-Rivières: St. Louis Ward (Trois-Rivières City)
+        <div id="1" reel="148226" frame="84" count="17"/>
+        <div id="2" reel="148226" frame="101" count="29"/>
+    </option>
+    <option value="193_C">
+        Trois-Rivières: St. Philippe Ward (Trois-Rivières City)
+        <div id="" reel="148226" frame="130" count="50"/>
+    </option>
+    <option value="193_D">
+        Trois-Rivières: Ste. Ursule Ward (Trois-Rivières City)
+        <div id="" reel="148226" frame="180" count="23"/>
+    </option>
+    <option value="193_E">
+        Trois-Rivières: Trois-Riviéres Parish
+        <div id="" reel="148226" frame="203" count="11"/>
+    </option>
+    <option value="194_A">
+        Vaudreuil: Como Village
+        <div id="" reel="148226" frame="214" count="10"/>
+    </option>
+    <option value="194_B">
+        Vaudreuil: Pointe Fortune Village
+        <div id="" reel="148226" frame="224" count="8"/>
+    </option>
+    <option value="194_C">
+        Vaudreuil: Rigaud
+        <div id="1" reel="148226" frame="232" count="25"/>
+        <div id="2" reel="148226" frame="257" count="9"/>
+    </option>
+    <option value="194_D">
+        Vaudreuil: Rigaud Village
+        <div id="" reel="148226" frame="266" count="14"/>
+    </option>
+    <option value="194_E">
+        Vaudreuil: Ste. Jeanne de L'Ile Perrot
+        <div id="" reel="148226" frame="280" count="19"/>
+    </option>
+    <option value="194_F">
+        Vaudreuil: Ste. Justine de Newton
+        <div id="1" reel="148226" frame="299" count="18"/>
+        <div id="2" reel="148226" frame="317" count="17"/>
+    </option>
+    <option value="194_G">
+        Vaudreuil: St. Lazare
+        <div id="" reel="148226" frame="334" count="28"/>
+    </option>
+    <option value="194_H">
+        Vaudreuil: Ste. Marthe
+        <div id="1" reel="148226" frame="362" count="21"/>
+        <div id="2" reel="148226" frame="383" count="14"/>
+    </option>
+    <option value="194_I">
+        Vaudreuil: Très St. Sacrement
+        <div id="" reel="148226" frame="397" count="12"/>
+    </option>
+    <option value="194_J">
+        Vaudreuil: Vaudreuil
+        <div id="" reel="148226" frame="409" count="33"/>
+    </option>
+    <option value="194_K">
+        Vaudreuil: Vaudreuil Village
+        <div id="" reel="148226" frame="442" count="10"/>
+    </option>
+    <option value="195_A">
+        Verchères: Beloeil
+        <div id="" reel="148226" frame="452" count="37"/>
+    </option>
+    <option value="195_B">
+        Verchères: Contrecoeur
+        <div id="" reel="148226" frame="489" count="37"/>
+    </option>
+    <option value="195_C">
+        Verchères: St. Antoine
+        <div id="1" reel="148226" frame="526" count="18"/>
+        <div id="2" reel="148226" frame="544" count="13"/>
+    </option>
+    <option value="195_D">
+        Verchères: Ste. Julie
+        <div id="" reel="148226" frame="557" count="27"/>
+    </option>
+    <option value="195_E">
+        Verchères: St. Marc
+        <div id="" reel="148226" frame="584" count="19"/>
+    </option>
+    <option value="195_F">
+        Verchères: Ste. Théodosie
+        <div id="" reel="148226" frame="603" count="13"/>
+    </option>
+    <option value="195_G">
+        Verchères: Varennes
+        <div id="" reel="148226" frame="616" count="33"/>
+    </option>
+    <option value="195_H">
+        Verchères: Varennes Village
+        <div id="" reel="148226" frame="649" count="19"/>
+    </option>
+    <option value="195_I">
+        Verchères: Verchères
+        <div id="1" reel="148226" frame="668" count="29"/>
+        <div id="2" reel="148226" frame="697" count="14"/>
+    </option>
+    <option value="196_A">
+        Yamaska: La Baie du Fevre
+        <div id="" reel="148226" frame="711" count="46"/>
+    </option>
+    <option value="196_B">
+        Yamaska: Pierreville &amp; Abenakis Villages
+        <div id="1" reel="148226" frame="757" count="21"/>
+    </option>
+</select>

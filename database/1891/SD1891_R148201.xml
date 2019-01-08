@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148201">
+    <option value="154_U">
+        Hochelaga: St. Leonard, Port Maurice
+        <div id="" reel="148201" frame="0" count="25"/>
+    </option>
+    <option value="154_V">
+        Hochelaga: Verdun Village
+        <div id="" reel="148201" frame="25" count="7"/>
+    </option>
+    <option value="155_A">
+        Huntingdon: Dundee
+        <div id="1" reel="148201" frame="32" count="18"/>
+        <div id="2" reel="148201" frame="50" count="15"/>
+    </option>
+    <option value="155_B">
+        Huntingdon: Elgin
+        <div id="" reel="148201" frame="65" count="19"/>
+    </option>
+    <option value="155_C">
+        Huntingdon: Franklin
+        <div id="" reel="148201" frame="84" count="24"/>
+    </option>
+    <option value="155_D">
+        Huntingdon: Godmanchester
+        <div id="" reel="148201" frame="108" count="34"/>
+    </option>
+    <option value="155_E">
+        Huntingdon: Havelock
+        <div id="1" reel="148201" frame="142" count="12"/>
+        <div id="2" reel="148201" frame="154" count="11"/>
+    </option>
+    <option value="155_F">
+        Huntingdon: Hemmingford
+        <div id="1" reel="148201" frame="165" count="19"/>
+        <div id="2" reel="148201" frame="184" count="17"/>
+    </option>
+    <option value="155_G">
+        Huntingdon: Hemmingford Village
+        <div id="" reel="148201" frame="201" count="7"/>
+    </option>
+    <option value="155_H">
+        Huntingdon: Hinchinbrooke
+        <div id="1" reel="148201" frame="208" count="0"/>
+        <div id="2" reel="148201" frame="208" count="49"/>
+    </option>
+    <option value="155_I">
+        Huntingdon: Huntingdon Village
+        <div id="" reel="148201" frame="257" count="25"/>
+    </option>
+    <option value="155_J">
+        Huntingdon: St. Anicet
+        <div id="1" reel="148201" frame="282" count="21"/>
+        <div id="2" reel="148201" frame="303" count="23"/>
+    </option>
+    <option value="155_K">
+        Huntingdon: Ste. Barbe
+        <div id="" reel="148201" frame="326" count="13"/>
+    </option>
+    <option value="156_A">
+        Iberville: Iberville Town
+        <div id="" reel="148201" frame="339" count="35"/>
+    </option>
+    <option value="156_B">
+        Iberville: St. Alexandre
+        <div id="1" reel="148201" frame="374" count="26"/>
+        <div id="2" reel="148201" frame="400" count="18"/>
+    </option>
+    <option value="156_C">
+        Iberville: Ste. Anne de Sabrevois
+        <div id="" reel="148201" frame="418" count="17"/>
+    </option>
+    <option value="156_D">
+        Iberville: St. Athanase
+        <div id="" reel="148201" frame="435" count="22"/>
+    </option>
+    <option value="156_E">
+        Iberville: Ste. Brigide
+        <div id="1" reel="148201" frame="457" count="20"/>
+        <div id="2" reel="148201" frame="477" count="23"/>
+    </option>
+    <option value="156_F">
+        Iberville: St. George de Henriville
+        <div id="" reel="148201" frame="500" count="27"/>
+    </option>
+    <option value="156_G">
+        Iberville: St. Grégoire le Grand
+        <div id="" reel="148201" frame="527" count="29"/>
+    </option>
+    <option value="156_H">
+        Iberville: St. Sébastien
+        <div id="" reel="148201" frame="556" count="31"/>
+    </option>
+    <option value="157_A">
+        Jacques Cartier: Lachine
+        <div id="" reel="148201" frame="587" count="23"/>
+    </option>
+    <option value="157_B">
+        Jacques Cartier: Lachine Town
+        <div id="" reel="148201" frame="610" count="76"/>
+    </option>
+    <option value="157_C">
+        Jacques Cartier: Ste. Anne du Bout de l'Ile
+        <div id="" reel="148201" frame="686" count="13"/>
+    </option>
+    <option value="157_D">
+        Jacques Cartier: Ste. Anne de Bellevue
+        <div id="" reel="148201" frame="699" count="24"/>
+    </option>
+    <option value="157_E">
+        Jacques Cartier: Ste. Geneviève
+        <div id="1" reel="148201" frame="723" count="9"/>
+        <div id="2" reel="148201" frame="732" count="19"/>
+    </option>
+    <option value="157_F">
+        Jacques Cartier: Ste. Geneviève Village
+        <div id="" reel="148201" frame="751" count="16"/>
+    </option>
+    <option value="157_G">
+        Jacques Cartier: St. Joachim de la Pointe Claire
+        <div id="" reel="148201" frame="767" count="17"/>
+    </option>
+    <option value="157_H">
+        Jacques Cartier: St. Joachim de la Pointe Claire Village
+        <div id="" reel="148201" frame="784" count="12"/>
+    </option>
+</select>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148220">
+    <option value="181_T">
+        Richmond &amp; Wolfe: Weedon
+        <div id="" reel="148220" frame="0" count="16"/>
+    </option>
+    <option value="181_U">
+        Richmond &amp; Wolfe: Windsor Mills Village
+        <div id="" reel="148220" frame="16" count="33"/>
+    </option>
+    <option value="181_V">
+        Richmond &amp; Wolfe: Wotton
+        <div id="1" reel="148220" frame="49" count="20"/>
+        <div id="2" reel="148220" frame="69" count="23"/>
+    </option>
+    <option value="182_A">
+        Rimouski: Causapscal
+        <div id="" reel="148220" frame="92" count="4"/>
+    </option>
+    <option value="182_B">
+        Rimouski: Cherbourg
+        <div id="" reel="148220" frame="96" count="16"/>
+    </option>
+    <option value="182_C">
+        Rimouski: Dalebaire
+        <div id="" reel="148220" frame="112" count="9"/>
+    </option>
+    <option value="182_D">
+        Rimouski: Mont Joli Village
+        <div id="" reel="148220" frame="121" count="16"/>
+    </option>
+    <option value="182_E">
+        Rimouski: Neigette
+        <div id="" reel="148220" frame="137" count="6"/>
+    </option>
+    <option value="182_F">
+        Rimouski: Nôtre-Dame de L'Assomption
+        <div id="" reel="148220" frame="143" count="42"/>
+    </option>
+    <option value="182_G">
+        Rimouski: Nôtre-Dame du Sacre-Coeur
+        <div id="" reel="148220" frame="185" count="14"/>
+    </option>
+    <option value="182_H">
+        Rimouski: Rimouski
+        <div id="" reel="148220" frame="199" count="25"/>
+    </option>
+    <option value="182_I">
+        Rimouski: Rimouski Town
+        <div id="" reel="148220" frame="224" count="30"/>
+    </option>
+    <option value="182_J">
+        Rimouski: Romieux
+        <div id="" reel="148220" frame="254" count="6"/>
+    </option>
+    <option value="182_K">
+        Rimouski: St. Anaclet
+        <div id="" reel="148220" frame="260" count="20"/>
+    </option>
+    <option value="182_L">
+        Rimouski: Ste. Anne de la Point au Père
+        <div id="" reel="148220" frame="280" count="0"/>
+    </option>
+    <option value="182_M">
+        Rimouski: Ste. Angèle de Merrice
+        <div id="" reel="148220" frame="280" count="34"/>
+    </option>
+    <option value="182_N">
+        Rimouski: St. Benoit Labre &amp; St. Edmond
+        <div id="" reel="148220" frame="314" count="0"/>
+    </option>
+    <option value="182_O">
+        Rimouski: Ste. Blandine
+        <div id="" reel="148220" frame="314" count="30"/>
+    </option>
+    <option value="182_P">
+        Rimouski: Ste. Cécile du Bic
+        <div id="" reel="148220" frame="344" count="0"/>
+    </option>
+    <option value="182_Q">
+        Rimouski: St. Damase
+        <div id="" reel="148220" frame="344" count="59"/>
+    </option>
+    <option value="182_R">
+        Rimouski: St. Donat
+        <div id="" reel="148220" frame="403" count="0"/>
+    </option>
+    <option value="182_S">
+        Rimouski: St. Fabien
+        <div id="" reel="148220" frame="403" count="57"/>
+    </option>
+    <option value="182_T">
+        Rimouski: Ste. Félicité &amp; Cherbourg
+        <div id="" reel="148220" frame="460" count="0"/>
+    </option>
+    <option value="182_U">
+        Rimouski: Ste. Flavie
+        <div id="" reel="148220" frame="460" count="51"/>
+    </option>
+    <option value="182_V">
+        Rimouski: St. Gabriel &amp; St. Marcellin
+        <div id="" reel="148220" frame="511" count="0"/>
+    </option>
+    <option value="182_W">
+        Rimouski: St. Jerôme de Matane
+        <div id="" reel="148220" frame="511" count="0"/>
+    </option>
+    <option value="182_X">
+        Rimouski: St. Joseph de Lepage
+        <div id="" reel="148220" frame="511" count="73"/>
+    </option>
+    <option value="182_Y">
+        Rimouski: Ste. Luce
+        <div id="" reel="148220" frame="584" count="29"/>
+    </option>
+    <option value="182_Z">
+        Rimouski: St. Mathieu
+        <div id="" reel="148220" frame="613" count="18"/>
+    </option>
+    <option value="182_AA">
+        Rimouski: St. Moïse
+        <div id="" reel="148220" frame="631" count="0"/>
+    </option>
+    <option value="182_BB">
+        Rimouski: St. Octave de Metes &amp; Village des Écossais
+        <div id="1" reel="148220" frame="631" count="0"/>
+        <div id="2" reel="148220" frame="631" count="68"/>
+    </option>
+    <option value="182_CC">
+        Rimouski: St. Pierre du Lac &amp; Sayabec
+        <div id="" reel="148220" frame="699" count="24"/>
+    </option>
+    <option value="182_DD">
+        Rimouski: St. Simon
+        <div id="" reel="148220" frame="723" count="21"/>
+    </option>
+    <option value="182_EE">
+        Rimouski: St. Ulric
+        <div id="" reel="148220" frame="744" count="42"/>
+    </option>
+    <option value="182_FF">
+        Rimouski: St. Valérien
+        <div id="" reel="148220" frame="786" count="0"/>
+    </option>
+    <option value="182_GG">
+        Rimouski: Tessier
+        <div id="" reel="148220" frame="786" count="29"/>
+    </option>
+</select>

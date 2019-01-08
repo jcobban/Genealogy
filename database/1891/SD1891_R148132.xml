@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148132">
+    <option value="55_D">
+        Carleton: Nepean
+        <div id="1" reel="148132" frame="0" count="30"/>
+        <div id="2" reel="148132" frame="30" count="34"/>
+        <div id="3" reel="148132" frame="64" count="41"/>
+        <div id="4" reel="148132" frame="105" count="5"/>
+        <div id="5" reel="148132" frame="110" count="25"/>
+        <div id="6" reel="148132" frame="135" count="33"/>
+        <div id="7" reel="148132" frame="168" count="24"/>
+        <div id="8" reel="148132" frame="192" count="45"/>
+    </option>
+    <option value="55_E">
+        Carleton: North Gower
+        <div id="1" reel="148132" frame="237" count="18"/>
+        <div id="2" reel="148132" frame="255" count="15"/>
+        <div id="3" reel="148132" frame="270" count="18"/>
+    </option>
+    <option value="55_F">
+        Carleton: Ottawa East Village
+        <div id="" reel="148132" frame="288" count="16"/>
+    </option>
+    <option value="55_G">
+        Carleton: Richmond Village
+        <div id="" reel="148132" frame="304" count="10"/>
+    </option>
+    <option value="55_H">
+        Carleton: Torbolton
+        <div id="" reel="148132" frame="314" count="21"/>
+    </option>
+    <option value="56_A">
+        Cornwall &amp; Stormont: Cornwall
+        <div id="1" reel="148132" frame="335" count="23"/>
+        <div id="2" reel="148132" frame="358" count="19"/>
+        <div id="3" reel="148132" frame="377" count="22"/>
+        <div id="4" reel="148132" frame="399" count="35"/>
+        <div id="5" reel="148132" frame="434" count="19"/>
+        <div id="6" reel="148132" frame="453" count="17"/>
+        <div id="7" reel="148132" frame="470" count="11"/>
+    </option>
+    <option value="56_B">
+        Cornwall &amp; Stormont: Cornwall City, Centre Ward
+        <div id="1" reel="148132" frame="481" count="19"/>
+        <div id="2" reel="148132" frame="500" count="27"/>
+    </option>
+    <option value="56_C">
+        Cornwall &amp; Stormont: Cornwall City, East Ward
+        <div id="1" reel="148132" frame="527" count="25"/>
+        <div id="2" reel="148132" frame="552" count="23"/>
+    </option>
+</select>

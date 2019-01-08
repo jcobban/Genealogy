@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148140">
+    <option value="67_C">
+        Grey East: Euphrasia
+        <div id="1" reel="148140" frame="0" count="21"/>
+        <div id="2" reel="148140" frame="21" count="19"/>
+        <div id="3" reel="148140" frame="40" count="17"/>
+        <div id="4" reel="148140" frame="57" count="19"/>
+    </option>
+    <option value="67_D">
+        Grey East: Meaford Town
+        <div id="" reel="148140" frame="76" count="41"/>
+    </option>
+    <option value="67_E">
+        Grey East: Melancthon
+        <div id="1" reel="148140" frame="117" count="33"/>
+        <div id="2" reel="148140" frame="150" count="59"/>
+    </option>
+    <option value="67_F">
+        Grey East: Osprey
+        <div id="1" reel="148140" frame="209" count="15"/>
+        <div id="2" reel="148140" frame="224" count="17"/>
+        <div id="3" reel="148140" frame="241" count="20"/>
+        <div id="4" reel="148140" frame="261" count="19"/>
+    </option>
+    <option value="67_G">
+        Grey East: Proton
+        <div id="1" reel="148140" frame="280" count="22"/>
+        <div id="2" reel="148140" frame="302" count="23"/>
+        <div id="3" reel="148140" frame="325" count="24"/>
+    </option>
+    <option value="67_H">
+        Grey East: St-Vincent
+        <div id="1" reel="148140" frame="349" count="18"/>
+        <div id="2" reel="148140" frame="367" count="21"/>
+        <div id="3" reel="148140" frame="388" count="21"/>
+        <div id="4" reel="148140" frame="409" count="15"/>
+    </option>
+    <option value="67_I">
+        Grey East: Shelburne Village
+        <div id="" reel="148140" frame="424" count="26"/>
+    </option>
+    <option value="67_J">
+        Grey East: Thornbury Town
+        <div id="" reel="148140" frame="450" count="19"/>
+    </option>
+    <option value="68_A">
+        Grey North: Derby
+        <div id="1" reel="148140" frame="469" count="16"/>
+        <div id="2" reel="148140" frame="485" count="17"/>
+        <div id="3" reel="148140" frame="502" count="15"/>
+    </option>
+    <option value="68_B">
+        Grey North: Holland
+        <div id="1" reel="148140" frame="517" count="0"/>
+        <div id="2" reel="148140" frame="517" count="21"/>
+        <div id="3" reel="148140" frame="538" count="26"/>
+        <div id="4" reel="148140" frame="564" count="17"/>
+        <div id="5" reel="148140" frame="581" count="14"/>
+    </option>
+    <option value="68_C">
+        Grey North: Keppel
+        <div id="1" reel="148140" frame="595" count="17"/>
+        <div id="2" reel="148140" frame="612" count="22"/>
+        <div id="3" reel="148140" frame="634" count="21"/>
+        <div id="4" reel="148140" frame="655" count="21"/>
+    </option>
+    <option value="68_D">
+        Grey North: Owen Sound Town, Bay Ward
+        <div id="1" reel="148140" frame="676" count="18"/>
+        <div id="2" reel="148140" frame="694" count="35"/>
+    </option>
+</select>

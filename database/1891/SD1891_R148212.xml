@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148212">
+    <option value="172_H">
+        Montréal City: St. Mary Ward
+        <div id="30" reel="148212" frame="0" count="14"/>
+        <div id="31" reel="148212" frame="14" count="20"/>
+        <div id="32" reel="148212" frame="34" count="17"/>
+        <div id="33" reel="148212" frame="51" count="15"/>
+        <div id="34" reel="148212" frame="66" count="20"/>
+        <div id="35" reel="148212" frame="86" count="22"/>
+        <div id="36" reel="148212" frame="108" count="13"/>
+        <div id="37" reel="148212" frame="121" count="20"/>
+        <div id="38" reel="148212" frame="141" count="32"/>
+        <div id="39" reel="148212" frame="173" count="23"/>
+        <div id="40" reel="148212" frame="196" count="18"/>
+        <div id="41" reel="148212" frame="214" count="29"/>
+    </option>
+    <option value="172_I">
+        Montréal City: West Ward
+        <div id="1" reel="148212" frame="243" count="12"/>
+        <div id="2" reel="148212" frame="255" count="10"/>
+    </option>
+    <option value="173_A">
+        Napierville: Napierville Village
+        <div id="" reel="148212" frame="265" count="19"/>
+    </option>
+    <option value="173_B">
+        Napierville: St. Cyprien
+        <div id="" reel="148212" frame="284" count="35"/>
+    </option>
+    <option value="173_C">
+        Napierville: St. Édouard
+        <div id="" reel="148212" frame="319" count="27"/>
+    </option>
+    <option value="173_D">
+        Napierville: St. Michel Archange
+        <div id="1" reel="148212" frame="346" count="18"/>
+        <div id="2" reel="148212" frame="364" count="16"/>
+    </option>
+    <option value="173_E">
+        Napierville: St. Patrice de Sherrington
+        <div id="1" reel="148212" frame="380" count="20"/>
+        <div id="2" reel="148212" frame="400" count="16"/>
+        <div id="3" reel="148212" frame="416" count="5"/>
+    </option>
+    <option value="173_F">
+        Napierville: St. Rémi
+        <div id="1" reel="148212" frame="421" count="26"/>
+        <div id="2" reel="148212" frame="447" count="9"/>
+    </option>
+    <option value="173_G">
+        Napierville: St. Rémi Village
+        <div id="" reel="148212" frame="456" count="35"/>
+    </option>
+    <option value="174_A">
+        Nicolet: Bécancourt
+        <div id="" reel="148212" frame="491" count="41"/>
+    </option>
+    <option value="174_B">
+        Nicolet: Gentilly
+        <div id="" reel="148212" frame="532" count="53"/>
+    </option>
+    <option value="174_C">
+        Nicolet: La Rochelle Village
+        <div id="" reel="148212" frame="585" count="16"/>
+    </option>
+    <option value="174_D">
+        Nicolet: Nicolet
+        <div id="" reel="148212" frame="601" count="37"/>
+    </option>
+    <option value="174_E">
+        Nicolet: Nicolet Town
+        <div id="" reel="148212" frame="638" count="53"/>
+    </option>
+    <option value="174_F">
+        Nicolet: Ste. Angèle de Laval
+        <div id="" reel="148212" frame="691" count="26"/>
+    </option>
+    <option value="174_G">
+        Nicolet: Ste. Brigitte des Saults
+        <div id="" reel="148212" frame="717" count="25"/>
+    </option>
+    <option value="174_H">
+        Nicolet: St. Célestin
+        <div id="" reel="148212" frame="742" count="32"/>
+    </option>
+    <option value="174_I">
+        Nicolet: Ste. Eulalie
+        <div id="" reel="148212" frame="774" count="19"/>
+    </option>
+</select>

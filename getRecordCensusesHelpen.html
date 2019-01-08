@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Get Censuses Record: Help</title>
+    <META HTTP-EQUIV='CONTENT-TYPE' CONTENT='text/html; charset=utf-8'>
+    <META http-equiv='Content-Style-Type' content='text/css'>
+    <meta name='author' content='James A. Cobban'>
+    <meta name='copyright' content='&copy; 2017 James A. Cobban'>
+    <link rel='stylesheet' type='text/css' href='/styles.css'/>
+    <style>
+    td {	font-family:	sans-serif;
+		text-align:	left;
+		padding:	0px 3px 6px 3px;
+		}
+
+    </style>
+<!--*********************************************************************
+ *  History:															*
+ *		2017/10/10		created											*
+ **********************************************************************-->
+</head>
+<body>
+<div class='topcrumbs'>
+  <a href='/indexHelpen.html'>Home</a>: 
+  <a href='/genealogyHelpen.html'>Genealogy</a>: 
+  <a href='/getRecordXmlHelpen.html'>Get Record as XML</a>: 
+  <a href='/getRecordJsonHelpen.html'>Get Record as JSON</a>: 
+</div>
+<div class='help'>
+  <h1>Get Censuses Record: Help
+  </h1>
+      <p>This table contains records representing
+	censuses that are supported for citations by transcriptions.
+	<br>
+	Specific records are identified by parameters 'censusid'.  All census
+	records are displayed if no parameters are specified.
+	<br>
+	You can search for a list of censuses by specifying 
+	one or more of the following parameters:
+	<table> 
+	  <tr>
+	    <th>name</th>
+	    <td>a regular expression for search for a census by name.
+		For example "name=Canada" will match all censuses whose name
+		includes the text "Canada".</td>
+	  </tr>
+	  <tr>
+	    <th>linesperpage</th>
+	    <td>match censuses with a specific normal number of lines
+		per page.</td>
+	  </tr>
+	  <tr>
+	    <th>collective</th>
+	    <td>"collective=1" matches virtual censuses that represent a
+		number of censuses enumerated independently at the same
+		time.  "collective=0" matches only real censuses.</td>
+	  </tr>
+	  <tr>
+	    <th>province</th>
+	    <td>match censuses that include the specified province as
+		identified by a code.  For example "province=NS" matches
+		censuses that include Nova Scotia.</td>
+	  </tr>
+	  <tr>
+	    <th>provinces</th>
+	    <td>match censuses which include all of the provinces identified
+		by the supplied value.  The province codes must be entered
+		in alphabetical order.</td>
+	  </tr>
+	  <tr>
+	    <th>partof</th>
+	    <td>match separately administered censuses that are within a
+		country identified by a country code.</td>
+	  </tr>
+	  <tr>
+	    <th>countrycode</th>
+	    <td>match censuses that are within a country identified by
+		a country code.  This includes both censuses administered
+		at the level of that country, and those which are part of
+		a virtual collective census of the country.</td>
+	  </tr>
+	</table>
+      </p>
+</div>
+<div class='botcrumbs'>
+  <span class='right'>
+    <img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+  </span>
+  <a href='/contactAuthor.php?subject=getRecordHelpCensuses.html' target='_blank'>Contact Author</a>
+  <br/>
+  <a href='/indexHelpen.html'>Home</a>: 
+  <a href='/genealogyHelpen.html'>Genealogy</a>: 
+  <a href='/getRecordXmlHelpen.html'>Get Record as XML</a>: 
+  <a href='/getRecordJsonHelpen.html'>Get Record as JSON</a>: 
+  <div style='clear: both;'></div>
+</div>
+</body>
+</html>

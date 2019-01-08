@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Get Address Record: Help</title>
+    <META HTTP-EQUIV='CONTENT-TYPE' CONTENT='text/html; charset=utf-8'>
+    <META http-equiv='Content-Style-Type' content='text/css'>
+    <meta name='author' content='James A. Cobban'>
+    <meta name='copyright' content='&copy; 2017 James A. Cobban'>
+    <link rel='stylesheet' type='text/css' href='/styles.css'/>
+    <style>
+    td {	font-family:	sans-serif;
+		text-align:	left;
+		padding:	0px 3px 6px 3px;
+		}
+
+    </style>
+<!--*********************************************************************
+ *  History:															*
+ *		2017/10/10		created											*
+ **********************************************************************-->
+</head>
+<body>
+<div class='topcrumbs'>
+  <a href='/indexHelpen.html'>Home</a>: 
+  <a href='/genealogyHelpen.html'>Genealogy</a>: 
+  <a href='/getRecordXmlHelpen.html'>Get Record as XML</a>: 
+  <a href='/getRecordJsonHelpen.html'>Get Record as JSON</a>: 
+</div>
+<div class='help'>
+  <h1>Get Address Record: Help
+  </h1>
+  <p>This table contains records representing a fully
+     structured postal address.  For example this is used for the addresses of
+     repositories.
+     <br>
+     Specific records are identified by parameter 'idar'.
+     <br>
+	You can search for a list of address records by specifying the 
+	"kind" parameter, which is required to validate the authority of the
+	current user to view records in this table, plus any of the following:
+	<table>
+	  <tr>
+	    <th>idar</th>
+	    <td>A single integer value or multiple integer values
+		such as "idar[]=55&amp;idar[]=66".  Synonym "id".
+		Each value may optionally be prefixed by a comparison
+		operator "&lt;", "&lt;=", "=", "!=", "&gt;=", or "&gt;".
+		If there is no prefix or the prefixes are all '=' then
+		records matching any of the values are returned, otherwise
+		only records that match all of the expressions are returned.
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>minidar</th>
+	    <td>An integer value identifying the lowest IDAR to match.
+		Alternatively you can specify 
+		"idar[]=&gt;=<i>minvalue</i>&amp;idar[]=&lt;=<i>maxvalue</i>
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>maxidar</th>
+	    <td>An integer value identifying the highest IDAR to match.
+		Alternatively you can specify 
+		"idar[]=&gt;=<i>minvalue</i>&amp;idar[]=&lt;=<i>maxvalue</i>
+	  </tr>
+	  <tr>
+	    <th>kind</th>
+	    <td>0=mailing, 1=event, 2=repository.  May be a single
+		value or a set of values such as "kind[]=2&amp;kind[]=3".
+		The "kind" parameter is required to validate the authority
+		of the current user to view records in this table.
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>style</th>
+	    <td>0 = American, 1=European</td>
+	  </tr>
+	  <tr>
+	    <th>addrname</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>addrsort</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>address1</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>address2</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>city</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>state</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>zipcode</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>country</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>latitude</th>
+	    <td>Numeric angle "±ddmmss.fff".</td>
+	  </tr>
+	  <tr>
+	    <th>longitude</th>
+	    <td>Numeric angle "±ddmmss.fff".</td>
+	  </tr>
+	  <tr>
+	    <th>phone1</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>phone2</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>email</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>homepage</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>addrnotes</th>
+	    <td>regular expression pattern match</td>
+	  </tr>
+	  <tr>
+	    <th>private</th>
+	    <td>1 if private.</td>
+	  </tr>
+	</table>
+	<br>For example "?table=Address&amp;kind=2&amp;addrname=Family" returns
+	a list of repository address records with addrname including "Family". 
+       </p>
+</div>
+<div class='botcrumbs'>
+  <span class='right'>
+    <img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+  </span>
+  <a href='/contactAuthor.php?subject=getRecordHelpAddress.html' target='_blank'>Contact Author</a>
+  <br/>
+  <a href='/indexHelpen.html'>Home</a>: 
+  <a href='/genealogyHelpen.html'>Genealogy</a>: 
+  <a href='/getRecordXmlHelpen.html'>Get Record as XML</a>: 
+  <a href='/getRecordJsonHelpen.html'>Get Record as JSON</a>: 
+  <div style='clear: both;'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Census Sub-District Table Help</title>
+    <meta http-equiv=Content-Type content="text/html; charset=utf8">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+ *  	2010/11/21  	created                                         *
+ *      2018/11/08      rename to ...Helpen.html                        *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  
+  <body>
+    <div class="topcrumbs">
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+    	<a href="/database/genCensusesHelpen.html">Censuses</a>: 
+    </div>
+    <div class="help">
+        <h1>Census Sub-District Table Help</h1>
+    <p>Each district of a census of Canada is divided into sub-districts.
+    Generally a sub-district corresponds to a township, town, large village, or a ward in a city.
+    <p>For censuses prior to 1911
+    if the workload of collecting the census data was anticipated to exceed the
+    capacity of a single enumerator, then the sub-district was divided into
+    divisions.  In the 1911 census multiple sub-districts were created instead.
+    <p>All of the information that the application requires to know about a
+    sub-district (or division) is collected in the Sub-District Table.
+    This includes:
+      <ul>
+        <li>The 6 character identifier of the census.  This consists of the
+    	2 character country code, 'CA' for Canada, 
+    	and the 4 digit enumeration year.
+        <li>The numeric identifier of the district of which the sub-district
+    	is a part. 
+        <li>The identifier of the sub-district within the district.  For some
+    	censuses (1851, 1861, 1906, 1911) this is a number.  For others it
+    	is an alphabetic code.
+        <li>The division number if the sub-district is divided into divisions.
+    	There is a separate record in this table for each division.
+        <li>The name of the sub-district.
+        <li>The number of pages in the population (enumeration of the living)
+    	schedule.
+        <li>The first page number in the division.  In most cases this is 1.
+    	However in the 1851 and 1861 censuses the pages were not 
+    	consistently numbered by the enumerators, and the pages were 
+    	subsequently numbered sequentially through the entire sub-district
+    	when the original documents were microfilmed (and the originals
+    	destroyed!).
+        <li>The page increment within the division.  In a few cases when the
+    	1851 and 1861 census pages were numbered, during the microfilming
+    	process, the technician incremented the page number twice for
+    	each leaf of the schedule of the living because information about
+    	the individuals was recorded on both the recto and the verson of
+    	each leaf.  In this case the application has to know that only the
+    	odd page numbers are used to identify the page[s] containing
+    	information on an individual.
+        <li>The total number of individuals in the division.  This is used
+    	by the web pages that track the progress of the transcription.
+        <li>Library &amp; Archives of Canada (LAC) microfilm reel identifier.
+        <li>Church of Latter Day Saints (LDS) Family History Library (FHL) 
+    	microfilm reel number.
+        <li>The "Image Base", and "Relative Frame" fields identify the crucial
+    	numeric values that are used to compute the Uniform Record Locator
+    	(URL) of the image of the first page of the population schedule.
+    	The exact meaning of these two fields depends upon the census.
+        <li>The number of images for this division on the web site.
+      </ul
+    </p>
+    <p>The "Update SubDist Table" application requires that you uniquely
+    identify the district containing the sub-district (and division) for which
+    you wish to correct information.  Once you have made that selection the
+    application displays the portion of the table including 
+    all of the sub-districts (and divisions) in the selected division.
+    <p>To identify the district you identify the enumeration year, and district.
+    The pre-Confederation censuses were administered separately in each of the
+    colonies, and when the Dominion Bureau of Statistics (predecessor of
+    Statistics Canada) organized the records for those censuses, it assigned
+    separate sets of district numbers for each of the colonies.  So for the
+    pre-Confederation censuses you must also specify the colony (province) in
+    which the district is located.  For the post-Confederation censuses
+    specifying the province is optional, although it limits the set of
+    districts displayed.
+    <p>Once you have selected the district, click on the 
+    <span class="button">Request Form</span> button.
+    The application displays the information on all of the sub-districts and
+    divisions in the requested district in a 
+    <a href="SubDistFormHelpen.html">tabular form</a>
+    that can be updated like a spreadsheet.
+    </div>
+    <div class="botcrumbs">
+    	<a href="/contactAuthor.php?subject=ReqUpdateSubDistsHelpen.html" target="_blank">Contact Author</a>
+    	<br/>
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+    	<a href="/database/genCensusesHelpen.html">Censuses</a>: 
+          <span class="right">
+            <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+          </span>
+      <span style="clear: both;"></span>
+    </div>
+  </body>
+</html>

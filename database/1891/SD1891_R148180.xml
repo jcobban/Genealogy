@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148180">
+    <option value="127_F">
+        Wellington South: Puslinch
+        <div id="2" reel="148180" frame="0" count="1"/>
+        <div id="2" reel="148180" frame="1" count="22"/>
+        <div id="3" reel="148180" frame="23" count="18"/>
+        <div id="4" reel="148180" frame="41" count="18"/>
+    </option>
+    <option value="128_A">
+        Wentworth North: Beverley
+        <div id="1" reel="148180" frame="59" count="35"/>
+        <div id="2" reel="148180" frame="94" count="32"/>
+        <div id="3" reel="148180" frame="126" count="31"/>
+    </option>
+    <option value="128_B">
+        Wentworth North: Dundas Town
+        <div id="1" reel="148180" frame="157" count="36"/>
+        <div id="2" reel="148180" frame="193" count="37"/>
+    </option>
+    <option value="128_C">
+        Wentworth North: Flamborough East
+        <div id="1" reel="148180" frame="230" count="25"/>
+        <div id="2" reel="148180" frame="255" count="30"/>
+    </option>
+    <option value="128_D">
+        Wentworth North: Flamborough West
+        <div id="1" reel="148180" frame="285" count="32"/>
+        <div id="2" reel="148180" frame="317" count="31"/>
+    </option>
+    <option value="128_E">
+        Wentworth North: Waterdown Village
+        <div id="" reel="148180" frame="348" count="16"/>
+    </option>
+    <option value="129_A">
+        Wentworth South: Barton
+        <div id="1" reel="148180" frame="364" count="51"/>
+        <div id="2" reel="148180" frame="415" count="36"/>
+        <div id="3" reel="148180" frame="451" count="18"/>
+    </option>
+    <option value="129_B">
+        Wentworth South: Binbrook
+        <div id="1" reel="148180" frame="469" count="16"/>
+        <div id="2" reel="148180" frame="485" count="20"/>
+    </option>
+    <option value="129_C">
+        Wentworth South: Caistor
+        <div id="1" reel="148180" frame="505" count="25"/>
+        <div id="2" reel="148180" frame="530" count="18"/>
+    </option>
+    <option value="129_D">
+        Wentworth South: Glanford
+        <div id="1" reel="148180" frame="548" count="18"/>
+        <div id="2" reel="148180" frame="566" count="20"/>
+    </option>
+    <option value="129_E">
+        Wentworth South: Grimsby North
+        <div id="" reel="148180" frame="586" count="24"/>
+    </option>
+    <option value="129_F">
+        Wentworth South: Grimsby South
+        <div id="1" reel="148180" frame="610" count="15"/>
+        <div id="2" reel="148180" frame="625" count="20"/>
+    </option>
+    <option value="129_G">
+        Wentworth South: Grimsby Village
+        <div id="" reel="148180" frame="645" count="19"/>
+    </option>
+    <option value="129_H">
+        Wentworth South: Saltfleet
+        <div id="1" reel="148180" frame="664" count="24"/>
+        <div id="2" reel="148180" frame="688" count="36"/>
+    </option>
+    <option value="130_A">
+        York East: Markham
+        <div id="1" reel="148180" frame="724" count="23"/>
+        <div id="2" reel="148180" frame="747" count="25"/>
+        <div id="3" reel="148180" frame="772" count="20"/>
+    </option>
+</select>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148161">
+    <option value="102_D">
+        Ontario West: Uxbridge
+        <div id="3" reel="148161" frame="0" count="9"/>
+        <div id="4" reel="148161" frame="9" count="11"/>
+        <div id="5" reel="148161" frame="20" count="10"/>
+        <div id="6" reel="148161" frame="30" count="10"/>
+    </option>
+    <option value="102_E">
+        Ontario West: Uxbridge Town
+        <div id="1" reel="148161" frame="40" count="29"/>
+        <div id="2" reel="148161" frame="69" count="16"/>
+    </option>
+    <option value="102_F">
+        Ontario West: Whitchurch
+        <div id="1" reel="148161" frame="85" count="16"/>
+        <div id="2" reel="148161" frame="101" count="13"/>
+        <div id="3" reel="148161" frame="114" count="8"/>
+        <div id="4" reel="148161" frame="122" count="13"/>
+        <div id="5" reel="148161" frame="135" count="15"/>
+        <div id="6" reel="148161" frame="150" count="22"/>
+    </option>
+    <option value="103_A">
+        Ottawa City: By Ward
+        <div id="1" reel="148161" frame="172" count="50"/>
+        <div id="2" reel="148161" frame="222" count="43"/>
+        <div id="3" reel="148161" frame="265" count="38"/>
+    </option>
+    <option value="103_B">
+        Ottawa City: Ottawa Ward
+        <div id="1" reel="148161" frame="303" count="57"/>
+        <div id="2" reel="148161" frame="360" count="54"/>
+        <div id="3" reel="148161" frame="414" count="52"/>
+    </option>
+    <option value="103_C">
+        Ottawa City: St. Georgés Ward
+        <div id="1" reel="148161" frame="466" count="38"/>
+        <div id="2" reel="148161" frame="504" count="43"/>
+        <div id="3" reel="148161" frame="547" count="39"/>
+    </option>
+    <option value="103_D">
+        Ottawa City: Victoria Ward
+        <div id="1" reel="148161" frame="586" count="27"/>
+        <div id="2" reel="148161" frame="613" count="36"/>
+    </option>
+    <option value="103_E">
+        Ottawa City: Wellington Ward
+        <div id="1" reel="148161" frame="649" count="46"/>
+        <div id="2" reel="148161" frame="695" count="56"/>
+    </option>
+</select>

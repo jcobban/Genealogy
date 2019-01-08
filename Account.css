@@ -1,0 +1,20 @@
+/**
+ *  Account.css
+ *
+ *  Stylesheet for the script Account.php
+ *
+ *  History:
+ *	2013/12/08	created
+ *
+ *  Copyright &copy; 2013 James A. Cobban
+ **/
+
+    label.label {font-family: sans-serif;
+		font-weight: bold;
+		text-align: right;
+		vertical-align: top;
+		padding: 0px 3px 0px 3px;
+		float: left;
+		width: 15em;
+		}
+

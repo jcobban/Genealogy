@@ -1,0 +1,276 @@
+<!--*********************************************************************
+ *  testNameen.html   	    											*
+ *																		*
+ *  Display a web page for testing the Name class.                      *
+ *																		*
+ *  History:															*
+ *		2019/01/04      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">
+			Genealogy
+    </a>:
+    <a href="/genCountry.php?cc=CA&lang=$LANG">
+			Canada
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&lang=$LANG">
+			Ontario
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">
+			Services
+    </a>:
+    <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+			Nominal Index
+    </a>:
+  </div>
+  <div class="body">
+	<h1>
+	  <span class="right">
+		<a href="NameHelpen.html" target="help">? Help</a>
+	  </span>
+      Test Name:
+	</h1>
+	    $TRACE
+	    $MSG
+    <form name='indForm' action='testSurname.php' method='post'>
+      <input name='Debug' type='hidden' value='$DEBUG'>
+	  <div class="row" id="idirRow">
+	  	<label class="column1" for="Name">
+	  	    IDIR:
+	  	</label>
+	  	<input type="text" name="IDIR" id="IDIR"
+	  			class="ina rightnc"
+	  			value="$IDIR"
+	  			readonly="readonly">
+	    <div style="clear: both;">
+	  </div> <!-- class="row" id="idirRow" -->
+	  <div class="row" id="tblirNameRow">
+	  	<label class="column1">
+	  	     tblIR Name:
+	  	</label>
+	  	<a href="Person.php?idir=$IDIR&lang=$LANG"
+	  			class="$SEX">
+	  	   $TBLIRNAME
+	  	</a>
+	    <div style="clear: both;">
+	  </div> <!-- class="row" id="tblirNameRow" -->
+	  <div class="row" id="surnameRow">
+	  	<label class="column1" for="surname">
+	  	    Surname:
+	  	</label>
+	  	<input type="input" class="ina leftnc"
+	  			name="surname" id="surname" value="$SURNAME">
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="surnameRow" -->
+	  <div class="row" id="tblnrSurnameRow">
+	  	<label class="column1">
+	  	     Surname Record:
+	  	</label>
+		<a href="/FamilyTree/Names.php?surname=$SURNAME&lang=$LANG">
+	  	  $SURNAME
+	  	</a>
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="tblnrSurnameRow" -->
+	  <div class="row" id="soundslikeRow">
+	  	<label class="column1" for="soundslike">
+	  	    SOUNDEX Code:
+	  	</label>
+	  	<input type="input" class="ina left"
+	  			name="soundslike" id="soundslike"
+	  			value="$SOUNDSLIKE"
+	  			readonly="readonly">
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="soundslikeRow" -->
+	  <div class="row" id="givennameRow">
+	  	<label class="column1" for="givenname">
+	  	    Given Name:
+	  	</label>
+	  	<input type="input" class="ina leftnc"
+	  			name="givenname" id="givenname" value="$GIVENNAME">
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="givennameRow" -->
+	  <div class="row" id="prefixRow">
+	  	<label class="column1" for="prefix">
+	  	    Prefix:
+	  	</label>
+	  	<input type="input" class="ina leftnc"
+	  			name="prefix" id="prefix" value="$PREFIX">	
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="prefixRow" -->
+	  <div class="row" id="titleRow">
+	  	<label class="column1" for="title">
+	  	    Title:
+	  	</label>
+	  	<input type="input" class="ina leftnc"
+	  			name="title" id="title" value="$NAMETITLE">	
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="titleRow" -->
+	  <div class="row" id="userrefRow">
+	  	<label class="column1" for="userref">
+	  	    User Ref:
+	  	</label>
+	  	<input type="input" class="ina leftnc"
+	  			name="userref" id="userref" value="$USERREF">
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="userrefRow" -->
+	  <div class="row" id="orderRow">
+	  	<label class="column1" for="order">
+	  	    Order:
+	  	</label>
+	  	<input type="input" class="ina rightnc"
+	  			name="order" id="order" value="$ORDER">
+        <span id="orderMarried" style="display: $ORDERMARRIEDCLASS;">
+            Married Name
+        </span>
+        <span id="orderPrime" style="display: $ORDERPRIMECLASS;">
+            Primary Name
+        </span>
+        <span id="orderAka" style="display: $ORDERAKACLASS;">
+            Also Known As
+        </span>
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="orderRow" -->
+	  <div class="row" id="marriednamecreatedbyRow">
+	  	<label class="column1" for="marriednamecreatedby">
+	  	    Married Name Created by:
+	  	</label>
+        <select name="marriednamecreatedby" id="marriednamecreatedby"
+            readonly="readonly">
+		  <option value="0" $MNSELECTED0>
+		        Not a Married Name
+          </option>
+		  <option value="1" $MNSELECTED1>
+		        Rule Created Married Name
+          </option>
+		  <option value="2" $MNSELECTED2>
+		        User Created Married Name
+          </option>
+        </select>
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="marriednamecreatedbyRow" -->
+	  <div class="row" id="birthsdRow">
+	  	<label class="column1" for="birthsd">
+	  	    Birth Sorted Date:
+	  	</label>
+	  	<input type="input" class="ina rightnc"
+	  			name="birthsd" id="birthsd" value="$BIRTHSD">
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="birthsdRow" -->
+	  <div class="row" id="preferredakaRow">
+	  	<label class="column1" for="preferredaka">
+	  	    Preferred AKA:
+	  	</label>
+	  	<input type="input" class="ina rightnc"
+	  			name="preferredaka" id="preferredaka" value="$PREFERREDAKA">
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="preferredakaRow" -->
+	  <div class="row" id="akanoteRow">
+	  	<label class="column1" for="akanote">
+	  	    AKA Note:
+	  	</label>
+	  	<input type="input" class="ina leftnc"
+	  			name="akanote" id="akanote" value="$AKANOTE">
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="akanoteRow" -->
+	  <div class="row" id="marriednamemarididRow">
+	  	<label class="column1" for="marriednamemaridid">
+	  	    IDMR of Family:
+	  	</label>
+	  	<input type="input" class="ina rightnc"
+	  			name="marriednamemaridid" id="marriednamemaridid"
+	  			value="$IDMR">
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="marriednamemarididRow" -->
+	  <div class="row" id="familyRow">
+	    <label class="column1">
+	  	    Family:
+	    </label>
+	    <a href="editMarriages.php?idmr=$IDMR&lang=$LANG">
+	  	$FAMILYNAME
+	    </a>
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="familyRow" -->
+	  <div class="row" id="srchtagRow">
+	   <label class="column1" for="srchtag">
+	  	    Srch Tag:
+	    </label>
+	    <input type="input" class="ina rightnc"
+	  			name="srchtag" id="srchtag" value="$SRCHTAG">
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="srchtagRow" -->
+	  <div class="row" id="qstagRow">
+	    <label class="column1" for="qstag">
+	  	    QS Tag:
+	    </label>
+	    <input type="input" class="ina rightnc"
+	  			name="qstag" id="qstag" value="$QSTAG">	
+	    <div style="clear: both;"></div>
+	  </div> <!-- class="row" id="qstagRow" -->
+	</form>
+  </div> <!-- body division -->
+	<!-- a division containing templates for dynamically created HTML -->
+	<!-- the remaining portion of the page is divisions containing popup help -->
+	<div class="balloon" id="Helpidnx">
+	  The unique numeric identifier of the name record record in the database.
+      This is assigned by the system when a new name record is created, 
+      and cannot be altered by the user.
+	</div>
+	<div class="balloon" id="HelpName">
+	  The name record name as it appears in web pages.
+	</div>
+	<div class="balloon" id="HelpqsTag">
+	  This field is currently unused.
+	  The checkbox is selected if the value of this field is 'yes'.
+	</div>
+	<div class="balloon" id="HelpTag1">
+	  This field is currently unused.
+	  The checkbox is selected if the value of this field is 'yes'.
+	</div>
+	<div class="balloon" id="HelpshowMap">
+	  Clicking on this button displays or hides a Google map
+	  centered at the name record.
+	</div>
+	<div class="balloon" id="HelpgetMap">
+	  Clicking on this button extracts information from the Google map display
+	  about the center of the map and its zoom level and stores that information
+      into the latitude, longitude, and zoom level input fields. 
+      This permits you
+	  to use the zoom and pan functions of the Google map to adjust the display
+	  appropriately, and then save those settings for subsequent users.
+	</div>
+	<div class="balloon" id="HelpSubmit">
+	  Clicking on this button updates the database entry for this name record.
+	</div>
+	<div class="balloon" id="HelpClose">
+	  Clicking on this button closes the dialog and returns to the 
+	  list of name records.
+	</div>
+	<div class="balloon" id="HelpReferences">
+	  Clicking on this button displays a list of the database entries, either
+	  individuals or families, that reference the name record.
+	</div>
+	<div class="balloon" id="HelpmergeDuplicates">
+	  Clicking on this button merges all of the name records with the same name
+	  with the current name record.
+	</div>
+	<div class="balloon" id="HelpDupIdlr">
+	  This read-only field displays the unique identification number of
+	  a name record with the same name record name as the current name record.
+	</div>
+	  <div class="balloon" id="HelpPictures">
+	Click this button to open a dialog for managing the pictures associated
+	with the name record.
+	  </div>
+	<script src="/jscripts/js20/http.js" type="application/javaScript">
+    </script>
+	<script src="/jscripts/CommonForm.js" type="application/javaScript">
+    </script>
+	<script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+	<script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="application/javaScript">
+    </script>
+	<script src="/FamilyTree/Name.js" type="application/javaScript">
+    </script>

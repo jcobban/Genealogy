@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148138">
+    <option value="63_F">
+        Essex South: Gosfield
+        <div id="4" reel="148138" frame="0" count="19"/>
+    </option>
+    <option value="63_G">
+        Essex South: Kingsville Village
+        <div id="" reel="148138" frame="19" count="28"/>
+    </option>
+    <option value="63_H">
+        Essex South: Leamington Village
+        <div id="1" reel="148138" frame="47" count="21"/>
+        <div id="2" reel="148138" frame="68" count="21"/>
+    </option>
+    <option value="63_I">
+        Essex South: Malden
+        <div id="1" reel="148138" frame="89" count="22"/>
+        <div id="2" reel="148138" frame="111" count="12"/>
+    </option>
+    <option value="63_J">
+        Essex South: Mersea
+        <div id="1" reel="148138" frame="123" count="16"/>
+        <div id="2" reel="148138" frame="139" count="21"/>
+        <div id="3" reel="148138" frame="160" count="20"/>
+        <div id="4" reel="148138" frame="180" count="24"/>
+    </option>
+    <option value="63_K">
+        Essex South: Pelee Island
+        <div id="" reel="148138" frame="204" count="13"/>
+    </option>
+    <option value="64_A">
+        Frontenac: Garden Island Village
+        <div id="" reel="148138" frame="217" count="9"/>
+    </option>
+    <option value="64_B">
+        Frontenac: Howe Island
+        <div id="" reel="148138" frame="226" count="10"/>
+    </option>
+    <option value="64_C">
+        Frontenac: Kingston
+        <div id="1" reel="148138" frame="236" count="15"/>
+        <div id="2" reel="148138" frame="251" count="19"/>
+        <div id="3" reel="148138" frame="270" count="11"/>
+        <div id="4" reel="148138" frame="281" count="8"/>
+        <div id="5" reel="148138" frame="289" count="13"/>
+        <div id="6" reel="148138" frame="302" count="8"/>
+    </option>
+    <option value="64_D">
+        Frontenac: Pittsburgh
+        <div id="1" reel="148138" frame="310" count="18"/>
+        <div id="2" reel="148138" frame="328" count="11"/>
+        <div id="3" reel="148138" frame="339" count="13"/>
+        <div id="4" reel="148138" frame="352" count="13"/>
+        <div id="5" reel="148138" frame="365" count="16"/>
+    </option>
+    <option value="64_E">
+        Frontenac: Portsmouth Village
+        <div id="" reel="148138" frame="381" count="41"/>
+    </option>
+    <option value="64_F">
+        Frontenac: Storrington
+        <div id="1" reel="148138" frame="422" count="13"/>
+        <div id="2" reel="148138" frame="435" count="18"/>
+        <div id="3" reel="148138" frame="453" count="18"/>
+        <div id="4" reel="148138" frame="471" count="3"/>
+    </option>
+    <option value="64_G">
+        Frontenac: Wolfe Island
+        <div id="1" reel="148138" frame="474" count="11"/>
+        <div id="2" reel="148138" frame="485" count="18"/>
+        <div id="3" reel="148138" frame="503" count="7"/>
+        <div id="4" reel="148138" frame="510" count="10"/>
+    </option>
+    <option value="65_A">
+        Glengarry: Alexandria Village
+        <div id="" reel="148138" frame="520" count="33"/>
+    </option>
+    <option value="65_B">
+        Glengarry: Charlottenburg
+        <div id="1" reel="148138" frame="553" count="25"/>
+        <div id="2" reel="148138" frame="578" count="31"/>
+        <div id="3" reel="148138" frame="609" count="30"/>
+        <div id="4" reel="148138" frame="639" count="33"/>
+    </option>
+    <option value="65_C">
+        Glengarry: Kenyon
+        <div id="1" reel="148138" frame="672" count="19"/>
+    </option>
+</select>

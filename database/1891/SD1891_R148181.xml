@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148181">
+    <option value="130_A">
+        York East: Markham
+        <div id="4" reel="148181" frame="0" count="27"/>
+        <div id="5" reel="148181" frame="27" count="25"/>
+    </option>
+    <option value="130_B">
+        York East: Markham Village
+        <div id="" reel="148181" frame="52" count="23"/>
+    </option>
+    <option value="130_C">
+        York East: St. Pauls Ward &amp; St. Mathews Ward
+        <div id="1" reel="148181" frame="75" count="43"/>
+        <div id="2" reel="148181" frame="118" count="47"/>
+        <div id="3" reel="148181" frame="165" count="30"/>
+        <div id="4" reel="148181" frame="195" count="43"/>
+        <div id="5" reel="148181" frame="238" count="40"/>
+        <div id="6" reel="148181" frame="278" count="32"/>
+        <div id="7" reel="148181" frame="310" count="32"/>
+        <div id="8" reel="148181" frame="342" count="37"/>
+        <div id="9" reel="148181" frame="379" count="38"/>
+        <div id="10" reel="148181" frame="417" count="33"/>
+    </option>
+    <option value="130_D">
+        York East: Scarborough
+        <div id="1" reel="148181" frame="450" count="53"/>
+        <div id="2" reel="148181" frame="503" count="29"/>
+    </option>
+    <option value="130_E">
+        York East: York East
+        <div id="1" reel="148181" frame="532" count="38"/>
+        <div id="2" reel="148181" frame="570" count="29"/>
+        <div id="3" reel="148181" frame="599" count="21"/>
+        <div id="4" reel="148181" frame="620" count="38"/>
+    </option>
+    <option value="131_A">
+        York North: Aurora Town
+        <div id="1" reel="148181" frame="658" count="20"/>
+        <div id="2" reel="148181" frame="678" count="22"/>
+    </option>
+    <option value="131_B">
+        York North: Bradford Village
+        <div id="1" reel="148181" frame="700" count="9"/>
+        <div id="2" reel="148181" frame="709" count="17"/>
+    </option>
+    <option value="131_C">
+        York North: Georgina &amp; Georgina Island
+        <div id="1" reel="148181" frame="726" count="19"/>
+        <div id="2" reel="148181" frame="745" count="23"/>
+    </option>
+    <option value="131_D">
+        York North: Gwillimbury East
+        <div id="1" reel="148181" frame="768" count="13"/>
+        <div id="2" reel="148181" frame="781" count="15"/>
+    </option>
+</select>

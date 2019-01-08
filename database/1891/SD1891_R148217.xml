@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148217">
+    <option value="178_G">
+        Québec City: Palais Ward
+        <div id="1" reel="148217" frame="0" count="18"/>
+        <div id="2" reel="148217" frame="18" count="31"/>
+    </option>
+    <option value="178_H">
+        Québec City: St-Jean Ward
+        <div id="1" reel="148217" frame="49" count="57"/>
+        <div id="2" reel="148217" frame="106" count="43"/>
+        <div id="3" reel="148217" frame="149" count="30"/>
+        <div id="4" reel="148217" frame="179" count="29"/>
+    </option>
+    <option value="178_I">
+        Québec City: St-Louis Ward
+        <div id="1" reel="148217" frame="208" count="15"/>
+        <div id="2" reel="148217" frame="223" count="44"/>
+    </option>
+    <option value="178_J">
+        Québec City: St-Pierre Ward
+        <div id="1" reel="148217" frame="267" count="34"/>
+        <div id="2" reel="148217" frame="301" count="9"/>
+        <div id="3" reel="148217" frame="310" count="15"/>
+    </option>
+    <option value="178_K">
+        Québec City: St-Roch Ward
+        <div id="1" reel="148217" frame="325" count="39"/>
+        <div id="2" reel="148217" frame="364" count="42"/>
+        <div id="3" reel="148217" frame="406" count="80"/>
+        <div id="4" reel="148217" frame="486" count="25"/>
+    </option>
+    <option value="178_L">
+        Québec City: St-Roch North Ward
+        <div id="1" reel="148217" frame="511" count="24"/>
+        <div id="2" reel="148217" frame="535" count="38"/>
+        <div id="3" reel="148217" frame="573" count="8"/>
+    </option>
+    <option value="178_M">
+        Québec City: St-Roch South Ward
+        <div id="1" reel="148217" frame="581" count="48"/>
+        <div id="2" reel="148217" frame="629" count="106"/>
+        <div id="3" reel="148217" frame="735" count="82"/>
+    </option>
+</select>

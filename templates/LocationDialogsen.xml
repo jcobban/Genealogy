@@ -1,0 +1,78 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--*********************************************************************
+ *  LocationDialogsen.xml												*
+ *																		*
+ *  Common layout of the popup dialogs presented by the common support	*
+ *  for dynamic management of Locations.								*
+ *  Note:	Although this is an HTML file and is stored in the		    *
+ *			same directory used for template files used by			    *
+ *			class Template, this file is used by the dynamic		    *
+ *			display functionality in Javascript.					    *
+ *																		*
+ *  History:															*
+ *		2018/01/09		created so that the dialogs displayed by		*
+ *						/jscripts/locationcommon.js are identical		*
+ *						in all scripts.									*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+<div class="hidden">
+  <!-- template for dialog reporting new location 
+	var parms	= {"template"	: "",
+			   "name"	: name,
+			   "formname"	: formname,
+			   "field"	: field};
+
+  	displayDialog(msgDiv,
+		      'NewLocationMsg$template',
+		      parms,
+		      element,		// position
+		      closeNewDialog,	// button closes dialog
+		      false);		// default show on open
+-->
+  <form name='NewLocationMsg$template' id='NewLocationMsg$template'>
+    <p class='label'>$name</p>
+    <p class='warning'>Note: This is a previously undefined location</p>
+    <p>
+      <input type='hidden' id='formname' name='formname' value='$formname'/>
+      <input type='hidden' id='field' name='field' value='$field'/>
+      <button type='button' id='closeDlg$template'>
+	    Continue to Create New Location
+      </button>
+    </p>
+  </form>
+
+  <!-- template for dialog for choosing new location
+	var parms	= {"template"	: "",
+			   "name"	: name};
+
+	displayDialog(msgDiv,
+		      'ChooseLocationMsg$template',
+		      parms,
+		      element,		// position
+		      null,		// button closes dialog
+		      true);		// do not show yet
+
+	// update selection list for choice
+	var	select	= document.getElementById('locationSelect');
+	select.onchange	= locationChosen;
+	select.setAttribute("for", field);
+	select.setAttribute("formname", formname);
+	// code to add options to select
+	select.selectedIndex	= 0;
+
+	// make the dialog visible
+	show(msgDiv);
+-->
+  <form name='ChooseLocationMsg$template' id='ChooseLocationMsg$template'>
+    <h2>Multiple Matches Found for '$name'</h2>
+    <select id='locationSelect$template' size='5'>
+	<option value="-1">[choose a Location]</option>
+    </select>
+    <p>
+      <button type='button' id='closeChooser$template'>
+	Cancel
+      </button>
+    </p>
+  </form>
+</div>

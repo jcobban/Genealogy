@@ -1,0 +1,128 @@
+<!--*********************************************************************
+ *  descendantReporten.html     										*
+ *																		*
+ *  Display a web page containing a report of the descendants of an		*
+ *  individual.															*
+ *																		*
+ * History:																*
+ *		2018/10/24		created                                         *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">
+		Genealogy
+    </a>:
+    <a href="/genCountry.php?cc=CA&lang=$LANG">
+		Canada
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&lang=$LANG">
+		Ontario
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">
+		Services
+    </a>:
+    <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+		Nominal Index
+    </a>:
+    <span id="surnamesPrefix">
+        <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+		Surnames Starting with '$PREFIX'
+    </a>:
+    </span>
+    <span  id="surname">
+        <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+		Surname '$SURNAME'
+        </a>:
+    </span>
+  </div>
+
+  <div class='body'>
+    <h1>
+      <span class='right'>
+		<a href='descendantReportHelpen.html' target='help'>? Help</a>
+      </span>
+        Descendant Tree for $NAME
+      <div style='clear: both;'></div>
+    </h1>
+    $TRACE
+    $MSG
+  <p id="private">This individual is private.  Cannot display descendants.
+  </p>
+  <form  name='depthForm' id='depthForm'action='descendantReport.php'
+        method='get'>
+    <div class='row'>
+      <label class='label' for='descDepth' style='width: 20em;'>
+		Maximum depth in generations: 
+      </label>
+		<input type='text' name='descDepth' id='descDepth'
+				size='2' class='white rightnc'
+				value='$DESCDEPTH'>
+		<input type='hidden' name='idir'
+				value='$IDIR'>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <label class='label' for='incLocsSet' style='width: 20em;'>
+		Display locations?
+      </label>
+		<input type='checkbox' name='incLocsSet' id='incLocsSet'
+				value='1' $INCLOCSCHECKED>
+		<input type='hidden' name='incLocs'
+				value='$INCLOCS'>
+      <div style='clear: both;'></div>
+    </div>
+      <div class='row'>
+		<button type='button' id='Close' accessKey='C'>
+		  <u>C</u>lose
+		</button>
+		&nbsp;
+		<button type='button' id='FullScreen' accessKey='F'>
+		  <u>F</u>ull Screen
+		</button>
+      </div>
+    </form>
+		$DATA
+  </div> <!-- class="body" -->
+  <div id="templates" class="hidden">
+    <ol>
+        <li id="descendant">
+            <a href='Person.php?idir=$IDIR'
+				class='$GCLASS'>
+				$NAME
+		    </a>
+        $MARRIAGES
+		</li>
+    </ol>
+            <span id="marriage"> 
+              <br>Married $MDATETXT 
+                 <span id="marriageLoc">at $MLOCTXT</span>
+		            to <a href='Person.php?idir=$SPSID' class='$SPSCLASS'>
+		                $NAME
+		            </a>
+		      <ol id="children">
+				$SHOWCHILD
+		      </ol>
+            </span>
+    <span id="Failure">Failure</span>
+  </div> <!-- id="templates" -->
+  <div id='HelpdescDepth' class='balloon'>
+    Specify the number of generations of descendants to display.
+  </div>
+  <div id='HelpincLocsSet' class='balloon'>
+    Click on this checkbox to determine whether or not locations are included
+    with the reported birth and death events.
+  </div>
+  <div id='HelpClose' class='balloon'>
+    Click on this button to close the dialog.  Keyboard shortcuts are Alt-C and
+    Alt-Shift-C.
+  </div>
+	<script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+	<script src="/jscripts/util.js" type="text/javascript">
+    </script>
+	<script src="/jscripts/CommonForm.js" type="text/javascript">
+    </script>
+	<script src="descendantReport.js" type="text/javascript">
+    </script>

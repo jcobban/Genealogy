@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148169">
+    <option value="115_D">
+        Russell: Gloucester
+        <div id="1" reel="148169" frame="0" count="12"/>
+        <div id="2" reel="148169" frame="12" count="16"/>
+        <div id="3" reel="148169" frame="28" count="13"/>
+        <div id="4" reel="148169" frame="41" count="14"/>
+        <div id="5" reel="148169" frame="55" count="27"/>
+        <div id="6" reel="148169" frame="82" count="15"/>
+        <div id="7" reel="148169" frame="97" count="17"/>
+        <div id="8" reel="148169" frame="114" count="16"/>
+        <div id="9" reel="148169" frame="130" count="19"/>
+    </option>
+    <option value="115_E">
+        Russell: New Edinburgh Ward (Ottawa City)
+        <div id="1" reel="148169" frame="149" count="22"/>
+        <div id="2" reel="148169" frame="171" count="13"/>
+    </option>
+    <option value="115_F">
+        Russell: Osgoode
+        <div id="1" reel="148169" frame="184" count="34"/>
+        <div id="2" reel="148169" frame="218" count="16"/>
+        <div id="3" reel="148169" frame="234" count="22"/>
+        <div id="4" reel="148169" frame="256" count="16"/>
+        <div id="5" reel="148169" frame="272" count="14"/>
+    </option>
+    <option value="115_G">
+        Russell: Rockland Village
+        <div id="" reel="148169" frame="286" count="30"/>
+    </option>
+    <option value="115_H">
+        Russell: Russell
+        <div id="1" reel="148169" frame="316" count="12"/>
+        <div id="2" reel="148169" frame="328" count="21"/>
+        <div id="3" reel="148169" frame="349" count="29"/>
+        <div id="4" reel="148169" frame="378" count="23"/>
+    </option>
+    <option value="116_A">
+        Simcoe East: Gravenhurst Town
+        <div id="" reel="148169" frame="401" count="38"/>
+    </option>
+    <option value="116_B">
+        Simcoe East: Matchedash
+        <div id="" reel="148169" frame="439" count="9"/>
+    </option>
+    <option value="116_C">
+        Simcoe East: Medonte
+        <div id="1" reel="148169" frame="448" count="18"/>
+        <div id="2" reel="148169" frame="466" count="19"/>
+        <div id="3" reel="148169" frame="485" count="29"/>
+        <div id="4" reel="148169" frame="514" count="28"/>
+    </option>
+    <option value="116_D">
+        Simcoe East: Medora &amp; Wood
+        <div id="" reel="148169" frame="542" count="19"/>
+    </option>
+    <option value="116_E">
+        Simcoe East: Midland Town
+        <div id="1" reel="148169" frame="561" count="22"/>
+        <div id="2" reel="148169" frame="583" count="22"/>
+    </option>
+    <option value="116_F">
+        Simcoe East: Monck
+        <div id="" reel="148169" frame="605" count="18"/>
+    </option>
+    <option value="116_G">
+        Simcoe East: Muskoka
+        <div id="" reel="148169" frame="623" count="17"/>
+    </option>
+    <option value="116_H">
+        Simcoe East: Orillia
+        <div id="1" reel="148169" frame="640" count="26"/>
+        <div id="2" reel="148169" frame="666" count="27"/>
+        <div id="3" reel="148169" frame="693" count="24"/>
+    </option>
+    <option value="116_I">
+        Simcoe East: Orillia Town
+        <div id="1" reel="148169" frame="717" count="48"/>
+    </option>
+</select>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="41">
+    <option value="466">
+        Etobicoke
+    </option>
+    <option value="467">
+        Georgina
+    </option>
+    <option value="468">
+        Gwillimbury E.
+    </option>
+    <option value="469">
+        Gwillimbury N.
+    </option>
+    <option value="470">
+        Holland Landing Village
+    </option>
+    <option value="471">
+        King
+    </option>
+    <option value="472">
+        Markham
+    </option>
+    <option value="473">
+        Scarborough
+    </option>
+    <option value="474">
+        Vaughan
+    </option>
+    <option value="475">
+        Whitchurch
+    </option>
+    <option value="476">
+        York
+    </option>
+    <option value="477">
+        Yorkville Village
+    </option>
+    <option value="477A">
+        Agricultural Census
+    </option>
+</select>

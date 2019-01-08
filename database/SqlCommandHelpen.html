@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Sql Command Help</title>
+    <meta http-equiv=Content-Type content="text/html; charset=utf8">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+ *  	2013/11/29  	created                                         *
+ *      2018/11/08      rename to ...Helpen.html                        *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  
+  <body>
+    <div class="topcrumbs">
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+    </div>
+    <div class="help">
+        <h1>Issue SQL Command Help</h1>
+      <p>This is an administrator tool to permit correcting problems in the
+      contents of the database that cannot be corrected through any of the normal
+      tools.  It permits issuing a wide range of SQL data manipulation commands
+      to apply changes directly to the database.
+      <p>The tool provides two key functions that are not available through
+      the standard MySql client command line tool:
+      <ol>
+        <li>Before an update command is performed the user is warned of how many
+    	lines will be affected by the command.  This permits catching
+    	situations where the WHERE clause of an UPDATE or DELETE is too
+    	vague and therefore matches too many lines of the database.
+        <li>Each update command issued through this tool is logged along with
+    	updates performed by the standard user tools, so that they are included
+    	if the log is used to restore the database after a disk failure.
+      </ol>
+    </div>
+    <div class="botcrumbs">
+    	<a href="/contactAuthor.php?subject=SqlCommandHelpen.html" target="_blank">Contact Author</a>
+    	<br/>
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+          <span class="right">
+            <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+          </span>
+      <span style="clear: both;"></span>
+    </div>
+  </body>
+</html>

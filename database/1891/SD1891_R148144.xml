@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148144">
+    <option value="72_E">
+        Hamilton: Ward 5
+        <div id="5" reel="148144" frame="0" count="34"/>
+        <div id="6" reel="148144" frame="34" count="19"/>
+    </option>
+    <option value="72_F">
+        Hamilton: Ward 6
+        <div id="1" reel="148144" frame="53" count="20"/>
+        <div id="2" reel="148144" frame="73" count="27"/>
+        <div id="3" reel="148144" frame="100" count="34"/>
+        <div id="4" reel="148144" frame="134" count="34"/>
+        <div id="5" reel="148144" frame="168" count="36"/>
+    </option>
+    <option value="72_G">
+        Hamilton: Ward 7
+        <div id="1" reel="148144" frame="204" count="32"/>
+        <div id="2" reel="148144" frame="236" count="40"/>
+        <div id="3" reel="148144" frame="276" count="31"/>
+        <div id="4" reel="148144" frame="307" count="39"/>
+        <div id="5" reel="148144" frame="346" count="53"/>
+    </option>
+    <option value="73_A">
+        Hastings East: Deseronto Village
+        <div id="1" reel="148144" frame="399" count="26"/>
+        <div id="2" reel="148144" frame="425" count="42"/>
+    </option>
+    <option value="73_B">
+        Hastings East: Hungerford
+        <div id="1" reel="148144" frame="467" count="10"/>
+        <div id="2" reel="148144" frame="477" count="13"/>
+        <div id="3" reel="148144" frame="490" count="10"/>
+        <div id="4" reel="148144" frame="500" count="15"/>
+        <div id="5" reel="148144" frame="515" count="17"/>
+        <div id="6" reel="148144" frame="532" count="16"/>
+        <div id="7" reel="148144" frame="548" count="15"/>
+        <div id="8" reel="148144" frame="563" count="7"/>
+    </option>
+    <option value="73_C">
+        Hastings East: Thurlow
+        <div id="1" reel="148144" frame="570" count="33"/>
+        <div id="2" reel="148144" frame="603" count="16"/>
+        <div id="3" reel="148144" frame="619" count="17"/>
+        <div id="4" reel="148144" frame="636" count="20"/>
+        <div id="5" reel="148144" frame="656" count="15"/>
+    </option>
+    <option value="73_D">
+        Hastings East: Tyendinaga
+        <div id="1" reel="148144" frame="671" count="25"/>
+        <div id="2" reel="148144" frame="696" count="13"/>
+        <div id="3" reel="148144" frame="709" count="18"/>
+        <div id="4" reel="148144" frame="727" count="24"/>
+    </option>
+</select>

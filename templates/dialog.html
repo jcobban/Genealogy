@@ -1,0 +1,71 @@
+<!DOCTYPE HTML >
+<html>
+  <head>
+    <title>
+	$TITLE
+    </title>
+<!--*********************************************************************
+ *  dialog.html								                            *
+ *									                                    *
+ *  HTML template used for dialogs.					                    *
+ *									                                    *
+ *  History:								                            *
+ *	    2018/02/08	    update header/footer links			            *
+ *									                                    *
+ *  Copyright &copy; 2018 James A. Cobban				                *
+ **********************************************************************-->
+    <meta charset='utf-8'>
+    <meta http-equiv='default-style' content='text/css'>
+    <meta name='author' content='James A. Cobban'>
+    <meta name='copyright' content='&copy; 2018 James A. Cobban'>
+    <meta name='keywords' content='genealogy, family, tree, ontario, canada $KEYWORDS'>
+    <link rel='stylesheet' type='text/css' href='/styles.css'/>
+    <link rel='stylesheet' type='text/css' href='$filename.css'
+            id="otherStylesheets">
+  </head>
+  <body>
+  <main>
+    <noscript>
+      <p class="warning">
+     For full functionality of this site it is necessary to enable JavaScript.
+     Here are the <a href="https://www.enable-javascript.com/" target="_blank">
+     instructions how to enable JavaScript in your web browser</a>.
+      </p>
+    </noscript>
+$MAIN
+  </main>
+  <footer>
+    <div class='botcrumbs'>
+      <span class='right450'>
+	<iframe id='facebookFrame' class='facebook' $IECRAP>
+	</iframe>
+	&nbsp;
+	<img src='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+      </span>
+	<a href='/contactAuthor.php?idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
+	  Contact Author</a>
+	<br>
+    $BREADCRUMBS
+      <div style='clear: both;'></div>
+    </div> <!-- end of page footer -->
+  </footer>
+    <div class='hidden' id='UserInfo'>
+      <span id='UserInfoUserid'>$USERID</span>
+      <span id='UserInfoAuthorized'>$AUTHORIZED</span>
+      <span id='UserInfoOptions'>$OPTIONS</span>
+    </div>
+    <div class='balloon' id='msgDiv'>
+    </div>
+    <div id='hideMsgTemplate' class='hidden'>
+      <!-- template for dialog reporting error from getIndivNamesXml.php -->
+      <form name='Msg\$template' id='Msg\$template'>
+	<p class='message'>\$msg</p>
+	<p>
+	  <button type='button' id='closeDlg\$template'>
+    	OK
+	  </button>
+	</p>
+      </form>
+    </div>		<!-- id='hideMsgTemplate'-->
+  </body>
+</html>

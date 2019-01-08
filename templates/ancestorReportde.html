@@ -1,0 +1,116 @@
+<!--*********************************************************************
+ *  ancestorReportfr.html												*
+ *																		*
+ *  Display a web page containing a report of the ancestors of an		*
+ *  individual.															*
+ *																		*
+ * History:																*
+ *		2018/10/25      created                                         *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+<link rel='stylesheet' type='text/css' href='ancestorReport.css'>
+  <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">
+		Genealogie
+    </a>:
+    <a href="/genCountry.php?cc=CA&lang=$LANG">
+		Canada
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&lang=$LANG">
+		Ontario
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">
+		Dienste
+    </a>:
+    <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+		Nominaler Index
+    </a>:
+    <span id="surnamesPrefix">
+        <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+		Nachnamen, die mit beginnen '$PREFIX'
+    </a>:
+    </span>
+    <span  id="surname">
+        <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+		Nachname '$SURNAME'
+    </a>:
+    </span>
+  </div>
+
+  <div class="body">
+    <h1>
+      <span class="right">
+		<a href="ancestorReportHelpde.html" target="help">? Help</a>
+      </span>
+      Vorfahrenbaum  $NAME
+      <div style="clear: both;"></div>
+    </h1>
+    $TRACE
+    $MSG
+    <p class="message" id="private">
+        Diese Person ist privat. Ahnen können nicht angezeigt werden.
+    </p>
+    <form name="depthForm" id="depthForm" action="ancestorReport.php"
+				method="get">
+      <div class="row">
+		<label class="column1" for="ancDepth">
+		  Maximale Tiefe in Generationen:
+		</label> 
+		<input type="text" name="ancDepth" id="ancDepth"
+				size="2" class="white rightnc"
+				value="$ANCDEPTH">
+		<input type="hidden" name="idir" id="idir"
+				value="$IDIR">
+		<div style="clear: both;"></div>
+      </div>  <!-- class="row" -->
+      <div class="row">
+		<label class="column1" for="incLocsSet">
+		  Standorte anzeigen?
+		</label>
+		<input type="checkbox" name="incLocsSet" id="incLocsSet"
+				value="1" $INCLOCSCHECKED>
+		<input type="hidden" name="incLocs" id="incLocs"
+				value="$INCLOCS">
+		<div style="clear: both;"></div>
+      </div>  <!-- class="row" -->
+      <div class="row">
+		<button type="button" id="Close" accessKey="C">
+		  Schließen
+		</button>
+      </div>  <!-- class="row" -->
+    </form>
+	$DATA
+  </div>	<!-- end of <div id="body"> -->
+  <div id="templates" class="hidden">
+    <p id="showPerson">
+      $PREFIX 
+      <a href="Person.php?idir=$IDIR" class="$GCLASS">
+  		$NAME
+      </a>
+    </p>
+    <span id="Father">Vater</span>
+    <span id="Mother">Mutter</span>
+    <span id="Fathers">s Vater</span>
+    <span id="Mothers">s Mutter</span>
+    <span id="direction">CP</span>
+    <span id="Failure">échec</span>
+  </div><!-- id="templates" -->
+  <div id="HelpancDepth" class="balloon">
+	Specify the number of generations of ancestors to display.
+  </div>
+  <div id="HelpincLocsSet" class="balloon">
+	Click on this checkbox to determine whether or not locations are included
+	with the reported birth and death events.
+  </div>
+  <div id="HelpClose" class="balloon">
+	Click on this button to close the dialog.  Keyboard shortcuts are Alt-C and
+	Alt-Shift-C.
+  </div>
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="ancestorReport.js" type="text/javascript">
+    </script>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="39">
+    <option value="13">
+        Amaranth
+    </option>
+    <option value="14">
+        Arthur
+    </option>
+    <option value="15">
+        Elora
+    </option>
+    <option value="16">
+        Eramosa
+    </option>
+    <option value="17">
+        Erin
+    </option>
+    <option value="18">
+        Fergus Village
+    </option>
+    <option value="19">
+        Garafraxa
+    </option>
+    <option value="20">
+        Guelph
+    </option>
+    <option value="21">
+        Guelph Town &amp; Gaol
+    </option>
+    <option value="22">
+        Luther
+    </option>
+    <option value="23">
+        Maryborough
+    </option>
+    <option value="24">
+        Minto
+    </option>
+    <option value="25">
+        Nichol
+    </option>
+    <option value="26">
+        Peel
+    </option>
+    <option value="27">
+        Pilkington
+    </option>
+    <option value="28">
+        Puslinch
+    </option>
+</select>

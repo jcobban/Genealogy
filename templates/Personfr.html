@@ -1,0 +1,584 @@
+<!--*********************************************************************
+ *  Personfr.html														*
+ *																		*
+ *  Display a web page containing details of an particular individual	*
+ *  from the Legacy table of individuals.								*
+ *																		*
+ * History:																*
+ *		2017/11/13		created		template for popups					*
+ *		2018/01/27		extend template to whole body					*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+<link rel='stylesheet' type='text/css' href='Person.css'>
+  <div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Accueil</a>:
+    <a href="/genealogy.php?lang=fr">
+			Généalogie
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=fr">
+			Services
+    </a>:
+    <a href="/genCountry.php?cc=CA&lang=fr">
+			Canada
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&lang=fr">
+			Ontario
+    </a>:
+    <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=fr">
+			Indice Nominale
+    </a>:
+    <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=fr">
+			Surnoms qui commence avec '$PREFIX'
+    </a>:
+    <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=fr">
+			Surnom '$SURNAME'
+    </a>:
+  </div>
+  <div class="body">
+  <h1>
+      <span class="right">
+		<a href="/FamilyTree/PersonHelpfr.html" target="help">? Aide</a>
+      </span>
+		$TITLE
+		<span id="inTree">: en arbre "$treeName"</span>
+      <div style="clear: both;"></div>
+  </h1>
+  $TRACE
+  $MSG
+    <div id="display">
+		$BODY
+    </div> <!-- id="display" -->
+    <p id='wishtosee'>
+      Si vous souhaitez voir les informations privées sur cet individu
+      <span id='notloggedon'>
+		<a href='/Register.php?lang=fr' target='_blank'>
+		s'inscrire comme nouvel utilisateur</a> or
+		<a href='/Signon.php?lang=fr' target='_blank'>
+		connectez-vous en tant qu'utilisateur déjà inscrit</a>.
+      </span>
+      <span id='contactOwners'>
+		<a href='/contactAuthor.php?idir=$IDIR&tableName=tblIR&subject=%5BFamily%20Tree%5D%20Please%20Grant%20Access%20to%20$TITLE%3A%20IDIR%3D$IDIR' target='_blank'>
+		contacter les utilisateurs qui ont déjà accès
+		</a>
+		pour demander qu'ils vous accordent l'accès.
+      </span>
+    </p>
+    <form name="actionsForm" id="actionsForm" action="nothing.php" method="post"
+		enctype='multipart/form-data'>
+      <div class="row" id="buttonsRow">
+		<button type="button" id="showDescTree" accessKey="D">
+		    Arbre des <u>D</u>escendants
+		</button>
+		&nbsp;
+		<button type="button" id="showAncTree" accessKey="A">
+		    Arbre des <u>A</u>ncêtres
+		</button>
+		&nbsp;
+		<button type="button" id="relationshipCalc" accessKey="R">
+		    Calculateur de la <u>R</u>elation
+		</button>
+		&nbsp;
+		<button type="button" id="edit" accessKey="E">
+		    Modifier cette personne
+		</button>
+		&nbsp;
+		<button type="button" id="reqgrant" accessKey="I">
+		    Puis je modifier cette personne
+		</button>
+		&nbsp;
+		<a href='/FamilyTree/getPersonSvg.php?idir=$IDIR&lang=en'
+				id="showGraphTree" target="picture" class="button">
+		    <img src='/logobutton.gif' height='25' width='81'
+					alt='James Cobban Logo'>
+		</a>
+      </div>
+      <div id="searchParmsHidden" class="hidden">
+		<input type="hidden" name="idir" id="idir"
+				value="$IDIR">
+		<input type="hidden" name="givenname" id="givenname"
+				value="$GIVENNAME">
+		<input type="hidden" name="surname" id="surname"
+				value="$SURNAME">
+		<input type="hidden" name="treeName" id="treeName"
+				value="$TREENAME">
+		<input type="hidden" name="birthDate" id="birthDate"
+				value="$BIRTHDATE">
+		<input type="hidden" name="birthPlace" id="birthPlace"
+				value="$BIRTHPLACE">
+		<input type="hidden" name="deathDate" id="deathDate"
+				value="$DEATHDATE">
+		<input type="hidden" name="deathPlace" id="deathPlace"
+				value="$DEATHPLACE">
+		<input type="hidden" name="fatherGivenName" id="fatherGivenName"
+				value="$FATHERGIVENNAME">
+		<input type="hidden" name="fatherSurname" id="fatherSurname"
+				value="$FATHERSURNAME">
+		<input type="hidden" name="motherGivenName" id="motherGivenName"
+				value="$MOTHERGIVENNAME">
+		<input type="hidden" name="motherSurname" id="motherSurname"
+				value="$MOTHERSURNAME">
+      </div>
+    </form>
+  <hr>	<!-- start of blog section of page -->
+    <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
+		enctype='multipart/form-data'>
+      <div id="blog$blid">
+		<p class='label'>
+		  le $datetime employeur '$username' a écrit:
+		</p>
+		<p>
+		$text
+		</p>
+		<div id="deleteButtons$showButtons"> <!-- $username == $userid -->
+		  <p>
+		    <button type="button" id="blEdit$blid">
+				Modifier la Message
+		    </button>
+		    <button type="button" id="blDel$blid">
+				Ecraser la Message
+		    </button>
+		  </p>
+		</div> <!-- $username == $userid -->
+      </div> <!-- id="blog$blid" -->
+    <input type="hidden" name="userid" id="userid"
+		value="$userid">
+    <input type="hidden" name="idir" id="blogidir"
+		value="$idir">
+  <p>
+    <textarea name="message" id="message" placeholder="[enter message]"
+		rows='5' cols='100'></textarea>
+  </p>
+  <div class="row" id="blogEmailRow">
+    <label class='column1' for='emailAddress'>
+		Your E-Mail Address:
+    </label>
+    <input type="text" class="white leftnc"
+				id="emailAddress" name="emailAddress"
+				size="80" value="$EMAIL">
+  </div>
+  <div class="row" id="blogPostRow">
+    <button type="button" id="PostBlog" accessKey="B">
+		Post <u>B</u>log
+    </button>
+  </div>
+</form> <!-- name="blogform" id="blogform" -->
+<hr class='footnotes'/>
+<p class='label'>Footnotes:</p>
+<div id='footnote$key'>
+    <div class="column1" id="#fn$key">
+		$key
+    </div>
+		$text
+    <div style='clear: both;'></div>
+</div> <!-- class='footnote$key' -->
+  </div> <!-- class="body" -->
+  <!-- division within which to display a Google map -->
+  <div class="map" id="mapDiv">
+  </div>
+  <!-- a division containing a button to hide the map division -->
+  <div class="balloon" id="hideMapDiv">
+    <center>
+      <button id="hideMap" class="button">Hide Map</button>
+    </center>
+  </div>
+<!--*********************************************************************
+ *  generate popups														*
+ **********************************************************************-->
+  <div id="Individ$idir" class="balloon">
+    <b>$name</b>
+    <p>
+      <span id="deletePers$birthd">born $birthd
+        <span id="deletePers$birthloc">at $birthloc</span>
+      </span>
+      <span id="deletePers$deathd">died $deathd
+        <span id="deletePers$deathloc">$description at $deathloc</span>
+      </span>
+    </p>
+    <p id="families$families">Marriage of $name. </p>
+    <p id="parents$parents">Child of $name</p>
+  </div> 
+
+  <div id="Source$idsr" class="balloon">
+    <b>Source: $title</b>
+    <p>Auteur: $author</p>
+    <p>Type: $typetext</p>
+    <p id="deleteSource$note">Note: $note</p>
+    <p id="deleteSource$callnumurl">
+      <a href='$callnumurl' target='_blank'>$name</a>
+    </p>
+  </div> 
+
+  <div id="showLocDiv$idlr" class="balloon">
+    <b>$name</b>
+    <p>
+    $notes
+    </p>
+    <form name='locForm$idlr'>
+		<input type="hidden" name="searchName" value="$searchName">
+		<input type="hidden" name="county" value="$county">
+		<input type="hidden" name="Location" value="$location">
+		<input type="hidden" name="Latitude" value="$latitude">
+		<input type="hidden" name="Longitude" value="$longitude">
+		<input type="hidden" name="Zoom" value="$zoom">
+		<input type="hidden" name="Boundary" value="$boundary">
+		<button type="button" id="showMap$idlr" class="button">
+		    Montrer la carte
+		</button>
+		&nbsp;
+		<button type="button" id="editLoc$idlr" class="button">
+		    Modifier l'endroit
+		</button>
+    </form>
+  </div>
+
+  <div id="showTplDiv$idtr" class="balloon">
+    <b>Temple: $name</b>
+    <p>
+    $notes
+    </p>
+    <form name='tplForm$idtr'>
+		<input type="hidden" name="Location" value="$temple">
+		<input type="hidden" name="Latitude" value="$latitude">
+		<input type="hidden" name="Longitude" value="$longitude">
+		<button type="button" id="tshowMap$idtr" class="button">
+		    Montrer la carte
+		</button>
+    </form>
+  </div> <!-- end of id=showTplDiv$idtr -->
+
+  <div id="showAdrDiv$idar" class="balloon">
+    <b>Addresse: $name</b>
+    <p>
+    $notes
+    </p>
+    <form name='adrForm$idar'>
+		<input type="hidden" name="Location" value="$address">
+		<input type="hidden" name="Latitude" value="$latitude">
+		<input type="hidden" name="Longitude" value="$longitude">
+		<button type="button" id="ashowMap$idar" class="button">
+		    Montrer la carte
+		</button>
+    </form>
+  </div> <!-- end of id=showAdrDiv$idar -->
+$DEATHCAUSES
+
+  <!-- the remaining portion of the page is divisions containing popup help -->
+  <div class="balloon" id="HelpshowDescTree">
+    Cliquez sur ce bouton pour voir un arbre récapitulatif des descendants de cette
+    individuel.
+    L'application prend également en charge le raccourci clavier Alt-D.
+  </div>
+  <div class="balloon" id="HelpshowAncTree">
+    Click on this button to see a summary tree of the ancestors of this individual.
+    The application also supports the keyboard shortcut Alt-A.
+  </div>
+  <div class="balloon" id="HelprelationshipCalc">
+    Click on this button to display a dialog to calculate the degree of
+    relationship between the current individual and another individual in the
+    family tree.
+    The application also supports the keyboard shortcut Alt-R.
+  </div>
+  <div class="balloon" id="HelpancestrySearch">
+    Click on this button to split the screen horizontally between the display
+    of the individual page and the results of a search of the Ancestry.ca
+    database for document records with a similar name, birth date, birth place,
+    and parents names.
+    The application also supports the keyboard shortcut Alt-S.
+  </div>
+  <div class="balloon" id="HelpshowGraphTree">
+    Click on this button to see a graphical family tree centered on this
+    individual.
+  </div>
+  <div class="balloon" id="Helpedit">
+    Click on this button to edit the information recorded for this individual.
+    The application also supports the keyboard shortcut Alt-E.
+  </div>
+  <div class="balloon" id="Helpmessage">
+    This field is used to edit a message to be posted as a blog entry against
+    this individual.
+  </div>
+  <div class="balloon" id="HelpemailAddress">
+    If you are not signed in as a registré contributor to the web-site you
+    are required to supply an e-mail address to identify the source of any
+    blog messages you post.
+  </div>
+  <div class="balloon" id="HelpPostBlog">
+    Click on this button to post the message you have typed as a blog entry
+    against this individual.
+    The application also supports the keyboard shortcut Alt-B.
+  </div>
+  <div class="balloon" id="HelpblEdit">
+    Click on this button to edit the text of the message immediately above
+    the button, which is a message that you posted.
+  </div>
+  <div class="balloon" id="HelpblDel">
+    Click on this button to delete the message immediately above
+    the button, which is a message that you posted.
+  </div>
+  <div class="balloon" id="Helpreqgrant">
+    Click on this button to request permission to update the current individual,
+    and the current individual's ancestors and descendants.
+  </div>
+  <div class="balloon" id="HelpshowMap">
+    Click on this button to display a popup map of the location.
+  </div>
+  <div class="balloon" id="HelpeditLoc">
+    Click on this button to open a dialog to edit the information recorded about
+    a location.  This can include changing the name of the location,
+    although this will not be reflected in the description
+    of this individual until the page is refreshed.
+  </div>
+    <!-- general I18N translate table -->
+    <div id="tranTab" class="hidden">
+		<span data-key=""></span>
+		<span data-key="a[fem]">a</span>
+		<span data-key="a[masc]">a</span>
+		<span data-key="about">environ</span>
+		<span data-key="AD">ap. J.-C.</span>
+		<span data-key="adopted">adopté</span>
+		<span data-key="after">apres</span>
+		<span data-key="an unknown person">une personne inconnue</span>
+		<span data-key="and">et</span>
+		<span data-key="Apr">Avr</span>
+		<span data-key="April">Avril</span>
+		<span data-key="at">à</span>
+		<span data-key="Aug">Aoû</span>
+		<span data-key="August">Août</span>
+		<span data-key="Banns">Banns</span>
+		<span data-key="BC">av. J.-C.</span>
+		<span data-key="BCE">av. EC</span>
+		<span data-key="before 1970">avant 1970</span>
+		<span data-key="before">avant</span>
+		<span data-key="between">entre</span>
+		<span data-key="bic">bic</span>
+		<span data-key="biological">biologique</span>
+		<span data-key="brother">frere</span>
+		<span data-key="calculated as">calculée comme</span>
+		<span data-key="Cancelled">Annullée</span>
+		<span data-key="CE">EC</span>
+		<span data-key="challenged">recusé</span>
+		<span data-key="Child">Enfant</span>
+		<span data-key="child">enfant</span>
+		<span data-key="Children of">Les Enfants de</span>
+		<span data-key="circa">environ</span>
+		<span data-key="cleared">cleared</span>
+		<span data-key="Completed">Fini</span>
+		<span data-key="daughter">fille</span>
+		<span data-key="Dec">Dec</span>
+		<span data-key="Deceased">Decedée</span>
+		<span data-key="December">Decembre</span>
+		<span data-key="Did not say">n'a dit pas</span>
+		<span data-key="disproved">réfuté</span>
+		<span data-key="dns/can">dns/can</span>
+		<span data-key="Done">Fait</span>
+		<span data-key="estimated as">estimée comme</span>
+		<span data-key="family member">membre de famille</span>
+		<span data-key="Feb">Fev</span>
+		<span data-key="February">Fevrier</span>
+		<span data-key="female">femelle</span>
+		<span data-key="for">pour</span>
+		<span data-key="foster">de lait</span>
+		<span data-key="from">de</span>
+		<span data-key="guardianship">tutelle</span>
+		<span data-key="had">a eu</span>
+		<span data-key="had a Common Law relationship with">a eu une relation Common-Law avec</span>
+		<span data-key="had some other relationship with">a eu quelque autre relation avec</span>
+		<span data-key="had a relationship with">a eu une relation avec</span>
+		<span data-key="has no recorded parents">a aucune parents enregistrés</span>
+		<span data-key="He">Il</span>
+		<span data-key="He/She">Il/Elle</span>
+		<span data-key="Illegitimate">Naturel</span>
+		<span data-key="illegitimate">naturel</span>
+		<span data-key="in Q">en Quartier</span>
+		<span data-key="in">en</span>
+		<span data-key="in[masc]">au</span>
+		<span data-key="Infant">Bebé</span>
+		<span data-key="Jan">Jan</span>
+		<span data-key="January">Janvier</span>
+		<span data-key="Jul">Jul</span>
+		<span data-key="July">Juillet</span>
+		<span data-key="Jun">Jun</span>
+		<span data-key="June">Juin</span>
+		<span data-key="License">License</span>
+		<span data-key="male">mâle</span>
+		<span data-key="Mar">Mar</span>
+		<span data-key="March">Mars</span>
+		<span data-key="married">a marié</span>
+		<span data-key="May">Mai</span>
+		<span data-key="Never married">Jamais marié</span>
+		<span data-key="None">Aucune</span>
+		<span data-key="Not married">Pas marié</span>
+		<span data-key="Nov">Nov</span>
+		<span data-key="November">Novembre</span>
+		<span data-key="Oct">Oct</span>
+		<span data-key="October">Octobre</span>
+		<span data-key="of">de</span>
+		<span data-key="on">le</span>
+		<span data-key="or">ou</span>
+		<span data-key="Private">Privée</span>
+		<span data-key="private">privée</span>
+		<span data-key="[Private]">[Privée]</span>
+		<span data-key="See Notes">Voir Notes</span>
+		<span data-key="sealing">sceau</span>
+		<span data-key="Sep">Sep</span>
+		<span data-key="September">Septembre</span>
+		<span data-key="She">Elle</span>
+		<span data-key="sibling">frere ou soeur</span>
+		<span data-key="sister">soeur</span>
+		<span data-key="son">fils</span>
+		<span data-key="step">beau-</span>
+		<span data-key="Stillborn">Mort-née</span>
+		<span data-key="submitted">submitted</span>
+		<span data-key="The cause of death was">La cause de mort etait</span>
+		<span data-key="to">à</span>
+		<span data-key="Twin">Jumeau</span>
+		<span data-key="uncleared">uncleared</span>
+		<span data-key="unexpected null value">unexpected null value</span>
+		<span data-key="Unknown">Inconnu</span>
+		<span data-key="unknown">inconnu</span>
+		<span data-key="was also known as">était également connu comme</span>
+		<span data-key="was never married">etait jamais marié</span>
+		<span data-key="was sealed to">est étanchéité a</span>
+		<span data-key="was sealed to parents">est étanchéité a parents</span>
+		<span data-key="was the[male]">etait le</span>
+		<span data-key="was the[female]">etait la</span>
+		<span data-key="was the[unknown]">etait le</span>
+		<span data-key="was the partner of">etait partenaire de</span>
+		<span data-key="was widowed">est veuve</span>
+		<span data-key="was single">etait celébitaire</span>
+		<span data-key="was a friend [with benefits]">etait un ami [with benefits]</span>
+		<span data-key="WFT estimate">WFT estimée</span>
+		<span data-key="Young">Jeune</span>
+
+		<span data-key='intType'>unexpected null value</span>
+		<span data-key='intType1'></span>
+		<span data-key='intType2'>adopté</span>
+		<span data-key='intType3'>biologique</span>
+		<span data-key='intType4'>recusé</span>
+		<span data-key='intType5'>réfuté</span>
+		<span data-key='intType6'>de lait</span>
+		<span data-key='intType7'>tutelle</span>
+		<span data-key='intType8'>étanchéité</span>
+		<span data-key='intType9'>beau-</span>
+		<span data-key='intType10'>inconnu</span>
+		<span data-key='intType11'>privée</span>
+		<span data-key='intType12'>membre de famille</span>
+		<span data-key='intType13'>naturel</span>
+		<span data-key='eventText1'>[Pronoun] [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText2'>[Pronoun] est adopté [onDate] [Location] by [Description].[Citations] [Notes]</span>
+		<span data-key='eventText3'>[Pronoun] est né [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText4'>[Pronoun] a été enterré [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText5'>[Pronoun] est baptizé [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText6'>[Pronoun] est mort [onDate] [Description] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText7'>[Pronoun] a sa mariage annullée [Description], [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText8'>[Pronoun] est baptizé de LDS [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText9'>Il a celebré son bar mitzvah [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText10'>Elle a celebré sa bas mitzvah [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText11'>[Pronoun] est beni [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText12'>[Pronoun] a apparait a le [Description] census [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText13'>[Pronoun] est circumcisé [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText14'>[Pronoun] est devient un [Description] citizen [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText15'>[Pronoun] est confirmé [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText16'>[Pronoun] est confirmed in The Church of Jesus Christ of Latter-day Saints [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText17'>[Pronoun] est involvé in a court case about [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText18'>[Pronoun] est cremé [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText19'>[Pronoun] a recu une degreée de [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText20'>[Pronoun] sont divorcés [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText21'>[Pronoun] filed for divorce [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText22'>[Pronoun] est educé à [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText23'>[Pronoun] emigré [Description] [onDate] [fromLocation].[Citations] [Notes]</span>
+		<span data-key='eventText24'>[Pronoun] est employé comme un [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText25'>[Pronoun] sont engagés [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText26'>[Pronoun] a reçu First Holy Communion [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText27'>[Pronoun] a gradué de [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText28'>[Pronoun] a enjoui [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText29'>[Pronoun] est honoré pour [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText30'>[Pronoun] est à l'hôpital pour [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText31'>[Pronoun] est ill avec [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText32'>[Pronoun] a immigré [Description] [onDate] [toLocation].[Citations] [Notes]</span>
+		<span data-key='eventText33'>[Pronoun] est interviewed [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText34'>[Pronoun] [Description] land [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText35'>[Pronoun] a publié les banns de mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText36'>[Pronoun] a signé un contract de mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText37'>[HusbFirstName] et [WifeFirstName] a obtainu un license pour mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText38'>[Pronoun] a publié un intent a marier [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText39'>[Pronoun] a obtenu un settlement de mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText40'>[Pronoun] a reçu des attentions medicaux pour [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText41'>[Pronoun] est un membre de [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText42'>[Pronoun] a servie dans le militaire [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText43'>[Pronoun] a servie dans une mission [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText44'>[Pronoun] est named after [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText45'>[Pronoun] est naturalizé [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText46'>[Pronoun] obituary est publié dans le [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText47'>[Pronoun] a travaillé comme un [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText48'>[Pronoun] a l'ordinance LDS [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText49'>[Pronoun] est ordiné a [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText50'>[Pronoun] est descrit comme [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText51'>[Pronoun] a un estate probé [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText52'>[Pronoun] [Description] proprieté [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText53'>[Pronoun] a appartenu a la croyance [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText54'>[Pronoun] a demeuré [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText55'>[Pronoun] retired [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText56'>[Pronoun] attended school [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText57'>[Pronoun] est assigned US Social Security Number [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText58'>[Pronoun] signed a will [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText59'>[Pronoun] had a medical condition of [Description], [onDate], [Location].[Citations] [Notes]</span>
+		<span data-key='eventText60'>[Pronoun] served in the military: [Description], [onDate], [Location].[Citations] [Notes]</span>
+		<span data-key='eventText61'>[Pronoun] had a photo taken [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText62'>[Pronoun] est assigned US Social Security Number [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText63'>[Pronoun] had another occupation as [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText64'>[Pronoun] est [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText65'>[Pronoun] a appartenu à une groupe familielle [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText66'>[Pronoun] a s'identifié comme [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText67'>[Pronoun] funeral est held [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText68'>[Pronoun] est eligé comme [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText69'>[Pronoun] est marie [Description] [onDate] and [Location].[Citations] [Notes]</span>
+		<span data-key='eventText70'>Evenement de mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText71'>[Her][!His] naissance est registré [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText72'>[Her][!His] mort est registré [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText73'>Son mariage est registré [Description] [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText2000'>[Pronoun] est né [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText3000'>[Pronoun] est baptizé [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText4000'>[Pronoun] est mort [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText5000'>[Pronoun] est sepulté [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText5001'>[Pronoun] est incenéré [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText15000'>[Pronoun] a reçu le Baptism LDS [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText16000'>[Pronoun] a reçu l'Endowment LDS [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText26000'>[Pronoun] a reçu la Confirmation LDS [onDate] [Location].[Citations] [Notes]</span>
+		<span data-key='eventText27000'>[Pronoun] a reçu l'Initiatory LDS [onDate] [Location].[Citations] [Notes]</span>
+
+
+    </div>
+    <div class="hidden" id="srcTypes">`
+		<span data-key="1"></span>
+		<span data-key="2">Bible</span>
+		<span data-key="3">Livre</span>
+		<span data-key="4">Document de recensement ou d'impôt</span>
+		<span data-key="5">Document d'une Église</span>
+		<span data-key="6">Document du tribunal</span>
+		<span data-key="7">Entrevue</span>
+		<span data-key="8">Journal intime</span>
+		<span data-key="9">Registres fonciers</span>
+		<span data-key="10">Lettre</span>
+		<span data-key="11">Militaire</span>
+		<span data-key="12">Journal</span>
+		<span data-key="13">Périodiques</span>
+		<span data-key="14">Communication personnelle</span>
+		<span data-key="15">Statistiques vitales</span>
+		<span data-key="16">Site-Web</span>
+    </div><!-- id="srcTypes" -->
+  </div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/Cookie.js" type="application/javascript">
+    </script>
+    <script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/Person.js" type="application/javascript">
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.4&sensor=false&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>

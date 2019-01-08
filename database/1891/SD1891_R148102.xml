@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148102">
+    <option value="14_E">
+        Gloucester: New Bandon
+        <div id="3" reel="148102" frame="0" count="15"/>
+    </option>
+    <option value="14_F">
+        Gloucester: St. Isidore
+        <div id="1" reel="148102" frame="15" count="9"/>
+        <div id="2" reel="148102" frame="24" count="10"/>
+    </option>
+    <option value="14_G">
+        Gloucester: Saumarez
+        <div id="1" reel="148102" frame="34" count="25"/>
+        <div id="2" reel="148102" frame="59" count="30"/>
+    </option>
+    <option value="14_H">
+        Gloucester: Shippigan
+        <div id="1" reel="148102" frame="89" count="23"/>
+        <div id="2" reel="148102" frame="112" count="26"/>
+        <div id="3" reel="148102" frame="138" count="18"/>
+    </option>
+    <option value="15_A">
+        Kent: Acadieville
+        <div id="1" reel="148102" frame="156" count="12"/>
+        <div id="2" reel="148102" frame="168" count="12"/>
+    </option>
+    <option value="15_B">
+        Kent: Carleton
+        <div id="1" reel="148102" frame="180" count="9"/>
+        <div id="2" reel="148102" frame="189" count="16"/>
+    </option>
+    <option value="15_C">
+        Kent: Dundas
+        <div id="1" reel="148102" frame="205" count="19"/>
+        <div id="2" reel="148102" frame="224" count="18"/>
+        <div id="3" reel="148102" frame="242" count="18"/>
+        <div id="4" reel="148102" frame="260" count="16"/>
+    </option>
+    <option value="15_D">
+        Kent: Harcourt
+        <div id="1" reel="148102" frame="276" count="12"/>
+        <div id="2" reel="148102" frame="288" count="16"/>
+    </option>
+    <option value="15_E">
+        Kent: Richibucto
+        <div id="1" reel="148102" frame="304" count="27"/>
+        <div id="2" reel="148102" frame="331" count="18"/>
+        <div id="3" reel="148102" frame="349" count="18"/>
+        <div id="4" reel="148102" frame="367" count="21"/>
+    </option>
+    <option value="15_F">
+        Kent: St. Louis
+        <div id="1" reel="148102" frame="388" count="20"/>
+        <div id="2" reel="148102" frame="408" count="24"/>
+    </option>
+    <option value="15_G">
+        Kent: Ste. Marie
+        <div id="1" reel="148102" frame="432" count="25"/>
+        <div id="2" reel="148102" frame="457" count="25"/>
+    </option>
+    <option value="15_H">
+        Kent: St. Paul
+        <div id="1" reel="148102" frame="482" count="14"/>
+        <div id="2" reel="148102" frame="496" count="9"/>
+    </option>
+    <option value="15_I">
+        Kent: Weldford
+        <div id="1" reel="148102" frame="505" count="12"/>
+        <div id="2" reel="148102" frame="517" count="20"/>
+        <div id="3" reel="148102" frame="537" count="20"/>
+        <div id="4" reel="148102" frame="557" count="16"/>
+        <div id="5" reel="148102" frame="573" count="11"/>
+    </option>
+    <option value="15_J">
+        Kent: Wellington
+        <div id="1" reel="148102" frame="584" count="18"/>
+        <div id="2" reel="148102" frame="602" count="16"/>
+        <div id="3" reel="148102" frame="618" count="21"/>
+    </option>
+</select>

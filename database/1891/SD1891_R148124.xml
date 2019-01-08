@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148124">
+    <option value="44_G">
+        Yarmouth: Court House
+        <div id="" reel="148124" frame="0" count="25"/>
+    </option>
+    <option value="44_H">
+        Yarmouth: Eel Brook
+        <div id="" reel="148124" frame="25" count="11"/>
+    </option>
+    <option value="44_I">
+        Yarmouth: Exchange Building
+        <div id="" reel="148124" frame="36" count="31"/>
+    </option>
+    <option value="44_J">
+        Yarmouth: Hebron
+        <div id="" reel="148124" frame="67" count="16"/>
+    </option>
+    <option value="44_K">
+        Yarmouth: Islands
+        <div id="" reel="148124" frame="83" count="11"/>
+    </option>
+    <option value="44_L">
+        Yarmouth: Kemptville
+        <div id="" reel="148124" frame="94" count="8"/>
+    </option>
+    <option value="44_M">
+        Yarmouth: Milton
+        <div id="" reel="148124" frame="102" count="17"/>
+    </option>
+    <option value="44_N">
+        Yarmouth: Ohio
+        <div id="" reel="148124" frame="119" count="20"/>
+    </option>
+    <option value="44_O">
+        Yarmouth: Port Maitland
+        <div id="" reel="148124" frame="139" count="22"/>
+    </option>
+    <option value="44_P">
+        Yarmouth: Pubnico East
+        <div id="" reel="148124" frame="161" count="12"/>
+    </option>
+    <option value="44_Q">
+        Yarmouth: Head of Pubnico
+        <div id="" reel="148124" frame="173" count="24"/>
+    </option>
+    <option value="44_R">
+        Yarmouth: Pubnico West
+        <div id="" reel="148124" frame="197" count="20"/>
+    </option>
+    <option value="44_S">
+        Yarmouth: Rockville
+        <div id="" reel="148124" frame="217" count="16"/>
+    </option>
+    <option value="44_T">
+        Yarmouth: South End
+        <div id="" reel="148124" frame="233" count="33"/>
+    </option>
+    <option value="44_U">
+        Yarmouth: Tusket
+        <div id="" reel="148124" frame="266" count="36"/>
+    </option>
+    <option value="44_V">
+        Yarmouth: Tuskey Lakes
+        <div id="" reel="148124" frame="302" count="8"/>
+    </option>
+    <option value="44_W">
+        Yarmouth: Tuskey Wedge
+        <div id="" reel="148124" frame="310" count="33"/>
+    </option>
+    <option value="45_A">
+        Addington: Abinger, Effingham, Ashby &amp; Denbigh
+        <div id="" reel="148124" frame="343" count="18"/>
+    </option>
+    <option value="45_B">
+        Addington: Barrie
+        <div id="" reel="148124" frame="361" count="14"/>
+    </option>
+    <option value="45_C">
+        Addington: Bedford
+        <div id="" reel="148124" frame="375" count="38"/>
+    </option>
+    <option value="45_D">
+        Addington: Camden
+        <div id="1" reel="148124" frame="413" count="22"/>
+        <div id="2" reel="148124" frame="435" count="27"/>
+        <div id="3" reel="148124" frame="462" count="24"/>
+        <div id="4" reel="148124" frame="486" count="27"/>
+    </option>
+    <option value="45_E">
+        Addington: Clarendon&amp;Miller
+        <div id="" reel="148124" frame="513" count="21"/>
+    </option>
+    <option value="45_F">
+        Addington: Hinchinbrooke
+        <div id="1" reel="148124" frame="534" count="18"/>
+        <div id="2" reel="148124" frame="552" count="14"/>
+    </option>
+    <option value="45_G">
+        Addington: Kaladar&amp;Anglesea
+        <div id="1" reel="148124" frame="566" count="21"/>
+        <div id="2" reel="148124" frame="587" count="6"/>
+    </option>
+    <option value="45_H">
+        Addington: Kennebec
+        <div id="" reel="148124" frame="593" count="30"/>
+    </option>
+    <option value="45_I">
+        Addington: Loughborough
+        <div id="1" reel="148124" frame="623" count="28"/>
+        <div id="2" reel="148124" frame="651" count="18"/>
+    </option>
+    <option value="45_J">
+        Addington: Newburgh Village
+        <div id="" reel="148124" frame="669" count="14"/>
+    </option>
+</select>

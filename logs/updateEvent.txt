@@ -1,0 +1,354 @@
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='86098'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: date='1877'
+updateEvent.php: occupation='Medical Doctor'
+updateEvent.php: location='Harrietsville, Dorchester North, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='0'
+updateEvent.php: citType='30'
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=86098, ider=0, date=1877, location=Harrietsville, Dorchester North, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='86098'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: date='1877'
+updateEvent.php: occupation='Medical Doctor'
+updateEvent.php: location='Harrietsville, Dorchester North, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='0'
+updateEvent.php: citType='30'
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=86098, ider=0, date=1877, location=Harrietsville, Dorchester North, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='86098'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: date='1877'
+updateEvent.php: occupation='Medical Doctor'
+updateEvent.php: location='Harrietsville, Dorchester North, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='0'
+updateEvent.php: citType='30'
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=86098, ider=0, date=1877, location=Harrietsville, Dorchester North, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='86098'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: date='1877'
+updateEvent.php: occupation='Medical Doctor'
+updateEvent.php: location='Harrietsville, Dorchester North, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='0'
+updateEvent.php: citType='30'
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=86098, ider=0, date=1877, location=Harrietsville, Dorchester North, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='86098'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: date='1877'
+updateEvent.php: occupation='Medical Doctor'
+updateEvent.php: location='Harrietsville, Dorchester North, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='0'
+updateEvent.php: citType='30'
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=86098, ider=0, date=1877, location=Harrietsville, Dorchester North, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='86098'
+updateEvent.php: ider='131673'
+updateEvent.php: type='30'
+updateEvent.php: date='1877'
+updateEvent.php: occupation='Medical Doctor'
+updateEvent.php: location='Harrietsville, Dorchester North, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='131673'
+updateEvent.php: citType='30'
+updateEvent.php: Source371313='Marriage Register, CA, Ontario'
+updateEvent.php: Page371313='1877-06838'
+Citation.inc: 569 'SELECT * FROM tblSX WHERE IDSX=371313', 'SELECT * FROM tblSX WHERE IDSX=:idsx', Array
+(
+    [idsx] => 371313
+)
+
+updateEvent.php: 413: 
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=86098, ider=131673, date=1877, location=Harrietsville, Dorchester North, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=131673
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='69664'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: date='1871'
+updateEvent.php: occupation='Farmer'
+updateEvent.php: location='London, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='0'
+updateEvent.php: citType='30'
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=69664, ider=0, date=1871, location=London, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: idir='69664'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: etype='47'
+updateEvent.php: date='1871'
+updateEvent.php: desc=''
+updateEvent.php: note=''
+updateEvent.php: description='farmer'
+updateEvent.php: location='london, Middlesex, ON, CA'
+updateEvent.php: order=''
+updateEvent.php: givenName=''
+updateEvent.php: surname=''
+updateEvent.php: title=''
+updateEvent.php: prefix=''
+updateEvent.php: newAltGivenName=''
+updateEvent.php: newAltSurname=''
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=69664, ider=0, date=1871, location=london, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: idir='69664'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: etype='47'
+updateEvent.php: date='1871'
+updateEvent.php: desc=''
+updateEvent.php: note=''
+updateEvent.php: description='farmer'
+updateEvent.php: location='london, Middlesex, ON, CA'
+updateEvent.php: order=''
+updateEvent.php: givenName=''
+updateEvent.php: surname=''
+updateEvent.php: title=''
+updateEvent.php: prefix=''
+updateEvent.php: newAltGivenName=''
+updateEvent.php: newAltSurname=''
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=69664, ider=0, date=1871, location=london, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: idir='69664'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: etype='47'
+updateEvent.php: date='1871'
+updateEvent.php: desc=''
+updateEvent.php: note=''
+updateEvent.php: description='farmer'
+updateEvent.php: location='london, Middlesex, ON, CA'
+updateEvent.php: order=''
+updateEvent.php: givenName=''
+updateEvent.php: surname=''
+updateEvent.php: title=''
+updateEvent.php: prefix=''
+updateEvent.php: newAltGivenName=''
+updateEvent.php: newAltSurname=''
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=69664, ider=0, date=1871, location=london, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='69664'
+updateEvent.php: ider='131678'
+updateEvent.php: type='30'
+updateEvent.php: date='1871'
+updateEvent.php: occupation='Farmer'
+updateEvent.php: location='London, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='131678'
+updateEvent.php: citType='30'
+updateEvent.php: Source371316='1861 Census of Canada'
+updateEvent.php: IDSR371316='12'
+updateEvent.php: Page371316='CW dist 22 Middlesex, subdist 243 London Twp div 2 page 61'
+Citation.inc: 569 'SELECT * FROM tblSX WHERE IDSX=371316', 'SELECT * FROM tblSX WHERE IDSX=:idsx', Array
+(
+    [idsx] => 371316
+)
+
+updateEvent.php: 413: 
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=69664, ider=131678, date=1871, location=London, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=131678
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='69664'
+updateEvent.php: ider='131678'
+updateEvent.php: type='30'
+updateEvent.php: date='1871'
+updateEvent.php: occupation='Farmer'
+updateEvent.php: location='London, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='131678'
+updateEvent.php: citType='30'
+updateEvent.php: Source371316='1861 Census of Canada'
+updateEvent.php: IDSR371316='12'
+updateEvent.php: Page371316='CW dist 22 Middlesex, subdist 243 London Twp div 2 page 61'
+Citation.inc: 569 'SELECT * FROM tblSX WHERE IDSX=371316', 'SELECT * FROM tblSX WHERE IDSX=:idsx', Array
+(
+    [idsx] => 371316
+)
+
+updateEvent.php: 413: 
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=69664, ider=131678, date=1871, location=London, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=131678
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='69664'
+updateEvent.php: ider='131678'
+updateEvent.php: type='30'
+updateEvent.php: date='1861'
+updateEvent.php: occupation='Farmer'
+updateEvent.php: location='London, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='131678'
+updateEvent.php: citType='30'
+updateEvent.php: Source371316='1861 Census of Canada'
+updateEvent.php: IDSR371316='12'
+updateEvent.php: Page371316='CW dist 22 Middlesex, subdist 243 London Twp div 2 page 61'
+Citation.inc: 569 'SELECT * FROM tblSX WHERE IDSX=371316', 'SELECT * FROM tblSX WHERE IDSX=:idsx', Array
+(
+    [idsx] => 371316
+)
+
+updateEvent.php: 413: 
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=69664, ider=131678, date=1861, location=London, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=131678
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='117083'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: date=''
+updateEvent.php: occupation=''
+updateEvent.php: location='lon'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='0'
+updateEvent.php: citType='30'
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=117083, ider=0, date=, location=lon
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='117083'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: date=''
+updateEvent.php: occupation=''
+updateEvent.php: location='london'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='0'
+updateEvent.php: citType='30'
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=117083, ider=0, date=, location=london
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='117083'
+updateEvent.php: ider='0'
+updateEvent.php: type='30'
+updateEvent.php: date='1871'
+updateEvent.php: occupation=''
+updateEvent.php: location='London, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='0'
+updateEvent.php: citType='30'
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=117083, ider=0, date=1871, location=London, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=0
+updateEvent.php: <parms>
+updateEvent.php: etype='47'
+updateEvent.php: idir='117083'
+updateEvent.php: ider='131684'
+updateEvent.php: type='30'
+updateEvent.php: date='1871'
+updateEvent.php: occupation='Farmer'
+updateEvent.php: location='London, Middlesex, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='131684'
+updateEvent.php: citType='30'
+updateEvent.php: Source371317='1871 Census of Canada'
+updateEvent.php: Page371317='dist 9 Middlesex, subdist C London Twp, div 4 page 25'
+Citation.inc: 569 'SELECT * FROM tblSX WHERE IDSX=371317', 'SELECT * FROM tblSX WHERE IDSX=:idsx', Array
+(
+    [idsx] => 371317
+)
+
+updateEvent.php: 413: 
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=117083, ider=131684, date=1871, location=London, Middlesex, ON, CA
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=131684
+updateEvent.php: <parms>
+updateEvent.php: etype='3'
+updateEvent.php: idir='117084'
+updateEvent.php: ider='131686'
+updateEvent.php: type='30'
+updateEvent.php: date='about 1830'
+updateEvent.php: description=''
+updateEvent.php: location='Ontario, Canada'
+updateEvent.php: note=''
+updateEvent.php: order='-2'
+updateEvent.php: idime='131686'
+updateEvent.php: citType='30'
+updateEvent.php: Source371325='1871 Census of Canada'
+updateEvent.php: Page371325='dist 9 Middlesex East, subdist C London Twp, div 4 page 25'
+Citation.inc: 569 'SELECT * FROM tblSX WHERE IDSX=371325', 'SELECT * FROM tblSX WHERE IDSX=:idsx', Array
+(
+    [idsx] => 371325
+)
+
+updateEvent.php: 413: 
+updateEvent.php: 425 </parms>
+updateEvent.php: 433 type=30
+updateEvent.php: 948 Citation::STYPE_EVENT: idir=117084, ider=131686, date=about 1830, location=Ontario, Canada
+updateEvent.php: 1072citation type specific actions complete with no errors, ider=131686

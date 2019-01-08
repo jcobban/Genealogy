@@ -1,0 +1,1650 @@
+/************************************************************************
+ *  styles.css                                                          *
+ *                                                                      *
+ *  Global stylesheet for the web-site www.jamescobban.net              *
+ *                                                                      *
+ *  History:                                                            *
+ *        2010/08/21    add button.width100                             *
+ *        2010/11/20    set padding 0 in th.cell and th.underline to    *
+ *                      avoid padding between lines in census forms     *
+ *        2010/12/10    improve appearance of children in main web page *
+ *        2011/03/05    insert left and right padding in th and td cells*
+ *        2011/04/04    add gender based label styles for th cells      *
+ *        2011/05/06    add th class 'colheadSmall'                     *
+ *        2011/05/22    adjust details of button style for span to more *
+ *                      closely match default Firefox button.           *
+ *        2011/05/28    support for framed images                       *
+ *        2011/06/06    add fixed serif input field                     *
+ *        2011/06/12    add span classes male and female                *
+ *                      add option classes male and female              *
+ *        2011/07/02    add inalabel style for input tag                *
+ *        2011/09/24    explicitly set text color for span to black     *
+ *        2011/09/26    add map style for div                           *
+ *        2011/10/16    increase distinctiveness of percentage colors   *
+ *                      and make them all pure red to green shades      *
+ *        2011/11/18    add td.cellRight, td.cellCenter,                *
+ *                      td.underlineRight, and td.underlineCenter       *
+ *                      add inacenter, inacenternc, actcenter, and      *
+ *                      actcenternc styles for input tag                *
+ *        2011/12/17    add p.large (p.label without indent)            *
+ *                      add p.warning                                   *
+ *        2011/12/22    highlight input fiel d classes                  *
+ *        2012/01/02    add classes for input cells that are selected   *
+ *        2012/01/16    add <div class='hidden'> for templates          *
+ *        2012/02/26    add message style for span,                     *
+ *                      img.example, p.picdesc                          *
+ *                      add bottom margin to div class='picture' to     *
+ *                      visually separate successive pictures           *
+ *        2012/03/28    add td.oddcenter and td.evencenter              *
+ *        2012/03/31    indent subsequent lines of text in td.odd,      *
+ *                      td.oddleft, td.even, and td.evenleft            *
+ *                      add td.oddmale and td.oddfemale                 *
+ *                      add td.evenmale and td.evenfemale               *
+ *        2012/05/06    provide default style for buttons               *
+ *                      add styles actcode, and inacode styles for      *
+ *                      input tag and display the field value in        *
+ *                      monospace font                                  *
+ *        2012/05/28    add option.unknown for unknown sex              *
+ *                      add td.evenunknown and td.oddunknown for        *
+ *                      unknown sex                                     *
+ *                      add a.unknown for unknown sex                   *
+ *        2012/06/23    add vertical padding to button style for span   *
+ *        2012/07/30    correct td.colheadSmall to have same borders as *
+ *                      colhead                                         *
+ *        2012/09/17    change appearance of actrightfixed style for    *
+ *                      input tag                                       *
+ *        2012/10/23    add error reporting highlighting classes        *
+ *        2013/01/26    add male, female, and unknown styles for        *
+ *                      input tag                                       *
+ *        2013/02/24    change text alignment in th.label to right      *
+ *        2013/03/04    add hyperlink style for input tag to underline  *
+ *                      in blue                                         *
+ *        2013/03/28    change button.width100 to button.width110       *
+ *        2013/04/05    add right450 style for span to accomodate       *
+ *                      Facebook button                                 *
+ *        2013/05/17    shrink vertical size of button.button           *
+ *        2013/05/29    button.button:disabled                          *
+ *        2013/06/10    change th.label and th.labelsmall so the label  *
+ *                      is vertically aligned                           *
+ *        2013/06/13    add td.pad10 for a cell that has width 10%      *
+ *        2013/07/01    add style a.button to make anchors look like    *
+ *                      buttons                                         *
+ *        2013/07/04    there is no way to have a single style that     *
+ *                      allows an anchor to look like a button          *
+ *                      containingeither text or an image.              *
+ *                      You have to have two different classes!         *
+ *        2013/06/17    capitalize subdistrict and division identifiers *
+ *        2013/12/19    add text-align: right to right style for span   *
+ *                      add iframe.facebook                             *
+ *        2013/12/24    make left and right styles for span consistent  *
+ *                      in appearance                                   *
+ *        2013/12/27    add center style for div for 3-way split        *
+ *        2014/01/01    move styles used only by usstates.html          *
+ *                      to usstates.css                                 *
+ *        2014/01/10    move styles used only by MarriageRegDetail.php  *
+ *                      to MarriageRegDetail.css                        *
+ *        2014/01/14    adjust styles for summary status tables         *
+ *        2014/02/12    add fieldset styles                             *
+ *        2014/02/25    align attribute values for clarity              *
+ *        2014/03/05    add warning style for span                      *
+ *        2014/03/27    add row style for div                           *
+ *        2014/05/30    add select.actleftcit                           *
+ *        2014/05/30    add right368 style for span                     *
+ *                      add iframe.advert                               *
+ *                      add advert style for div                        *
+ *        2014/11/29    add warning style for div                       *
+ *        2015/01/13    add unknown style for span                      *
+ *                      add span.note                                   *
+ *        2015/01/23    add margin-bottom: 1em; to list items           *
+ *        2015/02/05    move tab styles from index.css                  *
+ *        2015/02/17    add a border between left and right iframes     *
+ *        2015/05/13    add article style for div                       *
+ *        2015/06/02    use same size font in TinyMCE editor as for     *
+ *                      other input fields                              *
+ *        2015/06/22    missing input.unknownerror                      *
+ *        2015/07/17    set width of advert border explicitly to        *
+ *                      avoid browser interpretations of "thick"        *
+ *        2016/01/19    add p style notes                               *
+ *        2016/07/03    only print the body of the page                 *
+ *        2017/12/05    separate styles into separate classes for       *
+ *                      text color, including gender, error, warning    *
+ *                      background color                                *
+ *        2017/12/08    remove rounded corners from select and option   *
+ *        2018/05/22    change "grey" from #404040 to #606060           *
+ *        2018/11/30    remove obsolete composite styles                *
+ *                                                                      *
+ *  Copyright &copy; 2018 James A. Cobban                               *
+ ************************************************************************/
+
+   /*********************************************************************
+    *   styles for text color by gender                                 *
+    *********************************************************************/
+    .black     {color:              #000000; /* black */
+                }
+    .same      {color:              #606060; /* grey */
+                }
+    .male      {color:              #000080; /* dark blue */
+                }
+    .female    {color:              #800000; /* dark red */
+                }
+    .unknown   {color:              #008000; /* dark green */
+                }
+    .error     {color:              red;
+                }
+    .warning   {color:              #806000; /* dark yellow */
+                }
+
+   /*********************************************************************
+    *    styles for background color                                    *
+    *********************************************************************/
+    .white     {background-color:   white;
+                }
+    .odd       {background-color:   #F8F8F8;   /* very bright gray */
+                }
+    .even      {background-color:   #E0E0E0;   /* gray */
+                }
+    .ina       {background-color:   #F0F0F0;   /* bright gray */
+                }
+    .balloon   {background-color:   #FFFFA0;   /* yellow 3M PostIt® note */
+                }
+    .body      {background-color:   #FEFEE0;   /* aged vellum */
+                }
+    .help      {background-color:   #F8F8FF;   /* pale blue */
+                }
+
+   /*********************************************************************
+    *   Styles for displaying <body> tags                               *
+    *   Also see div class='body' the <main> section of a standard page *
+    *********************************************************************/
+    body      { background-color:   #FEFEE0;
+                margin:             0px;
+                padding:            0px;
+                font-family:        sans-serif;
+                font-size:          16px;
+                }
+
+   /*********************************************************************
+    *   TinyMCE appearance customization                                *
+    *********************************************************************/
+    body.mceContentBody {
+                background-color:   white;
+                }
+
+   /*********************************************************************
+    *   styles for displaying <iframe> tags                             *
+    *********************************************************************/
+    iframe.facebook {   /* facebook "like" frame */
+                border:             none;
+                overflow:           hidden; 
+                width:              360px; 
+                height:             80px;
+                display:            inline;
+                float:              left;
+                }
+
+    iframe.advert {     /* container for advertisements */
+                border:             none;
+                overflow:           hidden; 
+                width:              370px; 
+                height:             85px;
+                display:            inline;
+                float:              left;
+                background-color:   white;
+                }
+
+    iframe.left {       /* left half of split window */
+                border-top:         0px none transparent;
+                border-right:       1px solid gray;
+                border-bottom:      0px none transparent;
+                border-left:        0px none transparent;
+                padding:            0px;
+                }
+
+    iframe.right {      /* right half of split window */
+                border-top:         0px none transparent;
+                border-right:       0px none transparent;
+                border-bottom:      0px none transparent;
+                border-left:        1px solid black;
+                padding:            0px;
+                }
+
+   /*********************************************************************
+    *       div styles for dividing line into three columns             *
+    *********************************************************************/
+    div.left {  float:              left;
+                }
+    div.center {
+                text-align:         center;
+                font-family:        sans-serif;
+                font-weight:        bold;
+                }
+    div.right { float:              right;
+                }
+
+   /*********************************************************************
+    *   div.row                                                         *
+    *   Display information in columnar format without using table      *
+    *********************************************************************/
+    div.row {   white-space:        nowrap; }
+
+   /*********************************************************************
+    *   div class='balloon' is used to display context specific help.   *
+    *   It is intended to look like a yellow 3M PostIt® note.           *
+    *********************************************************************/
+    div.balloon {
+                display:            none;
+                background-color:   #FFFFA0;    /* bright yellow*/
+                font-family:        sans-serif;
+                position:           absolute;
+                top:                10%;
+                left:               10%;
+                width:              50%;
+                height:             auto;
+                padding:            2px;
+                border:             thin solid black
+                }
+   /*********************************************************************
+    *    div class='popup' is used to hold information temporarily      *
+    *    displayed to the user.                                         *
+    *********************************************************************/
+    div.popup {
+                display:            none;
+                background-color:   #C0FFC0;
+                font-family:        sans-serif;
+                position:           absolute;
+                top:                10%;
+                left:               10%;
+                width:              auto;
+                height:             auto;
+                padding:            2px;
+                border:             thin solid black
+                }
+   /*********************************************************************
+    *    div class='hidden' is used to hold templates which are never   *
+    *    displayed inline to the user.                                  *
+    *********************************************************************/
+    div.hidden {
+                display:            none;
+                background-color:   white;
+                font-family:        sans-serif;
+                position:           absolute;
+                width:              auto;
+                height:             auto;
+                }
+   /*********************************************************************
+    *    div class='map' intended to be used to display a map           *
+    *    using Google Maps support.                                     *
+    *********************************************************************/
+    div.map {
+                display:            none;
+                background-color:   white;
+                font-family:        sans-serif;
+                position:           absolute;
+                width:              60%;
+                height:             80%;
+                padding:            2px;
+                border-top:         thick solid #402000;
+                border-left:        thick solid #402000;
+                border-bottom:      thick solid #A05000;
+                border-right:       thick solid #A05000;
+                }
+
+   /*********************************************************************
+    *   div class='submenu' intended to hold a form that is displayed   *
+    *   to the user as opposed to creating a separate window.           *
+    *********************************************************************/
+    div.submenu {
+                display:            none;
+                background-color:   #FEFEE0;
+                margin:             0px;
+                padding:            0px;
+                }
+
+   /*********************************************************************
+    *   div class='fullwidth' is used for distributing displayed fields *
+    *   across the full width of the window as opposed to using a table *
+    *   because the use of a table to lay out fields is deprecated if   *
+    *   they do not actually represent a table.  However this capability*
+    *   does not work with a few current (i.e. Internet Explorer < 9)   *
+    *   browsers.                                                       *
+    *********************************************************************/
+    div.fullwidth {
+                padding:            4px;
+                font-family:        sans-serif;
+                font-weight:        bold;
+                width:              100%;
+                }
+
+   /*********************************************************************
+    *   div class='topcrumbs' is used to style the page header          *
+    *   information                                                     *
+    *********************************************************************/
+    div.topcrumbs {
+                background-color:   white;
+                padding:            4px;
+                font-family:        sans-serif;
+                font-weight:        bold;
+                border-bottom:      thick solid #008000;
+                width:              100%;
+                }
+
+   /*********************************************************************
+    *   div class='body' is used to style the body of a standard page   *
+    *********************************************************************/
+    div.body  { background-color:   #FEFEE0;    /* aged vellum */
+                padding:            4px;
+                font-family:        sans-serif;
+                }
+
+   /*********************************************************************
+    *   div class='article' is used to style the body of a page         *
+    *   containing an article                                           *
+    *********************************************************************/
+    div.article  {
+                background-color:   white;
+                padding-top:		4px;
+                padding-left:		1cm;
+                padding-right:		1cm;
+                padding-bottom:		4px;
+                font-family:        sans-serif;
+                }
+
+   /*********************************************************************
+    *   div class='help' is used to style the body of a help page       *
+    *********************************************************************/
+    div.help  { background-color:   #F8F8FF;    /* pale blue */
+                padding:            4px;
+                font-family:        sans-serif;
+                }
+
+   /*********************************************************************
+    *   div class='botcrumbs' is used to style the page trailer         *
+    *   information                                                     *
+    *********************************************************************/
+    div.botcrumbs {
+                background-color:   white;
+                padding:            4px;
+                font-family:        sans-serif;
+                font-weight:        bold;
+                border-top:         thick solid #008000; /* dark green */
+                width:              100%;
+                }
+
+   /*********************************************************************
+    *   div class='warning' is used to contain diagnostic information   *
+    *   that does not represent terminal errors                         *
+    *********************************************************************/
+    div.warning {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                color:			    rgb(128,96,0);	/* dark yellow */
+                margin-top:		    0;
+                margin-bottom:		0.5ex;	/* half letter height */
+                }
+
+   /*********************************************************************
+    *   div class='picture' is used to display an image within a page   *
+    *********************************************************************/
+    div.picture {
+                background-color:   white;
+                padding:            4px;
+                font-family:        sans-serif;
+                border:             thick solid #008000;
+                border-top:         thick solid #402000;
+                border-left:        thick solid #402000;
+                border-bottom:      thick solid #A05000;
+                border-right:       thick solid #A05000;
+                margin-bottom:		0.5ex;	/* half letter height */
+                }
+
+   /*********************************************************************
+    *   div class='advert' is used to display an advertisement          *
+    *   in the page header. Note that this allocates the space to       *
+    *   hold the advertisement.                                         *
+    *********************************************************************/
+    div.advert {
+                background-color:   white;
+                font-family:        sans-serif;
+                width:              350px;
+                height:             auto;
+                font-size:          180%;
+                font-weight:        bold;
+                border:             5px solid red
+                }
+
+   /*********************************************************************
+    *   styles for displaying a row of tabs                             *
+    *********************************************************************/
+    div.tabs {
+                background-color:   #F5DEB3;
+                width:              100%;
+                border-spacing:     0px;
+                padding:            0px;
+    }
+    span.tabs { background-color:   #F7E2B8;
+                border-top:         3px solid #FEF0E0;	
+                border-left:        3px solid #FEF0E0;
+                border-right:       3px solid brown;
+                border-bottom:      2px solid brown;
+                border-top-left-radius:		10px;
+                border-top-right-radius:	10px;
+                padding-top:		2px;
+                padding-bottom:		2px;
+                padding-left:		7px;	
+                padding-right:		7px;	
+                float:              left;
+                font-family:        sans-serif;
+                font-size:          larger;
+                text-align:         center;
+    }
+    span.tabsFront {
+                background-color:   #FEFEE0;            /* brighter*/
+                border-top:         3px solid white;    /* brighter*/	
+                border-left:        3px solid white;    /* brighter*/
+                border-right:       3px solid brown;
+                border-bottom:      0px;	            /* none */
+                border-top-left-radius:		10px;
+                border-top-right-radius:	10px;
+                padding-top:		2px;
+                padding-bottom:		4px;
+                padding-left:		7px;	
+                padding-right:		7px;	
+                float:              left;
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          larger;
+                text-align:         center;
+    }
+
+   /*********************************************************************
+    *   standardize the display of section headings                     *
+    *********************************************************************/
+    h1        { font-family:        sans-serif;
+                }
+    h1.big    { font-family:        sans-serif;
+                font-size:          160px;
+                }
+    h2        { font-family:        sans-serif;
+                }
+    h3        { font-family:        sans-serif;
+                }
+    p         { font-family:        sans-serif;
+                }
+    p.notes   { font-family:        sans-serif;
+                padding-left:		2em;
+                padding-right:		2em;
+                }
+    li        { font-family:        sans-serif;
+                margin-bottom:      1em;
+                }
+
+   /*********************************************************************
+    *   p class='label'                                                 *
+    *********************************************************************/
+    p.label   { font-family:        sans-serif;
+                font-size:          larger;
+                font-weight:        bold;
+                margin-left:		6em;
+                text-indent:		-3em;
+                margin-top:         0;
+                margin-bottom:		0.5ex;	/* half letter height */
+                }
+
+   /*********************************************************************
+    *   p class='large' is the same as class='label' but without the    *
+    *   indent.                                                         *
+    ********************************************************************/
+    p.large   { font-family:        sans-serif;
+                font-size:          larger;
+                font-weight:        bold;
+                margin-top:		    0;
+                margin-bottom:		0.5ex;	/* half letter height */
+                }
+   /*********************************************************************
+    *   p class='labelSmall' is the same as class='label' but with      *
+    *   smaller text.                                                   *
+    *********************************************************************/
+    p.labelSmall {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                margin-left:		6em;
+                text-indent:		-3em;
+                margin-top:         0;
+                margin-bottom:		0.5ex;	/* half letter height */
+                }
+    p.indent {  font-family:        sans-serif;
+                margin-left:		6em;
+                margin-top:         0;
+                margin-bottom:		0;
+                }
+    p.left    { font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         left;
+                }
+    p.message { font-family:        sans-serif;
+                font-weight:        bold;
+                color:		        rgb(192,0,0);	/* dark red */
+                margin-top:         0;
+                margin-bottom:		0.5ex;	/* half letter height */
+                }
+    p.warning { font-family:        sans-serif;
+                font-weight:        bold;
+                color:		        rgb(128,96,0);	/* dark yellow */
+                margin-top:		    0;
+                margin-bottom:		0.5ex;	/* half letter height */
+                }
+    p.clear   { margin-top:         0.5ex;	/* half letter height */
+                margin-bottom:		0.5ex;	/* half letter height */ 
+                font-weight:        bold;
+                font-family:        sans-serif;
+                clear:		        both; 
+                }
+
+   /*********************************************************************
+    *   p class='picdesc' is used for descriptions of images            *    
+    *********************************************************************/
+    p.picdesc { font-family:        sans-serif;
+                font-size:          smaller;
+                margin-top:		    0.5ex;	/* half letter height */
+                margin-bottom:		0.5ex;	/* half letter height */
+                }
+
+   /*********************************************************************
+    *   the default label tag for laying out simple 2 column forms      *
+    *   individual scripts will override it to change the width of      *
+    *   the label                                                       *
+    *********************************************************************/
+    label.label {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                vertical-align:		top;
+                padding:            0px 3px 0px 3px;
+                float:              left;
+                width:              15em;
+                }
+    label.labelSmall {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          smaller;
+                text-align:         right;
+                vertical-align:		top;
+                padding:            0px 3px 0px 3px;
+                float:              left;
+                width:              15em;
+                }
+
+   /*********************************************************************
+    *   label.column1                                                   *
+    *                                                                   *
+    *   default label width for forms.  Typically the width is          *
+    *   overriden by a dialog specific CSS file                         *
+    *********************************************************************/
+    label.column1 {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                vertical-align:		top;
+                padding:            0px 3px 0px 3px;
+                margin-top:		    1px;
+                float:              left;
+                width:              15em;
+                }
+
+   /*********************************************************************
+    *   label.column2                                                   *
+    *                                                                   *
+    *   default label width for forms.  Typically the width is          *
+    *   overriden by a dialog specific CSS file                         *
+    *********************************************************************/
+    label.column2 {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                vertical-align:		top;
+                padding:            0px 3px 0px 3px;
+                margin-top:		    1px;
+                float:              left;
+                width:              15em;
+                }
+
+   /*********************************************************************
+    *   styled <a> links                                                *
+    *********************************************************************/
+    a.button:link    { 
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                text-decoration:    none;
+                background-color:   #E0E0E0;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                padding:            4px 12px 4px 12px;
+                }
+    a.button:visited    { 
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                text-decoration:    none;
+                background-color:   #E0E0E0;
+                border-top:         2px solid #606060;
+                border-left:        2px solid #606060;
+                border-bottom:      3px solid white;
+                border-right:       3px solid white;
+                padding:            4px 12px 4px 12px;
+                display:            inline-block;
+                }
+    a.buttonText:link    { 
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                text-decoration:    none;
+                background-color:   #E0E0E0;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                padding:            4px 12px 4px 12px;
+                }
+    a.buttonText:visited    { 
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                text-decoration:    none;
+                background-color:   #E0E0E0;
+                border-top:         2px solid #606060;
+                border-left:        2px solid #606060;
+                border-bottom:      3px solid white;
+                border-right:       3px solid white;
+                padding:            4px 12px 4px 12px;
+                }
+    a.male:link    { 
+                font-family:        sans-serif;
+                color:			    blue;
+                }
+    a.male:visited    { 
+                font-family:        sans-serif;
+                color:		        rgb(0,0,128);   /* dark blue */
+                }
+    a.female:link { 
+                font-family:        sans-serif;
+                color:		        red;
+                }
+    a.female:visited    { 
+                font-family:        sans-serif;
+                color:		        rgb(128,0,0);   /* dark red */
+                }
+    a.unknown:link { 
+                font-family:        sans-serif;
+                color:		        green;
+                }
+    a.unknown:visited    { 
+                font-family:        sans-serif;
+                color:			    rgb(0,128,0);   /* dark green */
+                }
+
+   /*********************************************************************
+    *   styled <span>s                                                  *
+    *********************************************************************/
+    span.label { 
+                font-family:        sans-serif;
+                font-size:          larger;
+                font-weight:        bold;
+                }
+    span.labelSmall {    
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                font-size:          smaller;
+                }
+    span.button {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                background-color:   #E0E0E0;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                padding:            4px 12px 4px 12px;
+                }
+    span.h1{    float:              left;
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          200%;
+                padding:            0px 4px 8px 4px;
+                }
+    span.left { float:              left;
+                text-align:         left;
+                font-weight:        bold;
+                font-family:        sans-serif;
+                font-size:          12px;
+                padding:            0px 4px 0px 4px;
+                }
+    span.center {
+                text-align:         center;
+                font-weight:        bold;
+                font-family:        sans-serif;
+                font-size:          12px;
+                padding:            0px 8px 0px 8px;
+                }
+    span.right {
+                float:              right;
+                text-align:         right;
+                font-weight:        bold;
+                font-family:        sans-serif;
+                font-size:          12px;
+                width:              100px;
+                padding:            0px 4px 0px 4px;
+                }
+    span.right450 {
+                float:              right;
+                width:              450px;
+                padding:            0px 4px 0px 4px;
+                }
+    span.right368 {
+                float:              right;
+                width:              368px;
+                padding:            0px 4px 0px 4px;
+                }
+    span.pad {  padding:            4px;
+                }
+    span.note { font-family:        sans-serif;
+                font-weight:        bold;
+                color:			    rgb(0,128,0);	/* dark green */
+                }
+    span.message {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                color:			    rgb(192,0,0);	/* dark red */
+                }
+    span.warning {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                color:			    rgb(128,96,0);	/* dark yellow */
+                }
+
+   /*********************************************************************
+    *  styles for displaying images in <img> tags                        *
+    *********************************************************************/
+    img.example {
+                border-top:         2px solid #C00000;
+                border-left:        2px solid #C00000;
+                border-bottom:      2px solid #400000;
+                border-right:       2px solid #400000;
+                border-spacing:		2px;
+                }
+    img.figure {
+                border-top:         4px solid white;
+                border-left:        4px solid white;
+                border-bottom:      4px solid #808080;
+                border-right:       4px solid #808080;
+                border-spacing:		2px;
+                }
+
+   /*********************************************************************
+    *   styles for displaying <table> tags                              *
+    *********************************************************************/
+    table.details {
+                border:             2px solid black; 
+                border-spacing:		0px;
+                }
+    table.summary {
+                border:             2px solid black; 
+                padding:            0px;
+                }
+    table.fullwidth {
+                width:              100%
+                }
+    table.form {
+                border-spacing:		0px;
+                padding:            0px;
+                border:             2px solid black; 
+                }
+
+   /*********************************************************************
+    *   styles for displaying <th> tags                                 *
+    *********************************************************************/
+    th {        font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                padding:            0px 3px 0px 3px;
+                }
+    th.list {   font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                vertical-align:		top;
+                }
+    th.label {  font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                vertical-align:		top;
+                padding:            0px 3px 0px 3px;
+                }
+    th.labelSmall {    
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                vertical-align:		top;
+                font-size:          smaller;
+                padding:            0px 3px 0px 5px;
+                }
+    th.left {    font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         left;
+                padding:            0px 3px 0px 3px;
+                }
+    th.center { font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                padding:            0px 3px 0px 3px;
+                }
+    th.right {  font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                padding:            0px 3px 0px 3px;
+                }
+    th.rightnum {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                width:              7%;
+                padding-right:		6px;
+                }
+    th.detlabel {    
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         left;
+                background-color:   #F4E8B0;
+                border-top:         thin solid black;
+                border-bottom:      thin solid black;
+                border-right:       thin solid black;
+                border-left:        thin solid black;
+                }
+    th.colhead {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                background-color:   #F4E8B0;
+                border-top:         thin solid black;
+                border-bottom:      medium solid black;
+                border-right:       thin solid black;
+                }
+    th.colhead1st {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                background-color:   #F4E8B0;
+                border-top:         thin solid black;
+                border-bottom:      medium solid black;
+                border-right:       thin solid black;
+                border-left:        thin solid black;
+                }
+    th.colheadSmall {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                font-size:          small;
+                background-color:   #F4E8B0;
+                border-top:         thin solid black;
+                border-bottom:      medium solid black;
+                border-right:       thin solid black;
+                }
+    th.cell {   font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                padding:            0px;
+                border-width:              0px 0px 0px 0px;
+                empty-cells:		show;
+                }
+    th.form {   font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         left;
+                padding:            0px 3px 0px 3px;
+                border-width:              0px 0px 0px 0px;
+                empty-cells:		show;
+                }
+    th.underline {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                padding:            0px;
+                border-width:              0px 0px medium 0px;
+                border-bottom:      medium solid black;
+                }
+
+   /*********************************************************************
+    *   styles for displaying <td> tags                                 *
+    *********************************************************************/
+    td      {   font-family:        sans-serif;
+                text-align:         left;
+                padding:            0px 3px 0px 3px;
+                }
+    td.label {  font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         left;
+                padding:            0px 3px 0px 3px;
+                }
+    td.labelSmall {    
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         left;
+                font-size:          smaller;
+                padding:            0px 3px 0px 3px;
+                }
+    td.labelleft {    
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         left;
+                padding:            0px 3px 0px 3px;
+                }
+    td.labelcenter {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                padding:            0px 3px 0px 3px;
+                }
+    td.labelright {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                padding:            0px 3px 0px 3px;
+                }
+    td.name    {
+                font-family:        sans-serif;
+                text-align:         left;
+                background-color:   white;
+                padding-left:		4px;
+                padding-right:		4px;
+                }
+    td.dataleft {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         left;
+                background-color:   white;
+                }
+    td.datacenter {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                background-color:   white;
+                }
+    td.dataright {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                background-color:   white;
+                }
+    td.bold {   font-family:        sans-serif;
+                font-weight:        bold;
+                }
+    td.left {   text-align:         left;
+                }
+    td.center { text-align:         center;
+                }
+    td.right {  text-align:         right;
+                }
+    td.total {
+                border-top:         4px double black;
+                font-family:        sans-serif;
+                font-weight:        bold;
+                }
+    td.pad10 {  font-family:        sans-serif;
+                width:              10%;
+                text-align:         right;
+                }
+    /* cells for displaying percentage highlighted by color  and
+     * brightness.  */
+    td.p00right {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                background-color:   #e00000;	/* brilliance 0e0 */
+                }
+    td.p01right {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                background-color:   #f03000;	/* brilliance 120 */
+                }
+    td.p05right {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                background-color:   #e85800;	/* brilliance 140 */
+                }
+    td.p15right {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                background-color:   #c89800;	/* brilliance 160 */
+                }
+    td.p25right {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                background-color:   #b8b800;	/* brilliance 180 */
+                }
+    td.p50right {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                background-color:   #98d800;	/* brilliance 170 */
+                }
+    td.p75right {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                background-color:   #78f800;	/* brilliance 170 */
+                }
+    td.p100right {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                background-color:   #31ff30;	/* brilliance 160 */
+                }
+
+    /* add border to two sides of a cell so the entire table
+     * will have cells separated by single thin black borders */
+    td.first {                                  /* first column */
+                border-right:       thin solid black;
+                border-left:        thin solid black;
+                border-bottom:      thin solid black;
+                }
+    td.border {
+                border-right:       thin solid black;
+                border-bottom:      thin solid black;
+                }
+
+    /* display a table cell as if it were a button */
+    td.button {    font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                font-size:          80%;
+                background-color:   #E0E0E0;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                padding:            4px 12px 4px 12px;
+                }
+    td.white {    font-family:        sans-serif;
+                background-color:   white;
+                border-right:       thin solid black;
+                border-bottom:      thin solid black;
+                padding:            2px 2px 2px 2px;
+                empty-cells:		show;
+                }
+    td.odd {    font-family:        sans-serif;
+                background-color:   #F8F8F8;
+                border-right:       thin solid black;
+                border-bottom:      thin solid black;
+                padding:            2px 2px 2px 2px;
+                empty-cells:		show;
+                }
+    td.even {    font-family:        sans-serif;
+                background-color:   #E0E0E0;
+                border-right:       thin solid black;
+                border-bottom:      thin solid black;
+                padding:            2px 2px 2px 2px;
+                empty-cells:		show;
+                }
+    td.cell {    font-family:        sans-serif;
+                border-width:              0px;
+                padding:            0px;
+                empty-cells:		show;
+                }
+    td.underline {
+                font-family:        sans-serif;
+                border-width:              0px;
+                padding:            0px;
+                empty-cells:		show;
+                border-bottom:      medium solid black;
+                }
+
+   /*********************************************************************
+    *  styles for displaying <hr> tags                                  *
+    *********************************************************************/
+    hr {        height:             4px;
+                border-top:         4px solid #902525;
+                border-bottom:      0px none;
+                background-color:   #902525;
+                width:              50%;
+                margin-top:		    10mm;
+                }	
+    hr.footnotes {
+                height:             2px;
+                border-top:         2px solid black;
+                border-bottom:      0px none;
+                background-color:   #902525;
+                width:              50%;
+                margin-top:		    10mm;
+                margin-left:		0px;
+                }
+
+   /*********************************************************************
+    * common <fieldset> styles                                          *
+    *********************************************************************/
+    fieldset.female    {
+                background-color:   #FFE0E0;
+                border:             1px solid red;
+                padding-left:		1px;
+                padding-bottom:		1px;
+                padding-right:		1px;
+                }
+    fieldset.male    {
+                background-color:   #E0E0FF;
+                border:             1px solid blue;
+                padding-left:		1px;
+                padding-bottom:		1px;
+                padding-right:		1px;
+                }
+    fieldset.other    {
+                border:             1px solid #808000;
+                padding-left:		1px;
+                padding-bottom:		1px;
+                padding-right:		1px;
+                }
+    legend.label {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         right;
+                vertical-align:		top;
+                padding:            0px 3px 0px 3px;
+                margin-top:		    1px;
+                }
+    legend.labelSmall {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          smaller;
+                text-align:         right;
+                vertical-align:		top;
+                padding:            0px 3px 0px 3px;
+                margin-top:		    1px;
+                }
+
+   /*********************************************************************
+    *   common <input> styles                                           *
+    *********************************************************************/
+    input.label {
+                font-family:        sans-serif;
+                font-size:          larger;
+                font-weight:        bold;
+                text-align:         center;
+                }
+    input.left {
+                font-family:        sans-serif;
+                text-align:         left;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.leftnc {
+                font-family:        sans-serif;
+                text-align:         left;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.center {
+                font-family:        sans-serif;
+                text-align:         center;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.centernc {
+                font-family:        sans-serif;
+                text-align:         center;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.right {
+                font-family:        sans-serif;
+                text-align:         right;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.rightnc {
+                font-family:        sans-serif;
+                text-align:         right;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.rightfixed {
+                font-family:        fixed sans-serif;
+                text-align:         right;
+                background-color:   white;
+                text-transform:		capitalize;
+                font-weight:        bold;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.male {
+                font-family:        sans-serif;
+                text-align:         left;
+                background-color:   white;
+                color:              blue;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.female {
+                font-family:        sans-serif;
+                text-align:         left;
+                background-color:   white;
+                color:              red;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.unknown {
+                font-family:        sans-serif;
+                text-align:         left;
+                background-color:   white;
+                color:              green;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.labelSelected {
+                color:              white;
+                font-family:        sans-serif;
+                font-size:          larger;
+                font-weight:        bold;
+                text-align:         center;
+                }
+    input.inalabelSelected {
+                color:              #F0F0F0;	/* bright gray */
+                font-family:        sans-serif;
+                font-size:          larger;
+                text-align:         center;
+                font-weight:        bold;
+                }
+    input.inaleftSelected {
+                font-family:        sans-serif;
+                text-align:         left;
+                color:              #F0F0F0;	/* bright gray */
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.inaleftncSelected {
+                font-family:        sans-serif;
+                text-align:         left;
+                color:              #F0F0F0;	/* bright gray */
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.inacenterSelected {
+                font-family:        sans-serif;
+                text-align:         center;
+                color:              #F0F0F0;	/* bright gray */
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.inacenterncSelected {
+                font-family:        sans-serif;
+                text-align:         center;
+                color:              #F0F0F0;	/* bright gray */
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.inarightSelected {
+                font-family:        sans-serif;
+                text-align:         right;
+                color:              #F0F0F0;	/* bright gray */
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.inarightncSelected {
+                font-family:        sans-serif;
+                text-align:         right;
+                color:              #F0F0F0;	/* bright gray */
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.actleftSelected {
+                font-family:        sans-serif;
+                text-align:         left;
+                color:              white;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.actleftncSelected {
+                font-family:        sans-serif;
+                text-align:         left;
+                color:              white;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.actcenterSelected {
+                font-family:        sans-serif;
+                text-align:         center;
+                color:              white;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.actcenterncSelected {
+                font-family:        sans-serif;
+                text-align:         center;
+                color:              white;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.actrightSelected {
+                font-family:        sans-serif;
+                text-align:         right;
+                color:              white;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.actrightfixedSelected {
+                font-family:        fixed serif;
+                text-align:         right;
+                color:              white;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.actrightncSelected {
+                font-family:        sans-serif;
+                text-align:         right;
+                color:              white;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.code {
+                font-family:        Lucida Console, Courier;
+                font-weight:        bold;
+                text-align:         left;
+                text-transform:		capitalize;
+                padding:            0px;
+                padding-left:		2px;
+                padding-right:		2px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.codenc {
+                font-family:        Lucida Console, Courier;
+                font-weight:        bold;
+                text-align:         left;
+                padding:            0px;
+                padding-left:		2px;
+                padding-right:		2px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.dftleft {
+                font-family:        sans-serif;
+                text-align:         left;
+                background-color:   white;
+                color:              #606060;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.dftright {
+                font-family:        sans-serif;
+                text-align:         right;
+                background-color:   white;
+                color:              #606060;
+                text-transform:		capitalize;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.dftleftnc {
+                font-family:        sans-serif;
+                text-align:         left;
+                background-color:   white;
+                color:              #606060;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.dftrightnc {
+                font-family:        sans-serif;
+                text-align:         right;
+                background-color:   white;
+                color:              #606060;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+    input.hyperlink {
+                font-family:        sans-serif;
+                text-align:         left;
+                text-decoration:    underline;
+                background-color:   white;
+                color:              blue;
+                padding:            0px;
+                border-top:         1px solid black;
+                border-left:        1px solid black;
+                border-bottom:      1px solid white;
+                border-right:       1px solid white;
+                }
+
+/************************************************************************
+ *        styles for displaying <select> tags								*
+ ************************************************************************/
+    select {
+                font-family:        sans-serif;
+                text-align:         left;
+                padding:            0px;
+                -moz-border-radius: 0px;
+                -webkit-border-radius:  0px;
+                border-radius:      0px;
+                }
+    select.left {
+                font-family:        sans-serif;
+                text-align:         left;
+                padding:            0px;
+                }
+    select.leftcit {
+                font-family:        sans-serif;
+                text-align:         left;
+                padding:            0px;
+                width:              473px;
+                }
+
+/************************************************************************
+ *      styles for displaying <option> tags								*
+ ************************************************************************/
+    option {
+                font-family:        sans-serif;
+                text-align:         left;
+                padding:            0px;
+                -moz-border-radius: 0px;
+                -webkit-border-radius: 0px;
+                border-radius:      0px;
+                }
+    option.left {
+                font-family:        sans-serif;
+                text-align:         left;
+                padding:            0px;
+                }
+    option.right {
+                font-family:        sans-serif;
+                text-align:         right;
+                padding:            0px;
+                }
+
+/************************************************************************
+ *      styles for displaying <button> tags								*
+ ************************************************************************/
+    button {    font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                background-color:   #E0E0E0;
+                color:              black;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                padding:            2px 12px 2px 12px;
+                }
+    button:disabled {    
+                color:              #606060; };
+
+    button[disabled] {
+                color:              #804040;
+                }
+    button.button {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                background-color:   #E0E0E0;
+                color:              black;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                padding:            0px 12px 0px 12px;
+                }
+    button.button:disabled {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                background-color:   #E0E0E0;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                color:              #606060;
+                padding:            0px 12px 0px 12px;
+                }
+    button.width110 {    
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                color:              black;
+                width:              110px;
+                }
+
+/************************************************************************
+ *      styles for displaying <textarea> tags							*
+ ************************************************************************/
+    textarea   {
+                font-family:        serif;
+                text-align:         left;
+                border-top:         3px solid black;
+                border-left:        3px solid black;
+                border-bottom:      3px solid #808080;
+                border-right:       3px solid #808080;
+                }
+    textarea.leftnc   {
+                font-family:        serif;
+                text-align:         left;
+                border-top:         3px solid black;
+                border-left:        3px solid black;
+                border-bottom:      3px solid #808080;
+                border-right:       3px solid #808080;
+                }
+
+/************************************************************************
+ *  If the user requests to print a page do not include the <header>,   *
+ *  <footer>, or any <form>s in what is printed.                        *
+ ************************************************************************/
+@media print {
+    header, footer, form {
+                display:            none;
+    }
+}

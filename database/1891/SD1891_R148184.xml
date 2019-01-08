@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148184">
+    <option value="133_C">
+        Kings: Lot 39
+        <div id="" reel="148184" frame="0" count="20"/>
+    </option>
+    <option value="133_D">
+        Kings: Lot 40
+        <div id="" reel="148184" frame="20" count="22"/>
+    </option>
+    <option value="133_E">
+        Kings: Lot 41
+        <div id="" reel="148184" frame="42" count="26"/>
+    </option>
+    <option value="133_F">
+        Kings: Lot 42
+        <div id="" reel="148184" frame="68" count="14"/>
+    </option>
+    <option value="133_G">
+        Kings: Lot 43
+        <div id="" reel="148184" frame="82" count="22"/>
+    </option>
+    <option value="133_H">
+        Kings: Lot 44
+        <div id="" reel="148184" frame="104" count="27"/>
+    </option>
+    <option value="133_I">
+        Kings: Lot 45
+        <div id="1" reel="148184" frame="131" count="18"/>
+        <div id="2" reel="148184" frame="149" count="25"/>
+    </option>
+    <option value="133_J">
+        Kings: Lot 46
+        <div id="" reel="148184" frame="174" count="22"/>
+    </option>
+    <option value="133_K">
+        Kings: Lot 47
+        <div id="" reel="148184" frame="196" count="24"/>
+    </option>
+    <option value="133_L">
+        Kings: Lot 51
+        <div id="" reel="148184" frame="220" count="23"/>
+    </option>
+    <option value="133_M">
+        Kings: Lot 52
+        <div id="1" reel="148184" frame="243" count="18"/>
+        <div id="2" reel="148184" frame="261" count="14"/>
+    </option>
+    <option value="133_N">
+        Kings: Lot 53
+        <div id="1" reel="148184" frame="275" count="15"/>
+        <div id="2" reel="148184" frame="290" count="12"/>
+    </option>
+    <option value="133_O">
+        Kings: Lot 54
+        <div id="" reel="148184" frame="302" count="22"/>
+    </option>
+    <option value="133_P">
+        Kings: Lot 55
+        <div id="" reel="148184" frame="324" count="28"/>
+    </option>
+    <option value="133_Q">
+        Kings: Lot 56
+        <div id="" reel="148184" frame="352" count="21"/>
+    </option>
+    <option value="133_R">
+        Kings: Lot 59
+        <div id="1" reel="148184" frame="373" count="25"/>
+        <div id="2" reel="148184" frame="398" count="12"/>
+    </option>
+    <option value="133_S">
+        Kings: Lot 61
+        <div id="" reel="148184" frame="410" count="31"/>
+    </option>
+    <option value="133_T">
+        Kings: Lot 63
+        <div id="" reel="148184" frame="441" count="31"/>
+    </option>
+    <option value="133_U">
+        Kings: Lot 64
+        <div id="1" reel="148184" frame="472" count="20"/>
+        <div id="2" reel="148184" frame="492" count="20"/>
+    </option>
+    <option value="133_V">
+        Kings: Lot 66
+        <div id="" reel="148184" frame="512" count="9"/>
+    </option>
+    <option value="134_A">
+        Prince: Summerside Town
+        <div id="1" reel="148184" frame="521" count="21"/>
+        <div id="2" reel="148184" frame="542" count="20"/>
+        <div id="3" reel="148184" frame="562" count="20"/>
+    </option>
+    <option value="134_B">
+        Prince: Lot 1
+        <div id="1" reel="148184" frame="582" count="36"/>
+        <div id="2" reel="148184" frame="618" count="25"/>
+    </option>
+    <option value="134_C">
+        Prince: Lot 2
+        <div id="1" reel="148184" frame="643" count="25"/>
+        <div id="2" reel="148184" frame="668" count="25"/>
+    </option>
+    <option value="134_D">
+        Prince: Lot 3
+        <div id="" reel="148184" frame="693" count="30"/>
+    </option>
+    <option value="134_E">
+        Prince: Lot 4
+        <div id="1" reel="148184" frame="723" count="25"/>
+        <div id="2" reel="148184" frame="748" count="25"/>
+    </option>
+</select>

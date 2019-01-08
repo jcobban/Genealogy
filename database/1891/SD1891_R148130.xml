@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148130">
+    <option value="51_F">
+        Bruce East: Walkerton Town
+        <div id="" reel="148130" frame="0" count="63"/>
+    </option>
+    <option value="52_A">
+        Bruce North: Albemarle &amp; Cape Croker
+        <div id="1" reel="148130" frame="63" count="13"/>
+        <div id="2" reel="148130" frame="76" count="16"/>
+        <div id="3" reel="148130" frame="92" count="13"/>
+    </option>
+    <option value="52_B">
+        Bruce North: Amabel &amp; Saugeen
+        <div id="1" reel="148130" frame="105" count="50"/>
+        <div id="2" reel="148130" frame="155" count="20"/>
+        <div id="3" reel="148130" frame="175" count="11"/>
+    </option>
+    <option value="52_C">
+        Bruce North: Arran
+        <div id="1" reel="148130" frame="186" count="19"/>
+        <div id="2" reel="148130" frame="205" count="20"/>
+        <div id="3" reel="148130" frame="225" count="23"/>
+    </option>
+    <option value="52_D">
+        Bruce North: Chesley Village
+        <div id="" reel="148130" frame="248" count="30"/>
+    </option>
+    <option value="52_E">
+        Bruce North: Eastnor
+        <div id="" reel="148130" frame="278" count="32"/>
+    </option>
+    <option value="52_F">
+        Bruce North: Elderslie
+        <div id="1" reel="148130" frame="310" count="23"/>
+        <div id="2" reel="148130" frame="333" count="23"/>
+        <div id="3" reel="148130" frame="356" count="18"/>
+    </option>
+    <option value="52_G">
+        Bruce North: Lindsay
+        <div id="" reel="148130" frame="374" count="12"/>
+    </option>
+    <option value="52_H">
+        Bruce North: Paisley Village
+        <div id="" reel="148130" frame="386" count="28"/>
+    </option>
+    <option value="52_I">
+        Bruce North: Port Elgin Village
+        <div id="" reel="148130" frame="414" count="34"/>
+    </option>
+    <option value="52_J">
+        Bruce North: St-Edmonds
+        <div id="" reel="148130" frame="448" count="8"/>
+    </option>
+    <option value="52_K">
+        Bruce North: Southampton Village
+        <div id="" reel="148130" frame="456" count="30"/>
+    </option>
+    <option value="52_L">
+        Bruce North: Tara Village
+        <div id="" reel="148130" frame="486" count="15"/>
+    </option>
+    <option value="52_M">
+        Bruce North: Wiarton Village
+        <div id="" reel="148130" frame="501" count="41"/>
+    </option>
+    <option value="53_A">
+        Bruce West: Bruce
+        <div id="1" reel="148130" frame="542" count="42"/>
+        <div id="2" reel="148130" frame="584" count="37"/>
+    </option>
+    <option value="53_B">
+        Bruce West: Huron
+        <div id="1" reel="148130" frame="621" count="44"/>
+        <div id="2" reel="148130" frame="665" count="41"/>
+    </option>
+</select>

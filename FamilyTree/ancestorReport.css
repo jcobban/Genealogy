@@ -1,0 +1,24 @@
+/************************************************************************
+ *  ancestorReport.css							*
+ *									*
+ *  Stylesheet for the scripts ancestorReport.php			*
+ *									*
+ *  History:								*
+ *	2014/02/10	created						*
+ *	2014/03/06	label class name changed to column1		*
+ *									*
+ *  Copyright &copy; 2014 James A. Cobban				*
+ ************************************************************************/
+
+/*	labels of various widths */
+    label.column1 {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		font-size: smaller;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		margin-top:	1px;
+		float:		left;
+		width:		20em;
+		}

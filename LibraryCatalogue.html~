@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 5.3.1.2 (Linux)"/>
+	<meta name="created" content="2017-08-31T19:28:32.334905680"/>
+	<meta name="changed" content="2017-08-31T20:02:45.332052824"/>
+	
+	<style type="text/css">
+		body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Liberation Sans"; font-size:x-small }
+		a.comment-indicator:hover + comment { background:#ffd; position:absolute; display:block; border:1px solid black; padding:0.5em;  } 
+		a.comment-indicator { background:red; display:inline-block; border:1px solid black; width:0.5em; height:0.5em;  } 
+		comment { display:none;  } 
+	</style>
+	
+</head>
+
+<body>
+<table cellspacing="0" border="0">
+	<colgroup width="431"></colgroup>
+	<colgroup width="192"></colgroup>
+	<colgroup width="122"></colgroup>
+	<colgroup span="3" width="85"></colgroup>
+	<tr>
+		<td height="17" align="center"><b>Title</b></td>
+		<td align="center"><b>Author</b></td>
+		<td align="center"><b>ISBN</b></td>
+		<td align="center"><b>Dewey</b></td>
+		<td align="center"><b>Format</b></td>
+		<td align="center"><b>Notes</b></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">Out in the Open, Life on the Street</td>
+		<td align="left">Ballantyne, Bob, photographer</td>
+		<td align="left">1-55145-099-2</td>
+		<td align="left">305.569’</td>
+		<td align="left">softcover</td>
+		<td align="left">signed</td>
+	</tr>
+	<tr>
+		<td height="17" align="left">The Ubiquitous Pig</td>
+		<td align="left">Nissenson, Marilyn Et Al</td>
+		<td align="left">0-8109-8155-6</td>
+		<td align="left">636.4-dc20</td>
+		<td align="left">hardcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">Movement Never Lies: an Autobiography</td>
+		<td align="left">Kain, Karen</td>
+		<td align="left">0-7710-4575-1</td>
+		<td align="left">792.8’092</td>
+		<td align="left">softcover</td>
+		<td align="left">signed</td>
+	</tr>
+	<tr>
+		<td height="17" align="left">Open Heart, Open Mind</td>
+		<td align="left">Hughes, Clara</td>
+		<td align="left">978-1-4767-5698-1</td>
+		<td align="left">796.092’</td>
+		<td align="left">hardcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">Elizabeth of York</td>
+		<td align="left">Weir, Alison</td>
+		<td align="left">978-0-22408981-4</td>
+		<td align="left">942.051092’</td>
+		<td align="left">hardcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">I Love You</td>
+		<td align="left">Baker, Liza</td>
+		<td align="left">0-439-84799-0</td>
+		<td align="left">Childrens Fiction</td>
+		<td align="left">hardcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">The Painted Girls</td>
+		<td align="left">Buchanan, Cathy Marie</td>
+		<td align="left">978-1-44341-234-6</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">Mockingjay</td>
+		<td align="left">Collins, Suzanne</td>
+		<td align="left">978-0-545-78829-8</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">Believing the Lie</td>
+		<td align="left">George, Elizabeth</td>
+		<td align="left">978-0-525-95258-9</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">Beach House, The</td>
+		<td align="left">Green, Jane</td>
+		<td align="left">978-0-452-29538-4</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">The Lady of the Rivers</td>
+		<td align="left">Gregory, Philippa</td>
+		<td align="left">978-4165-6371-6</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">Grow old along with me the best is yet to be</td>
+		<td align="left">Martz, Sandra Haldeman, ed</td>
+		<td align="left">0-918949-86-6</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">If I had a hammer, Women’s Work in Poetry, Fiction, and Photographs</td>
+		<td align="left">Martz, Sandra Haldeman, ed</td>
+		<td align="left">0-918949-09-2</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">If I had my life to live over, I would pick more daisies</td>
+		<td align="left">Martz, Sandra Haldeman, ed</td>
+		<td align="left">0-918949-24-6</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">When I am an Old Woman I shall wear purple</td>
+		<td align="left">Martz, Sandra Haldeman, ed</td>
+		<td align="left">0-918949-16-5</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+	<tr>
+		<td height="17" align="left">From May Sarton’s Well</td>
+		<td align="left">Sarton, May</td>
+		<td align="left">0-918949-51-3</td>
+		<td align="left">Fiction</td>
+		<td align="left">softcover</td>
+		<td align="left"><br></td>
+	</tr>
+</table>
+<!-- ************************************************************************** -->
+</body>
+
+</html>

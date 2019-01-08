@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148110">
+    <option value="25_S">
+        York: Stanley
+        <div id="2" reel="148110" frame="0" count="23"/>
+    </option>
+    <option value="26_A">
+        Annapolis: Annapolis Royal
+        <div id="" reel="148110" frame="23" count="20"/>
+    </option>
+    <option value="26_B">
+        Annapolis: Bear River
+        <div id="" reel="148110" frame="43" count="15"/>
+    </option>
+    <option value="26_C">
+        Annapolis: Belle Isle
+        <div id="" reel="148110" frame="58" count="21"/>
+    </option>
+    <option value="26_D">
+        Annapolis: Bridgetown
+        <div id="" reel="148110" frame="79" count="23"/>
+    </option>
+    <option value="26_E">
+        Annapolis: Carleton Corner
+        <div id="" reel="148110" frame="102" count="18"/>
+    </option>
+    <option value="26_F">
+        Annapolis: Clarence
+        <div id="" reel="148110" frame="120" count="19"/>
+    </option>
+    <option value="26_G">
+        Annapolis: Clements
+        <div id="" reel="148110" frame="139" count="15"/>
+    </option>
+    <option value="26_H">
+        Annapolis: Clementsvale
+        <div id="" reel="148110" frame="154" count="15"/>
+    </option>
+    <option value="26_I">
+        Annapolis: Clements West
+        <div id="" reel="148110" frame="169" count="10"/>
+    </option>
+    <option value="26_J">
+        Annapolis: Dalhousie
+        <div id="" reel="148110" frame="179" count="10"/>
+    </option>
+    <option value="26_K">
+        Annapolis: Granville Ferry
+        <div id="" reel="148110" frame="189" count="19"/>
+    </option>
+    <option value="26_L">
+        Annapolis: Granville Lower
+        <div id="" reel="148110" frame="208" count="19"/>
+    </option>
+    <option value="26_M">
+        Annapolis: Hampton
+        <div id="" reel="148110" frame="227" count="10"/>
+    </option>
+    <option value="26_N">
+        Annapolis: Lawrencetown Lane
+        <div id="" reel="148110" frame="237" count="15"/>
+    </option>
+    <option value="26_O">
+        Annapolis: Lequille
+        <div id="" reel="148110" frame="252" count="19"/>
+    </option>
+    <option value="26_P">
+        Annapolis: Maitland
+        <div id="" reel="148110" frame="271" count="9"/>
+    </option>
+    <option value="26_Q">
+        Annapolis: Margaretsville
+        <div id="" reel="148110" frame="280" count="15"/>
+    </option>
+    <option value="26_R">
+        Annapolis: Meadowvale
+        <div id="" reel="148110" frame="295" count="15"/>
+    </option>
+    <option value="26_S">
+        Annapolis: Melvern
+        <div id="" reel="148110" frame="310" count="11"/>
+    </option>
+    <option value="26_T">
+        Annapolis: Middleton
+        <div id="" reel="148110" frame="321" count="16"/>
+    </option>
+    <option value="26_U">
+        Annapolis: Milford
+        <div id="" reel="148110" frame="337" count="9"/>
+    </option>
+    <option value="26_V">
+        Annapolis: New Albany
+        <div id="" reel="148110" frame="346" count="7"/>
+    </option>
+    <option value="26_W">
+        Annapolis: Nictaux
+        <div id="" reel="148110" frame="353" count="17"/>
+    </option>
+    <option value="26_X">
+        Annapolis: Parkers Cove
+        <div id="" reel="148110" frame="370" count="13"/>
+    </option>
+    <option value="26_Y">
+        Annapolis: Port George
+        <div id="" reel="148110" frame="383" count="15"/>
+    </option>
+    <option value="26_Z">
+        Annapolis: Port Lorne
+        <div id="" reel="148110" frame="398" count="14"/>
+    </option>
+    <option value="26_AA">
+        Annapolis: Round Hill (Moschelle)
+        <div id="" reel="148110" frame="412" count="15"/>
+    </option>
+    <option value="26_BB">
+        Annapolis: Springfield
+        <div id="" reel="148110" frame="427" count="16"/>
+    </option>
+    <option value="27_A">
+        Antigonish: Antigonish Harbour
+        <div id="1" reel="148110" frame="443" count="21"/>
+        <div id="2" reel="148110" frame="464" count="24"/>
+        <div id="3" reel="148110" frame="488" count="14"/>
+    </option>
+    <option value="27_B">
+        Antigonish: Antigonish Village
+        <div id="" reel="148110" frame="502" count="15"/>
+    </option>
+    <option value="27_C">
+        Antigonish: Arisaig
+        <div id="" reel="148110" frame="517" count="16"/>
+    </option>
+    <option value="27_D">
+        Antigonish: Ballantynes Cove
+        <div id="" reel="148110" frame="533" count="22"/>
+    </option>
+    <option value="27_E">
+        Antigonish: Frasers Mills
+        <div id="" reel="148110" frame="555" count="16"/>
+    </option>
+    <option value="27_F">
+        Antigonish: Harbour au Bouche
+        <div id="" reel="148110" frame="0" count="23"/>
+    </option>
+    <option value="27_G">
+        Antigonish: Heatherton
+        <div id="" reel="148110" frame="23" count="19"/>
+    </option>
+    <option value="27_H">
+        Antigonish: Linwood
+        <div id="" reel="148110" frame="42" count="23"/>
+    </option>
+    <option value="27_I">
+        Antigonish: Lochaber Lake
+        <div id="" reel="148110" frame="65" count="18"/>
+    </option>
+    <option value="27_J">
+        Antigonish: Malignant Brook
+        <div id="" reel="148110" frame="83" count="14"/>
+    </option>
+    <option value="27_K">
+        Antigonish: Mahoneys Beach
+        <div id="" reel="148110" frame="97" count="20"/>
+    </option>
+    <option value="27_L">
+        Antigonish: Merland
+        <div id="" reel="148110" frame="117" count="22"/>
+    </option>
+    <option value="27_M">
+        Antigonish: Pomquet River
+        <div id="" reel="148110" frame="139" count="23"/>
+    </option>
+    <option value="27_N">
+        Antigonish: Salt Springs
+        <div id="1" reel="148110" frame="162" count="9"/>
+        <div id="2" reel="148110" frame="171" count="5"/>
+    </option>
+    <option value="27_O">
+        Antigonish: St. Josephs
+        <div id="" reel="148110" frame="176" count="30"/>
+    </option>
+    <option value="27_P">
+        Antigonish: Upper South River
+        <div id="" reel="148110" frame="206" count="13"/>
+    </option>
+    <option value="28_A">
+        Cape Breton: Balls Creek
+        <div id="" reel="148110" frame="219" count="26"/>
+    </option>
+    <option value="28_B">
+        Cape Breton: Big Pond
+        <div id="" reel="148110" frame="245" count="11"/>
+    </option>
+    <option value="28_C">
+        Cape Breton: Boisdale
+        <div id="" reel="148110" frame="256" count="20"/>
+    </option>
+</select>

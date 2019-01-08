@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="25">
+    <option value="271">
+        Brock
+    </option>
+    <option value="272">
+        Mara
+    </option>
+    <option value="273">
+        Oshawa Village
+    </option>
+    <option value="274">
+        Pickering
+    </option>
+    <option value="275">
+        Rama
+    </option>
+    <option value="276">
+        Reach
+    </option>
+    <option value="277">
+        Reach
+    </option>
+    <option value="278">
+        Scugog
+    </option>
+    <option value="279">
+        Thora
+    </option>
+    <option value="280">
+        Uxbridge
+    </option>
+    <option value="281">
+        Whitby E.
+    </option>
+    <option value="282">
+        Whitby W.
+    </option>
+    <option value="283">
+        Reach
+    </option>
+</select>

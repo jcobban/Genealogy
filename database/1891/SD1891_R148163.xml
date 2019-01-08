@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148163">
+    <option value="105_A">
+        Oxford South: Burford
+        <div id="5" reel="148163" frame="0" count="23"/>
+        <div id="6" reel="148163" frame="23" count="19"/>
+    </option>
+    <option value="105_B">
+        Oxford South: Ingersoll Town
+        <div id="1" reel="148163" frame="42" count="32"/>
+        <div id="2" reel="148163" frame="74" count="28"/>
+        <div id="3" reel="148163" frame="102" count="27"/>
+    </option>
+    <option value="105_C">
+        Oxford South: Norwich North
+        <div id="1" reel="148163" frame="129" count="12"/>
+        <div id="2" reel="148163" frame="141" count="19"/>
+        <div id="3" reel="148163" frame="160" count="19"/>
+    </option>
+    <option value="105_D">
+        Oxford South: Norwich South
+        <div id="1" reel="148163" frame="179" count="20"/>
+        <div id="2" reel="148163" frame="199" count="24"/>
+        <div id="3" reel="148163" frame="223" count="18"/>
+    </option>
+    <option value="105_E">
+        Oxford South: Norwich Village
+        <div id="" reel="148163" frame="241" count="26"/>
+    </option>
+    <option value="105_F">
+        Oxford South: Oakland
+        <div id="1" reel="148163" frame="267" count="11"/>
+        <div id="2" reel="148163" frame="278" count="8"/>
+    </option>
+    <option value="105_G">
+        Oxford South: Oxford East
+        <div id="1" reel="148163" frame="286" count="14"/>
+        <div id="2" reel="148163" frame="300" count="16"/>
+        <div id="3" reel="148163" frame="316" count="17"/>
+    </option>
+    <option value="105_H">
+        Oxford South: Oxford North
+        <div id="1" reel="148163" frame="333" count="14"/>
+        <div id="2" reel="148163" frame="347" count="13"/>
+        <div id="3" reel="148163" frame="360" count="8"/>
+    </option>
+    <option value="105_I">
+        Oxford South: Oxford West
+        <div id="1" reel="148163" frame="368" count="14"/>
+        <div id="2" reel="148163" frame="382" count="16"/>
+        <div id="3" reel="148163" frame="398" count="17"/>
+    </option>
+    <option value="106_A">
+        Peel: Brampton Town
+        <div id="1" reel="148163" frame="415" count="25"/>
+        <div id="2" reel="148163" frame="440" count="20"/>
+        <div id="3" reel="148163" frame="460" count="23"/>
+    </option>
+    <option value="106_B">
+        Peel: Chinguacousy
+        <div id="1" reel="148163" frame="483" count="17"/>
+        <div id="2" reel="148163" frame="500" count="17"/>
+        <div id="3" reel="148163" frame="517" count="17"/>
+        <div id="4" reel="148163" frame="534" count="17"/>
+        <div id="5" reel="148163" frame="551" count="18"/>
+        <div id="6" reel="148163" frame="569" count="17"/>
+    </option>
+    <option value="106_C">
+        Peel: Streetsville
+        <div id="" reel="148163" frame="586" count="15"/>
+    </option>
+    <option value="106_D">
+        Peel: Toronto Twp
+        <div id="1" reel="148163" frame="601" count="19"/>
+        <div id="2" reel="148163" frame="620" count="19"/>
+        <div id="3" reel="148163" frame="639" count="26"/>
+        <div id="4" reel="148163" frame="665" count="20"/>
+        <div id="5" reel="148163" frame="685" count="22"/>
+        <div id="6" reel="148163" frame="707" count="13"/>
+    </option>
+    <option value="106_E">
+        Peel: Toronto Gore
+        <div id="1" reel="148163" frame="720" count="14"/>
+    </option>
+</select>

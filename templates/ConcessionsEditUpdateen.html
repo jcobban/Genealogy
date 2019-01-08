@@ -1,0 +1,350 @@
+<!--*********************************************************************
+ *  ConcessionsEditUpdateen.html										*
+ *																		*
+ *  Display form for editting information about concessions for			*
+ *  vital statistics records											*
+ *																		*
+ *  History:															*
+ *		2018/10/24		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">
+		Genealogy
+    </a>:
+    <a href="/Canada/CountriesEdit.php?lang=$LANG">
+		List of Supported Countries
+    </a>:
+    <a href="/genCountry.php?cc=$CC&lang=$LANG">
+		$COUNTRYNAME
+    </a>:
+	<a href="/Canada/genProvince.php?Domain=$DOMAIN&lang=$LANG">
+	    $DOMAINNAME
+    </a>:
+	<a href="/Canada/CountiesEdit.php?Domain=$DOMAIN&lang=$LANG">
+	    $DOMAINNAME Counties
+    </a>:
+	<a href="/Canada/TownshipsEdit.php?Domain=$DOMAIN&County=$COUNTY&lang=$LANG">
+	    $COUNTYNAME Townships
+    </a>:
+  </div>
+
+  <div class="body">
+  <h1>
+    $COUNTRYNAME: $DOMAINNAME: County of $COUNTYNAME: $TOWNSHIPNAME:
+    Concession Table
+    <span class='right'>
+	    <a href='ConcessionsEditHelpen.html' target='help'>? Help</a>
+    </span>
+    <div style='clear: both;'></div>
+  </h1>
+    $TRACE
+    $MSG
+  <!--- Put out the response as a table -->
+  <form name='concessionForm'
+	    action='ConcessionsUpdate.php' 
+	    method='post' 
+	    autocomplete='off' 
+	    enctype='multipart/form-data'>
+    <input type='hidden' name='Domain' value='$DOMAIN'>
+    <input type='hidden' name='County' value='$COUNTY'>
+    <input type='hidden' name='Township' value='$TOWNSHIP'>
+    <input type='hidden' name='lang' value='$LANG'>
+    <input type='hidden' name='Debug' value='$DEBUG'>
+    <table class='form' id='dataTbl'>
+      <!--- Put out the column headers -->
+      <thead>
+	    <tr id='hdrRow'>
+		  <th class='colhead'>
+		  ID
+		  </th>
+		  <th class='colhead'>
+		  First Lot 
+		  </th>
+		  <th class='colhead'>
+		  Last Lot 
+		  </th>
+		  <th class='colhead'>
+		  Lot 1 Latitude
+		  </th>
+		  <th class='colhead'>
+		  Lot 1 Longitude
+		  </th>
+		  <th class='colhead'>
+		  Latitude Incr
+		  </th>
+		  <th class='colhead'>
+		  Longitude Incr
+		  </th>
+		  <th class='colhead'>
+		  Plot
+		  </th>
+		  <th class='colhead'>
+		  Add
+		  </th>
+		  <th class='colhead'>
+		  Delete
+		  </th>
+	    </tr>
+	  </thead>
+	  <tbody id='tbody'>
+	    <tr id='Row$LINE'>
+		  <td class='right'>
+		      <input type='text' name='ConID$LINE'
+		  			id='ConID$LINE'
+		  			value='$CONID'
+		  			class='white leftnc' 
+		  			size='28' maxlength='64'>
+		      <input type='hidden' name='OldConID$LINE'
+		  			value='$CONID'>
+		      <input type='hidden' name='Order$LINE'
+		  			id='Order$LINE'
+		  			value='$ORDER'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' name='FirstLot$LINE' 
+		  			id='FirstLot$LINE'
+		  			id='FirstLot$LINE' 
+		  			value='$FIRSTLOT' 
+		  			class='white rightnc'
+		  			size='6' maxlength='6'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' name='LastLot$LINE' 
+		  			id='LastLot$LINE'
+		  			id='LastLot$LINE' 
+		  			value='$LASTLOT' 
+		  			class='white rightnc'
+		  			size='6' maxlength='6'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' name='Latitude$LINE'
+		  			id='Latitude$LINE' 
+		  			value='$LATITUDE' 
+		  			class='white rightnc'
+		  			size='12' maxlength='12'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' name='Longitude$LINE'
+		  			id='Longitude$LINE' 
+		  			value='$LONGITUDE' 
+		  			class='white rightnc'
+		  			size='12' maxlength='12'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' name='LatByLot$LINE' 
+		  			id='LatByLot$LINE' 
+		  			value='$LATBYLOT' 
+		  			class='white rightnc'
+		  			size='12' maxlength='12'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' name='LongByLot$LINE' 
+		  			id='LongByLot$LINE' 
+		  			value='$LONGBYLOT' 
+		  			class='white rightnc'
+		  			size='12' maxlength='12'>
+		  </td>
+		  <td class='center'>
+		      <button type='button' id='Plot$LINE' >
+		  		Plot
+		      </button> 
+		  </td>
+		  <td class='center'>
+		      <button type='button' id='Add$LINE' >
+		  		Add
+		      </button> 
+		  </td>
+		  <td class='center'>
+		      <button type='button' id='Delete$LINE' >
+		  		Delete
+		      </button> 
+		  </td>
+	    </tr>
+      </tbody>
+    </table>
+    <p>
+      <input type="hidden" name="ConID99999" id="ConID99999" value="">
+      <button type='submit' id='Submit'>Update Database</button>
+    </p>
+  </form>
+  </div>
+  <div class='balloon' id='HelpConID'>
+    The identifier of the concession.  This must be unique within the
+    township.  For exanple "con 7".
+  </p>
+  </div>
+  <div class='balloon' id='HelpFirstLot'>
+    The lowest lot number in the concession.
+  </p>
+  </div>
+  <div class='balloon' id='HelpLastLot'>
+    The highest lot number in the concession.
+  </p>
+  </div>
+  <div class='balloon' id='HelpLatitude'>
+    The latitude of the center of the first lot of the concession.
+  </p>
+  </div>
+  <div class='balloon' id='HelpLongitude'>
+    The longitude of the center of the first lot of the concession.
+  </p>
+  </div>
+  <div class='balloon' id='HelpLatByLot'>
+    The change in latitude for each successive lot number.
+  </p>
+  </div>
+  <div class='balloon' id='HelpLongByLot'>
+    The change in longitude for each successive lot number
+  </p>
+  </div>
+  <div class='balloon' id='HelpDelete'>
+    This button is used to delete a concession record from the list.
+  </p>
+  </div>
+  <div class='balloon' id='HelpPlot'>
+    Click on this button to display a Google map which you use to locate the
+    center of lot 1 of the concession.
+  </div>
+  <div class='balloon' id='HelpAdd'>
+    Click on this button to display a dialog for adding 1 or more concessions
+    either
+    before or after the current concession.  Remember that the order of the
+    concession records is significant and does not usually conform to the
+    sort order of the concession identifiers.
+  </div>
+  <div class='balloon' id='HelpSubmit'>
+    Click on this button to update the database to include the changes you
+    have made to the concessions list for the current county.
+  </div>
+  <div class='hidden' id='templates'>
+      <span id="unknownDomain">
+          Unknown domain value '$value'. 
+      </span>
+      <span id="unknownCounty">
+          Unknown county '$county' within domain '$domain'.  
+      </span>
+      <span id="missingCounty">
+          Missing mandatory parameter County.
+      </span>
+      <span id="unknownTownship">
+          Unknown township '$township' within county '$county'.  
+      </span>
+      <span id="missingTownship">
+          Missing mandatory parameter Township.
+      </span>
+    <!-- template for requesting the addition of concessions -->
+    <form name='AddDialog$template' id='AddDialog$template'>
+	  <h2>Add Concessions</h2>
+	  <div class='row' id='positionRow$template'>
+	    <label class='column1' for='Position'>
+		      Position:
+	    </label>
+	    <input type='radio' id='Position$template' name='Position' 
+		  		value='before' checked='checked'>Before
+	    <input type='radio' name='Position$template' value='after'
+		  checked='checked'>After
+	  </div>
+	  <div class='row' id='countRow$template'>
+	    <label class='column1' for='Count'>
+		      Number of Rows:
+	    </label>
+	    <input type='text' id='Count$template' name='Count'
+		  		value='1' class='white rightnc'>
+	  </div>
+	  <p>
+	    <button type='button' id='PerformAdd$template'>
+		  OK
+	    </button>
+	    <input type='hidden' id='Domain$template' name='Domain'
+		  		value='$domain'>
+	    <input type='hidden' id='County$template' name='County'
+		  		value='$county'>
+	    <input type='hidden' id='Township$template' name='Township'
+		  		value='$township'>
+	    <input type='hidden' id='formname$template' name='formname'
+		  		value='$formname'>
+	    <input type='hidden' id='line$template' name='line'
+		  		value='$line'>
+		  &nbsp;
+	    <button type='button' id='cancel$template'>
+		  Cancel
+	    </button>
+	  </p>
+	  </form> <!-- id='AddDialog$template' -->
+	  <table>
+	    <!-- template for adding a new concession -->
+	    <tr id='Row$line'>
+		  <td class='right'>
+		      <input type='text' id='ConID$line' name='ConID$line'
+		  			value='$conid'
+		  			class='ina leftnc' 
+		  			size='28' maxlength='64'>
+		      <input type='hidden' id='OldConID$line' name='OldConID$line'
+		  			value='$conid'>
+		      <input type='hidden' name='Order$line' id='Order$line'
+		  			value='$order'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' id='FirstLot$line' name='FirstLot$line' 
+		  			value='$firstlot' 
+		  			class='ina right'
+		  			size='6' maxlength='6'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' id='LastLot$line' name='LastLot$line' 
+		  			value='$lastlot' 
+		  			class='ina right'
+		  			size='6' maxlength='6'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' id='Latitude$line'  name='Latitude$line' 
+		  			value='$latitude' 
+		  			class='ina right'
+		  			size='12' maxlength='12'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' id='Longitude$line'  name='Longitude$line' 
+		  			value='$longitude' 
+		  			class='ina right'
+		  			size='12' maxlength='12'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' id='LatByLot$line'  name='LatByLot$line' 
+		  			value='$latbylot' 
+		  			class='ina right'
+		  			size='12' maxlength='12'>
+		  </td>
+		  <td class='rightnc'>
+		      <input type='text' id='LongByLot$line'  name='LongByLot$line' 
+		  			value='$longbylot' 
+		  			class='ina right'
+		  			size='12' maxlength='12'>
+		  </td>
+		  <td class='center'>
+		      <button type='button' id='Plot$line'>
+		  		Plot
+		      </button> 
+		  </td>
+		  <td class='center'>
+		      <button type='button' id='Add$line'>
+		  		Add
+		      </button> 
+		  </td>
+		  <td class='center'>
+		      <button type='button' id='Delete$line'>
+		  		Delete
+		      </button> 
+		  </td>
+	    </tr>
+	  </table>
+  </div>
+    <script src="/jscripts/CommonForm.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="ConcessionsEdit.js" type="text/javaScript">
+    </script>

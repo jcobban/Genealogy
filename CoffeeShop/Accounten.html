@@ -1,0 +1,258 @@
+<!--*********************************************************************
+ *  Accounten.html							*
+ *									*
+ *  English language template for the Account management page		*
+ *									*
+ *  History:								*
+ *	2017/11/15	Created						*
+ *	2018/01/04	remove Template from template file names	*
+ *	2018/02/28	add "Generate Password" button			*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+    <a href="/genealogy.php">Genealogy</a>:
+  </div>	
+  <div class="body">
+    <h1 class="clear">Account Management
+      <span class="right">
+	<a href="/Account.php?lang=fr">Français</a>
+	<a href="/AccountHelpen.html" target="help">?&nbsp;Help</a>
+      </span>
+    </h1>
+    $TRACE
+    $MSG
+  <p class="label" id="okmsg">$OKMSG</p>
+  <div id="update">
+    <form action="Account.php"
+	name="accountForm" id="accountForm"
+	method="post"  
+	enctype="multipart/form-data">
+      <p id="useridRow" class="clear">
+	<label class="label" for="userid">
+	  User Identifier:
+	</label>
+	<input type="text" size="32" maxlength="64"
+		class="white leftnc" name="userid" id="userid"
+		autocomplete="off" readonly="readonly"
+		value="$USERID"/>
+      </p>
+      <p id="passRow" class="clear">
+	<label class="label" for="password">
+	  Current Password:
+	</label>
+	<input type="password" size="32" maxlength="64"
+		name="password" id="password"
+		class="white leftnc" autocomplete="off"/>
+	    <span id='passwordPoor' style='color:#e00000; display:none'>
+		Your new password is poor.
+	    </span>
+	    <span id='passwordWeak' style='color:#a89800; display:none'>
+		Your new password is weak.
+	    </span>
+	    <span id='passwordGood' style='color:#60d800; display:none'>
+		Your new password is good.
+	    </span>
+	    <span id='passwordStrong' style='color:#11ff10; display:none'>
+		Your new password is strong.
+	    </span>
+      </p>
+      <p id="newPassRow" class="clear">
+	<label class="label" for="newPassword">
+	  New Password:
+	</label>
+	<input type="password" size="32" maxlength="64" 
+		name="newPassword" id="newPassword" class="white leftnc"
+		autocomplete="off"/>
+	<button type="button" id="generatePassword">
+		Generate Random Password
+	</button>
+	<input type="text" size="32" value=""
+		name="randomPassword" id="randomPassword"
+		class="white leftnc" readonly="readonly">
+      </p>
+      <p id="newPass2Row" class="clear">
+	<label class="label" for="newPassword2">
+	  Repeat New Password:
+	</label>
+	<input type="password" size="32" maxlength="64"
+		name="newPassword2" id="newPassword2" class="white leftnc"
+		autocomplete="off"/>
+      </p>
+      <p id="emailRow" class="clear">
+	<label class="label" for="email">
+	  E-Mail Address:
+	</label>
+	<input type="text" size="64" name="email" id="email"
+		class="white leftnc" autocomplete="off"
+		value="$EMAIL"/>
+      </p>
+      <p id="useEmailRow" class="clear">
+	<label class="label" for="usemail">
+	  Send Notices to E-mail:
+	</label>
+	<input type="checkbox" name="usemail" id="usemail"
+			$chkusemail/>
+      </p>
+      <p id="nopRow" class="clear">
+	<label class="label" for="nohelp">
+	  Suppress Help Popups:
+	</label>
+	<input type="checkbox" name="nohelp" id="nohelp"
+			$chknohelp/>
+      </p>
+
+      <p class="clear">
+	<span class="pad">
+	  <button type="submit" id="Submit"> 
+	    <u>A</u>pply Changes
+	  </button>
+	</span>
+	<span class="pad">
+	  <button type="button" id="Signoff"> 
+	    Sign <u>O</u>ff
+	  </button>
+	</span>
+	<span class="pad">
+	  <button type="button" id="Close">
+	    <u>C</u>lose
+	  </button>
+	</span>
+	<span class="button">
+	  <a href="/ContactAuthor.php?subject=Account Management">
+		Contact Administrator</a>
+	</span>
+	<input type="hidden" name="act" id="act" value="">
+	<input type="hidden" name="debug" id="debug" value="$DEBUG">
+	<input type="hidden" name="lang" id="lang" value="$LANG">
+      </p>
+    </form>
+  </div><!--id="update"-->
+<h2>Messages:</h2>
+  <form name="blogForm">
+    <div id="blog$blid">
+    <p class="label">
+	At $datetime user '$username' 
+	wrote:
+    </p>
+    <p>
+	$text 
+    </p>
+    <p>
+	<!-- Note that any characters that occur between the opening and
+	     closing textarea tags become part of the value of the tag-->
+	<textarea name="message$blid"
+		rows="5" cols="80"></textarea>
+    </p>
+    <p>
+	<button type="button" id="Delete$blid">
+	  Delete Blog
+	</button>
+	&nbsp;
+	<button type="button" id="Reply$blid">
+	  Reply 
+	</button>
+    </p>
+    </div>
+    </form>
+ </div>
+ <div class="balloon" id="Helpuserid">
+<p>
+This read-only field displays the userid identifying the user identifier
+of the current account for which account management functions may be
+performed.
+</p>
+ </div>
+ <div class="balloon" id="Helppassword">
+<p>
+Enter the current password for this account to permit modification of
+the account.  The value of the password is not displayed.
+</p>
+ </div>
+ <div class="balloon" id="HelpnewPassword">
+    <p>
+	If you wish to change the password on this account enter it here.
+	The value of the new password is not displayed.  The password can be
+	up to 64 characters long and can contain any character you can enter.
+    </p>
+ </div>
+ <div class="balloon" id="HelpgeneratePassword">
+    <p>
+	Click on this button to generate a random password constructed from the
+	95 printable ASCII characters including space.
+	The value of this generated password is displayed in the
+	following field from
+	which you can copy it to the New and Repeat New Password fields.
+    </p>
+ </div>
+ <div class="balloon" id="HelprandomPassword">
+    <p>
+	This is where the Generate Password button displays the generated
+	password which you can copy to the New and Repeat New Password fields.
+    </p>
+ </div>
+ <div class="balloon" id="HelpnewPassword2">
+<p>
+If you wish to change the password on this account you must enter it
+twice to avoid possible typing errors which would make the account
+inaccessable.
+The value of the new password is not displayed.
+</p>
+ </div>
+ <div class="balloon" id="Helpemail">
+<p>
+This is the e-mail address associated with the account.  This e-mail address
+is used only for authorization purposes.
+</p>
+ </div>
+ <div class="balloon" id="Helpusemail">
+<p>
+If this is checked then messages will be sent to the associated e-mail
+address regarding changes in the web-site such as new features and capabilities.
+Generally this will be no more frequently than once a month.
+These notices will also be posted to the web-site.
+If you clear this checkbox then the only e-mail you will receive will be the
+one used to verify the existence of your e-mail address.
+</p>
+ </div>
+ <div class="balloon" id="Helpnohelp">
+<p>
+If this option is checked then the feature to pop up element specific
+help if the mouse if held over a button or input field for more than 2
+seconds is turned off.
+</p>
+ </div>
+ <div class="balloon" id="HelpSubmit">
+Clicking on this button with the mouse applies the changes to the account.
+You may also apply the changes by pressing the Enter key while the focus is
+in any input text field in the form, or by pressing the key combinations
+ctrl-S or alt-A.
+ </div>
+ <div class="balloon" id="HelpSignoff">
+Clicking on this button with the mouse signs the current user off
+the application so extended capabilities are disables
+As a short-cut you may also signoff by pressing the
+key combination alt-S.
+ </div>
+ <div class="balloon" id="HelpClose">
+Clicking on this button with the mouse closes the dialog without making
+any changes to the account.
+As a short-cut you may also close the dialog by pressing the
+key combination alt-C.
+ </div>
+<div id="Helpmessage" class="balloon">
+Use this text area to enter a reply to the blog, and then click on the
+Reply button.
+</div>
+<div id="HelpDelete" class="balloon">
+Click on this button to delete the blog.
+</div>
+<div id="HelpReply" class="balloon">
+Click on this button to reply to the blog.
+</div>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="text/javaScript">
+    </script>
+    <script src="/Account.js" type="text/javaScript">
+    </script>

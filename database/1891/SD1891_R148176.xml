@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148176">
+    <option value="121_B">
+        Victoria South: Emily
+        <div id="3" reel="148176" frame="0" count="22"/>
+    </option>
+    <option value="121_C">
+        Victoria South: Lindsay Town
+        <div id="1" reel="148176" frame="22" count="30"/>
+        <div id="2" reel="148176" frame="52" count="42"/>
+        <div id="3" reel="148176" frame="94" count="53"/>
+    </option>
+    <option value="121_D">
+        Victoria South: Mariposa
+        <div id="1" reel="148176" frame="147" count="22"/>
+        <div id="2" reel="148176" frame="169" count="28"/>
+        <div id="3" reel="148176" frame="197" count="24"/>
+        <div id="4" reel="148176" frame="221" count="29"/>
+    </option>
+    <option value="121_E">
+        Victoria South: Omemee Village
+        <div id="" reel="148176" frame="250" count="15"/>
+    </option>
+    <option value="121_F">
+        Victoria South: Ops
+        <div id="1" reel="148176" frame="265" count="16"/>
+        <div id="2" reel="148176" frame="281" count="22"/>
+        <div id="3" reel="148176" frame="303" count="24"/>
+    </option>
+    <option value="121_G">
+        Victoria South: Verulam
+        <div id="1" reel="148176" frame="327" count="29"/>
+        <div id="2" reel="148176" frame="356" count="19"/>
+    </option>
+    <option value="122_A">
+        Waterloo North: Berlin Town
+        <div id="1" reel="148176" frame="375" count="30"/>
+        <div id="2" reel="148176" frame="405" count="25"/>
+        <div id="3" reel="148176" frame="430" count="34"/>
+        <div id="4" reel="148176" frame="464" count="27"/>
+        <div id="5" reel="148176" frame="491" count="39"/>
+    </option>
+    <option value="122_B">
+        Waterloo North: Elmira Village
+        <div id="" reel="148176" frame="530" count="22"/>
+    </option>
+    <option value="122_C">
+        Waterloo North: Waterloo
+        <div id="1" reel="148176" frame="552" count="21"/>
+        <div id="2" reel="148176" frame="573" count="27"/>
+        <div id="3" reel="148176" frame="600" count="25"/>
+    </option>
+    <option value="122_D">
+        Waterloo North: Waterloo Town
+        <div id="1" reel="148176" frame="625" count="32"/>
+        <div id="2" reel="148176" frame="657" count="31"/>
+    </option>
+    <option value="122_E">
+        Waterloo North: Wellesley
+        <div id="1" reel="148176" frame="688" count="19"/>
+        <div id="2" reel="148176" frame="707" count="35"/>
+        <div id="3" reel="148176" frame="742" count="17"/>
+        <div id="4" reel="148176" frame="759" count="25"/>
+        <div id="5" reel="148176" frame="784" count="23"/>
+    </option>
+</select>

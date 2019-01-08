@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>List of Families Help</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="default-style" CONTENT="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+    <script src="jscripts/util.js" language="JavaScript">
+    </script>
+<!--*********************************************************************
+ *  editFamiliesHelpen.html												*
+ *																		*
+ *  Help panel for the editFamilies.php dialog page.					*
+ *																		*
+ *  History:															*
+ *		2010/12/04		created											*
+ *		2011/12/24		add support for more events						*
+ *		2012/01/13		change class names								*
+ *		2014/02/10		remove tables									*
+ *		2015/06/21		update functionality							*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+</head>
+<body>
+<div class="topcrumbs">
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>: 
+	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>: 
+	<a href="/FamilyTree/PersonHelpen.html">Individual Page</a>: 
+	<a href="/FamilyTree/editIndividHelpen.html">Edit Individual</a>: 
+</div>
+<div class="help">
+  <h1>Edit Families Help</h1>
+<p>
+The Edit Families dialog is displayed when you click on the 'Edit' button
+associated with Families on the 
+<a href="/FamilyTree/editIndividHelpen.html">edit individual</a> page.  This appears as
+either <span class="button">Edit <u>F</u>amilies</span> if there are
+already defined relationships for this individual, or as
+<span class="button">Add Spouse or Child</span> if there are no families
+defined yet.
+The Edit Families dialog displays a list of the marriages or relationships
+in which the identified individual is a partner.
+</p>
+<p>For each marriage or relationship the dialog displays:
+<ul>
+  <li>The date, if known, of marriage.  This can be used to order the
+	marriages chronologically.
+  <li>The name of the male partner in the marriage/relationship.
+	This is a hyperlink to the web page of that individual.
+  <li>The name of the female partner in the marriage/relationship.
+	This is a hyperlink to the web page of that individual.
+  <li>A checkbox indicating which of the marriages is preferred, and
+	providing an interface for changing this preference.  Clicking on
+	a preference box that does not have a check in it sets the
+	selected marriage as preferred, and clears the check mark from
+	the old preferred marriage.  Note that the preference is
+	recorded in the individual's record, so it is not written to the
+	database until you click on the 'Update Individual button of the
+	invoking <a href="/FamilyTree/editIndividHelpen.html">edit individual</a> page.
+  <li>A button to display the <a href="#marriage">edit dialog</a>
+	for the specific marriage/relationship.
+	This dialog appears in the same window below the list of marriages.
+  <li>A button to delete the specific marriage/relationship.
+</ul>
+<p>Below the list of families there is a 
+<span class="button"><u>A</u>dd Family</span> button to request adding
+a new marriage or relationship for the current individual.
+<p>There is a <span class="button"><u>O</u>rder Families by Date</span>
+button to reorder the marriages in chronological order of date of
+marriage.  It is recommended that you put some date or range of dates
+in the marriage date field to facilitate ordering,
+and as a hint for searching for documentation of the marriage.
+<h2 id="marriage">Marriage Edit Dialog</h2>
+<p>The dialog for editing details about a specific marriage or relationship
+is displayed in the same window below the list of marriages.
+It is organized into five categories of information:
+  <ul>
+    <li>Information about the male partner, with a blue background.
+    <li>Information about the female partner, with a pink background.
+    <li>Information about events related to the relationship.
+    <li>General information about the relationship.
+    <li>A summary of information about the children of this relationship.
+  </ul>
+<h3>Husband</h3>
+<p>The first row in this section displays the given name and surname 
+of the male partner in the relationship.
+You can alter this information and it will be applied when you click on the
+<span class="button"><u>U</u>pdate Family</span> button.
+Clicking on the 
+<span class="button">Edit Husband</span> button at the end of this row
+opens the standard <a href="/FamilyTree/editIndividHelpen.html">edit individual</a>
+dialog.  This button is disabled if you invoked this dialog from the
+individual page of the male partner.
+<p>The next row displays the surname used by the male partner as a result of
+this marriage. 
+<p>The next row contains three buttons that are used to change the male partner
+in this relationship.
+These buttons are disabled if you invoked this dialog from the
+individual page of the current male partner.
+  <ul>
+    <li>Clicking on <span class="button">Select&nbsp;Existing&nbsp;Husband</span>
+	opens a dialog that permits selecting any male individual in the
+	database as the male partner.
+    <li>Clicking on <span class="button">Create&nbsp;New&nbsp;<u>H</u>usband</span>
+	opens the standard  <a href="/FamilyTree/editIndividHelpen.html">edit individual</a>
+	dialog to permit you to create a new individual as the male partner.
+	If there is already a male partner associated with this marriage then
+	that individual is detached from this marriage.
+    <li>Clicking on <span class="button">Detach&nbsp;Husband</span>
+	detaches the existing male partner from this marriage but does not
+	delete the individual from the database.
+  </ul>
+<h3>Wife</h3>
+<p>The first row of this section displays the given name and surname
+of the female partner in the relationship.
+You can alter this information and it will be applied when you click on the
+<span class="button"><u>U</u>pdate Family</span> button.
+other information about the female partner, click on the 
+Clicking on the 
+<span class="button">Edit&nbsp;Wife</span> button at the end of this row
+opens the standard <a href="/FamilyTree/editIndividHelpen.html">edit individual</a>
+dialog.
+This button is disabled if you invoked this dialog from the
+individual page of the female partner.
+<p>The next row displays the surname used by the female partner as a result of
+this marriage. 
+<p>The next row contains three buttons that are used to change the female
+partner in this relationship.
+These buttons are disabled if you invoked this dialog from the
+individual page of the current female partner.
+  <ul>
+    <li>Clicking on <span class="button">Select Existing Wife</span>
+	opens a dialog that permits selecting any female individual in the
+	database as the female partner. 
+    <li>Clicking on <span class="button">Create New <u>W</u>ife</span>
+	opens the standard <a href="/FamilyTree/editIndividHelpen.html">edit individual</a>
+	dialog to permit you to create a new individual as the female partner.
+	If there is already a female partner associated with this marriage then
+	that individual is detached from this marriage.
+    <li>Clicking on <span class="button">Detach Wife</span>
+	detaches the existing female partner from this marriage but does not
+	delete the individual from the database.
+  </ul>
+<h3>Events</h3>
+<p>This section contains a summary of events associated with this family. 
+This summary includes only the type of event, the date, and the place
+of the event.  You can modify either date and place on this form.  More detailed
+information about the wedding, including source citations and extended
+textual description can be edited by clicking on the
+<span class="button">Details</span> button at the end of this line.
+<p>There are a number of events that can be recorded about a marriage,
+for example the Church of Latter Day Saints sealing, formal engagement,
+divorce, annulment, and whether or not the couple actually got married.  These
+optional facts are summarized in optional lines following the wedding line.
+To see more information about a specific fact, or to add source citations, or 
+modify any details about a fact, click on the
+<span class="button">Details</span> button in the specific line.
+To remove any fact or event completely click on the
+<span class="button">Delete</span> button in the specific line.
+<p>Following the last event is a line containing an
+<span class="button">Add Event</span> button.  Clicking on this button
+opens a <a href="/FamilyTree/editEventHelpen.html">dialog</a> to define a new event.
+This line also includes an
+<span class="button">Order Events by <u>D</u>ate</span> button.
+<h3>General Information</h3>
+    <p>The first line of this section displays the internal record number of
+	the marriage in a read-only field.  This is used for debugging.
+    </p>
+    <p>The next line of the dialog contains a selection list which permits you
+	to specify what the current or ending status of the relationship is.
+    </p>
+    <p>The next line of the dialog contains a selection list which permits you
+	to specify how the married surnames of the partners are assigned.  The
+	default is the traditional western rule that the male partner retains
+	his birth surname while the female partner takes her
+	male partner's surname. 
+	This selection
+	controls how the married surname fields higher up the dialog behave.
+    </p>
+    <p>The next portion of the dialog is a rich-text editor that permits you
+	to enter general information about the relationship. 
+	Do not record anything
+	here that can be more precisely described using other features of this
+	dialog.  In particular do not record any of the information that can be
+	recorded as a marriage related event.  You could, for example, use this
+	space to identify the witnesses to the marriage, and the name of
+	the minister
+	as obtained from the civil marriage registration.
+	Because this is a rich-text editor those names could be inserted as
+	links to the individual pages for those individuals.
+	However if you wish to quote from the marriage notice in a newspaper
+	that quote should be recorded in the source citation text.
+    </p>
+    <p>Below this text editor is a 
+	<span class="button">Details</span> button that opens a dialog 
+	to specify, in particular, source citations for the text.
+    </p>
+    <p>Clicking on <span class="button">Edit <u>P</u>ictures</span>
+	opens a dialog that permits you to associate images with this
+	family.
+    </p>
+<h3>Children</h3>
+    <p>The last major portion of this dialog contains information on the
+	children of this relationship.
+<!--
+    <p>The first line of this section contains a check-box that you can use
+	to indicate that to your certain knowledge this relationship had no
+	children.
+	The <span class="button">Details</span> button at the end of this line
+	permits you to identify the source of this knowledge.
+-->
+	<p>This features a table which displays for each child the
+	name of the child, highlighted in blue for males, in red for females,
+	and green for children for whom the sex is unknown, the
+	date of birth, the date of death, an
+	<span class="button">Edit Child</span> 
+	button that can be used to open an
+	<a href="/FamilyTree/editIndividHelpen.html">edit individual</a> dialog to modify any
+	details about the child, and a <span class="button">Detach Child</span>
+	button to detach (not delete) this child from this family.
+    <p>You can use the Tab key to advance through the input fields for a child,
+	and to set the focus to either of the buttons. 
+	Shift-Tab moves backward through the fields. 
+	Pressing the Enter key in any of the input fields moves
+	the focus down to the given name field of the next child. 
+	If you do this on
+	the last child, an empty child is added to the table, just as if you
+	had clicked on the <span class="button">Add <u>N</u>ew Child</span> 
+	button.  The up and down arrow keys can be used to move within a column.
+    <p>The last line of this section contains an 
+	<span class="button">Add <u>E</u>xisting Child</span> button that
+	opens a dialog to choose an existing individual in the database
+	to add as a child of this family,
+	and an <span class="button">Add <u>N</u>ew Child</span> 
+	button that opens an
+	<a href="/FamilyTree/editIndividHelpen.html">edit individual</a> dialog to create
+	a new individual to be added as a child.
+    <p>Clicking on 
+	<span class="button"><u>O</u>rder Children by Birth Date</span>
+	sorts the children by birth date.  To make use of this feature
+	ensure that you have entered something for the birth date of
+	each child so that even if you do not know the birth date, the
+	children will sort correctly.
+    <p>The bottom line of the dialog contains two buttons:
+    <ul>
+    <li>Clicking on <span class="button"><u>U</u>pdate Family</span>
+	writes all of the changes you have made to the database
+	and hides the dialog.
+    <li>Clicking on <span class="button"><u>C</u>lose</p>
+	closes the dialog without applying any changes to the database.
+    </ul>
+</div>
+<div class="botcrumbs">
+    <span class="right">
+	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+    </span>
+	<a href="/contactAuthor.php?subject=PageHelpen.html" target="_blank">
+		Contact Author</a>
+	<br/>
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>: 
+	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>: 
+	<a href="/FamilyTree/PersonHelpen.html">Individual Page</a>: 
+	<a href="/FamilyTree/editIndividHelpen.html">Edit Individual</a>: 
+    <div style="clear: both;"></div>
+</div>
+</body>
+</html>

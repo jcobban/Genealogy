@@ -1,0 +1,80 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+   <title>Choose Individual: Help</title>
+    <meta http-equiv='content-type' content='text/html; charset=utf-8'>
+    <meta http-equiv='Content-Style-Type' content='text/css'>
+    <meta name='author' content='James A. Cobban'>
+    <meta name='copyright' content='&copy; 2018 James A. Cobban'>
+<!--*********************************************************************
+ *  chooseIndividHelpen.html											*
+ *																		*
+ *  History:															*
+ *		2011/12/30		created											*
+ *		2014/02/10		remove tables									*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='/styles.css'/>
+</head>
+<body>
+<div class='topcrumbs'>
+    <a href='/indexHelpen.html'>Home</a>: 
+    <a href='/genealogyHelpen.html'>Genealogy</a>: 
+    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>: 
+</div>
+<div class='help'>
+<h1>Choose Individual; Help</h1>
+    <p>This page is used to choose an existing individual in the database to
+	be used by the invoking script.  For example this page is used:
+<ul>
+  <li>To specify the individual whose family relationship to an other
+      individual is to be determined.
+  <li>To specify a child to add to a family.
+  <li>To specify a spouse to add to a family.
+</ul>
+    <p>The page displays a selection list of 50 individuals
+displayed in alphabetical order first by surname, and then by given name
+within surname.
+Initially this is the first 50 individuals in the database, starting with
+those for whom no surname is known, or the first 50 individuals
+starting with the individual whose name sorts as close to the
+supplied name.  Subsequently the list updates on the fly as you
+enter more information.
+    </p>
+<img src='InitialNameList.png' alt='Initial list of names'>
+    <p>When you type a surname, or the beginning
+of a surname into the input field the list is updated on the fly whenever you
+stop typing for more than a fraction of a second, to include the first 50
+individuals whose surname, and optionally given name,
+are sort at or immediately after the typed value.
+    </p>
+    <p>Since there are some family names for which there are more than 50 members,
+you can also provide a given name, or prefix thereof, separated from the
+surname by a comma and a space.  For example "Smith, John".
+    </p>
+<img src='JohnSmithNameList.png' alt='list of names starting with John Smith'>
+    <p>Note how the names of the individuals are sorted first by surname,
+then by given name within surname, and then by birth date,
+and finally by death date.
+    </p>
+    <p>Select a specific individual in the list and then click on the
+<span class='button'>Select</span> button to complete the action requested
+by the invoking script.
+    </p>
+</div>
+<div class='botcrumbs'>
+    <span class='right'>
+	<img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+    </span>
+    <a href='/contactAuthor.php?subject=chooseIndividHelpen.html' target='_blank'>
+	Contact Author
+    </a>
+    <br/>
+    <a href='/indexHelpen.html'>Home</a>: 
+    <a href='/genealogyHelpen.html'>Genealogy</a>: 
+    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>: 
+    <div style='clear: both;'></div>
+</div>
+</body>
+</html>

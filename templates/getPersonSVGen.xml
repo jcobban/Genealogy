@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns:dc='http://purl.org/dc/elements/1.1/'
+	xmlns:cc='http://creativecommons.org/ns#'
+	xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+	xmlns:svg='http://www.w3.org/2000/svg'
+	xmlns='http://www.w3.org/2000/svg'
+	xmlns:xlink='http://www.w3.org/1999/xlink'
+	width='$width'
+	height='800'
+	id='svg2'
+	version='1.1' >
+<!--*********************************************************************
+ *  getPersonSVGen.xml							*
+ *									*
+ *  Lay out the information on an individual as an SVG response file so	*
+ *  it can be displayed as a graphic					*
+ *									*
+ *  History:								*
+ *	2018/02/10	created						*
+ *									*
+ *  Copyright &copy; 2017 James Alan Cobban				*
+ **********************************************************************-->
+  <defs id='defs4' />
+  <metadata id='metadata7'>
+    <rdf:RDF>
+      <cc:Work rdf:about=''>
+	<dc:format>image/svg+xml</dc:format>
+	<dc:type
+	   rdf:resource='http://purl.org/dc/dcmitype/StillImage' />
+	<dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g id='layer1'>
+    <text id='text_seqid_1' y='40' x='40' fill='red' font-weight='bold'
+	  style='font-size:18px;font-style:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill-opacity:1;stroke:none;font-family:Sans'
+	  xml:space='preserve'>
+      <tspan y='40' x='50' id='tspan_seqid_2' >
+	$msg
+      </tspan>
+    </text>
+    <text id='text_seqid_3' y='10' x='40' fill='black' font-weight='bold'
+	style='font-size:24px;font-style:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill-opacity:1;stroke:none;font-family:Sans'
+	xml:space='preserve'>
+      <tspan y='25' x='200' id='tspan_seqid_4'>
+Family Tree for $name
+      </tspan>
+    </text>
+    <text id='text_seqid_5' y='40' x='40' fill='blue' font-weight='bold'
+	style='font-size:18px;font-style:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill-opacity:1;stroke:none;font-family:Sans'
+	xml:space='preserve'>
+      <tspan y='60' x='200' id='tspan_seqid_6'>
+	Click on a name to re-center tree.
+      </tspan>
+    </text>
+    $TREE
+    $TRACE
+    <text id='text_seqid_7' y='140' x='200'
+	style='font-size:18px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans'
+	xml:space='preserve'>
+      <tspan y='140' x='200' id='tspan_seqid_8' >
+	Global exception: $eMessage
+      </tspan>
+    </text>
+  </g>
+</svg>

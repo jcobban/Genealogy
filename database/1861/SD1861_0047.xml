@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="47">
+    <option value="484">
+        By Ward
+    </option>
+    <option value="484A">
+        Ottawa Ward
+    </option>
+    <option value="484B">
+        St. George Ward
+    </option>
+    <option value="484C">
+        Wellington Ward
+    </option>
+    <option value="484D">
+        Victoria Ward
+    </option>
+</select>

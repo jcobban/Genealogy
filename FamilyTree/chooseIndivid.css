@@ -1,0 +1,40 @@
+/************************************************************************
+ *  chooseIndivid.css							*
+ *									*
+ *  Stylesheet for the script chooseIndivid.php				*
+ *									*
+ *  History:								*
+ *	2013/12/08	created						*
+ *	2014/03/06	label class name changed to column1		*
+ *	2015/02/04	widen selection					*
+ *									*
+ *  Copyright &copy; 2015 James A. Cobban				*
+ ************************************************************************/
+
+    .clear { 	clear:		both;
+		margin-bottom:	2px; }
+
+    label.column1 {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		float:		left;
+		width:		10em;
+		}
+    select.actleft {font-family:sans-serif;
+		text-align:	left;
+		background-color:white;
+		color:		black;
+		padding:	0px;
+		width:		65em;
+		}
+
+    span.right {float:		right;
+		font-weight:	bold;
+		font-family:	sans-serif;
+		font-size:	12px;
+		width:		100px;
+		padding:	0px 4px 0px 4px;
+		}

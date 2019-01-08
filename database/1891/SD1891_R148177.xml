@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148177">
+    <option value="122_F">
+        Waterloo North: Woolwich
+        <div id="1" reel="148177" frame="0" count="20"/>
+        <div id="2" reel="148177" frame="20" count="17"/>
+        <div id="3" reel="148177" frame="37" count="21"/>
+        <div id="4" reel="148177" frame="58" count="17"/>
+        <div id="5" reel="148177" frame="75" count="20"/>
+        <div id="6" reel="148177" frame="95" count="10"/>
+    </option>
+    <option value="122_A">
+        Waterloo South: Ayr Village
+        <div id="" reel="148177" frame="105" count="22"/>
+    </option>
+    <option value="122_B">
+        Waterloo South: Dumfries North
+        <div id="1" reel="148177" frame="127" count="24"/>
+        <div id="2" reel="148177" frame="151" count="29"/>
+    </option>
+    <option value="122_C">
+        Waterloo South: Galt Town
+        <div id="1" reel="148177" frame="180" count="80"/>
+        <div id="2" reel="148177" frame="260" count="74"/>
+    </option>
+    <option value="122_D">
+        Waterloo South: Hespeler Village
+        <div id="" reel="148177" frame="334" count="31"/>
+    </option>
+    <option value="122_E">
+        Waterloo South: New Hamburg Village
+        <div id="" reel="148177" frame="365" count="28"/>
+    </option>
+    <option value="122_F">
+        Waterloo South: Preston Village
+        <div id="" reel="148177" frame="393" count="39"/>
+    </option>
+    <option value="122_G">
+        Waterloo South: Waterloo South
+        <div id="1" reel="148177" frame="432" count="32"/>
+        <div id="2" reel="148177" frame="464" count="25"/>
+        <div id="3" reel="148177" frame="489" count="24"/>
+    </option>
+    <option value="122_H">
+        Waterloo South: Wilmot
+        <div id="1" reel="148177" frame="513" count="36"/>
+        <div id="2" reel="148177" frame="549" count="43"/>
+        <div id="3" reel="148177" frame="592" count="33"/>
+    </option>
+    <option value="124_A">
+        Welland: Bertie
+        <div id="1" reel="148177" frame="625" count="27"/>
+        <div id="2" reel="148177" frame="652" count="36"/>
+        <div id="3" reel="148177" frame="688" count="28"/>
+    </option>
+    <option value="124_B">
+        Welland: Chippewa Village
+        <div id="" reel="148177" frame="716" count="11"/>
+    </option>
+    <option value="124_C">
+        Welland: Crowland
+        <div id="" reel="148177" frame="727" count="23"/>
+    </option>
+    <option value="124_D">
+        Welland: Fort Erie Village
+        <div id="" reel="148177" frame="750" count="20"/>
+    </option>
+    <option value="124_E">
+        Welland: Humberstone
+        <div id="1" reel="148177" frame="770" count="21"/>
+        <div id="2" reel="148177" frame="0" count="23"/>
+    </option>
+</select>

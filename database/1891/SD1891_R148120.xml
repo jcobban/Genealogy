@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148120">
+    <option value="37_J">
+        Kings: Aylesford South
+        <div id="2" reel="148120" frame="0" count="5"/>
+        <div id="3" reel="148120" frame="5" count="7"/>
+        <div id="4" reel="148120" frame="12" count="14"/>
+    </option>
+    <option value="37_K">
+        Kings: Dalhousie
+        <div id="" reel="148120" frame="26" count="7"/>
+    </option>
+    <option value="37_L">
+        Kings: Aylesford North
+        <div id="1" reel="148120" frame="33" count="17"/>
+        <div id="2" reel="148120" frame="50" count="19"/>
+    </option>
+    <option value="37_M">
+        Kings: Berwick
+        <div id="1" reel="148120" frame="69" count="17"/>
+        <div id="2" reel="148120" frame="86" count="21"/>
+    </option>
+    <option value="37_N">
+        Kings: Harbourville
+        <div id="1" reel="148120" frame="107" count="12"/>
+        <div id="2" reel="148120" frame="119" count="16"/>
+    </option>
+    <option value="38_A">
+        Lunenburg: Bayswater
+        <div id="" reel="148120" frame="135" count="13"/>
+    </option>
+    <option value="38_B">
+        Lunenburg: Blockhouse
+        <div id="1" reel="148120" frame="148" count="17"/>
+        <div id="2" reel="148120" frame="165" count="35"/>
+        <div id="3" reel="148120" frame="200" count="34"/>
+    </option>
+    <option value="38_C">
+        Lunenburg: Bridgewater
+        <div id="1" reel="148120" frame="234" count="25"/>
+        <div id="2" reel="148120" frame="259" count="27"/>
+        <div id="3" reel="148120" frame="286" count="31"/>
+    </option>
+    <option value="38_D">
+        Lunenburg: Chester
+        <div id="1" reel="148120" frame="317" count="29"/>
+        <div id="2" reel="148120" frame="346" count="34"/>
+    </option>
+    <option value="38_E">
+        Lunenburg: Conquerall
+        <div id="" reel="148120" frame="380" count="30"/>
+    </option>
+    <option value="38_F">
+        Lunenburg: Lunenburg
+        <div id="1" reel="148120" frame="410" count="33"/>
+        <div id="2" reel="148120" frame="443" count="37"/>
+        <div id="3" reel="148120" frame="480" count="32"/>
+    </option>
+    <option value="38_G">
+        Lunenburg: Mill Cove
+        <div id="" reel="148120" frame="512" count="13"/>
+    </option>
+    <option value="38_H">
+        Lunenburg: New Germany
+        <div id="1" reel="148120" frame="525" count="20"/>
+        <div id="2" reel="148120" frame="545" count="30"/>
+        <div id="3" reel="148120" frame="575" count="31"/>
+    </option>
+    <option value="38_I">
+        Lunenburg: New Ross
+        <div id="" reel="148120" frame="606" count="24"/>
+    </option>
+    <option value="38_J">
+        Lunenburg: Petite Riviere
+        <div id="1" reel="148120" frame="630" count="23"/>
+        <div id="2" reel="148120" frame="653" count="30"/>
+    </option>
+</select>

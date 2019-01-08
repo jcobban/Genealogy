@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="1">
+    <option value="1">
+        Brantford Town
+    </option>
+    <option value="2">
+        Brantford
+    </option>
+    <option value="3">
+        Burford
+    </option>
+    <option value="4">
+        Dumfries South
+    </option>
+    <option value="5">
+        Oakland
+    </option>
+    <option value="6">
+        Onondaga
+    </option>
+    <option value="7">
+        Paris Town
+    </option>
+    <option value="8">
+        Tuscarora
+    </option>
+</select>

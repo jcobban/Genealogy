@@ -1,0 +1,56 @@
+<!--*********************************************************************
+ *  showLocDiven.html							*
+ *									*
+ *  English language template for building popups in Person.php.	*
+ *									*
+ *  History:								*
+ *	2017/11/13	created						*
+ *									*
+ *  Copyright &copy; 2017 James A. Cobban				*
+ **********************************************************************-->
+  <div id="Individ$idir" class="balloon">
+    <b>$name</b>
+    <p>
+      <span id="deletePers$birthd">born $birthd
+        <span id="deletePers$birthloc">at $birthloc</span>
+      </span>
+      <span id="deletePers$deathd">died $deathd
+        <span id="deletePers$deathloc">$description at $deathloc</span>
+      </span>
+    </p>
+    <p id="families$families">Marriage of $name. </p>
+    <p id="parents$parents">Child of $name</p>
+  </div> 
+
+  <div id="Source$idsr" class="balloon">
+    <b>Source: $title</b>
+    <p>Author: $author</p>
+    <p>Type: $typetext</p>
+    <p id="deleteSource$note">Note: $note</p>
+    <p id="deleteSource$callnumurl">
+      <a href='$callnumurl' target='_blank'>$name</a>
+    </p>
+  </div> 
+
+  <div id="showLocDiv$idlr" class="balloon">
+    <b>$name</b>
+    <p>
+    $notes
+    </p>
+    <form name='locForm$idlr'>
+	<input type="hidden" name="searchName" value="$searchName">
+	<input type="hidden" name="county" value="$county">
+	<input type="hidden" name="Location" value="$location">
+	<input type="hidden" name="Latitude" value="$latitude">
+	<input type="hidden" name="Longitude" value="$longitude">
+	<input type="hidden" name="Zoom" value="$zoom">
+	<input type="hidden" name="Boundary" value="$boundary">
+	<button type="button" id="showMap$idlr" class="button">
+	    Show Map
+	</button>
+	&nbsp;
+	<button type="button" id="editLoc$idlr" class="button">
+	    Edit Location
+	</button>
+    </form>
+  </div>

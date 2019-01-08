@@ -1,0 +1,48 @@
+<div class='hidden' id='templates'>
+    <!-- template for adding a new language -->
+    <table>
+      <tr id='Row$code'>
+	<td class='right'>
+	  <input type='text' name='Code$code' id='Code$code'
+			value='$code'
+			class='white code' 
+			size='2' maxlength='2'>
+	</td>
+	<td class='left'>
+	  <input type='text' name='Name$code' 
+			value='' 
+			class='white left'
+			size='28' maxlength='64'>
+	</td>
+	<td class='left'>
+	    <input type='text' name='NativeName$code' id='NativeName$code'
+			value='$nativename' 
+			class='ina leftnc'
+			readonly="readonly"
+			size='28' maxlength='255'>
+	</td>
+	<td class='left'>
+	    <input type='text' name='Article$code' id='Article$code'
+			value='$article' 
+			class='ina leftnc'
+			readonly="readonly"
+			size='12' maxlength='32'>
+	</td>
+	<td class='left'>
+	    <input type='text' name='Possessive$code' id='Possessive$code'
+			value='$possessive' 
+			class='ina leftnc'
+			readonly="readonly"
+			size='12' maxlength='32'>
+	</td>
+	<td class='center'>
+	  <button type='button'
+			id='Delete$code'
+			disabled='disabled'>
+		    Effacer
+	  </button> 
+	</td>
+      </tr>
+    </table>
+</div> <!-- id='templates' -->
+

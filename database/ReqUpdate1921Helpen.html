@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv=Content-Type content="text/html; charset=utf8">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2011 James A. Cobban">
+    <title>1921 Census Update Help</title>
+<!--*********************************************************************
+ *  History:															*
+ *  	2011/01/22  	created                                         *
+ *      2018/11/08      rename to ...Helpen.html                        *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+</head>
+
+<body>
+<div class="topcrumbs">
+  <table class="fullwidth">
+    <tr>
+      <td>
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/database/genCensusesHelpen.html">Censuses</a>: 
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="help">
+    <h1>1921 Census of Canada: Update: Help</h1>
+<p>This form is used to identify a specific page of the 1921 census of
+Canada to be transcribed, or to update the transcription.
+<p>In 1921 the Dominion of Canada comprised 9 provinces: Nova Scotia,
+New Brunswick, Prince Edward Island, Quebec, Ontario, Manitoba, 
+Saskatchewan, Alberta, and
+British Columbia, plus the North-West Territories and the Yukon
+Territory). 
+<p>The census is divided into enumeration districts.
+Each district generally
+corresponds to a federal electoral district (called a riding in Canada),
+which were very roughly similar in population based upon the preceding
+census.  Each district was uniquely numbered.  For this census the district
+numbers were assigned alphabetically within each province.
+<p>Each enumeration district was subdivided into enumeration divisions,
+identified numerically.  Unlike the previous censuses there was no intermediate
+organizational level between districts and enumeration divisions.  However
+to share the database infrastructure the enumeration divisions are treated
+like sub-districts by this application.
+<p>In a few cases of urban areas some ambitious enumerators signed up to
+collect information from more than one enumeration division.  For some reason
+in the post-census administration these separate collections of data were
+identified as single divisions, even though they sometimes covered 
+parts of multiple wards and the page numbering and family numbering restarted
+for each separate enumeration.  This complicates the incorporation of the
+data into the database infrastructure.  The census clerks in some cases
+renumbered the pages into a single sequence, but they did not renumber the
+families, with the result that there are still multiple fammilies with the
+same family number within a single "division".  I have chosen to reuse the
+division field, which is otherwise unused for this census, to distinguish
+these.  
+<p>Within the enumeration division pages are identified numerically.
+<p>The application requires that you:
+<ol>
+    <li>Optionally identify the province to restrict the displayed list
+	of districts (presented alphabetically by district name).
+    <li>Identify the district by selecting from the displayed list.
+    <li>Select the sub-district from the list displayed once you have
+	selected a district.
+    <li>If the sub-district is divided into multiple divisions
+	to resolve the issue described above, a selection
+	list is presented from which you must select a division.
+    <li>Select the page from the selection list of page numbers that is
+	presented once you have selected the enumeration division.
+</ol>
+<p>Once you have selected the page, click on the "Request Form" button.
+The application displays a 
+<a href="CensusForm1921Helpen.html">data entry form</a>
+that can be updated like a spreadsheet.
+This form matches the layout of the
+original census image.  If the page has already been transcribed this form
+contains the current contents of the transcription.
+<p>Immediately following the "Request Form" button there is a 
+"Progress Display" button.  Click on this to display an
+<a href="CensusUpdateStatusHelpen.html">overview of the transcription status
+</a> of the 1921 census.  This shows the district by district progress of
+the transcription effort.  It also provides an alternate method to identify
+a page to view, transcribe, or update.
+</div>
+<div class="botcrumbs">
+	<a href="/contactAuthor.php?subject=ReqUpdate1921Helpen.html" target="_blank">Contact Author</a>
+	<br/>
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/database/genCensusesHelpen.html">Censuses</a>: 
+    <span class="right">
+	  <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+    </span>
+    <div style="clear: both;"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,965 @@
+  <!--*********************************************************************
+   *  History:								*
+   *	2010/09/24	Use FormMail for request submission		*
+   *	2011/04/01	support keyboard shortcuts			*
+   *			use <button> for buttons			*
+   *			support context specific help			*
+   *	2011/10/24	support mouseover help for signon button	*
+   *	2013/04/05	add Facebook Like button			*
+   *	2013/07/30	defer facebook initialization until after load	*
+   *	2013/12/28	use CSS for layout				*
+   *	2014/09/04	clear style in page footer			*
+   *	2015/05/11	use contactAuthor.php to contact administrator	*
+   *	2015/05/24	top of hierarchy changed to genealogy.php	*
+   **********************************************************************-->
+  <link rel="stylesheet" type="text/css" href="/genServices.css">
+  <div class='body'>
+    <div class='hidden' id='breadcrumbs'>
+      <a href='/genealogy.php'>Genealogy</a>: 
+    </div>
+    <h1>Research Assistance
+      <span class='right'>
+  	<a href='/FamilyTree/genServicesHelpes.html' target='help'>? Help</a>
+      </span>
+    </h1>
+  $MSG
+  $TRACE
+  <p>
+      I provide Genealogical and Family History research services particularly 
+      utilizing the 
+      resources of Library and Archives Canada and the Ontario Archives.  
+  </p>
+  <p>
+      Public archives provide access to information collected by
+      government agencies,
+      such as census records, records of government employment, submissions to
+      government boards, and vital statistics.  This information is considered
+      private for statutory periods generally established such that
+      the individual covered by the material is probably dead.  For example:
+  </p>
+  <ul>
+  <li>Canadian Census records are private for 92 years after the year of the
+      census.
+  <li>Ontario Birth records are private for 95 years after the year of birth.
+  <li>Canadian military personnel records are public for soldiers of World War
+      I, but are still private for soldiers of World War II.
+  </ul>
+  <p>
+      To gain access to private information you must establish that you have
+      legitimate grounds for access.  For example that you are a close living
+      relative of the individual, and that the individual is deceased and
+      therefore cannot grant you access to their private information.
+  </p>
+  <p>Therefore before you can delegate research on your family to a professional
+      genealogist you must either collect the appropriate documentation
+      to satisfy 
+      the privacy criteria of the government agency, or personally trace your
+      ancestry back beyond the privacy cutoff.  The first step is to
+      complete the
+      following family tree, to the best of your ability.  All fields whose
+      label is <b>highlighted in bold</b> should be filled in if possible.  
+      If you do not know
+      the required information, say so.  Even an approximate birth date,
+      such as "about 1905" or "1890s" can help the research,
+      as can an uncertain birthplace
+      such as "Canada or Sweden". 
+      Your e-mail address is required only for sending
+      the results of the research to you.
+  </p>
+  <form action='/cgi-sys/FormMail.pl' method='POST' name='request'>
+    <input type='hidden' name='recipient' 
+		value='webmaster@jamescobban.net'/>
+    <input type='hidden' name='subject'
+		value='Family History Research Request'/>
+      <table class='famTree' cellspacing='0px'>
+	<colgroup id='gen0' class='quarter' span='2'>
+	</colgroup>
+	<colgroup id='gen1' class='quarter' span='2'>
+	</colgroup>
+	<colgroup id='gen2' class='quarter' span='2'>
+	</colgroup>
+	<colgroup id='gen3' class='quarter' span='2'>
+	</colgroup>
+	<tbody>
+	  <tr>
+	    <th colspan='2'>Your Generation	    </th>
+	    <th colspan='2'>Parents	    </th>
+	    <th colspan='2'>Grand-Parents	    </th>
+	    <th colspan='2'>Great-Grand-Parents	    </th>
+	  </tr>
+	  <tr>
+	    <td colspan='6'>
+	    </td>
+	    <td class='top' colspan='2'>Father's Father's Father:
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='6'>
+	    </td>
+	    <td class='midleft'>Name:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fffname'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='6'>
+	    </td>
+	    <td class='midleft'>Birth Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fffbirth'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='5'>
+	    </td>
+	    <td class='nw'>&nbsp;
+	    </td>
+	    <td class='midleft'>Birth Place:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fffbplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='4'>
+	    </td>
+	    <td class='top' colspan='2'>Father's Father:
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fffdeath'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='4'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Name:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='ffname'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='fffdplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='4'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Date:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='ffbirth'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='3'>
+	    </td>
+	    <td class='nw'>&nbsp;
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Place:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='ffbplace'>
+	    </td>
+	    <td class='top' colspan='2'>Father's Father's Mother:
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='3'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='ffdeath'>
+	    </td>
+	    <td class='midleft'>Name:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='ffmname'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='3'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='ffdplace'>
+	    </td>
+	    <td class='midleft'>Birth Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='ffmbirth'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='2'>
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='sw'>&nbsp;
+	    </td>
+	    <td class='midleft'>Birth Place:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='ffmbplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='2'>
+	    </td>
+	    <td class='top' colspan='2'>Father:
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='ffmdeath'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Name:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fname'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='fmfdplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Date:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fbirth'>
+	    </td>
+	    <td colspan='4'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Place:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fbplace'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='top' colspan='2'>Father's Mother's Father:
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='nw'>&nbsp;
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fdeath'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>Name:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmfname'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='fdplace'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>Birth Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmfbirth'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='nw'>&nbsp;
+	    </td>
+	    <td class='midleft'>Birth Place:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmfbplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='top' colspan='2'>Father's Mother:
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmfdeath'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='midleft'>
+	    <b>Name:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmname'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='fmfdplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='sw'>&nbsp;
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Date:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmbirth'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Place:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmbplace'>
+	    </td>
+	    <td class='top' colspan='2'>Father's Mother's Mother:
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmdeath'>
+	    </td>
+	    <td class='midleft'>Name:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmmname'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='fmdplace'>
+	    </td>
+	    <td class='midleft'>Birth Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmmbirth'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='3'>
+	    </td>
+	    <td class='sw'>&nbsp;
+	    </td>
+	    <td class='midleft'>Birth Place:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmmbplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td class='top' colspan='2'>Yourself:
+	    </td>
+	    <td colspan='4'>
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='fmmdeath'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td class='midleft'>
+	    <b>
+	    <b>Name:</b>
+	    </b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='name'>
+	    </td>
+	    <td colspan='4'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='fmfdplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td class='midleft'>
+	    <b>Birth Date:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='birth'>
+	    </td>
+	    <td colspan='6'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td class='midleft'>
+	    <b>Birth Place:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='bplace'>
+	    </td>
+	    <td colspan='4'>
+	    </td>
+	    <td class='top' colspan='2'>Mother's Father's Father:
+	    </td>
+	  </tr>
+	  <tr>
+	    <td class='botleft'>
+	    <b>E-mail address:</b>
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='email'>
+	    </td>
+	    <td colspan='4'>
+	    </td>
+	    <td class='midleft'>Name:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mffname'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='4'>
+	    </td>
+	    <td class='midleft'>Birth Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mffbirth'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='3'>
+	    </td>
+	    <td class='nw'>&nbsp;
+	    </td>
+	    <td class='midleft'>Birth Place:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mffbplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='top' colspan='2'>Mother's Father:
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mffdeath'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Name:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mfname'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='mffdplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Date:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mfbirth'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='nw'>&nbsp;
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Place:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mfbplace'>
+	    </td>
+	    <td class='top' colspan='2'>Mother's Father's Mother:
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mfdeath'>
+	    </td>
+	    <td class='midleft'>Name:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mfmname'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='mfdplace'>
+	    </td>
+	    <td class='midleft'>Birth Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mfmbirth'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='sw'>&nbsp;
+	    </td>
+	    <td class='midleft'>Birth Place:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mfmbplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='top' colspan='2'>Mother:
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mfmdeath'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='midleft'>
+	    <b>Name:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mname'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='mmfdplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='1'>
+	    </td>
+	    <td class='sw'>&nbsp;
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Date:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mbirth'>
+	    </td>
+	    <td colspan='4'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Place:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mbplace'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='top' colspan='2'>Mother's Mother's Father:
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mdeath'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>Name:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmfname'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='2'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='mdplace'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	    <td class='midleft'>Birth Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmfbirth'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='3'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td colspan='1'>
+	    </td>
+	    <td class='nw'>&nbsp;
+	    </td>
+	    <td class='midleft'>Birth Place:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmfbplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='3'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='top' colspan='2'>Mother's Mother:
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmfdeath'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='3'>
+	    </td>
+	    <td class='west'>&nbsp;
+	    </td>
+	    <td class='midleft'>
+	    <b>Name:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmname'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='mmfdplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='3'>
+	    </td>
+	    <td class='sw'>&nbsp;
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Date:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmbirth'>
+	    </td>
+	    <td colspan='2'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='4'>
+	    </td>
+	    <td class='midleft'>
+	    <b>Birth Place:</b>
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmbplace'>
+	    </td>
+	    <td class='top' colspan='2'>Mother's Mother's Mother:
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='4'>
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmdeath'>
+	    </td>
+	    <td class='midleft'>Name:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmmname'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='4'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='mmdplace'>
+	    </td>
+	    <td class='midleft'>Birth Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmmbirth'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='5'>
+	    </td>
+	    <td class='sw'>&nbsp;
+	    </td>
+	    <td class='midleft'>Birth Place:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmmbplace'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='6'>
+	    </td>
+	    <td class='midleft'>Death Date:
+	    </td>
+	    <td class='midright'>
+	      <input type='text' size='30' name='mmmdeath'>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan='6'>
+	    </td>
+	    <td class='botleft'>Death Place:
+	    </td>
+	    <td class='botright'>
+	      <input type='text' size='30' name='mmfdplace'>
+	    </td>
+	  </tr>
+        </tbody>
+      </table>
+    <p>
+      <button type='submit' name='Submit'>
+	    <u>S</u>ubmit Request
+      </button>
+      <button type='reset' name='Reset'>
+	    <u>C</u>lear
+      </button>
+    </p>
+  </form>
+  </div> <!-- class='body' -->
+  <div class='balloon' id='HelpName'>
+      Enter the name of the individual.
+  </div>
+  <div class='balloon' id='HelpBirthDate'>
+    <p>
+      Enter the birth date of the individual to the best of your knowledge.
+      Specifying something, even a range of years is better than nothing.
+  </p>
+  </div>
+  <div class='balloon' id='HelpDeathDate'>
+    <p>
+      Enter the death date of the individual to the best of your knowledge.
+      Leave blank if they individual is not dead.  Enter "Don't Know" if you
+      believe the individual to be dead, but do not know when they died.
+  </p>
+  </div>
+  <div class='balloon' id='HelpBPlace'>
+    <p>
+      Enter the birth place of the individual with as much detail as possible
+      to assist in locating appropriate documentation.
+  </p>
+  </div>
+  <div class='balloon' id='HelpDPlace'>
+    <p>
+      Enter the death place of the individual with as much detail as possible
+      to assist in locating appropriate documentation.
+  </p>
+  </div>
+  <div class='balloon' id='Helpemail'>
+    <p>
+      You must enter your e-mail address so that an administrator can 
+      follow up on your request.
+  </p>
+  </div>
+  <div class='balloon' id='HelpSubmit'>
+    <p>
+      Clicking on this button submits the research request.
+      As an alternative you
+      may also use the keyboard short-cuts Ctrl-S or Alt-S.
+  </p>
+  </div>
+  <div class='balloon' id='HelpReset'>
+    <p>
+      Clicking on this button resets all of the fields on the page to their
+      default values.  As an alternative you
+      may also use the keyboard short-cut Alt-C.
+    </p>
+  </div>
+  <div class='balloon' id='HelprightTop'>
+      Click on this button to signon to access extended features of the web-site
+      or to manage your account with the web-site.
+  </div>

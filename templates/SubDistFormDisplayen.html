@@ -1,0 +1,346 @@
+<!--*********************************************************************
+ *  SubDistFormDisplayen.html						*
+ *									*
+ *  Display form for viewing sub-district information for a district	*
+ *  of a Census of $COUNTRYNAME					*
+ *									*
+ *  History:								*
+ *	2017/09/25	created						*
+ *	2018/01/04	remove Template from template file names	*
+ *	2018/01/10	separate administrator and client templates	*
+ *	2018/05/22	support distinctive style for id, name,		*
+ *			lacreel, ldsreel, and image base columns	*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+<div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">
+		Genealogy</a>: 
+    <a href="/genCountry.php?cc=$CC&lang=$LANG">
+			$COUNTRYNAME</a>:
+    <a href="/database/genCensuses.php?lang=$LANG">
+		Censuses</a>:
+    <a href="/database/EditCensuses.php?lang=$LANG">
+		Censuses Admin</a>:
+    <a href="/database/DistForm.php?Census=$CENSUSID&Province=$PROVINCE&lang=$LANG">
+	$CENSUSID Districts Admin</a>:
+    <a href="/database/ReqUpdateSubDists.php$SEARCH&lang=$LANG">
+	Select New Sub-District</a>:
+</div> <!-- id="breadcrumbs" -->
+<div class="body">
+    <h1>
+    <span class="right">
+	<a href="/database/SubDistFormHelpen.html">? Help</a>
+    </span>
+    Census Administration: $COUNTRYNAME: $CENSUSYEAR Census:
+    SubDistrict Table Display
+    <div style="clear: both;"></div>
+    </h1>
+    $TRACE
+
+  <!--- Put out a line with links to previous and next section of table -->
+  <div class="center" id="linkHdr">
+    <span class="left" id="npPrevFront">
+      <a href="/database/SubDistForm.php$npPrev">&lt;---</a>
+    </span>
+    <span class="right" id="npNextFront">
+      <a href="/database/SubDistForm.php$npNext">---&gt;</a>
+    </span>
+    $CENSUSYEAR Census of $COUNTRYNAME $DNAME
+    ($PROVINCE) ($DISTID)
+    <div style="clear: both;"></div>
+  </div>
+<!--- Put out the response as a table -->
+<form name="censusForm"
+	action="SubDistUpdate.php" 
+	method="post" 
+	autocomplete="off" 
+	enctype="multipart/form-data">
+    <input type="hidden" name="Census" id="Census"
+		value="$CENSUSID">
+    <input type="hidden" name="Province" id="Province" 
+		value="$PROVINCE">
+    <input type="hidden" name="District" id="District" 
+		value="$DISTID">
+    <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
+    <table class="form" id="dataTbl">
+      <thead> <!--- Put out the column headers -->
+	<tr id="hdrRow">
+	  <th class="colhead" id="SD_IdHead">
+	    ID
+	  </th>
+	  <th class="colhead" id="SD_DivHead">
+	    Div
+	  </th>
+	  <th class="colhead" id="SD_NameHead">
+	    Name
+	  </th>
+	  <th class="colhead" id="SD_PagesHead">
+	    Pages
+	  </th>
+	  <th class="colhead" id="SD_PopulationHead">
+	    Population
+	  </th>
+	  <th class="colhead" id="SD_LacReelHead">
+	    LAC Reel
+	  </th>
+	  <th class="colhead" id="SD_LdsReelHead">
+	    LDS Reel
+	  </th>
+	  <th class="colhead" id="SD_ImageBaseHead">
+	    Image Base
+	  </th>
+	  <th class="colhead" id="SD_RelFrameHead">
+	    Rel. Frame
+	  </th>
+	  <th class="colhead" id="SD_FrameCtHead">
+	    F. Count
+	  </th>
+	  <th class="colhead" id="SD_RemarksHead">
+	    Remarks
+	  </th>
+	  <th class="colhead">
+	    Actions
+	  </th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr id="Row$line">
+	  <td class="right">
+	    <!-- fields to identify existing row in database -->
+	    <input type="hidden"
+			name="Orig_Id$line" id="Orig_Id$line"
+	 		value="$id"> 
+	    <input type="hidden"
+			name="Orig_Div$line" id="Orig_Div$line"
+	 		value="$div">
+	    <input type="hidden"
+			name="Orig_Sched$line" id="Orig_Sched$line"
+	 		value="1">
+	    <!-- permit modifying the ID of the existing row -->
+	    <input type="text"
+			name="SD_Id$line" id="SD_Id$line"
+	 		value="$id" readonly="readonly"
+			class="$idclass ina rightfixed" size="3" maxlength="6">
+	  </td>
+	  <td class="right">
+	    <!-- permit modifying the Div of the existing row -->
+	    <input type="text"
+			name="SD_Div$line" id="SD_Div$line"
+	 		value="$div" readonly="readonly"
+			class="black ina rightfixed" size="3" maxlength="4">
+	  </td>
+	  <td class="right">
+	    <input type="text"
+			name="SD_Name$line" id="SD_Name$line"
+	 		value="$name" readonly="readonly"
+			class="$nameclass ina leftnc" size="$nameWidth"
+			maxlength="255">
+	  </td>
+	  <td class="right">
+	    <input type="text"
+			name="SD_Pages$line" id="SD_Pages$line"
+	 		value="$pages" readonly="readonly"
+			class="black ina rightnc" size="4" maxlength="4">
+	  </td>
+	  <td class="right">
+	    <input type="text"
+			name="SD_Population$line" id="SD_Population$line"
+	 		value="$population" readonly="readonly"
+			class="black ina rightnc" size="7" maxlength="8">
+	  </td>
+	  <td class="right">
+	    <input type="text" name="SD_LacReel$line" id="SD_LacReel$line"
+	 		value="$lacreel" readonly="readonly"
+			class="$lacclass ina left" size="7" maxlength="8">
+	  </td>
+	  <td class="right">
+	    <input type="text" name="SD_LdsReel$line" id="SD_LdsReel$line"
+	 		value="$ldsreel" readonly="readonly"
+			class="ldsclass ina rightnc" size="8" maxlength="8">
+	  </td>
+	  <td class="right">
+	    <input type="text"
+			name="SD_ImageBase$line" id="SD_ImageBase$line"
+	 		value="$imagebase" readonly="readonly"
+			class="$baseclass ina rightnc" size="8" maxlength="8">
+	  </td>
+	  <td class="right">
+	    <input type="text"
+			name="SD_RelFrame$line" id="SD_RelFrame$line"
+	 		value="$relframe" readonly="readonly"
+			class="black ina rightnc" size="8" maxlength="8">
+	  </td>
+	  <td class="right">
+	    <input type="text"
+			name="SD_FrameCt$line" id="SD_FrameCt$line"
+	 		value="$framect" readonly="readonly"
+			class="black ina rightnc" size="3" maxlength="4">
+	  </td>
+	  <td class="right">
+	    <input type="text"
+			name="SD_Remarks$line" id="SD_Remarks$line"
+	 		value="$remarks" readonly="readonly"
+			class="black ina leftnc"
+			size="$remarksWidth">
+	  </td>
+	  <td>
+	    <button type="button" class="button"
+			id="Pages$line">
+		  Pages
+	    </button>
+	  </td>
+    <!-- complete the current row and set up for the next -->
+	</tr>
+      </tbody>
+    </table>
+  </form>
+  <!--- Put out a line with links to previous and next section of table -->
+  <div class="center" id="linkFtr">
+    <span class="left" id="npPrevBack">
+      <a href="/database/SubDistForm.php$npPrev">&lt;---</a>
+    </span>
+    <span class="right" id="npNextBack">
+      <a href="/database/SubDistForm.php$npNext">---&gt;</a>
+    </span>
+    $CENSUSYEAR Census of $COUNTRYNAME
+    $DNAME ($PROVINCE) ($DISTID)
+    <div style="clear: both;"></div>
+  </div>
+    $MSG
+  </div> <!-- end of <div id="body"> -->
+<!-- The remainder of the page consists of context specific help text.
+-->
+<div class="balloon" id="HelpSD_Id">
+<p>The sub-district identifier within the district.  For pre-confederation
+censuses, and for the 1906 and 1911 censuses, this is a sequential number
+within the district.  For the 1871 through 1901 censuses it is a letter, 
+combination of letters, or a letter followed by a roman numeral exponent.
+</p>
+<p>This is part of the unique key of the sub-district.  Caution must 
+be taken in changing it to ensure that the combination of sub-district and
+division remains unique within the district.
+</p>
+</div>
+<div class="balloon" id="HelpSD_Div">
+<p>Where the sub-district was too large to be enumerated by a single enumerator
+it was divided into multiple divisions or wards.
+</p>
+<p>This is part of the unique key of the sub-district.  Caution must 
+be taken in changing it to ensure that the combination of sub-district and
+division remains unique within the district.
+</p>
+<p>Note that when you click on the "Add Division" button, the new line has
+this field set to 1 larger than the value of previous row.  The application
+does not check whether this new value is unique.  For example if you add a
+division after division 3 in a sub-district that has 4 divisions the new
+row will specify division 4, even though that division number is already in
+use.  It is your responsibility to resolve this before clicking on the update
+button.
+</p>
+</div>
+<div class="balloon" id="HelpSD_Name">
+<p>The name of the subdistrict.  This does not have to be the same in
+all divisions of the sub-district, although that is normally the case.
+</p>
+</div>
+<div class="balloon" id="HelpSD_Pages">
+<p>The number of pages in the population schedule or schedule of the living.
+This is a decimal number.
+</p>
+</div>
+<div class="balloon" id="HelpSD_Page1">
+<p>
+The first page number in the schedule of the living or population schedule.
+This is a decimal number.
+<p>In most cases this is 1.
+	However in the 1851 and 1861 censuses the pages were not 
+	consistently numbered by the enumerators, and the pages were 
+	subsequently numbered sequentially through the entire sub-district
+	when the original documents were microfilmed (and the originals
+	destroyed!).
+</p>
+</div>
+<div class="balloon" id="HelpSD_ByPage">
+<p>The page increment within the division.  In a few cases when the
+	1851 and 1861 census pages were numbered, during the microfilming
+	process, the technician incremented the page number twice for
+	each leaf of the schedule of the living because information about
+	the individuals was recorded on both the <i>recto</i> and the 
+	</i>verso</i> of
+	each leaf.  In this case the application has to know that only the
+	odd page numbers are used to identify the page[s] containing
+	information on an individual.
+</div>
+<div class="balloon" id="HelpSD_Population">
+<p>
+The total number of individuals enumerated in this division.
+This is a decimal number.
+</p>
+</div>
+<div class="balloon" id="HelpSD_LacReel">
+<p>
+The identifier of the microfilm reel at the 
+Library and Archives of $COUNTRYNAME (LAC).
+</p>
+</div>
+<div class="balloon" id="HelpSD_LdsReel">
+<p>
+The identifier of the microfilm reel in the Family History Library of the
+Church of Latter Day Saints.  This is a decimal number.
+</p>
+</div>
+<div class="balloon" id="HelpSD_ImageBase">
+<p>
+The section identifier in the LAC image database.  This is used in different
+ways in the various censuses.  Sometimes it identifies a directory, sometimes
+it is part of the file name.  This is a decimal number
+</p>
+</div>
+<div class="balloon" id="HelpSD_RelFrame">
+<p>
+The frame number in the LAC image database.  This is a decimal number.
+</p>
+</div>
+<div class="balloon" id="HelpSD_FrameCt">
+<p>
+The number of frames in the LAC image database for the population census of
+this division.  This is a decimal number.
+</p>
+</div>
+<div class="balloon" id="HelpSD_Remarks">
+<p>
+Any comments or remarks about the location.  For example you can use this to
+more precisely describe the geographic area covered by the sub-district.
+</p>
+</div>
+<div class="balloon" id="HelpAdd">
+<p>This button is used to add a new division into the district.  This new
+division has default values filled in to add it to the associated sub-district.
+However once inserted you can alter any fields.  Note that the first two
+columns are part of the unique identifier of the division.  The remainder
+of this unique identifier is displayed in the header above the input form.
+You are responsible for ensuring that the combination of the values of
+the first two columns remains unique within the census district.
+</p>
+</div>
+<div class="balloon" id="HelpDel">
+<p>This button is used to delete the current row from the table.
+</div>
+<div class="balloon" id="HelpPages">
+<p>Click on this button to see the detailed information about all of the
+pages in this enumeration division.
+</div>
+<div class="balloon" id="HelpSubmit">
+<p>Clicking on this button applies the changes to the database.
+You can also apply the changes by using the keyboard shortcuts Ctrl-S and
+Alt-U.
+</div>
+    <script src= '/jscripts/CommonForm.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= '/database/SubDistForm.js' type="text/javascript">
+    </script>

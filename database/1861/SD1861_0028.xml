@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="28">
+    <option value="305">
+        Blanchard
+    </option>
+    <option value="306">
+        Downie
+    </option>
+    <option value="307">
+        Easthope N.
+    </option>
+    <option value="308">
+        Easthope S.
+    </option>
+    <option value="309">
+        Ellice
+    </option>
+    <option value="310">
+        Elma
+    </option>
+    <option value="311">
+        Fullarton
+    </option>
+    <option value="312">
+        Hibbert
+    </option>
+    <option value="313">
+        Logan
+    </option>
+    <option value="314">
+        Mitchell
+    </option>
+    <option value="315">
+        Mornington
+    </option>
+    <option value="316">
+        St. Marýs Village
+    </option>
+    <option value="317">
+        Stratford Town
+    </option>
+    <option value="318">
+        Wallace
+    </option>
+    <option value="318A">
+        Agricultural Census
+    </option>
+</select>

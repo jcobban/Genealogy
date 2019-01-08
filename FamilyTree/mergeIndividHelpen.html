@@ -1,0 +1,178 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+   <title>Merge Individuals: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  ancestorReportHelpen.html                                           *
+ *                                                                      *
+ *  History:															*
+ *		2010/12/26		created											*
+ *		2010/12/26		additional description							*
+ *		2013/01/29		support Do Not Merge Table						*
+ *		2014/02/10		eliminate use of tables for layout				*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+</head>
+<body>
+<div class="topcrumbs">
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>: 
+	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>: 
+	<a href="/FamilyTree/PersonHelpen.html">Individual Page</a>: 
+</div>
+<div class="help">
+<h1>Merge Individuals: Help</h1>
+<p>This page is used to merge two individuals in the family tree.
+Information from the second individual is merged into the first
+individual.  This is a complex process that necessarily results in some
+loss of information, so you will have to examine the final state of the
+merged individual to ensure that your intentions have been carried out.
+</p>
+<p>This functionality is under development and special attention should
+be paid to the results.  To assist this the function generates internal
+trace information into the resulting web page that describes exact what
+changes were made to the database.  If you encounter undesirable results
+please copy the contents of that web page to your reporting e-mail.
+</p>
+<h3>What happens in a merge?</h3>
+<p>There is some information about an individual that is only recorded
+once.  Since there are two copies of this information in the original
+individuals, some information is discarded as a result of the merge.  To
+avoid making the user interface excessively complicated explicit control
+of which version of the information is retained in the final result is
+only provided for a few frequently used fields:
+</p>
+<ul>
+    <li>Surname
+    <li>Given Names
+    <li>Birth Date
+    <li>Birth Location
+    <li>Christening Date
+    <li>Christening Location
+    <li>Death Date
+    <li>Death Location
+    <li>Burial Date
+    <li>Burial Location
+</ul>
+<p>Note that serious confusion would be created if you
+merge two individuals with different genders so the application
+does not permit this.
+<p>For some information for which there is only one copy per
+individual the version in the first individual is retained if there is
+a conflict with the version in the second individual.  However if there
+is no value for a field in the first individual then the value from
+the second is used.  This category of information includes:
+</p>
+<ul>
+    <li>Cremated indicator
+    <li>Addresses associated with birth, christening, death, or burial.
+    <li>Living indicator
+    <li>Everything associated with LDS sacraments baptism, endow,
+	confirm, and initiatory, except textual notes as described later.
+    <li>Everything associated with Family Search
+    <li>Preferred parents selection
+    <li>Preferred spouse selection
+    <li>Ancestor interest level (highest level retained)
+    <li>Descendant interest level (highest level retained)
+    <li>User reference identifier
+    <li>Ancestral file identifier
+    <li>Date and time individual added to database
+    <li>Date and time individual updated is set to now.
+    <li>IntelliShare code
+    <li>Mary Hill ancestor colors
+    <li>DNA
+</ul>
+<p>However for textual information for which there is a single field per
+individual, the two versions are concatenated with a paragraph separation.
+This includes:
+<ul>
+    <li>Name notes
+    <li>Notes associated with birth, christening, death, and burial.
+    <li>General, medical history, and research notes.
+    <li>Cause of death
+    <li>Notes associated with LDS sacraments baptism, endow,
+	confirm, and initiatory.
+</ul>
+<p>All other individual events, marriages, and sets of parents
+are retained, which can lead to duplications that you will need to
+manually clean up.
+</p>
+<p>All source citations are retained, which can lead to duplications.
+</p>
+<p>If the two individuals were children in different families, then
+the merged individual is a child of <b>both</b> families.
+</p>
+<p>The merged individual is a spouse in <b>all</b> families that either
+original individual was a spouse in.  The name of the merged individual is
+adjusted in each of the family records to be consistent with the name you
+selected.
+</p>
+<p>Once all of the information has been merged, the second individual
+is deleted from the family tree.</p>
+<h3>Using the Page</h3>
+<p>You get to the merge page from the
+<a href="/FamilyTree/editIndividHelpen.html">edit individual page</a>.  When first
+displayed this page shows the values of the major fields for the
+selected individual in read-only text fields.
+</p>
+<p>You need to choose the second individual to be merged into the
+first individual.  Since the "Choose Second" button is given the focus
+when the page is first displayed, normally all you have to do is press
+the "Enter" key on the keyboard, however you can also use the mouse to
+click on the button.  This displays a dialog permitting you to choose
+the second individual.  
+Initially this is a list starting with the individuals with the same name.
+Only individuals with the same gender are displayed, since merging
+individuals with different genders is not supported.  This list
+excludes any individuals who have previously been identified as definitely
+not the same individual.
+</p>
+<p>
+When you select an individual from the list the chooser dialog
+closes and values of the major fields for the second individual are
+displayed, which gives you the opportunity to verify that you are
+merging the intended two individuals.  A "details" button is enabled, 
+permitting you to examine the individual in more detail.
+Also at this point the "Merge Individuals" and "Do Not Ever Merge" buttons
+at the top of the page are enabled.
+</p>
+<p>Associated with each pair of values are a pair of check-boxes.  This
+permits you, for these specific fields, to explicitly identify which of the
+two values is to be retained in the merged individual.  Note that although
+only one value can be retained for each field, all citations for each fact
+are retained.
+</p>
+<p>Note that the "Merge Individuals" button is disabled and shown "greyed-out"
+until you choose a second individual.  Once you are satisfied with your
+selections click on this button to perform the merge.
+Of course you must be a designated owner of <b>both</b> individuals in
+order to merge them.
+</p>
+<p>The "Do Not Ever Merge" button is also disabled and shown "greyed-out"
+until you choose a second individual.  Clicking on this button records that
+you are confident that the two selected individuals are distinct.  In future
+you will never be given the option of merging the two.  The page is reset so
+you can click on "Choose Second" to try another individual for merging.
+</p>
+</div>
+<div class="botcrumbs">
+    <span class="right">
+	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+    </span>
+	<a href="/contactAuthor.php?subject=editIndividHelpen.html" target="_blank">Contact Author</a>
+	<br/>
+	<a href="/indexHelpen.html">Home</a>: 
+	<a href="/genealogyHelpen.html">Genealogy</a>: 
+	<a href="/FamilyTree/ServicesHelpen.html">Services</a>: 
+	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>: 
+	<a href="/FamilyTree/PersonHelpen.html">Individual Page</a>: 
+    <div style="clear: both;"></div>
+</div>
+</body>
+</html>

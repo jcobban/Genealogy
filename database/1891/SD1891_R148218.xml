@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148218">
+    <option value="178_M">
+        Québec City: St-Roch South Ward
+        <div id="4" reel="148218" frame="1" count="63"/>
+        <div id="5" reel="148218" frame="64" count="20"/>
+    </option>
+    <option value="179_A">
+        Québec: Ancienne Lorette
+        <div id="1" reel="148218" frame="84" count="28"/>
+        <div id="2" reel="148218" frame="112" count="24"/>
+    </option>
+    <option value="179_B">
+        Québec: Beauport
+        <div id="1" reel="148218" frame="136" count="69"/>
+        <div id="2" reel="148218" frame="205" count="34"/>
+    </option>
+    <option value="179_C">
+        Québec: Charlesbourg
+        <div id="1" reel="148218" frame="239" count="19"/>
+        <div id="2" reel="148218" frame="258" count="29"/>
+    </option>
+    <option value="179_D">
+        Québec: Stoneham &amp; Tewkesbury
+        <div id="1" reel="148218" frame="287" count="11"/>
+        <div id="2" reel="148218" frame="298" count="6"/>
+    </option>
+    <option value="179_E">
+        Québec: St. Ambroise de la jeune Lorette
+        <div id="1" reel="148218" frame="304" count="35"/>
+        <div id="2" reel="148218" frame="339" count="27"/>
+    </option>
+    <option value="179_F">
+        Québec: St. Ambroise
+        <div id="1" reel="148218" frame="366" count="0"/>
+        <div id="2" reel="148218" frame="366" count="20"/>
+    </option>
+    <option value="179_G">
+        Québec: St. Colomb de Sillery
+        <div id="1" reel="148218" frame="386" count="29"/>
+        <div id="2" reel="148218" frame="415" count="30"/>
+    </option>
+    <option value="179_H">
+        Québec: St. Dunstan, Lac Beauport
+        <div id="1" reel="148218" frame="445" count="5"/>
+    </option>
+    <option value="179_I">
+        Québec: St. Félix du Cap Rouge
+        <div id="" reel="148218" frame="450" count="12"/>
+    </option>
+    <option value="179_J">
+        Québec: Ste. Foye
+        <div id="" reel="148218" frame="462" count="22"/>
+    </option>
+    <option value="179_K">
+        Québec: St. Gabriel de Valcartier
+        <div id="" reel="148218" frame="484" count="11"/>
+    </option>
+    <option value="179_L">
+        Québec: St. Gabriel West
+        <div id="" reel="148218" frame="495" count="13"/>
+    </option>
+    <option value="180_A">
+        Richelieu: Sorel City
+        <div id="1" reel="148218" frame="508" count="80"/>
+        <div id="2" reel="148218" frame="588" count="58"/>
+    </option>
+    <option value="180_B">
+        Richelieu: Ste. Anne
+        <div id="" reel="148218" frame="646" count="51"/>
+    </option>
+    <option value="180_C">
+        Richelieu: Ste. Anne de Sorel
+        <div id="" reel="148218" frame="697" count="25"/>
+    </option>
+    <option value="180_D">
+        Richelieu: St. Joseph de Sorel
+        <div id="" reel="148218" frame="722" count="26"/>
+    </option>
+    <option value="180_E">
+        Richelieu: St. Louis de Bonsecours
+        <div id="" reel="148218" frame="748" count="23"/>
+    </option>
+    <option value="180_F">
+        Richelieu: St. Marcel
+        <div id="" reel="148218" frame="771" count="26"/>
+    </option>
+</select>

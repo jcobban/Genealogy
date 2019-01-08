@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="10">
+    <option value="92">
+        Augusta
+    </option>
+    <option value="93">
+        Edwardsburg
+    </option>
+    <option value="94">
+        Gower South
+    </option>
+    <option value="95">
+        Kemptville Village
+    </option>
+    <option value="96">
+        Merrickville Village
+    </option>
+    <option value="97">
+        Oxford Township
+    </option>
+    <option value="98">
+        Prescott Town
+    </option>
+    <option value="99">
+        Wolford
+    </option>
+    <option value="99A">
+        Agricultural Census
+    </option>
+</select>

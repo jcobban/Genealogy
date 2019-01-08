@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148165">
+    <option value="108_D">
+        Perth South: Hibbert
+        <div id="2" reel="148165" frame="0" count="20"/>
+        <div id="3" reel="148165" frame="20" count="18"/>
+    </option>
+    <option value="108_E">
+        Perth South: Mitchell Town
+        <div id="1" reel="148165" frame="38" count="23"/>
+        <div id="2" reel="148165" frame="61" count="21"/>
+    </option>
+    <option value="108_F">
+        Perth South: St. Marys Town
+        <div id="1" reel="148165" frame="82" count="20"/>
+        <div id="2" reel="148165" frame="102" count="20"/>
+        <div id="3" reel="148165" frame="122" count="14"/>
+        <div id="4" reel="148165" frame="136" count="20"/>
+    </option>
+    <option value="108_G">
+        Perth South: Usborne
+        <div id="1" reel="148165" frame="156" count="19"/>
+        <div id="2" reel="148165" frame="175" count="18"/>
+        <div id="3" reel="148165" frame="193" count="20"/>
+    </option>
+    <option value="109_A">
+        Peterborough East: Ashburnham Village
+        <div id="" reel="148165" frame="213" count="34"/>
+    </option>
+    <option value="109_B">
+        Peterborough East: Asphodel
+        <div id="1" reel="148165" frame="247" count="14"/>
+        <div id="2" reel="148165" frame="261" count="11"/>
+        <div id="3" reel="148165" frame="272" count="15"/>
+    </option>
+    <option value="109_C">
+        Peterborough East: Belmont
+        <div id="1" reel="148165" frame="287" count="19"/>
+        <div id="2" reel="148165" frame="306" count="34"/>
+    </option>
+    <option value="109_D">
+        Peterborough East: Burleigh, Astruther, &amp; Chandos
+        <div id="" reel="148165" frame="340" count="32"/>
+    </option>
+    <option value="109_E">
+        Peterborough East: Cardiff
+        <div id="" reel="148165" frame="372" count="13"/>
+    </option>
+    <option value="109_F">
+        Peterborough East: Cavendish
+        <div id="" reel="148165" frame="385" count="3"/>
+    </option>
+    <option value="109_G">
+        Peterborough East: Douro
+        <div id="1" reel="148165" frame="388" count="29"/>
+        <div id="2" reel="148165" frame="417" count="17"/>
+    </option>
+    <option value="109_H">
+        Peterborough East: Dummer
+        <div id="1" reel="148165" frame="434" count="30"/>
+        <div id="2" reel="148165" frame="464" count="16"/>
+    </option>
+    <option value="109_I">
+        Peterborough East: Glamorgan
+        <div id="" reel="148165" frame="480" count="11"/>
+    </option>
+    <option value="109_J">
+        Peterborough East: Harcourt, Dudley, Dysart, Guilford, Harburn, Bruton, Clyde, Eyre, Havelock, Livingstone, Lawrence, Nightingale
+        <div id="" reel="148165" frame="491" count="23"/>
+    </option>
+    <option value="109_K">
+        Peterborough East: Harvey
+        <div id="" reel="148165" frame="514" count="29"/>
+    </option>
+    <option value="109_L">
+        Peterborough East: Lakefield Village
+        <div id="" reel="148165" frame="543" count="23"/>
+    </option>
+    <option value="109_M">
+        Peterborough East: Methuen
+        <div id="" reel="148165" frame="566" count="6"/>
+    </option>
+    <option value="109_N">
+        Peterborough East: Monmouth
+        <div id="" reel="148165" frame="572" count="12"/>
+    </option>
+    <option value="109_O">
+        Peterborough East: Norwood Village
+        <div id="" reel="148165" frame="584" count="21"/>
+    </option>
+    <option value="109_P">
+        Peterborough East: Otonabee
+        <div id="1" reel="148165" frame="605" count="27"/>
+        <div id="2" reel="148165" frame="632" count="22"/>
+        <div id="3" reel="148165" frame="654" count="13"/>
+        <div id="4" reel="148165" frame="667" count="15"/>
+    </option>
+    <option value="110_A">
+        Peterborough West: Ennismore
+        <div id="" reel="148165" frame="682" count="21"/>
+    </option>
+    <option value="110_B">
+        Peterborough West: Monaghan North
+        <div id="1" reel="148165" frame="703" count="12"/>
+        <div id="2" reel="148165" frame="715" count="11"/>
+    </option>
+    <option value="110_C">
+        Peterborough West: Monaghan South
+        <div id="1" reel="148165" frame="726" count="15"/>
+        <div id="2" reel="148165" frame="741" count="12"/>
+    </option>
+    <option value="110_D">
+        Peterborough West: Peterborough Town
+        <div id="1" reel="148165" frame="753" count="32"/>
+        <div id="2" reel="148165" frame="785" count="23"/>
+    </option>
+</select>

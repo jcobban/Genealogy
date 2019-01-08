@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="36">
+    <option value="399">
+        Anson
+    </option>
+    <option value="400">
+        Bexley
+    </option>
+    <option value="401">
+        Carden
+    </option>
+    <option value="402">
+        Dalton
+    </option>
+    <option value="403">
+        Digby
+    </option>
+    <option value="404">
+        Eldon
+    </option>
+    <option value="405">
+        Emily
+    </option>
+    <option value="406">
+        Fenelon
+    </option>
+    <option value="407">
+        Hendon
+    </option>
+    <option value="408">
+        Laxton
+    </option>
+    <option value="409">
+        Lindsay Town
+    </option>
+    <option value="410">
+        Lutterworth
+    </option>
+    <option value="411">
+        Macauley
+    </option>
+    <option value="411A">
+        Draper
+    </option>
+    <option value="412">
+        Mariposa
+    </option>
+    <option value="413">
+        Ops
+    </option>
+    <option value="414">
+        Somerville
+    </option>
+    <option value="415">
+        Verulam
+    </option>
+    <option value="415A">
+        Agricultural Census
+    </option>
+</select>

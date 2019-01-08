@@ -1,0 +1,88 @@
+/**
+ *  QueryDetail.css
+ *
+ *  Stylesheet for the scripts QueryDetailyyyy.php
+ *
+ *  History:
+ *	2013/12/08	created
+ *
+ *  Copyright &copy; 2013 James A. Cobban
+ **/
+
+/*	column containers */
+    div.column1	{float: left;
+		width: 25em;
+		margin-top: 1px;
+		margin-right: 3px;
+		}
+    div.column2	{float: left;
+		margin-top: 1px;
+		margin-right: 3px;
+		}
+    div.column3	{float: left;
+		margin-top: 1px;
+		margin-right: 3px;
+		}
+/*	labels of various widths */
+    label.labelSmall9em {font-family: sans-serif;
+		font-weight: bold;
+		font-size: smaller;
+		text-align: right;
+		vertical-align: top;
+		padding: 0px 3px 0px 3px;
+		margin-top: 1px;
+		float: left;
+		width: 11em;
+		}
+    label.labelSmall6em {font-family: sans-serif;
+		font-weight: bold;
+		font-size: smaller;
+		text-align: right;
+		vertical-align: top;
+		padding: 0px 3px 0px 3px;
+		margin-top: 1px;
+		float: left;
+		width: 6em;
+		}
+
+    input.actleft {font-family: sans-serif;
+		text-align: left;
+		background-color: white;
+		color: black;
+		text-transform: capitalize;
+		padding: 0px;
+		border-top: 1px solid black;
+		border-left: 1px solid black;
+		border-bottom: 1px solid white;
+		border-right: 1px solid white;
+		width: 18em;
+		margin-bottom: 2px;
+		}
+    input.actleftnc {font-family: sans-serif;
+		text-align: left;
+		background-color: white;
+		color: black;
+		padding: 0px;
+		border-top: 1px solid black;
+		border-left: 1px solid black;
+		border-bottom: 1px solid white;
+		border-right: 1px solid white;
+		width: 18em;
+		margin-bottom: 2px;
+		}
+
+    select.actleftwide {font-family: sans-serif;
+		text-align: left;
+		background-color: white;
+		color: black;
+		padding: 0px;
+		width: 18em;
+		margin-bottom: 2px;
+		}
+    select.actleft {font-family: sans-serif;
+		text-align: left;
+		background-color: white;
+		color: black;
+		padding: 0px;
+		margin-bottom: 2px;
+		}

@@ -1,0 +1,67 @@
+<!--*********************************************************************
+ *  MarriageRegUpdatefr.html			  	  						    *
+ *																		*
+ *  Update a marriage record with information supplied from the form	*
+ *  MarriageRegDetail.php												*
+ *																		*
+ *  History:															*
+ *		2018/12/22		created                                         *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+  	  <a href="/index.html">Accueil</a>:
+      <a href="/genealogy.php?lang=fr">
+  		Généalogie
+      </a>:
+      <a href='/Canada/CountriesEdit.php?lang=fr'>
+  	    Liste des Pays Soutenus
+      </a>:
+      <a href="/genCountry.php?cc=$CC&amp;lang=fr">
+  		$COUNTRYNAME
+      </a>:
+      <a href="/Canada/genProvince.php?Domain=$DOMAIN&amp;lang=fr">
+  		$DOMAINNAME
+      </a>:
+    	<a href="MarriageRegQuery.php?domain=$DOMAIN&amp;lang=fr">
+      	Requête de Mariage
+  	</a>:
+  	<a href="MarriageRegStats.php?RegDomain=$DOMAIN&amp;lang=fr">
+      	$DOMAINNAME statut
+  	</a>:
+  	<a href="MarriageRegYearStats.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;lang=fr">
+      	$DOMAINNAME statut $REGYEAR
+      </a>:
+      <span id="countyStats">
+  	    <a href="MarriageRegYearStats.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;County=$REGCOUNTY&amp;lang=fr">
+  	    Statut $REGYEAR $COUNTYNAME
+        </a>:
+      </span>
+      <span id="townshipStats">
+  	    <a href="MarriageRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegCounty=$REGCOUNTY&amp;RegTownship=$REGTOWNSHIP&amp;lang=fr">
+      	Statut $REGYEAR Canton $REGTOWNSHIP
+  	    </a>:
+      </span>
+    </div>
+    <div class='body'>
+      <h1>$DOMAINNAME: Mise à Jour l'Inscription de Mariage $REGYEAR-$REGNUM
+      </h1>
+      $TRACE
+      $MSG
+      <div id="actions">
+        <p class='label'>
+          <a href='MarriageRegResponse.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&RegNum=$REGNUM&Count=20'>
+              Montrer des Inscriptions de Mariage
+          </a>
+        </p>
+        <!-- Short cut to update next registration -->
+        <p class='label'>
+          <a href='MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&RegNum=$NEXTNUM'
+                  id='updNext'>
+            Mise à Jour l'Inscription de Mariage $REGYEAR-$NEXTNUMPADDED 
+          </a>
+        </p>
+      </div> <!-- id="actions"-->
+    </div> <!-- class="body"-->
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="/Ontario/MarriageRegUpdate.js" type="text/javascript"></script>

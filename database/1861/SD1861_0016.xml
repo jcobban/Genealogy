@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="16">
+    <option value="167">
+        Camden &amp; Gore
+    </option>
+    <option value="168">
+        Chatham Town
+    </option>
+    <option value="169">
+        Chatham &amp; Gore
+    </option>
+    <option value="170">
+        Dover
+    </option>
+    <option value="171">
+        Harwich
+    </option>
+    <option value="172">
+        Howard
+    </option>
+    <option value="173">
+        Orford
+    </option>
+    <option value="174">
+        Raleigh
+    </option>
+    <option value="175">
+        Romney
+    </option>
+    <option value="176">
+        Tilbury East
+    </option>
+    <option value="177">
+        Zone
+    </option>
+    <option value="177A">
+        Agricultural Census
+    </option>
+</select>

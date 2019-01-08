@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148156">
+    <option value="93_F">
+        Middlesex West: Mosa
+        <div id="1" reel="148156" frame="0" count="26"/>
+        <div id="2" reel="148156" frame="26" count="26"/>
+    </option>
+    <option value="93_G">
+        Middlesex West: Newbury
+        <div id="" reel="148156" frame="52" count="10"/>
+    </option>
+    <option value="93_H">
+        Middlesex West: Strathroy
+        <div id="1" reel="148156" frame="62" count="20"/>
+        <div id="2" reel="148156" frame="82" count="25"/>
+        <div id="3" reel="148156" frame="107" count="23"/>
+    </option>
+    <option value="93_I">
+        Middlesex West: Wardsville
+        <div id="" reel="148156" frame="130" count="9"/>
+    </option>
+    <option value="94_A">
+        Monck: Canboro
+        <div id="1" reel="148156" frame="139" count="13"/>
+        <div id="2" reel="148156" frame="152" count="12"/>
+    </option>
+    <option value="94_B">
+        Monck: Cayuga South
+        <div id="1" reel="148156" frame="164" count="12"/>
+        <div id="2" reel="148156" frame="176" count="9"/>
+    </option>
+    <option value="94_C">
+        Monck: Dunn
+        <div id="1" reel="148156" frame="185" count="11"/>
+        <div id="2" reel="148156" frame="196" count="11"/>
+    </option>
+    <option value="94_D">
+        Monck: Dunnville Village
+        <div id="1" reel="148156" frame="207" count="16"/>
+        <div id="2" reel="148156" frame="223" count="22"/>
+    </option>
+    <option value="94_E">
+        Monck: Gainsborough
+        <div id="1" reel="148156" frame="245" count="19"/>
+        <div id="2" reel="148156" frame="264" count="19"/>
+        <div id="3" reel="148156" frame="283" count="19"/>
+    </option>
+    <option value="94_F">
+        Monck: Moulton
+        <div id="1" reel="148156" frame="302" count="15"/>
+        <div id="2" reel="148156" frame="317" count="12"/>
+        <div id="3" reel="148156" frame="329" count="15"/>
+    </option>
+    <option value="94_G">
+        Monck: Pelham
+        <div id="1" reel="148156" frame="344" count="19"/>
+        <div id="2" reel="148156" frame="363" count="18"/>
+        <div id="3" reel="148156" frame="381" count="16"/>
+    </option>
+    <option value="94_H">
+        Monck: Sherbrooke
+        <div id="" reel="148156" frame="397" count="10"/>
+    </option>
+    <option value="94_I">
+        Monck: Wainfleet
+        <div id="1" reel="148156" frame="407" count="23"/>
+        <div id="2" reel="148156" frame="430" count="17"/>
+        <div id="3" reel="148156" frame="447" count="22"/>
+    </option>
+    <option value="95_A">
+        Muskoka &amp; Parry Sound: Armour &amp; Ryerson
+        <div id="" reel="148156" frame="469" count="44"/>
+    </option>
+    <option value="95_B">
+        Muskoka &amp; Parry Sound: Baxter, Gibson, &amp; Freeman
+        <div id="" reel="148156" frame="513" count="15"/>
+    </option>
+    <option value="95_C">
+        Muskoka &amp; Parry Sound: Bethune, Perry, &amp; Proudfoot
+        <div id="" reel="148156" frame="528" count="35"/>
+    </option>
+    <option value="95_D">
+        Muskoka &amp; Parry Sound: Blair, Brown, Burton, Shawanaga, Harrison, Walbridge, Mowat, &amp; French River
+        <div id="" reel="148156" frame="563" count="23"/>
+    </option>
+    <option value="95_E">
+        Muskoka &amp; Parry Sound: Brunel &amp; Stephenson
+        <div id="" reel="148156" frame="586" count="38"/>
+    </option>
+    <option value="95_F">
+        Muskoka &amp; Parry Sound: Chapman &amp; Croft
+        <div id="" reel="148156" frame="624" count="27"/>
+    </option>
+    <option value="95_G">
+        Muskoka &amp; Parry Sound: Conger, Cowper, &amp; Foley
+        <div id="" reel="148156" frame="651" count="11"/>
+    </option>
+    <option value="95_H">
+        Muskoka &amp; Parry Sound: Ferguson, Carling, &amp; Burpee
+        <div id="" reel="148156" frame="662" count="11"/>
+    </option>
+    <option value="95_I">
+        Muskoka &amp; Parry Sound: Ferrie, Mills, Hardy, Wilson, McConkey, &amp; McKenzie
+        <div id="" reel="148156" frame="673" count="17"/>
+    </option>
+    <option value="95_J">
+        Muskoka &amp; Parry Sound: Franklin, Sinclair, &amp; Chaffey
+        <div id="" reel="148156" frame="690" count="37"/>
+    </option>
+    <option value="95_K">
+        Muskoka &amp; Parry Sound: Gurd, Pringle, &amp; Patterson
+        <div id="" reel="148156" frame="727" count="18"/>
+    </option>
+    <option value="95_L">
+        Muskoka &amp; Parry Sound: Himsworth North &amp; South, &amp; Nipissing
+        <div id="" reel="148156" frame="745" count="39"/>
+    </option>
+</select>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148223">
+    <option value="187_C">
+        Shefford: Granby
+        <div id="1" reel="148223" frame="0" count="38"/>
+        <div id="2" reel="148223" frame="38" count="22"/>
+    </option>
+    <option value="187_D">
+        Shefford: Granby Village
+        <div id="" reel="148223" frame="60" count="35"/>
+    </option>
+    <option value="187_E">
+        Shefford: Roxton
+        <div id="" reel="148223" frame="95" count="37"/>
+    </option>
+    <option value="187_F">
+        Shefford: Roxton Falls Village
+        <div id="" reel="148223" frame="132" count="19"/>
+    </option>
+    <option value="187_G">
+        Shefford: Shefford
+        <div id="1" reel="148223" frame="151" count="24"/>
+        <div id="2" reel="148223" frame="175" count="21"/>
+        <div id="3" reel="148223" frame="196" count="23"/>
+    </option>
+    <option value="187_H">
+        Shefford: Stukely North
+        <div id="1" reel="148223" frame="219" count="23"/>
+        <div id="2" reel="148223" frame="242" count="22"/>
+    </option>
+    <option value="187_I">
+        Shefford: Stukely South
+        <div id="1" reel="148223" frame="264" count="14"/>
+        <div id="2" reel="148223" frame="278" count="8"/>
+    </option>
+    <option value="187_J">
+        Shefford: Ste. Cécile de Milton
+        <div id="" reel="148223" frame="286" count="31"/>
+    </option>
+    <option value="187_K">
+        Shefford: Ste. Prudentienne
+        <div id="1" reel="148223" frame="317" count="20"/>
+        <div id="2" reel="148223" frame="337" count="20"/>
+    </option>
+    <option value="187_L">
+        Shefford: St. Valérien
+        <div id="" reel="148223" frame="357" count="40"/>
+    </option>
+    <option value="187_M">
+        Shefford: Waterloo Village
+        <div id="" reel="148223" frame="397" count="36"/>
+    </option>
+    <option value="188_A">
+        Sherbrooke: Centre Ward (Sherbooke City)
+        <div id="1" reel="148223" frame="433" count="38"/>
+        <div id="2" reel="148223" frame="471" count="17"/>
+    </option>
+    <option value="188_B">
+        Sherbrooke: East Ward (Sherbrooke City)
+        <div id="1" reel="148223" frame="488" count="28"/>
+        <div id="2" reel="148223" frame="516" count="19"/>
+    </option>
+    <option value="188_C">
+        Sherbrooke: North Ward (Sherbrooke City)
+        <div id="1" reel="148223" frame="535" count="26"/>
+        <div id="2" reel="148223" frame="561" count="24"/>
+    </option>
+    <option value="188_D">
+        Sherbrooke: South Ward (Sherbrooke City)
+        <div id="" reel="148223" frame="585" count="61"/>
+    </option>
+    <option value="188_E">
+        Sherbrooke: Ascott
+        <div id="1" reel="148223" frame="646" count="42"/>
+        <div id="2" reel="148223" frame="688" count="22"/>
+        <div id="3" reel="148223" frame="710" count="18"/>
+    </option>
+    <option value="188_F">
+        Sherbrooke: Lennoxville Village
+        <div id="" reel="148223" frame="728" count="20"/>
+    </option>
+    <option value="188_G">
+        Sherbrooke: Orford
+        <div id="1" reel="148223" frame="748" count="15"/>
+        <div id="2" reel="148223" frame="763" count="10"/>
+    </option>
+    <option value="189_A">
+        Soulanges: Cedars Village
+        <div id="" reel="148223" frame="773" count="6"/>
+    </option>
+    <option value="189_B">
+        Soulanges: Coteau Landing
+        <div id="" reel="148223" frame="779" count="12"/>
+    </option>
+</select>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148121">
+    <option value="38_J">
+        Lunenburg: Petite Riviere
+        <div id="3" reel="148121" frame="0" count="19"/>
+    </option>
+    <option value="38_K">
+        Lunenburg: Pitceys Cove
+        <div id="" reel="148121" frame="19" count="40"/>
+    </option>
+    <option value="38_L">
+        Lunenburg: Summerside
+        <div id="" reel="148121" frame="59" count="32"/>
+    </option>
+    <option value="38_M">
+        Lunenburg: Tancook
+        <div id="" reel="148121" frame="91" count="12"/>
+    </option>
+    <option value="39_A">
+        Pictou: Abercrombie
+        <div id="" reel="148121" frame="103" count="10"/>
+    </option>
+    <option value="39_B">
+        Pictou: Baileys Brook
+        <div id="" reel="148121" frame="113" count="19"/>
+    </option>
+    <option value="39_C">
+        Pictou: Barneys River
+        <div id="" reel="148121" frame="132" count="22"/>
+    </option>
+    <option value="39_D">
+        Pictou: Cape John
+        <div id="" reel="148121" frame="154" count="32"/>
+    </option>
+    <option value="39_E">
+        Pictou: Cariboo East &amp; West
+        <div id="1" reel="148121" frame="186" count="11"/>
+        <div id="2" reel="148121" frame="197" count="13"/>
+    </option>
+    <option value="39_F">
+        Pictou: Dalhousie
+        <div id="" reel="148121" frame="210" count="21"/>
+    </option>
+    <option value="39_G">
+        Pictou: East River
+        <div id="1" reel="148121" frame="231" count="10"/>
+        <div id="2" reel="148121" frame="241" count="15"/>
+    </option>
+    <option value="39_H">
+        Pictou: Frasers Mountain &amp; Churchville
+        <div id="" reel="148121" frame="256" count="30"/>
+    </option>
+    <option value="39_I">
+        Pictou: French River
+        <div id="" reel="148121" frame="286" count="14"/>
+    </option>
+    <option value="39_J">
+        Pictou: Garden of Eden
+        <div id="" reel="148121" frame="300" count="18"/>
+    </option>
+    <option value="39_K">
+        Pictou: Green Hill
+        <div id="" reel="148121" frame="318" count="16"/>
+    </option>
+    <option value="39_L">
+        Pictou: Hardwood Hill
+        <div id="" reel="148121" frame="334" count="20"/>
+    </option>
+    <option value="39_M">
+        Pictou: Hopewell &amp; Lorne
+        <div id="1" reel="148121" frame="354" count="17"/>
+        <div id="2" reel="148121" frame="371" count="18"/>
+    </option>
+    <option value="39_N">
+        Pictou: Little Harbour
+        <div id="" reel="148121" frame="389" count="16"/>
+    </option>
+    <option value="39_O">
+        Pictou: McLellans Mountain
+        <div id="1" reel="148121" frame="405" count="20"/>
+        <div id="2" reel="148121" frame="425" count="17"/>
+    </option>
+    <option value="39_P">
+        Pictou: Merigomish
+        <div id="" reel="148121" frame="442" count="16"/>
+    </option>
+    <option value="39_Q">
+        Pictou: Middle River
+        <div id="" reel="148121" frame="458" count="17"/>
+    </option>
+    <option value="39_R">
+        Pictou: Mill Brook
+        <div id="" reel="148121" frame="475" count="13"/>
+    </option>
+    <option value="39_S">
+        Pictou: Mount Thom
+        <div id="" reel="148121" frame="488" count="20"/>
+    </option>
+    <option value="39_T">
+        Pictou: New Glasgow Town
+        <div id="1" reel="148121" frame="508" count="21"/>
+        <div id="2" reel="148121" frame="529" count="18"/>
+        <div id="3" reel="148121" frame="547" count="28"/>
+        <div id="4" reel="148121" frame="575" count="13"/>
+    </option>
+    <option value="39_U">
+        Pictou: New Lairg
+        <div id="" reel="148121" frame="588" count="10"/>
+    </option>
+    <option value="39_V">
+        Pictou: Pictou Island &amp; Fishers Grant
+        <div id="1" reel="148121" frame="598" count="4"/>
+        <div id="2" reel="148121" frame="602" count="10"/>
+    </option>
+    <option value="39_W">
+        Pictou: Pictou Town
+        <div id="1" reel="148121" frame="612" count="18"/>
+        <div id="2" reel="148121" frame="630" count="13"/>
+        <div id="3" reel="148121" frame="643" count="32"/>
+    </option>
+    <option value="39_X">
+        Pictou: River John
+        <div id="" reel="148121" frame="675" count="26"/>
+    </option>
+</select>

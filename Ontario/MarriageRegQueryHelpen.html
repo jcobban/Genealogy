@@ -1,0 +1,146 @@
+<!doctype html >
+<html>
+<head>
+  <title>Ontario: Marriage Registration Query: Help</title>
+  <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+  <META http-equiv="Content-Style-Type" content="text/css">
+  <meta name="author" content="James A. Cobban">
+  <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+ *	    2011/08/10  	add selection boxes for roles                   *
+ *	    2014/01/03  	replace tables with CSS for layout              *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  <body>
+    <div class="topcrumbs">
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/Canada/genCanadaHelpen.html">Canada</a>:
+      <a href="/Ontario/genOntarioHelpen.html">Ontario</a>:
+    </div>
+    <div class="help">
+      <h1>Marriage Registration Query: Help
+      </h1>
+        <p>The associated panel permits searching the database of Ontario
+    	Marriage Registrations.
+        <p><span class="label">Identification:</span>
+    	Permits searching for marriage registrations by specifying the year 
+    	of registration and the number assigned by the Ontario Registrar 
+    	when the records were indexed starting in the 1950s.  Specifying
+    	the registration year and number limits responses to the records 
+    	with registration number between the specified value, and that number 
+    	plus the value of Count minus one. 
+        <p><span class="label">Count:</span>
+    	Permits specifying the maximum number of matching entries to display
+    	at a time.  The default is 20 at a time. 
+        <p><span class="label">Registration: County:</span>
+    	This selection list is used to limit the response to marriages 
+    	registered in the selected county.
+        <p><span class="label">
+    	Registration: Township:
+          </span>
+    	For some counties this is a selection list of the recognized towns
+    	and townships in the selected county.  For others it is a text entry
+    	field where you may type the name of the township.  If a township
+    	is specified in either way, the response is limited to marriages 
+    	registered in the specified city, town, or township.
+        <p><span class="label">Name: Given:</span>
+    	Specify a value here to limit the response to marriages of 
+    	individuals whose given name matches the specified pattern.
+    	The value is a regular expression.  In particular if a simple string
+    	is given it matches all names that <b>contain</b> the string.  For 
+    	example 'fred' matches 'Frederick', 'Freddie', and 'Alfred',
+    	among other names.  The search is case insensitive.
+        <p><span class="label">Name: Family:</span>
+    	If specified limits the response to marriages of individuals whose
+    	family name matches the specified pattern. The type of search depends 
+    	upon the value specified here and whether the 'Soundex' option is 
+    	selected. In particular if the value is composed of letters of the 
+    	alphabet, the apostrophe ('), and spaces then only names that match 
+    	exactly are included, except if the 'Soundex' option is specified.  
+    	However if the value contains characters that have a special meaning in 
+    	regular expressions then a pattern match it performed.   
+    	For example '.*smith$' matches names that <b>end</b> in 'smith',
+    	including 'Smith'.
+        <p><span class="label">Soundex:</span>
+    	If this option is checked then the Soundex algorithm is used to make 
+    	the surname search based on sound rather than an exact match.
+        <p><span class="label">Roles: Husband:</span>
+    	If this option is checked, then the response will include grooms
+    	who match the other criteria.
+        <p><span class="label">Roles: Wife:</span>
+    	If this option is checked, then the response will include brides
+    	who match the other criteria.
+        <p><span class="label">Roles: Minister:</span>
+    	If this option is checked, then the response will include ministers
+    	who match the other criteria.
+        <p><span class="label">Birth Year:</span>
+    	Specify this to limit the response to individuals whose calculated
+    	year of birth is within 'Range' years of a particular year.
+        <p><span class="label">Range:</span>
+    	Specify this to limit the response to individuals whose calculated
+    	year of birth is within this many years of the specified 'Birth Year'.
+        <p><span class="label">Marriage Place:</span>
+    	If specified limits the response to marriages of individuals whose
+    	marriage place matches the specified pattern.  The value is a 
+    	case-insensitive regular expression.  
+    	In particular if a simple string is given it 
+    	matches all marriage places that <b>contain</b> the string. 
+    	For example specifying 'london' matches all marriage places containing
+    	'london' or 'London'.
+    	As a more sophisticated example 
+    	'm.*x' matches places whose name contains the letter 'm' or 'M' and 
+    	where somewhere later in the place name there is a letter 'x' or 'X',
+    	for example 'Middlesex', 'Msx', and 'Mexico', among others.
+        <p><span class="label">Marriage Date:</span>
+    	If specified limits the response to marriages of individuals whose 
+    	marriage date matches the specified pattern.  The value is a 
+    	regular expression.  In particular if a simple string is given it 
+    	matches all dates that <b>contain</b> the string.  For example
+    	specifying '1882' will match all dates in 1882.
+    	Specifying 'Mar' matches all marriages taking place in March.
+    	Specifying 'Mar.*1882' matches all marriages in March of 1882.
+        <p><span class="label">Father: Name:</span>
+    	If specified limits the response to marriages of individuals whose 
+    	Father's name matches the specified pattern.
+    	The value is a regular expression.  In particular if a simple string is
+    	given it matches all names that <b>contain</b> the string.
+    	As a suggestion, since the surname of the party to the marriage is
+    	generally the same as the father's surname, it is more efficient to
+    	only specify the father's given name here.  For example to find 
+    	marriages of the children of 'John Smith' specify 'smith' in the
+    	individual's family name field, and 'john' in this field.
+        <p><span class="label">Mother: Name:</span>
+    	If specified limits the response to marriages of individuals whose 
+    	Mother's name matches the specified pattern.
+    	The value is a regular expression.  In particular if a simple string is
+    	given it matches all names that <b>contain</b> the string.
+    	As a suggestion: to find the marriages of all children of 'John &amp; 
+    	Mary Smith' specify 'smith' in the individual family name field, 'john'
+    	in the father's name field, and 'mary' in the mother's name field.
+        <p><span class="button">Query</span>
+    	Clicking on this button performs the query.  This may also be requested 
+    	by pressing the Enter key while the input focus is in a text field.
+        <p><span class="button">Clear Form</span>
+    	Clicking on this button resets the input fields to their default values.
+        <p><span class="button">Status</span>
+    	Clicking on this button displays a 
+    	<a href="/Ontario/MarriageRegStatsHelpen.html">
+    	    report on the overall progress of the transcription effort.
+    	</a>
+    </div>
+    <div class="botcrumbs">
+      <a href="/contactAuthor.php?subject=MarriageRegQueryHelpen.html" target="_blank">Contact Author</a>
+      <br/>
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/Canada/genCanadaHelpen.html">Canada</a>:
+      <a href="/Ontario/genOntarioHelpen.html">Ontario</a>:
+      <span class="right">
+        <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+      </span>
+    </div>
+  </body>
+</html>

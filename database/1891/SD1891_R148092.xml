@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148092">
+    <option value="1_A">
+        Cariboo: Alexandria
+        <div id="" reel="148092" frame="0" count="14"/>
+    </option>
+    <option value="1_B">
+        Cariboo: Alkali Lake
+        <div id="" reel="148092" frame="14" count="12"/>
+    </option>
+    <option value="1_C">
+        Cariboo: Big Bar
+        <div id="" reel="148092" frame="26" count="6"/>
+    </option>
+    <option value="1_D">
+        Cariboo: Clinton
+        <div id="" reel="148092" frame="32" count="10"/>
+    </option>
+    <option value="1_E">
+        Cariboo: Keithley Creek
+        <div id="1" reel="148092" frame="42" count="7"/>
+        <div id="2" reel="148092" frame="49" count="14"/>
+    </option>
+    <option value="1_F">
+        Cariboo: Lac La Hache
+        <div id="" reel="148092" frame="63" count="5"/>
+    </option>
+    <option value="1_G">
+        Cariboo: Lightning Creek
+        <div id="" reel="148092" frame="68" count="3"/>
+    </option>
+    <option value="1_H">
+        Cariboo: Lillooet
+        <div id="" reel="148092" frame="71" count="23"/>
+    </option>
+    <option value="1_I">
+        Cariboo: Quesnelle
+        <div id="" reel="148092" frame="94" count="15"/>
+    </option>
+    <option value="1_J">
+        Cariboo: Richfield
+        <div id="" reel="148092" frame="109" count="8"/>
+    </option>
+    <option value="1_K">
+        Cariboo: Williams Lake
+        <div id="" reel="148092" frame="117" count="9"/>
+    </option>
+    <option value="2_A">
+        New Westminster: New Westminster
+        <div id="1" reel="148092" frame="126" count="31"/>
+        <div id="2" reel="148092" frame="157" count="14"/>
+        <div id="3" reel="148092" frame="171" count="23"/>
+        <div id="4" reel="148092" frame="194" count="16"/>
+        <div id="5" reel="148092" frame="210" count="12"/>
+        <div id="6" reel="148092" frame="222" count="17"/>
+        <div id="7" reel="148092" frame="239" count="35"/>
+        <div id="8" reel="148092" frame="274" count="19"/>
+        <div id="9" reel="148092" frame="293" count="27"/>
+        <div id="10" reel="148092" frame="320" count="25"/>
+        <div id="11" reel="148092" frame="345" count="27"/>
+        <div id="12" reel="148092" frame="372" count="33"/>
+        <div id="13" reel="148092" frame="405" count="5"/>
+        <div id="14" reel="148092" frame="410" count="11"/>
+        <div id="15" reel="148092" frame="421" count="93"/>
+        <div id="16" reel="148092" frame="514" count="18"/>
+        <div id="17" reel="148092" frame="532" count="14"/>
+        <div id="18" reel="148092" frame="546" count="37"/>
+    </option>
+    <option value="2_B">
+        New Westminster: New Westminster City
+        <div id="1" reel="148092" frame="583" count="24"/>
+        <div id="2" reel="148092" frame="607" count="28"/>
+        <div id="3" reel="148092" frame="635" count="18"/>
+        <div id="4" reel="148092" frame="653" count="12"/>
+        <div id="5" reel="148092" frame="665" count="16"/>
+        <div id="6" reel="148092" frame="681" count="23"/>
+        <div id="7" reel="148092" frame="704" count="21"/>
+    </option>
+</select>

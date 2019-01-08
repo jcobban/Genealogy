@@ -1,0 +1,66 @@
+<!--*********************************************************************
+ *  ConcessionsUpdateen.html											*
+ *																		*
+ *  Display the results of an update to the Concessions table for       *
+ *  a township.                                                         *
+ *																		*
+ *  History:															*
+ *		2018/10/25		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">
+		Genealogy
+    </a>:
+    <a href="/Canada/CountriesEdit.php?lang=$LANG">
+		List of Supported Countries
+    </a>:
+    <a href="/genCountry.php?cc=$CC&lang=$LANG">
+		$COUNTRYNAME
+    </a>:
+	<a href="/Canada/genProvince.php?Domain=$DOMAIN&lang=$LANG">
+	    $DOMAINNAME
+    </a>:
+	<a href="/Canada/CountiesEdit.php?Domain=$DOMAIN&lang=$LANG">
+	    $DOMAINNAME Counties
+    </a>:
+	<a href="/Canada/TownshipsEdit.php?Domain=$DOMAIN&County=$COUNTY&lang=$LANG">
+	    $COUNTYNAME Townships
+    </a>:
+	<a href="/Canada/ConcessionsEdit.php?Domain=$DOMAIN&County=$COUNTY&Township=$TOWNSHIP&lang=$LANG">
+	    $TOWNSHIPNAME Township
+    </a>:
+  </div>
+  <div class='body'>
+    <h1>
+        $COUNTRYNAME: $DOMAINNAME: County of $COUNTYNAME: $TOWNSHIPNAME:
+        Concession Table Update
+      <span class='right'>
+		<a href='ConcessionsUpdateHelpen.html' target='help'>? Help</a>
+      </span>
+      <div style='clear: both;'></div>
+    </h1>
+    $TRACE
+    $MSG
+    <p class='message'>
+		You are not authorized.
+		<a href='/Signon.php' target='_blank'>
+		<span class='button'>Sign on</span></a>
+		to update the database.
+    </p>
+    $DATA
+    <div id="templates" class="hidden">
+	  <p id="changed">Changed concession "$CONID"</p>
+	  <p id="added">Added concession "$CONID"</p>
+	  <p id="deleted">Deleted concession "$CONID"</p>
+
+	  <p id="count0">Updated No concessions.</p>
+	  <p id="count1">Updated 1 concession.</p>
+	  <p id="countmany">Updated $CHANGECOUNT concessions.</p>
+    </div><!-- id="templates"-->
+  </div><!-- class="body"-->
+    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="/jscripts/default.js" type="text/javascript"></script>

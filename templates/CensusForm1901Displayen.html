@@ -1,0 +1,651 @@
+<!--*********************************************************************
+ *  CensusForm1901Updateen.html						*
+ *									*
+ *  Edit a page from the 1901 census of Canada				*
+ *									*
+ *  History:								*
+ *	2018/01/11	created						*
+ *	2018/02/27	remove province display				*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+    <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>:
+    <a href="/database/QueryDetail.php?Census=CA1901&Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&lang=$LANG">
+	1901 Census Search
+    </a>: 
+    <a href="/database/ReqUpdate.php?Census=CA1901$SEARCH&lang=$LANG">
+	1901 Census Select Page
+    </a>:
+    <a href="/database/CensusUpdateStatus.php?Census=CA1901&lang=$LANG">
+	Summary
+    </a>:
+    <a href="/database/CensusUpdateStatusDist.php?Census=CA1901&amp;Province=$PROVINCE&amp;District=$DISTRICT&lang=$LANG">
+	    District $DISTRICT $DISTRICTNAME Summary
+    </a>:
+    <a href="/database/CensusUpdateStatusDetails.php?Census=CA1901&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&lang=$LANG">
+	Division Details
+    </a>:	
+  </div>
+  <div id="transcription" style="overflow: auto; overflow-x: scroll">
+    <div class="body">
+      <h1>
+	  1901 Census of Canada Update
+	<span class="right">
+	  <a href="/database/CensusForm1901Helpen.html" target="help">? Help</a>
+	</span>
+	<div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <!--- Put out a line with links to previous and next section of table -->
+      <div class="center" id="frontPager">
+	<span class="left" id="npPrevFront">
+	    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
+		&lt;---
+	    </a>
+	</span>
+	<span class="right" id="npNextFront">
+	    <a href="/database/CensusForm.php$npNext" id="prenpnext">
+		---&gt;
+	    </a>
+	</span>
+	    dist $DISTRICT $DISTRICTNAME,
+	    subdist $SUBDISTRICT $SUBDISTRICTNAME,
+	    <span id="frontDiv">div $DIVISION </span>
+	    page $PAGE
+	</span>
+      </div> <!-- id="frontPager"-->
+    
+      <!--- Put out the response as a table -->
+      <form name="censusForm" id="censusForm"
+	    action="CensusUpdate.php" 
+	    method="post"  
+	    autocomplete="off" 
+	    enctype="multipart/form-data">
+	<p class="label" id="TranscriberLine">
+	    Transcriber: $TRANSCRIBER 
+	</p>
+	<p class="label" id="ProofreaderLine">
+	    Proof Reader: $PROOFREADER 
+	</p>
+	<p class="label" id="imageLine">
+	    <span id="ImageButton">
+	    <button type="button" id="imageButton">
+		Display Original Census <u>I</u>mage
+	    </button>
+	    <input type="hidden" name="Image" id="Image"
+		value="$IMAGE"> readonly="readonly"
+	    </span> <!-- id="ImageButton" -->
+	      &nbsp;
+	    <button type="button" id="showImportant">
+		Show Important
+	    </button>
+	</p>
+	
+	<div class="hidden" id="hidden">
+	  <input type="hidden" name="Census" value="$CENSUSID"> readonly="readonly"
+	  <input type="hidden" name="Province" value="$PROVINCE"> readonly="readonly"
+	  <input type="hidden" name="District" value="$DISTRICT"> readonly="readonly"
+	  <input type="hidden" name="SubDistrict" value="$SUBDISTRICT"> readonly="readonly"
+	  <input type="hidden" name="Division" value="$DIVISION"> readonly="readonly"
+	  <input type="hidden" name="Page" value="$PAGE"> readonly="readonly"
+	  <input type="hidden" name="Rows" value="$ROWS"> readonly="readonly"
+	  <input type="hidden" name="Debug" value="$DEBUG"> readonly="readonly"
+	</div>
+	<table class="form" id="form" >
+	  <thead>
+	    <!--- Put out the column headers -->
+	    <tr>
+	      <th class="colhead1st">
+	      Line
+	      </th>
+	      <th class="colhead">
+	      Fam
+	      </th>
+	      <th class="colhead">
+	      Surname
+	      </th>
+	      <th class="colhead">
+	      Given Names
+	      </th>
+	      <th class="colhead">
+	      Sex
+	      </th>
+	      <th class="colhead">
+	      Race
+	      </th>
+	      <th class="colhead">
+	      Relation
+	      </th>
+	      <th class="colhead">
+	      MSt
+	      </th>
+	      <th class="colhead">
+	      BDate
+	      </th>
+	      <th class="colhead">
+	      BYear
+	      </th>
+	      <th class="colhead">
+	      Age
+	      </th>
+	      <th class="colhead">
+	      Birth Place
+	      </th>
+	      <th class="colhead">
+	      u/r
+	      </th>
+	      <th class="colhead">
+	      Line
+	      </th>
+	      <th class="colhead">
+	      ImmYr
+	      </th>
+	      <th class="colhead">
+	      NatYr
+	      </th>
+	      <th class="colhead">
+	      Origin
+	      </th>
+	      <th class="colhead">
+	      Nationality
+	      </th>
+	      <th class="colhead">
+	      Religion
+	      </th>
+	      <th class="colhead">
+	      Occupation
+	      </th>
+	      <th class="colhead">
+		Line
+	      </th>
+	      <th class="colhead">
+		Own Means
+	      </th>
+	      <th class="colhead">
+		Employ er
+	      </th>
+	      <th class="colhead">
+		Employ ee
+	      </th>
+	      <th class="colhead">
+		Own Acct
+	      </th>
+	      <th class="colhead">
+		Fact Home
+	      </th>
+	      <th class="colhead">
+		Months Fact
+	      </th>
+	      <th class="colhead">
+		Months Home
+	      </th>
+	      <th class="colhead">
+		Months Other
+	      </th>
+	      <th class="colhead">
+		Income Emp
+	      </th>
+	      <th class="colhead">
+		Income Oth
+	      </th>
+	      <th class="colhead">
+		Months School
+	      </th>
+	      <th class="colhead">
+		Can Read
+	      </th>
+	      <th class="colhead">
+		Can Write
+	      </th>
+	      <th class="colhead">
+		Spk English
+	      </th>
+	      <th class="colhead">
+		Spk French
+	      </th>
+	      <th class="colhead">
+		Mother Tongue
+	      </th>
+	      <th class="colhead">
+		Infirmities
+	      </th>
+	      <th class="colhead">
+		Line
+	      </th>
+	      <th class="colhead">
+		Address
+	      </th>
+	      <th class="colhead">
+		Remarks
+	      </th>
+	      <th class="colhead">
+		FT
+	      </th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <tr id="Row$line">
+	      <th class="$cellclass left">
+		  $line 
+	      </th>
+	      <td class="$cellclass right">
+		<input type="text" name="Family$line" 
+			value="$family" readonly="readonly"
+			class="$famclass white right"
+			size="3" maxlength="4">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="Surname$line"
+			value="$surname" readonly="readonly"
+			class="$surclass white leftnc"
+			size="14" maxlength="120">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="GivenNames$line"
+			value="$givennames" readonly="readonly"
+			class="black white left" 
+			size="18" maxlength="120">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="Sex$line"
+			value="$sex"  readonly="readonly"
+			class="black white center"
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="Race$line"
+			value="$race"  readonly="readonly"
+			class="black white center"
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="Relation$line"
+			value="$relation"  readonly="readonly"
+			class="black white left"
+			size="8" maxlength="32">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="MStat$line"
+			value="$mstat" readonly="readonly"
+			class="black white center" 
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="BDate$line"
+			value="$bdate" readonly="readonly"
+			class="black white left" 
+			size="6" maxlength="8">
+	      </td>
+	      <td class="$cellclass right">
+		<input type="text" name="BYearTxt$line"
+			value="$byeartxt" readonly="readonly"
+			class="black white rightnc" 
+			size="4" maxlength="8">
+	      </td>
+	      <td class="$cellclass right">
+		<input type="text" name="Age$line"
+			value="$age" readonly="readonly"
+			class="black white rightnc" 
+			size="3" maxlength="8">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="BPlace$line"
+			value="$bplace" readonly="readonly"
+			class="black white left" 
+			size="14" maxlength="32">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="BPlaceRu$line"
+			value="$bplaceru" readonly="readonly"
+			class="black white centernc" 
+			size="1" maxlength="1">
+	      </td>
+	      <th class="$cellclass left">
+		  $line 
+	      </th>
+	      <td class="$cellclass right">
+		<input type="text" name="ImmYear$line"
+			value="$immyear" readonly="readonly"
+			class="black white rightnc" 
+			size="4" maxlength="6">
+	      </td>
+	      <td class="$cellclass right">
+		<input type="text" name="NatYear$line"
+			value="$natyear" readonly="readonly"
+			class="black white rightnc" 
+			size="4" maxlength="6">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="Origin$line"
+			value="$origin" readonly="readonly"
+			class="$orgclass white left"
+			size="12" maxlength="16">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="Nationality$line"
+			value="$nationality" readonly="readonly"
+			class="$natclass white left"
+			size="12" maxlength="16">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="Religion$line"
+			value="$religion" readonly="readonly"
+			class="$relclass white leftnc"
+			size="12" maxlength="32">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="Occupation$line"
+			value="$occupation" readonly="readonly"
+			class="black white leftnc" 
+			size="18" maxlength="48">
+	      </td>
+	      <th class="$cellclass left">
+		  $line 
+	      </th>
+	      <td class="$cellclass center">
+		<input type="text" name="OwnMeans$line"
+			value="$ownmeans" readonly="readonly"
+			class="black white center" 
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="Employer$line"
+			value="$employer" readonly="readonly"
+			class="black white center" 
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="Employee$line"
+			value="$employee" readonly="readonly"
+			class="black white center" 
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="OwnAcct$line"
+			value="$ownacct" readonly="readonly"
+			class="black white center" 
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="FactHome$line"
+			value="$facthome" readonly="readonly"
+			class="black white center" 
+			size="2" maxlength="2">
+	      </td>
+	      <td class="$cellclass right">
+		<input type="text" name="MonthsFact$line"
+			value="$monthsfact" readonly="readonly"
+			class="black white rightnc" 
+			size="2" maxlength="2">
+	      </td>
+	      <td class="$cellclass right">
+		<input type="text" name="MonthsHome$line"
+			value="$monthshome" readonly="readonly"
+			class="black white rightnc" 
+			size="2" maxlength="2">
+	      </td>
+	      <td class="$cellclass right">
+		<input type="text" name="MonthsOther$line"
+			value="$monthsother" readonly="readonly"
+			class="black white rightnc" 
+			size="2" maxlength="2">
+	      </td>
+	      <td class="$cellclass right">
+		<input type="text" name="IncomeEmp$line"
+			value="$incomeemp" readonly="readonly"
+			class="black white rightnc" 
+			size="6" maxlength="8">
+	      </td>
+	      <td class="$cellclass right">
+		<input type="text" name="IncomeOth$line"
+			value="$incomeoth" readonly="readonly"
+			class="black white rightnc" 
+			size="6" maxlength="8">
+	      </td>
+	      <td class="$cellclass right">
+		<input type="text" name="MonthsSchool$line"
+			value="$monthsschool" readonly="readonly"
+			class="black white rightnc" 
+			size="2" maxlength="2">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="CanRead$line"
+			value="$canread" readonly="readonly"
+			class="black white center" 
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="CanWrite$line"
+			value="$canwrite" readonly="readonly"
+			class="black white center" 
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="SpkEnglish$line"
+			value="$spkenglish" readonly="readonly"
+			class="black white center" 
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass center">
+		<input type="text" name="SpkFrench$line"
+			value="$spkfrench" readonly="readonly"
+			class="black white center" 
+			size="1" maxlength="1">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="MotherTongue$line"
+			value="$mothertongue" readonly="readonly"
+			class="black white leftnc" 
+			size="8" maxlength="16">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="Infirmities$line"
+			value="$infirmities" readonly="readonly"
+			class="black white leftnc" 
+			size="10" maxlength="50">
+	      </td>
+	      <th class="$cellclass left">
+		  $line 
+	      </th>
+	      <td class="$cellclass left">
+		<input type="text" name="Address$line"
+			value="$address" readonly="readonly"
+			class="black white leftnc" 
+			size="20" maxlength="48">
+	      </td>
+	      <td class="$cellclass left">
+		<input type="text" name="Remarks$line"
+			value="$remarks" readonly="readonly"
+			class="black white leftnc" 
+			size="20" maxlength="255">
+	      </td>
+	      <td class="$cellclass left" style="white-space: nowrap;">
+		<input type="hidden" name="IDIR$line"
+			value="$idir">
+		<button type="button" id="doIdir$line"
+			class="button">
+		    $idirtext 
+		</button>
+	      </td>
+	    </tr>
+	  </tbody>
+	  <tfoot>
+	    <!--- Put out the column footers -->
+	    <tr>
+	      <th class="colhead1st">
+		Line
+	      </th>
+	      <th class="colhead">
+		Fam
+	      </th>
+	      <th class="colhead">
+		Surname
+	      </th>
+	      <th class="colhead">
+		Given Names
+	      </th>
+	      <th class="colhead">
+		Sex
+	      </th>
+	      <th class="colhead">
+		Race
+	      </th>
+	      <th class="colhead">
+		Relation
+	      </th>
+	      <th class="colhead">
+		MSt
+	      </th>
+	      <th class="colhead">
+		BDate
+	      </th>
+	      <th class="colhead">
+		BYear
+	      </th>
+	      <th class="colhead">
+		Age
+	      </th>
+	      <th class="colhead">
+		Birth Place
+	      </th>
+	      <th class="colhead">
+		u/r
+	      </th>
+	      <th class="colhead">
+		Line
+	      </th>
+	      <th class="colhead">
+		ImmYr
+	      </th>
+	      <th class="colhead">
+		NatYr
+	      </th>
+	      <th class="colhead">
+		Origin
+	      </th>
+	      <th class="colhead">
+		Nationality
+	      </th>
+	      <th class="colhead">
+		Religion
+	      </th>
+	      <th class="colhead">
+		Occupation
+	      </th>
+	      <th class="colhead">
+		Line
+	      </th>
+	      <th class="colhead">
+		Own Means
+	      </th>
+	      <th class="colhead">
+		Employ er
+	      </th>
+	      <th class="colhead">
+		Employ ee
+	      </th>
+	      <th class="colhead">
+		Own Acct
+	      </th>
+	      <th class="colhead">
+		Fact Home
+	      </th>
+	      <th class="colhead">
+		Months Fact
+	      </th>
+	      <th class="colhead">
+		Months Home
+	      </th>
+	      <th class="colhead">
+		Months Other
+	      </th>
+	      <th class="colhead">
+		Income Emp
+	      </th>
+	      <th class="colhead">
+		Income Oth
+	      </th>
+	      <th class="colhead">
+		Months School
+	      </th>
+	      <th class="colhead">
+		Can Read
+	      </th>
+	      <th class="colhead">
+		Can Write
+	      </th>
+	      <th class="colhead">
+		Spk English
+	      </th>
+	      <th class="colhead">
+		Spk French
+	      </th>
+	      <th class="colhead">
+		Mother Tongue
+	      </th>
+	      <th class="colhead">
+		Infirmities
+	      </th>
+	      <th class="colhead">
+		Line
+	      </th>
+	      <th class="colhead">
+		Address
+	      </th>
+	      <th class="colhead">
+		Remarks
+	      </th>
+	      <th class="colhead">
+		FT
+	      </th>
+	    </tr>
+	  </tfoot>
+	</table>
+      </form>
+      <!--- Put out a line with links to previous and next section of table -->
+      <div class="center" id="backPager">
+	<span class="left" id="npPrevBack">
+	    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
+		&lt;---
+	    </a>
+	</span>
+	<span class="right" id="npNextBack">
+	    <a href="/database/CensusForm.php$npNext" id="prenpnext">
+		---&gt;
+	    </a>
+	</span>
+	    dist $DISTRICT $DISTRICTNAME,
+	    subdist $SUBDISTRICT $SUBDISTRICTNAME,
+	    <span id="backDiv">div $DIVISION </span>
+	    page $PAGE
+	</span>
+      </div> <!-- id="backPager" -->
+
+      <div id="comments">
+	<h2>User Comments on the Transcription</h2>
+	  <p id="comment$index">
+	    On line $line field $fldName 
+	    changed from '$oldValue'
+	    to '$newValue'
+	    by $userid
+	    <span id="commentDesc$index">because $Comment</span>
+	  </p>
+      </div> <!-- id="comments" -->
+    </div> <!-- class="body" -->
+  </div> <!-- id="transcription" -->
+  $POPUPS
+
+    <script src= '/jscripts/CommonForm.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/Cookie.js' type="text/javascript">
+    </script>
+    <script src= '/database/CensusForm.js' type="text/javascript">
+    </script>

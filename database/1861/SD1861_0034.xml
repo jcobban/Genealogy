@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="34">
+    <option value="373">
+        Adjala
+    </option>
+    <option value="374">
+        Barrie Town &amp; Gaol
+    </option>
+    <option value="375">
+        Bradford Village
+    </option>
+    <option value="376">
+        Collingwood Town
+    </option>
+    <option value="377">
+        Essa
+    </option>
+    <option value="378">
+        Flos
+    </option>
+    <option value="379">
+        Gwillimbury W.
+    </option>
+    <option value="380">
+        Innisfil
+    </option>
+    <option value="381">
+        Medonte
+    </option>
+    <option value="382">
+        Mono
+    </option>
+    <option value="383">
+        Morrison &amp; Muskoka
+    </option>
+    <option value="384">
+        Mulmer
+    </option>
+    <option value="385">
+        Nottawasaga
+    </option>
+    <option value="386">
+        Orillia &amp; Matchedash
+    </option>
+    <option value="387">
+        Oro
+    </option>
+    <option value="388">
+        Sunnidale
+    </option>
+    <option value="389">
+        Tay &amp; Tiny
+    </option>
+    <option value="390">
+        Tecumseth
+    </option>
+    <option value="391">
+        Tosorontio
+    </option>
+    <option value="392">
+        Reformatory Prison
+    </option>
+    <option value="393">
+        Vespra
+    </option>
+    <option value="393A">
+        Agricultural Census
+    </option>
+</select>

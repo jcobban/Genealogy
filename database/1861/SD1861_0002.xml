@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="2">
+    <option value="9">
+        Albemarle
+    </option>
+    <option value="10">
+        Amabel
+    </option>
+    <option value="11">
+        Arran
+    </option>
+    <option value="12">
+        Brant
+    </option>
+    <option value="13">
+        Bruce
+    </option>
+    <option value="14">
+        Carrick
+    </option>
+    <option value="15">
+        Culross
+    </option>
+    <option value="16">
+        Elderslie
+    </option>
+    <option value="17">
+        Greenock
+    </option>
+    <option value="18">
+        Huron
+    </option>
+    <option value="19">
+        Kincardine
+    </option>
+    <option value="20">
+        Kincardine Village
+    </option>
+    <option value="21">
+        Kinloss
+    </option>
+    <option value="22">
+        Saugeen
+    </option>
+</select>

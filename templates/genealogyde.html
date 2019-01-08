@@ -1,0 +1,163 @@
+<!--*********************************************************************
+ *  genealogyde.html													*
+ *																		*
+ *  This script displays the main entry point to the web site.			*
+ *																		*
+ *  History:															*
+ *		2018/02/02		translate to German								*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+<div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Startseite</a>:
+    <a href="/genealogy.php">
+	Genealogie
+    </a>:
+    <a href="/FamilyTree/Services.php">
+	Bedienungs
+    </a>:
+</div> <!-- id="breadcrumbs" -->
+<div class="body">
+  <h1>Genealogie
+    <span class="right">
+	<a href="/genealogy.php?lang=en">
+	English
+	</a>
+	<a href="/genealogy.php?lang=fr">
+	Français
+	</a>
+	<a href="/genealogy.php?lang=es">
+	Español
+	</a>
+	<a href="/genealogyHelpde.html" target="help">?&nbsp;Hilfe</a>
+    </span>
+  </h1>
+    $TRACE
+    $MSG
+  <p>
+  Genealogisch und Familiengeschichte Forschungs Bedienungs besondere verwenden
+  die Ressourcen der Bibliothek und die Archive von Canada und 
+  die Archive von Ontario.  
+  </p>
+  <h3>Familienstammbaum:</h3>
+  <p class="label">
+    <a href="/FamilyTree/Services.php?lang=de">
+  	Familienstammbaum-Datenbankdienste
+    </a>
+  </p>
+  <p class="label">
+    <a href="/FamilyTree/nominalIndex.php?lang=de" target="_blank">
+  	Nominaler Index von Individuen
+    </a>
+  </p>
+  <h3>Geographische:</h3>
+  <p class="label">
+  	<a href="/genCountry.php?cc=CA&amp;lang=de">
+  	Canada
+      </a>
+  </p>
+  <p class="label">
+    <a href="/genCountry.php?cc=US&amp;lang=de">
+  	Vereinigte Staaten von Amerika
+    </a>
+  </p>
+  <p class="label">
+    <a href="/genCountry.php?cc=GB&amp;lang=de">
+  	Vereinigter Königreich Großbritannien
+    </a>
+  </p>
+  <p class="label">
+    <a href="/displayPage.php?template=genCommercial&amp;lang=de">
+  	Handelsdatenbanken
+    </a>
+  </p>
+  <p class="label">
+  	<a href="/Canada/CountriesEdit.php?lang=de">
+  	Liste der unterstützten Länder
+      </a>
+  </p>
+  <h3>
+      <a href="/videoTutorials.php?lang=de" target="_blank">
+	Videoanleitungen
+     </a>:
+  </h3>
+  <h3>Genealogie Benutzerhandbücher:</h3>
+      <p class="label">
+  	<a href="/displayPage.php?template=Articles/FileFormatsInGenealogy"
+  		target="_blank">
+  	Digitale Darstellung von genealogischen Informationen
+      </a>:
+      </p>
+      <p class="label">
+  	<a href="/displayPage.php?template=Articles/ReadingHandwriting"
+  		target="_blank">
+  	<i>
+  	Handschrift lesen
+      </i>
+  	</a>:
+      </p>
+      <p class="label">
+  	<a href="/displayPage.php?template=Articles/FrenchOccupations"
+  		target="_blank">
+  	Französische Berufe
+      </a>:
+      </p>
+      <p class="label">
+  	<a href="/displayPage.php?template=Articles/MicrofilmGimp"
+  		target="_blank">
+  	Mikrofilm und digitale Bildgebung
+      </a>:
+      </p>
+      <p class="label">
+  	<a href="/displayPage.php?template=Articles/SpreadsheetsInGenealogy"
+  		target="_blank">
+  	Verwenden von Tabellen in der Genealogie
+  	</a>:
+      </p>
+      <p class="label">
+	<a href="https://hobbyhelp.com/genealogy/"
+		target="_blank">
+	Ultimativer Genealogie Leitfaden für Anfänger
+	</a>:
+      </p>
+      <p class="label">
+  	<a href="/displayPage.php?template=Articles/Newsletter2013_10"
+  		target="_blank">
+  	Benutzerhandbuch:
+	Eigenschaften der Seite für eine Person im Stammbaum
+  	</a>:
+      </p>
+      <p class="label">
+  	<a href="/displayPage.php?template=Articles/IntroductionToUpdating"
+  		target="_blank">
+  	Benutzerhandbuch:
+  	Erste Schritte beim Aktualisieren des Familienstammbaums
+  	</a>:
+      </p>
+      <p class="label">
+	<a href="/displayPage.php?template=Articles/Locations"
+		target="_blank">
+  	Benutzerhandbuch:
+	Standorte verstehen
+	</a>:
+      </p>
+      <h3>Monatliche Rundschreiben:</h3>
+      <p class="label" id="newsletter$mm$year">
+  	<a href="/Newsletters/$filename" target="_blank">
+  		$month $year Rundschreiben
+  	</a>
+      </p>
+      <h3>Monatliche technische Statusberichte:</h3>
+      <p class="label"  id="report$mm$year">
+  	<a href="/MonthlyUpdates/$filename" target="_blank">
+  		$month $year
+  		Aktualisierungen der Website-Funktionalität
+  	</a>
+      </p>
+  </div> <!-- class=body -->
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="/genealogy.js" type="text/javascript">
+    </script>

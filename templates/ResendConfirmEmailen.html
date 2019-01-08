@@ -1,0 +1,76 @@
+<!--*********************************************************************
+ *  ResendConfirmEmailen.html											*
+ *																		*
+ *  This template provides the layout of the page for requesting		*
+ *  pending users to confirm their e-mail addresses.					*
+ *																		*
+ *  History:															*
+ *		2018/09/05		Created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div id='breadcrumbs' style='hidden'>
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/Users.php?lang=$LANG">Users</a>:
+  </div>
+  <div class='body'>
+    <h1>
+	Resend Confirm Email to Pending Users
+      <span class='right'>
+	<a href='ResendConfirmEmailHelpen.html' target='help'>? Help</a>
+      </span>
+      <div style='clear: both;'></div>
+    </h1>
+    $TRACE
+    <p class="message" id="notAuthorized">
+        Current User is not authorized to use this function.
+    </p>
+    $MSG
+  </div>
+  <div class='hidden'>
+    <span id="emailSubject">
+	[JamesCobban.net] Thank You for Registering as User '$newuserid'
+    </span>
+    <span id="emailBody">
+      <p>
+	You have not confirmed your registration by accessing the confirmation
+	page on jamescobban.net.  Since you may have forgotten your password,
+	and the site does not know what you chose as a password when you
+	registered, the password on user name '$newuserid' has been reset to
+	'$newpassword'.  Since e-mail is not encrypted you should log on to
+	your account and change this password as soon as possible.
+      </p>
+      <p>
+	Please complete your registration for user name '$newuserid'
+	by verifying your e-mail address by clicking on the following link:  .
+	<a href="https://$servername/ConfirmEmail.php?userid=$newuserid&id=$id&hash=$shapassword">Confirm</a>
+      </p>
+      <p>
+	Thank you.
+	<br>
+	<i>Administrator</i>
+      </p>
+    </span>
+  </div>
+  <div class='balloon' id='matchDiv'>
+      <form name='matchForm' id='matchForm'>
+	<p class='message'>The two password values must match</p>
+	<p>
+	  <button type='button' id='closeDlgMatch'>
+    	OK
+	  </button>
+	</p>
+      </form>
+  </div>
+  <div class='balloon' id='Helpclose'>
+    <p>
+	Clicking on this button with the mouse closes the dialog without making
+	any changes to the account.
+	As a short-cut you may also close the dialog by pressing the
+	key combination alt-C.
+    </p>
+  </div>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/ResendConfirmEmail.js" type="text/javaScript">
+    </script>

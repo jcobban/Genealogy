@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148093">
+    <option value="2_C">
+        New Westminster: Vancouver City
+        <div id="1" reel="148093" frame="0" count="17"/>
+        <div id="2" reel="148093" frame="17" count="22"/>
+        <div id="3" reel="148093" frame="39" count="15"/>
+        <div id="4" reel="148093" frame="54" count="18"/>
+        <div id="5" reel="148093" frame="72" count="33"/>
+        <div id="6" reel="148093" frame="105" count="16"/>
+        <div id="7" reel="148093" frame="121" count="26"/>
+        <div id="8" reel="148093" frame="147" count="26"/>
+        <div id="9" reel="148093" frame="173" count="40"/>
+        <div id="10" reel="148093" frame="213" count="49"/>
+        <div id="11" reel="148093" frame="262" count="27"/>
+    </option>
+    <option value="3_A">
+        Vancouver: Alberni
+        <div id="" reel="148093" frame="289" count="5"/>
+    </option>
+    <option value="3_B">
+        Vancouver: Comox &amp; Nelson
+        <div id="" reel="148093" frame="294" count="12"/>
+    </option>
+    <option value="3_C">
+        Vancouver: Comox South
+        <div id="" reel="148093" frame="306" count="4"/>
+    </option>
+    <option value="3_D">
+        Vancouver: Cowichan North
+        <div id="1" reel="148093" frame="310" count="17"/>
+        <div id="2" reel="148093" frame="327" count="3"/>
+    </option>
+    <option value="3_E">
+        Vancouver: Cowichan South
+        <div id="" reel="148093" frame="330" count="9"/>
+    </option>
+    <option value="3_F">
+        Vancouver: Gabriola Island
+        <div id="" reel="148093" frame="339" count="4"/>
+    </option>
+    <option value="3_G">
+        Vancouver: Goldstream &amp; Sooke
+        <div id="1" reel="148093" frame="343" count="6"/>
+        <div id="2" reel="148093" frame="349" count="13"/>
+        <div id="3" reel="148093" frame="362" count="15"/>
+        <div id="4" reel="148093" frame="377" count="39"/>
+    </option>
+    <option value="3_H">
+        Vancouver: Lake &amp; High Land
+        <div id="" reel="148093" frame="416" count="8"/>
+    </option>
+    <option value="3_I">
+        Vancouver: Mayne Island
+        <div id="" reel="148093" frame="424" count="5"/>
+    </option>
+    <option value="3_J">
+        Vancouver: Mountain
+        <div id="" reel="148093" frame="429" count="34"/>
+    </option>
+    <option value="3_K">
+        Vancouver: Nanaimo
+        <div id="1" reel="148093" frame="463" count="27"/>
+        <div id="2" reel="148093" frame="490" count="32"/>
+        <div id="3" reel="148093" frame="522" count="36"/>
+        <div id="4" reel="148093" frame="558" count="4"/>
+        <div id="5" reel="148093" frame="562" count="25"/>
+        <div id="6" reel="148093" frame="587" count="13"/>
+    </option>
+    <option value="3_L">
+        Vancouver: Saanich North &amp; South
+        <div id="" reel="148093" frame="600" count="13"/>
+    </option>
+    <option value="3_M">
+        Vancouver: Salt Spring Island
+        <div id="1" reel="148093" frame="613" count="5"/>
+        <div id="2" reel="148093" frame="618" count="6"/>
+    </option>
+    <option value="3_N">
+        Vancouver: West Shore
+        <div id="" reel="148093" frame="624" count="60"/>
+    </option>
+    <option value="4_A">
+        Victoria: James Bay Ward (Victoria City)
+        <div id="1" reel="148093" frame="684" count="32"/>
+    </option>
+</select>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148109">
+    <option value="24_H">
+        Westmoreland: Westmoreland
+        <div id="2" reel="148109" frame="0" count="22"/>
+    </option>
+    <option value="25_A">
+        York: Bright
+        <div id="" reel="148109" frame="22" count="35"/>
+    </option>
+    <option value="25_B">
+        York: Canterbury
+        <div id="1" reel="148109" frame="57" count="41"/>
+        <div id="2" reel="148109" frame="98" count="11"/>
+    </option>
+    <option value="25_C">
+        York: Douglas
+        <div id="1" reel="148109" frame="109" count="37"/>
+        <div id="2" reel="148109" frame="146" count="22"/>
+    </option>
+    <option value="25_D">
+        York: Dumfries
+        <div id="" reel="148109" frame="168" count="15"/>
+    </option>
+    <option value="25_E">
+        York: Fredericton City (Carleton Ward)
+        <div id="" reel="148109" frame="183" count="33"/>
+    </option>
+    <option value="25_F">
+        York: Fredericton City (Kings Ward)
+        <div id="" reel="148109" frame="216" count="23"/>
+    </option>
+    <option value="25_G">
+        York: Fredericton City (Queens Ward)
+        <div id="" reel="148109" frame="239" count="29"/>
+    </option>
+    <option value="25_H">
+        York: Fredericton City (St. Anns Ward)
+        <div id="" reel="148109" frame="268" count="33"/>
+    </option>
+    <option value="25_I">
+        York: Fredericton City (Wellington Ward)
+        <div id="" reel="148109" frame="301" count="19"/>
+    </option>
+    <option value="25_J">
+        York: Kingsclear
+        <div id="1" reel="148109" frame="320" count="19"/>
+        <div id="2" reel="148109" frame="339" count="18"/>
+    </option>
+    <option value="25_K">
+        York: Manners Sutton
+        <div id="1" reel="148109" frame="357" count="23"/>
+        <div id="2" reel="148109" frame="380" count="13"/>
+    </option>
+    <option value="25_L">
+        York: Marysville Town
+        <div id="" reel="148109" frame="393" count="28"/>
+    </option>
+    <option value="25_M">
+        York: New Maryland
+        <div id="" reel="148109" frame="421" count="9"/>
+    </option>
+    <option value="25_N">
+        York: Northlake
+        <div id="" reel="148109" frame="430" count="16"/>
+    </option>
+    <option value="25_O">
+        York: Prince William
+        <div id="1" reel="148109" frame="446" count="14"/>
+        <div id="2" reel="148109" frame="460" count="20"/>
+    </option>
+    <option value="25_P">
+        York: Queensbury
+        <div id="1" reel="148109" frame="480" count="17"/>
+        <div id="2" reel="148109" frame="497" count="17"/>
+    </option>
+    <option value="25_Q">
+        York: St. Marys
+        <div id="1" reel="148109" frame="514" count="37"/>
+        <div id="2" reel="148109" frame="551" count="32"/>
+    </option>
+    <option value="25_R">
+        York: Southampton
+        <div id="1" reel="148109" frame="583" count="23"/>
+        <div id="2" reel="148109" frame="" count="0"/>
+    </option>
+    <option value="25_S">
+        York: Stanley
+        <div id="1" reel="148109" frame="" count="0"/>
+    </option>
+</select>

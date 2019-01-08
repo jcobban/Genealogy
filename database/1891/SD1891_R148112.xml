@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148112">
+    <option value="28_P">
+        Cape Breton: Little Bras d'Or
+        <div id="" reel="148112" frame="0" count="18"/>
+    </option>
+    <option value="28_Q">
+        Cape Breton: Loch Lomond
+        <div id="" reel="148112" frame="18" count="9"/>
+    </option>
+    <option value="28_R">
+        Cape Breton: Louisburg
+        <div id="" reel="148112" frame="27" count="26"/>
+    </option>
+    <option value="28_S">
+        Cape Breton: Main-à-Dieu
+        <div id="" reel="148112" frame="53" count="24"/>
+    </option>
+    <option value="28_T">
+        Cape Breton: North Sydney
+        <div id="" reel="148112" frame="77" count="51"/>
+    </option>
+    <option value="28_U">
+        Cape Breton: Sydney Town
+        <div id="" reel="148112" frame="128" count="51"/>
+    </option>
+    <option value="28_V">
+        Cape Breton: Sydney Forks
+        <div id="" reel="148112" frame="179" count="26"/>
+    </option>
+    <option value="28_W">
+        Cape Breton: Sydney Mines
+        <div id="" reel="148112" frame="205" count="50"/>
+    </option>
+    <option value="28_X">
+        Cape Breton: Trout Brook
+        <div id="" reel="148112" frame="255" count="21"/>
+    </option>
+    <option value="28_Y">
+        Cape Breton: Victoria
+        <div id="" reel="148112" frame="276" count="14"/>
+    </option>
+    <option value="29_A">
+        Colchester: Acadia Mines West
+        <div id="" reel="148112" frame="290" count="30"/>
+    </option>
+    <option value="29_B">
+        Colchester: Acadia Mines East
+        <div id="" reel="148112" frame="320" count="26"/>
+    </option>
+    <option value="29_C">
+        Colchester: Brookfield
+        <div id="" reel="148112" frame="346" count="23"/>
+    </option>
+    <option value="29_D">
+        Colchester: Clilfton
+        <div id="" reel="148112" frame="369" count="21"/>
+    </option>
+    <option value="29_E">
+        Colchester: Earlton
+        <div id="" reel="148112" frame="390" count="22"/>
+    </option>
+    <option value="29_F">
+        Colchester: Economy
+        <div id="" reel="148112" frame="412" count="23"/>
+    </option>
+    <option value="29_G">
+        Colchester: Five Islands
+        <div id="" reel="148112" frame="435" count="17"/>
+    </option>
+    <option value="29_H">
+        Colchester: Kempt Town
+        <div id="" reel="148112" frame="452" count="7"/>
+    </option>
+    <option value="29_I">
+        Colchester: Lower Stewiack North
+        <div id="" reel="148112" frame="459" count="20"/>
+    </option>
+    <option value="29_J">
+        Colchester: Lower Stewiack South
+        <div id="" reel="148112" frame="479" count="14"/>
+    </option>
+    <option value="29_K">
+        Colchester: Lower Onslow
+        <div id="" reel="148112" frame="493" count="18"/>
+    </option>
+    <option value="29_L">
+        Colchester: Lower Londonderry
+        <div id="" reel="148112" frame="511" count="20"/>
+    </option>
+    <option value="29_M">
+        Colchester: Middle Londonderry
+        <div id="" reel="148112" frame="531" count="26"/>
+    </option>
+    <option value="29_N">
+        Colchester: Middle Stewiacke
+        <div id="" reel="148112" frame="557" count="15"/>
+    </option>
+    <option value="29_O">
+        Colchester: New Annan
+        <div id="" reel="148112" frame="572" count="18"/>
+    </option>
+    <option value="29_P">
+        Colchester: North River
+        <div id="" reel="148112" frame="590" count="24"/>
+    </option>
+    <option value="29_Q">
+        Colchester: Salmon River
+        <div id="" reel="148112" frame="614" count="27"/>
+    </option>
+    <option value="29_R">
+        Colchester: Tatamagouche East
+        <div id="" reel="148112" frame="641" count="16"/>
+    </option>
+</select>

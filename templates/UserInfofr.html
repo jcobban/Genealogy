@@ -1,0 +1,93 @@
+<!--*********************************************************************
+ *  UserInfoen.html							*
+ *									*
+ *  This is the English language template for the welcome page after	*
+ *  sign-on.								*
+ *									*
+ * History:								*
+ *	2017/11/16	created						*
+ *	2018/01/04	remove Template from template file names	*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=fr">Généalogie</a>:
+    <a href="/FamilyTree/Services.php?lang=fr">Services</a>:
+    <a href="/FamilyTree/nominalIndex.php?lang=fr">Arbre Familiale</a>:
+  </div>
+  <div class="body">
+    <h1>
+      <span class="right">
+	<a href="/UserInfoHelpfr.html" target="help">? Aide</a>
+      </span>
+	Bienvenu $USERID
+    </h1>
+    $TRACE
+    $MSG
+
+    <p class="warning">Note:</p>
+    <p>En conformité avec la legislation anti-SPAM Canadienne
+	vous avez le droit de ne recevoir pas le courriel non solicité.
+	Si vous preferez de ne recevoir plus le courriel reguliere des
+	notifications de cette site, suivre 
+	<a href="/Account.php?lang=fr">cet lien interactif</a> et
+	enlever l'option authoriser la transmission des cettes messages.
+    </p>
+    <p class="label" id="newsletter$i">
+      <a href="/Newsletters/$filename" target="_blank">
+		Bulletin $month $y
+      </a>:
+    </p>
+    <p class="label" id="MonthlyUpdates$i">
+      <a href="/MonthlyUpdates/$filename" target="_blank">
+		$month $y
+		Rapport Technical
+      </a>:
+    </p>
+    <p class="label">
+      <a href="/FamilyTree/showAddedIndividuals.php">
+		List of Recently Added Individuals
+      </a>:
+    </p>
+    <form name="blogForm">
+      <div id="blog$blid">
+	<p class="label">
+	    A $datetime usager "$username" 
+	    a écrit:
+	</p>
+	<p>
+	    $text 
+	</p>
+	<p>
+	    <textarea name="message$blid"
+		    rows="5" cols="80"></textarea>
+	</p>
+	<p>
+	    <button type="button" id="Delete$blid">
+	      Ecraser Blog
+	    </button>
+	    &nbsp;
+	    <button type="button" id="Reply$blid">
+	      Répondre 
+	    </button>
+	</p>
+      </div>
+    </form>
+  </div> <!-- class="body" -->
+  <div id="Helpmessage" class="balloon">
+    Use this text area to enter a reply to the blog, and then click on the
+    Reply button.
+  </div>
+  <div id="HelpDelete" class="balloon">
+    Click on this button to delete the blog.
+  </div>
+  <div id="HelpReply" class="balloon">
+    Click on this button to reply to the blog.
+  </div>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/UserInfo.js" type="text/javascript">
+    </script>
+

@@ -1,0 +1,475 @@
+<!--*********************************************************************
+ *  mergeIndividen.html	  	  										    *
+ *																		*
+ *  Display a web page to support merging two individuals				*
+ *  in the family tree table of individuals.							*
+ *                                                                      *
+ *	History:															*
+ *		2019/01/07      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='Person.css'>
+    <div id="breadcrumbs" class="hidden">
+  	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+  			Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+  			Services
+      </a>:
+      <a href="/genCountry.php?cc=CA&lang=$LANG">
+  			Canada
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+  			Nominal Index
+      </a>:
+      <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+  			Surnames Starting with '$PREFIX'
+      </a>:
+      <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+  			Surname '$SURNAME'
+      </a>:
+      <a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG">
+  			$NAME
+      </a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+    	  <a href="mergeIndividHelpen.html" target="help">? Help</a>
+        </span>
+    	  Merge $NAME
+      </h1>
+      $TRACE
+      $MSG
+      <form name="indForm" action="mergeUpdIndivid.php" method="post">
+        <div class="row" id="ButtonRow">
+    	  <button type="submit" id="Submit" disabled>
+    	      Merge Persons
+    	  </button>
+    	  &nbsp;
+    	  <button type="button" id="choose">
+    	      Choose Second
+    	  </button>
+    	  &nbsp;
+    	  <button type="button" id="donotmerge" disabled>
+    	      Do Not Ever Merge
+    	  </button>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="HeaderRow">
+    	  <div class="labelColumn"></div>
+    	  <div class="checkboxColumn"></div>
+    	  <div class="headerColumn">
+    	  		First Person
+    	  </div>
+    	  <div class="checkboxColumn"></div>
+    	  <div class="headerColumn">
+    	  		Second Person
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="IdirRow">
+    	  <div class="labelColumn">
+    	  		IDIR:
+    	  </div>
+    	  <div class="checkboxColumn"></div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="idir1" id="idir1"
+    	  		  class="ina rightnc"
+    	  		  readonly="readonly" size="6"
+    	  		  value="$IDIR">
+    	    <input type="hidden" name="surname" id="surname"
+    	  		value="$SURNAME">
+    	    <input type="hidden" name="givenpre" id="givenpre"
+    	  		value="$GIVENPRE">
+    	    <input type="hidden" name="treename" id="treename"
+    	  		value="$TREENAME">
+    	    <input type="hidden" name="gender" id="gender"
+    	  		value="$GENDER">
+    	    <input type="hidden" name="birthmin" id="birthmin"
+    	  		value="$BIRTHMIN">
+    	    <input type="hidden" name="birthmax" id="birthmax"
+    	  		value="$BIRTHMAX">
+    	  </div>
+    	  <div class="checkboxColumn"></div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="idir2"
+    	  		  class="ina rightnc"
+    	  		  readonly="readonly" size="6"
+    	  		  value="$IDIR2">
+    	    <button type="button" name="view2" disabled="disabled">
+    	  		Details
+    	    </button>
+    	    <input type="hidden" name="Sex" value="$GENDER">
+    	    <input type="hidden" name="Debug" value="$DEBUG">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="SurnameRow">
+    	  <div class="labelColumn">
+    	  		Surname:
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="SurnameCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="Surname1" size="20" class="ina left"
+    	  		  readonly="readonly"
+    	  		  value="$SURNAME">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="SurnameCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="Surname2" size="20" class="ina left"
+    	  		  readonly="readonly"
+    	  		  value="$SURNAME2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="GivenNameRow">
+    	  <div class="labelColumn">
+    	  		Given Names:
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="GivenNameCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="GivenName1" size="32" class="ina left"
+    	  		  readonly="readonly"
+    	  		  value="$GIVEN">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="GivenNameCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="GivenName2" size="32" class="ina left"
+    	  		  readonly="readonly"
+    	  		  value="$GIVEN2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="BirthDateRow">
+    	  <div class="labelColumn">
+    	  		Birth Date:
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="BthDateCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="BirthDate1" size="16"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$BIRTHD">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="BthDateCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="BirthDate2" size="16"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$BIRTHD2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="BirthLocationRow">
+    	  <div class="labelColumn">
+    	  		Location: 
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="BthLocCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="BirthLocation1" size="32"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$BIRTHLOCATIONNAME">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="BthLocCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="BirthLocation2" size="32"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$BIRTHLOCATIONNAME2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="ChrisDateRow">
+    	  <div class="labelColumn">
+    	  		Christening Date:
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="CrsDateCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="ChrisDate1" size="16"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$CHRISD">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="CrsDateCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="ChrisDate2" size="16"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$CHRISD2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="ChrisLocationRow">
+    	  <div class="labelColumn">
+    	  		Location:
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="CrsLocCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="ChrisLocation1" size="32"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$CHRISLOCATIONNAME">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="CrsLocCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="ChrisLocation2" size="32"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$CHRISLOCATIONNAME2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="DeathDateRow">
+    	  <div class="labelColumn">
+    	  		Death Date:
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="DthDateCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="DeathDate1" size="16"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$DEATHD">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="DthDateCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="DeathDate2" size="16"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$DEATHD2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="DeathLocationRow">
+    	  <div class="labelColumn">
+    	  		Location:
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="DthLocCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="DeathLocation1" size="32"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$DEATHLOCATIONNAME">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="DthLocCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="DeathLocation2" size="32"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$DEATHLOCATIONNAME2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="BurialDateRow">
+    	  <div class="labelColumn">
+    	  		Burial Date:
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="BurDateCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="BuriedDate1" size="16"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$BURIEDD">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="BurDateCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="BuriedDate2" size="16"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$BURIEDD2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="BurialLocationRow">
+    	  <div class="labelColumn">
+    	  		Location: 
+    	  </div>
+    	  <div class="checkboxColumn">
+    	    <input type="checkbox" name="BurLocCb1" checked>
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="BuriedLocation1" size="32"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$BURIEDLOCATIONNAME">
+    	  </div>
+    	  <div class="checkboxColumn">
+    	  <input type="checkbox" name="BurLocCb2">
+    	  </div>
+    	  <div class="dataColumn">
+    	    <input type="text" name="BuriedLocation2" size="32"
+    	  		  class="ina left" readonly="readonly"
+    	  		  value="$BURIEDLOCATIONNAME2">
+    	  </div>
+    	  <div style="clear: both;"></div>
+        </div>
+      </form>
+      </div>  <!-- end of <div id="body"> -->
+    <div class="balloon" id="HelpSubmit">
+      Clicking on this button merges the second individual into the first
+      individual.
+    </div>
+    <div class="balloon" id="Helpchoose">
+      Clicking on this button opens a dialog to choose the second individual.
+      The dialog displays a list of individuals in order by surname and given name,
+      starting with the surname and given name of the first individual,
+      who match the first individual on gender.
+    </div>
+    <div class="balloon" id="Helpdonotmerge">
+      Clicking on this button records in the database that the two individuals
+      are not the same individual.  In future the list of individuals that you
+      are given to choose from will exclude the current pair.  The page
+      resets to permit you to make another choice.
+    </div>
+    <div class="balloon" id="Helpidir1">
+      This field displays the internal record number of the first individual.
+    </div>
+    <div class="balloon" id="Helpidir2">
+      This field displays the internal record number of the second individual.
+    </div>
+    <div class="balloon" id="Helpview2">
+      Clicking on this button opens a window to display the details about the
+      second individual.
+    </div>
+    <div class="balloon" id="HelpSurnameCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the surname of the first individual.
+    </div>
+    <div class="balloon" id="HelpSurnameCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the surname of the second individual.
+    </div>
+    <div class="balloon" id="HelpSurname">
+      This readonly field displays the surname of the individual.
+    </div>
+    <div class="balloon" id="HelpGivenNameCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the given name of the first individual.
+    </div>
+    <div class="balloon" id="HelpGivenNameCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the given name of the second individual.
+    </div>
+    <div class="balloon" id="HelpGivenName">
+      This readonly field displays the given name of the individual.
+    </div>
+    <div class="balloon" id="HelpBthDateCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the birth date of the first individual.
+    </div>
+    <div class="balloon" id="HelpBthDateCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the birth date of the second individual.
+    </div>
+    <div class="balloon" id="HelpBirthDate">
+      This readonly field displays the birth date of the individual.
+    </div>
+    <div class="balloon" id="HelpBthLocCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the birth location of the first individual.
+    </div>
+    <div class="balloon" id="HelpBthLocCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the birth location of the second individual.
+    </div>
+    <div class="balloon" id="HelpBirthLocation">
+      This readonly field displays the birth location of the individual.
+    </div>
+    <div class="balloon" id="HelpCrsDateCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the christening date of the first individual.
+    </div>
+    <div class="balloon" id="HelpCrsDateCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the christening date of the second individual.
+    </div>
+    <div class="balloon" id="HelpChrisDate">
+      This readonly field displays the christening date of the individual.
+    </div>
+    <div class="balloon" id="HelpCrsLocCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the christening location of the first individual.
+    </div>
+    <div class="balloon" id="HelpCrsLocCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the christening location of the second individual.
+    </div>
+    <div class="balloon" id="HelpChrisLocation">
+      This readonly field displays the christening location of the individual.
+    </div>
+    <div class="balloon" id="HelpDthDateCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the death date of the first individual.
+    </div>
+    <div class="balloon" id="HelpDthDateCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the death date of the second individual.
+    </div>
+    <div class="balloon" id="HelpDeathDate">
+      This readonly field displays the death date of the individual.
+    </div>
+    <div class="balloon" id="HelpDthLocCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the death location of the first individual.
+    </div>
+    <div class="balloon" id="HelpDthLocCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the death location of the second individual.
+    </div>
+    <div class="balloon" id="HelpDeathLocation">
+      This readonly field displays the death location of the individual.
+    </div>
+    <div class="balloon" id="HelpBurDateCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the buried date of the first individual.
+    </div>
+    <div class="balloon" id="HelpBurDateCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the buried date of the second individual.
+    </div>
+    <div class="balloon" id="HelpBuriedDate">
+      This readonly field displays the buried date of the individual.
+    </div>
+    <div class="balloon" id="HelpBurLocCb1">
+      Clicking on this checkbox indicates that the merged individual is
+      to retain the buried location of the first individual.
+    </div>
+    <div class="balloon" id="HelpBurLocCb2">
+      Clicking on this checkbox indicates that the merged individual is
+      to take the buried location of the second individual.
+    </div>
+    <div class="balloon" id="HelpBuriedLocation">
+      This readonly field displays the buried location of the individual.
+    </div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/mergeIndivid.js" type="application/javascript">
+    </script>

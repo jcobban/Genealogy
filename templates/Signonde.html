@@ -1,0 +1,171 @@
+<!--*********************************************************************
+ *  Signonen.html														*
+ *																		*
+ *  This is the German version of the template for displaying the		*
+ *  sign-on dialog for the site.										*
+ *																		*
+ *  History:															*
+ *		2017/02/06		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class='hidden' id='breadcrumbs'>
+    <a href='/genealogy.php'>Genealogie</a>:
+  </div>
+  <div class='body'>
+    <h1>
+    Melden Sie sich als Mitwirkender an
+      <span class='right'>
+	<a href='/SignonHelpde.html' target='help'>? Hilfe</a>
+      </span>
+      <div style='clear: both;'></div>
+    </h1>
+    $TRACE
+    <p class='message' id='messages'>
+	<span class="message" id='signedoff'>abgemeldet.</span>
+	<span class="message" id='specify'>Bitte geben Sie Ihre Benutzerkennung 
+	und Ihr Passwort an.</span>
+	<span class="message" id='incorrect'>Benutzername und/oder Passwort 
+	    falsch.</span>
+    </p>
+    $MSG 
+    <p>Sie können zu dieser Website beitragen, indem Sie Transkriptionen
+	von hinzufügen Volkszählungsseiten, Geburt/Heirat/Todesmeldungen,
+	oder durch Hinzufügen Informationen über Ihre Familie zum Stammbaum.
+	Wenn Sie nicht bereits Abonnent dieser Website sind,
+	klicken Sie bitte auf <b>registrieren</b> oder halten Sie die
+	Alt-Taste gedrückt und drücken Sie R.
+    <p>Bitte beachten Sie die Bestimmungen der Europäischen Union
+	dass Sie mit Ihrer Unterschrift zustimmen, diese Seite zu nutzen
+	Kekse. 
+    <form action='/Signon.php'
+	  name='signonForm' id='signonForm'
+	  method='post'  
+	  enctype='multipart/form-data'>
+      <p class='clear' id='useridRow'>
+	<label class='label' for='userid'>
+	  Benutzername:
+	</label>
+	<input type='text' size='32' maxlength='64' name='userid' id='userid'
+		class='white leftnc' value='$USERID'/>
+	<input type='hidden' name='debug' id='debug' value='$DEBUG'>
+      </p>
+      <p class='clear' id='passRow'>
+	<label class='label' for='password'>
+	  Passwort:
+	</label>
+	<input type='password' size='16' name='password' id='password'
+		class='white leftnc'/>
+      </p>
+      <p class='clear' id='emailRow'>
+	<label class='label' for='email'>
+	  E-Mail-Addresse:
+	</label>
+	<input type='text' size='64' maxlength='256' name='email' id='email'
+		class='white leftnc' value=''/>
+      </p>
+      <p class='clear' id='rememberRow'>
+	<label class='label' for='remember'>
+	  Erinnere:
+	</label>
+	<input type='checkbox' name='remember' id='remember' 
+		value='on'/>
+	Erinnere mich an diesem Computer.
+      </p>
+      <p class='clear'>
+	<span class='pad'>
+	    <button type='submit' id='Submit' accesskey='I'> 
+		anmelden
+	    </button>
+	</span>
+	<span class='pad'>
+	    <button type='button' id='Signoff' accesskey='O'>
+		Ausloggen
+	    </button>
+	</span>
+	<span class='pad'>
+	    <button type='button' id='Register' accesskey='R'>
+		<u>R</u>egistrieren</button>
+	</span>
+	<span class='pad'>
+	    <button type='button' id='ForgotPassword' accesskey='F'>
+		Ich habe mein Passwort vergessen
+	    </button>
+	</span>
+	<span class='pad'>
+	    <button type='button' id='Close' accesskey='C'>
+		schließen
+	    </button>
+	</span>
+	<span class='button'>
+	  <a href='/ContactAuthor.php?subject=Sign On'>
+		Kontakt Administrator</a>
+	</span>
+	<input type='hidden' name='act' value=''>
+	<input type='hidden' name='redirect' 
+		value='$REDIRECTTO'>
+      </p>
+    </form>
+</div>
+<div class='balloon' id='Helpuserid'>
+<p>Geben Sie den eindeutigen Benutzernamen ein, den Sie zuvor registriert haben.
+Dies ist bis zu 64 Zeichen lang und kann fast alle Zeichen enthalten,
+einschließlich Leerzeichen.  Zum Beispiel könnte es dein Name sein.
+Vermeiden Sie, irgendetwas zu verwenden, das private Informationen enthält,
+die eindeutig sind identifiziert Sie wie Ihre E-Mail-Adresse
+</p>
+</div>
+<div class='balloon' id='Helpemail'>
+<p>Geben Sie die E-Mail-Adresse ein, die Sie beim ersten Abonnement
+verwendet haben zum Service.  Dieses Feld wird nur für administrative
+Zwecke verwendet im Zusammenhang mit der Website.
+</p>
+</div>
+<div class='balloon' id='Helppassword'>
+<p>This is the password that you registered for the above user name.  It
+must be at least 6 characters long, and should be hard to guess.
+</p>
+</div>
+<div class='balloon' id='Helpremember'>
+<p>If you are accessing the site from a trusted computer, for example one that
+belongs to you and is not used by any other person, then selecting this
+option will cause the userid and password you have entered to be remembered
+in a file on your computer and you will be automatically logged to the
+site when you access it in the future.
+</p>
+</div>
+<div class='balloon' id='HelpSubmit'>
+<p>Click on this button to sign on.  You may also sign on by pressing the
+Enter key after completing typing your userid and password, or by the
+keyboard short-cuts Alt-I or Ctrl-S.
+</p>
+</div>
+<div class='balloon' id='HelpSignoff'>
+<p>Click on this button to sign off.  You may also sign off by the keyboard
+short-cut Alt-O (letter 'O').
+</p>
+</div>
+<div class='balloon' id='HelpRegister'>
+<p>Click on this button, or use the keyboard short-cut Alt-R, to register 
+a new user identifier and associated
+password.  You will be prompted to enter additional registration information.
+</p>
+</div>
+<div class='balloon' id='HelpForgotPassword'>
+<p>Click on this button, or use the keyboard short-cut Alt-F, if you have
+forgotten either your password or your userid.  If you have forgotten your
+password enter your password.  If you have forgotten your userid enter the
+electronic mail address that you used when you first registered.
+</p>
+</div>
+<div class='balloon' id='HelpClose'>
+<p>Click on this button, or use the keyboard short-cut Alt-C, 
+to close the dialog.
+</p>
+</div>
+    <script src='/jscripts/util.js' type='text/javascript'>
+    </script>
+    <script src='/jscripts/Cookie.js' type='text/javascript'>
+    </script>
+    <script src='/Signon.js' type='text/javascript'>
+    </script>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148195">
+    <option value="150_B">
+        Deux Montagnes: St. Augustin Village
+        <div id="" reel="148195" frame="0" count="28"/>
+    </option>
+    <option value="150_C">
+        Deux Montagnes: St. Benoit
+        <div id="" reel="148195" frame="28" count="29"/>
+    </option>
+    <option value="150_D">
+        Deux Montagnes: St. Canut
+        <div id="" reel="148195" frame="57" count="14"/>
+    </option>
+    <option value="150_E">
+        Deux Montagnes: St. Colomban
+        <div id="" reel="148195" frame="71" count="9"/>
+    </option>
+    <option value="150_F">
+        Deux Montagnes: St. Eustache
+        <div id="" reel="148195" frame="80" count="37"/>
+    </option>
+    <option value="150_G">
+        Deux Montagnes: St. Eustache Village
+        <div id="" reel="148195" frame="117" count="20"/>
+    </option>
+    <option value="150_H">
+        Deux Montagnes: St. Hermas
+        <div id="" reel="148195" frame="137" count="25"/>
+    </option>
+    <option value="150_I">
+        Deux Montagnes: St. Joseph
+        <div id="" reel="148195" frame="162" count="25"/>
+    </option>
+    <option value="150_J">
+        Deux Montagnes: St. Monique
+        <div id="" reel="148195" frame="187" count="23"/>
+    </option>
+    <option value="150_K">
+        Deux Montagnes: St. Placide
+        <div id="" reel="148195" frame="210" count="21"/>
+    </option>
+    <option value="150_L">
+        Deux Montagnes: St. Scholastique
+        <div id="" reel="148195" frame="231" count="37"/>
+    </option>
+    <option value="150_M">
+        Deux Montagnes: St. Scholastique Village
+        <div id="" reel="148195" frame="268" count="18"/>
+    </option>
+    <option value="151_A">
+        Dorchester: St. Anselme
+        <div id="1" reel="148195" frame="286" count="19"/>
+        <div id="2" reel="148195" frame="305" count="24"/>
+    </option>
+    <option value="151_B">
+        Dorchester: St. Bernard
+        <div id="1" reel="148195" frame="329" count="17"/>
+        <div id="2" reel="148195" frame="346" count="17"/>
+    </option>
+    <option value="151_C">
+        Dorchester: Ste. Claire
+        <div id="1" reel="148195" frame="363" count="21"/>
+        <div id="2" reel="148195" frame="384" count="18"/>
+    </option>
+    <option value="151_D">
+        Dorchester: St. Édouard de Frampton
+        <div id="1" reel="148195" frame="402" count="20"/>
+        <div id="2" reel="148195" frame="422" count="15"/>
+    </option>
+    <option value="151_E">
+        Dorchester: St. Germain du Lac Etchemin
+        <div id="" reel="148195" frame="437" count="27"/>
+    </option>
+    <option value="151_F">
+        Dorchester: Ste. Hénédine
+        <div id="" reel="148195" frame="464" count="22"/>
+    </option>
+    <option value="151_G">
+        Dorchester: St. Isidore
+        <div id="1" reel="148195" frame="486" count="25"/>
+        <div id="2" reel="148195" frame="511" count="18"/>
+    </option>
+    <option value="151_H">
+        Dorchester: Ste. Justine
+        <div id="" reel="148195" frame="529" count="13"/>
+    </option>
+    <option value="151_I">
+        Dorchester: St. Léon de Standon
+        <div id="1" reel="148195" frame="542" count="25"/>
+        <div id="2" reel="148195" frame="567" count="10"/>
+    </option>
+    <option value="151_J">
+        Dorchester: St. Malachie
+        <div id="1" reel="148195" frame="577" count="7"/>
+        <div id="2" reel="148195" frame="584" count="15"/>
+        <div id="3" reel="148195" frame="599" count="12"/>
+    </option>
+    <option value="151_K">
+        Dorchester: Ste. Marguerite
+        <div id="1" reel="148195" frame="611" count="15"/>
+        <div id="2" reel="148195" frame="626" count="12"/>
+    </option>
+    <option value="151_L">
+        Dorchester: St. Odilon de Cranbourne
+        <div id="1" reel="148195" frame="638" count="11"/>
+        <div id="2" reel="148195" frame="649" count="10"/>
+    </option>
+    <option value="151_M">
+        Dorchester: St. Prosper, Buckland West
+        <div id="" reel="148195" frame="659" count="14"/>
+    </option>
+    <option value="151_N">
+        Dorchester: Ste. Rose de Watford
+        <div id="" reel="148195" frame="673" count="7"/>
+    </option>
+    <option value="151_O">
+        Dorchester: St. Zacharie de Metgermette
+        <div id="" reel="148195" frame="680" count="14"/>
+    </option>
+    <option value="152_A">
+        Drummond &amp; Arthabaska: Arthabaskaville Village
+        <div id="" reel="148195" frame="694" count="22"/>
+    </option>
+    <option value="152_B">
+        Drummond &amp; Arthabaska: Chenier
+        <div id="" reel="148195" frame="716" count="31"/>
+    </option>
+    <option value="152_C">
+        Drummond &amp; Arthabaska: Chester North
+        <div id="" reel="148195" frame="747" count="14"/>
+    </option>
+    <option value="152_D">
+        Drummond &amp; Arthabaska: Durham
+        <div id="" reel="148195" frame="761" count="12"/>
+    </option>
+    <option value="152_E">
+        Drummond &amp; Arthabaska: Durham South
+        <div id="" reel="148195" frame="773" count="31"/>
+    </option>
+</select>

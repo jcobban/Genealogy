@@ -1,0 +1,131 @@
+<!--*********************************************************************
+ *  BlogPosten.html														*
+ *																		*
+ *  Template for a web page for displaying a blog entry in English.		*
+ *																		*
+ * History:																*
+ *		2018/09/12		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+<div id="breadcrumbs" class="hidden">
+  <a href="index.html">
+		Home
+  </a>:
+  <a href="Blogs.php?lang=fr">
+		Blogs
+  </a>:
+  <span id="parentBlog">
+  <a href="BlogPost.php?table=Blogs&blogid=$parentblogid&lang=fr">
+		Blog $parentblogid
+  </a>:
+  </span>
+</div>
+  <div class="body">
+  <h1>
+      <span class="right">
+	<a href="/BlogPostHelpen.html" target="help">? Help</a>
+      </span>
+	$TITLE
+      <div style="clear: both;"></div>
+  </h1>
+  <div class="hidden"><!-- choices for page title and h1-->
+	<span id="NewBlog">Post New General Blog</span>
+	<span id="AddBlog">Post a Blog in Response to Blog $BLOGTITLE</span>
+	<span id="EditBlog">Change Existing Blog $BLOGTITLE</span>
+  </div>
+  $TRACE
+  $MSG
+  <form name="blogForm" id="blogForm" action="BlogPost.php" method="post"
+	enctype='multipart/form-data'>
+    <input id="lang" type="hidden" value="fr">
+  $POSTS
+  <div class="hidden" id="blogTemplate">
+      <p class="label" style="margin-left: $margin">
+	$day $month $year at $time user '$username' 
+	wrote: <a href="BlogPost.php?table=Blogs&blogid=$blogid&lang=fr">$blogname</a>
+      </p>
+      <div style="margin-left: $margin; text-indent: 3em; white-space: normal;">
+        $message
+      </div>
+      <p style="margin-left: $margin" id="buttonRow$blogid">
+        <button id="edit$blogid">Change</button>
+        <button id="del$blogid">Delete</button>
+      </p>
+  </div>	
+  <h2>
+    <span id="Response">Follow up:</span>
+    <span id="Edit">Edit Blog Post $blogid:</span>
+    <span id="NewPost">Post New Blog:</span>
+  </h2>
+    <input type="hidden" name="userid" id="userid"
+	        value="$userid">
+    <input type="hidden" name="blogid" id="blogid"
+	        value="$blogid">
+    <input type="hidden" name="debug" id="debug"
+	        value="$debug">
+  <p class="warning" id="notLoggedOn">
+    You are not signed in as a registered user of this site.
+    Anything which you supply will be associated with your e-mail address.
+  </p>
+  <div class="row" id="blogSubjectRow">
+    <label class='column1' for='subject'>
+	Subject:
+    </label>
+    <input type="text" class="white leftnc"
+		id="subject" name="subject"
+		size="80" value="$postsubject">
+  </div>
+  <div class="row" id="blogMsgRow">
+    <label class='column1' for='message' id="msgLabel">
+	Message:
+    </label>
+    <textarea name="message" id="message" placeholder="[enter message]"
+	rows="15">$posttext</textarea>
+  </div>
+  <div class="row" id="blogEmailRow">
+    <label class='column1' for='emailAddress'>
+	Your e-mail address:
+    </label>
+    <input type="text" class="$EMAILCLASS leftnc" $READONLY
+		id="emailAddress" name="emailAddress"
+		size="80" value="$EMAIL">
+  </div>
+  <p id="blogPostRow">
+    <button type="button" id="PostBlog" accessKey="B">
+	Post <u>B</u>log
+    </button>
+  </p>
+</form> <!-- name="blogform" id="blogform" -->
+
+  <!-- the remaining portion of the page is divisions containing popup help -->
+  <div class="balloon" id="Helpsubject">
+    This field supplies a title or a summary of the content of the blog
+    If this is omitted the first line of the body of the message
+    is used as subject.
+  </div>
+  <div class="balloon" id="Helpmessage">
+    Ce champ permet de modifier un message à publier en tant qu’entrée 
+    de blogue.
+  </div>
+  <div class="balloon" id="HelpemailAddress">
+    Si vous n'êtes pas connecté en tant que contributeur inscrit au site Web,
+    vous devez fournir une adresse e-mail pour identifier
+    la source de tout
+    messages de blogue que vous publiez.
+    Cette adresse e-mail sera exposée dans le message posté.
+  </div>
+  <div class="balloon" id="HelpPostBlog">
+    Cliquez sur ce bouton pour poster le message que vous avez entré.
+    L'application prend également en charge le raccourci clavier Alt-B.
+  </div>
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="text/javascript">
+    </script>
+    <script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript">
+    </script>
+    <script src="/BlogPost.js" type="text/javascript">
+    </script>

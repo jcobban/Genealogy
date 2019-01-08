@@ -1,0 +1,289 @@
+<!--*********************************************************************
+ *  WmbQuery.html							*
+ *									*
+ *  Prompt the user to enter parameters for a search of the Wesleyan	*
+ *  Methodist Baptisms database						*
+ *									*
+ *  History:								*
+ *	2013/06/29	created						*
+ *	2013/08/04	add facebook status				*
+ *	2015/04/06	top level page changed to genealogy.php		*
+ *	2016/08/19	change default number of lines to 25		*
+ *	2016/09/24	add display of statistics by volume		*
+ *	2018/01/24	convert to template				*
+ *			change default number of lines to 20		*
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/Ontario/WmbQuery.css"/>
+<div class="hidden" id="breadcrumbs">
+  <a href="/genealogy.php">Genealogy</a>:
+  <a href="/genCountry.php?cc=CA">Canada</a>:
+  <a href="/Canada/genProvince.php?Domain=CAON">Ontario</a>:</p> 
+</div>
+<div class="body">
+  <h1>Wesleyan Methodist Baptisms Query
+    <span class="right">
+	<a href="/Ontario/WmbQueryHelpen.html" target="_blank">Help?</a>
+    </span>
+  </h1>
+$MSG
+$TRACE
+<p>This tool is an alternate and <b>unofficial</b> interface to the 
+<a href="http://freepages.genealogy.rootsweb.ancestry.com/~wjmartin/wesleyan.htm">information transcribed and copyright © 2001 by Ida Reed</a>.
+<form action="/Ontario/WmbDoQuery.php" method="get"
+	name="distForm" id="distForm">
+  <input name="Offset" id="Offset" type="hidden" value="0">
+  <div id="formTable">
+    <div class="row">
+      <div class="column1">
+	<label class="labelSmall" for="Count">Count:</label>
+	<input name="Count" id="Count" type="text"
+		class="white rightnc" size="6" maxlength="6" value="20"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row" id="RegRow">
+      <div class="column1">
+	<label class="labelSmall" for="District">District:</label>
+	<input type="text" name="District" id="District" class="white left"
+		size="20" maxlength="128">
+      </div>
+      <div class="column2" id="TwpCell">
+	<label class="labelSmall" for="Area">Area:</label>
+	<input name="Area" id="Area" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="labelSmall" for="Volume">Volume:</label>
+	<input name="Volume" id="Volume" type="text"
+		class="white rightnc" size="8" maxlength="8"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="Page">Page:</label>
+	<input name="Page" id="Page" type="text"
+		class="white rightnc" size="3" maxlength="8"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="labelSmall" for="GivenName">Name: Given:</label>
+	<input name="GivenName" id="GivenName" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="Surname">Surname:</label>
+	<input name="Surname" id="Surname" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div class="column3">
+        <label class="labelSmall5em" for="SurnameSoundex">Soundex:</label>
+	<input type="checkbox" name="SurnameSoundex" id="SurnameSoundex" 
+		value="yes"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="labelSmall" for="Father">Father:</label>
+	<input name="Father" id="Father" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="Mother">Mother:</label>
+	<input name="Mother" id="Mother" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="labelSmall" for="Residence">Residence:</label>
+	<input name="Residence" id="Residence" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="labelSmall" for="BirthDate">Birth&nbsp;Date:</label>
+	<input name="BirthDate" id="BirthDate" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="BirthPlace">Birth&nbsp;Place:</label>
+	<input name="BirthPlace" id="BirthPlace" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="labelSmall" for="BaptismDate">Baptism&nbsp;Date:</label>
+	<input name="BaptismDate" id="BaptismDate" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div class="column2">
+	<label class="labelSmall" for="BaptismPlace">Baptism&nbsp;Place:</label>
+	<input name="BaptismPlace" id="BaptismPlace" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+      <div class="column1">
+	<label class="labelSmall" for="Minister">Minister:</label>
+	<input name="Minister" id="Minister" type="text"
+		class="white left" size="20" maxlength="128"/>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+  </div> <!-- id="formTable" -->
+  <p>
+    <button type="submit" id="Query">Query</button>
+    &nbsp;
+    <button type="reset" id="Reset">Clear Form</button>
+    &nbsp;
+    <button type="button" id="Status">District Status</button>
+    &nbsp;
+    <button type="button" id="VolStatus">Volume Status</button>
+  </p>
+</form>
+</div>
+<div class="balloon" id="HelpCount">
+The number of entries per page to return.  The default is 20.
+</div>
+<div class="balloon" id="HelpDistrict">
+Limit the response to baptisms registered in the specified district.
+</div>
+<div class="balloon" id="HelpArea">
+Limit Townshipthe response to baptisms registered in the specified area within
+a area.  An area is typically a township.
+</div>
+<div class="balloon" id="HelpVolume">
+Limit the response to baptisms recorded in the specified volume.
+</div>
+<div class="balloon" id="HelpPage">
+Limit the response to baptisms recorded on the specified page.
+</div>
+<div class="balloon" id="HelpGivenName">
+Limit the response to individuals whose given names match the pattern in
+this field.  
+This search is done as a 
+case-insensitive pattern match, not a simple comparison. 
+<p>Specifying simple text, comprising letters and spaces, matches against
+any names containing that text.  "John" or "john" or "JOHN" will match
+"Johnathan" and "William John" as well as the simple "John".
+<p>This is an 
+	<a href="https://www.regular-expressions.info/posix.html#ere">
+	    extended regular expression</a>,
+	as supported by MySQL.
+There are too many options to enumerate here, but a few examples include:
+<ul>
+    <li>If you want to match just the name "John", excluding names that include
+	"John" as part of them, enter "^John\$".
+    <li>Enumerators often use unusual spellings of names.  For example if you
+	to match names including both "Henry" and "Henery", enter "Hen.*ry".
+</ul>
+</div>
+<div class="balloon" id="HelpSurname">
+<p>This field is used to specify text to look for in the surname of 
+the person getting married.
+If the value contains only letters and spaces then only surnames that match
+exactly (except for case) are found.  Otherwise this
+uses an 
+	<a href="https://www.regular-expressions.info/posix.html#ere">
+	    extended regular expression</a>,
+	as supported by MySQL.
+For example to match surnames starting with "McL..." and ending with "...n",
+such as "McLean", "McLain", "McLennan", or "McLellan" you could specify 
+"^McL.*n\$".
+<p>The meaning of this field changes if the Soundex option is selected.
+<p>The Soundex code has been used for decades to attempt to match names that
+sound similar.  For example it is used by police forces to perform a rough
+match for the names of drivers.  It is a problematic tool, as it
+is based upon the phonetics of British surnames.
+If you select Soundex then the search
+is made for surnames that "sound like" the given surname.  For example
+specifying Soundex together with "McLean" will match all of the surnames in
+the pattern match example under "Surname", but many other names as well, such
+"McCallum", "McAllan", "McClain", and "McWilliams". 
+</div>
+<div class="balloon" id="HelpSurnameSoundex"> 
+<p>The Soundex code has been used for decades to attempt to match names that
+sound similar.  For example it is used by police forces to perform a rough
+match for the names of drivers.  It is a problematic tool, as it
+is based upon the phonetics of British surnames.
+If you select this option along with a
+complete surname, not a pattern match, in the Surname field, then the search
+is made for surnames that "sound like" the given surname.  For example
+specifying Soundex together with "McLean" will match all of the surnames in
+the pattern match example under "Surname", but many other names as well, such
+"McCallum", "McAllan", "McClain", and "McWilliams". 
+</div>
+<div class="balloon" id="HelpFather">
+Limit the response to baptisms where the specified value is part of the
+Father's name.
+</div>
+<div class="balloon" id="HelpMother">
+Limit the response to baptisms where the specified value is part of the
+Mother's name.
+</div>
+<div class="balloon" id="HelpResidence">
+Limit the response to baptisms where the specified value is part of the
+name of the Residence.
+</div>
+<div class="balloon" id="HelpBirthPlace">
+Limit the response to baptisms where the specified value is part of the
+name of the Birth Place.
+</div>
+<div class="balloon" id="HelpBirthDate">
+Limit the response to baptisms where the specified value is part of the
+name of the Birth Date.
+</div>
+<div class="balloon" id="HelpBaptismDate">
+Limit the response to baptisms where the specified value is part of the
+name of the Baptism Date.
+</div>
+<div class="balloon" id="HelpBaptismPlace">
+Limit the response to baptisms where the specified value is part of the
+name of the Baptism Place.
+</div>
+<div class="balloon" id="HelpMinister">
+Limit the response to baptisms where the specified value is part of the
+name of the Minister.
+</div>
+<div class="balloon" id="HelpQuery">
+Clicking on this button performs the query.
+</div>
+<div class="balloon" id="HelpReset">
+Clicking on this button clears all of the input fields back to their
+default values.
+</div>
+<div class="balloon" id="HelpStatus">
+Clicking on this button displays a summary of the transcription
+broken down by Wesleyan Methodist administrative districts.  Note that
+these districts varied over time.
+</div>
+<div class="balloon" id="HelpVolStatus">
+Clicking on this button displays a summary of the transcription
+broken down by the volume in which the records are kept.
+</div>
+<div class="balloon" id="HelprightTop">
+Click on this button to signon to access extended features of the web-site
+or to manage your account with the web-site.
+</div>
+<div class="popup" id="loading">
+Loading...
+</div>
+<div class="hidden" id="templates">
+  <span id="noCountyCell">
+    Districts summary file not available from server.
+  </span>
+</div>
+    <script src="/jscripts/js20/http.js" language="JavaScript"></script>
+    <script src="/jscripts/util.js" language="JavaScript"></script>
+    <script src="/jscripts/CommonForm.js" language="JavaScript"></script>
+    <script src="/Ontario/WmbQuery.js" language="JavaScript"></script>

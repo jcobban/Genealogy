@@ -1,0 +1,641 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Get Database Record in XML: Help</title>
+    <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+ *		2017/01/30		created											*
+ *      2018/11/08      rename to ...Helpen.html                        *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+    <style>
+    td {	font-family:	sans-serif;
+		text-align:	left;
+		padding:	0px 3px 6px 3px;
+		}
+
+    </style>
+</head>
+<body>
+<div class="topcrumbs">
+  <a href="/indexHelpen.html">Home</a>: 
+  <a href="/genealogyHelpen.html">Genealogy</a>: 
+</div>
+<div class="help">
+  <h1>Get Database Record in XML: Help
+  </h1>
+  <p>This page describes the use of the script getRecordXml.php
+which is used to extract the content of database records in
+eXtensible Markup Language (XML).
+  </p>
+  <p>The user must be signed in as a user to use this feature.
+The contents of the response to a request depends upon the level of
+authorization of the requesting user.  In particular a requesting user
+can only see information that the user is authorized to see.  For example
+private information about an individual in the family tree is only visible
+to members of that individual's family.
+  </p>
+  <p>The record or records to be returned is specified by parameters passed
+by method "Get", that is by parameters passed as part of the 
+Uniform Record Location (URL).  The parameter names are case insensitive.
+For example you can specify "...?table=Picture" or "...?Table=Picture",
+"...&amp;id=756" or "...&amp;ID=756".
+  </p>
+  <p>The table to be examined is identified by the parameter "table", which
+can have one of the following case-sensitive values:
+  </p>
+  <table>
+    <tr>
+      <th class="label">Addresses</th>
+      <td>This table contains records representing a fully
+	structured address.  For example this is used for the addresses of
+	repositories. 
+	This table is implied if the IDAR parameter is specified.
+	For further information see
+	<a href="/getRecordAddressHelpen.html">Addresses</a>
+      </td>
+    </tr>
+    <tr>
+      <th class="label">PictureBases</th>
+      <td>This table contains records representing a folder
+	on the Web which contains images.
+	<br>
+	Specific records are identified by parameters 'id'.
+	If this is omitted the complete table is displayed.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Pictures</th>
+      <td>This table contains records representing images.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of address records by specifying the 
+	any of the following, "idir", "idtype", "pictype", "picorder",
+	"picname", "picnameurl", "idbppic", "piccaption", "picd", "picsd", 
+	"picdate", "picdesc", "picprint", "picsoundname", "picsoundnameurl", 
+	"idbpsound", "used", "picpref", "filingref".
+	For example "?table=Picture&amp;idtype=0&amp;idir=5" displays all
+	pictures associated with individual 5.
+       </td>
+    </tr>
+    <tr>
+      <th class="label">ChildParentRels</th>
+      <td>This table contains types of relationships between children
+	and parents.
+	<br>
+	Specific records are identified by parameters 'id'.
+	If this is omitted the complete table is displayed.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Children</th>
+      <td>This table contains records representing a child's
+	relationship to a set of parents.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of address records by specifying 
+	one or more of the following parameters. 
+	"idmr", "idir", "order", "prefchild", "idcs", "idcpdad", "idcpmom",
+	"cpdadprivate", "cpmomprivate", "parseald", "parsealsd", 
+	"idtrparseal", "parsealnote", "ldsp", "templetag".
+	For example specifying "?table=Child&amp;idmr=6" 
+	lists all children in family 6.
+	For example "?table=Child&amp;idir=10939" lists all families in which
+	individual 10939 is a child.
+       </td>
+    </tr>
+    <tr>
+      <th class="label">ChildStatuses</th>
+      <td>This table contains records defining values of the
+	field "idcs" in the Child table.
+	<br>
+	Specific records are identified by parameters 'id'.
+	If this is omitted the complete table is displayed.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">DontMergeEntries</th>
+      <td>This table contains records representing pairs of
+	individuals who should never be merged because they are known
+	to be distinct even though very similar in name and birth date.
+	<br>
+	Specific records are identified by parameters 'idirleft' and 'idirright'
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Events</th>
+      <td>This table contains records representing 
+	facts or events about an individual or a family.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of event records by specifying 
+	one or more of the following parameters. 
+	"idir", "idet", "order", "eventd", "eventsd", "idlrevent", "desc",
+	"gedtag", "eventexclude", "idtype", "idar", "description",
+	"sentenceoverride", "qstag", "rgexclude", "kind",
+	"ldstempleready", "preferred"
+       </td>
+    </tr>
+    <tr>
+      <th class="label">EventTypes</th>
+      <td>This table contains records representing 
+	values of event type.
+	<br>
+	Specific records are identified by parameters 'id'.
+	If this is omitted the complete table is displayed.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Bookmarks</th>
+      <td>This table contains records representing bookmarks.
+	<br>
+	Specific records are identified by parameters 'id'.  There are always
+	200 entries in this table, numbered 1 through 200.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">HistoryList</th>
+      <td>This table contains records representing a 
+	history of the last 200 family tree individuals or families
+	referenced by the system.  This does not mean much when there are
+	multiple users sharing the family tree so it is not maintained
+	by the site.
+	<br>
+	Specific records are identified by parameters 'id'.  There are always
+	200 entries in this table, numbered 1 through 200.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Header</th>
+      <td>This table contains records representing 
+	information about the family tree database itself.
+	<br>
+	no parameters required.  The complete table is always displayed.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Persons</th>
+      <td>This table contains records representing 
+	individuals in the family tree.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of location records by specifying 
+	one or more of the following parameters.
+	"fsid", "surname", "soundslike", "givenname", "prefix", "title",
+	"namenote", "gender", "birthd", "birthsd", "idlrbirth",
+	"chrisd", "chrissd", "idlrchris", "chrterm",
+	"deathd", "deathsd", "idlrdeath",
+	"buriedd", "buriedsd", "idlrburied", "cremated",
+	"idarbirth", "idarchris", "idardeath", "idarburied",
+	"birthnote", "chrisnote", "deathnote", "buriednote", "living",
+	"baptismd", "baptismsd", "baptismkind", "idtrbaptism", "baptismnote",
+	"ldsb", "confirmationd", "confirmationsd", "confirmationkind",
+	"idtrconfirmation", "confirmationnote", "ldsc",
+	"initiatoryd", "initiatorysd", "idtrinitiatory", "initiatorynote",
+	"ldsi", "endowd", "endowsd", "idtrendow", "endownote", "ldse",
+	"templetag", "idmrpref", "idmrparents", "idar",
+	"ancinterest", "decinterest",
+	"tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9",
+	"taggroup", "taganc", "tagdec", "savetag", "srchtag", "srchtagigi",
+	"srchtagrg", "srchtagfs", "qstag", "remindertag", "remindertagdeath",
+	"treenum", "ltmp1", "ltmp2", "alreadyused", "userref", "ancestralref",
+	"notes", "references", "medical", "deathcause", "ppcheck", "imported",
+	"added", "addedtime", "updated", "updatedtime", "relations",
+	"nevermarried", "directline", "stmp1", "colortag", "intellishare",
+	"private", "ppexclude", "rgexclude", "dna", "fssync", "fsdups",
+	"fsordinance", "fslinks"
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Locations</th>
+      <td>This table contains records representing
+	locations associated with events or facts.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of location records by specifying 
+	one or more of the following parameters. 
+	"fsplaceid", "location", "used", "sortedlocation",
+	"latitude", "longitude", "tag1", "shortname", "preposition", "notes",
+	"verified", "fsresolved", "veresolved", "qstag", "zoom", "boundary".
+       </td>
+    </tr>
+    <tr>
+      <th class="label">Families</th>
+      <td>This table contains records representing
+	a family.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of location records by specifying 
+	one or more of the following parameters. 
+	"idirhusb", "husborder", "husbprefmar", "husbsurname", "husbgivenname",
+	"husbmarrsurname", "husbbirthsd", "idirwife", "wifeorder",
+	"wifeprefmar", "wifesurname", "wifegivenname", "wifemarrsurname",
+	"wifebirthsd", "marriednamerule", "idms", "mardc", "mard", "marsd",
+	"marenddc", "marendd", "marendsd", "idlrmar", "marloc", "sealdc",
+	"seald", "sealsd", "idtrseal", "sealloc", "sealnote", "ldss",
+	"templetag", "tag1", "tag2", "tag3", "taggroup", "srchtag", "qstag",
+	"remindertag", "notmarried", "nochildren", "alreadyused", "ltmp1",
+	"ltmp2", "notes", "ppcheck", "added", "addedtime", "updated",
+	"updatedtime", "idar", "hphrase", "wphrase", "rphrase", "rphrase2",
+	"id", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "userref",
+	"mphrase", "sphrase", "husbwifeover1", "husbwifeover2",
+	"wifehusbover1", "wifehusbover2", "private"
+      </td>
+    </tr>
+    <tr>
+      <th class="label">MarriageStatuses</th>
+      <td>This table contains records representing 
+	the set of marriage statuses.
+	<br>
+	Specific records are identified by parameters 'id'.
+	If this is omitted the complete table is displayed.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Surnames</th>
+      <td>This table contains records representing 
+		family names present in the database.
+		<br>
+		A specific record is identified by parameter 'surname=^surname$'.
+		<br>
+		You can search for a list of location records by specifying 
+		one or more of the following parameters. 
+		"surname", "soundslike", and "notes" use a pattern match. 
+	    "used", "tag1", "qstag" are numeric values.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Names</th>
+      <td>This table contains records representing 
+		individual names of individuals in the database.
+		<br>
+		A specific record is identified by parameter 'id=number'.
+		<br>
+		You can search for a list of name records by specifying 
+		one or more of the following parameters. 
+	    "surname", "soundslike", "givenname", "prefix",
+		"title", "userref", and "treename" are pattern matches.
+		"idir", "order", "marriednamecreatedby", "birthsd",
+		"preferredaka", "akanote", "idmr",
+		"srchtag", and "qstag" are numeric values. 
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Reminders</th>
+      <td>This table contains records representing
+	reminders.
+	<br>
+	Specific records are identified by parameters 'id'.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Sources</th>
+      <td>This table contains records representing
+	documentary sources.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters. 
+	"srcname", "srctitle", "srcauthor", "srcpubl", "srctext", "srcnote",
+	"srctag", "srcexclude", "idst", "used", "psrcnote", "fsrcnote",
+	"tsrcnote", "psrctext", "fsrctext", "tsrctext", "idar", "enteredsd",
+	"filingref", "srccallnum", "verified", "published", "enteredd",
+	"qstag", "srcmpub", "srcrollnum", "templateid", "contents",
+	"usestandard", "idar2", "bibliography", "override",
+	"overridefootnote", "overridesubsequent", "overridebibliography".
+	For example "?table=Source&amp;srcname=Census" lists all sources 
+	whose name includes the word "Census".
+      </td>
+    </tr>
+    <tr>
+      <th class="label">SourceTypes</th>
+      <td>This table contains records representing
+	types of sources.
+	<br>
+	Specific records are identified by parameters 'id'.
+	If this is omitted the complete table is displayed.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Citations</th>
+      <td>This table contains records representing
+	citations to sources.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters. 
+	"idsr", "idime", "type", "srcdetail", "srcsurety", "srcprint", 
+	"srcprintdetail", "srcprinttext", "srcdettext", "srcdetnote", 
+	"srcprintnote", "enteredd", "enteredsd", "filingref", "order", 
+	"used", "verified", "content", "override", "overridefootnote", 
+	"overridesubsequent", "overridebibliography".
+      </td>
+    </tr>
+    <tr>
+      <th class="label">ToDoCategories</th>
+      <td>This table contains records representing
+	categories of To-Do items.
+	<br>
+	Specific records are identified by parameters 'id'.
+	If this is omitted the complete table is displayed.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">ToDoEntries</th>
+      <td>This table contains records representing
+	actions to take in the future.
+	<br>
+	Specific records are identified by parameters 'id'.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">ToDoLocalities</th>
+      <td>This table contains records representing
+	localities associated with To-Do items.
+	<br>
+	Specific records are identified by parameters 'id'.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Temples</th>
+      <td>This table contains records representing
+	LDS Temples at which ordinances take place.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters. 
+	"code", "code2", "temple", "templestart", "templeend",
+	"used", "tag1", "qstag"
+      </td>
+    </tr>
+    <tr>
+      <th class="label">RemovedIndividuals</th>
+      <td>This table contains records representing
+	record numbers of individuals that are no longer in use.
+	<br>
+	Specific records are identified by parameters 'id'.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">RemovedFamilies</th>
+      <td>This table contains records representing
+	record numbers of families that are no longer in use.
+	<br>
+	Specific records are identified by parameters 'id'.
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Users</th>
+      <td>This table contains representing registered users of
+	the site. Only an administrator can view this table.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters. 
+	"username", "password", "shapassword", "email", "auth", "id", "options"
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Blogs</th>
+      <td>This table contains records representing
+	blog entries associated with any record in the database.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters. 
+	"index", "datetime", "username", "bl_table",
+	"keyname", "keyvalue", "text"
+      </td>
+    </tr>
+    <tr>
+      <th class="label">MethodistBaptisms</th>
+      <td>This table contains records representing
+	Baptism records, particularly as maintained by the Wesleyan
+	Methodist Church in Canada.
+	<br>
+	Specific records are identified by parameters 'id'.
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters. 
+	"volume", "page", "district", "area", "givenname", "surname", "father", "mother", "residence", "birthplace", "birthdate", "baptismdate", "baptismplace", "minister", "idir"
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Births</th>
+      <td>This table contains records representing
+	birth registrations.
+	<br>
+	Specific records are identified by parameters 'domain', 'year', 'regnum'
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Deaths</th>
+      <td>This table contains records representing
+	death registrations.
+	<br>
+	Specific records are identified by parameters 'domain', 'year', 'regnum'
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Marriages</th>
+      <td>This table contains records representing
+	marriage registrations.
+	<br>
+	Specific records are identified by parameters 'domain', 'year', 'regnum'
+      </td>
+    </tr>
+    <tr>
+      <th class="label">CountyMarriages</th>
+      <td>This table contains records representing
+	marriages registered in Ontario prior to confederation which use
+	a different system of identification than those after confederation.
+	<br>
+	Specific records are identified by parameters 'Domain', 'Volume', 'ReportNo', 'ItemNo'
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters. 
+	"volume", "reportno", "domain"
+      </td>
+    </tr>
+    <tr>
+      <th class="label">CountyMarriageReports</th>
+      <td>This table contains records representing
+	annual reports from clergymen.
+	<br>
+	Specific records are identified by parameters 'Domain', 'Volume', 'ReportNo'.
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters. 
+	"volume", "domain"
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Counties</th>
+      <td>This table contains records representing
+	counties within a state or province.
+	<br>
+	Specific records are identified by parameters 'domain', and 'code'
+	<br>
+	For further information see
+	<a href="/getRecordCountiesHelpen.html">Counties</a>
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Townships</th>
+      <td>This table contains records representing
+	townships, towns, cities, and villages within a county for which
+	there as a separate registrar of vital statistics.
+	<br>
+	Specific records are identified by parameters 'domain', 'county', and
+	'code'.
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters. 
+	Exact match to "domain", "county", "prov", "code". 
+	Partial match to "name".
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Censuses</th>
+      <td>This table contains records representing
+	censuses that are supported for citations by transcriptions.
+	<br>
+	Specific records are identified by the parameter 'censusid'.  All census
+	records are displayed if no parameters are specified.
+	<br>
+	For further information see
+	<a href="/getRecordCensusesHelpen.html">Censuses</a>
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Districts</th>
+      <td>This table contains records representing
+	enumeration districts into which a census is divided for
+	administration.
+	<br>
+	Specific records are identified by parameters 'censusid', 'district'.
+	<br>
+	You can search for a list of districts by specifying 
+	one or more of the following parameters: 
+	"censusid", "name", "nom", "province", "population".
+      </td>
+    </tr>
+    <tr>
+      <th class="label">SubDistricts</th>
+      <td>This table contains records representing
+	enumeration divisions within a census.
+	<br>
+	Specific records are identified by parameters 'censusid', 'district', 
+	'subdistrict', 'division'.
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters: 
+	"domain", "county"
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Pages</th>
+      <td>This table contains records representing
+	individual pages within a census.
+	<br>
+	Specific records are identified by parameters "censusid", "district", 
+	"subdistrict", "division", "page".
+	<br>
+	You can search for a list of source records by specifying 
+	one or more of the following parameters: 
+	"censusid", "district", "subdistrict", "division", "page", "sched",
+	"population", "image", "transcriber", "proofreader".
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Census1851</th>
+      <td rowspan="10">These tables contain records transcribed from
+	specific censuses.
+	<br>
+	Specific records are identified by parameters "district",
+	"subdistrict", "division", "page", and "line". 
+	For pre-confederation (1867) censuses
+	the "province" must also be specified, for example "&amp;province=CW".
+	<br>
+	You can search for a list of source records by specifying 
+	any field names within the census.
+	For example "?table=Census1881&amp;givennames=John&amp;surname=Smith".
+	Some fields have special handling:
+	<table>
+	  <tr>
+	    <th>SurnameSoundex
+	    </th>
+	    <td>If this is a 4-character SOUNDEX code it is compared
+		directly to the SurnameSoundex field in the record.
+		Otherwise it is treated as a surname whose SOUNDEX code
+		is computed before the search is performed. 
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>GivenNames
+	    </th>
+	    <td>A loose search is performed for records whose given names
+		field contains any of the strings consisting of the first
+		two characters of any of the names in the value.  For example
+		"givennames=John William" will match any records with
+		given names containing either "jo" or "wi".
+	    </td>
+	  </tr>
+	</table>
+      </td>
+    </tr>
+    <tr>
+      <th class="label">Census1861</th>
+    </tr>
+    <tr>
+      <th class="label">Census1871</th>
+    </tr>
+    <tr>
+      <th class="label">Census1881</th>
+    </tr>
+    <tr>
+      <th class="label">Census1891</th>
+    </tr>
+    <tr>
+      <th class="label">Census1901</th>
+    </tr>
+    <tr>
+      <th class="label">Census1906</th>
+    </tr>
+    <tr>
+      <th class="label">Census1911</th>
+    </tr>
+    <tr>
+      <th class="label">Census1916</th>
+    </tr>
+    <tr>
+      <th class="label">Census1921</th>
+    </tr>
+  </table>
+</div>
+<div class="botcrumbs">
+  <span class="right">
+    <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+  </span>
+  <a href="/contactAuthor.php?subject=CountyMarriagesEditHelpen.html&amp;lang=en" target="_blank">Contact Author</a>
+  <br/>
+  <a href="/indexHelpen.html">Home</a>: 
+  <a href="/genealogyHelpen.html">Genealogy</a>: 
+  <div style="clear: both;"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Census Administration: Districts Help</title>
+      <meta http-equiv=Content-Type content="text/html; charset=utf-8">
+      <meta http-equiv="default-style" CONTENT="text/css">
+      <meta name="author" content="James A. Cobban">
+      <meta name="copyright" content="&copy; 2013 James A. Cobban">
+<!--*********************************************************************
+ *   History:															*
+ *                                                                      *
+ *		2011/06/03		created											*
+ *		2013/08/30		document new functionality						*
+ *		2013/12/28		use CSS for layout								*
+ *		2016/01/22		add EditCensusesHelpen.html to the hierarchy	*
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  <body>
+    <div class="topcrumbs">
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/Canada/genCanadaHelpen.html">Canada</a>:
+      <a href="/database/genCensusesHelpen.html">Censuses</a>:
+      <a href="/database/EditCensusesHelpen.html">Censuses Admin</a>:
+      <a href="/database/ReqUpdateDistsHelpen.html">Select Districts</a>:
+    </div>
+    <div class="help">
+      <h1>How to Update the Districts Table</h1>
+      <p>
+        The <b>Districts</b> table is intended to provide information on each 
+        district of a census.
+        The table is not complete because there is no automated way to collect all 
+        of the necessary information.  The  
+        <a href="/database/ReqUpdateDistsHelpen.html" target="help">
+    	Request Edit Districts Table</a>
+        page is used to manage the collection of the required information about
+        each district.
+      </p>
+      <p>Further information on the use of each of the fields on this page
+        is available by holding the mouse over the field or button.
+      </p>
+      <p>This page permits modifying the complete information maintained about each
+        district in a portion of a census.  Generally this form provides access
+        to the information on all districts within a province or state within a specific
+        census year.
+      </p>
+      <p>The body of the form functions like a spreadsheet, particularly with
+        respect to special key strokes.
+      <ul>
+        <li>The forward and backward tab keys, and the left and right arrow keys,
+    	change the selected input field in the table
+    	to the left or the right. Motion wraps around at the left and right
+    	edges of the table.
+        <li>The up and down arrows change the selected input field in the table 
+    	up or down one row at a time.
+    	Motion wraps around at the bottom and top of the table.
+        <li>The "Home" key repositions the text cursor at the beginning of the
+    	current input field.  The "End" key repositions the text cursor
+    	after the last character in the current input field.
+        <li>The "Ctl-Home" key combination selects the first input field in the row.
+    	The "Ctl-End" key combination selects the last input field in the row.
+        <li>The "Ctl-Z" key combination discards whatever you have typed in the
+    	current input field, and restores the value to what it was when the
+    	page was first displayed.
+        <li>The "Enter" key changes the selected cell in the table down
+    	one row at a time, rather than submitting the form as happens on
+    	simpler forms.
+      </ul>
+      </p>
+      <p>
+        The District number field is a sequential number from the first to
+        the last district number defined for the current census and province.  
+        It is not editable.  There is no mechanism for adding or deleting
+        districts through the web interface.
+      </p>
+      <p>The "Name" field contains the name of the district in English.
+      </p>
+      <p>The "Nom" field contains the name of the district in French.
+      </p>
+      <p>The "Province" column contains the two character postal abbreviation
+        for the Province.  For the pre-confederation censuses this may be
+      'CE' or 'CW' for Canada East and Canada West.
+      </p>
+      <p>The "Count" column displays the number of sub-districts defined in the
+        Sub-Districts table for this district.  If this is zero then it is necessary
+        to create the associated Sub-Districts for this District by clicking on
+        the "Sub-Districts" button and entering data from the Library and
+        Archives of Canada web-site. 
+      </p>
+      <p>The "%Done" column displays the percentage of the defined sub-districts
+        that have been completed for this district.  Only completed sub-districts
+        are ready for transcribers to contribute to.
+      </p>
+      <p>The <span class="button">Sub-Districts</span> button displays the
+      <a href="/database/SubDistFormHelpen.html">form for editing information about
+        the sub-districts and divisions in this district</a>.
+      </p>
+      <p>Further information on the use of each of the fields on this page
+        is available by pressing the F1 key while the field is selected.
+      </p>
+      <p>
+        You must click on the 
+      <span class="button">Update Database</span> button at the bottom of the
+        form to apply changes.  
+        If you click on the left or right arrow hyperlinks to the preceding and
+        following divisions in the line above the table
+        any changes you made to the table are discarded.
+        Observe that unlike simpler forms you cannot
+        submit this form by pressing the Enter key, because this simply moves
+        the selected cell down one row in the table.
+      </p>
+      <p>Once the database has been updated an 
+      <a href="/database/DistUpdateHelpen.html">update status page</a> is displayed.
+      </p>
+    </div>
+    <div class="botcrumbs">
+      <span class="right">		
+        <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+      </span>
+      <a href="/contactAuthor.php?subject=DistFormHelpen.html" target="_blank">
+    	Contact Author</a>
+      <br/>
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/Canada/genCanadaHelpen.html">Canada</a>:
+      <a href="/database/genCensusesHelpen.html">Censuses</a>:
+      <a href="/database/EditCensusesHelpen.html">Censuses Admin</a>:
+      <a href="/database/ReqUpdateDistsHelpen.html">Select Districts</a>:
+      <div style="clear: both;"></div>
+    </div>
+  </body>
+</html>

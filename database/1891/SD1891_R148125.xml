@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148125">
+    <option value="45_K">
+        Addington: Olden
+        <div id="" reel="148125" frame="0" count="21"/>
+    </option>
+    <option value="45_L">
+        Addington: Oso
+        <div id="1" reel="148125" frame="21" count="15"/>
+        <div id="2" reel="148125" frame="36" count="11"/>
+    </option>
+    <option value="45_M">
+        Addington: Palmerston&amp;Canonto
+        <div id="" reel="148125" frame="47" count="22"/>
+    </option>
+    <option value="45_N">
+        Addington: Portland
+        <div id="1" reel="148125" frame="69" count="19"/>
+        <div id="2" reel="148125" frame="88" count="17"/>
+        <div id="3" reel="148125" frame="105" count="17"/>
+    </option>
+    <option value="45_O">
+        Addington: Sheffield
+        <div id="1" reel="148125" frame="122" count="26"/>
+        <div id="2" reel="148125" frame="148" count="24"/>
+    </option>
+    <option value="46_A">
+        Algoma: Algoma Mills
+        <div id="" reel="148125" frame="172" count="13"/>
+    </option>
+    <option value="46_B">
+        Algoma: Bruce Mines
+        <div id="" reel="148125" frame="185" count="16"/>
+    </option>
+    <option value="46_C">
+        Algoma: Day
+        <div id="1" reel="148125" frame="201" count="11"/>
+        <div id="2" reel="148125" frame="212" count="11"/>
+    </option>
+    <option value="46_D">
+        Algoma: Echo River
+        <div id="1" reel="148125" frame="223" count="5"/>
+        <div id="2" reel="148125" frame="228" count="8"/>
+    </option>
+    <option value="46_E">
+        Algoma: Garden River
+        <div id="" reel="148125" frame="236" count="13"/>
+    </option>
+    <option value="46_F">
+        Algoma: Goulais Bay
+        <div id="" reel="148125" frame="249" count="6"/>
+    </option>
+    <option value="46_G">
+        Algoma: Grande Pointe
+        <div id="" reel="148125" frame="255" count="4"/>
+    </option>
+    <option value="46_H">
+        Algoma: Hallam &amp; Graham
+        <div id="1" reel="148125" frame="259" count="10"/>
+        <div id="2" reel="148125" frame="269" count="6"/>
+    </option>
+    <option value="46_I">
+        Algoma: Hilton
+        <div id="" reel="148125" frame="275" count="9"/>
+    </option>
+    <option value="46_J">
+        Algoma: Killarney
+        <div id="" reel="148125" frame="284" count="11"/>
+    </option>
+    <option value="46_K">
+        Algoma: Kirkwood
+        <div id="" reel="148125" frame="295" count="5"/>
+    </option>
+    <option value="46_L">
+        Algoma: Mamainse
+        <div id="" reel="148125" frame="300" count="3"/>
+    </option>
+    <option value="46_M">
+        Algoma: Michipicoten
+        <div id="" reel="148125" frame="303" count="3"/>
+    </option>
+    <option value="46_N">
+        Algoma: Mississagua
+        <div id="" reel="148125" frame="306" count="17"/>
+    </option>
+    <option value="46_O">
+        Algoma: Otter Tail
+        <div id="1" reel="148125" frame="323" count="10"/>
+        <div id="2" reel="148125" frame="333" count="9"/>
+    </option>
+    <option value="46_P">
+        Algoma: Port Findlay
+        <div id="1" reel="148125" frame="342" count="8"/>
+        <div id="2" reel="148125" frame="350" count="10"/>
+    </option>
+    <option value="46_Q">
+        Algoma: Root River, Korah, Tarentorous, Awenge, Parke, &amp; Prince
+        <div id="1" reel="148125" frame="360" count="4"/>
+        <div id="2" reel="148125" frame="364" count="11"/>
+    </option>
+    <option value="46_R">
+        Algoma: Sault Ste. Marie Centre
+        <div id="" reel="148125" frame="375" count="21"/>
+    </option>
+    <option value="46_S">
+        Algoma: Sault Ste. Marie East
+        <div id="" reel="148125" frame="396" count="11"/>
+    </option>
+    <option value="46_T">
+        Algoma: Sault Ste. Marie West
+        <div id="" reel="148125" frame="407" count="20"/>
+    </option>
+    <option value="46_U">
+        Algoma: Spanish River
+        <div id="1" reel="148125" frame="427" count="19"/>
+        <div id="2" reel="148125" frame="446" count="11"/>
+    </option>
+    <option value="46_V">
+        Algoma: St-Joseph
+        <div id="" reel="148125" frame="457" count="8"/>
+    </option>
+    <option value="46_W">
+        Algoma: Tenby Bay
+        <div id="" reel="148125" frame="465" count="8"/>
+    </option>
+    <option value="46_X">
+        Algoma: Thessalon
+        <div id="" reel="148125" frame="473" count="24"/>
+    </option>
+    <option value="46_Y">
+        Algoma: Beaver &amp; Silver Mountain
+        <div id="" reel="148125" frame="497" count="15"/>
+    </option>
+    <option value="46_Z">
+        Algoma: Biscotasing
+        <div id="1" reel="148125" frame="512" count="0"/>
+        <div id="2" reel="148125" frame="512" count="20"/>
+        <div id="3" reel="148125" frame="532" count="3"/>
+        <div id="4" reel="148125" frame="535" count="7"/>
+        <div id="5" reel="148125" frame="542" count="9"/>
+        <div id="6" reel="148125" frame="551" count="6"/>
+    </option>
+    <option value="46_AA">
+        Algoma: Snider
+        <div id="1" reel="148125" frame="557" count="2"/>
+        <div id="2" reel="148125" frame="559" count="16"/>
+    </option>
+    <option value="46_BB">
+        Algoma: Fort Francis
+        <div id="1" reel="148125" frame="575" count="3"/>
+        <div id="2" reel="148125" frame="578" count="23"/>
+    </option>
+    <option value="46_CC">
+        Algoma: Hawk Lake
+        <div id="" reel="148125" frame="601" count="1"/>
+    </option>
+    <option value="46_DD">
+        Algoma: Keewatin North
+        <div id="" reel="148125" frame="602" count="12"/>
+    </option>
+    <option value="46_EE">
+        Algoma: Keewatin South
+        <div id="" reel="148125" frame="614" count="18"/>
+    </option>
+    <option value="46_FF">
+        Algoma: Murillo
+        <div id="" reel="148125" frame="632" count="10"/>
+    </option>
+    <option value="46_GG">
+        Algoma: Neebing Centre &amp; South
+        <div id="" reel="148125" frame="642" count="19"/>
+    </option>
+    <option value="46_HH">
+        Algoma: Neebing North
+        <div id="" reel="148125" frame="661" count="23"/>
+    </option>
+</select>

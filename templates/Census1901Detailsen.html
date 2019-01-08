@@ -1,0 +1,116 @@
+<!--*********************************************************************
+ *  Census1901Detailsen.html											*
+ *																		*
+ *  Display every field from a row of the 1901 census in tabular form.	*
+ *																		*
+ *  History:															*
+ *		2017/10/25		created											*
+ *		2018/01/04		remove Template from template file names		*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>
+    <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">Canada</a>
+    <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>
+    <a href="/database/QueryDetail.php?Census=CA1901&amp;lang=$LANG">New 1901 Census Query</a>
+    <a onclick="history.back(); return false;" href="dummy">Search Results</a>
+    <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTID&amp;lang=$LANG">District $DISTID $DISTNAME Summary</a>
+    <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&amp;Division=$DIVISION&amp;lang=$LANG">Division Details</a>
+  </div> <!-- id="breadcrumbs" -->
+
+  <div class="body">
+    <h1>
+      <span class="right">
+		<a href="/database/CensusDetailsHelpen.html" target="help">? Help</a>
+      </span>
+		1901 Census of Canada: Details
+      <div style="clear: both;"></div>
+    </h1>
+    $MSG
+    $TRACE
+    <div class="center">
+      <span class="left">
+		<a href="/database/Census<?php print $cyear; ?>Details.php?Province=<?php print $province; ?>&amp;District=<?php print $distId; ?>&amp;SubDistrict=<?php print $subdistId; ?>&amp;Division=<?php print $division; ?>&amp;Page=<?php print $prevPage; ?>&amp;Line=<?php print $prevLine; ?>">&lt;---</a>
+      </span>
+      <span class="right">
+		<a href="/database/Census<?php print $cyear; ?>Details.php?Province=<?php print $province; ?>&amp;District=<?php print $distId; ?>&amp;SubDistrict=<?php print $subdistId; ?>&amp;Division=<?php print $division; ?>&amp;Page=<?php print $nextPage; ?>&amp;Line=<?php print $nextLine; ?>">---&gt;</a>
+      </span>
+		<?php print $heading; ?>
+      <div style="clear: both;"></div>
+    </div>
+    <table class="details" <?php print $cellspacing; ?>>
+     <thead>
+     <!--- Put out the column headers -->
+      <tr>
+		<th class="colhead">
+		  Field Name
+		</th>
+		<th class="colhead">
+		  Value
+		</th>
+		<th class="colhead">
+		  Field Name
+		</th>
+		<th class="colhead">
+		  Value
+		</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr id="Row">
+		<th class="label">
+		    $label1 
+		</th>
+		<td class="odd">
+<?php
+		    if ($key == 'family')
+		    {		// hyperlink to family list
+?> 
+		    <a href="/database/CensusResponse.php?<?php print $uri; ?>&amp;Family=<?php print $val; ?>">
+			<?php print $val; ?>
+		    </a>
+<?php
+		    }		// hyperlink to family list
+		    else
+		    if ($key == 'page')
+		    {		// hyperlink to page summary display
+?> 
+		    <a href="/database/CensusResponse.php?<?php print $uri; ?>&amp;Page=<?php print $val; ?>">
+			<?php print $val; ?>
+		    </a>
+<?php
+		    }		// hyperlink to page summary display
+		    else
+		    if ($key == 'idir')
+		    {		// hyperlink to family tree display
+?> 
+		    <a href="/FamilyTree/Person.php?idir=<?php print $val; ?>"
+			target="_blank">
+			<?php print $val; ?>
+		    </a>
+<?php
+		    }		// hyperlink to family tree display
+		    else
+		    {		// just show the value
+?>
+		    <?php print $val; ?> 
+<?php
+		    }		// just show the value
+?>
+		</td>
+<?php
+
+		    // complete the current row and set up for the next
+		    if ($even)
+		    {
+?> 
+      </tr>
+<?php
+		    }
+		    $even	= !$even;
+		}		// foreach field in row
+?>
+     </tbody>
+    </table>
+  </div> <!-- class="body" -->

@@ -1,0 +1,82 @@
+/************************************************************************
+ *  BirthRegQuery.css													*
+ *																		*
+ *  Stylesheet for the script BirthRegQuery.php							*
+ *																		*
+ *  History:															*
+ *		2013/12/26	created								    			*
+ *	    2018/03/17	increase width of labelSmall to 12em	            * 
+ *	    2018/03/17	increase width of labelSmall to 13em	            * 
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ ************************************************************************/
+
+/*	column containers */
+    div.column1	{float:         left;
+				width:          25em;
+				margin-top:     1px;
+				margin-right:   3px;
+				}
+    div.column2	{float:         left;
+				margin-top:     1px;
+				margin-right:   3px;
+				}
+    div.column3	{float:         left;
+				margin-top:     1px;
+				margin-right:   3px;
+				}
+/*	labels of various widths */
+    label.labelSmall {font-family: sans-serif;
+				font-weight:    bold;
+				font-size:      smaller;
+				text-align:     right;
+				vertical-align: top;
+				padding:        0px 3px 0px 3px;
+				margin-top:     1px;
+				float:          left;
+				width:          13em;
+				}
+    label.labelSmall5em {
+                font-family:    sans-serif;
+				font-weight:    bold;
+				font-size:      smaller;
+				text-align:     right;
+				vertical-align: top;
+				padding:        0px 3px 0px 3px;
+				margin-top:     1px;
+				float:          left;
+				width:          5em;
+				}
+    label.labelSmallcol2 {
+                font-family:    sans-serif;
+				font-weight:    bold;
+				font-size:      smaller;
+				text-align:     right;
+				vertical-align: top;
+				padding:        0px 3px 0px 3px;
+				margin-top:     1px;
+				float:          left;
+				width:          9em;
+				}
+    input.actleft {
+				font-family:	sans-serif;
+				text-align: 	left;
+				background-color: white;
+				color:	    	black;
+				text-transform: capitalize;
+				padding:    	0px;
+				border-top:	    1px solid black;
+				border-left:	1px solid black;
+				border-bottom:	1px solid white;
+				border-right:	1px solid white;
+				width:	    	14em;
+				}
+
+    select.actleft {
+				font-family:	sans-serif;
+				text-align: 	left;
+				background-color: white;
+				color:		    black;
+				padding:    	0px;
+				width:	    	14em;
+				}

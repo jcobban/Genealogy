@@ -1,0 +1,61 @@
+/************************************************************************
+ *  editSource.css							*
+ *									*
+ *  Stylesheet for the scripts editSource.php				*
+ *									*
+ *  History:								*
+ *	2014/01/30	created						*
+ *	2014/03/06	change name of <label> class			*
+ *									*
+ *  Copyright &copy; 2014 James A. Cobban				*
+ ************************************************************************/
+
+/*	column containers */
+    div.column1	{float:		left;
+		margin-top:	1px;
+		margin-right:	3px;
+		}
+/*	labels of various widths */
+    label.column1 {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		margin-top:	1px;
+		float:		left;
+		width:		11em;
+		}
+    input.left {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		black;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		45em;
+		margin-bottom:	2px;
+		}
+    input.leftnc {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		black;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		45em;
+		margin-bottom:	2px;
+		}
+    select.leftwide {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		black;
+		padding:	0px;
+		width:		45em;
+		margin-bottom:	2px;
+		}

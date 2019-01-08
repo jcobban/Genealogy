@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148202">
+    <option value="159_H">
+        Kamouraska: Ste. Eleuthère
+        <div id="" reel="148202" frame="0" count="14"/>
+    </option>
+    <option value="159_I">
+        Kamouraska: Ste. Hélène
+        <div id="" reel="148202" frame="14" count="31"/>
+    </option>
+    <option value="159_J">
+        Kamouraska: St. Louis
+        <div id="" reel="148202" frame="45" count="22"/>
+    </option>
+    <option value="159_K">
+        Kamouraska: St. Onésime d'Ixworth
+        <div id="" reel="148202" frame="67" count="16"/>
+    </option>
+    <option value="159_L">
+        Kamouraska: St. Pacôme
+        <div id="" reel="148202" frame="83" count="41"/>
+    </option>
+    <option value="159_M">
+        Kamouraska: St. Paschal &amp; Woodbridge
+        <div id="1" reel="148202" frame="124" count="49"/>
+        <div id="2" reel="148202" frame="173" count="15"/>
+    </option>
+    <option value="159_N">
+        Kamouraska: St. Philippe de Neré
+        <div id="" reel="148202" frame="188" count="23"/>
+    </option>
+    <option value="160_A">
+        Laprairie: Laprairie
+        <div id="1" reel="148202" frame="211" count="13"/>
+        <div id="2" reel="148202" frame="224" count="10"/>
+        <div id="3" reel="148202" frame="234" count="12"/>
+    </option>
+    <option value="160_B">
+        Laprairie: Laprairie Village
+        <div id="" reel="148202" frame="246" count="26"/>
+    </option>
+    <option value="160_C">
+        Laprairie: Sault St. Louis
+        <div id="1" reel="148202" frame="272" count="18"/>
+        <div id="2" reel="148202" frame="290" count="23"/>
+    </option>
+    <option value="160_D">
+        Laprairie: St. Constant
+        <div id="1" reel="148202" frame="313" count="18"/>
+        <div id="2" reel="148202" frame="331" count="15"/>
+    </option>
+    <option value="160_E">
+        Laprairie: St. Isidore
+        <div id="1" reel="148202" frame="346" count="17"/>
+        <div id="2" reel="148202" frame="363" count="15"/>
+    </option>
+    <option value="160_F">
+        Laprairie: St. Jacques le Mineur
+        <div id="1" reel="148202" frame="378" count="14"/>
+        <div id="2" reel="148202" frame="392" count="20"/>
+    </option>
+    <option value="160_G">
+        Laprairie: St. Phillippe
+        <div id="1" reel="148202" frame="412" count="13"/>
+        <div id="2" reel="148202" frame="425" count="24"/>
+    </option>
+    <option value="161_A">
+        L'Assomption: Lachenaie
+        <div id="" reel="148202" frame="449" count="13"/>
+    </option>
+    <option value="161_B">
+        L'Assomption: L'Assomption
+        <div id="" reel="148202" frame="462" count="26"/>
+    </option>
+    <option value="161_C">
+        L'Assomption: L'Assomption Town
+        <div id="" reel="148202" frame="488" count="26"/>
+    </option>
+    <option value="161_D">
+        L'Assomption: Laurentides Town
+        <div id="" reel="148202" frame="514" count="20"/>
+    </option>
+    <option value="161_E">
+        L'Assomption: L'Épiphanie
+        <div id="1" reel="148202" frame="534" count="16"/>
+        <div id="2" reel="148202" frame="550" count="15"/>
+    </option>
+    <option value="161_F">
+        L'Assomption: Repentigny
+        <div id="" reel="148202" frame="565" count="15"/>
+    </option>
+    <option value="161_G">
+        L'Assomption: St. Henri de Mascouche
+        <div id="1" reel="148202" frame="580" count="17"/>
+        <div id="2" reel="148202" frame="597" count="27"/>
+    </option>
+    <option value="161_H">
+        L'Assomption: St. Lin
+        <div id="1" reel="148202" frame="624" count="17"/>
+        <div id="2" reel="148202" frame="641" count="18"/>
+    </option>
+    <option value="161_I">
+        L'Assomption: St. Paul l'Ermite
+        <div id="" reel="148202" frame="659" count="26"/>
+    </option>
+    <option value="161_J">
+        L'Assomption: St. Roch de L'Achigan
+        <div id="" reel="148202" frame="685" count="42"/>
+    </option>
+    <option value="161_K">
+        L'Assomption: St. Sulpice
+        <div id="" reel="148202" frame="727" count="19"/>
+    </option>
+    <option value="162_A">
+        Laval: Ste. Dorothée
+        <div id="" reel="148202" frame="746" count="19"/>
+    </option>
+    <option value="162_B">
+        Laval: St. François de Sales
+        <div id="" reel="148202" frame="765" count="17"/>
+    </option>
+    <option value="162_C">
+        Laval: St. Martin
+        <div id="1" reel="148202" frame="782" count="19"/>
+    </option>
+</select>

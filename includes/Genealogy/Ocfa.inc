@@ -1,0 +1,163 @@
+<?php
+namespace Genealogy;
+use \PDO;
+use \Exception;
+use \ArrayAccess;
+use \Countable;
+use \Iterator;
+/************************************************************************
+ *  Ocfa.inc												            *
+ *																		*
+ *  Definition of a class representing a record in the					*
+ *  Ontario Cemetery Finding Aid (OCFA) table.                          *
+ *																		*
+ *		CREATE TABLE `Ocfa` (								            *
+ *	    	`Surname`           VARCHAR(48),							*
+ *	    	`GivenName`         VARCHAR(48),							*
+ *	    	`Cemetery`          VARCHAR(64),							*
+ *	    	`County`            VARCHAR(32),							*
+ *	    	`Township`          VARCHAR(48),							*
+ *	    	`Reference`         VARCHAR(16),							*
+ *	    	`Soundex`           CHAR(4) )								*
+ *          ENGINE=InnoDBDEFAULT CHARSET=utf8							*
+ *																		*
+ *  History:															*
+ *		2018/11/21		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ ************************************************************************/
+require_once __NAMESPACE__ . '/Record.inc';
+
+/************************************************************************
+ *  class Ocfa												            *
+ *																		*
+ *  Definition of a class implementing the interface to a record		*
+ *  in the Ontario Cemetery Finding Aid (OCFA) table.					*
+ ************************************************************************/
+
+class Ocfa extends Record
+{
+
+    /********************************************************************
+     *	Ocfa::$initRow		array containing default values for			*
+     *						each field in a new record					*
+     ********************************************************************/
+    protected static	$initRow	= array(
+                    'recordindex'       => 0,
+                    'surname'			=> '',
+                    'givenname'			=> '',
+                    'cemetery'			=> '',
+                    'county'			=> '',
+                    'township'			=> '',
+                    'reference'			=> '',
+                    'soundex'           => '');
+
+    /********************************************************************
+     *	Ocfa::$translate                                                *
+     *																	*	
+     *	static array containing alternate field names		            *
+     ********************************************************************/
+    protected static	$translate	= array(
+						'id'				=> 'recordindex');
+
+    /********************************************************************
+     *	Ocfa::$defaultOrder		                						*
+     *																	*
+     *	Definition of default order for records retrieved by RecordSet	*
+     ********************************************************************/
+    protected static	$defaultOrder	= 
+        'Surname,GivenName, County, Township, Cemetery';
+						
+    /********************************************************************
+     *	function Ocfa::__construct							            *
+     *																	*
+     *  Given defining parameters construct an instance.				*
+     *																	*
+     *  Input:															*
+     *		$parms		associative array of parameters					*
+     *					for example:									*
+     *					    array('id'		=> $id)				        *
+     *					or an array representing an already fetched		*
+     *					record											*
+     *																	*
+     *  Returns object containing Ocfa record.				            *
+     ********************************************************************/
+    function __construct($parms)
+    {
+		global	$debug;
+		global	$warn;
+		global	$connection;
+		global	$userid;
+
+		$needInsert	= true;
+		$errors		= '';
+
+		if ($debug)
+		    $warn	.= "<p>Ocfa::__construct(" .
+							print_r($parms, true) . ")</p>\n";
+
+		if (is_array($parms))
+		{		// associative array
+		    if (count($parms) >= count(self::$initRow))
+		    {			// complete row from database
+				$dbrow		        = $parms;
+				$needInsert	        = false;
+		    }			// complete row from datase
+		    else
+		    {			// key and optional other parms
+				$id		= 0;
+				if (array_key_exists('id', $parms))
+				    $id = $parms['id'];
+
+                if ($id > 0)
+				{		// initialize from database
+				    // construct the query of the user table
+				    $query	= 'SELECT * FROM Ocfa ' .
+								'WHERE RecordIndex=:id';
+				    $sqlParms	= array('id'	=> $id);
+				    
+				    // query the database
+				    $stmt	    = $connection->prepare($query);
+				    $queryText	= debugPrepQuery($query, $sqlParms);
+				    
+				    if ($stmt->execute($sqlParms))
+				    {		// success
+						if ($debug)
+						    $warn	.= "<p>Ocfa::__construct: ".
+								   "$queryText</p>";
+						$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
+						if (count($result) > 0)
+						{		// found matching record
+						    $dbrow		    = $result[0];
+						    $needInsert		= false;
+						}		// found matching record
+						else
+						{		// invalid key
+						    $dbrow		    = self::$initRow;
+						    $needInsert		= true;
+						}		// invalid key
+				    }		// success
+				    else
+				    {		// error performing query
+						throw new Exception("Ocfa::__construct: " .
+								    "query='$queryText', " .
+							    print_r($stmt->errorInfo(),true));
+				    }		// error performing query
+				}		// initialize from database
+		    }		// key and optional other parms
+		}		// associative array
+		else
+		{		// unexpected parameter type
+		    throw new Exception('Ocfa::__construct: called with ' .
+							 gettype($parms));
+		}		// unexpected parameter type
+
+		// invoke constructor of base class
+		parent::__construct($dbrow,
+						    'Ocfa');
+		$this->needInsert	= $needInsert;
+
+		// diagnostic output if debug is set
+		$this->dump('Ocfa Record constructed:');
+    }		// Ocfa::__construct
+}		// class Ocfa 

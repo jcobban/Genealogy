@@ -1,0 +1,97 @@
+<!--*********************************************************************
+ *  cobban.html								*
+ * 									*
+ *  Display intro web page to Cobban family tree			*
+ * 									*
+ *  History: 								*
+ * 	2010/08/21	Change to use new page format			*
+ *	2013/06/01	change nominalIndex.html to legacyIndex.php	*
+ *	2014/02/10	remove tables					*
+ *	2015/03/25	top page of hierarchy is now genealogy.php	*
+ *	2018/02/03	change breadcrumbs to new standard		*
+ *			convert to template				*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php">
+	Genealogy</a>:
+    <a href="/genCountry.php?cc=CA">
+	Canada
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=CAON">
+	Ontario
+    </a>:
+    <a href="/FamilyTree/nominalIndex.php">
+	Index of Names
+    </a>:
+  </div>
+  <div class="body" id="familyTree">
+    <h1>Cobban Family Tree</h1>
+    <p>This web page documents all known descendants of
+	<a href="/FamilyTree/Person.php?idir=196">John (Earnest) Cobban</a>
+	(1758-1813).
+	There is also some information about his father
+	<a href="/FamilyTree/Person.php?idir=203">William Couban</a>
+	(1724-?) and his siblings.
+    </p>
+    <p>This web page also documents all known descendants, and ancestors, of 
+	<a href="/FamilyTree/Person.php?idir=656">John Wilton Sr.</a>
+	(1790-1861), who include my paternal grandmother Ethel Clara Wilton.
+    </p>
+    <p>There is some information on the descendants of 
+	<a href="/FamilyTree/Person.php?idir=1243" target="_blank">John Brodie</a>
+	(1816-1883) and 
+	<a href="/FamilyTree/Person.php?idir=1292" target="_blank">Stephen Bond </a>(1809-1886),
+	who include my paternal great-grandmothers Margaret Brodie and Elizabeth
+	Bond.
+    </p>
+    <p>On my mother's side there is some information on the descendants of
+	<a href="/FamilyTree/Person.php?idir=189" target="_blank">John Gale</a> (about 1730-?) 
+	and <a href="/FamilyTree/Person.php?idir=2696" target="_blank">William Whittaker</a>
+	(about 1805-?), who include my mother.
+    </p>
+    <p>You can search for an individual in this tree by name using the
+	<a href="/FamilyTree/nominalIndex.php" target="_blank">Index of Names</a>.
+    <p>There is also some background information collected by my Father:
+    </p>
+  <ul>
+    <li>
+      <a href="/displayPage.php?template=History.html" target="_blank">
+	Summary of Scottish history
+      </a>
+    </li>
+    <li>
+      <a href="/displayPage.php?template=cobbback.html" target="_blank">
+	Cobban Family Background
+      </a>
+    </li>
+    <li>
+      <a href="/displayPage.php?template=CobbMail.html" target="_blank">
+	List of Contributors and Contacts
+      </a>
+    </li>
+  </ul>
+
+  </div> <!-- class="body" -->
+<!--*********************************************************************
+ *  generate popups							*
+ **********************************************************************-->
+  <div id="Individ$idir" class="balloon">
+    <b>$name</b>
+    <p>
+      <span id="deletePers$birthd">born $birthd
+        <span id="deletePers$birthloc">at $birthloc</span>
+      </span>
+      <span id="deletePers$deathd">died $deathd
+        <span id="deletePers$deathloc">$description at $deathloc</span>
+      </span>
+    </p>
+    <p id="families$families">Marriage of $name. </p>
+    <p id="parents$parents">Child of $name</p>
+  </div> 
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="text/javaScript">
+    </script>
+    <script src="/displayPage.js" type="text/javaScript">
+    </script>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="37">
+    <option value="416">
+        Berlin Village &amp; Gaol
+    </option>
+    <option value="417">
+        Dumfries N.
+    </option>
+    <option value="418">
+        Galt Town
+    </option>
+    <option value="419">
+        Hamburg Village
+    </option>
+    <option value="420">
+        Hespeler Village
+    </option>
+    <option value="421">
+        Preston Village
+    </option>
+    <option value="422">
+        Waterloo Village
+    </option>
+    <option value="423">
+        Waterloo N.
+    </option>
+    <option value="424">
+        Waterloo S.
+    </option>
+    <option value="425">
+        Wellesley
+    </option>
+    <option value="426">
+        Wilmot
+    </option>
+    <option value="427">
+        Woolwich
+    </option>
+    <option value="427A">
+        Agricultural Census
+    </option>
+</select>

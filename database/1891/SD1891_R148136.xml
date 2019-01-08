@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148136">
+    <option value="61_A">
+        Elgin West: Aldborough
+        <div id="2" reel="148136" frame="0" count="36"/>
+        <div id="3" reel="148136" frame="36" count="15"/>
+        <div id="4" reel="148136" frame="51" count="37"/>
+    </option>
+    <option value="61_B">
+        Elgin West: Dunwich
+        <div id="1" reel="148136" frame="88" count="28"/>
+        <div id="2" reel="148136" frame="116" count="28"/>
+        <div id="3" reel="148136" frame="144" count="20"/>
+    </option>
+    <option value="61_C">
+        Elgin West: Dutton
+        <div id="" reel="148136" frame="164" count="19"/>
+    </option>
+    <option value="61_D">
+        Elgin West: Howard
+        <div id="1" reel="148136" frame="183" count="30"/>
+        <div id="2" reel="148136" frame="213" count="19"/>
+        <div id="3" reel="148136" frame="232" count="26"/>
+    </option>
+    <option value="61_E">
+        Elgin West: Orford
+        <div id="1" reel="148136" frame="258" count="13"/>
+        <div id="2" reel="148136" frame="271" count="29"/>
+        <div id="3" reel="148136" frame="300" count="18"/>
+        <div id="4" reel="148136" frame="318" count="14"/>
+    </option>
+    <option value="61_F">
+        Elgin West: Ridgetown
+        <div id="" reel="148136" frame="332" count="48"/>
+    </option>
+    <option value="61_G">
+        Elgin West: Southwold
+        <div id="1" reel="148136" frame="380" count="41"/>
+        <div id="2" reel="148136" frame="421" count="33"/>
+        <div id="3" reel="148136" frame="454" count="25"/>
+    </option>
+    <option value="62_A">
+        Essex North: Belle River Village
+        <div id="" reel="148136" frame="479" count="14"/>
+    </option>
+    <option value="62_B">
+        Essex North: Maidstone
+        <div id="1" reel="148136" frame="493" count="20"/>
+        <div id="2" reel="148136" frame="513" count="45"/>
+    </option>
+    <option value="62_C">
+        Essex North: Rochester
+        <div id="1" reel="148136" frame="558" count="33"/>
+        <div id="2" reel="148136" frame="591" count="26"/>
+    </option>
+    <option value="62_D">
+        Essex North: Sandwich East
+        <div id="1" reel="148136" frame="617" count="58"/>
+        <div id="2" reel="148136" frame="675" count="33"/>
+    </option>
+</select>

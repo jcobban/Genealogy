@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148118">
+    <option value="35_F">
+        Hants: Five Mile River
+        <div id="" reel="148118" frame="0" count="9"/>
+    </option>
+    <option value="35_G">
+        Hants: Forks
+        <div id="" reel="148118" frame="9" count="17"/>
+    </option>
+    <option value="35_H">
+        Hants: Gore
+        <div id="" reel="148118" frame="26" count="25"/>
+    </option>
+    <option value="35_I">
+        Hants: Hantsport
+        <div id="" reel="148118" frame="51" count="19"/>
+    </option>
+    <option value="35_J">
+        Hants: Kempt
+        <div id="1" reel="148118" frame="70" count="19"/>
+        <div id="2" reel="148118" frame="89" count="18"/>
+    </option>
+    <option value="35_K">
+        Hants: Maitland
+        <div id="" reel="148118" frame="107" count="16"/>
+    </option>
+    <option value="35_L">
+        Hants: Nine Mile River
+        <div id="" reel="148118" frame="123" count="25"/>
+    </option>
+    <option value="35_M">
+        Hants: Noel
+        <div id="" reel="148118" frame="148" count="25"/>
+    </option>
+    <option value="35_N">
+        Hants: Rawdon Church
+        <div id="" reel="148118" frame="173" count="18"/>
+    </option>
+    <option value="35_O">
+        Hants: Scotch Village
+        <div id="" reel="148118" frame="191" count="17"/>
+    </option>
+    <option value="35_P">
+        Hants: Selmah
+        <div id="" reel="148118" frame="208" count="12"/>
+    </option>
+    <option value="35_Q">
+        Hants: Shubenacadie
+        <div id="" reel="148118" frame="220" count="29"/>
+    </option>
+    <option value="35_R">
+        Hants: South Maitland
+        <div id="" reel="148118" frame="249" count="12"/>
+    </option>
+    <option value="35_S">
+        Hants: South Rawdon &amp; Uniacke
+        <div id="" reel="148118" frame="261" count="19"/>
+    </option>
+    <option value="35_T">
+        Hants: Ste. Croix
+        <div id="" reel="148118" frame="280" count="31"/>
+    </option>
+    <option value="35_U">
+        Hants: Walton
+        <div id="" reel="148118" frame="311" count="15"/>
+    </option>
+    <option value="35_V">
+        Hants: Windsor Court House
+        <div id="1" reel="148118" frame="326" count="29"/>
+        <div id="2" reel="148118" frame="355" count="23"/>
+    </option>
+    <option value="36_A">
+        Inverness: Broad Cove Marsh
+        <div id="1" reel="148118" frame="378" count="12"/>
+        <div id="2" reel="148118" frame="390" count="11"/>
+    </option>
+    <option value="36_B">
+        Inverness: Cheticamp
+        <div id="1" reel="148118" frame="401" count="14"/>
+        <div id="2" reel="148118" frame="415" count="18"/>
+        <div id="3" reel="148118" frame="433" count="19"/>
+        <div id="4" reel="148118" frame="452" count="17"/>
+    </option>
+    <option value="36_C">
+        Inverness: Glencoe
+        <div id="" reel="148118" frame="469" count="22"/>
+    </option>
+    <option value="36_D">
+        Inverness: Hawkesbury Town
+        <div id="" reel="148118" frame="491" count="14"/>
+    </option>
+    <option value="36_E">
+        Inverness: Hillsboro
+        <div id="1" reel="148118" frame="505" count="11"/>
+        <div id="2" reel="148118" frame="516" count="11"/>
+    </option>
+    <option value="36_F">
+        Inverness: Judique
+        <div id="1" reel="148118" frame="527" count="16"/>
+        <div id="2" reel="148118" frame="543" count="15"/>
+        <div id="3" reel="148118" frame="558" count="10"/>
+    </option>
+    <option value="36_G">
+        Inverness: Lake Ainslie East
+        <div id="" reel="148118" frame="568" count="16"/>
+    </option>
+    <option value="36_H">
+        Inverness: Lake Ainslie West
+        <div id="" reel="148118" frame="584" count="9"/>
+    </option>
+    <option value="36_I">
+        Inverness: Margarie
+        <div id="1" reel="148118" frame="593" count="22"/>
+        <div id="2" reel="148118" frame="615" count="14"/>
+    </option>
+    <option value="36_J">
+        Inverness: Margarie North-East
+        <div id="1" reel="148118" frame="629" count="14"/>
+        <div id="2" reel="148118" frame="643" count="17"/>
+    </option>
+    <option value="36_K">
+        Inverness: Margarie South-West
+        <div id="1" reel="148118" frame="660" count="12"/>
+    </option>
+</select>

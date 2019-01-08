@@ -1,0 +1,246 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+   <title>Edit Event: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+<!--*********************************************************************
+ *  editEventHelpen.html                                                *
+ *                                                                      *
+ *  History:															*
+ *		2010/12/04		created											*
+ *		2011/01/28		new features									*
+ *		2011/03/03		keyboard shortcuts								*
+ *		2011/10/01		document database lookup assist for location	*
+ *						name											*
+ *		2011/12/24		improved generic event support					*
+ *		2012/02/26		document rich text editing of note field		*
+ *						add images to clarify text						*
+ *						highlight button text							*
+ *		2013/05/16		document ability to add new source				*
+ *		2013/08/25		document ability to change event type			*
+ *						document new Clear Note button					*
+ *						improve description of WYSIWYG editor			*
+ *		2014/02/10		remove tables									*
+ *		2017/09/09		change class LegacyLocation to class Location	*
+ *		2018/02/04		update header/footer links						*
+ *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+</head>
+<body>
+<div class="topcrumbs">
+    <a href="/indexHelpen.html">Home</a>: 
+    <a href="/genealogyHelpen.html">Genealogy</a>: 
+    <a href="/FamilyTree/ServicesHelpen.html">Services</a>: 
+    <a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>: 
+    <a href="/FamilyTree/PersonHelpen.html">Individual</a>: 
+    <a href="/FamilyTree/editIndividHelpen.html">Edit Individual</a>: 
+</div>
+<div class="help">
+<h1>Edit Event: Help</h1>
+<p>There are many different types of events or facts that can be
+recorded in the database.  In most cases these are updated using the
+common event dialog that is documented by this page.  The exact set of
+input fields presented by the dialog depends upon the nature of the
+event or fact.  For example some facts only support a block of text,
+while others have multiple pieces of information.
+</p>
+<p>Although facts and events are accessed through the same interface there
+is a significant difference between them.  An event is something that 
+<i>happened</i> at a specific moment in time that changed the state of the
+individual or individuals involved.  
+A fact is something that was <i>observed</i>
+to be true at some time, but was actually true over a period of time.
+For example the marriage event changes the status of each of the partners
+from single to married, and the status of their relationship from engaged
+to married.  The fact that the couple are married may be observed at any time
+between the marriage event and the death or divorce event.
+</p>
+<p>The title of the page provides general information about the type of fact or
+event and the individual or individuals that it applies to.  Individual
+facts or events are associated with a particular individual.  
+Marriage facts or events are usually
+associated with a pair of individuals.  The name of an individual in the title
+is implemented as a hyper-link to the main page for that individual.
+<p>Although some common events, such as birth, death, or marriage,
+will present this dialog with the event type already selected, when you
+add or edit most events you are prompted to identify the type of event
+with a selection list of possibilities.  In many cases you can even change the
+type of an already existing event.  For example you could change a 
+place of residence event into an occupation event.  The exact set of
+fields that you are then presented with in the dialog depends upon
+which event type you select from this list.
+<p>For most events you can enter the date of the event.  This text field
+supports a broad range of options.  It is suggested that common dates
+be entered as numeric day of the month, name or abbreviation of
+the name of the month, and year.  For a more complete description of
+what can be entered and how it is interpreted see
+<a href="/FamilyTree/datesHelpen.html">Help on Entering Dates</a>.
+</p>
+<p>Since a fact is true over a period of time the associated date may
+be of the form "<b>from</b> first-date <b>to</b> second-date". 
+On the other hand 
+an event occurs at some specific moment in time which may not be 
+accurately known, so the associated date for the event may be
+"<b>between</b> first-date <b>and</b> second-date".
+<p>For many events you can enter a description.  The meaning of this
+field depends upon the event, however basically it is anything that is
+<b>not</b> part of the name of location where the event took place.  
+For example for an
+"Occupation" event the description includes the job title, and optionally the
+name of the business or employer.
+</p>
+<p>You may identify the location where the event took place or
+the fact was observed.  Each
+location in this application is actually a reference to a member of the
+<a href="/FamilyTree/LocationsHelpen.html">location table</a>.
+The text you enter is used to find or create an instance in this table.
+The search is done ignoring the case of letters, and matches either on the full name or the short name of the location,
+although the full name is always displayed in reports.
+</p>
+<p>When you finish typing in the location field, indicated by for example
+tabbing to the next field or using the mouse to click in another field, the
+text you have typed is used to search the location table for a match.
+The application looks first for a unique 
+match on either the full or short name for
+a location and if one is found the full name replaces the entered value.
+If this search fails then a search is made for location names that 
+<i>start</i> with
+the supplied text.  If one match is found then that location name replaces
+the entered value.  If more than one match is found then a selection list
+appears under the input text field giving you the option of selecting the
+best match.  Note that even after the application has filled in the value
+you do not have to accept it as is.  For example say you want to record that
+an event took place at a specific location in Westminster township.  You can
+type in "westminster".  When you leave the field this is replaced by 
+the full location name associated with that string, for example "Westminster, 
+Middlesex, ON, CA".  You then go back into the field and insert the specific
+location at the front.
+In addition most browsers keep track of past values that you have entered
+in a particular field and present you with previous values that are
+similar to what you have entered any time you pause in typing.  So if you
+have previously specified that an event took place in  "Westminster, 
+Middlesex, ON, CA" that value may be presented to you if you pause after typing
+"west".
+</p>
+<p>There is special support for the family related sacraments of the Church 
+of Jesus Christ of Latter Day Saints.  Where a sacrament takes place in a
+temple the location field is replaced by a selection list of the temples.
+</p>
+<p>Some LDS sacraments may alternatively take place outside of a temple. 
+In this case the dialog will include a line that provides a choice between
+a temple and a general location.
+<p>Textual notes are entered into a multiple line text area: 
+    <img src="richtextedit.png" alt="rich text editor example" class="example">
+<p>You can
+enter thousands of characters of text into such a field, however the total
+amount of text of all notes fields on an individual is limited to about
+60,000 characters.  Pressing the Enter key while editing this field starts
+a new paragraph in the input field, it does not cause the form to be
+submitted as happens on most forms if you press Enter in a text input field.
+The field supports highlighting text as bold, italic, struck through, 
+or underlined, as well as the creation of bulleted or numbered lists.
+<p>However going overboard on text formatting can detract from the 
+legibility of the generated web pages.
+</p>
+<p>If there is an extended note field associated with the fact or event
+then an extra <span class="button"><u>C</u>lear&nbsp;Note</span>
+button appears at the bottom of the form.  Clicking on this button,
+or using the keyboard short-cut Alt-C while any other input field or
+button has the focus, erases the contents of the note.  However if the
+text field itself has the focus you must use the common user interface
+sequence Ctrl-A (to select all of the text in the field) Ctrl-X (to cut
+the selection). 
+</p>
+<p>The next section of the page documents the source citations that
+support the event. 
+    <img src="citationlist.png" alt="citation list example" class="example">
+<p>There is one summary row for each existing citation.
+This consists of:
+</p>
+<ol>
+    <li>A button to permit you to 
+	<span class="button">Edit&nbsp;Citation</span>.
+	Clicking on this button
+	pops up the <a href="/FamilyTree/editCitationHelpen.html">edit citation dialog</a>.
+    <li>A read-only text field containing the name of the referenced source.
+	To change this you click on the
+	<span class="button">Edit&nbsp;Citation</span> button. 
+    <li>A read-only text field containing the citation page field.
+	To change this you click on the
+	<span class="button">Edit&nbsp;Citation</span> button. 
+  <li>A button to permit you to 
+	<span class="button">Delete&nbsp;Citation</span>.
+</ol>
+<p>After the list of existing citations there is an 
+<span class="button">Add&nbsp;Citation</span> button.
+Clicking on <span class="button">Add&nbsp;Citation</span> 
+adds a new row to the list of citations.
+This row initially displays a scrolling selection list of
+all of the defined sources, and a text input field to identify 
+the source details, that is the place in the master source
+containing the documentation, usually the page number.</p>
+<p>The <span class="button">Add Citation</span> button may be disabled when
+this web page is first
+displayed, until you supply an event type by selecting from the selection
+list of event types.
+The Add Citation button is also disabled while adding a citation so you cannot
+add a second citation until you have finished entering the first.  
+The dialog also supports a keyboard shortcut of alt-A to add a citation.
+</p>
+<p>When you request to add a new citation
+the last source that you cited is pre-selected for you, and the last page
+cited defaults to the last value you entered.  This facilitates citing the
+last referenced document for multiple facts.
+</p>
+<p>To accept the last citation just tab from the selection list of sources,
+and then tab out of the cited page field.
+</p>
+<p>To change the citation click on the new master source, tab into the cited
+page field, change the value and then press enter or tab to confirm the
+change.
+</p>
+<p>To add a citation to a new source, that is one that has not yet been
+referenced in the family tree, scroll up the master source selection list to
+the first entry, which reads "Add New Source" and click on that row.  
+A short-cut for that action is simply to press the "A" key while the focus
+is on the selection list.  Either action pops up a
+<a href="/FamilyTree/editSourceHelpen.html">dialog to create the new master source</a>. 
+<p>When you complete the citation by leaving the page input field, 
+the appearance of the new citation is changed
+to match the existing defined citations, and the 
+<span class="button">Add&nbsp;Citation</span> button is
+re-enabled.  The <span class="button"><u>U</u>pdate&nbsp;Event</span> 
+button acquires the focus.
+</p>
+<p>Clicking on the <span class="button"><u>U</u>pdate&nbsp;Event</span> button with the mouse, or pressing the
+Enter key while the <span class="button"><u>U</u>pdate&nbsp;Event</span> 
+button has the focus, updates the event, and closes the dialog.
+The keyboard shortcuts alt-U and ctrl-S may also be used to update the event.
+In most cases updating an event results in changes to the dialog which
+initiated the event update.
+</p>
+<p>For additional assistance hold the mouse over a field or press the F1 key
+while a field has the focus and
+popup help is displayed relevant to that field.
+</p>
+</div>
+<div class="botcrumbs">
+    <span class="right">
+	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+    </span>
+    <a href="/contactAuthor.php?subject=editEventHelpen.html" target="_blank">Contact Author</a>
+    <br/>
+    <a href="/indexHelpen.html">Home</a>: 
+    <a href="/genealogyHelpen.html">Genealogy</a>: 
+    <a href="/FamilyTree/ServicesHelpen.html">Services</a>: 
+    <a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>: 
+    <a href="/FamilyTree/PersonHelpen.html">Individual</a>: 
+    <a href="/FamilyTree/editIndividHelpen.html">Edit Individual</a>: 
+    <div style="clear: both;"></div>
+</div>
+</body>
+</html>

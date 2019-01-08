@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148173">
+    <option value="119_D">
+        Toronto City: St. James Ward
+        <div id="6" reel="148173" frame="0" count="34"/>
+        <div id="7" reel="148173" frame="34" count="33"/>
+        <div id="8" reel="148173" frame="67" count="33"/>
+        <div id="9" reel="148173" frame="100" count="32"/>
+        <div id="10" reel="148173" frame="132" count="23"/>
+        <div id="11" reel="148173" frame="155" count="22"/>
+    </option>
+    <option value="119_E">
+        Toronto City: St. Johns Ward
+        <div id="1" reel="148173" frame="177" count="21"/>
+        <div id="2" reel="148173" frame="198" count="33"/>
+        <div id="3" reel="148173" frame="231" count="29"/>
+        <div id="4" reel="148173" frame="260" count="37"/>
+        <div id="5" reel="148173" frame="297" count="30"/>
+        <div id="6" reel="148173" frame="327" count="27"/>
+        <div id="7" reel="148173" frame="354" count="8"/>
+        <div id="8" reel="148173" frame="362" count="39"/>
+        <div id="9" reel="148173" frame="401" count="48"/>
+        <div id="10" reel="148173" frame="449" count="17"/>
+    </option>
+    <option value="119_F">
+        Toronto City: St. Lawrence Ward
+        <div id="1" reel="148173" frame="466" count="10"/>
+        <div id="2" reel="148173" frame="476" count="20"/>
+        <div id="3" reel="148173" frame="496" count="33"/>
+        <div id="4" reel="148173" frame="529" count="35"/>
+        <div id="5" reel="148173" frame="564" count="21"/>
+        <div id="6" reel="148173" frame="585" count="27"/>
+        <div id="7" reel="148173" frame="612" count="19"/>
+    </option>
+    <option value="119_G">
+        Toronto City: St. Patricks Ward
+        <div id="1" reel="148173" frame="631" count="57"/>
+        <div id="2" reel="148173" frame="688" count="68"/>
+        <div id="3" reel="148173" frame="756" count="71"/>
+    </option>
+</select>

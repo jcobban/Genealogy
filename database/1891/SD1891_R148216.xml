@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148216">
+    <option value="177_H">
+        Portneuf: Portneuf
+        <div id="" reel="148216" frame="2" count="38"/>
+    </option>
+    <option value="177_I">
+        Portneuf: Rivière-a-Pierre
+        <div id="" reel="148216" frame="40" count="13"/>
+    </option>
+    <option value="177_J">
+        Portneuf: St. Alban
+        <div id="" reel="148216" frame="53" count="44"/>
+    </option>
+    <option value="177_K">
+        Portneuf: St. Augustin
+        <div id="" reel="148216" frame="97" count="31"/>
+    </option>
+    <option value="177_L">
+        Portneuf: St. Basile
+        <div id="" reel="148216" frame="128" count="40"/>
+    </option>
+    <option value="177_M">
+        Portneuf: St. Casimir
+        <div id="" reel="148216" frame="168" count="61"/>
+    </option>
+    <option value="177_N">
+        Portneuf: Ste. Catherine
+        <div id="" reel="148216" frame="229" count="23"/>
+    </option>
+    <option value="177_O">
+        Portneuf: Ste. Jeanne de Neuville
+        <div id="" reel="148216" frame="252" count="27"/>
+    </option>
+    <option value="177_P">
+        Portneuf: St. Raymond
+        <div id="" reel="148216" frame="279" count="67"/>
+    </option>
+    <option value="177_Q">
+        Portneuf: St. Ubalde
+        <div id="" reel="148216" frame="346" count="24"/>
+    </option>
+    <option value="178_A">
+        Québec City: Banlieu Centre
+        <div id="" reel="148216" frame="370" count="16"/>
+    </option>
+    <option value="178_B">
+        Québec City: Banlieu South
+        <div id="1" reel="148216" frame="386" count="2"/>
+        <div id="2" reel="148216" frame="388" count="9"/>
+    </option>
+    <option value="178_C">
+        Québec City: Champlain Ward
+        <div id="1" reel="148216" frame="397" count="18"/>
+        <div id="2" reel="148216" frame="415" count="30"/>
+        <div id="3" reel="148216" frame="445" count="17"/>
+    </option>
+    <option value="178_D">
+        Québec City: Jacques-Cartier Ward
+        <div id="1" reel="148216" frame="462" count="54"/>
+        <div id="2" reel="148216" frame="516" count="44"/>
+        <div id="3" reel="148216" frame="560" count="35"/>
+        <div id="4" reel="148216" frame="595" count="47"/>
+    </option>
+    <option value="178_E">
+        Québec City: Montcalm Ward
+        <div id="1" reel="148216" frame="642" count="32"/>
+        <div id="2" reel="148216" frame="674" count="27"/>
+        <div id="3" reel="148216" frame="701" count="24"/>
+    </option>
+    <option value="178_F">
+        Québec City: Montcalm West Ward
+        <div id="1" reel="148216" frame="725" count="22"/>
+        <div id="2" reel="148216" frame="747" count="16"/>
+        <div id="3" reel="148216" frame="763" count="16"/>
+        <div id="4" reel="148216" frame="779" count="21"/>
+    </option>
+</select>

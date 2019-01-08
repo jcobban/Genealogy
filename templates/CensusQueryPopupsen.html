@@ -1,0 +1,143 @@
+<!--*********************************************************************
+ *  CensusQueryPopupsen.html						*
+ *									*
+ *  Shared popups to explain use of fields in census query forms.	*
+ *									*
+ *  History:								*
+ *	2018/05/20	created						*
+ *									*
+ *  Copyright &copy; 2018 James A. Cobban				*
+ **********************************************************************-->
+    <div class='balloon' id='HelpQuery'>
+	Click on this button to perform the query of the census database.
+    </div>
+    <div class='balloon' id='HelpCoverage'>
+	Click on this button to obtain a display of the top level statistics
+	on the transcription effort on this census.
+    </div>
+    <div class='balloon' id='HelpProvince'>
+	This is a selection list of provinces which are covered by the
+	census.  Select one of the provinces if you wish to restrict the
+	search to a specific province. The default is to search all
+	provinces.
+    </div>
+    <div class='balloon' id='HelpDistrict'>
+	This is a selection list of all enumeration districts.  
+	In pre-confederation censuses each of these is a county.
+	In post-confederation censuses each of these is a federal
+	election district or riding. The contents of this list reflects
+	the choice of province.
+	You can select one or more enumeration districts.
+    </div>
+    <div class='balloon' id='HelpCount'>
+	Use this field to control the maximum number of responses to
+	display at a time.
+    </div>
+    <div class='balloon' id='HelpSubDistrict'>
+	If you have selected one or more enumeration districts then this
+	selection list permits you to further restrict the search to a
+	specific sub-district within the selected districts. 
+	A sub-district is generally a town, village, 
+	township, or a ward of a city.
+    </div>
+    <div class='balloon' id='HelpDivision'>
+	If you have selected a sub-district then this selection list
+	permits you to further restrict the search to a specific enumeration
+	division within the sub-district.  There are multiple
+	enumeration divisions within a sub-district if the number of
+	residents required assigning multiple enumerators.
+    </div>
+    <div class='balloon' id='HelpPage'>
+	You can limit the search to a individuals matching a specific
+	page number.  This normally only makes sense if you have selected
+	a specific district, subdistrict, and division.
+    </div>
+    <div class='balloon' id='HelpGivenNames'>
+     <p>
+	Specify one or more given names to match.  Individuals who match
+	any of the specified names are included.  For example if you seach for
+	"John William" the result will include individuals who have either
+	"John" or "William" as one of their given names.  If the value is
+	simple text then it is used to match given names that start with
+	that text.  For example "Jo" will match individuals who have a
+	given name starting with "Jo" such as "John" or "Joanna".
+     </p>
+     <p>
+	A search value may alternatively be a <a href="https://dev.mysql.com/doc/refman/8.0/en/regexp.html">regular expression</a>
+	which permits a more complicated match.  For example "^M.*l" matches
+	given names that start with an "M" and contain an "l" anywhere.
+	This would include "Michael", or "Millie".  The pattern "^R.*[td]$"
+	matches given names that start with "R" and end with a "t" or a "d",
+	such as "Robert" or "Richard".
+     </p>
+    </div>
+    <div class='balloon' id='HelpSurname'>
+     <p>
+	The interpretation of this input field depends upon whether the
+	SOUNDEX option has been selected.
+     </p>
+	If SOUNDEX has not been chosen then the value is interpreted as
+	a complete surname and the search is performed using the search
+	pattern defined for the surname in the table of surnames that
+	can be reached from the nominal index search panel.  For example
+	the surname "Smith" has a regular expression pattern of 
+	"^sm[eiy]*th?e?$"
+	which means that it matches against any surname that starts with "Sm",
+	followed by zero or more front vowels followed by "t", optionally
+	followed by an "h" and optionally ending with an "e".  That is the
+	search will not only match against "Smith" but also "Smythe" and
+	"Smet".  If the surname does not have a pattern specified then
+	the surname must match exactly except for case.
+     <p>
+	If SOUNDEX has been specified then a loose search is made using the
+	sound matching algorithm originally invented by AT&amp;T for its
+	directory assistance service and also commonly used by law enforcement
+	for example for checking driver's licenses.  In this case you can
+	enter either a literal soundex code, consisting of a letter followed
+	by three digitis, or more commonly a surname which is used to
+	generate a SOUNDEX code for the search.
+     </p>
+    </div>
+    <div class='balloon' id='HelpSurnameSoundex'>
+	Selecting this option changes the way that the value in the
+	Surname field is interpreted.
+    </div>
+    <div class='balloon' id='HelpSex'>
+	Select an option to restrict the search to individuals with a
+	particular sex.
+    </div>
+    <div class='balloon' id='HelpMStat'>
+	Select an option to restrict the search to individuals with a
+	particular marital status.
+    </div>
+    <div class='balloon' id='HelpOccupation'>
+	Enter a value to restrict the search to individuals with a 
+	particular occupation.  The supplied value is used to search
+	each occupation field.  For example a search for "Farm" will
+	return individuals whose occupation includes the text "Farm" such as
+	"Farmer", "Farm Laborer", "retired Farmer", or "Farm Manager".
+    </div>
+    <div class='balloon' id='HelpBPlace'>
+	Enter a value to restrict the search to individuals with a 
+	particular birthplace.  The supplied value is used to search
+	each birthplace field.  For example a search for "England" will
+	will return individuals who birth place includes the text "England"
+	including "Yorkshire England".
+    </div>
+    <div class='balloon' id='HelpReligion'>
+	Enter a value to restrict the search to individuals with a 
+	particular religion.  The supplied value is used to search
+	each religion field.  For example a search for "Methodist" will
+	return individuals whose religion includes the text "Methodist"
+	including "Wesleyan Methodist" and "Methodist Episcopal".
+    </div>
+    <div class='balloon' id='HelpBYear'>
+	Enter a year number to restrict the search to individuals
+	born about a specific year.  The range on either side of the
+	specified year is controlled by the Range field.
+    </div>
+    <div class='balloon' id='HelpRange'>
+	Enter a number between 1 and 20 to control how loose the match
+	on birth year is.  The default is 2 years either side of the
+	value specified in the "Birth Year" field.
+    </div>

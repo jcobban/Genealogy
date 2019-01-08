@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148127">
+    <option value="47_D">
+        Bothwell: Dawn
+        <div id="3" reel="148127" frame="0" count="16"/>
+        <div id="4" reel="148127" frame="20" count="12"/>
+    </option>
+    <option value="47_E">
+        Bothwell: Dresden Town
+        <div id="1" reel="148127" frame="40" count="6"/>
+        <div id="2" reel="148127" frame="62" count="20"/>
+    </option>
+    <option value="47_F">
+        Bothwell: Sombra
+        <div id="1" reel="148127" frame="83" count="19"/>
+        <div id="2" reel="148127" frame="97" count="17"/>
+        <div id="3" reel="148127" frame="119" count="8"/>
+        <div id="4" reel="148127" frame="156" count="12"/>
+    </option>
+    <option value="47_G">
+        Bothwell: Thamesville Village
+        <div id="" reel="148127" frame="173" count="23"/>
+    </option>
+    <option value="47_H">
+        Bothwell: Wallaceburg Village
+        <div id="1" reel="148127" frame="190" count="7"/>
+        <div id="2" reel="148127" frame="213" count="4"/>
+    </option>
+    <option value="47_I">
+        Bothwell: Walpole Island
+        <div id="" reel="148127" frame="247" count="16"/>
+    </option>
+    <option value="47_J">
+        Bothwell: Zone
+        <div id="1" reel="148127" frame="266" count="12"/>
+        <div id="2" reel="148127" frame="281" count="6"/>
+    </option>
+    <option value="48_A">
+        Brant North: Ancaster
+        <div id="1" reel="148127" frame="296" count="21"/>
+        <div id="2" reel="148127" frame="317" count="20"/>
+        <div id="3" reel="148127" frame="337" count="29"/>
+        <div id="4" reel="148127" frame="366" count="16"/>
+    </option>
+    <option value="48_B">
+        Brant North: Blenheim
+        <div id="1" reel="148127" frame="382" count="26"/>
+        <div id="2" reel="148127" frame="408" count="32"/>
+        <div id="3" reel="148127" frame="440" count="25"/>
+        <div id="4" reel="148127" frame="465" count="33"/>
+    </option>
+    <option value="48_C">
+        Brant North: Brantford East
+        <div id="1" reel="148127" frame="498" count="15"/>
+        <div id="2" reel="148127" frame="513" count="13"/>
+        <div id="3" reel="148127" frame="526" count="14"/>
+        <div id="4" reel="148127" frame="540" count="27"/>
+        <div id="5" reel="148127" frame="567" count="19"/>
+    </option>
+    <option value="48_D">
+        Brant North: Dumfries South
+        <div id="1" reel="148127" frame="586" count="31"/>
+        <div id="2" reel="148127" frame="617" count="15"/>
+        <div id="3" reel="148127" frame="632" count="21"/>
+    </option>
+    <option value="49_A">
+        Brant South: Brantford West
+        <div id="1" reel="148127" frame="653" count="22"/>
+    </option>
+</select>

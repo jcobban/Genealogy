@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Census: Surname Statistics Help</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf8">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2015 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+ *		2013/05/22		created											*
+ *		2014/01/06		use CSS for layout not tables					*
+ *		2014/10/09		document additional functionality				*
+ *		2015/01/14		help page renamed								*
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  
+  <body>
+    <div class="topcrumbs">
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/database/genCensusesHelpen.html">Censuses</a>: 
+      <a href="/database/QuerySurnamesTopHelpen.html">Index by First Letter</a>: 
+    </div>
+    <div class="help">
+        <h1>Census Surname Statistics</h1>
+    <p>The Surname Statistics page displays all of the surnames that appear
+    in the requested portion of the requested census that match the
+    pattern requested by the Surname parameter.
+    The displayed table lists each surname
+    and how many individuals in the selected portion of the census have
+    that surname.  The surname itself a link to 
+    <a href="CensusResponseHelpen.html">a page listing individuals with that surname</a>.
+    <p>The surnames are displayed in columns so that more names can be displayed
+    on the page.  By default 3 columns are displayed, however a parameter 
+    "columns=n" can be passed to the script to change this.  By default 20
+    rows of surnames are displayed, although this can be changed by passing the
+    "count=n" parameter to this script.
+    If there are more than (count * columns) matching surnames then forward and
+    backward hyperlinks are provided above and below the displayed names
+    to permit browsing through the set of names.
+    Just above the table a line displays information on the number of surnames
+    displayed on this page, the position within the total result set, 
+    and the total number of surnames that match the pattern.
+    <p>The selection of surnames displayed is controlled by the "Surname=pattern"
+    parameter.  This is typically a caret (^) followed by the first letter or
+    letters of the surnames to be included.  For example "Surname=^Mc" displays
+    surnames starting with "Mc".  The script also accepts a parameter value
+    ending with a dollar sign ($).  This matches surnames ending with the
+    preceding string.  For example "Surname=ell$" matches surnames ending with
+    "ell" such as Campbell.  If the parameter neither begins with a caret nor
+    ends with a dollar sign, then names containing the parameter value are
+    included.  For example "Surname=ack" matches surnames that contain the
+    string "ack" such as "Black" or "Jackson".
+    <div class="botcrumbs">
+      <a href="/contactAuthor.php?subject=Census%20Surnames%20Statistics%20Help" target="_blank">Contact Author</a>
+      <br/>
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/database/genCensusesHelpen.html">Censuses</a>: 
+      <a href="/database/QuerySurnamesTopHelpen.html">Index by First Letter</a>: 
+      <span class="right">
+        <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+      </span>
+        <div style="clear: both;"></div>
+    </div>
+  </body>
+</html>

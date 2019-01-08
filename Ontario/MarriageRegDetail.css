@@ -1,0 +1,157 @@
+/************************************************************************
+ *  MarriageRegDetail.css						*
+ *									*
+ *  Stylesheet for the scripts MarriageRegDetailyyyy.php		*
+ *									*
+ *  History:								*
+ *	2014/01/10	created						*
+ *	2014/01/18	reduce width of marital status field		*
+ *	2013/01/22	use fieldsets for participants			*
+ *	2014/02/28	add error styles				*
+ *									*
+ *  Copyright &copy; 2014 James A. Cobban				*
+ ************************************************************************/
+/*	column containers */
+    div.column1	{float:		left;
+		width:		25em;
+		margin-top:	1px;
+		margin-right:	3px;
+		}
+    div.column2	{float:	left;
+		margin-top:	1px;
+		margin-right:	3px;
+		}
+    div.column3	{float:	left;
+		margin-top:	1px;
+		margin-right:	3px;
+		}
+    div.female    {
+		background-color: #FFE0E0;
+		border:		1px solid red;
+		}
+    div.male    {
+		background-color: #E0E0FF;
+		border:		1px solid blue;
+		}
+    div.other    {
+		border:		1px solid #808000;
+		}
+
+    p.labelSmall {font-family:	sans-serif;
+		font-weight:	bold;
+		font-size:	smaller;
+		text-align:	left;
+		margin-top:	0;
+		margin-bottom:	0.5ex;
+		margin-left:	0;
+		text-indent:	0;
+		padding:	0px 3px 0px 3px;
+		}
+
+/*	labels of various widths */
+    label.labelSmall {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		font-size:	smaller;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		margin-top:	1px;
+		float:		left;
+		width:		9em;
+		}
+
+    input.left {
+		font-family:	sans-serif;
+		text-align:	left;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    input.lefterror {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		red;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    input.left1em {
+		font-family:	sans-serif;
+		text-align:	left;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		1em;
+		margin-bottom:	2px;
+		}
+    input.left1emerror {
+		font-family:	sans-serif;
+		text-align:	left;
+		color:		red;
+		text-transform:	capitalize;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		1em;
+		margin-bottom:	2px;
+		}
+    input.leftnc {
+		font-family:	sans-serif;
+		text-align:	left;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    input.leftvar {
+		font-family:	sans-serif;
+		text-align:	left;
+		padding:	0px;
+		border-top:	1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		margin-bottom:	2px;
+		}
+    input.rightnc {
+		font-family:	sans-serif;
+		text-align:	right;
+		padding: 	0px;
+		border-top: 	1px solid black;
+		border-left: 	1px solid black;
+		border-bottom: 	1px solid white;
+		border-right: 	1px solid white;
+		width:		3em;
+		}
+    select.leftwide {
+		font-family:	sans-serif;
+		text-align:	left;
+		padding:	0px;
+		width:		18em;
+		margin-bottom:	2px;
+		}
+    select.left {
+		font-family:	sans-serif;
+		text-align:	left;
+		padding:	0px;
+		margin-bottom:	2px;
+		}

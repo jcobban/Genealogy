@@ -1,0 +1,253 @@
+/************************************************************************
+ *  DeathRegResponse.js													*
+ *																		*
+ *  This file implements the dynamic functionality of the web page		*
+ *  DeathRegResponse.php												*
+ *																		*
+ *  History:															*
+ *		2011/00/27		created											*
+ *		2013/08/01		defer facebook initialization until after load	*
+ *		2014/08/28		add support for Delete button					*
+ *		2014/10/11		ask user to confirm delete of registration		*
+ *		2014/10/24		form not initialized in deleteReg				*
+ *						invoked script deleteBirthRegXml instead of		*
+ *						deleteDeathRegXml								*
+ *		2018/10/30      use Node.textContent rather than getText        *
+ *																		*
+ *  Copyright &copy; 2014 James A. Cobban								*
+ ************************************************************************/
+
+window.onload	= onLoad;
+
+/************************************************************************
+ *  onLoad																*
+ *																		*
+ *  Initialize the dynamic functionality once the page is loaded		*
+ ************************************************************************/
+function onLoad()
+{
+    pageInit();
+
+    // activate handling of key strokes in text input fields
+    // including support for context specific help
+    var	element;
+    var trace	= '';
+    for (var fi = 0; fi < document.forms.length; fi++)
+    {		// loop through all forms
+		var form	= document.forms[fi];
+		trace	+= "<form ";
+		if (form.name.length > 0)
+		    trace	+= "name='" + form.name + "' ";
+		if (form.id.length > 0)
+		    trace	+= "id='" + form.id + "' ";
+		trace	+= ">";
+
+		for (var i = 0; i < form.elements.length; ++i)
+		{	// loop through all elements of form
+		    element		= form.elements[i];
+		    trace += "<" + element.nodeName + " ";
+		if (element.name.length > 0)
+		    trace	+= "name='" + element.name + "' ";
+		if (element.id.length > 0)
+		    trace	+= "id='" + element.id + "' ";
+		trace	+= ">";
+		    element.onkeydown	= keyDown;
+    
+		    // pop up help balloon if the mouse hovers over a field
+		    // for more than 2 seconds
+		    if (element.parentNode.nodeName == 'TD')
+		    {	// set mouseover on containing cell
+			element.parentNode.onmouseover	= eltMouseOver;
+			element.parentNode.onmouseout	= eltMouseOut;
+		    }	// set mouseover on containing cell
+		    else
+		    {	// set mouseover on input element itself
+			element.onmouseover		= eltMouseOver;
+			element.onmouseout		= eltMouseOut;
+		    }	// set mouseover on input element itself
+    
+		    if (element.id.substring(0, 6) == 'Action')
+		    {
+			element.helpDiv	= 'Action';
+			element.onclick	= showReg;
+		    }
+		    else
+		    if (element.id.substring(0, 6) == 'Delete')
+		    {
+			element.helpDiv	= 'Delete';
+			element.onclick	= deleteReg;
+		    }
+		}	// loop through all elements in the form
+    }		// loop through all forms
+}		// onLoad
+
+/************************************************************************
+ *  showReg																*
+ *																		*
+ *  When a Action button is clicked this function displays the				*
+ *  page to edit or display details of the registration.				*
+ *																		*
+ *  Input:																*
+ *		this		<button type=button id='Action...'>						*
+ ************************************************************************/
+function showReg()
+{
+    var	rownum	= this.id.substring(6);
+    var regyear	= rownum.substring(0,4);
+    var regnum	= rownum.substring(4);
+    var	lang		= 'en';
+    if ('lang' in args)
+		lang		= args['lang'];
+    location	= 'DeathRegDetail.php?RegYear=' + regyear +
+			  '&RegNum=' + regnum +'&lang=' + lang;
+    return false;
+}		// showReg
+
+/************************************************************************
+ *  deleteReg																*
+ *																		*
+ *  When a Delete button is clicked this function invokes a server		*
+ *  to delete the registration.												*
+ *																		*
+ *  Input:																*
+ *		this		<button type=button id='Delete...'>						*
+ ************************************************************************/
+function deleteReg()
+{
+    var	form	= this.form;
+    var	rownum	= this.id.substring(6);
+    var	domain	= form.RegDomain.value;
+    var regyear	= rownum.substring(0,4);
+    var regnum	= rownum.substring(4);
+
+    var parms		= {"regdomain"	: domain,
+				   "regyear"	: regyear,
+				   "regnum"	: regnum,
+				   "formname"	: form.name, 
+				   "template"	: "",
+				   "msg"	:
+				"Are you sure you want to delete this registration?"};
+
+    if (debug != 'n')
+		parms["debug"]	= debug;
+
+    // ask user to confirm delete
+    dialogDiv	= document.getElementById('msgDiv');
+    if (dialogDiv)
+    {		// have popup <div> to display message in
+		displayDialog(dialogDiv,
+			      'RegDel$template',
+			      parms,
+			      this,		// position relative to
+			      confirmDelete,	// 1st button confirms Delete
+			      false);		// default show on open
+    }		// have popup <div> to display message in
+    else
+		alert("DeathRegResponse.js: deleteReg: " +
+			"Error: <div id='msgDiv'> not defined");
+}		// deleteReg
+
+/************************************************************************
+ *  confirmDelete														*
+ *																		*
+ *  This method is called when the user confirms the request to delete		*
+ *  a registration.														*
+ *																		*
+ *  Input:																*
+ *		this				<button id='confirmDelete...'>						*
+ ************************************************************************/
+function confirmDelete()
+{
+    // get the parameter values hidden in the dialog
+    var	form		= this.form;
+    var	regnum		= this.id.substr(13);
+    var	regdomain	= form.elements['regdomain'].value;
+    var	regyear		= form.elements['regyear'].value;
+    var	formname	= form.elements['formname'].value;
+
+    // hide the dialog
+    dialogDiv.style.display	= 'none';
+    var script	= 'deleteDeathRegXml.php';
+    var	parms	= { 'RegDomain'	: regdomain,
+			    'RegYear'	: regyear,
+			    'RegNum'	: regnum,
+			    'rownum'	: regyear + "" + regnum};
+    if (debug != 'n')
+		parms["debug"]	= debug;
+
+    // update the citation in the database
+    HTTP.post(  script,
+			parms,
+			gotDeleteReg,
+			noDeleteReg);
+    return false;		// suppress default action for button
+}		// confirmDelete
+
+/************************************************************************
+ *  gotDeleteReg														*
+ *																		*
+ *  This method is called when the XML file representing				*
+ *  the deletion of the registration from the database is retrieved.		*
+ *																		*
+ *  Input:																*
+ *		xmlDoc		response document										*
+ ************************************************************************/
+function gotDeleteReg(xmlDoc)
+{
+    if (xmlDoc === undefined)
+    {
+		alert("DeathRegResponse.js: gotDeleteReg: xmlDoc is undefined!");
+    }
+    else
+    {
+		var	root	= xmlDoc.documentElement;
+		for (var i = 0; i < root.childNodes.length; i++)
+		{			// loop through all children
+		    var	elt	= root.childNodes[i];
+		    if (elt.nodeType == 1)
+		    {			// tag
+			if (elt.nodeName == 'parms')
+			{		// parms
+			    for (var j = 0; i < elt.childNodes.length; i++)
+			    {		// loop through all children
+			        var	child	= elt.childNodes[i];
+			        if (child.nodeType == 1)
+			        {	// tag
+				    if (child.nodeName == 'rownum')
+				    {	// rownum
+					var rownum	= child.textContent.trim();
+					// remove Delete button
+					var butid	= 'Delete' + rownum;
+					var button	= document.getElementById(butid);
+					var cell	= button.parentNode;
+					cell.removeChild(button);
+
+					// blank out text columns
+					var rowNode	= cell.parentNode;
+					var rowCells	= rowNode.cells;
+					for (var ic = 3; ic < rowCells.length; ic++)
+					{		// loop through columns
+					    cell	= rowCells[ic];
+					    while (cell.firstChild)
+						cell.removeChild(cell.firstChild);
+					}		// loop through columns
+				    }	// rownum
+			        }	// tag
+			    }		// loop through all children
+			}		// parms
+		    }			// tag
+		}			// loop through all children
+
+    }
+}		// gotDeleteReg
+
+/************************************************************************
+ *  noDeleteReg																*
+ *																		*
+ *  This method is called if there is no delete registration script.		*
+ ************************************************************************/
+function noDeleteReg()
+{
+    alert("DeathRegResponse.js: noDeleteReg: " +
+			"script 'deleteDeathRegXml.php' not found on server");
+}		// noDeleteReg

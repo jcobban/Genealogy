@@ -1,0 +1,168 @@
+<!--*********************************************************************
+ *  VitalRegResponseUpdateen.html   									*
+ *																		*
+ *  Display the results of a query of the vital record registrations	*
+ *  tables.																*
+ *																		*
+ *  History:															*
+ *		2018/12/20		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href='/Canada/CountriesEdit.php?lang=$LANG'>
+	    List of Supported Countries
+    </a>:
+    <a href="/genCountry.php?cc=$cc&amp;lang=$LANG">
+		$countryName
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=$domain&amp;lang=$LANG">
+		$domainName
+    </a>:
+    <a href="VitalRegQuery.php?domain=$domain&amp;lang=$LANG">Vital Statistics Query</a>:
+  </div>	
+ <div class='body'>
+  <h1>
+<span class='right'>
+    <a href='VitalRegResponseHelpen.html' target='_blank'>Help?</a>
+</span>
+$domainName: Vital Statistics Registration Query
+<div style='clear: both;'></div>
+  </h1>
+    $TRACE
+    $MSG
+  <!--- Put out a line with links to previous and next section of table -->
+  <div class='center'>
+<span class='left'>
+      <a href='$npuri.$npand.$npprev'>&lt;---</a>
+</span>
+<span class='right'>
+      <a href='$npuri.$npand.$npnext'>---&gt;</a>
+</span>
+    displaying rows $offset+1 to
+    $offset + $numRows of $totalrows
+<div style='clear: both;'></div>
+  </div>
+  <!--- Put out the response as a table -->
+  <form id='respform'>
+<div><input type='hidden' id='RegDomain' name='RegDomain'
+    		value='$domain'>
+</div>
+<table class='form'>
+  <thead>
+    <!--- Put out the column headers -->
+    <tr>
+      <th class='colhead'>
+        Action
+      </th>
+      <th class='colhead'>
+        Year
+      </th>
+      <th class='colhead'>
+        Num
+      </th>
+      <th class='colhead'>
+        Name
+      </th>
+      <th class='colhead'>
+        Date
+      </th>
+      <th class='colhead'>
+        Birthplace
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+   <tr>
+     <!-- link to update action -->
+     <td class='left' style='white-space: nowrap;'>
+         <button type='button' id='Action$regYear$regNum'>
+    		 Update
+         </button>
+        <button type='button' id='Delete$regYear$regNum'>
+    		 Delete
+        </button>
+     </td>
+     <td class='$rowClass right'>
+         $regYear 
+     </td>
+     <td class='$rowClass right'>
+         $regNum 
+     </td>
+     <td class='$rowClass $sex'>
+       <a href='/FamilyTree/Person.php?idir=$idir&lang=$lang'
+    		target='_blank' class='$sex'>
+         <strong>$surname</strong>, $givennames 
+       </a>
+     </td>
+     <td class='$rowClass'>
+         $birthdate 
+     </td>
+     <td class='$rowClass'>
+         $calcbirth 
+     </td>
+     <td class='$rowClass'>
+         $birthplace 
+     </td>
+   </tr>
+  </tbody>
+</table>
+  </form>
+  <!--- Put out a line with links to previous and next section of response -->
+      <div class='center'>
+        <span class='left'>
+          <a href='$npuri.$npand.$npprev'>&lt;---</a>
+        </span>
+        <span class='right'>
+          <a href='$npuri.$npand.$npnext'>---&gt;
+          </a>
+        </span>
+          &nbsp;
+        <div style='clear: both;'></div>
+      </div>
+    </div> <!-- end of <div id='body'> -->
+    <div id='templates' class='hidden'>
+    
+      <!-- template for confirming the deletion of a citation-->
+      <form name='RegDel$template' id='RegDel$template'>
+        <p class='message'>$msg</p>
+        <p>
+          <button type='button' id='confirmDelete$regnum'>
+    	    OK
+          </button>
+          <input type='hidden' id='regdomain$template' name='regdomain$template'
+    			value='$regdomain'>
+          <input type='hidden' id='regyear$template' name='regyear$template'
+    			value='$regyear'>
+          <input type='hidden' id='formname$template' name='formname$template'
+    			value='$formname'>
+    	    &nbsp;
+          <button type='button' id='cancelDelete$regnum'>
+    	    Cancel
+          </button>
+        </p>
+      </form>
+    </div> <!-- end of <div id='templates'> -->
+    <div class='balloon' id='HelprightTop'>
+      Click on this button to signon to access extended features of the web-site
+      or to manage your account with the web-site.
+    </div>
+    <div class='balloon' id='HelpRegYear'>
+      This field contains the year in which the event was registered.
+    </div>
+    <div class='balloon' id='HelpRegNum'>
+      This field contains the registration number as assigned by the 
+      Registrar of Ontario.
+    </div>
+    <div class='balloon' id='HelpAction'>
+      Click on this button to display the page of detail information from the
+      registration, with the ability to update the information if you
+      are authorized.
+    </div>
+    <script src="/jscripts/js20/http.js" type="application/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+    <script src="VitalRegResponse.js" type="application/javaScript">
+    </script>

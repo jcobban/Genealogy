@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="27">
+    <option value="298">
+        Albion
+    </option>
+    <option value="299">
+        Brampton Village
+    </option>
+    <option value="300">
+        Caledon
+    </option>
+    <option value="301">
+        Chinguacousy
+    </option>
+    <option value="302">
+        Streetsville Village
+    </option>
+    <option value="303">
+        Toronto
+    </option>
+    <option value="304">
+        Toronto Gore
+    </option>
+</select>

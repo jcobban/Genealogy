@@ -1,0 +1,385 @@
+<!--*********************************************************************
+ *  CensusDetails1851en.html											*
+ *																		*
+ *  Display a single line from the 1851 census of Canada				*
+ *																		*
+ *  History:															*
+ *		2018/11/07		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+    <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>:
+    <a href="/database/QueryDetail.php?Census=CA1851&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;lang=$LANG">
+			1851 Census Search
+    </a>: 
+    <a onclick="history.back(); return false;" href="dummy">Search Results</a>:
+    <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;lang=$LANG">
+			District $DISTRICT $DISTNAME Summary
+    </a>:
+    <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;lang=$LANG">
+			Division Details
+    </a>:	
+	<a href="CensusResponse.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;OrderBy=Line&amp;Page=$PAGE&amp;lang=$LANG">
+			Page $PAGE</a>:
+  </div>
+  <div class="body">
+   <h1>1851/2 Census of Canada: Details
+      <span class="right">
+		<a href="CensusDetailsHelpen.html" target="help">? Help</a>
+      </span>
+   </h1>
+   $TRACE
+   $MSG
+    <div class="center" id="linksFront">
+      <span class="left" id="prevLink">
+		<a href="CensusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$PREVLINE&amp;lang=$LANG">&lt;---</a>
+      </span>
+      <span class="right" id="nextLink">
+		<a href="CensusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$NEXTLINE&amp;lang=$LANG">---&gt;</a>
+      </span>
+		$PROVINCENAME, dist $DISTRICT Middlesex, 
+        subdist $SUBDISTRICT $SUBDISTNAME, 
+        <span id="division">div $DIVISION</span>
+		 page $PAGE
+      <div style="clear: both;"></div>
+    </div>
+    <table class="details" id="details">
+     <thead>
+     <!--- Put out the column headers -->
+      <tr>
+		<th class="colhead">
+		  Field Name
+		</th>
+		<th class="colhead">
+		  Value
+		</th>
+		<th class="colhead">
+		  Field Name
+		</th>
+		<th class="colhead">
+		  Value
+		</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr>
+		<th class="label">
+		    Province 
+		</th>
+		<td class="odd">
+		    $PROVINCE 
+		</td>
+		<th class="label">
+		    District ID 
+		</th>
+		<td class="odd">
+		    $DISTRICT 
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Sub-District ID 
+		</th>
+		<td class="odd right">
+		    $SUBDISTRICT 
+		</td>
+		<th class="label">
+		    Division 
+		</th>
+		<td class="odd">
+		    $DIVISION 
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Page 
+		</th>
+		<td class="odd right">
+		    <a href="CensusResponse.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;OrderBy=Line&amp;Page=$PAGE&amp;lang=$LANG">
+			$PAGE</a>
+		</td>
+		<th class="label">
+		    Line 
+		</th>
+		<td class="odd right">
+		    $LINE 
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Pagedisp 
+		</th>
+		<td class="odd right">
+		    $pagedisp 
+		</td>
+		<th class="label">
+		    Family 
+		</th>
+		<td class="odd right">
+		    <a href="CensusResponse.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;OrderBy=Line&amp;Family=$family&amp;lang=$LANG">
+			$family</a>
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Surname 
+		</th>
+		<td class="odd">
+		    $surname
+		</td>
+		<th class="label">
+		    Surname SOUNDEX 
+		</th>
+		<td class="odd">
+		    $surnamesoundex
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Given Names 
+		</th>
+		<td class="odd">
+		    $givennames 
+		</td>
+		<th class="label">
+		    Occupation 
+		</th>
+		<td class="odd">
+		    $occupation 
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Birth Place 
+		</th>
+		<td class="odd">
+		    $bplace 
+		</td>
+		<th class="label">
+		    Religion 
+		</th>
+		<td class="odd">
+		    $religion 
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Location 
+		</th>
+		<td class="odd">
+		    $location
+		</td>
+		<th class="label">
+		    Age 
+		</th>
+		<td class="odd right">
+		    $age 
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Birth Year 
+		</th>
+		<td class="odd right">
+		    $byear 
+		</td>
+		<th class="label">
+		    Sex 
+		</th>
+		<td class="odd center">
+		    $sex 
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Marital Status 
+		</th>
+		<td class="odd center">
+		    $mstat 
+		</td>
+		<th class="label">
+		    Negro 
+		</th>
+		<td class="odd center">
+		    $negro 
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Indian 
+		</th>
+		<td class="odd center">
+		     $indian
+		</td>
+		<th class="label">
+		    Member 
+		</th>
+		<td class="odd center">
+		    $member
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Absent 
+		</th>
+		<td class="odd center">
+		     $absent
+		</td>
+		<th class="label">
+		    Deaf 
+		</th>
+		<td class="odd center">
+		     $deaf
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Blind 
+		</th>
+		<td class="odd center">
+		     $blind
+		</td>
+		<th class="label">
+		    Lunatics 
+		</th>
+		<td class="odd center">
+		     $lunatics
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    School 
+		</th>
+		<td class="odd center">
+		    $school 
+		</td>
+		<th class="label">
+		    Birth 
+		</th>
+		<td class="odd center">
+		     $birth
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Gender of Deceased 
+		</th>
+		<td class="odd center">
+		    $deathsex
+		</td>
+		<th class="label">
+		    Age at Death 
+		</th>
+		<td class="odd right">
+		    $ageatdeath
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Cause of Death 
+		</th>
+		<td class="odd">
+		    $causeofdeath
+		</td>
+		<th class="label">
+		    Residence Type 
+		</th>
+		<td class="odd">
+		     $restype
+		</td>
+ 
+      </tr>
+      <tr>
+		<th class="label">
+		    Stories 
+		</th>
+		<td class="odd right">
+		    $stories
+		</td>
+		<th class="label">
+		    Num. Families 
+		</th>
+		<td class="odd right">
+		    $numfamilies
+		</td>
+      </tr>
+ 
+      <tr>
+		<th class="label">
+		    Remarks 
+		</th>
+		<td class="odd" colspan="3">
+		    $remarks
+		</td>
+      </tr>
+ 
+      <tr>
+		<th class="label">
+		    Family Tree ID 
+		</th>
+		<td class="odd">
+		    <a href="/FamilyTree/Person.php?idir=$idir&amp;lang=$LANG"
+			    id="IDIR" target="_blank">
+			$idir</a>
+		</td>
+      </tr>
+      <tr>
+		<th class="label">
+		    District Name 
+		</th>
+		<td class="odd" style="min-width: 200px;">
+		    $DISTNAME 
+		</td>
+		<th class="label">
+		    Sub-District Name 
+		</th>
+		<td class="odd" style="min-width: 200px; max-width: 400px;">
+		    $SUBDISTNAME
+		</td>
+ 
+      </tr>
+     </tbody>
+    </table>
+  </div> <!-- class="body" -->
+  <div class="hidden" id="templates">
+      <span id="invalidCensusId">
+          Invalid value of CensusID='$value'. 
+      </span>
+      <span id="invalidDomainId">
+          '$state' is not a supported province/state identifier
+          for country code '$cc'. 
+      </span>
+      <span id="invalidDistId">
+          District='$value' is not defined within the Census.
+      </span>
+      <span id="invalidSubdistId">
+          SubDistrict='$value' Division='$div'
+          is not defined within the District. 
+      </span>
+      <span id="invalidPage">
+          Page='$value' is not defined within the SubDistrict.
+      </span>
+  </div>
+    <script src="/jscripts/default.js" type="application/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+ 

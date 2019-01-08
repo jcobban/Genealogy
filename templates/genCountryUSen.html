@@ -1,0 +1,80 @@
+<!--*********************************************************************
+ *  genCountryUSen.html													*
+ *																		*
+ *  Template for accessing services for the United States of America	*
+ *																		*
+ *  History:															*
+ *		2011/06/24		include javascript libraries					*
+ *						support signon button							*
+ *		2011/10/24		support mouseover help for signon button		*
+ *		2013/12/28		use CSS for layout								*
+ *		2014/09/04		add link to help								*
+ *						clear style in page footer						*
+ *		2014/11/03		change function of page usstates.html			*
+ *						move genMichigan.html to lower level			*
+ *		2014/12/18		move ussstates.html to lower level				*
+ *		2015/05/24		top of hierarchy changed to genealogy.php		*
+ *		2018/01/04		remove Template from template file names		*
+ *		2018/01/25		add local CSS and Javascript references			*
+ *		2018/11/03		use standard script for states                  *
+ *                      add lang= parameters                            *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">
+        Genealogy
+    </a>:
+    <a href="/Canada/CountriesEdit.php?lang=$LANG">
+        List of Supported Countries
+    </a>:
+  </div>
+  <div class="body">
+  <h1>Genealogy Resources for the United States of America
+      <span class="right">
+        <a href="/USA/genUSAHelpen.html" target="_blank">? Help</a>
+      </span>
+    </h1>
+    $MSG
+    $TRACE
+    <h3>
+	  <a href="/Canada/DomainsEdit.php?cc=US&lang=$LANG">
+          List of States
+      </a>
+    </h3>
+    <h3>Commercial Data Bases</h3>
+    <p class="label">
+	  <a target="_blank" href="http://www.kindredkonnections.com/">
+	  	Ancestry and Genealogy at MyTrees.com
+	  </a> 
+    </p>
+    <p class="label">
+	  <a target="_blank" href="http://www.ancestry.com/main.htm">
+	  	Ancestry.com - Online Genealogy
+	  </a> 
+    </p>
+    <p class="label">
+	  <a target="_blank" href="http://www.geneanet.org/">
+	  	GeneaNet - Discover your genealogy and family history
+	  </a> 
+    </p>
+    <p class="label">
+	  <a target="_blank" href="http://www.americanwardead.com/searchww.htm">
+	  	World War II Search
+	  </a> 
+    </p>
+  
+    <h3>Free Databases</h3>
+      <p class="label">
+	    <a target="_blank" href="http://www.familysearch.org/">
+	        FamilySearch Internet Genealogy Service
+	    </a> 
+      </p>
+  
+  </div> <!-- class="body" -->
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/default.js" type="text/javascript">
+    </script>

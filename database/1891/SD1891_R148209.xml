@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148209">
+    <option value="172_D">
+        Montréal City: St. Antoine Ward
+        <div id="17" reel="148209" frame="0" count="43"/>
+        <div id="18" reel="148209" frame="43" count="20"/>
+        <div id="19" reel="148209" frame="63" count="12"/>
+        <div id="20" reel="148209" frame="75" count="4"/>
+        <div id="21" reel="148209" frame="79" count="20"/>
+        <div id="22" reel="148209" frame="99" count="10"/>
+        <div id="23" reel="148209" frame="109" count="12"/>
+        <div id="24" reel="148209" frame="121" count="25"/>
+        <div id="25" reel="148209" frame="146" count="21"/>
+        <div id="26" reel="148209" frame="167" count="24"/>
+        <div id="27" reel="148209" frame="191" count="15"/>
+        <div id="28" reel="148209" frame="206" count="8"/>
+        <div id="29" reel="148209" frame="214" count="17"/>
+        <div id="30" reel="148209" frame="231" count="12"/>
+        <div id="31" reel="148209" frame="243" count="8"/>
+    </option>
+    <option value="172_E">
+        Montréal City: St. James Ward
+        <div id="1" reel="148209" frame="251" count="17"/>
+        <div id="2" reel="148209" frame="268" count="16"/>
+        <div id="3" reel="148209" frame="284" count="15"/>
+        <div id="4" reel="148209" frame="299" count="16"/>
+        <div id="5" reel="148209" frame="315" count="24"/>
+        <div id="6" reel="148209" frame="339" count="11"/>
+        <div id="7" reel="148209" frame="350" count="14"/>
+        <div id="8" reel="148209" frame="364" count="16"/>
+        <div id="9" reel="148209" frame="380" count="16"/>
+        <div id="10" reel="148209" frame="396" count="34"/>
+        <div id="11" reel="148209" frame="430" count="14"/>
+        <div id="12" reel="148209" frame="444" count="18"/>
+        <div id="13" reel="148209" frame="462" count="17"/>
+        <div id="14" reel="148209" frame="479" count="13"/>
+        <div id="15" reel="148209" frame="492" count="16"/>
+        <div id="16" reel="148209" frame="508" count="16"/>
+        <div id="17" reel="148209" frame="524" count="12"/>
+        <div id="18" reel="148209" frame="536" count="13"/>
+        <div id="19" reel="148209" frame="549" count="16"/>
+        <div id="20" reel="148209" frame="565" count="21"/>
+        <div id="21" reel="148209" frame="586" count="18"/>
+        <div id="22" reel="148209" frame="604" count="10"/>
+        <div id="23" reel="148209" frame="614" count="15"/>
+        <div id="24" reel="148209" frame="629" count="17"/>
+        <div id="25" reel="148209" frame="646" count="18"/>
+        <div id="26" reel="148209" frame="664" count="13"/>
+        <div id="27" reel="148209" frame="677" count="16"/>
+        <div id="28" reel="148209" frame="693" count="14"/>
+        <div id="29" reel="148209" frame="707" count="14"/>
+        <div id="30" reel="148209" frame="721" count="14"/>
+        <div id="31" reel="148209" frame="735" count="12"/>
+        <div id="32" reel="148209" frame="747" count="13"/>
+        <div id="33" reel="148209" frame="760" count="21"/>
+        <div id="34" reel="148209" frame="781" count="10"/>
+    </option>
+</select>

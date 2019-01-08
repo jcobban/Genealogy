@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="26">
+    <option value="284">
+        Blandford
+    </option>
+    <option value="285">
+        Blenheim
+    </option>
+    <option value="286">
+        Reach
+    </option>
+    <option value="287">
+        Embro village
+    </option>
+    <option value="288">
+        Ingersoll Village
+    </option>
+    <option value="289">
+        Nissouri E.
+    </option>
+    <option value="290">
+        Norwich N.
+    </option>
+    <option value="291">
+        Norwich S.
+    </option>
+    <option value="292">
+        Reach
+    </option>
+    <option value="293">
+        Oxford E.
+    </option>
+    <option value="294">
+        Oxford W.
+    </option>
+    <option value="295">
+        Woodstock Town
+    </option>
+    <option value="296">
+        Zorra E.
+    </option>
+    <option value="297">
+        Zorra W.
+    </option>
+    <option value="297A">
+        Agricultural Census
+    </option>
+</select>

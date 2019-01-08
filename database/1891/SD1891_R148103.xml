@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148103">
+    <option value="15_J">
+        Kent: Wellington
+        <div id="4" reel="148103" frame="0" count="14"/>
+        <div id="5" reel="148103" frame="14" count="13"/>
+    </option>
+    <option value="16_A">
+        Kings: Cardwell
+        <div id="1" reel="148103" frame="27" count="16"/>
+        <div id="2" reel="148103" frame="43" count="12"/>
+    </option>
+    <option value="16_B">
+        Kings: Greenwich
+        <div id="1" reel="148103" frame="55" count="10"/>
+        <div id="2" reel="148103" frame="65" count="9"/>
+    </option>
+    <option value="16_C">
+        Kings: Hammond
+        <div id="" reel="148103" frame="74" count="17"/>
+    </option>
+    <option value="16_D">
+        Kings: Hampton
+        <div id="1" reel="148103" frame="91" count="20"/>
+        <div id="2" reel="148103" frame="111" count="20"/>
+    </option>
+    <option value="16_E">
+        Kings: Havelock
+        <div id="1" reel="148103" frame="131" count="18"/>
+        <div id="2" reel="148103" frame="149" count="25"/>
+    </option>
+    <option value="16_F">
+        Kings: Kars
+        <div id="1" reel="148103" frame="174" count="6"/>
+        <div id="2" reel="148103" frame="180" count="6"/>
+    </option>
+    <option value="16_G">
+        Kings: Kingston
+        <div id="1" reel="148103" frame="186" count="18"/>
+        <div id="2" reel="148103" frame="204" count="22"/>
+    </option>
+    <option value="16_H">
+        Kings: Norton
+        <div id="1" reel="148103" frame="226" count="16"/>
+        <div id="2" reel="148103" frame="242" count="18"/>
+    </option>
+    <option value="16_I">
+        Kings: Rothesay
+        <div id="1" reel="148103" frame="260" count="11"/>
+        <div id="2" reel="148103" frame="271" count="13"/>
+    </option>
+    <option value="16_J">
+        Kings: Studholm
+        <div id="1" reel="148103" frame="284" count="30"/>
+        <div id="2" reel="148103" frame="314" count="14"/>
+        <div id="3" reel="148103" frame="328" count="14"/>
+    </option>
+    <option value="16_K">
+        Kings: Springfield
+        <div id="1" reel="148103" frame="342" count="21"/>
+        <div id="2" reel="148103" frame="363" count="18"/>
+    </option>
+    <option value="16_L">
+        Kings: Sussex
+        <div id="1" reel="148103" frame="381" count="21"/>
+        <div id="2" reel="148103" frame="402" count="24"/>
+        <div id="3" reel="148103" frame="426" count="23"/>
+    </option>
+    <option value="16_M">
+        Kings: Upham
+        <div id="1" reel="148103" frame="449" count="13"/>
+        <div id="2" reel="148103" frame="462" count="12"/>
+    </option>
+    <option value="16_N">
+        Kings: Waterford
+        <div id="1" reel="148103" frame="474" count="13"/>
+        <div id="2" reel="148103" frame="487" count="12"/>
+    </option>
+    <option value="16_O">
+        Kings: Westfield
+        <div id="1" reel="148103" frame="499" count="15"/>
+        <div id="2" reel="148103" frame="514" count="11"/>
+    </option>
+    <option value="17_A">
+        Northumberland: Alnwick
+        <div id="1" reel="148103" frame="525" count="19"/>
+        <div id="2" reel="148103" frame="544" count="16"/>
+        <div id="3" reel="148103" frame="560" count="27"/>
+    </option>
+    <option value="17_B">
+        Northumberland: Blackville
+        <div id="1" reel="148103" frame="587" count="14"/>
+        <div id="2" reel="148103" frame="601" count="18"/>
+        <div id="3" reel="148103" frame="619" count="12"/>
+    </option>
+</select>

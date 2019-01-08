@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148142">
+    <option value="69_G">
+        Grey South: Normanby
+        <div id="2" reel="148142" frame="0" count="33"/>
+        <div id="3" reel="148142" frame="33" count="31"/>
+        <div id="4" reel="148142" frame="64" count="25"/>
+    </option>
+    <option value="70_A">
+        Haldimand: Caledonia Village
+        <div id="" reel="148142" frame="89" count="20"/>
+    </option>
+    <option value="70_B">
+        Haldimand: Cayuga North
+        <div id="1" reel="148142" frame="109" count="13"/>
+        <div id="2" reel="148142" frame="122" count="17"/>
+        <div id="3" reel="148142" frame="139" count="10"/>
+    </option>
+    <option value="70_C">
+        Haldimand: Cayuga Village
+        <div id="" reel="148142" frame="149" count="17"/>
+    </option>
+    <option value="70_D">
+        Haldimand: Hagersville Village
+        <div id="" reel="148142" frame="166" count="22"/>
+    </option>
+    <option value="70_E">
+        Haldimand: Oneida
+        <div id="1" reel="148142" frame="188" count="21"/>
+        <div id="2" reel="148142" frame="209" count="19"/>
+        <div id="3" reel="148142" frame="228" count="13"/>
+    </option>
+    <option value="70_F">
+        Haldimand: Rainham
+        <div id="1" reel="148142" frame="241" count="16"/>
+        <div id="2" reel="148142" frame="257" count="18"/>
+        <div id="3" reel="148142" frame="275" count="12"/>
+    </option>
+    <option value="70_G">
+        Haldimand: Seneca
+        <div id="1" reel="148142" frame="287" count="16"/>
+        <div id="2" reel="148142" frame="303" count="24"/>
+        <div id="3" reel="148142" frame="327" count="13"/>
+    </option>
+    <option value="70_H">
+        Haldimand: Walpole
+        <div id="1" reel="148142" frame="340" count="24"/>
+        <div id="2" reel="148142" frame="364" count="15"/>
+        <div id="3" reel="148142" frame="379" count="18"/>
+        <div id="4" reel="148142" frame="397" count="22"/>
+        <div id="5" reel="148142" frame="419" count="13"/>
+        <div id="6" reel="148142" frame="432" count="16"/>
+    </option>
+    <option value="71_A">
+        Halton: Acton Village
+        <div id="" reel="148142" frame="448" count="25"/>
+    </option>
+    <option value="71_B">
+        Halton: Burlington Village
+        <div id="" reel="148142" frame="473" count="27"/>
+    </option>
+    <option value="71_C">
+        Halton: Esquesing
+        <div id="1" reel="148142" frame="500" count="32"/>
+        <div id="2" reel="148142" frame="532" count="26"/>
+        <div id="3" reel="148142" frame="558" count="36"/>
+    </option>
+    <option value="71_D">
+        Halton: Georgetown Village
+        <div id="" reel="148142" frame="594" count="31"/>
+    </option>
+    <option value="71_E">
+        Halton: Milton Town
+        <div id="" reel="148142" frame="625" count="31"/>
+    </option>
+    <option value="71_F">
+        Halton: Nassagaweya
+        <div id="1" reel="148142" frame="656" count="30"/>
+    </option>
+</select>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="48">
+    <option value="485">
+        St. Andrew Ward
+    </option>
+    <option value="485A">
+        St. David Ward
+    </option>
+    <option value="485B">
+        St. George Ward
+    </option>
+    <option value="485C">
+        St. James Ward
+    </option>
+    <option value="485D">
+        St. John Ward
+    </option>
+    <option value="485E">
+        St. Lawrence Ward
+    </option>
+    <option value="485F">
+        St. Patrick Ward
+    </option>
+</select>

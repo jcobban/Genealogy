@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148155">
+    <option value="91_G">
+        Middlesex North: Stephen
+        <div id="1" reel="148155" frame="0" count="27"/>
+        <div id="2" reel="148155" frame="27" count="28"/>
+        <div id="3" reel="148155" frame="55" count="32"/>
+    </option>
+    <option value="91_H">
+        Middlesex North: Williams E.
+        <div id="1" reel="148155" frame="87" count="21"/>
+        <div id="2" reel="148155" frame="108" count="16"/>
+    </option>
+    <option value="91_I">
+        Middlesex North: Williams W.
+        <div id="" reel="148155" frame="124" count="37"/>
+    </option>
+    <option value="92_A">
+        Middlesex South: Caradoc
+        <div id="1" reel="148155" frame="161" count="29"/>
+        <div id="2" reel="148155" frame="190" count="20"/>
+        <div id="3" reel="148155" frame="210" count="26"/>
+        <div id="4" reel="148155" frame="236" count="24"/>
+    </option>
+    <option value="92_B">
+        Middlesex South: Delaware
+        <div id="1" reel="148155" frame="260" count="39"/>
+        <div id="2" reel="148155" frame="299" count="15"/>
+    </option>
+    <option value="92_C">
+        Middlesex South: Lobo
+        <div id="1" reel="148155" frame="314" count="21"/>
+        <div id="2" reel="148155" frame="335" count="17"/>
+        <div id="3" reel="148155" frame="352" count="14"/>
+        <div id="4" reel="148155" frame="366" count="11"/>
+    </option>
+    <option value="92_D">
+        Middlesex South: Westminster
+        <div id="1" reel="148155" frame="377" count="27"/>
+        <div id="2" reel="148155" frame="404" count="34"/>
+        <div id="3" reel="148155" frame="438" count="33"/>
+        <div id="4" reel="148155" frame="471" count="30"/>
+        <div id="5" reel="148155" frame="501" count="20"/>
+        <div id="6" reel="148155" frame="521" count="35"/>
+    </option>
+    <option value="93_A">
+        Middlesex West: Adelaide
+        <div id="1" reel="148155" frame="556" count="16"/>
+        <div id="2" reel="148155" frame="572" count="22"/>
+        <div id="3" reel="148155" frame="594" count="18"/>
+    </option>
+    <option value="93_B">
+        Middlesex West: Ekfrid
+        <div id="1" reel="148155" frame="612" count="23"/>
+        <div id="2" reel="148155" frame="635" count="13"/>
+        <div id="3" reel="148155" frame="648" count="13"/>
+        <div id="4" reel="148155" frame="661" count="9"/>
+    </option>
+    <option value="93_C">
+        Middlesex West: Euphemia
+        <div id="1" reel="148155" frame="670" count="14"/>
+        <div id="2" reel="148155" frame="684" count="22"/>
+        <div id="3" reel="148155" frame="706" count="18"/>
+    </option>
+    <option value="93_D">
+        Middlesex West: Glencoe
+        <div id="" reel="148155" frame="724" count="21"/>
+    </option>
+    <option value="93_E">
+        Middlesex West: Metcalfe
+        <div id="1" reel="148155" frame="745" count="17"/>
+        <div id="2" reel="148155" frame="762" count="19"/>
+    </option>
+</select>

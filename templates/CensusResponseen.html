@@ -1,0 +1,202 @@
+<!--*********************************************************************
+ *  CensusResponseen.html												*
+ *																		*
+ *  Display list of individuals matching a query of a census of Canada.		*
+ *																		*
+ *  History:																*
+ *		2017/09/25		created												*
+ *		2018/01/04		remove Template from template file names		*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+    <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>:
+    <a href="/database/QueryDetail.php?Census=CA$CENSUS&amp;lang=">New $CENSUS Census Query</a>: 
+  </div>
+  <div id="transcription" style="overflow: auto; overflow-x: scroll">
+    <div class="body">
+      <h1>
+	  $CENSUS Census of Canada Query Response
+        <span class="right">
+	  <a href="CensusResponseHelpen.html" target="help">? Help</a>
+        </span>
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+    <form action="doNothing.php" name="buttonForm" id="buttonForm">
+	<p class="label" id="buttonRow">
+	    <input type="hidden" name="search" disabled="disabled"
+		value="CensusForm$CENSUS.php$SEARCH">
+	    <input type="hidden" name="image" disabled="disabled"
+		value="$IMAGE">
+	    <button type="button" name="seeAllFields">See All Fields</button>
+	    <button type="button" name="displayImage">Display Image</button>
+	</p>
+<!--- Put out a line with links to previous and next section of table -->
+<div class="center">
+    <span class="left" id="npPrevFront">
+	<a href="$npPrev" id="prenpprev">
+	&lt;---
+	</a>
+    </span>
+    <span class="right" id="npNextFront">
+	<a href="$npNext" id="prenpnext">
+	    ---&gt;
+	</a>
+    </span>
+      <span id="respdescrows">
+	returned rows $first to $last of $totalrows
+      </span>
+      <span id="respdescsub">
+	$province dist $dId $DName, subdist $subdId $SubDName
+      </span>
+      <span id="respdescdiv">
+	 div $divId
+      </span>
+      <span id="respdescpage">
+	 page $page
+      </span>
+      <span id="respdescfam">
+	 family $family
+      </span>
+    <div style="clear: both;"></div>
+  </div>
+  <!--- Put out the response as a table -->
+  <table class="summary" cellspacing="0px" id="responseTable">
+    <thead> <!--- Put out the column headers -->
+      <tr>
+	<th class="colhead">
+	    Action
+	</th>
+	<th class="colhead">
+	    Province
+	</th>
+	<th class="colhead">
+	    Name
+	</th>
+	<th class="colhead">
+	    B.Year
+	</th>
+	<th class="colhead">
+	    Birth Place
+	</th>
+	<th class="colhead">
+	    Occupation
+	</th>
+	<th class="colhead">
+	    Sub-District
+	</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="Row$i">
+	<td>
+	  <input type="hidden" name="href$i"
+		value="CensusDetails.php?Census=CA{$census}&amp;Province=$province&amp;District=$district&amp;SubDistrict=$subdistrict&amp;Division=$division&amp;Page=$page&amp;Line=$line&amp;lang=$ang">
+	  <button type="button" name="Details$i">
+	    Details
+	  </button>
+	</td>
+	<td class="$class left">
+	  $province
+	</td>
+	<td class="$class $sex">
+	  $fullname
+	</td>
+	<td class="$class right">
+	  $byear
+	</td>
+	<td class="$class left">
+	  $bplace
+	</td>
+	<td class="$class left">
+	  $occupation
+	</td>
+	<td class="$class left">
+	  $sd_name
+	</td>
+      </tr>
+    </tbody>
+  </table>
+    </form>
+  <!--- Put out a line with links to previous and next section of table -->
+  <div class="center">
+    <span class="left" id="npPrevBack">
+	<a href="$npPrev" id="postnpprev">
+	&lt;---
+	</a>
+    </span>
+    <span class="right" id="npNextBack">
+	<a href="$npNext" id="postnpnext">
+	    ---&gt;
+	</a>
+    </span>
+    <div style="clear: both;"></div>
+  </div>
+  </div>
+  </div> <!-- id="transcription" -->
+<div class="balloon" id="HelpseeAllFields">
+Click on this button to display a form containing all of the transcribed
+columns for the page.  If you are a registered contributor to the
+web-site you will be able to edit the contents of this form to add
+or correct the transcription of the census.
+</div>
+<div class="balloon" id="HelpdisplayImage">
+Click on this button to split the window and display the original
+census image corresponding to this page as obtained from the Library and
+Archives of Canada web-site.
+</div>
+<div class="balloon" id="HelpDetails">
+Click on this button to see all of the fields from this row of the census
+transcription.
+</div>
+<div class="hidden" id="templates">
+  <!-- the following are language specific error messages -->
+  <span class="note" id="imageCopyrightNote">
+	Image provided courtesy of 
+	<a href="http://www.bac-lac.gc.ca/eng/Pages/home.aspx">
+	Library and Archives Canada</a>.
+  </span>
+</div>
+  <!-- balloons to pop up when mouse moves over forward and back links -->
+  <div class="popup" id="mouseprenpprev">
+    <p class="label">
+	<span id="familyminusonepre">Go to Family {$family - 1}&nbsp;</span>
+	<span id="pageminusonepre">Go to Page {$page - 1}&nbsp;</span>
+	<span id="rowminuscountpre">Go to Row {$offset - limit + 1}&nbsp;</span>
+    </p>
+  </div>
+  <div class="popup" id="mouseprenpnext">
+    <p class="label">
+	<span id="familyplusonepre">Go to Family {$family + 1}&nbsp;</span>
+	<span id="pageplusonepre">Go to Page {$page + 1}&nbsp;</span>
+	<span id="rowpluscountpre">Go to Row {$offset + limit + 1}&nbsp;</span>
+    </p>
+  </div>
+  <div class="popup" id="mousepostnpprev">
+    <p class="label">
+	<span id="familyminusonepost">Go to Family {$family - 1}&nbsp;</span>
+	<span id="pageminusonepost">Go to Page {$page - 1}&nbsp;</span>
+	<span id="rowminuscountpost">Go to Row {$offset - limit + 1}&nbsp;</span>
+    </p>
+  </div>
+  <div class="popup" id="mousepostnpnext">
+    <p class="label">
+	<span id="familyplusonepost">Go to Family {$family + 1}&nbsp;</span>
+	<span id="pageplusonepost">Go to Page {$page + 1}&nbsp;</span>
+	<span id="rowpluscountpost">Go to Row {$offset + limit + 1}&nbsp;</span>
+    </p>
+  </div>
+    <script src= '/jscripts/CommonForm.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/Cookie.js' type="text/javascript">
+    </script>
+    <script src= '/database/CensusResponse.js' type="text/javascript">
+    </script>

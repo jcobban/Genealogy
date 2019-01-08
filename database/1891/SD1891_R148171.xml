@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148171">
+    <option value="117_F">
+        Simcoe North: Stayner Village
+        <div id="" reel="148171" frame="0" count="28"/>
+    </option>
+    <option value="117_G">
+        Simcoe North: Sunnidale
+        <div id="1" reel="148171" frame="28" count="34"/>
+        <div id="2" reel="148171" frame="62" count="23"/>
+    </option>
+    <option value="117_H">
+        Simcoe North: Vespra
+        <div id="1" reel="148171" frame="85" count="22"/>
+        <div id="2" reel="148171" frame="107" count="25"/>
+        <div id="3" reel="148171" frame="132" count="18"/>
+    </option>
+    <option value="118_A">
+        Simcoe South: Alliston Village
+        <div id="1" reel="148171" frame="150" count="15"/>
+        <div id="2" reel="148171" frame="165" count="16"/>
+    </option>
+    <option value="118_B">
+        Simcoe South: Beeton Village
+        <div id="" reel="148171" frame="181" count="17"/>
+    </option>
+    <option value="118_C">
+        Simcoe South: Essa
+        <div id="1" reel="148171" frame="198" count="30"/>
+        <div id="2" reel="148171" frame="228" count="44"/>
+    </option>
+    <option value="118_D">
+        Simcoe South: Innisfil
+        <div id="1" reel="148171" frame="272" count="23"/>
+        <div id="2" reel="148171" frame="295" count="24"/>
+        <div id="3" reel="148171" frame="319" count="31"/>
+        <div id="4" reel="148171" frame="350" count="29"/>
+    </option>
+    <option value="118_E">
+        Simcoe South: Mulmur
+        <div id="1" reel="148171" frame="379" count="39"/>
+        <div id="2" reel="148171" frame="418" count="37"/>
+    </option>
+    <option value="118_F">
+        Simcoe South: Tecumseth
+        <div id="1" reel="148171" frame="455" count="25"/>
+        <div id="2" reel="148171" frame="480" count="28"/>
+        <div id="3" reel="148171" frame="508" count="27"/>
+    </option>
+    <option value="118_G">
+        Simcoe South: Tossorontio
+        <div id="1" reel="148171" frame="535" count="21"/>
+        <div id="2" reel="148171" frame="556" count="18"/>
+    </option>
+    <option value="118_H">
+        Simcoe South: Tottenham Village
+        <div id="" reel="148171" frame="574" count="13"/>
+    </option>
+    <option value="119_A">
+        Toronto City: St. Andrews Ward
+        <div id="1" reel="148171" frame="587" count="11"/>
+        <div id="2" reel="148171" frame="598" count="61"/>
+        <div id="3" reel="148171" frame="659" count="51"/>
+        <div id="4" reel="148171" frame="710" count="50"/>
+        <div id="5" reel="148171" frame="760" count="45"/>
+    </option>
+</select>

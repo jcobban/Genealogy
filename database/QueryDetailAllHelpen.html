@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>All Censuses of Canada: Nominal Search Help</title>
+    <meta http-equiv=Content-Type content="text/html; charset=utf8">
+    <meta name=AUTHOR content="James A. Cobban">
+    <meta name="copyright" id="copyright" content="&copy; 2015 James A. Cobban">
+<!--*********************************************************************
+ *  QueryDetailAllHelpen.html											*
+ *																		*
+ *  Help for query for individuals in All Censuses of Canada			*
+ *																		*
+ *  History:															*
+ *		2016/01/20		created											*
+ *      2018/11/08      rename to ...Helpen.html                        *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  
+  <body>
+    <div class="topcrumbs">
+      <a href="/genealogy.php">Genealogy</a>: 
+      <a href="/Canada/genCanada.html">Canada</a>:
+      <a href="/database/genCensuses.php">Censuses</a>:
+    </div>
+    <div class="help">
+      <h1>All Census: Nominal Search Help</h1>
+      <p>This form permits you to specify the characteristics of individuals that
+      you are looking for in All Censuses of Canada.
+      <p>Once you have made all of your desired selections, click on the "Query"
+      button centered at the top of the form.	
+      <p class="label">Province</p>
+      <p>You can restrict the response by province.  Select one of
+      New Brunswick, Nova Scotia, Prince Edward Island, Quebec, 
+      Ontario, Manitoba, Saskatchewan, Alberta, 
+      and British Columbia, as well as the North-West Territories.
+      If you wish to limit the search to a specific province the choice is made
+      using the selection list.
+      <p class="label">Count</p>
+      <p>The Count field permits specifying how many records are to be displayed at
+      at a time.  The default is 20 records.
+      <p class="label">Given Names</p>
+      <p>This field is used to specify text which is matched against the given names
+      of individuals in the database.  This search is done as a 
+      case-insensitive pattern match, not a simple comparison. 
+      <p>Specifying simple text, comprising letters and spaces, matches against
+      any names containing that text.  "John" or "john" or "JOHN" will match
+      "Johnathan" and "William John" as well as the simple "John".
+      <p>The text may be a 
+          <a href="http://en.wikipedia.org/wiki/Regular_expression">
+      	regular expression</a>.
+      There are too many options to enumerate here, but a few examples include:
+      <ul>
+          <li>If you want to match just the name "John", excluding names that include
+      	"John" as part of them, enter "^John$".
+          <li>Enumerators often use unusual spellings of names.  For example if you
+      	to match names including both "Henry" and "Henery", enter "Hen.*ry".
+      </ul>
+      <p class="label">Surname</p>
+      <p>This field is used to specify text to look for in the surname of individuals.
+      If the value contains only letters and spaces then only names that match
+      exactly (except for case) are found.  Otherwise this
+      uses the same pattern matching as described for Given Names.
+      For example to match surnames starting with "McL..." and ending with ".n",
+      such as "McLean", "McLain", "McLennan", or "McLellan" you could specify 
+      "^McL.*n$".
+      <p>The meaning of this field changes if the Soundex option is selected.
+      <p class="label">Soundex</p>
+      <p>The Soundex code has been used for decades to attempt to match names that
+      sound similar.  For example it is used by police forces to perform a rough
+      match for the names of drivers.  It is a problematic tool, as it
+      is based upon the phonetics of British surnames.
+      If you select this option along with a
+      complete surname, not a pattern match, in the Surname field, then the search
+      is made for surnames that "sound like" the given surname.  For example
+      specifying Soundex together with "McLean" will match all of the surnames in
+      the pattern match example under "Surname", but many other names as well, such
+      "McCallum", "McAllan", "McClain", and "McWilliams". 
+      <p class="label">Sex</p>
+      <p>Select this option if you only want to look for male or female individuals.
+      <p class="label">Marital Status</p>
+      <p>Select this option if you wish to restrict the search based upon the
+      marital status of the individuals.
+      <p class="label">Occupation</p>
+      <p>This option is used to search for individuals based upon their listed
+      occupations.  This is again a pattern match.  For example searching for 
+      "Labo[u]{0,1}rer" will match any occupation that contains either "Laborer" or
+      "Labourer", including "Farm Labourer" and "R'y Laborer".
+      <p class="label">Birth Place</p>
+      <p>This option is used to search for individuals based upon where they were
+      born.  This is a pattern match.  For example searching for "Canada" will 
+      also match "Canada East", "Canada West", "Lower Canada", and "Upper Canada".
+      <p class="label">Religion</p>
+      <p>This option is used to search for individuals based upon their
+      religious affiliation.  This is a pattern match.  For example searching for
+      "Meth" will match any religion containing that string, including
+      "Wesleyan Methodist", "C. Meth.", "New Connexion Methodist", 
+      and "Methodist Episcopal".
+      </p>
+      <p class="label">Address</p>
+      <P>This option is used to
+      search for individuals based upon their address.
+      This is a pattern match. For example searching for
+      &quot;Dundas St&quot; will match any address containing that string,
+      including &quot;137 Dundas St&quot;, &quot;cor of Queen St &amp;
+      Dundas St&quot; and &quot;Dundas Station&quot;. 
+      </p>
+      <p class="label">Origin</p>
+      <p>The Origin field is used to search for individuals with a particular
+      ethnic origin.  Note that by the instructions to the enumerators the
+      term "Canadian" only applied to <i>Canadiens-françaises</i>, 
+      and the term "American"
+      was not to be used, regardless of how many generations the individual's
+      family had been living in America.
+      <p class="label">Birth Year &amp; Range</p>
+      <p>The Birth Year and Range fields are used to search for individuals based upon 
+      their approximate birth year calculated from their age at the time of the census
+      in spring All.  
+      </p>
+    </div>
+    <div class="botcrumbs">
+      <span class="right">
+          <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+      </span>
+      <a href="/contactAuthor.php?subject=QueryDetailAllHelpen.html" target="_blank">Contact Author</a>
+      <br/>
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/Canada/genCanada.html">Canada</a>:
+      <a href="/database/genCensusesHelpen.html">Censuses</a>: 
+      <div style="clear: both;"></div>
+    </div>
+  </body>
+</html>

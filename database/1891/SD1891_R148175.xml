@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148175">
+    <option value="119_H">
+        Toronto City: St. Stephens Ward &amp; St. Marks Ward (part)
+        <div id="8" reel="148175" frame="1" count="59"/>
+        <div id="9" reel="148175" frame="60" count="43"/>
+    </option>
+    <option value="119_I">
+        Toronto City: St. Thomas Ward
+        <div id="1" reel="148175" frame="103" count="43"/>
+        <div id="2" reel="148175" frame="146" count="54"/>
+        <div id="3" reel="148175" frame="200" count="44"/>
+        <div id="4" reel="148175" frame="244" count="48"/>
+        <div id="5" reel="148175" frame="292" count="23"/>
+        <div id="6" reel="148175" frame="315" count="21"/>
+        <div id="7" reel="148175" frame="336" count="31"/>
+    </option>
+    <option value="120_A">
+        Victoria North: Anson &amp; Hendon
+        <div id="" reel="148175" frame="367" count="7"/>
+    </option>
+    <option value="120_B">
+        Victoria North: Bexley
+        <div id="" reel="148175" frame="374" count="19"/>
+    </option>
+    <option value="120_C">
+        Victoria North: Carden
+        <div id="" reel="148175" frame="393" count="17"/>
+    </option>
+    <option value="120_D">
+        Victoria North: Dalton
+        <div id="" reel="148175" frame="410" count="11"/>
+    </option>
+    <option value="120_E">
+        Victoria North: Eldon
+        <div id="1" reel="148175" frame="421" count="24"/>
+        <div id="2" reel="148175" frame="445" count="18"/>
+        <div id="3" reel="148175" frame="463" count="24"/>
+    </option>
+    <option value="120_F">
+        Victoria North: Fenelon
+        <div id="1" reel="148175" frame="487" count="17"/>
+        <div id="2" reel="148175" frame="504" count="25"/>
+        <div id="3" reel="148175" frame="529" count="20"/>
+    </option>
+    <option value="120_G">
+        Victoria North: Fenelon Falls Village
+        <div id="" reel="148175" frame="549" count="25"/>
+    </option>
+    <option value="120_H">
+        Victoria North: Galway
+        <div id="" reel="148175" frame="574" count="15"/>
+    </option>
+    <option value="120_I">
+        Victoria North: Laxton, Digby, &amp; Longford
+        <div id="1" reel="148175" frame="589" count="14"/>
+        <div id="2" reel="148175" frame="603" count="5"/>
+    </option>
+    <option value="120_J">
+        Victoria North: Lutterworth
+        <div id="" reel="148175" frame="608" count="12"/>
+    </option>
+    <option value="120_K">
+        Victoria North: Minden
+        <div id="" reel="148175" frame="620" count="25"/>
+    </option>
+    <option value="120_L">
+        Victoria North: Snowden
+        <div id="" reel="148175" frame="645" count="21"/>
+    </option>
+    <option value="120_M">
+        Victoria North: Stanhope, Sherburne, &amp; McClintock
+        <div id="1" reel="148175" frame="666" count="10"/>
+        <div id="2" reel="148175" frame="676" count="3"/>
+    </option>
+    <option value="120_N">
+        Victoria North: Somerville
+        <div id="1" reel="148175" frame="679" count="17"/>
+        <div id="2" reel="148175" frame="696" count="24"/>
+    </option>
+    <option value="120_O">
+        Victoria North: Woodville Village
+        <div id="" reel="148175" frame="720" count="9"/>
+    </option>
+    <option value="121_A">
+        Victoria South: Bobcaygeon Village
+        <div id="" reel="148175" frame="729" count="20"/>
+    </option>
+    <option value="121_B">
+        Victoria South: Emily
+        <div id="1" reel="148175" frame="749" count="16"/>
+        <div id="2" reel="148175" frame="765" count="22"/>
+    </option>
+</select>

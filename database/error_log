@@ -1,0 +1,13 @@
+[11-Mar-2018 01:37:14 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/jcobban/includes/CensusLineSet.inc on line 750
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  Invalid argument supplied for foreach() in /home/jcobban/includes/CensusLineSet.inc on line 745
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  reset() expects parameter 1 to be array, null given in /home/jcobban/includes/CensusLineSet.inc on line 754
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  Invalid argument supplied for foreach() in /home/jcobban/includes/CensusLineSet.inc on line 745
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  reset() expects parameter 1 to be array, null given in /home/jcobban/includes/CensusLineSet.inc on line 754
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  key() expects parameter 1 to be array, null given in /home/jcobban/includes/RecordSet.inc on line 1991
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  Invalid argument supplied for foreach() in /home/jcobban/includes/CensusLineSet.inc on line 745
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  reset() expects parameter 1 to be array, null given in /home/jcobban/includes/CensusLineSet.inc on line 754
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  Invalid argument supplied for foreach() in /home/jcobban/includes/CensusLineSet.inc on line 745
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  reset() expects parameter 1 to be array, null given in /home/jcobban/includes/CensusLineSet.inc on line 754
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  Invalid argument supplied for foreach() in /home/jcobban/includes/CensusLineSet.inc on line 745
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  reset() expects parameter 1 to be array, null given in /home/jcobban/includes/CensusLineSet.inc on line 754
+[10-Mar-2018 20:37:47 America/Toronto] PHP Warning:  key() expects parameter 1 to be array, null given in /home/jcobban/includes/RecordSet.inc on line 1991

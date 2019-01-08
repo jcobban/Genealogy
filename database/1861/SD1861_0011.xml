@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="11">
+    <option value="100">
+        Artemisia
+    </option>
+    <option value="101">
+        Bentinck
+    </option>
+    <option value="102">
+        Collingwood
+    </option>
+    <option value="103">
+        Darby
+    </option>
+    <option value="104">
+        Egremont
+    </option>
+    <option value="105">
+        Euphrasia
+    </option>
+    <option value="106">
+        Glenelg
+    </option>
+    <option value="107">
+        Holland
+    </option>
+    <option value="108">
+        Keppel, Sarawack, &amp; Brooke
+    </option>
+    <option value="109">
+        Melancthon
+    </option>
+    <option value="110">
+        Normanby
+    </option>
+    <option value="111">
+        Osprey
+    </option>
+    <option value="112">
+        Owen Sound Town
+    </option>
+    <option value="113">
+        Proton
+    </option>
+    <option value="114">
+        Sullivan
+    </option>
+    <option value="115">
+        Sydenham
+    </option>
+    <option value="116">
+        St. Vincent
+    </option>
+    <option value="116A">
+        Agricultural Census
+    </option>
+</select>

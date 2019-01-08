@@ -1,0 +1,172 @@
+<!--*********************************************************************
+ *  QuerySurnamesen.html	        									*
+ *																		*
+ *  Display list of surnames for a subset of the census database.		*
+ *																		*
+ *  History:															*
+ *		2018/01/12      created                                         *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+      <a href="/database/genCensuses.php?cc=CA&amp;lang=$LANG">Censuses</a>:
+      <a href="/database/QueryDetail.php?Census=$CENSUSID&Province=$PROVINCE&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&lang=$LANG">
+  	        $CENSUSYEAR	 Census Search
+      </a>: 
+      <a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&lang=$LANG">
+  	        Summary
+      </a>:
+      <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTID&lang=$LANG">
+  	        District $DISTID $DNAME Summary
+      </a>:
+      <span id="crumbSubdist">
+        <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&amp;Division=$DIVISION&amp;lang=$LANG">
+  	        Division Details
+        </a>:
+      </span>
+		<a href="/database/QuerySurnamesTop.php?Census=$CENSUSID&District=$DISTID&amp;SubDistrict=$SUBDISTID&amp;Division=$DIVISION&amp;lang=$LANG">
+  	        Initials
+        </a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+  		<a href="QuerySurnamesHelpen.html" target="help">? Help</a>
+        </span>
+            $CENSUSYEAR Census of $COUNTRYNAME: District $DISTID $DNAME: 
+            <span id="titleSubdist">SubDistrict '$SUBDISTID' $SDNAME:
+            <span id="titleDivision">Division $DIVISION:</span></span>
+  	        Surname Index
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <!--- Put out a line with links to previous and next section of table -->
+      <div class="fullwidth" style="text-align: center;" id="frontPager">
+        <span class="left">
+    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$PREVOFFSET">&lt;---</a>
+        </span>
+        <span class="right">
+    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$NEXTOFFSET">---&gt;</a>
+        </span>
+    		returned surnames $OFFSETSTART to $LAST
+    		of $TOTALCOUNT surnames
+        <div style="clear: both;"></div>
+      </div>
+      <!--- Put out the response as a table -->
+      <table class="summary" id="response" cellspacing="0px">
+        <thead>
+          <!--- Put out the column headers -->
+          <!-- the number of column pairs in this row controls
+                the number of column pairs in the surname response -->
+          <tr id="headerRow">
+    		<th class="colhead">
+    		    Surname
+    		</th>
+    		<th class="colhead">
+    		    Count
+    		</th>
+    		<th class="colhead">
+    		    Surname
+    		</th>
+    		<th class="colhead">
+    		    Count
+    		</th>
+    		<th class="colhead">
+    		    Surname
+    		</th>
+    		<th class="colhead">
+    		    Count
+    		</th>
+    		<th class="colhead">
+    		    Surname
+    		</th>
+    		<th class="colhead">
+    		    Count
+    		</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="dataRow">
+    		<td class="$CLASS" id="surnameCol">
+    		    <a href="/database/CensusResponse.php?$NPURI&Surname=^$USURNAME$">
+    		    $SURNAME
+    		    </a>
+    		</td>
+    		<td class="$CLASS right" id="numberCol">
+    		    $NUMBER
+    		</td>
+          </tr>
+        </tbody>
+      </table>
+      <!--- Put out a line with links to previous and next section of table -->
+      <div class="fullwidth" style="text-align: center;" id="backPager">
+        <span class="left">
+    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$PREVOFFSET">&lt;---</a>
+        </span>
+        <span class="right">
+    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$NEXTOFFSET">---&gt;</a>
+        </span>
+        <div style="clear: both;"></div>
+      </div>
+    </div> <!-- class="body" -->
+    <div class="hidden" id="templates">
+	  <span id="countInvalid">
+		Maximum number of rows of surnames per page Count=$count must be a number between 1 and 99. 
+	  </span>
+	  <span id="offsetInvalid">
+		Starting row offset $offset must be positive integer. 
+	  </span>
+	  <span id="totalcountInvalid">
+		TotalCount $totalcount must be positive integer. 
+	  </span>
+	  <span id="censusInvalid">
+		Invalid Census identifier '$censusId' provided.  
+	  </span>
+	  <span id="censusUnsupported">
+		Unsupported Census identifier '$censusId'. 
+	  </span>
+	  <span id="censusMissing">
+		Census identifier not provided. 
+	  </span>
+	  <span id="districtUndefined">
+		District identifier '$id' not defined for Census '$censusId'. 
+	  </span>
+	  <span id="multidistMultisubConflict">
+		Multiple selection on district not supported with multiple selection 
+        on subdistrict. 
+	  </span>
+	  <span id="multidistSinglesubConflict">
+		Multiple districts not supported to qualify subdistrict. 
+	  </span>
+	  <span id="districtMissing">
+		District id not provided to qualify subdistrict. 
+	  </span>
+	  <span id="subdistrictUndefined">
+        SubDistrict identifier '$firstSdId' is not defined within District '$distId' within Census '$censusId'.
+	  </span>
+	  <span id="divNeedsDistSubDist">
+		Division specified without both single District and SubDistrict.  
+	  </span>
+	  <span id="divMultiConflict">
+		Division cannot be specified together with multiple selection
+        for either District or SubDistrict.  
+	  </span>
+	  <span id="rangeInvalid">
+        Birth Year range must be numeric.  
+	  </span>
+	  <span id="rangeOutofrange">
+		Birth Year range $range is negative or greater than 20. 
+	  </span>
+	  <span id="byearInvalid">
+		BYear='$byear' invalid or out of range.  
+	  </span>
+    </div> <!-- id="templates" -->
+    <script src="/jscripts/js20/http.js" type="application/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+    <script src="/database/QuerySurnames.js" type="application/javaScript">
+    </script>

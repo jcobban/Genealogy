@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148159">
+    <option value="98_G">
+        Northumberland East: Murray
+        <div id="5" reel="148159" frame="0" count="14"/>
+    </option>
+    <option value="98_H">
+        Northumberland East: Percy
+        <div id="1" reel="148159" frame="14" count="17"/>
+        <div id="2" reel="148159" frame="31" count="23"/>
+        <div id="3" reel="148159" frame="54" count="12"/>
+        <div id="4" reel="148159" frame="66" count="11"/>
+        <div id="5" reel="148159" frame="77" count="10"/>
+    </option>
+    <option value="98_I">
+        Northumberland East: Seymour
+        <div id="1" reel="148159" frame="87" count="10"/>
+        <div id="2" reel="148159" frame="97" count="14"/>
+        <div id="3" reel="148159" frame="111" count="11"/>
+        <div id="4" reel="148159" frame="122" count="14"/>
+        <div id="5" reel="148159" frame="136" count="16"/>
+        <div id="6" reel="148159" frame="152" count="11"/>
+    </option>
+    <option value="99_A">
+        Northumberland West: Alnwick
+        <div id="1" reel="148159" frame="163" count="17"/>
+        <div id="2" reel="148159" frame="180" count="11"/>
+    </option>
+    <option value="99_B">
+        Northumberland West: Cobourg Town
+        <div id="1" reel="148159" frame="191" count="29"/>
+        <div id="2" reel="148159" frame="220" count="19"/>
+        <div id="3" reel="148159" frame="239" count="27"/>
+        <div id="4" reel="148159" frame="266" count="25"/>
+    </option>
+    <option value="99_C">
+        Northumberland West: Haldimand
+        <div id="1" reel="148159" frame="291" count="17"/>
+        <div id="2" reel="148159" frame="308" count="16"/>
+        <div id="3" reel="148159" frame="324" count="14"/>
+        <div id="4" reel="148159" frame="338" count="25"/>
+        <div id="5" reel="148159" frame="363" count="13"/>
+        <div id="6" reel="148159" frame="376" count="12"/>
+    </option>
+    <option value="99_D">
+        Northumberland West: Hamilton
+        <div id="1" reel="148159" frame="388" count="14"/>
+        <div id="2" reel="148159" frame="402" count="14"/>
+        <div id="3" reel="148159" frame="416" count="14"/>
+        <div id="4" reel="148159" frame="430" count="19"/>
+        <div id="5" reel="148159" frame="449" count="19"/>
+        <div id="6" reel="148159" frame="468" count="15"/>
+    </option>
+    <option value="100_A">
+        Ontario North: Beaverton Village
+        <div id="" reel="148159" frame="483" count="18"/>
+    </option>
+    <option value="100_B">
+        Ontario North: Bracebridge Village
+        <div id="1" reel="148159" frame="501" count="10"/>
+        <div id="2" reel="148159" frame="511" count="12"/>
+        <div id="3" reel="148159" frame="523" count="9"/>
+    </option>
+    <option value="100_C">
+        Ontario North: Brock
+        <div id="1" reel="148159" frame="532" count="34"/>
+        <div id="2" reel="148159" frame="566" count="29"/>
+        <div id="3" reel="148159" frame="595" count="25"/>
+    </option>
+    <option value="100_D">
+        Ontario North: Cannington Village
+        <div id="" reel="148159" frame="620" count="22"/>
+    </option>
+    <option value="100_E">
+        Ontario North: Draper
+        <div id="" reel="148159" frame="642" count="28"/>
+    </option>
+    <option value="100_F">
+        Ontario North: Macaulay
+        <div id="" reel="148159" frame="670" count="16"/>
+    </option>
+    <option value="100_G">
+        Ontario North: MacLean
+        <div id="" reel="148159" frame="686" count="12"/>
+    </option>
+    <option value="100_H">
+        Ontario North: Mara
+        <div id="1" reel="148159" frame="698" count="17"/>
+        <div id="2" reel="148159" frame="715" count="25"/>
+        <div id="3" reel="148159" frame="740" count="16"/>
+        <div id="4" reel="148159" frame="756" count="10"/>
+    </option>
+    <option value="100_I">
+        Ontario North: Morrison
+        <div id="" reel="148159" frame="766" count="19"/>
+    </option>
+    <option value="100_J">
+        Ontario North: Oakley
+        <div id="" reel="148159" frame="785" count="9"/>
+    </option>
+</select>

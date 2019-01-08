@@ -1,0 +1,65 @@
+<!--*********************************************************************
+ *  jscriptsIndexen.html												*
+ * 																		*
+ *  Display a web page with an explanation of jscripts.                *
+ * 																		*
+ *  History: 															*
+ *		2018/11/17		created                                         *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+      <div class='hidden' id='breadcrumbs'>
+        <a href="/index.html">Home</a>:
+        <a href='/genealogy.php?lang=$LANG'>
+    	    Genealogy
+        </a>:
+      </div>
+      <div class='body'>
+        <h1>ECMAScript/JavaScript/JScript Scripts</h1>
+        $TRACE
+        $MSG
+        <p>This directory contains scripts used by the web-site to
+        provide dynamic functionality within web-pages.
+        These scripts are written in a standardized language which
+        is managed by an industry-wide committee operating under
+        the auspices of the European Computer Manufacturers Association
+        (ECMA). These scripts run inside your browser so they can
+        respond immediately to input you provide through the mouse, touchpad,
+        touch-sensitive screen, or the keyboard.  The first version
+        of this language was implemented in 1995 and marketted by
+        Netscape Communications as Javascript, although it had almost
+        nothing to do with Java, a product of Sun Systems, except that like
+        Java it was intended to operate in a platform independent manner and
+        used some language structures borrowed from the C language.
+        When Microsoft delivered an independent implementation of a
+        similar language they called it JScript.  The two languages were
+        similar, but incompatible at the library level, so 
+        a committee of developer teams came together under ECMA 
+        to coordinate the definition of the language across
+        all browser implementations.  The standards documenting this
+        common design refer to it as ECMAScript.  All current browsers
+        are compliant to the 7th edition of this standard, issued in 2016.
+        </p>
+	    <p>This folder contains shared Javascript (EcmaScript, JScript) program files
+	  that are used by all of most of the pages on this site to implement portions
+	  of the dynamic functionality of the pages.
+	    <dl>
+	      <dt><a href='CommonForm.js' type='text/javascript' target='_blank'>CommonForm.js</a></dt>
+	      <dd>Functions which are used to implement dynamic functionality for 
+	  	elements in forms.
+	      <dt><a href='Cookie.js' type='text/javascript' target='_blank'>Cookie.js</a></dt>
+	      <dd>The definition of a class Cookie which encapsulates browser side
+	  	support for cookies.
+	      <dt><a href='Ontario.js' type='text/javascript' target='_blank'>Ontario.js</a></dt>
+	      <dd>Functions that are used to implement dynamic functionality for
+	  	pages related to vital statistics.
+	      <dt><a href='default.js' type='text/javascript' target='_blank'>default.js</a></dt>
+	      <dd>A default handler for the onload event of the page, to provide
+	  	minimal dynamic functionality for a page.
+	      <dt><a href='util.js' type='text/javascript' target='_blank'>util.js</a></dt>
+	      <dd>Common utility functions.
+	    </dl>
+        <p>Only web-site administrators need access to the contents of
+        this directory.
+        </p>
+      </div>

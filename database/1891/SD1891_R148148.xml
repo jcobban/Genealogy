@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148148">
+    <option value="79_B">
+        Kent: Chatham Town
+        <div id="3" reel="148148" frame="0" count="19"/>
+        <div id="4" reel="148148" frame="19" count="36"/>
+        <div id="5" reel="148148" frame="55" count="33"/>
+        <div id="6" reel="148148" frame="88" count="19"/>
+    </option>
+    <option value="79_C">
+        Kent: Dover
+        <div id="1" reel="148148" frame="107" count="19"/>
+        <div id="2" reel="148148" frame="126" count="41"/>
+        <div id="3" reel="148148" frame="167" count="31"/>
+    </option>
+    <option value="79_D">
+        Kent: Harwich
+        <div id="1" reel="148148" frame="198" count="20"/>
+        <div id="2" reel="148148" frame="218" count="19"/>
+        <div id="3" reel="148148" frame="237" count="24"/>
+        <div id="4" reel="148148" frame="261" count="27"/>
+        <div id="5" reel="148148" frame="288" count="21"/>
+        <div id="6" reel="148148" frame="309" count="17"/>
+    </option>
+    <option value="79_E">
+        Kent: Raleigh
+        <div id="1" reel="148148" frame="326" count="19"/>
+        <div id="2" reel="148148" frame="345" count="21"/>
+        <div id="3" reel="148148" frame="366" count="21"/>
+        <div id="4" reel="148148" frame="387" count="24"/>
+    </option>
+    <option value="79_F">
+        Kent: Romney
+        <div id="1" reel="148148" frame="411" count="13"/>
+        <div id="2" reel="148148" frame="424" count="20"/>
+    </option>
+    <option value="79_G">
+        Kent: Tilbury Centre Village
+        <div id="" reel="148148" frame="444" count="15"/>
+    </option>
+    <option value="79_H">
+        Kent: Tilbury East
+        <div id="1" reel="148148" frame="459" count="20"/>
+        <div id="2" reel="148148" frame="#N/A" count="0"/>
+        <div id="3" reel="148148" frame="479" count="25"/>
+    </option>
+    <option value="80_A">
+        Kingston City: Cataraqui Ward
+        <div id="1" reel="148148" frame="504" count="32"/>
+        <div id="2" reel="148148" frame="536" count="43"/>
+    </option>
+    <option value="80_B">
+        Kingston City: Frontenac Ward
+        <div id="1" reel="148148" frame="579" count="3"/>
+        <div id="2" reel="148148" frame="582" count="38"/>
+        <div id="3" reel="148148" frame="620" count="47"/>
+        <div id="4" reel="148148" frame="667" count="5"/>
+    </option>
+    <option value="80_C">
+        Kingston City: Ontario Ward
+        <div id="" reel="148148" frame="672" count="26"/>
+    </option>
+    <option value="80_D">
+        Kingston City: Rideau Ward
+        <div id="1" reel="148148" frame="698" count="38"/>
+        <div id="2" reel="148148" frame="736" count="23"/>
+        <div id="3" reel="148148" frame="759" count="31"/>
+    </option>
+    <option value="80_E">
+        Kingston City: St. Lawrence Ward
+        <div id="1" reel="148148" frame="790" count="70"/>
+    </option>
+</select>

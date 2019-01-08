@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148186">
+    <option value="135_E">
+        Queens: Lot 23
+        <div id="" reel="148186" frame="0" count="39"/>
+    </option>
+    <option value="135_F">
+        Queens: Lot 24
+        <div id="1" reel="148186" frame="39" count="27"/>
+        <div id="2" reel="148186" frame="66" count="27"/>
+    </option>
+    <option value="135_G">
+        Queens: Lot 29
+        <div id="1" reel="148186" frame="93" count="21"/>
+        <div id="2" reel="148186" frame="114" count="21"/>
+    </option>
+    <option value="135_H">
+        Queens: Lot 30
+        <div id="1" reel="148186" frame="135" count="17"/>
+        <div id="2" reel="148186" frame="152" count="14"/>
+    </option>
+    <option value="135_I">
+        Queens: Lot 31
+        <div id="1" reel="148186" frame="166" count="14"/>
+        <div id="2" reel="148186" frame="180" count="19"/>
+    </option>
+    <option value="135_J">
+        Queens: Lot 32
+        <div id="1" reel="148186" frame="199" count="12"/>
+        <div id="2" reel="148186" frame="211" count="16"/>
+    </option>
+    <option value="135_K">
+        Queens: Lot 33
+        <div id="" reel="148186" frame="227" count="27"/>
+    </option>
+    <option value="135_L">
+        Queens: Lot 34
+        <div id="1" reel="148186" frame="254" count="16"/>
+        <div id="2" reel="148186" frame="270" count="15"/>
+    </option>
+    <option value="135_M">
+        Queens: Lot 35
+        <div id="1" reel="148186" frame="285" count="16"/>
+        <div id="2" reel="148186" frame="301" count="7"/>
+    </option>
+    <option value="135_N">
+        Queens: Lot 36
+        <div id="1" reel="148186" frame="308" count="13"/>
+        <div id="2" reel="148186" frame="321" count="14"/>
+    </option>
+    <option value="135_O">
+        Queens: Lot 37
+        <div id="1" reel="148186" frame="335" count="16"/>
+        <div id="2" reel="148186" frame="351" count="17"/>
+    </option>
+    <option value="135_P">
+        Queens: Lot 48
+        <div id="1" reel="148186" frame="368" count="15"/>
+        <div id="2" reel="148186" frame="383" count="15"/>
+    </option>
+    <option value="135_Q">
+        Queens: Lot 49
+        <div id="1" reel="148186" frame="398" count="20"/>
+        <div id="2" reel="148186" frame="418" count="13"/>
+    </option>
+    <option value="135_R">
+        Queens: Lot 50
+        <div id="1" reel="148186" frame="431" count="16"/>
+        <div id="2" reel="148186" frame="447" count="14"/>
+    </option>
+    <option value="135_S">
+        Queens: Lot 57
+        <div id="1" reel="148186" frame="461" count="19"/>
+        <div id="2" reel="148186" frame="480" count="23"/>
+    </option>
+    <option value="135_T">
+        Queens: Lot 58
+        <div id="1" reel="148186" frame="503" count="12"/>
+        <div id="2" reel="148186" frame="515" count="15"/>
+    </option>
+    <option value="135_U">
+        Queens: Lot 60
+        <div id="1" reel="148186" frame="530" count="11"/>
+        <div id="2" reel="148186" frame="541" count="12"/>
+    </option>
+    <option value="135_V">
+        Queens: Lot 62
+        <div id="" reel="148186" frame="553" count="23"/>
+    </option>
+    <option value="135_W">
+        Queens: Lot 65
+        <div id="1" reel="148186" frame="576" count="17"/>
+        <div id="2" reel="148186" frame="593" count="19"/>
+    </option>
+    <option value="135_X">
+        Queens: Lot 67
+        <div id="" reel="148186" frame="612" count="39"/>
+    </option>
+    <option value="136_A">
+        Argenteuil: Arundel
+        <div id="" reel="148186" frame="651" count="16"/>
+    </option>
+    <option value="136_B">
+        Argenteuil: Carillon Village
+        <div id="" reel="148186" frame="667" count="6"/>
+    </option>
+    <option value="136_C">
+        Argenteuil: Chatham
+        <div id="1" reel="148186" frame="673" count="59"/>
+        <div id="2" reel="148186" frame="732" count="18"/>
+    </option>
+    <option value="136_D">
+        Argenteuil: Gore
+        <div id="" reel="148186" frame="750" count="12"/>
+    </option>
+    <option value="136_E">
+        Argenteuil: Grenville
+        <div id="" reel="148186" frame="762" count="48"/>
+    </option>
+</select>

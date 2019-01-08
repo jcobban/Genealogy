@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148111">
+    <option value="28_D">
+        Cape Breton: Boularderie
+        <div id="" reel="148111" frame="276" count="29"/>
+    </option>
+    <option value="28_E">
+        Cape Breton: Bridgeport
+        <div id="" reel="148111" frame="305" count="45"/>
+    </option>
+    <option value="28_F">
+        Cape Breton: Catalone
+        <div id="" reel="148111" frame="350" count="17"/>
+    </option>
+    <option value="28_G">
+        Cape Breton: Cow Bay
+        <div id="1" reel="148111" frame="367" count="25"/>
+        <div id="2" reel="148111" frame="392" count="21"/>
+    </option>
+    <option value="28_H">
+        Cape Breton: East Bay
+        <div id="1" reel="148111" frame="413" count="25"/>
+        <div id="2" reel="148111" frame="438" count="14"/>
+    </option>
+    <option value="28_I">
+        Cape Breton: Gabarus
+        <div id="" reel="148111" frame="452" count="28"/>
+    </option>
+    <option value="28_J">
+        Cape Breton: Glace Bay
+        <div id="" reel="148111" frame="480" count="52"/>
+    </option>
+    <option value="28_K">
+        Cape Breton: Grand Mira
+        <div id="" reel="148111" frame="532" count="18"/>
+    </option>
+    <option value="28_L">
+        Cape Breton: Grand Narrows
+        <div id="1" reel="148111" frame="550" count="17"/>
+        <div id="2" reel="148111" frame="567" count="13"/>
+    </option>
+    <option value="28_M">
+        Cape Breton: Hillside Mira
+        <div id="" reel="148111" frame="580" count="22"/>
+    </option>
+    <option value="28_N">
+        Cape Breton: Leitches Creek
+        <div id="" reel="148111" frame="602" count="25"/>
+    </option>
+    <option value="28_O">
+        Cape Breton: Lingan
+        <div id="1" reel="148111" frame="627" count="16"/>
+        <div id="2" reel="148111" frame="643" count="25"/>
+    </option>
+</select>

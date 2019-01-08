@@ -1,0 +1,80 @@
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+   <title>Manage Registered Users: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2015 James A. Cobban">
+<!--*********************************************************************
+ *  History:								*
+ *	2014/08/01	created						*
+ *	2014/11/03	functionality enhancements			*
+ *	2015/05/11	use contactAuthor.php to contact administrator	*
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+</head>
+<body>
+<div class="topcrumbs">
+  <a href="/indexHelpen.html">Home</a>: 
+  <a href="/genealogyHelpen.html">Genealogy</a>: 
+</div>
+<div class="help">
+<h1>Manage Registered Users: Help</h1>
+<p>This dialog provides the ability for an administrator to manage the 
+table of registered users.
+</p>
+<p>You get to this dialog by clicking on the "Manage Registered Users"
+link on the
+<a href="/FamilyTree/ServicesHelpen.html">Family Tree Services page.</a>
+</p>
+<p>The input field "Pattern" permits the administrator to limit the
+response to users whose name includes the specified pattern.  This is 
+a "regular expression".
+<p>The input field 
+"Authorizations" permits the administrator to limit the response to users
+whose authorization list includes the specified capability.  For example
+specifying "edit" limits the response to users who have permission to update
+the database.
+</p>
+<p>The input field "E-Mail Address" permits the administrator to limit the
+response to users whose e-mail address includes the specified pattern.  This is 
+a "regular expression".
+<p>The "Send Bulk Mail" link opens an e-mail dialog to send a message to
+all registered users who have accepted to receive bulk notifications.
+</p>
+<p>The "Search" button performs the search specified by the Pattern,
+Authorizations, and E-Mail Address input fields, and applies any changes 
+made to the value of the Authorizations column of any user.
+</p>
+<p>The remainder of the page is a tabe of up to 20 registered users who 
+match the specied conditions.  Each row of this table permits the
+administrator to:
+</p>
+<ul>
+    <li>View the user name.
+    <li>Send an individual e-mail to the user.
+    <li>Delete the user.
+    <li>View and alter the authorizations of the user.
+    <li>Delete a user.
+    <li>Reset the password of the user to a new random value, which is
+	automatically e-mailed to the user.
+    <li>If the user has registered but not yet confirmed, the administrator
+	can manually confirm the registration, although the user has the
+	ability to this for their own account.
+</ul>
+</div>
+<div class="botcrumbs">
+  <span class="right">
+    <img src="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+  </span>
+  <a href="/contactAuthor.php?subject=UsersHelpen.html"
+	target="_blank">
+	Contact Author</a>
+  <br/>
+  <a href="/indexHelpen.html">Home</a>: 
+  <a href="/genealogyHelpen.html">Genealogy</a>: 
+  <div style="clear: both;"></div> 
+</div>
+</body>
+</html>

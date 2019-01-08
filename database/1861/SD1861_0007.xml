@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="7">
+    <option value="59">
+        Amherstburg Town
+    </option>
+    <option value="59A">
+        Malden Lunatic Asylum
+    </option>
+    <option value="60">
+        Anderdon
+    </option>
+    <option value="61">
+        Colchester
+    </option>
+    <option value="62">
+        Gosfield
+    </option>
+    <option value="63">
+        Maidstone
+    </option>
+    <option value="64">
+        Malden
+    </option>
+    <option value="65">
+        Mersea
+    </option>
+    <option value="66">
+        Sandwich East
+    </option>
+    <option value="67">
+        Sandwich West
+    </option>
+    <option value="68">
+        Sandwich Town
+    </option>
+    <option value="69">
+        Rochester
+    </option>
+    <option value="70">
+        Tilbury West
+    </option>
+    <option value="71">
+        Windsor Town
+    </option>
+    <option value="71A">
+        Agricultural Census
+    </option>
+</select>

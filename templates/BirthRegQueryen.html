@@ -1,0 +1,428 @@
+<!--*********************************************************************
+ *  BirthRegQueryen.html												*
+ *																		*
+ *  Template for dialog for querying the table of birth registrations	*
+ *  for any province or state.											*
+ *																		*
+ *  History:															*
+ *		2018/10/05		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+<link rel="stylesheet" type="text/css" href="/Canada/BirthRegQuery.css">
+<div id="breadcrumbs" class="hidden">
+    <a href="/genealogy.php?lang=$LANG">
+        Genealogy</a>:
+    <a href='/Canada/CountriesEdit.php?lang=$LANG'>
+	    List of Supported Countries
+    </a>:
+    <a href="/genCountry.php?code=$CC&lang=$LANG">
+		$COUNTRYNAME</a>:
+    <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG" id="stateCrumb">
+		$DOMAINNAME</a>:
+</div>
+ <div class='body'>
+  <h1>$DOMAINNAME: Birth Registration Query
+    <span class='right'>
+		<a href='BirthRegQueryHelpen.html' target='_blank'>Help?</a>
+    </span>
+    <div style='clear: both;'></div>
+  </h1>
+    $TRACE
+    $MSG
+
+  <form action='BirthRegResponse.php' method='get'
+		name='distForm' id='distForm'>
+    <!-- Specify to query birth registrations from Ontario, Canada -->
+    <input name='RegDomain' id='RegDomain' type='hidden'
+			value='$DOMAIN'>
+    <input name='Offset'	id='Offset'	type='hidden' value='0'>
+    <input name='lang'	    id='lang'	type='hidden' value='$LANG'>
+    <input name='debug'	    id='debug'	type='hidden' value='$DEBUG'>
+    <div class='row'>
+      <div style='float: left;'>
+        <label class='labelSmall' for='RegYear'>
+		  Identification:&nbsp;Year:
+		</label>
+      	<input name='RegYear' id='RegYear' type='text'
+			class='white rightnc' size='4' maxlength='4'/>
+      </div>
+      <div style='float: left; width: 10em;'>
+        <label class='labelSmall5em' for='RegNum'>
+		  Number:
+		</label>
+      	<input name='RegNum' id='RegNum' type='text'
+			class='white rightnc' size='6' maxlength='6'/>
+      </div>
+      <div style='float: left;'>
+		<label class='labelSmallcol2' for='Limit'>
+		  Limit:
+		</label>
+      	<input name='Limit' id='Limit' type='text'
+			class='white rightnc' size='6' maxlength='6' value='20'/>
+            <div style='clear: both;'></div>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row' id='RegRow'>
+      <div class='column1'>
+		<label class='labelSmall' for='RegCounty'>
+		  Registration:&nbsp;County:
+		</label>
+      	<select name='RegCounty' id='RegCounty' size='1' class='white left'>
+		    <option value='' class='white left'>Choose a county:</option>
+		</select>
+      </div>
+      <div id='TwpCell'>
+        <label class='labelSmallcol2' for='RegTownship'>
+		  Township:
+        </label>
+		<!-- the following is replaced by a selection
+			if the XML file for the county exists -->
+		<input name='RegTownship' id='RegTownship' type='text'
+			class='white left' size='20' maxlength='40'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+		<label class='labelSmall' for='GivenNames'>
+		  Name:&nbsp;Given:
+		</label>
+      	<input name='GivenNames' id='GivenNames' type='text'
+			class='white left' size='20' maxlength='48'/>
+      </div>
+      <div class='column2'>
+        <label class='labelSmallcol2' for='Surname'>
+		  Family:
+		</label>
+      	<input name='Surname' id='Surname' type='text'
+			class='white left' size='20' maxlength='32'/>
+      </div>
+      <div>
+        <label class='labelSmallcol2' for='SurnameSoundex'>
+		  Soundex:
+		</label>
+        <input type='checkbox' name='SurnameSoundex' id='SurnameSoundex' 
+			value='yes'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+		<label class='labelSmall' for='Sex'>
+		  Sex:
+		</label>
+      	<select name='Sex' id='Sex' size='1' class='white left'>
+		  <option value='' class='unknown' selected='yes'>Don't Care</option>
+		  <option value='M' class='male'>Male</option>
+		  <option value='F' class='female'>Female</option>
+		  <option value='U' class='unknown'>Unreported</option>
+		</select>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+		<label class='labelSmall' for='BirthPlace'>
+		  Birth Place:
+		</label>
+      	<input name='BirthPlace' id='BirthPlace' type='text'
+			class='white leftnc' size='20' maxlength='60'/>
+      </div>
+      <div>
+        <label class='labelSmallcol2' for='BirthDate'>
+		  Birth&nbsp;Date:
+		</label>
+      	<input name='BirthDate' id='BirthDate' type='text'
+			class='white left' size='10' maxlength='16'/>
+      </div>
+      <div>
+        <label class='labelSmallcol2' for='Range'>
+		  Range:
+		</label>
+      	<input name='Range' id='Range' type='text'
+			class='white right' size='2' maxlength='2'
+			value='1'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+		<label class='labelSmall' for='FatherName'>
+		  Father:&nbsp;Name:
+		</label>
+      	<input name='FatherName' id='FatherName' type='text'
+			class='white left' size='20' maxlength='48'/>
+      </div>
+      <div>
+        <label class='labelSmallcol2' for='FatherOccupation'>
+		  Occupation:
+		</label>
+      	<input name='FatherOccupation' id='FatherOccupation' type='text'
+			class='white left' size='20' maxlength='48'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+		<label class='labelSmall' for='MotherName'>
+		  Mother:&nbsp;Name:
+		</label>
+      	<input name='MotherName' id='MotherName' type='text'
+			class='white left' size='20' maxlength='48'/>
+      </div>
+      <div>
+        <label class='labelSmallcol2' for='MotherOccupation'>
+		  Occupation:
+		</label>
+      	<input name='MotherOccupation' id='MotherOccupation' type='text'
+			class='white left' size='20' maxlength='48'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+		<label class='labelSmall' for='Accoucheur'>
+		  Attendant:&nbsp;Name:
+		</label>
+      	<input name='Accoucheur' id='Accoucheur' type='text'
+			class='white left' size='10' maxlength='48'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+		<label class='labelSmall' for='Informant'>
+		  Informant:&nbsp;Name:
+		</label>
+      	<input name='Informant' id='Informant' type='text'
+			class='white left' size='20' maxlength='48'/>
+      </div>
+      <div class='column2'>
+        <label class='labelSmallcol2' for='InformantRel'>
+		  Relation:
+		</label>
+      	<select name='InformantRel' id='InformantRel' size='1' class='white left'>
+		    <option value='' selected='yes' class='unknown'>
+			Other/Unrelated</option>
+		    <option value='Physician' class='male'>Physician</option>
+		    <option value='Father' class='male'>Father</option>
+		    <option value='Mother' class='female'>Mother</option>
+		    <option value='Son' class='male'>Son</option>
+		    <option value='Daughter' class='female'>Daughter</option>
+		    <option value='Uncle' class='male'>Uncle</option>
+		    <option value='Aunt' class='female'>Aunt</option>
+		    <option value='Grand-Father' class='male'>Grand-Father</option>
+		    <option value='Grand-Mother' class='female'>Grand-Mother</option>
+		    <option value='Nephew' class='male'>Nephew</option>
+		    <option value='Niece' class='female'>Niece</option>
+		</select>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <p>
+		<button type='submit' id='Query'>Query</button>
+		&nbsp;
+		<button type='reset' id='Reset'>Clear Form</button>
+		&nbsp;
+		<button type='button' id='ShowStatus'>Transcription Status</button>
+    </p>
+  </form>
+</div> <!-- end of body -->
+	<div class='balloon' id='HelpRegYear'>
+		The year the birth was registered.
+	</div>
+	<div class='balloon' id='HelpRegNum'>
+		The registration number within the year.
+	</div>
+	<div class='balloon' id='HelpLimit'>
+		Limit the number of entries per page to return.  The default is 20.
+	</div>
+	<div class='balloon' id='HelpRegCounty'>
+		Limit the response to births registered in the specified county.
+	</div>
+	<div class='balloon' id='HelpRegTownship'>
+		Limit the response to births registered in the specified municipality within
+		a county.  A municipality may be a city, town, or township.
+	</div>
+	<div class='balloon' id='HelpGivenNames'>
+		Limit the response to individuals whose given names match the pattern in
+		this field.  This search is done as a 
+		case-insensitive pattern match, not a simple comparison. 
+	  <p>Specifying simple text, comprising letters and spaces, matches against
+		any names containing that text.  "John" or "john" or "JOHN" will match
+	"Johnathan" and "William John" as well as the simple "John".
+	  <p>The text may be a 
+	    <a href="http://en.wikipedia.org/wiki/Regular_expression">
+				regular expression</a>.
+		There are too many options to enumerate here, but a few examples include:
+	  <ul>
+	    <li>If you want to match just the name "John", excluding names that include
+			"John" as part of them, enter "^John$".
+	    <li>Enumerators often use unusual spellings of names.  For example if you
+				to match names including both "Henry" and "Henery", enter "Hen.*ry".
+	  </ul>
+	</div>
+	<div class='balloon' id='HelpSurname'>
+	<p>This field is used to specify text to look for in the surname of 
+		the child.
+		If the value contains only letters and spaces then only surnames that match
+		exactly (except for case) are found.  Otherwise this
+		uses 
+	    <a href="http://en.wikipedia.org/wiki/Regular_expression">
+		regular expression</a> pattern matching.
+		For example to match surnames starting with "McL..." and ending with "...n",
+		such as "McLean", "McLain", "McLennan", or "McLellan" you could specify 
+	"^McL.*n$".
+	<p>The meaning of this field changes if the Soundex option is selected.
+	<p>The Soundex code has been used for decades to attempt to match names that
+		sound similar.  For example it is used by police forces to perform a rough
+		match for the names of drivers.  It is a problematic tool, as it
+		is based upon the phonetics of British surnames.
+		If you select Soundex then the search
+		is made for surnames that "sound like" the given surname.  For example
+		specifying Soundex together with "McLean" will match all of the surnames in
+		the pattern match example under "Surname", but many other names as well, such
+	"McCallum", "McAllan", "McClain", and "McWilliams". 
+	</div>
+	<div class='balloon' id='HelpSurnameSoundex'> 
+        The Soundex code has been used for decades to attempt to match names
+        that sound similar.  For example it is used by police forces
+        to perform a rough
+		match for the names of drivers.  It is a problematic tool, as it
+		is based upon the phonetics of British surnames.
+        If you select this option along with a complete surname,
+        not a pattern match, in the Surname field, then the search
+		is made for surnames that "sound like" the given surname.  For example
+        specifying Soundex together with "McLean" will match all of
+        the surnames in the pattern match example under "Surname",
+        but many other names as well, such
+	    "McCallum", "McAllan", "McClain", and "McWilliams". 
+	</div>
+	<div class='balloon' id='HelpSex'>
+	    Select this option if you only want to look for male or female individuals.
+	</div>
+	<div class='balloon' id='HelpFatherOccupation'>
+	    This option is used to search for births based upon the
+		occupation of the Father of the child. 
+		This field uses 
+	    <a href="http://en.wikipedia.org/wiki/Regular_expression">
+		regular expression</a> pattern matching.  
+		For example searching for 
+	    "Labo[u]{0,1}rer" will match any occupation that contains either "Laborer" or
+	    "Labourer", including "Farm Labourer" and "R'y Laborer".
+	</div>
+	<div class='balloon' id='HelpMotherOccupation'>
+	    This option is used to search for births based upon the
+		occupation of the Mother of the child. 
+		This field uses 
+	    <a href="http://en.wikipedia.org/wiki/Regular_expression">
+		regular expression</a> pattern matching.  
+		For example searching for 
+	    "Labo[u]{0,1}rer" will match any occupation that contains either "Laborer" or
+	    "Labourer", including "Farm Labourer" and "R'y Laborer".
+	</div>
+	<div class='balloon' id='HelpBirthPlace'>
+        This option is used to search for individuals based upon
+        where they were born.  This is a pattern match. 
+        For example searching for "Canada" will 
+        also match "Canada East", "Canada West", "Lower Canada",
+        and "Upper Canada".
+	</div>
+	<div class='balloon' id='HelpBirthDate'>
+	    This field is used to specify text to look for in date of birth.
+		For example searching for "1910" will find people who were born in 1910.
+		Specifying "Jan" will find people who were born in January.
+		Specifying "23" will find people who were born either on the 23rd of a
+		month, or in 1823 or 1923.
+		In more detail this field uses 
+	    <a href="http://en.wikipedia.org/wiki/Regular_expression">
+		regular expression</a> pattern matching.  For example
+	    '[[:&lt;:]]23[[:&gt;:]]' matches dates containing '23' as a word, and
+		so could be used to match individuals born on the 23rd of any month.
+	</div>
+	<div class='balloon' id='HelpAccoucheur'>
+		This field is used to search for individuals based upon the name of the
+		attending physician or midwife.
+	</div>
+	<div class='balloon' id='HelpInformant'>
+        This field is used to search for birth registrations based upon
+        the name of the person who reported the birth.
+	</div>
+	<div class='balloon' id='HelpInformantRel'>
+		This field is used to search for birth registrations based upon the
+		relationship of the person reporting the birth to the 
+		child.  For example
+	        "Father" or "Brother" or "Aunt".
+	</div>
+	<div class='balloon' id='HelpInfOcc'>
+		This field is used to search for birth registrations based upon the
+		occupation of the person reporting the birth.
+	</div>
+	<div class='balloon' id='HelpInfRes'>
+		This field is used to search for birth registrations based upon the
+		address of the informant.
+	</div>
+	<div class='balloon' id='HelpReligion'>
+	    <p>This option is used to search for individuals based upon their
+        religious affiliation.  This is a pattern match. 
+        For example searching for
+    	"Meth" will match any religion containing that string, including 
+    	"Wesleyan Methodist", "C. Meth.", "New Connexion Methodist", 
+		and "Methodist Episcopal".
+	</div>
+	<div class='balloon' id='HelpFatherName'>
+		This option is used to search for birth registrations based upon the
+		name of the father of the child.
+	</div>
+	<div class='balloon' id='HelpFatherBPlce'>
+		This option is used to search for birth registrations based upon the
+		birth place of the father of the child.
+	</div>
+	<div class='balloon' id='HelpMotherName'>
+		This option is used to search for birth registrations based upon the
+		name of the mother of the child.
+	</div>
+	<div class='balloon' id='HelpMotherBPlce'>
+		This option is used to search for birth registrations based upon the
+		birth place of the mother of the child.
+	</div>
+	<div class='balloon' id='HelpQuery'>
+		Clicking on this button performs the query.
+	</div>
+	<div class='balloon' id='HelpReset'>
+		Clicking on this button clears all of the input fields back to their
+		default values.
+	</div>
+	<div class='balloon' id='HelpShowStatus'>
+		Clicking on this button displays a summary page of the progress of the
+		transcription of birth registrations broken down by year of registration.
+	</div>
+	<div class='balloon' id='HelprightTop'>
+		Click on this button to signon to access extended features of the web-site
+		or to manage your account with the web-site.
+	</div>
+	<div class='popup' id='loading'>
+		Loading...
+	</div>
+	<div class='hidden' id='templates'>
+	  <div id='chooseTownshipCell'>
+			<select size='0' name='RegTownship' class='white left'>
+			    <option value=''>Choose a Township
+			</select>
+	  </div>
+	  <div id='noTownshipCell'>
+			<input type='text' class='white left' size='20' maxlength='40'
+					name='RegTownship'>
+	  </div>
+	  <div id='noCountyMsg'>
+			Counties summary file "CountiesListXml.php?Prov=$PROVINCE"
+			not available from server.
+	  </div>
+	</div>
+	<script src="/jscripts/js20/http.js" type="text/javascript"></script>
+	<script src="/jscripts/Ontario.js" type="text/javascript"></script>
+	<script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/Canada/BirthRegQuery.js" type="text/javascript"></script>

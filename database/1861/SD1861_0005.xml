@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="5">
+    <option value="41">
+        Bowmanville
+    </option>
+    <option value="42">
+        Cavan
+    </option>
+    <option value="43">
+        Cartwright
+    </option>
+    <option value="44">
+        Clarke
+    </option>
+    <option value="45">
+        Darlington
+    </option>
+    <option value="46">
+        Hope
+    </option>
+    <option value="47">
+        Manvers
+    </option>
+    <option value="48">
+        Newcastle
+    </option>
+    <option value="49">
+        Port Hope Town
+    </option>
+</select>

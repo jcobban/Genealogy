@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148213">
+    <option value="174_J">
+        Nicolet: Ste. Gertrude
+        <div id="" reel="148213" frame="0" count="48"/>
+    </option>
+    <option value="174_K">
+        Nicolet: St. Grégoire
+        <div id="" reel="148213" frame="48" count="41"/>
+    </option>
+    <option value="174_L">
+        Nicolet: St. Léonard
+        <div id="" reel="148213" frame="89" count="42"/>
+    </option>
+    <option value="174_M">
+        Nicolet: Ste. Marie de Blanford
+        <div id="" reel="148213" frame="131" count="7"/>
+    </option>
+    <option value="174_N">
+        Nicolet: Ste. Monique
+        <div id="" reel="148213" frame="138" count="45"/>
+    </option>
+    <option value="174_O">
+        Nicolet: Ste. Perpétue
+        <div id="" reel="148213" frame="183" count="18"/>
+    </option>
+    <option value="174_P">
+        Nicolet: St. Pierre les Becquets
+        <div id="" reel="148213" frame="201" count="53"/>
+    </option>
+    <option value="174_Q">
+        Nicolet: St. Samuel
+        <div id="" reel="148213" frame="254" count="8"/>
+    </option>
+    <option value="174_R">
+        Nicolet: Ste. Sophie de Lévrard
+        <div id="" reel="148213" frame="262" count="24"/>
+    </option>
+    <option value="174_S">
+        Nicolet: St. Sylvère
+        <div id="" reel="148213" frame="286" count="18"/>
+    </option>
+    <option value="174_T">
+        Nicolet: St. Wenceslas
+        <div id="" reel="148213" frame="304" count="41"/>
+    </option>
+    <option value="175_A">
+        Ottawa County: Amherst
+        <div id="" reel="148213" frame="345" count="9"/>
+    </option>
+    <option value="175_B">
+        Ottawa County: Aumond
+        <div id="" reel="148213" frame="354" count="13"/>
+    </option>
+    <option value="175_C">
+        Ottawa County: Aylwin
+        <div id="" reel="148213" frame="367" count="19"/>
+    </option>
+    <option value="175_D">
+        Ottawa County: Aylmer Town
+        <div id="" reel="148213" frame="386" count="42"/>
+    </option>
+    <option value="175_E">
+        Ottawa County: Bigelow, Wells, Blake &amp; McGill
+        <div id="" reel="148213" frame="428" count="14"/>
+    </option>
+    <option value="175_F">
+        Ottawa County: Bouchette
+        <div id="" reel="148213" frame="442" count="22"/>
+    </option>
+    <option value="175_G">
+        Ottawa County: Bouthillier, Kiamiku &amp; Campbell
+        <div id="" reel="148213" frame="464" count="8"/>
+    </option>
+    <option value="175_H">
+        Ottawa County: Bowmen &amp; Villeneuve
+        <div id="" reel="148213" frame="472" count="16"/>
+    </option>
+    <option value="175_I">
+        Ottawa County: Buckingham Town
+        <div id="1" reel="148213" frame="488" count="22"/>
+        <div id="2" reel="148213" frame="510" count="29"/>
+    </option>
+    <option value="175_J">
+        Ottawa County: Buckingham
+        <div id="1" reel="148213" frame="539" count="0"/>
+        <div id="2" reel="148213" frame="539" count="49"/>
+    </option>
+    <option value="175_K">
+        Ottawa County: Cameron
+        <div id="" reel="148213" frame="588" count="13"/>
+    </option>
+    <option value="175_L">
+        Ottawa County: Clyde &amp; Joly
+        <div id="" reel="148213" frame="601" count="16"/>
+    </option>
+    <option value="175_M">
+        Ottawa County: Denholm
+        <div id="" reel="148213" frame="617" count="8"/>
+    </option>
+    <option value="175_N">
+        Ottawa County: Eardley
+        <div id="" reel="148213" frame="625" count="33"/>
+    </option>
+    <option value="175_O">
+        Ottawa County: Egan
+        <div id="" reel="148213" frame="658" count="26"/>
+    </option>
+    <option value="175_P">
+        Ottawa County: Hartwell
+        <div id="" reel="148213" frame="684" count="0"/>
+    </option>
+    <option value="175_Q">
+        Ottawa County: Hincks
+        <div id="" reel="148213" frame="684" count="38"/>
+    </option>
+    <option value="175_R">
+        Ottawa County: Hull City
+        <div id="1" reel="148213" frame="722" count="24"/>
+        <div id="2" reel="148213" frame="746" count="53"/>
+    </option>
+</select>

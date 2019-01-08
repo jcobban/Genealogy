@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="15">
+    <option value="148">
+        Ashfield
+    </option>
+    <option value="149">
+        Biddulph
+    </option>
+    <option value="150">
+        Clinton Village
+    </option>
+    <option value="151">
+        Colborne
+    </option>
+    <option value="152">
+        Goderich
+    </option>
+    <option value="153">
+        Goderich Town
+    </option>
+    <option value="154">
+        Grey
+    </option>
+    <option value="155">
+        Hay
+    </option>
+    <option value="156">
+        Howick
+    </option>
+    <option value="157">
+        Hullet
+    </option>
+    <option value="158">
+        McGillivray
+    </option>
+    <option value="159">
+        McKillop
+    </option>
+    <option value="160">
+        Morris
+    </option>
+    <option value="161">
+        Stanley
+    </option>
+    <option value="162">
+        Stephen
+    </option>
+    <option value="163">
+        Tuckersmith
+    </option>
+    <option value="164">
+        Turnbury
+    </option>
+    <option value="165">
+        Usborne
+    </option>
+    <option value="166">
+        Wawanosh
+    </option>
+    <option value="166A">
+        Agricultural Census
+    </option>
+</select>

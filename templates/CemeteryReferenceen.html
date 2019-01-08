@@ -1,0 +1,103 @@
+  <!--*********************************************************************
+ *  CemeteryReferenceen.html											*
+ *																		*
+ *  Display a web page containing all of the individuals matching		*
+ *  a particular cemetery plot reference.								*
+ *																		*
+ *  History:															*
+ *		2018/11/01	    created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+    <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+  </div>
+  <div class='body'>
+    <h1>
+      <span class='right'>
+    	<a href='CemeteryReferenceHelpen.html' target='help'>? Help</a>
+      </span>
+        $TITLE
+    </h1>
+    $TRACE
+    $MSG
+    <p id="amatch">
+      <a href='Person.php?idir=$IDIR&lang=$LANG' target='_blank'>
+    	$NAME
+      </a>
+    </p>
+    <p class='label'id="nomatches">No matches</p>
+  </div> <!-- class="body" -->
+  <div id="templates" class="hidden">
+      <span id="Cemetery">Cemetery</span>
+      <span id="missingPlot">
+          Plot parameter not supplied.  Please specify a plot identifier. 
+      </span>
+	  <span id="missingIdsr">
+          IDSR parameter not supplied.  Please identify cemetery. 
+      </span>
+  </div>
+  <div class='balloon' id='Helppattern'>
+    <p>
+        This is an extended regular expression, as supported by MySQL, 
+        which is used to limit
+        the locations to be displayed. See <a href='http://www.tin.org/bin/man.cgi?section=7&topic=regex'>Henry Spencer's regex page</a>.
+    </p>
+    <ul>
+        <li>If the pattern contains no special 
+            characters then only locations containing that string will 
+            be included.
+            For example the pattern "London" will match locations containing
+            the string "London".  Note that the search ignores case, so that
+            pattern will also match "LONDON" and "london".
+        <li>If the pattern begins with a caret '^' then only locations that
+            <b>begin</b> with the remainder of the pattern are included.  
+            For example the pattern
+            "^Ba" displays locations starting with "Ba" (or "ba" or "BA").
+        <li>If the pattern ends with a dollar sign '$', then only locations that
+            <b>end</b> with the remainder of the pattern are included.  
+            For example the pattern
+            "CA$" matches locations that end with "CA" (or "ca" or "Ca").
+        <li>In a pattern a period '.' matches any single character.  For example
+            the pattern "B.b" matches any location that contains 
+            two letter Bs separated
+            by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
+            anywhere in the location name.
+        <li>In a pattern an asterisk '*' matches zero or more of the preceding
+            character; "bo*b" matches "bb", "bob", and "boob"
+            anywhere in the location name.
+    </ul>
+  </div>
+  <div class='balloon' id='Helptype'>
+    This selection list is used to choose the type of Event for which
+    a list of citations is to be produced.
+  </div>
+  <div class='balloon' id='Helpidsr'>
+    This selection list is used to choose the master source to which the
+    citations refer.
+  </div>
+  <div class='balloon' id='Helptypeparm'>
+    This selection list is used to choose the type of Event for which a list of
+    citations is to be produced.
+  </div>
+  <div class='balloon' id='Helpidsrparm'>
+    This selection list is used to choose the master source to which the
+    citations refer.
+  </div>
+  <div class='balloon' id='HelpSubmit'>
+     Click on this button to apply the search criteria.
+  </div>
+	<script src="/jscripts/CommonForm.js" type="text/javascript">
+    </script>
+	<script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+	<script src="/jscripts/util.js" type="text/javascript">
+    </script>
+	<script src="/jscripts/CommonForm.js" type="text/javascript">
+    </script>
+	<script src="CemeteryReference.js" type="text/javascript">
+    </script>

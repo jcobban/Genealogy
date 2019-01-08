@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select dist="19">
+    <option value="205">
+        Bastard
+    </option>
+    <option value="206">
+        Brockville Town
+    </option>
+    <option value="207">
+        Burgess
+    </option>
+    <option value="208">
+        Crosby N.
+    </option>
+    <option value="209">
+        Crosby S.
+    </option>
+    <option value="210">
+        Elmsley
+    </option>
+    <option value="211">
+        Elizabethtown
+    </option>
+    <option value="212">
+        Escott
+    </option>
+    <option value="213">
+        Kitley
+    </option>
+    <option value="214">
+        Landsown
+    </option>
+    <option value="215">
+        Leeds
+    </option>
+    <option value="216">
+        Yonge
+    </option>
+    <option value="216A">
+        Agricultural Census
+    </option>
+</select>

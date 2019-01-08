@@ -1,0 +1,80 @@
+/************************************************************************
+ *  reqReportIndivids.css						*
+ *									*
+ *  Stylesheet for the script reqReportIndivids.php			*
+ *									*
+ *  History:								*
+ *	2014/03/10	created						*
+ *	2014/03/25	label for column 1 not wide enough		*
+ *									*
+ *  Copyright &copy; 2014 James A. Cobban				*
+ ************************************************************************/
+
+/*	column containers */
+    div.row {	white-space:	nowrap; }
+
+    div.column1	{
+		float:		left;
+		text-align:	left;
+		font-family:	sans-serif;
+		font-weight:	bold;
+		margin-top:	1px;
+		margin-right:	3px;
+		margin-left:	3px;
+		width:		460px;
+		}
+
+    div.column2	{
+		float:		left;
+		text-align:	left;
+		font-family:	sans-serif;
+		font-weight:	bold;
+		margin-top:	1px;
+		margin-right:	3px;
+		margin-left:	3px;
+		width:		432px;
+		}
+
+    div.column3	{
+		float:		left;
+		text-align:	left;
+		font-family:	sans-serif;
+		font-weight:	bold;
+		margin-top:	1px;
+		margin-right:	3px;
+		margin-left:	3px;
+		width:		432px;
+		}
+
+    label.column1 {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		font-size:	smaller;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		float:		left;
+		width:		10em;
+		}
+
+    label.column2 {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		font-size:	smaller;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		float:		left;
+		width:		8em;
+		}
+
+    label.column3 {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		font-size:	smaller;
+		text-align:	right;
+		vertical-align:	top;
+		padding:	0px 3px 0px 3px;
+		float:		left;
+		width:		10em;
+		}

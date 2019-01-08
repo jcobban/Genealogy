@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148095">
+    <option value="6_E">
+        Lisgar: Gimli
+        <div id="" reel="148095" frame="0" count="34"/>
+    </option>
+    <option value="6_F">
+        Lisgar: Kildonan
+        <div id="" reel="148095" frame="34" count="12"/>
+    </option>
+    <option value="6_G">
+        Lisgar: Macdonald
+        <div id="" reel="148095" frame="46" count="9"/>
+    </option>
+    <option value="6_H">
+        Lisgar: Plessis
+        <div id="" reel="148095" frame="55" count="6"/>
+    </option>
+    <option value="6_I">
+        Lisgar: Posen
+        <div id="" reel="148095" frame="" count="0"/>
+    </option>
+    <option value="6_J">
+        Lisgar: Rockwood
+        <div id="1" reel="148095" frame="61" count="24"/>
+        <div id="2" reel="148095" frame="85" count="36"/>
+    </option>
+    <option value="6_K">
+        Lisgar: Selkirk Town
+        <div id="" reel="148095" frame="121" count="22"/>
+    </option>
+    <option value="6_L">
+        Lisgar: Springfield
+        <div id="1" reel="148095" frame="143" count="16"/>
+        <div id="2" reel="148095" frame="159" count="22"/>
+    </option>
+    <option value="6_M">
+        Lisgar: St. Andrews
+        <div id="" reel="148095" frame="181" count="39"/>
+    </option>
+    <option value="6_N">
+        Lisgar: St. Clements
+        <div id="" reel="148095" frame="220" count="20"/>
+    </option>
+    <option value="6_O">
+        Lisgar: St. Francois Xavier
+        <div id="" reel="148095" frame="240" count="23"/>
+    </option>
+    <option value="6_P">
+        Lisgar: St. Laurent
+        <div id="" reel="148095" frame="263" count="36"/>
+    </option>
+    <option value="6_R">
+        Lisgar: Varennes
+        <div id="" reel="148095" frame="" count="0"/>
+    </option>
+    <option value="6_Q">
+        Lisgar: St. Paul
+        <div id="" reel="148095" frame="299" count="13"/>
+    </option>
+    <option value="6_S">
+        Lisgar: Woodlands
+        <div id="1" reel="148095" frame="312" count="14"/>
+        <div id="2" reel="148095" frame="326" count="9"/>
+    </option>
+    <option value="7_A">
+        Marquette: Archie (&amp; subdist I Ellice)
+        <div id="" reel="148095" frame="335" count="16"/>
+    </option>
+    <option value="7_B">
+        Marquette: Birtle
+        <div id="" reel="148095" frame="351" count="19"/>
+    </option>
+    <option value="7_C">
+        Marquette: Birtle Town
+        <div id="" reel="148095" frame="370" count="8"/>
+    </option>
+    <option value="7_D">
+        Marquette: Blanchard
+        <div id="" reel="148095" frame="378" count="12"/>
+    </option>
+    <option value="7_E">
+        Marquette: Boulton (&amp; subdist EE Shell River)
+        <div id="" reel="148095" frame="390" count="10"/>
+    </option>
+    <option value="7_F">
+        Marquette: Clanwilliam
+        <div id="" reel="148095" frame="400" count="13"/>
+    </option>
+    <option value="7_G">
+        Marquette: Cypress North
+        <div id="1" reel="148095" frame="413" count="41"/>
+        <div id="2" reel="148095" frame="454" count="15"/>
+    </option>
+    <option value="7_H">
+        Marquette: Cypress South
+        <div id="" reel="148095" frame="469" count="31"/>
+    </option>
+    <option value="7_I">
+        Marquette: Ellice
+        <div id="" reel="148095" frame="335" count="16"/>
+    </option>
+    <option value="7_J">
+        Marquette: Elm River
+        <div id="" reel="148095" frame="500" count="12"/>
+    </option>
+    <option value="7_K">
+        Marquette: Gladstone Town
+        <div id="" reel="148095" frame="512" count="9"/>
+    </option>
+    <option value="7_L">
+        Marquette: Glendale
+        <div id="" reel="148095" frame="521" count="16"/>
+    </option>
+    <option value="7_M">
+        Marquette: Harrison
+        <div id="" reel="148095" frame="537" count="8"/>
+    </option>
+    <option value="7_N">
+        Marquette: Lansdowne
+        <div id="" reel="148095" frame="545" count="20"/>
+    </option>
+    <option value="7_O">
+        Marquette: Miniota
+        <div id="" reel="148095" frame="565" count="20"/>
+    </option>
+    <option value="7_P">
+        Marquette: Minnedosa Town
+        <div id="" reel="148095" frame="585" count="13"/>
+    </option>
+    <option value="7_Q">
+        Marquette: Neepawa Town
+        <div id="" reel="148095" frame="598" count="16"/>
+    </option>
+    <option value="7_R">
+        Marquette: Norfolk North
+        <div id="" reel="148095" frame="614" count="32"/>
+    </option>
+    <option value="7_S">
+        Marquette: Norfolk South
+        <div id="" reel="148095" frame="646" count="49"/>
+    </option>
+    <option value="7_T">
+        Marquette: Oak River
+        <div id="" reel="148095" frame="695" count="15"/>
+    </option>
+    <option value="7_U">
+        Marquette: Odanah
+        <div id="" reel="148095" frame="710" count="22"/>
+    </option>
+</select>

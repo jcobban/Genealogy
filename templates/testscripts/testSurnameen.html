@@ -1,0 +1,107 @@
+<!--*********************************************************************
+ *  testSurnameen.html        											*
+ *        																*
+ *  Test driver for the Surname class        							*
+ *         																*
+ *  History:         													*
+ *        2019/01/04		create											*
+ *        																*
+ *  Copyright 2019 James A. Cobban        								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+    <a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">
+        	Genealogy
+    </a>:
+    <a href="/genCountry.php?cc=CA&lang=$LANG">
+        	Canada
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">
+        	Services
+    </a>:
+    <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+        	Nominal Index
+    </a>:
+  </div>
+  <div class="body">
+    <h1>Test Surname</h1>
+        $TRACE
+        $MSG
+    <form name="indForm" action="testSurname.php" method="get">
+      <input name="Debug" type="hidden" value="$DEBUG">
+      <div class="row">
+        <div class="column1">
+          <label class="label">
+            IDNR
+		  </label>
+          <input type="text" name="idnr" class="white right"
+                value="$IDNR">
+        </div>
+	  </div>
+      <div class="row">
+        <div class="column1">
+          <label class="label">
+            Surname
+		  </label>
+          <input type="text" name="Surname" class="white left"
+        value="$SURNAME">
+        </div>
+	  </div>
+      <div class="row">
+        <div class="column1">
+          <label class="label">
+            Soundslike
+		  </label>
+          <input type="text" name=soundslike" class="white left" value="$SOUNDSLIKE">
+        </div>
+	  </div>
+      <div class="row">
+        <div class="column1">
+          <label class="label">
+            Pattern
+		  </label>
+          <input type="text" name=pattern" class="white left" value="$PATTERN">
+        </div>
+	  </div>
+      <div class="row">
+        <div class="column1">
+          <label class="label">
+            Notes
+		  </label>
+          <input type="text" name=notes" class="white left" value="$NOTES">
+        </div>
+	  </div>
+      <div class="row">
+        <div class="column1">
+          <label class="label">
+            Used
+		  </label>
+          <input type="text" name=used" class="white right" value="$USED">
+        </div>
+	  </div>
+      <div class="row">
+        <div class="column1">
+          <label class="label">
+            Tag1
+		  </label>
+          <input type="text" name=tag1" class="white right" value="$TAG1">
+        </div>
+	  </div>
+      <div class="row">
+        <div class="column1">
+          <label class="label">
+            QsTag
+		  </label>
+          <input type="text" name=qstag" class="white right" value="$QSTAG">
+        </div>
+	  </div>
+      <div class="row">
+        <div class="column1">
+          <label class="label">
+            Actions
+		  </label>
+            <button type="submit" id="Submit">Submit</button>
+        </div>
+	  </div>
+    </form>
+  </div>

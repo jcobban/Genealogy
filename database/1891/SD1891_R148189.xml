@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148189">
+    <option value="139_D">
+        Beauharnois: St. Clément
+        <div id="" reel="148189" frame="0" count="37"/>
+    </option>
+    <option value="139_E">
+        Beauharnois: St. Etienne
+        <div id="" reel="148189" frame="37" count="21"/>
+    </option>
+    <option value="139_F">
+        Beauharnois: St. Louis de Gonzague
+        <div id="1" reel="148189" frame="58" count="29"/>
+        <div id="2" reel="148189" frame="87" count="18"/>
+    </option>
+    <option value="139_G">
+        Beauharnois: St. Stanislas de Kostka
+        <div id="" reel="148189" frame="105" count="25"/>
+    </option>
+    <option value="139_H">
+        Beauharnois: St. Timothé
+        <div id="" reel="148189" frame="130" count="43"/>
+    </option>
+    <option value="140_A">
+        Bellechasse: Armagh
+        <div id="" reel="148189" frame="173" count="32"/>
+    </option>
+    <option value="140_B">
+        Bellechasse: Beaumont
+        <div id="1" reel="148189" frame="205" count="11"/>
+        <div id="2" reel="148189" frame="216" count="7"/>
+    </option>
+    <option value="140_C">
+        Bellechasse: Buckland
+        <div id="" reel="148189" frame="223" count="25"/>
+    </option>
+    <option value="140_D">
+        Bellechasse: St. Charles
+        <div id="1" reel="148189" frame="248" count="22"/>
+        <div id="2" reel="148189" frame="270" count="22"/>
+    </option>
+    <option value="140_E">
+        Bellechasse: St. Damien
+        <div id="" reel="148189" frame="292" count="17"/>
+    </option>
+    <option value="140_F">
+        Bellechasse: St. Gervais
+        <div id="1" reel="148189" frame="309" count="21"/>
+        <div id="2" reel="148189" frame="330" count="22"/>
+    </option>
+    <option value="140_G">
+        Bellechasse: St. Lazare
+        <div id="1" reel="148189" frame="352" count="14"/>
+        <div id="2" reel="148189" frame="366" count="14"/>
+    </option>
+    <option value="140_H">
+        Bellechasse: St. Magloire
+        <div id="" reel="148189" frame="380" count="23"/>
+    </option>
+    <option value="140_I">
+        Bellechasse: St. Michel
+        <div id="1" reel="148189" frame="403" count="21"/>
+        <div id="2" reel="148189" frame="424" count="19"/>
+    </option>
+    <option value="140_J">
+        Bellechasse: St. Nérie
+        <div id="" reel="148189" frame="443" count="25"/>
+    </option>
+    <option value="140_K">
+        Bellechasse: Ste. Philomon de Mailloux
+        <div id="" reel="148189" frame="468" count="16"/>
+    </option>
+    <option value="140_L">
+        Bellechasse: St. Raphaël
+        <div id="1" reel="148189" frame="484" count="28"/>
+        <div id="2" reel="148189" frame="512" count="24"/>
+    </option>
+    <option value="140_M">
+        Bellechasse: St. Valier
+        <div id="" reel="148189" frame="536" count="27"/>
+    </option>
+    <option value="141_A">
+        Berthier: Berthier
+        <div id="" reel="148189" frame="563" count="38"/>
+    </option>
+    <option value="141_B">
+        Berthier: Berthier Town
+        <div id="" reel="148189" frame="601" count="32"/>
+    </option>
+    <option value="141_C">
+        Berthier: Courcelle
+        <div id="" reel="148189" frame="633" count="43"/>
+    </option>
+    <option value="141_D">
+        Berthier: [missing]
+        <div id="" reel="148189" frame="676" count="0"/>
+    </option>
+    <option value="141_E">
+        Berthier: Lavaltrie
+        <div id="" reel="148189" frame="676" count="21"/>
+    </option>
+    <option value="141_F">
+        Berthier: St. Barthélemi
+        <div id="" reel="148189" frame="697" count="52"/>
+    </option>
+    <option value="141_G">
+        Berthier: St. Cuthbert
+        <div id="" reel="148189" frame="749" count="68"/>
+    </option>
+</select>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<select reel="148228">
+    <option value="198_A">
+        Assiniboia East: Broadview
+        <div id="10" reel="148228" frame="0" count="12"/>
+        <div id="11" reel="148228" frame="12" count="15"/>
+        <div id="12" reel="148228" frame="27" count="14"/>
+        <div id="13" reel="148228" frame="41" count="23"/>
+        <div id="14" reel="148228" frame="64" count="19"/>
+        <div id="15" reel="148228" frame="83" count="9"/>
+        <div id="16" reel="148228" frame="92" count="17"/>
+        <div id="17" reel="148228" frame="109" count="5"/>
+        <div id="18" reel="148228" frame="114" count="13"/>
+        <div id="19" reel="148228" frame="127" count="7"/>
+    </option>
+    <option value="198_B">
+        Assiniboia East: Q'Appelle
+        <div id="1" reel="148228" frame="134" count="16"/>
+        <div id="2" reel="148228" frame="150" count="6"/>
+        <div id="3" reel="148228" frame="156" count="15"/>
+        <div id="4" reel="148228" frame="171" count="21"/>
+        <div id="5" reel="148228" frame="192" count="7"/>
+        <div id="6" reel="148228" frame="199" count="9"/>
+        <div id="7" reel="148228" frame="208" count="7"/>
+        <div id="8" reel="148228" frame="215" count="9"/>
+        <div id="9" reel="148228" frame="224" count="17"/>
+        <div id="10" reel="148228" frame="241" count="5"/>
+        <div id="11" reel="148228" frame="246" count="10"/>
+        <div id="12" reel="148228" frame="256" count="7"/>
+        <div id="13" reel="148228" frame="263" count="3"/>
+    </option>
+    <option value="199_A">
+        Assiniboia West: Maple Creek
+        <div id="" reel="148228" frame="266" count="15"/>
+    </option>
+    <option value="199_B">
+        Assiniboia West: Medicine Hat
+        <div id="1" reel="148228" frame="281" count="14"/>
+        <div id="2" reel="148228" frame="295" count="19"/>
+    </option>
+    <option value="199_C">
+        Assiniboia West: Moosejaw &amp; Regina
+        <div id="1" reel="148228" frame="314" count="64"/>
+        <div id="2" reel="148228" frame="378" count="31"/>
+        <div id="3" reel="148228" frame="409" count="15"/>
+        <div id="4" reel="148228" frame="424" count="6"/>
+        <div id="5" reel="148228" frame="430" count="32"/>
+        <div id="6" reel="148228" frame="462" count="6"/>
+        <div id="7" reel="148228" frame="468" count="6"/>
+    </option>
+    <option value="199_D">
+        Assiniboia West: Swift Current
+        <div id="1" reel="148228" frame="474" count="7"/>
+        <div id="2" reel="148228" frame="481" count="3"/>
+    </option>
+    <option value="200_A">
+        Saskatchewan: Battleford
+        <div id="1" reel="148228" frame="484" count="12"/>
+        <div id="2" reel="148228" frame="496" count="13"/>
+        <div id="3" reel="148228" frame="509" count="5"/>
+    </option>
+    <option value="200_B">
+        Saskatchewan: Carrol River &amp; Lake Winnipeg
+        <div id="" reel="148228" frame="514" count="12"/>
+    </option>
+    <option value="200_C">
+        Saskatchewan: Prince Albert
+        <div id="1" reel="148228" frame="526" count="9"/>
+        <div id="2" reel="148228" frame="535" count="7"/>
+        <div id="3" reel="148228" frame="542" count="7"/>
+        <div id="4" reel="148228" frame="549" count="9"/>
+        <div id="5" reel="148228" frame="558" count="25"/>
+        <div id="6" reel="148228" frame="583" count="13"/>
+        <div id="7" reel="148228" frame="596" count="8"/>
+        <div id="8" reel="148228" frame="604" count="7"/>
+        <div id="9" reel="148228" frame="611" count="7"/>
+        <div id="10" reel="148228" frame="618" count="29"/>
+    </option>
+    <option value="201_A">
+        Unorganized Territories: Unorganized Territories
+        <div id="1" reel="148228" frame="647" count="14"/>
+        <div id="2" reel="148228" frame="661" count="3"/>
+        <div id="3" reel="148228" frame="664" count="2"/>
+        <div id="4" reel="148228" frame="666" count="32"/>
+        <div id="5" reel="148228" frame="698" count="11"/>
+        <div id="6" reel="148228" frame="709" count="13"/>
+        <div id="7" reel="148228" frame="722" count="2"/>
+        <div id="8" reel="148228" frame="724" count="7"/>
+        <div id="9" reel="148228" frame="731" count="11"/>
+        <div id="10" reel="148228" frame="742" count="8"/>
+    </option>
+    <option value="201_B">
+        Unorganized Territories: McKenzie River District
+        <div id="1" reel="148228" frame="750" count="4"/>
+        <div id="2" reel="148228" frame="754" count="8"/>
+        <div id="3" reel="148228" frame="762" count="14"/>
+        <div id="4" reel="148228" frame="776" count="14"/>
+        <div id="5" reel="148228" frame="790" count="7"/>
+    </option>
+</select>
