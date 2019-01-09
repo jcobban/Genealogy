@@ -12,11 +12,11 @@ use \Exception;
  *	2015/05/25	show request_uri if redirect_url unavailable	*
  *	2015/07/17	use absolute URL in header			*
  ************************************************************************/
-    require_once __NAMESPACE__ . "//home/jcobban/includes/common.inc";
+    require_once __NAMESPACE__ . "/common.inc";
 
     htmlHeader("Genealogy: Page Not Found",
-		array('../jscripts/util.js',
-		      '../jscripts/default.js'),
+		array('/jscripts/util.js',
+		      '/jscripts/default.js'),
 		false);
     pageTop(array(
 	'/genealogy.php'	=> 'Genealogy',

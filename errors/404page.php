@@ -13,7 +13,7 @@ use \Exception;
  *		2015/07/17		use absolute URL in header						*
  *		2018/11/28      redirect non-English help pages                 *
  ************************************************************************/
-require_once __NAMESPACE__ . "//home/jcobban/includes/common.inc";
+require_once __NAMESPACE__ . "/common.inc";
 
 if (array_key_exists('REDIRECT_URL', $_ENV))
 {

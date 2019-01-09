@@ -1,53 +1,53 @@
 /************************************************************************
- *  mergeIndivid.css							*
- *									*
- *  Stylesheet for the script mergeIndivid.php				*
- *									*
- *  History:								*
- *	2014/03/10	created						*
- *									*
- *  Copyright &copy; 2014 James A. Cobban				*
+ *  mergeIndivid.css													*
+ *																		*
+ *  Stylesheet for the script mergeIndivid.php							*
+ *																		*
+ *  History:															*
+ *		2014/03/10		created											*
+ *																		*
+ *  Copyright &copy; 2014 James A. Cobban								*
  ************************************************************************/
 
 /*	column containers */
     div.row {	white-space:	nowrap; }
 
     div.labelColumn	{
-		float:		left;
-		text-align:	right;
+		float:			left;
+		text-align:		right;
 		font-family:	sans-serif;
 		font-weight:	bold;
-		margin-top:	1px;
+		margin-top:		1px;
 		margin-right:	3px;
 		margin-left:	3px;
-		width:		161px;
+		width:			161px;
 		}
 
     div.checkboxColumn	{
-		float:		left;
-		text-align:	center;
-		margin-top:	1px;
+		float:			left;
+		text-align:		center;
+		margin-top:		1px;
 		margin-right:	3px;
 		margin-left:	3px;
-		width:		22px;
+		width:			22px;
 		}
 
     div.headerColumn	{
-		float:		left;
+		float:			left;
 		font-family:	sans-serif;
 		font-weight:	bold;
-		text-align:	center;
-		margin-top:	1px;
+		text-align:		center;
+		margin-top:		1px;
 		margin-right:	3px;
 		margin-left:	3px;
-		width:		307px;
+		width:			307px;
 		}
 
     div.dataColumn	{
-		float:		left;
-		margin-top:	1px;
+		float:			left;
+		margin-top:		1px;
 		margin-right:	3px;
 		margin-left:	3px;
-		width:		307px;
+		width:			307px;
 		}
 

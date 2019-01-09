@@ -1055,10 +1055,6 @@ class Person extends RecordPic
                 $warn	.= "<p>Person::_construct: " . __LINE__ .
             ' $priName = new Name(array(\'idir\' => $this, \'order\' => 0)' .
             "</p>\n";
-            if (strlen($warn) > 0)
-                error_log("Person.inc: 1032 $warn\n",
-                3,
-                $document_root . "/logs/updateIndivid.log");
  
             if ($this['idir'] > 0)
             {

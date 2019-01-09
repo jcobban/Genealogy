@@ -13,6 +13,67 @@ use \Iterator;
  *  This class provides access to the information in a row				*
  *  of the table Deaths.												*
  *																		*
+ *		CREATE TABLE `Deaths` (                                         *
+ *			`D_RegDomain`   VARCHAR(4) NOT NULL DEFAULT 'CAON',			*
+ *			`D_RegYear`     INT(11) NOT NULL DEFAULT '2009',			*
+ *			`D_RegNum`      INT(11) NOT NULL DEFAULT '0',			    *
+ *			`D_RegCounty`   CHAR(3) DEFAULT NULL,			            *
+ *			`D_RegTownship` VARCHAR(64) DEFAULT NULL,			        *
+ *			`D_MsVol`       INT(4) DEFAULT '0',			                *
+ *			`D_Surname`     VARCHAR(32) DEFAULT NULL,			        *
+ *			`D_SurnameSoundex` CHAR(4) DEFAULT NULL,			        *
+ *			`D_GivenNames`  VARCHAR(48) DEFAULT NULL,			        *
+ *			`D_Sex`         CHAR(1) DEFAULT NULL,			            *
+ *			`D_Place`       VARCHAR(128) DEFAULT NULL,			        *
+ *			`D_Date`        VARCHAR(32) DEFAULT NULL,			        *
+ *			`D_CalcDate`    INT(11) DEFAULT NULL,			            *
+ *			`D_Age`         VARCHAR(16) DEFAULT NULL,			        *
+ *			`D_BirthDate`   VARCHAR(32) DEFAULT NULL,			        *
+ *			`D_CalcBirth`   INT(11) DEFAULT NULL,			            *
+ *			`D_Occupation`  VARCHAR(64) DEFAULT NULL,			        *
+ *			`D_MarStat`     CHAR(1) DEFAULT NULL,			            *
+ *			`D_BirthPlace`  VARCHAR(128) DEFAULT NULL,			        *
+ *			`D_ResPlace`    VARCHAR(16) DEFAULT NULL,			        *
+ *			`D_ResOnt`      VARCHAR(16) DEFAULT NULL,			        *
+ *			`D_ResCan`      VARCHAR(16) DEFAULT NULL,			        *
+ *			`D_Cause`       VARCHAR(255) DEFAULT NULL,			        *
+ *			`D_Duration`    VARCHAR(64) DEFAULT NULL,			        *
+ *			`D_Phys`        VARCHAR(48) DEFAULT NULL,			        *
+ *			`D_PhysAddr`    VARCHAR(128) DEFAULT NULL,					*
+ *			`D_Informant`   VARCHAR(48) DEFAULT NULL,					*
+ *			`D_InfRel`      VARCHAR(16) DEFAULT NULL,					*
+ *			`D_InfOcc`      VARCHAR(32) DEFAULT NULL,					*
+ *			`D_InfRes`      VARCHAR(128) DEFAULT NULL,					*
+ *			`D_Religion`    VARCHAR(32) DEFAULT NULL,					*
+ *			`D_FatherName`  VARCHAR(48) DEFAULT NULL,					*
+ *			`D_FatherBPlce` VARCHAR(128) DEFAULT NULL,					*
+ *			`D_MotherName`  VARCHAR(48) DEFAULT NULL,					*
+ *			`D_MotherBPlce` VARCHAR(128) DEFAULT NULL,					*
+ *			`D_HusbandName` VARCHAR(48) DEFAULT NULL,					*
+ *			`D_Remarks`     LONGTEXT,					                *
+ *			`D_BurPlace`    VARCHAR(128) DEFAULT NULL,					*
+ *			`D_BurDate`     VARCHAR(48) DEFAULT NULL,					*
+ *			`D_Undertkr`    VARCHAR(48) DEFAULT NULL,					*
+ *			`D_UndertkrAddr` VARCHAR(128) DEFAULT NULL,					*
+ *			`D_RegDate`     VARCHAR(16) DEFAULT NULL,					*
+ *			`D_Registrar`   VARCHAR(128) DEFAULT NULL,					*
+ *			`D_RecordedBy`  VARCHAR(64) DEFAULT NULL,					*
+ *			`D_Image`       VARCHAR(256) NOT NULL DEFAULT '',			*
+ *			`D_IDIR`        INT(10) UNSIGNED DEFAULT NULL,				*
+ *			`D_ChangedBy`   VARCHAR(64) NOT NULL DEFAULT '',			*
+ *			`D_ChangeDate`  DATE DEFAULT NULL,					        *
+ *			`D_OriginalVolume` VARCHAR(16) DEFAULT NULL,				*
+ *			`D_OriginalPage` INT(11) DEFAULT NULL,					    *
+ *			`D_OriginalItem` INT(11) DEFAULT NULL,					    *
+ *			PRIMARY KEY (`D_RegDomain`,			                        *
+ *			`D_RegYear`,			                                    *
+ *			`D_RegNum`),			                                    *
+ *			KEY `D_Surname` (`D_Surname`),			                    *
+ *			KEY `D_SurnameSoundex` (`D_SurnameSoundex`),			    *
+ *			KEY `D_GivenNames` (`D_GivenNames`),			            *
+ *			KEY `D_IDIR` (`D_IDIR`),			                        *
+ *			KEY `D_ChangeDate` (`D_ChangeDate`) )			            *
+ *																		*
  *  History:															*
  *		2014/01/14		created											*
  *		2014/10/10		add country code to default location			*
@@ -37,8 +98,9 @@ use \Iterator;
  *						set to NULL for empty string					*
  *		2018/11/24      log entry for insert did not include parms      *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		                replace DATE with yyyymmdd                      *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -74,10 +136,10 @@ class Death extends Record
 				'd_sex'					=> '?',
 				'd_place'				=> '',
 				'd_date'				=> '',
-				'd_calcdate'			=> '',
+				'd_calcdate'			=> 0,
 				'd_age'					=> '',
 				'd_birthdate'			=> '',
-				'd_calcbirth'			=> '',
+				'd_calcbirth'			=> 0,
 				'd_occupation'			=> '',
 				'd_marstat'				=> '?',
 				'd_birthplace'			=> '',
@@ -323,7 +385,7 @@ class Death extends Record
 				    $dbrow['d_date']		= $year;
 				    $dbrow['d_burdate']		= $year;
 				    $dbrow['d_regdate']		= $year;
-				    $dbrow['d_calcdate']	= "$year-06-15";
+				    $dbrow['d_calcdate']	= $year*10000 + 0615;
 
 				    // fill in some fields from the preceding record, 
 				    // if it exists
@@ -529,7 +591,7 @@ class Death extends Record
                     $d          = 15;
 				if ($d < 10)
                     $d	        = '0' . $d;
-				parent::set('d_calcdate',"$y-$m-$d");
+				parent::set('d_calcdate',$y*10000 + $m*100 + $d);
 				return parent::set('d_date', $value);
 		    }
 
@@ -563,7 +625,7 @@ class Death extends Record
 				    $d		= 28;
 				if ($d < 10)
 				    $d	= '0' . $d;
-				parent::set('d_calcbirth',"$y-$m-$d");
+				parent::set('d_calcbirth',$y*10000 + $m*100 + $d);
 				return parent::set($fieldLc, $value);
 		    }
 

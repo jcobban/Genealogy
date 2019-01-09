@@ -178,13 +178,14 @@ function chooseIndivid()
 						"unable to get value of idir from form",
 				   this);
     return true;
-}	// chooseIndivid
+}	// function chooseIndivid
 
 /************************************************************************
  *  function doNotMerge													*
  *																		*
- *  This method is called when the user requests to choose				*
- *  a second individual to merge with the current individual.			*
+ *  This method is called when the user requests to flag that			*
+ *  the two individuals displayed on this page are never to be          *
+ *  merged automatically.                                               *
  *  This is the onclick method of <button id='donotmerge'>				*
  *																		*
  *  Input:																*
@@ -207,7 +208,7 @@ function doNotMerge()
     else
 		alert("mergeIndivid.js: doNotMerge: unable to get value of idirs from form");
     return true;
-}	// doNotMerge
+}	// function doNotMerge
 
 /************************************************************************
  *  function gotDoNotMerge												*
@@ -245,7 +246,7 @@ function gotDoNotMerge(xmlDoc)
 }		// gotDoNotMerge
 
 /************************************************************************
- *  noDoNotMerge														*
+ *  function noDoNotMerge												*
  *																		*
  *  This method is called if there is no response to adding a do not	*
  *  merge indviduals record.											*
@@ -253,10 +254,10 @@ function gotDoNotMerge(xmlDoc)
 function noDoNotMerge()
 {
     alert("mergeIndivid.js: noDoNotMerge: 'addDoNotMergeXml.php' script not found on server");
-}		// noDoNotMerge
+}		// function noDoNotMerge
 
 /************************************************************************
- *  viewSecond															*
+ *  function viewSecond													*
  *																		*
  *  This method is called when the user requests to view the details of	*
  *  the second individual to merge with the current individual.			*
@@ -281,10 +282,10 @@ function viewSecond()
     else
 		alert("mergeIndivid.js: viewSecond: unable to get form");
     return true;
-}	// viewSecond
+}	// function viewSecond
 
 /************************************************************************
- *  callidir															*
+ *  function callidir													*
  *																		*
  *  This callback method is called by the chooseIndivid.php script		*
  *  when the user has chosen an individual to merge.					*
@@ -296,204 +297,17 @@ function viewSecond()
 function callidir(idir)
 {
     var	form	= this;
-    HTTP.getXML("getPersonXml.php?idir=" + idir,
-				gotIndiv,
-				noIndiv);
-}	// callidir
+    location.href   = location.href + '&idir2=' + idir;
+}	// function callidir
 
 /************************************************************************
- *  gotIndiv															*
+ *  function radioButton												*
  *																		*
- *  This method is called when the XML file representing				*
- *  the individual is retrieved from the database.						*
- *																		*
- *  Parameters:															*
- *		xmlDoc	information about the defined individual as an XML		*
- *				document												*
- ************************************************************************/
-function gotIndiv(xmlDoc)
-{
-    var form	= document.indForm;
-    if (xmlDoc === null)
-    {
-		alert("mergeIndivid.js: gotIndiv: " + 
-		      "System Error, no response from script getPersonXml.php");
-		return;
-    }
-    if (xmlDoc.documentElement)
-		root	= xmlDoc.documentElement;
-    else
-		root	= null;
-    if (root)
-    {
-		if (root.nodeName == 'indiv')
-		{		// valid response
-		    var	indiv		= getObjFromXml(root);
-
-		    var	idir		= indiv.idir;
-		    var	surname		= indiv.names.name.surname;
-		    var	givenname	= indiv.names.name.givenname;
-		    var	birthd		= "";
-		    var	birthloc	= "";
-		    var	chrisd		= "";
-		    var	chrisloc	= "";
-		    var	deathd		= "";
-		    var	deathloc	= "";
-		    var	buriedd		= "";
-		    var	buriedloc	= "";
-
-		    var	events		= indiv.event;
-		    if (typeof(events) == "object")
-		    {			// have events and is object or array
-				if (!(events instanceof Array))
-				    events	= new Array(events);
-				// get information from events
-				for (var j = 0; j < events.length; j++)
-				{		// loop through events
-				    var	evnt	= events[j];
-				    if (evnt.idet)
-				    {		// idet attribute defined
-						switch(evnt.idet)
-						{	// act on specific events
-						    case '3':
-						    case '2000':
-						    {	// birth event
-							birthd		= evnt.eventd;
-							birthloc	= evnt.eventloc;
-							break;
-						    }	// birth event
-
-						    case '5':
-						    case '3000':
-						    {	// christening event
-							chrisd		= evnt.eventd;
-							chrisloc	= evnt.eventloc;
-							break;
-						    }	// chris event
-
-						    case '6':
-						    case '4000':
-						    {	// death event
-							deathd		= evnt.eventd;
-							deathloc	= evnt.eventloc;
-							break;
-						    }	// death event
-
-						    case '4':
-						    case '5000':
-						    {	// buried event
-							buriedd		= evnt.eventd;
-							buriedloc	= evnt.eventloc;
-							break;
-						    }	// buried event
-
-						}	// act on specific events
-				    }		// idet attribute defined
-				}		// loop through events
-		    }			// have events and is object or array
-
-		    // fill in the values for the second individual
-		    form.idir2.value		= idir;
-		    form.Surname2.value		= surname;
-		    form.GivenName2.value	= givenname;
-		    form.BirthDate2.value	= birthd;
-		    if (form.BirthDate1.value.length == 0 &&
-				birthd.length > 0)
-		    {
-				form.BthDateCb1.checked	= false;
-				form.BthDateCb2.checked	= true;
-		    }
-
-		    form.BirthLocation2.value	= birthloc;
-		    if (form.BirthLocation1.value.length == 0 &&
-				birthloc.length > 0)
-		    {
-				form.BthLocCb1.checked	= false;
-				form.BthLocCb2.checked	= true;
-		    }
-
-		    form.ChrisDate2.value	= chrisd;
-		    if (form.ChrisDate1.value.length == 0 &&
-				chrisd.length > 0)
-		    {
-				form.CrsDateCb1.checked	= false;
-				form.CrsDateCb2.checked	= true;
-		    }
-
-		    form.ChrisLocation2.value	= chrisloc;
-		    if (form.ChrisLocation1.value.length == 0 &&
-				chrisloc.length > 0)
-		    {
-				form.CrsLocCb1.checked	= false;
-				form.CrsLocCb2.checked	= true;
-		    }
-
-		    form.DeathDate2.value	= deathd;
-		    if (form.DeathDate1.value.length == 0 &&
-				deathd.length > 0)
-		    {
-				form.DthDateCb1.checked	= false;
-				form.DthDateCb2.checked	= true;
-		    }
-
-		    form.DeathLocation2.value	= deathloc;
-		    if (form.DeathLocation1.value.length == 0 &&
-				deathloc.length > 0)
-		    {
-				form.DthLocCb1.checked	= false;
-				form.DthLocCb2.checked	= true;
-		    }
-
-		    form.BuriedDate2.value	= buriedd;
-		    if (form.BuriedDate1.value.length == 0 &&
-				buriedd.length > 0)
-		    {
-				form.BurDateCb1.checked	= false;
-				form.BurDateCb2.checked	= true;
-		    }
-
-		    form.BuriedLocation2.value	= buriedloc;
-		    if (form.BuriedLocation1.value.length == 0 &&
-				buriedloc.length > 0)
-		    {
-				form.BurLocCb1.checked	= false;
-				form.BurLocCb2.checked	= true;
-		    }
-
-		    // now that we have both individuals, enable submit
-		    form.Submit.disabled	= false;
-		    form.donotmerge.disabled	= false;
-		    form.view2.disabled		= false;
-		    form.Submit.focus();	
-		}		// valid response
-		else
-		    alert("mergeIndivid.js: gotIndiv: root=" + tagToString(root));
-    }
-    else
-    {
-		alert("mergeIndivid.js: gotIndiv: xmlDoc=" + xmlDoc);
-    }
-}		// gotIndiv
-
-/************************************************************************
- *  noIndiv																*
- *																		*
- *  This method is called if there is no individual						*
- *  file.																*
- ************************************************************************/
-function noIndiv()
-{
-    alert("mergeIndivid.js: noIndiv: document not found on server");
-}		// noIndiv
-
-/************************************************************************
- *  radioButton																*
- *																		*
- *  This method is called when the user clicks on a checkbox				*
- *  to choose one of a pair of values.										*
+ *  This method is called when the user clicks on a checkbox			*
+ *  to choose one of a pair of values.									*
  *																		*
  *  Input:																*
- *		this		instance of HtmlInputElement								*
+ *		this	instance of HtmlInputElement							*
  ************************************************************************/
 function radioButton()
 {
@@ -517,4 +331,4 @@ function radioButton()
     }
 
     return true;
-}		// radioButton
+}		// function radioButton

@@ -3,15 +3,16 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  DeathRegQuery.php														*
- *																			*
- *  Display the query dialog for transcriptions of Death registrations.		*
- *																			*
- *  History:																*
- *			2017/10/19		created											*
- *			2018/01/04		remove Template from template file names		*
- *																			*
- *  Copyright &copy; 2018 James A. Cobban									*
+ *  DeathRegQuery.php													*
+ *																		*
+ *  Display the query dialog for transcriptions of Death registrations.	*
+ *																		*
+ *  History:															*
+ *		2017/10/19		created										    *
+ *		2018/01/04		remove Template from template file names	    *
+ *		2019/01/06      use namespace Genealogy                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/Census.inc';
