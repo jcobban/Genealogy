@@ -1,6 +1,0 @@
-updateMarriageXml.php?treename=&IDIRHusb=82449&HusbGivenName=George Hindley&HusbSurname=Core&HusbBirthSD=18500813&HusbOrder=0&HusbMarrSurname=Core&IDIRWife=82451&WifeGivenName=Bethanny&WifeSurname=Gammon&WifeBirthSD=18540814&WifeOrder=0&WifeMarrSurname=Core&MarD=7 Nov 1872&MarLoc=Forest, Lambton, ON, CA&idmr=22803&IDMS=1&MarriedNameRule=1&Notes=&CGiven0=Amos&CIdir0=82460&CIdcr0=61230&CGender0=0&CSurname0=Core&Cbirth0=12 Sep 1875&Cbirthsd0=18750912&Cdeath0=1942&CGiven1=Ann&CIdir1=82462&CIdcr1=61231&CGender1=1&CSurname1=Core&Cbirth1=about 1878&Cbirthsd1=18780000&Cdeath1=&CGiven2=Ellen&CIdir2=89465&CIdcr2=61232&CGender2=1&CSurname2=Core&Cbirth2=3 Jun 1887&Cbirthsd2=18870603&Cdeath2=9 Dec 1968&CGiven3=Frederick&CIdir3=82471&CIdcr3=61239&CGender3=0&CSurname3=Core&Cbirth3=6 Oct 1891&Cbirthsd3=18911006&Cdeath3=
-535 id=0 maxChildOrder=3 cidcr=61230
-535 id=1 maxChildOrder=3 cidcr=61231
-535 id=2 maxChildOrder=3 cidcr=61232
-535 id=3 maxChildOrder=3 cidcr=61239
-663 idir=82471
