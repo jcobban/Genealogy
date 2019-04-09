@@ -459,41 +459,41 @@ $warn	.= "<p>Location.inc: " . __LINE__ . " add '$tempname'</p>\n";
 		if (isset($this->extras['searchname']))
 		    return $this->extras['searchname'];
 
-		$name		= trim($this->row['location']);
-		$searchName	= $name;
-		$part1		= '';
-		$part2		= '';
-		$county		= '';
+		$name		    = trim($this->row['location']);
+		$searchName	    = $name;
+		$part1		    = '';
+		$part2		    = '';
+		$county		    = '';
 		//		  local    county       province        country
-		$geoPattern	= "/^(.*),\s*([^,]+),\s*([^,]+),\s*(\w\w)$/";
-		$results	= array();
-		$res1		= preg_match($geoPattern, $name, $results);
+		$geoPattern	    = "/^(.*),\s*([^,]+),\s*([^,]+),\s*(\w\w)$/";
+		$results	    = array();
+		$res1		    = preg_match($geoPattern, $name, $results);
 		if ($res1)
 		{		// ends with county, province, country
-		    $part1	= trim($results[1]);	// street or lot 
-		    $county	= trim($results[2]);	// county or city name
-		    $province	= $results[3];		// province code
-		    $cc		= $results[4];		// country
+		    $part1	    = trim($results[1]);	// street or lot 
+		    $county	    = trim($results[2]);	// county or city name
+		    $province	= $results[3];		    // province code
+		    $cc		    = $results[4];		    // country
 		    if (strlen($province) > 2)
 		    {
-				$domains	= new DomainSet(array('cc'	=> $cc,
-									      'name'	=> $province));
+				$domains	    = new DomainSet(array('cc'	    => $cc,
+								    	              'name'	=> $province));
 				if ($domains->count() > 0)
 				{
-				    $domain	= $domains->rewind();
+				    $domain	    = $domains->rewind();
 				    $province	= $domain->get('province');
 				}
 				else
-				    $province	= substr($province, 0, 3);
+				    return $searchName;
 		    }
 
 		    // the following is to strip off rural addresses that
 		    // are not supported by Google maps
 		    $res2	= preg_match("/\b(lot|lots|con|cons)\b[^,]*,(.*)$/",
 							     $part1,
-							     $results);
+                                 $results);
 		    $getParms	= array('domain'	=> $cc . $province,
-							'name'		=> $county);
+							    'name'		=> $county);
 		    $counties	= new CountySet($getParms);
 		    if (count($counties) > 0)
 		    {			// $county is a valid county name

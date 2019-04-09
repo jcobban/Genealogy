@@ -44,29 +44,11 @@ foreach ($_GET as $key => $value)
 }			// foreach parameter
 $update     = canUser('edit');
 
-$tempBase	= $document_root . '/templates/';
-$template	= new FtTemplate("${tempBase}page$lang.html");
-$includeSub	= "MonthlyUpdates$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub     = 'MonthlyUpdatesen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
-if (file_exists($tempBase . "TranTab$lang.html"))
-    $trtemplate = new Template("${tempBase}TranTab$lang.html");
-else
-    $trtemplate = new Template("${tempBase}TranTaben.html");
+$template	= new FtTemplate("MonthlyUpdates$lang.html");
+$trtemplate = $template->getTranslate();
 
 // get month names
-$monthTag		= $trtemplate->getElementById('Months');
+$monthTag		= $trtemplate['Months'];
 if ($monthTag)
 {
 	$monthnames	= array('');

@@ -55,301 +55,306 @@ use \Exception;
  *		2018/02/02		use class Template								*
  *		2018/04/28		limit Bulk Mail to matching users				*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    $lang		    	= 'en';
-    $pattern			= '';
-    $authPattern		= '';
-    $mailPattern		= '';
-    $offset			    = 0;
-    $limit			    = 20;
-    $id				    = '';
-    $mainParms			= array();
-    $bccParms			= array('options'	=> 1);
+$lang		    	= 'en';
+$pattern			= '';
+$authPattern		= '';
+$mailPattern		= '';
+$offset			    = 0;
+$limit			    = 20;
+$id				    = '';
+$mainParms			= array();
+$bccParms			= array('options'	=> 1);
 
-    if (isset($_GET))
-    {			// invoked by method=get
-		foreach($_GET as $key => $value)
-		{		// loop through parameters
-		    $fieldLc	= strtolower($key);
-		    switch($fieldLc)
-		    {		// act on specific parameter
-				case 'lang':
-				{		// lang
-				    if (strlen($value) >= 2)
-						$lang			= strtolower(substr($value,0,2));
-				    break;
-				}		// lang
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{		        // loop through parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    $fieldLc	= strtolower($key);
+	    switch($fieldLc)
+	    {		// act on specific parameter
+			case 'lang':
+			{		// lang
+			    if (strlen($value) >= 2)
+					$lang			= strtolower(substr($value,0,2));
+			    break;
+			}		// lang
 
-				case 'pattern':
-				{
-				    if (strlen($value) > 0)
-				    {
-						$pattern		= $value;
-						$mainParms['username']	= $pattern;
-						$bccParms['username']	= $pattern;
-				    }
-				    break;
-				}
-    
-				case 'authpattern':
-				{
-				    if (strlen($value) > 0)
-				    {
-						$authPattern		= $value;
-						$mainParms['auth']	= $authPattern;
-						$bccParms['auth']	= $authPattern;
-				    }
-				    break;
-				}
-    
-				case 'mailpattern':
-				{
-				    if (strlen($value) > 0)
-				    {
-						$mailPattern		= $value;
-						$mainParms['email']	= $mailPattern;
-						$bccParms['email']	= $mailPattern;
-				    }
-				    break;
-				}
-    
-				case 'offset':
-				{
-				    $offset			= (int)$value;
-				    break;
-				}
-    
-				case 'limit':
-				{
-				    $limit			= (int)$value;
-				    break;
-				}
-		    }		// act on specific parameter
-		}		// loop through parameters
-    }			// invoked by method=get
+			case 'pattern':
+			{
+			    if (strlen($value) > 0)
+			    {
+					$pattern		= $value;
+					$mainParms['username']	= $pattern;
+					$bccParms['username']	= $pattern;
+			    }
+			    break;
+			}
 
-    // create the Template instance
-    $tempBase		= $document_root . '/templates/';
-    $template		= new FtTemplate("${tempBase}page$lang.html");
-    $includeSub		= "UsersEdit$lang.html";
-    if (!file_exists($tempBase . $includeSub))
+			case 'authpattern':
+			{
+			    if (strlen($value) > 0)
+			    {
+					$authPattern		= $value;
+					$mainParms['auth']	= $authPattern;
+					$bccParms['auth']	= $authPattern;
+			    }
+			    break;
+			}
+
+			case 'mailpattern':
+			{
+			    if (strlen($value) > 0)
+			    {
+					$mailPattern		= $value;
+					$mainParms['email']	= $mailPattern;
+					$bccParms['email']	= $mailPattern;
+			    }
+			    break;
+			}
+
+			case 'offset':
+			{
+			    $offset			= (int)$value;
+			    break;
+			}
+
+			case 'limit':
+			{
+			    $limit			= (int)$value;
+			    break;
+			}
+	    }		    // act on specific parameter
+	}		        // loop through parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}			        // invoked by method=get
+
+// create the Template instance
+$template		= new FtTemplate("UsersEdit$lang.html");
+
+// if not the administrator do nothing
+if (canUser('all'))
+{		// only the administrator can use this dialog
+	// get the parameters
+	$namePattern		= '/^([A-Za-z_]+)(\d+)$/';
+
+    if (count($_POST) > 0)
     {
-		$language	= new Language(array('code' => $lang));
-		$langName	= $language->get('name');
-		$nativeName	= $language->get('nativename');
-		$sorry  	= $language->getSorry();
-        $warn   	.= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-		$includeSub	= 'UsersEditen.html';
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_POST as $key => $value)
+	{		// loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    // fields for individual users are identified by the
+	    // field name plus the record id number
+	    $rgxResult		= preg_match($namePattern,
+						    	     $key,
+						    	     $matches);
+	    if ($rgxResult == 1)
+	    {
+			$key		= $matches[1];
+			if ($matches[2] != $id)
+			{		// change to id number
+			    if ($user)
+					$user->save(false);
+			    $id		= $matches[2];
+			    $user	= new User(array('id' => $id));
+			}		// get new User record
+	    }
+	    else
+	    {
+			if ($user)
+			{
+			    $user->save(false);
+			    $user	= null;
+			}
+			$id		= '';
+	    }
+
+	    switch(strtolower($key))
+	    {		// act on specific parameter name
+			case 'pattern':
+			{
+			    if (strlen($value) > 0)
+			    {
+					$pattern		= $value;
+					$mainParms['username']	= $pattern;
+					$bccParms['username']	= $pattern;
+			    }
+			    break;
+			}
+
+			case 'authpattern':
+			{
+			    if (strlen($value) > 0)
+			    {
+					$authPattern		= $value;
+					$mainParms['auth']	= $authPattern;
+					$bccParms['auth']	= $authPattern;
+			    }
+			    break;
+			}
+
+			case 'mailpattern':
+			{
+			    if (strlen($value) > 0)
+			    {
+					$mailPattern		= $value;
+					$mainParms['email']	= $mailPattern;
+					$bccParms['email']	= $mailPattern;
+			    }
+			    break;
+			}
+
+			case 'offset':
+			{
+			    $offset			= (int)$value;
+			    break;
+			}
+
+			case 'limit':
+			{
+			    $limit			= (int)$value;
+			    break;
+			}
+
+			case 'user':
+			{			// update to user name
+			    if ($user)
+			    {
+					$user->set('username', $value);
+			    }
+			    break;
+			}			// update to user name
+
+			case 'email':
+			{			// update to email address
+			    if ($user)
+			    {
+					$user->set('email', $value);
+			    }
+			    break;
+			}			// update to email address
+
+			case 'auth':
+			{			// update to auth settings
+			    if ($user)
+			    {
+					$user->set('auth', $value);
+			    }
+			    break;
+			}			// other
+	    }		// act on specific parameter name
+	}		// loop through all parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
     }
-    $template->includeSub($tempBase . $includeSub,
-						  'MAIN');
+	$mainParms['limit']		= $limit;
+	$mainParms['offset']	= $offset;
 
-    // if not the administrator do nothing
-    if (canUser('all'))
-    {		// only the administrator can use this dialog
-		// get the parameters
-		$namePattern		= '/^([A-Za-z_]+)(\d+)$/';
+	$prevoffset		        = $offset - $limit;
+	$nextoffset		        = $offset + $limit;
 
-		foreach($_POST as $key => $value)
-		{		// loop through all parameters
-		    // fields for individual users are identified by the
-		    // field name plus the record id number
-		    $rgxResult		= preg_match($namePattern,
-								     $key,
-								     $matches);
-		    if ($rgxResult == 1)
-		    {
-				$key		= $matches[1];
-				if ($matches[2] != $id)
-				{		// change to id number
-				    if ($user)
-						$user->save(false);
-				    $id		= $matches[2];
-				    $user	= new User(array('id' => $id));
-				}		// get new User record
-		    }
-		    else
-		    {
-				if ($user)
-				{
-				    $user->save(false);
-				    $user	= null;
-				}
-				$id		= '';
-		    }
-
-		    switch(strtolower($key))
-		    {		// act on specific parameter name
-				case 'pattern':
-				{
-				    if (strlen($value) > 0)
-				    {
-						$pattern		= $value;
-						$mainParms['username']	= $pattern;
-						$bccParms['username']	= $pattern;
-				    }
-				    break;
-				}
-    
-				case 'authpattern':
-				{
-				    if (strlen($value) > 0)
-				    {
-						$authPattern		= $value;
-						$mainParms['auth']	= $authPattern;
-						$bccParms['auth']	= $authPattern;
-				    }
-				    break;
-				}
-    
-				case 'mailpattern':
-				{
-				    if (strlen($value) > 0)
-				    {
-						$mailPattern		= $value;
-						$mainParms['email']	= $mailPattern;
-						$bccParms['email']	= $mailPattern;
-				    }
-				    break;
-				}
-    
-				case 'offset':
-				{
-				    $offset			= (int)$value;
-				    break;
-				}
-    
-				case 'limit':
-				{
-				    $limit			= (int)$value;
-				    break;
-				}
-
-				case 'user':
-				{			// update to user name
-				    if ($user)
-				    {
-						$user->set('username', $value);
-				    }
-				    break;
-				}			// update to user name
-
-				case 'email':
-				{			// update to email address
-				    if ($user)
-				    {
-						$user->set('email', $value);
-				    }
-				    break;
-				}			// update to email address
-
-				case 'auth':
-				{			// update to auth settings
-				    if ($user)
-				    {
-						$user->set('auth', $value);
-				    }
-				    break;
-				}			// other
-		    }		// act on specific parameter name
-		}		// loop through all parameters
-		$mainParms['limit']		= $limit;
-		$mainParms['offset']	= $offset;
-
-		$prevoffset		    = $offset - $limit;
-		$nextoffset		    = $offset + $limit;
-    
-		// construct the blind carbon copy (BCC) list for bulk mailing
-		$users			    = new RecordSet('Users', $bccParms);
+	// construct the blind carbon copy (BCC) list for bulk mailing
+	$users			    = new RecordSet('Users', $bccParms);
    
-		$bcclist		    = '';
-		$tolist			    = '';
-		foreach($users as $id => $user)
-		{		// assemble bulk mailing list
-		    $email		    = $user->get('email');
-		    $auth		    = $user->get('auth');
+	$bcclist		    = '';
+	$tolist			    = '';
+	foreach($users as $id => $user)
+	{		// assemble bulk mailing list
+	    $email		    = $user->get('email');
+	    $auth		    = $user->get('auth');
 
-		    // administrators are listed in the to: attribute of the message
-		    // clients are listed in the bcc: attribute of the message
-		    $pos	        = strpos($auth, 'yes');
-		    // stupid return value from PHP's strpos function
-		    if ($pos === false)
-		    {		// contributor
-				if (strlen($bcclist) > 0)
-				    $bcclist	.= ',';
-				$bcclist	.= $email;
-		    }		// contributor
-		    else
-		    {		// administrator
-				if (strlen($tolist) > 0)
-				    $tolist	.= ',';
-				$tolist		.= "Family Tree Mailing List <$email>";
-		    }		// administrator
-		}		// assemble bulk mailing list
-    
-		// then query the database for matches to the request
-		$users		= new RecordSet('Users', $mainParms);
-		$readonly	= $users->count() > 10;
-		$info		= $users->getInformation();
-		$count		= $info['count'];
-		$rowtype	= 'odd';
-		foreach($users as $id => $user)
-		{		// assemble bulk mailing list
-		    $user->set('rowtype', $rowtype);
-		    if ($rowtype == 'odd')
-				$rowtype	= 'even';
-		    else
-				$rowtype	= 'odd';
-		}		// assemble bulk mailing list
+	    // administrators are listed in the to: attribute of the message
+	    // clients are listed in the bcc: attribute of the message
+	    $pos	        = strpos($auth, 'yes');
+	    // stupid return value from PHP's strpos function
+	    if ($pos === false)
+	    {		// contributor
+			if (strlen($bcclist) > 0)
+			    $bcclist	.= ',';
+			$bcclist	.= $email;
+	    }		// contributor
+	    else
+	    {		// administrator
+			if (strlen($tolist) > 0)
+			    $tolist	.= ',';
+			$tolist		.= "Family Tree Mailing List <$email>";
+	    }		// administrator
+	}		// assemble bulk mailing list
 
-		$template->set('BCCLIST', $bcclist);
-		$template->set('TOLIST', $tolist);
-		$template->set('PATTERN', $pattern);
-		$template->set('AUTHPATTERN', $authPattern);
-		$template->set('MAILPATTERN', $mailPattern);
-		$template->set('OFFSET', $offset);
-		$template->set('LAST', min($offset + $limit, $count));
-		$template->set('COUNT', $count);
+	// then query the database for matches to the request
+	$users		= new RecordSet('Users', $mainParms);
+	$readonly	= $users->count() > 10;
+	$info		= $users->getInformation();
+	$count		= $info['count'];
+	$rowtype	= 'odd';
+	foreach($users as $id => $user)
+	{		// assemble bulk mailing list
+	    $user->set('rowtype', $rowtype);
+	    if ($rowtype == 'odd')
+			$rowtype	= 'even';
+	    else
+			$rowtype	= 'odd';
+	}		// assemble bulk mailing list
 
-		$template->updateTag('notadmin', null);
-		if ($offset - $limit > 0)
-		    $template->updateTag('prevLink',
-						         array('pattern'	=> $pattern,
-							       'authpattern'	=> $authPattern,
-							       'mailpattern'	=> $mailPattern,
-							       'prevoffset'	=> $offset - $limit,
-							       'limit'		=> $limit));
-		else
-		    $template->updateTag('prevLink', null);
-		if ($offset + $limit < $count)
-		{
-		    $template->updateTag('nextLink',
-						         array('pattern'	=> $pattern,
-							       'authpattern'	=> $authPattern,
-							       'mailpattern'	=> $mailPattern,
-							       'nextoffset'	=> $offset + $limit,
-							       'limit'		=> $limit));
-		}
-		else
-		    $template->updateTag('nextLink', null);
+	$template->set('BCCLIST', $bcclist);
+	$template->set('TOLIST', $tolist);
+	$template->set('PATTERN', $pattern);
+	$template->set('AUTHPATTERN', $authPattern);
+	$template->set('MAILPATTERN', $mailPattern);
+	$template->set('OFFSET', $offset);
+	$template->set('LAST', min($offset + $limit, $count));
+	$template->set('COUNT', $count);
 
-        // display matching users
-        $template->updateTag('Row$id',
-						     $users);
-    }		// only administrator can use this dialog
-    else
-    {		// not administrator
-		$template->updateTag('locForm', null);
-		$template->updateTag('userCount', null);
-    }		// not administrator
+	$template->updateTag('notadmin', null);
+	if ($offset - $limit > 0)
+	    $template->updateTag('prevLink',
+					         array('pattern'	=> $pattern,
+						       'authpattern'	=> $authPattern,
+						       'mailpattern'	=> $mailPattern,
+						       'prevoffset'	=> $offset - $limit,
+						       'limit'		=> $limit));
+	else
+	    $template->updateTag('prevLink', null);
+	if ($offset + $limit < $count)
+	{
+	    $template->updateTag('nextLink',
+					         array('pattern'	=> $pattern,
+						       'authpattern'	=> $authPattern,
+						       'mailpattern'	=> $mailPattern,
+						       'nextoffset'	=> $offset + $limit,
+						       'limit'		=> $limit));
+	}
+	else
+	    $template->updateTag('nextLink', null);
 
-    $template->display();
+    // display matching users
+    $template->updateTag('Row$id',
+					     $users);
+}		// only administrator can use this dialog
+else
+{		// not administrator
+	$template->updateTag('locForm', null);
+	$template->updateTag('userCount', null);
+}		// not administrator
+
+$template->display();

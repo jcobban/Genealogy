@@ -564,10 +564,6 @@ pageBot();
 			<?php print $nextDistName; ?>
 </p>
   </div>
-<div class='balloon' id='HelprightTop'>
-Click on this button to signon to access extended features of the web-site
-or to manage your account with the web-site.
-</div>
 <div class='balloon' id='HelpEdit'>
 Click on this button to view detailed information about the page by page
 status of the transcription for this division.

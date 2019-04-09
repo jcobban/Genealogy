@@ -5,7 +5,7 @@
     <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=UTF-8">
     <meta http-equiv='Default-Style' content='text/css'>
     <meta name='author' content='James A. Cobban'>
-    <meta name='copyright' content='&copy; 2018 James A. Cobban'>
+    <meta name='copyright' content='&copy; 2019 James A. Cobban'>
 <!--*********************************************************************
  *  genCanMilitary.html													*
  *																		*
@@ -24,11 +24,12 @@
  *		2015/04/06		top level page changed to genealogy.php			*
  *		2015/05/11		use contactAuthor.php to contact administrator	*
  *      2018/11/18      correct obsolete links                          *
+ *      2019/02/05      changes required by redesign of displayPage.php *
  **********************************************************************-->
     <link rel='stylesheet' type='text/css' href='/styles.css'/>
   </head>
   <body LANG='en-US' DIR='LTR'>
-    <div class='topcrumbs'>
+    <div class='topcrumbs' id="breadcrumbs">
       <a href='/genealogy.php?lang=en'>Genealogy</a>:
       <a href='/genCountry.php?cc=CA&lang=en'>Canada</a>: 
     </div> 
@@ -61,21 +62,9 @@
     	Commonwealth War Graves Commission: Debt of Honour Register</a> 
       </p>
     </div>
-    <div class='botcrumbs'>
-      <span class='right450'>
-        <iframe id='facebookFrame' scrolling='no' frameborder='0' style='border:none; overflow:hidden; width:360px; height:80px;display:inline;' allowTransparency='true'></iframe>
-    	<img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
-      </span>
-      <a href='/contactAuthor.php?subject=Canada:Military Web Sites'
-    	target='_blank'>Contact Author</a>
-      <br/>
-      <a href='/genealogy.php?lang=en'>Genealogy</a>:
-      <a href='/genCountry.php?cc=CA&lang=en'>Canada</a>: 
-      <div style='clear: both;'></div> 
-    </div> 
-    <div class='balloon' id='HelprightTop'>
-      Click on this button to signon to access extended features of the web-site
-      or to manage your account with the web-site.
-    </div>
+    <script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+    <script src="/jscripts/default.js" type="application/javaScript">
+    </script>
   </body>
 </html>

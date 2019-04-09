@@ -22,8 +22,9 @@
  *		2015/06/02		invoked from ReqUpdateSubDists.php				*
  *		2016/09/27		check for presence of arg before using			*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 // define the function to be called when the page is loaded
@@ -42,9 +43,6 @@ var provinceNames	= [];
  ************************************************************************/
 function loadDistricts()
 {
-    // perform common page initialization
-    pageInit();
-
     // load names of provinces
     var	divs	= document.getElementsByTagName('div');
     for(var di = 0; di < divs.length; di++)
@@ -67,9 +65,6 @@ function loadDistricts()
 		{
 		    var element	= form.elements[j];
 
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 		    element.onkeydown	= keyDown;
 		    var	name	= element.name;
 		    if (!name || name.length == 0)

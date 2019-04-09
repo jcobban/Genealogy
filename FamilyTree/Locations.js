@@ -9,21 +9,24 @@
  *						support mouseover help							*
  *		2012/01/13		change class names								*
  *		2013/05/18		add name field to permit direct creation of		*
- *						locations										*
+ *						function locations								*
  *		2013/05/29		use actMouseOverHelp common function			*
  *		2013/08/01		defer facebook initialization until after load	*
  *		2014/10/12		use method show to display popups				*
  *		2015/07/06		add button to close the dialog					*
  *		2016/04/05		add button to create new location				*
  *		2017/09/09		renamed to Locations.js							*
+ *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/04/07      ensure that the paging lines can be displayed   *
+ *		                within the visible portion of the browser.      *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onloadLocations;
 
 /************************************************************************
- *  childFrameClass														*
+ *  function childFrameClass											*
  *																		*
  *  If this dialog is opened in a half window then any child dialogs	*
  *  are opened in the other half of the window.							*
@@ -31,14 +34,12 @@ window.onload	= onloadLocations;
 var childFrameClass	= 'right';
 
 /************************************************************************
- *  onLoadLocations														*
+ *  function onLoadLocations											*
  *																		*
  *  Initialize dynamic functionality of page.							*
  ************************************************************************/
 function onloadLocations()
 {
-    pageInit();
-
     // determine in which half of the window child frames are opened
     if (window.frameElement)
     {				// dialog opened in half frame
@@ -64,10 +65,6 @@ function onloadLocations()
 		for(var j = 0; j < form.elements.length; j++)
 		{	// loop through all elements
 		    var element	= form.elements[j];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    // take action depending upon the element name
 		    var	name;
@@ -124,22 +121,33 @@ function onloadLocations()
     }	        	// iterate through all forms
 
     // add mouseover actions for forward and backward links
-    var npprev	= document.getElementById('npprev');
+    var npprev	= document.getElementById('topPrev');
     if (npprev)
     {		// defined
 		npprev.onmouseover	= linkMouseOver;
 		npprev.onmouseout	= linkMouseOut;
     }		// defined
-    var npnext	= document.getElementById('npnext');
+    var npnext	= document.getElementById('topNext');
     if (npnext)
     {		// defined
 		npnext.onmouseover	= linkMouseOver;
 		npnext.onmouseout	= linkMouseOut;
     }		// defined
-}		// onLoadDeath
+
+    var dataTable               = document.getElementById('dataTable');
+    var dataWidth               = dataTable.offsetWidth;
+    var windowWidth             = document.body.clientWidth - 8;
+    if (dataWidth > windowWidth)
+        dataWidth               = windowWidth;
+    var topBrowse               = document.getElementById('topBrowse');
+    topBrowse.style.width       = dataWidth + "px";
+    var botBrowse               = document.getElementById('botBrowse');
+    if (botBrowse)
+        botBrowse.style.width   = dataWidth + "px";
+}		// onLoadLocations
 
 /************************************************************************
- *  validateForm														*
+ *  function validateForm												*
  *																		*
  *  Ensure that the data entered by the user has been minimally			*
  *  validated before submitting the form.								*
@@ -150,7 +158,7 @@ function validateForm()
 }		// validateForm
 
 /************************************************************************
- *  resetForm															*
+ *  function resetForm													*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
@@ -161,7 +169,7 @@ function resetForm()
 }	// resetForm
 
 /************************************************************************
- *  patternChanged														*
+ *  function patternChanged												*
  *																		*
  *  Take action when the value of the pattern field changes.  This		*
  *  specifically means that changes have been made and the focus has	*
@@ -186,7 +194,7 @@ function patternChanged()
 }		// patternChanged
 
 /************************************************************************
- *  nameChanged															*
+ *  function nameChanged													*
  *																		*
  *  Take action when the value of the name field changes.  This			*
  *  specifically means that changes have been made and the focus has	*
@@ -213,7 +221,7 @@ function nameChanged()
 }		// nameChanged
 
 /************************************************************************
- *  search																*
+ *  function search														*
  *																		*
  *  Take action to either submit the form or pop up a dialog to create	*
  *  or edit a specific location.										*
@@ -235,7 +243,7 @@ function search()
 }		// search
 
 /************************************************************************
- *  closeDialog															*
+ *  function closeDialog													*
  *																		*
  *  Take action to close the dialog.									*
  *																		*
@@ -248,7 +256,7 @@ function closeDialog()
 }		// closeDialog
 
 /************************************************************************
- *  newLocation															*
+ *  function newLocation													*
  *																		*
  *  Create a new location using the pattern or name						*
  *																		*
@@ -270,7 +278,7 @@ function newLocation()
 }		// newLocation
 
 /************************************************************************
- *  linkMouseOver														*
+ *  function linkMouseOver												*
  *																		*
  *  This function is called if the mouse moves over a forward or		*
  *  backward hyperlink on the invoking page.							*
@@ -298,7 +306,7 @@ function linkMouseOver()
 }		// linkMouseOver
 
 /************************************************************************
- *  linkMouseOut														*
+ *  function linkMouseOut												*
  *																		*
  *  This function is called if the mouse moves off a forward or			*
  *  backward hyperlink on the invoking page.							*

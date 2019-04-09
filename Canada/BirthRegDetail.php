@@ -134,8 +134,9 @@ use \Exception;
  *						adjust length of remarks and image fields		*
  *						to match width of rest of form					*
  *		2018/10/03      use class Template                              *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/County.inc';
@@ -190,11 +191,6 @@ foreach($_GET as $key => $value)
 	    case 'regyear':
 	    {
 			$regYear	= $value;
-			if (preg_match("/^([0-9]{4})$/", $regYear) == 0 ||
-			    ($regYear < 1860) || ($regYear > 2020))
-			{
-			    $msg	.= "Registration Year $regYear must be a number between 1860 and 2020. ";
-			}
 			break;
 	    }		// RegYear passed
 
@@ -272,12 +268,23 @@ foreach($_GET as $key => $value)
 			$warn	.= "Unexpected parameter $key='$value'. ";
 			break;
 	    }		// any other paramters
-	}		// process specific named parameters
-}			// loop through all input parameters
+	}		    // process specific named parameters
+}			    // loop through all input parameters
 
+// start the template
+$template		= new FtTemplate("BirthRegDetail$action$lang.html");
+$trtemplate         = $template->getTranslate();
+
+// validate parameters
 if ($regYear == '')
 {
 	$msg		.= "RegYear omitted. ";
+}
+else
+if (preg_match("/^([0-9]{4})$/", $regYear) == 0 ||
+    ($regYear < 1860) || ($regYear > 2020))
+{
+    $msg	.= "Registration Year $regYear must be a number between 1860 and 2020. ";
 }
 
 if ($regNum == '' && $volume == '')
@@ -294,28 +301,6 @@ if ($volume != '' && $page != '' && $item != '')
 }
 else
     $paddedRegNum	= str_pad($regNum,7,"0",STR_PAD_LEFT);
-
-// start the template
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "BirthRegDetail$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	= new Language(array('code' => $lang));
-	$langName	= $language->get('name');
-	$nativeName	= $language->get('nativename');
-    $sorry  	= $language->getSorry();
-    $warn   	.= str_replace(array('$langName','$nativeName'),
-                               array($langName, $nativeName),
-                               $sorry);
-	$includeSub	= "BirthRegDetail" . $action . "en.html";
-}
-$template->includeSub($tempBase . $includeSub,
-		    		  'MAIN');
-if (file_exists($tempBase . "Trantab$lang.html"))
-    $trtemplate = new Template("${tempBase}Trantab$lang.html");
-else
-    $trtemplate = new Template("${tempBase}Trantaben.html");
 
 // pass parameters to template
 $template->set('regYear',		$regYear);

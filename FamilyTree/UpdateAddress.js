@@ -1,30 +1,29 @@
 /************************************************************************
- *  UpdateAddress.js							*
- *									*
- *  Javascript code to implement dynamic functionality of the		*
- *  page UpdateAddress.php.						*
- *									*
- *  History:								*
- *	2015/05/27	created
- *									*
- *  Copyright &copy; 2015 James A. Cobban				*
+ *  UpdateAddress.js													*
+ *																		*
+ *  Javascript code to implement dynamic functionality of the			*
+ *  page UpdateAddress.php.												*
+ *																		*
+ *  History:															*
+ *	    2015/05/27	    created                                         *
+ *		2019/02/10      no longer need to call pageInit                 *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
- *  Specify the function to get control once the page is loaded.	*
+ *  Specify the function to get control once the page is loaded.		*
  ************************************************************************/
 window.onload	= onLoadAddress;
 
 /************************************************************************
- *  onLoadAddress							*
- *									*
- *  Function invoked once the web page is loaded into the browser.	*
- *  Initialize dynamic functionality of elements.			*
+ *  function onLoadAddress												*
+ *																		*
+ *  Function invoked once the web page is loaded into the browser.		*
+ *  Initialize dynamic functionality of elements.						*
  ************************************************************************/
 function onLoadAddress()
 {
-    pageInit();
-
     var	form			= document.locForm;
     var formName		= '';
     var msglengths		= 0;
@@ -45,10 +44,6 @@ function onLoadAddress()
     for (var i = 0; i < formElts.length; ++i)
     {
 	var element	= formElts[i];
-
-	// pop up help balloon if the mouse hovers over a field
-	// for more than 2 seconds
-	actMouseOverHelp(element);
 
 	var	name;
 	if (element.name && element.name.length > 0)
@@ -99,13 +94,13 @@ function onLoadAddress()
 }		// function onLoadAddress
 
 /************************************************************************
- *  ignoreSubmit							*
- *									*
- *  Ensure that the data entered by the user has been minimally		*
- *  validated before submitting the form.				*
- *									*
- *  Input:								*
- *	this	instance of <form>					*
+ *  function ignoreSubmit												*
+ *																		*
+ *  Ensure that the data entered by the user has been minimally				*
+ *  validated before submitting the form.								*
+ *																		*
+ *  Input:																*
+ *		this		instance of <form>										*
  ************************************************************************/
 function ignoreSubmit()
 {
@@ -114,12 +109,12 @@ function ignoreSubmit()
 }		// function validateForm
 
 /************************************************************************
- *  closeDialog								*
- *									*
- *  This method closes the frame without updating the record.		*
- *									*
- *  Input:								*
- *	this	instance of <button id='Close'>				*
+ *  function closeDialog												*
+ *																		*
+ *  This method closes the frame without updating the record.			*
+ *																		*
+ *  Input:																*
+ *		this		instance of <button id='Close'>								*
  ************************************************************************/
 function closeDialog()
 {

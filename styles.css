@@ -112,8 +112,11 @@
  *        2017/12/08    remove rounded corners from select and option   *
  *        2018/05/22    change "grey" from #404040 to #606060           *
  *        2018/11/30    remove obsolete composite styles                *
+ *        2019/01/30    add style div.menu for popup menu               *
+ *        2019/03/02    add .left, .center, .right                      *
+ *                      remove div.right450                             *
  *                                                                      *
- *  Copyright &copy; 2018 James A. Cobban                               *
+ *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
 
    /*********************************************************************
@@ -153,6 +156,22 @@
                 }
 
    /*********************************************************************
+    *    styles for position                                            *
+    *********************************************************************/
+    .left {
+                float:              left;
+                padding:            0px 4px 0px 4px;
+                }
+    .center {
+                float:              center;
+                padding:            0px 4px 0px 4px;
+                }
+    .right {
+                float:              right;
+                padding:            0px 4px 0px 4px;
+                }
+
+   /*********************************************************************
     *   Styles for displaying <body> tags                               *
     *   Also see div class='body' the <main> section of a standard page *
     *********************************************************************/
@@ -185,7 +204,7 @@
     iframe.advert {     /* container for advertisements */
                 border:             none;
                 overflow:           hidden; 
-                width:              370px; 
+                width:              500px; 
                 height:             85px;
                 display:            inline;
                 float:              left;
@@ -287,6 +306,23 @@
                 border-left:        thick solid #402000;
                 border-bottom:      thick solid #A05000;
                 border-right:       thick solid #A05000;
+                }
+
+   /*********************************************************************
+    *   div class='menu' intended to hold a menu of actions.            *
+    *********************************************************************/
+    div.menu {
+                display:            none;
+                background-color:   #FFFFFF;
+                margin:             0px;
+                padding-top:        4px;
+                padding-left:       4px;
+                padding-bottom:     4px;
+                padding-right:      8px;
+                border-top:         thin solid #A05000;
+                border-left:        thin solid #A05000;
+                border-bottom:      thin solid #402000;
+                border-right:       thin solid #402000;
                 }
 
    /*********************************************************************
@@ -405,11 +441,21 @@
     div.advert {
                 background-color:   white;
                 font-family:        sans-serif;
-                width:              350px;
+                width:              490px;
                 height:             auto;
                 font-size:          180%;
                 font-weight:        bold;
                 border:             5px solid red
+                }
+
+   /*********************************************************************
+    *   styles for displaying a menu icon                               *
+    *********************************************************************/
+    div.menuicon {
+                width: 35px;
+                height: 5px;
+                background-color: black;
+                margin: 6px 0;
                 }
 
    /*********************************************************************
@@ -744,14 +790,9 @@
                 width:              100px;
                 padding:            0px 4px 0px 4px;
                 }
-    span.right450 {
+    span.rightAdvert {
                 float:              right;
-                width:              450px;
-                padding:            0px 4px 0px 4px;
-                }
-    span.right368 {
-                float:              right;
-                width:              368px;
+                width:              500px;
                 padding:            0px 4px 0px 4px;
                 }
     span.pad {  padding:            4px;
@@ -964,6 +1005,12 @@
                 padding-left:		4px;
                 padding-right:		4px;
                 }
+    td.data {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                background-color:   white;
+                padding:            0px 0px 0px 0px;
+                }
     td.dataleft {
                 font-family:        sans-serif;
                 font-weight:        bold;
@@ -986,10 +1033,13 @@
                 font-weight:        bold;
                 }
     td.left {   text-align:         left;
+                float:              none;
                 }
     td.center { text-align:         center;
+                float:              none;
                 }
     td.right {  text-align:         right;
+                float:              none;
                 }
     td.total {
                 border-top:         4px double black;
@@ -1089,21 +1139,21 @@
                 padding:            2px 2px 2px 2px;
                 empty-cells:		show;
                 }
-    td.even {    font-family:        sans-serif;
+    td.even {   font-family:        sans-serif;
                 background-color:   #E0E0E0;
                 border-right:       thin solid black;
                 border-bottom:      thin solid black;
                 padding:            2px 2px 2px 2px;
                 empty-cells:		show;
                 }
-    td.cell {    font-family:        sans-serif;
-                border-width:              0px;
+    td.cell {   font-family:        sans-serif;
+                border-width:       0px;
                 padding:            0px;
                 empty-cells:		show;
                 }
     td.underline {
                 font-family:        sans-serif;
-                border-width:              0px;
+                border-width:       0px;
                 padding:            0px;
                 empty-cells:		show;
                 border-bottom:      medium solid black;
@@ -1155,7 +1205,7 @@
     legend.label {
                 font-family:        sans-serif;
                 font-weight:        bold;
-                text-align:         right;
+                text-align:         left;
                 vertical-align:		top;
                 padding:            0px 3px 0px 3px;
                 margin-top:		    1px;
@@ -1164,7 +1214,7 @@
                 font-family:        sans-serif;
                 font-weight:        bold;
                 font-size:          smaller;
-                text-align:         right;
+                text-align:         left;
                 vertical-align:		top;
                 padding:            0px 3px 0px 3px;
                 margin-top:		    1px;
@@ -1201,6 +1251,7 @@
     input.center {
                 font-family:        sans-serif;
                 text-align:         center;
+                float:              left;
                 text-transform:		capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
@@ -1211,6 +1262,7 @@
     input.centernc {
                 font-family:        sans-serif;
                 text-align:         center;
+                float:              left;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1220,6 +1272,7 @@
     input.right {
                 font-family:        sans-serif;
                 text-align:         right;
+                float:              left;
                 text-transform:		capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
@@ -1230,6 +1283,7 @@
     input.rightnc {
                 font-family:        sans-serif;
                 text-align:         right;
+                float:              left;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1239,6 +1293,7 @@
     input.rightfixed {
                 font-family:        fixed sans-serif;
                 text-align:         right;
+                float:              left;
                 background-color:   white;
                 text-transform:		capitalize;
                 font-weight:        bold;
@@ -1251,6 +1306,7 @@
     input.male {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 background-color:   white;
                 color:              blue;
                 text-transform:		capitalize;
@@ -1263,6 +1319,7 @@
     input.female {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 background-color:   white;
                 color:              red;
                 text-transform:		capitalize;
@@ -1275,6 +1332,7 @@
     input.unknown {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 background-color:   white;
                 color:              green;
                 text-transform:		capitalize;
@@ -1290,17 +1348,20 @@
                 font-size:          larger;
                 font-weight:        bold;
                 text-align:         center;
+                float:              left;
                 }
     input.inalabelSelected {
                 color:              #F0F0F0;	/* bright gray */
                 font-family:        sans-serif;
                 font-size:          larger;
                 text-align:         center;
+                float:              left;
                 font-weight:        bold;
                 }
     input.inaleftSelected {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 color:              #F0F0F0;	/* bright gray */
                 text-transform:		capitalize;
                 padding:            0px;
@@ -1312,6 +1373,7 @@
     input.inaleftncSelected {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 color:              #F0F0F0;	/* bright gray */
                 padding:            0px;
                 border-top:         1px solid black;
@@ -1322,6 +1384,7 @@
     input.inacenterSelected {
                 font-family:        sans-serif;
                 text-align:         center;
+                float:              left;
                 color:              #F0F0F0;	/* bright gray */
                 text-transform:		capitalize;
                 padding:            0px;
@@ -1333,6 +1396,7 @@
     input.inacenterncSelected {
                 font-family:        sans-serif;
                 text-align:         center;
+                float:              left;
                 color:              #F0F0F0;	/* bright gray */
                 padding:            0px;
                 border-top:         1px solid black;
@@ -1343,6 +1407,7 @@
     input.inarightSelected {
                 font-family:        sans-serif;
                 text-align:         right;
+                float:              left;
                 color:              #F0F0F0;	/* bright gray */
                 text-transform:		capitalize;
                 padding:            0px;
@@ -1354,6 +1419,7 @@
     input.inarightncSelected {
                 font-family:        sans-serif;
                 text-align:         right;
+                float:              left;
                 color:              #F0F0F0;	/* bright gray */
                 padding:            0px;
                 border-top:         1px solid black;
@@ -1375,6 +1441,7 @@
     input.actleftncSelected {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 color:              white;
                 padding:            0px;
                 border-top:         1px solid black;
@@ -1385,6 +1452,7 @@
     input.actcenterSelected {
                 font-family:        sans-serif;
                 text-align:         center;
+                float:              left;
                 color:              white;
                 text-transform:		capitalize;
                 padding:            0px;
@@ -1396,6 +1464,7 @@
     input.actcenterncSelected {
                 font-family:        sans-serif;
                 text-align:         center;
+                float:              left;
                 color:              white;
                 padding:            0px;
                 border-top:         1px solid black;
@@ -1406,6 +1475,7 @@
     input.actrightSelected {
                 font-family:        sans-serif;
                 text-align:         right;
+                float:              left;
                 color:              white;
                 text-transform:		capitalize;
                 padding:            0px;
@@ -1417,6 +1487,7 @@
     input.actrightfixedSelected {
                 font-family:        fixed serif;
                 text-align:         right;
+                float:              left;
                 color:              white;
                 text-transform:		capitalize;
                 padding:            0px;
@@ -1428,6 +1499,7 @@
     input.actrightncSelected {
                 font-family:        sans-serif;
                 text-align:         right;
+                float:              left;
                 color:              white;
                 padding:            0px;
                 border-top:         1px solid black;
@@ -1439,6 +1511,7 @@
                 font-family:        Lucida Console, Courier;
                 font-weight:        bold;
                 text-align:         left;
+                float:              left;
                 text-transform:		capitalize;
                 padding:            0px;
                 padding-left:		2px;
@@ -1452,6 +1525,7 @@
                 font-family:        Lucida Console, Courier;
                 font-weight:        bold;
                 text-align:         left;
+                float:              left;
                 padding:            0px;
                 padding-left:		2px;
                 padding-right:		2px;
@@ -1463,6 +1537,7 @@
     input.dftleft {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 background-color:   white;
                 color:              #606060;
                 text-transform:		capitalize;
@@ -1475,6 +1550,7 @@
     input.dftright {
                 font-family:        sans-serif;
                 text-align:         right;
+                float:              left;
                 background-color:   white;
                 color:              #606060;
                 text-transform:		capitalize;
@@ -1487,6 +1563,7 @@
     input.dftleftnc {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 background-color:   white;
                 color:              #606060;
                 padding:            0px;
@@ -1498,6 +1575,7 @@
     input.dftrightnc {
                 font-family:        sans-serif;
                 text-align:         right;
+                float:              left;
                 background-color:   white;
                 color:              #606060;
                 padding:            0px;
@@ -1509,6 +1587,7 @@
     input.hyperlink {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 text-decoration:    underline;
                 background-color:   white;
                 color:              blue;
@@ -1548,6 +1627,7 @@
     option {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 padding:            0px;
                 -moz-border-radius: 0px;
                 -webkit-border-radius: 0px;
@@ -1556,11 +1636,13 @@
     option.left {
                 font-family:        sans-serif;
                 text-align:         left;
+                float:              left;
                 padding:            0px;
                 }
     option.right {
                 font-family:        sans-serif;
                 text-align:         right;
+                float:              left;
                 padding:            0px;
                 }
 

@@ -83,12 +83,6 @@ define ('BAD_NUMBER',	8);
 define ('MISS_YEAR',	16);
 define ('MISS_NUMBER',	32);
 
-// expand only if authorized
-if (!canUser('edit'))
-{				// not authorized
-	$msg	.= 'You are not authorized to update birth registrations. ';
-}				// not authorized
-
 // default values
 $cc				        = 'CA';
 $countryName            = 'Canada';
@@ -196,6 +190,12 @@ if (is_null($regYear))
 if (is_null($regNum))
 	$msg	.= 'Registration number not specified. ';
 
+// expand only if authorized
+if (!canUser('edit'))
+{				// not authorized
+	$msg	.= 'You are not authorized to update birth registrations. ';
+}				// not authorized
+
 if (strlen($msg) == 0)
 {						// no errors
 	$death		= new Death(array('domain'  => $domain,
@@ -298,10 +298,11 @@ if (strlen($msg) == 0)
 			$deathCause	    = $death->get('cause');
 			$deathDur	    = $death->get('duration');
 			if ($debug)
-			    $warn	.= "Update death date of " . $person->getName() .
+                $warn	.= "<p>DeathRegUpdate.php: ". __LINE__ . 
+                            " Update death date of " . $person->getName() .
 						   " to " .  $deathDate->toString() .
 						   " at " . $deathLocation . 
-						   " with cause " . $deathCause . ". ";
+						   " with cause " . $deathCause . "</p>";
 
 			// if the death date currently recorded for the individual
 			// is not set, or is only an approximation, set it to
@@ -329,7 +330,8 @@ if (strlen($msg) == 0)
 			    $person->save(false);
 			}		// death cause not set
 	    } catch (Exception $e) {
-			$warn		.= $e->getMessage() . ". ";
+            $warn	.= "<p>DeathRegUpdate.php: ". __LINE__ . ' ' .
+			            $e->getMessage() . "</p>\n";
 			$idir		= 0;	// IDIR was invalid
 	    }				// catch
 
@@ -357,29 +359,14 @@ if (strlen($msg) == 0)
 // Identify next registration to update
 $nextRegNum		= intval($regNum) + 1;
 
-if (strlen($msg) == 0 && strlen($warn) == 0)
+if (strlen($msg) == 0 && strlen($warn) == 0 && !headers_sent())
 {				// redirect immediately to next registration
 	header("Location: DeathRegDetail.php?RegDomain=$domain&RegYear=$regYear&RegNum=$nextRegNum&lang=$lang"); 
     exit;
 }				// redirect immediately to next registration
 
 // display page
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "DeathRegUpdate$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	    = new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-    $sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = "DeathRegUpdateen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-			    	  'MAIN');
+$template		= new FtTemplate("DeathRegUpdate$lang.html");
 
 if ($errors & NOT_AUTH)
 {
@@ -431,6 +418,7 @@ $template->set('REGYEAR',		$regYear);
 $template->set('REGNUM',		$regNum);
 $template->set('PADDEDREGNUM',	$paddedRegNum);
 $template->set('NEXTNUM',		$nextNum);
+$template->set('NEXTREGNUM',	$nextNum);
 $template->set('DOMAIN',		$domain);
 $template->set('CC',		    $cc);
 $template->set('LANG',	        $lang);

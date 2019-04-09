@@ -10,7 +10,7 @@
  *		2011/01/22		improve separation of HTML and Javascript		*
  *		2011/06/02		handle IE										*
  *		2012/05/06		replace calls to getEltId with calls to			*
- *						getElementById									*
+ *						function getElementById							*
  *		2012/09/21		pass census id to CensusUpdateStatus.php		*
  *		2013/05/07		use common scripts for all censuses				*
  *		2013/06/11		onchange methods must be invoked as methods		*
@@ -19,35 +19,33 @@
  *		2014/09/12		remove use of obsolete selectOptByValue			*
  *		2014/10/14		indices of args array are now lower case		*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
     window.onload	= loadDistricts;
 
 /************************************************************************
- *  the census identifier consisting of a 2 character domain identifier		*
- *  and the year of the census												*
+ *  the census identifier consisting of a 2 character domain identifier	*
+ *  and the year of the census											*
  ************************************************************************/
     var	census		= null;
 
 /************************************************************************
- *  loadDistricts														*
+ *  function loadDistricts												*
  *																		*
- *  The onload method of the Census Request web page.						*
- *  Request a list of districts in the census as an XML file.				*
+ *  The onload method of the Census Request web page.					*
+ *  Request a list of districts in the census as an XML file.			*
  *  If the user is returning from a previous request the province		*
  *  may be specified as a search argument, in which case only the		*
  *  districts for that province are loaded.								*
  *																		*
  *  Input:																*
- *		this				instance of Window								*
+ *		this			instance of Window								*
  ************************************************************************/
 function loadDistricts()
 {
-    // perform common page initialization
-    pageInit();
-
     var	provSelect	= null;
 
     // activate functionality for individual input elements
@@ -57,19 +55,6 @@ function loadDistricts()
 		for(var j = 0; j < form.elements.length; j++)
 		{
 		    var element	= form.elements[j];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    if (element.parentNode.nodeName == 'TD')
-		    {		// set mouseover on containing cell
-				element.parentNode.onmouseover	= eltMouseOver;
-				element.parentNode.onmouseout	= eltMouseOut;
-		    }		// set mouseover on containing cell
-		    else
-		    {		// set mouseover on input element itself
-				element.onmouseover		= eltMouseOver;
-				element.onmouseout		= eltMouseOut;
-		    }		// set mouseover on input element itself
 
 		    var	name	= element.name;
 		    if (name === undefined || name.length == 0)
@@ -147,14 +132,14 @@ function loadDistricts()
 }		// loadDistricts
 
 /************************************************************************
- *  doSubmit																*
+ *  function doSubmit													*
  *																		*
- *  This method is invoked when the user clicks on the "submit"				*
- *  button.  The request to obtain a form for updating the specified		*
+ *  This method is invoked when the user clicks on the "submit"			*
+ *  button.  The request to obtain a form for updating the specified	*
  *  page of the census is submitted to the server.						*
  *																		*
  *  Input:																*
- *		this				<button name='showForm'>						*
+ *		this			<button name='showForm'>						*
  ************************************************************************/
 function doSubmit()
 {
@@ -163,14 +148,14 @@ function doSubmit()
 }		// doSubmit
 
 /************************************************************************
- *  showStatus																*
+ *  function showStatus													*
  *																		*
  *  This method is invoked when the user clicks on the "progress"		*
- *  button.  A web page summarizing the progress of the transcription		*
+ *  button.  A web page summarizing the progress of the transcription	*
  *  effort is displayed.												*
  *																		*
  *  Input:																*
- *		this				<button id='progress'>								*
+ *		this		<button id='progress'>								*
  ************************************************************************/
 function showStatus()
 {
@@ -180,13 +165,13 @@ function showStatus()
 }		// showStatus
 
 /************************************************************************
- *  provChanged																*
+ *  function provChanged												*
  *																		*
  *  The onchange method for the Province select element.				*
- *  Take action when the user selects a new province.						*
+ *  Take action when the user selects a new province.					*
  *																		*
  *  Input:																*
- *		this				<select name='Province'>						*
+ *		this			<select name='Province'>						*
  ************************************************************************/
 function provChanged()
 {
@@ -201,14 +186,14 @@ function provChanged()
 }
 
 /************************************************************************
- *  loadDistsProv														*
+ *  function loadDistsProv												*
  *																		*
  *  Obtain the list of districts for a specific province				*
  *  in the census as an XML file.										*
  *																		*
  *  Input:																*
- *		provSelect		<select> object										*
- *		prov				two character province code						*
+ *		provSelect		<select> object									*
+ *		prov			two character province code						*
  ************************************************************************/
 function loadDistsProv(provSelect, 
 					prov)
@@ -222,13 +207,13 @@ function loadDistsProv(provSelect,
 }		// loadDistsProv
 
 /************************************************************************
- *  gotDistFile																*
+ *  function gotDistFile												*
  *																		*
- *  This method is called when the XML file containing						*
+ *  This method is called when the XML file containing					*
  *  the districts information is retrieved.								*
  *																		*
  *  Input:																*
- *		xmlDoc		XML document from server with districts information		*
+ *		xmlDoc		XML document from server with districts information	*
  ************************************************************************/
 function gotDistFile(xmlDoc)
 {
@@ -279,16 +264,16 @@ function gotDistFile(xmlDoc)
 }		// gotDistFile
 
 /************************************************************************
- *  setDist																*
+ *  function setDist													*
  *																		*
  *  This method ensures that the District selection matches				*
- *  the value passed in the search arguments.								*
+ *  the value passed in the search arguments.							*
  *																		*
- *  Returns:																*
+ *  Returns:															*
  *		true if no District was specified, or if it did not match		*
  *				any of the selection items								*
  *		false if it is necessary to load the SubDistrict selection		*
- *				list from the server for a specific District				*
+ *				list from the server for a specific District			*
  ************************************************************************/
 function setDist()
 {
@@ -311,9 +296,9 @@ function setDist()
 }		// setDist
 
 /************************************************************************
- *  noDistFile																*
+ *  function noDistFile													*
  *																		*
- *  This method is called if there is no census summary script on the		*
+ *  This method is called if there is no census summary script on the	*
  *  server. The selection list of districts is cleared and an error		*
  *  message is displayed.												*
  ************************************************************************/
@@ -336,13 +321,13 @@ function noDistFile()
 }		// noDistFile
 
 /************************************************************************
- *  districtChanged														*
+ *  function districtChanged											*
  *																		*
- *  The onchange method of the District select element.						*
- *  This method is called when the user selects a new district.				*
+ *  The onchange method of the District select element.					*
+ *  This method is called when the user selects a new district.			*
  *																		*
  *  Input:																*
- *		this		<select name='District'>								*
+ *		this		<select name='District'>							*
  ************************************************************************/  
 function districtChanged()
 {
@@ -367,13 +352,13 @@ function districtChanged()
 }		// districtChanged
 
 /************************************************************************
- *  gotSubDist																*
+ *  function gotSubDist													*
  *																		*
- *  This method is called when the sub-district information XML				*
+ *  This method is called when the sub-district information XML			*
  *  document describing a particular district is retrieved.				*
  *																		*
  *  Input:																*
- *		xmlDoc				XML document returned from server				*
+ *		xmlDoc			XML document returned from server				*
  ************************************************************************/
 function gotSubDist(xmlDoc)
 {
@@ -433,10 +418,10 @@ function gotSubDist(xmlDoc)
 }		// gotSubDist
 
 /************************************************************************
- *  setSubDist																*
+ *  function setSubDist													*
  *																		*
- *  This method ensures that the SubDistrict selection matches				*
- *  the value passed in the search arguments.								*
+ *  This method ensures that the SubDistrict selection matches			*
+ *  the value passed in the search arguments.							*
  ************************************************************************/
 function setSubDist()
 {
@@ -491,9 +476,9 @@ function setSubDist()
 }		// setSubDist
 
 /************************************************************************
- *  noSubDist																*
+ *  function noSubDist													*
  *																		*
- *  This method is called if there is no sub-district						*
+ *  This method is called if there is no sub-district					*
  *  script on the server.												*
  ************************************************************************/
 function noSubDist()
@@ -512,13 +497,13 @@ function noSubDist()
 }
 
 /************************************************************************
- *  subDistChanged														*
+ *  function subDistChanged												*
  *																		*
  *  This is the onchange method of the subdistrict select element.		*
  *  This method is called when the user selects a new sub-district.		*
  *																		*
  *  Input:																*
- *		this				<select name='SubDistrict'>						*
+ *		this			<select name='SubDistrict'>						*
  ************************************************************************/  
 function subDistChanged()
 {
@@ -581,7 +566,7 @@ function subDistChanged()
 }		// subDistChanged
 
 /************************************************************************
- *  divSelected																*
+ *  function divSelected														*
  *																		*
  *  This method is called when the user selects a new division				*
  *																		*

@@ -17,14 +17,15 @@
  *		2016/02/06		call pageInit on load							*
  *		2016/12/07		activate edit and delete citation buttons		*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= loadEdit;
 
 /************************************************************************
- *  nameChildFrameClass														*
+ *  function nameChildFrameClass												*
  *																		*
  *  If this dialog is opened in a half window then any child dialogs		*
  *  are opened in the other half of the window.								*
@@ -54,14 +55,12 @@ tinyMCE.init({
 });
 
 /************************************************************************
- *  loadEdit																*
+ *  function loadEdit														*
  *																		*
  *  Initialize dynamic functionality of elements.						*
  ************************************************************************/
 function loadEdit()
 {
-    pageInit();
-
     var	namePattern	= /^([a-zA-Z_]+)(\d+)$/;
 
     // determine which half of the window child frames are opened
@@ -100,10 +99,6 @@ function loadEdit()
 
 		    if (element.nodeName.toLowerCase() == 'fieldset')
 				continue;
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var	name;
 		    if (element.name && element.name.length > 0)
@@ -194,7 +189,7 @@ function loadEdit()
 }		// loadEdit
 
 /************************************************************************
- *  suppressSubmit														*
+ *  function suppressSubmit												*
  *																		*
  *  This function ensures that the form cannot be submitted in the		*
  *  normal way, for example by pressing the Enter key.						*
@@ -205,7 +200,7 @@ function suppressSubmit()
 }		// suppressSubmit
 
 /************************************************************************
- *  proceedWithSubmit														*
+ *  function proceedWithSubmit												*
  *																		*
  *  For testing do not intercept submit.								*
  ************************************************************************/
@@ -215,7 +210,7 @@ function proceedWithSubmit()
 }		// proceedWithSubmit
 
 /************************************************************************
- *  resetForm																*
+ *  function resetForm														*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
@@ -226,7 +221,7 @@ function resetForm()
 }	// resetForm
 
 /************************************************************************
- *  eeKeyDown																*
+ *  function eeKeyDown														*
  *																		*
  *  Handle key strokes that apply to the dialog as a whole.  For		*
  *  example the key combinations Ctrl-S and Alt-U are interpreted to		*
@@ -294,7 +289,7 @@ function eeKeyDown(e)
 }		// eeKeyDown
 
 /************************************************************************
- *  updateName																*
+ *  function updateName														*
  *																		*
  *  This method is called when the user requests to update				*
  *  an name of an individual.												*
@@ -328,7 +323,7 @@ function updateName()
 }	// updateName
 
 /************************************************************************
- *  gotName																*
+ *  function gotName														*
  *																		*
  *  This method is called when the XML file representing				*
  *  an updated name is retrieved from the database.						*
@@ -414,7 +409,7 @@ function gotName(xmlDoc)
 }		// gotName
 
 /************************************************************************
- *  noName																*
+ *  function noName														*
  *																		*
  *  This method is called if there is no name response from the				*
  *  server.																*
@@ -425,7 +420,7 @@ function noName()
 }		// noName
 
 /************************************************************************
- *  addCitation																*
+ *  function addCitation														*
  *																		*
  *  This method is called when the user requests to add 				*
  *  a citation to the name.												*
@@ -529,14 +524,14 @@ function addCitation()
 }		// addCitation
 
 /************************************************************************
- *  gotSources																*
+ *  function gotSources														*
  *																		*
  *  This method is called when the XML file representing				*
  *  the list of sources from the database is retrieved.						*
  *																		*
  *  Parameters:																*
  *		xmlDoc		information about the defined sources as an XML				*
- *				document												*
+ *				function document										*
  ************************************************************************/
 function gotSources(xmlDoc)
 {
@@ -658,7 +653,7 @@ function gotSources(xmlDoc)
 }		// gotSources
 
 /************************************************************************
- *  noSources																*
+ *  function noSources														*
  *																		*
  *  This method is called if there is no sources script on the server.		*
  ************************************************************************/
@@ -668,7 +663,7 @@ function noSources()
 }		// noSources
 
 /************************************************************************
- *  createCitation														*
+ *  function createCitation												*
  *																		*
  *  The user has requested to add a citation and supplied all of		*
  *  the required information.												*
@@ -760,7 +755,7 @@ function createCitation()
 }	// createCitation
 
 /************************************************************************
- *  gotAddCit																*
+ *  function gotAddCit														*
  *																		*
  *  This method is called when the XML file representing				*
  *  the addition of a citation is retrieved.								*
@@ -831,7 +826,7 @@ function gotAddCit(xmlDoc)
 }		// gotAddCit
 
 /************************************************************************
- *  noAddCit																*
+ *  function noAddCit														*
  *																		*
  *  This method is called if there is no add citation response				*
  *  file from the server.												*
@@ -841,7 +836,7 @@ function noAddCit()
 }		// noAddCit
 
 /************************************************************************
- *  editCitation														*
+ *  function editCitation												*
  *																		*
  *  This method is called when the user requests to edit				*
  *  a citation to a source for an name.										*
@@ -860,7 +855,7 @@ function editCitation()
 }	// editCitation
 
 /************************************************************************
- *  deleteCitation														*
+ *  function deleteCitation												*
  *																		*
  *  This method is called when the user requests to edit				*
  *  a citation to a source for an name.										*
@@ -885,7 +880,7 @@ function deleteCitation()
 }	// deleteCitation
 
 /************************************************************************
- *  gotDeleteCit														*
+ *  function gotDeleteCit												*
  *																		*
  *  This method is called when the XML file representing				*
  *  a deleted citation is retrieved from the database.						*
@@ -930,7 +925,7 @@ function gotDeleteCit(xmlDoc)
 }		// gotDeleteCit
 
 /************************************************************************
- *  noDeleteCit																*
+ *  function noDeleteCit														*
  *																		*
  *  This method is called if there is no delete citation response		*
  *  file.																*
@@ -941,7 +936,7 @@ function noDeleteCit()
 }		// noDeleteCit
 
 /************************************************************************
- *  updateCitation														*
+ *  function updateCitation												*
  *																		*
  *  This method is called by the editCitation.php script to feed back		*
  *  the results so they can be reflected in this page.						*
@@ -974,14 +969,14 @@ function updateCitation(idsx,
 }		// updateCitation
 
 /************************************************************************
- *  checkForAdd																*
+ *  function checkForAdd												*
  *																		*
- *  The user has selected a different option in the selection list of		*
- *  sources.																*
+ *  The user has selected a different option in the selection list of	*
+ *  sources.															*
  *																		*
- *  Parameters:																*
- *		this				the input element for which this is the				*
- *						onchange method										*
+ *  Parameters:															*
+ *		this			<select> element for which this is the			*
+ *						onchange method									*
  ************************************************************************/
 function checkForAdd()
 {
@@ -998,13 +993,13 @@ function checkForAdd()
 }		// checkForAdd
 
 /************************************************************************
- *  clearNotes																*
+ *  function clearNotes													*
  *																		*
  *  This method is called when the user requests to clear the note		*
  *  area to empty.														*
  *																		*
  *  Input:																*
- *		this		the <button type='button' id='Clear'>						*
+ *		this		<button type='button' id='Clear'>					*
  ************************************************************************/
 function clearNotes()
 {
@@ -1012,16 +1007,16 @@ function clearNotes()
 }	// clearNotes
 
 /************************************************************************
- *  sourceCreated														*
+ *  function sourceCreated												*
  *																		*
  *  This method is called when a child window notifies this script		*
- *  that a new source has been created.										*
- *  The new source is added to the end of the selection list, out of		*
- *  alphabetical order, and made the currently selected item.				*
+ *  that a new source has been created.									*
+ *  The new source is added to the end of the selection list, out of	*
+ *  alphabetical order, and made the currently selected item.			*
  *																		*
  *  Input:																*
- *		this				<form ...>										*
- *		parms				associative array of field values				*
+ *		this			<form ...>										*
+ *		parms			associative array of field values				*
  *						parms.elementname		= name of <select>		*
  ************************************************************************/
 function sourceCreated(parms)

@@ -14,6 +14,7 @@
  *		2014/07/04		type selection list set up entirely by PHP now	*
  *		2015/05/27		use absolute URLs for AJAX						*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -26,8 +27,6 @@ window.onload	= loadPage;
  ************************************************************************/
 function loadPage()
 {
-    pageInit();
-
     var	type		= 0;
     var	idsr		= 0;
 
@@ -47,35 +46,31 @@ function loadPage()
 		{
 		    var element	= form.elements[j];
 
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
-
 		    // take action specific to element
 		    var	name;
 		    if (element.name && element.name.length > 0)
-			name	= element.name;
+				    name	= element.name;
 		    else
-			name	= element.id;
+				    name	= element.id;
 
 		    switch(name)
 		    {		// act on field name
-			case 'typeparm':
-			{
-			    type	= parseInt(element.value);
-			    break;
-			}	// typeparm
+				case 'typeparm':
+				{
+				    type	= parseInt(element.value);
+				    break;
+				}	// typeparm
 
-			case 'idsrparm':
-			{
-			    idsr	= parseInt(element.value);
-			    break;
-			}	// idsrparm
+				case 'idsrparm':
+				{
+				    idsr	= parseInt(element.value);
+				    break;
+				}	// idsrparm
 
-			case 'type':
-			{
-			    break;
-			}	// type
+				case 'type':
+				{
+				    break;
+				}	// type
 
 		    }		// act on field name
 		}		// loop through all elements
@@ -87,10 +82,10 @@ function loadPage()
     // the <form> are passed as parameters so they can be returned
     // in the response.
     HTTP.getXML('/FamilyTree/getSourcesXml.php?name=idsr' +
-					'&idsr=' + idsr +
-					'&formname=citForm',
-			gotSources,
-			noSources);
+						'&idsr=' + idsr +
+						'&formname=citForm',
+				gotSources,
+				noSources);
 }		// loadPage
 
 /************************************************************************
@@ -176,14 +171,14 @@ function gotSources(xmlDoc)
 		    msg += form.elements[i].name + ", ";
 		    if (form.elements[i].name == name)
 		    {
-			elt	= form.elements[i];
-			break;
+				elt	= form.elements[i];
+				break;
 		    }
 		}
 		if (elt == null)
 		{		// elt still null
 		alert("Citations.js: gotSources: could not find named element " +
-			name + ", element names=" + msg);
+				name + ", element names=" + msg);
 		return;
 		}		// elt still null
     }
@@ -217,8 +212,8 @@ function gotSources(xmlDoc)
 
 		// create a new HTML Option object and add it to the Select
 		option	= addOption(elt,	// Select element
-				    text,	// text value to display
-				    value);	// unique key of source record
+					    text,	// text value to display
+					    value);	// unique key of source record
 
 		// select the last source chosen by the user
 		if (idsr &&

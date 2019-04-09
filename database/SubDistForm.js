@@ -8,7 +8,7 @@
  *		2010/11/23		add column for page increment					*
  *						add button to delete row						*
  *						allow replication of columns that don't			*
- *						capitalize										*
+ *						function capitalize								*
  *						correct enter/down from bottom row				*
  *						correct Ctl-Home and Ctl-End					*
  *						add onchange function for Pages column			*
@@ -26,7 +26,7 @@
  *		2011/11/17		do not change relative frame number in next row	*
  *						if it has previously been set					*
  *		2012/05/06		replace calls to getEltId with calls to			*
- *						getElementById									*
+ *						function getElementById							*
  *		2012/09/18		pass full census identifier to scripts			*
  *		2012/10/27		support more than 100 subdistrict per district	*
  *		2013/06/25		main form is now the 2nd form					*
@@ -54,8 +54,11 @@
  *		2018/05/11		some numeric fields permit zero					*
  *		2018/05/21		changeReplDown changed to use new styles		*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/04/07      ensure that the paging lines can be displayed   *
+ *		                within the visible portion of the browser.      *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 var namePattern	= /([A-Za-z_]+)([0-9]+)/;
@@ -72,9 +75,6 @@ window.onload	= onLoadSub;
  ************************************************************************/
 function onLoadSub()
 {
-    // perform common page initialization
-    pageInit();
-
     document.body.onkeydown		= qsKeyDown;
     var firstElt			= null;
 
@@ -91,10 +91,6 @@ function onLoadSub()
 		for (var ei = 0; ei < form.elements.length; ei++)
 		{		// loop through all elements of the form
 		    var element	= form.elements[ei];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var result	= namePattern.exec(element.id);
 		    var colName;
@@ -225,31 +221,42 @@ function onLoadSub()
     }			// loop through forms
 
     // enable support for hiding and revealing columns
-    var dataTbl		= document.getElementById("dataTbl");
-    var tblHdr		= dataTbl.tHead;
-    var tblHdrRow	= tblHdr.rows[0];
+    var dataTbl		            = document.getElementById("dataTbl");
+    var tblHdr		            = dataTbl.tHead;
+    var tblHdrRow	            = tblHdr.rows[0];
     for(i = 0; i < tblHdrRow.cells.length; i++)
     {		// loop through all cells of header row
-		var th			= tblHdrRow.cells[i];
-		th.onclick		= columnClick;	// left button click
-		th.oncontextmenu	= columnWiden;	// right button click
+		var th			        = tblHdrRow.cells[i];
+		th.onclick		        = columnClick;	// left button click
+		th.oncontextmenu	    = columnWiden;	// right button click
     }		// loop through all cells of header row
+
+
+    var dataTable               = document.getElementById('dataTbl');
+    var dataWidth               = dataTable.offsetWidth;
+    var windowWidth             = document.body.clientWidth - 8;
+    if (dataWidth > windowWidth)
+        dataWidth               = windowWidth;
+    var topBrowse               = document.getElementById('topBrowse');
+    topBrowse.style.width       = dataWidth + "px";
+    var botBrowse               = document.getElementById('botBrowse');
+    if (botBrowse)
+        botBrowse.style.width   = dataWidth + "px";
 
     // set the focus to the first element of the first row
     firstElt.focus();
     firstElt.select();
-
 }		// onLoadSub
 
 /************************************************************************
- *  getFieldByColRow														*
+ *  function getFieldByColRow											*
  *																		*
  *  Get a field in the form given its column name and row number.		*
  *																		*
  *  Input:																*
- *		colName				the name of the column in the spreadsheet		*
- *		rowNum				the row number within the spreadsheet				*
- *		formElts		the associative array of form elements				*
+ *		colName			the name of the column in the spreadsheet		*
+ *		rowNum			the row number within the spreadsheet			*
+ *		formElts		the associative array of form elements			*
  ************************************************************************/
 function getFieldByColRow(colName,
 						  rowNum,
@@ -265,18 +272,18 @@ function getFieldByColRow(colName,
 }	// getFieldByColRow
 
 /************************************************************************
- *  setClassByValue														*
+ *  function setClassByValue											*
  *																		*
  *  Set the class name for the indicated cell of the spreadsheet		*
- *  depending upon its value.  If the value is equal to the value of		*
+ *  depending upon its value.  If the value is equal to the value of	*
  *  the same cell in the previous row of the spreadsheet, then the class*
- *  is set to indicate that the cell has inherited its value from the		*
+ *  is set to indicate that the cell has inherited its value from the	*
  *  previous row.  														*
  *																		*
  *  Input:																*
- *		colName				the name of the column in the spreadsheet		*
- *		rowNum				the row number within the spreadsheet				*
- *		formElts		the associative array of form elements				*
+ *		colName			the name of the column in the spreadsheet		*
+ *		rowNum			the row number within the spreadsheet			*
+ *		formElts		the associative array of form elements			*
  ************************************************************************/
 function setClassByValue(colName,
 						 rowNum,
@@ -323,14 +330,14 @@ function setClassByValue(colName,
 }	// setClassByValue
 
 /************************************************************************
- *  changeReplDown														*
+ *  function changeReplDown												*
  *																		*
- *  Take action when the user changes a field whose value is				*
- *  replicated into subsequent fields in the same column whose				*
+ *  Take action when the user changes a field whose value is			*
+ *  replicated into subsequent fields in the same column whose			*
  *  value has not yet been explicitly set.								*
  *																		*
  *  Input:																*
- *		$this				instance of <input>								*
+ *		$this			instance of <input>								*
  ************************************************************************/
 function changeReplDown()
 {
@@ -389,14 +396,14 @@ function changeReplDown()
 }		// changeReplDown
 
 /************************************************************************
- *  changeDefault														*
+ *  function changeDefault												*
  *																		*
  *  Take action when the user changes a field whose value				*
  *  may be a default.  If it is, change the presentation of				*
- *  the field.																*
+ *  the field.															*
  *																		*
  *  Input:																*
- *		$this				instance of <input>								*
+ *		$this			instance of <input>								*
  ************************************************************************/
 function changeDefault()
 {
@@ -428,7 +435,7 @@ function changeDefault()
 }		// changeDefault
 
 /************************************************************************
- *  censusLinesPerPage														*
+ *  censusLinesPerPage												    *
  ************************************************************************/
 var censusLinesPerPage	= new Array();
 censusLinesPerPage[1851]	= 50;	
@@ -443,7 +450,7 @@ censusLinesPerPage[1916]	= 50;
 censusLinesPerPage[1921]	= 50;
 
 /************************************************************************
- *  censusPagesPerFrame														*
+ *  censusPagesPerFrame												    *
  ************************************************************************/
 var censusPagesPerFrame	= new Array();
 censusPagesPerFrame[1851]	= 0.5;	
@@ -458,13 +465,13 @@ censusPagesPerFrame[1916]	= 1;
 censusPagesPerFrame[1921]	= 1;
 
 /************************************************************************
- *  changePages																*
+ *  function changePages												*
  *																		*
  *  Take action when the user changes the number of pages in the		*
- *  division.																*
+ *  division.															*
  *																		*
  *  Input:																*
- *		this		instance of <input type='text'>								*
+ *		this		instance of <input type='text'>						*
  ************************************************************************/
 function changePages()
 {
@@ -501,13 +508,13 @@ function changePages()
 }		// changePages
 
 /************************************************************************
- *  changeFrameCt														*
+ *  function changeFrameCt												*
  *																		*
  *  Take action when the user changes the number of image frames 		*
- *  in the division.														*
+ *  in the division.													*
  *																		*
  *  Input:																*
- *		this		instance of <input type='text'>								*
+ *		this		instance of <input type='text'>						*
  ************************************************************************/
 function changeFrameCt()
 {
@@ -534,13 +541,13 @@ function changeFrameCt()
 }		// changeFrameCt
 
 /************************************************************************
- *  addDiv																*
+ *  function addDiv														*
  *																		*
  *  Add a division after the current row.								*
- *  This is the onclick method of a <button>.								*
+ *  This is the onclick method of a <button>.							*
  *																		*
- *  Parameters:																*
- *		this		the invoking button										*
+ *  Parameters:															*
+ *		this		the invoking button									*
  ************************************************************************/
 function addDiv()
 {
@@ -723,13 +730,13 @@ function addDiv()
 }		// addDiv
 
 /************************************************************************
- *  checkForDuplicates														*
+ *  function checkForDuplicates											*
  *																		*
- *  Check the updated list of subdistricts for any duplicates by key		*
- *  to ensure the internal validity of the database.						*
+ *  Check the updated list of subdistricts for any duplicates by key	*
+ *  to ensure the internal validity of the database.					*
  *																		*
- *  Parameters:																*
- *		this		the form containing the displayed table of subdistricts		*
+ *  Parameters:															*
+ *		this	the form containing the displayed table of subdistricts	*
  ************************************************************************/
 function checkForDuplicates()
 {
@@ -773,13 +780,13 @@ function checkForDuplicates()
 }		// checkForDuplicates
 
 /************************************************************************
- *  delRow																*
+ *  function delRow														*
  *																		*
  *  Delete the current row.												*
- *  This is the onclick method of a <button>.								*
+ *  This is the onclick method of a <button>.							*
  *																		*
- *  Parameters:																*
- *		this		the invoking <button id='Del...'>						*
+ *  Parameters:															*
+ *		this		the invoking <button id='Del...'>					*
  ************************************************************************/
 function delRow()
 {
@@ -793,13 +800,13 @@ function delRow()
 }		// delRow
 
 /************************************************************************
- *  gotDel																*
+ *  function gotDel														*
  *																		*
- *  This method is called when the XML file reporting the results of		*
- *  deleting an instance of SubDistrict from the database is received.		*
+ *  This method is called when the XML file reporting the results of	*
+ *  deleting an instance of SubDistrict from the database is received.	*
  *																		*
  *  Input:																*
- *		xmlDoc				Document representing the XML file				*
+ *		xmlDoc			Document representing the XML file				*
  ************************************************************************/
 function gotDel(xmlDoc)
 {
@@ -860,10 +867,10 @@ function gotDel(xmlDoc)
 }		// gotDel
 
 /************************************************************************
- *  noDel																*
+ *  function noDel														*
  *																		*
  *  This method is called if the script to copy the division data		*
- *  from the development server to the production server is missing.		*
+ *  from the development server to the production server is missing.	*
  ************************************************************************/
 function noDel()
 {
@@ -873,13 +880,13 @@ function noDel()
 }		// noDel
 
 /************************************************************************
- *  showPageTable														*
+ *  function showPageTable												*
  *																		*
  *  Display the page table.  This is invoked as the onclick method		*
  *  of a <button>.														*
  *																		*
- *  Parameters:																*
- *		this		the invoking <button id='Pages...'>						*
+ *  Parameters:															*
+ *		this		the invoking <button id='Pages...'>					*
  ************************************************************************/
 function showPageTable()
 {
@@ -905,14 +912,14 @@ function showPageTable()
 }		// showPageTable
 
 /************************************************************************
- *  qsKeyDown																*
+ *  function qsKeyDown													*
  *																		*
- *  Handle key strokes that apply to the entire dialog window.				*
- *  For example the key combinations Ctrl-S and Alt-U are interpreted		*
- *  to apply the update, as shortcut alternatives to using the mouse		*
+ *  Handle key strokes that apply to the entire dialog window.			*
+ *  For example the key combinations Ctrl-S and Alt-U are interpreted	*
+ *  to apply the update, as shortcut alternatives to using the mouse	*
  *  to click the Update Individual button								*
  *																		*
- *  Parameters:																*
+ *  Parameters:															*
  *		e		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function qsKeyDown(e)

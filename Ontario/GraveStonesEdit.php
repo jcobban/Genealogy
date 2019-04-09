@@ -39,11 +39,11 @@ use \Exception;
  *		2017/01/23		do not use htmlspecchars to build input values	*
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/02/17		use Template									*
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Template.inc";
-require_once __NAMESPACE__ . "/Language.inc";
 require_once __NAMESPACE__ . '/DomainSet.inc';
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . "/County.inc";
@@ -482,26 +482,13 @@ if ($county != '' && $township != '' && $cemetery != '' && $zone != '')
 else
     $results	= null;
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-//if (canUser('edit'))
+if (canUser('edit'))
     $action		= 'Edit';
-//else
-//    $action		= 'Display';
-$includeSub		= "GraveStones$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	= new Language(array('code' => $lang));
-	$langName	= $language->get('name');
-	$nativeName	= $language->get('nativename');
-    $sorry      = $language->getSorry();
-    $warn       .= str_replace(array('$langName','$nativeName'),
-                               array($langName, $nativeName),
-                               $sorry);
-    $includeSub		= "GraveStones{$action}en.html";
-}
-$template->includeSub($tempBase . $includeSub,
-						  'MAIN');
+else
+    $action		= 'Display';
+$tempBase		= $document_root . '/templates/';
+$template		= new FtTemplate("GraveStones$action$lang.html");
+
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('PROVINCENAME',	$provinceName);
 $template->set('DOMAIN',	$domain);

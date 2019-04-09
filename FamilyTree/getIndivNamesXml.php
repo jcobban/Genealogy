@@ -129,563 +129,563 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
+header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/PersonSet.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    // return the results as an XML document
-    header("Content-Type: text/xml");
-    // the following is a kluge to get around a bug in VIM styling for
-    // PHP scripts where it interprets the closing bracket as the end of
-    // PHP code and the beginning of HTML code
-    print "<?xml version='1.0' encoding='UTF-8'?" . ">\n";
+// return the results as an XML document
+// the following is a kluge to get around a bug in VIM styling for
+// PHP scripts where it interprets the closing bracket as the end of
+// PHP code and the beginning of HTML code
+print "<?xml version='1.0' encoding='UTF-8'?" . ">\n";
 
-    // construct search pattern from parameters
-    $where				= '';		//Un start constructing where clause
-    $idir				= 0;		// IDIR to exclude from response
-    $indiv				= null;		// instance of Person
-    $idmr				= 0;		// IDMR of family to add to
-    $family				= null;		// instance of Family
-    $surname			= '';		// default to start at first surname
-    $lastsurname		= null;		// default to start at first surname
-    $givenname			= '';		// default to start at first given name 
-    $sex				= '';		// default to either sex
-    $birthyear			= null;		// default to not checking birth year
-    $birthmin			= null;		// default to not checking bth year min
-    $birthmax			= null;		// default to not checking bth year max
-    $sexPassed			= false;	// true if explicit sex specified
-    $birthyearPassed	= false;	// true if explicit birth year
-    $birthminPassed		= false;	// true if explicit min birth year
-    $birthmaxPassed		= false;	// true if explicit max birth year
-    $incMarried			= false;	// default to not include married names
-    $loose				= false;	// default to exact name match
-    $includeParents		= false;	// do not include parents' names
-    $includeSpouse		= false;	// do not include spouse's name
-    $range				= 3;		// +/- 3 years on birth year
-    $buttonId			= '';		// id of invoking button
-    $treename			= '';
-    $qsurname			= "''";
-    $limit				= 50;
-    $matches			= array();
+// construct search pattern from parameters
+$where				= '';		//Un start constructing where clause
+$idir				= 0;		// IDIR to exclude from response
+$indiv				= null;		// instance of Person
+$idmr				= 0;		// IDMR of family to add to
+$family				= null;		// instance of Family
+$surname			= '';		// default to start at first surname
+$lastsurname		= null;		// default to start at first surname
+$givenname			= '';		// default to start at first given name 
+$sex				= '';		// default to either sex
+$birthyear			= null;		// default to not checking birth year
+$birthmin			= null;		// default to not checking bth year min
+$birthmax			= null;		// default to not checking bth year max
+$sexPassed			= false;	// true if explicit sex specified
+$birthyearPassed	= false;	// true if explicit birth year
+$birthminPassed		= false;	// true if explicit min birth year
+$birthmaxPassed		= false;	// true if explicit max birth year
+$incMarried			= false;	// default to not include married names
+$loose				= false;	// default to exact name match
+$includeParents		= false;	// do not include parents' names
+$includeSpouse		= false;	// do not include spouse's name
+$range				= 3;		// +/- 3 years on birth year
+$buttonId			= '';		// id of invoking button
+$treename			= '';
+$qsurname			= "''";
+$limit				= 50;
+$matches			= array();
 
+foreach($_GET as $key => $value)
+{
+    switch(strtolower($key))
+    {		// act on specific keys
+        case 'idir':
+        {		// match an existing individual for merge
+    		if (strlen($value) > 0)
+    		{	// value provided
+    		    if (ctype_digit($value))
+    		    {	// all numeric
+    				$idir		= $value;
+    				try {
+    				    $indiv   = new Person(array('idir' => $idir));
+    				}		// try
+    				catch (Exception $e) {
+    				    $msg    .= "No database record for idir=$idir. ";
+    				}	// catch
+    		    }	// all numeric
+    		    else
+    				$msg	.= "Invalid value of IDIR='" .
+    						   xmlentities($value) . "'. ";
+    		}	// value provided
+    		break;
+        }		// match an existing individual for merge
+
+        case 'surname':
+        {		// match by surname
+            if (strlen(trim($value)) > 0)
+    		    $surname	= $value;
+    		break;
+        }		// match by surname
+
+        case 'lastsurname':
+        {		// match by surname
+    		if (strlen(trim($value)) > 0)
+    		    $lastsurname	= $value;
+    		else
+    		    $lastsurname	= null;
+    		break;
+        }		// match by surname
+
+        case 'givenname':
+        {		// match by given name pattern
+            // see note above for surname
+            if (strlen(trim($value)) > 0)
+    		    $givenname	= str_replace("'", "", $value);
+    		break;
+        }		// match by given name pattern
+
+        case 'treename':
+        {		// match by treename
+            if (strlen(trim($value)) > 0)
+    		    $treename	= $value;
+    		break;
+        }		// match by treename
+
+
+        case 'sex':
+        {		// match by sex
+    		$sexPassed		= true;
+    		if ($value == 'm' || $value == 'M' ||
+    		    $value == 'f' || $value == 'F')
+    		    $sex		= $value;
+    		break;
+        }		// match by sex
+
+        case 'birthyear':
+        {		// match by approximate year of birth
+    		$birthyearPassed	= true;
+    		if (strlen($value) > 0)
+    		{	// value supplied
+    		    if (preg_match('/-?\d+/', $value, $matches) == 1)
+    				$birthyear	= $matches[0];
+    		    else
+    				$msg	.= "Invalid value of BirthYear='$value'. ";
+    		}	// value supplied
+    		break;
+        }		// match by year of birth
+
+        case 'birthmin':
+        {		// match by year of birth
+    		$birthminPassed	= true;
+    		if (strlen($value) > 0)
+    		{	// value supplied
+    		    if (preg_match('/-?\d+/', $value, $matches) == 1)
+    				$birthmin	= $matches[0];
+    		    else
+    				$msg	.= "Invalid value of BirthMin='$value'. ";
+    		}	// value supplied
+    		else
+    		    $birthmin	= -9999;
+    		break;
+        }		// match by year of birth
+
+        case 'birthmax':
+        {		// match by year of birth
+    		$birthmaxPassed	= true;
+    		if (strlen($value) > 0)
+    		{	// value supplied
+    		    if (preg_match('/-?\d+/', $value, $matches) == 1)
+    				$birthmax	= $matches[0];
+    		    else
+    				$msg	.= "Invalid value of BirthMax='$value'. ";
+    		}	// value supplied
+    		else
+    		    $birthmax	= 9999;
+    		break;
+        }		// match by year of birth
+
+        case 'range':
+        {		// range of birth dates
+    		if (strlen($value) > 0)
+    		{	// value supplied
+    		    if (ctype_digit($value))
+    				$range		= $value;
+    		    else
+    				$msg	.= "Invalid value of range='$value'. ";
+    		}	// value supplied
+    		break;
+        }		// range of birth dates
+
+        case 'incmarried':
+        {		// include married names in response
+    		$incMarried	= strtolower($value) == 'y' ||
+    						  strtolower($value) == 'yes';
+    		break;
+        }		// include married names in response
+
+        case 'includeparents':
+        {		// include parents' names in response
+    		$includeParents	= strtolower($value) == 'y' ||
+    						  strtolower($value) == 'yes';
+    		break;
+        }		// include parents' names in response
+
+        case 'includespouse':
+        {		// include spouse's name in response
+    		$includeSpouse	= strtolower($value) == 'y' ||
+    						  strtolower($value) == 'yes';
+    		break;
+        }		// include spouse's name in response
+
+        case 'parentsidmr':
+        {		// IDMR of family to add children to
+    		if (strlen($value) > 0)
+    		{	// value supplied
+    		    if (ctype_digit($value))
+    		    {		// is numeric
+    				$idmr		= $value;
+    				try {
+    				    $family	= new Family(array('idmr' => $idmr));
+    				    $husbbirthsd= $family->get('husbbirthsd');
+    				    $wifebirthsd= $family->get('wifebirthsd');
+    				    if ($husbbirthsd != 0)
+    				    {	// have father's birth date
+    						$birthmin	= floor($husbbirthsd/10000)+15;
+    						$birthmax	= floor($husbbirthsd/10000)+65;
+    				    }	// have father's birth date
+    				    else
+    				    if ($wifebirthsd != 0)
+    				    {	// have mother's birth date
+    						$birthmin	= floor($wifebirthsd/10000)+15;
+    						$birthmax	= floor($wifebirthsd/10000)+55;
+    				    }	// have mother's birth date
+    				    $incMarried	= false;
+    				}	// try
+    				catch (Exception $e) {
+    				    $msg	.= "No database record for parentsIdmr=$idmr. ";
+    				}	// catch
+    		    }		// is numeric
+    		    else
+    				$msg	.= "Invalid value of parentsIdmr='$value'. ";
+    		}	// value supplied
+    		break;
+        }		// IDMR of family to add children to
+
+        case 'loose':
+        {
+    		$loose		= strtolower($value) == 'y' ||
+    						  strtolower($value) == 'yes';
+    		break;
+        }		// loose specified
+
+        case 'buttonid':
+        {		// feeds back a linkage to the invoker
+    		$buttonId	= $value;
+    		break;
+        }		// feeds back a linkage to the invoker
+
+        case 'limit':
+        {		// limit number of responses
+    		if (strlen($value) > 0)
+    		{	// value supplied
+    		    if (ctype_digit($value))
+    				$limit	= $value;
+    		    else
+    				$msg	.= "Invalid value of Limit='$value'. ";
+    		}	// value supplied
+    		break;
+        }		// limit number of responses
+
+    }		// act on specific keys
+}			// loop through parameters
+
+// check for various birth year combinations
+if (is_null($birthmin) && is_null($birthmax) && !is_null($birthyear))
+{		// birthyear specified
+    $birthmin	= $birthyear - $range;
+    $birthmax	= $birthyear + $range;
+}		// birthyear specified
+else
+if ($birthmin > $birthmax)
+{
+    $msg	.= "BirthMin=$birthmin greater than BirthMax=$birthmax. ";
+}
+
+// if any errors detected just return error message
+if (strlen($msg) > 0)
+{
+    print "<msg>$msg</msg>\n";
+}
+else
+{			// no errors
+    // top node of XML result
+    // the "buttonId" parameter feeds back a linkage to the invoker
+    if (strlen($buttonId) > 0)
+        print("<names buttonId='$buttonId'>\n");
+    else
+        print("<names>\n");
+
+    // document parameters to script
+    print "  <parms>\n";
     foreach($_GET as $key => $value)
     {
-    	switch(strtolower($key))
-    	{		// act on specific keys
-    	    case 'idir':
-    	    {		// match an existing individual for merge
-    			if (strlen($value) > 0)
-    			{	// value provided
-    			    if (ctype_digit($value))
-    			    {	// all numeric
-    					$idir		= $value;
-    					try {
-    					    $indiv   = new Person(array('idir' => $idir));
-    					}		// try
-    					catch (Exception $e) {
-    					    $msg    .= "No database record for idir=$idir. ";
-    					}	// catch
-    			    }	// all numeric
-    			    else
-    					$msg	.= "Invalid value of IDIR='" .
-    							   xmlentities($value) . "'. ";
-    			}	// value provided
-    			break;
-    	    }		// match an existing individual for merge
-
-    	    case 'surname':
-            {		// match by surname
-                if (strlen(trim($value)) > 0)
-    			    $surname	= $value;
-    			break;
-    	    }		// match by surname
-
-    	    case 'lastsurname':
-    	    {		// match by surname
-    			if (strlen(trim($value)) > 0)
-    			    $lastsurname	= $value;
-    			else
-    			    $lastsurname	= null;
-    			break;
-    	    }		// match by surname
-
-    	    case 'givenname':
-    	    {		// match by given name pattern
-                // see note above for surname
-                if (strlen(trim($value)) > 0)
-    			    $givenname	= str_replace("'", "", $value);
-    			break;
-    	    }		// match by given name pattern
-
-    	    case 'treename':
-    	    {		// match by treename
-                if (strlen(trim($value)) > 0)
-    			    $treename	= $value;
-    			break;
-    	    }		// match by treename
-
-
-    	    case 'sex':
-    	    {		// match by sex
-    			$sexPassed		= true;
-    			if ($value == 'm' || $value == 'M' ||
-    			    $value == 'f' || $value == 'F')
-    			    $sex		= $value;
-    			break;
-    	    }		// match by sex
-
-    	    case 'birthyear':
-    	    {		// match by approximate year of birth
-    			$birthyearPassed	= true;
-    			if (strlen($value) > 0)
-    			{	// value supplied
-    			    if (preg_match('/-?\d+/', $value, $matches) == 1)
-    					$birthyear	= $matches[0];
-    			    else
-    					$msg	.= "Invalid value of BirthYear='$value'. ";
-    			}	// value supplied
-    			break;
-    	    }		// match by year of birth
-
-    	    case 'birthmin':
-    	    {		// match by year of birth
-    			$birthminPassed	= true;
-    			if (strlen($value) > 0)
-    			{	// value supplied
-    			    if (preg_match('/-?\d+/', $value, $matches) == 1)
-    					$birthmin	= $matches[0];
-    			    else
-    					$msg	.= "Invalid value of BirthMin='$value'. ";
-    			}	// value supplied
-    			else
-    			    $birthmin	= -9999;
-    			break;
-    	    }		// match by year of birth
-
-    	    case 'birthmax':
-    	    {		// match by year of birth
-    			$birthmaxPassed	= true;
-    			if (strlen($value) > 0)
-    			{	// value supplied
-    			    if (preg_match('/-?\d+/', $value, $matches) == 1)
-    					$birthmax	= $matches[0];
-    			    else
-    					$msg	.= "Invalid value of BirthMax='$value'. ";
-    			}	// value supplied
-    			else
-    			    $birthmax	= 9999;
-    			break;
-    	    }		// match by year of birth
-
-    	    case 'range':
-    	    {		// range of birth dates
-    			if (strlen($value) > 0)
-    			{	// value supplied
-    			    if (ctype_digit($value))
-    					$range		= $value;
-    			    else
-    					$msg	.= "Invalid value of range='$value'. ";
-    			}	// value supplied
-    			break;
-    	    }		// range of birth dates
-
-    	    case 'incmarried':
-    	    {		// include married names in response
-    			$incMarried	= strtolower($value) == 'y' ||
-    							  strtolower($value) == 'yes';
-    			break;
-    	    }		// include married names in response
-
-    	    case 'includeparents':
-    	    {		// include parents' names in response
-    			$includeParents	= strtolower($value) == 'y' ||
-    							  strtolower($value) == 'yes';
-    			break;
-    	    }		// include parents' names in response
-
-    	    case 'includespouse':
-    	    {		// include spouse's name in response
-    			$includeSpouse	= strtolower($value) == 'y' ||
-    							  strtolower($value) == 'yes';
-    			break;
-    	    }		// include spouse's name in response
-
-    	    case 'parentsidmr':
-    	    {		// IDMR of family to add children to
-    			if (strlen($value) > 0)
-    			{	// value supplied
-    			    if (ctype_digit($value))
-    			    {		// is numeric
-    					$idmr		= $value;
-    					try {
-    					    $family	= new Family(array('idmr' => $idmr));
-    					    $husbbirthsd= $family->get('husbbirthsd');
-    					    $wifebirthsd= $family->get('wifebirthsd');
-    					    if ($husbbirthsd != 0)
-    					    {	// have father's birth date
-    							$birthmin	= floor($husbbirthsd/10000)+15;
-    							$birthmax	= floor($husbbirthsd/10000)+65;
-    					    }	// have father's birth date
-    					    else
-    					    if ($wifebirthsd != 0)
-    					    {	// have mother's birth date
-    							$birthmin	= floor($wifebirthsd/10000)+15;
-    							$birthmax	= floor($wifebirthsd/10000)+55;
-    					    }	// have mother's birth date
-    					    $incMarried	= false;
-    					}	// try
-    					catch (Exception $e) {
-    					    $msg	.= "No database record for parentsIdmr=$idmr. ";
-    					}	// catch
-    			    }		// is numeric
-    			    else
-    					$msg	.= "Invalid value of parentsIdmr='$value'. ";
-    			}	// value supplied
-    			break;
-    	    }		// IDMR of family to add children to
-
-    	    case 'loose':
-    	    {
-    			$loose		= strtolower($value) == 'y' ||
-    							  strtolower($value) == 'yes';
-    			break;
-    	    }		// loose specified
-
-    	    case 'buttonid':
-    	    {		// feeds back a linkage to the invoker
-    			$buttonId	= $value;
-    			break;
-    	    }		// feeds back a linkage to the invoker
-
-    	    case 'limit':
-    	    {		// limit number of responses
-    			if (strlen($value) > 0)
-    			{	// value supplied
-    			    if (ctype_digit($value))
-    					$limit	= $value;
-    			    else
-    					$msg	.= "Invalid value of Limit='$value'. ";
-    			}	// value supplied
-    			break;
-    	    }		// limit number of responses
-
-    	}		// act on specific keys
-    }			// loop through parameters
-
-    // check for various birth year combinations
-    if (is_null($birthmin) && is_null($birthmax) && !is_null($birthyear))
-    {		// birthyear specified
-    	$birthmin	= $birthyear - $range;
-    	$birthmax	= $birthyear + $range;
-    }		// birthyear specified
-    else
-    if ($birthmin > $birthmax)
-    {
-    	$msg	.= "BirthMin=$birthmin greater than BirthMax=$birthmax. ";
+        print "    <$key>$value</$key>\n";
     }
 
-    // if any errors detected just return error message
-    if (strlen($msg) > 0)
+    // include deduced parameters
+    if (!$sexPassed	&& strlen($sex) > 0)
     {
-    	print "<msg>$msg</msg>\n";
+        print "    <sex>$sex</sex>\n";
     }
+    if (!$birthyearPassed && !is_null($birthyear))
+    {
+        print "    <birthyear>$birthyear</birthyear>\n";
+    }
+    if (!$birthminPassed && !is_null($birthmin))
+    {
+        print "    <birthmin>$birthmin</birthmin>\n";
+    }
+    if (!$birthmaxPassed && !is_null($birthmax))
+    {
+        print "    <birthmax>$birthmax</birthmax>\n";
+    }
+    print "  </parms>\n";
+
+    if (strlen($warn) > 0)
+    {		    // support diagnostics prior to start of XML
+        print "<div class='warning'>$warn</div>\n";
+    }		    // support diagnostics prior to start of XML
+
+    // if the name pattern to search for was not supplied in
+    // the parameters, get the name that was used in the last
+    // invocation of this script from a cookie
+    if (strlen($surname) == 0 &&
+        strlen($givenname) == 0 &&
+        count($_COOKIE) > 0)
+    {		    // parameters did not set name
+        // the familyTree cookie is now extracted by common code for
+        // all scripts
+        if (array_key_exists('idir', $familyTreeCookie))
+        {		// last referenced individual
+    		$val	        = $familyTreeCookie['idir'];
+    		try {
+    		    $indiv	    = new Person(array('idir' => $val));
+    		    $surname	= $indiv->get('surname');
+    		    $givenname	= $indiv->get('givenname');
+    		    $retval	    = true;		// globals set
+    		} catch(Exception $e) {
+    		    $msg	    .= $e->getMessage();
+    		}
+        }		// last referenced individual
+    }		    // parameters did not set initial name
+
+    // construct WHERE clause
+    $getParms	= array();
+    if ($loose)
+    {			// loose comparison for names
+        $getParms['loose']		= 'Y';
+        $getParms['surname']	= "$surname";
+    }			// loose comparison for names
     else
-    {			// no errors
-    	// top node of XML result
-    	// the "buttonId" parameter feeds back a linkage to the invoker
-    	if (strlen($buttonId) > 0)
-    	    print("<names buttonId='$buttonId'>\n");
-    	else
-    	    print("<names>\n");
+    {			// range of surnames
+        // starting with the specific name and running to the end
+        $getParms['surname']	= array($surname, $lastsurname);
+    }			// range of surnames
 
-    	// document parameters to script
-    	print "  <parms>\n";
-    	foreach($_GET as $key => $value)
-    	{
-    	    print "    <$key>$value</$key>\n";
-    	}
+    // optional given name for first individual within surname
+    if (strlen($givenname) > 0)
+    {
+        $givennames		= explode(' ', $givenname);
+        $givennames		= array_diff($givennames, array(''));
+        if (count($givennames) == 1)
+    		$getParms['givenname']	= $givenname;
+        else
+    		$getParms['givenname']	= $givennames;
+    }		// given name supplied
 
-    	// include deduced parameters
-    	if (!$sexPassed	&& strlen($sex) > 0)
-    	{
-    	    print "    <sex>$sex</sex>\n";
-    	}
-    	if (!$birthyearPassed && !is_null($birthyear))
-    	{
-    	    print "    <birthyear>$birthyear</birthyear>\n";
-    	}
-    	if (!$birthminPassed && !is_null($birthmin))
-    	{
-    	    print "    <birthmin>$birthmin</birthmin>\n";
-    	}
-    	if (!$birthmaxPassed && !is_null($birthmax))
-    	{
-    	    print "    <birthmax>$birthmax</birthmax>\n";
-    	}
-    	print "  </parms>\n";
+    // tree name
+    $getParms['treename']		= $treename;
 
-    	if (strlen($warn) > 0)
-    	{		    // support diagnostics prior to start of XML
-    	    print "<div class='warning'>$warn</div>\n";
-    	}		    // support diagnostics prior to start of XML
+    // check for gender specific request
+    if ($sex == 'M' || $sex == 'm')
+    {			// looking for male
+        $getParms['gender']		= 0;
+    }			// looking for male
+    else
+    if ($sex == 'F' || $sex == 'f')
+    {			// looking for female
+        $getParms['gender']		= 1;
+    }			// looking for female
 
-    	// if the name pattern to search for was not supplied in
-    	// the parameters, get the name that was used in the last
-    	// invocation of this script from a cookie
-    	if (strlen($surname) == 0 &&
-    	    strlen($givenname) == 0 &&
-    	    count($_COOKIE) > 0)
-    	{		    // parameters did not set name
-    	    // the familyTree cookie is now extracted by common code for
-    	    // all scripts
-    	    if (array_key_exists('idir', $familyTreeCookie))
-    	    {		// last referenced individual
-    			$val	        = $familyTreeCookie['idir'];
-    			try {
-    			    $indiv	    = new Person(array('idir' => $val));
-    			    $surname	= $indiv->get('surname');
-    			    $givenname	= $indiv->get('givenname');
-    			    $retval	    = true;		// globals set
-    			} catch(Exception $e) {
-    			    $msg	    .= $e->getMessage();
-    			}
-    	    }		// last referenced individual
-    	}		    // parameters did not set initial name
+    // which types of names to include
+    // if looking for a potential spouse or child to add to a family 
+    // do not include married names
+    if ($incMarried)
+        $getParms['incmarried']	= 'y';
 
-    	// construct WHERE clause
-    	$getParms	= array();
-    	if ($loose)
-    	{			// loose comparison for names
-    	    $getParms['loose']		= 'Y';
-    	    $getParms['surname']	= "$surname";
-    	}			// loose comparison for names
-    	else
-    	{			// range of surnames
-    	    // starting with the specific name and running to the end
-    	    $getParms['surname']	= array($surname, $lastsurname);
-    	}			// range of surnames
+    // birth year to include in comparison
+    if (!is_null($birthmin))
+        $getParms['birthmin']	= $birthmin;
+    if (!is_null($birthmax))
+        $getParms['birthmax']	= $birthmax;
 
-    	// optional given name for first individual within surname
-    	if (strlen($givenname) > 0)
-    	{
-    	    $givennames		= explode(' ', $givenname);
-    	    $givennames		= array_diff($givennames, array(''));
-    	    if (count($givennames) == 1)
-    			$getParms['givenname']	= $givenname;
-    	    else
-    			$getParms['givenname']	= $givennames;
-    	}		// given name supplied
+    // IDIR to exclude for match
+    // do not merge an individual with him/herself, and do not merge with
+    // any individual already known not to be the individual
+    if ($idir > 0)
+        $getParms['excidir']	= $idir;
 
-    	// tree name
-    	$getParms['treename']		= $treename;
+    // if request to look for child to add to a family,
+    // exclude existing children of family from results
+    if ($idmr > 0)
+        $getParms['excidmr']	= $idmr;
 
-    	// check for gender specific request
-    	if ($sex == 'M' || $sex == 'm')
-    	{			// looking for male
-    	    $getParms['gender']		= 0;
-    	}			// looking for male
-    	else
-    	if ($sex == 'F' || $sex == 'f')
-    	{			// looking for female
-    	    $getParms['gender']		= 1;
-    	}			// looking for female
-
-    	// which types of names to include
-    	// if looking for a potential spouse or child to add to a family 
-    	// do not include married names
-    	if ($incMarried)
-    	    $getParms['incmarried']	= 'y';
-
-    	// birth year to include in comparison
-    	if (!is_null($birthmin))
-    	    $getParms['birthmin']	= $birthmin;
-    	if (!is_null($birthmax))
-    	    $getParms['birthmax']	= $birthmax;
-
-    	// IDIR to exclude for match
-    	// do not merge an individual with him/herself, and do not merge with
-    	// any individual already known not to be the individual
-    	if ($idir > 0)
-    	    $getParms['excidir']	= $idir;
-
-    	// if request to look for child to add to a family,
-    	// exclude existing children of family from results
-    	if ($idmr > 0)
-    	    $getParms['excidmr']	= $idmr;
-
-    	$getParms['limit']		= $limit;
-    	$getParms['order']		= 'tblNX.`Surname`, tblNX.`GivenName`, COALESCE(EBirth.`EventSD`,tblIR.`BirthSD`)';
-        // execute the query
-        $msgParms       = "array(";
-        $comma          = '';
-        foreach($getParms as $key => $value)
+    $getParms['limit']		= $limit;
+    $getParms['order']		= 'tblNX.`Surname`, tblNX.`GivenName`, COALESCE(EBirth.`EventSD`,tblIR.`BirthSD`)';
+    // execute the query
+    $msgParms       = "array(";
+    $comma          = '';
+    foreach($getParms as $key => $value)
+    {
+        $msgParms   .= "$comma'$key'=>";
+        if (is_string($value))
         {
-            $msgParms   .= "$comma'$key'=>";
-            if (is_string($value))
-            {
-                if (preg_match('/-?\d+/',$value))
-                    $msgParms   .= $value;
-                else
-                    $msgParms   .= "'$value'";
-            }
-            else
-            if (is_int($value))
+            if (preg_match('/-?\d+/',$value))
                 $msgParms   .= $value;
             else
-            if (is_null($value))
-                $msgParms   .= 'null';
-            else
-            if (is_array($value))
-            {
-                $msgParms   .= 'array(';
-                $tcom       = '';
-                foreach($value as $id => $val)
-                {
-                    $msgParms   .= "$tcom$id=>";
-		            if (is_string($val))
-		                $msgParms   .= "'$val'";
-		            else
-		            if (is_int($val))
-		                $msgParms   .= $val;
-		            else
-		            if (is_null($val))
-		                $msgParms   .= 'null';
-		            else
-                        $msgParms   .= print_r($val, true);
-                    $tcom           = ',';
-                }
-                $msgParms           .= ')';
-            }
-            else
-                $msgParms   .= print_r($value, true);
-            $comma                  = ',';
+                $msgParms   .= "'$value'";
         }
-        $msgParms                   .= ')';
-        print "<cmd>new PersonSet($msgParms)</cmd>\n";
-    	$result		            = new PersonSet($getParms);
-    	$info		            = $result->getInformation();
-    	print "<cmd>" . $info['query'] . "</cmd>\n";
-    	$count		            = $result->count();
+        else
+        if (is_int($value))
+            $msgParms   .= $value;
+        else
+        if (is_null($value))
+            $msgParms   .= 'null';
+        else
+        if (is_array($value))
+        {
+            $msgParms   .= 'array(';
+            $tcom       = '';
+            foreach($value as $id => $val)
+            {
+                $msgParms   .= "$tcom$id=>";
+                if (is_string($val))
+                    $msgParms   .= "'$val'";
+                else
+                if (is_int($val))
+                    $msgParms   .= $val;
+                else
+                if (is_null($val))
+                    $msgParms   .= 'null';
+                else
+                    $msgParms   .= print_r($val, true);
+                $tcom           = ',';
+            }
+            $msgParms           .= ')';
+        }
+        else
+            $msgParms   .= print_r($value, true);
+        $comma                  = ',';
+    }
+    $msgParms                   .= ')';
+    print "<cmd>new PersonSet($msgParms)</cmd>\n";
+    $result		            = new PersonSet($getParms);
+    $info		            = $result->getInformation();
+    print "<cmd>" . $info['query'] . "</cmd>\n";
+    $count		            = $result->count();
 
-    	// iterate through results
-    	foreach($result as $idir => $indiv)
-    	{		// loop through all result rows
-    	    // check if current user is an owner of the record and therefore
-    	    // permitted to see private information and edit the record
-    	    $isOwner	        = $indiv->isOwner();
+    // iterate through results
+    foreach($result as $idir => $indiv)
+    {		// loop through all result rows
+        // check if current user is an owner of the record and therefore
+        // permitted to see private information and edit the record
+        $isOwner	        = $indiv->isOwner();
 
-    	    // extract fields from individual 
-    	    $surname	        = xmlentities($indiv->get('indexsurname'));
-    	    $maidenname	        = xmlentities($indiv->get('surname'));
-    	    $givenname	        = xmlentities($indiv->get('givenname'));
-    	    $birth	            = $indiv->getBirthEvent();
-    	    $death	            = $indiv->getDeathEvent();
-    	    if ($isOwner)
-    	    {
-    			$bprivlim		= 9999;
-    			$dprivlim		= 9999;
-    	    }
-    	    else
-    	    {
-    			$currYear		= intval(date('Y'));
-    			$bprivlim		= $currYear - 100;
-    			$dprivlim		= $currYear - 27;
-    	    }
-    	    if ($birth)
-    	    {
-    			$birthsd	    = $birth->get('eventsd');
-    			$birthd		    = $birth->getDate($bprivlim);
-    	    }
-    	    else
-    	    {
-    			$birthd		    = '';
-    			$birthsd	    = 99999999;
-    	    }
-    	    if ($death)
-    	    {
-    			$deathsd	    = $death->get('eventsd');
-    			$deathd	        = $death->getDate($dprivlim);
-    	    }
-    	    else
-    	    {
-    			$deathd		    = '';
-    			$deathsd	    = 99999999;
-    	    }
-    	    $gender	            = $indiv->get('gender');
-    	    $private	        = $indiv->get('private');
-    	    if ($isOwner || $private < 2)
-    	    {		// existence of individual visible
-    			print "    <indiv id='$idir'>\n";
-    			print "\t<surname>" . $surname . "</surname>\n";
-    			print "\t<maidenname>" . $maidenname . "</maidenname>\n";
-    			print "\t<givenname>" . $givenname . "</givenname>\n";
-    			print "\t<gender>" . $gender . "</gender>\n";
-    			print "\t<birthd>$birthd</birthd>\n";
-    			print "\t<deathd>$deathd</deathd>\n";
-    			if ($isOwner)
-    			{		// shared owner
-    			    print "\t<birthsd>$birthsd</birthsd>\n";
-    			    print "\t<deathsd>$deathsd</deathsd>\n";
-    			}		// shared owner
+        // extract fields from individual 
+        $surname	        = xmlentities($indiv->get('indexsurname'));
+        $maidenname	        = xmlentities($indiv->get('surname'));
+        $givenname	        = xmlentities($indiv->get('givenname'));
+        $birth	            = $indiv->getBirthEvent();
+        $death	            = $indiv->getDeathEvent();
+        if ($isOwner)
+        {
+    		$bprivlim		= 9999;
+    		$dprivlim		= 9999;
+        }
+        else
+        {
+    		$currYear		= intval(date('Y'));
+    		$bprivlim		= $currYear - 100;
+    		$dprivlim		= $currYear - 27;
+        }
+        if ($birth)
+        {
+    		$birthsd	    = $birth->get('eventsd');
+    		$birthd		    = $birth->getDate($bprivlim);
+        }
+        else
+        {
+    		$birthd		    = '';
+    		$birthsd	    = 99999999;
+        }
+        if ($death)
+        {
+    		$deathsd	    = $death->get('eventsd');
+    		$deathd	        = $death->getDate($dprivlim);
+        }
+        else
+        {
+    		$deathd		    = '';
+    		$deathsd	    = 99999999;
+        }
+        $gender	            = $indiv->get('gender');
+        $private	        = $indiv->get('private');
+        if ($isOwner || $private < 2)
+        {		// existence of individual visible
+    		print "    <indiv id='$idir'>\n";
+    		print "\t<surname>" . $surname . "</surname>\n";
+    		print "\t<maidenname>" . $maidenname . "</maidenname>\n";
+    		print "\t<givenname>" . $givenname . "</givenname>\n";
+    		print "\t<gender>" . $gender . "</gender>\n";
+    		print "\t<birthd>$birthd</birthd>\n";
+    		print "\t<deathd>$deathd</deathd>\n";
+    		if ($isOwner)
+    		{		// shared owner
+    		    print "\t<birthsd>$birthsd</birthsd>\n";
+    		    print "\t<deathsd>$deathsd</deathsd>\n";
+    		}		// shared owner
 
-    			if ($private == 0)
-    			{		// information is public
-    			    // display names of parents
-    			    if ($includeParents)
-    			    {		// include parents' names
-    					$parents	= $indiv->getParents();
-    					if (count($parents) > 0)
-    					{
-    					    print "\t<parents>\n";
-    					    $conjunction	= '';
-    					    foreach($parents as $idmr => $parent)
-    					    {
-    							print $conjunction . $parent->getName(false);
-    							$conjunction	= ', and ';
-    					    }	// loop through all sets of parents
-    					    print "\t</parents>\n";
-    					}
-    			    }		// include parents' names
+    		if ($private == 0)
+    		{		// information is public
+    		    // display names of parents
+    		    if ($includeParents)
+    		    {		// include parents' names
+    				$parents	= $indiv->getParents();
+    				if (count($parents) > 0)
+    				{
+    				    print "\t<parents>\n";
+    				    $conjunction	= '';
+    				    foreach($parents as $idmr => $parent)
+    				    {
+    						print $conjunction . $parent->getName(false);
+    						$conjunction	= ', and ';
+    				    }	// loop through all sets of parents
+    				    print "\t</parents>\n";
+    				}
+    		    }		// include parents' names
 
-    			    // display name of spouse
-    			    if ($includeSpouse)
-    			    {		// include spouse's name
-    					$families	= $indiv->getFamilies();
-    					if (count($families) > 0)
-    					{
-    					    print "\t<families>\n";
-    					    $conjunction	= '';
-    					    foreach($families as $idmr => $family)
-    					    {
-    							if ($gender == 0)
-    							    $spouseIdir	= $family->get('idirwife');
-    							else
-    							    $spouseIdir	= $family->get('idirhusb');
-    							if ($spouseIdir)
-    							{
-    							  try {
-    							    $spouse	= new Person(
-    										    array('idir'=>$spouseIdir));
-    							    print $conjunction . $spouse->getName();
-    							  } catch(Exception $e) {
-    							    print $conjunction .
-    									"idmr=$idmr, spouseIdir=$spouseIdir: " .
-    									  $e->getMessage();
-    							  }
-    							    $conjunction	= ', and ';
-    							}
-    					    }	// loop through all sets of families
-    					    print "\t</families>\n";
-    					}
-    			    }		// include spouse's name
-    			}		// information is public
+    		    // display name of spouse
+    		    if ($includeSpouse)
+    		    {		// include spouse's name
+    				$families	= $indiv->getFamilies();
+    				if (count($families) > 0)
+    				{
+    				    print "\t<families>\n";
+    				    $conjunction	= '';
+    				    foreach($families as $idmr => $family)
+    				    {
+    						if ($gender == 0)
+    						    $spouseIdir	= $family->get('idirwife');
+    						else
+    						    $spouseIdir	= $family->get('idirhusb');
+    						if ($spouseIdir)
+    						{
+    						  try {
+    						    $spouse	= new Person(
+    									    array('idir'=>$spouseIdir));
+    						    print $conjunction . $spouse->getName();
+    						  } catch(Exception $e) {
+    						    print $conjunction .
+    								"idmr=$idmr, spouseIdir=$spouseIdir: " .
+    								  $e->getMessage();
+    						  }
+    						    $conjunction	= ', and ';
+    						}
+    				    }	// loop through all sets of families
+    				    print "\t</families>\n";
+    				}
+    		    }		// include spouse's name
+    		}		// information is public
 
-    			// close the top level
-    			print "    </indiv>\n";
-    	    }		// existence of individual visible
-    	}			// loop through all result rows
+    		// close the top level
+    		print "    </indiv>\n";
+        }		// existence of individual visible
+    }			// loop through all result rows
 
-    	print("</names>\n");	// close off top node of XML result
-    }			// no errors
+    print("</names>\n");	// close off top node of XML result
+}			// no errors

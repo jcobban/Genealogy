@@ -52,10 +52,6 @@ function onLoad()
 		    if(!name || name.length == 0)
 				name		= element.id;
 
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
-
 		    // activate keystroke support
 		    element.onkeydown	= keyDown;
 

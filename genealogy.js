@@ -10,25 +10,37 @@
  *						invoked signon.									*
  *		2013/07/30		defer facebook initialization until after load	*
  *		2015/07/28		close comment blocks							*
+ *		2019/02/11      scroll just the main section, leaving header    *
+ *		                and footer visible always                       *
+ *		                calling pageInit no longer required             *
  *																		*
- *  Copyright &copy; 2015 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
-window.onload	= onLoad;
+if (window.addEventListener) 
+{                    // For all major browsers, except IE 8 and earlier
+    window.addEventListener("load", onLoad, false);
+} 
+else 
+if (window.attachEvent) 
+{                  // For IE 8 and earlier versions
+    window.attachEvent("onload", onLoad)
+}
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Perform initialization after page is loaded.  This page is			*
  *  frequently invoked by the signon script.  If this is the case then	*
  *  the page that invoked the signon script should be refreshed to		*
  *  reflect the change in user status.									*
  *																		*
+ *	Input:																*
+ *	    event       instance of Event containing load event             *
+ *	    this        instance of Window                                  *
  ************************************************************************/
-function onLoad()
+function onLoad(event)
 {
-    pageInit();
-
     var	opener		= window.opener;
     if (opener)
     {			// invoked from another window
@@ -39,4 +51,18 @@ function onLoad()
 				opener.location.reload();
 		}		// refresh
     }			// invoked from another window
+
+    // scroll main portion of page if it does not fit without scrolling
+    var headSection         = document.getElementById('headSection');
+    var headHeight          = headSection.offsetHeight;
+    var mainSection         = document.getElementById('mainSection');
+    var mainHeight          = mainSection.offsetHeight;
+    var footSection         = document.getElementById('footSection');
+    var footHeight          = footSection.offsetHeight;
+    var windHeight          = window.innerHeight;
+    if (mainHeight + headHeight + footHeight > windHeight)
+    {
+        mainSection.style.height    = (windHeight - headHeight - footHeight - 12) + 'px';
+        mainSection.style.overflowY = 'auto';
+    }
 }		// onLoad

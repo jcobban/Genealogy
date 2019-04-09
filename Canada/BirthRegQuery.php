@@ -21,6 +21,7 @@ use \Exception;
  *		2016/05/20		use class Domain to validate domain code		*
  *		2017/02/07		use class Country								*
  *		2018/10/05      use class Template                              *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -37,31 +38,42 @@ use \Exception;
  ************************************************************************/
 
 // validate all parameters passed to the server script
-$code		    = 'ON';
-$cc			    = 'CA';
-$domain		    = 'CAON';
-$countryName	= 'Canada';
-$domainName		= 'Canada: Ontario';
-$stateName		= 'Ontario';
-$lang	    	= 'en';
+$code		    		= 'ON';
+$cc			    		= 'CA';
+$domain		    		= 'CAON';
+$countryName			= 'Canada';
+$domainName				= 'Canada: Ontario';
+$stateName				= 'Ontario';
+$lang	    			= 'en';
 
+$parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
 foreach ($_GET as $key => $value)
 {			    // loop through all parameters
+    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
 	switch(strtolower($key))
 	{	    	// act on specific parameters
 	    case 'code':
 	    {		// state postal abbreviation
-			$code		= $value;
-			$cc		    = 'CA';
-			$domain		= 'CA' . $code;
+			$code		    = $value;
+			$cc		        = 'CA';
+			$domain		    = 'CA' . $code;
 			break;
 	    }		// state postal abbreviation
 
 	    case 'domain':
 	    case 'regdomain':
-	    {		// state postal abbreviation
+        {		// state postal abbreviation
 			$domain		    = $value;
-			$cc		        = substr($domain, 0, 2);
+            if (strlen($value) >= 4)
+            {
+                $cc		    = substr($domain, 0, 2);
+                if ($cc == 'UK')
+                    $cc     = 'GB';
+            }
 			break;
 	    }		// state postal abbreviation
 
@@ -73,30 +85,24 @@ foreach ($_GET as $key => $value)
 	    }
 	}   		// act on specific parameters
 }   			// loop through all parameters
+if ($debug)
+    $warn       .= $parmsText . "</table>\n";
 
-$domainObj	    = new Domain(array('domain'	    => $domain,
-				                   'language'	=> $lang));
-$countryObj	    = new Country(array('code' => $cc));
-$countryName	= $countryObj->getName();
-$domainName	    = $domainObj->getName(1);
-$stateName	    = $domainObj->getName(0);
-$code		    = substr($domain, 2, 2);
+$template		        = new FtTemplate("BirthRegQuery$lang.html");
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= $tempBase . "BirthRegQuery$lang.html";
-if (!file_exists($includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub		= $tempBase . "BirthRegQueryen.html";
-}
-$template->includeSub($includeSub, 'MAIN');
+$domainObj	            = new Domain(array('domain'	    => $domain,
+                                           'language'	=> $lang));
+if ($domainObj->isExisting())
+    $template['unsupportedDomain']->update(null);
+$countryObj	            = new Country(array('code' => $cc));
+if ($countryObj->isExisting())
+    $template['unsupportedCountry']->update(null);
+
+$countryName        	= $countryObj->getName();
+$domainName	            = $domainObj->getName(1);
+$stateName	            = $domainObj->getName(0);
+$code		            = substr($domain, 2, 2);
+
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('CC',		        $cc);
 $template->set('DOMAINNAME',		$domainName);

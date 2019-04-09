@@ -31,8 +31,10 @@ use \Exception;
  *		2017/11/04		$provinces erroneously set to empty array		*
  *		2018/01/04		remove Template from template file names		*
  *		2018/01/11		htmlspecchars moved to Template class			*
+ *		2019/02/21      use new FtTemplate constructor                  *
+ *		                improve support of non-Canadian Censuses        *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/CensusSet.inc';
@@ -49,11 +51,11 @@ require_once __NAMESPACE__ . '/common.inc';
 $censusList		= array();
 $getParms		= array('partof'	=> null);
 $censuses		= new CensusSet($getParms);
-foreach($censuses as $censusRec)
+foreach($censuses as $census)
 {
-	$censusList[$censusRec->get('censusid')] =
-					array(	'id'		=> $censusRec->get('censusid'),
-						    'name'		=> $censusRec->get('name'),
+	$censusList[$census->get('censusid')] =
+					array(	'id'		=> $census->get('censusid'),
+						    'name'		=> $census->get('name'),
 						    'selected'	=> '');
 }
 
@@ -81,32 +83,31 @@ foreach($_GET as $key => $value)
 			    $censusId	= $value;
 
 			// validate
-			$censusRec	= new Census(array('censusid'	=> $censusId));
-			if ($censusRec->isExisting())
+			$census	        = new Census(array('censusid'	=> $censusId));
+			if ($census->isExisting())
 			{
-			    $provinces	= $censusRec->get('provinces');
+			    $provinces	= $census->get('provinces');
 			    $censusList[$censusId]['selected'] = "selected='selected'";
 			}
 			else
 			{
-			    $warn	.= "<p>Census '$censusId' is unsupported</p>\n";
+			    $warn	    .= "<p>Census '$censusId' is unsupported</p>\n";
 			    $provinces	= '';
 			}
-			$cc		= substr($censusId, 0, 2);
-			$censusYear	= substr($censusId, 2);
-			$country	= new Country(array('code' => $cc));
+			$cc		        = $census['cc'];
+			$province	    = $census['province'];
+			$censusYear	    = $census['year'];
+			$country	    = new Country(array('code' => $cc));
 			$countryName	= $country->get('name');
-			if ($cc == 'QC')
-			    $province	= 'QC';
 			break;
 	    }
 
 	    case 'province':
 	    {			// province code
-			$province	= $value;
+			$province	    = $value;
 			if (strlen($value) == 2)
 			{
-			    $pos	= strpos($provinces, $value);
+			    $pos	    = strpos($provinces, $value);
 			    if ($pos === false && ($pos & 1) == 1)
 					$msg	.= "Invalid value '$value' for Province. ";
 			}
@@ -119,33 +120,19 @@ foreach($_GET as $key => $value)
 	    case 'lang':
         {
             if (strlen($value) >= 2)
-			    $lang		= strtolower(substr($value,0,2));
+			    $lang		= strtolower(substr($value, 0, 2));
 			break;
 	    }			// language code
 
-	}	// act on specific parameters
-}		// loop through parameters
+	}	            // act on specific parameters
+}		            // loop through parameters
 
 // notify the invoker if they are not authorized
 $update	            = canUser('edit');
-$tempBase	        = $document_root . '/templates/';
-$template	        = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	        = "ReqUpdateDists$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = 'ReqUpdateDistsen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-	            	  'MAIN');
+$template	        = new FtTemplate("ReqUpdateDists$lang.html");
 
 $template->set('CENSUSYEAR', 	$censusYear);
+$template->set('CC',	        $cc);
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('CENSUSID',		$censusId);
 $template->set('PROVINCE',		$province);

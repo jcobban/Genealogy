@@ -3,76 +3,77 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  CensusUpdate.php							*
- *									*
+ *  CensusUpdate.php													*
+ *																		*
  *  This script updates one page of the year specific census of Canada	*
- *  database.								*
- *  It is invoked by CensusFormYYYY.php using method='post'.		*
- *									*
- *  History prior to merging all CensusUpdateYYYY.php scripts:		*
- *	2010/08/21	Extract Image URL from parameters		*
- *	2010/10/01	Reformat to new page layout.			*
- *	2010/10/02	Support more or less than 25 lines in a page	*
- *	2011/01/06	Improve separation of PHP and HTML		*
- *			use shared MDB2 connection			*
- *			only offer option of next page if exists	*
- *	2011/01/15	do not count blank lines in page table stats	*
- *			credit transcription to current user		*
- *			allow the form to update any selected fields	*
- *	2011/05/15	use CSS for layout				*
- *			add missing Javascript file			*
- *	2011/09/24	set focus on update next page in division	*
- *			use buttons rather than hyperlinks for actions	*
- *	2011/10/20	Issue message to guide user if not signed in	*
- *			set NumHands to NULL if not numeric value	*
- *			generalized so this script will handle any	*
- *			census						*
- *  History after merging:						*
- *	2011/10/22	renamed consolidated script			*
- *	2011/11/06	do not mention division number if it is unused	*
- *	2012/04/14	allow more characters in an image URL		*
- *	2012/06/24	allow more characters in an image URL		*
- *	2012/09/16	use full census identifier for parameters	*
- *	2012/10/23	unused variable $warn corrected			*
- *	2012/11/02	use page1 and bypage values from SubDistTable	*
- *			to calculate last page in division and next page*
- *	2013/01/26	table SubDistTable renamed to SubDistricts	*
- *	2013/02/25	accept age enclosed in square brackets		*
- *	2013/06/02	use class CensusLine to exploit LegacyRecord	*
- *			capability					*
- *			to update selected fields in a record		*
- *			use pageTop and pageBot to standardize		*
- *			appearance of page				*
- *	2013/06/05	only warn on bad image URL			*
- *	2013/06/11	correct URL for requesting next page to edit	*
- *	2013/06/13	do not insert record with surname '[Delete]'	*
- *			into the database, and delete existing record	*
- *			if surname changed to '[Delete']		*
- *	2013/06/16	correct updating of birth year field from age	*
- *	2013/09/02	add dynamic debug setting			*
- *	2013/09/05	handle exceptions from setField			*
- *	2013/11/29	let common.inc set initial value of $debug	*
- *	2013/12/28	use CSS for layout				*
- *	2014/04/26	use classes SubDistrict and Page to make	*
- *			update of those tables consistent and log	*
- *	2014/10/23	add search link to header and footer		*
- *	2014/12/30	use new form of Page constructor		*
- *			redirect debugging output to $warn		*
- *	2015/02/03	move onclick methods for buttons to .js		*
- *			add a close window button so dialog can be	*
- *			closed when in a frame				*
- *	2015/07/02	access PHP includes using include_path		*
- *	2015/11/10	do not include division in invocation of search	*
- *	2015/11/17	update statistics in associated District	*
- *	2016/01/04	add help popups for the buttons			*
- *	2016/01/31	use class Census to validate censusId		*
- *	2016/12/26	add citation for birth for new IDIR link	*
- *			on debug do not print command to page		*
- *	2017/07/27	class LegacyCitation renamed to class Citation	*
- *	2017/09/12	use get( and set(				*
- *	2017/10/13	class LegacyIndiv renamed to class Person	*
- *									*
- *  Copyright 2017 James A. Cobban					*
+ *  database.															*
+ *  It is invoked by CensusFormYYYY.php using method='post'.			*
+ *																		*
+ *  History prior to merging all CensusUpdateYYYY.php scripts:			*
+ *		2010/08/21		Extract Image URL from parameters				*
+ *		2010/10/01		Reformat to new page layout.					*
+ *		2010/10/02		Support more or less than 25 lines in a page	*
+ *		2011/01/06		Improve separation of PHP and HTML				*
+ *						use shared MDB2 connection						*
+ *						only offer option of next page if exists		*
+ *		2011/01/15		do not count blank lines in page table stats	*
+ *						credit transcription to current user			*
+ *						allow the form to update any selected fields	*
+ *		2011/05/15		use CSS for layout								*
+ *						add missing Javascript file						*
+ *		2011/09/24		set focus on update next page in division		*
+ *						use buttons rather than hyperlinks for actions	*
+ *		2011/10/20		Issue message to guide user if not signed in	*
+ *						set NumHands to NULL if not numeric value		*
+ *						generalized so this script will handle any		*
+ *						census											*
+ *  History after merging:												*
+ *		2011/10/22		renamed consolidated script						*
+ *		2011/11/06		do not mention division number if it is unused	*
+ *		2012/04/14		allow more characters in an image URL			*
+ *		2012/06/24		allow more characters in an image URL			*
+ *		2012/09/16		use full census identifier for parameters		*
+ *		2012/10/23		unused variable $warn corrected					*
+ *		2012/11/02		use page1 and bypage values from SubDistTable	*
+ *						to calculate last page in division and next page*
+ *		2013/01/26		table SubDistTable renamed to SubDistricts		*
+ *		2013/02/25		accept age enclosed in square brackets			*
+ *		2013/06/02		use class CensusLine to exploit LegacyRecord	*
+ *						capability										*
+ *						to update selected fields in a record			*
+ *						use pageTop and pageBot to standardize			*
+ *						appearance of page								*
+ *		2013/06/05		only warn on bad image URL						*
+ *		2013/06/11		correct URL for requesting next page to edit	*
+ *		2013/06/13		do not insert record with surname '[Delete]'	*
+ *						into the database, and delete existing record	*
+ *						if surname changed to '[Delete']				*
+ *		2013/06/16		correct updating of birth year field from age	*
+ *		2013/09/02		add dynamic debug setting						*
+ *		2013/09/05		handle exceptions from setField					*
+ *		2013/11/29		let common.inc set initial value of $debug		*
+ *		2013/12/28		use CSS for layout								*
+ *		2014/04/26		use classes SubDistrict and Page to make		*
+ *						update of those tables consistent and log		*
+ *		2014/10/23		add search link to header and footer			*
+ *		2014/12/30		use new form of Page constructor				*
+ *						redirect debugging output to $warn				*
+ *		2015/02/03		move onclick methods for buttons to .js			*
+ *						add a close window button so dialog can be		*
+ *						closed when in a frame							*
+ *		2015/07/02		access PHP includes using include_path			*
+ *		2015/11/10		do not include division in invocation of search	*
+ *		2015/11/17		update statistics in associated District		*
+ *		2016/01/04		add help popups for the buttons					*
+ *		2016/01/31		use class Census to validate censusId			*
+ *		2016/12/26		add citation for birth for new IDIR link		*
+ *						on debug do not print command to page			*
+ *		2017/07/27		class LegacyCitation renamed to class Citation	*
+ *		2017/09/12		use get( and set(								*
+ *		2017/10/13		class LegacyIndiv renamed to class Person		*
+ *		2019/02/19      use new FtTemplate constructor                  *
+ *																		*
+ *  Copyright 2019 James A. Cobban										*
  ************************************************************************/
 require_once __NAMESPACE__ . '/CensusLine.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -382,32 +383,28 @@ else
 		Sign in and then refresh this page to apply the changes.";
 }
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "CensusUpdate$lang.html";
-if (!file_exists($tempBase . $includeSub))
-    $includeSub		= 'CensusFormen.html';
-$template->includeSub($tempBase . $includeSub,
-			'MAIN');
+$template		= new FtTemplate("CensusUpdate$lang.html");
+
 $template->set('CENSUSYEAR', 		$censusYear);
-$template->set('CC',			$cc);
+$template->set('CC',			    $cc);
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('CENSUSID',			$censusId);
 $template->set('PROVINCE',			$province);
 $template->set('PROVINCENAME',		$provinceName);
-$template->set('LANG',			$lang);
+$template->set('LANG',			    $lang);
 $template->set('DISTRICT',			$distID);
 $template->set('DISTRICTNAME',		$districtName);
 $template->set('SUBDISTRICT',		$subDistID);
-$template->set('SUBDISTRICTNAME',		$subDistrictName);
+$template->set('SUBDISTRICTNAME',	$subDistrictName);
 $template->set('DIVISION',			$division);
-$template->set('PAGE',			$page);
+$template->set('PAGE',			    $page);
 $template->set('PREVPAGE',			$page - $bypage);
 $template->set('NEXTPAGE',			$page + $bypage);
 $template->set('CENSUS',			$censusYear);
 $template->set('CONTACTTABLE',		'Census' . $censusYear);
-$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
-$template->set('IMAGE',	$image);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('IMAGE',	            $image);
+
 if (strlen($province) == 0)
 {
     $template->updateTag('frontProv', null);

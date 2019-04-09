@@ -489,6 +489,17 @@ class Event extends RecordPic
 				'preferred'				=> 0);
 
     /********************************************************************
+     *	Event::$translate												*
+     *																	*
+     *	array containing synonyms for field names						*
+     ********************************************************************/
+    protected static	$translate	= array(
+				'id'		=> 'ider',
+				'notes'		=> 'desc',
+				'date'		=> 'eventd',
+				'location'	=> 'idleevent');
+
+    /********************************************************************
      *	Event::defaultOrder												*
      *																	*
      *	Default order for results returned from RecordSet				*
@@ -1323,16 +1334,25 @@ class Event extends RecordPic
     function setAssociatedRecord($record)
     {
 		if ($this->row['idtype'] == self::IDTYPE_INDIV &&
-		    $record instanceof Person)
-		    $this->associatedRecord	= $record;
+            $record instanceof Person)
+        {
+            $this->associatedRecord	= $record;
+            $this->row['idir']      = $record['idir'];
+		}
 		else
 		if ($this->row['idtype'] == self::IDTYPE_MAR &&
 		    $record instanceof Family)
+        {
 		    $this->associatedRecord	= $record;
+            $this->row['idir']      = $record['idmr'];
+		}
 		else
 		if ($this->row['idtype'] == self::IDTYPE_CHILD &&
 		    $record instanceof Child)
+        {
 		    $this->associatedRecord	= $record;
+            $this->row['idir']      = $record['idcr'];
+		}
 		else
 		{
 		    $parminfo	= gettype($record);
@@ -1564,33 +1584,36 @@ class Event extends RecordPic
     function setLocation($value)
     {
 		if (is_string($value) && ctype_digit($value))
-		    $value	= (int)$value;
+		    $value	    = (int)$value;
 
+		if (is_null($value) || strlen($value) == 0)
+            return parent::set('idlrevent', null);
+		else
 		if (is_int($value))
 		{		// idlr value
 		    if ($value < 1)
 				$value	= 1;
-		    $idlr	= $value;
+		    $idlr	    = $value;
 		}		// idlr value
 		else
 		if (is_string($value))
 		{		// location text
-		    $loc	= new Location(array('location' => $value));
+		    $loc	    = new Location(array('location' => $value));
 		    $loc->save(false);		// in case its a new location
-		    $idlr	= $loc->getIdlr();
+		    $idlr	    = $loc->getIdlr();
 		}		// location text
 		else
 		if (is_a($value, 'Location'))
 		{		// location object
-		    $loc	= $value;
+		    $loc	    = $value;
 		    $loc->save(false);		// in case its a new location
-		    $idlr	= $loc->getIdlr();
+		    $idlr	    = $loc->getIdlr();
 		}		// location text
 		else
 		if (is_a($value, 'Temple'))
 		{		// temple object
-		    $loc	= $value;
-		    $idlr	= $loc->getIdtr();
+		    $loc	    = $value;
+		    $idlr	    = $loc->getIdtr();
 		    parent::set('kind', 1);
 		}		// location text
 		else
@@ -1680,8 +1703,11 @@ class Event extends RecordPic
 		global	$debug;
 		global	$warn;
 
-		if (is_a($value, 'LegacyDate'))
+		if ($value instanceof LegacyDate)
 		{			// parameter is an instance of LegacyDate
+            if ($debug)
+                $warn   .= "<p>Event::setDate(LegacyDate('" .
+                            $value->toString() . "'))</p>\n";
 		    $date	    = $value;
 		}			// parameter is an instance of LegacyDate
 		else
@@ -1697,13 +1723,17 @@ class Event extends RecordPic
 	                else
 	                    $pos        = 'false';
 	            }
+                $warn   .= "<p>Event::setDate(internal '$value')</p>\n";
             }
 		    $date	    = new LegacyDate($value);
         }           // parameter is internal date format
         else
 		{			// convert the value to instance of LegacyDate
+            if ($debug)
+                $warn   .= "<p>Event::setDate(external '$value')</p>\n";
 		    $date	    = new LegacyDate(' ' . $value);
-		}			// convert the value to instance of LegacyDate
+        }			// convert the value to instance of LegacyDate
+
 		// handle events that are actually recorded in another record
 		$preferred  	= $this->row['preferred'];
 		if ($preferred && !$local)
@@ -2195,7 +2225,60 @@ class Event extends RecordPic
 		if ($print)
 		    print $retval;
 		return $retval;
-    }		// Event::toJson
+	}		// function Event::toJson
+ 
+    /********************************************************************
+     *  function Event::get												*
+     *																	*
+     *	Get the value of a field in the object.						    *
+     *																	*
+     *  Parameters:														*
+     *	    $field		name of field to change							*
+     *																	*
+     *	Returns:														*
+     *	    value of field										        *
+     ********************************************************************/
+    function get($field, $value)
+    {
+        global  $warn;
+
+		$fieldLc	= strtolower($field);
+		if (array_key_exists($fieldLc, self::$translate))
+		    $fieldLc	= self::$translate[$fieldLc];
+		switch($fieldLc)
+        {               // act on specific fields
+			case 'desc':
+            {
+        		$notes	= $this->row['desc'];
+        		if ($notes === null)
+        		    return '';
+        		else
+        		    return $notes;
+            }		// Notes
+
+			case 'description':
+            {
+        		$text	= $this->row['description'];
+        		if ($text === null)
+        		    return '';
+        		else
+        		    return $text;
+            }
+
+			case 'kind':
+            {
+        		if (array_key_exists('kind', $this->row))
+        		    return $this->row['kind'];
+        		else
+        		    return 0;		// instance of Location
+            }		// Kind
+
+		    default:
+		    {		// no validation implemented yet
+				return parent::set($field, $value);
+		    }		// no validation implemented yet
+        }               // act on specific fields
+	}		// function Event::get
 
     /********************************************************************
      *  function Event::set												*
@@ -2238,26 +2321,20 @@ class Event extends RecordPic
 		    }		// type of associated record
 
 		    case 'eventd':
-		    case 'date':
 		    {		// legacy internal date format
 				return $this->setDate($value);
 		    }		// legacy internal date format
 
 		    case 'idlrevent':
-		    case 'location':
 		    {		// value is IDLR
-				if (is_int($value) || ctype_digit($value))
-				    return $this->setLocation($value);
-				else
-				if (is_null($value) || strlen($value) == 0)
-                    return parent::set('idlrevent', null);
-				else
-				    $warn	.= "<p>Event::set: " .
-							"invalid value '$value' for field '$field'</p>\n";
+				return $this->setLocation($value);
 		    }		// value is IDLR
 
 		    case 'idar':
 		    {		// value is IDAR
+		        if (is_a($value, 'Address') && $value->isExisting())
+                    return parent::set('idar', $value->get('idar'));
+                else
 				if (is_int($value) || ctype_digit($value))
 				    return parent::set('idar', $value);
 				else

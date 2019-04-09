@@ -16,8 +16,9 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2018/02/04		use class Template								*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
     require_once __NAMESPACE__ . '/User.inc';
     require_once __NAMESPACE__ . '/Template.inc';
@@ -120,22 +121,8 @@ foreach($_REQUEST as $key => $value)
     }		// act on specific parameter
 }	// loop through all parameters
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "resetPassword$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-    $language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub     = 'resetPassworden.html';
-}
-$template->includeSub($tempBase . $includeSub,
-				      'MAIN');
+$template		= new FtTemplate("resetPassword$lang.html");
+
 $template->set('USERID',	$username);
 $template->set('EMAIL',		$email);
 $template->set('LANG',		$lang);

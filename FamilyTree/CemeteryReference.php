@@ -18,14 +18,14 @@ use \Exception;
  *		2017/11/19		use CitationSet in place of getCitations		*
  *		2018/02/24		undefined $list									*
  *		2018/11/01      use class Template                              *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/CitationSet.inc';
 require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/Person.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -77,21 +77,7 @@ foreach($_GET as $key => $value)
 	}	            // take action on specific parameter
 }		            // loop through all parameters
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "CemeteryReference$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	= new Language(array('code' => $lang));
-	$langName	= $language->get('name');
-	$nativeName	= $language->get('nativename');
-    $sorry      = $language->getSorry();
-    $warn       .= str_replace(array('$langName','$nativeName'),
-                           array($langName, $nativeName),
-                           $sorry);
-	$includeSub	= 'CemeteryReferenceen.html';
-}
-$template->includeSub($tempBase . $includeSub, 'MAIN');
+$template		= new FtTemplate("CemeteryReference$lang.html");
 
 if (strlen($plot) == 0)
     $msg	.= $template->getElementById('missingPlot')->innerHTML();

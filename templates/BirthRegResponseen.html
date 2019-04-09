@@ -146,20 +146,22 @@
 
     <div id="templates" class="hidden">
       <!-- template for confirming the deletion of a citation-->
-      <form name="RegDel$TEMPLATE" id="RegDel$TEMPLATE">
-        <p class="message">$MSG</p>
+      <form name="RegDel$template" id="RegDel$template">
+        <p class="message">
+            Are you sure you want to delete this registration?
+        </p>
         <p>
-          <button type="button" id="confirmDelete$REGNUM">
+          <button type="button" id="confirmDelete$regnum">
       	    OK
           </button>
-          <input type="hidden" id="regdomain$TEMPLATE" name="regdomain$TEMPLATE"
-      	        value="$REGDOMAIN">
-          <input type="hidden" id="regyear$TEMPLATE" name="regyear$TEMPLATE"
-      	        value="$REGYEAR">
-          <input type="hidden" id="formname$TEMPLATE" name="formname$TEMPLATE"
-      	        value="$FORMNAME">
+          <input type="hidden" id="regdomain$template" name="regdomain$template"
+      	        value="$regdomain">
+          <input type="hidden" id="regyear$template" name="regyear$template"
+      	        value="$regyear">
+          <input type="hidden" id="formname$template" name="formname$template"
+      	        value="$formname">
           &nbsp;
-          <button type="button" id="cancelDelete$REGNUM">
+          <button type="button" id="cancelDelete$regnum">
       	    Cancel
           </button>
         </p>
@@ -190,10 +192,6 @@
         Registration Year. 
       </span>
     </div> <!-- end of <div id="templates"> -->
-    <div class="balloon" id="HelprightTop">
-    	Click on this button to signon to access extended features of the
-        web-site or to manage your account with the web-site.
-    </div>
     <div class="balloon" id="HelpRegYear">
     	This field contains the year in which the event was registered.
     </div>

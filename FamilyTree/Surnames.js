@@ -9,8 +9,9 @@
  *		2012/01/13		change class names								*
  *		2013/08/01		defer facebook initialization until after load	*
  *		2017/07/31		class LegacySurname renamed to class Surname	*
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onloadSurnames;
@@ -22,8 +23,6 @@ window.onload	= onloadSurnames;
  ************************************************************************/
 function onloadSurnames()
 {
-    pageInit();
-
     var	table	= document.getElementById('namesTable');
     for(var ir = 0; ir < table.rows.length; ir++)
     {		// loop through all rows of table of names

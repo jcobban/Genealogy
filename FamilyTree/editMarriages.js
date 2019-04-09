@@ -166,8 +166,9 @@
  *		2017/07/22		add month abbreviation table to child birth		*
  *						and death fields								*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= loadEdit;
@@ -182,8 +183,6 @@ window.onload	= loadEdit;
  ************************************************************************/
 function loadEdit()
 {
-    pageInit();
-
     // the edit button for the preferred marriage
     var	editPref	= null;
     var	idmrNotSet	= true;
@@ -230,10 +229,6 @@ function loadEdit()
 		    element.onkeydown	= keyDown;
 		    element.onchange	= change;	// default handler
 
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
-    
 		    // do element specific initialization
 		    var namePattern	= /^([a-zA-Z$_]+)([0-9]*)$/;
 		    var pieces		= namePattern.exec(name);

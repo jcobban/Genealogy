@@ -6,25 +6,8 @@
  *																		*
  *  History:															*
  *		2018/09/12		created											*
+ *		2019/02/10      all functionality moved to util.js              *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
-
-/************************************************************************
- *  Initialization code that is executed when this script is loaded.	*
- *																		*
- *  Define the function to be called once the web page is loaded.		*
- ************************************************************************/
-window.onload	= onLoad;
-
-/************************************************************************
- *  onLoad																*
- *																		*
- *  Perform initialization functions once the page is loaded.			*
- ************************************************************************/
-function onLoad()
-{
-    pageInit();
-
-}		// onLoad
 

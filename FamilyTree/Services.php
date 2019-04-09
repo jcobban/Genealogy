@@ -52,11 +52,11 @@ use \Exception;
  *		2018/01/10		distinguish administrator from contributor		*
  *		2018/02/17		suppress warning on pendingUsers tag			*
  *						issue warning for unsupported language			*
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 /************************************************************************
@@ -98,22 +98,7 @@ else
 	$action		= 'Display';	// casual visitor
 
 // create the Template
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= $tempBase . "Services$action$lang.html";
-if (!file_exists($includeSub))
-{			// try without language
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub 	= $tempBase . "Services{$action}en.html";
-}			// try without language
-$gotPage	= $template->includeSub($includeSub,
-								'MAIN');
+$template		= new FtTemplate("Services$action$lang.html");
 
 // set global replacements
 $template->set('DATABASE_NAME',	$databaseName);

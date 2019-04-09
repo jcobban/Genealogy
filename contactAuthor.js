@@ -7,8 +7,9 @@
  *		2014/03/30		created											*
  *		2015/05/14		if invoked in a half frame, close the frame		*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -21,23 +22,16 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    // perform common page initialization
-    pageInit();
-
     // activate functionality for individual input elements
     for(var i = 0; i < document.forms.length; i++)
-    {			// loop through all forms
+    {			    // loop through all forms
 		var form	= document.forms[i];
 		for(var j = 0; j < form.elements.length; j++)
-		{
+		{           // loop through all elements
 		    var	element		= form.elements[j];
 		    var name		= element.name;
 		    if (!name || name.length == 0)
 				name		= element.id;
-
-		    // pop up help balloon if the mouse hovers over a element
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    // identify change action for each cell
 		    switch(name)
@@ -57,9 +51,9 @@ function onLoad()
 				}	// action button
 
 		    }		// switch on column name
-		}		// loop through all elements
-    }			// loop through all forms
-}		// onLoad
+		}		    // loop through all elements
+    }			    // loop through all forms
+}		// function onLoad
 
 /************************************************************************
  *  function postBlog													*

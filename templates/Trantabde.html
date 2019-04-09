@@ -1,37 +1,31 @@
 <!--*********************************************************************
- *  Trantaben.html														*
+ *  Trantabde.html														*
  *																		*
- *  Common translation table to English                                 *
- *  Common layout of the popup dialogs presented by the common support	*
- *  for dynamic management of Locations.								*
- *  Although this is an HTML file and is stored in the		            *
- *	same directory used for template files used by			            *
- *	class Template, this file is used by the dynamic		            *
- *	display functionality in Javascript.					            *
+ *  Common translation table to German                                  *
  *																		*
  *  History:															*
  *		2018/09/12		created											*
+ *      2019/04/06      add translate tables used by Person.php         *
+ *                      add translate tables used by EditEvent.php      *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden">
     <div id="Months">
-	  <span></span>
-	  <span>Jan</span>
-	  <span>Feb</span>
-	  <span>Mar</span>
-	  <span>Apr</span>
-	  <span>Mai</span>
-	  <span>Jun</span>
-	  <span>Jul</span>
-	  <span>Aug</span>
-	  <span>Sep</span>
-	  <span>Okt</span>
-	  <span>Nov</span>
-	  <span>Dez</span>
+      <span>Jan</span>
+      <span>Feb</span>
+      <span>Mar</span>
+      <span>Apr</span>
+      <span>Mai</span>
+      <span>Jun</span>
+      <span>Jul</span>
+      <span>Aug</span>
+      <span>Sep</span>
+      <span>Okt</span>
+      <span>Nov</span>
+      <span>Dez</span>
     </div>
     <div id="LMonths">
-	  <span></span>
       <span>Januar</span>
       <span>Februar</span>
       <span>Marz</span>
@@ -45,4 +39,571 @@
       <span>November</span>
       <span>Dezember</span>
     </div> <!-- id="LMonths" -->
+    <!-- general I18N translate table -->
+    <div id="tranTab">
+      <span data-key=""></span>
+      <span data-key="a[fem]">a</span>
+      <span data-key="a[masc]">a</span>
+      <span data-key="about">about</span>
+      <span data-key="AD">AD</span>
+      <span data-key="adopted">adopted</span>
+      <span data-key="after">after</span>
+      <span data-key="an unknown person">an unknown person</span>
+      <span data-key="and">and</span>
+      <span data-key="Apr">Apr</span>
+      <span data-key="April">April</span>
+      <span data-key="at">at</span>
+      <span data-key="Aug">Aug</span>
+      <span data-key="August">August</span>
+      <span data-key="Banns">Banns</span>
+      <span data-key="BC">BC</span>
+      <span data-key="BCE">BCE</span>
+      <span data-key="before 1970">before 1970</span>
+      <span data-key="before">before</span>
+      <span data-key="between">between</span>
+      <span data-key="bic">bic</span>
+      <span data-key="biological">biological</span>
+      <span data-key="brother">brother</span>
+      <span data-key="calculated as">calculated as</span>
+      <span data-key="Cancelled">Cancelled</span>
+      <span data-key="CE">CE</span>
+      <span data-key="challenged">challenged</span>
+      <span data-key="Child">Child</span>
+      <span data-key="child">child</span>
+      <span data-key="Children of">Children of</span>
+      <span data-key="circa">circa</span>
+      <span data-key="cleared">cleared</span>
+      <span data-key="Completed">Completed</span>
+      <span data-key="daughter">daughter</span>
+      <span data-key="Dec">Dec</span>
+      <span data-key="Deceased">Deceased</span>
+      <span data-key="December">Dezember</span>
+      <span data-key="Did not say">Did not say</span>
+      <span data-key="Display">Anzeigen</span>
+      <span data-key="disproved">disproved</span>
+      <span data-key="dns/can">dns/can</span>
+      <span data-key="Done">Done</span>
+      <span data-key="estimated as">estimated as</span>
+      <span data-key="family member">family member</span>
+      <span data-key="Feb">Feb</span>
+      <span data-key="February">Februar</span>
+      <span data-key="female">female</span>
+      <span data-key="for">for</span>
+      <span data-key="foster">foster</span>
+      <span data-key="from">from</span>
+      <span data-key="guardianship">guardianship</span>
+      <span data-key="had">had</span>
+      <span data-key="had a Common Law relationship with">had a Common Law relationship with</span>
+      <span data-key="had some other relationship with">had some other relationship with</span>
+      <span data-key="had a relationship with">had a relationship with</span>
+      <span data-key="has no recorded parents">has no recorded parents</span>
+      <span data-key="He">He</span>
+      <span data-key="He/She">He/She</span>
+      <span data-key="Illegitimate">Illegitimate</span>
+      <span data-key="illegitimate">illegitimate</span>
+      <span data-key="in Q">in Q</span>
+      <span data-key="in">in</span>
+      <span data-key="in[masc]">in[masc]</span>
+      <span data-key="Infant">Infant</span>
+      <span data-key="Jan">Jan</span>
+      <span data-key="January">Januar</span>
+      <span data-key="Jul">Jul</span>
+      <span data-key="July">Juli</span>
+      <span data-key="Jun">Jun</span>
+      <span data-key="June">Juni</span>
+      <span data-key="License">License</span>
+      <span data-key="male">male</span>
+      <span data-key="Mar">Mar</span>
+      <span data-key="March">Marz</span>
+      <span data-key="married">married</span>
+      <span data-key="May">Mai</span>
+      <span data-key="Never married">Never married</span>
+      <span data-key="None">None</span>
+      <span data-key="Not married">Not married</span>
+      <span data-key="Nov">Nov</span>
+      <span data-key="November">November</span>
+      <span data-key="Oct">Oct</span>
+      <span data-key="October">Oktober</span>
+      <span data-key="of">of</span>
+      <span data-key="on">on</span>
+      <span data-key="or">or</span>
+      <span data-key="Private">Private</span>
+      <span data-key="private">private</span>
+      <span data-key="[Private]">[Private]</span>
+      <span data-key="See Notes">See Notes</span>
+      <span data-key="sealing">sealing</span>
+      <span data-key="Sep">Sep</span>
+      <span data-key="September">September</span>
+      <span data-key="She">She</span>
+      <span data-key="sibling">sibling</span>
+      <span data-key="sister">sister</span>
+      <span data-key="son">son</span>
+      <span data-key="step">step</span>
+      <span data-key="Stillborn">Stillborn</span>
+      <span data-key="submitted">submitted</span>
+      <span data-key="The cause of death was">The cause of death was</span>
+      <span data-key="to">to</span>
+      <span data-key="Twin">Twin</span>
+      <span data-key="uncleared">uncleared</span>
+      <span data-key="unexpected null value">unexpected null value</span>
+      <span data-key="Unknown">Unknown</span>
+      <span data-key="unknown">unknown</span>
+      <span data-key="Update">Aktualisieren</span>
+      <span data-key="was also known as">was also known as</span>
+      <span data-key="was never married">was never married</span>
+      <span data-key="was sealed to">was sealed to</span>
+      <span data-key="was sealed to parents">was sealed to parents</span>
+      <span data-key="was the[male]">was the</span>
+      <span data-key="was the[female]">was the</span>
+      <span data-key="was the[unknown]">was the</span>
+      <span data-key="was the partner of">was the partner of</span>
+      <span data-key="was widowed">was widowed</span>
+      <span data-key="was single">was single</span>
+      <span data-key="was a friend [with benefits]">was a friend [with benefits]</span>
+      <span data-key="WFT estimate">WFT estimate</span>
+      <span data-key="Young">Young</span>
+      <span data-key="intType">unexpected null value</span>
+      <span data-key="intType1"></span>
+      <span data-key="intType2">adopted</span>
+      <span data-key="intType3">biological</span>
+      <span data-key="intType4">challenged</span>
+      <span data-key="intType5">disproved</span>
+      <span data-key="intType6">foster</span>
+      <span data-key="intType7">guardianship</span>
+      <span data-key="intType8">sealing</span>
+      <span data-key="intType9">step</span>
+      <span data-key="intType10">unknown</span>
+      <span data-key="intType11">private</span>
+      <span data-key="intType12">family member</span>
+      <span data-key="intType13">illegitimate</span>);
+      <span data-key="eventText1">[Pronoun] [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText2">[Pronoun] was adopted [onDate] [Location] by [Description].[Citations] [Notes]</span>
+      <span data-key="eventText3">[Pronoun] was born [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText4">[Pronoun] was buried [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText5">[Pronoun] was christened [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText6">[Pronoun] died [onDate] [Description] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText7">[Pronoun] had a marriage annulled [Description], [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText8">[Pronoun] was baptized [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText9">He celebrated his bar mitzvah [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText10">She celebrated her bas mitzvah [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText11">[Pronoun] was blessed [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText12">[Pronoun] appeared on the [Description] census [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText13">[Pronoun] was circumcised [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText14">[Pronoun] became a [Description] citizen [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText15">[Pronoun] was confirmed [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText16">[Pronoun] was confirmed in The Church of Jesus Christ of Latter-day Saints [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText17">[Pronoun] was involved in a court case about [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText18">[Pronoun] was cremated [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText19">[Pronoun] received a degree of [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText20">[Pronoun] were divorced [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText21">[Pronoun] filed for divorce [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText22">[Pronoun] was educated at [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText23">[Pronoun] emigrated [Description] [onDate] [fromLocation].[Citations] [Notes]</span>
+      <span data-key="eventText24">[Pronoun] was employed as a [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText25">[Pronoun] were engaged [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText26">[Pronoun] received First Holy Communion [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText27">[Pronoun] graduated from [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText28">[Pronoun] enjoyed [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText29">[Pronoun] was honoured for [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText30">[Pronoun] was in the hospital for [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText31">[Pronoun] was ill with [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText32">[Pronoun] immigrated [Description] [onDate] [toLocation].[Citations] [Notes]</span>
+      <span data-key="eventText33">[Pronoun] was interviewed [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText34">[Pronoun] [Description] land [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText35">[Pronoun] had marriage banns published [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText36">[Pronoun] signed a marriage contract [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText37">[HusbFirstName] and [WifeFirstName] obtained a marriage license [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText38">[Pronoun] published an intent to marry [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText39">[Pronoun] obtained a marriage settlement [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText40">[Pronoun] received medical attention for [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText41">[Pronoun] was a member of [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText42">[Pronoun] served in the military [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText43">[Pronoun] served a mission [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText44">[Pronoun] was named after [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText45">[Pronoun] was naturalized [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText46">[Pronoun] obituary was published in the [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText47">[Pronoun] worked as a [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText48">[Pronoun] had the LDS ordinance [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText49">[Pronoun] was ordained a [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText50">[Pronoun] was described as [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText51">[Pronoun] had an estate probated [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText52">[Pronoun] [Description] property [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText53">[Pronoun] belonged to the [Description] faith [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText54">[Pronoun] lived [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText55">[Pronoun] retired [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText56">[Pronoun] attended school at [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText57">[Pronoun] was assigned US Social Security Number [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText58">[Pronoun] signed a will [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText59">[Pronoun] had a medical condition of [Description], [onDate], [Location].[Citations] [Notes]</span>
+      <span data-key="eventText60">[Pronoun] served in the military: [Description], [onDate], [Location].[Citations] [Notes]</span>
+      <span data-key="eventText61">[Pronoun] had a photo taken [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText62">[Pronoun] was assigned US Social Security Number [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText63">[Pronoun] had another occupation as [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText64">[Pronoun] was [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText65">[Pronoun] belongs to family group [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText66">[Pronoun] identified [her][!him]self as [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText67">[Pronoun] funeral was held [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText68">[Pronoun] was elected as [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText69">[Pronoun] were married [Description] [onDate] and [Location].[Citations] [Notes]</span>
+      <span data-key="eventText70">Marriage event [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText71">[Her][!His] birth was registered [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText72">[Her][!His] death was registered [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText73">Their marriage was registered [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText2000">[Pronoun] was born [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText3000">[Pronoun] was christened [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText4000">[Pronoun] died [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText5000">[Pronoun] was buried [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText5001">[Pronoun] was cremated [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText15000">[Pronoun] received LDS Baptism [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText16000">[Pronoun] received LDS Endowment [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText26000">[Pronoun] received LDS Confirmation [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText27000">[Pronoun] received LDS Initiatory [onDate] [Location].[Citations] [Notes]</span>
+
+    </div>
+    <div class="hidden" id="srcTypes">`
+      <span data-key="1"></span>
+      <span data-key="2">Bible</span>
+      <span data-key="3">Book</span>
+      <span data-key="4">Census/Tax records</span>
+      <span data-key="5">Church records</span>
+      <span data-key="6">Court records</span>
+      <span data-key="7">Interview</span>
+      <span data-key="8">Personal Journal</span>
+      <span data-key="9">Land records</span>
+      <span data-key="10">Letter</span>
+      <span data-key="11">Military records</span>
+      <span data-key="12">Newspaper</span>
+      <span data-key="13">Periodical</span>
+      <span data-key="14">Personal Communication</span>
+      <span data-key="15">Vital Statistics</span>
+      <span data-key="16">Web Site</span>
+    </div><!-- id="srcTypes" -->
+    <!--*****************************************************************
+     *  $typeText														*
+     *																	*
+     *  Events which are implemented by fields inside a record other	*
+     *  than an instance of Event (tblER), are distinguished			*
+     *	by the citation type, passed as parameter type.  This table		*
+     *	is used to modify the title of the dialog based upon the type.	*
+     ******************************************************************-->
+    <div id="typeText">
+      <span id="type0">Generic Fact</span>
+      <span id="type1">Name Fact</span>
+      <span id="type2">Birth Event</span>
+      <span id="type3">Christening Event</span>
+      <span id="type4">Death Event</span>
+      <span id="type5">Buried Event</span>
+      <span id="type6">General Notes</span>
+      <span id="type7">Research Notes</span>
+      <span id="type8">Medical Notes</span>
+      <span id="type9">Cause of Death</span>
+      <span id="type10"></span>
+      <span id="type11">Child Status</span>
+      <span id="type12">Relationship to Father</span>
+      <span id="type13">Relationship to Mother</span>
+      <span id="type15">LDS Baptism Event</span>
+      <span id="type16">LDS Endowment Event</span>
+      <span id="type17">LDS Sealed to Parents Event</span>
+      <span id="type18">LDS Sealed to Spouse Event</span>
+      <span id="type19">Person Never Married Fact</span>
+      <span id="type20">Marriage Event</span>
+      <span id="type21">Marriage Note</span>
+      <span id="type22">Never Married Fact</span>
+      <span id="type23">This Couple had no Children Fact</span>
+      <span id="type24">Marriage Ended</span>
+      <span id="type26">LDS Confirmation Event</span>
+      <span id="type27">LDS Initiatory Event</span>
+    </div>
+	
+    <!--*****************************************************************
+     *  $eventText														*
+     *																	*
+     *  This table provides a translation from an event type to the text*
+     *  to display to the user.  This is ordered alphabetically for use	*
+     *	constructing a select element in a web page.					*
+     ******************************************************************-->
+    <div id="eventText">
+      <span data-key="2">was adopted</span>
+      <span data-key="63">also worked as a </span>
+      <span data-key="17">appeared in court</span>
+      <span data-key="56">attended school</span>
+      <span data-key="15000">was baptized (LDS)</span>
+      <span data-key="8">was baptized (LDS)</span>
+      <span data-key="9">had his Bar Mitzvah</span>
+      <span data-key="10">had her Bat Mitzvah</span>
+      <span data-key="14">became a citizen</span>
+      <span data-key="41">belonged to</span>
+      <span data-key="71">birth was registered</span>
+      <span data-key="11">was blessed (LDS)</span>
+      <span data-key="2000">was born</span>
+      <span data-key="3">was born</span>
+      <span data-key="5000">was buried</span>
+      <span data-key="4">was buried</span>
+      <span data-key="3000">was christened</span>
+      <span data-key="5">was christened</span>
+      <span data-key="13">was circumcized</span>
+      <span data-key="15">was confirmed</span>
+      <span data-key="26000">was confirmed (LDS)</span>
+      <span data-key="16">was confirmed (LDS)</span>
+      <span data-key="18">was cremated</span>
+      <span data-key="72">death was registered</span>
+      <span data-key="50">was described as </span>
+      <span data-key="4000">died</span>
+      <span data-key="6">died</span>
+      <span data-key="20">was divorced </span>
+      <span data-key="22">had education </span>
+      <span data-key="68">was elected as</span>
+      <span data-key="23">emigrated from </span>
+      <span data-key="24">was employed as</span>
+      <span data-key="16000">was endowed (LDS)</span>
+      <span data-key="74">was endowed (LDS)</span>
+      <span data-key="25">got engaged</span>
+      <span data-key="36">entered marriage contract</span>
+      <span data-key="12">was enumerated in a census</span>
+      <span data-key="66">identified with ethnicity</span>
+      <span data-key="65">belonged to family group</span>
+      <span data-key="21">filed for a divorce </span>
+      <span data-key="26">had first communion</span>
+      <span data-key="67">had a funeral</span>
+      <span data-key="27">graduated from</span>
+      <span data-key="28">had a hobby of</span>
+      <span data-key="29">was honored as</span>
+      <span data-key="31">was ill with</span>
+      <span data-key="32">immigrated</span>
+      <span data-key="30">in hospital</span>
+      <span data-key="60">in the military</span>
+      <span data-key="27000">initiatory (LDS)</span>
+      <span data-key="75">initiatory (LDS)</span>
+      <span data-key="33">was interviewed</span>
+      <span data-key="54">lived</span>
+      <span data-key="35">marriage banns issued</span>
+      <span data-key="37">got a marriage license</span>
+      <span data-key="39">got a marriage settlement</span>
+      <span data-key="7">marriage was annulled</span>
+      <span data-key="73">marriage was registered</span>
+      <span data-key="38">was married</span>
+      <span data-key="69">married</span>
+      <span data-key="20000">married</span>
+      <span data-key="70"></span>
+      <span data-key="59">had a medical condition</span>
+      <span data-key="40">had a medical event</span>
+      <span data-key="42">served in the military</span>
+      <span data-key="43">went on mission</span>
+      <span data-key="44">was named for</span>
+      <span data-key="64">had a nationality </span>
+      <span data-key="45">was naturalized</span>
+      <span data-key="1">null event 1</span>
+      <span data-key="46">an obituary was published</span>
+      <span data-key="49">was ordained as</span>
+      <span data-key="48">ordinance (LDS)</span>
+      <span data-key="34">owned land</span>
+      <span data-key="52">owned property</span>
+      <span data-key="61">had a photo</span>
+      <span data-key="19">received a degree</span>
+      <span data-key="53">belonged to the religious affiliation </span>
+      <span data-key="55">retired</span>
+      <span data-key="76">sealed to spouse</span>
+      <span data-key="18000">sealed to spouse</span>	// obsolete
+      <span data-key="57">had Social Security Number</span>
+      <span data-key="62">had Social Security Number (62)</span>
+      <span data-key="51">will was probated</span>
+      <span data-key="58">wrote a will</span>
+      <span data-key="47">worked as a </span>
+      <span data-key="0">unused 0</span>
+    </div>
+	
+    <!--*****************************************************************
+     *  $personidualEvents												*
+     *																	*
+     *  This table is used to create the selection list for				*
+     *	events specific to an individual.  Where the event type			*
+     *	is greater than 999 it indicates an event recorded in the		*
+     *	Person record itself, and the code is the citation				*
+     *	type times 1000.												*
+     ******************************************************************-->
+    <div id="personidualEvents">
+      <span data-key="0">Choose an event type:</span>
+      <span data-key="1"></span>
+      <span data-key="2">Adoption</span>
+      <span data-key="3">Birth</span>
+      <span data-key="4">Burial</span>
+      <span data-key="5">Christening</span>
+      <span data-key="16">Confirmation (LDS)</span>
+      <span data-key="6">Death</span>
+      <span data-key="8">Baptism</span>
+      <span data-key="15000">Baptism (LDS)</span>
+      <span data-key="9">BarMitzvah</span>
+      <span data-key="10">BasMitzvah</span>
+      <span data-key="71">Birth Registration</span>
+      <span data-key="11">Blessing</span>
+      <span data-key="12">Census</span>
+      <span data-key="13">Circumcision</span>
+      <span data-key="14">Citizenship</span>
+      <span data-key="15">Confirmation</span>
+      <span data-key="26000">Confirmation (LDS)</span>
+      <span data-key="17">Court</span>
+      <span data-key="18">Cremation</span>
+      <span data-key="72">Death Registration</span>
+      <span data-key="19">Degree</span>
+      <span data-key="22">Education</span>
+      <span data-key="68">Election</span>
+      <span data-key="23">Emigration</span>
+      <span data-key="24">Employment</span>
+      <span data-key="16000">Endowment (LDS)</span>
+      <span data-key="66">Ethnicity</span>
+      <span data-key="65">Family Group</span>
+      <span data-key="26">First Communion</span>
+      <span data-key="67">Funeral</span>
+      <span data-key="27">Graduation</span>
+      <span data-key="28">Hobbies</span>
+      <span data-key="29">Honours</span>
+      <span data-key="30">Hospital</span>
+      <span data-key="31">Illness</span>
+      <span data-key="27000">Initiatory (LDS)</span>
+      <span data-key="32">Immigration</span>
+      <span data-key="33">Interview</span>
+      <span data-key="34">Land</span>
+      <span data-key="40">Medical</span>
+      <span data-key="59">Medical Condition</span>
+      <span data-key="41">Membership</span>
+      <span data-key="60">Military</span>
+      <span data-key="42">Military Service</span>
+      <span data-key="43">Mission</span>
+      <span data-key="44">Namesake</span>
+      <span data-key="64">Nationality</span>
+      <span data-key="45">Naturalization</span>
+      <span data-key="46">Obituary</span>
+      <span data-key="47">Occupation</span>
+      <span data-key="63">Occupation 1</span>
+      <span data-key="48">Ordinance</span>
+      <span data-key="49">Ordination</span>
+      <span data-key="61">Photo</span>
+      <span data-key="50">Physical Description</span>
+      <span data-key="51">Probate</span>
+      <span data-key="52">Property</span>
+      <span data-key="53">Religion</span>
+      <span data-key="54">Residence</span>
+      <span data-key="55">Retirement</span>
+      <span data-key="56">School</span>
+      <span data-key="57">Social Security Number</span>
+      <span data-key="62">Soc Sec Num</span>
+      <span data-key="58">Will</span>
+    </div>
+	
+    <!--*****************************************************************
+     *  $marriageEvents													*
+     *																	*
+     *  This table is used to create the selection list for				*
+     *	events specific to a marriage.  Where the event type			*
+     *	is greater than 999 it indicates an event recorded in the		*
+     *	Family record itself, and the code is the citation		        *
+     *	type times 1000.												*
+     ******************************************************************-->
+    <div id="marriageEvents">
+      <span data-key="0">Choose an event type:</span>
+      <span data-key="69">Marriage</span>
+      <span data-key="7">Annulment</span>
+      <span data-key="20">Divorce</span>
+      <span data-key="25">Engagement</span>
+      <span data-key="21">Filed for Divorce</span>
+      <span data-key="36">Marriage Contract</span>
+      <span data-key="24000">Marriage Ended</span>
+      <span data-key="37">Marriage License</span>
+      <span data-key="38">Marriage Notice</span>
+      <span data-key="72">Marriage Registered</span>
+      <span data-key="39">Marriage Settlement</span>
+      <span data-key="22000">Never Married</span>
+      <span data-key="23000">No Children</span>
+      <span data-key="70">Other Marriage Fact</span>
+      <span data-key="76">sealed to spouse</span>
+      <span data-key="18000">Sealed to Spouse (LDS)</span>
+    </div>
+		
+    <!--*****************************************************************
+     *  $idetTitleText													*
+     *																	*
+     *  This table is used to construct a customized title for events	*
+     *	represented by a row in table tblER.							*
+     ******************************************************************-->
+    <div id="idetTitleText">
+      <span data-key="0"></span>
+      <span data-key="1"></span>
+      <span data-key="2">Adoption</span>
+      <span data-key="3">Birth</span>
+      <span data-key="4">Burial</span>
+      <span data-key="5">Christening</span>
+      <span data-key="6">Death</span>
+      <span data-key="7">Annulment</span>
+      <span data-key="8">LDS Baptism</span>
+      <span data-key="9">Bar Mitzvah</span>
+      <span data-key="10">Bas Mitzvah</span>
+      <span data-key="11">LDS Blessing</span>
+      <span data-key="12">Census Enumeration</span>
+      <span data-key="13">Circumcision</span>
+      <span data-key="14">Citizenship</span>
+      <span data-key="15">Confirmation</span>
+      <span data-key="16">LDS Confirmation</span>
+      <span data-key="17">Court</span>
+      <span data-key="18">Cremation</span>
+      <span data-key="19">Degree</span>
+      <span data-key="20">Divorce</span>
+      <span data-key="21">Divorce Filing</span>
+      <span data-key="22">Education</span>
+      <span data-key="23">Emigration</span>
+      <span data-key="24">Employment</span>
+      <span data-key="25">Engagement</span>
+      <span data-key="26">First Communion</span>
+      <span data-key="27">Graduation</span>
+      <span data-key="28">Hobbies</span>
+      <span data-key="29">Honours</span>
+      <span data-key="30">Hospital</span>
+      <span data-key="31">Illness</span>
+      <span data-key="32">Immigration</span>
+      <span data-key="33">Interview</span>
+      <span data-key="34">Land</span>
+      <span data-key="35">Marriage Banns</span>
+      <span data-key="36">Marriage Contract</span>
+      <span data-key="37">Marriage License</span>
+      <span data-key="38">Marriage Notice</span>
+      <span data-key="39">Marriage Settlement</span>
+      <span data-key="40">Medical</span>
+      <span data-key="41">Membership</span>
+      <span data-key="42">Military Service</span>
+      <span data-key="43">Mission</span>
+      <span data-key="44">Namesake</span>
+      <span data-key="45">Naturalization</span>
+      <span data-key="46">Obituary</span>
+      <span data-key="47">Occupation</span>
+      <span data-key="48">Ordinance</span>
+      <span data-key="49">Ordination</span>
+      <span data-key="50">Physical Description</span>
+      <span data-key="51">Probate</span>
+      <span data-key="52">Property</span>
+      <span data-key="53">Religion</span>
+      <span data-key="54">Residence</span>
+      <span data-key="55">Retirement</span>
+      <span data-key="56">School</span>
+      <span data-key="57">Social Security Number</span>
+      <span data-key="59">Will</span>
+      <span data-key="59">Medical Condition</span>
+      <span data-key="60">Military</span>
+      <span data-key="61">Photo</span>
+      <span data-key="62">Social Security Number</span>
+      <span data-key="63">Other Occupation</span>
+      <span data-key="64">Nationality</span>
+      <span data-key="65">Family Group</span>
+      <span data-key="66">Ethnicity</span>
+      <span data-key="67">Funeral</span>
+      <span data-key="68">Election</span>
+      <span data-key="69">Marriage</span>
+      <span data-key="70">Marriage Fact</span>
+      <span data-key="71">Birth Registration</span>
+      <span data-key="72">Death Registration</span>
+      <span data-key="73">Marriage Registration</span>
+      <span data-key="74">LDS Endowed</span>
+      <span data-key="75">LDS Initiatory</span>
+      <span data-key="76">LDS Sealed</span>
+      <span data-key="77">Marriage End</span>
+      <span data-key="78">LDS Child Sealed to Parents</span>
+    </div>
   </div>

@@ -10,48 +10,53 @@ use \Iterator;
  *																		*
  *  Definition of a class representing a name of a country.				*
  *  This class provides access to the information in a row				*
- *  of the table CountryNames.												*
+ *  of the table CountryNames.											*
  *																		*
- *  CREATE TABLE CountryNames (												*
- *		`Code3166_1`		CHAR(2) NOT NULL, -- country code				*
+ *  CREATE TABLE CountryNames (											*
+ *		`Code3166_1`	CHAR(2) NOT NULL, -- country code			    *
  *      `Code639_1`		CHAR(2) NOT NULL, -- language code				*
- *		`Name`				VARCHAR(255) NOT NULL DEFAULT '',				*
+ *		`Name`			VARCHAR(255) NOT NULL DEFAULT '',			    *
  *		`Article`		VARCHAR(32) NOT NULL DEFAULT '',				*
- *		`Possessive`		VARCHAR(32) NOT NULL DEFAULT '',				*
+ *		`Possessive`	VARCHAR(32) NOT NULL DEFAULT '',			    *
  *		PRIMARY KEY (`Code3166_1`,`Code639_1`) )						*
  *		ENGINE=InnoDb DEFAULT CHARSET=utf8;								*
  *																		*
- *		`Code3166_1`		The ISO 3166-1 two character country code		*
+ *		`Code3166_1`	The ISO 3166-1 two character country code	    *
  *						by convention in upper case						*
  *      `Code639_1`		The ISO 639-1 two character language code		*
  *						by convention in lower case						*
- *		`Name`				The name of the specified country in the		*
+ *		`Name`			The name of the specified country in the		*
  *						specified language								*
- *		`Article`		The definite article with which to prefix the		*
+ *		`Article`		The definite article with which to prefix the	*
  *						name of the country.  For example:				*
  *						    'France' takes 'la ' in language 'fr'		*
  *						    'Canada' takes 'le ' in language 'fr'		*
- *						    'États Unies de l'Amerique' takes 'les '		*
+ *						    'États Unies de l'Amerique' takes 'les '	*
  *								in language 'fr'						*
  *						    Countries that start with a vowel take		*
- *								"l'" in language 'fr'.  This				*
- *								requires that the value of this field		*
- *								include the space separator if needed		*
- *		`Possessive`		The possessive with which to prefix the name		*
- *						of the country.  For example:						*
- *						    'France' takes 'de la ' in language 'fr'		*
+ *								"l'" in language 'fr'.  This			*
+ *								requires that the value of this field	*
+ *								include the space separator if needed	*
+ *		`Possessive`	The possessive with which to prefix the name	*
+ *						of the country.  For example:					*
+ *						    'France' takes 'de la ' in language 'fr'	*
  *						    'Canada' takes 'du ' in language 'fr'		*
- *						    'États Unies de l'Amerique' takes 'des '		*
+ *						    'États Unies de l'Amerique' takes 'des '	*
  *								in language 'fr'						*
  *						    Countries that start with a vowel take		*
- *								"de l'" in language 'fr'.  This				*
- *								requires that the value of this field		*
- *								include the space separator if needed		*
+ *								"de l'" in language 'fr'.  This			*
+ *								requires that the value of this field	*
+ *								include the space separator if needed	*
  *																		*
- *  History:																*
- *		2017/10/27		created												*
+ *  History:															*
+ *		2017/10/27		created											*
  *		2017/12/18		add support for temporary fields				*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/02/19      do not throw exceptions in constructor          *
+ *		                do not invoke other constructors from           *
+ *		                the constructor                                 *
+ *		                permit passing instances of Country and         *
+ *		                Language to the constructor                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -60,37 +65,51 @@ require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 
 /************************************************************************
- *  class CountryName														*
+ *  class CountryName													*
  *																		*
  *  Definition of a class recording information about a name of a		*
- *  country.																*
+ *  country.															*
  ************************************************************************/
 
 class CountryName extends Record
 {
     /********************************************************************
-     *		CountryName::$defaultOrder										*
-     *																		*
-     *		Default sort order for query response by class RecordSet		*
+     *	CountryName::$country   										*
+     *																	*
+     *	Associated instance of Country.                                 *
+     ********************************************************************/
+    private $country	    = null;
+
+    /********************************************************************
+     *	CountryName::$language   										*
+     *																	*
+     *	Associated instance of Language.                                *
+     ********************************************************************/
+    private $language	    = null;
+
+    /********************************************************************
+     *	CountryName::$defaultOrder										*
+     *																	*
+     *	Default sort order for query response by class RecordSet		*
      ********************************************************************/
     static $defaultOrder	= "`Name`";
 
     /********************************************************************
-     *		CountryName::$initRow												*
-     *																		*
-     *		Default initial row												*
+     *	CountryName::$initRow											*
+     *																	*
+     *	Default initial row												*
      ********************************************************************/
     protected static $initRow	= array(
 				'code3166_1'		=> '',
-				'code639_1'		=> '',
-				'name'			=> '',
-				'article'		=> '',
+				'code639_1'		    => '',
+				'name'			    => '',
+				'article'		    => '',
 				'possessive'		=> '');
 
     /********************************************************************
-     *		CountryName::$translate												*
-     *																		*
-     *		Define synonyms for field names										*
+     *	CountryName::$translate											*
+     *																	*
+     *	Define synonyms for field names									*
      ********************************************************************/
     protected static $translate	= array(
 				'cc'			=> 'code3166_1',
@@ -99,21 +118,22 @@ class CountryName extends Record
 				'of'			=> 'possessive');
 
     /********************************************************************
-     *		CountryName::__construct										*
-     *																		*
-     *		Construct an instance of CountryName based upon the				*
-     *		parameters.  This instance may or may not be synchronized with		*
-     *		the database.														*
-     *																		*
-     *		Input:																*
-     *		    $parms		 		an associative array of parameters		*
-     *								to select an existing entry or				*
-     *								a complete row from the table as an		*
-     *								associative array						*
-     *																		*
-     *		Returns object containing a description of a name of a country		*
-     *																		*
-     *		Throws Exception if unable to complete function						*
+     *	function CountryName::__construct								*
+     *																	*
+     *	Construct an instance of CountryName based upon the				*
+     *	parameters.                                                     *
+     *																	*
+     *	Input:															*
+     *	    $parms		an associative array of parameters		        *
+     *					to select an existing entry where:		        *
+	 *					'code3166_1' may be a string or an              *
+     *                  instance of Country                             *
+	 *					case 'code639_1' may be a string or an          *
+     *                  instance of Language                            *
+     *					or a complete row from the table as an		    *
+     *					associative array						        *
+     *																	*
+     *	Returns object containing a description of a name of a country	*
      ********************************************************************/
     function __construct($parms)
     {
@@ -129,8 +149,8 @@ class CountryName extends Record
 		    throw new Exception('CountryName::constructor: " .
 							"No connection to database server');
 		}
-		$needInsert	= false;
-		$this->table	= 'CountryNames';
+		$needInsert	        = false;
+		$this->table	    = 'CountryNames';
 
 		// validate parameters
 		if (is_array($parms))
@@ -140,7 +160,7 @@ class CountryName extends Record
 				$code		= 'not supplied';
 				$where		= '';
 				$and		= 'WHERE ';
-				$cc		= 'CA';
+				$cc		    = 'CA';
 				$lang		= 'en';
 				$sqlParms	= array();
 				foreach($parms as $key => $value)
@@ -151,22 +171,32 @@ class CountryName extends Record
 				    switch($fieldLc)
 				    {			// act on key fields
 						case 'code3166_1':
-						{		// country code
-						    $cc			= $value;
-						    $where		.= $and . $fieldLc .
-									   '=:' . $fieldLc;
-						    $sqlParms[$fieldLc]	= $value;
-						    $and		= ' AND ';
+                        {		// country code
+                            if ($value instanceof Country)
+                            {
+                                $this->country      = $value;
+                                $cc                 = $value['cc'];
+                            }
+                            else
+						        $cc			        = $value;
+						    $where		            .= "$and$fieldLc=:$fieldLc";
+						    $sqlParms[$fieldLc]	    = $value;
+						    $and		            = ' AND ';
 						    break;
 						}		// country code
 
 						case 'code639_1':
 						{		// language identifier
-						    $lang		= $value;
-						    $where		.= $and . $fieldLc .
-									   '=:' . $fieldLc;
-						    $sqlParms[$fieldLc]	= $value;
-						    $and		= ' AND ';
+                            if ($value instanceof Language)
+                            {
+                                $this->language     = $value;
+                                $land               = $value['code'];
+                            }
+                            else
+						        $lang		        = $value;
+						    $where		            .= "$and$fieldLc=:$fieldLc";
+						    $sqlParms[$fieldLc]	    = $value;
+						    $and		            = ' AND ';
 						    break;
 						}		// language identifier
 
@@ -187,46 +217,51 @@ class CountryName extends Record
 				    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
 				    if (count($result) == 1)
 				    {		// existing record
-						$dbrow		= $result[0];
-						$needInsert	= false;
+						$dbrow		            = $result[0];
+						$needInsert	            = false;
 				    }		// existing record
 				    else
 				    if (count($result) == 0)
 				    {		// create a new record
 						// set defaults
-						$dbrow			= self::$initRow;
+						$dbrow			        = self::$initRow;
 						$dbrow['code3166_1']	= $cc;
-						$dbrow['code639_1']	= $lang;
-						$country	= new Country(array('cc' => $cc));
-						$language	= new Language(array('code' => $lang));
-						$dbrow['name']		= $country->get('name');
-						$dbrow['article']	= $language->get('article');
-						$dbrow['possessive']	= $language->get('possessive');
+                        $dbrow['code639_1']	    = $lang;
+                        if ($this->country)
+                            $dbrow['name']		= $this->country->get('name');
+                        if ($this->language)
+                        {
+						    $dbrow['article']	= $this->language->get('article');
+                            $dbrow['possessive']= $this->language->get('possessive');
+                        }
 						$needInsert		= true;
 				    }		// create new record
 				    else
 				    {		// error performing query
-						throw new Exception("CountryName::__construct: '$queryText' " .
-							"returns " . count($result) . " records");
+						$this->msg  .= "CountryName::__construct: '$queryText' " .
+							"returns " . count($result) . " records";
+						$dbrow	    = self::$initRow;
 				    }		// error performing query
 				}		// success
 				else
 				{		// error performing query
-				    throw new Exception("CountryName::__construct: '$queryText' " .
-								print_r($stmt->errorInfo(),true));
+				    $this->msg      .= "CountryName::__construct: '$queryText' " .
+								print_r($stmt->errorInfo(),true);
+					$dbrow		    = self::$initRow;
 				}		// error performing query
 		    }			// search parameters
 		    else
 		    {			// build from existing record
-				$dbrow		= $parms;
-				$needInsert	= false;
+				$dbrow		        = $parms;
+				$needInsert	        = false;
 		    }			// build from existing record
 		}			// array parameter
 		else
 		{			// unsupported parameter type
-		    throw new Exception("CountryName::__construct: " .
+		    $this->msg              .= "CountryName::__construct: " .
 						"parameter must be an array: is " .
-						gettype($parms));
+						gettype($parms);
+			$dbrow			        = self::$initRow;
 		}			// unsupported parameter type
 
 
@@ -240,14 +275,66 @@ class CountryName extends Record
     }		// CountryName::__construct
 
     /********************************************************************
-     *		CountryName::save												*
-     *																		*
-     *		Save changes made to the CountryName record into the database.		*
-     *																		*
-     *		Parameters:														*
-     *		    $xml		if true diagnostic output is emitted in XML		*
-     *						format within <cmd> tags.						*
-     *						if a string use it as tag name						*
+     *	function CountryName::get										*
+     *																	*
+     *	Get the value of a field in the object.							*
+     *																	*
+     *  Parameters:														*
+     *	    $field		name of field to get value of					*
+     *																	*
+     *	Returns:														*
+     *	    the value of the field										*
+     *																	*
+     *	Side Effects:													*
+     *	    Adds warning if $field is not already defined as a field	*
+     *	    or pseudo-field and returns null.							*
+     ********************************************************************/
+    function get($field)
+    {
+		$fieldLc	= strtolower($field);
+		if (array_key_exists($fieldLc, self::$translate))
+		    $fieldLc	= self::$translate[$fieldLc];
+		switch($fieldLc)
+		{
+            case 'name':
+            {
+                return $this->getName();
+            }
+
+			case 'article':
+            case 'possessive':
+            {
+                if ($this->row[$fieldLc] == '')
+                {
+                    if (is_null($this->language))
+                    {
+                        $ll             = $this->row['code3166_1'];
+                        $this->language = new Language(array('code' => $ll));
+                    }
+					$this->row['article']	= $this->language->get('article');
+                    $this->row['possessive']= $this->language->get('possessive');
+                }
+                return $this->row[$fieldLc];
+            }
+
+			case 'code3166_1':
+			case 'code639_1':
+		    default:
+		    {		// other fields
+				return parent::get($fieldLc);
+		    }		// other fields
+		}		// switch on field name
+    }		// CountryName::get
+
+    /********************************************************************
+     *	function CountryName::save										*
+     *																	*
+     *	Save changes made to the CountryName record into the database.	*
+     *																	*
+     *	Parameters:														*
+     *	    $xml		if true diagnostic output is emitted in XML		*
+     *					format within <cmd> tags.						*
+     *					if a string use it as tag name					*
      ********************************************************************/
     function save($xml)
     {
@@ -381,18 +468,18 @@ class CountryName extends Record
     }		// CountryName::save
 
     /********************************************************************
-     *		CountryName::delete												*
-     *																		*
-     *		Delete the database record associated with this instance.		*
-     *																		*
-     *		Input:																*
-     *		    $xml		if true emit XML								*
-     *						if a string emit XML using as tag name				*
-     *																		*
-     *		Returns:														*
-     *		    false		if the method was unable to update the database		*
-     *		    1				if the method deleted the database record		*
-     *		    0				if the record did not need to be deleted		*
+     *	function CountryName::delete									*
+     *																	*
+     *	Delete the database record associated with this instance.		*
+     *																	*
+     *	Input:															*
+     *	    $xml		if true emit XML								*
+     *					if a string emit XML using as tag name			*
+     *																	*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method deleted the database record		*
+     *	    0			if the record did not need to be deleted		*
      ********************************************************************/
     function delete($xml=false)
     {
@@ -467,26 +554,35 @@ class CountryName extends Record
     }		// CountryName::delete
 
     /********************************************************************
-     *		CountryName::getName												*
-     *																		*
-     *		Convenience function for accessing the 'name' attribute.		*
-     *																		*
-     *		Returns:														*
-     *		    Name of the county as a string.								*
+     *	function CountryName::getName									*
+     *																	*
+     *	Convenience function for accessing the 'name' attribute.		*
+     *																	*
+     *	Returns:														*
+     *	    Name of the county as a string.								*
      ********************************************************************/
     function getName($options	= null)
     {
+        if ($this->row['name'] == '')
+        {
+            if (is_null($this->country))
+            {
+                $cc                 = $this->row['code3166_1'];
+                $this->country      = new Country(array('cc'    => $cc));
+            }
+            $this->row['name'] = $this->country->getName();
+        }
 		return $this->row['name'];
     }		// CountryName::getName
 
     /********************************************************************
-     *		CountryName::__toString												*
-     *																		*
-     *		Implement conversion to string.										*
+     *	function CountryName::__toString								*
+     *																	*
+     *	Implement conversion to string.									*
      ********************************************************************/
     function __toString()
     {
-		return  $this->row['name'];
+		return  $this->getName();
     }		// CountryName::__toString
 
 }		// class CountryName

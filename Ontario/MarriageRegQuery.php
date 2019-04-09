@@ -34,13 +34,13 @@ use \Exception;
  *						OriginalItem									*
  *		2018/01/01		add language parameter							*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/DomainSet.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -106,29 +106,14 @@ foreach($_GET as $key => $value)
         {
             $warn	.= "Unexpected parameter $key='$value'. ";
             break;
-        }		// any other paramters
+        }		// any other parameters
     }		// process specific named parameters
 }			// loop through all input parameters
 if ($debug && count($_GET) > 0)
     $warn       .= $parmsText . "</table>\n";
 
 // create instance of Template
-$tempBase		    = $document_root . '/templates/';
-$template		    = new FtTemplate("${tempBase}page$lang.html");
-$includeSub		    = "MarriageRegQuery$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-    $language   	= new Language(array('code' => $lang));
-    $langName   	= $language->get('name');
-    $nativeName	    = $language->get('nativename');
-    $sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub	    = 'MarriageREgQueryen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-                      'MAIN');
+$template		    = new FtTemplate("MarriageRegQuery$lang.html");
 
 $domainObj	        = new Domain(array('domain'     => $domain,
                                        'language'	=> $lang));

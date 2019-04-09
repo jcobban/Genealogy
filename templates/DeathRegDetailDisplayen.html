@@ -7,36 +7,38 @@
  *  History:															*
  *		2018/05/28		convert to template								*
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &amp;copy; 2018 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=$LANG">
 		Genealogy
     </a>:
-    <a href='/Canada/CountriesEdit.php?lang=fr'>
+    <a href='/Canada/CountriesEdit.php?lang=$LANG'>
 	    List of Supported Countries
     </a>:
-    <a href="/genCountry.php?cc=$CC&lang=$LANG">
+    <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">
 	    $COUNTRYNAME
     </a>:
-    <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG">
+    <a href="/Canada/genProvince.php?domain=$DOMAIN&amp;lang=$LANG">
 	    $DOMAINNAME
     </a>:
     <a href="DeathRegQuery.php?lang=$LANG">
 		New Query
     </a>: 
-    <a href="DeathRegStats.php?RegDomain=$DOMAIN&lang=$LANG">
+    <a href="DeathRegStats.php?RegDomain=$DOMAIN&amp;lang=$LANG">
 	    $DOMAINNAME Transcription Status
     </a>: 
-    <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&regyear=$REGYEAR&lang=$LANG">
+    <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&amp;regyear=$REGYEAR&amp;lang=$LANG">
 	    $DOMAINNAME Status $REGYEAR
     </a>: 
-    <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&regyear=$REGYEAR&regCounty=$REGCOUNTY&lang=$LANG">
+    <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&amp;regyear=$REGYEAR&amp;regCounty=$REGCOUNTY&amp;lang=$LANG">
 		Status $REGYEAR $COUNTYNAME
     </a>: 
-    <a href="DeathRegResponse.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&RegCounty=$REGCOUNTY&RegTownship=$REGTOWNSHIP&lang=$LANG">
+    <a href="DeathRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegCounty=$REGCOUNTY&amp;RegTownship=$REGTOWNSHIP&amp;lang=$LANG">
 		Status $REGYEAR Township $REGTOWNSHIP
     </a>:
+      <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$PREVREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE" id="Previous">Previous</a>:
+      <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$NEXTREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE" id="Next">Next</a>:
   </div> 
   <div class="body">
     <h1>

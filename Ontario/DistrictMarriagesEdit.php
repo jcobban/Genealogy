@@ -1119,10 +1119,6 @@ pageBot();
     Click on this button to update the database to include the changes you
     have made to the list of marriage registrations.
     </div>
-    <div class="balloon" id="HelprightTop">
-    Click on this button to signon to access extended features of the web-site
-    or to manage your account with the web-site.
-    </div>
     <div class="hidden" id="templates">
     <!-- template for adding a new marriage -->
     <table>

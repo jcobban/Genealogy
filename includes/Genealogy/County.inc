@@ -373,17 +373,17 @@ class County extends Record
 		    {
 				return parent::get($fieldLc);
 		    }		// other fields
-		}		// check field name
+		}		    // check field name
     }			// function County::get
 
     /********************************************************************
-     *		County::getRealFieldName										*
-     *																		*
-     *		Perform standard manipulation for this table to obtain the		*
-     *		the name of a field from a suggested parameter name.				*
-     *																		*
-     *		Returns:														*
-     *		    A field name in lower case or null if input is invalid.		*
+     *	County::getRealFieldName										*
+     *																	*
+     *	Perform standard manipulation for this table to obtain the		*
+     *	the name of a field from a suggested parameter name.			*
+     *																	*
+     *	Returns:														*
+     *	    A field name in lower case or null if input is invalid.		*
      ********************************************************************/
     public static function getRealFieldName($fldname)
     {

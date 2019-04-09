@@ -24,6 +24,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
+header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/CountySet.inc';
@@ -85,7 +86,6 @@ if (is_null($domain))
 
 // display the results
 // top node of XML result
-header("Content-Type: text/xml");
 print("<?xml version='1.0' encoding='UTF-8'?>\n");
 
 // query the database

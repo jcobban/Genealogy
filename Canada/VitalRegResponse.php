@@ -37,12 +37,12 @@ use \Exception;
  *		2016/05/20		use class Domain to validate domain code		*
  *		2017/02/07		use class Country								*
  *		2017/08/16		script legacyIndivid.php renamed to Person.php	*
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . '/Birth.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -231,22 +231,7 @@ else
     $action         = 'Display';
 
 // start the template
-$tempBase		    = $document_root . '/templates/';
-$template		    = new FtTemplate("${tempBase}page$lang.html");
-$includeSub		    = "VitalRegResponse$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	    = new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                               array($langName, $nativeName),
-                               $sorry);
-	$includeSub	    = "VitalRegResponse${action}en.html";
-}
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
+$template		    = new FtTemplate("VitalRegResponse$action$lang.html");
 
 // validation of parameters is left until after the template
 // is allocated so that context specific text can be obtained from the template

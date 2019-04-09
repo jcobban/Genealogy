@@ -74,8 +74,10 @@ use \Exception;
  *		2018/10/16      lang parameter was ignored                      *
  *		                get language apology text from Languages        *
  *		                address performance problem                     *
+ *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/04/06      use new FtTemplate::includeSub                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -375,30 +377,10 @@ else
 }
 
 $warn	        .= ob_get_clean();	// ensure previous output in page
-$tempBase	    = $document_root . '/templates/';
-$template	    = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	    = "CensusForm$censusYear$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub	= "CensusForm$censusYear{$action}en.html";
-}
-if (!file_exists($tempBase . $includeSub))
-{			// new implementation not supported yet
-	header("Location: /database/CensusForm$censusYear.php?Province=$province&District=$distID&SubDistrict=$subDistID&Division=$division&Page=$page");
-}			// new implementation not supported yet
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
+$template	    = new FtTemplate("CensusForm$censusYear$action$lang.html");
+
 $popups	= "CensusFormPopups$lang.html";
-if (!file_exists($tempBase . $popups))
-	$popups	= "CensusFormPopupsen.html";
-$template->includeSub($tempBase . $popups,
+$template->includeSub($popups,
 					  'POPUPS');
 $template->set('CENSUSYEAR', 		$censusYear);
 $template->set('COUNTRYNAME',		$countryName);

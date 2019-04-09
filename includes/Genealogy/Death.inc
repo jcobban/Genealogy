@@ -63,7 +63,7 @@ use \Iterator;
  *			`D_ChangedBy`   VARCHAR(64) NOT NULL DEFAULT '',			*
  *			`D_ChangeDate`  DATE DEFAULT NULL,					        *
  *			`D_OriginalVolume` VARCHAR(16) DEFAULT NULL,				*
- *			`D_OriginalPage` INT(11) DEFAULT NULL,					    *
+ *			`D_OriginalPage` VARCHAR(11) DEFAULT NULL,				    *
  *			`D_OriginalItem` INT(11) DEFAULT NULL,					    *
  *			PRIMARY KEY (`D_RegDomain`,			                        *
  *			`D_RegYear`,			                                    *
@@ -99,6 +99,7 @@ use \Iterator;
  *		2018/11/24      log entry for insert did not include parms      *
  *		2019/01/06      move to namespace Genealogy                     *
  *		                replace DATE with yyyymmdd                      *
+ *		2019/03/18  	`D_OriginalPage` VARCHAR(11) DEFAULT NULL,	    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -171,7 +172,7 @@ class Death extends Record
 				'd_image'				=> '',
 				'd_idir'				=> 0,
 				'd_originalvolume'		=> 0,
-				'd_originalpage'		=> 0,
+				'd_originalpage'		=> null,
 				'd_originalitem'		=> 0,
 				'd_changedby'			=> '',
 				'd_changedate'			=> '');
@@ -187,7 +188,9 @@ class Death extends Record
 				'regyear'				=> 'd_regyear',
 				'regnum'				=> 'd_regnum',
 				'regcounty'				=> 'd_regcounty',
+				'county'				=> 'd_regcounty',
 				'regtownship'			=> 'd_regtownship',
+				'township'		    	=> 'd_regtownship',
 				'msvol'					=> 'd_msvol',
 				'surname'				=> 'd_surname',
 				'surnamesoundex'		=> 'd_surnamesoundex',
@@ -208,6 +211,8 @@ class Death extends Record
 				'cause'					=> 'd_cause',
 				'duration'				=> 'd_duration',
 				'phys'					=> 'd_phys',
+				'physician'				=> 'd_phys',
+				'attendant'				=> 'd_phys',
 				'physaddr'				=> 'd_physaddr',
 				'informant'				=> 'd_informant',
 				'infrel'				=> 'd_infrel',
@@ -716,95 +721,94 @@ class Death extends Record
 		global	$connection;
 
 		if (is_string($xml))
-		{		// string tag name
+		{	            	// string tag name
 		    $tagname	= $xml;
-		    $xml	= true;
-		}		// string tag name
+		    $xml    	= true;
+		}           		// string tag name
 		else
 		if ($xml)
-		{		// true
+		{           		// true
 		    $tagname	= 'cmd';
-		}		// true
+		}           		// true
 
 		if ($this->needInsert)
-		{		// create new record
+		{	            	// create new record
 		    $fldnames					= '';
 		    $comma		    			= '';
 		    $values		    			= '';
 		    $sqlParms					= array();
 		    foreach($this->row as $fld => $value)
-		    {			// loop through all fields in record
+		    {	    		// loop through all fields in record
 				switch($fld)
-				{		// act on specific fields
+				{   		// act on specific fields
 				    case 'd_surnamesoundex':
-				    {
-						$fldnames		.= $comma . "`$fld`"; 
-						$surname		= $this->row['d_surname'];
-						$values		.= ',LEFT(SOUNDEX(:surname), 4)';
+				    {       // ask server to calculate
+						$fldnames	        	.= $comma . "`$fld`"; 
+						$surname        		= $this->row['d_surname'];
+						$values		            .= ',LEFT(SOUNDEX(:surname),4)';
 						$sqlParms['surname']	= $surname;
-						$comma			= ", ";
+						$comma	        		= ", ";
 						break;
 				    }		// D_SurnameSoundex
 
 				    case 'd_changedby':
 				    {
-						$fldnames		.= $comma . "`$fld`"; 
-						$values			.= $comma . ':changedby';
+						$fldnames       		.= $comma . "`$fld`"; 
+						$values	        		.= $comma . ':changedby';
 						$sqlParms['changedby']	= $userid;
-						$comma			= ", ";
+						$comma	        		= ", ";
 						break;
 				    }		// D_ChangedBy
 
 				    case 'd_changedate':
 				    {
-						$fldnames		.= $comma . "`$fld`"; 
-						$values			.= $comma . 'CURDATE()';
-						$comma			= ", ";
+						$fldnames       		.= $comma . "`$fld`"; 
+						$values	        		.= $comma . 'CURDATE()';
+						$comma	        		= ", ";
 						break;
 				    }		// D_ChangeDate
 
 				    case 'd_idir':
-				    case 'd_originalpage':
 				    case 'd_originalitem':
 				    {		// integer fields
-						$fldnames		.= $comma . "`$fld`";
-						$shortFld		= substr($fld, 2);
-						$values			.= $comma . ':' . $shortFld;
+						$fldnames	        	.= $comma . "`$fld`";
+						$shortFld       		= substr($fld, 2);
+						$values			        .= $comma . ':' . $shortFld;
 						if (is_int($value) || ctype_digit($value))
 						    $sqlParms[$shortFld]= $value;
 						else
 						    $sqlParms[$shortFld]= null;
-						$comma			= ', ';
+						$comma			        = ', ';
 						break;
 				    }		// integer fields
 
 				    default:
 				    {
-						$fldnames		.= $comma . "`$fld`";
-						$shortFld		= substr($fld, 2);
-						$values			.= $comma . ':' . $shortFld;
+						$fldnames		        .= $comma . "`$fld`";
+						$shortFld       		= substr($fld, 2);
+						$values			        .= $comma . ':' . $shortFld;
 						$sqlParms[$shortFld]	= $value;
-						$comma			= ", ";
+						$comma			        = ", ";
 						break;
 				    }		// most fields
-				}		// act on specific fields
-		    }			// loop through all fields in record
+				}	    	// act on specific fields
+		    }		    	// loop through all fields in record
 
 		    // construct the SQL INSERT command	
-		    $insert	= "INSERT INTO Deaths ($fldnames) VALUES($values)";
+		    $insert	    = "INSERT INTO Deaths ($fldnames) VALUES($values)";
 		    $insertText	= debugPrepQuery($insert, $sqlParms);
 
 		    // insert the new record into the database
 		    $stmt	= $connection->prepare($insert);
 		    if ($stmt->execute($sqlParms))
-		    {		// insert successful
-				$count			= $stmt->rowCount();
+		    {		        // insert successful
+				$count			    = $stmt->rowCount();
 				if ($xml)
 				    print "<$tagname result='$count'>" . xmlentities($insert) . 
 						    "</$tagname>\n";
 				else
 				if ($debug)
-				    $warn	.= "<p>$insert</p>\n<p>count=$count</p>\n";
+				    $warn	        .= "<p>$insert</p>\n<p>count=$count</p>\n";
 
 				$this->changed		= array();	// reset
 				$this->needInsert	= false;
@@ -812,29 +816,28 @@ class Death extends Record
 				// log the update
 				$this->log($insert, $sqlParms);
 				return $count;
-		    }		// insert successful
+		    }		        // insert successful
 		    else
-		    {		// error inserting record
+		    {		        // error inserting record
                 error_log("Death.inc: " . __LINE__ . " '$insertText'\n");
-                showTrace();
 				throw new Exception("Death::save: '" .
 								substr($insertText,0,40) .  "...', " .
 								print_r($stmt->errorInfo(),true));
-		    }		// error inserting record
-		}		// create new record
+		    }		        // error inserting record
+		}		            // create new record
 		else
-		{		// update existing record
-		    $update		= "UPDATE Deaths SET ";
-		    $set		= '';
-		    $comma		= '';
-		    $sqlParms		= array();
+		{		            // update existing record
+		    $update         		= "UPDATE Deaths SET ";
+		    $set            		= '';
+		    $comma          		= '';
+		    $sqlParms       		= array();
 		    foreach($this->changed as $fld => $value)
 		    {
 				switch($fld)
-				{		// act on specific fields
+				{		    // act on specific fields
 				    case 'd_surname':
 				    {		// surname changed
-						$set		.= $comma . '`D_Surname`=:surname';
+						$set		    .= $comma . '`D_Surname`=:surname';
 						$sqlParms['surname']	= $value;
 						$set			.= ',`D_SurnameSoundex`='; 
 						$set			.= 'LEFT(SOUNDEX(:surname), 4)';
@@ -844,43 +847,41 @@ class Death extends Record
 
 				    case 'd_changedby':
 				    case 'd_changedate':
-				    {
+				    case 'd_surnamesoundex':
+				    {       // calculated
 						break;
 				    }		// D_ChangedBy, D_ChangeDate
 
 				    case 'd_idir':
-				    case 'd_originalpage':
+				    case 'd_msvol':
 				    case 'd_originalitem':
-				    {		// most fields
-						$shortFld		= substr($fld, 2);
-						$set			.= $comma . "`$fld`=:$shortFld";
+				    {		// integer value fields
+						$shortFld   		    = substr($fld, 2);
+						$set	    	    	.= $comma . "`$fld`=:$shortFld";
 						if (is_int($value) || ctype_digit($value))
-						{
-						    $sqlParms[$shortFld]	= $value;
-						}
+						    $sqlParms[$shortFld]= $value;
 						else
-						{
-						    $sqlParms[$shortFld]	= null;
-						}
-						$comma	= ', ';
+						    $sqlParms[$shortFld]= null;
+						$comma          	    = ', ';
 						break;
-				    }		// most fields
+				    }		// integer value fields
 
 				    default:
 				    {		// most fields
-						$shortFld		= substr($fld, 2);
-						$set			.= $comma . "`$fld`=:$shortFld";
+						$shortFld       		= substr($fld, 2);
+						$set	        		.= $comma . "`$fld`=:$shortFld";
 						$sqlParms[$shortFld]	= $value;
-						$comma	= ', ';
+						$comma	                = ', ';
 						break;
 				    }		// most fields
-				}		// act on specific fields
-		    }		// loop through all changed fields in record
+				}		    // act on specific fields
+		    }		        // loop through all changed fields in record
 
 		    $this->changed	= array();	// reset
 
 		    if (strlen($set) > 0)
-		    {		// changes made
+            {		// changes made
+                // record who changed the record and when
 				$set			.= ',D_ChangedBy=:userid';
 				$set			.= ',D_ChangeDate=CURDATE()';
 				$sqlParms['userid']	= $userid;

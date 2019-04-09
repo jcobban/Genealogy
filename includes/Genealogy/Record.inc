@@ -186,8 +186,9 @@ use \Iterator;
  *		                to add to $this->msg instead                    *
  *		                add member $record->template and setTemplate    *
  *		2018/12/12      add support for multiple field keys to getId    *
+ *		2019/04/06      add method __toString                           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -620,7 +621,7 @@ class Record implements Iterator, ArrayAccess
 		'Nicknames'	    => array('prime'	=> 'nickname',
 							 	'srvmg'	=> false,
 							 	'fldcount'	=> 3,
-							 	'classname'	=> 'NickName'),
+							 	'classname'	=> 'Nickname'),
 		'Videos'	    => array('prime'	=> array('filename','lang'),
 							 	'srvmg'	=> false,
 							 	'fldcount'	=> 3,
@@ -895,9 +896,9 @@ class Record implements Iterator, ArrayAccess
      ********************************************************************/
     function getName($options = null)
     {
-		$name		= $this->table;
+		$name		    = $this->table;
 		$information	= $this->getInfo();
-		$prime		= $information['prime'];
+		$prime		    = $information['prime'];
 		if (is_array($prime))
 		{
 		    $connector	= ':';
@@ -923,6 +924,26 @@ class Record implements Iterator, ArrayAccess
 		}		// include the first field in the record
 		return $name;
     }		// function Record::getName
+
+    /********************************************************************
+     *	Record::toString												*
+     *																	*
+     *	Default implementation                                          *
+     ********************************************************************/
+    function toString()
+    {
+        return  $this->getName();
+    }
+
+    /********************************************************************
+     *	Record::__toString												*
+     *																	*
+     *	Implement conversion to string.									*
+     ********************************************************************/
+    function __toString()
+    {
+		return  $this->toString();
+    }		// Record::__toString
 
     /********************************************************************
      *  function Record::isExisting										*
@@ -951,6 +972,8 @@ class Record implements Iterator, ArrayAccess
      *  Input:															*
      *		$label		descriptive identifier for record				*
      *		$force		if true output even if $debug false				*
+     *		            This is not needed because you can write:       *
+     *		                $warn   = $record->dump();                  *
      *																	*
      *	Return:															*
      *	    string containing trace output as HTML						*
@@ -2004,6 +2027,7 @@ class Record implements Iterator, ArrayAccess
      *					to this table									*
      *	'initrow'		default initial row.  This provides information	*
      *					on the fields in the table						*
+     *	'maxsetsize'    the maximum size of a RecordSet for this table  *       
      ********************************************************************/
     public static function getInformation($tableName)
     {
@@ -2043,7 +2067,9 @@ class Record implements Iterator, ArrayAccess
             }
 		    $order			        = $nsclass::$defaultOrder;
 		    if (strlen($order) > 0)
-				$information['order']	= $order;
+                $information['order']	= $order;
+
+            // get contents of default initial row
 		    if ($className == 'CensusLine')
 				$initrow		    = CensusLine::getInitRow($table);
 		    else
@@ -2058,7 +2084,9 @@ class Record implements Iterator, ArrayAccess
 				if (is_array($row))
 				    $initrow	    = $row;
 		    }			// no class specific init row
-		    $information['initrow']	= $initrow;
+            $information['initrow']	= $initrow;
+
+            $information['maxsetsize']  = 1000;
 		    return $information;
 		}
 		else
@@ -2733,7 +2761,6 @@ require_once __NAMESPACE__ . '/RecOwner.inc';
 function debugPrepQuery($query, $sqlParms)
 {
     global $warn;
-
     // check for substitutions by indexed values
     $queryParts		= explode('?', $query);
     if (count($queryParts) > 1)

@@ -34,6 +34,7 @@ use \Exception;
  *						correct placement of page top					*
  *		2018/09/07		default template namemisspelled					*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -108,22 +109,7 @@ switch($tableName)
 	}
 }			// act on specific table names
 
-$tempBase		    = $document_root . '/templates/';
-$template		    = new FtTemplate("${tempBase}page$lang.html");
-$includeSub		    = "ContactAuthor$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn       	.= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = 'ContactAuthoren.html';
-}
-$template->includeSub($tempBase . $includeSub,
-				  'MAIN');
+$template		    = new FtTemplate("ContactAuthor$lang.html");
 
 // get a list of all the owners of the current record
 // this includes all of the administrators

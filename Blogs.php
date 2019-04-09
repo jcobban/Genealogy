@@ -11,12 +11,12 @@ use \Exception;
  *  History:															*
  *		2018/09/15		Created											*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Blog.inc';
 require_once __NAMESPACE__ . '/User.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -43,22 +43,9 @@ $bloglist		    = new RecordSet('Blogs', $blogParms);
 $blogCount		    = $bloglist->count();
 
 $title	    	    = 'Blog Management';
-$tempBase		    = $document_root . '/templates/';
-$template		    = new FtTemplate("${tempBase}page$lang.html");
-$includeSub		    = "Blogs$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub     = 'Blogsen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
+$template		    = new FtTemplate("Blogs$lang.html");
+
+$tempBase           = $document_root . '/templates/';
 if (file_exists($tempBase . "Trantab$lang.html"))
     $trtemplate = new Template("${tempBase}Trantab$lang.html");
 else

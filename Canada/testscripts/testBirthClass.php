@@ -3,14 +3,14 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  testBirthClass.html							*
- *									*
- *  Test driver for the class Birth and class BirthSet.			*
- *									*
- *  History:								*
- *	2017/09/30	created						*
- *									*
- *  Copyright &copy; 2017 James Alan Cobban				*
+ *  testBirthClass.html													*
+ *																		*
+ *  Test driver for the class Birth and class BirthSet.					*
+ *																		*
+ *  History:															*
+ *		2017/09/30		created											*
+ *																		*
+ *  Copyright &copy; 2017 James Alan Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Birth.inc';
 require_once __NAMESPACE__ . '/BirthSet.inc';
@@ -303,10 +303,6 @@ The maximum number of items to return.
 </div>
 <div class='balloon' id='HelpDelete'>
 Clicking on this button performs the delete.
-</div>
-<div class='balloon' id='HelprightTop'>
-Click on this button to signon to access extended features of the web-site
-or to manage your account with the web-site.
 </div>
 <div class='popup' id='loading'>
 Loading...

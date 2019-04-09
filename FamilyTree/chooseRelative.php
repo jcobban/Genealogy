@@ -41,126 +41,86 @@ use \Exception;
  *		2017/03/19		use preferred parameters for new LegacyIndiv	*
  *		2017/05/24		missing dialogBot								*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2019/02/19      use Template                                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
+require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    // enable debug output
-    $title	= 'Choose Relative';
+// parameters
+$lang               = 'en';
+$idir               = null;
 
-    if (array_key_exists('idir', $_GET))
-    {
-		$idir	= $_GET['idir'];
-		try
-		{
-		    $person	= new Person(array('idir' => $_GET['idir']));
+foreach($_GET as $key => $value)
+{				// loop through all parameters
+	$value		= trim($value);
+	switch(strtolower($key))
+	{			// act on specific parameters
+	    case 'idir':
+	    case 'id':
+	    {			// get the individual by identifier
+			if (is_int($value) || ctype_digit($value))
+			{
+			    $idir		= $value;
+			    $getParms['idir']	= $idir;
+			}
+			else
+			    $msg	.= "Invalid IDIR=$value. ";
+			break;
+	    }			// get the individual by identifier
 
-		    // check if current user is an owner of the record and therefore
-		    // permitted to see private information and edit the record
-		    $isOwner	= $person->isOwner();
+	    case 'lang':
+	    {
+			$lang		= strtolower(substr($value,0,2));
+			break;
+	    }
+	}			// act on specific parameters
+}				// loop through all parameters
 
-		    // get information for constructing title and
-		    // breadcrumbs
-		    $name	= $person->getName(Person::NAME_INCLUDE_DATES);
-		    $given	= $person->getGivenName();
-		    $surname	= $person->getSurname();
-		    $nameuri	= rawurlencode($surname . ', ' . $given);
-		    if (strlen($surname) == 0)
-				$prefix	= '';
-		    else
-		    if (substr($surname,0,2) == 'Mc')
-				$prefix	= 'Mc';
-		    else
-				$prefix	= substr($surname,0,1);
+$template		    = new FtTemplate("chooseRelative$lang.html", true);
 
-		    $title		= "Choose Relative of " . $name;
+if ($idir)
+{
+    $person	        = new Person(array('idir' => $idir));
 
-		}	// try
-		catch(Exception $e)
-		{	// error creating individual
-		    $msg	.= 'Invalid value of default IDIR. ' . $e->getMessage();
-		    $name	= '';
-		}	// error creating individual
-    }		// default individual specified
+    // check if current user is an owner of the record and therefore
+    // permitted to see private information and edit the record
+    $isOwner	    = $person->isOwner();
+
+    // get information for constructing title and
+    // breadcrumbs
+    $name	        = $person->getName(Person::NAME_INCLUDE_DATES);
+    $given	        = $person->getGivenName();
+    $surname	    = $person->getSurname();
+    $treename       = $person->getTreename();
+    $nameuri	    = rawurlencode($surname . ', ' . $given);
+    if (strlen($surname) == 0)
+		$prefix	    = '';
     else
-		$msg	.= 'Missing mandatory parameter idir. ';
+    if (substr($surname,0,2) == 'Mc')
+		$prefix	    = 'Mc';
+    else
+		$prefix	    = substr($surname,0,1);
 
-    htmlHeader($title,
-				array(  '/jscripts/js20/http.js',
-						'/jscripts/util.js',
-						'chooseRelative.js'),
-				true);
-?>
-<body>
-  <div class="body">
-    <h1>
-      <span class="right">
-		<a href="chooseRelativeHelpen.html" target="help">? Help</a>
-      </span>
-		<?php print $title; ?>
-      <div style="clear: both;"></div>
-    </h1>
-<?php
-		if (strlen($msg) > 0)
-		{
-?>
-      <p class="message">
-		<?php print $msg; ?> 
-      </p>
-<?php
-		}
-		else
-		{	// no error messages
-?>
-  <form name="indForm" action="relationshipCalculator.php" method="get">
-      <div class="row">
-		<label class="column1" for="Name">Name:
-		</label>
-		<input type="text" name="Name" id="Name" size="56" class="white left"
-				value="<?php print $name; ?>">
-		<input type="hidden" name="idir1"
-				value="<?php print $idir; ?>">
-		<div style="clear: both;"></div>
-      </div>
-      <p><!-- leave a little extra space --></p>
-      <div class="row">
-		<label class="column1" for="idir2">
-		  Select:
-		</label>
-		<select name="idir2" id="idir2" size="10" class="white left">
-		    <option value="0">Choose an individual</option>
-		</select>
-		<div style="clear: both;"></div>
-      </div>
-  </form>
-<?php
-		}		// no error messages
-?>
-</div>	<!-- end of <div id="body"> -->
-<?php
-    dialogBot();
-?>
-<div class="balloon" id="HelpName">
-Type a name, starting with the surname, a comma, and the given names.  As you 
-type the text you have entered is used to select the individuals to list,
-starting with the first individual whose name begins with the text
-you have entered.
-</div>
-<div class="balloon" id="Helpidir2">
-This selection list displays a list of individuals in alphabetical order,
-by surname, and then by given name, that starts with the individual
-in the database who is the first to come after the text entered in the
-name field.  Click on an individual in this list to display the information
-known about that individual.
-</div>
-<div class="balloon" id="HelpincMarried">
-If this option is checked then the list of individuals will include
-married names as well as birth names.
-</div>
-<div class="popup" id="loading">
-Loading...
-</body>
-</html>
+    $template->set('IDIR',		    $idir);
+    $template->set('NAME',		    $name);
+    $template->set('GIVEN',		    $given);
+    $template->set('SURNAME',		$surname);
+    if (strlen($surname) > 2)
+        $template->set('PREFIX',    substr($surname,0,2));
+    else
+        $template->set('PREFIX',    $surname);
+    $template->set('TREENAME',		$treename);
+    $template->set('NAMEURI',		$nameuri);
+}		// default individual specified
+else
+{
+    $msg	.= 'Missing mandatory parameter idir. ';
+    $template->set('NAME',		    'Missing IDIR');
+    $template['indForm']->update(null);
+}
+
+$template->display();

@@ -185,8 +185,17 @@
  *		                supported by browser                            *
  *		                in displayHelp do not include $ substitution    *
  *		                in help division name                           *
+ *		2019/02/06      function of rightTop button moved into menu     *
+ *		2019/02/08      common mandatory initialization required for    *
+ *		                all pages is moved from the initPage method     *
+ *		                which had to be explicitly called by the        *
+ *		                onload handler for each page to the commonInit  *
+ *		                function which is invoked for all pages         *
+ *		2019/03/02      remove facebook link if not enough room         *
+ *		2019/04/07      display help if mouse click on input field      *
+ *		                this is in part to support mobile devices       *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -265,8 +274,8 @@ if (navigator.appName == 'Microsoft Internet Explorer')
     if (result === null || result[1] < 9)
 		alert("Microsoft Internet Explorer Version: " +
 		      navigator.appVersion +
-		  " is deviant in its implementation and many services may not work. " +
-		  "Upgrade to version 9 or later, or use any other browser.");
+		  " is non-standard in its implementation and many services may not work. " +
+		  "Upgrade to Internet Explorer version 9 or later, or use any other browser.");
 }
 
 /************************************************************************
@@ -455,7 +464,7 @@ var	currentUser	= null;
  *  This global variable contains an associative array of the cookie	*
  *  values passed to the script.										*
  ************************************************************************/
-var cookies		= [];
+var cookies		    = [];
 var tempCookies		= document.cookie;
 if (tempCookies.length > 0)
 {			// cookies passed
@@ -569,7 +578,10 @@ function createNamedElement(type, name)
 function getElt(current, tagName)
 {
     if (current === null)
+    {
+        console.trace();
 		throw new Error("util.js: getElt: parameter is null");
+    }
     if (current.childNodes === undefined)
 		throw new Error("util.js: getElt: parameter is not a document element");
     if (current)
@@ -825,12 +837,15 @@ function tagToString(node)
  ************************************************************************/
 function show(id)
 {
-    var	element		= null;
-    if (typeof id === 'object' && id.nodeType == 1)
-		element		= id;
+    var	element		            = null;
+    if (this instanceof Element)
+        element                 = this;
     else
-		element		= document.getElementById(id);
-    element.style.display 	= 'block';
+    if (id instanceof Element)
+		element		            = id;
+    else
+		element		            = document.getElementById(id);
+    element.style.display 	    = 'block';
     element.style.visibility	= 'visible';
     element.scrollIntoView();
 
@@ -855,12 +870,15 @@ function show(id)
  ************************************************************************/
 function hide(id)
 {
-    var	element		= null;
-    if (typeof id === 'object' && id.nodeType == 1)
-		element		= id;
+    var	element		            = null;
+    if (this instanceof Element)
+        element                 = this;
     else
-		element		= document.getElementById(id);
-    element.style.display	= 'none';
+    if (id instanceof Element)
+		element		            = id;
+    else
+		element		            = document.getElementById(id);
+    element.style.display	    = 'none';
 }	// function hide
 
 /************************************************************************
@@ -1048,12 +1066,12 @@ function displayHelp(element)
 {
     // if a previous help balloon is still being displayed, hide it
     if (helpDiv)
-    {		// a help balloon is displayed	
+    {		// a help balloon is currently displayed	
 		helpDiv.style.display	= 'none';
 		helpDiv			        = null;
-    }		// a help balloon is displayed
+    }		// a help balloon is currently displayed
 
-    var helpDivName	= "";
+    var helpDivName	            = "";
     var	name		            = element.name;
     if (name === undefined || name === null || name == '')
 		name		            = element.id;
@@ -1301,7 +1319,7 @@ function copyXmlToHtml(xmlNode,
  *  This method is called to open the signon dialog if the user is not	*
  *  yet signed on.														*
  ************************************************************************/
-function openSignon()
+function openSignon(ev)
 {
     var	server	= location.protocol + "//" +
 				  location.hostname;
@@ -1329,7 +1347,7 @@ function openSignon()
  *  This method is called to open the account dialog if the user is		*
  *  already signed on.													*
  ************************************************************************/
-function openAccount()
+function openAccount(ev)
 {
     var	server	= location.protocol + "//" +
 				  location.hostname;
@@ -1430,13 +1448,14 @@ function changeDiv(divNode)
  *  Input:																*
  *		this		HTML tag											*
  ************************************************************************/
+var helpEltText     = '';
 function eltMouseOver()
 {
-    // clear any old element
-    helpElt	= null;
-
     if (popupHelpOption)
     {			// this user wants help
+		if (this.nodeName.toUpperCase() == 'FIELDSET')
+            return;
+
 		// in some cases the mouseover event is against the table cell
 		// containing the input element.  Locate the first element node
 		// under the cell to display help for
@@ -1458,6 +1477,7 @@ function eltMouseOver()
 
 		if (helpElt)
 		{
+            helpEltText = "helpElt=" + helpElt.outerHTML + ". ";
 		    helpDelayTimer	= setTimeout(popupHelp, 2000);
 		}
     }			// this user wants help
@@ -1467,13 +1487,28 @@ function eltMouseOver()
  *  function popupHelp													*
  *																		*
  *  This function is called if the mouse is held over an input element	*
- *  on the invoking page for more than 2 seconds.  It shows the			*
- *  associated help division.											*
+ *  on the invoking page for more than 2 seconds, or the mouse is       *
+ *  clicked on the element.  It shows the associated help division.		*
  ************************************************************************/
+function popupHelpHandler(ev)
+{
+    if (popupHelpOption)
+    {
+        helpElt             = ev.target;
+        popupHelp();
+    }
+}       // function popupHelpHandler
+
 function popupHelp()
 {
-    displayHelp(helpElt);
-}		// popupHelp
+    if (helpElt)
+    {
+        displayHelp(helpElt);
+        helpElt         = null;
+    }
+    else
+        alert("popupHelp: helpElt is null " + helpEltText);
+}		// function popupHelp
 
 /************************************************************************
  *  function eltMouseOut												*
@@ -1489,7 +1524,7 @@ function eltMouseOut()
 {
     clearTimeout(helpDelayTimer);
     helpDelayTimer	= setTimeout(hideHelp, 2000);
-}		// eltMouseOut
+}		// function eltMouseOut
 
 /************************************************************************
  *  function actMouseOverHelp											*
@@ -1504,9 +1539,50 @@ function actMouseOverHelp(element)
 {
     if (element === undefined)
 		throw "util.js: actMouseOverHelp: element is undefined";
-    element.onmouseover		= eltMouseOver;
-    element.onmouseout		= eltMouseOut;
-}		// actMouseOverHelp    
+    
+    addEventHandler(element, 'mouseover',   eltMouseOver);
+    addEventHandler(element, 'mouseout',    eltMouseOut);
+    addEventHandler(element, 'click',       popupHelpHandler);
+}		// function actMouseOverHelp    
+
+/************************************************************************
+ *  function displayMenu												*
+ *																		*
+ *  This function displays the page menu in a popup				        *
+ *																		*
+ ************************************************************************/
+function displayMenu(ev)
+{
+    ev.stopPropagation();
+    var dialog              = document.getElementById('menu');
+
+    // ensure the dialog is hidden before modifying it
+    dialog.style.display	= 'none';
+    dialog.style.position	= 'absolute';
+    dialog.style.visibility	= 'hidden';
+    dialog.style.display	= 'block';
+
+	// display the dialog offset from the requesting button
+    var element             = document.getElementById('menuButton');
+	var leftOffset		    = getOffsetLeft(element);
+	var rightOffset		    = getOffsetRight(element);
+
+	var dialogWidth		= dialog.clientWidth;
+	if (leftOffset - dialogWidth < 10)
+	    leftOffset	    = rightOffset + 10;
+	else
+	    leftOffset	    = leftOffset - dialogWidth - 10;
+	dialog.style.left	= leftOffset + "px";
+    dialog.style.top	= (getOffsetTop(element) + 10) + 'px';
+
+    dialog.style.display 	    = 'block';
+    dialog.style.visibility	    = 'visible';
+    dialog.scrollIntoView();
+
+	dialogDiv		    = dialog;
+
+    return dialogDiv;
+}		// function displayMenu
 
 /************************************************************************
  *  function displayDialog												*
@@ -1514,7 +1590,7 @@ function actMouseOverHelp(element)
  *  This function displays a customized dialog in a popup				*
  *																		*
  *  Input:																*
- *		dialog				an HTML element to modify and make visible.	*
+ *		dialog			an HTML element to modify and make visible.	    *
  *						This is normally a <div> element that is		*
  *						initially not visible							*
  *		templateId		identifier of an HTML element that provides the	*
@@ -1548,21 +1624,21 @@ function displayDialog(dialog,
     if (dialogDiv)
     {		// a dialog balloon is displayed
 		dialogDiv.style.display	= 'none';
-		dialogDiv		= null;
+		dialogDiv		        = null;
     }		// a dialog balloon is displayed
 
     // ensure the dialog is hidden before modifying it
-    dialog.style.display	= 'none';
-    dialog.style.position	= 'absolute';
-    dialog.style.visibility	= 'hidden';
-    dialog.style.display	= 'block';
+    dialog.style.display    	= 'none';
+    dialog.style.position   	= 'absolute';
+    dialog.style.visibility 	= 'hidden';
+    dialog.style.display    	= 'block';
 
-    var template	= null;
+    var template	            = null;
     if (typeof templateId == 'string')
-        template	= document.getElementById(templateId);
+        template	            = document.getElementById(templateId);
     else
     if (typeof templateId == 'object')
-        template	= templateId;
+        template	            = templateId;
     if (template === null)
     {
 		alert("util.js: displayDialog: could not find template with id='" +
@@ -1572,34 +1648,32 @@ function displayDialog(dialog,
     else
     {		// template OK
 		// clear existing contents of message division
-		while(dialog.hasChildNodes())
-		{		// remove existing contents of popup
-		    dialog.removeChild(dialog.firstChild);
-		}		// remove existing contents of popup
+		dialog.innerHTML        = '';
 
 		// customize the template
-		var	form	= createFromTemplate(template,
-									     parms,
-									     null);
+		var	form	            = createFromTemplate(template,
+								            	     parms,
+							            		     null);
 		if (form.nodeName.toUpperCase() != 'FORM')
 		{		// catch and correct definition problem
 		    alert("util.js: displayDialog: template with id='" +
                     templateId + "' is not an instance of <form>");
-		    form	= document.createElement("FORM").appendChild(form);
+		    form	            = document.createElement("FORM").
+                                            appendChild(form);
 		}		// catch and correct definition problem
-		form		= dialog.appendChild(form);
+		form		            = dialog.appendChild(form);
 
 		// set the onclick action for the first (or only) button
 		// in the dialog
-		var buttons	= dialog.getElementsByTagName('BUTTON');
+		var buttons	            = dialog.getElementsByTagName('BUTTON');
 		var button;
 		if (buttons.length == 0)
 		{		// button, button, who's got the button?
 		    // add a default "Cancel" button
-		    button	= document.createElement("BUTTON");
+		    button	            = document.createElement("BUTTON");
 		    button.appendChild(document.createTextNode("Cancel"));
 		    form.appendChild(button);
-		    buttons[0]	= button;
+		    buttons[0]	        = button;
 		}		// missing button
 
 		if (action)
@@ -1627,38 +1701,44 @@ function displayDialog(dialog,
 		}		// default action, every button closes dialog
 
 		// display the dialog offset from the requesting button
-		var leftOffset		= 0;
-		var rightOffset		= 0;
+		var leftOffset	    	= 0;
+		var rightOffset	    	= 0;
 		if (element)
 		{
-		    leftOffset		= getOffsetLeft(element);
-		    rightOffset		= getOffsetRight(element);
+		    leftOffset		    = getOffsetLeft(element);
+		    rightOffset		    = getOffsetRight(element);
 		}
-		var pane		= document.getElementById('transcription');
+		var pane		        = document.getElementById('transcription');
 		if (pane === null)
-		    pane		= document.body;
+		    pane		        = document.body;
 
-		var dialogWidth		= dialog.clientWidth;
+		var dialogWidth		    = dialog.clientWidth;
 		if (leftOffset - dialogWidth < 10)
-		    leftOffset	= rightOffset + 10 - pane.scrollLeft;
+		    leftOffset	        = rightOffset + 10 - pane.scrollLeft;
 		else
-		    leftOffset	= leftOffset - dialogWidth - 10 - pane.scrollLeft;
-		dialog.style.left	= leftOffset + "px";
+		    leftOffset	        = leftOffset - dialogWidth - 10 - 
+                                            pane.scrollLeft;
+		dialog.style.left	    = leftOffset + "px";
 		if (element)
 		    dialog.style.top	= (getOffsetTop(element) + 10) + 'px';
 
 		// support mouse dragging
-		dialog.onmousedown	= dialogMouseDown;
-		dialog.onmousemove	= null;
-		dialog.onmouseup	= dialogMouseUp;
+		dialog.onmousedown	    = dialogMouseDown;
+		dialog.onmousemove  	= null;
+		dialog.onmouseup    	= dialogMouseUp;
 
 		// show the dialog if not requested to defer this until dialog complete
 		if (!defer)
 		{		// display the dialog immediately
 		    if (form.elements.length > 0)
 				form.elements[0].focus();
-		    dialog.style.visibility	= 'visible';
+		    dialog.style.visibility	    = 'visible';
 		    dialog.scrollIntoView();
+            dialog.style.display 	    = 'block';
+
+            // do not permit mouse clicks in this dialog to
+            // bubble up to the click handler on <body>
+            addEventHandler(dialog, 'click', stopProp);
 
 		    // set the focus on the first button so Enter will apply it
 		    buttons[0].focus();
@@ -1669,6 +1749,61 @@ function displayDialog(dialog,
 }		// function displayDialog
 
 /************************************************************************
+ *  function addEventHandler											*
+ *																		*
+ *  This provides a portable interface for adding event handlers.       *
+ *																		*
+ *  Input:																*
+ *		element 	the HTML element        							*
+ *		type        string identifying the event type                   *
+ *		handler     function                                            *
+ ************************************************************************/
+function addEventHandler(element, type, handler)
+{
+    if (element.addEventListener)
+        element.addEventListener(type, handler, false);
+    else if (element.attachEvent)
+        element.attachEvent('on' + type, handler);
+    else
+    switch(type.toLowerCase())
+    {                   // incredibly ancient browser
+
+        case 'click':
+            element.onclick         = handler;
+            break;
+
+        case 'keydown':
+            element.onkeydown       = handler;
+            break;
+
+        case 'mouseover':
+            element.onmouseover     = handler;
+            break;
+
+        case 'mouseout':
+            element.onmouseout      = handler;
+            break;
+
+    }                   // incredibly ancient browser
+}       // function addEventHandler
+
+/************************************************************************
+ *  function stopProp													*
+ *																		*
+ *  This onclick handler receives all mouse click events from the       *
+ *  area of the dialog.  It prevents them from propagating through      *
+ *  to the mouse click event handler on <body>.                         *
+ *																		*
+ *  Input:																*
+ *		this		the HTML element        							*
+ ************************************************************************/
+function stopProp(ev)
+{
+    ev.stopPropagation();
+    return false;
+}		// function stopProp
+
+/************************************************************************
  *  function hideDialog													*
  *																		*
  *  This is the default onclick action for a button in a dialog.  It	*
@@ -1677,7 +1812,7 @@ function displayDialog(dialog,
  *  Input:																*
  *		this		the HTML <button> element							*
  ************************************************************************/
-function hideDialog()
+function hideDialog(ev)
 {
     // no longer displaying the modal dialog popup
     if (dialogDiv)
@@ -1705,14 +1840,15 @@ function dialogIsDisplayed()
  *																		*
  *  Input:																*
  *		this	the top element of the dialog							*
+ *		event   instance of MouseDown Event                             *
  ************************************************************************/
-function dialogMouseDown(e)
+function dialogMouseDown(event)
 {
-    if (!e)
-		e	= window.event;
+    if (!event)
+		event	= window.event;
     dragok	= true;
-    dx	 	= parseInt(this.style.left+0)	- e.clientX;
-    dy 		= parseInt(this.style.top+0)	- e.clientY;
+    dx	 	= parseInt(this.style.left+0)	- event.clientX;
+    dy 		= parseInt(this.style.top+0)	- event.clientY;
     // only have onmousemove handler while dragging
     this.onmousemove = dialogMouseMove;
     return false;	// suppress default action
@@ -1726,15 +1862,16 @@ function dialogMouseDown(e)
  *																		*
  *  Input:																*
  *		this	the top element of the dialog							*
+ *		event   instance of MouseMove Event                             *
  ************************************************************************/
-function dialogMouseMove(e)
+function dialogMouseMove(event)
 {
-    if (!e) 
-		e	= window.event;
+    if (!event) 
+		event	= window.event;
     if (dragok)
     {
-		this.style.left	= dx + e.clientX + "px";
-		this.style.top	= dy + e.clientY + "px";
+		this.style.left	= dx + event.clientX + "px";
+		this.style.top	= dy + event.clientY + "px";
 		return false;
     }
 }		// function dialogMouseMove
@@ -1755,49 +1892,191 @@ function dialogMouseUp()
 }	// function dialogMouseUp
 
 /************************************************************************
- *  function pageInit													*
+ *  function documentOnClick											*
  *																		*
- *  This function should be called by all onload methods to				*
- *  perform initialization that is common to all pages.					*
+ *  This is the click event handler for the document.  It closes		*
+ *  any open dialogs.                                                   *
+ *																		*
+ *  Input:																*
+ *		this	the top element of the dialog							*
  ************************************************************************/
-function pageInit()
+function documentOnClick(event)
 {
-    // set onclick action for the rightTop button
-    var rightTop	= document.getElementById('rightTop');
-    var userid		= document.getElementById('UserInfoUserid');
-    if (userid && rightTop)
+    if (dialogDiv)
+    {		// a dialog balloon is displayed
+		dialogDiv.style.display	= 'none';
+		dialogDiv		        = null;
+    }		// a dialog balloon is displayed
+}       // function documentOnClick
+
+/************************************************************************
+ *  function keyDownPaging												*
+ *																		*
+ *  Handle key strokes for pageDown and pageUp                          *
+ *																		*
+ *  Parameters:															*
+ *		e		W3C compliant browsers pass an event as a parameter		*
+ ************************************************************************/
+function keyDownPaging(e)
+{
+    if (!e)
+    {		// browser is not W3C compliant
+		e   	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    var	code	            = e.key;
+
+    // take action based upon code
+    switch (code)
     {
-		userid		= userid.innerHTML.trim();
-		if (userid.length > 0)
-		    rightTop.onclick	= openAccount;
-		else
-		    rightTop.onclick	= openSignon;
+		case "PageDown":	// page down
+		{
+            var element     = document.getElementById('topNext');
+            if (element)
+            {               // topNext exists
+	            for(var child   = element.firstChild; 
+                    child; 
+                    child = child.nextSibling)
+	            {           // loop through children
+	                if (child.nodeName.toLowerCase() == 'a')
+	                {       // <a>
+	                    location    = child.getAttribute('href');
+	                    return false;
+	                }       // <a>
+                }           // loop through children
+            }               // topNext exists
+		    return false;	// suppress default action
+		}	                // page down
+
+		case "PageUp":	    // page up
+		{
+            var element     = document.getElementById('topPrev');
+            if (element)
+            {               // topPrev exists
+	            for(var child   = element.firstChild; 
+                    child; 
+                    child = child.nextSibling)
+	            {           // loop through children
+	                if (child.nodeName.toLowerCase() == 'a')
+	                {       // <a>
+	                    location    = child.getAttribute('href');
+	                    return false;
+	                }       // <a>
+                }           // loop through children
+            }               // topPrev exists
+		    return false;		// suppress default action
+		}	    // page down
+
+    }	    // switch on key code
+
+    return;
+}		// function keyDownPaging
+
+/************************************************************************
+ *  function commonInit													*
+ *																		*
+ *  This function is called for all pages to perform initialization     *
+ *  that is common to all pages.					                    *
+ *  This replaces the requirement for all pages to call pageInit in     *
+ *  the pages body.onload handler.                                      *
+ *																		*
+ *	Input:																*
+ *	    event       instance of Event containing load event             *
+ *	    this        instance of Window                                  *
+ ************************************************************************/
+addEventHandler(window, "load", commonInit);
+
+function commonInit(event)
+{
+    var w = window,
+    d = document,
+    e = d.documentElement,
+    g = d.getElementsByTagName('body')[0],
+    x = w.innerWidth || e.clientWidth || g.clientWidth,
+    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+
+    addEventHandler(document, "click", documentOnClick);
+    addEventHandler(document, "keydown", keyDownPaging);
+
+    // set onclick action for the menu button
+    var menuButton	        = document.getElementById('menuButton');
+    var menuWidth           = 0
+    if (menuButton)
+    {
+        addEventHandler(menuButton,'click', displayMenu);
+        menuWidth           = menuButton.offsetWidth;
     }
+
+    var logo                = document.getElementById('logo');
+    var logoWidth           = 0
+    if (logo)
+    {
+        addEventHandler(logo,'click', displayMenu);
+        logoWidth           = logo.offsetWidth;
+    }
+
+    var advert              = document.getElementById('advertSpan');
+    var advertWidth         = 0
+    if (advert)
+    {
+        advertWidth         = advert.offsetWidth;
+    }
+
+    var facebook            = document.getElementById('facebookSpan');
+    var facebookWidth       = 0
+    if (facebook)
+    {
+        facebookWidth       = facebook.offsetWidth;
+    }
+
+    var menusWidth= menuWidth + logoWidth + advertWidth + facebookWidth;
+
+    // display Facebook status after page is loaded
+    if ((menusWidth + 10) > x)
+    {                           // not enough room for Facebook
+        var parentNode       = facebook.parentNode;
+        parentNode.removeChild(facebook);
+    }                           // not enough room for Facebook
+    else
+    {                           // enough room for Facebook
+	    try {
+		    var	facebookFrame	= document.getElementById("facebookFrame");
+		    if (facebookFrame)
+				facebookFrame.src	= "https://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.jamescobban.net%2Fgenealogy.html&amp;send=false&amp;layout=standard&amp;width=360&amp;show_faces=true&amp;font&amp;colorscheme=light&amp;action=like&amp;height=40";
+	    } catch (e) {
+			alert("util.js: pageInit: catch " + e.message);
+	    }
+    }                           // enough room for Facebook
 
     // if the user has requested it, suppress popup help
     // information about the current user is now available in all pages
-    // that use pageBot() or dialogBot()
     var optionsElt	= document.getElementById('UserInfoOptions');
     if (optionsElt)
     {				// have info from User instance
-		var topt	= optionsElt.textContent.trim() - 0;
+		var topt	        = optionsElt.textContent.trim() - 0;
 		if (topt && 2)
 		{			// turn off popup Help
 		    traceAlert("util.js: pageInit: turn off popup help");
 		    popupHelpOption	= false;
 		}			// turn off popup Help
     }				// have info from User instance
+    else
+        alert("commonInit: cannot find UserInfoOptions");
 
-    // display Facebook status
-    try {
-    var	facebookFrame	= document.getElementById("facebookFrame");
-    if (facebookFrame)
-		facebookFrame.src	= "https://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.jamescobban.net%2Fgenealogy.html&amp;send=false&amp;layout=standard&amp;width=360&amp;show_faces=true&amp;font&amp;colorscheme=light&amp;action=like&amp;height=80";
-    } catch (e) {
-		alert("util.js: pageInit: catch " + e.message);
-    }
+    // scan through all forms and set common dynamic functionality
+    // for elements
+    for(var i = 0; i < document.forms.length; i++)
+    {		    // iterate through all forms
+		var form	= document.forms[i];
+		for(var j = 0; j < form.elements.length; j++)
+		{	    // loop through elements in form
+		    var element	= form.elements[j];
 
-}		// function pageInit
+		    // pop up help balloon if the mouse hovers over an element
+		    // for more than 2 seconds
+		    actMouseOverHelp(element);
+		}	    // loop through elements in form
+    }		    // iterate through all forms
+}		// function commonInit
 
 /************************************************************************
  *  function traceAlert													*
@@ -1845,10 +2124,10 @@ function traceAlert(message)
  *  Fields to track mouse operations on a table for performing			*
  *  copy and paste														*
  ************************************************************************/
-var	mouseIsDown	= false;
+var	mouseIsDown	    = false;
 var	pendStartCell	= null;		// pending possible selection
-var	startCell	= null;		// first cell of selection
-var	endCell		= null;		// last cell of selection
+var	startCell	    = null;		// first cell of selection
+var	endCell		    = null;		// last cell of selection
 
 /************************************************************************
  *  function getStartSelection											*
@@ -2344,7 +2623,7 @@ function popupAlert(msg, element)
 				      'Msg$template',
 				      parms,
 				      element,		// position relative to
-				      null,		// button closes dialog
+				      null,		    // button closes dialog
 				      false);		// default show on open
     }		// have popup <div> to display message in
     else
@@ -2503,7 +2782,7 @@ function openFrame(name, url, side)
     }				// need to create new frame
 
     iframe.opener		= window;	// parent of new dialog
-    
+
     // identify the page to load into the frame
     if (url !== null && url != iframe.src)
     {

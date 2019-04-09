@@ -7,8 +7,9 @@
  *  History:															*
  *		2018/09/12		created											*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -20,9 +21,9 @@ window.onload	= onLoad;
 
 // specify style for tinyMCE editing
 tinyMCE.init({
-		mode			: "textareas",
-		theme			: "advanced",
-		plugins 		: "spellchecker,advhr,preview", 
+		mode			        : "textareas",
+		theme			        : "advanced",
+		plugins 		        : "spellchecker,advhr,preview", 
 				
 		// Theme options - button# indicated the row# only
 		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
@@ -32,21 +33,18 @@ tinyMCE.init({
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
 		theme_advanced_resizing : true,
-		forced_root_block	: false,
-		forced_root_block	: false,
-		content_css		: "/styles.css",
+		forced_root_block	    : false,
+		content_css		        : "/styles.css",
 
 });
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Perform initialization functions once the page is loaded.			*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     document.body.onresize	= onWindowResize;
 
     var names	= "";
@@ -58,10 +56,6 @@ function onLoad()
 		for(var j = 0; j < form.elements.length; j++)
 		{
 		    var element	= form.elements[j];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var	name	= element.name;
 		    var	id	= '';
@@ -118,7 +112,7 @@ function onLoad()
 		}	// loop through elements in form
     }		// iterate through all forms
 
-    // pop up help balloon if the mouse hovers over a field
+    // pop up help balloon if the mouse hovers over the message input field
     // for more than 2 seconds
     element		= document.getElementById('message_ifr');
     if (element)
@@ -130,7 +124,7 @@ function onLoad()
 }		// onLoad
 
 /************************************************************************
- *  onWindowResize														*
+ *  function onWindowResize												*
  *																		*
  *  This method is called when the browser window size is changed.		*
  *  If the window is split between the main display and a second		*
@@ -150,7 +144,7 @@ function onWindowResize()
 }		// onWindowResize
 
 /************************************************************************
- *  postBlog															*
+ *  function postBlog													*
  *																		*
  *  This method is called when the user requests to post				*
  *  a message to the blog of an individual.								*
@@ -208,7 +202,7 @@ function postBlog(rownum)
 }		// postBlog
 
 /************************************************************************
- *  gotBlog																*
+ *  function gotBlog													*
  *																		*
  *  This method is called when the XML file representing				*
  *  a posted blog is retrieved from the database.						*
@@ -261,7 +255,7 @@ function gotBlog(xmlDoc)
 }		// gotBlog
 
 /************************************************************************
- *  noBlog																*
+ *  function noBlog														*
  *																		*
  *  This method is called if there is no blog script on the web server.	*
  ************************************************************************/
@@ -275,7 +269,7 @@ function noBlog()
 }		// noBlog
 
 /************************************************************************
- *  editBlog															*
+ *  function editBlog													*
  *																		*
  *  This method is called if the user requests to edit the blog			*
  *  message.															*
@@ -294,7 +288,7 @@ function editBlog()
 }		// editBlog
 
 /************************************************************************
- *  delBlog																*
+ *  function delBlog													*
  *																		*
  *  This method is called if the user requests to delete the blog		*
  *  message.															*
@@ -317,9 +311,9 @@ function delBlog()
 }		// delBlog
 
 /************************************************************************
- *  noDelBlog																*
+ *  function noDelBlog													*
  *																		*
- *  This method is called if there is no blog script on the web server.		*
+ *  This method is called if there is no blog script on the web server.	*
  ************************************************************************/
 function noDelBlog()
 {

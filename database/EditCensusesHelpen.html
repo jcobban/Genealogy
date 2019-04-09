@@ -4,12 +4,13 @@
     <title>Census Administration: Censuses Table Help</title>
       <meta http-equiv=Content-Type content="text/html; charset=utf-8">
       <meta name="author" content="James A. Cobban">
-      <meta name="copyright" content="&copy; 2018 James A. Cobban">
+      <meta name="copyright" content="&copy; 2019 James A. Cobban">
 <!--*********************************************************************
  *   History:															*
  *          															*
  *		2016/01/22		created											*
  *      2018/11/08      rename to ...Helpen.html                        *
+ *      2019/04/07      add clicking on column headers                  *
  **********************************************************************-->
       <link rel="stylesheet" type="text/css" href="/styles.css"/>
   </head>
@@ -23,35 +24,49 @@
     <h1>How to Update the Censuses Table</h1>
     <p>
       The <b>Censuses</b> table is intended to provide information on each 
-      census for which transcription and indexing is supported.
+      census enumeration for which transcription and indexing is supported.
     </p>
     <p>Further information on the use of each of the fields on this page
-      is available by holding the mouse over the field or button.
+      is available by holding the mouse over the field or button or
+      clicking on an input field.
     </p>
     <p>This page permits modifying the complete information about each census.  
     </p>
+    <p>If there are more census enumerations than can be displayed on the
+        page then the summary line above the table will include a left arrow
+        (&lt;--) and a right arrow (--&gt;) which provide access to the
+        portions of the table preceding or following the portion which 
+        is displayed.  You can see those portions either by clicking on
+        one of the arrows, or by using the PageDn key to go to the previous
+        page or the PageUp key to go to the next page.
+    </p>
     <p>The body of the form functions like a spreadsheet, particularly with
-      respect to special key strokes.
-    <ul>
-      <li>The forward and backward tab keys, and the left and right arrow keys,
-  	change the selected input field in the table
-  	to the left or the right. Motion wraps around at the left and right
-  	edges of the table.
-      <li>The up and down arrows change the selected input field in the table 
-  	up or down one row at a time.
-  	Motion wraps around at the bottom and top of the table.
-      <li>The "Home" key repositions the text cursor at the beginning of the
-  	current input field.  The "End" key repositions the text cursor
-  	after the last character in the current input field.
-      <li>The "Ctl-Home" key combination selects the first input field in the row.
-  	The "Ctl-End" key combination selects the last input field in the row.
-      <li>The "Ctl-Z" key combination discards whatever you have typed in the
-  	current input field, and restores the value to what it was when the
-  	page was first displayed.
-      <li>The "Enter" key changes the selected cell in the table down
-  	one row at a time, rather than submitting the form as happens on
-  	simpler forms.
-    </ul>
+        respect to special key strokes.
+      <ul>
+        <li>You can temporarily hide a column by clicking on the
+            column header.  Click again to display the column again.
+        <li>You can widen the display of a column by clicking with the
+            right button on the column header.
+        <li>The forward and backward tab keys, and the left and
+            right arrow keys, change the selected input field in the table
+        	to the left or the right. Motion wraps around at the left and right
+        	edges of the table.
+        <li>The up and down arrows change the selected input field in the table 
+        	up or down one row at a time.
+        	Motion wraps around at the bottom and top of the table.
+        <li>The "Home" key repositions the text cursor at the beginning of the
+        	current input field.  The "End" key repositions the text cursor
+    	    after the last character in the current input field.
+        <li>The "Ctl-Home" key combination selects the first input field 
+            in the row.  The "Ctl-End" key combination selects
+            the last input field in the row.
+        <li>The "Ctl-Z" key combination discards whatever you have typed in the
+    	    current input field, and restores the value to what it was when the
+    	    page was first displayed.
+        <li>The "Enter" key changes the selected cell in the table down
+    	    one row at a time, rather than submitting the form as happens on
+    	    simpler forms.
+      </ul>
     </p>
     <p>
       The census identifier column is a combination of a domain identifier,
@@ -65,28 +80,32 @@
     </p>
     <p>The "Collective" column is a Y/N indicator of whether or not this entry
       is a conceptual collection of censuses.  For example prior to Canadian
-      Confederation in 1867 each of the separate British colonies in North America
-      had a separately administered census, as part of the British Imperial Census.
-      Even Canada West (Upper Canada) and Canada East (Lower Canada) had separately
-      administered enumerations, although they used a common form.
+      Confederation in 1867 each of the separate British colonies in
+      North America had a separately administered census,
+      as part of the British Imperial Census.
+      Even Canada West (Upper Canada) and Canada East (Lower Canada) had
+      separately administered enumerations, although they used a common form.
     </p>
     <p>The "Part of" column indicates for censuses that were administered at a 
-      level below that of a separate nation or colony, the higher level political
-      unit that they were a part of.  For example the 1861 Census of Canada West,
-      with identifier 'CW1861' is considered part of the census of British North
-      America, which is prolepticly identified as 'CA'.  
+      level below that of a separate nation or colony, the higher level
+      political unit that they were a part of. 
+      For example the 1861 Census of Canada West,
+      with identifier 'CW1861' is considered part of the census of
+      British North America, which is prolepticly identified as 'CA'.  
     </p>
-    <p>The "Provinces" column displays a list of the 2-character identifiers of the
-      provinces or states that are covered by a national census.
+    <p>The "Provinces" column displays a list of the 2-character identifiers
+      of the provinces or states that are covered by a national census.
     </p>
-    <p>The <span class="button">Delete</span> button deletes the specified census
-      from the database.
+    <p>The <span class="button">Delete</span> button deletes the specified
+      census from the database.
     </p>
-    <p>The <span class="button">Districts</span> button displays <a href="DistFormHelpen.html">the form for
-      administering the enumeration districts into which the census is divided</a>.
+    <p>The <span class="button">Districts</span> button displays
+      <a href="DistFormHelpen.html">the form for administering the
+          enumeration districts into which the census is divided</a>.
     </p>
     <p>Further information on the use of each of the fields on this page
-      is available by pressing the F1 key while the field is selected.
+      is available by pressing the F1 key while the field is selected or
+      clicking on the field.
     </p>
     <p>
       You must click on the 
@@ -94,12 +113,14 @@
       form to apply changes.  
       If you click on the left or right arrow hyperlinks to the preceding and
       following divisions in the line above the table
-      any changes you made to the table, except deletion of censuses, are discarded.
+      any changes you made to the table, except deletion of censuses, 
+      are discarded.
       Observe that unlike simpler forms you cannot
       submit this form by pressing the Enter key, because this simply moves
       the selected cell down one row in the table.
     </p>
-    <p>Once the database has been updated the form is re-displayed showing the updates.
+    <p>Once the database has been updated the form is re-displayed showing 
+      the updates.
     </p>
   </div>
   <div class="botcrumbs">

@@ -195,8 +195,9 @@
  *						pass language to other pages					*
  *		2018/04/19		correct splitting field names into col and row	*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 // strings for determining and changing the case of letters
@@ -409,9 +410,6 @@ var	numCanReadFlds	= 0;
  ************************************************************************/
 function onLoad()
 {
-    // perform common page initialization
-    pageInit();
-
     document.body.onresize	= onWindowResize;
 
     // activate functionality for individual input elements
@@ -1866,10 +1864,11 @@ function checkDecimal()
  *  Add an extra row into the tabular portion of the current form.		*
  *																		*
  *  Input:																*
- *		this				<button id='addRow'>								*
+ *		this		<button id='addRow'>								*
  ************************************************************************/
-function addRow()
+function addRow(event)
 {
+    event.stopPropagation();
     // locate the last row of the existing table
     var form		= this.form
     var formElts	= form.elements;
@@ -1951,10 +1950,6 @@ function addRow()
 function initElement(element, clear)
 {
     var form	= element.form;
-
-    // pop up help balloon if the mouse hovers over a field
-    // for more than 2 seconds
-    actMouseOverHelp(element);
 
     var	fldName	= element.name;
     if (fldName === undefined || fldName.length == 0)
@@ -2547,15 +2542,16 @@ function initElement(element, clear)
 }	// function initElement
 
 /************************************************************************
- *  showImportant														*
+ *  function showImportant												*
  *																		*
  *  Take action when the user clicks on the 'showImportant' button.		*
  *																		*
  *  Input:																*
- *		this				<button id='showImportant'>						*
+ *		this			<button id='showImportant'>						*
  ************************************************************************/
-function showImportant()
+function showImportant(event)
 {
+    event.stopPropagation();
     var form		= this.form;
     var	table		= document.getElementById('form');
     if (table)
@@ -2597,15 +2593,16 @@ function showImportant()
 }	// function showImportant
 
 /************************************************************************
- *  reset																*
+ *  function reset														*
  *																		*
  *  Take action when the user clicks on the 'reset' button.				*
  *																		*
  *  Input:																*
- *		this				<button id='reset'>								*
+ *		this			<button id='reset'>								*
  ************************************************************************/
-function reset()
+function reset(event)
 {
+    event.stopPropagation();
     var form		= this.form;
     var	census		= form.Census.value;
     var	censusYear	= census.substring(2);
@@ -2818,7 +2815,7 @@ function gotPrevLine(xmlDoc)
 }		// gotPrevLine
 
 /************************************************************************
- *  noPrevLine																*
+ *  function noPrevLine													*
  *																		*
  *  The database server was unable to respond to the query.				*
  ************************************************************************/
@@ -2829,18 +2826,19 @@ function noPrevLine()
 }		// function noPrevLine
 
 /************************************************************************
- *  showImage																*
+ *  function showImage													*
  *																		*
  *  Display the image of the original census page.						*
- *  This is the onclick method for the button with id 'imageButton'.		*
+ *  This is the onclick method for the button with id 'imageButton'.	*
  *																		*
  *  Input:																*
- *		this				<button id='imageButton'>						*
+ *		this			<button id='imageButton'>						*
  ************************************************************************/
 var imageTypes	= ['jpg', 'jpeg', 'gif', 'png'];
 
-function showImage()
+function showImage(event)
 {
+    event.stopPropagation();
     var	form			= this.form;
     var image			= form.elements['Image'].value;
     var	lang			= 'en';
@@ -2889,17 +2887,18 @@ function showImage()
 }	// showImage
 
 /************************************************************************
- *  correctImageUrl														*
+ *  function correctImageUrl											*
  *																		*
  *  Change the display so the user can modify the Uniform Record Locator*
  *  of the image for this page.  This is the onclick method for the		*
  *  button with id 'correctImage'.										*
  *																		*
  *  Input:																*
- *		this				<button id='correctImage'>						*
+ *		this			<button id='correctImage'>						*
  ************************************************************************/
-function correctImageUrl()
+function correctImageUrl(event)
 {
+    event.stopPropagation();
     var	form		= this.form;
     var imageLine	= document.getElementById("ImageButton");
     var imageUrl	= '';
@@ -2932,17 +2931,18 @@ function correctImageUrl()
 }	// correctImageUrl
 
 /************************************************************************
- *  matchCitations														*
+ *  function matchCitations												*
  *																		*
  *  Match all citations to this page against the individuals in the page*
  *  to set the link to the appropriate entry in the family tree.		*
  *  This is the onclick method for the button with id 'treeMatch'.		*
  *																		*
  *  Input:																*
- *		this				<button id='treeMatch'>								*
+ *		this		<button id='treeMatch'>								*
  ************************************************************************/
-function matchCitations()
+function matchCitations(event)
 {
+    event.stopPropagation();
     var	form		= this.form;
     var	lang		= 'en';
     if ('lang' in args)
@@ -2958,19 +2958,20 @@ function matchCitations()
 
     window.open(url, "matchCitations");
     return false;
-}	// matchCitations
+}	// function matchCitations
 
 /************************************************************************
- *  doIdir																*
+ *  function doIdir														*
  *																		*
  *  The user has requested to manage the IDIR value for the				*
  *  current line.														*
  *																		*
  *  Input:																*
- *		this		instance of <button>										*
+ *		this		instance of <button>								*
  ************************************************************************/
-function doIdir()
+function doIdir(event)
 {
+    event.stopPropagation();
     var	agePattern	= /([0-9]+m)|([0-9]+)/;
     var	rxResults	= null;
     var	button		= this;
@@ -2986,7 +2987,7 @@ function doIdir()
 
     if (idir > 0)
     {			// have an existing association
-		window.open('../FamilyTree/Person.php?idir=' + idir,
+		window.open('/FamilyTree/Person.php?idir=' + idir,
 				    '_blank');
     }			// have an existing association
     else
@@ -2995,8 +2996,8 @@ function doIdir()
 		var	line		= button.id.substring(6);
 		var	surname		= form.elements['Surname' + line].value;
 		var	givennames	= form.elements['GivenNames' + line].value;
-		var	age		= form.elements['Age' + line].value;
-		var	sex		= form.elements['Sex' + line].value;
+		var	age		    = form.elements['Age' + line].value;
+		var	sex		    = form.elements['Sex' + line].value;
 		var	censusYear	= form.Census.value.substring(2);
 		var	birthYear	= censusYear;	// default
 
@@ -3041,13 +3042,13 @@ function doIdir()
 }		// doIdir
 
 /************************************************************************
- *  gotIdir																*
+ *  function gotIdir													*
  *																		*
- *  The XML response to the database query for matching individuals has		*
+ *  The XML response to the database query for matching individuals has	*
  *  been returned.														*
  *																		*
  *  Input:																*
- *		xmlDoc		XML document												*
+ *		xmlDoc		XML document										*
  ************************************************************************/
 function gotIdir(xmlDoc)
 {
@@ -3143,17 +3144,18 @@ function gotIdir(xmlDoc)
 }		// gotIdir
 
 /************************************************************************
- *  clearIdir																*
+ *  function clearIdir													*
  *																		*
  *  The user has requested to clear the IDIR value for the current line.*
- *  Note that this only clears the value on the web page, the user must		*
- *  update the census page to apply the change to the database.				*
+ *  Note that this only clears the value on the web page, the user must	*
+ *  update the census page to apply the change to the database.			*
  *																		*
  *  Input:																*
- *		this		instance of <button>										*
+ *		this		instance of <button>								*
  ************************************************************************/
-function clearIdir()
+function clearIdir(event)
 {
+    event.stopPropagation();
     var	button		= this;
     var	name		= button.id;
     var	lineNum		= name.substring(name.length - 2);
@@ -3169,27 +3171,27 @@ function clearIdir()
 }		// clearIdir
 
 /************************************************************************
- *  displaySelectIdir														*
+ *  function displaySelectIdir											*
  *																		*
  *  This function displays a customized dialog for choosing from		*
  *  a list of individuals who match the individual described by the		*
- *  current line of the census.												*
+ *  current line of the census.											*
  *																		*
  *  Input:																*
- *		msgDiv				an HTML element to modify and make visible.		*
+ *		msgDiv			an HTML element to modify and make visible.		*
  *						This is normally a <div> element				*
- *		templateId		identifier of an HTML element that provides the		*
- *						structure and constant strings to be laid out		*
- *						in the dialog										*
- *		parms				an object containing values to substitute for		*
- *						symbols ($xxxx) in the template						*
- *		element				an HTML element used for positioning the		*
+ *		templateId		identifier of an HTML element that provides the	*
+ *						structure and constant strings to be laid out	*
+ *						in the dialog									*
+ *		parms			an object containing values to substitute for	*
+ *						symbols ($xxxx) in the template					*
+ *		element			an HTML element used for positioning the		*
  *						dialog for the user.  This is normally the 		*
- *						<button> for the user to request the dialog.		*
- *		action				onclick action to set for 1st (or only) button		*
- *						in the dialog.  If null the default action is		*
+ *						<button> for the user to request the dialog.	*
+ *		action			onclick action to set for 1st (or only) button	*
+ *						in the dialog.  If null the default action is	*
  *						to just hide the dialog.						*
- *		matches				array of XML <indiv> tags						*
+ *		matches			array of XML <indiv> tags						*
  ************************************************************************/
 function displaySelectIdir(dialog,
 						   templateId,
@@ -3206,8 +3208,8 @@ function displaySelectIdir(dialog,
 				      true))
     {
 		// update the selection list with the matching individuals
-		var select	= document.getElementById("chooseIdir");
-		select.onchange	= idirSelected;
+		var select	        = document.getElementById("chooseIdir");
+		select.onchange	    = idirSelected;
 		//select.onclick	= function() {alert("select.onclick");};
 
 		// add the matches
@@ -3295,9 +3297,9 @@ function displaySelectIdir(dialog,
 		    var text	= surname;
 		    if (maidenname != surname)
 				text	+= " (" + maidenname + ")";
-		    text	+= ", " + givenname + "(" +
-						   birthd + "-" +
-						   deathd + ")";
+		    text	    += ", " + givenname + "(" +
+					    	   birthd + "-" +
+					    	   deathd + ")";
 		    if (parents.length > 0)
 				text	+= ", child of " + parents;
 		    if (spouses.length > 0)
@@ -3320,23 +3322,23 @@ function displaySelectIdir(dialog,
 		for(var io=0; io < select.options.length; io++)
 		{
 		    var option	= select.options[io];
-		    option.addEventListener("click", function() {this.selected = true; this.parentNode.onchange();});
+		    option.addEventListener("click", function(event) {event.stopPropagation(); this.selected = true; this.parentNode.onchange();});
 		}
 		select.focus();
 		return true;
     }		// template OK
     else
 		return false;
-}		// displaySelectIdir
+}		// function displaySelectIdir
 
 /************************************************************************
- *  idirSelected														*
+ *  function idirSelected												*
  *																		*
- *  This is the onchange method of the select in the popup to choose		*
- *  the individual to associated with the current line.						*
+ *  This is the onchange method of the select in the popup to choose	*
+ *  the individual to associated with the current line.					*
  *																		*
  *  Input:																*
- *		this		= <select id='chooseIdir'>								*
+ *		this		<select id='chooseIdir'>							*
  ************************************************************************/
 function idirSelected()
 {
@@ -3366,7 +3368,7 @@ function idirSelected()
 }		// function idirSelected
 
 /************************************************************************
- *  noIdir																*
+ *  function noIdir														*
  *																		*
  *  The database server was unable to respond to the query.				*
  ************************************************************************/
@@ -3377,15 +3379,16 @@ function noIdir()
 }		// function noIdir
 
 /************************************************************************
- *  closeIdirDialog														*
+ *  function closeIdirDialog											*
  *																		*
- *  The user clicked on the button to close the IDIR dialog.				*
+ *  The user clicked on the button to close the IDIR dialog.			*
  *																		*
  *  Input:																*
- *		this		instance of <button>										*
+ *		this		instance of <button>								*
  ************************************************************************/
-function closeIdirDialog()
+function closeIdirDialog(event)
 {
+    event.stopPropagation();
     var	form	= this.form;
     var select	= form.chooseIdir;
     if (select)
@@ -3466,13 +3469,13 @@ function closeIdirDialog()
 }		// closeIdirDialog
 
 /************************************************************************
- *  gotFamily																*
+ *  function gotFamily													*
  *																		*
- *  The XML response to the database query for matching members of a		*
- *  family from the family tree database against a family in a census.		*
+ *  The XML response to the database query for matching members of a	*
+ *  family from the family tree database against a family in a census.	*
  *																		*
  *  Input:																*
- *		xmlDoc		XML document												*
+ *		xmlDoc		XML document										*
  ************************************************************************/
 function gotFamily(xmlDoc)
 {
@@ -3533,34 +3536,34 @@ function gotFamily(xmlDoc)
 }		// gotFamily
 
 /************************************************************************
- *  displayFamily														*
+ *  function displayFamily												*
  *																		*
  *  This function displays a customized dialog for choosing from		*
  *  a list of individuals who match the individual described by the		*
- *  current line of the census.												*
+ *  current line of the census.											*
  *																		*
  *  Input:																*
- *		msgDiv				an HTML element to modify and make visible.		*
+ *		msgDiv			an HTML element to modify and make visible.		*
  *						This is normally a <div> element				*
- *		templateId		identifier of an HTML element that provides the		*
+ *		templateId		identifier of an HTML element that provides the	*
  *						structure and constant strings to be laid out in*
  *						the dialog										*
- *		parms				an object containing values to substitute for		*
- *						symbols ($xxxx) in the template						*
- *		element				an HTML element used for positioning the		*
+ *		parms			an object containing values to substitute for	*
+ *						symbols ($xxxx) in the template					*
+ *		element			an HTML element used for positioning the		*
  *						dialog for the user.  This is normally the 		*
- *						<button> for the user to request the dialog.		*
- *		action				onclick action to set for 1st (or only) button		*
- *						in the dialog.  If null the default action is		*
+ *						<button> for the user to request the dialog.	*
+ *		action			onclick action to set for 1st (or only) button	*
+ *						in the dialog.  If null the default action is	*
  *						to just hide the dialog.						*
- *		matches				array of XML <indiv> tags						*
+ *		matches			array of XML <indiv> tags						*
  ************************************************************************/
 function displayFamily(dialog,
-						   templateId,
-						   parms,
-						   element,
-						   action,
-						   matches)
+						templateId,
+						parms,
+						element,
+						action,
+						matches)
 {
     if (displayDialog(dialog,
 				      templateId,
@@ -3599,10 +3602,10 @@ function displayFamily(dialog,
     }		// template OK
     else
 		return false;
-}		// displayFamily
+}		// function displayFamily
 
 /************************************************************************
- *  noFamily																*
+ *  function noFamily													*
  *																		*
  *  The database server was unable to respond to the query.				*
  ************************************************************************/
@@ -3610,22 +3613,22 @@ function noFamily()
 {
     alert("CensusForm.js: noFamily: " +
 		  "unable to find script 'getFamilyOfXml.php' on web server");
-}		// noFamily
+}		// function noFamily
 
 /************************************************************************
- *  idirFeedback														*
+ *  function idirFeedback												*
  *																		*
- *  This callback function is called by the script matchCitations.php		*
+ *  This callback function is called by the script matchCitations.php	*
  *  when it has matched one or more individuals who have cited the		*
  *  current census page, to individuals on the page itself.  Those		*
  *  lines in the census are now linked to the family tree database		*
- *  and the existence of those linkages must be recorded on this page		*
- *  both to visually clue in the viewer that the linkages exist, and to		*
+ *  and the existence of those linkages must be recorded on this page	*
+ *  both to visually clue in the viewer that the linkages exist, and to	*
  *  ensure that if the current page is written into the database it will*
  *  not over-write the linkages.										*
  *																		*
  *  Input:																*
- *		parms		array in which each entry associates a line of the		*
+ *		parms	array in which each entry associates a line of the		*
  *				census page to the IDIR of the record in the family tree*
  ************************************************************************/
 function idirFeedback(parms)
@@ -3657,4 +3660,4 @@ function idirFeedback(parms)
 		}
     }		// loop through all matched lines
     }		// if false
-}		// idirFeedback
+}		// function idirFeedback

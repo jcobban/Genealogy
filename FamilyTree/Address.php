@@ -81,8 +81,9 @@ use \Exception;
  *		2017/10/16		use class RecordSet								*
  *		2018/02/12		use Template									*
  *						merge functionality of UpdateAddress.php		*
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Address.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -109,17 +110,21 @@ $tag1Checked		= '';
 $verifiedChecked	= ''; 
 $qsTagChecked		= '';
 $duplicates		    = null; 
+$action	            	= '';
 
 // examine the value of all parameters passed with the request
 if (isset($_GET) && count($_GET) > 0)
-{		// parameters passed by method=get
-    $action	            	= '';
+{		        // parameters passed by method=get
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
-    {		// loop through all parameters
-		if ($debug)
-		    $warn	        .= "<p>\$_GET['$key']='$value'</p>\n";
-		switch($key)
-		{	// act on specific key
+    {		    // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{	    // act on specific key
 		    case 'formname':
 		    {
 				$formname	= $value;
@@ -177,22 +182,28 @@ if (isset($_GET) && count($_GET) > 0)
 				break;
 		    }	// presentation language
 
-		}	// act on specific key
-    }		// loop through all parameters
-}		// parameters passed by method=get
+		}	    // act on specific key
+    }		    // loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}		        // parameters passed by method=get
 else
 if (isset($_POST) && count($_POST) > 0)
 {		// parameters passed by method=post
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {		// loop through all parameters
-		if ($debug)
-		{
-		    if (is_array($value))
-				$warn	.= "<p>\$_POST['$key']=" . print_r($value, true) . "</p>\n";
-		    else
-				$warn	.= "<p>\$_POST['$key']='$value'</p>\n";
-		}
-		switch($key)
+		if (is_array($value))
+            $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>" . print_r($value) .
+                            "</td></tr>\n"; 
+		else
+            $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$value</td></tr>\n"; 
+		switch($strtolower(key))
 		{	// act on specific key
 		    case 'formname':
 		    {
@@ -239,9 +250,11 @@ if (isset($_POST) && count($_POST) > 0)
 				break;
 		    }	// presentation language
 
-		}	// act on specific key
-    }		// loop through all parameters
-}		// parameters passed by method=post
+		}	    // act on specific key
+    }		    // loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}		        // parameters passed by method=post
 
 // calculate default address name
 if ($kind == 0 &&			// mailing address
@@ -403,21 +416,7 @@ else
 	$action		= 'Display';
 }
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "Address$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	= new Language(array('code' => $lang));
-	$langName	= $language->get('name');
-	$nativeName	= $language->get('nativename');
-    $sorry      = $language->getSorry();
-    $warn       .= str_replace(array('$langName','$nativeName'),
-                           array($langName, $nativeName),
-                           $sorry);
-	$includeSub	= "Address{$action}en.html";
-}
-$template->includeSub($tempBase . $includeSub, 'MAIN');
+$template		= new FtTemplate("Address$action$lang.html");
 
 // handle idiosyncracies of Google geocoder implementation
 $searchName		= $name;

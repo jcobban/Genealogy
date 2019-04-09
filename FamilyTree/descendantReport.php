@@ -61,8 +61,9 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/10/24		use class Template                              *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -290,22 +291,8 @@ if (is_null($idir))
 }		// missing parameter
 
 // display page
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}dialog$lang.html");
-$includeSub		= "descendantReport$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	    = new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-    $sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = "descendantReporten.html";
-}
-$template->includeSub($tempBase . $includeSub,
-                      'MAIN');
+$template		= new FtTemplate("descendantReport$lang.html", true);
+ 
 if (strlen($surname) == 0)
 {
 	$template->updateTag('surnamesPrefix',  null);

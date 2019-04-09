@@ -66,8 +66,9 @@
  *						small sections of the names and building the	*
  *						selection with one short query after another	*
  *		2016/02/06		call pageInit on load							*
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2016 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -102,8 +103,6 @@ var	loadcnt	= 0;
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     // initialize dynamic functionality
     for (var fi = 0; fi < document.forms.length; fi++)
     {
@@ -111,10 +110,6 @@ function onLoad()
 		for(var j = 0; j < form.elements.length; j++)
 		{
 		    var element	= form.elements[j];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var	name	= element.name;
 		    if (name === undefined || name.length == 0)

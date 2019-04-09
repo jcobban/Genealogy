@@ -7,8 +7,9 @@
  *																		*
  *  History:															*
  *		2018/11/28		created											*
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2015 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 var reader      = null;         // instance of FileReader
@@ -29,7 +30,6 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
     if (window.File && window.FileReader && window.FileList && window.Blob)
     {
         reader                  = new FileReader();

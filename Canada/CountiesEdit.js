@@ -14,21 +14,22 @@
  *		2018/02/03		if county name ends in ' District' do not		*
  *						insert ' Co'									*
  *		2018/10/08      blank out row for county delete                 *
+ *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/04/07      ensure that the paging lines can be displayed   *
+ *		                within the visible portion of the browser.      *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Initialize the dynamic functionality once the page is loaded		*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
     // including support for context specific help
     var	element;
@@ -112,10 +113,21 @@ function onLoad()
 		    }
 		}	// loop through all elements in the form
     }		// loop through all forms
-}		// onLoad
+
+    var dataTable           = document.getElementById('dataTbl');
+    var dataWidth           = dataTable.offsetWidth;
+    var windowWidth             = document.body.clientWidth - 8;
+    if (dataWidth > windowWidth)
+        dataWidth               = windowWidth;
+    var topBrowse           = document.getElementById('topBrowse');
+    topBrowse.style.width   = dataWidth + "px";
+    var botBrowse               = document.getElementById('botBrowse');
+    if (botBrowse)
+        botBrowse.style.width   = dataWidth + "px";
+}		// function onLoad
 
 /************************************************************************
- *  changeCode															*
+ *  function changeCode													*
  *																		*
  *  Take action when the user changes the county code.					*
  *																		*
@@ -154,7 +166,7 @@ function changeCode()
 }		// changeCode
 
 /************************************************************************
- *  deleteCounty														*
+ *  function deleteCounty												*
  *																		*
  *  When a Delete button is clicked this function removes the			*
  *  row from the table.													*
@@ -188,7 +200,7 @@ function deleteCounty()
 }		// deleteCounty
 
 /************************************************************************
- *  showTownships														*
+ *  function showTownships												*
  *																		*
  *  When a Townships button is clicked this function displays the		*
  *  edit dialog for the list of townships in a county.					*
@@ -217,7 +229,7 @@ function showTownships()
 }		// showTownships
 
 /************************************************************************
- *  editLocation														*
+ *  function editLocation												*
  *																		*
  *  When a Location button is clicked this function displays the		*
  *  edit dialog for the Location record associated with the county.		*
@@ -256,7 +268,7 @@ function editLocation()
 }		// editLocation
 
 /************************************************************************
- *  addCounty															*
+ *  function addCounty													*
  *																		*
  *  When the Add county button is clicked this function adds a row		*
  *  into the table.														*

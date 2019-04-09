@@ -6,8 +6,9 @@
  *																		*
  *  History:															*
  *		2018/11/04      created                                         *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -32,17 +33,15 @@ tinyMCE.init({
 
 });
 
-window.onload	= onloadName;
+window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Initialize elements.												*
  ************************************************************************/
-function onloadName()
+function onLoad()
 {
-    pageInit();
-
     // activate functionality of form elements
     var trace   = '';
     for (var fi = 0; fi < document.forms.length; fi++)
@@ -52,10 +51,6 @@ function onloadName()
 		for (var i = 0; i < formElts.length; ++i)
 		{
 		    var element	= formElts[i];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var	name			= element.name;
 		    if (name.length == 0)

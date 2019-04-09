@@ -61,22 +61,7 @@ if (count($_GET) > 0)
 }	        	    // invoked by URL to display current status of account
 
 // create instance of Template
-$tempBase		    = $document_root . '/templates/';
-$template		    = new FtTemplate("${tempBase}page$lang.html");
-$includeSub		    = "testscripts/testSurname$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = 'testscripts/testSurnameen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-                      'MAIN');
+$template		    = new FtTemplate("testscripts/testSurname$lang.html");
 
 $surnameRec         = new Surname(array('surname'   => $surname));
 

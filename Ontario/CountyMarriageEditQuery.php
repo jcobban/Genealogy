@@ -82,21 +82,7 @@ foreach($_GET as $key => $value)
 if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "CountyMarriageEditQuery$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	    = new Language(array('code'	=> $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-    $sorry          = $language->getSorry();
-    $warn           .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	= 'CountyMarriageEditQueryen.html';
-}
-$template->includeSub($tempBase . $includeSub, 'MAIN');
+$template		= new FtTemplate("CountyMarriageEditQuery$lang.html");
 
 $domainObj	    = new Domain(array('domain'	    => $domain,
 								   'language'	=> $lang));

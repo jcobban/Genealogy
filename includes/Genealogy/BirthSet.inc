@@ -13,8 +13,13 @@ use \Iterator;
  *  History:															*
  *		2017/10/16		created											*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/03/14      if a birth date containing a month is specified *
+ *		                then the range value is in months instead of    *
+ *		                years                                           *
+ *		2019/04/06      change response from getStatistics, and         *
+ *		                getCountyStatistics                             *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Birth.inc';
@@ -55,6 +60,9 @@ class BirthSet extends RecordSet
     function __construct($parms	= array(),
 						 $order	= 'B_RegDomain, B_RegYear, B_RegNum')
     {
+        foreach($parms as $name=> $value)
+            if (strtolower($name) == 'order')
+                $order      = $value;
 		$parms['order']		= $order;
 		parent::__construct('Births', $parms);
     }		// BirthSet::__construct
@@ -186,8 +194,11 @@ class BirthSet extends RecordSet
 		}			// translate field names and ignore empty
 
 		// create WHERE clause
-		$surname		= null;
-		$soundex		= false;
+		$surname		            = null;
+        $soundex		            = false;
+        $range                      = 1;
+        $birthDate                  = '';
+        $marriageDate               = '';
 
 		foreach($tparms as $fieldLc => $value)
 		{
@@ -206,6 +217,13 @@ class BirthSet extends RecordSet
 						$this->offset		= intval($value);
 				    break;
 				}
+
+				case 'range':
+				{
+				    if (is_int($value) || ctype_digit($value))
+						$range		        = intval($value);
+				    break;
+                }
 
 				case 'b_birthplace':
 				case 'b_fatheroccupation':
@@ -249,60 +267,21 @@ class BirthSet extends RecordSet
 										             $this->sqlParms);
 				    if (strlen($expression) > 0)
 				    {		// expression generated
-						$where		.= $and . $expression;
-						$and		= ' AND ';
+						$where		        .= $and . $expression;
+						$and		        = ' AND ';
 				    }		// expression generated
 				    break;
 				}		// positive integer fields
 
 				case 'b_birthdate':
-				{		// birth date fields
-				    $rangeSet	= array_key_exists('range', $tparms);
-				    if ($rangeSet)
-						$range	= intval($tparms['range']);
-				    else
-						$range	= 1;
-
-				    if (strlen($value) > 0 &&
-						($rangeSet ||
-						 preg_match('/^\s*\d+\s*$/', $value)))
-				    {
-						$date		= new LegacyDate(' ' . $value);
-						$y		= $date->getYear();
-						$m		= $date->getMonth();
-						$d		= $date->getDay();
-						$where		.= $and .
-						"ABS(DATEDIFF(B_CalcBirth, '$y-$m-$d'))<(365 * ?)";
-						$this->sqlParms[]	= $range;
-				    }
-				    else
-				    {		// simple comparison
-						$where			.= "$and `$fieldLc`=?";
-						$this->sqlParms[]	= $value;
-				    }		// simple comparison
-				    $and		= ' AND ';
+                {		// birth date fields
+                    $birthDate              = $value;
 				    break;
 				}		// birth date field
 
 				case 'b_marriagedate':
 				{		// marriage date field
-				    if (strlen($value) > 0 &&
-						array_key_exists('range', $tparms) )
-				    {
-						$date		= new LegacyDate(' ' . $value);
-						$y		= $date->getYear();
-						$m		= $date->getMonth();
-						$d		= $date->getDay();
-						$where		.= $and .
-"ABS(DATEDIFF(STR_TO_DATE(B_MarriageDate,'%d %M %Y'), '$y-$m-$d'))<(365 * ?)";
-						$this->sqlParms[]	= $tparms['range'];
-				    }
-				    else
-				    {		// simple comparison
-						$where		.= "$and `$fieldLc`=?";
-						$this->sqlParms[]	= $value;
-				    }		// simple comparison
-				    $and		= ' AND ';
+                    $marriageDate           = $value;
 				    break;
 				}		// date fields
 
@@ -341,6 +320,35 @@ class BirthSet extends RecordSet
 				}		// other fields
 		    }			// act on specific fields
 		}			// loop through all parameters
+
+        // birth date interpretation involves two parameters
+	    if (strlen($birthDate) > 0)
+	    {
+			$date   		    = new LegacyDate(' ' . $birthDate);
+			$y		            = $date->getYear();
+            $m		            = $date->getActualMonth();
+            if ($m > 0)
+			    $where		    .= $and .
+			                "ABS(DATEDIFF(B_CalcBirth, '$y-$m-15'))<(30 * ?)";
+            else
+			    $where		    .= $and .
+			                "ABS(DATEDIFF(B_CalcBirth, '$y-6-15'))<(365 * ?)";
+			$this->sqlParms[]	= $range;
+            $and		        = ' AND ';
+	    }
+
+        // marriage date interpretation involves two parameters
+	    if (strlen($marriageDate) > 0)
+	    {
+			$date	         	= new LegacyDate(' ' . $marriageDate);
+			$y  		        = $date->getYear();
+			$m  	    	    = $date->getMonth();
+			$d	        	    = $date->getDay();
+			$where      		.= $and .
+"ABS(DATEDIFF(STR_TO_DATE(B_MarriageDate,'%d %M %Y'), '$y-$m-$d'))<(365 * ?)";
+			$this->sqlParms[]	= $range;
+	        $and	    	    = ' AND ';
+	    }
 
 		// special checks for surname
 		if (!is_null($surname))
@@ -427,7 +435,7 @@ class BirthSet extends RecordSet
      *		an array containing the following values for each		    *
      *		county in the domain:										*
      *				b_regcounty		county code						    *
-     *				surnamecount	number of transcribed records		*
+     *				count	        number of transcribed records		*
      *				linkcount		number linked to the tree		    *
      *				low				lowest registration number		    *
      *				high			highest registration number		    *
@@ -441,7 +449,7 @@ class BirthSet extends RecordSet
 
 		// execute the query
 		$query	= 'SELECT B_RegCounty, ' .
-								'SUM(B_Surname != "") AS SurnameCount,  ' .
+								'SUM(B_Surname != "") AS `Count`,  ' .
 								'SUM(B_Idir != 0) AS LinkCount, ' .
 								'MIN(B_RegNum) as low, ' .
 								'MAX(B_RegNum) as high  ' .
@@ -481,7 +489,7 @@ class BirthSet extends RecordSet
      *		town, city, or township in the county:					    *
      *				b_regcounty		county code						    *
      *				b_regtownship	township name					    *
-     *				surnamecount	number of transcribed records	    *
+     *				count	        number of transcribed records	    *
      *				linkcount		number linked to the tree		    *
      *				low				lowest registration number		    *
      *				high			highest registration number		    *
@@ -495,7 +503,7 @@ class BirthSet extends RecordSet
 
 		// execute the query
 		$query	= 'SELECT B_RegCounty, B_RegTownship, ' .
-								'SUM(B_Surname != "") AS SurnameCount,  ' .
+								'SUM(B_Surname != "") AS `Count`,  ' .
 								'SUM(B_Idir != 0) AS LinkCount, ' .
 								'MIN(B_RegNum) as low, ' .
 								'MAX(B_RegNum) as high  ' .

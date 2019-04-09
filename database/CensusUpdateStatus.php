@@ -62,6 +62,7 @@ use \Exception;
  *		2018/01/04		remove Template from template file names		*
  *		2018/01/11		htmlspecchars moved to Template class			*
  *		2018/01/29		use class FtTemplate							*
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -69,7 +70,6 @@ require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/CensusSet.inc';
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -180,8 +180,8 @@ if (is_null($province))
 	$provinceName	= 'National';
 else			// translate province code to name
 {
-	$domainObj	= new Domain(array('domain'	=> $cc . $province,
-							   'language'	=> 'en'));
+	$domainObj	= new Domain(array('domain'	    => $cc . $province,
+							       'language'	=> $lang));
 	if ($domainObj->isExisting())
 	    $provinceName	= $domainObj->get('name');
 	else
@@ -317,34 +317,12 @@ if (is_null($province))
 else
 	$title	= "$censusYear Census of $countryName: $provinceName Transcription Status";
 
-$tempBase	= $document_root . '/templates/';
-$template	= new FtTemplate("${tempBase}page$lang.html");
 if (is_null($province))
-{
-	$includeFile	= "CensusUpdateStatusNational$lang.html";
-	if (!file_exists($tempBase . $includeFile))
-	{
-	    $includeFile	= 'CensusUpdateStatusNationalen.html';
-	    $language		= new Language(array('code' => $lang));
-	    $warn		.= "<p>This page does not support " .
-						   $language->get('name') . '/' .
-						   $language->get('nativename') ."</p>\n";
-	}
-}
+	$scope	= "National";
 else
-{
-	$includeFile	= "CensusUpdateStatusProvincial$lang.html";
-	if (!file_exists($tempBase . $includeFile))
-	{
-	    $includeFile	= 'CensusUpdateStatusProvincialen.html';
-	    $language		= new Language(array('code' => $lang));
-	    $warn		.= "<p>This page does not support " .
-						   $language->get('name') . '/' .
-						   $language->get('nativename') ."</p>\n";
-	}
-}
-$template->includeSub($tempBase . $includeFile,
-					  'MAIN');
+	$scope	= "Provincial";
+$template	= new FtTemplate("CensusUpdateStatus$scope$lang.html");
+
 $template->set('TITLE',	 		    $title);
 $template->set('CENSUSYEAR', 		$censusYear);
 $template->set('COUNTRYNAME',		$countryName);

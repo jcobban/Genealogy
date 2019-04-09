@@ -42,159 +42,156 @@ use \Exception;
  *		2017/09/09		change class LegacyLocation to class Location	*
  *		2017/09/12		use set(										*
  *		2018/12/12		use class Template								*
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    $idlr		    = null;		// primary key
-    $location		= null;		// instance of Location
-    $lang		    = 'en';
-    $closeAtEnd		= false;
+$idlr		    = null;		// primary key
+$location		= null;		// instance of Location
+$lang		    = 'en';
+$closeAtEnd		= false;
 
-    // get the requested Location record
-    foreach($_POST as $key => $value)
-    {				// loop through all parameters
-		if ($debug)
-		    $warn	.= "<p>\$_POST['$key']='$value'</p>\n";
-		switch(strtolower($key))
-		{			// act on specific keys
-		    case 'idlr':
-		    {			// identifier present
-				$idlr	= $value;
-				if (strlen($idlr) > 0 &&
-				    ctype_digit($idlr))
-				{		// positive integer
-				    if ($idlr > 0)
-				    {		// IDLR of existing location
-						$location	= new Location(array('idlr' => $idlr));
-				    }		// IDLR of existing location
-				}		// positive integer
-				else
-				    $msg	.= 'Invalid Value of idlr=' . $idlr;
-				break;
-		    }			// identifier present
+// get the requested Location record
+foreach($_POST as $key => $value)
+{				// loop through all parameters
+	if ($debug)
+	    $warn	.= "<p>\$_POST['$key']='$value'</p>\n";
+	switch(strtolower($key))
+	{			// act on specific keys
+	    case 'idlr':
+	    {			// identifier present
+			$idlr	= $value;
+			if (strlen($idlr) > 0 &&
+			    ctype_digit($idlr))
+			{		// positive integer
+			    if ($idlr > 0)
+			    {		// IDLR of existing location
+					$location	= new Location(array('idlr' => $idlr));
+			    }		// IDLR of existing location
+			}		// positive integer
+			else
+			    $msg	.= 'Invalid Value of idlr=' . $idlr;
+			break;
+	    }			// identifier present
 
-		    case 'location':
-		    {			// location name
-				if (is_null($idlr))
-				{
-				    $msg	.= 'Got to location name handler with IDLR null, which should only happen if the input field for location is before the input field for IDLR in the input form. ';
-				}
+	    case 'location':
+	    {			// location name
+			if (is_null($idlr))
+			{
+			    $msg	.= 'Got to location name handler with IDLR null, which should only happen if the input field for location is before the input field for IDLR in the input form. ';
+			}
 
-				if (strlen($msg) == 0)
-				{		// no errors
-				    if (is_null($location))
-				    {		// create new location
-						$location	= new Location(array('location' => $value));
+			if (strlen($msg) == 0)
+			{		// no errors
+			    if (is_null($location))
+			    {		// create new location
+					$location	= new Location(array('location' => $value));
 
-						// make the current user an owner of this location
-						if (!$location->isExisting())
-						    $location->save(false);
-						$location->addOwner();
-				    }		// create new location
-				    else
-						$location->setName($value);
-				}		// no errors
-				break;
-		    }			// location name supplied
+					// make the current user an owner of this location
+					if (!$location->isExisting())
+					    $location->save(false);
+					$location->addOwner();
+			    }		// create new location
+			    else
+					$location->setName($value);
+			}		// no errors
+			break;
+	    }			// location name supplied
 
-		    case 'latitude':
-		    {
-				if ($location)
-				    $location->setLatitude($value);
-				break;
-		    }			// latitude
+	    case 'latitude':
+	    {
+			if ($location)
+			    $location->setLatitude($value);
+			break;
+	    }			// latitude
 
-		    case 'longitude':
-		    {
-				if ($location)
-				    $location->setLongitude($value);
-				break;
-		    }			// longitude
+	    case 'longitude':
+	    {
+			if ($location)
+			    $location->setLongitude($value);
+			break;
+	    }			// longitude
 
-		    case 'fsplaceid':
-		    case 'used':
-		    case 'sortedlocation':
-		    case 'tag1':
-		    case 'shortname':
-		    case 'preposition':
-		    case 'notes':
-		    case 'verified':
-		    case 'fsresolved':
-		    case 'veresolved':
-		    case 'qstag':
-		    case 'zoom':
-		    case 'boundary':
-		    {
-				if ($location)
-				    $location->set($key, $value);
-				break;
-		    }			// longitude
+	    case 'fsplaceid':
+	    case 'used':
+	    case 'sortedlocation':
+	    case 'tag1':
+	    case 'shortname':
+	    case 'preposition':
+	    case 'notes':
+	    case 'verified':
+	    case 'fsresolved':
+	    case 'veresolved':
+	    case 'qstag':
+	    case 'zoom':
+	    case 'boundary':
+	    {
+			if ($location)
+			    $location->set($key, $value);
+			break;
+	    }			// longitude
 
-		    case 'closeatend':
-		    {			// close the frame after update
-				if (strtolower($value) == 'y')
-				    $closeAtEnd		= true;
-				break;
-		    }			// close the frame after update
+	    case 'closeatend':
+	    {			// close the frame after update
+			if (strtolower($value) == 'y')
+			    $closeAtEnd		= true;
+			break;
+	    }			// close the frame after update
 
-		    case 'lang':
-		    {
-				if (strlen($value) == 2)
-				    $lang		= strtolower($value);
-				break;
-		    }
-		}			// act on specific keys
-    }				// loop through all parameters
+	    case 'lang':
+	    {
+			if (strlen($value) >= 2)
+			    $lang		= strtolower(substr($value, 0, 2));
+			break;
+	    }
+	}			// act on specific keys
+}				// loop through all parameters
 
-    // use possibly updated location name
-    // for search pattern
-    if ($location)
-    {
-		$pattern		= $location->getName();
-		if (strlen($pattern) > 5)
-		    $pattern	= substr($pattern, 0, 5);
+// use possibly updated location name
+// for search pattern
+if ($location)
+{
+	$pattern		= $location->getName();
+	if (strlen($pattern) > 5)
+	    $pattern	= substr($pattern, 0, 5);
 
-		if ($location->isOwner())
-		    $location->save(false);
-    }
-    else
-		$pattern		= '';
+	if ($location->isOwner())
+	    $location->save(false);
+}
+else
+	$pattern		= '';
 
-    if (is_null($idlr))
-    {
-		$msg			.= 'idlr Parameter Missing';
-		$idlr			= 1;
-    }
+if (is_null($idlr))
+{
+	$msg			.= 'idlr Parameter Missing';
+	$idlr			= 1;
+}
 
-    $tempBase	        = $document_root . '/templates/';
-    $template	        = new FtTemplate("${tempBase}page$lang.html");
-    $template->set('LANG',		$lang);
+if (strlen($msg) > 0 || strlen($warn) > 0)
+{
+	$template	        = new FtTemplate("updateLocationError$lang.html");
+    $template->set('LANG',		    $lang);
     $template->set('NAMESTART',		$pattern);
-    $template->set('IDLR',		$idlr);
-    if (strlen($msg) > 0 || strlen($warn) > 0)
-    {
-		$includeSub	= 'updateLocationError.html';
-		$template->includeSub($tempBase . $includeSub,
-						      'MAIN');
-		$template->display();
-    }
-    else
-    {			// update was successful
-		if ($closeAtEnd)
-		{		// close the dialog
-		    $includeSub	= 'updateLocationOK.html';
-		    $template->includeSub($tempBase . $includeSub,
-								  'MAIN');
-		    $template->display();
-		}		// close the dialog
-		else
-		{		// redirect to main page for locations
-		    header('Location: Locations.php?pattern=^' .
-									urlencode($pattern));
-		}		// redirect to main page for locations
-    }			// update was successful
+    $template->set('IDLR',		    $idlr);
+	$template->display();
+}
+else
+{			// update was successful
+	if ($closeAtEnd)
+	{		// close the dialog
+	    $template	        = new FtTemplate("updateLocationOK$lang.html");
+        $template->set('LANG',		$lang);
+        $template->set('NAMESTART',	$pattern);
+        $template->set('IDLR',		$idlr);
+        $template->display();
+	}		// close the dialog
+	else
+	{		// redirect to main page for locations
+	    header('Location: Locations.php?pattern=^' . urlencode($pattern));
+	    //header('Location: Locations.php?pattern=^' . urlencode($pattern));
+	}		// redirect to main page for locations
+}			// update was successful

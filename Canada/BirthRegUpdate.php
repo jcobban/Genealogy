@@ -65,6 +65,7 @@ use \Exception;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2017/11/19		use CitationSet in place of getCitations		*
  *		2018/10//20     use class Template                              *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
@@ -78,13 +79,6 @@ require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
-
-define ('NOT_AUTH', 	1);
-define ('BAD_DOMAIN',	2);
-define ('BAD_YEAR',	    4);
-define ('BAD_NUMBER',	8);
-define ('MISS_YEAR',	16);
-define ('MISS_NUMBER',	32);
 
 // default values
 $cc             		= 'CA';
@@ -108,9 +102,7 @@ foreach($_POST as $key => $value)
 	    case 'domain':
 	    {
 			$domain	    = $value;
-			if (preg_match("/[A-Z]{4,5}/", $value) == 0)
-                $errors         |= BAD_DOMAIN;
-            else
+            if (strlen($value) > 2)
             {
                 $cc     = substr($value, 0, 2);
                 $code   = substr($value, 2);
@@ -121,16 +113,12 @@ foreach($_POST as $key => $value)
 	    case 'regyear':
 	    {
 			$regYear	= $value;
-			if (preg_match("/1[89][0-9]{2}/", $value) == 0)
-                $errors         |= BAD_YEAR;
 			break;
 	    }		// registration year
 
 	    case 'regnum':
 	    {
 			$regNum	    = $value;
-			if (preg_match("/[0-9]{3,7}/", $value) == 0)
-                $errors         |= BAD_NUMBER;
 			break;
 	    }		// registration number
 
@@ -156,14 +144,45 @@ foreach($_POST as $key => $value)
 	}		// act on specific parameters
 }			// loop through all parameters
 
+// create page template
+$template		= new FtTemplate("BirthRegUpdate$lang.html");
+
 if (!canUser('edit'))
-    $errors                     |= NOT_AUTH;
+{
+    $elt        = $template->getElementById('notAuthorized');
+    $msg        .= $elt->innerHTML();
+}
+
 
 if (is_null($regYear))
-    $errors                     |= MISS_YEAR;
+{
+    $elt        = $template->getElementById('missYear');
+    $msg        .= $elt->innerHTML();
+}
 
 if (is_null($regNum))
-    $errors                     |= MISS_NUMBER;
+{
+    $elt        = $template->getElementById('missNumber');
+    $msg        .= $elt->innerHTML();
+}
+
+if (preg_match("/[A-Z]{4,5}/", $domain) == 0)
+{
+    $elt        = $template->getElementById('badDomain');
+    $msg        .= str_replace('$value', $domain, $elt->innerHTML());
+}
+
+if (preg_match("/1[89][0-9]{2}/", $regYear) == 0)
+{
+    $elt        = $template->getElementById('badYear');
+    $msg        .= str_replace('$value', $regYear, $elt->innerHTML());
+}
+
+if (preg_match("/[0-9]{3,7}/", $regNum) == 0)
+{
+    $elt        = $template->getElementById('badNumber');
+    $msg        .= str_replace('$value', $regNum, $elt->innerHTML());
+}
 
 // interpret domain code
 $domainObj	            = new Domain(array('domain'     => $domain,
@@ -181,7 +200,7 @@ if (is_string($county))
 $nextNum	            = intval($regNum) + 1;
 $paddedRegNum	        = str_pad($regNum, 5, '0', STR_PAD_LEFT);
 
-if ($errors == 0)
+if (strlen($msg) == 0)
 {
 	$birth		    = new Birth($domain,
 					            $regYear,
@@ -285,31 +304,27 @@ if ($errors == 0)
 	{	// the associated individual in the family tree has changed
 	    // if the birth event has not been set or is incomplete
 	    // add the birth information to the individual's birth event
-	    try {
-			$indiv		    = new Person(array('idir' => $idir));
-			$birthEvent	    = $indiv->getBirthEvent(true);
-			$oldBirthDate	= $birthEvent->get('eventd');
-			$oldBirthIdlr	= $birthEvent->get('idlrevent');
-			$birthDate	    = $birth->get('birthdate');
-			$birthDate	    = new LegacyDate(' ' . $birthDate);
-			$birthLocation	= $birth->get('birthplace');
-			if ($debug)
-			{
-			    $warn .= "<p>Update birth date of " . $indiv->getName() .
-				" to " .  $birthDate->toString() . " at " .
-				$birthLocation . "</p>";
-			}
-			
-			if (strlen($oldBirthDate) == 0 ||
-			    substr($oldBirthDate,0,1) != '0' ||
-			    substr($oldBirthDate,2,2) == 0)
-			    $birthEvent->setDate($birthDate);
-			if ($oldBirthIdlr <= 1)
-			    $birthEvent->setLocation($birthLocation);
-			$birthEvent->save(false);
-	    } catch (Exception $e) {
-			$msg	.= $e->getMessage() . ". ";
-	    }			// catch
+		$indiv		    = new Person(array('idir' => $idir));
+		$birthEvent	    = $indiv->getBirthEvent(true);
+		$oldBirthDate	= $birthEvent->get('eventd');
+		$oldBirthIdlr	= $birthEvent->get('idlrevent');
+		$birthDate	    = $birth->get('birthdate');
+		$birthDate	    = new LegacyDate(' ' . $birthDate);
+		$birthLocation	= $birth->get('birthplace');
+		if ($debug)
+		{
+		    $warn .= "<p>Update birth date of " . $indiv->getName() .
+			" to " .  $birthDate->toString() . " at " .
+			$birthLocation . "</p>";
+		}
+		
+		if (strlen($oldBirthDate) == 0 ||
+		    substr($oldBirthDate,0,1) != '0' ||
+		    substr($oldBirthDate,2,2) == 0)
+		    $birthEvent->setDate($birthDate);
+		if ($oldBirthIdlr <= 1)
+		    $birthEvent->setLocation($birthLocation);
+		$birthEvent->save(false);
 
 	    // add a citation for the birth to the registration
 	    $citParms	    = array('idime'		=> $idir, 
@@ -331,66 +346,12 @@ if ($errors == 0)
 	    $citation->save(false);	// write into the database
     }	        // the associated individual in the family tree has changed
 
-    if (strlen($warn) == 0)
+    if (strlen($warn) == 0 && !headers_sent())
 	{		        // redirect immediately to next registration
 	    header("Location: BirthRegDetail.php?RegDomain=$domain&RegYear=$regYear&RegNum=$nextNum&lang=$lang");
 	    exit;
 	}		        // redirect immediately to next registration
 }		            // no errors detected
-
-// display page
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "BirthRegUpdate$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	    = new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-    $sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = "BirthRegUpdateen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-			    	  'MAIN');
-
-if ($errors & NOT_AUTH)
-{
-    $elt        = $template->getElementById('notAuthorized');
-    $msg        .= $elt->innerHTML();
-}
-
-if ($errors & BAD_DOMAIN)
-{
-    $elt        = $template->getElementById('badDomain');
-    $msg        .= str_replace('$value', $domain, $elt->innerHTML());
-}
-
-if ($errors & BAD_YEAR)
-{
-    $elt        = $template->getElementById('badYear');
-    $msg        .= str_replace('$value', $regYear, $elt->innerHTML());
-}
-
-if ($errors & BAD_NUMBER)
-{
-    $elt        = $template->getElementById('badNumber');
-    $msg        .= str_replace('$value', $regNum, $elt->innerHTML());
-}
-
-if ($errors & MISS_YEAR)
-{
-    $elt        = $template->getElementById('missYear');
-    $msg        .= $elt->innerHTML();
-}
-
-if ($errors & MISS_NUMBER)
-{
-    $elt        = $template->getElementById('missNumber');
-    $msg        .= $elt->innerHTML();
-}
 
 if (is_null($countyName))
 {
@@ -402,18 +363,18 @@ if (is_null($township))
 }
 
 // pass parameters to template
-$template->set('REGYEAR',		$regYear);
-$template->set('REGNUM',		$regNum);
-$template->set('PADDEDREGNUM',	$paddedRegNum);
-$template->set('NEXTNUM',		$nextNum);
-$template->set('DOMAIN',		$domain);
-$template->set('CC',		    $cc);
-$template->set('LANG',	        $lang);
-$template->set('CODE',	        $code);
-$template->set('COUNTRYNAME',	$countryName);
-$template->set('DOMAINNAME',	$domainName);
-$template->set('COUNTYNAME',	$countyName);
-$template->set('REGTOWNSHIP',	$township);
+$template->set('REGYEAR',			$regYear);
+$template->set('REGNUM',			$regNum);
+$template->set('PADDEDREGNUM',		$paddedRegNum);
+$template->set('NEXTNUM',			$nextNum);
+$template->set('DOMAIN',			$domain);
+$template->set('CC',			    $cc);
+$template->set('LANG',		        $lang);
+$template->set('CODE',		        $code);
+$template->set('COUNTRYNAME',		$countryName);
+$template->set('DOMAINNAME',		$domainName);
+$template->set('COUNTYNAME',		$countyName);
+$template->set('REGTOWNSHIP',		$township);
 $template->set('CONTACTTABLE',		'Births');
 $template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
 

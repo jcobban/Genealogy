@@ -58,12 +58,12 @@ use \Exception;
  *		2018/01/25		common functionality moved to class FtTemplate	*
  *		2018/05/28		include specific CSS							*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Blog.inc';
 require_once __NAMESPACE__ . '/User.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -197,24 +197,17 @@ if (count($_POST) > 0)
 
 if (strlen($userid) > 0 && strlen($msg) == 0)
 {			        // signed on	
-	try {
-	    // get existing account details
-	    $user		    = new User(array("username" => $userid));
-	    $oldemail		= $user->get('email');	// old email
-	    $oldpasswd		= $user->get('password');// MD5 of password
-	    $oldshapasswd	= $user->get('shapassword');// SHA of password
-	    $oldoptions		= $user->get('options');// user options
+    // get existing account details
+    $user		    = new User(array("username" => $userid));
+    $oldemail		= $user->get('email');	// old email
+    $oldpasswd		= $user->get('password');// MD5 of password
+    $oldshapasswd	= $user->get('shapassword');// SHA of password
+    $oldoptions		= $user->get('options');// user options
 
-	    $blogParms		= array('keyvalue'	=> $user->get('id'),
-	            				'table'		=> 'Users');
-	    $bloglist		= new RecordSet('Blogs', $blogParms);
-	    $blogCount		= $bloglist->count();
-	} catch(Exception $e) {
-	    $msg		    = "Account: Internal system error. " . 
-			"Unable to find account record for current user. ";
-	    $user		    = null;
-	    $oldoptions		= User::OPT_USEMAIL_ON;
-	}
+    $blogParms		= array('keyvalue'	=> $user->get('id'),
+            				'table'		=> 'Users');
+    $bloglist		= new RecordSet('Blogs', $blogParms);
+    $blogCount		= $bloglist->count();
 }			        // signed on
 else
 {			        // redirect to signon
@@ -291,22 +284,7 @@ $nohelp		        = false;
 
 // create instance of Template
 $title		    	= 'Account Management';
-$tempBase		    = $document_root . '/templates/';
-$template		    = new FtTemplate("${tempBase}dialog$lang.html");
-$includeSub		    = "Account$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = 'Accounten.html';
-}
-$template->includeSub($tempBase . $includeSub,
-                      'MAIN');
+$template		    = new FtTemplate("Account$lang.html", true);
 
 // define substitution values
 $template->set('TITLE',		    $title);

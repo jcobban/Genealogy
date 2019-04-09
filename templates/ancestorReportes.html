@@ -6,8 +6,9 @@
  *																		*
  * History:																*
  *		2018/10/25      created                                         *
+ *      2019/02/08      missing link to invoking Person                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
 <link rel='stylesheet' type='text/css' href='ancestorReport.css'>
   <div id="breadcrumbs" class="hidden">
@@ -36,6 +37,11 @@
         <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
 		Apellido '$SURNAME'
     </a>:
+    </span>
+    <span  id="person">
+        <a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG">
+		$NAME
+        </a>:
     </span>
   </div>
 

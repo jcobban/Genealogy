@@ -13,27 +13,27 @@
  *		2015/07/01		update page DOM as a result of delete request	*
  *						instead of reloading page						*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/01/31      permit using pageUp and pageDown to move        *
+ *		                through pages of response                       *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Initialize the dynamic functionality once the page is loaded		*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
-    // including support for context specific help
-    var	element;
     var trace		= '';
-    for (fi = 0; fi < document.forms.length; fi++)
-    {		// loop through all forms
+    var	element;
+    for (var fi = 0; fi < document.forms.length; fi++)
+    {		    // loop through all forms
 		var form	= document.forms[fi];
 		trace		+= "<form ";
 		if (form.name.length > 0)
@@ -43,55 +43,43 @@ function onLoad()
 		trace	+= ">";
 
 		for (var i = 0; i < form.elements.length; ++i)
-		{	// loop through all elements of form
+		{	    // loop through all elements of form
 		    element		= form.elements[i];
 		    trace += "<" + element.nodeName + " ";
 		if (element.name.length > 0)
 		    trace	+= "name='" + element.name + "' ";
 		if (element.id.length > 0)
 		    trace	+= "id='" + element.id + "' ";
-		trace	+= ">";
+    		trace	+= ">";
 		    element.onkeydown	= keyDown;
-    
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    if (element.parentNode.nodeName == 'TD')
-		    {	// set mouseover on containing cell
-			element.parentNode.onmouseover	= eltMouseOver;
-			element.parentNode.onmouseout	= eltMouseOut;
-		    }	// set mouseover on containing cell
-		    else
-		    {	// set mouseover on input element itself
-			element.onmouseover		= eltMouseOver;
-			element.onmouseout		= eltMouseOut;
-		    }	// set mouseover on input element itself
     
 		    if (element.id.substring(0, 6) == 'Action')
 		    {
-			element.helpDiv	= 'Action';
-			element.onclick	= showReg;
+    			element.helpDiv	= 'Action';
+    			element.onclick	= showReg;
 		    }
 		    else
 		    if (element.id.substring(0, 6) == 'Delete')
 		    {
-			element.helpDiv	= 'Delete';
-			element.onclick	= deleteReg;
+    			element.helpDiv	= 'Delete';
+    			element.onclick	= deleteReg;
 		    }
-		}	// loop through all elements in the form
-    }		// loop through all forms
-}		// onLoad
+		}	    // loop through all elements in the form
+    }		    // loop through all forms
+}		// function onLoad
 
 /************************************************************************
- *  showReg																*
+ *  function showReg													*
  *																		*
- *  When a Action button is clicked this function displays the				*
+ *  When a Action button is clicked this function displays the			*
  *  page to edit or display details of the registration.				*
  *																		*
  *  Input:																*
- *		this		<button type=button id='Action...'>						*
+ *		this	<button type=button id='Action...'>						*
  ************************************************************************/
-function showReg()
+function showReg(event)
 {
+    event.stopPropagation();
     var	form	= this.form;
     var	domain	= form.RegDomain.value;
     var	recid	= this.id.substring(6);
@@ -105,16 +93,17 @@ function showReg()
 }		// showReg
 
 /************************************************************************
- *  deleteReg																*
+ *  function deleteReg													*
  *																		*
  *  When a Delete button is clicked this function invokes a server		*
- *  to delete the registration.												*
+ *  to delete the registration.											*
  *																		*
  *  Input:																*
- *		this		<button type=button id='Delete...'>						*
+ *		this	<button type=button id='Delete...'>						*
  ************************************************************************/
-function deleteReg()
+function deleteReg(event)
 {
+    event.stopPropagation();
     var	form	= this.form;
     var	recid	= this.id.substring(6);
     var	domain	= form.RegDomain.value;
@@ -122,12 +111,12 @@ function deleteReg()
     var regnum	= recid.substring(4);
 
     var parms		= {"regdomain"	: domain,
-				   "regyear"	: regyear,
-				   "regnum"	: regnum,
-				   "formname"	: form.name, 
-				   "template"	: "",
-				   "msg"	:
-				"Are you sure you want to delete this registration?"};
+    				   "regyear"	: regyear,
+	    			   "regnum"	: regnum,
+		    		   "formname"	: form.name, 
+			    	   "template"	: "",
+				       "msg"	:
+	        			"Are you sure you want to delete this registration?"};
 
     if (debug != 'n')
 		parms["debug"]	= debug;
@@ -137,11 +126,11 @@ function deleteReg()
     if (dialogDiv)
     {		// have popup <div> to display message in
 		displayDialog(dialogDiv,
-			      'RegDel$template',
-			      parms,
-			      this,		// position relative to
-			      confirmDelete,	// 1st button confirms Delete
-			      false);		// default show on open
+    			      'RegDel$template',
+    			      parms,
+    			      this,		// position relative to
+    			      confirmDelete,	// 1st button confirms Delete
+    			      false);		// default show on open
     }		// have popup <div> to display message in
     else
 		alert("MarriageRegResponse.js: deleteReg: " +
@@ -149,7 +138,7 @@ function deleteReg()
 }		// deleteReg
 
 /************************************************************************
- *  confirmDelete														*
+ *  function confirmDelete												*
  *																		*
  *  This method is called when the user confirms the request to delete		*
  *  a registration.														*
@@ -186,7 +175,7 @@ function confirmDelete()
 }		// deleteReg
 
 /************************************************************************
- *  gotDeleteReg														*
+ *  function gotDeleteReg												*
  *																		*
  *  The XML document representing the results of the request to 		*
  *  delete the marriage registration has been received.						*
@@ -240,12 +229,12 @@ function gotDeleteReg(xmlDoc)
 }		// gotDeleteReg
 
 /************************************************************************
- *  noDeleteReg																*
+ *  function noDeleteReg												*
  *																		*
- *  This method is called if there is no delete registration script.		*
+ *  This method is called if there is no delete registration script.	*
  ************************************************************************/
 function noDeleteReg()
 {
     alert("MarriageRegResponse.js: noDeleteReg: " +
 		  "script 'deleteMarriageRegXml.php' not found on server");
-}
+}       // function noDeleteReg

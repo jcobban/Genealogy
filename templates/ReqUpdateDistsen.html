@@ -1,19 +1,20 @@
 <!--*********************************************************************
- *  ReqUpdateDistsen.html						*
- *									*
- *  Census of Canada							*
- *									*
- *  History:								*
- *	2017/10/23	created						*
- *	2018/01/04	remove Template from template file names	*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  ReqUpdateDistsen.html												*
+ *																		*
+ *  Page to request updating the districts for a particular             *
+ *  state or province within a census.                                  *
+ *																		*
+ *  History:															*
+ *		2017/10/23		created											*
+ *		2018/01/04		remove Template from template file names		*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
   <div class='hidden' id='breadcrumbs'>
     <a href='/genealogy.php?lang=$LANG'>Genealogy</a>:
-    <a href='/genCountry.php?cc=CA&amp;lang=$LANG'>Canada</a>:
-    <a href='/database/genCensuses.php?lang=$LANG'>Censuses</a>:
-    <a href='/database/EditCensuses.php?lang=$LANG'>Censuses Admin</a>:
+    <a href='/genCountry.php?cc=$CC&amp;lang=$LANG'>$COUNTRYNAME</a>:
+    <a href='/database/genCensuses.php?cc=$CC&amp;lang=$LANG'>Censuses</a>:
+    <a href='/database/EditCensuses.php?cc=$CC&amp;lang=$LANG'>Censuses Admin</a>:
   </div>
 <div class='body'>
   <h1>
@@ -33,7 +34,7 @@
           <label class='labelSmall' style='width: 6em;' for='Census'>
 	    Census:
 	  </label>
-	  <select size='8' name='Census' id='Census' class='white left'>
+	  <select size='20' name='Census' id='Census' class='white left'>
 	    <option value=''>Choose a Census:</option>
 	    <option id='censusOpt' value='$id' $selected>
 		$name:
@@ -44,7 +45,7 @@
           <label class='labelSmall' style='width: 6em;' for='Province'>
 	    Province:
 	  </label>
-  	  <select size='8' name='Province' id='Province' class='white left'>
+  	  <select size='20' name='Province' id='Province' class='white left'>
 	    <option id='allProvincesOpt' value='' $selected>
 		All Provinces
 	    </option>

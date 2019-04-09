@@ -60,8 +60,9 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2017/08/16		script legacyIndivid.php renamed to Person.php	*
  *		2018/11/05      use class Template                              *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -163,26 +164,7 @@ foreach ($_GET as $key => $value)
 }		        	// foreach parameter
 
 // create template
-$tempBase	    = $document_root . '/templates/';
-$template	    = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	    = "CensusDetails$censusYear$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub	= "CensusDetails{$censusYear}en.html";
-}
-if (!file_exists($tempBase . $includeSub))
-{			// template for new implementation not supported yet
-	header("Location: /database/Census{$censusYear}Details.php?Province=$province&District=$distId&SubDistrict=$subDistId&Division=$division&Page=$page&Line=$line");
-}			// template for new implementation not supported yet
-$template->includeSub($tempBase . $includeSub,
-    'MAIN');
+$template	    = new FtTemplate("CensusDetails$censusYear$lang.html");
 
 // parameters for getting instance of CensusLine
 $getParms                       = array();

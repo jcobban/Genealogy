@@ -9,7 +9,7 @@
  *		2011/10/28		support mouseover help							*
  *						replace link to status with button				*
  *		2012/05/06		replace calls to getEltId with calls to			*
- *						getElementById									*
+ *						function getElementById							*
  *		2012/05/09		invoke scripts to obtain database information	*
  *						rather than loading static files				*
  *						show loading indicator							*
@@ -19,8 +19,9 @@
  *		2016/05/20		counties list script moved to folder Canada		*
  *		2017/12/30		TownshipsListXml.php moved to folder Canada		*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban.								*
+ *  Copyright &copy; 2019 James A. Cobban.								*
  ************************************************************************/
 
 window.onload	= loadCounties;
@@ -35,10 +36,7 @@ window.onload	= loadCounties;
  ************************************************************************/
 function loadCounties()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
-    // including support for context specific help
     for(var i = 0; i < document.forms.length; i++)
     {		// loop through all forms
 		var form	= document.forms[i];
@@ -58,11 +56,6 @@ function loadCounties()
 
 		    element.onkeydown	= keyDown;
 
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    element.onmouseover		= eltMouseOver;
-		    element.onmouseout		= eltMouseOut;
-		
 		    var	name	= element.name;
 		    if (name.length == 0)
 			name	= element.id;
@@ -205,7 +198,7 @@ function gotCountiesFile(xmlDoc)
 }		// gotCountiesFile
 
 /************************************************************************
- *  noCountiesFile														*
+ *  function noCountiesFile												*
  *																		*
  *  This method is called if there is no census summary file.				*
  *  The selection list of counties is cleared and an error message		*
@@ -244,7 +237,7 @@ function noCountiesFile()
 }		// noCountiesFile
 
 /************************************************************************
- *  changeDomain														*
+ *  function changeDomain												*
  *																		*
  *  This method is called when the user selects a new domain from		*
  *  the selection list of registration domain identifiers.				*
@@ -266,7 +259,7 @@ function changeDomain()
 }		// changeDomain
 
 /************************************************************************
- *  changeCounty														*
+ *  function changeCounty												*
  *																		*
  *  This method is called when the user selects a new county from		*
  *  the Counties selection list.										*
@@ -304,9 +297,9 @@ function changeCounty()
 }		// changeCounty
 
 /************************************************************************
- *  showStats																*
+ *  function showStats													*
  *																		*
- *  This function is called when the user clicks on the Stats button.		*
+ *  This function is called when the user clicks on the Stats button.	*
  *  It displays the top level statistics page for Marriage				*
  *  registrations.														*
  *																		*

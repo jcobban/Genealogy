@@ -47,6 +47,7 @@ use \Exception;
  *		2018/01/18		tolerate lang parameter							*
  *		2018/11/16      use class Template                              *
  *		                use prepared statements                         *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -221,22 +222,7 @@ if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
 // create template
-$tempBase	        = $document_root . '/templates/';
-$template	        = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	        = "QuerySurnames$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub	    = "QuerySurnamesen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
+$template	        = new FtTemplate("QuerySurnames$lang.html");
 
 // validate parameters and build WHERE clause
 // constructing the WHERE clause by starting with $and set to 'WHERE '

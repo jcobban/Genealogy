@@ -21,6 +21,7 @@ use \Exception;
  *		2018/01/04		remove Template from template file names		*
  *		2018/02/02		page through results if more than limit			*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -237,29 +238,12 @@ if (canUser('edit'))
 else
 	$action		= 'Display';
 $tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= 'DomainsEdit' . $action .  $cc . $lang . '.html';
-if (!file_exists($tempBase . $includeSub))
-{			// try English
-	$includeSub	= 'DomainsEdit' . $action . $cc .'en.html';
-	if ($lang != 'en')
-	{
-	    $language	= new Language(array('code'	=> $lang));
-    	$langName	= $language->get('name');
-    	$nativeName	= $language->get('nativename');
-    	$sorry  	= $language->getSorry();
-        $warn   	.= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	}
-
-	if (!file_exists($tempBase . $includeSub))
-	{		// no country specific template
-	    $includeSub	= 'DomainsEdit' . $action . 'CAen.html';
-	}		// no country specific template
-}			// Try English
-$gotPage	= $template->includeSub($tempBase . $includeSub,
-						    		'MAIN');
+$includeSub     = "DomainsEdit$action$cc$lang.html";
+if (!file_exists($tempBase . "DomainsEdit$action{$cc}en.html"))
+{                   // country code not supported
+    $includeSub = "DomainsEdit{$action}CA$lang.html";      
+}                   // country code not supported
+$template		= new FtTemplate($includeSub);
 
 $template->set('CONTACTTABLE',	    'Domains');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
@@ -272,25 +256,25 @@ $template->updateTag('languageOpt',
 					 $languageSet);
 
 if (($offset - $limit) >= 0)
-	$template->updateTag('npPrevFront',
+	$template->updateTag('topPrev',
 					     array('cc'		=> $cc,
 		    				   'lang'	=> $lang,
 		    				   'offset'	=> $offset - $limit,
 		    				   'limit'	=> $limit));
 else
-	$template->updateTag('npPrevFront', null);
+	$template->updateTag('topPrev', null);
 		
 if (($offset + $limit) < $totcount)
-	$template->updateTag('npNextFront',
+	$template->updateTag('topNext',
 					     array('cc'		=> $cc,
 		    				   'lang'	=> $lang,
 		    				   'offset'	=> $offset + $limit,
 			    			   'limit'	=> $limit));
 else
-	$template->updateTag('npNextFront', null);
+	$template->updateTag('topNext', null);
 
 $template->updateTag('respdescrows',
-					 array('first'		=> $offset,
+					 array('first'		=> $offset + 1,
 					       'last'		=> min($totcount, $offset+$limit),
 					       'totalrows'	=> $totcount));
 

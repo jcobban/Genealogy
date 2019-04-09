@@ -274,6 +274,7 @@ use \Exception;
  *						create person popups for marriage notes			*
  *		2018/09/15		urlencode subject in contact author				*
  *		2018/12/03      Citation::toHTML changed to return text         *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -1497,30 +1498,16 @@ foreach($_GET as $key => $value)
 }				// loop through all parameters
 
 // start the template
+$template		= new FtTemplate("Person$lang.html");
+
 $tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "Person$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	= new Language(array('code' => $lang));
-	$langName	= $language->get('name');
-    $nativeName	= $language->get('nativename');
-    $sorry      = $language->getSorry();
-    $warn       .= str_replace(array('$langName','$nativeName'),
-                               array($langName, $nativeName),
-                               $sorry);
-	$nativeName	= $language->get('nativename');
-	$includeSub	= "Personen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-				  'MAIN');
 if (file_exists($tempBase . "Trantab$lang.html"))
     $trtemplate = new Template("${tempBase}Trantab$lang.html");
 else
     $trtemplate = new Template("${tempBase}Trantaben.html");
 
 // internationalization support
-$monthsTag	= $trtemplate->getElementById('Months');
+$monthsTag	    = $trtemplate->getElementById('Months');
 if ($monthsTag)
 {
 	$months		= array();

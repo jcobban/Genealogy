@@ -24,37 +24,34 @@ use \Exception;
  *		2016/01/19		add id to debug trace							*
  *						include http.js before util.js					*
  *		2018/02/17		use Template									*
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
-    require_once __NAMESPACE__ . "/Template.inc";
-    require_once __NAMESPACE__ . "/Language.inc";
-    require_once __NAMESPACE__ . "/common.inc";
+require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/common.inc";
 
 $lang		= 'en';
 
-foreach($_GET as $key => $value)
-{
-    $fieldLc	= strtolower($key);
-    if ($key == 'lang' && strlen($value) == 2)
-		$lang	= strtolower($value);
-}
+if (count($_GET) > 0)
+{		            // invoked by submit to update account
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    $fieldLc	= strtolower($key);
+	    if ($key == 'lang' && strlen($value) >= 2)
+	    	$lang	= strtolower(substr($value, 0, 2));
+	}
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}		            // invoked by submit to update account
 
-    $tempBase		= $document_root . '/templates/';
-    $template		= new FtTemplate("${tempBase}page$lang.html");
-    $includeSub		= "calcBirthDate$lang.html";
-    if (!file_exists($tempBase . $includeSub))
-    {
-	$language	= new Language(array('code' => $lang));
-	$langName	= $language->get('name');
-	$nativeName	= $language->get('nativename');
-    $sorry      = $language->getSorry();
-    $warn       .= str_replace(array('$langName','$nativeName'),
-                               array($langName, $nativeName),
-                               $sorry);
-		$includeSub	= 'calcBirthDateen.html';
-    }
-    $template->includeSub($tempBase . $includeSub,
-						  'MAIN');
-    $template->set('LANG',		$lang);
-    $template->display();
+$template		= new FtTemplate("calcBirthDate$lang.html");
+
+$template->set('LANG',		$lang);
+$template->display();

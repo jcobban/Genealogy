@@ -3,32 +3,32 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  deleteUserXml.php							*
- *									*
- *  Handle a request to delete an registered user from the		*
- *  database.  This file generates an					*
- *  XML file, so it can be invoked from Javascript.			*
- *									*
- *  Parameters:								*
- *	userid	unique name of a registered user			*
- *									*
- *  History:								*
- *	2011/02/14	Created						*
- *	2012/01/13	change class names				*
- *	2013/12/07	$msg and $debug initialized by common.inc	*
- *	2014/12/25	rename to deleteUserXml.php			*
- *	2015/07/02	access PHP includes using include_path		*
- *	2015/09/28	migrate from MDB2 to PDO			*
- *	2015/12/30	error in use of PDO execute			*
- *	2017/09/13	use class User					*
- *									*
- *  Copyright &copy; 2017 James A. Cobban				*
+ *  deleteUserXml.php													*
+ *																		*
+ *  Handle a request to delete an registered user from the				*
+ *  database.  This file generates an									*
+ *  XML file, so it can be invoked from Javascript.						*
+ *																		*
+ *  Parameters:															*
+ *		userid		unique name of a registered user					*
+ *																		*
+ *  History:															*
+ *		2011/02/14		Created											*
+ *		2012/01/13		change class names								*
+ *		2013/12/07		$msg and $debug initialized by common.inc		*
+ *		2014/12/25		rename to deleteUserXml.php						*
+ *		2015/07/02		access PHP includes using include_path			*
+ *		2015/09/28		migrate from MDB2 to PDO						*
+ *		2015/12/30		error in use of PDO execute						*
+ *		2017/09/13		use class User									*
+ *																		*
+ *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
+    header("Content-Type: text/xml");
     require_once __NAMESPACE__ . "/User.inc";
     require_once __NAMESPACE__ . '/common.inc';
 
     // emit the XML header
-    header("Content-Type: text/xml");
     print("<?xml version='1.0' encoding='UTF-8'?>\n");
     print "<deleted>\n";
 

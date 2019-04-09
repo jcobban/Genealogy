@@ -169,21 +169,8 @@ if ($regYear == '')
 	$msg		.= "RegYear omitted. ";
 }
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= $tempBase . "BirthRegYearStats$lang.html";
-if (!file_exists($includeSub))
-{
-    $language		= new Language(array('code' => $lang));
-    $langName		= $language->get('name');
-    $nativeName		= $language->get('nativename');
-    $sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub		= $tempBase . "BirthRegYearStatsen.html";
-}
-$template->includeSub($includeSub, 'MAIN');
+$template		= new FtTemplate("BirthRegYearStats$lang.html");
+
 $template->set('CC',        		$cc);
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('DOMAINNAME',		$domainName);
@@ -197,6 +184,7 @@ if ($county)
 else
 {
     $template->set('COUNTY',            '');
+    $template->set('COUNTYNAME',		'All');
     $template->updateTag('countyName',  null);
 }
 $template->set('LANG',		    	$lang);
@@ -259,7 +247,7 @@ foreach($result as $row)
          $township	    = $row['b_regtownship'];
     else
          $township      = '&nbsp;';
-	$count		        = $row['surnamecount'];
+	$count		        = $row['count'];
 	$total		        += $count;
 	$linked		        = $row['linkcount'];
 	if ($count == 0)

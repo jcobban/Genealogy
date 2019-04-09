@@ -12,8 +12,12 @@
  *		2014/10/11		ask user to confirm delete of registration		*
  *		2014/12/18		support all provinces							*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/02/20      shrink browse rows to match width of table      *
+ *		2019/04/07      ensure that the paging lines can be displayed   *
+ *		                within the visible portion of the browser.      *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban.								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -25,10 +29,7 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
-    // including support for context specific help
     var	element;
     var trace	= '';
     for (var fi = 0; fi < document.forms.length; fi++)
@@ -78,6 +79,16 @@ function onLoad()
 		    }
 		}	        // loop through all elements in the form
     }		        // loop through all forms
+
+    var dataTable           = document.getElementById('dataTable');
+    var dataWidth           = dataTable.offsetWidth;
+    var windowWidth             = document.body.clientWidth - 8;
+    if (dataWidth > windowWidth)
+        dataWidth               = windowWidth;
+    var topBrowse           = document.getElementById('topBrowse');
+    topBrowse.style.width   = dataWidth + "px";
+    var botBrowse           = document.getElementById('botBrowse');
+    botBrowse.style.width   = dataWidth + "px";
 }	        	// function onLoad
 
 /************************************************************************
@@ -109,21 +120,20 @@ function showReg()
  *  Input:																*
  *		this	<button type=button id='Delete...'>						*
  ************************************************************************/
-function deleteReg()
+function deleteReg(ev)
 {
-    var	form	= this.form;
-    var	rownum	= this.id.substring(6);
-    var	domain	= form.RegDomain.value;
-    var regyear	= rownum.substring(0,4);
-    var regnum	= rownum.substring(4);
+    ev.stopPropagation();
+    var	form			= this.form;
+    var	rownum			= this.id.substring(6);
+    var	domain			= form.RegDomain.value;
+    var regyear			= rownum.substring(0,4);
+    var regnum			= rownum.substring(4);
 
-    var parms		= {"regdomain"	: domain,
+    var parms		    = {"regdomain"	: domain,
 						   "regyear"	: regyear,
 						   "regnum"	: regnum,
 						   "formname"	: form.name, 
-						   "template"	: "",
-						   "msg"	:
-						"Are you sure you want to delete this registration?"};
+						   "template"	: ""};
 
     if (debug != 'n')
 		parms["debug"]	= debug;
@@ -135,9 +145,9 @@ function deleteReg()
 		displayDialog(dialogDiv,
 				      'RegDel$template',
 				      parms,
-				      this,		// position relative to
+				      this,		        // position relative to
 				      confirmDelete,	// 1st button confirms Delete
-				      false);		// default show on open
+				      false);		    // default show on open
     }		// have popup <div> to display message in
     else
 		alert("BirthRegResponse.js: deleteReg: " +
@@ -164,11 +174,13 @@ function confirmDelete()
 
     // hide the dialog
     dialogDiv.style.display	= 'none';
-    var script	= 'deleteBirthRegXml.php';
-    var	parms	= { 'RegDomain'	: regdomain,
-				    'RegYear'	: regyear,
-				    'RegNum'	: regnum,
-				    'rownum'	: regyear + "" + regnum};
+
+
+    var script	    = 'deleteBirthRegXml.php';
+    var	parms	    = { 'RegDomain'	: regdomain,
+				        'RegYear'	: regyear,
+				        'RegNum'	: regnum,
+				        'rownum'	: regyear + "" + regnum};
     if (debug != 'n')
 		parms["debug"]	= debug;
 

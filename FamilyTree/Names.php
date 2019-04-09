@@ -55,8 +55,10 @@ use \Exception;
  *		                support scrolling through set of names if       *
  *		                they exceed the limit                           *
  *		2018/12/26      ignore field IDNR in Name record                *
+ *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/03/12      Surname record not created if not required      * 
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -64,7 +66,6 @@ require_once __NAMESPACE__ . '/Surname.inc';
 require_once __NAMESPACE__ . '/RecOwner.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/PersonSet.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -98,9 +99,7 @@ foreach($_GET as $key => $value)
 	{
 	    case 'surname':
         {		// surname specified
-			$surnameRec	    = new Surname(array('surname' => $value));
-            $surname	    = ucfirst($surnameRec['surname']);
-			$soundex	    = $surnameRec->get('soundslike');
+            $surname	    = ucfirst($value);
 
 			// identify prefix of the name, usually the first letter
 			if (strlen($surname) == 0)
@@ -209,22 +208,7 @@ if (strlen($given) > 0)
 else
     $nameUri        = $surname;
 
-$tempBase	        = $document_root . '/templates/';
-$template	        = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	        = "Names" . $action . $lang . '.html';
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	    = new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-    $sorry          = $language->getSorry();
-    $warn           .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = "Names" . $action . "en.html";
-}
-$template->includeSub($tempBase . $includeSub,
-                      'MAIN');
+$template	        = new FtTemplate("Names$action$lang.html");
 
 // I18N
 $tranTabTag	            = $template->getElementById('tranTab');
@@ -251,19 +235,21 @@ if (is_null($surname))
 {		// missing mandatory parameter
     $msg		    .= 'Missing mandatory parameter Surname';
     $surname        = '';
-    $surnameRec	    = new Surname(array('surname' => ''));
+    $surnameRec	    = new Surname(array('idnr' => 1));
     $title	        = $template->getElementById('missing')->innerHTML();
 }		// missing mandatory parameter
 else
 if (strlen($surname) == 0)
 {
     $title	        = $template->getElementById('nosurname')->innerHTML();
+    $surnameRec	    = new Surname(array('idnr' => 1));
 }
 else
 {
     $title	        = $template->getElementById('surname')->innerHTML();
+    $surnameRec	    = new Surname(array('surname' => $surname));
 }
-$idnr               = $surnameRec->getIdnr();
+$idnr               = $surnameRec->get('idnr');
 $soundslike         = $surnameRec->get('soundslike');
 $pattern            = $surnameRec->get('pattern');
 $notes              = $surnameRec->get('notes');
@@ -329,9 +315,8 @@ else
     $count                  = 0;
     $actualCount            = 0;
 }
-if ($actualCount < $count)
-    $template->set('ACTUALCOUNT',		    $actualCount);
-else
+$template->set('ACTUALCOUNT',		    $actualCount);
+if ($actualCount >= $count)
     $template->updateTag('showActualCount', null);
 $template->set('PREV',			    max($offset-$limit,0));
 $template->set('NEXT',			    min($offset+$limit, $count-1));
@@ -347,96 +332,106 @@ if ($count == 0)
 else
     $template->set('COUNT',     $count);
 
-$surnamerec	        = new Surname(array('surname' => $surname));
-$idnr		        = $surnamerec->getIdnr();
-$nxparms	        = array('idnr' => $idnr);
+$idnr		        = $surnameRec->get('idnr');
+$nxparms	        = array('surname' => $surname);
 $nxlist		        = new RecordSet('Names', $nxparms);
 $information	    = $nxlist->getInformation();
+$query	            = $information['query'];
+$template->set('QUERY',   $query);
 $nxcount	        = $information['count'];
 if ($nxcount == 0)
-{
-    if (canUser('edit') && $surnamerec->get('pattern') == '')
-        $surnamerec->delete(false);
+{                       // no matching names
+    if (canUser('edit') && 
+        $surnameRec->get('pattern') == '' && 
+        $surnameRec->isExisting())
+    {
+        $surnameRec->delete(false);
+    }
     else
         $template->updateTag('deletedUnused',   null);
     $template->set('NXCOUNT',   'No');
-}
+}                       // no matching names
 else
-{
+{                       // some matching names
     $template->updateTag('deletedUnused',   null);
     $template->set('NXCOUNT',   $nxcount);
-}
+}                       // some matching names
 
 if (!canUser('edit'))
     $template->updateTag('surnameForm',    null);
 
-    // display the results
-    $maxcols	    		= 4;
-    $curcol	        		= 0;
-    $data           		= '';
-    $rowElt         		= $template->getElementById('row');
-    $rowEltHtml     		= $rowElt->outerHTML();
-    $entryElt       		= $template->getElementById('entry');
-    $entryEltHtml   		= $entryElt->outerHTML();
-    
-    foreach($personList as $idir => $person)
+// display the results
+$maxcols	    		= 4;
+$curcol	        		= 0;
+$data           		= '';
+$rowElt         		= $template->getElementById('row');
+$rowEltHtml     		= $rowElt->outerHTML();
+$entryElt       		= $template->getElementById('entry');
+$entryEltHtml   		= $entryElt->outerHTML();
+
+foreach($personList as $idir => $person)
+{
+    if ($curcol == 0)
     {
-        if ($curcol == 0)
-        {
-            $rowTemplate    = new Template($rowEltHtml);
-            $rowdata        = '';
-        }
+        $rowTemplate    = new Template($rowEltHtml);
+        $rowdata        = '';
+    }
 		$curcol++;
 
-        // link to detailed query action
-        $entryTemplate      = new Template($entryEltHtml);
+    // link to detailed query action
+    $entryTemplate      = new Template($entryEltHtml);
 		$name		        = $person->getName(Person::NAME_INCLUDE_DATES);
 		$gender		        = $person->getGender();
-        $gender             = $genderText[$gender];
-        $entryTemplate->set('NAME',     $name);
-        $entryTemplate->set('IDIR',     $idir);
-        $entryTemplate->set('GENDER',   $gender);
-        $entryTemplate->set('LANG',     $lang);
-        $rowdata            .= $entryTemplate->compile();
-		if ($curcol == $maxcols)
-        {		    // end row and setup to start new row
-            $rowTemplate->updateTag('entry',    $rowdata);
-            $data           .= $rowTemplate->compile();
-		    $curcol	= 0;
-		}		    // end row and setup to start new row
-    }	            // loop through results
-
-    if ($curcol != 0)
-    {		        // there is an incomplete row started
+    $gender             = $genderText[$gender];
+    $entryTemplate->set('NAME',     $name);
+    $entryTemplate->set('IDIR',     $idir);
+    $entryTemplate->set('GENDER',   $gender);
+    $entryTemplate->set('LANG',     $lang);
+    $rowdata            .= $entryTemplate->compile();
+	if ($curcol == $maxcols)
+    {		    // end row and setup to start new row
         $rowTemplate->updateTag('entry',    $rowdata);
         $data           .= $rowTemplate->compile();
-    }		        // there is an incomplete row started
-    $template->updateTag('row',  $data);
+		    $curcol	= 0;
+	}		    // end row and setup to start new row
+}	            // loop through results
+
+if ($curcol != 0)
+{		        // there is an incomplete row started
+    $rowTemplate->updateTag('entry',    $rowdata);
+    $data           .= $rowTemplate->compile();
+}		        // there is an incomplete row started
+$template->updateTag('row',  $data);
 
 // show any blog postings
-$idnr				= $surnameRec->getIdnr();
-$blogParms			= array('keyvalue'	        => $idnr,
-					        'table'				=> 'tblNR');
-$bloglist			= new RecordSet('Blogs', $blogParms);
+if ($surnameRec->isExisting())
+{
+    $idnr				= $surnameRec->get('idnr');
+    $blogParms			= array('keyvalue'	        => $idnr,
+	    				        'table'				=> 'tblNR');
+    $bloglist			= new RecordSet('Blogs', $blogParms);
 
-// display existing blog entries
-$blogElt    		= $template->getElementById('blogEntry');
-$data       		= '';
-foreach($bloglist as $blid => $blog)
-{		// loop through all blog entries
-    $blogTemplate   = new Template($blogElt->innerHTML());
-    $blogTemplate->set('BLID',      $blid);
-    $datetime	    = $blog->getTime();
-    $blogTemplate->set('DATETIME',  $datetime);
-    $username	    = $blog->getUser();
-    $blogTemplate->set('USERNAME',  $username);
-    $text	        = $blog->getText();
-    $text	        = str_replace("\n", "</p>\n<p>", $text);
-    $blogTemplate->set('TEXT',  $text);
-    if ($username != $userid)
-        $blogTemplate->updateTag('blogActions', null);
-    $data           .= $blogTemplate->compile();
-}		// loop through all blog entries
-$template->updateTag('blogEntry',   $data);
+	// display existing blog entries
+	$blogElt    		= $template->getElementById('blogEntry');
+	$data       		= '';
+	foreach($bloglist as $blid => $blog)
+	{		// loop through all blog entries
+	    $blogTemplate   = new Template($blogElt->innerHTML());
+	    $blogTemplate->set('BLID',      $blid);
+	    $datetime	    = $blog->getTime();
+	    $blogTemplate->set('DATETIME',  $datetime);
+	    $username	    = $blog->getUser();
+	    $blogTemplate->set('USERNAME',  $username);
+	    $text	        = $blog->getText();
+	    $text	        = str_replace("\n", "</p>\n<p>", $text);
+	    $blogTemplate->set('TEXT',  $text);
+	    if ($username != $userid)
+	        $blogTemplate->updateTag('blogActions', null);
+	    $data           .= $blogTemplate->compile();
+	}		// loop through all blog entries
+	$template->updateTag('blogEntry',   $data);
+}
+else
+	$template->updateTag('blogEntry',   null);
 
 $template->display();

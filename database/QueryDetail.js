@@ -15,7 +15,7 @@
  *		2011/10/07		clear the sub-district selection list if the	*
  *						user specifies to search all districts			*
  *						make coding more consistent and add error		*
- *						handling										*
+ *						function handling								*
  *		2011/12/28		popup a loading indicator while waiting for a	*
  *						server response									*
  *						pop up help balloon if mouse held over field	*
@@ -38,14 +38,15 @@
  *		2014/10/14		indices of args array are now lower case		*
  *		2017/09/19		support lang=fr									*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoadDetail;
 
 /************************************************************************
- *  onLoadDetail														*
+ *  function onLoadDetail												*
  *																		*
  *  The onload method of a QueryDetailYyyy.html web page.  				*
  *  This is invoked after the web page has been loaded into the browser.*
@@ -57,8 +58,6 @@ window.onload	= onLoadDetail;
  ************************************************************************/
 function onLoadDetail()
 {
-    pageInit();
-
     document.body.onkeydown		= qdKeyDown;
 
     var	form	= document.distForm;
@@ -78,11 +77,6 @@ function onLoadDetail()
 		{	// loop through all form elements
 		    var	element		= elements[i];
 		    element.onkeydown	= keyDown;
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    element.onmouseover	= eltMouseOver;
-		    element.onmouseout	= eltMouseOut;
 
 		    var	name	= element.name;
 		    if (name.length == 0)
@@ -107,7 +101,7 @@ function onLoadDetail()
 				{
 				    element.onchange	= changePage;
 				    break;
-				}	// user selected different province
+				}	// user selected different page
 
 				case 'Surname':
 				{
@@ -125,23 +119,23 @@ function onLoadDetail()
 				    var	distUrl	= "CensusGetDistricts.php?";
 				    if (censusYear < 1867)
 				    {		// pre-confederation census by province
-					var	provSelect	= form.Province;
-					var	optIndex	= provSelect.selectedIndex;
-					if (optIndex != -1)
-					{		// province selected
-					    var	prov	= provSelect.options[optIndex].value;
-					    distUrl	+= "Census=" + prov + censusYear;
-					}		// province selected
-					else
-					    distUrl	+= "Census=" + censusId;
+						var	provSelect	= form.Province;
+						var	optIndex	= provSelect.selectedIndex;
+						if (optIndex != -1)
+						{		// province selected
+						    var	prov	= provSelect.options[optIndex].value;
+						    distUrl	+= "Census=" + prov + censusYear;
+						}		// province selected
+						else
+						    distUrl	+= "Census=" + censusId;
 				    }		// pre-confederation census by province
 				    else
-					distUrl	+= "Census=" + censusId;
+					    distUrl	+= "Census=" + censusId;
 				    if ('lang' in args)
-					distUrl	+= '&lang=' + args['lang'];
+					    distUrl	+= '&lang=' + args['lang'];
 				    HTTP.getXML(distUrl,
-						gotDistFile,
-						noDistFile);
+						        gotDistFile,
+						        noDistFile);
 				    break;
 				}	// districts selection
 		    }	// act on specific elements by name
@@ -166,7 +160,7 @@ function onLoadDetail()
 }		// onLoadDetail
 
 /************************************************************************
- *  gotDistFile																*
+ *  function gotDistFile														*
  *																		*
  *  This method is called when the XML file, listing all the districts 		*
  *  in the province, has been retrieved from the web server.				*
@@ -264,7 +258,7 @@ function gotDistFile(xmlDoc)
 }		// gotDistFile
 
 /************************************************************************
- *  noDistFile																*
+ *  function noDistFile														*
  *																		*
  *  This method is called if there is no list of districts for this		*
  *  census.  The selection list of districts is cleared.				*
@@ -301,7 +295,7 @@ function noDistFile()
 }		// noDistFile
 
 /************************************************************************
- *  changeProv																*
+ *  function changeProv														*
  *																		*
  *  The onchange method of the Province select element.						*
  *  Take action when the user selects a new province.						*
@@ -324,7 +318,7 @@ function changeProv()
 }		// changeProv
 
 /************************************************************************
- *  changePage																*
+ *  function changePage														*
  *																		*
  *  The onchange method of the Page select element.						*
  *  Take action when the user selects a new province.						*
@@ -342,7 +336,7 @@ function changePage()
 
 
 /************************************************************************
- *  onLoadProv																*
+ *  function onLoadProv														*
  *																		*
  *  Use Ajax to obtain the list of districts in the census 				*
  *  for a specific province as an XML file from the Web server.				*
@@ -387,7 +381,7 @@ function onLoadProv(prov)
 }		// onLoadProv
 
 /************************************************************************
- *  changeDist																*
+ *  function changeDist														*
  *																		*
  *  This method is called when the user selects a new district.				*
  *  This includes extending or retracting a multiple selection.				*
@@ -453,7 +447,7 @@ function changeDist()
 }		// changeDist
 
 /************************************************************************
- *  addSubDistOption														*
+ *  function addSubDistOption												*
  *																		*
  *  This method is called when the sub-district information XML				*
  *  document relating to a particular district is retrieved.				*
@@ -482,7 +476,7 @@ function addSubDistOption(subdistSelect, name, optval, node)
 }		// addSubDistOption
 
 /************************************************************************
- *  gotSubDist																*
+ *  function gotSubDist														*
  *																		*
  *  This method is called when the sub-district information XML				*
  *  document relating to a particular district is retrieved.				*
@@ -587,7 +581,7 @@ function gotSubDist(xmlDoc)
 }		// gotSubDist
 
 /************************************************************************
- *  noSubDist																*
+ *  function noSubDist														*
  *																		*
  *  This method is called if there is no sub-district						*
  *  description to return.												*
@@ -604,7 +598,7 @@ function noSubDist()
 }
 
 /************************************************************************
- *  changeSubDist														*
+ *  function changeSubDist												*
  *																		*
  *  This method is called when the user selects a new sub-district.		*
  *  If required a selection list of divisions is created in the form.		*
@@ -656,7 +650,7 @@ function changeSubDist()
 }		// changeSubDist
 
 /************************************************************************
- *  gotMultSD																*
+ *  function gotMultSD														*
  *																		*
  *  This method is called when there is more than one sub-district in		*
  *  a named township.  This is the case for the 1906, 1911, 1916, and		*
@@ -709,7 +703,7 @@ function gotMultSD(subDistrict,
 }		// gotMultSD
 
 /************************************************************************
- *  gotDivs																*
+ *  function gotDivs														*
  *																		*
  *  This method is called when the division information XML document		*
  *  relating to a particular sub-district is retrieved.						*
@@ -791,7 +785,7 @@ function gotDivs(xmlDoc, divSelect)
 }		// gotDivs
 
 /************************************************************************
- *  showCoverage														*
+ *  function showCoverage												*
  *																		*
  *  Display a web page showing the transcription coverage of this		*
  *  census.																*
@@ -807,7 +801,7 @@ function showCoverage()
 }		//showCoverage
 
 /************************************************************************
- *  qdKeyDown																*
+ *  function qdKeyDown														*
  *																		*
  *  Handle key strokes that apply to the entire dialog window.  For		*
  *  example the key combinations Ctrl-S and Alt-Q are interpreted to		*

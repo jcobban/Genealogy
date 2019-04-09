@@ -1,62 +1,69 @@
 <!--*********************************************************************
- *  getIndividualsByLocationen.html					*
- *									*
- *  Template for response to request to get a list of individuals	*
- *  who have events referencing a specified location.			*
- *									*
- *  History:								*
- *	2018/02/25	created						*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  getIndividualsByLocationen.html										*
+ *																		*
+ *  Template for response to request to get a list of individuals		*
+ *  who have events referencing a specified location.					*
+ *																		*
+ *  History:															*
+ *		2018/02/25		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
+    <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
       <a href="/FamilyTree/Locations.php?pattern=^$PREFIX&amp;lang=$LANG">Location Index</a>:
       <a href="/FamilyTree/Location.php?idlr=$IDLR&amp;lang=$LANG">$LOCNAME</a>:
-  </div>
-  <div class="body">
-    <h1>
-      <span class="right">
-	<a href="getIndividualsByLocationHelpen.html" target="help">? Help</a>
-      </span>
-      Persons Using Location: $LOCNAME
-    </h1>
-    $TRACE
-    $MSG
-    <div id="references">
-      <h2>References from Events</h2>
-	<p id="indOver" class="warning">There are $indcount individuals
-	  with classic events at this location.
-	  Only the first $limit are displayed.</p>
-	<p id="famOver" class="warning">There are $famcount families 
-	  with classic events at this location. 
-	  Only the first $limit are displayed.</p>
-	<p id="evtOver" class="warning">There are $evtcount events
-	  with this location.  Only the first $limit are displayed.</p>
-	<p id="personEvents">$eventType of
-	    <a href="$mpage" class="$gender">$dname</a>
-	</p>		
-	<p id="generalEvents">$eventType of
-	    <a href="$mpage" class="$gender">$dname</a>
-	</p>		
-	<p id="marriageEvents">Marriage of
-	    <a href="$mpage">$familyName</a>
-	</p>		
-    </div> <!-- id="references" -->
-    <div id="delete">
-	<p id="nofacts">No facts use location "$locName".</p>
-	<p id="deletedLocation">Deleted location '$locName'.</p>
-	<form name="delForm" id="delForm"
-		method="post" action="deleteLocation.php">
-	    <input type="hidden" name="idlr" value="$idlr">
-	    <input type="hidden" name="debug" value="$debug">
-	    <button type="submit" >
-		Delete this location
-	    </button>
-	</form>
-    </div> <!-- id="delete" -->
-  </div> <!-- class="body" -->
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+      <a href="getIndividualsByLocationHelpen.html" target="help">? Help</a>
+        </span>
+        Persons Using Location: $LOCNAME
+      </h1>
+      $TRACE
+      $MSG
+      <div id="references">
+        <h2>References from Events</h2>
+        <p id="indOver" class="warning">There are $indcount individuals
+          with classic events at this location.
+          Only the first $limit are displayed.
+        </p>
+        <p id="famOver" class="warning">There are $famcount families 
+          with classic events at this location. 
+          Only the first $limit are displayed.
+        </p>
+        <p id="evtOver" class="warning">There are $evtcount events
+          with this location.  Only the first $limit are displayed.
+        </p>
+        <p id="personEvents">$eventType of
+            <a href="$mpage" class="$gender">$dname
+            </a>
+        </p>		
+        <p id="generalEvents">$eventType of
+            <a href="$mpage" class="$gender">$dname
+            </a>
+        </p>		
+        <p id="marriageEvents">Marriage of
+            <a href="$mpage">$familyName
+            </a>
+        </p>		
+      </div> <!-- id="references" -->
+      <div id="delete">
+        <p id="nofacts">No facts use location "$locName".</p>
+        <p id="deletedLocation">Deleted location '$locName'.</p>
+        <form name="delForm" id="delForm"
+            method="post" action="deleteLocation.php">
+            <input type="hidden" name="idlr" id="idlr" value="$IDLR">
+            <input type="hidden" name="debug" id="debug" value="$DEBUG">
+            <input type="hidden" name="lang" id="lang" value="$LANG">
+            <button type="submit" >
+              Delete this location
+            </button>
+        </form>
+      </div> <!-- id="delete" -->
+    </div> <!-- class="body" -->
     <script src="/jscripts/js20/http.js" type="text/javaScript">
     </script>
     <script src="/jscripts/util.js" type="text/javaScript">

@@ -50,12 +50,12 @@ require_once __NAMESPACE__ . "/common.inc";
  *																		*
  *  Implement sorting order of instances of CountyMarriage				*
  *  This is required because PHP does not yet have a way to access		*
- *  a normal member function of a class to perform comparisons.				*
+ *  a normal member function of a class to perform comparisons.			*
  ************************************************************************/
 function compareReports(CountyMarriage $r1, 
-				CountyMarriage $r2)
+        				CountyMarriage $r2)
 {
-return $r1->compare($r2);
+    return $r1->compare($r2);
 }
 
 // validate parameters
@@ -76,10 +76,10 @@ $fixup					= true;
 
 if (count($_POST) > 0)
 {			// perform update
-    $parmsText  = "<p class="label">\$_POST</p>\n" .
-                  "<table class="summary">\n" .
-                  "<tr><th class="colhead">key</th>" .
-                      "<th class="colhead">value</th></tr>\n";
+    $parmsText  = '<p class="label">\$_POST</p>\n' .
+                  '<table class="summary">\n' .
+                  '<tr><th class="colhead">key</th>' .
+                      '<th class="colhead">value</th></tr>\n';
 	$reports	    = array();
 	$record		    = null;
 	$domain		    = null;
@@ -88,8 +88,8 @@ if (count($_POST) > 0)
 
 	foreach($_POST as $key => $value)
 	{               // loop through all update parameters
-        $parmsText  .= "<tr><th class="detlabel">$key</th>" .
-                         "<td class="white left">$value</td></tr>\n"; 
+        $parmsText  .= "<tr><th class=\"detlabel\">$key</th>" .
+                         "<td class=\"white left\">$value</td></tr>\n"; 
 	    if (preg_match("/^([a-zA-Z_]+)(\d*)$/", $key, $matches))
 	    {
 			$column	= $matches[1];
@@ -193,20 +193,20 @@ if (count($_POST) > 0)
 	}
 
 	// ensure still sorted by keys
-	usort($reports,'compareReports');
+	usort($reports,'Genealogy\compareReports');
 }			            // perform update
 else
 {			            // initial report
-    $parmsText      = "<p class="label">\$_GET</p>\n" .
-                        "<table class="summary">\n" .
-                        "<tr><th class="colhead">key</th>" .
-                        "<th class="colhead">value</th></tr>\n";
+    $parmsText      = "<p class=\"label\">\$_GET</p>\n" .
+                        "<table class=\"summary\">\n" .
+                        "<tr><th class=\"colhead\">key</th>" .
+                        "<th class=\"colhead\">value</th></tr>\n";
 	$getParms	    = array();
 	$fixup		    = true;
 	foreach($_GET as $key => $value)
 	{                   // loop through all parameters
-        $parmsText  .= "<tr><th class="detlabel">$key</th>" .
-                         "<td class="white left">$value</td></tr>\n"; 
+        $parmsText  .= "<tr><th class=\"detlabel\">$key</th>" .
+                         "<td class=\"white left\">$value</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {               // act on specific parameters
 			case 'prov':
@@ -1187,10 +1187,6 @@ pageBot();
     <div class="balloon" id="HelpSubmit">
     Click on this button to update the database to include the changes you
     have made to the list of marriage registrations.
-    </div>
-    <div class="balloon" id="HelprightTop">
-    Click on this button to signon to access extended features of the web-site
-    or to manage your account with the web-site.
     </div>
     <div class="hidden" id="templates">
     <!-- template for adding a new marriage -->

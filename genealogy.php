@@ -44,8 +44,9 @@ use \Exception;
  *		2018/01/31		ignore unexpected parameters					*
  *		2018/10/15      get language apology text from Languages        *
  *		2018/11/28      use language specific page layout               *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -78,22 +79,9 @@ foreach ($_GET as $key => $value)
 }			// foreach parameter
 $update     = canUser('edit');
 
+$template	= new FtTemplate("genealogy$lang.html");
+
 $tempBase	= $document_root . '/templates/';
-$template	= new FtTemplate("${tempBase}page$lang.html");
-$includeSub	= "genealogy$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub     = 'genealogyen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
 if (file_exists($tempBase . "Trantab$lang.html"))
     $trtemplate = new Template("${tempBase}Trantab$lang.html");
 else
@@ -118,7 +106,7 @@ if ($monthTag)
 {
 	$monthnames	= array('');
 	foreach($monthTag->childNodes() as $tag)
-	    $monthnames[]	= trim($tag->innerHTML());
+        $monthnames[]	= trim($tag->innerHTML());
 }
 else
 	$monthnames	= array('',

@@ -28,8 +28,9 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/01/07      name of second individual moved to Name         *
  *		                record in XML response                          *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -46,8 +47,6 @@
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     for (var fi = 0; fi < document.forms.length; fi++)
     {			// loop through all forms
 		var	form		= document.forms[fi];
@@ -66,10 +65,6 @@ function onLoad()
 		for (var i = 0; i < formElts.length; ++i)
 		{		// loop through elements
 		    var element	= formElts[i];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    // take action on specific elements by name
 		    var	name	= element.name;

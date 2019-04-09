@@ -685,8 +685,6 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		    }			// success
 		    else
 		    {			// error performing query
-				print "<p>RecordSet::__construct: " . __LINE__ .
-						    " query=\"$queryText\"</p>\n";
 				if (strlen($queryText) > 40)
 				    $queryText	= substr($queryText, 0, 30) . '...' .
 								      substr($queryText, -7);
@@ -1173,7 +1171,16 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		$or				= '';
 
 		foreach($parms as $pattern)
-		{		// loop through patterns
+        {		// loop through patterns
+            if (is_array($pattern))
+            {
+                foreach($pattern as $val)
+                {
+                    $where			.= $or . "$fldname='$val'";
+                    $or             = ' OR ';
+                }
+            }
+            else
 		    if ($pattern == '')
 		    {			// empty string
 				$where			.= $or . "$fldname=''";

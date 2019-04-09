@@ -37,33 +37,33 @@ class CountyMarriage extends Record
 {
 
     /********************************************************************
-     *		CountyMarriage::$initRow										*
-     *																		*
-     *		static array containing default values for a new record				*
+     *	CountyMarriage::$initRow										*
+     *																	*
+     *	static array containing default values for a new record			*
      ********************************************************************/
     protected static	$initRow	= array(
 						'm_regdomain'		=> 'CAON',
-						'm_volume'		=> 1,
+						'm_volume'	    	=> 1,
 						'm_reportno'		=> 1,
-		 		'm_itemno'		=> '',
-		 		'm_role'		=> '',
-		 		'm_givennames'		=> '',
-		 		'm_surname'		=> '',
-		 		'm_surnamesoundex'	=> '',
-						'm_age'			=> '',
+		 		        'm_itemno'		    => '',
+		 		        'm_role'		    => '',
+		 		        'm_givennames'		=> '',
+		 		        'm_surname'	    	=> '',
+		 		        'm_surnamesoundex'	=> '',
+						'm_age'		    	=> '',
 						'm_residence'		=> '',
 						'm_birthplace'		=> '',
 						'm_fathername'		=> '',
 						'm_mothername'		=> '',
-		 		'm_date'		=> '',
-		 		'm_licensetype'		=> 'L',
-		 		'm_witnessname'		=> '',
-						'm_idir'		=> 0,
-						'm_remarks'		=> '');
+		 		        'm_date'		    => '',
+		 		        'm_licensetype'		=> 'L',
+		 		        'm_witnessname'		=> '',
+						'm_idir'		    => 0,
+						'm_remarks'		    => '');
 
     /********************************************************************
-     *		$translate		static array containing common translations of		*
-     *						field names										*
+     *	$translate		static array containing common translations of	*
+     *					field names										*
      ********************************************************************/
     protected static	$translate = array(
 						'regdomain'		=> 'm_regdomain',
@@ -73,47 +73,47 @@ class CountyMarriage extends Record
 						'reportno'		=> 'm_reportno',
 						'itemno'		=> 'm_itemno',
 						'role'			=> 'm_role',
-						'givennames'		=> 'm_givennames',
+						'givennames'	=> 'm_givennames',
 						'surname'		=> 'm_surname',
-						'surnamesoundex'	=> 'm_surnamesoundex',
+						'surnamesoundex'=> 'm_surnamesoundex',
 						'age'			=> 'm_age',
 						'residence'		=> 'm_residence',
-						'birthplace'		=> 'm_birthplace',
-						'fathername'		=> 'm_fathername',
-						'mothername'		=> 'm_mothername',
+						'birthplace'	=> 'm_birthplace',
+						'fathername'	=> 'm_fathername',
+						'mothername'	=> 'm_mothername',
 						'date'			=> 'm_date',
-						'licensetype'		=> 'm_licensetype',
-						'witnessname'		=> 'm_witnessname',
+						'licensetype'	=> 'm_licensetype',
+						'witnessname'	=> 'm_witnessname',
 						'idir'			=> 'm_idir',
 						'remarks'		=> 'm_remarks');
 
     /********************************************************************
-     *		$defaultOrder														*
-     *																		*
-     *		Default sort order for reports										*
+     *	$defaultOrder													*
+     *																	*
+     *	Default sort order for reports									*
      ********************************************************************/
     protected static $defaultOrder	=
 				"M_RegDomain, M_Volume, M_ReportNo, M_ItemNo, M_Role DESC";
 
     /********************************************************************
-     *		CountyMarriage::__construct										*
-     *																		*
-     *  Create an instance of a class that describes a spouse				*
-     *		in a county marriage registration.								*
-     *																		*
-     *  Input:																*
-     *		    $parms		an associative array containing either				*
-     *						a complete row from the database or				*
-     *				 		    array('Domain'		=> $domain,				*
-     *								  'Volume'		=> $volume,				*
-     *								  'ReportNo'		=> $reportno,				*
-     *								  'ItemNo'		=> $itemno,				*
-     *								  'Role'		=> $role)				*
-     *						with the case of the parameter names ignored		*
-     *																		*
-     *  Returns object containing county marriage individual record.		*
-     *																		*
-     *		Throws Exception if unable to complete function						*
+     *	CountyMarriage::__construct										*
+     *																	*
+     *  Create an instance of a class that describes a spouse			*
+     *	in a county marriage registration.								*
+     *																	*
+     *  Input:															*
+     *	    $parms		an associative array containing either			*
+     *					a complete row from the database or				*
+     *			 		    array('Domain'		=> $domain,				*
+     *							  'Volume'		=> $volume,				*
+     *							  'ReportNo'	=> $reportno,			*
+     *							  'ItemNo'		=> $itemno,				*
+     *							  'Role'		=> $role)				*
+     *					with the case of the parameter names ignored	*
+     *																	*
+     *  Returns object containing county marriage individual record.	*
+     *																	*
+     *	Throws Exception if unable to complete function					*
      ********************************************************************/
     function __construct($parms)
     {
@@ -272,15 +272,15 @@ class CountyMarriage extends Record
     }		// CountyMarriage::__construct
 
     /********************************************************************
-     *		CountyMarriage::save												*
-     *																		*
-     *		Save changes made to the CountyMarriage record into				*
-     *		the database.														*
-     *																		*
-     *		Parameters:														*
-     *		    $xml		if true diagnostic output is emitted in XML		*
-     *						format within <cmd> tags.						*
-     *						if a string use it as tag name						*
+     *	CountyMarriage::save											*
+     *																	*
+     *	Save changes made to the CountyMarriage record into				*
+     *	the database.													*
+     *																	*
+     *	Parameters:														*
+     *	    $xml		if true diagnostic output is emitted in XML		*
+     *					format within <cmd> tags.						*
+     *					if a string use it as tag name					*
      ********************************************************************/
     function save($xml = false)
     {
@@ -435,18 +435,18 @@ class CountyMarriage extends Record
     }		// CountyMarriage::save
 
     /********************************************************************
-     *		CountyMarriage::delete												*
-     *																		*
+     *	CountyMarriage::delete											*
+     *																	*
      *  Delete the database records associated with this instance.		*
-     *																		*
+     *																	*
      *  Parameters:														*
-     *		    $xml		if true diagnostic output is emitted in				*
-     *						XML format										*
-     *																		*
-     *		Returns:														*
-     *		    false		if the method was unable to update the database		*
-     *		    1				if the method deleted the database record		*
-     *		    0				if the record did not need to be deleted		*
+     *	    $xml		if true diagnostic output is emitted in			*
+     *					XML format										*
+     *																	*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method deleted the database record		*
+     *	    0			if the record did not need to be deleted		*
      ********************************************************************/
     function delete($xml = false)
     {
@@ -523,17 +523,17 @@ class CountyMarriage extends Record
     }		// CountyMarriage::delete
 
     /********************************************************************
-     *		CountyMarriage::compare												*
-     *																		*
-     *		Compare two marriage records										*
-     *																		*
-     *		Input:																*
-     *		    $other				another instance of CountyMarriage		*
-     *																		*
-     *		Returns:														*
-     *		    > 0 if $other is greater than $this by date (in order)		*
-     *		    == 0 if $other is equal to $this by date						*
-     *		    < 0 if $other is less than $this by date (out of order)		*
+     *	CountyMarriage::compare											*
+     *																	*
+     *	Compare two marriage records									*
+     *																	*
+     *	Input:															*
+     *	    $other			another instance of CountyMarriage			*
+     *																	*
+     *	Returns:														*
+     *	    > 0 if $other is greater than $this by date (in order)		*
+     *	    == 0 if $other is equal to $this by date					*
+     *	    < 0 if $other is less than $this by date (out of order)		*
      ********************************************************************/
     function compare($other)
     {

@@ -56,8 +56,9 @@ use \Exception;
  *		2017/11/28		use RecordSet									*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2018/12/02      use class Template                              *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -121,22 +122,7 @@ if (canUser('edit'))
     $action                 = 'Update';
 else
     $action                 = 'Display';
-$tempBase		            = $document_root . '/templates/';
-$template		            = new FtTemplate("${tempBase}dialog$lang.html");
-$includeSub		            = "editSource$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	        = new Language(array('code' => $lang));
-	$langName   	        = $language->get('name');
-	$nativeName	            = $language->get('nativename');
-	$sorry  	            = $language->getSorry();
-    $warn   	            .= str_replace(array('$langName','$nativeName'),
-                                           array($langName, $nativeName),
-                                           $sorry);
-	$includeSub	            = "editSource{$action}en.html";
-}
-$template->includeSub($tempBase . $includeSub,
-                      'MAIN');
+$template		            = new FtTemplate("editSource$action$lang.html");
 
 // validate parameters
 if (!is_null($idsr))

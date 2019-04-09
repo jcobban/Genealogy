@@ -10,7 +10,7 @@ use \Exception;
  *  Parameters:									                        *
  *		RegDomain	domain consisting of country code and state	        *
  *										                                *
- *  History:								                        	*
+ *  History:								                            *
  *		2011/01/09	    created						                    *
  *		2011/03/16	    display in 3 columns				            *
  *				        include 2nd level breakdown			            *
@@ -30,17 +30,20 @@ use \Exception;
  *		2017/02/07	    use class Country				                *
  *		2018/06/01	    add support for lang parameter			        *
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
+ *		2019/01/19      use class Template
  *										                                *
  *  Copyright &copy; 2018 James A. Cobban					            *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
+require_once __NAMESPACE__ . '/Language.inc';
+require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
 $cc			    = 'CA';		// default country code
 $countryName	= 'Canada';	// default country name
-$domain	    	= 'CAON';	// default domain
+$domain	        = 'CAON';	// default domain
 $domainName		= 'Ontario';
 $lang		    = 'en';
 
@@ -52,262 +55,153 @@ foreach($_GET as $key => $value)
 {			// loop through all input parameters
     $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                          "<td class='white left'>$value</td></tr>\n"; 
-	switch(strtolower($key))
-	{		// process specific named parameters
-	    case 'regdomain':
-	    {
-			$domainObj	= new Domain(array('domain'	=> $value,
-		    							   'language'	=> 'en'));
-			if ($domainObj->isExisting())
-			{
-			    $domain	= $value;
-			    $cc		= substr($domain, 0, 2);
-			    $countryObj		= new Country(array('code' => $cc));
-			    $countryName	= $countryObj->getName();
-			    $domainName	= $domainObj->get('name');
-			}
-			else
-			{
-			    $msg	.= "Domain '$domain' must be a supported two character country code followed by a two character state or province code. ";
-			    $domainName	= "Domain" . $domain;
-			}
-			break;
-	    }		// RegDomain
+    switch(strtolower($key))
+    {		// process specific named parameters
+        case 'regdomain':
+        {
+            $domain	    = $value;
+            break;
+        }		// RegDomain
 
-	    case 'lang':
-	    {
-			if (strlen($value) == 2)
-				$lang		= strtolower($value);
-			break;
-	    }		//lang
+        case 'lang':
+        {
+            if (strlen($value) == 2)
+                $lang		= strtolower($value);
+            break;
+        }		//lang
 
-	    case 'debug':
-	    {
-			break;
-	    }		// handled by common code
+        case 'debug':
+        {
+            break;
+        }		// handled by common code
 
-	    default:
-	    {
-			$warn	.= "Unexpected parameter $key='$value'. ";
-			break;
-	    }		// any other paramters
-	}		// process specific named parameters
+        default:
+        {
+            $warn	.= "Unexpected parameter $key='$value'. ";
+            break;
+        }		// any other paramters
+    }		// process specific named parameters
 }			// loop through all input parameters
 if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
-// if no error messages Issue the query
-if (strlen($msg) == 0)
-{			// no errors
-	// execute the query
-	$query	= "SELECT D_RegYear, SUM(D_Surname != ''), SUM(D_IDIR > 0) " .
-						"FROM Deaths
-						    WHERE D_RegDomain='$domain'
-						    GROUP BY D_RegYear ORDER BY D_RegYear";
-	$stmt	 	= $connection->query($query);
-	if ($stmt)
-	{		// successful query
-	    $result		= $stmt->fetchAll(PDO::FETCH_NUM);
-	    if ($debug)
-				$warn		.= "<p>$query</p>\n";
-	}		// successful query
-	else
-	{
-	    $msg	.= "query '$query' failed: " .
-						    print_r($connection->errorInfo(),true);
-	}		// query failed
-}			// no error messages
+$template		= new FtTemplate("DeathRegStats$lang.html");
 
-$title	= $domainName . ": Death Registration Status";
-
-htmlHeader($title,
-			array('/jscripts/util.js',
-			      'DeathRegStats.js'));
-?>
-    <body>
-<?php
-pageTop(array(
-			"/genealogy.php?lang=$lang"		=> 'Genealogy', 
-			"/genCountry.php?cc=CA&lang=$lang"	=> $countryName,
-			"/Canada/genProvince.php?domain=$domain&lang=$lang"
-											=> $domainName,
-			"DeathRegQuery.php?RegDomain=$domain&lang=$lang"
-											=> 'New Death Query'));
-?>
-    <div class='body'>
-      <h1><?php print $title; ?>
-        <span class='right'>
-			<a href='DeathRegStatsHelpen.html' target='_blank'>Help?</a>
-        </span>
-      </h1>
-<?php
-if (strlen($warn) > 0)
-{		// print warning messages if any
-    print "<p class='warning'>$warn</p>\n";
-}		// print warning messages if any
-
-if (strlen($msg) > 0)
-{		// print error messages if any
-    print "<p class='message'>$msg</p>\n";
-}		// print error messages if any
+$template->set('CC',                $cc);
+$template->set('COUNTRYNAME',		$countryName);
+$template->set('DOMAINNAME',		$domainName);
+$template->set('DOMAIN',	        $domain);
+$template->set('LANG',		        $lang);
+$template->set('CONTACTTABLE',		'Deaths');
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+if ($debug)
+    $template->set('DEBUG',		    'Y');
 else
-{		// display results of query
-?>
-      <form id='display' action='donothing.php' method='get'>
-        <!--- Put out the response as a table -->
-        <table class='details'>
-          <!--- Put out the column headers -->
-          <thead>
-			<tr>
-			  <th class='colhead'>
-			RegYear
-			  </th>
-			  <th class='colhead'>
-			Done
-			  </th>
-			  <th class='colhead'>
-			Linked
-			  </th>
-			  <th class='colhead'>
-			View
-			  </th>
-			  <th>
-			  </th>
-			  <th class='colhead'>
-			RegYear
-			  </th>
-			  <th class='colhead'>
-			Done
-			  </th>
-			  <th class='colhead'>
-			Linked
-			  </th>
-			  <th class='colhead'>
-			View
-			  </th>
-			  <th>
-			  </th>
-			  <th class='colhead'>
-			RegYear
-			  </th>
-			  <th class='colhead'>
-			Done
-			  </th>
-			  <th class='colhead'>
-			Linked
-			  </th>
-			  <th class='colhead'>
-			View
-			  </th>
-			</tr>
-        </thead>
-        <tbody>
-<?php
-			    $columns		= 3;
-			    $col		= 1;
-			    $total		= 0;
-			    $totalLinked	= 0;
-			    $rownum		= 0;
-			    $yearclass		= "odd right";
-			    foreach($result as $row)
-			    {
-						$rownum++;
-						$regYear	= $row[0];
-						$count		= $row[1];
-						$linked		= $row[2];
-						if ($count == 0)
-						    $pctLinked	= 0;
-						else
-						    $pctLinked	= 100 * $linked / $count;
-						$total		+= $count;
-						$totalLinked	+= $linked;
-						$count		= number_format($count); 
-						$linked		= number_format($linked); 
-						if ($col == 1)
-						{
-?>
-			<tr>
-<?php
-						}
-?>
-			  <td class='<?php print $yearclass; ?>'>
-			      <?php print $regYear; ?>
-			  </td>
-			  <td class='<?php print $yearclass; ?>'>
-			      <?php print $count; ?>
-			  </td>
-			  <td class='<?php print pctClass($pctLinked); ?>'>
-			      <?php print $linked; ?>
-			  </td>
-			  <td class='left'>
-			      <button type='button'
-								id='YearStats<?php print $domain.$regYear; ?>'>
-						View
-			      </button>
-			  </td>
-<?php
-						$col++;
-						if ($col > $columns)
-						{	// at column limit, end row
-						    $col	= 1;
-						    if ($yearclass == "odd right")
-								$yearclass	= "even right";
-						    else
-								$yearclass	= "odd right";
-?>
-            </tr>
-<?php
-						}	// at column limit, end row
-						else
-						{	// start new column
-?>
-			  <td>
-			  </td>
-<?php
-						}	// start new column
-			    }		// process all rows
+    $template->set('DEBUG',		    'N');
 
-			    // end last row if necessary
-			    if ($col != 1)
-			    {		// partial last column
-?>
-			</tr>
-<?php
-			    }		// partial last column
+// validate domain
+$domainObj	            = new Domain(array('domain'	    => $domain,
+                                           'language'	=> 'en'));
+if ($domainObj->isExisting())
+{
+    $cc		            = substr($domain, 0, 2);
+    $countryObj		    = new Country(array('code' => $cc));
+    $countryName	    = $countryObj->getName();
+    $domainName	        = $domainObj->get('name');
+}
+else
+{
+    $domainName	        = $domainObj->get('name');
+    $msg	            .= "Domain '$domain' must be a supported two character country code followed by a state or province code. ";
+    $domain             = 'CAON';
+}
 
-			    // insert comma into formatting of total
-			    $total		= number_format($total);
-			    $totalLinked	= number_format($totalLinked);
-?>
-		  </tbody>
-		  <tfoot>
-			<tr>
-			  <td class='total right'>
-			    Totals
-			  </td>
-			  <td class='total right'>
-			      <?php print $total; ?>
-			  </td>
-			  <td class='total right'>
-			      <?php print $totalLinked; ?>
-			  </td>
-			</tr>
-		  </tfoot>
-		</table>
-	  </form>
-<?php
-}		// display results of query
-?>
-    </div> <!-- end of <div id='body'> -->
-<?php
-pageBot();
-?>
-    <div class='balloon' id='HelpYearStats'>
-      Click on this button to display the geographical breakdown of the
-      transcription for the specific year.
-    </div>
-    <div class='balloon' id='HelpRegYear'>
-      This field shows the year for which the statistics apply.
-    </div>
-  </body>
-</html>
+// execute the query
+// The following should be moved to a class DeathSet method summary
+$query	= "SELECT D_RegYear, SUM(D_Surname != ''), SUM(D_IDIR > 0) " .
+                        "FROM Deaths " .
+                            "WHERE D_RegDomain=:domain " .
+                        "GROUP BY D_RegYear ORDER BY D_RegYear";
+$sqlParms               = array('domain'    => $domain);
+$queryText              = debugPrepQuery($query, $sqlParms);
+$stmt	 	            = $connection->prepare($query);
+if ($stmt->execute($sqlParms))
+{		// successful query
+    $result		        = $stmt->fetchAll(PDO::FETCH_NUM);
+    if ($debug)
+            $warn		.= "<p>$query</p>\n";
+}		// successful query
+else
+{
+    $msg	.= "Query '$queryText' failed: " .
+                print_r($stmt->errorInfo(),true) . ". ";
+    $result             = array();
+}		// query failed
+
+// the following calculation permits the template designer to control the
+// number of columns in the display by modifying the contents of the header
+// row
+$thRow              = $template->getElementById('thRow');
+$numCols            = (int)((count($thRow->children) + 1) / 5);
+
+// $dataRow is the template for displaying a single year of statistics
+$dataRow            = $template['dataRow'];
+$yearHTML           = $dataRow->innerHTML();
+
+$col		        = 0;
+$total		        = 0;
+$totalLinked	    = 0;
+$rownum		        = 0;
+$yearClass		    = "odd right";
+$data               = '';
+
+foreach($result as $row)
+{
+    if ($col == 0)
+        $data       .= "    <tr>\n";
+    $rownum++;
+    $ttemplate      = new Template($yearHTML);
+    $regYear	    = $row[0];
+    $count		    = $row[1];
+    $linked		    = $row[2];
+    if ($count == 0)
+        $pctLinked	= 0;
+    else
+        $pctLinked	= 100 * $linked / $count;
+    $total		    += $count;
+    $totalLinked	+= $linked;
+    $ttemplate->set('DOMAIN', $domain);
+    $ttemplate->set('REGYEAR', $regYear);
+    $ttemplate->set('YEARCLASS', $yearClass . ' right');
+    $ttemplate->set('COUNT', number_format($count));
+    $ttemplate->set('LINKED', number_format($linked));
+    $ttemplate->set('PCTLINKED', pctClass($pctLinked));
+    $col++;
+    if ($col >= $numCols)
+    {	// at column limit, end row
+        $col	= 0;
+        if ($yearClass == "odd right")
+            $yearClass	= "even right";
+        else
+            $yearClass	= "odd right";
+        $ttemplate["columnSep"]->update(null);
+        $data           .= $ttemplate->compile();
+        $data           .= "    </tr>\n";
+    }	// at column limit, end row
+    else
+    {	// start new column
+        $data           .= $ttemplate->compile();
+    }	// start new column
+}		// process all rows
+
+// end last row if necessary
+if ($col != 0)
+{		// partial last column
+    $data               .= "    </tr>\n";
+}		// partial last column
+
+$dataRow->update($data);
+$template->set('TOTAL',         number_format($total));
+$template->set('TOTALLINKED',   number_format($totalLinked));
+ 
+$template->display();

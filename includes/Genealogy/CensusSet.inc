@@ -45,6 +45,9 @@ class CensusSet extends RecordSet
     function __construct($parms,
 						 $order		= '`Name`')
     {
+        foreach($parms as $name=> $value)
+            if (strtolower($name) == 'order')
+                $order      = $value;
 		$parms['order']		= $order;
 		parent::__construct('Censuses',
 						    $parms);
@@ -63,6 +66,7 @@ class CensusSet extends RecordSet
      *				Special Field Names:								*
      *				  year			match the census year			    *
      *				  countrycode	match a country					    *
+     *				  cc        	match a country					    *
      *				  state			match an included state			    *
      *				  province		match an included province		    *
      *	    $this->sqlParms		sets substitution values to PDO exec	*
@@ -125,6 +129,7 @@ class CensusSet extends RecordSet
 				}		// census identifier
 
 				case 'countrycode':
+				case 'cc':
 				{		// country code
 				    $where		.= "$and (SUBSTRING(`CensusId`,1,2)=? OR `PartOf`=?)";
 				    $this->sqlParms[]	= $value;
@@ -208,13 +213,6 @@ class CensusSet extends RecordSet
 				{		// ignore if set by previous invocation
 				    break;
 				}		// ignore if set by previous invocation
-
-				default:
-				{
-				    $warn	.= "<p>CensusSet::getWhere: " .
-							   "Unsupported field name `$fldname`.</p>\n";
-				    break;
-				}		// match whole value
 		    }
 		}		// loop through all parameters
 

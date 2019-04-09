@@ -307,26 +307,8 @@ if ($debug)
     $warn               .= $parmsText . "</table>\n";
 
 // start the template
-$tempBase			= $document_root . '/templates/';
-$template			= new FtTemplate("${tempBase}page$lang.html");
-$includeSub			= "DeathRegResponse$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language		= new Language(array('code' => $lang));
-	$langName		= $language->get('name');
-	$nativeName		= $language->get('nativename');
-	$sorry  		= $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	= "DeathRegResponseen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-				      'MAIN');
-if (file_exists($tempBase . "Trantab$lang.html"))
-    $trtemplate = new Template("${tempBase}Trantab$lang.html");
-else
-    $trtemplate = new Template("${tempBase}Trantaben.html");
+$template			= new FtTemplate("DeathRegResponse$lang.html");
+$trtemplate     = $template->getTranslate();
 
 // validate domain code
 $domainObj	            	= new Domain(array('domain'	    => $domain,

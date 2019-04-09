@@ -51,6 +51,7 @@ use \Exception;
  *		2018/11/19      change Help.html to Helpen.html                 *
  *		2019/01/07      use namespace Genealogy                         *
  *		                use Template                                    *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -104,21 +105,7 @@ if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
 // get template
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "mergeIndivid$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	= new Language(array('code' => $lang));
-	$langName	= $language->get('name');
-	$nativeName	= $language->get('nativename');
-    $sorry      = $language->getSorry();
-    $warn       .= str_replace(array('$langName','$nativeName'),
-                               array($langName, $nativeName),
-                               $sorry);
-	$includeSub	= "mergeIndividen.html";
-}
-$template->includeSub($tempBase . $includeSub, 'MAIN');
+$template		= new FtTemplate("mergeIndivid$lang.html");
 
 $template->set('LANG', $lang);
 if ($debug)

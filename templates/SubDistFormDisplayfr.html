@@ -1,36 +1,36 @@
 <!--*********************************************************************
- *  SubDistFormDisplayfr.html						*
- *									*
+ *  SubDistFormDisplayfr.html											*
+ *																		*
  *  Display form for editting sub-district information for a district	*
- *  of a Recensement of Canada						*
- *									*
- *  History:								*
- *	2017/09/25	created						*
- *	2018/01/04	remove Template from template file names	*
- *	2018/01/10	separate administrator and client templates	*
- *	2018/05/22	support distinctive style for id, name,		*
- *			lacreel, ldsreel, and image base columns	*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  of a Recensement of Canada											*
+ *																		*
+ *  History:															*
+ *		2017/09/25		created											*
+ *		2018/01/04		remove Template from template file names		*
+ *		2018/01/10		separate administrator and client templates		*
+ *		2018/05/22		support distinctive style for id, name,			*
+ *						lacreel, ldsreel, and image base columns		*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
 <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=fr">
-		Généalogie</a>:
+			Généalogie</a>:
     <a href="/genCountry.php?cc=$CC&lang=fr">
-			$COUNTRYNAME</a>:
+				$COUNTRYNAME</a>:
     <a href="/database/genCensuses.php?lang=fr">
-		Recensements</a>:
+			Recensements</a>:
     <a href="/database/EditCensuses.php?lang=fr">
-		Administration des Recensements</a>:
+			Administration des Recensements</a>:
     <a href="/database/DistForm.php?Census=$CENSUSID&Province=$PROVINCE&lang=fr">
-	$CENSUSID Administration des Districts</a>:
+		$CENSUSID Administration des Districts</a>:
     <a href="/database/ReqUpdateSubDists.php$SEARCH&lang=fr">
-	Choisir Nouveau Sous-District</a>:
+		Choisir Nouveau Sous-District</a>:
 </div> <!-- id="breadcrumbs" -->
 <div class="body">
     <h1>
     <span class="right">
-	<a href="/database/SubDistFormHelpfr.html">? Aide</a>
+		<a href="/database/SubDistFormHelpfr.html">? Aide</a>
     </span>
     Administration des Recensements: Canada: Recensement $CENSUSYEAR:
     Regarder Table des Sous-Districts 
@@ -39,11 +39,11 @@
     $TRACE
     $MSG
   <!--- Put out a line with links to previous and next section of table -->
-  <div class="center" id="linkHdr">
-    <span class="left" id="npPrevFront">
+  <div class="center" id="topBrowse">
+    <span class="left" id="topPrev">
       <a href="/database/SubDistForm.php$npPrev">&lt;---</a>
     </span>
-    <span class="right" id="npNextFront">
+    <span class="right" id="topNext">
       <a href="/database/SubDistForm.php$npNext">---&gt;</a>
     </span>
     $CENSUSYEAR Recensement de $COUNTRYNAME $DNAME ($PROVINCE) ($DISTID)
@@ -51,200 +51,200 @@
   </div>
   <!--- Put out the response as a table -->
   <form name="censusForm"
-	action="SubDistUpdate.php" 
-	method="post" 
-	autocomplete="off" 
-	enctype="multipart/form-data">
+		action="SubDistUpdate.php" 
+		method="post" 
+		autocomplete="off" 
+		enctype="multipart/form-data">
     <input type="hidden" name="Census" id="Census"
-		value="$CENSUSID">
+			value="$CENSUSID">
     <input type="hidden" name="Province" id="Province" 
-		value="$PROVINCE">
+			value="$PROVINCE">
     <input type="hidden" name="District" id="District" 
-		value="$DISTID">
+			value="$DISTID">
     <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
     <table class="form" id="dataTbl">
       <thead> <!--- Put out the column headers -->
-	<tr id="hdrRow">
-	  <th class="colhead" id="SD_IdHead">
-	    ID
-	  </th>
-	  <th class="colhead" id="SD_DivHead">
-	    Div
-	  </th>
-	  <th class="colhead" id="SD_NameHead">
-	    Nom
-	  </th>
-	  <th class="colhead" id="SD_PagesHead">
-	    Pages
-	  </th>
-	  <th class="colhead" id="SD_PopulationHead">
-	    Population
-	  </th>
-	  <th class="colhead" id="SD_LacReelHead">
-	    Bobine LAC
-	  </th>
-	  <th class="colhead" id="SD_LdsReelHead">
-	    Bobine LDS
-	  </th>
-	  <th class="colhead" id="SD_ImageBaseHead">
-	    Base de l'Image
-	  </th>
-	  <th class="colhead" id="SD_RelFrameHead">
-	    No. de l'Image
-	  </th>
-	  <th class="colhead" id="SD_FrameCtHead">
-	    Compte des Images
-	  </th>
-	  <th class="colhead" id="SD_RemarksHead">
-	    Remarques
-	  </th>
-	  <th class="colhead">
-	    Actions
-	  </th>
-	</tr>
+		<tr id="hdrRow">
+		  <th class="colhead" id="SD_IdHead">
+		    ID
+		  </th>
+		  <th class="colhead" id="SD_DivHead">
+		    Div
+		  </th>
+		  <th class="colhead" id="SD_NameHead">
+		    Nom
+		  </th>
+		  <th class="colhead" id="SD_PagesHead">
+		    Pages
+		  </th>
+		  <th class="colhead" id="SD_PopulationHead">
+		    Population
+		  </th>
+		  <th class="colhead" id="SD_LacReelHead">
+		    Bobine LAC
+		  </th>
+		  <th class="colhead" id="SD_LdsReelHead">
+		    Bobine LDS
+		  </th>
+		  <th class="colhead" id="SD_ImageBaseHead">
+		    Base de l'Image
+		  </th>
+		  <th class="colhead" id="SD_RelFrameHead">
+		    No. de l'Image
+		  </th>
+		  <th class="colhead" id="SD_FrameCtHead">
+		    Compte des Images
+		  </th>
+		  <th class="colhead" id="SD_RemarksHead">
+		    Remarques
+		  </th>
+		  <th class="colhead">
+		    Actions
+		  </th>
+		</tr>
       </thead>
       <tbody>
-	<tr id="Row$line">
-	  <td class="right">
-	    <!-- fields to identify existing row in database -->
-	    <input type="hidden"
-			name="Orig_Id$line" id="Orig_Id$line"
-	 		value="$id"> 
-	    <input type="hidden"
-			name="Orig_Div$line" id="Orig_Div$line"
-	 		value="$div">
-	    <input type="hidden"
-			name="Orig_Sched$line" id="Orig_Sched$line"
-	 		value="1">
-	    <!-- permit modifying the ID of the existing row -->
-	    <input type="text"
-			name="SD_Id$line" id="SD_Id$line"
-	 		value="$id" readonly="readonly"
-			class="$idclass ina rightfixed" size="3" maxlength="6">
-	  </td>
-	  <td class="right">
-	    <!-- permit modifying the Div of the existing row -->
-	    <input type="text"
-			name="SD_Div$line" id="SD_Div$line"
-	 		value="$div" readonly="readonly"
-			class="black ina rightfixed" size="3" maxlength="4">
-	  </td>
-	  <td class="right">
-	    <input type="text"
-			name="SD_Name$line" id="SD_Name$line"
-	 		value="$name" readonly="readonly"
-			class="$nameclass ina leftnc" size="$nameWidth"
-			maxlength="255">
-	  </td>
-	  <td class="right">
-	    <input type="text"
-			name="SD_Pages$line" id="SD_Pages$line"
-	 		value="$pages" readonly="readonly"
-			class="black ina rightnc" size="4" maxlength="4">
-	  </td>
-	  <td class="right">
-	    <input type="text"
-			name="SD_Population$line" id="SD_Population$line"
-	 		value="$population" readonly="readonly"
-			class="black ina rightnc" size="7" maxlength="8">
-	  </td>
-	  <td class="right">
-	    <input type="text"
-			name="SD_LacReel$line" id="SD_LacReel$line"
-	 		value="$lacreel" readonly="readonly"
-			class="$lacclass ina left" size="7" maxlength="8">
-	  </td>
-	  <td class="right">
-	    <input type="text"
-			name="SD_LdsReel$line" id="SD_LdsReel$line"
-	 		value="$ldsreel" readonly="readonly"
-			class="$ldsclass ina rightnc" size="8" maxlength="8">
-	  </td>
-	  <td class="right">
-	    <input type="text"
-			name="SD_ImageBase$line" id="SD_ImageBase$line"
-	 		value="$imagebase" readonly="readonly"
-			class="$baseclass ina rightnc" size="8" maxlength="8">
-	  </td>
-	  <td class="right">
-	    <input type="text"
-			name="SD_RelFrame$line" id="SD_RelFrame$line"
-	 		value="$relframe" readonly="readonly"
-			class="black ina rightnc" size="8" maxlength="8">
-	  </td>
-	  <td class="right">
-	    <input type="text"
-			name="SD_FrameCt$line" id="SD_FrameCt$line"
-	 		value="$framect" readonly="readonly"
-			class="black ina rightnc" size="3" maxlength="4">
-	  </td>
-	  <td class="right">
-	    <input type="text"
-			name="SD_Remarks$line" id="SD_Remarks$line"
-	 		value="$remarks" readonly="readonly"
-			class="black ina leftnc" size="$remarksWidth">
-	  </td>
-	  <td>
-	    <button type="button" class="button"
-			id="Pages$line">
-		  Voir&nbsp;Pages
-	    </button>
-	  </td>
+		<tr id="Row$line">
+		  <td class="right">
+		    <!-- fields to identify existing row in database -->
+		    <input type="hidden"
+				name="Orig_Id$line" id="Orig_Id$line"
+		 		value="$id"> 
+		    <input type="hidden"
+				name="Orig_Div$line" id="Orig_Div$line"
+		 		value="$div">
+		    <input type="hidden"
+				name="Orig_Sched$line" id="Orig_Sched$line"
+		 		value="1">
+		    <!-- permit modifying the ID of the existing row -->
+		    <input type="text"
+				name="SD_Id$line" id="SD_Id$line"
+		 		value="$id" readonly="readonly"
+				class="$idclass ina rightfixed" size="3" maxlength="6">
+		  </td>
+		  <td class="right">
+		    <!-- permit modifying the Div of the existing row -->
+		    <input type="text"
+				name="SD_Div$line" id="SD_Div$line"
+		 		value="$div" readonly="readonly"
+				class="black ina rightfixed" size="3" maxlength="4">
+		  </td>
+		  <td class="right">
+		    <input type="text"
+				name="SD_Name$line" id="SD_Name$line"
+		 		value="$name" readonly="readonly"
+				class="$nameclass ina leftnc" size="$nameWidth"
+				maxlength="255">
+		  </td>
+		  <td class="right">
+		    <input type="text"
+				name="SD_Pages$line" id="SD_Pages$line"
+		 		value="$pages" readonly="readonly"
+				class="black ina rightnc" size="4" maxlength="4">
+		  </td>
+		  <td class="right">
+		    <input type="text"
+				name="SD_Population$line" id="SD_Population$line"
+		 		value="$population" readonly="readonly"
+				class="black ina rightnc" size="7" maxlength="8">
+		  </td>
+		  <td class="right">
+		    <input type="text"
+				name="SD_LacReel$line" id="SD_LacReel$line"
+		 		value="$lacreel" readonly="readonly"
+				class="$lacclass ina left" size="7" maxlength="8">
+		  </td>
+		  <td class="right">
+		    <input type="text"
+				name="SD_LdsReel$line" id="SD_LdsReel$line"
+		 		value="$ldsreel" readonly="readonly"
+				class="$ldsclass ina rightnc" size="8" maxlength="8">
+		  </td>
+		  <td class="right">
+		    <input type="text"
+				name="SD_ImageBase$line" id="SD_ImageBase$line"
+		 		value="$imagebase" readonly="readonly"
+				class="$baseclass ina rightnc" size="8" maxlength="8">
+		  </td>
+		  <td class="right">
+		    <input type="text"
+				name="SD_RelFrame$line" id="SD_RelFrame$line"
+		 		value="$relframe" readonly="readonly"
+				class="black ina rightnc" size="8" maxlength="8">
+		  </td>
+		  <td class="right">
+		    <input type="text"
+				name="SD_FrameCt$line" id="SD_FrameCt$line"
+		 		value="$framect" readonly="readonly"
+				class="black ina rightnc" size="3" maxlength="4">
+		  </td>
+		  <td class="right">
+		    <input type="text"
+				name="SD_Remarks$line" id="SD_Remarks$line"
+		 		value="$remarks" readonly="readonly"
+				class="black ina leftnc" size="$remarksWidth">
+		  </td>
+		  <td>
+		    <button type="button" class="button"
+				id="Pages$line">
+			  Voir&nbsp;Pages
+		    </button>
+		  </td>
     <!-- complete the current row and set up for the next -->
-	</tr>
+		</tr>
       </tbody>
       <tfoot> <!--- Put out the column headers -->
-	<tr id="ftrRow">
-	  <th class="colhead" id="SD_IdHead">
-	    ID
-	  </th>
-	  <th class="colhead" id="SD_DivHead">
-	    Div
-	  </th>
-	  <th class="colhead" id="SD_NameHead">
-	    Nom
-	  </th>
-	  <th class="colhead" id="SD_PagesHead">
-	    Pages
-	  </th>
-	  <th class="colhead" id="SD_PopulationHead">
-	    Population
-	  </th>
-	  <th class="colhead" id="SD_LacReelHead">
-	    Bobine LAC
-	  </th>
-	  <th class="colhead" id="SD_LdsReelHead">
-	    Bobine LDS
-	  </th>
-	  <th class="colhead" id="SD_ImageBaseHead">
-	    Base de l'Image
-	  </th>
-	  <th class="colhead" id="SD_RelFrameHead">
-	    No. de l'Image
-	  </th>
-	  <th class="colhead" id="SD_FrameCtHead">
-	    Compte des Images
-	  </th>
-	  <th class="colhead" id="SD_RemarksHead">
-	    Remarques
-	  </th>
-	  <th class="colhead">
-	    Actions
-	  </th>
-	</tr>
+		<tr id="ftrRow">
+		  <th class="colhead" id="SD_IdHead">
+		    ID
+		  </th>
+		  <th class="colhead" id="SD_DivHead">
+		    Div
+		  </th>
+		  <th class="colhead" id="SD_NameHead">
+		    Nom
+		  </th>
+		  <th class="colhead" id="SD_PagesHead">
+		    Pages
+		  </th>
+		  <th class="colhead" id="SD_PopulationHead">
+		    Population
+		  </th>
+		  <th class="colhead" id="SD_LacReelHead">
+		    Bobine LAC
+		  </th>
+		  <th class="colhead" id="SD_LdsReelHead">
+		    Bobine LDS
+		  </th>
+		  <th class="colhead" id="SD_ImageBaseHead">
+		    Base de l'Image
+		  </th>
+		  <th class="colhead" id="SD_RelFrameHead">
+		    No. de l'Image
+		  </th>
+		  <th class="colhead" id="SD_FrameCtHead">
+		    Compte des Images
+		  </th>
+		  <th class="colhead" id="SD_RemarksHead">
+		    Remarques
+		  </th>
+		  <th class="colhead">
+		    Actions
+		  </th>
+		</tr>
       </tfoot>
     </table>
   </form>
   <!--- Put out a line with links to previous and next section of table -->
-  <div class="center" id="linkFtr">
-    <span class="left" id="npPrevBack">
+  <div class="center" id="botBrowse">
+    <span class="left" id="botPrev">
       <a href="/database/SubDistForm.php$npPrev">&lt;---</a>
     </span>
-    <span class="right" id="npNextBack">
+    <span class="right" id="botNext">
       <a href="/database/SubDistForm.php$npNext">---&gt;</a>
     </span>
     $CENSUSYEAR Recensement de
-	$COUNTRYNAME
+		$COUNTRYNAME
     $DNAME ($PROVINCE) ($DISTID)
     <div style="clear: both;"></div>
   </div>
@@ -294,23 +294,23 @@ This is a decimal number.
 The first page number in the schedule of the living or population schedule.
 This is a decimal number.
 <p>In most cases this is 1.
-	However in the 1851 and 1861 censuses the pages were not 
-	consistently numbered by the enumerators, and the pages were 
-	subsequently numbered sequentially through the entire sub-district
-	when the original documents were microfilmed (and the originals
-	destroyed!).
+		However in the 1851 and 1861 censuses the pages were not 
+		consistently numbered by the enumerators, and the pages were 
+		subsequently numbered sequentially through the entire sub-district
+		when the original documents were microfilmed (and the originals
+		destroyed!).
 </p>
 </div>
 <div class="balloon" id="HelpSD_ByPage">
 <p>The page increment within the division.  In a few cases when the
-	1851 and 1861 census pages were numbered, during the microfilming
-	process, the technician incremented the page number twice for
-	each leaf of the schedule of the living because information about
-	the individuals was recorded on both the <i>recto</i> and the 
-	</i>verso</i> of
-	each leaf.  In this case the application has to know that only the
-	odd page numbers are used to identify the page[s] containing
-	information on an individual.
+		1851 and 1861 census pages were numbered, during the microfilming
+		process, the technician incremented the page number twice for
+		each leaf of the schedule of the living because information about
+		the individuals was recorded on both the <i>recto</i> and the 
+		</i>verso</i> of
+		each leaf.  In this case the application has to know that only the
+		odd page numbers are used to identify the page[s] containing
+		information on an individual.
 </div>
 <div class="balloon" id="HelpSD_Population">
 <p>

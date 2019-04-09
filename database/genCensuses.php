@@ -5,8 +5,8 @@ use \Exception;
 /************************************************************************
  *  genCensuses.php														*
  *																		*
- *  Display a web page containing details of an particular Location		*
- *  from the Legacy database.											*
+ *  Display a web page containing information on Censuses for a country *
+ *  recorded in the database.											*
  *																		*
  *  History:															*
  *		2010/08/23		use new layout									*
@@ -60,6 +60,7 @@ use \Exception;
  *		2017/10/16		use class CensusSet								*
  *		2017/12/01		get statistics more efficiently					*
  *		2018/01/04		remove Template from template file names		*
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
  *  Copyright 2018 &copy; James A. Cobban								*
  ***********************************************************************/
@@ -104,50 +105,43 @@ foreach ($_GET as $key => $value)
 }			// foreach parameter
 
 // initialize template
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$languageObj	= new Language(array('code' => $lang));
-$template->set('LANGUAGE', $languageObj->get('name'));
 if (canUser('edit'))
-	$action		= 'Update';
+	$action		    = 'Update';
 else
-	$action		= 'Display';
-$includeSub		= "genCensuses$action$cc$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{			// try without language
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub		= "genCensuses$action{$cc}en.html";
-	if (!file_exists($tempBase . $includeSub))
-    {
-	    $includeSub	= 'genCensusesen.html';	// country not supported
-	}
-}		        	// try without language
-$template->includeSub($tempBase. $includeSub,
-                      'MAIN');
+	$action		    = 'Display';
+$tempBase		    = $document_root . '/templates/';
+$baseName		    = "genCensuses$action{$cc}en.html";
+if (file_exists($tempBase . $baseName))
+    $includeSub		= "genCensuses$action$cc$lang.html";
+else
+    $includeSub		= "genCensuses{$action}__$lang.html";
+$template		= new FtTemplate($includeSub);
 
 // initialize substitution values
-$countryNameObj	= new CountryName(array('cc' => $cc, 'lang' => $lang));
-$countryName	= $countryNameObj->getName();
-$article		= $countryNameObj->get('article');
-$possessive		= $countryNameObj->get('possessive');
-$update		    = canUser('edit');
+$languageObj		= new Language(array('code' => $lang));
+$template->set('LANGUAGE', $languageObj->get('name'));
+$countryNameObj		= new CountryName(array('cc' => $cc, 'lang' => $lang));
+$countryName		= $countryNameObj->getName();
+$article			= $countryNameObj->get('article');
+$possessive			= $countryNameObj->get('possessive');
+$update		    	= canUser('edit');
 
 // get statistics
-$cenpop		    = array();
-$cendone		= array();
-$getParms		= array('countrycode'	=> $cc,
+$cenpop		    	= array();
+$cendone			= array();
+$getParms			= array('countrycode'	=> $cc,
 							'collective'	=> 0);
-$censuses		= new CensusSet($getParms);
-$query	= "SELECT D_Census, SUM(D_Transcribed) AS transcribed, SUM(D_Population) AS Population FROM Districts GROUP BY D_Census ORDER BY RIGHT(D_Census,4), LEFT(D_Census,2)";
+$censuses			= new CensusSet($getParms);
+$query		        = "SELECT D_Census, SUM(D_Transcribed) AS transcribed, SUM(D_Population) AS Population " .
+                    "FROM Districts LEFT JOIN Censuses ON CensusId=D_Census " .
+                        "WHERE LEFT(CensusId,2)=:cc OR PartOf=:cc " .
+                        "GROUP BY D_Census " .
+                        "ORDER BY RIGHT(D_Census,4), LEFT(D_Census,2)";
 
-$stmt	= $connection->query($query);
-if ($stmt)
+$stmt	            = $connection->prepare($query);
+$sqlParms           = array('cc' => $cc);
+$queryText          = debugPrepQuery($query, $sqlParms);
+if ($stmt->execute($sqlParms))
 {  		// success
     if ($debug)
 		$warn	.= "<p>genCensuses.php: " . __LINE__ . " $query</p>\n";
@@ -169,8 +163,8 @@ if ($stmt)
 }		// loop through each census
 else
 {
-    $msg	.= "query='$query': message=" .
-					print_r($connection->errorInfo(), true) . ". ";
+    $msg	.= "query='$queryText': message=" .
+					print_r($stmt->errorInfo(), true) . ". ";
 }		// error on request
 
 $title		= $countryName . ": Censuses";

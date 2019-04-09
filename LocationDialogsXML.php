@@ -15,8 +15,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/common.inc';
-
+$document_root	    = $_SERVER['DOCUMENT_ROOT'];
 $lang		        = 'en';
 foreach ($_GET as $key => $value)
 {

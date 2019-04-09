@@ -3,16 +3,16 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  testCountyMarriageLinks.html					*
- *									*
- *  Prompt the user to enter parameters for a search of the Ontario	*
- *  County Marriage Report database.					*
- *									*
- *  History:								*
- *	2016/01/30	created						*
- *	2017/11/19	use CitationSet in place of getCitations	*
- *									*
- *  Copyright &copy; 2017 James A. Cobban				*
+ *  testCountyMarriageLinks.html										*
+ *																		*
+ *  Prompt the user to enter parameters for a search of the Ontario		*
+ *  County Marriage Report database.									*
+ *																		*
+ *  History:															*
+ *		2016/01/30		created											*
+ *		2017/11/19		use CitationSet in place of getCitations		*
+ *																		*
+ *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/CitationSet.inc';
@@ -84,10 +84,6 @@ The registration number within the year.
 </div>
 <div class='balloon' id='HelpDelete'>
 Clicking on this button performs the delete.
-</div>
-<div class='balloon' id='HelprightTop'>
-Click on this button to signon to access extended features of the web-site
-or to manage your account with the web-site.
 </div>
 <div class='popup' id='loading'>
 Loading...

@@ -77,8 +77,9 @@ use \Exception;
  *						the client's request once signed on				*
  *		2018/05/28		include specific CSS							*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/User.inc";
 require_once __NAMESPACE__ . '/Template.inc';
@@ -248,7 +249,7 @@ if (strlen($msg) == 0)
 		    // browser so the request to back-up to the previous
 		    // page must be performed by Javascript
 		    $tempBase	= $document_root . '/templates/';
-		    $template	= new Template($tempBase . 'repost.html');
+		    $template	= new Template($tempBase . 'reposten.html');
 		    $template->set('TITLE', 'Repost User Command after Signon');
 		    $template->display();
 		    exit;
@@ -274,21 +275,8 @@ if (strlen($msg) == 0)
 }					// parameters syntactically OK
 
 $tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}dialog$lang.html");
-$includeSub		= "Signon$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub     = 'Signonen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-			          'MAIN');
+$template		= new FtTemplate("Signon$lang.html", true);
+
 $template->set('REDIRECTTO',	$redirectto);
 $template->updateTag('otherStylesheets',
     	       		array('filename'	=> '/Signon'));

@@ -563,9 +563,5 @@ function checkRow($row)
 	Go to Page <?php print $page + 1; ?>&nbsp;
     </p>
   </div>
-<div class='balloon' id='HelprightTop'>
-Click on this button to signon to access extended features of the web-site
-or to manage your account with the web-site.
-</div>
 </body>
 </html>

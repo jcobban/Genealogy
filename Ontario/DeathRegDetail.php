@@ -164,775 +164,789 @@ require_once __NAMESPACE__ . '/CitationSet.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . "/common.inc";
 
-    //	data base column name prefix
-    $dbprefix	= "d_";
+//	data base column name prefix
+$dbprefix	= "d_";
 
-    // action depends upon whether the user is authorized to
-    // update the database
-    if(canUser('edit'))
-    {
-		$title		= 'Ontario Death Registration Detail Update';
-		$update		= true;
-		$action		= 'Update';
-		$readonly	= '';
-		$txtleftclass	= 'left';
-		$txtleftclassnc	= 'leftnc';
-		$txtrightclass	= 'right';
-		$formaction	= 'DeathRegUpdate.php';
-    }
-    else
-    {
-		$title		= 'Ontario Death Registration Detail Query';
-		$update		= false;
-		$action		= 'Display';
-		$readonly	= " readonly='readonly'";
-		$txtleftclass	= 'ina left';
-		$txtleftclassnc	= 'ina leftnc';
-		$txtrightclass	= 'ina rightnc';
-		$formaction	= 'donothing.php';
-    }
+// action depends upon whether the user is authorized to
+// update the database
+if(canUser('edit'))
+{
+    $update				= true;
+    $action				= 'Update';
+}
+else
+{
+    $update				= false;
+    $action				= 'Display';
+}
 
-    // validate parameters
-    $regYear		= '';
-    $regNum		= '';
-    $volume		= '';
-    $page		= '';
-    $item		= '';
-    $cc			= 'CA';
-    $countryName	= 'Canada';
-    $domain		= 'CAON';	// default domain
-    $domainName		= 'Ontario';	// default domain name
-    $lang		= 'en';
-    $imatches		= null;
+// validate parameters
+$regYear				= '';
+$regNum		   	    	= '';
+$volume		   	    	= '';
+$page	    			= '';
+$item	    			= '';
+$cc		    			= 'CA';
+$countryName			= 'Canada';
+$domain	    			= 'CAON';	    // default domain
+$domainName				= 'Ontario';	// default domain name
+$showImage              = false;
+$lang	    			= 'en';
+$imatches			    = null;
 
-    foreach($_GET as $key => $value)
-    {			// loop through all input parameters
-		switch(strtolower($key))
-		{		// process specific named parameters
-		    case 'regyear':
-		    {
-				$regYear	= $value;
-				if (!preg_match("/^([0-9]{4})$/", $regYear) ||
-				    ($regYear < 1860) || ($regYear > 2000))
-				{
-				    $msg	.= "Registration Year $regYear must be a number between 1869 and 2000. ";
-				}
-				break;
-		    }		// RegYear passed
+$parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+foreach($_GET as $key => $value)
+{			// loop through all input parameters
+    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+    switch(strtolower($key))
+    {		// process specific named parameters
+        case 'regyear':
+        {
+            $regYear	= $value;
+            if (!preg_match("/^([0-9]{4})$/", $regYear) ||
+                ($regYear < 1860) || ($regYear > 2000))
+            {
+                $msg	.= "Registration Year $regYear must be a number between 1869 and 2000. ";
+            }
+            break;
+        }		// RegYear passed
 
-		    case 'regnum':
-		    {
-				$regNum	= $value;
-				if (!preg_match("/^([0-9]{2,7})$/", $regNum))
-				{
-				    $msg	.= "Registration Number $regNum must be a number. ";
-				}
-				break;
-		    }		// RegNum passed
+        case 'regnum':
+        {
+            $regNum	= $value;
+            if (!preg_match("/^([0-9]{2,7})$/", $regNum))
+            {
+                $msg	.= "Registration Number $regNum must be a number. ";
+            }
+            break;
+        }		// RegNum passed
 
-		    case 'originalvolume':
-		    {
-				$volume		= $value;
-				$numVolume	= preg_replace('/[^0-9]/', '', $value);
-				break;
-		    }		// RegNum passed
+        case 'originalvolume':
+        {
+            $volume		= $value;
+            $numVolume	= preg_replace('/[^0-9]/', '', $value);
+            break;
+        }		// RegNum passed
 
-		    case 'originalpage':
-		    {
-				if (ctype_digit($value))
-				    $page	= $value;
-				else
-				    $msg	.= "Page Number $value must be a number. ";
-				break;
-		    }		// RegNum passed
+        case 'originalpage':
+        {
+            if (ctype_digit($value))
+                $page	= $value;
+            else
+                $msg	.= "Page Number $value must be a number. ";
+            break;
+        }		// RegNum passed
 
-		    case 'originalitem':
-		    {
-				if (ctype_digit($value))
-				    $item	= $value;
-				else
-				    $msg	.= "Item Number $value must be a number. ";
-				break;
-		    }		// RegNum passed
+        case 'originalitem':
+        {
+            if (ctype_digit($value))
+                $item	= $value;
+            else
+                $msg	.= "Item Number $value must be a number. ";
+            break;
+        }		// RegNum passed
 
-		    case 'domain':
-		    case 'regdomain':
-		    {
-				$domainObj	= new Domain(array('domain'	=> $value,
-									   'language'	=> 'en'));
-				if ($domainObj->isExisting())
-				{
-				    $domain		= $value;
-				    $cc			= substr($domain, 0, 2);
-				    $countryObj		= new Country(array('code' => $cc));
-				    $countryName	= $countryObj->getName();
-				    $domainName		= $domainObj->get('name');
-				}
-				else
-				{
-				    $msg	.= "Domain '$value' is not a supported " .
-							"two character country code followed by ".
-							"a state or province code. ";
-				    $domainName	= 'Domain : ' . $value;
-				}
-				break;
-		    }		// RegDomain
+        case 'domain':
+        case 'regdomain':
+        {
+            $domainObj	= new Domain(array('domain'	=> $value,
+                				   'language'	=> 'en'));
+            if ($domainObj->isExisting())
+            {
+                $domain		    = $value;
+                $cc			    = substr($domain, 0, 2);
+                $countryObj		= new Country(array('code' => $cc));
+                $countryName	= $countryObj->getName();
+                $domainName		= $domainObj->get('name');
+            }
+            else
+            {
+                $msg	.= "Domain '$value' is not a supported " .
+                		"two character country code followed by ".
+                		"a state or province code. ";
+                $domainName	= 'Domain : ' . $value;
+            }
+            break;
+        }		// RegDomain
 
-		    case 'showimage':
-		    {
-				break;
-		    }		// handled by JavaScript
+        case 'showimage':
+        {
+            $showImage          = strtolower(substr($value,0,1)) == 'y';
+            break;
+        }		// handled by JavaScript
 
-		    case 'lang':
-		    {		// language specification
-				if (strlen($value) == 2)
-				    $lang		= strtolower($value);
-				break;
-		    }		// language specification
+        case 'lang':
+        {		// language specification
+            if (strlen($value) >= 2)
+                $lang		    = strtolower(substr($value,0,2));
+            break;
+        }		// language specification
 
-		    case 'debug':
-		    {		// debug handled by common code
-				break;
-		    }		// debug handled by common code
+        case 'debug':
+        {		// debug handled by common code
+            break;
+        }		// debug handled by common code
 
-		    default:
-		    {		// any other paramters
-				$warn	.= "Unexpected parameter $key='$value'. ";
-				break;
-		    }		// any other paramters
-		}		// process specific named parameters
-    }			// loop through all input parameters
+        default:
+        {		// any other paramters
+            $warn	.= "Unexpected parameter $key='$value'. ";
+            break;
+        }		// any other paramters
+    }		// process specific named parameters
+}			// loop through all input parameters
+if ($debug)
+    $warn       .= $parmsText . "</table>\n";
 
-    if ($regYear == '')
-    {
-		$msg		.= "RegYear omitted. ";
-    }
+// create Template
+$template		        = new FtTemplate("DeathRegDetail$action$lang.html");
+$trtemplate             = $template->getTranslate();
 
-    if ($regNum == '' && $volume == '')
-    {
-		$msg		.= "RegNum omitted. ";
-    }
-    else
-    if ($volume != '' && $page != '' && $item != '')
-    {
-		$regNum		= $numVolume .
-						  str_pad($page, 4, '0', STR_PAD_LEFT) .
-						  str_pad($item, 2, '0', STR_PAD_LEFT);
-    }
-    $paddedRegNum	= str_pad($regNum,7,"0",STR_PAD_LEFT);
+if ($regYear == '')
+{
+    $msg		        .= "RegYear omitted. ";
+}
 
-    // if no error messages Issue the query
-    if (strlen($msg) == 0)
-    {		// no errors
-		// get the death registration object
-		$death		= new Death($domain, $regYear, $regNum);
+if ($regNum == '' && $volume == '')
+{
+    $msg		        .= "RegNum omitted. ";
+}
+else
+if ($volume != '' && $page != '' && $item != '')
+{
+    $regNum		        = $numVolume .  str_pad($page, 4, '0', STR_PAD_LEFT) .
+                                	    str_pad($item, 2, '0', STR_PAD_LEFT);
+}
+$paddedRegNum	        = str_pad($regNum,7,"0",STR_PAD_LEFT);
 
-		// copy contents into working variables
-		$surname	= $death->get('d_surname');
-		$idir		= $death->get('d_idir');
-		$givenNames	= $death->get('d_givennames');
-		$birthDate	= $death->get('d_birthdate');
-		$sex		= $death->get('d_sex');
-		if ($sex == 'M')
-		{
-		    $gender	= 0;
-		}
-		else
-		if ($sex == 'F')
-		{
-		    $gender	= 1;
-		}
-		else
-		{
-		    $gender	= 2;
-		}
+// if no error messages Issue the query
+if (strlen($msg) == 0)
+{		// no errors
+    // get the death registration object
+    $death      		= new Death($domain, $regYear, $regNum);
 
-		$person		= null;
-
-		// if this registration is not already linked to
-		// look for individuals who match
-		if ($idir == 0 && $update)
-		{			// updating
-		    // check for existing citations to this registration
-		    $citparms	=
-				    array('idsr'		=> 98,
-						  'type'		=> Citation::STYPE_DEATH,
-						  'srcdetail'		=> "^$regYear-0*$regNum");
-		    $citations	= new CitationSet($citparms);
-
-		    if ($citations->count() > 0)
-		    {		// citation to death in old location
-				$citrow	= $citations->rewind();
-				$idir	= $citrow->get('idime');
-		    }		// citation to death in old location
-		    else
-		    {		// check for event citation
-				$citparms	=
-						array('idsr'	=> 98,
-						      'type'	=> Citation::STYPE_EVENT,
-						      'srcdetail'	=> "^$regYear-0*$regNum");
-				$citations	= new CitationSet($citparms);
-				foreach($citations as $idsx => $citation)
-				{
-				    $ider		= $citation->get('idime');
-				    try {
-				    $event		= new Event($ider);
-				    $idet		= $event->getIdet();
-				    if ($idet == Event::ET_DEATH)
-				    {
-						$idir		= $event->getIdir();
-						break;
-				    }
-				    } catch(Exception $e)
-				    {		// bad citation
-						$citation->delete(false);
-				    }		// bad citation
-				}
-		    }			// check for event citation
-
-		    if ($idir == 0 && strlen($surname) > 0 && strlen($givenNames) > 0)
-		    {			// no existing citation
-				if ($debug)
-				    $warn	.= "<p>Search for match on $surname, $givenNames</p>\n";
-				// look for individuals in the family tree whose names are
-				// rough matches to the name on the death registration
-				// who have the same sex, and who were born within 2 years
-				// of the deceased.
-
-				// obtain the birth year for the death registration
-				$rxResult		= preg_match('/[0-9]{4}/',
-									 $birthDate,
-									 $matches);
-				if ($rxResult > 0)
-				{		// explicit birth date includes year of birth
-				    $birthYear	= intval($matches[0]);
-				}		// explicit birth date includes year of birth
-				else
-				{		// need to calculate birth year from age
-				    // get the year of death
-				    $date		= $death->get('d_date');
-				    $rxResult		= preg_match('/[0-9]{4}/',
-									     $date,
-									     $matches);
-				    if ($rxResult > 0)
-				    {	// date of death includes a year
-						$deathYear	= intval($matches[0]);
-				    }	// date of death includes a year
-				    else
-				    {	// assume died in year death was registered
-						$deathYear	= $regYear;
-				    }	// assume died in year death was registered
-
-				    // check for all numeric age
-				    $age		= trim($death->get('d_age'));
-				    $rxResult		= preg_match('/([0-9]+)(y|\s|$)/',
-									     $age,
-									     $matches);
-				    if ($rxResult == 1)
-				    {	// age contains a number of years
-						$birthYear	= $deathYear - intval($matches[1]);
-				    }	// age contains a number of years
-				    else
-				    {	// no number of years in age
-						$birthYear	= $deathYear;
-				    }	// no number of years in age
-				}		// need to calculate birth year
-				// look 2 years on either side of the year
-				$birthrange	= array(($birthYear - 2) * 10000,
-								($birthYear + 2) * 10000);
-				// search for a match on any of the parts of the
-				// given name
-				$gnameList	= explode(' ', $givenNames);
-
-				// quote the surname value
-				$getParms	= array('loose'		=> true,
-								'surname'	=> $surname,
-								'givenname'	=> $gnameList,
-								'gender'	=> $gender,
-								'birthsd'	=> $birthrange,
-								'incmarried'	=> true,
-								'order'		=> "tblNX.Surname, tblNX.GivenName, tblIR.BirthSD");
-				$imatches	= new PersonSet($getParms);
-		    }			// record is initialized with name
-		    else
-		    if ($idir > 0 && strlen($surname) == 0 && strlen($givenNames)== 0)
-		    {			// record is uninitialized
-
-				if ($idir > 0)
-				{		// found a citation
-				    try {
-						$person		= new Person(array('idir' => $idir));
-						$linkedName	= $person->getName(Person::NAME_INCLUDE_DATES);
-				    } catch (Exception $e) {
-						$msg	.= "Exception: " .  $e->getMessage();
-				    }
-				}		// found a citation
-		    }			// record is uninitialized
-		}			// updating
-
-		// if we have identified a matching individual in the family tree
-		// and the record is not yet initialized
-		if ($person &&
-		    strlen($surname) == 0 &&
-		    strlen($givenNames) == 0)
-		{			// initialize from family tree
-		    if ($debug)
-				$warn	.= "<p>Initialize death record from individual</p>\n";
-		    $surname		= $person->get('surname');
-		    $givenNames		= $person->get('givenname');
-		    $gender		= $person->get('gender');
-		    if ($gender == 0)
-		    {
-				$sex		= 'M';
-				$genderClass	= 'male';
-		    }
-		    else
-		    if ($gender == 1)
-		    {
-				$sex		= 'F';
-				$genderClass	= 'female';
-		    }
-		    else
-		    {
-				$sex		= '?';
-				$genderClass	= 'unknown';
-		    }
-		    $birthEvent		= $person->getBirthEvent(true);
-		    $birthDate		= $birthEvent->getDate();
-		    $birthSd		= $birthEvent->get('eventsd');
-		    $birthYear		= floor($birthSd / 10000);
-		    $age		= $regYear - $birthYear;
-		    $birthLocation	= $birthEvent->getLocation();
-		    $deathEvent		= $person->getDeathEvent(true);
-		    $deathDate		= $deathEvent->getDate();
-		    $deathLocation	= $deathEvent->getLocation();
-		    $prefParents	= $person->getPreferredParents();
-		    $death->set('surname',
-						$surname);
-		    $death->set('givennames',
-						$givenNames);
-		    $death->set('sex',
-						$sex);
-		    $death->set('place',
-						$deathLocation->getName());
-		    $death->set('date',
-						$deathDate);
-		    $death->set('birthplace',
-						$birthLocation->getName());
-		    $death->set('birthdate',
-						$birthDate);
-		    $death->set('age',
-						$age);
-		    $death->set('cause',
-						$person->get('deathcause'));
-		    $death->set('idir',
-						$idir);
-		    if ($prefParents)
-		    {			// have preferred parents
-				$father		= $prefParents->getHusbName();
-				$death->set('d_fathername', $father);
-				$mother		= $prefParents->getWifeName();
-				$death->set('d_mothername', $mother);
-		    }			// have preferred parents
-		}			// initialize from family tree
-
-		// set $gender to the code in tblIR
-		// set $genderClass to the CSS class
-		$sex			= $death->get('d_sex');
-		if ($sex == 'M')
-		{			// male
-		    $gender		= 0;
-		    $genderClass	= 'male';
-		}			// male
-		else
-		if ($sex == 'F')
-		{			// female
-		    $gender		= 1;
-		    $genderClass	= 'female';
-		}			// female
-		else
-		{			// unknown
-		    $gender		= 2;
-		    $genderClass	= 'unknown';
-		}			// unknown
-
-		// get information from the existing link
-		if ($idir > 0)
-		{			// existing link
-		    if ($debug)
-				$warn		.= "<p>Existing link IDIR=$idir</p>\n";
-		    try {
-				if (is_null($person))
-				    $person	= new Person(array('idir' => $idir));
-				$linkedName  = $person->getName(Person::NAME_INCLUDE_DATES);
-				$maidenName	= $person->getSurname();
-				if ($maidenName != $surname)
-				{		// $surname is not maiden name
-				    $linkedName	= str_replace($maidenName,
-								      "($maidenName) $surname",
-								      $linkedName);
-				}		// $surname is not maiden name
-		    } catch (Exception $e)
-		    {
-				$linkedName	= $givenNames . ' ' . $surname .
-							  ' (not found in database)';
-		    }
-		}			// existing link
-
-		// copy contents into working variables
-		// some of the fields may have been changed by the cross-ref code
-		$surname	= $death->get('d_surname');
-		$givenNames	= $death->get('d_givennames');
-		$date		= $death->get('d_date');
-		$age		= $death->get('d_age');
-		$birthDate	= $death->get('d_birthdate');
-
-		$subject	= "$domainName Death Registration: number: " .
-						  $regYear . '-' . $regNum . ', ' .
-						  $givenNames . ' ' . $surname;
-
-		$regCounty	= $death->get('d_regcounty');
-		$countyObj	= new County($domain, $regCounty);
-		$countyName	= $countyObj->get('name');
-		$regTownship	= $death->get('d_regtownship');
-    }			// no errors, perform query
-    else
-    {			// error detected
-		$subject	= "$domainName Death Registration: number: " .
-						  $regYear . '-' . $regNum ;
-		$regCounty	    = '';
-		$countyName	    = '';
-		$regTownship	= 'undefined';
-    }			// error detected
-
-    $tempBase		= $document_root . '/templates/';
-    $template		= new FtTemplate("${tempBase}page$lang.html");
-    $includeSub		= "DeathRegDetail$action$lang.html";
-    if (!file_exists($tempBase . $includeSub))
-    {
-		$language	    = new Language(array('code'	=> $lang));
-	    $langName	    = $language->get('name');
-	    $nativeName	    = $language->get('nativename');
-        $sorry          = $language->getSorry();
-        $warn           .= str_replace(array('$langName','$nativeName'),
-                                       array($langName, $nativeName),
-                                       $sorry);
-		$includeSub	= 'DeathRegDetail' . $action . 'en' . '.html';
-    }
-    $template->includeSub($tempBase . $includeSub, 'MAIN');
-    if (file_exists($tempBase . "Trantab$lang.html"))
-        $trtemplate = new Template("${tempBase}Trantab$lang.html");
-    else
-        $trtemplate = new Template("${tempBase}Trantaben.html");
-
-	// internationalization support
-	$monthsTag		    = $trtemplate->getElementById('Months');
-	if ($monthsTag)
-	{
-		$months	    	= array();
-		foreach($monthsTag->childNodes() as $span)
-		    $months[]	= trim($span->innerHTML());
-	}
-	$lmonthsTag		    = $trtemplate->getElementById('LMonths');
-	if ($lmonthsTag)
-	{
-		$lmonths		= array();
-		foreach($lmonthsTag->childNodes() as $span)
-		    $lmonths[]	= trim($span->innerHTML());
-    }
-
-    $template->set('CONTACTTABLE',	'Counties');
-    $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
-    $template->set('DOMAIN',		$domain);
-    $template->set('DOMAINNAME',	$domainName);
-    $template->set('CC',		    $cc);
-    $template->set('COUNTRYNAME',	$countryName);
-    $template->set('LANG',		    $lang);
-    $template->updateTag('otherStylesheets',
-				   		array('filename'	=> '/Ontario/DeathRegDetail'));
-
-    $template->set('REGYEAR',		$regYear);
-    $template->set('REGNUM',		$regNum);
-    $template->set('PADDEDREGNUM',	$paddedRegNum);
-    $template->set('REGCOUNTY',		$death->get('d_regcounty'));
-    $template->set('COUNTYNAME',	$countyName);
-    $template->set('REGTOWNSHIP',
-				   $death->get('d_regtownship'));
-    $template->set('MSVOL',
-				   $death->get('d_msvol'));
-    $template->set('SURNAME',
-				   $death->get('d_surname'));
-    $template->set('SURNAMESOUNDEX',
-				   $death->get('d_surnamesoundex'));
-    $template->set('GIVENNAMES',
-				   $death->get('d_givennames'));
+    // copy contents into working variables
+    $surname        	= $death->get('d_surname');
+    $idir	        	= $death->get('d_idir');
+    $givenNames     	= $death->get('d_givennames');
+    $birthDate      	= $death->get('d_birthdate');
+    $sex		        = $death->get('d_sex');
     if ($sex == 'M')
     {
-		$template->updateTag('SexM',
-						     array('selected' => "selected='selected'"));
-		$template->updateTag('SexF',
-						     array('selected' => ' '));
-		$template->updateTag('SexU',
-						     array('selected' => ' '));
+        $gender	        = 0;
     }
     else
     if ($sex == 'F')
     {
-		$template->updateTag('SexF',
-						     array('selected' => "selected='selected'"));
-		$template->updateTag('SexM',
-						     array('selected' => ' '));
-		$template->updateTag('SexU',
-						     array('selected' => ' '));
+        $gender	        = 1;
     }
     else
     {
-		$template->updateTag('SexU',
-						     array('selected' => "selected='selected'"));
-		$template->updateTag('SexM',
-						     array('selected' => ' '));
-		$template->updateTag('SexF',
-						     array('selected' => ' '));
-    }
-    $template->set('PLACE',
-				   $death->get('d_place'));
-    $template->set('DATE',
-				   $death->get('d_date'));
-    $template->set('CALCDATE',
-				   $death->get('d_calcdate'));
-    $template->set('AGE',
-				   $death->get('d_age'));
-    $template->set('BIRTHDATE',
-				   $death->get('d_birthdate'));
-    $template->set('CALCBIRTH',
-				   $death->get('d_calcbirth'));
-    $template->set('OCCUPATION',
-				   $death->get('d_occupation'));
-    $marStat	= $death->get('d_marstat');
-
-    switch(strtoupper($marStat))
-    {
-		case 'S':
-		    $template->updateTag('MarStatS',
-						     array('selected' => "selected='selected'"));
-		    $template->updateTag('MarStatM',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatW',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatD',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatU',
-							 array('selected'	=> ' '));
-		    break;
-
-		case 'M':
-		    $template->updateTag('MarStatS',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatM',
-						     array('selected' => "selected='selected'"));
-		    $template->updateTag('MarStatW',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatD',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatU',
-							 array('selected'	=> ' '));
-		    break;
-
-		case 'E':
-		    $template->updateTag('MarStatS',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatM',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatW',
-						     array('selected' => "selected='selected'"));
-		    $template->updateTag('MarStatD',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatU',
-							 array('selected'	=> ' '));
-		    break;
-
-		case 'D':
-		    $template->updateTag('MarStatS',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatM',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatW',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatD',
-						     array('selected' => "selected='selected'"));
-		    $template->updateTag('MarStatU',
-							 array('selected'	=> ' '));
-		    break;
-
-		case '?':
-		    $template->updateTag('MarStatS',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatM',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatW',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatD',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatU',
-						     array('selected' => "selected='selected'"));
-		    break;
-
-
-		default:
-		    $template->updateTag('MarStatS',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatM',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatW',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatD',
-							 array('selected'	=> ' '));
-		    $template->updateTag('MarStatU',
-							 array('selected'	=> ' '));
-		    break;
-
+        $gender	        = 2;
     }
 
-    $template->set('BIRTHPLACE',
-				   $death->get('d_birthplace'));
-    $template->set('RESPLACE',
-				   $death->get('d_resplace'));
-    $template->set('RESONT',
-				   $death->get('d_resont'));
-    $template->set('RESCAN',
-				   $death->get('d_rescan'));
-    $template->set('CAUSE',
-				   $death->get('d_cause'));
-    $template->set('DURATION',
-				   $death->get('d_duration'));
-    $template->set('PHYS',
-				   $death->get('d_phys'));
-    $template->set('PHYSADDR',
-				   $death->get('d_physaddr'));
-    $template->set('INFORMANT',
-				   $death->get('d_informant'));
-    $template->set('INFREL',
-				   $death->get('d_infrel'));
-    $template->set('INFOCC',
-				   $death->get('d_infocc'));
-    $template->set('INFRES',
-				   $death->get('d_infres'));
-    $template->set('RELIGION',
-				   $death->get('d_religion'));
-    $template->set('FATHERNAME',
-				   $death->get('d_fathername'));
-    $template->set('FATHERBPLCE',
-				   $death->get('d_fatherbplce'));
-    $template->set('MOTHERNAME',
-				   $death->get('d_mothername'));
-    $template->set('MOTHERBPLCE',
-				   $death->get('d_motherbplce'));
-    $template->set('HUSBANDNAME',
-				   $death->get('d_husbandname'));
-    $template->set('REMARKS',
-				   $death->get('d_remarks'));
-    $template->set('BURPLACE',
-				   $death->get('d_burplace'));
-    $template->set('BURDATE',
-				   $death->get('d_burdate'));
-    $template->set('UNDERTKR',
-				   $death->get('d_undertkr'));
-    $template->set('UNDERTKRADDR',
-				   $death->get('d_undertkraddr'));
-    $template->set('REGDATE',
-				   $death->get('d_regdate'));
-    $template->set('REGISTRAR',
-				   $death->get('d_registrar'));
-    $template->set('RECORDEDBY',
-				   $death->get('d_recordedby'));
-    $template->set('IMAGE',
-				   $death->get('d_image'));
-    $template->set('ORIGINALVOLUME',
-				   $death->get('d_originalvolume'));
-    $template->set('ORIGINALPAGE',
-				   $death->get('d_originalpage'));
-    $template->set('ORIGINALITEM',
-				   $death->get('d_originalitem'));
-    if ($debug)
-		$template->set('DEBUG', 'Y');
+    $person		        = null;
+
+    // if this registration is not already linked to
+    // look for individuals who match
+    if ($idir == 0 && $update)
+    {			// updating
+        // check for existing citations to this registration
+        $citparms	        = array('idsr'		=> 98,
+                	                'type'		=> Citation::STYPE_DEATH,
+                	                'srcdetail'	=> "^$regYear-0*$regNum");
+        $citations	        = new CitationSet($citparms);
+
+        if ($citations->count() > 0)
+        {		// citation to death in old location
+            $citrow	        = $citations->rewind();
+            $idir	        = $citrow->get('idime');
+        }		// citation to death in old location
+        else
+        {		// check for event citation
+            $citparms	    = array('idsr'	    => 98,
+                	                'type'	    => Citation::STYPE_EVENT,
+                	                'srcdetail'	=> "^$regYear-0*$regNum");
+            $citations	    = new CitationSet($citparms);
+            foreach($citations as $idsx => $citation)
+            {
+                $ider		= $citation->get('idime');
+                $event		= new Event($ider);
+                if ($event->isExisting())
+                {
+                    $idet		= $event->getIdet();
+                    if ($idet == Event::ET_DEATH)
+                    {
+                    	$idir		= $event->getIdir();
+                    	break;
+                    }
+                }
+                else
+                {		// bad citation
+                	$citation->delete(false);
+                }		// bad citation
+            }
+        }			// check for event citation
+
+        if ($idir == 0 && strlen($surname) > 0 && strlen($givenNames) > 0)
+        {			// no existing citation
+            if ($debug)
+                $warn	.= "<p>Search for match on $surname, $givenNames</p>\n";
+            // look for individuals in the family tree whose names are
+            // rough matches to the name on the death registration
+            // who have the same sex, and who were born within 2 years
+            // of the deceased.
+
+            // obtain the birth year for the death registration
+            $rxResult		    = preg_match('/[0-9]{4}/',
+                		            		 $birthDate,
+                	        		    	 $matches);
+            if ($rxResult > 0)
+            {		// explicit birth date includes year of birth
+                $birthYear	    = intval($matches[0]);
+            }		// explicit birth date includes year of birth
+            else
+            {		// need to calculate birth year from age
+                // get the year of death
+                $date		    = $death->get('d_date');
+                $rxResult		= preg_match('/[0-9]{4}/',
+                		        		     $date,
+                			        	     $matches);
+                if ($rxResult > 0)
+                {	// date of death includes a year
+                	$deathYear	= intval($matches[0]);
+                }	// date of death includes a year
+                else
+                {	// assume died in year death was registered
+                	$deathYear	= $regYear;
+                }	// assume died in year death was registered
+
+                // check for all numeric age
+                $age		    = trim($death->get('d_age'));
+                $rxResult		= preg_match('/([0-9]+)(y|\s|$)/',
+                	        			     $age,
+                			        	     $matches);
+                if ($rxResult == 1)
+                {	// age contains a number of years
+                	$birthYear	= $deathYear - intval($matches[1]);
+                }	// age contains a number of years
+                else
+                {	// no number of years in age
+                	$birthYear	= $deathYear;
+                }	// no number of years in age
+            }		// need to calculate birth year
+            // look 2 years on either side of the year
+            $birthrange	        = array(($birthYear - 2) * 10000,
+                		            	($birthYear + 2) * 10000);
+            // search for a match on any of the parts of the
+            // given name
+            $gnameList	        = explode(' ', $givenNames);
+
+            // quote the surname value
+            $getParms	    = array('loose'		    => true,
+                		        	'surname'	    => $surname,
+                		        	'givenname'	    => $gnameList,
+                		        	'gender'	    => $gender,
+                		        	'birthsd'	    => $birthrange,
+                		        	'incmarried'	=> true,
+                		        	'order'		    => "tblNX.Surname, tblNX.GivenName, tblIR.BirthSD");
+            $imatches	= new PersonSet($getParms);
+            if ($debug)
+                $warn   .= "<p>DeathRegDetail.php: " . __LINE__ . 
+                            " got imatches</p>\n";
+        }			// record is initialized with name
+        else
+        if ($idir > 0 && strlen($surname) == 0 && strlen($givenNames)== 0)
+        {			// record is uninitialized
+
+            if ($idir > 0)
+            {		// found a citation
+                try {
+                	$person		= new Person(array('idir' => $idir));
+                	$linkedName	= $person->getName(Person::NAME_INCLUDE_DATES);
+                } catch (Exception $e) {
+                	$msg	.= "Exception: " .  $e->getMessage();
+                }
+            }		// found a citation
+        }			// record is uninitialized
+    }			    // updating
+
+    // if we have identified a matching individual in the family tree
+    // and the record is not yet initialized
+    if ($person &&
+        strlen($surname) == 0 &&
+        strlen($givenNames) == 0)
+    {			// initialize from family tree
+        if ($debug)
+            $warn	.= "<p>Initialize death record from individual</p>\n";
+        $surname		= $person->get('surname');
+        $givenNames		= $person->get('givenname');
+        $gender		= $person->get('gender');
+        if ($gender == 0)
+        {
+            $sex		= 'M';
+            $genderClass	= 'male';
+        }
+        else
+        if ($gender == 1)
+        {
+            $sex		= 'F';
+            $genderClass	= 'female';
+        }
+        else
+        {
+            $sex		= '?';
+            $genderClass	= 'unknown';
+        }
+        $birthEvent		= $person->getBirthEvent(true);
+        $birthDate		= $birthEvent->getDate();
+        $birthSd		= $birthEvent->get('eventsd');
+        $birthYear		= floor($birthSd / 10000);
+        $age		    = $regYear - $birthYear;
+        $birthLocation	= $birthEvent->getLocation();
+        $deathEvent		= $person->getDeathEvent(true);
+        $deathDate		= $deathEvent->getDate();
+        $deathLocation	= $deathEvent->getLocation();
+        $prefParents	= $person->getPreferredParents();
+        $death->set('surname',
+                	$surname);
+        $death->set('givennames',
+                	$givenNames);
+        $death->set('sex',
+                	$sex);
+        $death->set('place',
+                	$deathLocation->getName());
+        $death->set('date',
+                	$deathDate);
+        $death->set('birthplace',
+                	$birthLocation->getName());
+        $death->set('birthdate',
+                	$birthDate);
+        $death->set('age',
+                	$age);
+        $death->set('cause',
+                	$person->get('deathcause'));
+        $death->set('idir',
+                	$idir);
+        if ($prefParents)
+        {			// have preferred parents
+            $father		= $prefParents->getHusbName();
+            $death->set('d_fathername', $father);
+            $mother		= $prefParents->getWifeName();
+            $death->set('d_mothername', $mother);
+        }			// have preferred parents
+    }			// initialize from family tree
+
+    // set $gender to the code in tblIR
+    // set $genderClass to the CSS class
+    $sex			= $death->get('d_sex');
+    if ($sex == 'M')
+    {			// male
+        $gender		= 0;
+        $genderClass	= 'male';
+    }			// male
     else
-		$template->set('DEBUG', 'N');
+    if ($sex == 'F')
+    {			// female
+        $gender		= 1;
+        $genderClass	= 'female';
+    }			// female
+    else
+    {			// unknown
+        $gender		= 2;
+        $genderClass	= 'unknown';
+    }			// unknown
 
+    // get information from the existing link
     if ($idir > 0)
-    {			// link to family tree database
-		$template->updateTag('LinkRowSet',
-						     array('idir'	    => $idir,
-							       'genderClass'=> $genderClass,
-				 		           'linkedName'	=> $linkedName));
-		$template->updateTag('LinkRowMatch',	null);
-    }			// link to family tree database
-    else
-    if ($imatches && $imatches->count() > 0)
-    {			// matched to some individuals in database
-		$template->updateTag('LinkRowSet',	null);
-		$matches	= array();
-		foreach($imatches as $iidir => $person)
-		{		// loop through results
-		    $isex			= $person->get('gender');
-		    $newMatch			= array();
-		    $newMatch['idir']		= $iidir;
-		    if ($isex == Person::MALE)
-		    {
-				$newMatch['sexclass']	= 'male';
-				$childrole		        = 'son';
-				$spouserole 		    = 'husband';
-		    }
-		    else
-		    if ($isex == Person::FEMALE)
-		    {
-				$newMatch['sexclass']	= 'female';
-				$childrole		        = 'daughter';
-				$spouserole		        = 'wife';
-		    }
-		    else
-		    {
-				$newMatch['sexclass']	= 'unknown';
-				$childrole		        = 'child';
-				$spouserole		        = 'spouse';
-		    }
+    {			// existing link
+        if ($debug)
+            $warn		.= "<p>Existing link IDIR=$idir</p>\n";
+        try {
+            if (is_null($person))
+                $person	= new Person(array('idir' => $idir));
+            $linkedName  = $person->getName(Person::NAME_INCLUDE_DATES);
+            $maidenName	= $person->getSurname();
+            if ($maidenName != $surname)
+            {		// $surname is not maiden name
+                $linkedName	= str_replace($maidenName,
+                			      "($maidenName) $surname",
+                			      $linkedName);
+            }		// $surname is not maiden name
+        } catch (Exception $e)
+        {
+            $linkedName	= $givenNames . ' ' . $surname .
+                		  ' (not found in database)';
+        }
+    }			// existing link
 
-		    $iname	        = $person->getName(Person::NAME_INCLUDE_DATES);
-		    $parents	    = $person->getParents();
-		    $comma	        = ' ';
-		    foreach($parents as $idcr => $set)
-		    {		// loop through parents
-				$father	            = $set->getHusbName();
-				$mother	            = $set->getWifeName();
-				$iname	        .= "$comma$childrole of $father and $mother";
-				$comma	            = ', ';
-		    }		// loop through parents
+    // copy contents into working variables
+    // some of the fields may have been changed by the cross-ref code
+    $surname		= $death->get('d_surname');
+    $givenNames		= $death->get('d_givennames');
+    $date			= $death->get('d_date');
+    $age			= $death->get('d_age');
+    $birthDate		= $death->get('d_birthdate');
 
-		    $families	            = $person->getFamilies();
-		    $comma	                = ' ';
-		    foreach ($families as $idmr => $set)
-		    {		// loop through families
-				if ($isex == Person::FEMALE)
-				    $spouse	        = $set->getHusbName();
-				else
-				    $spouse	        = $set->getWifeName();
-				$iname	            .= "$comma$spouserole of $spouse";
-				$comma	            = ', ';
-		    }		// loop through families
-		    $newMatch['name']		= $iname;
-		    $matches[$iidir]		= $newMatch;
-		}		// loop through results
-		$template->updateTag('match',	$matches);
-    }			// matched to some individuals in database
-    else
-    {			// no matches
-		$template->updateTag('LinkRowSet',	null);
-		$template->updateTag('LinkRowMatch',	null);
-    }			// no matches
+    $subject		= "$domainName Death Registration: number: " .
+                	    $regYear . '-' . $regNum . ', ' .
+                	    $givenNames . ' ' . $surname;
 
-    if ($regYear < 1909)
-    {
-		$template->updateTag('ResLengthRow', null);
-    }
+    $regCounty		= $death->get('d_regcounty');
+    $countyObj		= new County($domain, $regCounty);
+    $countyName		= $countyObj->get('name');
+    $regTownship	= $death->get('d_regtownship');
+}			// no errors, perform query
+else
+{			// error detected
+    $subject	    = "$domainName Death Registration: number: " .
+                	    $regYear . '-' . $regNum ;
+    $regCounty	    = '';
+    $countyName	    = '';
+    $regTownship	= 'undefined';
+    $sex            = '';
+}			// error detected
 
-    $template->display();
-    showTrace();
+// internationalization support
+$monthsTag		    = $trtemplate->getElementById('Months');
+if ($monthsTag)
+{
+    $months	        = array();
+    foreach($monthsTag->childNodes() as $span)
+        $months[]	= trim($span->innerHTML());
+}
+$lmonthsTag		    = $trtemplate->getElementById('LMonths');
+if ($lmonthsTag)
+{
+    $lmonths		= array();
+    foreach($lmonthsTag->childNodes() as $span)
+        $lmonths[]	= trim($span->innerHTML());
+}
+
+$template->set('CONTACTTABLE',	'Deaths');
+$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('DOMAIN',		$domain);
+$template->set('DOMAINNAME',	$domainName);
+$template->set('CC',		    $cc);
+$template->set('COUNTRYNAME',	$countryName);
+$template->set('LANG',		    $lang);
+$template->updateTag('otherStylesheets',
+                   	 array('filename'	=> '/Ontario/DeathRegDetail'));
+
+$template->set('REGYEAR',		$regYear);
+$template->set('REGNUM',		$regNum);
+$template->set('PREVREGNUM',	$regNum-1);
+$template->set('PREV5REGNUM',	$regNum-5);
+$template->set('NEXTREGNUM',	$regNum+1);
+$template->set('NEXT5REGNUM',	$regNum+5);
+$template->set('PADDEDREGNUM',	$paddedRegNum);
+$template->set('COUNTYNAME',	$countyName);
+if ($showImage)
+    $template->set('SHOWIMAGE',	'yes');
+else
+    $template->set('SHOWIMAGE',	'no');
+if (isset($death))
+{
+    $template->set('REGCOUNTY',	$death->get('d_regcounty'));
+    $template->set('REGTOWNSHIP',
+                   $death->get('d_regtownship'));
+    $template->set('MSVOL',
+                   $death->get('d_msvol'));
+    $template->set('SURNAME',
+                   $death->get('d_surname'));
+    $template->set('SURNAMESOUNDEX',
+                   $death->get('d_surnamesoundex'));
+    $template->set('GIVENNAMES',
+                   $death->get('d_givennames'));
+	$template->set('PLACE',
+	               $death->get('d_place'));
+	$template->set('DATE',
+	               $death->get('d_date'));
+	$template->set('CALCDATE',
+	               $death->get('d_calcdate'));
+	$template->set('AGE',
+	               $death->get('d_age'));
+	$template->set('BIRTHDATE',
+	               $death->get('d_birthdate'));
+	$template->set('CALCBIRTH',
+	               $death->get('d_calcbirth'));
+	$template->set('OCCUPATION',
+	               $death->get('d_occupation'));
+	$marStat	= $death->get('d_marstat');
+}
+else
+{
+    $template->set('REGCOUNTY',	    '');
+    $template->set('REGTOWNSHIP',	'');
+    $template->set('MSVOL',		    '');
+    $template->set('SURNAME',		'');
+    $template->set('SURNAMESOUNDEX','');
+    $template->set('GIVENNAMES',	'');
+	$template->set('PLACE',		    'Ontario, Canada');
+	$template->set('DATE',		    $regyear);
+	$template->set('CALCDATE',		$regyear);
+	$template->set('AGE',		    '');
+	$template->set('BIRTHDATE',		$regyear);
+	$template->set('CALCBIRTH',		'');
+	$template->set('OCCUPATION',	'');
+    $marStat	= '?';
+}
+
+if ($sex == 'M')
+{
+    $template->updateTag('SexM',
+                	     array('selected' => "selected='selected'"));
+    $template->updateTag('SexF',
+                	     array('selected' => ' '));
+    $template->updateTag('SexU',
+                	     array('selected' => ' '));
+}
+else
+if ($sex == 'F')
+{
+    $template->updateTag('SexF',
+                	     array('selected' => "selected='selected'"));
+    $template->updateTag('SexM',
+                	     array('selected' => ' '));
+    $template->updateTag('SexU',
+                	     array('selected' => ' '));
+}
+else
+{
+    $template->updateTag('SexU',
+                	     array('selected' => "selected='selected'"));
+    $template->updateTag('SexM',
+                	     array('selected' => ' '));
+    $template->updateTag('SexF',
+                	     array('selected' => ' '));
+}
+
+switch(strtoupper($marStat))
+{
+    case 'S':
+        $template->updateTag('MarStatS',
+                	     array('selected' => "selected='selected'"));
+        $template->updateTag('MarStatM',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatW',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatD',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatU',
+                		 array('selected'	=> ' '));
+        break;
+
+    case 'M':
+        $template->updateTag('MarStatS',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatM',
+                	     array('selected' => "selected='selected'"));
+        $template->updateTag('MarStatW',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatD',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatU',
+                		 array('selected'	=> ' '));
+        break;
+
+    case 'E':
+        $template->updateTag('MarStatS',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatM',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatW',
+                	     array('selected' => "selected='selected'"));
+        $template->updateTag('MarStatD',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatU',
+                		 array('selected'	=> ' '));
+        break;
+
+    case 'D':
+        $template->updateTag('MarStatS',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatM',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatW',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatD',
+                	     array('selected' => "selected='selected'"));
+        $template->updateTag('MarStatU',
+                		 array('selected'	=> ' '));
+        break;
+
+    case '?':
+        $template->updateTag('MarStatS',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatM',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatW',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatD',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatU',
+                	     array('selected' => "selected='selected'"));
+        break;
+
+
+    default:
+        $template->updateTag('MarStatS',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatM',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatW',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatD',
+                		 array('selected'	=> ' '));
+        $template->updateTag('MarStatU',
+                		 array('selected'	=> ' '));
+        break;
+
+}
+
+$template->set('BIRTHPLACE',
+               $death->get('d_birthplace'));
+$template->set('RESPLACE',
+               $death->get('d_resplace'));
+$template->set('RESONT',
+               $death->get('d_resont'));
+$template->set('RESCAN',
+               $death->get('d_rescan'));
+$template->set('CAUSE',
+               $death->get('d_cause'));
+$template->set('DURATION',
+               $death->get('d_duration'));
+$template->set('PHYS',
+               $death->get('d_phys'));
+$template->set('PHYSADDR',
+               $death->get('d_physaddr'));
+$template->set('INFORMANT',
+               $death->get('d_informant'));
+$template->set('INFREL',
+               $death->get('d_infrel'));
+$template->set('INFOCC',
+               $death->get('d_infocc'));
+$template->set('INFRES',
+               $death->get('d_infres'));
+$template->set('RELIGION',
+               $death->get('d_religion'));
+$template->set('FATHERNAME',
+               $death->get('d_fathername'));
+$template->set('FATHERBPLCE',
+               $death->get('d_fatherbplce'));
+$template->set('MOTHERNAME',
+               $death->get('d_mothername'));
+$template->set('MOTHERBPLCE',
+               $death->get('d_motherbplce'));
+$template->set('HUSBANDNAME',
+               $death->get('d_husbandname'));
+$template->set('REMARKS',
+               $death->get('d_remarks'));
+$template->set('BURPLACE',
+               $death->get('d_burplace'));
+$template->set('BURDATE',
+               $death->get('d_burdate'));
+$template->set('UNDERTKR',
+               $death->get('d_undertkr'));
+$template->set('UNDERTKRADDR',
+               $death->get('d_undertkraddr'));
+$template->set('REGDATE',
+               $death->get('d_regdate'));
+$template->set('REGISTRAR',
+               $death->get('d_registrar'));
+$template->set('RECORDEDBY',
+               $death->get('d_recordedby'));
+$template->set('IMAGE',
+               $death->get('d_image'));
+$template->set('ORIGINALVOLUME',
+               $death->get('d_originalvolume'));
+$template->set('ORIGINALPAGE',
+               $death->get('d_originalpage'));
+$template->set('ORIGINALITEM',
+               $death->get('d_originalitem'));
+if ($debug)
+    $template->set('DEBUG', 'Y');
+else
+    $template->set('DEBUG', 'N');
+
+if ($idir > 0)
+{			// link to family tree database
+    $template->updateTag('LinkRowSet',
+                	     array('idir'	    => $idir,
+                		       'genderClass'=> $genderClass,
+                 	           'linkedName'	=> $linkedName));
+    $template->updateTag('LinkRowMatch',	null);
+}			// link to family tree database
+else
+if ($imatches && $imatches->count() > 0)
+{			// matched to some individuals in database
+    $template->updateTag('LinkRowSet',	null);
+    $matches	                    = array();
+    foreach($imatches as $iidir => $person)
+    {		// loop through results
+        $isex			            = $person->get('gender');
+        $newMatch			        = array();
+        $newMatch['idir']		    = $iidir;
+        if ($isex == Person::MALE)
+        {
+            $newMatch['sexclass']	= 'male';
+            $childrole		        = 'son';
+            $spouserole 		    = 'husband';
+        }
+        else
+        if ($isex == Person::FEMALE)
+        {
+            $newMatch['sexclass']	= 'female';
+            $childrole		        = 'daughter';
+            $spouserole		        = 'wife';
+        }
+        else
+        {
+            $newMatch['sexclass']	= 'unknown';
+            $childrole		        = 'child';
+            $spouserole		        = 'spouse';
+        }
+
+        $iname	                = $person->getName(Person::NAME_INCLUDE_DATES);
+        $parents	            = $person->getParents();
+        $comma	                = ' ';
+        foreach($parents as $idcr => $set)
+        {		// loop through parents
+            $father	            = $set->getHusbName();
+            $mother	            = $set->getWifeName();
+            $iname	            .= "$comma$childrole of $father and $mother";
+            $comma	            = ', ';
+        }		// loop through parents
+
+        $families	            = $person->getFamilies();
+        $comma	                = ' ';
+        foreach ($families as $idmr => $set)
+        {		// loop through families
+            if ($isex == Person::FEMALE)
+                $spouse	        = $set->getHusbName();
+            else
+                $spouse	        = $set->getWifeName();
+            $iname	            .= "$comma$spouserole of $spouse";
+            $comma	            = ', ';
+        }		// loop through families
+        $newMatch['name']		= $iname;
+        $matches[$iidir]		= $newMatch;
+    }		// loop through results
+    $template->updateTag('match',	$matches);
+}			// matched to some individuals in database
+else
+{			// no matches
+    $template->updateTag('LinkRowSet',	null);
+    $template->updateTag('LinkRowMatch',	null);
+}			// no matches
+
+if ($regYear < 1909)
+{
+    $template->updateTag('ResLengthRow', null);
+}
+
+$template->display();
+showTrace();

@@ -195,25 +195,9 @@ require_once __NAMESPACE__ . '/common.inc';
 		}		// apply changes
     }		// invoked by submit from previous invocation
 
-    $title		= 'Account Management';
-    $tempBase		= $document_root . '/templates/';
     $coffBase		= $document_root . '/CoffeeShop/';
-    $template		= new FtTemplate("${tempBase}dialog$lang.html");
-    $includeSub		= "Account$lang.html";
-    if (!file_exists($coffBase . $includeSub))
-    {
-	    $language	= new Language(array('code' => $lang));
-	    $langName	= $language->get('name');
-	    $nativeName	= $language->get('nativename');
-        $sorry      = $language->getSorry();
-        $warn       .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-		$includeSub	= 'Accounten.html';
-    }
-    $template->includeSub($coffBase . $includeSub,
-						  'MAIN');
-    $template->set('TITLE',		    $title);
+    $template		= new FtTemplate("Account$lang.html", true);
+
     $template->set('USERID',		$userid);
     $template->set('EMAIL',		    $email);
     $template->set('LANG',		    $lang);

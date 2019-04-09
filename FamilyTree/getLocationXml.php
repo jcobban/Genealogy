@@ -47,112 +47,113 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
+header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    $limit		= 40;		// default limit
-    $getParms		= array();
-    $name		= null;
+$limit		= 40;		// default limit
+$getParms		= array();
+$name		= null;
 
-    foreach($_GET as $fldname => $value)
-    {			// loop through all parameters
-	switch(strtolower($fldname))
-	{		// act on specific fieldnames
-	    case 'limit':
-	    {		// override limit
-		$limit			= $value;
-		break;
-	    }		// other field names
+foreach($_GET as $fldname => $value)
+{			// loop through all parameters
+    switch(strtolower($fldname))
+    {		// act on specific fieldnames
+        case 'limit':
+        {		// override limit
+    		$limit			= $value;
+    		break;
+        }		// other field names
 
-	    case 'debug':
-	    {
-		break;
-	    }
+        case 'debug':
+        {
+    		break;
+        }
 
-	    case 'name':
-	    {		// special 'name' parameter
-		if ($value == '')
-		    $getParms['location']	= $value;
-		else	// match either location or short name
-		{
-		    $getParms[]		= array('location'  => "^$value$",
-						'shortname' => "^$value$");
-		    $name		= $value;
-		}
-		break;
-	    }		// special 'name' parameter
+        case 'name':
+        {		// special 'name' parameter
+    		if ($value == '')
+    		    $getParms['location']	= $value;
+    		else	// match either location or short name
+            {
+                $value          = str_replace('[','',str_replace(']','',$value));
+    		    $getParms[]		= array('location'  => "^$value$",
+    	            					'shortname' => "^$value$");
+    		    $name		    = $value;
+    		}
+    		break;
+        }		// special 'name' parameter
 
-	    case 'idlr':
-	    case 'fsplaceid':
-	    case 'location':
-	    case 'used':
-	    case 'sortedlocation':
-	    case 'latitude':
-	    case 'longitude':
-	    case 'tag1':
-	    case 'shortname':
-	    case 'preposition':
-	    case 'notes':
-	    case 'verified':
-	    case 'fsresolved':
-	    case 'veresolved':
-	    case 'qstag':
-	    case 'zoom':
-	    case 'boundary':
-	    {		// other field names
-		$getParms[$fldname]	= $value;
-		break;
-	    }		// other field names
-	}		// act on specific fieldnames
-    }			// loop through all parameters
+        case 'idlr':
+        case 'fsplaceid':
+        case 'location':
+        case 'used':
+        case 'sortedlocation':
+        case 'latitude':
+        case 'longitude':
+        case 'tag1':
+        case 'shortname':
+        case 'preposition':
+        case 'notes':
+        case 'verified':
+        case 'fsresolved':
+        case 'veresolved':
+        case 'qstag':
+        case 'zoom':
+        case 'boundary':
+        {		// other field names
+    		$getParms[$fldname]	= $value;
+    		break;
+        }		// other field names
+    }		// act on specific fieldnames
+}			// loop through all parameters
 
-    $getParms['limit']		= $limit;
-    $locations			= new RecordSet('Locations', $getParms);
+$getParms['limit']		= $limit;
+$locations			= new RecordSet('Locations', $getParms);
 
-    if (is_string($name) && $locations->count() == 0)
-    {			// repeat with more general search
-	unset($getParms[0]);
-	$getParms['location']	= "^$name";
-	$locations		= new RecordSet('Locations', $getParms);
-    }
+if (is_string($name) && $locations->count() == 0)
+{			// repeat with more general search
+    unset($getParms[0]);
+    $getParms['location']	= "^$name";
+    $locations		= new RecordSet('Locations', $getParms);
+}
 
-    // display the results
-    header("Content-Type: text/xml");
-    print("<?xml version='1.0' encoding='UTF-8'?>\n");
+// display the results
+print("<?xml version='1.0' encoding='UTF-8'?>\n");
 
-    if (strlen($msg) > 0)
-    {				// report failure
-	print "<msg>\n";
-	print "    " . $msg . "\n";
-	print "</msg>\n";
-    }				// report failure
-    else
-    {				// have a location or locations to return
-	$count		= $locations->count();
-	if ($count > 1)
-	{			// check for duplicates
-	    $oldname	= null;
-	    foreach($locations as $location)
-	    {
-		if ($location->getName() == $oldname)
-		    $count--;	// we only have to fudge the count
-		else
-		    $oldname	= $location->getName();
-	    }
-	}			// check for duplicates
-	print '<locations count="' .  $count . '" ';
-	foreach($_GET as $key => $value)
-	{			// report parameters
-	    print $key . '="' . str_replace('"','&quote;',str_replace('&','&amp;',$value)) . '" ';
-	}			// report parameters
-	print ">\n";		// close tag
-	$info		= $locations->getInformation();
-	$query		= $info['query'];
-	print "<cmd>$query</cmd>\n";
-	foreach($locations as $idlr => $location)
-	{			// run through all matching locations
-	    $location->toXml('location');
-	}			// run through all matching locations
-	print "</locations>\n";
-    }				// have a location or locations to return
+if (strlen($msg) > 0)
+{				// report failure
+    print "<msg>\n";
+    print "    " . $msg . "\n";
+    print "</msg>\n";
+}				// report failure
+else
+{				// have a location or locations to return
+    $count		= $locations->count();
+    if ($count > 1)
+    {			// check for duplicates
+        $oldname	= null;
+        foreach($locations as $location)
+        {
+    		if ($location->getName() == $oldname)
+    		    $count--;	// we only have to fudge the count
+    		else
+    		    $oldname	= $location->getName();
+        }
+    }			// check for duplicates
+    print '<locations count="' .  $count . '" ';
+    foreach($_GET as $key => $value)
+    {			// report parameters
+        print $key . '="' . str_replace('"','&quote;',str_replace('&','&amp;',$value)) . '" ';
+    }			// report parameters
+    print ">\n";		// close tag
+    $info		= $locations->getInformation();
+    $query		= $info['query'];
+    print "<cmd>$query</cmd>\n";
+    foreach($locations as $idlr => $location)
+    {			// run through all matching locations
+        $location->toXml('location');
+    }			// run through all matching locations
+    print "</locations>\n";
+}				// have a location or locations to return

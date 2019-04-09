@@ -13,7 +13,7 @@
  *						independent of which fields the designed chose	*
  *						to include in the form.							*
  *		2011/09/04		support month name abbreviations in date of		*
- *						death											*
+ *						function death									*
  *						use real buttons for next, previous, and		*
  *						new query										*
  *						assign Alt-key combos to the buttons			*
@@ -58,7 +58,7 @@
  *						the previous and next registration buttons		*
  *						pass the ShowImage flag							*
  *						pass RegDomain parameter when going to new		*
- *						registration									*
+ *						function registration							*
  *		2015/06/11		correct too small font in rich-text editor		*
  *		2015/10/06		support image URL with https					*
  *		2015/11/18		display "hours" for abbreviation "h"			*
@@ -68,12 +68,16 @@
  *		2016/05/20		counties list script moved to folder Canada		*
  *		2016/05/30		use common function dateChanged					*
  *		2017/07/12		use function locationChanged					*
+ *		2019/02/10      no longer need to call pageInit                 *
+*		2019/03/29      do not alter marital status based on informant  *
+*		                occupation                                      *
+*		                if informant is undertaker update undertaker    *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
- *  daysinmonth															*
+ *  daysinmonth											        		*
  *																		*
  *  Array containing the number of days in each month.					*
  *		daysinmonth[0] is for December of the preceding year			*
@@ -81,13 +85,14 @@
  *		...																*
  *		daysinmonth[12] is for December									*
  ************************************************************************/
-
+//                      0   1   2   3   4   5   6
 var daysinmonth		= [31, 31, 28, 31, 30, 31, 30,
+//                          7   8   9  10  11  12
 						   31, 31, 30, 31, 30, 31];
 
 
 /************************************************************************
- *  monthIndex															*
+ *  monthIndex      													*
  *																		*
  *  object translating month names to month numbers						*
  ************************************************************************/
@@ -122,7 +127,7 @@ var monthIndex	= {"jan"	        : 1,
 				   "december"		: 12};
 
 /************************************************************************
- *  monthNames															*
+ *  monthNames	        												*
  *																		*
  *  Array containing the name of each month.							*
  ************************************************************************/
@@ -142,10 +147,11 @@ var monthNames	= ["Dec",
 				   "Dec"];
 
 /************************************************************************
- *	DurationAbbrs														*
+ *	DurationAbbrs		        										*
  *																		*
  *  Table for expanding abbreviations for age to standardize			*
- *  representation of fractional ages.									*
+ *  representation of fractional ages and to define words which are     *
+ *  not capitalized.                                                    *
  ************************************************************************/
 var	DurationAbbrs = {
 					"1/4" :					"¼",
@@ -209,22 +215,20 @@ tinyMCE.init({
 });
 
 /************************************************************************
- *  onLoadDeath															*
+ *  function onLoadDeath												*
  *																		*
  *  This function is called when the web page has been loaded into the	*
  *  browser.  Initialize dynamic functionality of elements.				*
  ************************************************************************/
 function onLoadDeath()
 {
-    pageInit();
-
     document.body.onkeydown		= ddKeyDown;
 
     // activate handling of key strokes in text input fields
     // including support for context specific help
     for(var i = 0; i < document.forms.length; i++)
     {		// loop through all forms
-		var form	= document.forms[i];
+		var form	    = document.forms[i];
 		form.onsubmit 	= validateForm;
 		form.onreset 	= resetForm;
 
@@ -234,11 +238,6 @@ function onLoadDeath()
 
 		    element.onkeydown	    = keyDown;
 		    element.onchange	    = change;	// default handling
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    element.onmouseover		= eltMouseOver;
-		    element.onmouseout		= eltMouseOut;
 
 		    // an element whose value is passed with the update
 		    // request to the server is identified by a name= attribute
@@ -256,8 +255,8 @@ function onLoadDeath()
 				    var	domain		= form.RegDomain.value;
 				    // get the counties information file
 				    HTTP.getXML("/Canada/CountiesListXml.php?Domain=" + domain,
-							gotCountiesFile,
-							noCountiesFile);
+					    		gotCountiesFile,
+						    	noCountiesFile);
 				    break;
 				}
 
@@ -267,7 +266,7 @@ function onLoadDeath()
 				    element.onchange	= changeSurname;
 				    element.onkeydown	= keyDown;	// special key handling
 				    element.checkfunc	= checkName;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}	// surname field
 
@@ -277,7 +276,7 @@ function onLoadDeath()
 				    element.onkeydown	= keyDown;	// special key handling
 				    element.onchange	= change;	// default handler
 				    element.checkfunc	= checkName;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    // give focus to the given names field if present
 				    element.focus();
 				    break;
@@ -294,7 +293,7 @@ function onLoadDeath()
 				    element.onkeydown	= keyDown;	// special key handling
 				    element.onchange	= change;	// default handler
 				    element.checkfunc	= checkName;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}	// other names
 
@@ -312,7 +311,7 @@ function onLoadDeath()
 				    element.onkeydown	= keyDown;	// special key handling
 				    element.onchange	= locationChanged;
 				    element.checkfunc	= checkAddress;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}	// birthplace fields
 
@@ -326,20 +325,29 @@ function onLoadDeath()
 				    element.onkeydown	= keyDown;	// special key handling
 				    element.onchange	= locationChanged;
 				    element.checkfunc	= checkAddress;
-				    element.checkfunc(); 
+				    element.checkfunc();            // check initial value
 				    break;
 				}	// location fields
 
 				case 'Occupation':
-				case 'InfOcc':
 				{
 				    element.abbrTbl	    = OccAbbrs;
 				    element.onkeydown	= keyDown;	// special key handling
 				    element.onchange	= changeOccupation;
 				    element.checkfunc	= checkOccupation;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
-				}	// occupation field
+				}	        // occupation field
+
+				case 'InfOcc':
+				{
+				    element.abbrTbl	    = OccAbbrs;
+				    element.onkeydown	= keyDown;	// special key handling
+				    element.onchange	= changeInfOcc;
+				    element.checkfunc	= checkOccupation;
+				    element.checkfunc();            // check initial value
+				    break;
+				}	        // informant occupation field
 
 				case 'MarStat':
 				{
@@ -360,7 +368,7 @@ function onLoadDeath()
 				    element.abbrTbl	    = AgeAbbrs;
 				    element.onchange	= changeAge;
 				    element.checkfunc	= checkAge;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}	// age field
 
@@ -371,7 +379,7 @@ function onLoadDeath()
 				    if (element.value.length == 0)
 						form.Age.onchange();
 				    element.checkfunc	= checkDate;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}	// age field
 
@@ -381,7 +389,7 @@ function onLoadDeath()
 				    element.onkeydown	= keyDown;	// special key handling
 				    element.onchange	= change;	// default handler
 				    element.checkfunc	= checkName;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}	// religion field
 
@@ -390,7 +398,7 @@ function onLoadDeath()
 				    element.abbrTbl	    = RelAbbrs;
 				    element.onchange	= changeInfRel;
 				    element.checkfunc	= checkName;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    element.disabled	= form.Surname.readOnly;
 				    break;
 				}	// marital status field
@@ -408,7 +416,7 @@ function onLoadDeath()
 				    element.abbrTbl	    = MonthAbbrs;
 				    element.onchange	= dateChanged;	// default handler
 				    element.checkfunc	= checkDate;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}
 
@@ -417,7 +425,7 @@ function onLoadDeath()
 				    element.abbrTbl	    = CauseAbbrs;
 				    element.onchange	= change;	// default handler
 				    element.checkfunc	= checkText;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}
 
@@ -426,14 +434,14 @@ function onLoadDeath()
 				    element.abbrTbl	    = DurationAbbrs;
 				    element.onchange	= changeDuration;
 				    element.checkfunc	= checkText;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}
 
 				case 'Image':
 				{
 				    element.checkfunc	= checkURL;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}		// Image URL
 
@@ -481,7 +489,7 @@ function onLoadDeath()
 				    element.onkeydown	= keyDown;	// special key handling
 				    element.onchange	= change;	// default handler
 				    element.checkfunc	= checkText;
-				    element.checkfunc();
+				    element.checkfunc();            // check initial value
 				    break;
 				}	// other fields
 		    }		// act on specific fields
@@ -491,7 +499,7 @@ function onLoadDeath()
 }		// onLoadDeath
 
 /************************************************************************
- *  changeSurname														*
+ *  function changeSurname												*
  *																		*
  *  Take action when the surname of the deceased is changed.			*
  *  The surname is capitalized, and abbreviations are expanded and		*
@@ -518,7 +526,7 @@ function changeSurname()
 }		// changeSurname
 
 /************************************************************************
- *  changeMarStat														*
+ *  function changeMarStat												*
  *																		*
  *  Act when the marital status of the deceased is changed.				*
  *  Set defaults for the father's name and the husband's name.				*
@@ -552,7 +560,7 @@ function changeMarStat()
 }		// changeMarStat
 
 /************************************************************************
- *  changeInfRel														*
+ *  function changeInfRel												*
  *																		*
  *  Take action when the informant's relation to the deceased changes.	*
  *																		*
@@ -580,7 +588,7 @@ function changeInfRel()
 }		// changeInfRel
 
 /************************************************************************
- *  changeFatherName													*
+ *  function changeFatherName											*
  *																		*
  *  Take action when the user changes the name of the father			*
  *  of the deceased.													*
@@ -609,7 +617,7 @@ function changeFatherName()
 }		// changeFatherName
 
 /************************************************************************
- *  changeAge															*
+ *  function changeAge													*
  *																		*
  *  Take action when the user changes the age at death.					*
  *  Compute the birth date.												*
@@ -884,7 +892,7 @@ function changeAge()
 }		// changeAge
 
 /************************************************************************
- *  changeDuration														*
+ *  function changeDuration												*
  *																		*
  *  Take action when the user changes the duration of illness.			*
  *  Compute the birth date.												*
@@ -913,7 +921,7 @@ function changeDuration()
 }		// changeDuration
 
 /************************************************************************
- *  changeOccupation													*
+ *  function changeOccupation											*
  *																		*
  *  Take action when the user changes the occupation of the deceased.	*
  *																		*
@@ -928,7 +936,7 @@ function changeOccupation()
 
     this.checkfunc();	// validate entered value
 
-    // some values suggest
+    // some values suggest marital status
     var	form		= this.form;
     var	occupation	= this.value;
     var marStat		= form.MarStat;
@@ -970,6 +978,29 @@ function changeOccupation()
 }		// changeOccupation
 
 /************************************************************************
+ *  function changeInfOcc   											*
+ *																		*
+ *  Take action when the user changes the occupation of the informant.	*
+ *																		*
+ *  Input:																*
+ *		this			<input name='InfOcc'>		    				*
+ ************************************************************************/
+function changeInfOcc()
+{
+    // expand abbreviations
+    expAbbr(this,
+		    this.abbrTbl);
+
+    this.checkfunc();	// validate entered value
+
+    if (this.value == 'Undertaker')
+    {                   // informant is the undertaker
+        var form        = this.form;
+        form.Undertkr.value = form.Informant.value;
+    }                   // informant is the undertaker
+}		// changeOccupation
+
+/************************************************************************
  *  validate Form														*
  *																		*
  *  Ensure that the data entered by the user has been minimally			*
@@ -1007,7 +1038,7 @@ function validateForm()
 }		// validateForm
 
 /************************************************************************
- *  resetForm															*
+ *  function resetForm													*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
@@ -1024,7 +1055,7 @@ function resetForm()
 }	// resetForm
 
 /************************************************************************
- *  clearIdir															*
+ *  function clearIdir													*
  *																		*
  *  This function is called when the user selects the clearIdir button	*
  *  with the mouse.														*
@@ -1050,7 +1081,7 @@ function clearIdir()
 }		// clearIdir
 
 /************************************************************************
- *  showImage															*
+ *  function showImage													*
  *																		*
  *  This function is called when the user clicks the ShowImage button	*
  *  with the mouse or types Alt-I.										*
@@ -1084,7 +1115,7 @@ function showImage()
 }		// showImage
 
 /************************************************************************
- *  showPrevious														*
+ *  function showPrevious												*
  *																		*
  *  This function is called when the user clicks the Previous			*
  *  button with the mouse or types Alt-P.								*
@@ -1112,7 +1143,7 @@ function showPrevious()
 }		// showPrevious
 
 /************************************************************************
- *  showNext															*
+ *  function showNext													*
  *																		*
  *  This function is called when the user selects the Next button		*
  *  with the mouse or types Alt-N.										*
@@ -1140,7 +1171,7 @@ function showNext()
 }		// showNext
 
 /************************************************************************
- *  showSkip5															*
+ *  function showSkip5													*
  *																		*
  *  This function is called when the user selects the Skip5 button		*
  *  with the mouse.														*
@@ -1169,7 +1200,7 @@ function showSkip5()
 }		// showSkip5
 
 /************************************************************************
- *  showNewQuery														*
+ *  function showNewQuery												*
  *																		*
  *  This function is called when the user clicks the NewQuery			*
  *  button with the mouse or types Alt-Q.								*
@@ -1187,7 +1218,7 @@ function showNewQuery()
 }		// showNewQuery
 
 /************************************************************************
- *  ddKeyDown															*
+ *  function ddKeyDown													*
  *																		*
  *  Handle key strokes that apply to the entire dialog window.  For		*
  *  example the key combinations Ctrl-S and Alt-U are interpreted to	*

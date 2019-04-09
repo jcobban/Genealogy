@@ -44,8 +44,9 @@
  *						maps geolocate									*
  *		2016/12/29		adjust search name if displayed name changes	*
  *		2017/09/09		renamed to Location.js							*
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -54,7 +55,7 @@
 window.onload	= onLoadLocation;
 
 /************************************************************************
- *  ontarioCountyNames													*
+ *  function ontarioCountyNames											*
  *																		*
  *		The google database of location names does not generally		*
  *		include the county name, so it is necessary to remove the		*
@@ -121,7 +122,7 @@ HTTP.get('/Canada/CountiesListJson.php?domain=CAON',
          options);
 
 /************************************************************************
- *  gotCounties															*
+ *  function gotCounties													*
  *																		*
  *  This method is called when the JSON document representing			*
  *  the list of counties is received from the server.                   *
@@ -186,14 +187,13 @@ tinyMCE.init({
 });
 
 /************************************************************************
- *  onLoadLocation														*
+ *  function onLoadLocation												*
  *																		*
  *  This function is invoked once the page is completely loaded into the*
  *  browser.  Initialize dynamic behavior of elements.					*
  ************************************************************************/
 function onLoadLocation()
 {
-    pageInit();
     // support for displaying map and geocoding
     try {
 		geocoder	= new google.maps.Geocoder();
@@ -218,10 +218,6 @@ function onLoadLocation()
 		{
 		    var element	= form.elements[j];
 
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
-
 		    // take action specific to element
 		    var	name;
 		    if (element.name && element.name.length > 0)
@@ -234,7 +230,7 @@ function onLoadLocation()
 				case 'Location':
 				{
 				    element.onkeydown	= keyDown;
-				    element.abbrTbl	= LocAbbrs;
+				    element.abbrTbl	    = LocAbbrs;
 				    element.onchange	= locationChanged;
 				    break;
 				}		// location name field
@@ -333,7 +329,7 @@ function onLoadLocation()
 }		// onLoadLocation
 
 /************************************************************************
- *  validateForm														*
+ *  function validateForm												*
  *																		*
  *  Ensure that the data entered by the user has been minimally			*
  *  validated before submitting the form.								*
@@ -344,7 +340,7 @@ function validateForm()
 }		// validateForm
 
 /************************************************************************
- *  resetForm															*
+ *  function resetForm													*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
@@ -358,7 +354,7 @@ function resetForm()
 }	// resetForm
 
 /************************************************************************
- *  locationChanged														*
+ *  function locationChanged												*
  *																		*
  *  Handle a change to the value of the Location field.					*
  *																		*
@@ -451,7 +447,7 @@ function locationChanged()
 }		// locationChanged
 
 /************************************************************************
- *  mergeDuplicates														*
+ *  function mergeDuplicates												*
  *																		*
  *  This method is called when the user requests to merge				*
  *  all duplicates of the current location								*
@@ -506,7 +502,7 @@ function mergeDuplicates()
 }	// mergeDuplicates
 
 /************************************************************************
- *  gotMerge															*
+ *  function gotMerge													*
  *																		*
  *  This method is called when the XML file representing				*
  *  a completed merge is retrieved from the database.					*
@@ -539,7 +535,7 @@ function gotMerge(xmlDoc)
 }		// gotMerge
 
 /************************************************************************
- *  noMerge																*
+ *  function noMerge														*
  *																		*
  *  This method is called if there is no response						*
  *  file.																*
@@ -555,7 +551,7 @@ function noMerge()
 }		// noMerge
 
 /************************************************************************
- *  showMap																*
+ *  function showMap														*
  *																		*
  *  This function is called if the user clicks on the show Map button.	*
  *  It displays a map using Google maps support.						*
@@ -613,7 +609,7 @@ function showMap()
 }		// showMap
 
 /************************************************************************
- *  displayMap															*
+ *  function displayMap													*
  *																		*
  *  This function is called to display a Google maps map				*
  *  of the location.													*
@@ -696,7 +692,7 @@ function displayMap(latlng, zoomlevel)
 }		// displayMap
 
 /************************************************************************
- *  mapClick															*
+ *  function mapClick													*
  *																		*
  *  This function is called if the user clicks the cursor somewhere in	*
  *  the map other than on a marker.  The location under the cursor is	*
@@ -720,7 +716,7 @@ function mapClick(mouseEvent)
 }
 
 /************************************************************************
- *  hideMap																*
+ *  function hideMap														*
  *																		*
  *  This function is called if the user clicks on the show Map button.	*
  *  It displays a map using Google maps support.						*
@@ -749,7 +745,7 @@ function hideMap()
 }		// hideMap
 
 /************************************************************************
- *  getMap																*
+ *  function getMap														*
  *																		*
  *  This function is called to copy information from the map into		*
  *  the location record.												*
@@ -810,7 +806,7 @@ function getMap()
 }		// getMap
 
 /************************************************************************
- *  displayReferences													*
+ *  function displayReferences											*
  *																		*
  *  This function is called if the user clicks on the references button.*
  *  It displays a list of records that reference this location			*
@@ -827,7 +823,7 @@ function displayReferences()
 }		// displayReferences
 
 /************************************************************************
- *  editPictures														*
+ *  function editPictures												*
  *																		*
  *  This is the onclick method of the "Edit Pictures" button.  			*
  *  It is called when the user requests to edit							*
@@ -868,7 +864,7 @@ function editPictures()
 }	// editPictures
 
 /************************************************************************
- *  close																*
+ *  function close														*
  *																		*
  *  This is the onclick method of the "Close" button. 		 			*
  *																		*

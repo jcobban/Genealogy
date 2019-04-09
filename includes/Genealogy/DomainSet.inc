@@ -38,6 +38,9 @@ class DomainSet extends RecordSet
     function __construct($parms	= array(),
 						 $order	= "`Name`")
     {
+        foreach($parms as $name=> $value)
+            if (strtolower($name) == 'order')
+                $order      = $value;
 		$parms['order']		= $order;
 		parent::__construct('Domains', $parms);
     }		// DomainSet::__construct
@@ -54,17 +57,17 @@ class DomainSet extends RecordSet
 		global	$connection;
 
 		// validate parameter
-		$limit		= null;
-		$offset		= null;
-		$where		= '';
-		$and		= 'WHERE ';
+		$limit  		= null;
+		$offset			= null;
+		$where			= '';
+		$and			= 'WHERE ';
 		$this->sqlParms	= array();
-		$language	= null;
-		$cc		= null;
-		$domain		= null;
-		$state		= null;
+		$language		= null;
+		$cc		    	= null;
+		$domain			= null;
+		$state			= null;
 
-		foreach($this->parms as $key => $value)
+		foreach($this->parms as $key 	=> $value)
 		{			// loop through all parameters
 		    $fieldLc	= Domain::getRealFieldName($key);
 		    $matches	= array();
@@ -89,7 +92,9 @@ class DomainSet extends RecordSet
 				    {		// or expression
 						$warn	.= "<p>DomainSet::getWhere: " .
 							       "Unsupported value for `$key`=" .
-							       print_r($value, true) . "</p>\n";
+                                   print_r($value, true) . "</p>\n";
+                        throw new Exception("Unsupported value for `$key`=" .
+                                   print_r($value, true));
 				    }		// or expression
 				    break;
 				}			// cc

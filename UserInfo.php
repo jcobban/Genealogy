@@ -33,20 +33,64 @@ use \Exception;
  *		2017/10/16		use class RecordSet								*
  *		2018/01/04		remove Template from template file names		*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ***********************************************************************/
 require_once __NAMESPACE__ . '/Blog.inc';
 require_once __NAMESPACE__ . '/User.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-if (array_key_exists('lang', $_REQUEST))
-	$lang		= $_REQUEST['lang'];
+$lang		    = 'en';
+if (count($_GET) > 0)
+{	        	    // invoked by URL to display current status of account
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {		    	// loop through parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+        switch(strtolower($key))
+        {
+    		case 'lang':
+    		{
+    		    if (strlen($value) >= 2)
+    			    $lang		= strtolower(substr($value,0,2));
+    		    break;
+            }		// language
+        }           // act on specific parameter
+    }			    // loop through parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL 
 else
-	$lang		= 'en';
+if (count($_POST) > 0)
+{	        	    // invoked by post
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+    foreach($_POST as $key => $value)
+    {		    	// loop through parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+        switch(strtolower($key))
+        {
+    		case 'lang':
+    		{
+    		    if (strlen($value) >= 2)
+    			    $lang		= strtolower(substr($value,0,2));
+    		    break;
+    		}		// language
+        }           // act on specific parameter
+    }			    // loop through parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by post 
 
 $monthnames	= array('',
 					'January','February','March','April',
@@ -66,22 +110,7 @@ if (strlen($userid) > 0)
 else
 	$msg	.= "This script must be invoked from the Signon dialog. ";
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "UserInfo$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = 'UserInfoen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
+$template		= new FtTemplate("UserInfo$lang.html");
 
 if (strlen($msg) == 0)
 {

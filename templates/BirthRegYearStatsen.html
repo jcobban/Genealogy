@@ -5,151 +5,148 @@
  *																		*
  *  History:															*
  *		2018/10/06  created                                             *
+ *      2019/03/21  support adjusting left/right scroll bar to table    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
-<div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php?lang=$LANG">
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">
         Genealogy</a>:
-    <a href="/Canada/CountriesEdit.php?lang=$LANG">
+      <a href="/Canada/CountriesEdit.php?lang=$LANG">
 	    List of Supported Countries
-    </a>:
-    <a href="/genCountry.php?code=$CC&lang=$LANG">
+      </a>:
+      <a href="/genCountry.php?code=$CC&lang=$LANG">
 		$COUNTRYNAME</a>:
-    <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG" id="stateCrumb">
+      <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG" id="stateCrumb">
 		$STATENAME</a>:
-	<a href="/Canada/BirthRegQuery.php?domain=$DOMAIN&lang=$LANG">New Birth Query</a>:
-    <a href="BirthRegStats.php?RegDomain=$DOMAIN&lang=$LANG">
+	  <a href="/Canada/BirthRegQuery.php?domain=$DOMAIN&lang=$LANG">New Birth Query</a>:
+     <a href="BirthRegStats.php?RegDomain=$DOMAIN&lang=$LANG">
         $STATENAME Status</a>:
-	<a href="BirthRegYearStats.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&lang=$LANG" id="countyStatusLink">
+	  <a href="BirthRegYearStats.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&lang=$LANG" id="countyStatusLink">
 		$STATENAME County Status $REGYEAR</a>:
-</div>
-<div class="body">
-  <h1>$DOMAINNAME:
-    <span id="countyName">$COUNTYNAME County:</span>
-    Birth Registration Status $REGYEAR
-    <span class="right">
-		<a href="BirthRegYearStatsHelpen.html" target="_blank">Help?</a>
-    </span>
-  </h1>
-  <div class="center">
-    <div class="left">
+    </div>
+    <div class="body">
+      <h1>$DOMAINNAME:
+        <span id="countyName">$COUNTYNAME County:</span>
+            Birth Registration Status $REGYEAR
+        <span class="right">
+    	  <a href="BirthRegYearStatsHelpen.html" target="_blank">Help?</a>
+        </span>
+      </h1>
+      <div class="center" id="topBrowse">
+        <span class="left" id="topPrev">
 		<a href="BirthRegYearStats.php?RegDomain=$DOMAIN&RegYear=$REGYEARP&county=$COUNTY" id="toPrevYear">
 		    &lt;--- $REGYEARP
 		</a>
-    </div>
-    <div class="right">
+        </span>
+        <span class="right" id="topNext">
 		<a href="BirthRegYearStats.php?RegDomain=$DOMAIN&RegYear=$REGYEARN&county=$COUNTY" id="toNextYear">
 		    $REGYEARN ---&gt;
 		</a>
-    </div>
-    <div style="clear: both;"></div>
-  </div>
-  <form id="display" action="donothing.php" method="get">
-    <input type="hidden" id="RegYear" 
-		value="$REGYEAR">
-    <input type="hidden" id="Domain" 
-		value="$DOMAIN">
-    <!--- Put out the response as a table -->
-    <table class="form">
-      <!--- Put out the column headers -->
-      <thead>
-		<tr>
-		  <th class="colhead1st">
-		    County
-		  </th>
-		  <th class="colhead" id="TownshipTH">
-		    Township
-		  </th>
-		  <th class="colhead">
-		    Done
-		  </th>
-		  <th class="colhead">
-		  Low
-		  </th>
-		  <th class="colhead">
-		  High
-		  </th>
-		  <th class="colhead">
-		  %Done
-		  </th>
-		  <th class="colhead">
-		    %Linked
-		  </th>
-		  <th class="colhead">
-		    View
-		  </th>
-		</tr>
-      </thead>
-      <tbody>
-		<tr id="dataRow">
-		  <td class="odd bold left first">
-		      $COUNTYNAME
-		    <input type="hidden" id="County$ROWNUM" 
-				value="$COUNTY">
-		  </td>
-		  <td class="odd bold left" id="townshipCol">
-		      $TOWNSHIP
-		      <input type="hidden" id="Town$ROWNUM" 
-				value="$TOWNSHIP">
-		  </td>
-		  <td class="odd bold right">
-		      $COUNT
-		  </td>
-		  <td class="odd bold right">
-		      $LOW
-		      <input type="hidden" id="low$ROWNUM" 
-				  value="$LOW">
-		  </td>
-		  <td class="odd bold right">
-		      $HIGH
-		      <input type="hidden" id="high$ROWNUM" 
-				  value="$HIGH">
-		  </td>
-		  <td class="$PCTDONECLASS">
-		      $PCTDONE% 
-		  </td>
-		  <td class="$PCTLINKEDCLASS">
-		    $PCTLINKED% 
-		  </td>
-		  <td>
-		    <button type="button" id="TownStats$ROWNUM">
-				View
-		    </button>
-		  </td>
-		</tr>
-		</tbody>
-		<tfoot>
-		  <tr>
-		    <td class="odd bold left first" id="CountyCol">&nbsp;</td>
-		    <td class="odd bold left first">
-		        Total
-		    </td>
-		    <td class="odd bold right">
-		        $TOTAL
-		    </td>
-		    <td class="odd bold right">
-				$LOWEST
-		    </td>
-		    <td class="odd bold right">
-				$HIGHEST
-		    </td>
-		    <td class="$PCTDONECLASS">
-				$PCTDONE% 
-		    </td>
-		    <td class="$PCTLINKEDCLASS">
-		      $PCTLINKED% 
-		    </td>
-		    <td class="odd bold left">&nbsp;</td>
-		  </tr>
-		</tfoot>
-      </table>
-    </form>
-  </div> <!-- end of <div id="body"> -->
-	<div class="balloon" id="HelprightTop">
-        Click on this button to signon to access extended features of the
-        web-site or to manage your account with the web-site.
-	</div>
+        </span>
+        <div style="clear: both;"></div>
+      </div>
+      <form id="display" action="donothing.php" method="get">
+        <input type="hidden" id="RegYear" 
+        		value="$REGYEAR">
+        <input type="hidden" id="Domain" 
+        		value="$DOMAIN">
+        <!--- Put out the response as a table -->
+        <table class="form" id="dataTable">
+	      <!--- Put out the column headers -->
+	      <thead>
+			<tr>
+			  <th class="colhead1st">
+			    County
+			  </th>
+			  <th class="colhead" id="TownshipTH">
+			    Township
+			  </th>
+			  <th class="colhead">
+			    Done
+			  </th>
+			  <th class="colhead">
+			  Low
+			  </th>
+			  <th class="colhead">
+			  High
+			  </th>
+			  <th class="colhead">
+			  %Done
+			  </th>
+			  <th class="colhead">
+			    %Linked
+			  </th>
+			  <th class="colhead">
+			    View
+			  </th>
+			</tr>
+	      </thead>
+	      <tbody>
+			<tr id="dataRow">
+			  <td class="odd bold left first">
+			      $COUNTYNAME
+			    <input type="hidden" id="County$ROWNUM" 
+					value="$COUNTY">
+			  </td>
+			  <td class="odd bold left" id="townshipCol">
+			      $TOWNSHIP
+			      <input type="hidden" id="Town$ROWNUM" 
+					value="$TOWNSHIP">
+			  </td>
+			  <td class="odd bold right">
+			      $COUNT
+			  </td>
+			  <td class="odd bold right">
+			      $LOW
+			      <input type="hidden" id="low$ROWNUM" 
+					  value="$LOW">
+			  </td>
+			  <td class="odd bold right">
+			      $HIGH
+			      <input type="hidden" id="high$ROWNUM" 
+					  value="$HIGH">
+			  </td>
+			  <td class="$PCTDONECLASS">
+			      $PCTDONE% 
+			  </td>
+			  <td class="$PCTLINKEDCLASS">
+			    $PCTLINKED% 
+			  </td>
+			  <td>
+			    <button type="button" id="TownStats$ROWNUM">
+					View
+			    </button>
+			  </td>
+			</tr>
+		  </tbody>
+		  <tfoot>
+			<tr>
+			  <td class="odd bold left first" id="CountyCol">&nbsp;</td>
+			  <td class="odd bold left first">
+			        Total
+			  </td>
+			  <td class="odd bold right">
+			        $TOTAL
+			  </td>
+			  <td class="odd bold right">
+					$LOWEST
+			  </td>
+			  <td class="odd bold right">
+					$HIGHEST
+			  </td>
+			  <td class="$PCTDONECLASS">
+					$PCTDONE% 
+			  </td>
+			  <td class="$PCTLINKEDCLASS">
+			      $PCTLINKED% 
+			  </td>
+			  <td class="odd bold left">&nbsp;</td>
+			</tr>
+		  </tfoot>
+	    </table>
+	  </form>
+	</div> <!-- end of <div id="body"> -->
 	<div class="balloon" id="HelpTownStats">
 		Click on this button to display a summary of the births transcribed
 		for the specific town or township.

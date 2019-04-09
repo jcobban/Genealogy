@@ -18,6 +18,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
+header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Census.inc";
 require_once __NAMESPACE__ . "/District.inc";
 require_once __NAMESPACE__ . "/RecordSet.inc";
@@ -70,7 +71,6 @@ if ($censusYear < 1867 && is_null($province))
 	$province	= substr($census, 0, 2);
 
 // top node of XML result
-header("Content-Type: text/xml");
 print("<?xml version='1.0' encoding='UTF-8'?>\n");
 
 if (strlen($msg) == 0)

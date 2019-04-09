@@ -35,10 +35,11 @@ use \Exception;
  *  History:															*
  *		2017/01/15		initialization moved to getRecordCommon.php		*
  *		2017/10/15		support class RecordSet							*
+ *		2019/01/10      move to namespace Genealogy                     *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/getRecordCommon.php';
+require_once 'getRecordCommon.php';
 
 // display the results
 header("Content-Type: text/xml");
@@ -72,9 +73,9 @@ else
 			{
 			    $records	= $record;
 			    print "<list count=\"" . $records->count() . "\">\n";
-			    showTrace();
+                showTrace();
 			    foreach($records as $key => $record)
-			    {
+                {
 					$record->toXml($top, true, $options);
 			    }
 			    print "</list>\n";

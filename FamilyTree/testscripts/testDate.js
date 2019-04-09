@@ -25,35 +25,28 @@
  **/
 function onLoad()
 {
-    pageInit();
-
     // scan through all forms and set dynamic functionality
     // for specific elements
     for(var i = 0; i < document.forms.length; i++)
     {
-	var form	= document.forms[i];
-	for(var j = 0; j < form.elements.length; j++)
-	{
-	    var element	= form.elements[j];
+		var form	= document.forms[i];
+		for(var j = 0; j < form.elements.length; j++)
+		{
+		    var element	= form.elements[j];
 
-	    // pop up help balloon if the mouse hovers over a field
-	    // for more than 2 seconds
-	    actMouseOverHelp(element);
-
-	    if (element.name == 'selTemplate')
-	    {
-		selectOptByValue(element, form.template.value);
-		element.onchange	= templateChanged;
-	    }
-	}	// loop through elements in form
+		    if (element.name == 'selTemplate')
+		    {
+				selectOptByValue(element, form.template.value);
+				element.onchange	= templateChanged;
+		    }
+		}	// loop through elements in form
     }		// iterate through all forms
 }		// onLoad
 
 function templateChanged()
 {
-    var form
-	= this.form;
-    var	option	= this.options[this.selectedIndex];
+    var form        = this.form;
+    var	option	    = this.options[this.selectedIndex];
 
     form.template.value	= option.value;
 }		// templateChanged

@@ -38,16 +38,16 @@
  *						Remove obsolete functions						*
  *		2010/11/28		With addition of ability to edit associated		*
  *						Child record, the presence of the				*
- *						parentsIdmr										*
+ *						function parentsIdmr							*
  *						parameter is no longer enough to require adding	*
  *						a child onto the invoking editMarriage page		*
  *		2010/12/08		improve separation of HTML and JavaScript		*
  *		2010/12/15		enable submission for buttons that update the	*
- *						base											*
+ *						function base									*
  *		2010/12/16		correct incorrect addition of row to invoking	*
  *						marriage dialog on update existing child		*
  *						invoke changeChild method of invoking marriage	*
- *						dialog											*
+ *						function dialog									*
  *		2010/12/20		If the individual has no family connections		*
  *						provide an option to delete the individual from	*
  *						the database.									*
@@ -62,7 +62,7 @@
  *		2011/02/26		clean up parameter handling						*
  *		2011/03/02		change name of submit button to 'Submit'		*
  *						support Ctrl-S and Alt-U shortcuts to perform	*
- *						update											*
+ *						function update									*
  *						Make Merge a <button> and support Alt-M			*
  *						Support Alt-D to delete							*
  *		2011/03/06		Support Alt shortcuts for edit buttons			*
@@ -94,7 +94,7 @@
  *						pass current death cause text to edit Event		*
  *		2012/02/26		use id= rather than name= on elements whose		*
  *						value does not need to be passed to action		*
- *						script											*
+ *						function script									*
  *						add support for all events moved from			*
  *						editEvents.js									*
  *						Edit Other Events button replaced by Add Event,	*
@@ -150,11 +150,11 @@
  *						to access invoking page to update it			*
  *		2013/06/06		expand list of female names						*
  *		2013/06/11		disable edit families button if invoked for a	*
- *						spouse											*
+ *						function spouse									*
  *		2013/06/23		disable edit families button if invoked to		*
  *						add new child									*
  *		2013/06/28		disable edit parents button if invoked for a	*
- *						child											*
+ *						function child									*
  *		2013/07/04		update displayed event type text for optional	*
  *						events if etype changes							*
  *		2013/07/30		defer facebook initialization until after load	*
@@ -178,7 +178,7 @@
  *						update DOM to remove display of event			*
  *		2014/10/27		birth and death dates no longer guaranteed to	*
  *						be in input fields with names BirthDate and		*
- *						DeathDate										*
+ *						function DeathDate								*
  *		2014/11/02		place information from preferred events into	*
  *						reserved fields on form.  This reverses the		*
  *						change described above for 27 October 2014		*
@@ -225,7 +225,7 @@
  *		2015/02/01		support being opened in an <iframe> by the		*
  *						utility function openFrame						*
  *		2015/02/10		support being invoked in <iframe> missed one	*
- *						spot											*
+ *						function spot									*
  *						document input to eventFeedback method			*
  *						use closeFrame									*
  *		2015/02/23		openFrame returns an instance of Window			*
@@ -269,7 +269,7 @@
  *		2016/02/27		add a space between digits and letters in dates	*
  *		2016/04/12		invoke editEvent.php with debug if requested	*
  *		2016/06/26		eventFeedback did not supply parms.datesd to	*
- *						createFromTemplate								*
+ *						function createFromTemplate						*
  *		2016/08/13		delete citations when deleting events from		*
  *						from main individual record						*
  *						blank out cause of death when deleting death	*
@@ -293,8 +293,9 @@
  *						the "Edit Families" frame was tracked, the		*
  *						"Edit Parents" frame was not.					*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -442,11 +443,11 @@ var locTrace			        = "";
 
 /************************************************************************
  *																		*
- * Microsoft Internet Explorer is a piece of $hit prior to IE9				*
+ * Microsoft Internet Explorer is a piece of $hit prior to IE9			*
  *																		*
  ************************************************************************/
-var	ie		= false;
-var	ieversion	= null;
+var	ie		                    = false;
+var	ieversion               	= null;
 
 // update Title is true if the script is invoked for a brand new individual
 var	updateTitle	= false;
@@ -456,20 +457,20 @@ var	updateTitle	= false;
 var	titlePrefix	= "Edit ";
 
 /************************************************************************
- *  parmIdir 																*
+ *  parmIdir	        												*
  *																		*
  *  contains the value of idir as requested by the invoking				*
  *  parameters. This is null if the idir parameter is not passed to		*
- *  the PHP script, which means a new individual was created.				*
+ *  the PHP script, which means a new individual was created.			*
  *																		*
  ************************************************************************/
-var	parmIdir	= null;
-var	parentsIdmr	= null;
-var	testSubmit	= false;
-var	newSearch	= location.search;
+var	parmIdir			= null;
+var	parentsIdmr			= null;
+var	testSubmit			= false;
+var	newSearch			= location.search;
 
 /************************************************************************
- *  feedbackRow																*
+ *  feedbackRow														    *
  *																		*
  *  DOM element in invoking page to which to feed back results of		*
  *  creation of a new individual.  The method changePerson of this		*
@@ -478,7 +479,7 @@ var	newSearch	= location.search;
 var	feedbackRow	= null;
 
 /************************************************************************
- *  idetArray															*
+ *  idetArray													        *
  *																		*
  *  This array contains the IDET, event type, value for each displayed	*
  *  event, indexed by the row number.  It is used to validate the		*
@@ -487,7 +488,7 @@ var	feedbackRow	= null;
 var	idetArray	= [];
 
 /************************************************************************
- *  windowList															*
+ *  windowList													        *
  *																		*
  *  This array contains a list of child windows currently displayed		*
  *  in the right hand side of the main window.							*
@@ -495,14 +496,14 @@ var	idetArray	= [];
 var	windowList	= [];
 
 /************************************************************************
- *  dialogDiv															*
+ *  dialogDiv													        *
  *																		*
  *  Global variable to hold a reference to a displayed dialog			*
  ************************************************************************/
 var	dialogDiv	= null;
 
 /************************************************************************
- *  datePatt															*
+ *  datePatt													        *
  *																		*
  *  pattern for common dates											*
  ************************************************************************/
@@ -514,7 +515,7 @@ var	datePatt	= /\d{4}/;
 window.onload	= loadEdit;
 
 /************************************************************************
- *  loadEdit															*
+ *  function loadEdit													*
  *																		*
  *  Initialize elements when the page is loaded.						*
  ************************************************************************/
@@ -536,9 +537,6 @@ function loadEdit()
     // if updateTitle is true then titlePrefix is whatever text is present
     // preceding the empty date range
     titlePrefix		= title.substring(0, title.length - 3);
-
-    // if invoked as a page, perform page initialization
-    pageInit();
 
     document.body.onresize	= onWindowResize;
 
@@ -646,10 +644,10 @@ function loadEdit()
     else
 		alert ("editIndivid.js: loadEdit: navigator object not defined");
 
-}		// loadEdit
+}		// function loadEdit
 
 /************************************************************************
- *  onWindowResize														*
+ *  function onWindowResize												*
  *																		*
  *  This method is called when the browser window size is changed		*
  *  If the window is split between the main display and a second		*
@@ -673,10 +671,10 @@ function onWindowResize()
 		if (iframe.className == "left")
 		    openFrame(iframe.name, null, "left");
     }			// loop through all iframes
-}		// onWindowResize
+}		// function onWindowResize
 
 /************************************************************************
- *  activateElements													*
+ *  function activateElements											*
  *																		*
  *  Activate handling of key strokes in text input fields				*
  *  and handle mouse events for buttons and input fields				*
@@ -698,10 +696,6 @@ function activateElements(form)
 		else
 		    element.onkeydown	= keyDown;	// context specific help
 		element.onchange	= change;	// default handler
-
-		// pop up help balloon if the mouse hovers over a field
-		// for more than 2 seconds
-		actMouseOverHelp(element);
 
 		// set behavior for individual elements by name
 		var	name	= element.name;
@@ -931,10 +925,10 @@ function activateElements(form)
 		    }		// button to grant access to this individual
 		}		// switch on name of element
     }		// loop through all elements in the form
-}		// activateElements
+}		// function activateElements
 
 /************************************************************************
- *  validateForm														*
+ *  function validateForm												*
  *																		*
  *  This method is called when the user submits the form.				*
  *  Ensure that the data entered by the user has been minimally			*
@@ -1110,10 +1104,10 @@ function validateForm()
     update();		// use AJAX to update the database record
 
     return false;	// do not submit
-}		// validateForm
+}		// function validateForm
 
 /************************************************************************
- *  refresh																*
+ *  function refresh													*
  *																		*
  *  This method is called to refresh the edit form but only after		*
  *  pending updates to the main record are applied.						*
@@ -1150,10 +1144,10 @@ function refresh()
 		      parms,
 		      gotRefreshed,
 		      noUpdated);
-}	// refresh
+}	// function refresh
 
 /************************************************************************
- *  gotRefreshed														*
+ *  function gotRefreshed												*
  *																		*
  *  The XML document representing the results of the request to refresh	*
  *  the page has been received.											*
@@ -1199,10 +1193,10 @@ function gotRefreshed(xmlDoc)
 		    alert("editIndivid.js: 1185: gotRefreshed: '" + xmlDoc + "'");
     }			// error response
 
-}		// gotRefreshed
+}		// function gotRefreshed
 
 /************************************************************************
- *  update																*
+ *  function update														*
  *																		*
  *  This method is called to update the main record and segue to the	*
  *  main display form.													*
@@ -1281,10 +1275,10 @@ function update()
 		      parms,
 		      gotUpdated,
 		      noUpdated);
-}	// update
+}	// function update
 
 /************************************************************************
- *  gotUpdated															*
+ *  function gotUpdated													*
  *																		*
  *  The XML document representing the results of the request to update	*
  *  the record has been received.										*
@@ -1429,20 +1423,20 @@ function gotUpdated(xmlDoc)
 		else
 		    alert("editIndivid.js: 1397: gotUpdated: '" + xmlDoc + "'");
     }
-}		// gotUpdated
+}		// function gotUpdated
 
 /************************************************************************
- *  noUpdated															*
+ *  function noUpdated													*
  *																		*
  *  The server was unable to find the action script updateIndivid.xml.	*
  ************************************************************************/
 function noUpdated()
 {
     alert("editIndivid.js: 1408: noUpdated: script 'updateIndividXml.php' not found on server");
-}		// noUpdated
+}		// function noUpdated
 
 /************************************************************************
- *  resetForm															*
+ *  function resetForm													*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
@@ -1450,10 +1444,10 @@ function noUpdated()
 function resetForm()
 {
     return true;
-}	// resetForm
+}	// function resetForm
 
 /************************************************************************
- *  editMarriages														*
+ *  function editMarriages												*
  *																		*
  *  This method is called when the user requests to edit				*
  *  information about the marriages of the current individual.			*
@@ -1486,10 +1480,10 @@ function editMarriages()
 		refresh();
     }			// individual record not created in database yet
     return true;
-}	// editMarriages
+}	// function editMarriages
 
 /************************************************************************
- *  editParents															*
+ *  function editParents												*
  *																		*
  *  This method is called when the user requests to edit				*
  *  information about the parents of the current individual.			*
@@ -1522,10 +1516,10 @@ function editParents()
 		refresh();
     }			// individual record not created in database yet
     return true;
-}	// editParents
+}	// function editParents
 
 /************************************************************************
- *  editEventIndiv														*
+ *  function editEventIndiv												*
  *																		*
  *  This method is called when the user requests to edit				*
  *  information about an event of the current individual				*
@@ -1541,8 +1535,9 @@ function editParents()
  *  Input:																*
  *		this		instance of <button> that invoked this function		*
  ************************************************************************/
-function editEventIndiv()
+function editEventIndiv(ev)
 {
+    ev.stopPropagation();
     // check for open event frame
     if (windowList.length > 0)
     {			// there are incomplete actions pending
@@ -1680,10 +1675,10 @@ function editEventIndiv()
     }			// individual record not created in database yet
 
     return true;
-}	// editEventIndiv
+}	// function editEventIndiv
 
 /************************************************************************
- *  clearEventIndiv														*
+ *  function clearEventIndiv											*
  *																		*
  *  This method is called when the user requests to clear				*
  *  information about an event of the current individual				*
@@ -1699,8 +1694,9 @@ function editEventIndiv()
  *  Input:																*
  *		this		<button id='Clear...'>								*
  ************************************************************************/
-function clearEventIndiv()
-{
+function clearEventIndiv(ev)
+{	
+    ev.stopPropagation();
     var	button		= this;
     var	form		= this.form;
     var	type		= button.id.substring(5);
@@ -1724,10 +1720,10 @@ function clearEventIndiv()
     else
 		popupAlert("editEvent.js: deleteCitation: Error: " + msg,
 				   this);
-}		// clearEventIndiv
+}		// function clearEventIndiv
 
 /************************************************************************
- *  confirmClearInd														*
+ *  function confirmClearInd												*
  *																		*
  *  This method is called when the user confirms the request to delete	*
  *  an event which is defined inside the Person record.					*
@@ -1885,10 +1881,10 @@ function confirmClearInd()
 		popupAlert("editIndivid.js: clearEventIndiv: unable to get value of idir from form",
 				   this);
     return true;
-}	// confirmClearInd
+}	// function confirmClearInd
 
 /************************************************************************
- *  editEventChildr														*
+ *  function editEventChildr											*
  *																		*
  *  This method is called when the user requests to edit				*
  *  information about an event of the current individual				*
@@ -1904,8 +1900,9 @@ function confirmClearInd()
  *  Input:																*
  *		this	instance of <button> that invoked this function			*
  ************************************************************************/
-function editEventChildr()
+function editEventChildr(ev)
 {
+    ev.stopPropagation();
     // check for open event frame
     if (windowList.length > 0)
     {			// there are incomplete actions pending
@@ -1961,10 +1958,10 @@ function editEventChildr()
 		popupAlert("editIndivid.js: editEventChildr: unable to get value of idcr from form",
 				   this);
     return true;
-}	// editEventChildr
+}	// function editEventChildr
 
 /************************************************************************
- *  clearEventChildr													*
+ *  function clearEventChildr											*
  *																		*
  *  This method is called when the user requests to clear				*
  *  information about an event of the current individual				*
@@ -1980,8 +1977,9 @@ function editEventChildr()
  *  Input:																*
  *		this	instance of <button> that invoked this function			*
  ************************************************************************/
-function clearEventChildr()
+function clearEventChildr(ev)
 {
+    ev.stopPropagation();
     var	button		= this;
     var	type		= button.id.substring(5);
     var	form		= this.form;
@@ -2020,10 +2018,10 @@ function clearEventChildr()
     else
 		alert("editIndivid.js: 1987: clearEventChildr: unable to get value of idcr from form");
     return true;
-}	// clearEventChildr
+}	// function clearEventChildr
 
 /************************************************************************
- *  gotClearedEvent														*
+ *  function gotClearedEvent											*
  *																		*
  *  The XML document representing the results of the request to clear	*
  *  the event has been received.										*
@@ -2044,10 +2042,10 @@ function gotClearedEvent(xmlDoc)
 		else
 		    alert("editIndivid.js: 2011: gotClearedEvent: '" + xmlDoc + "'");
     }
-}
+}       // function gotClearedEvent
 
 /************************************************************************
- *  noClearedEvent														*
+ *  function noClearedEvent												*
  *																		*
  *  The server was unable to find the action script.					*
  ************************************************************************/
@@ -2055,10 +2053,10 @@ function noClearedEvent()
 {
     hideLoading();		// hide the "loading..." popup
     alert("editIndivid.js: 2023: noClearedEvent: action script 'ClearIndivEvent.php' not found");
-}
+}       // function noClearedEvent
 
 /************************************************************************
- *  eventDetail															*
+ *  function eventDetail												*
  *																		*
  *  This method is called when the user requests to edit				*
  *  information about an event of the current individual				*
@@ -2070,8 +2068,9 @@ function noClearedEvent()
  *  Input:																*
  *		this		instance of <button> that invoked this function		*
  ************************************************************************/
-function eventDetail()
+function eventDetail(ev)
 {
+    ev.stopPropagation();
     // check for open event frame
     if (windowList.length > 0)
     {			// there are incomplete actions pending
@@ -2279,10 +2278,10 @@ function eventDetail()
 		newSearch	= this;		// identify button that was clicked
 		refresh();			// update database first
     }			// individual record not created in database yet
-}		// eventDetail
+}		// function eventDetail
 
 /************************************************************************
- *  eventAdd															*
+ *  function eventAdd													*
  *																		*
  *  This method is called when the user requests to add					*
  *  an event to an individual.											*
@@ -2290,8 +2289,9 @@ function eventDetail()
  *  Input:																*
  *		this		instance of <button> that invoked this function		*
  ************************************************************************/
-function eventAdd()
+function eventAdd(ev)
 {
+    ev.stopPropagation();
     var	form		= this.form;
     var	idir		= form.idir.value;
     if (idir > 0)
@@ -2320,7 +2320,7 @@ function eventAdd()
 }	// function eventAdd
 
 /************************************************************************
- *  eventDelete															*
+ *  function eventDelete												*
  *																		*
  *  This method is called when the user requests to delete				*
  *  an event of an individual that is an instance of Event.		        *
@@ -2328,42 +2328,44 @@ function eventAdd()
  *  Input:																*
  *		this		<button id='EventDelete...'> 						*
  ************************************************************************/
-function eventDelete()
+function eventDelete(ev)
 {
-    var	button		= this;
-    var	form		= button.form;
-    var	idir		= form.idir.value;
-    var rownum		= button.id.substring(11);
-    var	ider		= form.elements['EventIder' + rownum].value;
-    var	idet		= form.elements['EventIdet' + rownum].value;
-    var	citType		= form.elements['EventCitType' + rownum].value;
-    var	row		= button.parentNode;
-    var parms		= {"type"	: idet,
-						   "ider"	: ider,
+    ev.stopPropagation();
+    var	button			= this;
+    var	form			= button.form;
+    var	idir			= form.idir.value;
+    var rownum			= button.id.substring(11);
+    var	ider			= form.elements['EventIder' + rownum].value;
+    var	idet			= form.elements['EventIdet' + rownum].value;
+    var	citType			= form.elements['EventCitType' + rownum].value;
+    var	row		    	= button.parentNode;
+    var parms			= {"type"	    : idet,
+						   "ider"	    : ider,
 						   "formname"	: form.name, 
-						   "rownum"	: rownum, 
+						   "rownum"	    : rownum, 
 						   "rowname"	: row.id,
 						   "template"	: "",
-						   "msg"	:
+						   "msg"	    :
 						"Are you sure you want to delete this event?"};
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
+    dialogDiv	        = document.getElementById('msgDiv');
+    var template	    = document.getElementById('ClrInd$template');
     if (dialogDiv)
     {		// have popup <div> to display message in
 		displayDialog(dialogDiv,
 				      'ClrInd$template',
 				      parms,
-				      this,		// position relative to
+				      this,		        // position relative to
 				      confirmEventDel,	// 1st button confirms Delete
-				      false);		// default show on open
+				      false);		    // default show on open
     }		// have popup <div> to display message in
     else
 		alert("editIndivid.js: 2329: eventDelete: Error: " + msg);
-}		// eventDelete
+}		// function eventDelete
 
 /************************************************************************
- *  confirmEventDel														*
+ *  function confirmEventDel											*
  *																		*
  *  This method is called when the user confirms the request to delete	*
  *  an event which is defined in an instance of Event.					*
@@ -2375,18 +2377,18 @@ function eventDelete()
 function confirmEventDel()
 {
     // get the parameter values hidden in the dialog
-    var	form		= this.form;
-    var	type		= this.id.substr(12);
-    var	ider		= form.elements['IDER' + type].value;
-    var	rowname		= form.elements['RowName' + type].value;
-    var	rownum		= form.elements['RowNum' + type].value;
+    var	form				= this.form;
+    var	type				= this.id.substr(12);
+    var	ider				= form.elements['IDER' + type].value;
+    var	rowname				= form.elements['RowName' + type].value;
+    var	rownum				= form.elements['RowNum' + type].value;
     dialogDiv.style.display	= 'none';
 
     // action depends upon whether the event is recorded in tblIR or tblER
     if (ider > 0)
     {			// event is in tblER
 		// invoke script to delete the record
-		var parms		= { "idime"	: ider,
+		var parms		    = { "idime"	: ider,
 							    "cittype"	: 30,
 							    "rownum"	: rownum,
 							    "rowname"	: rowname};
@@ -2487,10 +2489,10 @@ function confirmEventDel()
 		    alert("editIndivid.js: 2454: confirmEventDelete: " +
 				  "Unexpected rowname='" + rowname + "'");
     }			// event is in tblIR
-}	// confirmEventDelete
+}	// function confirmEventDelete
 
 /************************************************************************
- *  gotDeleteEvent														*
+ *  function gotDeleteEvent												*
  *																		*
  *  This method is called when the response to the request to delete	*
  *  a Event is received from the server.								*
@@ -2562,10 +2564,10 @@ function gotDeleteEvent(xmlDoc)
 		alert (msg);
     }		// error
     hideLoading();		// hide the "loading..." popup
-}	// gotDeleteEvent
+}	// function gotDeleteEvent
 
 /************************************************************************
- *  noDeleteEvent														*
+ *  function noDeleteEvent												*
  *																		*
  *  This method is called if the delete Event server script does		*
  *  not exist on the server.											*
@@ -2575,10 +2577,10 @@ function noDeleteEvent()
     hideLoading();		// hide the "loading..." popup
     alert("editIndivid.js: 2543: noDeleteEvent: " + 
 		  "server script deleteEventXml.php not found");
-}	// noDeleteEvent
+}	// function noDeleteEvent
 
 /************************************************************************
- *  gotDeleteCitations													*
+ *  function gotDeleteCitations											*
  *																		*
  *  This method is called when the response to the request to delete	*
  *  LegacyCitations for an event is received from the server.			*
@@ -2610,10 +2612,10 @@ function gotDeleteCitations(xmlDoc)
 		    msg	+= xmlDoc;
 		alert (msg);
     }		// error
-}	// gotDeleteCitations
+}	// function gotDeleteCitations
 
 /************************************************************************
- *  noDeleteCitations													*
+ *  function noDeleteCitations											*
  *																		*
  *  This method is called if the delete LegacyCitations server script	*
  *  does not exist on the server.										*
@@ -2622,10 +2624,10 @@ function noDeleteCitations()
 {
     alert("editIndivid.js: 2590: noDeleteCitations: " + 
 		  "server script deleteCitationsXml.php not found");
-}	// noDeleteCitations
+}	// function noDeleteCitations
 
 /************************************************************************
- *  eventChanged														*
+ *  function eventChanged												*
  *																		*
  *  This method is called when the user modifies the value of any field	*
  *  in an event of an individual that is an instance of Event.			*
@@ -2695,10 +2697,10 @@ function eventChanged()
 		var	titleElement	= document.getElementById('title');
 		titleElement.innerHTML	= titlePrefix + newName;
     }
-}	// eventChanged
+}	// function eventChanged
 
 /************************************************************************
- *  eventPrefChanged													*
+ *  function eventPrefChanged											*
  *																		*
  *  This method is called when the user modifies the setting of a		*
  *  preferred event checkbox.											*
@@ -2770,10 +2772,10 @@ function eventPrefChanged()
 		    }			// was not previously checked
 		}			// events recorded in tblIR
     }				// cannot uncheck some events
-}		// eventPrefChanged
+}		// function eventPrefChanged
 
 /************************************************************************
- *  grantAccess															*
+ *  function grantAccess												*
  *																		*
  *  This method is called when the user requests to grant access		*
  *  to the current individual to a user.								*
@@ -2781,8 +2783,9 @@ function eventPrefChanged()
  *  Input:																*
  *		this		instance of <button> that invoked this function		*
  ************************************************************************/
-function grantAccess()
+function grantAccess(ev)
 {
+    ev.stopPropagation();
     // open dialog to grant access in right half of window
     var	form	= this.form;
     var	idir	= form.idir.value;
@@ -2792,7 +2795,7 @@ function grantAccess()
 }	// function grantAccess
 
 /************************************************************************
- *  genderChanged														*
+ *  function genderChanged												*
  *																		*
  *  This method is called when the user modifies the value of the		*
  *  gender of an individual.											*
@@ -2825,10 +2828,10 @@ function genderChanged()
 		}	// unknown
 
     }		// act on new value of sex
-}	// genderChanged
+}	// function genderChanged
 
 /************************************************************************
- *  orderEventsByDate													*
+ *  function orderEventsByDate											*
  *																		*
  *  This method is called when the user requests to reorder the			*
  *  Events by date.														*
@@ -2914,10 +2917,10 @@ function orderEventsByDate()
     // reactivate the dynamic functionality of the replacement body
     activateElements(form);
 
-}		// orderEventsByDate
+}		// function orderEventsByDate
 
 /************************************************************************
- *  compareSortDates													*
+ *  function compareSortDates											*
  *																		*
  *  This function is invoked by the array sort method to compare two	*
  *  sort dates.															*
@@ -2934,10 +2937,10 @@ function orderEventsByDate()
 function compareSortDates(first, second)
 {
     return first.eventSD - second.eventSD;
-}		// compareSortDates
+}		// function compareSortDates
 
 /************************************************************************
- *  gotOrder															*
+ *  function gotOrder													*
  *																		*
  *  This method is called when the XML response to a request to the		*
  *  server to reorder the Events by date is received.					*
@@ -2970,13 +2973,13 @@ function gotOrder(xmlDoc)
 		    msg		+= xmlDoc;
 		alert (msg);
     }		// error
-}	// gotOrder
+}	// function gotOrder
 
 /************************************************************************
- *  ShowMore															*
+ *  function ShowMore													*
  *																		*
  *  This method is called when the user requests to see more input		*
- *  fields																*
+ *  function fields														*
  *																		*
  *  Input:																*
  *		this		<button id='ShowMore'> element						*
@@ -3066,7 +3069,7 @@ function showMore()
 }		// function showMore
 
 /************************************************************************
- *  editAddress															*
+ *  function editAddress												*
  *																		*
  *  This method is called when the user requests to edit				*
  *  information about the Address field of the current individual.		*
@@ -3104,10 +3107,10 @@ function editAddress()
 		alert("editIndivid.js: 3074: editAddress: " +
 				"unable to get value of idar from form");
     return true;
-}	// editAddress
+}	// function editAddress
 
 /************************************************************************
- *  editPictures														*
+ *  function editPictures												*
  *																		*
  *  This is the onclick method of the "Edit Pictures" button.  			*
  *  It is called when the user requests to edit							*
@@ -3117,8 +3120,9 @@ function editAddress()
  *  Parameters:															*
  *		this		<button id='Pictures'> element						*
  ************************************************************************/
-function editPictures()
+function editPictures(ev)
 {
+    ev.stopPropagation();
     var	form	= this.form;
 
     if (form.idir && form.idir.value > 0)
@@ -3137,10 +3141,10 @@ function editPictures()
 		refresh();
     }	// individual record not created in database yet
     return true;
-}	// editPictures
+}	// function editPictures
 
 /************************************************************************
- *  setIdar																*
+ *  function setIdar													*
  *																		*
  *  This is a method that may be called from a dialog invoked by		*
  *  this page to set the value of the hidden IDAR element.				*
@@ -3165,10 +3169,10 @@ function setIdar(newIdar)
 		// with text from a template to make the code language independent
 		button.innerHTML	= template.innerHTML;
     }		// edit address button present
-}		// setIdar
+}		// function setIdar
 
 /************************************************************************
- *  delIndivid															*
+ *  function delIndivid													*
  *																		*
  *  This is the onclick method of the button with name 'Delete'.		*
  *  This method invokes the delIndivid.php script to delete the current	*
@@ -3177,8 +3181,9 @@ function setIdar(newIdar)
  *  Parameters:															*
  *		this		<button id='Delete'>								*
  ************************************************************************/
-function delIndivid()
+function delIndivid(ev)
 {
+    ev.stopPropagation();
     var	form	= this.form;
     if (form.idir && form.idir.value.length > 0)
     {		// idir field present
@@ -3192,10 +3197,10 @@ function delIndivid()
 		alert("editIndivid.js: 3157: delIndivid: " +
 				"unable to get value of idir from form");
     return true;	// continue
-}		// delIndivid
+}		// function delIndivid
 
 /************************************************************************
- *  mergeIndivid														*
+ *  function mergeIndivid												*
  *																		*
  *  This is the onclick method of the button with name 'Merge'.			*
  *  This method invokes the mergeIndivid.php script to merge the		*
@@ -3204,8 +3209,9 @@ function delIndivid()
  *  Parameters:															*
  *		this		<button id='Merge'>									*
  ************************************************************************/
-function mergeIndivid()
+function mergeIndivid(ev)
 {
+    ev.stopPropagation();
     var	form	= this.form;
     if (form.idir && form.idir.value > 0)
     {		// idir field present
@@ -3224,10 +3230,10 @@ function mergeIndivid()
 		refresh();
     }	// individual record not created in database yet
     return true;	// continue
-}		// mergeIndivid
+}		// function mergeIndivid
 
 /************************************************************************
- *  popdownSearch														*
+ *  function popdownSearch												*
  *																		*
  *  Display popdown menu of search buttons.								*
  *																		*
@@ -3247,10 +3253,10 @@ function popdownSearch()
 		menu.style.visibility	= "visible";
 		return menu;
     }			// make the menu visible on top of the button
-}		// popdownSearch
+}		// function popdownSearch
 
 /************************************************************************
- *  censusSearch														*
+ *  function censusSearch												*
  *																		*
  *  Perform a search for a matching individual in census tables.		*
  *																		*
@@ -3294,10 +3300,10 @@ function censusSearch()
     var swindow	= openFrame("searchFrame",
 						    searchUrl,
 						    "right");
-}		// censusSearch
+}		// function censusSearch
 
 /************************************************************************
- *  bmdSearch															*
+ *  function bmdSearch													*
  *																		*
  *  Perform a search for a matching individual in vital statistics		*
  *  tables.																*
@@ -3351,10 +3357,10 @@ function bmdSearch()
     var swindow	= openFrame("searchFrame",
 						    searchUrl,
 						    "right");
-}		// bmdSearch
+}		// function bmdSearch
 
 /************************************************************************
- *  ancestrySearch														*
+ *  function ancestrySearch												*
  *																		*
  *  Perform a search for a matching individual in Ancestry.ca.			*
  *																		*
@@ -3406,10 +3412,10 @@ function ancestrySearch()
     var swindow	= openFrame("searchFrame",
 						    searchUrl,
 						    "right");
-}		// ancestrySearch
+}		// function ancestrySearch
 
 /************************************************************************
- *  marriageUpdated														*
+ *  function marriageUpdated											*
  *																		*
  *  This is a method of the form object that is called by the script 	*
  *  editMarriages.php to report back that a marriage has been updated.	*
@@ -3475,10 +3481,10 @@ function marriageUpdated(idmr, newcount)
 		if (mergeButton)
 		    mergeButton.style.display	= 'inline';
     }
-}		// marriageUpdated
+}		// function marriageUpdated
 
 /************************************************************************
- *  setIdmrPref															*
+ *  function setIdmrPref												*
  *																		*
  *  This is a method of the form object that is called by the script	*
  *  editMarriages.php to report back that the preferred marriage has	*
@@ -3501,10 +3507,10 @@ function setIdmrPref(idmr)
 		form.appendChild(inputElt);
     }	// IDMRPref field not present in form
     prefElt.value		= idmr;
-}		// setIdmrPref
+}		// function setIdmrPref
 
 /************************************************************************
- *  setParentsPref														*
+ *  function setParentsPref												*
  *																		*
  *  This is a method of the form object that is called by the script	*
  *  editMarriages.php to report back that the particular set of parents	*
@@ -3527,7 +3533,7 @@ function setParentsPref(idmr)
 		form.appendChild(inputElt);
     }	// ParentsPref field not present in form
     prefElt.value		= idmr;
-}		// setParentsPref
+}		// function setParentsPref
 
 /************************************************************************
  *  function getRowNumOf												*
@@ -3557,9 +3563,10 @@ function getRowNumOf(anElement)
 		} 
     }
     return '';
-}
+}       // function getRowNumOf
+
 /************************************************************************
- *  eventFeedback														*
+ *  function eventFeedback												*
  *																		*
  *  This is a method of the form object that is called by the script	*
  *  editEvent.php to report back changes to an event that should be		*
@@ -3938,14 +3945,14 @@ function eventFeedback(parms)
 		{			// act on specific fields
 		    case 'eventdetail':
 		    {
-				detailButton		= child;
+				detailButton		    = child;
 				detailButton.onclick	= eventDetail;
 				break;
 		    }
 
 		    case 'eventdelete':
 		    {
-				deleteButton		= child;
+				deleteButton		    = child;
 				deleteButton.onclick	= eventDelete;
 				break;
 		    }
@@ -4294,10 +4301,10 @@ function eventFeedback(parms)
 
     // reenable the Order Events by Date button
     document.getElementById('Order').disabled	= false;
-}		// eventFeedback
+}		// function eventFeedback
 
 /************************************************************************
- *  fldKeyDown															*
+ *  function fldKeyDown													*
  *																		*
  *  Handle key strokes in text fields that represent values held in the	*
  *  main record, and that therefore require that the form be submitted.	*
@@ -4320,10 +4327,10 @@ function fldKeyDown(e)
     if (e.key)
 		code	= e.key;
     return this.oldkeydown(e);		// pass to common handling
-}		// fldKeyDown
+}		// function fldKeyDown
 
 /************************************************************************
- *  eiKeyDown															*
+ *  function eiKeyDown													*
  *																		*
  *  Handle key strokes that apply to the entire dialog window.  For		*
  *  example the key combinations Ctrl-S and Alt-U are interpreted to	*
@@ -4453,4 +4460,4 @@ function eiKeyDown(e)
     }		// alt key shortcuts
 
     return true;	// do default action
-}		// eiKeyDown
+}		// function eiKeyDown

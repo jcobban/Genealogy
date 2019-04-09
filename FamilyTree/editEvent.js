@@ -153,8 +153,9 @@
  *		2018/03/24		add button to control whether textareas are		*
  *						displayed as rich text or raw text				*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -209,8 +210,6 @@ tinyMCE.init({
  ************************************************************************/
 function loadEdit()
 {
-    pageInit();
-
     var	namePattern	        = /^([a-zA-Z_]+)(\d+)$/;
 
     // determine in which half of the window child frames are opened
@@ -232,6 +231,7 @@ function loadEdit()
     {				    // loop through all forms in page
 		var form		= document.forms[fi];
 		form.updateCitation	= updateCitation;
+		addEventHandler(form, 'click', stopProp);
 
 		// set action methods for form
 		if (form.name == 'evtForm')
@@ -248,10 +248,6 @@ function loadEdit()
 		    var element	= formElts[i];
 		    if (element.nodeName.toLowerCase() == 'fieldset')
 				continue;
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var	name;
 		    if (element.name && element.name.length > 0)
@@ -321,7 +317,7 @@ function loadEdit()
 				case 'deathcause':
 				{		// cause of death
 				    element.onkeydown	= inputKeyDown;
-				    element.abbrTbl	= CauseAbbrs;
+				    element.abbrTbl	    = CauseAbbrs;
 				    element.checkfunc	= checkText;
 				    element.onchange	= change;
 				    break;
@@ -330,7 +326,7 @@ function loadEdit()
 				case 'updevent':
 				{		// <button id='updEvent'>
 				    element.onkeydown	= keyDown;
-				    element.onclick	= updateEvent;
+				    element.onclick     = updateEvent;
 				    element.onchange	= change;	// default handler
 				    break;
 				}		// <button id='updEvent'>
@@ -338,28 +334,28 @@ function loadEdit()
 				case 'raw':
 				{		// <button id='raw'>
 				    element.onkeydown	= keyDown;
-				    element.onclick	= showRaw;
+				    element.onclick     = showRaw;
 				    break;
 				}		// <button id='raw'>
 
 				case 'clear':
 				{		// <button id='Clear'>
 				    element.onkeydown	= keyDown;
-				    element.onclick	= clearNotes;
+				    element.onclick     = clearNotes;
 				    break;
 				}		// <button id='Clear'>
 
 				case 'submit':
 				{		// <button id='Submit' type='submit'>
 				    element.onkeydown	= keyDown;
-				    form.onsubmit	= proceedWithSubmit;
+				    form.onsubmit	    = proceedWithSubmit;
 				    break;
 				}		// <button id='Submit' type='submit'>
 
 				case 'close':
 				{		// <button id='close'>
 				    element.onkeydown	= keyDown;
-				    element.onclick	= closeWithoutUpdating;
+				    element.onclick     = closeWithoutUpdating;
 				    break;
 				}		// <button id='close'>
 
@@ -369,8 +365,8 @@ function loadEdit()
 				    element.onchange	= change;	// default handler
 				    if (!focusSet)
 				    {		// need focus in some field
-					element.focus();	// set focus
-					focusSet	= true;
+					    element.focus();	// set focus
+					    focusSet	= true;
 				    }		// need focus in some field
 				    break;
 				}		// textual notes on event
@@ -379,49 +375,49 @@ function loadEdit()
 				case 'addcitationdeathcause':
 				{		// add citation to primary fact
 				    element.onkeydown	= keyDown;
-				    element.onclick	= addCitation;
+				    element.onclick     = addCitation;
 				    break;
 				}		// add citation to primary fact
 
 				case 'pictures':
 				{		// <button id='Pictures'>
 				    element.onkeydown	= keyDown;
-				    element.onclick	= editPictures;
+				    element.onclick     = editPictures;
 				    break;
 				}		// <button id='Pictures'>
 
 				case 'editname':
 				{		// edit alternate name button
 				    element.onkeydown	= keyDown;
-				    element.onclick	= editName;
+				    element.onclick     = editName;
 				    break;
 				}		// edit alternate name button
 
 				case 'delname':
 				{		// delete alternate name button
 				    element.onkeydown	= keyDown;
-				    element.onclick	= delName;
+				    element.onclick     = delName;
 				    break;
 				}		// delete alternate name button
 
 				case 'editcitation':
 				{		// edit alternate name citation button
 				    element.onkeydown	= keyDown;
-				    element.onclick	= editCitation;
+				    element.onclick     = editCitation;
 				    break;
 				}		// edit alternate name citation button
 
 				case 'delcitation':
 				{		// delete alternate name citation button
 				    element.onkeydown	= keyDown;
-				    element.onclick	= deleteCitation;
+				    element.onclick     = deleteCitation;
 				    break;
 				}		// delete alternate name citation button
 
 				case 'addcitation':
 				{		// add alternate name citation button
 				    element.onkeydown	= keyDown;
-				    element.onclick	= addAltCitation;
+				    element.onclick     = addAltCitation;
 				    break;
 				}		// add alternate name citation button
 
@@ -818,7 +814,7 @@ function resetForm()
  *		this		the <button id='updateEvent'> element				*
  ************************************************************************/
 var parmStr;
-function updateEvent()
+function updateEvent(ev)
 {
     if (deferSubmit)
     {
@@ -954,7 +950,7 @@ function updateEvent()
  *  Input:																*
  *		this		the <button id='close'> element						*
  ************************************************************************/
-function closeWithoutUpdating()
+function closeWithoutUpdating(ev)
 {
     closeFrame();
 }		// function closeWithoutUpdating
@@ -1124,7 +1120,7 @@ function noEvent()
  *  Input:																*
  *		this		instance of <button id='editName...'>				*
  ************************************************************************/
-function editName()
+function editName(ev)
 {
     var	idnx		= this.id.substr(8);
     var	formName	= this.form.name;
@@ -1149,7 +1145,7 @@ function editName()
  *  Input:																*
  *		this		instance of <button id='delName...'>				*
  ************************************************************************/
-function delName()
+function delName(ev)
 {
     var	idnx	= this.id.substr(7);
 
@@ -1292,7 +1288,7 @@ function eeKeyDown(e)
  ************************************************************************/
 var pendingElement	= null;
 
-function addCitation()
+function addCitation(ev)
 {
     this.disabled	= true;			// prevent double add cit
     var	form		= this.form;
@@ -1316,7 +1312,6 @@ function addCitation()
 		alert("addCitation: invalid value of type=" + type);
 		return;
     }
-
 
     if (debug.toLowerCase() == 'y')
     {
@@ -1384,8 +1379,8 @@ function addCitation()
     actMouseOverHelp(sourceCell);
 
     // set actions for detail input text field
-    var element		= form.Page0;
-    element.onblur	= createCitation;	// leave field
+    var element		    = form.Page0;
+    element.onblur	    = createCitation;	// leave field
     element.onchange	= createCitation;	// change field
     actMouseOverHelp(element);
 
@@ -1413,7 +1408,7 @@ function addCitation()
  *  Parameters:															*
  *		this		a <button> element									*
  ************************************************************************/
-function editPictures()
+function editPictures(ev)
 {
     var	form		= this.form;
     var	picIdType	= form.PicIdType.value;
@@ -1651,26 +1646,25 @@ function createCitation()
 		    cookie.store(10);		// keep for 10 days
 
 		    // parameters passed by method='post'
-		    var parms		= {
-						"idime" 	: idime,
-						"type"		: type,
-						"idet"		: idet,
-						"idsr"		: idsr,
-						"page"		: pageText,
-						"row"		: rownum,
-						"formname"	: formName,
-                        "debug"     : debug}; 
+		    var parms		= { "idime" 	: idime,
+								"type"		: type,
+								"idet"		: idet,
+								"idsr"		: idsr,
+								"page"		: pageText,
+								"row"		: rownum,
+								"formname"	: formName,
+		                        "debug"     : debug}; 
 
-			var msg	= "parms={";
-			var comma	= '';
+			var msg	        = "parms={";
+			var comma	    = '';
 			for(var pname in parms)
 			{
-			    msg	+= comma + pname + "='" + parms[pname] + "'";
-			    comma	= ',';
+			    msg	        += comma + pname + "='" + parms[pname] + "'";
+			    comma	    = ',';
 			}
-			msg		+= "}";
+			msg		        += "}";
 
-            console.log("editEvent.js: createCitation: 1662 " + msg);
+            //alert("editEvent.js: createCitation: 1667 " + msg);
 
 		    if (debug.toLowerCase() == 'y')
 		    {			// debugging activated
@@ -1783,9 +1777,9 @@ function gotAddCit(xmlDoc)
 
 				    // activate functionality of buttons
 				    var edit	= document.getElementById('editCitation'+ idsx);
-				    edit.onclick= editCitation;
+				    addEventHandler(edit, 'click', editCitation);
 				    var del	= document.getElementById('delCitation' + idsx);
-				    del.onclick	= deleteCitation;
+				    addEventHandler(del, 'click', deleteCitation);
 				}		// citation created
 		    }
 		}		// valid response
@@ -1817,7 +1811,7 @@ function noAddCit()
  *  Input:																*
  *		this		the invoking <button> element						*
  ************************************************************************/
-function addAltCitation()
+function addAltCitation(ev)
 {
     this.disabled	= true;			// prevent double add cit
     var	form		= this.form;
@@ -1883,7 +1877,7 @@ function addAltCitation()
  *  Input:																*
  *		this			instance of <button> tag						*
  ************************************************************************/
-function editCitation()
+function editCitation(ev)
 {
     var	form		= this.form;
     var	idsx		= this.id.substr(12);
@@ -1915,7 +1909,7 @@ function editCitation()
  *  Input:																*
  *		this			<button id='delCitation...'>					*
  ************************************************************************/
-function deleteCitation()
+function deleteCitation(ev)
 {
     var	form		= this.form;
     var	idsx		= this.id.substr(11);
@@ -1937,9 +1931,9 @@ function deleteCitation()
 		displayDialog(dialogDiv,
 				      'CitDel$template',
 				      parms,
-				      this,		// position relative to
+				      this,		        // position relative to
 				      confirmDelete,	// 1st button confirms Delete
-				      false);		// default show on open
+				      false);		    // default show on open
     }		// have popup <div> to display message in
     else
 		alert("editEvent.js: deleteCitation: Error: " + msg);
@@ -2115,7 +2109,7 @@ function checkForAdd()
  *  Input:																*
  *		this		the <button type='button' id='raw'>					*
  ************************************************************************/
-function showRaw()
+function showRaw(ev)
 {
     if ('editnotes' in args)
     {

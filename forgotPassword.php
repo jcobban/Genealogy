@@ -14,8 +14,9 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2018/02/04		use class Template								*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright 2018 James A. Cobban										*
+ *  Copyright &copy; 2019 James A. Cobban		                        *
  ************************************************************************/
 require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/Template.inc';
@@ -28,81 +29,81 @@ $username		= null;		// name
 $email			= null;		// e-mail address
 $lang			= 'en';
 
-foreach($_POST as $key => $value)
-{	// loop through all parameters
+if (count($_POST) > 0)
+{	        	    // invoked by post
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+    foreach($_POST as $key => $value)
+    {	// loop through all parameters
+        if ($debug)
+    		$warn	.= "<p>\$_POST['$key']='$value'</p>\n";
+        switch(strtolower($key))
+        {		// act on specific parameter
+    		case 'userid':
+    		case 'username':
+    		{
+    		    if (strlen($value) > 0)
+    		    {			// userid supplied
+    				$username		= trim($value);
+    				// get existing account details
+    				$user           = new User(array("username" => $username));
+    				if ($user->isExisting())
+    				{
+    				    $email		    = $user->get('email');
+    				    $shapassword	= $user->get('shapassword');
+    				}
+    				else
+    				{
+    				    $msg	.=
+    					"Unable to find account record for user '$username'. ";
+    				}
+    		    }			// signed on
+    		    break;
+    		}	            // userid
+    
+    		case 'email':
+    		{
+    		    if (is_null($email))
+    				$email	            = $value;
+    		    if (strlen($email) > 0)
+    		    {			// email supplied
+    				// get existing account details
+    				$user	            = new User(array("email" => $email));
+    				if ($user->isExisting())
+    				{
+    				    $username		= $user->get('username');
+    				    $shapassword	= $user->get('shapassword');
+    				}
+    				else
+    				{
+    				    $msg	.=
+    					"Unable to find account record for email '$email'. ";
+    				}
+    		    }			// signed on
+    		    break;
+    		}	            // email
+    
+    		case 'lang':
+    		{
+    		    if (strlen($value) >= 2)
+    				$lang		= strtolower(substr($value,0,2));
+    		    break;
+    		}
+        }		// act on specific parameter
+    }			// loop through all parameters
     if ($debug)
-		$warn	.= "<p>\$_POST['$key']='$value'</p>\n";
-    switch(strtolower($key))
-    {		// act on specific parameter
-		case 'userid':
-		case 'username':
-		{
-		    if (strlen($value) > 0)
-		    {			// userid supplied
-				$username		= trim($value);
-				// get existing account details
-				$user    = new User(array("username" => $username));
-				if ($user->isExisting())
-				{
-				    $email		= $user->get('email');
-				    $shapassword	= $user->get('shapassword');
-				}
-				else
-				{
-				    $msg	.=
-					"Unable to find account record for user '$username'. ";
-				}
-		    }			// signed on
-		    break;
-		}	// userid
-
-		case 'email':
-		{
-		    if (is_null($email))
-				$email	= $value;
-		    if (strlen($email) > 0)
-		    {			// email supplied
-				// get existing account details
-				$user	= new User(array("email" => $email));
-				if ($user->isExisting())
-				{
-				    $username		= $user->get('username');
-				    $shapassword	= $user->get('shapassword');
-				}
-				else
-				{
-				    $msg	.=
-					"Unable to find account record for email '$email'. ";
-				}
-		    }			// signed on
-		    break;
-		}	// userid
-
-		case 'lang':
-		{
-		    if (strlen($value) >= 2)
-				$lang		= strtolower(substr($value,0,2));
-		    break;
-		}
-    }		// act on specific parameter
-}			// loop through all parameters
-
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "forgotPassword$lang.html";
-if (!file_exists($tempBase . $includeSub))
+        $warn       .= $parmsText . "</table>\n";
+}	        	// invoked by post 
+else
 {
-    $language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub	= 'forgotPassworden.html';
+    $msg            .= "Not invoked by method=POST. ";
+    $shapassword    = null;
 }
-$template->includeSub($tempBase . $includeSub,
-				      'MAIN');
+
+$template		= new FtTemplate("forgotPassword$lang.html");
+
 $template->set('USERID',	$username);
 $template->set('EMAIL',		$email);
 $template->set('LANG',		$lang);

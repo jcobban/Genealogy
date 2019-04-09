@@ -104,8 +104,9 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/11/02      pass authentication key to GoogleApis           *
  *		2018/11/19      only display coordinates to 6 decimal places    *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																	    *
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Picture.inc';
@@ -195,21 +196,7 @@ else
     $action     = 'Display';
 }
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "Location$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	= new Language(array('code' => $lang));
-	$langName	= $language->get('name');
-	$nativeName	= $language->get('nativename');
-    $sorry      = $language->getSorry();
-    $warn       .= str_replace(array('$langName','$nativeName'),
-                               array($langName, $nativeName),
-                               $sorry);
-	$includeSub	= "Location{$action}en.html";
-}
-$template->includeSub($tempBase . $includeSub, 'MAIN');
+$template		= new FtTemplate("Location$action$lang.html");
 
 // set up title
 if ($idlr > 0)
@@ -235,6 +222,10 @@ $template->set('LATITUDE',		    number_format($location->get('latitude'),6));
 $template->set('LONGITUDE',		    number_format($location->get('longitude'),6));
 $template->set('ZOOM',		        $location->get('zoom'));
 $template->set('NOTES',		        $location->get('notes'));
+if ($closeAtEnd)
+    $template->set('CLOSE',		    'y');
+else
+    $template->set('CLOSE',		    'n');
 
 // update breadcrumbs depending upon location name
 if (strlen($name) > 5)

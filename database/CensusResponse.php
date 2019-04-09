@@ -130,8 +130,11 @@ use \Exception;
  *		2018/06/06		do not set SubDist to array in npprev and npnext*
  *						if there is only one value						*
  *		2018/11/12      simplify construction of forward and back links *
+ *		2019/01/19      avoid failure on district id array              *
+ *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/04/01      do not fail if district not specified           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
@@ -143,23 +146,23 @@ require_once __NAMESPACE__ . '/common.inc';
 // various portions of the SQL SELECT statement
 // set default values that are overriden by parameters
 
-$censusYear				= 1881;		// census year
+$censusYear				= 1881;		    // census year
 $censusId				= 'CA1881';	
-$cc					    = 'CA';		// country code
-$countryName			= 'Canada';	// country name
-$province				= '';		// province/state code
-$provinceName			= '';		// province/state name
-$district				= '';		// default all districts
-$subDistId				= '';		// default all subdistricts
-$distId					= '';		// default all divisions
-$limit					= 20;		// default max lines per page
-$offset					= 0;		// default start with first line of result
-$range					= 1;		// default 1 year either side of age/byear
-$page					= null;		// default any page
-$family					= null;		// default any family
-$lang					= 'en';		// default language
-$orderBy				= 'Name';	// default order alphabetically
-$SurnameSoundex			= false;	// check text of surname, not soundex code
+$cc					    = 'CA';	    	// country code
+$countryName			= 'Canada'; 	// country name
+$province				= 'ON';	    	// province/state code
+$provinceName			= 'Ontario';	// province/state name
+$district				= '';	    	// default all districts
+$subDistId				= '';	    	// default all subdistricts
+$distId					= '';	    	// default all divisions
+$limit					= 20;	    	// default max lines per page
+$offset					= 0;	    	// default start first line of result
+$range					= 1;	    	// default 1 year either side age/byear
+$page					= null;	    	// default any page
+$family					= null;	    	// default any family
+$lang					= 'en';		    // default language
+$orderBy				= 'Name';   	// default order alphabetically
+$SurnameSoundex			= false;    	// check text of surname, not soundex
 $result					= array();
 $respDesc				= '';		
 $search			        = ''; 
@@ -327,18 +330,18 @@ foreach ($_GET as $key => $value)
 
 		    case 'surnamesoundex':
 		    {			// Do soundex comparison of surname
-				$parms[$fieldLc]		= $value;
-				$parmCount		++;
-				$SurnameSoundex		= true;
+				$parms[$fieldLc]		    = $value;
+				$parmCount++;
+				$SurnameSoundex		        = true;
 				break;
 		    }			// Do soundex comparison of surname
 
 		    case 'province':
 		    {			// used only by menu
-				$parmCount		++;
+				$parmCount++;
 				if (preg_match("/^([A-Z]{2})$/", $value))
 				{
-				    $province		= $value;
+				    $province		        = $value;
 				    $parms[$fieldLc]		= $value;
 				}
 				else
@@ -348,10 +351,10 @@ foreach ($_GET as $key => $value)
 
 		    case 'district':
 		    {			// district is simple text
-				$parmCount		++;
+				$parmCount++;
 				if (is_array($value) || is_numeric($value))
 				{
-				    $district	= $value;
+				    $district	            = $value;
 				    $parms[$fieldLc]		= $value;
 				}
 				else
@@ -573,17 +576,30 @@ if (strlen($msg) == 0)
     }		// display lines in alphabetical order
 
     // include district information in URIs for previous and next page
-	if (strlen($province) == 0)
-	{
-	    $getParms		= array();
-	    if ($censusYear == 1851 || $censusYear == 1861)
-			$getParms['d_census']	= $province . $censusYear;
-	    else
-			$getParms['d_census']	= $censusId;
-	    $getParms['d_id']	= $district;
-	    $districtObj	    = new District($getParms);
-	    $province		    = $districtObj->get('d_province');
-	}
+    if (isset($district))
+    {
+	    $getParms		            = array();
+        if ($censusYear == 1851 || $censusYear == 1861)
+	    	$getParms['d_census']	= $province . $censusYear;
+        else
+            $getParms['d_census']	= $censusId;
+        if (is_array($district))
+            $dist_id        	    = reset($district);
+        else
+            $dist_id                = $district;
+        if (!is_null($dist_id) && $dist_id != 0)
+        {
+            $getParms['d_id']   	= $district;
+            $districtObj	        = new District($getParms);
+            $province		        = $districtObj->get('d_province');
+        }
+        else
+            $districtObj	        = null;
+    }
+    else
+    {
+        $districtObj	            = null;
+    }
 
     // execute the query
     $parms['order']	        = $orderBy;
@@ -784,8 +800,6 @@ if ($showLine && $page)
 }		// display whole page
 
     $title	= "$censusYear Census of $countryName Query Response";
-    $tempBase	= $document_root . '/templates/';
-    $template	= new FtTemplate("${tempBase}page$lang.html");
     if ($showLine)
 		$showLineFile	= 'Line';
     else
@@ -794,12 +808,8 @@ if ($showLine && $page)
 		$file	= "CensusResponseAll$showLineFile$lang.html";
     else
 		$file	= "CensusResponse$showLineFile$lang.html";
-    if ($debug)
-		$warn	.= "<p>CensusResponse.php: " . __LINE__ .
-        " includeSub=$tempBase". $file . "</p>\n";
+    $template	= new FtTemplate($file);
 
-    $template->includeSub($tempBase . $file,
-						  'MAIN');
     $template->set('CENSUSYEAR', 		$censusYear);
     $template->set('COUNTRYNAME',		$countryName);
     $template->set('CENSUSID',			$censusId);

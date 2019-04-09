@@ -29,6 +29,7 @@ use \Exception;
  *		2018/01/18		tolerate lang parameter							*
  *						ignore case of parameter names					*
  *		2018/11/11      use class Template                              *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -125,22 +126,7 @@ foreach ($_GET as $key => $value)
 }			            // loop through all parameters
 
 // create template
-$tempBase	        = $document_root . '/templates/';
-$template	        = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	        = "QuerySurnamesTop$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub	    = "QuerySurnamesTopen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
+$template	        = new FtTemplate("QuerySurnamesTop$lang.html");
 
 // validate parameters
 

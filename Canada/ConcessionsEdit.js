@@ -7,8 +7,9 @@
  *  History:															*
  *		2012/06/18		created											*
  *		2018/10/24      change implementation of delete                 *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban.								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -23,8 +24,6 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
     // including support for context specific help
     var	element;

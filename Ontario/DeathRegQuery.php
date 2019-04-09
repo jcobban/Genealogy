@@ -90,14 +90,8 @@ if ($domainObj->isExisting())
     $countryName		= $country->get('name');
 }
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= $tempBase . "DeathRegQuery$lang.html";
-if (!file_exists($includeSub))
-{
-    $includeSub		= $tempBase . "DeathRegQueryen.html";
-}
-$template->includeSub($includeSub, 'MAIN');
+$template		= new FtTemplate("DeathRegQuery$lang.html");
+
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('PROVINCENAME',		$provinceName);
 $template->set('DOMAIN',	    	$domain);

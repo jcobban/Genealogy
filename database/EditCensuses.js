@@ -6,28 +6,27 @@
  *  History:															*
  *		2016/01/21		created											*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/02/21      delete requested by setting name to 'Delete'    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  The onload method of the web page.  This is invoked after the		*
- *  web page has been loaded into the browser. 								*
+ *  web page has been loaded into the browser. 							*
  ************************************************************************/
 function onLoad()
 {
     var	namePattern	= /^([^0-9]*)([0-9]*)$/
 
-    // perform common page initialization
-    pageInit();
-
     // activate functionality for individual input elements
     for(var i = 0; i < document.forms.length; i++)
-    {			// loop through all forms
+    {			    // loop through all forms
 		var form	= document.forms[i];
 		for(var j = 0; j < form.elements.length; j++)
 		{
@@ -43,10 +42,6 @@ function onLoad()
 				colName		= rgxResult[1];
 				rowNum		= rgxResult[2];
 		    }
-
-		    // pop up help balloon if the mouse hovers over a element
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    // identify change action for each cell
 		    switch(colName.toLowerCase())
@@ -94,79 +89,83 @@ function onLoad()
 				    break;
 				}	// other fields
 		    }		// switch on column name
-		}		// loop through all elements
-    }			// loop through all forms
-}		// onLoad
+		}		    // loop through all elements
+    }			    // loop through all forms
+
+    // enable support for hiding and revealing columns
+    var dataTbl		            = document.getElementById("dataTbl");
+    var tblHdr		            = dataTbl.tHead;
+    var tblHdrRow	            = tblHdr.rows[0];
+    for(i = 0; i < tblHdrRow.cells.length; i++)
+    {		// loop through all cells of header row
+		var th			        = tblHdrRow.cells[i];
+		th.onclick		        = columnClick;	// left button click
+		th.oncontextmenu	    = columnWiden;	// right button click
+    }		// loop through all cells of header row
+
+
+    var dataTable               = document.getElementById('dataTbl');
+
+    var dataTable               = document.getElementById('dataTbl');
+    var dataWidth               = dataTable.offsetWidth;
+    var windowWidth             = document.body.clientWidth - 8;
+    if (dataWidth > windowWidth)
+        dataWidth               = windowWidth;
+    var topBrowse               = document.getElementById('topBrowse');
+    topBrowse.style.width       = dataWidth + "px";
+    var botBrowse               = document.getElementById('botBrowse');
+    if (botBrowse)
+        botBrowse.style.width   = dataWidth + "px";
+}		// function onLoad
 
 /************************************************************************
- *  deleteCensus														*
+ *  function deleteCensus												*
  *																		*
- *  This function is called when the user requests to delete a census.		*
+ *  This function is called when the user requests to delete a census.	*
  *																		*
  *  Input:																*
- *		this				<button id='Delete...'> element						*
+ *		this		<button id='Delete...'> element						*
  ************************************************************************/
 function deleteCensus()
 {
-    var	id		= this.id.substring(6);
-    var censusIdElt	= document.getElementById('CensusId' + id);
-    var parms	= {'censusid'		: censusIdElt.value,
-				   'row'		: id};
+    var	id		        = this.id.substring(6);
+    var censusIdElt	    = document.getElementById('CensusId' + id);
+    var parms	        = {'censusid'		: censusIdElt.value,
+				           'row'		    : id};
 
-    HTTP.post("deleteCensusXml.php",
-		      parms,
-		      gotDelete,
-		      noDelete);
-
-    var	cell		= this.parentNode;
-    var	row		= cell.parentNode;
-    var	section		= row.parentNode;
-    section.removeChild(row);
+    var	cell		    = this.parentNode;
+    var	row		        = cell.parentNode;
+    var inputs		    = row.getElementsByTagName('input');
+    for(var ic = 0; ic < inputs.length; ic++)
+    {
+        var element     = inputs[ic];
+        element.type    = 'hidden';
+    }                   // loop through cells of row
+    var buttons		    = row.getElementsByTagName('button');
+    for(var ic = 0; ic < buttons.length; ic++)
+    {
+        element         = buttons[ic];
+        cell            = element.parentNode;
+        row.removeChild(cell);
+    }                   // loop through cells of row
+    var anchors		    = row.getElementsByTagName('a');
+    for(var ic = 0; ic < anchors.length; ic++)
+    {
+        element         = anchors[ic];
+        cell            = element.parentNode;
+        row.removeChild(cell);
+    }
+    var nameElt	        = document.getElementById('Name' + id);
+    nameElt.value       = 'delete';
 }		// deleteCensus
 
 /************************************************************************
- *  gotDelete																*
- *																		*
- *  This method is called when the XML file representing				*
- *  the deletion of the census is received.								*
- *																		*
- *  Input:																*
- *		xmlDoc		XML response file describing the deletion of the message*
- ************************************************************************/
-function gotDelete(xmlDoc)
-{
-    var	censusId	= 'Unknown';
-    var	count		= 0;
-    var censusIdList	= xmlDoc.getElementsByTagName("censusid");
-    if (censusIdList.length > 0)
-		censusId	= censusIdList[0].textContent;
-    var cmdList		= xmlDoc.getElementsByTagName("cmd");
-    if (cmdList.length > 0)
-		count		= cmdList[0].getAttribute('count') - 0;
-
-    if (count == 1)
-		alert("Census " + censusId + ' deleted' );
-    else
-		alert("EditCensuses: gotDelete: Census " + censusId + ' unexpected count=' + count );
-}		// gotDelete
-
-/************************************************************************
- *  noDelete																*
- *																		*
- *  This method is called if there is no script to delete the Census.		*
- ************************************************************************/
-function noDelete()
-{
-    alert("EditCensuses: script deleteCensusXml.php not found on server");
-}		// noDelete
-
-/************************************************************************
- *  addCensus																*
+ *  function addCensus													*
  *																		*
  *  This function is called when the user requests to add a census.		*
  *																		*
  *  Input:																*
- *		this				<button id='Add'> element						*
+ *		this			<button id='Add'> element						*
  ************************************************************************/
 function addCensus()
 {
@@ -174,7 +173,5 @@ function addCensus()
     var	body		= table.tBodies[0];
     var	newRow		= body.rows[0].cloneNode(true);
     var inputs		= newRow.getElementsByTagName('input');
-    for(var ie = 0; ie < inputs.length; ie++)
-		inputs[ie].value	= '';
     body.appendChild(newRow);
 }		// addCensus

@@ -13,8 +13,9 @@ use \Exception;
  *		table	Table that this message is referencing.  Default 'Blogs'*
  *																		*
  * History:																*
- *		2018/09/12	created												*
- *		2018/12/12  change insertion in title to BLOGTITLE              *
+ *		2018/09/12	    created											*
+ *		2018/12/12      change insertion in title to BLOGTITLE          *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -167,22 +168,9 @@ foreach($_GET as $key => $value)
 }			    	// loop through all parameters
 
 // start the template
-$tempBase	    	= $document_root . '/templates/';
-$template	    	= new FtTemplate("${tempBase}page$lang.html");
-$includeSub	    	= "BlogPost$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-    $language		= new Language(array('code' => $lang));
-    $langName		= $language->get('name');
-    $nativeName		= $language->get('nativename');
-	$sorry      	= $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub		= "BlogPosten.html";
-}
-$template->includeSub($tempBase . $includeSub,
-        		     'MAIN');
+$template	    	= new FtTemplate("BlogPost$lang.html");
+
+$tempBase           = $document_root . '/templates/';
 if (file_exists($tempBase . "Trantab$lang.html"))
     $trtemplate = new Template("${tempBase}Trantab$lang.html");
 else

@@ -126,6 +126,8 @@ foreach ($_GET as $key => $value)
 	}   		// act on specific parameters
 }   			// loop through all parameters
 
+$template		    = new FtTemplate("BirthDateFixup$lang.html");
+
 $domainObj	        = new Domain(array('domain'	    => $domain,
 				                       'language'	=> $lang));
 $countryObj	        = new Country(array('code' => $cc));
@@ -173,21 +175,6 @@ else
 							   print_r($stmt->errorInfo(), true);
 }		// error performing query
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= $tempBase . "BirthDateFixup$lang.html";
-if (!file_exists($includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub		= $tempBase . "BirthDteFixupen.html";
-}
-$template->includeSub($includeSub, 'MAIN');
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('DOMAINNAME',		$domainName);
 $template->set('DOMAIN',	    	$domain);

@@ -5,11 +5,12 @@
  *  page ToDoList.php.								                    *
  *																		*
  *  History:								                            *
- *	2010/12/25	created								                    *
- *	2012/01/13	change class names								        *
- *	2013/08/01	defer facebook initialization until after load			*
+ *	    2010/12/25	    created						                    *
+ *	    2012/01/13	    change class names						        *
+ *	    2013/08/01	    defer facebook initialization until after load	*
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2013 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -26,34 +27,28 @@
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     for(var i = 0; i < document.forms.length; i++)
     {
-	var form	= document.forms[i];
-	var projectId	= form.name.substring(8);
+		var form	= document.forms[i];
+		var projectId	= form.name.substring(8);
 
-	for(var j = 0; j < form.elements.length; j++)
-	{
-	    var element	= form.elements[j];
+		for(var j = 0; j < form.elements.length; j++)
+		{
+		    var element	= form.elements[j];
 
-	    // pop up help balloon if the mouse hovers over a field
-	    // for more than 2 seconds
-	    actMouseOverHelp(element);
+		    // take action specific to element
+		    var	name;
+		    if (element.name && element.name.length > 0)
+				name	= element.name;
+		    else
+				name	= element.id;
 
-	    // take action specific to element
-	    var	name;
-	    if (element.name && element.name.length > 0)
-		name	= element.name;
-	    else
-		name	= element.id;
-
-	    if (name.substring(0,7) == 'message')
-		element.onfocus	= messageFocus;
-	    else
-	    if (name.substring(0,8) == 'PostBlog')
-		element.onclick	= postBlog;
-	}	// loop through all elements in form
+		    if (name.substring(0,7) == 'message')
+				element.onfocus	= messageFocus;
+		    else
+		    if (name.substring(0,8) == 'PostBlog')
+				element.onclick	= postBlog;
+		}	// loop through all elements in form
     }		// loop through all forms in this page
 }		// onLoad
 
@@ -89,14 +84,14 @@ function postBlog()
     var message		= blogform['message' + projectId].value;
 
     var parms		= {
-		"projectId"	: projectId,
-		"message"	: message};
+				"projectId"	: projectId,
+				"message"	: message};
 
     // invoke script to update Event and return XML result
     HTTP.post("postProjectBlog.php",
-	      parms,
-	      gotBlog,
-	      noBlog);
+		      parms,
+		      gotBlog,
+		      noBlog);
 }	// postBlog
 
 /************************************************************************
@@ -110,24 +105,24 @@ function gotBlog(xmlDoc)
     var	root	= xmlDoc.documentElement;
     if (root && root.nodeName == 'blog')
     {
-	//alert("gotBlog: " + tagToString(root));
-	location	= location;	// force refresh of window
+		//alert("gotBlog: " + tagToString(root));
+		location	= location;	// force refresh of window
     }
     else
     {		// error
-	var	msg	= "Error: ";
-	if (root)
-	{
-	    for(var i = 0; i < root.childNodes.length; i++)
-	    {		// loop through children
-		var node	= root.childNodes[i];
-		if (node.nodeValue != null)
-		    msg	+= node.nodeValue;
-	    }		// loop through children
-	}
-	else
-	    msg	+= root;
-	alert (msg);
+		var	msg	= "Error: ";
+		if (root)
+		{
+		    for(var i = 0; i < root.childNodes.length; i++)
+		    {		// loop through children
+				var node	= root.childNodes[i];
+				if (node.nodeValue != null)
+				    msg	+= node.nodeValue;
+		    }		// loop through children
+		}
+		else
+		    msg	+= root;
+		alert (msg);
     }		// error
 }		// gotBlog
 

@@ -1,25 +1,25 @@
 /************************************************************************
- *  Videos.js								*
- *									*
- *  This file implements the dynamic functionality of the web page	*
- *  Videos.php								*
- *									*
- *  History:								*
- *	2018/02/01	created						*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  Videos.js															*
+ *																		*
+ *  This file implements the dynamic functionality of the web page		*
+ *  Videos.php															*
+ *																		*
+ *  History:															*
+ *		2018/02/01		created											*
+ *		2019/02/10      no longer need to call pageInit                 *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad								*
- *									*
- *  Initialize the dynamic functionality once the page is loaded	*
+ *  function onLoad														*
+ *																		*
+ *  Initialize the dynamic functionality once the page is loaded		*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
 
     // activate handling of key strokes in text input fields
     // including support for context specific help
@@ -120,14 +120,14 @@ function onLoad()
 }		// function onLoad
 
 /************************************************************************
- *  deleteVideo								*
- *									*
- *  When a Delete button is clicked this function visually removes the	*
- *  row from the table and sets a flag so when the Update button is	*
- *  clicked the record will be deleted.					*
- *									*
- *  Input:								*
- *	$this		<button type=button id='DeleteButton....'	*
+ *  deleteVideo																*
+ *																		*
+ *  When a Delete button is clicked this function visually removes the		*
+ *  row from the table and sets a flag so when the Update button is		*
+ *  clicked the record will be deleted.										*
+ *																		*
+ *  Input:																*
+ *		$this				<button type=button id='DeleteButton....'		*
  ************************************************************************/
 function deleteVideo()
 {
@@ -144,13 +144,13 @@ function deleteVideo()
 }		// deleteVideo
 
 /************************************************************************
- *  addVideo								*
- *									*
- *  When the Add row button is clicked this function adds a row		*
- *  into the table.							*
- *									*
- *  Input:								*
- *	$this		<button type=button id='Add'>			*
+ *  function addVideo													*
+ *																		*
+ *  When the Add row button is clicked this function adds a row			*
+ *  into the table.														*
+ *																		*
+ *  Input:																*
+ *		$this		<button type=button id='Add'>						*
  ************************************************************************/
 function addVideo()
 {

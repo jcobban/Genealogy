@@ -1,5 +1,5 @@
 <!DOCTYPE HTML >
-<html lang="$LANG">
+<html lang="en">
   <head>
     <title>
 	$TITLE
@@ -14,79 +14,93 @@
  *		2018/01/25		optional CSS and Javascript removed				*
  *		2018/02/04		update header/footer links						*
  *		2018/05/27		add insertion for other style sheets			*
+ *      2019/01/29      use menu button                                 *
+ *      2019/02/05      remove rightTop button                          *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
-    <meta charset='utf-8'>
-    <meta name='author' content='James A. Cobban'>
-    <meta name='copyright' content='&copy; 2018 James A. Cobban'>
-    <meta name='keywords' content='genealogy, family, tree, ontario, canada $KEYWORDS'>
-    <link rel='stylesheet' type='text/css' href='/styles.css'>
-    <link rel='stylesheet' type='text/css' href='$filename.css'
+    <meta charset="utf-8">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2019 James A. Cobban">
+    <meta name="keywords" content="genealogy, family, tree, ontario, canada $KEYWORDS">
+    <link rel="stylesheet" type="text/css" href="/styles.css">
+    <link rel="stylesheet" type="text/css" href="$filename.css"
             id="otherStylesheets">
   </head>
   <body>
-  <header>
-  <div class='topcrumbs'> <!-- start of page header -->
-    <span class='right'>
-      <button id='rightTop' type='button'>
-	    $BLOGFLAG$USERID$CONTRIBUTE
-      </button>
-    </span>
-    <span class='right368'>
-      <iframe id='advertFrame' class='advert' $IECRAP src='$ADURL'>
-      </iframe>
-    </span>
-    $BREADCRUMBS
-    <div style='clear: both;'></div>
-    </div> <!-- end of page header -->
-  </header>
-  <main>
-<noscript>
-  <p class="warning">
- For full functionality of this site it is necessary to enable JavaScript.
- Here are the <a href="https://www.enable-javascript.com/" target="_blank">
- instructions how to enable JavaScript in your web browser</a>.
-  </p>
-</noscript>
-$MAIN
-  </main>
-  <footer>
-    <div class='botcrumbs'>
-      <span class='right450'>
-	<iframe id='facebookFrame' class='facebook' $IECRAP>
-	</iframe>
-	&nbsp;
-	<img src='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+    <header id="headSection">
+      <div class="topcrumbs"> <!-- start of page header -->
+    	<img src="/logo70.gif" id="logo" class="right"
+                height="70" width="70" alt="James Cobban Logo">
+          &nbsp;
+        <span class="right" style="width: 360px;" id="facebookSpan">
+    	  <iframe id="facebookFrame" class="facebook" $IECRAP>
+    	  </iframe>
+          &nbsp;
+        </span>
+        <span class="right" style="width: 500px;" id="advertSpan">
+          <iframe id="advertFrame" class="advert" $IECRAP src="$ADURL">
+          </iframe>
+          &nbsp;
+        </span>
+        <span id="menuButton" class="left">
+          <div class="menuicon"></div>
+          <div class="menuicon"></div>
+          <div class="menuicon"></div>
+        </span>
+        <div class="menu" id="menu">
+            $BREADCRUMBS
+        </div>
+        <div style="clear: both;"></div>
+      </div> <!-- end of page header -->
+    </header>
+    <main id="mainSection">
+  	<noscript>
+  	  <p class="warning">
+      	 For full functionality of this site it is necessary to enable
+           JavaScript.  Here are the
+           <a href="https://www.enable-javascript.com/" target="_blank">
+      	 instructions how to enable JavaScript in your web browser</a>.
+  	  </p>
+  	</noscript>
+  	$MAIN
+    </main>
+    <footer id="footSection">
+      <div class="botcrumbs">
+  	    <a href="/contactAuthor.php?idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT" target="_blank">
+  	      Contact Author</a>
+  	    <br>
+        <div style="clear: both;"></div>
+      </div> <!-- end of page footer -->
+    </footer>
+    <div class="hidden" id="UserInfo">
+      <span id="UserInfoUserid">$USERID</span>
+      <span id="UserInfoAuthorized">$AUTHORIZED</span>
+      <span id="UserInfoOptions">$OPTIONS</span>
+      <span id="UserInfoSignon"><span title="Sign on to your account or register to contribute">Sign On</span></span>
+      <span id="UserInfoAccount">
+          <a href="/Account.php?lang=$LANG" id="session" target="_blank"
+              title="Your account status">
+              Account $USERID
+            <span id="gotMail">
+                <img src="/envelope.svg" alt="You have mail" style="display: inline; height: 19px;"/>
+            </span>
+          </a><br>
       </span>
-	<a href='/contactAuthor.php?idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
-	  Contact Author</a>
-	<br>
-    $BREADCRUMBS
-      <div style='clear: both;'></div>
-    </div> <!-- end of page footer -->
-  </footer>
-    <div class='hidden' id='UserInfo'>
-      <span id='UserInfoUserid'>$USERID</span>
-      <span id='UserInfoAuthorized'>$AUTHORIZED</span>
-      <span id='UserInfoOptions'>$OPTIONS</span>
+      <span id="UserInfoAbout">About this Site</span>
     </div>
-    <div class='balloon' id='HelprightTop'>
-    Click on this button to signon to access extended features of the web-site
-    or to manage your account with the web-site.
+    <div class="balloon" id="msgDiv">
     </div>
-    <div class='balloon' id='msgDiv'>
-    </div>
-    <div id='hideMsgTemplate' class='hidden'>
+    <div id="hideMsgTemplate" class="hidden">
       <!-- template for dialog reporting error from getIndivNamesXml.php -->
-      <form name='Msg\$template' id='Msg\$template'>
-	    <p class='message'>\$msg</p>
+      <form name="Msg\$template" id="Msg\$template">
+	    <p class="message">\$msg</p>
     	<p>
-	    <button type='button' id='closeDlg\$template'>
+	    <button type="button" id="closeDlg\$template">
     	    OK
 	    </button>
 	    </p>
       </form>
-    </div>		<!-- id='hideMsgTemplate'-->
+    </div>		<!-- id="hideMsgTemplate"-->
   </body>
 </html>

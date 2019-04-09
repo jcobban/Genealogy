@@ -10,41 +10,40 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
-  </div>	
-  <div class="body">
-    <h1 class="clear">Account Management
-      <span class="right">
-	<a href="/Account.php?lang=fr">Français</a>
-	<a href="/AccountHelpen.html" target="help">?&nbsp;Help</a>
-      </span>
-    </h1>
-    $TRACE
-    $MSG
-  <p class="label" id="okmsg">$OKMSG</p>
-  <div id="update">
-    <form action="Account.php"
-	name="accountForm" id="accountForm"
-	method="post"  
-	enctype="multipart/form-data">
-      <p id="useridRow" class="clear">
-	<label class="label" for="userid">
-	  User Identifier:
-	</label>
-	<input type="text" size="32" maxlength="64"
-		class="white leftnc" name="userid" id="userid"
-		autocomplete="off" readonly="readonly"
-		value="$USERID"/>
-      </p>
-      <p id="passRow" class="clear">
-	<label class="label" for="password">
-	  Current Password:
-	</label>
-	<input type="password" size="32" maxlength="64"
-		name="password" id="password"
-		class="white leftnc" autocomplete="off"/>
-	    <span id='passwordPoor' style='color:#e00000; display:none'>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    </div>	
+    <div class="body">
+      <h1 class="clear">Account Management
+        <span class="right">
+    	  <a href="/AccountHelpen.html" target="help">?&nbsp;Help</a>
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <p class="label" id="okmsg">$OKMSG</p>
+      <div id="update">
+        <form action="Account.php"
+        	name="accountForm" id="accountForm"
+        	method="post"  
+        	enctype="multipart/form-data">
+          <p id="useridRow" class="clear">
+        	<label class="label" for="userid">
+        	  User Identifier:
+        	</label>
+	        <input type="text" size="32" maxlength="64"
+	        	class="white leftnc" name="userid" id="userid"
+		        autocomplete="off" readonly="readonly"
+		        value="$USERID"/>
+          </p>
+          <p id="passRow" class="clear">
+	        <label class="label" for="password">
+        	  Current Password:
+        	</label>
+        	<input type="password" size="32" maxlength="64"
+        		name="password" id="password"
+        		class="white leftnc" autocomplete="off"/>
+        	  <span id='passwordPoor' style='color:#e00000; display:none'>
 		Your new password is poor.
 	    </span>
 	    <span id='passwordWeak' style='color:#a89800; display:none'>

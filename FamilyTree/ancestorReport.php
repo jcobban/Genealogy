@@ -60,11 +60,11 @@ use \Exception;
  *		2017/10/08		improve parameter validation					*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/10/25      use class Template                              *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -159,7 +159,7 @@ function show($person, $level, $prefix 		= '', $template)
 		    }		// displaying info on father
         }		// loop through parents
 
-        $temElt         		= $template->getElementById('showPerson');
+        $temElt         		= $template['showPerson'];
         $ttemplate      		= new Template($temElt->outerHTML());
         $ttemplate->set('PREFIX',       $prefix);
         $ttemplate->set('IDIR',         $idir);
@@ -199,7 +199,7 @@ function show($person, $level, $prefix 		= '', $template)
     }			// at least one set of parents
     else
     {			// no parents
-        $temElt         		= $template->getElementById('showPerson');
+        $temElt         		= $template['showPerson'];
         $ttemplate      		= new Template($temElt->outerHTML());
         $ttemplate->set('PREFIX',       $prefix);
         $ttemplate->set('IDIR',         $idir);
@@ -251,111 +251,107 @@ foreach($_COOKIE as $key => $value)
 }		            // examine all relevant session parameters
 
 // check passed parameters
-foreach($_GET as $key => $value)
-{		// examine all parameters
-	switch ($key)
-	{	// act on specific parameters
-	    case 'ancDepth':
-	    {
-			if (ctype_digit($value) && $value > 0)
-			{
-			    $ancDepth		= $value;
-			    setcookie('ancDepth', $ancDepth);
-			}
-			else
-			    $warn	.= "<p>ancDepth='$value' ignored.</p>\n";
-			break;
-	    }	// ancestor display depth
+if (count($_GET) > 0)
+{		            // invoked by submit to update account
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {		// examine all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch ($key)
+		{	// act on specific parameters
+		    case 'ancDepth':
+		    {
+				if (ctype_digit($value) && $value > 0)
+				{
+				    $ancDepth		= $value;
+				    setcookie('ancDepth', $ancDepth);
+				}
+				else
+				    $warn	.= "<p>ancDepth='$value' ignored.</p>\n";
+				break;
+		    }	// ancestor display depth
+	
+		    case 'incLocs':
+		    {    // indicator of whether or not to show locations
+				$incLocs		= $value;
+				if ($incLocs)
+				    setcookie('incLocs', $incLocs == 1);
+				break;
+		    }	// to show or not to show locations
+	
+		    case 'idir':
+		    {    // identify the individual whose ancestors are to be displayed
+				if (ctype_digit($value) && $value > 0)
+				{
+				    $idir	= intval($value);
+				    $person	= new Person(array('idir' => $idir));
+	
+				    if ($person->isExisting())
+				    {
+						$name		= $person->getName(
+								Person::NAME_INCLUDE_DATES);
+						$surname	= $person->getSurname();
+						$given		= $person->getGivenName();
+						$bdateTxt	= $person->getBirthDate();
+						$ddateTxt	= $person->getDeathDate();
+						$treeName	= $person->getTreeName();
+						$nameuri	= rawurlencode($surname . ', ' .$given);
+						if (strlen($surname) == 0)
+						    $prefix	= '';
+						else
+						if (substr($surname,0,2) == 'Mc')
+						    $prefix	= 'Mc';
+						else
+						    $prefix	= substr($surname,0,1);
+	
+						$title		= "Ancestor Tree for $name";
+				    }		// existing person in tree
+				    else
+				    {
+						$msg		.=
+							"There is no existing person with IDIR=$idir. ";
+						$title		= "Ancestor Tree Failure";
+						$surname	= 'Unknown';
+						$name		= 'Unknown';
+						$prefix		= '?';
+				    }
+				}	// syntax OK
+				else
+				{	// not a number
+				    $msg	.= "Invalid parameter IDIR='$value'. ";
+				}	// not a number
+				break;
+	        }		// IDIR
+	
+	        case 'lang':
+	        {
+	            if (strlen($value) >= 2)
+				    $lang	        = strtolower(substr($value, 0, 2));
+	        }
+		}		    // act on specific parameters
+    }			    // examine all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}		            // invoked by submit to update account
 
-	    case 'incLocs':
-	    {    // indicator of whether or not to show locations
-			$incLocs		= $value;
-			if ($incLocs)
-			    setcookie('incLocs', $incLocs == 1);
-			break;
-	    }	// to show or not to show locations
-
-	    case 'idir':
-	    {    // identify the individual whose ancestors are to be displayed
-			if (ctype_digit($value) && $value > 0)
-			{
-			    $idir	= intval($value);
-			    $person	= new Person(array('idir' => $idir));
-
-			    if ($person->isExisting())
-			    {
-					$name		= $person->getName(
-							Person::NAME_INCLUDE_DATES);
-					$surname	= $person->getSurname();
-					$given		= $person->getGivenName();
-					$bdateTxt	= $person->getBirthDate();
-					$ddateTxt	= $person->getDeathDate();
-					$treeName	= $person->getTreeName();
-					$nameuri	= rawurlencode($surname . ', ' .$given);
-					if (strlen($surname) == 0)
-					    $prefix	= '';
-					else
-					if (substr($surname,0,2) == 'Mc')
-					    $prefix	= 'Mc';
-					else
-					    $prefix	= substr($surname,0,1);
-
-					$title		= "Ancestor Tree for $name";
-			    }		// existing person in tree
-			    else
-			    {
-					$msg		.=
-						"There is no existing person with IDIR=$idir. ";
-					$title		= "Ancestor Tree Failure";
-					$surname	= 'Unknown';
-					$name		= 'Unknown';
-					$prefix		= '?';
-			    }
-			}	// syntax OK
-			else
-			{	// not a number
-			    $msg	.= "Invalid parameter IDIR='$value'. ";
-			}	// not a number
-			break;
-        }		// IDIR
-
-        case 'lang':
-        {
-            if (strlen($value) == 2)
-                $lang           = strtolower($value);
-        }
-	}		// act on specific parameters
-}			// examine all parameters
+// display page
+$template		= new FtTemplate("ancestorReport$lang.html", true);
 
 // check for mandatory parameters
 if (is_null($idir))
 {		// missing parameter
-	$title	= "Ancestor Tree Failure";
-	$msg	.= 'Missing mandatory parameter idir. ';
+	$title	        = "Ancestor Tree Failure";
+	$msg	        .= 'Missing mandatory parameter idir. ';
 }		// missing parameter
 
-// display page
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}dialog$lang.html");
-$includeSub		= "ancestorReport$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	    = new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-    $sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = "ancestorReporten.html";
-}
-$template->includeSub($tempBase . $includeSub,
-			    	  'MAIN');
-
 // I18N
-$fatherText		    = $template->getElementById('Father')->innerHTML();
-$motherText		    = $template->getElementById('Mother')->innerHTML();
-$elt                = $template->getElementById('Fathers');
+$fatherText		    = $template['Father']->innerHTML();
+$motherText		    = $template['Mother']->innerHTML();
+$elt                = $template['Fathers'];
 if ($elt)
 {
     $fathersmaleText	= $elt->innerHTML();
@@ -363,10 +359,10 @@ if ($elt)
 }
 else
 {
-    $fathersmaleText	= $template->getElementById('Fathersmale')->innerHTML();
-    $fathersfemaleText	= $template->getElementById('Fathersfemale')->innerHTML();
+    $fathersmaleText	= $template['Fathersmale']->innerHTML();
+    $fathersfemaleText	= $template['Fathersfemale']->innerHTML();
 }
-$elt                = $template->getElementById('Mothers');
+$elt                = $template['Mothers'];
 if ($elt)
 {
     $mothersmaleText	= $elt->innerHTML();
@@ -374,11 +370,11 @@ if ($elt)
 }
 else
 {
-    $mothersmaleText	= $template->getElementById('Mothersmale')->innerHTML();
-    $mothersfemaleText	= $template->getElementById('Mothersfemale')->innerHTML();
+    $mothersmaleText	= $template['Mothersmale']->innerHTML();
+    $mothersfemaleText	= $template['Mothersfemale']->innerHTML();
 }
-$failureText		= $template->getElementById('Failure')->innerHTML();
-$direction		    = $template->getElementById('direction')->innerHTML();
+$failureText		    = $template['Failure']->innerHTML();
+$direction		        = $template['direction']->innerHTML();
 
 // pass parameters to template
 $template->set('LANG',	        $lang);

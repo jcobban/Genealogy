@@ -128,52 +128,167 @@ use \Exception;
  *		2018/03/17		display registration year and number in col 1	*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		                do not reject lang parameter                    *
+ *		2019/01/24      use class Template                              *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/Person.inc';
+require_once __NAMESPACE__ . '/PersonSet.inc';
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Marriage.inc';
 require_once __NAMESPACE__ . '/MarriageParticipant.inc';
 require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/CitationSet.inc';
+require_once __NAMESPACE__ . "/Template.inc";
 require_once __NAMESPACE__ . "/common.inc";
-require_once 'MarriageRegDetailLib.php';
 
 /************************************************************************
- *  $monthNames															*
+ *  searchpParticipant													*
  *																		*
- *		Table to translate numeric months to month names				*
- ************************************************************************/
-    $monthNames	= array(	'01'	=> 'Jan',
-    						'02'	=> 'Feb',
-    						'03'	=> 'Mar',
-    						'04'	=> 'Apr',
-    						'05'	=> 'May',
-    						'06'	=> 'Jun',
-    						'07'	=> 'Jul',
-    						'08'	=> 'Aug',
-    						'09'	=> 'Sep',
-    						'10'	=> 'Oct',
-    						'11'	=> 'Nov',
-    						'12'	=> 'Dec');
-
-/************************************************************************
- *  function right														*
- *																		*
- *  Return the right most portion of a string								*
+ *  Handle the IDIR or IDIR lookup for a participant.                   *
  *																		*
  *  Input:																*
- *		$string				string												*
- *		$len				length of string to return						*
+ *		$participant				MarriageParticipant record			*
  ************************************************************************/
-function right($string, $len)
+function searchParticipant($participant)
 {
-    return substr($string, strlen($string) - $len);
-}		// function right
+    global  $template;
+    global  $debug;
+    global  $warn;
+
+    // if this participant is not already linked to
+    // look for individuals who match
+    $regYear			= $participant->get('m_regyear');
+    $role				= $participant->get('m_role');
+    $givenNames			= $participant->get('m_givennames');
+    $surname			= $participant->get('m_surname');
+    $age				= $participant->get('m_age');
+    $birthYear			= $participant->get('m_byear');
+    $idir				= $participant->get('m_idir');
+    $residence			= $participant->get('m_residence');
+    $birthPlace			= $participant->get('m_birthplace');
+    $occupation			= $participant->get('m_occupation');
+    $marStat			= $participant->get('m_marstat');
+    $religion			= $participant->get('m_religion');
+    $fatherName			= $participant->get('m_fathername');
+    $motherName			= $participant->get('m_mothername');
+
+    // assume minister is middle aged (between 25 and 69)
+    if ($role == 'M' && ($age == '' || $age == 0))
+    {
+        $age	= 47;
+        $birthYear	= $regYear - 47;
+    }
+
+    // cover the case where the birth year fields is not initialized
+    if ($birthYear === null || $birthYear == 0 ||
+        $age === null || $age === 0)
+    {		// birth year not present in transcription
+        if (is_int($age) || (strlen($age) > 0 && ctype_digit($age)))
+            $birthYear	= $regYear - $age;
+        else
+            $birthYear	= $regYear - 20;
+    }		// birth year not present in database
+
+    // check for matching individuals in the family tree
+    $chooseRow          = $template[$role . 'ChooseRow'];
+    if ($chooseRow)
+    {                       // updating
+	    if (strlen($surname) > 0 && strlen($givenNames) > 0 &&
+	        ($idir == 0 || $idir === null))
+	    {		            // no existing citation
+	        // search for a match on any of the parts of the
+	        // given name
+	        $gnameList	= explode(' ', $givenNames);
+	
+	        $getParms	= array('loose'		    => true,
+	                            'incmarried'	=> true,
+	                            'surname'	    => $surname,
+	                            'givenname'	    => $gnameList);
+	
+	        // selection based on gender of partner
+	        if ($role == 'G')
+	        {
+	            $getParms['gender']	= 0;
+	            $birthDelta		    = 2;
+	        }
+	        else
+	        if ($role == 'B')
+	        {
+	            $getParms['gender']	= 1;
+	            $birthDelta		    = 2;
+	        }
+	        else
+	        {
+	            $birthDelta		    = 27;
+	        }
+	
+	        // look on either side of the birth year
+	        $birthrange	= array(($birthYear - $birthDelta) * 10000,
+	                            ($birthYear + $birthDelta) * 10000);
+	        $getParms['birthsd']	= $birthrange;
+	        $getParms['order']		= "tblNX.Surname, tblNX.GivenName, tblIR.BirthSD";
+	
+	        $fatherName	    = trim($fatherName);
+	        if (strlen($fatherName) > 2)
+	        {		        // possibly include father's surname in check
+	            $spacecol	= strrpos($fatherName, ' ');
+	            if (is_int($spacecol))
+	                $fatherSurname	= substr($fatherName, $spacecol + 1);
+	            else
+	                $fatherSurname	= $fatherName;
+	            if (is_string($fatherSurname) && $fatherSurname != $surname)
+	                $getParms['surname']	= array($surname,
+	                                        		$fatherSurname, null);
+	        }		        // possibly include father's surname in check
+	
+	        // use the alternate name table so the search includes married
+	        // names, but include information from the main record
+	        if ($role == 'M')
+	            $getParms['occupation']	= array('minister',
+	                        	                'priest',
+	                        	                'clergyman');
+	
+	        if ($debug)
+	            $warn	    .= "<p>\$getParms=" . print_r($getParms, true) .
+	                           "</p<\n";
+	        $imatches	    = new PersonSet($getParms);
+	        $options        = $template[$role . 'Option$iidir'];
+	        if (is_null($options))
+	        {
+	            $warn   .= "<p>263 cannot find '{$role}Option\$iidir'</p>\n";
+                $warn   .= "<p>264 chooseRow=" . $chooseRow->show() . "</p>\n";
+	        }
+	        else
+		    if ($imatches && $imatches->count() > 0)
+	        {	            // matched to some individuals in family tree
+                $searchList     = array();
+                $childof        = $template['childof']->innerHTML();
+		        foreach($imatches as $iidir => $person)
+		        {	        // loop through results
+                    $iname          = $person->getName(Person::NAME_INCLUDE_DATES);
+                    $parents        = $person->getPreferredParents();
+                    if ($parents)
+                        $iname      .= $childof . $parents->getName();
+		            $searchList[]   = array('iidir'     => $iidir,
+		                                    'iname'     => $iname,
+		                                    'sexclass'  => $person->getGenderClass());
+	            }	        // loop through results
+	            $options->update($searchList);
+		    }	            // matched to some individuals in family tree
+		    else
+	        {               // no matches
+	            $chooseRow->update(null);
+		    }               // no matches
+	    }		            // no existing citation
+		else
+	        $chooseRow->update(null);
+    }                       // updating
+}		// function searchParticipant
 
 /************************************************************************
  *		Open Code														*
@@ -182,28 +297,23 @@ function right($string, $len)
 // update the database
 if(canUser('edit'))
 {
-	$action		= "Update";
-	$readonly	= "";
-	$txtleftclass	= "white left";
-	$txtleftclassnc	= "white leftnc";
-	$txtrightclass	= "white rightnc";
+    $action		    = "Update";
 }
 else
 {
-	$action		= "Details";
-	$readonly	= " readonly='readonly'";
-	$txtleftclass	= "ina left";
-	$txtleftclassnc	= "ina leftnc";
-	$txtrightclass	= "ina rightnc";
+    $action		    = "Display";
 }
 
 // validate parameters
 $regYear			= '';
-$regNum		    	= '';
-$volume	    		= '';
-$page	    		= '';
-$item	    		= '';
-$domain	    		= 'CAON';	    // default domain
+$regNum		        = '';
+$paddedRegNum       = '0000000';
+$volume	            = '';
+$page	            = '';
+$item	            = '';
+$cc	                = 'CA';	        // default country code
+$countryName		= 'Canada';	    // default country name
+$domain	            = 'CAON';	    // default domain
 $domainName			= 'Ontario';	// default domain name
 $countyName			= '';
 $regCounty			= '';
@@ -218,1002 +328,501 @@ foreach($_GET as $key => $value)
 {			// loop through all input parameters
     $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                          "<td class='white left'>$value</td></tr>\n"; 
-	switch(strtolower($key))
-	{		// process specific named parameters
-	    case 'regyear':
-	    {
-			if (ctype_digit($value) &&
-			    ($value >= 1800) && ($value < 2018))
-			    $regYear	= $value;
-			else
-			    $msg	.= "Registration Year $value must be a number between 1800 and 2018. ";
-			break;
-	    }		// RegYear passed
+    switch(strtolower($key))
+    {		// process specific named parameters
+        case 'regyear':
+        {
+            $regYear	    = $value;
+            break;
+        }		// RegYear passed
 
-	    case 'regnum':
-	    {
-			if (ctype_digit($value))
-			    $regNum	= $value;
-			else
-			    $msg	.= "Registration Number $value must be a number. ";
-			break;
-	    }		// RegNum passed
+        case 'regnum':
+        {
+            $regNum	        = $value;
+            break;
+        }		// RegNum passed
 
-	    case 'originalvolume':
-	    {
-			$volume		= $value;
-			$numVolume	= preg_replace('/[^0-9]/', '', $value);
-			break;
-	    }		// RegNum passed
+        case 'originalvolume':
+        {
+            $volume		    = $value;
+            $numVolume	    = preg_replace('/[^0-9]/', '', $value);
+            break;
+        }		// RegNum passed
 
-	    case 'originalpage':
-	    {
-			if (ctype_digit($value))
-			    $page	= $value;
-			else
-			    $msg	.= "Page Number $value must be a number. ";
-			break;
-	    }		// RegNum passed
+        case 'originalpage':
+        {
+            if (ctype_digit($value))
+                $page	    = $value;
+            else
+                $msg	    .= "Page Number $value must be a number. ";
+            break;
+        }		// RegNum passed
 
-	    case 'originalitem':
-	    {
-			if (ctype_digit($value))
-			    $item	= $value;
-			else
-			    $msg	.= "Item Number $value must be a number. ";
-			break;
-	    }		// RegNum passed
+        case 'originalitem':
+        {
+            if (ctype_digit($value))
+                $item	    = $value;
+            else
+                $msg	    .= "Item Number $value must be a number. ";
+            break;
+        }		// RegNum passed
 
-	    case 'regdomain':
-	    case 'domain':
-	    {
-			$domainObj	= new Domain(array('domain'	=> $value,
-								   'language'	=> 'en'));
-			if ($domainObj->isExisting())
-			{
-			    $domain	= $value;
-			    $domainName	= $domainObj->get('name');
-			}
-			else
-			{
-			    $msg	.= "Domain '$domain' must be a supported two character country code followed by a state or province code. ";
-			    $domainName	= 'Domain : ' . $domain;
-			}
-			break;
-	    }		// RegDomain
+        case 'regdomain':
+        case 'domain':
+        {
+            $domain	        = $value;
+            break;
+        }		// RegDomain
 
-	    case 'showimage':
-	    {
-			break;
-	    }		// handled by JavaScript
+        case 'showimage':
+        {
+            break;
+        }		// handled by JavaScript
 
-	    case 'lang':
+        case 'lang':
         {		// preferred language
             if (strlen($value) >= 2)
                 $lang       = strtolower(substr($value, 0, 2));
-			break;
-	    }		// preferred language
+            break;
+        }		// preferred language
 
 
-	    case 'debug':
-	    {		// handled by common code
-			break;
-	    }		// debug
+        case 'debug':
+        {		// handled by common code
+            break;
+        }		// debug
 
-	    default:
-	    {
-			$warn	.= "<p>Unexpected parameter $key='$value'.</p>\n";
-			break;
-	    }		// any other paramters
-	}		    // process specific named parameters
+        default:
+        {
+            $warn	.= "<p>Unexpected parameter $key='$value'.</p>\n";
+            break;
+        }		// any other paramters
+    }		    // process specific named parameters
 }			    // loop through all input parameters
 if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
+// create Template
+$template		= new FtTemplate("MarriageRegDetail$action$lang.html");
+$trtemplate     = $template->getTranslate();
+
+// internationalization support
+$monthsTag		    = $trtemplate->getElementById('Months');
+if ($monthsTag)
+{
+    $months	        = array();
+    foreach($monthsTag->childNodes() as $span)
+        $months[]	= trim($span->innerHTML());
+}
+$lmonthsTag		    = $trtemplate->getElementById('LMonths');
+if ($lmonthsTag)
+{
+    $lmonths		= array();
+    foreach($lmonthsTag->childNodes() as $span)
+        $lmonths[]	= trim($span->innerHTML());
+}
+
+// issue error messages
 if ($regYear == '' && $volume == '')
 {
-	$msg		.= "RegYear omitted. ";
+    $msg		    .= "RegYear omitted. ";
 }
+else
+if (!ctype_digit($regYear) ||
+    ($regYear < 1800) || ($regYear > 2018))
+    $msg	        .= "Registration Year '$regYear' must be a number between 1800 and 2018. ";
 
 if ($regNum == '' && $volume == '')
 {
-	$msg		.= "RegNum omitted. ";
+    $msg		    .= "RegNum omitted. ";
 }
 else
 if ($volume != '' && $page != '' && $item != '')
 {
-	$regNum		= $numVolume .
-					  str_pad($page, 3, '0', STR_PAD_LEFT) .
-					  $item;
+    $regNum	        = $numVolume .
+                        str_pad($page, 3, '0', STR_PAD_LEFT) .
+                      $item;
+    $paddedRegNum   = $regNum;
 }
 else
-	$paddedRegNum	= str_pad($regNum,7,"0",STR_PAD_LEFT);
+if (ctype_digit($regNum))
+    $paddedRegNum	= str_pad($regNum,7,"0",STR_PAD_LEFT);
+else
+    $msg	        .= "Registration Number $regNum must be a number. ";
 
 // the number of the immediately preceding and following registrations
 if (!isset($volume) || ($volume == '' && $regNum > 9999))
-    $volume	= floor($regNum/10000);
+    $volume	        = floor($regNum/10000);
 if ($regYear <= 1872 && isset($volume)) 
 {
-	if (!isset($page) || $page == '')
-	{
-	    $page	= (int)(($regNum % 10000)/10);
-	    $item	= $regNum % 10;
-	}
-	if ($regNum % 10 == 1)
-	{
-	    $prevNum	= $regNum - 8;
-	    $nextNum	= $regNum + 1;
-	}
-	else
-	if ($regNum % 10 == 3)
-	{
-	    $prevNum	= $regNum - 1;
-	    $nextNum	= $regNum + 8;
-	}
-	else
-	{
-	    $prevNum	= $regNum - 1;
-	    $nextNum	= $regNum + 1;
-	}
-
+    if (!isset($page) || $page == '')
+    {
+        $page	    = (int)(($regNum % 10000)/10);
+        $item	    = $regNum % 10;
+    }
+    if ($regNum % 10 == 1)
+    {
+        $prevNum	= $regNum - 8;
+        $nextNum	= $regNum + 1;
+    }
+    else
+    if ($regNum % 10 == 3)
+    {
+        $prevNum	= $regNum - 1;
+        $nextNum	= $regNum + 8;
+    }
+    else
+    {
+        $prevNum	= $regNum - 1;
+        $nextNum	= $regNum + 1;
+    }
 }
 else
 {		// sequentially numbered
-	$prevNum	= $regNum - 1;
-	$nextNum	= $regNum + 1;
+    $prevNum	    = $regNum - 1;
+    $nextNum	    = $regNum + 1;
 }		// sequentially numbered
+
+// get information about the administrative domain
+$domainObj	        = new Domain(array('domain'	    => $domain,
+                                       'language'	=> 'en'));
+if ($domainObj->isExisting())
+{
+    $cc			    = substr($domain, 0, 2);
+    $countryObj		= new Country(array('code' => $cc));
+    $countryName	= $countryObj->getName();
+    $domainName		= $domainObj->get('name');
+}
+else
+{
+    $msg	        .= "Domain '$domain' is not a supported " .
+                        "two character country code followed by ".
+                        "a state or province code. ";
+    $domainName	= 'Domain : ' . $domain;
+}
+
+// set the global field values in the template
+$template->set('CONTACTTABLE',	'Marriages');
+$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('DOMAIN',		$domain);
+$template->set('DOMAINNAME',	$domainName);
+$template->set('CC',		    $cc);
+$template->set('COUNTRYNAME',	$countryName);
+$template->set('LANG',		    $lang);
+$template['otherStylesheets']->update(
+                        array('filename'	=> '/Ontario/MarriageRegDetail'));
+$template->set('REGYEAR',		$regYear);
+$template->set('REGNUM',		$regNum);
+$template->set('PREVNUM',		$prevNum);
+$template->set('NEXTNUM',		$nextNum);
+$template->set('PADDEDREGNUM',	$paddedRegNum);
 
 // if no error messages Issue the query
 if (strlen($msg) == 0)
 {		// no error messages
-	// execute the query
-	if ($volume != '' && $page != '' && $item != '')
-	{
-	    $marrParms	= array('domain'		=> $domain,
-						'originalvolume'	=> $volume,
-						'originalpage'		=> $page,
-						'originalitem'		=> $item);
-	    if ($regYear >= 1873)
-			$marrParms['regyear']	= $regYear;
-	    $marriage	= new Marriage($marrParms);
-	    $regYear	= $marriage->get('regyear');
-	    $regNum	= $marriage->get('regnum');
-	}
-	else
-	{
-	    $marriage	= new Marriage($domain,
-						       $regYear,
-						       $regNum);
-	}
+    // execute the query
+    if ($volume != '' && $page != '' && $item != '')
+    {
+        $marrParms	        = array('domain'		    => $domain,
+                                    'originalvolume'	=> $volume,
+                                    'originalpage'		=> $page,
+                                    'originalitem'		=> $item);
+        if ($regYear >= 1873)
+            $marrParms['regyear']	= $regYear;
+        $marriage           = new Marriage($marrParms);
+        $regYear            = $marriage->get('regyear');
+        $regNum	            = $marriage->get('regnum');
+    }
+    else
+    {
+        $marriage	= new Marriage($domain,
+                                   $regYear,
+                                   $regNum);
+    }
 
-	// extract field values for display
-	$msVol		= $marriage->get('m_msvol');
-	$regCounty	= $marriage->get('m_regcounty');
-	$countyObj	= new County($domain, $regCounty);
-	$countyName	= $countyObj->get('name');
-	$regTownship	= $marriage->get('m_regtownship');
-	$mDate		= $marriage->get('m_date');
-	$mPlace		= $marriage->get('m_place');
-	$licenseType	= $marriage->get('m_licensetype');
-	$regDate	= $marriage->get('m_regdate');
-	if (is_null($regDate) || $regDate == '')
-	    $regDate	= $regYear;
-	$registrar	= $marriage->get('m_registrar');
-	$remarks	= $marriage->get('m_remarks');
-	$image		= $marriage->get('m_image');
-	$originalVolume	= $marriage->get('m_originalvolume');
-	$originalPage	= $marriage->get('m_originalpage');
-	$originalItem	= $marriage->get('m_originalitem');
+    // extract field values for display
+    $msVol					= $marriage->get('m_msvol');
+    $regCounty				= $marriage->get('m_regcounty');
+    $countyObj				= new County($domain, $regCounty);
+    $countyName				= $countyObj->get('name');
+    $regTownship			= $marriage->get('m_regtownship');
+    $mDate					= $marriage->get('m_date');
+    $mPlace					= $marriage->get('m_place');
+    $licenseType			= $marriage->get('m_licensetype');
+    $regDate				= $marriage->get('m_regdate');
+    if (is_null($regDate) || $regDate == '')
+        $regDate			= $regYear;
+    $registrar				= $marriage->get('m_registrar');
+    $remarks				= $marriage->get('m_remarks');
+    $image					= $marriage->get('m_image');
+    $originalVolume			= $marriage->get('m_originalvolume');
+    $originalPage			= $marriage->get('m_originalpage');
+    $originalItem			= $marriage->get('m_originalitem');
 
-	// reformat all numeric date if necessary
-	$mdyPattern	= '/^([0-9]{2,2})\/([0-9]{2,2})\/([0-9]{2,2})$/';
-	if(preg_match($mdyPattern,
-			      $mDate,
-			      $matches) == 1)
-	{		// mm/dd/yy
-	    if ($matches[1] <= 12)
-	    {	// mm/dd/yy
-			$month	= $monthNames[$matches[1]];
-			$day	= $matches[2];
-	    }	// mm/dd/yy
-	    else
-	    if ($matches[2] <= 12)
-	    {	// dd/mm/yy
-			$month	= $monthNames[$matches[2]];
-			$day	= $matches[1];
-	    }	// dd/mm/yy
-	    else
-	    {	// illegal format
-			$month	= $matches[2] . '?';
-			$day	= $matches[1];
-	    }	// illegal format
-	    $year	= floor($regYear / 100) * 100 + $matches[3];
-	    if ($year > $regYear)
-			$year	= $year - 100;
-	    $mDate	= $day . ' ' . $month . ' ' . $year;
-	}		// mm/dd/yy or dd/mm/yy
+    // reformat all numeric date if necessary
+    $mdyPattern		= '/^([0-9]{2,2})\/([0-9]{2,2})\/([0-9]{2,2})$/';
+    if(preg_match($mdyPattern,
+                  $mDate,
+                  $matches) == 1)
+    {		// mm/dd/yy
+        if ($matches[1] <= 12)
+        {	// mm/dd/yy
+            $month			= $monthNames[$matches[1]];
+            $day			= $matches[2];
+        }	// mm/dd/yy
+        else
+        if ($matches[2] <= 12)
+        {	// dd/mm/yy
+            $month			= $monthNames[$matches[2]];
+            $day			= $matches[1];
+        }	// dd/mm/yy
+        else
+        {	// illegal format
+            $month			= $matches[2] . '?';
+            $day			= $matches[1];
+        }	// illegal format
+        $year				= floor($regYear / 100) * 100 + $matches[3];
+        if ($year > $regYear)
+            $year			= $year - 100;
+        $mDate				= $day . ' ' . $month . ' ' . $year;
+    }		// mm/dd/yy or dd/mm/yy
 
-	// get associated individual records
-	$groom		= $marriage->getGroom(true);
-	$bride		= $marriage->getBride(true);
-	$minister	= $marriage->getMinister(canUser('edit'));
+    // get associated individual records
+    $groom					= $marriage->getGroom(true);
+    $bride					= $marriage->getBride(true);
+    $minister				= $marriage->getMinister(true);
 
-	// check for existing citations to this registration
-	$citparms	= array('idsr'		=> 99,
-						'type'		=> Citation::STYPE_MAR,
-						'srcdetail'	=> "^$regYear-0*$regNum"); 
-	$citations	= new CitationSet($citparms);
-	if ($citations->count() > 0)
-	{		// existing citation
-	    $citrow	= $citations->rewind();
-	    $idmr	= $citrow->get('idime');
-	    try {
-			$family		= new Family(array('idmr' => $idmr));
+    // check for existing citations to this registration
+    $citparms				= array('idsr'		=> 99,
+                                    'type'		=> Citation::STYPE_MAR,
+                                    'srcdetail'	=> "^$regYear-0*$regNum"); 
+    $citations				= new CitationSet($citparms);
+    if ($citations->count() > 0)
+    {		// existing citation
+        $citrow				= $citations->rewind();
+        $idmr				= $citrow->get('idime');
+        $family			    = new Family(array('idmr' => $idmr));
 
-			if ($mDate == '' || $mDate == $regYear)
-			{
-			    $marDate	= new LegacyDate($family->get('mard'));
-			    $mDate	= $marDate->toString();
-			}
+        if ($mDate == '' || $mDate == $regYear)
+        {
+            $marDate        = new LegacyDate($family->get('mard'));
+            $mDate		    = $marDate->toString();
+        }
 
-			if ($mPlace == '')
-			{		// location not supplied
-			    try {
-					$idlr		= $family->get('idlrmar');
-					$mLocation	= new Location(array('idlr' => $idlr));
-					$mPlace		= $mLocation->getName();
-			    } catch (Exception $e) {}
-			}		// location not supplied
+        if ($mPlace == '')
+        {		// location not supplied
+            try {
+                $idlr	    = $family->get('idlrmar');
+                $mLocation	= new Location(array('idlr' => $idlr));
+                $mPlace		= $mLocation->getName();
+            } catch (Exception $e) {}
+        }		// location not supplied
 
-			$idirhusb	= $family->get('idirhusb');
-			$idirwife	= $family->get('idirwife');
+        $idirhusb	        = $family->get('idirhusb');
+        $idirwife	        = $family->get('idirwife');
 
-			// update information on groom based upon marriage
-			// registration
-			if ($groom->get('m_surname') == '')
-			{	// create new groom
-			    try {
-			    $person	= new Person(array('idir' => $idirhusb));
+        // update information on groom based upon marriage
+        // registration
+        if ($groom->get('m_surname') == '')
+        {	// create new groom
+            $person	        = new Person(array('idir' => $idirhusb));
 
-			    $groom->set('m_surname',
-						     $person->get('surname'));
-			    $groom->set('m_givennames',
-						     $person->get('givenname'));
-			    $byear	= floor($person->get('birthsd')/10000);
-			    if ($byear <= -9999)
-					$groom->set('m_age',
-							 20);
-			    else
-					$groom->set('m_age',
-							 $regYear - $byear);
-			    $groom->set('m_idir',
-						     $idirhusb);
-			    } catch (Exception $e) {
-					$msg	.= "IDIR=$idirhusb, Exception:" .
-						   $e->getMessage();
-			    }
-			}	// create new groom
-			else
-			if ($groom->get('m_idir') == 0)
-			    $groom->set('m_idir', $idirhusb);
+            $groom->set('m_surname',
+                         $person->get('surname'));
+            $groom->set('m_givennames',
+                         $person->get('givenname'));
+            $byear	        = floor($person->get('birthsd')/10000);
+            if ($byear <= -9999)
+                $groom->set('m_age',
+                            20);
+            else
+                $groom->set('m_age',
+                            $regYear - $byear);
+            $groom->set('m_idir',
+                         $idirhusb);
+        }	// create new groom
+        else
+        if ($groom->get('m_idir') == 0)
+            $groom->set('m_idir', $idirhusb);
 
-			// update information on bride based upon marriage
-			// registration
-			if ($bride->get('m_surname') == '')
-			{	// create new bride
-			    try {
-			    $person	= new Person(array('idir' => $idirwife));
+        // update information on bride based upon marriage
+        // registration
+        if ($bride->get('m_surname') == '')
+        {	// create new temporary bride
+            $person	        = new Person(array('idir' => $idirwife));
 
-			    $bride->set('m_surname',
-						     $person->get('surname'));
-			    $bride->set('m_givennames',
-						     $person->get('givenname'));
-			    $byear	= floor($person->get('birthsd')/10000);
-			    if ($byear <= -9999)
-					$bride->set('m_age',
-							 20);
-			    else
-					$bride->set('m_age',
-							 $regYear - $byear);
-			    $bride->set('m_idir',
-						     $idirwife);
-			    } catch (Exception $e) {
-					$msg	.= "IDIR=$idirwife, Exception:" .
-						   $e->getMessage();
-			    }
-			}	// create new bride
-			else
-			if ($bride->get('m_idir') == 0)
-			    $bride->set('m_idir', $idirwife);
+            $bride->set('m_surname',
+                        $person->get('surname'));
+            $bride->set('m_givennames',
+                        $person->get('givenname'));
+            $byear	        = floor($person->get('birthsd')/10000);
+            if ($byear <= -9999)
+                $bride->set('m_age',
+                             20);
+            else
+                $bride->set('m_age',
+                             $regYear - $byear);
+            $bride->set('m_idir',
+                         $idirwife);
+        }	// create new temporary bride
+        else
+        if ($bride->get('m_idir') == 0)
+            $bride->set('m_idir', $idirwife);
 
-	    }		// try existing marriage registration
-	    catch (Exception $e)
-	    {		// do not report bad key errors
-			$warn	.= "IDMR=$idmr, Exception:" . $e->getMessage();
-	    }		// do not report bad key errors
-	}		// existing citation
+    }		// existing citation
 
-	$mPlace		= str_replace("'","&#39;",$mPlace);
+    $mPlace		            = str_replace("'","&#39;",$mPlace);
+
+    $template->set('MSVOL',	        $msVol);
+    $template->set('REGCOUNTY',	    $regCounty);
+    $template->set('COUNTYOBJ',	    $countyObj);
+    $template->set('COUNTYNAME',	$countyName);
+    $template->set('REGTOWNSHIP',	$regTownship);
+    $template->set('MDATE',	        $mDate);
+    $template->set('MPLACE',	    $mPlace);
+    $template->set('LICENSETYPE',	$licenseType);
+    $template->set('REGDATE',	    $regDate);
+    $template->set('REGISTRAR',	    $registrar);
+    $template->set('REMARKS',	    $remarks);
+    $template->set('IMAGE',	        $image);
+    if (strlen($image) < 4 || substr($image, 0, 4) != 'http')
+    {
+        $template->set('IMAGEDISABLED',	        'disabled="disabled"');
+        if ($action != 'Update')
+            $template['ShowImage']->update(null);
+    }
+    else
+    {
+        $template->set('IMAGEDISABLED',	        '');
+        $notAvail   = $template['ImageNotAvailable'];
+        if ($notAvail)
+            $notAvail->update(null);
+    }
+
+    $template->set('ORIGINALVOLUME',$originalVolume);
+    $template->set('ORIGINALPAGE',	$originalPage);
+    $template->set('ORIGINALITEM',	$originalItem);
+
+    $template->set('GROOMROLE',		        $groom['role']);
+    $template->set('GROOMSURNAME',		    $groom['surname']);
+    $template->set('GROOMSURNAMESOUNDEX',	$groom['surnamesoundex']);
+    $template->set('GROOMGIVENNAMES',		$groom['givennames']);
+    $template->set('GROOMAGE',		        $groom['age']);
+    $template->set('GROOMBIRTHYEAR',	    $groom['byear']);
+    $template->set('GROOMRESIDENCE',		$groom['residence']);
+    $template->set('GROOMBIRTHPLACE',		$groom['birthplace']);
+    $template->set('GROOMMARSTAT',		    $groom['marstat']);
+    $template->set('GROOMOCCUPATION',		$groom['occupation']);
+    $template->set('GROOMFATHERNAME',		$groom['fathername']);
+    $template->set('GROOMMOTHERNAME',		$groom['mothername']);
+    $template->set('GROOMRELIGION',		    $groom['religion']);
+    $template->set('WITNESSNAME1',		    $groom['witnessname']);
+    $template->set('WITNESSRES1',		    $groom['witnessres']);
+    $template->set('GROOMREMARKS',		    $groom['remarks']);
+    $template->set('GROOMIDIR',		        $groom['idir']);
+    if ($groom['idir'] == 0)
+    {
+        $template['GroomLinkRow']->update(null);
+        $template->set('GROOMNAME',		    $groom['givennames'] . ' ' . $groom['surname']);
+        searchParticipant($groom);
+    }
+    else
+    {
+        $chooseRow          = $template['GChooseRow'];
+        if ($chooseRow)
+            $chooseRow->update(null);
+        $nameObj            = new Name(array('idir'     => $groom['idir'],
+                                             'order'    => 0));
+        $name               = $nameObj->getName(Person::NAME_INCLUDE_DATES);
+        $template->set('GROOMNAME',         $name);
+    }
+
+    $template->set('BRIDEROLE',		        $bride['role']);
+    $template->set('BRIDESURNAME',		    $bride['surname']);
+    $template->set('BRIDESURNAMESOUNDEX',	$bride['surnamesoundex']);
+    $template->set('BRIDEGIVENNAMES',		$bride['givennames']);
+    if ($bride['idir'] > 0)
+    {
+        $nameObj            = new Name(array('idir'     => $bride['idir'],
+                                             'order'    => 0));
+        $name               = $nameObj->getName(Person::NAME_INCLUDE_DATES);
+        $template->set('BRIDENAME',         $name);
+    }
+    else
+        $template->set('BRIDENAME',	        $bride['givennames'] . ' ' . $bride['surname']);
+    $template->set('BRIDEAGE',		        $bride['age']);
+    $template->set('BRIDEBIRTHYEAR',	    $bride['byear']);
+    $template->set('BRIDERESIDENCE',		$bride['residence']);
+    $template->set('BRIDEBIRTHPLACE',		$bride['birthplace']);
+    $template->set('BRIDEMARSTAT',		    $bride['marstat']);
+    $template->set('BRIDEOCCUPATION',		$bride['occupation']);
+    $template->set('BRIDEFATHERNAME',		$bride['fathername']);
+    $template->set('BRIDEMOTHERNAME',		$bride['mothername']);
+    $template->set('BRIDERELIGION',		    $bride['religion']);
+    $template->set('WITNESSNAME2',	        $bride['witnessname']);
+    $template->set('WITNESSRES2',	        $bride['witnessres']);
+    $template->set('BRIDEREMARKS',		    $bride['remarks']);
+    $template->set('BRIDEIDIR',		        $bride['idir']);
+    if ($bride['idir'] == 0)
+    {
+        $template['BrideLinkRow']->update(null);
+        $template->set('BRIDENAME',		    $bride['givennames'] . ' ' . $bride['surname']);
+        searchParticipant($bride);
+    }
+    else
+    {
+        $chooseRow          = $template['BChooseRow'];
+        if ($chooseRow)
+            $chooseRow->update(null);
+        $nameObj            = new Name(array('idir'     => $bride['idir'],
+                                             'order'    => 0));
+        $name               = $nameObj->getName(Person::NAME_INCLUDE_DATES);
+        $template->set('BRIDENAME',         $name);
+    }
+
+    $template->set('MINISTERROLE',		    $minister['role']);
+    $template->set('MINISTERSURNAME',		$minister['surname']);
+    $template->set('MINISTERSURNAMESOUNDEX',$minister['surnamesoundex']);
+    $template->set('MINISTERGIVENNAMES',	$minister['givennames']);
+    if ($minister['idir'] > 0)
+    {
+        $nameObj            = new Name(array('idir'     => $minister['idir'],
+                                             'order'    => 0));
+        $name               = $nameObj->getName(Person::NAME_INCLUDE_DATES);
+        $template->set('MINISTERNAME',      $name);
+    }
+    else
+        $template->set('MINISTERNAME',	    $minister['givennames'] . ' ' . $minister['surname']);
+    $template->set('MINISTERAGE',		    $minister['age']);
+    $template->set('MINISTERBIRTHYEAR',	    $minister['byear']);
+    $template->set('MINISTERRESIDENCE',		$minister['residence']);
+    $template->set('MINISTERBIRTHPLACE',	$minister['birthplace']);
+    $template->set('MINISTERMARSTAT',		$minister['marstat']);
+    $template->set('MINISTEROCCUPATION',	$minister['occupation']);
+    $template->set('MINISTERFATHERNAME',	$minister['fathername']);
+    $template->set('MINISTERMOTHERNAME',	$minister['mothername']);
+    $template->set('MINISTERRELIGION',		$minister['religion']);
+    $template->set('MINISTERWITNESSNAME',	$minister['witnessname']);
+    $template->set('MINISTERWITNESSRES',	$minister['witnessres']);
+    $template->set('MINISTERREMARKS',		$minister['remarks']);
+    $template->set('MINISTERIDIR',		    $minister['idir']);
+    if ($minister['idir'] == 0)
+    {
+        $template['MinisterLinkRow']->update(null);
+        searchParticipant($minister);
+    }
+    else
+    {
+        $chooseRow          = $template['MChooseRow'];
+        if ($chooseRow)
+            $chooseRow->update(null);
+        $nameObj            = new Name(array('idir'     => $minister['idir'],
+                                             'order'    => 0));
+        $name               = $nameObj->getName(Person::NAME_INCLUDE_DATES);
+        $template->set('MINISTERNAME',         $name);
+    }
 }			// no error messages
-
-$subject	= $domainName . ' Marriage Registration: number: ' . 
-			  $regYear . '-' . $regNum;
-$subject	= rawurlencode($subject);
-
-// emit standard HTML header customized to browser
-htmlHeader($domainName . ': Marriage Registration ' . $action,
-	       array(	'/jscripts/js20/http.js',
-					'/jscripts/CommonForm.js',
-					'/jscripts/Ontario.js',
-					'/jscripts/util.js',
-					'/jscripts/locationCommon.js',
-					'/tinymce/jscripts/tiny_mce/tiny_mce.js',
-			     	'MarriageRegDetail.js'),
-			true);
-?>
-<body>
-  <div id='transcription' style='overflow: auto; overflow-x: scroll'>
-<?php
-pageTop(array(
-			'/genealogy.php'	=> 'Genealogy',
-			'/genCountry.php?cc=CA'	=> 'Canada',
-			'/Canada/genProvince.php?Domain=CAON'
-							=> 'Ontario',
-			'/Ontario/MarriageRegQuery.html'
-							=> 'New Marriage Query',
-			"/Ontario/MarriageRegStats.php?regdomain=$domain"
-							=> 'Status',
-			"/Ontario/MarriageRegYearStats.php?regdomain=$domain&regyear=$regYear"
-							=> "Status $regYear",
-			"MarriageRegYearStats.php?regdomain=$domain&regyear=$regYear&county=$regCounty"
-							=> "Status $regYear $countyName",
-			"MarriageRegResponse.php?RegDomain=$domain&Offset=0&Count=20&RegYear=$regYear&RegCounty=$regCounty&RegTownship=$regTownship"
-							=> "Status $regYear $countyName $regTownship"));
-?>
- <div class='body'>
-<h1><?php print $domainName; ?>: Marriage Registration
-	<?php print $action; ?>
-  <span class='right'>
-	<a href='MarriageRegDetailHelpen.html' target='help'>? Help</a>
-  </span>
-  <div style='clear: both;'></div>
-</h1>
-<?php
-
-showTrace();
- 
-if (strlen($msg) > 0)
-{		// display error messages
-?>
-  <p class='message'>
-<?php print $msg; ?> 
-  </p>
-<?php
-}		// display error messages
 else
-{		// no errors
-?>
-  <form action='MarriageRegUpdate.php'
-	name='distForm' id='distForm'
-	method='POST'>
-<div id='hidden'>
-  <!-- the following 3 elements store the URLs of the actions
-	for the buttons: id='previous', id='next', and id='newQuery' -->
-  <input type='hidden' name='previousHref' id='previousHref' disabled
-	value='MarriageRegDetail.php?RegDomain=<?php print $domain; ?>&RegYear=<?php print $regYear; ?>&amp;RegNum=<?php print $prevNum; ?>'>
-  <input type='hidden' name='nextHref' id='nextHref' disabled
-	value='MarriageRegDetail.php?RegDomain=<?php print $domain; ?>&RegYear=<?php print $regYear; ?>&amp;RegNum=<?php print $nextNum; ?>' >
-  <input type='hidden' name='newQueryHref' id='newQueryHref' disabled
-	value='MarriageRegQuery.html'>
-  <!-- the following stores the textual value of the county name in
-// the web page so it can be used by the Javascript code 
-// to initialize the RegCounty select tag -->
-  <input type='hidden' name='RegCountyTxt' id='RegCountyTxt' disabled
-			value='<?php print str_replace("'","&#39;",$regCounty); ?>'/>
-  <!-- the following stores the textual value of the township name in
-// the web page so it can be used by the Javascript code 
-// to initialize the RegTownship select tag -->
-  <input type='hidden' name='RegTownshipTxt' id='RegTownshipTxt' disabled 
-	value='<?php print str_replace("'","&#39;",$regTownship); ?>'/>
-  <!-- the following stores the textual value of the marriage type in
-// the web page so it can be used by the Javascript code 
-// to initialize the LicenseType select tag -->
-  <input name='LicenseTypeTxt' id='LicenseTypeTxt' type='hidden' disabled
-	value='<?php print $licenseType; ?>'/>
-<?php
-	if ($debug)
-	{
-?>
-  <input name='Debug' id='Debug' type='hidden' value='Y'/>
-<?php
-	}
-?>
-</div> <!-- class='hidden' -->
-  <p>
-<button type='button' id='previous'><u>P</u>revious</button>
-  &nbsp;
-<button type='button' id='next'><u>N</u>ext</button>
-  &nbsp;
-<button type='button' id='newQuery'>New <u>Q</u>uery</button>
-  </p>
-  <fieldset class='other'>
-<legend class='labelSmall'>Identification:</legend>
-  <div class='row' >
-<?php
-// action depends upon whether the user is authorized to
-// update the database
-if(canUser('edit'))
-{
-	// display the record identification as two separate fields
-	// the user is not permitted to modify these fields
-	// as they are the record identifier
-?>
-	<div class='column1'>
-	  <div style="float: left;">
-	  <label class='labelSmall'>Year:</label>
-  	  <input name='RegYear' id='RegYear' type='text' class='ina rightnc'
-			maxlength='4' readonly='readonly'
-			value='<?php print $regYear; ?>'/>
-	  <input name='RegDomain' id='RegDomain' type='hidden'
-			value='<?php print $domain; ?>'>
-	  </div>
-	  <div class='right'>
-	    <label class='labelSmall'>Number:</label>
-  	    <input name='RegNum' id='RegNum' type='text' class='ina rightnc'
-			style='width: 5em' maxlength='6' readonly='readonly'
-			value='<?php print $regNum; ?>'/>
-	  </div>
-	</div>
-<?php
-}	// authorized to update database
-else
-{	// not authorized to update database, combine the two fields
-	$paddedRegNum	= str_pad($regNum,5,'0',STR_PAD_LEFT);
-?>
-	<div class='column1'>
-	  <label class='labelSmall'>Identification:</label>
-  	  <input name='RegId' id='RegId' type='text' class='ina right'
-			readonly='readonly'
-			style='width: ' maxlength='12'
-			value='<?php print "$regYear-$paddedRegNum"; ?>'/>
-	  <input name='RegDomain' id='RegDomain' type='hidden'
-			value='<?php print $domain; ?>'>
-	</div>
-<?php
-}	// not authorized to update database
-?>
-	<div class='column2'>
-	  <label class='labelSmall'>MS 932 Reel:</label>
-  	  <input name='MsVol' id='MsVol' type='text'
-			class='<?php print $txtrightclass; ?>'
-			size='4' maxlength='4' <?php print $readonly; ?>
-			value='<?php print $msVol; ?>'/>
-	</div>
-	<div style='clear: both;'></div>
-  </div>
-<?php
-if ($regYear <= 1872 || $regNum > 100000)
-{
-?>
-  <div class='row' >
-	<div class='column1'>
-	  <label class='labelSmall' for='OriginalVolume'>Volume:</label>
-  	  <input name='OriginalVolume' id='OriginalVolume'
-			type='text' class='<?php print $txtrightclass; ?>'
-			size='3' maxlength='3' <?php print $readonly; ?>
-			value='<?php print $originalVolume; ?>'/>
-	</div>
-	<div class='column2'>
-	  <label class='labelSmall' for='OriginalPage'>Page:</label>
-  	  <input name='OriginalPage' id='OriginalPage'
-			type='text' class='<?php print $txtrightclass; ?>'
-			size='3' maxlength='3' <?php print $readonly; ?>
-			value='<?php print $originalPage; ?>'/>
-	</div>
-	<div class='column2'>
-	  <label class='labelSmall' for='OriginalItem'>Item:</label>
-  	  <input name='OriginalItem' id='OriginalItem'
-			type='text' class='<?php print $txtrightclass; ?>'
-			size='3' maxlength='3' <?php print $readonly; ?>
-			value='<?php print $originalItem; ?>'/>
-	</div>
-	<div style='clear: both;'></div>
-  </div>
-<?php
-}
-else
-{
-?>
-  	  <input name='OriginalVolume' id='OriginalVolume'
-			type='hidden'
-			value='<?php print $originalVolume; ?>'/>
-  	  <input name='OriginalPage' id='OriginalPage'
-			type='hidden'
-			value='<?php print $originalPage; ?>'/>
-  	  <input name='OriginalItem' id='OriginalItem'
-			type='hidden'
-			value='<?php print $originalItem; ?>'/>
-<?php
-}
-?>
-  <div class='row'  id='RegRow'>
-	<div class='column1'>
-	  <label class='labelSmall'>County:</label>
-	  <select name='RegCounty' id='RegCounty' size='1'
-			class='<?php print $txtleftclass; ?>'>
-	  </select>
-	</div>
-	<div class='column2'>
-	  <label class='labelSmall'>Township:</label>
-  	  <input type='text' name='RegTownship' id='RegTownship'
-	    size='20' maxlength='64'
-	    value='<?php print str_replace("'","&#39;",$regTownship); ?>'
-	    class='<?php print $txtleftclassnc; ?>' <?php print $readonly; ?> />
-	</div>
-	<div style='clear: both;'></div>
-  </div>
-  </fieldset>
-  <fieldset class='other'>
-<legend class='labelSmall'>Marriage:</legend>
-  <div class='row' >
-	<div class='column1'>
-	  <label class='labelSmall'>Date:</label>
-  	  <input name='Date' id='Date'
-			type='text' size='10' maxlength='16'
-			value='<?php print str_replace("'","&#39;",$mDate); ?>'
-	    class='<?php print $txtleftclassnc; ?>' <?php print $readonly; ?> />
-	</div>
-	<div class='column2'>
-	  <label class='labelSmall'>Place:</label>
-  	  <input type='text' name='Place' id='Place' size='20' maxlength='64'
-	    value='<?php print $mPlace; ?>'
-	    class='<?php print $txtleftclassnc; ?>' <?php print $readonly; ?> />
-	</div>
-	<div style='clear: both;'></div>
-  </div>
-  <div class='row' >
-	<div class='column1'>
-	  <label class='labelSmall'>Type:</label>
-	    <select name='LicenseType' id='LicenseType'
-			size='1' class='<?php print $txtleftclass; ?>'>
-	      <option value='L'>License</option>
-	      <option value='B'>Banns</option>
-	    </select>
-	</div>
-	<div style='clear: both;'></div>
-  </div>
-  </fieldset>
-<?php
-	// display details for groom
-	dispParticipant($groom);
+    $template['distForm']->update(null);
 
-	// display details for bride
-	dispParticipant($bride);
-
-?>
-<?php
-	// display information on witnesses
-	$witnessName1	= str_replace("'","&#39;",$groom->get('m_witnessname'));
-	$witnessRes1	= str_replace("'","&#39;",$groom->get('m_witnessres'));
-	$witnessName2	= str_replace("'","&#39;",$bride->get('m_witnessname'));
-	$witnessRes2	= str_replace("'","&#39;",$bride->get('m_witnessres'));
-	if ((strlen($witnessName1) > 0) ||
-	    (strlen($witnessName2) > 0) ||
-	    (canUser('edit')))
-	{		// include witness information in display
-?>
-  <fieldset class='other'>
-	<legend class='labelSmall'>Witnesses:</legend>
-  <div class='row' >
-	<div class='column1'>
-	  <label class='labelSmall'>Name:</label>
-  	  <input name='Witness1' id='Witness1' type='text' size='22' maxlength='64'
-			class='<?php print $txtleftclass; ?>'
-			value='<?php print $witnessName1; ?>' 
-			  <?php print $readonly; ?>/>
-	</div>
-	<div class='column2'>
-	  <label class='labelSmall'>Residence:</label>
-  	  <input name='Witness1Res' id='Witness1Res' type='text'
-			size='22' maxlength='64'
-			class='<?php print $txtleftclassnc; ?>'
-			value='<?php print $witnessRes1; ?>' 
-			  <?php print $readonly; ?>/>
-	</div>
-	<div style='clear: both;'></div>
-  </div>
-  <div class='row' >
-	<div class='column1'>
-	  <label class='labelSmall'>Name:</label>
-  	  <input name='Witness2' id='Witness2' type='text' size='22' maxlength='64'
-			class='<?php print $txtleftclass; ?>'
-			value='<?php print $witnessName2; ?>' 
-			  <?php print $readonly; ?>/>
-	</div>
-	<div class='column2'>
-	  <label class='labelSmall'>Residence:</label>
-  	  <input name='Witness2Res' id='Witness2Res' type='text'
-			size='22' maxlength='64'
-			class='<?php print $txtleftclass; ?>'
-			value='<?php print $witnessRes2; ?>' 
-			  <?php print $readonly; ?>/>
-	</div>
-	<div style='clear: both;'></div>
-  </div>
-  </fieldset>	<!-- class='other' -->
-<?php
-	}		// include witness row in display
-
-	if (!is_null($minister))
-	{		// minister record present
-	    // only display the Minister information if it is present
-	    $mSurname		= $minister->get('m_surname');
-	    if ($mSurname != '' || canUser('edit'))
-			dispParticipant($minister);
-	}		// minister record present
-	else
-?>
-  <fieldset class='other'>
-<legend class='labelSmall'>Registration:</legend>
-	<div class='row'>
-	  <div class='column1'>
-	    <label class='labelSmall' for='RegDate'>
-	      Date:
-	    </label>
-	    <input name='RegDate' id='RegDate'
-			type='text' size='16' maxlength='16'
-			value='<?php print $regDate; ?>'
-			class='<?php print $txtleftclass; ?>'
-			  <?php print $readonly; ?>/>
-	  </div>
-	  <div class='column2'>
-	    <label class='labelSmall' for='Registrar'>
-	    Registrar:
-	    </label>
-	    <input name='Registrar' id='Registrar'
-			type='text' size='24' maxlength='128'
-			value='<?php print $registrar; ?>'
-			class='<?php print $txtleftclass; ?>'
-			  <?php print $readonly; ?>/>
-	  </div>
-	  <div style='clear: both;'></div>
-	</div>
-<?php
-	if (canUser('edit'))
-	{	// display remarks if present or editting
-?>
-  <div class='row' >
-	  <label class='labelSmall'>Remarks:</label>
-  	  <textarea name='Remarks' id='Remarks'
-			type='text' cols='65' rows=4
-			class='<?php print $txtleftclassnc; ?>' 
-			<?php print $readonly; ?>
-			>  <?php print $remarks; ?></textarea>
-	<div style='clear: both;'></div>
-  </div>
-<?php
-	}	// updating record
-	else
-	if (strlen($remarks) > 0)
-	{	// Remarks present in DB
-?>
-<div class='row' >
-	<div class='column1'>
-	  <label class='labelSmall'>Remarks:</label>
-	    <?php print $remarks; ?>
-	</div>
-	<div style='clear: both;'></div>
-  </div>
-<?php
-	}	// Remarks present in DB
-
-
-	// display or permit the modification of the image URL
-?>
-  <div class='row' >
-	<div class='column2'>
-	  <label class='labelSmall'>Image:</label>
-<?php
-
-	if(canUser('edit'))
-	{		// authorized to update database
-	    if (strlen($image) > 0)
-	    {		// provide button
-?>
-	  <button type='button' id='ShowImage'>
-	    Show <u>I</u>mage
-	  </button>
-<?php
-	    }		// provide button
-?>
-
-	  <input name='Image' id='Image' type='text' size='80' maxlength='256'
-			value='<?php print $image; ?>'
-			class='<?php print $txtleftclass; ?>var'
-			<?php print $readonly; ?> />
-<?php
-	}		// authorized to update database
-	else
-	if (strlen($image) > 0)
-	{		// view only
-?>
-	  <button type='button' id='showImage'>
-	    Show <u>I</u>mage
-	  </button>
-	  <input name='Image' id='Image' type='hidden' disabled
-			value='<?php print $image; ?>' />
-<?php
-	}		// view only
-	else
-	{		// no image
-?>
-	<span class='warning'>Not available for this registration</span>
-<?php
-	}		// no image
-?>
-	</div>
-	<div style='clear: both;'></div>
-  </div>
-</fieldset>
-<?php
-
-	if(canUser('edit'))
-	{		// authorized to update database
-	    // display submit and reset buttons
-?>
-  <p>
-	  <button type='submit' id='Update'>
-	      <u>U</u>pdate
-	  </button>
-	&nbsp;
-	  <button type='button' id='Reset'>
-	      <u>C</u>lear Form
-	  </button>
-  </p>
-<?php
-	}		// authorized to update database
-?>
-  </form>
-<?php
-}		// no error messages
-?>
-  </div> <!-- class='body' -->
-<?php
-pageBot();
-?>
-  </div> <!-- id='transcription' -->
-<div class='hidden' id='templates'>
-
-<?php
-include $document_root . '/templates/LocationDialogs.html';
-?>
-
-</div> <!-- id='templates' -->
-<!--  The remainder of the web page consists of divisions containing
-context specific help.  These divisions are only displayed if the user
-requests help by pressing F1.  Including this information here ensures
-that the language of the help balloons matches the language of the
-input form.
--->
-  <div class='balloon' id='HelpRegTownship'>
-The township where the marriage was registered.
-  </div>
-  <div class='balloon' id='HelpRegTownshipTxt'>
-The township where the marriage was registered.
-  </div>
-  <div class='balloon' id='HelpDate'>
-The date the marriage took place.
-It is recommended that, for consistency, this be entered as day, month, and
-year, with the month abbreviated to the first 3 characters.
-  </div>
-  <div class='balloon' id='HelpPlace'>
-The place where the marriage took place.
-  </div>
-  <div class='balloon' id='HelpLicenseType'>
-'L' if the marriage was by License, or 'B' if it was by Banns.
-  </div>
-  <div class='balloon' id='HelpGGivenNames'>
-The given names of the groom.
-  </div>
-  <div class='balloon' id='HelpBGivenNames'>
-The given names of the bride.
-  </div>
-  <div class='balloon' id='HelpMGivenNames'>
-The given names of the minister.
-  </div>
-  <div class='balloon' id='HelpGSurname'>
-The surname of the groom.
-  </div>
-  <div class='balloon' id='HelpBSurname'>
-The surname of the bride.
-  </div>
-  <div class='balloon' id='HelpMSurname'>
-The surname of the minister.
-  </div>
-  <div class='balloon' id='HelpGIDIR'>
-This is a link to the groom's record in the family tree or 
-a selection list of individuals from the family tree
-who may match the groom.
-  </div>
-  <div class='balloon' id='HelpBIDIR'>
-This is a link to the bride's record in the family tree or 
-a selection list of individuals from the family tree
-who may match the bride.
-  </div>
-  <div class='balloon' id='HelpMIDIR'>
-This is a link to the minister's record in the family tree or 
-a selection list of individuals from the family tree
-who may match the minister.
-  </div>
-  <div class='balloon' id='HelpClearG'>
-Click on this button to clear the current association between the
-Groom in this marriage registration and a record in the family tree.
-  </div>
-  <div class='balloon' id='HelpClearB'>
-Click on this button to clear the current association between the
-Groom in this marriage registration and a record in the family tree.
-  </div>
-  <div class='balloon' id='HelpGResidence'>
-The current residence of the groom.
-  </div>
-  <div class='balloon' id='HelpBResidence'>
-The current residence of the bride.
-  </div>
-  <div class='balloon' id='HelpMResidence'>
-The current residence of the minister.
-  </div>
-  <div class='balloon' id='HelpGAge'>
-The age of the groom in years.
-When you set this the approximate birth year of the groom is calculated
-by subtracting the age from the registration year.
-  </div>
-  <div class='balloon' id='HelpBAge'>
-The age of the bride in years.
-When you set this the approximate birth year of the bride is calculated
-by subtracting the age from the registration year.
-  </div>
-  <div class='balloon' id='HelpMAge'>
-The age of the minister in years.
-When you set this the approximate birth year of the minister is calculated
-by subtracting the age from the registration year.
-  </div>
-  <div class='balloon' id='HelpGBirthYear'>
-This read-only field displays the calculated birth year of the groom.
-  </div>
-  <div class='balloon' id='HelpBBirthYear'>
-This read-only field displays the calculated birth year of the bride.
-  </div>
-  <div class='balloon' id='HelpMBirthYear'>
-This read-only field displays the calculated birth year of the minister.
-  </div>
-  <div class='balloon' id='HelpGBirthPlace'>
-The birth place of the groom.
-  </div>
-  <div class='balloon' id='HelpBBirthPlace'>
-The birth place of the bride.
-  </div>
-  <div class='balloon' id='HelpMBirthPlace'>
-The birth place of the minister.
-  </div>
-  <div class='balloon' id='HelpGOccupation'>
-The occupation of the groom.
-  </div>
-  <div class='balloon' id='HelpBOccupation'>
-The occupation of the bride.
-  </div>
-  <div class='balloon' id='HelpMOccupation'>
-The occupation of the minister.
-  </div>
-  <div class='balloon' id='HelpGMarStat'>
-The marital status of the groom.
-This should be specified as 'M', 'W', 'D', or 'S'.
-  </div>
-  <div class='balloon' id='HelpBMarStat'>
-The marital status of the bride.
-This should be specified as 'M', 'W', 'D', or 'S'.
-  </div>
-  <div class='balloon' id='HelpGReligion'>
-The religion of the groom.
-  </div>
-  <div class='balloon' id='HelpBReligion'>
-The religion of the bride.
-  </div>
-  <div class='balloon' id='HelpMReligion'>
-The religion of the minister.
-  </div>
-  <div class='balloon' id='HelpGFatherName'>
-The name of the Father of the groom.
-  </div>
-  <div class='balloon' id='HelpBFatherName'>
-The name of the Father of the bride.
-  </div>
-  <div class='balloon' id='HelpGMotherName'>
-The name of the Mother of the groom.
-  </div>
-  <div class='balloon' id='HelpBMotherName'>
-The name of the Mother of the bride.
-  </div>
-  <div class='balloon' id='HelpWitness1'>
-The name of a formal witness to the marriage.
-  </div>
-  <div class='balloon' id='HelpWitness2'>
-The name of a formal witness to the marriage.
-  </div>
-  <div class='balloon' id='HelpWitness1Res'>
-The residence of a formal witness to the marriage.
-  </div>
-  <div class='balloon' id='HelpWitness2Res'>
-The residence of a formal witness to the marriage.
-  </div>
-  <div class='balloon' id='HelpRemarks'>
-  <p>This field is used to record any comments by the registrar or clerk.
-You may use this field to record your own comments by enclosing them in
-editorial square brackets.
-  </p>
-  </div>
-  <div class='balloon' id='HelpUpdate'>
-Clicking on this button commits the changes you have made to the database.
-  </div>
-  <div class='balloon' id='HelpReset'>
-Clicking on this button resets the values of some fields to their defaults.
-  </div>
-  <div class='balloon' id='Helpprevious'>
-Clicking on this button displays the marriage registration with the next
-lower registration number:
-	RegDomain=<?php print $domain; ?>, RegYear=<?php print $regYear; ?>,
-	RegNum=<?php print $prevNum; ?>
-  </div>
-  <div class='balloon' id='Helpnext'>
-Clicking on this button displays the marriage registration with the next
-higher registration number:
-	RegDomain=<?php print $domain; ?>, RegYear=<?php print $regYear; ?>,
-	RegNum=<?php print $nextNum; ?>
-  </div>
-  <div class='balloon' id='HelpnewQuery'>
-Clicking on this button displays the dialog for searching for marriage
-registrations.
-  </div>
-  <div class='balloon' id='HelpRegYear'>
-This read-only field displays the year in which this marriage was
-registered.
-  </div>
-  <div class='balloon' id='HelpRegNum'>
-This read-only field displays the registration number assigned by
-the Registrar of Ontario within the registration year.
-  </div>
-  <div class='balloon' id='HelpRegDate'>
-This field displays the date on which the marriage was registered/
-  </div>
-  <div class='balloon' id='HelpRegistrar'>
-This field displays the name of the registrar who recorded the
-marriage registration.
-  </div>
-  <div class='balloon' id='HelpMsVol'>
-This read-only field displays the number of the reel of microfilm containing
-the original image of this registration.
-  </div>
-  <div class='balloon' id='HelpRegCounty'>
-This selection list is used to choose the county for a new registration
-or to display the county for an existing registration.
-  </div>
-  <div class='balloon' id='HelpOriginalVolume'>
-This field contains the identification of the original bound volume
-containing the marriage registrations or certificates.
-  </div>
-  <div class='balloon' id='HelpOriginalPage'>
-This field contains the page number containing the original
-marriage registrations or certificate.
-  </div>
-  <div class='balloon' id='HelpOriginalItem'>
-Where there are more than one marriage registration on the page this field 
-contains the ordinal position of the specific registration on the page.
-  </div>
-  <div class='balloon' id='HelpImage'>
-This field is used to supply the Uniform Record Location (URL) of an image
-file for this registration.
-  </div>
-  <div class='balloon' id='HelpviewImage'>
-Click on this button to see the original image of the registration.
-  </div>
-</body>
-</html>
+$template->display();

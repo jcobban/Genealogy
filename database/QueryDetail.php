@@ -16,6 +16,8 @@ use \Exception;
  *		2017/10/16		use class DomainSet								*
  *		2018/01/04		remove Template from template file names		*
  *		2018/05/20		add popups										*
+ *		2019/02/21      use new FtTemplate constructor                  *
+ *		2019/04/06      use new FtTemplate::includeSub                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -60,20 +62,20 @@ if (count($_GET) > 0)
 	    {			// switch on parameter name
 			case 'census':
 			{			// Census identifier
-			    $censusId		= $value;
+			    $censusId		        = $value;
 	
 			    if (strtoupper($censusId) == 'CAALL')
 			    {		// special census identifier to search all
-					$cc			    = substr($censusId, 0, 2);
-					$censusYear		= substr($censusId, 2);
-					$province		= 'CW';	// for pre-confederation
+					$cc			        = substr($censusId, 0, 2);
+					$censusYear		    = substr($censusId, 2);
+					$province		    = 'CW';	// for pre-confederation
 			    }		// special census identifier
 			    else
 			    {		// full census identifier
 					$censusRec	= new Census(array('censusid'	=> $value));
 					if ($censusRec->isExisting())
 					{
-					    $cc			= substr($censusId, 0, 2);
+					    $cc			    = substr($censusId, 0, 2);
 					    $censusYear		= substr($censusId, 2);
 					    if ($censusRec->get('partof'))
 					    {
@@ -84,10 +86,14 @@ if (count($_GET) > 0)
 					    	$states		= $parentRec->get('provinces');
 					    }
 					    else
-						$states		= $censusRec->get('provinces');
+						$states		    = $censusRec->get('provinces');
 					}
-					else
-					    $msg .= "Census value '$censusId' invalid. ";
+                    else
+                    {
+                        $msg            .= "Census value '$censusId' invalid. ";
+					    $cc			    = substr($censusId, 0, 2);
+					    $censusYear		= substr($censusId, 2);
+                    }
 			    }		// full census identifier
 			    break;
 			}			// Census identifier
@@ -115,20 +121,26 @@ if ($cc != 'CA')
 }
 
 // determine contents of province/state selection list
-$stateArray		= array();
+$stateArray		    = array();
 for ($i = 0; $i < strlen($states); $i += 2)
     $stateArray[]	=  $cc . substr($states, $i, 2);
-$getParms		= array('domain'	=> $stateArray,
-				'lang'		=> $lang);
-$stateList		= new DomainSet($getParms);
-$selection		= array();
+$getParms	    	= array('domain'	=> $stateArray,
+        	    			'lang'		=> $lang);
+$stateList	    	= new DomainSet($getParms);
+if ($stateList->count() == 0)
+{
+    $getParms	    = array('domain'	=> $stateArray,
+        	    			'lang'		=> 'en');
+    $stateList	    = new DomainSet($getParms);
+}
+$selection	    	= array();
 foreach($stateList as $state)
 {
     $sel	= array('statecode'	=> $state->get('state'),
-			'statename'	=> $state->get('name'),
-			'selected'	=> '');
+        			'statename'	=> $state->get('name'),
+	        		'selected'	=> '');
     if ($state->get('state') == $province)
-	$sel['selected']		= 'selected="selected"';
+	    $sel['selected']		= 'selected="selected"';
     $selection[]	= $sel;
 }
 
@@ -138,33 +150,23 @@ if (strtoupper($censusYear) == 'ALL')
 
 $title	    	= "$censusYear Census of $countryName Query Request";
 $tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub 	= "Query$censusYear$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$langObj	= new Language(array('code' => $lang));
-	$warn		.= "<p>Language=" . $langObj->get('name') . '/' . 
-			    $langObj->get('nativename') . 
-			    " is not supported</p>\n";
-	$includeSub	= "Query{$censusYear}en.html";
-}
-$template->includeSub($tempBase . $includeSub,
-		        'MAIN');
+if (file_exists($tempBase . "Query$cc$censusYear" . "en.html"))
+    $template		= new FtTemplate("Query$cc$censusYear$lang.html");
+else
+    $template		= new FtTemplate("QueryUnsupported$lang.html");
+
 $includePop 	= "CensusQueryPopups$lang.html";
-if (!file_exists($tempBase . $includePop))
-{
-	$includePop 	= 'CensusQueryPopupsen.html';
-}
-$template->includeSub($tempBase . $includePop,
+$template->includeSub($includePop,
 	    		      'POPUPS');
-$template->set('CENSUSYEAR', 	$censusYear);
-$template->set('COUNTRYNAME',	$countryName);
-$template->set('CENSUSID',		$censusId);
-$template->set('LANG',		$lang);
-$template->set('CENSUS',		$censusYear);
-$template->set('CONTACTTABLE',	'Census' . $censusYear);
+$template->set('CENSUSYEAR', 	    $censusYear);
+$template->set('CC',   	            $cc);
+$template->set('COUNTRYNAME',   	$countryName);
+$template->set('CENSUSID',	    	$censusId);
+$template->set('LANG',	        	$lang);
+$template->set('CENSUS',	    	$censusYear);
+$template->set('CONTACTTABLE',  	'Census' . $censusYear);
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 
 $template->updateTag('stateoption',
-			 $selection);
+			         $selection);
 $template->display();

@@ -122,6 +122,9 @@ use \Iterator;
  *		2018/11/06      do not throw exception for invalid IDAR         *
  *		2019/01/05      do not thrown any exceptions from constructor   *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/01/18      method mergeAddresses used the obsolete         *
+ *		                Address::deleteAddresses instead of             *
+ *		                RecordSet->delete                               *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -949,8 +952,9 @@ class Address extends RecordPic
 		}		// repository
 
 		// delete the now redundant address record[s]
-		$getParms	= array('IDAR' => $from);
-		Address::deleteAddresses($getParms, 'p');
+        $addresses  = new RecordSet('Addresses',
+                                    array('IDAR' => $from));
+		$addresses->delete('p');
     }		// Address::mergeAddresses
 
 }		// class Address 

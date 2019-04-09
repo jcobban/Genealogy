@@ -18,21 +18,20 @@
  *						for link button									*
  *		2017/01/13		add "Clear" button to remove linkage			*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Initialize the dynamic functionality once the page is loaded		*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
     // including support for context specific help
     var	element;
@@ -62,7 +61,7 @@ function onLoad()
 }		// function::onLoad
 
 /************************************************************************
- *  linkToTree																*
+ *  function linkToTree														*
  *																		*
  *  When a Link button is clicked a window is opened either to display		*
  *  an existing individual in the tree or to search for a match.		*
@@ -148,7 +147,7 @@ function linkToTree()
 }		// linkToTree
 
 /************************************************************************
- *  gotIdir																*
+ *  function gotIdir														*
  *																		*
  *  The XML response to the database query for matching individuals has		*
  *  been returned.														*
@@ -237,7 +236,7 @@ function gotIdir(xmlDoc)
 }		// gotIdir
 
 /************************************************************************
- *  noIdir																*
+ *  function noIdir														*
  *																		*
  *  The database server was unable to respond to the query.				*
  ************************************************************************/
@@ -248,7 +247,7 @@ function noIdir()
 }		// function noIdir
 
 /************************************************************************
- *  displaySelectIdir														*
+ *  function displaySelectIdir												*
  *																		*
  *  This function displays a customized dialog for choosing from		*
  *  a list of individuals who match the individual described by the		*
@@ -409,7 +408,7 @@ function displaySelectIdir(dialog,
 }		// displaySelectIdir
 
 /************************************************************************
- *  idirSelected														*
+ *  function idirSelected												*
  *																		*
  *  This is the onchange method of the select in the popup to choose		*
  *  the individual to associated with the current line.						*
@@ -445,7 +444,7 @@ function idirSelected()
 }		// function idirSelected
 
 /************************************************************************
- *  closeIdirDialog														*
+ *  function closeIdirDialog												*
  *																		*
  *  The user clicked on the button to close the IDIR dialog.				*
  *																		*
@@ -498,7 +497,7 @@ function closeIdirDialog()
 }		// closeIdirDialog
 
 /************************************************************************
- *  clearFromTree														*
+ *  function clearFromTree												*
  *																		*
  *  The user clicked on the button to remove an existing linkage to		*
  *  the family tree.														*
@@ -533,7 +532,7 @@ function clearFromTree()
 }		// clearFromTree
 
 /************************************************************************
- *  showDetails																*
+ *  function showDetails														*
  *																		*
  *  When a Details button is clicked this function displays the				*
  *  detailed information about the marriage.								*
@@ -599,7 +598,7 @@ function showDetails()
 }		// showDetails
 
 /************************************************************************
- *  deleteRow																*
+ *  function deleteRow														*
  *																		*
  *  When a Delete button is clicked this function removes the				*
  *  row from the table.														*
@@ -668,7 +667,7 @@ function deleteRow()
 }		// deleteRow
 
 /************************************************************************
- *  gotDelete																*
+ *  function gotDelete														*
  *																		*
  *  This method is called when the XML file representing				*
  *  the deletion of the report from the database is retrieved.				*
@@ -706,7 +705,7 @@ function gotDelete(xmlDoc)
 }		// gotDelete
 
 /************************************************************************
- *  noDelete																*
+ *  function noDelete														*
  *																		*
  *  This method is called if there is no delete registration script.		*
  ************************************************************************/
@@ -717,7 +716,7 @@ function noDelete()
 }		// noDelete
 
 /************************************************************************
- *  checkFlagBG																*
+ *  function checkFlagBG														*
  *																		*
  *  Validate the current value of a field containing a flag.				*
  *																		*
@@ -745,7 +744,7 @@ function checkFlagBG()
 }		// checkFlagBG
 
 /************************************************************************
- *  checkFlagBL																*
+ *  function checkFlagBL														*
  *																		*
  *  Validate the current value of a field containing a flag.				*
  *																		*
@@ -773,7 +772,7 @@ function checkFlagBL()
 }		// checkFlagBL
 
 /************************************************************************
- *  tableKeyDown														*
+ *  function tableKeyDown												*
  *																		*
  *  Handle key strokes in text input fields in a row.						*
  *																		*
@@ -978,19 +977,6 @@ function initElement(element)
 {
     element.onkeydown	= keyDown;
 
-    // pop up help balloon if the mouse hovers over a field
-    // for more than 2 seconds
-    if (element.parentNode.nodeName == 'TD')
-    {	// set mouseover on containing cell
-		element.parentNode.onmouseover	= eltMouseOver;
-		element.parentNode.onmouseout	= eltMouseOut;
-    }	// set mouseover on containing cell
-    else
-    {	// set mouseover on input element itself
-		element.onmouseover		= eltMouseOver;
-		element.onmouseout		= eltMouseOut;
-    }	// set mouseover on input element itself
-
     var namePattern		= /^([a-zA-Z_]+)(\d*)$/;
     var	id			= element.id;
     if (id.length == 0)
@@ -1152,12 +1138,12 @@ function initElement(element)
 }		// function initElement
 
 /************************************************************************
- *  marriageDateChanged														*
+ *  function marriageDateChanged												*
  *																		*
  *  Take action when the user changes the marriage date field				*
  *																		*
  *  Input:																*
- *		this				an instance of an HTML input element. 				*
+ *		this		an instance of an HTML input element. 				*
  ************************************************************************/
 function marriageDateChanged()
 {
@@ -1193,12 +1179,12 @@ function marriageDateChanged()
 }		// marriageDateChanged
 
 /************************************************************************
- *  licenseTypeChanged														*
+ *  function licenseTypeChanged											*
  *																		*
- *  Take action when the user changes the licence type field				*
+ *  Take action when the user changes the licence type field			*
  *																		*
  *  Input:																*
- *		this				an instance of an HTML input element. 				*
+ *		this		an instance of an HTML input element. 				*
  ************************************************************************/
 function licenseTypeChanged()
 {

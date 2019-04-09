@@ -3,967 +3,960 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  CensusFormPopupsEnglish.php						*
- *									*
+ *  CensusFormPopupsEnglish.php											*
+ *																		*
  *  The English language version of the common popups used by Census	*
- *  forms to provide help and diagnostic information to the user.	*
- *									*
- *  History:								*
- *	2012/04/13	created						*
- *	2013/02/09	credit LAC for images				*
- *	2013/06/21	remove support for renamed field 'NoFamilies'	*
- *	2013/06/23	change button text on chooseIdir panel		*
- *	2014/04/26	document new function in family, flag,		*
- *			and age columns					*
- *			add help popups for the Find/Show/Clear buttons	*
- *	2014/07/15	support for popupAlert moved to common code	*
- *	2015/01/13	Add copyright notice for census image		*
- *			remove obsolete error message popups		*
- *	2016/12/13	add columns for the 1911 census			*
- *	2017/08/16	script legacyIndivid.php renamed to Person.php	*
- *									*
- *  Copyright &copy; 2017 James A. Cobban				*
+ *  forms to provide help and diagnostic information to the user.		*
+ *																		*
+ *  History:															*
+ *		2012/04/13		created											*
+ *		2013/02/09		credit LAC for images							*
+ *		2013/06/21		remove support for renamed field 'NoFamilies'	*
+ *		2013/06/23		change button text on chooseIdir panel			*
+ *		2014/04/26		document new function in family, flag,			*
+ *						and age columns									*
+ *						add help popups for the Find/Show/Clear buttons	*
+ *		2014/07/15		support for popupAlert moved to common code		*
+ *		2015/01/13		Add copyright notice for census image			*
+ *						remove obsolete error message popups			*
+ *		2016/12/13		add columns for the 1911 census					*
+ *		2017/08/16		script legacyIndivid.php renamed to Person.php	*
+ *																		*
+ *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
 ?>
-  <!-- balloons to pop up when mouse moves over forward and back links -->
-  <div class='popup' id='mouseprenpprev'>
-    <p class='label'>
-	Go to Page <?php print $page - 1; ?>&nbsp;
-    </p>
-  </div>
-  <div class='popup' id='mouseprenpnext'>
-    <p class='label'>
-	Go to Page <?php print $page + 1; ?>&nbsp;
-    </p>
-  </div>
-  <div class='popup' id='mousepostnpprev'>
-    <p class='label'>
-	Go to Page <?php print $page - 1; ?>&nbsp;
-    </p>
-  </div>
-  <div class='popup' id='mousepostnpnext'>
-    <p class='label'>
-	Go to Page <?php print $page + 1; ?>&nbsp;
-    </p>
-  </div>
-  <!-- the following are language specific popups for field specific help -->
-<div id='popups'>
-<div class='balloon' id='HelpFamily'>
-<p>
-The value of the family identifier is the same in all 
-members of a family.  
-If you change the value it is replicated in all subsequent 
-rows until the start of the next family.
-On the first line of a new family you can enter the value '+' which is
-replaced by the next higher family number.
-</p>
-</div>
-<div class='balloon' id='HelpSurname'>
-<p>
-Enter the surname of the individual.
-The value is replicated in each successive line until an explicitly set
-value is encountered.  
-</p>
-</div>
-<div class='balloon' id='HelpGivenNames'>
-<p>
-Enter the given names of the individual.
-</p>
-</div>
-<div class='balloon' id='HelpAddress'>
-<p>
-Enter the address of the family.  In some censuses this is available from
-another schedule.
-</p>
-</div>
-<div class='balloon' id='HelpTownship'>
-<p>
-Enter the parish or township name where the family is located.
-</p>
-</div>
-<div class='balloon' id='HelpLocation'>
-<p>
-The Location field is used in the population schedule of the census
-for comments about where the individual is if they were outside of the
-enumeration division at the time of the census.  The field is therefore only
-rarely filled in.  It is recommended that, to avoid wasting all this space in
-the census transcription, the transcriber insert the address information from
-the corresponding entry in schedule B, the agricultural census.  However
-to clearly indicate that the information is not present in the population
-schedule, the address copied from schedule B should be enclosed in square
-brackets.
-</p>
-</div>
-<div class='balloon' id='HelpAge'> 
-<p>
-Enter the age at time of census.  If not provided by the enumerator
-enter '0' if you believe the enumerator intended to indicate that the
-child was less than one year old, otherwise enter a '[', which is
-expanded to '[blank]' to indicate that the enumerator erroneously failed
-to fill in this mandatory field.
-You can enter an age in months as, for example: '3m', 'm3', or '3/12'.  These
-are all converted to a common form '3m'.  If the form also includes a month
-of birth field, that is initialized with the most probable month, assuming the
-census enumeration took place in April.
-</p>
-</div>
-<div class='balloon' id='HelpSex'> 
-<p>
-Indicate the sex of the individual.  
-The expected values are 'M' or 'F'.
-</p>
-</div>
-<div class='balloon' id='HelpRace'> 
-<p>
-This is a single character abbreviation for the "race" to which the
-individual belongs.  "Race" is expressed as a color:
-</p>
-<table>
-  <tr>
-    <th>B</th><td>for Black (Negro)</td>
-  </tr>
-  <tr>
-    <th>R</th><td>for Red (American Native)</td>
-  </tr>
-  <tr>
-    <th>W</th><td>for White (Western Eurasian)</td>
-  </tr>
-  <tr>
-    <th>Y</th><td>for Yellow (Eastern Eurasian)</td>
-  </tr>
-</table>
-<p>If the enumerator was a francophone these are replaced by:
-</p>
-<table>
-  <tr>
-    <th>B</th><td>for <i>Blanc[he] (Eurasien[ne] Occidental[e])</i> (note confusion with English abbreviation)</td>
-  </tr>
-  <tr>
-    <th>R</th><td>for <i>Rouge (Autocthone Americain[e])</i></td>
-  </tr>
-  <tr>
-    <th>N</th><td>for <i>Noir (Negre)</i></td>
-  </tr>
-  <tr>
-    <th>J</th><td>for <i>Jaune (Eurasien[ne] Oriental[e])</i></td>
-  </tr>
-</table>
-</div>
-<div class='balloon' id='HelpMStat'> 
-<p>
-Indicate the marital status of the individual.  
-Expected values are: 
-</p>
-<table>
-  <tr>
-    <th>M</th><td>for Married</td>
-  </tr>
-  <tr>
-    <th>W</th><td>for Widow/Widower</td>
-  </tr>
-  <tr>
-    <th>D</th><td>for Divorced</td>
-  </tr>
-  <tr>
-    <th>S</th><td>for Single</td>
-  </tr>
-  <tr>
-    <th>blank</th><td>for Single</td>
-  </tr>
-</table>
-<p>If the enumerator was a francophone, the marital status values are:
-<table>
-  <tr>
-    <th>M</th><td>for <i>Mari&eacute;[e]</i></td>
-  </tr>
-  <tr>
-    <th>V</th><td>for <i>Veuve/Veuf</i></td>
-  </tr>
-  <tr>
-    <th>D</th><td>for <i>Divorc&eacute;[e]</i></td>
-  </tr>
-  <tr>
-    <th>C</th><td>for <i>C&eacute;libatair[e]</i></td>
-  </tr>
-  <tr>
-    <th>blank</th><td>for <i>C&eacute;libatair[e]</i></td>
-  </tr>
-</table>
-</div>
-<div class='balloon' id='HelpFrench'>
-<p>
-Indicate whether the individual is a French-Canadian.  
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpOrigin'>
-<p>
-Specify the ethnic origin of the individual.
-For individuals of European descent the enumerator was supposed to enter the
-ethnicity inherited from the father.  For example the term "Canadian" was
-only to be used for French-Canadians.  However even one drop of African or
-Native ancestry on the mother's side made the person Negro or Indian or at 
-best a 'Half-Breed'
-</p>
-</div>
-<div class='balloon' id='HelpColoured'>
-<p>
-Indicate whether the individual is a Negro (African descent).
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpNegro'>
-<p>
-Indicates whether the individual is a Negro (African descent).
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpIndian'>
-<p>
-Indicate whether the individual is a Indian (Native).
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpMember'>
-<p>
-Indicate whether the individual is a member of the primary family in this
-household.
-The enumerator generally entered a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpAbsent'>
-<p>
-Indicate whether the individual was absent at the time of the enumeration.
-The enumerator generally entered a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpNationality'>
-<p>
-Specify the nationality (citizenship) of the individual.
-</p>
-</div>
-<div class='balloon' id='HelpBYearTxt'>
-<p>
-The 4 digit year of birth.  If only 2 digits are entered the century is
-filled in on the assumption the year falls in the century up to and
-including the census year. If not entered by the enumerator enter '[' to
-fill the field with '[Blank]'.
-</p>
-</div>
-<div class='balloon' id='HelpBInYear'>
-<p>
-Indicator that the individual was born in the 12 months preceding the census.
-Generally an abbreviation for a month name, which is 
-standardized and capitalized for you.
-</p>
-</div>
-<div class='balloon' id='HelpBDate'>
-<p>
-Birth date of the individual.
-Generally an abbreviation for a month name, which is capitalized for you.
-In some cases a month and day of the month may be entered.  
-</p>
-</div>
-<div class='balloon' id='HelpMarYear'>
-<p>
-Indicator that the individual was married in the 12 months preceding the census.
-Generally an abbreviation for a month name, which is capitalized for you.
-</p>
-</div>
-<div class='balloon' id='HelpMInYear'>
-<p>
-Indicator that the individual was married in the 12 months preceding the census.
-Generally an abbreviation for a month name, which is capitalized for you.
-In some cases a month and day of the month may be entered.  
-</p>
-</div>
-<div class='balloon' id='HelpRelation'>
-<p>
-The relation of the individual to the head of household field.
-</p>
-</div>
-<div class='balloon' id='HelpBPlace'>
-<p>
-The birth place of the individual.
-</p>
-</div>
-<div class='balloon' id='HelpBPlaceRu'>
-<p>
-If the individual was born in Canada, then this field indicates whether
-the place of birth was rural or urban.
-</p>
-</div>
-<div class='balloon' id='HelpImmYear'>
-<p>
-The year of immigration if the individual was not born in Canada.  
-If not entered by the enumerator and the birthplace is not in
-Canada enter '[' to fill the field with '[Blank]'.
-</p>
-</div>
-<div class='balloon' id='HelpNatYear'>
-<p>
-The year of naturalization.  
-An individual only required naturalization if not born in the British
-Empire.  
-</p>
-</div>
-<div class='balloon' id='HelpFathersBPlace'>
-<p>
-The birth place of the father of the individual.
-</p>
-</div>
-<div class='balloon' id='HelpMothersBPlace'>
-<p>
-The birth place of the mother of the individual.
-</p>
-</div>
-<div class='balloon' id='HelpReligion'>
-<p>
-The religious affiliation of the individual.
-</p>
-</div>
-<div class='balloon' id='HelpOccupation'>
-<p>
-The primary occupation of the individual.
-</p>
-</div>
-<div class='balloon' id='HelpOccOther'>
-<p>
-A secondary occupation of the individual.
-</p>
-</div>
-<div class='balloon' id='HelpEmployer'>
-<p>
-Indicator of whether the individual is an employer.
-This may be entered as a letter 'Y', or 'N', or as a stroke which can be
-entered as a '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpEmployee'>
-<p>
-Indicator of whether the individual is an employee.
-This may be entered as a letter 'Y', or 'N', or as a stroke which can be
-entered as a '1'. 
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpUnemployed'>
-<p>
-If this field is non-blank then the individual was unemployed during
-the week preceding the enumeration.
-The enumerator generally wrote a stroke so enter something that looks
-like a stroke, for example the digit '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpNumHands'>
-<p>
-If this field is non-blank and not zero then it contains the number of 
-individuals employed by this individual.  This field should be filled
-in if the individual is an employer.
-This should be a number.
-</p>
-</div>
-<div class='balloon' id='HelpOwnAcct'>
-<p>
-Indicator of whether the individual is self-employed.
-This may be entered as a letter 'Y', or 'N', or as a stroke which can be
-entered as a '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpOwnMeans'>
-<p>
-Indicator of whether the individual is self-employed.
-This may be entered as a letter 'Y', or 'N', or as a stroke which can be
-entered as a '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpEmpWhere'>
-<p>
-Specifies where the person worked, if they were an employee.
-</p>
-</div>
-<div class='balloon' id='HelpMonthsFact'>
-<p>
-Specifies where the number of months worked in a factory.
-</p>
-</div>
-<div class='balloon' id='HelpMonthsHome'>
-<p>
-Specifies where the number of months worked at home.
-</p>
-</div>
-<div class='balloon' id='HelpMonthsOther'>
-<p>
-Specifies where the number of months worked other than at home or in a factory.
-</p>
-</div>
-<div class='balloon' id='HelpMonthsSchool'>
-<p>
-Specifies where the number of months spent at school.
-</p>
-</div>
-<div class='balloon' id='HelpWksEmp'>
-<p>
-Specifies the number of weeks that the person worked at the primary
-occupation.
-</p>
-</div>
-<div class='balloon' id='HelpWksOth'>
-<p>
-Specifies the number of weeks that the person worked at the other
-occupation.
-</p>
-</div>
-<div class='balloon' id='HelpHpWEmp'>
-<p>
-Specifies the number of hours per week that the person work at the
-primary occupation
-</p>
-</div>
-<div class='balloon' id='HelpHpWOth'>
-<p>
-Specifies the number of hours per week that the person work at the
-other occupation
-</p>
-</div>
-<div class='balloon' id='HelpIncomeEmp'>
-<p>
-Specifies the annual income from the primary occupation.
-</p>
-</div>
-<div class='balloon' id='HelpIncomeOth'>
-<p>
-Specifies the annual income from the other occupation.
-</p>
-</div>
-<div class='balloon' id='HelpHourlyRate'>
-<p>
-For individuals who are paid by the hour this specifies the hourly
-rate of pay in cents.  This is sometimes entered as a cents amount but
-most enumerators provided the value in dollars and cents with the cents
-amount, for example, entered in smaller digits.  Enter the value with a
-decimal point to separate the dollar and cent portions of the rate.
-</p>
-</div>
-<div class='balloon' id='HelpEmpType'>
-<p>
-Indicator of whether the individual is an employer, an employee, or
-working on his own account.  Note that in English, though not in French, 
-the abbreviation 'E' is ambiguous.  If an Anglophone enumerator filled this
-in with 'E' for employer, replace it with 'R', as described in the column
-heading in the original form image.
-</p>
-</div>
-<div class='balloon' id='HelpEmpWhere'>
-<p>
-Specifies where the person worked.
-</p>
-</div>
-<div class='balloon' id='HelpMilitary'>
-<p>
-For members of a household who were away on military posting, there was a
-war going on, this column specifies where they were posted.
-</p>
-</div>
-<div class='balloon' id='HelpAddrTwp'>
-<p>
-Enter the township number portion of the address.
-</p>
-</div>
-<div class='balloon' id='HelpAddrRng'>
-<p>
-Enter the range number portion of the address.
-</p>
-</div>
-<div class='balloon' id='HelpAddrMdn'>
-<p>
-Enter the meridian portion of the address.
-</p>
-</div>
-<div class='balloon' id='HelpAddrMuni'>
-<p>
-Enter the municipality name portion of the address.
-</p>
-</div>
-<div class='balloon' id='HelpPostOffice'>
-<p>
-Enter the name of the post office.
-</p>
-</div>
-<div class='balloon' id='HelpAddrSect'>
-<p>
-Enter the number of the section within the township.
-</p>
-</div>
-<div class='balloon' id='HelpAddrTwp'>
-<p>
-Enter the number of the township within the range.
-</p>
-</div>
-<div class='balloon' id='HelpAddrRng'>
-<p>
-Enter the number of the range relative to the meridian.
-</p>
-</div>
-<div class='balloon' id='HelpAddrMdn'>
-<p>
-Enter the identifier of the meridian with respect to which the range is
-specified.
-</p>
-</div>
-<div class='balloon' id='HelpHorses'>
-<p>
-Enter the number of horses of all ages on the property.
-</p>
-</div>
-<div class='balloon' id='HelpMilkCows'>
-<p>
-Enter the number of milch cows on the property.
-</p>
-</div>
-<div class='balloon' id='HelpCattle'>
-<p>
-Enter the number of other cattle or other horned animals on the property.
-</p>
-</div>
-<div class='balloon' id='HelpSheep'>
-<p>
-Enter the number of sheep on the property.
-</p>
-</div>
-<div class='balloon' id='HelpPigs'>
-<p>
-Enter the number of hogs and pigs on the property.
-</p>
-</div>
-<div class='balloon' id='HelpSpkEnglish'>
-<p>
-Indicate whether the individual can speak English.
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpSpkFrench'>
-<p>
-Indicate whether the individual can speak French.
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpMotherTongue'>
-<p>
-Specify the mother tongue of the individual.
-</p>
-</div>
-<div class='balloon' id='HelpInfirmities'>
-<p>
-Specify the any infirmities the individual has, such as deaf or blind.
-</p>
-</div>
-<div class='balloon' id='HelpLifeInsurance'>
-<p>
-The 1911 census was particular concerned with the state of the insurance
-industry, so individuals who had life insurance were asked to enter
-the benefit amount.
-</p>
-</div>
-<div class='balloon' id='HelpAccInsurance'>
-<p>
-The 1911 census was particular concerned with the state of the insurance
-industry, so individuals who had health or accident insurance were asked
-to enter the benefit amount.
-</p>
-</div>
-<div class='balloon' id='HelpCostInsurance'>
-<p>
-The 1911 census was particular concerned with the state of the insurance
-industry, so individuals who had insurance were asked to enter
-the how much it cost per year.
-</p>
-</div>
-<div class='balloon' id='HelpCanRead'>
-<p>
-Indicate whether the individual can read.
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpCanWrite'>
-<p>
-Indicate whether the individual can write.
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpCantRead'> 
-<p>
-Indicates whether the individual even though an adult, cannot read.
-Any non-blank value is interpreted as true.  The original form generally
-just has a stroke that can be interpreted as a "1".
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpCantWrite'> 
-<p>
-Indicates whether the individual even though an adult, cannot write.
-Any non-blank value is interpreted as true.  The original form generally
-just has a stroke that can be interpreted as a "1".
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpIlliterate'>
-<p>
-Indicates whether the individual was illiterate.
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-</p>
-</div>
-<div class='balloon' id='HelpBirth'>
-<p>
-Indicates whether the individual was born within the preceding 12 months
-and the sex of the individual.
-Expected values 'M', 'F', or blank.
-</p>
-</div>
-<div class='balloon' id='HelpDeathSex'>
-<p>
-Indicates whether an individual member of the household 
-died within the preceding 12 months, and the sex of that individual.
-Expected values 'M', 'F', or blank.
-Note that this information does <b>not</b> refer to the individual described
-by the other fields in this line of the form.
-</p>
-</div>
-<div class='balloon' id='HelpAgeAtDeath'>
-<p>
-Indicates the age of the deceased individual at the time of death.
-Note that this information does <b>not</b> refer to the individual described
-by the other fields in this line of the form.
-</p>
-</div>
-<div class='balloon' id='HelpCauseOfDeath'>
-<p>
-Indicates the cause of death.
-Note that this information does <b>not</b> refer to the individual described
-by the other fields in this line of the form.
-</p>
-</div>
-<div class='balloon' id='HelpResType'>
-<p>
-Indicates the type of residence: Log Cabin, Shanty, and Brick are the
-most common reported values.
-</p>
-</div>
-<div class='balloon' id='HelpStories'>
-<p>
-Indicates the number of stories: 1, 1½, or 2.
-</p>
-</div>
-<div class='balloon' id='HelpNumFamilies'>
-<p>
-Indicates the number of families sharing this residence.
-</p>
-</div>
-<div class='balloon' id='HelpLanguage'>
-<p>
-In this column the enumerator was requested to enter the primary language
-spoken.
-</p>
-</div>
-<div class='balloon' id='HelpSpkOther'>
-<p>
-If the individual can speak a language other than French or English
-this column identifies the language.  If the enumerator filled this column
-in with 'English', 'French', 'Anglais', or 'Français', leave the column blank
-because there are separate columns for that information.
-</p>
-</div>
-<div class='balloon' id='HelpSchool'> 
-<p>
-Indicate whether the individual is attending school.
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpDeaf'>
-<p>
-If this field is non-blank then the individual is deaf.
-The enumerator generally wrote a stroke so enter something that looks
-like a stroke, for example the digit '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpBlind'>
-<p>
-If this field is non-blank then the individual is blind.
-The enumerator generally wrote a stroke so enter something that looks
-like a stroke, for example the digit '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpInsane'>
-<p>
-If this field is non-blank then the individual is of unsound mind.
-The enumerator generally wrote a stroke so enter something that looks
-like a stroke, for example the digit '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpIdiot'>
-<p>
-If this field is non-blank then the individual is "an idiot or silly."
-In modern parlance developmentally delayed.
-The enumerator generally wrote a stroke so enter something that looks
-like a stroke, for example the digit '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpLunatic'>
-<p>
-Indicates whether the individual was mentally incapacitated.
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpLunatics'>
-<p>
-Indicates whether the individual was mentally incapacitated.
-Any non-blank value indicates true.  The enumerator generally entered
-a stroke which can be entered as '1'.
-Anything other than 0 or the letter 'N' is converted to 'Y'.
-</p>
-</div>
-<div class='balloon' id='HelpOwnerTenant'>
-<p>
-Enter 'O' if the householder owns the property, or 'R' or 'T' if the householder
-is a tenant.  If the householder is resident in a house that is supplied
-as part of the job, for example a Manse supplied for a Minister, or a house
-supplied by the Railroad to a Station Agent, then specify 'F'.
-This is specified only on the head of household.
-</p>
-</div>
-<div class='balloon' id='HelpHouseRent'>
-<p>In the 1921 census if the householder is a tenant,
-specify the monthly rent in dollars.
-</p>
-</div>
-<div class='balloon' id='HelpHouseClass'>
-<p>Specify 'S' for a single family dwelling, 
-or 'M' for a multiple family dwelling.
-</p>
-</div>
-<div class='balloon' id='HelpHouseMaterial'>
-<p>
-Indicates the materials of which the residence is constructed: Frame, 
-Log, Shanty, Stone, and Brick are the most common reported values.
-</p>
-</div>
-<div class='balloon' id='HelpHouseRooms'>
-<p>The number of rooms occupied by the family.
-</p>
-</div>
-<div class='balloon' id='HelpWeeksUnemp'>
-<p>Specify the number of weeks during the last 12 months that the
-individual was unemployed
-</p>
-</div>
-<div class='balloon' id='HelpWeeksIll'>
-<p>Specify the number of weeks during the last 12 months that the
-individual was unemployed because of illness or injury.
-</p>
-</div>
-<div class='balloon' id='HelpSchoolMons'>
-<p>Specify the number of months that the individual was attending school.
-</p>
-</div>
-<div class='balloon' id='HelpRemarks'>
-<p>
-Remarks about the individual by the enumerator.
-If the transcriber wishes to enter notes they should be enclosed in
-editorial square brackets to indicate that the text is not present in
-the original image.
-</p>
-</div>
-<div class='balloon' id='HelpdoIdir'>
-<p>
-If the button text is "Find" then clicking on this button pops up a dialog
-with a list of individuals in the family tree that are close matches to the
-name, sex, and birth date of the individual recorded by this row of the
-census.  You can use this dialog to identify the individual that corresponds
-to this row of the census.
-</p>
-<p>
-If the button text is "Show" then clicking on this button pops up 
-the main information page on the individual that has previously been linked
-to this row of the census.
-</p>
-</div>
-<div class='balloon' id='HelpclearIdir'>
-<p>
-This button appears if the row of the census is linked to an individual
-in the family tree.  Click on this button if you determine that the linkage
-is incorrect.  The button immediately to the left is changed to display
-the action "Find" so you can correct the identification.
-</p>
-</div>
-<div class='balloon' id='Helpsubmit'>
-<p>
-Click on this button to apply the updates to the database.  Note that unlike
-many other web pages you cannot submit the updates by pressing the enter key
-because that is reinterpreted as to advance to the next line of the census.
-You also cannot tab to this button because tab is defined to wrap around to
-the beginning of the line within the census.
-</p>
-</div>
-<div class='balloon' id='Helpreset'>
-<p>
-Click on this button to reset all of the fields in the form to their default
-values.  Most fields become empty.
-</p>
-</div>
-<div class='balloon' id='HelptreeMatch'>
-<p>
-Click on this button to perform a match between all individuals in the
-family tree who have
-citations to the current census page, and the names and birth years of the
-individuals on this page.
-</p>
-</div>
-<div class='balloon' id='HelpaddRow'>
-<p>
-Click on this button to add an extra line to the form.  This is required if
-the enumerator squeezed an extra line beyond the basic 50 onto the form.
-</p>
-</div>
-<div class='balloon' id='HelpSubmit'>
-<p>
-Click on this button to update this page in the census database.
-You can also request the update by using the keyboard short-cuts Ctrl-S or
-Alt-U.
-</p>
-</div>
-<div class='balloon' id='HelpaddRow'>
-<p>
-In some cases the enumerator squeezed an extra individual at the bottom of
-the form.  Click on this button to add an extra blank line to the form
-so you can enter the details for that individual.
-</p>
-</div>
-<div class='balloon' id='HelpImage'>
-<p>
-Fill in or correct this field with the uniform record location (URL) of the
-image of the original census page.
-</p>
-</div>
-<div class='balloon' id='HelpimageButton'>
-<p>
-Click on this button to open a new window (or tab) containing the original
-census image corresponding to this page as obtained from the Library and
-Archives of Canada web-site.
-</p>
-</div>
-<div class='balloon' id='HelpcorrectImage'>
-<p>
-If after clicking on the 
-<span class='button'>Display&nbsp;Original&nbsp;Census&nbsp;Image</span>
-button you determine that the incorrect image has been specified, and you
-have determined through browsing the web what the correct URL should be,
-click on this button to obtain a text input field which you can use
-to enter the correct URL.
-</p>
-</div>
-<div class='balloon' id='HelpIDIR'>
-<p>
-If the individual described by this line of the census has been identified
-with an individual in the family tree then this button displays the text
-<span class='button'>Show</span> and clicking on it pops up a new window
-displaying the entry in the family tree.  Otherwise,
-if you are signed on and authorized to update the database,
-the button displays the
-text <span class='button'>Find</span> and clicking on it pops up a 
-dialog to search the family tree for individuals with a similar name and
-year of birth.
-</p>
-</div>
-<div class='balloon' id='HelprightTop'>
-If this button displays the text <span class='button'>contribute</span> then
-click on this button to signon to access extended features of the web-site.
-If you are not already registered as a user of this web-site click on this
-button to register as a new user.
-<p>Otherwise this button displays your user identifier.  Click on this button
-to manage your account with the web-site.  For example you can change your
-password or e-mail address.
-</div>
-</div>
-<!-- popup to display dialog for IDIR -->
-<div class='balloon' id='IdirDialog'>
-</div>
-<div class='hidden' id='templates'>
-  <!-- the following are language specific error messages -->
-  <span class='note' id='imageCopyrightNote'>
-	Image provided courtesy of 
-	<a href='http://www.bac-lac.gc.ca/eng/Pages/home.aspx'>
-	Library and Archives Canada</a>.
-  </span>
-  <!-- language specific ignore errors button -->
-  <p id='errorPrompt'>
-    <button type='button' id='errorButton$sub'>Submit with Errors</button>
-  </p>
-  <!-- select matching names dialog -->
-  <form name='idirChooserForm$sub' id='idirChooserForm$sub'>
-    <p class='label'>$surname, $givenname born $birthyear
-    <p>
-    <select name='chooseIdir' id='chooseIdir$sub' size='5'>
-      <option value='0'>Choose from the following partial matches:</option>
-    </select>
-    <p>
-      <button type='button' id='choose$line'>Cancel</button>
-    </p>
-  </form>
-  <!-- no matching names dialog -->
-  <form name='idirNullForm$sub' id='idirNullForm$sub'>
-    <p class='label'>$surname, $givenname born $birthyear
-    <p class='message'>No individuals match
-    <p>
-      <button type='button' id='closeDlg$sub'>Close</button>
-    </p>
-    <p style='display: none'>$cmd</p>
-  </form>
-  <!-- select matching names dialog -->
-  <form name='FamilyEntryForm$sub' id='FamilyEntryForm$sub'>
-    <p class='label'>Matches to Family $family in Census $census dist $district 
-		sub-dist $subDistrict-$division
-    <p id='FamilyButtonLine$sub'>
-      <button type='button' id='closeFam$sub'>Apply All Checked Entries</button>
-    </p>
-  </form>
-  <p id='Match$idir'>
-    Page $page Line $line Matches
-    <input type='checkbox' name='Confirm$idir' checked=checked>
-    <a href='/FamilyTree/Person.php?idir=$idir'>$surname,
-	$givenname ($birthd-$deathd)</a>
-  </p>
-  <p id='NoMatch$sub'>
-    Page $page Line $line does not match any member of family.
-  </p>
-</div>
+	  <!-- balloons to pop up when mouse moves over forward and back links -->
+	  <div class='popup' id='mouseprenpprev'>
+	    <p class='label'>
+			Go to Page <?php print $page - 1; ?>&nbsp;
+	    </p>
+	  </div>
+	  <div class='popup' id='mouseprenpnext'>
+	    <p class='label'>
+			Go to Page <?php print $page + 1; ?>&nbsp;
+	    </p>
+	  </div>
+	  <div class='popup' id='mousepostnpprev'>
+	    <p class='label'>
+			Go to Page <?php print $page - 1; ?>&nbsp;
+	    </p>
+	  </div>
+	  <div class='popup' id='mousepostnpnext'>
+	    <p class='label'>
+			Go to Page <?php print $page + 1; ?>&nbsp;
+	    </p>
+	  </div>
+	  <!-- the following are language specific popups for field specific help -->
+	<div id='popups'>
+	<div class='balloon' id='HelpFamily'>
+	  <p>
+	  The value of the family identifier is the same in all 
+	  members of a family.  
+	  If you change the value it is replicated in all subsequent 
+	  rows until the start of the next family.
+	  On the first line of a new family you can enter the value '+' which is
+	  replaced by the next higher family number.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSurname'>
+	  <p>
+	  Enter the surname of the individual.
+	  The value is replicated in each successive line until an explicitly set
+	  value is encountered.  
+	  </p>
+	</div>
+	<div class='balloon' id='HelpGivenNames'>
+	  <p>
+	  Enter the given names of the individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAddress'>
+	  <p>
+	  Enter the address of the family.  In some censuses this is available from
+	  another schedule.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpTownship'>
+	  <p>
+	  Enter the parish or township name where the family is located.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpLocation'>
+	  <p>
+	  The Location field is used in the population schedule of the census
+	  for comments about where the individual is if they were outside of the
+	  enumeration division at the time of the census.  The field is therefore only
+	  rarely filled in.  It is recommended that, to avoid wasting all this space in
+	  the census transcription, the transcriber insert the address information from
+	  the corresponding entry in schedule B, the agricultural census.  However
+	  to clearly indicate that the information is not present in the population
+	  schedule, the address copied from schedule B should be enclosed in square
+	  brackets.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAge'> 
+	  <p>
+	  Enter the age at time of census.  If not provided by the enumerator
+	  enter '0' if you believe the enumerator intended to indicate that the
+	  child was less than one year old, otherwise enter a '[', which is
+	  expanded to '[blank]' to indicate that the enumerator erroneously failed
+	  to fill in this mandatory field.
+	  You can enter an age in months as, for example: '3m', 'm3', or '3/12'.  These
+	  are all converted to a common form '3m'.  If the form also includes a month
+	  of birth field, that is initialized with the most probable month, assuming the
+	  census enumeration took place in April.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSex'> 
+	  <p>
+	  Indicate the sex of the individual.  
+	  The expected values are 'M' or 'F'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpRace'> 
+	  <p>
+	  This is a single character abbreviation for the "race" to which the
+	  individual belongs.  "Race" is expressed as a color:
+	  </p>
+	<table>
+	  <tr>
+	    <th>B</th><td>for Black (Negro)</td>
+	  </tr>
+	  <tr>
+	    <th>R</th><td>for Red (American Native)</td>
+	  </tr>
+	  <tr>
+	    <th>W</th><td>for White (Western Eurasian)</td>
+	  </tr>
+	  <tr>
+	    <th>Y</th><td>for Yellow (Eastern Eurasian)</td>
+	  </tr>
+	</table>
+	  <p>If the enumerator was a francophone these are replaced by:
+	  </p>
+	<table>
+	  <tr>
+	    <th>B</th><td>for <i>Blanc[he] (Eurasien[ne] Occidental[e])</i> (note confusion with English abbreviation)</td>
+	  </tr>
+	  <tr>
+	    <th>R</th><td>for <i>Rouge (Autocthone Americain[e])</i></td>
+	  </tr>
+	  <tr>
+	    <th>N</th><td>for <i>Noir (Negre)</i></td>
+	  </tr>
+	  <tr>
+	    <th>J</th><td>for <i>Jaune (Eurasien[ne] Oriental[e])</i></td>
+	  </tr>
+	</table>
+	</div>
+	<div class='balloon' id='HelpMStat'> 
+	  <p>
+	  Indicate the marital status of the individual.  
+	  Expected values are: 
+	  </p>
+	<table>
+	  <tr>
+	    <th>M</th><td>for Married</td>
+	  </tr>
+	  <tr>
+	    <th>W</th><td>for Widow/Widower</td>
+	  </tr>
+	  <tr>
+	    <th>D</th><td>for Divorced</td>
+	  </tr>
+	  <tr>
+	    <th>S</th><td>for Single</td>
+	  </tr>
+	  <tr>
+	    <th>blank</th><td>for Single</td>
+	  </tr>
+	</table>
+	  <p>If the enumerator was a francophone, the marital status values are:
+	<table>
+	  <tr>
+	    <th>M</th><td>for <i>Mari&eacute;[e]</i></td>
+	  </tr>
+	  <tr>
+	    <th>V</th><td>for <i>Veuve/Veuf</i></td>
+	  </tr>
+	  <tr>
+	    <th>D</th><td>for <i>Divorc&eacute;[e]</i></td>
+	  </tr>
+	  <tr>
+	    <th>C</th><td>for <i>C&eacute;libatair[e]</i></td>
+	  </tr>
+	  <tr>
+	    <th>blank</th><td>for <i>C&eacute;libatair[e]</i></td>
+	  </tr>
+	</table>
+	</div>
+	<div class='balloon' id='HelpFrench'>
+	  <p>
+	  Indicate whether the individual is a French-Canadian.  
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpOrigin'>
+	  <p>
+	  Specify the ethnic origin of the individual.
+	  For individuals of European descent the enumerator was supposed to enter the
+	  ethnicity inherited from the father.  For example the term "Canadian" was
+	  only to be used for French-Canadians.  However even one drop of African or
+	  Native ancestry on the mother's side made the person Negro or Indian or at 
+	  best a 'Half-Breed'
+	  </p>
+	</div>
+	<div class='balloon' id='HelpColoured'>
+	  <p>
+	  Indicate whether the individual is a Negro (African descent).
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpNegro'>
+	  <p>
+	  Indicates whether the individual is a Negro (African descent).
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpIndian'>
+	  <p>
+	  Indicate whether the individual is a Indian (Native).
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMember'>
+	  <p>
+	  Indicate whether the individual is a member of the primary family in this
+	  household.
+	  The enumerator generally entered a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAbsent'>
+	  <p>
+	  Indicate whether the individual was absent at the time of the enumeration.
+	  The enumerator generally entered a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpNationality'>
+	  <p>
+	  Specify the nationality (citizenship) of the individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpBYearTxt'>
+	  <p>
+	  The 4 digit year of birth.  If only 2 digits are entered the century is
+	  filled in on the assumption the year falls in the century up to and
+	  including the census year. If not entered by the enumerator enter '[' to
+	  fill the field with '[Blank]'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpBInYear'>
+	  <p>
+	  Indicator that the individual was born in the 12 months preceding the census.
+	  Generally an abbreviation for a month name, which is 
+	  standardized and capitalized for you.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpBDate'>
+	  <p>
+	  Birth date of the individual.
+	  Generally an abbreviation for a month name, which is capitalized for you.
+	  In some cases a month and day of the month may be entered.  
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMarYear'>
+	  <p>
+	  Indicator that the individual was married in the 12 months preceding the census.
+	  Generally an abbreviation for a month name, which is capitalized for you.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMInYear'>
+	  <p>
+	  Indicator that the individual was married in the 12 months preceding the census.
+	  Generally an abbreviation for a month name, which is capitalized for you.
+	  In some cases a month and day of the month may be entered.  
+	  </p>
+	</div>
+	<div class='balloon' id='HelpRelation'>
+	  <p>
+	  The relation of the individual to the head of household field.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpBPlace'>
+	  <p>
+	  The birth place of the individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpBPlaceRu'>
+	  <p>
+	  If the individual was born in Canada, then this field indicates whether
+	  the place of birth was rural or urban.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpImmYear'>
+	  <p>
+	  The year of immigration if the individual was not born in Canada.  
+	  If not entered by the enumerator and the birthplace is not in
+	  Canada enter '[' to fill the field with '[Blank]'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpNatYear'>
+	  <p>
+	  The year of naturalization.  
+	  An individual only required naturalization if not born in the British
+	  Empire.  
+	  </p>
+	</div>
+	<div class='balloon' id='HelpFathersBPlace'>
+	  <p>
+	  The birth place of the father of the individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMothersBPlace'>
+	  <p>
+	  The birth place of the mother of the individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpReligion'>
+	  <p>
+	  The religious affiliation of the individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpOccupation'>
+	  <p>
+	  The primary occupation of the individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpOccOther'>
+	  <p>
+	  A secondary occupation of the individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpEmployer'>
+	  <p>
+	  Indicator of whether the individual is an employer.
+	  This may be entered as a letter 'Y', or 'N', or as a stroke which can be
+	  entered as a '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpEmployee'>
+	  <p>
+	  Indicator of whether the individual is an employee.
+	  This may be entered as a letter 'Y', or 'N', or as a stroke which can be
+	  entered as a '1'. 
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpUnemployed'>
+	  <p>
+	  If this field is non-blank then the individual was unemployed during
+	  the week preceding the enumeration.
+	  The enumerator generally wrote a stroke so enter something that looks
+	  like a stroke, for example the digit '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpNumHands'>
+	  <p>
+	  If this field is non-blank and not zero then it contains the number of 
+	  individuals employed by this individual.  This field should be filled
+	  in if the individual is an employer.
+	  This should be a number.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpOwnAcct'>
+	  <p>
+	  Indicator of whether the individual is self-employed.
+	  This may be entered as a letter 'Y', or 'N', or as a stroke which can be
+	  entered as a '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpOwnMeans'>
+	  <p>
+	  Indicator of whether the individual is self-employed.
+	  This may be entered as a letter 'Y', or 'N', or as a stroke which can be
+	  entered as a '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpEmpWhere'>
+	  <p>
+	  Specifies where the person worked, if they were an employee.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMonthsFact'>
+	  <p>
+	  Specifies where the number of months worked in a factory.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMonthsHome'>
+	  <p>
+	  Specifies where the number of months worked at home.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMonthsOther'>
+	  <p>
+	  Specifies where the number of months worked other than at home or in a factory.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMonthsSchool'>
+	  <p>
+	  Specifies where the number of months spent at school.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpWksEmp'>
+	  <p>
+	  Specifies the number of weeks that the person worked at the primary
+	  occupation.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpWksOth'>
+	  <p>
+	  Specifies the number of weeks that the person worked at the other
+	  occupation.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpHpWEmp'>
+	  <p>
+	  Specifies the number of hours per week that the person work at the
+	  primary occupation
+	  </p>
+	</div>
+	<div class='balloon' id='HelpHpWOth'>
+	  <p>
+	  Specifies the number of hours per week that the person work at the
+	  other occupation
+	  </p>
+	</div>
+	<div class='balloon' id='HelpIncomeEmp'>
+	  <p>
+	  Specifies the annual income from the primary occupation.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpIncomeOth'>
+	  <p>
+	  Specifies the annual income from the other occupation.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpHourlyRate'>
+	  <p>
+	  For individuals who are paid by the hour this specifies the hourly
+	  rate of pay in cents.  This is sometimes entered as a cents amount but
+	  most enumerators provided the value in dollars and cents with the cents
+	  amount, for example, entered in smaller digits.  Enter the value with a
+	  decimal point to separate the dollar and cent portions of the rate.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpEmpType'>
+	  <p>
+	  Indicator of whether the individual is an employer, an employee, or
+	  working on his own account.  Note that in English, though not in French, 
+	  the abbreviation 'E' is ambiguous.  If an Anglophone enumerator filled this
+	  in with 'E' for employer, replace it with 'R', as described in the column
+	  heading in the original form image.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpEmpWhere'>
+	  <p>
+	  Specifies where the person worked.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMilitary'>
+	  <p>
+	  For members of a household who were away on military posting, there was a
+	  war going on, this column specifies where they were posted.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAddrTwp'>
+	  <p>
+	  Enter the township number portion of the address.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAddrRng'>
+	  <p>
+	  Enter the range number portion of the address.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAddrMdn'>
+	  <p>
+	  Enter the meridian portion of the address.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAddrMuni'>
+	  <p>
+	  Enter the municipality name portion of the address.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpPostOffice'>
+	  <p>
+	  Enter the name of the post office.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAddrSect'>
+	  <p>
+	  Enter the number of the section within the township.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAddrTwp'>
+	  <p>
+	  Enter the number of the township within the range.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAddrRng'>
+	  <p>
+	  Enter the number of the range relative to the meridian.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAddrMdn'>
+	  <p>
+	  Enter the identifier of the meridian with respect to which the range is
+	  specified.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpHorses'>
+	  <p>
+	  Enter the number of horses of all ages on the property.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMilkCows'>
+	  <p>
+	  Enter the number of milch cows on the property.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpCattle'>
+	  <p>
+	  Enter the number of other cattle or other horned animals on the property.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSheep'>
+	  <p>
+	  Enter the number of sheep on the property.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpPigs'>
+	  <p>
+	  Enter the number of hogs and pigs on the property.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSpkEnglish'>
+	  <p>
+	  Indicate whether the individual can speak English.
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSpkFrench'>
+	  <p>
+	  Indicate whether the individual can speak French.
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMotherTongue'>
+	  <p>
+	  Specify the mother tongue of the individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpInfirmities'>
+	  <p>
+	  Specify the any infirmities the individual has, such as deaf or blind.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpLifeInsurance'>
+	  <p>
+	  The 1911 census was particular concerned with the state of the insurance
+	  industry, so individuals who had life insurance were asked to enter
+	  the benefit amount.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAccInsurance'>
+	  <p>
+	  The 1911 census was particular concerned with the state of the insurance
+	  industry, so individuals who had health or accident insurance were asked
+	  to enter the benefit amount.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpCostInsurance'>
+	  <p>
+	  The 1911 census was particular concerned with the state of the insurance
+	  industry, so individuals who had insurance were asked to enter
+	  the how much it cost per year.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpCanRead'>
+	  <p>
+	  Indicate whether the individual can read.
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpCanWrite'>
+	  <p>
+	  Indicate whether the individual can write.
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpCantRead'> 
+	  <p>
+	  Indicates whether the individual even though an adult, cannot read.
+	  Any non-blank value is interpreted as true.  The original form generally
+	  just has a stroke that can be interpreted as a "1".
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpCantWrite'> 
+	  <p>
+	  Indicates whether the individual even though an adult, cannot write.
+	  Any non-blank value is interpreted as true.  The original form generally
+	  just has a stroke that can be interpreted as a "1".
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpIlliterate'>
+	  <p>
+	  Indicates whether the individual was illiterate.
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpBirth'>
+	  <p>
+	  Indicates whether the individual was born within the preceding 12 months
+	  and the sex of the individual.
+	  Expected values 'M', 'F', or blank.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpDeathSex'>
+	  <p>
+	  Indicates whether an individual member of the household 
+	  died within the preceding 12 months, and the sex of that individual.
+	  Expected values 'M', 'F', or blank.
+	  Note that this information does <b>not</b> refer to the individual described
+	  by the other fields in this line of the form.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpAgeAtDeath'>
+	  <p>
+	  Indicates the age of the deceased individual at the time of death.
+	  Note that this information does <b>not</b> refer to the individual described
+	  by the other fields in this line of the form.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpCauseOfDeath'>
+	  <p>
+	  Indicates the cause of death.
+	  Note that this information does <b>not</b> refer to the individual described
+	  by the other fields in this line of the form.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpResType'>
+	  <p>
+	  Indicates the type of residence: Log Cabin, Shanty, and Brick are the
+	  most common reported values.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpStories'>
+	  <p>
+	  Indicates the number of stories: 1, 1½, or 2.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpNumFamilies'>
+	  <p>
+	  Indicates the number of families sharing this residence.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpLanguage'>
+	  <p>
+	  In this column the enumerator was requested to enter the primary language
+	  spoken.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSpkOther'>
+	  <p>
+	  If the individual can speak a language other than French or English
+	  this column identifies the language.  If the enumerator filled this column
+	  in with 'English', 'French', 'Anglais', or 'Français', leave the column blank
+	  because there are separate columns for that information.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSchool'> 
+	  <p>
+	  Indicate whether the individual is attending school.
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpDeaf'>
+	  <p>
+	  If this field is non-blank then the individual is deaf.
+	  The enumerator generally wrote a stroke so enter something that looks
+	  like a stroke, for example the digit '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpBlind'>
+	  <p>
+	  If this field is non-blank then the individual is blind.
+	  The enumerator generally wrote a stroke so enter something that looks
+	  like a stroke, for example the digit '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpInsane'>
+	  <p>
+	  If this field is non-blank then the individual is of unsound mind.
+	  The enumerator generally wrote a stroke so enter something that looks
+	  like a stroke, for example the digit '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpIdiot'>
+	  <p>
+	  If this field is non-blank then the individual is "an idiot or silly."
+	  In modern parlance developmentally delayed.
+	  The enumerator generally wrote a stroke so enter something that looks
+	  like a stroke, for example the digit '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpLunatic'>
+	  <p>
+	  Indicates whether the individual was mentally incapacitated.
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpLunatics'>
+	  <p>
+	  Indicates whether the individual was mentally incapacitated.
+	  Any non-blank value indicates true.  The enumerator generally entered
+	  a stroke which can be entered as '1'.
+	  Anything other than 0 or the letter 'N' is converted to 'Y'.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpOwnerTenant'>
+	  <p>
+	  Enter 'O' if the householder owns the property, or 'R' or 'T' if the householder
+	  is a tenant.  If the householder is resident in a house that is supplied
+	  as part of the job, for example a Manse supplied for a Minister, or a house
+	  supplied by the Railroad to a Station Agent, then specify 'F'.
+	  This is specified only on the head of household.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpHouseRent'>
+	  <p>In the 1921 census if the householder is a tenant,
+	  specify the monthly rent in dollars.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpHouseClass'>
+	  <p>Specify 'S' for a single family dwelling, 
+	  or 'M' for a multiple family dwelling.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpHouseMaterial'>
+	  <p>
+	  Indicates the materials of which the residence is constructed: Frame, 
+	  Log, Shanty, Stone, and Brick are the most common reported values.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpHouseRooms'>
+	  <p>The number of rooms occupied by the family.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpWeeksUnemp'>
+	  <p>Specify the number of weeks during the last 12 months that the
+	  individual was unemployed
+	  </p>
+	</div>
+	<div class='balloon' id='HelpWeeksIll'>
+	  <p>Specify the number of weeks during the last 12 months that the
+	  individual was unemployed because of illness or injury.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSchoolMons'>
+	  <p>Specify the number of months that the individual was attending school.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpRemarks'>
+	  <p>
+	  Remarks about the individual by the enumerator.
+	  If the transcriber wishes to enter notes they should be enclosed in
+	  editorial square brackets to indicate that the text is not present in
+	  the original image.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpdoIdir'>
+	  <p>
+	  If the button text is "Find" then clicking on this button pops up a dialog
+	  with a list of individuals in the family tree that are close matches to the
+	  name, sex, and birth date of the individual recorded by this row of the
+	  census.  You can use this dialog to identify the individual that corresponds
+	  to this row of the census.
+	  </p>
+	  <p>
+	  If the button text is "Show" then clicking on this button pops up 
+	  the main information page on the individual that has previously been linked
+	  to this row of the census.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpclearIdir'>
+	  <p>
+	  This button appears if the row of the census is linked to an individual
+	  in the family tree.  Click on this button if you determine that the linkage
+	  is incorrect.  The button immediately to the left is changed to display
+	  the action "Find" so you can correct the identification.
+	  </p>
+	</div>
+	<div class='balloon' id='Helpsubmit'>
+	  <p>
+	  Click on this button to apply the updates to the database.  Note that unlike
+	  many other web pages you cannot submit the updates by pressing the enter key
+	  because that is reinterpreted as to advance to the next line of the census.
+	  You also cannot tab to this button because tab is defined to wrap around to
+	  the beginning of the line within the census.
+	  </p>
+	</div>
+	<div class='balloon' id='Helpreset'>
+	  <p>
+	  Click on this button to reset all of the fields in the form to their default
+	  values.  Most fields become empty.
+	  </p>
+	</div>
+	<div class='balloon' id='HelptreeMatch'>
+	  <p>
+	  Click on this button to perform a match between all individuals in the
+	  family tree who have
+	  citations to the current census page, and the names and birth years of the
+	  individuals on this page.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpaddRow'>
+	  <p>
+	  Click on this button to add an extra line to the form.  This is required if
+	  the enumerator squeezed an extra line beyond the basic 50 onto the form.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSubmit'>
+	  <p>
+	  Click on this button to update this page in the census database.
+	  You can also request the update by using the keyboard short-cuts Ctrl-S or
+	  Alt-U.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpaddRow'>
+	  <p>
+	  In some cases the enumerator squeezed an extra individual at the bottom of
+	  the form.  Click on this button to add an extra blank line to the form
+	  so you can enter the details for that individual.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpImage'>
+	  <p>
+	  Fill in or correct this field with the uniform record location (URL) of the
+	  image of the original census page.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpimageButton'>
+	  <p>
+	  Click on this button to open a new window (or tab) containing the original
+	  census image corresponding to this page as obtained from the Library and
+	  Archives of Canada web-site.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpcorrectImage'>
+	  <p>
+	  If after clicking on the 
+	  <span class='button'>Display&nbsp;Original&nbsp;Census&nbsp;Image</span>
+	  button you determine that the incorrect image has been specified, and you
+	  have determined through browsing the web what the correct URL should be,
+	  click on this button to obtain a text input field which you can use
+	  to enter the correct URL.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpIDIR'>
+	  <p>
+	  If the individual described by this line of the census has been identified
+	  with an individual in the family tree then this button displays the text
+	  <span class='button'>Show</span> and clicking on it pops up a new window
+	  displaying the entry in the family tree.  Otherwise,
+	  if you are signed on and authorized to update the database,
+	  the button displays the
+	  text <span class='button'>Find</span> and clicking on it pops up a 
+	  dialog to search the family tree for individuals with a similar name and
+	  year of birth.
+	  </p>
+	</div>
+	<!-- popup to display dialog for IDIR -->
+	<div class='balloon' id='IdirDialog'>
+	</div>
+	<div class='hidden' id='templates'>
+	  <!-- the following are language specific error messages -->
+	  <span class='note' id='imageCopyrightNote'>
+			Image provided courtesy of 
+			<a href='http://www.bac-lac.gc.ca/eng/Pages/home.aspx'>
+			Library and Archives Canada</a>.
+	  </span>
+	  <!-- language specific ignore errors button -->
+	  <p id='errorPrompt'>
+	    <button type='button' id='errorButton$sub'>Submit with Errors</button>
+	  </p>
+	  <!-- select matching names dialog -->
+	  <form name='idirChooserForm$sub' id='idirChooserForm$sub'>
+	    <p class='label'>$surname, $givenname born $birthyear
+	    <p>
+	    <select name='chooseIdir' id='chooseIdir$sub' size='5'>
+	      <option value='0'>Choose from the following partial matches:</option>
+	    </select>
+	    <p>
+	      <button type='button' id='choose$line'>Cancel</button>
+	    </p>
+	  </form>
+	  <!-- no matching names dialog -->
+	  <form name='idirNullForm$sub' id='idirNullForm$sub'>
+	    <p class='label'>$surname, $givenname born $birthyear
+	    <p class='message'>No individuals match
+	    <p>
+	      <button type='button' id='closeDlg$sub'>Close</button>
+	    </p>
+	    <p style='display: none'>$cmd</p>
+	  </form>
+	  <!-- select matching names dialog -->
+	  <form name='FamilyEntryForm$sub' id='FamilyEntryForm$sub'>
+        <p class='label'>Matches to Family $family in
+                    Census $census dist $district 
+					sub-dist $subDistrict-$division
+	    <p id='FamilyButtonLine$sub'>
+          <button type='button' id='closeFam$sub'>
+                Apply All Checked Entries
+          </button>
+	    </p>
+	  </form>
+	  <p id='Match$idir'>
+	    Page $page Line $line Matches
+	    <input type='checkbox' name='Confirm$idir' checked=checked>
+	    <a href='/FamilyTree/Person.php?idir=$idir'>$surname,
+			$givenname ($birthd-$deathd)</a>
+	  </p>
+	  <p id='NoMatch$sub'>
+	    Page $page Line $line does not match any member of family.
+	  </p>
+	</div>

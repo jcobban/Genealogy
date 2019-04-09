@@ -13,8 +13,9 @@
  *		2016/11/13		add row even if existing table is empty			*
  *		2017/02/07		simplify implementation of delete township		*
  *		2018/10/21      change name of new township dialog template     *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban.								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -29,8 +30,6 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
     // including support for context specific help
     var	element;

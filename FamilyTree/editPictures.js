@@ -24,8 +24,9 @@
  *		2015/06/16		open picture in other half of the window		*
  *		2016/02/06		call pageInit on load							*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -34,7 +35,7 @@
 window.onload	= loadEdit;
 
 /************************************************************************
- *  childFrameClass														*
+ *  function childFrameClass												*
  *																		*
  *  If this dialog is opened in a half window then any child dialogs		*
  *  are opened in the other half of the window.								*
@@ -42,14 +43,12 @@ window.onload	= loadEdit;
 var childFrameClass	= 'right';
 
 /************************************************************************
- *  loadEdit																*
+ *  function loadEdit														*
  *																		*
  *  Initialize dynamic functionality of elements.						*
  ************************************************************************/
 function loadEdit()
 {
-    pageInit();
-
     // determine in which half of the window child frames are opened
     if (window.frameElement)
     {				// dialog opened in half frame
@@ -73,10 +72,6 @@ function loadEdit()
     for (var i = 0; i < formElts.length; ++i)
     {
 		var element	= formElts[i];
-
-		// pop up help balloon if the mouse hovers over a field
-		// for more than 2 seconds
-		actMouseOverHelp(element);
 
 		var	name;
 		if (element.name && element.name.length > 0)
@@ -127,7 +122,7 @@ function loadEdit()
 }		// loadEdit
 
 /************************************************************************
- *  validateForm														*
+ *  function validateForm												*
  *																		*
  *  Ensure that the data entered by the user has been minimally				*
  *  validated before submitting the form.								*
@@ -141,7 +136,7 @@ function validateForm()
 }		// validateForm
 
 /************************************************************************
- *  resetForm																*
+ *  function resetForm														*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
@@ -155,7 +150,7 @@ function resetForm()
 }	// resetForm
 
 /************************************************************************
- *  picEdit																*
+ *  function picEdit														*
  *																		*
  *  This method is called when the user requests to edit				*
  *  a picture of a genealogical entity.										*
@@ -174,7 +169,7 @@ function picEdit()
 }	// picEdit
 
 /************************************************************************
- *  picAdd																*
+ *  function picAdd														*
  *																		*
  *  This method is called when the user requests to add						*
  *  a picture to a genealogical entity.										*
@@ -194,7 +189,7 @@ function picAdd()
 }	// picAdd
 
 /************************************************************************
- *  picDel																*
+ *  function picDel														*
  *																		*
  *  This method is called when the user requests to delete				*
  *  a picture from a genealogical entity.								*
@@ -233,7 +228,7 @@ function picDel()
 }		// picDel
 
 /************************************************************************
- *  confirmDelete														*
+ *  function confirmDelete												*
  *																		*
  *  This method is called when the user confirms the request to delete		*
  *  a picture.																*
@@ -264,7 +259,7 @@ function confirmDelete()
 }	// picDel
 
 /************************************************************************
- *  gotDelete																*
+ *  function gotDelete														*
  *																		*
  *  This method is called when the response to the request to delete		*
  *  a picture is received from the server.								*
@@ -333,7 +328,7 @@ function gotDelete(xmlDoc)
 }	// gotDelete
 
 /************************************************************************
- *  noDelete																*
+ *  function noDelete														*
  *																		*
  *  This method is called if there is no response to the AJAX				*
  *  delete picture request.												*
@@ -345,7 +340,7 @@ function noDelete()
 }	// noDelete
 
 /************************************************************************
- *  orderByDate																*
+ *  function orderByDate														*
  *																		*
  *  This method is called when the user requests to reorder the				*
  *  pictures by date.														*
@@ -370,7 +365,7 @@ function orderByDate()
 }	// orderByDate
 
 /************************************************************************
- *  gotOrder																*
+ *  function gotOrder														*
  *																		*
  *  This method is called when the XML response to a request to reorder		*
  *  the pictures by date is received.										*
@@ -405,7 +400,7 @@ function gotOrder(xmlDoc)
 }	// gotOrder
 
 /************************************************************************
- *  noOrder																*
+ *  function noOrder														*
  *																		*
  *  This method is called if there is no response to the AJAX				*
  *  reorder pictures call.												*
@@ -417,7 +412,7 @@ function noOrder()
 }	// noOrder
 
 /************************************************************************
- *  finish																*
+ *  function finish														*
  *																		*
  *  This method is called when the user requests to close				*
  *  the window.																*
@@ -432,7 +427,7 @@ function finish()
 }	// finish
 
 /************************************************************************
- *  epKeyDown																*
+ *  function epKeyDown														*
  *																		*
  *  The key combinations Ctrl-S and Alt-U are interpreted to apply the		*
  *  update, as shortcut alternatives to using the mouse to click the 		*

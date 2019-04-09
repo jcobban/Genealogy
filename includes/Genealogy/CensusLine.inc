@@ -61,8 +61,9 @@ use \Iterator;
  *		                constructor to avoid creating a new copy        *
  *		2018/11/07      support method setGetModeHTML                   *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/01/19      report constructor errors through message       *
  *															    		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -703,7 +704,7 @@ class CensusLine extends Record
 								$province	= substr($censusId, 0, 2);
 						}			// valid census identifier
 						else
-						    $msg	.= "Invalid Census='$censusId'";
+						    $this->msg	.= "Invalid Census='$censusId'";
 				    }			// string
 				    else
 				    if ($value instanceof Census)
@@ -718,7 +719,7 @@ class CensusLine extends Record
 						    $province	= substr($censusId, 0, 2);
 				    }
 				    else
-						$msg	.= "Invalid Census=" . print_r($value, true);
+						$this->msg	.= "Invalid Census=" . print_r($value, true);
 				    break;
 				}
 
@@ -766,7 +767,7 @@ class CensusLine extends Record
 		}			// loop through all parms
 
 		if ($censusId == null)
-		    $msg            	.= "Missing parameter Census. ";
+		    $this->msg            	.= "Missing parameter Census. ";
 
 		if (is_array($line))
 		{			// $line is a record
@@ -778,7 +779,7 @@ class CensusLine extends Record
 		{			// $line is a line number
 		    $line		            = intval($line);
 		    if ($distID == null)
-				$msg		        .= "Missing parameter District. ";
+				$this->msg		        .= "Missing parameter District. ";
 		    else
 		    {			// have district parameter
 				if ($distID instanceof District)
@@ -796,13 +797,13 @@ class CensusLine extends Record
 		    }			// have district parameter
 
 		    if ($subDistID == null)
-				$msg	.= "Missing parameter SubDistrict. ";
+				$this->msg	.= "Missing parameter SubDistrict. ";
 		    if ($div == null)
 				$div	= '';
 		    if ($page == null)
-				$msg	.= "Missing parameter Page. ";
+				$this->msg	.= "Missing parameter Page. ";
 		    if ($line == null)
-				$msg	.= "Missing parameter Line. ";
+				$this->msg	.= "Missing parameter Line. ";
 		    else
 		    {
 				$line		= intval($line);
@@ -905,13 +906,9 @@ class CensusLine extends Record
 		}			// $line is null or a line number
 		else
 		{			// invalid parameter
-		    $msg	.= "CensusLine::__construct: called with Line " .
+		    $this->msg	.= "CensusLine::__construct: called with Line " .
 				 gettype($line) . ", value='" . print_r($line) . "'";
 		}			// invalid parameter
-
-		// report parameter validation failures
-		if (strlen($msg) > 0)
-		    throw new Exception("CensusLine::__construct: $msg");
 
 		// determine year from which birth year is calculated by census
 		if ($censusYear == 1851 &&
@@ -945,7 +942,8 @@ class CensusLine extends Record
 		}	// check for other initialization
 
 		// diagnostic output if debug is set
-		$this->dump('CensusLine Record constructed:');
+        $this->dump('CensusLine Record constructed:');
+        $msg    .= $this->msg;
     }		// CensusLine::__construct
 
     /********************************************************************

@@ -310,12 +310,12 @@ else
   </thead>
   <tbody>
 <?php
-	    $total		= 0;
+	    $total		    = 0;
 	    $totalLinked	= 0;
-	    $rownum		= 0;
+	    $rownum		    = 0;
 	    $countyObj		= null;
 	    $countyName		= '';
-	    $lowest		= PHP_INT_MAX;
+	    $lowest		    = PHP_INT_MAX;
 	    $highest		= 0;
 	    foreach($result as $row)
 	    {
@@ -345,13 +345,16 @@ else
 			else
 			    $pctLinked	= 100 * $linked / $count;
 			$totalLinked	+= $linked;
-			$low		= $row['low'];
-			$high		= $row['high'];
+			$low		    = $row['low'];
+			$high		    = $row['high'];
 			if ($low < $lowest)
-			    $lowest	= $low;
-			if ($high > $highest)
-			    $highest	= $high;
-			$todo		= $high - $low + 1;
+			    $lowest	    = $low;
+            if ($high > $highest &&
+                ($highest == 0 || 
+                 ($high - $low) < 2000) ||
+                 ($high - $highest) < 2000)
+                $highest	= $high;
+			$todo		    = $high - $low + 1;
 			if ($todo == 0)
 			    $pctDone	= 0;
 			else
@@ -488,12 +491,10 @@ else
 </table>
   </form>
 <?php
+        showTrace();
 }		// display results of query
 ?>
   </div> <!-- end of <div id='body'> -->
-<?php
-pageBot();
-?>
 <div class='balloon' id='HelpTownStats'>
 Click on this button to display a summary of the marriages transcribed
 for the specific town or township.
@@ -506,5 +507,6 @@ marriage was registered.
 This field displays the name of the city, town, village, or township where the
 marriage was registered.
 </div>
-</body>
-</html>
+<?php
+pageBot();
+?>

@@ -56,12 +56,12 @@ use \Exception;
  *		2017/08/16		renamed to nominalIndex.php						*
  *		2017/11/13		use class Template								*
  *		2018/01/04		remove Template from template file names		*
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/Template.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $birthmin		= '-10000';
@@ -119,22 +119,8 @@ foreach($treeNames as $atree)
 			    			'selected'	=> '');
 }
 
-$tempBase	        = $document_root . '/templates/';
-$template	        = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	        = "nominalIndex" .$lang . '.html';
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	    = new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-    $sorry          = $language->getSorry();
-    $warn           .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = "nominalIndexen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
+$template	        = new FtTemplate("nominalIndex$lang.html");
+
 $template->set('TREENAME',		$treeNameText);
 $template->set('birthmin',		$birthmin);
 $template->set('birthmax',		$birthmax);

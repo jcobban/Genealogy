@@ -11,6 +11,7 @@ use \Exception;
  *		2017/10/27		created											*
  *		2018/01/03		remove Template from template names				*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -186,21 +187,8 @@ else
 	$action		= 'Display';
 }
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "CountryNamesEdit$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$includeSub	= "CountryNamesEdit{$action}en.html";
-	$language	= new Language(array('code'	=> $lang));
-	$langName	= $language->get('name');
-	$nativeName	= $language->get('nativename');
-	$sorry  	= $language->getSorry();
-$warn   	.= str_replace(array('$langName','$nativeName'),
-                           array($langName, $nativeName),
-                           $sorry);
-}
-$gotPage	= $template->includeSub($tempBase . $includeSub, 'MAIN');
+$template		= new FtTemplate("CountryNamesEdit$action$lang.html");
+
 $template->set('LANG',		$lang);
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('ARTICLE',		$article);

@@ -1,35 +1,35 @@
 /************************************************************************
- *  UserInfo.js								*
- *									*
- *  Javascript code to implement dynamic functionality of the		*
- *  page UserInfo.php.							*
- *									*
- *  History:								*
- *	2014/03/30	created						*
- *	2014/07/25	fix comments					*
- *			store user information in a cookie		*
- *	2014/08/22	delete the user cookie if there are any errors	*
- *	2014/08/23	setting of cookie for user information		*
- *			moved to Signon.php				*
- *									*
- *  Copyright &copy; 2014 James A. Cobban				*
+ *  UserInfo.js															*
+ *																		*
+ *  Javascript code to implement dynamic functionality of the			*
+ *  page UserInfo.php.													*
+ *																		*
+ *  History:															*
+ *		2014/03/30		created											*
+ *		2014/07/25		fix comments									*
+ *						store user information in a cookie				*
+ *		2014/08/22		delete the user cookie if there are any errors	*
+ *		2014/08/23		setting of cookie for user information			*
+ *						moved to Signon.php								*
+ *		2019/02/10      no longer need to call pageInit                 *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
  *  Initialization code that is executed when this script is loaded.	*
- *									*
- *  Define the function to be called once the web page is loaded.	*
+ *																		*
+ *  Define the function to be called once the web page is loaded.		*
  ************************************************************************/
     window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad								*
- *									*
- *  Perform initialization functions once the page is loaded.		*
+ *  onLoad																*
+ *																		*
+ *  Perform initialization functions once the page is loaded.			*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
 
     // refresh the page that the user signed on from
     var	invoker	= window.opener;
@@ -48,10 +48,6 @@ function onLoad()
 	{		// loop through elements
 	    var element	= formElts[i];
 
-	    // pop up help balloon if the mouse hovers over a field
-	    // for more than 2 seconds
-	    actMouseOverHelp(element);
-
 	    // take action on specific elements by name
 	    var	name	= element.name;
 	    if (name.length == 0)
@@ -67,13 +63,13 @@ function onLoad()
 }			// onLoad
 
 /************************************************************************
- *  deleteBlog								*
- *									*
- *  This method is called when the user requests to delete a specific	*
- *  message. This is the onclick method of <button id='Delete...'>	*
- *									*
- *  Input:								*
- *	this	<button id='Delete...'>					*
+ *  deleteBlog																*
+ *																		*
+ *  This method is called when the user requests to delete a specific		*
+ *  message. This is the onclick method of <button id='Delete...'>		*
+ *																		*
+ *  Input:																*
+ *		this		<button id='Delete...'>										*
  ************************************************************************/
 function deleteBlog()
 {
@@ -90,13 +86,13 @@ function deleteBlog()
 }	// deleteDelete
 
 /************************************************************************
- *  gotDelete								*
- *									*
- *  This method is called when the XML file representing		*
- *  the deletion of the blog is received.				*
- *									*
- *  Input:								*
- *	xmlDoc	XML response file describing the deletion of the message*
+ *  gotDelete																*
+ *																		*
+ *  This method is called when the XML file representing				*
+ *  the deletion of the blog is received.								*
+ *																		*
+ *  Input:																*
+ *		xmlDoc		XML response file describing the deletion of the message*
  ************************************************************************/
 function gotDelete(xmlDoc)
 {
@@ -105,9 +101,9 @@ function gotDelete(xmlDoc)
 }		// gotDelete
 
 /************************************************************************
- *  noDelete								*
- *									*
- *  This method is called if there is no script to delete the Blog.	*
+ *  noDelete																*
+ *																		*
+ *  This method is called if there is no script to delete the Blog.		*
  ************************************************************************/
 function noDelete()
 {
@@ -115,14 +111,14 @@ function noDelete()
 }		// noDelete
 
 /************************************************************************
- *  replyBlog								*
- *									*
- *  This method is called when the user requests to view the reply	*
- *  to a specific queued message.					*
- *  This is the onclick method of <button id='Reply...'>		*
- *									*
- *  Input:								*
- *	this	<button id='Reply...'>					*
+ *  replyBlog																*
+ *																		*
+ *  This method is called when the user requests to view the reply		*
+ *  to a specific queued message.										*
+ *  This is the onclick method of <button id='Reply...'>				*
+ *																		*
+ *  Input:																*
+ *		this		<button id='Reply...'>										*
  ************************************************************************/
 function replyBlog()
 {
@@ -142,13 +138,13 @@ function replyBlog()
 }	// replyBlog
 
 /************************************************************************
- *  gotReply								*
- *									*
- *  This method is called when the XML file representing		*
- *  the act of replying to the blog is received.			*
- *									*
- *  Input:								*
- *	xmlDoc	XML response file describing the sending of the reply	*
+ *  gotReply																*
+ *																		*
+ *  This method is called when the XML file representing				*
+ *  the act of replying to the blog is received.						*
+ *																		*
+ *  Input:																*
+ *		xmlDoc		XML response file describing the sending of the reply		*
  ************************************************************************/
 function gotReply(xmlDoc)
 {
@@ -157,9 +153,10 @@ function gotReply(xmlDoc)
 }		// gotReply
 
 /************************************************************************
- *  noReply								*
- *									*
- *  This method is called if there is no script to reply to the Blog.	*
+ *  noReply																*
+ *																		*
+ *  This method is called if there is no script on the server           *
+ *  to reply to the Blog.	                                            *
  ************************************************************************/
 function noReply()
 {

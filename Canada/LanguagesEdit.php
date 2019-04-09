@@ -16,6 +16,8 @@ use \Exception;
  *		2018/01/04  	remove Template from template file names	    *
  *		2018/01/22  	display only part of the table at a time	    *
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/21      use new FtTemplate constructor                  *
+ *		2019/04/06      use new FtTemplate::includeSub                  *
  *											                            *
  *  Copyright &copy; 2018 James A. Cobban						        *
  ************************************************************************/
@@ -209,37 +211,19 @@ if (canUser('edit'))
 else
 	$action		= 'Display';
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "Languages$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	= "Languages{$action}en.html";
-}
-$gotPage	    = $template->includeSub($tempBase . $includeSub,
-				            			'MAIN');
-$includeSub		= "LanguagesDialogs$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$includeSub	= 'LanguagesDialogsen.html';
-}
-$gotPage	= $template->includeSub($tempBase . $includeSub,
-				        			'DIALOGS',
-						        	true);	// add after substitutions
+$template		= new FtTemplate("Languages$action$lang.html");
 
-$template->set('PATTERN',		 $pattern);
-$template->set('CONTACTTABLE',	'Languages');
+$includeSub		= "LanguagesDialogs$lang.html";
+$gotPage	    = $template->includeSub($includeSub,
+				            			'DIALOGS',
+					    	        	true);	// add after substitutions
+
+$template->set('PATTERN',		    $pattern);
+$template->set('CONTACTTABLE',	    'Languages');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
-$template->set('LANG', $lang);
-$template->set('OFFSET', $offset);
-$template->set('LIMIT', $limit);
+$template->set('LANG',              $lang);
+$template->set('OFFSET',            $offset);
+$template->set('LIMIT',             $limit);
 $info       	= $languages->getInformation();
 $count	        = $info['count'];
 $template->set('TOTALROWS', $count);

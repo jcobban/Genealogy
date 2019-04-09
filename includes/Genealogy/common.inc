@@ -208,6 +208,13 @@ use \Iterator;
  *		                for pages still using function htmlHeader       *
  *		2018/11/12      only activate debug output for administrators   *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/02/08      determination of advertisement to display       *
+ *		                moved to class FtTemplate                       *
+ *		2019/03/18      for scripts that do not yet support templates   *
+ *		                move the help link to the menu button           *
+ *		                move the contact link to the menu button        *
+ *		                add the "About Site" link to the menu button    *
+ *		                add the advertisement to the header             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -265,34 +272,14 @@ try {
 
 
 /************************************************************************
- *																		*
  *  The following bit of open code is executed on every page 			*
- *  to determine the advertising page to display.						*
  *																		*
  *  Global Variables:													*
  *		$document_root			the root directory of the site	    	*
- *		$adurl					the URL within the site of the ad	    *
- *																		*
  ************************************************************************/
 // choose the advertising page to display
 $ads		    = array();
 $document_root	= $_SERVER['DOCUMENT_ROOT'];
-$dh			    = opendir("$document_root/Advertisements");
-if ($dh)
-{			// found advertisements directory
-	while (($filename = readdir($dh)) !== false)
-	{		// loop through files
-	    if (strlen($filename) > 5 &&
-		$filename != "index.html" &&
-		substr($filename, strlen($filename) - 5) == '.html')
-		$ads[]		= $filename;
-	}		// loop through files
-	$index	= rand(0, count($ads) - 1);
-	$adname	= $ads[$index];
-}			// found advertisements directory
-else
-	$adname	    = 'AddForRent.html';
-$adurl	        = "/Advertisements/$adname";
 
 /************************************************************************
  *  The following bit of open code is executed on every page that		*
@@ -327,7 +314,7 @@ try {
 			    $userid		        = trim($value);
 			    if (strlen($userid) > 0)
 			    {			// user name passed
-		    		$user	        = new User(array("username" => $userid));
+                    $user	        = new User(array("username" => $userid));
 		    		if ($user->isExisting())
 		    		{
 		    		    $authorized	= $user->get('auth');
@@ -686,6 +673,7 @@ function htmlHeader($title,
 	global	$directory;
 	global	$scriptIncludes;
 	global	$template;
+	global	$lang;
 	global	$debug;
 	global	$warn;
 	global	$msg;
@@ -695,21 +683,17 @@ function htmlHeader($title,
 	if (!class_exists(__NAMESPACE__ . '\\Language'))
         include __NAMESPACE__ . '/Language.inc';
 
-	$tempBase	= $_SERVER['DOCUMENT_ROOT'] . '/templates/';
-	$nohtml5	= $browser->browser == 'IE' && $browser->majorver < 9;
+	$tempBase	    = $_SERVER['DOCUMENT_ROOT'] . '/templates/';
+	$nohtml5	    = $browser->browser == 'IE' && $browser->majorver < 9;
 
 	if ($nohtml5)
 	{		// browser does not support HTML 5, use HTML 4
-		$dtd	= 'PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"';
-		$csstype= 'Content-Style-Type';
 		$template	= new Template($tempBase . 'pageIE7.html');
 		$template->set('IECRAP',
 			"scrolling='no' frameborder='0' allowTransparency='true'");
     }		// HTML 4
 	else
 	{		// HTML 5
-		$dtd	= '';
-		$csstype= 'default-style';
 		$template	= new Template($tempBase . 'page.html');
 		$template->set('IECRAP', '');
     }		// HTML 5
@@ -739,7 +723,7 @@ function htmlHeader($title,
 		$template->set('DEBUG',	'N');
 
 	$template->set('BREADCRUMBS',	'');
-	$template->set('ADURL',		'');
+	$template->set('ADURL',		    '');
 	$template->set('USERID',		'');
 	$template->set('CONTRIBUTE',	'');
 	$template->set('AUTHORIZED',	'');
@@ -791,6 +775,7 @@ function pageTop($breadCrumbs)
 	global	$signonText;
 	global	$browser;
 	global	$adurl;
+	global	$bctext;
 	
 	$template->set('ADURL',		$adurl);
 	
@@ -843,8 +828,49 @@ function pageTop($breadCrumbs)
 		    $bctext	.= "<a href='$url'>$label</a>: ";
 		}		// actual URL
     }		// loop through breadcrumbs
-    $template->set('BREADCRUMBS', $bctext);
-}		// pageTop
+
+	$menuButton		            = $template->getElementById('menuButton');
+    if ($menuButton)
+    {           // new heading style
+        $bctext            = str_replace(':', '<br>', $bctext);
+        global  $userid;
+        if (isset($userid) && strlen($userid) > 0)
+        {
+            $bctext    .= "<a href=\"/Account.php?lang=en\">$userid</a><br>\n";
+        }
+        else
+        {
+            $elt            = $template['UserInfoSignon'];
+            if ($elt)
+                $signon     = $elt->innerHTML();
+            else
+                $signon     = 'Sign On';
+            $bctext    .= "<a href=\"/Signon.php?lang=en\">$signon</a><br>\n";
+        }
+
+        // add contents of help section of <h1> tag
+        $h1array		        = $template->getElementsByTagName('h1');
+        if (count($h1array) > 0)
+        {               // at least one <h1> tag in page
+            $h1		            = current($h1array);
+            foreach($h1->childNodes() as $child)
+            {           // loop through children of first <h1>
+                if ($child->tagName == 'span' &&
+                    isset($child->attributes['class']) &&
+                    $child->attributes['class'] == 'right')
+                {       // move help section to menu
+                    $help       = $child->innerHTML();
+                    $help       = str_replace('</a>',
+                                                  '</a><br>',
+                                                  $help);
+                    $bctext.= $help;
+                    $child->update(null);
+                }       // move help section to menu
+            }           // loop through children of first <h1>
+        }               // at least one <h1> tag in page
+    }                   // new heading style
+
+}		// function pageTop
 
 /************************************************************************
  *  function pageBot													*
@@ -868,7 +894,12 @@ function pageBot($pageName	= null,
 	global	$template;
 	global	$browser;
 	global	$directory;
-	global	$scriptIncludes;
+    global	$scriptIncludes;
+    global  $bctext;
+    global  $lang;
+    global  $document_root;
+    global  $debug;
+    global  $warn;
 
 	// include javascript files
 	for ($i = 0; $i < count($scriptIncludes); $i++)
@@ -893,22 +924,111 @@ function pageBot($pageName	= null,
 	}			// loop through javascript includes
 
 	// use the accumulated output from the script for the page body
-	$main	= ob_get_clean();
-	$main	= str_replace('<body>','',$main);
-	$main	= str_replace('</body>','',$main);
-	$main	= str_replace('</html>','',$main);
-	$template->set('MAIN', $main);
+	$main	        = ob_get_clean();
+	$main	        = str_replace('<body>','',$main);
+	$main	        = str_replace('</body>','',$main);
+    $main	        = str_replace('</html>','',$main);
 
+    $mtemplate      = new Template($main);
+
+    // add contents of help section of <h1> tag
+    $h1array		        = $mtemplate->getElementsByTagName('h1');
+    if (count($h1array) > 0)
+    {               // at least one <h1> tag in page
+        $h1		            = current($h1array);
+        foreach($h1->childNodes() as $child)
+        {           // loop through children of first <h1>
+            if ($child->tagName == 'span' &&
+                isset($child->attributes['class']) &&
+                $child->attributes['class'] == 'right')
+            {       // move help section to menu
+                $help       = $child->innerHTML();
+                $help       = str_replace('</a>',
+                                              '</a><br>',
+                                              $help);
+                $bctext     .= $help;
+                $child->update(null);
+            }       // move help section to menu
+        }           // loop through children of first <h1>
+    }               // at least one <h1> tag in page
+
+    // add about link
+    $elt            = $mtemplate['UserInfoAbout'];
+    if ($elt)
+        $about      = $elt->innerHTML();
+    else
+        $about      = 'About This Site';
+    $bctext         .= "<a href=\"/AboutHelp$lang.html\">$about</a><br>\n";
+
+    // add contact author link
 	if (is_null($pageName) || strlen($pageName) == '')
 	{		// use current page name from URL
 		$scriptName	= $_SERVER["SCRIPT_NAME"]; 
 		$pageName	= substr($scriptName,strrpos($scriptName,'/') + 1);
 	}		// use current page name from URL
-
 	$template->set('CONTACTSUBJECT',
 			rawurlencode("[Family Tree] $pageName?" . $_SERVER['QUERY_STRING']));
 	$template->set('CONTACTKEY', $recordKey);
 	$template->set('CONTACTTABLE', $tableName);
+
+    $footSection    = $template['footSection'];
+    foreach($footSection->childNodes() as $child)
+    {           // loop through children of footer
+        if ($child->tagName == 'div' &&
+            isset($child->attributes['class']) &&
+            $child->attributes['class'] == 'botcrumbs')
+        {       // move help section to menu
+            $help       = $child->innerHTML();
+        	$help	= str_replace('$CONTACTSUBJECT',
+                                  rawurlencode("[Family Tree] $pageName?" . $_SERVER['QUERY_STRING']),
+                                  $help);
+        	$help	= str_replace('$CONTACTKEY', $recordKey, $help);
+        	$help	= str_replace('$CONTACTTABLE', $tableName, $help);
+            $bctext     .= $help;
+            $child->update(null);
+        }       // move help section to menu
+    }           // loop through children of first <h1>
+
+	$template->set('MAIN', $mtemplate->compile());
+    $template->set('BREADCRUMBS', $bctext);
+
+    // pick a random ad to display
+	$dh			    = opendir("$document_root/Advertisements");
+	if ($dh)
+	{			// found advertisements directory
+		while (($filename = readdir($dh)) !== false)
+		{		// loop through files
+		    if (strlen($filename) > 5 &&
+			    $filename != "index.html" &&
+			    substr($filename, strlen($filename) - 5) == '.html')
+			$ads[]		= $filename;
+		}		// loop through files
+		$index	= rand(0, count($ads) - 1);
+		$adname	= $ads[$index];
+	}			// found advertisements directory
+	else
+		$adname	    = 'AddForRent.html';
+    $adurl	        = "/Advertisements/$adname";
+
+    // change insertion of ads to not use <iframe>
+    $adElement              = $template['advertFrame'];
+    if ($adElement)
+    {
+        $adTemplate         = new Template($document_root . $adurl);
+        $adDoc              = $adTemplate->getDocument();
+        $adBody             = $adDoc->getElementsByTagName('body');
+        if (count($adBody) > 0)
+        {
+            $adBody         = current($adBody);
+            // the following replaces the <iframe> with the contents of
+            // the <body> of the referenced URL
+            $adElement->update($adBody->innerHTML());
+        }
+        else
+            $warn           .= $adTemplate->getDocument()->show();
+    }
+    else
+        $template->set('ADURL',		    $adurl);
 
 	$template->display();
 }		// pageBot
@@ -1148,7 +1268,7 @@ function showTrace()
 		    $warnid++;
 		$warn	= '';
     }			// output trace and warning information 
-}		// showTrace
+}		// function showTrace
 
 /************************************************************************
  *  xmlentities															*
@@ -1172,4 +1292,3 @@ function xmlentities($in)
     $entities	= array("&amp;", "&lt;", "&gt;", "-");
     return str_replace($specchars, $entities, $in);
 }		// xmlentities
-

@@ -134,10 +134,10 @@ require_once __NAMESPACE__ . "/common.inc";
 				}		// found the file we are looking for
 				$previmg	= $filename;
 		    }			// loop through images in order
-		}			// protocol supported by opendir
+		}			    // protocol supported by opendir
 		else
 		if ($protocol == "http:" || $protocol == "https:")
-		{			// assume prev by decrement, next by increment
+		{			    // assume prev by decrement, next by increment
 		    $dirname	= $protocol . $dirname;
 		    $result	= preg_match("#([a-zA-Z]*|\d+_\d+-|\d+_)(\d+)([a-zA-Z]*\.\w+)#",
 							     $imageName,
@@ -159,29 +159,15 @@ require_once __NAMESPACE__ . "/common.inc";
 								 $lnum - strlen($nextimg)) .
 							  $nextimg . $suffix;
 		    }			// successful match
-		}			// assume prev by decrement, next by increment
-    }		// no errors
+		}			    // assume prev by decrement, next by increment
+    }		            // no errors
     else
-    {		// errors detected
+    {		            // errors detected
 		$title		= "Display Image Error";
-    }		// errors detected
+    }		            // errors detected
 
-    $tempBase		= $document_root . '/templates/';
-    $template		= new FtTemplate("${tempBase}dialog$lang.html");
-    $includeSub		= "DisplayImage$lang.html";
-    if (!file_exists($tempBase . $includeSub))
-    {
-		$language	= new Language(array('code' => $lang));
-		$langName	= $language->get('name');
-		$nativeName	= $language->get('nativename');
-		$sorry  	= $language->getSorry();
-    $warn   	.= str_replace(array('$langName','$nativeName'),
-                               array($langName, $nativeName),
-                               $sorry);
-		$includeSub	= 'DisplayImageen.html';
-    }
-    $template->includeSub($tempBase . $includeSub,
-						  'MAIN');
+    $template		= new FtTemplate("DisplayImage$lang.html", true);
+
     $template->set('TITLE',		$title);
     $template->set('LANG',		$lang);
     $template->set('IMAGENAME',		$imageName);

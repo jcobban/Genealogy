@@ -2,9 +2,6 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
 /************************************************************************
  *  Person.inc															*
  *																		*
@@ -1044,7 +1041,7 @@ class Person extends RecordPic
         else
         {		            // privatize dates
             $currYear		= intval(date('Y'));
-            $this->bprivlim	= $currYear - 100;
+            $this->bprivlim	= $currYear - 105;
             $this->dprivlim	= $currYear - 72;
         }		            // privatize dates
 
@@ -1531,7 +1528,7 @@ class Person extends RecordPic
      *	    $newname	new given names as a string						*
      *																	*
      *	Returns:														*
-     *			the old value of given names as a string				*
+     *		the old value of given names as a string				    *
      ********************************************************************/
     function setGivenName($newname)
     {
@@ -2122,7 +2119,6 @@ class Person extends RecordPic
         global $connection;
         global $userid;
 
-
         if ($this->parents == null)
         {		// need to perform query for parent sets
             // initialize parents to empty RecordSet
@@ -2155,6 +2151,7 @@ class Person extends RecordPic
                     // remove from RecordSet of children
                     unset($this->child[$idcr]);
                     // notify the administrators
+                    $idir           = $this->row['idir'];
                     error_log('Person::getParents: ' . __LINE__ .
                                 ' Child with ' .
                                 "IDIR=$idir, IDCR=$idcr, IDMR=$idmr, " .
@@ -2183,7 +2180,7 @@ class Person extends RecordPic
         global $connection;
 
         $idmrparents		= $this->row['idmrparents'];
-        $parents		= $this->getParents();
+        $parents		    = $this->getParents();
         if ($idmrparents > 0)
         {			// preferred parents specified
             foreach($parents as $idmr => $parent)
@@ -2264,25 +2261,25 @@ class Person extends RecordPic
 
         if ($this->families == null)
         {		// need to perform query for families
-            $idir		= $this->row['idir'];
+            $idir		            = $this->row['idir'];
 
             // construct the query of the marriage table for all marriages
             // in which the current individual is a partner
             if ($this->row['gender'] == Person::FEMALE)
             {			// wife
-                $famParms	= array('IDIRWife'	=> $idir,
-                                        'order'		=> 'WifeOrder');
+                $famParms	        = array('IDIRWife'	=> $idir,
+                                            'order'		=> 'WifeOrder');
                 $this->families	= new RecordSet('Families', $famParms);
             }			// wife
             else
             {			// husband
-                $famParms	= array('IDIRHusb'	=> $idir,
-                                        'order'		=> 'HusbOrder');
+                $famParms	        = array('IDIRHusb'	=> $idir,
+                                            'order'		=> 'HusbOrder');
                 $this->families	= new RecordSet('Families', $famParms);
             }			// husband
 
             // fixup for bad value of idmrpref
-            $idmrpref			= $this->row['idmrpref'];
+            $idmrpref			    = $this->row['idmrpref'];
             if ($idmrpref > 0)
             {			// preferred IDMR specified
                 $idmrprefbad		= true;
@@ -2542,7 +2539,7 @@ class Person extends RecordPic
                                 'desc'		    => $this['deathnote'],
                                 'description'	=> $this['deathcause'],
                                 'preferred'     => 1,
-                                'order'		    => (1 << 15) - 2);
+                                'order'		    => (1 << 15) - 3);
                 $event	                    = new Event($trow);
                 $this->deathEvent		    = $event;
                 $this->pevents['death']		= $event;
@@ -2621,7 +2618,7 @@ class Person extends RecordPic
                                 'idar'		    => $this['idarburied'],
                                 'desc'		    => $this['buriednote'],
                                 'description'   => $description,
-                                'order'		    => (1 << 15) - 1);
+                                'order'		    => (1 << 15) - 2);
                 $event	                = new Event($trow);
                 $this->buriedEvent		= $event;
             }		// buried event present
@@ -2827,8 +2824,8 @@ class Person extends RecordPic
                                 'eventsd'	    => $this['endowsd'],
                                 'idlrevent'	    => $this['idtrendow'],
                                 'kind'		    => 1,
-                                'ldstempleready'=> $indiv->get('ldse'),
-                                'desc'		    => $indiv->get('endownote'),
+                                'ldstempleready'=> $this['ldse'],
+                                'desc'		    => $this['endownote'],
                                 'description'	=> '');
                 $event	                = new Event($trow);
                 $this->endowEvent		= $event;

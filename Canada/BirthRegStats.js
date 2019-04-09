@@ -5,25 +5,24 @@
  *  BirthRegStats.php                                                   *
  *                                                                      *
  *  History:                                                            *
- *	    2011/00/27	created                                             *
- *	    2013/08/01	defer facebook initialization until after load      *
- *	    2013/11/16	add support for domains other than Ontario          *
- *	    2018/10/06  pass language code to next script                   *
- *                                                                      *
- *  Copyright &copy; 2018 James A. Cobban                               *
+ *	    2011/00/27	    created                                         *
+ *	    2013/08/01	    defer facebook initialization until after load  *
+ *	    2013/11/16	    add support for domains other than Ontario      *
+ *	    2018/10/06      pass language code to next script               *
+ *		2019/02/10      no longer need to call pageInit                 *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad	                    										*
+ *  function onLoad	               										*
  *																		*
  *  Initialize the dynamic functionality once the page is loaded		*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
     // including support for context specific help
     var	element;

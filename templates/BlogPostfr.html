@@ -45,7 +45,7 @@
 	Le $day $month $year à $time l'employeur '$username' 
 	a écrit: <a href="BlogPost.php?table=Blogs&blogid=$blogid&lang=fr">$blogname</a>
       </p>
-      <div style="margin-left: $margin; text-indent: 3em; white-space: normal;">
+      <div style="margin-left: $margin; white-space: normal;">
         $message
       </div>
       <p style="margin-left: $margin" id="buttonRow$blogid">
@@ -74,7 +74,7 @@
     </label>
     <input type="text" class="white leftnc"
 		id="subject" name="subject"
-		size="80" value="$postsubject">
+		size="80" value="$BLOGTITLE">
   </div>
   <div class="row" id="blogMsgRow">
     <label class='column1' for='message' id="msgLabel">

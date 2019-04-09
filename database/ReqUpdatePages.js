@@ -20,8 +20,9 @@
  *		2016/03/16		adjust value of Census parameter to PageForm.php*
  *						for 1851 and 1861 censuses to include province	*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
     window.onload	= onloadPages;
@@ -36,9 +37,6 @@
  ************************************************************************/
 function onloadPages()
 {
-    // perform common page initialization
-    pageInit();
-
     // scan through all forms and set dynamic functionality
     // for specific elements
     for(var i = 0; i < document.forms.length; i++)
@@ -48,10 +46,6 @@ function onloadPages()
 		{
 		    var element	= form.elements[j];
 		    element.onkeydown	= keyDown;
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var	name	= element.name;
 		    if (!name || name.length == 0)
@@ -608,8 +602,6 @@ function changeSubDist()
 		var select	= tdNode.appendChild(document.createElement("select"));
 		select.name	= "Division";
 		select.size	= 1;
-		actMouseOverHelp(select);
-		//select.onchange	= divSelected;
 
 		for (var i = 0; i < xmlOpt.childNodes.length; i++)
 		{

@@ -80,8 +80,9 @@ use \Iterator;
  *						empty string to an INT, so ensure INT fields	*
  *						set to NULL for empty string					*
  *		2018/12/11      ensure m_calcdate always valid                  *
+ *		2019/01/24      add missing method toJson                       *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/MarriageParticipant.inc';
@@ -390,14 +391,14 @@ class Marriage extends Record
 
                 }
 
-                $sel	.= $and . $lcfldname . '=:' . $field;
-                $and	= ' AND ';
+                $sel	    .= $and . $lcfldname . '=:' . $field;
+                $and	    = ' AND ';
             }
 
             // query the database
-            $query	= "SELECT * FROM Marriage $sel";
-            $stmt	= $connection->prepare($query);
-            $queryText	= debugPrepQuery($query, $sqlParms);
+            $query	        = "SELECT * FROM Marriage $sel";
+            $stmt	        = $connection->prepare($query);
+            $queryText	    = debugPrepQuery($query, $sqlParms);
             if ($stmt->execute($sqlParms))
             {		// successful query
                 $result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -411,11 +412,11 @@ class Marriage extends Record
 
                 if (count($result) > 0)
                 {		// existing record
-                    $dbrow		= $result[0];
-                    $mregdomain		= $dbrow['m_regdomain'];
-                    $mregyear		= $dbrow['m_regyear'];
-                    $mregnum		= $dbrow['m_regnum'];
-                    $needInsert		= false;
+                    $dbrow	            	= $result[0];
+                    $mregdomain	        	= $dbrow['m_regdomain'];
+                    $mregyear	        	= $dbrow['m_regyear'];
+                    $mregnum	        	= $dbrow['m_regnum'];
+                    $needInsert	        	= false;
                 }		// existing record
                 else
                 {		// create a new record
@@ -427,34 +428,34 @@ class Marriage extends Record
                     else
                         $msvol	= '';
                     // set defaults
-                    $dbrow			= self::$initRow;
+                    $dbrow			        = self::$initRow;
                     $dbrow['m_regdomain']	= $domain;
                     $dbrow['m_regyear']		= $year;
                     $dbrow['m_regnum']		= $number;
                     $dbrow['m_date']		= $year;
                     $dbrow['m_regdate']		= $year;
                     $dbrow['m_msvol']		= $msvol;
-                    $mregdomain			= $domain;
-                    $mregyear			= $year;
-                    $mregnum			= $number;
+                    $mregdomain		    	= $domain;
+                    $mregyear		    	= $year;
+                    $mregnum		    	= $number;
 
                     // fill in some fields from the preceding record, 
                     // if it exists
                     $query	= "SELECT M_RegCounty,M_RegTownship,M_MsVol," .
                                   "M_OriginalVolume,M_OriginalPage,M_OriginalItem," .
                                   "M_Registrar,M_RegDate,M_Image " .
-                                "FROM Marriage  " .
-                          "WHERE M_RegDomain=:domain AND   " .
-                                    "M_RegYear=:year AND  " .
-                                    "M_RegNum<:number " .
-                                "ORDER BY M_RegNum DESC " .
-                                "LIMIT 1";
+                                    "FROM Marriage  " .
+                                    "WHERE M_RegDomain=:domain AND   " .
+                                          "M_RegYear=:year AND  " .
+                                          "M_RegNum<:number " .
+                                    "ORDER BY M_RegNum DESC " .
+                                    "LIMIT 1";
 
-                    $sqlParms	= array('domain'	=> $domain,
-                                    'year'		=> $year,
-                                    'number'	=> $number);
-                    $stmt	= $connection->prepare($query);
-                    $queryText	= debugPrepQuery($query, $sqlParms);
+                    $sqlParms	    = array('domain'	=> $domain,
+                                            'year'		=> $year,
+                                            'number'	=> $number);
+                    $stmt	        = $connection->prepare($query);
+                    $queryText	    = debugPrepQuery($query, $sqlParms);
                     if ($stmt->execute($sqlParms))
                     {		// successful query
                         if ($debug)
@@ -463,34 +464,32 @@ class Marriage extends Record
                                        " query='$queryText'</p>\n";
                         }
 
-                        $result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        if (count($result) > 0)
+                        $result		= $stmt->fetch(PDO::FETCH_ASSOC);
+                        if (is_array($result))
                         {		// a preceding record exists
-                            $row			= $result[0];
-                            $row['m_regdomain']		= $domain;
-                            $regCounty			= $row['m_regcounty'];
-                            $dbrow['m_regcounty']	= $regCounty;
-                            $regTownship		= $row['m_regtownship'];
-                            $dbrow['m_regtownship']	= $regTownship;
-                            $dbrow['m_msvol']		= $row['m_msvol'];
-                            $dbrow['m_registrar']	= $row['m_registrar'];
-                            $dbrow['m_image']		= $row['m_image'];
+                            $row                        = $result;
+                            $row['m_regdomain']		    = $domain;
+                            $regCounty			        = $row['m_regcounty'];
+                            $dbrow['m_regcounty']	    = $regCounty;
+                            $regTownship		        = $row['m_regtownship'];
+                            $dbrow['m_regtownship']	    = $regTownship;
+                            $dbrow['m_msvol']		    = $row['m_msvol'];
+                            $dbrow['m_registrar']	    = $row['m_registrar'];
+                            $dbrow['m_image']		    = $row['m_image'];
                             $dbrow['m_originalvolume']	= $row['m_originalvolume'];
                             $dbrow['m_originalpage']	= $row['m_originalpage'];
                             $dbrow['m_originalitem']	= $row['m_originalitem'] + 1;
                             if (strlen($row['m_regdate']) > 0)
-                                $dbrow['m_regdate']	= $row['m_regdate'];
+                                $dbrow['m_regdate']	    = $row['m_regdate'];
 
                             // initialize places with default value
-                            $dftPlace		= $this->getDefaultPlace($row);
+                            $dftPlace		    = $this->getDefaultPlace($row);
                             $dbrow['m_place']	= $dftPlace;
                         }	// a preceding record exists
-                        $needInsert		= true;
+                        $needInsert		        = true;
                     }		// successful query
                     else
                     {		// error issuing query
-                        print '<p class="message">Marriage.inc: ' . __LINE__ .
-                                " query='$queryText'</p>\n";
                         if (strlen($queryText) > 40)
                             $queryText	= substr($queryText, 0, 30) . '...' .
                                       substr($queryText, -7);
@@ -502,7 +501,7 @@ class Marriage extends Record
                     // apply any other fields
                     foreach($parms as $field => $value)
                     {
-                        $lcfldname		= strtolower($field);
+                        $lcfldname		    = strtolower($field);
                         if (array_key_exists($lcfldname, self::$translate))
                             $lcfldname		= self::$translate[$lcfldname];
                         $dbrow[$lcfldname]	= $value;
@@ -531,20 +530,18 @@ class Marriage extends Record
         $pqueryText	= debugPrepQuery($pquery, $sqlParms);
         if ($pstmt->execute($sqlParms))
         {		// query successful
-            $presults	= $pstmt->fetchAll(PDO::FETCH_ASSOC);
+            $presults	        = $pstmt->fetchAll(PDO::FETCH_ASSOC);
             foreach($presults as $prow)
             {		// loop through rows
                 $participant	= new MarriageParticipant($prow); 
-                $role		= $prow['m_role'];
+                $role		    = $prow['m_role'];
                 $this->participants[$role]	= $participant;
             }		// loop through rows
         }		// query successful
         else
         {		// error issuing query
-            print "<p>Marriage.inc: " . __LINE__ .
-                        " query='$pqueryText'</p>\n";
-            print "<p class='message'>SQL error info=" .
-                        print_r($pstmt->errorInfo(),true) . "</p>\n";
+             $this->msg     .= " query='$pqueryText', " .
+                                print_r($pstmt->errorInfo(),true) . ".\n";
         }		// error issuing query
 
         // invoke constructor of base class
@@ -606,20 +603,20 @@ class Marriage extends Record
     }		// Death::getDefaultPlace
 
     /********************************************************************
-     *		Marriage::toXml														*
+     *	function Marriage::toXml										*
      *																	*
-     *  Emit the contents of the object as XML.								*
+     *  Emit the contents of the object as XML.							*
      *																	*
      *  Parameters:														*
-     *		    $top		tag name as a string for the tag enclosing the		*
-     *						output.												*
-     *						If null, do not enclose the individual values		*
-     *						inside a root node.								*
-     *		    $print		if true print the output, else just return it		*
-     *		    $options		match signature										*
+     *	    $top		tag name as a string for the tag enclosing the	*
+     *					output.											*
+     *					If null, do not enclose the individual values	*
+     *					inside a root node.								*
+     *	    $print		if true print the output, else just return it	*
+     *	    $options	match signature									*
      *																	*
      *  Returns:														*
-     *		    XML representation of the object								*
+     *	    XML representation of the object							*
      ********************************************************************/
     function toXml($top,
                    $print	= true,
@@ -660,6 +657,72 @@ class Marriage extends Record
         if ($top !== null)
             $retval	.= "    </$top>\n";
     }		// Marriage::toXml
+
+    /********************************************************************
+     *	function Marriage::toJson										*
+     *																	*
+     *  Emit the contents of the object as JSON.						*
+     *																	*
+     *  Parameters:														*
+     *	    $print		if true print the output, else just return it	*
+     *	    $options	match signature									*
+     *																	*
+     *  Returns:														*
+     *	    JSON representation of the object							*
+     ********************************************************************/
+    function toJson($print      = true,
+                    $options	= 0)
+    {
+        global	$debug;
+
+
+        $retval	    = '';
+        $comma	    = "{\n";
+        foreach($this->row as $key => $value)
+        {
+            if (substr($key, 0, 2) == 'm_')
+                $key	= substr($key, 2);
+            if (is_numeric($value))
+		    {
+				if ((strlen($value) == 1 || substr($value, 0, 1) != '0'))
+				    $retval		.= $comma . "\t\"$key\":\t$value";
+				else
+				{		// handle values with leading 0
+				    $retval		.= $comma . "\t\"$key\":\t\"$value\"";
+				}		// handle values with leading 0
+		    }
+		    else
+		    {
+				$retval		.= $comma . "\t\"$key\":\t" .
+							   json_encode($value);
+		    }
+		    $comma		= ",\n";
+        }
+
+        // display information about participants in the marriage
+        foreach ($this->participants as $role => $participant)
+        {		// loop through participants
+            if ($role == 'B')
+				$retval		.= $comma . "\t\"bride\":\n";
+            else
+            if ($role == 'G')
+				$retval		.= $comma . "\t\"groom\":\n";
+            else
+            if ($role == 'M')
+				$retval		.= $comma . "\t\"minister\":\n";
+            else
+				$retval		.= $comma . "\t\"$role\":\n";
+           
+            $retval	.= $participant->toJson(false);
+        }		// loop through participants
+
+		if (strlen($retval) > 0)
+		    $retval		.= "\n}\n";
+		if ($print)
+		    print $retval;
+		return $retval;
+
+    }		// Marriage::toJson
 
     /********************************************************************
      *	function Marriage::set											*
@@ -744,7 +807,7 @@ class Marriage extends Record
     /********************************************************************
      *	function Marriage::getBride										*
      *																	*
-     *  Get the instance of MarriageParticipant for the bride.				*
+     *  Get the instance of MarriageParticipant for the bride.			*
      *																	*
      *  Parameters:														*
      *		$create				if true create record if necessary		*
@@ -762,9 +825,9 @@ class Marriage extends Record
             $year	= $this->row['m_regyear'];
             $number	= $this->row['m_regnum'];
             $bride	= new MarriageParticipant($domain,
-                                          $year,
-                                          $number,
-                                          'B');
+                                              $year,
+                                              $number,
+                                              'B');
             $this->participants['B']	= $bride;
             return	$bride;
         }		// create new bride record
@@ -773,7 +836,7 @@ class Marriage extends Record
     /********************************************************************
      *	function Marriage::getGroom										*
      *																	*
-     *  Get the instance of MarriageParticipant for the groom.				*
+     *  Get the instance of MarriageParticipant for the groom.			*
      *																	*
      *  Parameters:														*
      *		$create				if true create record if necessary		*

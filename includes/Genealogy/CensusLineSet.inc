@@ -128,16 +128,16 @@ class CensusLineSet extends RecordSet
 				{
 				    if ($value instanceof Census)
 				    {
-						$censusObj		= $value;
+						$censusObj		    = $value;
 						$this->censusObj	= $censusObj;
-						$censusId		= $censusObj->get('id');
+						$censusId		    = $censusObj->get('id');
 				    }
-				    else
-						$censusId		= $value;
-				    $this->censusId		= $censusId;
+                    else
+						$censusId		    = $value;
+				    $this->censusId		    = $censusId;
 				    if ($censusId == 'CAALL')
 				    {		// search all Canadian censuses
-						$censusYear		= 'ALL';
+						$censusYear		    = 'ALL';
 						$this->censusYear	= $censusYear;
 						$this->table		= 'CensusALL';
 				    }		// search all Canadian censuses
@@ -315,31 +315,31 @@ class CensusLineSet extends RecordSet
     }			// CensusLineSet::getGivenNames
 
     /********************************************************************
-     *  function CensusLineSet::getWhere												*
+     *  function CensusLineSet::getWhere								*
      *																	*
      *  Given an associative array of parameters for searching the		*
-     *  table, return the appropriate SQL WHERE clause.						*
+     *  table, return the appropriate SQL WHERE clause.					*
      *																	*
-     *		    $this->parms  associative array of field/value combinations		*
-     *						  censusId may compared to an array of values		*
-     *						  offset is the starting offset in the result		*
-     *						  limit is the max number of records to return		*
-     *						Special Field Names:								*
-     *						  year				match the census year				*
-     *						  countrycode		match a country						*
-     *						  state				match an included state				*
-     *						  province		match an included province		*
-     *		    $this->sqlParms		sets substitution values to PDO exec		*
-     *		    $this->offset		sets starting offset if supplied		*
-     *		    $this->limit		sets maximum number of matches				*
+     *	    $this->parms  associative array of field/value combinations	*
+     *					  censusId may compared to an array of values	*
+     *					  offset is the starting offset in the result	*
+     *					  limit is the max number of records to return	*
+     *				Special Field Names:								*
+     *					  year			match the census year			*
+     *					  countrycode	match a country					*
+     *					  state			match an included state			*
+     *					  province		match an included province		*
+     *	    $this->sqlParms		sets substitution values to PDO exec	*
+     *	    $this->offset		sets starting offset if supplied		*
+     *	    $this->limit		sets maximum number of matches			*
      *																	*
-     *		Returns:														*
-     *		    string containing WHERE clause								*
-     *		    A zero length string is returned if the input array is		*
+     *	Returns:														*
+     *	    string containing WHERE clause								*
+     *	    A zero length string is returned if the input array is		*
      *      empty, otherwise the string starts with the word WHERE		*
      *																	*
-     *		Side Effects:														*
-     *		    Errors are appended to the global $warn						*
+     *	Side Effects:													*
+     *	    Errors are appended to the global $warn						*
      ********************************************************************/
     function getWhere()
     {
@@ -348,15 +348,15 @@ class CensusLineSet extends RecordSet
 		global	$msg;
 		global	$connection;
 
-		$range		= 5;
+		$range		    = 5;
 		$this->orderby	= 'Surname, GivenNames, BYear';
-		$province	= '';
-		$cenYear	= 1881;
-		$byear		= null;
-		$surname	= null;
-		$soundex	= false;
-		$where		= '';
-		$and		= 'WHERE ';
+		$province   	= '';
+		$cenYear    	= 1881;
+		$byear	    	= null;
+		$surname    	= null;
+		$soundex    	= false;
+		$where	    	= '';
+		$and	    	= 'WHERE ';
 		$this->notPage	= false;
 
 		// obtain information required for comparisons 
@@ -428,7 +428,7 @@ class CensusLineSet extends RecordSet
 						$value		= reset($value);
 				    $this->district	= $value;
 				    $expression		= $this->getIdentifier($fieldLc,
-										       $value);
+										                   $value);
 				    if (strlen($expression) > 0)
 				    {
 						$where		.= $and . $expression;
@@ -715,15 +715,15 @@ class CensusLineSet extends RecordSet
     }		// CensusLineSet::getWhere
 
     /********************************************************************
-     *		function CensusLineSet::rewind										*
+     *	function CensusLineSet::rewind									*
      *																	*
-     *		Part of the implementation of the interface Iterator.				*
-     *		Reposition to the first element of the "array".						*
-     *		Since this is called just before any iteration this is the		*
-     *		latest point at which the contents of the set can be loaded.		*
+     *	Part of the implementation of the interface Iterator.			*
+     *	Reposition to the first element of the "array".					*
+     *	Since this is called just before any iteration this is the		*
+     *	latest point at which the contents of the set can be loaded.	*
      *																	*
      *  Returns:														*
-     *		    first instance of Record in the set								*
+     *	    first instance of Record in the set							*
      ********************************************************************/
     public function rewind()
     {
@@ -736,26 +736,29 @@ class CensusLineSet extends RecordSet
 		{
 		    if ($this->district && $this->subdistrict && $this->page)
 		    {			// response is all or part of a page
-				$censusObj	= $this->censusObj;
-				$censusYear	= substr($this->censusId, 2);
-				$count		= $censusObj->get('linesperpage');
-				$distParms	= array('d_census'	=> $censusObj,
-								'd_id'		=> $this->district);
-				$distObj	= new District($distParms);
-				$prov		= $distObj->get('province');
-				$distName	= $distObj->get('name');
-				$sdistParms	= array('sd_census'	=> $censusObj,
-								'sd_distid'	=> $this->district,
-								'sd_id'		=> $this->subdistrict,
-								'sd_div'	=> $this->division);
-				$subdistObj		= new SubDistrict($sdistParms);
+				$censusObj			= $this->censusObj;
+				$censusYear			= substr($this->censusId, 2);
+				$count				= $censusObj->get('linesperpage');
+                $distParms			= array('d_census'	=> $censusObj);
+                if (is_array($this->district))
+                    $distParms['d_id']		= reset($this->district);
+                else
+                    $distParms['d_id']		= $this->district;
+				$distObj			= new District($distParms);
+				$prov				= $distObj->get('province');
+				$distName			= $distObj->get('name');
+				$sdistParms			= array('sd_census'	=> $censusObj,
+					    			        'sd_distid'	=> $this->district,
+					    			        'sd_id'		=> $this->subdistrict,
+					    			        'sd_div'	=> $this->division);
+				$subdistObj		    = new SubDistrict($sdistParms);
 				$subDistName		= $subdistObj->get('name');
-				$oldfamily		=
+				$oldfamily		    =
 									($this->page - $subdistObj->get('page1')) *
 						($censusObj->get('linesperpage') / 5) + 1;
-				$oldsurname		= '[unknown]';
+				$oldsurname		    = '[unknown]';
 				$oldreligion		= '[religion]';
-				$oldorigin		= '[origin]';
+				$oldorigin		    = '[origin]';
 				$oldnationality		= 'Canadian';
 
 				$parms		= array('censusid'	=> $censusObj,

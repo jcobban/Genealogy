@@ -12,33 +12,34 @@ use \Exception;
  *		lang        language code, default 'en'                         *
  *																		*
  *  History:															*
- *		2011/01/09	created												*
- *		2011/03/16	display in 3 columns								*
- *		2011/08/10	add help										    *
- *		2011/10/27	use <button> instead of <a> for view action		    *
- *					support mouseover help								*
- *		2013/04/13	use functions pageTop and pageBot to standardize    *
- *		2013/11/16	handle lack of database server connection		    *
- *					gracefully										    *
- *					clean up parameter handling						    *
- *					support RegDomain parameter						    *
- *		2013/12/07	$msg and $debug initialized by common.inc		    *
- *		2013/12/24	use CSS for layout instead of tables				*
- *		2014/01/13	use CSS for table style								*
- *		2015/07/02	access PHP includes using include_path				*
- *		2015/09/28	migrate from MDB2 to PDO						    *
- *		2016/01/19	add id to debug trace								*
- *					include http.js before util.js						*
- *					rejected debug parameter						    *
- *		2016/05/20	use class Domain to validate domain code		    *
- *		2017/01/02	add linked column								    *
- *		2017/02/07	use class Country								    *
- *		2017/10/01	use Birth::getStatistics						    *
- *		2017/10/01	use BirthSet->getSummary						    *
- *		2018/01/02	use split class names								*
- *		2018/10/06  use class Template                                  *
+ *		2011/01/09  	created											*
+ *		2011/03/16  	display in 3 columns							*
+ *		2011/08/10  	add help										*
+ *		2011/10/27  	use <button> instead of <a> for view action		*
+ *				    	support mouseover help							*
+ *		2013/04/13  	use functions pageTop and pageBot to standardize*
+ *		2013/11/16  	handle lack of database server connection		*
+ *				    	gracefully										*
+ *				    	clean up parameter handling						*
+ *				    	support RegDomain parameter						*
+ *		2013/12/07  	$msg and $debug initialized by common.inc		*
+ *		2013/12/24  	use CSS for layout instead of tables			*
+ *		2014/01/13  	use CSS for table style							*
+ *		2015/07/02  	access PHP includes using include_path			*
+ *		2015/09/28  	migrate from MDB2 to PDO						*
+ *		2016/01/19  	add id to debug trace							*
+ *				    	include http.js before util.js					*
+ *				    	rejected debug parameter						*
+ *		2016/05/20  	use class Domain to validate domain code		*
+ *		2017/01/02  	add linked column								*
+ *		2017/02/07  	use class Country								*
+ *		2017/10/01  	use Birth::getStatistics						*
+ *		2017/10/01  	use BirthSet->getSummary						*
+ *		2018/01/02  	use split class names							*
+ *		2018/10/06      use class Template                              *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Birth.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -48,13 +49,13 @@ require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
-$domain	    	= 'CAON';	// default domain
-$cc			    = 'CA';		// default country code
-$code		    = 'ON';		// default province code
-$countryName	= 'Canada';	// default country name
-$domainName		= 'Canada: Ontario';
-$stateName		= 'Ontario';
-$lang	    	= 'en';
+$domain	    			= 'CAON';	// default domain
+$cc			    		= 'CA';		// default country code
+$code		    		= 'ON';		// default province code
+$countryName			= 'Canada';	// default country name
+$domainName				= 'Canada: Ontario';
+$stateName				= 'Ontario';
+$lang	    			= 'en';
 
 foreach($_GET as $key => $value)
 {				// loop through all input parameters
@@ -68,16 +69,16 @@ foreach($_GET as $key => $value)
 	    }			// RegDomain
 
 	    case 'code':
-	    {
+	    {           // province code within Canada
             $code		= strtoupper($value);
             $domain     = 'CA' . $code;
 			break;
-        }			// code
+        }			// province code
 
 	    case 'lang':
         {
             if (strlen($value) >= 2)
-            $lang		= strtolower(substr($value,0,2));
+                $lang		= strtolower(substr($value,0,2));
 			break;
         }			// lang
 
@@ -88,44 +89,23 @@ foreach($_GET as $key => $value)
 
 	    default:
 	    {			// any other parameters
-			$warn	.= "Unexpected parameter $key='$value'. ";
+			$warn	.= "<p>Unexpected parameter $key='$value'.</p>";
 			break;
 	    }			// any other parameters
 	}			// process specific named parameters
 }				// loop through all input parameters
 
-$domainObj	= new Domain(array('domain' 	=> $domain,
-							   'language'	=> 'en'));
-if ($domainObj->isExisting())
-{
-    $domainName	    = $domainObj->getName(1);
-    $stateName	    = $domainObj->getName(0);
-}
-else
-{
-    $domainName	    = "Unknown Domain: $domain";
-    $stateName	    = "Unknown Domain: $domain";
-}
+$template		    = new FtTemplate("BirthRegStats$lang.html");
+
+$domainObj	        = new Domain(array('domain' 	=> $domain,
+				        			   'language'	=> 'en'));
+$domainName	        = $domainObj->getName(1);
+$stateName	        = $domainObj->getName(0);
 $cc	    		    = substr($domain, 0, 2);
 $code	    	    = substr($domain, 2, 2);
 $countryObj		    = new Country(array('code' => $cc));
 $countryName    	= $countryObj->getName();
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= $tempBase . "BirthRegStats$lang.html";
-if (!file_exists($includeSub))
-{
-    $language		= new Language(array('code' => $lang));
-    $langName		= $language->get('name');
-    $nativeName		= $language->get('nativename');
-    $sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub		= $tempBase . "BirthRegStatsen.html";
-}
-$template->includeSub($includeSub, 'MAIN');
 $template->set('CC',        		$cc);
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('DOMAINNAME',		$domainName);
@@ -160,7 +140,10 @@ foreach($result as $i => $row)
     $regYear        = $row[0];
     $count          = $row[1];
     $linked         = $row[2];
-    $pctLinked      = 100*$row[2]/$row[1];
+    if ($count == 0)
+        $pctLinked	= 0;
+    else
+        $pctLinked	= 100 * $linked / $count;
     $total          += $count;
     $totalLinked    += $linked;
     $ttemplate->set('DOMAIN', $domain);

@@ -126,12 +126,40 @@
  *		2018/04/15		limit characters that can be entered in Family	*
  *		2018/05/09		change religion abbreviations to spell "Church"	*
  *		2018/05/10		add method checkPositiveNumber					*
+ *		2019/01/21      remove static list of surnames with gender      *
+ *		                functionality is moved to Nicknames table       *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
+var givenNames	        = [];
+var options = {"timeout"    : false};
+
+if (typeof HTTP === 'function')
+{
+    HTTP.get('/getRecordJson.php?table=Nicknames',
+             gotNicknames,
+             options);
+}
+
 /************************************************************************
- *		RelAbbrs														*
+ *  function gotNicknames												*
+ *																		*
+ *  This method is called when the JSON document representing			*
+ *  the list of given names is received from the server.                *
+ ************************************************************************/
+function gotNicknames(obj)
+{
+    if (typeof(obj) == 'object')
+    {
+        givenNames              = obj;
+    }
+    else
+        alert('CommonForm.js:gotNicknames: ' + typeof obj);
+}       // function gotNicknames
+
+/************************************************************************
+ *	RelAbbrs															*
  *																		*
  *  Table for expanding abbreviations for Relationships					*
  *  This table is used in two different contexts:						*
@@ -987,577 +1015,6 @@ var	preTab	= {
 				};
 
 /************************************************************************
- *  femaleNames															*
- *																		*
- *  This table contains the common female given names					*
- *  in the database.  If the given name of the individual is changed	*
- *  and contains one of the following, the sex of the individual		*
- *  is changed to female.												*
- ************************************************************************/
-var femaleNames	= {
-				'abagail'			: 16,
-				'abbie'				: 16,
-				'abby'				: 16,
-				'abigail'			: 16,
-				'ada'				: 28,
-				'adalaide'			: 28,
-				'adaline'			: 23,
-				'addie'				: 23,
-				'adelaide'			: 28,
-				'adele'				: 28,
-				'adelia'			: 23,
-				'adeline'			: 23,
-				'aggie'				: 2,
-				'agnes'				: 143,
-				'agness'			: 15,
-				'aileen'			: 5,
-				'alberta'			: 20,
-				'alceste'			: 2,
-				'alexandra'			: 2,
-				'alexandrina'		: 2,
-				'alice'				: 115,
-				'allison'			: 1,
-				'alma'				: 20,
-				'almeda'			: 20,
-				'almina'			: 20,
-				'almira'			: 20,
-				'alvira'			: 20,
-				'amanda'			: 21,
-				'amelia'			: 39,
-				'amey'				: 21,
-				'amy'				: 21,
-				'anabel'			: 1,
-				'anabell'			: 1,
-				'andrea'			: 1,
-				'angela'			: 1,
-				'angelina'			: 1,
-				'angeline'			: 1,
-				'ann'				: 392,
-				'anna'				: 64,
-				'anne'				: 86,
-				'annette'			: 6,
-				'annie'				: 304,
-				'annis'				: 3,
-				'arabella'			: 3,
-				'araminta'			: 3,
-				'arvilla'			: 3,
-				'audrey'			: 3,
-				'augusta'			: 3,
-				'aurelia'			: 3,
-				'aurilla'			: 3,
-				'avis'				: 3,
-				'barbara'			: 59,
-				'bathsheba'			: 5,
-				'beatrice'			: 29,
-				'belinda'			: 1,
-				'bella'				: 16,
-				'berenice'			: 16,
-				'berenise'			: 16,
-				'bernadette'		: 16,
-				'bernice'			: 16,
-				'bertha'			: 43,
-				'bessie'			: 34,
-				'beth'				: 31,
-				'betsy'				: 31,
-				'betty'				: 15,
-				'beulah'			: 15,
-				'blanch'			: 17,
-				'blanche'			: 17,
-				'brenda'			: 17,
-				'bridget'			: 17,
-				'candace'			: 11,
-				'carmen'			: 11,
-				'carol'				: 11,
-				'caroline'			: 113,
-				'carolyn'			: 11,
-				'carrie'			: 19,
-				'cassie'			: 19,
-				'catharine'			: 128,
-				'catherine'			: 415,
-				'cecelia'			: 19,
-				'celia'				: 19,
-				'charity'			: 19,
-				'charlotte'			: 118,
-				'cheryl'			: 19,
-				'christena'			: 51,
-				'christie'			: 5,
-				'christina'			: 148,
-				'christine'			: 16,
-				'christy'			: 27,
-				'clara'				: 55,
-				'clarissa'			: 18,
-				'constance'			: 18,
-				'cora'				: 18,
-				'cordelia'			: 18,
-				'cynthia'			: 18,
-				'daisy'				: 15,
-				'daughter'			: 15,
-				'debbie'			: 14,
-				'deborah'			: 14,
-				'delia'				: 14,
-				'delilah'			: 14,
-				'della'				: 14,
-				'diana'				: 14,
-				'dinah'				: 14,
-				'donna'				: 14,
-				'dora'				: 16,
-				'doris'				: 16,
-				'dorothea'			: 42,
-				'dorothy'			: 42,
-				'edith'				: 77,
-				'edna'				: 22,
-				'effie'				: 34,
-				'elaine'			: 6,
-				'eleanor'			: 46,
-				'eleanora'			: 46,
-				'elisabeth'			: 39,
-				'eliza'				: 214,
-				'elizabeth'			: 949,
-				'ella'				: 32,
-				'ellen'				: 241,
-				'elma'				: 32,
-				'elsie'				: 15,
-				'elspet'			: 21,
-				'elva'				: 32,
-				'emaline'			: 16,
-				'emeline'			: 16,
-				'emiline'			: 16,
-				'emily'				: 77,
-				'emma'				: 125,
-				'estella'			: 7,
-				'estelle'			: 7,
-				'ester'				: 7,
-				'esther'			: 57,
-				'ethel'				: 83,
-				'etta'				: 7,
-				'eunice'			: 7,
-				'euphemia'			: 89,
-				'euretta'			: 89,
-				'eva'				: 32,
-				'evelina'			: 32,
-				'eveline'			: 32,
-				'evelyn'			: 32,
-				'fannie'			: 16,
-				'fanny'				: 52,
-				'flora'				: 102,
-				'florence'			: 74,
-				'frances'			: 66,
-				'georgina'			: 23,
-				'gertrude'			: 44,
-				'gladys'			: 29,
-				'grace'				: 62,
-				'hannah'			: 187,
-				'harriet'			: 111,
-				'hattie'			: 15,
-				'hazel'				: 29,
-				'helen'				: 89,
-				'helena'			: 16,
-				'hellen'			: 16,
-				'henrietta'			: 40,
-				'hester'			: 17,
-				'ida'				: 59,
-				'ilene'				: 22,
-				'infant'			: 22,
-				'irene'				: 22,
-				'isabel'			: 27,
-				'isabella'			: 383,
-				'isabelle'			: 3,
-				'jane'				: 583,
-				'janet'				: 192,
-				'jannet'			: 15,
-				'jean'				: 91,
-				'jeanette'			: 91,
-				'jemima'			: 25,
-				'jennet'			: 33,
-				'jennie'			: 53,
-				'jessie'			: 93,
-				'joanna'			: 22,
-				'johanna'			: 15,
-				'josephine'			: 25,
-				'julia'				: 48,
-				'kate'				: 21,
-				'katherine'			: 18,
-				'kathleen'			: 25,
-				'katie'				: 18,
-				'kezia'				: 15,
-				'laura'				: 38,
-				'lavina'			: 17,
-				'lena'				: 19,
-				'leona'				: 19,
-				'letitia'			: 18,
-				'lillian'			: 22,
-				'lillie'			: 20,
-				'lilly'				: 18,
-				'loretta'			: 9,
-				'lorraine'			: 9,
-				'louisa'			: 93,
-				'louise'			: 24,
-				'lovena'			: 24,
-				'lovina'			: 24,
-				'lovinia'			: 24,
-				'lucille'			: 33,
-				'lucinda'			: 33,
-				'lucy'				: 44,
-				'luella'			: 44,
-				'lydia'				: 47,
-				'mabel'				: 58,
-				'mabelena'			: 8,
-				'mable'				: 21,
-				'madaline'			: 6,
-				'madeline'			: 6,
-				'madge'				: 6,
-				'madora'			: 6,
-				'mae'				: 6,
-				'magdalen'			: 6,
-				'magdalena'			: 6,
-				'magdalene'			: 6,
-				'magdaline'			: 6,
-				'maggie'			: 46,
-				'maggy'				: 6,
-				'mahala'			: 6,
-				'mahalia'			: 6,
-				'mahhitable'		: 6,
-				'maisie'			: 6,
-				'malinda'			: 6,
-				'malisa'			: 6,
-				'malissa'			: 6,
-				'malvina'			: 6,
-				'mamie'				: 6,
-				'mandana'			: 6,
-				'mandy'				: 6,
-				'manetta'			: 6,
-				'manette'			: 6,
-				'marcella'			: 6,
-				'margaret'			: 955,
-				'margareta'			: 5,
-				'margarete'			: 5,
-				'margarett'			: 5,
-				'margaretta'		: 5,
-				'margarette'		: 5,
-				'margary'			: 5,
-				'margerie'			: 5,
-				'margery'			: 5,
-				'margorie'			: 5,
-				'marguerite'		: 14,
-				'maria'				: 105,
-				'mariah'			: 5,
-				'mariam'			: 5,
-				'marian'			: 5,
-				'marianne'			: 5,
-				'marie'				: 5,
-				'marietta'			: 5,
-				'marilla'			: 5,
-				'marilyn'			: 5,
-				'marina'			: 5,
-				'marinda'			: 5,
-				'marion'			: 29,
-				'marjery'			: 17,
-				'marjorie'			: 17,
-				'marjory'			: 14,
-				'marleen'			: 14,
-				'marlene'			: 14,
-				'martha'			: 190,
-				'mary'				: 1351,
-				'matilda'			: 95,
-				'maud'				: 41,
-				'may'				: 37,
-				'melissa'			: 25,
-				'meryl'				: 25,
-				'meta'				: 25,
-				'michelle'			: 22,
-				'mildred'			: 22,
-				'millicent'			: 22,
-				'millie'			: 22,
-				'milly'				: 22,
-				'mina'				: 22,
-				'minerva'			: 22,
-				'minetta'			: 22,
-				'minney'			: 8,
-				'minnie'			: 78,
-				'miranda'			: 8,
-				'miriam'			: 8,
-				'mirtle'			: 3,
-				'mizie'				: 3,
-				'mona'				: 3,
-				'monica'			: 3,
-				'muriel'			: 3,
-				'myrtle'			: 33,
-				'myzie'				: 3,
-				'nadine'			: 3,
-				'nancy'				: 141,
-				'naomi'				: 3,
-				'natalie'			: 3,
-				'nellie'			: 39,
-				'nelly'				: 3,
-				'nettie'			: 3,
-				'netty'				: 3,
-				'neva'				: 3,
-				'nichole'			: 3,
-				'nicole'			: 3,
-				'nina'				: 3,
-				'nora'				: 3,
-				'norah'				: 3,
-				'norine'			: 3,
-				'norma'				: 3,
-				'olga'				: 3,
-				'olive'				: 34,
-				'olivia'			: 3,
-				'ora'				: 3,
-				'orpha'				: 3,
-				'pamela'			: 3,
-				'pamelia'			: 3,
-				'patience'			: 3,
-				'patricia'			: 3,
-				'paula'				: 3,
-				'pauline'			: 3,
-				'pearl'				: 36,
-				'peggy'				: 3,
-				'penelope'			: 3,
-				'permila'			: 3,
-				'permilla'			: 3,
-				'pheba'				: 4,
-				'phebe'				: 4,
-				'phidelia'			: 4,
-				'philena'			: 4,
-				'phillipa'			: 4,
-				'phoeba'			: 4,
-				'phoebe'			: 24,
-				'phyllis'			: 4,
-				'polly'				: 4,
-				'priscilla'			: 4,
-				'prudence'			: 4,
-				'rachael'			: 4,
-				'rachel'			: 83,
-				'rebecca'			: 98,
-				'reita'				: 4,
-				'rena'				: 4,
-				'reta'				: 4,
-				'rhea'				: 4,
-				'rhoda'				: 16,
-				'rita'				: 4,
-				'robena'			: 4,
-				'roberta'			: 4,
-				'robin'				: 4,
-				'rosa'				: 4,
-				'rosalie'			: 4,
-				'rosamond'			: 4,
-				'rosana'			: 4,
-				'rosann'			: 4,
-				'rosanna'			: 18,
-				'rose'				: 22,
-				'rosella'			: 4,
-				'roseltha'			: 4,
-				'rosemary'			: 4,
-				'rosetta'			: 4,
-				'rosey'				: 4,
-				'rosie'				: 4,
-				'rosina'			: 4,
-				'rossana'			: 4,
-				'rowena'			: 4,
-				'roxana'			: 4,
-				'roxane'			: 4,
-				'roxanna'			: 4,
-				'roxanne'			: 4,
-				'roxie'				: 4,
-				'roxey'				: 4,
-				'roxy'				: 4,
-				'rubena'			: 4,
-				'rubie'				: 4,
-				'rubina'			: 4,
-				'ruby'				: 19,
-				'ruth'				: 41,
-				'sarah'				: 571,
-				'sophia'			: 29,
-				'stella'			: 16,
-				'stillborndaughter'	: 35,
-				'susan'				: 110,
-				'susanna'			: 39,
-				'susannah'			: 35,
-				'theresa'			: 35,
-				'unnameddaughter'	: 45,
-				'vera'				: 14,
-				'viola'				: 16,
-				'violet'			: 29,
-				'winnifred'			: 15};
-
-/************************************************************************
- *  maleNames															*
- *																		*
- *  This table contains the 132 most common male given names			*
- *  in the database.  If the given name of the individual is changed	*
- *  and contains one of the following, the sex of the individual		*
- *  is changed to male.													*
- *  The value of each name is the number of occurrences in the database	*
- ************************************************************************/
-var maleNames	= {
-				'aaron'			: 22,
-				'abraham'		: 46,
-				'abram'			: 44,
-				'adam'			: 97,
-				'albert'		: 472,
-				'alex'			: 170,
-				'alexander'		: 660,
-				'alfred'		: 313,
-				'allan'			: 83,
-				'allen'			: 45,
-				'alonzo'		: 16,
-				'alvin'			: 32,
-				'amos'			: 32,
-				'andrew'		: 349,
-				'angus'			: 227,
-				'anthony'		: 43,
-				'archibald'		: 307,
-				'archie'		: 167,
-				'arthur'		: 408,
-				'benjamin'		: 152,
-				'bruce'			: 50,
-				'calvin'		: 30,
-				'carl'			: 31,
-				'cecil'			: 74,
-				'charles'		: 1265,
-				'charley'		: 30,
-				'charlie'		: 81,
-				'chester'		: 76,
-				'christian'		: 13,
-				'christopher'	: 83,
-				'clarance'		: 36,
-				'clarence'		: 134,
-				'clifford'		: 93,
-				'colin'			: 53,
-				'cornelius'		: 34,
-				'cyrenius'		: 34,
-				'dan'			: 48,
-				'daniel'		: 376,
-				'david'			: 629,
-				'dennis'		: 34,
-				'donald'		: 385,
-				'dougald'		: 44,
-				'douglas'		: 32,
-				'dugald'		: 87,
-				'duncan'		: 462,
-				'earl'			: 96,
-				'earnest'		: 112,
-				'edgar'			: 71,
-				'edmund'		: 21,
-				'edward'		: 766,
-				'edwin'			: 136,
-				'eli'			: 31,
-				'elias'			: 17,
-				'elijah'		: 40,
-				'elmer'			: 30,
-				'emerson'		: 13,
-				'ephraim'		: 17,
-				'ernest'		: 169,
-				'ezra'			: 13,
-				'francis'		: 178,
-				'frank'			: 620,
-				'franklin'		: 53,
-				'fred'			: 276,
-				'frederick'		: 337,
-				'fredrick'		: 193,
-				'freeman'		: 17,
-				'george'		: 2313,
-				'gilbert'		: 67,
-				'gorden'		: 36,
-				'gordon'		: 202,
-				'grant'			: 202,
-				'harold'		: 133,
-				'harry'			: 341,
-				'harvey'		: 81,
-				'hector'		: 59,
-				'henery'		: 68,
-				'henry'			: 757,
-				'herbert'		: 196,
-				'herman'		: 33,
-				'hiram'			: 67,
-				'horace'		: 13,
-				'howard'		: 67,
-				'hugh'			: 312,
-				'isaac'			: 166,
-				'ivan'			: 14,
-				'jacob'			: 127,
-				'jack'			: 19,
-				'james'			: 2572,
-				'jeremiah'		: 35,
-				'jesse'			: 18,
-				'john'			: 4651,
-				'jonathan'		: 23,
-				'joseph'		: 931,
-				'josiah'		: 14,
-				'joshua'		: 33,
-				'keith'			: 13,
-				'kenneth'		: 54,
-				'lachlin'		: 17,
-				'lawrence'		: 54,
-				'leo'			: 36,
-				'leonard'		: 71,
-				'leslie'		: 59,
-				'levi'			: 41,
-				'lewis'			: 71,
-				'lloyd'			: 71,
-				'lorne'			: 63,
-				'louis'			: 58,
-				'malcolm'		: 156,
-				'mark'			: 40,
-				'martin'		: 81,
-				'mathew'		: 65,
-				'matthew'		: 31,
-				'melvin'		: 32,
-				'michael'		: 156,
-				'milton'		: 70,
-				'moses'			: 50,
-				'murray'		: 14,
-				'nathan'		: 24,
-				'nathaniel'		: 40,
-				'neil'			: 216,
-				'nelson'		: 95,
-				'nicholas'		: 18,
-				'norman'		: 177,
-				'oliver'		: 74,
-				'orville'		: 18,
-				'oscar'			: 52,
-				'patrick'		: 164,
-				'paul'			: 164,
-				'percy'			: 80,
-				'peter'			: 389,
-				'philip'		: 88,
-				'phillip'		: 15,
-				'ralph'			: 67,
-				'reginald'		: 31,
-				'reuben'		: 27,
-				'richard'		: 519,
-				'robert'		: 1296,
-				'roderick'		: 14,
-				'ross'			: 40,
-				'roy'			: 260,
-				'russel'		: 61,
-				'russell'		: 66,
-				'samuel'		: 559,
-				'sidney'		: 45,
-				'silas'			: 18,
-				'simon'			: 40,
-				'solomon'		: 22,
-				'stanley'		: 104,
-				'stephen'		: 88,
-				'stewart'		: 35,
-				'sylvester'		: 21,
-				'theophilus'	: 16,
-				'thomas'		: 1659,
-				'timothy'		: 38,
-				'victor'		: 38,
-				'wallace'		: 54,
-				'walter'		: 408,
-				'warren'		: 15,
-				'wayne'			: 14,
-				'wellington'	: 45,
-				'wesley'		: 123,
-				'wilbert'		: 65,
-				'wilfred'		: 56,
-				'william'		: 4305,
-				'willie'		: 61,
-				'wilson'		: 40};
-
-/************************************************************************
  *  capitalize															*
  *																		*
  *  Capitalize the value of a HTML input element.						*
@@ -1846,10 +1303,10 @@ function dateChanged()
 /************************************************************************
  *  surnameChanged														*
  *																		*
- *  Take action when the user changes the surname field						*
+ *  Take action when the user changes the surname field					*
  *																		*
  *  Input:																*
- *		this				an instance of an HTML input element. 				*
+ *		this		an instance of an HTML input element. 				*
  ************************************************************************/
 function surnameChanged()
 {
@@ -1896,33 +1353,44 @@ function surnameChanged()
  ************************************************************************/
 function givenChanged()
 {
-    var	form		= this.form;
+    var	form		                            = this.form;
+	var	givenName	                            = this.value;
     if (form.Gender)
-    {			// there is a Gender selection list
-		var	givenName	= this.value.toLowerCase();
-		var	names		= givenName.split(" ");
+    {			        // there is a Gender selection list
+		var	givenNameLc	                        = givenName.toLowerCase();
+		var	names		                        = givenNameLc.split(/\s+/);
 		for (var i = 0; i < names.length; i++)
-		{		// loop through individual given names
+		{		        // loop through individual given names
 		    var	aName	= names[i];
-		    if (maleNames[aName] > 0)
+		    if (aName in givenNames)
 		    {
-				form.Gender.selectedIndex	= 0;
-				form.Gender.className		= 'male';
+                var givenName                   = givenNames[aName];
+                if (givenName.gender == 'M')
+                {
+				    form.Gender.selectedIndex	= 0;
+				    form.Gender.className		= 'male';
+                }
+                else
+                if (givenName.gender == 'F')
+                {
+				    form.Gender.selectedIndex	= 1;
+				    form.Gender.className		= 'female';
+                }
 				break;
 		    }
 		    else
-		    if (aName.substring(aName.length - 1) == 'a' ||
-				femaleNames[aName] > 0)
+		    if (aName.substring(aName.length - 1) == 'a')
 		    {
 				form.Gender.selectedIndex	= 1;
 				form.Gender.className		= 'female';
 				break;
 		    }
-		}		// loop through individual given names
-    }			// there is a Gender selection list
+		}		        // loop through individual given names
+    }			        // there is a Gender selection list
 
     // fold to upper case and expand abbreviations
     changeElt(this);
+    capitalize(this);
 
     if (this.checkfunc)
 		this.checkfunc();
@@ -1961,8 +1429,9 @@ function givenChanged()
  *  Input:																*
  *		this			an instance of an HTML <button> element.		*
  ************************************************************************/
-function goToLink()
+function goToLink(event)
 {
+    event.stopPropagation();
     if (this.href)
     {		// new URL defined
 		if (this.target)
@@ -2892,8 +2361,10 @@ function tableKeyDown(e)
  *  Input:																*
  *		this	instance of <th> for which this is the onclick method	*
  ************************************************************************/
-function columnClick()
+function columnClick(event)
 {
+    if (event)
+        event.stopPropagation();
     var	colIndex	= this.cellIndex;
     var	row		= this.parentNode;
     var	section		= row.parentNode;
@@ -2978,7 +2449,7 @@ function columnClick()
 		    }			// element node
 		}			// loop through all children of cell
     }				// loop through all rows of body
-}		// columnClick
+}		// function columnClick
 
 /************************************************************************
  *  columnWiden															*

@@ -9,11 +9,11 @@ use \Exception;
  *																		*
  *    History:															*
  *		2018/11/17		hide contents of templates directory            *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . "/common.inc";
 
 /************************************************************************
@@ -47,26 +47,7 @@ if (count($_GET) > 0)
         $warn       .= $parmsText . "</table>\n";
 }	        	    // invoked by URL to display current status of account
 
-$title	    	= "EcmaScript/JavaScript/JScript Scripts";
-$tempBase	    = $document_root . '/templates/';
-$template	    = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	    = "jscriptsIndex$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-    if ($lang != 'en')
-    {
-		$language   	= new Language(array('code' => $lang));
-		$langName	    = $language->get('name');
-		$nativeName	    = $language->get('nativename');
-		$sorry  	    = $language->getSorry();
-        $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                       array($langName, $nativeName),
-                                       $sorry);
-    }
-    $includeSub	= "jscriptsIndexen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-				      'MAIN');
+$template	    = new FtTemplate("jscriptsIndex$lang.html");
 
 $template->display();
 

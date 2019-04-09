@@ -21,14 +21,16 @@
  *		2018/10/18      pass language to scripts initiated by buttons   *
  *		2018/12/21      increase probability of digits and letters      *
  *		                in generated password, and trim password        *
+ *		2019/02/06      session status moved to link in menu            *
+ *		2019/02/08      use addEventListener                            *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Perform initialization of dynamic functionality after page is		*
  *  loaded.																*
@@ -36,12 +38,24 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    document.body.onkeydown	= amKeyDown;
+    if (document.body.addEventListener) 
+    {       // For all major browsers, except IE 8 and earlier
+        document.body.addEventListener("keydown",
+                                       amKeyDown, 
+                                       false);
+    }       // For all major browsers, except IE 8 and earlier
+    else 
+    if (document.body.attachEvent) 
+    {       // For IE 8 and earlier versions
+        document.body.attachEvent("onkeydown",
+                                  amKeyDown);
+    }       // For IE 8 and earlier versions
+
     for(var i = 0; i < document.forms.length; i++)
-    {
+    {                   // loop through forms
 		var form	= document.forms[i];
 		for(var j = 0; j < form.elements.length; j++)
-		{
+		{               // loop through elements
 		    var element		= form.elements[j];
 		    var	name		= element.name;
 		    if(!name || name.length == 0)
@@ -54,7 +68,7 @@ function onLoad()
 		    element.onkeydown		= keyDown;
 
 		    switch(name)
-		    {	// act on specific element
+		    {	        // act on specific element
 				case 'userid':
 				{
 				    element.focus();	// put focus in userid field
@@ -75,8 +89,23 @@ function onLoad()
 
 				case 'newPassword':
 				{
-				    element.onkeypress	= newPasswordKeyPress;
-				    element.onchange	= newPasswordChange;
+				    if (element.addEventListener) 
+				    {       // For all major browsers, except IE 8 and earlier
+				        element.addEventListener("keypress",
+                                                 newPasswordKeyPress, 
+                                                 false);
+				        element.addEventListener("change",
+                                                 newPasswordChange, 
+                                                 false);
+				    }       // For all major browsers, except IE 8 and earlier
+				    else 
+				    if (element.attachEvent) 
+				    {       // For IE 8 and earlier versions
+				        element.attachEvent("onkeypress",
+                                            newPasswordKeyPress);
+				        element.attachEvent("onchange",
+                                            newPasswordChange);
+				    }       // For IE 8 and earlier versions
 				    break;
 				}
 
@@ -108,13 +137,13 @@ function onLoad()
 				    break;
 				}		// others
 
-		    }	// act on specific element
-		}	// loop through elements in form
-    }		// loop through all form elements
-}		// onLoad
+		    }	        // act on specific element
+		}	            // loop through elements in form
+    }		            // loop through all form elements
+}		// function onLoad
 
 /************************************************************************
- *  signoff																*
+ *  function signoff													*
  *																		*
  *  Sign off.															*
  *																		*
@@ -123,20 +152,21 @@ function onLoad()
  ************************************************************************/
 function signoff()
 {
-    var	opener		= window.opener;
+    var	opener		    = window.opener;
     if (opener)
     {			// invoked from another window
-		var rightTop	= opener.document.getElementById("rightTop");
-		try {
-		if (rightTop)
-		{		// opener has a rightTop button
-		    while(rightTop.firstChild)
-				rightTop.removeChild(rightTop.firstChild);
-		    rightTop.appendChild(document.createTextNode("sign on"));
-		}		// opener has a rightTop button
-		} catch(e) {
-		    //alert("Account: signoff: e=" + e + ", rightTop=" + rightTop);
-		}
+        var callPage    = opener.document;
+		var session	    = callPage.getElementById("session");
+		if (session)
+		{		// opener has a session button
+            var href    = session.getAttribute('href');
+            session.setAttribute('href', href.replace('Account','Signon'));
+            var userInfoSignon  = callPage.getElementById("UserInfoSignon");
+            if (userInfoSignon)
+                session.innerHTML   = userInfoSignon.innerHTML;
+            else
+                session.innerHTML   = 'Sign On';
+		}		// opener has a session button
     }			// invoked from another window
 
     // go to the signon dialog to permit user to sign on with a different
@@ -153,7 +183,7 @@ function signoff()
 }		// signoff
 
 /************************************************************************
- *  finish																*
+ *  function finish														*
  *																		*
  *  Close the current window											*
  *																		*
@@ -194,9 +224,11 @@ function checkEmail()
  ************************************************************************/
 function newPasswordKeyPress(evt)
 {
-    evt			= evt || window.event;
     var	code		= evt.which || evt.keyCode;
-    var	pass		= this.value + String.fromCharCode(code);
+    var element     = this;
+    if (element == window)
+        element     = evt.target || evt.srcElement;
+    var	pass		= element.value + String.fromCharCode(code);
     if (code == 8)	// backspace passed by some browsers
 		pass		= pass.substr(0, pass.length - 2);
     scorePassword(pass);
@@ -210,10 +242,14 @@ function newPasswordKeyPress(evt)
  *																		*
  *  Input:																*
  *		this		<input type='text' id='newPassword'>				*
+ *		evt			the change event							    	*
  ************************************************************************/
-function newPasswordChange()
+function newPasswordChange(evt)
 {
-    scorePassword(this.value);
+    var element     = this;
+    if (element == window)
+        element     = evt.target || evt.srcElement;
+    scorePassword(element.value);
 }
 
 /************************************************************************
@@ -476,14 +512,10 @@ function noReply()
  *  click the "Apply Changes" button.									*
  *																		*
  *  Parameters:															*
- *		e		W3C compliant browsers pass an event as a parameter		*
+ *		e		instance of Event                                       *
  ************************************************************************/
 function amKeyDown(e)
 {
-    if (!e)
-    {		// browser is not W3C compliant
-		e	=  window.event;	// IE
-    }		// browser is not W3C compliant
     var	code	= e.keyCode;
     var	form	= document.accountForm;
 

@@ -25,8 +25,9 @@
  *		2015/05/15		censusId not extracted from args				*
  *		2015/07/08		simplify activation of popups for hyper-links	*
  *						use CommonForm.js								*
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- * Copyright &copy; 2015 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 window.onload	= onLoad;
 
@@ -40,9 +41,6 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    // perform common page initialization
-    pageInit();
-
     var form	= document.buttonForm;
 
     if (form)
@@ -50,10 +48,6 @@ function onLoad()
     {
 		// perform element specific processing
 		var	element	= form.elements[i];
-
-		// pop up help balloon if the mouse hovers over a field
-		// for more than 2 seconds
-		actMouseOverHelp(element);
 
 		// perform element specific processing
 		var	name	= element.name;

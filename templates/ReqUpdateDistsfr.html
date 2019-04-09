@@ -1,26 +1,27 @@
 <!--*********************************************************************
- *  ReqUpdateDistsfr.html						*
- *									*
- *  Census of Canada							*
- *									*
- *  History:								*
- *	2017/10/23	created						*
- *	2018/01/04	remove Template from template file names	*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  ReqUpdateDistsfr.html												*
+ *																		*
+ *  Census of Canada													*
+ *																		*
+ *  History:															*
+ *		2017/10/23		created											*
+ *		2018/01/04		remove Template from template file names		*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
   <div class='hidden' id='breadcrumbs'>
     <a href='/genealogy.php?lang=fr'>Généalogie</a>:
-    <a href='/genCountry.php?cc=CA&amp;lang=fr'>Canada</a>:
-    <a href='/database/genCensuses.php?lang=fr'>Recensements</a>:
-    <a href='/database/EditCensuses.php?lang=fr'>Administration des Recensements</a>:
+    <a href='/genCountry.php?cc=$CC&amp;lang=fr'>$COUNTRYNAME</a>:
+    cc=$CC&amp;<a href='/database/genCensuses.php?lang=fr'>Recensements</a>:
+    <a href='/database/EditCensuses.php?cc=$CC&amp;lang=fr'>Administration des Recensements</a>:
   </div>
 <div class='body'>
   <h1>
     <span class='right'>
 	<a href='/database/ReqUpdateDistsHelpfr.html' target='help'>? Help</a>
     </span>
-    Administration des Recensements: $COUNTRYNAME: Recensement $CENSUSYEAR : Choisir la Table des Districts
+    Administration des Recensements: $COUNTRYNAME: Recensement $CENSUSYEAR: 
+    Choisir la Table des Districts
     <div style='clear: both;'></div>
   </h1>
 
@@ -33,7 +34,7 @@
           <label class='labelSmall' style='width: 6em;' for='Census'>
 	    Census:
 	  </label>
-	  <select size='8' name='Census' id='Census' class='white left'>
+	  <select size='20' name='Census' id='Census' class='white left'>
 	    <option value=''>Choisire un Recensement:</option>
 	    <option id='censusOpt' value='$id' $selected>
 		$name:
@@ -44,7 +45,7 @@
           <label class='labelSmall' style='width: 6em;' for='Province'>
 	    Province:
 	  </label>
-  	  <select size='8' name='Province' id='Province' class='white left'>
+  	  <select size='20' name='Province' id='Province' class='white left'>
 	    <option id='allProvincesOpt' value='' $selected>
 		Toutes Provinces
 	    </option>

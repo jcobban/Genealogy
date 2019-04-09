@@ -12,8 +12,9 @@
  *		2015/06/06		if invoked from an instance of editIndivid.php	*
  *						add events copied from second to that page		*
  *		2017/03/18		pass updated given name and surname to caller	*
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -58,9 +59,6 @@ var STYPE_MAREVENT		= 31;	// Individual Event
  ************************************************************************/
 function onLoad()
 {
-    // common initialization
-    pageInit();
-
     // setup feedback to invoking edit dialog
     var	opener		= null;
     var	feedbackFunc	= null;
@@ -92,10 +90,6 @@ function onLoad()
 		for(var j = 0; j < form.elements.length; j++)
 		{
 		    var element	= form.elements[j];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    // take action specific to element
 		    var	name;

@@ -165,7 +165,7 @@ require_once __NAMESPACE__ . '/common.inc';
 		    {		// some time in the past
 ?>
 		<div class="right" id="toNextWeek">
-		    <a href="showAddedIndividuals.php?week=<?php print $next; ?>">---&gt;</a></td>
+		    <a href="showAddedIndividuals.php?week=<?php print $next; ?>">---&gt;</a>
 		</div>
 <?php
 		    }		// some time in the past
@@ -180,7 +180,7 @@ require_once __NAMESPACE__ . '/common.inc';
 <?php
 		}
 		else
-		{	// some matches
+		{	            // some matches
 ?>
     <?php print $count; ?> matches for that period
 		<div style="clear: both;"></div>
@@ -188,8 +188,7 @@ require_once __NAMESPACE__ . '/common.inc';
 <?php
 		    $style	= 'odd';
 		    foreach($persons as $idir => $person)
-		    {	// loop through all rows
-				try {
+		    {	        // loop through all rows
 				$idir		= $person->get('idir');
 				$surname	= $person->get('surname');
 				$givenname	= $person->get('givenname');
@@ -228,30 +227,30 @@ require_once __NAMESPACE__ . '/common.inc';
 				    $parents	= $person->getParents();
 				    foreach($parents as $pidmr => $family)
 				    {		// loop through parents
-					$parentsStr	.= ' ' . $childRole . " of " .
-								$family->getName();
+						$parentsStr	.= ' ' . $childRole . " of " .
+					    				$family->getName();
 				    }		// loop through parents
 
 				    $spouseStr	= '';
 				    $spouse	= $person->getFamilies();
 				    foreach($spouse as $pidmr => $family)
 				    {		// loop through spouses
-					if ($gender == 'male')
-					{
-					    $spouseStr	.= " husband of " .
-						$family->getWifeName();
-					}
-					else
-					if ($gender == 'female')
-					{
-					    $spouseStr	.= " wife of " .
-						$family->getHusbName();
-					}
-					else
-					{
-					    $spouseStr	.= " partner of " .
-						$family->getName();
-					}
+						if ($gender == 'male')
+						{
+						    $spouseStr	.= " husband of " .
+							$family->getWifeName();
+						}
+						else
+						if ($gender == 'female')
+						{
+						    $spouseStr	.= " wife of " .
+							$family->getHusbName();
+						}
+						else
+						{
+						    $spouseStr	.= " partner of " .
+							$family->getName();
+						}
 				    }		// loop through spouses
 ?>
 		  <p style="margin-left:6em; text-indent:-3em; margin-top:0; margin-bottom:0.5ex;">
@@ -260,31 +259,19 @@ require_once __NAMESPACE__ . '/common.inc';
 				<?php print "$surname, $givenname ($birthd-$deathd)" ?>
 		    </a>
 				<?php print $parentsStr; ?>
-				<?php print $spouseStr; ?>
+				<?php print $spouseStr; ?> 
 		  </p>
 <?php
 				    if ($style == 'odd')
-					$style	= 'even';
+				    	$style	= 'even';
 				    else
-					$style	= 'odd';
+			    		$style	= 'odd';
 				}		// a real entry
-				} catch (Exception $e) {
-?>
-    <span class="message"><?php $e->getMessage(); ?></span>
-<?php
-				}		// catch
-		    }	// loop through all rows
-?>
-      <tbody>
-    </table>
-<?php
-		}	// some matches
-    }		// no errors
+		    }	        // loop through all rows
+		}	            // some matches
+    }		            // no errors
 ?>
 </div>
-<?php
-    pageBot($title);
-?>
   <div id="mousetoPrevWeek" class="popup">
     <p class="label">Go to Previous Week
     </p>
@@ -302,5 +289,5 @@ require_once __NAMESPACE__ . '/common.inc';
 		'tblNR'.
     </p>
 </div>
-</body>
-</html>
+<?php
+    pageBot($title);

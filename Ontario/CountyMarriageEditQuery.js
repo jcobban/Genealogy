@@ -9,8 +9,9 @@
  *		2016/05/31		use common function dateChanged					*
  *		2017/10/22		display result from Upper Canada using			*
  *						DistrictMarriagesEdit.php						*
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2016 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -22,8 +23,6 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
     // including support for context specific help
     var	element;
@@ -36,19 +35,6 @@ function onLoad()
 		{	// loop through all elements of form
 		    element		        = form.elements[i];
 		    element.onkeydown	= keyDown;
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    if (element.parentNode.nodeName == 'TD')
-		    {	// set mouseover on containing cell
-				element.parentNode.onmouseover	= eltMouseOver;
-				element.parentNode.onmouseout	= eltMouseOut;
-		    }	// set mouseover on containing cell
-		    else
-		    {	// set mouseover on input element itself
-				element.onmouseover		= eltMouseOver;
-				element.onmouseout		= eltMouseOut;
-		    }	// set mouseover on input element itself
 
 		    var namePattern	= /^([a-zA-Z_]+)(\d*)$/;
 		    var	id		= element.id;

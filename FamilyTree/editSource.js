@@ -21,11 +21,11 @@
  *		2013/05/15		support feeding back newly created source info	*
  *						to the invoking page							*
  *						copy source name to source title for new		*
- *						instance										*
+ *						function instance								*
  *		2013/05/29		use actMouseOverHelp common function			*
  *		2013/07/30		defer facebook initialization until after load	*
  *		2015/02/01		used submit because debug flag was erroneously	*
- *						set												*
+ *						function set										*
  *		2015/02/10		support being opened in <iframe>				*
  *		2015/05/27		use absolute URLs for AJAX						*
  *		2015/06/01		new feedback mechanism to invoking page to		*
@@ -36,8 +36,9 @@
  *		2017/08/04		class LegacyAddress renamed to Address			*
  *		2018/12/02      closing dialog if not in child frame did not    *
  *		                return to Sources menu.                         *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -46,7 +47,7 @@
 window.onload	= onloadEdit;
 
 /************************************************************************
- *  childFrameClass														*
+ *  function childFrameClass												*
  *																		*
  *  If this dialog is opened in a half window then any child dialogs	*
  *  are opened in the other half of the window.							*
@@ -71,9 +72,6 @@ function onloadEdit()
 		    childFrameClass	= 'left';
     }				    // dialog opened in half frame
 
-    // common page initialization
-    pageInit();
-
     // scan through all forms and set dynamic functionality
     // for specific elements
     for(var i = 0; i < document.forms.length; i++)
@@ -89,10 +87,6 @@ function onloadEdit()
 		for(var j = 0; j < form.elements.length; j++)
 		{		        // loop through all elements in the form
 		    var element	= form.elements[j];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    // take action specific to element
 		    var	name;
@@ -214,7 +208,7 @@ function updSource()
 }	    // function updSource
 
 /************************************************************************
- *  gotSource															*
+ *  function gotSource													*
  *																		*
  *  This method is called when the XML file representing				*
  *  an updated source is retrieved from the database.					*

@@ -47,8 +47,9 @@ use \Exception;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2018/12/02      use class Template                              *
  *		                exploit internationalization of Source          *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -110,22 +111,7 @@ if (count($_GET) > 0)
 }	        	    // invoked by URL to display current status of account
 
 // create instance of Template
-$tempBase		    = $document_root . '/templates/';
-$template		    = new FtTemplate("${tempBase}dialog$lang.html");
-$includeSub		    = "Source$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = "Sourceen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-                      'MAIN');
+$template		    = new FtTemplate("Source$lang.html", true);
 
 $template['otherStylesheets']->update(array('filename' => 'Source'));
 // validate parameters

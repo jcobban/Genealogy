@@ -8,9 +8,9 @@
  *		2010/08/23		add onload function								*
  *						select all text in the blog textarea			*
  *		2010/10/29		close window if adding child or spouse to		*
- *						marriage										*
+ *						function marriage								*
  *		2010/12/25		set onclick for blogging here rather than in	*
- *						HTML											*
+ *						function HTML									*
  *		2011/06/24		For editting spouses and children this page is	*
  *						now invoked from editMarriages.php				*
  *		2011/08/12		add buttons so owner of blog message can edit	*
@@ -42,7 +42,7 @@
  *						pass surname and given name of initial			*
  *						individual to choose relative dialog			*
  *		2015/01/23		open descendant and ancestor trees in a new		*
- *						frame											*
+ *						function frame									*
  *		2015/01/26		edit and delete blog onclick not activated		*
  *		2015/02/05		request and pass email address to let non-user	*
  *						post a blog										*
@@ -77,8 +77,9 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2018/11/02      pass authentication key to GoogleApis           *
  *		                ensure lang= parameter not passed to popup      *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -89,7 +90,7 @@
 window.onload	= onLoad;
 
 /************************************************************************
- *  ontarioCountyNames													*
+ *  function ontarioCountyNames											*
  *																		*
  *	The google database of location names does not generally		    *
  *	include the county name, so it is necessary to remove the		    *
@@ -187,14 +188,12 @@ tinyMCE.init({
 });
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Perform initialization functions once the page is loaded.			*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
-
     document.body.onresize	= onWindowResize;
 
     // set action methods for form
@@ -234,10 +233,6 @@ function onLoad()
 		for(var j = 0; j < form.elements.length; j++)
 		{
 		    var element	= form.elements[j];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var	name	= element.name;
 		    if (name.length == 0)
@@ -371,13 +366,13 @@ function onLoad()
 		if (span.id.length > 9 && span.id.substring(0,4) == "show")
 		{
 		    span.onmouseover		= locMouseOver;
-		    span.onmouseout		= locMouseOut;
+		    span.onmouseout		    = locMouseOut;
 		}
 		else
 		if (span.id.length > 10 && span.id.substring(0,10) == 'DeathCause')
 		{
 		    span.onmouseover		= causeMouseOver;
-		    span.onmouseout		= causeMouseOut;
+		    span.onmouseout		    = causeMouseOut;
 		}
     } 
 
@@ -687,7 +682,7 @@ function relationshipCalc()
 }		// relationshipCalc
 
 /************************************************************************
- *  ancestrySearch														*
+ *  function ancestrySearch												*
  *																		*
  *  Perform a search for a matching individual in Ancestry.ca.				*
  *																		*
@@ -1253,7 +1248,7 @@ function srcMouseOver()
  *  This function is called if the mouse is held over a link to a		*
  *  source record on the invoking page for more than 2 seconds.			*
  *  It shows the information  from the associated instance of			*
- *  Source																*
+ *  Source														        *
  ************************************************************************/
 function popupSource()
 {

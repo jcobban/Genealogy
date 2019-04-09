@@ -14,8 +14,11 @@
  *		2015/06/02		use main style for TinyMCE editor				*
  *		2017/10/13		add support to validate regular expression		*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/03/12      only include actual error message in reporting  *
+ *		                bad pattern                                     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -40,29 +43,23 @@ tinyMCE.init({
 
 });
 
-window.onload	= onloadNames;
+window.onload	= onLoad;
 
 /************************************************************************
- *  onLoadNames																*
+ *  function onLoad														*
  *																		*
  *  Initialize elements.												*
  ************************************************************************/
-function onloadNames()
+function onLoad()
 {
-    pageInit();
-
     // activate functionality of form elements
     for (var fi = 0; fi < document.forms.length; fi++)
-    {			// loop through all forms
+    {			    // loop through all forms
 		var	form		= document.forms[fi];
 		var formElts	= form.elements;
 		for (var i = 0; i < formElts.length; ++i)
 		{
 		    var element	= formElts[i];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var	name			= element.name;
 		    if (name.length == 0)
@@ -92,42 +89,44 @@ function onloadNames()
 				    break;
 				}	// Pattern input field
 
-		    }		
-		// act on specific element
-		}		// loop through all elements in the form
-    }			// loop through all forms
+		    }		// act on specific element
+		}		    // loop through all elements in the form
+    }			    // loop through all forms
 
     // activate functionality associated with hyperlinks
     for(var il = 0; il < document.links.length; il++)
-    {			// loop through all links
+    {	    		// loop through all links
 		var link	= document.links[il];
 		actMouseOverHelp(link);
-    }			// loop through all links
+    }			    // loop through all links
 
     // activate functionality of table cells
     var	table	= document.getElementById('namesTable');
     if (table)
-    {		// table defined in page
+    {		        // table defined in page
 		for(var ir = 0; ir < table.rows.length; ir++)
-		{		// loop through all rows of table of names
+		{		    // loop through all rows of table of names
 		    var	row	= table.rows[ir];
 		    for (var ic = 0; ic < row.cells.length; ic++)
-		    {	// loop through all cells of table of names
+		    {	    // loop through all cells of table of names
 				var cell	= row.cells[ic];
 				if (cell)
 				    cell.onclick	= followLink;
-		    }	// loop through all cells of table of names
-		}		// loop through all rows of table of names
-    }		// table defined in page
-}		// onLoadNames
+		    }	    // loop through all cells of table of names
+		}		    // loop through all rows of table of names
+    }		        // table defined in page
+}		// function onLoad
 
 /************************************************************************
- *  followLink																*
+ *  function followLink													*
  *																		*
  *  This is the onclick method for a table cell that contains a <a>		*
- *  element.																*
- *  When this cell is clicked on, it acts as if the mouse was clicking		*
- *  on the contained <a> tag.												*
+ *  element.															*
+ *  When this cell is clicked on, it acts as if the mouse was clicking	*
+ *  on the contained <a> tag.											*
+ *																		*
+ *  Input:																*
+ *		this		HtmlElement         								*
  ************************************************************************/
 function followLink()
 {
@@ -141,16 +140,16 @@ function followLink()
 		}	// anchor node
     }		// loop through all children
     return false;
-}		// follow link
+}		// function followLink
 
 /************************************************************************
- *  postBlog																*
+ *  function postBlog													*
  *																		*
  *  This method is called when the user requests to post				*
  *  a message to the blog of an individual.								*
  *																		*
  *  Input:																*
- *		this				<button id='PostBlog'>								*
+ *		this		<button id='PostBlog'>								*
  ************************************************************************/
 function postBlog(rownum)
 {
@@ -188,13 +187,13 @@ function postBlog(rownum)
 }		// postBlog
 
 /************************************************************************
- *  gotBlog																*
+ *  function gotBlog													*
  *																		*
  *  This method is called when the XML file representing				*
  *  a posted blog is retrieved from the database.						*
  *																		*
  *  Input:																*
- *		xmlDoc				response from web server as XML document		*
+ *		xmlDoc			response from web server as XML document		*
  ************************************************************************/
 function gotBlog(xmlDoc)
 {
@@ -231,38 +230,38 @@ function gotBlog(xmlDoc)
 		popupAlert(msg, messageElt);
  
     location	= location;
-}		// gotBlog
+}		// function gotBlog
 
 /************************************************************************
- *  noBlog																*
+ *  function noBlog														*
  *																		*
- *  This method is called if there is no blog script on the web server.		*
+ *  This method is called if there is no blog script on the web server.	*
  ************************************************************************/
 function noBlog()
 {
     alert('Names.js: noBlog: ' +
 				'script "postBlogXml.php" not found on web server');
-}		// noBlog
+}		// function noBlog
 
 /************************************************************************
- *  noDelBlog																*
+ *  function noDelBlog													*
  *																		*
- *  This method is called if there is no blog script on the web server.		*
+ *  This method is called if there is no blog script on the web server.	*
  ************************************************************************/
 function noDelBlog()
 {
     alert('Names.js: noDelBlog: ' +
 				'script "deleteBlogXml.php" not found on web server');
-}		// noDelBlog
+}		// function noDelBlog
 
 /************************************************************************
- *  changePattern														*
+ *  function changePattern												*
  *																		*
- *  This method is called if the user changes the regular expression		*
- *  pattern.																*
+ *  This method is called if the user changes the regular expression	*
+ *  pattern.															*
  *																		*
  *  Input:																*
- *		this				<button id='Pattern'>								*
+ *		this			<button id='Pattern'>							*
  ************************************************************************/
 function changePattern()
 {
@@ -274,10 +273,10 @@ function changePattern()
 				    gotTestPattern,
 				    noTestPattern);
     }		// invoke script to update Event and return XML result
-}		// changePattern
+}		// function changePattern
 
 /************************************************************************
- *  gotTestPattern														*
+ *  function gotTestPattern												*
  *																		*
  *  This method is called to process the response to testing the		*
  *  name pattern on the web server.										*
@@ -286,14 +285,14 @@ function gotTestPattern(xmlDoc)
 {
     if (xmlDoc === null)
     {
-		alert('Names.js: error');
+		alert('Names.js: error xmlDoc is null');
 		return;
     }
-    var	root		= xmlDoc.documentElement;
+    var	root		    = xmlDoc.documentElement;
     //alert("names.js: root=" + tagToString(root));
-    var	cmd		= '';
+    var	cmd		        = '';
     var	matchingNames	= '';
-    var	comma		= '';
+    var	comma		    = '';
     if (root && root.nodeName == 'test')
     {
 		//alert('count=' + root.attributes.count.value);
@@ -301,7 +300,7 @@ function gotTestPattern(xmlDoc)
 		{		// loop through children
 		    var node	= root.childNodes[i];
 		    if (node.nodeName == 'cmd')
-				cmd	= node.textContent;
+				cmd	    = node.textContent;
 		    else
 		    if (node.nodeName == 'surname')
 		    {
@@ -316,50 +315,62 @@ function gotTestPattern(xmlDoc)
 				}
 		    }
 		}		// loop through children
-		alert('Pattern matches=' + matchingNames);
+        if (matchingNames != '')
+		    alert('Pattern matches=' + matchingNames);
     }
     else
     if (root && root.nodeName == 'msg')
     {
-		alert('Names.js: message=' + root.textContent);
+        var msg     = root.textContent;
+        var pos     = msg.indexOf("[2] => ")
+        if (pos >= 0)
+        {
+            msg     = msg.substring(pos+7);
+        }
+		alert('Names.js: pattern failed validation message=' +
+             msg);
     }
-}		// gotTestPattern
+    else
+    {
+		alert('Names.js: message=' + xmlDoc);
+    }
+}		// function gotTestPattern
 
 /************************************************************************
- *  noTestPattern														*
+ *  function noTestPattern												*
  *																		*
  *  This method is called if there is no name pattern test script		*
- *  on the web server.														*
+ *  on the web server.													*
  ************************************************************************/
 function noTestPattern()
 {
     alert('Names.js: noTestPattern: ' +
 				'script "testNamePatternXml.php" not found on web server');
-}		// noTestPattern
+}		// function noTestPattern
 
 /************************************************************************
- *  editBlog																*
+ *  function editBlog													*
  *																		*
- *  This method is called if the user requests to edit the blog				*
- *  message.																*
+ *  This method is called if the user requests to edit the blog			*
+ *  message.															*
  *																		*
  *  Input:																*
- *		this				<button id='blEdit'>								*
+ *		thi			<button id='blEdit'>								*
  ************************************************************************/
 function editBlog()
 {
     alert('to do: editBlog: ' + this.id.substring(6));
     return false;
-}		// editBlog
+}		// function editBlog
 
 /************************************************************************
- *  delBlog																*
+ *  function delBlog													*
  *																		*
  *  This method is called if the user requests to delete the blog		*
- *  message.																*
+ *  message.															*
  *																		*
  *  Input:																*
- *		this				<button id='blDel'>								*
+ *		this			<button id='blDel'>								*
  ************************************************************************/
 function delBlog()
 {
@@ -373,4 +384,4 @@ function delBlog()
 		      parms,
 		      gotBlog,
 		      noDelBlog);
-}		// delBlog
+}		// function delBlog

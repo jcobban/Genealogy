@@ -3,66 +3,66 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  postBlogXml.php							*
- *									*
- *  PHP script to support posting a blog message using Ajax.		*
- *									*
- *  Parameters:								*
- *	idir	unique numeric identifier of record to post blog for	*
- *	table	name of table containing the relevant record		*
- *	email	email address of sender					*
- *	subject	subject or title of blog post				*
- *	message	text of blog post					*
- *	update	if 'Y' update the specified post instead of adding	*
- *		a post that references the specified post		*
- *									*
- *  History:								*
- *	2010/08/11	Renamed to postBlog.php				*
- *	2010/08/11	Changed to return XML output to permit use	*
- *			through Javascript Ajax.			*
- *	2010/09/25	Check error on $result, not $connection after	*
- *			query/exec					*
- *	2010/10/23	move connection establishment to common.inc	*
- *	2011/12/08	allow users other than master to post blogs	*
- *	2012/01/13	change class names				*
- *	2013/12/07	$msg and $debug initialized by common.inc	*
- *	2014/03/25	broaden support to any table with numeric key	*
- *			use class Blog					*
- *			rename to PostBlogXml.php			*
- *	2014/03/31	anyone can post to the Users table		*
- *	2015/07/02	access PHP includes using include_path		*
- *	2015/07/26	accept 'emailaddress' as a parameter		*
- *			include text entered by a guest as the default	*
- *			body of the e-mail used to respond, and the	*
- *			first line of that text as the subject of the	*
- *			email						*
- *	2016/01/19	add id to debug trace				*
- *	2018/09/07	do not report error for empty tablename		*
- *	2018/09/12	add support for subject				*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  postBlogXml.php														*
+ *																		*
+ *  PHP script to support posting a blog message using Ajax.			*
+ *																		*
+ *  Parameters:															*
+ *		idir		unique numeric identifier of record to post blog for*
+ *		table		name of table containing the relevant record		*
+ *		email		email address of sender								*
+ *		subject		subject or title of blog post						*
+ *		message		text of blog post									*
+ *		update		if 'Y' update the specified post instead of adding	*
+ *				a post that references the specified post				*
+ *																		*
+ *  History:															*
+ *		2010/08/11		Renamed to postBlog.php							*
+ *		2010/08/11		Changed to return XML output to permit use		*
+ *						through Javascript Ajax.						*
+ *		2010/09/25		Check error on $result, not $connection after	*
+ *						query/exec										*
+ *		2010/10/23		move connection establishment to common.inc		*
+ *		2011/12/08		allow users other than master to post blogs		*
+ *		2012/01/13		change class names								*
+ *		2013/12/07		$msg and $debug initialized by common.inc		*
+ *		2014/03/25		broaden support to any table with numeric key	*
+ *						use class Blog									*
+ *						rename to PostBlogXml.php						*
+ *		2014/03/31		anyone can post to the Users table				*
+ *		2015/07/02		access PHP includes using include_path			*
+ *		2015/07/26		accept 'emailaddress' as a parameter			*
+ *						include text entered by a guest as the default	*
+ *						body of the e-mail used to respond, and the		*
+ *						first line of that text as the subject of the	*
+ *						email											*
+ *		2016/01/19		add id to debug trace							*
+ *		2018/09/07		do not report error for empty tablename			*
+ *		2018/09/12		add support for subject							*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
+header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Blog.inc";
 require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    // emit the XML header
-    header("Content-Type: text/xml");
-    print("<?xml version='1.0' encoding='UTF-8'?>\n");
-    print "<blog>\n";
-    print "    <parms>\n";
+// emit the XML header
+print("<?xml version='1.0' encoding='UTF-8'?>\n");
+print "<blog>\n";
+print "    <parms>\n";
 
-    $idir		= null;
-    $table		= 'tblIR';
-    $subject		= null;
-    $message		= '';
-    $email		= '';
-    $information	= null;
-    $keyname		= null;
-    $update		= false;
+$idir		= null;
+$table		= 'tblIR';
+$subject		= null;
+$message		= '';
+$email		= '';
+$information	= null;
+$keyname		= null;
+$update		= false;
 
-    foreach($_POST as $key => $value)
-    {	
+foreach($_POST as $key => $value)
+{	
 	print "\t<$key>" . xmlentities($value) . "</$key>\n";
 
 	switch(strtolower($key))
@@ -290,25 +290,25 @@ require_once __NAMESPACE__ . '/common.inc';
 			break;
 	    }		// email address of sender
 	}		// act on specific parameters
-    }
-    print "    </parms>\n";
+}
+print "    </parms>\n";
 
-    if (is_null($information) && is_string($table))
-    {
+if (is_null($information) && is_string($table))
+{
 	$information	= Record::getInformation($table);
-    }
-    if ($keyname)
+}
+if ($keyname)
 	$keyname	= strtoupper($keyname);
-    else
-    if ($information)
+else
+if ($information)
 	$keyname	= strtoupper($information['prime']);
-    else
+else
 	$keyname	= 'Unknown';
  
-    if (is_null($idir))
+if (is_null($idir))
 	$msg	.= "Missing mandatory record identifier '$keyname'. ";
-    if (strlen($userid) == 0)
-    {			// not signed in
+if (strlen($userid) == 0)
+{			// not signed in
 	if (strlen($email) == 0)
 	    $msg	.= 'Posting user did not self identify. ';
 	else
@@ -319,12 +319,12 @@ require_once __NAMESPACE__ . '/common.inc';
 	    else
 			$username	= $email;
 	}
-    }			// not signed in
-    else
+}			// not signed in
+else
 	$username	= $userid;
 
-    if (strlen($msg) == 0)
-    {			// no errors detected
+if (strlen($msg) == 0)
+{			// no errors detected
 	if (strlen($subject) == 0)
 	{
 	    $nlpos		= strpos($message, "\n");
@@ -380,15 +380,15 @@ require_once __NAMESPACE__ . '/common.inc';
 			}
 	    }
 	}
-    }		// no errors detected
-    else
-    {		// errors in parameters
+}		// no errors detected
+else
+{		// errors in parameters
 	print "    <msg>\n";
 	print xmlentities($msg);
 	print "    </msg>\n";
-    }		// errors in parameters
+}		// errors in parameters
 
-    showTrace();
+showTrace();
 
-    // close root node of XML output
-    print "</blog>\n";
+// close root node of XML output
+print "</blog>\n";

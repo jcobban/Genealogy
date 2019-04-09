@@ -3,23 +3,24 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  CensusProofUpdate.php						*
- *									*
+ *  CensusProofUpdate.php												*
+ *																		*
  *  Simulate the update of a page of a census for the case where the	*
  *  current user is not the original transcriber of the page and the	*
  *  values of the updated fields are written to the FieldComments table.*
- *									*
- *  History:								*
- *	2011/07/02	created						*
- *	2012/01/24	use default.js for initialization		*
- *	2013/11/26	handle database server failure gracefully	*
- *	2013/11/29	let common.inc set initial value of $debug	*
- *	2014/04/26	remove formUtil.inc obsolete			*
- *	2015/05/09	simplify and standardize <h1>			*
- *	2015/07/02	access PHP includes using include_path		*
- *	2017/11/24	use prepared statement for insert		*
- *									*
- *  Copyright &copy; 2017 James A. Cobban				*
+ *																		*
+ *  History:															*
+ *		2011/07/02		created											*
+ *		2012/01/24		use default.js for initialization				*
+ *		2013/11/26		handle database server failure gracefully		*
+ *		2013/11/29		let common.inc set initial value of $debug		*
+ *		2014/04/26		remove formUtil.inc obsolete					*
+ *		2015/05/09		simplify and standardize <h1>					*
+ *		2015/07/02		access PHP includes using include_path			*
+ *		2017/11/24		use prepared statement for insert				*
+ *		2019/02/19      use new FtTemplate constructor                  *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FieldComment.inc';
 require_once __NAMESPACE__ . '/common.inc';
@@ -177,32 +178,28 @@ if (!canUser('edit'))
 		Sign in and then refresh this page to apply the changes.";
 }
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "CensusUpdate$lang.html";
-if (!file_exists($tempBase . $includeSub))
-    $includeSub		= 'CensusFormen.html';
-$template->includeSub($tempBase . $includeSub,
-			'MAIN');
+$template		= new FtTemplate("CensusUpdate$lang.html");
+
 $template->set('CENSUSYEAR', 		$censusYear);
-$template->set('CC',			$cc);
+$template->set('CC',			    $cc);
 $template->set('COUNTRYNAME',		$countryName);
-$template->set('CENSUSID',		$censusId);
-$template->set('PROVINCE',		$province);
+$template->set('CENSUSID',		    $censusId);
+$template->set('PROVINCE',		    $province);
 $template->set('PROVINCENAME',		$provinceName);
-$template->set('LANG',			$lang);
-$template->set('DISTRICT',		$distID);
+$template->set('LANG',			    $lang);
+$template->set('DISTRICT',		    $distID);
 $template->set('DISTRICTNAME',		$districtName);
 $template->set('SUBDISTRICT',		$subDistID);
 $template->set('SUBDISTRICTNAME',	$subDistrictName);
-$template->set('DIVISION',		$division);
-$template->set('PAGE',			$page);
-$template->set('PREVPAGE',		$page - $bypage);
-$template->set('NEXTPAGE',		$page + $bypage);
-$template->set('CENSUS',		$censusYear);
+$template->set('DIVISION',		    $division);
+$template->set('PAGE',			    $page);
+$template->set('PREVPAGE',		    $page - $bypage);
+$template->set('NEXTPAGE',		    $page + $bypage);
+$template->set('CENSUS',		    $censusYear);
 $template->set('CONTACTTABLE',		'Census' . $censusYear);
-$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
-$template->set('IMAGE',	$image);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('IMAGE',	            $image);
+
 if (strlen($province) == 0)
 {
     $template->updateTag('frontProv', null);

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML >
 <html>
-  <head>
+  <head lang="en">
     <title>
 	$TITLE
     </title>
@@ -11,6 +11,7 @@
  *									                                    *
  *  History:								                            *
  *	    2018/02/08	    update header/footer links			            *
+ *      2019/02/08      remove breadcrumbs from footer                  *
  *									                                    *
  *  Copyright &copy; 2018 James A. Cobban				                *
  **********************************************************************-->
@@ -24,35 +25,44 @@
             id="otherStylesheets">
   </head>
   <body>
-  <main>
-    <noscript>
-      <p class="warning">
-     For full functionality of this site it is necessary to enable JavaScript.
-     Here are the <a href="https://www.enable-javascript.com/" target="_blank">
-     instructions how to enable JavaScript in your web browser</a>.
-      </p>
-    </noscript>
-$MAIN
-  </main>
-  <footer>
-    <div class='botcrumbs'>
-      <span class='right450'>
-	<iframe id='facebookFrame' class='facebook' $IECRAP>
-	</iframe>
-	&nbsp;
-	<img src='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
-      </span>
-	<a href='/contactAuthor.php?idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
-	  Contact Author</a>
-	<br>
-    $BREADCRUMBS
-      <div style='clear: both;'></div>
-    </div> <!-- end of page footer -->
-  </footer>
+    <main id="mainSection">
+      <noscript>
+        <p class="warning">
+       For full functionality of this site it is necessary to enable JavaScript.
+       Here are the <a href="https://www.enable-javascript.com/" target="_blank">
+       instructions how to enable JavaScript in your web browser</a>.
+        </p>
+      </noscript>
+  $MAIN
+    </main>
+    <footer id="footSection">
+      <div class='botcrumbs'>
+        <span class='right450'>
+  	    <iframe id='facebookFrame' class='facebook' $IECRAP>
+  	    </iframe>
+  	    &nbsp;
+  	    <img src='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+        </span>
+  	  <a href='/contactAuthor.php?idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
+  	    Contact Author</a>
+        <div style='clear: both;'></div>
+      </div> <!-- end of page footer -->
+    </footer>
     <div class='hidden' id='UserInfo'>
       <span id='UserInfoUserid'>$USERID</span>
       <span id='UserInfoAuthorized'>$AUTHORIZED</span>
       <span id='UserInfoOptions'>$OPTIONS</span>
+      <span id='UserInfoSignon'>Anmelden</span>
+      <span id='UserInfoAccount'>
+          <a href="/Account.php?lang=$LANG" id="session" target="_blank"
+              title="Your account status">
+              Account $USERID
+            <span id="gotMail">
+                <img src="/envelope.svg" alt="You have mail" style="display: inline; height: 19px;"/>
+            </span>
+          </a><br>
+      </span>
+      <span id='UserInfoAbout'>About this Site</span>
     </div>
     <div class='balloon' id='msgDiv'>
     </div>

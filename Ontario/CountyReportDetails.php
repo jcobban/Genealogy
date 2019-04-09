@@ -209,114 +209,114 @@ else
 
 $title	= "$countryName: $province: $by Marriage Report Update";
 htmlHeader($title,
-							       array(	'/jscripts/CommonForm.js',
-									'/jscripts/js20/http.js',
-									'/jscripts/util.js',
-									'/tinymce/jscripts/tiny_mce/tiny_mce.js',
-									'CountyReportDetails.js'));
+	       array(	'/jscripts/CommonForm.js',
+					'/jscripts/js20/http.js',
+					'/jscripts/util.js',
+					'/tinymce/jscripts/tiny_mce/tiny_mce.js',
+					'CountyReportDetails.js'));
 ?>
-<body>
+  <body>
 <?php
-pageTop(array(	'/genealogy.php'	=> 'Genealogy',
-								'/genCountry.php?cc=CA'	=> 'Canada',
-								'/Canada/genProvince.php?Domain=CAON'
+pageTop(array(	'/genealogy.php'	        => 'Genealogy',
+				'/genCountry.php?cc=CA'	    => 'Canada',
+				'/Canada/genProvince.php?Domain=CAON'
 											=> 'Ontario',
-								"/Ontario/CountyMarriageEditQuery.php"
+				"/Ontario/CountyMarriageEditQuery.php"
 											=> $by . ' Marriage Query',
-								"/Ontario/CountyMarriageVolumeSummary.php?Domain=$domain"
+				"/Ontario/CountyMarriageVolumeSummary.php?Domain=$domain"
 											=> 'Volume Summary',
-								"CountyMarriageReportEdit.php?Domain=$domain&Volume=$volume"
+				"CountyMarriageReportEdit.php?Domain=$domain&Volume=$volume"
 											=> "Volume"));
 ?>
-<div class='body'>
-  <h1>
-<span class='right'>
-							<a href='CountyReportDetailsHelpen.html' target='help'>? Help</a>
-</span>
-							<?php print $title; ?>
-<div style='clear: both;'></div>
-  </h1>
+    <div class='body'>
+      <h1>
+        <span class='right'>
+    		<a href='CountyReportDetailsHelpen.html' target='help'>? Help</a>
+        </span>
+		<?php print $title; ?>
+        <div style='clear: both;'></div>
+      </h1>
 <?php
 showTrace();
 
 if (strlen($msg) == 0)
 {
-							// notify the invoker if they are not authorized
-							if (!canUser('edit'))
-							{
+	// notify the invoker if they are not authorized
+	if (!canUser('edit'))
+	{
 ?>
   <p class='warning'>
-							You are not authorized.
-							<a href='/Signon.php' target='_blank'>
-							<span class='button'>Sign on</span></a>
-							to update the database.
+		You are not authorized.
+		<a href='/Signon.php' target='_blank'>
+		<span class='button'>Sign on</span></a>
+		to update the database.
   </p>
 <?php
-							    $readonly		= "readonly='readonly'";
-							    $disabled		= "disabled='disabled'";
-							    $codeclass		= 'ina code';
-							    $textclass		= 'ina left';
-							    $textclassnc	= 'ina leftnc';
-							    $numclass		= 'ina right';
-							}		// not authorized to update database
-							else
-							{		// authorized to update database
-							    $readonly		= '';
-							    $disabled		= '';
-							    $codeclass		= 'white code';
-							    $textclass		= 'white left';
-							    $textclassnc	= 'white leftnc';
-							    $numclass		= 'white rightnc';
-							}		// authorized to update database
+        $readonly		= "readonly='readonly'";
+        $disabled		= "disabled='disabled'";
+        $codeclass		= 'ina code';
+        $textclass		= 'ina left';
+        $textclassnc	= 'ina leftnc';
+        $numclass		= 'ina right';
+    }		// not authorized to update database
+    else
+    {		// authorized to update database
+        $readonly		= '';
+        $disabled		= '';
+        $codeclass		= 'white code';
+        $textclass		= 'white left';
+        $textclassnc	= 'white leftnc';
+        $numclass		= 'white rightnc';
+    }		// authorized to update database
 
 ?>
-  <!--- Put out a line with links to previous and next section of table -->
-  <div class='center'>
+      <!--- Put out a line with links to previous and next section of table -->
+      <div class='center'>
 <?php
-							    if ($reportNo > 1)
-							    {
+if ($reportNo > 1)
+    {
 ?>
-<span class='left'>
-  <a href='CountyReportDetails.php?Domain=<?php print $domain; ?>&Volume=<?php print $volume; ?>&ReportNo=<?php print $reportNo - 1; ?>'>&lt;---&nbsp;Report&nbsp;<?php print $reportNo - 1; ?></a>
-</span>
+        <span class='left'>
+          <a href='CountyReportDetails.php?Domain=<?php print $domain; ?>&Volume=<?php print $volume; ?>&ReportNo=<?php print $reportNo - 1; ?>'>&lt;---&nbsp;Report&nbsp;<?php print $reportNo - 1; ?></a>
+        </span>
 <?php
-							    }
+    }
 ?>
-<span class='right'>
-  <a href='CountyReportDetails.php?Domain=<?php print $domain; ?>&Volume=<?php print $volume; ?>&ReportNo=<?php print $reportNo + 1; ?>'>Report&nbsp;<?php print $reportNo + 1; ?>&nbsp;---&gt;</a>
-</span>
+        <span class='right'>
+          <a href='CountyReportDetails.php?Domain=<?php print $domain; ?>&Volume=<?php print $volume; ?>&ReportNo=<?php print $reportNo + 1; ?>'>Report&nbsp;<?php print $reportNo + 1; ?>&nbsp;---&gt;</a>
+        </span>
 Volume <?php print $volume; ?> Report <?php print $reportNo; ?>
-  </div>
+      </div>
 <?php
 ?>
-<!--- Put out the response as a table -->
-<form name='reportForm'
-							action='CountyReportDetails.php' 
-							method='post' 
-							autocomplete='off' 
-							enctype='multipart/form-data'>
+    <!--- Put out the response as a table -->
+    <form name='reportForm'
+		action='CountyReportDetails.php' 
+		method='post' 
+		autocomplete='off' 
+		enctype='multipart/form-data'>
 <?php
-							if ($debug)
-							{
+if ($debug)
+{
 ?>
-  <input type='hidden' name='Debug' value='Y'>
+      <input type='hidden' name='Debug' value='Y'>
 <?php
-							}		// debug enabled
+}		// debug enabled
 
 // get contents of record
-$domain	= $report->get('domain');
-$volume	= $report->get('volume');
+$domain	    = $report->get('domain');
+$volume	    = $report->get('volume');
 $reportNo	= $report->get('reportno');
 if ($reportNo == floor($reportNo))
-							$reportNo	= intval($reportNo);
-$page	= $report->get('page'); 
-$image	= trim($report->get('image'));
+	$reportNo	= intval($reportNo);
+$page	    = $report->get('page'); 
+$image	    = trim($report->get('image'));
 $givennames	= $report->get('givennames');
 $surname	= $report->get('surname');
-$faith	= $report->get('faith');
+$faith	    = $report->get('faith');
 $residence	= $report->get('residence');
-$image	= $report->get('image');
-$idir	= $report->get('idir');
+$image	    = $report->get('image');
+$idir	    = $report->get('idir');
 $remarks	= $report->get('remarks');
 if (canUser('edit'))
 {
@@ -523,10 +523,6 @@ Click on this button to add another county into the list.
 <div class='balloon' id='HelpSubmit'>
 Click on this button to update the database to include the changes you
 have made to the counties list for the current province.
-</div>
-<div class='balloon' id='HelprightTop'>
-Click on this button to signon to access extended features of the web-site
-or to manage your account with the web-site.
 </div>
 <div class='hidden' id='templates'>
 </div>

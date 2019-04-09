@@ -3,32 +3,32 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  deleteBlogXml.php							*
- *									*
- *  PHP script to support deleting a blog entry using Ajax.		*
- *									*
- *  Parameters:								*
- *	blid	unique numeric identifier of blog message to delete	*
- *									*
- *  History:								*
- *	2011/08/12	created						*
- *	2012/01/13	change class names				*
- *	2013/12/07	$msg and $debug initialized by common.inc	*
- *	2014/03/25	use class Blog					*
- *	2014/03/30	validate that only sender or receiver of a	*
- *			blog can delete it				*
- *	2015/07/02	access PHP includes using include_path		*
- *	2015/12/30	fix conflict with autoload			*
- *	2017/09/12	use get( and set(				*
- *									*
- *  Copyright &copy; 2017 James A. Cobban				*
+ *  deleteBlogXml.php													*
+ *																		*
+ *  PHP script to support deleting a blog entry using Ajax.				*
+ *																		*
+ *  Parameters:															*
+ *		blid		unique numeric identifier of blog message to delete	*
+ *																		*
+ *  History:															*
+ *		2011/08/12		created											*
+ *		2012/01/13		change class names								*
+ *		2013/12/07		$msg and $debug initialized by common.inc		*
+ *		2014/03/25		use class Blog									*
+ *		2014/03/30		validate that only sender or receiver of a		*
+ *						blog can delete it								*
+ *		2015/07/02		access PHP includes using include_path			*
+ *		2015/12/30		fix conflict with autoload						*
+ *		2017/09/12		use get( and set(								*
+ *																		*
+ *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
+    header("Content-Type: text/xml");
     require_once __NAMESPACE__ . "/Blog.inc";
     require_once __NAMESPACE__ . "/User.inc";
     require_once __NAMESPACE__ . '/common.inc';
 
     // emit the XML header
-    header("Content-Type: text/xml");
     print("<?xml version='1.0' encoding='UTF-8'?>\n");
     print "<blog>\n";
     print "    <parms>\n";

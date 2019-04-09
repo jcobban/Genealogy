@@ -16,6 +16,8 @@ use \Iterator;
  *		2017/12/10		created											*
  *		2019/01/03      replace call to static Surname::getNextSurname  *
  *		                with new Surname(">=$surname")                  *
+ *		2019/03/29      make given name search slightly looser by       *
+ *		                ignoring the last character in longer names     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -758,7 +760,12 @@ class PersonSet extends RecordSet
 						    $this->sqlParms[]		= $surname;
 						    $conj		= '';
 						    foreach($givennames as $givenname)
-						    {
+                            {
+                                $glen               = strlen($givenname);
+                                if ($glen > 3)
+                                    $givenname      = substr($givenname,
+                                                             0, 
+                                                             $glen - 1);
 								$where		.= "$conj tblNX.GivenName>=?";
 								$this->sqlParms[]	= $givenname;
 								$conj		= ' OR ';
@@ -917,8 +924,7 @@ class PersonSet extends RecordSet
 
 		if (strlen($message) > 0)
 		    throw new Exception("PersonSet::getWhere: " .
-								$message);
-showTrace();
+            $message);
 		return $where;
     }		// PersonSet::getWhere
 

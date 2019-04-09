@@ -33,6 +33,7 @@ use \Exception;
  *						format count of events							*
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -40,138 +41,126 @@ require_once __NAMESPACE__ . "/Location.inc";
 require_once __NAMESPACE__ . "/Person.inc";
 require_once __NAMESPACE__ . "/RecordSet.inc";
 require_once __NAMESPACE__ . "/PersonSet.inc";
+require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    // determine if permitted to update records
-    if (!canUser('edit'))
-    {		// take no action
-		$msg	.= 'User not authorized to delete location. ';
-    }		// take no action
+// determine if permitted to update records
+if (!canUser('edit'))
+{		        // take no action
+	$msg	        .= 'User not authorized to delete location. ';
+}		        // take no action
 
-    // validate parameters
-    if (array_key_exists('idlr', $_POST))
-		$idlr	= $_POST['idlr'];
+// validate parameters
+$idlr               = null;
+$lang               = 'en';
+
+if (isset($_POST) && count($_POST) > 0)
+{		            // parameters passed by method=post
+    $parmsText      = "<p class='label'>\$_POST</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_POST as $key => $value)
+    {		        // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{	        // act on specific key
+
+		    case 'lang':
+		    {
+				if (strlen($value) == 2)
+				    $lang	= strtolower($value);
+				break;
+		    }	    // presentation language
+
+		    case 'idlr':
+            {
+                if (is_int($value) && $value > 0)
+                {
+                    $idlr	= $value;
+                }
+				else
+                if (is_string($value) &&
+                    strlen($value) > 0 && 
+                    ctype_digit($value))
+                {
+                    $idlr	= intval($value);
+                }
+				else
+				{	// invalid format
+				    $name	= "Invalid Value of idlr='$value'";
+				    $msg	.= $name . '. ';
+				}	// invalid format
+				break;
+		    }	    // idlr
+		}	        // act on specific key
+    }		        // loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}		        // parameters passed by method=post
+
+$template       = new FtTemplate("deleteLocation$lang.html");
+
+if (is_null($idlr))
+{
+    $msg	    .= 'Missing mandatory parameter idlr. ';
+    $name       = 'IDLR not Specified';
+    $namePref   = 'IDLR';
+}
+
+if (strlen($msg) == 0)
+{		        // no problems encountered
+    $location	= new Location(array('IDLR' => $idlr));
+    $name	    = $location->getName();
+    $namePref	= substr($name, 0, 5); 
+
+	// search for matches in tblIR
+	$indParms	    = array(array('idlrbirth' => $idlr,
+	    					      'idlrchris' => $idlr,
+	       					      'idlrdeath' => $idlr,
+		    				      'idlrburied' => $idlr),
+			    			'order'		=> 'Surname, GivenName, BirthSD, DeathSD');
+	
+	$persons	    = new PersonSet($indParms,
+	       							'Surname, GivenName, BirthSD, DeathSD');
+	$info	    	= $persons->getInformation();
+	$count	    	= $info['count'];
+	
+	// search for matches in tblMR
+	$famParms	    = array('idlrmar'   => $idlr,
+	    					'order'		=> 'Surname, GivenName, BirthSD, DeathSD');
+	
+	$families	    = new RecordSet('Families', $famParms);
+	$info		    = $families->getInformation();
+	$count		    += $info['count'];
+	
+	// check for references to this location from events
+	$getParms	    = array('idlrevent' => $idlr);
+	$events		    = new RecordSet('Events', $getParms);
+	$info		    = $events->getInformation();
+	$count		    += $info['count'];
+	
+    if ($count == 0)
+    {
+        $result		= $location->delete(false);
+        $template['referenced']->update(null);
+        if ($result == 0)
+            $template['deleted']->update(null);
+    }
     else
     {
-		$msg	.= 'Missing mandatory parameter idlr. ';
-		$idlr	= null;
+        $template['deleted']->update(null);
+        $template->set('COUNT',     $count);
     }
+}		        // no problems encountered
+else
+{
+    $template['referenced']->update(null);
+    $template['deleted']->update(null);
+}
 
-    if (strlen($msg) == 0)
-    {		// no problems encountered
-		try
-		{
-		    $location	= new Location(array('IDLR' => $idlr));
-		    $name	= $location->getName();
-		    $namePref	= substr($name, 0, 5); 
-		}
-		catch (Exception $e)
-		{	// not found
-		    $location	= null;
-		    $name	= 'Not Found';
-		    $namePref	= '';
-		    $msg	.= "Create location failed for IDLR=$idlr. " .
-						$e->getMessage();
-		}	// not found
-
-		// search for matches in tblIR
-		$indParms	= array(array('idlrbirth' => $idlr,
-							      'idlrchris' => $idlr,
-							      'idlrdeath' => $idlr,
-							      'idlrburied' => $idlr),
-							'order'		=> 'Surname, GivenName, BirthSD, DeathSD');
-
-		$persons	= new PersonSet($indParms,
-								'Surname, GivenName, BirthSD, DeathSD');
-		$info		= $persons->getInformation();
-		$count		= $info['count'];
-
-		// check for references to this location from events
-		$getParms	= array('idlrevent' => $idlr);
-		$events		= new RecordSet('Events', $getParms);
-		$info		= $events->getInformation();
-		$count		+= $info['count'];
-		if ($count > 0)
-		    $msg	.= "Location not deleted because " .
-						   number_format($count) .
-						   " events reference it. ";
-    }		// no problems encountered
-    else
-    {		// error
-		$location	= null;
-		$name		= 'Error';
-		$namePref	= '';
-    }		// error
-
-    $title	= "Delete Location: $name";
-    htmlHeader($title,
-				array("/jscripts/default.js"));
-?>
-<body>
-<?php
-    pageTop(array('/genealogy.php'		=> 'Genealogy',
-				  '/genCountry.php?cc=CA'	=> 'Canada',
-				  '/Canada/genProvince.php?Domain=CAON'
-									=> 'Ontario',
-				  '/FamilyTree/Services.php'	=> 'Services',
-				  "/FamilyTree/Locations.php?pattern=$namePref"
-									=> 'Locations'));
-?>
-  <div class="body">
-    <h1>
-      <span class="right">
-		<a href="deleteLocationHelpen.html" target="help">? Help</a>
-      </span>
-		<?php print $title; ?>
-      <div style="clear: both;"></div>
-    </h1>
-<?php
-    showTrace();
-
-    if (strlen($msg) > 0)
-    {
-?>
-    <p class="message">
-		<?php print $msg; ?> 
-    </p>
-<?php
-    }
-    else
-    {
-		if ($debug)
-		    $deleteParm	= "<p>";
-		else
-		    $deleteParm	= false;
-		$result		= $location->delete($deleteParm);
-
-		if ($result == 1)
-		{		// exactly one location deleted
-?>
-		<p class="label">Location "<?php print $name; ?>" deleted</p>
-<?php
-		}		// exactly one location deleted
-		else
-		if ($result == 0)
-		{		// no locations deleted
-?>
-		<p class="warning">Location "<?php print $name; ?>" not deleted</p>
-<?php
-		}		// no locations deleted
-		else
-		{		// more than one location deleted
-?>
-		<p class="warning"><?php $result; ?> locations deleted</p>
-<?php
-		}		// more than one location deleted
-    }
-
-?>
-</div>
-<?php
-    if (is_null($idlr))
-		pageBot($title);
-    else
-		pageBot($title . " IDLR=$idlr");
-?>
-</body>
-</html>
+$template->set('NAME',          $name);
+$template->set('NAMEPREF',      $namePref);
+$template->set('IDLR',          $idlr);
+$template->display();

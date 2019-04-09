@@ -140,7 +140,7 @@ class CountySet extends RecordSet
 						$this->domain		= $value->get('domain');
 				    }
 				    else
-				    if (is_string($value) && strlen($value) > 0)
+				    if (is_string($value) && strlen($value) >= 4)
 				    {
 						$this->domain		= $value;
 				    }
@@ -253,7 +253,7 @@ class CountySet extends RecordSet
 		{			// domain id supplied
 		    $this->domainObj	=
 						new Domain(array('domain'	=> $this->domain,
-								 'language'	=> 'en'));
+								         'language'	=> 'en'));
 		}
 		if (!is_null($this->domainObj))
 		{

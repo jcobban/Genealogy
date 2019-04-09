@@ -72,10 +72,6 @@ The registration number within the year.
 <div class='balloon' id='HelpDelete'>
 Clicking on this button performs the delete.
 </div>
-<div class='balloon' id='HelprightTop'>
-Click on this button to signon to access extended features of the web-site
-or to manage your account with the web-site.
-</div>
 <div class='popup' id='loading'>
 Loading...
 </div>

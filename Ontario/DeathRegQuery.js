@@ -6,14 +6,14 @@
  *																		*
  *  History:															*
  *		2011/06/17		set initial input focus on registration year	*
- *						field											*
+ *						function field									*
  *						change name of onload handler					*
  *						clean up comments								*
  *		2011/11/06		support mousover help							*
  *						support button for displaying transcription		*
- *						status											*
+ *						function status									*
  *		2012/05/06		replace calls to getEltId with calls to			*
- *						getElementById									*
+ *						function getElementById							*
  *		2012/05/09		invoke scripts to obtain database information	*
  *						rather than loading static files				*
  *						show loading indicator							*
@@ -22,50 +22,39 @@
  *		2014/08/29		change name of row limit to Limit				*
  *		2017/12/30		TownshipsListXml.php moved to folder Canada		*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/01/19      support lang= parameter in URL                  *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoadPage;
 
 /************************************************************************
- *  onLoadPage																*
+ *  function onLoadPage													*
  *																		*
- *  Obtain the list of counties in the province as an XML file.				*
+ *  Initialize the dynamic functionality of the page including all      *
+ *  event handlers for elements of the page.                            *
+ *  Obtain the list of counties in the province as an XML file.			*
  ************************************************************************/
 function onLoadPage()
 {
-    pageInit();
-
     var	form	= document.distForm;
 
     // activate handling of key strokes in text input fields
     // including support for context specific help
     for(var i = 0; i < document.forms.length; i++)
-    {		// loop through all forms
+    {		        // loop through all forms
 		var form	= document.forms[i];
 		form.onsubmit 	= validateForm;
 		form.onreset 	= resetForm;
 
 		for(var j = 0; j < form.elements.length; j++)
-		{	// loop through all elements of a form
+		{	        // loop through all elements of a form
 		    var element		= form.elements[j];
 
 		    element.onkeydown	= keyDown;
 		    element.onchange	= change;	// default handling
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    if (element.parentNode.nodeName == 'TD')
-		    {		// set mouseover on containing cell
-			element.parentNode.onmouseover	= eltMouseOver;
-			element.parentNode.onmouseout	= eltMouseOut;
-		    }		// set mouseover on containing cell
-		    else
-		    {		// set mouseover on input element itself
-			element.onmouseover		= eltMouseOver;
-			element.onmouseout		= eltMouseOut;
-		    }		// set mouseover on input element itself
 
 		    // an element whose value is passed with the update
 		    // request to the server is identified by a name= attribute
@@ -73,56 +62,56 @@ function onLoadPage()
 		    // identified by an id= attribute
 		    var	name	= element.name;
 		    if (name.length == 0)
-			name	= element.id;
+				name	= element.id;
 
 		    // set up dynamic functionality based on the name of the element
 		    switch(name)
 		    {
-			case 'RegYear':
-			{	// year of registration
-			    // put the initial focus in the registration year field
-			    element.focus();
-			    break;
-			}	// year of registration
+				case 'RegYear':
+				{	// year of registration
+				    // put the initial focus in the registration year field
+				    element.focus();
+				    break;
+				}	// year of registration
 
-			case "ShowStatus":
-			{
-			    element.onclick	= showStatus;
-			    break;
-			}
+				case "ShowStatus":
+				{
+				    element.onclick	= showStatus;
+				    break;
+				}
 
-			case "RegCounty":
-			{
-			    popupLoading(element);
-			    // get the counties information file
-			    HTTP.getXML("/Canada/CountiesListXml.php?Prov=ON",
-					gotCountiesFile,
-					noCountiesFile);
-			    break;
-			}
+				case "RegCounty":
+				{
+				    popupLoading(element);
+				    // get the counties information file
+				    HTTP.getXML("/Canada/CountiesListXml.php?Prov=ON",
+							    gotCountiesFile,
+							    noCountiesFile);
+				    break;
+				}
 
 		    }	// switch on field name
-		}	// loop through all elements in the form
-    }		// loop through forms in the page
-}		// onLoadPage
+		}	    // loop through all elements in the form
+    }		    // loop through forms in the page
+}		// function onLoadPage
 
 /************************************************************************
- *  validate Form														*
+ *  function validateForm												*
  *																		*
- *  Ensure that the data entered by the user has been minimally				*
+ *  Ensure that the data entered by the user has been minimally			*
  *  validated before submitting the form.								*
  *																		*
  *  Input:																*
- *		this		<form>														*
+ *		this		<form>												*
  ************************************************************************/
 function validateForm()
 {
-    var	form	= this;
-    var yearPat	= /^\d{4}$/;
-    var numPat	= /^\d{1,6}$/;
-    var countPat= /^\d{1,2}$/;
+    var	form	    = this;
+    var yearPat	    = /^\d{4}$/;
+    var numPat	    = /^\d{1,6}$/;
+    var countPat    = /^\d{1,2}$/;
 
-    var	msg	= "";
+    var	msg	        = "";
     if ((form.RegYear.value.length > 0) && 
 		form.RegYear.value.search(yearPat) == -1)
 		msg	= "Year is not 4 digit number. ";
@@ -142,27 +131,30 @@ function validateForm()
 }		// validateForm
 
 /************************************************************************
- *  resetForm																*
+ *  function resetForm													*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
  *  This is required because the browser does not call the				*
- *  onchange method for form elements that have one.						*
+ *  onchange method for form elements that have one.					*
+ *																		*
+ *  Parameters:															*
+ *		this        <form>                                              *
  ************************************************************************/
 function resetForm()
 {
-    changeCounty();	// repopulate Township selection
-    return true;
-}	// resetForm
+    changeCounty();	        // repopulate Township selection
+    return true;            // continue with default action
+}	// function resetForm
 
 /************************************************************************
- *  gotCountiesFile														*
+ *  function gotCountiesFile											*
  *																		*
  *  This method is called when the counties file						*
  *  is retrieved.  It populates the selection statement.				*
  *																		*
- *  Parameters:																*
- *		xmlDoc		the counties table as an XML document						*
+ *  Parameters:															*
+ *		xmlDoc		the counties table as an XML document				*
  ************************************************************************/
 function gotCountiesFile(xmlDoc)
 {
@@ -193,22 +185,23 @@ function gotCountiesFile(xmlDoc)
 
 		// create a new HTML Option object and add it to the Select
 		var	newOption	= addOption(countySelect,
-						    text,
-						    value);
+							    text,
+							    value);
     }			// loop through source "option" nodes
 
     // specify the action for selecting a county
     countySelect.onchange	= changeCounty;
     countySelect.onchange();	// invoke it for the first time
     countySelect.selectedIndex	= 0;
-}		// gotCountiesFile
+}		// function gotCountiesFile
 
 /************************************************************************
- *  noCountiesFile														*
+ *  function noCountiesFile												*
  *																		*
- *  This method is called if there is no file of county names.				*
+ *  This method is called if there is no file of county names			*
+ *  returned from the server.                                           *
  *  The selection list of countys is cleared and an error message		*
- *  displayed.																*
+ *  displayed.															*
  ************************************************************************/
 function noCountiesFile()
 {
@@ -227,8 +220,8 @@ function noCountiesFile()
     // create the replacement contents
     // this is essentially cloneNode(true) with symbol substitutions
     var	newCell		= createFromTemplate("noCountyMsg",
-						     {"province" : "ON"},
-						     null);
+							     {"province" : "ON"},
+							     null);
 
     // insert the replacement contents
     while (newCell.hasChildNodes())
@@ -240,15 +233,15 @@ function noCountiesFile()
 		element.options.length	= 0;
     else
 		element.value	= '';
-}		// noCountiesFile
+}		// function noCountiesFile
 
 /************************************************************************
- *  changeCounty														*
+ *  function changeCounty												*
  *																		*
- *  This method is called when the user selects a new county.				*
+ *  This method is called when the user selects a new county.			*
  *																		*
  *  Input:																*
- *		this		<select name='RegCounty'>								*
+ *		this		<select name='RegCounty'>							*
  ************************************************************************/
 function changeCounty()
 {
@@ -266,32 +259,35 @@ function changeCounty()
 		    // identify the file containing township information for
 		    // the selected county
 		    var subFileName	= "/Canada/TownshipsListXml.php?Prov=ON&County=" +
-						optVal;
+							optVal;
 		    if (debug != 'n')
-			alert('DeathRegQuery.js: changeCounty: ' + subFileName);
-		
+				alert('DeathRegQuery.js: changeCounty: ' + subFileName);
+
 		    // get the township information file
 		    HTTP.getXML(subFileName,
-				gotTownship,
-				noTownship);
+					    gotTownship,
+					    noTownship);
 
 		    popupLoading(document.distForm.RegTownship);
 		}	// have a county code
     }
 
-}		// changeCounty
+}		// function changeCounty
 
 /************************************************************************
- *  showStatus																*
+ *  function showStatus													*
  *																		*
- *  Switch to the transcription status page.								*
+ *  Switch to the transcription status page.							*
  *  This function is called when the ShowStatus button is selected.		*
  *																		*
  *  Input:																*
- *		this				<button id='Stats'>								*
+ *		this			<button id='Stats'>								*
  ************************************************************************/
 function showStatus()
 {
-    location	= "DeathRegStats.php";
+    var lang            = 'en';
+    if ('lang' in args)
+        lang            = args['lang'];
+    location	= "DeathRegStats.php?lang=" + lang;
     return false;	// do not submit form
-}		// showStatus
+}		// function showStatus

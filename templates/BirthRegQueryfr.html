@@ -34,7 +34,10 @@
     $TRACE
     $MSG
 
-  <p class='message' id='msgCell'></p>
+  <p class='message' id='unsupportedDomain'>
+    Domaine d'enregistrement non pris en charge '$DOMAIN'</p>
+  <p class='message' id='unsupportedCountry'>
+    Code de pays non pris en charge '$CC'</p>
   <form action='BirthRegResponse.php' method='get'
 		name='distForm' id='distForm'>
     <!-- Specify to query birth registrations from Ontario, Canada -->
@@ -402,10 +405,6 @@
 	<div class='balloon' id='HelpShowStatus'>
 		Clicking on this button displays a summary page of the progress of the
 		transcription of birth registrations broken down by year of registration.
-	</div>
-	<div class='balloon' id='HelprightTop'>
-		Click on this button to signon to access extended features of the web-site
-		or to manage your account with the web-site.
 	</div>
 	<div class='popup' id='loading'>
 		Loading...

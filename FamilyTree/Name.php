@@ -23,13 +23,13 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/11/04      use class Template                              *
  *		2018/12/26      ignore field IDNR in Name record                *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/Person.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -100,22 +100,7 @@ else
 }
 
 // get the template
-$tempBase	        = $document_root . '/templates/';
-$template	        = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	        = "Name" . $action . $lang . '.html';
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	    = new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-    $sorry          = $language->getSorry();
-    $warn           .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	    = "Name" . $action . "en.html";
-}
-$template->includeSub($tempBase . $includeSub,
-                      'MAIN');
+$template	        = new FtTemplate("Name$action$lang.html");
 
 // get the requested name record
 if (!is_null($idnx) && $name->isExisting())

@@ -363,7 +363,7 @@ function createCitation()
     // get parameters from the form containing this cell
     var	form			= this.form;		// form containing element
     document.getElementById('AddCitation').disabled
-							    = false;	// re-enable adding citations
+					    = false;	        // re-enable adding citations
     var formname		= form.name;		// name of the form
     var idime			= form.idime.value;	// key of associated record
     var type			= form.citType.value;	// type of event within record

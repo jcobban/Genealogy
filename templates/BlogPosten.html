@@ -12,11 +12,11 @@
   <a href="index.html">
 		Home
   </a>:
-  <a href="Blogs.php?lang=fr">
+  <a href="Blogs.php?lang=en">
 		Blogs
   </a>:
   <span id="parentBlog">
-  <a href="BlogPost.php?table=Blogs&blogid=$parentblogid&lang=fr">
+  <a href="BlogPost.php?table=Blogs&blogid=$parentblogid&lang=en">
 		Blog $parentblogid
   </a>:
   </span>
@@ -43,9 +43,9 @@
   <div class="hidden" id="blogTemplate">
       <p class="label" style="margin-left: $margin">
 	$day $month $year at $time user '$username' 
-	wrote: <a href="BlogPost.php?table=Blogs&blogid=$blogid&lang=fr">$blogname</a>
+	wrote: <a href="BlogPost.php?table=Blogs&blogid=$blogid&lang=en">$blogname</a>
       </p>
-      <div style="margin-left: $margin; text-indent: 3em; white-space: normal;">
+      <div style="margin-left: $margin; white-space: normal;">
         $message
       </div>
       <p style="margin-left: $margin" id="buttonRow$blogid">
@@ -74,7 +74,7 @@
     </label>
     <input type="text" class="white leftnc"
 		id="subject" name="subject"
-		size="80" value="$postsubject">
+		size="80" value="$BLOGTITLE">
   </div>
   <div class="row" id="blogMsgRow">
     <label class='column1' for='message' id="msgLabel">

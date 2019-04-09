@@ -1436,1319 +1436,1354 @@ function parseJoin($join)
 /************************************************************************
  *  Open Code															*
  ************************************************************************/
-
-    $title		= 'Issue SQL Command';
-    $emsg		= '';
-    $sqlCommand		= '';
-    $execute		= false;
-    // interpret parameters passed by POST
+$title		    = 'Issue SQL Command';
+$emsg		    = '';
+$sqlCommand		= '';
+$execute		= false;
+$lang           = 'en';
+if (count($_POST) > 0)
+{               // interpret parameters passed by POST
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {			// loop through all parameters
-		switch(strtolower($key))
-		{
-		    case 'sqlcommand':
-		    {
-				$sqlCommand	= $value;
-				break;
-		    }		// SqlCommand
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+        switch(strtolower($key))
+        {
+            case 'sqlcommand':
+            {
+                $sqlCommand	    = $value;
+                break;
+            }		// SqlCommand
 
-		    case 'confirm':
-		    {
-				if (strtolower($value) == 'y')
-				    $execute	= true;
-				break;
-		    }		// Confirm permission to go ahead
+            case 'confirm':
+            {
+                if (strtolower($value) == 'y')
+                    $execute	= true;
+                break;
+            }		// Confirm permission to go ahead
 
-		    case 'submit':
-		    {
-				break;
-		    }		// submit without executing command
+            case 'submit':
+            case 'debug':
+            {
+                break;
+            }		// previously handled
 
-		    case 'debug':
-		    case 'lang':
-		    {
-				break;
-		    }
+            case 'lang':
+            {
+                if (strlen($value) >= 2)
+                    $lang       = strtolower(substr($lang, 0, 2));
+                break;
+            }
 
-		    default:
-		    {
-				$warn	.= "Unexpected parameter $key='$value'. ";
-				break;
-		    }		// other
-		}
+            default:
+            {
+                $warn	.= "Unexpected parameter $key='$value'. ";
+                break;
+            }		// other
+        }
     }			// loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}		        // parameters passed by method=post
+else
+if (count($_GET) > 0)
+{               // interpret parameters passed by GET
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {			// loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+        switch(strtolower($key))
+        {
+            case 'lang':
+            {
+                if (strlen($value) >= 2)
+                    $lang       = strtolower(substr($lang, 0, 2));
+                break;
+            }
+        }
+    }			// loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}		        // parameters passed by method=post
 
-    // parse patterns for SQL commands
-    $cmdPattern		= '/^\s*(DELETE|UPDATE|SELECT|INSERT|SHOW|ALTER)\s/i';
-    $deletePattern	= '/DELETE\s+(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
-    $insertPattern	= '/INSERT\s+INTO\s+(\w+)\s+(.*)$/i';
-    $selectPattern	= '/SELECT\s+(.*?) FROM\s+(\w+)(.*)$/i';
-    $updatePattern	= '/UPDATE\s+(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
-    $insertCmd		= '/^\s*INSERT\s+(.*)$/i';
+// parse patterns for SQL commands
+$cmdPattern		= '/^\s*(DELETE|UPDATE|SELECT|INSERT|SHOW|ALTER)\s/i';
+$deletePattern	= '/DELETE\s+(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
+$insertPattern	= '/INSERT\s+INTO\s+(\w+)\s+(.*)$/i';
+$selectPattern	= '/SELECT\s+(.*?) FROM\s+(\w+)(.*)$/i';
+$updatePattern	= '/UPDATE\s+(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
+$insertCmd		= '/^\s*INSERT\s+(.*)$/i';
 
-    // results of parse
-    $command		= null;
-    $table			= null;
-    $join			= null;
-    $operands		= null;
-    $where			= null;
-    $count			= null;
-    $groupby		= null;
-    $having			= null;
-    $orderby		= null;
-    $limit			= 999999999;
-    $offset			= null;
-    $query			= false;
+// results of parse
+$command		= null;
+$table			= null;
+$join			= null;
+$operands		= null;
+$where			= null;
+$count			= null;
+$groupby		= null;
+$having			= null;
+$orderby		= null;
+$limit			= 999999999;
+$offset			= null;
+$query			= false;
 
-    $tables			= array();
-    $stmt			= $connection->query("SHOW TABLES");
-    $tableRes		= $stmt->fetchAll(PDO::FETCH_NUM);
-    foreach($tableRes as $row)
+$tables			= array();
+$stmt			= $connection->query("SHOW TABLES");
+$tableRes		= $stmt->fetchAll(PDO::FETCH_NUM);
+foreach($tableRes as $row)
+{
+    $ttable			= $row[0];
+    array_push($tables, $ttable);
+    $colStmt		= $connection->query("SHOW COLUMNS FROM `$ttable`");
+    $colRes			= $colStmt->fetchAll(PDO::FETCH_ASSOC);
+    $fieldList		= array();
+    foreach($colRes as $field)
+        array_push($fieldList, $field['field']);
+    $fields[$ttable]		= $fieldList;
+}
+
+if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
+{			// no errors and work to do
+    $getCount		= true;
+    $matches	= array();
+    $result		= preg_match($cmdPattern, $sqlCommand, $matches);
+    if ($result == 1)
+    {		// SQL command recognized
+        $command	= strtoupper($matches[1]);
+
+        switch($command)
+        {		// check syntax of command
+            case 'DELETE':
+            {
+                // validate authorization
+                if (!canUser('all'))
+                    $msg	.=
+                            'You are not authorized to use this feature. ';
+
+                $result	= preg_match($deletePattern,
+                                         $sqlCommand,
+                                         $matches);
+                if ($result == 1)
+                {
+                    $operands	= $matches[1];
+                    $table		= $matches[2];
+                    $rest		= $matches[3];
+                    $info		= Record::getInformation($table);
+                    if ($info)
+                    {
+                        $table	= $info['table'];
+                        $sqlCommand	= "DELETE $operands FROM $table $rest";
+                    }
+                    if ($debug)
+                        $warn	.= "<p> " . __LINE__ .
+            " operands='$operands', table='$table', rest='$rest'</p>\n";
+                    $result		= preg_match('/^(.*)\s*WHERE\s+(.*)$/i',
+                                             $rest,
+                                             $matches);
+                    if ($result == 1)
+                    {
+                        $join	= $matches[1];
+                        $where	= $matches[2];
+                        if ($debug)
+                            $warn	.= "<p> " . __LINE__ .
+                                    " join='$join', where='$where'</p>\n";
+                    }
+                    else
+                        $msg	.= 'Unsupported syntax for DELETE command. ' . __LINE__;
+                    $query		= false;
+                }
+                else
+                    $msg	.= 'Unsupported syntax for DELETE command. ' . __LINE__;
+                break;
+            }	// delete command
+
+            case 'INSERT':
+            {
+                // validate authorization
+                if (!canUser('all'))
+                    $msg	.=
+                            'You are not authorized to use this feature. ';
+
+                $result	= preg_match($insertPattern,
+                                         $sqlCommand,
+                                         $matches);
+                if ($result == 1)
+                {
+                    $table		= $matches[1];
+                    $operands	= $matches[2];
+                    $info		= Record::getInformation($table);
+                    if ($info)
+                    {
+                        $table	= $info['table'];
+                        $sqlCommand	= "INSERT INTO $table $operands";
+                    }
+                    $query		= false;
+                    $count		= 1;
+                }
+                else
+                    $msg	.= 'Unsupported syntax for INSERT command. ';
+                break;
+            }	// insert command
+
+            case 'SELECT':
+            {
+                $result	= preg_match($selectPattern,
+                                         $sqlCommand,
+                                         $matches);
+                if ($result == 1)
+                {
+                    $operands	= $matches[1];
+                    $table		= $matches[2];
+                    $join		= $matches[3];
+                    $info		= Record::getInformation($table);
+                    if ($info)
+                    {
+                        $table	= $info['table'];
+                        $sqlCommand	= "SELECT $operands FROM $table $join";
+                    }
+                    if ($debug)
+                    {
+                        $warn	.= "<p>\$operands='$operands'</p>\n";
+                        $warn	.= "<p>\$table='$table'</p>\n";
+                        $warn	.= "<p>\$join='$join'</p>\n";
+                    }
+                    $where		= '';
+                    $groupby	= '';
+                    $having		= '';
+                    $orderby	= '';
+                    $limit		= '';
+                    $offset		= '';
+
+                    // parse the portion of the SELECT after the
+                    // first table name in the FROM clause
+                    if (strlen($join) > 0)
+                    {
+                        $delimPatt	= 
+    '/\s+(WHERE|GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|PROCEDURE)\s+/i';
+                        $matches	= preg_split($delimPatt,
+                                             $join, 
+                                             2, 
+                                             PREG_SPLIT_DELIM_CAPTURE);
+                        if (count($matches) == 3)
+                        {
+                            $join		= $matches[0];
+                            switch (strtoupper(substr($matches[1],0,5)))
+                            {
+                                case 'WHERE':
+                                {
+                                    $where	= $matches[2];
+                                    break;
+                                }
+
+                                case 'GROUP':
+                                {
+                                    $groupby	= $matches[2];
+                                    break;
+                                }
+
+                                case 'HAVIN':
+                                {
+                                    $having		= $matches[2];
+                                    break;
+                                }
+
+                                case 'ORDER':
+                                {
+                                    $orderby	= $matches[2];
+                                    break;
+                                }
+
+                                case 'LIMIT':
+                                {
+                                    $limit		= $matches[2];
+                                    break;
+                                }
+
+                                case 'PROCE':
+                                {
+                                    $procedure	= $matches[2];
+                                    break;
+                                }
+
+                            }		// switch
+                        }		// found delimiter of FROM clause
+                    }		// have text after the table name
+
+                    // parse the JOIN clause
+                    if ($debug)
+                        $warn	.= "<div class='warning'>parseJoin('$join')</div>\n";
+                    $msg	.= parseJoin($join);
+
+                    // parse the portion of the SELECT after the
+                    // WHERE clause
+                    if (strlen($where) > 0)
+                    {
+                        $delimPatt	= 
+    '/\s+(GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|PROCEDURE)\s+/i';
+                        $matches	= preg_split($delimPatt,
+                                             $where, 
+                                             2, 
+                                             PREG_SPLIT_DELIM_CAPTURE);
+                        if (count($matches) == 3)
+                        {
+                            $where		= $matches[0];
+                            switch (strtoupper(substr($matches[1],0,5)))
+                            {
+                                case 'GROUP':
+                                {
+                                    $groupby	= $matches[2];
+                                    break;
+                                }
+
+                                case 'HAVIN':
+                                {
+                                    $having		= $matches[2];
+                                    break;
+                                }
+
+                                case 'ORDER':
+                                {
+                                    $orderby	= $matches[2];
+                                    break;
+                                }
+
+                                case 'LIMIT':
+                                {
+                                    $limit		= $matches[2];
+                                    break;
+                                }
+
+                                case 'PROCE':
+                                {
+                                    $procedure	= $matches[2];
+                                    break;
+                                }
+
+                            }		// switch
+                        }		// found delimiter of WHERE clause
+                    }		// have text in the WHERE clause
+
+                    // parse the portion of the SELECT after the
+                    // GROUP BY clause
+                    if (strlen($groupby) > 0)
+                    {
+                        $delimPatt	= 
+            '/\s+(HAVING|ORDER\s+BY|LIMIT|PROCEDURE)\s+/i';
+                        $matches	= preg_split($delimPatt,
+                                             $groupby,
+                                             2, 
+                                             PREG_SPLIT_DELIM_CAPTURE);
+                        if (count($matches) == 3)
+                        {
+                            $groupby	= $matches[0];
+                            switch (strtoupper(substr($matches[1],0,5)))
+                            {
+                                case 'HAVIN':
+                                {
+                                    $having		= $matches[2];
+                                    break;
+                                }
+
+                                case 'ORDER':
+                                {
+                                    $orderby	= $matches[2];
+                                    break;
+                                }
+
+                                case 'LIMIT':
+                                {
+                                    $limit		= $matches[2];
+                                    break;
+                                }
+
+                                case 'PROCE':
+                                {
+                                    $procedure	= $matches[2];
+                                    break;
+                                }
+
+                            }		// switch
+                        }		// found delimiter of GROUP BY clause
+                    }		// have text in the GROUP BY clause
+
+                    // parse the portion of the SELECT after the
+                    // HAVING clause
+                    if (strlen($having) > 0)
+                    {
+                        $delimPatt	= 
+                            '/\s+(ORDER\s+BY|LIMIT|PROCEDURE)\s+/i';
+                        $matches	= preg_split($delimPatt,
+                                             $having,
+                                             2, 
+                                             PREG_SPLIT_DELIM_CAPTURE);
+                        if (count($matches) == 3)
+                        {
+                            $having		= $matches[0];
+                            switch (strtoupper(substr($matches[1],0,5)))
+                            {
+                                case 'ORDER':
+                                {
+                                    $orderby	= $matches[2];
+                                    break;
+                                }
+
+                                case 'LIMIT':
+                                {
+                                    $limit		= $matches[2];
+                                    break;
+                                }
+
+                                case 'PROCE':
+                                {
+                                    $procedure	= $matches[2];
+                                    break;
+                                }
+
+                            }		// switch
+                        }		// found delimiter of HAVING clause
+                    }		// have text in the HAVING clause
+
+                    // parse the portion of the SELECT after the
+                    // ORDERBY clause
+                    if (strlen($orderby) > 0)
+                    {
+                        $delimPatt	= '/\s+(LIMIT|PROCEDURE)\s+/i';
+                        $matches	= preg_split($delimPatt,
+                                             $orderby, 
+                                             2, 
+                                             PREG_SPLIT_DELIM_CAPTURE);
+                        if (count($matches) == 3)
+                        {
+                            $orderby	= $matches[0];
+                            switch (strtoupper(substr($matches[1],0,5)))
+                            {
+                                case 'LIMIT':
+                                {
+                                    $limit		= $matches[2];
+                                    break;
+                                }
+
+                                case 'PROCE':
+                                {
+                                    $procedure	= $matches[2];
+                                    break;
+                                }
+
+                            }		// switch
+                        }		// found delimiter of ORDERBY clause
+
+                        // validate ORDER BY clause
+                        $validateOrder	=
+                            '/\s(FROM|WHERE|GROUP|HAVING|ORDER)\s/i';
+                        $result	= preg_match($validateOrder,
+                                             $orderby,
+                                             $matches);
+                        if ($result == 1)
+                        {
+                            $resword	= strtoupper($matches[1]);
+                            $msg	.= "Unexpected keyword $resword after ORDER BY. ";
+                        }
+
+                    }		// have text in the ORDERBY clause
+
+                    // parse the portion of the SELECT after the
+                    // LIMIT clause
+                    if (strlen($limit) > 0)
+                    {
+                        $delimPatt	= '/\s+(PROCEDURE)\s+/i';
+                        $matches	= preg_split($delimPatt,
+                                             $limit,
+                                             2, 
+                                             PREG_SPLIT_DELIM_CAPTURE);
+                        if (count($matches) == 3)
+                        {
+                            $limit	= $matches[0];
+                            switch (strtoupper(substr($matches[1],0,5)))
+                            {
+                                case 'PROCE':
+                                {
+                                    $procedure	= $matches[2];
+                                    break;
+                                }
+
+                            }		// switch
+                        }		// found delimiter of LIMIT clause
+
+                        // validate LIMIT clause
+                        $validateLimit	=
+            '/^\s*((\d+)|(\d+),\s*(\d+)|(\d+)\s+OFFSET\s+(\d+))\s*$/i';
+                        $result	= preg_match($validateLimit,
+                                             $limit,
+                                             $matches);
+                        if ($result == 1)
+                        {		// parse of LIMIT clause succeeded
+                            if (count($matches) == 3 &&
+                                strlen($matches[2] > 0))
+                            {
+                                $limit	= $matches[2];
+                            }
+                            else
+                            if (count($matches) == 5 &&
+                                strlen($matches[3]) > 0 &&
+                                strlen($matches[4] > 0))
+                            {
+                                $limit	= $matches[4];
+                                $offset	= $matches[3];
+                            }
+                            else
+                            if (count($matches) == 7 &&
+                                strlen($matches[5]) > 0 &&
+                                strlen($matches[6] > 0))
+                            {
+                                $limit	= $matches[5];
+                                $offset	= $matches[6];
+                            }
+                            else
+                            {
+                                $msg	.=
+                                    "Unexpected value LIMIT \$matches=" .
+                                    print_r($matches, true);
+                                $limit	= '';
+                            }
+                        }		// parse of LIMIT clause succeeded
+                        else
+                        {		// parse failed
+                            $msg	.= "Unexpected value 'LIMIT $limit'. ";
+                            $limit	= '';
+                        }		// parse failed
+
+                    }		// have text in the LIMIT clause
+                }			// parse succeeded
+                else
+                {			// no FROM clause
+                    $table		= 'DUAL';
+                }			// no FROM clause
+                $query		= true;
+                break;
+            }	// select command
+
+            case 'UPDATE':
+            {
+                // validate authorization
+                if (!canUser('all'))
+                    $msg	.=
+                            'You are not authorized to use this feature. ';
+
+                $result	= preg_match($updatePattern,
+                                         $sqlCommand,
+                                         $matches);
+                if ($result == 1)
+                {
+                    $table		= $matches[1];
+                    $operands	= $matches[2];
+                    $where		= $matches[3];
+                    $info		= Record::getInformation($table);
+                    if ($info)
+                    {
+                        $table	= $info['table'];
+                        $sqlCommand	= "UPDATE $table $operands WHERE $where";
+                    }
+                    $query		= false;
+                }
+                else
+                    $msg	.= 'Unsupported syntax for UPDATE command. ';
+                break;
+            }	// update command
+
+            case 'SHOW':
+            {
+                // validate authorization
+                if (!canUser('all'))
+                    $msg	.=
+                            'You are not authorized to use this feature. ';
+
+                $result	= preg_match('/^SHOW\s+CREATE\s+TABLE\s+(\w+)(.*)/i',
+                                         trim($sqlCommand),
+                                         $matches);
+                if ($result == 1)
+                {
+                    $table		= $matches[1];
+                    $rest		= $matches[2];
+                    $info		= Record::getInformation($table);
+                    if ($info)
+                    {
+                        $table	= $info['table'];
+                        $sqlCommand	= "SHOW CREATE TABLE $table$rest";
+                    }
+                }
+                $query		= true;
+                $execute		= true;
+                $getCount		= false;
+                $sresult		= null;
+                break;
+            }
+
+            case 'ALTER':
+            {
+                // validate authorization
+                if (!canUser('all'))
+                    $msg	.=
+                            'You are not authorized to use this feature. ';
+
+                $result	= preg_match('/^ALTER\s+TABLE\s+(\w+)(.*)/i',
+                                         trim($sqlCommand),
+                                         $matches);
+
+                if ($result == 1)
+                {
+                    $table		= $matches[1];
+                    $rest		= $matches[2];
+                    $info		= Record::getInformation($table);
+                    if ($info)
+                    {
+                        $table	= $info['table'];
+                        $sqlCommand	= "ALTER TABLE $table$rest";
+                    }
+                }
+                $query		= true;
+                $execute		= true;
+                $getCount		= false;
+                $sresult		= null;
+                break;
+            }
+
+        }		// check syntax of command
+    }		// SQL command recognized
+    else
     {
-		$ttable			= $row[0];
-		array_push($tables, $ttable);
-		$colStmt		= $connection->query("SHOW COLUMNS FROM `$ttable`");
-		$colRes			= $colStmt->fetchAll(PDO::FETCH_ASSOC);
-		$fieldList		= array();
-		foreach($colRes as $field)
-		    array_push($fieldList, $field['field']);
-		$fields[$ttable]		= $fieldList;
+        $sqlCommand		= trim($sqlCommand);
+        if (preg_match("/^([^\s]+)/", $sqlCommand, $matches) == 1)
+            $command	= strtoupper($matches[1]);
+        else
+        if (strlen($sqlCommand) < 10)
+            $command	= $sqlCommand;
+        else
+            $command	= substr($sqlCommand, 0, 10) . "..."; 
+        $msg	.= "'$command' is not a valid command verb. ";
+        $execute	= false;
     }
 
-    if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
-    {			// no errors and work to do
-		$getCount		= true;
-		$matches	= array();
-		$result		= preg_match($cmdPattern, $sqlCommand, $matches);
-		if ($result == 1)
-		{		// SQL command recognized
-		    $command	= strtoupper($matches[1]);
-
-		    switch($command)
-		    {		// check syntax of command
-				case 'DELETE':
-				{
-				    // validate authorization
-				    if (!canUser('all'))
-						$msg	.=
-								'You are not authorized to use this feature. ';
-
-				    $result	= preg_match($deletePattern,
-										     $sqlCommand,
-										     $matches);
-				    if ($result == 1)
-				    {
-						$operands	= $matches[1];
-						$table		= $matches[2];
-						$rest		= $matches[3];
-						$info		= Record::getInformation($table);
-						if ($info)
-						{
-						    $table	= $info['table'];
-						    $sqlCommand	= "DELETE $operands FROM $table $rest";
-						}
-						if ($debug)
-						    $warn	.= "<p> " . __LINE__ .
-				" operands='$operands', table='$table', rest='$rest'</p>\n";
-						$result		= preg_match('/^(.*)\s*WHERE\s+(.*)$/i',
-											     $rest,
-											     $matches);
-						if ($result == 1)
-						{
-						    $join	= $matches[1];
-						    $where	= $matches[2];
-						    if ($debug)
-								$warn	.= "<p> " . __LINE__ .
-										" join='$join', where='$where'</p>\n";
-						}
-						else
-						    $msg	.= 'Unsupported syntax for DELETE command. ' . __LINE__;
-						$query		= false;
-				    }
-				    else
-						$msg	.= 'Unsupported syntax for DELETE command. ' . __LINE__;
-				    break;
-				}	// delete command
-
-				case 'INSERT':
-				{
-				    // validate authorization
-				    if (!canUser('all'))
-						$msg	.=
-								'You are not authorized to use this feature. ';
-
-				    $result	= preg_match($insertPattern,
-										     $sqlCommand,
-										     $matches);
-				    if ($result == 1)
-				    {
-						$table		= $matches[1];
-						$operands	= $matches[2];
-						$info		= Record::getInformation($table);
-						if ($info)
-						{
-						    $table	= $info['table'];
-						    $sqlCommand	= "INSERT INTO $table $operands";
-						}
-						$query		= false;
-						$count		= 1;
-				    }
-				    else
-						$msg	.= 'Unsupported syntax for INSERT command. ';
-				    break;
-				}	// insert command
-
-				case 'SELECT':
-				{
-				    $result	= preg_match($selectPattern,
-										     $sqlCommand,
-										     $matches);
-				    if ($result == 1)
-				    {
-						$operands	= $matches[1];
-						$table		= $matches[2];
-						$join		= $matches[3];
-						$info		= Record::getInformation($table);
-						if ($info)
-						{
-						    $table	= $info['table'];
-						    $sqlCommand	= "SELECT $operands FROM $table $join";
-						}
-						if ($debug)
-						{
-						    $warn	.= "<p>\$operands='$operands'</p>\n";
-						    $warn	.= "<p>\$table='$table'</p>\n";
-						    $warn	.= "<p>\$join='$join'</p>\n";
-						}
-						$where		= '';
-						$groupby	= '';
-						$having		= '';
-						$orderby	= '';
-						$limit		= '';
-						$offset		= '';
-
-						// parse the portion of the SELECT after the
-						// first table name in the FROM clause
-						if (strlen($join) > 0)
-						{
-						    $delimPatt	= 
-		'/\s+(WHERE|GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|PROCEDURE)\s+/i';
-						    $matches	= preg_split($delimPatt,
-											     $join, 
-											     2, 
-											     PREG_SPLIT_DELIM_CAPTURE);
-						    if (count($matches) == 3)
-						    {
-								$join		= $matches[0];
-								switch (strtoupper(substr($matches[1],0,5)))
-								{
-								    case 'WHERE':
-								    {
-										$where	= $matches[2];
-										break;
-								    }
-
-								    case 'GROUP':
-								    {
-										$groupby	= $matches[2];
-										break;
-								    }
-
-								    case 'HAVIN':
-								    {
-										$having		= $matches[2];
-										break;
-								    }
-
-								    case 'ORDER':
-								    {
-										$orderby	= $matches[2];
-										break;
-								    }
-
-								    case 'LIMIT':
-								    {
-										$limit		= $matches[2];
-										break;
-								    }
-
-								    case 'PROCE':
-								    {
-										$procedure	= $matches[2];
-										break;
-								    }
-
-								}		// switch
-						    }		// found delimiter of FROM clause
-						}		// have text after the table name
-
-						// parse the JOIN clause
-						if ($debug)
-						    $warn	.= "<div class='warning'>parseJoin('$join')</div>\n";
-						$msg	.= parseJoin($join);
-
-						// parse the portion of the SELECT after the
-						// WHERE clause
-						if (strlen($where) > 0)
-						{
-						    $delimPatt	= 
-		'/\s+(GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|PROCEDURE)\s+/i';
-						    $matches	= preg_split($delimPatt,
-											     $where, 
-											     2, 
-											     PREG_SPLIT_DELIM_CAPTURE);
-						    if (count($matches) == 3)
-						    {
-								$where		= $matches[0];
-								switch (strtoupper(substr($matches[1],0,5)))
-								{
-								    case 'GROUP':
-								    {
-										$groupby	= $matches[2];
-										break;
-								    }
-
-								    case 'HAVIN':
-								    {
-										$having		= $matches[2];
-										break;
-								    }
-
-								    case 'ORDER':
-								    {
-										$orderby	= $matches[2];
-										break;
-								    }
-
-								    case 'LIMIT':
-								    {
-										$limit		= $matches[2];
-										break;
-								    }
-
-								    case 'PROCE':
-								    {
-										$procedure	= $matches[2];
-										break;
-								    }
-
-								}		// switch
-						    }		// found delimiter of WHERE clause
-						}		// have text in the WHERE clause
-
-						// parse the portion of the SELECT after the
-						// GROUP BY clause
-						if (strlen($groupby) > 0)
-						{
-						    $delimPatt	= 
-				'/\s+(HAVING|ORDER\s+BY|LIMIT|PROCEDURE)\s+/i';
-						    $matches	= preg_split($delimPatt,
-											     $groupby,
-											     2, 
-											     PREG_SPLIT_DELIM_CAPTURE);
-						    if (count($matches) == 3)
-						    {
-								$groupby	= $matches[0];
-								switch (strtoupper(substr($matches[1],0,5)))
-								{
-								    case 'HAVIN':
-								    {
-										$having		= $matches[2];
-										break;
-								    }
-
-								    case 'ORDER':
-								    {
-										$orderby	= $matches[2];
-										break;
-								    }
-
-								    case 'LIMIT':
-								    {
-										$limit		= $matches[2];
-										break;
-								    }
-
-								    case 'PROCE':
-								    {
-										$procedure	= $matches[2];
-										break;
-								    }
-
-								}		// switch
-						    }		// found delimiter of GROUP BY clause
-						}		// have text in the GROUP BY clause
-
-						// parse the portion of the SELECT after the
-						// HAVING clause
-						if (strlen($having) > 0)
-						{
-						    $delimPatt	= 
-								'/\s+(ORDER\s+BY|LIMIT|PROCEDURE)\s+/i';
-						    $matches	= preg_split($delimPatt,
-											     $having,
-											     2, 
-											     PREG_SPLIT_DELIM_CAPTURE);
-						    if (count($matches) == 3)
-						    {
-								$having		= $matches[0];
-								switch (strtoupper(substr($matches[1],0,5)))
-								{
-								    case 'ORDER':
-								    {
-										$orderby	= $matches[2];
-										break;
-								    }
-
-								    case 'LIMIT':
-								    {
-										$limit		= $matches[2];
-										break;
-								    }
-
-								    case 'PROCE':
-								    {
-										$procedure	= $matches[2];
-										break;
-								    }
-
-								}		// switch
-						    }		// found delimiter of HAVING clause
-						}		// have text in the HAVING clause
-
-						// parse the portion of the SELECT after the
-						// ORDERBY clause
-						if (strlen($orderby) > 0)
-						{
-						    $delimPatt	= '/\s+(LIMIT|PROCEDURE)\s+/i';
-						    $matches	= preg_split($delimPatt,
-											     $orderby, 
-											     2, 
-											     PREG_SPLIT_DELIM_CAPTURE);
-						    if (count($matches) == 3)
-						    {
-								$orderby	= $matches[0];
-								switch (strtoupper(substr($matches[1],0,5)))
-								{
-								    case 'LIMIT':
-								    {
-										$limit		= $matches[2];
-										break;
-								    }
-
-								    case 'PROCE':
-								    {
-										$procedure	= $matches[2];
-										break;
-								    }
-
-								}		// switch
-						    }		// found delimiter of ORDERBY clause
-
-						    // validate ORDER BY clause
-						    $validateOrder	=
-								'/\s(FROM|WHERE|GROUP|HAVING|ORDER)\s/i';
-						    $result	= preg_match($validateOrder,
-											     $orderby,
-											     $matches);
-						    if ($result == 1)
-						    {
-								$resword	= strtoupper($matches[1]);
-								$msg	.= "Unexpected keyword $resword after ORDER BY. ";
-						    }
-
-						}		// have text in the ORDERBY clause
-
-						// parse the portion of the SELECT after the
-						// LIMIT clause
-						if (strlen($limit) > 0)
-						{
-						    $delimPatt	= '/\s+(PROCEDURE)\s+/i';
-						    $matches	= preg_split($delimPatt,
-											     $limit,
-											     2, 
-											     PREG_SPLIT_DELIM_CAPTURE);
-						    if (count($matches) == 3)
-						    {
-								$limit	= $matches[0];
-								switch (strtoupper(substr($matches[1],0,5)))
-								{
-								    case 'PROCE':
-								    {
-										$procedure	= $matches[2];
-										break;
-								    }
-
-								}		// switch
-						    }		// found delimiter of LIMIT clause
-
-						    // validate LIMIT clause
-						    $validateLimit	=
-				'/^\s*((\d+)|(\d+),\s*(\d+)|(\d+)\s+OFFSET\s+(\d+))\s*$/i';
-						    $result	= preg_match($validateLimit,
-											     $limit,
-											     $matches);
-						    if ($result == 1)
-						    {		// parse of LIMIT clause succeeded
-								if (count($matches) == 3 &&
-								    strlen($matches[2] > 0))
-								{
-								    $limit	= $matches[2];
-								}
-								else
-								if (count($matches) == 5 &&
-								    strlen($matches[3]) > 0 &&
-								    strlen($matches[4] > 0))
-								{
-								    $limit	= $matches[4];
-								    $offset	= $matches[3];
-								}
-								else
-								if (count($matches) == 7 &&
-								    strlen($matches[5]) > 0 &&
-								    strlen($matches[6] > 0))
-								{
-								    $limit	= $matches[5];
-								    $offset	= $matches[6];
-								}
-								else
-								{
-								    $msg	.=
-										"Unexpected value LIMIT \$matches=" .
-										print_r($matches, true);
-								    $limit	= '';
-								}
-						    }		// parse of LIMIT clause succeeded
-						    else
-						    {		// parse failed
-								$msg	.= "Unexpected value 'LIMIT $limit'. ";
-								$limit	= '';
-						    }		// parse failed
-
-						}		// have text in the LIMIT clause
-				    }			// parse succeeded
-				    else
-				    {			// no FROM clause
-						$table		= 'DUAL';
-				    }			// no FROM clause
-				    $query		= true;
-				    break;
-				}	// select command
-
-				case 'UPDATE':
-				{
-				    // validate authorization
-				    if (!canUser('all'))
-						$msg	.=
-								'You are not authorized to use this feature. ';
-
-				    $result	= preg_match($updatePattern,
-										     $sqlCommand,
-										     $matches);
-				    if ($result == 1)
-				    {
-						$table		= $matches[1];
-						$operands	= $matches[2];
-						$where		= $matches[3];
-						$info		= Record::getInformation($table);
-						if ($info)
-						{
-						    $table	= $info['table'];
-						    $sqlCommand	= "UPDATE $table $operands WHERE $where";
-						}
-						$query		= false;
-				    }
-				    else
-						$msg	.= 'Unsupported syntax for UPDATE command. ';
-				    break;
-				}	// update command
-
-				case 'SHOW':
-				{
-				    // validate authorization
-				    if (!canUser('all'))
-						$msg	.=
-								'You are not authorized to use this feature. ';
-
-				    $result	= preg_match('/^SHOW\s+CREATE\s+TABLE\s+(\w+)(.*)/i',
-										     trim($sqlCommand),
-										     $matches);
-				    if ($result == 1)
-				    {
-						$table		= $matches[1];
-						$rest		= $matches[2];
-						$info		= Record::getInformation($table);
-						if ($info)
-						{
-						    $table	= $info['table'];
-						    $sqlCommand	= "SHOW CREATE TABLE $table$rest";
-						}
-				    }
-				    $query		= true;
-				    $execute		= true;
-				    $getCount		= false;
-				    $sresult		= null;
-				    break;
-				}
-
-				case 'ALTER':
-				{
-				    // validate authorization
-				    if (!canUser('all'))
-						$msg	.=
-								'You are not authorized to use this feature. ';
-
-				    $result	= preg_match('/^ALTER\s+TABLE\s+(\w+)(.*)/i',
-										     trim($sqlCommand),
-										     $matches);
-
-				    if ($result == 1)
-				    {
-						$table		= $matches[1];
-						$rest		= $matches[2];
-						$info		= Record::getInformation($table);
-						if ($info)
-						{
-						    $table	= $info['table'];
-						    $sqlCommand	= "ALTER TABLE $table$rest";
-						}
-				    }
-				    $query		= true;
-				    $execute		= true;
-				    $getCount		= false;
-				    $sresult		= null;
-				    break;
-				}
-
-		    }		// check syntax of command
-		}		// SQL command recognized
-		else
-		{
-		    $sqlCommand		= trim($sqlCommand);
-		    if (preg_match("/^([^\s]+)/", $sqlCommand, $matches) == 1)
-				$command	= strtoupper($matches[1]);
-		    else
-		    if (strlen($sqlCommand) < 10)
-				$command	= $sqlCommand;
-		    else
-				$command	= substr($sqlCommand, 0, 10) . "..."; 
-		    $msg	.= "'$command' is not a valid command verb. ";
-		    $execute	= false;
-		}
-
-		// before actually issuing a new command let the user know
-		// how many lines of the database it will effect
-		if (strlen($msg) == 0 && $getCount)
-		{		// command valid and includes WHERE clause
-		    if (strtoupper($operands) == 'COUNT(*)')
-		    {		// returning only count
+    // before actually issuing a new command let the user know
+    // how many lines of the database it will effect
+    if (strlen($msg) == 0 && $getCount)
+    {		// command valid and includes WHERE clause
+        if (strtoupper($operands) == 'COUNT(*)')
+        {		// returning only count
 print "<p>$sqlCommand</p>\n";
-				$stmt		= $connection->query($sqlCommand);
-				if ($stmt === false)
-				{
-				    $msg	.= "query='" . htmlentities($sqlCommand) .
-										"', " .  print_r($connection->errorInfo(),true);
-				}		// error on request
-				else
-				{
-				    $sresult	= $stmt->fetchAll(PDO::FETCH_NUM);
-				    $count	= count($sresult);
-				}
-		    }		// returning only count
-		    else
-		    {		// returning actual rows
-				if ($command == 'INSERT' || $command == 'SHOW')
-				{
-				    $count	= 1;
-				}
-				else
-				{
-				    $sresult	= null;
-				    $countQuery	= "SELECT COUNT(*) FROM $table $join";
-				    if (is_string($where) && strlen($where) > 0)
-						$countQuery	.= " WHERE $where";
-				    $stmt	= $connection->query($countQuery);
-				    if ($stmt)
-				    {
-						$row	= $stmt->fetch(PDO::FETCH_NUM);
-						if ($row)
-						    $count	= $row[0];
-						if (strlen($limit) > 0 && $count > $limit)
-						    $count	= $limit;
-				    }
-				    else
-				    {
-						$msg	.= "query='" . htmlentities($countQuery) .
-										    "', " .  print_r($connection->errorInfo(),true);
-				    }		// error on request
-				}
-		    }		// returning actual rows
-		}		// command valid and includes WHERE clause
+            $stmt		= $connection->query($sqlCommand);
+            if ($stmt === false)
+            {
+                $msg	.= "query='" . htmlentities($sqlCommand) .
+                                    "', " .  print_r($connection->errorInfo(),true);
+            }		// error on request
+            else
+            {
+                $sresult	= $stmt->fetchAll(PDO::FETCH_NUM);
+                $count	= count($sresult);
+            }
+        }		// returning only count
+        else
+        {		// returning actual rows
+            if ($command == 'INSERT' || $command == 'SHOW')
+            {
+                $count	= 1;
+            }
+            else
+            {
+                $sresult	= null;
+                $countQuery	= "SELECT COUNT(*) FROM $table $join";
+                if (is_string($where) && strlen($where) > 0)
+                    $countQuery	.= " WHERE $where";
+                $stmt	= $connection->query($countQuery);
+                if ($stmt)
+                {
+                    $row	= $stmt->fetch(PDO::FETCH_NUM);
+                    if ($row)
+                        $count	= $row[0];
+                    if (strlen($limit) > 0 && $count > $limit)
+                        $count	= $limit;
+                }
+                else
+                {
+                    $msg	.= "query='" . htmlentities($countQuery) .
+                                        "', " .  print_r($connection->errorInfo(),true);
+                }		// error on request
+            }
+        }		// returning actual rows
+    }		// command valid and includes WHERE clause
 
-		// if authorized actually issue the command
-		if ($execute)
-		{		// OK to execute command
-		    $phpfield		= null; 
-		    if ($query)
-		    {		// SELECT command, issue query
-				if (is_null($sresult))
-				{	// query not issued yet
-				    if (preg_match("/(.*)(phpsoundex\(\w+\))(.*)/i", 
-								   $sqlCommand, 
-								   $parts) == 1)
-				    {
-						$before		= $parts[1];
-						$phpfield	= substr($parts[2],11);
-						$phpfield	= substr($phpfield, 0, strlen($phpfield) - 1);
-						$after		= $parts[3];
-						print "<p>before='$before',field='$phpfield',after='$after'</p>\n";
-						$sqlCommand	= $before . $phpfield . $after;
-				    }
-				    $stmt	= $connection->query($sqlCommand);
-				    if ($stmt)
-						$sresult	= $stmt->fetchAll(PDO::FETCH_ASSOC);
-				    else
-				    {
-						$msg	.= "query='" . htmlentities($sqlCommand) .
-										"', " .  print_r($connection->errorInfo(),true);
-				    }		// error on request
-				}	// query not issued yet
-		    }		// SELECT command, issue query	   
-		    else
-		    {		// DELETE, INSERT, or UPDATE, issue exec
-				$stmt		= $connection->query($sqlCommand);
-				if ($stmt === false)
-				{
-				    $msg	.= "exec='" . htmlentities($sqlCommand) . "', " .
-								print_r($connection->errorInfo(),true);
-				}		// error on request
-				else
-				{		// log that the update has been performed
-				    $sresult	= $stmt->rowCount();
-				    if ($sresult > 0)
-						logSqlUpdate($sqlCommand,
-								     '',
-								     0,
-								     '',
-								     '');
-				}		// log that the update has been performed
-		    }		// DELETE, INSERT, or UPDATE, issue exec
-		}		// execute command
-    }			// no errors and work to do
+    // if authorized actually issue the command
+    if ($execute)
+    {		// OK to execute command
+        $phpfield		= null; 
+        if ($query)
+        {		// SELECT command, issue query
+            if (is_null($sresult))
+            {	// query not issued yet
+                if (preg_match("/(.*)(phpsoundex\(\w+\))(.*)/i", 
+                               $sqlCommand, 
+                               $parts) == 1)
+                {
+                    $before		= $parts[1];
+                    $phpfield	= substr($parts[2],11);
+                    $phpfield	= substr($phpfield, 0, strlen($phpfield) - 1);
+                    $after		= $parts[3];
+                    print "<p>before='$before',field='$phpfield',after='$after'</p>\n";
+                    $sqlCommand	= $before . $phpfield . $after;
+                }
+                $stmt	= $connection->query($sqlCommand);
+                if ($stmt)
+                    $sresult	= $stmt->fetchAll(PDO::FETCH_ASSOC);
+                else
+                {
+                    $msg	.= "query='" . htmlentities($sqlCommand) .
+                                    "', " .  print_r($connection->errorInfo(),true);
+                }		// error on request
+            }	// query not issued yet
+        }		// SELECT command, issue query	   
+        else
+        {		// DELETE, INSERT, or UPDATE, issue exec
+            $stmt		= $connection->query($sqlCommand);
+            if ($stmt === false)
+            {
+                $msg	.= "exec='" . htmlentities($sqlCommand) . "', " .
+                            print_r($connection->errorInfo(),true);
+            }		// error on request
+            else
+            {		// log that the update has been performed
+                $sresult	= $stmt->rowCount();
+                if ($sresult > 0)
+                    logSqlUpdate($sqlCommand,
+                                 '',
+                                 0,
+                                 '',
+                                 '');
+            }		// log that the update has been performed
+        }		// DELETE, INSERT, or UPDATE, issue exec
+    }		// execute command
+}			// no errors and work to do
 
-    htmlHeader($title,
-				array('/jscripts/util.js',
-				      'SqlCommand.js'));
+htmlHeader($title,
+            array('/jscripts/util.js',
+                  'SqlCommand.js'));
 ?>
 <body>
 <?php
-    pageTop(array('/genealogy.php'	=> 'Genealogy'));
+pageTop(array('/genealogy.php'	=> 'Genealogy'));
 ?>
   <div class='body'>
-    <h1>
-      <span class='right'>
-		<a href='SqlCommandHelpen.html' target='help'>? Help</a>
-      </span>
-		<?php print $title; ?>
-      <div style='clear: both;'></div>
-    </h1>
+<h1>
+  <span class='right'>
+    <a href='SqlCommandHelpen.html' target='help'>? Help</a>
+  </span>
+    <?php print $title; ?>
+  <div style='clear: both;'></div>
+</h1>
 <?php
 
-    showTrace();
+showTrace();
 
-    if (strlen($msg) > 0)
-    {			// errors
+if (strlen($msg) > 0)
+{			// errors
 ?>
-    <p class='message'><?php print $msg; ?></p>
+<p class='message'><?php print $msg; ?></p>
 <?php
-    }			// errors
+}			// errors
 
-    if (is_string($command))
-    {			// have request to issue command
+if (is_string($command))
+{			// have request to issue command
 ?>
-    <p><span class='label'>Command:</span> '<?php print $command; ?>'
-    </p>
+<p><span class='label'>Command:</span> '<?php print $command; ?>'
+</p>
 <?php
-    }			// have request to issue command    
+}			// have request to issue command    
 
-    if (is_string($table))
-    {			// have parsed table name out of command
-		if (strtoupper($table) == 'DUAL')
-		{		// reserved word for no table
-		}		// reserved word for no table
-		else
-		if (in_array($table, $tables))
-		{		// table defined on server
+if (is_string($table))
+{			// have parsed table name out of command
+    if (strtoupper($table) == 'DUAL')
+    {		// reserved word for no table
+    }		// reserved word for no table
+    else
+    if (in_array($table, $tables))
+    {		// table defined on server
 ?>
-    <p><span class='label'>Table:</span> '<?php print $table; ?>'
-    </p>
+<p><span class='label'>Table:</span> '<?php print $table; ?>'
+</p>
 <?php
-		}		// table defined on server
-		else
-		{		// table not defined on server
+    }		// table defined on server
+    else
+    {		// table not defined on server
 ?>
-    <p class='message'>Table '<?php print $table; ?>' not defined on server.
-    </p>
-    <p>The <?php print count($tables); ?> defined tables are:</p>
-    <table>
+<p class='message'>Table '<?php print $table; ?>' not defined on server.
+</p>
+<p>The <?php print count($tables); ?> defined tables are:</p>
+<table>
 <?php
-		    for($i = 0; $i < count($tables); $i++)
-		    {
-				if (($i % 4) == 0)
-				{
+        for($i = 0; $i < count($tables); $i++)
+        {
+            if (($i % 4) == 0)
+            {
 ?>
-      <tr>
+  <tr>
 <?php
-				}
+            }
 ?>
-		<th style='text-align: left;'>
-		  <?php print $tables[$i]; ?>
-		</th>
+    <th style='text-align: left;'>
+      <?php print $tables[$i]; ?>
+    </th>
 <?php
-				if (($i % 4) == 3)
-				{
+            if (($i % 4) == 3)
+            {
 ?>
-      </tr>
+  </tr>
 <?php
-				}
-		    }
-		    if (($i % 4) != 0)
-		    {
+            }
+        }
+        if (($i % 4) != 0)
+        {
 ?>
-      </tr>
+  </tr>
 <?php
-		    }
+        }
 ?>
-    </table>
+</table>
 <?php
-		}		// table not defined on server
-    }			    // have parsed table name out of commans
+    }		// table not defined on server
+}			    // have parsed table name out of commans
 
-    if (is_string($join) && strlen($join) > 0)
-    {			    // have a join specification
+if (is_string($join) && strlen($join) > 0)
+{			    // have a join specification
 ?>
-    <p><span class='label'>Join:</span> '<?php print $join; ?>'
+<p><span class='label'>Join:</span> '<?php print $join; ?>'
 <?php
-		$emsg	.= validateFieldNames($join);
-    }			    // have a join specification
+    $emsg	.= validateFieldNames($join);
+}			    // have a join specification
 
-    if (is_string($operands) && strlen($operands) > 0)
-    {			// have a list of operands/expressions	    
+if (is_string($operands) && strlen($operands) > 0)
+{			// have a list of operands/expressions	    
 ?>
-    <p><span class='label'>Operands:</span> '<?php print $operands; ?>'
+<p><span class='label'>Operands:</span> '<?php print $operands; ?>'
 <?php
-		$emsg	.= validateFieldNames($operands);
-    }			// have a list of operands/expressions	    
+    $emsg	.= validateFieldNames($operands);
+}			// have a list of operands/expressions	    
 
-    if (is_string($where))
-    { 			// have a WHERE expression  
+if (is_string($where))
+{ 			// have a WHERE expression  
 ?>
-    <p><span class='label'>Where:</span> '<?php print $where; ?>'
+<p><span class='label'>Where:</span> '<?php print $where; ?>'
 <?php
-		$emsg	.= validateFieldNames($where);
-    }			// have a WHERE expression  
+    $emsg	.= validateFieldNames($where);
+}			// have a WHERE expression  
 
-    if (is_string($groupby) && strlen($groupby) > 0)
-    {	// GROUP BY
+if (is_string($groupby) && strlen($groupby) > 0)
+{	// GROUP BY
 ?>
-    <p><span class='label'>GROUP BY:</span> '<?php print $groupby; ?>'
+<p><span class='label'>GROUP BY:</span> '<?php print $groupby; ?>'
 <?php
-		$emsg	.= validateFieldNames($groupby);
-    }	// GROUP BY
-    if (is_string($having) && strlen($having) > 0)
-    {	// HAVING
+    $emsg	.= validateFieldNames($groupby);
+}	// GROUP BY
+if (is_string($having) && strlen($having) > 0)
+{	// HAVING
 ?>
-    <p><span class='label'>HAVING:</span> '<?php print $having; ?>'
+<p><span class='label'>HAVING:</span> '<?php print $having; ?>'
 <?php
-    }	// HAVING
+}	// HAVING
 
-    if (is_string($orderby) && strlen($orderby) > 0)
-    {	// ORDER BY
+if (is_string($orderby) && strlen($orderby) > 0)
+{	// ORDER BY
 ?>
-    <p><span class='label'>ORDER BY:</span> '<?php print $orderby; ?>'
+<p><span class='label'>ORDER BY:</span> '<?php print $orderby; ?>'
 <?php
-		$emsg	.= validateFieldNames($orderby);
-    }	// ORDER BY
+    $emsg	.= validateFieldNames($orderby);
+}	// ORDER BY
 
-    if (is_string($limit) && strlen($limit) > 0)
-    {	// LIMIT
+if (is_string($limit) && strlen($limit) > 0)
+{	// LIMIT
 ?>
-    <p><span class='label'>LIMIT:</span> '<?php print $limit; ?>'
+<p><span class='label'>LIMIT:</span> '<?php print $limit; ?>'
 <?php
-    }	// LIMIT
+}	// LIMIT
 
-    if (is_string($offset) && strlen($offset) > 0)
-    {	// OFFSET
+if (is_string($offset) && strlen($offset) > 0)
+{	// OFFSET
 ?>
-    <p><span class='label'>OFFSET:</span> '<?php print $offset; ?>'
+<p><span class='label'>OFFSET:</span> '<?php print $offset; ?>'
 <?php
-    }	// OFFSET
+}	// OFFSET
 
-    showTrace();
+showTrace();
  
-    if (strlen($emsg) > 0)
-    {
+if (strlen($emsg) > 0)
+{
 ?>
-    <p class='message'><?php print $emsg; ?></p>
+<p class='message'><?php print $emsg; ?></p>
 <?php
-		foreach($badTables as $tableName => $val)
-		{		// loop through all tables
-		    if (array_key_exists($tableName, $fields))
-		    {
-				$fieldsList	= $fields[$tableName];
+    foreach($badTables as $tableName => $val)
+    {		// loop through all tables
+        if (array_key_exists($tableName, $fields))
+        {
+            $fieldsList	= $fields[$tableName];
 ?>
-    <p>The <?php print count($fieldsList); ?> defined fields in 
-		<?php print $tableName; ?> table are:</p>
-    <table>
+<p>The <?php print count($fieldsList); ?> defined fields in 
+    <?php print $tableName; ?> table are:</p>
+<table>
 <?php
-				for($i = 0; $i < count($fieldsList); $i++)
-				{
-				    if (($i % 4) == 0)
-						print "<tr>";
+            for($i = 0; $i < count($fieldsList); $i++)
+            {
+                if (($i % 4) == 0)
+                    print "<tr>";
 ?>
-		<th style='text-align: left;'><?php print $fieldsList[$i]; ?></th>
+    <th style='text-align: left;'><?php print $fieldsList[$i]; ?></th>
 <?php
-				    if (($i % 4) == 3)
-						print "</tr>\n";
-				}
-				if (($i % 4) != 0)
-				    print "</tr>\n";
+                if (($i % 4) == 3)
+                    print "</tr>\n";
+            }
+            if (($i % 4) != 0)
+                print "</tr>\n";
 ?>
-    </table>
+</table>
 <?php
-		    }		// valid table name
-		}		// loop through all tables
-    }			// error in interpreting command
+        }		// valid table name
+    }		// loop through all tables
+}			// error in interpreting command
 
 ?>
-    <form name='sqlform' action='SqlCommand.php' method='post'>
+<form name='sqlform' action='SqlCommand.php' method='post'>
 <?php
-    if ($debug)
-    {
+if ($debug)
+{
 ?>
-      <input type='hidden' id='debug' name='debug' 
-				value='Y'>
+  <input type='hidden' id='debug' name='debug' 
+            value='Y'>
 <?php
-    }
+}
 
-    if (!is_null($count))
-    {	   
+if (!is_null($count))
+{	   
 ?>
-    <p class='warning'>This command will 
+<p class='warning'>This command will 
 <?php 
-		if ($query) print "display $count rows from";
-		else print "update $count rows in"; 
+    if ($query) print "display $count rows from";
+    else print "update $count rows in"; 
 ?>
   the database.</p>
-    <p>
-      <button type='button' id='Submit'>Issue Command</button>
-      <input type='hidden' id='Confirm' name='Confirm' value=''>
+<p>
+  <button type='button' id='Submit'>Issue Command</button>
+  <input type='hidden' id='Confirm' name='Confirm' value=''>
 <?php
-    }
+}
 ?>
-      <p>
-		<label class='label' style='width: 7em;' for='SqlCommand'>
-		    Command:
-		</label>
-		<input type='text' name='SqlCommand' id='SqlCommand'
-				class='white leftnc' size='80'
-				value='<?php print htmlspecialchars($sqlCommand, ENT_QUOTES); ?>'>
-    </form>
+  <p>
+    <label class='label' style='width: 7em;' for='SqlCommand'>
+        Command:
+    </label>
+    <input type='text' name='SqlCommand' id='SqlCommand'
+            class='white leftnc' size='80'
+            value='<?php print htmlspecialchars($sqlCommand, ENT_QUOTES); ?>'>
+</form>
 <?php
-		if ($execute && strlen($msg) == 0)
-		{			// command performed
-		    if ($query)
-		    {			// display response to query
-				$firstRow	= true;
-				$cellClass	= 'odd';
-				$count		= count($sresult);
-				if ($count == 0)
-				    $count	= 'No';
+    if ($execute && strlen($msg) == 0)
+    {			// command performed
+        if ($query)
+        {			// display response to query
+            $firstRow	= true;
+            $cellClass	= 'odd';
+            $count		= count($sresult);
+            if ($count == 0)
+                $count	= 'No';
 ?>
-    <p class='label'><?php print $count; ?> rows in response</p>
+<p class='label'><?php print $count; ?> rows in response</p>
 <?php
-				if (is_array($sresult))
-				{
+            if (is_array($sresult))
+            {
 ?>
-    <table class='summary' cellspacing='0px'>
+<table class='summary' cellspacing='0px'>
 <?php
-				$phpcolumn	= null;
-		        foreach($sresult as $row)
-		        {		// loop through rows
-				    if ($firstRow)
-				    {		// first row in table
+            $phpcolumn	= null;
+            foreach($sresult as $row)
+            {		// loop through rows
+                if ($firstRow)
+                {		// first row in table
 ?>
-      <thead>
-		<tr>
+  <thead>
+    <tr>
 <?php
-						foreach($row as $name => $value)
-						{		// loop through fields in row
-								
+                    foreach($row as $name => $value)
+                    {		// loop through fields in row
+                            
 ?>
-		  <th class='colhead'><?php print $name; ?></th>
+      <th class='colhead'><?php print $name; ?></th>
 <?php
-						}		// loop through fields in row
+                    }		// loop through fields in row
 ?>
-		</tr>
-      </thead>
-      <tbody>
+    </tr>
+  </thead>
+  <tbody>
 <?php
-						$firstRow	= false;
-				    }		// first row in table
+                    $firstRow	= false;
+                }		// first row in table
 ?>
-		<tr>
+    <tr>
 <?php
-				    // display data
-				    foreach($row as $fldname => $value)
-				    {		// loop through fields in row
-						if ($fldname == 'idime' && 
-						    $table == 'tblSX' &&
-						    array_key_exists('type', $row))
-						{	// translate to specific record key
-						    if (array_key_exists($row['type'],
-											 Citation::$recType))
-						    { 
-								$fldname = Citation::$recType[$row['type']];
-								$fldname = strtolower($fldname);
-						    }
-						}	// translate to specific record key
+                // display data
+                foreach($row as $fldname => $value)
+                {		// loop through fields in row
+                    if ($fldname == 'idime' && 
+                        $table == 'tblSX' &&
+                        array_key_exists('type', $row))
+                    {	// translate to specific record key
+                        if (array_key_exists($row['type'],
+                                         Citation::$recType))
+                        { 
+                            $fldname = Citation::$recType[$row['type']];
+                            $fldname = strtolower($fldname);
+                        }
+                    }	// translate to specific record key
 
-						if (ctype_digit($value))
-						{	// integer value
-						    switch ($fldname)
-						    {		// act on specific field names
-								case 'idir':
-								case 'idirhusb':
-								case 'idirwife':
-								case 'b_idir':
-								case 'd_idir':
-								case 'm_idir':
-								{	// IDIR field
-								    $person	= new Person(
-												array('idir'=>$value));
-								    $name	= $person->getName();
+                    if (ctype_digit($value))
+                    {	// integer value
+                        switch ($fldname)
+                        {		// act on specific field names
+                            case 'idir':
+                            case 'idirhusb':
+                            case 'idirwife':
+                            case 'b_idir':
+                            case 'd_idir':
+                            case 'm_idir':
+                            {	// IDIR field
+                                $person	= new Person(array('idir'=>$value));
+                                $name	= $person->getName();
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/FamilyTree/Person.php?idir=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/FamilyTree/Person.php?idir=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
+      </td>
 <?php
-								    break;
-								}	// IDIR field
+                                break;
+                            }	// IDIR field
 
-								case 'idlr':
-								case 'idlrevent':
-								case 'idlrbirth':
-								case 'idlrchris':
-								case 'idlrdeath':
-								case 'idlrburied':
-								case 'idlrmar':
-								{	// IDLR field
-								    $location	= new Location(array('idlr' => $value));
-								    $name	= $location->getName();
+                            case 'idlr':
+                            case 'idlrevent':
+                            case 'idlrbirth':
+                            case 'idlrchris':
+                            case 'idlrdeath':
+                            case 'idlrburied':
+                            case 'idlrmar':
+                            {	// IDLR field
+                                $location	= new Location(array('idlr' => $value));
+                                $name	= $location->getName();
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/FamilyTree/Location.php?idlr=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/FamilyTree/Location.php?idlr=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
+      </td>
 <?php
-								    break;
-								}	// IDLR field
+                                break;
+                            }	// IDLR field
 
-								case 'idtr':
-								case 'idtrbaptism':
-								case 'idtrconfirmation':
-								case 'idtrinitiatory':
-								case 'idtrendow':
-								{	// IDTR field
-								    try {
-										$temple	= new Temple(
-											    array('idtr' => $value));
-										$name	= $temple->getName();
-								    } catch (Exception $e) {
-										$name	= '?';
-								    }
+                            case 'idtr':
+                            case 'idtrbaptism':
+                            case 'idtrconfirmation':
+                            case 'idtrinitiatory':
+                            case 'idtrendow':
+                            {	// IDTR field
+                                try {
+                                    $temple	= new Temple(
+                                            array('idtr' => $value));
+                                    $name	= $temple->getName();
+                                } catch (Exception $e) {
+                                    $name	= '?';
+                                }
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/FamilyTree/Temple.php?idtr=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/FamilyTree/Temple.php?idtr=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
+      </td>
 <?php
-								    break;
-								}	// IDTR field
+                                break;
+                            }	// IDTR field
 
-								case 'idmr':
-								case 'idmrparents':
-								case 'idmrpref':
-								case 'marriednamemaridid':
-								{	// IDMR field
-								    try {
-										$family	= new Family(array('idmr' => $value));
-										$name	= $family->getName();
-								    } catch (Exception $e) {
-										$name	= '?';
-								    }
+                            case 'idmr':
+                            case 'idmrparents':
+                            case 'idmrpref':
+                            case 'marriednamemaridid':
+                            {	// IDMR field
+                                try {
+                                    $family	= new Family(array('idmr' => $value));
+                                    $name	= $family->getName();
+                                } catch (Exception $e) {
+                                    $name	= '?';
+                                }
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/FamilyTree/editMarriages.php?idmr=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/FamilyTree/editMarriages.php?idmr=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
+      </td>
 <?php
-								    break;
-								}	// IDMR field
+                                break;
+                            }	// IDMR field
 
-								case 'ider':
-								{	// IDER field
-								    try {
-										$event	= new Event(array('ider' => $value));
-										$name	= $event->getName();
-								    } catch (Exception $e) {
-										$name	= '?';
-								    }
+                            case 'ider':
+                            {	// IDER field
+                                try {
+                                    $event	= new Event(array('ider' => $value));
+                                    $name	= $event->getName();
+                                } catch (Exception $e) {
+                                    $name	= '?';
+                                }
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/FamilyTree/editEvent.php?ider=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/FamilyTree/editEvent.php?ider=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
+      </td>
 <?php
-								    break;
-								}	// IDER field
+                                break;
+                            }	// IDER field
 
-								case 'idcr':
-								{	// IDCR field
+                            case 'idcr':
+                            {	// IDCR field
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
+      <td class='<?php print $cellClass; ?> right'>
 <?php
-								    try {
-										$child	= new Child(array('idcr' => $value));
-										$name	= $child->getName(Child::NAME_INCLUDE_DATES | Child::NAME_INCLUDE_MDATE);
+                                try {
+                                    $child	= new Child(array('idcr' => $value));
+                                    $name	= $child->getName(Child::NAME_INCLUDE_DATES | Child::NAME_INCLUDE_MDATE);
 ?>
-		    <a href='/getRecordXml.php?idcr=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
+        <a href='/getRecordXml.php?idcr=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
 <?php
-								    } catch (Exception $e) {
-										print "Invalid IDCR=$value";
-								    }
+                                } catch (Exception $e) {
+                                    print "Invalid IDCR=$value";
+                                }
 ?>
-		  </td>
+      </td>
 <?php
-								    break;
-								}	// IDCR field
+                                break;
+                            }	// IDCR field
 
-								case 'idnr':
-								{	// IDNR field
-								    try {
-										$surname= new Surname(
-											array('idnr' => $value));
-										$name	= $surname->getName();
-								    } catch (Exception $e) {
-										$name	= '?';
-								    }
+                            case 'idnr':
+                            {	// IDNR field
+                                try {
+                                    $surname= new Surname(
+                                        array('idnr' => $value));
+                                    $name	= $surname->getName();
+                                } catch (Exception $e) {
+                                    $name	= '?';
+                                }
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/getRecordXml.php?idnr=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/FamilyTree/Names.php?idnr=<?php print $value; ?>&edit=Y' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
+      </td>
 <?php
-								    break;
-								}	// IDNR field
+                                break;
+                            }	// IDNR field
 
-								case 'idnx':
-								{	// IDNX field
-								    try {
-										$namer		= new Name(
-											array('idnx' => $value));
-										$name		= $namer->getName();
-								    } catch (Exception $e) {
-										$name		= '?';
-								    }
+                            case 'idnx':
+                            {	// IDNX field
+                                try {
+                                    $namer		= new Name(
+                                        array('idnx' => $value));
+                                    $name		= $namer->getName();
+                                } catch (Exception $e) {
+                                    $name		= '?';
+                                }
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/getRecordXml.php?idnx=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/getRecordXml.php?idnx=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
+      </td>
 <?php
-								    break;
-								}	// IDNX field
+                                break;
+                            }	// IDNX field
 
-								case 'idsx':
-								{	// field displayed using getRecordXml
+                            case 'idsx':
+                            {	// field displayed using getRecordXml
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/getRecordXml.php?<?php print $fldname; ?>=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/getRecordXml.php?<?php print $fldname; ?>=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+      </td>
 <?php
-								    break;
-								}	// field displayed using getRecordXml
+                                break;
+                            }	// field displayed using getRecordXml
 
-								case 'idsr':
-								{	// IDSR field
-								    try {
-										$source	= new Source(array('idsr' => $value));
-										$name	= $source->getName();
-								    } catch (Exception $e) {
-										$name	= '?';
-								    }
+                            case 'idsr':
+                            {	// IDSR field
+                                try {
+                                    $source	= new Source(array('idsr' => $value));
+                                    $name	= $source->getName();
+                                } catch (Exception $e) {
+                                    $name	= '?';
+                                }
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/FamilyTree/Source.php?idsr=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/FamilyTree/Source.php?idsr=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
+      </td>
 <?php
-								    break;
-								}	// IDSR field
+                                break;
+                            }	// IDSR field
 
-								case 'idar':
-								case 'idar2':
-								{	// IDAR field
-								    try {
-										$address= new Address(array('idar' => $value));
-										$name	= $address->getName();
-								    } catch (Exception $e) {
-										$name	= '?';
-								    }
+                            case 'idar':
+                            case 'idar2':
+                            {	// IDAR field
+                                try {
+                                    $address= new Address(array('idar' => $value));
+                                    $name	= $address->getName();
+                                } catch (Exception $e) {
+                                    $name	= '?';
+                                }
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <a href='/FamilyTree/Address.php?idar=<?php print $value; ?>' target='_blank'>
-				<?php print $value; ?>
-		    </a>
-		    =<?php print $name; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <a href='/FamilyTree/Address.php?idar=<?php print $value; ?>' target='_blank'>
+            <?php print $value; ?>
+        </a>
+        =<?php print $name; ?>
+      </td>
 <?php
-								    break;
-								}	// IDAR field
+                                break;
+                            }	// IDAR field
 
-								case 'birthd':
-								case 'chrisd':
-								case 'deathd':
-								case 'buriedd':
-								case 'eventd':
-								case 'enteredd':
-								{	// date field
-								    $date	= new LegacyDate($value);
+                            case 'birthd':
+                            case 'chrisd':
+                            case 'deathd':
+                            case 'buriedd':
+                            case 'eventd':
+                            case 'enteredd':
+                            {	// date field
+                                $date	= new LegacyDate($value);
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-				<?php print $date->toString(); ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+            <?php print $date->toString(); ?>
+      </td>
 <?php
-								    break;
-								}	// date field
+                                break;
+                            }	// date field
 
-								case 'type':
-								{	// tblSX citation type field
+                            case 'type':
+                            {	// tblSX citation type field
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-				<?php print $value; ?>
+      <td class='<?php print $cellClass; ?> right'>
+            <?php print $value; ?>
 <?php
-								    if ($table == 'tblSX')
-								    {
-										$text	= Citation::$intType[$value];
+                                if ($table == 'tblSX')
+                                {
+                                    $text	= Citation::$intType[$value];
 ?>
-				<?php print "=$text"; ?>
+            <?php print "=$text"; ?>
 <?php
-								    }
+                                }
 ?>
-		  </td>
+      </td>
 <?php
-								    break;
-								}	// tblSX citation type field
+                                break;
+                            }	// tblSX citation type field
 
-								default:
-								{	// ordinary numeric field
+                            default:
+                            {	// ordinary numeric field
 
 ?>
-		  <td class='<?php print $cellClass; ?> right'>
-		    <?php print htmlspecialchars($value); ?>
-		  </td>
+      <td class='<?php print $cellClass; ?> right'>
+        <?php print htmlspecialchars($value); ?>
+      </td>
 <?php
-								    break;
-								}	// ordinary numeric field
-						    }		// act on specific field names
-						}	// integer value
-						else 
-						if ($fldname == 'create table')
-						{
-						    $pos = strpos($value, '(');
-						    if ($pos !== false)
-								$value = substr_replace($value,"(<br>",$pos,1);
-						    $pos = strrpos($value, ')');
-						    if ($pos !== false)
-								$value = substr_replace($value,")<br>",$pos,1);
-						    $value	= str_replace(",",",<br>",$value);
-						    $value	= str_replace($sqlTypes,
-											      $sqlTypesUpper,
-											      $value);
+                                break;
+                            }	// ordinary numeric field
+                        }		// act on specific field names
+                    }	// integer value
+                    else 
+                    if ($fldname == 'create table')
+                    {
+                        $pos = strpos($value, '(');
+                        if ($pos !== false)
+                            $value = substr_replace($value,"(<br>",$pos,1);
+                        $pos = strrpos($value, ')');
+                        if ($pos !== false)
+                            $value = substr_replace($value,")<br>",$pos,1);
+                        $value	= str_replace(",",",<br>",$value);
+                        $value	= str_replace($sqlTypes,
+                                              $sqlTypesUpper,
+                                              $value);
 ?>
-		  <td class='<?php print $cellClass; ?>'>
-		    <?php print $value; ?>
-		  </td>
+      <td class='<?php print $cellClass; ?>'>
+        <?php print $value; ?>
+      </td>
 <?php
-						}
-						else
-						{	// normal text field
+                    }
+                    else
+                    {	// normal text field
 ?>
-		  <td class='<?php print $cellClass; ?>'>
-		    <?php print htmlspecialchars($value); ?>
-		  </td>
+      <td class='<?php print $cellClass; ?>'>
+        <?php print htmlspecialchars($value); ?>
+      </td>
 <?php
-						}	// normal text field
-				    }		// loop through fields in row
+                    }	// normal text field
+                }		// loop through fields in row
 
-				    if ($phpfield)
-				    {
+                if ($phpfield)
+                {
 ?>
-		  <td class='<?php print $cellClass; ?>'>
-		    <?php print soundex($row[$phpfield]); ?>
-		  </td>
+      <td class='<?php print $cellClass; ?>'>
+        <?php print soundex($row[$phpfield]); ?>
+      </td>
 <?php
-				    }
+                }
 ?>
-		</tr>
+    </tr>
 <?php
-				    if ($cellClass == 'odd')
-						$cellClass	= 'even';
-				    else
-						$cellClass	= 'odd';
-				}		// loop through rows
+                if ($cellClass == 'odd')
+                    $cellClass	= 'even';
+                else
+                    $cellClass	= 'odd';
+            }		// loop through rows
 ?>
-      </tbody>
-    </table>
+  </tbody>
+</table>
 <?php
-				}		// have an array of results
-		    }			// display response to query
-		    else
-		    {			// display response to update
+            }		// have an array of results
+        }			// display response to query
+        else
+        {			// display response to update
 ?>
-    <p class='label'>
-		Updated <?php print $sresult; ?> rows in the table.
-    </p>
+<p class='label'>
+    Updated <?php print $sresult; ?> rows in the table.
+</p>
 <?php
-		    }			// display response to query
-		}			// command performed
+        }			// display response to query
+    }			// command performed
 ?>
   </div>
 <?php
-    pageBot();
+pageBot();
 ?>
 <div class='balloon' id='HelpSqlCommand'>
 Use this selection list to limit the response to a single province within 

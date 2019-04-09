@@ -10,11 +10,11 @@ use \Exception;
  *																		*
  *    History:															*
  *		2018/11/28      created                                         *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . "/common.inc";
 
 /************************************************************************
@@ -42,23 +42,10 @@ foreach ($_GET as $key => $value)
 	    }		// requested debug
 	}		// switch on parameter name
 }			// foreach parameter
+
 $update     = canUser('edit');
 
-$tempBase	= $document_root . '/templates/';
-$template	= new FtTemplate("${tempBase}page$lang.html");
-$includeSub	= "uploadGedcom$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub     = 'uploadGedcomen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-					  'MAIN');
+// create template
+$template	= new FtTemplate("uploadGedcom$lang.html");
 
 $template->display();

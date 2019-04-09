@@ -40,6 +40,7 @@ use \Exception;
  *		2017/02/07		use class Country								*
  *		2018/01/01		support language parameter						*
  *		2018/01/04		remove Template from template file names		*
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
@@ -102,32 +103,29 @@ $stateName		= $domainObj->getName(0);
 $domainName		= $domainObj->getName(1);
 
 $tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
 $includeSub		= "genProvince$domain$lang.html";
+if (!file_exists($tempBase . "genProvince{$domain}en.html"))
+{                   // domain code not supported
+    $includeSub = "genProvince$lang.html";
+}                   // domain code not supported
 if (!file_exists($tempBase . $includeSub))
 {	    		            // no template for domain in chosen language
-	$includeSub	= "genProvince{$domain}en.html";
+	$includeSub	            = "genProvince{$domain}en.html";
 	if (!file_exists($tempBase . $includeSub))
 	{	    	            // no template for domain in English
-	    $includeSub	= "genProvince$cc$lang.html";
+	    $includeSub	        = "genProvince$cc$lang.html";
 	    if (!file_exists($tempBase . $includeSub))
 	    {		            // no template for country in chosen language
-			$includeSub	= "genProvince{$cc}en.html";
+			$includeSub	    = "genProvince{$cc}en.html";
 			if (!file_exists($tempBase . $includeSub))
-			{	    // no template for country in English
+			{	            // no template for country in English
 			    $includeSub	= "genProvince$lang.html";
-			    if (!file_exists($tempBase . $includeSub))
-			    {	// no template for language
-				    $includeSub	= 'genProvinceen.html';
-			    }	// no template for language
-			}	    // no template for country in English
+			}	            // no template for country in English
 	    }	    	        // no template for country in chosen language
 	}	    	            // no template for domain in English
 }			                // no template for domain in chosen language
-if ($debug)
-	$warn	            .= "<p>\$includeSub='$includeSub'</p>\n";
-$gotPage	            = $template->includeSub($tempBase . $includeSub,
-								                'MAIN');
+$template		= new FtTemplate($includeSub);
+
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('PROVINCENAME',	$stateName);
 $template->set('DOMAINNAME',	$domainName);

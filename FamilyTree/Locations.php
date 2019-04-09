@@ -46,8 +46,9 @@ use \Exception;
  *		2017/11/04		use RecordSet instead of getLocations			*
  *		2018/04/14		urlencode the pattern in forward and back links	*
  *		2018/11/06      use class Template                              *
+ *		2019/02/19      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -104,21 +105,7 @@ foreach($_GET as $key => $value)
 	}		                // take action based upon key
 }                           // loop through parameters
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "Locations$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language	= new Language(array('code' => $lang));
-	$langName	= $language->get('name');
-	$nativeName	= $language->get('nativename');
-    $sorry      = $language->getSorry();
-    $warn       .= str_replace(array('$langName','$nativeName'),
-                               array($langName, $nativeName),
-                               $sorry);
-	$includeSub	= 'Locationsen.html';
-}
-$template->includeSub($tempBase . $includeSub, 'MAIN');
+$template		= new FtTemplate("Locations$lang.html");
 
 $template->set('PATTERN',       $pattern);
 $template->set('UPATTERN',      urlencode($pattern));
@@ -159,11 +146,11 @@ if (strlen($msg) == 0)
 	    $template->set('LAST', $last);
 		if ($prevoffset < 0)
 	    {	// no previous page of output to display
-	        $template->updateTag('npprev', null);
+	        $template->updateTag('topPrev', null);
 		}	// no previous page of output to display
 		if ($nextoffset >= $count)
 		{	// no next page of output to display
-	        $template->updateTag('npnext', null);
+	        $template->updateTag('topNext', null);
         }	// no next page of output to display
 
         // display the results

@@ -1,20 +1,22 @@
 <!--*********************************************************************
- *  DisplayImageen.php							*
- *									*
- *  Template to display an image with controls for moving backward	*
- *  and forward	through a folder of images and controlling zoom.	*
- *									*
- *  History:								*
- *	2018/02/09	created						*
- *	2018/02/24	remove incorrect quotes in forward and backward	*
- *			image links					*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  DisplayImagefr.php													*
+ *																		*
+ *  Template to display an image with controls for moving backward		*
+ *  and forward		through a folder of images and controlling zoom.	*
+ *																		*
+ *  History:															*
+ *		2018/02/09		created											*
+ *		2018/02/24		remove incorrect quotes in forward and backward	*
+ *						image links										*
+ *      2019/03/02      add hidden <h1> to satisfy FtTemplate           *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
     <a href="/genealogy.php">Genealogy</a>:
   </div>	
 <div class="body">
+  <h1 id="head1" style="display: none;">Montre Image '$IMAGENAME'</h1>
   <h2 id="head2">Montre Image '$IMAGENAME'</h2>
     $MSG
     $TRACE

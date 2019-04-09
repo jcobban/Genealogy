@@ -26,6 +26,7 @@ use \Exception;
  *		'Families'				'id'									*
  *		'Surnames'				'surname'								*
  *		'Names'					'id'									*
+ *		'Nicknames'				'id'	    							*
  *		'SurnameList'			'id'									*
  *		'Sources'				'id'									*
  *		'Citations'				'id'									*
@@ -124,35 +125,9 @@ use \Exception;
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
-require_once __NAMESPACE__ . '/Address.inc';
-require_once __NAMESPACE__ . '/Birth.inc';
-require_once __NAMESPACE__ . '/Blog.inc';
-require_once __NAMESPACE__ . '/Census.inc';
-require_once __NAMESPACE__ . '/CensusLine.inc';
-require_once __NAMESPACE__ . '/Child.inc';
-require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/County.inc';
-require_once __NAMESPACE__ . '/CountyMarriage.inc';
-require_once __NAMESPACE__ . '/CountyMarriageReport.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
-require_once __NAMESPACE__ . '/DontMergeEntry.inc';
-require_once __NAMESPACE__ . '/Death.inc';
-require_once __NAMESPACE__ . '/Event.inc';
-require_once __NAMESPACE__ . '/LegacyHeader.inc';
-require_once __NAMESPACE__ . '/Person.inc';
-require_once __NAMESPACE__ . '/Family.inc';
-require_once __NAMESPACE__ . '/Location.inc';
-require_once __NAMESPACE__ . '/Marriage.inc';
-require_once __NAMESPACE__ . '/MethodistBaptism.inc';
-require_once __NAMESPACE__ . '/Name.inc';
-require_once __NAMESPACE__ . '/Picture.inc';
-require_once __NAMESPACE__ . '/Source.inc';
-require_once __NAMESPACE__ . '/Surname.inc';
-require_once __NAMESPACE__ . '/Temple.inc';
-require_once __NAMESPACE__ . '/ToDo.inc';
-require_once __NAMESPACE__ . '/Township.inc';
-require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -317,6 +292,7 @@ foreach($_GET as $key 	=> $value)
 	    case 'census':
 	    case 'censusid':
 	    {		// census year
+require_once __NAMESPACE__ . '/Census.inc';
 			if (strlen($value) == 4)
 			    $censusId		= 'CA' . $censusYear;
 			else
@@ -409,11 +385,21 @@ foreach($_GET as $key 	=> $value)
 	    case 'iduser':
 	    case 'idblog':
 	    case 'id':
-	    {
-			$id		            = $value;
-			$parms[$key]	    = $value;
+        {
 			if (is_null($table) && strlen($key) > 2)
-			    $table	= ucfirst(substr($key,2)) . 's';
+                $table	= ucfirst(substr($key,2)) . 's';
+            if (is_string($table))
+            {
+                $info           = Record::getInformation($table);
+                $prime          = $info['prime'];          
+            }
+            else
+                $prime          = $key;
+            if (strpos($value, ','))
+                $id             = array($prime => explode(',',$value));
+            else
+			    $id		        = $value;
+			$parms[$prime]	    = $id;
 			break;
 	    }		// registration number
 
@@ -494,6 +480,11 @@ foreach($_GET as $key 	=> $value)
 			break;
 	    }		// options parameter
 
+	    case 'debug':
+	    {
+			break;
+	    }		// options parameter
+
 	    default:
 	    {
 			$parms[$key]	= $value;
@@ -510,6 +501,7 @@ if (strlen($msg) == 0)
 	{
 	    case 'tblAR':
 	    {		// Address record
+require_once __NAMESPACE__ . '/Address.inc';
 			if (is_array($parms))
 			{		// search parameters
 			    if (array_key_exists('kind', $parms))
@@ -537,6 +529,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblBR':
 	    {		// Picture record
+require_once __NAMESPACE__ . '/Picture.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -561,6 +554,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblCR':
 	    {		// Child record
+require_once __NAMESPACE__ . '/Child.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -582,6 +576,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblDM':
 	    {
+require_once __NAMESPACE__ . '/DontMergeEntry.inc';
 			if (isset($idirleft) && isset($idirright))
 			{
 			    $record	= new DontMergeEntry($idirleft, $idirright);
@@ -599,6 +594,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblER':
 	    {		// Event record
+require_once __NAMESPACE__ . '/Event.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -623,6 +619,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblHR':
 	    {		// Header record
+require_once __NAMESPACE__ . '/LegacyHeader.inc';
 			// only one record, key ignored
 			$record		= new LegacyHeader();
 			$top		= 'header';
@@ -631,6 +628,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblIR':
 	    {		// Person record
+require_once __NAMESPACE__ . '/Person.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -655,6 +653,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblLR':
 	    {		// Location record
+require_once __NAMESPACE__ . '/Location.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -679,6 +678,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblMR':
 	    {		// Family record
+require_once __NAMESPACE__ . '/Family.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -705,6 +705,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblNX':
 	    {		// Name record
+require_once __NAMESPACE__ . '/Name.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -729,6 +730,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblNR':
 	    {		// Surname record
+require_once __NAMESPACE__ . '/Surname.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -751,8 +753,36 @@ if (strlen($msg) == 0)
 			break;
 	    }		// Surname record
 
+	    case 'Nicknames':
+	    {		// given name record
+            require_once __NAMESPACE__ . '/Nickname.inc';
+            if (!array_key_exists('limit', $parms))
+                $parms['limit']         = 10000;
+
+			if (isset($id))
+			{
+			    if (is_array($id))
+			    {		// search parameters
+				    $record	= new RecordSet('Nicknames',$parms);
+			    }		// search parameters
+			    else
+			    {
+				    $record	= new Nickname(array('nickname' => $id));
+                }
+                if (strlen($warn) > 0)
+                    showTrace();
+			}
+			else
+			{
+			    $record	= new RecordSet('Nicknames', $parms);
+			}
+			$top	= 'nickname';
+			break;
+	    }		// given name record
+
 	    case 'tblSR':
 	    {		// Master Source record
+require_once __NAMESPACE__ . '/Source.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -772,6 +802,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblSX':
 	    {		// Citation record
+require_once __NAMESPACE__ . '/Citation.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -796,6 +827,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblTD':
 	    {		// To Do record
+require_once __NAMESPACE__ . '/ToDo.inc';
 			if (isset($id))
 			{
 			    $record	= new ToDo(array('idtd' => $id));
@@ -813,6 +845,7 @@ if (strlen($msg) == 0)
 
 	    case 'tblTR':
 	    {		// Temple record
+require_once __NAMESPACE__ . '/Temple.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -877,6 +910,8 @@ if (strlen($msg) == 0)
 
 	    case 'Births':
 	    {
+require_once __NAMESPACE__ . '/Birth.inc';
+require_once __NAMESPACE__ . '/BirthSet.inc';
 			if (isset($domain) && isset($regyear) && isset($regnum))
 			    $record	= new Birth($domain, $regyear, $regnum);
 			else
@@ -887,6 +922,7 @@ if (strlen($msg) == 0)
 
 	    case 'Deaths':
 	    {
+require_once __NAMESPACE__ . '/Death.inc';
 			$record		= new Death($domain, $regyear, $regnum);
 			$top		= 'death';
 			break;
@@ -894,6 +930,7 @@ if (strlen($msg) == 0)
 
 	    case 'Marriage':
 	    {
+require_once __NAMESPACE__ . '/Marriage.inc';
 			$record		= new Marriage($domain, $regyear, $regnum);
 			$top		= 'marriage';
 			break;
@@ -901,6 +938,7 @@ if (strlen($msg) == 0)
 
 	    case 'CountyMarriage':
 	    {
+require_once __NAMESPACE__ . '/CountyMarriage.inc';
 			if (isset($volume))
 			{
 			    if (isset($reportNo))
@@ -942,6 +980,7 @@ if (strlen($msg) == 0)
 
 	    case 'CountyMarriageReports':
 	    {
+require_once __NAMESPACE__ . '/CountyMarriageReport.inc';
 			if ($domain == 'CAON')
 			    $domain	= 'CACW';
 			if (isset($volume))
@@ -1018,6 +1057,7 @@ if (strlen($msg) == 0)
 
 	    case 'Townships':
 	    {
+require_once __NAMESPACE__ . '/Township.inc';
 			if (count($parms) > 0)
 			{
 			    $record		= new RecordSet('Townships',$parms);
@@ -1030,6 +1070,7 @@ if (strlen($msg) == 0)
 
 	    case 'Users':
 	    {
+require_once __NAMESPACE__ . '/User.inc';
 			if (count($parms) > 0)
 			{
 			    $record	= new RecordSet('Users',$parms);
@@ -1049,6 +1090,7 @@ if (strlen($msg) == 0)
 
 	    case 'Blogs':
 	    {
+require_once __NAMESPACE__ . '/Blog.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -1073,6 +1115,7 @@ if (strlen($msg) == 0)
 
 	    case 'MethodistBaptisms':
 	    {
+require_once __NAMESPACE__ . '/MethodistBaptism.inc';
 			if (isset($id))
 			{
 			    if (is_array($id))
@@ -1137,6 +1180,7 @@ if (strlen($msg) == 0)
 	    case 'Census1851':
 	    case 'Census1861':
 	    {
+require_once __NAMESPACE__ . '/CensusLine.inc';
 			if (count($parms) > 0)
 			    $record	= new RecordSet('CensusLines',$parms);
 			else
@@ -1154,6 +1198,7 @@ if (strlen($msg) == 0)
 	    case 'Census1916':
 	    case 'Census1921':
 	    {
+require_once __NAMESPACE__ . '/CensusLine.inc';
 			if (count($parms) > 0)
 			{
 			    $parms['censusid']	= 'CA' . substr($table, 6);
@@ -1188,5 +1233,5 @@ if (is_array($record) && strlen($msg) == 0)
 	else
 	if ($count > 100)
 	    $msg	.= "Too many '$extTableName' records to return. " .
-				   $count . ' matches.';
+        $count . ' matches.';
 }

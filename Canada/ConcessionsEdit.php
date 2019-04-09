@@ -97,21 +97,7 @@ if (canUser('edit'))
 else
 	$action			= 'Display';
 
-$tempBase			= $document_root . '/templates/';
-$template			= new FtTemplate("${tempBase}page$lang.html");
-$includeSub			= "ConcessionsEdit$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language		= new Language(array('code'	=> $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                           array($langName, $nativeName),
-                           $sorry);
-	$includeSub		= "ConcessionsEdit{$action}en.html";
-}
-$template->includeSub($tempBase . $includeSub, 'MAIN');
+$template			= new FtTemplate("ConcessionsEdit$action$lang.html");
 
 $template->set('CONTACTTABLE',	'Concessions');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);

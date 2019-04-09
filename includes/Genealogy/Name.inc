@@ -2,9 +2,6 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
 /************************************************************************
  *  Name.inc															*
  *																		*
@@ -305,7 +302,7 @@ class Name extends Record
     	}		    // successful query
     	else
     	{		    // error performing query
-    	    $this->msg      .= "Name::getNextOrder:" .
+    	    $msg      .= "Name::getNextOrder:" .
                 "'$queryText', " .  print_r($stmt->errorInfo(),true) .
                 ".\n";
     		return null;
@@ -401,7 +398,7 @@ class Name extends Record
 
     			case 'order':
                 {		                    // Order
-                    $order                  = $value;
+                    $order                  = intval($value);
     			    break;
     			}	                        // Order
 
@@ -410,16 +407,14 @@ class Name extends Record
     			    if ($value instanceof Family)
                     {		                // Family record
     					$this->family		= $value;
-                        if (!$this->family->isExisting())
-                            $this->msg      .= __LINE__ . 
-                                                " Called with unsaved Family. ";
     					$idmr		        = $this->family->getIdmr();
     			    }		                // Family record
     			    else
     			    if (is_int($value) || ctype_digit($value))
     			    {		                // IDMR
-    					$idmr		        = intval($value);
-    					$this->family		= new Family(array('idmr' => $idmr));
+                        $idmr		        = intval($value);
+                        if ($idmr > 0)
+    					    $this->family	= new Family(array('idmr' => $idmr));
     			    }		                // IDMR
                     else
                     {                       // invalid value
@@ -428,10 +423,12 @@ class Name extends Record
                         break;
                     }                       // invalid value
 
-                    $where		            .= $and .
-                                                "IDMR=:idmr";
-    			    $sqlParms['idmr']	    = $idmr;
-    			    $and		            = ' AND ';
+                    if ($idmr > 0)
+                    {
+                        $where		            .= $and . "IDMR=:idmr";
+    			        $sqlParms['idmr']	    = $idmr;
+    			        $and		            = ' AND ';
+                    }                       // valid value
     			    break;
     			}	                        // idmr of family
 
@@ -563,6 +560,13 @@ class Name extends Record
         $parmsText              = '';
 
     	// action depends upon type of first parameter
+    	if (is_null($parms))
+        {
+            $parms		        = array('idnx'	=> $parms);
+            $parmsText          = "NULL";
+            throw new Exception("Name.inc: " . __LINE__ . " __construct(NULL)");
+        }
+    	else
     	if (is_int($parms) ||
             (is_string($parms) && ctype_digit($parms)))
         {
@@ -587,6 +591,26 @@ class Name extends Record
     								    'idmr'	=> $family);
             $parmsText          = "Family(IDMR=$idmr)";
         }			                // old way to reset married surname of wife
+        else
+        if (is_array($parms))
+        {
+            $parmsText          = 'array(';
+            $comma              = '';
+            foreach ($parms as $key => $value)
+            {
+                $parmsText      .= "$comma'$key'=";
+                if ($value instanceof Record)
+                {
+                    $parmsText  .= get_class($value) . '(' . $value->getId() . ')';
+                }
+                else
+                if (is_null($value))
+                    $parmsText  .= 'NULL';
+                else
+                    $parmsText  .= $value;
+                $comma          = ',';
+            }
+        }
 
     	// all of the supported (if deprecated) parameter formats have been
     	// reformatted into an array
@@ -690,8 +714,8 @@ class Name extends Record
                         { 
     			            if (!array_key_exists($fieldLc, self::$initRow))
     			            {
-    					        $this->msg	.= 
-    							"Invalid field name '$fieldLc' in parameters. ".
+    					        $warn	.= "<p>Name::__construct: " . __LINE__ .
+    							" Invalid field name '$fieldLc' in parameters.</p>\n".
     							print_r($parms, true) . ".\n";
     					        ob_start();
     					        debug_print_backtrace();
@@ -711,7 +735,8 @@ class Name extends Record
     	        $sqlParms		    = array();
     	        $where		        = $this->constructWhere($parms,
     							            			    $sqlParms);
-    			// if selection parameters passed, get or create the record
+
+                // if selection parameters passed, get or create the record
     			if (strlen($where) > 0)
     			{			        // requested search for matching record
     			    // construct the query of the alternate name table
@@ -821,21 +846,30 @@ class Name extends Record
                                     print_r($stmt->errorInfo(),true) . ".\n";
     	                $dbrow	        = self::$initRow;
     			    }			    // error performing query
-    			}			        // requested search for matching record
+                }			        // requested search for matching record
+                else
+                {                   // called with incomplete Person
+                    $dbrow	            = self::$initRow;
+                    if ($this->person)
+                    {
+                        $dbrow['surname']       = $this->person['surname'];
+                        $dbrow['givenname']     = $this->person['givenname'];
+                    }
+                }                   // called with incomplete Person
     	    }				        // partial row, use as search parameters
         }		                    // associative array
         else
-        {
-            $this->msg          .= "($parmsText). ";
-        }
+        {                           // invalid parameters
+            $dbrow	                = self::$initRow;
+        }                           // invalid parameters
         if ($debug)
             $warn       .= "<p>Name::__construct($parmsText)</p>\n";
 
+        if (is_null($dbrow))
+            throw new Exception("Name.inc: " . __LINE__ . " how can row not be initialized? parms=($parmsText)");
         // invoke constructor of base class
     	parent::__construct($dbrow,
-    						'tblNX');
-        if ($this->get('idir') == 0)
-            $warn   .= $this->dump("Name::__construct: " . __LINE__);
+            'tblNX');
     	$this->needInsert	= $needInsert;
 
         // the IDNR field in this record is no longer maintained
@@ -846,7 +880,7 @@ class Name extends Record
 
         if (is_null($this->person))
         {
-    		$this->person	    = new Person(array('idir' => $this));
+    		$this->person	    = new Person(array('idir' => $this->row['idir']));
         }
         else
         {
@@ -933,8 +967,10 @@ class Name extends Record
 		    parent::set('birthd',	    $birthEvent['eventd']);
 	        $deathEvent                 = $this->person->getDeathEvent(true);
 		    parent::set('deathsd',	    $birthEvent['eventsd']);
-		    parent::set('deathd',	    $birthEvent['eventd']);
-	        parent::set('treename',	    $this->person->getTreeName());
+            parent::set('deathd',	    $birthEvent['eventd']);
+            if ($this->person->isExisting() &&
+                $this->person->getIdir() > 0)
+	            parent::set('treename',	$this->person->getTreeName());
         }
 
         // ensure that all married names match the prime givenname,
@@ -949,7 +985,7 @@ class Name extends Record
 	    $names	    = new RecordSet('Names', $updParms);
         $count	    = $names->update($setParms);
 
-        if ($this->get('order') == -1 && is_null($this->get('idmr')))
+        if ($this->row['order'] == -1 && is_null($this->row['idmr']))
             throw new Exception("Name::__construct: attempt to create married name record without IDMR"); 
 
     	// diagnostic output if debug is set
@@ -1378,6 +1414,18 @@ class Name extends Record
             return 0;
         }
 
+        // if the instance of Name was created using an instance of Person
+        // or an instance of Family that had not been inserted into the
+        // database at the time the Name was created, check to see if
+        // the Person or Family has subsequently been created.
+        if ($this->row['idir'] == 0 && $this->person)
+            $this->row['idir']      = $this->person['idir']; 
+        if ($this->row['idmr'] == 0 && $this->family)
+            $this->row['idmr']      = $this->family['idmr'];
+
+        // the instance of Name cannot be inserted into the database
+        // if it does not have an associated Person, and for a "married name"
+        // instance, and associated Family record
         if ($this->row['idir'] == 0 || 
             ($this->row['order'] == -1 && $this->row['idmr'] == 0))
         {

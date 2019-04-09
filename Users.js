@@ -15,8 +15,9 @@
  *						not found on server								*
  *		2016/01/06		passwords with < or > in them cause XML issues	*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoadUserNames;
@@ -29,7 +30,6 @@ window.onload	= onLoadUserNames;
  ************************************************************************/
 function onLoadUserNames()
 {
-    pageInit();
 
     // activate handling of key strokes in text input fields
     // including support for context specific help
@@ -50,10 +50,6 @@ function onLoadUserNames()
 		    elt.onkeydown	= keyDown;
 		    elt.onchange	= change;	// default handler
 
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(elt);
-    
 		    if (elt.id.substring(0,'delete'.length) == 'delete')
 			elt.onclick	= deleteUserid;
 		    else

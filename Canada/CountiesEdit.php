@@ -36,8 +36,10 @@ use \Exception;
  *		2018/01/11		htmlspecchars moved into class Template			*
  *		2018/01/22		display only part of the table at a time		*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/21      use new FtTemplate constructor                  *
+ *		2019/04/06      use new FtTemplate::includeSub                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -129,45 +131,29 @@ if (count($_GET) > 0)
 	    $parmsText	    .= "</table>\n";
 	    $warn           .= $parmsText;
 	}
-	
-	$domainObj		= new Domain(array('domain'	=> $domain,
-									   'language'	=> $lang));
-	$cc				= substr($domain, 0, 2);
-	$prov			= substr($domain, 2, 2);
-	$stateName		= $domainObj->getName(0);
-	$domainName		= $domainObj->getName(1);
-	$countryObj		= new Country(array('code' => $cc));
-	$countryName	= $countryObj->getName();
 
-	$tempBase			= $document_root . '/templates/';
-	$template			= new FtTemplate("${tempBase}page$lang.html");
-	$includeSub			= "Counties$action$lang.html";
-	if (!file_exists($tempBase . $includeSub))
-	{
-		$includeSub		= 'Counties' . $action . 'en' . '.html';
-		$language		= new Language(array('code'	=> $lang));
-		$langName	    = $language->get('name');
-		$nativeName	    = $language->get('nativename');
-		$sorry  	    = $language->getSorry();
-	    $warn   	    .= str_replace(array('$langName','$nativeName'),
-	                           array($langName, $nativeName),
-	                           $sorry);
-	}
-	$template->includeSub($tempBase . $includeSub, 'MAIN');
+    // create template
+	$template			= new FtTemplate("Counties$action$lang.html");
 
 	$includeSub			= "CountiesDialogs$lang.html";
-	if (!file_exists($tempBase . $includeSub))
-	{
-		$includeSub		= 'CountiesDialogsen.html';
-	}
-    $template->includeSub($tempBase . $includeSub, 'DIALOGS', true);
+    $template->includeSub($includeSub, 'DIALOGS', true);
 
-	$changed        = $template['changed'];
-	$deleted        = $template['deleted'];
-	$added          = $template['added'];
-	$changedText	= null;
-	$deletedText	= null;
-    $addedText	    = null;
+    // process parameters    
+	$domainObj			= new Domain(array('domain'	=> $domain,
+		    							   'language'		=> $lang));
+	$cc					= substr($domain, 0, 2);
+	$prov				= substr($domain, 2, 2);
+	$stateName			= $domainObj->getName(0);
+	$domainName			= $domainObj->getName(1);
+	$countryObj			= new Country(array('code' => $cc));
+	$countryName		= $countryObj->getName();
+
+	$changed        	= $template['changed'];
+	$deleted        	= $template['deleted'];
+	$added          	= $template['added'];
+	$changedText		= null;
+	$deletedText		= null;
+    $addedText	    	= null;
     $template['summary']->update(null);
 }                       // initial invocation from URL
 else
@@ -185,8 +171,6 @@ if (count($_POST) > 0)
 	{				// loop through all parameters
 	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
 	                        "<td class='white left'>$value</td></tr>\n"; 
-		// separate parameter names into column and code
-	
 		switch(strtolower($key))
 		{		            	// act on specific keys
 		    case 'domain':
@@ -217,30 +201,13 @@ if (count($_POST) > 0)
 	    $warn           .= $parmsText;
 	}
 
-	$tempBase			= $document_root . '/templates/';
-	$template			= new FtTemplate("${tempBase}page$lang.html");
-	$includeSub			= "Counties$action$lang.html";
-	if (!file_exists($tempBase . $includeSub))
-	{
-		$includeSub		= 'Counties' . $action . 'en' . '.html';
-		$language		= new Language(array('code'	=> $lang));
-		$langName	    = $language->get('name');
-		$nativeName	    = $language->get('nativename');
-		$sorry  	    = $language->getSorry();
-	    $warn   	    .= str_replace(array('$langName','$nativeName'),
-	                           array($langName, $nativeName),
-	                           $sorry);
-	}
-    $template->includeSub($tempBase . $includeSub, 'MAIN');
-
+    // create template
+	$template			= new FtTemplate("Counties$action$lang.html");
 
     $includeSub			= "CountiesDialogs$lang.html";
-    if (!file_exists($tempBase . $includeSub))
-    {
-    	$includeSub		= 'CountiesDialogsen' . '.html';
-    }
-    $template->includeSub($tempBase . $includeSub, 'DIALOGS', true);
+    $template->includeSub($includeSub, 'DIALOGS', true);
 
+    // analyse parameters
 	$domainObj	    = new Domain(array('domain'	    => $domain,
 	           					       'language'	=> 'en'));
 	if ($domainObj->isExisting())
@@ -256,7 +223,8 @@ if (count($_POST) > 0)
 	}
 	$countryObj		= new Country(array('code' => $cc));
 	$countryName	= $countryObj->getName();
-	
+
+    // loop through the parameters again to apply updates to the County objects
 	foreach($_POST as $key => $value)
 	{				            // loop through all parameters
 		$matches		= array();

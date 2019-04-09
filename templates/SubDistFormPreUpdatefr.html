@@ -1,17 +1,18 @@
 <!--*********************************************************************
- *  SubDistFormPreDisplayfr.html					*
- *									*
+ *  SubDistFormPreDisplayfr.html										*
+ *																		*
  *  Display form for editting sub-district information for a district	*
- *  of a Census of Canada						*
- *									*
- *  History:								*
- *	2017/09/25	created						*
- *	2018/01/04	remove Template from template file names	*
- *	2018/01/10	separate administrator and client templates	*
- *	2018/05/22	support distinctive style for id, name,		*
- *			lacreel, ldsreel, and image base columns	*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  of a Census of Canada												*
+ *																		*
+ *  History:															*
+ *		2017/09/25		created											*
+ *		2018/01/04		remove Template from template file names		*
+ *		2018/01/10		separate administrator and client templates		*
+ *		2018/05/22		support distinctive style for id, name,			*
+ *						lacreel, ldsreel, and image base columns		*
+ *      2019/02/25      improve field alignment                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
 <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=fr">Généalogie</a>:
@@ -36,28 +37,36 @@
     $TRACE
     $MSG
   <!--- Put out a line with links to previous and next section of table -->
-  <div class="center" id="linkHdr">
-    <span class="left" id="npPrevFront">
+  <div class="center" id="topBrowse">
+    <span class="left" id="topPrev">
       <a href="/database/SubDistForm.php$npPrev">&lt;---</a>
     </span>
-    <span class="right" id="npNextFront">
+    <span class="right" id="topNext">
       <a href="/database/SubDistForm.php$npNext">---&gt;</a>
     </span>
     $CENSUSYEAR Recensement de $COUNTRYNAME $DNAME ($PROVINCE) ($DISTID)
     <div style="clear: both;"></div>
   </div>
-<!--- Put out the response as a table -->
-<form name="censusForm"
-	action="SubDistUpdate.php" 
-	method="post" 
-	autocomplete="off" 
-	enctype="multipart/form-data">
+      <!--- Put out the response as a table -->
+      <form name="censusForm"
+        	action="SubDistForm.php" 
+        	method="post" 
+        	autocomplete="off" 
+        	enctype="multipart/form-data">
     <input type="hidden" name="Census" id="Census"
 		value="$CENSUSID">
     <input type="hidden" name="Province" id="Province" 
 		value="$PROVINCE">
     <input type="hidden" name="District" id="District" 
 		value="$DISTID">
+    <input type="hidden" name="NameWidth" id="NameWidth" 
+        		value="$NAMEWIDTH">
+    <input type="hidden" name="RemarksWidth" id="RemarksWidth" 
+        		value="$REMARKSWIDTH">
+    <input type="hidden" name="FcAuto" id="FcAuto" 
+        		value="$FCAUTO">
+    <input type="hidden" name="lang" id="lang" 
+        		value="$LANG">
     <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
     <table class="form" id="dataTbl">
       <thead> <!--- Put out the column headers -->
@@ -108,7 +117,7 @@
       </thead>
       <tbody>
 	<tr id="Row$line">
-	  <td class="right">
+	  <td class="data right">
 	    <!-- fields to identify existing row in database -->
 	    <input type="hidden"
 			name="Orig_Id$line" id="Orig_Id$line"
@@ -125,75 +134,75 @@
 	 		value="$id" 
 			class="$idclass rightfixed" size="3" maxlength="6">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <!-- permit modifying the Div of the existing row -->
 	    <input type="text"
 			name="SD_Div$line" id="SD_Div$line"
 	 		value="$div" 
 			class="black rightfixed" size="3" maxlength="4">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_Name$line" id="SD_Name$line"
 	 		value="$name" 
 			class="$nameclass leftnc" size="$nameWidth"
 			maxlength="255">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_Pages$line" id="SD_Pages$line"
 	 		value="$pages" 
 			class="black rightnc" size="4" maxlength="4">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_PageI$line" id="SD_PageI$line"
-	 		value="$page1" 
+	 		value="$page1"  style="width: 85px;"
 			class="black rightnc" size="4" maxlength="4">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_ByPage$line" id="SD_ByPage$line"
-	 		value="$bypage" 
+	 		value="$bypage"  style="width: 85px;"
 			class="black rightnc" size="4" maxlength="4">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_Population$line" id="SD_Population$line"
-	 		value="$population" 
+	 		value="$population"  style="width: 101px;"
 			class="black rightnc" size="7" maxlength="8">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_LacReel$line" id="SD_LacReel$line"
 	 		value="$lacreel" 
 			class="$lacclass left" size="7" maxlength="8">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_LdsReel$line" id="SD_LdsReel$line"
 	 		value="$ldsreel" 
 			class="$ldsclass rightnc" size="8" maxlength="8">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_ImageBase$line" id="SD_ImageBase$line"
-	 		value="$imagebase" 
+	 		value="$imagebase" style="width: 101px;"
 			class="$baseclass rightnc" size="8" maxlength="8">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_RelFrame$line" id="SD_RelFrame$line"
-	 		value="$relframe" 
+	 		value="$relframe" style="width: 101px;" 
 			class="black rightnc" size="8" maxlength="8">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_FrameCt$line" id="SD_FrameCt$line"
-	 		value="$framect" 
+	 		value="$framect" style="width: 101px;" 
 			class="black rightnc" size="3" maxlength="4">
 	  </td>
-	  <td class="right">
+	  <td class="data right">
 	    <input type="text"
 			name="SD_Remarks$line" id="SD_Remarks$line"
 	 		value="$remarks" 
@@ -226,11 +235,11 @@
     </button>
   </form>
   <!--- Put out a line with links to previous and next section of table -->
-  <div class="center" id="linkFtr">
-    <span class="left" id="npPrevBack">
+  <div class="center" id="botBrowse">
+    <span class="left" id="botPrev">
       <a href="/database/SubDistForm.php$npPrev">&lt;---</a>
     </span>
-    <span class="right" id="npNextBack">
+    <span class="right" id="botNext">
       <a href="/database/SubDistForm.php$npNext">---&gt;</a>
     </span>
     $CENSUSYEAR Census of

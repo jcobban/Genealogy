@@ -3,15 +3,15 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  ToDoList.php							*
- *									*
+ *  ToDoList.php														*
+ *																		*
  *  List of candidate features for the web site family tree software.	*
- *									*
- *  History:								*
- *	2010/12/25	created						*
- *	2017/10/16	use class RecordSet				*
- *									*
- *  Copyright &copy; 2017 James A. Cobban				*
+ *																		*
+ *  History:															*
+ *		2010/12/25		created											*
+ *		2017/10/16		use class RecordSet								*
+ *																		*
+ *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Blog.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -76,9 +76,6 @@ function showBlog($projectId)
 	<a href='/Canada/genProvince.php?domain=CAON'>Ontario</a>:
 	<a href='/FamilyTree/Services.php'>Services</a>:
 	<td class='right'>
-<?php
-	rightTop();
-?>	
 	</td>
       </tr>
     </table>

@@ -30,8 +30,9 @@
  *		2015/06/16		open list of pictures in other half of window	*
  *		2016/02/06		call pageInit on load							*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -86,8 +87,6 @@ tinyMCE.init({
  ************************************************************************/
 function loadEdit()
 {
-    pageInit();
-
     // determine in which half of the window child frames are opened
     if (window.frameElement)
     {				// dialog opened in half frame
@@ -118,7 +117,6 @@ function loadEdit()
 		    var element		= formElts[i];
 		    if (element.nodeName.toLowerCase() == 'fieldset')
 				continue;
-		    actMouseOverHelp(element);
 
 		    // set behavior for individual elements by name
 		    var	name	= element.name;

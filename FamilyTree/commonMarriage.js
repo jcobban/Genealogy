@@ -191,8 +191,9 @@
  *						children by birth date without requiring that	*
  *						the user manually edit new children first		*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/01/21      get gender for given name from database         *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -203,11 +204,11 @@
  *  as variables.														*
  ************************************************************************/
 
-var CHILD_PREFIX		= "child";
+var CHILD_PREFIX		    = "child";
 var CHILD_PREFIX_LEN		= CHILD_PREFIX.length;
 var EDIT_CHILD_PREFIX		= "editChild";
 var EDIT_CHILD_PREFIX_LEN	= EDIT_CHILD_PREFIX.length;
-var DELETE_PREFIX		= "Delete";
+var DELETE_PREFIX		    = "Delete";
 var DELETE_PREFIX_LEN		= DELETE_PREFIX.length;
 var DELETE_EVENT_PREFIX		= "DelEvent";
 var DELETE_EVENT_PREFIX_LEN	= DELETE_EVENT_PREFIX.length;
@@ -221,19 +222,19 @@ var EDIT_EVENT_PREFIX_LEN	= EDIT_EVENT_PREFIX.length;
  ************************************************************************
  *		IDIME points to Marriage Record tblMR.idmr						*
  ************************************************************************/
-var STYPE_LDSS		= 18;	// Sealed to Spouse
-var STYPE_NEVERMARRIED	= 19;	// This individual never married 
-var STYPE_MAR		= 20;	// Marriage	
-var STYPE_MARNOTE	= 21;	// Marriage Note
-var STYPE_MARNEVER	= 22;	// Never Married	     
-var STYPE_MARNOKIDS	= 23;	// This couple had no children
-var STYPE_MAREND	= 24;	// Marriage ended
+var STYPE_LDSS		        = 18;	// Sealed to Spouse
+var STYPE_NEVERMARRIED	    = 19;	// This individual never married 
+var STYPE_MAR		        = 20;	// Marriage	
+var STYPE_MARNOTE	        = 21;	// Marriage Note
+var STYPE_MARNEVER	        = 22;	// Never Married	     
+var STYPE_MARNOKIDS	        = 23;	// This couple had no children
+var STYPE_MAREND	        = 24;	// Marriage ended
 				
 /************************************************************************
  *		IDIME points to Event Record tblER.ider							*
  ************************************************************************/
-var STYPE_EVENT		= 30;	// Individual Event
-var STYPE_MAREVENT	= 31;	// Marriage Event
+var STYPE_EVENT	        	= 30;	// Individual Event
+var STYPE_MAREVENT	        = 31;	// Marriage Event
 
 /************************************************************************
  * specify the style for tinyMCE editing								*
@@ -1215,24 +1216,24 @@ function changeWife(parms)
 }		// changeWife`
 
 /************************************************************************
- *  changeChild																*
+ *  changeChild															*
  *																		*
  *  Change the displayed information about a child.						*
  *  This is a callback method of <div id='child$rownum'>				*
  *  that is called by editIndivid.js to update the displayed information*
  *  about a child in the summary list on this page.						*
  *																		*
- *  Parameters:																*
- *		this				<div id='child$rownum'>								*
- *		parms				object with at least the following members		*
+ *  Parameters:															*
+ *		this			<div id='child$rownum'>							*
+ *		parms			object with at least the following members		*
  *		    idir		IDIR of child as individual						*
  *		    idcr		IDCR of child relationship record				*
- *		    givenname		new given name of child								*
- *		    surname		new surname of child								*
- *		    birthd		new birth date of child								*
- *		    deathd		new death date of child								*
- *		    gender		new gender of child: "male" or "female"				*
- *		    gender		new sex code of child: 0 or 1						*
+ *		    givenname	new given name of child							*
+ *		    surname		new surname of child							*
+ *		    birthd		new birth date of child							*
+ *		    deathd		new death date of child							*
+ *		    gender		new gender of child: "male" or "female"			*
+ *		    gender		new sex code of child: 0 or 1					*
  ************************************************************************/
 function changeChild(parms)
 {
@@ -1721,43 +1722,63 @@ function addNewChild()
  *  Input:																*
  *		this	instance of <input id="CGiven...">			            *
  ************************************************************************/
+var givenElt        = null;
 function givenChanged()
 {
-    var	form		= this.form;
-    var	rownum		= this.name.substring(6);
+    givenElt        = this;
+    var	givenName	= this.value.toLowerCase();
+    var options             = {};
+    options.errorHandler    = function() {alert('script getRecordJson.php not found')};
+    var url         = '/getRecordJson.php?table=Nicknames&id=' + givenName.replace(/\s+/g, ',');
+    HTTP.get(url,
+             gotNickname,
+             options);
+}	// function givenChanged
+
+function gotNickname(nickname)
+{
+    var	form		= givenElt.form;
+    var	rownum		= givenElt.name.substring(6);
     var	surnameElt	= form.elements['CSurname' + rownum];
     var genderElt	= form.elements['CGender' + rownum];
-    var	givenName	= this.value.toLowerCase();
-    var	names		= givenName.split(" ");
-    for (var i = 0; i < names.length; i++)
-    {		// loop through individual given names
-		if (femaleNames[names[i]] > 0)
-		{
-		    this.className		= 'female'
-		    if (surnameElt)
-				surnameElt.className	= 'female';
-		    if (genderElt)
-				genderElt.value		= 1;
-		    break;
-		}
-		else
-		if (maleNames[names[i]] > 0)
-		{
-		    this.className		= 'male'
-		    if (surnameElt)
-				surnameElt.className	= 'male';
-		    if (genderElt)
-				genderElt.value		= 0;
-		    break;
-		}
-    }		// loop through individual given names
 
-    // fold to upper case and expand abbreviations
-    changeElt(this);
+    if (typeof nickname !== 'object')
+        alert ("gotNickname called with " + JSON.stringify(nickname));
+    if (!('gender' in nickname))
+    {                       // array of responses
+        var nicknames   = nickname;
+        for(var name in nicknames)
+        {                   // loop through responses
+            nickname   = nicknames[name];
+            if (nickname.gender !== null)
+                break;
+        }                   // loop through responses
+    }                       // array of responses
 
-    if (this.checkfunc)
-		this.checkfunc();
-}	// function givenChanged
+	if (nickname.gender == 'F')
+	{
+	    givenElt.className		    = 'female'
+	    if (surnameElt)
+			surnameElt.className	= 'female';
+	    if (genderElt)
+			genderElt.value		    = 1;
+	}
+	else
+	if (nickname.gender == 'M')
+	{
+	    givenElt.className		    = 'male'
+	    if (surnameElt)
+			surnameElt.className	= 'male';
+	    if (genderElt)
+			genderElt.value		    = 0;
+	}
+
+    // fold according to case rules and expand abbreviations
+    changeElt(givenElt);
+
+    if (givenElt.checkfunc)
+		givenElt.checkfunc();
+}	// function gotNickname
 
 /************************************************************************
  *  function changeHusbSurname											*
@@ -2706,26 +2727,26 @@ function noAddChild()
  *  addChildToPage														*
  *																		*
  *  This method is called to add information about a child				*
- *  as a visible row in the web page.  If requested it also adds the		*
+ *  as a visible row in the web page.  If requested it also adds the	*
  *  child to the database. This is a callback method of the				*
  *  <table id='children'> element that is called by editIndivid.js		*
  *  to display information about a child that is being added to the		*
  *  family.																*
  *																		*
- *  Parameters:																*
- *		this				table element with id='children'				*
- *		parms				object with at least the following membets		*
+ *  Parameters:															*
+ *		this			table element with id='children'				*
+ *		parms			object with at least the following membets		*
  *		    idir		IDIR of child to update or object				*
- *		    givenname		given name of new child								*
- *		    surname		surname of new child								*
- *		    birthd		birth date of new child as text						*
+ *		    givenname	given name of new child							*
+ *		    surname		surname of new child							*
+ *		    birthd		birth date of new child as text					*
  *		    birthsd		birth date of new child as yyyymmdd				*
- *		    deathd		death date of new child as text						*
- *		    gender		gender of new child: "male" or "female"				*
- *		updateDb		no longer used										*
+ *		    deathd		death date of new child as text					*
+ *		    gender		gender of new child: "male" or "female"			*
+ *		updateDb		no longer used									*
  *																		*
- *  Returns:																*
- *		<div id='childnnn> or <tr id='childnnn'> element added to page		*
+ *  Returns:															*
+ *		<div id='childnnn> or <tr id='childnnn'> element added to page	*
  ************************************************************************/
 function addChildToPage(parms,
 						updateDb,

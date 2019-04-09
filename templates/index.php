@@ -47,26 +47,7 @@ if (count($_GET) > 0)
         $warn       .= $parmsText . "</table>\n";
 }	        	    // invoked by URL to display current status of account
 
-$title	    	= "Templates";
-$tempBase	    = $document_root . '/templates/';
-$template	    = new FtTemplate("${tempBase}page$lang.html");
-$includeSub	    = "templatesIndex$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-    if ($lang != 'en')
-    {
-		$language   	= new Language(array('code' => $lang));
-		$langName	    = $language->get('name');
-		$nativeName	    = $language->get('nativename');
-		$sorry  	    = $language->getSorry();
-        $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                       array($langName, $nativeName),
-                                       $sorry);
-    }
-    $includeSub	= "templatesIndexen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-				      'MAIN');
+$template	    = new FtTemplate("templatesIndex$lang.html");
 
 $template->display();
 

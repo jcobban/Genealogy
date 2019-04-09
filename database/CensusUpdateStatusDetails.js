@@ -20,8 +20,9 @@
  *		2018/02/27		do not pass province to CensusForm.php for		*
  *						post-confederation census						*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -40,9 +41,6 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    // perform common page initialization
-    pageInit();
-
     // add mouseover actions for forward and backward links
     for (var il = 0; il < document.links.length; il++)
     {			// loop through all hyper-links
@@ -59,12 +57,8 @@ function onLoad()
 		{			// loop through all elements in form
 		    var element	= form.elements[j];
 
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
-
 		    var	name	= element.name;
-		    var	id	= '';		// numeric portion of name
+		    var	id	    = '';		// numeric portion of name
 		    if (!name || name.length == 0)
 				name	= element.id;
 		    var namePattern	= /^([a-zA-Z]+)(\d*)$/

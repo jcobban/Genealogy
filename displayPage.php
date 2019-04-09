@@ -20,8 +20,12 @@ use \Exception;
  *		2018/01/25		common functionality moved to class FtTemplate	*
  *		2018/02/03		generate popups for links to family tree		*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/05      embed <body> contents of non-template pages     *
+ *		                into main template so all of the FtTemplate     *
+ *		                customization is performed                      *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -129,14 +133,14 @@ if (count($_GET) > 0)
 }	        	    // invoked by URL to display current status of account
 
 $tempBase	            = $document_root . '/templates/';
-$template	            = new FtTemplate("${tempBase}page$lang.html");
 if (substr($templateName, 0, 1) == '/')
 {                   // template location relative to document root
+    $template	            = new FtTemplate("${tempBase}page$lang.html");
     if (substr($templateName, -5) != '.html' &&
         substr($templateName, -4) != '.htm')
-    {               // template location relative to template directory
+    {               // add filetype
         $templateName	= $templateName . '.html';
-    }               // template location relative to template directory
+    }               // add filetype
 
 	if (file_exists($document_root . $templateName))
     {               // template file exists
@@ -149,48 +153,12 @@ if (substr($templateName, 0, 1) == '/')
             if (strtolower($tag->tagName) == 'body')
             {       // <body> tag
                 $body       = $tag;
-                $bodyTags   = $body->childNodes();
-                $bodyText   = '';
-                foreach($bodyTags as $btag)
-                {   // loop through children of <body>
-                    //$warn   .= "<p>" . __LINE__ . " &lt;" .
-                    //    $btag->tagName . ' ' . print_r($btag->attributes, true) . "&gt;</p>";
-                    if (array_key_exists('class', $btag->attributes))
-                    {
-                        if ($btag->attributes['class'] == 'topcrumbs')
-                            $template->set('BREADCRUMBS',
-                                           $btag->innerHTML());
-                        else
-                        if ($btag->attributes['class'] == 'botcrumbs')
-                        {   // hide botcrumbs
-                        }   // hide botcrumbs
-                        else
-                            $bodyText   .= $btag->outerHTML();
-                    }
-                    else
-                        $bodyText   .= $btag->outerHTML();
-                }   // loop through children of <body>
+                $bodyText   = $body->innerHTML();
+                $bodyText   .= "\n        <script src=\"/jscripts/util.js\" type=\"application/javaScript\">\n</script>\n";
+                $template->includeSub($bodyText,    'MAIN');
+                break;
             }       // <body> tag
         }           // loop through children of <html>
-        $template->set('MAIN',      $bodyText);
-        $h1array       = $sourceTemplate->getElementsByTagName('h1');
-        if (count($h1array) > 0)
-        {
-            $title		= current($h1array)->innerHTML();
-            // remove tags
-            $spanpos	= strpos($title, '<span class');
-            if ($spanpos !== false)
-            {
-                $clospos	= strpos($title, '</span>', $spanpos) + 7;
-                $title		= substr($title, 0, $spanpos) .
-                                  substr($title, $clospos);
-            }
-            $title		= preg_replace('#<[^>]+>#s', '', $title);
-            $title		= trim($title);
-            // do substitutions into the string and make it the
-            // value of TITLE
-            $template->set('TITLE', $title, true);
-        }
     }               // template file exists
     else
         $msg        .= "Unable to open file $document_root$templateName. ";
@@ -198,39 +166,19 @@ if (substr($templateName, 0, 1) == '/')
 else
 {                   // template location relative to template directory
     if (substr($templateName, -5) == '.html')
-    {               // template location relative to template directory
+    {               // exclude file type
         $templateName	= substr($templateName, 0, strlen($templateName) - 5);
-    }               // template location relative to template directory
-    $tempdir            = $tempBase;
+    }               // exclude file type
 	$includeSub	        = $templateName . $lang . '.html';
-	if (!file_exists($tempdir . $includeSub))
-	{
-	    if ($lang != 'en')
-	    {
-			$language   = new Language(array('code' => $lang));
-			$langName	= $language->get('name');
-			$nativeName	= $language->get('nativename');
-			$sorry  	= $language->getSorry();
-	        $warn   	.= str_replace(array('$langName','$nativeName'),
-	                                   array($langName, $nativeName),
-	                                   $sorry);
-	    }
-	    $includeSub	        = $templateName . 'en.html';
-	    if (!file_exists($tempBase . $includeSub))
-			$includeSub	    = $templateName . '.html';
-	}
-    if ($debug)
-        $warn   .= "<p>" . __LINE__ .
-                " \$template->includeSub($tempdir$includeSub,'MAIN')</p>\n";
-    $template->includeSub($tempdir . $includeSub,
-	    			      'MAIN');
+	$template           = new FtTemplate($includeSub);
 }                   // template location relative to template directory
 
 // create popup balloons for each of the individuals referenced on this page
-$tag		            = $template->getElementById('Individ$idir');
-if ($tag)
+$tag		            = $template['Individ$idir'];
+$bodyTag   	            = $template['familyTree'];
+if ($tag && $bodyTag)
 {			// place to expand popups
-    $body   	        = $template->getElementById('familyTree')->innerHTML();
+    $body   	        = $bodyTag->innerHTML();
     createPopups($body);
     $templateParms	    = array();
     foreach($individTable as $idir => $individ)

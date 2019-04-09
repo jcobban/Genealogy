@@ -3,28 +3,29 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  Temples.php								*
- *									*
- *  Display a web page containing all of the temples matching a		*
- *  pattern.								*
- *									*
- *  History:								*
- *	2012/12/06	created						*
- *	2013/05/23	use pageTop and pageBot to standardize		*
- *			appearance					*
- *	2013/05/29	help popup for rightTop button moved to		*
- *			common.inc					*
- *	2013/12/07	$msg and $debug initialized by common.inc	*
- *	2014/03/10	replace table with CSS for layout		*
- *	2014/04/26	formUtil.inc obsoleted				*
- *	2014/12/12	print $warn, which may contain debug trace	*
- *	2015/07/02	access PHP includes using include_path		*
- *	2016/01/19	add id to debug trace				*
- *	2017/09/02	class LegacyTemple renamed to class Temple	*
- *	2017/11/18	use RecordSet instead of Temple::getTemples	*
- *	2018/01/04	remove Template from template file names	*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  Temples.php															*
+ *																		*
+ *  Display a web page containing all of the temples matching a			*
+ *  pattern.															*
+ *																		*
+ *  History:															*
+ *		2012/12/06		created											*
+ *		2013/05/23		use pageTop and pageBot to standardize			*
+ *						appearance										*
+ *		2013/05/29		help popup for rightTop button moved to			*
+ *						common.inc										*
+ *		2013/12/07		$msg and $debug initialized by common.inc		*
+ *		2014/03/10		replace table with CSS for layout				*
+ *		2014/04/26		formUtil.inc obsoleted							*
+ *		2014/12/12		print $warn, which may contain debug trace		*
+ *		2015/07/02		access PHP includes using include_path			*
+ *		2016/01/19		add id to debug trace							*
+ *		2017/09/02		class LegacyTemple renamed to class Temple		*
+ *		2017/11/18		use RecordSet instead of Temple::getTemples		*
+ *		2018/01/04		remove Template from template file names		*
+ *		2019/02/19      use new FtTemplate constructor                  *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Temple.inc';
 require_once __NAMESPACE__ . '/Template.inc';
@@ -81,15 +82,7 @@ require_once __NAMESPACE__ . '/common.inc';
     $info		= $temples->getInformation();
     $count		= $info['count'];
 
-    $tempBase		= $document_root . '/templates/';
-    $template		= new FtTemplate("${tempBase}page$lang.html");
-    $includeSub		= "Temples" . $lang . '.html';
-    if (!file_exists($tempBase . $includeSub))
-    {
-	$includeSub	= "Templesen.html";
-    }
-    $template->includeSub($tempBase . $includeSub,
-			  'MAIN');
+    $template		= new FtTemplate("Temples$lang.html");
 
     $template->set('pattern',		$pattern);
 

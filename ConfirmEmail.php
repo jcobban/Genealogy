@@ -20,12 +20,12 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2018/01/28		use Template									*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Template.inc";
 require_once __NAMESPACE__ . "/User.inc";
-require_once __NAMESPACE__ . "/Language.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
 // get parameters
@@ -88,22 +88,8 @@ else
 	$msg		.= "Missing mandatory parameters. ";
 }		// registration not supplied
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "ConfirmEmail$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	= 'ConfirmEmailen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-				      'MAIN');
+$template		= new FtTemplate("ConfirmEmail$lang.html");
+
 $template->set('USERID',	$userid);
 $template->set('LANG',		$lang);
 

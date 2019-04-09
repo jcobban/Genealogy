@@ -96,8 +96,9 @@ use \Exception;
  *		2018/10/15      get language apology text from Languages        *
  *		2018/12/21      correct insertion of empty rows                 *
  *		                get error message text from template            *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -244,6 +245,7 @@ foreach ($_GET as $key => $value)
 			    break;
 			}		// registration year
 
+			case 'county':
 			case 'regcounty':
 			{
 			    $regCounty		    = $value;
@@ -290,6 +292,7 @@ foreach ($_GET as $key => $value)
 			    $npuri	        	.= "$npand$key=" .
 						        	   urlencode($value);
 			    $npand		        = '&amp;'; 
+			    $expand		        = false;
 			    break;
 			}		// birth date
 
@@ -324,6 +327,8 @@ foreach ($_GET as $key => $value)
 			    break;
 			}		// debug
 
+            case 'township':
+                $fieldLc            = "reg$fieldLc";
 			default:
 			{		// ordinary parameter
                 $getParms[$fieldLc]	= $value;
@@ -340,26 +345,8 @@ if ($debug && count($_GET) > 0)
 	$warn   	    .= $parmsText . "</table>\n";
 
 // start the template
-$tempBase			= $document_root . '/templates/';
-$template			= new FtTemplate("${tempBase}page$lang.html");
-$includeSub			= "BirthRegResponse$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language		= new Language(array('code' => $lang));
-	$langName		= $language->get('name');
-	$nativeName		= $language->get('nativename');
-	$sorry  		= $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	= "BirthRegResponseen.html";
-}
-$template->includeSub($tempBase . $includeSub,
-				      'MAIN');
-if (file_exists($tempBase . "Trantab$lang.html"))
-    $trtemplate = new Template("${tempBase}Trantab$lang.html");
-else
-    $trtemplate = new Template("${tempBase}Trantaben.html");
+$template			= new FtTemplate("BirthRegResponse$lang.html");;
+$trtemplate         = $template->getTranslate();
 
 // validate domain code
 $domainObj	           		= new Domain(array('domain'	    => $domain,
@@ -419,7 +406,7 @@ if ($regnum)
 {
     if (ctype_digit($regnum))
     {
-		$getParms[$fieldLc]	= $regnum;
+		$getParms['regnum']	= $regnum;
     }
     else
     {
@@ -486,7 +473,7 @@ if ($tranTabTag)
         $action                 = $tranTab['Display'];
 }                   // tranTabTag
 else
-if (userCan('update'))
+if (canUser('update'))
     $action                     = 'Update';
 else
     $action                     = 'Details';
@@ -557,8 +544,12 @@ $template->set('REGNUM',        $regnum);
 // if no error messages display the results of the query
 if (strlen($msg) == 0)
 {		// no error messages
-	if ($expand)
-	    $getParms['regnum']	= array($regnum, ':' . ($regnum + $limit - 1));
+    if ($expand && $regnum > 0)
+    {
+        $warn   .= "<p>BirthRegResponse.php: " . __LINE__ .
+                " regnum=$regnum</p>\n";
+        $getParms['regnum']	= array($regnum, ':' . ($regnum + $limit - 1));
+    }
 
 	// get the set of Births matching the parameters
 	$births					= new BirthSet($getParms, $orderby);

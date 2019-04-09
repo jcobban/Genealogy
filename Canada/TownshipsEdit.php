@@ -1,4 +1,7 @@
-  <?php
+<?php
+namespace Genealogy;
+use \PDO;
+use \Exception;
 /************************************************************************
  *  TownshipsEdit.php													*
  *																		*
@@ -37,17 +40,17 @@
  *		2017/09/12		use get( and set(								*
  *		2017/12/20		use class TownshipSet							*
  *		2018/10/21      use class Template                              *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
-require_once "Domain.inc";
-require_once 'County.inc';
-require_once 'Country.inc';
-require_once 'Township.inc';
-require_once 'TownshipSet.inc';
-require_once 'Language.inc';
-require_once 'Template.inc';
-require_once 'common.inc';
+require_once __NAMESPACE__ . "/Domain.inc";
+require_once __NAMESPACE__ . '/County.inc';
+require_once __NAMESPACE__ . '/Country.inc';
+require_once __NAMESPACE__ . '/Township.inc';
+require_once __NAMESPACE__ . '/TownshipSet.inc';
+require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/common.inc';
 
 $prov		    = 'ON';		    // postal abbreviation for province
 $domain		    = 'CAON';	    // administrative domain
@@ -176,37 +179,23 @@ if (canUser('edit'))
 else
 	$action			= 'Display';
 
-$tempBase			= $document_root . '/templates/';
-$template			= new FtTemplate("${tempBase}page$lang.html");
-$includeSub			= "TownshipsEdit$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$includeSub		= 'TownshipsEdit' . $action . 'en' . '.html';
-	$language		= new Language(array('code'	=> $lang));
-	$langName	    = $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                           array($langName, $nativeName),
-                           $sorry);
-}
-$template->includeSub($tempBase . $includeSub, 'MAIN');
+$template			= new FtTemplate("TownshipsEdit$action$lang.html");
 
-$template->set('CONTACTTABLE',	'Counties');
+$template->set('CONTACTTABLE',	    'Counties');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
-$template->set('CC',	    	$cc);
-$template->set('COUNTRYNAME',	$countryName);
-$template->set('DOMAIN',		$domain);
-$template->set('DOMAINNAME',	$domainName);
-$template->set('COUNTYCODE',	$countyCode);
-$template->set('COUNTYNAME',	$countyName);
-$template->set('LANG',          $lang);
-$template->set('OFFSET',        $offset);
-//$template->set('LIMIT',         $limit);
-$template->set('TOTALROWS',     $count);
-$template->set('FIRST',         $offset + 1);
-$template->set('LAST',          min($count, $offset + $limit));
-$template->set('$line',         '$line');
+$template->set('CC',	    	    $cc);
+$template->set('COUNTRYNAME',	    $countryName);
+$template->set('DOMAIN',	    	$domain);
+$template->set('DOMAINNAME',    	$domainName);
+$template->set('COUNTYCODE',    	$countyCode);
+$template->set('COUNTYNAME',    	$countyName);
+$template->set('LANG',              $lang);
+$template->set('OFFSET',            $offset);
+//$template->set('LIMIT',           $limit);
+$template->set('TOTALROWS',         $count);
+$template->set('FIRST',             $offset + 1);
+$template->set('LAST',              min($count, $offset + $limit));
+$template->set('$line',             '$line');
 //if ($offset > 0)
 //	$template->set('npPrev', "&offset=" . ($offset-$limit) . "&limit=$limit");
 //else

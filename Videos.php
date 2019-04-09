@@ -9,8 +9,9 @@ use \Exception;
  *																		*
  *  History:															*
  *		2018/02/01		created											*
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/RecordSet.inc";
 require_once __NAMESPACE__ . "/Language.inc";
@@ -27,10 +28,14 @@ $limit		    = 20;
 // initial invocation by method='get'
 if (isset($_GET) && count($_GET) > 0)
 {			// method='get'
-	$ttext		    = "<table>\n";
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{			// loop through parameters
-		$ttext	.= "<tr><th>$key</th><td>$value</td></tr>\n";
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {
 			case 'lang':
@@ -64,16 +69,20 @@ if (isset($_GET) && count($_GET) > 0)
 	    }			// act on specific parameters
 	}			// loop through parameters
 	if ($debug)
-	    $warn   	.= $ttext . "</table>\n";
+	    $warn   	.= $parmstext . "</table>\n";
 }				// method='get'
 else
 if (isset($_POST) && count($_POST) > 0)
 {		// when submit button is clicked invoked by method='post'
-	$ttext		    = "<table>\n";
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
 	$video		    = null;
 	foreach($_POST as $key => $value)
 	{
-	    $ttext		.= "<tr><th>$key</th><td>$value</td></tr>\n";
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
 	    $fieldLc		= strtolower($key);
 	    $matches		= array();
 	    if (preg_match('/^([a-zA-Z]+)(\d+)$/', $fieldLc, $matches))
@@ -112,9 +121,9 @@ if (isset($_POST) && count($_POST) > 0)
 			    if (strlen($row) > 0)
 			    {
 					$lang		= strtolower(substr($value, 0, 2));
-					$video	= new Record(array('filename'	=> $filename,
-								   'lang'	=> $lang),
-							     'Videos');
+					$video	    = new Record(array('filename'	=> $filename,
+								                   'lang'	    => $lang),
+							                 'Videos');
 			    }
 			    break;
 			}		// language
@@ -123,7 +132,7 @@ if (isset($_POST) && count($_POST) > 0)
 			{
 			    $video->set('description', $value);
 			    break;
-			}		// language
+			}		// description
 
 			case 'display':
 			{
@@ -163,10 +172,8 @@ if (isset($_POST) && count($_POST) > 0)
 
 	    }			// check supported parameters
 	}			// loop through all parameters
-
-	$ttext  	.= "</table>";
-	if ($debug)
-	    $warn	.= $ttext;
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
 }		// when submit button is clicked invoked by method='post'
 
 if (strlen($msg) == 0)
@@ -186,22 +193,7 @@ else
 }
 
 $tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "Videos$action$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                      array($langName, $nativeName),
-                                       $sorry);
-	$includeSub	    = "Videos{$action}en.html";
-}
-
-$gotPage	= $template->includeSub($tempBase . $includeSub,
-								    'MAIN');
+$template		= new FtTemplate("Videos$action$lang.html");
 
 $template->set('PATTERN',		 $pattern);
 $template->set('CONTACTTABLE',	'Videos');

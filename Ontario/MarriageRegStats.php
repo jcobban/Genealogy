@@ -139,7 +139,7 @@ pageTop(array(
   <span class='right'>
 	<a href='MarriageRegStatsHelpen.html' target='_blank'>Help?</a>
   </span>
-  <?php print $title; ?></h1>
+  <?php print $title; ?>
 </h1>
 <?php
 	if (strlen($warn) > 0)
@@ -276,12 +276,9 @@ pageTop(array(
   </table>
  </form>
 <?php
-	}		// display results of query
+    }		// display results of query
 ?>
  </div>
-<?php
-pageBot();
-?>
 <div class='balloon' id='HelpYearStats'>
 Click on this button to display the geographical breakdown of the
 transcription for the specific year.
@@ -289,5 +286,8 @@ transcription for the specific year.
 <div class='balloon' id='HelpRegYear'>
 This field shows the year for which the statistics apply.
 </div>
+<?php
+pageBot();
+?>
 </body>
 </html>

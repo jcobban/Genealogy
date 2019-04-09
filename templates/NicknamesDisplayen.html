@@ -1,163 +1,176 @@
 <!--*********************************************************************
- *  NicknamesUpdateen.html						*
- *									*
- *  Template to display a web page containing all of the given names	*
- *  matching a pattern.							*
- *									*
- *  History:								*
- *	2017/11/06	created						*
- *	2018/01/04	remove Template from template file names	*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  NicknamesDisplayen.html    	        								*
+ *    	        														*
+ *  Template to display a web page containing all of the given names    *
+ *  matching a pattern.    	        									*
+ *    	        														*
+ *  History:    	        											*
+ *      2017/11/06	    created											*
+ *      2018/01/04	    remove Template from template file names		*
+ *      2019/01/21      add support for gender                          *
+ *    	        														*
+ *  Copyright &copy; 2019 James A. Cobban    	        				*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php">Genealogy</a>:
-    <a href="/genCountry.php?cc=CA">Canada</a>:
-    <a href="/Canada/genProvince.php?Domain=CAON">Ontario</a>:
-    <a href="/FamilyTree/Services.php">Services</a>:
-  </div>	
-  <div class="body">
-    <h1>
-      <span class="right">
-	<a href="/FamilyTree/NicknamesHelpen.html" target="help">? Help</a>
-      </span>
-      Given Name Translation Table
-    </h1>
-    $TRACE
-    $MSG
-  <form name="locForm" action="Nicknames.php" method="post">
-    <p style="white-space: nowrap;">
-      <label class="label" style="width: 11em;" for="pattern">
-	Pattern:
-      </label>
-      <input name="pattern" id="pattern" type="text" 
-		class="white leftnc" size="80"
-		value="$pattern">
-      <input type="hidden" name="offset" value="$offset">
-      <input type="hidden" name="limit" value="$limit">
-    </p>
-    <p>
-      <button type="submit" id="Search">
-	Search
-      </button>
-    </p>
-  <div class="center" id="linksfront">
-    <div class="left" id="npprev">
-      <a href="/FamilyTree/Nicknames.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$prevoffset">&lt;---</a>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php">Genealogy</a>:
+      <a href="/genCountry.php?cc=CA">Canada</a>:
+      <a href="/Canada/genProvince.php?Domain=CAON">Ontario</a>:
+      <a href="/FamilyTree/Services.php">Services</a>:
+    </div>    
+    <div class="body">
+      <h1>
+        <span class="right">
+      <a href="/FamilyTree/NicknamesHelpen.html" target="help">? Help</a>
+        </span>
+        Given Name Translation Table
+      </h1>
+      $TRACE
+      $MSG
+      <form name="locForm" action="Nicknames.php" method="post">
+        <p style="white-space: nowrap;">
+          <label class="label" style="width: 11em;" for="pattern">
+        Pattern:
+          </label>
+          <input name="pattern" id="pattern" type="text" 
+            class="white leftnc" size="80"
+            value="$PATTERN">
+          <input type="hidden" name="offset" value="$OFFSET">
+          <input type="hidden" name="limit" value="$LIMIT">
+          <input type="hidden" name="debug" value="$DEBUG">
+        </p>
+        <p>
+          <button type="submit" id="Search">
+        Search
+          </button>
+        </p>
+        <div class="center" id="linksfront">
+          <div class="left" id="npprev">
+            <a href="/FamilyTree/Nicknames.php?pattern=$PATTERN&amp;lang=$LANG&amp;limit=$LIMIT&amp;offset=$PREVOFFSET">&lt;---</a>
+          </div>
+          <div class="right" id="npnext"> 
+          <a href="/FamilyTree/Nicknames.php?pattern=$PATTERN&amp;lang=$LANG&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET">---&gt;</a>
+          </div>
+          rows $OFFSET to $LAST of $COUNT 
+          <div style="clear: both;"></div>
+        </div>
+        <!--- Put out the response as a table -->
+        <table class="details" id="details">
+          <!--- Put out the column headers -->
+          <thead>
+            <tr>
+	          <th class="colhead">
+	            Nickname
+	          </th>
+	          <th class="colhead">
+	            Prefix
+	          </th>
+	          <th class="colhead">
+	            Given Name
+	          </th>
+	          <th class="colhead">
+	            Given Name
+	          </th>
+	          <th class="colhead">
+	            Gender
+	          </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="nickname$I">
+	          <td class="$EVEN left">
+	              $NICKNAME
+	            <input type="hidden" name="name$I" id="name$I"
+	              value="$NICKNAME">
+	          </td>
+	          <td class="$EVEN left">
+	            <input type="text" name="prefix$I" id="prefix$I"
+	              class="ina left" readonly="readonly"
+	              value="$PREFIX">
+	          </td>
+	          <td class="$EVEN left">
+	            <input type="text" name="givenname$I" id="givenname$I"
+	              class="ina left" readonly="readonly"
+	              value="$GIVENNAME">
+	          </td>
+	          <td class="$EVEN center">
+	            <input type="text" name="gender$I" id="gender$I"
+	              class="ina center" readonly="readonly" style="width: 1em;"
+	              value="$GENDER">
+	          </td>
+          </tr>
+        </tbody>
+      </table>
+      </form>
+    </div> <!-- end of <div class="body"> -->
+    <div class="balloon" id="Helppattern">
+      <p>
+      This is an 
+      <a href="https://www.regular-expressions.info/posix.html#ere">
+          extended regular expression</a>,
+      as supported by MySQL,
+      which is used to search for users based upon their user name.
+      This is a regular expression, as supported by MySQL, which is used to limit
+      the nicknames to be displayed. See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer"s regex page</a>.
+      <ul>
+        <li>If the pattern contains no special 
+      characters then only nicknames containing that string will be included.
+      For example the pattern "London" will match nicknames containing the
+      string "London".  Note that the search ignores case, so that pattern
+      will also match "LONDON" and "london".
+        <li>If the pattern begins with a caret "^" then only nicknames that
+      <b>begin</b> with the remainder of the pattern are included.  
+      For example the pattern
+      "^Ba" displays nicknames starting with "Ba" (or "ba" or "BA").
+        <li>If the pattern ends with a dollar sign "$", then only nicknames that
+      <b>end</b> with the remainder of the pattern are included.  
+      For example the pattern
+      "CA$" matches nicknames that end with "CA" (or "ca" or "Ca").
+        <li>In a pattern a period "." matches any single character.  For example
+      the pattern "B.b" matches any nickname that contains two letter Bs
+      separated by one character, for example "Bab", "Beb", "Bib", "Bob",
+      or "Bub" anywhere in the nickname name.
+        <li>In a pattern an asterisk "*" matches zero or more of the preceding
+      character; "bo*b" matches "bb", "bob", and "boob"
+      anywhere in the nickname name.
+      </ul>
+      </p>
     </div>
-    <div class="right" id="npnext"> 
-    <a href="/FamilyTree/Nicknames.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$nextoffset">---&gt;</a>
+    <div class="balloon" id="HelpSearch">
+    <p>Clicking on this button refreshes the displayed list of nicknames
+      based upon the pattern.  You may also hit the "enter" key to perform the
+      same function.
+    </p>
     </div>
-	rows $offset to $last of $count 
-    <div style="clear: both;"></div>
-  </div>
-  <!--- Put out the response as a table -->
-  <table class="details" id="details">
-    <!--- Put out the column headers -->
-    <thead>
-      <tr>
-	<th class="colhead">
-	  Nickname
-	</th>
-	<th class="colhead">
-	  Prefix
-	</th>
-	<th class="colhead">
-	  Given Name
-	</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr id="nickname$i">
-	<td class="$even left">
-	    $nickname
-	  <input type="hidden" name="name$i" id="name$i"
-		value="$nickname">
-	</td>
-	<td class="$even left">
-	  <input type="text" name="prefix$i" id="prefix$i"
-		class="ina left" readonly="readonly"
-		value="$prefix">
-	</td>
-	<td class="$even left">
-	  <input type="text" name="givenname$i" id="givenname$i"
-		class="ina left" readonly="readonly"
-		value="$givenname">
-	</td>
-      </tr>
-    </tbody>
-  </table>
-  </form>
-</div> <!-- end of <div class="body"> -->
-  <div class="balloon" id="Helppattern">
-    <p>
-	This is an 
-	<a href="https://www.regular-expressions.info/posix.html#ere">
-	    extended regular expression</a>,
-	as supported by MySQL,
-	which is used to search for users based upon their user name.
-    This is a regular expression, as supported by MySQL, which is used to limit
-    the nicknames to be displayed. See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer"s regex page</a>.
-    <ul>
-      <li>If the pattern contains no special 
-	characters then only nicknames containing that string will be included.
-	For example the pattern "London" will match nicknames containing the
-	string "London".  Note that the search ignores case, so that pattern
-	will also match "LONDON" and "london".
-      <li>If the pattern begins with a caret "^" then only nicknames that
-	<b>begin</b> with the remainder of the pattern are included.  
-	For example the pattern
-	"^Ba" displays nicknames starting with "Ba" (or "ba" or "BA").
-      <li>If the pattern ends with a dollar sign "$", then only nicknames that
-	<b>end</b> with the remainder of the pattern are included.  
-	For example the pattern
-	"CA$" matches nicknames that end with "CA" (or "ca" or "Ca").
-      <li>In a pattern a period "." matches any single character.  For example
-	the pattern "B.b" matches any nickname that contains two letter Bs
-	separated by one character, for example "Bab", "Beb", "Bib", "Bob",
-	or "Bub" anywhere in the nickname name.
-      <li>In a pattern an asterisk "*" matches zero or more of the preceding
-	character; "bo*b" matches "bb", "bob", and "boob"
-	anywhere in the nickname name.
-    </ul>
-    </p>
-  </div>
-  <div class="balloon" id="HelpSearch">
-  <p>Clicking on this button refreshes the displayed list of nicknames
-    based upon the pattern.  You may also hit the "enter" key to perform the
-    same function.
-  </p>
-  </div>
-  <div class="balloon" id="Helpname">
-    This field contains the actual given name component to match against.
-    It can only be specified when a new entry is added.
-  </div>
-  <div class="balloon" id="Helpprefix">
-    This field contains the additional name prefix to search for, or a
-    comma-separated list of additional name prefixes to search for.
-  </div>
-  <div class="balloon" id="Helpgivenname">
-    This field is used to contain a comment identifying the "normal"
-    spelling of what is believed to be the given name intended by the
-    original respondent before it was mangled by the clerk or enumerator.
-  </div>
-  <div class="balloon" id="Helpupdate">
-    Update Database
-  </div>
-  <div class="balloon" id="Helpadd">
-    Add a Given Name
-  </div>
-  <!-- balloons to pop up when mouse moves over forward and back links -->
-  <div class="popup" id="mousenpprev">
-    <p class="label">
-	Go to Row $prevoffset&nbsp;
-    </p>
-  </div>
-  <div class="popup" id="mousenpnext">
-    <p class="label">
-	Go to Row $nextoffset&nbsp;
-    </p>
-  </div>
+    <div class="balloon" id="Helpname">
+      This field contains the actual given name component to match against.
+      It can only be specified when a new entry is added.
+    </div>
+    <div class="balloon" id="Helpprefix">
+      This field contains the additional name prefix to search for, or a
+      comma-separated list of additional name prefixes to search for.
+    </div>
+    <div class="balloon" id="Helpgivenname">
+      This field is used to contain a comment identifying the "normal"
+      spelling of what is believed to be the given name intended by the
+      original respondent before it was mangled by the clerk or enumerator.
+    </div>
+    <div class="balloon" id="Helpupdate">
+      Update Database
+    </div>
+    <div class="balloon" id="Helpadd">
+      Add a Given Name
+    </div>
+    <!-- balloons to pop up when mouse moves over forward and back links -->
+    <div class="popup" id="mousenpprev">
+      <p class="label">
+      Go to Row $prevoffset&nbsp;
+      </p>
+    </div>
+    <div class="popup" id="mousenpnext">
+      <p class="label">
+      Go to Row $nextoffset&nbsp;
+      </p>
+    </div>
     <script src="/jscripts/js20/http.js" type="text/javascript">
     </script>
     <script src="/jscripts/CommonForm.js" type="text/javascript">

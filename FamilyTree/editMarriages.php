@@ -1559,6 +1559,24 @@ child there.
 to edit the set of pictures associated with this family.
 </p>
 </div>
+<div class="balloon" id="HelpFamiliesSet">
+This part of the page lists the marriages.
+</div>
+<div class="balloon" id="HelpHusbandSet">
+This part of the page groups information about the Husband.
+</div>
+<div class="balloon" id="HelpWifeSet">
+This part of the page groups information about the Wife.
+</div>
+<div class="balloon" id="HelpEventSet">
+This part of the page groups information about the events of the marriage.
+</div>
+<div class="balloon" id="HelpInformationSet">
+This part of the page groups general information about the marriage.
+</div>
+<div class="balloon" id="HelpChildrenSet">
+This part of the page groups information about the children.
+</div>
 <div id="loading" class="popup">
 Loading...
 </div>

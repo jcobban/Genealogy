@@ -45,8 +45,10 @@
  *						notification of previously undefined location	*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2018/12/28      dynamically load templates                      *
+ *		2019/01/22      do not lookup locations [blank] or [N/A]        *
+ *		2019/03/03      myform was no longer defined                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -109,12 +111,14 @@ var	evtLocAbbrs = {
 
 // get an XML file containing dialog templates from the server
 var lang                = 'en';
+var args                = getArgs();
 if ('lang' in args)
     lang                = args['lang'];
 var url	= "/LocationDialogsXML.php?lang=" + lang;
+
 HTTP.getXML(url,
-		     gotDialogs,
-		     noDialogs);
+		    gotDialogs,
+		    noDialogs);
 
 /************************************************************************
  *  gotDialogs  														*
@@ -131,7 +135,7 @@ var forms           = [];
 function gotDialogs(xmlDoc)
 {
     topXml	    = xmlDoc.documentElement;
-    if (topXml && typeof(topXml) == "object" && topXml.nodeName == 'div')
+    if (topXml && topXml.nodeName == 'div')
     {			// valid response
         for(var elt = topXml.firstChild; elt !== null; elt = elt.nextSibling)
         {           // loop through children
@@ -206,6 +210,7 @@ function noDialogs()
     alert("locationCommon.js: cannot find LocationDialogs");
 }       // function noDialogs
 
+var myform          = null;
 /************************************************************************
  *  deferSubmit															*
  *																		*
@@ -215,7 +220,7 @@ function noDialogs()
 var	deferSubmit	= false;
 
 /************************************************************************
- *  locationChanged														*
+ *  function locationChanged											*
  *																		*
  *  Take action when the user changes a field containing a location		*
  *  name to implement assists such as converting to upper case,			*
@@ -230,7 +235,6 @@ var	deferSubmit	= false;
 function locationChanged()
 {
     var	form			        = this.form;
-    deferSubmit			        = true;
     var	updateButton		    = document.getElementById('updEvent');
     if (updateButton)
 		updateButton.disabled	= true;
@@ -299,7 +303,8 @@ function locationChanged()
 
     // if possible display a loading indicator to the user so he/she is
     // aware that the location lookup is being performed
-    if (this.value.length != 0)
+    var loc             = this.value.toLowerCase();
+    if (loc.length != 0 && loc != '[blank]' && loc != '[n/a]')
     {		// search only for non-blank location
 		popupLoading(this);
 
@@ -311,11 +316,14 @@ function locationChanged()
 		HTTP.getXML(url,
 				    gotLocationXml,
 				    noLocationXml);
+        deferSubmit			    = true;
     }		// search only for non-blank location
-}		// locationChanged
+    else
+        deferSubmit			    = false;
+}		// function locationChanged
 
 /************************************************************************
- *  gotLocationXml														*
+ *  function gotLocationXml												*
  *																		*
  *  This method is called when the XML document representing			*
  *  the location or locations is retrieved from the database.			*
@@ -573,26 +581,32 @@ function closeNewDialog()
     if (updateButton)
 		updateButton.disabled	= false;
 
-    var	field			= myform.field.value;
-    var	formname		= myform.elements['formname'].value;
-    var	field			= myform.elements['field'].value;
-    var	mainForm		= document.forms[formname];
-    var	element			= mainForm.elements[field];
-    if (element)
-    {
-		focusNext(element);
-    }
+    var forms	            = dialogDiv.getElementsByTagName('FORM');
+    if (forms.length > 0)
+    {                           // the dialog includes a form
+        var myform          = forms[0];
+	    var	formname	   	= myform.elements['formname'].value;
+	    var	field		   	= myform.elements['field'].value;
+	    var	mainForm	   	= document.forms[formname];
+	    var	element		   	= mainForm.elements[field];
+	    if (element)
+	    {                       // found requested field in invoking form
+			focusNext(element);
+	    }                       // found requested field in invoking form
+	    else
+	    {                       // issue diagnostic
+			var	elementList	= '';
+			var	comma		= '[';
+			for(var fieldname in mainForm.elements)
+			{
+			    elementList	+= comma + fieldname;
+			    comma		= ',';
+			}
+			alert("locationCommon.js: closeNewDialog: cannot find input element with name='" + field + "' in form '" + formname + "' elements=" + elementList + "]");
+	    }                       // issue diagnostic
+    }                           // the dialog includes a form
     else
-    {
-		var	elementList		= '';
-		var	comma		= '[';
-		for(var fieldname in mainForm.elements)
-		{
-		    elementList		+= comma + fieldname;
-		    comma		= ',';
-		}
-		alert("locationCommon.js: closeNewDialog: cannot find input element with name='" + field + "' in form '" + formname + "' elements=" + elementList + "]");
-    }
+		alert("locationCommon.js: closeNewDialog: cannot find <form> in open dialog");
     return null;
 }		// closeNewDialog
 

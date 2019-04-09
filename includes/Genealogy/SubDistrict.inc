@@ -307,8 +307,10 @@ class SubDistrict extends Record
 		if (is_null($district))
 		{
 		    $distParms  	= array('d_census'	=> $censusRec,
-					        		'd_id'		=> $distId);
-		    $district	    = new District($distParms);
+                                    'd_id'		=> $distId);
+            if (is_array($distId))
+                $distParms['d_id']  = reset($distId);
+            $district	    = new District($distParms);
 		}
 		$this->district		= $district;
 

@@ -333,7 +333,7 @@ if (strlen($msg) == 0)
 	    if ($volume > 1)
 	    {
 ?>
-<       span class="left">
+        <span class="left">
           <a href="CountyMarriageReportEdit.php?RegDomain=<?php print $domainCode; ?>&Volume=<?php print $volume - 1; ?>">&lt;---&nbsp;Volume&nbsp;<?php print $volume - 1; ?></a>
         </span>
 <?php
@@ -645,10 +645,6 @@ pageBot();
     <div class="balloon" id="HelpSubmit">
       Click on this button to update the database to include the changes you
       have made to the counties list for the current province.
-    </div>
-    <div class="balloon" id="HelprightTop">
-      Click on this button to signon to access extended features of the web-site
-      or to manage your account with the web-site.
     </div>
     <div class="hidden" id="templates">
     </div>

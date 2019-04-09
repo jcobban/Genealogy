@@ -21,11 +21,11 @@ namespace Genealogy;
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
+header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Genealogy/GedCom/Document.inc';
 require_once __NAMESPACE__ . '/Genealogy/common.inc';
 
 // emit the XML header
-header("Content-Type: text/xml");
 print "<?xml version='1.0' encoding='UTF-8'?>\n";
 print "<tag>\n";
 

@@ -25,14 +25,14 @@ use \Exception;
  *		2017/02/07		use class Country								*
  *						handle change of identification code			*
  *		2018/10/22      use class Template                              *
+ *		2019/02/21      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/Township.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -139,21 +139,8 @@ $countyObj	        	= new County(array('domain'     => $domain,
 $countyName	        	= $countyObj->getName();
 
 // start template
-$tempBase		        = $document_root . '/templates/';
-$template		        = new FtTemplate("${tempBase}page$lang.html");
-$includeSub		        = $tempBase . "TownshipsUpdate$lang.html";
-if (!file_exists($includeSub))
-{
-    $language		= new Language(array('code' => $lang));
-    $langName		= $language->get('name');
-    $nativeName		= $language->get('nativename');
-    $sorry      	= $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-    $includeSub		= $tempBase . "TownshipsUpdateen.html";
-}
-$template->includeSub($includeSub, 'MAIN');
+$template		        = new FtTemplate("TownshipsUpdate$lang.html");
+
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('DOMAINNAME',		$domainName);
 $template->set('DOMAIN',	    	$domain);

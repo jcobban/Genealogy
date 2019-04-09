@@ -2,9 +2,6 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
 /************************************************************************
  *  Citation.inc														*
  *																	    *
@@ -726,12 +723,12 @@ class Citation extends RecordPic
 							        'tblSX');
             $this->needInsert	= $dbrow['idsx'] == 0;
 
-			if (!is_null($idime) && !is_null($type))
+			if ($idime != 0 && !is_null($type))
 			{	                // validate IDIME
                 $record		            = $this->getRecord(); // ?
                 if (!$record->isExisting())
                     $warn               .= "<p>Citation::__construct: " .
-                    __LINE__ . " record with " . $recType[$type] .
+                    __LINE__ . " record with " . self::$recType[$type] .
                     "=$idime does not exist</p>";
             }	                // validate IDIME
 
@@ -2063,9 +2060,9 @@ class Citation extends RecordPic
 				    $distId		= $matches[2];
 				else
 				    $distId		= null;
-				if (is_null($distId))
+				if ((strlen($detail) > 0) && is_null($distId))
                     $warn   .= "<p>Citation::toHTML: " . __LINE__ .
-                                " dist pattern failed.</p>\n";
+                                " dist pattern failed for '$detail  '.</p>\n";
 
 				$count	= preg_match('/\s(subdist|subdistrict)\s*([A-Z0-9]+)/i',
 							        $detail,
@@ -2074,9 +2071,9 @@ class Citation extends RecordPic
 				    $subdistId	= $matches[2];
 				else
 				    $subdistId	= null;
-				if (is_null($distId))
+				if ((strlen($detail) > 0) && is_null($distId))
                     $warn   .= "<p>Citation::toHTML: " . __LINE__ .
-                                " subdist pattern failed.</p>\n";
+                                " subdist pattern failed for '$detail'.</p>\n";
 
 				$count	= preg_match('/\s(div|division)\s*([0-9]+)/i',
 							     $detail,
@@ -2093,9 +2090,9 @@ class Citation extends RecordPic
 				    $pageNum	= $matches[1];
 				else
 				    $pageNum	= null;
-				if (is_null($distId))
+				if ((strlen($detail) > 0) && is_null($distId))
                     $warn   .= "<p>Citation::toHTML: " . __LINE__ .
-                                " page pattern failed.</p>\n";
+                                " page pattern failed for '$detail'.</p>\n";
 
 				if ($distId && $subdistId && $pageNum)
 				{
@@ -2118,7 +2115,7 @@ class Citation extends RecordPic
 		    case '1861 Census of Canada':
 		    {		// use detail to build link
 				$cenyear	= substr($title, 0, 4);
-				$count	= preg_match('/^([A-Z]{2}), +(dist|district) ([0-9\.]+) .* (subdist|subdistrict) ([A-Z0-9]+).* (div|ward) ([0-9]+) page +([0-9]+)/i',
+				$count	= preg_match('/^([A-Z]{2}),? +(dist|district) ([0-9\.]+) .* (subdist|subdistrict) ([A-Z0-9]+).* (div|ward) ([0-9]+) page +([0-9]+)/i',
 								 $detail,
 								 $matches);
 				if ($count == 1)

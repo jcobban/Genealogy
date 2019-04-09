@@ -33,22 +33,7 @@ foreach($_GET as $key => $value)
     }               // act on specific parameter
 }                   // loop through parameters
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}page$lang.html");
-$includeSub		= "ListOfAdvertisers$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                      array($langName, $nativeName),
-                                      $sorry);
-	$includeSub	= 'ListOfAdvertisersen.html';
-}
-$template->includeSub($tempBase . $includeSub,
-                      'MAIN');
+$template		= new FtTemplate("ListOfAdvertisers$lang.html");
 
 $scripts	        = array();
 $dh                 = opendir($document_root . '/Advertisements/');

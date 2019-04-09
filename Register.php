@@ -57,8 +57,9 @@ use \Exception;
  *		2018/02/05		use template									*
  *		2018/05/28		include specific CSS							*
  *		2018/10/15      get language apology text from Languages        *
+ *		2019/02/18      use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/User.inc";
 require_once __NAMESPACE__ . "/Language.inc";
@@ -164,22 +165,7 @@ foreach($_POST as $key => $value)
 $title			= 'Register a New User';
 $user			= null;
 
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("${tempBase}dialog$lang.html");
-$includeSub		= "Register$lang.html";
-if (!file_exists($tempBase . $includeSub))
-{
-	$language   	= new Language(array('code' => $lang));
-	$langName   	= $language->get('name');
-	$nativeName	    = $language->get('nativename');
-	$sorry  	    = $language->getSorry();
-    $warn   	    .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-	$includeSub	= 'Registeren.html';
-}
-$template->includeSub($tempBase . $includeSub,
-						  'MAIN');
+$template		= new FtTemplate("Register$lang.html", true);
 
 $template->set('TITLE',		$title);
 $template->set('CHKUSEMAIL',	$chkusemail);

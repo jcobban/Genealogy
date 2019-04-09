@@ -23,24 +23,24 @@
  *		2017/01/23		use common implementations of gotCountiesFile,	*
  *						noCountiesFile, and changeCounty				*
  *		2018/10/05      pass language to transcription status script    *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
-window.onload	= onLoadPage;
+window.onload	= onLoad;
 
 /************************************************************************
- *  onLoadPage															*
+ *  function onLoad	    												*
  *																		*
  *  Obtain the list of counties in the province as an XML file.			*
  *																		*
  *  Input:																*
  *		this		Window object										*
  ************************************************************************/
-function onLoadPage()
+function onLoad()
 {
     var	domain;
-    pageInit();
 
     // activate handling of key strokes in text input fields
     // including support for context specific help
@@ -113,8 +113,7 @@ function onLoadPage()
     HTTP.getXML("CountiesListXml.php?Domain=" + domain,
 				gotCountiesFile,
 				noCountiesFile);
-
-}		// onLoadPage
+}		// function onLoad
 
 /************************************************************************
  *  validateForm														*

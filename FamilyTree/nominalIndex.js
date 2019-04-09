@@ -17,7 +17,7 @@
  *		2011/06/12		color code names by gender						*
  *		2011/10/28		support mouse-over help							*
  *		2011/11/26		add checkbox to include married names in		*
- *						selection										*
+ *						function selection								*
  *		2011/12/27		display loading indicator while waiting for		*
  *						response from server for list of names			*
  *						only display response from server when it is	*
@@ -44,7 +44,7 @@
  *		2014/11/25		add names of parents and spouse if available	*
  *		2015/02/02		add button to add an unrelated individual		*
  *		2015/06/16		display only privatised dates for private		*
- *						individuals										*
+ *						function individuals								*
  *		2015/08/11		add treeName field on form						*
  *		2015/08/12		pass debug flag to next page					*
  *		2015/10/26		make display more responsive by asking for		*
@@ -54,12 +54,13 @@
  *		2017/08/16		renamed to nominalIndex.js						*
  *						invoke Person.php instead of legacyIndiv.php	*
  *		2018/09/07		add diagnostic information to noNames report	*
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
- *  timer																*
+ *  function timer														*
  *																		*
  *  This timer is started whenever the user presses a key in the input	*
  *  field and pops if 0.7 second passes without a new keystroke			*
@@ -67,7 +68,7 @@
 var	timer	= null;
 
 /************************************************************************
- *  loadcnt																*
+ *  function loadcnt														*
  *																		*
  *  This counts the number of outstanding requests to the server		*
  ************************************************************************/
@@ -81,13 +82,12 @@ var	loadcnt	= 0;
     window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Perform initialization functions once the page is loaded.			*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
     // activate dynamic functionality for elements
     for (var fi = 0; fi < document.forms.length; fi++)
     {			// loop through all forms
@@ -98,10 +98,6 @@ function onLoad()
 		for(var j = 0; j < form.elements.length; j++)
 		{
 		    var element	= form.elements[j];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    var	name	= element.name;
 		    if (name === undefined || name.length == 0)
@@ -190,7 +186,7 @@ function onLoad()
 }		// onLoad
 
 /************************************************************************
- *  suppressSubmit														*
+ *  function suppressSubmit												*
  *																		*
  *  The input elements on this form are required by HTML to be enclosed	*
  *  in  a <form> tag, and by default pressing the enter key in an		*
@@ -205,7 +201,7 @@ function suppressSubmit()
 }		// suppressSubmit
 
 /************************************************************************
- *  onKeyDownName														*
+ *  function onKeyDownName												*
  *																		*
  *  This method is called when a key is pressed in the Name field.		*
  *  A timer is set so that when the user stops typing the selection		*
@@ -223,7 +219,7 @@ function onKeyDownName(event)
 }		// onKeyDownName
 
 /************************************************************************
- *  changeTree															*
+ *  function changeTree													*
  *																		*
  *  This method is called when the user changes the selection of		*
  *  which tree to display.												*
@@ -270,7 +266,7 @@ function changeTree()
 }		// changeTree
 
 /************************************************************************
- *  newTreeNameChanged													*
+ *  function newTreeNameChanged											*
  *																		*
  *  This method is called when the user enters the name of a new		*
  *  tree to create or select by name.									*
@@ -312,7 +308,7 @@ function newTreeNameChanged()
 }		// function newTreeNameChanged
 
 /************************************************************************
- *  update																*
+ *  function update														*
  *																		*
  *  This method is called when the user stops typing to repopulate		*
  *  the selection list based upon the current contents of the Name		*
@@ -448,7 +444,7 @@ function update()
 }		// update
 
 /************************************************************************
- *  gotNames															*
+ *  function gotNames													*
  *																		*
  *  This method is called when the XML file representing				*
  *  the list of individuals is retrieved from the database.				*
@@ -659,7 +655,7 @@ function gotNames(xmlDoc)
 }		// gotNames
 
 /************************************************************************
- *  noNames																*
+ *  function noNames														*
  *																		*
  *  This method is called if there is no getIndivNamesXml.php script	*
  *  on the server.														*
@@ -677,7 +673,7 @@ function noNames()
 }		// noNames
 
 /************************************************************************
- *  onChangeIndivid														*
+ *  function onChangeIndivid												*
  *																		*
  *  This method is called when the user changes the selected			*
  *  individual.															*
@@ -711,7 +707,7 @@ function onChangeIndivid()
 }		// onChangeIndivid
 
 /************************************************************************
- *  addUnrelated														*
+ *  function addUnrelated												*
  *																		*
  *  This method is called when the user requests to add an unrelated	*
  *  individual to the database/											*

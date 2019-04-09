@@ -10,8 +10,9 @@
  *		2016/09/24		add button to display statistics by volume		*
  *		2018/01/24		remove gettRightSub								*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban.								*
+ *  Copyright &copy; 2019 James A. Cobban.								*
  ************************************************************************/
 
 window.onload	= loadWmb;
@@ -23,10 +24,7 @@ window.onload	= loadWmb;
  ************************************************************************/
 function loadWmb()
 {
-    pageInit();
-
     // activate handling of key strokes in text input fields
-    // including support for context specific help
     for(var i = 0; i < document.forms.length; i++)
     {		// loop through all forms
 		var form	= document.forms[i];
@@ -42,10 +40,6 @@ function loadWmb()
 
 		    element.onkeydown	= keyDown;
 		    element.onchange	= change;	// default handling
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    actMouseOverHelp(element);
 
 		    // an element whose value is passed with the update
 		    // request to the server is identified by a name= attribute

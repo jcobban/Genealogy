@@ -1247,7 +1247,8 @@ else
 		        </label>
 		        <input type="text" name="GivenName" id="GivenName" size="64"
 		                placeholder="Supply Given Name of new Individual"
-		                maxlength="120" class="white left" style="width: 594px;"
+                        maxlength="120" class="white leftnc" 
+                        style="width: 594px;"
 		                value="<?php print $eGiven; ?>">
 		        <button type="button" class="button" id="Detail1">
 		            Details

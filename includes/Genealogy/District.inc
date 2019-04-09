@@ -2,9 +2,6 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
 /************************************************************************
  *  District.inc														*
  *																		*
@@ -72,6 +69,7 @@ use \Iterator;
  *		                for existing record                             *
  *		                add method getCensus                            *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/01/19      report constructor errors through message       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -171,6 +169,7 @@ class District extends Record
     {
 		global $debug;
 		global $warn;
+		global $msg;
 		global $connection;
 
 		if (!is_array($parms))
@@ -183,12 +182,12 @@ class District extends Record
 		// check for $parms as a complete existing row from the database
 		$dbrow		= null;
 		if (count($parms) == count(self::$initRow))
-        {			    // expected size for complete row from database
+        {			            // expected size for complete row from database
 		    $valid		= true;
 		    foreach($parms as $field => $value)
-		    {			// loop through all fields
+		    {			        // loop through all fields
 				switch(strtolower($field))
-				{		// act on specific field names
+				{		        // act on specific field names
 				    case 'd_census':
 				    {
 						if ($value instanceof Census)
@@ -204,8 +203,9 @@ class District extends Record
 						    $this->census	= new Census($cparms);
 						    if (!$this->census->isExisting())
 						    {		// unable to create instance of Census
-		    					error_log("District::__construct: " . __LINE__ .
-			    				 " unsupported census identifier '$censusId'");
+                                $this->msg  .= "District::__construct: " .
+                                                __LINE__ .
+			    				 " unsupported census identifier '$censusId'";
 						    }		// unable to create instance of Census
 						}		// string
 						break;
@@ -222,17 +222,17 @@ class District extends Record
 				    case 'd_province':
 				    case 'd_population':
 				    case 'd_transcribed':
-				    {		// valid field names
+				    {		    // valid field names
 						break;
-				    }		// valid field names
+				    }		    // valid field names
 
 				    default:
-				    {		// unexpected field name
+				    {		    // unexpected field name
 						$valid		= false;
 						break;
-				    }		// unexpected field name
-				}		// act on specific field names
-		    }			// loop through all fields
+				    }		    // unexpected field name
+				}		        // act on specific field names
+		    }			        // loop through all fields
 
 		    // if all valid field names, use row
 		    if ($valid)
@@ -241,15 +241,15 @@ class District extends Record
 		    // add sub-district statistics
 		    $this->extras	= array('d_sdcount'	=> 0,
 								'd_fcount'	=> 0);
-		    $distQuery	= 'SELECT ' .
-						    'COUNT(sd_name) as `d_sdcount`, ' .
-						    'SUM(sd_relframe > 0) AS d_fcount ' .
-						'FROM SubDistricts ' .
-						'WHERE SD_Census=:censusId AND SD_DistId=:distId';
-		    $sqlParms	= array('censusId'	=> $censusId, 
-							'distId'	=> $distId);
-		    $queryText		= debugPrepQuery($distQuery, $sqlParms);
-		    $stmt		= $connection->prepare($distQuery);
+		    $distQuery	    = 'SELECT ' .
+						        'COUNT(sd_name) as `d_sdcount`, ' .
+					    	    'SUM(sd_relframe > 0) AS d_fcount ' .
+					    	'FROM SubDistricts ' .
+					    	'WHERE SD_Census=:censusId AND SD_DistId=:distId';
+		    $sqlParms   	= array('censusId'	=> $censusId, 
+					    		    'distId'	=> $distId);
+		    $queryText  	= debugPrepQuery($distQuery, $sqlParms);
+		    $stmt	    	= $connection->prepare($distQuery);
 		    if ($stmt->execute($sqlParms))
 		    {			// successful query
 				if ($debug)
@@ -265,75 +265,85 @@ class District extends Record
 		    }			// successful query
 		    else
 		    {			// query failed
-				throw new Exception("District::__construct: '$queryText' " .
-							    print_r($stmt->errorInfo(),true));
+				$this->msg  .= "District::__construct: '$queryText' " .
+							    print_r($stmt->errorInfo(),true);
 		    }			// query failed
 		}			// complete row from database
 
 		// if need to create new row
 		if (is_null($dbrow))
-		{			// parameters for creating row
+		{			                // parameters for creating row
 		    // default values
 		    $censusId		= self::$initRow['d_census'];
 		    $distId	    	= self::$initRow['d_id'];
 
 		    // process parameters that identify a district
 		    foreach($parms as $field => $value)
-		    {			// process search parameters
+		    {			            // process search parameters
 				$fieldLc	= strtolower($field);
 				if (array_key_exists($fieldLc, self::$translate))
 				    $fieldLc	= self::$translate[$fieldLc];
 				switch($fieldLc)
-				{		// act on specific parameters
+				{		            // act on specific parameters
 				    case 'd_census':
 				    case 'sd_census':
 				    {
 						if ($value instanceof Census)
-						{		// object
+						{		    // object
 						    $this->census	= $value;
 						    $censusId		= $this->census->get('censusid');
-						}		// object
+						}		    // object
 						else
-						{		// string
+						{		    // string
 						    $censusId		= $value;
 						    $parms		= array('censusid' => $censusId,
 	        									'collective'	=> 0);
 						    $this->census	= new Census($parms);
 						    if (!$this->census->isExisting())
 						    {		// unable to create instance of Census
-		    					error_log("District::__construct: " . __LINE__ .
-			    				 " unsupported census identifier '$censusId'");
+                                $this->msg  .= "District::__construct: " .
+                                                __LINE__ .
+			    				 " unsupported census identifier '$censusId'";
 						    }		// unable to create instance of Census
-						}		// string
+						}		    // string
 						break;
 				    }
 
 				    case 'd_id':
 				    case 'sd_distid':
 				    {
-						if (is_array($value) && count($value) == 1)
+						if (is_array($value))
 						{
-						    $value	= reset($value);
-						}
+						    if (count($value) == 1)
+                                $distId     = reset($value);
+                            else
+                                $this->msg  .= "District::__construct: " . __LINE__ . " Invalid district id as array. ";
+                        }
 
-						if (preg_match("/^\d+(\.0|\.5|)$/", $value) == 1 &&
-						    $value >= 1)
-						{	// syntax valid
-						    $distId		= $value;
-						}	// syntax valid
-						else
-						    error_log("District::__construct: " . __LINE__ .
-								 " Invalid District ID value '$value'");
+                        if (is_numeric($value))
+                            $distId		= $value;
+                        else
+                        if (is_string($value))
+                        {
+							if (preg_match("/^\d+(\.0|\.5|)$/", $value) == 1 &&
+							    $value >= 1)
+							{	    // syntax valid
+							    $distId		= $value;
+	                        }	    // syntax valid
+							else
+							    $this->msg  .="District::__construct: " . __LINE__ .
+	                                " Invalid District ID value '$value'. ";
+                        }
 						break;
-				    }
+				    }               // district identifier
 
-				}		// act on specific parameters
-		    }			// process search parameters
+				}		            // act on specific parameters
+		    }			        // process search parameters
 
 		    // check if district id was provided
 		    if ($distId == 0)
-				error_log("District::__construct: " . __LINE__ .
-							    " Missing District Id value");
+				$this->msg  .= "District::__construct: " . __LINE__ .
+							    " Missing District Id value";
 
 		    // construct the query to look for an existing record
 		    // query the database for district information
@@ -397,8 +407,8 @@ class District extends Record
 		    }			        // successful query
 		    else
 		    {			        // error performing query
-				throw new Exception("District::__construct: '$queryText' " .
-							    print_r($stmt->errorInfo(),true));
+				$this->msg      .= "District::__construct: '$queryText' " .
+							    print_r($stmt->errorInfo(),true);
 		    }			        // error performing query
 		}			            // parameters for creating row
 
@@ -436,7 +446,9 @@ class District extends Record
 		    $this->synchPopulation();
 
 		// diagnostic output if debug is set
-		$this->dump('District Record constructed:');
+        $this->dump('District Record constructed:');
+        
+        $msg        .= $this->msg;
     }		// function District::__construct
 
     /********************************************************************

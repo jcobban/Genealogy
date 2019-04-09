@@ -1,30 +1,30 @@
 /************************************************************************
- *  DisplayPage.js							*
- *									*
- *  Javascript code to implement dynamic functionality of the		*
- *  pages displayed by displayPage.php.					*
- *									*
- *  History:								*
- *	2018/02/03	created						*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  DisplayPage.js														*
+ *																		*
+ *  Javascript code to implement dynamic functionality of the			*
+ *  pages displayed by displayPage.php.									*
+ *																		*
+ *  History:															*
+ *		2018/02/03		created											*
+ *		2019/02/10      no longer need to call pageInit                 *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
  *  Initialization code that is executed when this script is loaded.	*
- *									*
- *  Define the function to be called once the web page is loaded.	*
+ *																		*
+ *  Define the function to be called once the web page is loaded.		*
  ************************************************************************/
 window.onload	= onLoad;
 
 /************************************************************************
- *  onLoad								*
- *									*
- *  Perform initialization functions once the page is loaded.		*
+ *  onLoad																*
+ *																		*
+ *  Perform initialization functions once the page is loaded.				*
  ************************************************************************/
 function onLoad()
 {
-    pageInit();
 
     var names	= "";
     // scan through all forms and set dynamic functionality
@@ -35,10 +35,6 @@ function onLoad()
 	for(var j = 0; j < form.elements.length; j++)
 	{
 	    var element	= form.elements[j];
-
-	    // pop up help balloon if the mouse hovers over a field
-	    // for more than 2 seconds
-	    actMouseOverHelp(element);
 
 	    var	name	= element.name;
 	    if (name.length == 0)
@@ -73,14 +69,14 @@ function onLoad()
 }		// onLoad
 
 /************************************************************************
- *  indMouseOver							*
- *									*
- *  This function is called if the mouse moves over an element		*
- *  containing a hyperlink to an individual on the invoking page. 	*
- *  Delay popping up the information balloon for two seconds.		*
- *									*
- *  Input:								*
- *	this	<a> tag							*
+ *  indMouseOver														*
+ *																		*
+ *  This function is called if the mouse moves over an element				*
+ *  containing a hyperlink to an individual on the invoking page. 		*
+ *  Delay popping up the information balloon for two seconds.				*
+ *																		*
+ *  Input:																*
+ *		this		<a> tag														*
  ************************************************************************/
 function indMouseOver()
 {
@@ -90,11 +86,11 @@ function indMouseOver()
 }		// indMouseOver
 
 /************************************************************************
- *  popupIndiv								*
- *									*
- *  This function is called if the mouse is held over a link to an	*
- *  individual on the invoking page for more than 2 seconds.  It shows	*
- *  the information from the associated instance of Person		*
+ *  popupIndiv																*
+ *																		*
+ *  This function is called if the mouse is held over a link to an		*
+ *  individual on the invoking page for more than 2 seconds.  It shows		*
+ *  the information from the associated instance of Person				*
  ************************************************************************/
 function popupIndiv()
 {
@@ -135,15 +131,15 @@ function popupIndiv()
 }		// popupIndiv
 
 /************************************************************************
- *  indMouseOut								*
- *									*
- *  This function is called if the mouse moves off an element		*
- *  containing a indiv name on the invoking page. 			*
- *  The help balloon, if any, remains up for				*
- *  a further 2 seconds to permit access to links within the help text.	*
- *									*
- *  Input:								*
- *	this	<a> tag							*
+ *  indMouseOut																*
+ *																		*
+ *  This function is called if the mouse moves off an element				*
+ *  containing a indiv name on the invoking page. 						*
+ *  The help balloon, if any, remains up for								*
+ *  a further 2 seconds to permit access to links within the help text.		*
+ *																		*
+ *  Input:																*
+ *		this	<a> tag													*
  ************************************************************************/
 function indMouseOut()
 {

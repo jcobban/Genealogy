@@ -120,6 +120,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
+header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Temple.inc';
@@ -130,37 +131,41 @@ require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
-header("Content-Type: text/xml");
 print("<?xml version='1.0' encoding='UTF-8'?>\n");
 print "<event>\n";
 
 // get the updated values of the fields in the record
-$msg				= '';
-$idir				= null;
-$idmr				= null;
-$ider				= null;
-$idcr				= null;
-$type				= null;
-$etype				= null;
-$order				= null;
-$date				= null;
-$location			= null;
-$note				= '';
-$deathCause			= '';
-$description		= '';
-$notmar				= 0;
-$nokids				= 0;
-$templeReady		= 0;
-$cremated			= 0;
-$kind				= 0;	// location is a Location
-$prefix				= null;
-$title				= null;
-$surname			= null;
-$givenName			= null;
-$altSurname			= null;
-$altGivenName		= null;
-$idlr				= 1;	// default location blank
-$citParms			= array();
+$msg						= '';
+$idir						= null;
+$person             		= null;         // instance of Person
+$idmr						= null;
+$family             		= null;         // instance of Family
+$ider						= null;
+$event              		= null;         // instance of Event
+$idcr						= null;
+$child              		= null;         // instance of Child
+$type						= null;
+$etype						= null;
+$order						= null;
+$date						= null;
+$location					= null;         // instance of Location or Temple
+$kind						= 0;	        // 1 if location is a temple
+$note						= '';
+$deathCause					= '';
+$description				= '';
+$notmar						= 0;
+$nokids						= 0;
+$templeReady				= 0;
+$cremated					= 0;
+$prefix						= null;
+$title						= null;
+$surname					= null;
+$givenName					= null;
+$altSurname					= null;
+$altGivenName				= null;
+$idlr						= 1;	        // default location blank
+$citParms					= array();
+$citations          		= array();      // list of citations
 
 print "    <parms>\n";
 error_log("updateEvent.php: <parms>\n",3,$document_root . "/logs/updateEvent.txt");
@@ -194,8 +199,10 @@ error_log("updateEvent.php: $xmlkey='$value'\n",3,$document_root . "/logs/update
 	    case 'ider':
 	    {		// ider to be updated
 			$ider		                = $value;
-			if (strlen($ider) > 0)
-			    $event	                = new Event(array('ider' => $ider));
+            if (strlen($ider) > 0)
+            {
+                $event	                = new Event(array('ider' => $ider));
+            }
 			break;
 	    }		// ider to be updated
 
@@ -397,6 +404,13 @@ error_log("updateEvent.php: $xmlkey='$value'\n",3,$document_root . "/logs/update
 	    {		// other fields
 			if (substr($key, 0, 6) == 'Source')
 			{	// IDSR of source
+			    $idsx	                = intval(substr($key, 6));
+			    $citParms['idsr']	    = $value;
+			}	// IDSR of source
+			else
+			if (substr($key, 0, 6) == 'IDSR')
+			{	// IDSR of source
+			    $idsx	                = intval(substr($key, 4));
 			    $citParms['idsr']	    = $value;
 			}	// IDSR of source
 			else
@@ -412,8 +426,8 @@ error_log("updateEvent.php: $xmlkey='$value'\n",3,$document_root . "/logs/update
 			    {		// update existing citation
 					$citation	        = new Citation(array('idsx' => $idsx));
 					$citation->set('srcdetail', $value);
-			    }		// update existing citation
-error_log("updateEvent.php: " . __LINE__ . ': ' . $citation->dump('created for event') ."\n",3,$document_root . "/logs/updateEvent.txt");
+                }		// update existing citation
+                $citations[]            = $citation;
 			}
 	    }		// other fields
 	}	// act on specific keys
@@ -433,7 +447,7 @@ if (!canUser('edit'))
 
 $rtype	= null;
 
-error_log("updateEvent.php: " . __LINE__ . " type=$type\n",3,$document_root . "/logs/updateEvent.txt");
+print "<trace>" . __LINE__ . " type=$type</trace>\n";
 try {
 switch($type)
 {		// act on the event citation type
@@ -470,7 +484,10 @@ switch($type)
 			if ($givenName !== null)
 			    $record->set('GivenName', $givenName);
 			if ($surname !== null)
-			    $record->set('Surname', $surname);
+                $record->set('Surname', $surname);
+            $priName    = $person->getPriName();
+            if ($priName)
+                $priName->save('cmd');
 
 			// check for request to add a new alternate name
 			if (($altSurname !== null && strlen($altSurname) > 0) ||
@@ -948,7 +965,7 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
 
 	case Citation::STYPE_EVENT:		// 30
 	{
-error_log("updateEvent.php: " . __LINE__ . " Citation::STYPE_EVENT: idir=$idir, ider=$ider, date=$date, location=" . $location->getName() . "\n",3,$document_root . "/logs/updateEvent.txt");
+print "<trace>" . __LINE__ . " Citation::STYPE_EVENT: idir=$idir, ider=$ider, date=$date, location=" . $location->getName() . "</trace>\n";
 	    if (is_null($idir))
 	    {
 			$msg	.= "idir value not specified. ";
@@ -980,14 +997,15 @@ error_log("updateEvent.php: " . __LINE__ . " Citation::STYPE_EVENT: idir=$idir, 
 	    if (is_null($order) || strlen($order) == 0) 
 	    {		// event order not set
 			$eventSet	= new RecordSet('tblER',
-						array('idir'	=> $idir,
-						      'idtype'	=> Event::IDTYPE_INDIV));
+		                				array('idir'	=> $idir,
+					                	      'idtype'	=> Event::IDTYPE_INDIV));
 			$order		= $eventSet->count();
 	    }		// order not set
 
 	    if (strlen($msg) == 0)
 	    {		// OK to update
 			$record		= $event;
+			$record->set('IDER',		$ider);
 			$record->set('IDIR',		$idir);
 			$record->set('EventD',		$date);
 			$record->set('IDET',		$etype);
@@ -1072,15 +1090,15 @@ error_log("updateEvent.php: " . __LINE__ . " Citation::STYPE_EVENT: idir=$idir, 
 
 if (strlen($msg) == 0)
 {		        // no errors detected
-error_log("updateEvent.php: " . __LINE__ . "citation type specific actions complete with no errors, ider=$ider\n",3,$document_root . "/logs/updateEvent.txt");
 	// update the database to record the new information
 	if (isset($record))
     {		        // need to update record
         $needIdime                  = !$record->isExisting();
         $record->save(true);
-        if (isset($citation))
+        foreach($citations as $citation)
         {
-            if ($needIdime)
+            if ($needIdime ||
+                $citation['idime'] == 0)
                 $citation->set('idime', $record->getId());
             $citation->save('cmd');
         }
@@ -1096,7 +1114,6 @@ error_log("updateEvent.php: " . __LINE__ . "citation type specific actions compl
 }		            // no errors detected
 else
 {		            // errors in parameters
-error_log("updateEvent.php: " . __LINE__ . ": '$msg'\n",3,$document_root . "/logs/updateEvent.txt");
 	print "    <msg>\n";
 	print xmlentities($msg);
 	print "    </msg>\n";

@@ -14,8 +14,9 @@
  *		2013/07/30		defer facebook initialization until after load	*
  *		2013/08/25		use pageInit common function					*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/02/10      no longer need to call pageInit                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 // identify function to invoke when page loaded
@@ -31,9 +32,6 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
-    // perform common page initialization
-    pageInit();
-
     // add mouseover actions for forward and backward links
     for (var il = 0; il < document.links.length; il++)
     {			// loop through all hyper-links
@@ -49,19 +47,6 @@ function onLoad()
 		for(var j = 0; j < form.elements.length; j++)
 		{
 		    var element	= form.elements[j];
-
-		    // pop up help balloon if the mouse hovers over a field
-		    // for more than 2 seconds
-		    if (element.parentNode.nodeName == 'TD')
-		    {		// set mouseover on containing cell
-				element.parentNode.onmouseover	= eltMouseOver;
-				element.parentNode.onmouseout	= eltMouseOut;
-		    }		// set mouseover on containing cell
-		    else
-		    {		// set mouseover on input element itself
-				element.onmouseover		= eltMouseOver;
-				element.onmouseout		= eltMouseOut;
-		    }		// set mouseover on input element itself
 
 		    if (element.id.substring(0,4) == 'Edit')
 				element.onclick	= editDiv;

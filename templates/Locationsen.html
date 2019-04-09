@@ -32,6 +32,7 @@
 		</label>
 		<input name="pattern" id="pattern" type="text" size="64"
 				    class="white leftnc" value="$PATTERN">
+        <div style="clear: both"></div>
 	  </div>
 	  <div class="row">
 		<label class="label" for="namefld" style="width: 11em;">
@@ -39,8 +40,9 @@
 		</label>
 		<input name="namefld" id="namefld" type="text" size="64"
 				    class="white leftnc" value="">
+        <div style="clear: both"></div>
 	  </div>
-	  <p class="label">
+      <p class="label">
 		<button type="button" class="button" id="Search" accesskey="s">
 		    <u>S</u>earch
 		</button>
@@ -61,18 +63,18 @@
 	  <p class="label" id="countmatches">
 		  $COUNT Locations match the specified pattern.
 	  </p>
-	  <div class="center">
-	    <div class="left" id="npprev">
+      <div class="center" id="topBrowse">
+        <div class="left" id="topPrev">
 	        <a href="Locations.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET&amp;lang=$LANG">&lt;---</a>
 	    </div>
-	    <div class="right" id="npnext"> 
+	    <div class="right" id="topNext"> 
 	        <a href="Locations.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG">---&gt;</a>
 	    </div>
 		  rows $OFFSET to $LAST of $COUNT 
         <div style="clear: both;"></div>
 	  </div> <!-- class="center" -->
 	  <!--- Put out the response as a table -->
-	  <table class="details">
+	  <table class="details" id="dataTable">
 		<!--- Put out the column headers -->
 		<thead>
 		  <tr>

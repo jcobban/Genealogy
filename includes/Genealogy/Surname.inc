@@ -2,9 +2,6 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
 /************************************************************************
  *  Surname.inc															*
  *																		*
@@ -257,7 +254,12 @@ class Surname extends Record
 						    }	// create a new surname record
 						    else
 						    {	// create a new surname record
-					    		$dbrow		        = self::$initRow;
+                                $dbrow		        = self::$initRow;
+                                if (!is_null($idnr))
+                                {
+                                    $dbrow['idnr']  = $idnr;
+                                    $dbrow['surname']   = "Missing IDNR $idnr";
+                                }
                                 $needInsert	        = true;
                                 $this->msg          .=
                         "Cannot create new Surname record without surname. ";

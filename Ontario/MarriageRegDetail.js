@@ -1,105 +1,104 @@
 /************************************************************************
- *  MarriageRegDetail.js						*
- *									*
- *  This file implements the dynamic functionality of the web page	*
- *  MarriageRegDetail.php.						*
- *									*
- *  History:								*
- *	2011/03/14	add keyboard shortcut support			*
- *	2011/03/27	for cities default location does not include	*
- *			county						*
- *	2011/04/07	support keyboard shortcuts			*
- *	2011/04/10	use selection list for license type		*
- *	2011/06/08	add abbreviation table for residence fields	*
- *			set default value of Bride's religion to Groom's*
- *	2011/07/15	expand abbreviations for locations		*
- *	2011/08/08	rename to MarriageRegDetail			*
- *	2011/09/04	support month name abbreviations in date of	*
- *			marriage					*
- *			use real buttons for next, previous, and new	*
- *			query						*
- *			assign Alt-key combos to the buttons		*
- *	2011/09/11	open image in named window			*
- *	2011/10/01	add abbreviations for father and mother's names	*
- *			and for witness names				*
- *	2011/11/09	if age is not an integer, assume 20 in estimating*
- *			birth year					*
- *			Note that type of age column has been changed to*
- *			VARCHAR(7) to allow for the value '[blank]'	*
- *	2012/02/13	expand county abbreviations			*
- *	2012/07/14	use common getDefaultLocation function		*
- *	2013/02/05	add help for birth year display			*
- *	2013/03/15	wrong help displayed for Reset button		*
- *	2013/06/27	use tinyMCE for editing remarks			*
- *	2013/07/05	remove debug code from key handler		*
- *	2013/08/01	defer facebook initialization until after load	*
- *	2013/11/06	correct action of Ctl-S				*
- *	2014/01/22	remove help division overrides			*
- *			support <fieldset>				*
- *	2014/02/05	initialize functionality of MOccupation and	*
- *			MReligion					*
- *	2014/02/28	permit age in years enclosed in square brackets	*
- *	2014/09/12	remove use of obsolete selectOptByValue		*
- *	2014/10/11	get counties list using domain			*
- *	2015/01/06	implement clear of IDIR association		*
- *	2015/05/01	use new dialog DisplayImage.php to show image	*
- *			in right side of window if the image is on the	*
- *			web site.					*
- *			new parameter ShowImage directs the script	*
- *			to immediately display the image		*
- *			the previous and next registration buttons	*
- *			pass the ShowImage flag				*
- *			pass RegDomain parameter when going to new	*
- *			registration					*
- *	2015/06/11	correct too small text in rich-text editor	*
- *	2015/07/10	correct handling of previous and next buttons	*
- *			for 1869, 1870, and 1871			*
- *	2015/10/06	support image URL with https			*
- *	2016/05/31	use common method dateChanged			*
- *	2017/02/17	add fields OriginalVolume, OriginalPage, and	*
- *			OriginalItem					*
- *	2017/03/17	birth year is displayed as text not <input>	*
- *	2017/07/12	use function locationChanged			*
- *									*
- *  Copyright &copy; 2017 James A. Cobban.				*
+ *  MarriageRegDetail.js												*
+ *																		*
+ *  This file implements the dynamic functionality of the web page		*
+ *  MarriageRegDetail.php.												*
+ *																		*
+ *  History:															*
+ *		2011/03/14		add keyboard shortcut support					*
+ *		2011/03/27		for cities default location does not include	*
+ *						function county									*
+ *		2011/04/07		support keyboard shortcuts						*
+ *		2011/04/10		use selection list for license type				*
+ *		2011/06/08		add abbreviation table for residence fields		*
+ *						set default value of Bride's religion to Groom's*
+ *		2011/07/15		expand abbreviations for locations				*
+ *		2011/08/08		rename to MarriageRegDetail						*
+ *		2011/09/04		support month name abbreviations in date of		*
+ *						function marriage								*
+ *						use real buttons for next, previous, and new	*
+ *						function query									*
+ *						assign Alt-key combos to the buttons			*
+ *		2011/09/11		open image in named window						*
+ *		2011/10/01		add abbreviations for father and mother's names	*
+ *						and for witness names							*
+ *		2011/11/09		if age is not an integer, assume 20 in estimating*
+ *						birth year										*
+ *						Note that type of age column has been changed to*
+ *						VARCHAR(7) to allow for the value '[blank]'		*
+ *		2012/02/13		expand county abbreviations						*
+ *		2012/07/14		use common getDefaultLocation function			*
+ *		2013/02/05		add help for birth year display					*
+ *		2013/03/15		wrong help displayed for Reset button			*
+ *		2013/06/27		use tinyMCE for editing remarks					*
+ *		2013/07/05		remove debug code from key handler				*
+ *		2013/08/01		defer facebook initialization until after load	*
+ *		2013/11/06		correct action of Ctl-S							*
+ *		2014/01/22		remove help division overrides					*
+ *						support <fieldset>								*
+ *		2014/02/05		initialize functionality of MOccupation and		*
+ *						function MReligion								*
+ *		2014/02/28		permit age in years enclosed in square brackets	*
+ *		2014/09/12		remove use of obsolete selectOptByValue			*
+ *		2014/10/11		get counties list using domain					*
+ *		2015/01/06		implement clear of IDIR association				*
+ *		2015/05/01		use new dialog DisplayImage.php to show image	*
+ *						in right side of window if the image is on the	*
+ *						web site.										*
+ *						new parameter ShowImage directs the script		*
+ *						to immediately display the image				*
+ *						the previous and next registration buttons		*
+ *						pass the ShowImage flag							*
+ *						pass RegDomain parameter when going to new		*
+ *						function registration							*
+ *		2015/06/11		correct too small text in rich-text editor		*
+ *		2015/07/10		correct handling of previous and next buttons	*
+ *						for 1869, 1870, and 1871						*
+ *		2015/10/06		support image URL with https					*
+ *		2016/05/31		use common method dateChanged					*
+ *		2017/02/17		add fields OriginalVolume, OriginalPage, and	*
+ *						function OriginalItem							*
+ *		2017/03/17		birth year is displayed as text not <input>		*
+ *		2017/07/12		use function locationChanged					*
+ *		2019/02/10      no longer need to call pageInit                 *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban.								*
  ************************************************************************/
  
 window.onload	= onLoadMarriage;
 
 // specify style for tinyMCE editing
 tinyMCE.init({
-	mode			: "textareas",
-	theme			: "advanced",
-	plugins 		: "spellchecker,advhr,preview", 
-		
-	// Theme options - button# indicated the row# only
-	theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-	theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-	theme_advanced_buttons3 : "",
-	theme_advanced_toolbar_location : "top",
-	theme_advanced_toolbar_align : "left",
-	theme_advanced_statusbar_location : "bottom",
-	theme_advanced_resizing : true,
-	forced_root_block	: false,
-	forced_root_block	: false,
-	content_css		: "/styles.css"
+		mode			: "textareas",
+		theme			: "advanced",
+		plugins 		: "spellchecker,advhr,preview", 
+				
+		// Theme options - button# indicated the row# only
+		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
+		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
+		theme_advanced_buttons3 : "",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "left",
+		theme_advanced_statusbar_location : "bottom",
+		theme_advanced_resizing : true,
+		forced_root_block	: false,
+		forced_root_block	: false,
+		content_css		: "/styles.css"
 
 });
 
 /************************************************************************
- *  onLoadMarriage							*
- *									*
- *  This function is called after the associated web page,		*
- *  MarriageRegDetail.php, is completely loaded into the DOM.		*
- *									*
- *  Obtain the list of counties in the province as an XML file.		*
- *  Set appropriate event handlers on the form.				*
- *  Initialize dynamic functionality of form elements.			*
+ *  function onLoadMarriage												*
+ *																		*
+ *  This function is called after the associated web page,				*
+ *  MarriageRegDetail.php, is completely loaded into the DOM.				*
+ *																		*
+ *  Obtain the list of counties in the province as an XML file.				*
+ *  Set appropriate event handlers on the form.								*
+ *  Initialize dynamic functionality of form elements.						*
  ************************************************************************/
 function onLoadMarriage()
 {
-    pageInit();
-
     document.body.onkeydown		= mdKeyDown;
 
     // activate event handlers for the form
@@ -111,291 +110,286 @@ function onLoadMarriage()
     var	comma	= '';
     for (var i = 0; i < theForm.elements.length; i++)
     {		// act on every element within the form
-	var	element	= theForm.elements[i];
+		var	element	= theForm.elements[i];
 
-	if (element.nodeName.toUpperCase() == 'FIELDSET')
-	    continue;
+		if (element.nodeName.toUpperCase() == 'FIELDSET')
+		    continue;
 
-	// pop up help balloon if the mouse hovers over a field
-	// for more than 2 seconds
-	element.onmouseover		= eltMouseOver;
-	element.onmouseout		= eltMouseOut;
+		// field is identified by attribute name if its value is
+		// passed to the action script, otherwise by the id attribute
+		var	fldName	= element.name;
+		if (fldName.length == 0)
+		    fldName	= element.id;
+		names	+= comma + fldName;
+		comma	= ',';
+		// default change handler
+		element.onchange	= change;
 
-	// field is identified by attribute name if its value is
-	// passed to the action script, otherwise by the id attribute
-	var	fldName	= element.name;
-	if (fldName.length == 0)
-	    fldName	= element.id;
-	names	+= comma + fldName;
-	comma	= ',';
-	// default change handler
-	element.onchange	= change;
+		// activate common keystroke support
+		element.onkeydown	= keyDown;
 
-	// activate common keystroke support
-	element.onkeydown	= keyDown;
+		// set up references to tables for expanding abbreviations
+		// and set defaults for field values
+		switch(fldName)
+		{
+		    case 'LicenseTypeTxt':
+		    {		// hidden license type text field
+				if (element.value.length == 0)
+				    element.value	= 'L';
+				theForm.LicenseType.value	= element.value;
+				break;
+		    }		// hidden license type text field
 
-	// set up references to tables for expanding abbreviations
-	// and set defaults for field values
-	switch(fldName)
-	{
-	    case 'LicenseTypeTxt':
-	    {		// hidden license type text field
-		if (element.value.length == 0)
-		    element.value	= 'L';
-		theForm.LicenseType.value	= element.value;
-		break;
-	    }		// hidden license type text field
+		    case 'RegCounty':
+		    {		// County of registration
+				element.onchange	= changeCounty;
+				var	domain		= theForm.RegDomain.value;
+				// get the counties information file
+				HTTP.getXML("/Canada/CountiesListXml.php?Domain=" + domain,
+						    gotCountiesFile,
+						    noCountiesFile);
+				break;
+		    }		// County of registration
 
-	    case 'RegCounty':
-	    {		// County of registration
-		element.onchange	= changeCounty;
-		var	domain		= theForm.RegDomain.value;
-		// get the counties information file
-		HTTP.getXML("/Canada/CountiesListXml.php?Domain=" + domain,
-			    gotCountiesFile,
-			    noCountiesFile);
-		break;
-	    }		// County of registration
+		    case 'RegTownship':
+		    {		// County of registration
+				element.onchange	= changeTownship;
+				break;
+		    }		// County of registration
 
-	    case 'RegTownship':
-	    {		// County of registration
-		element.onchange	= changeTownship;
-		break;
-	    }		// County of registration
+		    case 'Place':
+		    {		// place of marriage
+				element.abbrTbl		= LocAbbrs;
+				element.onchange	= locationChanged;
+				element.checkfunc	= checkAddress;
+				element.checkfunc();
+				break;
+		    }		// place of marriage
 
-	    case 'Place':
-	    {		// place of marriage
-		element.abbrTbl		= LocAbbrs;
-		element.onchange	= locationChanged;
-		element.checkfunc	= checkAddress;
-		element.checkfunc();
-		break;
-	    }		// place of marriage
+		    case 'Date':
+		    {		// date of the marriage
+				element.abbrTbl		= MonthAbbrs;
+				element.onchange	= dateChanged;
+				element.checkfunc	= checkDate;
+				element.checkfunc();
+				element.focus();
+				break;
+		    }		// date of the marriage
 
-	    case 'Date':
-	    {		// date of the marriage
-		element.abbrTbl		= MonthAbbrs;
-		element.onchange	= dateChanged;
-		element.checkfunc	= checkDate;
-		element.checkfunc();
-		element.focus();
-		break;
-	    }		// date of the marriage
+		    case 'ShowImage':
+		    {	// display image button
+				element.onclick	= showImage;
+				if (typeof(args.showimage) == 'string' &&
+						args.showimage.toLowerCase() == 'yes')
+						element.onclick();
+				break;
+		    }	// display image button
 
-	    case 'ShowImage':
-	    {	// display image button
-		element.onclick	= showImage;
-		if (typeof(args.showimage) == 'string' &&
-			args.showimage.toLowerCase() == 'yes')
-			element.onclick();
-		break;
-	    }	// display image button
+		    case 'next':
+		    case 'Next':
+		    {		// button to go to next marriage registration
+				element.onclick	= showNext;
+				break;
+		    }		// button to go to next marriage registration
 
-	    case 'next':
-	    case 'Next':
-	    {		// button to go to next marriage registration
-		element.onclick	= showNext;
-		break;
-	    }		// button to go to next marriage registration
+		    case 'previous':
+		    case 'Previous':
+		    {		// button to go to previous marriage registration
+				element.onclick	= showPrevious;
+				break;
+		    }		// button to go to previous marriage registration
 
-	    case 'previous':
-	    case 'Previous':
-	    {		// button to go to previous marriage registration
-		element.onclick	= showPrevious;
-		break;
-	    }		// button to go to previous marriage registration
+		    case 'newQuery':
+		    {		// button to issue new query
+				element.href	= theForm.newQueryHref.value;
+				element.onclick	= goToLink;
+				break;
+		    }		// button to issue new query
 
-	    case 'newQuery':
-	    {		// button to issue new query
-		element.href	= theForm.newQueryHref.value;
-		element.onclick	= goToLink;
-		break;
-	    }		// button to issue new query
+		    case 'Reset':
+		    {		// Reset button
+				element.onclick	= resetForm;
+				break;
+		    }		// Reset button
 
-	    case 'Reset':
-	    {		// Reset button
-		element.onclick	= resetForm;
-		break;
-	    }		// Reset button
+		    case 'GSurname':
+		    case 'BSurname':
+		    case 'MSurname':
+		    {		// surname of a participant
+				element.abbrTbl		= SurnAbbrs;
+				element.checkfunc	= checkName;
+				element.checkfunc();
+				break;
+		    }		// surname of a participant
 
-	    case 'GSurname':
-	    case 'BSurname':
-	    case 'MSurname':
-	    {		// surname of a participant
-		element.abbrTbl		= SurnAbbrs;
-		element.checkfunc	= checkName;
-		element.checkfunc();
-		break;
-	    }		// surname of a participant
+		    case 'GResidence':
+		    case 'BResidence':
+		    case 'MResidence':
+		    {		// current residence of a participant
+				element.abbrTbl		= LocAbbrs;
+				element.onchange	= locationChanged;
+				element.checkfunc	= checkAddress;
+				element.checkfunc();
+				break;
+		    }		// current residence of a participant
 
-	    case 'GResidence':
-	    case 'BResidence':
-	    case 'MResidence':
-	    {		// current residence of a participant
-		element.abbrTbl		= LocAbbrs;
-		element.onchange	= locationChanged;
-		element.checkfunc	= checkAddress;
-		element.checkfunc();
-		break;
-	    }		// current residence of a participant
+		    case 'GBirthPlace':
+		    case 'BBirthPlace':
+		    {		// birth place of participant
+				element.abbrTbl		= BpAbbrs;
+				element.onchange	= locationChanged;
+				element.checkfunc	= checkAddress;
+				element.checkfunc();
+				break;
+		    }		// birth place of participant
 
-	    case 'GBirthPlace':
-	    case 'BBirthPlace':
-	    {		// birth place of participant
-		element.abbrTbl		= BpAbbrs;
-		element.onchange	= locationChanged;
-		element.checkfunc	= checkAddress;
-		element.checkfunc();
-		break;
-	    }		// birth place of participant
+		    case 'GReligion':
+		    {		// religious affiliation of groom
+				element.onchange	= changeGReligion;
+				element.abbrTbl		= RlgnAbbrs;
+				element.checkfunc	= checkName;
+				element.checkfunc();
+				break;
+		    }		// religious affiliation of groom
 
-	    case 'GReligion':
-	    {		// religious affiliation of groom
-		element.onchange	= changeGReligion;
-		element.abbrTbl		= RlgnAbbrs;
-		element.checkfunc	= checkName;
-		element.checkfunc();
-		break;
-	    }		// religious affiliation of groom
+		    case 'BReligion':
+		    case 'MReligion':
+		    {		// religious affiliation of bride
+				element.abbrTbl		= RlgnAbbrs;
+				element.checkfunc	= checkName;
+				element.checkfunc();
+				break;
+		    }		// religious affiliation of bride
 
-	    case 'BReligion':
-	    case 'MReligion':
-	    {		// religious affiliation of bride
-		element.abbrTbl		= RlgnAbbrs;
-		element.checkfunc	= checkName;
-		element.checkfunc();
-		break;
-	    }		// religious affiliation of bride
+		    case 'GOccupation':
+		    {		// occupation of groom
+				// for the groom set the default occupation as Farmer
+				if (element.value.length == 0)
+				    element.value	= 'Farmer';
+				element.abbrTbl		= OccAbbrs;
+				element.checkfunc	= checkOccupation;
+				element.checkfunc();
+				break;
+		    }		// occupation of groom
 
-	    case 'GOccupation':
-	    {		// occupation of groom
-		// for the groom set the default occupation as Farmer
-		if (element.value.length == 0)
-		    element.value	= 'Farmer';
-		element.abbrTbl		= OccAbbrs;
-		element.checkfunc	= checkOccupation;
-		element.checkfunc();
-		break;
-	    }		// occupation of groom
+		    case 'BOccupation':
+		    case 'MOccupation':
+		    {		// occupation of bride
+				element.abbrTbl		= OccAbbrs;
+				element.checkfunc	= checkOccupation;
+				element.checkfunc();
+				break;
+		    }		// occupation of bride
 
-	    case 'BOccupation':
-	    case 'MOccupation':
-	    {		// occupation of bride
-		element.abbrTbl		= OccAbbrs;
-		element.checkfunc	= checkOccupation;
-		element.checkfunc();
-		break;
-	    }		// occupation of bride
+		    case 'GMarStat':
+		    {		// marital status of groom
+				if (element.value.length == 0)
+				    element.value		= 'B';	// Bachelor
+				element.checkfunc	= checkMStat;
+				element.checkfunc();
+				break;
+		    }		// marital status of groom
 
-	    case 'GMarStat':
-	    {		// marital status of groom
-		if (element.value.length == 0)
-		    element.value		= 'B';	// Bachelor
-		element.checkfunc	= checkMStat;
-		element.checkfunc();
-		break;
-	    }		// marital status of groom
+		    case 'BMarStat':
+		    {		// marital status of bride
+				if (element.value.length == 0)
+				    element.value		= 'S';	// Spinster
+				element.checkfunc	= checkMStat;
+				element.checkfunc();
+				break;
+		    }		// marital status of bride
 
-	    case 'BMarStat':
-	    {		// marital status of bride
-		if (element.value.length == 0)
-		    element.value		= 'S';	// Spinster
-		element.checkfunc	= checkMStat;
-		element.checkfunc();
-		break;
-	    }		// marital status of bride
+		    case 'GGivenNames':
+		    case 'BGivenNames':
+		    case 'MGivenNames':
+		    {		// given names of a participant
+				element.abbrTbl		= GivnAbbrs;
+				element.checkfunc	= checkName;
+				element.checkfunc();
+				break;
+		    }		// given names of a participant
 
-	    case 'GGivenNames':
-	    case 'BGivenNames':
-	    case 'MGivenNames':
-	    {		// given names of a participant
-		element.abbrTbl		= GivnAbbrs;
-		element.checkfunc	= checkName;
-		element.checkfunc();
-		break;
-	    }		// given names of a participant
+		    case 'ClearG':
+		    case 'ClearB':
+		    case 'ClearM':
+		    {		// clear IDIR association
+				element.onclick		= clearIdir;
+				break;
+		    }		// clear IDIR association
 
-	    case 'ClearG':
-	    case 'ClearB':
-	    case 'ClearM':
-	    {		// clear IDIR association
-		element.onclick		= clearIdir;
-		break;
-	    }		// clear IDIR association
+		    case 'GFatherName':
+		    case 'BFatherName':
+		    {		// father's name
+				element.abbrTbl		= GivnAbbrs;
+				element.checkfunc	= checkName;
+				element.checkfunc();
+				break;
+		    }		// father's name
 
-	    case 'GFatherName':
-	    case 'BFatherName':
-	    {		// father's name
-		element.abbrTbl		= GivnAbbrs;
-		element.checkfunc	= checkName;
-		element.checkfunc();
-		break;
-	    }		// father's name
+		    case 'GMotherName':
+		    case 'BMotherName':
+		    {		// mother's name
+				element.abbrTbl		= GivnAbbrs;
+				element.checkfunc	= checkName;
+				element.checkfunc();
+				break;
+		    }		// mother's name
 
-	    case 'GMotherName':
-	    case 'BMotherName':
-	    {		// mother's name
-		element.abbrTbl		= GivnAbbrs;
-		element.checkfunc	= checkName;
-		element.checkfunc();
-		break;
-	    }		// mother's name
+		    case 'Witness1':
+		    case 'Witness2':
+		    {		// witness names
+				element.abbrTbl		= GivnAbbrs;
+				element.checkfunc	= checkName;
+				element.checkfunc();
+				break;
+		    }		// witness names
 
-	    case 'Witness1':
-	    case 'Witness2':
-	    {		// witness names
-		element.abbrTbl		= GivnAbbrs;
-		element.checkfunc	= checkName;
-		element.checkfunc();
-		break;
-	    }		// witness names
+		    case 'Witness1Res':
+		    case 'Witness2Res':
+		    {		// witness address
+				element.abbrTbl		= LocAbbrs;
+				element.onchange	= locationChanged;
+				element.checkfunc	= checkAddress;
+				element.checkfunc();
+				break;
+		    }		// witness address
 
-	    case 'Witness1Res':
-	    case 'Witness2Res':
-	    {		// witness address
-		element.abbrTbl		= LocAbbrs;
-		element.onchange	= locationChanged;
-		element.checkfunc	= checkAddress;
-		element.checkfunc();
-		break;
-	    }		// witness address
+		    case 'GAge':
+		    case 'BAge':
+		    {		// age of bride or groom
+				element.abbrTbl		= AgeAbbrs;
+				element.onchange	= changeAge;
+				element.checkfunc	= checkAge;
+				element.checkfunc();
+				break;
+		    }		// age of bride or groom
 
-	    case 'GAge':
-	    case 'BAge':
-	    {		// age of bride or groom
-		element.abbrTbl		= AgeAbbrs;
-		element.onchange	= changeAge;
-		element.checkfunc	= checkAge;
-		element.checkfunc();
-		break;
-	    }		// age of bride or groom
+		    case 'Image':
+		    {
+				element.checkfunc	= checkURL;
+				element.checkfunc();
+				break;
+		    }		// Image URL
 
-	    case 'Image':
-	    {
-		element.checkfunc	= checkURL;
-		element.checkfunc();
-		break;
-	    }		// Image URL
+		    case 'GBirthYear':
+		    case 'BBirthYear':
+		    {		// birth year of bride or groom
+				break;
+		    }		// birth year of bride or groom
 
-	    case 'GBirthYear':
-	    case 'BBirthYear':
-	    {		// birth year of bride or groom
-		break;
-	    }		// birth year of bride or groom
-
-	}	// switch on fldName
+		}	// switch on fldName
     }		// act on every element within the form
 }		// onLoadMarriage
 
 /************************************************************************
- *  changeAge								*
- *									*
- *  Take action when the user changes the age of a partner in the	*
- *  marriage to update the display of the calculated birth year of	*
- *  the partner.							*
- *									*
- *  Input:								*
- *	this	<input type='text'>					*
+ *  function changeAge														*
+ *																		*
+ *  Take action when the user changes the age of a partner in the		*
+ *  marriage to update the display of the calculated birth year of		*
+ *  the partner.														*
+ *																		*
+ *  Input:																*
+ *		this		<input type='text'>										*
  ************************************************************************/
 function changeAge()
 {
@@ -403,15 +397,15 @@ function changeAge()
     var	regYear		= form.RegYear.value;
     // expand abbreviations
     expAbbr(this,
-	    this.abbrTbl);
+		    this.abbrTbl);
     var	age		= this.value.trim();
     if (/^\[\d+\]$/.test(age))
-	age		= age.substring(1,age.length - 1) - 0;
+		age		= age.substring(1,age.length - 1) - 0;
     else
     if (/^\d+$/.test(age))
-	age		= age - 0;
+		age		= age - 0;
     else
-	age		= 20;
+		age		= 20;
     var	birthYear	= regYear - age;
     var role		= this.name.substring(0,1);
     var birthYearElt	= form.elements[role + 'BirthYear'];
@@ -422,31 +416,31 @@ function changeAge()
 }		// changeAge
 
 /************************************************************************
- *  changeGReligion							*
- *									*
- *  This is the onchange handler for the Groom's religion.		*
- *  Take action when the user changes the religion of the Groom.	*
- *  Set the default value of the religion of the Bride to match.	*
- *									*
- *  Input:								*
- *	this	<input type='text'>					*
+ *  function changeGReligion												*
+ *																		*
+ *  This is the onchange handler for the Groom's religion.				*
+ *  Take action when the user changes the religion of the Groom.		*
+ *  Set the default value of the religion of the Bride to match.		*
+ *																		*
+ *  Input:																*
+ *		this		<input type='text'>										*
  ************************************************************************/
 function changeGReligion()
 {
     // expand abbreviations
     expAbbr(this,
-	    this.abbrTbl);
+		    this.abbrTbl);
     var	form		= this.form;
     if (form.BReligion.value.length == 0)
-	form.BReligion.value	= this.value;
+		form.BReligion.value	= this.value;
     this.checkfunc();
 }		// changeGReligion
 
 /************************************************************************
- *  validate Form							*
- *									*
- *  Ensure that the data entered by the user has been minimally		*
- *  validated before submitting the form.				*
+ *  validate Form														*
+ *																		*
+ *  Ensure that the data entered by the user has been minimally				*
+ *  validated before submitting the form.								*
  ************************************************************************/
 function validateForm()
 {
@@ -455,27 +449,27 @@ function validateForm()
 
     var	msg	= "";
     if ((document.distForm.RegYear.value.length > 0) && 
-	document.distForm.RegYear.value.search(yearPat) == -1)
-	msg	= "Year is not 4 digit number. ";
+		document.distForm.RegYear.value.search(yearPat) == -1)
+		msg	= "Year is not 4 digit number. ";
     if ((document.distForm.RegNum.value.length > 0) &&
-	document.distForm.RegNum.value.search(numPat) == -1)
-	msg	+= "Number is not a valid number. ";
+		document.distForm.RegNum.value.search(numPat) == -1)
+		msg	+= "Number is not a valid number. ";
 
     if (msg != "")
     {
-	alert(msg);
-	return false;
+		alert(msg);
+		return false;
     }
     return true;
 }		// validateForm
 
 /************************************************************************
- *  resetForm								*
- *									*
- *  This method is called when the user requests the form		*
- *  to be reset to default values.					*
- *  This is required because the browser does not call the		*
- *  onchange method for form elements that have one.			*
+ *  function resetForm														*
+ *																		*
+ *  This method is called when the user requests the form				*
+ *  to be reset to default values.										*
+ *  This is required because the browser does not call the				*
+ *  onchange method for form elements that have one.						*
  ************************************************************************/
 function resetForm()
 {
@@ -521,148 +515,155 @@ function resetForm()
 }	// resetForm
 
 /************************************************************************
- *  clearIdir								*
- *									*
- *  This function is called when the user selects the clear IDIR	*
- *  assocation button with the mouse.					*
- *									*
- *  Input:								*
- *	$this		<button id='ClearX'>				*
+ *  function clearIdir													*
+ *																		*
+ *  This function is called when the user selects the clear IDIR		*
+ *  assocation button with the mouse.									*
+ *																		*
+ *  Input:																*
+ *		$this		<button id='ClearX'>								*
  ************************************************************************/
-function clearIdir()
+function clearIdir(ev)
 {
+    ev.stopPropagation();
     var	form		= this.form;
     var	role		= this.id.substring(5,6);
     var	idirElement	= document.getElementById(role + 'IDIR');
     var	showElement	= document.getElementById(role + 'ShowLink');
     if (idirElement)
     {			// have IDIR element
-	var	parentNode	= idirElement.parentNode;
-	if (showElement)
-	    parentNode.removeChild(showElement);// remove old <a href=''>
-	idirElement.value	= 0;
-	parentNode.appendChild(document.createTextNode("Cleared"));
-	this.parentNode.removeChild(this);	// remove the button
+		var	parentNode	= idirElement.parentNode;
+		if (showElement)
+		    parentNode.removeChild(showElement);// remove old <a href=''>
+		idirElement.value	= 0;
+		parentNode.appendChild(document.createTextNode("Cleared"));
+		this.parentNode.removeChild(this);	// remove the button
     }			// have IDIR element
+    else
+        alert ("Cannot find '" + role + "IDIR' id='" + this.id + "'");
     return false;	// suppress any standard functionality
 }		// clearIdir
 
 /************************************************************************
- *  showImage								*
- *									*
+ *  function showImage													*
+ *																		*
  *  This function is called when the user clicks the ShowImage button	*
- *  with the mouse or types Alt-I.					*
- *									*
- *  Input:								*
- *	this		<button id='ShowImage'>				*
+ *  with the mouse or types Alt-I.										*
+ *																		*
+ *  Input:																*
+ *		this		<button id='ShowImage'>								*
  ************************************************************************/
-function showImage()
+function showImage(ev)
 {
+    ev.stopPropagation();
     var	form		= this.form;
     if (form.Image)
     {		// Image field defined
-	args.showimage	= 'yes';	// previous and next request image
-	var imageUrl	= form.Image.value;
-	if (imageUrl.length == 0)
-	    alert("MarriageRegDetail.js: showImage: " +
-		  "no image defined for this registration");
-	else
-	if (imageUrl.length > 5 &&
-	    (imageUrl.substring(0,5) == "http:" ||
-	     imageUrl.substring(0,6) == "https:"))
-	    openFrame("Images",
-		      imageUrl,
-		      "right");
-	else
-	    openFrame("Images",
-		      '../Canada/DisplayImage.php?src=Images/' + imageUrl,
-		      "right");
+		args.showimage	= 'yes';	// previous and next request image
+		var imageUrl	= form.Image.value;
+		if (imageUrl.length == 0)
+		    alert("MarriageRegDetail.js: showImage: " +
+				  "no image defined for this registration");
+		else
+		if (imageUrl.length > 5 &&
+		    (imageUrl.substring(0,5) == "http:" ||
+		     imageUrl.substring(0,6) == "https:"))
+		    openFrame("Images",
+				      imageUrl,
+				      "right");
+		else
+		    openFrame("Images",
+				      '../Canada/DisplayImage.php?src=Images/' + imageUrl,
+				      "right");
     }		// Image field defined
     return false;
 }		// showImage
 
 /************************************************************************
- *  showPrevious							*
- *									*
- *  This function is called when the user clicks the Previous		*
- *  button with the mouse or types Alt-P.				*
- *									*
- *  Input:								*
- *	this		<button id='Previous'>				*
+ *  function showPrevious												*
+ *																		*
+ *  This function is called when the user clicks the Previous			*
+ *  button with the mouse or types Alt-P.								*
+ *																		*
+ *  Input:																*
+ *		this		<button id='Previous'>								*
  ************************************************************************/
-function showPrevious()
+function showPrevious(ev)
 {
+    ev.stopPropagation();
     var	form		= this.form;
     var	prevUrl		= form.previousHref.value;
     if (typeof(args.showimage) == 'string' &&
-	args.showimage.toLowerCase() == 'yes')
-	prevUrl		+= "&ShowImage=Yes";
+		args.showimage.toLowerCase() == 'yes')
+		prevUrl		+= "&ShowImage=Yes";
     location		= prevUrl;
     return false;
 }		// showPrevious
 
 /************************************************************************
- *  showNext								*
- *									*
- *  This function is called when the user selects the Next button	*
- *  with the mouse or types Alt-N.					*
- *									*
- *  Input:								*
- *	this		<button id='Next'>				*
+ *  function showNext													*
+ *																		*
+ *  This function is called when the user selects the Next button		*
+ *  with the mouse or types Alt-N.										*
+ *																		*
+ *  Input:																*
+ *		this			<button id='Next'>								*
  ************************************************************************/
-function showNext()
+function showNext(ev)
 {
+    ev.stopPropagation();
     var	form		= this.form;
     var	nextUrl		= form.nextHref.value;
     if (typeof(args.showimage) == 'string' &&
-	args.showimage.toLowerCase() == 'yes')
-	nextUrl		+= "&ShowImage=Yes";
+		args.showimage.toLowerCase() == 'yes')
+		nextUrl		+= "&ShowImage=Yes";
     location		= nextUrl;
     return false;
 }		// showNext
 
 /************************************************************************
- *  showSkip5								*
- *									*
- *  This function is called when the user selects the Skip5 button	*
- *  with the mouse.							*
- *  This is not currently referenced.					*
- *									*
- *  Input:								*
- *	this		<button id='Skip5'>				*
+ *  function showSkip5													*
+ *																		*
+ *  This function is called when the user selects the Skip5 button		*
+ *  with the mouse.														*
+ *  This is not currently referenced.									*
+ *																		*
+ *  Input:																*
+ *		this			<button id='Skip5'>								*
  ************************************************************************/
-function showSkip5()
+function showSkip5(ev)
 {
+    ev.stopPropagation();
     var	form		= this.form;
     var regDomain	= form.RegDomain.value;
     var regYear		= form.RegYear.value;
     var regNum		= 5 + Number(form.RegNum.value);
     var	nextUrl		= "MarriageRegDetail.php?RegDomain=" + regDomain +
-			  "&RegYear=" + regYear +
-			  "&RegNum=" + regNum;
+						  "&RegYear=" + regYear +
+						  "&RegNum=" + regNum;
     if (typeof(args.showimage) == 'string' &&
-	args.showimage.toLowerCase() == 'yes')
-	nextUrl		+= "&ShowImage=Yes";
+		args.showimage.toLowerCase() == 'yes')
+		nextUrl		+= "&ShowImage=Yes";
     location		= nextUrl;
     return false;
 }		// showSkip5
 
 /************************************************************************
- *  mdKeyDown								*
- *									*
- *  Handle key strokes that apply to the entire dialog window.  For	*
+ *  function mdKeyDown													*
+ *																		*
+ *  Handle key strokes that apply to the entire dialog window.  For		*
  *  example the key combinations Ctrl-S and Alt-U are interpreted to	*
  *  apply the update, as shortcut alternatives to using the mouse to 	*
- *  click the Update Individual button.					*
- *									*
- *  Parameters:								*
- *	e	W3C compliant browsers pass an event as a parameter	*
+ *  click the Update Individual button.									*
+ *																		*
+ *  Parameters:															*
+ *		e		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function mdKeyDown(e)
 {
     if (!e)
     {		// browser is not W3C compliant
-	e	=  window.event;	// IE
+		e	=  window.event;	// IE
     }		// browser is not W3C compliant
     var	form	= document.distForm;
     var	code	= e.keyCode;
@@ -670,60 +671,60 @@ function mdKeyDown(e)
     // take action based upon code
     if (e.ctrlKey)
     {
-	if (code == 83)
-	{		// letter 'S'
-	    form.submit();
-	    return false;	// do not perform standard action
-	}		// letter 'S'
+		if (code == 83)
+		{		// letter 'S'
+		    form.submit();
+		    return false;	// do not perform standard action
+		}		// letter 'S'
     }		// ctrl key shortcuts
     
     if (e.altKey)
     {		// alt key shortcuts
-	switch (code)
-	{
-	    case 67:
-	    {		// letter 'C'
-		form.Reset.onclick();
-		break;
-	    }		// letter 'C'
+		switch (code)
+		{
+		    case 67:
+		    {		// letter 'C'
+				form.Reset.onclick();
+				break;
+		    }		// letter 'C'
     
-	    case 73:
-	    {		// letter 'I'
-		if (form.viewImage)
-		    form.viewImage.onclick();
-		break;
-	    }		// letter 'I'
+		    case 73:
+		    {		// letter 'I'
+				if (form.viewImage)
+				    form.viewImage.onclick();
+				break;
+		    }		// letter 'I'
     
-	    case 78:
-	    {		// letter 'N'
-		form.next.onclick();
-		break;
-	    }		// letter 'N'
+		    case 78:
+		    {		// letter 'N'
+				form.next.onclick();
+				break;
+		    }		// letter 'N'
     
-	    case 80:
-	    {		// letter 'P'
-		form.previous.onclick();
-		break;
-	    }		// letter 'P'
+		    case 80:
+		    {		// letter 'P'
+				form.previous.onclick();
+				break;
+		    }		// letter 'P'
     
-	    case 81:
-	    {		// letter 'Q'
-		form.newQuery.onclick();
-		break;
-	    }		// letter 'Q'
+		    case 81:
+		    {		// letter 'Q'
+				form.newQuery.onclick();
+				break;
+		    }		// letter 'Q'
     
-	    case 85:
-	    {		// letter 'U'
-		form.submit();
-		break;
-	    }		// letter 'U'
+		    case 85:
+		    {		// letter 'U'
+				form.submit();
+				break;
+		    }		// letter 'U'
 
-	    default:
-	    {
-		//alert("mdKeyDown: alt-" + code);
-		break;
-	    }
-	}	    // switch on key code
+		    default:
+		    {
+				//alert("mdKeyDown: alt-" + code);
+				break;
+		    }
+		}	    // switch on key code
     }		// alt key shortcuts
 
     return;

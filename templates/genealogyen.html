@@ -9,153 +9,146 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-	<a href="/index.html">Home</a>:
-    <a href="/genealogy.php?lang=$LANG">
-	Genealogy
-    </a>:
-    <a href="/FamilyTree/Services.php?lang=$LANG">
-	Services
-    </a>:
-  </div> <!-- id="breadcrumbs" -->
-  <div class="body">
-    <h1>Genealogy
-      <span class="right">
-	<a href="/genealogy.php?lang=fr">
-	Français
-	</a>
-	<a href="/genealogy.php?lang=de">
-	Deutsche
-	</a>
-	<a href="/genealogy.php?lang=es">
-	Español
-	</a>
-	<a href="/genealogyHelpen.html" target="help">?&nbsp;Help</a>
-      </span>
-    </h1>
-    $TRACE
-    $MSG
-  <p>
-  Genealogical and Family History research services particularly utilizing the 
-  resources of Library and Archives Canada and the Ontario Archives.  
-  </p>
-  <h3>Family Tree:</h3>
-  <p class="label">
-	<a href="/FamilyTree/Services.php?lang=$LANG">
-	Top Level Services
-      </a>
-  </p>
-  <p class="label">
-	<a href="/FamilyTree/nominalIndex.php?lang=$LANG" target="_blank">
-	Nominal Index of Individuals
-      </a>
-  </p>
-  <h3>
-	Geographical:</h3>
-  <p class="label">
-	<a href="/genCountry.php?cc=CA&amp;lang=$LANG">
-	Canada
-      </a>
-  </p>
-  <p class="label">
-	<a href="/genCountry.php?cc=US&amp;lang=$LANG">
-	United States of America
-      </a>
-  </p>
-  <p class="label">
-	<a href="/genCountry.php?cc=GB&amp;lang=$LANG">
-	United Kingdom
-      </a>
-  </p>
-  <p class="label">
-	<a href="/displayPage.php?template=genCommercial&amp;lang=$LANG">
-	Commercial Data Bases
-      </a>
-  </p>
-  <p class="label">
-	<a href="/Canada/CountriesEdit.php?lang=$LANG">
-	List of Supported Countries
-      </a>
-  </p>
-  <h3>
-      <a href="/videoTutorials.php?lang=$LANG" target="_blank">
-	Video Tutorials
-     </a>:
-  </h3>
-  <h3>Genealogy User Guides:</h3>
+      <div id="breadcrumbs" class="hidden">
+    	<a href="/index.html">Home</a>:
+        <a href="/genealogy.php?lang=$LANG">
+    	Genealogy
+        </a>:
+      </div> <!-- id="breadcrumbs" -->
+      <div class="body">
+        <h1>Genealogy
+          <span class="right">
+    	    <a href="/genealogyHelpen.html" target="help">?&nbsp;Help</a>
+          </span>
+        </h1>
+        $TRACE
+        $MSG
+      <p>
+      Genealogical and Family History research services particularly utilizing the 
+      resources of Library and Archives Canada and the Ontario Archives.  
+      </p>
+      <h3>Family Tree:</h3>
       <p class="label">
-	<a href="/displayPage.php?template=Articles/FileFormatsInGenealogy"
-		target="_blank">
-	Digital Representation of Genealogical Information
-      </a>:
+    	<a href="/FamilyTree/Services.php?lang=$LANG">
+    	Top Level Services
+          </a>
       </p>
       <p class="label">
-	<a href="/displayPage.php?template=Articles/ReadingHandwriting"
-		target="_blank">
-	<i>
-	Reading Handwriting
-      </i>
-	</a>:
+    	<a href="/FamilyTree/nominalIndex.php?lang=$LANG" target="_blank">
+    	Nominal Index of Individuals
+        </a>
       </p>
       <p class="label">
-	<a href="/displayPage.php?template=Articles/FrenchOccupations"
-		target="_blank">
-	French Occupations
-      </a>:
+        <a href="https://github.com/jcobban/Genealogy/wiki" target="_blank">
+    	Technical Details of the Site Implementation
+        </a>
+      </p>
+      <h3>
+    	Geographical:</h3>
+      <p class="label">
+    	<a href="/genCountry.php?cc=CA&amp;lang=$LANG">
+    	Canada
+          </a>
       </p>
       <p class="label">
-	<a href="/displayPage.php?template=Articles/MicrofilmGimp"
-		target="_blank">
-	Microfilm and Digital Imaging
-      </a>:
+    	<a href="/genCountry.php?cc=US&amp;lang=$LANG">
+    	United States of America
+          </a>
       </p>
       <p class="label">
-	<a href="/displayPage.php?template=Articles/SpreadsheetsInGenealogy"
-		target="_blank">
-	Using Spreadsheets in Genealogy
-	</a>:
+    	<a href="/genCountry.php?cc=GB&amp;lang=$LANG">
+    	United Kingdom
+          </a>
       </p>
       <p class="label">
-	<a href="https://hobbyhelp.com/genealogy/"
-		target="_blank">
-	Ultimate Beginners Guide to Genealogy
-	</a>:
+    	<a href="/displayPage.php?template=genCommercial&amp;lang=$LANG">
+    	Commercial Data Bases
+          </a>
       </p>
       <p class="label">
-	<a href="/displayPage.php?template=Articles/Newsletter2013_10"
-		target="_blank">
-	User Guide: Features of the Page for an Individual in the Family Tree
-	</a>:
+    	<a href="/Canada/CountriesEdit.php?lang=$LANG">
+    	List of Supported Countries
+          </a>
       </p>
-      <p class="label">
-	<a href="/displayPage.php?template=Articles/IntroductionToUpdating"
-		target="_blank">
-	User Guide: Getting Started with Updating the Family Tree
-	</a>:
-      </p>
-      <p class="label">
-	<a href="/displayPage.php?template=Articles/Locations"
-		target="_blank">
-	User Guide: Understanding Locations
-	</a>:
-      </p>
-      <h3>Monthly NewsLetters:</h3>
-      <p class="label" id="newsletter$mm$year">
-	<a href="/Newsletters/$filename" target="_blank">
-		$month $year Newsletter
-	</a>
-      </p>
-      <h3>Monthly Technical Status Reports:</h3>
-      <p class="label"  id="report$mm$year">
-	<a href="/MonthlyUpdates/$filename" target="_blank">
-		$month $year
-		Updates to Website Functionality
-	</a>
-      </p>
-  </div> <!-- class=body -->
-    <script src="/jscripts/js20/http.js" type="text/javascript">
-    </script>
-    <script src="/jscripts/util.js" type="text/javascript">
-    </script>
-    <script src="/genealogy.js" type="text/javascript">
-    </script>
+      <h3>
+          <a href="/videoTutorials.php?lang=$LANG" target="_blank">
+    	Video Tutorials
+         </a>:
+      </h3>
+      <h3>Genealogy User Guides:</h3>
+          <p class="label">
+    	<a href="/displayPage.php?template=Articles/FileFormatsInGenealogy"
+    		target="_blank">
+    	Digital Representation of Genealogical Information
+          </a>:
+          </p>
+          <p class="label">
+    	<a href="/displayPage.php?template=Articles/ReadingHandwriting"
+    		target="_blank">
+    	<i>
+    	Reading Handwriting
+          </i>
+    	</a>:
+          </p>
+          <p class="label">
+    	<a href="/displayPage.php?template=Articles/FrenchOccupations"
+    		target="_blank">
+    	French Occupations
+          </a>:
+          </p>
+          <p class="label">
+    	<a href="/displayPage.php?template=Articles/MicrofilmGimp"
+    		target="_blank">
+    	Microfilm and Digital Imaging
+          </a>:
+          </p>
+          <p class="label">
+    	<a href="/displayPage.php?template=Articles/SpreadsheetsInGenealogy"
+    		target="_blank">
+    	Using Spreadsheets in Genealogy
+    	</a>:
+          </p>
+          <p class="label">
+    	<a href="https://hobbyhelp.com/genealogy/"
+    		target="_blank">
+    	Ultimate Beginners Guide to Genealogy
+    	</a>:
+          </p>
+          <p class="label">
+    	<a href="/displayPage.php?template=Articles/Newsletter2013_10"
+    		target="_blank">
+    	User Guide: Features of the Page for an Individual in the Family Tree
+    	</a>:
+          </p>
+          <p class="label">
+    	<a href="/displayPage.php?template=Articles/IntroductionToUpdating"
+    		target="_blank">
+    	User Guide: Getting Started with Updating the Family Tree
+    	</a>:
+          </p>
+          <p class="label">
+    	<a href="/displayPage.php?template=Articles/Locations"
+    		target="_blank">
+    	User Guide: Understanding Locations
+    	</a>:
+          </p>
+          <h3>Monthly NewsLetters:</h3>
+          <p class="label" id="newsletter$mm$year">
+    	<a href="/Newsletters/$filename" target="_blank">
+    		$month $year Newsletter
+    	</a>
+          </p>
+          <h3>Monthly Technical Status Reports:</h3>
+          <p class="label"  id="report$mm$year">
+    	<a href="/MonthlyUpdates/$filename" target="_blank">
+    		$month $year
+    		Updates to Website Functionality
+    	</a>
+          </p>
+      </div> <!-- class=body -->
+      <script src="/jscripts/js20/http.js" type="text/javascript">
+      </script>
+      <script src="/jscripts/util.js" type="text/javascript">
+      </script>
+      <script src="/genealogy.js" type="text/javascript">
+      </script>

@@ -54,8 +54,11 @@ use \Exception;
  *						type that will be displayed						*
  *		2018/02/18		report even if IDLR is no longer defined		*
  *		2018/02/25		use Template									*
+ *		2019/01/21      delete button was not displayed for unused      *
+ *		2019/02/19      pass language to next scripts                   *
+ *		                use new FtTemplate constructor                  *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -67,10 +70,10 @@ require_once __NAMESPACE__ . '/Template.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
     // validate parameters
-    $idlr		= null;
-    $limit		= 25;
+    $idlr		    = null;
+    $limit		    = 25;
     $autodelete		= false;
-    $lang		= 'en';
+    $lang		    = 'en';
     $indcount		= 0;
     $marcount		= 0;
     $evtcount		= 0;
@@ -81,23 +84,22 @@ require_once __NAMESPACE__ . '/common.inc';
 		{		// act on parameters
 		    case 'idlr':
 		    {
-				$idlr		= intval($value);
+				$idlr		    = intval($value);
 				break;
 		    }		// IDLR
 
 		    case 'limit':
 		    {
-				$limit		= intval($value);
+				$limit		    = intval($value);
 				break;
 		    }		// Limit
 
 		    case 'lang':
 		    {
-				if (strlen($value) == 2)
-				$limit		= intval($value);
+				if (strlen($value) >= 2)
+				    $lang		= strtolower(substr($value, 0, 2));
 				break;
 		    }		// Limit
-
 
 		    case 'delete':
 		    {
@@ -135,13 +137,13 @@ require_once __NAMESPACE__ . '/common.inc';
 
 		// get individuals who have the location in one of the events
 		// recorded in the individual record
-		$indParms	= array(array('idlrbirth'	=> $idlr,
-							      'idlrchris'	=> $idlr,
-							      'idlrdeath'	=> $idlr,
-							      'idlrburied'	=> $idlr),
-							'limit'			=> $limit,
-							'order'			=>
-								'Surname, GivenName, BirthSD, DeathSD');
+		$indParms	= array(array('idlrbirth'	    => $idlr,
+							      'idlrchris'	    => $idlr,
+							      'idlrdeath'	    => $idlr,
+							      'idlrburied'	    => $idlr),
+							      'limit'			=> $limit,
+							      'order'			=>
+								  'Surname, GivenName, BirthSD, DeathSD');
 		$indivs		= new PersonSet($indParms);
 		$indInfo	= $indivs->getInformation();
 		$indcount	= $indInfo['count'];
@@ -167,21 +169,7 @@ require_once __NAMESPACE__ . '/common.inc';
 		$count		+= $evtcount;
     }		// no messages
 
-    $tempBase		= $document_root . '/templates/';
-    $template		= new FtTemplate("${tempBase}page$lang.html");
-    $includeSub		= "getIndividualsByLocation$lang.html";
-    if (!file_exists($tempBase . $includeSub))
-    {
-	    $language	= new Language(array('code' => $lang));
-	    $langName	= $language->get('name');
-	    $nativeName	= $language->get('nativename');
-        $sorry      = $language->getSorry();
-        $warn       .= str_replace(array('$langName','$nativeName'),
-                                   array($langName, $nativeName),
-                                   $sorry);
-		$includeSub	= 'getIndividualsByLocationen.html';
-    }
-    $template->includeSub($tempBase . $includeSub, 'MAIN');
+    $template		= new FtTemplate("getIndividualsByLocation$lang.html");
 
     $template->set('IDLR', $idlr);
     $template->set('LOCNAME', $locName);
@@ -189,33 +177,6 @@ require_once __NAMESPACE__ . '/common.inc';
     if (strlen($prefix) > 4)
 		$prefix		= substr($prefix, 0, 4);
     $template->set('PREFIX', $prefix);
-    if ($indcount > $limit)
-    {
-		$indcount		= number_format($indcount);
-		$template->updateTag('indOver',
-						     array('indcount'	=> $indcount,
-							   'limit'	=> $limit));
-    }
-    else
-		$template->updateTag('indOver', null);
-    if ($famcount > $limit)
-    {
-		$famcount		= number_format($famcount);
-		$template->updateTag('famOver',
-						     array('famcount'	=> $famcount,
-							   'limit'	=> $limit));
-    }
-    else
-		$template->updateTag('famOver', null);
-    if ($evtcount > $limit)
-    {    
-		$evtcount		= number_format($evtcount);
-		$template->updateTag('evtOver',
-						     array('evtcount'	=> $evtcount,
-							   'limit'	=> $limit));
-    }
-    else
-		$template->updateTag('evtOver', null);
 
     if ($count > 0)
     {		// some individuals with refs in main record
@@ -240,12 +201,12 @@ require_once __NAMESPACE__ . '/common.inc';
 				$eventType		= 'Unknown Event';
 		    $name		= $person->getName(Person::NAME_INCLUDE_DATES);
 		    $person['eventType']	= $eventType;
-		    $person['mpage']		= "$page?idir=$idir";
+		    $person['mpage']		= "$page?idir=$idir&lang=$lang";
 		    $person['dname']		= $name;
 		    $person['gender']		= $gender;
 		}		// loop through individuals
 
-		$template->updateTag('personEvents', $indivs);
+		$template['personEvents']->update( $indivs);
 
 		foreach($events as $ider => $event)
 		{		// loop through events
@@ -266,7 +227,7 @@ require_once __NAMESPACE__ . '/common.inc';
 				}
 				$name	= $person->getName(Person::NAME_INCLUDE_DATES);
 				$event['eventType']	= $eventType;
-				$event['mpage']		= "$page?idir=$idir";
+				$event['mpage']		= "$page?idir=$idir&lang=$lang";
 				$event['dname']		= $name;
 				$event['gender']	= $gender;
 		    }	// individual event
@@ -274,75 +235,92 @@ require_once __NAMESPACE__ . '/common.inc';
 		    if ($event->get('idtype') == Event::IDTYPE_MAR)
 		    {	// family event
 				$family		= $event->getAssociatedRecord();
-				$IDMR		= $family->get('idmr');
-				$IDIR		= $family->get('idirhusb');
-				if ($IDIR == 0)
-				    $IDIR	= $family->get('idirwife');
+				$idmr		= $family->get('idmr');
+				$idir		= $family->get('idirhusb');
+				if ($idir == 0)
+				    $idir	= $family->get('idirwife');
 				if (canUser('edit'))
-				    $mpage	= 'editMarriages.php?idir=' . $IDIR .
-									    '&idmr=' . $IDMR;
+				    $mpage	= "editMarriages.php?idir=$idir&idmr=$idmr&lang=$lang";
 				else
-				    $mpage	= 'Person.php?idir=' . $IDIR;
+				    $mpage	= "Person.php?idir=$idir&lang=$lang";
 				$event['eventType']		= $eventType;
 				$event['mpage']			= $mpage;
 				$event['dname']			= $family->getName();
 				$event['gender']		= 'unknown';
-		    }	// family event
-		}		// loop through events
+		    }	    // family event
+		}		    // loop through events
 
-		$template->updateTag('generalEvents', $events);
+		$template['generalEvents']->update( $events);
 
 		foreach($families as $idmr => $family)
-		{		// loop through families
+		{		    // loop through families
 		    $marrEvent	= $family->getMarEvent();
 		    if ($marrEvent->get('ider') == 0)
 		    {		// not already handled
-				$IDMR		= $family->get('idmr');
-				$IDIR		= $family->get('idirhusb');
-				if ($IDIR == 0)
-				    $IDIR	= $family->get('idirwife');
+				$idmr		                = $family->get('idmr');
+				$idir		                = $family->get('idirhusb');
+				if ($idir == 0)
+				    $idir	                = $family->get('idirwife');
 				if (canUser('edit'))
-				    $mpage		= 'editMarriages.php?idir=' . $IDIR .
-										'&idmr=' . $IDMR;
+				    $mpage		= "editMarriages.php?idir=$idir&idmr=$idmr&lang=$lang";
 				else
-				    $mpage		= 'Person.php?idir=' . $IDIR;
-				$family['mpage']		= $mpage;
+				    $mpage		= "Person.php?idir=$idir&lang=$lang";
+				$family['mpage']		    = $mpage;
 				$family['familyName']		= $family->getName();
-				$family['gender']		= 'unknown';
-		    }	// not already handled
-		}		// loop through families
+				$family['gender']		    = 'unknown';
+		    }	    // not already handled
+		}		    // loop through families
 
-		$template->updateTag('marriageEvents', $families);
-		$template->updateTag('nofacts', null);
-		$template->updateTag('deletedLocation', null);
-		$template->updateTag('delForm', null);
-    }		// references
+	    if ($indcount > $limit)
+	    {
+			$indcount		= number_format($indcount);
+			$template['indOver']->update(array('indcount'	=> $indcount,
+								               'limit'	    => $limit));
+	    }
+	    else
+			$template['indOver']->update( null);
+	    if ($famcount > $limit)
+	    {
+			$famcount		= number_format($famcount);
+			$template['famOver']->update(array('famcount'	=> $famcount,
+								               'limit'	    => $limit));
+	    }
+	    else
+			$template['famOver']->update( null);
+	    if ($evtcount > $limit)
+	    {    
+			$evtcount		= number_format($evtcount);
+			$template['evtOver']->update(array('evtcount'	=> $evtcount,
+								               'limit'	    => $limit));
+	    }
+	    else
+			$template['evtOver']->update( null);
+		$template['marriageEvents']->update($families);
+		$template['nofacts']->update(null);
+		$template['deletedLocation']->update(null);
+		$template['delForm']->update(null);
+    }		    // references
     else
-    {		// no facts use this location
-		    $warn	.= "<p>no facts use this location</p>\n";
-		$template->updateTag('references', null);
-		$template->updateTag('nofacts',
-						     array('locName'	=> $locName));
+    {		    // no facts use this location
+		$template['references']->update(null);
+		$template['nofacts']->update(array('locName'	=> $locName));
 		if ($autodelete)
-		{	// delete automatically
-		    //$result		= $location->delete(false);
-		    $template->updateTag('deletedLocation',
-							 array('locName'	=> $locName));
-		    $template->updateTag('delForm',
-							 null);
+		{	    // delete automatically
+		    $result		= $location->delete(false);
+		    $template['deletedLocation']->update(array('locName' => $locName));
+		    $template['delForm']->update(null);
 		}		// delete automatically
 		else
 		{		// ask user if we can delete
-		    $template->updateTag('deletedLocation', null);
+		    $template['deletedLocation']->update(null);
 		    if ($debug)
 				$debugyn	= 'Y';
 		    else
 				$debugyn	= 'N';
-		    $template->updateTag('delForm',
-							 array('locName'	=> $locName,
-							       'idlr'		=> $idlr,
-							       'debug'		=> $debugyn));
+		    $template['delForm']->update(array('locName'	=> $locName,
+							                   'idlr'		=> $idlr,
+							                   'debug'		=> $debugyn));
 		}		// ask user if we can delete
-    }		// no facts use this location
+    }		    // no facts use this location
 
     $template->display();
