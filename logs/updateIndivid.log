@@ -1,0 +1,293 @@
+<p>updateIndividXml.php: 232<id>100692</id>
+<p>updateIndividXml.php: 232<parentsIdmr>0</parentsIdmr>
+<p>updateIndividXml.php: 232<idcr>0</idcr>
+<p>updateIndividXml.php: 232<idar>0</idar>
+<p>updateIndividXml.php: 232<fatherGivenName>james</fatherGivenName>
+<p>updateIndividXml.php: 232<fatherSurname>gammon</fatherSurname>
+<p>updateIndividXml.php: 232<motherGivenName>susan</motherGivenName>
+<p>updateIndividXml.php: 232<motherSurname>pollard</motherSurname>
+<p>updateIndividXml.php: 232<treeName></treeName>
+<p>updateIndividXml.php: 232<parentCount>1</parentCount>
+<p>updateIndividXml.php: 232<familyCount>1</familyCount>
+<p>updateIndividXml.php: 232<idir>82451</idir>
+<p>updateIndividXml.php: 232<Surname>Gammon</Surname>
+<p>updateIndividXml.php: 232<GivenName>Bethanny</GivenName>
+<p>updateIndividXml.php: 232<Gender>1</Gender>
+<p>updateIndividXml.php: 232<EventIder0>131716</EventIder0>
+<p>updateIndividXml.php: 232<BirthDate>14 Aug 1854</BirthDate>
+<p>updateIndividXml.php: 232<BirthLocation>Grimsby, Lincoln, ON, CA</BirthLocation>
+<p>updateIndividXml.php: 431 event location=47</p>
+<p>updateIndividXml.php: 232<EventPref0>Y</EventPref0>
+<p>updateIndividXml.php: 232<EventIdet0>3</EventIdet0>
+<p>updateIndividXml.php: 232<EventCitType0>30</EventCitType0>
+<p>updateIndividXml.php: 232<EventOrder0>-2</EventOrder0>
+<p>updateIndividXml.php: 232<EventSD0>18540814</EventSD0>
+<p>updateIndividXml.php: 232<EventChanged0>0</EventChanged0>
+<p>updateIndividXml.php: 232<EventIder1>0</EventIder1>
+<p>updateIndividXml.php: 232<EventDate1></EventDate1>
+<p>updateIndividXml.php: 232<EventLocation1></EventLocation1>
+<p>updateIndividXml.php: 431 event location=1</p>
+<p>updateIndividXml.php: 232<EventPref1>Y</EventPref1>
+<p>updateIndividXml.php: 232<EventIdet1>5</EventIdet1>
+<p>updateIndividXml.php: 232<EventCitType1>30</EventCitType1>
+<p>updateIndividXml.php: 232<EventOrder1>-1</EventOrder1>
+<p>updateIndividXml.php: 232<EventSD1>-99999999</EventSD1>
+<p>updateIndividXml.php: 232<EventChanged1>0</EventChanged1>
+<p>updateIndividXml.php: 232<EventIder2>45378</EventIder2>
+<p>updateIndividXml.php: 232<EventDate2>1872</EventDate2>
+<p>updateIndividXml.php: 232<EventLocation2>Bosanquet, Lambton, ON, CA</EventLocation2>
+<p>updateIndividXml.php: 431 event location=1831</p>
+<p>updateIndividXml.php: 232<EventPref2>Y</EventPref2>
+<p>updateIndividXml.php: 232<EventIdet2>54</EventIdet2>
+<p>updateIndividXml.php: 232<EventCitType2>30</EventCitType2>
+<p>updateIndividXml.php: 232<EventOrder2>0</EventOrder2>
+<p>updateIndividXml.php: 232<EventSD2>18720615</EventSD2>
+<p>updateIndividXml.php: 232<EventChanged2>0</EventChanged2>
+<p>updateIndividXml.php: 232<EventIder3>0</EventIder3>
+<p>updateIndividXml.php: 232<DeathDate>10 Apr 1935</DeathDate>
+<p>updateIndividXml.php: 232<DeathLocation></DeathLocation>
+<p>updateIndividXml.php: 431 event location=1</p>
+<p>updateIndividXml.php: 232<EventPref3>Y</EventPref3>
+<p>updateIndividXml.php: 232<EventIdet3>6</EventIdet3>
+<p>updateIndividXml.php: 232<EventCitType3>30</EventCitType3>
+<p>updateIndividXml.php: 232<EventOrder3>1</EventOrder3>
+<p>updateIndividXml.php: 232<EventSD3>19350410</EventSD3>
+<p>updateIndividXml.php: 232<EventChanged3>0</EventChanged3>
+<p>updateIndividXml.php: 232<EventIder4>0</EventIder4>
+<p>updateIndividXml.php: 232<EventDate4></EventDate4>
+<p>updateIndividXml.php: 232<EventLocation4>Beechwood Cemetery, Forest, Lambton, ON, CA</EventLocation4>
+<p>updateIndividXml.php: 431 event location=2420</p>
+<p>updateIndividXml.php: 232<EventPref4>Y</EventPref4>
+<p>updateIndividXml.php: 232<EventIdet4>4</EventIdet4>
+<p>updateIndividXml.php: 232<EventCitType4>30</EventCitType4>
+<p>updateIndividXml.php: 232<EventOrder4>2</EventOrder4>
+<p>updateIndividXml.php: 232<EventSD4>99999999</EventSD4>
+<p>updateIndividXml.php: 232<EventChanged4>0</EventChanged4>
+<p>updateIndividXml.php: 232<Private>0</Private>
+<p>updateIndividXml.php: 232<NeverMarried>0</NeverMarried>
+<p>updateIndividXml.php: 232<UserRef></UserRef>
+<p>updateIndividXml.php: 232<AncestralRef></AncestralRef>
+<p>updateIndividXml.php: 232<AncInterest>0</AncInterest>
+<p>updateIndividXml.php: 232<DecInterest>0</DecInterest>
+<p>updateIndividXml.php: 232<IDMRPref>22803</IDMRPref>
+<p>updateIndividXml.php 780</p>
+<p>updateIndividXml.php: 232<id>100692</id>
+<p>updateIndividXml.php: 232<parentsIdmr>0</parentsIdmr>
+<p>updateIndividXml.php: 232<idcr>0</idcr>
+<p>updateIndividXml.php: 232<idar>0</idar>
+<p>updateIndividXml.php: 232<fatherGivenName>james</fatherGivenName>
+<p>updateIndividXml.php: 232<fatherSurname>gammon</fatherSurname>
+<p>updateIndividXml.php: 232<motherGivenName>susan</motherGivenName>
+<p>updateIndividXml.php: 232<motherSurname>pollard</motherSurname>
+<p>updateIndividXml.php: 232<treeName></treeName>
+<p>updateIndividXml.php: 232<parentCount>1</parentCount>
+<p>updateIndividXml.php: 232<familyCount>1</familyCount>
+<p>updateIndividXml.php: 232<idir>82451</idir>
+<p>updateIndividXml.php: 232<Surname>Gammon</Surname>
+<p>updateIndividXml.php: 232<GivenName>Bethanny</GivenName>
+<p>updateIndividXml.php: 232<Gender>1</Gender>
+<p>updateIndividXml.php: 232<EventIder0>131716</EventIder0>
+<p>updateIndividXml.php: 232<BirthDate>14 Aug 1854</BirthDate>
+<p>updateIndividXml.php: 232<BirthLocation>Grimsby, Lincoln, ON, CA</BirthLocation>
+<p>updateIndividXml.php: 431 event location=47</p>
+<p>updateIndividXml.php: 232<EventPref0>Y</EventPref0>
+<p>updateIndividXml.php: 232<EventIdet0>3</EventIdet0>
+<p>updateIndividXml.php: 232<EventCitType0>30</EventCitType0>
+<p>updateIndividXml.php: 232<EventOrder0>-2</EventOrder0>
+<p>updateIndividXml.php: 232<EventSD0>18540814</EventSD0>
+<p>updateIndividXml.php: 232<EventChanged0>0</EventChanged0>
+<p>updateIndividXml.php: 232<EventIder1>0</EventIder1>
+<p>updateIndividXml.php: 232<EventDate1></EventDate1>
+<p>updateIndividXml.php: 232<EventLocation1></EventLocation1>
+<p>updateIndividXml.php: 431 event location=1</p>
+<p>updateIndividXml.php: 232<EventPref1>Y</EventPref1>
+<p>updateIndividXml.php: 232<EventIdet1>5</EventIdet1>
+<p>updateIndividXml.php: 232<EventCitType1>30</EventCitType1>
+<p>updateIndividXml.php: 232<EventOrder1>-1</EventOrder1>
+<p>updateIndividXml.php: 232<EventSD1>-99999999</EventSD1>
+<p>updateIndividXml.php: 232<EventChanged1>0</EventChanged1>
+<p>updateIndividXml.php: 232<EventIder2>45378</EventIder2>
+<p>updateIndividXml.php: 232<EventDate2>1872</EventDate2>
+<p>updateIndividXml.php: 232<EventLocation2>Bosanquet, Lambton, ON, CA</EventLocation2>
+<p>updateIndividXml.php: 431 event location=1831</p>
+<p>updateIndividXml.php: 232<EventPref2>Y</EventPref2>
+<p>updateIndividXml.php: 232<EventIdet2>54</EventIdet2>
+<p>updateIndividXml.php: 232<EventCitType2>30</EventCitType2>
+<p>updateIndividXml.php: 232<EventOrder2>0</EventOrder2>
+<p>updateIndividXml.php: 232<EventSD2>18720615</EventSD2>
+<p>updateIndividXml.php: 232<EventChanged2>0</EventChanged2>
+<p>updateIndividXml.php: 232<EventIder3>0</EventIder3>
+<p>updateIndividXml.php: 232<DeathDate>10 Apr 1935</DeathDate>
+<p>updateIndividXml.php: 232<DeathLocation></DeathLocation>
+<p>updateIndividXml.php: 431 event location=1</p>
+<p>updateIndividXml.php: 232<EventPref3>Y</EventPref3>
+<p>updateIndividXml.php: 232<EventIdet3>6</EventIdet3>
+<p>updateIndividXml.php: 232<EventCitType3>30</EventCitType3>
+<p>updateIndividXml.php: 232<EventOrder3>1</EventOrder3>
+<p>updateIndividXml.php: 232<EventSD3>19350410</EventSD3>
+<p>updateIndividXml.php: 232<EventChanged3>0</EventChanged3>
+<p>updateIndividXml.php: 232<EventIder4>0</EventIder4>
+<p>updateIndividXml.php: 232<EventDate4></EventDate4>
+<p>updateIndividXml.php: 232<EventLocation4>Beechwood Cemetery, Forest, Lambton, ON, CA</EventLocation4>
+<p>updateIndividXml.php: 431 event location=2420</p>
+<p>updateIndividXml.php: 232<EventPref4>Y</EventPref4>
+<p>updateIndividXml.php: 232<EventIdet4>4</EventIdet4>
+<p>updateIndividXml.php: 232<EventCitType4>30</EventCitType4>
+<p>updateIndividXml.php: 232<EventOrder4>2</EventOrder4>
+<p>updateIndividXml.php: 232<EventSD4>99999999</EventSD4>
+<p>updateIndividXml.php: 232<EventChanged4>0</EventChanged4>
+<p>updateIndividXml.php: 232<Private>0</Private>
+<p>updateIndividXml.php: 232<NeverMarried>0</NeverMarried>
+<p>updateIndividXml.php: 232<UserRef></UserRef>
+<p>updateIndividXml.php: 232<AncestralRef></AncestralRef>
+<p>updateIndividXml.php: 232<AncInterest>0</AncInterest>
+<p>updateIndividXml.php: 232<DecInterest>0</DecInterest>
+<p>updateIndividXml.php: 232<IDMRPref>22803</IDMRPref>
+<p>updateIndividXml.php 780</p>
+<p>updateIndividXml.php: 232<id>100692</id>
+<p>updateIndividXml.php: 232<parentsIdmr>0</parentsIdmr>
+<p>updateIndividXml.php: 232<idcr>0</idcr>
+<p>updateIndividXml.php: 232<idar>0</idar>
+<p>updateIndividXml.php: 232<fatherGivenName>james</fatherGivenName>
+<p>updateIndividXml.php: 232<fatherSurname>gammon</fatherSurname>
+<p>updateIndividXml.php: 232<motherGivenName>susan</motherGivenName>
+<p>updateIndividXml.php: 232<motherSurname>pollard</motherSurname>
+<p>updateIndividXml.php: 232<treeName></treeName>
+<p>updateIndividXml.php: 232<parentCount>1</parentCount>
+<p>updateIndividXml.php: 232<familyCount>1</familyCount>
+<p>updateIndividXml.php: 232<idir>82451</idir>
+<p>updateIndividXml.php: 232<Surname>Gammon</Surname>
+<p>updateIndividXml.php: 232<GivenName>Bethanny</GivenName>
+<p>updateIndividXml.php: 232<Gender>1</Gender>
+<p>updateIndividXml.php: 232<EventIder0>131716</EventIder0>
+<p>updateIndividXml.php: 232<BirthDate>14 Aug 1854</BirthDate>
+<p>updateIndividXml.php: 232<BirthLocation>Grimsby, Lincoln, ON, CA</BirthLocation>
+<p>updateIndividXml.php: 431 event location=47</p>
+<p>updateIndividXml.php: 232<EventPref0>Y</EventPref0>
+<p>updateIndividXml.php: 232<EventIdet0>3</EventIdet0>
+<p>updateIndividXml.php: 232<EventCitType0>30</EventCitType0>
+<p>updateIndividXml.php: 232<EventOrder0>-2</EventOrder0>
+<p>updateIndividXml.php: 232<EventSD0>18540814</EventSD0>
+<p>updateIndividXml.php: 232<EventChanged0>0</EventChanged0>
+<p>updateIndividXml.php: 232<EventIder1>0</EventIder1>
+<p>updateIndividXml.php: 232<EventDate1></EventDate1>
+<p>updateIndividXml.php: 232<EventLocation1></EventLocation1>
+<p>updateIndividXml.php: 431 event location=1</p>
+<p>updateIndividXml.php: 232<EventPref1>Y</EventPref1>
+<p>updateIndividXml.php: 232<EventIdet1>5</EventIdet1>
+<p>updateIndividXml.php: 232<EventCitType1>30</EventCitType1>
+<p>updateIndividXml.php: 232<EventOrder1>-1</EventOrder1>
+<p>updateIndividXml.php: 232<EventSD1>-99999999</EventSD1>
+<p>updateIndividXml.php: 232<EventChanged1>0</EventChanged1>
+<p>updateIndividXml.php: 232<EventIder2>45378</EventIder2>
+<p>updateIndividXml.php: 232<EventDate2>1872</EventDate2>
+<p>updateIndividXml.php: 232<EventLocation2>Bosanquet, Lambton, ON, CA</EventLocation2>
+<p>updateIndividXml.php: 431 event location=1831</p>
+<p>updateIndividXml.php: 232<EventPref2>Y</EventPref2>
+<p>updateIndividXml.php: 232<EventIdet2>54</EventIdet2>
+<p>updateIndividXml.php: 232<EventCitType2>30</EventCitType2>
+<p>updateIndividXml.php: 232<EventOrder2>0</EventOrder2>
+<p>updateIndividXml.php: 232<EventSD2>18720615</EventSD2>
+<p>updateIndividXml.php: 232<EventChanged2>0</EventChanged2>
+<p>updateIndividXml.php: 232<EventIder3>0</EventIder3>
+<p>updateIndividXml.php: 232<DeathDate>10 Apr 1935</DeathDate>
+<p>updateIndividXml.php: 232<DeathLocation></DeathLocation>
+<p>updateIndividXml.php: 431 event location=1</p>
+<p>updateIndividXml.php: 232<EventPref3>Y</EventPref3>
+<p>updateIndividXml.php: 232<EventIdet3>6</EventIdet3>
+<p>updateIndividXml.php: 232<EventCitType3>30</EventCitType3>
+<p>updateIndividXml.php: 232<EventOrder3>1</EventOrder3>
+<p>updateIndividXml.php: 232<EventSD3>19350410</EventSD3>
+<p>updateIndividXml.php: 232<EventChanged3>0</EventChanged3>
+<p>updateIndividXml.php: 232<EventIder4>0</EventIder4>
+<p>updateIndividXml.php: 232<EventDate4></EventDate4>
+<p>updateIndividXml.php: 232<EventLocation4>Beechwood Cemetery, Forest, Lambton, ON, CA</EventLocation4>
+<p>updateIndividXml.php: 431 event location=2420</p>
+<p>updateIndividXml.php: 232<EventPref4>Y</EventPref4>
+<p>updateIndividXml.php: 232<EventIdet4>4</EventIdet4>
+<p>updateIndividXml.php: 232<EventCitType4>30</EventCitType4>
+<p>updateIndividXml.php: 232<EventOrder4>2</EventOrder4>
+<p>updateIndividXml.php: 232<EventSD4>99999999</EventSD4>
+<p>updateIndividXml.php: 232<EventChanged4>0</EventChanged4>
+<p>updateIndividXml.php: 232<Private>0</Private>
+<p>updateIndividXml.php: 232<NeverMarried>0</NeverMarried>
+<p>updateIndividXml.php: 232<UserRef></UserRef>
+<p>updateIndividXml.php: 232<AncestralRef></AncestralRef>
+<p>updateIndividXml.php: 232<AncInterest>0</AncInterest>
+<p>updateIndividXml.php: 232<DecInterest>0</DecInterest>
+<p>updateIndividXml.php: 232<IDMRPref>22803</IDMRPref>
+<p>updateIndividXml.php 780</p>
+Name.inc: 1322 
+<p>updateIndividXml.php: 232<id>59884</id>
+<p>updateIndividXml.php: 232<parentsIdmr>0</parentsIdmr>
+<p>updateIndividXml.php: 232<idcr>0</idcr>
+<p>updateIndividXml.php: 232<idar>0</idar>
+<p>updateIndividXml.php: 232<fatherGivenName></fatherGivenName>
+<p>updateIndividXml.php: 232<fatherSurname></fatherSurname>
+<p>updateIndividXml.php: 232<motherGivenName></motherGivenName>
+<p>updateIndividXml.php: 232<motherSurname></motherSurname>
+<p>updateIndividXml.php: 232<treeName></treeName>
+<p>updateIndividXml.php: 232<parentCount>0</parentCount>
+<p>updateIndividXml.php: 232<familyCount>1</familyCount>
+<p>updateIndividXml.php: 232<idir>59675</idir>
+<p>updateIndividXml.php: 232<Surname>McIver</Surname>
+<p>updateIndividXml.php: 232<GivenName>Elizabeth</GivenName>
+<p>updateIndividXml.php: 232<Gender>1</Gender>
+<p>updateIndividXml.php: 232<EventIder0>118868</EventIder0>
+<p>updateIndividXml.php: 232<BirthDate>Mar 1840</BirthDate>
+<p>updateIndividXml.php: 232<BirthLocation>Scotland</BirthLocation>
+<p>updateIndividXml.php: 431 event location=96</p>
+<p>updateIndividXml.php: 232<EventPref0>Y</EventPref0>
+<p>updateIndividXml.php: 232<EventIdet0>3</EventIdet0>
+<p>updateIndividXml.php: 232<EventCitType0>30</EventCitType0>
+<p>updateIndividXml.php: 232<EventOrder0>-2</EventOrder0>
+<p>updateIndividXml.php: 232<EventSD0>18400615</EventSD0>
+<p>updateIndividXml.php: 232<EventChanged0>0</EventChanged0>
+<p>updateIndividXml.php: 232<EventIder1>0</EventIder1>
+<p>updateIndividXml.php: 232<EventDate1></EventDate1>
+<p>updateIndividXml.php: 232<EventLocation1></EventLocation1>
+<p>updateIndividXml.php: 431 event location=1</p>
+<p>updateIndividXml.php: 232<EventPref1>Y</EventPref1>
+<p>updateIndividXml.php: 232<EventIdet1>5</EventIdet1>
+<p>updateIndividXml.php: 232<EventCitType1>30</EventCitType1>
+<p>updateIndividXml.php: 232<EventOrder1>-1</EventOrder1>
+<p>updateIndividXml.php: 232<EventSD1>-99999999</EventSD1>
+<p>updateIndividXml.php: 232<EventChanged1>0</EventChanged1>
+<p>updateIndividXml.php: 232<EventIder2>32777</EventIder2>
+<p>updateIndividXml.php: 232<EventDate2>1845</EventDate2>
+<p>updateIndividXml.php: 232<EventLocation2>Canada</EventLocation2>
+<p>updateIndividXml.php: 431 event location=49</p>
+<p>updateIndividXml.php: 232<EventPref2>Y</EventPref2>
+<p>updateIndividXml.php: 232<EventIdet2>32</EventIdet2>
+<p>updateIndividXml.php: 232<EventCitType2>30</EventCitType2>
+<p>updateIndividXml.php: 232<EventOrder2>0</EventOrder2>
+<p>updateIndividXml.php: 232<EventSD2>18450615</EventSD2>
+<p>updateIndividXml.php: 232<EventChanged2>0</EventChanged2>
+<p>updateIndividXml.php: 232<EventIder3>118910</EventIder3>
+<p>updateIndividXml.php: 232<DeathDate>16 Feb 1904</DeathDate>
+<p>updateIndividXml.php: 232<DeathLocation>London, Middlesex, ON, CA</DeathLocation>
+<p>updateIndividXml.php: 431 event location=2483</p>
+<p>updateIndividXml.php: 232<EventPref3>Y</EventPref3>
+<p>updateIndividXml.php: 232<EventIdet3>6</EventIdet3>
+<p>updateIndividXml.php: 232<EventCitType3>30</EventCitType3>
+<p>updateIndividXml.php: 232<EventOrder3>32766</EventOrder3>
+<p>updateIndividXml.php: 232<EventSD3>19040216</EventSD3>
+<p>updateIndividXml.php: 232<EventChanged3>0</EventChanged3>
+<p>updateIndividXml.php: 232<EventIder4>118911</EventIder4>
+<p>updateIndividXml.php: 232<BuriedDate></BuriedDate>
+<p>updateIndividXml.php: 232<BuriedLocation>Telfer Presbyterian Cemetery, London, Middlesex, ON, CA</BuriedLocation>
+<p>updateIndividXml.php: 431 event location=16383</p>
+<p>updateIndividXml.php: 232<EventPref4>Y</EventPref4>
+<p>updateIndividXml.php: 232<EventIdet4>4</EventIdet4>
+<p>updateIndividXml.php: 232<EventCitType4>30</EventCitType4>
+<p>updateIndividXml.php: 232<EventOrder4>32767</EventOrder4>
+<p>updateIndividXml.php: 232<EventSD4>99999999</EventSD4>
+<p>updateIndividXml.php: 232<EventChanged4>0</EventChanged4>
+<p>updateIndividXml.php: 232<Private>0</Private>
+<p>updateIndividXml.php: 232<NeverMarried>0</NeverMarried>
+<p>updateIndividXml.php: 232<UserRef></UserRef>
+<p>updateIndividXml.php: 232<AncestralRef></AncestralRef>
+<p>updateIndividXml.php: 232<AncInterest>0</AncInterest>
+<p>updateIndividXml.php: 232<DecInterest>0</DecInterest>
+<p>updateIndividXml.php: 232<IDMRPref>16835</IDMRPref>
+<p>updateIndividXml.php 780</p>

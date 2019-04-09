@@ -1,0 +1,328 @@
+updateEvent.php: <parms>
+updateEvent.php: idir='0'
+updateEvent.php: ider='140067'
+updateEvent.php: idet='1'
+updateEvent.php: rownum='0'
+updateEvent.php: type='30'
+updateEvent.php: etype='0'
+updateEvent.php: date='14 Aug 1854'
+updateEvent.php: description=''
+updateEvent.php: location='Grimsby, Lincoln, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='140067'
+updateEvent.php: citType='30'
+updateEvent.php: Source371356='Marriage Register, CA, Ontario'
+updateEvent.php: Page371356='1872 vol 21 page 321 item 1'
+updateEvent.php: PicIdType='30'
+updateEvent.php: 440 </parms>
+updateEvent.php: 448 type=30
+updateEvent.php: 966 Citation::STYPE_EVENT: idir=0, ider=140067, date=14 Aug 1854, location=Grimsby, Lincoln, ON, CA
+updateEvent.php: 1123: exception Event::save: NULL event: Array
+(
+    [ider] => 0
+    [idir] => 0
+    [idtype] => 0
+    [idet] => 0
+    [order] => 0
+    [eventd] => 001408185400000000
+    [eventsd] => 18540814
+    [idlrevent] => 47
+    [desc] => 
+    [gedtag] => 
+    [eventexclude] => 0
+    [idar] => 0
+    [description] => 
+    [sentenceoverride] => 
+    [qstag] => 0
+    [rgexclude] => 0
+    [kind] => 0
+    [ldstempleready] => 
+    [preferred] => 0
+)
+: #0 /home/jcobban/public_html/FamilyTree/updateEvent.php(1094): Genealogy\Event->save(true)
+#1 {main}
+updateEvent.php: <parms>
+updateEvent.php: idir='0'
+updateEvent.php: ider='140067'
+updateEvent.php: idet='1'
+updateEvent.php: rownum='0'
+updateEvent.php: type='30'
+updateEvent.php: etype='0'
+updateEvent.php: date='14 Aug 1854'
+updateEvent.php: description=''
+updateEvent.php: location='Grimsby, Lincoln, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='140067'
+updateEvent.php: citType='30'
+updateEvent.php: Source371356='Marriage Register, CA, Ontario'
+updateEvent.php: Page371356='1872 vol 21 page 321 item 1'
+updateEvent.php: PicIdType='30'
+updateEvent.php: 443 </parms>
+updateEvent.php: 451 type=30
+updateEvent.php: 969 Citation::STYPE_EVENT: idir=0, ider=140067, date=14 Aug 1854, location=Grimsby, Lincoln, ON, CA
+updateEvent.php: 1126: exception Event::save: NULL event: Array
+(
+    [ider] => 0
+    [idir] => 0
+    [idtype] => 0
+    [idet] => 0
+    [order] => 0
+    [eventd] => 001408185400000000
+    [eventsd] => 18540814
+    [idlrevent] => 47
+    [desc] => 
+    [gedtag] => 
+    [eventexclude] => 0
+    [idar] => 0
+    [description] => 
+    [sentenceoverride] => 
+    [qstag] => 0
+    [rgexclude] => 0
+    [kind] => 0
+    [ldstempleready] => 
+    [preferred] => 0
+)
+: #0 /home/jcobban/public_html/FamilyTree/updateEvent.php(1097): Genealogy\Event->save(true)
+#1 {main}
+updateEvent.php: <parms>
+updateEvent.php: idir='0'
+updateEvent.php: ider='140067'
+updateEvent.php: idet='1'
+updateEvent.php: rownum='0'
+updateEvent.php: type='30'
+updateEvent.php: etype='0'
+updateEvent.php: date='14 Aug 1854'
+updateEvent.php: description=''
+updateEvent.php: location='Grimsby, Lincoln, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='140067'
+updateEvent.php: citType='30'
+updateEvent.php: Source371356='Marriage Register, CA, Ontario'
+updateEvent.php: Page371356='1872 vol 21 page 321 item 1'
+updateEvent.php: PicIdType='30'
+updateEvent.php: 443 </parms>
+updateEvent.php: 969 Citation::STYPE_EVENT: idir=0, ider=140067, date=14 Aug 1854, location=Grimsby, Lincoln, ON, CA
+updateEvent.php: 1126: exception Event::save: NULL event: Array
+(
+    [ider] => 0
+    [idir] => 0
+    [idtype] => 0
+    [idet] => 0
+    [order] => 0
+    [eventd] => 001408185400000000
+    [eventsd] => 18540814
+    [idlrevent] => 47
+    [desc] => 
+    [gedtag] => 
+    [eventexclude] => 0
+    [idar] => 0
+    [description] => 
+    [sentenceoverride] => 
+    [qstag] => 0
+    [rgexclude] => 0
+    [kind] => 0
+    [ldstempleready] => 
+    [preferred] => 0
+)
+: #0 /home/jcobban/public_html/FamilyTree/updateEvent.php(1097): Genealogy\Event->save(true)
+#1 {main}
+updateEvent.php: <parms>
+updateEvent.php: idir='0'
+updateEvent.php: ider='140067'
+updateEvent.php: idet='1'
+updateEvent.php: rownum='0'
+updateEvent.php: type='30'
+updateEvent.php: etype='0'
+updateEvent.php: date='14 Aug 1854'
+updateEvent.php: description=''
+updateEvent.php: location='Grimsby, Lincoln, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='140067'
+updateEvent.php: citType='30'
+updateEvent.php: Source371356='Marriage Register, CA, Ontario'
+updateEvent.php: Page371356='1872 vol 21 page 321 item 1'
+updateEvent.php: PicIdType='30'
+updateEvent.php: 443 </parms>
+updateEvent.php: 1126: exception Event::save: NULL event: Array
+(
+    [ider] => 0
+    [idir] => 0
+    [idtype] => 0
+    [idet] => 0
+    [order] => 0
+    [eventd] => 001408185400000000
+    [eventsd] => 18540814
+    [idlrevent] => 47
+    [desc] => 
+    [gedtag] => 
+    [eventexclude] => 0
+    [idar] => 0
+    [description] => 
+    [sentenceoverride] => 
+    [qstag] => 0
+    [rgexclude] => 0
+    [kind] => 0
+    [ldstempleready] => 
+    [preferred] => 0
+)
+: #0 /home/jcobban/public_html/FamilyTree/updateEvent.php(1097): Genealogy\Event->save(true)
+#1 {main}
+updateEvent.php: <parms>
+updateEvent.php: idir='0'
+updateEvent.php: ider='140067'
+updateEvent.php: idet='1'
+updateEvent.php: rownum='0'
+updateEvent.php: type='30'
+updateEvent.php: etype='0'
+updateEvent.php: date='14 Aug 1854'
+updateEvent.php: description=''
+updateEvent.php: location='Grimsby, Lincoln, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='140067'
+updateEvent.php: citType='30'
+updateEvent.php: Source371356='Marriage Register, CA, Ontario'
+updateEvent.php: Page371356='1872 vol 21 page 321 item 1'
+updateEvent.php: PicIdType='30'
+updateEvent.php: 443 </parms>
+updateEvent.php: 1127: exception Event::save: NULL event: Array
+(
+    [ider] => 0
+    [idir] => 0
+    [idtype] => 0
+    [idet] => 0
+    [order] => 0
+    [eventd] => 001408185400000000
+    [eventsd] => 18540814
+    [idlrevent] => 47
+    [desc] => 
+    [gedtag] => 
+    [eventexclude] => 0
+    [idar] => 0
+    [description] => 
+    [sentenceoverride] => 
+    [qstag] => 0
+    [rgexclude] => 0
+    [kind] => 0
+    [ldstempleready] => 
+    [preferred] => 0
+)
+: #0 /home/jcobban/public_html/FamilyTree/updateEvent.php(1098): Genealogy\Event->save(true)
+#1 {main}
+updateEvent.php: <parms>
+updateEvent.php: idir='0'
+updateEvent.php: ider='140067'
+updateEvent.php: idet='1'
+updateEvent.php: rownum='0'
+updateEvent.php: type='30'
+updateEvent.php: etype='0'
+updateEvent.php: date='14 Aug 1854'
+updateEvent.php: description=''
+updateEvent.php: location='Grimsby, Lincoln, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='140067'
+updateEvent.php: citType='30'
+updateEvent.php: Source371356='Marriage Register, CA, Ontario'
+updateEvent.php: Page371356='1872 vol 21 page 321 item 1'
+updateEvent.php: PicIdType='30'
+updateEvent.php: 443 </parms>
+updateEvent.php: 1127: exception Event::save: NULL event: Array
+(
+    [ider] => 140067
+    [idir] => 0
+    [idtype] => 0
+    [idet] => 0
+    [order] => 0
+    [eventd] => 001408185400000000
+    [eventsd] => 18540814
+    [idlrevent] => 47
+    [desc] => 
+    [gedtag] => 
+    [eventexclude] => 0
+    [idar] => 0
+    [description] => 
+    [sentenceoverride] => 
+    [qstag] => 0
+    [rgexclude] => 0
+    [kind] => 0
+    [ldstempleready] => 
+    [preferred] => 0
+)
+: #0 /home/jcobban/public_html/FamilyTree/updateEvent.php(1098): Genealogy\Event->save(true)
+#1 {main}
+updateEvent.php: <parms>
+updateEvent.php: idir='82451'
+updateEvent.php: ider='0'
+updateEvent.php: idet='3'
+updateEvent.php: rownum='0'
+updateEvent.php: type='2'
+updateEvent.php: etype='3'
+updateEvent.php: date='14 Aug 1854'
+updateEvent.php: description=''
+updateEvent.php: location='Grimsby, Lincoln, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='-2'
+updateEvent.php: preferred='1'
+updateEvent.php: idime='82451'
+updateEvent.php: citType='2'
+updateEvent.php: Source247354='Marriage Register, CA, Ontario'
+updateEvent.php: IDSR247354='99'
+updateEvent.php: Page247354='1872 vol 21 page 321 item 1'
+updateEvent.php: Source249446='1901 Census of Canada'
+updateEvent.php: IDSR249446='19'
+updateEvent.php: Page249446='dist 79 Lambton West, subdist C Plympton, div 8 page 4'
+updateEvent.php: Source247402='1861 Census of Canada'
+updateEvent.php: IDSR247402='12'
+updateEvent.php: Page247402='CW, dist 17 Lambton, subdist 184 Plympton, div 3 page 61'
+updateEvent.php: PicIdType='1'
+updateEvent.php: 443 </parms>
+updateEvent.php: <parms>
+updateEvent.php: etype=''
+updateEvent.php: idir='82451'
+updateEvent.php: type='1'
+updateEvent.php: surname='Gammon'
+updateEvent.php: givenName='Bethanny'
+updateEvent.php: prefix=''
+updateEvent.php: title=''
+updateEvent.php: note=''
+updateEvent.php: idime='82451'
+updateEvent.php: citType='1'
+updateEvent.php: Source247355='Marriage Register, CA, Ontario'
+updateEvent.php: IDSR247355='99'
+updateEvent.php: Page247355='1872 vol 21 page 321 item 1'
+updateEvent.php: newAltSurname=''
+updateEvent.php: newAltGivenName=''
+updateEvent.php: 443 </parms>
+updateEvent.php: <parms>
+updateEvent.php: etype=''
+updateEvent.php: idmr='22803'
+updateEvent.php: type='20'
+updateEvent.php: date='7 Nov 1872'
+updateEvent.php: location='Forest, Lambton, ON, CA'
+updateEvent.php: idime='22803'
+updateEvent.php: citType='20'
+updateEvent.php: Source247357='Marriage Register, CA, Ontario'
+updateEvent.php: IDSR247357='99'
+updateEvent.php: Page247357='1872 vol 21 page 321 item 1'
+updateEvent.php: 443 </parms>
+updateEvent.php: <parms>
+updateEvent.php: etype='54'
+updateEvent.php: idir='82451'
+updateEvent.php: ider='45378'
+updateEvent.php: type='30'
+updateEvent.php: date='1872'
+updateEvent.php: description=''
+updateEvent.php: location='Bosanquet, Lambton, ON, CA'
+updateEvent.php: note=''
+updateEvent.php: order='0'
+updateEvent.php: idime='45378'
+updateEvent.php: citType='30'
+updateEvent.php: Source247356='Marriage Register, CA, Ontario'
+updateEvent.php: IDSR247356='99'
+updateEvent.php: Page247356='1872 vol 21 page 321 item 1'
+updateEvent.php: 443 </parms>
