@@ -6,18 +6,18 @@ use \ArrayAccess;
 use \Countable;
 use \Iterator;
 /************************************************************************
- *  PageSet.inc								*
- *									*
- *  Definition of a class representing a set of pages of a census.	*
- *  This extension exists such that asking for all of the pages in	*
- *  an enumeration division will always return every page in the	*
- *  division even if only some of the records have actually been	*
- *  created by the transription process.				*
- *									*
- *  History:								*
- *	2018/02/13	created						*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  PageSet.inc															*
+ *																		*
+ *  Definition of a class representing a set of pages of a census.		*
+ *  This extension exists such that asking for all of the pages in		*
+ *  an enumeration division will always return every page in the		*
+ *  division even if only some of the records have actually been		*
+ *  created by the transription process.								*
+ *																		*
+ *  History:															*
+ *		2018/02/13		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Page.inc';
@@ -25,67 +25,67 @@ require_once __NAMESPACE__ . '/SubDistrict.inc';
 require_once __NAMESPACE__ . '/SubDistrictSet.inc';
 
 /************************************************************************
- *  class PageSet							*
- *									*
- *  Definition of a class representing a set of pages of a census.	*
+ *  class PageSet														*
+ *																		*
+ *  Definition of a class representing a set of pages of a census.		*
  ************************************************************************/
 
 class PageSet extends RecordSet
 {
     /********************************************************************
-     *	$parmsSet							*
-     *									*
-     *	This is a bit mask indicating which parameters have been	*
-     *	passed to the constructor.					*
-     *									*
-     *		 1	Census Identifier				*
-     *		 2	District Identifier				*
-     *		 4	SubDistrict Identifier				*
-     *		 8	Division Identifier				*
-     *		16	Schedule Identifier				*
-     *		32	any other field					*
+     *	$parmsSet														*
+     *																	*
+     *	This is a bit mask indicating which parameters have been		*
+     *	passed to the constructor.										*
+     *																	*
+     *			 1		Census Identifier								*
+     *			 2		District Identifier								*
+     *			 4		SubDistrict Identifier							*
+     *			 8		Division Identifier								*
+     *			16		Schedule Identifier								*
+     *			32		any other field									*
      ********************************************************************/
     private	$parmsSet	= 0;
 
     /********************************************************************
-     *	$subDistrict							*
-     *									*
-     *	Instance of SubDistrict						*
+     *	$subDistrict													*
+     *																	*
+     *	Instance of SubDistrict											*
      ********************************************************************/
     private	$subDistrict	= null;
 
     /********************************************************************
-     *	__construct							*
-     *									*
-     *	Create an instance of the class PageSet				*
-     *									*
-     *	Parameters:							*
-     *	    $parameters		associative array of fieldname, value	*
-     *				pairs to define the subset of the	*
-     *				records in the SQL table that are	*
-     *				represented by this instance.  The	*
-     *				parameters 'offset' and 'limit'		*
-     *				are reserved to set the OFFSET and	*
-     *				LIMIT clauses.  Use '`offset`', and	*
-     *				'`limit`' to reference fields with	*
-     *				those names. This may be null.		*
-     *									*
-     *	Examples:							*
-     *	$set	= new PageSet(array('census'	=> 'CA1891',		*
-     *				    'distid'	=> 89,			*
-     *				    'sdid'	=> 'A',			*
-     *				    'div'	=> 1,			*
-     *				    'sched'	=> 1));			*
-     *									*
-     *	$subdist = new SubDistrict(array('census'	=> 'CA1891',	*
-     *					 'distid'	=> 89,		*
-     *					 'sdid'`	=> 'A',		*
-     *					 'div'		=> 1,		*
-     *					 'sched'	=> 1));		*
-     *	$set	= new PageSet(array('sd'	=> $subdist));		*
-     *									*
-     *	Throws:								*
-     *	    An exception for invalid parameters.			*
+     *	function PageSet::__construct									*
+     *																	*
+     *	Create an instance of the class PageSet							*
+     *																	*
+     *	Parameters:														*
+     *	    $parameters			associative array of fieldname, value	*
+     *							pairs to define the subset of the		*
+     *							records in the SQL table that are		*
+     *							represented by this instance.  The		*
+     *							parameters 'offset' and 'limit'			*
+     *							are reserved to set the OFFSET and		*
+     *							LIMIT clauses.  Use '`offset`', and		*
+     *							'`limit`' to reference fields with		*
+     *							those names. This may be null.			*
+     *																	*
+     *	Examples:														*
+     *	$set		= new PageSet(array('census'	=> 'CA1891',		*
+     *								    'distid'	=> 89,				*
+     *								    'sdid'		=> 'A',				*
+     *								    'div'		=> 1,				*
+     *								    'sched'		=> 1));				*
+     *																	*
+     *	$subdist = new SubDistrict(array('census'	=> 'CA1891',		*
+     *									 'distid'	=> 89,				*
+     *									 'sdid'`	=> 'A',				*
+     *									 'div'		=> 1,				*
+     *									 'sched'	=> 1));				*
+     *	$set		= new PageSet(array('sd'	=> $subdist));			*
+     *																	*
+     *	Throws:															*
+     *	    An exception for invalid parameters.						*
      ********************************************************************/
     function __construct($parms	= array())
     {
@@ -93,29 +93,29 @@ class PageSet extends RecordSet
     }		// PageSet::__construct
 
     /********************************************************************
-     *	PageSet::getWhere						*
-     *									*
-     *  Given an associative array of parameters for searching the	*
-     *  table, return the appropriate SQL WHERE clause.			*
-     *									*
-     *	$this->parms	associative array of field/value combinations	*
-     *			the field names are interpreted according to	*
-     *			the standard translate table.  Note that	*
-     *			because the parameter is an associative array	*
-     *			that only one value can be specified for each	*
+     *		PageSet::getWhere												*
+     *																		*
+     *  Given an associative array of parameters for searching the		*
+     *  table, return the appropriate SQL WHERE clause.						*
+     *																		*
+     *		$this->parms		associative array of field/value combinations		*
+     *						the field names are interpreted according to		*
+     *						the standard translate table.  Note that		*
+     *						because the parameter is an associative array		*
+     *						that only one value can be specified for each		*
      *			field name.
-     *	$this->sqlParms	construct array of parms for PDO execute	*
-     *	$this->limit	return value of limit parameter			*
-     *	$this->offset	return value of offset parameter		*
-     *									*
-     *	Returns:							*
-     *	    string containing WHERE clause				*
-     *	    A zero length string is returned if the input array is	*
-     *      empty, otherwise the string starts with the word WHERE	*
-     *									*
-     *	Side-Effects:							*
-     *	    Issues with the supplied parms are reported by adding	*
-     *	    warning messages onto the global variable $warn.		*
+     *		$this->sqlParms		construct array of parms for PDO execute		*
+     *		$this->limit		return value of limit parameter						*
+     *		$this->offset		return value of offset parameter				*
+     *																		*
+     *		Returns:														*
+     *		    string containing WHERE clause								*
+     *		    A zero length string is returned if the input array is		*
+     *      empty, otherwise the string starts with the word WHERE		*
+     *																		*
+     *		Side-Effects:														*
+     *		    Issues with the supplied parms are reported by adding		*
+     *		    warning messages onto the global variable $warn.				*
      ********************************************************************/
     protected function getWhere()
     {
@@ -394,13 +394,13 @@ class PageSet extends RecordSet
     }		// PageSet::getWhere
 
     /********************************************************************
-     *	function PageSet::rewind					*
-     *									*
-     *	Part of the implementation of the interface Iterator.		*
-     *	Reposition to the first element of the "array".			*
-     *									*
-     *  Returns:							*
-     *	    first instance of Record in the set				*
+     *		function PageSet::rewind										*
+     *																		*
+     *		Part of the implementation of the interface Iterator.				*
+     *		Reposition to the first element of the "array".						*
+     *																		*
+     *  Returns:														*
+     *		    first instance of Record in the set								*
      ********************************************************************/
     public function rewind()
     {

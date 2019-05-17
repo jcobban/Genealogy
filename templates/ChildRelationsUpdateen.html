@@ -1,0 +1,167 @@
+<!--*********************************************************************
+ *  ChildRelationsUpdateen.html 										*
+ *																		*
+ *  Display a web page containing the records from the Legacy			*
+ *  Child/Parent Relationship Table tblCP/ChildRelations.				*
+ *																		*
+ *  History:															*
+ *		2019/05/05		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+  		<a href="ChildRelationsHelpen.html" target="help">? Help</a>
+        </span>
+        Child/Parent Relationship List
+      </h1>
+      <p class="warning">This table is not used by this implementation because it does not support internationalization.</p>
+      $TRACE
+      $MSG
+      <form name="srcForm" action="ChildRelations.php" method="post">
+        <input id="Debug" name="Debug" type="hidden" value="$DEBUG">
+        <input id="lang" name="lang" type="hidden" value="$LANG">
+	    <!--- Put out the response as a table -->
+	    <table class="details" id="formTable">
+	      <!--- Put out the column headers -->
+	      <thead>
+	        <th class="colhead">
+	  		IDCP
+	        </th>
+	        <th class="colhead">
+	  		Relationship
+	        </th>
+	        <th class="colhead">
+	  		Used
+	        </th>
+	        <th class="colhead">
+	  		Tag1
+	        </th>
+	        <th class="colhead">
+	  		qsTag
+	        </th>
+	        <th class="colhead">
+	  		Action
+	        </th>
+	      </thead>
+	      <tbody>
+	        <tr id="dataRow">
+	  		  <td class="left">
+	  		    <input type="text" class="ina rightnc" size="4"
+	  						name="IDCP$idcp"
+	  						id="IDCP$idcp"
+	  						value="$idcp" readonly="readonly">
+	  		    <input type="hidden" name="Updated$idcp"
+	  						id="Updated$idcp"
+	  						value="0">
+	  		  </td>
+	  		  <td class="left">
+	  		    <input type="text" class="white left" size="40"
+	  						name="CPRelation$idcp"
+	  						id="CPRelation$idcp"
+	  						value="$cprelation"
+	  						>
+	  		  </td>
+	  		  <td class="center">
+	  		    <input type="checkbox"
+	  					name="Used$idcp" id="Used$idcp"
+                        $checkedused> 
+	  		  </td>
+	  		  <td class="center">
+	  		    <input type="checkbox"
+	  					name="tag1$idcp" id="tag1$idcp"
+                        $checkedtag1> 
+	  		  </td>
+	  		  <td class="center">
+	  		    <input type="checkbox" 
+	  					name="qstag$idcp" id="qstag$idcp"
+                        $checkedqstag> 
+	  		  </td>
+	  		  <td class="center">
+	  		    <button id="Delete$idcp">
+	  				Delete
+	  		    </button>
+	  		  </td>
+	        </tr>
+	      </tbody>
+	    </table>
+        <p>
+  		  <button type="button" id="Add">
+  		    Create New Relationship
+  		  </button>
+        </p>
+        <input type="hidden" name="IDCP999" id="IDCP999" value="999">
+        <button type="submit" id="Submit">Update Table</button>
+      </form>
+    </div>
+    <div id="templates" class="hidden">
+     <table>
+      <tr id="newRowTemplate">
+  		<td class="left">
+  		    <input type="text" class="white rightnc" size="4"
+  						name="IDCP$idcp"
+  						value="$idcp">
+  		    <input type="hidden" name="Updated$idcp"
+  						value="1">
+  		</td>
+  		<td class="left">
+  		    <input type="text" class="white left" size="40"
+  						name="CPRelation$idcp"
+  						value="$relation">
+  		</td>
+  		<td class="center">
+  		    <input type="checkbox" name="Used$idcp">
+  		</td>
+  		<td class="center">
+  		    <input type="checkbox" name="tag1$idcp">
+  		</td>
+  		<td class="center">
+  		    <input type="checkbox" name="qstag$idcp">
+  		</td>
+  		<td class="center">
+  		</td>
+      </tr>
+     </table>
+    </div>
+    <div class="balloon" id="HelpIDCP">
+        This field contains the unique numeric code point used in the
+  		Child/Parent relationship table (tblCP) to identify this
+  		relationship.
+    </div>
+    <div class="balloon" id="HelpCPRelation">
+        This field contains the textual description of the Child/Parent
+  		relationship, as it will appear in web pages, and on selection
+  		lists when updating the database.
+    </div>
+    <div class="balloon" id="HelpUsed">
+      Internal use by Legacy.
+    </div>
+    <div class="balloon" id="Helptag1">
+      Internal use by Legacy.
+    </div>
+    <div class="balloon" id="Helpqstag">
+      Internal use by Legacy.
+    </div>
+    <div class="balloon" id="HelpDelete">
+        Click on this button to delete the relationship described in this row
+  		of the table.
+    </div>
+    <div class="balloon" id="HelpAdd">
+        Click on this button to add a new relationship to the table.
+  		A new row is added to the table with a blank description.
+  		Edit the description and click on the "Update Table" button
+  		to add the new entry.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+        Click on this button to update the database to reflect the
+  		changes you have entered.  
+    </div>
+    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="/FamilyTree/ChildRelations.js" type="text/javascript"></script>

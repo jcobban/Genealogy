@@ -70,14 +70,14 @@ if (count($_POST) > 0)
 	$create		= false;
 	$fixup		= false;
 
-    $parmsText  = "<p class="label">\$_POST</p>\n" .
-                  "<table class="summary">\n" .
-                  "<tr><th class="colhead">key</th>" .
-                      "<th class="colhead">value</th></tr>\n";
+    $parmsText  = "<p class=\"label\">\$_POST</p>\n" .
+                  "<table class=\"summary\">\n" .
+                  "<tr><th class=\"colhead\">key</th>" .
+                      "<th class=\"colhead\">value</th></tr>\n";
 	foreach($_POST as $key => $value)
 	{
-        $parmsText  .= "<tr><th class="detlabel">$key</th>" .
-                         "<td class="white left">$value</td></tr>\n"; 
+        $parmsText  .= "<tr><th class=\"detlabel\">$key</th>" .
+                         "<td class=\"white left\">$value</td></tr>\n"; 
 	    if (preg_match("/^([a-zA-Z_]+)(\d*)$/", $key, $matches))
 	    {
 			$column	= $matches[1];
@@ -90,7 +90,7 @@ if (count($_POST) > 0)
 	    }
 
 	    if ($debug)
-			$warn	.= "<p>\$_POST["$key"]="$value"</p>\n";
+			$warn	.= "<p>\$_POST[\"$key\"]=\"$value\"</p>\n";
 	    switch(strtolower($column))
 	    {		// act on specific parameters
 			case 'domain':
@@ -123,7 +123,7 @@ if (count($_POST) > 0)
 			    }
 			    else
 					$warn	.= "<p>DistrictMarriagesEdit.php: " . __LINE__ .
-						   " reportno="$value"</p>\n";
+						   " reportno=\"$value\"</p>\n";
 			    break;
 			}
 
@@ -190,14 +190,14 @@ else
 	$getParms	= array();
     $fixup		= true;
 
-    $parmsText  = "<p class="label">\$_GET</p>\n" .
-                  "<table class="summary">\n" .
-                  "<tr><th class="colhead">key</th>" .
-                      "<th class="colhead">value</th></tr>\n";
+    $parmsText  = "<p class=\"label\">\$_GET</p>\n" .
+                  "<table class=\"summary\">\n" .
+                  "<tr><th class=\"colhead\">key</th>" .
+                      "<th class=\"colhead\">value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{
-        $parmsText  .= "<tr><th class="detlabel">$key</th>" .
-                         "<td class="white left">$value</td></tr>\n"; 
+        $parmsText  .= "<tr><th class=\"detlabel\">$key</th>" .
+                         "<td class=\"white left\">$value</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {
 			case 'prov':
@@ -244,7 +244,7 @@ else
 			    else
 			    if ($value != '')
 					$warn	.= "<p>DistrictMarriagesEdit.php: " . __LINE__ .
-						   " reportno="$value"</p>\n";
+						   " reportno=\"$value\"</p>\n";
 			    break;
 			}
 
@@ -361,7 +361,7 @@ else
 
 			default:
 			{
-			    $warn	.= "Unexpected parameter $key="$value". ";
+			    $warn	.= "Unexpected parameter $key=\"$value\". ";
 			    break;
 			}
 	    }		// check supported parameters
@@ -385,7 +385,7 @@ else
 	    }
 	    else
 	    {
-			$msg			.= "Domain="$domain" unsupported. ";
+			$msg			.= "Domain=\"$domain\" unsupported. ";
 			$province		= 'Domain : ' . $domain;
 	    }
 	    $countryObj			= new Country(array('code' => $cc));
@@ -514,8 +514,8 @@ if (strlen($msg) == 0)
 	to update the database.
   </p>
 <?php
-	    $readonly	= "readonly="readonly"";
-	    $disabled	= "disabled="disabled"";
+	    $readonly	= "readonly=\"readonly\"";
+	    $disabled	= "disabled=\"disabled\"";
 	    $codeclass	= 'ina code';
 	    $textclass	= 'ina left';
 	    $numclass	= 'ina right';
@@ -557,17 +557,17 @@ if (strlen($msg) == 0)
 			$nextText	= $reportNo . '-' . ($itemNo + 1);
 	    }
 ?>
-  <div class="center">
-  <div class="left">
-	<a href="DistrictMarriagesEdit.php?<?php print $prevUri; ?>" id="toPrevReport">
+  <div class="center" id="topBrowse">
+    <div class="left" id="topPrev">
+	  <a href="DistrictMarriagesEdit.php?<?php print $prevUri; ?>" id="toPrevReport">
 	    &lt;--- <?php print $prevText; ?> 
-	</a>
-  </div>
-  <div class="right">
-	<a href="DistrictMarriagesEdit.php?<?php print $nextUri; ?>" id="toNextYear">
+	  </a>
+    </div>
+    <div class="right" id="topNext">
+	  <a href="DistrictMarriagesEdit.php?<?php print $nextUri; ?>" id="toNextYear">
 	    <?php print $nextText; ?> ---&gt;
-	</a>
-  </div>
+	  </a>
+    </div>
 <?php
 	    if ($showReport)
 			print "Volume $volume Report " . $reportNoText;
@@ -637,7 +637,7 @@ if (strlen($msg) == 0)
 	if (count($reports) > 0)
 	{		// some rows to display
 ?>
-  <table class="form" id="dataTbl">
+  <table class="form" id="dataTable">
 <!--- Put out the column headers -->
 <thead>
   <tr id="hdrRow">

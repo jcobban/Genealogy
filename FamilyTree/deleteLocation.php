@@ -41,7 +41,7 @@ require_once __NAMESPACE__ . "/Location.inc";
 require_once __NAMESPACE__ . "/Person.inc";
 require_once __NAMESPACE__ . "/RecordSet.inc";
 require_once __NAMESPACE__ . "/PersonSet.inc";
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // determine if permitted to update records

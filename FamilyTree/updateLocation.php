@@ -47,7 +47,7 @@ use \Exception;
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $idlr		    = null;		// primary key

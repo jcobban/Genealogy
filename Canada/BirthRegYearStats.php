@@ -56,7 +56,7 @@ require_once __NAMESPACE__ . "/Country.inc";
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/County.inc";
 require_once __NAMESPACE__ . "/BirthSet.inc";
-require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters

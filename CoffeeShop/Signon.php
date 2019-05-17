@@ -1,7 +1,11 @@
 <?php
-namespace Genealogy;
+namespace CoffeeShop;
 use \PDO;
 use \Exception;
+use \Genealogy/Blog;
+use \Genealogy/User;
+use \Genealogy/Language;
+
 /************************************************************************
  *  Signon.php															*
  *																		*
@@ -18,11 +22,11 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
-    require_once __NAMESPACE__ . "/User.inc";
-    require_once __NAMESPACE__ . '/Template.inc';
-    require_once __NAMESPACE__ . '/Language.inc';
-    // the following obtains $userid and $authorized from the cookie
-    require_once __NAMESPACE__ . "/common.inc";
+require_once 'Genealogy/User.inc';
+require_once 'Genealogy/Language.inc';
+require_once __NAMESPACE__ . '/CsTemplate.inc';
+// the following obtains $userid and $authorized from the cookie
+require_once __NAMESPACE__ . "/common.inc";
 
     // validate parameters
     $newuserid		= '';
@@ -213,7 +217,7 @@ use \Exception;
     }					// parameters syntactically OK
 
     $coffBase		= $document_root . '/CoffeeShop/';
-    $template		= new FtTemplate("Signon$lang.html", true);
+    $template		= new CsTemplate("Signon$lang.html", true);
 
     $template->set('REDIRECTTO',	$redirectto);
     $template->updateTag('otherStylesheets',

@@ -128,6 +128,9 @@
  *		2018/05/10		add method checkPositiveNumber					*
  *		2019/01/21      remove static list of surnames with gender      *
  *		                functionality is moved to Nicknames table       *
+ *		2019/04/12      loosen syntax for ages                          *
+ *		                add function getNumeric to convert numbers      *
+ *		                that include '½' as a digit.                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1461,7 +1464,7 @@ function goToLink(event)
 function checkName()
 {
     var	element		= this;
-    var	re		= /^[a-zA-Z7\u00c0-\u00ff .'"()\-&\[\]?]*$/;
+    var	re		= /^[a-zA-Z7\u00c0-\u00ff .,'"()\-&\[\]?]*$/;
     var	name		= element.value;
     setErrorFlag(element, re.test(name));
 }		// checkName
@@ -1791,7 +1794,7 @@ function checkAge()
 {
     var	element		= this;
     var	re		= /^[mM]?[0-9]+[mM]?$/;
-    var	re2		= /^([0-9½]+[yY]|)\s*([0-9½]+[mM]|)\s*([0-9½]+[wW]|)\s*([0-9½]+[dD]|)$/;
+    var	re2		= /^(([0-9½]+)\s*[yY][a-zA-Z]*|)\s*(([0-9½]+)\s*[mM][a-zA-Z]*|)\s*(([0-9½]+)\s*[wW][a-zA-Z]*|)\s*(([0-9½]+)\s*[dD][a-zA-Z]*|)\s*(([0-9½]+)\s*[hH]|)/;
     var	age		= element.value;
     setErrorFlag(element, age.length == 0 ||
 						  age == '?' ||
@@ -1799,6 +1802,53 @@ function checkAge()
 						  re.test(age) || 
 						  re2.test(age));
 }		// checkAge
+
+/************************************************************************
+ *  function getNumeric                 								*
+ *																		*
+ *  Given a string consisting of decimal digits and '½' return the      *
+ *  numeric value.                                                      *
+ *																		*
+ *  Input:																*
+ *		number      string                                              *
+ ************************************************************************/
+function getNumeric(number)
+{
+    if (typeof number === 'undefined')
+        return 0;
+
+    var retval      = 0;
+    number          = number.trim();
+    var num         = 0;        // accumulate number
+    for(var i = 0; i < number.length; i++)
+    {           // loop through digits
+	    var	c	= number.charAt(i);
+	    switch(c)
+	    {		// act on character
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+			{		// numeric digit
+			    num		= (num * 10) + (c - '0');
+			    break;
+			}		// numeric digit
+
+			case '½':
+			{		// half
+			    num		+= 0.5;
+			    break;
+			}		// half
+        }           // act on specific characters
+    }               // loop through digits
+    return num;
+}       // function getNumeric
 
 /************************************************************************
  *  checkURL															*

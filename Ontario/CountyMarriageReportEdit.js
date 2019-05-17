@@ -140,9 +140,9 @@ function onLoad()
 				    break;
 				}
 		    }		// act on specific fields
-		}		// loop through all elements in the form
-    }			// loop through all forms
-}		// onLoad
+		}		    // loop through all elements in the form
+    }			    // loop through all forms
+}		// function onLoad
 
 /************************************************************************
  *  fnction deleteReport												*
@@ -182,7 +182,7 @@ function deleteReport()
 				gotDeleteReport,
 				noDeleteReport);
     return false;
-}		// deleteReport
+}		// function `deleteReport
 
 /************************************************************************
  *  function gotDeleteReport											*
@@ -231,7 +231,7 @@ function gotDeleteReport(xmlDoc)
 		    }		// have at least 1 rownum element
 		}		// have at least 1 parms element
     }			// xmlDoc is defined
-}		// gotDeleteReport
+}		// function gotDeleteReport
 
 /************************************************************************
  *  function noDeleteReport												*
@@ -242,7 +242,7 @@ function noDeleteReport()
 {
     alert("CountyMarriageReportEdit.js: noDeleteReport: " +
 				"script 'deleteCountyMarriageReportXml.php' not found on server");
-}		// noDeleteReport
+}		// function noDeleteReport
 
 /************************************************************************
  *  function editReport													*

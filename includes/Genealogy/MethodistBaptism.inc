@@ -94,35 +94,35 @@ class MethodistBaptism extends Record
 		global	$connection;
 		global	$userid;
 
-		$needInsert	= true;
-		$errors		= '';
+		$needInsert	                = true;
+		$errors		                = '';
 
 		if ($debug)
-		    $warn	.= "<p>MethodistBaptism::__construct(" .
-							print_r($parms, true) . ")</p>\n";
+		    $warn	                .= "<p>MethodistBaptism::__construct(" .
+							            print_r($parms, true) . ")</p>\n";
 
 		if (is_array($parms))
-		{		// associative array
+		{		            // associative array
 		    if (count($parms) >= count(self::$initRow))
-		    {			// complete row from database
-				$dbrow		= $parms;
-				$needInsert	 = false;
-		    }			// complete row from datase
+		    {			    // complete row from database
+				$dbrow		        = $parms;
+				$needInsert	        = false;
+		    }			    // complete row from datase
 		    else
-		    {			// key and optional other parms
-				$idmb		= 0;
+		    {			    // key and optional other parms
+				$idmb		        = 0;
 
 				if (array_key_exists('idmb', $parms) &&
 				    ($idmb = $parms['idmb']) > 0)
-				{		// initialize from database
+				{		    // initialize from database
 				    // construct the query of the user table
-				    $query	= 'SELECT * FROM MethodistBaptisms ' .
-								'WHERE IDMB=:idmb';
-				    $sqlParms	= array('idmb'	=> $idmb);
+				    $query	        = 'SELECT * FROM MethodistBaptisms ' .
+								        'WHERE IDMB=:idmb';
+				    $sqlParms	    = array('idmb'	=> $idmb);
 				    
 				    // query the database
-				    $stmt	= $connection->prepare($query);
-				    $queryText	= debugPrepQuery($query, $sqlParms);
+				    $stmt	        = $connection->prepare($query);
+				    $queryText	    = debugPrepQuery($query, $sqlParms);
 				    
 				    if ($stmt->execute($sqlParms))
 				    {		// success
@@ -132,29 +132,29 @@ class MethodistBaptism extends Record
 						$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
 						if (count($result) > 0)
 						{		// found matching record
-						    $dbrow		= $result[0];
+						    $dbrow		    = $result[0];
 						    $needInsert		= false;
 						}		// found matching record
 						else
 						{		// invalid key
-						    $dbrow		= self::$initRow;
+						    $dbrow		    = self::$initRow;
 						    $needInsert		= true;
 						}		// invalid key
 				    }		// success
 				    else
 				    {		// error performing query
-						throw new Exception("MethodistBaptism::__construct: " .
-								    "query='$queryText', " .
-							    print_r($stmt->errorInfo(),true));
+						$this->msg  .= "MethodistBaptism::__construct: " .
+								        "query='$queryText', " .
+							            print_r($stmt->errorInfo(),true);
 				    }		// error performing query
-				}		// initialize from database
-		    }		// key and optional other parms
-		}		// associative array
+				}		    // initialize from database
+		    }		        // key and optional other parms
+		}		            // associative array
 		else
-		{		// unexpected parameter type
-		    throw new Exception('MethodistBaptism::__construct: called with ' .
-							 gettype($parms));
-		}		// unexpected parameter type
+		{		            // unexpected parameter type
+		    $this->msg      .= 'MethodistBaptism::__construct: called with ' .
+							    gettype($parms);
+		}		            // unexpected parameter type
 
 		// invoke constructor of base class
 		parent::__construct($dbrow,

@@ -252,18 +252,18 @@ if (strlen($msg) > 0)
 else
 {		// display results of query
 ?>
-  <div class='center'>
-  <div class='left'>
-	<a href='MarriageRegYearStats.php?regdomain=<?php print $domain; ?>&regyear=<?php print $regYear - 1; ?>&county=<?php print $county; ?>' id='toPrevYear'>
+  <div class='center' id="topBrowse">
+    <div class='left' id="topPrev">
+      <a href='MarriageRegYearStats.php?regdomain=<?php print $domain; ?>&regyear=<?php print $regYear - 1; ?>&county=<?php print $county; ?>' id='toPrevYear'>
 	    &lt;--- <?php print $regYear - 1; ?> 
-	</a>
-  </div>
-  <div class='right'>
-	<a href='MarriageRegYearStats.php?regdomain=<?php print $domain; ?>&regyear=<?php print $regYear + 1; ?>&county=<?php print $county; ?>' id='toNextYear'>
+	  </a>
+    </div>
+    <div class='right' id="topNext">
+	  <a href='MarriageRegYearStats.php?regdomain=<?php print $domain; ?>&regyear=<?php print $regYear + 1; ?>&county=<?php print $county; ?>' id='toNextYear'>
 	    <?php print $regYear + 1; ?> ---&gt;
-	</a>
-  </div>
-  <div style='clear: both;'></div>
+	  </a>
+    </div>
+    <div style='clear: both;'></div>
   </div>
   <form id='display' action='donothing.php' method='get'>
 <input type='hidden' id='RegYear' 
@@ -271,7 +271,7 @@ else
 <input type='hidden' id='Domain' 
 	value='<?php print $domain; ?>'>
 <!--- Put out the response as a table -->
-<table class='form'>
+<table class='form' id="dataTable">
   <thead>
   <!--- Put out the column headers -->
 	<tr>

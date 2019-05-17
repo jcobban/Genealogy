@@ -50,13 +50,13 @@ function onloadNicknames()
     }		// iterate through all forms
 
     // add mouseover actions for forward and backward links
-    var npprev	= document.getElementById('npprev');
+    var npprev	= document.getElementById('topPrev');
     if (npprev)
     {		// defined
 		npprev.onmouseover	= linkMouseOver;
 		npprev.onmouseout	= linkMouseOut;
     }		// defined
-    var npnext	= document.getElementById('npnext');
+    var npnext	= document.getElementById('topNext');
     if (npnext)
     {		// defined
 		npnext.onmouseover	= linkMouseOver;
@@ -94,7 +94,7 @@ function resetForm()
  ************************************************************************/
 function addName()
 {
-    var details		= document.getElementById('details');
+    var details		= document.getElementById('dataTable');
     var	tbody		= details.tBodies[0];
     var	parms		= {'i'		: tbody.rows.length,
 					           'even'	: 'odd'};

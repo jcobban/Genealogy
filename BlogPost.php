@@ -2,6 +2,9 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template
+use \Templating\TemplateTag
+
 /************************************************************************
  *  BlogPost.php														*
  *																		*
@@ -19,7 +22,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Blog.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/User.inc';

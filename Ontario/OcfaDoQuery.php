@@ -34,8 +34,12 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2015/09/28		migrate from MDB2 to PDO						*
  *		2016/04/25		replace ereg with preg_match					*
+ *		2019/05/01      update link to query to include parameters      *
+ *		                passed to this script                           *
+ *		                use standard element ids for top and bottom     *
+ *		                page scrolling so PgUp and PgDn work            *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Record.inc";
 require_once __NAMESPACE__ . "/common.inc";
@@ -48,9 +52,12 @@ $and			= 'WHERE ';	// logical and operator in SQL expressions
 $where			= '';
 $npuri			= 'OcfaDoQuery.php';	// for next and previous links
 $npand			= '?';		// adding parms to $npuri
-$count			= 20;
-$county         = null;
-$township       = null;
+$limit			= 20;
+$county         = '';
+$township       = '';
+$cemetery       = '';
+$givennames     = '';
+$surname        = '';
 $offset			= 0;
 $lang			= 'en';
 
@@ -68,15 +75,16 @@ foreach($_GET as $key => $value)
 	switch(strtolower($key))
 	{		        // switch on parameter name
 	    case 'count':
+	    case 'limit':
         {		    // limit number of rows returned
-            if (strlen($value) > 0)
-			    $count	        = $value;
+            if (ctype_digit($value))
+			    $limit	        = $value;
 			break;
 	    }		    // limit number of rows returned
 
 	    case 'offset':
 	    {		    // starting offset
-            if (strlen($value) > 0)
+            if (ctype_digit($value))
 			    $offset	        = $value;
 			break;
 	    }		    // starting offset
@@ -85,6 +93,7 @@ foreach($_GET as $key => $value)
 	    {
             if (strlen($value) > 0)
             {
+                $surname            = $value;
     			if (preg_match("/[.+*^$]/", $value))
     			{		// match pattern
     			    $where	        .= "$and$key REGEXP ?";
@@ -101,9 +110,9 @@ foreach($_GET as $key => $value)
     			    $where	        .= "$and$key=?";
                     $sqlParms[]     = $value;
     			}		// match exact
-                $and            = ' AND ';
-    			$npuri	        .= "{$npand}{$key}=" . urlencode($value);
-                $npand	        = '&amp;'; 
+                $and                = ' AND ';
+    			$npuri	            .= "{$npand}{$key}=" . urlencode($value);
+                $npand	            = '&amp;'; 
             }
 			break;
 	    }
@@ -113,11 +122,12 @@ foreach($_GET as $key => $value)
 	    {		// match anywhere in string
             if (strlen($value) > 0)
             {
-			    $where	        .= "{$and}GivenName REGEXP ?";
-                $sqlParms[]     = $value;
-                $and            = ' AND ';
-			    $npuri	        .= "{$npand}GivenName=" . urlencode($value);
-                $npand	        = '&amp;'; 
+                $givennames         = $value;
+			    $where	            .= "{$and}GivenName REGEXP ?";
+                $sqlParms[]         = $value;
+                $and                = ' AND ';
+			    $npuri	            .= "{$npand}GivenName=" . urlencode($value);
+                $npand	            = '&amp;'; 
             }
 			break;
 	    }		// match in string
@@ -126,40 +136,59 @@ foreach($_GET as $key => $value)
         {		// match anywhere in string
             if (strlen($value) > 0)
             {
-			    $where	        .= "$and$key REGEXP ?";
-                $sqlParms[]     = $value;
-                $and            = ' AND ';
-			    $npuri	        .= "{$npand}{$key}=" . urlencode($value);
-                $npand	        = '&amp;'; 
+                $cemetery           = $value;
+			    $where	            .= "$and$key REGEXP ?";
+                $sqlParms[]         = $value;
+                $and                = ' AND ';
+			    $npuri	            .= "{$npand}{$key}=" . urlencode($value);
+                $npand	            = '&amp;'; 
             }
 			break;
 	    }		// match in string
 
 	    case 'surnamesoundex':
 	    {		// handled under Surname
-			$npuri	        .= "{$npand}{$key}=" . urlencode($value);
-			$npand	        = '&amp;'; 
+			$npuri	                .= "{$npand}{$key}=" . urlencode($value);
+			$npand	                = '&amp;'; 
 			break;
 	    }		// handled under Surname
 
 	    case 'county':
+        {		// exact match on field in table
+            if (strlen($value) > 0)
+            {
+                $county             = $value;
+		    	$where	            .= "$and$key=?";
+                $sqlParms[]         = $value;
+                $and                = ' AND ';
+			    $npuri	            .= "{$npand}{$key}=" . urlencode($value);
+                $npand	            = '&amp;';
+            }
+			break;
+	    }		// exact match on field in table
+
 	    case 'township':
         {		// exact match on field in table
             if (strlen($value) > 0)
             {
-		    	$where	        .= "$and$key=?";
-                $sqlParms[]     = $value;
-                $and            = ' AND ';
-			    $npuri	        .= "{$npand}{$key}=" . urlencode($value);
-                $npand	        = '&amp;';
+                $township           = $value;
+		    	$where	            .= "$and$key=?";
+                $sqlParms[]         = $value;
+                $and                = ' AND ';
+			    $npuri	            .= "{$npand}{$key}=" . urlencode($value);
+                $npand	            = '&amp;';
             }
 			break;
 	    }		// exact match on field in table
 
 	    case 'lang':
         {
-            if (strlen($value) == 2)
-                $lang       = strtolower($value);
+            if (strlen($value) >= 2)
+            {
+                $lang               = strtolower(substr($value,0,2));
+			    $npuri	            .= "{$npand}{$key}=$lang";
+                $npand	            = '&amp;'; 
+            }
 			break;
 	    }
 
@@ -167,8 +196,8 @@ foreach($_GET as $key => $value)
 	    {
             if (strlen($value) > 0)
             {
-			    $npuri	        .= "{$npand}{$key}=" . urlencode($value);
-                $npand	        = '&amp;'; 
+			    $npuri	            .= "{$npand}{$key}=" . urlencode($value);
+                $npand	            = '&amp;'; 
             }
 			break;
 	    }
@@ -177,11 +206,11 @@ foreach($_GET as $key => $value)
 	    {		// exact match on field in table
             if (strlen($value) > 0)
             {
-			    $where	        .= "$and$key=?";
-                $sqlParms[]     = $value;
-                $and            = ' AND ';
-			    $npuri	        .= "{$npand}{$key}=" . urlencode($value);
-                $npand	        = '&amp;'; 
+			    $where	            .= "$and$key=?";
+                $sqlParms[]         = $value;
+                $and                = ' AND ';
+			    $npuri	            .= "{$npand}{$key}=" . urlencode($value);
+                $npand	            = '&amp;'; 
             }
 			break;
 	    }		// exact match on field in table
@@ -191,10 +220,10 @@ if ($debug)
     $warn   .= $parmsText . "</table>\n";
 
 // validation
-if (!preg_match("/^([0-9]{1,2})$/", $count))
+if (!preg_match("/^([0-9]{1,2})$/", $limit))
 {
     $msg        .= "Row count must be number between 1 and 99. ";
-    $count	    = 20;		// replace with default
+    $limit	    = 20;		// replace with default
 }
 
 if (!preg_match("/^([0-9]{1,6})$/", $offset))
@@ -206,20 +235,20 @@ if (!preg_match("/^([0-9]{1,6})$/", $offset))
 // variable portion of URI for next and previous links
 if ($offset > 0)
 {		// starting offset within existing query
-	$limit	        = " LIMIT {$count} OFFSET {$offset}";
-	$tmp	        = $offset - $count;
+	$limitClause	= " LIMIT {$limit} OFFSET {$offset}";
+	$tmp	        = $offset - $limit;
 	if ($tmp < 0)
 	    $npprev	    = "";	// no previous link
 	else
-	    $npprev	    = "Count={$count}&Offset={$tmp}";
-	$tmp		    = $offset + $count;
-	$npnext		    = "Count={$count}&Offset={$tmp}";
+	    $npprev	    = "Count={$limit}&Offset={$tmp}";
+	$tmp		    = $offset + $limit;
+	$npnext		    = "Count={$limit}&Offset={$tmp}";
 }		// starting offset within existing query
 else
 {
-	$limit		    = " LIMIT $count";
+	$limitClause	= " LIMIT $limit";
 	$npprev		    = "";
-	$npnext		    = "Count={$count}&Offset={$count}";
+	$npnext		    = "Count={$limit}&Offset={$limit}";
 }
 
 if (strlen($msg) == 0)
@@ -231,17 +260,17 @@ if (strlen($msg) == 0)
 	if ($stmt->execute($sqlParms))
 	{		// successful query
 	    if ($debug)
-            $warn	.= "<p>OcfaDoQuery.php: " . __LINE__ . 
-                        " $queryText</p>";
+            $warn	    .= "<p>OcfaDoQuery.php: " . __LINE__ . 
+                            " $queryText</p>";
 
 	    // get the value of COUNT(*)
 	    $row		    = $stmt->fetch(PDO::FETCH_NUM);
 	    $totalrows		= $row[0];
 
 	    // execute the query
-	    $query		= "SELECT Surname, GivenName, Cemetery, Township, County FROM Ocfa $where ORDER BY Surname, GivenName, County, Township, Cemetery $limit";
-	    $stmt		= $connection->prepare($query);
-        $queryText  = debugPrepQuery($query, $sqlParms);
+	    $query		    = "SELECT Surname, GivenName, Cemetery, Township, County FROM Ocfa $where ORDER BY Surname, GivenName, County, Township, Cemetery $limitClause";
+	    $stmt		    = $connection->prepare($query);
+        $queryText      = debugPrepQuery($query, $sqlParms);
 	    if ($stmt->execute($sqlParms))
 	    {		// successful query
 			$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -272,12 +301,12 @@ htmlHeader("Ontario Cemetery Finding Aid Query",
 <body>
 <?php
 pageTop(array(	'/genealogy.php'	=> 'Genealogy',
-			'/genCanada.html'	=> 'Canada',
+			'/genCanada.html'	    => 'Canada',
 			'/genCountry.php?cc=CA'	=> 'Canada',
 			'/Canada/genProvince.php?Domain=CAON'
-							=> 'Ontario',
-			'/Ontario/OcfaQuery.html'
-							=> 'New Query')); 
+					    		    => 'Ontario',
+            "/Ontario/OcfaQuery.php?County=$county&amp;Township=$township&amp;Cemetery=$cemetery&amp;GivenNames=$givennames&amp;Surname=$surname"
+			        				=> 'New Query')); 
 ?>
     <div class='body'>
       <h1>
@@ -286,7 +315,7 @@ pageTop(array(	'/genealogy.php'	=> 'Genealogy',
         </span>
         Ontario Cemetery Finding Aid Query
       </h1>
-      <p>This tool is an alternate and <b>unofficial</b> interface to an old copy
+      <p>This tool is an alternate and <b>unauthorized</b> interface to an old copy
         of the database maintained at <a href='http://www.islandnet.com/ocfa/'>
         Ontario Cemetery Finding Aid</a>.
       </p>
@@ -308,8 +337,8 @@ else
 {		// display results of query
 ?>
   <!--- Put out a line with links to previous and next section of table -->
-  <div class='center'>
-<span class='left'>
+  <div class='center' id="topBrowse">
+    <span class='left' id="topPrev">
 <?php
 	if (strlen($npprev) > 0)
 	{
@@ -318,15 +347,15 @@ else
 <?php
 	}
 ?>
-</span>
-<span class='right'>
- <a href='<?php print $npuri.$npand.$npnext; ?>' id='nextPage'>---&gt;</a>
-</span>
+    </span>
+    <span class='right' id="topNext">
+     <a href='<?php print $npuri.$npand.$npnext; ?>' id='nextPage'>---&gt;</a>
+    </span>
 	displaying rows <?php print $offset+1; ?> to <?php print $offset + $numRows; ?> of <?php print $totalrows; ?> 
   </div>
   <!--- Put out the response as a table -->
-  <table class='details'>
-<thead>
+  <table class='details' id="dataTable">
+    <thead>
 <!--- Put out the column headers -->
   <tr>
 	<th class='colhead'>
@@ -378,8 +407,8 @@ else
 <tbody>
   </table>
   <!--- Put out a line with links to previous and next section of table -->
-  <div class='center'>
-<span class='left'>
+  <div class='center'id="botBrowse">
+    <span class='left' id="botPrev">
 <?php
 	if (strlen($npprev) > 0)
 	{
@@ -388,10 +417,10 @@ else
 <?php
 	}
 ?>
-</span>
-<span class='right'>
+    </span>
+    <span class='right' id="botNext">
 	  <a href='<?php print $npuri.$npand.$npnext; ?>'>---&gt;</a>
-</span>
+    </span>
 &nbsp;
   </div>
 <?php

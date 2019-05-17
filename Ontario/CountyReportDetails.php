@@ -271,18 +271,18 @@ if (strlen($msg) == 0)
 
 ?>
       <!--- Put out a line with links to previous and next section of table -->
-      <div class='center'>
+      <div class='center' id="topBrowse">
 <?php
 if ($reportNo > 1)
     {
 ?>
-        <span class='left'>
+        <span class='left' id="topPrev">
           <a href='CountyReportDetails.php?Domain=<?php print $domain; ?>&Volume=<?php print $volume; ?>&ReportNo=<?php print $reportNo - 1; ?>'>&lt;---&nbsp;Report&nbsp;<?php print $reportNo - 1; ?></a>
         </span>
 <?php
     }
 ?>
-        <span class='right'>
+        <span class='right' id="topNext">
           <a href='CountyReportDetails.php?Domain=<?php print $domain; ?>&Volume=<?php print $volume; ?>&ReportNo=<?php print $reportNo + 1; ?>'>Report&nbsp;<?php print $reportNo + 1; ?>&nbsp;---&gt;</a>
         </span>
 Volume <?php print $volume; ?> Report <?php print $reportNo; ?>

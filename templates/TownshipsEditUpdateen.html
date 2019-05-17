@@ -6,6 +6,7 @@
  *																		*
  *  History:															*
  *		2018/10/21      created                                         *
+ *      2019/04/12      change TownshipsUpdate,php to TownshipsEdit.php *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
@@ -39,7 +40,7 @@
     $MSG
   <!--- Put out the response as a table -->
   <form name="townshipForm"
-		action="TownshipsUpdate.php" 
+		action="TownshipsEdit.php" 
 		method="post" 
 		autocomplete="off" 
 		enctype="multipart/form-data">
@@ -47,7 +48,7 @@
     <input type="hidden" name="Domain" value="$DOMAIN">
     <input type="hidden" name="County" value="$COUNTYCODE">
     <input type="hidden" name="Debug" value="$DEBUG">
-    <table class="form" id="dataTbl">
+    <table class="form" id="dataTable">
     <!--- Put out the column headers -->
 	  <thead>
 		<tr id="hdrRow">
@@ -118,15 +119,15 @@
     <table>
 		<tr id="NewTownship$line">
 		  <td class="right">
-			<input type="text" name="Code$line"
+			<input type="text" name="Code$line" id="Code$line"
 					value="$code"
 					class="white code" 
 					size="28" maxlength="64">
-		    <input type="hidden" name="OldCode$line"
+		    <input type="hidden" name="OldCode$line" id="OldCode$line"
 					value="$code">
 		  </td>
 		  <td class="left">
-			<input type="text" name="Name$line" 
+			<input type="text" name="Name$line"  id="Name$line" 
 					value="$name" 
 					class="white left"
 					size="28" maxlength="64">

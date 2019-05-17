@@ -1,0 +1,101 @@
+<!--*********************************************************************
+ *  WmbVolStatsen.html  												*
+ *																		*
+ *  Display statistics about the transcription of Wesleyan Methodist	*
+ *  Baptisms by volume number.											*
+ *																		*
+ *  History:															*
+ *		2016/09/25		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+  	    Genealogy
+      </a>:
+      <a href="/Canada/CountriesEdit.php?lang=$LANG">
+        List of Supported Countries
+      </a>:
+      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">
+  	    Canada
+      </a>:
+      <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">
+  	    Ontario
+      </a>:
+      <a href="/displayPage.php?template=WmbQuery">
+        Wesleyan Methodist Baptism Query
+      </a>:
+    </div>
+    <div class="body">
+      <h1>Ontario: Wesleyan Methodist Baptisms Volume Statistics
+    <span class="right">
+	    <a href="WmbVolStatsHelpen.html" target="_blank">Help?</a>
+    </span>
+    <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <form name="statsForm">
+        <!--- Put out the response as a table -->
+        <table class="form" id="dataTable">
+          <thead>
+	        <!--- Put out the column headers -->
+	        <tr>
+	          <th class="colhead1st">
+	            Volume
+	          </th>
+	          <th class="colhead">
+	            Pages
+	          </th>
+	          <th class="colhead">
+	            Done
+	          </th>
+	          <th class="colhead">
+	            View
+	          </th>
+	        </tr>
+          </thead>
+          <tbody>
+	        <tr id="dataRow">
+	          <td class="odd bold left first">
+	            $volume
+	          </td>
+	          <td class="odd bold right">
+	            $pages
+	          </td>
+	          <td class="odd bold right">
+	            $count
+	          </td>
+	          <td>
+	            <button id="ShowVolStats$volume" type="button">
+			      View
+	            </button>
+	          </td>
+	        </tr>
+          </tbody>
+          <tfoot>
+	        <tr id="footRow">
+	          <td class="total right first">
+	            Total
+	          </td>
+              <td class="total right">
+                &nbsp;
+	          </td>
+	          <td class="total right">
+	            $total
+	          </td>
+              <td class="total right">
+                &nbsp;
+	          </td>
+	        </tr>
+          </tfoot>
+        </table>
+      </form>
+    </div>
+    <div id="HelpShowVolStats" class="balloon">
+      Click on this button to show page level statistics for this volume.
+    </div>
+    <script src="/jscripts/js20/http.js"    type="text/javascript"></script>
+    <script src="/jscripts/util.js"         type="text/javascript"></script>
+    <script src="/Ontario/WmbVolStats.js"   type="text/javascript"></script>

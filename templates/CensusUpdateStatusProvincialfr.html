@@ -1,13 +1,13 @@
 <!--*********************************************************************
- *  CensusUpdateStatusProvincialfr.html					*
- *									*
- *  Display the progress of the transcription of a specific census	*
- *  for a specific province						*
- *									*
- *  History:								*
- *	2018/01/18	created						*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  CensusUpdateStatusProvincialfr.html									*
+ *																		*
+ *  Display the progress of the transcription of a specific census		*
+ *  for a specific province												*
+ *																		*
+ *  History:															*
+ *		2018/01/18		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
    <link rel="stylesheet" type="text/css" href='CensusUpdateStatus.css'>
 <div id='breadcrumbs' class='hidden'>
@@ -26,21 +26,21 @@
       $MSG 
     <div id='displayForm'>
       <!--- Put out a line with links to previous and next census year -->
-      <div class='center'>
-	<div class='left' id="prevCensusLink">
-	    <a href='/database/CensusUpdateStatus.php?Census=$prevCensus&amp;Province=$prevProv' 
-		    id='prevCensusLink'>
-		&lt;--- $prevCensus Récensement $prevName
-	    </a>
-	</div>
-	<div class='right' id="nextCensusLink">
-	    <a href='/database/CensusUpdateStatus.php?Census=$nextCensus&amp;Province=$nextProv' 
-		    id='nextCensusLink'>
-		$nextCensus Récensement $nextName ---&gt;
-	    </a>
-	</div>
-	&nbsp;
-	<div style='clear: both;'></div>
+      <div class="center" id="topBrowse">
+	    <div class='left' id="topPrev">
+	      <a href='/database/CensusUpdateStatus.php?Census=$prevCensus&amp;Province=$prevProv' 
+		        id='prevCensusLink'>
+		    &lt;--- $prevCensus Récensement $prevName
+	      </a>
+	    </div>
+	    <div class='right' id="topNext">
+	     <a href='/database/CensusUpdateStatus.php?Census=$nextCensus&amp;Province=$nextProv' 
+		        id='nextCensusLink'>
+		    $nextCensus Récensement $nextName ---&gt;
+	      </a>
+	    </div>
+	    &nbsp;
+	    <div style='clear: both;'></div>
       </div>
       <!--- Put out the response as a table -->
       <form name='statForm' id='statForm' action='donothing.php'>

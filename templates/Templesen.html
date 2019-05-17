@@ -1,134 +1,136 @@
 <!--*********************************************************************
- *  Templesen.html							*
- *									*
- *  Template to display a web page containing all of the temples	*
- *  matching a pattern.							*
- *									*
- *  History:								*
- *	2017/11/06	created						*
- *	2018/01/04	remove Template from template file names	*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  Templesen.html														*
+ *																		*
+ *  Template to display a web page containing all of the temples		*
+ *  matching a pattern.													*
+ *																		*
+ *  History:															*
+ *		2017/11/06		created											*
+ *		2018/01/04		remove Template from template file names		*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php">Genealogy</a>:
-    <a href="/FamilyTree/Services.php">Services</a>:
-  </div>	
-  <div class="body">
-    <h1>
-      <span class="right">
-	<a href="/FamilyTree/TemplesHelpen.html" target="help">? Help</a>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php">Genealogy</a>:
+      <a href="/FamilyTree/Services.php">Services</a>:
+    </div>	
+    <div class="body">
+      <h1>
+        <span class="right">
+		  <a href="/FamilyTree/TemplesHelpen.html" target="help">? Help</a>
+        </span>
+        Master List of Temples of the Church of Jesus Christ of Latter Day Saints
+      </h1>
+      $TRACE
+      $MSG
+    <form name="locForm" action="Temples.php">
+      <p style="white-space: nowrap;">
+        <label class="label" style="width: 11em;" for="pattern">
+		  Pattern:
+        </label>
+        <input name="pattern" id="pattern" type="text" 
+			  class="white leftnc" size="80"
+			  value="$pattern">
+      </p>
+      <p>
+        <button type="submit" id="Search">
+		  Search
+        </button>
+      </p>
+    </form>
+    <div class="center" id="topBrowse">
+        <span class="left" id="topPrev">
+        <a href="/FamilyTree/Temples.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$prevoffset">&lt;---</a>
       </span>
-      Master List of Temples of the Church of Jesus Christ of Latter Day Saints
-    </h1>
-    $TRACE
-    $MSG
-  <form name="locForm" action="Temples.php">
-    <p style="white-space: nowrap;">
-      <label class="label" style="width: 11em;" for="pattern">
-	Pattern:
-      </label>
-      <input name="pattern" id="pattern" type="text" 
-		class="white leftnc" size="80"
-		value="$pattern">
-    </p>
-    <p>
-      <button type="submit" id="Search">
-	Search
-      </button>
-    </p>
-  </form>
-  <div class="center" id="linksfront">
-    <div class="left" id="npprev">
-      <a href="/FamilyTree/Temples.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$prevoffset">&lt;---</a>
+      <span class="right" id="topNext">
+        <a href="/FamilyTree/Temples.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$nextoffset">---&gt;</a>
+      </span>
+		  rows $offset to $last of $count 
+      <div style="clear: both;"></div>
     </div>
-    <div class="right" id="npnext"> 
-    <a href="/FamilyTree/Temples.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$nextoffset">---&gt;</a>
+    <!--- Put out the response as a table -->
+    <table class="details" id="dataTable">
+      <!--- Put out the column headers -->
+      <thead>
+        <tr>
+		  <th class="colhead">
+		    IDTR
+		  </th>
+		  <th class="colhead">
+		    Code
+		  </th>
+		  <th class="colhead">
+		    Temple
+		  </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="temple$idtr">
+		  <td class="$even right"
+                style="padding-left: 5px; padding-right: 5px;">
+		        <a href="/FamilyTree/Temple.php?idtr=$idtr">
+			    $idtr 
+		        </a>
+		  </td>
+		  <td class="$even left"
+                style="padding-left: 5px; padding-right: 5px;">
+		        $code
+		  </td>
+		  <td class="$even left" style="min-width: 300px;">
+		        $temple
+		  </td>
+        </tr>
+      </tbody>
+    </table>
+  </div> <!-- end of <div class="body"> -->
+    <div class="balloon" id="Helppattern">
+      <p>
+		  This is an 
+		  <a href="https://www.regular-expressions.info/posix.html#ere">
+		      extended regular expression</a>,
+		  as supported by MySQL,
+		  which is used to search for users based upon their user name.
+      <ul>
+        <li>If the pattern contains no special 
+		  characters then only temples containing that string will be included.
+		  For example the pattern "London" will match temples containing the
+		  string "London".  Note that the search ignores case, so that pattern
+		  will also match "LONDON" and "london".
+        <li>If the pattern begins with a caret '^' then only temples that
+		  <b>begin</b> with the remainder of the pattern are included.  
+		  For example the pattern
+		  "^Ba" displays temples starting with "Ba" (or "ba" or "BA").
+        <li>If the pattern ends with a dollar sign '$', then only temples that
+		  <b>end</b> with the remainder of the pattern are included.  
+		  For example the pattern
+		  "CA$" matches temples that end with "CA" (or "ca" or "Ca").
+        <li>In a pattern a period '.' matches any single character.  For example
+		  the pattern "B.b" matches any temple that contains two letter Bs
+		  separated by one character, for example "Bab", "Beb", "Bib", "Bob",
+		  or "Bub" anywhere in the temple name.
+        <li>In a pattern an asterisk '*' matches zero or more of the preceding
+		  character; "bo*b" matches "bb", "bob", and "boob"
+		  anywhere in the temple name.
+      </ul>
+      </p>
     </div>
-	rows $offset to $last of $count 
-    <div style="clear: both;"></div>
-  </div>
-  <!--- Put out the response as a table -->
-  <table class="details" id="details">
-    <!--- Put out the column headers -->
-    <thead>
-      <tr>
-	<th class="colhead">
-	  IDTR
-	</th>
-	<th class="colhead">
-	  Code
-	</th>
-	<th class="colhead">
-	  Temple
-	</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr id="temple$idtr">
-	<td class="$even right">
-	    <a href="/FamilyTree/Temple.php?idtr=$idtr">
-		$idtr 
-	    </a>
-	</td>
-	<td class="$even left">
-	    $code
-	</td>
-	<td class="$even left">
-	    $temple
-	</td>
-      </tr>
-    </tbody>
-  </table>
-</div> <!-- end of <div class="body"> -->
-  <div class="balloon" id="Helppattern">
-    <p>
-	This is an 
-	<a href="https://www.regular-expressions.info/posix.html#ere">
-	    extended regular expression</a>,
-	as supported by MySQL,
-	which is used to search for users based upon their user name.
-    <ul>
-      <li>If the pattern contains no special 
-	characters then only temples containing that string will be included.
-	For example the pattern "London" will match temples containing the
-	string "London".  Note that the search ignores case, so that pattern
-	will also match "LONDON" and "london".
-      <li>If the pattern begins with a caret '^' then only temples that
-	<b>begin</b> with the remainder of the pattern are included.  
-	For example the pattern
-	"^Ba" displays temples starting with "Ba" (or "ba" or "BA").
-      <li>If the pattern ends with a dollar sign '$', then only temples that
-	<b>end</b> with the remainder of the pattern are included.  
-	For example the pattern
-	"CA$" matches temples that end with "CA" (or "ca" or "Ca").
-      <li>In a pattern a period '.' matches any single character.  For example
-	the pattern "B.b" matches any temple that contains two letter Bs
-	separated by one character, for example "Bab", "Beb", "Bib", "Bob",
-	or "Bub" anywhere in the temple name.
-      <li>In a pattern an asterisk '*' matches zero or more of the preceding
-	character; "bo*b" matches "bb", "bob", and "boob"
-	anywhere in the temple name.
-    </ul>
+    <div class="balloon" id="HelpSearch">
+    <p>Clicking on this button refreshes the displayed list of temples
+      based upon the pattern.  You may also hit the "enter" key to perform the
+      same function.
     </p>
-  </div>
-  <div class="balloon" id="HelpSearch">
-  <p>Clicking on this button refreshes the displayed list of temples
-    based upon the pattern.  You may also hit the "enter" key to perform the
-    same function.
-  </p>
-  </div>
-  <!-- balloons to pop up when mouse moves over forward and back links -->
-  <div class="popup" id="mousenpprev">
-    <p class="label">
-	Go to Row $prevoffset&nbsp;
-    </p>
-  </div>
-  <div class="popup" id="mousenpnext">
-    <p class="label">
-	Go to Row $nextoffset&nbsp;
-    </p>
-  </div>
+    </div>
+    <!-- balloons to pop up when mouse moves over forward and back links -->
+    <div class="popup" id="mousetopPrev">
+      <p class="label">
+		  Go to Row $prevoffset&nbsp;
+      </p>
+    </div>
+    <div class="popup" id="mousetopNext">
+      <p class="label">
+		  Go to Row $nextoffset&nbsp;
+      </p>
+    </div>
     <script src="/jscripts/js20/http.js" type="text/javascript">
     </script>
     <script src="/jscripts/CommonForm.js" type="text/javascript">

@@ -187,6 +187,15 @@ use \Iterator;
  *		                add member $record->template and setTemplate    *
  *		2018/12/12      add support for multiple field keys to getId    *
  *		2019/04/06      add method __toString                           *
+ *		2019/04/18      add method getLastSqlCmd                        *
+ *		2019/04/28      add common support for field names ending       *
+ *		                in "soundex"                                    *
+ *		2019/05/05      improve getInformation                          *
+ *		                for MySQL get prime key from server             *
+ *		2019/05/14      in method getInformation if using definition    *
+ *		                from Record::$primeKey get default sort order   *
+ *		                for RecordSet from                              *
+ *		                Genealogy/classname::$defaultOrder              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -203,27 +212,27 @@ class Record implements Iterator, ArrayAccess
     /********************************************************************
      *	$this->row														*
      *																	*
-     *	Row returned from database query.								*
+     *	Row returned from database query as an associative array		*
      ********************************************************************/
-    protected	$row		= null;
+    protected	$row		        = null;
 
     /********************************************************************
      *	$this->changed													*
      *																	*
-     *	Row of fields whose values have changed.						*
+     *	Row of fields whose values have changed as associative array.	*
      *	$this->changed['name'] contains the value of field 'name'		*
      *  but only if it has changed since the record was last loaded from*
      *  the database.													*
      ********************************************************************/
-    protected	$changed	= null;
+    protected	$changed	        = null;
 
     /********************************************************************
      *	$this->former													*
      *																	*
      *	If the record has been changed the original values of the		*
-     *	record are recorded in this array.								*
+     *	record are recorded in this associative array.					*
      ********************************************************************/
-    protected	$former		= null;
+    protected	$former		        = null;
 
     /********************************************************************
      *	$this->extras													*
@@ -232,7 +241,7 @@ class Record implements Iterator, ArrayAccess
      *	to the record which is not preserved in the database.			*
      *	This information is only accessible through subscripts			*
      ********************************************************************/
-    protected	$extras		= array();
+    protected	$extras		        = array();
 
     /********************************************************************
      *	$this->table													*
@@ -240,7 +249,7 @@ class Record implements Iterator, ArrayAccess
      *	Name of the database table whose records are presented by a		*
      *	class derived from Record.										*
      ********************************************************************/
-    protected	$table		= '';
+    protected	$table		        = '';
 
     /********************************************************************
      *	$this->prime													*
@@ -248,17 +257,28 @@ class Record implements Iterator, ArrayAccess
      *	The name of the key that uniquely identifies records in this	*
      *	table.  The name of the key is given all in lower case to		*
      *	agree with the default PDO row interface.						*
+     *	If multiple fields comprise the unique key then this is an      *
+     *	array of strings.                                               *
      ********************************************************************/
-    protected	$prime		= 'id';
+    protected	$prime		        = 'id';
 
     /********************************************************************
      *	$this->template													*
      *																	*
      *	If not null this is an instance of Template which is used       *
      *	to provide the text strings necessary to implement              *
-     *	internationalization of text outputs from the current Class.    *
+     *	internationalization of text outputs from the current class.    *
      ********************************************************************/
-    protected	$template	= null;
+    protected	$template	        = null;
+
+    /********************************************************************
+     *	$this->lastSqlCmd												*
+     *																	*
+     *	This string contains a representation of the last command       *
+     *	used to update the database.  It is set by Record::save and     *
+     *	Record::delete.                                                 *
+     ********************************************************************/
+    protected	$lastSqlCmd         = '';
 
     /********************************************************************
      *	$this->needInsert												*
@@ -268,7 +288,7 @@ class Record implements Iterator, ArrayAccess
      *	updated to include changes made to the							*
      *	memory copy.													*
      ********************************************************************/
-    protected	$needInsert	= true;
+    protected	$needInsert	        = true;
 
     /********************************************************************
      *	$this->getModeHtml												*
@@ -278,7 +298,7 @@ class Record implements Iterator, ArrayAccess
      *	and null values result in returning "&nbsp;", and characters    *
      *	which have a special meaning to HTML are escaped.               *
      ********************************************************************/
-    protected	$getModeHtml	= false;
+    protected	$getModeHtml	    = false;
 
     /********************************************************************
      *	$this->msg       												*
@@ -286,7 +306,7 @@ class Record implements Iterator, ArrayAccess
      *	Any error messages accumulated by constructor.                  *
      *	See Record::getErrors                                           *
      ********************************************************************/
-    protected 	$msg	        = '';
+    protected 	$msg	            = '';
 
     /********************************************************************
      *	Record::$initRow												*
@@ -313,6 +333,13 @@ class Record implements Iterator, ArrayAccess
     protected static	$defaultOrder	= '';
 
     /********************************************************************
+     *	Record::$info       											*
+     *																	*
+     *	This is overloaded by each derived class.                       *
+     ********************************************************************/
+    protected static	$info	        = array();
+
+    /********************************************************************
      *	Record::$primeKey												*
      *																	*
      *  This table contains information about the supported tables.		*
@@ -329,56 +356,52 @@ class Record implements Iterator, ArrayAccess
      *					to this table									*
      ********************************************************************/
     protected static $primeKey = array(
-		'tblAR'		    => array('prime'	=> 'idar',
-							 	'srvmg'	    => true,
-							 	'fldcount'	=> 4,
-							 	'classname'	=> 'Address'),
-		'tblBP'		    => array('prime'	=> 'idbp',
-							 	'srvmg'	    => true,
-							 	'fldcount'	=> 4,
-							 	'classname'	=> ''),	// part of Picture
-		'tblBR'			=> array('prime'	=> 'idbr',
-							 	'srvmg'		=> true,
+		'tblBP'		    => array('prime'	    => 'idbp',
+							 	'srvmg'         => true,
+							 	'fldcount'	    => 4,
+							 	'classname'	    => ''),	// part of Picture
+		'tblBR'			=> array('prime'	    => 'idbr',
+							 	'srvmg'         => true,
 							 	'fldcount'		=> 4,
 							 	'classname'		=> 'Picture'),
-		'tblCP'			=> array('prime'	=> 'idcp',
-							 	'srvmg'		=> false,
+		'tblCP'			=> array('prime'	    => 'idcp',
+							 	'srvmg'         => false,
 							 	'fldcount'		=> 4,
 							 	'classname'		=> ''),	// part of Child
-		'tblCR'			=> array('prime'	=> 'idcr',
-							 	'srvmg'		=> true,
+		'tblCR'			=> array('prime'	    => 'idcr',
+							 	'srvmg'         => true,
 							 	'fldcount'		=> 4,
 							 	'classname'		=> 'Child'),
-		'tblDM'			=> array('prime'	=> '',
-							 	'srvmg'		=> false,
+		'tblDM'			=> array('prime'	    => '',
+							 	'srvmg'         => false,
 							 	'fldcount'		=> 4,
 							 	'classname'		=> 'DontMergeEntry'),
-		'tblER'			=> array('prime'	=> 'ider',
-							 	'srvmg'		=> true,
+		'tblER'			=> array('prime'	    => 'ider',
+							 	'srvmg'         => true,
 							 	'fldcount'		=> 4,
 							 	'classname'		=> 'Event'),
 		'tblHB'			=> array('prime'	=> 'idhb',
-							 	'srvmg'		=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'		=> 3,
 							 	'classname'		=> ''),
 		'tblHL'			=> array('prime'	=> 'idhl',
-							 	'srvmg'		=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'		=> 3,
 							 	'classname'	=> ''),
 		'tblHR'		    => array('prime'	=> '',
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 2,
 							 	'classname'	=> 'LegacyHeader'),
 		'tblIR'		    => array('prime'	=> 'idir',
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 11,
 							 	'classname'	=> 'Person'),
 		'tblLR'		    => array('prime'	=> 'idlr',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 17,
 							 	'classname'	=> 'Location'),
 		'tblMR'		    => array('prime'	=> 'idmr',
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 6,
 							 	'classname'	=> 'Family'),
 // Note that srvmg is generally true if the primary key is	        *
@@ -388,132 +411,123 @@ class Record implements Iterator, ArrayAccess
 // should not be, and the server is not permitted to manage		    *
 // this key by Record.												*
 		'tblNR'	    	=> array('prime'	=> 'idnr',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 5,
 							 	'classname'	=> 'Surname'),
 		'tblNX'		    => array('prime'	=> 'idnx',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 17,
 							 	'classname'	=> 'Name'),
 		'tblRM'		    => array('prime'	=> 'idrm',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 4,
 							 	'classname'	=> ''),
 		'tblSR'		    => array('prime'	=> 'idsr',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 4,
 							 	'classname'	=> 'Source'),
 		'tblSX'		    => array('prime'	=> 'idsx',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 4,
 							 	'classname'	=> 'Citation'),
 		'tblTC'		    => array('prime'	=> 'idtc',
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 5,
 							 	'classname'	=> ''), // part of ToDo
 		'tblTD'		    => array('prime'	=> 'idtd',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 20,
 							 	'classname'	=> 'ToDo'),
 		'tblTL'		    => array('prime'	=> 'idtl',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 5,
 							 	'classname'	=> ''),
 		'tblTR'		    => array('prime'	=> 'idtr',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 9,
 							 	'classname'	=> 'Temple'),
 		'tblXI'		    => array('prime'	=> 'deletedid',
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 1,
 							 	'classname'	=> ''),
 		'tblXM'		    => array('prime'	=> 'deletedid',
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 1,
 							 	'classname'	=> ''),
 		'RecOwners'	    => array('prime'	=> 'ro_index',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 5,
 							 	'classname'	=> 'RecOwner'),
 		'Users'		    => array('prime'	=> 'id',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 7,
 							 	'classname'	=> 'User'),
 		'MethodistBaptisms'=> array('prime'	=> 'idmb',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 7,
 							 	'classname'	=> 'MethodistBaptism'),
 		'Ocfa'          => array('prime'	=> 'RecordIndex',
-							 	'srvmg'	    => true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 8,
 							 	'classname'	=> 'Ocfa'),
-		'Blogs'		    => array('prime'	=> 'bl_index',
-							 	'srvmg'	=> true,
-							 	'fldcount'	=> 7,
-							 	'classname'	=> 'Blog'),
-		'Births'	    => array('prime'	=> array('b_regdomain','b_regyear','b_regnum'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 34,
-							 	'classname'	=> 'Birth'),
 		'Marriage'	    => array('prime'	=> array('m_regdomain','m_regyear','m_regnum'),
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 16,
 							 	'classname'	=> 'Marriage'),
 		'MarriageIndi'	=> array('prime'	=> array('m_regdomain','m_regyear','m_regnum','m_role'),
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 20,
 							 	'classname'	=> ''),
 		'CountyMarriageReports'	=> array('prime'=>  array('m_regdomain', 'm_volume', 'm_reportno'),
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 11,
 							 	'classname'	=> 'CountyMarriageReport'),
 		'CountyMarriages'=> array('prime'	=> array('m_regdomain', 'm_volume', 'm_reportno', 'm_itemno', 'm_role'),
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 11,
 							 	'classname'	=> 'CountyMarriage'),
 		'Deaths'	    => array('prime'	=> array('d_regdomain','d_regyear','d_regnum'),
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 48,
 							 	'classname'	=> 'Death'),
 		'Countries'	    => array('prime'	=> 'code',
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 4,
 							 	'classname'	=> 'Country'),
-		'CountryNames'	=> array('prime'	=> '',
-							 	'srvmg'	=> false,
+		'CountryNames'	=> array('prime'	=> array('code3166_1', 'code639_1'),
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 4,
 							 	'classname'	=> 'CountryName'),
 		'Domains'	    => array('prime'	=> array('domain','language'),
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 3,
 							 	'classname'	=> 'Domain'),
 		'Counties'	    => array('prime'	=> array('domain','code'),
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 5,
 							 	'classname'	=> 'County'),
 		'Languages'	    => array('prime'	=> 'code639_1',
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 4,
 							 	'classname'	=> 'Language'),
-		'Townships'	    => array('prime'	=> '',
-							 	'srvmg'	=> false,
+		'Townships'	    => array('prime'	=> array('domain','county','code'),
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 5,
 							 	'classname'	=> 'Township'),
-		'Concessions'	=> array('prime'	=> '',
-							 	'srvmg'	=> false,
+		'Concessions'	=> array('prime'	=> array('domain','county','township','conid'),
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 5,
 							 	'classname'	=> 'Concession'),
-		'Districts'	    => array('prime'	=> array('d_census',
-										 'd_id'),
-							 	'srvmg'	=> false,
+		'Districts'	    => array('prime'	=> array('d_census', 'd_id'),
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 5,
 							 	'classname'	=> 'District'),
 		'SubDistricts'	=> array('prime'	=> array('sd_census',
-										 'sd_distid',
-										 'sd_id',
-										 'sd_div',
-										 'sd_sched'),
-							 	'srvmg'	=> false,
+													 'sd_distid',
+													 'sd_id',
+													 'sd_div',
+													 'sd_sched'),
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 16,
 							 	'classname'	=> 'SubDistrict'),
 		'Pages'	    	=> array('prime'	=> array('pt_census',
@@ -521,109 +535,105 @@ class Record implements Iterator, ArrayAccess
 										 'pt_sdid',
 										 'pt_div',
 										 'pt_sched'),
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 10,
 							 	'classname'	=> 'Page'),
-		'Census1851'	=> array('prime'	=> array('province',
-										 'district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 7,
-							 	'classname'	=> 'CensusLine'),
-		'Census1861'	=> array('prime'	=> array('province',
-										 'district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 7,
-							 	'classname'	=> 'CensusLine'),
-		'Census1871'	=> array('prime'	=> array('district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 6,
-							 	'classname'	=> 'CensusLine'),
-		'Census1881'	=> array('prime'	=> array('district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 6,
-							 	'classname'	=> 'CensusLine'),
-		'Census1891'	=> array('prime'	=> array('district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 6,
-							 	'classname'	=> 'CensusLine'),
-		'Census1901'	=> array('prime'	=> array('district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 6,
-							 	'classname'	=> 'CensusLine'),
-		'Census1906'	=> array('prime'	=> array('district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 6,
-							 	'classname'	=> 'CensusLine'),
-		'Census1911'	=> array('prime'	=> array('district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 6,
-							 	'classname'	=> 'CensusLine'),
-		'Census1916'	=> array('prime'	=> array('district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 6,
-							 	'classname'	=> 'CensusLine'),
-		'Census1921'	=> array('prime'	=> array('district',
-										 'subdistrict',
-										 'division',
-										 'page',
-										 'line'),
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 6,
-							 	'classname'	=> 'CensusLine'),
-		'Censuses'	    => array('prime'	=> 'censusid',
-							 	'srvmg'	=> false,
-							 	'fldcount'	=> 6,
-							 	'classname'	=> 'Census'),
+//		'Census1851'	=> array('prime'	=> array('province',
+//										 'district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 7,
+//							 	'classname'	=> 'CensusLine'),
+//		'Census1861'	=> array('prime'	=> array('province',
+//										 'district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 7,
+//							 	'classname'	=> 'CensusLine'),
+//		'Census1871'	=> array('prime'	=> array('district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 6,
+//							 	'classname'	=> 'CensusLine'),
+//		'Census1881'	=> array('prime'	=> array('district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 6,
+//							 	'classname'	=> 'CensusLine'),
+//		'Census1891'	=> array('prime'	=> array('district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 6,
+//							 	'classname'	=> 'CensusLine'),
+//		'Census1901'	=> array('prime'	=> array('district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 6,
+//							 	'classname'	=> 'CensusLine'),
+//		'Census1906'	=> array('prime'	=> array('district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 6,
+//							 	'classname'	=> 'CensusLine'),
+//		'Census1911'	=> array('prime'	=> array('district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 6,
+//							 	'classname'	=> 'CensusLine'),
+//		'Census1916'	=> array('prime'	=> array('district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 6,
+//							 	'classname'	=> 'CensusLine'),
+//		'Census1921'	=> array('prime'	=> array('district',
+//										 'subdistrict',
+//										 'division',
+//										 'page',
+//										 'line'),
+//							 	'srvmg'     => false,
+//							 	'fldcount'	=> 6,
+//							 	'classname'	=> 'CensusLine'),
 		'FieldComments'	=> array('prime'	=> 'fc_index',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 12,
 							 	'classname'	=> 'FieldComment'),
 		'GraveStones'	=> array('prime'	=> 'gs_index',
-							 	'srvmg'	=> true,
+							 	'srvmg'     => true,
 							 	'fldcount'	=> 13,
 							 	'classname'	=> 'GraveStone'),
 		'Nicknames'	    => array('prime'	=> 'nickname',
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 3,
 							 	'classname'	=> 'Nickname'),
 		'Videos'	    => array('prime'	=> array('filename','lang'),
-							 	'srvmg'	=> false,
+							 	'srvmg'     => false,
 							 	'fldcount'	=> 3,
 							 	'classname'	=> ''));
 
@@ -639,7 +649,7 @@ class Record implements Iterator, ArrayAccess
      *	table.															*
      ********************************************************************/
     protected static $externalTableNames	= array(
-				'Addresses'	    	=> 'tblAR',
+				'Addresses'		    => 'tblAR',
 				'PictureBases'		=> 'tblBP',
 				'Pictures'		    => 'tblBR',
 				'ChildParentRels'	=> 'tblCP',
@@ -714,7 +724,7 @@ class Record implements Iterator, ArrayAccess
      *	            	an external synonym				                * 
      ********************************************************************/
     function __construct($dbrow,
-						 $table)
+						 $table = null)
     {
 		global	$debug;
 		global	$warn;
@@ -722,73 +732,84 @@ class Record implements Iterator, ArrayAccess
 		global	$connection;
 
 		if (is_null($connection))
-		{			// no database connection
+		{			        // no database connection
 		    throw new Exception(
 						"Record::__construct: no database server connection");
-		}			// no database connection
+		}			        // no database connection
 
-		// support external table name synonym
-		if (array_key_exists($table, self::$externalTableNames))
-		    $table		    = self::$externalTableNames[$table];
-
-		// validate the $table parameter
-		if (strlen($table) == 0 ||
-		    !array_key_exists($table, self::$primeKey))
-		{		        	// assume defaults
-		    self::$primeKey[$table]	= array('prime'		=> '',
-        									'srvmg'		=> false,
-        									'fldcount'	=> 3);
-		}			        // assume defaults
-
-		// initialize object
-		$this->table		= $table;
-		$this->prime		= self::$primeKey[$table]['prime'];
-		$fldcount		    = self::$primeKey[$table]['fldcount'];
-		$prime			    = $this->prime;
-        $this->changed		= array();
+        // validate the $table parameter
+        if (is_string($table) && strlen($table) > 0)
+        {                   // table name supplied
+	        $information        		= self::getInformation($table);
+	        if (is_null($information))
+			    throw new Exception(
+							"Record::__construct: no implementation for table '$table'");
+	
+            // initialize object
+            if (array_key_exists('table', $information))
+            {
+			    $this->table				= $information['table'];
+			    $this->prime				= $information['prime'];
+                $fldcount		    		= $information['fldcount'];
+            }
+            else
+                throw new Exception(
+							"Record::__construct: information not initialized for '$table', information=" . print_r($information, true));
+        }                   // table name supplied
+        else
+        {                   // create generic record
+			$this->table				= '';
+			$this->prime				= '';
+            $fldcount		    		= count($dbrow);
+            $this->row                  = $dbrow;
+        }                   // create generic record` 
+		$prime			    			= $this->prime;
+        $this->changed					= array();
         if (is_array($this->row))
-            return;         // already constructed
+            return;         // already constructed by derived class
 
 		// interpret first parameter
 		if (is_array($dbrow))
 		{			        // associative array
 		    if (count($dbrow) < $fldcount)
 		    {			    // key of record
-				$query		= "SELECT * FROM $table";
-				$parms		= array();
-				$and		= ' WHERE ';
-				foreach($dbrow as $fldname => $value)
-				{		// process each parameter
-				    $query	.= $and . $fldname . '=?';
-				    array_push($parms, $value);
-				    $and	= ' AND ';
+				$query		            	= "SELECT * FROM $table";
+				$sqlparms		        	= array();
+				$and		            	= ' WHERE ';
+				foreach($dbrow as $fldname 	=> $value)
+				{		    // process each parameter
+				    $fieldLc	   	    	= strtolower($fldname);
+				    $query	                .= "$and$fldname=:$fieldLc";
+				    $sqlparms[$fieldLc] 	= $value;
+				    $and	            	= ' AND ';
 				}		    // process each parameter
-				$stmt		= $connection->prepare($query);
-				$queryText	= debugPrepQuery($query, $parms);
-				if ($stmt->execute($parms))
+				$stmt		            	= $connection->prepare($query);
+				$queryText	            	= debugPrepQuery($query, $sqlparms);
+                $this->lastSqlCmd       	= $queryText;
+				if ($stmt->execute($sqlparms))
 				{		    // successful
 				    if ($debug)
-						$warn	.= "<p>Record::__construct: " . __LINE__ .
-								"'$queryText'</p>\n";
-				    $result	= $stmt->fetch(PDO::FETCH_ASSOC);
+                        $warn	            .= "<p>Record::__construct: " .
+                                                __LINE__ .
+						        		        "'$queryText'</p>\n";
+				    $result	                = $stmt->fetch(PDO::FETCH_ASSOC);
 				    if (is_array($result))
 				    {		// have row from DB
-						$this->row		        = $result;
-						$this->needInsert   	= false;
+						$this->row		    = $result;
+						$this->needInsert   = false;
 				    }		// have row from DB
 				    else
 				    {		// no existing record
 						if ($debug)
-						    $warn	.= "<p>Record::__construct: " .
-								    __LINE__ .
-								    " no existing record matches</p>\n";
-						$info			        = $this->getInfo();
-						$result			        = $info['initrow'];
+						    $warn	        .= "<p>Record::__construct: " .
+								                __LINE__ .
+								            " no existing record matches</p>\n";
+						$result		        = $information['initrow'];
 						foreach($dbrow as $fldname => $value)
-						{		// update row from parameters
+						{	// update row from parameters
 						    $fieldLc	    	= strtolower($fldname);
 						    $result[$fieldLc]	= $value;
-						}		// update row from parameters
+						}	// update row from parameters
 						$this->row		        = $result;
 						$this->needInsert	    = true;
 				    }		// no existing record
@@ -802,15 +823,15 @@ class Record implements Iterator, ArrayAccess
 		    }			// key of record
 		    else
 		    {			// full row from database
+				$this->row		            = $dbrow;
 				if (is_array($prime) || strlen($prime) == 0)
-				{		// no numeric key
-				    $this->row		            = $dbrow;
+                {		// no numeric key
+                    $this->needInsert       = false;
 				}		// no numeric key
 				else
 				if (array_key_exists($prime, $dbrow))
 				{		// element exists for primary key
-				    $this->needInsert	        = $dbrow[$prime] == 0;
-				    $this->row		            = $dbrow;
+				    $this->needInsert	    = $dbrow[$prime] == 0;
 				}		// element exists for primary key
 				else
 				    $this->msg  .= "Record::__construct: " .
@@ -820,7 +841,7 @@ class Record implements Iterator, ArrayAccess
 		else
 		    $this->msg  .= "Record::__construct: invalid parameter type " .
 						    gettype($dbrow) . ", value=" . $dbrow;
-    }		// __construct
+    }		// function Record::__construct
 
     /********************************************************************
      *	function Record::getId											*
@@ -880,6 +901,24 @@ class Record implements Iterator, ArrayAccess
     {
 		return $this->table;
     }		// function Record::getTableName
+
+    /********************************************************************
+     *  function Record::getLastSqlCmd									*
+     *																	*
+     *  Returns a string containing a representation of the last        *
+     *  SQL command issued by the class.                                *
+     *  After the constructor this is the SELECT command that was       *
+     *  issued to populate the instance, regardless of whether it       *
+     *  succeeded or not.                                               *
+     *  After calling method save this is the INSERT or UPDATE command  *
+     *  that was issued to update the database, if save returned 1.     *
+     *  After calling method delete this is the DELETE command that     *
+     *  was issued to update the database, if delete returned 1.        *
+     ********************************************************************/
+    function getLastSqlCmd()
+    {
+		return $this->lastSqlCmd;
+    }		// function Record::getLastSqlCmd
 
     /********************************************************************
      *	function Record::getName										*
@@ -1122,8 +1161,7 @@ class Record implements Iterator, ArrayAccess
 		    $srvmg	        = $information['srvmg'];
 		else
 		{
-		    print "<p>Record.inc: " . __LINE__ . " table='$table'</p>\n";
-		    $srvmg	= false;
+		    $srvmg	        = false;
 		    debug_print_backtrace();
             $this->msg      .= "Record::save: " . __LINE__ . 
                                " no description of table `$table` not defined";
@@ -1144,8 +1182,8 @@ class Record implements Iterator, ArrayAccess
 		    if ($debug)
 				$warn	.= "<p>Record::save: needInsert=true</p>\n";
 		    $fldnames	= '';
-		    $values	= '';
-		    $comma	= '';
+		    $values	    = '';
+		    $comma	    = '';
 		    if (is_null($this->row))
 		    {
 				$msg	.= "Record::save: insert with \$this->row null. ";
@@ -1153,33 +1191,45 @@ class Record implements Iterator, ArrayAccess
 		    }
 		    foreach($this->row as $fld => $value)
 		    {
-				if ($fld ==  'added')
+				if ($fld == 'added')
 				{	// date added
-				    $fldnames	.= "$comma`$fld`";
-				    $values	.= $comma . $today;
-				    $comma	= ', ';
+				    $fldnames	    .= "$comma`$fld`";
+				    $values	        .= "$comma:$fld";
+				    $parms[$fld]	= $today;
+				    $comma	        = ', ';
 				}	// date added
 				else
-				if ($fld ==  'addedtime')
+				if ($fld == 'addedtime')
 				{	// time added
-				    $fldnames	.= "$comma`$fld`";
-				    $values	.= "$comma'$currtime'";
-				    $comma	= ', ';
+				    $fldnames	    .= "$comma`$fld`";
+				    $values	        .= "$comma:$fld";
+				    $parms[$fld]	= $currtime;
+				    $comma	        = ', ';
 				}	// time added
 				else
-				if ($fld ==  'updated')
+				if ($fld == 'updated')
 				{	// date updated
-				    $fldnames	.= "$comma`$fld`";
-				    $values	.= $comma . $today;
-				    $comma	= ', ';
+				    $fldnames	    .= "$comma`$fld`";
+				    $values	        .= "$comma:$fld";
+				    $parms[$fld]	= $today;
+				    $comma	        = ', ';
 				}	// date updated
 				else
-				if ($fld ==  'updatedtime')
+				if ($fld == 'updatedtime')
 				{	// time updated
-				    $fldnames	.= "$comma`$fld`";
-				    $values	.= "$comma'$currtime'";
-				    $comma	= ', ';
+				    $fldnames	    .= "$comma`$fld`";
+				    $values	        .= "$comma:$fld";
+				    $parms[$fld]	= $currtime;
+				    $comma	        = ', ';
 				}	// time updated
+				else
+				if (substr($fld,-7) == 'soundex')
+				{	// soundex updated
+				    $fldnames	    .= "$comma`$fld`";
+                    $values	        .= $comma .  "LEFT(SOUNDEX(:" .
+                                       substr($fld,0,strlen($fld)-7) . "),4)";
+				    $comma	        = ', ';
+				}	// soundex updated
 				else
 				if (($fld == 'id' ||
 				    (is_string($prime) && $fld == $prime && $srvmg)) &&
@@ -1189,18 +1239,20 @@ class Record implements Iterator, ArrayAccess
 				else
 				{	// other fields
 				    $fldnames		.= "$comma`$fld`";
-				    $values		.= $comma . ':' . $fld;
+				    $values		    .= "$comma:$fld";
 				    $parms[$fld]	= $value;
-				    $comma		= ', ';
+				    $comma		    = ', ';
 				}	// other fields
 		    }		// loop through all fields in record
 
-		    $insert	= "INSERT INTO $table ($fldnames) VALUES($values)";
-		    $stmt	= $connection->prepare($insert);
-		    $insertText	= debugPrepQuery($insert, $parms);
+            $insert	            = "INSERT INTO $table ($fldnames) " . 
+                                    "VALUES($values)";
+		    $stmt	            = $connection->prepare($insert);
+            $insertText	        = debugPrepQuery($insert, $parms);
+            $this->lastSqlCmd   = $insertText;
 		    if ($stmt->execute($parms))
 		    {		// successful
-				$count		= $stmt->rowCount();
+				$count		    = $stmt->rowCount();
 				if ($xml)
 				{		// XML output
 				    print "<$tagname count='$count'>" . $insertText .
@@ -1208,8 +1260,7 @@ class Record implements Iterator, ArrayAccess
 				}		// XML output
 
 				if ($debug)
-				    $warn	.= "<p>" . $insertText .
-							   "</p>\n";
+				    $warn	    .= "<p>$insertText</p>\n";
 				$this->needInsert	= false;
 
 				// if the record has an auto increment primary key then the
@@ -1259,19 +1310,33 @@ class Record implements Iterator, ArrayAccess
 				}	// time added cannot change
 				if ($fld ==  'updated')
 				{	// date updated
-				    $set	.= $comma . "`$fld`=DATE_FORMAT(CURDATE(),'%Y%m%d')";
-				    $comma		= ', ';
+                    $set	        .= $comma . 
+                                "`$fld`=DATE_FORMAT(CURDATE(),'%Y%m%d')";
+				    $comma		    = ', ';
 				}	// date updated
 				if ($fld ==  'updatedtime')
 				{	// time updated
-				    $set		.= $comma . "`$fld`=CURTIME()";
-				    $comma		= ', ';
+				    $set		    .= $comma . "`$fld`=CURTIME()";
+				    $comma		    = ', ';
 				}	// time updated
 				else
-				{	// other fields
-				    $set		.= $comma . "`$fld`=:$fld";
+				if (substr($fld, -7) == 'surname')
+				{	// surname updated
+				    $set		    .= $comma . "`$fld`=:$fld";
 				    $parms[$fld]	= $value;
-				    $comma		= ', ';
+				    $comma		    = ', ';
+                    $set		    .= $comma .
+                                   "`{$fld}soundex`=LEFT(SOUNDEX(:$fld), 4)";
+				}	// surname updated
+				else
+				if (substr($fld, -7) == 'soundex')
+				{	// soundex updated as part of surname change
+				}	// soundex updated as part of surname change
+				else
+				{	// other fields
+				    $set		    .= $comma . "`$fld`=:$fld";
+				    $parms[$fld]	= $value;
+				    $comma		    = ', ';
 				}	// other fields
 		    }		// loop through all modified fields in record
 
@@ -1304,11 +1369,12 @@ class Record implements Iterator, ArrayAccess
 				    $parms['prime']	= $key;
 				}		// primary key is single field
 
-				$stmt		= $connection->prepare($update);
-				$updateText	= debugPrepQuery($update, $parms);
+				$stmt		        = $connection->prepare($update);
+				$updateText	        = debugPrepQuery($update, $parms);
+                $this->lastSqlCmd   = $updateText;
 				if ($stmt->execute($parms))
 				{		// successful update
-				    $count	= $stmt->rowCount();	// changed rows
+				    $count	        = $stmt->rowCount();	// changed rows
 				    if ($xml)
 				    {
 						print "<$tagname result='$count'>" .
@@ -1317,14 +1383,14 @@ class Record implements Iterator, ArrayAccess
 				    }
 
 				    if ($debug)
-						$warn	.= "<p>" . $updateText . "</p>\n";
+						$warn	    .= "<p>" . $updateText . "</p>\n";
 
 				    // log the update
 				    logSqlUpdate($update,
-							 $parms,
-							 $key,
-							 json_encode($this->former),
-							 $this->toJson(false));
+								 $parms,
+								 $key,
+								 json_encode($this->former),
+								 $this->toJson(false));
 				}		// successful update
 				else
 				{		// error updating record
@@ -1393,25 +1459,25 @@ class Record implements Iterator, ArrayAccess
 		}
 
 		// to simplify expressions
-		$table	= $this->table;		// name of table
-		$prime	= $this->prime;		// name of primary key
+		$table	                = $this->table;		// name of table
+		$prime	                = $this->prime;		// name of primary key
 		if (!$this->needInsert)
 		{			// existing record
 		    if (is_array($prime))
 		    {
-				$delete		= "DELETE FROM $table";
-				$key		= 0;
-				$and		= ' WHERE ';
-				$sqlParms	= array();
+				$delete		    = "DELETE FROM $table";
+				$key		    = 0;
+				$and		    = ' WHERE ';
+				$sqlParms	    = array();
 				foreach($prime as $fldname)
 				{		// loop through components of key
 				    if ($this->former)
 						$value	= $this->former[$fldname];
 				    else
 						$value	= $this->row[$fldname];
-				    $delete	.= $and . $fldname . '=:o' . $fldname;
+				    $delete	    .= $and . $fldname . '=:o' . $fldname;
 				    $sqlParms['o' . $fldname]	= $value;
-				    $and	= ' AND ';
+				    $and	    = ' AND ';
 				}		// loop through components of key
 		    }
 		    else
@@ -1419,21 +1485,22 @@ class Record implements Iterator, ArrayAccess
 				$this->row[$prime] > 0)
 		    {
 				if ($this->former)
-				    $key	= $this->former[$prime];
+				    $key	    = $this->former[$prime];
 				else
-				    $key	= $this->row[$prime];
+				    $key	    = $this->row[$prime];
 
-				$delete		= "DELETE FROM $table WHERE $prime=:key";
-				$sqlParms	= array('key'	=> $key);
+				$delete		    = "DELETE FROM $table WHERE $prime=:key";
+				$sqlParms	    = array('key'	=> $key);
 		    }			// single key field
 		    else
 				return 0;	// nothing to delete
 
-		    $stmt	= $connection->prepare($delete);
-		    $deleteText	= debugPrepQuery($delete, $sqlParms);
+		    $stmt	            = $connection->prepare($delete);
+		    $deleteText	        = debugPrepQuery($delete, $sqlParms);
+            $this->lastSqlCmd   = $deleteText;
 		    if ($stmt->execute($sqlParms))
 		    {			// successful delete
-				$count	= $stmt->rowCount();	// changed rows
+				$count	        = $stmt->rowCount();	// changed rows
 				if ($xml)
 				    print "<$xmltag count='$count'>$deleteText</$xmltag>\n";
 				if ($debug)
@@ -2005,33 +2072,56 @@ class Record implements Iterator, ArrayAccess
     /********************************************************************
      *	static function Record::getInformation							*
      *																	*
-     *	Staic function to get information about a supported table.		*
+     *	Static function to get information about a supported table.		*
+     *	This is the recommended way to determine whether or not a       *
+     *	table is supported.                                             *
      *																	*
      *	Parameters:														*
-     *	    The name of the table as a string.  This may be a synonym	*
-     *	    as defined in Record::$externalTableNames.					*
+     *	    The name of the table as a string.  This should be the      *
+     *	    external table name as defined in                           *
+     *	    Record::$externalTableNames or the class-specific static    *
+     *	    attribute $info, but internal table names are supported.    *
+     *	    For example Record::getInformation('Citations') works       *
+     *	    because it looks in class Citation, derived from the        *
+     *	    singular form of the table name.                            *
      *																	*
      *	Returns:														*
-     *	    An associative array of named attributes:					*
-     *	'table'			SQL table name									*
-     *	'name'			external name of the table shown to users		*
-     *  'prime'			The primary key name for the table.				*
-     *					The key names are in lower case so they will	*
-     *					match the field name in the query response.		*
-     *	'srvmg'			true if the setting of the primary key is		*
-     *					managed by the database server for new records,	*
-     *					and false if it is managed by the application.	*
-     *	'fldcount'		not currently used								*
-     *	'order'			default order for operations on this table		*
-     *	'classname'		name of the class that implements the interface	*
-     *					to this table									*
-     *	'initrow'		default initial row.  This provides information	*
-     *					on the fields in the table						*
-     *	'maxsetsize'    the maximum size of a RecordSet for this table  *       
+     *	    An associative array of named attributes or null if the     *
+     *	    specified table is not supported.                           *
+     *			'table'			SQL internal table name					*
+     *			'name'			external name of the table as shown     *
+     *			                to users		                        *
+     *  		'prime'			The primary key name for the table.		*
+     *  		                This is a string or an array of strings *
+     *					        The key names are in lower case so they *
+     *					        will match the field names in the       *
+     *					        query response.		                    *
+     *			'srvmg'			true if the setting of the primary key	*
+     *					        is managed by the database server for   *
+     *					        new records, and false if it is managed *
+     *					        by the application.	                    *
+     *			'fldcount'		not currently used						*
+     *			'order'			default order for sorting records       *
+     *			                from this table in class RecordSet      *
+     *			'classname'		the namespace-qualified name of the     *
+     *			                class that implements the interface     *
+     *			                to this table.				            *
+     *			'initrow'		default initial row.  This provides     *
+     *			                information	on the fields in the table	*
+     *			'maxsetsize'    the maximum size of a RecordSet for     *
+     *			                this table                              *       
      ********************************************************************/
     public static function getInformation($tableName)
     {
 		global	$connection;
+		global	$dsn;
+		global	$debug;
+		global	$warn;
+
+        if ($tableName == '')
+            return null;
+
+        $namespace                  = __NAMESPACE__;
 
 		if (array_key_exists($tableName, self::$externalTableNames))
 		{
@@ -2045,50 +2135,194 @@ class Record implements Iterator, ArrayAccess
 				$externalName	    = self::$internalTableNames[$table];
 		    else
 				$externalName	    = $table;
-		}
+        }
 
-		// get information about the selected table
+        // get information about the selected table
+        $information                = array();
+
 		if (array_key_exists($table, self::$primeKey))
-		{
-		    $information		    = self::$primeKey[$table];
-		    $information['table']	= $table;
-		    $information['name']	= $externalName;
-		    $information['order']	= $information['prime'];
+		{                   // class description in base class
+            $information		    = self::$primeKey[$table];
 		    $className			    = $information['classname'];
 		    if ($className == '')
 		    {
 				$className			= 'Record';
 				$information['classname']	= 'Record';
-		    }
-            $nsclass	            = __NAMESPACE__ . "\\" . $className;
-            if (!class_exists($nsclass))
-            {
-                include __NAMESPACE__ . "/" . $className . ".inc";
             }
-		    $order			        = $nsclass::$defaultOrder;
-		    if (strlen($order) > 0)
-                $information['order']	= $order;
+
+            // get fully qualified class name
+            $rresult                = preg_match('#^\\?(\w\+)\\(\w+)$#',
+                                                 $className,
+                                                 $matches);
+            if ($rresult)
+            {
+                $namespace          = $matches[1];
+                $className          = $matches[2];
+                $nsclass            = "$namespace\\$className";
+            }
+            else
+                $nsclass	        = __NAMESPACE__ . "\\$className";
+
+	        if (!class_exists($nsclass))
+	        {                   // ensure the class is loaded
+	            $incname        = __NAMESPACE__ . "/$className.inc";
+	            $filepath       = stream_resolve_include_path($incname);
+	            if ($filepath && file_exists($filepath))
+	                include $incname;
+	            else
+	            {
+	                throw new Exception("unable to load class $nsclass");
+	            }
+	        }                   // ensure the class is loaded
+	
+            $order			        = $nsclass::$defaultOrder;
+            if ($order != '')
+                $information['order']   = $order;
+            else
+            if (is_array($information['prime']))
+		        $information['order']   = implode(',',$information['prime']);
+            else
+		        $information['order']   = $information['prime'];
+        }                   // class description in base class
+        else
+        {                   // use external name to locate class
+            if (substr($externalName, -3) == 'ies')
+                $className          = substr($externalName, 0, strlen($externalName) - 3) . 'y';
+            else
+            if (substr($externalName, -4) == 'sses' ||
+                substr($externalName, -4) == 'uses')
+                $className          = substr($externalName, 0, strlen($externalName) - 2);
+            else
+            if (substr($externalName, -1) == 's')
+                $className          = substr($externalName, 0, strlen($externalName) - 1);
+            else
+            if (substr($externalName, -3) == 'ren')
+                $className          = substr($externalName, 0, strlen($externalName) - 3);
+            else
+                $className          = $externalName;
+
+            $nsclass	            = __NAMESPACE__ . "\\" . $className;
+        }                   // use table name to locate class
+
+        if (!class_exists($nsclass))
+        {                   // ensure the class is loaded
+            $incname                = __NAMESPACE__ . "/$className.inc";
+            $filepath               = stream_resolve_include_path($incname);
+            if ($filepath && file_exists($filepath))
+                include $incname;
+            else
+            {
+                return null;// unable to load class
+            }
+        }                   // ensure the class is loaded
+
+        if ($className != 'Record' && class_exists($nsclass))
+        {                   // prefer to get description from class itself
+            $tinfo                  = $nsclass::$info;
+            if (count($tinfo) > 0)
+            {               // static $info is overloaded
+                if (!array_key_exists('initrow', $tinfo))
+                    $tinfo['initrow']   = $nsclass::$initRow;
+                if (!array_key_exists('order', $tinfo))
+                    $tinfo['order']     = $nsclass::$defaultOrder;
+                $tinfo['classname']     = $nsclass;
+                return $tinfo;
+            }               // static $info is overloaded
+            else
+            if ($dsn['phptype'] == 'mysql')
+            {               // query MySQL for info
+                $tinfo['table']         = $table;
+                $tinfo['name']          = $externalName;
+                $tinfo['srvmg']         = false;
+                $tinfo['classname']     = $className;
+                $query  = "SHOW KEYS FROM `$table` WHERE Key_name='PRIMARY'";
+                $stmt                   = $connection->query($query);
+                if ($stmt)
+                {
+                    $prime              = array();
+                    $orderby            = '';
+                    $comma              = '';
+                    foreach($stmt as $row)
+                    {
+                        $prime[]        = strtolower($row['column_name']);
+                        $orderby        .= $comma . $row['column_name'];
+                        $comma          = ',';
+                    }
+                    if (count($prime) == 1)
+                    {
+                        $prime              = $prime[0];
+                        $tinfo['fldcount']  = 1;
+                    }
+                    else
+                        $tinfo['fldcount']  = count($prime);
+                    $tinfo['prime']     = $prime;
+                    if (strlen($orderby) == 4 && 
+                        strtoupper(substr($orderby, 0, 2)) == 'ID')
+                        $tinfo['srvmg'] = true;
+                    $tinfo['order']     = $orderby;
+                    if (!array_key_exists('initrow', $tinfo))
+                    {
+                        if (count($nsclass::$initRow) > 1)
+                        {
+                            $tinfo['initrow']   = $nsclass::$initRow;
+                            $tinfo['fldcount']  = count($nsclass::$initRow);
+                        }
+                        else
+                        {   // get the very first record in the table
+							$query		    = "SELECT * FROM $table LIMIT 1";
+							$stmt		    = $connection->query($query);
+							if ($stmt)
+							    $row	    = $stmt->fetch(PDO::FETCH_ASSOC);
+                            if (is_array($row))
+                            {
+							    $initrow	        = $row;
+                                $tinfo['initrow']   = $initrow;
+                                $tinfo['fldcount']  = count($initrow);
+                            }
+                            else
+                                $tinfo['initrow']   = array();
+                        }   // get the very first record in the table
+                    }
+                    $tinfo['classname']     = $nsclass;
+                    return $tinfo;
+                }
+            }               // query MySQL for info
+		    $information['classname']   = $className		;
+        }                   // prefer to get description from class itself
+
+        if (count($information) > 1)
+        {                   // have basic description
+		    $information['table']   	= $table;
+            $information['name']    	= $externalName;
+            if (!array_key_exists('order', $information) ||
+                $information['order'] == $information['prime'])
+            {
+		        $order			        = $nsclass::$defaultOrder;
+		        if (strlen($order) > 0)
+                    $information['order']= $order;
+            }
 
             // get contents of default initial row
 		    if ($className == 'CensusLine')
-				$initrow		    = CensusLine::getInitRow($table);
+				$initrow		        = CensusLine::getInitRow($table);
 		    else
-				$initrow		    = $nsclass::$initRow;
+				$initrow		        = $nsclass::$initRow;
 		    if (count($initrow) == 0)
-		    {			// no class specific init row
+		    {			    // no class specific init row
 				// get the very first record in the table
-				$query		        = 'SELECT * FROM ' . $table . ' LIMIT 1';
-				$stmt		        = $connection->query($query);
+				$query		            = "SELECT * FROM $table LIMIT 1";
+				$stmt		            = $connection->query($query);
 				if ($stmt)
-				    $row	        = $stmt->fetch(PDO::FETCH_ASSOC);
+				    $row	            = $stmt->fetch(PDO::FETCH_ASSOC);
 				if (is_array($row))
-				    $initrow	    = $row;
-		    }			// no class specific init row
-            $information['initrow']	= $initrow;
+				    $initrow	        = $row;
+		    }			    // no class specific init row
+            $information['initrow']	    = $initrow;
 
             $information['maxsetsize']  = 1000;
+            $tinfo['classname']         = $nsclass;
 		    return $information;
-		}
+		}                   // have basic description
 		else
 		    return null;	// unsupported table
     }		// public static function getInformation
@@ -2123,7 +2357,18 @@ class Record implements Iterator, ArrayAccess
      ********************************************************************/
     public function getInfo()
     {
-		return self::getInformation($this->table);
+        if (count(static::$info) > 0)
+        {
+            $tinfo          = static::$info;
+            if (count($tinfo) > 0)
+            {
+                if (!array_key_exists('initrow', $tinfo))
+                    $tinfo['initrow']   = static::$initRow;
+            }
+            return $tinfo;
+        }
+        else
+            return self::getInformation($this->table);
     }       //function Record::getInfo
 
     /********************************************************************

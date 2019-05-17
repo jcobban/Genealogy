@@ -70,11 +70,11 @@
   	    <u>A</u>dd a New Address
   	</button>
     </p>
-  <div class="center">
-    <div class="left" id="prevPage">
+  <div class="center" id="topBrowse">
+    <div class="left" id="topPrev">
       <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$prevoffset&lang=$LANG">&lt;---</a>
     </div>
-    <div class="right" id="nextPage"> 
+    <div class="right" id="topNext"> 
       <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$nextoffset&lang=$LANG">---&gt;</a>
     </div>
     <span id="summary">
@@ -83,7 +83,7 @@
     <div style="clear: both;"></div>
   </div>
   <!--- Put out the response as a table -->
-  <table class="details" id="addressesTable">
+  <table class="details" id="dataTable">
     <!--- Put out the column headers -->
     <thead>
       <tr>
@@ -193,7 +193,6 @@
 	Note that although the table row is removed from visibility, 
 	the record is not deleted until you click on the Search button.
   </div>
-    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
     <script src="/jscripts/js20/http.js" type="text/javascript"></script>
     <script src="/jscripts/util.js" type="text/javascript"></script>
     <script src="/jscripts/CommonForm.js" type="text/javascript"></script>

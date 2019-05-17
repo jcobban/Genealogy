@@ -173,28 +173,28 @@ class MarriageSet extends RecordSet
 		    {                   // act on specific field names
 				case 'regyear':
 				{		        // numeric field
-				    $where		    .= "$and Marriage.M_RegYear=? ";
+				    $where		        .= "$and Marriage.M_RegYear=? ";
 				    $this->sqlParms[]	= $value;
-				    $and		    = 'AND';
-				    $regYear		= $value;
+				    $and		        = 'AND';
+				    $regYear	    	= $value;
 				    break;
 				}		        // RegYear
 
 				case 'regnum':
 				{		        // RegNum
-				    $regNum		= $value;
-				    $lastRegNum		= $regNum + $count;
+				    $regNum		        = $value;
+				    $lastRegNum	    	= $regNum + $count;
 				    if (is_null($regYear))
 				    {
-						$warn		.= '<p>MarriageSet::getWhere: ' .
-									    __LINE__ . 
+						$warn	    	.= '<p>MarriageSet::getWhere: ' .
+								    	    __LINE__ . 
 		'Registration Number may only be specified with Registration Year.</p>';
 				    }
 				    else
 				    {
-						$where			.= "$and Marriage.M_RegNum>=? ";
+						$where			    .= "$and Marriage.M_RegNum>=? ";
 						$this->sqlParms[]	= $value;
-						$and			= 'AND';
+						$and		    	= 'AND';
 						if ($expand)
 						{
 						    if ($regYear <= 1872 && $regNum > 10000)
@@ -235,21 +235,21 @@ class MarriageSet extends RecordSet
 				    else
 				    if (array_key_exists("SurnameSoundex", $this->parms))
 				    {		        // match soundex
-						$or			= '';
-						$where		.= "$and (";
+						$or			    = '';
+						$where		    .= "$and (";
 						if ($selroles & 1)
 						{
-						    $where	.= "Groom.M_SurnameSoundex=LEFT(SOUNDEX(?),4) ";
+						    $where	    .= "Groom.M_SurnameSoundex=LEFT(SOUNDEX(?),4) ";
 						    $this->sqlParms[]	= $value;
 						}
 						if ($selroles & 2)
 						{
-						    $where	.= "$or Bride.M_SurnameSoundex=LEFT(SOUNDEX(?),4) ";
+						    $where	    .= "$or Bride.M_SurnameSoundex=LEFT(SOUNDEX(?),4) ";
 						    $this->sqlParms[]	= $value;
 						}
 						if ($selroles & 4)
 						{
-						    $where	.= "$or Minister.M_SurnameSoundex=LEFT(SOUNDEX(?),4) ";
+						    $where	    .= "$or Minister.M_SurnameSoundex=LEFT(SOUNDEX(?),4) ";
 						    $this->sqlParms[]	= $value;
 						}
 						    $or		    = 'OR';

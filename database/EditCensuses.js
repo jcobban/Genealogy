@@ -93,8 +93,8 @@ function onLoad()
     }			    // loop through all forms
 
     // enable support for hiding and revealing columns
-    var dataTbl		            = document.getElementById("dataTbl");
-    var tblHdr		            = dataTbl.tHead;
+    var dataTable		        = document.getElementById("dataTable");
+    var tblHdr		            = dataTable.tHead;
     var tblHdrRow	            = tblHdr.rows[0];
     for(i = 0; i < tblHdrRow.cells.length; i++)
     {		// loop through all cells of header row
@@ -103,19 +103,6 @@ function onLoad()
 		th.oncontextmenu	    = columnWiden;	// right button click
     }		// loop through all cells of header row
 
-
-    var dataTable               = document.getElementById('dataTbl');
-
-    var dataTable               = document.getElementById('dataTbl');
-    var dataWidth               = dataTable.offsetWidth;
-    var windowWidth             = document.body.clientWidth - 8;
-    if (dataWidth > windowWidth)
-        dataWidth               = windowWidth;
-    var topBrowse               = document.getElementById('topBrowse');
-    topBrowse.style.width       = dataWidth + "px";
-    var botBrowse               = document.getElementById('botBrowse');
-    if (botBrowse)
-        botBrowse.style.width   = dataWidth + "px";
 }		// function onLoad
 
 /************************************************************************
@@ -169,7 +156,7 @@ function deleteCensus()
  ************************************************************************/
 function addCensus()
 {
-    var	table		= document.getElementById('dataTbl');
+    var	table		= document.getElementById('dataTable');
     var	body		= table.tBodies[0];
     var	newRow		= body.rows[0].cloneNode(true);
     var inputs		= newRow.getElementsByTagName('input');

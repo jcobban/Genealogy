@@ -5,8 +5,9 @@
  *																		*
  *  History:															*
  *		2018/02/02		created											*
+ *      2019/04/11      add send email to pending users                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
     <a href="/genealogy.php?lang=$LANG">
@@ -61,26 +62,32 @@
 		Search
       </button>
     &nbsp;
-      <a href="mailto:?to=$TOLIST&bcc=$BCCLIST&subject=[JamesCobban.net]%20General%20Notice" 
+      <a href="mailto:?to=$TOLIST&amp;bcc=$BCCLIST&amp;subject=[JamesCobban.net]%20General%20Notice" T
 		    class="buttonText" id="bulkMail">
-		Send Bulk Mail
+		Send Mail to all Users
+      </a>
+    &nbsp;
+      <a href="mailto:?to=$TOLIST&amp;bcc=$PENDLIST&amp;subject=[JamesCobban.net]%20General%20Notice" 
+	    class="buttonText" id="bulkMail">
+	    Send Mail to all Pending Users
       </a>
     </p>
-  <div class="center">
-    <div class="left" id="prevLink">
-		<a href="/Users.php?pattern=$pattern&amp;authpattern=$authpattern&amp;mailpattern=$mailpattern&amp;limit=$limit&amp;offset=$prevoffset">&lt;---
-		</a>
-    </div>
-    <div class="right" id="nextLink"> 
-		<a href="/Users.php?pattern=$pattern&amp;authpattern=$authpattern&amp;mailpattern=$mailpattern&amp;limit=$limit&amp;offset=$nextoffset">
-		---&gt;
-		</a>
-    </div>
-    rows $OFFSET to $LAST of $COUNT
-    <div style="clear: both;"></div>
-  </div>
+      <div class="center" id="topBrowse">
+        <span class="left" id="topPrev">
+		  <a href="/Users.php?pattern=$pattern&amp;authpattern=$authpattern&amp;mailpattern=$mailpattern&amp;limit=$limit&amp;offset=$prevoffset">
+            &lt;---
+          </a>
+        </span>
+        <span class="right" id="topNext">
+		  <a href="/Users.php?pattern=$pattern&amp;authpattern=$authpattern&amp;mailpattern=$mailpattern&amp;limit=$limit&amp;offset=$nextoffset">
+		    ---&gt;
+		  </a>
+        </span>
+        rows $OFFSET to $LAST of $COUNT
+        <div style="clear: both;"></div>
+      </div>
     <!--- Put out the response as a table -->
-    <table class="details">
+    <table class="details" id="dataTable">
     <!--- Put out the column headers -->
       <thead>
 		<tr>
@@ -126,7 +133,7 @@
 			</button>
 		  </td>
 		  <td class="$rowtype left">
-			<button type="button" id="confirm$id">
+			<button type="button" id="confirm$id" $disabled>
 		    	Confirm
 			</button>
  	  </td>

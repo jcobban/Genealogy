@@ -574,16 +574,16 @@ if (strlen($msg) == 0)
 			$nextText	= $reportNoText . '-' . ($itemNo + 1);
 	    }
 ?>
-  <div class="center">
-  <div class="left">
-	<a href="CountyMarriagesEdit.php?<?php print $prevUri; ?>" id="toPrevReport">
+  <div class="center" id="topBrowse">
+    <div class="left" id="topPrev">
+	  <a href="CountyMarriagesEdit.php?<?php print $prevUri; ?>" id="toPrevReport">
 	    &lt;--- <?php print $prevText; ?> 
-	</a>
-  </div>
-  <div class="right">
-	<a href="CountyMarriagesEdit.php?<?php print $nextUri; ?>" id="toNextYear">
+	  </a>
+    </div>
+    <div class="right" id="topNext">
+	  <a href="CountyMarriagesEdit.php?<?php print $nextUri; ?>" id="toNextYear">
 	    <?php print $nextText; ?> ---&gt;
-	</a>
+	  </a>
   </div>
 <?php
 	    if ($showReport)
@@ -654,7 +654,7 @@ if (strlen($msg) == 0)
 	if (count($reports) > 0)
 	{		// some rows to display
 ?>
-  <table class="form" id="dataTbl">
+  <table class="form" id="dataTable">
 <!--- Put out the column headers -->
 <thead>
   <tr id="hdrRow">

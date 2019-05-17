@@ -12,7 +12,8 @@
  **********************************************************************-->
   <div class="hidden">
     <div id="Months">
-      <span>Jan</span>
+      <span></span>    <!--  0 -->
+      <span>Jan</span> <!--  1 -->
       <span>Feb</span>
       <span>Mar</span>
       <span>Apr</span>
@@ -26,7 +27,8 @@
       <span>Dez</span>
     </div>
     <div id="LMonths">
-      <span>Januar</span>
+      <span></span>         <!--  0 -->
+      <span>Januar</span>   <!--  1 -->
       <span>Februar</span>
       <span>Marz</span>
       <span>April</span>
@@ -42,41 +44,41 @@
     <!-- general I18N translate table -->
     <div id="tranTab">
       <span data-key=""></span>
-      <span data-key="a[fem]">a</span>
-      <span data-key="a[masc]">a</span>
-      <span data-key="about">about</span>
-      <span data-key="AD">AD</span>
+      <span data-key="a[fem]">eine</span>
+      <span data-key="a[masc]">einen</span>
+      <span data-key="about">um</span>
+      <span data-key="AD">nach Christus</span>
       <span data-key="adopted">adopted</span>
-      <span data-key="after">after</span>
-      <span data-key="an unknown person">an unknown person</span>
-      <span data-key="and">and</span>
+      <span data-key="after">nach dem</span>
+      <span data-key="an unknown person">eine unbekannte Person</span>
+      <span data-key="and">und</span>
       <span data-key="Apr">Apr</span>
       <span data-key="April">April</span>
-      <span data-key="at">at</span>
+      <span data-key="at">in</span>
       <span data-key="Aug">Aug</span>
       <span data-key="August">August</span>
       <span data-key="Banns">Banns</span>
-      <span data-key="BC">BC</span>
-      <span data-key="BCE">BCE</span>
-      <span data-key="before 1970">before 1970</span>
-      <span data-key="before">before</span>
-      <span data-key="between">between</span>
+      <span data-key="BC">v</span>
+      <span data-key="BCE">VGÄ</span>
+      <span data-key="before 1970">vor 1970</span>
+      <span data-key="before">vor</span>
+      <span data-key="between">zwischen</span>
       <span data-key="bic">bic</span>
       <span data-key="biological">biological</span>
-      <span data-key="brother">brother</span>
-      <span data-key="calculated as">calculated as</span>
-      <span data-key="Cancelled">Cancelled</span>
-      <span data-key="CE">CE</span>
+      <span data-key="brother">Bruder</span>
+      <span data-key="calculated as">berechnet als</span>
+      <span data-key="Cancelled">abgebrochen</span>
+      <span data-key="CE">GÄ</span>
       <span data-key="challenged">challenged</span>
-      <span data-key="Child">Child</span>
-      <span data-key="child">child</span>
-      <span data-key="Children of">Children of</span>
-      <span data-key="circa">circa</span>
+      <span data-key="Child">Kind</span>
+      <span data-key="child">Kind</span>
+      <span data-key="Children of">Kinder von</span>
+      <span data-key="circa">zirka</span>
       <span data-key="cleared">cleared</span>
       <span data-key="Completed">Completed</span>
-      <span data-key="daughter">daughter</span>
+      <span data-key="daughter">tochter</span>
       <span data-key="Dec">Dec</span>
-      <span data-key="Deceased">Deceased</span>
+      <span data-key="Deceased">Verstorben</span>
       <span data-key="December">Dezember</span>
       <span data-key="Did not say">Did not say</span>
       <span data-key="Display">Anzeigen</span>
@@ -97,14 +99,14 @@
       <span data-key="had some other relationship with">had some other relationship with</span>
       <span data-key="had a relationship with">had a relationship with</span>
       <span data-key="has no recorded parents">has no recorded parents</span>
-      <span data-key="He">He</span>
-      <span data-key="He/She">He/She</span>
-      <span data-key="Illegitimate">Illegitimate</span>
-      <span data-key="illegitimate">illegitimate</span>
-      <span data-key="in Q">in Q</span>
-      <span data-key="in">in</span>
-      <span data-key="in[masc]">in[masc]</span>
-      <span data-key="Infant">Infant</span>
+      <span data-key="He">Er</span>
+      <span data-key="He/She">Er/Sie</span>
+      <span data-key="Illegitimate">Illegitim</span>
+      <span data-key="illegitimate">illegitim</span>
+      <span data-key="in Q">im Q</span>
+      <span data-key="in">im</span>
+      <span data-key="in[masc]">im</span>
+      <span data-key="Infant">Säugling</span>
       <span data-key="Jan">Jan</span>
       <span data-key="January">Januar</span>
       <span data-key="Jul">Jul</span>
@@ -115,51 +117,52 @@
       <span data-key="male">male</span>
       <span data-key="Mar">Mar</span>
       <span data-key="March">Marz</span>
-      <span data-key="married">married</span>
+      <span data-key="married">verheiratet</span>
       <span data-key="May">Mai</span>
-      <span data-key="Never married">Never married</span>
+      <span data-key="Never married">nie verheiratet</span>
       <span data-key="None">None</span>
-      <span data-key="Not married">Not married</span>
+      <span data-key="Not married">nicht verheiratet</span>
       <span data-key="Nov">Nov</span>
       <span data-key="November">November</span>
       <span data-key="Oct">Oct</span>
       <span data-key="October">Oktober</span>
-      <span data-key="of">of</span>
-      <span data-key="on">on</span>
-      <span data-key="or">or</span>
-      <span data-key="Private">Private</span>
-      <span data-key="private">private</span>
-      <span data-key="[Private]">[Private]</span>
-      <span data-key="See Notes">See Notes</span>
-      <span data-key="sealing">sealing</span>
+      <span data-key="of">von</span>
+      <span data-key="on">auf</span>
+      <span data-key="or">oderr</span>
+      <span data-key="Private">Privates</span>
+      <span data-key="private">privates</span>
+      <span data-key="[Private]">[Privates]</span>
+      <span data-key="See Notes">siehe Notizen</span>
+      <span data-key="sealing">Abdichtung</span>
       <span data-key="Sep">Sep</span>
       <span data-key="September">September</span>
-      <span data-key="She">She</span>
-      <span data-key="sibling">sibling</span>
-      <span data-key="sister">sister</span>
-      <span data-key="son">son</span>
-      <span data-key="step">step</span>
-      <span data-key="Stillborn">Stillborn</span>
-      <span data-key="submitted">submitted</span>
-      <span data-key="The cause of death was">The cause of death was</span>
-      <span data-key="to">to</span>
-      <span data-key="Twin">Twin</span>
+      <span data-key="She">Sie</span>
+      <span data-key="sibling">Geschwister</span>
+      <span data-key="sister">schwester</span>
+      <span data-key="son">sohn</span>
+      <span data-key="step">stief</span>
+      <span data-key="Stillborn">Tot geboren</span>
+      <span data-key="stillborn">tot geboren</span>
+      <span data-key="submitted">übermittelt</span>
+      <span data-key="The cause of death was">Die Todesursache war</span>
+      <span data-key="to">zu</span>
+      <span data-key="Twin">Zwilling</span>
       <span data-key="uncleared">uncleared</span>
-      <span data-key="unexpected null value">unexpected null value</span>
-      <span data-key="Unknown">Unknown</span>
-      <span data-key="unknown">unknown</span>
+      <span data-key="unexpected null value">unerwarteter Nullwert</span>
+      <span data-key="Unknown">Unbekannte</span>
+      <span data-key="unknown">unbekannte</span>
       <span data-key="Update">Aktualisieren</span>
-      <span data-key="was also known as">was also known as</span>
-      <span data-key="was never married">was never married</span>
-      <span data-key="was sealed to">was sealed to</span>
-      <span data-key="was sealed to parents">was sealed to parents</span>
-      <span data-key="was the[male]">was the</span>
-      <span data-key="was the[female]">was the</span>
-      <span data-key="was the[unknown]">was the</span>
-      <span data-key="was the partner of">was the partner of</span>
-      <span data-key="was widowed">was widowed</span>
-      <span data-key="was single">was single</span>
-      <span data-key="was a friend [with benefits]">was a friend [with benefits]</span>
+      <span data-key="was also known as">war auch bekannt als</span>
+      <span data-key="was never married">war nie verheiratet</span>
+      <span data-key="was sealed to">wurde an den Ehepartner gesiegelt</span>
+      <span data-key="was sealed to parents">wurde an seine eltern gesiegelt</span>
+      <span data-key="was the[male]">war der</span>
+      <span data-key="was the[female]">war die</span>
+      <span data-key="was the[unknown]">war der</span>
+      <span data-key="was the partner of">war der Partner von</span>
+      <span data-key="was widowed">wurde verwitwet</span>
+      <span data-key="was single">war unverheiratet</span>
+      <span data-key="was a friend [with benefits]">war ein Freund [mit Vorteilen]</span>
       <span data-key="WFT estimate">WFT estimate</span>
       <span data-key="Young">Young</span>
       <span data-key="intType">unexpected null value</span>
@@ -177,17 +180,17 @@
       <span data-key="intType12">family member</span>
       <span data-key="intType13">illegitimate</span>);
       <span data-key="eventText1">[Pronoun] [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="eventText2">[Pronoun] was adopted [onDate] [Location] by [Description].[Citations] [Notes]</span>
-      <span data-key="eventText3">[Pronoun] was born [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="eventText4">[Pronoun] was buried [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText2">[Pronoun] wurde adoptiert [onDate] [Location] by [Description].[Citations] [Notes]</span>
+      <span data-key="eventText3">[Pronoun] wurde geboren [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText4">[Pronoun] wurde begraben [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText5">[Pronoun] was christened [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="eventText6">[Pronoun] died [onDate] [Description] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText6">[Pronoun] starb [onDate] [Description] [Location].[Citations] [Notes]</span>
       <span data-key="eventText7">[Pronoun] had a marriage annulled [Description], [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="eventText8">[Pronoun] was baptized [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText8">[Pronoun] wurde getauft [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText9">He celebrated his bar mitzvah [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText10">She celebrated her bas mitzvah [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText11">[Pronoun] was blessed [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="eventText12">[Pronoun] appeared on the [Description] census [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText12">[Pronoun] appeared on the [Description] Volkszählung von [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText13">[Pronoun] was circumcised [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText14">[Pronoun] became a [Description] citizen [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText15">[Pronoun] was confirmed [Description] [onDate] [Location].[Citations] [Notes]</span>
@@ -222,14 +225,14 @@
       <span data-key="eventText44">[Pronoun] was named after [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText45">[Pronoun] was naturalized [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText46">[Pronoun] obituary was published in the [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="eventText47">[Pronoun] worked as a [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText47">[Pronoun] arbeitete als [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText48">[Pronoun] had the LDS ordinance [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText49">[Pronoun] was ordained a [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText50">[Pronoun] was described as [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText51">[Pronoun] had an estate probated [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText52">[Pronoun] [Description] property [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText53">[Pronoun] belonged to the [Description] faith [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="eventText54">[Pronoun] lived [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="eventText54">[Pronoun] hat [Description] [onDate] [Location] gelebt.[Citations] [Notes]</span>
       <span data-key="eventText55">[Pronoun] retired [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText56">[Pronoun] attended school at [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="eventText57">[Pronoun] was assigned US Social Security Number [Description] [onDate] [Location].[Citations] [Notes]</span>

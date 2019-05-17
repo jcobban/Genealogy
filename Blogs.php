@@ -2,6 +2,9 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+use \Templating\TemplateTag;
+
 /************************************************************************
  *  Blogs.php															*
  *																		*
@@ -12,17 +15,19 @@ use \Exception;
  *		2018/09/15		Created											*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2019/05/17      exploit TemplateTag support for subscripts      *
+ *		                do not set names set by class FtTemplate        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Blog.inc';
 require_once __NAMESPACE__ . '/User.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // common
-$lang	    	= 'en';
-$okmsg	        = '';		// positive notices
+$lang	    	    = 'en';
+
 foreach($_REQUEST as $key => $value)
 {
     switch(strtolower($key))
@@ -36,41 +41,24 @@ foreach($_REQUEST as $key => $value)
     }
 }
 
+// get template for displaying page
+$template		    = new FtTemplate("Blogs$lang.html");
+
+// internationalization support
+$trtemplate         = $template->getTranslate();
+$months		        = $trtemplate->getElementById('Months');
+$lmonths		    = $trtemplate->getElementById('LMonths');
+
 // get top level Blog posts
 $blogParms		    = array('keyvalue'	=> 0,
 							'table'		=> 'Blogs');
 $bloglist		    = new RecordSet('Blogs', $blogParms);
 $blogCount		    = $bloglist->count();
 
-$title	    	    = 'Blog Management';
-$template		    = new FtTemplate("Blogs$lang.html");
-
-$tempBase           = $document_root . '/templates/';
-if (file_exists($tempBase . "Trantab$lang.html"))
-    $trtemplate = new Template("${tempBase}Trantab$lang.html");
-else
-    $trtemplate = new Template("${tempBase}Trantaben.html");
-
-// internationalization support
-$monthsTag		    = $trtemplate->getElementById('Months');
-if ($monthsTag)
-{
-	$months	    	= array();
-	foreach($monthsTag->childNodes() as $span)
-	     $months[]	= trim($span->innerHTML());
-}
-$lmonthsTag		    = $trtemplate->getElementById('LMonths');
-if ($lmonthsTag)
-{
-	$lmonths		= array();
-	foreach($lmonthsTag->childNodes() as $span)
-	     $lmonths[]	= trim($span->innerHTML());
-}
-
 foreach($bloglist as $blog)
 {
-	$datetime	= $blog->get('datetime');
-	$matches	= array();
+	$datetime	    = $blog->get('datetime');
+	$matches	    = array();
 	if (preg_match('/^(\d+)-(\d+)-(\d+) *(.*)$/', $datetime, $matches) == 1)
 	{
 	    $blog->set('year',		$matches[1]);
@@ -89,9 +77,6 @@ foreach($bloglist as $blog)
 	}
 }
 
-$template->set('TITLE',				$title);
-$template->set('USERID',			$userid);
-$template->set('LANG',				$lang);
 $template->set('CONTACTTABLE',		'Blogs');
 $template->set('CONTACTKEYVALUE',	0);
 

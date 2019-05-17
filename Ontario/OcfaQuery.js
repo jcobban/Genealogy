@@ -121,9 +121,15 @@ function resetForm()
  ************************************************************************/
 function gotCountiesFile(xmlDoc)
 {
-    var	countySelect	= document.distForm.County;
+    var	countySelect	        = document.distForm.County;
+    // specify the action for selecting a county
+    countySelect.onchange	    = changeCounty;
+
+    var	countyText	            = document.distForm.CountyText;
+    var selectedCounty          = countyText.value;
     countySelect.options.length	= 0;	// clear the selection
-    var newOptions	= xmlDoc.getElementsByTagName("option");
+    countySelect.selectedIndex	= 0;
+    var newOptions	            = xmlDoc.getElementsByTagName("option");
 
     // hide the loading indicator
     hideLoading();	// hide "loading" indicator
@@ -145,13 +151,16 @@ function gotCountiesFile(xmlDoc)
 
 		// create a new HTML Option object and add it to the Select
 		var	newOption	= addOption(countySelect,
-									    text,
-									    value);
+									text,
+									value);
+        if (text.length > 0 && text == selectedCounty)
+        {
+            newOption.selected      = true;
+        }
     }			// loop through source "option" nodes
+    if (countySelect.selectedIndex > 0)
+        countySelect.onchange();
 
-    // specify the action for selecting a county
-    countySelect.onchange	= changeCounty;
-    countySelect.selectedIndex	= 0;
 }		// gotCountiesFile
 
 /************************************************************************
@@ -197,22 +206,24 @@ function noCountiesFile()
 function changeCounty()
 {
     // identify the selected county
-    var	countySelect	= this;
-    var	form		= countySelect.form;
-    var	optIndex	= countySelect.selectedIndex;
+    var	countySelect	    = this;
+    var	form		        = countySelect.form;
+    var	optIndex	        = countySelect.selectedIndex;
     //alert("changeCounty() optIndex=" + optIndex);
     if (optIndex == -1)		// no entry selected
 		noTownship();
     else
     {
 		var	optVal	= countySelect.options[optIndex].value;
-		
-		// get the township information file
-		popupLoading(document.getElementById("TwpCell"));
-		HTTP.getXML('/Ontario/OcfaTownshipsXml.php?County=' +
-					encodeURIComponent(optVal),
-					gotTownship,
-					noTownship);
+        if (optVal.length > 0)
+        {
+		    // get the township information file
+		    popupLoading(document.getElementById("TwpCell"));
+		    HTTP.getXML('/Ontario/OcfaTownshipsXml.php?County=' +
+			    		encodeURIComponent(optVal),
+				    	gotTownship,
+					    noTownship);
+        }
     }
 }		// changeCounty
 
@@ -231,25 +242,27 @@ function gotTownship(xmlDoc)
     hideLoading();	// hide "loading" indicator
 
     // clear out existing input prompt for township
-    var	township	= document.getElementById("Township");
-    var	container	= township.parentNode;
-    var	select		= null;
-    var nodeName	= township.nodeName.toLowerCase();
+    var	township	            = document.getElementById("Township");
+    var	townshipText	        = document.getElementById("TwpText");
+    var selectedTownship        = townshipText.value;
+    var	container	            = township.parentNode;
+    var	select		            = null;
+    var nodeName	            = township.nodeName.toLowerCase();
     if (nodeName == 'select')
     {		// <select>
-		select			= township;
+		select			        = township;
 		select.options.length	= 0;	// clear out current selection
     }		// <select>
     else
     if (nodeName == 'input')
     {		// <input>
-		nextChild	= township.nextSibling;
+		nextChild	            = township.nextSibling;
 		container.removeChild(township);
-		select		= document.createElement('select');
-		select.setAttribute('name', 'Township');
-		select.setAttribute('id', 'Township');
-		select.setAttribute('class', 'actleft');
-		select.setAttribute('size', 0);
+		select		            = document.createElement('select');
+		select.setAttribute('name',     'Township');
+		select.setAttribute('id',       'Township');
+		select.setAttribute('class',    'actleft');
+		select.setAttribute('size',     0);
 		container.insertBefore(select, nextChild);
     }		// <input>
 
@@ -275,19 +288,21 @@ function gotTownship(xmlDoc)
 		    var	xmlOptionElt	= newOptions[i];
     
 		    // get the text value to display to the user
-		    var	text	= xmlOptionElt.textContent;
+		    var	text	        = xmlOptionElt.textContent;
     
 		    // get the "value" attribute
-		    var	value	= xmlOptionElt.getAttribute("value");
+		    var	value	        = xmlOptionElt.getAttribute("value");
 		    if ((value == null) || (value.length == 0))
 		    {		// cover our ass
-				value		= text;
+				value		    = text;
 		    }		// cover our ass
     
 		    // create a new HTML Option object and add it 
-		    addOption(select,
-					  text,
-					  value);
+		    var newOption       = addOption(select,
+                        					text,
+					                        value);
+            if (text.length > 0 && text == selectedTownship)
+                newOption.selected      = true;
 		}		// loop through source "option" elements
     }			// add options from XML document
 }		// gotTownship

@@ -49,16 +49,16 @@ function onLoad()
     }			// loop through all forms
 
     // enable support for hiding and revealing columns within a table
-    var dataTbl		= document.getElementById("dataTbl");
-    var tblHdr		= dataTbl.tHead;
-    var tblHdrRow	= tblHdr.rows[0];
+    var dataTable		    = document.getElementById("dataTable");
+    var tblHdr		        = dataTable.tHead;
+    var tblHdrRow	        = tblHdr.rows[0];
     for(i = 0; i < tblHdrRow.cells.length; i++)
     {			// loop through cells of header row
-		var th			= tblHdrRow.cells[i];
-		th.onclick		= columnClick;
+		var th			    = tblHdrRow.cells[i];
+		th.onclick		    = columnClick;
 		th.oncontextmenu	= columnWiden;
     }			// loop through cells of header row
-}		// function::onLoad
+}		// function onLoad
 
 /************************************************************************
  *  function linkToTree														*

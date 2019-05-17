@@ -27,16 +27,16 @@
       $TRACE
       $MSG
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="center">
+      <div class="center" id="topBrowse">
         <span class="left" id="topPrev">
-    	<a href="/Canada/LanguagesEdit.php?lang=$LANG$npPrev" id="prenpprev">
-    	&lt;---
-    	</a>
+    	  <a href="/Canada/LanguagesEdit.php?lang=$LANG$npPrev" id="prenpprev">
+    	    &lt;---
+    	  </a>
         </span>
         <span class="right" id="topNext">
-    	<a href="/Canada/LanguagesEdit.php?lang=$LANG$npNext" id="prenpnext">
+    	  <a href="/Canada/LanguagesEdit.php?lang=$LANG$npNext" id="prenpnext">
     	    ---&gt;
-    	</a>
+    	  </a>
         </span>
           <span id="respdescrows">
     	returned rows $FIRST to $LAST of $TOTALROWS
@@ -56,7 +56,7 @@
     	value="$PATTERN"
     	class="white leftnc" size=24" maxlength="256">
       </p>
-      <table class="form" id="dataTbl">
+      <table class="form" id="dataTable">
         <!--- Put out the column headers -->
         <thead>
           <tr id="hdrRow">

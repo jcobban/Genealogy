@@ -107,47 +107,10 @@
 	      Surnames with the Same Soundex '$SOUNDEX'
 	  </a>
     </p>
-    <p class="label">
-	  $COUNT individuals have the surname '$SURNAME'.
-    </p>
-  <!--- Put out a line with links to previous and next section of table -->
-  <div class="center" id="showActualCount" >
-    <span class="left" id="npPrevFront">
-	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$PREV&limit=$LIMIT" id="prenpprev">
-	&lt;---
-	</a>
-    </span>
-    <span class="right" id="npNextFront">
-	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$NEXT&limit=$LIMIT" id="prenpnext">
-	    ---&gt;
-	</a>
-    </span>
-      <span id="respdescrows">
-      Displaying $ACTUALCOUNT starting with entry $OFFSET.
-      </span>
-    <div style="clear: both;"></div>
-  </div> <!-- left and right arrow links -->
-    <p id="showActualCount" class="label">
-    </p>
-    <p id="deletedUnused" class="label">
-      Deleted unused record for surname '$SURNAME'
-    </p>
-    <!--- Put out the response as a table -->
-    <table id="namesTable">
-    <!--- Put out the column headers -->
-	  <tr id="row">
-	      <td class="button" id="entry">
-	  		<a href="/FamilyTree/Person.php?idir=$IDIR"
-	  		   id="show$IDIR"
-	  		    class="$GENDER">
-	  		    $NAME
-	  		</a>
-	      </td>
-	  </tr>
-    </table>
     <hr>	<!-- start of blog section of page -->
+    <h3>Blogs</h3>
     <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
-	  enctype="multipart/form-data">
+	        enctype="multipart/form-data">
         <div id="blogEntry">
 		    <p class="label">
 			  At $DATETIME user '$USERNAME' 
@@ -165,29 +128,67 @@
 		      </button>
 		    </p>
         </div> <!-- id="blogEntry" -->
-    <div class="hidden" id="hidden">
-        <input type="hidden" name="userid" id="userid" value="$USERID">
-        <input type="hidden" name="idnr" id="idnr" value="$IDNR">
-        <input type="hidden" name="lang" id="lang" value="$LANG">
-    </div>
-    <p>
-    <textarea name="message" id="message" placeholder="[message]"
-	  rows="5" cols="100"></textarea>
-    </p>
-    <div class="row" id="blogEmailRow">
-    <label class="column1" for="emailAddress">
-	  Your E-Mail Address:
-    </label>
-    <input type="text" class="$EMAILCLASS leftnc" $EMAILREADONLY
-            id="emailAddress" name="emailAddress"
-	  		size="80" value="$EMAILADDRESS">
-    </div>
-    <div class="row" id="blogPostRow">
-    <button type="button" id="PostBlog" accessKey="B">
-	  Post <u>B</u>log
-    </button>
-    </div>
+        <div class="hidden" id="hidden">
+          <input type="hidden" name="userid" id="userid" value="$USERID">
+          <input type="hidden" name="idnr" id="idnr" value="$IDNR">
+          <input type="hidden" name="lang" id="lang" value="$LANG">
+        </div>
+        <p>
+        <textarea name="message" id="message" placeholder="[message]"
+	            rows="5" cols="100"></textarea>
+        </p>
+        <div class="row" id="blogEmailRow">
+          <label class="column1" for="emailAddress">
+	        Your E-Mail Address:
+          </label>
+          <input type="text" class="$EMAILCLASS leftnc" $EMAILREADONLY
+                id="emailAddress" name="emailAddress"
+	  		    size="80" value="$EMAILADDRESS">
+        </div>
+        <div class="row" id="blogPostRow">
+          <button type="button" id="PostBlog" accessKey="B">
+	        Post <u>B</u>log
+          </button>
+        </div>
     </form> <!-- name="blogform" id="blogform" -->
+    <hr>	<!-- start of blog section of page -->
+    <p class="label">
+	  $COUNT individuals have the surname '$SURNAME'.
+    </p>
+  <!--- Put out a line with links to previous and next section of table -->
+  <div class="center" id="showActualCount" >
+    <span class="left" id="npPrevFront">
+	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$PREV&limit=$LIMIT" id="prenpprev">
+	&lt;---
+	</a>
+    </span>
+    <span class="right" id="npNextFront">
+	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$NEXT&limit=$LIMIT" id="prenpnext">
+	    ---&gt;
+	</a>
+    </span>
+      <span id="respdescrows">
+          Names $FIRST to $LAST of $COUNT
+      </span>
+    <div style="clear: both;"></div>
+  </div> <!-- left and right arrow links -->
+    <p id="showActualCount" class="label">
+    </p>
+    <p id="deletedUnused" class="label">
+      Deleted unused record for surname '$SURNAME'
+    </p>
+    <!--- Put out the response as a table -->
+    <table id="namesTable">
+	  <tr id="row">
+	      <td class="button" id="entry">
+	  		<a href="/FamilyTree/Person.php?idir=$IDIR"
+	  		   id="show$IDIR"
+	  		    class="$GENDER">
+	  		    $NAME
+	  		</a>
+	      </td>
+	  </tr>
+    </table>
   </div> <!-- class="body" -->
   <div class="hidden" id="templates">
 	<span id="missing">Persons List Missing Surname</span>

@@ -69,7 +69,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';

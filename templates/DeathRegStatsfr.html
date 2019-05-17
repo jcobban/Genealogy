@@ -1,0 +1,129 @@
+<!--*********************************************************************
+ *  DeathRegStatsen.html	    					                    *
+ *										                                *
+ *  Display statistics about the transcription of death registrations.	*
+ *										                                *
+ *  History:								                            *
+ *		2019/01/20      created						                    *
+ *										                                *
+ *  Copyright &copy; 2019 James A. Cobban					            *
+ **********************************************************************-->
+	<div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=fr">
+  		Genealogie
+      </a>:
+      <a href="/Canada/CountriesEdit.php?lang=fr">
+  	    Liste des Pays Soutenus
+      </a>:
+      <a href="/genCountry.php?cc=$CC&amp;lang=fr">
+  		$COUNTRYNAME
+      </a>:
+      <a href="/Canada/genProvince.php?Domain=$DOMAIN&amp;lang=fr">
+  		$DOMAINNAME
+      </a>:
+    	<a href="BirthRegQuery.php?domain=$DOMAIN&amp;lang=fr">
+  	    Nouvelle requête
+  	</a>:
+	</div>
+    <div class='body'>
+      <h1>
+        $DOMAINNAME: Statut des Enregistrements de Mort
+        <span class='right'>
+            <a href='DeathRegStatsHelpen.html' target='_blank'>Aide?</a>
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <form id='display' action='donothing.php' method='get'>
+        <!--- Put out the response as a table -->
+        <table class='details' id="dataTable">
+          <!--- Put out the column headers -->
+          <thead>
+            <tr id="thRow">
+              <th class='colhead'>
+            Année
+              </th>
+              <th class='colhead'>
+            Fait
+              </th>
+              <th class='colhead'>
+            Lié
+              </th>
+              <th class='colhead'>
+            Regarder
+              </th>
+              <th>
+              </th>
+              <th class='colhead'>
+            Année
+              </th>
+              <th class='colhead'>
+            Fait
+              </th>
+              <th class='colhead'>
+            Lié
+              </th>
+              <th class='colhead'>
+            Regarder
+              </th>
+              <th>
+              </th>
+              <th class='colhead'>
+            Année
+              </th>
+              <th class='colhead'>
+            Fait
+              </th>
+              <th class='colhead'>
+            Lié
+              </th>
+              <th class='colhead'>
+            Regarder
+              </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="dataRow">
+              <td class='$YEARCLASS'>
+                  $REGYEAR
+              </td>
+              <td class='$YEARCLASS' style="min-width: 55px;">
+                  $COUNT
+              </td>
+              <td class='$PCTLINKED' style="min-width: 55px;">
+                  $LINKED
+              </td>
+              <td class='left'>
+                  <button type='button' id='YearStats$DOMAIN$REGYEAR'>
+                        Regarder
+                  </button>
+              </td>
+              <td id="columnSep">
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class='total right'>
+                Totaux
+              </td>
+              <td class='total right'>
+                  $TOTAL
+              </td>
+              <td class='total right'>
+                  $TOTALLINKED
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </form>
+    </div> <!-- end of <div id='body'> -->
+    <div class='balloon' id='HelpYearStats'>
+      Cliquez sur ce bouton pour afficher la répartition géographique des
+      transcriptions pour l'année spécifique.
+    </div>
+    <div class='balloon' id='HelpRegYear'>
+      Ce champ indique l'année pour laquelle les statistiques s'appliquent.
+    </div>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/Ontario/DeathRegStats.js" type="text/javascript"></script>

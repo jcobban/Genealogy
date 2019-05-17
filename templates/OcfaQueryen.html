@@ -1,0 +1,209 @@
+<!--*********************************************************************
+ *  OcfaQueryen.html													*
+ *																		*
+ *  Prompt the user to enter parameters for a search of the Ontario		*
+ *  Cemetery Finding Aid database										*
+ *																		*
+ *  History:															*
+ *		2011/03/20		created											*
+ *		2011/10/24		support mouseover help for signon button		*
+ *		2012/05/07		use templates to support I18N					*
+ *						make Status a button rather than a hyperlink	*
+ *						add support for default change function			*
+ *		2013/08/04		add facebook status								*
+ *		2014/01/01		remove <table>s and use CSS						*
+ *		2015/04/06		top level page changed to genealogy.php			*
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='/Ontario/OcfaQuery.css'/>
+    <div class='hidden' id='breadcrumbs'>
+      <a href='/genealogy.php'>Genealogy</a>:
+      <a href='/genCountry.php?cc=CA&amp;lang=en'>Canada</a>:
+      <a href='/Canada/genProvince.php?Domain=CAON'>Ontario</a>:</p> 
+    </div>
+    <div class='body'>
+      <h1>Ontario Cemetery Finding Aid Query
+        <span class='right'>
+        <a href='/Ontario/OcfaQueryHelpen.html' target='_blank'>Help?</a>
+        </span>
+      </h1>
+      $MSG
+      $TRACE
+      <p>This tool is an alternate and <b>unauthorized</b> interface to an 
+        old copy
+        of the database maintained at <a href='http://www.islandnet.com/ocfa/'>
+        Ontario Cemetery Finding Aid</a>.
+        <span class='message' id='msgCell'></span>
+      </p>
+      <form action='/Ontario/OcfaDoQuery.php' method='get'
+            name='distForm' id='distForm'>
+        <input name='Offset' id='Offset' type='hidden' value='0'>
+        <div class='row'>
+          <div class='column1'>
+        <label class='labelSmall' for='Count'>Count:</label>
+        <input name='Count' id='Count' type='text'
+    	    class='white rightnc' size='6' maxlength='6' value='$COUNT'/>
+          </div>
+          <div style='clear: both;'></div>
+        </div>
+        <div class='row' id='RegRow'>
+          <div class='column1'>
+            <label class='labelSmall' for='County'>County:</label>
+            <input type="hidden" id="CountyText" name="CountyText"
+                    value="$COUNTY" disabled="disabled">
+            <select name='County' id='County' size='1' class='white left'>
+            </select>
+          </div>
+          <div class='column2' id='TwpCell'>
+            <label class='labelSmall7em' for='Township'>Township:</label>
+            <input type="hidden" id="TwpText" name="TwpText"
+                    value="$TOWNSHIP" disabled="disabled">
+            <!-- the following is replaced by a selection
+                 if the XML file for the county exists -->
+            <input name='Township' id='Township' type='text'
+            	    class='white left' size='20' maxlength='40'/>
+          </div>
+          <div style='clear: both;'></div>
+        </div>
+        <div class='row'>
+          <div class='column1'>
+            <label class='labelSmall' for='Cemetery'>Cemetery:</label>
+            <input name='Cemetery' id='Cemetery' type='text'
+                    value='$CEMETERY'
+            	    class='white left' size='20' maxlength='64'/>
+          </div>
+          <div style='clear: both;'></div>
+        </div>
+        <div class='row'>
+          <div class='column1'>
+            <label class='labelSmall' for='GivenNames'>Name: Given:</label>
+            <input name='GivenNames' id='GivenNames' type='text'
+                    value='$GIVENNAME'
+            	    class='white left' size='20' maxlength='48'/>
+          </div>
+          <div class='column2'>
+            <label class='labelSmall7em' for='Surname'>Family:</label>
+            <input name='Surname' id='Surname' type='text'
+                    value='$SURNAME'
+            	    class='white left' size='20' maxlength='32'/>
+          </div>
+          <div class='left' class='label'>
+            <label class='labelSmall7em' for='SurnameSoundex'>Soundex:</label>
+            <input type='checkbox' name='SurnameSoundex' id='SurnameSoundex' 
+    	            value='yes'/>
+          </div>
+          <div style='clear: both;'></div>
+        </div>
+        <p>
+          <button type='submit' name='Query' id='Query'>Query</button>
+          &nbsp;
+          <button type='reset' name='Reset' id='Reset'>Clear Form</button>
+          &nbsp;
+          <button type='button' name='Status' id='Status'>Status</button>
+        </p>
+      </form>
+    </div>
+    <div class='balloon' id='HelpCount'>
+      The number of entries per page to return.  The default is 20.
+    </div>
+    <div class='balloon' id='HelpCounty'>
+      Limit the response to cemeteries registered in the specified county.
+    </div>
+    <div class='balloon' id='HelpTownship'>
+      Limit the response to cemeteries registered in the specified municipality
+      within a county.  A municipality may be a city, town, or township.
+    </div>
+    <div class='balloon' id='HelpCemetery'>
+      Limit the response to cemeteries whose name matches the supplied pattern.
+    <p>Specifying simple text, comprising letters and spaces, matches against
+      any names containing that text.  "Hill" or "hill" or "HILL" will match
+      "Hillcrest" and "Anything Hill" as well as the simple "Hill".
+    </div>
+    <div class='balloon' id='HelpGivenNames'>
+      Limit the response to individuals whose given names match the pattern in
+      this field.  
+      This search is done as a 
+      case-insensitive pattern match, not a simple comparison. 
+    <p>Specifying simple text, comprising letters and spaces, matches against
+      any names containing that text.  "John" or "john" or "JOHN" will match
+      "Johnathan" and "William John" as well as the simple "John".
+    <p>
+      This is an 
+      <a href="https://www.regular-expressions.info/posix.html#ere">
+          extended regular expression</a>,
+      as supported by MySQL,
+      There are too many options to enumerate here, but a few examples include:
+    <ul>
+        <li>If you want to match just the name "John", excluding names that
+          include "John" as part of them, enter "^John\$".
+        <li>Enumerators often use unusual spellings of names.  For example 
+            if you want to match names including both "Henry" and "Henery",
+            enter "Hen.*ry".
+    </ul>
+    </div>
+    <div class='balloon' id='HelpSurname'>
+    <p>This field is used to specify text to look for in the surname of 
+      the person getting married.
+      If the value contains only letters and spaces then only surnames that match
+      exactly (except for case) are found.  Otherwise this
+      uses 
+        <a href="http://en.wikipedia.org/wiki/Regular_expression">
+    	regular expression</a> pattern matching.
+      For example to match surnames starting with "McL..." and ending with "...n",
+      such as "McLean", "McLain", "McLennan", or "McLellan" you could specify 
+      "^McL.*n\$".
+    <p>The meaning of this field changes if the Soundex option is selected.
+    <p>The Soundex code has been used for decades to attempt to match names that
+      sound similar.  For example it is used by police forces to perform a rough
+      match for the names of drivers.  It is a problematic tool, as it
+      is based upon the phonetics of British surnames.
+      If you select Soundex then the search
+      is made for surnames that "sound like" the given surname.  For example
+      specifying Soundex together with "McLean" will match all of the surnames in
+      the pattern match example under "Surname", but many other names as well,
+      such "McCallum", "McAllan", "McClain", and "McWilliams". 
+    </div>
+    <div class='balloon' id='HelpSurnameSoundex'> 
+    <p>The Soundex code has been used for decades to attempt to match names that
+      sound similar.  For example it is used by police forces to perform a rough
+      match for the names of drivers.  It is a problematic tool, as it
+      is based upon the phonetics of British surnames.
+      If you select this option along with a
+      complete surname, not a pattern match, in the Surname field, then the search
+      is made for surnames that "sound like" the given surname.  For example
+      specifying Soundex together with "McLean" will match all of the surnames in
+      the pattern match example under "Surname", but many other names as well,
+      such "McCallum", "McAllan", "McClain", and "McWilliams". 
+    </div>
+    <div class='balloon' id='HelpQuery'>
+      Clicking on this button performs the query.
+    </div>
+    <div class='balloon' id='HelpReset'>
+      Clicking on this button clears all of the input fields back to their
+      default values.
+    </div>
+    <div class='balloon' id='HelpStatus'>
+      Clicking on this button displays a summary of the available transcriptions
+      by county.
+    </div>
+    <div class='popup' id='loading'>
+      Loading...
+    </div>
+    <div class='hidden' id='templates'>
+      <div class='left' id='chooseTownshipCell'>
+        <select size='0' name='Township'>
+          <option value=''>Choose a Township
+        </select>
+      </div>
+      <div class='left' id='noTownshipCell'>
+        <input type='text' class='white left' size='20' maxlength='40'
+  	            name='Township'>
+      </div>
+      <div class='left' id='noCountyMsg'>
+        Counties summary file "OcfaCountiesXml.php"
+        not available from server.
+      </div>
+    </div>
+    <script src='/jscripts/js20/http.js'    language='JavaScript'></script>
+    <script src='/jscripts/util.js'         language='JavaScript'></script>
+    <script src='/jscripts/CommonForm.js'   language='JavaScript'></script>
+    <script src='/Ontario/OcfaQuery.js'     language='JavaScript'></script>

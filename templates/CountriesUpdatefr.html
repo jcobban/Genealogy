@@ -26,135 +26,130 @@
 	  </h1>
 	  $TRACE
 	  $MSG
-	<!--- Put out the response as a table -->
-	<form name='countryForm'
-		action='CountriesEdit.php' 
-		method='post' 
-		autocomplete='off' 
-		enctype='multipart/form-data'>
-	    <input type='hidden' name='Debug' id='Debug' value='$DEBUG'>
-	    <input type='hidden' name='lang' value='$lang'>
-	    <input type='hidden' name='offset' value='$offset'>
-	    <input type='hidden' name='limit' value='$limit'>
-	  <!--- Put out a line with links to previous and next section of table -->
-	  <div class="center" id="topBrowse">
-	    <span class='left' id='topPrev'>
-		<a href='/Canada/CountriesEdit.php?lang=fr$npPrev' id='prenpprev'>
-		&lt;---
-		</a>
-	    </span>
-	    <span class='right' id='topNext'>
-		<a href='/Canada/CountriesEdit.php?lang=fr$npNext' id='prenpnext'>
-		    ---&gt;
-		</a>
-	    </span>
-	      <span id='respdescrows'>
-		montrer rangs $first a $last de $totalrows
+	  <!--- Put out the response as a table -->
+	  <form name='countryForm'
+		  action='CountriesEdit.php' 
+		  method='post' 
+		  autocomplete='off' 
+		  enctype='multipart/form-data'>
+	      <input type='hidden' name='Debug' id='Debug' value='$DEBUG'>
+	      <input type='hidden' name='lang' value='$lang'>
+	      <input type='hidden' name='offset' value='$offset'>
+	      <input type='hidden' name='limit' value='$limit'>
+	    <!--- Put out a line with links to previous and next section of table -->
+	    <div class="center" id="topBrowse">
+	      <span class='left' id='topPrev'>
+		  <a href='/Canada/CountriesEdit.php?lang=fr$npPrev' id='prenpprev'>
+		  &lt;---
+		  </a>
 	      </span>
-	    <div style='clear: both;'></div>
-	  </div> <!-- left and right arrow links -->
-	  <p>
-	    <label class='label' for='pattern' style='width: 10em;'>Pattern:</label>
-	    <input type='text' id='pattern' name='pattern' 
-		value='$PATTERN'
-		class='white leftnc' size=24' maxlength='256'>
-	  </p>
-	  <table class='form' id='dataTbl'>
-	    <!--- Put out the column headers -->
-	    <thead>
-	      <tr id='hdrRow'>
-		<th class='colhead'>
-		ID
-		</th>
-		<th class='colhead'>
-		Nom
-		</th>
-		<th class='colhead'>
-		Autre Noms
-		</th>
-		<th class='colhead'>
-		États
-		</th>
-		<th class='colhead'>
-		Généalogie
-		</th>
-		<th class='colhead'>
-		Effacer
-		</th>
-	      </tr>
-	    </thead>
-	    <tbody>
-	      <tr id='Row$code'>
-		<td class='right'>
-		    <input type='text' name='Code$code' id='Code$code'
-				value='$code'
-				class='white code' 
-				size='2' maxlength='2' readonly='readonly'>
-		</td>
-		<td class='left'>
-		    <input type='text' name='Name$code' id='Name$code' 
-				value='$name' 
-				class='white leftnc'
-				size='28' maxlength='64'>
-		</td>
-		<td class='center'>
-		    <button type='button' id='Names$code'>
-			Noms
-		    </button> 
-		</td>
-		<td class='center'>
-		    <button type='button' id='EditDomains$code'>
-			États
-		    </button> 
-		</td>
-		<td class='left'>
-		    <a class='button' href='/genCountry.php?cc=$code&amp;lang=fr'
-			target='_blank'>
-			$name Généalogie
-		    </a> 
-		</td>
-		<td class='center'>
-		    <button type='button' id='Delete$code'>
-			Effacer
-		    </button> 
-		</td>
-	      </tr>
-	    </tbody>
-	  </table>
-	  <p>
-	    <button type='submit' id='Submit'>Mise a Jour la Base des Données</button>
-	    &nbsp;
-	    <button type='button' id='Add'>Ajouter un Pays</button>
-	  </p>
-	</form>
+	      <span class='right' id='topNext'>
+		  <a href='/Canada/CountriesEdit.php?lang=fr$npNext' id='prenpnext'>
+		      ---&gt;
+		  </a>
+	      </span>
+	        <span id='respdescrows'>
+		  montrer rangs $first a $last de $totalrows
+	        </span>
+	      <div style='clear: both;'></div>
+	    </div> <!-- left and right arrow links -->
+	    <p>
+	      <label class='label' for='pattern' style='width: 10em;'>Pattern:</label>
+	      <input type='text' id='pattern' name='pattern' 
+		  value='$PATTERN'
+		  class='white leftnc' size=24' maxlength='256'>
+  
+	    <table class='form' id='dataTable'>
+	      <!--- Put out the column headers -->
+	      <thead>
+	        <tr id='hdrRow'>
+		  <th class='colhead'>
+		  ID
+		  </th>
+		  <th class='colhead'>
+		  Nom
+		  </th>
+		  <th class='colhead'>
+		  Autre Noms
+		  </th>
+		  <th class='colhead'>
+		  États
+		  </th>
+		  <th class='colhead'>
+		  Généalogie
+		  </th>
+		  <th class='colhead'>
+		  Effacer
+		  </th>
+	        </tr>
+	      </thead>
+	      <tbody>
+	        <tr id='Row$code'>
+		  <td class='right'>
+		      <input type='text' name='Code$code' id='Code$code'
+				  value='$code'
+				  class='white code' 
+				  size='2' maxlength='2' readonly='readonly'>
+		  </td>
+		  <td class='left'>
+		      <input type='text' name='Name$code' id='Name$code' 
+				  value='$name' 
+				  class='white leftnc'
+				  size='28' maxlength='64'>
+		  </td>
+		  <td class='center'>
+		      <button type='button' id='Names$code'>
+			  Noms
+		      </button> 
+		  </td>
+		  <td class='center'>
+		      <button type='button' id='EditDomains$code'>
+			  États
+		      </button> 
+		  </td>
+		  <td class='left'>
+		      <a class='button' href='/genCountry.php?cc=$code&amp;lang=fr'
+			            target="_blank" style="min-width: 350px; display: inline-block; text-align: left;">
+			  Généalogie $name
+		      </a> 
+		  </td>
+		  <td class='center'>
+		      <button type='button' id='Delete$code'>
+			  Effacer
+		      </button> 
+		  </td>
+	        </tr>
+	      </tbody>
+	    </table>
+	    <p>
+	      <button type='submit' id='Submit'>Mise a Jour la Base des Données</button>
+	      &nbsp;
+	      <button type='button' id='Add'>Ajouter un Pays</button>
+  
+	  </form>
+	  </div>
 	<!-- The remainder of the page consists of context specific help text. -->
 	<div class='balloon' id='HelpCode'>
-	<p>This field contains a 2-character ISO code for the country which
-	is used to refer to this record.
-	Except when adding a new country this is a read-only field.
-	</p>
+	  This field contains a 2-character ISO code for the country which
+	  is used to refer to this record.
+	  Except when adding a new country this is a read-only field.
 	</div>
 	<div class='balloon' id='HelpName'>
-	<p>Le nom du pays en Anglais.
-	</p>
+	  Le nom du pays en Anglais.
 	</div>
 	<div class='balloon' id='HelpNames'>
-	<p>Appuyer sur cet bouton pour ouvrir un dialogue pour réviser les noms du pays
+	  Appuyer sur cet bouton pour ouvrir un dialogue pour réviser les noms du pays
 	en autre langages.
-	</p>
 	</div>
 	<div class='balloon' id='Helppattern'>
-	<p>Enter text to search for in the country names.
-	</p>
+	  Enter text to search for in the country names.
 	</div>
 	<div class='balloon' id='HelpDelete'>
-	<p>Appuyer sur cet bouton pour effacer le pays du table des pays.
-	</p>
+	  Appuyer sur cet bouton pour effacer le pays du table des pays.
 	</div>
 	<div class='balloon' id='HelpEditDomains'>
-	<p>This button is used to display a dialog for editing the lower level
+	  This button is used to display a dialog for editing the lower level
 	administrative units of the country, that is the states or provinces.
-	</p>
 	</div>
 	<div class='balloon' id='HelpAdd'>
 	Click on this button to add another country into the list.

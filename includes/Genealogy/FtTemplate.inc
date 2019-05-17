@@ -1,6 +1,9 @@
 <?php
 namespace Genealogy;
 use \Exception;
+use Templating\Template;
+use Templating\TemplateTag;
+
 /************************************************************************
  *  class FTTemplate									    			*
  *														                *
@@ -20,7 +23,7 @@ use \Exception;
 // the classes User and Language need to be defined in order to execute this
 // sample extension.  It is requested by include rather than require
 // so this sample code can be left in place even when not used
-require_once  __NAMESPACE__ . '/TemplateOnly.inc' ;
+require_once  'Templating/Template.inc' ;
 include_once  __NAMESPACE__ . '/User.inc';
 include_once  __NAMESPACE__ . '/Language.inc';
 
@@ -464,7 +467,8 @@ class FtTemplate extends Template
                 $dir            = opendir($folder);
                 if ($dir === false)
                 {
-                    print "<p>emplate.inc: " . __LINE__ . " folder='" . escape($folder) . "'</p>\n";
+                    print "<p>emplate.inc: " . __LINE__ . " folder='" .
+                        \Templating\escape($folder) . "'</p>\n";
                     exit;
                 }
 
@@ -540,7 +544,7 @@ class FtTemplate extends Template
         }                   // new heading style
         else
             $warn   .= "<p>FtTemplate::displayBegin: breadcrumbs=" .
-                        escape($breadcrumbs) . "</p>\n";
+                        Templating\escape($breadcrumbs) . "</p>\n";
 
 	    $this->set('BREADCRUMBS',	$breadcrumbs, true);
 

@@ -9,6 +9,7 @@
  *		2013/05/29		use actMouseOverHelp common function			*
  *		2013/08/01		defer facebook initialization until after load	*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/04/12      shrink page scroll line to width of table       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -45,24 +46,25 @@ function onloadTemples()
     }		// iterate through all forms
 
     // add mouseover actions for forward and backward links
-    var npprev	= document.getElementById('npprev');
-    if (npprev)
+    var topPrev	= document.getElementById('topPrev');
+    if (topPrev)
     {		// defined
-		npprev.onmouseover	= linkMouseOver;
-		npprev.onmouseout	= linkMouseOut;
+		topPrev.onmouseover	= linkMouseOver;
+		topPrev.onmouseout	= linkMouseOut;
     }		// defined
-    var npnext	= document.getElementById('npnext');
-    if (npnext)
+    var topNext	= document.getElementById('topNext');
+    if (topNext)
     {		// defined
-		npnext.onmouseover	= linkMouseOver;
-		npnext.onmouseout	= linkMouseOut;
+		topNext.onmouseover	= linkMouseOver;
+		topNext.onmouseout	= linkMouseOut;
     }		// defined
+
 }		// onLoadDeath
 
 /************************************************************************
  *  function validateForm												*
  *																		*
- *  Ensure that the data entered by the user has been minimally				*
+ *  Ensure that the data entered by the user has been minimally			*
  *  validated before submitting the form.								*
  ************************************************************************/
 function validateForm()
@@ -71,7 +73,7 @@ function validateForm()
 }		// validateForm
 
 /************************************************************************
- *  function resetForm														*
+ *  function resetForm													*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
@@ -85,10 +87,10 @@ function resetForm()
  *  function linkMouseOver												*
  *																		*
  *  This function is called if the mouse moves over a forward or		*
- *  backward hyperlink on the invoking page.								*
+ *  backward hyperlink on the invoking page.							*
  *																		*
- *  Parameters:																*
- *		this				element the mouse moved on to						*
+ *  Parameters:															*
+ *		this			element the mouse moved on to					*
  ************************************************************************/
 function linkMouseOver()
 {

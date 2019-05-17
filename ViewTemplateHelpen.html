@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+   <title>View Template: Help</title>
+    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="author" content="James A. Cobban">
+    <meta name="copyright" content="&copy; 2019 James A. Cobban">
+<!--*********************************************************************
+ *  History:															*
+ *      2019/04/18      created                                         *
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  <body>
+	<div class="topcrumbs">
+	  <a href="/indexHelpen.html">Home</a>: 
+	  <a href="/genealogyHelpen.html">Genealogy</a>: 
+	  <a href="/templates/indexHelpen.html">Templates</a>: 
+	</div>
+	<div class="help">
+	  <h1>View Template: Help</h1>
+	  <p>This page is used to provide a user-friendly view of a template file.
+	  Template files are used to hold the presentation information for a page,
+	  separating it from the application logic which organizes information obtained
+	  from the server or the network.
+	  </p>
+	  <p>The page displays the template in two forms:
+	  <ol>
+	    <li>The left half of the page displays the template as it implements
+	      the presentation.  That is each element of the template is displayed
+          as it will appear to the end user, except that substitution points, where
+          information is inserted from the server, appear as either a dollar sign
+          followed by the name of the substitution point, for example $PAGE, 
+          or as the name of the substitution point enclosed in double curly braces,
+          for example {{PAGE}}.  In addition all of the popup dialogs, which are
+          normally hidden until invoked by user action, are displayed.
+          Note that the TRACE insertion point is displayed according to the
+          CSS class "warning" which defaults to 
+          <span class="warning">dark yellow text</span>, while the
+          MSG insertion point is displayed according to the CSS class "error"
+          which defaults to <span class="error">red text</span>.
+      <li>The right half of the page displays the raw HTML, or XML, or JSON,
+          of the template.
+      </ol>
+    </div> <!-- class="help" -->
+	<div class="botcrumbs">
+	  <span class="right">
+	    <img src="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+	  </span>
+	  <a href="/contactAuthor.php?subject=ViewTemplateHelpen.html"
+		target="_blank">Contact Author</a>
+	  <br/>
+	  <a href="/indexHelpen.html">Home</a>: 
+	  <a href="/genealogyHelpen.html">Genealogy</a>: 
+	  <a href="/templates/indexHelpen.html">Templates</a>: 
+	  <div style="clear: both;"></div> 
+	</div>
+  </body>
+</html>

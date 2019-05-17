@@ -8,6 +8,7 @@
  *		2018/09/12		created											*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/04/13      support new tinyMCE                             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -20,21 +21,14 @@
 window.onload	= onLoad;
 
 // specify style for tinyMCE editing
-tinyMCE.init({
-		mode			        : "textareas",
-		theme			        : "advanced",
-		plugins 		        : "spellchecker,advhr,preview", 
-				
-		// Theme options - button# indicated the row# only
-		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-		forced_root_block	    : false,
-		content_css		        : "/styles.css",
+tinymce.init({
+	selector            : 'textarea',
+    plugins             : 'link lists image',
+    menubar             : 'file edit view format insert',
+    toolbar             : "undo redo | styleselect | bold italic | " 
+                           + "alignleft aligncenter alignright alignjustify | " 
+                           + "bullist numlist outdent indent | link image",
+    content_css		    : "/styles.css"
 
 });
 
@@ -47,7 +41,11 @@ function onLoad()
 {
     document.body.onresize	= onWindowResize;
 
-    var names	= "";
+    var names	        = "";
+
+    var blogid          = 0;
+    if ('blogid' in args)
+        blogid          = args.blogid;
     // scan through all forms and set dynamic functionality
     // for specific elements
     for(var i = 0; i < document.forms.length; i++)
@@ -73,15 +71,24 @@ function onLoad()
 		    // take action specific to the element based on its name
 		    switch(name.toLowerCase())
 		    {		// switch on name
+                case 'subject':
+                {
+                    if (blogid == 0)
+                        element.focus();
+				    break;
+                }
+
 				case 'message':
 				{	// blog text area
 				    var msgLabel	= document.getElementById('msgLabel');
 				    var mframe		= tinymce.DOM.get('message_ifr');
 				    var textwidth	= window.innerWidth -
-								  msgLabel.offsetWidth - 40;
+								      msgLabel.offsetWidth - 40;
 				    tinymce.DOM.setStyle(mframe, 'width', textwidth + 'px');
-				    element.focus();	// make it the current input element
-				    element.select();	// select all text
+                    if (blogid > 0)
+                    {	            // focus on the current input element
+				        tinymce.get('message').focus();
+                    }	            // focus on the current input element
 				    break;
 				}	// blog text area
 
@@ -127,8 +134,8 @@ function onLoad()
  *  function onWindowResize												*
  *																		*
  *  This method is called when the browser window size is changed.		*
- *  If the window is split between the main display and a second		*
- *  display, resize.													*
+ *  For example if the window is split between the main display and	    *
+ *  a second display, resize.											*
  *																		*
  *  Input:																*
  *		this		<body> element										*
@@ -137,10 +144,14 @@ function onWindowResize()
 {
     if (iframe)
 		openFrame(iframe.name, null, "right");
-    var msgLabel	= document.getElementById('msgLabel');
-    var mframe		= tinymce.DOM.get('message_ifr');
-    var textwidth	= window.innerWidth - msgLabel.offsetWidth - 40;
+    var msgLabel	        = document.getElementById('msgLabel');
+    var mframe		        = tinymce.DOM.get('message_ifr');
+    var textwidth	        = window.innerWidth - msgLabel.offsetWidth - 40;
     tinymce.DOM.setStyle(mframe, 'width', textwidth + 'px');
+    var subject             = document.getElementById('subject');
+    subject.style.width     = textwidth + 'px';
+    var email               = document.getElementById('emailAddress');
+    email.style.width       = textwidth + 'px';
 }		// onWindowResize
 
 /************************************************************************

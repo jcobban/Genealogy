@@ -14,6 +14,9 @@
  *		2017/02/07		simplify implementation of delete township		*
  *		2018/10/21      change name of new township dialog template     *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/04/12      fix bug in adding multiple townships            *
+ *		                simplify delete                                 *
+ *		                validate new township for unique id             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -83,41 +86,43 @@ function onLoad()
 		    {			// act on column name
 				case 'add':
 				{
-				    element.onclick	= addTownship;
+				    element.onclick	    = addTownship;
 				    break;
 				}
 
 				case 'code':
 				{
-				    element.helpDiv	= 'Code';
-				    element.change	= changeCode;
+				    element.helpDiv	    = 'Code';
+				    element.change	    = changeCode;
+                    element.checkfunc   = checkCode;
 				    break;
 				}
 
 				case 'name':
 				{
-				    element.helpDiv	= 'Name';
-				    element.change	= change;
+				    element.helpDiv	    = 'Name';
+				    element.change	    = change;
+                    element.checkfunc   = checkName;
 				    break;
 				}
 
 				case 'delete':
 				{
-				    element.helpDiv	= 'Delete';
-				    element.onclick	= deleteTownship;
+				    element.helpDiv	    = 'Delete';
+				    element.onclick	    = deleteTownship;
 				    break;
 				}
 
 				case 'concessions':
 				{
-				    element.helpDiv	= 'Concessions';
-				    element.onclick	= showConcessions;
+				    element.helpDiv	    = 'Concessions';
+				    element.onclick	    = showConcessions;
 				    break;
 				}
 		    }			// act on column name
 		}	// loop through all elements in the form
     }		// loop through all forms
-}		// onLoad
+}		// function onLoad
 
 /************************************************************************
  *  function deleteTownship												*
@@ -132,19 +137,18 @@ function deleteTownship()
 {
     var	form		    = this.form;
     var	rowid	    	= this.id.substring(6);
-    var	townshipCode	= form.elements['Code' + rowid].value;
-    var	deleteElement	= document.createElement('input');
-    deleteElement.type	= 'hidden';
-    deleteElement.name	= 'DeleteCode' + townshipCode;
-    deleteElement.value	= 'DeleteCode' + townshipCode;
+    var	township	    = form.elements['Code' + rowid];
+    township.value      = 'delete';
+    township.type       = 'hidden';
+    var	name    	    = form.elements['Name' + rowid];
+    name.type           = 'hidden';
     var	cell	    	= this.parentNode;
+    cell.removeChild(this);
+    var	concessions	    = form.elements['Concessions' + rowid];
+    cell	    	    = concessions.parentNode;
+    cell.removeChild(concessions);
     var	row	        	= cell.parentNode;
-    var	section	    	= row.parentNode;
-    var	table	    	= section.parentNode;
-    form.insertBefore(deleteElement, table);
-    section.removeChild(row);
-    return false;
-}		// deleteTownship
+}		// function deleteTownship
 
 /************************************************************************
  *  function addTownship												*
@@ -158,7 +162,7 @@ function deleteTownship()
 function addTownship()
 {
     var	form	    	= this.form;
-    var	table	    	= document.getElementById("dataTbl");
+    var	table	    	= document.getElementById("dataTable");
     var	tbody	    	= table.tBodies[0];
     var	lastRow	    	= tbody.rows[tbody.rows.length - 1];
     var	numTownships	= tbody.rows.length;
@@ -176,7 +180,7 @@ function addTownship()
     var	newRow		    = createFromTemplate("NewTownship$line",
 				        				     parms,
 				        				     null);
-
+    newRow.id           = "Row" + numTownships;
     tbody.appendChild(newRow);
 
     // initialize dynamic functionality of new row
@@ -184,12 +188,14 @@ function addTownship()
     var nameField	    = form.elements["Name" + numTownships];
     var	deleteBtn	    = document.getElementById("Delete" + numTownships);
     codeField.onchange	= changeCode;
+    codeField.checkfunc	= checkCode;
     codeField.focus();
     nameField.onchange	= change;
+    nameField.checkfunc	= checkName;
     deleteBtn.onclick	= deleteTownship;
 
     return false;
-}		// addTownship
+}		// function addTownship
 
 /************************************************************************
  *  function changeCode													*
@@ -197,9 +203,9 @@ function addTownship()
  *  Take special action when the user changes the identifier field.		*
  *																		*
  *  Input:																*
- *		$this		<input id='Code...'>								*
+ *		this		<input id='Code...'>								*
  ************************************************************************/
-function changeCode()
+function changeCode(ev)
 {
     var form	    = this.form;
     var	line		= this.name.substring(4);
@@ -216,7 +222,35 @@ function changeCode()
 
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeCode
+}		// function changeCode
+
+/************************************************************************
+ *  function checkCode													*
+ *																		*
+ *  Validate changes to the identifier field.		                    *
+ *																		*
+ *  Input:																*
+ *		this		<input id='Code...'>								*
+ ************************************************************************/
+function checkCode()
+{
+    var	element		= this;
+    form            = this.form;
+    var	re		    = /^[a-zA-Z7\u00c0-\u00ff .,'"()\-&\[\]?]*$/;
+    var	name		= element.value;
+    setErrorFlag(element, re.test(name));   // invalid contents
+    var rownum      = this.id.substring(4) - 0;
+    for (var line = 1; line < rownum; line++)
+    {                       // loop through existing townships
+        var idfield = form.elements['Code' + line];
+        if (idfield && idfield.value == element.value)
+        {                   // duplicate code found
+            setErrorFlag(element, false);
+            popupAlert("ID '" + element.value + "' duplicates an existing township", this);
+            break;
+        }                   // duplicate code found
+    }                       // loop through existing townships
+}		// function checkCode
 
 /************************************************************************
  *  function showConcessions											*
@@ -240,5 +274,5 @@ function showConcessions()
     window.open(url,
 				'_blank');
     return false;
-}		// showConcessions
+}		// function showConcessions
 

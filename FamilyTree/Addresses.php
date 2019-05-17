@@ -48,7 +48,7 @@ use \Exception;
  ************************************************************************/
 require_once __NAMESPACE__ . '/Address.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $kindToText		= array('Mail','Event','Repo');
@@ -231,7 +231,7 @@ if (isset($_POST) && count($_POST) > 0)
 				if (strtolower($value) == 'delete')
 				{
 				    $address	= new Address(array('idar'	=> $idar,
-									    'kind'	=> $kind));
+								            	    'kind'	=> $kind));
 				    $address->delete(false);
 				}
 				break;
@@ -331,8 +331,8 @@ if ($count > 0)
 	$last	= min($nextOffset, $count);
 	$template->updateTag('summary',
 					     array('first'	=> $first,
-						   'last'	=> $last,
-						   'count'	=> $count));
+						       'last'	=> $last,
+						       'count'	=> $count));
 
 	$addrClass		= 'odd';
 	foreach($addresses as $idar => $address)
@@ -350,6 +350,6 @@ if ($count > 0)
 					     $addresses);
 }		// display the results
 else
-	$template->updateTag('addressesTable', null);
+	$template->updateTag('dataTable', null);
 
 $template->display();

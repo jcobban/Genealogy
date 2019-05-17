@@ -4,117 +4,118 @@
  *  Global stylesheet for the web-site www.jamescobban.net              *
  *                                                                      *
  *  History:                                                            *
- *        2010/08/21    add button.width100                             *
- *        2010/11/20    set padding 0 in th.cell and th.underline to    *
+ *		2010/08/21      add button.width100                             *
+ *		2010/11/20      set padding 0 in th.cell and th.underline to    *
  *                      avoid padding between lines in census forms     *
- *        2010/12/10    improve appearance of children in main web page *
- *        2011/03/05    insert left and right padding in th and td cells*
- *        2011/04/04    add gender based label styles for th cells      *
- *        2011/05/06    add th class 'colheadSmall'                     *
- *        2011/05/22    adjust details of button style for span to more *
+ *		2010/12/10      improve appearance of children in main web page *
+ *		2011/03/05      insert left and right padding in th and td cells*
+ *		2011/04/04      add gender based label styles for th cells      *
+ *		2011/05/06      add th class 'colheadSmall'                     *
+ *		2011/05/22      adjust details of button style for span to more *
  *                      closely match default Firefox button.           *
- *        2011/05/28    support for framed images                       *
- *        2011/06/06    add fixed serif input field                     *
- *        2011/06/12    add span classes male and female                *
+ *		2011/05/28      support for framed images                       *
+ *		2011/06/06      add fixed serif input field                     *
+ *		2011/06/12      add span classes male and female                *
  *                      add option classes male and female              *
- *        2011/07/02    add inalabel style for input tag                *
- *        2011/09/24    explicitly set text color for span to black     *
- *        2011/09/26    add map style for div                           *
- *        2011/10/16    increase distinctiveness of percentage colors   *
+ *		2011/07/02      add inalabel style for input tag                *
+ *		2011/09/24      explicitly set text color for span to black     *
+ *		2011/09/26      add map style for div                           *
+ *		2011/10/16      increase distinctiveness of percentage colors   *
  *                      and make them all pure red to green shades      *
- *        2011/11/18    add td.cellRight, td.cellCenter,                *
+ *		2011/11/18      add td.cellRight, td.cellCenter,                *
  *                      td.underlineRight, and td.underlineCenter       *
  *                      add inacenter, inacenternc, actcenter, and      *
  *                      actcenternc styles for input tag                *
- *        2011/12/17    add p.large (p.label without indent)            *
+ *		2011/12/17      add p.large (p.label without indent)            *
  *                      add p.warning                                   *
- *        2011/12/22    highlight input fiel d classes                  *
- *        2012/01/02    add classes for input cells that are selected   *
- *        2012/01/16    add <div class='hidden'> for templates          *
- *        2012/02/26    add message style for span,                     *
+ *		2011/12/22      highlight input fiel d classes                  *
+ *		2012/01/02      add classes for input cells that are selected   *
+ *		2012/01/16      add <div class='hidden'> for templates          *
+ *		2012/02/26      add message style for span,                     *
  *                      img.example, p.picdesc                          *
  *                      add bottom margin to div class='picture' to     *
  *                      visually separate successive pictures           *
- *        2012/03/28    add td.oddcenter and td.evencenter              *
- *        2012/03/31    indent subsequent lines of text in td.odd,      *
+ *		2012/03/28      add td.oddcenter and td.evencenter              *
+ *		2012/03/31      indent subsequent lines of text in td.odd,      *
  *                      td.oddleft, td.even, and td.evenleft            *
  *                      add td.oddmale and td.oddfemale                 *
  *                      add td.evenmale and td.evenfemale               *
- *        2012/05/06    provide default style for buttons               *
+ *		2012/05/06      provide default style for buttons               *
  *                      add styles actcode, and inacode styles for      *
  *                      input tag and display the field value in        *
  *                      monospace font                                  *
- *        2012/05/28    add option.unknown for unknown sex              *
+ *		2012/05/28      add option.unknown for unknown sex              *
  *                      add td.evenunknown and td.oddunknown for        *
  *                      unknown sex                                     *
  *                      add a.unknown for unknown sex                   *
- *        2012/06/23    add vertical padding to button style for span   *
- *        2012/07/30    correct td.colheadSmall to have same borders as *
+ *		2012/06/23      add vertical padding to button style for span   *
+ *		2012/07/30      correct td.colheadSmall to have same borders as *
  *                      colhead                                         *
- *        2012/09/17    change appearance of actrightfixed style for    *
+ *		2012/09/17      change appearance of actrightfixed style for    *
  *                      input tag                                       *
- *        2012/10/23    add error reporting highlighting classes        *
- *        2013/01/26    add male, female, and unknown styles for        *
+ *		2012/10/23      add error reporting highlighting classes        *
+ *		2013/01/26      add male, female, and unknown styles for        *
  *                      input tag                                       *
- *        2013/02/24    change text alignment in th.label to right      *
- *        2013/03/04    add hyperlink style for input tag to underline  *
+ *		2013/02/24      change text alignment in th.label to right      *
+ *		2013/03/04      add hyperlink style for input tag to underline  *
  *                      in blue                                         *
- *        2013/03/28    change button.width100 to button.width110       *
- *        2013/04/05    add right450 style for span to accomodate       *
+ *		2013/03/28      change button.width100 to button.width110       *
+ *		2013/04/05      add right450 style for span to accomodate       *
  *                      Facebook button                                 *
- *        2013/05/17    shrink vertical size of button.button           *
- *        2013/05/29    button.button:disabled                          *
- *        2013/06/10    change th.label and th.labelsmall so the label  *
+ *		2013/05/17      shrink vertical size of button.button           *
+ *		2013/05/29      button.button:disabled                          *
+ *		2013/06/10      change th.label and th.labelsmall so the label  *
  *                      is vertically aligned                           *
- *        2013/06/13    add td.pad10 for a cell that has width 10%      *
- *        2013/07/01    add style a.button to make anchors look like    *
+ *		2013/06/13      add td.pad10 for a cell that has width 10%      *
+ *		2013/07/01      add style a.button to make anchors look like    *
  *                      buttons                                         *
- *        2013/07/04    there is no way to have a single style that     *
+ *		2013/07/04      there is no way to have a single style that     *
  *                      allows an anchor to look like a button          *
  *                      containingeither text or an image.              *
  *                      You have to have two different classes!         *
- *        2013/06/17    capitalize subdistrict and division identifiers *
- *        2013/12/19    add text-align: right to right style for span   *
+ *		2013/06/17      capitalize subdistrict and division identifiers *
+ *		2013/12/19      add text-align: right to right style for span   *
  *                      add iframe.facebook                             *
- *        2013/12/24    make left and right styles for span consistent  *
+ *		2013/12/24      make left and right styles for span consistent  *
  *                      in appearance                                   *
- *        2013/12/27    add center style for div for 3-way split        *
- *        2014/01/01    move styles used only by usstates.html          *
+ *		2013/12/27      add center style for div for 3-way split        *
+ *		2014/01/01      move styles used only by usstates.html          *
  *                      to usstates.css                                 *
- *        2014/01/10    move styles used only by MarriageRegDetail.php  *
+ *		2014/01/10      move styles used only by MarriageRegDetail.php  *
  *                      to MarriageRegDetail.css                        *
- *        2014/01/14    adjust styles for summary status tables         *
- *        2014/02/12    add fieldset styles                             *
- *        2014/02/25    align attribute values for clarity              *
- *        2014/03/05    add warning style for span                      *
- *        2014/03/27    add row style for div                           *
- *        2014/05/30    add select.actleftcit                           *
- *        2014/05/30    add right368 style for span                     *
+ *		2014/01/14      adjust styles for summary status tables         *
+ *		2014/02/12      add fieldset styles                             *
+ *		2014/02/25      align attribute values for clarity              *
+ *		2014/03/05      add warning style for span                      *
+ *		2014/03/27      add row style for div                           *
+ *		2014/05/30      add select.actleftcit                           *
+ *		2014/05/30      add right368 style for span                     *
  *                      add iframe.advert                               *
  *                      add advert style for div                        *
- *        2014/11/29    add warning style for div                       *
- *        2015/01/13    add unknown style for span                      *
+ *		2014/11/29      add warning style for div                       *
+ *		2015/01/13      add unknown style for span                      *
  *                      add span.note                                   *
- *        2015/01/23    add margin-bottom: 1em; to list items           *
- *        2015/02/05    move tab styles from index.css                  *
- *        2015/02/17    add a border between left and right iframes     *
- *        2015/05/13    add article style for div                       *
- *        2015/06/02    use same size font in TinyMCE editor as for     *
+ *		2015/01/23      add margin-bottom: 1em; to list items           *
+ *		2015/02/05      move tab styles from index.css                  *
+ *		2015/02/17      add a border between left and right iframes     *
+ *		2015/05/13      add article style for div                       *
+ *		2015/06/02      use same size font in TinyMCE editor as for     *
  *                      other input fields                              *
- *        2015/06/22    missing input.unknownerror                      *
- *        2015/07/17    set width of advert border explicitly to        *
+ *		2015/06/22      missing input.unknownerror                      *
+ *		2015/07/17      set width of advert border explicitly to        *
  *                      avoid browser interpretations of "thick"        *
- *        2016/01/19    add p style notes                               *
- *        2016/07/03    only print the body of the page                 *
- *        2017/12/05    separate styles into separate classes for       *
+ *		2016/01/19      add p style notes                               *
+ *		2016/07/03      only print the body of the page                 *
+ *		2017/12/05      separate styles into separate classes for       *
  *                      text color, including gender, error, warning    *
  *                      background color                                *
- *        2017/12/08    remove rounded corners from select and option   *
- *        2018/05/22    change "grey" from #404040 to #606060           *
- *        2018/11/30    remove obsolete composite styles                *
- *        2019/01/30    add style div.menu for popup menu               *
- *        2019/03/02    add .left, .center, .right                      *
+ *		2017/12/08      remove rounded corners from select and option   *
+ *		2018/05/22      change "grey" from #404040 to #606060           *
+ *		2018/11/30      remove obsolete composite styles                *
+ *		2019/01/30      add style div.menu for popup menu               *
+ *		2019/03/02      add .left, .center, .right                      *
  *                      remove div.right450                             *
+ *      2019/04/18      brighten up body background                     *
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
@@ -150,7 +151,7 @@
                 }
     .balloon   {background-color:   #FFFFA0;   /* yellow 3M PostIt® note */
                 }
-    .body      {background-color:   #FEFEE0;   /* aged vellum */
+    .body      {background-color:   #FFFDF0;   /* aged vellum */
                 }
     .help      {background-color:   #F8F8FF;   /* pale blue */
                 }
@@ -175,7 +176,7 @@
     *   Styles for displaying <body> tags                               *
     *   Also see div class='body' the <main> section of a standard page *
     *********************************************************************/
-    body      { background-color:   #FEFEE0;
+    body      { background-color:   #FFFDF0;
                 margin:             0px;
                 padding:            0px;
                 font-family:        sans-serif;
@@ -186,6 +187,9 @@
     *   TinyMCE appearance customization                                *
     *********************************************************************/
     body.mceContentBody {
+                background-color:   white;
+                }
+    body.mce-content-body {
                 background-color:   white;
                 }
 
@@ -207,7 +211,7 @@
                 width:              500px; 
                 height:             85px;
                 display:            inline;
-                float:              left;
+                float:              right;
                 background-color:   white;
                 }
 
@@ -331,7 +335,7 @@
     *********************************************************************/
     div.submenu {
                 display:            none;
-                background-color:   #FEFEE0;
+                background-color:   #FFFDF0;
                 margin:             0px;
                 padding:            0px;
                 }
@@ -365,9 +369,25 @@
                 }
 
    /*********************************************************************
+    *   span class='advert' is used to display an advertisement         *
+    *   in the page header. Note that this allocates the space to       *
+    *   hold the advertisement.                                         *
+    *********************************************************************/
+    div.advert {
+                background-color:   white;
+                font-family:        sans-serif;
+                font-size:          180%;
+                font-weight:        bold;
+                width:              500px;
+                height:             auto;
+                float:              right;
+                border:             5px solid red
+                }
+
+   /*********************************************************************
     *   div class='body' is used to style the body of a standard page   *
     *********************************************************************/
-    div.body  { background-color:   #FEFEE0;    /* aged vellum */
+    div.body  { background-color:   #FFFDF0;    /* aged vellum */
                 padding:            4px;
                 font-family:        sans-serif;
                 }
@@ -434,21 +454,6 @@
                 }
 
    /*********************************************************************
-    *   div class='advert' is used to display an advertisement          *
-    *   in the page header. Note that this allocates the space to       *
-    *   hold the advertisement.                                         *
-    *********************************************************************/
-    div.advert {
-                background-color:   white;
-                font-family:        sans-serif;
-                width:              490px;
-                height:             auto;
-                font-size:          180%;
-                font-weight:        bold;
-                border:             5px solid red
-                }
-
-   /*********************************************************************
     *   styles for displaying a menu icon                               *
     *********************************************************************/
     div.menuicon {
@@ -484,7 +489,7 @@
                 text-align:         center;
     }
     span.tabsFront {
-                background-color:   #FEFEE0;            /* brighter*/
+                background-color:   #FFFDF0;            /* brighter*/
                 border-top:         3px solid white;    /* brighter*/	
                 border-left:        3px solid white;    /* brighter*/
                 border-right:       3px solid brown;
@@ -790,11 +795,30 @@
                 width:              100px;
                 padding:            0px 4px 0px 4px;
                 }
-    span.rightAdvert {
-                float:              right;
+
+   /*********************************************************************
+    *   span class='advert' is used to display an advertisement         *
+    *   in the page header. Note that this allocates the space to       *
+    *   hold the advertisement.                                         *
+    *********************************************************************/
+    span.advert {
                 width:              500px;
-                padding:            0px 4px 0px 4px;
+                height:             auto;
                 }
+
+   /*********************************************************************
+    *   span class='facebook' is used to display an advertisement       *
+    *   in the page header. Note that this allocates the space to       *
+    *   hold the facebook like button.                                  *
+    *********************************************************************/
+    span.facebook {
+                background-color:   white;
+                font-family:        sans-serif;
+                width:              360px;
+                height:             auto;
+                float:              right;
+                }
+
     span.pad {  padding:            4px;
                 }
     span.note { font-family:        sans-serif;
@@ -1041,8 +1065,12 @@
     td.right {  text-align:         right;
                 float:              none;
                 }
-    td.total {
-                border-top:         4px double black;
+    td.total {  background-color:   white;
+                border-right:       thin solid black;
+                border-bottom:      thin solid black;
+                border-top:         2px double black;
+                padding:            2px 2px 2px 2px;
+                empty-cells:		show;
                 font-family:        sans-serif;
                 font-weight:        bold;
                 }
@@ -1114,7 +1142,7 @@
                 }
 
     /* display a table cell as if it were a button */
-    td.button {    font-family:        sans-serif;
+    td.button { font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         center;
                 font-size:          80%;
@@ -1125,7 +1153,7 @@
                 border-right:       3px solid #606060;
                 padding:            4px 12px 4px 12px;
                 }
-    td.white {    font-family:        sans-serif;
+    td.white {  font-family:        sans-serif;
                 background-color:   white;
                 border-right:       thin solid black;
                 border-bottom:      thin solid black;

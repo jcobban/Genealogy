@@ -58,16 +58,6 @@ function onLoad()
 		}	// loop through all elements in the form
     }		// loop through all forms in the page
 
-    var dataTable           = document.getElementById('dataTable');
-    var dataWidth           = dataTable.offsetWidth;
-    var windowWidth             = document.body.clientWidth - 8;
-    if (dataWidth > windowWidth)
-        dataWidth               = windowWidth;
-    var topBrowse           = document.getElementById('topBrowse');
-    topBrowse.style.width   = dataWidth + "px";
-    var botBrowse               = document.getElementById('botBrowse');
-    if (botBrowse)
-        botBrowse.style.width   = dataWidth + "px";
 }		// function onLoad
 
 /************************************************************************

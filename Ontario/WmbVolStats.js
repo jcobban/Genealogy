@@ -56,8 +56,13 @@ function loadStats()
  ************************************************************************/
 function showStatus()
 {
+    var lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
+
     location	= "WmbPageStats.php?volume=" +
-					encodeURIComponent(this.id.substring(12));
+					encodeURIComponent(this.id.substring(12)) +
+                    '&lang=' + lang;
     return false;	// suppress default action
 }		// showStatus
 

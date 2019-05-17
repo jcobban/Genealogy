@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use Templating\Template;
 /************************************************************************
  *  Citation.inc														*
  *																	    *
@@ -207,6 +208,8 @@ use \Exception;
  *		                method toHTML returns the generated text        *
  *		                instead of printing it                          *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/04/15      replace is_a with instanceof                    *
+ *		2019/04/18      support method getLastSqlCmd                    *
  *																	    *
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/	
@@ -398,6 +401,20 @@ class Citation extends RecordPic
 						'overridebibliography'	=> 1);
 
     /********************************************************************
+     *	Citation::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'tblSX',
+                'name'      => 'Citations',
+                'prime'	    => 'idsx',
+	            'srvmg'     => true,
+	            'fldcount'	=> 4,
+                'order'     => '`Order`',
+                'classname' => 'Citation');
+
+    /********************************************************************
      *	Citation::$translate											*
      *																	*
      *	array containing synonyms for field names						*
@@ -570,9 +587,7 @@ class Citation extends RecordPic
 				    // query the database
 				    $stmt		        = $connection->prepare($query);
 				    $queryText		    = debugPrepQuery($query, $sqlParms);
-                        error_log("Citation.inc: " . __LINE__ . " '$queryText', '$query', " . print_r($sqlParms, true) . "\n",
-                                  3,
-                                  $document_root . "/logs/updateEvent.txt");
+                    $this->lastSqlCmd   = $queryText;
 				    if ($stmt->execute($sqlParms))
 				    {		    // successful query
 						if ($debug)
@@ -617,10 +632,6 @@ class Citation extends RecordPic
 				    else
 				    {		// error performing query
                         $errorInfo	= $stmt->errorInfo();
-                        error_log("Citation.inc: " . __LINE__ . " '$queryText', ". print_r($errorInfo,true) ."\n",
-                                  3,
-                                  $document_root . "/logs/updateEvent.txt");
-
 						$this->msg .= "Citation.inc: " . __LINE__ . " '$queryText', " . 
 								    print_r($errorInfo,true) . ". ";
 				    }		// error performing query
@@ -643,6 +654,7 @@ class Citation extends RecordPic
 						$stmt		        = $connection->prepare($orderQuery);
 						$orderQueryText	    = debugPrepQuery($orderQuery,
 										                    $sqlParms);
+                        $this->lastSqlCmd   = $orderQueryText;
 						if ($stmt->execute($sqlParms))
 						{		// successful query
 						    if ($debug)
@@ -729,7 +741,8 @@ class Citation extends RecordPic
                 if (!$record->isExisting())
                     $warn               .= "<p>Citation::__construct: " .
                     __LINE__ . " record with " . self::$recType[$type] .
-                    "=$idime does not exist</p>";
+                    "=$idime does not exist</p>" .
+                 $record->dump('why not existing');
             }	                // validate IDIME
 
 		    // if every field supplied, construct from the array
@@ -842,85 +855,84 @@ class Citation extends RecordPic
      ********************************************************************/
     function getRecord()
     {
-		if ($this->refRecord)	// already identified
-		    return	$this->refRecord;
+        global      $warn;
 
-		$idime		= $this->row['idime'];
-		$stype		= $this->row['type'];
+        if ($this->refRecord)	// already identified
+        {
+            return	$this->refRecord;
+        }
 
-		$refRec		= null;		// initial return value
-		try {
-		    switch($stype)
-		    {
-				//  Facts where IDIME points to an Person Record in tblIR
-				case self::STYPE_UNSPECIFIED:	// 0
-				case self::STYPE_NAME:		// 1
-				case self::STYPE_BIRTH:		// 2
-				case self::STYPE_CHRISTEN:	// 3
-				case self::STYPE_DEATH:		// 4
-				case self::STYPE_BURIED:	// 5
-				case self::STYPE_NOTESGENERAL:	// 6
-				case self::STYPE_NOTESRESEARCH:	// 7
-				case self::STYPE_NOTESMEDICAL:	// 8
-				case self::STYPE_DEATHCAUSE:	// 9
-				case self::STYPE_LDSB:		// 15 Baptism
-				case self::STYPE_LDSE:		// 16 Endowment
-				case self::STYPE_LDSC:		// 26 Confirmation
-				case self::STYPE_LDSI:		// 27 Initiatory
-				{
-				    $refRec	= new Person(array('idir' => $idime));
-				    break;
-				}
+	    $idime		= $this->row['idime'];
+	    $stype		= $this->row['type'];
 
-				//	IDIME points to Name record in tblNX
-				case self::STYPE_ALTNAME:	// 10
-				{
-				    $refRec	= new Name(array('idnx' => $idime));
-				    break;
-				}
+	    $refRec		= null;		// initial return value
+	    switch($stype)
+	    {
+			//  Facts where IDIME points to an Person Record in tblIR
+			case self::STYPE_UNSPECIFIED:	// 0
+			case self::STYPE_NAME:		    // 1
+			case self::STYPE_BIRTH:		    // 2
+			case self::STYPE_CHRISTEN:  	// 3
+			case self::STYPE_DEATH:	    	// 4
+			case self::STYPE_BURIED:    	// 5
+			case self::STYPE_NOTESGENERAL:	// 6
+			case self::STYPE_NOTESRESEARCH:	// 7
+			case self::STYPE_NOTESMEDICAL:	// 8
+			case self::STYPE_DEATHCAUSE:	// 9
+			case self::STYPE_LDSB:	    	// 15 Baptism
+			case self::STYPE_LDSE:	    	// 16 Endowment
+			case self::STYPE_LDSC:	    	// 26 Confirmation
+			case self::STYPE_LDSI:	    	// 27 Initiatory
+			{
+			    $refRec	= new Person(array('idir' => $idime));
+			    break;
+			}
 
-				//	IDIME points to Child Record tblCR.IDCR
-				case self::STYPE_CHILDSTATUS:	// 11 Child Status
-				case self::STYPE_CPRELDAD:	// 12 Relationship to Father
-				case self::STYPE_CPRELMOM:	// 13 Relationship to Mother
-				case self::STYPE_LDSP:		// 17 Sealed to Parents
-				{
-				    $refRec	= new Child(array('idcr' => $idime));
-				    break;
-				}
+			//	IDIME points to Name record in tblNX
+			case self::STYPE_ALTNAME:   	// 10
+			{
+			    $refRec	= new Name(array('idnx' => $idime));
+			    break;
+			}
 
-				//	IDIME points to Marriage Record tblMR.idmr
-				case self::STYPE_LDSS:		// 18 Sealed to Spouse
-				case self::STYPE_NEVERMARRIED:	// 19 never married 
-				case self::STYPE_MAR:		// 20 Marriage	  
-				case self::STYPE_MARNOTE:	// 21 Marriage Note
-				case self::STYPE_MARNEVER:	// 22 Never Married	     
-				case self::STYPE_MARNOKIDS:	// 23 no children
-							case self::STYPE_MAREND:		// 24 Marriage ended *added**
-				{
-				    $refRec	= new Family(array('idmr' => $idime));
-				    break;
-				}
+			//	IDIME points to Child Record tblCR.IDCR
+			case self::STYPE_CHILDSTATUS:	// 11 Child Status
+			case self::STYPE_CPRELDAD:  	// 12 Relationship to Father
+			case self::STYPE_CPRELMOM:  	// 13 Relationship to Mother
+			case self::STYPE_LDSP:	    	// 17 Sealed to Parents
+			{
+			    $refRec	= new Child(array('idcr' => $idime));
+			    break;
+			}
 
-				//	IDIME points to Event Record tblER.ider	
-				case self::STYPE_EVENT:		// 30 Individual Event
-				case self::STYPE_MAREVENT:	// 31 Marriage Event
-				{
-				    $refRec	= new Event(array('ider' => $idime));
-				    break;
-				}
+			//	IDIME points to Marriage Record tblMR.idmr
+			case self::STYPE_LDSS:		    // 18 Sealed to Spouse
+			case self::STYPE_NEVERMARRIED:	// 19 never married 
+			case self::STYPE_MAR:		    // 20 Marriage	  
+			case self::STYPE_MARNOTE:	    // 21 Marriage Note
+			case self::STYPE_MARNEVER:	    // 22 Never Married	     
+			case self::STYPE_MARNOKIDS:	    // 23 no children
+			case self::STYPE_MAREND:		// 24 Marriage ended *added**
+            {
+                $refRec	= new Family(array('idmr' => $idime));
+			    break;
+			}
 
-				//  IDIME points to To-Do records tblTD.IDTD
-				case self::STYPE_TODO:		// 40 To-Do
-				{
-				    $refRec	= new ToDo(array('idtd' => $idime));
-				    break;
-				}
-		    }		// act on record type
-		} catch (Exception $e)
-		{		// exception thrown by a constructor
-		    $refRec	= null;
-		}		// exception thrown by a constructor
+			//	IDIME points to Event Record tblER.ider	
+			case self::STYPE_EVENT:		// 30 Individual Event
+			case self::STYPE_MAREVENT:	// 31 Marriage Event
+			{
+			    $refRec	= new Event(array('ider' => $idime));
+			    break;
+			}
+
+			//  IDIME points to To-Do records tblTD.IDTD
+			case self::STYPE_TODO:		// 40 To-Do
+			{
+			    $refRec	= new ToDo(array('idtd' => $idime));
+			    break;
+			}
+	    }		// act on record type
 
 		$this->refRecord	= $refRec;
 		return	$refRec;
@@ -1320,7 +1332,7 @@ class Citation extends RecordPic
     {
 		$olddate	= $this->getDate();
 		$sdname		= 'enteredsd';
-		if (is_a($value, 'LegacyDate'))
+		if ($value instanceof LegacyDate)
 		{	// parameter is an instance of LegacyDate
 		    $date	= $value;
 		}	// parameter is an instance of LegacyDate
@@ -1567,16 +1579,17 @@ class Citation extends RecordPic
 							'content'	    => $this->row['content'],
 							'override'	    => $this->row['override']);
 		    // query the database
-		    $stmt		= $connection->prepare($query);
-		    $queryText		= debugPrepQuery($query, $sqlParms);
+		    $stmt		        = $connection->prepare($query);
+		    $queryText		    = debugPrepQuery($query, $sqlParms);
+            $this->lastSqlCmd   = $queryText;
 		    if ($stmt->execute($sqlParms))
 		    {			// successful query
 				if ($debug)
-				    $warn	.= '<p>Citation.inc: ' . __LINE__ .
-							   " query='$queryText'</p>";
+				    $warn	    .= '<p>Citation.inc: ' . __LINE__ .
+					    		   " query='$queryText'</p>";
 
 				// if found duplicate citation record
-				$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
+				$result		    = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				if (count($result) > 0)
 				{		// ignore duplicate
 				    $row		= $result[0];
@@ -1750,13 +1763,13 @@ class Citation extends RecordPic
 
 				case 'enteredd':
 				{		// legacy internal date format
-				    $date	= new LegacyDate($value);
-				    $retval	.= $comma . "\t\"{$fld}c\":\t" . 
-							   json_encode($value);
-				    $comma	= ",\n";
-				    $value	= $date->toString();
-				    $retval	.= $comma . "\t\"$fld\":\t" . 
-							   json_encode($value);
+				    $date	    = new LegacyDate($value);
+                    $retval	    .= $comma . "\t\"{$fld}c\":\t" . 
+                                    json_encode($value);
+				    $comma	    = ",\n";
+				    $value	    = $date->toString();
+                    $retval	    .= $comma . "\t\"$fld\":\t" .  
+                                    json_encode($value);
 				    break;
 				}		// legacy internal date format
 

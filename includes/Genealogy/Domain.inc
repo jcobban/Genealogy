@@ -371,8 +371,14 @@ class Domain extends Record
      ********************************************************************/
     function getCountry()
     {
+        global  $debug;
+        global  $warn;
+
         if (is_null($this->country))
+        {
+            $cc 	        = substr($this['domain'], 0, 2);
             $this->country	= new Country(array('code'	=> $cc));
+        }
         if (!($this->country->isExisting()))
         {
             if ($debug)

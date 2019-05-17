@@ -184,6 +184,7 @@ use \Iterator;
  *						the pseudo-fields 'typetext' and 'callnumurl'	*
  *		2018/12/02      support field synonyms in constructor           *
  *		                report constructor errors through $this->msg    *
+ *		2019/04/15      replace is_a with instanceof                    *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -1136,7 +1137,7 @@ class Source extends RecordPic
 		    $newRepository	= new Address(array('addrname' => $newName,
 									    'kind' => ADDRESS::REPOSITORY));
 		else
-		if (is_a($newName, 'Address'))
+		if ($newName instanceof Address)
 		    $newRepository	= $newName;
         else
         {                       // ignore invalid value

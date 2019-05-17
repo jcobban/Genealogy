@@ -512,7 +512,8 @@ var	datePatt	= /\d{4}/;
 /************************************************************************
  *  Specify the function to get control once the page is loaded.		*
  ************************************************************************/
-window.onload	= loadEdit;
+addEventHandler(window, "load", loadEdit);
+
 
 /************************************************************************
  *  function loadEdit													*

@@ -2,9 +2,6 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
 /************************************************************************
  *  CountyMarriageReport.inc											*
  *																		*
@@ -35,6 +32,7 @@ use \Iterator;
  *						use $record->log method instead of static		*
  *		2018/11/21      remove static getWhere                          *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/05/18      add $info                                       *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -70,9 +68,23 @@ class CountyMarriageReport extends Record
 						'm_remarks'				=> '');
 
     /********************************************************************
-     *		CountyMarriageReport::$translate								*
-     *																		*
-     *		Translation of alternate field names								*
+     *	CountyMarriageReport::$info										*
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     		=> 'CountyMarriageReports',
+                'name'      		=> 'CountyMarriageReports',
+                'prime'	    		=> array('m_regdomain','m_volume','m_reportno'),
+	            'srvmg'     		=> false,
+	            'fldcount'			=> 6,
+                'order'     		=> 'M_RegDomain,M_Volume,M_ReportNo',
+                'classname' 		=> 'CountyMarriageReport');
+
+    /********************************************************************
+     *	CountyMarriageReport::$translate								*
+     *																	*
+     *	Translation of alternate field names							*
      ********************************************************************/
     protected static $translate	= array(
 						'regdomain'				=> 'm_regdomain',
@@ -94,8 +106,7 @@ class CountyMarriageReport extends Record
      *																	*
      *	Definition of default order for records retrieved by RecordSet	*
      ********************************************************************/
-    protected static	$defaultOrder	=
-        'M_regdomain,M_volume,M_reportno,M_page';
+    protected static	$defaultOrder	= 'M_regdomain,M_volume,M_reportno';
 
 
     /********************************************************************

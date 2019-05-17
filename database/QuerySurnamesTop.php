@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+
 /************************************************************************
  *  QuerySurnamesTop.php												*
  *																		*
@@ -38,7 +40,7 @@ require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/District.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
 require_once __NAMESPACE__ . '/Language.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // default values of parameters

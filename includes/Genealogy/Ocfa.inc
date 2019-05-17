@@ -23,6 +23,8 @@ use \Iterator;
  *																		*
  *  History:															*
  *		2018/11/21		created											*
+ *		2019/04/11      support case independent search for record      *
+ *		                key, and support key synonym                    *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -97,34 +99,46 @@ class Ocfa extends Record
 							print_r($parms, true) . ")</p>\n";
 
 		if (is_array($parms))
-		{		// associative array
+		{		                // associative array
 		    if (count($parms) >= count(self::$initRow))
-		    {			// complete row from database
+		    {			        // complete row from database
 				$dbrow		        = $parms;
 				$needInsert	        = false;
-		    }			// complete row from datase
+		    }			        // complete row from datase
 		    else
-		    {			// key and optional other parms
-				$id		= 0;
-				if (array_key_exists('id', $parms))
-				    $id = $parms['id'];
+		    {			        // key and optional other parms
+                $id		            = 0;
+                foreach($parms as $fldname => $value)
+                {               // loop through parms
+				    $fieldLc        = strtolower($fldname);
+            		if (array_key_exists($fieldLc, self::$translate))
+            		    $fieldLc	= self::$translate[$fieldLc];
+            		switch($fieldLc)
+                    {           // act on specific parameter
+                        case 'recordindex':
+                        {
+                            $id     = $value;
+                            break;
+                        }       // prime key
+                    }           // act on specific parameter
+                }               // loop through parms
 
                 if ($id > 0)
-				{		// initialize from database
+				{		        // initialize from database
 				    // construct the query of the user table
-				    $query	= 'SELECT * FROM Ocfa ' .
-								'WHERE RecordIndex=:id';
-				    $sqlParms	= array('id'	=> $id);
+				    $query	        = 'SELECT * FROM Ocfa ' .
+							        	'WHERE RecordIndex=:id';
+				    $sqlParms	    = array('id'	=> $id);
 				    
 				    // query the database
-				    $stmt	    = $connection->prepare($query);
-				    $queryText	= debugPrepQuery($query, $sqlParms);
+				    $stmt	        = $connection->prepare($query);
+				    $queryText	    = debugPrepQuery($query, $sqlParms);
 				    
 				    if ($stmt->execute($sqlParms))
-				    {		// success
+				    {		    // success
 						if ($debug)
 						    $warn	.= "<p>Ocfa::__construct: ".
-								   "$queryText</p>";
+							        	   "$queryText</p>";
 						$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
 						if (count($result) > 0)
 						{		// found matching record
@@ -136,21 +150,21 @@ class Ocfa extends Record
 						    $dbrow		    = self::$initRow;
 						    $needInsert		= true;
 						}		// invalid key
-				    }		// success
+				    }		    // success
 				    else
-				    {		// error performing query
+				    {		    // error performing query
 						throw new Exception("Ocfa::__construct: " .
 								    "query='$queryText', " .
 							    print_r($stmt->errorInfo(),true));
-				    }		// error performing query
-				}		// initialize from database
-		    }		// key and optional other parms
-		}		// associative array
+				    }		    // error performing query
+				}		        // initialize from database
+		    }		            // key and optional other parms
+		}		                // associative array
 		else
-		{		// unexpected parameter type
+		{		                // unexpected parameter type
 		    throw new Exception('Ocfa::__construct: called with ' .
 							 gettype($parms));
-		}		// unexpected parameter type
+		}		                // unexpected parameter type
 
 		// invoke constructor of base class
 		parent::__construct($dbrow,

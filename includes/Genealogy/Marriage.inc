@@ -251,23 +251,23 @@ class Marriage extends Record
         // validate parameters
         if (is_string($domain) || $domain instanceof Domain)
         {		// initialize new entry
-            $parms	= array('m_regdomain'	=> $domain,
-                                'm_regyear'	=> $year,
-                                'm_regnum'	=> $number);
+            $parms	            = array('m_regdomain'	=> $domain,
+                                        'm_regyear'	    => $year,
+                                        'm_regnum'	    => $number);
         }
         else
         if (is_array($domain))
-            $parms	= $domain;
+            $parms	            = $domain;
         else
-            $this->msg      .= "Invalid parameter " . print_r($domain, true) .
-                                '. ';
+            $this->msg          .= "Invalid parameter " . 
+                                    print_r($domain, true) . '. ';
 
         if (count($parms) >= count(self::$initRow))
         {			// row returned from database query
-            $dbrow		= $parms;
+            $dbrow		        = $parms;
             foreach($dbrow as $field => $value)
             {		// loop through fields
-                $fieldLc	= strtolower($field);
+                $fieldLc	    		= strtolower($field);
                 if (!array_key_exists($fieldLc, self::$initRow))
                 {		// move any extra fields to extras
                     $this->extras[$fieldLc]	= $value;
@@ -275,30 +275,30 @@ class Marriage extends Record
                 }		// move any extra fields to extras
             }		// loop through fields
 
-            $mregdomain	= $dbrow['m_regdomain'];
-            $mregyear	= $dbrow['m_regyear'];
-            $mregnum	= $dbrow['m_regnum'];
+            $mregdomain	        		= $dbrow['m_regdomain'];
+            $mregyear	        		= $dbrow['m_regyear'];
+            $mregnum	        		= $dbrow['m_regnum'];
 
-            $needInsert	= false;
+            $needInsert	        		= false;
         }		// row returned from database query
         else
         {		// search parameters
-            $sel			= '';
-            $and			= 'WHERE ';
-            $sqlParms			= $parms;
-            $year			= 0;
-            $number			= 0;
-            $domain			= 'CAON';
-            $domainObj			= null;
-            $numvolume			= null;
+            $sel			    		= '';
+            $and			    		= 'WHERE ';
+            $sqlParms			        = $parms;
+            $year		    	        = 0;
+            $number		    	        = 0;
+            $domain		    	        = 'CAON';
+            $domainObj			        = null;
+            $numvolume			        = null;
             foreach($parms as $field => $value)
             {
                 $value			= trim($value);
                 if (strlen($value) == 0)
                     continue;
-                $lcfldname		= strtolower($field);
+                $lcfldname		        = strtolower($field);
                 if (array_key_exists($lcfldname, self::$translate))
-                    $lcfldname		= self::$translate[$lcfldname];
+                    $lcfldname		    = self::$translate[$lcfldname];
                 switch($lcfldname)
                 {
                     case 'm_originalvolume':
@@ -318,19 +318,19 @@ class Marriage extends Record
                             error_log("Marriage.inc: " . __LINE__ .
                                         " m_originalvolume='$value'\n");
                         }
-                        $number		+= $numvolume * 10000;
+                        $number		    += $numvolume * 10000;
                         break;
                     }
 
                     case 'm_originalpage':
                     {
-                        $number		+= $value * 10;
+                        $number		    += $value * 10;
                         break;
                     }
 
                     case 'm_originalitem':
                     {
-                        $number		+= $value;
+                        $number		    += $value;
                         break;
                     }
 
@@ -339,51 +339,52 @@ class Marriage extends Record
                         if ($value instanceof Domain)
                         {
                             $domainObj	= $value;
-                            $domain	= $domainObj->get('code');
+                            $domain	    = $domainObj->get('code');
                         }
                         else
                         {
-                            $domain	= $value;
+                            $domain	    = $value;
                             $domParms	= array('domain'	=> $domain,
                                         'language'	=> 'en');
                             $domainObj	= new Domain($domParms);
                         }
                         if ($domainObj->isExisting())
                         {		// valid domain
-                            $cc		= substr($domain, 0, 2);
-                            $pc		= substr($domain, 2);
+                            $cc		    = substr($domain, 0, 2);
+                            $pc		    = substr($domain, 2);
                             $addrEnd	= ", $pc, $cc";
                         }
                         else
-                            $warn	.= "<p>Marriage.inc: " . __LINE__ .
-                                       " invalid domain id '$domain'</p>\n";
-                        $mregdomain	= $domain;
+                            $warn	    .= "<p>Marriage.inc: " . __LINE__ .
+                                           " invalid domain id '$domain'</p>\n";
+                        $mregdomain	    = $domain;
                         break;
                     }
 
                     case 'm_regyear':
                     {
-                        $mregyear	= $value;
-                        $year		= $value;
+                        $mregyear	    = $value;
+                        $year		    = $value;
                         if (is_string($year) && ctype_digit($year))
-                            $year	= (int)$year;
+                            $year	    = (int)$year;
                         else
                         if (!is_int($year) || $year < 1800 || $year > 2100)
-                            $warn .= "<p>Marriage::__construct: " . __LINE__ .
-                "registration year '$year' must be a numeric year</p>\n";
+                            $warn       .= "<p>Marriage::__construct: " . 
+                                            __LINE__ .
+                    "registration year '$year' must be a numeric year</p>\n";
                         break;
                     }
 
                     case 'm_regnum':
                     {
-                        $mregnum	= $value;
-                        $number		= $value;
+                        $mregnum	    = $value;
+                        $number		    = $value;
                         if (is_string($number) && ctype_digit($number))
-                            $number	= (int)$number;
+                            $number	    = (int)$number;
                         else
                         if (!is_int($number) || $number < 1)
-                            $warn	.= "Marriage::__construct: " .
-                                       __LINE__ .
+                            $warn	    .= "Marriage::__construct: " .
+                                           __LINE__ .
         "registration number '$number' must be a positive integer</p>\n";
 
                         break;
@@ -391,17 +392,17 @@ class Marriage extends Record
 
                 }
 
-                $sel	    .= $and . $lcfldname . '=:' . $field;
-                $and	    = ' AND ';
+                $sel	                .= $and . $lcfldname . '=:' . $field;
+                $and	                = ' AND ';
             }
 
             // query the database
-            $query	        = "SELECT * FROM Marriage $sel";
-            $stmt	        = $connection->prepare($query);
-            $queryText	    = debugPrepQuery($query, $sqlParms);
+            $query	                    = "SELECT * FROM Marriage $sel";
+            $stmt	                    = $connection->prepare($query);
+            $queryText	                = debugPrepQuery($query, $sqlParms);
             if ($stmt->execute($sqlParms))
             {		// successful query
-                $result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $result		            = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($debug)
                 {
                     $warn	.= "<p>Marriage.inc: " . __LINE__ .
@@ -412,11 +413,11 @@ class Marriage extends Record
 
                 if (count($result) > 0)
                 {		// existing record
-                    $dbrow	            	= $result[0];
-                    $mregdomain	        	= $dbrow['m_regdomain'];
-                    $mregyear	        	= $dbrow['m_regyear'];
-                    $mregnum	        	= $dbrow['m_regnum'];
-                    $needInsert	        	= false;
+                    $dbrow	            = $result[0];
+                    $mregdomain	        = $dbrow['m_regdomain'];
+                    $mregyear	        = $dbrow['m_regyear'];
+                    $mregnum	        = $dbrow['m_regnum'];
+                    $needInsert	        = false;
                 }		// existing record
                 else
                 {		// create a new record
@@ -426,7 +427,7 @@ class Marriage extends Record
                         $msvol	= self::$pre1873Years[$numvolume]['reel'];
                     }
                     else
-                        $msvol	= '';
+                        $msvol	            = '';
                     // set defaults
                     $dbrow			        = self::$initRow;
                     $dbrow['m_regdomain']	= $domain;
@@ -451,17 +452,17 @@ class Marriage extends Record
                                     "ORDER BY M_RegNum DESC " .
                                     "LIMIT 1";
 
-                    $sqlParms	    = array('domain'	=> $domain,
-                                            'year'		=> $year,
-                                            'number'	=> $number);
-                    $stmt	        = $connection->prepare($query);
-                    $queryText	    = debugPrepQuery($query, $sqlParms);
+                    $sqlParms	        = array('domain'	=> $domain,
+                                                'year'		=> $year,
+                                                'number'	=> $number);
+                    $stmt	            = $connection->prepare($query);
+                    $queryText	        = debugPrepQuery($query, $sqlParms);
                     if ($stmt->execute($sqlParms))
                     {		// successful query
                         if ($debug)
                         {
-                            $warn	.= '<p>Marriage.inc: ' . __LINE__ .
-                                       " query='$queryText'</p>\n";
+                            $warn	    .= '<p>Marriage.inc: ' . __LINE__ .
+                                           " query='$queryText'</p>\n";
                         }
 
                         $result		= $stmt->fetch(PDO::FETCH_ASSOC);
@@ -769,8 +770,8 @@ class Marriage extends Record
                 else
                 {
                     $date	= new LegacyDate(" $value");
-                    $y	= $date->getYear();
-                    $m	= $date->getMonth();
+                    $y	    = $date->getYear();
+                    $m	    = $date->getMonth();
                     if ($m < 10)
                         $m	= '0' . $m;
                     $d	= $date->getDay();
@@ -809,13 +810,10 @@ class Marriage extends Record
      *																	*
      *  Get the instance of MarriageParticipant for the bride.			*
      *																	*
-     *  Parameters:														*
-     *		$create				if true create record if necessary		*
-     *																	*
      *  Returns:														*
      *	    instance of MarriageParticipant								*
      ********************************************************************/
-    function getBride($create = false)
+    function getBride()
     {
         if (array_key_exists('B', $this->participants))
             return $this->participants['B'];
@@ -838,13 +836,10 @@ class Marriage extends Record
      *																	*
      *  Get the instance of MarriageParticipant for the groom.			*
      *																	*
-     *  Parameters:														*
-     *		$create				if true create record if necessary		*
-     *																	*
      *  Returns:														*
      *	    instance of MarriageParticipant								*
      ********************************************************************/
-    function getGroom($create = false)
+    function getGroom()
     {
         if (array_key_exists('G', $this->participants))
             return $this->participants['G'];
@@ -1171,18 +1166,18 @@ class Marriage extends Record
     }		// Marriage::save
 
     /********************************************************************
-     *		Marriage::delete												*
+     *	function Marriage::delete										*
      *																	*
      *  Delete the database records associated with this instance.		*
      *																	*
      *  Parameters:														*
-     *		    $xml		if true diagnostic output is emitted in				*
-     *						XML format										*
-     *																	*
+     *	    $xml		if true diagnostic output is emitted in			*
+     *					XML format										*
+     *																    *
      *  Returns:														*
-     *		    false		if the method was unable to update the database		*
-     *		    1				if the method deleted the database record		*
-     *		    0				if the record did not need to be deleted		*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method deleted the database record		*
+     *	    0			if the record did not need to be deleted		*
      ********************************************************************/
     function delete($xml = false)
     {

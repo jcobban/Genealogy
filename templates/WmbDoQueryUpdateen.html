@@ -1,159 +1,159 @@
 <!--*********************************************************************
- *  WmbDoQueryUpdateen.html						*
- *									*
+ *  WmbDoQueryUpdateen.html												*
+ *																		*
  *  Display a report of individuals whose Wesleyan Methodist Baptism	*
- *  matches the requested pattern.					*
- *									*
- *  History (of WmbDoQuery.php):					*
- *	2013/06/28	created						*
- *	2013/11/27	handle database server failure gracefully	*
- *	2013/12/07	$msg and $debug initialized by common.inc	*
- *	2014/01/03	interpret numeric dates				*
- *			replace tables with CSS				*
- *	2015/05/01	PHP print statements were corrupted		*
- *			validate date before interpreting month		*	
- *	2015/07/02	access PHP includes using include_path		*
- *	2015/07/28	force minimum width of columns			*
- *	2015/09/28	migrate from MDB2 to PDO			*
- *	2016/03/26	make given name a hyperlink			*
- *	2016/04/25	replace ereg with preg_match			*
- *	2016/08/19	change default number of lines to 25		*
- *			always display full page if page requested	*
- *			forward and back links are by page if page	*
- *			requested					*
- *			order by internal order for display of page	*
- *	2016/11/28	handle invalid month 00				*
- *  History as WmbDoQueryUpdateen.html:					*
- *	2018/01/24	convert to template				*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  matches the requested pattern.										*
+ *																		*
+ *  History (of WmbDoQuery.php):										*
+ *		2013/06/28		created											*
+ *		2013/11/27		handle database server failure gracefully		*
+ *		2013/12/07		$msg and $debug initialized by common.inc		*
+ *		2014/01/03		interpret numeric dates							*
+ *						replace tables with CSS							*
+ *		2015/05/01		PHP print statements were corrupted				*
+ *						validate date before interpreting month			*		
+ *		2015/07/02		access PHP includes using include_path			*
+ *		2015/07/28		force minimum width of columns					*
+ *		2015/09/28		migrate from MDB2 to PDO						*
+ *		2016/03/26		make given name a hyperlink						*
+ *		2016/04/25		replace ereg with preg_match					*
+ *		2016/08/19		change default number of lines to 25			*
+ *						always display full page if page requested		*
+ *						forward and back links are by page if page		*
+ *						requested										*
+ *						order by internal order for display of page		*
+ *		2016/11/28		handle invalid month 00							*
+ *  History as WmbDoQueryUpdateen.html:									*
+ *		2018/01/24		convert to template								*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-<div class="hidden" id="breadcrumbs">
-  <a href="/genealogy.php">
-	Genealogy
-  </a>:
-  <a href="/genCountry.php?cc=CA">
-	Canada
-  </a>:
-  <a href="/Canada/genProvince.php?Domain=CAON">
-	Ontario
-  </a>:
-  <a href="/displayPage.php?template=WmbQuery">
-	Wesleyan Methodist Baptism Query
-  </a>:
-  <a href="/Ontario/WmbVolStats.php">
-	Statistics by Volume
-  </a>:
-  <a href="/Ontario/WmbPageStats.php?volume=$volume">
-	Volume $volume
-  </a>:
-</div>
-<div class="body">
-  <h1>
-	Wesleyan Methodist Baptisms Update
-    <span class="right">
-	<a href="/Ontario/WmbDoQueryHelpen.html" target="_blank">
-		Help?
-	</a>
-    </span>
-  </h1>
-  <p>This tool is an alternate and <b>unauthorized</b> interface to the
-	transcription © Ida Reed, 2001 and made 
-	<a href="http://freepages.genealogy.rootsweb.ancestry.com/~wjmartin/wesleyan.htm">available on Rootsweb</a>
-	by Bill Martin.
-  </p>
-$TRACE
-$MSG
-  <!--- Put out a line with links to previous and next section of table -->
-  <div class="center">
-    <div class="left">
-	  <a href="$npuri$npand$npprev" id="prevPage">&lt;---</a>
-    </div>
-    <div class="right">
-	  <a href="$npuri$npand$npnext" id="nextPage">---&gt;</a>
-    </div>
-    displaying rows $offsetplus1 to $offsetplusnumRows
-	of $totalrows 
-    <div style="clear: both;"></div>
-  </div>
-  <!--- Put out the response as a table -->
-  <form name="wmbform" action="nothing">
-  <table class="details">
-    <thead>
-    <!--- Put out the column headers -->
-      <tr>
-	<th class="colhead">
-	  Volume
-	</th>
-	<th class="colhead">
-	  Page
-	</th>
-	<th class="colhead">
-	  Surname
-	</th>
-	<th class="colhead">
-	  Given Names
-	</th>
-	<th class="colhead">
-	  Birth Place
-	</th>
-	<th class="colhead">
-	  Birth Date
-	</th>
-	<th class="colhead">
-	  Details
-	</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-	<td class="$class right">
-	  $volume
-	</td>
-	<td class="$class right">
-	  $page
-	</td>
-	<td class="$class" style="min-width: 180px">
-	  $surname
-	</td>
-	<td class="$class" style="min-width: 180px">
-	  <a href="/FamilyTree/Person.php?idir=$idir"
-			target="_blank">"
-	    $givenname
-	  </a>
-	</td>
-	<td class="$class" style="min-width: 120px">
-	  $birthplace
-	</td>
-	<td class="$class" style="min-width: 110px">
-	  $birthdate
-	</td>
-	<td class="$class">
-	  <button type="button" id="Details$idmb" class="button">
-		Details
-	  </button>
-	</td>
-      </tr>
-    </tbody>
-  </table>
-  </form>
-  <!--- Put out a line with links to previous and next section of table -->
-  <div class="center">
-    <div class="left">
-	  <a href="$npuri$npand$npprev">&lt;---</a>
-    </div>
-    <div class="right">
-	  <a href="$npuri$npand$npnext">---&gt;</a>
-    </div>
-    <div style="clear: both;"></div>
-  </div>
-</div> <!-- end of <div id="body"> -->
-<div class="balloon" id="HelpDetails">
-Click on this button to see the whole record.
-</div>
-    <script src="/jscripts/js20/http.js">
-    </script>
-    <script src="/jscripts/util.js">
-    </script>
-    <script src="/Ontario/WmbDoQuery.js">
-    </script>
+	<div class="hidden" id="breadcrumbs">
+	  <a href="/genealogy.php">
+		Genealogy
+	  </a>:
+	  <a href="/genCountry.php?cc=CA">
+		Canada
+	  </a>:
+	  <a href="/Canada/genProvince.php?Domain=CAON">
+		Ontario
+	  </a>:
+	  <a href="/displayPage.php?template=WmbQuery">
+		Wesleyan Methodist Baptism Query
+	  </a>:
+	  <a href="/Ontario/WmbVolStats.php">
+		Statistics by Volume
+	  </a>:
+	  <a href="/Ontario/WmbPageStats.php?volume=$volume">
+		Volume $volume
+	  </a>:
+	</div>
+	<div class="body">
+	  <h1>
+		Wesleyan Methodist Baptisms Update
+	    <span class="right">
+		<a href="/Ontario/WmbDoQueryHelpen.html" target="_blank">
+			Help?
+		</a>
+	    </span>
+	  </h1>
+	  <p>This tool is an alternate and <b>unauthorized</b> interface to the
+		transcription © Ida Reed, 2001 and made 
+		<a href="http://freepages.genealogy.rootsweb.ancestry.com/~wjmartin/wesleyan.htm">available on Rootsweb</a>
+		by Bill Martin.
+	  </p>
+	$TRACE
+	$MSG
+	  <!--- Put out a line with links to previous and next section of table -->
+	  <div class="center" id="topBrowse">
+	    <div class="left" id="topPrev">
+		  <a href="$npuri$npand$npprev" id="prevPage">&lt;---</a>
+	    </div>
+	    <div class="right" id="topNext">
+		  <a href="$npuri$npand$npnext" id="nextPage">---&gt;</a>
+	    </div>
+	    displaying rows $offsetplus1 to $offsetplusnumRows
+		of $totalrows 
+	    <div style="clear: both;"></div>
+	  </div>
+	  <!--- Put out the response as a table -->
+	  <form name="wmbform" action="nothing">
+	  <table class="details">
+	    <thead>
+	    <!--- Put out the column headers -->
+	      <tr>
+		<th class="colhead">
+		  Volume
+		</th>
+		<th class="colhead">
+		  Page
+		</th>
+		<th class="colhead">
+		  Surname
+		</th>
+		<th class="colhead">
+		  Given Names
+		</th>
+		<th class="colhead">
+		  Birth Place
+		</th>
+		<th class="colhead">
+		  Birth Date
+		</th>
+		<th class="colhead">
+		  Details
+		</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td class="$class right">
+		  $volume
+		</td>
+		<td class="$class right">
+		  $page
+		</td>
+		<td class="$class" style="min-width: 180px">
+		  $surname
+		</td>
+		<td class="$class" style="min-width: 180px">
+		  <a href="/FamilyTree/Person.php?idir=$idir"
+				target="_blank">"
+		    $givenname
+		  </a>
+		</td>
+		<td class="$class" style="min-width: 120px">
+		  $birthplace
+		</td>
+		<td class="$class" style="min-width: 110px">
+		  $birthdate
+		</td>
+		<td class="$class">
+		  <button type="button" id="Details$idmb" class="button">
+			Details
+		  </button>
+		</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  </form>
+	  <!--- Put out a line with links to previous and next section of table -->
+	  <div class="center" id="botBrowse">
+	    <div class="left" id="botPrev">
+		  <a href="$npuri$npand$npprev">&lt;---</a>
+	    </div>
+	    <div class="right" id="botNext">
+		  <a href="$npuri$npand$npnext">---&gt;</a>
+	    </div>
+	    <div style="clear: both;"></div>
+	  </div>
+	</div> <!-- end of <div id="body"> -->
+	<div class="balloon" id="HelpDetails">
+	Click on this button to see the whole record.
+	</div>
+	<script src="/jscripts/js20/http.js">
+	</script>
+	<script src="/jscripts/util.js">
+	</script>
+	<script src="/Ontario/WmbDoQuery.js">
+	</script>

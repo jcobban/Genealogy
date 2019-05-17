@@ -379,6 +379,7 @@ use \Iterator;
  *                      fields added and corresponding copies of        *
  *                      the names of the partners deprecated            *
  *                      dump did not return contents of dump            *
+ *		2019/04/15      replace is_a with instanceof                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -695,6 +696,8 @@ class Family extends RecordPic
 				foreach($parms as $fldname => $value)
 				{		        // loop through all parameters	
 				    $fieldLc                = strtolower($fldname);
+            		if (array_key_exists($fieldLc, self::$translate))
+		                $fieldLc	= self::$translate[$fieldLc];
 				    switch ($fieldLc)
 				    {		    // act on specific fields
 						case 'idmr':
@@ -1345,7 +1348,7 @@ class Family extends RecordPic
     /********************************************************************
      *  function Family::getChildren									*
      *																	*
-     *  Get an array of the children of this family.					*
+     *  Get a RecordSet of the children of this family.					*
      *																	*
      *  Returns:														*
      *      instance of RecordSet containing instances of Child			*
@@ -2405,7 +2408,7 @@ catch(Exception $e)
      ********************************************************************/
     function get($field)
     {
-		$fieldLc	= strtolower($field);
+		$fieldLc	    = strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
@@ -2420,7 +2423,8 @@ catch(Exception $e)
 		    }
 
 		    case 'marloc':
-		    {
+            {
+                $idlrmar    = $this->get('idlrmar');
 				if ($idlrmar > 1)
 				{		// not the null location
 				    $marloc	= new Location(array('idlr' => $idlrmar));
@@ -2468,7 +2472,7 @@ catch(Exception $e)
 		    {		// legacy internal date format
 				$sdname	= substr($field, 0, strlen($field)-1) . 'sd';
 				$oldvalue		= $this->row[$field];
-				if (is_a($value, 'LegacyDate'))
+				if ($value instanceof LegacyDate)
 				{	// parameter is an instance of LegacyDate
 				    $date	= $value;
 				}	// parameter is an instance of LegacyDate

@@ -274,7 +274,7 @@ function changePlot()
  ************************************************************************/
 function addRow()
 {
-    var	table		= document.getElementById('dataTbl');
+    var	table		= document.getElementById('dataTable');
     var	tbody		= table.tBodies[0];
     var num		= tbody.rows.length - 1;
     var lastrow		= tbody.rows[num];

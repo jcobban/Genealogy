@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+
 /************************************************************************
  *  DeathRegResponse.php												*
  *																		*
@@ -89,7 +91,7 @@ require_once __NAMESPACE__ . "/Country.inc";
 require_once __NAMESPACE__ . "/County.inc";
 require_once __NAMESPACE__ . "/Death.inc";
 require_once __NAMESPACE__ . "/Language.inc";
-require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 /************************************************************************
@@ -291,6 +293,13 @@ foreach ($_GET as $key => $value)
 			{
 			    break;
 			}
+
+            case 'order':
+            {
+                if (strlen($value) > 0)
+                    $orderby        = $value;
+                break;
+            }
 
 			default:
 			{		// ordinary parameter
@@ -510,7 +519,7 @@ if (strlen($msg) == 0)
     // get the set of Deaths matching the parameters
     $getParms['order']      = $orderby;
 	$deaths					= new RecordSet('Deaths', $getParms);
-	$totalrows				= $deaths->getInformation()['count'];
+    $totalrows				= $deaths->getInformation()['count'];
     $numRows				= $deaths->count();
 
 	if ($offset + $numRows >= $totalrows && $regnum == 0)
@@ -581,12 +590,12 @@ if (strlen($msg) == 0)
 
         $deathTemplate      = new Template($deathHTML);
         if ($idir > 0)
-            $deathTemplate->updateTag('name$regyear$regnum', null);
+            $deathTemplate['name$regyear$regnum']->update(null);
         else
-            $deathTemplate->updateTag('link$regyear$regnum', null);
+            $deathTemplate['link$regyear$regnum']->update(null);
         if (!canUser('update'))
-            $deathTemplate->updateTag('Delete$regyear$regnum', null);
-        $deathTemplate->updateTag('deathRow$regyear$regnum', array($death));
+            $deathTemplate['Delete$regyear$regnum']->update(null);
+        $deathTemplate['deathRow$regyear$regnum']->update($death);
         $data               .= $deathTemplate->compile() . "\n";
         $regnum		        = $regnum + 1;	// expected entry
         $eregnum		    = $regnum;	    // expected entry

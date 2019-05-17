@@ -18,9 +18,9 @@
 window.onload	= loadWmb;
 
 /************************************************************************
- *  loadWmb																*
+ *  function loadWmb													*
  *																		*
- *  Initialize the dynamic functionality of the script.						*
+ *  Initialize the dynamic functionality of the script.					*
  ************************************************************************/
 function loadWmb()
 {
@@ -110,9 +110,9 @@ function loadWmb()
 }	// function loadWmb
 
 /************************************************************************
- *  validate Form														*
+ *  function validateForm												*
  *																		*
- *  Ensure that the data entered by the user has been minimally				*
+ *  Ensure that the data entered by the user has been minimally			*
  *  validated before submitting the form.								*
  ************************************************************************/
 function validateForm()
@@ -121,12 +121,12 @@ function validateForm()
 }		// validateForm
 
 /************************************************************************
- *  resetForm																*
+ *  function resetForm													*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
  *  This is required because the browser does not call the				*
- *  onchange method for form elements that have one.						*
+ *  onchange method for form elements that have one.					*
  ************************************************************************/
 function resetForm()
 {
@@ -136,7 +136,7 @@ function resetForm()
 }	// resetForm
 
 /************************************************************************
- *  gotDistrictsFile														*
+ *  function gotDistrictsFile											*
  *																		*
  *  This method is called when the districts file						*
  *  is retrieved.  It populates the selection statement.				*
@@ -174,14 +174,14 @@ function gotDistrictsFile(xmlDoc)
     // specify the action for selecting a county
     countySelect.onchange	= changeDistrict;
     countySelect.selectedIndex	= 0;
-}		// gotDistrictsFile
+}		// function gotDistrictsFile
 
 /************************************************************************
- *  noDistrictsFile														*
+ *  function noDistrictsFile											*
  *																		*
- *  This method is called if there is no census summary file.				*
+ *  This method is called if there is no census summary file.			*
  *  The selection list of districts is cleared and an error message		*
- *  displayed.																*
+ *  displayed.															*
  ************************************************************************/
 function noDistrictsFile()
 {
@@ -203,9 +203,9 @@ function noDistrictsFile()
 }		// noDistrictsFile
 
 /************************************************************************
- *  changeDistrict														*
+ *  function changeDistrict												*
  *																		*
- *  This method is called when the user selects a new district.				*
+ *  This method is called when the user selects a new district.			*
  ************************************************************************/
 function changeDistrict()
 {
@@ -225,16 +225,16 @@ function changeDistrict()
                 gotArea,
                 noArea);
     }
-}		// changeDistrict
+}		// function changeDistrict
 
 /************************************************************************
- *  gotArea																*
+ *  function gotArea													*
  *																		*
- *  This method is called when the township information XML document		*
+ *  This method is called when the township information XML document	*
  *  relating to a particular district is retrieved.						*
  *																		*
  *  Input:																*
- *		xmlDoc		XML document retrieved from server						*
+ *		xmlDoc		XML document retrieved from server					*
  ************************************************************************/
 function gotArea(xmlDoc)
 {
@@ -297,15 +297,14 @@ function gotArea(xmlDoc)
 }		// gotArea
 
 /************************************************************************
- *  noArea																*
+ *  function noArea														*
  *																		*
  *  This method is called if there is no township						*
- *  description file returned by the server.								*
- *  The selection list of townships is replaced by a text input field.		*
+ *  description file returned by the server.							*
+ *  The selection list of townships is replaced by a text input field.	*
  ************************************************************************/
 function noArea()
 {
-//alert("noArea");
     var	tdNode		= document.getElementById("TwpCell");
 
     // create the replacement contents
@@ -324,27 +323,31 @@ function noArea()
 }		// noArea
 
 /************************************************************************
- *  showStatus																*
+ *  function showStatus													*
  *																		*
- *  Switch to the transcription status page.								*
+ *  Switch to the transcription status page.							*
  *  This function is called when the ShowStatus button is selected.		*
  ************************************************************************/
 function showStatus()
 {
-    location	= "WmbStats.php";
+    var lang    = 'en';
+    if ('lang' in args)
+        lang    = args.lang;
+    location	= "/Ontario/WmbStats.php?lang=" + lang;
     return false;	// suppress default action
 }		// showStatus
 
 /************************************************************************
- *  showVolStatus														*
+ *  function showVolStatus												*
  *																		*
- *  Switch to the statistics by volume page.								*
- *  This function is called when the ShowVolStatus button is selected.		*
+ *  Switch to the statistics by volume page.							*
+ *  This function is called when the ShowVolStatus button is selected.	*
  ************************************************************************/
 function showVolStatus()
 {
-    location	= "WmbVolStats.php";
+    var lang    = 'en';
+    if ('lang' in args)
+        lang    = args.lang;
+    location	= "/Ontario/WmbVolStats.php?lang=" + lang;
     return false;	// suppress default action
 }		// showVolStatus
-
-

@@ -282,11 +282,11 @@ require_once __NAMESPACE__ . '/common.inc';
 
     /********************************************************************
      *  $typeText														*
-     *																		*
-     *  Events which are implemented by fields inside a record other		*
-     *  than an instance of Event (tblER), are distinguished				*
-     *		by the citation type, passed as parameter type.  This table		*
-     *		is used to modify the title of the dialog based upon the type.		*
+     *																	*
+     *  Events which are implemented by fields inside a record other	*
+     *  than an instance of Event (tblER), are distinguished			*
+     *	by the citation type, passed as parameter type.  This table		*
+     *	is used to modify the title of the dialog based upon the type.	*
      ********************************************************************/
     $typeText	= array(
 					 0			=> 'Generic Fact',
@@ -793,6 +793,7 @@ $picIdType			= null; // for invoking EditPictures dialog
 $given				= '';
 $surname			= '';
 $rownum				= null;
+$lang               = 'en';
 
 // database records
 $event				= null;	// instance of Event
@@ -814,51 +815,57 @@ foreach($_GET as $key => $value)
     {
         case 'type':
         {		// supplied event type
-            $type	= (int)$value;
-            if ($type == 0)
-                $readonly	= "readonly='readonly'";
-            // textual description of event type
-            if (array_key_exists($type, Citation::$intType))
-                $eventType	= Citation::$intType[$type];
-            else
-                $eventType	= 'Invalid event type ' . $type;
+            if (ctype_digit($value))
+            {
+	            $type	= (int)$value;
+	            if ($type == 0)
+	                $readonly	= "readonly='readonly'";
+	            // textual description of event type
+	            if (array_key_exists($type, Citation::$intType))
+	                $eventType	= Citation::$intType[$type];
+	            else
+                    $eventType	= 'Invalid event type ' . $type;
+            }
             break;
         }		 // supplied event type
 
         // get the event record identifier if present
         case 'ider':
         {
-            $ider	= $value;
-            if ($ider != 0)
-            {		// existing event
-                try
-                {
-                    $event		= new Event(array('ider' 		=> $ider));
-                    $idet		= $event->getIdet();
-                    if ($event->get('idtype') == 0)
-                    {	// individual event
-                        $idir	= $event->get('idir');
-                        $type	= 30;
-                    }	// individual event
-                    else
-                    {	// marriage event
-                        $idmr	= $event->get('idir');
-                        $type	= 31;
-                    }	// married event
-                }
-                catch(Exception $e)
-                {		// new Event failed
-                    $event	= null;
-                    $msg	.= "Invalid event ider=$ider " .
-                                   $e->getMessage();
-                    $ider	= null;
-                }		// new Event failed
-            }		// existing event
-            else
-            {		// request to create new event
-                $event	= null;		// is done later
-            }		// request to create new event
-            break;
+            if (ctype_digit($value))
+            {               // valid numeric
+	            $ider	= $value;
+	            if ($ider != 0)
+	            {		    // existing event
+	                try
+	                {
+	                    $event		= new Event(array('ider' 		=> $ider));
+	                    $idet		= $event->getIdet();
+	                    if ($event->get('idtype') == 0)
+	                    {	// individual event
+	                        $idir	= $event->get('idir');
+	                        $type	= 30;
+	                    }	// individual event
+	                    else
+	                    {	// marriage event
+	                        $idmr	= $event->get('idir');
+	                        $type	= 31;
+	                    }	// married event
+	                }
+	                catch(Exception $e)
+	                {		// new Event failed
+	                    $event	= null;
+	                    $msg	.= "Invalid event ider=$ider " .
+	                                   $e->getMessage();
+	                    $ider	= null;
+	                }		// new Event failed
+	            }		    // existing event
+	            else
+	            {		    // request to create new event
+	                $event	= null;		// is done later
+                }		    // request to create new event
+            }               // valid numeric
+	        break;
         }		// ider
 
         // get the event type identifier if present
@@ -1045,13 +1052,20 @@ foreach($_GET as $key => $value)
             break;
         }		// control edit for notes
 
+        case 'lang':
+        {
+            if (strlen($value) >= 2)
+                $lang       = strtolower(substr($value, 0, 2));
+            break;
+        }
+
         default:
         {		// other parameters
-            $msg	.= "Unexpected parameter $key='$value'";
+            $warn	.= "<p>Unexpected parameter $key='$value'</p>\n";
             break;
         }		// other parameters
-    }	// switch
-}		// loop through all parameters
+    }	        // switch
+}		        // loop through all parameters
 
 // get the associated individual record
 if (strlen($msg) == 0 && !is_null($idir))

@@ -57,24 +57,24 @@ class DomainSet extends RecordSet
 		global	$connection;
 
 		// validate parameter
-		$limit  		= null;
-		$offset			= null;
-		$where			= '';
-		$and			= 'WHERE ';
-		$this->sqlParms	= array();
-		$language		= null;
-		$cc		    	= null;
-		$domain			= null;
-		$state			= null;
+		$limit  				= null;
+		$offset					= null;
+		$where					= '';
+		$and					= 'WHERE ';
+		$this->sqlParms			= array();
+		$language				= null;
+		$cc		    			= null;
+		$domain					= null;
+		$state					= null;
 
 		foreach($this->parms as $key 	=> $value)
 		{			// loop through all parameters
-		    $fieldLc	= Domain::getRealFieldName($key);
-		    $matches	= array();
+		    $fieldLc	        = Domain::getRealFieldName($key);
+		    $matches	        = array();
 		    if (preg_match('/^(.*) AS (.*)$/i', $fieldLc, $matches))
 		    {
-				$fieldExpr	= $matches[1];
-				$fieldLc	= strtolower($matches[2]);
+				$fieldExpr	    = $matches[1];
+				$fieldLc	    = strtolower($matches[2]);
 		    }
 
 		    switch($fieldLc)
@@ -86,13 +86,16 @@ class DomainSet extends RecordSet
 						$where			.= $and . $fieldExpr . "=?";
 						array_push($this->sqlParms, $value);
 						$and			= ' AND ';
-						$cc			= $value;
+						$cc			    = $value;
 				    }
 				    else
 				    {		// or expression
 						$warn	.= "<p>DomainSet::getWhere: " .
 							       "Unsupported value for `$key`=" .
                                    print_r($value, true) . "</p>\n";
+                        $warn   .= "<p>parms=" . print_r($this->parms, true) .
+                                    "</p>\n";
+                        showTrace();
                         throw new Exception("Unsupported value for `$key`=" .
                                    print_r($value, true));
 				    }		// or expression

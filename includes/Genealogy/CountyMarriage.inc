@@ -21,6 +21,8 @@ use \Iterator;
  *		2017/10/10		complete migration to prepared statements		*
  *						permit updating identification fields by set	*
  *		2017/12/18		add support for temporary fields				*
+ *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/05/18      add $info                                       *
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
@@ -60,6 +62,20 @@ class CountyMarriage extends Record
 		 		        'm_witnessname'		=> '',
 						'm_idir'		    => 0,
 						'm_remarks'		    => '');
+
+    /********************************************************************
+     *	CountyMarriage::$info											*
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     		=> 'CountyMarriages',
+                'name'      		=> 'CountyMarriages',
+                'prime'	    		=> array('m_regdomain','m_volume','m_reportno','m_itemno','m_role'),
+	            'srvmg'     		=> false,
+	            'fldcount'			=> 6,
+                'order'     		=> 'M_Regdomain,M_Volume,M_Reportno,M_Itemno,M_Role DESC',
+                'classname' 		=> 'CountyMarriage');
 
     /********************************************************************
      *	$translate		static array containing common translations of	*
@@ -175,18 +191,18 @@ class CountyMarriage extends Record
 						{
 						    if (is_string($value))
 						    {
-							// some idiot put in fractional values for
-							// report numbers!
-							$value		= trim($value);
-							$matches	= array();
-							$rxr	= preg_match('#(\d+)(\x{00BD}|.5|1/2)#u',
-									     $value);
-							if ($rxr)
-							    $value	= intval($matches[1]) + 0.5;
+								// some idiot put in fractional values for
+								// report numbers!
+								$value		= trim($value);
+								$matches	= array();
+								$rxr	    = preg_match('#(\d+)(\x{00BD}|.5|1/2)#u',
+										                 $value);
+								if ($rxr)
+							        $value	= intval($matches[0]) + 0.5;
 						    }
-						    $where		.= $and . 'M_ReportNo=?';
+						    $where		    .= $and . 'M_ReportNo=?';
 						    $sqlParms[]		= $value;
-						    $and		= ' AND ';
+						    $and		    = ' AND ';
 						    break;
 						}	// report number
 
@@ -217,10 +233,11 @@ class CountyMarriage extends Record
 
 				if (strlen($msg) == 0)
 				{			// no errors so far
-				    $query		= "SELECT * FROM CountyMarriages " .
-								  $where;
-				    $stmt		= $connection->prepare($query);
-				    $queryText		= debugPrepQuery($query, $sqlParms);
+				    $query		        = "SELECT * FROM CountyMarriages " .
+					        			  $where;
+				    $stmt		        = $connection->prepare($query);
+				    $queryText		    = debugPrepQuery($query, $sqlParms);
+                    $this->lastSqlCmd   = $queryText;
 				    if ($stmt->execute($sqlParms))
 				    {		// successful select
 						if ($debug)
@@ -323,20 +340,21 @@ class CountyMarriage extends Record
 		    }			// loop through all fields in record
 
 		    // insert the new record into the database
-		    $insert		= "INSERT INTO CountyMarriages ($fldnames) " .
-								"VALUES($values)";
-		    $stmt		= $connection->prepare($insert);
-		    $insertText		= debugPrepQuery($insert, $sqlParms);
+		    $insert		        = "INSERT INTO CountyMarriages ($fldnames) " .
+								    "VALUES($values)";
+		    $stmt		        = $connection->prepare($insert);
+		    $insertText		    = debugPrepQuery($insert, $sqlParms);
+            $this->lastSqlCmd   = $insertText;
 		    if ($stmt->execute($sqlParms))
 		    {			// successful insert
-				$count		= $stmt->rowCount();
+				$count		    = $stmt->rowCount();
 				if ($xml)
 				    print "<$tagname count='$count'>$insertText</$tagname>\n";
 
 				if ($debug)
-				    $warn	.= '<p>CountyMarriage.inc: ' . __LINE__ .
-							    " cmd='$insertText'</p>\n" .
-							       "<p>count=$count</p>\n";
+				    $warn	    .= '<p>CountyMarriage.inc: ' . __LINE__ .
+							        " cmd='$insertText'</p>\n" .
+							           "<p>count=$count</p>\n";
 
 				// log the update
 				logSqlUpdate($insert,
@@ -360,7 +378,6 @@ class CountyMarriage extends Record
 		}			// create new record
 		else
 		{			// update existing record
-		    $update		= "UPDATE CountyMarriages ";
 		    $set		= '';
 		    $sqlParms		= array();
 		    $comma		= 'SET ';
@@ -403,14 +420,16 @@ class CountyMarriage extends Record
 								  "M_Role=:orole";
 
 				// assemble the UPDATE command
-				$update		.= $set . ' WHERE ' . $where;
+		        $update		        = "UPDATE CountyMarriages " .
+				        		         $set . ' WHERE ' . $where;
 
 				// perform the update
-				$stmt		= $connection->prepare($update);
-				$updateText	= debugPrepQuery($update, $sqlParms);
+				$stmt		        = $connection->prepare($update);
+				$updateText	        = debugPrepQuery($update, $sqlParms);
+                $this->lastSqlCmd   = $updateText;
 				if ($stmt->execute($sqlParms))
 				{		// successful update
-				    $count	= $stmt->rowCount();
+				    $count	        = $stmt->rowCount();
 				    if ($xml)
 						print "<$tagname count='$count'>$updateText</$tagname>\n";
 
@@ -433,94 +452,6 @@ class CountyMarriage extends Record
 		    }			// changes made
 		}			// update existing record
     }		// CountyMarriage::save
-
-    /********************************************************************
-     *	CountyMarriage::delete											*
-     *																	*
-     *  Delete the database records associated with this instance.		*
-     *																	*
-     *  Parameters:														*
-     *	    $xml		if true diagnostic output is emitted in			*
-     *					XML format										*
-     *																	*
-     *	Returns:														*
-     *	    false		if the method was unable to update the database	*
-     *	    1			if the method deleted the database record		*
-     *	    0			if the record did not need to be deleted		*
-     ********************************************************************/
-    function delete($xml = false)
-    {
-		global	$debug;
-		global	$warn;
-		global	$connection;
-
-		// handle XML output option
-		if (is_string($xml))
-		    $xmltag	= $xml;
-		else
-		if ($xml)
-		{
-		    $xml	= true;
-		    $xmltag	= 'cmd';
-		}
-
-		// get the key of the table rows referenced by this record
-		$sqlParms		= array();
-		if ($this->former)
-		{		// record has been updated since read
-		    $sqlParms['regdomain']	= $this->former['m_regdomain'];
-		    $sqlParms['volume']		= $this->former['m_volume'];
-		    $sqlParms['reportNo']	= $this->former['m_reportno'];
-		    $sqlParms['itemNo']		= $this->former['m_itemno'];
-		    $sqlParms['role']		= $this->former['m_role'];
-		}		// record has been updated since read
-		else
-		{		// record not updated
-		    $sqlParms['regdomain']	= $this->row['m_regdomain'];
-		    $sqlParms['volume']		= $this->row['m_volume'];
-		    $sqlParms['reportNo']	= $this->row['m_reportno'];
-		    $sqlParms['itemNo']		= $this->row['m_itemno'];
-		    $sqlParms['role']		= $this->row['m_role'];
-		}		// record not updated
-
-		// delete all associated records
-		if (!$this->needInsert)
-		{		// only delete if already in database
-		    $delete	= 'DELETE FROM CountyMarriages ' .
-							'WHERE M_RegDomain=:regdomain AND ' .
-							'M_Volume=:volume AND ' .
-							'M_ReportNo=:reportNo AND ' .
-							'M_ItemNo=:itemNo AND ' .
-							'M_Role=:role';
-		    $stmt	= $connection->prepare($delete);
-		    $deleteText	= debugPrepQuery($delete);
-		    if ($stmt->execute($sqlParms))
-		    {		// successful delete
-				$count		= $stmt->rowCount();
-				if ($debug)
-						$warn	.= '<p>CountyMarriage.inc: ' . __LINE__ .
-							  " query='$deleteText'</p>\n";
-
-				if ($xml)
-				    print "<$xmltag count='$count'>$deleteText</$xmltag>\n";
-
-				// log the update
-				logSqlUpdate($delete,
-						     $sqlParms,
-						     $count,
-						     $this->toJson(false),
-						     '');
-		    }		// successful delete
-		    else
-		    {		// error updating record
-				$warn	.= '<p>CountyMarriage.inc: ' . __LINE__ .
-							" query='$deleteText', " .
-							print_r($stmt->errorInfo(),true) . "</p>\n";
-				return 0;
-		    }		// error updating record
-		}		// only delete if already in database
-		return 0;	// no records deleted
-    }		// CountyMarriage::delete
 
     /********************************************************************
      *	CountyMarriage::compare											*

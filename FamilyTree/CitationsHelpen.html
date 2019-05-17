@@ -15,51 +15,81 @@
  *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
  **********************************************************************-->
     <link rel='stylesheet' type='text/css' href='/styles.css'/>
-</head>
-<body>
-<div class='topcrumbs'>
-    <a href='/indexHelpen.html'>Home</a>: 
-    <a href='/genealogyHelpen.html'>Genealogy</a>: 
-    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>:
-</div>
-<div class='help'>
-<h1>Manage Master List of Citations: Help</h1>
-<p>This page is used to search for and manage citations independently from
-the individuals or facts that they document.
-</p>
-<p>The "Event Type" selection list is used to limit the response to
-citations to a particular type of event or fact.  Most citations are to
-generic events associated either with an indivdual or a family ("Marriage"),
-however the site inherits information in which facts or events are recorded in
-a non-standard way.  For example the birth of an individual may be recorded
-either as a birth instance of a generic event, or as the birth attribute of an
-individual.
-<p>The "Master Source" selection list limits the response to
-citations to a specific document.  You must select a master source.
-</p>
-<p>The "Pattern" input field is used to search all of the citations matching
-the "Event Type" and "Master Source" for those citations whose "page" field
-matches a pattern.  The pattern is specified as a
-<a href='https://en.wikipedia.org/wiki/Regular_expression'>Regular Expression</a>.
-For example entering "<code>page</code>" matches all citations whose page field
-<em>contains</em> the string "page".
-Specifying "<code>^dist</code>" matches all citations whose page field
-<em>starts</em> with the string "dist".
-Specifying "<code>\d$</code>" matches all citations whose page field
-<em>ends</em> with a decimal digit.
-This search is insensitive to the case of letters.
-</p>
-</div>
-<div class='botcrumbs'>
-    <span class='right'>
-	<img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
-    </span>
-    <a href='/contactAuthor.php?subject=chooseRelativeHelpen.html' target='_blank'>Contact Author</a>
-    <br/>
-    <a href='/indexHelpen.html'>Home</a>: 
-    <a href='/genealogyHelpen.html'>Genealogy</a>: 
-    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>:
-    <div style='clear: both;'></div>
-</div>
-</body>
+  </head>
+  <body>
+	<div class='topcrumbs'>
+	    <a href='/indexHelpen.html'>Home</a>: 
+	    <a href='/genealogyHelpen.html'>Genealogy</a>: 
+	    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>:
+	</div>
+	<div class='help'>
+	  <h1>Manage Master List of Citations: Help</h1>
+	  <p>This page is used to search for and manage citations independently from
+	    the individuals or facts that they document.
+	  </p>
+      <p>At the top the page reports the number of citations that matched
+      the current request, or identifies missing information from the
+      last request made.
+      </p>
+	  <p>The "Event Type" selection list is used to limit the response to
+	    citations to a particular type of event or fact.  Most citations are to
+	    generic events associated either with an individual ("Event")
+	    or a family ("Marriage"),
+	    however the site inherits information in which facts or events are recorded in
+	    a non-standard way.  For example the birth of an individual may be recorded
+	    either as a birth instance of a generic event, or as the birth attribute of an
+	    individual.
+      </p>
+	  <p>The "Master Source" selection list limits the response to
+	    citations to a specific document.  You must select a master source.
+	  </p>
+	  <p>The "Pattern" input field is used to search all of the citations matching
+	    the "Event Type" and "Master Source" for those citations whose "page" field
+	    matches a pattern.  The pattern is specified as a
+	  <a href='https://en.wikipedia.org/wiki/Regular_expression'>Regular Expression</a>.
+	    For example entering "<code>page</code>" matches all citations whose page field
+	  <em>contains</em> the string "page".
+	    Specifying "<code>^dist</code>" matches all citations whose page field
+	  <em>starts</em> with the string "dist".
+	    Specifying "<code>\d$</code>" matches all citations whose page field
+	  <em>ends</em> with a decimal digit.
+	    This search is insensitive to the case of letters.
+	  </p>
+      <p>The matching citations are listed in a table with two columns.
+      If there are more matches than can be displayed at once this is preceded
+      by a line which describes what portion of the matches is displayed
+      and provided links for moving backward and forward through the
+      result set.  You can also use the PgUp and PgDn keys to move through
+      the set.
+      </p>
+      <table class="details">
+        <thead>
+          <tr>
+            <th class="colhead">IDIME</th>
+            <th class="colhead">Page</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="white">A link to a record in the family tree</td>
+            <td class="white">The identification of the specific page in the source</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <img src='/Images/CitationsMasterList.png' alt='Sample response'>
+      </p>
+	</div>
+	<div class='botcrumbs'>
+	    <span class='right'>
+		<img SRC='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
+	    </span>
+	    <a href='/contactAuthor.php?subject=chooseRelativeHelpen.html' target='_blank'>Contact Author</a>
+	    <br/>
+	    <a href='/indexHelpen.html'>Home</a>: 
+	    <a href='/genealogyHelpen.html'>Genealogy</a>: 
+	    <a href='/FamilyTree/ServicesHelpen.html'>Services</a>:
+	    <div style='clear: both;'></div>
+	</div>
+  </body>
 </html>

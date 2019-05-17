@@ -3,14 +3,14 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  testRecordSet.php							*
- *									*
- *  Test the RecordSet constructor					*
- *									*
- *  History:								*
- *	2017/11/02	created						*
- *									*
- *  Copyright &copy; 2017 James A. Cobban				*
+ *  testRecordSet.php													*
+ *																		*
+ *  Test the RecordSet constructor										*
+ *																		*
+ *  History:															*
+ *		2017/11/02		created											*
+ *																		*
+ *  Copyright &copy; 2017 James A. Cobban				                *
  ************************************************************************/
 require_once __NAMESPACE__ . "/RecordSet.inc";
 require_once __NAMESPACE__ . "/common.inc";
@@ -19,47 +19,55 @@ class Tester extends Record
 {
     function __construct()
     {
-	foreach (self::$primeKey as $table => $description)
-	{
+		foreach (self::$primeKey as $table => $description)
+		{
 ?>
   <h3>Test RecordSet('<?php print $table; ?>')</h3>
 <?php
-	    $parms	= array('limit' => 5);
-	    $info	= Record::getInformation($table);
-	    $initRow	= $info['initrow'];
-	    foreach($initRow as $fldname => $value)
-	    {
-		if (strpos($fldname, 'name') !== false)
-		{
-		    $parms[$fldname]	= 'D';
-		    break;
-		}
-	    }
-	    $set	= new RecordSet($table, $parms); 
-	    $info	= $set->getInformation();
+		    $parms	= array('limit' => 5);
+		    $info	= Record::getInformation($table);
+		    $initRow	= $info['initrow'];
+		    foreach($initRow as $fldname => $value)
+		    {
+				if (strpos($fldname, 'name') !== false)
+				{
+				    $parms[$fldname]	= 'D';
+				    break;
+				}
+		    }
+		    $set	= new RecordSet($table, $parms); 
+		    $info	= $set->getInformation();
 ?>
     <p>Information</p>
     <table>
       <thead>
-	<tr>
-	  <th class='colhead'>Key</th>
-	  <th class='colhead'>Value</th>
-	</tr>
+		<tr>
+		  <th class='colhead'>Key</th>
+		  <th class='colhead'>Value</th>
+		</tr>
       </thead>
       <tbody>
 <?php
-	    showTrace();
-	    foreach($info as $key => $value)
-	    {
-		if (is_array($value))
-		    $value	= print_r($value, true);
+		    showTrace();
+		    foreach($info as $key => $value)
+		    {
+			    if (is_array($value))
+			        $value	= print_r($value, true);
+                else
+                if (is_bool($value))
+                {
+                    if ($value)
+                        $value  = 'true';
+                    else
+                        $value  = 'false';
+                }
 ?>
         <tr>
-	  <th class='label'><?php print $key; ?></th>
-	  <td class='odd'><?php print $value; ?></td>
+		  <th class='label'><?php print $key; ?></th>
+		  <td class='odd'><?php print $value; ?></td>
         </tr>
 <?php
-	    }
+		    }
 ?>
       </tbody>
     </table>
@@ -67,53 +75,54 @@ class Tester extends Record
     <table>
       <thead>
 <?php
-	    $first	= true;
-	    foreach($set as $key => $record)
-	    {		// loop through records
-		if ($first)
-		{	// put out header
+		    $first	= true;
+		    foreach($set as $key => $record)
+		    {		// loop through records
+			    if ($first)
+			    {	// put out header
 ?>
-	<tr>
-	  <th class='colhead'>Key</th>
+		<tr>
+		  <th class='colhead'>Key</th>
 <?php
-		    foreach($record as $field => $value)
-		    {
+			            foreach($record as $field => $value)
+			            {
 ?>
-	  <th class='colhead'><?php print $field;?></th>
+		  <th class='colhead'><?php print $field;?></th>
 <?php
-		    }
+			            }
 ?>
-	</tr>
+		</tr>
       </thead>
       <tbody>
 <?php
-		}	// put out header
+			        }	// put out header
 ?>
-	<tr>
-	  <th class='label'><?php print $key; ?></th>
+		<tr>
+		  <th class='label'><?php print $key; ?></th>
 <?php
-		foreach($record as $field => $value)
-		{
-		    if (strlen($value) > 32)
-			$value	= substr($value,0,29) . '...';
+			        foreach($record as $field => $value)
+			        {
+			            if (strlen($value) > 32)
+				            $value	= substr($value,0,29) . '...';
 ?>
-	  <td class='odd'><?php print $value;?></td>
+		  <td class='odd'><?php print $value;?></td>
 <?php
-		}
+			        }
 ?>
-	</tr>
+		</tr>
 <?php
-		$first	= false;
-	    }		// loop through records
+			        $first	= false;
+		        }		// loop through records
 ?>
       </tbody>
     </table>
 <?php
-	    showTrace();
-	    flush();
-	}
+		    showTrace();
+		    flush();
+		}
     }
-}
+}       // class Tester
+
 htmlHeader('Test RecordSet');
 ?>
 <body>
@@ -121,9 +130,9 @@ htmlHeader('Test RecordSet');
 <?php
     $debug	= true;
     $set	= new RecordSet('Locations',
-				array(array('Location'	=> '^lon',
-					    'ShortName'	=> '^lon'),
-				'limit'		=> 5));
+					        array(array('Location'	=> '^lon',
+						                'ShortName'	=> '^lon'),
+					        'limit'		=> 5));
     $debug	= false;
     showTrace();
     $info	= $set->getInformation();
@@ -131,24 +140,32 @@ htmlHeader('Test RecordSet');
     <p>Information</p>
     <table>
       <thead>
-	<tr>
-	  <th class='colhead'>Key</th>
-	  <th class='colhead'>Value</th>
-	</tr>
+		<tr>
+		  <th class='colhead'>Key</th>
+		  <th class='colhead'>Value</th>
+		</tr>
       </thead>
       <tbody>
 <?php
-	    foreach($info as $key => $value)
-	    {
-		if (is_array($value))
-		    $value	= print_r($value, true);
+		    foreach($info as $key => $value)
+		    {
+			    if (is_array($value))
+                    $value	= print_r($value, true);
+                else
+                if (is_bool($value))
+                {
+                    if ($value)
+                        $value  = 'true';
+                    else
+                        $value  = 'false';
+                }
 ?>
         <tr>
-	  <th class='label'><?php print $key; ?></th>
-	  <td class='odd'><?php print $value; ?></td>
+		  <th class='label'><?php print $key; ?></th>
+		  <td class='odd'><?php print $value; ?></td>
         </tr>
 <?php
-	    }
+		    }
 ?>
       </tbody>
     </table>
@@ -156,44 +173,44 @@ htmlHeader('Test RecordSet');
     <table>
       <thead>
 <?php
-	    $first	= true;
-	    foreach($set as $key => $record)
-	    {		// loop through records
-		if ($first)
-		{	// put out header
+		    $first	= true;
+		    foreach($set as $key => $record)
+		    {		// loop through records
+			if ($first)
+			{	// put out header
 ?>
-	<tr>
-	  <th class='colhead'>Key</th>
+		<tr>
+		  <th class='colhead'>Key</th>
 <?php
-		    foreach($record as $field => $value)
-		    {
+			    foreach($record as $field => $value)
+			    {
 ?>
-	  <th class='colhead'><?php print $field;?></th>
+		  <th class='colhead'><?php print $field;?></th>
 <?php
-		    }
+			    }
 ?>
-	</tr>
+		</tr>
       </thead>
       <tbody>
 <?php
-		}	// put out header
+			}	// put out header
 ?>
-	<tr>
-	  <th class='label'><?php print $key; ?></th>
+		<tr>
+		  <th class='label'><?php print $key; ?></th>
 <?php
-		foreach($record as $field => $value)
-		{
-		    if (strlen($value) > 32)
-			$value	= substr($value,0,29) . '...';
+			foreach($record as $field => $value)
+			{
+			    if (strlen($value) > 32)
+				$value	= substr($value,0,29) . '...';
 ?>
-	  <td class='odd'><?php print $value;?></td>
+		  <td class='odd'><?php print $value;?></td>
 <?php
-		}
+			}
 ?>
-	</tr>
+		</tr>
 <?php
-		$first	= false;
-	    }		// loop through records
+			$first	= false;
+		    }		// loop through records
 ?>
       </tbody>
     </table>

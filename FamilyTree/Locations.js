@@ -134,16 +134,6 @@ function onloadLocations()
 		npnext.onmouseout	= linkMouseOut;
     }		// defined
 
-    var dataTable               = document.getElementById('dataTable');
-    var dataWidth               = dataTable.offsetWidth;
-    var windowWidth             = document.body.clientWidth - 8;
-    if (dataWidth > windowWidth)
-        dataWidth               = windowWidth;
-    var topBrowse               = document.getElementById('topBrowse');
-    topBrowse.style.width       = dataWidth + "px";
-    var botBrowse               = document.getElementById('botBrowse');
-    if (botBrowse)
-        botBrowse.style.width   = dataWidth + "px";
 }		// onLoadLocations
 
 /************************************************************************

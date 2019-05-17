@@ -348,7 +348,7 @@ else
 <?php
 	    }
 ?>
-        <table id='dataTbl' class='form'>
+        <table id='dataTable' class='form'>
 		  <thead><!--- Put out the column headers -->
 			<tr>
 			  <th class='colhead'>

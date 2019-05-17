@@ -70,7 +70,7 @@ require_once __NAMESPACE__ . '/District.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
 require_once __NAMESPACE__ . '/CensusLine.inc';
 require_once __NAMESPACE__ . '/Language.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // initial values
@@ -286,11 +286,11 @@ if (strlen($msg) == 0)
     if ($line > 1)
         $template->set('PREVLINE',			$line - 1);
     else
-        $template->updateTag('prevLink',    null);
+        $template->updateTag('topPrev',    null);
     if ($line < $lastLine)
 	    $template->set('NEXTLINE',			$line + 1);
     else
-        $template->updateTag('nextLink',    null);
+        $template->updateTag('topNex',    null);
 
     $getParms['line']                   = $line;
     $censusLine                         = new CensusLine($getParms);
@@ -313,19 +313,19 @@ if (strlen($msg) == 0)
                 $familyIdElt->update(null);
         }
         $censusLine->setGetModeHTML(true);
-        $template->updateTag('details',     array($censusLine));
+        $template->updateTag('dataTable',     array($censusLine));
     }
     else
     {
         $msg        .= "No matching record in transcription. ";
         $template->updateTag('linksFront',      null);
-        $template->updateTag('details',         null);
+        $template->updateTag('dataTable',         null);
     }
 }
 else
 {                   // error message generated
     $template->updateTag('linksFront',      null);
-    $template->updateTag('details',         null);
+    $template->updateTag('dataTable',         null);
 }                   // error message generated
 
 // check for abnormal behavior of Internet Explorer

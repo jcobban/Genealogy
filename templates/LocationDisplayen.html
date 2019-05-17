@@ -8,6 +8,7 @@
  *  History:															*
  *		2018/11/02		created                                         *
  *		                pass authentication key to GoogleApis           *
+ *      2019/04/10      display Search Name and County Name             *
  *																	    *
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
@@ -59,6 +60,33 @@
 	      </label>
 	      <input type="text" name="ShortName" id="ShortName" size="64"
 	            	class="ina leftnc" value="$SHORTNAME" readonly="readonly">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="sortedLocationRow">
+	      <label class="column1" for="SortedLocation">
+	        Sort Key:
+	      </label>
+	      <input type="text" name="SortedLocation" id="SortedLocation"
+	    	        size="64" class="ina leftnc"
+	            	value="$SORTEDLOC" readonly="readonly">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="searchNameRow">
+	      <label class="column1" for="SearchName">
+	        Search Name:
+	      </label>
+	      <input type="text" name="SearchName" id="SearchName"
+	    	        size="64" class="ina leftnc"
+	            	value="$SEARCHNAME" readonly="readonly">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="countyNameRow">
+	      <label class="column1" for="CountyName">
+	        County Name:
+	      </label>
+	      <input type="text" name="CountyName" id="CountyName"
+	    	        size="64" class="ina leftnc"
+	            	value="$COUNTY" readonly="readonly">
         <div style="clear: both;"></div>
       </div>
       <div class="row" id="sortedLocationRow">

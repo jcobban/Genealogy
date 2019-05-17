@@ -3,17 +3,17 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  replyBlogXml.php														*
+ *  replyBlogXml.php													*
  *																		*
- *  PHP script to support replying to a blog entry using Ajax.				*
+ *  PHP script to support replying to a blog entry using Ajax.			*
  *																		*
- *  Parameters:																*
- *		blid		unique numeric identifier of blog message to reply to		*
- *	message	reply text
+ *  Parameters:															*
+ *		blid	unique numeric identifier of blog message to reply to	*
+ *	    message	reply text                                              *
  *																		*
- *  History:																*
- *		2014/03/30		created												*
- *		2015/07/02		access PHP includes using include_path				*
+ *  History:															*
+ *		2014/03/30		created											*
+ *		2015/07/02		access PHP includes using include_path			*
  *		2015/12/30		fix conflict with autoload						*
  *		2017/09/12		use get( and set(								*
  *																		*
@@ -77,7 +77,7 @@ if (strlen($msg) == 0)
     else
         $receiver	= '';
 
-    if ($userid == $sender || $userid == $receiver)
+    if ($userid == $sender || $userid == $receiver || canUser('yes'))
     {
         $count	= $blog->delete(true);
 

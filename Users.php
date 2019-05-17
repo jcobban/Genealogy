@@ -56,12 +56,13 @@ use \Exception;
  *		2018/04/28		limit Bulk Mail to matching users				*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2019/04/11      add broadcast to pending users                  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/Language.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $lang		    	= 'en';
@@ -72,7 +73,7 @@ $offset			    = 0;
 $limit			    = 20;
 $id				    = '';
 $mainParms			= array();
-$bccParms			= array('options'	=> 1);
+$bccParms			= array('options'	=> "&1");
 
 if (isset($_GET) && count($_GET) > 0)
 {			        // invoked by method=get
@@ -273,79 +274,95 @@ if (canUser('all'))
 	$prevoffset		        = $offset - $limit;
 	$nextoffset		        = $offset + $limit;
 
-	// construct the blind carbon copy (BCC) list for bulk mailing
-	$users			    = new RecordSet('Users', $bccParms);
+    // construct the blind carbon copy (BCC) list for bulk mailing
+	$users			    		= new RecordSet('Users', $bccParms);
    
-	$bcclist		    = '';
-	$tolist			    = '';
+	$bcclist		    		= '';
+    $bcomma             		= '';
+    $pendlist		    		= '';
+    $pcomma             		= '';
+	$tolist			    		= '';
+    $tcomma             		= '';
 	foreach($users as $id => $user)
 	{		// assemble bulk mailing list
-	    $email		    = $user->get('email');
-	    $auth		    = $user->get('auth');
+	    $email		    		= $user->get('email');
+	    $auth		    		= $user->get('auth');
 
 	    // administrators are listed in the to: attribute of the message
 	    // clients are listed in the bcc: attribute of the message
-	    $pos	        = strpos($auth, 'yes');
+	    $pos	        		= strpos($auth, 'yes');
 	    // stupid return value from PHP's strpos function
 	    if ($pos === false)
-	    {		// contributor
-			if (strlen($bcclist) > 0)
-			    $bcclist	.= ',';
-			$bcclist	.= $email;
-	    }		// contributor
+        {		            // contributor
+            $bcclist	        .= $bcomma . urlencode($email);
+            $bcomma             = ',';
+            if ($auth == 'pending')
+            {
+                $pendlist       .= $pcomma . urlencode($email);
+                $pcomma         = ',';
+            }
+	    }		            // contributor
 	    else
-	    {		// administrator
-			if (strlen($tolist) > 0)
-			    $tolist	.= ',';
-			$tolist		.= "Family Tree Mailing List <$email>";
-	    }		// administrator
-	}		// assemble bulk mailing list
+        {		            // administrator
+            if ($tcomma == '')
+                $tolist		    .= $tcomma .
+                                urlencode("Family Tree Mailing List <$email>");
+            else
+                $tolist         .= urlencode($email);
+            $tcomma             = ',';
+	    }		            // administrator
+	}		                // assemble bulk mailing list
 
 	// then query the database for matches to the request
-	$users		= new RecordSet('Users', $mainParms);
-	$readonly	= $users->count() > 10;
-	$info		= $users->getInformation();
-	$count		= $info['count'];
-	$rowtype	= 'odd';
+	$users		                = new RecordSet('Users', $mainParms);
+	$readonly	                = $users->count() > 10;
+	$info		                = $users->getInformation();
+	$count		                = $info['count'];
+	$rowtype	                = 'odd';
 	foreach($users as $id => $user)
-	{		// assemble bulk mailing list
-	    $user->set('rowtype', $rowtype);
+	{		                // create display of a page of users
+        $user['rowtype']        = $rowtype;
+        if ($user['auth'] == 'pending')
+            $user['disabled']   = '';
+        else
+            $user['disabled']   = 'disabled="disabled"';
 	    if ($rowtype == 'odd')
-			$rowtype	= 'even';
+			$rowtype	        = 'even';
 	    else
-			$rowtype	= 'odd';
-	}		// assemble bulk mailing list
+			$rowtype	        = 'odd';
+	}		                // create display of a page of users
 
-	$template->set('BCCLIST', $bcclist);
-	$template->set('TOLIST', $tolist);
-	$template->set('PATTERN', $pattern);
-	$template->set('AUTHPATTERN', $authPattern);
-	$template->set('MAILPATTERN', $mailPattern);
-	$template->set('OFFSET', $offset);
-	$template->set('LAST', min($offset + $limit, $count));
-	$template->set('COUNT', $count);
+	$template->set('BCCLIST',                   $bcclist);
+	$template->set('PENDLIST',                  $pendlist);
+	$template->set('TOLIST',                    $tolist);
+	$template->set('PATTERN',                   $pattern);
+	$template->set('AUTHPATTERN',               $authPattern);
+	$template->set('MAILPATTERN',               $mailPattern);
+	$template->set('OFFSET',                    $offset);
+	$template->set('LAST',                      min($offset + $limit, $count));
+	$template->set('COUNT',                     $count);
 
-	$template->updateTag('notadmin', null);
+	$template->updateTag('notadmin',            null);
 	if ($offset - $limit > 0)
-	    $template->updateTag('prevLink',
+	    $template->updateTag('topPrev',
 					         array('pattern'	=> $pattern,
 						       'authpattern'	=> $authPattern,
 						       'mailpattern'	=> $mailPattern,
-						       'prevoffset'	=> $offset - $limit,
-						       'limit'		=> $limit));
+						       'prevoffset'	    => $offset - $limit,
+						       'limit'		    => $limit));
 	else
-	    $template->updateTag('prevLink', null);
+	    $template->updateTag('topPrev',         null);
 	if ($offset + $limit < $count)
 	{
-	    $template->updateTag('nextLink',
+	    $template->updateTag('topNext',
 					         array('pattern'	=> $pattern,
 						       'authpattern'	=> $authPattern,
 						       'mailpattern'	=> $mailPattern,
-						       'nextoffset'	=> $offset + $limit,
-						       'limit'		=> $limit));
+						       'nextoffset'	    => $offset + $limit,
+						       'limit'		    => $limit));
 	}
 	else
-	    $template->updateTag('nextLink', null);
+	    $template->updateTag('topNext',         null);
 
     // display matching users
     $template->updateTag('Row$id',

@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+
 /************************************************************************
  *  Location.php														*
  *																	    *
@@ -105,6 +107,7 @@ use \Exception;
  *		2018/11/02      pass authentication key to GoogleApis           *
  *		2018/11/19      only display coordinates to 6 decimal places    *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/04/10      support county names containing an &            *
  *																	    *
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -113,7 +116,7 @@ require_once __NAMESPACE__ . '/Picture.inc';
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/CountySet.inc';
 require_once __NAMESPACE__ . '/Language.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // default values of parametets
@@ -278,7 +281,7 @@ $searchName		= $name;
 $part1			= '';
 $part2			= '';
 $county			= '';
-$geoPattern		= "/^\s*(.*),([a-zA-Z ]*),([a-zA-Z ]+),\s*CA\s*$/";
+$geoPattern		= "/^\s*(.*),([a-zA-Z &]*),([a-zA-Z ]+),\s*CA\s*$/";
 $results		= array();
 $res1			= preg_match($geoPattern, $name, $results);
 if ($res1)
@@ -313,7 +316,9 @@ if ($res1)
 		    $searchName	= "$part1, $county, $province, CA";
     }
 }
-$template->set('SEARCHNAME',		str_replace('"','&quote;',$searchName));
+$template->set('SEARCHNAME',	str_replace('"', '&quote;', $searchName));
+$template->set('COUNTY',		str_replace('"', '&quote;',
+                                    str_replace('&', '&amp;', $county)));
 
 // display duplicate entries if any
 $duplicateRow           = $template->getElementById('duplicateRow');

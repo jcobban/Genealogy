@@ -25,10 +25,11 @@ window.onload	= loadPage;
  *																		*
  *  Initialize elements.												*
  ************************************************************************/
+var	type		= 0;
+var	idsr		= 0;
+
 function loadPage()
 {
-    var	type		= 0;
-    var	idsr		= 0;
 
     // scan through all forms and set dynamic functionality
     // for specific elements
@@ -73,9 +74,9 @@ function loadPage()
 				}	// type
 
 		    }		// act on field name
-		}		// loop through all elements
-    }			// loop through all forms
-    
+		}		    // loop through all elements
+    }			    // loop through all forms
+
     // get the list of defined sources to populate the select
     // for IDSR value.  The name of the <select> element,
     // the numeric key of the <option> to select, and the name of
@@ -111,13 +112,13 @@ function resetForm()
 }	// resetForm
 
 /************************************************************************
- *  gotSources																*
+ *  function gotSources													*
  *																		*
  *  This method is called when the XML file representing				*
- *  the list of sources from the database is retrieved.						*
+ *  the list of sources from the database is retrieved.					*
  *																		*
- *  Parameters:																*
- *		xmlDoc		information about the defined sources as an XML document*
+ *  Parameters:															*
+ *		xmlDoc	information about the defined sources as an XML document*
  ************************************************************************/
 function gotSources(xmlDoc)
 {
@@ -134,17 +135,9 @@ function gotSources(xmlDoc)
 		return;
     }		// name not returned
 
-    // get the idsr of the select option to be highlighted
-    var idsrElts	= xmlDoc.getElementsByTagName('idsr');
-    var	idsr		= null;
-    if (idsrElts.length >= 1)
-    {		// idsr returned
-		idsr	= idsrElts[0].textContent;
-    }		// idsr returned
-
     // get the formname of the select option to be highlighted
     var formnameElts	= xmlDoc.getElementsByTagName('formname');
-    var	formname	= null;
+    var	formname	    = null;
     if (formnameElts.length >= 1)
     {		// formname returned
 		formname	= formnameElts[0].textContent;
@@ -177,9 +170,9 @@ function gotSources(xmlDoc)
 		}
 		if (elt == null)
 		{		// elt still null
-		alert("Citations.js: gotSources: could not find named element " +
-				name + ", element names=" + msg);
-		return;
+	    	alert("Citations.js: gotSources: could not find named element " +
+		    		name + ", element names=" + msg);
+		    return;
 		}		// elt still null
     }
 
@@ -212,8 +205,8 @@ function gotSources(xmlDoc)
 
 		// create a new HTML Option object and add it to the Select
 		option	= addOption(elt,	// Select element
-					    text,	// text value to display
-					    value);	// unique key of source record
+					        text,	// text value to display
+					        value);	// unique key of source record
 
 		// select the last source chosen by the user
 		if (idsr &&

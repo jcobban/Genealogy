@@ -114,16 +114,6 @@ function onLoad()
 		}			// loop through all elements in the form
     }				// loop through all forms
 
-    var dataTable           = document.getElementById('dataTbl');
-    var dataWidth           = dataTable.offsetWidth;
-    var windowWidth             = document.body.clientWidth - 8;
-    if (dataWidth > windowWidth)
-        dataWidth               = windowWidth;
-    var topBrowse           = document.getElementById('topBrowse');
-    topBrowse.style.width   = dataWidth + "px";
-    var botBrowse               = document.getElementById('botBrowse');
-    if (botBrowse)
-        botBrowse.style.width   = dataWidth + "px";
 }		// function onLoad
 
 /************************************************************************
@@ -261,7 +251,7 @@ function addCountry()
     var	newRow		= createFromTemplate(template,
 									     parms,
 									     null);
-    var	table		= document.getElementById("dataTbl");
+    var	table		= document.getElementById("dataTable");
     var	tbody		= table.tBodies[0];
     tbody.appendChild(newRow);
 

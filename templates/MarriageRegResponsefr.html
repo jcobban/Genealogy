@@ -1,0 +1,215 @@
+<!--*********************************************************************
+ *  MarriageRegResponse.php												*
+ *																		*
+ *  Display a report of individuals whose marriage matches the			*
+ *  requested pattern.                                      			*
+ *																		*
+ *  History: 															*
+ *		2019/01/09      created                                         *
+ *      2019/05/03      set min-width for names and location            *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Accueil</a>:
+    <a href="/genealogy.php?lang=fr">
+	    Généalogie
+    </a>:
+    <a href='/Canada/CountriesEdit.php?lang=fr'>
+	    Liste des Pays Soutenus
+    </a>:
+    <a href="/genCountry.php?cc=$cc&amp;lang=fr">
+        $COUNTRYNAME
+      </a>:
+      <a href="/Canada/genProvince.php?Domain=$DOMAIN&amp;lang=fr">
+        $DOMAINNAME
+      </a>:
+      <a href="MarriageRegQuery.php?domain=$DOMAIN&amp;lang=fr">
+	    Nouvelle requête
+      </a>:
+      <a href="MarriageRegStats.php?RegDomain=$DOMAIN&amp;lang=fr">
+        $DOMAINNAME statut de transcription
+      </a>:
+      <span id="yearStats">
+      <a href="MarriageRegYearStats.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;lang=fr">
+        $DOMAINNAME Statut $REGYEAR
+      </a>:
+      </span>
+      <span id="countyStats">
+        <a href="MarriageRegYearStats.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;County=$REGCOUNTY&amp;lang=fr">
+            Statut $REGYEAR $COUNTYNAME
+        </a>:
+      </span>
+      <span id="townshipStats">
+        <a href="MarriageRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegCounty=$REGCOUNTY&amp;RegTownship=$REGTOWNSHIP&amp;lang=fr">
+          Statut $REGYEAR Canton $REGTOWNSHIP
+        </a>:
+      </span>
+    </div>
+    <div class='body'>
+      <h1>
+        <span class='right'>
+            <a href='MarriageRegResponseHelpen.html' target='_blank'>Help?</a>
+        </span>
+        $DOMAINNAME: Enregistrement des Mariages $ACTION
+        <div style='clear: both;'></div>
+      </h1>
+      $TRACE
+      $MSG
+      <!--- Put out a line with links to previous and next section of table -->
+      <div class="center" id="topBrowse">
+        <span class="left" id="topPrev">
+            <a href='$NPURI$NPAND$NPPREV'>&lt;---</a>
+         </span>
+        <span class='right' id="topNext">
+            <a href='$NPURI$NPAND$NPNEXT'>---&gt;</a>
+        </span>
+        montrer rangs $FIRSTOFFSET
+        à $LASTOFFSET de $TOTALROWS 
+      </div>
+      <!--- Put out the response as a table -->
+      <form id='respform'>
+        <input type='hidden' id='RegDomain' value='$DOMAIN'>
+        <table class='form'>
+          <thead>
+          <!--- Put out the column headers -->
+          <tr>
+            <th class='colhead'>
+                Action
+            </th>
+            <th class='colhead'>
+                Année
+            </th>
+            <th class='colhead'>
+                No.
+            </th>
+            <th class='colhead'>
+                Nom de l'Époux
+            </th>
+            <th class='colhead'>
+                Année<br>de Naissance
+            </th>
+            <th class='colhead'>
+                Nom de l'Épouse
+            </th>
+            <th class='colhead'>
+                Année<br>de Naissance
+            </th>
+            <th class='colhead'>
+                Date
+            </th>
+            <th class='colhead'>
+                Lieu de la Mariage
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr id="row$regyear$regnum">
+              <!-- link to update action -->
+              <td class='left' style='white-space: nowrap;'>
+                  <button type='button'
+                            id='Action$regyear$regnum'>
+                     $action 
+                  </button>
+                  <button type='button'
+                            id='Delete$regyear$regnum'>
+                    Écraser
+                  </button>
+              </td>
+              <td class='$rowclass right'>
+                $regyear 
+              </td>
+              <td class='$rowclass right'>
+                $regnum 
+              </td>
+              <td class='$rowclass male' style="min-width: 240px;">
+                <a href='/FamilyTree/Person.php?idir=$g_idir'
+                        id="glink$regyear$regnum"
+                        class='male' target='_blank'>
+                  <strong>$g_surname</strong>, $g_given
+                </a>
+                <span id="gname$regyear$regnum">
+      	            <strong>$g_surname</strong>, $g_given 
+                </span>
+              </td>
+              <td class='$rowclass right'>
+                $g_byear
+              </td>
+              <td class='$rowclass female' style="min-width: 240px;">
+                <a href='/FamilyTree/Person.php?idir=$b_idir'
+                        id="blink$regyear$regnum"
+                        class='female' target='_blank'>
+                  <strong>$b_surname</strong>, $b_given
+                </a>
+                <span id="bname$regyear$regnum">
+      	            <strong>$b_surname</strong>, $b_given 
+                </span>
+              </td>
+              <td class='$rowclass right'>
+                $b_byear
+              </td>
+              <td class='$rowclass' style="min-width: 7em;">
+                $m_date
+              </td>
+              <td class='$rowclass' style="min-width: 250px;">
+                $m_place
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    <!--- Put out a line with links to previous and next section of response -->
+      <div class="center" id="botBrowse">
+        <span class="left" id="botPrev">
+            <a href='$NPURI$NPAND$NPPREV'>&lt;---</a>
+         </span>
+        <span class='right' id="botNext">
+            <a href='$NPURI$NPAND$NPNEXT'>---&gt;</a>
+        </span>
+        montrer rangs $FIRSTOFFSET
+        à $LASTOFFSET de $TOTALROWS 
+      </div>
+    <div id='templates' class='hidden'>
+    
+      <!-- template for confirming the deletion of a citation-->
+      <form name='RegDel$template' id='RegDel$template'>
+        <p class='message'>$msg</p>
+        <p>
+          <button type='button' id='confirmDelete$regnum'>
+            Confirmer
+          </button>
+          <input type='hidden' id='regdomain$template' name='regdomain$template'
+                    value='$regdomain'>
+          <input type='hidden' id='regyear$template' name='regyear$template'
+                    value='$regyear'>
+          <input type='hidden' id='formname$template' name='formname$template'
+                    value='$formname'>
+            &nbsp;
+          <button type='button' id='cancelDelete$regnum'>
+            Annuler
+          </button>
+        </p>
+      </form>
+    </div> <!-- end of <div id='templates'> -->
+    <div class='balloon' id='HelpAction'>
+      Click on this button to display the page of detail information from the
+      registration, with the ability to update the information
+      if you are authorized.
+    </div>
+    <div class='balloon' id='HelpDelete'>
+      Click on this button to delete the transcription of the specific marriage.
+    </div>
+    <div class='balloon' id='HelpRegYear'>
+      This field contains the year in which the event was registered.
+    </div>
+    <div class='balloon' id='HelpRegNum'>
+      This field contains the registration number as assigned by
+      the Registrar of Ontario.
+    </div>
+    <div id="tranTab" class="hidden">
+		<span data-key="Update">Mise à jour</span>
+		<span data-key="Display">Montrer</span>
+    </div>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+    <script src="/Ontario/MarriageRegResponse.js" type="text/javascript"></script>

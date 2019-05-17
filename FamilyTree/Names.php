@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+
 /************************************************************************
  *  Names.php															*
  *																		*
@@ -56,7 +58,8 @@ use \Exception;
  *		                they exceed the limit                           *
  *		2018/12/26      ignore field IDNR in Name record                *
  *		2019/02/19      use new FtTemplate constructor                  *
- *		2019/03/12      Surname record not created if not required      * 
+ *		2019/03/12      Surname record not created if not required      *
+ *		2019/05/17      initialize SOUNDEX, FIRST, and LAST             * 
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -66,7 +69,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
 require_once __NAMESPACE__ . '/RecOwner.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/PersonSet.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // analyze input parameters
@@ -76,7 +79,6 @@ $surname		    = null;
 $surnameRec		    = null;
 $nameUri            = '';
 $treename           = '';
-$soundex		    = '';
 $where		        = '';
 $lang		        = 'en';
 $givenOk		    = false;
@@ -123,7 +125,6 @@ foreach($_GET as $key => $value)
             $idnr           = $value;
 			$surnameRec	    = new Surname(array('idnr' => $value));
             $surname    	= $surnameRec->get('surname');
-			$soundex	    = $surnameRec->get('soundslike');
 
 			// identify prefix of the name, usually the first letter
 			if (strlen($surname) == 0)
@@ -258,6 +259,7 @@ $template->set("PREFIX",	        $prefix);
 $template->set('TITLE',	            $title, true);
 $template->set("IDNR",	            $idnr);
 $template->set("SOUNDSLIKE",	    $soundslike);
+$template->set("SOUNDEX",	        $soundslike);
 $template->set("PATTERN",	        $pattern);
 $template->set("NOTES",	            $notes);
 $template->set('LANG',			    $lang);
@@ -315,7 +317,10 @@ else
     $count                  = 0;
     $actualCount            = 0;
 }
+$template->set('TOTALCOUNT',		    $count);
 $template->set('ACTUALCOUNT',		    $actualCount);
+$template->set('FIRST',		            $offset + 1);
+$template->set('LAST',		            min($offset + $actualCount, $count));
 if ($actualCount >= $count)
     $template->updateTag('showActualCount', null);
 $template->set('PREV',			    max($offset-$limit,0));
@@ -326,7 +331,7 @@ $template->set('TREENAME',          $treename);
 // check for notes about family
 $notes	        	= $surnameRec->get('notes');
 $template->set('NOTES',         $notes);
-$template->set('SOUNDEX',       $soundex);
+$template->set('SOUNDEX',       $soundslike);
 if ($count == 0)
     $template->set('COUNT',     $tranTab['No']);
 else

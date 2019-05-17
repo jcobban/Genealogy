@@ -33,6 +33,8 @@ use \Iterator;
  *		2018/10/24      constructor accepts objects for selection       *
  *		                values for domain, county, and township         *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/05/18      add $info                                       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -78,6 +80,20 @@ class Concession extends Record
 				'longitude'		=> 0.0, // center longitude of lot 1
 				'latbylot'		=> 0.0,	// diff latitude for lot n+1
 				'longbylot'		=> 0.0);// diff longitude for lot n+1
+
+    /********************************************************************
+     *	Concession::$info											    *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Concessions',
+                'name'      => 'Concessions',
+                'prime'	    => array('domain','county','township','conid'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 11,
+                'order'     => "`Domain`,`County`,`Township`,`Order`",
+                'classname' => 'Concession');
 
     /********************************************************************
      *	function Concession::__construct								*
@@ -195,13 +211,14 @@ class Concession extends Record
 		    throw new Exception("Concession::__construct: " .
 						"Missing mandatory parameter ConID");
 		// construct the record from a query
-		$query	= "SELECT * FROM Concessions  " .
-						  "WHERE `Domain`=? AND `County`=? AND `Township`=? AND ConID=?";
-		$sqlParms	= array($domain, $county, $township, $conid);
+		$query	            = "SELECT * FROM Concessions  " .
+				"WHERE `Domain`=? AND `County`=? AND `Township`=? AND ConID=?";
+		$sqlParms	        = array($domain, $county, $township, $conid);
 
 		// query the database
-		$stmt		= $connection->prepare($query);
-		$queryText	= debugPrepQuery($query, $sqlParms);
+		$stmt		        = $connection->prepare($query);
+		$queryText	        = debugPrepQuery($query, $sqlParms);
+        $this->lastSqlCmd   = $queryText;
 		if ($stmt->execute($sqlParms))
 		{	            	// successful query
 		    if ($debug)
@@ -272,268 +289,5 @@ class Concession extends Record
 		// diagnostic output if debug is set
 		$this->dump('Concession Record constructed:');
     }		// function Concession::__construct
-
-    /********************************************************************
-     *	function Concession::set										*
-     *																	*
-     *	Change the value of a field in the object.						*
-     *	The method validates that the supplied value is compatible with *
-     *	the target field.												*
-     *																	*
-     *	Parameters:														*
-     *	    $field		name of field to change							*
-     *	    $value		new value to set it to							*
-     *																	*
-     *	Side Effects:													*
-     *	    Adds trace if $field is not already defined as a field		*
-     *	    or pseudo-field and debugging is enabled					*
-     ********************************************************************/
-    function set($field, $value)
-    {
-		global	$warn;
-
-		$fieldLc	= strtolower($field);
-		if (array_key_exists($fieldLc, self::$translate))
-		    $fieldLc	= self::$translate[$fieldLc];
-		switch($fieldLc)
-		{		        	// act on specific fields
-		    case 'order':
-		    case 'firstlot':
-		    case 'lastlot':
-		    case 'latitude':
-		    case 'longitude':
-		    case 'latbylot':
-		    case 'longbylot':
-		    {
-				return parent::set($field, $value);
-		    }
-
-		    default:
-		    {
-				if (array_key_exists($fieldLc, $this->row))
-				{	    	// permanent field
-				    if ($value != $this->row[$fieldLc])
-						$warn	.= "<p>Concession::set: " . __LINE__ .
-								"cannot change value of '$field'</p>\n";
-				    return $this->row[$fieldLc];
-				}	    	// permanent field
-				else
-				return parent::set($field, $value);
-		    }
-		}		        	// act on specific fields
-    }		// function Concession::set
-
-    /********************************************************************
-     *	function Concession::save										*
-     *																	*
-     *	Save changes made to the Concession record into the database.	*
-     *																	*
-     *	Parameters:														*
-     *	    $xml		if true diagnostic output is emitted in XML		*
-     *					format within <cmd> tags.						*
-     *					if a string use it as tag name					*
-     ********************************************************************/
-    function save($xml)
-    {
-		global	$debug;
-		global	$warn;
-		global	$userid;
-		global	$connection;
-
-		if (is_string($xml))
-		{		        	// string tag name
-		    $tagname	= $xml;
-		    $xml	= true;
-		}		        	// string tag name
-		else
-		if ($xml)
-		{		        	// true
-		    $tagname	= 'cmd';
-		}	        		// true
-
-		if ($this->needInsert)
-		{		        	// create new record
-		    $fldnames	= '';
-		    $comma	= '';
-		    $values	= '';
-		    $trvalues	= '';
-		    $parms	= array();
-		    foreach($this->row as $fld => $value)
-		    {
-				$fldnames	.= $comma . "`$fld`"; 
-				$values		.= $comma . '?';
-				$trvalues	.= $comma . "'$value'";
-				array_push($parms, $value);
-				$comma	= ", ";
-		    }		        	// loop through all fields in record
-
-		    // construct the SQL INSERT command	
-		    $insert	= "INSERT INTO Concessions ($fldnames) VALUES($values)";
-		    $stmt	= $connection->prepare($insert);
-		    $insertText	= debugPrepQuery($insert, $parms);
-		    // insert the new record into the database
-		    if ($stmt->execute($parms))
-		    {		    	// successful insert
-				$count		= $stmt->rowCount();
-				if ($xml)
-				    print "<$tagname result='$count'>$insertText</$tagname>\n";
-
-				if ($debug)
-				{
-				    $warn	.= "<p>$insertText</p>\n";
-				    $warn	.= "<p>count=$count</p>\n";
-				}
-
-				$this->changed	= array();	// reset
-				$this->needInsert	= false;
-
-				// log the update
-				logSqlUpdate($insert,
-						     $parms,
-						     0,		// compound key
-						     '',
-						     $this->toJson(false));
-				return $count;
-		    }		    	// error performing query
-		    else
-		    {		    	// error inserting record
-				throw new Exception("Concession::save:
-							    '$insertText', " .
-							    print_r($stmt->errorInfo(),true));
-		    }	    		// error inserting record
-		}		        	// create new record
-		else
-		{		        	// update existing record
-		    $update		= "UPDATE Concessions SET ";
-		    $trace		= "UPDATE Concessions SET ";
-		    $set		= '';
-		    $comma		= '';
-		    $eparms		= array();
-		    foreach($this->changed as $fld => $value)
-		    {
-				$set	.= $comma . "`$fld`=?";
-				array_push($eparms, $value);
-				$trace	.= $comma . "`$fld`=" . $connection->quote($value);
-				$comma	= ', ';
-		    }	        	// loop through all fields in record
-		    $this->changed	= array();	// reset
-
-		    if (strlen($set) > 0)
-		    {		// changes made
-				// construct the where clause
-				array_push($eparms,$this->row['domain']);
-				array_push($eparms,$this->row['county']);
-				array_push($eparms,$this->row['township']);
-				array_push($eparms,$this->row['conid']);
-				$where	= 'Domain=? AND County=? AND Township=? AND ConID=?';
-				$trace	.= ' WHERE Domain=' . $connection->quote($this->row['domain']) . " AND County=" . $connection->quote($this->row['county']) . " AND Township=" . $connection->quote($this->row['township']) . " AND ConID=" . $connection->quote($this->row['conid']);
-
-				// assemble the UPDATE command
-				$update		.= $set . ' WHERE ' . $where;
-				$stmt		= $connection->prepare($update);
-				$updateText	= debugPrepQuery($update, $eparms);
-				// perform the update
-				if ($stmt->execute($eparms))
-				{	    	// successful update
-				    $count		= $stmt->rowCount();
-				    if ($xml)
-						print "<$tagname count='$count'>$updateText</$tagname>\n";
-				    if ($debug)
-						$warn	.= "<p>$updateText</p>\n" .
-
-				    // log the update
-				    logSqlUpdate($update,
-							 $parms,
-							 0,	// compound key
-							 json_encode($this->former),
-							 $this->toJson(false));
-				    return	$count;
-				}	    	// successful update
-				else
-				{	    	// error updating record
-				    throw new Exception("Concession::save:
-								'$updateText', " .
-								print_r($stmt->errorInfo(),true));
-				}	    	// error updating record
-		    }		    	// changes made
-		}		        	// update existing record
-		return 0;
-    }		// function Concession::save
-
-    /********************************************************************
-     *	function Concession::delete										*
-     *																	*
-     *	Delete the database record associated with this instance.		*
-     *																	*
-     *	Input:															*
-     *	    $xml		if true emit XML								*
-     *					if a string emit XML using as tag name			*
-     *																	*
-     *	Returns:														*
-     *	    false		if the method was unable to update the database	*
-     *	    1			if the method deleted the database record		*
-     *	    0			if the record did not need to be deleted		*
-     ********************************************************************/
-    function delete($xml=false)
-    {
-		global	$debug;
-		global	$warn;
-		global	$connection;
-
-		// handle XML output option
-		if (is_string($xml))
-		    $xmltag	= $xml;
-		else
-		if ($xml)
-		{
-		    $xml	= true;
-		    $xmltag	= 'cmd';
-		}
-
-		// to simplify expressions
-		if (!$this->needInsert)
-		{	                	// have existing record
-		    $sqlParms	= array($this->row['domain'],
-							$this->row['county'], 
-							$this->row['township'],
-							$this->row['conid']);
-		    $delete	= "DELETE FROM Concessions WHERE" .
-						' Domain=? AND County=? AND Township=? AND ConID=?';
-		    $stmt	= $connection->prepare($delete);
-		    $deleteText	= debugPrepQuery($delete, $sqlParms);
-		    if ($stmt->execute($sqlParms))
-		    {
-				 if ($debug)
-				    $warn	.= "<p>Concession::delete: " . __LINE__ . 
-								"$deleteText</p>\n";
-		    }
-		    else
-		    {	            	// error updating record
-				$msg	.= "$deleteText, " . print_r($stmt->errorInfo(),true) . 
-						    "</p>\n";
-				return false;
-		    }	            	// error updating record
-
-		    $count	= $stmt->rowCount();
-		    if ($xml)
-				print "<$xmltag count='$count'>$delete</$xmltag>\n";
-
-		    // log the update
-		    logSqlUpdate($delete,
-					     $sqlParms,
-					     0,		// compound key
-					     '',
-					     $this->toJson(false));
-
-		    // update the memory copy of the record to reflect that it
-		    // no longer represents a database record
-		    $this->needInsert	= true;
-
-		    return $count;	    // number of records deleted
-		}		                // have key value
-
-		// record never written to database
-		return 0;	            // nothing to delete
-    }		// function Concession::delete
 
 }		// class Concession 

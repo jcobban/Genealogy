@@ -1,0 +1,144 @@
+<!--*********************************************************************
+ *  mergeUpdIndividen.html												*
+ *																		*
+ *  Template to display the results of merging two individuals in 		*
+ *  the family tree database.									        *
+ *																		*
+ *  History:															*
+ *		2019/05/06		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+
+    <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+			  Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+			  Services
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+			  Nominal Index
+      </a>:
+      <span id="crumbsSurname">
+      <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+			  Surnames Starting with '$PREFIX'
+      </a>:
+      <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+			  Surname '$SURNAME'
+      </a>:
+	  <a href="/FamilyTree/Person.php?idir=$IDIR1&lang=$LANG">
+			  $NAME1
+      </a>:
+      </span>
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+		  <a href="mergeUpdIndividHelpen.html" target="help">? Help</a>
+        </span>
+        <span id="titleNames">
+	          Merge  $NAME1 and $NAME2
+        </span>
+        <span id="titleFailed">
+	          Merge Failed
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <div id="results">
+	    <p>Values from individual record IDIR=$IDIR2 are
+	       selectively merged into individual record IDIR=$IDIR1.
+	    <p id="replaceSurname">Surname replaced by '$NEWSURNAME'.
+	    <p id="replaceGivenname">Given name replaced by '$NEWGIVENNAME'.
+	    <p id="replaceBirthDate">Birth date replaced by '$BIRTHDATE2'.
+	    <p id="replaceBirthLoc">Birth location replaced by '$BIRTHLOCATION2'.
+	    <p>Copy $BIRTHCITATIONSCOUNT citations to birth.
+	    <p id="replaceChrisDate">Christening date replaced by '$CHRISDATE2'.
+	    <p id="replaceChrisLoc">Christening location replaced by '$CHRISLOCATION2'.
+	    <p>Copy $CHRISCITATIONSCOUNT citations to christening.
+	    <p id="replaceDeathDate">Death date replaced by '$DEATHDATE2'.
+	    <p id="replaceDeathLoc">Death location replaced by '$DEATHLOCATION2'.
+	    <p>Copy $DEATHCITATIONSCOUNT citations to death.
+	    <p id="replaceBurialDate">Burial date replaced by '$BURIEDDATE2'.
+	    <p id="replaceBurialLoc">Burial location replaced by '$BURIEDLOCATION2'.
+	    <p>Copy $BURIALCITATIONSCOUNT citations to burial.
+	    <p>Moved $RESULT individual event records from $IDIR2 
+			  to $IDIR1.
+	    <p>Deleted $RESULT nominal index records for second individual. 
+	    <p>Update nominal index records for merged individual.</p> 
+	    <p>In marriage record IDMR=$FAMILY2IDMR
+			  field '$MIDIRFLD' set to '$IDIR1'.
+	    <p>All information merged into family IDMR=$FAMILY1IDMR
+			  and family IDMR=$FAMILY2IDMR deleted.
+	    <p>In marriage record IDMR=$IDMR
+			  fields '$MSURNFLD' and 
+			  '$MGIVNFLD' set to 
+			  $SURNAME . ", " . $GIVENNAME.
+	    <p>Child record IDCR=$IDCR
+			  is deleted as a duplicate.
+	    <p>In child record IDCR=$CHILDRIDCR
+			  field 'IDIR' set to '$IDIR1'.
+	    <p>Update $RESULT source citations
+			  to point to individual record IDIR=$IDIR1
+	    <p>Update the transcription of the birth registration.
+	    <p>Update the transcription of the death registration.
+	    <p>Update the transcription of the marriage registration.
+	    <p>Move $BLOGSETCOUNT blog messages.
+	    <p>Delete the individual record $IDIR2</p>
+	  </div>
+      <form action="Person.php?idir=$IDIR1"
+				  name="mainForm" method="get">
+        <div class="hidden" id="hiddenElements">
+		  <input type="hidden" name="birthd" id="birthd"
+				  value="$BIRTHD">
+		  <input type="hidden" name="birthloc" id="birthloc" 
+				  value="$BIRTHLOC">
+		  <input type="hidden" name="chrisd" id="chrisd" 
+				  value="$CHRISD">
+		  <input type="hidden" name="chrisloc" id="chrisloc" 
+				  value="$CHRISLOC">
+		  <input type="hidden" name="deathd" id="deathd" 
+				  value="$DEATHD">
+		  <input type="hidden" name="deathloc" id="deathloc" 
+				  value="$DEATHLOC">
+		  <input type="hidden" name="buriald" id="buriald" 
+				  value="$BURIALD">
+		  <input type="hidden" name="burialloc" id="burialloc" 
+				  value="$BURIALLOC">
+		  <input type="hidden" name="givenname" id="givenname" 
+				  value="$GIVENNAME">
+		  <input type="hidden" name="surname" id="surname" 
+				  value="$SURNAME">
+          <span id="movedevent">
+		  <input type="hidden" name="eventd$IDER"
+				  id="eventd$IDER"
+				  value="$DATE">
+		  <input type="hidden" name="eventtype$IDER"
+				  id="eventtype$IDER"
+				  value="$IDET">
+		  <input type="hidden" name="eventcittype$IDER"
+				  id="eventcittype$IDER"
+				  value="$CITTYPE">
+		  <input type="hidden" name="eventdescription$IDER"
+				  id="eventdescription$IDER"
+				  value="$DESCRIPTION">
+		  <input type="hidden" name="eventloc$IDER"
+				  id="eventloc$IDER"
+				  value="$LOCATION">
+          </span>
+        </div>
+        <button type="submit" id="Submit">
+		  Close
+        </button>
+      </form>
+    </div>  <!-- end of <div id="body"> -->
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/mergeUpdIndivid.js" type="application/javascript">
+    </script>

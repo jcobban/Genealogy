@@ -5,7 +5,7 @@ use \Exception;
 /************************************************************************
  *  /templates/index.php												*
  *																		*
- *  This script displays information about the templates directory.     *
+ *  This script displays information about the jscripts directory.      *
  *																		*
  *    History:															*
  *		2018/11/17		hide contents of templates directory            *
@@ -13,7 +13,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . "/common.inc";
 
 /************************************************************************

@@ -6,8 +6,9 @@
  *																		*
  *  History:															*
  *		2018/10/21      created                                         *
+ *      2019/04/12      change TownshipsUpdate,php to TownshipsEdit.php *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=$LANG">
@@ -45,7 +46,7 @@
   </p>
   <!--- Put out the response as a table -->
   <form name="townshipForm"
-		action="TownshipsUpdate.php" 
+		action="TownshipsEdit.php" 
 		method="post" 
 		autocomplete="off" 
 		enctype="multipart/form-data">
@@ -53,7 +54,7 @@
     <input type="hidden" name="Domain" value="$DOMAIN">
     <input type="hidden" name="County" value="$COUNTYCODE">
     <input type="hidden" name="Debug" value="$DEBUG">
-    <table class="form" id="dataTbl">   
+    <table class="form" id="dataTable">   
     <!--- Put out the column headers -->
 	  <thead>
 		<tr id="hdrRow">

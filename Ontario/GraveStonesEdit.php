@@ -43,7 +43,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/DomainSet.inc';
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . "/County.inc";
@@ -565,6 +565,6 @@ if ($results)
     $template->updateTag('Row$i', $results);
 else
     $template->updateTag('Row$i', $results);
-    //$template->updateTag('dataTbl', null);
+    //$template->updateTag('dataTable', null);
 
 $template->display();

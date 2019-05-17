@@ -17,7 +17,7 @@ use \Exception;
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Language.inc";
-require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
 if (array_key_exists('REDIRECT_URL', $_ENV))

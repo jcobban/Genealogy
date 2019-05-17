@@ -33,104 +33,105 @@
     	pour mise a jour la base des données.
         </p>
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="center">
+      <div class="center" id="topBrowse">
         <span class="left" id="topPrev">
-    	<a href="/Canada/LanguagesEdit.php?lang=fr$npPrev" id="prenpprev">
-    	&lt;---
-    	</a>
+    	  <a href="/Canada/LanguagesEdit.php?lang=fr$npPrev" id="prenpprev">
+    	    &lt;---
+    	  </a>
         </span>
         <span class="right" id="topNext">
-    	<a href="/Canada/LanguagesEdit.php?lang=fr$npNext" id="prenpnext">
+    	  <a href="/Canada/LanguagesEdit.php?lang=fr$npNext" id="prenpnext">
     	    ---&gt;
-    	</a>
+    	  </a>
         </span>
           <span id="respdescrows">
     	montrer rangs $FIRST a $LAST de $TOTALROWS
           </span>
         <div style="clear: both;"></div>
       </div> <!-- left and right arrow links -->
-    <!--- Put out the response as a table -->
-    <form name="countryForm"
-    	action="LanguagesEdit.php" 
-    	method="post" 
-    	autocomplete="off" 
-    	enctype="multipart/form-data">
-        <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
-      <p>
-        <label class="label" for="pattern" style="width: 10em;">Pattern:</label>
-        <input type="text" id="pattern" name="pattern" 
-    	value="$PATTERN"
-    	class="ina leftnc" size=24" maxlength="256">
-      </p>
-      <table class="form" id="dataTbl">
-        <!--- Put out the column headers -->
-        <thead>
-          <tr id="hdrRow">
-    		<th class="colhead">
-    		    ID
-    		</th>
-    		<th class="colhead">
-    		    Nom
-    		</th>
-    		<th class="colhead">
-    		    Nom Native
-    		</th>
-    		<th class="colhead">
-    		    Article
-    		</th>
-    		<th class="colhead">
-    		    Possessive
-    		</th>
-    		<th class="colhead">
-    		    Apologie
-    		</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id="Row$code">
-    	<td class="right">
-    	    <input type="text" name="Code$code" id="Code$code"
-    			value="$code"
-    			class="ina code"  style="text-transform: lowercase;"
-    			size="2" maxlength="2" readonly="readonly">
-    	</td>
-    	<td class="left">
-    	    <input type="text" name="Name$code" id="Name$code" 
-    			value="$name" 
-    			class="ina leftnc"
-    			size="28" maxlength="64">
-    	</td>
-    	<td class="left">
-    	    <input type="text" name="NativeName$code" id="NativeName$code"
-    			value="$nativename" 
-    			class="ina leftnc"
-    			size="28" maxlength="255">
-    	</td>
-    	<td class="left">
-    	    <input type="text" name="Article$code" id="Article$code"
-    			value="$article" 
-    			class="ina leftnc"
-    			size="12" maxlength="32">
-    	</td>
-    	<td class="left">
-    	    <input type="text" name="Possessive$code" id="Possessive$code"
-    			value="$possessive" 
-    			class="ina leftnc"
-    			size="12" maxlength="32">
-    	</td>
-    		<td class="left">
-    		    <input type="text" name="Sorry$code" id="Sorry$code"
-    				value="$sorry" 
-    				class="white leftnc"
-    				size="40" maxlength="255">
-    		</td>
-          </tr>
-        </tbody>
-      </table>
-      <p>
-        <button type="submit" id="Submit">Refraichir</button>
-      </p>
-    </form>
+      <!--- Put out the response as a table -->
+      <form name="countryForm"
+      	action="LanguagesEdit.php" 
+      	method="post" 
+      	autocomplete="off" 
+      	enctype="multipart/form-data">
+          <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
+        <p>
+          <label class="label" for="pattern" style="width: 10em;">Pattern:</label>
+          <input type="text" id="pattern" name="pattern" 
+      	value="$PATTERN"
+      	class="ina leftnc" size=24" maxlength="256">
+        </p>
+        <table class="form" id="dataTable">
+          <!--- Put out the column headers -->
+          <thead>
+            <tr id="hdrRow">
+      		<th class="colhead">
+      		    ID
+      		</th>
+      		<th class="colhead">
+      		    Nom
+      		</th>
+      		<th class="colhead">
+      		    Nom Native
+      		</th>
+      		<th class="colhead">
+      		    Article
+      		</th>
+      		<th class="colhead">
+      		    Possessive
+      		</th>
+      		<th class="colhead">
+      		    Apologie
+      		</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="Row$code">
+      	<td class="right">
+      	    <input type="text" name="Code$code" id="Code$code"
+      			value="$code"
+      			class="ina code"  style="text-transform: lowercase;"
+      			size="2" maxlength="2" readonly="readonly">
+      	</td>
+      	<td class="left">
+      	    <input type="text" name="Name$code" id="Name$code" 
+      			value="$name" 
+      			class="ina leftnc"
+      			size="28" maxlength="64">
+      	</td>
+      	<td class="left">
+      	    <input type="text" name="NativeName$code" id="NativeName$code"
+      			value="$nativename" 
+      			class="ina leftnc"
+      			size="28" maxlength="255">
+      	</td>
+      	<td class="left">
+      	    <input type="text" name="Article$code" id="Article$code"
+      			value="$article" 
+      			class="ina leftnc"
+      			size="12" maxlength="32">
+      	</td>
+      	<td class="left">
+      	    <input type="text" name="Possessive$code" id="Possessive$code"
+      			value="$possessive" 
+      			class="ina leftnc"
+      			size="12" maxlength="32">
+      	</td>
+      		<td class="left">
+      		    <input type="text" name="Sorry$code" id="Sorry$code"
+      				value="$sorry" 
+      				class="white leftnc"
+      				size="40" maxlength="255">
+      		</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <button type="submit" id="Submit">Refraichir</button>
+        </p>
+      </form>
+    </div>
     <!-- The remainder of the page consists of context specific help text. -->
     <div class="balloon" id="HelpCode">
     <p>This field contains a 2-character ISO 639-1 abbreviation for the language 

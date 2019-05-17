@@ -70,16 +70,6 @@ function onLoad()
 		}	// loop through all elements in the form
     }		// loop through all forms
 
-    var dataTable               = document.getElementById('dataTable');
-    var dataWidth               = dataTable.offsetWidth;
-    var windowWidth             = document.body.clientWidth - 8;
-    if (dataWidth > windowWidth)
-        dataWidth               = windowWidth;
-    var topBrowse               = document.getElementById('topBrowse');
-    topBrowse.style.width       = dataWidth + "px";
-    var botBrowse               = document.getElementById('botBrowse');
-    if (botBrowse)
-        botBrowse.style.width   = dataWidth + "px";
 }		// function onLoad
 
 /************************************************************************
@@ -105,16 +95,17 @@ function showReg()
 }		// showReg
 
 /************************************************************************
- *  function deleteReg														*
+ *  function deleteReg													*
  *																		*
  *  When a Delete button is clicked this function invokes a server		*
- *  to delete the registration.												*
+ *  to delete the registration.											*
  *																		*
  *  Input:																*
- *		this		<button type=button id='Delete...'>						*
+ *		this		<button type=button id='Delete...'>					*
  ************************************************************************/
-function deleteReg()
+function deleteReg(ev)
 {
+    stopProp(ev);
     var	form	= this.form;
     var	rownum	= this.id.substring(6);
     var	domain	= form.RegDomain.value;
@@ -139,9 +130,9 @@ function deleteReg()
 		displayDialog(dialogDiv,
 				      'RegDel$template',
 				      parms,
-				      this,		// position relative to
+				      this,		        // position relative to
 				      confirmDelete,	// 1st button confirms Delete
-				      false);		// default show on open
+				      false);		    // default show on open
     }		// have popup <div> to display message in
     else
 		alert("DeathRegResponse.js: deleteReg: " +
@@ -151,19 +142,20 @@ function deleteReg()
 /************************************************************************
  *  function confirmDelete												*
  *																		*
- *  This method is called when the user confirms the request to delete		*
+ *  This method is called when the user confirms the request to delete	*
  *  a registration.														*
  *																		*
  *  Input:																*
- *		this				<button id='confirmDelete...'>						*
+ *		this		<button id='confirmDelete...'>						*
  ************************************************************************/
-function confirmDelete()
+function confirmDelete(ev)
 {
+    stopProp(ev);
     // get the parameter values hidden in the dialog
     var	form		= this.form;
     var	regnum		= this.id.substr(13);
     var	regdomain	= form.elements['regdomain'].value;
-    var	regyear		= form.elements['regyear'].value;
+    var	regyear		= form.elements['regYear'].value;
     var	formname	= form.elements['formname'].value;
 
     // hide the dialog

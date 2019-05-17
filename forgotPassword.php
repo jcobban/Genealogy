@@ -19,7 +19,7 @@ use \Exception;
  *  Copyright &copy; 2019 James A. Cobban		                        *
  ************************************************************************/
 require_once __NAMESPACE__ . '/User.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // the user is not signed on so we must act on the userid or e-mail
@@ -131,7 +131,7 @@ if ($tag)
     if ($debug)
     {
 		$warn		.= "<p>mail('$email','$emailSubject'," . 
-						    escape($emailText) . "</p>\n";
+						    \Templating\escape($emailText) . "</p>\n";
     }			// debug
     $sent		= mail(	$email,
 						$emailSubject,

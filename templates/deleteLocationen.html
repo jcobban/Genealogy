@@ -1,0 +1,35 @@
+<!--*********************************************************************
+ *  deleteLocationen.html   											*
+ *																		*
+ *  Delete a location record from the table of locations.				*
+ *																		*
+ *  History:															*
+ *		2019/02/19		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+      <a href="/FamilyTree/Locations.php?lang=$LANG">Locations</a>:
+      <a href="/FamilyTree/Locations.php?pattern=^$NAMEPREF&lang=$LANG">					Locations starting with '$NAMEPREF'</a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+		  <a href="deleteLocationHelpen.html" target="help">? Help</a>
+        </span>
+		Delete Location $NAME
+        <div style="clear: both;"></div>
+      </h1>
+      <p class="warning" id="referenced">
+        Location '$NAME' not deleted because $COUNT events reference it
+      </p>
+      $TRACE
+      $MSG
+	  <p class="label" id="deleted">Location "$NAME" deleted</p>
+    </div>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>

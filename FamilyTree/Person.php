@@ -2,6 +2,9 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+use \Templating\TemplateTag;
+
 /************************************************************************
  *  Person.php															*
  *																		*
@@ -288,7 +291,7 @@ require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Picture.inc';
 require_once __NAMESPACE__ . '/Source.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/User.inc';
 require_once 'customization.php';
 require_once __NAMESPACE__ . '/common.inc';
@@ -330,7 +333,7 @@ static $childRole	= array(
 								'child');
 
 /************************************************************************
- *	$locPrepTrans														*
+ *	$tranTab														*
  *																		*
  * Translate location preposition.										*
  * 'at' is the usual preposition for geographically 'small' locations	*
@@ -339,7 +342,7 @@ static $childRole	= array(
  * used for countries that start with a consonant and are grammatically	*
  * 'masculine'.															*
  ***********************************************************************/
-static $locPrepTrans	= array(
+static $tranTab	= array(
 							'at'		=> 'at',
 							'for'		=> 'for',
 							'in'		=> 'in',
@@ -550,7 +553,7 @@ $templeTable	= array();
 $addressTable	= array();
 
 /************************************************************************
- *  createPopups														*
+ *  function createPopups												*
  *																		*
  *  Create popups for any individuals identified by hyper-links in		*
  *  the supplied text.													*
@@ -566,18 +569,18 @@ function createPopups($desc)
     global	$warn;
     global	$individTable;
     global	$lang;
+    global	$tranTab;
 
     $pieces		= explode('<a ', $desc);
     $first		= true;
-    $retval		= '';
-    foreach($pieces as $piece)
+    $piece		= $pieces[0];
+    $tran       = $tranTab[$piece];
+    if (is_string($tran) && strlen($tran) > 0)
+        $piece  = $tran;
+    $retval		= $piece;
+    for($ip = 1; $ip < count($pieces); $ip++)
     {		// description contains a link
-		if ($first)
-		{
-		    $retval	.= $piece;
-		    $first	= false;
-		    continue;
-		}
+		$piece      = $pieces[$ip];
 		$retval		.= "<a ";
 		$urlstart	= strpos($piece, "href=");
 		// $quote is either single or double quote
@@ -594,11 +597,11 @@ function createPopups($desc)
 		    $refind		= new Person(array('idir' => $refidir));
 		    $individTable[$refidir]	= $refind;
 		    if (substr($url, 0, $equalpos) == "Person.php?")
-						$retval	.= substr($piece, 0, $urlstart) .
+				$retval	.= substr($piece, 0, $urlstart) .
 							     "/FamilyTree/" .
 							     substr($piece, $urlstart);
 		    else
-						$retval	.= $piece;
+				$retval	.= $piece;
 		}
 		else
 		    $retval	.= $piece;
@@ -607,7 +610,7 @@ function createPopups($desc)
 }		// function createPopups
 
 /************************************************************************
- *  addFootnote															*
+ *  function addFootnote												*
  *																		*
  *  Add a footnote.														*
  *																		*
@@ -638,10 +641,10 @@ function addFootnote($key,
 		$citTable[$footnote]	= $cit;
     }		// citation needs new footnote number
     return $footnote;
-}		// addFootnote
+}		// function addFootnote
 
 /************************************************************************
- *  showCitations														*
+ *  function showCitations												*
  *																		*
  *  Given the description of an individual event identify the			*
  *  source citations for that event, emit the HTML for a superscript	*
@@ -684,10 +687,10 @@ function showCitations($event,
 		$comma	        = ',';
     }		// loop through all event records
 
-}		// showCitations
+}		// function showCitations
 
 /************************************************************************
- *  showCitationTable													*
+ *  function showCitationTable											*
  *																		*
  *  Dump the accumulated list of citation footnotes.					*
  ************************************************************************/
@@ -732,10 +735,10 @@ function showCitationTable()
 		$parmTable[$key]		= $entry;
     }			// for each
     $template->updateTag('footnote$key', $parmTable);
-}		// showCitationTable
+}		// function showCitationTable
 
 /************************************************************************
- *  showEvent															*
+ *  function showEvent													*
  *																		*
  *  Generate the HTML to display information about an event				*
  *  of an individual.													*
@@ -744,7 +747,7 @@ function showCitationTable()
  *		$pronoun		pronoun appropriate for described individual	*
  *		$gender			gender of individual being described			*
  *		$event			instance of Event containing the event			*
- *						information										*
+ *						information		        						*
  *		$template		string template to fill in						*
  *						This template has substitution points for:		*
  *						[Pronoun]										*
@@ -1013,16 +1016,16 @@ function showEvent($pronoun,
 		}	// loop through template
     }		// there is an event of this kind
     print "\n";
-}		// showEvent
+}		// function showEvent
 
 /************************************************************************
- *  showLocation														*
+ *  function showLocation												*
  *																		*
  *  Display a location as part of an event in a standard way.			*
  *																		*
  *		Input:															*
  *		    $location	instance of Location, Temple, or				*
- *						Address											*
+ *						Address	        								*
  *		    $comma		separator between footnote references			*
  *		    $defPrep	default preposition before place names			*
  ************************************************************************/
@@ -1030,7 +1033,7 @@ function showLocation($location,
 					  $comma    = '',
 					  $defPrep  = 'at')
 {
-    global	$locPrepTrans;
+    global	$tranTab;
     global	$locindex;
     global	$locationTable;
     global	$templeTable;
@@ -1067,23 +1070,23 @@ function showLocation($location,
 		$prep	= $location->getPreposition();
 		if (strlen($prep) > 0)
 		{
-		    if (array_key_exists($prep, $locPrepTrans))
-				print $locPrepTrans[$prep];
+		    if (array_key_exists($prep, $tranTab))
+				print $tranTab[$prep];
 		    else
 				print $prep;
 		}
 		else
-		    print $locPrepTrans[$defPrep];
+		    print $tranTab[$defPrep];
 		$idime	= $location->getId();
 		print " <span id=\"{$idprefix}{$locindex}_{$idime}\">";
 		$locindex++;
 		print $locname;
 		print '</span>';
     }		// location defined
-}		// showLocation
+}		// function showLocation
 
 /************************************************************************
- *  showParents															*
+ *  function showParents												*
  *																		*
  *  Generate the HTML to display information about the parents			*
  *  of an individual.													*
@@ -1257,10 +1260,10 @@ function showParents($person)
 		print $tranTab['has no recorded parents'] . ". ";
     }		// no parents defined
 
-}		// showParents
+}		// function showParents
 
 /************************************************************************
- *  showEvents															*
+ *  function showEvents													*
  *																		*
  *  Given the identifier of an individual, extract information			*
  *  about that individual's Events.										*
@@ -1430,7 +1433,7 @@ function showEvents($person)
 
     // reset to former date presentation
     LegacyDate::setTemplate($oldfmt);
-}		// showEvents
+}		// function showEvents
 
 /********************************************************************
  *		  OOO  PPPP  EEEEE N   N    CCC   OOO  DDDD  EEEEE		    *
@@ -1461,10 +1464,10 @@ $lang		    = 'en';
 $getParms		= array();
 
 foreach($_GET as $key => $value)
-{				// loop through all parameters
+{			    	// loop through all parameters
 	$value		= trim($value);
 	switch(strtolower($key))
-	{			// act on specific parameters
+	{		    	// act on specific parameters
 	    case 'idir':
 	    case 'id':
 	    {			// get the individual by identifier
@@ -1494,42 +1497,19 @@ foreach($_GET as $key => $value)
 			$lang		= strtolower(substr($value,0,2));
 			break;
 	    }
-	}			// act on specific parameters
-}				// loop through all parameters
+	}			    // act on specific parameters
+}				    // loop through all parameters
 
 // start the template
-$template		= new FtTemplate("Person$lang.html");
-
-$tempBase		= $document_root . '/templates/';
-if (file_exists($tempBase . "Trantab$lang.html"))
-    $trtemplate = new Template("${tempBase}Trantab$lang.html");
-else
-    $trtemplate = new Template("${tempBase}Trantaben.html");
+$template		        = new FtTemplate("Person$lang.html");
 
 // internationalization support
-$monthsTag	    = $trtemplate->getElementById('Months');
-if ($monthsTag)
-{
-	$months		= array();
-	foreach($monthsTag->childNodes() as $span)
-	    $months[]	= trim($span->innerHTML());
-}
-$lmonthsTag	= $trtemplate->getElementById('LMonths');
-if ($lmonthsTag)
-{
-	$lmonths		= array();
-	foreach($lmonthsTag->childNodes() as $span)
-	    $lmonths[]	= trim($span->innerHTML());
-}
-$tranTabTag	= $template->getElementById('tranTab');
-if ($tranTabTag)
-{
-	$tranTab		    = array();
-	foreach($tranTabTag->childNodes() as $span)
-	{
-	    $key		    = $span->attributes['data-key'];
-	    $tranTab[$key]	= trim($span->innerHTML());
-	}
+$trtemplate             = $template->getTranslate();
+$months	                = $trtemplate['Months'];
+$lmonths	            = $trtemplate['LMonths'];
+$tranTab	            = $trtemplate['tranTab'];
+if ($tranTab)
+{                   // override default translation terms
 	$malePronoun		= $tranTab['He'];
 	$femalePronoun		= $tranTab['She'];
 	$otherPronoun		= $tranTab['He/She'];
@@ -1539,186 +1519,182 @@ if ($tranTabTag)
 	$childRole		    = array($maleChildRole,
 					        	$femaleChildRole,
 					        	$unknownChildRole);
-	$locPrepTrans	= array(
-				'at'		=> $tranTab['at'],
-				'for'		=> $tranTab['for'],
-				'in'		=> $tranTab['in'],
-				'in[masc]'	=> $tranTab['in[masc]'],
-				'to'		=> $tranTab['to']
-				);
-	$intStatus	= array( 1	=> '',
-		        		 2	=> $tranTab['None'],
-			        	 3	=> $tranTab['Stillborn'],
-			        	 4	=> $tranTab['Twin'],
-		        		 5	=> $tranTab['Illegitimate']
-					);
-	$intType	= array(
-				'' => $tranTab['intType'],
-				 1 => $tranTab['intType1'],
-				 2 => $tranTab['intType2'],
-				 3 => $tranTab['intType3'],
-				 4 => $tranTab['intType4'],
-				 5 => $tranTab['intType5'],
-				 6 => $tranTab['intType6'],
-				 7 => $tranTab['intType7'],
-				 8 => $tranTab['intType8'],
-				 9 => $tranTab['intType9'],
-				10 => $tranTab['intType10'],
-				11 => $tranTab['intType11'],
-				12 => $tranTab['intType12'],
-				13 => $tranTab['intType13']);
+    $intStatus			= array(
+                         1	        => '',
+		        		 2			=> $tranTab['None'],
+			        	 3			=> $tranTab['Stillborn'],
+			        	 4			=> $tranTab['Twin'],
+		        		 5			=> $tranTab['Illegitimate']
+                     );
+
+	$intType	        = array(
+						''			=> $tranTab['intType'],
+						 1			=> $tranTab['intType1'],
+						 2			=> $tranTab['intType2'],
+						 3			=> $tranTab['intType3'],
+						 4			=> $tranTab['intType4'],
+						 5			=> $tranTab['intType5'],
+						 6			=> $tranTab['intType6'],
+						 7			=> $tranTab['intType7'],
+						 8			=> $tranTab['intType8'],
+						 9			=> $tranTab['intType9'],
+						10			=> $tranTab['intType10'],
+						11			=> $tranTab['intType11'],
+						12			=> $tranTab['intType12'],
+		                13			=> $tranTab['intType13']);
+
 	$eventText	= array(
-				 1 => $tranTab['eventText1'], 
-				 2 => $tranTab['eventText2'], 
-				 3 => $tranTab['eventText3'], 
-				 4 => $tranTab['eventText4'], 
-				 5 => $tranTab['eventText5'], 
-				 6 => $tranTab['eventText6'], 
-				 7 => $tranTab['eventText7'], 
-				 8 => $tranTab['eventText8'], 
-				 9 => $tranTab['eventText9'], 
-				10 => $tranTab['eventText10'], 
-				11 => $tranTab['eventText11'], 
-				12 => $tranTab['eventText12'], 
-				13 => $tranTab['eventText13'], 
-				14 => $tranTab['eventText14'], 
-				15 => $tranTab['eventText15'], 
-				16 => $tranTab['eventText16'], 
-				17 => $tranTab['eventText17'], 
-				18 => $tranTab['eventText18'], 
-				19 => $tranTab['eventText19'], 
-				20 => $tranTab['eventText20'], 
-				21 => $tranTab['eventText21'], 
-				22 => $tranTab['eventText22'], 
-				23 => $tranTab['eventText23'], 
-				24 => $tranTab['eventText24'], 
-				25 => $tranTab['eventText25'], 
-				26 => $tranTab['eventText26'], 
-				27 => $tranTab['eventText27'], 
-				28 => $tranTab['eventText28'], 
-				29 => $tranTab['eventText29'], 
-				30 => $tranTab['eventText30'], 
-				31 => $tranTab['eventText31'], 
-				32 => $tranTab['eventText32'], 
-				33 => $tranTab['eventText33'], 
-				34 => $tranTab['eventText34'], 
-				35 => $tranTab['eventText35'], 
-				36 => $tranTab['eventText36'], 
-				37 => $tranTab['eventText37'], 
-				38 => $tranTab['eventText38'], 
-				39 => $tranTab['eventText39'], 
-				40 => $tranTab['eventText40'], 
-				41 => $tranTab['eventText41'], 
-				42 => $tranTab['eventText42'], 
-				43 => $tranTab['eventText43'], 
-				44 => $tranTab['eventText44'], 
-				45 => $tranTab['eventText45'], 
-				46 => $tranTab['eventText46'], 
-				47 => $tranTab['eventText47'], 
-				48 => $tranTab['eventText48'], 
-				49 => $tranTab['eventText49'], 
-				50 => $tranTab['eventText50'], 
-				51 => $tranTab['eventText51'], 
-				52 => $tranTab['eventText52'], 
-				53 => $tranTab['eventText53'], 
-				54 => $tranTab['eventText54'], 
-				55 => $tranTab['eventText55'], 
-				56 => $tranTab['eventText56'], 
-				57 => $tranTab['eventText57'], 
-				58 => $tranTab['eventText58'], 
-				59 => $tranTab['eventText59'], 
-				60 => $tranTab['eventText60'], 
-				61 => $tranTab['eventText61'], 
-				62 => $tranTab['eventText62'], 
-				63 => $tranTab['eventText63'], 
-				64 => $tranTab['eventText64'], 
-				65 => $tranTab['eventText65'], 
-				66 => $tranTab['eventText66'], 
-				67 => $tranTab['eventText67'], 
-				68 => $tranTab['eventText68'], 
-				69 => $tranTab['eventText69'], 
-				70 => $tranTab['eventText70'], 
-				71 => $tranTab['eventText71'], 
-				72 => $tranTab['eventText72'], 
-				73 => $tranTab['eventText73'], 
-		      2000 => $tranTab['eventText2000'], 
-		      3000 => $tranTab['eventText3000'], 
-		      4000 => $tranTab['eventText4000'], 
-		      5000 => $tranTab['eventText5000'], 
-		      5001 => $tranTab['eventText5001'], 
-		     15000 => $tranTab['eventText15000'], 
-		     16000 => $tranTab['eventText16000'], 
-		     26000 => $tranTab['eventText26000'], 
-		     27000 => $tranTab['eventText27000']);
-}
+						 1			=> $tranTab['eventText1'], 
+						 2			=> $tranTab['eventText2'], 
+						 3			=> $tranTab['eventText3'], 
+						 4			=> $tranTab['eventText4'], 
+						 5			=> $tranTab['eventText5'], 
+						 6			=> $tranTab['eventText6'], 
+						 7			=> $tranTab['eventText7'], 
+						 8			=> $tranTab['eventText8'], 
+						 9			=> $tranTab['eventText9'], 
+						10			=> $tranTab['eventText10'], 
+						11			=> $tranTab['eventText11'], 
+						12			=> $tranTab['eventText12'], 
+						13			=> $tranTab['eventText13'], 
+						14			=> $tranTab['eventText14'], 
+						15			=> $tranTab['eventText15'], 
+						16			=> $tranTab['eventText16'], 
+						17			=> $tranTab['eventText17'], 
+						18			=> $tranTab['eventText18'], 
+						19			=> $tranTab['eventText19'], 
+						20			=> $tranTab['eventText20'], 
+						21			=> $tranTab['eventText21'], 
+						22			=> $tranTab['eventText22'], 
+						23			=> $tranTab['eventText23'], 
+						24			=> $tranTab['eventText24'], 
+						25			=> $tranTab['eventText25'], 
+						26			=> $tranTab['eventText26'], 
+						27			=> $tranTab['eventText27'], 
+						28			=> $tranTab['eventText28'], 
+						29			=> $tranTab['eventText29'], 
+						30			=> $tranTab['eventText30'], 
+						31			=> $tranTab['eventText31'], 
+						32			=> $tranTab['eventText32'], 
+						33			=> $tranTab['eventText33'], 
+						34			=> $tranTab['eventText34'], 
+						35			=> $tranTab['eventText35'], 
+						36			=> $tranTab['eventText36'], 
+						37			=> $tranTab['eventText37'], 
+						38			=> $tranTab['eventText38'], 
+						39			=> $tranTab['eventText39'], 
+						40			=> $tranTab['eventText40'], 
+						41			=> $tranTab['eventText41'], 
+						42			=> $tranTab['eventText42'], 
+						43			=> $tranTab['eventText43'], 
+						44			=> $tranTab['eventText44'], 
+						45			=> $tranTab['eventText45'], 
+						46			=> $tranTab['eventText46'], 
+						47			=> $tranTab['eventText47'], 
+						48			=> $tranTab['eventText48'], 
+						49			=> $tranTab['eventText49'], 
+						50			=> $tranTab['eventText50'], 
+						51			=> $tranTab['eventText51'], 
+						52			=> $tranTab['eventText52'], 
+						53			=> $tranTab['eventText53'], 
+						54			=> $tranTab['eventText54'], 
+						55			=> $tranTab['eventText55'], 
+						56			=> $tranTab['eventText56'], 
+						57			=> $tranTab['eventText57'], 
+						58			=> $tranTab['eventText58'], 
+						59			=> $tranTab['eventText59'], 
+						60			=> $tranTab['eventText60'], 
+						61			=> $tranTab['eventText61'], 
+						62			=> $tranTab['eventText62'], 
+						63			=> $tranTab['eventText63'], 
+						64			=> $tranTab['eventText64'], 
+						65			=> $tranTab['eventText65'], 
+						66			=> $tranTab['eventText66'], 
+						67			=> $tranTab['eventText67'], 
+						68			=> $tranTab['eventText68'], 
+						69			=> $tranTab['eventText69'], 
+						70			=> $tranTab['eventText70'], 
+						71			=> $tranTab['eventText71'], 
+						72			=> $tranTab['eventText72'], 
+						73			=> $tranTab['eventText73'], 
+				      2000			=> $tranTab['eventText2000'], 
+				      3000			=> $tranTab['eventText3000'], 
+				      4000			=> $tranTab['eventText4000'], 
+				      5000			=> $tranTab['eventText5000'], 
+				      5001			=> $tranTab['eventText5001'], 
+				     15000			=> $tranTab['eventText15000'], 
+				     16000			=> $tranTab['eventText16000'], 
+				     26000			=> $tranTab['eventText26000'], 
+				     27000			=> $tranTab['eventText27000']);
+}                   // override default translation terms
 
 // must have a parameter
 if (count($getParms) == 0)
-{				// missing identifier
-	$msg		.= "Missing mandatory identifier parameter. ";
-	$title		= 'Person Not Found';
-}				// missing identifier
+{				    // missing identifier
+	$msg		        .= "Missing mandatory identifier parameter. ";
+	$title		        = 'Person Not Found';
+}				    // missing identifier
 else
-{				// have an identifier
+{				    // have an identifier
 	// obtain the instance of Person based upon the parameters
-	    $person	        = new Person($getParms);
-	    $idir	        = $person->getIdir();
-	    $evBirth	    = $person->getBirthEvent(false);
-	    $evDeath	    = $person->getDeathEvent(false);
-	    $bprivlim	    = $person->getBPrivLim();
-	    $dprivlim	    = $person->getDPrivLim();
+    $person	        = new Person($getParms);
+    $idir	        = $person->getIdir();
+    $evBirth	    = $person->getBirthEvent(false);
+    $evDeath	    = $person->getDeathEvent(false);
+    $bprivlim	    = $person->getBPrivLim();
+    $dprivlim	    = $person->getDPrivLim();
 
-	    // check if current user is an owner of the record and therefore
-	    // permitted to see private information and edit the record
-	    $isOwner	    = $person->isOwner();
+    // check if current user is an owner of the record and therefore
+    // permitted to see private information and edit the record
+    $isOwner	    = $person->isOwner();
 
-	    // get information for constructing title and
-	    // breadcrumbs
-	    $givenName		= $person->getGivenName();
-	    if (strlen($givenName) > 2)
-			$givenPre	= substr($givenName, 0, 2);
-	    else
-			$givenPre	= $givenName;
-	    $surname		= $person->getSurname();
-	    $nameuri		= rawurlencode($surname . ', ' . $givenPre);
-	    if (strlen($surname) == 0)
-			$prefix		= '';
-	    else
-	    if (substr($surname,0,2) == 'Mc')
-			$prefix		= 'Mc';
-	    else
-			$prefix		= substr($surname,0,1);
+    // get information for constructing title and
+    // breadcrumbs
+    $givenName		= $person->getGivenName();
+    if (strlen($givenName) > 2)
+		$givenPre	= substr($givenName, 0, 2);
+    else
+		$givenPre	= $givenName;
+    $surname		= $person->getSurname();
+    $nameuri		= rawurlencode($surname . ', ' . $givenPre);
+    if (strlen($surname) == 0)
+		$prefix		= '';
+    else
+    if (substr($surname,0,2) == 'Mc')
+		$prefix		= 'Mc';
+    else
+		$prefix		= substr($surname,0,1);
 
-	    // format dates for title
-	    if ($person->get('private') == 2 && !$isOwner)
-	    {
-			$title		= "Person is Invisible";
-			$surname	= "";
-			$birthDate	= 'Private';
-			$somePrivate	= true;
-	    }
-	    else
-	    {
-			$title		= $person->getName($tranTab);
-			$bdoff		= strpos($title, '(');
-			if ($bdoff === false)
-			    $birthDate	= '';
-			else
-			{
-			    $bdoff++;
-			    $mdashoff	= strpos($title, '&', $bdoff);
-			    $birthDate	= substr($title, $bdoff, $mdashoff - $bdoff);
-			    $ddoff	= $mdashoff + 7;
-			    $cboff	= strpos($title, ')', $ddoff);
-			    $deathDate	= substr($title, $ddoff, $cboff - $ddoff);
-			}
-	    }
+    // format dates for title
+    if ($person->get('private') == 2 && !$isOwner)
+    {
+		$title		= "Person is Invisible";
+		$surname	= "";
+		$birthDate	= 'Private';
+		$somePrivate	= true;
+    }
+    else
+    {
+		$title		= $person->getName($tranTab);
+		$bdoff		= strpos($title, '(');
+		if ($bdoff === false)
+		    $birthDate	= '';
+		else
+		{
+		    $bdoff++;
+		    $mdashoff	= strpos($title, '&', $bdoff);
+		    $birthDate	= substr($title, $bdoff, $mdashoff - $bdoff);
+		    $ddoff	= $mdashoff + 7;
+		    $cboff	= strpos($title, ')', $ddoff);
+		    $deathDate	= substr($title, $ddoff, $cboff - $ddoff);
+		}
+    }
 
-	    // determine if the individual is private
-	    if (($birthDate != 'Private' && $person->get('private') == 0) ||
-			$isOwner)
-			$private	= false;
-}				// have an identifier
+    // determine if the individual is private
+    if (($birthDate != 'Private' && $person->get('private') == 0) ||
+		$isOwner)
+		$private	= false;
+}				    // have an identifier
 
 
 $template->set('TITLE',		    $title);
@@ -1780,7 +1756,7 @@ if (!is_null($person))
 			print $pronoun . ' ' . $tranTab['was also known as'] . ' ' .
 				$altName->getName() . '. ';
 			showCitations(Citation::STYPE_ALTNAME,
-				      $idnx);
+				          $idnx);
 			$note	= $altName->get('akanote');
 			if (strlen($note) > 0)
 			    print $note . ' ';
@@ -1887,7 +1863,7 @@ if (!is_null($person))
 			    try {
 				if ($spsid > 0)
 				{
-				    $spouse	= new Person(array('idir' => $spsid));
+				    $spouse	        = new Person(array('idir' => $spsid));
 				    $individTable[$spsid]	= $spouse;
 				}
 			    } catch(Exception $e)
@@ -1897,13 +1873,13 @@ if (!is_null($person))
 			<?php print $e->getMessage(); ?>
 	</p>
 <?php
-				$spouse	= null;
-				$spsid	= 0;
+				    $spouse	        = null;
+				    $spsid	        = 0;
 			    }
-			    $mdateo	= new LegacyDate($family->get('mard'));
-			    $mdate	= $mdateo->toString($dprivlim,
-							    true,
-							    $tranTab);
+			    $mdateo	            = new LegacyDate($family->get('mard'));
+			    $mdate	            = $mdateo->toString($dprivlim,
+							                            true,
+							                            $tranTab);
 
 ?>
 	<p>
@@ -1947,166 +1923,165 @@ if (!is_null($person))
 			    $idms		= $family->get('idms');
 			    if (array_key_exists($idms, $statusText))
 			    {		// marriage status text defined
-				$marStatus		= $statusText[$idms];
-				if (strlen($marStatus) > 0)
-				    print $marStatus . "\n";
+				    $marStatus		= $statusText[$idms];
+				    if (strlen($marStatus) > 0)
+				        print $marStatus . "\n";
 			    }		// marriage status text defined
 
 			    // show marriage notes
 			    $mnotes	= $family->get('notes');
 			    if (strlen($mnotes) > 0)
 			    {		// notes defined for this family
-				$mnotes		= createPopups($mnotes);
-				print str_replace("\n\n", "\n<p>", $mnotes) .
-					    "\n";
+				    $mnotes		= createPopups($mnotes);
+				    print str_replace("\n\n", "\n<p>", $mnotes) . "\n";
 			    }		// notes defined for this family
 
 			    if ($spsid > 0)
 			    {		// have a spouse
-				// never married indicator
-				if ($family->get('notmarried') > 0)
-				{		// never married indicator
-				    print "This couple were never married. ";
-				}		// never married indicator
+					if ($family->get('notmarried') > 0)
+					{		// never married indicator
+					    print "This couple were never married. ";
+					}		// never married indicator
 
-				// LDS sealing
-				if (strlen($family->get('seald')) > 0)
-				{		// LDS sealing present
-				    $date	= new LegacyDate($family->get('seald'));
-				    $temple	= new Temple(
-					    array('idtr' => $family->get('idtrseal')));
-				    $locn	= $temple->getName();
-				    print $person->getName() . ' ' .
-					$tranTab['was sealed to'] . ' ' .
-					$spouse->getName() . ' ' .
-					$date->toString($dprivlim, true, $tranTab).' '.
-					$tranTab['at'] . ' ' .  $locn . '.';
-				}		// LDS sealing present
+					// LDS sealing
+					if (strlen($family->get('seald')) > 0)
+					{		// LDS sealing present
+					    $date	= new LegacyDate($family->get('seald'));
+					    $temple	= new Temple(
+						            array('idtr' => $family->get('idtrseal')));
+					    $locn	= $temple->getName();
+					    print $person->getName() . ' ' .
+						$tranTab['was sealed to'] . ' ' .
+						$spouse->getName() . ' ' .
+						$date->toString($dprivlim, true, $tranTab).' '.
+						                $tranTab['at'] . ' ' .  $locn . '.';
+					}		// LDS sealing present
 
-				// display the event table entries for this family
-				$events	= $family->getEvents();
-				foreach($events as $ie => $event)
-				{		// loop through all event records
-				    // display event
-				    $idet	= $event->getIdet();
-				    showEvent('They',		// pronoun for family
-					      0,		// not relevant
-					      $event,		// record with details
-					      $eventText[$idet]);// template
-				}		// loop through all event records
+					// display the event table entries for this family
+					$events	= $family->getEvents();
+					foreach($events as $ie => $event)
+					{		// loop through all event records
+					    // display event
+					    $idet	= $event->getIdet();
+					    showEvent('They',		// pronoun for family
+						      0,		// not relevant
+						      $event,		// record with details
+						      $eventText[$idet]);// template
+					}		// loop through all event records
 
-							//****************************************************
-							//  marriage ended event						     *
-							//												     *
-							//  The Legacy database contains a marriage end date *
-				//  which
-							//  is presumably intended to record the unofficial  *
-							//  termination of the relationship where there is no*
-							//  formal event, such as						     *
-							//  Divorce (ET_DIVORCE), or Annulment (ET_ANNULMENT).*
-							//  Note that tblER does not define a formal separation*
-							//  event although that could be user implemented as *
-							//  ET_MARRIAGE_FACT with description "Separation".  *
-							//  The Legacy database also does not define a citation*
-							//  type in tblSX to be able to document		     *
-							//  the information source for knowledge of the end of*
-							//  the marriage.								     *
-							//  To permit this event to be handled in a manner   *
-							//  consistent with all other events, a new citation *
-							//  type is defined.							     *
-							//												     *
-							//****************************************************
-				if (strlen($family->get('marendd')) > 0)
-				{		// marriage ended date present
-				    $date	= new LegacyDate($family->get('marendd'));
+					//****************************************************
+					//  marriage ended event						     *
+					//												     *
+					//  The Legacy database contains a marriage end date *
+					//  which
+					//  is presumably intended to record the unofficial  *
+					//  termination of the relationship where there is no*
+					//  formal event, such as						     *
+					//  Divorce (ET_DIVORCE), or Annulment (ET_ANNULMENT).*
+					//  Note that tblER does not define a formal separation*
+					//  event although that could be user implemented as *
+					//  ET_MARRIAGE_FACT with description "Separation".  *
+					//  The Legacy database also does not define a citation*
+					//  type in tblSX to be able to document		     *
+					//  the information source for knowledge of the end of*
+					//  the marriage.								     *
+					//  To permit this event to be handled in a manner   *
+					//  consistent with all other events, a new citation *
+					//  type is defined.							     *
+					//												     *
+					//****************************************************
+					if (strlen($family->get('marendd')) > 0)
+					{		// marriage ended date present
+					    $date	= new LegacyDate($family->get('marendd'));
 ?>
 	    The marriage ended
 <?php
-				print $date->toString(9999, true, $tranTab) . '.';
-				// show citations for this marriage
-				showCitations(Citation::STYPE_MAREND,
-					      $family->getIdmr());
-			    }		// marriage ended date present
+					    print $date->toString(9999, true, $tranTab) . '.';
+					    // show citations for this marriage
+					    showCitations(Citation::STYPE_MAREND,
+						              $family->getIdmr());
+				    }		    // marriage ended date present
 ?>
 	</p>
 <?php
-			    // show any images/video files for the family
-			    if (!$private)
-				$family->displayPictures(Picture::IDTYPEMar);
+				    // show any images/video files for the family
+				    if (!$private)
+					$family->displayPictures(Picture::IDTYPEMar);
 
-			    // Print the name of the spouse before the first event
+				    // Print the name of the spouse before the first event
 ?>
 <p><?php print $spouse->getName(); ?>
 <?php
-			    // print citations for the name
-			    showCitations(Citation::STYPE_NAME,
-					  $spouse->getIdir());
-			    print ' ';		// separate name from following
+				    // print citations for the name
+				    showCitations(Citation::STYPE_NAME,
+						  $spouse->getIdir());
+				    print ' ';		// separate name from following
 
-			    // show information about the parents of the spouse
-			    showParents($spouse);
+				    // show information about the parents of the spouse
+				    showParents($spouse);
 
-			    // display any alternate names
-			    $altNames	= $spouse->getNames(1);
-			    foreach($altNames as $idnx => $altName)
-			    {	// loop through alternate names
-				print $spousePronoun . ' ' .$tranTab['was also known as'] . ' ' .
-					$altName->getName() . '.';
-				showCitations(Citation::STYPE_ALTNAME,
-					      $idnx);
-				$note	= $altName->get('akanote');
-				if (strlen($note) > 0)
-				    print $note;
-			    }	// loop through alternate names
+				    // display any alternate names
+				    $altNames	= $spouse->getNames(1);
+				    foreach($altNames as $idnx => $altName)
+				    {	// loop through alternate names
+                        print $spousePronoun . ' ' .
+                                $tranTab['was also known as'] . ' ' .
+							    $altName->getName() . '.';
+						showCitations(Citation::STYPE_ALTNAME,
+							          $idnx);
+						$note	= $altName->get('akanote');
+						if (strlen($note) > 0)
+						    print $note;
+				    }	// loop through alternate names
 
-			    // show events in the life of the spouse
-			    showEvents($spouse);
+				    // show events in the life of the spouse
+				    showEvents($spouse);
 ?>
 	</p>
 <?php
-			    // display the user reference field if present
-			    try
-			    {		// userref field present in database
-				$userref	= $spouse->get('userref');
-				if (strlen($userref) > 0)
-				{		// user reference
+				    // display the user reference field if present
+				    try
+				    {		// userref field present in database
+						$userref	= $spouse->get('userref');
+						if (strlen($userref) > 0)
+						{		// user reference
 ?>
 	<p>User Reference: <?php print $userref; ?>
 	</p>
 <?php
-				}		// userref field present in database
-				else
-				    $userref	= '';
-			    }
-			    catch(Exception $e)
-			    {
-				$userref	= '';
-			    }			// getField failed
+						}		// userref field present in database
+						else
+						    $userref	= '';
+				    }
+				    catch(Exception $e)
+				    {
+					    $userref	= '';
+				    }			// getField failed
 
-			    // display any general notes for the spouse
-			    $notes	= $spouse->get('notes');
-			    if (strlen($notes) > 0 && !$somePrivate)
-			    {		// notes defined
+				    // display any general notes for the spouse
+				    $notes	= $spouse->get('notes');
+				    if (strlen($notes) > 0 && !$somePrivate)
+				    {		// notes defined
 ?>
 	<p class="notes"><b>Notes:</b>
 <?php
-				print str_replace("\n\n", "\n<p>", $notes);
-				showCitations(Citation::STYPE_NOTESGENERAL,
-					      $spouse->getIdir());
+					    print str_replace("\n\n", "\n<p>", $notes);
+					    showCitations(Citation::STYPE_NOTESGENERAL,
+						              $spouse->getIdir());
 ?>
 	</p>
 <?php
-			    }		// notes defined
-			    // show any images/video files for the spouse
-			    if (!$private)
-				$spouse->displayPictures(Picture::IDTYPEPerson);
-			}		// have a spouse
-			else
-			{		// end sentence
+				    }		// notes defined
+				    // show any images/video files for the spouse
+				    if (!$private)
+					    $spouse->displayPictures(Picture::IDTYPEPerson);    
+				}		// have a spouse
+				else
+				{		// end sentence
 ?>
 .
 <?php
-			}		// end sentence
+			    }		// end sentence
 
 			// display information about children
 			$children	= $family->getChildren();
@@ -2118,7 +2093,7 @@ if (!is_null($person))
 			    print $tranTab['Children of'] . ' ' . $person->getName();
 			    if ($spsid)
 			    {
-				print " " . $tranTab['and'] . " " . $spouse->getName();
+				    print " " . $tranTab['and'] . " " . $spouse->getName();
 			    }
 			    print ":";
 ?>
@@ -2170,83 +2145,83 @@ try {
 {
     print "<p class=\"message\">failure: " . $e->getMessage();
 }
-			}	// found at least one child record
-	    }		// loop through families
-	    LegacyDate::setTemplate($oldfmt);
-	}		// at least one marriage
-
-	// give user options if some information is hidden
-	if ($somePrivate)
-	{
-	    if ($userid == '')
-	    {		// not logged on
-			$template->updateTag('contactOwners', null);
-	    }		// not logged on
-	    else
-	    {		// logged on but not an owner
-			$template->updateTag('notloggedon', null);
-	    }		// logged on but not an owner
-	}		// some data is private
-	else
-	    $template->updateTag('wishtosee', null);
-
-	// for already logged on users
-	if (strlen($userid) == 0)
-	{
-	    $template->updateTag('reqgrant', null);
-	}
-	else
-	if ($isOwner)
-	{
-	    $template->updateTag('reqgrant', null);
-	}
-	else
-	{
-	    $template->updateTag('edit', null);
-	}
-
-	$birthPlace		= '';
-	if ($evBirth)
-	    $birthPlace		= $evBirth->getLocation()->getName();
-	$deathPlace		= '';
-	if ($evDeath)
-	    $deathPlace		= $evDeath->getLocation()->getName();
-	$fatherGivenName	= '';
-	$fatherSurname		= '';
-	$motherGivenName	= '';
-	$motherSurname		= '';
-	$parents		= $person->getPreferredParents();
-	if ($parents)
-	{			// have preferred parents
-	    $father		= $parents->getHusband();
-	    if ($father)
-	    {			// have father
-			$fatherGivenName= $father->getGivenName();
-			$fatherSurname	= $father->getSurname();
-	    }			// have father
-	    $mother		= $parents->getWife();
-	    if ($mother)
-	    {			// have father
-			$motherGivenName= $mother->getGivenName();
-			$motherSurname	= $mother->getSurname();
-	    }			// have father
-	}			// have preferred parents
-	$template->set('IDIR',			$idir);
-	$template->set('GIVENNAME',		$givenName);
-	$template->set('SURNAME',		$surname);
-	$template->set('TREENAME',		$treeName);
-	$template->set('BIRTHDATE',		$birthDate);
-	$template->set('BIRTHPLACE',		$birthPlace);
-	$template->set('DEATHDATE',		$deathDate);
-	$template->set('DEATHPLACE',		$deathPlace);
-	$template->set('FATHERGIVENNAME',	$fatherGivenName);
-	$template->set('FATHERSURNAME',		$fatherSurname);
-	$template->set('MOTHERGIVENNAME',	$motherGivenName);
-	$template->set('MOTHERSURNAME',		$motherSurname);
+				}	// found at least one child record
+		    }		// loop through families
+		    LegacyDate::setTemplate($oldfmt);
+		}		// at least one marriage
+	
+		// give user options if some information is hidden
+		if ($somePrivate)
+		{
+		    if ($userid == '')
+		    {		// not logged on
+				$template->updateTag('contactOwners', null);
+		    }		// not logged on
+		    else
+		    {		// logged on but not an owner
+				$template->updateTag('notloggedon', null);
+		    }		// logged on but not an owner
+		}		// some data is private
+		else
+		    $template->updateTag('wishtosee', null);
+	
+		// for already logged on users
+		if (strlen($userid) == 0)
+		{
+		    $template->updateTag('reqgrant', null);
+		}
+		else
+		if ($isOwner)
+		{
+		    $template->updateTag('reqgrant', null);
+		}
+		else
+		{
+		    $template->updateTag('edit', null);
+		}
+	
+		$birthPlace		= '';
+		if ($evBirth)
+		    $birthPlace		= $evBirth->getLocation()->getName();
+		$deathPlace		= '';
+		if ($evDeath)
+		    $deathPlace		= $evDeath->getLocation()->getName();
+		$fatherGivenName	= '';
+		$fatherSurname		= '';
+		$motherGivenName	= '';
+		$motherSurname		= '';
+		$parents		= $person->getPreferredParents();
+		if ($parents)
+		{			// have preferred parents
+		    $father		= $parents->getHusband();
+		    if ($father)
+		    {			// have father
+				$fatherGivenName= $father->getGivenName();
+				$fatherSurname	= $father->getSurname();
+		    }			// have father
+		    $mother		= $parents->getWife();
+		    if ($mother)
+		    {			// have father
+				$motherGivenName= $mother->getGivenName();
+				$motherSurname	= $mother->getSurname();
+		    }			// have father
+		}			// have preferred parents
+		$template->set('IDIR',			$idir);
+		$template->set('GIVENNAME',		$givenName);
+		$template->set('SURNAME',		$surname);
+		$template->set('TREENAME',		$treeName);
+		$template->set('BIRTHDATE',		$birthDate);
+		$template->set('BIRTHPLACE',		$birthPlace);
+		$template->set('DEATHDATE',		$deathDate);
+		$template->set('DEATHPLACE',		$deathPlace);
+		$template->set('FATHERGIVENNAME',	$fatherGivenName);
+		$template->set('FATHERSURNAME',		$fatherSurname);
+		$template->set('MOTHERGIVENNAME',	$motherGivenName);
+		$template->set('MOTHERSURNAME',		$motherSurname);
 
 	    // show any blog postings
 	    $blogParms	= array('keyvalue'	=> $idir,
-			    		'table'		=> 'tblIR');
+			    		    'table'		=> 'tblIR');
 	    $bloglist	= new RecordSet('Blogs', $blogParms);
 
 	    // display existing blog entries
@@ -2275,8 +2250,10 @@ try {
 // embed all of the output from the script    
 $template->set('BODY', ob_get_clean());
 
-// create popup balloons for each of the individuals referenced on this page
-$templateParms	= array();
+// create popup balloons for each of the people referenced on this page
+$tag                = $template['Individ$idir'];
+$templateText       = $tag->outerHTML();
+$data               = '';
 foreach($individTable as $idir => $individ)
 {		// loop through all referenced individuals
 	$name	    	= $individ->getName();
@@ -2325,12 +2302,11 @@ foreach($individTable as $idir => $individ)
         			'description'	=> '',
    				    'families'		=> $families,
    				    'parents'		=> $parents);
-	$templateParms[$idir]	= $entry;
+    $itemplate      = new Template($templateText);
+    $itemplate['Individ$idir']->update($entry);
+    $data           .= $itemplate->compile();
 }		// loop through all referenced individuals
-
-// create popup balloons for each of the people referenced on this page
-$template->updateTag('Individ$idir',
-		        	 $templateParms);
+$tag->update($data);
 
 // create popup balloons for each of the sources referenced on this page
 $template->updateTag('Source$idsr',

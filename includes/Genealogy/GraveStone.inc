@@ -8,38 +8,38 @@ use \Iterator;
 /************************************************************************
  *  GraveStone.inc														*
  *																		*
- *  Definition of a class representing a grave stone.						*
+ *  Definition of a class representing a grave stone.					*
  *  This class provides access to the information in a row				*
- *  of the table GraveStones.												*
+ *  of the table GraveStones.											*
  *																		*
- * CREATE TABLE `GraveStones` (												*
- *		`GS_Index` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,				*
- *		`GraveStone` CHAR(3) NOT NULL,										*
+ * CREATE TABLE `GraveStones` (											*
+ *		`GS_Index` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,			*
+ *		`GraveStone` CHAR(3) NOT NULL,									*
  *		`Township` VARCHAR(48) NOT NULL,								*
  *		`Cemetery` VARCHAR(64) NOT NULL,								*
  *		`Zone` VARCHAR(8) NOT NULL,										*
  *		`Row` VARCHAR(8) NOT NULL,										*
  *		`Plot` VARCHAR(8) NOT NULL,										*
- *		`Side` VARCHAR(16) NOT NULL,										*
- *		`Surname` VARCHAR(64) NOT NULL,										*
+ *		`Side` VARCHAR(16) NOT NULL,									*
+ *		`Surname` VARCHAR(64) NOT NULL,									*
  *		`GivenName` VARCHAR(64) NOT NULL,								*
- *		`Text` TEXT,														*
+ *		`Text` TEXT,													*
  *		`BirthDate` INT(11) DEFAULT NULL,								*
  *		`DeathDate` INT(11) DEFAULT NULL,								*
  *		PRIMARY KEY (`GS_Index`),										*
  *		UNIQUE KEY `GS_Index` (`GS_Index`),								*
- *		KEY `GraveStone` (`County`),										*
- *		KEY `Township` (`Township`),										*
- *		KEY `Cemetery` (`Cemetery`),										*
- *		KEY `Zone` (`Zone`),												*
+ *		KEY `GraveStone` (`County`),									*
+ *		KEY `Township` (`Township`),									*
+ *		KEY `Cemetery` (`Cemetery`),									*
+ *		KEY `Zone` (`Zone`),											*
  *		KEY `Row` (`Row`),												*
- *		KEY `Plot` (`Plot`),												*
+ *		KEY `Plot` (`Plot`),											*
  *		KEY `Surname` (`Surname`),										*
- *		KEY `GivenName` (`GivenName`) )										*
+ *		KEY `GivenName` (`GivenName`) )									*
  *		ENGINE=InnoDB DEFAULT CHARSET=utf8 								*
  *																		*
- *  History:																*
- *		2018/02/17		created												*
+ *  History:															*
+ *		2018/02/17		created											*
  *		2019/01/06      move to namespace Genealogy                     *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
@@ -47,9 +47,9 @@ use \Iterator;
 require_once __NAMESPACE__ . '/Record.inc';
 
 /************************************************************************
- *  class GraveStone														*
+ *  class GraveStone													*
  *																		*
- *  Definition of a class recording information about a single grave		*
+ *  Definition of a class recording information about a single grave	*
  *  stone																*
  *																		*
  ************************************************************************/
@@ -57,9 +57,9 @@ require_once __NAMESPACE__ . '/Record.inc';
 class GraveStone extends Record
 {
     /********************************************************************
-     *		GraveStone::$initRow												*
-     *																		*
-     *		Default initial row												*
+     *	GraveStone::$initRow											*
+     *																	*
+     *	Default initial row												*
      ********************************************************************/
     protected static $initRow	= array(
 				'gs_index'		=> 0,
@@ -77,42 +77,42 @@ class GraveStone extends Record
 				'deathdate'		=> 0);
 
     /********************************************************************
-     *		GraveStone::$translate												*
-     *																		*
-     *		Define alternate field names										*
+     *	GraveStone::$translate											*
+     *																	*
+     *	Define alternate field names									*
      ********************************************************************/
     protected static $translate	= array('index'		=> 'gs_index');
 
     /********************************************************************
-     *		GraveStone::$defaultOrder										*
-     *																		*
-     *		Default sort order												*
+     *	GraveStone::$defaultOrder										*
+     *																	*
+     *	Default sort order												*
      ********************************************************************/
     protected static $defaultOrder	=
 							"`Zone`,`Row`,`Plot`,`Side`,`GS_Index`";
     /********************************************************************
-     *		GraveStone::$monthName												*
-     *																		*
-     *		Table for translating month numbers to names.						*
+     *	GraveStone::$monthName											*
+     *																	*
+     *	Table for translating month numbers to names.					*
      ********************************************************************/
     protected static $monthName		= array(
 				'', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
 				    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 
     /********************************************************************
-     *		GraveStone::__construct												*
-     *																		*
-     *		Construct an instance of GraveStone based upon the				*
-     *		parameters.  This instance may or may not be synchronized with		*
-     *		the database.														*
-     *																		*
-     *		Input:																*
-     *		    $parms				an associative array containing a		*
-     *								record or search parameters				*
-     *																		*
-     *		Returns object containing a description of a grave stone		*
-     *																		*
-     *		Throws Exception if unable to complete function						*
+     *	function GraveStone::__construct								*
+     *																	*
+     *	Construct an instance of GraveStone based upon the				*
+     *	parameters.  This instance may or may not be synchronized with	*
+     *	the database.													*
+     *																	*
+     *	Input:															*
+     *	    $parms				an associative array containing a		*
+     *							record or search parameters				*
+     *																	*
+     *	Returns object containing a description of a grave stone		*
+     *																	*
+     *	Throws Exception if unable to complete function					*
      ********************************************************************/
     function __construct($parms)
     {
@@ -130,31 +130,33 @@ class GraveStone extends Record
 
 		// validate parameters
 		if (is_array($parms))
-		{			// array
+		{			            // array
 		    if (count($parms) < count(self::$initRow))
-		    {			// associative array of parameters
+            {			        // associative array of parameters
+                $and            = 'WHERE ';
 				foreach($parms as $key => $value)
-				{			// loop through parameters
+				{			    // loop through parameters
 				    $fieldLc	= strtolower($key);
 				    if (array_key_exists($fieldLc, self::$translate))
 						$fieldLc	= self::$translate[$fieldLc];
 				    switch($fieldLc)
-				    {		// act on key fields
+				    {		    // act on key fields
 						case 'gs_index':
 						{		// grave stone code
-						    $where	= "WHERE GS_Index=:index";
+						    $where	    = "WHERE GS_Index=:index";
 						    $sqlParms	= array('index'	=> $value);
-						    break;
-						}		// grave stone code
+						    break 2;
+                        }		// grave stone code
+
 				    }			// act on key fields
-				}			// loop through parameters
+				}			    // loop through parameters
 
 				// set defaults
 				$dbrow		= self::$initRow;
 				$needInsert	= true;
 
 				if (strlen($where) > 0)
-				{			// read the record from the database
+				{			    // read the record from the database
 				    $query	= "SELECT * FROM GraveStones " . $where;
 				    $stmt	= $connection->prepare($query);
 				    $queryText	= debugPrepQuery($query, $sqlParms);
@@ -178,12 +180,12 @@ class GraveStone extends Record
 								    "'$queryText' " .
 								    print_r($stmt->errorInfo(),true));
 				    }			// error performing query
-				}			// read the record from the database
-		    }				// associative array of parameters
+				}			    // read the record from the database
+		    }				    // associative array of parameters
 		    else
-		    {				// build from existing record
+		    {				    // build from existing record
 				$dbrow		= $parms;
-		    }				// build from existing record
+		    }				    // build from existing record
 		    parent::__construct($dbrow,
 							'GraveStones');
 
@@ -211,13 +213,13 @@ class GraveStone extends Record
     }		// GraveStone::__construct
 
     /********************************************************************
-     *		GraveStone:get														*
-     *																		*
-     *		Obtain the current value of a field in the object.				*
-     *																		*
+     *	function GraveStone:get											*
+     *																	*
+     *	Obtain the current value of a field in the object.				*
+     *																	*
      *  Parameters:														*
-     *		    $name		name of field to retrieve						*
-     *																		*
+     *	    $name		name of field to retrieve						*
+     *																	*
      ********************************************************************/
     function get($field)
     {
@@ -263,14 +265,14 @@ class GraveStone extends Record
     }			// function GraveStone::get
 
     /********************************************************************
-     *		GraveStone:set														*
-     *																		*
-     *		Change the current value of a field in the object.				*
-     *																		*
+     *	function GraveStone:set											*
+     *																	*
+     *	Change the current value of a field in the object.				*
+     *																	*
      *  Parameters:														*
-     *		    $name		name of field to change								*
-     *		    $value		new value										*
-     *																		*
+     *	    $name		name of field to change							*
+     *	    $value		new value										*
+     *																	*
      ********************************************************************/
     function set($field, $value)
     {
@@ -318,12 +320,12 @@ class GraveStone extends Record
     }			// function GraveStone::set
 
     /********************************************************************
-     *		GraveStone::getName												*
-     *																		*
-     *		Convenience function for accessing the 'name' attribute.		*
-     *																		*
-     *		Returns:														*
-     *		    Name of the grave stone as a string.						*
+     *	function GraveStone::getName									*
+     *																	*
+     *	Convenience function for accessing the 'name' attribute.		*
+     *																	*
+     *	Returns:														*
+     *	    Name of the grave stone as a string.						*
      ********************************************************************/
     function getName($options	= null)
     {

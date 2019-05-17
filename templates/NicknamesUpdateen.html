@@ -43,18 +43,18 @@
         Search
           </button>
         </p>
-        <div class="center" id="linksfront">
-          <div class="left" id="npprev">
+        <div class="center" id="topBrowse">
+          <div class="left" id="topPrev">
             <a href="/FamilyTree/Nicknames.php?pattern=$PATTERN&amp;lang=$LANG&amp;limit=$LIMIT&amp;offset=$PREVOFFSET">&lt;---</a>
           </div>
-          <div class="right" id="npnext"> 
+          <div class="right" id="topNext"> 
           <a href="/FamilyTree/Nicknames.php?pattern=$PATTERN&amp;lang=$LANG&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET">---&gt;</a>
           </div>
-          rows $OFFSET to $LAST of $COUNT 
+          rows $FIRST to $LAST of $COUNT 
           <div style="clear: both;"></div>
         </div>
         <!--- Put out the response as a table -->
-        <table class="details" id="details">
+        <table class="details" id="dataTable">
           <!--- Put out the column headers -->
           <thead>
             <tr>
@@ -163,12 +163,12 @@
       Add a Given Name
     </div>
     <!-- balloons to pop up when mouse moves over forward and back links -->
-    <div class="popup" id="mousenpprev">
+    <div class="popup" id="mousetopPrev">
       <p class="label">
       Go to Row $PREVOFFSET&nbsp;
       </p>
     </div>
-    <div class="popup" id="mousenpnext">
+    <div class="popup" id="mousetopNext">
       <p class="label">
       Go to Row $NEXTOFFSET&nbsp;
       </p>

@@ -1,0 +1,199 @@
+<!--*********************************************************************
+ *  Query1851fr.html							*
+ *									*
+ *  Form to determine options for selecting individuals from the	*
+ *  1851 Census of Canada						*
+ *									*
+ *  History:								*
+ *	2017/09/19	created						*
+ *									*
+ *  Copyright &copy; 2017 James A. Cobban				*
+ **********************************************************************-->
+<link rel='stylesheet' type='text/css' href='QueryDetail.css'>
+  <div class='hidden' id='breadcrumbs'>
+    <a href='/genealogy.php?lang=fr'>Généalogie</a>:
+    <a href='/genCountry.php?cc=CA&amp;lang=fr'>Canada</a>:
+    <a href='/database/genCensuses.php?lang=fr'>Recensements</a>:
+  </div>
+<div class='body'>
+  <h1>
+	Recensement 1851 de $COUNTRYNAME: Recherche Nominale
+      <span class='right'>
+	<a href='/database/QueryDetail1851Helpfr.html' target='help'>? Aide</a>
+      </span>
+    <div style='clear: both;'></div>
+  </h1>
+  $TRACE
+  $MSG
+  <form action='/database/CensusResponse.php'
+        name='distForm' id='distForm'>
+      <p>
+	<button type='submit' name='Query' id='Query' class='label'>
+	    Fouiller
+	</button>
+	&nbsp;
+	<button type='button' name='Coverage' id='Coverage' class='label'>
+	    <u>C</u>ouvrage
+	</button>
+	<input type='hidden' name='Census' id='Census' value='CA1851'/>
+	<input type='hidden' name='debug' id='debug' value='$DEBUG'/>
+	<input type='hidden' name='Lang' id='Lang' value='fr'/>
+      </p>
+    <div class='row'>
+      <div class='column1'>
+	<label class='labelSmall9em' for='Province'>
+	  Province:
+	</label>
+	<select size='5' name='Province' id='Province' class='white leftwide'>
+	  <option value='' selected='selected'>
+	  Quelque Province:</option>
+	  <option value='$statecode' id='stateoption' $selected>
+	  $statename</option>
+	</select> 
+      </div>
+      <div class='column2'>
+	<label class='labelSmall9em' for='District'>
+	  District:
+	</label>
+	<select size='5' name='District[]' id='District' multiple='multiple'
+		class='white leftwide'>
+	</select> 
+      </div>
+      <div class='column3'>
+	<label class='labelSmall6em' for='Count'>
+	  Compte:
+	</label>
+	<input type='text' class='white rightnc' size='2' name='Count' id='Count' 
+		  maxlength='4' value='20'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row' id='divRow'>
+      <div class='column1'>
+	<label class='labelSmall9em' for='SubDistrict'>
+	  Sous-District:
+	</label>
+	<select size='5' name='SubDistrict' id='SubDistrict'
+		class='white leftwide'>
+  	</select> 
+      </div>
+      <div class='column2' id='divCell'>
+	<label class='labelSmall9em' id='divLabel' for='Division'>
+	  Division:
+	</label>
+	<select size='1' name='Division' id='Division' class='white leftwide'>
+	</select>
+      </div>
+      <div class='column3'>
+	<label class='labelSmall6em' for='Page'>
+	  Page:
+	</label>
+	<input type='text' class='white rightnc' size='2' name='Page' id='Page' 
+		  maxlength='2'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+	<label class='labelSmall9em' for='GivenNames'>
+	  Prenoms:
+	</label>
+	<input type='text' class='white left' size='20'
+		name='GivenNames' id='GivenNames' maxlength='48'/>
+      </div>
+      <div class='column2'>
+	<label class='labelSmall9em' for='Surname'>
+	  Surnom:
+	</label>
+	<input type='text' class='white left' size='20'
+		name='Surname' id='Surname' maxlength='48'/>
+      </div>
+      <div class='column3'>
+	<label class='labelSmall6em' for='SurnameSoundex'>
+	  Soundex:
+	</label>
+	<input type='checkbox' name='SurnameSoundex' id='SurnameSoundex' 
+		  value='yes'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+	<label class='labelSmall9em' for='Sex'>
+	  Sexe:
+	</label>
+	<select class='white left' size='1' name='Sex' id='Sex'>
+	  <option value=''>Quelque
+	  <option value='F'>Femelle
+	  <option value='M'>Male
+	</select>
+      </div>
+      <div class='column2'>
+	<label class='labelSmall9em' for='MStat'>
+	  État Maritale:
+	</label>
+	<select class='white left' size='1' name='MStat' id='MStat'>
+	  <option value=''>Quelque
+	  <option value='D'>Divorcé[e]
+	  <option value='M'>Marié[e]
+	  <option value='S'>Celebitaire
+	  <option value='W'>Veuf/Veuve
+	</select>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+	<label class='labelSmall9em' for='Occupation'>
+	  Occupation:
+	</label>
+	<input type='text' class='white left' size='20'
+		name='Occupation' id='Occupation' maxlength='48'/>
+      </div>
+      <div class='column2'>
+	<label class='labelSmall9em' for='BPlace'>
+	  Lieu de Naissance:
+	</label>
+	<input type='text' class='white left' size='20'
+		name='BPlace' id='BPlace' maxlength='32'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+	<label class='labelSmall9em' for='Religion'>
+	  Religion:
+	</label>
+	<input type='text' class='white left' size='20'
+		name='Religion' id='Religion' maxlength='32'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+    <div class='row'>
+      <div class='column1'>
+	<label class='labelSmall9em' for='BYear'>
+	  Année de Naissance:
+	</label>
+	<input type='text' class='white rightnc' size='4' 
+		name='BYear' id='BYear' maxlength='8'/>
+      </div>
+      <div class='column2'>
+	<label class='labelSmall9em' for='Range'>
+	  Gamme:
+	</label>
+	<input type='text' class='white rightnc' size='4' 
+		name='Range' id='Range' maxlength='8'/>
+      </div>
+      <div style='clear: both;'></div>
+    </div>
+  </form>
+</div> <!-- class='body' -->
+    $POPUPS
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/Cookie.js' type="text/javascript">
+    </script>
+    <script src= 'QueryDetail.js' type="text/javascript">
+    </script>

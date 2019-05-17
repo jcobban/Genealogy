@@ -62,11 +62,14 @@ use \Iterator;
  *		2018/11/07      support method setGetModeHTML                   *
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/01/19      report constructor errors through message       *
+ *		2019/04/18      support method getLastSqlCmd                    *
  *															    		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Census.inc';
+require_once __NAMESPACE__ . '/District.inc';
+require_once __NAMESPACE__ . '/SubDistrict.inc';
 
 /************************************************************************
  *  class CensusLine													*
@@ -766,8 +769,13 @@ class CensusLine extends Record
 		    }			// act on identification parms
 		}			// loop through all parms
 
-		if ($censusId == null)
-		    $this->msg            	.= "Missing parameter Census. ";
+        if ($censusId == null)
+        {
+            showTrace();
+            $this->msg            	.= "Missing parameter Census. ";
+            print "<p>new Census_Line(" . print_r($parms, true) . ")</p>\n";
+            throw new Exception("Missing parameter census");
+        }
 
 		if (is_array($line))
 		{			// $line is a record
@@ -836,12 +844,12 @@ class CensusLine extends Record
 				}			// positive line number
 				else
 				{			// get last line of previous page
-				    $sdParms	= array('sd_census'	=> $censusId,
-									'sd_distid'	=> $distID,
-									'sd_id'		=> $subDistID,
-									'sd_div'	=> $div);
-				    $subDistObj		= new SubDistrict($sdParms);
-				    $tpage		= $page - $subDistObj->get('bypage');
+				    $sdParms	        = array('sd_census'	=> $censusId,
+							        		    'sd_distid'	=> $distID,
+							        		    'sd_id'		=> $subDistID,
+							        		    'sd_div'	=> $div);
+				    $subDistObj		    = new SubDistrict($sdParms);
+				    $tpage		        = $page - $subDistObj->get('bypage');
 				    $sqlParms['page']	= $tpage;
 
 				    if (intval($censusYear) < 1867)
@@ -872,15 +880,16 @@ class CensusLine extends Record
 				}			// get last line of previous page
 
 				// query the database
-				$stmt		= $connection->prepare($query);
-				$queryText	= debugPrepQuery($query, $sqlParms);
+				$stmt		        = $connection->prepare($query);
+				$queryText	        = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd   = $queryText;
 				if ($stmt->execute($sqlParms))
 				{			// query successful
 				    if ($debug)
-						$warn	.= "<p>CensusLine.inc:" . __LINE__ .
+						$warn	    .= "<p>CensusLine.inc:" . __LINE__ .
 									    " '$queryText'</p>\n";
 
-				    $result		= $stmt->fetch(PDO::FETCH_ASSOC);
+				    $result		    = $stmt->fetch(PDO::FETCH_ASSOC);
 				    if (is_array($result))
 				    {		// existing record
 						$dbrow			= $result;
@@ -1385,8 +1394,9 @@ class CensusLine extends Record
 						"($fldnames) VALUES($values)";
 
 		    // insert the new record into the database
-		    $stmt	= $connection->prepare($insert);
-		    $insertText	= debugPrepQuery($insert, $sqlParms);
+		    $stmt	            = $connection->prepare($insert);
+		    $insertText	        = debugPrepQuery($insert, $sqlParms);
+            $this->lastSqlCmd   = $insertText;
 		    if ($stmt->execute($sqlParms))
 		    {		// record inserted
 				$count			= $stmt->rowCount();
@@ -1598,11 +1608,12 @@ class CensusLine extends Record
 				$update			.= $set . ' WHERE ' . $where;
 
 				// perform the update
-				$stmt			= $connection->prepare($update);
-				$updateText		= debugPrepQuery($update, $sqlParms);
+				$stmt			    = $connection->prepare($update);
+				$updateText		    = debugPrepQuery($update, $sqlParms);
+                $this->lastSqlCmd   = $updateText;
 				if ($stmt->execute($sqlParms))
 				{
-				    $count		= $stmt->rowCount();
+				    $count		    = $stmt->rowCount();
 				    if ($xml)
 						print "<$tagname count='$count'>" .
 								$updateText . "</$tagname>\n";
@@ -1699,12 +1710,14 @@ class CensusLine extends Record
 									" AND Line=:line";
 		    }			// post-confederation
 
-		    $stmt	= $connection->prepare($delete);
+		    $stmt	            = $connection->prepare($delete);
+			$deleteText	        = debugPrepQuery($query, $sqlParms);
+            $this->lastSqlCmd   = $deleteText;
 		    if ($stmt->execute($parms))
 		    {		// delete successful
 				$count			= $stmt->rowCount();
 				if ($xml)
-				    print "<$xmltag count='$count'>$delete</$xmltag>\n";
+				    print "<$xmltag count='$count'>$deleteText</$xmltag>\n";
 
 				// log the update
 				logSqlUpdate($delete,
@@ -1722,8 +1735,7 @@ class CensusLine extends Record
 		    else
 		    {		// error updating record
 				print "<p class='message'>CensusLine::delete: " . __LINE__ .
-								" '$delete', " .
-								'$parms=' . print_r($parms, true) .
+								" '$deleteText', " .
 								print_r($stmt->errorInfo(),true) .
 						"</p>\n";
 				return false;
@@ -1740,3 +1752,672 @@ class CensusLine extends Record
  *  Initialize CensusLine::$defaultRows									*
  ************************************************************************/
 CensusLine::init();
+
+/************************************************************************
+ *  class Census1851													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1851 census of Canada.			*
+ ************************************************************************/
+
+class Census1851 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1851::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1851',
+                'name'      => 'Census1851',
+		        'prime'	    => array('province',
+									 'district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1851',
+    	        'initrow'   => array('province'				=> '',
+									 'district'				=> 0,
+									 'subdistrict'			=> 0,
+									 'division'				=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'pagedisp'				=> '',
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'occupation'			=> '',
+									 'bplace'				=> 'Canada West',
+									 'religion'				=> '',
+									 'location'				=> '',
+									 'age'					=> '',
+									 'byear'				=> null,
+									 'sex'					=> '?',
+									 'mstat'				=> '',
+									 'negro'				=> '',
+									 'indian'				=> '',
+									 'member'				=> 'Y',
+									 'absent'				=> '',
+									 'deaf'					=> '',
+									 'blind'				=> '',
+									 'lunatics'				=> '',
+									 'school'				=> '',
+									 'birth'				=> '',
+									 'deathsex'				=> '',
+									 'ageatdeath'			=> '',
+									 'causeofdeath'			=> '',
+									 'restype'				=> '',
+									 'stories'				=> '',
+									 'numfamilies'			=> '',
+									 'remarks'				=> '',
+					                 'idir'					=> 0));
+
+}		// class Census1851 
+
+/************************************************************************
+ *  class Census1861													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1861 census of Canada.			*
+ ************************************************************************/
+
+class Census1861 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1861::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1861',
+                'name'      => 'Census1861',
+		        'prime'	    => array('province',
+									 'district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1861',
+    	        'initrow'   => array('province'				=> '',
+									 'district'				=> 0,
+									 'subdistrict'			=> 0,
+									 'division'				=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'pagedisp'				=> '',
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'occupation'			=> '',
+									 'bplace'				=> 'Canada West',
+									 'maryear'				=> '',
+									 'religion'				=> '',
+									 'location'				=> '',
+									 'age'					=> '',
+									 'byear'				=> null,
+									 'sex'					=> '?',
+									 'mstat'				=> '',
+									 'coloured'				=> '',
+									 'member'				=> 'Y',
+									 'absent'				=> '',
+									 'deaf'					=> '',
+									 'blind'				=> '',
+									 'lunatic'				=> '',
+									 'school'				=> '',
+									 'illiterate'			=> '',
+									 'birth'				=> '',
+									 'deathsex'				=> '',
+									 'ageatdeath'			=> '',
+									 'causeofdeath'			=> '',
+									 'restype'				=> '',
+									 'stories'				=> '',
+									 'numfamilies'			=> '',
+									 'remarks'				=> '',
+									 'idir'					=> 0));
+
+}		// class Census1861 
+
+/************************************************************************
+ *  class Census1871													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1871 census of Canada.			*
+ ************************************************************************/
+
+class Census1871 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1871::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1871',
+                'name'      => 'Census1871',
+		        'prime'	    => array('district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1871',
+    	        'initrow'   => array('province'				=> '',
+									 'district'		   		=> 0,
+									 'subdistrict'			=> 0,
+									 'division'		   		=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'sex'					=> '?',
+									 'age'					=> '',
+									 'byear'				=> null,
+									 'binyear'				=> '',
+									 'bplace'				=> 'Ontario',
+									 'religion'				=> '',
+									 'origin'				=> '',
+									 'occupation'			=> '',
+									 'mstat'				=> '',
+									 'minyear'				=> '',
+									 'address'				=> '',
+									 'remarks'				=> '',
+									 'school'				=> '',
+									 'cantread'				=> '',
+									 'cantwrite'			=> '',
+									 'deaf'					=> '',
+									 'blind'				=> '',
+									 'insane'				=> '',
+									 'idir'					=> 0));
+
+}		// class Census1871 
+
+/************************************************************************
+ *  class Census1881													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1881 census of Canada.			*
+ ************************************************************************/
+
+class Census1881 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1881::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1881',
+                'name'      => 'Census1881',
+		        'prime'	    => array('district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1881',
+    	        'initrow'   => array('province'				=> '',
+									 'district'				=> 0,
+									 'subdistrict'			=> 0,
+									 'division'				=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'sex'					=> '?',
+									 'age'					=> '',
+									 'byear'				=> null,
+									 'binyear'				=> '',
+									 'bplace'				=> 'Ontario',
+									 'religion'				=> '',
+									 'origin'				=> '',
+									 'occupation'			=> '',
+									 'mstat'				=> '',
+									 'remarks'				=> '',
+									 'school'				=> '',
+									 'deaf'					=> '',
+									 'blind'				=> '',
+									 'insane'				=> '',
+									 'idir'					=> 0));
+
+}		// class Census1881 
+
+/************************************************************************
+ *  class Census1891													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1891 census of Canada.			*
+ ************************************************************************/
+
+class Census1891 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1891::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1891',
+                'name'      => 'Census1891',
+		        'prime'	    => array('district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1891',
+    	        'initrow'   => array('province'				=> '',
+									 'district'				=> 0,
+									 'subdistrict'			=> 0,
+									 'division'				=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'sex'					=> '?' ,
+									 'age'					=> '',
+									 'byear'				=> null,
+									 'mstat'				=> '',
+									 'relation'				=> '',
+									 'bplace'				=> 'Ontario',
+									 'french'				=> '',
+									 'fathersbplace'		=> 'Ontario',
+									 'mothersbplace'		=> 'Ontario',
+									 'religion'				=> '',
+									 'occupation'			=> '',
+									 'employer'				=> '',
+									 'employee'				=> '',
+									 'unemployed'			=> '',
+									 'numhands'				=> '',
+									 'canread'				=> '1',
+									 'canwrite'				=> '1',
+									 'deaf'					=> '',
+									 'blind'				=> '',
+									 'insane'				=> '',
+									 'remarks'				=> '',
+									 'idir'					=> 0));
+}		// class Census1891 
+
+/************************************************************************
+ *  class Census1901													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1901 census of Canada.			*
+ ************************************************************************/
+
+class Census1901 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1901::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1901',
+                'name'      => 'Census1901',
+		        'prime'	    => array('district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1901',
+    	        'initrow'   => array('province'				=> '',
+									 'district'				=> 0,
+									 'subdistrict'			=> 0,
+									 'division'				=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'sex'					=> '?' ,
+									 'race'					=> 'W' ,
+									 'relation'				=> '',
+									 'mstat'				=> '',
+									 'age'					=> '',
+									 'bdate'				=> '',
+									 'byeartxt'				=> '',
+									 'byear'				=> null,
+									 'bplace'				=> 'Ontario',
+									 'bplaceru'				=> 'r',
+									 'immyear'				=> '',
+									 'natyear'				=> '',
+									 'origin'				=> '',
+									 'nationality'			=> 'Canadian',
+									 'religion'				=> '',
+									 'occupation'			=> '',
+									 'address'				=> '',
+									 'remarks'				=> '',
+									 'idir'					=> 0,
+									 'ownmeans'				=> '',
+									 'employer'				=> '',
+									 'employee'				=> '',
+									 'ownacct'				=> '',
+									 'facthome'				=> ' ',
+									 'monthsfact'			=> 0,
+									 'monthshome'			=> 0,
+									 'monthsother'			=> 0,
+									 'incomeemp'			=> 0,
+									 'incomeoth'			=> 0,
+									 'monthsschool'			=> 0,
+									 'canread'				=> '',
+									 'canwrite'				=> '',
+									 'spkenglish'			=> 1,
+									 'spkfrench'			=> '',
+									 'mothertongue'			=> '',
+				                     'infirmities'			=> ''));
+
+
+}		// class Census1901 
+
+/************************************************************************
+ *  class Census1906													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1906 census of Canada.			*
+ ************************************************************************/
+
+class Census1906 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1906::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1906',
+                'name'      => 'Census1906',
+		        'prime'	    => array('district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1906',
+    	        'initrow'   => array('province'				=> '',
+									 'district'				=> 0,
+									 'subdistrict'			=> 0,
+									 'division'				=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'relation'				=> '',
+									 'sex'					=> '?' ,
+									 'mstat'				=> '',
+									 'age'					=> '',
+									 'byeartxt'				=> '',
+									 'byear'				=> null,
+									 'bplace'				=> 'Ontario',
+									 'immyear'				=> '',
+									 'postoffice'			=> '',
+									 'addrsect'				=> '',
+									 'addrtwp'				=> '',
+									 'addrrng'				=> '',
+									 'addrmdn'				=> '',
+									 'horses'				=> 0,
+									 'milkcows'				=> 0,
+									 'cattle'				=> 0,
+									 'sheep'				=> 0,
+									 'pigs'					=> 0,
+									 'remarks'				=> '',
+									 'idir'					=> 0));
+
+}		// class Census1906
+
+/************************************************************************
+ *  class Census1911													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1911 census of Canada.			*
+ ************************************************************************/
+
+class Census1911 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1911::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1911',
+                'name'      => 'Census1911',
+		        'prime'	    => array('district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1911',
+    	        'initrow'   => array('province'				=> '',
+									 'district'				=> 0,
+									 'subdistrict'			=> 0,
+									 'division'				=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'address'				=> '',
+									 'sex'					=> '?',
+									 'relation'				=> '',
+									 'mstat'				=> '',
+									 'bdate'				=> '',
+									 'byeartxt'				=> '',
+									 'age'					=> '',
+									 'byear'				=> null,
+									 'bplace'				=> 'Ontario',
+									 'immyear'				=> '',
+									 'natyear'				=> '',
+									 'origin'				=> '',
+									 'nationality'			=> 'Canadian',
+									 'religion'				=> '',
+									 'occupation'			=> '',
+									 'occother'				=> '',
+									 'employer'				=> '',
+									 'employee'				=> '',
+									 'ownacct'				=> '',
+									 'empwhere'				=> '',
+									 'wksemp'				=> '',
+									 'wksoth'				=> '',
+									 'hpwemp'				=> '',
+									 'hpwoth'				=> '',
+									 'incomeemp'			=> '',
+									 'incomeoth'			=> '',
+									 'hourlyrate'			=> 0,
+									 'lifeinsurance'		=> 0,
+									 'accinsurance'			=> 0,
+									 'costinsurance'		=> 0,
+									 'schoolmons'			=> 0,
+									 'canread'				=> 'Y',
+									 'canwrite'				=> 'Y',
+									 'language'				=> 'English',
+									 'costeducation'		=> 0,
+									 'blind'				=> '',
+									 'deaf'					=> '',
+									 'insane'				=> '',
+									 'idiot'				=> '',
+									 'remarks'				=> '',
+									 'idir'					=> 0));
+
+}		// class Census1911 
+
+/************************************************************************
+ *  class Census1916													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1916 census of Canada.			*
+ ************************************************************************/
+
+class Census1916 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1916::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1916',
+                'name'      => 'Census1916',
+		        'prime'	    => array('district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1916',
+    	        'initrow'   => array('province'				=> '',
+									 'district'				=> 0,
+									 'subdistrict'			=> 0,
+									 'division'				=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'military'				=> '',
+									 'addrtwp'				=> '',
+									 'addrrng'				=> '',
+									 'addrmdn'				=> '',
+									 'addrmuni'				=> '',
+									 'relation'				=> '',
+									 'sex'					=> '?' ,
+									 'mstat'				=> '',
+									 'age'					=> '',
+									 'byear'				=> null,
+									 'bplace'				=> 'Ontario',
+									 'religion'				=> '',
+									 'immyear'				=> '',
+									 'natyear'				=> '',
+									 'nationality'			=> 'Canadian',
+									 'origin'				=> '',
+									 'spkenglish'			=> '1',
+									 'spkfrench'			=> '',
+									 'spkother'				=> '',
+									 'canread'				=> '1',
+									 'canwrite'				=> '1',
+									 'occupation'			=> '',
+									 'emptype'				=> '',
+									 'empwhere'				=> '',
+									 'remarks'				=> '',
+									 'idir'					=> 0));
+
+}		// class Census1916 
+
+/************************************************************************
+ *  class Census1921													*
+ *							    										*
+ *  Definition of a class recording information about an individual		*
+ *  from the population schedule of the 1921 census of Canada.			*
+ ************************************************************************/
+
+class Census1921 extends CensusLine
+{
+    
+    /********************************************************************
+     *	Census1921::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Census1921',
+                'name'      => 'Census1921',
+		        'prime'	    => array('district',
+									 'subdistrict',
+									 'division',
+									 'page',
+									 'line'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 7,
+                'order'     => 'district,subdistrict,division,page,line',
+                'classname' => 'Census1921',
+    	        'initrow'   => array('province'				=> '',
+									 'district'				=> 0,
+									 'subdistrict'			=> 0,
+									 'division'				=> '',
+									 'page'					=> 0,
+									 'line'					=> 0,
+									 'family'				=> 1,
+									 'surname'				=> '',
+									 'surnamesoundex'		=> '',
+									 'givennames'			=> '',
+									 'township'				=> '',
+									 'address'				=> '',
+									 'ownertenant'			=> '',
+									 'houserent'			=> 0,
+									 'houseclass'			=> '',
+									 'housematerial'		=> '',
+									 'houserooms'			=> 0,
+									 'relation'				=> '',
+									 'sex'					=> '?',
+									 'mstat'				=> '',
+									 'age'					=> '',
+									 'byear'				=> null,
+									 'bplace'				=> 'Ontario',
+									 'fathersbplace'		=> 'Ontario',
+									 'mothersbplace'		=> 'Ontario',
+									 'immyear'				=> '',
+									 'natyear'				=> '',
+									 'nationality'			=> 'Canadian',
+									 'origin'				=> '[origin]',
+									 'spkenglish'			=> 'Y',
+									 'spkfrench'			=> '',
+									 'spkother'				=> '',
+									 'religion'				=> '[religion]',
+									 'canread'				=> 'Y',
+									 'canwrite'				=> 'Y',
+									 'schoolmons'			=> '',
+									 'occupation'			=> '',
+									 'emptype'				=> '',
+									 'empwhere'				=> '',
+									 'incomeemp'			=> '',
+									 'unemployed'			=> '',
+									 'weeksunemp'			=> '',
+									 'weeksill'				=> '',
+									 'remarks'				=> '',
+                					 'idir'					=> 0));
+
+}		// class Census1921 

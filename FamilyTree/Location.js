@@ -447,7 +447,7 @@ function locationChanged()
 }		// locationChanged
 
 /************************************************************************
- *  function mergeDuplicates												*
+ *  function mergeDuplicates											*
  *																		*
  *  This method is called when the user requests to merge				*
  *  all duplicates of the current location								*
@@ -509,14 +509,14 @@ function mergeDuplicates()
  ************************************************************************/
 function gotMerge(xmlDoc)
 {
-    var	form		= document.locForm;
+    var	form		    = document.locForm;
 
     // enable the submit button
-    var	button		= form.Submit;
-    button.disabled	= false;
+    var	button		    = form.Submit;
+    button.disabled	    = false;
     hideLoading();
 
-    var	root	= xmlDoc.documentElement;
+    var	root	        = xmlDoc.documentElement;
     if (root.nodeName == 'update')
     {
 		window.location	= window.location;	// refresh
@@ -528,17 +528,16 @@ function gotMerge(xmlDoc)
 		{		// loop through children
 		    var node	= root.childNodes[i];
 		    if (node.nodeValue != null)
-			msg	+= node.nodeValue;
+			    msg	+= node.nodeValue;
 		}		// loop through children
 		alert (msg);
     }		// error
 }		// gotMerge
 
 /************************************************************************
- *  function noMerge														*
+ *  function noMerge													*
  *																		*
- *  This method is called if there is no response						*
- *  file.																*
+ *  This method is called if there is no merge script on the server.    *
  ************************************************************************/
 function noMerge()
 {
@@ -551,7 +550,7 @@ function noMerge()
 }		// noMerge
 
 /************************************************************************
- *  function showMap														*
+ *  function showMap													*
  *																		*
  *  This function is called if the user clicks on the show Map button.	*
  *  It displays a map using Google maps support.						*
@@ -598,10 +597,10 @@ function showMap()
 			displayMap(results[0].geometry.location, zoom);
 		    } else {	// geocode failed
 			popupAlert("Location.js: showMap: " +
-					"Geocode for '" + searchName +
-				   "' was not successful for the following reason: " +
-					status,
-				   this);
+        					"Geocode for '" + searchName +
+    	    			    "' was not successful for the following reason: " +
+    					status,
+    				   this);
 		    }	// geocode failed
 		});	// end of inline function and invocation of geocode
     }		// use Geocoder
@@ -622,21 +621,21 @@ function displayMap(latlng, zoomlevel)
 {
     if (latlng !== null)
     {		// location resolved
-		var	button		= document.getElementById('showMap');
-		var	form		= document.locForm;
-		var	readonly	= form.Zoom.readOnly;
-		var	notes		= form.Notes;
-		mapDiv			= document.getElementById("mapDiv");
-		mapDiv.style.left	= getOffsetLeft(notes) + "px";
-		mapDiv.style.top	= getOffsetTop(notes) + "px";
+		var	button	        	= document.getElementById('showMap');
+		var	form	        	= document.locForm;
+		var	readonly        	= form.Zoom.readOnly;
+		var	notes	        	= form.Notes;
+		mapDiv		        	= document.getElementById("mapDiv");
+		mapDiv.style.left   	= getOffsetLeft(notes) + "px";
+		mapDiv.style.top    	= getOffsetTop(notes) + "px";
 		show(mapDiv);				// make visible
 
-		var hideMapDiv		= document.getElementById("hideMapDiv");
+		var hideMapDiv	    	= document.getElementById("hideMapDiv");
 		hideMapDiv.style.left	= "80px";
 		hideMapDiv.style.top	= "0px";
 		hideMapDiv.style.width	= "120px";
-		var hideMapBtn		= document.getElementById("hideMap");
-		hideMapBtn.onclick	= hideMap;
+		var hideMapBtn	    	= document.getElementById("hideMap");
+		hideMapBtn.onclick  	= hideMap;
 		show(hideMapDiv);			// make visible
 
 		var myOptions = {
@@ -649,7 +648,7 @@ function displayMap(latlng, zoomlevel)
 
 		try {		// try to create map
 		    map	= new google.maps.Map(mapDiv,
-					      myOptions);
+					                  myOptions);
 		    try {
 			var marker = new google.maps.Marker({map: map, 
 							     position: latlng });
@@ -658,14 +657,14 @@ function displayMap(latlng, zoomlevel)
 		    }		// try to create marker on map
 		    catch(e) {	// failed to create marker
 			popupAlert("Location.js: displayMap: " +
-			"new google.maps.Marker failed: message='" + e.message + "'",
-				   this);
+			    "new google.maps.Marker failed: message='" + e.message + "'",
+				       this);
 		    }		// failed to create marker
 		}		// try to create map	
 		catch(e) {	// failed to create map
 		    popupAlert("Location.js: displayMap: " +
-			"new google.maps.Map failed: message='" + e.message + "'",
-				this);
+			        "new google.maps.Map failed: message='" + e.message + "'",
+				       this);
 		}		// failed to create map
 
 		if (boundary)
@@ -676,7 +675,7 @@ function displayMap(latlng, zoomlevel)
 		// change the show map button into a hide map button
 		button.onclick		= hideMap;
 		while(button.firstChild)
-		    button.removeChild(button.firstChild)
+		    button.removeChild(button.firstChild);
 		var template	= document.getElementById('hideMapTemplate');
 		for(var childTemp = template.firstChild;
 			childTemp;
@@ -716,7 +715,7 @@ function mapClick(mouseEvent)
 }
 
 /************************************************************************
- *  function hideMap														*
+ *  function hideMap													*
  *																		*
  *  This function is called if the user clicks on the show Map button.	*
  *  It displays a map using Google maps support.						*
@@ -726,21 +725,21 @@ function mapClick(mouseEvent)
  ************************************************************************/
 function hideMap()
 {
-    var	hideMapDiv	= document.getElementById("hideMapDiv");
+    var	hideMapDiv	            = document.getElementById("hideMapDiv");
     hideMapDiv.style.display	= 'none';	// hide
-    var	mapDiv		= document.getElementById("mapDiv");
-    mapDiv.style.display	= 'none';	// hide
+    var	mapDiv		            = document.getElementById("mapDiv");
+    mapDiv.style.display	    = 'none';	// hide
 
-    var	form		= document.locForm;
-    var	button		= form.showMap;
+    var	form	            	= document.locForm;
+    var	button	            	= form.showMap;
     while(button.firstChild)
 		button.removeChild(button.firstChild)
-    var template	= document.getElementById('showMapTemplate');
-    for(var childTemp = template.firstChild;
+    var template            	= document.getElementById('showMapTemplate');
+    for(var childTemp           = template.firstChild;
 		    childTemp;
-		    childTemp = childTemp.nextSibling)
+		    childTemp           = childTemp.nextSibling)
 		button.appendChild(childTemp.cloneNode(true));
-    button.onclick		= showMap;
+    button.onclick	        	= showMap;
     return false;
 }		// hideMap
 
@@ -818,7 +817,11 @@ function displayReferences()
 {
     var	form	    	= document.locForm;
     var	idlr	    	= form.idlr.value;
-    location	    	= 'getIndividualsByLocation.php?idlr=' + idlr;
+    var lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
+    location	    	= 'getIndividualsByLocation.php?idlr=' + idlr +
+                                '&lang=' + lang;
     return false;
 }		// displayReferences
 
@@ -849,19 +852,23 @@ function editPictures()
 		    if (iframe.className == 'right')
 			    childFrameClass		= 'left';
 		}
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
 		openFrame("pictures",
-			  "editPictures.php?idlr=" + idlr +
-					    "&idtype=" + picIdType, 
-			  childFrameClass);
+			      "editPictures.php?idlr=" + idlr +
+                                    "&idtype=" + picIdType +
+                                    "&lang=" + lang, 
+			      childFrameClass);
     }		// idlr present in form
     else
     {		// unable to identify record to associate with
 		popupAlert("Location.js: editPictures: " +
-			   "Unable to identify record to associate pictures with",
+			            "Unable to identify record to associate pictures with",
 				   this);
     }		// unable to identify record to associate with
     return true;
-}	// editPictures
+}	    // function editPictures
 
 /************************************************************************
  *  function close														*

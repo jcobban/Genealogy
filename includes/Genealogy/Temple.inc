@@ -6,7 +6,7 @@ use \ArrayAccess;
 use \Countable;
 use \Iterator;
 /************************************************************************
- *  Temple.inc																*
+ *  Temple.inc															*
  *																		*
  *  Definition of a class representing a temple of the Church of		*
  *  Latter Day Saints in a genealogical database.				 		*
@@ -15,59 +15,61 @@ use \Iterator;
  *																		*
  *  Table: tblTR - Temple Name List										*
  *																		*
- *		IDTR						INT(10)				index						*
- *		Code						VARCHAR(6)		6 character id				*
- *		Code2						VARCHAR(6)		2 character id				*
- *		Temple						VARCHAR(50)		name						*
- *		Used						TINYINT(3)								*
- *		Tag1						TINYINT(3)								*
- *		qsTag						TINYINT(3)								*
- *		TempleStart				INT(10)										*
+ *		IDTR				INT(10)				index					*
+ *		Code				VARCHAR(6)		6 character id				*
+ *		Code2				VARCHAR(6)		2 character id				*
+ *		Temple				VARCHAR(50)		name						*
+ *		Used				TINYINT(3)								    *
+ *		Tag1				TINYINT(3)								    *
+ *		qsTag				TINYINT(3)								    *
+ *		TempleStart			INT(10)										*
  *				(0=no date, YYYYMMDD=20050621) date temple opened		*
- *		TempleEnd				INT(10)										*
+ *		TempleEnd			INT(10)										*
  *				(0=no date, YYYYMMDD=20050621) date temple closed		*
  *																		*
- *  History:																*
- *		2010/10/11		use explicit query code								*
+ *  History:															*
+ *		2010/10/11		use explicit query code							*
  *		2010/10/20		changed parent constructor						*
- *		2010/10/23		connection made global								*
- *	2010/12/26	add getPreposition method			*	
+ *		2010/10/23		connection made global							*
+ *	    2010/12/26	    add getPreposition method			            *
  *						add getNotes method								*
- *						eliminate internal member idtr						*
- *		2011/01/02		use regexp in construct by name						*
- *						throw Exception on construction failure				*
+ *						eliminate internal member idtr					*
+ *		2011/01/02		use regexp in construct by name					*
+ *						throw Exception on construction failure			*
  *		2011/06/11		add methods getFirst and getNext				*
  *		2012/01/13		rename classes to have upper case character		*
- *		2012/05/13		correct comparison for abbreviations				*
- *						support optional 2-character abbreviations used		*
- *						by GEDCOM 5.5										*
+ *		2012/05/13		correct comparison for abbreviations			*
+ *						support optional 2-character abbreviations used	*
+ *						by GEDCOM 5.5									*
  *		2012/08/15		add toString method								*
  *		2012/08/18		do not throw exception on IDTR 0				*
  *		2012/10/06		improve comments								*
  *		2012/10/20		standardize initialization of new record		*
  *		2012/12/08		change getName to only return name portion		*
  *						of string										*
- *		2013/02/23		implement changes to structure of tblTR record		*
+ *		2013/02/23		implement changes to structure of tblTR record	*
  *						add methods getCode and getCode2				*
- *		2013/08/09		base class renamed to Record						*
+ *		2013/08/09		base class renamed to Record					*
  *		2014/09/30		add static methods getTemples and getWhere		*
  *						obsolete getFirst, getNext						*
- *						add method get to invoke class specific		*
- *						handling of some fields								*
+ *						add method get to invoke class specific		    *
+ *						handling of some fields							*
  *		2014/10/01		add method addOwner								*
- *		2014/10/16		do not access database to construct null temple		*
- *		2014/12/28		send trace information to $warn						*
+ *		2014/10/16		do not access database to construct null temple	*
+ *		2014/12/28		send trace information to $warn					*
  *		2015/06/27		return instance of LegacyDate from methods		*
  *						getStartDate and getEndDate						*
  *						accept text date to set for 'templestart'		*
- *						and 'templeend'										*
+ *						and 'templeend'									*
  *						add support for 'YYYY/MM/DD' numeric date		*
  *		2015/09/28		migrate from MDB2 to PDO						*
- *		2015/12/08		base class changed to RecordPic						*
- *		2017/09/23		do not throw exception on new record				*
+ *		2015/12/08		base class changed to RecordPic					*
+ *		2017/09/23		do not throw exception on new record			*
  *		2017/12/18		add support for temporary fields				*
+ *		2019/05/14      do not throw exceptions in constructor or set   *
+ *		                add $info                                       *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -84,36 +86,50 @@ class Temple extends RecordPic
 {
 
     /********************************************************************
-     *		Temple::$initRow												*
-     *																		*
-     *		array containing default values for a new record				*
+     *	Temple::$initRow												*
+     *																	*
+     *	array containing default values for a new record				*
      ********************************************************************/
     protected static	$initRow	= array(
-				'idtr'			=> 0,
-				'code'			=> '',
-				'code2'			=> '',
-				'temple'		=> '',
-				'templestart'		=> 0,
-				'templeend'		=> 99991231,	// never
-				'used'			=> 0,
-				'tag1'			=> 0,
-				'qstag'			=> 0);
+									'idtr'			    => 0,
+									'code'			    => '',
+									'code2'			    => '',
+									'temple'		    => '',
+									'templestart'		=> 0,
+									'templeend'		    => 99991231,	// never
+									'used'			    => 0,
+									'tag1'			    => 0,
+									'qstag'			    => 0);
 
     /********************************************************************
-     *		Temple::$translate												*
-     *																		*
-     *		array containing alternate field names								*
+     *	Templt::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'tblTR',
+                'name'      => 'Temples',
+                'prime'	    => 'idtr',
+	            'srvmg'     => true,
+	            'fldcount'	=> 9,
+                'order'     => 'Temple',
+                'classname' => 'Temple');
+
+    /********************************************************************
+     *	Temple::$translate												*
+     *																	*
+     *	array containing alternate field names							*
      ********************************************************************/
     protected static	$translate	= array(
-				'name'			=> 'temple',
-				'latitude'		=> 'latitude',
-				'longitude'		=> 'longitude',
-				'preposition'		=> 'preposition');
+									'name'			    => 'temple',
+									'latitude'		    => 'latitude',
+									'longitude'		    => 'longitude',
+									'preposition'		=> 'preposition');
 
     /********************************************************************
-     *		Temple::$defaultOrder												*
-     *																		*
-     *		Definition of default order for records retrieved by RecordSet		*
+     *	Temple::$defaultOrder											*
+     *																	*
+     *	Definition of default order for records retrieved by RecordSet	*
      ********************************************************************/
     protected static	$defaultOrder	= 'Temple';
 
@@ -244,7 +260,7 @@ class Temple extends RecordPic
 		    if ($stmt->execute($sqlParms))
 		    {
 				if ($debug)
-				    $warn	        .= "<p>Temple::__construct: " . __LINE__ . 
+				    $warn	        .= "<p>Temple::__construct: " . __LINE__ .
 					        			" query='$queryText'</p>\n";
 				$result		        = $stmt->fetch(PDO::FETCH_ASSOC);
 				if (is_array($result))
@@ -265,9 +281,10 @@ class Temple extends RecordPic
 		    }
 		    else
 		    {		// error performing query
-				throw new Exception("Temple::__construct: " .
-								"query='$queryText' " .
-								print_r($stmt->errorInfo(),true));
+				$this->msg      .= "Temple::__construct: " .
+								    "query='$queryText' " .
+								    print_r($stmt->errorInfo(),true);
+				$dbrow		    = self::$initRow;
 		    }		// error performing query
 
 		}		// search parameters
@@ -282,7 +299,7 @@ class Temple extends RecordPic
 
         if (strlen($this->msg) > 0)
             $msg                    .= $this->msg;
-    }		// Temple::__construct
+    }		// function Temple::__construct
 
     /********************************************************************
      *	function Temple::get											*
@@ -353,12 +370,21 @@ class Temple extends RecordPic
 				return $this->getEndDate();
 		    }
 
+            case 'zoom':
+                return 12;
+
+            case 'latitude':
+                return 0;
+
+            case 'longitude':
+                return 0;
+
 		    default:
 		    {
 				return parent::get($field);
 		    }
 		}			// act on specific field names
-    }		// Temple::get
+    }		// function Temple::get
 
     /********************************************************************
      *	function Temple::getIdtr										*
@@ -371,7 +397,7 @@ class Temple extends RecordPic
     function getIdtr()
     {
 		return $this->row['idtr'];
-    }		// Temple::getIdtr
+    }		// function Temple::getIdtr
 
     /********************************************************************
      *	function Temple::getName										*
@@ -395,11 +421,11 @@ class Temple extends RecordPic
 		    if (count($parts) >= 2)
 				return $parts[1];
 		    else
-				return $temple; 
+				return $temple;
 		}
 		else
 		    return $temple;
-    }		// Temple::getName
+    }		// function Temple::getName
 
     /********************************************************************
      *	function Temple::getCode										*
@@ -425,7 +451,7 @@ class Temple extends RecordPic
 				return $parts[0];
 		}
 		return $temple;
-    }		// Temple::getCode
+    }		// function Temple::getCode
 
     /********************************************************************
      *	function Temple::getCode2										*
@@ -442,7 +468,7 @@ class Temple extends RecordPic
 		if (array_key_exists('code2', $this->row))
 		    return $this->row['code2'];
 		return '';
-    }		// Temple::getCode2
+    }		// function Temple::getCode2
 
     /********************************************************************
      *	function Temple::getPreposition									*
@@ -458,7 +484,7 @@ class Temple extends RecordPic
     function getPreposition()
     {
 		return 'at';
-    }		// Temple::getPreposition
+    }		// function Temple::getPreposition
 
     /********************************************************************
      *	function Temple::getNotes										*
@@ -475,7 +501,7 @@ class Temple extends RecordPic
     function getNotes()
     {
 		return '';
-    }		// Temple::getNotes
+    }		// function Temple::getNotes
 
     /********************************************************************
      *	function Temple::toString										*
@@ -488,7 +514,7 @@ class Temple extends RecordPic
     function toString()
     {
 		return $this->row['temple'];
-    }		// Temple::toString
+    }		// function Temple::toString
 
     /********************************************************************
      *	function Temple::__toString										*
@@ -501,7 +527,7 @@ class Temple extends RecordPic
     function __toString()
     {
 		return $this->row['temple'];
-    }		// Temple::__toString
+    }		// function Temple::__toString
 
     /********************************************************************
      *	function Temple::getStartDate									*
@@ -520,7 +546,7 @@ class Temple extends RecordPic
 							  '/' . substr($yyyymmdd, 6, 2));
 		else
 		    return new LegacyDate('');
-    }		// Temple::getStart
+    }		// function Temple::getStartDate
 
     /********************************************************************
      *	function Temple::getEndDate										*
@@ -539,7 +565,7 @@ class Temple extends RecordPic
 							  '/' . substr($yyyymmdd, 6, 2));
 		else
 		    return new LegacyDate('');
-    }		// Temple::getEnd
+    }		// function Temple::getEndDate
 
     /********************************************************************
      *	function Temple::set											*
@@ -561,6 +587,8 @@ class Temple extends RecordPic
      ********************************************************************/
     function set($field, $value)
     {
+        global  $msg;
+
 		$fieldLc	= strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
@@ -568,26 +596,30 @@ class Temple extends RecordPic
 		{
 		    case 'idtr':
 		    {			// primary key
-				throw new Exception("Temple: set: " .
-							    "Cannot alter key of record'");
+                $msg    .= "Temple::set: Cannot alter key of record'. ";
+                return $this->row['idtr'];
 		    }			// primary key
 
 		    case 'code':
 		    {			// abbreviation
 				$value		= strtoupper($value);
-				if (strlen($value) > 5)
-				    throw new Exception("Temple: set: " .
-							"invalid value '$value' for field '$field'");
-				return parent::set($field, $value);
+				if (strlen($value) <= 5)
+                    return parent::set($field, $value);
+                else
+				    $msg    .= "Temple: set: " .
+                                "invalid value '$value' for field '$field'. ";
+                return $this->row['code'];
 		    }			// abbreviation
 
 		    case 'code2':
 		    {			// short abbreviation
 				$value		= strtoupper($value);
-				if (strlen($value) > 2)
-				    throw new Exception("Temple: set: " .
-							"invalid value '$value' for field '$field'");
-				return parent::set($field, $value);
+				if (strlen($value) == 2)
+                    return parent::set($field, $value);
+                else
+				    $msg    .= "Temple: set: " .
+							"invalid value '$value' for field '$field'";
+                return $this->row['code2'];
 		    }			// short abbreviation
 
 		    case 'name':
@@ -599,7 +631,7 @@ class Temple extends RecordPic
 		    case 'templestart':
 		    case 'templeend':
 		    {			// internal date format
-				if (strlen($value) == 0 || $value == '0')
+				if (strlen($value) == 0 || $value == 0)
 				    return parent::set($field, 0);
 				if (is_int($value) || ctype_digit($value))
 				{		// completely numeric value
@@ -621,10 +653,12 @@ class Temple extends RecordPic
 		    case 'tag1':
 		    case 'qstag':
 		    {			// yes or no flags
-				if ($value != '0' && $value != '1')
-				    throw new Exception("Temple: set: " .
-							"Invalid value '$value' for field '$field'");
-				return parent::set($field, intval($value));
+				if ($value == 0 || $value == 1)
+                    return parent::set($field, intval($value));
+                else
+				    $msg    .= "Temple: set: " .
+                    "Invalid value '$value' for field '$field'. ";
+                return $this->row[$field];
 		    }			// yes or no flags
 
 		    default:
@@ -632,7 +666,7 @@ class Temple extends RecordPic
 				return parent::set($field, $value);
 		    }			// unexpected field name
 		}			// switch on field name
-    }		// Temple::set
+    }		// function Temple::set
 
-}		// class Temple 
+}		// class Temple
 

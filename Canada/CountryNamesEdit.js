@@ -181,7 +181,7 @@ function addName()
     var	newRow		= createFromTemplate(template,
 									     parms,
 									     null);
-    var	table		= document.getElementById("dataTbl");
+    var	table		= document.getElementById("dataTable");
     var	tbody		= table.tBodies[0];
     tbody.appendChild(newRow);
 

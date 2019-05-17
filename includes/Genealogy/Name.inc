@@ -2,6 +2,9 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use Templating\Template;
+use Templating\TemplateTag;
+
 /************************************************************************
  *  Name.inc															*
  *																		*
@@ -14,7 +17,7 @@ use \Exception;
  *  the vast majority of them document the primary name(s) by which an	*
  *  individual is known.  For most men there is only one record,		*
  *  tracking the birth name of the individual.  For married women who	*
- *  took their husband's surname  at marriage there is one record for	*
+ *  took their husband's surname at marriage there is one record for	*
  *  the birth name, and one for each married name.  This table is used	*
  *  to populate the nominal index of individuals in the database either	*
  *  including or excluding married names.								*
@@ -46,6 +49,7 @@ use \Exception;
  *				2  = user created married name							*
  *		  BirthSD				  INTEGER(10)							*
  *				(see Sort Date)											*
+ *				Unused by this implementation                           *
  *		  PreferredAKA			  TINYINT(3)							*
  *				0=no, 1=yes												*
  *		  AKANote				  LONGTEXT								*
@@ -54,8 +58,10 @@ use \Exception;
  *				Set to NULL for all names except Married names			*
  *		  SrchTag				  TINYINT(3)							*
  *				0=no, 1=yes												*
+ *				Unused by this implementation                           *
  *		  qsTag					  TINYINT(3)							*
  *				temporary use, 0=no, 1=yes								*
+ *				Unused by this implementation                           *
  *																		*
  *  The design of this table in the original implementation violated    *
  *  good design for SQL databases in that the information was           *
@@ -158,6 +164,9 @@ use \Exception;
  *		2018/12/25      change MarriedNameMarIDID to IDMR               *
  *		                add methods toXML and toJSON to hide IDNR       *
  *		2019/01/03      name fields in Person obsolete                  *
+ *		2019/02/16      do not act on unused fields                     *
+ *		2019/04/09      support passing TemplateTag to getName          *
+ *		2019/04/15      replace is_a with instanceof                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -200,8 +209,8 @@ class Name extends Record
      *	a new record.           						                *
      ********************************************************************/
     protected static	$initRow	= array(
-    					'idnx'					=> 0,	// autoincrement
-    					'idnr'					=> 0,   // deprecated
+    					'idnx'					=> 0,	        // autoincrement
+    					'idnr'					=> 0,           // ignored
     					'idir'					=> 0,
     					'surname'				=> '',
     					'soundslike'			=> '',
@@ -211,12 +220,12 @@ class Name extends Record
     					'userref'				=> '',
     					'order'					=> 0,
     					'marriednamecreatedby'	=> 0,
-    					'birthsd'				=> -99999999,
-    					'preferredaka'			=> 0,	// not AKA
+    					'birthsd'				=> -99999999,   // ignored
+    					'preferredaka'			=> 0,	        // not AKA
     					'akanote'				=> '',
     					'idmr'	                => null,
-    					'srchtag'				=> 0,	// no
-    					'qstag'					=> 0,	// no
+    					'srchtag'				=> 0,	        // ignored
+    					'qstag'					=> 0,	        // ignored
     					'treename'				=> ''
     					);
 
@@ -226,10 +235,13 @@ class Name extends Record
      *	static array containing alternate names for each field			*
      ********************************************************************/
     protected static	$translate	= array(
+    					'id'		            => 'idnx',
     					'`order`'		        => 'order',
+    					'type'		            => 'order',
     					'createdby'		        => 'marriednamecreatedby',
                         'marriednamemaridid'	=> 'idmr',
-                        'namenote'              => 'akanote'
+                        'namenote'              => 'akanote',
+                        'notes'                 => 'akanote'
     					);
 
     /********************************************************************
@@ -413,8 +425,6 @@ class Name extends Record
     			    if (is_int($value) || ctype_digit($value))
     			    {		                // IDMR
                         $idmr		        = intval($value);
-                        if ($idmr > 0)
-    					    $this->family	= new Family(array('idmr' => $idmr));
     			    }		                // IDMR
                     else
                     {                       // invalid value
@@ -542,6 +552,7 @@ class Name extends Record
      *																	*
      *  Creates object containing a name record.					    *
      ********************************************************************/
+    static $counter    = 0;
     function __construct($parms)
     {
     	global	$debug;
@@ -564,7 +575,7 @@ class Name extends Record
         {
             $parms		        = array('idnx'	=> $parms);
             $parmsText          = "NULL";
-            throw new Exception("Name.inc: " . __LINE__ . " __construct(NULL)");
+            $this->msg          = "Name.inc: ". __LINE__ ." __construct(NULL)";
         }
     	else
     	if (is_int($parms) ||
@@ -574,7 +585,7 @@ class Name extends Record
             $parmsText          = "IDNX=$parms";
         }
     	else
-    	if (is_a($parms, 'Person'))
+    	if ($parms instanceof Person)
         {			                // old way to init from individual
             $idir               = $parms->get('idir');
     	    $this->person		= $parms;
@@ -583,7 +594,7 @@ class Name extends Record
             $parmsText          = "Person(IDIR=$idir)";
     	}			                // old way to init from individual
     	else
-    	if (is_a($parms, 'Family'))
+    	if ($parms instanceof Family)
         {			                // old way to reset married surname of wife
             $idmr               = $parms->get('idmr');
     	    $this->family		= $parms;
@@ -611,67 +622,14 @@ class Name extends Record
                 $comma          = ',';
             }
         }
-
+        //print "<p>new Name($parmsText)";
+        //self::$counter++;
+        //if (self::$counter > 1)
+        //throw new Exception('how did we get here');
     	// all of the supported (if deprecated) parameter formats have been
     	// reformatted into an array
     	if (is_array($parms))
-        {		// associative array of field names and values
-            if(array_key_exists('idmr',$parms))
-            {               // log call and backtrace
-            if (strlen($parmsText) == 0)
-            {                       // parameters not interpreted yet
-                $parmsText                  = '[';
-                $comma                      = '';
-        		foreach($parms as $field => $value)
-                {
-                    if ($value instanceof Record)
-                    {
-                        $id                 = $value->getId();
-                        $parmsText          .= "$comma$field=class " .
-                                                get_class($value) . "($id)";
-                        $comma              = ', ';
-                    }
-                    else
-                    if (is_numeric($value))
-                    {
-                        $parmsText          .= "$comma$field=$value";
-                        $comma              = ', ';
-                    }
-                    else
-                    if (is_string($value))
-                    {
-                        $parmsText          .= "$comma$field='$value'";
-                        $comma              = ', ';
-                    }
-                    else
-                    {
-                        $parmsText          .= "$comma$field=" .
-                                                print_r($value, true);
-                        $comma              = ', ';
-                    }
-                }
-                $parmsText                  .= ']';
-            }                       // parameters not interpreted yet
-            $backtrace          = debug_backtrace();
-            $trace              = '';
-            foreach($backtrace as $call)
-            {                       // interpret backtrace
-                if (array_key_exists('class', $call) &&
-                    strlen($call['class']) > 0)
-                    $classPref      = $call['class'] . '::';
-                else
-                    $classPref      = '';
-                $trace   .= 
-                    " function=$classPref" . $call['function'] .
-                    " called from line=" . $call['line'] . 
-                    " of " . $call['file'] . "\n";
-            }                       // interpret backtrace
-
-    	    error_log("Name::__construct: " . __LINE__ .
-    			    	" ($parmsText) $trace\n",
-                        3, $document_root . "/logs/Name.log");
-            }                       // log call and backtrace
-
+        {		                // associative array of field names and values
     	    // validate parameter
     	    $numParms		            = count($parms);
 
@@ -706,9 +664,9 @@ class Name extends Record
                         }
 
                         case 'gender':
-    			        {		        // pseudo field copied from tblIR
-    					    break;
-    			        }		        // pseudo field copied from tblIR
+    			        {		        // pseudo field copied from Person
+    					    break;      // ignore
+    			        }		        // pseudo field copied from Person
 
                         default:
                         { 
@@ -749,7 +707,7 @@ class Name extends Record
     			    {		        // successful query
     					if ($debug)
     					    $warn       .= "<p>Name.inc: " . __LINE__ .
-    							                " query='$queryText', sqlParms=". print_r($sqlParms, true) . "</p>";
+    							                " query='$queryText'</p>\n";
     					$row		        = $stmt->fetch(PDO::FETCH_ASSOC);
     					if (is_array($row))
     					{		    // found existing name record
@@ -764,49 +722,20 @@ class Name extends Record
     					    $gender	        = Person::UNKNOWN;
     					    if ($this->person)
                             {		// person passed as parameter
-                                $idir       = $this->person->get('idir');
+                                $idir               = $this->person['idir'];
                                 $dbrow['idir']      = $idir;
-                                $surname	= $this->person->get('surname');
-                                $dbrow['surname']   = $surname;
-                                $givenname	= $this->person->get('givenname');
-                                $dbrow['givenname'] = $givenname;
-    							$gender		= $this->person->get('gender');
-                                $dbrow['gender']    = $gender;
+                                $gender             = $this->person['gender'];
                                 if (array_key_exists('order', $sqlParms))
                                 {
-                                    $order  = $sqlParms['order'];
+                                    $order          = $sqlParms['order'];
                                     $dbrow['order'] = $order;
                                 }
     					    }		// person passed as parameter
 
     					    if ($this->family)
     					    {		// family passed as parameter
-                                $dbrow['idmr']      = $this->family->get('idmr');
+                                $dbrow['idmr']      = $this->family['idmr'];
     							$dbrow['order']		= Name::MARRIED;
-    							switch($gender)
-    							{	// act on gender
-    							    case Person::MALE:
-    							    {
-    							    	$surname	=
-    							    $this->family->get('husbmarrsurname');
-                                        $dbrow['surname']   = $surname;
-    								    break;
-    							    }
-
-    							    case Person::FEMALE:
-    							    {
-    								    $surname	=
-    								$this->family->get('wifemarrsurname');
-                                        $dbrow['surname']   = $surname;
-    								    break;
-    							    }
-
-    							    case Person::UNKNOWN:
-    							    {
-    								    break;
-    							    }
-
-    							}	// act on gender
                             }		// family passed as parameter
 
                             if ($debug)
@@ -827,9 +756,44 @@ class Name extends Record
                                 {	            	// act on specific field
     			                    case 'surname':
     			                    {
-                                        $surname	= $value;
+                                        $dbrow['surname']	= $value;
                                         break;
                                     }
+								    case 'givenname':
+								    {
+										$dbrow['givenname']	= $value;
+										break;
+								    }
+					
+								    case 'prefix':
+								    {
+										$dbrow['prefix']	= $value;
+										break;
+								    }
+					
+								    case 'title':
+								    {
+										$dbrow['title']		= $value;
+										break;
+								    }
+					
+								    case 'akanote':
+								    {
+										$dbrow['akanote']	= $value;
+										break;
+								    }
+					
+								    case 'userref':
+								    {
+										$dbrow['userref']	= $value;
+										break;
+								    }
+					
+								    case 'order':
+								    {
+										$dbrow['order']		= $value;
+										break;
+			                        }
                                 }
                             }
     					    $needInsert	= true;
@@ -848,12 +812,16 @@ class Name extends Record
     			    }			    // error performing query
                 }			        // requested search for matching record
                 else
-                {                   // called with incomplete Person
-                    $dbrow	            = self::$initRow;
+                {                   // called with unsaved Person
+                    $dbrow	                    = self::$initRow;
                     if ($this->person)
                     {
                         $dbrow['surname']       = $this->person['surname'];
                         $dbrow['givenname']     = $this->person['givenname'];
+		    			$dbrow['prefix']		= $this->person['prefix'];
+		    			$dbrow['title']		    = $this->person['title'];
+		    			$dbrow['akanote']		= $this->person['namenote'];
+	        			$dbrow['userref']		= $this->person['userref'];
                     }
                 }                   // called with incomplete Person
     	    }				        // partial row, use as search parameters
@@ -867,128 +835,36 @@ class Name extends Record
 
         if (is_null($dbrow))
             throw new Exception("Name.inc: " . __LINE__ . " how can row not be initialized? parms=($parmsText)");
+
+        // the IDNR, and SoundsLike fields in this record 
+        // are no longer maintained
+
         // invoke constructor of base class
-    	parent::__construct($dbrow,
-            'tblNX');
-    	$this->needInsert	= $needInsert;
+    	parent::__construct($dbrow, 'tblNX');
+    	$this->needInsert	    = $needInsert;
 
-        // the IDNR field in this record is no longer maintained
-        $surname                = $this->row['surname'];
-        $this->surnameRec       = new Surname(array('surname' => $surname));
-        $idnr   		        = $this->surnameRec->getIdnr();
-        $soundslike  		    = $this->surnameRec->get('soundslike');
-
-        if (is_null($this->person))
-        {
-    		$this->person	    = new Person(array('idir' => $this->row['idir']));
-        }
-        else
-        {
-            $this->person->setPriName($this);
-        }
-        if ($this->isExisting())
-        {
-		    $givenname	    	    = $this->row['givenname'];
-		    $prefix		            = $this->row['prefix'];
-		    $title		            = $this->row['title'];
-		    $akanote		        = $this->row['akanote'];
-		    $userref		        = $this->row['userref'];
-	        $order		            = $this->row['order'];
-        }
-        else
-        {
-		    parent::set('idnr',		    $idnr);
-	        parent::set('soundslike',	$soundslike);
-		    $idir			        = $this->person['idir'];
-		    parent::set('idir',		    $idir);
-		    $givenname		        = $this->person['givenname'];
-		    $prefix		            = $this->person['prefix'];
-		    $title		            = $this->person['title'];
-		    $akanote		        = $this->person['namenote'];
-	        $userref		        = $this->person['userref'];
-        }
-	    foreach($parms as $field => $value)
-	    {
-			$fieldLc	= strtolower($field);
-			if (array_key_exists($fieldLc, self::$translate))
-			    $fieldLc	= self::$translate[$fieldLc];
-			switch($fieldLc)
-			{
-			    case 'givenname':
-			    {
-					$givenname	= $value;
-					break;
-			    }
-
-			    case 'prefix':
-			    {
-					$prefix		= $value;
-					break;
-			    }
-
-			    case 'title':
-			    {
-					$title		= $value;
-					break;
-			    }
-
-			    case 'akanote':
-			    {
-					$akanote	= $value;
-					break;
-			    }
-
-			    case 'userref':
-			    {
-					$userref	= $value;
-					break;
-			    }
-
-			    case 'order':
-			    {
-					$order		= $value;
-					break;
-			    }
-
-			}
-	    }
-        if (!$this->isExisting())
-        {
-		    parent::set('givenname',	$givenname);
-		    parent::set('prefix',	    $prefix);
-		    parent::set('title',	    $title);
-		    parent::set('akanote',	    $akanote);
-		    parent::set('userref',	    $userref);
-
-		    if (is_int($order))
-	            parent::set('order',	$order);
-	        $birthEvent                 = $this->person->getBirthEvent(true);
-		    parent::set('birthsd',	    $birthEvent['eventsd']);
-		    parent::set('birthd',	    $birthEvent['eventd']);
-	        $deathEvent                 = $this->person->getDeathEvent(true);
-		    parent::set('deathsd',	    $birthEvent['eventsd']);
-            parent::set('deathd',	    $birthEvent['eventd']);
-            if ($this->person->isExisting() &&
-                $this->person->getIdir() > 0)
-	            parent::set('treename',	$this->person->getTreeName());
-        }
+    	$idir	                = $dbrow['idir'];
 
         // ensure that all married names match the prime givenname,
         // prefix, title, and userref
-	    $updParms	= array('idir'		=> $idir,
-							'`order`'	=> -1,
-							'order'		=> 'idnx');
-	    $setParms	= array('givenname'	=> $givenname,
-							'prefix'	=> $prefix,
-							'title'		=> $title,
-							'userref'	=> $userref);
-	    $names	    = new RecordSet('Names', $updParms);
-        $count	    = $names->update($setParms);
-
-        if ($this->row['order'] == -1 && is_null($this->row['idmr']))
-            throw new Exception("Name::__construct: attempt to create married name record without IDMR"); 
-
-    	// diagnostic output if debug is set
+        if ($this['order'] == 0 && $idir > 0 && !$needInsert)
+        {                   // primary name record
+		    $updParms	= array('idir'		=> $idir,
+								'`order`'	=> -1,
+								'order'		=> 'idnx');
+		    $setParms	= array('givenname'	=> $this['givenname'],
+								'prefix'	=> $this['prefix'],
+								'title'		=> $this['title'],
+								'userref'	=> $this['userref']);
+		    $names	    = new RecordSet('Names', $updParms);
+	        $count	    = $names->update($setParms);
+	    }
+	
+	    if ($this->row['order'] == -1 && is_null($this->row['idmr']))
+	        $this->msg      = "Name::__construct: attempt to create married name record without IDMR"; 
+        $this->getSurnameRec();
+	
+	    // diagnostic output if debug is set
     	if ($needInsert)
     	    $this->dump('New Name Record constructed:');
     	else
@@ -1006,7 +882,8 @@ class Name extends Record
      *																	*
      *	Parameters:														*
      *	    $field		field name										*
-     *					'gender' returns value from corresponding		*
+     *					'gender', 'birthd', 'birthsd', 'deathd', and    *
+     *					'deathsd' return value for the corresponding	*
      *					Person record									*
      *																	*
      *	Side Effects:													*
@@ -1025,20 +902,95 @@ class Name extends Record
         {                   // act on specific fields
             case 'idnr':
             {               // obsolete field
-        	    return $this->surnameRec->getIdnr();
+                // note that there is a field 'idnr' in the old record
+                // but it is no longer supported
+        	    return $this->getSurnameRec()->get('idnr');
+            }               // obsolete field
+
+            case 'soundslike':
+            {               // obsolete field
+                // note that there is a field 'soundslike' in the old record
+                // but it is no longer supported
+        	    return $this->getSurnameRec()->get('soundslike');
             }               // obsolete field
 
             case 'gender':
             {               // pseudo-field
-                if (array_key_exists('gender', $this->row))
-    	            return $this->row['gender'];
                 if (!array_key_exists('gender', $this->extras))
-                    if (is_null($this->person))
+                {
+                    if (is_null($this->getPerson()))
                         $this->extras['gender'] = Person::UNKNOWN;
                     else
-               	        $this->extras['gender']	= $this->person['gender'];
+                        $this->extras['gender']	= $this->person['gender'];
+                }
     	        return $this->extras['gender'];
     	    }               // pseudo-field
+
+            case 'birthsd':
+            {               // pseudo-field
+                // note that there is a field 'birthsd' in the old record
+                // but it is no longer supported
+                if (!array_key_exists('birthsd', $this->extras))
+                {
+                    if (is_null($this->getPerson()))
+                        $this->extras['birthsd']    = -99999999;
+                    else
+                    {
+                        $birthEvent     = $this->person->getBirthEvent(true);
+                        $this->extras['birthsd']	= $birthEvent['eventsd'];
+                        $this->extras['birthd']	    = $birthEvent['eventd'];
+                    }
+                }
+    	        return $this->extras['birthsd'];
+    	    }               // birthsd
+
+            case 'birthd':
+            {               // pseudo-field
+                if (!array_key_exists('birthd', $this->extras))
+                {
+                    if (is_null($this->getPerson()))
+                        $this->extras['birthd']     = '';
+                    else
+                    {
+                        $birthEvent     = $this->person->getBirthEvent(true);
+                        $this->extras['birthsd']	= $birthEvent['eventsd'];
+                        $this->extras['birthd']	    = $birthEvent['eventd'];
+                    }
+                }
+    	        return $this->extras['birthd'];
+    	    }               // birthd
+
+            case 'deathsd':
+            {               // pseudo-field
+                if (!array_key_exists('deathsd', $this->extras))
+                {
+                    if (is_null($this->getPerson()))
+                        $this->extras['deathsd']    = -99999999;
+                    else
+                    {
+                        $deathEvent     = $this->person->getDeathEvent(true);
+                        $this->extras['deathsd']	= $deathEvent['eventsd'];
+                        $this->extras['deathd']	    = $deathEvent['eventd'];
+                    }
+                }
+    	        return $this->extras['deathsd'];
+    	    }               // deathsd
+
+            case 'deathd':
+            {               // pseudo-field
+                if (!array_key_exists('deathd', $this->extras))
+                {
+                    if (is_null($this->getPerson()))
+                        $this->extras['deathd']     = '';
+                    else
+                    {
+                        $deathEvent     = $this->person->getDeathEvent(true);
+                        $this->extras['deathsd']	= $deathEvent['eventsd'];
+                        $this->extras['deathd']	    = $deathEvent['eventd'];
+                    }
+                }
+    	        return $this->extras['deathd'];
+    	    }               // deathd
 
             default:
     	    {
@@ -1081,7 +1033,7 @@ class Name extends Record
 
             case 'idnr':
             {               // obsolete field
-        	    return $this->surnameRec->getIdnr();
+        	    return $this->getSurnameRec->get('idnr');
             }               // obsolete field
 
     	    case 'idnx':
@@ -1093,7 +1045,6 @@ class Name extends Record
     	    case 'userref':
     	    case 'order':
     	    case 'marriednamecreatedby':
-    	    case 'birthsd':
     	    case 'preferredaka':
     	    case 'akanote':
     	    case 'srchtag':
@@ -1102,6 +1053,15 @@ class Name extends Record
     	    {
     			return parent::set($fieldLc, $value);
     	    }
+
+		    case 'gender':
+		    case 'birthsd':
+		    case 'birthd':
+		    case 'deathsd':
+            case 'deathd':
+    	    {                   // do not alter fields only in Person
+    			return parent::get($fieldLc);
+    	    }                   // do not alter fields only in Person
 
     	    default:
     	    {	    	// other field names
@@ -1156,8 +1116,11 @@ class Name extends Record
      *	function Name::setSurname										*
      *																	*
      *	Change the value of surname for this alternate name record.		*
-     *  This also ensures that the IDNR value is appropriately			*
-     *	updated.														*
+     *  This also ensures that the reference to the associated          *
+     *	Surname instance is updated.  If this is the primary Name		*
+     *	record for an individual all alternate name records for this    *
+     *	individual are also updated.  For example this deals with the   *
+     *	situation where the spelling of the surname is corrected.       *
      *																	*
      *	Parameters:														*
      *	    $newname	new surname as a string							*
@@ -1167,23 +1130,28 @@ class Name extends Record
      ********************************************************************/
     function setSurname($newname)
     {
-    	$oldsurname		        = parent::set('surname', $newname);
-    	// get value of IDNR for the surname of the individual
-    	$this->surnameRec	    = new Surname(array('surname' => $newname));
-        if ($this->row['order'] == Name::PRIMARY)
-        {                           // primary name
-    	    $otherNames         = new RecordSet('Names',
-    							     array('idir'	=> $this->row['idir'],
-    									   '`order`'	=> '>0')); 
-    	    foreach($otherNames as $idnx => $nameRec)
-    	    {		                // loop through other name records
-    	        if ($nameRec->get('surname') == $oldsurname)
-    	        {		            // matches old surname
-    			    $nameRec->setSurname($newname);
-    			    $nameRec->save(false);
-                }		            // matches old surname
-            }                       // loop through other names
-        }                           // primary name
+    	$oldsurname		            = parent::set('surname', $newname);
+        // get value of IDNR for the surname of the individual
+        if ($newname != $oldsurname)
+        {
+            $this->surnameRec	    = new Surname(array('surname' => $newname));
+            $this->surnameRec->save(false);
+	        if ($this->row['order'] == Name::PRIMARY)
+	        {                       // primary name
+	    		$idir	            = $this->row['idir'];
+	    	    $otherNames         = new RecordSet('Names',
+	    							            array('idir'	    => $idir,
+	    									          '`order`'	    => '>0')); 
+	    	    foreach($otherNames as $idnx => $nameRec)
+	    	    {		            // loop through other name records
+	    	        if ($nameRec->get('surname') == $oldsurname)
+	    	        {		        // matches old surname
+	    			    $nameRec->setSurname($newname);
+	    			    $nameRec->save(false);
+	                }		        // matches old surname
+	            }                   // loop through other names
+	        }                       // primary name
+        }                           // surname has changed
     	return $oldsurname;
     }		//		function Name:: setSurname
 
@@ -1226,7 +1194,9 @@ class Name extends Record
 		global	$debug;
 		global	$warn;
 
-		if (is_array($options))
+        $evBirth                = null;
+        $evDeath                = null;
+		if (is_array($options) || $options instanceof TemplateTag)
 		{		// support being passed internationalization table
 		    $tranTab			= $options;
 		    $options			= self::NAME_INCLUDE_DATES;
@@ -1256,9 +1226,13 @@ class Name extends Record
 		$maidenName	    		= null;
 		$suffix		    		= $this->row['title'];
 
-		$evBirth				= $this->person->getBirthEvent();
-        $bprivlim               = $this->person->getBPrivLim();
-        $dprivlim               = $this->person->getDPrivLim();
+        if ($this->getPerson())
+        {
+		    $evBirth			= $this->person->getBirthEvent();
+            $bprivlim           = $this->person->getBPrivLim();
+            $dprivlim           = $this->person->getDPrivLim();
+        }
+
 		if ($evBirth)
         {
 			$tbirth		        = $evBirth->getDate($bprivlim,
@@ -1352,7 +1326,8 @@ class Name extends Record
 		    else
 				$birth	= '';
 
-		    $evDeath		= $this->person->getDeathEvent();
+            if ($this->person)
+		        $evDeath		= $this->person->getDeathEvent();
 		    if ($evDeath)
 		    {
 				$death		= $evDeath->getDate($dprivlim,
@@ -1457,7 +1432,6 @@ class Name extends Record
     	    $values		                = '';
     	    $sqlParms	            	= array();
     	    $comma		                = '';
-    	    $gender		                = Person::UNKNOWN;
     	    foreach($this->row as $fieldLc => $value)
     	    {
     			switch($fieldLc)
@@ -1526,11 +1500,13 @@ class Name extends Record
     	    // ensure 'marriednamecreatedby' set correctly
     	    if ($this->row['order'] == -1 &&
     			$this->row['marriednamecreatedby'] == 0)
-    	    {
+            {
+                $gender             = $this['gender'];
     			if ($gender == Person::FEMALE)
     			    $this->row['marriednamecreatedby'] == 1;
     			else
-    			    $this->row['marriednamecreatedby'] == 2;
+    			if ($gender == Person::MALE)
+    			    $this->row['marriednamecreatedby'] == 0;
     	    }
 
     	    // create the command to insert the new record into the database
@@ -1614,7 +1590,6 @@ class Name extends Record
     	    $update		            = "UPDATE tblNX SET ";
     	    $set		            = '';
     	    $comma		            = '';
-    	    $gender		            = Person::UNKNOWN;
     	    foreach($this->changed as $fieldLc => $value)
     	    {
     			switch($fieldLc)
@@ -1654,8 +1629,9 @@ class Name extends Record
     	    // ensure 'marriednamecreatedby' set correctly
     	    if ($this->row['order'] == -1 &&
     			$this->row['marriednamecreatedby'] == 0)
-    	    {               // correct setting of MarriedNameCreatedBy
-    			$set	.= $comma . "`marriednamecreatedby`=:createdby";
+            {               // correct setting of MarriedNameCreatedBy
+                $gender         = $this['gender'];
+    			$set	        .= "$comma`marriednamecreatedby`=:createdby";
     			if ($gender == Person::FEMALE)
     			    $sqlParms['createdby']	= 1;
     			else
@@ -1748,6 +1724,7 @@ class Name extends Record
         {
             $surname            = $this->row['surname'];
             $this->surnameRec   = new Surname(array('surname' => $surname));
+            $this->surnameRec->save(false);
         }
     	return $this->surnameRec;
     }		//		function Name::getSurnameRec
@@ -1796,10 +1773,30 @@ class Name extends Record
 
 		foreach($this->row as $key => $value)
         {
-            if ($key == 'idnr')
-                continue;
-
-		    $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
+            if ($key == 'idnr'||        // fields unused by this implementation
+                $key == 'soundslike'||
+                $key == 'birthsd'||
+                $key == 'srchtag'||
+                $key == 'qstag')
+            {}
+            else
+            if ($key == 'marriednamecreatedby')
+            {
+                $retval	.= "\t<$key>";
+                if ($value == 0)
+                    $retval	.= "0=not a married name";
+                else
+                if ($value == 1)
+                    $retval	.= "1=rule generated married name";
+                else
+                if ($value == 2)
+                    $retval	.= "2=user created married name";
+                else
+                    $retval	.= xmlentities($value);
+                $retval     .= "</$key>\n";
+            }
+            else
+		        $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
 		}
 		if ($top !== null)
 		    $retval	.= "    </$top>\n";
@@ -1831,7 +1828,11 @@ class Name extends Record
 		$comma		= "{\n";
 		foreach($this->row as $key => $value)
         {
-            if ($key == 'idnr')
+            if ($key == 'idnr'||        // fields unused by this implementation
+                $key == 'soundslike'||
+                $key == 'birthsd'||
+                $key == 'srchtag'||
+                $key == 'qstag')
                 continue;
 		    if (is_numeric($value))
 		    {
@@ -1848,7 +1849,8 @@ class Name extends Record
 							   json_encode($value);
 		    }
 		    $comma		= ",\n";
-		}
+        }
+
 		if (strlen($retval) > 0)
 		    $retval		.= "\n}\n";
 		if ($print)

@@ -90,11 +90,11 @@ htmlHeader("Ontario: OCFA Status for $countyName County",
 <body>
 <?php
 pageTop(array(
-			'/genealogy.php'	=> 'Genealogy',
-			'/genCountry.php?cc=CA'	=> 'Canada',
+			'/genealogy.php'	            => 'Genealogy',
+			'/genCountry.php?cc=CA'	        => 'Canada',
 			'/Canada/genProvince.php?Domain=CAON'
-							=> 'Ontario',
-			'/Ontario/OcfaQuery.html'	=> 'New Query',
+							                => 'Ontario',
+			'/Ontario/OcfaQuery.php'	    => 'New Query',
 			'/Ontario/OcfaStats.php'		=> 'Stats'));
 ?>
 <div class='body'>

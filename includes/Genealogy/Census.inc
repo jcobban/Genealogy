@@ -12,24 +12,25 @@ use \Iterator;
  *  access to the information in a row of the table Censuses			*
  *																		*
  *  CREATE TABLE `Censuses` (											*
- *		`CensusId` VARCHAR(8) NOT NULL,									*
+ *		`CensusId`      VARCHAR(8) NOT NULL,							*
  *				PRIMARY KEY (`CensusId`) )								*
  *						normally CCYYYY or CCSSYYYY						*
- *		`Name` VARCHAR(128) NOT NULL,									*
+ *		`Name`          VARCHAR(128) NOT NULL,							*
  *						descriptive name of census						*
- *		`LinesPerPage` INT(11) NOT NULL,								*
+ *		`LinesPerPage`  INT(11) NOT NULL,								*
  *						number of lines on the standard population form	*
- *		`Collective` TINYINT(1) DEFAULT '0',							*
+ *		`Collective`    TINYINT(1) DEFAULT '0',							*
  *						1 if represents multiple separately				*
  *						administered censuses							*
- *		`PartOf` VARCHAR(2) DEFAULT NULL,								*
+ *		`PartOf`        VARCHAR(2) DEFAULT NULL,						*
  *						CC of country if it is a census of part			*
- *		`Provinces` VARCHAR(254) NOT NULL,								*
+ *						and CensusId format CCSSYYYY is not used        *
+ *		`Provinces`     VARCHAR(254) NOT NULL,							*
  *						string containing the 2 character state ids		*
  *						of all states covered by the census				*
- *		`GroupLines` INT(2), interval for visually grouping lines		*
+ *		`GroupLines`    INT(2), interval for visually grouping lines	*
  *		`LastUnderline` INT(2), highes underlined line					*
- *		`IDSR`  INT(11), identifier of Source record					*
+ *		`IDSR`          INT(11), identifier of Source record			*
  *		ENGINE=InnoDB DEFAULT CHARSET=utf8								*
  *																		*
  *  History:															*
@@ -60,12 +61,19 @@ use \Iterator;
  *		2018/02/13		tolerate constructor call with string censusid	*
  *						if partof defined use it as the country id		*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/02/20      derive default name from CensusId               *
+ *		                improve get('countrycode')                      *
+ *		                improve get('table')                            *
+ *		                add get('province')                             *
+ *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/05/18      add $info                                       *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc' ;
 require_once __NAMESPACE__ . '/Domain.inc' ;
 require_once __NAMESPACE__ . '/DomainSet.inc' ;
+require_once __NAMESPACE__ . '/Country.inc' ;
 
 /************************************************************************
  *  class Census														*
@@ -93,6 +101,20 @@ class Census extends Record
 				'idsr'				=> null);
 
     /********************************************************************
+     *	Census::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     		=> 'Censuses',
+                'name'      		=> 'Censuses',
+                'prime'	    		=> 'censusid',
+	            'srvmg'     		=> false,
+	            'fldcount'			=> 6,
+                'order'     		=> 'Name',
+                'classname' 		=> 'Census');
+
+    /********************************************************************
      *	Census::$translate												*
      *																	*
      *	Alternative field names											*
@@ -102,9 +124,10 @@ class Census extends Record
 				'code'				=> 'censusid',
 				'states'			=> 'provinces',
 				'source'			=> 'idsr',
+				'state'			    => 'province',      // pseudo field
 				'country'			=> 'countrycode',	// pseudo field
 				'cc'				=> 'countrycode',	// pseudo field
-				'year'				=> 'year',		// pseudo field
+				'year'				=> 'year',		    // pseudo field
 				'table'				=> 'table');		// pseudo field
 
     /********************************************************************
@@ -216,14 +239,15 @@ class Census extends Record
 		    }			// process search parameters
 
 		    // query the database for census information
-		    $query		    = "SELECT * FROM Censuses $where";
-		    $stmt		    = $connection->prepare($query);
-		    $queryText		= debugPrepQuery($query, $sqlParms);
+		    $query		        = "SELECT * FROM Censuses $where";
+		    $stmt		        = $connection->prepare($query);
+		    $queryText		    = debugPrepQuery($query, $sqlParms);
+            $this->lastSqlCmd   = $queryText;
 		    if ($stmt->execute($sqlParms))
-		    {				// successful query
+            {				// successful query
 				if ($debug)
-				    $warn	.= "<p>Census.inc: " . __LINE__ .
-							   " query='" . $queryText . "'</p>";
+				    $warn	    .= "<p>Census.inc: " . __LINE__ .
+    							   " query='$queryText'</p>";
 
 				$dbrow	= $stmt->fetch(PDO::FETCH_ASSOC);
 				if (is_array($dbrow))
@@ -234,8 +258,9 @@ class Census extends Record
 				{			// create a new record
 				    // set defaults
 				    $dbrow			        = self::$initRow;
-				    $dbrow['censusid']		= $censusId;
-				    $needInsert			    = true;
+                    $dbrow['censusid']		= $censusId;
+                    $cc                     = substr($censusId, 0, 2);
+                    $year                   = substr($censusId, -4);
 
 				    // process parameters that modify record
 				    foreach($parms as $field => $value)
@@ -248,7 +273,6 @@ class Census extends Record
 						    case 'name':
 						    case 'linesperpage':
 						    case 'collective':
-						    case 'partof':
 						    case 'provinces':
 						    case 'idsr':
 						    {
@@ -256,8 +280,21 @@ class Census extends Record
 							    break;
 						    }		// set selected fields
 
+						    case 'partof':
+						    {
+                                $dbrow[$fieldLc]	= $value;
+                                if (strlen($value) == 2)
+                                    $cc             = strtoupper($value);
+							    break;
+						    }		// set selected fields
+
 						}		// act on specific parameters
 				    }			// process modify parameters
+
+                    $country                = new Country(array('cc' => $cc));
+                    $dbrow['name']          = "$year Census of " .
+                                              $country->getName();
+                    $needInsert			    = true;
 
 				    // fill in default states/provinces list
 				    if ($dbrow['provinces'] == '')
@@ -339,39 +376,67 @@ class Census extends Record
 				return $this->row[$fieldLc];
 
 		    case 'partof':
-		    {
+		    {           // if census for part of a country
 				$partof		= $this->row[$fieldLc];
 				if (is_null($partof))
 				    return '';
 				else
 				    return $partof;
-		    }
+		    }           // if census for part of a country
 
 		    case 'idsr':
-		    {
+		    {           // the identifier of the Source record
 				$idsr		= $this->row[$fieldLc];
 				if (is_null($idsr))
-				    return 1;
+				    return 1;       // "blank" Source
 				else
 				    return $idsr;
-		    }
-		    case 'countrycode':
-				return substr($this->row['censusid'],0,2);
+            }           // the identifier of the Source record
 
-		    case 'year':
+            case 'countrycode':
+            {           // ISO country code
+                $partof		= $this->row['partof'];
+                if (is_string($partof) && strlen($partof) == 2)
+                    return $partof;
+                else
+                    return substr($this->row['censusid'], 0, 2);
+            }           // ISO country code
+
+            case 'province':
+            {           // province or state abbreviation
+                // if this is a census of an individual state or
+                // province this returns the string id 
+                $partof		= $this->row['partof'];
+                if (is_string($partof) && strlen($partof) == 2)
+                    return substr($this->row['censusid'], 0, 2);
+                else
+                if (strlen($this->row['censusid']) == 8)
+                    return substr($this->row['censusid'], 2, 2);
+                else
+                    return null;    // national census
+            }           // province or state abbreviation
+
+            case 'year':
+            {           // enumeration year
 				return intval(substr($this->row['censusid'],-4));
+            }           // enumeration year
 
-		    case 'table':	// pseudo-field for now
+            case 'table':
+            {           // database table name
 				if (array_key_exists('table', $this->row))
-				    return $this->row['table'];
-				else
-				    return 'Census' . substr($this->row['censusid'], -4);
+				    return $this->row['table'];     // to do
+                else
+                if ($this->get('countrycode') == 'CA')
+                    return 'Census' . substr($this->row['censusid'], -4);
+                else
+                    return null;        // no database support
+            }           // database table name
 
 		    default:
-		    {		// other fields
+		    {		    // other fields
 				return parent::get($fieldLc);
-		    }		// other fields
-		}		// act on specific field
+		    }		    // other fields
+		}		        // act on specific field
     }		// function Census::get
 
     /********************************************************************
@@ -421,16 +486,17 @@ class Census extends Record
 		$query		.= " FROM $table WHERE GivenNames != ''";
     
         // execute the query
-        $stmt		= $connection->prepare($query);
-        $queryText	= debugPrepQuery($query, $sqlParms);
+        $stmt		        = $connection->prepare($query);
+        $queryText	        = debugPrepQuery($query, $sqlParms);
+        $this->lastSqlCmd   = $queryText;
         if ($stmt->execute($sqlParms))
         {		// successful query
-            $row	= $stmt->fetch(PDO::FETCH_ASSOC);
+            $row	        = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($debug)
 		    {
-		        $warn	.= "<p>Census:getStats: " . __LINE__ .
-				           " $queryText</p>\n";
-				$warn	.= "<p>" . print_r($row, true) . "</p>\n";
+		        $warn	    .= "<p>Census:getStats: " . __LINE__ .
+				               " $queryText</p>\n";
+				$warn	    .= "<p>" . print_r($row, true) . "</p>\n";
 		    }
 		    return $row;
         }		// successful query
@@ -474,83 +540,6 @@ class Census extends Record
 		else
 		    return null;
     }		// static function getRealFieldName
-
-    /********************************************************************
-     *	function Census::delete											*
-     *																	*
-     *  Delete the database record associated with this instance.		*
-     *																	*
-     *	Input:															*
-     *	    $xml		if true emit XML								*
-     *					if a string emit XML using as tag name			*
-     *																	*
-     *	Returns:														*
-     *	    false		if the method was unable to update the database	*
-     *	    1			if the method deleted the database record		*
-     *	    0			if the record did not need to be deleted		*
-     ********************************************************************/
-    function delete($xml = false)
-    {
-		global	$debug;
-		global	$warn;
-		global	$connection;
-
-		// handle XML output option
-		if (is_string($xml))
-		    $xmltag	= $xml;
-		else
-		if ($xml)
-		{
-		    $xml	= true;
-		    $xmltag	= 'cmd';
-		}
-
-		// to simplify expressions
-		if (!$this->needInsert)
-		{		// have existing record
-		    if ($this->former)
-				$censusId	= $this->former['censusid'];
-		    else
-				$censusId	= $this->row['censusid'];
-		    $delete		= 'DELETE FROM Censuses WHERE CensusId=:censusid';
-		    $sqlParms		= array('censusid'	=> $censusId);
-
-		    $stmt		= $connection->prepare($delete);
-		    $deleteText		= debugPrepQuery($delete,$sqlParms);
-		    if ($stmt->execute($sqlParms))
-		    {		// successful delete
-				$count		= $stmt->rowCount();
-				if ($xml)
-				    print "<$xmltag count='$count'>$deleteText" .
-						  "</$xmltag>\n";
-				if ($debug)
-				    $warn	.= "<p>Census.inc: " . __LINE__ .
-								" query='" . $deleteText. "'</p>\n" .
-							   "<p>count='$count'</p>\n";
-
-				// log the update
-				$this->log($delete,
-						   $sqlParms);
-
-				// update the memory copy of the record to reflect that it
-				// no longer represents a database record
-				$this->needInsert	= true;
-
-				return $count;	// number of records deleted
-		    }		// successful delete
-		    else
-		    {		// error updating record
-				print "<p>query='" . $deleteText. "'</p>\n";
-				print "<p class='message'>" .
-						print_r($stmt->errorInfo(),true) . 
-						"</p>\n";
-				return 0;
-		    }		// error updating record
-		}		// have key value
-
-		// record never written to database
-		return 0;	// nothing to delete
-    }			// function Census::delete
 
     /********************************************************************
      *	function Census::__toString										*

@@ -112,42 +112,32 @@ function onLoad()
 		}	        // loop through all elements in the form
     }		        // loop through all forms
 
-    var dataTable           = document.getElementById('dataTbl');
-    var dataWidth           = dataTable.offsetWidth;
-    var windowWidth             = document.body.clientWidth - 8;
-    if (dataWidth > windowWidth)
-        dataWidth               = windowWidth;
-    var topBrowse           = document.getElementById('topBrowse');
-    topBrowse.style.width   = dataWidth + "px";
-    var botBrowse               = document.getElementById('botBrowse');
-    if (botBrowse)
-        botBrowse.style.width   = dataWidth + "px";
-}		// onLoad
+}		// function onLoad
 
 /************************************************************************
- *  updateDisplay														*
+ *  function updateDisplay												*
  *																		*
- *  Take action when the user changes a main selection, so the display		*
- *  should be updated.														*
+ *  Take action when the user changes a main selection, so the display	*
+ *  should be updated.													*
  *																		*
  *  Input:																*
- *		$this				instance of <select >								*
+ *		$this			instance of <select >							*
  ************************************************************************/
 function updateDisplay()
 {
     this.form.submit();
-}		// updateDisplay
+}		// function updateDisplay
 
 /************************************************************************
- *  changeCode																*
+ *  function changeCode													*
  *																		*
- *  Take action when the user changes the domain code.						*
- *  Ensure that the change is applied to the record for the currently		*
+ *  Take action when the user changes the domain code.					*
+ *  Ensure that the change is applied to the record for the currently	*
  *  selected language, and not the English record which may				*
  *  be currently displayed as a default value for another language		*
  *																		*
  *  Input:																*
- *		$this				instance of <input name='Code...'>				*
+ *		$this			instance of <input name='Code...'>				*
  ************************************************************************/
 function changeCode()
 {
@@ -156,18 +146,18 @@ function changeCode()
     var	code		= name.substring(4);
     this.form.elements['Lang' + code].value	= language;
     changeElt(this);
-}		// changeCode
+}		// function changeCode
 
 /************************************************************************
- *  changeName																*
+ *  function changeName													*
  *																		*
- *  Take action when the user changes the domain name.						*
- *  Ensure that the change is applied to the record for the currently		*
+ *  Take action when the user changes the domain name.					*
+ *  Ensure that the change is applied to the record for the currently	*
  *  selected language, and not the English record which may				*
  *  be currently displayed as a default value for another language		*
  *																		*
  *  Input:																*
- *		$this				instance of <input name='Name...'>				*
+ *		$this			instance of <input name='Name...'>				*
  ************************************************************************/
 function changeName()
 {
@@ -176,17 +166,17 @@ function changeName()
     var	code		= name.substring(4);
     this.form.elements['Lang' + code].value	= language;
     changeElt(this);
-}		// changeName
+}		// function changeName
 
 /************************************************************************
- *  deleteDomain														*
+ *  function deleteDomain												*
  *																		*
- *  When a Delete button is clicked this function removes the				*
+ *  When a Delete button is clicked this function removes the			*
  *  row from the table, and sets up values to cause the submit to		*
- *  delete the record from the table.
+ *  delete the record from the table.                                   *
  *																		*
  *  Input:																*
- *		$this				<button type=button id='Delete....'				*
+ *		$this			<button type=button id='Delete....'				*
  ************************************************************************/
 function deleteDomain()
 {
@@ -203,16 +193,16 @@ function deleteDomain()
 						  "<input type='hidden' name='Name" + code +
 						  "' id='Name" + code + "' value=''></td>\n";
     return false;
-}		// deleteDomain
+}		// function deleteDomain
 
 /************************************************************************
- *  showCounties														*
+ *  function showCounties												*
  *																		*
  *  When a Counties button is clicked this function displays the		*
- *  edit dialog for the list of counties in a domain.						*
+ *  edit dialog for the list of counties in a domain.					*
  *																		*
  *  Input:																*
- *		$this				<button type=button id='Edit....'				*
+ *		$this			<button type=button id='Edit....'				*
  ************************************************************************/
 function showCounties()
 {
@@ -221,16 +211,16 @@ function showCounties()
     window.open('CountiesEdit.php?Domain=' + domain,
 				'_blank');
     return false;
-}		// showCounties
+}		// function showCounties
 
 /************************************************************************
- *  addDomain																*
+ *  function addDomain													*
  *																		*
  *  When the Add Domain button is clicked this function adds a row		*
  *  into the table.														*
  *																		*
  *  Input:																*
- *		$this				<button type=button id='Add'>						*
+ *		$this			<button type=button id='Add'>					*
  ************************************************************************/
 function addDomain()
 {
@@ -242,7 +232,7 @@ function addDomain()
     var	newRow		= createFromTemplate(template,
 									     parms,
 									     null);
-    var	table		= document.getElementById("dataTbl");
+    var	table		= document.getElementById("dataTable");
     var	tbody		= table.tBodies[0];
     tbody.appendChild(newRow);
 
@@ -253,4 +243,4 @@ function addDomain()
     codeElt.onchange	= changeCode;
 
     return false;
-}		// addDomain
+}		// function addDomain

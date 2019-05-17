@@ -45,7 +45,7 @@ require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
 require_once __NAMESPACE__ . "/County.inc";
 require_once __NAMESPACE__ . "/Language.inc";
-require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
@@ -63,9 +63,9 @@ $lang		    		= 'en';
 if (count($_GET) > 0)
 {                   // parameters passed
 	$parmsText      		= "<p class='label'>\$_GET</p>\n" .
-	                            "<table class		='summary'>\n" .
-	                            "<tr><th class		='colhead'>key</th>" .
-	                            "<th class		='colhead'>value</th></tr>\n";
+	                            "<table class='summary'>\n" .
+	                            "<tr><th class='colhead'>key</th>" .
+	                            "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{			    // loop through all input parameters
 	    $parmsText                  .= "<tr><th class='detlabel'>$key</th>" .
@@ -235,7 +235,8 @@ if (strlen($msg) == 0)
             $high                           = $result[$i]['high'];
             $low                            = $result[$i]['low'];
             $count                          = $high - $low + 1;
-            if ($high > $highest)
+            if ($high > $highest &&
+                ($highest == 0 || $high < ($highest + 2000) || $high < ($low + 2000)))
                 $highest                    = $high;
             if ($low < $lowest)
                 $lowest                     = $low;

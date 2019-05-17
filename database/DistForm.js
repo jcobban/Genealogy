@@ -130,16 +130,6 @@ function onLoad()
 		    actMouseOverHelp(link);
     }			// loop through all links
 
-    var dataTable               = document.getElementById('dataTbl');
-    var dataWidth               = dataTable.offsetWidth;
-    var windowWidth             = document.body.clientWidth - 8;
-    if (dataWidth > windowWidth)
-        dataWidth               = windowWidth;
-    var topBrowse               = document.getElementById('topBrowse');
-    topBrowse.style.width       = dataWidth + "px";
-    var botBrowse               = document.getElementById('botBrowse');
-    if (botBrowse)
-        botBrowse.style.width   = dataWidth + "px";
 }		// onLoad
 
 /************************************************************************

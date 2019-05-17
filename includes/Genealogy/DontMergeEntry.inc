@@ -37,6 +37,7 @@ use \Iterator;
  *		2017/10/30		complete migration to prepared statements		*
  *		2017/12/18		add support for temporary fields				*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/05/06      add method offsetExists                         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -183,7 +184,7 @@ class DontMergeEntry extends Record
 
 		    // invoke constructor of base class
 		    parent::__construct($dbrow,
-							'tblDM');
+							    'tblDM');
 
 		    // diagnostic output if debug is set
 		    $this->dump('DontMergeEntry Record constructed:');
@@ -257,10 +258,12 @@ class DontMergeEntry extends Record
      ********************************************************************/
     function get($field)
     {
+        global  $warn;
+
 		$fieldLc	= strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
-		    $fieldLc	= self::$translate[$fieldLc];
-		switch(strtolower($field))
+            $fieldLc	= self::$translate[$fieldLc];
+		switch($fieldLc)
 		{			// act on specific field names
 		    case 'idirleft':
 		    {
@@ -353,10 +356,130 @@ class DontMergeEntry extends Record
 		    }			// right.deathdate
 
 		    default:
-		    {		// other fields
-				return parent::get($fieldLc);
+            {		// other fields
+                if (substr($fieldLc, 0, 5) == 'left.')
+                {
+				    $indiv	= $this->getPersonLeft();
+                    if ($indiv->offsetExists(substr($fieldLc, 5)))
+				        return $indiv->get(substr($fieldLc, 5));
+                }
+                else
+                if (substr($fieldLc, 0, 6) == 'right.')
+                {
+				    $indiv	= $this->getPersonRight();
+                    if ($indiv->offsetExists(substr($fieldLc, 6)))
+				        return $indiv->get(substr($fieldLc, 6));
+                }
+                else
+                if (substr($fieldLc, 0, 1) == 'l')
+                {
+                    $indiv	= $this->getPersonLeft();
+                    if ($indiv->offsetExists(substr($fieldLc, 1)))
+				        return $indiv->get(substr($fieldLc, 1));
+                }
+                else
+                if (substr($fieldLc, 0, 1) == 'r')
+                {
+				    $indiv	= $this->getPersonRight();
+                    if ($indiv->offsetExists(substr($fieldLc, 1)))
+				        return $indiv->get(substr($fieldLc, 1));
+                }
+
+			    return parent::get($fieldLc);
 		    }		// other fields
 		}			// act on specific field names
     }		// DontMergeEntry::get
+
+    /********************************************************************
+     *	function DontMergeEntry::offsetExists							*
+     *																	*
+     *	Part of the implementation of the interface ArrayAccess.		*
+     *	Returns true if the field name is in use in either the record	*
+     *	or the array of temporary fields.								*
+     *	    isset($record[$field]);										*
+     *																	*
+     *	Parameters:														*
+     *	    $field		field name.  This is case insensitive and can	*
+     *					be either an actual field name or a synonym		*
+     *					defined by class::$translate.  It can also		*
+     *					be a temporary field name for the life of		*
+     *					this object.									*
+     ********************************************************************/
+    public function offsetExists($field)
+    {
+        global  $warn;
+
+		$fieldLc	= strtolower($field);
+		if (array_key_exists($field, static::$translate))
+		    $fieldLc	= static::$translate[$fieldLc];
+		switch($fieldLc)
+		{			// act on specific field names
+		    case 'idirleft':
+		    case 'idirright':
+		    case 'surname':
+		    case 'lsurname':
+		    case 'left.surname':
+		    case 'givenname':
+		    case 'lgivenname':
+		    case 'left.givenname':
+		    case 'birthdate':
+		    case 'lbirthdate':
+		    case 'left.birthdate':
+		    case 'deathdate':
+		    case 'ldeathdate':
+		    case 'left.deathdate':
+		    case 'rsurname':
+		    case 'right.surname':
+		    case 'rgivenname':
+		    case 'right.givenname':
+		    case 'rbirthdate':
+		    case 'right.birthdate':
+		    case 'rdeathdate':
+		    case 'right.deathdate':
+		    {		// other fields
+				return true;
+            }		// other fields
+
+		    default:
+            {		// other fields
+                if (substr($fieldLc, 0, 5) == 'left.')
+                {
+				    $indiv	= $this->getPersonLeft();
+                    if ($indiv->offsetExists(substr($fieldLc, 5)))
+				        return true;
+                }
+                else
+                if (substr($fieldLc, 0, 6) == 'right.')
+                {
+				    $indiv	= $this->getPersonRight();
+                    if ($indiv->offsetExists(substr($fieldLc, 6)))
+				        return true;
+                }
+                else
+                if (substr($fieldLc, 0, 1) == 'l')
+                {
+                    $indiv	= $this->getPersonLeft();
+                    if ($indiv->offsetExists(substr($fieldLc, 1)))
+				        return true;
+                }
+                else
+                if (substr($fieldLc, 0, 1) == 'r')
+                {
+				    $indiv	= $this->getPersonRight();
+                    if ($indiv->offsetExists(substr($fieldLc, 1)))
+				        return true;
+                }
+
+                if (array_key_exists($fieldLc, $this->extras))
+                    return true;
+                else
+                {
+                    $warn   .= "<p>DontMergeEntry::offsetExists: field='$field', fieldLc='$fieldLc' not found</p>\n";
+                    return false;
+                }
+            }
+		}			// act on specific field names
+    }		// public function DontMergeEntry::offsetExists
+
 
 }		// class DontMergeEntry 

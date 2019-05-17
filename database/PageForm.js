@@ -183,13 +183,13 @@ function onLoad()
     }			// loop through all forms
 
     // enable support for hiding and revealing columns
-    var dataTbl		= document.getElementById("dataTbl");
-    var tblHdr		= dataTbl.tHead;
-    var tblHdrRow	= tblHdr.rows[0];
+    var dataTable		= document.getElementById("dataTable");
+    var tblHdr		    = dataTable.tHead;
+    var tblHdrRow	    = tblHdr.rows[0];
     for(i = 0; i < tblHdrRow.cells.length; i++)
     {		// loop through all cells of header row
-		var th		= tblHdrRow.cells[i];
-		th.onclick	= columnClick;
+		var th		    = tblHdrRow.cells[i];
+		th.onclick	    = columnClick;
     }		// loop through all cells of header row
 
 }		// onLoad

@@ -194,7 +194,7 @@ if (strlen($msg) == 0)
 <?php
 	}		// debug enabled
 ?>
-  <table class="form" id="dataTbl">
+  <table class="form" id="dataTable">
 <!--- Put out the column headers -->
 <thead>
   <tr id="hdrRow">

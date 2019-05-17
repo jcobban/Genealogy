@@ -61,7 +61,7 @@ pageTop(array(
 			'/genCountry.php?cc=CA'	=> 'Canada',
 			'/Canada/genProvince.php?Domain=CAON'
 							=> 'Ontario',
-			'/Ontario/OcfaQuery.html'
+			'/Ontario/OcfaQuery.php'
 							=> 'New OCFA Query'));
 ?>
 <div class='body'>

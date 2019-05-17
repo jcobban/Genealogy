@@ -629,6 +629,8 @@ function select()
 						var idmr	= val;
 						var	childTable	=
 						    callerDoc.getElementById('children');
+                        if (childTable == null)
+                           alert("chooseIndivid.js: 633 childTable is null, callerDoc="+callerDoc);
 						var	gender	= option.className;
 						var	parms	= {
 									'idir'	: idir,

@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+
 /************************************************************************
  *  BirthRegResponse.php												*
  *																		*
@@ -106,7 +108,7 @@ require_once __NAMESPACE__ . "/County.inc";
 require_once __NAMESPACE__ . "/Birth.inc";
 require_once __NAMESPACE__ . "/BirthSet.inc";
 require_once __NAMESPACE__ . "/Language.inc";
-require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 /************************************************************************
@@ -546,8 +548,6 @@ if (strlen($msg) == 0)
 {		// no error messages
     if ($expand && $regnum > 0)
     {
-        $warn   .= "<p>BirthRegResponse.php: " . __LINE__ .
-                " regnum=$regnum</p>\n";
         $getParms['regnum']	= array($regnum, ':' . ($regnum + $limit - 1));
     }
 

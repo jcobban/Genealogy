@@ -105,45 +105,8 @@
 	      Noms de famille avec le même Soundex '$SOUNDEX'
 	  </a>
     </p>
-    <p class="label">
-	  $COUNT Personnes ont le même Nom de Famille '$SURNAME'.
-    </p>
-  <!--- Put out a line with links to previous and next section of table -->
-  <div class="center" id="showActualCount" >
-    <span class="left" id="npPrevFront">
-	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$PREV&limit=$LIMIT" id="prenpprev">
-	&lt;---
-	</a>
-    </span>
-    <span class="right" id="npNextFront">
-	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$NEXT&limit=$LIMIT" id="prenpnext">
-	    ---&gt;
-	</a>
-    </span>
-      <span id="respdescrows">
-      Afficher $ACTUALCOUNT à partir du décalage $OFFSET.
-      </span>
-    <div style="clear: both;"></div>
-  </div> <!-- left and right arrow links -->
-    <p id="showActualCount" class="label">
-    </p>
-    <p id="deletedUnused" class="label">
-      Enregistrement non utilisé pour le nom '$SURNAME' supprimé
-    </p>
-    <!--- Put out the response as a table -->
-    <table id="namesTable">
-    <!--- Put out the column headers -->
-	  <tr id="row">
-	      <td class="button" id="entry">
-	  		<a href="/FamilyTree/Person.php?idir=$IDIR"
-	  		   id="show$IDIR"
-	  		    class="$GENDER">
-	  		    $NAME
-	  		</a>
-	      </td>
-	  </tr>
-    </table>
     <hr>	<!-- start of blog section of page -->
+    <h3>Blogs</h3>
     <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
 	  enctype="multipart/form-data">
         <div id="blogEntry">
@@ -186,6 +149,45 @@
     </button>
     </div>
     </form> <!-- name="blogform" id="blogform" -->
+    <hr>	<!-- start of blog section of page -->
+    <p class="label">
+	  $COUNT Personnes ont le même Nom de Famille '$SURNAME'.
+    </p>
+  <!--- Put out a line with links to previous and next section of table -->
+  <div class="center" id="showActualCount" >
+    <span class="left" id="npPrevFront">
+	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$PREV&limit=$LIMIT" id="prenpprev">
+	&lt;---
+	</a>
+    </span>
+    <span class="right" id="npNextFront">
+	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$NEXT&limit=$LIMIT" id="prenpnext">
+	    ---&gt;
+	</a>
+    </span>
+      <span id="respdescrows">
+          Noms $FIRST à $LAST de $COUNT
+      </span>
+    <div style="clear: both;"></div>
+  </div> <!-- left and right arrow links -->
+    <p id="showActualCount" class="label">
+    </p>
+    <p id="deletedUnused" class="label">
+      Enregistrement non utilisé pour le nom '$SURNAME' supprimé
+    </p>
+    <!--- Put out the response as a table -->
+    <table id="namesTable">
+    <!--- Put out the column headers -->
+	  <tr id="row">
+	      <td class="button" id="entry">
+	  		<a href="/FamilyTree/Person.php?idir=$IDIR"
+	  		   id="show$IDIR"
+	  		    class="$GENDER">
+	  		    $NAME
+	  		</a>
+	      </td>
+	  </tr>
+    </table>
   </div> <!-- class="body" -->
   <div class="hidden" id="templates">
 	<span id="missing">Liste des Personnes Manquantes Paramètre de Nom de Famille</span>

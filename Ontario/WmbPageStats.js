@@ -58,8 +58,8 @@ function showStatus()
 {
     var	form	= this.form;
     var	volume	= form.Volume.value;
-    location	= "WmbDoQuery.php?Offset=0&Count=25&Volume=" + volume +
-				  "&Page=" + this.id.substring(15);
+    location	= "/Ontario/WmbResponse.php?Offset=0&Count=25&Volume=" +
+                    volume + "&Page=" + this.id.substring(15);
     return false;	// suppress default action
 }		// showStatus
 

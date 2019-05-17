@@ -177,7 +177,7 @@ function addDialog()
 {
     var	form		= this.form;
     var	line		= this.id.substring(3);
-    var	table		= document.getElementById("dataTbl");
+    var	table		= document.getElementById("dataTable");
     var	tbody		= table.tBodies[0];
     var	domain		= form.Domain.value;
     var	county		= form.County.value;

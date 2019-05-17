@@ -1,0 +1,142 @@
+<!--*********************************************************************
+ *  BirthRegStatsen.html												*
+ *																		*
+ *  Layout for display statistics about the transcription of birth      *
+ *  registrations in English.                                           *
+ *																		*
+ *  History:															*
+ *		2018/10/06  created                                             *
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/Canada/BirthRegQuery.css">
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=fr">
+	    Généalogie
+      </a>:
+      <a href='/Canada/CountriesEdit.php?lang=fr'>
+	    Liste des Pays Soutenus
+      </a>:
+      <a href="/genCountry.php?code=$CC&lang=fr">
+    		$COUNTRYNAME</a>:
+      <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=fr" id="stateCrumb">
+    		$STATENAME</a>:
+  	  <a href="BirthRegQuery.php?domain=$domain&amp;lang=fr">
+	    Nouvelle requête
+	  </a>:
+    </div>
+    <div class='body'>
+      <h1>$DOMAINNAME: Statut d'Enregistrement de Naissance
+        <span class='right'>
+    	  <a href='BirthRegStatsHelpfr.html' target='_blank'>Aide?</a>
+        </span>
+        <span style='clear: both;'></span>
+      </h1>
+        $TRACE
+        $MSG
+    
+      <form id='display' action='donothing.php' method='get'>
+        <!--- Put out the response as a table -->
+        <table class='details' id="dataTable">
+          <!--- Put out the column headers -->
+          <thead>
+    		<tr id="thRow">
+    		  <th class='colhead'>
+    		    Année
+    		  </th>
+    		  <th class='colhead'>
+    		    Fait
+    		  </th>
+    		  <th class='colhead'>
+    		    Lié
+    		  </th>
+    		  <th class='colhead'>
+    		    Regarder
+    		  </th>
+    		  <th>
+    		  </th>
+    		  <th class='colhead'>
+    		    Année
+    		  </th>
+    		  <th class='colhead'>
+    		    Fait
+    		  </th>
+    		  <th class='colhead'>
+    		    Lié
+    		  </th>
+    		  <th class='colhead'>
+    		    Regarder
+    		  </th>
+    		  <th>
+    		  </th>
+    		  <th class='colhead'>
+    		    Année
+    		  </th>
+    		  <th class='colhead'>
+    		    Fait
+    		  </th>
+    		  <th class='colhead'>
+    		    Lié
+    		  </th>
+    		  <th class='colhead'>
+    		    Regarder
+    		  </th>
+    		  <th>
+    		  </th>
+    		  <th class='colhead'>
+    		    Année
+    		  </th>
+    		  <th class='colhead'>
+    		    Fait
+    		  </th>
+    		  <th class='colhead'>
+    		    Lié
+    		  </th>
+    		  <th class='colhead'>
+    		    Regarder
+    		  </th>
+    		</tr>
+          </thead>
+          <tbody>
+            <tr id="dataRow">
+              <!-- repeated as many times as the header -->
+    		  <td class='$YEARCLASS'>
+    		      $REGYEAR
+    		  </td>
+    		  <td class='$YEARCLASS' style="min-width: 50px;">
+    		      $COUNT
+    		  </td>
+    		  <td class='$PCTLINKED' style="min-width: 50px;">
+    		      $LINKED
+    		  </td>
+    		  <td class='center'>
+    		      <button type='button'
+    					id='YearStats$DOMAIN$REGYEAR'>
+    				View
+    		      </button>
+    		  </td>
+            </tr>
+          </tbody>
+          <tfoot>
+    		<tr>
+    		  <td class='right'>
+    		    Totaux
+    		  </td>
+    		  <td class='dataright'>
+    		      $TOTAL
+    		  </td>
+    		  <td class='dataright'>
+    		      $TOTALLINKED
+    		  </td>
+    		</tr>
+          </tfoot>
+        </table>
+      </form>
+    </div> <!-- end of <div id='body'> -->
+	<div class='balloon' id='HelpYearStats'>
+	    Cliquez sur ce bouton pour afficher la répartition géographique
+        de la transcription pour l'année spécifique.
+	</div>
+	<script src="/jscripts/http.js" type="text/javascript"></script>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/Canada/BirthRegStats.js" type="text/javascript"></script>

@@ -12,6 +12,56 @@ use \Iterator;
  *  This class provides access to the information in a row				*
  *  of the table Births.												*
  *																		*
+ *	CREATE TABLE `Births` (                                             *
+ *		`B_RegDomain`			VARCHAR(4) NOT NULL DEFAULT 'CAON',		*
+ *		`B_RegYear`			    INT(11) NOT NULL,					    *
+ *		`B_RegNum`			    INT(11) NOT NULL,					    *
+ *		`B_RegCounty`           CHAR(3) DEFAULT NULL,					*
+ *		`B_RegTownship`			VARCHAR(64) DEFAULT NULL,				*
+ *		`B_MsVol`			    INT(4) DEFAULT '0',					    *
+ *		`B_Surname`			    VARCHAR(32) DEFAULT NULL,				*
+ *		`B_SurnameSoundex`      CHAR(4) DEFAULT NULL,					*
+ *		`B_GivenNames`			VARCHAR(48) DEFAULT NULL,				*
+ *		`B_Sex`                 CHAR(1) DEFAULT NULL,					*
+ *		`B_BirthPlace`			VARCHAR(128) DEFAULT NULL,				*
+ *		`B_BirthDate`			VARCHAR(16) DEFAULT NULL,				*
+ *		`B_CalcBirth`           DATE DEFAULT NULL,					    *
+ *		`B_ParentsMarried`      CHAR(1) DEFAULT NULL,					*
+ *		`B_FatherName`			VARCHAR(48) DEFAULT NULL,				*
+ *		`B_FatherOccupation`	VARCHAR(32) DEFAULT NULL,				*
+ *		`B_FatherOccPlace`		VARCHAR(128) DEFAULT NULL,				*
+ *		`B_MotherName`			VARCHAR(48) DEFAULT NULL,			    *
+ *		`B_MotherOccupation`	VARCHAR(32) DEFAULT NULL,				*
+ *		`B_MotherOccPlace`		VARCHAR(128) DEFAULT NULL,				*
+ *		`B_FormerHusband`		VARCHAR(48) DEFAULT NULL,			    *
+ *		`B_MarriagePlace`		VARCHAR(128) DEFAULT NULL,				*
+ *		`B_MarriageDate`		VARCHAR(16) DEFAULT NULL,			    *
+ *		`B_Accoucheur`			VARCHAR(48) DEFAULT NULL,			    *
+ *		`B_Informant`			VARCHAR(48) DEFAULT NULL,			    *
+ *		`B_InformantRes`		VARCHAR(128) DEFAULT NULL,			    *
+ *		`B_InformantRel`		VARCHAR(16) DEFAULT NULL,			    *
+ *		`B_RegDate`			    VARCHAR(16) DEFAULT NULL,			    *
+ *		`B_Remarks`             LONGTEXT,					            *
+ *		`B_Image`			    VARCHAR(256) DEFAULT NULL,			    *
+ *		`B_IDIR`			    INT(10) UNSIGNED DEFAULT NULL,			*
+ *		`B_ChangedBy`			VARCHAR(64) NOT NULL DEFAULT '',		*
+ *		`B_ChangeDate`          DATE DEFAULT NULL,					    *
+ *		`B_Registrar`			VARCHAR(128) NOT NULL DEFAULT '',		*
+ *		`B_OriginalVolume`		VARCHAR(16) DEFAULT NULL,				*
+ *		`B_OriginalPage`		INT(11) DEFAULT NULL,					*
+ *		`B_OriginalItem`		INT(11) DEFAULT NULL,					*
+ *		PRIMARY KEY (`B_RegDomain`,					                    *
+ *		             `B_RegYear`,					                    *
+ *		             `B_RegNum`),					                    *
+ *		KEY `B_RegCounty`   (`B_RegCounty`),					        *
+ *		KEY `B_RegTownship` (`B_RegTownship`),					        *
+ *		KEY `B_Surname`     (`B_Surname`),					            *
+ *		KEY `B_SurnameSoundex` (`B_SurnameSoundex`),					*
+ *		KEY `B_GivenNames`  (`B_GivenNames`),					        *
+ *		KEY `B_IDIR`        (`B_IDIR`),					                *
+ *		KEY `B_ChangeDate`  (`B_ChangeDate`) )					        *
+ *		ENGINE=InnoDB DEFAULT CHARSET=utf8 					            *
+ *                                                                      *
  *  History:															*
  *		2014/01/14		created											*
  *		2014/01/18		default b_parentsMarried to 'Y'					*
@@ -41,8 +91,9 @@ use \Iterator;
  *		                support passing instance of Domain              *
  *		                do not throw exceptions from constructor        *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/04/18      support method getLastSqlCmd                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -59,13 +110,6 @@ require_once __NAMESPACE__ . '/Domain.inc';
 
 class Birth extends Record
 {
-    /********************************************************************
-     *	Birth::$defaultOrder											*
-     *																	*
-     *	Default sort order for query response by class RecordSet		*
-     ********************************************************************/
-    static	$defaultOrder	= 'B_RegDomain, B_RegYear, B_RegNum';
-
     /********************************************************************
      *	Birth::$initRow													*
      *																	*
@@ -109,6 +153,20 @@ class Birth extends Record
 				'b_idir'				=> 0,
 				'b_changedby'			=> '',
 				'b_changedate'			=> '');
+
+    /********************************************************************
+     *	Birth::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'Births',
+                'name'      => 'Births',
+                'prime'	    => array('b_regdomain','b_regyear','b_regnum'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 34,
+                'order'     => 'B_RegDomain, B_RegYear, B_RegNum',
+                'classname' => 'Birth');
 
     /********************************************************************
      *		Birth::$translate												*
@@ -307,22 +365,22 @@ class Birth extends Record
 				$this->msg		.= "Birth::__construct: registration number '$number' must be a positive integer. ";
 
 		    // search for an existing record matching the key
-		    $query	= "SELECT * FROM Births 
-							WHERE B_RegDomain=:domain AND 
-								B_RegYear=:year AND
-								B_RegNum=:number";
-		    $stmt	                        = $connection->prepare($query);
+		    $query	            = "SELECT * FROM Births 
+            							WHERE B_RegDomain=:domain AND 
+			            					  B_RegYear=:year AND
+						            		  B_RegNum=:number";
+		    $stmt	            = $connection->prepare($query);
 		    
 		    // query the database
-            $sqlparms	= array('domain'        => $domain, 
-                                'year'          => $year, 
-                                'number'        => $number);
-		    if ($stmt->execute($sqlparms))
+            $sqlParms	        = array('domain'        => $domain, 
+                                        'year'          => $year, 
+                                        'number'        => $number);
+			$queryText	        = debugPrepQuery($query, $sqlParms);
+            $this->lastSqlCmd   = $queryText;
+		    if ($stmt->execute($sqlParms))
 		    {		        // successful query
 				if ($debug)
-                    $warn .= '<p>' .
-                            debugPrepQuery($query, $sqlparms) . 
-                             "</p>\n";
+                    $warn .= "<p>$queryText</p>\n";
 
 				$result	        = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				if (count($result) > 0)
@@ -352,8 +410,10 @@ class Birth extends Record
 							       ' ORDER BY B_RegNum DESC' .
 							       ' LIMIT 1';
 
-				    $stmt	= $connection->prepare($queryPrev);
-				    if ($stmt->execute($sqlparms))
+				    $stmt	            = $connection->prepare($queryPrev);
+			        $queryText	        = debugPrepQuery($queryPrev, $sqlParms);
+                    $this->lastSqlCmd   = $queryText;
+				    if ($stmt->execute($sqlParms))
 				    {		// successful query
 						if ($debug)
                             $warn .= '<p>' .
@@ -407,16 +467,15 @@ class Birth extends Record
 				    else
 				    {		// error issuing query
                         $this->msg		.= "Birth::__construct: '" .
-                                debugPrepQuery($queryPrev, $sqlparms) . "' " .
+                                debugPrepQuery($queryPrev, $sqlParms) . "' " .
 							    print_r($stmt->errorInfo(),true) . '. ';
 				    }		// error issuing query
 				}		    // create new record
 		    }			    // successful query
 		    else
 		    {			    // error performing query
-                $this->msg		.= "Birth::__construct: '" .
-                                    debugPrepQuery($query, $sqlparms) . "' " .
-							    print_r($stmt->errorInfo(),true) . '. ';
+                $this->msg		.= "Birth::__construct: '$queryText' " .
+							        print_r($stmt->errorInfo(),true) . '. ';
 		    }			    // error performing query
 		}			        // build from database query
 		else
@@ -433,7 +492,7 @@ class Birth extends Record
         $this->dump('Birth Record constructed:');
 
         $msg                .= $this->msg;
-    }		// Birth::__construct
+    }		// function Birth::__construct
 
     /********************************************************************
      *	function Birth::getDefaultPlace									*
@@ -481,7 +540,7 @@ class Birth extends Record
 		    $dftPlace	= $regTownship . ', ' .
 							 $countyName . $addrEnd;
 		return $dftPlace;
-    }		// Death::getDefaultPlace
+    }		// function Birth::getDefaultPlace
 
     /********************************************************************
      *	function Birth:set												*
@@ -610,347 +669,42 @@ class Birth extends Record
 				return parent::set($fieldLc, $value);
 		    }
 		}		            // act on specific field
-    }		// Birth::set
+    }		// function Birth::set
 
     /********************************************************************
-     *	function Birth::save											*
+     *	function Birthd::save											*
      *																	*
-     *	Save changes made to the Birth record into the database.		*
+     *  Save changes made to the Birth record into the	database.		*
      *																	*
-     *	Parameters:														*
+     *  Parameters:														*
      *	    $xml		if true diagnostic output is emitted in XML		*
-     *					format within <cmd> tags.						*
      *					if a string use it as tag name					*
+     *																	*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method updated the database record		*
+     *	    0			if the database did not need to be updated		*
+     *																	*
+     *  Throws:															*
+     *	    exception if user is not authorized to update the database	*
      ********************************************************************/
     function save($xml)
     {
 		global	$debug;
 		global	$warn;
-		global	$msg;
 		global	$userid;
-		global	$connection;
 
-        // report errors detected by constructor and suppress update
-        if (strlen($this->msg)> 0)
-        {                       // errors detected by constructor 
-            $warn   .= "<p>Birth::save: " . __LINE__ .
-                " Request to update the " .  get_class($this).
-                " record ignored because of errors detected when the record was created. '" . $this->msg . 
-                "'</p>\n";
+        if ($this->needInsert || count($this->changed) > 0)
+        {                   // record needs to be saved
+			// get current date 
+			$now		    = getdate();
+            parent::set('b_changedby', $userid);
+            parent::set('b_changedate', 
+                        $now['year'] . '-' .  $now['mon'] . '-' . $now['mday']);
+            parent::save($xml);
+        }                   // record needs to be saved
+        else
             return 0;
-        }                       // errors detected by constructor 
-
-		if (is_string($xml))
-		{	            	// string tag name
-		    $tagname			= $xml;
-		    $xml			= true;
-		}	            	// string tag name
-		else
-		if ($xml)
-		{		            // true
-		    $tagname			= 'cmd';
-		}		            // true
-
-		if ($this->needInsert)
-		{		            // create new record
-		    $fldnames			= '';
-		    $comma			= '';
-		    $values			= '';
-		    $sqlParms			= array();
-		    foreach($this->row as $fld => $value)
-		    {
-				switch($fld)
-				{
-				    case 'b_surnamesoundex':
-				    {
-						$fldnames	.= $comma . "`B_SurnameSoundex`"; 
-						$surname	= $this->row['b_surname'];
-						if (is_null($surname) || (strlen($surname) == 0))
-						{
-						    $values			.= $comma . ':surname';
-						    $sqlParms['surname']	= '';
-						}
-						else
-						{
-						    $values			.= $comma .
-									"LEFT(SOUNDEX(:surname), 4)";
-						    $sqlParms['surname']	= $surname;
-						}
-						$comma	= ", ";
-						break;
-				    }		// B_Surname
-
-				    case 'b_changedby':
-				    {
-						$fldnames		.= $comma . "`$fld`"; 
-						$values			.= $comma . ':userid';
-						$sqlParms['userid']	= $userid;
-						$comma			= ", ";
-						break;
-				    }		// B_Userid
-
-				    case 'b_changedate':
-				    {
-						$fldnames	.= $comma . "`$fld`"; 
-						$values		.= $comma . 'CURDATE()';
-						$comma		= ", ";
-						break;
-				    }		// B_ChangeDate
-
-				    case 'b_idir':
-				    case 'b_originalpage':
-				    case 'b_originalitem':
-				    {		// most fields
-						$fldnames		.= $comma . "`$fld`";
-						$shortFld		= substr($fld, 2);
-						$values			.= $comma . ':' . $shortFld;
-						if (is_int($value) || ctype_digit($value))
-						    $sqlParms[$shortFld]= $value;
-						else
-						    $sqlParms[$shortFld]= null;
-						$comma			= ', ';
-						break;
-				    }		// most fields
-
-				    default:
-				    {
-						$fldnames		.= $comma . "`$fld`"; 
-						$shortFld		= substr($fld, 2);
-						$values	.= $comma . ':' . $shortFld;
-						$sqlParms[$shortFld]	= $value;
-						$comma			= ", ";
-						break;
-				    }		// most fields
-				}		    // act on specific fields
-		    }		        // loop through all fields in record
-
-		    // construct the SQL INSERT command	
-		    // insert the new record into the database
-            $insert	= "INSERT INTO Births ($fldnames) VALUES($values)";
-		    $stmt	= $connection->prepare($insert);
-            $insertText     = debugPrepQuery($insert, $sqlParms);
-		    if ($stmt->execute($sqlParms))
-		    {		        // successful insert
-				$count		= $stmt->rowCount();
-				if ($xml)
-				    print "<$tagname result='$count'>$insert" . 
-						    "</$tagname>\n";
-
-				if ($debug)
-				    $warn	.= "<p>$insert</p>\n" .
-							   "<p>" . print_r($sqlParms, true) . "</p>\n" .
-							   "<p>count=$count</p>\n";
-
-				$this->changed		= array();	// reset
-				$this->needInsert	= false;
-
-				// log the update
-				logSqlUpdate($insert,
-						     $sqlParms,
-						     0,		// compound key
-						     '',
-						     json_encode($this->row));
-		    }		        // successful insert
-		    else
-		    {		        // error inserting record
-				print "<p>Birth::save: '$insert', " .
-							    print_r($sqlParms,true) .
-                                print_r($stmt->errorInfo(),true) . "</p>\n";
-                if (strlen($insertText) > 800)
-                    $insertText = substr($insertText, 0, 597) . '...' .
-                                  substr($insertText, -200);
-				throw new Exception("Birth::save: '$insertText', " .
-							    print_r($stmt->errorInfo(),true));
-		    }		        // error inserting record
-		}		            // create new record
-		else
-		{		            // update existing record
-		    $update		= "UPDATE Births SET ";
-		    $set		= '';
-		    $comma		= '';
-		    $sqlParms		= array();
-		    foreach($this->changed as $fld => $value)
-		    {
-				switch($fld)
-				{		    // act on specific fields
-				    case 'b_surname':
-				    {		// surname changed
-						$set			.= $comma .
-									    "`B_Surname`=:surname";
-						$set			.= ",`B_SurnameSoundex`="; 
-						if (is_null($value) || (strlen($value) == 0))
-						{
-						    $set			.= "''";
-						    $sqlParms['surname']	= '';
-						}
-						else
-						{
-						    $set	.= "LEFT(SOUNDEX(:surname), 4)";
-						    $sqlParms['surname']	= $value;
-						}
-						$comma	= ", ";
-						break;
-				    }		// B_Surname
-
-				    case 'b_changedby':
-				    case 'b_changedate':
-				    {
-						break;
-				    }		// B_ChangedBy, B_ChangeDate
-
-				    case 'b_idir':
-				    case 'b_originalpage':
-				    case 'b_originalitem':
-				    {		// most fields
-						$shortFld		= substr($fld, 2);
-						$set			.= $comma . "`$fld`=:$shortFld";
-						if (is_int($value) || ctype_digit($value))
-						{
-						    $sqlParms[$shortFld]= $value;
-						}
-						else
-						{
-						    $sqlParms[$shortFld]= null;
-						}
-						$comma	= ', ';
-						break;
-				    }		// most fields
-
-				    default:
-				    {		// most fields
-						$shortFld		= substr($fld, 2);
-						$set			.= $comma . "`$fld`=:$shortFld";
-						$sqlParms[$shortFld]	= $value;
-						$comma			= ', ';
-						break;
-				    }		// most fields
-				}		    // act on specific fields
-		    }		        // loop through all changed fields in record
-
-		    $this->changed	= array();	// reset
-
-		    if (strlen($set) > 0)
-		    {		        // changes made
-				$set			.= ',B_ChangedBy=:userid';
-				$sqlParms['userid']	= $userid;
-				$set			.= ',B_ChangeDate=CURDATE()';
-
-				// construct the where clause
-				$where		= 'B_RegDomain=:domain' . 
-						' AND B_RegYear=:regyear AND B_RegNum=:regnum';
-				$sqlParms['domain']	= $this->row['b_regdomain'];
-				$sqlParms['regyear']	= $this->row['b_regyear'];
-				$sqlParms['regnum']	= $this->row['b_regnum'];
-
-				// assemble the UPDATE command
-				$update		.= $set . ' WHERE ' . $where;
-
-				// perform the update
-				$stmt		= $connection->prepare($update);
-				$updateText	= debugPrepQuery($update, $sqlParms);
-				if ($stmt->execute($sqlParms))
-				{		    // successful update
-				    $count		= $stmt->rowCount();
-				    if ($xml)
-						print "<$tagname count='$count'>" .
-							$updateText . "</$tagname>\n";
-
-				    if ($debug)
-				    {
-						$warn	.= "<p>$updateText</p>\n";
-						$warn	.= "<p>Updated $count records</p>\n";
-				    }
-
-				    // log the update
-				    logSqlUpdate($update,
-							 $sqlParms,
-							 0,	// compound key
-							 json_encode($this->former),
-							 $this->toJson(false));
-				}		// successful update
-				else
-				{		// error updating record
-				    throw new Exception("Birth::save:
-								'$updateText', " .
-								print_r($stmt->errorInfo(),true));
-				}		// error updating record
-		    }		    // changes made
-		}	        	// update existing record
-    }		// Birth::save
-
-    /********************************************************************
-     *	function Birth::delete											*
-     *																	*
-     *	Delete the database record associated with this instance.		*
-     *																	*
-     *	Input:															*
-     *	    $xml		if true emit XML								*
-     *					if a string emit XML using as tag name			*
-     *																	*
-     *	Returns:														*
-     *	    false		if the method was unable to update the database	*
-     *	    1			if the method deleted the database record		*
-     *	    0			if the record did not need to be deleted		*
-     ********************************************************************/
-    function delete($xml=false)
-    {
-		global	$debug;
-		global	$warn;
-		global	$msg;
-		global	$connection;
-
-		// handle XML output option
-		if (is_string($xml))
-		    $xmltag	= $xml;
-		else
-		if ($xml)
-		{
-		    $xml	= true;
-		    $xmltag	= 'cmd';
-		}
-
-		// delete the record if it is in the database
-		if (!$this->needInsert)
-		{	        	// existing record in database
-		    $domain	= $this->row['b_regdomain'];
-		    $year	= $this->row['b_regyear'];
-		    $number	= $this->row['b_regnum'];
-		    $parms	= array($domain, $year, $number);
-		    $delete	= "DELETE FROM Births WHERE" .
-							' B_RegDomain=? AND B_RegYear=? AND B_RegNum=?';
-		    $stmt	= $connection->prepare($delete);
-		    if ($stmt->execute($parms))
-		    {	    	// successful delete
-				$count		= $stmt->rowCount();
-				if ($xml)
-				    print "<$xmltag count='$count'>$delete</$xmltag>\n";
-
-				// log the update
-				logSqlUpdate($delete,
-						     '',
-						     0,
-						     $this->toJson(false),
-						     '');
-
-				// update the memory copy of the record to reflect that it
-				// no longer represents a database record
-				$this->needInsert	= true;
-
-				return $count;	// number of records deleted
-		    }		    // successful delete
-		    else
-		    {		    // error updating record
-				print "<p>'$delete': " .
-						print_r($parms, true) . "</p>\n";
-				print "<p class='message'>" .
-						print_r($stmt->errorInfo(),true) . 
-						    "</p>\n";
-				return false;
-		    }	    	// error updating record
-		}       		// existing record in database
-
-		// record never written to database
-		return 0;	// nothing to delete
-    }		// Birth::delete
+    }       // function Birth::save
 
 }		// class Birth 

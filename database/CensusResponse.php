@@ -136,7 +136,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
 require_once __NAMESPACE__ . '/Page.inc';
 require_once __NAMESPACE__ . '/CensusLineSet.inc';
@@ -589,7 +589,7 @@ if (strlen($msg) == 0)
             $dist_id                = $district;
         if (!is_null($dist_id) && $dist_id != 0)
         {
-            $getParms['d_id']   	= $district;
+            $getParms['d_id']   	= $dist_id;
             $districtObj	        = new District($getParms);
             $province		        = $districtObj->get('d_province');
         }
@@ -844,27 +844,27 @@ if ($showLine && $page)
 
     if (strlen($npPrev) > 0)
     {
-		$template->updateTag('npPrevFront', 
+		$template->updateTag('topPrev', 
 						     array('npPrev' => "$npuri&$npPrev"));
-		$template->updateTag('npPrevBack', 
+		$template->updateTag('botPrev', 
 						     array('npPrev' => "$npuri&$npPrev"));
     }
     else
     {
-		$template->updateTag('npPrevFront', null);
-		$template->updateTag('npPrevBack', null);
+		$template->updateTag('topPrev', null);
+		$template->updateTag('botPrev', null);
     }
     if (strlen($npNext) > 0)
     {
-		$template->updateTag('npNextFront',
+		$template->updateTag('topNext',
 						     array('npNext' => "$npuri&$npNext"));
-		$template->updateTag('npNextBack', 
+		$template->updateTag('botNext', 
 						     array('npNext' => "$npuri&$npNext"));
     }
     else
     {
-		$template->updateTag('npNextFront', null);
-		$template->updateTag('npNextBack', null);
+		$template->updateTag('topNext', null);
+		$template->updateTag('botNext', null);
     }
 
     // update the popup for explaining the action taken by arrows

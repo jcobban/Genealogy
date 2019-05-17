@@ -72,6 +72,7 @@
 *		2019/03/29      do not alter marital status based on informant  *
 *		                occupation                                      *
 *		                if informant is undertaker update undertaker    *
+*		2019/04/12      loosen syntax for age                           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -627,13 +628,15 @@ function changeFatherName()
  ************************************************************************/
 function changeAge()
 {
+    var	rey		= /^[[a-zA-Z ]*(([0-9½]+)\s*([a-zA-Z]*|))(.*)/;
+
     // expand abbreviations
     expAbbr(this,
 		    this.abbrTbl);
 
     // replace 1/2 with symbol ½
     var	form		= this.form;
-    var age		= form.Age.value.replace('1/2','½');
+    var age		    = form.Age.value.replace('1/2','½');
     form.Age.value	= age;
 
     this.checkfunc();	// validate
@@ -645,107 +648,92 @@ function changeAge()
 		age		= age.toLowerCase();
 
 		// extract the components of the age
-		var num		= 0;
-		var days	= 0;
-		var weeks	= 0;
-		var months	= 0;
-		var years	= 0;
+        var years, months, weeks, days, hours, t;
+        years       = 0;
+        months      = 0;
+        weeks       = 0;
+        days        = 0;
+        hours       = 0;
 
-		for(var i = 0; i < age.length; i++)
-		{
-		    var	c	= age.charAt(i);
-		    switch(c)
-		    {		// act on character
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9':
-				{		// numeric digit
-				    num		= (num * 10) + (c - '0');
-				    break;
-				}		// numeric digit
-
-				case '½':
-				{		// half
-				    num		+= 0.5;
-				    break;
-				}		// half
-
-				case ' ':
-				case '\t':
-				{		// space delimiter of value
-				    if (num > 0)
-				    {	// accumulating a number
-						years		= num;
-						num		= 0;
-				    }	// accumulating a number
-				    break;
-				}		// space
-
-				case 'y':
-				{		// year delimiter
-				    if (num > 0)
-				    {	// accumulating a number
-						years		= num;
-						num		= 0;
-				    }	// accumulating a number
-				    break;
-				}		// year delimiter
-
-				case 'm':
-				{		// month delimiter
-				    if (num > 0)
-				    {	// accumulating a number
-						months		= num;
-						num		= 0;
-				    }	// accumulating a number
-				    break;
-				}		// month delimiter
-
-				case 'd':
-				{		// day delimiter
-				    if (num > 0)
-				    {	// accumulating a number
-						days		= num;
-						num		= 0;
-				    }	// accumulating a number
-				    break;
-				}		// day delimiter
-
-				case 'w':
-				{		// week delimiter
-				    if (num > 0)
-				    {	// accumulating a number
-						weeks		= num;
-						num		= 0;
-				    }	// accumulating a number
-				    break;
-				}		// week delimiter
-
-				case 'h':
-				{		// hours delimiter
-				    if (num > 0)
-				    {	// accumulating a number
-						days		= Math.floor((num + 12)/24);
-						num		= 0;
-				    }	// accumulating a number
-				    break;
-				}		// hours delimiter
-
-		    }
-		}		// scan the age
-
-		if (num > 0)
-		{	// accumulating a number at end of value
-		    years	= num;
-		    num		= 0;
-		}	// accumulating a number
+        var results         = rey.exec(age);
+        if (results)
+        {
+            years           = getNumeric(results[2]);
+            if (results[3].length > 0) 
+                t       = results[3].substring(0,1).toLowerCase();
+            else
+                t       = 'y';
+            if (t == 'y')
+            {
+                var rest            = results[4];
+                results             = rey.exec(rest);
+                if (results)
+                {
+                    months          = getNumeric(results[2]);
+                    if (results[3].length > 0)
+                        t   = results[3].substring(0,1).toLowerCase();
+                    else
+                        t   = 'm';
+                    if (t == 'm')
+                    {
+                        rest                = results[4];
+                        results             = rey.exec(rest);
+                        if (results)
+                        {
+                            days    = getNumeric(results[2]);
+                            if (results[3].length > 0)
+                            {
+                                var t   = results[3].substring(0,1).toLowerCase();
+                                if (t == 'd')
+                                {
+                                }
+                                if (t == 'w')
+                                {
+                                    weeks       = days;
+                                    days        = 0;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    if (t == 'w')
+                    {
+                        weeks       = months;
+                        months      = 0;
+                    }
+                    else
+                    if (t == 'd')
+                    {
+                        days        = months;
+                        months      = 0;
+                    }
+                }
+            }               // first number is year
+            else
+            if (t == 'm')
+            {
+                months      = years;
+                years       = 0;
+            }
+            else
+            if (t == 'w')
+            {
+                weeks       = years;
+                years       = 0;
+            }
+            else
+            if (t == 'd')
+            {
+                days        = years;
+                years       = 0;
+            }
+            else
+            if (t == 'h')
+            {
+                hours       = years;
+                years       = 0;
+            }
+        }
 
 		// include the number of weeks and any fractional portion of
 		// the months in the days portion
@@ -753,19 +741,20 @@ function changeAge()
 		//	"1½m" is interpreted as 1m15d
 		//	"1½w" is interpreted as 10d
 		//	"1½y" is interpreted as 1y6m
-		days	= Math.floor(days + 7 * weeks +
-							30 * (months - Math.floor(months)));
-		months	= Math.floor(months +
-							12 * (years - Math.floor(years)));
-		years	= Math.floor(years);
+		days	            = Math.floor(days + 7 * weeks +
+							    30 * (months - Math.floor(months)));
+		months	            = Math.floor(months +
+							    12 * (years - Math.floor(years)));
+		years	            = Math.floor(years);
 
 		// extract the components of the death date
-		var deathDate	= form.elements["Date"].value.toLowerCase();
-		var day		= 0;
-		var month	= 0;
-		var name	= "";	// name of month
-		var year	= 0;
+		var deathDate	    = form.elements["Date"].value.toLowerCase();
+		var day		        = 0;
+		var month	        = 0;
+		var name	        = "";	// name of month
+		var year	        = 0;
 
+        var num             = 0;
 		for(var i = 0; i < deathDate.length; i++)
 		{
 		    var	c	= deathDate.charAt(i);

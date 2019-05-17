@@ -5,6 +5,9 @@ use \Exception;
 use \ArrayAccess;
 use \Countable;
 use \Iterator;
+use Templating\Template;
+use Templating\TemplateTag;
+
 /************************************************************************
  *  Picture.inc															*
  *																		*
@@ -129,11 +132,14 @@ use \Iterator;
  *		                and extend toHtml so that immediate display     *
  *		                is suppressed and the method always returns     *
  *		                the generated HTML as a string                  *
+ *		2019/02/18      change template name for displaying picture     *
+ *		2019/04/15      replace is_a with instanceof                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/	
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 
 /************************************************************************
  *  class Picture														*
@@ -1156,7 +1162,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
      ********************************************************************/
     function setDate($newvalue)
     {
-		if (is_a($newvalue, 'LegacyDate'))
+		if ($newvalue instanceof LegacyDate)
 		{	// parameter is an instance of LegacyDate
 		    $date	= $value;
 		}	// parameter is an instance of LegacyDate
@@ -1672,13 +1678,12 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
      ********************************************************************/
     function toHtml($template   = true)
     {
-        if (!class_exists(__NAMESPACE__ . '\\Template'))
-            require __NAMESPACE__ . "/Template.inc";
+        global $document_root;
 
         if (is_bool($template))
         {
             $tempBase		= $document_root . '/templates/';
-            $template		= new Template($tempBase . 'PictureDefault.html');
+            $template		= new Template($tempBase . 'PictureDefaulten.html');
             $print          = $template;
         }
         else
@@ -1705,6 +1710,10 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
 		    case Picture::PIC_TYPE_PICTURE:
             {		// an image file
                 $element    = $template->getElementById('pictureTemplate');
+                if (is_null($element))
+                {
+                    print \Templating\escape($template->getRawTemplate());
+                }
                 $picTemp    = new Template($element->outerHTML());
 		        $picTemp->set('PICNAMEURL', $picNameUrl);
 		        $picTemp->set('PICCAPTION', $picCaption);

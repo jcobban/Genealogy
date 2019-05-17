@@ -1,7 +1,11 @@
 <?php
-namespace Genealogy;
+namespace CoffeeShop;
 use \PDO;
 use \Exception;
+use \Genealogy/Blog;
+use \Genealogy/User;
+use \Genealogy/Language;
+
 /************************************************************************
  *  Account.php															*
  *																		*
@@ -13,10 +17,10 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/Blog.inc';
-require_once __NAMESPACE__ . '/User.inc';
-require_once __NAMESPACE__ . '/Language.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once 'Genealogy/Blog.inc';
+require_once 'Genealogy/User.inc';
+require_once 'Genealogy/Language.inc';
+require_once __NAMESPACE__ . '/CsTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
     // common
@@ -196,7 +200,7 @@ require_once __NAMESPACE__ . '/common.inc';
     }		// invoked by submit from previous invocation
 
     $coffBase		= $document_root . '/CoffeeShop/';
-    $template		= new FtTemplate("Account$lang.html", true);
+    $template		= new CsTemplate("Account$lang.html", true);
 
     $template->set('USERID',		$userid);
     $template->set('EMAIL',		    $email);

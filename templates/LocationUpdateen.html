@@ -8,6 +8,7 @@
  *  History:															*
  *		2018/11/02		created                                         *
  *		                pass authentication key to GoogleApis           *
+ *      2019/04/10      display Search Name and County Name             *
  *																	    *
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
@@ -32,49 +33,67 @@
     </h1>
     $TRACE
     $MSG 
-  <form name="locForm" id="locForm" action="updateLocation.php" method="post">
-    <div class="row" id="idlrRow">
-	<label class='column1' for='idlr'>
-	    IDLR:
-	</label>
-	<input type="text" name="idlr" id="idlr" readonly="readonly"
-		class='black white rightnc' style='width: 8em;'
-		value="$IDLR">
-	<input type="hidden" name="debug" id="debug" value="$DEBUG">
-      <div style='clear: both;'></div>
-    </div>
-    <div class="row" id="locationRow">
-	<label class='column1' for='Location'>
-	    Location:
-	</label>
-	<input type="text" name="Location" id="Location" size="64"
-		class='white leftnc'
-		value="$LOCATION"
-		>
-	<input type="hidden" name="searchName" id="searchName" 
-		value="$SEARCHNAME">
-      <div style='clear: both;'></div>
-    </div>
-    <div class="row" id="shortNameRow">
-	<label class='column1' for='ShortName'>
-	    Short&nbsp;Name:
-	</label>
-	<input type="text" name="ShortName" id="ShortName" size="64"
-		class='white leftnc'
-		value="$SHORTNAME"
-		>
-      <div style='clear: both;'></div>
-    </div>
-    <div class="row" id="sortedLocationRow">
-	<label class='column1' for='SortedLocation'>
-	    Sort Key:
-	</label>
-	<input type="text" name="SortedLocation" id="SortedLocation"
-		size='64' class='white leftnc'
-		value="$SORTEDLOC"
-		>
-      <div style='clear: both;'></div>
-    </div>
+    <form name="locForm" id="locForm" action="updateLocation.php" method="post">
+      <div class="row" id="idlrRow">
+      <label class='column1' for='idlr'>
+          IDLR:
+      </label>
+      <input type="text" name="idlr" id="idlr" readonly="readonly"
+          class='black white rightnc' style='width: 8em;'
+          value="$IDLR">
+      <input type="hidden" name="debug" id="debug" value="$DEBUG">
+        <div style='clear: both;'></div>
+      </div>
+      <div class="row" id="locationRow">
+      <label class='column1' for='Location'>
+          Location:
+      </label>
+      <input type="text" name="Location" id="Location" size="64"
+          class='white leftnc'
+          value="$LOCATION"
+          >
+      <input type="hidden" name="searchName" id="searchName" 
+          value="$SEARCHNAME">
+        <div style='clear: both;'></div>
+      </div>
+      <div class="row" id="shortNameRow">
+      <label class='column1' for='ShortName'>
+          Short&nbsp;Name:
+      </label>
+      <input type="text" name="ShortName" id="ShortName" size="64"
+          class='white leftnc'
+          value="$SHORTNAME"
+          >
+        <div style='clear: both;'></div>
+      </div>
+      <div class="row" id="sortedLocationRow">
+        <label class='column1' for='SortedLocation'>
+          Sort Key:
+        </label>
+        <input type="text" name="SortedLocation" id="SortedLocation"
+          size='64' class='white leftnc'
+          value="$SORTEDLOC"
+          >
+        <div style='clear: both;'></div>
+      </div>
+      <div class="row" id="searchNameRow">
+	      <label class="column1" for="SearchName">
+	        Search Name:
+	      </label>
+	      <input type="text" name="SearchName" id="SearchName"
+	                size="64" class="ina leftnc"
+	                value="$SEARCHNAME" readonly="readonly">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="countyNameRow">
+	      <label class="column1" for="CountyName">
+	        County Name:
+	      </label>
+	      <input type="text" name="CountyName" id="CountyName"
+	                size="64" class="ina leftnc"
+	                value="$COUNTY" readonly="readonly">
+        <div style="clear: both;"></div>
+      </div>
     <div class="row" id="fsPlaceIdRow">
 	<label class='column1' for='FSPlaceId'>
 	    FS Place Id:
@@ -117,15 +136,15 @@
 	        Preposition:
 	    </label>
 	    <input type="text" name="Preposition" id="Preposition"
-    		style='width: 8em;' class='white leftnc'
-    		value="$PREPOSITION" 
-    		>
+            style='width: 8em;' class='white leftnc'
+            value="$PREPOSITION" 
+            >
       </div>
       <div class='column1'>
-    	<label class='column1' for='Zoom'>Zoom:</label>
-    	<input type="text" name="Zoom" id="Zoom"
-    		size='3' class='white right'
-    		value="$ZOOM">
+        <label class='column1' for='Zoom'>Zoom:</label>
+        <input type="text" name="Zoom" id="Zoom"
+            size='3' class='white right'
+            value="$ZOOM">
       </div>
 	  <div style='clear: both;'></div>
     </div><!-- id="prepZoomRow" -->
@@ -221,8 +240,8 @@
 	  <label class='label' for='DupIdlr$DUPIDLR'>
 	  </label>
 	  <input type='text' class='black white right' readonly='readonly'
-    		name='DupIdlr$DUPIDLR' id='DupIdlr$DUPIDLR' 
-    		value="$DUPIDLR">
+            name='DupIdlr$DUPIDLR' id='DupIdlr$DUPIDLR' 
+            value="$DUPIDLR">
       <div style='clear: both;'></div>
     </div><!-- class='row' id="duplicateRow" -->
     <div class='row' id='mergeRow'>

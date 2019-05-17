@@ -13,6 +13,8 @@
  *      2018/11/28      created                                         *
  *      2019/01/29      use menu button                                 *
  *      2019/02/05      remove rightTop button                          *
+ *      2019/04/14      add Facebook activation                         *
+ *      2019/05/03      use classes to style advert and facebook        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
@@ -25,16 +27,39 @@
             id="otherStylesheets">
   </head>
   <body>
+      
+<script>
+
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '2096433630426301',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v3.2'
+    });
+      
+    FB.AppEvents.logPageView();   
+      
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
     <header id="headSection">
       <div class="topcrumbs"> <!-- start of page header -->
     	<img src="/logo70.gif" id="logo" class="right"
                 height="70" width="70" alt="James Cobban Logo">
           &nbsp;
-        <span class="right" style="width: 360px;" id="facebookSpan">
+        <span class="facebook" id="facebookSpan">
       	  <iframe id='facebookFrame' class='facebook' $IECRAP>
       	  </iframe>
         </span>
-        <span class="right" style="width: 500px;" id="advertSpan">
+        <span class="advert" id="advertSpan">
           <iframe id='advertFrame' class='advert' $IECRAP src='$ADURL'>
           </iframe>
         </span>

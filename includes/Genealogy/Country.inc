@@ -28,6 +28,8 @@ use \Iterator;
  *		2018/01/01		improve diagnostics in constructor				*
  *						support short-hand constructor call				*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/05/18      add $info                                       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -43,22 +45,36 @@ require_once __NAMESPACE__ . '/Record.inc';
 class Country extends Record
 {
     /********************************************************************
-     *	Country::$defaultOrder											*
-     *																	*
-     *	Default sort order for query response by class RecordSet		*
-     ********************************************************************/
-    static $defaultOrder	= "`Name`";
-
-    /********************************************************************
      *	Country::$initRow												*
      *																	*
      *	Default initial row												*
      ********************************************************************/
     protected static $initRow	= array(
-				'code'			=> '',
-				'name'			=> '',
+				'code'			    => '',
+				'name'			    => '',  // English name
 				'dialingcode'		=> '',
-				'currency'		=> '');
+				'currency'		    => '');
+
+    /********************************************************************
+     *	Country::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     		=> 'Countries',
+                'name'      		=> 'Countries',
+                'prime'	    		=> 'code',
+	            'srvmg'     		=> false,
+	            'fldcount'			=> 6,
+                'order'     		=> 'Name',
+                'classname' 		=> 'Country');
+
+    /********************************************************************
+     *	Country::$defaultOrder											*
+     *																	*
+     *	Default sort order for query response by class RecordSet		*
+     ********************************************************************/
+    static $defaultOrder	= "`Name`";
 
     /********************************************************************
      *	Country::$translate												*
@@ -119,28 +135,31 @@ class Country extends Record
 						case 'cc':
 						case 'code':
 						{		// country
-						    $code		= $value;
-						    $where		.= $and . "Code=:code";
+                            $code		        = strtoupper($value);
+                            if ($code == 'UK')
+                                $code           = 'GB';
+						    $where		        .= $and . "Code=:code";
 						    $sqlParms['code']	= $value;
-						    $and		= ' AND ';
+						    $and		        = ' AND ';
 						    break;
 						}		// country
 
 				    }		// act on key fields
 				}			// loop through parameters
 
-				$query		= "SELECT * FROM Countries $where";
+				$query		        = "SELECT * FROM Countries $where";
 
 				// query the database
-				$stmt		= $connection->prepare($query);
-				$queryText	= debugPrepQuery($query, $sqlParms);
+				$stmt		        = $connection->prepare($query);
+				$queryText	        = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd   = $queryText;
 				if ($stmt->execute($sqlParms))
 				{		// success
 				    if ($debug)
-						$warn	.= "<p>Country::__construct: " . __LINE__ . 
+						$warn	    .= "<p>Country::__construct: " . __LINE__ . 
 							   " query='$queryText'</p>\n";
 
-				    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
+				    $result	        = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				    if (count($result) == 1)
 				    {		// existing record
 						$dbrow		= $result[0];
@@ -191,212 +210,25 @@ class Country extends Record
     }		// Country::__construct
 
     /********************************************************************
-     *	Country::save													*
-     *																	*
-     *	Save changes made to the Country record into the database.		*
-     *																	*
-     *	Parameters:														*
-     *	    $xml		if true diagnostic output is emitted in XML		*
-     *					format within <cmd> tags.						*
-     *					if a string use it as tag name					*
-     ********************************************************************/
-    function save($xml)
-    {
-		global	$debug;
-		global	$warn;
-		global	$userid;
-		global	$connection;
-
-		if (is_string($xml))
-		{		// string tag name
-		    $tagname	= $xml;
-		    $xml	= true;
-		}		// string tag name
-		else
-		if ($xml)
-		{		// true
-		    $tagname	= 'cmd';
-		}		// true
-
-		if ($this->needInsert)
-		{		// create new record
-		    $fldnames	= '';
-		    $comma	= '';
-		    $values	= '';
-		    $parms	= array();
-		    foreach($this->row as $fld => $value)
-		    {
-				$fldnames	.= $comma . "`$fld`";
-				$values		.= $comma . '?';
-				array_push($parms, $value);
-				$comma	= ", ";
-		    }		// loop through all fields in record
-
-		    // construct the SQL INSERT command	
-		    $insert	= "INSERT INTO Countries ($fldnames) VALUES($values)";
-
-		    // insert the new record into the database
-		    $stmt	= $connection->prepare($insert);
-		    if ($stmt->execute($parms) === false)
-		    {		// error inserting record
-				throw new Exception("Country::save:
-							    '$insert', " .
-							    print_r($stmt->errorInfo(),true));
-		    }		// error inserting record
-		    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
-		    $count	= count($result);
-		    if ($xml)
-				print "<$tagname result='$count'>" . xmlentities($insert) . 
-						"</$tagname>\n";
-		    if ($debug)
-		    {
-				$warn	.= "<p>$insert</p>\n";
-				$warn	.= "<p>count=$count</p>\n";
-		    }
-
-		    $this->changed	= array();	// reset
-		    $this->needInsert	= false;
-
-		    // log the update
-		    $this->log($insert,
-				       $parms);
-		}		// create new record
-		else
-		{		// update existing record
-		    $update		= "UPDATE Countries SET ";
-		    $set		= '';
-		    $comma		= '';
-		    $count		= 0;
-		    $parms		= array();
-		    foreach($this->changed as $fld => $value)
-		    {
-				$set	.= $comma . "`$fld`=?";
-				array_push($parms, $value);
-				$comma	= ', ';
-		    }		// loop through all fields in record
-		    $this->changed	= array();	// reset
-
-		    if (strlen($set) > 0)
-		    {		// changes made
-				// assemble the UPDATE command
-				$update		.= $set ." WHERE `Code`=?";
-				if ($this->former)
-				    array_push($parms, $this->former['code']);
-				else
-				    array_push($parms, $this->row['code']);
-
-
-				// perform the update
-				$stmt		= $connection->prepare($update);
-				if ($stmt->execute($parms) === false)
-				{		// error updating record
-				    throw new Exception("Country::save:
-								'$update', " .
-								print_r($stmt->errorInfo(),true));
-				}		// error updating record
-				$count		= $stmt->rowCount();
-				if ($xml)
-				    print "<$tagname count='$count'>" .
-							xmlentities($update) . "</$tagname>\n";
-				if ($debug)
-				    $warn	.= "<p>'$update' count=$count</p>\n";
-
-				// log the update
-				$this->log($update,
-						   $parms);
-		    }		// changes made
-		}		// update existing record
-		return $count;
-    }		// Country::save
-
-    /********************************************************************
-     *	Country::delete													*
-     *																	*
-     *	Delete the database record associated with this instance.		*
-     *																	*
-     *	Input:															*
-     *	    $xml		if true emit XML								*
-     *					if a string emit XML using as tag name			*
-     *																	*
-     *	Returns:														*
-     *	    false		if the method was unable to update the database	*
-     *	    1			if the method deleted the database record		*
-     *	    0			if the record did not need to be deleted		*
-     ********************************************************************/
-    function delete($xml=false)
-    {
-		global	$debug;
-		global	$warn;
-		global	$connection;
-
-		// handle XML output option
-		if (is_string($xml))
-		    $xmltag	= $xml;
-		else
-		if ($xml)
-		{
-		    $xml	= true;
-		    $xmltag	= 'cmd';
-		}
-
-		// to simplify expressions
-		if (!$this->needInsert)
-		{		// have existing record
-		    $code		= $this->row['code'];
-		    $delete		= "DELETE FROM Countries WHERE `Code`=:code";
-		    $sqlParms		= array('code'	=> $code);
-		    $sqlParmsText	= print_r($sqlParms, true);
-
-		    $stmt		= $connection->prepare($delete);
-		    if ($stmt->execute($sqlParms))
-		    {		// successful delete
-				$count		= $stmt->rowCount();
-				if ($xml)
-				    print "<$xmltag count='$count'>$delete</$xmltag>\n";
-				else
-				if ($debug)
-				    print "<p>$delete</p>\n<p>count='$count'</p>\n";
-
-				// log the update
-				$this->log($delete,
-						   $sqlParms);
-
-				// update the memory copy of the record to reflect that it
-				// no longer represents a database record
-				$this->needInsert	= true;
-
-				return $count;	// number of records deleted
-		    }		// successful delete
-		    else
-		    {		// error updating record
-				print "<p>query='$delete', parms=$sqlParmsText</p>\n";
-				print "<p class='message'>" .
-						print_r($stmt->errorInfo(),true) . 
-						"</p>\n";
-				return 0;
-		    }		// error updating record
-		}		// have key value
-
-		// record never written to database
-		return 0;	// nothing to delete
-    }		// Country::delete
-
-    /********************************************************************
      *	Country::getName												*
      *																	*
-     *	Convenience function for accessing the 'name' attribute.		*
+     *	Get the name of the country in a specified language.            *
+     *																	*
+     *	Input:															*
+     *		$language		2-char ISO language code					*
      *																	*
      *	Returns:														*
-     *	    Name of the county as a string.								*
+     *	    Name of the country as a string.							*
      ********************************************************************/
     function getName($options	= '')
     {
-		if (strlen($options) == 2)
+        if (is_string($options) && strlen($options) == 2 && 
+            strtolower($options) != 'en')
 		{
-		    $parms	= array('cc'	=> $this->row['code'],
-							'lang'	=> $options);
-		    $countryNameObj	= new CountryName($parms);
-		    return $countryNameObj->getName();
+		    $parms	        = array('cc'	=> $this->row['code'],
+							        'lang'	=> $options);
+		    $countryName	= new CountryName($parms);
+		    return $countryName->getName();
 		}
 		else
 		    return $this->row['name'];

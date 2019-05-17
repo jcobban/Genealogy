@@ -529,6 +529,9 @@ use \Exception;
  *		2018/12/07      eliminate infinite recursion in getBirthEvent   *
  *		                if debug requested                              *
  *		2019/01/03      name fields in Person obsolete                  *
+ *		2019/04/14      do not pass internal date string to LegacyDate  *
+ *		                prefixed by space                               *
+ *		2019/04/15      replace is_a with instanceof                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -767,6 +770,21 @@ class Person extends RecordPic
                 'fslinks'				=> '');
 
     /********************************************************************
+     *	Person::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'tblIR',
+                'name'      => 'Persons',
+                'prime'	    => 'idir',
+	            'srvmg'     => false,
+	            'fldcount'	=> 11,
+                'order'     => 'IDIR',
+                'classname' => 'Person');
+
+
+    /********************************************************************
      *	function Person::__construct									*
      *																	*
      *	Create an instance of the class Person from 					*
@@ -780,12 +798,11 @@ class Person extends RecordPic
      *					   create a new record.	 Or ...					*
      *					2) null to create a new empty record, or		*
      *					3) a database record presented as an array, or	*
-     *					4) instance of Child, or						*
-     *					5) value of a key specified by the second		*
+     *					4) value of a key specified by the second		*
      *					   parameter uniquely identifying the			*
      *					   individual.  This is deprecated in favor of	*
      *					   array($fldname, $value).  Or		...		 	*
-     *					6) 'new' to create a new empty record.			*
+     *					5) 'new' to create a new empty record.			*
      *					   This is deprecated in favor of option 1 or 2.*
      *	    $fldName	if $value is a key value the name of the		*
      *					database field to match it against:				*
@@ -794,7 +811,7 @@ class Person extends RecordPic
      *					 'id'	   auto-increment field, internal key	*
      *							   of tblIR								*
      *					 'userref' user assigned identifier				*
-     *					This is deprecated because option 5 is			*
+     *					This is deprecated because option 4 is			*
      *					deprecated.										*
      *																	*
      *	Example:														*
@@ -1345,6 +1362,12 @@ class Person extends RecordPic
      ********************************************************************/
     function getPriName()
     {
+        if (is_null($this->priName))
+        {
+            if ($this->row['idir'] == 0)
+                return null;        // avoid infinite recurstion
+            $this->priName          = new Name(array('idir' => $this));
+        }
         return $this->priName;
     }		// Person::getPriName
 
@@ -1361,8 +1384,12 @@ class Person extends RecordPic
      ********************************************************************/
     function setPriName($newName)
     {
-        $oldName            = $this->priName;
-        $this->priName      = $newName;
+        $oldName                = $this->priName;
+        if ($newName instanceof Name)
+            $this->priName      = $newName;
+        else
+            throw new Exception("Person::setPriName: invalid parameter " .
+                                print_r($newName, true));
         return $oldName;
     }		// Person::setPriName
 
@@ -1449,13 +1476,10 @@ class Person extends RecordPic
      ********************************************************************/
     function getSurname()
     {
-        if (is_null($this->priName))
-        {
-            if ($this->row['idir'] == 0)
-                return $this->row['surname'];   // prevent infinite recursion
-            $this->priName          = new Name(array('idir' => $this));
-        }
-        $retval	                    = $this->priName['surname'];
+        if (is_null($this->getPriName()))
+            $retval                 = $this->row['surname'];
+        else
+            $retval	                = $this->priName['surname'];
         if ($retval === null)
             return '';
         else
@@ -1475,12 +1499,8 @@ class Person extends RecordPic
      ********************************************************************/
     function setSurname($newname)
     {
-        if (is_null($this->priName))
-        {
-            if ($this->row['idir'] == 0)
-                return parent::set('surname', $newname);
-            $this->priName          = new Name(array('idir' => $this));
-        }
+        if (is_null($this->getPriName()))
+            return parent::set('surname', $newname);
 	    $oldsurname	            = $this->priName['surname'];
 	    if ($newname == $oldsurname)
 	        return $oldsurname;
@@ -1505,14 +1525,11 @@ class Person extends RecordPic
      *			the value of given name as a string						*
      ********************************************************************/
     function getGivenName()
-    {
-        if (is_null($this->priName))
-        {
-            if ($this->row['idir'] == 0)
-                return $this->row['givenname'];
-            $this->priName          = new Name(array('idir' => $this));
-        }
-        $retval	                    = $this->priName['givenname'];
+    { 
+        if (is_null($this->getPriName()))
+            $retval                 = $this->row['givenname'];
+        else
+            $retval	                = $this->priName['givenname'];
         if ($retval === null)
             return '';
         else
@@ -1532,32 +1549,25 @@ class Person extends RecordPic
      ********************************************************************/
     function setGivenName($newname)
     {
-        if (is_null($this->priName))
-        {
-            if ($this->row['idir'] == 0)
-                return parent::set('givenname', $newname);
-            else
-	            $this->priName          = new Name(array('idir' => $this));
-	        $oldname	                = $this->priName['givenname'];
-	        if ($newname == $oldname)
-	            return $oldname;
-	        $names		                = $this->getNames();
-	        foreach($names as $idnx => $nameRec)
-	        {		        // loop through all alternate name records
-	            if ($nameRec->get('order') <= 0 ||
-	                $nameRec->get('givenname') == $oldname)
-	            {		    // primary or married name or matches old given name
-	                $nameRec->set('givenname', $newname);
-	            }		    // primary or married name or matches old given name
-	        }	            // loop through all alternate name records
-	
-	        // ensure given name changed in all families
-	        $families	= $this->getFamilies();
-	        foreach($families as $idmr => $family)
-	            $family->setName($this);
-        }
-        else
-            $oldname        = $this->row['givenname'];
+        if (is_null($this->getPriName()))
+            return parent::set('givenname', $newname);
+        $oldname	                = $this->priName['givenname'];
+        if ($newname == $oldname)
+            return $oldname;
+        $names		                = $this->getNames();
+        foreach($names as $idnx => $nameRec)
+        {		        // loop through all alternate name records
+            if ($nameRec->get('order') <= 0 ||
+                $nameRec->get('givenname') == $oldname)
+            {		    // primary or married name or matches old given name
+                $nameRec->set('givenname', $newname);
+            }		    // primary or married name or matches old given name
+        }	            // loop through all alternate name records
+
+        // ensure given name changed in all families
+        $families	    = $this->getFamilies();
+        foreach($families as $idmr => $family)
+            $family->setName($this);
 
         parent::set('givenname', $newname);
         return $oldname;
@@ -1594,21 +1604,146 @@ class Person extends RecordPic
                                         ")::getName(\$tranTab)</p>\n";
         }
 
-        if (is_null($this->priName))
-        {
-	        if ($idir == 0)
-	        {                       // not initialized yet
-	            // no instances of Name created
-	            $givenname          = $this->row['givenname'];
-	            $surname            = $this->row['surname'];
-	            if (strlen($givenname) == 0 && strlen($surname) == 0)
-	                return "New Person";
+        if (is_null($this->getPriName()))
+        {                       // no instances of Name created
+	        $evBirth                = null;
+	        $evDeath                = null;
+			if (is_array($options) || $options instanceof TemplateTag)
+			{		// support being passed internationalization table
+			    $tranTab			= $options;
+			    $options			= self::NAME_INCLUDE_DATES;
+			}		// support being passed internationalization table
+			else
+			    $tranTab			= null;
+	
+	        if ($debug)
+	        {
+			    $warn			    .= "<p>Person(IDIR=" . $this->row['idir'] .
+	                                        ")::getName";
+	            if (is_null($tranTab))
+			        $warn			.= "($options)</p>\n";
 	            else
-	                return "$givenname $surname";
-	        }                       // not initialized yet
+			        $warn			.= "(\$tranTab)</p>\n";
+	        }
+	
+			$includeDates			= ($options & self::NAME_INCLUDE_DATES) != 0;
+			$includeLocs			= ($options & self::NAME_INCLUDE_LOCS) != 0;
+			$surnameFirst			= ($options & self::NAME_SURNAME_FIRST) != 0;
+	        $idir		    		= $this->row['idir'];
+			$prefix		    		= $this->row['prefix'];
+			$givenname	    		= $this->row['givenname'];
+			$surname	    		= $this->row['surname'];
+			$birth		    		= '';
+			$death		    		= '';
+			$suffix		    		= $this->row['title'];
+	
+			$evBirth			    = $this->getBirthEvent();
+	        $bprivlim               = $this->getBPrivLim();
+	        $dprivlim               = $this->getDPrivLim();
+	
+			if ($evBirth)
+	        {
+				$tbirth		        = $evBirth->getDate($bprivlim,
+	                                                    $tranTab);
+	            if ($tbirth == 'Private')
+	                return 'Private';
+            }
 
-            $this->priName          = new Name(array('idir' => $this));
-        }
+	        if (strlen($givenname) == 0 && strlen($surname) == 0)
+	            return "New Person";
+
+			$retval		            = '';
+			$space		            = '';
+	
+			if ($surnameFirst)
+			{			// Surname, Given Names
+			    $retval		        .= $surname;
+			    $retval		        .= ',';
+			    $space		        = ' ';
+	
+			    if (strlen($prefix) > 0)
+			    {
+					$retval		    .= $space . $prefix;
+					$space		    = ' ';
+			    }
+	
+			    if (strlen($givenname) > 0)
+			    {
+					$retval		    .= $space . $givenname;
+					$space		    = ' ';
+			    }
+	
+			    if (strlen($suffix) > 0)
+			    {
+					$retval		    .= $space . $suffix;
+			    }
+			}			// Surname, Given Names
+			else
+	        {			// Given Names Surname
+			    if (strlen($prefix) > 0)
+			    {
+					$retval		    .= $prefix;
+					$space		    = ' ';
+			    }
+	
+			    if (strlen($givenname) > 0)
+			    {
+					$retval		    .= $space . $givenname;
+					$space		    = ' ';
+			    }
+	
+			    if (strlen($surname) > 0)
+			    {
+					$retval		    .= $space . $surname;
+					$space		    = ' ';
+			    }
+	
+			    if (strlen($suffix) > 0)
+			    {
+					$retval		    .= $space . $suffix;
+			    }
+			}			// Given Names Surname
+	
+			// optionally include birth and death dates
+			if ($includeDates || $includeLocs)
+            {		// add dates
+                if ($tranTab)
+                    $at         = ' ' . $tranTab['at'] . ' ';
+                else
+                    $at         = ' at ';
+			    if ($evBirth)
+			    {
+					$birth		= $evBirth->getDate($bprivlim,
+	                                                $tranTab);
+					if ($includeLocs)
+					{	// include location name
+					    $loc	= $evBirth->getLocation();
+					    if ($loc->getIdlr() > 1)
+							$birth	.= $at . $loc->getName();
+					}	// include location name
+			    }
+			    else
+					$birth	= '';
+	
+			    $evDeath		= $this->getDeathEvent();
+			    if ($evDeath)
+			    {
+					$death		= $evDeath->getDate($dprivlim,
+												    $tranTab);
+					if ($includeLocs)
+					{	// include location name
+					    $loc	= $evDeath->getLocation();
+					    if ($loc->getIdlr() > 1)
+							$death	.= $at . $loc->getName();
+					}	// include location name
+			    }
+			    else
+					$death		    = '';
+	
+			    $retval	            .= $space . "($birth&#8212;$death)";
+            }		// add dates
+            return $retval;
+        }                       // not initialized yet
 
         return	$this->priName->getName($options);
     }		// function Person::getName
@@ -1624,8 +1759,8 @@ class Person extends RecordPic
     function getTreeName()
     {
         // ensure synchronized with Names table
-        if (is_null($this->priName))
-            $this->priName          = new Name(array('idir' => $this));
+        if (is_null($this->getPriName()))
+            return $this->row['treename'];
         if ($this->priName->isExisting())
             $this->treeName	        = $this->priName['treename'];
         return $this->treeName;
@@ -1693,11 +1828,10 @@ class Person extends RecordPic
 			case 'title':
             case 'userref':
             {                   // fields moved to Name
-                // $this->priName is set if initialization is complete
-                if ($this->priName)
-                    return $this->priName->row[$fieldLc];
-                else
+                if (is_null($this->getPriName()))
                     return $this->row[$fieldLc];
+                else
+                    return $this->priName->row[$fieldLc];
             }                   // fields moved to Name
 
             default:
@@ -2050,10 +2184,17 @@ class Person extends RecordPic
     private static function needDateObj($field, $value)
     {
         // validate and interpret new value
-        if (is_a($value, 'LegacyDate'))
+        if ($value instanceof LegacyDate)
         {	// parameter is an instance of LegacyDate
             $date	= $value;
         }	// parameter is an instance of LegacyDate
+        else
+        if (is_string($value) && 
+            (substr($value,0,1) == '0' || ctype_digit($value)) && 
+            strlen($value) == 18)
+        {	// convert internal value to instance of LegacyDate
+            $date	= new LegacyDate( $value);
+        }	// convert internal value to instance of LegacyDate
         else
         if (is_string($value) || is_int($value))
         {	// convert the value to instance of LegacyDate
@@ -2406,7 +2547,7 @@ class Person extends RecordPic
                 $event->get('eventsd') != -99999999)
             {                   // correct bad sort date
                 $this->set('birthsd', $event->get('eventsd'));
-                $this->save();
+                $this->save(false);
             }                   // correct bad sort date
         }
 

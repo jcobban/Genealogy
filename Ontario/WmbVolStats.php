@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+
 /************************************************************************
  *  WmbVolStats.php														*
  *																		*
@@ -14,143 +16,79 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-$title	= 'Ontario: Wesleyan Methodist Baptisms Status';
+$lang           = 'en';
 
-if (strlen($msg) == 0)
-{			// no errors
-	// execute the query
-	$query	= "SELECT Volume, COUNT(*), MAX(Page)" .
+// first extract the values of all supplied parameters
+$parmsText      = "<p class=\"label\">\$_GET</p>\n" .
+                        "<table class=\"summary\">\n" .
+                        "<tr><th class=\"colhead\">key</th>" .
+                        "<th class=\"colhead\">value</th></tr>\n";
+foreach ($_GET as $key => $value)
+{			    // loop through all parameters
+    $parmsText  .= "<tr><th class=\"detlabel\">$key</th>" .
+                         "<td class=\"white left\">$value</td></tr>\n"; 
+    switch(strtolower($key))
+    {		    // switch on parameter name
+
+        case 'lang':
+        {		// language requested
+            if (strlen($value) >= 2)
+                $lang       = strtolower(substr($value,0,2));
+            break;
+        }		// language requested
+    }		    // switch on parameter name
+}			    // loop through all parameters
+if ($debug)
+    $warn               .= $parmsText . "</table>\n";
+
+// execute the query
+$query	= "SELECT Volume, MAX(Page) as Pages, COUNT(*) as Done " .
 					" FROM MethodistBaptisms" .
 					" GROUP BY Volume ORDER BY Volume";
-	$stmt	 	= $connection->query($query);
-	if ($stmt)
-	{		// successful query
-	    $result	= $stmt->fetchAll(PDO::FETCH_NUM);
-	    if ($debug)
-			print "<p>$query</p>\n";
-	}		// successful query
-	else
-	{
-	    $msg	.= "query '$query' failed: " .
-					   print_r($connection->errorInfo(),true);
-	}		// query failed
-}			// no errors
-
-htmlHeader($title,
-	       array('/jscripts/default.js',
-			     '/jscripts/util.js',
-			     'WmbVolStats.js'));
-?>
-<body>
-<?php
-pageTop(array(
-			'/genealogy.php'	=> 'Genealogy',
-			'/genCountry.php?cc=CA'	=> 'Canada',
-			'/Canada/genProvince.php?Domain=CAON'
-							=> 'Ontario',
-			'/Ontario/WmbQuery.html'		=> 'New Wesleyan Methodist Baptisms Query'));
-?>
-<div class='body'>
-  <h1><?php print $title; ?>
-<span class='right'>
-	<a href='WmbVolStatsHelpen.html' target='_blank'>Help?</a>
-</span>
-<div style='clear: both;'></div>
-  </h1>
-<?php
-if (strlen($msg) > 0)
-{		// print error messages if any
-	print "<p class='message'>$msg</p>\n";
-}		// print error messages if any
+$stmt	 	        = $connection->query($query);
+if ($stmt)
+{		// successful query
+    $result	        = $stmt->fetchAll();
+    if ($debug)
+		print "<p>$query</p>\n";
+}		// successful query
 else
-{		// display results of query
-?>
-  <form name='statsForm'>
-<!--- Put out the response as a table -->
-<table class='form'>
-  <thead>
-	<!--- Put out the column headers -->
-	<tr>
-	  <th class='colhead1st'>
-	    Volume
-	  </th>
-	  <th class='colhead'>
-	    Pages
-	  </th>
-	  <th class='colhead'>
-	    Done
-	  </th>
-	  <th class='colhead'>
-	    View
-	  </th>
-	</tr>
-  </thead>
-  <tbody>
-<?php
-	    $columns		= 3;
-	    $total		= 0;
-	    foreach($result as $row)
-	    {
-			$volume		= $row[0];
-			$count		= $row[1];
-			$total		+= $count;
-?>
-	<tr>
-	  <td class='odd bold left first'>
-	    <?php print $volume; ?>
-	  </td>
-	  <td class='odd bold right'>
-	    <?php print number_format($row[2]); ?>
-	  </td>
-	  <td class='odd bold right'>
-	    <?php print number_format($count); ?>
-	  </td>
-	  <td>
-	    <button id='ShowVolStats<?php print $volume; ?>' type='button'>
-			View
-	    </button>
-	  </td>
-	</tr>
-<?php
-	    }		// process all rows
+{
+    $msg	        .= "query '$query' failed: " .
+                        print_r($connection->errorInfo(),true);
+    $result         = array();
+}		// query failed
 
-	    // insert comma into formatting of total
-	    $totallen	= strlen($total);
-	    if ($totallen > 6)
-			$total	= substr($total, 0, $totallen - 6) . ',' .
-					  substr($total, $totallen - 6, 3) . ',' .
-					  substr($total, $totallen - 3);
-	    else
-	    if ($totallen > 3)
-			$total	= substr($total, 0, $totallen - 3) . ',' .
-					  substr($total, $totallen - 3);
-?>
-  </tbody>
-  <tfoot>
-	<tr>
-	  <td class='odd bold right first'>
-	    Total
-	  </td>
-	  <td class='odd bold right'>
-	  </td>
-	  <td class='odd bold right'>
-	    <?php print $total; ?>
-	  </td>
-	</tr>
-  </tfoot>
-</table>
-  </form>
-<?php
-}		// display results of query
-?>
-</div>
-<?php
-pageBot();
-?>
-  <div id='HelpShowVolStats' class='balloon'>
-    Click on this button to show page level statistics for this volume.
-  </div>
-</body>
-</html>
+// get template
+
+$template               = new FtTemplate("WmbVolStats$lang.html");
+
+if (count($result) > 0)
+{
+    $dataRow            = $template['dataRow'];
+    $dataRowText        = $dataRow->outerHTML();
+    $data               = '';
+    $total		        = 0;
+    foreach($result as $row)
+    {
+		$volume		    = $row['volume'];
+        $count		    = $row['done'];
+        $pages          = $row['pages'];
+        $total		    += $count;
+        $rowTemplate    = new Template($dataRowText);
+        $rowTemplate['dataRow']->update(array('volume'  => $volume,
+                                              'count'   => number_format($count),
+                                              'pages'   => $pages));
+        $data           .= $rowTemplate->compile();
+    }
+    $dataRow->update($data);
+
+    $template['footRow']->update(array('total'      => number_format($total)));
+}
+else
+    $template['dataTable']->update(null);
+
+$template->display();

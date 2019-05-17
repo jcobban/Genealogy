@@ -16,6 +16,7 @@
  *		2016/01/06		passwords with < or > in them cause XML issues	*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/04/11      use common table pagination                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -23,10 +24,10 @@
 window.onload	= onLoadUserNames;
 
 /************************************************************************
- *  onLoadUserNames														*
+ *  function onLoadUserNames											*
  *																		*
  *  The onload method of the web page.  This is invoked after the		*
- *  web page has been loaded into the browser. 								*
+ *  web page has been loaded into the browser. 							*
  ************************************************************************/
 function onLoadUserNames()
 {
@@ -51,24 +52,34 @@ function onLoadUserNames()
 		    elt.onchange	= change;	// default handler
 
 		    if (elt.id.substring(0,'delete'.length) == 'delete')
-			elt.onclick	= deleteUserid;
+			    elt.onclick	= deleteUserid;
 		    else
 		    if (elt.id.substring(0,'reset'.length) == 'reset')
-			elt.onclick	= resetUserid;
+			    elt.onclick	= resetUserid;
 		    else
 		    if (elt.id.substring(0,'confirm'.length) == 'confirm')
-			elt.onclick	= confirmUserid;
+			    elt.onclick	= confirmUserid;
 		}	// loop through all elements
     }		// loop through all forms
-}		// onLoad
+
+    var dataTable           = document.getElementById('dataTable');
+    var dataWidth           = dataTable.offsetWidth;
+    var windowWidth         = document.body.clientWidth - 8;
+    if (dataWidth > windowWidth)
+        dataWidth           = windowWidth;
+    var topBrowse           = document.getElementById('topBrowse');
+    topBrowse.style.width   = dataWidth + "px";
+    var botBrowse           = document.getElementById('botBrowse');
+    botBrowse.style.width   = dataWidth + "px";
+}		// function onLoadNames
 
 /************************************************************************
- *  deleteUserid														*
+ *  function deleteUserid												*
  *																		*
- *  Delete the userid														*
+ *  Delete the userid													*
  *																		*
  *  Input:																*
- *		this		<button type='button' id='delete...'>						*
+ *		this		<button type='button' id='delete...'>				*
  ************************************************************************/
 function deleteUserid()
 {
@@ -83,7 +94,7 @@ function deleteUserid()
 }		// deleteUserid
 
 /************************************************************************
- *  gotDelete															*
+ *  function gotDelete													*
  *																		*
  *  This method is called when the response to the request to delete	*
  *  a user is received.													*
@@ -111,9 +122,9 @@ function gotDelete(xmlDoc)
 }	// gotDelete
 
 /************************************************************************
- *  noDelete																*
+ *  function noDelete													*
  *																		*
- *  This method is called if there is no response to the AJAX				*
+ *  This method is called if there is no response to the AJAX			*
  *  delete event request.												*
  ************************************************************************/
 function noDelete()
@@ -123,12 +134,12 @@ function noDelete()
 }	// noDelete
 
 /************************************************************************
- *  resetUserid																*
+ *  function resetUserid												*
  *																		*
- *  Reset the password of the userid										*
+ *  Reset the password of the userid									*
  *																		*
  *  Input:																*
- *		this		<button type='button' id='reset...'>						*
+ *		this		<button type='button' id='reset...'>				*
  ************************************************************************/
 function resetUserid()
 {
@@ -136,7 +147,7 @@ function resetUserid()
     var	newPassword	= randomPassword(10);
     var userid		= document.getElementById('User' + iu).value;
     var parms		= { "username" : userid,
-				    "password" : newPassword};
+					    "password" : newPassword};
     // update the password for the user
     HTTP.post("updateUserXml.php",
 		      parms,
@@ -146,14 +157,14 @@ function resetUserid()
 }		// resetUserid
 
 /************************************************************************
- *  randomPassword														*
+ *  function randomPassword												*
  *																		*
- *  Generate a random password.												*
- *  The selection of characters excludes the letters I and O, 				*
- *  lower case 'l', and the digits 1 and 0 to avoid misinterpretation.		*
+ *  Generate a random password.											*
+ *  The selection of characters excludes the letters I and O, 			*
+ *  lower case 'l', and the digits 1 and 0 to avoid misinterpretation.	*
  *																		*
  *  Input:																*
- *		len		number of characters in the resulting password				*
+ *		len		number of characters in the resulting password			*
  ************************************************************************/
 var	passwordAlphabet	=
 			"ABCDEFGHJKLMNPQRSTUVWXYZ" +
@@ -172,13 +183,13 @@ function randomPassword(len)
 }		// randomPassword
 
 /************************************************************************
- *  gotReset																*
+ *  function gotReset													*
  *																		*
  *  This method is called when the response to the request to reset		*
  *  the password for a user is received.								*
  *																		*
- *  Parameters:																*
- *		xmlDoc				reply as an XML document						*
+ *  Parameters:															*
+ *		xmlDoc			reply as an XML document						*
  ************************************************************************/
 function gotReset(xmlDoc)
 {
@@ -186,37 +197,37 @@ function gotReset(xmlDoc)
     var	root	= xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'update')
     {
-		var username	= '';
-		var password	= '';
-		var id		= '';
+		var username	        = '';
+		var password	        = '';
+		var id		            = '';
 		for (var i = 0; i < root.childNodes.length; i++)
-		{		// loop through all children
-		    var child	= root.childNodes[i];
+		{		        // loop through all children
+		    var child	        = root.childNodes[i];
 		    if (child.nodeName == 'parms')
 		    {
-			for (var j = 0; j < child.childNodes.length; j++)
-			{	// loop through all children
-			    var elt	= child.childNodes[j];
-			    if (elt.nodeName == 'username')
-				username	= elt.textContent;
-			    else
-			    if (elt.nodeName == 'password')
-				password	= elt.textContent;
-			}	// loop through all children
+				for (var j = 0; j < child.childNodes.length; j++)
+				{	    // loop through all children
+				    var elt	= child.childNodes[j];
+				    if (elt.nodeName == 'username')
+						username	= elt.textContent;
+				    else
+				    if (elt.nodeName == 'password')
+						password	= elt.textContent;
+				}	    // loop through all children
 		    }
 		    else
 		    if (child.nodeName == 'id')
 		    {
-			id	= child.textContent;
+			    id	            = child.textContent;
 		    }
-		}		// loop through all children
+		}		        // loop through all children
 		if (id.length > 0)
 		    popupAlert("Password for user '" + username +
-				"' reset to '" + password + "'",
+					"' reset to '" + password + "'",
 			       document.getElementById('reset' + id));
 		else
 		    alert("Password for user '" + username +
-				"' reset to '" + password + "'");
+					"' reset to '" + password + "'");
     }
     else
     {		// error
@@ -230,9 +241,9 @@ function gotReset(xmlDoc)
 }	// gotReset
 
 /************************************************************************
- *  noReset																*
+ *  function noReset													*
  *																		*
- *  This method is called if there is no response to the AJAX				*
+ *  This method is called if there is no response to the AJAX			*
  *  reset password request.												*
  ************************************************************************/
 function noReset()
@@ -242,12 +253,12 @@ function noReset()
 }	// noReset
 
 /************************************************************************
- *  confirmUserid														*
+ *  function confirmUserid												*
  *																		*
- *  Confirm the userid														*
+ *  Confirm the userid													*
  *																		*
  *  Input:																*
- *		this		<button type='button' id='confirm...'>						*
+ *		this		<button type='button' id='confirm...'>				*
  ************************************************************************/
 function confirmUserid()
 {
@@ -262,13 +273,13 @@ function confirmUserid()
 }		// confirmUserid
 
 /************************************************************************
- *  gotConfirm																*
+ *  function gotConfirm													*
  *																		*
- *  This method is called when the response to the request to confirm		*
- *  a user is received.														*
+ *  This method is called when the response to the request to confirm	*
+ *  a user is received.													*
  *																		*
- *  Parameters:																*
- *		xmlDoc				reply as an XML document						*
+ *  Parameters:															*
+ *		xmlDoc			reply as an XML document						*
  ************************************************************************/
 function gotConfirm(xmlDoc)
 {
@@ -290,9 +301,9 @@ function gotConfirm(xmlDoc)
 }	// gotConfirm
 
 /************************************************************************
- *  noConfirm																*
+ *  function noConfirm													*
  *																		*
- *  This method is called if there is no response to the AJAX				*
+ *  This method is called if there is no response to the AJAX			*
  *  confirm event request.												*
  ************************************************************************/
 function noConfirm()

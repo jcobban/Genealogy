@@ -154,7 +154,7 @@ function deleteVideo()
  ************************************************************************/
 function addVideo()
 {
-    var	table		= document.getElementById("details");
+    var	table		= document.getElementById("dataTable");
     var	tbody		= table.tBodies[0];
     var numRows		= tbody.rows.length;
     var	rowClass	= 'odd';

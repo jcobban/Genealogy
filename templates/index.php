@@ -12,7 +12,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . "/common.inc";
 
@@ -48,6 +48,20 @@ if (count($_GET) > 0)
 }	        	    // invoked by URL to display current status of account
 
 $template	    = new FtTemplate("templatesIndex$lang.html");
+
+$files          = scandir('.');
+$parm           = array();
+foreach ($files as $filename)
+{
+    if (is_dir($filename))
+        continue;
+    if (substr($filename, -4) != '.php' &&
+        substr($filename, 0, 1) != '.')
+    {
+        $parm[]     = array('name'      => $filename);
+    }
+}
+$template['afile']->update($parm);
 
 $template->display();
 

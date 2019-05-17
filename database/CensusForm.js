@@ -460,10 +460,10 @@ function onLoad()
     }			// loop through all hyper-links
 
     // enable support for hiding and revealing columns within a table
-    var dataTbl		= document.getElementById("form");
-    if (dataTbl)
+    var dataTable		        = document.getElementById("form");
+    if (dataTable)
     {
-		var tblHdr		        = dataTbl.tHead;
+		var tblHdr		        = dataTable.tHead;
 		var tblHdrRow	        = tblHdr.rows[0];
 		for(i = 0; i < tblHdrRow.cells.length; i++)
 		{			// loop through cells of header row

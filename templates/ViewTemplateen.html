@@ -1,0 +1,53 @@
+<!--*********************************************************************
+ *  ViewTemplateen.html										            *
+ *																	    *
+ *  Display the contents of a template file.                            *
+ *																		*
+ *  History:															*
+ *		2019/04/16	    created								            *
+ *																		*
+ *  Copyright &amp;copy; 2019 James A. Cobban							*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/index.html?lang=$LANG">
+	      Home
+      </a>:
+      <a href="/genealogy.php?lang=$LANG">
+		  Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=en">
+          Services
+      </a>:
+      <a href="/templates/index.php?lang=en">
+          Templates Index
+      </a>:
+    </div> 
+    <div class="body">
+      <h1>
+        <span class="right">
+	      <a href="ViewTemplateHelpen.html" target="help">? Help</a>  
+        </span>
+        View Template $TEMPLATENAME
+      </h1>
+      $MSG
+      $TRACE
+      <div id="left" style="width: 50%; float: left;">
+        $TEMPLATE
+      </div>
+      <div id="right" style="width: 50%; float: right; font-family: 'Courier New', monospace; background-color: white;">
+        $HTML
+      </div>
+   </div> <!-- end of <div id="body"> -->
+    <div class="hidden" id="templates">
+    </div> <!-- id="templates" -->
+    <!--
+      The remainder of the web page consists of divisions containing
+      context specific help.  These divisions are only displayed if the user
+      requests help by pressing F1.  Including this information here ensures
+      that the language of the help balloons matches the language of the
+      input form.
+    -->
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="ViewTemplate.js" type="text/javascript">
+    </script>

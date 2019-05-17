@@ -8,29 +8,42 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-      <div class='hidden' id='breadcrumbs'>
-        <a href="/index.html">Home</a>:
-        <a href='/genealogy.php?lang=$LANG'>
-    	    Genealogy
-        </a>:
+    <div class='hidden' id='breadcrumbs'>
+      <a href="/index.html">Home</a>:
+      <a href='/genealogy.php?lang=$LANG'>
+          Genealogy
+      </a>:
+    </div>
+    <div class='body'>
+      <h1>Templates Index
+      <span class="right">
+        <a href="indexHelpen.html" target="help">? Help</a>  
+      </span>
+      </h1>
+      $TRACE
+      $MSG
+      <p>This directory contains templates used by the web-site to
+      control the presentation of information within web-pages.
+      Each template contains HyperText Markup Language (HTML) 
+      tags which specify the function
+      of each piece of information which is used by the Cascading Style
+      Sheets (CSS) to determine the appearance of that information.
+      Using templates separates the management of data in the database from
+      its appearance. For example the same data will be presented
+      differently to a user depending upon the user's preferred language,
+      which is specified by the optional lang=xx parameter, where xx
+      is one of the ISO 639-1 two character identifiers.
+      </p>
+      <p>Only web-site administrators need access to the contents of
+      this directory.
+      </p>
+      <p>The following templates are defined:</p>
+      <div id="afile" style="padding-left: 15px;">
+        <a href="/ViewTemplate.php?template=$name&lang=$LANG">
+          $name
+        </a>
       </div>
-      <div class='body'>
-        <h1>Templates</h1>
-        $TRACE
-        $MSG
-        <p>This directory contains templates used by the web-site to
-        control the presentation of information within web-pages.
-        Each template contains HyperText Markup Language (HTML) 
-        tags which specify the function
-        of each piece of information which is used by the Cascading Style
-        Sheets (CSS) to determine the appearance of that information.
-        Using templates separates the management of data in the database from
-        its appearance. For example the same data will be presented
-        differently to a user depending upon the user's preferred language,
-        which is specified by the optional lang=xx parameter, where xx
-        is one of the ISO 639-1 two character identifiers.
-        </p>
-        <p>Only web-site administrators need access to the contents of
-        this directory.
-        </p>
-      </div>
+    </div>
+    <script src="/jscripts/util.js" type="text/javascript">
+    :0
+    </script>

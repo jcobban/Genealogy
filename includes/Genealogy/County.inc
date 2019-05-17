@@ -52,6 +52,7 @@ use \Iterator;
  *		2018/11/11      do not throw exception from constructor for     *
  *		                bad parameters                                  *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/05/18      add $info                                       *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -78,6 +79,20 @@ class County extends Record
 				'name'			=> '',
 				'startyear'		=> 1852,
 				'endyear'		=> 9999);
+
+    /********************************************************************
+     *	County::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     		=> 'Counties',
+                'name'      		=> 'Counties',
+                'prime'	    		=> array('domain', 'code'),
+	            'srvmg'     		=> false,
+	            'fldcount'			=> 6,
+                'order'     		=> 'Name',
+                'classname' 		=> 'County');
 
     /********************************************************************
      *	County::$translate												*
@@ -259,21 +274,21 @@ class County extends Record
 				}			// loop through parameters
 
 				// read the record from the database
-				$query	    = "SELECT * FROM Counties " .
+				$query	            = "SELECT * FROM Counties " .
 						    	"WHERE `Domain`=:domain AND `Code`=:code";
-				$eparms	    = array('domain'	=> $domain,
-							        'code'		=> $code);
+				$sqlParms	        = array('domain'	=> $domain,
+							                'code'		=> $code);
 
 				// query the database
-				$stmt	    = $connection->prepare($query);
-
-				if ($stmt->execute($eparms))
+				$stmt	            = $connection->prepare($query);
+			    $queryText	        = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd   = $queryText;
+				if ($stmt->execute($sqlParms))
 				{			// successful query
 				    if ($debug)
-						$warn	.= "<p>$query</p>\n" .
-							   "<p>parms=" . print_r($eparms,true)."</p>\n";
+						$warn	    .= "<p>$queryText</p>\n";
 
-				    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
+				    $result	        = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				    if (count($result) > 0)
 				    {		// existing record
 						$dbrow	    	= $result[0];
@@ -291,14 +306,13 @@ class County extends Record
 				}			// successful query
 				else
 				{			// error performing query
-				    error_log("County.inc " . __LINE__ ." query='$query'</p>\n".
-						   "<p>parms=" . print_r($eparms,true)."\n");
-				    $this->msg     .= __LINE__ . " query='$query' " .
+				    error_log("County.inc " . __LINE__ ." query='$queryText'</p>\n");
+				    $this->msg     .= __LINE__ . " query='$queryText' " .
 								    print_r($stmt->errorInfo(),true);
 				}			// error performing query
-		    }			// associative array of parameters
+		    }			    // associative array of parameters
 		    else
-		    {			// build from existing record
+		    {			    // build from existing record
 				$dbrow		            = $parms;
 				if ($dbrow['domain'] instanceof Domain)
 				{
@@ -407,217 +421,6 @@ class County extends Record
 		else
 		    return null;
     }		// static function getRealFieldName
-
-    /********************************************************************
-     *	function County::save											*
-     *																	*
-     *	Save changes made to the County record into the database.		*
-     *																	*
-     *	Parameters:														*
-     *	    $xml		if true diagnostic output is emitted in XML		*
-     *					format within <cmd> tags.						*
-     *					if a string use it as tag name					*
-     ********************************************************************/
-    function save($xml)
-    {
-		global	$debug;
-		global	$warn;
-		global	$userid;
-		global	$connection;
-
-        // report errors detected by constructor and suppress update
-        if (strlen($this->msg) > 0)
-        {
-            $warn   .= "<p>County::save: " . __LINE__ . " Request to update the County record ignored because of errors detected when the record was created. '" . $this->msg . 
-                "'</p>\n";
-            return 0;
-        }
-
-		if (is_string($xml))
-		{		// string tag name
-		    $tagname	= $xml;
-		    $xml	= true;
-		}		// string tag name
-		else
-		if ($xml)
-		{		// true
-		    $tagname	= 'cmd';
-		}		// true
-
-        //
-		if ($this->needInsert)
-		{		// create new record
-		    $fldnames	= '';
-		    $comma	= '';
-		    $values	= '';
-		    $parms	= array();
-		    foreach($this->row as $fld => $value)
-		    {
-				$fldnames	.= $comma . "`$fld`";
-				$values		.= $comma . '?';
-				array_push($parms, $value);
-				$comma	= ", ";
-		    }		// loop through all fields in record
-
-		    // construct the SQL INSERT command
-		    $insert	= "INSERT INTO Counties ($fldnames) VALUES($values)";
-
-		    // insert the new record into the database
-            $stmt	= $connection->prepare($insert);
-            $insertText     = debugPrepQuery($insert, $parms);
-		    if ($stmt->execute($parms) === false)
-		    {		// error inserting record
-				throw new Exception("County::save:
-					    		    '$insert', " .
-					    		    print_r($stmt->errorInfo(),true));
-		    }		// error inserting record
-		    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
-		    $count	= count($result);
-		    if ($xml)
-				print "<$tagname result='$count'>$insertText</$tagname>\n";
-		    if ($debug)
-		    {
-				$warn	.= "<p>$insertText, count=$count</p>\n";
-		    }
-
-		    $this->changed	    = array();	// reset
-		    $this->needInsert	= false;
-
-		    // log the update
-		    $this->log($insert,
-					   $parms);
-		}		// create new record
-		else
-		{		// update existing record
-		    $update		= "UPDATE Counties SET ";
-		    $set		= '';
-		    $comma		= '';
-		    $count		= 0;
-		    $parms		= array();
-		    foreach($this->changed as $fld => $value)
-		    {
-				$set	.= $comma . "`$fld`=?";
-				array_push($parms, $value);
-				$comma	= ', ';
-		    }		// loop through all fields in record
-		    $this->changed	= array();	// reset
-
-		    if (strlen($set) > 0)
-		    {		// changes made
-				// assemble the UPDATE command
-				$update	.= $set ." WHERE `Domain`=? AND `Code`=?";
-				if ($this->former)
-				{
-				    array_push($parms, $this->former['domain']);
-				    array_push($parms, $this->former['code']);
-				}
-				else
-				{
-				    array_push($parms, $this->row['domain']);
-				    array_push($parms, $this->row['code']);
-				}
-
-				// perform the update
-				$stmt		= $connection->prepare($update);
-                $updateText     = debugPrepQuery($update, $parms);
-				if ($stmt->execute($parms) === false)
-				{		// error updating record
-				    throw new Exception("County::save:
-					        			'$update', " .
-						        		print_r($stmt->errorInfo(),true));
-				}		// error updating record
-				$count		= $stmt->rowCount();
-				if ($xml)
-				    print "<$tagname count='$count'>$updateText</$tagname>\n";
-				if ($debug)
-				    $warn	.= "<p>$updateText</p>\n";
-
-				// log the update
-				$this->log($update,
-						   $parms);
-		    }		// changes made
-		}		// update existing record
-		return $count;
-    }		// function County::save
-
-    /********************************************************************
-     *	function County::delete											*
-     *																	*
-     *	Delete the database record associated with this instance.		*
-     *																	*
-     *	Input:															*
-     *	    $xml		if true emit XML								*
-     *					if a string emit XML using as tag name			*
-     *																	*
-     *	Returns:														*
-     *	    false		if the method was unable to update the database	*
-     *	    1			if the method deleted the database record		*
-     *	    0			if the record did not need to be deleted		*
-     ********************************************************************/
-    function delete($xml=false)
-    {
-		global	$debug;
-		global	$warn;
-		global	$connection;
-
-		// handle XML output option
-		if (is_string($xml))
-		    $xmltag	= $xml;
-		else
-		if ($xml)
-		{
-		    $xml	= true;
-		    $xmltag	= 'cmd';
-		}
-
-		// to simplify expressions
-		if (!$this->needInsert)
-		{		// have existing record
-		    $domain		= $this->row['domain'];
-		    $code		= $this->row['code'];
-		    $delete		= 'DELETE FROM Counties ' .
-							      'WHERE `Domain`=:domain AND `Code`=:code';
-		    $sqlParms		= array('domain'	=> $domain,
-								'code'		=> $code);
-		    $sqlParmsText	= print_r($sqlParms, true);
-
-		    $stmt	= $connection->prepare($delete);
-		    if ($stmt->execute($sqlParms))
-		    {			// success
-				$count		= $stmt->rowCount();
-				if ($xml)
-				    print "<$xmltag count='$count'>$delete" .
-							"<parms>$sqlParmsText</parms>\n".
-						  "</$xmltag>\n";
-				if ($debug)
-				    $warn	.= "<p>County.inc: " . __LINE__ . 
-							   "query='$delete', parms=$sqlParmsText</p>\n";
-
-				// log the update
-				logSqlUpdate($delete,
-						     $sqlParms,
-						     $count,
-						     $this->toJson(false),
-						     '');
-
-				// update the memory copy of the record to reflect that it
-				// no longer represents a database record
-				$this->needInsert	= true;
-
-				return $count;	// number of records deleted
-		    }			// success
-		    else
-		    {			// error updating record
-				throw new Exception("County.inc: " . __LINE__ . 
-				    			    "query='$delete', parms=$sqlParmsText, " .
-				    			    print_r($stmt->errorInfo(),true));
-		    }			// error updating record
-
-		}			// have existing record
-
-		// record never written to database
-		return 0;		// nothing to delete
-    }		// function County::delete
 
     /********************************************************************
      *	function County::getName										*

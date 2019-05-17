@@ -2,6 +2,9 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template
+use \Templating\TemplateTag
+
 /************************************************************************
  *  Signon.php															*
  *																		*
@@ -82,7 +85,7 @@ use \Exception;
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/User.inc";
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 // the following obtains $userid and $authorized from the cookie
 require_once __NAMESPACE__ . "/common.inc";

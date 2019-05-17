@@ -1,0 +1,182 @@
+<!--*********************************************************************
+ *  DontMergeEntriesen.html										        *
+ *																		*
+ *  Display a web page containing a list of entries to suppress global	*
+ *  merge of individuals on a case by case basis.  These are usually	*
+ *  name entries that are not distinguishable by name and birth date,	*
+ *  but are known not to represent the same individual.					*
+ *																		*
+ *  History:															*
+ *		2019/05/06		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+    </div>
+    <div class="body">
+      <h1>
+          <span class="right">
+    		<a href="DontMergeEntriesHelpen.html" target="help">? Help</a>
+          </span>
+		Do Not Merge Individuals List
+      </h1>
+      $TRACE
+      $MSG
+	  <form name="locForm" action="DontMergeEntries.php">
+	    <div class="row">
+	      <label class="label" for="pattern">
+			Surname Pattern:
+	      </label>
+          <input name="pattern" id="pattern" type="text" size="64"
+                class="white leftnc" value="$PATTERN">
+          <input name="debug" type="hidden" value="$DEBUG">
+          <input name="lang"  type="hidden" value="$LANG">
+	      <div style="clear: both;"></div>
+	    </div>
+	    <p>
+	      <button type="submit" id="Search">
+			Search
+	      </button>
+	    </p>
+	    <div class="center" id="topBrowse">
+	      <span class="left" id="topPrev">
+	        <a href="DontMergeEntries.php?pattern=$PATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET&amp;lang=$LANG">&lt;---</a>
+	      </span>
+	      <span class="right" id="topNext"> 
+	        <a href="Locations.php?pattern=$PATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG">---&gt;</a>
+	
+	      </span>
+			rows $FIRST to $LAST of $COUNT 
+	      <div style="clear: both;"></div>
+	    </div>
+		<!--- Put out the response as a table -->
+		<table class="details" id="dataTable">
+		<!--- Put out the column headers -->
+		  <thead>
+		    <tr>
+		      <th class="colhead">
+				IdirLeft
+		      </th>
+		      <th class="colhead">
+				Surname
+		      </th>
+		      <th class="colhead">
+				GivenName
+		      </th>
+		      <th class="colhead">
+				BirthD
+		      </th>
+		      <th class="colhead">
+				DeathD
+		      </th>
+		      <th class="colhead">
+		      </th>
+		      <th class="colhead">
+				IdirRight
+		      </th>
+		      <th class="colhead">
+				Surname
+		      </th>
+		      <th class="colhead">
+				GivenName
+		      </th>
+		      <th class="colhead">
+				BirthD
+		      </th>
+		      <th class="colhead">
+				DeathD
+		      </th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		    <tr id="dataRow">
+				<td class="$class right">
+				    <a href="Person.php?idir=$idirleft&amp;lang=$lang">
+						$idirleft
+				    </a>
+				</td>
+				<td class="$class left">
+				    $lsurname
+				</td>
+				<td class="$class left">
+				    $lgivenName
+				</td>
+				<td class="$class left">
+				    $lbirthdate
+				</td>
+				<td class="$class left">
+				    $ldeathdate
+				</td>
+				<td class="$class left">
+				</td>
+				<td class="$class right">
+				    <a href="Person.php?idir=$idirright&amp;lang=$lang">
+						$idirright
+				    </a>
+				</td>
+				<td class="$class left">
+				    $rsurname
+				</td>
+				<td class="$class left">
+				    $rgivenName
+				</td>
+				<td class="$class left">
+				    $rbirthdate
+				</td>
+				<td class="$class left">
+				    $rdeathdate
+				</td>
+		    </tr>
+		  </tbody>
+		</table>
+      </form>
+    </div>
+	<div class="balloon" id="Helppattern">
+        This is a regular expression, as supported by MySQL, which is used
+        to limit the locations to be displayed.
+        See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer"s regex page</a>.
+      <ul>
+	    <li>If the pattern contains no special 
+			characters then only locations containing that string will be included.
+	        For example the pattern "London" will match locations containing
+	        the string "London".  Note that the search ignores case, so that
+	        pattern will also match "LONDON" and "london".
+	    <li>If the pattern begins with a caret '^' then only locations that
+	        <b>begin</b> with the remainder of the pattern are included.  
+			For example the pattern
+	        "^Ba" displays locations starting with "Ba" (or "ba" or "BA").
+	    <li>If the pattern ends with a dollar sign '$', then only locations that
+	        <b>end</b> with the remainder of the pattern are included.  
+			For example the pattern
+	        "CA$" matches locations that end with "CA" (or "ca" or "Ca").
+	    <li>In a pattern a period '.' matches any single character.  For example
+            the pattern "B.b" matches any location that contains
+            two letter Bs separated
+			by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
+			anywhere in the location name.
+	    <li>In a pattern an asterisk '*' matches zero or more of the preceding
+			character; "bo*b" matches "bb", "bob", and "boob"
+	        anywhere in the location name.
+      </ul>
+	</div>
+	<div class="balloon" id="HelpSearch">
+	    Clicking on this button refreshes the displayed list of locations
+		based upon the pattern.  You may also hit the "enter" key to perform the
+		same function.
+	</div>
+    <!-- balloons to pop up when mouse moves over forward and back links -->
+	<div class="popup" id="mousetopPrev">
+	  <p class="label">
+		Go to Row $PREVOFFSET&nbsp;
+    </p>
+	</div>
+	<div class="popup" id="mousetopNext">
+	  <p class="label">
+		Go to Row $NEXTOFFSET&nbsp;
+      </p>
+	</div>
+    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>

@@ -47,7 +47,7 @@ require_once __NAMESPACE__ . '/Marriage.inc';
 require_once __NAMESPACE__ . '/MarriageParticipant.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/County.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // initial field value defaults

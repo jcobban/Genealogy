@@ -278,49 +278,49 @@ class Location extends RecordPic
 		}			// full row from database supplied
 		else
 		{			// search parameters
-		    $dbrow		= null;
-		    $where		= '';
-		    $and		= 'WHERE ';
+		    $dbrow		    = null;
+		    $where		    = '';
+		    $and		    = 'WHERE ';
 		    $sqlParms		= array();
-		    $idlr		= null;
+		    $idlr		    = null;
 		    $location		= null;
 		    foreach($parms as $fldname => $value)
-		    {		// loop through parameters
+		    {		        // loop through parameters
 				$fldnameLc	= strtolower($fldname);
 				if (is_array($value))
-				{		// combine by OR
+				{		    // combine by OR
 				    if (count($value) > 0)
 				    {		// not empty
-						$where		.= $and;
-						$or		= '(';
+						$where		        .= $and;
+						$or		            = '(';
 						foreach($value as $orfield => $orvalue)
 						{
-						    $where	.= "$or`$orfield`=?";
-						    $sqlParms[]	= $orvalue;
-						    $or		= ' OR ';
+						    $where	        .= "$or`$orfield`=?";
+						    $sqlParms[]	    = $orvalue;
+						    $or		        = ' OR ';
 						}
-						$where		.= ')';
-						$and		= ' AND ';
+						$where		        .= ')';
+						$and		        = ' AND ';
 				    }		// not empty
-				}		// combine by OR
+				}		    // combine by OR
 				else
 				switch($fldnameLc)
 				{		// act on specific field names
 				    case 'idlr':
 				    {
-						$where		.= "$and`$fldname`=?";
-						$sqlParms[]	= $value;
-						$idlr		= $value;
-						$and		= ' AND ';
+						$where		        .= "$and`$fldname`=?";
+						$sqlParms[]	        = $value;
+						$idlr		        = $value;
+						$and		        = ' AND ';
 						break;
 				    }
 
 				    case 'location':
 				    {
-						$where		.= "$and`$fldname`=?";
-						$sqlParms[]	= $value;
-						$location	= $value;
-						$and		= ' AND ';
+						$where		        .= "$and`$fldname`=?";
+						$sqlParms[]	        = $value;
+						$location	        = $value;
+						$and		        = ' AND ';
 						break;
 				    }
 				}		// act on specific field names
@@ -330,21 +330,21 @@ class Location extends RecordPic
 		    if (strlen($where) == 0)
 				throw new Exception("Location::__construct: " .
 							    "No IDLR Parameter Specified");
-		    $query	= "SELECT * FROM tblLR $where";
-		    $stmt	= $connection->prepare($query);
+		    $query	                = "SELECT * FROM tblLR $where";
+		    $stmt	                = $connection->prepare($query);
 		    if ($stmt->execute($sqlParms))
 		    {
-				$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
+				$result		        = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 				if ($debug)
-				    $warn	.=
+				    $warn	        .=
 						"<p>Location::__construct: " . __LINE__ . ' ' .
 										$query . "</p>\n" .
 						"<p>parms=" . print_r($sqlParms, true) . "</p>\n";
 
 				if (count($result) == 0)
 				{	// no location matches parameters, create new
-				    $dbrow		= self::$initRow;	// defaults
+				    $dbrow	    	= self::$initRow;	// defaults
 				    $needInsert		= true;
 
 				    if ($location)
@@ -366,24 +366,24 @@ class Location extends RecordPic
 						// check for street address to appropriately
 						// set the sorted name so street addresses sort within
 						// the street
-						$rgxres	= preg_match(self::$namePattern,
-									 $location,
-									 $matches);
+						$rgxres	            = preg_match(self::$namePattern,
+									                     $location,
+									                     $matches);
 						if ($rgxres > 0)
 						{		// street address
-						    $lotnum		= $matches[2];
+						    $lotnum		        = $matches[2];
 						    if (strlen($lotnum) < 3)
-							$lotnum	= substr('000' . $lotnum,
-									     strlen($lotnum));
+							    $lotnum	        = substr('000' . $lotnum,
+									                     strlen($lotnum));
 						    else
 						    if (substr($lotnum, 0, 4) == 'lot ' &&
-							strlen($lotnum) == 5)
+							    strlen($lotnum) == 5)
 						    {		// rural lot < 10
-							$lotnum	= 'lot 0' . substr($lotnum, 4);
+							    $lotnum	    = 'lot 0' . substr($lotnum, 4);
 						    }		// rural lot < 10
 						    $dbrow['sortedlocation']	= $matches[4] .
-							    $matches[5] . ', ' .  $lotnum . ' ' .
-							    $matches[1];
+							        $matches[5] . ', ' .  $lotnum . ' ' .
+							        $matches[1];
 						}		// street address
 						else		
 						    $dbrow['sortedlocation']	= $location;
@@ -392,11 +392,10 @@ class Location extends RecordPic
 				    else
 				    if ($idlr)
 				    {		// update fields based upon IDLR
-						$tempname		= 'Lost Location ' . $idlr;
-$warn	.= "<p>Location.inc: " . __LINE__ . " add '$tempname'</p>\n";
-						$dbrow['location']	= $tempname;
+						$tempname		        = 'Lost Location ' . $idlr;
+						$dbrow['location']	    = $tempname;
 						$dbrow['sortedlocation']= $tempname;
-						$dbrow['shortname']	= $tempname;
+						$dbrow['shortname']	    = $tempname;
 				    }		// update fields based upon IDLR
 				}		// no location matches parameters
 				else

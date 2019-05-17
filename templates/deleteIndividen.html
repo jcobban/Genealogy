@@ -1,0 +1,53 @@
+<!--*********************************************************************
+ *  deleteIndividen.html												*
+ *																		*
+ *  Display a web page to delete a particular record					*
+ *  from the Legacy table of individuals.								*
+ *																		*
+ *  History:															*
+ *		2019/05/05      creaated                                        *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+			Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+			Services
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+			Nominal Index
+      </a>:
+      <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+			Surnames Starting with '$PREFIX'
+      </a>:
+      <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+			Surname '$SURNAME'
+      </a>:
+	  <a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG">
+			$NAME
+      </a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+	      <a href="deleteIndividHelpen.html" target="help">? Help</a>
+        </span>
+	    Delete $NAME
+      </h1>
+      $TRACE
+      $MSG
+      <p class="label">
+        Deleted $CITCOUNT citations.
+        Deleted $EVENTCOUNT events.
+        Deleted $PERSONCOUNT persons.
+      </p>
+    </div>	<!-- end of <div id="body"> -->
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>

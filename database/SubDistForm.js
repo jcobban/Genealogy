@@ -221,8 +221,8 @@ function onLoadSub()
     }			// loop through forms
 
     // enable support for hiding and revealing columns
-    var dataTbl		            = document.getElementById("dataTbl");
-    var tblHdr		            = dataTbl.tHead;
+    var dataTable		        = document.getElementById("dataTable");
+    var tblHdr		            = dataTable.tHead;
     var tblHdrRow	            = tblHdr.rows[0];
     for(i = 0; i < tblHdrRow.cells.length; i++)
     {		// loop through all cells of header row
@@ -230,18 +230,6 @@ function onLoadSub()
 		th.onclick		        = columnClick;	// left button click
 		th.oncontextmenu	    = columnWiden;	// right button click
     }		// loop through all cells of header row
-
-
-    var dataTable               = document.getElementById('dataTbl');
-    var dataWidth               = dataTable.offsetWidth;
-    var windowWidth             = document.body.clientWidth - 8;
-    if (dataWidth > windowWidth)
-        dataWidth               = windowWidth;
-    var topBrowse               = document.getElementById('topBrowse');
-    topBrowse.style.width       = dataWidth + "px";
-    var botBrowse               = document.getElementById('botBrowse');
-    if (botBrowse)
-        botBrowse.style.width   = dataWidth + "px";
 
     // set the focus to the first element of the first row
     firstElt.focus();
@@ -551,15 +539,15 @@ function changeFrameCt()
  ************************************************************************/
 function addDiv()
 {
-    var	form	= this.form;
-    var	census	= form.Census.value;
-    var cenYear	= (census.substring(2,6)) - 0;
-    var	tbl	= document.getElementById("dataTbl");
-    var cell	= this.parentNode
-    var oldRow	= cell.parentNode;
-    var	tblSect	= oldRow.parentNode;
+    var	form			= this.form;
+    var	census			= form.Census.value;
+    var cenYear			= (census.substring(2,6)) - 0;
+    var	tbl	    		= document.getElementById("dataTable");
+    var cell			= this.parentNode
+    var oldRow			= cell.parentNode;
+    var	tblSect			= oldRow.parentNode;
     var	colnum;
-    var	sdId	= null;
+    var	sdId			= null;
 
     // rownum is the index of the TableRow object within the rows
     // collection of the enclosing table

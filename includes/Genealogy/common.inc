@@ -2,9 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
+use Templating\Template;
+
 /************************************************************************
  *  common.inc															*
  *																		*
@@ -676,10 +675,13 @@ function htmlHeader($title,
 	global	$lang;
 	global	$debug;
 	global	$warn;
-	global	$msg;
+    global	$msg;
+    global  $userid;
+    global  $authorized;
+    global  $options;
 
-	if (!class_exists(__NAMESPACE__ . '\\Template'))
-		include __NAMESPACE__ . '/Template.inc';
+	if (!class_exists('Template\\Template'))
+		include 'Templating/Template.inc';
 	if (!class_exists(__NAMESPACE__ . '\\Language'))
         include __NAMESPACE__ . '/Language.inc';
 
@@ -724,10 +726,10 @@ function htmlHeader($title,
 
 	$template->set('BREADCRUMBS',	'');
 	$template->set('ADURL',		    '');
-	$template->set('USERID',		'');
+	$template->set('USERID',		$userid);
 	$template->set('CONTRIBUTE',	'');
-	$template->set('AUTHORIZED',	'');
-	$template->set('OPTIONS',		'');
+	$template->set('AUTHORIZED',	$authorized);
+	$template->set('OPTIONS',		$options);
 	$template->set('BLOGFLAG',		'');
 
     // postpone javascript includes to end of document
@@ -769,6 +771,7 @@ function pageTop($breadCrumbs)
 	global	$user;
 	global	$userid;
 	global	$debug;
+	global	$warn;
 	global	$msg;
 	global	$authorized;
 	global	$options;
@@ -781,7 +784,7 @@ function pageTop($breadCrumbs)
 	
 	// run-time can interrogate these values to take action
 	// for example the OPTIONS value is used to determine whether or
-	// not to use popup help
+    // not to use popup help
 	$template->set('USERID',		$userid);
 	$template->set('AUTHORIZED',	$authorized);
 	$template->set('OPTIONS',		$options);

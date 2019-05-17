@@ -48,7 +48,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . "/common.inc";
 
@@ -80,12 +80,7 @@ foreach ($_GET as $key => $value)
 $update     = canUser('edit');
 
 $template	= new FtTemplate("genealogy$lang.html");
-
-$tempBase	= $document_root . '/templates/';
-if (file_exists($tempBase . "Trantab$lang.html"))
-    $trtemplate = new Template("${tempBase}Trantab$lang.html");
-else
-    $trtemplate = new Template("${tempBase}Trantaben.html");
+$trtemplate = $template->getTranslate();
 
 // create list of newsletters
 $names	= array();

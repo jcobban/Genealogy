@@ -94,9 +94,13 @@
   <p>
     When entered with no parameters the dialog displays the first 20
     entries from the table, and you can scroll through the entire table
-    using the left and right arrow hyperlinks.  When you hold the cursor
+    using the left <span style="color: blue; text-decoration: underline; font-weight: bold;">&lt;--</span>
+    and right <span style="color: blue; text-decoration: underline; font-weight: bold;">--&gt;</span> arrow hyperlinks, or by using the PgUp and 
+    PgDn keys.  When you hold the cursor
     over these hyperlinks the application displays an explanation of what
     clicking on the hyperlink will do.
+  </p>
+  <p>
     You can enter text into the "Pattern" field to limit the display to entries
     whose "nickname" field matches the pattern.  This is a regular expression.
     For example if you enter "th" only entries whose "nickname" field
@@ -116,6 +120,10 @@
   </p>
   <p>The third column is a comment indicating the most popular "standard"
     spelling of the given name.
+  </p>
+  <p>The fourth column indicates whether the name applies only to males or
+    females.
+  </p>
   <p>
     Administrators have the ability to modify entries in this table and to 
     add new entries.  All contributors can view the contents of this table.

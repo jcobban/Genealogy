@@ -68,6 +68,20 @@ class LegacyHeader implements Iterator
 				        'setting'	=> '');
 
     /********************************************************************
+     *	LegacyHeader::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    public static	$info	= array(
+                'table'     => 'tblHR',
+                'name'      => 'Header',
+                'prime'	    => 'item',
+	            'srvmg'     => false,
+	            'fldcount'	=> 2,
+                'order'     => 'Item',
+                'classname' => 'LegacyHeader');
+
+    /********************************************************************
      *	DontMergeEntry::$defaultOrder									*
      *																	*
      *	Definition of default order for records retrieved by RecordSet	*

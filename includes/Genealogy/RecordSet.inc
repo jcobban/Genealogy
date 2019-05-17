@@ -5,6 +5,7 @@ use \Exception;
 use \ArrayAccess;
 use \Countable;
 use \Iterator;
+use \ReflectionClass;
 /************************************************************************
  *  RecordSet.inc														*
  *																		*
@@ -13,7 +14,7 @@ use \Iterator;
  *																		*
  *  Examples:															*
  *		$list			= new RecordSet('Sources',						*
- *									array('idst'		=> 14));		*
+ *									    array('idst'		=> 14));	*
  *		$information	= $list->getInformation();						*
  *		print_r($information,true);										*
  *		print "Query='" . $information['query'] . "'";					*
@@ -77,8 +78,14 @@ use \Iterator;
  *						of CensusLines									*
  *		2018/02/17		do not log error for empty RecordSet			*
  *		2018/11/11      emit detailed debug for constructor             *
+ *		2019/03/07      permit limit parm to override maximum count     *
+ *		2019/04/11      add test with bit-mask to getWhereInt and       *
+ *		                getWhereCommon                                  *
+ *		2019/04/15      add namespace to is_a                           *
+ *		2019/04/28      to do: complete support for named substitutions *
+ *		                in getWhereInt, getWhereCommon, and surname     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -167,6 +174,14 @@ class RecordSet implements Iterator, Countable, ArrayAccess
     protected	$limit		= PHP_INT_MAX;
 
     /********************************************************************
+     *	$this->msg       												*
+     *																	*
+     *	Any error messages accumulated by constructor.                  *
+     *	See Record::getErrors                                           *
+     ********************************************************************/
+    protected 	$msg	        = '';
+
+    /********************************************************************
      *	$list															*
      *																	*
      *	Array of instances of class derived from Record					*
@@ -223,12 +238,13 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      *			<>		not equal										*
      *			>														*
      *			>=														*
+     *			&       bit mask test                                   *
      *			:		range, only in 2nd element of array				*
      *			IS 		testing against boolean or null					*
      *			IS NOT	testing against boolean or null					*
      ********************************************************************/
     protected static $pat	=
-				'/^(<=|<|=|!=|<=>|<>|>|>=|:|IS|IS NOT)?(.*)$/';
+				'/^(<=|<|=|!=|<=>|<>|>|>=|&|:|IS|IS NOT)?(.*)$/';
 
     /********************************************************************
      *	function __construct											*
@@ -285,7 +301,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      ********************************************************************/
     function __construct($tableName,
 						 $parameters	= null,
-						 $fields	= '*')
+						 $fields	    = '*')
     {
 		global	$debug;
 		global	$warn;
@@ -294,56 +310,56 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 
         if ($debug)
         {
-            $warn   .= "<p>RecordSet:__construct('$tableName', '";
+            $warn                           .= "<p>RecordSet:__construct('$tableName', '";
             if (is_null($parameters))
-                $warn   .= "null";
+                $warn                       .= "null";
             else
             if (is_array($parameters))
             {
-                $warn   .= "array(";
-                $comma  = '';
+                $warn                       .= "array(";
+                $comma                      = '';
                 foreach($parameters as $field => $value)
                 {
-                    $warn   .= $comma . "`$field`=";
+                    $warn                   .= $comma . "`$field`=";
                     if (is_numeric($value))
-                        $warn   .= $value;
+                        $warn               .= $value;
                     else
                     if (is_null($value))
-                        $warn   .= "null";
+                        $warn               .= "null";
                     else
                     if (is_bool($value))
                     {
                         if ($value)
-                            $warn   .= "true";
+                            $warn           .= "true";
                         else
-                            $warn   .= "false";
+                            $warn           .= "false";
                     }
                     else
                     if (is_string($value))
-                        $warn       .= htmlspecialchars("'$value'");
+                        $warn               .= htmlspecialchars("'$value'");
                     else
                     if ($value instanceof Record)
-                        $warn       .= "class " . get_class($value) . ' ' .
-                                        $value->getName();
+                        $warn               .= "class " . get_class($value) . 
+                                                ' ' .  $value->getName();
                     else
                     if ($value instanceof Template)
-                        $warn       .= "class Template";
+                        $warn               .= "class Template";
                     else
-                        $warn       .= print_r($value, true);
-                    $comma          = ',';
+                        $warn               .= print_r($value, true);
+                    $comma                  = ',';
                 }                   // loop through elements of parm 2
 
                 if ($fields != '*')
-                    $warn   .= ",'$fields'";
+                    $warn                   .= ",'$fields'";
                 $warn       .= ")</p>\n";
             }
-            $trace          = debug_backtrace();
+            $trace                          = debug_backtrace();
             foreach($trace as $call)
             {
                 if (array_key_exists('class', $call))
-                    $classRef       = $call['class'] . '::';
+                    $classRef               = $call['class'] . '::';
                 else
-                    $classRef       = '';
+                    $classRef               = '';
                 $warn   .= "<p>RecordSet::__construct: " . __LINE__ .
                             
                             " function=" . $classRef . $call['function'] .
@@ -353,50 +369,51 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         }
 
 		// validate parameters
-		$message		= '';
-		$orderby		= '';
-		$groupby		= '';
-		$tables			= array();
-		$joined			= false;
+		$orderby		    		        = '';
+		$groupby		    		        = '';
+		$tables			    		        = array();
+        $joined			    		        = false;
+        $this->limit        		        = PHP_INT_MAX;
 
 		// interpret table name
 		if (is_string($tableName))
 		{
-		    $tableName		= trim($tableName);
+		    $tableName		                = trim($tableName);
 		    if (preg_match('/^(\w+)\s*(JOIN|INNER JOIN|LEFT JOIN|FULL JOIN|RIGHT JOIN|OUTER JOIN)(.*)$/', $tableName))
 		    {			// support joined tables
 				// translate table names in the expression
-				$words		= preg_split('/\b/', $tableName);
-				$tableName	= $words[1];
-				$trans		= '';
+				$words		                = preg_split('/\b/', $tableName);
+				$tableName	                = $words[1];
+				$trans		                = '';
 				foreach($words as $word)
-				{
-				    $info	= Record::getInformation($word);
-				    if ($info)
-				    {
-						$trans	.= $info['table'];
+                {
+                    if (strlen($word) > 0)
+                    {
+					    $info	            = Record::getInformation($word);
+					    if ($info)
+							$trans	        .= $info['table'];
+					    else
+							$trans	        .= $word;
 				    }
-				    else
-						$trans	.= $word;
 				}
-				$this->table	= $trans;	// translated
+				$this->table	            = $trans;	// translated
 
 				// construct the SELECT expression
 				if ($fields == '*')
 				{
-				    $joinedtables	= preg_split('/JOIN/i', $trans);
-				    $fields		= '';
-				    $comma		= '';
+				    $joinedtables	        = preg_split('/JOIN/i', $trans);
+				    $fields		            = '';
+				    $comma		            = '';
 				    foreach($joinedtables as $join)
 				    {
-						$join		= trim($join);
-						$result		= preg_match('/^(\w+)(\s*AS\s+([^\s]+))?/i', $join, $matches);
+						$join		        = trim($join);
+						$result		        = preg_match('/^(\w+)(\s*AS\s+([^\s]+))?/i', $join, $matches);
 						if ($result)
 						{
 						    if (count($matches) >= 4)
-								$fields	.= $comma . $matches[3] . '.*';
+								$fields	    .= $comma . $matches[3] . '.*';
 						    else
-								$fields	.= $comma . $matches[1] . '.*';
+								$fields	    .= $comma . $matches[1] . '.*';
 						    $comma	= ',';
 						}
 						else
@@ -404,80 +421,78 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 									   __LINE__ . " \$join='$join'</p>\n";
 				    }
 				}
-				$joined		        = true;
-				$tables		        = array();		// not a union
+				$joined		                = true;
+				$tables		                = array();		// not a union
 		    }			// support joined tables
 		    else
 		    {			// check for UNION of tables list
-				$tables		        = explode(',',$tableName);
+				$tables		                = explode(',',$tableName);
 				if (count($tables) > 1)
-				    $tableName	    = trim($tables[0]);
+				    $tableName	            = trim($tables[0]);
 		    }			// check for UNION of tables list
 
 		    // get information about the table being searched
-		    $information	    	= Record::getInformation($tableName);
-		    $this->information		= $information;
-		    if ($information)
+		    $information	    	        = Record::getInformation($tableName);
+            $this->information		        = $information;
+		    if ($information && array_key_exists('table', $information))
 		    {			// supported
 				if (!$joined)
-				    $this->table	= $information['table'];// SQL
-				$this->externalName	= $information['name'];	// external
-				$orderby		    = $information['order'];
-				$className		    = $information['classname'];
-                $nsclass            = __NAMESPACE__ . "\\" . $className;
+				    $this->table	        = $information['table'];// SQL
+				$this->externalName	        = $information['name'];	// external
+				$orderby		            = $information['order'];
+				$className		            = $information['classname'];
+                $nsclass                    = __NAMESPACE__ . "\\" . $className;
 				// load the class if necessary
 				if (!class_exists(__NAMESPACE__ . "\\" . $className))
 				    include __NAMESPACE__ . "/" . $className . ".inc";
 		    }
 		    else
             {
-                $reflection     = new RelectionClass($tableName);
+                print "<p>RecordSet:449 tableName='$tableName' information=" . print_r($information) . "</p>\n";
+                $reflection                 = new ReflectionClass($tableName);
                 if ($reflection->isSubclassOf('Record'))
-                    $message		.= "Unsupported table '$tableName'. ";
+                    $this->msg		        .= "Unsupported table '$tableName'. ";
                 else
-                    $message		.= "class '$tableName' is not an extension of 'Record'. ";
+                    $this->msg		        .= "class '$tableName' is not an extension of 'Record'. ";
 		    }
 		}			// first parameter is string
 		else
-		    $message			.= "Table name must be a string. ";
+		    $this->msg			            .= "Table name must be a string. ";
 
 		// if the second parameter is NULL this object represents
 		// all of the records in the table
 		if (!is_null($parameters) && !is_array($parameters))
-		    $message	.= "Second parameter must be null or an array, " .
+		    $this->msg	.= "Second parameter must be null or an array, " .
 						   print_r($parameters, true) . '. ';
-		if (strlen($message) > 0)   
-		    throw new Exception("RecordSet::constructor: " .
-								$message);
 
 		// check for an array of records from the specified table
 		if (is_null($parameters))
 		    $parameters		= array();
 		else
-		{			// not null, check for array of records
-		    $recordArray		= true;
+		{			    // not null, check for array of records
+		    $recordArray		            = true;
 		    // note that $recordArray remains true if $parms is an empty array
 		    // this is deliberate to be able to create an empty set of records
 		    foreach($parameters as $index => $row)
 		    {			// loop through parameters
-				if (!is_a($row, $information['classname']))
+				if (!is_a($row, __NAMESPACE__ . "\\" . $information['classname']))
 				{
-				    $recordArray		= false;
+				    $recordArray		    = false;
 				    break;
 				}
 		    }			// loop through parameters
 
 		    if ($recordArray)
 		    {			// have array of records
-				$this->parms			= $parameters;
-				$this->sqlParms			= array();
-				$this->where			= '';
+				$this->parms			    = $parameters;
+				$this->sqlParms			    = array();
+				$this->where			    = '';
 				$this->information['query']	= '';
 				$this->information['count']	= count($parameters);
-				$this->list			= $parameters;
+				$this->list			        = $parameters;
 				return;
 		    }			// have array of records
-		}			// not null, check for array of records
+		}			    // not null, check for array of records
 
 		// 3rd parameter is explicit list of fields
 		if ($fields != '*')
@@ -565,28 +580,28 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		foreach($deleteNames as $name)
 		    unset($parameters[$name]);
 
-		$this->parms		= $parameters;
-		$this->orderby		= $orderby;
-		$this->sqlParms		= array();
-		$where			    = $this->getWhere();	// class specific
-		$this->where		= $where;
-		$orderby		    = $this->orderby;	    // getWhere updates
+		$this->parms			= $parameters;
+		$this->orderby			= $orderby;
+		$this->sqlParms			= array();
+		$where			   		= $this->getWhere();	// class specific
+		$this->where			= $where;
+		$orderby		   		= $this->orderby;	    // getWhere updates
 
 		// construct a query for the specific matches
-		$table			    = $this->table;
+		$table			   		= $this->table;
 		if (count($tables) > 1)
 		{			// multiple merged tables
-		    $union		    = '';
-		    $sqlParms		= array();
-		    $countQuery		= 'SELECT ';
-		    $plus		    = '';
-		    $query		    = '';
+		    $union		   		= '';
+		    $sqlParms			= array();
+		    $countQuery			= 'SELECT ';
+		    $plus		   		= '';
+		    $query		   		= '';
 		    foreach($tables as $table)
 		    {
 				if (substr($table, 0, 6) == 'Census')
 				{
 				    $censusYear	= substr($table,6);
-				    $tblid	= "'CA$censusYear' as CensusId,";
+				    $tblid	    = "'CA$censusYear' as CensusId,";
 				    if ($censusYear < 1867)
 				    {
 						$join	= "JOIN Districts ON (D_Census=CONCAT(`Province`,'$censusYear') AND D_Id=District) JOIN SubDistricts ON (SD_Census=CONCAT(`Province`,'$censusYear') AND SD_DistId=District AND SD_Id=SubDistrict AND SD_Div=Division) ";
@@ -600,24 +615,24 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 									      $this->fields);
 				    }
 				}
-				$query		.= $union . 'SELECT ' .
+				$query		    .= $union . 'SELECT ' .
 								  $tblid . $fields .
 								  " FROM $table " . $join . $where;
-				$countQuery	.= $plus .
+				$countQuery	    .= $plus .
 						"COALESCE((SELECT COUNT(*) FROM $table $where),0)";
-				$union		= " UNION ALL ";
-				$plus		= " + ";
-				$sqlParms	= array_merge($sqlParms, $this->sqlParms);
+				$union		    = " UNION ALL ";
+				$plus		    = " + ";
+				$sqlParms	    = array_merge($sqlParms, $this->sqlParms);
 		    }
-		    $this->query	= $query;
-		    $this->sqlParms	= $sqlParms;
+		    $this->query	    = $query;
+		    $this->sqlParms	    = $sqlParms;
 		}			// multiple merged tables
 		else
 		{
-		    $this->query	= 'SELECT ' . $this->fields .
+		    $this->query	    = 'SELECT ' . $this->fields .
 									' FROM ' . $this->table . ' ' .
 									$where;
-		    $countQuery		= "SELECT COUNT(*) FROM " . $this->table . 
+		    $countQuery		    = "SELECT COUNT(*) FROM " . $this->table . 
 								   ' ' . $where;
 		}
 
@@ -639,16 +654,19 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 
 		// construct the ORDER BY clause
 		if (is_string($orderby) && strlen($orderby) > 0)
-		{
-		    $words		= preg_split('/\b/', $orderby);
+        {
+		    $words		    = preg_split('/\b/', $orderby);
 		    $orderby		= '';
 		    foreach($words as $word)
-		    {			// translate external table names
-				$info		= Record::getInformation($word);
-				if ($info)
-				    $orderby	.= $info['table'];
-				else
-				    $orderby	.= $word;
+            {			// translate external table names
+                if (strlen($word) > 0)
+                {
+					$info		= Record::getInformation($word);
+					if ($info)
+					    $orderby	.= $info['table'];
+					else
+	                    $orderby	.= $word;
+                }
 		    }			// translate external table names
 		    $this->query	.= " ORDER BY " . $orderby; 
 		}
@@ -663,8 +681,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 
 		// external representation of query for messages
 		$this->information['query']	= debugPrepQuery($this->query,
-											 $this->sqlParms);
-
+			        								 $this->sqlParms);
 		// query the database for count
 		if (!isset($this->information['count']))
 		{			// set count to actual number of records
@@ -681,17 +698,16 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 
 				// return count in parameter object
 				$row 			= $stmt->fetch(PDO::FETCH_NUM);
-				$this->information['count']	= $row[0];
+                $this->information['count']	= $row[0];
 		    }			// success
 		    else
 		    {			// error performing query
-				if (strlen($queryText) > 40)
-				    $queryText	= substr($queryText, 0, 30) . '...' .
-								      substr($queryText, -7);
-				throw new Exception("RecordSet::__construct: \"$queryText\", " .
-								    print_r($stmt->errorInfo(),true));
+				$this->msg  .= "RecordSet::__construct: \"$queryText\", " .
+								    print_r($stmt->errorInfo(),true);
 		    }			// error performing query
-		}			// set count to actual number of records
+        }			// set count to actual number of records
+        if (strlen($this->msg) > 0)
+            $msg            .= $this->msg;
     }		// RecordSet::__construct
 
     /********************************************************************
@@ -775,6 +791,11 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      *					elementary value or a string consisting of		*
      *					a comparison operator followed by a positive	*
      *					integer.										*
+     *		$refname    if omitted using positional insertions in       *
+     *		            sqlParms                                        *
+     *		            if a string use it for named insertions         *
+     *		            if boolean true use the field name as the       *
+     *		            name for named insertions                       *
      *																	*
      *	Examples:														*
      *			getWhereCommon('idir',1234)								*
@@ -792,14 +813,25 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      *	    expression string.											*
      ********************************************************************/
     protected function getWhereCommon($fldname,
-								      $value)
+								      $value,
+                                      $refname = null)
     {
 		global	$debug;
 		global	$warn;
 
 		if (substr($fldname, 0, 1) != '`' &&
-		    strpos($fldname, '.') === false)
-		    $fldname		= "`$fldname`";
+            strpos($fldname, '.') === false)
+        {
+            if ($refname === true)
+                $refname    = strtolower($fldname);
+            $fldname		= "`$fldname`";
+        }
+        else
+        {
+            if ($refname === true)
+                $refname    = strtolower(substr($fldname,1,strlen($fldname)-1));
+        }
+
 		$matches		= array();
 		$where			= '';
 		if (is_array($value))
@@ -808,14 +840,23 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		    if (count($values) == 0)
 				return '';
 		    $oldwhere		= $where;	// prepare for ':' range
-		    $or			= '';
+		    $or			    = '';
 		    for($i = 0; $i < count($values); $i++)
 		    {
 				$value			= trim($values[$i]);
 				if (is_int($value))
 				{			// integer
-				    $where		.= $or . "$fldname=?";
-				    $this->sqlParms[]		= $value;
+                    if (is_string($refname))
+                    {
+                        $where			    .= $or . "$fldname=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $val;
+                        $i++;
+                    }
+                    else
+                    {
+                        $where			    .= $or . "$fldname=?";
+                        $this->sqlParms[]   = $val;
+                    }
 				    $or			= ' OR ';
 				}			// integer
 				else
@@ -846,10 +887,18 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 						    {		// only permitted on second element
 								// change original comparison for first element
 								// and add comparison for second element
-								$where		= $oldwhere .
-										      "$fldname>=? AND " .
-										      "$fldname<=?";
-								$this->sqlParms[]	= $value;
+                                if (is_string($refname))
+                                {
+                        $where			    .= $oldwhere . "$fldname=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $val;
+                                }
+                                else
+                                {
+								    $where		= $oldwhere .
+								    		      "$fldname>=? AND " .
+								    		      "$fldname<=?";
+								    $this->sqlParms[]	= $value;
+                                }
 						    }		// only permitted on second element
 						    else
 						    {		// ignore with warning
@@ -858,6 +907,11 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 										count($values) . "</p>\n";
 						    }		// ignore with warning
 						}		// range operator
+						else
+						if ($operator == '&')
+                        {		// bit-mask operator
+						    $where		.= $or . "($fldname&?)!= 0";
+                        }
 						else
 						{		// comparison operator
 						    if ($operator == '')
@@ -903,7 +957,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				       $matches))
 		{			// optional operator and value
 		    $operator		= $matches[1];
-		    $value		= $matches[2];
+		    $value		    = $matches[2];
 		    if (strlen($value) >= 2)
 		    {		// check for quoted string
 				if (substr($value,0,1) == "'" &&
@@ -917,6 +971,11 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		    }		// check for quoted string
 		    if ($operator == '')
 				$where		.= "$fldname=?";
+			else
+			if ($operator == '&')
+            {		// bit-mask operator
+                $where		.= "($fldname&?)!= 0";
+            }
 		    else
 		    if ($operator == ':')
 		    {
@@ -955,6 +1014,11 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      *					or an instance of Record, or					*
      *					an array each member of	which may be an integer	*
      *					or a string optionally starting with an operator*
+     *		$refname    if omitted using positional insertions in       *
+     *		            sqlParms                                        *
+     *		            if a string use it for named insertions         *
+     *		            if boolean true use the field name as the       *
+     *		            name for named insertions                       *
      *																	*
      *	Examples:														*
      *			getWhereInt('idir',1234)								*
@@ -973,14 +1037,25 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      *	    expression string.											*
      ********************************************************************/
     protected function getWhereInt($fldname,
-								   $value)
+								   $value,
+                                   $refname = null)
     {
 		global	$debug;
 		global	$warn;
 
 		if (substr($fldname, 0, 1) != '`' &&
-		    strpos($fldname, '.') === false)
-		    $fldname		= "`$fldname`";
+            strpos($fldname, '.') === false)
+        {
+            if ($refname === true)
+                $refname    = strtolower($fldname);
+            $fldname		= "`$fldname`";
+        }
+        else
+        {
+            if ($refname === true)
+                $refname    = strtolower(substr($fldname,1,strlen($fldname)-1));
+        }
+
 		$matches		= array();
 		$where			= '';
 		if (is_array($value))
@@ -989,14 +1064,22 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		    if (count($values) == 0)
 				return '';
 		    $oldwhere		= $where;	// prepare for ':' range
-		    $or			= '';
+		    $or			    = '';
 		    for($i = 0; $i < count($values); $i++)
 		    {
 				$value			= trim($values[$i]);
 				if (is_int($value))
 				{			// integer
-				    $where		.= $or . "$fldname=?";
-				    $this->sqlParms[]		= $value;
+                    if (is_string($refname))
+                    {
+                        $where			    .= $or . "$fldname=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $val;
+                    }
+                    else
+                    {
+                        $where			    .= $or . "$fldname=?";
+                        $this->sqlParms[]   = $val;
+                    }
 				    $or			= ' OR ';
 				}			// integer
 				else
@@ -1031,6 +1114,20 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 										count($values) . "</p>\n";
 						    }		// ignore with warning
 						}		// range operator
+            			else
+			            if ($operator == '&')
+                        {		// bit-mask operator
+                            if (is_string($refname))
+                            {
+                                $where		.= $or . "($fldname&:$refname)!=0";
+                                $this->sqlParms[$refname]   = $val;
+                            }
+                            else
+                            {
+                                $where		.= "$or($fldname&?)!= 0";
+                                $this->sqlParms[]   = $val;
+                            }
+                        }
 						else
 						{		// comparison operator
 						    if ($operator == '')
@@ -1074,19 +1171,63 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				       $matches))
 		{			// optional operator and integer
 		    $operator		= $matches[1];
-		    $value		= $matches[2];
-		    if ($operator == '')
-				$where		.= "$fldname=?";
+		    $value		    = $matches[2];
+            if ($operator == '')
+            {               // equality
+                if (is_string($refname))
+                {
+                    $where			    .= "$fldname=:$refname";
+                    $this->sqlParms[$refname]   = $value;
+                }
+                else
+                {
+                    $where			    .= "$fldname=?";
+                    $this->sqlParms[]   = $value;
+                }
+            }               // equality
+   			else
+            if ($operator == '&')
+            {		// bit-mask operator
+                if (is_string($refname))
+                {
+                    $where			    .= "($fldname&:$refname)!=0";
+                    $this->sqlParms[$refname]   = $value;
+                }
+                else
+                {
+                    $where			    .= "($fldname&?)!= 0";
+                    $this->sqlParms[]   = $value;
+                }
+            }
 		    else
 		    if ($operator == ':')
-		    {
-				$where		.= "$fldname=?";
+		    {               // range
+                if (is_string($refname))
+                {
+                    $where			    .= "$fldname=:$refname";
+                    $this->sqlParms[$refname]   = $value;
+                }
+                else
+                {
+                    $where			    .= "$fldname=?";
+                    $this->sqlParms[]   = $value;
+                }
 				$warn	.= "<p>RecordSet: " . __LINE__ . " Invalid $fldname value ':$value'," .
 								"count(\$values)=1</p>\n";
-		    }
-		    else
-				$where		.= "$fldname$operator?";
-		    $this->sqlParms[]	= $value;
+		    }               // range
+            else
+            {               // comparison operator
+                if (is_string($refname))
+                {
+                    $where			    .= "$fldname$operator:$refname";
+                    $this->sqlParms[$refname]   = $value;
+                }
+                else
+                {
+                    $where			    .= "$fldname$operator?";
+                    $this->sqlParms[]   = $value;
+                }
+            }               // comparison operator
 		}			// optional operator and integer
 		else
 		{
@@ -1117,6 +1258,11 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      *	    $pattern	the value, which is a string containing a		*
      *					regular expression or an array of strings		*
      *					containing regular expressions					*
+     *		$refname    if omitted using positional insertions in       *
+     *		            sqlParms                                        *
+     *		            if a string use it for named insertions         *
+     *		            if boolean true use the field name as the       *
+     *		            name for named insertions                       *
      *																	*
      *	Examples:														*
      *			getWherePattern('address',"^full text match$")			*
@@ -1132,19 +1278,30 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      *	Side-Effects:													*
      *	    Issues with the supplied value are reported by adding		*
      *	    warning messages onto the global variable $warn.			*
-     *	    The array $sqlParms is updated to include new substitution	*
-     *	    values corresponding to insertion points in the returned	*
-     *	    expression string.											*
+     *	    The array $this->sqlParms is updated to include new	        *
+     *	    substitution values corresponding to insertion points       *
+     *	    in the returned expression string.							*
      ********************************************************************/
     protected function getWherePattern($fldname,
-								       $pattern)
+                                       $pattern,
+                                       $refname = null)
     {
 		global	$debug;
 		global	$warn;
 
 		if (substr($fldname, 0, 1) != '`' &&
-		    strpos($fldname, '.') === false)
-		    $fldname		= "`$fldname`";
+            strpos($fldname, '.') === false)
+        {
+            if ($refname === true)
+                $refname    = strtolower($fldname);
+            $fldname		= "`$fldname`";
+        }
+        else
+        {
+            if ($refname === true)
+                $refname    = strtolower(substr($fldname,1,strlen($fldname)-1));
+        }
+
 		$matches		    = array();
 		$where		    	= '';
 		if (is_array($pattern))
@@ -1162,33 +1319,45 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		else
 		{
 		    $warn	        .= "<p>RecordSet::getWherePattern: " .
-						   "Invalid value for 2nd parameter " .
-						   print_r($pattern, true) . "</p>\n";
+						        "Invalid value for 2nd parameter " .
+						        print_r($pattern, true) . "</p>\n";
 		    return '';
 		}
 
 		// process parameters
-		$or				= '';
+        $or				= '';
+        $i              = 1;
 
 		foreach($parms as $pattern)
         {		// loop through patterns
             if (is_array($pattern))
-            {
+            {               // array of simple string comparisons
                 foreach($pattern as $val)
                 {
-                    $where			.= $or . "$fldname='$val'";
+                    if (is_string($refname))
+                    {
+                        $where			    .= $or . "$fldname=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $val;
+                        $i++;
+                    }
+                    else
+                    {
+                        $where			    .= $or . "$fldname=?";
+                        $this->sqlParms[]   = $val;
+                    }
                     $or             = ' OR ';
                 }
-            }
+            }               // array of simple string comparisons
             else
 		    if ($pattern == '')
-		    {			// empty string
+		    {			    // empty string
 				$where			.= $or . "$fldname=''";
-		    }			// empty string
+                $or             = ' OR ';
+		    }			    // empty string
 		    else
 		    if (strlen($pattern) > 5 &&
 				strtoupper(substr($pattern, 0, 5) == 'LIKE '))
-		    {		// portable pattern matching
+		    {		        // portable pattern matching
 				$value			= trim(substr($pattern, 5));
 				if (substr($value,0,1) == "'" &&
 				    substr($value,-1) == "'")
@@ -1198,57 +1367,126 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				    substr($value,-1) == '"')
 				    $value		= substr($value, 1, strlen($value)-2);
 				$value			= stripcslashes($value);
-				$where			.= $or . "$fldname LIKE ?";
+                if (is_string($refname))
+                {
+				    $where			.= $or . "$fldname LIKE :$refname$i";
+                    $this->sqlParms["$refname$i"]   = $value;
+                    $i++;
+                }
+                else
+                {
+                    $where			.= $or . "$fldname LIKE ?";
+                    $this->sqlParms[]   = $val;
+                }
+                $or                 = ' OR ';
 				$this->sqlParms[]	= $value;
-		    }		// portable pattern matching
+		    }		        // portable pattern matching
 		    else
 		    if (strlen($pattern) > 1 &&
 				substr($pattern, 0 ,1) == '^' &&
 				preg_match("/[.*+?()[\]]/",
 						   substr($pattern,1,strlen($pattern)-2)) == 0)
-		    {		// match at beginning
+		    {		        // match at beginning
 				if (substr($pattern, -1) == '$')
-				{		// match whole value
+				{		    // match whole value
 				    $vlen		= strlen($pattern) - 2;
-				    $where		.= $or . "$fldname=?";
-				    $this->sqlParms[]	= substr($pattern, 1, $vlen);
-				}		// match whole value
+				    $value	    = substr($pattern, 1, $vlen);
+                    if (is_string($refname))
+                    {
+				        $where		.= $or . "$fldname=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $value;
+                        $i++;
+                    }
+                    else
+                    {
+				        $where		.= $or . "$fldname=?";
+                        $this->sqlParms[]   = $value;
+                    }
+				}		    // match whole value
 				else
-				{		// match at beginning of string
+				{		    // match at beginning of string
 				    $vlen		= strlen($pattern) - 1;
-				    $where		.= $or . "LEFT($fldname, $vlen)=?";
-				    $this->sqlParms[]	= substr($pattern, 1);
-				}		// match at beginning of string
-		    }		// match at beginning
+				    $value  	= substr($pattern, 1);
+                    if (is_string($refname))
+                    {
+				        $where		.= $or . "LEFT($fldname, $vlen)=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $value;
+                        $i++;
+                    }
+                    else
+                    {
+				        $where		.= $or . "LEFT($fldname, $vlen)=?";
+                        $this->sqlParms[]   = $value;
+                    }
+				}		    // match at beginning of string
+		    }		        // match at beginning
 		    else
 		    if (strlen($pattern) > 1 &&
 				substr($pattern, -1) == '$' &&
 				preg_match("/[.*+?()[\]]/",
 						   substr($pattern,0,strlen($pattern)-1)) == 0)
-		    {		// match at end of string
+		    {		        // match at end of string
 				$vlen		 	= strlen($pattern) - 1;
-				$where			.= $or . "RIGHT($fldname, $vlen)=?";
-				$this->sqlParms[]	= substr($pattern, 0, $vlen);
-		    }		// match at end of string
+			    $value  	    = substr($pattern, 0, $vlen);
+                if (is_string($refname))
+                {
+			        $where		.= $or . "RIGHT($fldname, $vlen)=:$refname$i";
+                    $this->sqlParms["$refname$i"]   = $value;
+                    $i++;
+                }
+                else
+                {
+			        $where		.= $or . "RIGHT($fldname, $vlen)=?";
+                    $this->sqlParms[]   = $value;
+                }
+		    }		        // match at end of string
 		    else
 		    if (preg_match("/[.*+?()[\]]/", $pattern) == 1)
-		    {		// value is a REGEXP pattern
-				$where			.= $or . "$fldname REGEXP ?";
-				$this->sqlParms[]	= $pattern;
-		    }		// value is a REGEXP pattern
+		    {		        // value is a REGEXP pattern
+                if (is_string($refname))
+                {
+			        $where		.= $or . "$fldname REGEXP :$refname$i";
+                    $this->sqlParms["$refname$i"]   = $pattern;
+                    $i++;
+                }
+                else
+                {
+			        $where		.= $or . "$fldname REGEXP ?";
+                    $this->sqlParms[]   = $pattern;
+                }
+		    }		        // value is a REGEXP pattern
 		    else
 		    if (substr($pattern,0,1) == '!')
-		    {		// value is a string to exclude from results
-				$where			.= $or . "$fldname!=?";
-				$this->sqlParms[]	= substr($pattern,1);
-		    }		// value is a string to exclude from results
+		    {		        // value is a string to exclude from results
+				$value      	= substr($pattern,1);
+                if (is_string($refname))
+                {
+			        $where		.= $or . "$fldname!=:$refname$i";
+                    $this->sqlParms["$refname$i"]   = $value;
+                    $i++;
+                }
+                else
+                {
+			        $where		.= $or . "$fldname!=?";
+                    $this->sqlParms[]   = $value;
+                }
+		    }		        // value is a string to exclude from results
 		    else
-		    {		// value is a string to find
-				$where			.= $or . "LOCATE(?, $fldname) > 0";
-				$this->sqlParms[]	= $pattern;
-		    }		// value is a string to find
+		    {		        // value is a string to find
+                if (is_string($refname))
+                {
+			        $where		.= $or . "LOCATE(:$refname$i, $fldname) > 0";
+                    $this->sqlParms["$refname$i"]   = $pattern;
+                    $i++;
+                }
+                else
+                {
+			        $where		.= $or . "LOCATE(?, $fldname) > 0";
+                    $this->sqlParms[]   = $pattern;
+                }
+		    }		        // value is a string to find
 		    $or		= ' OR ';
-		}		// loop through patterns
+		}		            // loop through patterns
 		if (strlen($where) > 0 && count($parms) > 1)
 		{
 		    $where		= "($where)";
@@ -1414,7 +1652,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		    else
 		    if (is_string($fldname))
             {			// field name
-				$fieldLc	= $nsclass::getRealFieldName($fldname);
+                $fieldLc	= $nsclass::getRealFieldName($fldname);
 				if (is_null($fieldLc))
 				{
 				    $warn	.= "<p>RecordSet::getWhere: " . __LINE__ .
@@ -1430,15 +1668,18 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 						$expression	= $this->getWhereInt($fieldLc,
 											     $value);
 				    else
-				    {
+                    {
+                        if ($debug)
+                        {
 $warn	.= "<p>RecordSet::getWhere: " . __LINE__ .
 				" \$initRow['$fieldLc']=" . gettype($initRow[$fieldLc]) .
 				"</p>\n";
 foreach($initRow as $f => $v)
 $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
 				$f . '=' . gettype($v) . "='$v'</p>\n";
+                        }
 						$expression	= $this->getWhereCommon($fieldLc,
-												$value);
+                                                            $value);
 				    }
 				    if (strlen($expression) > 0)
 				    {
@@ -1480,12 +1721,16 @@ $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
     {
 		global	$debug;
 		global	$warn;
+		global	$msg;
 		global	$connection;
 
-		if ($this->information['count'] > 1000)
-		    throw new Exception("RecordSet::delete: " .
+        if ($this->information['count'] > 1000)
+        {
+		    $msg        .= "RecordSet::delete: " .
 								number_format($this->information['count']) .
-								" is too many records to delete.");
+                                " is too many records to delete.";
+            return 0;
+        }
 
 		if (is_string($xml))
 		{		// string tag name
@@ -1527,9 +1772,10 @@ $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
 		    }		// success
 		    else
 		    {		// error performing query
-				throw new Exception("RecordSet::delete: " .
+				$msg        .= "RecordSet::delete: " .
 									"'$deleteText', " .
-									print_r($stmt->errorInfo(),true));
+                                    print_r($stmt->errorInfo(),true);
+                return 0;
 		    }		// error performing query
 		}		// update database
 
@@ -1894,6 +2140,21 @@ $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
     }		// public function getDistinct()
 
     /********************************************************************
+     *	function RecordSet::getErrors									*
+     *																	*
+     *  Get any errors detected by the constructor.  These errors       *
+     *  prevent updates being applied to the database but are           *
+     *  accumulated as an alternative to throwing an exception.         *
+     *																	*
+     *	Returns:														*
+     *	    string containing error messages                            *
+     ********************************************************************/
+    function getErrors($xml)
+    {
+        return $this->$msg;
+    }		// function Record::getErrors
+
+    /********************************************************************
      *	function RecordSet::push										*
      *																	*
      *	Add a new index and record to the front of the RecordSet.		*
@@ -1937,16 +2198,21 @@ $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
 		global	$debug;
 		global	$warn;
 		global	$msg;
-		global	$connection;
-		if ($this->information['count'] > 1000 &&
-		    $this->limit > 1000)
-		{
-		    $warn		.= "<p>RecordSet::rewind: " . __LINE__ . ' ' .
-								   number_format($this->information['count']) .
-						   " is too many records to read into memory.</p>\n";
-		    $this->limit	= 0;
-		    return false;
-		}
+        global	$connection;
+
+        $maxsetsize         = 1000;
+        if (array_key_exists('maxsetsize', $this->information))
+            $maxsetsize     = $this->information['maxsetsize'];
+        if ($this->limit == PHP_INT_MAX &&
+            $this->information['count'] > $maxsetsize)
+        {
+            $warn   .= "<p>RecordSet::rewind: " . __LINE__ . ' ' .
+                        number_format($this->information['count']) .
+                        " is too many records to read into memory for query '" .
+                        $this->information['query'] . 
+                        "' from parms " . print_r($this->parms, true) . ".</p>\n";
+            $this->limit    = 0;
+        }
 
 		if ($this->list === null)
 		{
@@ -1957,11 +2223,11 @@ $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
 		    }
 
 		    // construct a query for the specific matches
-		    $query		= $this->query;
+		    $query		    = $this->query;
 		    $queryText		= debugPrepQuery($query, $this->sqlParms);
 
 		    // query the database for matches
-		    $stmt		= $connection->prepare($query);
+		    $stmt		    = $connection->prepare($query);
 		    if ($stmt->execute($this->sqlParms))
 		    {		// success
 				$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -1980,7 +2246,9 @@ $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
 				if (!class_exists($nsclass))
 				    include __NAMESPACE__ . "/" . $className . ".inc";
 				$censusObj		= null;
-				$oldCensusId	= '';
+                $oldCensusId	= '';
+                $censusTable    = ($className == 'CensusLine') ||
+                                  preg_match('/^Census\d\d\d\d$/', $className);
 				foreach($result as $row)
 				{		// loop through records from table
 				    if (is_array($row))
@@ -1990,17 +2258,18 @@ $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
 						    if ($className == 'Record')
 								$object		= new Record($row,$this->table);
 						    else
-						    if ($className == 'CensusLine')
-						    {
+						    if ($censusTable)
+						    {           // census
 								if (array_key_exists('censusid', $row))
 								    $censusId	= $row['censusid'];
 								else
 								{
 								    $censusYear	= substr($this->table, 6, 4);
 								    if ($censusYear > 1867)
-									$censusId= 'CA' . $censusYear;
+									    $censusId   = 'CA' . $censusYear;
 								    else
-									$censusId= $row['province']. $censusYear;
+                                        $censusId   = $row['province'] . 
+                                                      $censusYear;
 								}
 								if (is_null($censusObj) ||
 								    $censusId != $oldCensusId)
@@ -2011,12 +2280,12 @@ $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
 								}
 								$object		= new $nsclass(array('Census' => $censusObj),
 												 $row);
-						    }
+						    }           // census
 						    else
 								$object		= new $nsclass($row);
 						}
 						else
-						    $object		= new Record($row,$this->table);
+						    $object		    = new Record($row,$this->table);
 						if (is_string($prime) && strlen($prime) > 0)
 						    $retval[$row[$prime]]= $object;
 						else
@@ -2123,6 +2392,8 @@ $warn	.= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
     {
 		if ($this->list === null)
 		    $this->rewind();
+        if ($this->list === null)
+            return false;
 		$key		= key($this->list);
 		$valid 		= ($key !== NULL && $key !== FALSE);
 		return $valid;

@@ -1,196 +1,188 @@
 <!--*********************************************************************
- *  genProvinceCAONen.html						*
- *									*
- *  English template for menu of genealogical services for Ontario.	*
- *									*
- *  History:								*
- *	2017/11/13	created						*
- *	2018/01/03	add header link to Edit Domains dialog		*
- *	2018/01/04	remove Template from template file names	*
- *	2018/01/09	use only absolute filenames in href		*
- *	2018/03/07	initially hide portions of the page		*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  genProvinceCAONen.html												*
+ *																		*
+ *  English template for menu of genealogical services for Ontario.		*
+ *																		*
+ *  History:															*
+ *		2017/11/13		created											*
+ *		2018/01/03		add header link to Edit Domains dialog			*
+ *		2018/01/04		remove Template from template file names		*
+ *		2018/01/09		use only absolute filenames in href				*
+ *		2018/03/07		initially hide portions of the page				*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
 <div id="breadcrumbs" class="hidden">
     <a href="/genealogy.php?lang=$LANG">
-	Genealogy
+		Genealogy
     </a>:
     <a href="/Canada/CountriesEdit.php?lang=$LANG">
-	List of Supported Countries
+		List of Supported Countries
     </a>:
     <a href="/genCountry.php?cc=CA&amp;lang=$LANG">
-	Canada
+		Canada
     </a>:
     <a href="/Canada/DomainsEdit.php?cc=CA">
-	Provinces
+		Provinces
     </a>:
 </div>	
 <div class="body">
   <h1>
-	Ontario
+		Ontario
       <span class="right">
-	
+		
     <a href="/Ontario/genOntarioHelpen.html" target="help">? Help</a>
       </span>
   </h1>
     $TRACE
     $MSG
   <form name="actionForm">
-  <h2>
-	Province-wide Databases
+  <h2>Province-wide Databases
     <button type="button" id="showAll">+</button>
   </h2>
     <div id="provinceAll" style="display: none;">
       <p class="label">
-	<a target="_blank" href="http://www.archives.gov.on.ca/en/index.aspx">
-		Archives of Ontario</a>
+		<a target="_blank" href="http://www.archives.gov.on.ca/en/index.aspx">
+			Archives of Ontario</a>
       </p>
       <p class="label">
-	<a target="_blank" href="http://www.ancestry.com/">
-		Ancestry.com: Ontario BMD indices and images</a> 
+		<a target="_blank" href="http://www.ancestry.com/">
+			Ancestry.com: Ontario BMD indices and images</a> 
       </p>
       <p class="label">
-	<a target="_blank" href="http://www.familysearch.org/">
-		FamilySearch Internet Genealogy Service</a> 
+		<a target="_blank" href="http://www.familysearch.org/">
+			FamilySearch Internet Genealogy Service</a> 
       </p>
       <p class="label">
-	<a target="_blank" href="http://digit.tpl.toronto.on.ca:8000/">
-		Toronto Public Library Search</a> 
+		<a target="_blank" href="http://digit.tpl.toronto.on.ca:8000/">
+			Toronto Public Library Search</a> 
       </p>
       <p class="label">
-	<a target="_blank" href="http://digital.library.mcgill.ca/CountyAtlas/default.htm">
-		Canadian County Atlas Digital Project</a> 
+		<a target="_blank" href="http://digital.library.mcgill.ca/CountyAtlas/default.htm">
+			Canadian County Atlas Digital Project</a> 
       </p>
       <p class="label">
-	<a target="_blank" href="http://www.collectionscanada.ca/canadiandirectories/index-e.html">
-		Canadian directories who was where</a> 
+		<a target="_blank" href="http://www.collectionscanada.ca/canadiandirectories/index-e.html">
+			Canadian directories who was where</a> 
       </p>
       <p class="label">
-	<a target="_blank" href="http://www.islandnet.com/ocfa/">
-		Ontario Cemetery Finding Aid</a> 
+		<a target="_blank" href="http://www.islandnet.com/ocfa/">
+			Ontario Cemetery Finding Aid</a> 
       </p>
       <p class="label">
-	<a target="_blank" href="http://www.geneofun.on.ca/ontariolocator/">
-		Ontario Locator</a>
+		<a target="_blank" href="http://www.geneofun.on.ca/ontariolocator/">
+			Ontario Locator</a>
       </p>
       <p class="label">
-	<a target="_blank" href="http://www.ontarioroots.com/">
-		Ontario Roots</a> 
-      </p>
-      <p class="label">
-	<a target="_blank" href="http://www.ourroots.ca">
-		Our Roots - Nos Racines ~ Canada's Local Histories Online</a>
+		<a target="_blank" href="http://www.ourroots.ca">
+			Our Roots - Nos Racines ~ Canada's Local Histories Online</a>
       University of Calgary, Universit&eacute; Laval
       </p>
       <p class="label">
-	<a target="_blank"
-		href="http://freepages.genealogy.rootsweb.com/~wjmartin/wesleyan.htm">
-		Wesleyan Methodist Baptisms</a> 
+		<a target="_blank"
+			href="http://freepages.genealogy.rootsweb.com/~wjmartin/wesleyan.htm">
+			Wesleyan Methodist Baptisms</a> 
       </p>
       <p class="label">
-	<a target="_blank" href="http://www.ogs.on.ca/">
-		Ontario Genealogy Society</a> 
+		<a target="_blank" href="http://www.ogs.on.ca/">
+			Ontario Genealogy Society</a> 
       </p>
     </div>
-  <h2>
-	Ontario Family Trees
+  <h2>Ontario Family Trees
   </h2>
   <p class="label">
     <a target="_blank" 
-	href="/FamilyTree/nominalIndex.php">
-	Nominal Index of Family Tree
+		href="/FamilyTree/nominalIndex.php">
+		Nominal Index of Family Tree
     </a>
   </p>
 
-  <h2>
-	County Specific
+  <h2>County Specific
     <button type="button" id="showCounties">+</button>
   </h2>
   <div id="counties" style="display: none;">
     <p class="label">
       <a href="/displayPage.php?template=genOntElg" target="_blank">
-	Elgin County
+		Elgin County
       </a>
     </p>
     <p class="label">
       <a href="/displayPage.php?template=genOntLam" target="_blank">
-	Lambton County
+		Lambton County
       </a>
     </p>
     <p class="label">
       <a href="/displayPage.php?template=genOntMsx" target="_blank">
-	Middlesex County
+		Middlesex County
       </a>
     </p>
   </div>
-  <h2>
-	Databases
+  <h2>Databases
     <button type="button" id="showDbs">+</button>
   </h2>
   <div id="databases" style="display: none;">
     <p class="label">
       <a target="_blank" 
-		href="/Canada/BirthRegQuery.php?domain=CAON&lang=$LANG">
-	Birth Registration Query
+			href="/Canada/BirthRegQuery.php?domain=CAON&lang=$LANG">
+		Birth Registration Query
       </a>
     </p>
     <p class="label">
       <a target="_blank" 
-		href="/Ontario/DistrictMarriageEditQuery.php?lang=$LANG">
-	Upper Canada District Marriage Registrations 1780&mdash;1858 Query
+			href="/Ontario/DistrictMarriageEditQuery.php?lang=$LANG">
+		Upper Canada District Marriage Registrations 1780&mdash;1858 Query
       </a>
     </p>
     <p class="label">
       <a target="_blank" 
-		href="/Ontario/CountyMarriageEditQuery.php?lang=$LANG">
-	Canada West County Marriage Registration 1858&mdash;1869 Query
+			href="/Ontario/CountyMarriageEditQuery.php?lang=$LANG">
+		Canada West County Marriage Registration 1858&mdash;1869 Query
       </a>
     </p>
     <p class="label">
       <a target="_blank" 
-		href="/Ontario/MarriageRegQuery.php?lang=$LANG">
-	Marriage Registration Query
+			href="/Ontario/MarriageRegQuery.php?lang=$LANG">
+		Marriage Registration Query
       </a>
     </p>
     <p class="label">
       <a target="_blank" 
-		href="/Ontario/DeathRegQuery.php?lang=$LANG">
-	Death Registration Query
+			href="/Ontario/DeathRegQuery.php?lang=$LANG">
+		Death Registration Query
       </a>
     </p>
     <p class="label" id="OCFA">
       <a target="_blank" 
-		href="/displayPage.php?template=OcfaQuery">
-	Ontario Cemetery Finding Aid Unauthorized Back Door Query
+			href="/Ontario/OcfaQuery.php?lang=$LANG">
+		Ontario Cemetery Finding Aid Unauthorized Back Door Query
       </a>
     </p>
     <p class="label" id="Wesleyan">
       <a target="_blank" 
-		href="/displayPage.php?template=WmbQuery">
-	Ontario Wesleyan Methodist Baptisms Unauthorized Back Door Query
+			href="/Ontario/WmbQuery.html">
+		Ontario Wesleyan Methodist Baptisms Unauthorized Back Door Query
       </a>
     </p>
     <p class="label">
       <a target="_blank" 
-		href="/Canada/CountiesEdit.php?Domain=CAON&lang=$LANG">
-	Counties
+			href="/Canada/CountiesEdit.php?Domain=CAON&lang=$LANG">
+		Counties
       </a>
     </p>
   </div>
   </form>
   </div> <!-- end of <div id="body"> -->
     <div id="HelpshowAll" class="balloon">
-	Clicking on this button displays additional resource links
-	relevant to this state or province.
+		Clicking on this button displays additional resource links
+		relevant to this state or province.
     </div>
     <div id="HelpshowCounties" class="balloon">
-	Clicking on this button displays additional resource links
-	relevant to specific counties within this state or province.
+		Clicking on this button displays additional resource links
+		relevant to specific counties within this state or province.
     </div>
     <div id="HelpshowDbs" class="balloon">
-	Clicking on this button displays additional databases that
-	can be searched for this state or province.
+		Clicking on this button displays additional databases that
+		can be searched for this state or province.
     </div>
 
     <script src="/jscripts/js20/http.js" type="text/javascript">

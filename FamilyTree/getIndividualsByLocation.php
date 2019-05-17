@@ -66,7 +66,7 @@ require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/PersonSet.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
     // validate parameters
@@ -185,7 +185,7 @@ require_once __NAMESPACE__ . '/common.inc';
 		    if ($person->get('gender') == 0)
 				$gender			= 'male';
 		    else
-				$gender			= 'female';
+                $gender			= 'female';
 		    if ($person->get('idlrbirth') == $idlr)
 				$eventType		= 'Birth';
 		    else
@@ -210,7 +210,7 @@ require_once __NAMESPACE__ . '/common.inc';
 
 		foreach($events as $ider => $event)
 		{		// loop through events
-		    $idet			= $event->get('idet');
+		    $idet			    = $event->get('idet');
 		    $eventType			= Event::$eventText[$idet];
 		    $eventType			= ucfirst($eventType);
 		    if ($event->get('idtype') == Event::IDTYPE_INDIV)

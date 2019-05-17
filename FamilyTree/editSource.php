@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+
 /************************************************************************
  *  editSource.php														*
  *																		*
@@ -57,13 +59,14 @@ use \Exception;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2018/12/02      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/04/09      use common internationalization table           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Language.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
@@ -122,7 +125,10 @@ if (canUser('edit'))
     $action                 = 'Update';
 else
     $action                 = 'Display';
+
 $template		            = new FtTemplate("editSource$action$lang.html");
+
+$translate                  = $template->getTranslate();  //i18n
 
 // validate parameters
 if (!is_null($idsr))
@@ -179,29 +185,28 @@ else
 }
 
 $stSet                      = array();
-$srcTypesElt                = $template['srcTypes'];
-if ($srcTypesElt)
-{
-	foreach($srcTypesElt->childNodes() as $span)
+$srcTypes                   = $translate['srcTypes'];
+if ($srcTypes)
+{                       // build a selection list
+	foreach($srcTypes as $key => $text)
 	{
-	    $key		        = $span->attributes['data-key'];
-        $stSet[$key]	    = array('idst' => $key,
-                                    'srctype' => trim($span->innerHTML()), 
-                                    'selected' => '');
+        $stSet[$key]	    = array('idst'      => $key,
+                                    'srctype'   => $text, 
+                                    'selected'  => '');
     }
-}
+}                       // build a selection list
 $idst                       = $source->get('idst');
 $stSet[$idst]['selected']   = 'selected="selected"';
 			        
 // get the requested instance of Source
 if (strlen($msg) == 0)
 {
-	$idsr	= (int)$idsr;
+	$idsr	        = (int)$idsr;
 
 	// get all repository address records to create selection list
-	$repoSet	= new RecordSet('tblAR',
-							array('Kind'	=> 2,
-							      'Order'	=> 'AddrName'));
+	$repoSet	    = new RecordSet('tblAR',
+				        			array('Kind'	=> 2,
+					        		      'Order'	=> 'AddrName'));
 
 	// get all names of authors as an array of strings for selection list
 	$sourceSet	    = new RecordSet('tblSR');
@@ -240,14 +245,14 @@ $optionText                     = $optionElt->outerHTML();
 $data                           = '';
 foreach($authorResult as $i => $srcauthor)
 {
-    $optionTemplate = new Template($optionText);
+    $optionTemplate             = new Template($optionText);
     $optionTemplate->set('author',          $srcauthor);
     $optionTemplate->set('i',               $i);
     if ($srcauthor == $author)
         $optionTemplate->set('selected',    'selected="selected"');
     else
         $optionTemplate->set('selected',    '');
-    $data           .= $optionTemplate->compile();
+    $data                       .= $optionTemplate->compile();
 }
 $optionElt->update($data);
 //
@@ -261,14 +266,14 @@ $optionText                     = $optionElt->outerHTML();
 $data                           = '';
 foreach($repoSet as $idari => $instance)
 {
-    $optionTemplate = new Template($optionText);
+    $optionTemplate             = new Template($optionText);
     $optionTemplate->set('name',    htmlspecialchars($instance['addrname']));
-    $optionTemplate->set('idar',            $idari);
+    $optionTemplate->set('idar',    $idari);
     if ($idari == $idar)
         $optionTemplate->set('selected',    'selected="selected"');
     else
         $optionTemplate->set('selected',    '');
-    $data           .= $optionTemplate->compile();
+    $data                       .= $optionTemplate->compile();
 }
 $optionElt->update($data);
 //

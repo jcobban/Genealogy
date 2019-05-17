@@ -78,6 +78,8 @@
  *		2018/11/02      pass authentication key to GoogleApis           *
  *		                ensure lang= parameter not passed to popup      *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/16      familyTree cookie was erroneously set from      *
+ *		                the idir field in the popup template            *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -315,8 +317,12 @@ function onLoad()
 				case 'idir':
 				{	// edit individual
 				    var	cookie		= new Cookie("familyTree");
-				    cookie.idir		= element.value;
-				    cookie.store(10);		// keep for 10 days
+                    var tvalue      = parseInt(element.value);
+                    if (Number.isInteger(tvalue))
+                    {
+				        cookie.idir		= tvalue;
+				        cookie.store(10);		// keep for 10 days
+                    }
 				    break;
 				}	// edit individual
 

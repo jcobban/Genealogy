@@ -1,0 +1,233 @@
+<!--*********************************************************************
+ *  Usersen.html														*
+ *																		*
+ *  Template for a web page containing all of the users.				*
+ *																		*
+ *  History:															*
+ *		2018/01/29		Created											*
+ *																		*
+ *  Copyright &copy; 2017 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+    </div>
+    <div class='body'>
+      <h1>
+        <span class='right'>
+		  <a href='UsersHelpen.html' target='help'>? Help</a>
+        </span>
+		  Users Master List
+      </h1>
+      $TRACE
+      $MSG
+      <p class='label'>
+        $COUNT Users match the specified pattern.
+      </p>
+      <form name='locForm' action='Users.php' method='post'>
+        <div class='row'>
+  		  <label class='label' for='pattern'
+  			  style='width: 12em;'>
+  		      Pattern:
+  		  </label>
+  		  <input type='text' name='pattern' id='pattern' class='white leftnc'
+  			  size='64' value='$pattern'>
+        </div>
+        <div class='row'>
+  		  <label class='label' for='authPattern' style='width: 12em;'>
+  		      Authorizations:
+  		  </label>
+  		  <input type='text' name='authPattern' id='authPattern'
+  			  class='white leftnc' 
+  			  size='64' value='$authPattern'>
+        </div>
+        <div class='row'>
+  		  <label class='label' for='mailPattern' style='width: 12em;'>
+  		      E-Mail Address:
+  		  </label>
+  		  <input type='text' name='mailPattern' id='mailPattern'
+  			  class='white leftnc' 
+  			  size='64' value='$mailPattern'>
+        </div>
+  		  if ($debug
+        <input type='hidden' name='Debug' id='Debug' value='Y'>
+    <p class='label'>
+      <button type='submit' id='Submit'>
+        Search
+      </button>
+    &nbsp;
+  		  class='buttonText' id='bulkMail'>
+    Send Bulk Mail
+      </a>
+    </p>
+      <div class='center' id="topBrowse">
+        <div class='left' id="topPrev">
+  		  <a href='Users.php?pattern=$pattern&amp;limit=$limit&amp;offset=$prevoffset'>&lt;---
+  		  </a>
+        </div>
+    
+        <div class='right' id="topNext"> 
+  		  <a href='Users.php?pattern=$pattern&amp;limit=$limit&amp;offset=$nextoffset'>
+  		  ---&gt;
+  		  </a>
+        </div>
+        rows $offset to $last of $count
+        <div style='clear: both;'></div>
+      </div>
+    <!--- Put out the response as a table -->
+    <table class='details' id="dataTable">
+    <!--- Put out the column headers -->
+      <thead>
+        <tr>
+          <th class='colhead'>
+  		  User Name
+          </th>
+          <th class='colhead'>
+  		  E-Mail Address
+          </th>
+          <th class='colhead'>
+  		  Authorizations
+          </th>
+  		      if (!$readonly
+          <th class='colhead' colspan='3'>
+  		  Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  		  <td class='$rowtype left'>
+  	    $username
+  		    <input type='text' class='white leftnc' size='18'
+  			  name='User$id' id='User$id'
+  			    value='$username, ENT_QUOTES)'>
+  		  </td>
+  		  <td class='$rowtype left'>
+  	    $email
+  		    <input type='text' class='white leftnc' size='24'
+  			  name='EMail$id' id='EMail$id'
+  			    value='$email, ENT_QUOTES)'>
+  		  </td>
+  		  <td class='$rowtype left'>
+  		  if ($readonly
+  	    $auth
+  		  else
+  		    <input type='text' class='white leftnc' size='18'
+  			  name='Auth$id' id='Auth$id'
+  			    value='$auth, ENT_QUOTES)'>
+  		  </td>
+  		  <td class='$rowtype left'>
+  		      <button type='button' id='delete$id'>
+  			  Delete
+  		      </button>
+  		  </td>
+  		  <td class='$rowtype left'>
+  		      <button type='button' id='reset$id'>
+  			  Reset&nbsp;Password
+  		      </button>
+  		  </td>
+  		  <td class='$rowtype left'>
+  		      <button type='button' id='confirm$id'>
+  			  Confirm
+  		      </button>
+  		  </td>
+        </tr>
+      </tbody>
+    </table>
+    </form>
+      <p class='message'>Only the administrator can use this application</p>
+    </div>
+    <div class='balloon' id='Helppattern'>
+    <p>
+      This is an "extended regular expression", as supported by MySQL, which is
+      used to search for users based upon their user name.
+      See <a href='http://www.tin.org/bin/man.cgi?section=7&topic=regex'>Henry Spencer's regex page</a>.
+      <ul>
+         <li>If the pattern contains no special 
+  		  characters then only users containing that string will be included.
+  		  For example the pattern "bob" will match users containing the
+  		  string "bob".  Note that the search ignores case, so that pattern
+  		  will also match "Bob" and "BOB".
+        <li>If the pattern begins with a caret '^' then only users that
+  		  <b>begin</b> with the remainder of the pattern are included.  
+  		  For example the pattern
+  		  "^Ba" displays users starting with "Ba" (or "ba" or "BA").
+        <li>If the pattern ends with a dollar sign '$', then only users that
+  		  <b>end</b> with the remainder of the pattern are included.  
+  		  For example the pattern
+  		  "CA$" matches users that end with "CA" (or "ca" or "Ca").
+        <li>In a pattern a period '.' matches any single character.  For example
+  		  the pattern "B.b" matches any user that contains two letter Bs
+  		  separated by one character, for example "Bab", "Beb", "Bib", "Bob",
+  		  or "Bub" anywhere in the user name.
+        <li>In a pattern an asterisk '*' matches zero or more of the preceding
+  		  character; "bo*b" matches "bb", "bob", and "boob"
+  		  anywhere in the user name.
+      <ul>
+    </p>
+    </div>
+    <div class='balloon' id='HelpmailPattern'>
+    <p>
+      This is an "extended regular expression", as supported by MySQL, which is
+      used to search for users based upon their e-mail address.
+      See <a href='http://www.tin.org/bin/man.cgi?section=7&topic=regex'>Henry Spencer's regex page</a>.
+      <ul>
+         <li>If the pattern contains no special 
+  		  characters then only users whose e-mail address contains that string
+  		  will be included.
+  		  For example the pattern "London" will match users whose e-mail address
+  		  contains the
+  		  string "London".  Note that the search ignores case, so that pattern
+  		  will also match "LONDON" and "london".
+        <li>If the pattern begins with a caret '^' then only users whose e-mail
+  		  address <b>begins</b> with the remainder of the pattern are included.  
+  		  For example the pattern "^Ba" displays users whose e-mail address
+  		  starts with "Ba" (or "ba" or "BA").
+        <li>If the pattern ends with a dollar sign '$', then only users whose
+  		  e-mail address <b>ends</b> with the remainder of the pattern are
+  		  included.  For example the pattern "CA$" matches users whose e-mail
+  		  address ends with "CA" (or "ca" or "Ca").
+        <li>In a pattern a period '.' matches any single character.  For example
+  		  the pattern "B.b" matches any user whose e-mail address contains two
+  		  letter Bs separated by one character, for example "Bab", "Beb", "Bib",
+  		  "Bob", or "Bub" anywhere in the e-mail address.
+        <li>In a pattern an asterisk '*' matches zero or more of the preceding
+  		  character; "bo*b" matches "bb", "bob", and "boob"
+  		  anywhere in the e-mail address.
+      <ul>
+    </p>
+    </div>
+    <div class='balloon' id='HelpauthPattern'>
+      This is the identifier of a level of authorization, such as 'edit', or 'blog',
+      or 'all'.
+    </div>
+    <div class='balloon' id='HelpUser'>
+      This field permits the administrator to change the user name chosen by the
+      contributor.
+    </div>
+    <div class='balloon' id='HelpEMail'>
+      This field permits the administrator to change the e-mail address supplied
+      by the contributor.
+    </div>
+    <div class='balloon' id='HelpAuth'>
+      This field permits the administrator to change the list of authorizations
+      for the contributor.
+    </div>
+    <div class='balloon' id='HelpSubmit'>
+      Click on this button to search for matching users.
+    </div>
+    <div class='balloon' id='Helpdelete'>
+      Click on this button to delete the associated user.
+    </div>
+    <div class='balloon' id='Helpreset'>
+      Click on this button to reset the password of the associated user to a new
+      random string.
+    </div>
+    <div class='balloon' id='Helpconfirm'>
+      Click on this button to confirm the associated user and assign initial
+      permissions.  This is in-case the e-mail exchange failed.
+    </div>
+    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="Users/.js" type="text/javascript"></script>

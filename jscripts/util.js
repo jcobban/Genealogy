@@ -194,6 +194,12 @@
  *		2019/03/02      remove facebook link if not enough room         *
  *		2019/04/07      display help if mouse click on input field      *
  *		                this is in part to support mobile devices       *
+ *		2019/04/26      position dialog above element if not enough     *
+ *		                room below the element to show without scrolling*
+ *		2019/05/03      move management of page scrolling lines to      *
+ *		                commonInit                                      *
+ *		                reposition scrolling lines for scrolling        *
+ *		                hide and restore facebook on page resize        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1484,26 +1490,38 @@ function eltMouseOver()
 }		// function eltMouseOver
 
 /************************************************************************
+ *  function popupHelpHandler											*
+ *																		*
+ *  This method is called if the mouse is clicked on the element.       *
+ *  It shows the associated help division.		                        *
+ *  This is used because mobile devices do not support the mouseover    *
+ *  and mouseout events.                                                *
+ ************************************************************************/
+function popupHelpHandler(ev)
+{
+    if (popupHelpOption)
+    {                           // user accepts popup help
+        helpElt             = ev.target;
+        popupHelp();
+    }                           // user accepts popup help
+}       // function popupHelpHandler
+
+/************************************************************************
  *  function popupHelp													*
  *																		*
  *  This function is called if the mouse is held over an input element	*
  *  on the invoking page for more than 2 seconds, or the mouse is       *
  *  clicked on the element.  It shows the associated help division.		*
  ************************************************************************/
-function popupHelpHandler(ev)
-{
-    if (popupHelpOption)
-    {
-        helpElt             = ev.target;
-        popupHelp();
-    }
-}       // function popupHelpHandler
-
 function popupHelp()
 {
     if (helpElt)
     {
-        displayHelp(helpElt);
+        if (!helpElt.helpAlreadyDisplayed)
+        {                       // help for this element never displayed
+            displayHelp(helpElt);
+            helpElt.helpAlreadyDisplayed    = true; // only once
+        }                       // help for this element never displayed
         helpElt         = null;
     }
     else
@@ -1701,10 +1719,12 @@ function displayDialog(dialog,
 		}		// default action, every button closes dialog
 
 		// display the dialog offset from the requesting button
+		var topOffset	    	= 0;
 		var leftOffset	    	= 0;
 		var rightOffset	    	= 0;
 		if (element)
 		{
+		    topOffset		    = getOffsetTop(element);
 		    leftOffset		    = getOffsetLeft(element);
 		    rightOffset		    = getOffsetRight(element);
 		}
@@ -1713,14 +1733,25 @@ function displayDialog(dialog,
 		    pane		        = document.body;
 
 		var dialogWidth		    = dialog.clientWidth;
+		var dialogHeight		= dialog.clientHeight;
 		if (leftOffset - dialogWidth < 10)
+        {                   // display to right of element
 		    leftOffset	        = rightOffset + 10 - pane.scrollLeft;
+        }                   // display to right of element
 		else
+        {                   // display to left of element
 		    leftOffset	        = leftOffset - dialogWidth - 10 - 
                                             pane.scrollLeft;
+        }                   // display to left of element
 		dialog.style.left	    = leftOffset + "px";
-		if (element)
-		    dialog.style.top	= (getOffsetTop(element) + 10) + 'px';
+        if ((topOffset + dialogHeight + 10) > pane.clientHeight)
+        {                   // display above element
+		    dialog.style.top	    = (topOffset - dialogHeight - 10) + 'px';
+        }                   // display above element
+        else
+        {                   // display below element
+		    dialog.style.top	    = (topOffset + 10) + 'px';
+        }                   // display below element
 
 		// support mouse dragging
 		dialog.onmousedown	    = dialogMouseDown;
@@ -1761,7 +1792,9 @@ function displayDialog(dialog,
 function addEventHandler(element, type, handler)
 {
     if (element.addEventListener)
+    {
         element.addEventListener(type, handler, false);
+    }
     else if (element.attachEvent)
         element.attachEvent('on' + type, handler);
     else
@@ -1983,16 +2016,17 @@ function keyDownPaging(e)
  *	    event       instance of Event containing load event             *
  *	    this        instance of Window                                  *
  ************************************************************************/
-addEventHandler(window, "load", commonInit);
+addEventHandler(window, "load",     commonInit);
+addEventHandler(window, "resize",   commonResize);
 
 function commonInit(event)
 {
-    var w = window,
-    d = document,
-    e = d.documentElement,
-    g = d.getElementsByTagName('body')[0],
-    x = w.innerWidth || e.clientWidth || g.clientWidth,
-    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+    var w		= window,
+    d			= document,
+    e			= d.documentElement,
+    g			= d.getElementsByTagName('body')[0],
+    x			= w.innerWidth || e.clientWidth || g.clientWidth,
+    y			= w.innerHeight|| e.clientHeight|| g.clientHeight;
 
     addEventHandler(document, "click", documentOnClick);
     addEventHandler(document, "keydown", keyDownPaging);
@@ -2015,20 +2049,24 @@ function commonInit(event)
     }
 
     var advert              = document.getElementById('advertSpan');
-    var advertWidth         = 0
+    var advertWidth         = 500
     if (advert)
     {
-        advertWidth         = advert.offsetWidth;
+        advertWidth         = Math.max(advert.offsetWidth, 500);
     }
 
     var facebook            = document.getElementById('facebookSpan');
-    var facebookWidth       = 0
+    var facebookWidth       = 360;
     if (facebook)
     {
         facebookWidth       = facebook.offsetWidth;
     }
 
     var menusWidth= menuWidth + logoWidth + advertWidth + facebookWidth;
+    
+    FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+    });
 
     // display Facebook status after page is loaded
     if ((menusWidth + 10) > x)
@@ -2076,7 +2114,177 @@ function commonInit(event)
 		    actMouseOverHelp(element);
 		}	    // loop through elements in form
     }		    // iterate through all forms
+
+    var dataTable                   = document.getElementById('dataTable');
+    if (dataTable)
+    {                   // page contains display of tabular results
+	    var topBrowse               = document.getElementById('topBrowse');
+	    var botBrowse               = document.getElementById('botBrowse');
+        if (topBrowse || botBrowse)
+        {               // page contains pagination row
+		    var dataWidth           = dataTable.offsetWidth;
+		    var windowWidth         = document.body.clientWidth - 8;
+		    if (dataWidth > windowWidth)
+		        dataWidth           = windowWidth;
+            if (topBrowse)
+		        topBrowse.style.width   = dataWidth + "px";
+            if (botBrowse)
+		        botBrowse.style.width   = dataWidth + "px";
+
+			// only check for scrolling every 1/4 of a second
+			setInterval( function()
+			{
+			    if ( scrolling ) 
+			    {
+			        scrolling = false;
+			        if (topBrowse)
+                    {
+                        topBrowse.style.left    = lastScrollX + 'px';
+                        topBrowse.style.position= 'relative';
+                    }
+                    if (botBrowse)
+                    {
+                        botBrowse.style.left    = lastScrollX + 'px';
+                        botBrowse.style.position= 'relative';
+                    }
+			    }
+			}, 250);
+        }               // page contains pagination row
+    }                   // page contains display of tabular results
+
 }		// function commonInit
+
+/************************************************************************
+ *  function commonResize												*
+ *																		*
+ *  This function is called for all pages to perform action on resize   *
+ *  that is common to all pages.					                    *
+ *																		*
+ *	Input:																*
+ *	    event       instance of Event containing resize event           *
+ *	    this        instance of Window                                  *
+ ************************************************************************/
+addEventHandler(window, "resize",   commonResize);
+
+function commonResize(event)
+{
+    var w		= window,
+    d			= document,
+    e			= d.documentElement,
+    g			= d.getElementsByTagName('body')[0],
+    x			= w.innerWidth || e.clientWidth || g.clientWidth,
+    y			= w.innerHeight|| e.clientHeight|| g.clientHeight;
+
+    var topCrumbs	        = null;
+    var menuButton	        = document.getElementById('menuButton');
+    var menuWidth           = 0
+    if (menuButton)
+    {
+        topCrumbs           = menuButton.parentNode;
+        menuWidth           = menuButton.offsetWidth;
+    }
+
+    var logo                = document.getElementById('logo');
+    var logoWidth           = 0
+    if (logo)
+    {
+        logoWidth           = logo.offsetWidth;
+    }
+
+    var advert              = document.getElementById('advertSpan');
+    var advertWidth         = 0
+    if (advert)
+    {
+        topCrumbs           = advert.parentNode;
+        advertWidth         = Math.max(advert.offsetWidth, 500);
+    }
+
+    var facebook            = document.getElementById('facebookSpan');
+    var facebookWidth       = 360;
+    if (facebook)
+    {
+        facebookWidth       = facebook.offsetWidth;
+    }
+
+    var menusWidth= menuWidth + logoWidth + advertWidth + facebookWidth;
+    
+    // display Facebook status after page is loaded
+    if ((menusWidth + 10) > x)
+    {                           // not enough room for Facebook
+        if (facebook)
+        {
+            var parentNode       = facebook.parentNode;
+            parentNode.removeChild(facebook);
+        }
+    }                           // not enough room for Facebook
+    else
+    {                           // enough room for Facebook
+		var	facebookFrame	        = document.getElementById("facebookFrame");
+        if (facebook === null)
+        {                       // previously deleted
+            facebook                = document.createElement('span');
+            facebook.className      = 'facebook';
+            facebook.id             = 'facebookSpan';
+            topCrumbs.insertBefore(facebook, advert);
+            var facebookFrame       = document.createElement('iframe');
+            facebookFrame.className = 'facebook';
+            facebookFrame.id        = 'facebookFrame';
+            facebook.appendChild(facebookFrame);
+        }                       // previously deleted
+
+	    try {
+		    if (facebookFrame)
+				facebookFrame.src	= "https://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.jamescobban.net%2Fgenealogy.html&amp;send=false&amp;layout=standard&amp;width=360&amp;show_faces=true&amp;font&amp;colorscheme=light&amp;action=like&amp;height=40";
+	    } catch (e) {
+			alert("util.js: pageInit: catch " + e.message);
+	    }
+    }                           // enough room for Facebook
+
+    var dataTable                   = document.getElementById('dataTable');
+    if (dataTable)
+    {                   // page contains display of tabular results
+	    var topBrowse               = document.getElementById('topBrowse');
+	    var botBrowse               = document.getElementById('botBrowse');
+        if (topBrowse || botBrowse)
+        {               // page contains pagination row
+		    var dataWidth           = dataTable.offsetWidth;
+		    var windowWidth         = document.body.clientWidth - 8;
+		    if (dataWidth > windowWidth)
+		        dataWidth           = windowWidth;
+            if (topBrowse)
+		        topBrowse.style.width   = dataWidth + "px";
+            if (botBrowse)
+		        botBrowse.style.width   = dataWidth + "px";
+        }               // page contains pagination row
+    }                   // page contains display of tabular results
+
+}		// function commonResize
+
+/************************************************************************
+ *  function commonScroll												*
+ *																		*
+ *  This function is called for all pages to support actions when the   *
+ *  viewport of the window is scrolled from its base position.          *
+ *  Because scroll events can be fired at high frequency while the user *
+ *  is dragging the scroll bar, it is recommended to delay updating     *
+ *  the DOM by using an interval timer.                                 *
+ *																		*
+ *	Input:																*
+ *	    event       instance of Event containing scroll event           *
+ *	    this        instance of Window                                  *
+ ************************************************************************/
+addEventHandler(window, "scroll",   commonScroll);
+var scrolling               = false;
+var lastScrollY             = 0;
+var lastScrollX             = 0
+
+function commonScroll(event)
+{
+    lastScrollY             = Math.round(window.scrollY);
+    lastScrollX             = Math.round(window.scrollX);
+    scrolling               = true;
+}           // function commonScroll
+
 
 /************************************************************************
  *  function traceAlert													*

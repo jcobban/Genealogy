@@ -400,6 +400,7 @@ class LegacyDate
      ********************************************************************/
 
     private static	$tranTab	= array(
+    		''				    => '',
     		'about'				=> 'about',
     		'AD'				=> 'AD',
     		'after'				=> 'after',
@@ -508,18 +509,8 @@ class LegacyDate
 
     	if (strlen($value) > 0 && substr($value, 0, 1) == ' ')
         {		// external text format
-            if (substr($value, 0, 2) == ' 0')
-            {           // suspicious
-                $trace          = debug_backtrace();
-                foreach($trace as $call)
-                    $warn   .= "<p>LegacyDate::__construct: " . __LINE__ .
-                            
-                            " function=" . $call['class'] . '::' . $call['function'] .
-                            " called by line=" . $call['line'] . 
-                            " in " . $call['file'] . "</p>\n";
-                showTrace();
-                flush();
-            }           // suspicious
+            if (substr($value, 0, 2) == ' 0' && strlen($value) == 19)
+                $value      = substr($value, 1);  // error passing internal
     	    if (strlen($value) == 1)
     	    {
     			$this->date	= '';
@@ -3353,8 +3344,10 @@ class LegacyDate
     		          $needon	= false,
     		          $trantab	= null)
     {
+        global $warn;
+
     	if ($trantab == null)
-    	    $trantab	= self::$tranTab;
+            $trantab	= self::$tranTab;
 
     	if (($this->sortdate / 10000) > $privlim)
     	    return $trantab['Private'];
@@ -3502,34 +3495,36 @@ class LegacyDate
 					}	// case 'OSddd'
 
 					case 'Mon':
-					{
+                    {
+                        $enmonth    = self::$months[$mon];
 					    if ($mon > 0 && $mon <= 13)
-						$d1	.= $trantab[self::$months[$mon]];
+						    $d1	    .= $trantab[self::$months[$mon]];
 					    else
 					    if ($mon > 12)
-						$d1	.= '??' . $mon . '??';
+						    $d1	    .= '??' . $mon . '??';
 					    break;
 					}	// case 'Mon'
 
 					case 'OSMon':
 					{	// old style month after 1582
 					    if ($OSmon > 0 && $OSmon <= 13)
-						$d1	.= $trantab[self::$months[$OSmon]];
+						    $d1	    .= $trantab[self::$months[$OSmon]];
 					    else
 					    if ($OSmon > 12)
-						$d1	.= '??' . $OSmon . '??';
+						    $d1	    .= '??' . $OSmon . '??';
 					    break;
 					}	// case 'OSMon'
 
 					case 'Month':
 					{
+                        $enmonth    = self::$lmonths[$mon];
 					    if ($mon > 0 && $mon <= 13)
 					    {
-						$d1	.= $trantab[self::$lmonths[$mon]];
+						    $d1	    .= $trantab[self::$lmonths[$mon]];
 					    }
 					    else
 					    if ($mon > 12)
-						$d1	.= '??' . $mon . '??';
+						    $d1	    .= '??' . $mon . '??';
 					    break;
 					}	// case 'Month'
 

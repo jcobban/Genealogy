@@ -17,7 +17,7 @@ use \Iterator;
  *		BL_Table		VARCHAR(16),	# table name if referenced		*
  *		BL_KeyName		VARCHAR(16),	# primary key name of table		*
  *		BL_KeyValue		INT(10),		# unique identifier of record	*
- *		BL_Text			TEXT);			# blog text						*
+ *		BL_Text			TEXT,			# blog text						*
  *		BlogName		VARCHAR(255));	# subject or title line			*
  *																		*
  *  History:															*
@@ -47,8 +47,9 @@ use \Iterator;
  *		2017/12/18		add support for temporary fields				*
  *		2018/09/12		add BlogName field								*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/04/18      support method getLastSqlCmd                    *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -74,6 +75,20 @@ class Blog extends Record
 						'bl_keyvalue'			=> 0,
 						'bl_text'			    => '',
 						'blogname'			    => null);
+
+    /********************************************************************
+     *	Blog::$info				    							        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                		'table'     		=> 'Blogs',
+                		'name'      		=> 'Blogs',
+                		'prime'	    		=> 'bl_index',
+	            		'srvmg'     		=> true,
+	            		'fldcount'			=> 4,
+                		'order'     		=> 'BL_Index',
+                		'classname' 		=> 'Blog');
 
     /********************************************************************
      *	Blog::$translate                                                *
@@ -154,12 +169,13 @@ class Blog extends Record
 		    // query the blogs table
 		    if (!is_null($bl_index))
 		    {			// bl_index specified
-		        $query		    = "SELECT * FROM Blogs WHERE BL_Index=?";
-		        $sqlParms		= array($bl_index);
+		        $query		        = "SELECT * FROM Blogs WHERE BL_Index=?";
+		        $sqlParms		    = array($bl_index);
 		        
 		        // query the database
-                $stmt		    = $connection->prepare($query);
-                $queryText      = debugPrepQuery($query, $sqlParms);
+                $stmt		        = $connection->prepare($query);
+                $queryText          = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd   = $queryText;
 		        if ($bl_index == 0 || $stmt->execute($sqlParms))
 		        {		// success
 				    if ($debug)
@@ -198,7 +214,7 @@ class Blog extends Record
 				$needInsert		        = true;
 				// invoke constructor of base class
 				parent::__construct($dbrow,
-							    'Blogs');
+							        'Blogs');
 		    }			//bl_index not specified
 
 		    foreach($parms as $name => $value)
@@ -210,16 +226,20 @@ class Blog extends Record
 				{
 				    case 'bl_table':
                     {
-                        if (array_key_exists($value, Record::$externalTableNames))
+                        $table              = $value;
+                        if (array_key_exists($table, Record::$externalTableNames))
                         {                   // support external table names
-                            $value          = Record::$externalTableName[$value];
+                            $table          = Record::$externalTableName[$table];
                         }                   // support external table names
-						if (!array_key_exists($value, Record::$primeKey))
-						    $warn	        .= "<p>Blog::__construct: " .
-							"called with invalid BL_Table='$value'</p>\n";
-						$entry		        = Record::$primeKey[$value];
-						parent::set('bl_table', $value);
-						parent::set('bl_keyname', $entry['prime']);
+                        $info		        = Record::getInformation($table);
+                        if ($info)
+                        {
+						    parent::set('bl_table', $table);
+                            parent::set('bl_keyname', $info['prime']);
+                        }
+                        else
+        				    $this->msg  .= "Blog::__construct: " .
+            						       "unsupported BL_Table='$table'.";
 						break;
 				    }		// Table Name
 				    
@@ -239,7 +259,7 @@ class Blog extends Record
 		else
 		{		// unexpected parameter type
 		    throw new Exception('Blog::__construct: called with ' .
-							 print_r($parms, true));
+							    print_r($parms, true));
 		}		// unexpected parameter type
 
 		$this->needInsert	= $needInsert;

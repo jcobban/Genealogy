@@ -143,7 +143,7 @@ require_once __NAMESPACE__ . '/Marriage.inc';
 require_once __NAMESPACE__ . '/MarriageParticipant.inc';
 require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/CitationSet.inc';
-require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
 /************************************************************************

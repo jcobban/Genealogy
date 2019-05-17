@@ -125,6 +125,7 @@ use \Iterator;
  *		2019/01/18      method mergeAddresses used the obsolete         *
  *		                Address::deleteAddresses instead of             *
  *		                RecordSet->delete                               *
+ *		2019/04/18      support method getLastSqlCmd                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -166,37 +167,51 @@ class Address extends RecordPic
      *	new record														*
      ********************************************************************/
     protected static	$initRow	= array(
-				'idar'			=> 0,
-				'kind'			=> Address::REPOSITORY,
-				'style'			=> 0,
-				'addrname'		=> '',
-				'addrsort'		=> '',
-				'address1'		=> '',
-				'address2'		=> '',
-				'city'			=> '',
-				'state'			=> '',
-				'zipcode'		=> '',
-				'country'		=> '',
-				'phone1'		=> '',
-				'phone2'		=> '',
-				'email'			=> '',
-				'homepage'		=> '',
-				'addrnotes'		=> '',
-				'latitude'		=> 0,
-				'longitude'		=> 0,
-				'list1'			=> 0,
-				'list2'			=> 0,
-				'list3'			=> 0,
-				'list4'			=> 0,
-				'list5'			=> 0,
-				'list6'			=> 0,
-				'private'		=> 0,
-				'tag1'			=> 0,
-				'used'			=> 0,
+				'idar'				=> 0,
+				'kind'				=> Address::REPOSITORY,
+				'style'				=> 0,
+				'addrname'			=> '',
+				'addrsort'			=> '',
+				'address1'			=> '',
+				'address2'			=> '',
+				'city'				=> '',
+				'state'				=> '',
+				'zipcode'			=> '',
+				'country'			=> '',
+				'phone1'			=> '',
+				'phone2'			=> '',
+				'email'				=> '',
+				'homepage'			=> '',
+				'addrnotes'			=> '',
+				'latitude'			=> 0,
+				'longitude'			=> 0,
+				'list1'				=> 0,
+				'list2'				=> 0,
+				'list3'				=> 0,
+				'list4'				=> 0,
+				'list5'				=> 0,
+				'list6'				=> 0,
+				'private'			=> 0,
+				'tag1'				=> 0,
+				'used'				=> 0,
 				'fsresolved'		=> 0,
 				'veresolved'		=> 0,
-				'verified'		=> 0,
-				'qstag'			=> 0);
+				'verified'			=> 0,
+				'qstag'				=> 0);
+
+    /********************************************************************
+     *	Address::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     		=> 'tblAR',
+                'name'      		=> 'Addresses',
+                'prime'	    		=> 'idar',
+	            'srvmg'     		=> true,
+	            'fldcount'			=> 4,
+                'order'     		=> 'B_RegDomain, B_RegYear, B_RegNum',
+                'classname' 		=> 'Address');
 
     /********************************************************************
      *	Address::$translate												*
@@ -375,19 +390,18 @@ class Address extends RecordPic
 	
 			if (strlen($where) > 0)
 			{	// obtain the first instance that matches search parameters
-			    $query		= "SELECT * FROM tblAR $where";
+			    $query		        = "SELECT * FROM tblAR $where";
 	
 			    // query the database
-			    $stmt		= $connection->prepare($query);
+			    $stmt		        = $connection->prepare($query);
+				$queryText	        = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd   = $queryText;
 			    if ($stmt->execute($sqlParms))
 			    {			// successful query
 					$row		= $stmt->fetch(PDO::FETCH_ASSOC);
 					if ($debug)
 					    $warn	.= "<p>Address: " . __LINE__ .
-										  "'$query'</p>\n" .
-										  "<p>parms=" .
-											print_r($sqlParms, true) .
-										  "</p>\n";
+										  "'$queryText'</p>\n";
 	
 					if (is_array($row))
 					{		        // found address record
@@ -411,8 +425,7 @@ class Address extends RecordPic
 			    }			        // successful query
 			    else
 			    {			        // query failed
-					$this->msg  .= "Address::__construct: '$query', " .
-										print_r($sqlParms, true) . ', ' .
+					$this->msg  .= "Address::__construct: '$queryText', " .
 										print_r($stmt->errorInfo(), true) .". ";
 				    $dbrow		        = Address::$initRow;
 			    }		            // error performing query

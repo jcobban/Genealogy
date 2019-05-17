@@ -3,7 +3,7 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  ResenConfirmEmail.php												*
+ *  ResendConfirmEmail.php												*
  *																		*
  *  This script resets and resends the confirmation email to all		*
  *  registered users who have not previously confirmed their account	*
@@ -17,7 +17,7 @@ use \Exception;
  ************************************************************************/
 require_once __NAMESPACE__ . "/User.inc";
 require_once __NAMESPACE__ . "/Language.inc";
-require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
 /************************************************************************

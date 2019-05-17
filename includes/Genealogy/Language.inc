@@ -173,7 +173,7 @@ class Language extends Record
 				    }		// existing record
 				    else
 				    if (count($result) == 0)
-				    {		// create a new record
+                    {		// create a new record
 						// set defaults
 						$dbrow		    	= self::$initRow;
 						$dbrow['code639_1']	= $code;

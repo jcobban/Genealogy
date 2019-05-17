@@ -14,11 +14,12 @@ use \Exception;
  *		2018/01/10		use file_exists to check for defined templates	*
  *		2019/01/21      add gender field                                *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/05/05      improve parameter validation                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Nickname.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // get the parameters
@@ -52,21 +53,22 @@ if (count($_GET) > 0)
 
 			case 'offset':
 			{
-			    $offset			= (int)$value;
-			    $getParms['offset']	= $offset;
+                if (ctype_digit($value))
+			        $offset			= (int)$value;
 			    break;
 			}
 
 			case 'limit':
-			{
-			    $limit			= (int)$value;
-			    $getParms['limit']	= $limit;
+            {
+                if (ctype_digit($value))
+			        $limit			= (int)$value;
 			    break;
 			}
 
 			case 'lang':
-			{	// language choice
-			    $lang		= strtolower(substr($value,0,2));
+            {	// language choice
+                if (strlen($value) >= 2)
+			        $lang		= strtolower(substr($value,0,2));
 			    break;
 			}	// language choice
 	    }		// take action based upon key
@@ -102,22 +104,23 @@ if (count($_POST) > 0)
 			}
 
 			case 'offset':
-			{
-			    $offset			        = (int)$value;
-			    $getParms['offset']		= $offset;
+            {
+                if (ctype_digit($value))
+			        $offset			        = (int)$value;
 			    break;
 			}
 
 			case 'limit':
 			{
-			    $limit			        = (int)$value;
-			    $getParms['limit']		= $limit;
+                if (ctype_digit($value))
+			        $limit			        = (int)$value;
 			    break;
 			}
 
 			case 'lang':
-			{	// language choice
-			    $lang		= strtolower(substr($value,0,2));
+            {	// language choice
+                if (strlen($value) >= 2)
+			        $lang		            = strtolower(substr($value,0,2));
 			    break;
 			}	// language choice
 
@@ -166,9 +169,11 @@ if (count($_POST) > 0)
         $warn       .= $parmsText . "</table>\n";
 }			    // invoked by method=post
 
-$prevoffset	    = $offset - $limit;
-$nextoffset	    = $offset + $limit;
-$last	        = $offset + $limit - 1;
+$getParms['offset']	    = $offset;
+$getParms['limit']	    = $limit;
+$prevoffset	            = $offset - $limit;
+$nextoffset	            = $offset + $limit;
+$last	                = $offset + $limit;
 
 if (canUser('edit'))
 	$action		= 'Update';
@@ -183,6 +188,8 @@ $nicknames		= new RecordSet('Nicknames',
 									$getParms);
 $info		    = $nicknames->getInformation();
 $count		    = $info['count'];
+if ($last > $count)
+    $last       = $count;
 
 $template		= new FtTemplate("Nicknames$action$lang.html");
 
@@ -193,24 +200,29 @@ if ($nicknames)
 {		// query issued
 	$template->set('LIMIT',		    $limit);
 	$template->set('OFFSET',	    $offset);
-	$template->set('PREVOFFSET',	$prevoffset);
+	$template->set('FIRST',	        $offset + 1);
+    $template->set('PREVOFFSET',	$prevoffset);
+    if ($prevoffset < 0)
+        $template['topPrev']->update(null);
 	$template->set('NEXTOFFSET',	$nextoffset);
+    if ($nextoffset >= $count)
+        $template['topNext']->update(null);
 	$template->set('LAST',		    $last);
 	$template->set('COUNT',		    $count);
 	$template->set('LANG',		    $lang);
 
 	// display the results
-	$even			        = 'odd';
-	$i			            = 0;
+	$even			                = 'odd';
+	$i			                    = 0;
 	foreach($nicknames as $nickname)
 	{
-	    $nickname['even']	= $even;
-	    $nickname['i']	= $i;
+	    $nickname['even']	        = $even;
+	    $nickname['i']	            = $i;
 	    if ($even == 'even')
-			$even		= 'odd';
+			$even		            = 'odd';
 	    else
-            $even		= 'even';
-        $gender         = $nickname['gender'];
+            $even		            = 'even';
+        $gender                     = $nickname['gender'];
         if (is_null($gender))
             $nickname['gender']     = '';
         else
@@ -220,12 +232,12 @@ if ($nicknames)
             $nickname['gender']     = 'M';
 	    $i++;
 	}
-	$template->updateTag('nickname$i', $nicknames);
+	$template['nickname$i']->update($nicknames);
 }	// query issued
 else
 {
-	$template->updateTag('linksfront', null);
-	$template->updateTag('details', null);
+	$template['topBrowse']->update(null);
+	$template['dataTable']->update(null);
 }
 
 $template->display();

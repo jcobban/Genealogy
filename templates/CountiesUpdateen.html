@@ -1,0 +1,95 @@
+<!--*********************************************************************
+ *  CountiesUpdate.php													*
+ *																		*
+ *  Update the database to reflect changes from CountiesEdit.php.		*
+ *																		*
+ *  History:															*
+ *		2018/10/07		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">
+		Genealogy
+    </a>:
+    <a href="/Canada/CountriesEdit.php?lang=$LANG">
+    	List of Supported Countries
+    </a>:
+    <a href="/genCountry.php?cc=$CC&lang=$LANG">
+	    $COUNTRYNAME
+    </a>:
+    <a href="/Canada/genProvince.php?Domain=$DOMAIN&amp;lang=$LANG">
+		$DOMAINNAME
+    </a>:
+  	<a href="/Canada/CountiesEdit.php?domain=$DOMAIN&amp;lang=$LANG">
+   	    Edit Counties
+	</a>:
+  </div>
+	<div class="body">
+  <h1>
+    $COUNTRYNAME: $DOMAINNAME: County Table Update
+    <span class="right">
+		<a href="CountiesUpdateHelpen.html" target="help">? Help</a>
+    </span>
+    <div style="clear: both;"></div>
+  </h1>
+    $TRACE
+    $MSG
+    <p class="message" id="notAuthorized">
+		You are not authorized.
+		<a href="/Signon.php" target="_blank">
+		<span class="button">Sign on</span></a>
+		to update the database.
+    </p>
+	<p id="changed">Changed county '$CODE':
+				name '$NEWCOUNTYNAME'
+				date range $NEWCOUNTYSTARTYEAR
+				to $NEWCOUNTYENDYEAR.
+    </p>
+	<p id="deleted">Deleted county '$CODE'.
+    </p>
+	<p id="added">Added county '$COUNTY':
+				name '$COUNTYNAME'
+				date range $COUNTYSTARTYEAR
+				to $COUNTYENDYEAR.
+    </p>
+	<p>Updated $CHANGECOUNT counties.
+    </p>
+  </div> <!-- class="body"-->
+	<div class="balloon" id="HelpCode">
+	    This field contains a 3-character abbreviation for the county which
+		is used to refer to this record.
+		Except when adding a new county this is a read-only field.
+	</div>
+	<div class="balloon" id="HelpName">
+	    The name of the county.
+	</div>
+	<div class="balloon" id="HelpStartYear">
+	    The year the county came into existence as an administrative unit.
+		For most counties this is 1852.
+	</div>
+	<div class="balloon" id="HelpEndYear">
+	    The year the county ceased to exist.  For most counties this is 9999
+		indicating the county is still in existence, but, for example Carleton
+		County was merged into the City of Ottawa in the 1990s.
+	</div>
+	<div class="balloon" id="HelpEditTownships">
+	    This button is used to display a dialog for editing the lower level
+		administrative units of the county, that is the townships and towns. In most
+		cases some services, such as land and vital statistics registrations, are 
+		handled by the county for a city, so the city appears in this list as well.
+	</div>
+	<div class="balloon" id="HelpAdd">
+		Click on this button to add another county into the list.
+	</div>
+	<div class="balloon" id="HelpSubmit">
+		Click on this button to update the database to include the changes you
+		have made to the counties list for the current province.
+	</div>
+	<div class="balloon" id="HelprightTop">
+		Click on this button to signon to access extended features of the
+        web-site or to manage your account with the web-site.
+	</div>
+	<script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/jscripts/default.js" type="text/javascript"></script>

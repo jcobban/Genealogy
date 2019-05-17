@@ -1,0 +1,187 @@
+<!--*********************************************************************
+ *  Citationsen.html    												*
+ *																		*
+ *  Display a web page containing all of the citations matching a		*
+ *  pattern.															*
+ *																		*
+ *  History:															*
+ *      2019/05/05      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+<link rel='stylesheet' type='text/css' href='Person.css'>
+  <div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">
+			Genealogy
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">
+			Services
+    </a>:
+  </div>
+  <div class="body">
+    <h1>
+      <span class="right">
+		<a href="CitationsHelpen.html" target="help">? Help</a>
+      </span>
+      Citations Master List
+    </h1>
+    $TRACE
+    $MSG
+    <p class="label">
+        $COUNT Citations match the specified pattern.
+    </p>
+    <form name="citForm" id="citForm" action="Citations.php">
+      <div class="row">
+		<label class="column1" for="type">
+		    Event&nbsp;Type:
+		</label>
+		<select name="type" id="type" size="5" class="white left">
+				<option value="-1" $UNSELECTED>Choose a type</option>
+				<option value="0" $SELECTED0>Unspecified</option>
+				<option value="1" $SELECTED1>Name</option>
+				<option value="2" $SELECTED2>Birth</option>
+				<option value="3" $SELECTED3>Christening</option>
+				<option value="4" $SELECTED4>Death</option>
+				<option value="5" $SELECTED5>Buried</option>
+				<option value="6" $SELECTED6>General Notes</option>
+				<option value="7" $SELECTED7>Research Notes</option>
+				<option value="8" $SELECTED8>Medical Notes</option>
+				<option value="9" $SELECTED9>Death Cause</option>
+				<option value="10" $SELECTED10>Alternate Name</option>
+				<option value="11" $SELECTED11>Child Status</option>
+				<option value="12" $SELECTED12>Child Relationship to Dad</option>
+				<option value="13" $SELECTED13>Child Relationship to Mom</option>
+				<option value="15" $SELECTED15>LDS Baptism</option>
+				<option value="16" $SELECTED16>LDS Endowment</option>
+				<option value="17" $SELECTED17>LDS Sealed to Parents</option>
+				<option value="18" $SELECTED18>LDS Sealed to Spouse</option>
+				<option value="19" $SELECTED19>Never Married</option>
+				<option value="20" $SELECTED20>Marriage</option>
+				<option value="21" $SELECTED21>Marriage Note</option>
+				<option value="22" $SELECTED22>Marriage Never</option>
+				<option value="23" $SELECTED23>Marriage No Children</option>
+				<option value="26" $SELECTED26>LDS Confirmation</option>
+				<option value="27" $SELECTED27>LDS Initiatory</option>
+				<option value="30" $SELECTED30>Event</option>
+				<option value="31" $SELECTED31>Marriage Event</option>
+				<option value="40" $SELECTED40>To Do</option>
+		</select>
+		<input type="hidden" name="typeparm" id="typeparm" disabled="disabled"
+				value="$TYPE">
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row">
+		<label class="column1" for="idsr">
+		    Master&nbsp;Source:
+		</label>
+		<select name="idsr" id="idsr" size="5" class="white left">
+		    <option value="-1">Choose a type</option>
+		</select>
+		<input type="hidden" name="idsrparm" id="idsrparm" disabled="disabled"
+				value="$IDSR">
+		<div style="clear: both;"></div>
+      </div>
+      <div class="row">
+		<label class="column1" for="pattern">
+		    Pattern:
+		</label>
+		<input name="pattern" id="pattern" type="text"
+				class="white leftnc" size="64" value="$PATTERN">
+		<div style="clear: both;"></div>
+      </div>
+    <p>
+		<button type="submit" id="Submit">
+		    Search
+		</button>
+    </p>
+    </form>
+    <div class="center" id="topBrowse">
+      <span class="left" id="topPrev">
+		<a href="Citations.php?type=$TYPE&amp;idsr=$IDSR&amp;pattern=$PATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET">&lt;---</a>
+      </span>
+      <span class="right" id="topNext"> 
+		<a href="Citations.php?type=$TYPE&amp;idsr=$IDSR&amp;pattern=$PATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET">---&gt;</a>
+      </span>
+		rows $FIRST to $LAST of $TOTALCOUNT 
+      <div style="clear: both;"></div>
+    </div>
+      <!--- Put out the response as a table -->
+      <table class="details" id="dataTable">
+        <!--- Put out the column headers -->
+        <thead>
+          <tr>
+            <th class="colhead">
+      		  IDIME
+            </th>
+            <th class="colhead" style="width: 45em;">
+      		  Page
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="dataRow">
+      		<td class="odd right">
+      		    <a href="$href" target="_blank">
+      				$name
+      		    </a>
+      		</td>
+      		<td class="odd left">
+      		    $page 
+          </tr>
+        </tbody>
+      </table>
+	</div>
+	<div class="balloon" id="Helppattern">
+		This is an extended regular expression, as supported by MySQL, 
+		which is used to limit
+		the locations to be displayed. See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer"s regex page</a>.
+	<ul>
+	  <li>If the pattern contains no special 
+		characters then only locations containing that string will be included.
+		For example the pattern "London" will match locations containing the string
+	    "London".  Note that the search ignores case, so that pattern will also match
+	    "LONDON" and "london".
+	  <li>If the pattern begins with a caret '^' then only locations that
+	    <b>begin</b> with the remainder of the pattern are included.  
+		For example the pattern
+	    "^Ba" displays locations starting with "Ba" (or "ba" or "BA").
+	  <li>If the pattern ends with a dollar sign '$', then only locations that
+	    <b>end</b> with the remainder of the pattern are included.  
+		For example the pattern
+	    "CA$" matches locations that end with "CA" (or "ca" or "Ca").
+	  <li>In a pattern a period '.' matches any single character.  For example
+		the pattern "B.b" matches any location that contains two letter Bs separated
+		by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
+		anywhere in the location name.
+	  <li>In a pattern an asterisk '*' matches zero or more of the preceding
+		character; "bo*b" matches "bb", "bob", and "boob"
+		anywhere in the location name.
+	</div>
+	<div class="balloon" id="Helptype">
+	    This selection list is used to choose the type of Event for which a list of
+		citations is to be produced.
+	</div>
+	<div class="balloon" id="Helpidsr">
+	    This selection list is used to choose the master source to which the
+		citations refer.
+	</div>
+	<div class="balloon" id="Helptypeparm">
+	    This selection list is used to choose the type of Event for which a list of
+		citations is to be produced.
+	</div>
+	<div class="balloon" id="Helpidsrparm">
+	    This selection list is used to choose the master source to which the
+		citations refer.
+	</div>
+	<div class="balloon" id="HelpSubmit">
+	Click on this button to apply the search criteria.
+	</div>
+	<script src="/jscripts/js20/http.js" type="application/javascript">
+	</script>
+	<script src="/jscripts/util.js" type="application/javascript">
+	</script>
+	<script src="/jscripts/CommonForm.js" type="application/javascript">
+	</script>
+	<script src="/FamilyTree/Citations.js" type="application/javascript">
+	</script>

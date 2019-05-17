@@ -127,6 +127,7 @@ foreach($_GET as $key => $value)
 	    }		// Page passed
 
 	    case 'debug':
+	    case 'lang':
 	    {		// debug handled by common code
 			break;
 	    }		// debug handled by common code

@@ -1,0 +1,164 @@
+<!--*********************************************************************
+ *  DeathRegYearStatsTownen.html										*
+ *																		*
+ *  Display statistics about the transcription of death registrations.	*
+ *																		*
+ *  History:															*
+ *		2019/03/16		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+	<div id="breadcrumbs" class="hidden">
+	    <a href="/genealogy.php?lang=$LANG">
+	        Genealogy</a>:
+	    <a href="/Canada/CountriesEdit.php?lang=$LANG">
+	        List of Supported Countries
+	    </a>:
+	    <a href="/genCountry.php?code=$CC&lang=$LANG">
+	        $COUNTRYNAME</a>:
+        <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG">
+	        $DOMAINNAME</a>:
+	    <a href="/Ontario/DeathRegQuery.php?domain=$DOMAIN&lang=$LANG">
+	        New Death Query</a>:
+		<a href="DeathRegStats.php?RegDomain=$DOMAIN&lang=$LANG">
+			Status</a>:
+		<a href="DeathRegYearStats.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&lang=$LANG" id="countyStatusLink">
+			County Status $REGYEAR</a>:
+	</div>
+    <div class="body">
+      <h1>
+	    $DOMAINNAME $COUNTYNAME: Death Registration Status $REGYEAR
+        <span class="right">
+			<a href="DeathRegYearStatsHelpen.html" target="_blank">Help?</a>
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <div class="center" id="topBrowse">
+        <div class="left">
+          <a href="DeathRegYearStats.php?regyear=$PREVREGYEAR&county=$COUNTY&lang=$LANG" id="toPrevYear">
+			    &lt;--- $PREVREGYEAR 
+			</a>
+        </div>
+        <div class="right" id="topNext">
+			<a href="DeathRegYearStats.php?regyear=$NEXTREGYEAR&county=$COUNTY&lang=$LANG" id="toNextYear">
+			    $NEXTREGYEAR ---&gt;
+			</a>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+      <form id="display" action="donothing.php" method="get" id="form">
+        <input type="hidden" id="RegYear" 
+			value="$REGYEAR">
+        <input type="hidden" id="Domain" 
+			value="$DOMAIN">
+        <!--- Put out the response as a table -->
+        <table class="form" id="dataTable">
+          <!--- Put out the column headers -->
+          <thead>
+			<tr>
+			  <th class="colhead1st">
+			  County
+			  </th>
+			  <th class="colhead">
+			  Township
+			  </th>
+			  <th class="colhead">
+			  Done
+			  </th>
+			  <th class="colhead">
+			  Low
+			  </th>
+			  <th class="colhead">
+			  High
+			  </th>
+			  <th class="colhead">
+			  %Done
+			  </th>
+			  <th class="colhead">
+			  %Linked
+			  </th>
+			  <th class="colhead">
+			  View
+			  </th>
+			</tr>
+          </thead>
+          <tbody>
+			<tr id="stats$rownum">
+			  <td class="odd bold left first">
+			      $countyname
+			      <input type="hidden" id="County$rownum" 
+						  value="$d_regcounty">
+			  </td>
+			  <td class="odd bold left">
+			      $d_regtownship
+			      <input type="hidden" id="Town$rownum" 
+						  value="$d_regtownship">
+			  </td>
+			  <td class="odd bold right">
+			      $surnamecount
+			  </td>
+			  <td class="odd bold right">
+			      $low
+			      <input type="hidden" id="low$rownum" 
+						  value="$low">
+			  </td>
+			  <td class="odd bold right">
+			      $high
+			      <input type="hidden" id="high$rownum" 
+						  value="$high">
+			  </td>
+			  <td class="$pctdoneclass">
+			      $pctdone% 
+			  </td>
+			  <td class="$pctlinkedclass">
+			      $pctlinked% 
+			  </td>
+			  <td>
+			      <button type="button" id="TownStats$rownum">
+						  View
+			      </button>
+			  </td>
+			</tr>
+          </tbody>
+          <tfoot>
+			<tr>
+			  <td class="total left first">&nbsp;</td>
+			  <td class="total bold left">
+			      Total
+			  </td>
+			  <td class="total right">
+			      $TOTAL
+			  </td>
+			  <td class="total right">
+			      $LOWEST
+			  </td>
+			  <td class="total right">
+			      $HIGHEST
+			  </td>
+			  <td class="total $PCTDONECLASS">
+			      $PCTDONE% 
+			  </td>
+			  <td class="total $PCTLINKEDCLASS">
+			      $PCTLINKED% 
+			  </td>
+			  <td class="total left">&nbsp;</td>
+			</tr>
+          </tfoot>
+        </table>
+      </form>
+    </div> <!-- end of <div id="body"> -->
+    <div class="balloon" id="HelpTownStats">
+        Click on this button to display a summary of the deaths transcribed
+        for the specific town or township.
+    </div>
+    <div class="balloon" id="HelpCounty">
+      This field displays the name of the county where the
+     death was registered.
+    </div>
+    <div class="balloon" id="HelpTown">
+      This field displays the name of the city, town, village, or township where the
+      death was registered.
+    </div>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/Ontario/DeathRegYearStats.js" type="text/javascript"></script>

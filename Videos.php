@@ -15,7 +15,7 @@ use \Exception;
  ************************************************************************/
 require_once __NAMESPACE__ . "/RecordSet.inc";
 require_once __NAMESPACE__ . "/Language.inc";
-require_once __NAMESPACE__ . "/Template.inc";
+require_once __NAMESPACE__ . "/FFttTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters

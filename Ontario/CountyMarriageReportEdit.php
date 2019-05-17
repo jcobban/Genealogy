@@ -328,18 +328,18 @@ if (strlen($msg) == 0)
 	{		// display of whole volume
 ?>
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="center">
+      <div class="center" id="topBrowse">
 <?php
 	    if ($volume > 1)
 	    {
 ?>
-        <span class="left">
+        <span class="left" id="topPrev">
           <a href="CountyMarriageReportEdit.php?RegDomain=<?php print $domainCode; ?>&Volume=<?php print $volume - 1; ?>">&lt;---&nbsp;Volume&nbsp;<?php print $volume - 1; ?></a>
         </span>
 <?php
 	    }
 ?>
-        <span class="right">
+        <span class="right" id="topNext">
           <a href="CountyMarriageReportEdit.php?RegDomain=<?php print $domainCode; ?>&Volume=<?php print $volume + 1; ?>">Volume&nbsp;<?php print $volume + 1; ?>&nbsp;---&gt;</a>
         </span>
         All of Volume <?php print $volume; ?>
@@ -362,7 +362,7 @@ if (strlen($msg) == 0)
 <?php
 	}		// debug enabled
 ?>
-        <table class="form" id="dataTbl">
+        <table class="form" id="dataTable">
 <!--- Put out the column headers -->
           <thead>
 			<tr id="hdrRow">

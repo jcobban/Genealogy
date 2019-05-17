@@ -131,6 +131,8 @@ use \Iterator;
  *		2017/11/11		remove static functions replace by RecordSet	*
  *		2017/12/18		add support for temporary fields				*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/04/15      replace is_a with instanceof                    *
+ *		2019/04/18      support method getLastSqlCmd                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -184,12 +186,26 @@ class Child extends Record
 				'parsealnote'			=> '');		// deprecated
 
     /********************************************************************
+     *	Child::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                		'table'     		=> 'tblCR',
+                		'name'      		=> 'Children',
+                		'prime'	    		=> 'idcr',
+	            		'srvmg'     		=> true,
+	            		'fldcount'			=> 4,
+                		'order'     		=> '`order`',
+                		'classname' 		=> 'Child');
+
+    /********************************************************************
      *	Child::$translate												*
      *																	*
      *	static array containing synonyms for field names in the record	*
      ********************************************************************/
     protected static	$translate	= array(
-				'childorder'			=> 'order');
+				        'childorder'			=> 'order');
 
     /********************************************************************
      *	Child::$defaultOrder											*
@@ -211,13 +227,13 @@ class Child extends Record
 						 3 	=>	'Stillborn',
 						 4 	=>	'Twin',
 						 5 	=>	'Illegitimate'
-							);
+								);
 
     // Symbolic constants for calling Child::setStatus
-    const	STATUS_NULL		= 1;
-    const	STATUS_NONE		= 2;
+    const	STATUS_NULL		    = 1;
+    const	STATUS_NONE		    = 2;
     const	STATUS_STILLBORN	= 3;
-    const	STATUS_TWIN		= 4;
+    const	STATUS_TWIN		    = 4;
     const	STATUS_ILLEGITIMATE	= 5;
 
     /********************************************************************
@@ -243,15 +259,15 @@ class Child extends Record
 						13 => 'illegitimate');
 
     // Symbolic constants for calling Child::setCpRelxxx
-    const	RELATE_NULL		= 1;
-    const	RELATE_ADOPTED		= 2;
-    const	RELATE_BIOLOGICAL	= 3;
-    const	RELATE_CHALLENGED	= 4;
-    const	RELATE_DISPROVED	= 5;
-    const	RELATE_FOSTER		= 6;
-    const	RELATE_GUARDIAN		= 7;
-    const	RELATE_SEALING		= 8;
-    const	RELATE_STEP		= 9;
+    const	RELATE_NULL		    =  1;
+    const	RELATE_ADOPTED		=  2;
+    const	RELATE_BIOLOGICAL	=  3;
+    const	RELATE_CHALLENGED	=  4;
+    const	RELATE_DISPROVED	=  5;
+    const	RELATE_FOSTER		=  6;
+    const	RELATE_GUARDIAN		=  7;
+    const	RELATE_SEALING		=  8;
+    const	RELATE_STEP	    	=  9;
     const	RELATE_UNKNOWN		= 10;
     const	RELATE_PRIVATE		= 11;
     const	RELATE_FAMILYMEMBER	= 12;
@@ -290,7 +306,7 @@ class Child extends Record
 		global	$connection;
 
 		$connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,
-							  PDO::FETCH_ASSOC);
+								  PDO::FETCH_ASSOC);
 		$dbrow		= null;
 		$needInsert	= false;
 
@@ -308,7 +324,7 @@ class Child extends Record
 		    $parms	= $id;
 		else
 		    throw new Exception("Child::__construct: " .
-							"called with " .  print_r($id, true));
+								"called with " .  print_r($id, true));
 
 		// $parms is now an associative array
 		$idcr		= null;
@@ -430,7 +446,7 @@ class Child extends Record
 				default:
 				{		// unrecognized field names
 				    $warn	.= "<p>Child::__construct: " . __LINE__ . 
-							" Field Name '$fldname' not recognized.</p>";
+								" Field Name '$fldname' not recognized.</p>";
 				    break;
 				}		// unrecognized field names
 		    }			// act on specific field names
@@ -448,17 +464,18 @@ class Child extends Record
 		    if (strlen($where) > 0)
 		    {			// existing record
 				// construct the query of the child table
-				$query		= 'SELECT * FROM tblCR ' . $where;
+				$query		        = 'SELECT * FROM tblCR ' . $where;
 				
 				// query the database
-				$stmt		= $connection->prepare($query);
-				$queryText	= debugPrepQuery($query, $sqlParms);
+				$stmt		        = $connection->prepare($query);
+				$queryText	        = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd   = $queryText;
 				if ($stmt->execute($sqlParms))
 				{		// successful query
-				    $result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
+				    $result		    = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				    if ($debug)
 						$warn		.= '<p>Child:__construct: ' . __LINE__ .
-								   "query='$queryText'</p>\n";
+									   "query='$queryText'</p>\n";
 		
 				    $numMatches	= count($result);
 				    if ($numMatches == 1)
@@ -478,48 +495,49 @@ class Child extends Record
 		
 						    if ($idmr > 0)
 						    {		// existing family
-							// order new child after all existing children
-							$queryc		= "SELECT COALESCE(MAX(`Order`)+1,0) FROM tblCR WHERE IDMR=:idmr";
-							$sqlParms	= array('idmr' => $idmr);
+								// order new child after all existing children
+								$queryc		= "SELECT COALESCE(MAX(`Order`)+1,0) FROM tblCR WHERE IDMR=:idmr";
+								$sqlParms	= array('idmr' => $idmr);
 
-							// query the database
-							$stmt	= $connection->prepare($queryc);
-							$queryText	= debugPrepQuery($queryc,
-											 $sqlParms);
-							if ($stmt->execute($sqlParms))
-							{		// successful query
-							    $row	= $stmt->fetch(PDO::FETCH_NUM);
-							    $newOrder	= $row[0];
-							    if ($debug)
-								$warn	.= "<p>Child::__construct: " .
+								// query the database
+								$stmt	        = $connection->prepare($queryc);
+								$queryText	    = debugPrepQuery($queryc,
+								            	    			 $sqlParms);
+                            $this->lastSqlCmd   = $queryText;
+								if ($stmt->execute($sqlParms))
+								{		// successful query
+								    $row	    = $stmt->fetch(PDO::FETCH_NUM);
+								    $newOrder	= $row[0];
+								    if ($debug)
+									$warn	.= "<p>Child::__construct: " .
 						__LINE__ . " '$queryText' returns $newOrder</p>";
-							}		// successful query
-							else
-							{		// error performing query
-							    throw new Exception("Child::__construct: " .
-									__LINE__ . " '$queryText', " .
-								print_r($stmt->errorInfo(), true));
-							}		// error performing query
+								}		// successful query
+								else
+								{		// error performing query
+								    throw new Exception("Child::__construct: " .
+										__LINE__ . " '$queryText', " .
+									print_r($stmt->errorInfo(), true));
+								}		// error performing query
 						    }		// existing family
 						    else
-							$newOrder	= 0;
+								$newOrder	= 0;
 						    $dbrow['order']	= $newOrder;
 						}	// add new child to family
 						else
 						    throw new Exception("Child::__construct: " .
-								    "Record not found $queryText");
+									    "Record not found $queryText");
 				    }		// record not found
 				    else
 				    {		// too many records found
 						throw new Exception("Child::__construct: " .
-								    "$numMatches found $queryText");
+									    "$numMatches found $queryText");
 				    }		// too many records found
 				}		// successful query
 				else
 				{		// error performing query
 				    throw new Exception("Child::__construct: " .
-								"'$queryText' " .
-								print_r($stmt->errorInfo(),true));
+									"'$queryText' " .
+									print_r($stmt->errorInfo(),true));
 				}		// error performing query
 		    }			// existing record
 		    else
@@ -532,8 +550,8 @@ class Child extends Record
 		    else
 		    {			// invalid record
 				throw new Exception("Child::__construct: " .
-							    "Invalid array parameter :" .
-							    print_r($parms, true));
+								    "Invalid array parameter :" .
+								    print_r($parms, true));
 		    }			// invalid record
 		}			// search parameters
 
@@ -563,7 +581,7 @@ class Child extends Record
     {
 		if ($this->needInsert)
 		    throw new Exception("Child::getIdcr: " .
-							"record does not exist in database"); 
+								"record does not exist in database"); 
 		return $this->row['idcr'];
     }		// function Child::getIdcr
 
@@ -906,7 +924,7 @@ class Child extends Record
 		    case 'parseald':
 		    {		// legacy internal date format
 				// validate and interpret new value
-				if (is_a($newvalue, 'LegacyDate'))
+				if ($newvalue instanceof LegacyDate)
 				{	// parameter is an instance of LegacyDate
 				    $date	= $newvalue;
 				}	// parameter is an instance of LegacyDate
@@ -964,12 +982,12 @@ class Child extends Record
     function save($xml)
     {
 		// only save records represented by records in tblER
-		$idir	= $this->row['idir'];
+		$idir	            = $this->row['idir'];
 		if ($idir > 0)
-		{		// ignore incomplete records
+		{		        // ignore incomplete records
 		    // invoke parent's implementation
 		    parent::save($xml);
-		}		// ignore incomplete records
+		}		        // ignore incomplete records
     }		// function Child::save
 
     /********************************************************************
@@ -1083,7 +1101,7 @@ class Child extends Record
 				    try {
 						$family	= new Family(array('idmr' => $value));
 						$retval	.= "    <family>" . $family->getName() .
-							"    </family>\n";
+								"    </family>\n";
 				    } catch (Exception $e) {
 						$retval	.= "    <msg>" . $e->getMessage() . "</msg>\n";
 				    }			// catch
@@ -1096,7 +1114,7 @@ class Child extends Record
 				    $indiv	= new Person(array('idir' => $value));
 				    $retval	.= "    <indiv>" .
 						    $indiv->getName(Person::NAME_INCLUDE_DATES) .
-							"    </indiv>\n";
+								"    </indiv>\n";
 				    break;
 				}			// IDIR
 
@@ -1106,7 +1124,7 @@ class Child extends Record
 				    if ($isOwner)
 				    {			// can see private data
 						$retval	.= "    <{$fld}c>" . xmlentities($value) .
-							"</{$fld}c>\n";
+								"</{$fld}c>\n";
 						$value	= $date->toString();
 						$retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
 				    }			// can see private data
@@ -1135,7 +1153,7 @@ class Child extends Record
 				    $value	= $loc->getName();
 				    $locfld	= substr($fld,4) . 'loc';
 				    $retval	.= "    <$locfld>" . xmlentities($value) .
-							"</$locfld>\n";
+								"</$locfld>\n";
 				    } catch (Exception $e) {
 						$retval	.= "    <msg>" . $e->getMessage() . "</msg>\n";
 				    }		// catch
@@ -1215,15 +1233,15 @@ class Child extends Record
 				case 'idmr':
 				{
 				    $retval		.= $comma . "\t\"idmr\":\t" . 
-							   json_encode($value);
+								   json_encode($value);
 				    $comma		= ",\n";
 				    try {
 						$family		= new Family(array('idmr' => $value));
 						$retval		.= $comma . "\t\"family\":\t" . 
-								   json_encode($family->getName());
+									   json_encode($family->getName());
 				    } catch (Exception $e) {
 						$retval		.= $comma . "\t\"familymsg\":\t" . 
-								   json_encode($e->getMessage());
+									   json_encode($e->getMessage());
 				    }			// catch
 				    break;
 				}			// IDMR
@@ -1231,7 +1249,7 @@ class Child extends Record
 				case 'idir':
 				{
 				    $retval	.= $comma . "\t\"idir\":\t" . 
-							   json_encode($value);
+								   json_encode($value);
 				    $comma	= ",\n";
 				    $indiv	= new Person(array('idir' => $value));
 				    $retval	.= $comma . "\t\"child\":\t" . 
@@ -1245,17 +1263,17 @@ class Child extends Record
 				    if ($isOwner)
 				    {			// can see private data
 						$retval	.= $comma . "\t\"parsealdc\":\t" . 
-							   json_encode($value);
+								   json_encode($value);
 						$comma	= ",\n";
 						$value	= $date->toString();
 						$retval	.= $comma . "\t\"parseald\":\t" . 
-							   json_encode($value);
+								   json_encode($value);
 				    }			// can see private data
 				    else
 				    {			// cannot see private data
 						$value	= $date->toString($privlim);
 						$retval	.= $comma . "\t\"parseald\":\t" . 
-							   json_encode($value);
+								   json_encode($value);
 						$comma	= ",\n";
 				    }			// can see private data
 				    break;
@@ -1266,7 +1284,7 @@ class Child extends Record
 				    if ($isOwner)
 				    {			// can see private data
 						$retval	.= $comma . "\t\"parsealsd\":\t" . 
-							   json_encode($value);
+								   json_encode($value);
 						$comma	= ",\n";
 				    }			// can see private data
 				    break;
@@ -1275,17 +1293,12 @@ class Child extends Record
 				case 'idtrparseal':
 				{			// temple code
 				    $retval	.= $comma . "\t\"idtrparseal\":\t" . 
-							   json_encode($value);
+								   json_encode($value);
 				    $comma	= ",\n";
-				    try {
 				    $loc	= new Temple(array('idtr' => $value));
 				    $value	= $loc->getName();
 				    $retval	.= $comma . "\t\"parsealloc\":\t" . 
-							   json_encode($value);
-				    } catch (Exception $e) {
-						$retval	.= $comma . "\t\"idtrmsg\":\t" . 
-							   json_encode($e->getMessage());
-				    }		// catch
+								   json_encode($value);
 				    break;
 				}			// temple code
 
@@ -1307,7 +1320,7 @@ class Child extends Record
 				default:
 				{		// fields passed back with no interpretation
 				    $retval	.= $comma . "\t\"$fld\":\t" . 
-							   json_encode($value);
+								   json_encode($value);
 				    $comma	= ",\n";
 				    break;
 				}		// fields passed back with no interpretation

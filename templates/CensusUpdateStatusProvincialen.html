@@ -1,14 +1,14 @@
 <!--*********************************************************************
- *  CensusUpdateStatusProvincialen.html					*
- *									*
- *  Display the progress of the transcription of a specific census	*
- *  for a specific province						*
- *									*
- *  History:								*
- *	2017/11/25	created						*
- *	2018/01/04	remove Template from template file names	*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  CensusUpdateStatusProvincialen.html									*
+ *																		*
+ *  Display the progress of the transcription of a specific census		*
+ *  for a specific province												*
+ *																		*
+ *  History:															*
+ *		2017/11/25		created											*
+ *		2018/01/04		remove Template from template file names		*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban				                *
  **********************************************************************-->
    <link rel="stylesheet" type="text/css" href='CensusUpdateStatus.css'>
 <div id='breadcrumbs' class='hidden'>
@@ -27,14 +27,14 @@
       $MSG 
     <div id='displayForm'>
       <!--- Put out a line with links to previous and next census year -->
-      <div class='center'>
-	<div class='left' id="prevCensusLink">
+      <div class="center" id="topBrowse">
+	    <div class='left' id="topPrev">
 	    <a href='/database/CensusUpdateStatus.php?Census=$prevCensus&amp;Province=$prevProv' 
 		    id='prevCensusLink'>
 		&lt;--- $prevCensus Census $prevName
 	    </a>
 	</div>
-	<div class='right' id="nextCensusLink">
+	<div class='right' id="topNext">
 	    <a href='/database/CensusUpdateStatus.php?Census=$nextCensus&amp;Province=$nextProv' 
 		    id='nextCensusLink'>
 		$nextCensus Census $nextName ---&gt;

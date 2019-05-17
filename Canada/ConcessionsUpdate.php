@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+
 /************************************************************************
  *  ConcessionsUpdate.php												*
  *																		*
@@ -23,7 +25,7 @@ require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/Township.inc';
 require_once __NAMESPACE__ . '/Concession.inc';
 require_once __NAMESPACE__ . '/Language.inc';
-require_once __NAMESPACE__ . '/Template.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $domain		    		= 'CAON';

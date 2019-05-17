@@ -241,6 +241,7 @@ use \Iterator;
  *		2018/12/21      do not throw exception for bad values in        *
  *		                method set.  Support setting fields to null.    *
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/04/15      replace is_a with instanceof                    *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -487,6 +488,20 @@ class Event extends RecordPic
 				'kind'					=> 0,
 				'ldstempleready'		=> null,
 				'preferred'				=> 0);
+
+    /********************************************************************
+     *	Event::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'tblER',
+                'name'      => 'Events',
+                'prime'	    => 'ider',
+	            'srvmg'     => true,
+	            'fldcount'	=> 4,
+                'order'     => '`Order`',
+                'classname' => 'Event');
 
     /********************************************************************
      *	Event::$translate												*
@@ -1603,14 +1618,14 @@ class Event extends RecordPic
 		    $idlr	    = $loc->getIdlr();
 		}		// location text
 		else
-		if (is_a($value, 'Location'))
+		if ($value instanceof Location)
 		{		// location object
 		    $loc	    = $value;
 		    $loc->save(false);		// in case its a new location
 		    $idlr	    = $loc->getIdlr();
 		}		// location text
 		else
-		if (is_a($value, 'Temple'))
+		if ($value instanceof Temple)
 		{		// temple object
 		    $loc	    = $value;
 		    $idlr	    = $loc->getIdtr();
@@ -2238,7 +2253,7 @@ class Event extends RecordPic
      *	Returns:														*
      *	    value of field										        *
      ********************************************************************/
-    function get($field, $value)
+    function get($field)
     {
         global  $warn;
 
@@ -2275,7 +2290,7 @@ class Event extends RecordPic
 
 		    default:
 		    {		// no validation implemented yet
-				return parent::set($field, $value);
+				return parent::get($field);
 		    }		// no validation implemented yet
         }               // act on specific fields
 	}		// function Event::get
@@ -2332,7 +2347,7 @@ class Event extends RecordPic
 
 		    case 'idar':
 		    {		// value is IDAR
-		        if (is_a($value, 'Address') && $value->isExisting())
+		        if ($value instanceof Address && $value->isExisting())
                     return parent::set('idar', $value->get('idar'));
                 else
 				if (is_int($value) || ctype_digit($value))
