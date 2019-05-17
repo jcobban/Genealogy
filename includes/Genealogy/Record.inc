@@ -2151,7 +2151,7 @@ class Record implements Iterator, ArrayAccess
             }
 
             // get fully qualified class name
-            $rresult                = preg_match('#^\\?(\w\+)\\(\w+)$#',
+            $rresult                = preg_match('#^\\\\?(\w+)\\\\(\w+)$#',
                                                  $className,
                                                  $matches);
             if ($rresult)
@@ -2225,7 +2225,6 @@ class Record implements Iterator, ArrayAccess
                     $tinfo['initrow']   = $nsclass::$initRow;
                 if (!array_key_exists('order', $tinfo))
                     $tinfo['order']     = $nsclass::$defaultOrder;
-                $tinfo['classname']     = $nsclass;
                 return $tinfo;
             }               // static $info is overloaded
             else
@@ -2283,7 +2282,6 @@ class Record implements Iterator, ArrayAccess
                                 $tinfo['initrow']   = array();
                         }   // get the very first record in the table
                     }
-                    $tinfo['classname']     = $nsclass;
                     return $tinfo;
                 }
             }               // query MySQL for info
@@ -2320,7 +2318,6 @@ class Record implements Iterator, ArrayAccess
             $information['initrow']	    = $initrow;
 
             $information['maxsetsize']  = 1000;
-            $tinfo['classname']         = $nsclass;
 		    return $information;
 		}                   // have basic description
 		else
