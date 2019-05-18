@@ -404,9 +404,9 @@ function update()
 
 				case 'treeName':
 				{
-				    url			+= '&treename=' + element.value;
-				    var	cookie		= new Cookie("familyTree");
-				    cookie.treeName	= element.value;
+				    url			        += '&treename=' + element.value;
+				    var	cookie		    = new Cookie("familyTree");
+				    cookie.treeName	    = element.value;
 				    cookie.store(10);		// keep for 10 days
 				    break;
 				}
@@ -673,7 +673,7 @@ function noNames()
 }		// noNames
 
 /************************************************************************
- *  function onChangeIndivid												*
+ *  function onChangeIndivid											*
  *																		*
  *  This method is called when the user changes the selected			*
  *  individual.															*

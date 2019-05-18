@@ -379,8 +379,8 @@ if (strlen($msg) == 0)
 	if ($useBthDate2)
 	{		// take birth date from second
 	    $newEvent->set('eventd',
-						$birthDate2);
-        $template->set('BIRTHDATE2',    $_POST['BirthDate2'];
+					   $birthDate2);
+        $template->set('BIRTHDATE2',    $_POST['BirthDate2']);
 	}		// take birth date from second
 	else
 	{		// take birth date from first

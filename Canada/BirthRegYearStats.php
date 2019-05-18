@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+
 /************************************************************************
  *  BirthRegYearStats.php												*
  *																		*

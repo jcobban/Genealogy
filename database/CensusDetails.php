@@ -290,7 +290,7 @@ if (strlen($msg) == 0)
     if ($line < $lastLine)
 	    $template->set('NEXTLINE',			$line + 1);
     else
-        $template->updateTag('topNex',    null);
+        $template->updateTag('topNext',    null);
 
     $getParms['line']                   = $line;
     $censusLine                         = new CensusLine($getParms);

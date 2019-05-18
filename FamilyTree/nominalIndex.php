@@ -57,6 +57,8 @@ use \Exception;
  *		2017/11/13		use class Template								*
  *		2018/01/04		remove Template from template file names		*
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/05/18      get search name from cookie or parameters       *
+ *		                and display in input field                      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -66,39 +68,88 @@ require_once __NAMESPACE__ . '/common.inc';
 
 $birthmin		= '-10000';
 $birthmax		= '3000';
+$name		    = '';
 $treeName		= '';
 $lang	        = 'en';
 
-foreach($_GET as $key => $value)
-{				// loop through parameters
-	switch (strtolower($key))
-	{			// act on specific parameters
-	    case 'birthmin':
-	    {
-			$birthmin	= intval($value);
-			break;
-	    }
+// check familyTree cookie
+foreach($familyTreeCookie as $key => $value)
+{
+    switch(strtolower($key))
+    {
+        case 'treename':
+        {
+            $treeName           = $value;
+            break;
+        }
 
-	    case 'birthmax':
-	    {
-			$birthmax	= intval($value);
-			break;
-	    }
+        case 'idir':
+        {
+            if (ctype_digit($value))
+            {
+                $lastPerson     = new Person(array('idir' => $value));
+                if ($lastPerson->isExisting())
+                {
+                    $name       = $lastPerson->getName(Person::NAME_SURNAME_FIRST);
+                }
+            }
+            break;
+        }
+    }               // act on specific attributes
+}                   // loop through attributes
 
-	    case 'treename':
-	    {
-			$treeName	= $value;
-			break;
-	    }
+// if invoked by method=get process the parameters
+if (count($_GET) > 0)
+{	        	    // invoked by URL to display current status of account
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{				// loop through parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch (strtolower($key))
+		{			// act on specific parameters
+		    case 'birthmin':
+		    {
+				$birthmin	    = intval($value);
+				break;
+		    }
+	
+		    case 'birthmax':
+		    {
+				$birthmax	    = intval($value);
+				break;
+		    }
+	
+		    case 'treename':
+            {
+                if (strlen($value) > 0)
+				    $name	    = $value;
+				break;
+		    }
+	
+		    case 'treename':
+		    {
+				$treeName	    = $value;
+				break;
+		    }
+	
+		    case 'lang':
+            {		// language choice
+                if (strlen($value) >= 2)
+				    $lang		= strtolower(substr($value,0,2));
+				break;
+		    }		// language choice
+	
+		}			// act on specific parameters
+	}				// loop through parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display current status of account
 
-	    case 'lang':
-	    {		// language choice
-			$lang		= strtolower(substr($value,0,2));
-			break;
-	    }		// language choice
-
-	}			// act on specific parameters
-}				// loop through parameters
+$template	        = new FtTemplate("nominalIndex$lang.html");
 
 if ($treeName == '')
 	$treeNameText	= "South-Western Ontario";
@@ -119,8 +170,7 @@ foreach($treeNames as $atree)
 			    			'selected'	=> '');
 }
 
-$template	        = new FtTemplate("nominalIndex$lang.html");
-
+$template->set('NAME',		    $name);
 $template->set('TREENAME',		$treeNameText);
 $template->set('birthmin',		$birthmin);
 $template->set('birthmax',		$birthmax);
