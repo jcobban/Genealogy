@@ -547,7 +547,7 @@ function loadEdit()
     for(var key in args)
     {		// loop through all arguments
 		var value	= args[key];
-		switch(key)
+		switch(key.toLowerCase())
 		{
 		    case 'id':
 		    case 'idir':
@@ -562,7 +562,7 @@ function loadEdit()
 		    case 'idcr':
 		    {	// request to edit an existing child
 				document.getElementById('Marriages').disabled	= true;
-				document.getElementById('Parents').disabled	= true;
+				document.getElementById('Parents').disabled	    = true;
 				break;
 		    }	// request to edit an existing child
 
@@ -576,7 +576,7 @@ function loadEdit()
 		    {	// request to add a new child
 				parentsIdmr	= parseInt(value);
 				document.getElementById('Marriages').disabled	= true;
-				document.getElementById('Parents').disabled	= true;
+				document.getElementById('Parents').disabled	    = true;
 				break;
 		    }	// request to add a new child
 
@@ -1115,11 +1115,11 @@ function validateForm()
  ************************************************************************/
 function refresh()
 {
-    var form	= document.indForm;
+    var form	    = document.indForm;
 
     // parms contain every input element with its value
-    var	parms	= {};
-    var	msg	= "parms=(";
+    var	parms	    = {};
+    var	msg	        = "parms=(";
     for (var ei = 0; ei < form.elements.length; ei++)
     {
 		var	element	= form.elements[ei]

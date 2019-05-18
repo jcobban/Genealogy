@@ -132,7 +132,6 @@ Cookie.prototype.store = function(daysToLive,
         cookie += "; secure";
 
     // Now store the cookie by setting the magic Document.cookie property
-    alert("Cookie.store: '" + cookie + "'");
     document.cookie = cookie;
 }		// function store
 
