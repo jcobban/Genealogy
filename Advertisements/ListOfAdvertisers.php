@@ -2,6 +2,9 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+use \Templating\escape;
+
 /************************************************************************
  *  ListOfAdvertisers.php												*
  *																		*
@@ -59,11 +62,17 @@ $data           = '';
 for ($i = 0; $i < count($scripts); $i++)
 {		// loop through scripts in order
     $filename	= $scripts[$i];
-    $dispname	= preg_replace("/[A-Z]/", " $0", $filename);
-    $dispname	= ucfirst(substr($dispname, 0, strlen($dispname) - 5));
     $rtemplate  = new Template($rowHtml);
-    $rtemplate->set('filename',     $filename);
-    $rtemplate->set('dispname',     $dispname);
+    $atemplate  = new Template("$document_root/Advertisements/$filename");
+    $divs       = $atemplate->getDocument()->getElementsByTagName('div');
+    $div        = $divs[0];
+    $divText    = $div->outerHTML();
+    $res        = preg_match('#^(.*?style=.)([^\'"]*)(.*)$#is',
+                             $divText,
+                             $matches);
+    if ($res)
+        $divText    = $matches[1] . $matches[2] . ' float: left; display: block;' . $matches[3];
+    $rtemplate->set('AD', $divText);
     $data       .= $rtemplate->compile();
 }		// loop through scripts in order
 $template->updateTag('adrow',

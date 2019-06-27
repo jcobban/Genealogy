@@ -143,7 +143,7 @@ function emptyRows($limit, $html)
         $birthTemplate->set('regnum',       $eregnum);
         $birthTemplate->set('action',       $action);
         $birthTemplate->set('rowclass',     $rowclass);
-        $birthTemplate->set('sexclass',     'other');
+        $birthTemplate->set('sexclass',     'unknown');
 		$birthTemplate->updateTag('Delete$regyear$regnum', null);
 		$birthTemplate->updateTag('link$regyear$regnum', null);
 		$birthTemplate->updateTag('name$regyear$regnum', '&nbsp;');
@@ -538,6 +538,7 @@ $template->set('DOMAINNAME',	$domainName);
 $template->set('CC',	        $cc);
 $template->set('CODE',	        $code);
 $template->set('COUNTRYNAME',	$countryName);
+$template->set('REGCOUNTY',	    $regCounty);
 $template->set('COUNTYNAME',	$countyName);
 $template->set('LANG',	        $lang);
 $template->set('REGYEAR',       $regyear);
@@ -614,7 +615,7 @@ if (strlen($msg) == 0)
                 break;
 
             default:
-                $birth->set('sexclass',     'other');
+                $birth->set('sexclass',     'unknown');
                 break;
 
         }

@@ -25,6 +25,7 @@
  *		2016/02/06		call pageInit on load							*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -461,7 +462,7 @@ function epKeyDown(e)
 		{	// switch on key code
 		    case 65:
 		    {		// alt-A
-				document.getElementById('Add').onclick();
+				document.getElementById('Add').click();
 				return false;
 		    }		// alt-A
 
@@ -473,7 +474,7 @@ function epKeyDown(e)
 
 		    case 79:
 		    {		// alt-O
-				document.getElementById('Order').onclick();
+				document.getElementById('Order').click();
 				return false;
 		    }		// alt-O
 

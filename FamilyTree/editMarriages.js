@@ -167,6 +167,7 @@
  *						and death fields								*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -174,12 +175,12 @@
 window.onload	= loadEdit;
 
 /************************************************************************
- *  loadEdit																*
+ *  function loadEdit													*
  *																		*
  *  Initialize elements once the page is loaded into the browser.		*
  *																		*
  *  Input:																*
- *		$this				window												*
+ *		this			window											*
  ************************************************************************/
 function loadEdit()
 {
@@ -307,9 +308,9 @@ function loadEdit()
 				case 'editHusb':
 				{		// open dialog to edit Husband
 				    if (idir == idirHusb)
-					element.disabled	= true;
+					    element.disabled	= true;
 				    else
-					editChildButtons.push(element);
+					    editChildButtons.push(element);
 				    element.onclick		= editHusb;
 				    break;
 				}		// open dialog to edit Husband
@@ -317,9 +318,9 @@ function loadEdit()
 				case 'chooseHusb':
 				{		// open dialog to choose husband
 				    if (idir == idirHusb)
-					element.disabled	= true;
+					    element.disabled	= true;
 				    else
-					editChildButtons.push(element);
+					    editChildButtons.push(element);
 				    element.onclick		= chooseHusb;
 				    break;
 				}		// open dialog to choose husband
@@ -327,9 +328,9 @@ function loadEdit()
 				case 'createHusb':
 				{		// open dialog to create new husband
 				    if (idir == idirHusb)
-					element.disabled	= true;
+					    element.disabled	= true;
 				    else
-					editChildButtons.push(element);
+					    editChildButtons.push(element);
 				    element.onclick		= createHusb;
 				    break;
 				}		// open dialog to create new husband
@@ -598,16 +599,16 @@ function loadEdit()
 		    }		// act on node name
 		}		// element has a nodeName attribute
     }			// loop through all immediate children
-}		// loadEdit
+}		// function loadEdit
 
 /************************************************************************
- *  validateForm														*
+ *  function validateForm												*
  *																		*
- *  Ensure that the data entered by the user has been minimally				*
+ *  Ensure that the data entered by the user has been minimally			*
  *  validated before submitting the form.								*
  *																		*
  *  Input:																*
- *		$this				form object										*
+ *		this				form object									*
  ************************************************************************/
 function validateForm()
 {
@@ -631,32 +632,33 @@ function validateForm()
     }		// at least one child window still open
     else
 		return true;
-}		// validateForm
+}		// function validateForm
 
 /************************************************************************
- *  resetForm																*
+ *  function resetForm														*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
  *																		*
  *  Input:																*
- *		$this				form object										*
+ *		this		<form> object										*
  ************************************************************************/
 function resetForm()
 {
     return true;
-}	// resetForm
+}	// function resetForm
 
 /************************************************************************
- *  finish																*
+ *  function finish														*
  *																		*
  *  This method is called when the user requests to close				*
- *  the window.																*
+ *  the window.															*
  *																		*
  *  Input:																*
-*		$this				<button id='Finish'>								*
+ *		this		<button id='Finish'>    							*
+ *		e           click Event                                         *
  ************************************************************************/
-function finish()
+function finish(e)
 {
     if (window.opener)
     {			// invoked in a separate window
@@ -672,18 +674,18 @@ function finish()
 		window.history.back();
     }
     return true;
-}	// finish
+}	// function finish
 
 /************************************************************************
- *  emKeyDown																*
+ *  function emKeyDown													*
  *																		*
  *  Handle key strokes that apply to the dialog as a whole.  For example*
- *  the key combinations Ctrl-S and Alt-C are interpreted to close the		*
- *  dialog, as shortcut alternatives to using the mouse to click the 		*
+ *  the key combinations Ctrl-S and Alt-C are interpreted to close the	*
+ *  dialog, as shortcut alternatives to using the mouse to click the 	*
  *  Close button.														*
  *																		*
- *  Parameters:																*
- *		this		<body> object												*
+ *  Parameters:															*
+ *		this		<body> object										*
  *		e		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function emKeyDown(e)
@@ -702,7 +704,7 @@ function emKeyDown(e)
 		{		// letter 'A'
 		    if (e.altKey)
 		    {		// alt-A
-				form.Add.onclick();
+				form.Add.click();
 				return false;	// do not perform standard action
 		    }		// alt-A
 		    break;
@@ -722,7 +724,7 @@ function emKeyDown(e)
 		{		// letter 'O'
 		    if (e.altKey)
 		    {		// alt-O
-				form.Reorder.onclick();
+				form.Reorder.click();
 				return false;	// do not perform standard action
 		    }		// alt-O
 		    break;
@@ -740,18 +742,19 @@ function emKeyDown(e)
     }	    // switch on key code
 
     return true;
-}		// emKeyDown
+}		// function emKeyDown
 
 /************************************************************************
- *  editHusb																*
+ *  function editHusb													*
  *																		*
  *  Prompt the user to edit details of the existing husband				*
- *  in the marriage.														*
+ *  in the marriage.													*
  *																		*
  *  Input:																*
- *		this		<button id='editHusb'> element								*
+ *		this		<button id='editHusb'> element						*
+ *		e           click Event                                         *
  ************************************************************************/
-function editHusb()
+function editHusb(e)
 {
     var	button	= this;
     var	form	= button.form;
@@ -772,19 +775,20 @@ function editHusb()
 		childWindows.push(childWindow);
     }		// husband present
     else
-		document.getElementById('createHusb').onclick();
-}		// editHusb
+		document.getElementById('createHusb').click();
+}		// function editHusb
 
 /************************************************************************
- *  chooseHusb																*
+ *  function chooseHusb													*
  *																		*
- *  Prompt the user to select an existing individual as husband				*
- *  in the marriage.														*
+ *  Prompt the user to select an existing individual as husband			*
+ *  in the marriage.													*
  *																		*
- *  Parameters:																*
- *		this				<button id='chooseHusb'> element				*
+ *  Parameters:															*
+ *		this		<button id='chooseHusb'> element				    *
+ *		e           click Event                                         *
  ************************************************************************/
-function chooseHusb()
+function chooseHusb(e)
 {
     var	form	= this.form;
     var	url	= "chooseIndivid.php?id=Husb&name=" + 
@@ -807,16 +811,16 @@ function chooseHusb()
     var childWindow	= openFrame("chooserFrame",
 						    url,
 						    "left");
-}		// chooseHusb
+}		// function chooseHusb
 
 /************************************************************************
- *  gotHusb																*
+ *  function gotHusb													*
  *																		*
  *  This method is called when the XML file representing				*
- *  information on the selected husband is retrieved.						*
+ *  information on the selected husband is retrieved.					*
  *																		*
- *  Parameters:																*
- *		xmlDoc				response as an XML document						*
+ *  Parameters:															*
+ *		xmlDoc			response as an XML document						*
  ************************************************************************/
 function gotHusb(xmlDoc)
 {
@@ -841,26 +845,26 @@ function gotHusb(xmlDoc)
 		alert("editMarriages.js: gotHusb: newSurname is null");
     newSurname			= newSurname[0].textContent;
     famForm.HusbSurname.value	= newSurname;
-}		// gotHusb
+}		// function gotHusb
 
 /************************************************************************
- *  noHusb																*
+ *  function noHusb														*
  *																		*
  *  This method is called if there is no husband file.						*
  ************************************************************************/
 function noHusb()
 {
     alert ('editMarriages.js: noHusb: Missing XML file response for selecting existing husband.');
-}		// noHusb
+}		// function noHusb
 
 /************************************************************************
- *  editWife																*
+ *  function editWife													*
  *																		*
- *  Prompt the user to edit details of an existing wife						*
- *  in the marriage.														*
+ *  Prompt the user to edit details of an existing wife					*
+ *  in the marriage.													*
  *																		*
  *  Input:																*
- *		this		<button id='editWife'> element 								*
+ *		this		<button id='editWife'> element 						*
  ************************************************************************/
 function editWife()
 {
@@ -886,17 +890,17 @@ function editWife()
 		childWindows.push(childWindow);
     }		// wife present
     else
-		document.getElementById('createWife').onclick();
-}		// editWife
+		document.getElementById('createWife').click();
+}		// function editWife
 
 /************************************************************************
- *  chooseWife																*
+ *  function chooseWife													*
  *																		*
- *  Prompt the user to set the wife by selecting from a list of				*
+ *  Prompt the user to set the wife by selecting from a list of			*
  *  existing women in the database.										*
  *																		*
- *  Parameters:																*
- *		this				<button id='chooseWife'> element				*
+ *  Parameters:															*
+ *		this				<button id='chooseWife'> element			*
  ************************************************************************/
 function chooseWife()
 {
@@ -921,10 +925,10 @@ function chooseWife()
     var childWindow	= openFrame("chooserFrame",
 						    url,
 						    "left");
-}		// chooseWife
+}		// function chooseWife
 
 /************************************************************************
- *  gotWife																*
+ *  function gotWife														*
  *																		*
  *  This method is called when the XML file representing				*
  *  information on the new wife is retrieved.								*
@@ -958,26 +962,26 @@ function gotWife(xmlDoc)
 }
 
 /************************************************************************
- *  noWife																*
+ *  function noWife														*
  *																		*
- *  This method is called if there is no wife response file.				*
+ *  This method is called if there is no wife response file.			*
  ************************************************************************/
 function noWife()
 {
     alert ('Missing XML file response for selecting existing wife.');
-}		// noWife
+}		// function noWife
 
 /************************************************************************
- *  createHusb																*
+ *  function createHusb													*
  *																		*
  *  This method is called when the user requests to add 				*
- *  a new individual to the marriage as husband								*
+ *  a new individual to the marriage as husband							*
  *																		*
  *  Input:																*
- *		this		<button id='createHusb'> element 						*
+ *		this		<button id='createHusb'> element 					*
+ *		e           click Event                                         *
  ************************************************************************/
-
-function createHusb()
+function createHusb(e)
 {
     var	form		= this.form;
     var script		= "editIndivid.php?rowid=Husb&initGender=0" +
@@ -992,7 +996,7 @@ function createHusb()
     {				// disable all editChild buttons
 		editChildButtons[ib].disabled	= true;
     }				// disable all editChild buttons
-}	// createHusb
+}	// function createHusb
 
 /************************************************************************
  *  function createWife													*
@@ -1002,8 +1006,9 @@ function createHusb()
  *																		*
  *  Input:																*
  *		this		<button id='createWife'> element					*
+ *		e           click Event                                         *
  ************************************************************************/
-function createWife()
+function createWife(e)
 {
     var	form		= this.form;
     var script		= "editIndivid.php?rowid=Wife&initGender=1" +
@@ -1021,14 +1026,14 @@ function createWife()
 }	// function createWife
 
 /************************************************************************
- *  em1KeyDown																*
+ *  function em1KeyDown													*
  *																		*
  *  Handle key strokes that apply to the dialog as a whole.  For example*
- *  the key combinations Ctrl-S and Alt-U are interpreted to apply the		*
- *  update, as shortcut alternatives to using the mouse to click the 		*
+ *  the key combinations Ctrl-S and Alt-U are interpreted to apply the	*
+ *  update, as shortcut alternatives to using the mouse to click the 	*
  *  Update Marriage button.												*
  *																		*
- *  Parameters:																*
+ *  Parameters:															*
  *		e		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function em1KeyDown(e)
@@ -1045,7 +1050,7 @@ function em1KeyDown(e)
 		if (code == 83)
 		{		// letter 'S'
 		    var	button	= form.update;
-		    button.onclick();
+		    button.click();
 		    return false;	// do not perform standard action
 		}		// letter 'S'
     }		// ctrl
@@ -1060,63 +1065,63 @@ function em1KeyDown(e)
 		    case 65:
 		    {		// letter 'A'
 				button	= document.getElementById('addCitation');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'A'
     
 		    case 69:
 		    {		// letter 'E'
 				button	= document.getElementById('addChild');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'E'
     
 		    case 72:
 		    {		// letter 'H'
 				button	= document.getElementById('createHusb');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'H'
     
 		    case 78:
 		    {		// letter 'N'
 				button	= document.getElementById('addNewChild');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'N'
     
 		    case 79:
 		    {		// letter 'O'
 				button	= document.getElementById('orderChildren');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'O'
 
 		    case 80:
 		    {		// letter 'P'
 				button	= document.getElementById('Pictures');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'P'
     
 		    case 85:
 		    {		// letter 'U'
 				button	= document.getElementById('update');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'U'
     
 		    case 86:
 		    {		// letter 'V'
 				button	= document.getElementById('Events');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'V'
     
 		    case 87:
 		    {		// letter 'W'
 				button	= document.getElementById('createWife');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'N'
 
@@ -1129,4 +1134,4 @@ function em1KeyDown(e)
     }		// alt key held down
 
     return true;
-}		// em1KeyDown
+}		// function em1KeyDown

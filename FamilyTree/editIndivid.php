@@ -1113,7 +1113,7 @@ else
         if ($isOwner)
         {		    // user is authorized to edit this record
 ?>
-        <form name="indForm" id="indForm" action="updateIndividXml.php" method="post">
+        <form name="indForm" id="indForm" action="updatePersonJson.php" method="post">
           <p>
             <button type="submit" id="Submit" style="width: 175px;">
                 <u>U</u>pdate Person

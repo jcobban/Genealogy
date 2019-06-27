@@ -25,8 +25,9 @@
  *		2015/08/04		add button to reset password					*
  *		2016/01/18		signoff set wrong field to logoff				*
  *		2018/10/18      pass language to scripts initiated by buttons   *
+ *		2019/05/18      call element.click() to simulate buton click    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -236,13 +237,13 @@ function soKeyDown(e)
         {
 		    case 67:
 		    {		// letter 'C'
-		        form.Close.onclick();
+		        form.Close.click();
 		        break;
 		    }		// letter 'C'
 
 		    case 70:
 		    {		// letter 'F'
-		        form.ForgotPassword.onclick();
+		        form.ForgotPassword.click();
 		        break;
 		    }		// letter 'F'
 
@@ -254,13 +255,13 @@ function soKeyDown(e)
 
 		    case 79:
 		    {		// letter 'O'
-		        form.Signoff.onclick();
+		        form.Signoff.click();
 		        break;
 		    }		// letter 'O'
 
 		    case 82:
 		    {		// letter 'R'
-		        form.Register.onclick();
+		        form.Register.click();
 		        return false;
 		    }		// letter 'R'
 

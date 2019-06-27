@@ -43,8 +43,8 @@ require_once __NAMESPACE__ . "/common.inc";
 				$src		= $value;
 				// separate protocol from file name
 				$result		= preg_match("#^([a-z]+:|)([0-9a-zA-Z_\-/:. ]+)$#",
-								     $src,
-								     $matches);
+							    	     $src,
+								         $matches);
 				if ($result == 1)
 				{		// pattern matched
 				    $protocol	= $matches[1];
@@ -97,9 +97,13 @@ require_once __NAMESPACE__ . "/common.inc";
 		if ($protocol == '' || $protocol == 'file:')
 		{			// protocol supported by opendir
             // open the image directory
-		    $dh		= opendir("$document_root/$dirname");
+            if (substr($dirname,0,1) == '/')
+                $dirname		    = "$document_root$dirname";
+            else
+                $dirname            = "./$dirname";
+            $dh     = opendir($dirname);
 		    if ($dh)
-		    {			// found images directory
+            {			// found images directory
 				while (($filename = readdir($dh)) !== false)
 				{		// loop through files
 				    $lastdot	= strrpos($filename, '.');
@@ -170,7 +174,7 @@ require_once __NAMESPACE__ . "/common.inc";
 
     $template->set('TITLE',		$title);
     $template->set('LANG',		$lang);
-    $template->set('IMAGENAME',		$imageName);
+    $template->set('IMAGENAME',	$imageName);
     $template->set('SRC',		$src);
 
     if (strlen($msg) == 0 && strlen($warn) == 0)

@@ -32,6 +32,7 @@ use \Exception;
  *		2017/01/13		created from getRecordXml.php					*
  *		2017/01/23		support text keys								*
  *		2019/01/10      move to namespace Genealogy                     *
+ *		2019/06/23      decode HTML entities in string values           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -50,16 +51,33 @@ else
 	{
 	    if (is_array($record) || $record instanceof RecordSet)
 	    {
-			print "{\n";
+            print "{\n";
 			$records	= $record;
 			$comma		= '';
+            if ($record instanceof RecordSet)
+            {
+                $info       = $record->getInformation();
+                print "\n\"info\": {";
+                foreach ($info as $field => $value)
+                {
+                    if (is_numeric($value))
+                        print "$comma\t\t\"$field\":\t$value";
+                    else 
+                    if (is_string($value))
+                        print "$comma\t\t\"$field\":\t". json_encode(html_entity_decode($value));
+                    else 
+                        print "$comma\t\t\"$field\":\t". json_encode($value);
+                    $comma      = ",\n";
+                }
+                print "\n\t}";
+            }
 			foreach($records as $key => $record)
 			{
 			    print $comma . "\"$key\":\n    ";
 			    $record->toJson(true, $options);
 			    $comma	= ",\n";
 			}
-			print "}\n";
+			print "\n}\n";
 	    }
 	    else
 			$record->toJson(true, $options);

@@ -18,6 +18,7 @@
  *		2016/12/07		activate edit and delete citation buttons		*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -247,7 +248,7 @@ function eeKeyDown(e)
 		    if (e.altKey)
 		    {		// alt-A
 				var	button	= document.getElementById('addCitation');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// alt-A
 		    break;
@@ -258,7 +259,7 @@ function eeKeyDown(e)
 		    if (e.altKey)
 		    {		// alt-C
 				var	button	= document.getElementById('Clear');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// alt-C
 		    break;

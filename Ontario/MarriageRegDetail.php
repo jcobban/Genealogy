@@ -529,9 +529,10 @@ if (strlen($msg) == 0)
                                     'originalitem'		=> $item);
         if ($regYear >= 1873)
             $marrParms['regyear']	= $regYear;
-        $marriage           = new Marriage($marrParms);
-        $regYear            = $marriage->get('regyear');
-        $regNum	            = $marriage->get('regnum');
+        $marriage                   = new Marriage($marrParms);
+        if ($marriage->isExisting())
+            $regYear                = $marriage->get('regyear');
+        $regNum	                    = $marriage->get('regnum');
     }
     else
     {
@@ -685,11 +686,9 @@ if (strlen($msg) == 0)
     $template->set('REGISTRAR',	    $registrar);
     $template->set('REMARKS',	    $remarks);
     $template->set('IMAGE',	        $image);
-    if (strlen($image) < 4 || substr($image, 0, 4) != 'http')
+    if (strlen($image) < 4)
     {
         $template->set('IMAGEDISABLED',	        'disabled="disabled"');
-        if ($action != 'Update')
-            $template['ShowImage']->update(null);
     }
     else
     {

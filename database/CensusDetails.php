@@ -263,6 +263,8 @@ else
                                $text);
 }
 
+if (strlen($subDistrictName) > 24)
+    $subDistrictName        = substr($subDistrictName, 0, 21) . '...';
 $template->set('CENSUSYEAR', 		$censusYear);
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('CENSUSID',			$censusId);

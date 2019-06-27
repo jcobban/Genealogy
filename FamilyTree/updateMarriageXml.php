@@ -120,38 +120,32 @@ print "<marriage>\n";
 // user must be authorized to edit the database
 if (!canUser('edit'))
 {  		// the user not authorized
-	$msg	.= 'User not authorized to update the database. ';
+	$msg	        .= 'User not authorized to update the database. ';
 }  		// the user not authorized
 
 // obtain and validate IDMR
-$idmr	= null;
-$logmsg	= "updateMarriageXml.php?";
-$and	= '';
+$idmr				= null;
+$logmsg				= "updateMarriageXml.php?";
+$and				= '';
 foreach($_POST as $key => $value)
 {
-	$logmsg	.= $and . $key . '=' . $value;
-	$and	= '&';
+	$logmsg	        .= $and . $key . '=' . $value;
+	$and	        = '&';
 	if (strtolower($key) == 'idmr')
-	    $idmr	= $value;
+	    $idmr	    = $value;
 }
 error_log($logmsg . "\n", 3, $document_root . "/logs/ajax.log");
 
 if (is_null($idmr))
 {
-	$msg	.= 'Missing mandatory parameter idmr. ';
+	$msg	        .= 'Missing mandatory parameter idmr. ';
 }
 else
 if (!is_string($idmr) || !ctype_digit($idmr))
-	$msg	.= "Value of idmr='$idmr' must be numeric key. ";
+	$msg	        .= "Value of idmr='$idmr' must be numeric key. ";
 else
 {		// idmr specified and numeric
-	try {
-	    $family	= new Family(array('idmr' => $idmr));
-	}
-	catch(Exception $e)
-	{
-	    $msg	.= "idmr=$idmr fails with " . $e->getMessage();
-	}
+    $family	        = new Family(array('idmr' => $idmr));
 }		// idmr specified and numeric
 
 // if there were any errors detected, report them and terminate
@@ -205,7 +199,8 @@ foreach($_POST as $key => $value)
 			    else
 			    {
 					$gender		= Person::MALE;
-					$husb->setTreename($treename);
+                    $husb->setTreename($treename);
+                    $husb->set('sex',0);
 					$husb->save(false);
 					$idirhusb	= $husb->getIdir();
 					$husb->set('gender', Person::MALE);
@@ -228,17 +223,18 @@ foreach($_POST as $key => $value)
 	    }
 
 	    case 'husbgivenname':
-	    {
-			if ($husb)
+        {
+			if ($husb && $husb->getIdir() > 0)
 			    $husb->set('givenname', $value);
 			else
 			if ($value != '')
 			{
-			    $husb	= new Person();
-			    $husb->set('givenname', $value);
+                $husb	    = new Person();
+			    $husb->setGender(Person::MALE);
 			    $husb->save(false);
+			    $husb->set('givenname', $value);
 			    $idirhusb	= $husb->getIdir();
-			}
+            }
 			break;
 	    }
 
@@ -250,6 +246,7 @@ foreach($_POST as $key => $value)
 			if ($value != '' && $value != '?')
 			{
 			    $husb	= new Person();
+			    $husb->setGender(Person::MALE);
 			    $husb->set('surname', $value);
 			    $husb->save(false);
 			    $idirhusb	= $husb->getIdir();
@@ -305,16 +302,28 @@ foreach($_POST as $key => $value)
 	    }
 
 	    case 'wifegivenname':
-	    {
-    		if ($wife)
+        {
+			if ($wife && $wife->getIdir() > 0)
     		    $wife->set('givenname', $value);
+			else
+			if ($value != '')
+			{
+			    $wife	    = new Person();
+			    $husb->setGender(Person::FEMALE);
+			    $wife->save(false);
+			    $wife->set('givenname', $value);
+			    $idirwife	= $wife->getIdir();
+            }
     		break;
 	    }
 
 	    case 'wifesurname':
-	    {
-    		if ($wife && $value != '?')
-    		    $wife->set('surname', $value);
+        {
+            if ($value != '?')
+            {
+    		    if ($wife)
+                    $wife->set('surname', $value);
+            }
     		break;
 	    }
 
@@ -332,7 +341,6 @@ foreach($_POST as $key => $value)
 			    $nameRec->set('marriednamecreatedby', 1);
 			    $nameRec->save(true);
 			}
-			$family->set('wifemarrsurname', $value);
 			break;
 	    }
 
@@ -531,13 +539,7 @@ foreach($_POST as $key => $value)
 	
 			    case 'cidcr':
 			    {	// IDCR of child, may be zero
-					$idcr		= $value;
-					error_log(__LINE__ . ' id=' . $id .
-								' maxChildOrder=' . $maxChildOrder .
-								' cidcr=' . $idcr . 
-								"\n",
-							3, 
-							$document_root . "/logs/ajax.log");
+					$idcr		    = $value;
 					// $id contains rownum of instance of Child
 					if ($idcr == 0 || $id > $maxChildOrder)
 					{		// new child
@@ -556,7 +558,12 @@ foreach($_POST as $key => $value)
 					    {		// valid IDIR
 							$indiv	= new Person(array('idir' => $idir));
 					    }		// valid IDIR
-					    print "\n      <idir$id>$idir</idir$id>\n";
+                        print "\n      <idir$id>$idir</idir$id>\n";
+                        if ($idmr == 0)
+                        {
+                            $family->save('createfamily');
+                            $idmr   = $family->getIdmr();
+                        }
 					    $childr		= $family->addChild($idir);
 					    $idcr		= $childr->get('idcr');
 					    unset($children[$idcr]);
@@ -660,7 +667,7 @@ if ($indiv !== null &&
 	$indiv->get('givenname') != '')
 {		// editing existing child
 	$indiv->save(true);
-error_log(__LINE__ . ' idir=' . $indiv->getIdir() . "\n", 3, $document_root . "/logs/ajax.log");
+    print '<idir line="' . __LINE__ . '">' . $indiv->getIdir() . "</idir>\n";
 	if ($childr->getIdir() == 0)
 	    $childr->set('idir',
 				      $indiv->getIdir());
@@ -679,7 +686,8 @@ if (is_object($husb) &&
 	    $husb->save(true);
 	    $idirhusb	= $husb->getIdir();
 	    $family->set('idirhusb', $idirhusb);
-	    $family->setName($husb);
+        $family->setName($husb);
+        print '<family line="' . __LINE__ . '">' . $family->getName() . "</family>\n";
 	} catch(Exception $e)
 	{		// setName failed
 	    $msg	.= "Husband changed: " . $e->getMessage();
@@ -699,26 +707,18 @@ if (is_object($wife) &&
 	(strlen($wife->getGivenName()) > 0 ||
 	 strlen($wife->getSurname()) > 0 ))
 {		// have wife
-print "<setwifename>\n";
-	try {
-	    $wife->save(true);
-	    $idirWife	= $wife->getIdir();
-print "<idirwife>" . $family->get('idirwife');
-print "</idirwife>";
-	    $family->set('idirwife', $idirWife);
-print "<setnameforwife>\n";
-	    try {
-	    $family->setName($wife);
-	} catch(Exception $e)
-	{		// setName failed
-	    $msg	.= "setName(\$wife) failed: " . $e->getMessage();
-	}		// setName failed
-print "</setnameforwife>\n";
-	} catch(Exception $e)
-	{		// setName failed
-	    $msg	.= "Wife changed: " . $e->getMessage();
-	}		// setName failed
-print "</setwifename>\n";
+    print "<setwifename>\n";
+    $wife->set('sex',1);
+	$wife->save(true);
+	$idirWife	= $wife->getIdir();
+    print "<idirwife>" . $family->get('idirwife');
+    print "</idirwife>";
+	$family->set('idirwife', $idirWife);
+    print "<setnameforwife>\n";
+	$family->setName($wife);
+    print '<family line="' . __LINE__ . '">' . $family->getName() . "</family>\n";
+    print "</setnameforwife>\n";
+    print "</setwifename>\n";
 }		// wife changed
 else
 {		// no wife

@@ -50,8 +50,11 @@ use \Templating\Template;
  *		2017/10/16		use BirthSet									*
  *		2017/10/30		use composite cell style classes				*
  *		2018/10/06      use class Template                              *
+ *		2019/05/29      do not number_format registration numbers       *
+ *		2019/06/17      ignore late registrations in calculating        *
+ *		                highest registration number                     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Birth.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -204,7 +207,7 @@ if (strlen($msg) == 0)
 	if ($county)
 	    $result	= $births->getCountyStatistics();
 	else
-	    $result	= $births->getStatistics();
+        $result	= $births->getStatistics();
 }		// no errors
 else
     $result     = array();
@@ -230,7 +233,7 @@ foreach($result as $row)
 {
     $ttemplate      = new Template($yearHTML);
 	$rownum++;
-	$county		    = $row['b_regcounty'];
+	$county		    = $row['county'];
 	try {
 	    if (is_null($countyObj) ||
 		$county != $countyObj->get('code'))
@@ -245,8 +248,8 @@ foreach($result as $row)
 			"</p>\n";
 	    $countyName		= $county;
 	}
-	if (array_key_exists('b_regtownship', $row))
-         $township	    = $row['b_regtownship'];
+	if (array_key_exists('township', $row))
+         $township	    = $row['township'];
     else
          $township      = '&nbsp;';
 	$count		        = $row['count'];
@@ -258,12 +261,19 @@ foreach($result as $row)
 	    $pctLinked  	= 100 * $linked / $count;
 	$totalLinked	    += $linked;
 	$low		        = $row['low'];
-	$high		        = $row['high'];
+    $high		        = $row['high'];
+    if (array_key_exists('currhigh', $row))
+	    $currhigh		= $row['currhigh'];
+    else
+        $currhigh		= $high;
+
 	if ($low < $lowest)
 	    $lowest	        = $low;
-	if ($high > $highest)
+	if ($high < ($low + 400000) && $high > $highest)
 	    $highest	    = $high;
-	$todo		        = $high - $low + 1;
+    $todo		        = $currhigh - $low + 1;
+    if ($todo < $count)
+        $todo           = $count;
 	if ($todo == 0)
 	    $pctDone	    = 0;
 	else
@@ -274,9 +284,9 @@ foreach($result as $row)
     $ttemplate->set('COUNTYNAME',   $countyName);
     $ttemplate->set('TOWNSHIP',     $township);
     $ttemplate->set('COUNT',        number_format($count));
-    $ttemplate->set('LOW',          number_format($low));
-    $ttemplate->set('HIGH',         number_format($high));
-    $ttemplate->set('LINKED',       number_format($linked));
+    $ttemplate->set('LOW',          $low);
+    $ttemplate->set('HIGH',         $high);
+    $ttemplate->set('LINKED',       $linked);
     $ttemplate->set('PCTDONE',      number_format($pctDone,2));
     $ttemplate->set('PCTDONECLASS', pctClass($pctDone));
     $ttemplate->set('PCTLINKED',    number_format($pctLinked,2));
@@ -302,8 +312,8 @@ $template->set('REGYEAR',           $regYear);
 $template->set('REGYEARP',          $regYear - 1);
 $template->set('REGYEARN',          $regYear + 1);
 $template->set('TOTAL',             number_format($total));
-$template->set('LOWEST',            number_format($lowest));
-$template->set('HIGHEST',           number_format($highest));
+$template->set('LOWEST',            $lowest);
+$template->set('HIGHEST',           $highest);
 $template->set('PCTDONE',           number_format($pctDone,2));
 $template->set('PCTDONECLASS',      pctClass($pctDone));
 $template->set('TOTALLINKED',       number_format($totalLinked));

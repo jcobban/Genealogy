@@ -168,6 +168,7 @@ $code				= 'ON';
 $domainName			= 'Ontario';
 $regCounty			= null;
 $countyName		    = '';
+$regTownship		= null;
 $expand				= true;
 $getParms			= array();	// parameters to new DeathSet
 $regyear			= 0;
@@ -194,12 +195,34 @@ foreach ($_GET as $key => $value)
 	    switch($fieldLc)
 	    {
 			case 'regdomain':
+			case 'domain':
 			{
+                $getParms[$key]         = $value;
 				$domain		            = $value;
 				$npuri	                .= "$npand$key=$value";
 				$npand	                = '&amp;';
 			    break;
 			}		// administrative domain
+
+			case 'regcounty':
+			case 'county':
+			{
+                $getParms[$key]         = $value;
+				$regCounty		        = $value;
+				$npuri	                .= "$npand$key=$value";
+				$npand	                = '&amp;';
+			    break;
+			}		// county
+
+			case 'regtownship':
+			case 'township':
+			{
+                $getParms[$key]         = $value;
+				$regTownship		    = $value;
+				$npuri	                .= "$npand$key=$value";
+				$npand	                = '&amp;';
+			    break;
+            }		// township
 
 			case 'count':
 			case 'limit':
@@ -377,7 +400,7 @@ if ($regnum)
 {
     if (ctype_digit($regnum))
     {
-		$getParms['regnum']	    = $regnum;
+		$getParms['regnum']	= $regnum;
     }
     else
     {
@@ -386,6 +409,8 @@ if ($regnum)
         $regnum             = 0;
     }
 }
+else
+    $regnum                 = '';
 
 // validate limit
 if ((is_int($limit) || ctype_digit($limit)) && $limit < 100)
@@ -505,7 +530,9 @@ $template->set('DOMAINNAME',	$domainName);
 $template->set('CC',	        $cc);
 $template->set('CODE',	        $code);
 $template->set('COUNTRYNAME',	$countryName);
+$template->set('REGCOUNTY',	    $regCounty);
 $template->set('COUNTYNAME',	$countyName);
+$template->set('REGTOWNSHIP',	$regTownship);
 $template->set('LANG',	        $lang);
 $template->set('REGYEAR',       $regyear);
 $template->set('REGNUM',        $regnum);
@@ -547,7 +574,10 @@ if (strlen($msg) == 0)
     $rowclass   		= 'odd';
     $data               = '';
 	$rownum		        = 0;
-    $eregnum		    = $regnum;	// expected entry
+    if (is_numeric($regnum))
+        $eregnum		= $regnum;	// expected entry
+    else
+        $eregnum		= 0;	
 
     foreach($deaths as $death)
     {                   // loop through matching records

@@ -38,6 +38,16 @@
           Status $REGYEAR $COUNTYNAME
       </a>:
       </span>
+      <span>
+          <a href="/getRecordJson.php?Table=Deaths&RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;County=$REGCOUNTY&amp;Township=$REGTOWNSHIP">
+          Results as JSON Document
+      </a>:
+      </span>
+      <span>
+          <a href="/getRecordXml.php?Table=Deaths&RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;County=$REGCOUNTY&amp;Township=$REGTOWNSHIP">
+          Results as XML Document
+      </a>:
+      </span>
     </div>
     <div class="body">
       <h1>
@@ -174,6 +184,15 @@
         </p>
       </form>
     </div> <!-- end of <div id="templates"> -->
+    <div class="hidden" id="regnumNotNumber">
+        Parameter Regnum=$regnum is not numeric.
+    </div>
+    <div class="hidden" id="badLimit">
+        Invalid parameter value Count=$limit.
+    </div>
+    <div class="hidden" id="badOffset">
+        Invalid parameter value Offset=$offset.
+    </div>
     <div class="balloon" id="HelpRegYear">
       This field contains the year in which the event was registered.
     </div>

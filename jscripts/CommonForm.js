@@ -131,6 +131,11 @@
  *		2019/04/12      loosen syntax for ages                          *
  *		                add function getNumeric to convert numbers      *
  *		                that include '½' as a digit.                    *
+ *		2019/05/19      call element.click to trigger button click      *
+ *		2019/05/24      add numericKeyDown to filter non-numeric        *
+ *		                keystrokes                                      *
+ *		                improve handling of left and right arrow to     *
+ *		                go to next cell if no text to move over         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -139,11 +144,11 @@ var givenNames	        = [];
 var options = {"timeout"    : false};
 
 if (typeof HTTP === 'function')
-{
+{                       // load nicknames table from database
     HTTP.get('/getRecordJson.php?table=Nicknames',
              gotNicknames,
              options);
-}
+}                       // load nicknames table from database
 
 /************************************************************************
  *  function gotNicknames												*
@@ -1018,7 +1023,7 @@ var	preTab	= {
 				};
 
 /************************************************************************
- *  capitalize															*
+ *  function capitalize													*
  *																		*
  *  Capitalize the value of a HTML input element.						*
  *																		*
@@ -1049,10 +1054,10 @@ function capitalize(element)
     //		", returns '" + tmp + "'");
     element.value	= tmp;		// replace with capitalized value
     return tmp;
-}		// capitalize
+}		// function capitalize
 
 /************************************************************************
- *  setErrorFlag														*
+ *  function setErrorFlag												*
  *																		*
  *  Set the error flag on a field value by altering the class of		*
  *  the input field to either contain or not contain 'error'			*
@@ -1086,7 +1091,7 @@ function setErrorFlag(element, valid)
 }		// function setErrorFlag
 
 /************************************************************************
- *  expAbbr																*
+ *  function expAbbr														*
  *																		*
  *  Expand abbreviations.  This method modifies the value				*
  *  of the element that is passed to it.  If the value contains			*
@@ -1185,10 +1190,10 @@ function expAbbr(element, table)
     //alert("expAbbr: result='" + result + "'");
     element.value	= result;
     return result;
-}		// expAbbr
+}		// function expAbbr
 
 /************************************************************************
- *  changeElt															*
+ *  function changeElt													*
  *																		*
  *  Take action when the user changes a field to implement				*
  *  assists such as converting to upper case and expanding				*
@@ -1259,10 +1264,10 @@ function changeElt(element)
     else
 		alert("'CommonForm.js: changeElt: unable to get form, element '" +
 				id + "'");
-}		// changeElt
+}		// function changeElt
 
 /************************************************************************
- *  change																*
+ *  function change														*
  *																		*
  *  Take action when the user changes a field to implement common		*
  *  assists such as converting to upper case and expanding				*
@@ -1277,10 +1282,10 @@ function change()
 
     if (this.checkfunc)
 		this.checkfunc();
-}		// change
+}		// function change
 
 /************************************************************************
- *  dateChanged															*
+ *  function dateChanged													*
  *																		*
  *  Take action when the user changes a date field						*
  *																		*
@@ -1301,10 +1306,10 @@ function dateChanged()
 
     if (this.checkfunc)
 		this.checkfunc();
-}		// dateChanged
+}		// function dateChanged
 
 /************************************************************************
- *  surnameChanged														*
+ *  function surnameChanged												*
  *																		*
  *  Take action when the user changes the surname field					*
  *																		*
@@ -1341,10 +1346,10 @@ function surnameChanged()
         var	titleElement	= document.getElementById('title');
 		titleElement.innerHTML	= titlePrefix + newName;
     }
-}		// surnameChanged
+}		// function surnameChanged
 
 /************************************************************************
- *  givenChanged														*
+ *  function givenChanged												*
  *																		*
  *  This method is called when the user modifies the value of the		*
  *  given name of the individual.  It adjusts the default gender based	*
@@ -1418,10 +1423,10 @@ function givenChanged()
         var	titleElement	= document.getElementById('title');
 		titleElement.innerHTML	= titlePrefix + newName;
     }
-}	// givenChanged
+}	// function givenChanged
 
 /************************************************************************
- *  goToLink															*
+ *  function goToLink													*
  *																		*
  *  This function may be set as the onclick handler for an element.		*
  *  It requires that the 'href' attribute of the element has been set	*
@@ -1451,10 +1456,10 @@ function goToLink(event)
     {		// new URL not defined
 		alert("href attribute was not set for this button");
     }		// new URL not defined
-}		// goToLink
+}		// function goToLink
 
 /************************************************************************
- *  checkName															*
+ *  function checkName													*
  *																		*
  *  Validate the current value of a field containing a name.			*
  *																		*
@@ -1467,10 +1472,10 @@ function checkName()
     var	re		= /^[a-zA-Z7\u00c0-\u00ff .,'"()\-&\[\]?]*$/;
     var	name		= element.value;
     setErrorFlag(element, re.test(name));
-}		// checkName
+}		// function checkName
 
 /************************************************************************
- *  checkProvince														*
+ *  function checkProvince												*
  *																		*
  *  Validate the current value of a field containing a province code.	*
  *																		*
@@ -1482,10 +1487,10 @@ function checkProvince()
     var	element		= this;
     var	name		= element.value;
     setErrorFlag(element, (offset & 1) == 0);
-}		// checkProvince
+}		// function checkProvince
 
 /************************************************************************
- *  checkOccupation														*
+ *  function checkOccupation												*
  *																		*
  *  Validate the current value of a field containing a occupation.		*
  *																		*
@@ -1498,10 +1503,10 @@ function checkOccupation()
     var	re		= /^[a-zA-Z\u00c0-\u00ff .'&\-\[\]?]*$/;
     var	occupation	= element.value;
     setErrorFlag(element, re.test(occupation));
-}		// checkOccupation
+}		// function checkOccupation
 
 /************************************************************************
- *  checkAddress														*
+ *  function checkAddress												*
  *																		*
  *  Validate the current value of a field containing a address.			*
  *																		*
@@ -1514,10 +1519,10 @@ function checkAddress()
     var	re		= /^[-a-zA-Z\u00c0-\u00ff0-9 .,'½¼¾&\[\]\/?]*$/;
     var	address		= element.value;
     setErrorFlag(element, re.test(address));
-}		// checkAddress
+}		// function checkAddress
 
 /************************************************************************
- *  checkText															*
+ *  function checkText													*
  *																		*
  *  Validate the current value of a field containing text.				*
  *																		*
@@ -1530,10 +1535,10 @@ function checkText()
     var	re		= /^[a-zA-Z\u00c0-\u00ff0-9 .,:;'"()½/\[\]\-&?]*$/;
     var	text		= element.value;
     setErrorFlag(element, re.test(text));
-}		// checkText
+}		// function checkText
 
 /************************************************************************
- *  checkSex															*
+ *  function checkSex													*
  *																		*
  *  Validate the current value of a field containing a sex.				*
  *																		*
@@ -1546,10 +1551,10 @@ function checkSex()
     var	re		= /^[MFmf?]?$/;
     var	sex		= element.value;
     setErrorFlag(element, re.test(sex));
-}		// checkSex
+}		// function checkSex
 
 /************************************************************************
- *  checkMStat															*
+ *  function checkMStat													*
  *																		*
  *  Validate the current value of a field containing a mstat.			*
  *																		*
@@ -1562,10 +1567,10 @@ function checkMStat()
     var	re		= /^[BDMSWVCbdmswvc? ]?$/;
     var	mstat		= element.value;
     setErrorFlag(element, re.test(mstat));
-}		// checkMStat
+}		// function checkMStat
 
 /************************************************************************
- *  checkFlag															*
+ *  function checkFlag													*
  *																		*
  *  Validate the current value of a field containing a flag.			*
  *																		*
@@ -1578,10 +1583,10 @@ function checkFlag()
     var	re		= /^[ynYN1 ]?$/;
     var	flag		= element.value;
     setErrorFlag(element, re.test(flag));
-}		// checkFlag
+}		// function checkFlag
 
 /************************************************************************
- *  checkFlagSex														*
+ *  function checkFlagSex												*
  *																		*
  *  Validate the current value of a field containing a flag or a gender.*
  *																		*
@@ -1594,10 +1599,10 @@ function checkFlagSex()
     var	re		= /^[ynmfYNMF1 ]?$/;
     var	flag		= element.value;
     setErrorFlag(element, re.test(flag));
-}		// checkFlagSex
+}		// function checkFlagSex
 
 /************************************************************************
- *  checkDate															*
+ *  function checkDate													*
  *																		*
  *  Validate the current value of a field containing a date.			*
  *																		*
@@ -1655,10 +1660,10 @@ function checkDate()
     }
 
     setErrorFlag(element, matched);
-}		// checkDate
+}		// function checkDate
 
 /************************************************************************
- *  checkNumber															*
+ *  function checkNumber													*
  *																		*
  *  Validate the current value of a field containing a number.			*
  *  A number of fields that use this validation occasionally have		*
@@ -1679,10 +1684,10 @@ function checkNumber()
 		setErrorFlag(element, true);
     else
 		setErrorFlag(element, re.test(number));
-}		// checkNumber
+}		// function checkNumber
 
 /************************************************************************
- *  checkPositiveNumber													*
+ *  function checkPositiveNumber											*
  *																		*
  *  Validate the current value of a field containing a positive number.	*
  *  A number of fields that use this validation occasionally have		*
@@ -1703,10 +1708,10 @@ function checkPositiveNumber()
 		setErrorFlag(element, true);
     else
 		setErrorFlag(element, re.test(number) && (number != '0'));
-}		// checkPositiveNumber
+}		// function checkPositiveNumber
 
 /************************************************************************
- *  checkFamily															*
+ *  function checkFamily													*
  *																		*
  *  Validate the current value of a field containing a family number.	*
  *																		*
@@ -1759,10 +1764,10 @@ function checkFamily()
     if (family != '')
 		setErrorFlag(element, re.test(family) && 
 						      (family == prevFamily || family == expFamily));
-}		// checkFamily
+}		// function checkFamily
 
 /************************************************************************
- *  checkYear															*
+ *  function checkYear													*
  *																		*
  *  Validate the current value of a field containing a year.			*
  *  Should be 4 digit numeric year, possibly enclosed in editorial		*
@@ -1778,10 +1783,10 @@ function checkYear()
     var	year		= element.value;
 		// if valid value, clear the flag
     setErrorFlag(element, re.test(year));
-}		// checkYear
+}		// function checkYear
 
 /************************************************************************
- *  checkAge															*
+ *  function checkAge													*
  *																		*
  *  Validate the current value of an age field.  Should be numeric age	*
  *  in years, age in months (with a suffix 'm'), a question mark,		*
@@ -1801,7 +1806,7 @@ function checkAge()
 						  age.toLowerCase() == '[blank]' ||
 						  re.test(age) || 
 						  re2.test(age));
-}		// checkAge
+}		// function checkAge
 
 /************************************************************************
  *  function getNumeric                 								*
@@ -1851,7 +1856,7 @@ function getNumeric(number)
 }       // function getNumeric
 
 /************************************************************************
- *  checkURL															*
+ *  function checkURL													*
  *																		*
  *  Validate the current value of a field containing a Uniform			*
  *  Record Location (URL).												*
@@ -1865,10 +1870,10 @@ function checkURL()
     var	re		= new RegExp("^(http:|https:|ftp:|)(//[A-Za-z0-9_.]*/|)(.*/|)(.+)$");
     var	url		= element.value;
     setErrorFlag(element, url.length == 0 ||re.test(url));
-}		// checkAge
+}		// function checkAge
 
 /************************************************************************
- *  getSortDate															*
+ *  function getSortDate													*
  *																		*
  *  Given a textual date, compute a sort date YYYYMMDD					*
  *																		*
@@ -1910,10 +1915,10 @@ function getSortDate(date)
     }
     else
 		return -99999999;
-}		// getSortDate
+}		// function getSortDate
 
 /************************************************************************
- *  getCellRelRow														*
+ *  function getCellRelRow												*
  *																		*
  *  Get the element in another cell in the current row at a				*
  *  relative column position.											*
@@ -1973,10 +1978,10 @@ function getCellRelRow(	curr,
 
     // return requested field
     return field;
-}		// getCellRelRow
+}		// function getCellRelRow
 
 /************************************************************************
- *  getCellFirstRow														*
+ *  function getCellFirstRow												*
  *																		*
  *  Get the element in the first cell in the current row.				*
  *																		*
@@ -2018,10 +2023,10 @@ function getCellFirstRow(curr)
 				", col=" + col);
     // return requested field
     return field;
-}		// getCellFirstRow
+}		// function getCellFirstRow
 
 /************************************************************************
- *  getCellLastRow														*
+ *  function getCellLastRow												*
  *																		*
  *  Get the element in the last cell in the current row.				*
  *																		*
@@ -2065,10 +2070,10 @@ function getCellLastRow(curr)
 				", col=" + col);
     // return requested field
     return field;
-}		// getCellLastRow
+}		// function getCellLastRow
 
 /************************************************************************
- *  getCellRelCol														*
+ *  function getCellRelCol												*
  *																		*
  *  Get the element in another cell in another row at the				*
  *  same column position.												*
@@ -2137,10 +2142,10 @@ msg += ", newrow=" + row;
 
     // return requested field
     return field;
-}		// getCellRelCol
+}		// function getCellRelCol
 
 /************************************************************************
- *  isChanged															*
+ *  function isChanged													*
  *																		*
  *  Editting state variable used by function tableKeyDown				*
  *  true if the current field has been modified							*
@@ -2148,7 +2153,7 @@ msg += ", newrow=" + row;
 var	isChanged	= false;
 
 /************************************************************************
- *  tableKeyDown														*
+ *  function tableKeyDown												*
  *																		*
  *  Handle key strokes in input fields.  The objective is to emulate	*
  *  the behavior of cursor movement keys in a spreadsheet.				*
@@ -2194,13 +2199,14 @@ function tableKeyDown(e)
 		case 40:	// down
 		{
 		    isChanged	= false;
-		    field	= getCellRelCol(this, 1);
+		    field	    = getCellRelCol(this, 1);
+            e.preventDefault();
 		    if (field === undefined)
 				return false;
-		    field.focus();		// set focus on same column next row
+		    field.focus();	    	// set focus on same column next row
 		    if (field.select)
 				field.select();		// select all of the text to replace
-		    return false;		// suppress default action
+		    return false;		    // suppress default action
 		}		// return
 
 		case 35:
@@ -2209,6 +2215,7 @@ function tableKeyDown(e)
 		    if (e.ctrlKey)
 		    {		// ctrl-End
 				field	= getCellLastRow(this);
+                e.preventDefault();
 				if (field === undefined)
 				    return false;
 				field.focus();		// set focus on last column current row
@@ -2224,6 +2231,7 @@ function tableKeyDown(e)
 		    if (e.ctrlKey)
 		    {		// ctrl-Home
 				field	= getCellFirstRow(this);
+                e.preventDefault();
 				if (field === undefined)
 				    return false;
 				field.focus();	// set focus on first column current row
@@ -2236,18 +2244,25 @@ function tableKeyDown(e)
 
 		case 37:	// left
 		{
-		    //if (isChanged)
-				return true;
-		    //field	= getCellRelRow(this, -1);
-		    //field.focus();		// set focus on previous col same row
-		    //field.select();		// select all of the text to replace
-		    //return false;		// suppress default action
+            if ('selectionStart' in this)
+            {
+                if (this.selectionStart == 0)
+                {
+			        field	        = getCellRelRow(this, -1);
+			        field.focus();		// set focus on next col same row
+			        field.select();		// select all of the text to replace
+	                e.preventDefault();
+			        return false;		// suppress default action
+                }
+            }
+            break;
 		}		// return
 
 		case 38:	// up
 		{
 		    isChanged	= false;
 		    field	= getCellRelCol(this, -1);
+            e.preventDefault();
 		    if (field === undefined)
 				return false;
 		    field.focus();		// set focus on same column next row
@@ -2257,17 +2272,24 @@ function tableKeyDown(e)
 
 		case 39:	// right
 		{
-		    //if (isChanged)
-				return true;
-		    //field	= getCellRelRow(this, 1);
-		    //field.focus();		// set focus on next col same row
-		    //field.select();		// select all of the text to replace
-		    //return false;		// suppress default action
-		}		// return
+            if ('selectionStart' in this)
+            {
+                if (this.selectionStart == this.value.length)
+                {
+			        field	        = getCellRelRow(this, 1);
+			        field.focus();		// set focus on next col same row
+			        field.select();		// select all of the text to replace
+	                e.preventDefault();
+			        return false;		// suppress default action
+                }
+            }
+            break;
+		}		    // right
 
 		case 112:	// F1
 		{
 		    displayHelp(this);
+            e.preventDefault();
 		    return false;		// suppress default action
 		}		// F1
 
@@ -2278,14 +2300,9 @@ function tableKeyDown(e)
 				var correctImage= document.getElementById('correctImage');
 				if (correctImage)
 				    correctImageUrl();
+            e.preventDefault();
 				return false;
 		    }		// alt-C
-		    else
-		    if (colName == 'Family')
-		    {
-				if (e.preventDefault) e.preventDefault();
-				return false;
-		    }
 		    else
 				isChanged	= true;
 		    break;
@@ -2295,17 +2312,12 @@ function tableKeyDown(e)
 		{		// letter 'I'
 		    if (e.altKey)
 		    {		// alt-I
+                e.preventDefault();
 				var imageButton	= document.getElementById('imageButton');
 				if (imageButton)
-				    imageButton.onclick();
+				    imageButton.click();
 				return false;
 		    }		// alt-I
-		    else
-		    if (colName == 'Family')
-		    {
-				if (e.preventDefault) e.preventDefault();
-				return false;
-		    }
 		    else
 				isChanged	= true;
 		    break;
@@ -2316,14 +2328,9 @@ function tableKeyDown(e)
 		    if (e.ctrlKey)
 		    {		// ctrl-S
 				form.submit();
+                e.preventDefault();
 				return false;
 		    }		// ctrl-S
-		    else
-		    if (colName == 'Family')
-		    {
-				if (e.preventDefault) e.preventDefault();
-				return false;
-		    }
 		    else
 				isChanged	= true;
 		    break;
@@ -2336,12 +2343,6 @@ function tableKeyDown(e)
 				form.submit();
 		    }		// alt-U
 		    else	// letter U
-		    if (colName == 'Family')
-		    {
-				if (e.preventDefault) e.preventDefault();
-				return false;
-		    }
-		    else
 				isChanged	= true;
 		    break;
 		}		// letter 'U'
@@ -2351,15 +2352,10 @@ function tableKeyDown(e)
 		    if (e.ctrlKey)
 		    {		// ctrl-Z
 				this.value	= this.defaultValue;
+                e.preventDefault();
 				return false;
 		    }		// ctrl-Z
 		    else	// letter Z
-		    if (colName == 'Family')
-		    {
-				if (e.preventDefault) e.preventDefault();
-				return false;
-		    }
-		    else
 				isChanged	= true;
 		    break;
 		}		// letter 'Z'
@@ -2370,40 +2366,58 @@ function tableKeyDown(e)
 		    break;
 		}		// only handled in conjunction with other key
 
-		case 8:		// back-space
-		case 48:	// 0
-		case 49:	// 1
-		case 50:	// 2
-		case 51:	// 3
-		case 52:	// 4
-		case 53:	// 5
-		case 54:	// 6
-		case 55:	// 7
-		case 56:	// 8
-		case 57:	// 9
-		case 61:	// = duplicate previous value
-		{
-		    isChanged	= true;
-		    break;
-		}
-
 		default:
 		{		// other keystrokes
-		    if (colName == 'Family')
-		    {
-				if (e.preventDefault) e.preventDefault();
-				return false;
-		    }
 		    isChanged	= true;
 		    break;
 		}		// other keystrokes
     }	    // switch on key code
 
-    return;
-}		// tableKeyDown
+    return true;
+}		// function tableKeyDown
 
 /************************************************************************
- *  columnClick															*
+ *  function numericKeyDown												*
+ *																		*
+ *  Handle key strokes in input fields that only accept integers.   	*
+ *																		*
+ *  Input:																*
+ *		e		In a W3C compliant browser, the keydown event			*
+ *		this	<input> element											*
+ ************************************************************************/
+function numericKeyDown(e)
+{
+    if (!e)
+		e	=  window.event;
+    if ('key' in e)
+    {               // use preferred property key
+        var	key     = e.key;
+        if (/\d/.test(key))
+            return true;
+        if (key == '+')
+            return true;
+        if (key.length == 1)
+            e.preventDefault();
+        else
+            return true;
+    }               // use preferred property key
+    else
+    {               // use obsolete property code
+        var	code	= e.keyCode;
+        alert("numericKeyDown: code=" + code);
+        if (code >= 48 && code <= 57)
+            return true;
+        if (code == 61)
+            return true;
+        if (code > 58 && code <= 90)
+            e.stopPropagation();
+        else
+            return true;
+    }               // use obsolete property code
+}       // function numericKeyDown
+
+/************************************************************************
+ *  function columnClick													*
  *																		*
  *  User clicked left button on a column header.						*
  *  Hide or unhide the column.											*
@@ -2502,7 +2516,7 @@ function columnClick(event)
 }		// function columnClick
 
 /************************************************************************
- *  columnWiden															*
+ *  function columnWiden													*
  *																		*
  *  User clicked right button on a column header.  Widen the column.	*
  *																		*
@@ -2545,10 +2559,10 @@ function columnWiden()
 		}			// loop through all children of cell
     }				// loop through all rows of body
     return false;		// do not display menu
-}		// columnWiden
+}		// function columnWiden
 
 /************************************************************************
- *  linkMouseOver														*
+ *  function linkMouseOver												*
  *																		*
  *  This function is called if the mouse moves over a forward or		*
  *  backward hyperlink on the invoking page.							*
@@ -2573,10 +2587,10 @@ function linkMouseOver()
 		helpDiv			= msgDiv;
 		helpDiv.onkeydown	= tableKeyDown;
     }		// support for dynamic display of messages
-}		// linkMouseOver
+}		// function linkMouseOver
 
 /************************************************************************
- *  linkMouseOut														*
+ *  function linkMouseOut												*
  *																		*
  *  This function is called if the mouse moves off a forward or			*
  *  backward hyperlink on the invoking page.							*

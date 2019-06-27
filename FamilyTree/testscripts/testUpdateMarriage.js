@@ -5,100 +5,101 @@
  *  page editMarriages.php.
  *
  *  History of editMarriages.js before merger of editMarriage.js:
- *	2010/11/08	improve error handling on delete marriage
- *	2010/12/04	improve separation of HTML & JS
- *	2010/12/26	add callback method marriageUpdated to
- *			receive notification from script editMarriage.php
- *	2011/02/21	do not fail if calling page has already closed
- *	2011/03/03	support keyboard shortcuts:
- *			ctrl-S and alt-C for close
- *			alt-A for add marriage
- *	2011/04/10	reduce size of window for editMarriage.php
+ *		2010/11/08		improve error handling on delete marriage
+ *		2010/12/04		improve separation of HTML & JS
+ *		2010/12/26		add callback method marriageUpdated to
+ *						receive notification from script editMarriage.php
+ *		2011/02/21		do not fail if calling page has already closed
+ *		2011/03/03		support keyboard shortcuts:
+ *						ctrl-S and alt-C for close
+ *						alt-A for add marriage
+ *		2011/04/10		reduce size of window for editMarriage.php
  *
- *  History of editMarriage.js as a separate file:	
- *	2010/08/10	Change to use POST for invoking update scripts
- *	2010/08/13	Add function to create new spouse.
- *	2010/08/13	Add function to create new child.
- *	2010/08/13	Add function to detach existing child.
- *	2010/08/19	Correct invocation of editIndivid
- *	2010/08/21	Add function to reorder children by birth date.
- *	2010/08/27	Update page in detail on reorder rather than
- *			refresh, which wiped out changes made to other fields
- *	2010/08/28	Use getAttribute to get value of attribute of XML element
- *	2010/08/29	protect in case opener is terminated before this script
- *	2010/09/04	Use chooseIndivid.php for existing individuals
- *	2010/09/20	Do not overlay existing windows for editIndivid.php
- *			to permit creating multiple generations of parents
- *			without interruption
- *	2010/10/16	implement new format for maintaining citations
- *	2010/10/17	citation support moved to citTable.js
- *	2010/10/21	parameter removed from onclick methods of buttons
- *			use method=post to invoke updateMarriage.php
- *	2010/10/29	report explicit error message from detChildXml.php
- *			simplify and correct removal of child from web page
- *	2010/10/30	correct formatting of children after reordering
- *			add support for updating marriage status
- *	2010/11/11	set names of row and buttons on added child row
- *			so edit and detach child buttons work.
- *	2010/11/14	do not pass idir parameter to chooseIndivid
- *	2010/12/16	add method to permit editIndivid dialog to update
- *			table of children in this page
- *	2010/12/20	add detach spouse button
- *	2010/12/26	more object-oriented approach to notifying
- *			invoking page of the updated marriage by
- *			invoking a call-back method of the invoking document.
- *	2011/01/13	check before calling function from invoking page
- *	2011/02/06	standardize callbacks from editIndivid.php and
- *			chooseIndivid.php
- *	2011/02/21	fix callback calling sequence
- *			addChildToPage updates database to add	 child
- *	2011/02/23	new callbacks setNewHusb and setNewWife with
- *			same parameters as changeChild & addChildToPage
- *	2011/02/26	initialize father's surname when invoking
- *			chooseIndivid.php to select existing child
- *	2011/03/03	row id not retrieved
- *	2011/03/07	alert on error message from addChildXml
- *	2011/03/19	add keyboard shortcuts
- *	2011/03/25	set the initial focus on the "Update" button
- *			so pressing Enter closes the dialog, and the
- *			keyboard shortcuts work
- *	2011/04/22	syntax error on IE7
- *	2011/05/29	support button for editting pictures
- *	2011/06/09	support button for editting events
+ *  History of editMarriage.js as a separate file:		
+ *		2010/08/10		Change to use POST for invoking update scripts
+ *		2010/08/13		Add function to create new spouse.
+ *		2010/08/13		Add function to create new child.
+ *		2010/08/13		Add function to detach existing child.
+ *		2010/08/19		Correct invocation of editIndivid
+ *		2010/08/21		Add function to reorder children by birth date.
+ *		2010/08/27		Update page in detail on reorder rather than
+ *						refresh, which wiped out changes made to other fields
+ *		2010/08/28		Use getAttribute to get value of attribute of XML element
+ *		2010/08/29		protect in case opener is terminated before this script
+ *		2010/09/04		Use chooseIndivid.php for existing individuals
+ *		2010/09/20		Do not overlay existing windows for editIndivid.php
+ *						to permit creating multiple generations of parents
+ *						without interruption
+ *		2010/10/16		implement new format for maintaining citations
+ *		2010/10/17		citation support moved to citTable.js
+ *		2010/10/21		parameter removed from onclick methods of buttons
+ *						use method=post to invoke updateMarriage.php
+ *		2010/10/29		report explicit error message from detChildXml.php
+ *						simplify and correct removal of child from web page
+ *		2010/10/30		correct formatting of children after reordering
+ *						add support for updating marriage status
+ *		2010/11/11		set names of row and buttons on added child row
+ *						so edit and detach child buttons work.
+ *		2010/11/14		do not pass idir parameter to chooseIndivid
+ *		2010/12/16		add method to permit editIndivid dialog to update
+ *						table of children in this page
+ *		2010/12/20		add detach spouse button
+ *		2010/12/26		more object-oriented approach to notifying
+ *						invoking page of the updated marriage by
+ *						invoking a call-back method of the invoking document.
+ *		2011/01/13		check before calling function from invoking page
+ *		2011/02/06		standardize callbacks from editIndivid.php and
+ *						chooseIndivid.php
+ *		2011/02/21		fix callback calling sequence
+ *						addChildToPage updates database to add		 child
+ *		2011/02/23		new callbacks setNewHusb and setNewWife with
+ *						same parameters as changeChild & addChildToPage
+ *		2011/02/26		initialize father's surname when invoking
+ *						chooseIndivid.php to select existing child
+ *		2011/03/03		row id not retrieved
+ *		2011/03/07		alert on error message from addChildXml
+ *		2011/03/19		add keyboard shortcuts
+ *		2011/03/25		set the initial focus on the "Update" button
+ *						so pressing Enter closes the dialog, and the
+ *						keyboard shortcuts work
+ *		2011/04/22		syntax error on IE7
+ *		2011/05/29		support button for editting pictures
+ *		2011/06/09		support button for editting events
  *
  *  History of merged files:
- *	2011/06/11	functionality of editMarriage.js merged
- *	2011/06/24	add gender parameter to changeChild callback
- *	2011/07/14	enlarge popup windows
- *	2011/07/29	explicitly pass updated values of date and location
- *			to editEvent.php
- *	2011/08/21	always open editIndivid.php in a new window
- *	2011/08/22	if the individual has no existing families
- *			display the menu to create the first family
- *	2011/09/18	add try/catch on set onclick
- *	2011/10/01	support database assisted location name
- *	2011/11/15	add keyword idmr to initiate edit of pre-selected
- *			family.
- *			Add buttons for editing Husband and Wife as individuals
- *	2011/11/26	Support editing married surnames
- *	2012/01/07	explicitly pass parents names to child creation
- *	2012/01/11	do not use refresh to update the list of marriages
- *			because that causes the displayed marriage to be
- *			refreshed as well, removing any changes made since
- *			the last write to the database.
- *			If the name of the husband is changed change the now
- *			exposed married surnames of the husband and, if
- *			requires by the marriage name rule, the wife
- *	2012/01/13	change class names
- *			most functionality moved to commonMarriage.js
- *	2012/04/21	align child windows with main window
- *	2012/10/13	enable edit buttons for spouses
- *	2012/11/18	change edit and delete event buttons so the name
- *			of the button contains the event type for internal
- *			events and the IDER for LegacyEvent instances
- *	2013/01/17	correct comments
+ *		2011/06/11		functionality of editMarriage.js merged
+ *		2011/06/24		add gender parameter to changeChild callback
+ *		2011/07/14		enlarge popup windows
+ *		2011/07/29		explicitly pass updated values of date and location
+ *						to editEvent.php
+ *		2011/08/21		always open editIndivid.php in a new window
+ *		2011/08/22		if the individual has no existing families
+ *						display the menu to create the first family
+ *		2011/09/18		add try/catch on set onclick
+ *		2011/10/01		support database assisted location name
+ *		2011/11/15		add keyword idmr to initiate edit of pre-selected
+ *						family.
+ *						Add buttons for editing Husband and Wife as individuals
+ *		2011/11/26		Support editing married surnames
+ *		2012/01/07		explicitly pass parents names to child creation
+ *		2012/01/11		do not use refresh to update the list of marriages
+ *						because that causes the displayed marriage to be
+ *						refreshed as well, removing any changes made since
+ *						the last write to the database.
+ *						If the name of the husband is changed change the now
+ *						exposed married surnames of the husband and, if
+ *						requires by the marriage name rule, the wife
+ *		2012/01/13		change class names
+ *						most functionality moved to commonMarriage.js
+ *		2012/04/21		align child windows with main window
+ *		2012/10/13		enable edit buttons for spouses
+ *		2012/11/18		change edit and delete event buttons so the name
+ *						of the button contains the event type for internal
+ *						events and the IDER for LegacyEvent instances
+ *		2013/01/17		correct comments
+ *		2019/05/19      call element.click to trigger button click      *
  *
- *  Copyright &copy; 2013 James A. Cobban
+ *  Copyright &copy; 2019 James A. Cobban
  **/
 
 window.onload	= loadEdit;
@@ -367,11 +368,11 @@ function loadEdit()
     // set of parents, otherwise edit the preferred set of parents
     if (editPref)
     {
-		editPref.onclick();
+		editPref.click();
     }
     else
     {
-		document.getElementById('Add').onclick();
+		document.getElementById('Add').click();
     }
 		
 }		// loadEdit
@@ -419,7 +420,7 @@ function finish()
  *  Close button.
  *
  *  Parameters:
- *	e	W3C compliant browsers pass an event as a parameter
+ *		e		W3C compliant browsers pass an event as a parameter
  **/
 function emKeyDown(e)
 {
@@ -437,7 +438,7 @@ function emKeyDown(e)
 		{		// letter 'A'
 		    if (e.altKey)
 		    {		// alt-A
-				form.Add.onclick();
+				form.Add.click();
 				return false;	// do not perform standard action
 		    }		// alt-A
 		    break;
@@ -457,7 +458,7 @@ function emKeyDown(e)
 		{		// letter 'O'
 		    if (e.altKey)
 		    {		// alt-O
-				form.Reorder.onclick();
+				form.Reorder.click();
 				return false;	// do not perform standard action
 		    }		// alt-O
 		    break;
@@ -522,12 +523,12 @@ function changeHusb()
  *  for setting identification of husband.
  *
  *  Parameters:
- *	this		table row element
- *	idir		IDIR of husband
- *	newGiven	replacement given name
- *	newSurname	replacement surname
- *	newBirth	replacement birth date
- *	newDeath	replacement death date
+ *		this				table row element
+ *		idir				IDIR of husband
+ *		newGiven		replacement given name
+ *		newSurname		replacement surname
+ *		newBirth		replacement birth date
+ *		newDeath		replacement death date
  **/
 function setNewHusb(idir,
 				    newGiven, 
@@ -552,12 +553,12 @@ function setNewHusb(idir,
  *  for setting identification of wife.
  *
  *  Parameters:
- *	this		table row element
- *	idir		IDIR of wife
- *	newGiven	replacement given name
- *	newSurname	replacement surname
- *	newBirth	replacement birth date
- *	newDeath	replacement death date
+ *		this				table row element
+ *		idir				IDIR of wife
+ *		newGiven		replacement given name
+ *		newSurname		replacement surname
+ *		newBirth		replacement birth date
+ *		newDeath		replacement death date
  **/
 function setNewWife(idir,
 				    newGiven, 
@@ -579,7 +580,7 @@ function setNewWife(idir,
  *  information on the selected husband is retrieved.
  *
  *  Parameters:
- *	xmlDoc		response as an XML document
+ *		xmlDoc				response as an XML document
  **/
 function gotHusb(xmlDoc)
 {
@@ -676,7 +677,7 @@ function changeWife()
  *  information on the new wife is retrieved.
  *
  *  Parameters:
- *	xmlDoc		response as an XML document
+ *		xmlDoc				response as an XML document
  **/
 function gotWife(xmlDoc)
 {
@@ -730,10 +731,10 @@ function detachWife()
 }		// detachWife
 
 /**
- *	createHusb
+ *		createHusb
  *
- *	This method is called when the user requests to add 
- *	a new individual to the marriage as husband
+ *		This method is called when the user requests to add 
+ *		a new individual to the marriage as husband
  **/
 
 function createHusb()
@@ -771,7 +772,7 @@ function createWife()
  *  Update Marriage button.
  *
  *  Parameters:
- *	e	W3C compliant browsers pass an event as a parameter
+ *		e		W3C compliant browsers pass an event as a parameter
  **/
 function em1KeyDown(e)
 {
@@ -787,7 +788,7 @@ function em1KeyDown(e)
 		if (code == 83)
 		{		// letter 'S'
 		    var	button	= form.update;
-		    button.onclick();
+		    button.click();
 		    return false;	// do not perform standard action
 		}		// letter 'S'
     }		// ctrl
@@ -801,62 +802,62 @@ function em1KeyDown(e)
 		    case 65:
 		    {		// letter 'A'
 				var	button	= document.getElementById('addCitation');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'A'
     
 		    case 69:
 		    {		// letter 'E'
 				var	button	= form.addChild;
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'E'
     
 		    case 72:
 		    {		// letter 'H'
 				var	button	= form.createHusb;
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'H'
     
 		    case 78:
 		    {		// letter 'N'
 				var	button	= form.addNewChild;
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'N'
     
 		    case 79:
 		    {		// letter 'O'
 				var	button	= form.orderChildren;
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'O'
 
 		    case 80:
 		    {		// letter 'P'
-				form.Pictures.onclick();
+				form.Pictures.click();
 				return false;
 		    }		// letter 'P'
     
 		    case 85:
 		    {		// letter 'U'
 				var	button	= form.update;
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'U'
     
 		    case 86:
 		    {		// letter 'V'
 				var	button	= form.Events;
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'V'
     
 		    case 87:
 		    {		// letter 'W'
 				var	button	= form.createWife;
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'N'
 

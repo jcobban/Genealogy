@@ -392,6 +392,7 @@ else
 			}
 
 			case 'debug':
+			case 'lang':
 			{
 			    break;
 			}		    // debug handled by common code

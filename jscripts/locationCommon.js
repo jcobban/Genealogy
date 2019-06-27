@@ -47,6 +47,10 @@
  *		2018/12/28      dynamically load templates                      *
  *		2019/01/22      do not lookup locations [blank] or [N/A]        *
  *		2019/03/03      myform was no longer defined                    *
+ *		2019/05/28      do not treat special characters in location     *
+ *		                as regular expression operators                 *
+ *		2019/06/12      correctly set focus to next element when a      *
+ *		                new location is defined                         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -113,7 +117,7 @@ var	evtLocAbbrs = {
 var lang                = 'en';
 var args                = getArgs();
 if ('lang' in args)
-    lang                = args['lang'];
+    lang                = args.lang;
 var url	= "/LocationDialogsXML.php?lang=" + lang;
 
 HTTP.getXML(url,
@@ -121,7 +125,7 @@ HTTP.getXML(url,
 		    noDialogs);
 
 /************************************************************************
- *  gotDialogs  														*
+ *  function gotDialogs													*
  *																		*
  *  This method is called when the HTML document representing			*
  *  the dialog templates is received from the server.                   *
@@ -165,7 +169,7 @@ function gotDialogs(xmlDoc)
 }       // function gotDialogs
 
 /************************************************************************
- *  traverse      														*
+ *  function traverse    														*
  *																		*
  *  Recursively traverse all of the children of an XML node.            *`
  *																		*
@@ -201,7 +205,7 @@ function traverse(elt, form)
 }       // function traverse
 
 /************************************************************************
- *  noDialogs   														*
+ *  function noDialogs 													*
  *																		*
  *  This method is called if there is no response script on the server	*
  ************************************************************************/
@@ -212,7 +216,7 @@ function noDialogs()
 
 var myform          = null;
 /************************************************************************
- *  deferSubmit															*
+ *  function deferSubmit												*
  *																		*
  *  Common global flag to prevent submit from completing until all		*
  *  required operations to resolve a location are completed.			*
@@ -309,8 +313,15 @@ function locationChanged()
 		popupLoading(this);
 
 		// get an XML file containing location information from the database
+        var loc         = this.value;
+        loc             = loc.replace(/\?/g, '\\?');
+        loc             = loc.replace(/\./g, '\\.');
+        loc             = loc.replace(/\[/g, '\\[');
+        loc             = loc.replace(/\*/g, '\\*');
+        loc             = loc.replace(/\^/g, '\\^');
+        loc             = loc.replace(/\$/g, '\\$');
 		var url	= "/FamilyTree/getLocationXml.php?name=" +
-						encodeURIComponent(this.value) +
+						encodeURIComponent(loc) +
 						"&form=" + this.form.name +
 						"&field=" + this.name;
 		HTTP.getXML(url,
@@ -455,12 +466,12 @@ function gotLocationXml(xmlDoc)
 						        "field"	    : field};
 				try {
 				displayDialog(msgDiv,
-					      forms['NewLocationMsg$template'],
-					      parms,
-					      element,		// position
-					      closeNewDialog,	// button closes dialog
-					      false);		// default show on open
-				} catch (e) { 
+						      forms['NewLocationMsg$template'],
+						      parms,
+						      element,		// position
+						      closeNewDialog,	// button closes dialog
+						      false);		// default show on open
+					} catch (e) { 
 				    alert("locationCommon.js: gotLocationXml: display NewLocationMsg dialog failed: " +
 					  e.message); 
 				}
@@ -563,13 +574,13 @@ function gotLocationXml(xmlDoc)
 }		// gotLocationXml
 
 /************************************************************************
- *  closeNewDialog														*
+ *  function closeNewDialog												*
  *																		*
  *  This closes (hides) the new location dialog and reenables the		*
  *  update button.														*
  *																		*
  *  Input:																*
- *		this		the HTML <button> element								*
+ *		this		the HTML <button> element							*
  ************************************************************************/
 function closeNewDialog()
 {
@@ -581,29 +592,56 @@ function closeNewDialog()
     if (updateButton)
 		updateButton.disabled	= false;
 
-    var forms	            = dialogDiv.getElementsByTagName('FORM');
-    if (forms.length > 0)
+    var myform              = this.form;
+    if (myform)
     {                           // the dialog includes a form
-        var myform          = forms[0];
-	    var	formname	   	= myform.elements['formname'].value;
-	    var	field		   	= myform.elements['field'].value;
-	    var	mainForm	   	= document.forms[formname];
-	    var	element		   	= mainForm.elements[field];
-	    if (element)
-	    {                       // found requested field in invoking form
-			focusNext(element);
-	    }                       // found requested field in invoking form
-	    else
-	    {                       // issue diagnostic
-			var	elementList	= '';
-			var	comma		= '[';
-			for(var fieldname in mainForm.elements)
-			{
-			    elementList	+= comma + fieldname;
-			    comma		= ',';
-			}
-			alert("locationCommon.js: closeNewDialog: cannot find input element with name='" + field + "' in form '" + formname + "' elements=" + elementList + "]");
-	    }                       // issue diagnostic
+        var nameelt         = null;
+        var fieldelt        = null;
+        var elements        = myform.elements;
+        for(var ie = 0; ie < elements.length; ie++)
+        {
+            var element     = elements[ie];
+            switch(element.name)
+            {
+                case 'formname':
+                    nameelt     = element;
+                    break;
+
+                case 'field':
+                    fieldelt    = element
+                    break;
+
+            }
+        }
+        var formname        = '';
+        if (typeof(nameelt) == 'object')
+	        formname	   	= nameelt.value;
+        else
+            alert("locationCommon.js: closeNewDialog: missing element formname: " . myform.outerHTML);
+	    var	field		   	= '';
+        if (typeof(fieldelt) == 'object')
+        {
+	        field		   	= fieldelt.value;
+		    var	mainForm	= document.forms[formname];
+		    var	element		= mainForm.elements[field];
+		    if (element)
+		    {                       // found requested field in invoking form
+				focusNext(element);
+		    }                       // found requested field in invoking form
+		    else
+		    {                       // issue diagnostic
+				var	elementList	= '';
+				var	comma		= '[';
+				for(var fieldname in mainForm.elements)
+				{
+				    elementList	+= comma + fieldname;
+				    comma		= ',';
+				}
+				alert("locationCommon.js: closeNewDialog: cannot find input element with name='" + field + "' in form '" + formname + "' elements=" + elementList + "]");
+		    }                       // issue diagnostic
+        }
+        else
+            alert("locationCommon.js: closeNewDialog: missing element field: " . myform.outerHTML);
     }                           // the dialog includes a form
     else
 		alert("locationCommon.js: closeNewDialog: cannot find <form> in open dialog");
@@ -611,7 +649,7 @@ function closeNewDialog()
 }		// closeNewDialog
 
 /************************************************************************
- *  noLocationXml														*
+ *  function noLocationXml												*
  *																		*
  *  This method is called if there is no response script on the server	*
  ************************************************************************/
@@ -622,7 +660,7 @@ function noLocationXml()
 }		// noLocationXml
 
 /************************************************************************
- *  locationChosen														*
+ *  function locationChosen												*
  *																		*
  *  This method is called when the user chooses a location from			*
  *  the dynamic selection list.											*
@@ -657,7 +695,7 @@ function locationChosen()
 }		// locationChosen
 
 /************************************************************************
- *  focusNext															*
+ *  function focusNext													*
  *																		*
  *  This function sets the focus on the next input element after		*
  *  the supplied element.												*

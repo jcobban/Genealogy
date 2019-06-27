@@ -80,6 +80,7 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/16      familyTree cookie was erroneously set from      *
  *		                the idir field in the popup template            *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -171,21 +172,13 @@ var	geocoder	= null;
 
 // specify style for tinyMCE editing
 tinyMCE.init({
-		mode			: "textareas",
-		theme			: "advanced",
-		plugins 		: "spellchecker,advhr,preview", 
-				
-		// Theme options - button# indicated the row# only
-		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-		forced_root_block	: false,
-		forced_root_block	: false,
-		content_css		: "/styles.css",
+	selector            : 'textarea',
+    plugins             : 'link lists image',
+    menubar             : 'file edit view format insert',
+    toolbar             : "undo redo | styleselect | bold italic | " 
+                           + "alignleft aligncenter alignright alignjustify | " 
+                           + "bullist numlist outdent indent | link image",
+    content_css		    : "/styles.css"
 
 });
 
@@ -840,42 +833,42 @@ function diKeyDown(e)
 		    case 65:
 		    {		// letter 'A'
 				button	= document.getElementById('showAncTree');
-				button.onclick(); 
+				button.click(); 
 				return false;
 		    }		// letter 'A'
     
 		    case 66:
 		    {		// letter 'B'
 				button	= document.getElementById('PostBlog');
-				button.onclick(); 
+				button.click(); 
 				return false;
 		    }		// letter 'B'
 
 		    case 68:
 		    {		// letter 'D'
 				button	= document.getElementById('showDescTree');
-				button.onclick(); 
+				button.click(); 
 				return false;
 		    }		// letter 'D'
 
 		    case 69:
 		    {		// letter 'E'
 				button	= document.getElementById('edit');
-				button.onclick(); 
+				button.click(); 
 				return false;
 		    }		// letter 'E'
     
 		    case 82:
 		    {		// letter 'R'
 				button	= document.getElementById('relationshipCalc');
-				button.onclick(); 
+				button.click(); 
 				return false;
 		    }		// letter 'R'
     
 		    case 83:
 		    {		// letter 'S'
 				button	= document.getElementById('ancestrySearch');
-				button.onclick(); 
+				button.click(); 
 				return false;
 		    }		// letter 'S'
 

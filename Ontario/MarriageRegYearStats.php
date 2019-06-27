@@ -54,7 +54,7 @@ require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $regYear		= null;
-$domain		= 'CAON';	// default domain
+$domain		    = 'CAON';	// default domain
 $domainName		= 'Canada: Ontario:';
 $stateName		= 'Ontario';
 $lang		= 'en';
@@ -351,8 +351,7 @@ else
 			    $lowest	    = $low;
             if ($high > $highest &&
                 ($highest == 0 || 
-                 ($high - $low) < 2000) ||
-                 ($high - $highest) < 2000)
+                 ($high - $low) < 2000))
                 $highest	= $high;
 			$todo		    = $high - $low + 1;
 			if ($todo == 0)

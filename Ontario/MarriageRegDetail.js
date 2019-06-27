@@ -61,6 +61,7 @@
  *		2017/03/17		birth year is displayed as text not <input>		*
  *		2017/07/12		use function locationChanged					*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban.								*
  ************************************************************************/
@@ -181,7 +182,7 @@ function onLoadMarriage()
 				element.onclick	= showImage;
 				if (typeof(args.showimage) == 'string' &&
 						args.showimage.toLowerCase() == 'yes')
-						element.onclick();
+						element.click();
 				break;
 		    }	// display image button
 
@@ -572,8 +573,13 @@ function showImage(ev)
 				      imageUrl,
 				      "right");
 		else
+        if (imageUrl.substring(0, 1) == '/')
 		    openFrame("Images",
-				      '../Canada/DisplayImage.php?src=Images/' + imageUrl,
+				      '/Canada/DisplayImage.php?src=' + imageUrl,
+				      "right");
+        else
+		    openFrame("Images",
+				      '/Canada/DisplayImage.php?src=/Images/' + imageUrl,
 				      "right");
     }		// Image field defined
     return false;
@@ -684,32 +690,32 @@ function mdKeyDown(e)
 		{
 		    case 67:
 		    {		// letter 'C'
-				form.Reset.onclick();
+				form.Reset.click();
 				break;
 		    }		// letter 'C'
     
 		    case 73:
 		    {		// letter 'I'
 				if (form.viewImage)
-				    form.viewImage.onclick();
+				    form.viewImage.click();
 				break;
 		    }		// letter 'I'
     
 		    case 78:
 		    {		// letter 'N'
-				form.next.onclick();
+				form.next.click();
 				break;
 		    }		// letter 'N'
     
 		    case 80:
 		    {		// letter 'P'
-				form.previous.onclick();
+				form.previous.click();
 				break;
 		    }		// letter 'P'
     
 		    case 81:
 		    {		// letter 'Q'
-				form.newQuery.onclick();
+				form.newQuery.click();
 				break;
 		    }		// letter 'Q'
     

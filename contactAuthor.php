@@ -6,11 +6,15 @@ use \Exception;
  *  contactAuthor.php													*
  *																		*
  *  Implement contacting the author of a page by using the internal		*
- *  blog support														*
+ *  blog support.														*
+ *  If tablename and id are specified then the message is sent to all   *
+ *  of the owners of the specified record.                              *
+ *  If username is specified the message is sent to the specified user  *
  *																		*
  *  Parameters:															*
- *		idir			unique key of associated record instance	    *
+ *		id  			unique key of associated record instance	    *
  *		tablename		database table the key refers to				*
+ *		username        specific user to send the message to            *
  *		subject			information about the referrer			    	*
  *		text			additional text to include in message			*
  *																		*
@@ -35,8 +39,10 @@ use \Exception;
  *		2018/09/07		default template namemisspelled					*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2019/06/13      support I18N by moving "About :" template       *
+ *		                support explicitly sending message to a user    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/User.inc';
@@ -50,8 +56,10 @@ $recordid	    = 0;
 $tableName	    = 'tblIR';
 $about	        = '';
 $text	        = '';
+$username	    = '';
+$user           = null;
 $lang	        = 'en';
-$person	        = null;
+$record	        = null;
 
 foreach($_GET as $name => $value)
 {
@@ -66,58 +74,103 @@ foreach($_GET as $name => $value)
 
 	    case 'tablename':
 	    {
-			$info		= Record::getInformation($value);
+			$info		    = Record::getInformation($value);
 			if ($info)
-			    $tableName	= $info['table'];
+                $tableName	= $info['table'];
+            else
+                $tableName  = $value;
 			break;
 	    }		// table name
 
 	    case 'subject':
 	    {
-			$about		= "About: $value\n";
+			$about		    = $value;
 			break;
 	    }		// table name
 
 	    case 'text':
 	    {
-			$text		= $value;
+			$text		    = $value;
+			break;
+	    }		// table name
+
+	    case 'username':
+	    {
+            $username		= $value;
+            $user           = new User(array('username' => $username));
+            if ($user->isExisting())
+            {
+                $tableName  = 'Users';
+                $recordid   = $user['id'];
+            }
 			break;
 	    }		// table name
 
 	    case 'lang':
 	    {
 			if (strlen($value) >= 2)
-			    $lang	= strtolower(substr($value,0,2));
+			    $lang	    = strtolower(substr($value,0,2));
 			break;
-	    }		// table name
+	    }		// language selection
 
-	}		// act on specific keys
-}			// loop through all parameters
+        case 'debug':
+        {
+			break;
+	    }		// handled by common code
 
-// take any table specific action
-switch($tableName)
-{			// act on specific table names
-	case 'tblIR':
-	{
-	    if (strlen($about) == 0)
-	    {
-			$person		= new Person(array('idir' => $recordid));
-			if ($person->isExisting())
-			    $about	= "About: " . $person->getName() .
-					  " (IDIR=$recordid)\n";
-	    }
-	}
-}			// act on specific table names
+        default:
+        {
+            $about  .= "&$name=$value";
+            break;
+        }
+	}		    // act on specific keys
+}			    // loop through all parameters
 
 $template		    = new FtTemplate("ContactAuthor$lang.html");
+
+if ($user && !$user->isExisting())
+    $warn           .= "<p>parameter user=$username does not identify a registered user</p>\n";
+
+// take any table specific action
+if (strlen($about) == 0)
+{
+    if ($recordid)
+    {
+        switch($tableName)
+        {			// act on specific table names
+	        case 'tblIR':
+	        {
+			    $record		= new Person(array('idir' => $recordid));
+			    if ($record->isExisting())
+                    $about	= $record->getName() .  " (IDIR=$recordid)\n";
+                else
+                    $about	= "RecordID=$recordid"; 
+                break;
+            }
+
+            default:
+            {
+                $about      = "$tableName: id=$recordid";
+                break;
+            }
+        }
+    }
+    else
+        $about      = "Subject not specified";
+}			// act on specific table names
 
 // get a list of all the owners of the current record
 // this includes all of the administrators
 if (strlen($recordid) > 0 && strlen($tableName) > 0)
-	$contacts	= new UserSet(array('recordid'	=> $recordid,
-						            'table'	    => $tableName));
+{
+    if ($tableName == 'User')
+        $contacts   = new UserSet(array('id'        => $recordid));
+    else
+	    $contacts	= new UserSet(array('recordid'	=> $recordid,
+                                        'table'	    => $tableName));
+}
 else
-	$contacts	= new UserSet(array('auth'	    => 'yes'));
+	$contacts	    = new UserSet(array('auth'	    => 'yes'));
 
 $contactIds         = '';
 $comma	            = '';

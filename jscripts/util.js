@@ -1035,7 +1035,8 @@ function keyDown(e)
     {		// browser is not W3C compliant
 		e   	=  window.event;	// IE
     }		// browser is not W3C compliant
-    var	code	= e.keyCode;
+    var	code	= e.key;
+    alert("keydown: '$code'");
 
     // hide the help balloon on any keystroke
     if (helpDiv)
@@ -1049,11 +1050,14 @@ function keyDown(e)
     // take action based upon code
     switch (code)
     {
-		case 112:	// F1
+        case "F1":
 		{
 		    displayHelp(this);		// display help page
+            e.preventDefault();
+            e.stopPropagation();
 		    return false;		// suppress default action
 		}	    // F1
+
     }	    // switch on key code
 
     return;
@@ -1217,8 +1221,8 @@ function displayHelp(element)
 		helpDiv.onkeydown	= keyDown;
 		show(helpDiv);
     }		// have a help division to display
-    else
-		alert("util.js: displayHelp: Cannot find <div id='Help" + helpDivName + "'>");
+    //else
+	//	alert("util.js: displayHelp: Cannot find <div id='Help" + helpDivName + "'>");
 }		// function displayHelp
 
 /************************************************************************
@@ -1523,9 +1527,8 @@ function popupHelp()
             helpElt.helpAlreadyDisplayed    = true; // only once
         }                       // help for this element never displayed
         helpElt         = null;
+        helpEltText     += ", helpElt set to null line 1526";
     }
-    else
-        alert("popupHelp: helpElt is null " + helpEltText);
 }		// function popupHelp
 
 /************************************************************************
@@ -1557,7 +1560,7 @@ function actMouseOverHelp(element)
 {
     if (element === undefined)
 		throw "util.js: actMouseOverHelp: element is undefined";
-    
+
     addEventHandler(element, 'mouseover',   eltMouseOver);
     addEventHandler(element, 'mouseout',    eltMouseOut);
     addEventHandler(element, 'click',       popupHelpHandler);
@@ -1568,6 +1571,9 @@ function actMouseOverHelp(element)
  *																		*
  *  This function displays the page menu in a popup				        *
  *																		*
+ *	Input:																*
+ *		this		element with id="menuButton" or id="logo"           *
+ *		ev          click event                                         *
  ************************************************************************/
 function displayMenu(ev)
 {
@@ -1580,22 +1586,25 @@ function displayMenu(ev)
     dialog.style.visibility	= 'hidden';
     dialog.style.display	= 'block';
 
-	// display the dialog offset from the requesting button
-    var element             = document.getElementById('menuButton');
-	var leftOffset		    = getOffsetLeft(element);
-	var rightOffset		    = getOffsetRight(element);
+	// display the dialog offset from the main menu button
+    var element                 = document.getElementById('menuButton');
+	var leftOffset		        = getOffsetLeft(element);
+	var rightOffset		        = getOffsetRight(element);
 
-	var dialogWidth		= dialog.clientWidth;
+	var dialogWidth		        = dialog.clientWidth;
 	if (leftOffset - dialogWidth < 10)
-	    leftOffset	    = rightOffset + 10;
+	    leftOffset	            = rightOffset + 10;
 	else
-	    leftOffset	    = leftOffset - dialogWidth - 10;
-	dialog.style.left	= leftOffset + "px";
-    dialog.style.top	= (getOffsetTop(element) + 10) + 'px';
+	    leftOffset	            = leftOffset - dialogWidth - 10;
+	dialog.style.left	        = leftOffset + "px";
+    dialog.style.top	        = (getOffsetTop(element) + 10) + 'px';
 
     dialog.style.display 	    = 'block';
     dialog.style.visibility	    = 'visible';
     dialog.scrollIntoView();
+    var help                    = document.getElementById('menuhelp');
+    if (help)
+        help.focus();
 
 	dialogDiv		    = dialog;
 
@@ -1961,6 +1970,28 @@ function keyDownPaging(e)
     // take action based upon code
     switch (code)
     {
+        case "f":
+        case "F":
+        {
+            if (e.ctrlKey)
+            {
+                var element         = document.getElementById('menuButton');
+		        element.click();
+                e.preventDefault();
+                e.stopPropagation();
+		        return false;		// suppress default action
+            }
+        }
+
+        case "F10":
+		{
+            var element         = document.getElementById('menuButton');
+		    element.click();
+            e.preventDefault();
+            e.stopPropagation();
+		    return false;		// suppress default action
+		}	    // F1
+
 		case "PageDown":	// page down
 		{
             var element     = document.getElementById('topNext');
@@ -2003,6 +2034,37 @@ function keyDownPaging(e)
 
     return;
 }		// function keyDownPaging
+
+/************************************************************************
+ *  function statusChangeCallback										*
+ *																		*
+ *  Handle Facebook status change notification                          *
+ *																		*
+ *  Parameters:															*
+ *		response        Facebook Response object                        *
+ ************************************************************************/
+function statusChangeCallback(response)
+{
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected')
+    {       // Logged into your app and Facebook.
+        console.log('Welcome!  Fetching your information.... ');
+        FB.api('/me', function (response) 
+            {
+                console.log('Successful login for: ' + response.name);
+                traceAlert('Thanks for logging in, ' + response.name + '!');
+            });
+    }       // Logged into your app and Facebook.
+    else 
+    {       // The person is not logged into your app or we are unable to tell.
+        traceAlert('Please log ' + 'into this app.');
+    }       // The person is not logged into your app or we are unable to tell.
+}       // function statusChangeCallback
 
 /************************************************************************
  *  function commonInit													*
@@ -2063,16 +2125,20 @@ function commonInit(event)
     }
 
     var menusWidth= menuWidth + logoWidth + advertWidth + facebookWidth;
-    
-    FB.getLoginStatus(function(response) {
-        statusChangeCallback(response);
-    });
+
+    if (typeof(FB) != 'undefined')
+        FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+        });
 
     // display Facebook status after page is loaded
     if ((menusWidth + 10) > x)
     {                           // not enough room for Facebook
-        var parentNode       = facebook.parentNode;
-        parentNode.removeChild(facebook);
+        if (facebook)
+        {
+            var parentNode       = facebook.parentNode;
+            parentNode.removeChild(facebook);
+        }
     }                           // not enough room for Facebook
     else
     {                           // enough room for Facebook
@@ -2207,7 +2273,7 @@ function commonResize(event)
     }
 
     var menusWidth= menuWidth + logoWidth + advertWidth + facebookWidth;
-    
+
     // display Facebook status after page is loaded
     if ((menusWidth + 10) > x)
     {                           // not enough room for Facebook
@@ -2218,6 +2284,7 @@ function commonResize(event)
         }
     }                           // not enough room for Facebook
     else
+    if (topCrumbs)
     {                           // enough room for Facebook
 		var	facebookFrame	        = document.getElementById("facebookFrame");
         if (facebook === null)
@@ -2296,32 +2363,33 @@ function commonScroll(event)
  *  Input:																*
  *		message			text of message to display						*
  ************************************************************************/
-
 function traceAlert(message)
 {
     if (debug.toLowerCase() == 'y')
     {			// debugging
-		var traceDiv	= document.getElementById('debugTrace');
-		if (traceDiv)
+		var traceDiv	        = document.getElementById('debugTrace');
+		if (traceDiv == null)
 		{
-		    var line	= document.createElement('p');
-		    var tags	= message.split('>');
-		    if (tags.length > 10)
-		    {		// so many > implies XML
-				for(var it = 0; it < tags.length; it++)
-				{
-				    line.appendChild(document.createTextNode(tags[it] + '>'));
-				    line.appendChild(document.createElement('br'));
-				}
-		    }		// so many > implies XML
-		    else
-		    {
-				line.appendChild(document.createTextNode(message));
-		    }
-		    traceDiv.appendChild(line);
-		}
-		else
-		    alert(message);
+            traceDiv            = document.createElement('div');
+            traceDiv.id         = 'debugTrace';
+            traceDiv.className  = 'warning';
+            document.body.appendChild(traceDiv);
+        }
+	    var line	            = document.createElement('p');
+	    var tags	            = message.split('>');
+	    if (tags.length > 10)
+	    {		// so many > implies XML
+			for(var it = 0; it < tags.length; it++)
+			{
+			    line.appendChild(document.createTextNode(tags[it] + '>'));
+			    line.appendChild(document.createElement('br'));
+			}
+	    }		// so many > implies XML
+	    else
+	    {
+			line.appendChild(document.createTextNode(message));
+	    }
+	    traceDiv.appendChild(line);
     }			// debugging
 }		// function traceAlert
 

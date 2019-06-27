@@ -49,6 +49,7 @@ use \Templating\Template;
  *		2018/04/14		urlencode the pattern in forward and back links	*
  *		2018/11/06      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/06/15      use ordinal numbering of records                *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -144,7 +145,8 @@ if (strlen($msg) == 0)
         $template->updateTag('nomatches', null);
         $template->set('COUNT', number_format($count));
 	    $template->set('OFFSET', $offset);
-		$last	        = min($nextoffset - 1, $count);
+	    $template->set('FIRST', $offset + 1);
+		$last	        = min($nextoffset, $count);
 	    $template->set('LAST', $last);
 		if ($prevoffset < 0)
 	    {	// no previous page of output to display

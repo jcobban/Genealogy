@@ -14,11 +14,20 @@
  *		2019/03/21      pass language to next script                    *
  *		2019/04/07      ensure that the paging lines can be displayed   *
  *		                within the visible portion of the browser.      *
+ *		2019/05/29      handle clicking on stats where there is no      *
+ *		                county or township in the registrations         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
+
+var lang            = 'en';
+if ('lang' in args)
+    lang    =       args.lang;
+var	pcount			= 20;
+if ('count' in args)
+	pcount			= args.count;
 
 /************************************************************************
  *  function onLoad														*
@@ -51,7 +60,12 @@ function onLoad()
 				element.onmouseout		        = eltMouseOut;
 		    }	// set mouseover on input element itself
 
-		    if (element.id.substring(0, 9) == 'TownStats')
+            var parts           = /^([a-zA-Z_]+)(\d+)/.exec(element.id);
+            if (parts === null)
+                continue;
+            var column          = parts[1].toLowerCase();
+            var row             = parts[2];
+		    if (column == 'townstats')
 		    {
 				element.onclick	= showTownStats;
 		    }
@@ -65,28 +79,57 @@ function onLoad()
  *																		*
  *  When a TownStats button is clicked this function displays the		*
  *  statistics for specific year.										*
+ *																		*
+ *	Input:																*
+ *		this        instance of <button>								*
+ *		e           an Event                                            *
  ************************************************************************/
-function showTownStats()
+function showTownStats(e)
 {
-    var lang    = 'en';
-    if ('lang' in args)
-        lang    = args.lang;
+    var parts           = /^([a-zA-Z_]+)(\d+)/.exec(this.id);
+    if (parts === null)
+        return;
+    var rownum          = parts[2];
+    var regyear			= document.getElementById('RegYear').value;
+    var domain			= document.getElementById('Domain').value;
+    var county			= document.getElementById('County' + rownum).value;
+    var town			= document.getElementById('Town' + rownum);
+    var low	    		= document.getElementById('low' + rownum).value;
+    var high			= document.getElementById('high' + rownum).value;
 
-    var	rownum	= this.id.substring(9);
-    var regyear	= document.getElementById('RegYear').value;
-    var domain	= document.getElementById('Domain').value;
-    var county	= document.getElementById('County' + rownum).value;
-    var town	= document.getElementById('Town' + rownum);
     var	dest;
     if (town)
     {
-		town	= town.value;
-		dest	= 'BirthRegResponse.php?RegDomain=CAON&Offset=0&Count=20&RegYear=' + regyear + '&RegCounty=' + county + '&RegTownship=' + town + '&lang=' + lang; 
+		town	        = town.value;
+		dest	        = 'BirthRegResponse.php?RegDomain=' + domain +
+                            '&Offset=0&Count=' + pcount +
+                            '&RegYear=' + regyear + 
+                            '&RegCounty=' + county + 
+                            '&RegTownship=' + town + 
+                            '&lang=' + lang; 
+    }
+    else
+    if (county.length > 0)
+    {
+		dest	        = 'BirthRegYearStats.php?RegDomain=' + domain +
+                            '&RegYear=' + regyear + 
+                            '&County=' + county + 
+                            '&lang=' + lang;  
     }
     else
     {
-		dest	= 'BirthRegYearStats.php?RegDomain=CAON&RegYear=' + regyear + '&County=' + county + '&lang=' + lang;  
+        var count       = high - low;
+        if (count == 0)
+            count       = 1;
+        else
+        if (count > pcount)
+            count       = pcount;
+		dest	        = 'BirthRegResponse.php?RegDomain=' + domain +
+                            '&Offset=0&Count=' + count + 
+                            '&RegYear=' + regyear + 
+                            '&RegNum=' + low + 
+                            '&lang=' + lang; 
     }
-    location	= dest;
+    location	        = dest;
     return false;
 }		// showTownStats

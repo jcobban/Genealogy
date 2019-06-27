@@ -20,8 +20,14 @@
  ************************************************************************/
 window.onload	= onLoad;
 
-// specify style for tinyMCE editing
-tinymce.init({
+var	lang	        = 'en';
+if ('lang' in args)
+	lang	        = args.lang;
+
+/************************************************************************
+ *  specify style for tinyMCE editing                                   *
+ ************************************************************************/
+tinyMCE.init({
 	selector            : 'textarea',
     plugins             : 'link lists image',
     menubar             : 'file edit view format insert',
@@ -128,7 +134,7 @@ function onLoad()
 		actMouseOverHelp(element);
     }
 
-}		// onLoad
+}		// function onLoad
 
 /************************************************************************
  *  function onWindowResize												*
@@ -152,7 +158,7 @@ function onWindowResize()
     subject.style.width     = textwidth + 'px';
     var email               = document.getElementById('emailAddress');
     email.style.width       = textwidth + 'px';
-}		// onWindowResize
+}		// function onWindowResize
 
 /************************************************************************
  *  function postBlog													*
@@ -162,8 +168,9 @@ function onWindowResize()
  *																		*
  *  Input:																*
  *		this		<button id='PostBlog'>								*
+ *		e           instance of click Event                             *
  ************************************************************************/
-function postBlog(rownum)
+function postBlog(e)
 {
     var	form		= this.form;
     var	userid		= form.userid.value;
@@ -174,30 +181,29 @@ function postBlog(rownum)
 
     if (userid == '' && email == '')
     {			// not signed on or identified
-		openSignon();
+		openSignon();       // require user to sign on
     }			// not signed on or identified
     else
     {
-		var	idir		= form.blogid.value;
-		var	message		= tinyMCE.get('message').getContent();
-		var parms		= {
-				"idir"		: idir,
-				"table"		: 'Blogs',
-				"emailAddress"	: email,
-				"subject"	: subject,
-				"message"	: message};
+		var	idir    		= form.blogid.value;
+		var	message	    	= tinyMCE.get('message').getContent();
+		var parms	    	= { "idir"		    : idir,
+					    		"table"	    	: 'Blogs',
+					    		"emailAddress"	: email,
+					    		"subject"   	: subject,
+					    		"message"   	: message};
 
-		var	blogParms	= "parms={" +
-				"idir="		+ idir +
-				", table='Blogs'" +
-				", emailAddress='"+ email +
-				"', subject='"	+ subject + "'";
+		var	blogParms   	= "parms={" +
+					    		"idir="		+ idir +
+					    		", table='Blogs'" +
+					    		", emailAddress='"+ email +
+					    		"', subject='"	+ subject + "'";
 		if ('edit' in args && args['edit'].toUpperCase() == 'Y')
 		{
 		    parms['update']	= 'Y';
 		    blogParms		+= ", update='Y'";
 		}
-		blogParms		+= "}";
+		blogParms		    += "}";
 		if (debug.toLowerCase() == 'y')
 		{
 		    alert("BlogPost.js: postBlog: " + blogParms);
@@ -210,7 +216,7 @@ function postBlog(rownum)
 				  gotBlog,
 				  noBlog);
     }
-}		// postBlog
+}		// function postBlog
 
 /************************************************************************
  *  function gotBlog													*
@@ -263,7 +269,7 @@ function gotBlog(xmlDoc)
     var	url	    = location.href;
     url		    = url.replace(/&edit=Y/i, '');
     location	= url;	// refresh the page
-}		// gotBlog
+}		// function gotBlog
 
 /************************************************************************
  *  function noBlog														*
@@ -277,7 +283,7 @@ function noBlog()
 				    'script "postBlogXml.php" not found on web server',
     		   messageElt);
     location	= location;	// refresh the page
-}		// noBlog
+}		// function noBlog
 
 /************************************************************************
  *  function editBlog													*
@@ -287,16 +293,14 @@ function noBlog()
  *																		*
  *  Input:																*
  *		this		<button id='edit...'>								*
+ *		e           instance of click Event                             *
  ************************************************************************/
-function editBlog()
+function editBlog(e)
 {
-    var	lang	= 'en';
-    if ('lang' in args)
-		lang	= args.lang;
     location	= "/BlogPost.php?blogid=" + this.id.substring(4) +
 						"&table=Blogs&lang=" + lang + "&edit=Y";
     return false;
-}		// editBlog
+}		// function editBlog
 
 /************************************************************************
  *  function delBlog													*
@@ -306,8 +310,9 @@ function editBlog()
  *																		*
  *  Input:																*
  *		this		<button id='del...'>								*
+ *		e           instance of click Event                             *
  ************************************************************************/
-function delBlog()
+function delBlog(e)
 {
     var	form		= this.form;
     var	blid		= this.id.substring(3);
@@ -319,7 +324,7 @@ function delBlog()
 		      parms,
 		      gotBlog,
 		      noDelBlog);
-}		// delBlog
+}		// function delBlog
 
 /************************************************************************
  *  function noDelBlog													*
@@ -330,5 +335,5 @@ function noDelBlog()
 {
     alert('BlogPost.js: noDelBlog: ' +
 				'script "deleteBlogXml.php" not found on web server');
-}		// noDelBlog
+}		// function noDelBlog
 

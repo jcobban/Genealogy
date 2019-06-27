@@ -12,11 +12,20 @@
  *		2016/04/25		support multiple domains						*
  *		2017/12/17		display registrations by number					*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/29      handle clicking on stats where there is no      *
+ *		                county or township in the registrations         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
+
+var lang    = 'en';
+if ('lang' in args)
+    lang    = args.lang;
+var	pcount			= 20;
+if ('count' in args)
+	pcount			= args.count;
 
 /************************************************************************
  *  function onLoad														*
@@ -32,73 +41,114 @@ function onLoad()
 		var form	= document.forms[j];
 		for (var i = 0; i < form.elements.length; ++i)
 		{	// loop through all elements in the form
-		    element		= form.elements[i];
+		    element		        = form.elements[i];
 		    element.onkeydown	= keyDown;
-    
-		    if (element.id.substring(0, 9) == 'TownStats')
+
+            var parts           = /^([a-zA-Z_]+)(\d+)/.exec(element.id);
+            if (parts === null)
+                continue;
+            var column          = parts[1].toLowerCase();
+            var row             = parts[2];
+		    if (column == 'townstats')
 		    {
 				element.onclick	= showTownStats;
 		    }
 		    else
-		    if (element.id.substring(0, 8) == 'ByNumber')
+		    if (column == 'bynumber')
 		    {
 				element.onclick	= showByNumber;
 		    }
 		}	// loop through all elements in the form
     }		// loop through all forms in the page
-    
-}		// onLoad
+
+}		// function onLoad
 
 /************************************************************************
  *  function showTownStats												*
  *																		*
  *  When a TownStats button is clicked this function displays the		*
  *  statistics for specific year.										*
+ *                                                                      *
+ *  Input:                                                              *
+ *      this            <button id="TownStats...">                      *
+ *      e               click Event                                     *
  ************************************************************************/
 function showTownStats()
 {
-    var	rownum	= this.id.substring(9);
-    var regyear	= document.getElementById('RegYear').value;
-    var domain	= document.getElementById('Domain').value;
-    var county	= document.getElementById('County' + rownum).value;
-    var town	= document.getElementById('Town' + rownum);
-    var	count	= 20;
-    if ('count' in args)
-		count	= args['count'];
+    var parts           = /^([a-zA-Z_]+)(\d+)/.exec(this.id);
+    if (parts === null)
+        return;
+    var rownum          = parts[2];
+    var regyear			= document.getElementById('RegYear').value;
+    var domain			= document.getElementById('Domain').value;
+    var county			= document.getElementById('County' + rownum).value;
+    var town			= document.getElementById('Town' + rownum);
+    var low	    		= document.getElementById('low' + rownum).value;
+    var high			= document.getElementById('high' + rownum).value;
+
     var	dest;
     if (town)
     {
-		town	= town.value;
-		dest	= 'MarriageRegResponse.php?RegDomain=' + domain + '&Offset=0&Count=' + count + '&RegYear=' + regyear + '&RegCounty=' + county + '&RegTownship=' + town; 
+		town        	= town.value;
+		dest	        = 'MarriageRegResponse.php?RegDomain=' + domain + 
+                            '&Offset=0&Count=' + pcount + 
+                            '&RegYear=' + regyear + 
+                            '&RegCounty=' + county + 
+                            '&RegTownship=' + town + 
+				            '&lang=' + lang; 
+    }
+    else
+    if (county.length > 0)
+    {
+		dest        	= 'MarriageRegYearStats.php?RegDomain=' + domain +
+                            '&RegYear=' + regyear + 
+                            '&County=' + county + 
+				            '&lang=' + lang; 
     }
     else
     {
-		dest	= 'MarriageRegYearStats.php?RegDomain=' + domain + '&RegYear=' + regyear + '&County=' + county; 
+        var count       = high - low;
+        if (count == 0)
+            count       = 1;
+        else
+        if (count > pcount)
+            count       = pcount;
+		dest        	= 'MarriageRegResponse.php?RegDomain=' + domain + 
+                            '&Offset=0&Count=' + count + 
+                            '&RegYear=' + regyear + 
+                            '&RegNum=' + low + 
+                            '&lang=' + lang; 
     }
-    location	= dest;
+    location	        = dest;
     return false;
-}		// showTownStats
+}		// function showTownStats
 
 /************************************************************************
  *  function showByNumber												*
  *																		*
  *  When a ByNumber button is clicked this function displays the		*
- *  details for a particular township by registration number.				*
+ *  details for a particular township by registration number.			*
+ *                                                                      *
+ *  Input:                                                              *
+ *      this            <button id="ByNumber...">                       *
+ *      e               click Event                                     *
  ************************************************************************/
 function showByNumber()
 {
-    var	rownum	= this.id.substring(8);
-    var regyear	= document.getElementById('RegYear').value;
-    var domain	= document.getElementById('Domain').value;
-    var first	= document.getElementById('First' + rownum).value;
-    var	count	= 20;
-    if ('count' in args)
-		count	= args['count'];
-    var	dest	= 'MarriageRegResponse.php?RegDomain=' + domain + 
-							'&Offset=0&Count=' + count + 
+    var parts           = /^([a-zA-Z_]+)(\d+)/.exec(this.id);
+    if (parts === null)
+        return;
+    var rownum          = parts[2];
+    var regyear	        = document.getElementById('RegYear').value;
+    var domain	        = document.getElementById('Domain').value;
+    var first	        = document.getElementById('First' + rownum).value;
+
+    var	dest	        = 'MarriageRegResponse.php?RegDomain=' + domain + 
+							'&Offset=0&Count=' + pcount + 
 							'&RegYear=' + regyear + 
 							'&RegNum=' + first + 
-							'&order=number'; 
-    location	= dest;
+							'&order=number' + 
+                            '&lang=' + lang; 
+    location	        = dest;
     return false;
-}		// showByNumber
+}		// function showByNumber

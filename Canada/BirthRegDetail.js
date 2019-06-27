@@ -50,6 +50,7 @@
  *		2017/07/30		use locationChanged for father's occupation		*
  *						place and add afterChange handler				*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/18      call element.click() to trigger button click    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -262,7 +263,7 @@ function onLoadBirths()
 				    element.onclick	= showImage;
 				    if (typeof(args.showimage) == 'string' &&
 						args.showimage.toLowerCase() == 'yes')
-						element.onclick();
+						element.click();
 				    break;
 				}	// display image button
 
@@ -574,7 +575,7 @@ function showImage()
 				      "right");
 		else
 		    openFrame("Images",
-				      'DisplayImage.php?src=Images/' + imageUrl,
+				      'DisplayImage.php?src=/Images/' + imageUrl,
 				      "right");
     }		// Image field defined
     return false;
@@ -709,25 +710,25 @@ function ebKeyDown(e)
         {
 		    case 73:
 		    {		// letter 'I'
-		        document.getElementById('ShowImage').onclick();
+		        document.getElementById('ShowImage').click();
 		        return false;
 		    }		// letter 'I'
     
 		    case 78:
 		    {		// letter 'N'
-		        document.getElementById('Next').onclick();
+		        document.getElementById('Next').click();
 		        return false;
 		    }		// letter 'N'
 
 		    case 80:
 		    {		// letter 'P'
-		        document.getElementById('Previous').onclick();
+		        document.getElementById('Previous').click();
 		        return false;
 		    }		// letter 'P'
 
 		    case 81:
 		    {		// letter 'Q'
-		        document.getElementById('NewQuery').onclick();
+		        document.getElementById('NewQuery').click();
 		        return false;
 		    }		// letter 'Q'
     

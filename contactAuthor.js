@@ -46,7 +46,7 @@ function onLoad()
 		
 				case 'Blog':
 				{	// action button
-				    element.onclick	= postBlog;
+				    element.onclick	    = postBlog;
 				    break;
 				}	// action button
 
@@ -61,15 +61,16 @@ function onLoad()
  *  This function is called when the user clicks on the "Blog" button.	*
  *																		*
  *  Input:																*
- *		this				<button id='Blog'> element					*
+ *		this			<button id='Blog'> element					    *
+ *		e               instance of Event                               *
  ************************************************************************/
-function postBlog()
+function postBlog(e)
 {
     var	form	= this.form;
-    var	parms	= {'id'		: form.id.value,
+    var	parms	= {'id'		    : form.id.value,
 				   'tablename'	: form.tablename.value,
 				   'message'	: form.message.value,
-				   'email'	: form.email.value};
+				   'email'	    : form.email.value};
 
     // post the blog
     HTTP.post("postBlogXml.php",

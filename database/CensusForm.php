@@ -308,7 +308,7 @@ if (strlen($msg) == 0)
 	" sd_census=$censusId, sd_distid=$distID, sd_id=$subDistID, sd_div=$division</p>\n";
 	$subDistrictName	= $subDistrict->get('sd_name');
 	if (strlen($subDistrictName) > 48)
-	    $subDistrictName	= substr($subdName, 0, 45) . '...';
+	    $subDistrictName	= substr($subDistrictName, 0, 45) . '...';
 	$page1			    = $subDistrict->get('sd_page1');
 	$imageBase		    = $subDistrict->get('sd_imagebase');
 	$relFrame		    = $subDistrict->get('sd_relframe');

@@ -294,6 +294,9 @@
  *						"Edit Parents" frame was not.					*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/18      ensure event passed to onclick handlers         *
+ *		2019/06/01      use JSON in place of XML for AJAX response      *
+ *		                ensure individual created before exiting        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -607,8 +610,8 @@ function loadEdit()
 				form.onsubmit	 	= validateForm;
 		    else
 				alert('editIndivid.js: loadEdit: 608 testSubmit is true');
-		    form.onreset 		= resetForm;
-		    form.setIdar		= setIdar;
+		    form.onreset 		    = resetForm;
+		    form.setIdar		    = setIdar;
 
 		    // callback from editMarriages.php
 		    form.marriageUpdated	= marriageUpdated;
@@ -656,8 +659,9 @@ function loadEdit()
  *																		*
  *  Input:																*
  *		this		Window object										*
+ *		ev          resize Event                                        *
  ************************************************************************/
-function onWindowResize()
+function onWindowResize(ev)
 {
     var	body		= document.body;
     var	iframes		= body.getElementsByTagName('iframe');
@@ -935,48 +939,58 @@ function activateElements(form)
  *  Ensure that the data entered by the user has been minimally			*
  *  validated before submitting the form.  Update fields in the form	*
  *  of the invoking web page if requested by parameters.				*
+ *																		*
+ *	Input:																*
+ *		this        <form>												*
  ************************************************************************/
 function validateForm()
 {
+    var form                = this;
+    var	idir		        = form.idir.value;
+    if (idir == 0)
+    {                   // IDIR not assigned yet
+        newSearch           = document.getElementById('Submit');
+        refresh();      // use AJAX to create Person
+        return;
+    }                   // IDIR not assigned yet
+
     // do not submit the form if a modal dialog is being displayed
     if (deferSubmit)
     {
-		deferSubmit	= false;
+		deferSubmit	        = false;
 		return false;
     }
 
     // handle feedback if the editIndivid.php page was invoked from
     // another window
-    var	opener		= null;
+    var	opener		        = null;
     if (window.frameElement && window.frameElement.opener)
-		opener		= window.frameElement.opener;
+		opener		        = window.frameElement.opener;
     else
-		opener		= window.opener;
+		opener		        = window.opener;
+
     if (opener != null)
-    {			// invoked from another window
+    {			        // invoked from another window
 		// dstform is the form in the invoking page
-		var	dstform		= null;
+		var	dstform		    = null;
 		try
-		{	// do not fail script for permission failure 
-		    dstform		= opener.document.forms[0];
+		{	            // do not fail script for permission failure 
+		    dstform		    = opener.document.forms[0];
 		} catch(e) {
-		}	// do not fail script for permission failure 
+		}	            // do not fail script for permission failure 
 
 		if (dstform)
-		{		// opener contains a form
-		    // srcform is the form in the current edit page
-		    var	srcform		= document.indForm;
-		    var	idir		= srcform.idir.value;
+		{		        // opener contains a form
 		    // if parmIdir is zero then the script has added a new individual
 		    // into the database.  
 		    var	adding		= parmIdir == 0;
 
 		    // process the parameters passed to the PHP script
 		    for(var key in args)
-		    {		// loop through parameter name value pairs
+		    {		    // loop through parameter name value pairs
 				var	val	= args[key];
 				switch(key.toLowerCase())
-				{	// action depends upon parameter name
+				{	    // action depends upon parameter name
 				    case 'id':
 				    case 'idir':
 				    {
@@ -1065,7 +1079,7 @@ function validateForm()
 						// element in the invoking page
 						feedbackRow	= opener.document.getElementById(val);
 						break;
-				    }	 // update a spouse in invoking family
+				    }	// update a spouse in invoking family
 
 				    case 'initsurname':
 				    case 'fathsurname':
@@ -1076,10 +1090,9 @@ function validateForm()
 				    case 'treename':
 				    case 'debug':
 				    case 'lang':
-				    {	// default initial name
-						// already handled by PHP
+				    {	// already handled by PHP
 						break;
-				    }	// default initial name
+				    }	// already handled by PHP
 
 				    default:
 				    {	// unexpected
@@ -1089,22 +1102,22 @@ function validateForm()
 							  "='" + val + "'");
 						break;
 				    }	// unexpected
-				}	// action depends upon parameter name
-		    }		// loop through parameter name value pairs
+				}	    // action depends upon parameter name
+		    }		    // loop through parameter name value pairs
 
-		}		// opener contains a form
+		}		        // opener contains a form
 		else
-		{		// opener does not contain a form
+		{		        // opener does not contain a form
 		    // opener is also set when the page is invoked by a hyper-link
 		    // from another page, so this is not an error
 		    //alert("validateForm: opener.location='" + opener.location + 
 		    //	  "' does not contain a form");
-		}		// opener does not contain a form
-    }			// invoked from another window
+		}		        // opener does not contain a form
+    }			        // invoked from another window
 
-    update();		// use AJAX to update the database record
+    update();		    // use AJAX to update the database record
 
-    return false;	// do not submit
+    return false;	    // do not submit
 }		// function validateForm
 
 /************************************************************************
@@ -1141,7 +1154,7 @@ function refresh()
     locTrace += " editIndivid.js: refresh: " + msg;
 
     // invoke script to update Event and return XML result
-    HTTP.post('/FamilyTree/updateIndividXml.php',
+    HTTP.post('/FamilyTree/updatePersonJson.php',
 		      parms,
 		      gotRefreshed,
 		      noUpdated);
@@ -1150,48 +1163,49 @@ function refresh()
 /************************************************************************
  *  function gotRefreshed												*
  *																		*
- *  The XML document representing the results of the request to refresh	*
- *  the page has been received.											*
+ *  The JSON document representing the results of the request to 		*
+ *  update the Person has been received.								*
+ *																		*
+ *	Input:  															*
+ *	    jsonObj         Javascript object                               *
  ************************************************************************/
-function gotRefreshed(xmlDoc)
+function gotRefreshed(jsonObj)
 {
-    var	topXml	= xmlDoc.documentElement;
-    if (topXml && typeof(topXml) == "object" && topXml.nodeName == 'update')
-    {			// valid response
+    if (typeof(jsonObj) == "object")
+    {
 		if (typeof(newSearch) == "string")
 		{		// location to go to
 		    location.search	= newSearch;
 		}		// location to go to
 		else
-		if (typeof(newSearch.onclick) == "function")
+		if (typeof(newSearch) == "object")
 		{		// have a pending button click to issue
-		    var indlist		= topXml.getElementsByTagName('indiv');
-		    var indiv		= indlist[0];
-		    var idir		= indiv.getAttribute('idir');
+		    var indiv		        = jsonObj.person;
+		    var idir		        = indiv.idir;
 
 		    if ((idir - 0) == 0)
 				alert("editIndivid.js: 1164: gotRefreshed: idir=" + idir);
-		    var	idlist		= indiv.getElementsByTagName('id');
-		    var id		    = idlist[0].textContent;
-		    var form		= document.indForm;
-		    form.idir.value	= idir; // is now set
-		    form.id.value	= id;	// is now set
-		    newSearch.onclick();	// simulate press the button
-		    newSearch		= location.search;
+		    var id		            = indiv.id;
+
+		    var form		        = document.indForm;
+		    form.idir.value	        = idir; // is now set
+		    form.id.value	        = id;	// is now set
+            if (newSearch.type == 'submit')
+                form.submit();
+            else
+		        newSearch.click();	    // simulate press the button
+		    newSearch		        = location.search;
 		}		// have a pending button click to issue
 		else
 		{		// unexpected object
-		    alert("editIndivid.js: 1175: gotRefreshed: typeof(newSearch)=" + 
+		    alert("editIndivid.js: 1183: gotRefreshed: typeof(newSearch)=" + 
 						typeof(newSearch));
 		}		// unexpected object
 
     }			// valid response
     else
     {			// error response
-		if (topXml && typeof(topXml) == "object")
-		    alert("editIndivid.js: 1183: gotRefreshed: " + tagToString(topXml));
-		else
-		    alert("editIndivid.js: 1185: gotRefreshed: '" + xmlDoc + "'");
+		alert("editIndivid.js: 1190: gotRefreshed: " + jsonObj);
     }			// error response
 
 }		// function gotRefreshed
@@ -1199,8 +1213,9 @@ function gotRefreshed(xmlDoc)
 /************************************************************************
  *  function update														*
  *																		*
- *  This method is called to update the main record and segue to the	*
+ *  This method is called to update the main record and segué to the	*
  *  main display form.													*
+ *  Called from validateForm.                                           *
  ************************************************************************/
 function update()
 {
@@ -1244,21 +1259,21 @@ function update()
 		}
     }			// there are incomplete actions pending
 
-    var form	= document.indForm;
+    var form	            = document.indForm;
 
     // parms contain every input element with its value
-    var	parms	= {};
-    var	msg	= "parms=(";
+    var	parms	            = {};
+    var	msg	                = "parms=(";
     for (var ei = 0; ei < form.elements.length; ei++)
     {			// loop through all form elements
-		var	element	= form.elements[ei]
+		var	element	        = form.elements[ei]
 		if (element.name)
 		{		// element has a name
-		    var	name	= element.name;
-		    msg		+= name + "='" + element.value + "',";
+		    var	name	    = element.name;
+		    msg		        += name + "='" + element.value + "',";
 		    if (name.substring(name.length - 2) == '[]')
 		    {		// convention for passing an array
-				name	= name.substring(0, name.length - 2);
+				name	    = name.substring(0, name.length - 2);
 				if (element.type != 'checkbox' || element.checked)
 				    parms[name]	= element.value;
 		    }		// convention for passing an array
@@ -1266,13 +1281,13 @@ function update()
 				parms[name]	= element.value;
 		}		// element has a name
     }			// loop through all form elements
-    msg		= msg.substring(0,msg.length - 2) + "}";
-    locTrace += " editIndivid.js: 1275 update: " + msg;
+    msg		                = msg.substring(0,msg.length - 2) + "}";
+    locTrace                += " editIndivid.js: 1275 update: " + msg;
 	if (debug.toLowerCase() == 'y')
         alert(locTrace);
 
-    // invoke script to update Event and return XML result
-    HTTP.post('/FamilyTree/updateIndividXml.php',
+    // invoke script to update Event and return JSON result
+    HTTP.post('/FamilyTree/updatePersonJson.php',
 		      parms,
 		      gotUpdated,
 		      noUpdated);
@@ -1281,23 +1296,23 @@ function update()
 /************************************************************************
  *  function gotUpdated													*
  *																		*
- *  The XML document representing the results of the request to update	*
+ *  The JSON document representing the results of the request to update	*
  *  the record has been received.										*
+ *																		*
+ *	Input:  															*
+ *	    jsonObj         Javascript object                               *
  ************************************************************************/
-function gotUpdated(xmlDoc)
+function gotUpdated(jsonObj)
 {
-    var	opener		= null;
+    var	opener		    = null;
     if (window.frameElement && window.frameElement.opener)
-		opener		= window.frameElement.opener;
+		opener		    = window.frameElement.opener;
     else
-		opener		= window.opener;
-    var	topXml	= xmlDoc.documentElement;
-    if (topXml && typeof(topXml) == "object" && topXml.nodeName == 'update')
+		opener		    = window.opener;
+    if (typeof(jsonObj) == "object")
     {			// valid response
 		var	srcform		= document.indForm;
-		var	indlist		= topXml.getElementsByTagName('indiv');
-		// convert the first <indiv> tag into an associative array of fields
-		var	indiv		= getParmsFromXml(indlist);
+		var	indiv		= jsonObj.person;
 		// var	msg	= "";
 		// for(key in indiv)
 		//     msg		+= key + "='" + indiv[key] + "',";
@@ -1308,21 +1323,19 @@ function gotUpdated(xmlDoc)
 		if (typeof(idir) === "undefined")
 		{
 		    alert("editIndivid.js: 1314 idir=" + idir + 
-				  " topXml=" + tagToString(topXml));
+				  " jsonObj=" + JSON.stringify(jsonObj));
 		}
 		if ((idir - 0) == 0)
 		    alert("editIndivid.js: 1318: gotUpdated: idir=" + idir + ": " +
-						tagToString(topXml));
+						JSON.stringify(jsonObj));
 		// update IDIR value in form
 		srcform.idir.value	= idir;
 
 		// if there is a child tag present, get the IDCR value 
-		var	idcr		= 0;
-		var	cldlist		= topXml.getElementsByTagName('child');
-		var	childr		= getParmsFromXml(cldlist);
+		var	idcr		    = 0;
+		var	childr		    = jsonObj.child;
 		if (childr.idcr)
-		    idcr		= childr.idcr;
-		indiv.idcr		= idcr;
+		    idcr		    = childr.idcr;
 
 		// if invoker has requested to be notified of key information about
 		// the individual to update a specific individual in the invoking page
@@ -1368,14 +1381,13 @@ function gotUpdated(xmlDoc)
 		    }			// death row present
 
 		    // pass the information back to the invoker
-		    var	parms		= {
-							"idir"		: idir,
-							"givenname"	: srcform.GivenName.value,
-							"surname"	: srcform.Surname.value,
-							"birthd"	: birthDate,
-							"deathd"	: deathDate,
-							"gender"	: genderClass,
-							"sex"		: gender};
+		    var	parms		= { "idir"		: idir,
+								"givenname"	: srcform.GivenName.value,
+								"surname"	: srcform.Surname.value,
+								"birthd"	: birthDate,
+								"deathd"	: deathDate,
+								"gender"	: genderClass,
+							    "sex"		: gender};
 		    if (parentsIdmr !== null)
 				parms.idcr	= idcr;
 		
@@ -1419,8 +1431,8 @@ function gotUpdated(xmlDoc)
     }			// valid response
     else
     {
-		if (topXml && typeof(topXml) == "object")
-		    alert("editIndivid.js: 1395: gotUpdated: " + tagToString(topXml));
+		if (jsonObj && typeof(jsonObj) == "object")
+		    alert("editIndivid.js: 1395: gotUpdated: " + JSON.stringify(jsonObj));
 		else
 		    alert("editIndivid.js: 1397: gotUpdated: '" + xmlDoc + "'");
     }
@@ -1433,7 +1445,7 @@ function gotUpdated(xmlDoc)
  ************************************************************************/
 function noUpdated()
 {
-    alert("editIndivid.js: 1408: noUpdated: script 'updateIndividXml.php' not found on server");
+    alert("editIndivid.js: 1408: noUpdated: script 'updatePersonJson.php' not found on server");
 }		// function noUpdated
 
 /************************************************************************
@@ -1455,16 +1467,18 @@ function resetForm()
  *																		*
  *  Input:																*
  *		this	<button id='Marriages'>									*
+ *		ev      click Event                                             *
  ************************************************************************/
-function editMarriages()
+function editMarriages(ev)
 {
     var	form	= this.form;
     var	idir	= form.idir.value;
-    var	given	= encodeURIComponent(form.GivenName.value);
-    var	surname	= encodeURIComponent(form.Surname.value);
-    var	treeName= encodeURIComponent(form.treeName.value);
     if (idir > 0)
     {			// idir field present
+        var	given   	= encodeURIComponent(form.GivenName.value);
+        var	surname 	= encodeURIComponent(form.Surname.value);
+        var	treeName    = encodeURIComponent(form.treeName.value);
+
 		// open edit dialog in right half of window
 		var url	= "/FamilyTree/editMarriages.php?id=" + idir +
 							   "&given=" + given + 
@@ -1491,16 +1505,18 @@ function editMarriages()
  *																		*
  *  Input:																*
  *		this	<button id='Parents'>									*
+ *		ev      click Event                                             *
  ************************************************************************/
-function editParents()
+function editParents(ev)
 {
     var	form	= this.form;
     var	idir	= form.idir.value;
-    var	given	= encodeURIComponent(form.GivenName.value);
-    var	surname	= encodeURIComponent(form.Surname.value);
-    var	treeName= encodeURIComponent(form.treeName.value);
     if (idir > 0)
     {			// idir field present
+        var	given   	= encodeURIComponent(form.GivenName.value);
+        var	surname 	= encodeURIComponent(form.Surname.value);
+        var	treeName    = encodeURIComponent(form.treeName.value);
+
 		// open edit dialog in right half of window
 		var url	= "/FamilyTree/editParents.php?id=" + idir + 
 							"&given=" + given + 
@@ -1513,7 +1529,7 @@ function editParents()
     }			// idir field present
     else
     {			// individual record not created in database yet
-		newSearch	= this;		// identify button that was clicked
+		newSearch	    = this;		// identify button that was clicked
 		refresh();
     }			// individual record not created in database yet
     return true;
@@ -1535,10 +1551,12 @@ function editParents()
  *																		*
  *  Input:																*
  *		this		instance of <button> that invoked this function		*
+ *		ev          click Event                                         *
  ************************************************************************/
 function editEventIndiv(ev)
 {
     ev.stopPropagation();
+
     // check for open event frame
     if (windowList.length > 0)
     {			// there are incomplete actions pending
@@ -1694,6 +1712,7 @@ function editEventIndiv(ev)
  *																		*
  *  Input:																*
  *		this		<button id='Clear...'>								*
+ *		ev          click Event                                         *
  ************************************************************************/
 function clearEventIndiv(ev)
 {	
@@ -1724,7 +1743,7 @@ function clearEventIndiv(ev)
 }		// function clearEventIndiv
 
 /************************************************************************
- *  function confirmClearInd												*
+ *  function confirmClearInd											*
  *																		*
  *  This method is called when the user confirms the request to delete	*
  *  an event which is defined inside the Person record.					*
@@ -1733,8 +1752,9 @@ function clearEventIndiv(ev)
  *																		*
  *  Input:																*
  *		this		<button id='confirmClear...'>						*
+ *		ev          click Event                                         *
  ************************************************************************/
-function confirmClearInd()
+function confirmClearInd(ev)
 {
     // get the parameter values hidden in the dialog
     var	form		= this.form;
@@ -1791,7 +1811,7 @@ function confirmClearInd()
 				    form.IDTRBaptism.value	= 0;
 				else
 				{
-				    // add a field that will cause updateIndividXml.php
+				    // add a field that will cause updatePersonJson.php
 				    // to clear the location
 				    var	cell		= form.BaptismLocation.parentNode;
 				    var	idtrfld		= document.createElement('input');
@@ -1811,7 +1831,7 @@ function confirmClearInd()
 				    form.IDTREndowment.value	= 0;
 				else
 				{
-				    // add a field that will cause updateIndividXml.php
+				    // add a field that will cause updatePersonJson.php
 				    // to clear the location
 				    var	cell		= form.EndowmentLocation.parentNode;
 				    var	idtrfld		= document.createElement('input');
@@ -1831,7 +1851,7 @@ function confirmClearInd()
 				    form.IDTRConfirmation.value		= 0;
 				else
 				{
-				    // add a field that will cause updateIndividXml.php
+				    // add a field that will cause updatePersonJson.php
 				    // to clear the location
 				    var	cell		= form.ConfirmationLocation.parentNode;
 				    var	idtrfld		= document.createElement('input');
@@ -1851,7 +1871,7 @@ function confirmClearInd()
 				    form.IDTRInitiatory.value		= 0;
 				else
 				{
-				    // add a field that will cause updateIndividXml.php
+				    // add a field that will cause updatePersonJson.php
 				    // to clear the location
 				    var	cell		= form.InitiatoryLocation.parentNode;
 				    var	idtrfld		= document.createElement('input');
@@ -1900,6 +1920,7 @@ function confirmClearInd()
  *																		*
  *  Input:																*
  *		this	instance of <button> that invoked this function			*
+ *		ev      click Event                                             *
  ************************************************************************/
 function editEventChildr(ev)
 {
@@ -1976,7 +1997,8 @@ function editEventChildr(ev)
  *				STYPE_LDSP				= 17  LDS Sealed to Parents		*
  *																		*
  *  Input:																*
- *		this	instance of <button> that invoked this function			*
+ *		this	    instance of <button> that invoked this function		*
+ *		ev          click Event                                         *
  ************************************************************************/
 function clearEventChildr(ev)
 {
@@ -1993,7 +2015,7 @@ function clearEventChildr(ev)
 		    form.IDTRSealing.value	= 1;
 		else
 		{
-		    // add a field that will cause updateIndividXml.php
+		    // add a field that will cause updatePersonJson.php
 		    // to clear the location
 		    var	cell	= form.SealingTemple.parentNode;
 		    var	idtrfld	= document.createElement('input');
@@ -2068,6 +2090,7 @@ function noClearedEvent()
  *																		*
  *  Input:																*
  *		this		instance of <button> that invoked this function		*
+ *		ev          click Event                                         *
  ************************************************************************/
 function eventDetail(ev)
 {
@@ -2277,7 +2300,7 @@ function eventDetail(ev)
     else
     {			// individual record not created in database yet
 		newSearch	= this;		// identify button that was clicked
-		refresh();			// update database first
+		refresh();			    // update database first
     }			// individual record not created in database yet
 }		// function eventDetail
 
@@ -2289,6 +2312,7 @@ function eventDetail(ev)
  *																		*
  *  Input:																*
  *		this		instance of <button> that invoked this function		*
+ *		ev          click Event                                         *
  ************************************************************************/
 function eventAdd(ev)
 {
@@ -2316,7 +2340,7 @@ function eventAdd(ev)
     else
     {			// individual record not created in database yet
 		newSearch	= this;		// identify button that was clicked
-		refresh();			// update database first
+		refresh();			    // update database first
     }			// individual record not created in database yet
 }	// function eventAdd
 
@@ -2328,6 +2352,7 @@ function eventAdd(ev)
  *																		*
  *  Input:																*
  *		this		<button id='EventDelete...'> 						*
+ *		ev          click Event                                         *
  ************************************************************************/
 function eventDelete(ev)
 {
@@ -2374,8 +2399,9 @@ function eventDelete(ev)
  *																		*
  *  Input:																*
  *		this			<button id='confirmClear...'>					*
+ *		ev              click Event                                     *
  ************************************************************************/
-function confirmEventDel()
+function confirmEventDel(ev)
 {
     // get the parameter values hidden in the dialog
     var	form				= this.form;
@@ -2635,8 +2661,9 @@ function noDeleteCitations()
  *																		*
  *  Input:																*
  *		this		instance of <input> that invoked this function		*
+ *		ev          change Event                                        *
  ************************************************************************/
-function eventChanged()
+function eventChanged(ev)
 {
     var	form		= this.form;
     var	value		= this.value;
@@ -2664,7 +2691,7 @@ function eventChanged()
 		if (child.id && child.id.substring(0,12) == 'EventChanged')
 		    changeElement	= child;
     }	
-    // notify the script updateIndividXml.php that this event has been changed
+    // notify the script updatePersonJson.php that this event has been changed
     if (changeElement)
 		changeElement.value	= "1";
     else
@@ -2708,8 +2735,9 @@ function eventChanged()
  *																		*
  *  Input:																*
  *		this		instance of <input> that invoked this function		*
+ *		ev          change Event                                        *
  ************************************************************************/
-function eventPrefChanged()
+function eventPrefChanged(ev)
 {
     var	form		= this.form;
     var	name		= this.name;
@@ -2783,6 +2811,7 @@ function eventPrefChanged()
  *																		*
  *  Input:																*
  *		this		instance of <button> that invoked this function		*
+ *		ev          click Event                                         *
  ************************************************************************/
 function grantAccess(ev)
 {
@@ -2803,8 +2832,9 @@ function grantAccess(ev)
  *																		*
  *  Input:																*
  *		this		instance of <input> that invoked this function		*
+ *		ev          change Event                                        *
  ************************************************************************/
-function genderChanged()
+function genderChanged(ev)
 {
     var	form		= this.form;
     var	sex		= this.options[this.selectedIndex].value;
@@ -2839,8 +2869,9 @@ function genderChanged()
  *																		*
  *  Input:																*
  *		this		<button id='Order'> element							*
+ *		ev          click Event                                         *
  ************************************************************************/
-function orderEventsByDate()
+function orderEventsByDate(ev)
 {
     var	button		= this;
     button.disabled	= true;		// only permit one sort
@@ -2984,8 +3015,9 @@ function gotOrder(xmlDoc)
  *																		*
  *  Input:																*
  *		this		<button id='ShowMore'> element						*
+ *		ev          click Event                                         *
  ************************************************************************/
-function showMore()
+function showMore(ev)
 {
     var	form		= this.form;
     var layoutTable	= document.getElementById('layoutTable');
@@ -3077,8 +3109,9 @@ function showMore()
  *																		*
  *  Input:																*
  *		this		<button id='Address'> element						*
+ *		ev          click Event                                         *
  ************************************************************************/
-function editAddress()
+function editAddress(ev)
 {
     var	form	= this.form;
     if (form.idar && form.idar.value.length > 0)
@@ -3120,6 +3153,7 @@ function editAddress()
  *																		*
  *  Parameters:															*
  *		this		<button id='Pictures'> element						*
+ *		ev          click Event                                         *
  ************************************************************************/
 function editPictures(ev)
 {
@@ -3181,6 +3215,7 @@ function setIdar(newIdar)
  *																		*
  *  Parameters:															*
  *		this		<button id='Delete'>								*
+ *		ev          click Event                                         *
  ************************************************************************/
 function delIndivid(ev)
 {
@@ -3209,6 +3244,7 @@ function delIndivid(ev)
  *																		*
  *  Parameters:															*
  *		this		<button id='Merge'>									*
+ *		ev          click Event                                         *
  ************************************************************************/
 function mergeIndivid(ev)
 {
@@ -3239,9 +3275,10 @@ function mergeIndivid(ev)
  *  Display popdown menu of search buttons.								*
  *																		*
  *  Input:																*
- *		this				<button id='Search'>						*
+ *		this		<button id='Search'>			     			    *
+ *		ev          click Event                                         *
  ************************************************************************/
-function popdownSearch()
+function popdownSearch(ev)
 {
     var	form			= this.form;
     var menu			= document.getElementById("SearchDropdownMenu");
@@ -3262,9 +3299,10 @@ function popdownSearch()
  *  Perform a search for a matching individual in census tables.		*
  *																		*
  *  Input:																*
- *		this			<button id='censusSearch'>						*
+ *		this		<button id='censusSearch'>	    					*
+ *		ev          click Event                                         *
  ************************************************************************/
-function censusSearch()
+function censusSearch(ev)
 {
     var	form			= this.form;
     var menu			= document.getElementById("SearchDropdownMenu");
@@ -3310,9 +3348,10 @@ function censusSearch()
  *  tables.																*
  *																		*
  *  Input:																*
- *		this			<button id='bmdSearch'>							*
+ *		this		<button id='bmdSearch'>								*
+ *		ev          click Event                                         *
  ************************************************************************/
-function bmdSearch()
+function bmdSearch(ev)
 {
     var	form			= this.form;
     var menu			= document.getElementById("SearchDropdownMenu");
@@ -3366,9 +3405,10 @@ function bmdSearch()
  *  Perform a search for a matching individual in Ancestry.ca.			*
  *																		*
  *  Input:																*
- *		this				<button id='ancestrySearch'>				*
+ *		this		<button id='ancestrySearch'>		        		*
+ *		ev          click Event                                         *
  ************************************************************************/
-function ancestrySearch()
+function ancestrySearch(ev)
 {
     var	form			= this.form;
     var menu			= document.getElementById("SearchDropdownMenu");
@@ -4312,22 +4352,22 @@ function eventFeedback(parms)
  *  The submit button is therefore enabled.								*
  *																		*
  *  Parameters:															*
- *		this	<input type='text'>										*
- *		e		W3C compliant browsers pass an event as a parameter		*
+ *		this	    <input type='text'>									*
+ *		ev			keydown Event	                                    *
  ************************************************************************/
-function fldKeyDown(e)
+function fldKeyDown(ev)
 {
-    if (!e)
+    if (!ev)
     {		// browser is not W3C compliant
-		e	=  window.event;	// IE
+		ev	=  window.event;	// IE
     }		// browser is not W3C compliant
     var	form	= document.indForm;
-    if (e.ctrlKey || e.altKey)
+    if (ev.ctrlKey || ev.altKey)
 		return true;
-    var	code	= e.keyCode;
-    if (e.key)
-		code	= e.key;
-    return this.oldkeydown(e);		// pass to common handling
+    var	code	= ev.keyCode;
+    if (ev.key)
+		code	= ev.key;
+    return this.oldkeydown(ev);		// pass to common handling
 }		// function fldKeyDown
 
 /************************************************************************
@@ -4339,102 +4379,103 @@ function fldKeyDown(e)
  *  click the Update Person button.										*
  *																		*
  *  Parameters:															*
- *		e		W3C compliant browsers pass an event as a parameter		*
+ *      this        <input> element                                     *
+ *		ev		    a keydown Event		                                *
  ************************************************************************/
-function eiKeyDown(e)
+function eiKeyDown(ev)
 {
-    if (!e)
-    {		// browser is not W3C compliant
-		e	=  window.event;	// IE
-    }		// browser is not W3C compliant
-    var	code	= e.keyCode;
-    var	form	= document.indForm;
-    var	idir	= form.idir.value;
+    if (!ev)
+    {		    // browser is not W3C compliant
+		ev	        =  window.event;	// IE
+    }		    // browser is not W3C compliant
+    var	code	    = ev.keyCode;
+    var	form	    = document.indForm;
+    var	idir	    = form.idir.value;
 
     // take action based upon code
-    if (e.ctrlKey)
-    {		// ctrl key shortcuts
+    if (ev.ctrlKey)
+    {		    // ctrl key shortcuts
 		if (code == LTR_S)
 		{		// letter 'S'
 		    locTrace += " editIndivid.js: eiKeyDown: Ctrl-S";
 		    validateForm();
 		    return false;	// do not perform standard action
 		}		// letter 'S'
-    }		// ctrl key shortcuts
+    }		    // ctrl key shortcuts
 
-    if (e.altKey)
-    {		// alt key shortcuts
+    if (ev.altKey)
+    {		    // alt key shortcuts
 		switch (code)
 		{
 		    case LTR_A:
 		    {		// letter 'A' edit address
-				document.getElementById("Address").onclick();
+				document.getElementById("Address").click();
 				return false;	// suppress default action
 		    }		// letter 'A'
 
 		    case LTR_C:
 		    {		// letter 'C' census search
-				document.getElementById("censusSearch").onclick();
+				document.getElementById("censusSearch").click();
 				return false;	// suppress default action
 		    }		// letter 'C'
 
 		    case LTR_D:
 		    {		// letter 'D' delete
-				document.getElementById("Delete").onclick();
+				document.getElementById("Delete").click();
 				return false;	// suppress default action
 		    }		// letter 'D'
 
 		    case LTR_E:
 		    {		// letter 'E' add event
-				document.getElementById("AddEvent").onclick();
+				document.getElementById("AddEvent").click();
 				return false;	// suppress default action
 		    }		// letter 'E'
 
 		    case LTR_F:
 		    {		// letter 'F' edit families
-				document.getElementById("Marriages").onclick();
+				document.getElementById("Marriages").click();
 				return false;	// suppress default action
 		    }		// letter 'F'
 
 		    case LTR_I:
 		    {		// letter 'I' edit pictures
-				document.getElementById("Pictures").onclick();
+				document.getElementById("Pictures").click();
 				return false;	// suppress default action
 		    }		// letter 'G'
 
 		    case LTR_M:
 		    {		// letter 'M' merge button
-				document.getElementById("Merge").onclick();
+				document.getElementById("Merge").click();
 				return false;	// suppress default action
 		    }		// letter 'M'
 
 		    case LTR_N:
 		    {		// letter 'N' general notes
-				document.getElementById("Detail6").onclick();
+				document.getElementById("Detail6").click();
 				return false;	// suppress default action
 		    }		// letter 'N'
 
 		    case LTR_O:
 		    {		// alt-O
-				document.getElementById("Order").onclick();
+				document.getElementById("Order").click();
 				return false;	// suppress default action
 		    }		// alt-O
 
 		    case LTR_P:
 		    {		// letter 'P' edit parents
-				document.getElementById("Parents").onclick();
+				document.getElementById("Parents").click();
 				return false;	// suppress default action
 		    }		// letter 'P'
 
 		    case LTR_R:
 		    {		// letter 'R' research notes
-				document.getElementById("Detail7").onclick();
+				document.getElementById("Detail7").click();
 				return false;	// suppress default action
 		    }		// letter 'R'
 
 		    case LTR_S:
 		    {		// letter 'S' search tables
-				document.getElementById("Search").onclick();
+				document.getElementById("Search").click();
 				return false;	// suppress default action
 		    }		// letter 'S'
 
@@ -4447,18 +4488,18 @@ function eiKeyDown(e)
 
 		    case LTR_V:
 		    {		// letter 'V' vital statistics search tables
-				document.getElementById("bmdSearch").onclick();
+				document.getElementById("bmdSearch").click();
 				return false;	// suppress default action
 		    }		// letter 'V'
 
 		    case LTR_Y:
 		    {		// letter 'Y' ancestry.ca search
-				document.getElementById("ancestrySearch").onclick();
+				document.getElementById("ancestrySearch").click();
 				return false;	// suppress default action
 		    }		// letter 'Y'
 
 		}	    // switch on key code
-    }		// alt key shortcuts
+    }		    // alt key shortcuts
 
     return true;	// do default action
 }		// function eiKeyDown

@@ -380,6 +380,7 @@ use \Iterator;
  *                      the names of the partners deprecated            *
  *                      dump did not return contents of dump            *
  *		2019/04/15      replace is_a with instanceof                    *
+ *		2019/05/20      replace exceptions in method set to warnings    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -606,8 +607,8 @@ class Family extends RecordPic
      *	function Family::__construct									*
      *																	*
      *  Create a new instance of Family.  If unable to, usually			*
-     *	as a result of a bad parameter value, it throws an exception to	*
-     *	report the problem.												*
+     *	as a result of a bad parameter value, it updates $this->msg     *
+     *	report the problem and prevent the record from being saved.		*
      *																	*
      *  Input:															*
      *	    $parms	    o		a database record presented as an		*
@@ -2461,6 +2462,8 @@ catch(Exception $e)
      ********************************************************************/
     function set($field, $value)
     {
+        global  $warn;
+
 		$fieldLc	= strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
@@ -2494,8 +2497,11 @@ catch(Exception $e)
 						return parent::set($field, $value);
 				}
 				else
-				    throw new Exception("Family::set: " . 
-								"invalid value '$value' for field '$field'");
+                {
+				    $warn   .= "<p>Family::set: " . 
+                        "invalid value '$value' for field '$field'</p>\n";
+                    return $this->row[$fieldLc];
+                }
 		    }		// value is IDLR
 
 		    case 'idar':
@@ -2503,8 +2509,11 @@ catch(Exception $e)
 				if (is_int($value) || ctype_digit($value))
 				    return parent::set($field, $value);
 				else 
-				    throw new Exception("Family::set: " . 
-								"invalid value '$value' for field '$field'");
+                {
+				    $warn   .= "<p>Family::set: " . 
+                        "invalid value '$value' for field '$field'</p>\n";
+                    return $this->row[$fieldLc];
+                }
 		    }		// value is IDAR
 
 		    case 'husbprefmar':
@@ -2531,9 +2540,12 @@ catch(Exception $e)
 				{
 				    return parent::set($field, $value);
 				}
-				else
-				    throw new Exception("Family::set: " . 
-								"invalid value '$value' for field '$field'");
+                else
+                {
+				    $warn   .= "<p>Family::set: " . 
+                        "invalid value '$value' for field '$field'</p>\n";
+                    return $this->row[$fieldLc];
+                }
 		    }		// value is no (0) or yes (1)
 
 		    case 'husbsurname':
@@ -2542,9 +2554,11 @@ catch(Exception $e)
 		    case 'wifesurname':
 		    case 'wifegivenname':
 		    case 'wifebirthsd':
-		    {		// fields maintained through method setName
-				throw new Exception("Family::set: " . 
-								    "forbidden for field '$field'");
+            {		// fields maintained through method setName
+                $oldvalue           = $this->row[$fieldLc];
+                if ($this->row['idmr'] == 0)
+                    $this->row[$fieldLc]    = $value;
+                return $oldvalue;
 		    }		// fields maintained through method setName
 
 		    default:
@@ -2846,22 +2860,18 @@ catch(Exception $e)
 				$stmt		= $connection->prepare($query);
 				$queryText	= debugPrepQuery($query, $rParms);
 				if ($stmt->execute($rParms))
-				{		        // success
-				    if ($xml)
-				       print "<$tagname>$query</$tagname>\n";
-				    else
-				    if ($debug)
-				       $warn		.= "<p>Family::save: " . __LINE__ .
-									       " $queryText</p>\n";
+                {		        // success
 				    $this->row		= $stmt->fetch(PDO::FETCH_ASSOC);
 				    $idmr		= $this->row['idmr'];
+				    if ($xml)
+				       print "<$tagname idmr=\"$idmr\">$queryText</$tagname>\n";
+
+				    if ($debug)
+				       $warn		.= "<p>Family::save: " . __LINE__ .
+								       " idmr=$idmr query='$queryText'</p>\n";
 
 				    // log the update
-				    logSqlUpdate($insert,
-								 $sqlParms,
-								 $idmr,
-								 '',
-								 json_encode($this->row));
+				    $this->log($insert, $sqlParms);
 
 				    // ensure any children added while the instance was
 				    // incomplete have the correct IDMR

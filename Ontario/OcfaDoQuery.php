@@ -102,7 +102,7 @@ foreach($_GET as $key => $value)
     			else
     			if (array_key_exists("SurnameSoundex", $_GET))
     			{		// match soundex
-    			    $where	        .= "{$and}Soundex=LEFT(SOUNDEX(?,4))";
+    			    $where	        .= "{$and}Soundex=LEFT(SOUNDEX(?),4)";
                     $sqlParms[]     = $value;
     			}		// match soundex
     			else

@@ -39,6 +39,7 @@
  *		2017/09/19		support lang=fr									*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -844,7 +845,7 @@ function qdKeyDown(e)
 
 		    case 67:
 		    {		// letter 'C'
-				form.Coverage.onclick();
+				form.Coverage.click();
 				break;
 		    }		// letter 'C'
 

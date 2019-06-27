@@ -60,8 +60,9 @@ use \Exception;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/02/08		translate external table names to internal		*
  *						names in all commands							*
+ *		2019/06/15      support subqueries in SELECT                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
     require_once __NAMESPACE__ . '/Address.inc';
     require_once __NAMESPACE__ . '/Child.inc';
@@ -1515,12 +1516,10 @@ if (count($_GET) > 0)
 }		        // parameters passed by method=post
 
 // parse patterns for SQL commands
-$cmdPattern		= '/^\s*(DELETE|UPDATE|SELECT|INSERT|SHOW|ALTER)\s/i';
-$deletePattern	= '/DELETE\s+(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
-$insertPattern	= '/INSERT\s+INTO\s+(\w+)\s+(.*)$/i';
-$selectPattern	= '/SELECT\s+(.*?) FROM\s+(\w+)(.*)$/i';
-$updatePattern	= '/UPDATE\s+(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
-$insertCmd		= '/^\s*INSERT\s+(.*)$/i';
+$cmdPattern		= '/^(\w+)\s+(.*)$$/i';
+$deletePattern	= '/^(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
+$insertPattern	= '/^INTO\s+(\w+)\s+(.*)$/i';
+$updatePattern	= '/^(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
 
 // results of parse
 $command		= null;
@@ -1553,12 +1552,14 @@ foreach($tableRes as $row)
 
 if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
 {			// no errors and work to do
-    $getCount		= true;
-    $matches	= array();
-    $result		= preg_match($cmdPattern, $sqlCommand, $matches);
+    $getCount		    = true;
+    $matches	        = array();
+    $sqlCommand         = trim($sqlCommand);
+    $result		        = preg_match($cmdPattern, $sqlCommand, $matches);
     if ($result == 1)
     {		// SQL command recognized
-        $command	= strtoupper($matches[1]);
+        $command	    = strtoupper($matches[1]);
+        $therest        = trim($matches[2]);
 
         switch($command)
         {		// check syntax of command
@@ -1569,8 +1570,8 @@ if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
                     $msg	.=
                             'You are not authorized to use this feature. ';
 
-                $result	= preg_match($deletePattern,
-                                         $sqlCommand,
+                $result	    = preg_match($deletePattern,
+                                         $therest,
                                          $matches);
                 if ($result == 1)
                 {
@@ -1613,8 +1614,8 @@ if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
                     $msg	.=
                             'You are not authorized to use this feature. ';
 
-                $result	= preg_match($insertPattern,
-                                         $sqlCommand,
+                $result	    = preg_match($insertPattern,
+                                         $therest,
                                          $matches);
                 if ($result == 1)
                 {
@@ -1636,18 +1637,70 @@ if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
 
             case 'SELECT':
             {
-                $result	= preg_match($selectPattern,
-                                         $sqlCommand,
-                                         $matches);
+                $operands           = '';
+                $parms              = explode(',', $therest);
+                $therest            = '';
+                $comma              = '';
+                $accum              = '';
+                $afterexpr          = false;
+                foreach ($parms as $parm)
+                {                   // loop through comma separated list
+                    if ($afterexpr)
+                    {               // reassemble the remainder of the command
+                        $therest    .= $comma . $parm;
+                        continue;
+                    }               // reassemble the remainder of the command
+
+                    $accum                  = trim($accum);
+                    if (strlen($accum) > 0)
+                        $accum              = "$accum,$parm";
+                    else
+                        $accum              = $parm;
+                    $numlbraks              = substr_count($accum, '(');
+                    $numrbraks              = substr_count($accum, ')');
+                    if ($numlbraks == $numrbraks)
+                    {               // matching parentheses in expression
+                        if (substr($accum, 0, 1) == '(')
+                        {           // subquery
+                            $lpos           = strrpos($accum, ')');
+                            $after          = trim(substr($accum, $lpos + 1));
+                            $accum          = substr($accum, 0, $lpos + 1);
+                            $operands       .= $comma . $accum;
+                            $accum          = $after;
+                            $comma          = ',';
+                        }           // subquery
+                        else
+                        {
+                            $frompos    = strpos(strtoupper($accum),
+                                                 'FROM ');
+	                        if ($frompos !== false)
+                            {           // end of list of select expressions
+                                $operands   .= ' ' . 
+                                               substr($accum, 0, $frompos);
+                                $therest    = substr($accum, $frompos);
+	                            $afterexpr  = true;
+	                        }           // end of list of select expressions
+	                        else
+	                        {           // not end of list of select expressions
+	                            $operands   .= $comma . $accum;
+	                        }           // not end of list of select expressions
+	                        $comma          = ',';
+                            $accum          = '';
+                        }
+                    }               // matching parentheses in expression
+                }                   // loop through comma separated list
+
+                $result	        = preg_match('/^FROM\s+(\w+)(.*)$/i',
+                                             $therest,
+                                             $matches);
                 if ($result == 1)
                 {
-                    $operands	= $matches[1];
-                    $table		= $matches[2];
-                    $join		= $matches[3];
-                    $info		= Record::getInformation($table);
+                    $table		    = $matches[1];
+                    $join		    = $matches[2];  
+                    $info		    = Record::getInformation($table);
                     if ($info)
                     {
-                        $table	= $info['table'];
+                        $table	    = $info['table'];
                         $sqlCommand	= "SELECT $operands FROM $table $join";
                     }
                     if ($debug)
@@ -1978,8 +2031,8 @@ if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
                     $msg	.=
                             'You are not authorized to use this feature. ';
 
-                $result	= preg_match($updatePattern,
-                                         $sqlCommand,
+                $result	    = preg_match($updatePattern,
+                                         $therest,
                                          $matches);
                 if ($result == 1)
                 {
@@ -2006,8 +2059,8 @@ if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
                     $msg	.=
                             'You are not authorized to use this feature. ';
 
-                $result	= preg_match('/^SHOW\s+CREATE\s+TABLE\s+(\w+)(.*)/i',
-                                         trim($sqlCommand),
+                $result	    = preg_match('/^CREATE\s+TABLE\s+(\w+)(.*)/i',
+                                         $therest,
                                          $matches);
                 if ($result == 1)
                 {
@@ -2034,8 +2087,8 @@ if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
                     $msg	.=
                             'You are not authorized to use this feature. ';
 
-                $result	= preg_match('/^ALTER\s+TABLE\s+(\w+)(.*)/i',
-                                         trim($sqlCommand),
+                $result	    = preg_match('/^TABLE\s+(\w+)(.*)/i',
+                                         $therest,
                                          $matches);
 
                 if ($result == 1)
@@ -2056,11 +2109,17 @@ if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 break;
             }
 
+            default:
+            {
+                $msg	    .= "'$command' is not a valid command verb. ";
+                $execute	= false;
+                break;
+            }
+
         }		// check syntax of command
     }		// SQL command recognized
     else
     {
-        $sqlCommand		= trim($sqlCommand);
         if (preg_match("/^([^\s]+)/", $sqlCommand, $matches) == 1)
             $command	= strtoupper($matches[1]);
         else

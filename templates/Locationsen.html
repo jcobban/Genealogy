@@ -6,6 +6,7 @@
  *																		*
  *  History:															*
  *		2018/11/06      created                                         *
+ *      2019/06/15      use ordinal numbering of records                *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
@@ -70,7 +71,7 @@
 	    <div class="right" id="topNext"> 
 	        <a href="Locations.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG">---&gt;</a>
 	    </div>
-		  rows $OFFSET to $LAST of $COUNT 
+		  rows $FIRST to $LAST of $COUNT 
         <div style="clear: both;"></div>
 	  </div> <!-- class="center" -->
 	  <!--- Put out the response as a table -->
@@ -121,7 +122,7 @@
 	</div>	<!-- end of id="body" -->
 	<div class="balloon" id="Helppattern">
 	<p>
-		This is a regular expression, as supported by MySQL, which is used to limit
+		This is a regular expression, as supported by MySQL, which is used Sto limit
 		the locations to be displayed. See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer&quote;s regex page</a>.
 	<ul>
 	<li>If the pattern contains no special 

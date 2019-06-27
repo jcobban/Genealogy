@@ -23,9 +23,12 @@
         $TRACE
         $MSG
       <p>
-      Genealogisch und Familiengeschichte Forschungs Bedienungs besondere verwenden
-      die Ressourcen der Bibliothek und die Archive von Canada und 
-      die Archive von Ontario.  
+      Genealogisch und Familiengeschichte Forschungs Bedienungs besondere
+      verwenden die Ressourcen der 
+	  <a target="_blank" href="http://www.bac-lac.gc.ca/Pages/default.aspx">
+			Bibliothek und die Archive von Canada</a> und die
+	    <a target="_blank" href="http://www.archives.gov.on.ca/">
+			Archive von Ontario</a>.
       </p>
       <h3>Familienstammbaum:</h3>
       <p class="label">
@@ -45,6 +48,11 @@
       </p>
       <h3>Geographische:</h3>
       <p class="label">
+          <a href="/Canada/CountriesEdit.php?lang=de">
+            Liste der unterstützten Länder
+        </a>
+      </p>
+      <p class="label">
           <a href="/genCountry.php?cc=CA&amp;lang=de">
           Canada
           </a>
@@ -59,14 +67,15 @@
             Vereinigter Königreich Großbritannien
         </a>
       </p>
+      <h3>Andere nützliche Websites:</h3>
+      <p class="label">
+    	<a href="https://www.familysearch.org/">
+    	    FamilySearch.org
+          </a>
+      </p>
       <p class="label">
         <a href="/displayPage.php?template=genCommercial&amp;lang=de">
             Handelsdatenbanken
-        </a>
-      </p>
-      <p class="label">
-          <a href="/Canada/CountriesEdit.php?lang=de">
-            Liste der unterstützten Länder
         </a>
       </p>
       <h3>
@@ -76,13 +85,13 @@
       </h3>
       <h3>Genealogie Benutzerhandbücher:</h3>
         <p class="label">
-            <a href="/displayPage.php?template=Articles/FileFormatsInGenealogy"
+            <a href="/displayPage.php?template=/Articles/FileFormatsInGenealogy"
           	target="_blank">
           Digitale Darstellung von genealogischen Informationen
           </a>:
         </p>
         <p class="label">
-            <a href="/displayPage.php?template=Articles/ReadingHandwriting"
+            <a href="/displayPage.php?template=/Articles/ReadingHandwriting"
           	target="_blank">
               <i>
                 Handschrift lesen
@@ -90,19 +99,19 @@
             </a>:
         </p>
         <p class="label">
-            <a href="/displayPage.php?template=Articles/FrenchOccupations"
+            <a href="/displayPage.php?template=/Articles/FrenchOccupations"
           	target="_blank">
                 Französische Berufe
           </a>:
         </p>
         <p class="label">
-            <a href="/displayPage.php?template=Articles/MicrofilmGimp"
+            <a href="/displayPage.php?template=/Articles/MicrofilmGimp"
           	target="_blank">
                 Mikrofilm und digitale Bildgebung
           </a>:
         </p>
         <p class="label">
-            <a href="/displayPage.php?template=Articles/SpreadsheetsInGenealogy"
+            <a href="/displayPage.php?template=/Articles/SpreadsheetsInGenealogy"
           	target="_blank">
               Verwenden von Tabellen in der Genealogie
             </a>:
@@ -114,38 +123,48 @@
           </a>:
         </p>
         <p class="label">
-            <a href="/displayPage.php?template=Articles/Newsletter2013_10"
+            <a href="/displayPage.php?template=/Articles/Newsletter2013_10"
           	target="_blank">
               Benutzerhandbuch:
             Eigenschaften der Seite für eine Person im Stammbaum
             </a>:
         </p>
         <p class="label">
-            <a href="/displayPage.php?template=Articles/IntroductionToUpdating"
+            <a href="/displayPage.php?template=/Articles/IntroductionToUpdating"
           	target="_blank">
               Benutzerhandbuch:
               Erste Schritte beim Aktualisieren des Familienstammbaums
             </a>:
         </p>
         <p class="label">
-          <a href="/displayPage.php?template=Articles/Locations"
+          <a href="/displayPage.php?template=/Articles/Locations"
         	target="_blank">
               Benutzerhandbuch:
             Standorte verstehen
           </a>:
         </p>
-      <h3>Monatliche Rundschreiben:</h3>
-        <p class="label" id="newsletter$mm$year">
+        <h3>Monatliche Rundschreiben:</h3>
+          <p class="label" id="newsletter$mm$year">
             <a href="/Newsletters/$filename" target="_blank">
           	$month $year Rundschreiben
             </a>
-        </p>
-      <h3>Monatliche technische Statusberichte:</h3>
-        <p class="label"  id="report$mm$year">
-          <a href="/MonthlyUpdates/$filename" target="_blank">
-          	$month $year
-          	Aktualisierungen der Website-Funktionalität
-          </a>
+          </p>
+          <p class="label" id="morenewsletters">
+    	    <a href="/Newsletters/index.php?lang=$LANG">
+    		    ...
+    	    </a>
+          </p>
+        <h3>Monatliche technische Statusberichte:</h3>
+          <p class="label"  id="report$mm$year">
+            <a href="/MonthlyUpdates/$filename" target="_blank">
+          	    $month $year
+          	    Aktualisierungen der Website-Funktionalität
+            </a>
+          </p>
+        <p class="label" id="moreupdates">
+    	  <a href="/MonthlyUpdates/index.php?lang=$LANG">
+    	    ...
+    	  </a>
         </p>
     </div> <!-- class=body -->
     <script src="/jscripts/js20/http.js" type="text/javascript">

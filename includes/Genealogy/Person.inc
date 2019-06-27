@@ -1863,7 +1863,9 @@ class Person extends RecordPic
     {
         global $debug;
         global $warn;
-        $fieldLc	= strtolower($field);
+
+        $idir           = $this->row['idir'];
+        $fieldLc	    = strtolower($field);
         if (array_key_exists($fieldLc, self::$translate))
             $fieldLc	= self::$translate[$fieldLc];
         switch($fieldLc)
@@ -1889,7 +1891,9 @@ class Person extends RecordPic
 
             case 'surname':
             {
-                return $this->setSurname($value);
+                print '<dbg line="' . __LINE__ . "\">Person(idir=$idir)->setSurname('$value')</dbg>\n";
+                $oldsurname   = $this->setSurname($value);
+                print '<dbg line="' . __LINE__ . "\">Person(idir=$idir)->getName=" . $this->getName() . "</dbg>\n";
             }
 
 			case 'soundslike':
@@ -1902,7 +1906,9 @@ class Person extends RecordPic
                 // $this->priName is set if initialization is complete
                 if ($this->priName)
                     $this->priName[$fieldLc]		= $value;
+                print '<dbg line="' . __LINE__ . "\">Person(idir=$idir)->set('$fieldLc', '$value')</dbg>\n";
                 return parent::set($fieldLc, $value);
+                print '<dbg line="' . __LINE__ . "\">Person(idir=$idir)->priName->get('$fieldLc')='" . $this->priName[$fieldLc] . "')</dbg>\n";
             }                   // fields moved to Name
 
             case 'birthd':
@@ -4545,14 +4551,14 @@ class Person extends RecordPic
                 $queryText	        = debugPrepQuery($query, $refParms);
                 if ($stmt->execute($refParms))
                 {		        // success
+                    $this->row	    = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $idir	        = $this->row['idir'];
                     if ($xml)
-                        print "<$tagname>$queryText</$tagname>\n";
+                        print "<$tagname idir=\"$idir\">$queryText</$tagname>\n";
                     if ($debug)
                         $warn	.= "<p>Person::save: " . __LINE__ .
                                    " query='$queryText'</p>\n";
 
-                    $this->row	    = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $idir	        = $this->row['idir'];
                 }		        // success
                 else
                 {		        // error performing query

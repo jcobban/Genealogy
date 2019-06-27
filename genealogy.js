@@ -42,6 +42,7 @@ if (window.attachEvent)
 function onLoad(event)
 {
     var	opener		= window.opener;
+    try {
     if (opener)
     {			// invoked from another window
 		if (opener.location.host == window.location.host)
@@ -51,6 +52,8 @@ function onLoad(event)
 				opener.location.reload();
 		}		// refresh
     }			// invoked from another window
+    }
+    catch(error) {}
 
     // scroll main portion of page if it does not fit without scrolling
     var headSection         = document.getElementById('headSection');

@@ -45,6 +45,7 @@
  *		2016/12/29		adjust search name if displayed name changes	*
  *		2017/09/09		renamed to Location.js							*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -757,7 +758,7 @@ function getMap()
     if (map === null)
     {			// user forgot to do show map first
 		var	form	= this.form;
-		form.showMap.onclick();
+		form.showMap.click();
 		return;
     }			// user forgot to do show map first
 

@@ -116,6 +116,8 @@
  *		2019/03/02      add .left, .center, .right                      *
  *                      remove div.right450                             *
  *      2019/04/18      brighten up body background                     *
+ *      2019/06/25      change div.menu, add a.menuitem, hr.menubar     *
+ *                      to make menu look more like an application      *
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
@@ -161,14 +163,16 @@
     *********************************************************************/
     .left {
                 float:              left;
+                text-align:         left;
                 padding:            0px 4px 0px 4px;
                 }
     .center {
-                float:              center;
+                text-align:         center;
                 padding:            0px 4px 0px 4px;
                 }
     .right {
                 float:              right;
+                text-align:         right;
                 padding:            0px 4px 0px 4px;
                 }
 
@@ -208,8 +212,8 @@
     iframe.advert {     /* container for advertisements */
                 border:             none;
                 overflow:           hidden; 
-                width:              500px; 
-                height:             85px;
+                width:              728px; 
+                height:             90px;
                 display:            inline;
                 float:              right;
                 background-color:   white;
@@ -317,16 +321,16 @@
     *********************************************************************/
     div.menu {
                 display:            none;
-                background-color:   #FFFFFF;
+                background-color:   #E0E0E0;
                 margin:             0px;
                 padding-top:        4px;
                 padding-left:       4px;
                 padding-bottom:     4px;
                 padding-right:      8px;
-                border-top:         thin solid #A05000;
-                border-left:        thin solid #A05000;
-                border-bottom:      thin solid #402000;
-                border-right:       thin solid #402000;
+                border-top:         3px solid #FFFFFF;
+                border-left:        3px solid #FFFFFF;
+                border-bottom:      3px solid #C0C0C0;
+                border-right:       3px solid #C0C0C0;
                 }
 
    /*********************************************************************
@@ -378,7 +382,7 @@
                 font-family:        sans-serif;
                 font-size:          180%;
                 font-weight:        bold;
-                width:              500px;
+                width:              728px;
                 height:             auto;
                 float:              right;
                 border:             5px solid red
@@ -662,6 +666,20 @@
    /*********************************************************************
     *   styled <a> links                                                *
     *********************************************************************/
+    a.menuitem { 
+                font-family:        sans-serif;
+                font-weight:        bold;
+                background-color:   #E0E0E0;
+                color:              #404040;
+                text-decoration:    none;
+                }
+    a.menuitem:focus { 
+                font-family:        sans-serif;
+                font-weight:        bold;
+                background-color:   #F8F8F8;
+                color:              #000000;
+                text-decoration:    none;
+                }
     a.button:link    { 
                 font-family:        sans-serif;
                 font-weight:        bold;
@@ -802,7 +820,7 @@
     *   hold the advertisement.                                         *
     *********************************************************************/
     span.advert {
-                width:              500px;
+                width:              728px;
                 height:             auto;
                 }
 
@@ -1196,6 +1214,13 @@
                 background-color:   #902525;
                 width:              50%;
                 margin-top:		    10mm;
+                }	
+    hr.menubar {
+                height:             0px;
+                border-top:         2px solid #C0C0C0;
+                border-bottom:      2px solid #FFFFFF;
+                width:              100%;
+                margin-top:		    0px;
                 }	
     hr.footnotes {
                 height:             2px;

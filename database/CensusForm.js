@@ -40,7 +40,7 @@
  *						over a field for more than a seconscd.			*
  *		2011/10/19		add mouseover for forward and backward links	*
  *		2011/10/20		add warning message for non-numeric number of	*
- *						employees										*
+ *						function employees								*
  *		2011/11/09		loosen check for explicit blank agsce and birth	*
  *		2011/12/15		allow age in days or weeks or ?					*
  *		2011/12/30		handle blank birth year10 text field better		*
@@ -131,7 +131,7 @@
  *		2013/11/26		alert if gotIdir cannot find matching button	*
  *		2013/12/18		allow empty birth year field					*
  *		2014/03/24		only implement table key handling on input		*
- *						fields											*
+ *						function fields									*
  *						always invoke addRow function as a method of	*
  *						the addRow button								*
  *		2014/04/14		set class of image input field					*
@@ -141,7 +141,7 @@
  *						when set as a result of changing ResType		*
  *		2014/09/10		add 'Clear' button when IDIR resolved			*
  *		2014/10/03		only add IDIR Clear button if it is not already	*
- *						present											*
+ *						function present									*
  *		2014/10/07		move IDIR dialog closer to Find button			*
  *		2014/10/11		getElementById returns null instead of undefin..*
  *		2014/10/15		change implementation of reset to defaults		*
@@ -196,6 +196,8 @@
  *		2018/04/19		correct splitting field names into col and row	*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/19      call element.click to trigger button click      *
+ *		2019/05/24      prevent non-numeric input into numeric fields   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -205,7 +207,7 @@ var	upper	= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 var	lower	= "abcdefghijklmnopqrstuvwxyz";
 
 /************************************************************************
- *  CenPageSize															*
+ *  CenPageSize table													*
  *																		*
  *  Table for normal number of rows in full census page					*
  ************************************************************************/
@@ -223,7 +225,7 @@ var	CenPageSize = {
 				};
 
 /************************************************************************
- *  ForeignBplaces														*
+ *  ForeignBplaces table												*
  *																		*
  *  A list of common foreign birthplaces								*
  *  This table is used to determine if a birthplace is outside Canada	*
@@ -301,7 +303,7 @@ var	ForeignBplaces = {
 				'West Indies'		: 'West Indies'};
 
 /************************************************************************
- *  EmpWhereAbbrs														*
+ *  EmpWhereAbbrs table     											*
  *																		*
  *  A table for expanding abbreviations for employment locations		*
  ************************************************************************/
@@ -321,7 +323,7 @@ var	EmpWhereAbbrs = {
 				};
 
 /************************************************************************
- *  colNames2Blank														*
+ *  colNames2Blank table												*
  *																		*
  *  A list of column names that are cleared when the surname is changed *
  *  to '[Blank]'.														*
@@ -336,7 +338,7 @@ var colNames2Blank  	= ["Family",
 						   "Religion"];
 
 /************************************************************************
- *  bInYearMonth														*
+ *  bInYearMonth table      											*
  *																		*
  *  A list of month names that correspond to an age in months from		*
  *  the typical enumeration month of April.								*
@@ -356,7 +358,7 @@ var	bInYearMonth	= [ 'Apr',
 						'Apr'];
 
 /************************************************************************
- *  RelationGender														*
+ *  RelationGender table    											*
  *																		*
  *  Table for determining the expected sex value for a relationship.	*
  ************************************************************************/
@@ -401,7 +403,7 @@ var	numCanRead	= 0;
 var	numCanReadFlds	= 0;
 
 /************************************************************************
- *  onLoad																*
+ *  function onLoad														*
  *																		*
  *  Perform initialization after the web page has been loaded.			*
  *																		*
@@ -472,10 +474,10 @@ function onLoad()
 		    th.oncontextmenu	= columnWiden;
 		}			// loop through cells of header row
     }
-}		// onLoad
+}		// function onLoad
 
 /************************************************************************
- *  onWindowResize														*
+ *  function onWindowResize												*
  *																		*
  *  This method is called when the browser window size is changed		*
  *  If the window is split between the main display and a second		*
@@ -488,10 +490,10 @@ function onWindowResize()
 {
     if (iframe)
 		openFrame(iframe.name, null, "right");
-}		// onWindowResize
+}		// function onWindowResize
 
 /************************************************************************
- *  getOffsetLeft														*
+ *  function getOffsetLeft												*
  *																		*
  *  Get the offsetLeft of an HTML element relative to the page.			*
  *																		*
@@ -507,10 +509,10 @@ function getOffsetLeft(elt)
 		elt	= elt.offsetParent;
     }		// increment up to top element
     return left;
-}	// getOffsetLeft
+}	// function getOffsetLeft
 
 /************************************************************************
- *  getOffsetTop														*
+ *  function getOffsetTop												*
  *																		*
  *  Get the offsetTop of an HTML element relative to the page.			*
  *																		*
@@ -527,10 +529,10 @@ function getOffsetTop(elt)
 		elt	= elt.offsetParent;
     }		// increment up to top element
     return y;
-}	// getOffsetTop
+}	// function getOffsetTop
 
 /************************************************************************
- *  setClassByValue														*
+ *  function setClassByValue												*
  *																		*
  *  Set the class name for the indicated cell of the spreadsheet		*
  *  depending upon its value.  If the value is equal to the value of	*
@@ -565,10 +567,10 @@ function setClassByValue(colName,
 		    }
 		}	// change the presentation of this field
     }	// not first row of table
-}	// setClassByValue
+}	// function setClassByValue
 
 /************************************************************************
- *  changeReplDown														*
+ *  function changeReplDown												*
  *																		*
  *  Take action when the user changes a field whose value is			*
  *  replicated into subsequent fields in the same column whose			*
@@ -638,10 +640,10 @@ function changeReplDown()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeReplDown
+}		// function changeReplDown
 
 /************************************************************************
- *  changeSex															*
+ *  function changeSex													*
  *																		*
  *  Take action when the user changes the Sex field.					*
  *  This is the onchange member function of the element.				*
@@ -668,10 +670,10 @@ function changeSex()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeSex
+}		// function changeSex
 
 /************************************************************************
- *  changeCanRead														*
+ *  function changeCanRead												*
  *																		*
  *  Take action when the user changes the CanRead field.				*
  *  This is the onchange member function of the element.				*
@@ -693,10 +695,10 @@ function changeCanRead()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeCanRead
+}		// function changeCanRead
 
 /************************************************************************
- *  changeCantRead														*
+ *  function changeCantRead												*
  *																		*
  *  Take action when the user changes the CantRead field.				*
  *  This is the onchange member function of the element.				*
@@ -725,10 +727,10 @@ function changeCantRead()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeCantRead
+}		// function changeCantRead
 
 /************************************************************************
- *  changeAddress														*
+ *  function changeAddress												*
  *																		*
  *  Take action when the user changes the Address or Location field.	*
  *  This is the onchange member function of the element.				*
@@ -760,10 +762,10 @@ function changeAddress()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeAddress
+}		// function changeAddress
 
 /************************************************************************
- *  changeResType														*
+ *  function changeResType												*
  *																		*
  *  Take action when the user changes the residence type field.			*
  *  This is the onchange member function of the element.				*
@@ -811,10 +813,10 @@ function changeResType()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeResType
+}		// function changeResType
 
 /************************************************************************
- *  changeOwnerTenant														*
+ *  function changeOwnerTenant												*
  *																		*
  *  Take action when the user changes the residence type field.				*
  *  This is the onchange member function of the element.				*
@@ -869,10 +871,10 @@ function changeOwnerTenant()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeOwnerTenant
+}		// function changeOwnerTenant
 
 /************************************************************************
- *  changeSurname														*
+ *  function changeSurname												*
  *																		*
  *  Take action when the user changes a field whose value is				*
  *  replicated into subsequent fields in the same column whose				*
@@ -912,10 +914,10 @@ function changeSurname()
     replDown(this);
 
     this.checkfunc();
-}		// changeSurname
+}		// function changeSurname
 
 /************************************************************************
- *  changeOccupation														*
+ *  function changeOccupation												*
  *																		*
  *  Take action when the user changes the Occupation field.				*
  *  This is the onchange member function of the element.				*
@@ -959,10 +961,10 @@ function changeOccupation()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeOccupation
+}		// function changeOccupation
 
 /************************************************************************
- *  changeEmpType														*
+ *  function changeEmpType												*
  *																		*
  *  Take action when the user changes the EmpType field.				*
  *  This is the onchange member function of the element.				*
@@ -984,10 +986,10 @@ function changeEmpType()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeEmpType
+}		// function changeEmpType
 
 /************************************************************************
- *  changeGenderFlag														*
+ *  function changeGenderFlag												*
  *																		*
  *  Take action when the user changes the value of a flag column		*
  *  that displays a gender indicator.										*
@@ -1012,10 +1014,10 @@ function changeGenderFlag()
     // validate value
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeGenderFlag
+}		// function changeGenderFlag
 
 /************************************************************************
- *  changeSchoolMons														*
+ *  function changeSchoolMons												*
  *																		*
  *  Take action when the user changes the SchoolMons field.				*
  *  This is the onchange member function of the element.				*
@@ -1040,10 +1042,10 @@ function changeSchoolMons()
     // validate number of months
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeSchoolMons
+}		// function changeSchoolMons
 
 /************************************************************************
- *  changeFlag																*
+ *  function changeFlag														*
  *																		*
  *  Take action when the user changes a field that is a yes/no flag.		*
  *																		*
@@ -1066,10 +1068,10 @@ function changeFlag()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeFlag
+}		// function changeFlag
 
 /************************************************************************
- *  changeFlagRace														*
+ *  function changeFlagRace												*
  *																		*
  *  Take action when the user changes a field that is a yes/no flag		*
  *  or a race indicator.
@@ -1090,10 +1092,10 @@ function changeFlagRace()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeFlagRace
+}		// function changeFlagRace
 
 /************************************************************************
- *  replDown																*
+ *  function replDown														*
  *																		*
  *  Replicate the value of the current element into 						*
  *  subsequent elements in the current column whose						*
@@ -1174,10 +1176,10 @@ function replDown(curr)
 		    break;	// stop replicating value on first explicit cell
     }		// loop to end of page
 
-}		// changeReplDown
+}		// function changeReplDown
 
 /************************************************************************
- *  changeFBPlace														*
+ *  function changeFBPlace												*
  *																		*
  *  Take action when the user changes the value of the						*
  *  Father's birth place field in the 1891 census.  If the Mother's		*
@@ -1206,10 +1208,10 @@ function changeFBPlace()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeFBPlace
+}		// function changeFBPlace
 
 /************************************************************************
- *  changeBPlace														*
+ *  function changeBPlace												*
  *																		*
  *  Take action when the user changes the value of the						*
  *  birth place.														*
@@ -1276,10 +1278,10 @@ function changeBPlace()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeMBPlace
+}		// function changeMBPlace
 
 /************************************************************************
- *  changeMBPlace														*
+ *  function changeMBPlace												*
  *																		*
  *  Take action when the user changes the value of the						*
  *  Mother's birth place.												*
@@ -1306,10 +1308,10 @@ function changeMBPlace()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeMBPlace
+}		// function changeMBPlace
 
 /************************************************************************
- *  changeEmployee														*
+ *  function changeEmployee												*
  *																		*
  *  Take action when the user changes the value of the						*
  *  Employee field.														*
@@ -1334,10 +1336,10 @@ function changeEmployee()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeEmployee
+}		// function changeEmployee
 
 /************************************************************************
- *  changeEmployer														*
+ *  function changeEmployer												*
  *																		*
  *  Take action when the user changes the value of the						*
  *  OwnAcct field.														*
@@ -1372,10 +1374,10 @@ function changeEmployer()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeEmployer
+}		// function changeEmployer
 
 /************************************************************************
- *  changeSelfEmployed														*
+ *  function changeSelfEmployed												*
  *																		*
  *  Take action when the user changes the value of the						*
  *  OwnAcct field.														*
@@ -1401,10 +1403,10 @@ function changeSelfEmployed()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeSelfEmployed
+}		// function changeSelfEmployed
 
 /************************************************************************
- *  changeImmYear														*
+ *  function changeImmYear												*
  *																		*
  *  Take action when the user changes the value of the						*
  *  year of immigration.												*
@@ -1438,10 +1440,10 @@ function changeImmYear()
     }		// not a 4 digit number
 
     this.checkfunc();
-}		// changeImmYear
+}		// function changeImmYear
 
 /************************************************************************
- *  changeBYear																*
+ *  function changeBYear														*
  *																		*
  *  Take action when the user changes the value of an						*
  *  explicit birth year field.												*
@@ -1538,10 +1540,10 @@ function changeBYear()
     }
 
     this.checkfunc();
-}		// changeBYear
+}		// function changeBYear
 
 /************************************************************************
- *  changeAge																*
+ *  function changeAge														*
  *																		*
  *  Take action when the user changes the value of an						*
  *  age field.  Expand abbreviations and set default value for				*
@@ -1639,10 +1641,10 @@ function changeAge()
 
     // validate this field to set highlighting
     this.checkfunc();
-}		// changeAge
+}		// function changeAge
 
 /************************************************************************
- *  changeDefault														*
+ *  function changeDefault												*
  *																		*
  *  Take action when the user changes a field whose value				*
  *  may be a default.  If it is, change the presentation of				*
@@ -1670,10 +1672,10 @@ function changeDefault()
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
-}		// changeDefault
+}		// function changeDefault
 
 /************************************************************************
- *  getRangeObject														*
+ *  function getRangeObject												*
  *																		*
  *  Get an object compatible with the W3C Range interface.				*
  *																		*
@@ -1694,7 +1696,7 @@ function getRangeObject(selectionObject)
 }
 
 /************************************************************************
- *  checkRange																*
+ *  function checkRange														*
  *																		*
  *  On a keystroke check the selected range of the document.				*
  *  Under construction.														*
@@ -1734,10 +1736,10 @@ function checkRange(fNode)
 				"\n\t" + attrs);
     }		// IE
 
-}		// checkRange
+}		// function checkRange
 
 /************************************************************************
- *  checkBYear																*
+ *  function checkBYear														*
  *																		*
  *  Validate the current value of a field containing a birth year.		*
  *  Should be 4 digit numeric year, possibly enclosed in editorial		*
@@ -1779,10 +1781,10 @@ function checkBYear()
 
     // clear or set the error indicator if required by changing class name
     setErrorFlag(elt, rxResult && range <= 1);
-}		// checkBYear
+}		// function checkBYear
 
 /************************************************************************
- *  checkNatYear														*
+ *  function checkNatYear												*
  *																		*
  *  Validate the current value of a year of naturalization field.		*
  *  This may contain a 4 digit numeric year, possibly enclosed in		*
@@ -1798,10 +1800,10 @@ function checkNatYear()
     var	re		= /^(\[?[0-9]{4}\]?|nat?|\[blank\]?|\[Blank\]?|\?|)$/;
     var	year		= elt.value;
     setErrorFlag(elt, re.test(year));
-}		// checkNatYear
+}		// function checkNatYear
 
 /************************************************************************
- *  checkRelation														*
+ *  function checkRelation												*
  *																		*
  *  Validate the value of the relation column against the sex column.		*
  *																		*
@@ -1822,10 +1824,10 @@ function checkRelation()
 		// clear or set the error indicator if required by changing class name
 		setErrorFlag(elt, relationGender == sex);
     }			// relationship is gender specific
-}		// checkRelation
+}		// function checkRelation
 
 /************************************************************************
- *  checkOwnerTenant														*
+ *  function checkOwnerTenant												*
  *																		*
  *  Validate the current value of a field containing a sex.				*
  *																		*
@@ -1839,10 +1841,10 @@ function checkOwnerTenant()
     var	re		= /^[OPRopr?]?$/;
     var	type		= elt.value;
     setErrorFlag(elt, re.test(type));
-}		// checkOwnerTenant
+}		// function checkOwnerTenant
 
 /************************************************************************
- *  checkDecimal														*
+ *  function checkDecimal												*
  *																		*
  *  Validate the current value of a field containing a number				*
  *  with a possible decimal point.										*
@@ -1856,10 +1858,10 @@ function checkDecimal()
     var	re		= /^([0-9]*|[0-9]*\.[0-9]*)$/;
     var	number		= elt.value.trim();
     setErrorFlag(elt, re.test(number) && number > 0);
-}		// checkDecimal
+}		// function checkDecimal
 
 /************************************************************************
- *  addRow																*
+ *  function addRow														*
  *																		*
  *  Add an extra row into the tabular portion of the current form.		*
  *																		*
@@ -1935,7 +1937,7 @@ function addRow(event)
 				}	// loop through children
 		}	// element node
     }		// loop through all children of new row
-}		// addRow
+}		// function addRow
 
 /************************************************************************
  *  function initElement												*
@@ -1945,7 +1947,7 @@ function addRow(event)
  *  Input:																*
  *		element			instance of HtmlInputElement					*
  *		clear			if true set value of non-inherited fields to	*
- *						empty											*
+ *						function empty									*
  ************************************************************************/
 function initElement(element, clear)
 {
@@ -1961,51 +1963,48 @@ function initElement(element, clear)
     // for individual data elements the field name generally
     // consists of a column name plus the line number as the last
     // two characters
-    var colName		= fldName;
-    var	rowNum		= '';
     var result		= /([a-zA-Z_$]+)(\d*)$/.exec(fldName);
-    colName	= result[1];
-    rowNum	= parseInt(result[2]);
-
-    // override default key processing for input fields to provide
-    // spreadsheet emulation
-    if (element.nodeName.toUpperCase() == 'INPUT')
-		element.onkeydown	= tableKeyDown;
+    var colName	    = result[1].toLowerCase();
+    var rowNum	    = result[2];
+    if (rowNum.length > 0)
+        rowNum	    = parseInt(rowNum);
 
     switch(colName)
     {	// column specific initialization
-		case 'imageButton':
+		case 'imagebutton':
 		{
 		    element.onclick	= showImage;
 		    break;
 		}
 
-		case 'correctImage':
+		case 'correctimage':
 		{
 		    element.onclick	= correctImageUrl;
 		    break;
 		}
 
-		case 'treeMatch':
+		case 'treematch':
 		{
 		    element.onclick	= matchCitations;
 		    break;
 		}
 
-		case 'showImportant':
+		case 'showimportant':
 		{
 		    element.onclick	= showImportant;
 		    break;
 		}
 
-		case 'Family':
+		case 'family':
 		{	// family number
 		    element.onchange	= changeReplDown;
+            addEventHandler(element, 'keydown',   numericKeyDown);
 		    setClassByValue(colName,
 						    rowNum,
 						    form.elements);
 		    element.checkfunc	= checkFamily;
-		    element.checkfunc();
+		    element.checkfunc();    // validate current value
+
 		    // focus on the first field in the form
 		    if (rowNum == 1)
 		    {
@@ -2015,13 +2014,13 @@ function initElement(element, clear)
 		    break;
 		}	// family number replicates to subsequent rows
 
-		case 'AddrSect':
-		case 'AddrTwp':
-		case 'AddrRng':
-		case 'AddrMdn':
-		case 'AddrMuni':
-		case 'PostOffice':
-		case 'Township':
+		case 'addrsect':
+		case 'addrtwp':
+		case 'addrrng':
+		case 'addrmdn':
+		case 'addrmuni':
+		case 'postoffice':
+		case 'township':
 		{	// fields that replicate to subsequent rows
 		    element.onchange	= changeReplDown;
 		    setClassByValue(colName,
@@ -2032,7 +2031,7 @@ function initElement(element, clear)
 		    break;
 		}	// fields that replicate to subsequent rows
 
-		case 'Surname':
+		case 'surname':
 		{	// fields that replicate to subsequent rows
 		    element.abbrTbl	    = SurnAbbrs;
 		    element.onchange	= changeSurname;
@@ -2044,7 +2043,7 @@ function initElement(element, clear)
 		    break;
 		}	// fields that replicate to subsequent rows
 
-		case 'GivenNames':
+		case 'givennames':
 		{	// capitalize and expand abbreviations for given names
 		    if (clear)
 				element.value	= "";
@@ -2055,7 +2054,7 @@ function initElement(element, clear)
 		    break;
 		}	// capitalize given names
 
-		case 'Age':
+		case 'age':
 		{	// Age at time of census
 		    if (clear)
 				element.value	= "";
@@ -2066,7 +2065,7 @@ function initElement(element, clear)
 		    break;
 		}	// Age at time of census
 
-		case 'AgeAtDeath':
+		case 'ageatdeath':
 		{	// Age at time of death
 		    if (clear)
 				element.value	= "";
@@ -2077,7 +2076,7 @@ function initElement(element, clear)
 		    break;
 		}	// Age at time of death
 
-		case 'Sex':
+		case 'sex':
 		{	// capitalize flag values
 		    if (clear)
 				element.value	= "?";
@@ -2087,7 +2086,7 @@ function initElement(element, clear)
 		    break;
 		}	// capitalize flag values
 
-		case 'MStat':
+		case 'mstat':
 		{	// capitalize flag values
 		    if (clear)
 				element.value	= "";
@@ -2097,21 +2096,21 @@ function initElement(element, clear)
 		    break;
 		}	// capitalize flag values
 
-		case 'French':
-		case 'Deaf':
-		case 'Blind':
-		case 'Insane':
-		case 'Idiot':
-		case 'Lunatics':	// used in 1851
-		case 'Lunatic':		// used in 1861
-		case 'Idiot':		// used in 1911
-		case 'Unemployed':
-		case 'Member':
-		case 'Absent':
-		case 'SpkEnglish':
-		case 'SpkFrench':
-		case 'CanWrite':
-		case 'CantWrite':
+		case 'french':
+		case 'deaf':
+		case 'blind':
+		case 'insane':
+		case 'idiot':
+		case 'lunatics':	// used in 1851
+		case 'lunatic':		// used in 1861
+		case 'idiot':		// used in 1911
+		case 'unemployed':
+		case 'member':
+		case 'absent':
+		case 'spkenglish':
+		case 'spkfrench':
+		case 'canwrite':
+		case 'cantwrite':
 		{	// capitalize flag values
 		    if (clear)
 				element.value	= "";
@@ -2121,9 +2120,9 @@ function initElement(element, clear)
 		    break;
 		}	// capitalize flag values
 
-		case 'Negro':		// used in 1851
-		case 'Coloured':	// used in 1861
-		case 'Indian':
+		case 'negro':		// used in 1851
+		case 'coloured':	// used in 1861
+		case 'indian':
 		{	// capitalize flag values
 		    if (clear)
 				element.value	= "";
@@ -2131,8 +2130,8 @@ function initElement(element, clear)
 		    break;
 		}	// capitalize flag values
 
-		case 'School':
-		case 'Illiterate':
+		case 'school':
+		case 'illiterate':
 		{	// capitalize flag values
 		    if (clear)
 				element.value	= "";
@@ -2142,8 +2141,8 @@ function initElement(element, clear)
 		    break;
 		}	// capitalize flag values
 
-		case 'Birth':
-		case 'DeathSex':
+		case 'birth':
+		case 'deathsex':
 		{	// fields that contain a sex value
 		    if (clear)
 				element.value	= "";
@@ -2153,7 +2152,7 @@ function initElement(element, clear)
 		    break;
 		}	// fields that contain a sex value
 
-		case 'CanRead':
+		case 'canread':
 		{	// capitalize and copy to CanWrite
 		    numCanReadFlds++;
 		    if (element.value != '')
@@ -2164,7 +2163,7 @@ function initElement(element, clear)
 		    break;
 		}	// capitalize and copy to CanWrite
 
-		case 'CantRead':
+		case 'cantread':
 		{	// capitalize and copy to CantWrite
 		    element.onchange	= changeCantRead;
 		    element.checkfunc	= checkFlag;
@@ -2172,9 +2171,9 @@ function initElement(element, clear)
 		    break;
 		}	// capitalize and copy to CantWrite
 
-		case 'Origin':
-		case 'Nationality':
-		case 'Language':
+		case 'origin':
+		case 'nationality':
+		case 'language':
 		{	// Expand abbreviations
 		    element.abbrTbl	    = OrigAbbrs;
 		    element.onchange	= changeReplDown;
@@ -2186,7 +2185,7 @@ function initElement(element, clear)
 		    break;
 		}	// Expand abbreviations
 
-		case 'CauseOfDeath':
+		case 'causeofdeath':
 		{	// Cause of Death in 1851 and 1861 population census
 		    element.abbrTbl	    = CauseAbbrs;
 		    element.onchange	= change;
@@ -2195,7 +2194,7 @@ function initElement(element, clear)
 		    break;
 		}	// Cause of Death in 1851 and 1861 population census
 
-		case 'SpkOther':
+		case 'spkother':
 		{	// Expand abbreviations but don't repl down
 		    if (clear)
 				element.value	= "";
@@ -2206,10 +2205,10 @@ function initElement(element, clear)
 		    break;
 		}	// Expand abbreviations
 
-		case 'BInYear':
-		case 'BDate':
-		case 'MInYear':
-		case 'MarYear':
+		case 'binyear':
+		case 'bdate':
+		case 'minyear':
+		case 'maryear':
 		{	// Expand abbreviations
 		    if (clear)
 				element.value	= "";
@@ -2220,7 +2219,7 @@ function initElement(element, clear)
 		    break;
 		}	// Expand abbreviations
 
-		case 'Relation':
+		case 'relation':
 		{	// Expand abbreviations
 		    if (clear)
 				element.value	= "";
@@ -2231,7 +2230,7 @@ function initElement(element, clear)
 		    break;
 		}	// Expand abbreviations
 
-		case 'BPlace':
+		case 'bplace':
 		{	// expand abbreviations for birthplace
 		    if (clear)
 				element.value	= "Ontario";
@@ -2242,7 +2241,7 @@ function initElement(element, clear)
 		    break;
 		}	// expand abbreviations for birthplace
 
-		case 'ImmYear':
+		case 'immyear':
 		{	// expand abbreviations for immigration or nat'zation
 		    if (clear)
 				element.value	= "";
@@ -2252,7 +2251,7 @@ function initElement(element, clear)
 		    break;
 		}	// expand abbreviations for immigration or nat'zation
 
-		case 'NatYear':
+		case 'natyear':
 		{	// expand abbreviations for immigration or nat'zation
 		    if (clear)
 				element.value	= "";
@@ -2262,7 +2261,7 @@ function initElement(element, clear)
 		    break;
 		}	// expand abbreviations for immigration or nat'zation
 
-		case 'FathersBPlace':
+		case 'fathersbplace':
 		{	// Father's birthplace default for Mother's birthplace
 		    element.abbrTbl	    = BpAbbrs;
 		    element.onchange	= changeFBPlace;
@@ -2271,7 +2270,7 @@ function initElement(element, clear)
 		    break;
 		}	// Father's birthplace default for Mother's birthplace
 
-		case 'MothersBPlace':
+		case 'mothersbplace':
 		{	// Mother's birthplace
 		    element.abbrTbl	    = BpAbbrs;
 		    element.onchange	= changeMBPlace;
@@ -2280,7 +2279,7 @@ function initElement(element, clear)
 		    break;
 		}	// Mother's birthplace
 
-		case 'Religion':
+		case 'religion':
 		{	// religion: expand defaults and replicate down
 		    element.abbrTbl	    = RlgnAbbrs;
 		    element.onchange	= changeReplDown;
@@ -2292,8 +2291,8 @@ function initElement(element, clear)
 		    break;
 		}	// religion: expand defaults and replicate down
 
-		case 'Occupation':
-		case 'OccOther':
+		case 'occupation':
+		case 'occother':
 		{	// Occupation
 		    if (clear)
 				element.value	= "";
@@ -2304,7 +2303,7 @@ function initElement(element, clear)
 		    break;
 		}	// Occupation
 
-		case 'EmpType':
+		case 'emptype':
 		{	// employment type
 		    if (clear)
 				element.value	= "";
@@ -2314,7 +2313,7 @@ function initElement(element, clear)
 		    break;
 		}	// employment type
 
-		case 'EmpWhere':
+		case 'empwhere':
 		{	// employment location
 		    element.abbrTbl	    = EmpWhereAbbrs;
 		    element.onchange	= change;
@@ -2323,7 +2322,7 @@ function initElement(element, clear)
 		    break;
 		}	// employment location
 
-		case 'Employee':
+		case 'employee':
 		{	// Employee flag
 		    if (clear)
 				element.value	= "";
@@ -2333,7 +2332,7 @@ function initElement(element, clear)
 		    break;
 		}	// Employee flag`
 
-		case 'Employer':
+		case 'employer':
 		{	// Employer
 		    if (clear)
 				element.value	= "";
@@ -2343,8 +2342,8 @@ function initElement(element, clear)
 		    break;
 		}	// Employer
 
-		case 'OwnAcct':
-		case 'OwnMeans':
+		case 'ownacct':
+		case 'ownmeans':
 		{	// self employed
 		    if (clear)
 				element.value	= "";
@@ -2354,40 +2353,41 @@ function initElement(element, clear)
 		    break;
 		}	// self employed
 
-		case 'NumHands':
-		case 'WksEmp':
-		case 'WksOth':
-		case 'HpWEmp':
-		case 'HpWOth':
-		case 'IncomeEmp':
-		case 'IncomeOth':
-		case 'MonthsFact':
-		case 'MonthsHome':
-		case 'MonthsOther':
-		case 'MonthsSchool':
-		case 'HouseRooms':
-		case 'WeeksUnemp':
-		case 'WeeksIll':
-		case 'Horses':
-		case 'MilkCows':
-		case 'Cattle':
-		case 'Sheep':
-		case 'Pigs':
-		case 'LifeInsurance':	// 1911
-		case 'AccInsurance':	// 1911
-		case 'SchoolMons':	// 1911
+		case 'numhands':
+		case 'wksemp':
+		case 'wksoth':
+		case 'hpwemp':
+		case 'hpwoth':
+		case 'incomeemp':
+		case 'incomeoth':
+		case 'monthsfact':
+		case 'monthshome':
+		case 'monthsother':
+		case 'monthsschool':
+		case 'houserooms':
+		case 'weeksunemp':
+		case 'weeksill':
+		case 'horses':
+		case 'milkcows':
+		case 'cattle':
+		case 'sheep':
+		case 'pigs':
+		case 'lifeinsurance':	// 1911
+		case 'accinsurance':	// 1911
+		case 'schoolmons':	// 1911
 		{	// numeric fields
 		    if (clear)
 				element.value	= "";
 		    element.onchange	= change;
+            addEventHandler(element, 'keydown',   numericKeyDown);
 		    element.checkfunc	= checkNumber;
 		    element.checkfunc();
 		    break;
 		}	// numeric fields
 
-		case 'HourlyRate':	// 1911
-		case 'CostInsurance':	// 1911
-		case 'CostEducation':	// 1911
+		case 'hourlyrate':	// 1911
+		case 'costinsurance':	// 1911
+		case 'costeducation':	// 1911
 		{	// decimal fields
 		    if (clear)
 				element.value	= "";
@@ -2397,17 +2397,18 @@ function initElement(element, clear)
 		    break;
 		}	// decimal fields
 
-		case 'SchoolMons':
+		case 'schoolmons':
 		{	// months of school in 1921 census
 		    if (clear)
 				element.value	= "";
 		    element.onchange	= changeSchoolMons;
+            addEventHandler(element, 'keydown',   numericKeyDown);
 		    element.checkfunc	= checkNumber;
 		    element.checkfunc();
 		    break;
 		}	// months of school in 1921 census
 
-		case 'BYearTxt':
+		case 'byeartxt':
 		{	// year of birth
 		    element.onchange	= changeBYear;
 		    element.checkfunc	= checkBYear;
@@ -2415,8 +2416,8 @@ function initElement(element, clear)
 		    break;
 		}	// year of birth
 
-		case 'Location':
-		case 'Address':
+		case 'location':
+		case 'address':
 		{	// Address
 		    if (clear)
 				element.value	= "";
@@ -2428,7 +2429,7 @@ function initElement(element, clear)
 		}	// Address
 
 
-		case 'ResType':
+		case 'restype':
 		{	// capitalize and expand abbreviations for given names
 		    if (clear)
 				element.value	= "";
@@ -2439,7 +2440,7 @@ function initElement(element, clear)
 		    break;
 		}	// residence type
 
-		case 'OwnerTenant':
+		case 'ownertenant':
 		{	// capitalize and expand abbreviations for given names
 		    if (clear)
 				element.value	= "";
@@ -2449,18 +2450,19 @@ function initElement(element, clear)
 		    break;
 		}	// residence type
 
-		case 'HouseRent':
+		case 'houserent':
 		{	// montly rent
 		    if (clear)
 				element.value	= "";
 		    element.abbrTbl	    = StoriesAbbrs;
 		    element.onchange	= change;
+            addEventHandler(element, 'keydown',   numericKeyDown);
 		    element.checkfunc	= checkNumber;
 		    element.checkfunc();
 		    break;
 		}	// monthly rent
 
-		case 'HouseMaterial':
+		case 'housematerial':
 		{	// capitalize and expand abbreviations for given names
 		    if (clear)
 				element.value	= "";
@@ -2471,7 +2473,7 @@ function initElement(element, clear)
 		    break;
 		}	// handle house materials
 
-		case 'Stories':
+		case 'stories':
 		{	// expand abbreviations for number of stories in residence
 		    if (clear)
 				element.value	= "";
@@ -2482,17 +2484,18 @@ function initElement(element, clear)
 		    break;
 		}	// expand abbreviations for number of stories
 
-		case 'NumFamilies':
+		case 'numfamilies':
 		{	// validate number of families
 		    if (clear)
 				element.value	= "";
 		    element.onchange	= change;
+            addEventHandler(element, 'keydown',   numericKeyDown);
 		    element.checkfunc	= checkNumber;
 		    element.checkfunc();
 		    break;
 		}	// validate number of families
 
-		case 'Remarks':
+		case 'remarks':
 		{	// remarks
 		    if (clear)
 				element.value	= "";
@@ -2502,13 +2505,13 @@ function initElement(element, clear)
 		    break;
 		}	// remarks
 
-		case 'doIdir':
+		case 'doidir':
 		{	// button to manage the IDIR element
 		    element.onclick	    = doIdir;
 		    break;
 		}	// button to manage the IDIR element
 
-		case 'clearIdir':
+		case 'clearidir':
 		{	// button to clear the IDIR element
 		    element.onclick	    = clearIdir;
 		    break;
@@ -2520,7 +2523,7 @@ function initElement(element, clear)
 		    break;
 		}	// button to reset the form to defaults
 
-		case 'addRow':
+		case 'addrow':
 		{	// button to add an additional row to the end
 		    element.onclick	    = addRow;
 		    break;
@@ -2539,6 +2542,11 @@ function initElement(element, clear)
 		}		// all other columns
 
     }			// column specific initialization
+
+    // override default key processing for input fields to provide
+    // spreadsheet emulation
+    if (element.nodeName.toUpperCase() == 'INPUT')
+        addEventHandler(element, 'keydown',   tableKeyDown);
 }	// function initElement
 
 /************************************************************************
@@ -2583,7 +2591,7 @@ function showImportant(event)
 
 				    default:
 				    {
-						th.onclick();
+						th.click();
 						break;
 				    }
 				}	// act on label
@@ -2621,17 +2629,17 @@ function reset(event)
     HTTP.getXML(url,
 				gotPrevLine,
 				noPrevLine);
-}		// reset
+}		// function reset
 
 /************************************************************************
- *  gotPrevLine																*
+ *  function gotPrevLine													*
  *																		*
- *  Take action when the last line of the previous page is retrieved		*
- *  from the server.														*
+ *  Take action when the last line of the previous page is retrieved	*
+ *  from the server.													*
  *  Restore all fields in the form to their default values.				*
  *																		*
  *  Input:																*
- *		xmlDoc				XML document containing last line of prev page		*
+ *		xmlDoc		XML document containing last line of prev page		*
  ************************************************************************/
 function gotPrevLine(xmlDoc)
 {
@@ -2810,9 +2818,9 @@ function gotPrevLine(xmlDoc)
     var	pageSize	= CenPageSize[cenYear];
     var	addRowButton	= document.getElementById('addRow');
     for(rowNum += 1; rowNum <= pageSize; rowNum++)
-		addRowButton.onclick();
+		addRowButton.click();
     return false;
-}		// gotPrevLine
+}		// function gotPrevLine
 
 /************************************************************************
  *  function noPrevLine													*
@@ -2884,7 +2892,7 @@ function showImage(event)
 		      imageUrl,
 		      "right");
     return false;	// do not perform defaul action for button
-}	// showImage
+}	// function showImage
 
 /************************************************************************
  *  function correctImageUrl											*
@@ -2928,7 +2936,7 @@ function correctImageUrl(event)
     inputTag.value	= imageUrl;
     inputTag.className	= 'black white leftnc';
     imageLine.appendChild(inputTag);
-}	// correctImageUrl
+}	// function correctImageUrl
 
 /************************************************************************
  *  function matchCitations												*
@@ -3039,7 +3047,7 @@ function doIdir(event)
 				    gotIdir,
 				    noIdir);
     }		// search for matches
-}		// doIdir
+}		// function doIdir
 
 /************************************************************************
  *  function gotIdir													*
@@ -3141,7 +3149,7 @@ function gotIdir(xmlDoc)
 		}		// have no matching entries
 
     }		// support for dynamic display of messages
-}		// gotIdir
+}		// function gotIdir
 
 /************************************************************************
  *  function clearIdir													*
@@ -3168,7 +3176,7 @@ function clearIdir(event)
 		findButton.removeChild(findButton.firstChild);
     }	// remove contents of cell
     findButton.appendChild(document.createTextNode("Find"));
-}		// clearIdir
+}		// function clearIdir
 
 /************************************************************************
  *  function displaySelectIdir											*
@@ -3466,7 +3474,7 @@ function closeIdirDialog(event)
 
     // suppress default action
     return false;
-}		// closeIdirDialog
+}		// function closeIdirDialog
 
 /************************************************************************
  *  function gotFamily													*
@@ -3533,7 +3541,7 @@ function gotFamily(xmlDoc)
 		}		// have no matching entries
 
     }		// support for dynamic display of messages
-}		// gotFamily
+}		// function gotFamily
 
 /************************************************************************
  *  function displayFamily												*

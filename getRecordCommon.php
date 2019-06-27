@@ -121,8 +121,9 @@ use \Exception;
  *						all of the page records in an enumeration		*
  *						division										*
  *		2018/12/26      add surname parameter for tblIR, tblNR, tblNX   *
+ *		2019/06/23      support sets of Births, Deaths, and Marriages   *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -174,6 +175,8 @@ if (!canUser('edit'))
 // process the parameters
 foreach($_GET as $key 	=> $value)
 {			// loop through all parameters
+    if (strlen($value) == 0)
+        continue;
 	switch(strtolower($key))
 	{
 	    case 'table':
@@ -197,6 +200,7 @@ foreach($_GET as $key 	=> $value)
 	    }                   // surname
 
 	    case 'domain':
+	    case 'regdomain':
 	    {                   // vital statistics
 			$domain			    = $value;
 			$parms[$key]		= $value;
@@ -225,8 +229,9 @@ foreach($_GET as $key 	=> $value)
 	    }
 
 	    case 'year':
+	    case 'regyear':
 	    {
-			$rxres	= preg_match("/^[0-9]{4}$/", $value);
+			$rxres	                = preg_match("/^[0-9]{4}$/", $value);
 			if ($rxres == 1)
 			{
 			    $regyear		    = $value;
@@ -238,8 +243,9 @@ foreach($_GET as $key 	=> $value)
 	    }		// registration year
 
 	    case 'number':
+	    case 'regnum':
 	    {
-			$rxres	= preg_match("/^[0-9]+$/", $value);
+			$rxres	                = preg_match("/^[0-9]+$/", $value);
 			if ($rxres == 1)
 			{
 			    $regnum		        = $value;
@@ -251,8 +257,9 @@ foreach($_GET as $key 	=> $value)
 	    }		// registration number
 
 	    case 'county':
+	    case 'regcounty':
 	    {
-			$rxres	= preg_match("/^[a-zA-Z]\w+$/", $value);
+			$rxres	            = preg_match("/^[a-zA-Z]\w+$/", $value);
 			if ($rxres == 1)
 			{
 			    $county		    = $value;
@@ -264,12 +271,13 @@ foreach($_GET as $key 	=> $value)
 	    }		// county code
 
 	    case 'townshipcode':
+	    case 'regtownship':
 	    {
-			$rxres	= preg_match("/^[a-zA-Z]\w+$/", $value);
+			$rxres	            = preg_match("/^[a-zA-Z][\w &]+$/", $value);
 			if ($rxres == 1)
 			{
-			    $townshipcode	= $value;
-			    $parms['code']	= $value;
+			    $townshipcode	    = $value;
+			    $parms['township']	= $value;
 			}
 			else
 			    $msg	.= "Invalid parameter value $key='$value'. ";
@@ -317,8 +325,10 @@ require_once __NAMESPACE__ . '/Census.inc';
 	    }		// census year
 
 	    case 'province':
-	    {		// province code
-			$province		= $value;
+        {		// province code
+            if (strlen($value) < 2)
+                break;
+			$province		    = $value;
 			$parms[$key]		= $value;
 			if ($table == 'Censuses')
 			    break;
@@ -496,7 +506,7 @@ require_once __NAMESPACE__ . '/Census.inc';
 
 if (strlen($msg) == 0)
 {			// no errors detected
-	try {		// prevent throw from breaking XML
+	//try {		// prevent throw from breaking XML
 	switch($table)
 	{
 	    case 'tblAR':
@@ -912,18 +922,21 @@ require_once __NAMESPACE__ . '/Temple.inc';
 	    {
 require_once __NAMESPACE__ . '/Birth.inc';
 require_once __NAMESPACE__ . '/BirthSet.inc';
-			if (isset($domain) && isset($regyear) && isset($regnum))
+			if (isset($domain) && isset($regyear) && $regnum)
 			    $record	= new Birth($domain, $regyear, $regnum);
 			else
-			    $record	= new BirthSet($id);
+			    $record	= new BirthSet($parms);
 			$top		= 'birth';
 			break;
 	    }		// Births
 
 	    case 'Deaths':
 	    {
-require_once __NAMESPACE__ . '/Death.inc';
-			$record		= new Death($domain, $regyear, $regnum);
+            require_once __NAMESPACE__ . '/Death.inc';
+			if (isset($domain) && isset($regyear) && $regnum)
+                $record		= new Death($domain, $regyear, $regnum);
+            else
+                $record     = new RecordSet('Deaths', $parms);
 			$top		= 'death';
 			break;
 	    }		// Deaths
@@ -931,7 +944,10 @@ require_once __NAMESPACE__ . '/Death.inc';
 	    case 'Marriage':
 	    {
 require_once __NAMESPACE__ . '/Marriage.inc';
-			$record		= new Marriage($domain, $regyear, $regnum);
+			if (isset($domain) && isset($regyear) && $regnum)
+			    $record		= new Marriage($domain, $regyear, $regnum);
+            else
+                $record     = new RecordSet('Marriage', $parms);
 			$top		= 'marriage';
 			break;
 	    }		// Marriage
@@ -1182,7 +1198,7 @@ require_once __NAMESPACE__ . '/MethodistBaptism.inc';
 	    {
 require_once __NAMESPACE__ . '/CensusLine.inc';
 			if (count($parms) > 0)
-			    $record	= new RecordSet('CensusLines',$parms);
+			    $record	= new RecordSet('CensusLine',$parms);
 			else
 			    $msg	.= "Too many '$extTableName' records to return.";
 			$top		= 'line';
@@ -1200,13 +1216,10 @@ require_once __NAMESPACE__ . '/CensusLine.inc';
 	    {
 require_once __NAMESPACE__ . '/CensusLine.inc';
 			if (count($parms) > 0)
-			{
-			    $parms['censusid']	= 'CA' . substr($table, 6);
-			    $record	= new RecordSet('CensusLines',$parms);
-			}
+                $record	    = new RecordSet($table,$parms);
 			else
-			    $msg	.= "Too many '$extTableName' records to return.";
-			$top		= 'line';
+			    $msg	    .= "Too many '$extTableName' records to return.";
+			$top		    = 'line';
 			break;
 	    }		// Censuses
 
@@ -1215,10 +1228,10 @@ require_once __NAMESPACE__ . '/CensusLine.inc';
 			$msg	.= "Table `$table` is not supported by this script. ";
 	    }
 	}		// switch($table)
-	} catch(Exception $e) {
-	    $msg	.= "Unable to create instance of `$table`. " .
-				   $e->getMessage();
-	}
+//} catch(Exception $e) {
+//	    $msg	.= "Unable to create instance of `$table`. " .
+//				   $e->getMessage();
+//	}
 }			// no errors detected previously
 
 // protect against very large response sets

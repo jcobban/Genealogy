@@ -167,6 +167,8 @@ use Templating\TemplateTag;
  *		2019/02/16      do not act on unused fields                     *
  *		2019/04/09      support passing TemplateTag to getName          *
  *		2019/04/15      replace is_a with instanceof                    *
+ *		2019/05/20      do not display marriagenamecreatedby for        *
+ *		                non marriage records                            *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1782,18 +1784,21 @@ class Name extends Record
             else
             if ($key == 'marriednamecreatedby')
             {
-                $retval	.= "\t<$key>";
-                if ($value == 0)
-                    $retval	.= "0=not a married name";
-                else
-                if ($value == 1)
-                    $retval	.= "1=rule generated married name";
-                else
-                if ($value == 2)
-                    $retval	.= "2=user created married name";
-                else
-                    $retval	.= xmlentities($value);
-                $retval     .= "</$key>\n";
+                if ($this->row['order'] < 0)
+                {                       // married name record
+	                $retval	.= "\t<$key>";
+	                if ($value == 0)
+	                    $retval	.= "0=not a married name";
+	                else
+	                if ($value == 1)
+	                    $retval	.= "1=rule generated married name";
+	                else
+	                if ($value == 2)
+	                    $retval	.= "2=user created married name";
+	                else
+	                    $retval	.= xmlentities($value);
+	                $retval     .= "</$key>\n";
+                }                       // married name record
             }
             else
 		        $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";

@@ -2,8 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \Templating\Template
-use \Templating\TemplateTag
+use \Templating\Template;
+use \Templating\TemplateTag;
 
 /************************************************************************
  *  BlogPost.php														*

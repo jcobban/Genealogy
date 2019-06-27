@@ -15,29 +15,38 @@
       <a href="/Canada/CountriesEdit.php?lang=fr">
           Liste des Pays Soutenus
       </a>:
-      <a href="/genCountry.php?cc=$CC&lang=fr">
+      <a href="/genCountry.php?cc=$CC&amp;lang=fr">
           $COUNTRYNAME
       </a>:
-      <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=fr">
+      <a href="/Canada/genProvince.php?domain=$DOMAIN&amp;lang=fr">
           $DOMAINNAME
       </a>:
       <a href="DeathRegQuery.php?lang=fr">
           Nouveau Requête
       </a>:
-      <a href="DeathRegStats.php?RegDomain=$DOMAIN&lang=fr">
+      <a href="DeathRegStats.php?RegDomain=$DOMAIN&amp;lang=fr">
           $DOMAINNAME Statut de la Transcription
       </a>:
       <span id="yearStats">
-      <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&regyear=$REGYEAR&lang=fr">
+      <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&amp;regyear=$REGYEAR&amp;lang=fr">
           $DOMAINNAME Statut $REGYEAR
       </a>:
       </span>
       <span id="countyStats">
-      <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&regyear=$REGYEAR&regCounty=$REGCOUNTY&lang=fr">
+      <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&amp;regyear=$REGYEAR&amp;regCounty=$REGCOUNTY&amp;lang=fr">
           Statut $REGYEAR $COUNTYNAME
       </a>:
       </span>
+      <span>
+          <a href="/getRecordJson.php?Table=Deaths&amp;RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;County=$REGCOUNTY&amp;Township=$REGTOWNSHIP">
+          Résultats sous forme de document JSON
       </a>:
+      </span>
+      <span>
+          <a href="/getRecordXml.php?Table=Deaths&amp;RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;County=$REGCOUNTY&amp;Township=$REGTOWNSHIP">
+          Résultats sous forme de document XML
+      </a>:
+      </span>
     </div> 
     <div class="body">
       <h1>
@@ -173,6 +182,15 @@
         </p>
       </form>
     </div> <!-- end of <div id="templates"> -->
+    <div class="hidden" id="regnumNotNumber">
+        La valeur du paramètre Regnum=$regnum n'est pas numérique.
+    </div>
+    <div class="hidden" id="badLimit">
+        La valeur du paramètre Count=$limit est invalide.
+    </div>
+    <div class="hidden" id="badOffset">
+        La valeur du paramètre Offset=$offset est invalide.
+    </div>
     <div class="balloon" id="HelpRegYear">
       This field contains the year in which the event was registered.
     </div>

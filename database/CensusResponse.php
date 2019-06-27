@@ -750,10 +750,13 @@ if (strlen($msg) == 0)
     }		// show line number column
     else
     {
-		$info			= $result->getInformation();
-		$respDescRows		= array('first'		=> $offset + 1,
-								'last'		=> $offset + $limit,
-								'totalrows'	=> $info['count']);
+		$info		    	= $result->getInformation();
+		$totalrows	        = $info['count'];
+		$first		        = $offset + 1;
+		$last		        = min($offset + $limit, $totalrows);
+		$respDescRows		= array('first'		=> $first,
+								    'last'		=> $last,
+								    'totalrows'	=> $totalrows);
     }
 }		// no errors in validation
 

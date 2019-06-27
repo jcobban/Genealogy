@@ -192,6 +192,7 @@
  *						the user manually edit new children first		*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/01/21      get gender for given name from database         *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -952,7 +953,7 @@ function gotDelMarr(xmlDoc)
 						var row	= section.rows[0];
 						idmr	= row.id.substring(8);
 						var edit= document.getElementById('Edit' + idmr);
-						edit.onclick();
+						edit.click();
 				    }			// deleted currently displayed family
 				}			// at least one marriage left
 		    }		// no errors detected
@@ -2064,7 +2065,7 @@ function gotUpdatedFamily(xmlDoc)
 				form.idmr.value	= idmr;
 				var	tmp	= pendingButton;
 				pendingButton	= null;
-				tmp.onclick();
+				tmp.click();
 		    }		// another action to perform
 		    else
 		    if (opener)
@@ -2218,7 +2219,7 @@ function orderChildren()
 		if (typeof(idirElt) != 'undefined' && idirElt.value == 0)
 		{		// child is not yet in database
 		    pendingButton	= this;
-		    this.form.update.onclick();	// save the family first
+		    this.form.update.click();	// save the family first
 		}
 		bodyRows[i]	= body.rows[i];
     }
@@ -2305,7 +2306,7 @@ function editEvent()
     else
     {			// family needs to be saved first
 		pendingButton	= this;
-		form.update.onclick();	// save the family first
+		form.update.click();	// save the family first
     }			// family needs to be saved first
     return true;
 }	// function editEvent
@@ -2339,7 +2340,7 @@ function editIEvent()
     else
     {			// family needs to be saved first
 		pendingButton	= this;
-		form.update.onclick();	// save the family first
+		form.update.click();	// save the family first
     }			// family needs to be saved first
     return true;
 }	// editIEvent
@@ -2626,7 +2627,7 @@ function editPictures()
 		else
 		{			// family needs to be saved first
 		    pendingButton	= this;
-		    form.update.onclick();	// save the family first
+		    form.update.click();	// save the family first
 		}			// family needs to be saved first
     }
     else
@@ -2948,7 +2949,7 @@ function editEventMar(type, button)
 		else
 		{			// family needs to be saved first
 		    pendingButton	= button;
-		    form.update.onclick();	// save the family first
+		    form.update.click();	// save the family first
 		}			// family needs to be saved first
     }		// have form
     else
@@ -3018,7 +3019,7 @@ function childKeyDown(e)
 				    }		// loop through children of cell
 				}		// not the last row
 				else
-				    form.addNewChild.onclick();
+				    form.addNewChild.click();
 		    }
 		    else
 				alert("commonMarriage.js: childKeyDown: element is null.");

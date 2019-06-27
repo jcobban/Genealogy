@@ -38,6 +38,7 @@ use \Exception;
  *		2018/06/01		add support for lang parameter					*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/03/19      use Template                                    *
+ *		2019/06/23      add column currhigh which excludes delayed      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -74,12 +75,14 @@ if (count($_GET) > 0)
 		switch(strtolower($key))
 		{		    // process specific named parameters
 		    case 'regyear':
+		    case 'year':
 		    {
 				$regYear	        = $value;
 				break;
 		    }		// RegYear passed
 	
 		    case 'regdomain':
+		    case 'domain':
 		    {
 				$domain		        = $value;
 				break;
@@ -188,7 +191,7 @@ if (strlen($msg) == 0)
 	// execute the query
     if (is_null($county))
     {
-	    $query	= "SELECT D_RegCounty, " .
+	    $query	= "SELECT D_RegCounty AS County, " .
 							"SUM(D_Surname != '') AS SurnameCount,  " .
 							"SUM(D_Idir != 0) AS LinkCount, " .
 							"MIN(D_RegNum) as low, " .
@@ -202,11 +205,12 @@ if (strlen($msg) == 0)
     }
     else
     {
-	    $query	= "SELECT D_RegCounty, D_RegTownship, " .
+	    $query	= "SELECT D_RegCounty AS County, D_RegTownship AS Township, " .
 							"SUM(D_Surname != '') AS SurnameCount,  " .
 							"SUM(D_Idir != 0) AS LinkCount, " .
 							"MIN(D_RegNum) as low, " .
-							"MAX(D_RegNum) as high  " .
+							"MAX(D_RegNum) as high,  " .
+                            '(SELECT MAX(D_RegNum) FROM Deaths  WHERE D_regyear=:regyear and D_regcounty=:county AND D_regtownship=Township AND D_RegNum<500000) AS `currhigh` ' .
 						"FROM Deaths " .
 						"WHERE D_RegDomain=:domain AND D_RegYear=:regyear " .
 							"AND D_RegCounty=:county " .
@@ -223,30 +227,38 @@ if (strlen($msg) == 0)
         $result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
         for($i = 0; $i < count($result); $i++)
         {
+            $row                            = $result[$i];
             $result[$i]['rownum']           = $i;
             if (is_null($county))
             {
 	            $tcounty   = new County(array('domain'     => $domainObj, 
-                    'code'       => $result[$i]['d_regcounty']));
+                                              'code'       => $row['county']));
                 $result[$i]['countyname']   = $tcounty->get('name');
             }
             else
                 $result[$i]['countyname']   = $countyName;
-            $high                           = $result[$i]['high'];
-            $low                            = $result[$i]['low'];
-            $count                          = $high - $low + 1;
-            if ($high > $highest &&
-                ($highest == 0 || $high < ($highest + 2000) || $high < ($low + 2000)))
-                $highest                    = $high;
+            $low                            = $row['low'];
+            $high                           = $row['high'];
+            if (array_key_exists('currhigh', $row))
+                $currhigh                   = $row['currhigh'];
+            else
+                $currhigh                   = $high;
+            $count                          = $currhigh - $low + 1;
+            if ($currhigh > $highest)
+                $highest                    = $currhigh;
             if ($low < $lowest)
                 $lowest                     = $low;
-            $surnamecount                   = $result[$i]['surnamecount'];
+            $surnamecount                   = $row['surnamecount'];
             $totcount                       += $surnamecount;
             $pctdone                        = ($surnamecount * 100.0) / $count;
+            if ($pctdone > 100.0)
+                $pctdone                    = 100.0;
             $pctdoneclass                   = pctClass($pctdone);
-            $linkcount                      = $result[$i]['linkcount'];
+            $linkcount                      = $row['linkcount'];
             $totlinked                      += $linkcount;
             $pctlinked                      = ($linkcount * 100.0)/ $count;
+            if ($pctlinked > 100.0)
+                $pctlinked                  = 100.0;
             $pctlinkedclass                 = pctClass($pctlinked);
             $result[$i]['pctdone']          = number_format($pctdone,2);
             $result[$i]['pctdoneclass']     = $pctdoneclass;

@@ -73,6 +73,26 @@ else
 			{
 			    $records	= $record;
 			    print "<list count=\"" . $records->count() . "\">\n";
+                $info       = $records->getInformation();
+                print "\n\t<info>\n";
+                foreach ($info as $field => $value)
+                {
+                    if (is_string($value))
+                        $value      = trim($value);
+                    print "\t\t<$field>";
+                    if (is_array($value))
+                    {
+                        foreach($value as $key => $val)
+                            if (is_numeric($key))
+                                print "\t\t\t<val>$val</val>\n";
+                            else
+                                print "\t\t\t<$key>$val</$key>\n";
+                    }
+                    else
+                        print $value;
+                    print "</$field>\n";
+                }
+                print "\t</info>\n";
                 showTrace();
 			    foreach($records as $key => $record)
                 {

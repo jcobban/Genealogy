@@ -2,8 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \Templating\Template
-use \Templating\TemplateTag
+use \Templating\Template;
+use \Templating\TemplateTag;
 
 /************************************************************************
  *  displayPage.php														*
@@ -148,6 +148,7 @@ if (substr($templateName, 0, 1) == '/')
 	if (file_exists($document_root . $templateName))
     {               // template file exists
         $sourceTemplate = new Template($document_root . $templateName);
+        $bodyText       = $sourceTemplate->getRawTemplate();
         $document       = $sourceTemplate->getDocument();
         $html           = $document->childNodes()[0];
         $toplevel       = $html->childNodes();
@@ -157,11 +158,11 @@ if (substr($templateName, 0, 1) == '/')
             {       // <body> tag
                 $body       = $tag;
                 $bodyText   = $body->innerHTML();
-                $bodyText   .= "\n        <script src=\"/jscripts/util.js\" type=\"application/javaScript\">\n</script>\n";
-                $template->includeSub($bodyText,    'MAIN');
                 break;
             }       // <body> tag
         }           // loop through children of <html>
+        $bodyText   .= "\n\t<script src=\"/jscripts/util.js\" type=\"application/javaScript\">\n</script>\n";
+        $template->includeSub($bodyText, 'MAIN');
     }               // template file exists
     else
         $msg        .= "Unable to open file $document_root$templateName. ";

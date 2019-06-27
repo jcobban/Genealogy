@@ -154,6 +154,7 @@
  *						displayed as rich text or raw text				*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -466,7 +467,7 @@ function inputKeyDown(e)
     {
 		case KEY_ENTER:	// Enter
 		{
-		    document.getElementById('updEvent').onclick();
+		    document.getElementById('updEvent').click();
 		    return true;		// default action submit
 		}		        // Enter
 
@@ -1026,7 +1027,7 @@ function gotEvent(xmlDoc)
 		    var button			= pendingElement;
 		    pendingElement		= null;
 		    button.disabled		= false;
-		    button.onclick();
+		    button.click();
 		    return;
 		}		            // action to perform before closing window
 
@@ -1236,7 +1237,7 @@ function eeKeyDown(e)
 		    if (e.altKey)
 		    {		// alt-A
 				var	button	= document.getElementById('addCitation');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// alt-A
 		    break;
@@ -1247,7 +1248,7 @@ function eeKeyDown(e)
 		    if (e.altKey)
 		    {		// alt-C
 				var	button	= document.getElementById('Clear');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// alt-C
 		    break;
@@ -1257,7 +1258,7 @@ function eeKeyDown(e)
 		{		// letter 'S'
 		    if (e.ctrlKey)
 		    {		// ctrl-S
-				document.getElementById('updEvent').onclick();
+				document.getElementById('updEvent').click();
 				return false;	// do not perform standard action
 		    }		// ctrl-S
 		    break;
@@ -1267,7 +1268,7 @@ function eeKeyDown(e)
 		{		// letter 'U'
 		    if (e.altKey)
 		    {		// alt-U
-				document.getElementById('updEvent').onclick();
+				document.getElementById('updEvent').click();
 		    }		// alt-U
 		    break;
 		}		// letter 'U'
@@ -1327,7 +1328,7 @@ function addCitation(ev)
 		if (updEvent == null)
 		    form.submit();
 		else
-		    updEvent.onclick();
+		    updEvent.click();
 		return;
     }			// not assigned yet, update record in tblER
 

@@ -1192,7 +1192,7 @@ function showParents($person)
 				$siblings	= $parents->getChildren();
 				if (count($siblings) > 1)
 				{	// has siblings
-				    print $pronoun . ' ' . $tranTab['had'];
+				    print $pronoun . ' ' . $tranTab['had'] . ' ';
 				    foreach($siblings as $idcr => $sibChildRec)
 				    {	// loop through siblings
 					$sibIdir	= $sibChildRec->getIdir();
@@ -2168,7 +2168,7 @@ try {
 		// for already logged on users
 		if (strlen($userid) == 0)
 		{
-		    $template->updateTag('reqgrant', null);
+		    $template->updateTag('edit', null);
 		}
 		else
 		if ($isOwner)

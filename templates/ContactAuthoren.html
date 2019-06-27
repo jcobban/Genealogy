@@ -10,59 +10,61 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div class="hidden" id="breadcrumbs">
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
-    <a href="/FamilyTree/Services.php?lang=$LANG">Family Tree Services</a>:
-    <a href="/FamilyTree/nominalIndex.php?lang=$LANG">Family Tree</a>:
-  </div>
-
-  <div class="body">
-    <h1>
-      <span class="right">
-    	<a href="/contactAuthorHelpen.html" target="help">? Help</a>
-      </span>
-	Contact Author $ABOUT
-    </h1>
-    $MSG
-    $TRACE
-  <form name="evtForm" 
-	action="/postBlogXml.php" 
-	method="post">
-    <p id="promptforemail">
-	<label class="labelSmall" for="email">
-	    Your <u>E</u>-Mail Address:
-	</label>
-	<input type="text" name="email" id="email" accessKey="E"
-		class="white leftnc" size="60" value="">
+    <div class="hidden" id="breadcrumbs">
+      <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Family Tree Services</a>:
+      <a href="/FamilyTree/nominalIndex.php?lang=$LANG">Family Tree</a>:
+    </div>
+  
+    <div class="body">
+      <h1>
+        <span class="right">
+	      <a href="/contactAuthorHelpen.html" target="help">? Help</a>
+        </span>
+	  Contact Author About: $ABOUT
+      </h1>
+      $MSG
+      $TRACE
+      <form name="evtForm" 
+	    action="/postBlogXml.php" 
+	    method="post">
+        <p id="promptforemail">
+	    <label class="labelSmall" for="email">
+	        Your <u>E</u>-Mail Address:
+	    </label>
+	    <input type="text" name="email" id="email" accessKey="E"
+		    class="white leftnc" size="60" value="">
+        </p>
+	    <input type="hidden" name="email" id="hiddenemail"
+		    value="$EMAIL">
+        <p>
+	    <input type="hidden" name="id" id="id"
+		    class="white rightnc" value="$CONTACTIDS">
+	    <input type="hidden" name="tablename" id="tablename"
+		    class="white leftnc" value="$TABLENAME">
+	    <textarea name="message" 
+		    rows="5" cols="80">About: $ABOUT 
+$TEXT</textarea>
+        </p>
+        <p>
+	    <button type="button" id="Blog" accessKey="S">
+	      <u>S</u>end
+	    </button>
+      </p>
+    </form>
+      </div> <!-- class="body" -->
+    <div class="balloon" id="Helpmessage">
+    <p>Edit the message you wish to send to the owners.
     </p>
-	<input type="hidden" name="email" id="hiddenemail"
-		value="$EMAIL">
-    <p>
-	<input type="hidden" name="id" id="id"
-		class="white rightnc" value="$CONTACTIDS">
-	<input type="hidden" name="tablename" id="tablename"
-		class="white leftnc" value="$TABLENAME">
-	<textarea name="message" 
-		rows="5" cols="80">$ABOUT $TEXT</textarea>
-    </p>
-    <p>
-	<button type="button" id="Blog" accessKey="S">
-	  <u>S</u>end
-	</button>
-  </p>
-</form>
-  </div> <!-- class="body" -->
-<div class="balloon" id="Helpmessage">
-<p>Edit the message you wish to send to the owners.
-</p>
-</div>
-<div class="balloon" id="Helpemail">
-As a guest you need to supply the e-mail address at which you wish to be
-contacted regarding this request.
-</div>
-<div class="balloon" id="HelpBlog">
-Click on this button to post a blog to the authors of the requesting page.
-</div>
+    </div>
+    <div class="balloon" id="Helpemail">
+      As a guest you need to supply the e-mail address at which you wish to be
+      contacted regarding this request.
+    </div>
+    <div class="balloon" id="HelpBlog">
+      Click on this button to send a secure message to the authors.
+    </div>
     <script src="/jscripts/js20/http.js" type="text/javaScript">
     </script>
     <script src="/jscripts/CommonForm.js" type="text/javaScript">

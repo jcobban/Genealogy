@@ -203,7 +203,7 @@ if (isset($_POST) && count($_POST) > 0)
 		else
             $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                             "<td class='white left'>$value</td></tr>\n"; 
-		switch($strtolower(key))
+		switch(strtolower($key))
 		{	// act on specific key
 		    case 'formname':
 		    {

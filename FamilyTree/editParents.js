@@ -144,6 +144,7 @@
  *		2016/05/31		use common function dateChanged					*
  *		2016/06/23		chooseMother didn't work						*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -665,7 +666,7 @@ function epKeyDown(e)
 		{	// switch on key code
 		    case 65:
 		    {		// alt-A
-				form.Add.onclick();
+				form.Add.click();
 				return false;
 		    }		// alt-A
 
@@ -710,7 +711,7 @@ function editFather()
 		childWindows.push(childWindow);
     }		// father present
     else
-		document.getElementById('createHusb').onclick();
+		document.getElementById('createHusb').click();
 }		// editFather
 
 /************************************************************************
@@ -762,7 +763,7 @@ function editMother()
 		childWindows.push(childWindow);
     }		// wife present
     else
-		document.getElementById('createWife').onclick();
+		document.getElementById('createWife').click();
 }		// editMother
 
 /************************************************************************
@@ -864,7 +865,7 @@ function em1KeyDown(e)
 		if (code == 83)
 		{		// letter 'S'
 		    var	button	= form.update;
-		    button.onclick();
+		    button.click();
 		    return false;	// do not perform standard action
 		}		// letter 'S'
     }		// ctrl
@@ -880,63 +881,63 @@ function em1KeyDown(e)
 		    case 65:
 		    {		// letter 'A'
 				button	= document.getElementById('addCitation');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'A'
     
 		    case 69:
 		    {		// letter 'E'
 				button	= document.getElementById('addChild');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'E'
     
 		    case 72:
 		    {		// letter 'F'
 				button	= document.getElementById('createHusb');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'F'
     
 		    case 77:
 		    {		// letter 'M'
 				button	= document.getElementById('createWife');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'M'
     
 		    case 78:
 		    {		// letter 'N'
 				button	= document.getElementById('addNewChild');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'N'
     
 		    case 79:
 		    {		// letter 'O'
 				button	= document.getElementById('orderChildren');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'O'
 
 		    case 80:
 		    {		// letter 'P'
 				button	= document.getElementById('Pictures');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'P'
     
 		    case 85:
 		    {		// letter 'U'
 				button	= document.getElementById('update');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'U'
     
 		    case 86:
 		    {		// letter 'V'
 				button	= document.getElementById('Events');
-				button.onclick();
+				button.click();
 				return false;
 		    }		// letter 'V'
 

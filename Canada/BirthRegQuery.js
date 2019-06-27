@@ -27,6 +27,9 @@
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
+var lang    = 'en';
+if ('lang' in args)
+    lang    = args.lang;
 
 window.onload	= onLoad;
 
@@ -182,9 +185,6 @@ function resetForm()
  ************************************************************************/	
 function showStatus()
 {
-    var lang    = 'en';
-    if ('lang' in args)
-        lang    = args.lang;
     var	form	= this.form;
     location	= "BirthRegStats.php?RegDomain=" + form.RegDomain.value +
                     '&lang=' + lang;

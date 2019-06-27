@@ -57,9 +57,13 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/04/07      ensure that the paging lines can be displayed   *
  *		                within the visible portion of the browser.      *
+ *		2019/06/08      pass language to Pages form                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
+var lang    = 'en';
+if ('lang' in args)
+    lang    = args.lang;
 
 var namePattern	= /([A-Za-z_]+)([0-9]+)/;
 
@@ -894,7 +898,8 @@ function showPageTable()
 						"&SubDistrict=" + subdistId + 
 						"&Division=" + division +
 						"&ImageBase=" + imageBase +
-						"&RelFrame=" + relFrame,
+						"&RelFrame=" + relFrame +
+                        "&lang=" + lang,
 				"PageTable",
 				"resizable=yes,scrollbars=yes,status=yes");
 }		// showPageTable

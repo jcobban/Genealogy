@@ -24,9 +24,14 @@
         $TRACE
         $MSG
       <p>
-      Genealogical and Family History research services particularly utilizing the 
-      resources of Library and Archives Canada and the Ontario Archives.  
+      Genealogical and Family History research services particularly utilizing
+      the resources of the
+	  <a target="_blank" href="http://www.bac-lac.gc.ca/eng/Pages/home.aspx">
+			Library and Archives of Canada</a> and the 
+	    <a target="_blank" href="http://www.archives.gov.on.ca/en/index.aspx">
+			Archives of Ontario</a>.
       </p>
+
       <h3>Family Tree:</h3>
       <p class="label">
     	<a href="/FamilyTree/Services.php?lang=$LANG">
@@ -43,8 +48,23 @@
     	Technical Details of the Site Implementation
         </a>
       </p>
-      <h3>
-    	Geographical:</h3>
+      <h3>Other Useful Web-Sites:</h3>
+      <p class="label">
+    	<a href="https://www.familysearch.org/">
+    	    FamilySearch.org
+          </a>
+      </p>
+      <p class="label">
+    	<a href="/displayPage.php?template=genCommercial&amp;lang=$LANG">
+    	    Commercial Data Bases
+          </a>
+      </p>
+      <h3>Geographical:</h3>
+      <p class="label">
+    	<a href="/Canada/CountriesEdit.php?lang=$LANG">
+    	List of Supported Countries
+          </a>
+      </p>
       <p class="label">
     	<a href="/genCountry.php?cc=CA&amp;lang=$LANG">
     	Canada
@@ -60,16 +80,6 @@
     	United Kingdom
           </a>
       </p>
-      <p class="label">
-    	<a href="/displayPage.php?template=genCommercial&amp;lang=$LANG">
-    	Commercial Data Bases
-          </a>
-      </p>
-      <p class="label">
-    	<a href="/Canada/CountriesEdit.php?lang=$LANG">
-    	List of Supported Countries
-          </a>
-      </p>
       <h3>
           <a href="/videoTutorials.php?lang=$LANG" target="_blank">
     	Video Tutorials
@@ -77,13 +87,13 @@
       </h3>
       <h3>Genealogy User Guides:</h3>
           <p class="label">
-    	<a href="/displayPage.php?template=Articles/FileFormatsInGenealogy"
+    	<a href="/displayPage.php?template=/Articles/FileFormatsInGenealogy"
     		target="_blank">
     	Digital Representation of Genealogical Information
           </a>:
           </p>
           <p class="label">
-    	<a href="/displayPage.php?template=Articles/ReadingHandwriting"
+    	<a href="/displayPage.php?template=/Articles/ReadingHandwriting"
     		target="_blank">
     	<i>
     	Reading Handwriting
@@ -91,19 +101,19 @@
     	</a>:
           </p>
           <p class="label">
-    	<a href="/displayPage.php?template=Articles/FrenchOccupations"
+    	<a href="/displayPage.php?template=/Articles/FrenchOccupations"
     		target="_blank">
     	French Occupations
           </a>:
           </p>
           <p class="label">
-    	<a href="/displayPage.php?template=Articles/MicrofilmGimp"
+    	<a href="/displayPage.php?template=/Articles/MicrofilmGimp"
     		target="_blank">
     	Microfilm and Digital Imaging
           </a>:
           </p>
           <p class="label">
-    	<a href="/displayPage.php?template=Articles/SpreadsheetsInGenealogy"
+    	<a href="/displayPage.php?template=/Articles/SpreadsheetsInGenealogy"
     		target="_blank">
     	Using Spreadsheets in Genealogy
     	</a>:
@@ -115,36 +125,46 @@
     	</a>:
           </p>
           <p class="label">
-    	<a href="/displayPage.php?template=Articles/Newsletter2013_10"
+    	<a href="/displayPage.php?template=/Articles/Newsletter2013_10"
     		target="_blank">
     	User Guide: Features of the Page for an Individual in the Family Tree
     	</a>:
           </p>
           <p class="label">
-    	<a href="/displayPage.php?template=Articles/IntroductionToUpdating"
+    	<a href="/displayPage.php?template=/Articles/IntroductionToUpdating"
     		target="_blank">
     	User Guide: Getting Started with Updating the Family Tree
     	</a>:
           </p>
           <p class="label">
-    	<a href="/displayPage.php?template=Articles/Locations"
+    	<a href="/displayPage.php?template=/Articles/Locations"
     		target="_blank">
     	User Guide: Understanding Locations
     	</a>:
           </p>
           <h3>Monthly NewsLetters:</h3>
           <p class="label" id="newsletter$mm$year">
-    	<a href="/Newsletters/$filename" target="_blank">
-    		$month $year Newsletter
-    	</a>
+    	    <a href="/Newsletters/$filename" target="_blank">
+    		    $month $year Newsletter
+    	    </a>
+          </p>
+          <p class="label" id="morenewsletters">
+    	    <a href="/Newsletters/index.php?lang=$LANG">
+    		    ...
+    	    </a>
           </p>
           <h3>Monthly Technical Status Reports:</h3>
           <p class="label"  id="report$mm$year">
-    	<a href="/MonthlyUpdates/$filename" target="_blank">
-    		$month $year
-    		Updates to Website Functionality
-    	</a>
+        	<a href="/MonthlyUpdates/$filename" target="_blank">
+        		$month $year
+    	    	Updates to Website Functionality
+         	</a>
           </p>
+        <p class="label" id="moreupdates">
+    	  <a href="/MonthlyUpdates/index.php?lang=$LANG">
+    	    ...
+    	  </a>
+        </p>
       </div> <!-- class=body -->
       <script src="/jscripts/js20/http.js" type="text/javascript">
       </script>

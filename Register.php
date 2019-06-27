@@ -255,25 +255,25 @@ if ($user)
 		else
 		    $user->set('usemail', 0);
 		$user->save(false);
-		$id		= $user->get('id');
+		$id		        = $user->get('id');
 		$shapassword	= $user->get('shapassword');
 
-		$subjectTag	= $template->getElementById('emailSubject');
-		$subject	= str_replace('$newuserid',
-							      $newuserid,
-							      trim($subjectTag->innerHTML()));
-		$bodyTag	= $template->getElementById('emailBody');
-		$body		= str_replace(array('$newuserid','$servername','$id','$shapassword'),
-								  array($newuserid,$servername,$id,$shapassword),
-								  trim($bodyTag->innerHTML()));
+		$subjectTag	    = $template->getElementById('emailSubject');
+		$subject	    = str_replace('$newuserid',
+						    	      $newuserid,
+							          trim($subjectTag->innerHTML()));
+		$bodyTag    	= $template->getElementById('emailBody');
+		$body		    = str_replace(array('$newuserid','$servername','$id','$shapassword'),
+						    		  array($newuserid,$servername,$id,$shapassword),
+							    	  trim($bodyTag->innerHTML()));
 		// send e-mail to the new user to validate the address
-		$sent		= mail($email,
-		 		       $subject,
-		 		       $body);
+		$sent		    = mail($email,
+		 	        	       $subject,
+		 		               $body);
 
 		$template->updateTag('okmsgRespond',
 						     array('newuserid'	=> $newuserid,
-							   'email'	=> $email));
+						    	   'email'	=> $email));
 		$template->updateTag('okmsgAlready', null);
 		$template->updateTag('titleNew', null);
 		$template->updateTag('titleAlready', null);

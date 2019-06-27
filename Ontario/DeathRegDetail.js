@@ -73,6 +73,7 @@
 *		                occupation                                      *
 *		                if informant is undertaker update undertaker    *
 *		2019/04/12      loosen syntax for age                           *
+ *		2019/05/19      call element.click to trigger button click      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -457,7 +458,7 @@ function onLoadDeath()
 				    element.onclick	    = showImage;
 				    if (typeof(args.showimage) == 'string' &&
 						args.showimage.toLowerCase() == 'yes')
-						element.onclick();
+						element.click();
 				    break;
 				}	// display image button
 
@@ -643,7 +644,7 @@ function changeAge()
 
     var birthDate	= form.BirthDate;
     if (birthDate.value.length == 0 ||
-		birthDate.value.substr(0,1) == '[')
+		birthDate.value.substring(0,1) == '[')
     {		// birth date not explicitly set
 		age		= age.toLowerCase();
 
@@ -1096,8 +1097,13 @@ function showImage()
 				      imageUrl,
 				      "right");
 		else
+        if (imageUrl.substring(0, 1) == '/')
 		    openFrame("Images",
-				      '../Canada/DisplayImage.php?src=Images/' + imageUrl,
+				      '/Canada/DisplayImage.php?src=' + imageUrl,
+				      "right");
+        else
+		    openFrame("Images",
+				      '../Canada/DisplayImage.php?src=/Images/' + imageUrl,
 				      "right");
     }		// Image field defined
     return false;
@@ -1242,32 +1248,32 @@ function ddKeyDown(e)
 		{
 		    case 67:
 		    {		// letter 'C'
-				form.Reset.onclick();
+				form.Reset.click();
 				break;
 		    }		// letter 'C'
 
 		    case 73:
 		    {		// letter 'I'
 				if (form.ShowImage)
-				    form.ShowImage.onclick();
+				    form.ShowImage.click();
 				break;
 		    }		// letter 'I'
 
 		    case 78:
 		    {		// letter 'N'
-				form.Next.onclick();
+				form.Next.click();
 				break;
 		    }		// letter 'N'
 
 		    case 80:
 		    {		// letter 'P'
-				form.Previous.onclick();
+				form.Previous.click();
 				break;
 		    }		// letter 'P'
 
 		    case 81:
 		    {		// letter 'Q'
-				form.NewQuery.onclick();
+				form.NewQuery.click();
 				break;
 		    }		// letter 'Q'
 

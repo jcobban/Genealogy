@@ -45,6 +45,7 @@ use \Exception;
  *		2018/10/15      get language apology text from Languages        *
  *		2018/11/28      use language specific page layout               *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2019/05/30      use new common translation table indexes        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -77,81 +78,68 @@ foreach ($_GET as $key => $value)
 	    }		// requested debug
 	}		// switch on parameter name
 }			// foreach parameter
-$update     = canUser('edit');
+$update             = canUser('edit');
 
-$template	= new FtTemplate("genealogy$lang.html");
-$trtemplate = $template->getTranslate();
+$template	        = new FtTemplate("genealogy$lang.html");
+$trtemplate         = $template->getTranslate();
 
 // create list of newsletters
-$names	= array();
-$dh		= opendir('Newsletters');
+$names	            = array();
+$dh		            = opendir('Newsletters');
 if ($dh)
-{		// found Newsletters directory
+{		            // found Newsletters directory
 	while (($filename = readdir($dh)) !== false)
-	{		// loop through files
+	{	        	// loop through files
 	    if (strlen($filename) > 4 &&
 			substr($filename, strlen($filename) - 4) == '.pdf')
 			$names[]	= $filename;
-	}		// loop through files
+	}		        // loop through files
 	rsort($names);
-}		// found Newsletters directory
+}		            // found Newsletters directory
 
-$monthTag		= $trtemplate->getElementById('Months');
-if ($monthTag)
-{
-	$monthnames	= array('');
-	foreach($monthTag->childNodes() as $tag)
-        $monthnames[]	= trim($tag->innerHTML());
-}
-else
-	$monthnames	= array('',
-					'January',  'February',	'March',	'April',
-					'May',	    'June',	'July',		'Augustt',
-					'September','October',	'November',	'December');
+$monthnames			= $trtemplate->getElementById('Months');
 
-$newsletters	= array();
-for ($i = 0; $i < count($names); $i++)
-{		// loop through newsletters in order
-	$filename	= $names[$i];
-	$y		= substr($filename,10,4);
-	$m		= substr($filename,15,2);
-	$month		= $monthnames[$m - 0];
-	$newsletters[]	= array(
-			    'filename'	=> $filename,
-			    'mm'		=> $m,
-			    'month'		=> $month,
-			    'year'		=> $y);
-}		// loop through newsletters in order
+$newsletters		= array();
+for ($i	= 0; $i < min(count($names),5); $i++)
+{		            // loop through newsletters in order
+	$filename		= $names[$i];
+	$y		    	= substr($filename,10,4);
+	$m		    	= substr($filename,15,2);
+	$month			= $monthnames[$m - 0];
+	$newsletters[]	= array('filename'	=> $filename,
+						    'mm'		=> $m,
+						    'month'		=> $month,
+						    'year'		=> $y);
+}		            // loop through newsletters in order
 $template->updateTag('newsletter$mm$year',
 					 $newsletters);
 
 // create list of reports
-$names	= array();
-$dh		= opendir('MonthlyUpdates');
+$names	            = array();
+$dh		            = opendir('MonthlyUpdates');
 if ($dh)
-{		// found MonthlyUpdates directory
+{		            // found MonthlyUpdates directory
 	while (($filename = readdir($dh)) !== false)
-	{		// loop through files
+	{		        // loop through files
 	    if (strlen($filename) > 4 &&
 			substr($filename, strlen($filename) - 4) == '.pdf')
 			$names[]	= $filename;
-	}		// loop through files
+	}		        // loop through files
 	rsort($names);
-}		// found Newsletters directory
+}		            // found Newsletters directory
 
-$reports	= array();
-for ($i = 0; $i < count($names); $i++)
-{		// loop through reports in order
-	$filename	= $names[$i];
-	$y		= substr($filename,6,4);
-	$m		= substr($filename,11,2);
-	$month		= $monthnames[$m - 0];
-	$reports[]	= array(
-			    'filename'		=> $filename,
-			    'mm'		=> $m,
-			    'month'		=> $month,
-			    'year'		=> $y);
-}		// loop through reports in order
+$reports	        = array();
+for ($i = 0; $i < min(count($names),5); $i++)
+{		            // loop through reports in order
+	$filename		= $names[$i];
+	$y		    	= substr($filename,6,4);
+	$m		    	= substr($filename,11,2);
+	$month			= $monthnames[$m - 0];
+	$reports[]		= array('filename'		=> $filename,
+						    'mm'		=> $m,
+						    'month'		=> $month,
+						    'year'		=> $y);
+}		            // loop through reports in order
 $template->updateTag('report$mm$year',
 					 $reports);
 $template->display();
