@@ -92,6 +92,7 @@ use \Iterator;
  *		                do not throw exceptions from constructor        *
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/06/12      improve validation of values assigned to Dates  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -128,7 +129,7 @@ class Birth extends Record
 				'b_sex'					=> '?',
 				'b_birthplace'			=> '',
 				'b_birthdate'			=> '',
-				'b_calcbirth'			=> '',
+				'b_calcbirth'			=> null,
 				'b_parentsmarried'		=> 'Y',
 				'b_fathername'			=> '',
 				'b_fatheroccupation'	=> '',
@@ -564,27 +565,24 @@ class Birth extends Record
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
 		{	            	// act on specific field
-		    case 'b_regdomain':
-		    case 'b_regyear':
-		    case 'b_regnum':
 		    case 'b_surnamesoundex':
 		    case 'b_changedby':
 		    case 'b_changedate':
 		    case 'b_calcbirth':
-		    {
+		    {               // fields whose value is set from another field
 				throw new Exception(
 						"Birth::set: cannot modify '$field'");
-		    }
+		    }               // fields whose value is set from another field
 
 		    case 'b_birthdate':
 		    {
 				$date	= new LegacyDate(" $value");
-				$y	= $date->getYear();
+				$y	    = $date->getYear();
 				// fixup missing or abbreviated birth years
 				if ($y == 0)
 				    $y	= $this->row['b_regyear'];
 				else
-				if ($y < 100)
+				if ($y < 1000)
 				{
 				    $regYear	= $this->row['b_regyear'];
 				    $century	= floor($regYear / 100);
@@ -593,6 +591,8 @@ class Birth extends Record
 				    else
 						$y	= $y + ($century * 100);
 				}
+                if ($y > 9999)
+                    $y      = $y % 10000;
 
                 $m	        = $date->getMonth();
                 if ($m > 12)
@@ -610,9 +610,8 @@ class Birth extends Record
 				    $d		= 28;
 				if ($d < 10)
                     $d	= '0' . $d;
-                if ($y > 9999)
-                    $y      = $y % 10000;
-				parent::set('b_calcbirth',"$y-$m-$d");
+                
+				parent::set('b_calcbirth', "$y-$m-$d");
 				return parent::set($fieldLc, $value);
 		    }
 

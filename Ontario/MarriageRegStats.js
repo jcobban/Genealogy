@@ -21,6 +21,18 @@ window.onload	= onLoad;
  ************************************************************************/
 function onLoad()
 {
+    if (!('columns' in args))
+    {                       // invoker did not explicitly specify width
+        var dataTable       = document.getElementById('dataTable');
+        if (dataTable)
+        {                   // found table
+            var tableWidth  = dataTable.offsetWidth;
+            var colWidth    = tableWidth / 3;
+            var optColumns  = Math.floor(window.innerWidth / colWidth);
+            location.href   = location.href + "&columns=" + optColumns;
+            return;
+        }                   // found table
+    }                       // invoker did not explicitly specify width
     // activate handling of key strokes in text input fields
     var	element;
     for (fi = 0; fi < document.forms.length; fi++)
@@ -48,8 +60,12 @@ function onLoad()
  ************************************************************************/
 function showYearStats()
 {
-    var	rownum	= this.id.substring(9);
-    var year	= document.getElementById('RegYear' + rownum).value;
-    location	= 'MarriageRegYearStats.php?regyear=' + year;
+    var lang        = 'en';
+    if ('lang' in args)
+        lang        = args.lang;
+    var	rownum	    = this.id.substring(9);
+    var year	    = document.getElementById('RegYear' + rownum).value;
+    location	    = 'MarriageRegYearStats.php?regyear=' + year +
+                                                '&lang=' + lang;
     return false;
 }		// showYearStats

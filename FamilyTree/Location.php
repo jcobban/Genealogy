@@ -3,7 +3,6 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 use \Templating\Template;
-
 /************************************************************************
  *  Location.php														*
  *																	    *
@@ -115,9 +114,17 @@ require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Picture.inc';
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/CountySet.inc';
+require_once __NAMESPACE__ . '/TownshipSet.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
+
+// action depends upon whether the user is authorized to update
+// this specific record
+if (canUser('edit'))
+    $action     = 'Update';
+else
+    $action     = 'Display';
 
 // default values of parametets
 $namestart		= '';
@@ -149,10 +156,16 @@ foreach($_GET as $key => $value)
 
 	    case 'lang':
 	    {           // user's preferred language
-			if (strlen($value) == 2)
-			    $lang	= strtolower($value);
+			$lang	    = FtTemplate::validateLang($value);
 			break;
 	    }           // user's preferred language
+
+	    case 'action':
+	    {		    // request to only display the record
+			if (strtolower($value) == 'display')
+			    $action	        = 'Display';
+			break;
+	    }		    // request to only display the record
 
 	    case 'closeatend':
 	    {		    // close the frame when finished
@@ -162,9 +175,10 @@ foreach($_GET as $key => $value)
 	    }		    // close the frame when finished
 
 	    case 'debug':
-	    {		    // handled by common.inc
+	    case 'text':
+	    {		    // handled by common code
 			break;
-	    }		    // debug
+	    }		    // handled by common code
 
 	    default:
 	    {
@@ -173,51 +187,47 @@ foreach($_GET as $key => $value)
 	    }
 	}		        // act on specific parameters
 }			        // loop through all parameters
+
 // get the requested location
 if ($idlr > 0)
+{                   // IDLR of existing record specified
+    $location		= new Location(array('idlr' => $idlr));
+    $name			= $location->getName();
+}                   // IDLR of existing record specified
+else
+{                   // IDLR not specified
+    $location		= new Location(array('location' => $name));
+}                   // IDLR not specified
+
+if (!$location->isOwner())
+    $action     	= 'Display';
+
+// get template
+$template			= new FtTemplate("Location$action$lang.html");
+
+// customize title
+if ($location->isExisting())
 {
-    $location	= new Location(array('idlr' => $idlr));
-    $name		= $location->getName();
+	$idlr	    	= $location->getIdlr();
+    $title	    	= $template['locationTitle']->innerHTML();
 }
 else
 {
-    $location	= new Location(array('location' => $name));
-    if ($location->isExisting())
-		$idlr	= $location->getIdlr();
-    else
-		$idlr	= 0;
+	$idlr	    	= 0;
+    $title	    	= $template['newlocationTitle']->innerHTML();
 }
-
-// action depends upon whether the user is authorized to update
-// this specific record
-if ($location->isOwner())
-{			// user can edit this location
-    $action     = 'Update';
-}			// user can edit this location
-else
-{
-    $action     = 'Display';
-}
-
-$template		= new FtTemplate("Location$action$lang.html");
-
-// set up title
-if ($idlr > 0)
-    $title		= $template->getElementById('locationTitle')->innerHTML();
-else
-    $title		= $template->getElementById('newlocationTitle')->innerHTML();
-$title          = str_replace('$NAME', $name, $title);
+$title          	= str_replace('$NAME', $name, $title);
 $template->set('TITLE',             $title);
 
 // set up values for displaying in form
 $template->set('IDLR',	            $idlr);
-$locname		= $location->get('location');
+$locname			= $location->get('location');
 $template->set('LOCATION',		    str_replace('"','&quote;',$locname));
-$shortName		= $location->getShortName();
+$shortName			= $location->getShortName();
 $template->set('SHORTNAME',		    str_replace('"','&quote;',$shortName));
-$sortedLoc		= $location->get('sortedlocation');
+$sortedLoc			= $location->get('sortedlocation');
 $template->set('SORTEDLOC',		    str_replace('"','&quote;',$sortedLoc));
-$fsPlaceId		= $location->get('fsplaceid'); 
+$fsPlaceId			= $location->get('fsplaceid'); 
 $template->set('FSPLACEID',		    str_replace('"','&quote;',$fsPlaceId));
 $template->set('PREPOSITION',	    $location->get('preposition'));
 $template->set('BOUNDARY',		    $location->get('boundary'));
@@ -232,16 +242,16 @@ else
 
 // update breadcrumbs depending upon location name
 if (strlen($name) > 5)
-    $namestart	= substr($name, 0, 5);
+    $namestart	    = substr($name, 0, 5);
 else
-    $namestart	= $name;
+    $namestart	    = $name;
 if (strlen($namestart) == 0)
 	$template->updateTag('nameStart', null);
 else
     $template->set('NAMESTART',     $namestart);
 
 // set up selection lists on form
-$fsresolved		= $location->get('fsresolved');
+$fsresolved		    = $location->get('fsresolved');
 for ($i = 0;$i <= 2; $i++)
 {
     if ($i == $fsresolved)
@@ -249,7 +259,7 @@ for ($i = 0;$i <= 2; $i++)
     else
         $template->set("FSRESOLVED{$i}SELECTED", '');
 }
-$veresolved		= $location->get('veresolved');
+$veresolved		    = $location->get('veresolved');
 for ($i = 0;$i <= 2; $i++)
 {
     if ($i == $veresolved)
@@ -277,40 +287,54 @@ else
     $template->set('QSCHECKED', '');
 
 // handle idiosyncracies of Google geocoder implementation
-$searchName		= $name;
-$part1			= '';
-$part2			= '';
-$county			= '';
-$geoPattern		= "/^\s*(.*),([a-zA-Z &]*),([a-zA-Z ]+),\s*CA\s*$/";
-$results		= array();
-$res1			= preg_match($geoPattern, $name, $results);
+$searchName	    	= $name;
+$part1		    	= '';
+$part2		    	= '';
+$county		    	= '';
+$geoPattern	    	= "/^\s*(.*),\s*([a-zA-Z &]*),\s*([a-zA-Z ]+),\s*CA\s*$/";
+$results	    	= array();
+$res1		    	= preg_match($geoPattern, $name, $results);
 if ($res1)
 {
-    $part1		= trim($results[1]);	// street or lot location
-    $county		= trim($results[2]);	// county or city name
-    $province	= trim($results[3]);	// province
-    $getParms	= array('domain'	=> 'CA' . $province,
-	        			'name'		=> $county);
+    $part1		    = trim($results[1]);	// street or lot location
+    $county		    = trim($results[2]);	// county or city name
+    $province	    = trim($results[3]);	// province
+    $getParms	    = array('domain'	=> 'CA' . $province,
+	        	    		'name'		=> $county);
     $counties		= new CountySet($getParms);
-    $res2		= preg_match("/\b(lot|lots|con|cons)\b[^,]*,(.*)$/",
-				     $part1,
-				     $results);
-    if (count($counties) > 0)
-    {
-		if ($res2)
-		{
-		    $part2	= trim($results[2]);
-		    $searchName	= "$part2, $county county, $province, CA";
-		}
-		else
-		    $searchName	= "$part1, $county county, $province, CA";
-    }
+
+    $res2	        = preg_match("/\b(lot|lots|con|cons)\b[^,]*,(.*)$/",
+            				     $part1,
+                                 $results);
+
+    if ($counties->count() > 0)
+    {                       // at least one County matches the name
+        $countyObj  = $counties->rewind();  // get first County
+        $county     = $countyObj->getName();
+        $townships  = new TownshipSet(array('county'    => $countyObj,
+                                            'name'      => $part1));
+        if ($townships->count() > 0)
+		    $searchName	= "$part1 Township, $county, $province, CA";
+        else
+        {
+			if ($res2)
+			{                   // location includes lot or concession
+			    $part2	= trim($results[2]);
+			    $searchName	= "$part2 Township, $county, $province, CA";
+			}                   // location includes lot or concession
+            else
+            if (substr($county, -5) == ' City')
+	            $searchName	= "$part1, $county, $province, CA";
+            else
+	            $searchName	= "$part1, $county County, $province, CA";
+        }
+    }                       // at least one County matches the name
     else
     {
 		if ($res2)
 		{
-		    $part2	= trim($results[2]);
-		    $searchName	= "$part2, $county, $province, CA";
+		    $part2	        = trim($results[2]);
+		    $searchName	    = "$part2, $county, $province, CA";
 		}
 		else
 		    $searchName	= "$part1, $county, $province, CA";

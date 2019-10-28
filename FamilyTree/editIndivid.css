@@ -1,146 +1,186 @@
 /************************************************************************
- *  editIndivid.css							*
- *									*
- *  Stylesheet for the script editIndivid.php				*
- *									*
- *  History:								*
- *	2014/02/11	created						*
- *	2014/02/25	add input.actlefterror				*
- *	2014/03/06	label class name changed to column1		*
- *									*
- *  Copyright &copy; 2014 James A. Cobban				*
+ *  editIndivid.css														*
+ *																		*
+ *  Stylesheet for the script editIndivid.php							*
+ *																		*
+ *  History:															*
+ *		2014/02/11		created											*
+ *		2014/02/25		add input.actlefterror							*
+ *		2014/03/06		label class name changed to column1				*
+ *		2019/09/18      add label.column2                               *
+ *		2019/09/26      adjustments so longer French labels work        *
+ *		                remove special error classes                    *
+ *		                put action buttons in separate column           *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban				                *
  ************************************************************************/
 
 /*	column containers */
     div.row {	white-space:	nowrap; }
 
-    div.column1	{float:		left;
-		margin-top:	1px;
+    div.column1	{
+        float:	        left;
+		margin-top:	    1px;
 		margin-right:	3px;
-		width:		295px;
+		width:		    46em;
+		}
+
+    div.column1short {
+        float:	        left;
+		margin-top:	    1px;
+		margin-right:	3px;
+		width:		    25em;
 		}
 
 /*	labels of various widths */
     label.column1 {
 		font-family:	sans-serif;
 		font-weight:	bold;
-		font-size:	smaller;
-		text-align:	right;
+		font-size:	    smaller;
+		text-align:	    right;
 		vertical-align:	top;
-		padding:	0px 3px 0px 3px;
-		margin-top:	1px;
-		float:		left;
-		width:		11em;
+		padding:	    5px 3px 0px 3px;
+		margin-top:	    1px;
+		float:		    left;
+		width:		    14em;
+		}
+    label.column2 {
+		font-family:	sans-serif;
+		font-weight:	bold;
+		font-size:	    smaller;
+		text-align:	    right;
+		vertical-align:	top;
+		padding:	    5px 3px 0px 3px;
+		margin-top:	    1px;
+		float:		    left;
+		width:		    14em;
 		}
     input.left {
 		font-family:	sans-serif;
-		text-align:	left;
-		color:		black;
+		text-align:	    left;
+		color:		    black;
 		text-transform:	capitalize;
-		padding:	0px;
-		border-top:	1px solid black;
+		padding:	    0px;
+		border-top:	    1px solid black;
 		border-left:	1px solid black;
 		border-bottom:	1px solid white;
 		border-right:	1px solid white;
-		width:		40em;
+		width:		    40em;
 		margin-bottom:	2px;
 		}
-    input.lefterror {
+    input.leftname {
 		font-family:	sans-serif;
-		text-align:	left;
-		color:		red;
-		text-transform: capitalize;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		40em;
-		margin-bottom:	2px;
-		}
-    input.leftdate {
-		font-family:	sans-serif;
-		text-align:	left;
-		color:		black;
+		text-align:	    left;
+		color:		    black;
+		background-color: white;
 		text-transform:	capitalize;
-		padding:	0px;
-		border-top:	1px solid black;
+		padding:	    0px;
+		border-top:	    1px solid black;
 		border-left:	1px solid black;
 		border-bottom:	1px solid white;
 		border-right:	1px solid white;
-		width:		8em;
+		width:		    536px;
 		margin-bottom:	2px;
 		}
-    input.leftdateerror {
+    input.date {
 		font-family:	sans-serif;
-		text-align:	left;
-		color:		red;
+		text-align:	    left;
+		color:		    black;
+		background-color: white;
 		text-transform:	capitalize;
-		padding:	0px;
-		border-top:	1px solid black;
+		padding:	    0px;
+		border-top:	    1px solid black;
 		border-left:	1px solid black;
 		border-bottom:	1px solid white;
 		border-right:	1px solid white;
-		width:		8em;
+		width:		    8em;
 		margin-bottom:	2px;
 		}
-    input.leftloc {
+    input.description {
 		font-family:	sans-serif;
-		text-align:	left;
-		color:		black;
-		padding:	0px;
-		border-top:	1px solid black;
+		text-align:	    left;
+		color:		    black;
+		background-color: white;
+		padding:	    0px;
+		border-top:	    1px solid black;
 		border-left:	1px solid black;
 		border-bottom:	1px solid white;
 		border-right:	1px solid white;
-		width:		32em;
+		width:		    10em;
+		margin-bottom:	2px;
+		}
+    input.location {
+		font-family:	sans-serif;
+		text-align:	    left;
+		color:		    black;
+		background-color: white;
+		padding:	    0px;
+		border-top:	    1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		    28em;
+		margin-bottom:	2px;
+		}
+    input.shortloc {
+		font-family:	sans-serif;
+		text-align:	    left;
+		color:		    black;
+		background-color: white;
+		padding:	    0px;
+		border-top:	    1px solid black;
+		border-left:	1px solid black;
+		border-bottom:	1px solid white;
+		border-right:	1px solid white;
+		width:		    18em;
 		margin-bottom:	2px;
 		}
     input.leftnc {
 		font-family:	sans-serif;
-		text-align:	left;
-		color:		black;
-		padding:	0px;
-		border-top:	1px solid black;
+		text-align:	    left;
+		color:		    black;
+		padding:	    0px;
+		border-top:	    1px solid black;
 		border-left:	1px solid black;
 		border-bottom:	1px solid white;
 		border-right:	1px solid white;
-		width:		39em;
+		width:		    39em;
 		margin-bottom:	2px;
 		}
     select.leftwide {
 		font-family:	sans-serif;
-		text-align:	left;
-		color:		black;
-		padding:	0px;
-		width:		39em;
+		text-align:	    left;
+		color:		    black;
+		padding:	    0px;
+		width:		    39em;
 		margin-bottom:	2px;
 		}
+
     button.buttonCol1 {
 		font-family:	sans-serif;
 		font-weight:	bold;
-		font-size:	80%;
-		text-align:	center;
+		font-size:	    80%;
+		text-align:	    center;
 		background-color:#E0E0E0;
-		border-top:	2px solid white;
+		border-top:	    2px solid white;
 		border-left:	2px solid white;
 		border-bottom:	3px solid #404040;
 		border-right:	3px solid #404040;
-		color:		black;
-		padding:	0px 12px 0px 12px;
-		width:		185px;
+		color:		    black;
+		padding:	    0px 12px 0px 12px;
+		width:		    240px;
 		}
     button.buttonCol2 {
 		font-family:	sans-serif;
 		font-weight:	bold;
-		font-size:	80%;
-		text-align:	center;
+		font-size:	    80%;
+		text-align:	    center;
 		background-color:#E0E0E0;
-		border-top:	2px solid white;
+		border-top:	    2px solid white;
 		border-left:	2px solid white;
 		border-bottom:	3px solid #404040;
 		border-right:	3px solid #404040;
-		color:		black;
-		padding:	0px 12px 0px 12px;
-		width:		185px;
+		color:		    black;
+		padding:	    0px 12px 0px 12px;
+		width:		    240px;
 		}

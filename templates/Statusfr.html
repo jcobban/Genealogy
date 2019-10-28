@@ -1,0 +1,39 @@
+<!--*********************************************************************
+ *  Statusen.html														*
+ *																		*
+ *  Template to display a web page reporting statistics about the       *
+ *  family tree.	                                                	*
+ *																		*
+ *  History:															*
+ *		2019/07/26		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/index.html">Accueil</a>:
+      <a href="/genealogy.php?lang=fr">Génealogie</a>:
+      <a href="/FamilyTree/Services.php?lang=fr">Services</a>:
+    </div> <!-- id="breadcrumbs" -->
+    <div class="body">
+      <h1>
+        Statut de Base de Données
+        <span class="right">
+          <a href="StatusHelpen.html" target="help">? Aide</a>
+        </span>
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <p>La base de données contient:
+      </p>
+      <ul>
+        <li>$NUMPERSONS individus.</li>
+        <li>$NUMFAMILIES familles.</li>
+        <li>$NUMEVENTS evenements.</li>
+        <li>$NUMCITATIONS citations à sources.</li>
+      </ul>
+    </div>
+    <script src="/jscripts/CommonForm.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>

@@ -30,48 +30,48 @@ use \Exception;
  *		2016/05/20		use class Domain to validate domain code		*
  *		2018/01/01		add language parameter							*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
+ *		2019/07/08      use Template                                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
-$domain		= 'CAON';	// default domain
-$cc			= 'CA';
+$domain		    = 'CAON';	// default domain
+$cc			    = 'CA';
 $countryName	= 'Canada';
 $domainName		= 'Canada: Ontario:';
 $stateName		= 'Ontario';
-$lang		= 'en';
+$columns        = 3;
+$lang		    = 'en';
 
 $parmsText      = "<p class='label'>\$_GET</p>\n" .
                         "<table class='summary'>\n" .
                         "<tr><th class='colhead'>key</th>" .
                         "<th class='colhead'>value</th></tr>\n";
 foreach($_GET as $key => $value)
-{			// loop through all input parameters
+{			    // loop through all input parameters
     $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                          "<td class='white left'>$value</td></tr>\n"; 
 	switch(strtolower($key))
-	{		// process specific named parameters
+	{		    // process specific named parameters
 	    case 'domain':
 	    case 'regdomain':
 	    {
-			$domain		= $value;
-			$cc		= strtoupper(substr($domain, 0, 2));
-			$country	= new Country(array('code'	=> $cc));
-			$countryName	= $country->getName();
-			$domainObj	= new Domain(array('domain'	=> $domain,
-								   'language'	=> 'en'));
-			if (!$domainObj->isExisting())
-			{
-			    $msg	.= "Domain '$domain' must be a supported two character country code followed by a state or province code. ";
-			}
-			$domainName	= $domainObj->getName(1);
-			$stateName	= $domainObj->getName(0);
+			$domain		    = $value;
+			$cc		        = strtoupper(substr($domain, 0, 2));
 			break;
 	    }		// RegDomain
+
+        case 'columns':
+        {
+            if (ctype_digit($value) && $value > 0 && $value < 10)
+                $columns    = intval($value);
+            break;
+        }
 
 	    case 'lang':
 	    {
@@ -90,15 +90,33 @@ foreach($_GET as $key => $value)
 			$warn	.= "Unexpected parameter $key='$value'. ";
 			break;
 	    }		// any other paramters
-	}		// process specific named parameters
-}			// loop through all input parameters
+	}		    // process specific named parameters
+}			    // loop through all input parameters
 if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
-if (strlen($msg) == 0)
-{			// no errors
+$template       = new FtTemplate("MarriageRegStats$lang.html");
+
+$country	    = new Country(array('code'	    => $cc));
+$countryName	= $country->getName($lang);
+$domainObj	    = new Domain(array('domain'	    => $domain,
+				            	   'language'	=> $lang));
+if (!$domainObj->isExisting())
+{
+    $msg	        .= "Domain '$domain' must be a supported two character country code followed by a state or province code. ";
+	$domain		    = 'CAON';	    // restore defaults
+    $domainObj	    = new Domain(array('domain'	    => $domain,
+	    			            	   'language'	=> $lang));
+	$cc			    = 'CA';
+	$countryName	= 'Canada';
+	$domainName		= 'Canada: Ontario:';
+	$stateName		= 'Ontario';
+}
+$domainName	    = $domainObj->getName(1);
+$stateName	    = $domainObj->getName(0);
+
 	// execute the query
-	$query	= "SELECT M_RegYear, SUM(M_Date != '') FROM Marriage
+	$query	    = "SELECT M_RegYear, SUM(M_Date != '') AS Done FROM Marriage
 					    WHERE M_RegDomain='$domain'
 					    GROUP BY M_RegYear ORDER BY M_RegYear";
 	$stmt	 	= $connection->query($query);
@@ -109,185 +127,63 @@ if (strlen($msg) == 0)
 	    {		// debug output
 			print "<p>$query</p>\n";
 	    }		// debug output
-	}		// successful query
+	}		    // successful query
 	else
 	{
 	    $msg	.= "query '$query' failed: " .
 					   print_r($connection->errorInfo(),true);
-	}		// query failed
-}			// no errors
+	}		    // query failed
 
-$title	= $domainName . " Marriage Registration Status";
-htmlHeader($title,
-			array('/jscripts/util.js',
-			      'MarriageRegStats.js'));
-?>
-<body>
-<?php
-pageTop(array(
-			"/genealogy.php?lang=$lang"
-					=> 'Genealogy',
-			"/genCountry.php?cc=$cc&lang=$lang"
-							=> $countryName,
-			"/Canada/genProvince.php?domain=$domain&lang=$lang"
-							=> $stateName,
-			"MarriageRegQuery.php?lang=$lang"
-							=> 'New Marriage Query'));
-?>
-  <div class='body'>
-<h1>
-  <span class='right'>
-	<a href='MarriageRegStatsHelpen.html' target='_blank'>Help?</a>
-  </span>
-  <?php print $title; ?>
-</h1>
-<?php
-	if (strlen($warn) > 0)
-	{		// print warning messages if any
-	    print "<p class='warning'>$warn</p>\n";
-	}		// print warning messages if any
+// get sub-templates
+$colHeaders             = $template['columnHeaders'];
+$headerHtml             = $colHeaders->innerHTML();
+$colData                = "\t\t  <tr>\n";
+$spacer                 ='';
+for ($i = $columns; $i; $i--)
+{
+    $colData            .= $spacer . $headerHtml;
+    $spacer             = "\t\t\t<th>\n\t\t\t<th>\n";
+}
+$colHeaders->update($colData . "\t\t  </tr>\n");
 
-	if (strlen($msg) > 0)
-	{		// print error messages if any
-?>
-  <p class='message'>
-	<?php print $msg; ?> 
-  </p>
-<?php
-	}		// print error messages if any
-	else
-	{		// display results of query
-?>
- <form id='display' action='donothing.php' method='get'>
-<!--- Put out the response as a table -->
-  <table class='details'>
-<!--- Put out the column headers -->
-<tr>
-	<th class='colhead'>
-	RegYear
-	</th>
-	<th class='colhead'>
-	Done
-	</th>
-	<th class='colhead'>
-	View
-	</th>
-	<th>
-	</th>
-	<th class='colhead'>
-	RegYear
-	</th>
-	<th class='colhead'>
-	Done
-	</th>
-	<th class='colhead'>
-	View
-	</th>
-	<th>
-	</th>
-	<th class='colhead'>
-	RegYear
-	</th>
-	<th class='colhead'>
-	Done
-	</th>
-	<th class='colhead'>
-	View
-	</th>
-</tr>
-<?php
-	    $columns		= 3;
-	    $col		= 1;
-	    $total		= 0;
-	    $rownum		= 0;
-	    $yearclass		= "odd";
-	    foreach($result as $row)
-	    {
-			$rownum++;
-			$regYear	= $row[0];
-			$count		= $row[1];
-			$total		+= $count;
-			if (strlen($count) > 3)
-			    $count	= substr($count, 0, strlen($count) - 3) . ',' .
-						  substr($count, strlen($count) - 3);
-			if ($col == 1)
-			{
-?>
-<tr>
-<?php
-			}
-?>
-	<td class='<?php print $yearclass; ?> right'>
-	    <?php print $regYear; ?>
-	    <input type='hidden' id='RegYear<?php print $rownum; ?>'
-			value='<?php print $regYear; ?>'>
-	</td>
-	<td class='<?php print $yearclass; ?> right'>
-	    <?php print $count; ?>
-	</td>
-	<td class='left'>
-	    <button type='button' id='YearStats<?php print $rownum; ?>'>
-			View
-	    </button>
-	</td>
-<?php
-			$col++;
-			if ($col > $columns)
-			{	// at column limit, end row
-			    $col	= 1;
-			    if ($yearclass == "odd")
-					$yearclass	= "even";
-			    else
-					$yearclass	= "odd";
-?>
-</tr>
-<?php
-			}	// at column limit, end row
-			else
-			{	// start new column
-?>
-	<td>
-	</td>
-<?php
-			}	// start new column
-	    }		// process all rows
+// add display of data
+$rowElement             = $template['row$REGYEAR'];
+$rowHtml                = $rowElement->innerHTML();
+$rowData                = "";
+$total		            = 0;
+$yearClass              = 'odd';
+$row                    = reset($result);
+while($row)
+{               // continue until finished
+    $rowData            .= "\t\t  <tr>\n";
+    $spacer                 = '';
+	for ($i = $columns; $i && $row; $i--)
+	{
+        $rtemplate          = new \Templating\Template($rowHtml);
+	    $rtemplate->set('YEARCLASS',    $yearClass);
+		$regYear	        = $row[0];
+		$count		        = $row[1];
+	    $rtemplate->set('REGYEAR',      $regYear);
+	    $rtemplate->set('DONE',         number_format($count));
+	    $rowData            .= $spacer . $rtemplate->compile();
+        $spacer             = "\t\t\t<td>\n\t\t\t<td>\n";
+		$total		        += $count;
+        $row                = next($result);
+    }
+    $rowData            .= "\t\t  </tr>\n";
+    if ($yearClass == 'odd')
+        $yearClass          = 'even';
+    else
+        $yearClass          = 'odd';
+}               // continue until finished
+$rowElement->update($rowData);
 
-	    // end last row if necessary
-	    if ($col != 1)
-	    {		// partial last column
-?>
-</tr>
-<?php
-	    }		// partial last column
+$template->set('TOTAL',         number_format($total));
+$template->set('LANG',          $lang);
+$template->set('CC',            $cc);
+$template->set('COUNTRYNAME',   $countryName);
+$template->set('DOMAIN',        $domain);
+$template->set('DOMAINNAME',    $domainName);
+$template->set('STATENAME',     $stateName);
 
-	    // insert comma into formatting of total
-	    if (strlen($total) > 3)
-			$total	= substr($total, 0, strlen($total) - 3) . ',' .
-					  substr($total, strlen($total) - 3);
-?>
-<tr>
-	<td class='right'>
-	    Total
-	</td>
-	<td class='dataright'>
-	    <?php print $total; ?>
-	</td>
-</tr>
-  </table>
- </form>
-<?php
-    }		// display results of query
-?>
- </div>
-<div class='balloon' id='HelpYearStats'>
-Click on this button to display the geographical breakdown of the
-transcription for the specific year.
-</div>
-<div class='balloon' id='HelpRegYear'>
-This field shows the year for which the statistics apply.
-</div>
-<?php
-pageBot();
-?>
-</body>
-</html>
+$template->display();

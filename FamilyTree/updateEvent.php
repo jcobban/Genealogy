@@ -172,9 +172,11 @@ error_log("updateEvent.php: <parms>\n",3,$document_root . "/logs/updateEvent.txt
 try {
 foreach($_POST as $key => $value)
 {		// loop through all parameters
-	$xmlkey	= str_replace("$","_",$key);
-	print "\t<$xmlkey>" . xmlentities($value) . "</$xmlkey>\n";
-error_log("updateEvent.php: $xmlkey='$value'\n",3,$document_root . "/logs/updateEvent.txt");
+	$xmlkey	        = str_replace("$","_",$key);
+	print "\t<$xmlkey>" . htmlspecialchars($value,ENT_XML1) . "</$xmlkey>\n";
+    error_log("updateEvent.php: $xmlkey='$value'\n",
+              3,
+              $document_root . "/logs/updateEvent.txt");
 
 	switch($key)
 	{	// act on specific keys
@@ -447,7 +449,7 @@ if (!canUser('edit'))
 
 $rtype	= null;
 
-print "<trace>" . __LINE__ . " type=$type</trace>\n";
+print "<trace>updateEvent.php: " . __LINE__ . " type=$type</trace>\n";
 try {
 switch($type)
 {		// act on the event citation type
@@ -474,7 +476,9 @@ switch($type)
 
 	    if (strlen($msg) == 0)
 	    {		// OK to update
-			$record		= $person;
+            $record		= $person;
+            if ($person->isExisting())
+                $priName    = $person->getPriName();
 			if (!is_null($note))
 			    $record->set('namenote', $note);
 			if (!is_null($title))
@@ -485,7 +489,8 @@ switch($type)
 			    $record->set('GivenName', $givenName);
 			if ($surname !== null)
                 $record->set('Surname', $surname);
-            $priName    = $person->getPriName();
+            if (is_null($priName))
+                $priName    = $person->getPriName();
             if ($priName)
                 $priName->save('cmd');
 
@@ -965,7 +970,7 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
 
 	case Citation::STYPE_EVENT:		// 30
 	{
-print "<trace>" . __LINE__ . " Citation::STYPE_EVENT: idir=$idir, ider=$ider, date=$date, location=" . $location->getName() . "</trace>\n";
+print "<trace>updateEvent.php: " . __LINE__ . " Citation::STYPE_EVENT: idir=$idir, ider=$ider, date=$date, location=" . htmlspecialchars($location->getName(),ENT_XML1) . "</trace>\n";
 	    if (is_null($idir))
 	    {
 			$msg	.= "idir value not specified. ";
@@ -1115,13 +1120,13 @@ if (strlen($msg) == 0)
 else
 {		            // errors in parameters
 	print "    <msg>\n";
-	print xmlentities($msg);
+	print htmlspecialchars($msg,ENT_XML1);
 	print "    </msg>\n";
 }		            // errors in parameters
 } catch (Exception $e) {
 	print "    <msg>\n";
-	print xmlentities($e->getMessage());
-	print xmlentities($e->gettraceAsString());
+	print htmlspecialchars($e->getMessage(),ENT_XML1);
+	print htmlspecialchars($e->gettraceAsString(),ENT_XML1);
 	print "    </msg>\n";
     error_log("updateEvent.php: " . __LINE__ . ": exception " . $e->getMessage() .
         ': ' . $e->gettraceAsString() ."\n",3,$document_root . "/logs/updateEvent.txt");

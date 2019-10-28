@@ -2,9 +2,6 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
 /************************************************************************
  *  ToDo.inc															*
  *																		*
@@ -13,31 +10,37 @@ use \Iterator;
  *  the information in a row of the table tblTD.						*
  *																		*
  *  CREATE TABLE `tblTD` (			                                    *
- *		`IDTD`          INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,		*
- *		`ToDoType`      TINYINT(3) UNSIGNED DEFAULT NULL,			    *
- *		`IDIR`          INT(10) UNSIGNED DEFAULT NULL,			        *
- *		`IDTC`          INT(10) UNSIGNED DEFAULT NULL,			        *
- *		`IDTL`          INT(10) UNSIGNED DEFAULT NULL,			        *
+ *		`IDTD`          INT(10) NOT NULL AUTO_INCREMENT,		        *
+ *		`ToDoType`      TINYINT(3) DEFAULT NULL,			            *
+ *		`IDIR`          INT(10) DEFAULT NULL,			                *
+ *		`IDTC`          INT(10) DEFAULT NULL,			                *
+ *		`IDTL`          INT(10) DEFAULT NULL,			                *
  *		`ToDoName`      VARCHAR(255) DEFAULT NULL,			            *
+ *		`UserName`      VARCHAR(64) DEFAULT NULL,			            *
  *		`OpenedD`       VARCHAR(100) DEFAULT NULL,			            *
  *		`OpenedSD`      INT(10) DEFAULT NULL,			                *
  *		`ReminderD`     VARCHAR(100) DEFAULT NULL,			            *
  *		`ReminderSD`    INT(10) DEFAULT NULL,			                *
  *		`ClosedD`       VARCHAR(100) DEFAULT NULL,			            *
- *		`IDAR`          INT(10) UNSIGNED DEFAULT NULL,			        *
- *		`Status`        TINYINT(3) UNSIGNED DEFAULT NULL,			    *
- *		`Priority`      TINYINT(3) UNSIGNED DEFAULT NULL,			    *
+ *		`IDAR`          INT(10) DEFAULT NULL,			                *
+ *		`Status`        TINYINT(3) DEFAULT NULL,			            *
+ *		`Priority`      TINYINT(3) DEFAULT NULL,			            *
  *		`Desc`          LONGTEXT,			                            *
  *		`Results`       LONGTEXT,			                            *
  *		`FilingRef`     VARCHAR(50) DEFAULT NULL,			            *
- *		`Tag1`          TINYINT(3) UNSIGNED DEFAULT NULL,			    *
- *		`Used`          TINYINT(3) UNSIGNED DEFAULT NULL,			    *
- *		`qsTag`         TINYINT(3) UNSIGNED DEFAULT NULL,			    *
+ *		`Tag1`          TINYINT(3) DEFAULT NULL,			            *
+ *		`Used`          TINYINT(3) DEFAULT NULL,			            *
+ *		`qsTag`         TINYINT(3) DEFAULT NULL,			            *
  *		PRIMARY KEY (`IDTD`),			                                *
  *		KEY `ToDoName` (`ToDoName`),			                        *
  *		KEY `IDIR` (`IDIR`),			                                *
+ *	    FOREIGN KEY `Person` (`IDIR`) REFERENCES `tblIR` (`IDIR`),
  *		KEY `IDTC` (`IDTC`),			                                *
  *		KEY `IDTL` (`IDTL`) )			                                *
+ *      FOREIGN KEY `Location` (`IDTL`) REFERENCES `tblLR` (`IDLR`),    *
+ *		KEY `UserName` (`UserName`),			                        *
+ *      FOREIGN KEY `User` (`UserName`) REFERENCES `Users` (`UserName`))*
+ *      ENGINE=InnoDB DEFAULT CHARSET=utf8                              *
  *																		*
  *  History:															*
  *		2014/03/10		created											*
@@ -49,8 +52,9 @@ use \Iterator;
  *		2017/08/15		change class LegacyToDo to class ToDo			*
  *		2017/11/21		use prepared statements							*
  *		2017/12/18		add support for temporary fields				*
+ *		2019/08/27      add username field                              *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Address.inc';
@@ -76,14 +80,15 @@ class ToDo extends Record
 							'todotype'		=> 0,
 							'idir'			=> 0,
 							'idtc'			=> 0,
-							'idtl'			=> 0,
+							'idtl'			=> 1,
+							'todoname'		=> '',
 							'todoname'		=> '',
 							'openedsd'		=> -99999999,
 							'openedd'		=> '',
 							'remindersd'	=> -99999999,
 							'reminderd'		=> '',
-			              //'closeedsd'	=> -99999999,
-							'closeedd'		=> '',
+			              //'closedsd'	=> -99999999,
+							'closedd'		=> '',
 							'idar'			=> 0,
 							'status'		=> 1,
 							'priority'		=> 1,
@@ -95,6 +100,20 @@ class ToDo extends Record
 							'used'			=> 0);
 
     /********************************************************************
+     *	ToDo::$info											            *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                		'table'     		=> 'tblTD',
+                		'name'      		=> 'ToDos',
+                		'prime'	    		=> 'idtd',
+	            		'srvmg'     		=> true,
+	            		'fldcount'			=> 20,
+                		'order'     		=> array('IDIR','OpenedSD','UserName', 'ToDoName'),
+                		'classname' 		=> 'ToDo');
+
+    /********************************************************************
      *	ToDo::$translate												*
      *																	*
      *	array containing synonyms for field names                       *
@@ -104,6 +123,14 @@ class ToDo extends Record
                             'type'          => 'todotype',
                             'category'      => 'idtc',
                             'notes'         => 'desc');
+
+    /********************************************************************
+     *	constants for values of field 'todotype'                        *
+     ********************************************************************/
+    const TD_TODOITEM                   = 0;
+    const TD_CORRESPONDENCE             = 1;
+    const TD_OTHER                      = 2;
+
     /********************************************************************
      *	constants for values of field 'idtc'                            *
      ********************************************************************/
@@ -130,6 +157,9 @@ class ToDo extends Record
 
     /********************************************************************
      *	$intCategory	interpret the category field (IDTC)				*
+     *	                                                                *
+     *	See the localization tables in templates/Trantabll.html         *
+     *	<div id="idtcText">                                             *
      ********************************************************************/
     static $intCategory	= array(
 						 1	=> '',
@@ -160,17 +190,53 @@ class ToDo extends Record
      *	to do item.														*
      *																	*
      *  Input:															*
-     *	    $id			numeric identifier of a work item		 		*
-     *					or a database record presented as an array		*
-     *					If is 0 or 'new', create a new empty record		*
-     *					for later insertion into the database.			*
+     *	    $parms    * a database record presented as an array, or		*
+     *	              * array('idtd' => $idtd) to select an existing    *
+     *	                record                                          *
+     *	              * array('idir' => 0, 'todoname' => $name)         *
+     *	                to create a general work item                   *
+     *	              * array('idir' => $idir, 'todoname' => $name)     *
+     *	                to create a new work item for a specific Person *
+     *	                or access an existing record with the same      *
+     *	                key values                                      *
      *																	*
      *  Returns object containing work to do record.					*
+     *  Errors are reported in $this->msg.                              *
      ********************************************************************/
-    function __construct($id)
+    function __construct($id = array())
     {
-		global $debug;
-		global $connection;
+		global  $debug;
+		global  $warn;
+        global  $connection;
+        global  $userid;
+
+		// reformat old-style parameters into array format
+        if (!is_array($parms))
+        {
+			if (is_string($parms) && strtolower($parms) == 'new')
+			    $parms		= array('idtd'	    => 0);
+			else
+			if (is_string($parms))
+			{
+			    if (ctype_digit($parms))
+					$parms	= array('idtd'	    => (int)$parms);
+			    else
+	                $parms	= array('idir'      => 0,
+                                    'todoname'  => $parms,
+                                    'username'  => $userid);
+			}
+			else
+			if (is_int($parms))
+	            $parms		= array('idtd'	=> $parms);
+        }
+
+        if (!is_array($parms))
+        {
+		    $this->msg      .= "ToDo::__construct: " .
+                                "called with " . gettype($parms) .
+                                " value=" . var_dump($parms) . ". ";
+            $parms          = array();
+        }
 
 		$dbrow				= null;
 
@@ -187,60 +253,73 @@ class ToDo extends Record
 				    		  100*$currdate['mon'] +
 					    	  $currdate['mday'];
 
-		// reformat old-style parameters into array format
-		if (is_array($id))
-		    $parms			= $id;
-		else
-		if (is_string($id) && strtolower($id) == 'new')
-		    $parms			= array('idtd'	=> 0);
-		else
-		if (is_string($id))
-		{
-		    if (ctype_digit($id))
-				$parms		= array('idtd'	=> (int)$id);
-		    else
-				$parms		= array('todoname' => $id);
-		}
-		else
-		if (is_int($id))
-		    $parms			= array('idtd'	=> $id);
-		else
-		    throw new Exception("ToDo::__construct: " .
-				"called with " . gettype($id) . " value=" . $id);
-
+        $idtd               = null;
+        $idir               = null;
+        $todoname           = null;
+        $username           = null;
 		$where				= '';
 		$sqlParms		    = array();
 		$and				= 'WHERE ';
 		$createRecord		= true;
-		$errorMsg		= '';
+		$this->msg		    = '';
 
 		foreach($parms as $fieldname => $value)
-		{				// loop through parameters
-		    switch(strtolower($fieldname))
+		{				    // loop through parameters
+		    $fieldLc        = strtolower($fieldname);
+		    if (array_key_exists($fieldLc, self::$translate))
+		        $fieldLc	= self::$translate[$fieldLc];
+		    switch($fieldLc)
 		    {				// act on specific parameters
 				case 'idtd':
-				{
-				    if ($value > 0)
-				    {
-						$createRecord	= false;
-						$where		.= $and . "`IDTD`=:idtd";
-						$sqlParms['idtd']= $value;
+                {
+                    if ((is_int($value) || ctype_digit($value)) && 
+				        $value > 0)
+                    {
+                        $idtd               = (int)$value;
+						$createRecord	    = false;
+						$where		        .= "$and`IDTD`=:idtd";
+                        $sqlParms['idtd']   = $idtd;
+                        $and                = ' AND ';
 				    }
 				    else
-				    if ($value < 0)
-						$errorMsg	.= "'IDTD' value $value out of range. ";
+						$this->msg      .= "'IDTD' value $value invalid. ";
 				    break;
-				}		// idtd
+				}		    // idtd
+
+				case 'idir':
+				{
+                    if ((is_int($value) || ctype_digit($value)) && 
+				        $value > 0)
+                    {
+                        $idir               = (int)$value;
+				        $where		        .= "$and`IDIR`=:idir";
+				        $sqlParms['idir']	= $idir;
+                        $and                = ' AND ';
+				    }
+				    else
+						$this->msg      .= "'IDIR' value $value invalid. ";
+				    break;
+				}		    // IDIR
 
 				case 'todoname':
-				{
-				    $where		.= $and . "`ToDoName`=:todoname";
-				    $sqlParms['todoname']	= $value;
+                {
+                    $todoname               = $value;
+				    $where		            .= "$and`ToDoName`=:todoname";
+				    $sqlParms['todoname']	= $todoname;
+                    $and                    = ' AND ';
 				    break;
-				}		// todoname
+				}		    // todoname
+
+				case 'username':
+                {
+                    $username               = $value;
+				    $where		            .= "$and`UserName`=:username";
+				    $sqlParms['username']	= $username;
+                    $and                    = ' AND ';
+				    break;
+				}		    // username
 
 				case 'todotype':
-				case 'idir':
 				case 'idtc':
 				case 'idtl':
 				case 'openedsd':
@@ -257,79 +336,100 @@ class ToDo extends Record
 				case 'tag1':
 				case 'qstag':
 				case 'used':
-				{		// other valid field names not used to search
+				{		    // other valid field names not used to search
 				    break;
-				}		// other valid field names
+				}		    // other valid field names
 
 				default:
 				{
-				    $errorMsg	.= "'$fieldname' unsupported. ";
+				    $this->msg	.= "'$fieldname' unsupported. ";
 				    break;
 				}
 		    }				// act on specific search keys
-		}				// loop through parameters
+        }				    // loop through parameters
 
-		if (count($parms) >= count(ToDo::$initRow))
-		{		// complete row from database
-		    $dbrow		= $parms;
-		    $needInsert		= $dbrow['idtd'] == 0;
-		    $where		= '';
-		}		// complete row from database
+        // only return record for current user if user not specified
+        if (!is_null($idtd) && is_null($username))
+        {
+            $username               = $userid;
+		    $where		            .= "$and`UserName`=:username";
+            $sqlParms['username']	= $username;
+        }
 
-		// fail if invalid parameters
-		if (strlen($errorMsg) > 0)
-		    throw new Exception("ToDo::__construct: ".
-							    $errorMsg);
-
+		if (count($parms) >= count(ToDo::$initRow) && strlen($this->msg) == 0)
+		{		            // complete row from database
+		    $dbrow		            = $parms;
+            $needInsert		        = $idtd == 0;
+            if ($needInsert)
+            {
+		        $dbrow['openedsd']	= $sdate;
+                $dbrow['openedd']	= $ldate;
+            }
+		}		            // complete row from database
+        else
 		if (strlen($where) > 0)
-		{				// search for existing record
-		    // construct the query of the work to do table
-		    $query		= "SELECT * FROM tblTD WHERE " . $where;
+		{				    // search for existing record
+            // construct the query of the work to do table
+            if (is_null($idtd) && is_null($idir))
+                $where              .= "$amd IDIR=0";
+		    $query		            = "SELECT * FROM tblTD " . $where;
 		    
 		    // query the database
-		    $stmt		= $connection->prepare($query);
+            $stmt		            = $connection->prepare($query);
+            $queryText              = debugPrepQuery($query, $sqlParms);
 
 		    if ($stmt->execute($sqlParms))
-		    {		// successful execute
+		    {		        // successful execute
 				if ($debug)
-				    print "<p>$query</p>";
+                    print "<p>ToDo.inc::__construct: " . __LINE__ .
+                            " $queryText</p>";
 				
-				$result		= $stmt->fetch(PDO::FETCH_ASSOC);
-				if (is_null($result) && !$createRecord)
-				{		// error performing query
-				    throw new Exception("ToDo::__construct: ".
-								"No record found for '$where', " .
-								print_r($sqlParms, true));
-				}		// error performing query
+				$result 	        = $stmt->fetch(PDO::FETCH_ASSOC);
+				if (is_null($result))
+                {		// no matching record
+                    $dbrow          = self::$initRow;
+		            $dbrow['openedsd']	= $sdate;
+		            $dbrow['openedd']	= $ldate;
+                    $needInsert     = true;
+                }		// no matching record
+                else
+                {
+                    $dbrow          = $result;
+                    $needInsert     = false;
+                }
 		    }		// successful execute
 		    else
 		    {		// error performing query
-				throw new Exception("ToDo::__construct: ".
-							    "'$query', " . 
-							    print_r($sqlParms, true) . ', ' .
-							    print_r($stmt->errorInfo(), true));
+				$this->msg          .= "ToDo::__construct: " . __LINE__ .
+							            " '$queryText', " . 
+							        print_r($stmt->errorInfo(), true) . '. ';
 		    }		// error performing query
 		}		// existing record
 		else
 		{		// create a new record
-		    // set defaults
-		    $dbrow		= self::$initRow;
-		    $dbrow['openedsd']	= $sdate;
-		    $dbrow['openedd']	= $ldate;
+		    $dbrow		            = self::$initRow;
+		    $dbrow['openedsd']	    = $sdate;
+		    $dbrow['openedd']	    = $ldate;
+            $needInsert             = true;
 		}		// create new record
 
-		// invoke constructor of base class
+        // invoke constructor of base class
+        if (!is_array($dbrow))
+            throw new Exception("ToDo::__construct: " . __LINE__ .
+                                " \$dbrow not initialized");
 		parent::__construct($dbrow,
 						    'tblTD');
-		$this->needInsert	= $dbrow['idtd'] == 0;
+		$this->needInsert	        = $needInsert;
 
 		// initialize field values from parameters
 		if (count($parms) < count(ToDo::$initRow))
 		foreach($parms as $fieldname => $value)
 		{
-		    $fieldNameLc	= strtolower($fieldname);
-		    if ($fieldnameLc != 'idtd')
-				$dbrow[$fieldNameLc]	= $value;
+		    $fieldLc                = strtolower($fieldname);
+		    if (array_key_exists($fieldLc, self::$translate))
+		        $fieldLc	        = self::$translate[$fieldLc];
+		    if ($fieldLc != 'idtd')
+				$dbrow[$fieldLc]	= $value;
 		}		// loop through parameters
 
 		// diagnostic output if debug is set
@@ -352,126 +452,17 @@ class ToDo extends Record
     function getIdtd() { return $this->row['idtd']; }
 
     /********************************************************************
-     *	function ToDo::getCategory										*
-     *																	*
-     *	Get the numeric category code of the unit of work to do.		*
-     ********************************************************************/
-    function getCategory()
-    {
-		return $this->row['idtc'];
-    }		// function ToDo::getCategory
-
-    /********************************************************************
-     *	function ToDo::setCategory										*
-     *																	*
-     *	Set the numeric type code of the unit of work to do.			*
-     *																	*
-     *	Parameters:														*
-     *	    $newCategory		new value for IDTC						*
-     *																	*
-     *	Returns:														*
-     *	    previous type												*
-     *																	*
-     *	Throws Exception on bad parameter.								*
-     ********************************************************************/
-    function setCategory($newCategory)
-    {
-		if (!array_key_exists($newCategory, self::$intCategory))
-		{		// out of range of predefined values
-		    // query the database
-		    $query	        = "SELECT Category FROM tblTC WHERE IDTC=?";
-		    $sqlParms	    = array($newCategory);
-		    $stmt	        = $connection->prepare($query);
-		    $queryText	    = debugPrepQuery($query, $sqlParms);
-		    if ($stmt->execute($sqlParms))
-		    {		// success
-				$result		= $stmt->fetch(PDO::FETCH_ASSOC);
-				if (!is_array($result))
-				{
-				    error_log("ToDo::setCategory: ".
-							    "invalid new type=$newCategory\n");
-				    return $this->row['idtc'];
-				}
-		    }		// success
-		    else
-		    {		// error performing query
-				throw new Exception("ToDo::setCategory: ".
-							     "'$queryText' result=" . 
-							    print_r($stmt->errorInfo(),true));
-		    }		// out of range of predefined values
-		}		// out of range of predefined values
-		return parent::set('idtc', $newCategory);
-    }		// function ToDo::setCategory
-
-    /********************************************************************
-     *	function ToDo::getCategoryText									*
-     *																	*
-     *	Get the textual interpretation of the category code of the		*
-     *	unit of research work to do.									*
-     ********************************************************************/
-    function getCategoryText()
-    {
-		global $debug;
-		global $connection;
-
-		$type		= $this->row['idtc'];
-		if (array_key_exists($type, self::$intCategory))
-		    return self::$intCategory[$type];
-
-		// query the database
-		$query		= "SELECT Category FROM tblTC WHERE IDTC=?";
-		$sqlParms	= array($type);
-		$stmt		= $connection->prepare($query);
-		$queryText	= debugPrepQuery($query, $sqlParms);
-		if ($stmt->execute($sqlParms))
-		{		// success
-		    if ($debug)
-		        print "<p>ToDo::getCategoryText: " . __LINE__ . 
-							" $queryText</p>";
-		    $result		= $stmt->fetch(PDO::FETCH_ASSOC);
-		    if (is_array($result))
-		    {		// found work to do type record
-		        return $result['category'];
-		    }		// found work to do type record
-		    else
-		    {		// key not found
-		        return 'Unknown ToDo Category: ' . $type;
-		    }		// key not found
-		}		// success
-		else
-		{		// error performing query
-		    error_log("ToDo.inc: " . __LINE__ . " $queryText, " .
-						     print_r($stmt->errorInfo(),true) . "\n");
-		    return 'Unknown ToDo Category: ' . $type;
-		}		// error performing query
-
-    }		// function ToDo::getCategoryText
-
-    /********************************************************************
      *	function ToDo::getName											*
      *																	*
      *	Get the name of the unit of research work to do.				*
      ********************************************************************/
     function getName($options	= null)
     {
-		return $this->row['todoname'];
+        if ($this->row['idir'] > 0)
+		    return $this->row['idir'] . ': ' . $this->row['todoname'];
+        else
+		    return $this->row['todoname'];
     }		// function ToDo::getName
-
-    /********************************************************************
-     *	function ToDo::setName											*
-     *																	*
-     *	Set the name of the unit of research work to do.				*
-     *																	*
-     *	Parameters:														*
-     *	    $newName		new value for work to do name				*
-     *																	*
-     *	Returns:														*
-     *	    previous name												*
-     ********************************************************************/
-    function setName($newName)
-    {
-		return parent::set('todoname', $newName);
-    }		// function ToDo::setName
 
     /********************************************************************
      *	function ToDo::set												*
@@ -493,79 +484,135 @@ class ToDo extends Record
      ********************************************************************/
     function set($field, $value)
     {
-		$fieldLc	= strtolower($field);
+		$fieldLc	    = strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
-		{
+        {
+            case 'idtd':
+            {               // generated by server, cannot be changed
+                return $this->row['idtd'];
+            }               // generated by server, cannot be changed
+
+            case 'tootype':
+            {
+                if (is_int($value) || ctype_digit($value))
+                    if ($value >= 0 && $value <= 2)
+                        return parent::set('idtd', $value);
+                return $this->row['idtd'];
+            }
+
+            case 'idir':
+            {               // reference to Person
+                if (is_int($value) || ctype_digit($value))
+                    if ($value > 0)
+                        return parent::set('idir', $value);
+                return $this->row['idir'];
+            }               // reference to Person
+
+            case 'idtc':
+            {               // document category
+                if (is_int($value) || ctype_digit($value))
+                    if ($value >= 0 && $value <= 20)
+                        return parent::set('idtc', $value);
+                return $this->row['idtc'];
+            }               // documment category
+
+            case 'priority':
+            {
+                if (is_int($value) || ctype_digit($value))
+                    if ($value >= 0 && $value <= 2)
+                        return parent::set('priority', $value);
+                return $this->row['priority'];
+            }
+
+			case 'status':
+			case 'tag1':
+			case 'qstag':
+            case 'used':
+            {               // fields that can only be 0 or 1
+                if ($value)
+                    return parent::set($fieldLc, 1);    // true
+                else
+                    return parent::set($fieldLc, 0);    // false
+            }               // fields that can only be 0 or 1
+
 		    case 'openedd':
-		    {		// legacy internal date format
-				if ($value instanceof LegacyDate)
-				{	// parameter is an instance of LegacyDate
-				    $date	= $value;
-				}	// parameter is an instance of LegacyDate
-				else
-				{	// convert the value to instance of LegacyDate
-				    $date	= new LegacyDate(' ' . $value);
-				}	// convert the value to instance of LegacyDate
-				parent::set('openedsd', $date->getSortDate());
-				return parent::set('openedd', $date->getDate());
-		    }		// legacy internal date format
+		    case 'openesd':
+		    {		        // set when record created, cannot be changed
+                return $this->row['openedd'];
+		    }		        // set when record created, cannot be changed
 
 		    case 'reminderd':
-		    {		// legacy internal date format
+		    {		        // internal date format
 				if ($value instanceof LegacyDate)
-				{	// parameter is an instance of LegacyDate
+				{	        // parameter is an instance of LegacyDate
 				    $date	= $value;
-				}	// parameter is an instance of LegacyDate
+				}	        // parameter is an instance of LegacyDate
 				else
-				{	// convert the value to instance of LegacyDate
+				{	        // convert the value to instance of LegacyDate
 				    $date	= new LegacyDate(' ' . $value);
-				}	// convert the value to instance of LegacyDate
+				}	        // convert the value to instance of LegacyDate
 				parent::set('remindersd', $date->getSortDate());
 				return parent::set('reminderd', $date->getDate());
-		    }		// legacy internal date format
+		    }		        // internal date format
 
 		    case 'closedd':
-		    {		// legacy internal date format
-				if ($value instanceof LegacyDate)
-				{	// parameter is an instance of LegacyDate
-				    $date	= $value;
-				}	// parameter is an instance of LegacyDate
+		    {		        // text
+				return parent::set('closedd', $value);
+		    }		        // text
+
+		    case 'idtl':
+            {		        // value is key of location table
+                // the main table of Locations is used instead of the
+                // table of ToDo locations
+				if ($value instanceof Location)
+				{	        // parameter is an instance of Location
+				    return parent::set('idtl', $value['idlr']);
+				}	        // parameter is an instance of Location
 				else
-				{	// convert the value to instance of LegacyDate
-				    $date	= new LegacyDate(' ' . $value);
-				}	// convert the value to instance of LegacyDate
-				//parent::set('closedsd', $date->getSortDate());
-				return parent::set('closedd', $date->getDate());
-		    }		// legacy internal date format
+				if (is_int($value) || ctype_digit($value))
+				    return parent::set('idtl', (int)$value);
+                else
+                if (is_string($value))
+                {
+                    $location       = new Location(array('name' => $value));
+                    if (!$location->isExisting())
+                        $location->save(false);
+                    return parent::set('idtl', $location['idlr']);
+                }
+                else
+                    return $this->row['idtl'];
+            }               // value is key of location table
 
 		    case 'idar':
-		    {		// value is IDAR
+		    {		        // value is IDAR
 				if ($value instanceof Address)
-				{	// parameter is an instance of LegacyDate
+				{	        // parameter is an instance of Address
 				    return parent::set('idar', $value['idar']);
-				}	// parameter is an instance of LegacyDate
+				}	        // parameter is an instance of Address
 				else
 				if (is_int($value) || ctype_digit($value))
 				    return parent::set('idar', $value);
-				else
-				    throw new Exception("ToDo::set: invalid value '$value' for field '$field'");
-		    }		// value is IDAR
+                else
+                {
+				    $msg    .= "ToDo::set: invalid value '$value' for field '$field'";
+                    return $this->row['idar'];
+                }
+		    }		        // value is IDAR
 
 		    case 'openedsd':
 		    case 'remindersd':
-		    case 'closedsd':
-		    {		// legacy internal date format
-				// do not change the value, it is set by set('eventd')
+		    {		        // internal date format
+				// do not change the value, it is set by set('....d')
 				return $this->row[$field];
-		    }		// legacy internal date format
+		    }		        // internal date format
 
 		    default:
-		    {		// no validation implemented yet
+		    {		        // no validation implemented yet
 				return parent::set($field, $value);
-		    }		// no validation implemented yet
-		}		    // switch on field name
+		    }		        // no validation implemented yet
+		}		            // switch on field name
     }		// function ToDo::set
 
     /********************************************************************
@@ -604,37 +651,32 @@ class ToDo extends Record
 		    {
 				case 'idar':
 				{	    // IDAR of repository
-				    $retval	.= "    <$fld>" . $value . "</$fld>\n";
+				    $retval	    .= "    <$fld>" . $value . "</$fld>\n";
 				    if ($value > 0)
 				    {
-						try {
-						    $repo	= new Address(array('idar' => $value));
+                        $repo	= new Address(array('idar' => $value));
+                        if ($repo->isExisting())
 						    $retval	.= $repo->toXml('repository', false);
-						} catch (Exception $e) {
-						    $retval	.= "<msg>" . $e->getMessage() .
-								   "</msg>\n";
-						}
 				    }
 				    break;
 				}
 
 				case 'openedd':
 				case 'reminderd':
-				case 'closedd':
-				{		// legacy internal date format
-				    $date	= new LegacyDate($value);
-				    $retval	.= "    <{$fld}c>" . xmlentities($value) . "</{$fld}c>\n";
-				    $value	= $date->toString();
-				    $retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+				{		// internal date format
+				    $date	    = new LegacyDate($value);
+                    $retval	    .= "    <{$fld}c>" . xmlentities($value) . 
+                                    "</{$fld}c>\n";
+				    $value	    = $date->toString();
+                    $retval	    .= "    <$fld>" . xmlentities($value) . 
+                                    "</$fld>\n";
 				    break;
-				}		// legacy internal date format
+				}		// internal date format
 
 				case 'idtc':
 				{	    // document type
-				    $retval	.= "    <$fld>" . $value . "</$fld>\n";
-				    $value	= $this->getCategoryText();
-				    $retval	.= "    <category>" . xmlentities($value) .
-						"</category>\n";
+                    $meaning        = xmlentities(self::$intCategory[$value]);
+                    $retval	        .= "    <$fld>$value=$meaning</$fld>\n";
 				    break;
 				}
 
@@ -646,8 +688,11 @@ class ToDo extends Record
 		    }		    // switch on field name
 		}		        // loop through all fields
 		
-		$retval	.= "</$top>\n";
-    }		// ToDo::toXml
+        $retval	.= "</$top>\n";
+        if ($print)
+            print $retval;
+        return $retval;
+    }		// function ToDo::toXml
 
 }		// class ToDo 
 

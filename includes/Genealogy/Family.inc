@@ -2,9 +2,6 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
 /************************************************************************
  *  Family.inc															*
  *																		*
@@ -16,7 +13,7 @@ use \Iterator;
  *  The following is from the internal documentation of Legacy 7.4		*
  *  Copyright Millenium Corporation										*
  *																		*
- *		Table: tblMR - Marriage List, joins tw`o individual records		*
+ *		Table: tblMR - Marriage List, joins two individual records		*
  *				      husband must be MALE, wife must be FEMALE			*
  *				      RECORD 0 will always exist.  Don't delete it		*
  *				      RECORD 0 field IDTRSeal holds the next IDMR to use*
@@ -381,6 +378,13 @@ use \Iterator;
  *                      dump did not return contents of dump            *
  *		2019/04/15      replace is_a with instanceof                    *
  *		2019/05/20      replace exceptions in method set to warnings    *
+ *		2019/07/18      use Person::getPerson                           *
+ *		2019/07/21      use Location::getLocation                       *
+ *		2019/08/12      remove obsolete static function updateName      *
+ *		2019/08/26      add explicit definition of static $info         *
+ *		2019/09/07      improve support for language translate table    *
+ *		                on marriage date in getName                     *
+ *		2019/09/20      improve comments describing Family::dump        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -449,6 +453,11 @@ class Family extends RecordPic
      *	Family->sealEvent	instance of Event describing LDS sealing 	*
      ********************************************************************/
     private	$sealEvent	    = null;
+
+    /********************************************************************
+     *	Family->mprivlim	privacy limit on showing event dates        *
+     ********************************************************************/
+    private	$mprivlim	    = 9999;
 
     /********************************************************************
      *	Family->events		array of instances of Event					*
@@ -602,6 +611,20 @@ class Family extends RecordPic
 								'husbwifeover2'			=> '',
 								'wifehusbover2'			=> '',
 								'private'				=> 0);
+
+    /********************************************************************
+     *	Family::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'tblMR',
+                'name'      => 'Families',
+                'prime'	    => 'idmr',
+	            'srvmg'     => true,
+	            'fldcount'	=> 6,
+                'order'     => 'IDMR',
+                'classname' => 'Family');
 
     /********************************************************************
      *	function Family::__construct									*
@@ -827,6 +850,17 @@ class Family extends RecordPic
 
 		$this->needInsert	= $needInsert;
 
+        // privatize event dates if required
+        if ($this->isOwner())
+        {		            // do not privatize dates
+            $this->mprivlim	= 9999;
+        }		            // do not privatize dates
+        else
+        {		            // privatize dates
+            $currYear		= intval(date('Y'));
+            $this->mprivlim	= $currYear - 80;
+        }		            // privatize dates
+
 		// initialize the table of children of this family
 		if ($needInsert)
 		{		// new family has no children
@@ -903,7 +937,7 @@ class Family extends RecordPic
 
 		// delete the married name records associated with this
 		// family, if any
-		$nameParms	= array('Order'			        => -1, 
+		$nameParms	= array('`Order`'			        => -1, 
 							'MarriedNameMarIDID'	=> $idmr);
 		$names		= new RecordSet('Names', $nameParms);
 		$names->delete($xml);
@@ -1007,13 +1041,17 @@ class Family extends RecordPic
      ********************************************************************/
     function getName($options		= null)
     {
+        global  $warn;
+
 		$includeDate 	= true;
 		if (!class_exists(__NAMESPACE__ . '\\Language'))
 		    include __NAMESPACE__ . "/Language.inc";
 		$language	    = new Language();
 		$connector	    = $language->get('conjunction');
 		$dateprefix	    = $language->get('dateprefix');
-		$locprefix	    = '';
+        $locprefix	    = '';
+        $t              = null;
+
 		if (is_array($options))
 		{
 		    foreach($options as $key => $value)
@@ -1021,8 +1059,11 @@ class Family extends RecordPic
 				switch(strtolower($key))
 				{
 				    case 'includedate':
-				    {
-						$includeDate	= $value;
+                    {
+                        if ($value)
+						    $includeDate	= true;
+                        else
+                            $includeDate    = false;
 						break;
 				    }
 
@@ -1045,11 +1086,23 @@ class Family extends RecordPic
 				    }
 				}		// act on individual options
 		    }			// loop through options
-		}			    // options supplied
-
-		$name		        = '';
-		$mard		        = $this->row['mard'];
-        $idlrmar	        = $this->row['idlrmar'];
+        }			    // options supplied
+        else
+        if ($options instanceof \Templating\TemplateTag)
+        {
+            $t              = $options;
+			$connector	    = $t['and'];
+			$locprefix	    = $t['at'];
+			$includeDate	= true;
+        }
+        else
+        if (is_object($options))
+            $warn   .= "<p>Family::getName: " . __LINE__ . " options is instance of " . get_class($options) . "</p>\n";
+            
+        $name		        = '';
+        $marEvent           = $this->getMarEvent();
+		$mard		        = $marEvent['eventd'];
+        $idlrmar	        = $marEvent['idlrevent'];
 		if (!is_null($this->getHusbPriName()))
 		{		        // husband identified
 			$name	        .= $this->husbPriName->getName();
@@ -1066,11 +1119,22 @@ class Family extends RecordPic
 
 		if ($includeDate && strlen($mard) > 0)
 		{		        // include date of marriage
-		    $date	        = new LegacyDate($mard);
-		    $name	        .= " $dateprefix " . $date->toString();
+            $date	        = new LegacyDate($mard);
+            if ($t)
+            {
+                $name	    .= ' ' . $date->toString($this->mprivlim,
+                                                     true,
+                                                     $t);
+            }
+            else
+            {
+                $name	    .= " $dateprefix " .
+                               $date->toString($this->mprivlim,
+                                               false);
+            }
 		    if ($idlrmar > 1)
 		    {		    // not the null location
-				$marloc		= new Location(array('idlr' => $idlrmar));
+				$marloc		= Location::getLocation($idlrmar);
 				if (strlen($locprefix) > 0)
 				    $name	.= " $locprefix " . $marloc->getName();
 		    }		    // not the null location
@@ -1392,7 +1456,7 @@ class Family extends RecordPic
 		$children	= $this->getChildren();
 		foreach($children as $ic => $childr)
 		{		// loop through all existing children
-		    if ($childr->getIdir() == $idir)
+		    if ($childr['idir'] == $idir)
 				return $childr;
 		}		// loop through all existing children
 
@@ -1422,15 +1486,15 @@ class Family extends RecordPic
 		global	$debug;
 		global	$warn;
 
-		$children	= $this->getChildren();
+		$children	            = $this->getChildren();
 		foreach($children as $ic => $childr)
 		{		// loop through all existing children
-		    if ($childr->getIdir() == $idir)
+		    if ($childr['idir'] == $idir)
 				return $childr;
 		}		// loop through all existing children
-		$idmr		= $this->row['idmr'];
-		$childr		= new Child(array('idmr'	=> $idmr,
-									  'idir'	=> $idir));
+        $idmr		            = $this->row['idmr'];
+		$childr		            = new Child(array('idmr'	=> $idmr,
+                                                  'idir'	=> $idir));
 		// note that the new child does not have an IDCR value because
 		// it is not backed by a record in the database
 		// the IDCR value is assigned when the new record is saved
@@ -1466,7 +1530,7 @@ class Family extends RecordPic
 		// return null if undefined, unlike the failure when an array.
 		foreach($children as $i => $childr)
 		{		// loop through loaded list of children
-		    if ($childr->get('idcr') == $idcr)
+		    if ($childr['idcr'] == $idcr)
 		    {		// remove match
 				// remove matching entry from array
 				unset($this->children[$i]);
@@ -1776,51 +1840,6 @@ class Family extends RecordPic
 		    }			// events using IDLR
 		}			// validate event id
     }		// function Family::clearEvent
-
-    /********************************************************************
-     *  function Family::updateName										*
-     *																	*
-     *  Static member function to update appropriate records in			*
-     *	table tblMR as a result of a change to the name of an			*
-     *	individual.														*
-     *																	*
-     *  Parameters:														*
-     *	    $indiv		instance of Person for spouse					*
-     *	    $xml		true if executed command is to output to XML	*
-     ********************************************************************/
-    static function updateName($indiv, $xml=false)
-    {
-		global	$connection;
-		global	$debug;
-		global	$warn;
-		$idir		= $indiv->getIdir();
-		$gender		= $indiv->getGender();
-		if ($xml)
-		{
-		    print "<updateName>\n";
-		    print "<idir>$idir</idir>\n";
-		    print "<gender>$gender</gender>\n";
-		    print "</updateName>\n";
-		}
-
-		// update any marriage records
-		if ($gender == 1 /*Person::FEMALE*/)
-		{		// female
-		    $getParms	= array('IDIRWife'	=> $idir);
-		}		// female
-		else
-		{		// male
-		    $getParms	= array('IDIRHusb'	=> $idir);
-		}		// male
-
-		// get the list of marriages for this individual
-		$families	= new RecordSet('Families', $getParms);
-		foreach($families as $family)
-		{		// loop through all matching families
-		    $family->setName($indiv);
-		    $family->save($xml);
-		}		// loop through all matching families
-    }		// function Family::updateName
 
     /********************************************************************
      *  function Family::toXml											*
@@ -2428,7 +2447,7 @@ catch(Exception $e)
                 $idlrmar    = $this->get('idlrmar');
 				if ($idlrmar > 1)
 				{		// not the null location
-				    $marloc	= new Location(array('idlr' => $idlrmar));
+				    $marloc	= Location::getLocation($idlrmar);
 				    return $marloc->getName();
 				}		// not the null location
 				else
@@ -2473,15 +2492,15 @@ catch(Exception $e)
 		    case 'marendd':
 		    case 'seald':
 		    {		// legacy internal date format
-				$sdname	= substr($field, 0, strlen($field)-1) . 'sd';
+				$sdname	        = substr($field, 0, strlen($field)-1) . 'sd';
 				$oldvalue		= $this->row[$field];
 				if ($value instanceof LegacyDate)
 				{	// parameter is an instance of LegacyDate
-				    $date	= $value;
+				    $date	    = $value;
 				}	// parameter is an instance of LegacyDate
 				else
 				{	// convert the value to instance of LegacyDate
-				    $date	= new LegacyDate(' ' . $value);
+				    $date	    = new LegacyDate(' ' . $value);
 				}	// convert the value to instance of LegacyDate
 				parent::set($field, $date->getDate());
 				parent::set($sdname, $date->getSortDate());
@@ -2492,13 +2511,13 @@ catch(Exception $e)
 		    {		// value is IDLR
 				if (is_int($value) || ctype_digit($value))
 				{
-				    $tmp	= new Location(array('idlr' => $value));
+				    $tmp	    = Location::getLocation($value);
 				    if ($tmp->isExisting())
 						return parent::set($field, $value);
 				}
 				else
                 {
-				    $warn   .= "<p>Family::set: " . 
+				    $warn       .= "<p>Family::set: " . 
                         "invalid value '$value' for field '$field'</p>\n";
                     return $this->row[$fieldLc];
                 }
@@ -2510,7 +2529,7 @@ catch(Exception $e)
 				    return parent::set($field, $value);
 				else 
                 {
-				    $warn   .= "<p>Family::set: " . 
+				    $warn       .= "<p>Family::set: " . 
                         "invalid value '$value' for field '$field'</p>\n";
                     return $this->row[$fieldLc];
                 }
@@ -2542,7 +2561,7 @@ catch(Exception $e)
 				}
                 else
                 {
-				    $warn   .= "<p>Family::set: " . 
+				    $warn       .= "<p>Family::set: " . 
                         "invalid value '$value' for field '$field'</p>\n";
                     return $this->row[$fieldLc];
                 }
@@ -2555,9 +2574,8 @@ catch(Exception $e)
 		    case 'wifegivenname':
 		    case 'wifebirthsd':
             {		// fields maintained through method setName
-                $oldvalue           = $this->row[$fieldLc];
-                if ($this->row['idmr'] == 0)
-                    $this->row[$fieldLc]    = $value;
+                $oldvalue               = $this->row[$fieldLc];
+                $this->row[$fieldLc]    = $value;
                 return $oldvalue;
 		    }		// fields maintained through method setName
 
@@ -2571,12 +2589,14 @@ catch(Exception $e)
     /********************************************************************
      *  function Family::dump											*
      *																	*
-     *  If debug output is enabled, display a diagnostic dump of the	*
-     *  contents of a database record in the web page.					*
+     *  isplay a diagnostic dump of the	                                *
+     *  contents of the database record in the web page.				*
      *																	*
      *  Input:															*
      *	    $label		descriptive identifier for record				*
      *	    $force		if true output even if $debug false				*
+     *	                This is deprecated,                             *
+     *	                use $warn   .= $family->dump(...);              *
      *																	*
      *	Return:															*
      *	    string containing trace output as HTML						*
@@ -2591,14 +2611,14 @@ catch(Exception $e)
 		if (!is_string($label) || strlen($label) == 0)
 		    $label	= $this->getName();
 
-		$output		= '';
-        $output	    .= "<p class='label'>$label</p>\n";
-	    $output	    .= "<table border='1'>\n";
+        $output	    = "<p class='label'>$label</p>\n" .
+	                    "<table border='1'>\n";
 	    foreach($this->row as $key => $value)
 	    {
-			$output	.= "<tr>\n";
-			$output	.= "<th class='label'>\n$key</th>\n";
-			$output	.= "<td class='dataleft'>\n$value";
+			$output	.= "<tr>\n" .
+			            "  <th class='label'>\n$key</th>\n" .
+                        "    <td class='dataleft'>\n" .
+                        "      $value";
 
 			if (strlen($value) > 0)
 			switch($key)
@@ -2607,21 +2627,15 @@ catch(Exception $e)
 			    case 'marendd':
 			    case 'seald':
 			    {
-					$olddebug	= $debug;
-					$debug		= false;
 					$date		= new LegacyDate($value);
 					$output		.= ' = ' . $date->toString();
-					$debug		= $olddebug;
 					break;
 			    }		// dates
 
 			    case 'idlrmar':
 			    {
-					$olddebug	= $debug;
-					$debug		= false;
-					$loc		= new Location(array('idlr' => $value));
+					$loc		= Location::getLocation($value);
 					$output		.= ' = ' . $loc->toString();
-					$debug		= $olddebug;
 					break;
 			    }		// dates
 
@@ -2630,8 +2644,8 @@ catch(Exception $e)
 					break;
 			    }
 			}	// field specific formatting
-			$output	.= "</td>\n";
-			$output	.= "</tr>\n";
+			$output	            .= "\n    </td>\n" .
+			                        "  </tr>\n";
 	    }	// loop through keys
 	    $output	.= "</table>\n";
 
@@ -2668,18 +2682,18 @@ catch(Exception $e)
 		global	$connection;
 
 		// return value
-		$count		= false;
+		$count		    = false;
 
 		// get current date and time for added and updated fields in record
-		$now		= getdate();
-		$today		= $now['year'] * 10000 + $now['mon']*100 + $now['mday'];
-		$currtime	= $now['hours'] . ':' . $now['minutes'];
+		$now		    = getdate();
+		$today		    = $now['year'] * 10000 + $now['mon']*100 + $now['mday'];
+		$currtime	    = $now['hours'] . ':' . $now['minutes'];
 
 		// determine top level tag name for XML output
 		if (is_string($xml))
 		{		// string tag name
 		    $tagname	= $xml;
-		    $xml	= true;
+		    $xml	    = true;
 		}		// string tag name
 		else
 		if ($xml)
@@ -2691,74 +2705,75 @@ catch(Exception $e)
 		// ensure that fields in this record which represent locally
 		// cached copies of fields from other records are synchronized
 		// before saving.
-		$idirhusb	= $this->row['idirhusb'];
+		$idirhusb	    = $this->row['idirhusb'];
 		if ($idirhusb > 0)
 		{		// husband defined
 		    if (is_null($this->husband))
 		    {		// husband defined but not allocated
-				$this->husband	= new Person(array('idir' => $idirhusb));
+				$this->husband	= Person::getPerson($idirhusb);
 		    }		// husband defined but not allocated
 
-		    parent::set('husbgivenname',
-						     $this->husband->getGivenName());
-		    parent::set('husbsurname',
-						     $this->husband->getSurname());
-		    parent::set('husbbirthsd',
-						     $this->husband->get('birthsd'));
-		    $this->husband->save($xml);
+            $husbpriname                    = $this->husband->getPriName();
+		    $husbpriname['givenname']       = $this['husbgivenname'];
+		    $husbpriname['surname']         = $this['husbsurname'];
+		    parent::set('husbbirthsd',      $this->husband->get('birthsd'));
+            if ($xml)
+                $this->husband->save('husb' . __LINE__);
+            else
+		        $this->husband->save(false);
 		    parent::set('idirhusb', $this->husband->getIdir());
 		}		// husband defined
 
-		$idirwife	= $this->row['idirwife'];
+		$idirwife	                        = $this->row['idirwife'];
 		if ($idirwife > 0)
-		{		// wife defined
+		{		            // wife defined
 		    // implement wife's married name
-		    if ($this->row['marriednamerule'] == 1 &&
-				$this->row['husbsurname'] != '')
-		    {		// wife takes husband's surname
-				parent::set('wifemarrsurname',
-								 $this->get('husbsurname'));
-		    }		// wife takes husband's surname
+		    if ($this['marriednamerule'] == 1 &&
+				$this['husbsurname'] != '')
+		    {		        // wife takes husband's surname
+				parent::set('wifemarrsurname',  $this['husbsurname']);
+		    }		        // wife takes husband's surname
 		    else
-		    {		// wife keeps surname
-				parent::set('wifemarrsurname',
-								 $this->get('wifesurname'));
-		    }		// wife keeps surname
+		    {		        // wife keeps surname
+				parent::set('wifemarrsurname',  $this['wifesurname']);
+		    }		        // wife keeps surname
 
-		    try {
-				$wife	= new Person(array('idir' => $idirwife));
-				parent::set('wifegivenname',	$wife->getGivenName());
-				parent::set('wifesurname',	$wife->getSurname());
-				parent::set('wifebirthsd',	$wife->get('birthsd'));
-		    } catch (Exception $e) {
-				$wife	= new Person();	
-				$wife->set('givenname',		$this->get('wifegivenname'));
-				$wife->set('surname',		$this->get('wifesurname'));
+            $wife	                = Person::getPerson($idirwife);
+            if ($wife->isExisting())
+            {                   // existing Person
+				parent::set('wifebirthsd',	    $wife->get('birthsd'));
+            }                   // existing Person
+            else 
+            {                   // new Person
+				$wife->set('givenname',		    $this->get('wifegivenname'));
+				$wife->set('surname',		    $this->get('wifesurname'));
 				$birthsd			= $this->row['wifebirthsd'];
 				if ($birthsd != -99999999)
 				{
-				    $by		= floor($birthsd/10000);
-				    $birthsd	-= 10000*$by;
-				    $bm		= floor($birthsd/100);
-				    $bd		= $birthsd % 100;
+				    $by		        = floor($birthsd/10000);
+				    $birthsd	    -= 10000*$by;
+				    $bm		        = floor($birthsd/100);
+				    $bd		        = $birthsd % 100;
 				    if ($bm > 0)
 						$wife->set('birthd',
 									$by . '/' . $bm . '/' . $bd);
 				    else
 						$wife->set('birthd',
 									'about ' . $by);
-				}
-				$wife->save($xml);
+                }
+                if ($xml)
+                    $wife->save('wife' . __LINE__);
+                else
+				    $wife->save(false);
 				parent::set('idirwife', $wife->getIdir());
-		    }
-
-		}		// wife defined
+		    }                   // new Person
+		}		                // wife defined
 
 		// validate IDLRMar
 		$idlrmar	= $this->row['idlrmar'];
 		if ($idlrmar > 1)
 		{		// 1 is default empty location
-		    $marloc		= new Location(array('idlr' => $idlrmar));
+		    $marloc		= Location::getLocation($idlrmar);
 		}		// 1 is default empty location
 
 		// To Do
@@ -2878,8 +2893,11 @@ catch(Exception $e)
 				    $children		= $this->getChildren();
 				    foreach($children as $child)
 				    {
-				       $child->set('idmr', $idmr);
-				       $child->save($xml);
+                        $child->set('idmr', $idmr);
+                        if ($xml)
+                            $child->save('child' . __LINE__);
+                        else
+				            $child->save(false);
 				    }
 
 				    // make the current user an owner of the new family
@@ -3014,11 +3032,11 @@ catch(Exception $e)
 				{	            // output XML
 				    if ($childr->isExisting())
 						print "<child idcr='" . $childr->getIdcr() .
-								"' idir='" . $childr->getIdir() .
-								"' order='" .  $childr->get('order') . "'>\n";
+								"' idir='" . $childr['idir'] .
+								"' order='" .  $childr['order'] . "'>\n";
 				    else
-						print "<child idir='" . $childr->getIdir() .
-								"' order='" .  $childr->get('order') . "'>\n";
+						print "<child idir='" . $childr['idir'] .
+								"' order='" .  $childr['order'] . "'>\n";
 				}	            // output XML
 				$childr->save($xml);	// update database
 				if ($xml)
@@ -3079,7 +3097,7 @@ catch(Exception $e)
 
 		// merge marriage date and location
 		$date	= new LegacyDate($oldFamily->get('mard'));
-		$loc	= new Location(array('idlr' => $oldFamily->get('idlrmar')));
+		$loc	= Location::getLocation($oldFamily->get('idlrmar'));
 		if ($this->get('mard') == '' &&
 		    $this->get('idlrmar') <= 1)
 		{		// new family does not have a marriage event

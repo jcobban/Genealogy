@@ -6,6 +6,7 @@
  *  History:															*
  *		2018/02/02		created											*
  *      2019/04/11      add send email to pending users                 *
+ *      2019/08/24      correct alignment of buttons                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
@@ -57,21 +58,27 @@
 			size="64" value="$MAILPATTERN">
       </div>
     <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
-    <p class="label">
+    <div class="row" style="margin-left: 3em; margin-top: 3px;">
       <button type="submit" id="Submit">
+          <span style="display: inline;">
 		Search
+          </span>
       </button>
     &nbsp;
-      <a href="mailto:?to=$TOLIST&amp;bcc=$BCCLIST&amp;subject=[JamesCobban.net]%20General%20Notice" T
-		    class="buttonText" id="bulkMail">
-		Send Mail to all Users
+      <a href="mailto:?to=$TOLIST&amp;bcc=$BCCLIST&amp;subject=[JamesCobban.net]%20General%20Notice"
+		    class="button" id="bulkMail">
+          <span style="white-space: nowrap; text-indent: 0em;">
+              Send Mail to all Users
+          </span>
       </a>
     &nbsp;
       <a href="mailto:?to=$TOLIST&amp;bcc=$PENDLIST&amp;subject=[JamesCobban.net]%20General%20Notice" 
-	    class="buttonText" id="bulkMail">
-	    Send Mail to all Pending Users
+	    class="button" id="pendMail">
+          <span style="white-space: nowrap; text-indent: 0em;">
+              Send Mail to all Pending Users
+          </span>
       </a>
-    </p>
+    </div>
       <div class="center" id="topBrowse">
         <span class="left" id="topPrev">
 		  <a href="/Users.php?pattern=$pattern&amp;authpattern=$authpattern&amp;mailpattern=$mailpattern&amp;limit=$limit&amp;offset=$prevoffset">
@@ -109,32 +116,32 @@
 		<tr id="Row$id">
 		  <td class="$rowtype left">
 		      <input type="text" class="white leftnc" size="18"
-		    	name="User$id" id="User$id"
-		      	value="$username">
+			    name="User$id" id="User$id"
+			      value="$username">
 		  </td>
 		  <td class="$rowtype left">
 		      <input type="text" class="white leftnc" size="24"
-		    	name="EMail$id" id="EMail$id"
-		      	value="$email">
+			    name="EMail$id" id="EMail$id"
+			      value="$email">
 		  </td>
 		  <td class="$rowtype left">
 		      <input type="text" class="white leftnc" size="18"
-		    	name="Auth$id" id="Auth$id"
-		      	value="$auth">
+			    name="Auth$id" id="Auth$id"
+			      value="$auth">
 		  </td>
 		  <td class="$rowtype left">
 			<button type="button" id="delete$id">
-		    	Delete
+			    Delete
 			</button>
 		  </td>
 		  <td class="$rowtype left">
 			<button type="button" id="reset$id">
-		    	Reset&nbsp;Password
+			    Reset&nbsp;Password
 			</button>
 		  </td>
 		  <td class="$rowtype left">
 			<button type="button" id="confirm$id" $disabled>
-		    	Confirm
+			    Confirm
 			</button>
  	  </td>
 		</tr>
@@ -151,92 +158,102 @@
 		as supported by MySQL,
 		which is used to search for users based upon their user name.
     </p>
-  <ul>
-    <li>If the pattern contains no special 
-		characters then only users containing that string will be included.
-		For example the pattern "bob" will match users containing the
-		string "bob".  Note that the search ignores case, so that pattern
-		will also match "Bob" and "BOB".
-    <li>If the pattern begins with a caret '^' then only users that
-		<b>begin</b> with the remainder of the pattern are included.  
-		For example the pattern
-		"^Ba" displays users starting with "Ba" (or "ba" or "BA").
-    <li>If the pattern ends with a dollar sign '$', then only users that
-		<b>end</b> with the remainder of the pattern are included.  
-		For example the pattern
-		"CA$" matches users that end with "CA" (or "ca" or "Ca").
-    <li>In a pattern a period '.' matches any single character.  For example
-		the pattern "B.b" matches any user that contains two letter Bs
-		separated by one character, for example "Bab", "Beb", "Bib", "Bob",
-		or "Bub" anywhere in the user name.
-    <li>In a pattern an asterisk '*' matches zero or more of the preceding
-		character; "bo*b" matches "bb", "bob", and "boob"
-		anywhere in the user name.
-  <ul>
-</p>
-</div>
-<div class="balloon" id="HelpmailPattern">
-  <p>
-		This is an 
-		<a href="https://www.regular-expressions.info/posix.html#ere">
-		    extended regular expression</a>,
-		as supported by MySQL,
-		which is used to search for users based upon their user name.
-      <li>If the pattern contains no special 
-		characters then only users whose e-mail address contains that string
-		will be included.
-		For example the pattern "London" will match users whose e-mail address
-		contains the
-		string "London".  Note that the search ignores case, so that pattern
-		will also match "LONDON" and "london".
-      <li>If the pattern begins with a caret '^' then only users whose e-mail
-		address <b>begins</b> with the remainder of the pattern are included.  
-		For example the pattern "^Ba" displays users whose e-mail address
-		starts with "Ba" (or "ba" or "BA").
-      <li>If the pattern ends with a dollar sign '$', then only users whose
-		e-mail address <b>ends</b> with the remainder of the pattern are
-		included.  For example the pattern "CA$" matches users whose e-mail
-		address ends with "CA" (or "ca" or "Ca").
-      <li>In a pattern a period '.' matches any single character.  For example
-		the pattern "B.b" matches any user whose e-mail address contains two
-		letter Bs separated by one character, for example "Bab", "Beb", "Bib",
-		"Bob", or "Bub" anywhere in the e-mail address.
-      <li>In a pattern an asterisk '*' matches zero or more of the preceding
-		character; "bo*b" matches "bb", "bob", and "boob"
-		anywhere in the e-mail address.
     <ul>
-  </p>
+      <li>If the pattern contains no special 
+		  characters then only users containing that string will be included.
+		  For example the pattern "bob" will match users containing the
+		  string "bob".  Note that the search ignores case, so that pattern
+		  will also match "Bob" and "BOB".
+      </li>
+      <li>If the pattern begins with a caret '^' then only users that
+		  <b>begin</b> with the remainder of the pattern are included.  
+		  For example the pattern
+		  "^Ba" displays users starting with "Ba" (or "ba" or "BA").
+      </li>
+      <li>If the pattern ends with a dollar sign '$', then only users that
+		  <b>end</b> with the remainder of the pattern are included.  
+		  For example the pattern
+		  "CA$" matches users that end with "CA" (or "ca" or "Ca").
+      </li>
+      <li>In a pattern a period '.' matches any single character.  For example
+		  the pattern "B.b" matches any user that contains two letter Bs
+		  separated by one character, for example "Bab", "Beb", "Bib", "Bob",
+		  or "Bub" anywhere in the user name.
+      </li>
+      <li>In a pattern an asterisk '*' matches zero or more of the preceding
+		  character; "bo*b" matches "bb", "bob", and "boob"
+		  anywhere in the user name.
+      </li>
+    </ul>
   </div>
-  <div class="balloon" id="HelpauthPattern">
-    This is the identifier of a level of authorization, such as 'edit', or
-    'blog', or 'all'.
-  </div>
-  <div class="balloon" id="HelpUser">
-    This field permits the administrator to change the user name chosen by the
-    contributor.
-  </div>
-  <div class="balloon" id="HelpEMail">
-    This field permits the administrator to change the e-mail address supplied
-    by the contributor.
-  </div>
-  <div class="balloon" id="HelpAuth">
-    This field permits the administrator to change the list of authorizations
-    for the contributor.
-  </div>
-  <div class="balloon" id="HelpSubmit">
-    Click on this button to search for matching users.
-  </div>
-  <div class="balloon" id="Helpdelete">
-    Click on this button to delete the associated user.
-  </div>
-  <div class="balloon" id="Helpreset">
-    Click on this button to reset the password of the associated user to a new
-    random string.
-  </div>
-  <div class="balloon" id="Helpconfirm">
-    Click on this button to confirm the associated user and assign initial
-    permissions.  This is in-case the e-mail exchange failed.
-  </div>
+    <div class="balloon" id="HelpmailPattern">
+      <p>
+	      This is an 
+	      <a href="https://www.regular-expressions.info/posix.html#ere">
+		        extended regular expression</a>,
+	      as supported by MySQL,
+	      which is used to search for users based upon their user name.
+      </p>
+      <ul>
+        <li>If the pattern contains no special 
+		  characters then only users whose e-mail address contains that string
+		  will be included.
+		  For example the pattern "London" will match users whose e-mail address
+		  contains the
+		  string "London".  Note that the search ignores case, so that pattern
+		  will also match "LONDON" and "london".
+        </li>
+        <li>If the pattern begins with a caret '^' then only users whose e-mail
+		  address <b>begins</b> with the remainder of the pattern are included.  
+		  For example the pattern "^Ba" displays users whose e-mail address
+		  starts with "Ba" (or "ba" or "BA").
+        </li>
+        <li>If the pattern ends with a dollar sign '$', then only users whose
+		  e-mail address <b>ends</b> with the remainder of the pattern are
+		  included.  For example the pattern "CA$" matches users whose e-mail
+		  address ends with "CA" (or "ca" or "Ca").
+        </li>
+        <li>In a pattern a period '.' matches any single character.  For example
+		  the pattern "B.b" matches any user whose e-mail address contains two
+		  letter Bs separated by one character, for example "Bab", "Beb", "Bib",
+		  "Bob", or "Bub" anywhere in the e-mail address.
+        </li>
+        <li>In a pattern an asterisk '*' matches zero or more of the preceding
+		  character; "bo*b" matches "bb", "bob", and "boob"
+		  anywhere in the e-mail address.
+        </li>
+      </ul>
+    </div>
+    <div class="balloon" id="HelpauthPattern">
+      This is the identifier of a level of authorization, such as 'edit', or
+      'blog', or 'all'.
+    </div>
+    <div class="balloon" id="HelpUser">
+      This field permits the administrator to change the user name chosen by the
+      contributor.
+    </div>
+    <div class="balloon" id="HelpEMail">
+      This field permits the administrator to change the e-mail address supplied
+      by the contributor.
+    </div>
+    <div class="balloon" id="HelpAuth">
+      This field permits the administrator to change the list of authorizations
+      for the contributor.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+      Click on this button to search for matching users.
+    </div>
+    <div class="balloon" id="Helpdelete">
+      Click on this button to delete the associated user.
+    </div>
+    <div class="balloon" id="Helpreset">
+      Click on this button to reset the password of the associated user to a new
+      random string.
+    </div>
+    <div class="balloon" id="Helpconfirm">
+      Click on this button to confirm the associated user and assign initial
+      permissions.  This is in-case the e-mail exchange failed.
+    </div>
     <script src="/jscripts/js20/http.js" type="text/javaScript">
     </script>
     <script src="/jscripts/CommonForm.js" type="text/javaScript">

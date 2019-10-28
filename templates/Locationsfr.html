@@ -80,7 +80,7 @@
 		<thead>
 		  <tr>
 			<th class="colhead">
-			  IDLR
+			  Détails
 			</th>
 			<th class="colhead">
 			  Nom de Lieu
@@ -97,10 +97,10 @@
 		  </tr>
 		</thead>
 		<tbody>
-		  <tr id="location">
+		  <tr id="location$IDLR">
 			<td class="odd right">
-			    <a href="Location.php?id=$IDLR&amp;lang=fr">
-					$IDLR 
+			    <a href="Location.php?id=$IDLR&amp;lang=fr" class="button">
+					Détails
 			    </a>
 			</td>
 			<td class="odd left">
@@ -121,48 +121,52 @@
       </div> <!-- id="somematches"-->
 	</div>	<!-- end of id="body" -->
 	<div class="balloon" id="Helppattern">
-	<p>
+	  <p>
 		C'est une expression régulière, telle que supportée par MySQL, 
         qui permet de limiter les emplacements à afficher. 
         Voir <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer&quote;s regex page</a>.
-	<ul>
-	<li>Si le modèle ne contient pas de caractères spéciaux, seuls 
+	  </p>
+	  <ul>
+	    <li>Si le modèle ne contient pas de caractères spéciaux, seuls 
         les emplacements contenant cette chaîne seront inclus.
 		Par exemple, le modèle "London" correspondra aux emplacements 
         contenant la chaîne "London". 
         Notez que la recherche ignore la casse, de sorte que le motif 
         corresponde également aux "LONDON" et "London".
-	<li>Si le motif commence par un lambda caret '^', seuls les emplacements 
+        </li>
+	    <li>Si le motif commence par un lambda caret '^', seuls les emplacements 
         commençant par le reste du motif sont inclus.  
 		Par exemple, le motif "^ Ba" affiche les emplacements 
         commençant par "Ba" (ou "ba" ou "BA").
-	<li>If the pattern ends with a dollar sign '$', then only locations that
-	<b>end</b> with the remainder of the pattern are included.  
+        </li>
+	    <li>If the pattern ends with a dollar sign '$', then only locations that
+	    <b>end</b> with the remainder of the pattern are included.  
 		For example the pattern
-	"CA$" matches locations that end with "CA" (or "ca" or "Ca").
-	<li>In a pattern a period '.' matches any single character.  For example
+	    "CA$" matches locations that end with "CA" (or "ca" or "Ca").
+        </li>
+	    <li>In a pattern a period '.' matches any single character.  For example
 		the pattern "B.b" matches any location that contains two letter Bs separated
 		by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
 		anywhere in the location name.
-	<li>In a pattern an asterisk '*' matches zero or more of the preceding
+        </li>
+	    <li>In a pattern an asterisk '*' matches zero or more of the preceding
 		character; "bo*b" matches "bb", "bob", and "boob"
 		anywhere in the location name.
-	</p>
+        </li>
+	  </ul>
 	</div>
 	<div class="balloon" id="Helpnamefld">
-	<p>Entrez un nom d'emplacement réel dans ce champ.  Lorsque vous cliquez 
+	    Entrez un nom d'emplacement réel dans ce champ.  Lorsque vous cliquez 
         sur le bouton <span class="button">Rechercher</span>, la boîte de 
         dialogue permettant d'afficher ou de modifier les détails 
         de l'emplacement apparaît. If you are authorised to 
 		update the database then this dialog permits you to create a new location,
 		otherwise only existing locations can be viewed in this way.
-	</p>
 	</div>
 	<div class="balloon" id="HelpSearch">
-	<p>Clicking on this button refreshes the displayed list of locations
+	    Clicking on this button refreshes the displayed list of locations
 		based upon the pattern.  You may also hit the "enter" key to perform the
 		same function.
-	</p>
 	</div>
 	<!-- balloons to pop up when mouse moves over forward and back links -->
 	<div class="popup" id="mousetopPrev">

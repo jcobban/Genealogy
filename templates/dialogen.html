@@ -26,6 +26,23 @@
             id="otherStylesheets">
   </head>
   <body>
+      
+<script>
+
+   var tinyMCEparms = {
+		selector            : 'textarea',
+	    plugins             : 'link lists image',
+	    menubar             : false,
+        language            : '$LANG',
+        skin                : 'oxide-dark',
+	    toolbar             : "undo redo | styleselect | bold italic | " 
+	                           + "alignleft aligncenter alignright alignjustify | " 
+	                           + "bullist numlist | link image",
+	    content_css		    : "/styles.css"
+	};
+	
+</script>
+
     <main id="mainSection">
       <noscript>
         <p class="warning">
@@ -68,7 +85,7 @@
               title="Your account status">
               Account $USERID
             <span id="gotMail">
-                <img src="/envelope.svg" alt="You have mail" style="display: inline; height: 19px;"/>
+                <img src="/envelope.svg" alt="You have mail" style="display: inline-block; height: 19px;"/>
             </span>
           </a><br>
       </span>

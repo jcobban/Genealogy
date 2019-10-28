@@ -223,8 +223,13 @@ HTTP.post = function(url,
 				     callback, 
 				     errorHandler) 
 {
+    console.log("HTTP.post('" + url + "',values=" + JSON.stringify(values));
     if (values.length == 0)
-        console.log(new Error().stack);
+        console.log("HTTP.post: no values passed" + new Error().stack);
+    if (callback == 0)
+        console.log("HTTP.post: callback is null" + new Error().stack);
+    if (errorHandler == 0)
+        console.log("HTTP.post: errorHandler is null"+ new Error().stack);
     var request = HTTP.newRequest();
     request.onreadystatechange = function() {
 		if (request.readyState == 4) {
@@ -303,6 +308,7 @@ HTTP._getResponse = function(request) {
     
 		case "text/json":
 		case "application/json": 
+            console.log("HTTP._getResponse: 306 type='" + type + "' text='" + request.responseText + "'");
 		    // If the response is a JSON-encoded value,
 		    return JSON.parse(request.responseText);
     
@@ -315,6 +321,7 @@ HTTP._getResponse = function(request) {
 		    return eval(request.responseText);
     
 		default:
+            console.log("HTTP._getResponse: 318 type='" + type + "' text='" + request.responseText + "'");
 		    // Otherwise, treat the response as plain text and return as a string
 		    return request.responseText;
     }

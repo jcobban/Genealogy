@@ -9,8 +9,10 @@
  *		2018/02/03		change breadcrumbs to new standard				*
  *      2018/11/01      pass language to Surnames script                *
  *      2019/05/18      display search name from cookie or parameter    *
+ *      2019/06/29      no longer necessary to include $template in     *
+ *                      id attributes of elements in a template         *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
 <link rel="stylesheet" type="text/css" href="/FamilyTree/nominalIndex.css">
 <div class="hidden" id="breadcrumbs">
@@ -155,17 +157,17 @@
 </div> <!-- end of <div id="body"> -->
 <div class="hidden" id="templates">
   <!-- template for dialog for creating new tree -->
-  <form name="CreateTree$template" id="CreateTree$template"
+  <form name="CreateTreeTemplate" id="CreateTreeTemplate"
 	onsubmit="return false;">
     <h2>Créer un Arbre Neuf dans la Base de Données</h2>
-    <input id="newTreeName$template" name="newTreeName$template"
+    <input name="newTreeName"
 	class="white left" size="50">
     <p>
-      <button type="button" id="closeCreate$template">
+      <button type="button">
 	Annuller
       </button>
     </p>
-  </form> <!-- end of CreateTree$template -->
+  </form> <!-- end of CreateTreeTemplate -->
 </div> <!-- id="templates" -->
 <div class="balloon" id="HelpName">
 <p>Type a name, starting with the surname, a comma, and the given names.  

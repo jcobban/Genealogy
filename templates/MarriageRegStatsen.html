@@ -1,0 +1,94 @@
+<!--*********************************************************************
+ *  MarriageRegStatsen.html	        									*
+ *																		*
+ *  Template to display the status of the transcription of marriage     *
+ *  registrations.	                                                    *
+ *																		*
+ *  History:															*
+ *		2017/07/08		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+        Genealogy
+      </a>:
+      <a href='/Canada/CountriesEdit.php?lang=$LANG'>
+        List of Supported Countries
+      </a>:
+      <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">
+        $COUNTRYNAME
+      </a>:
+      <a href="/Canada/genProvince.php?Domain=$DOMAIN&amp;lang=$LANG">
+        $STATENAME
+      </a>:
+      <a href="MarriageRegQuery.php?domain=$DOMAIN&amp;lang=$LANG">
+        Marriage Query
+      </a>:
+    </div>
+    <div class='body'>
+      <h1>
+        <span class='right'>
+      	<a href='MarriageRegStatsHelpen.html' target='_blank'>Help?</a>
+        </span>
+          $DOMAINNAME Marriage Registration Status
+      </h1>
+      $TRACE
+	  $MSG
+      <form id='display' action='donothing.php' method='get'>
+      <!--- Put out the response as a table -->
+        <table class='details' id="dataTable">
+          <thead>
+          <!--- Put out the column headers -->
+            <tr id="columnHeaders">
+	          <th class='colhead'>
+	            Year
+	          </th>
+              <th class='colhead'>
+	            Done
+	          </th>
+	          <th class='colhead'>
+	            View
+	          </th>
+		    </tr>
+          </thead>
+          <tbody>
+            <tr id="row$REGYEAR">
+			  <td class='$YEARCLASS right'>
+			    $REGYEAR
+			    <input type='hidden' id='RegYear$REGYEAR'
+					    value='$REGYEAR'>
+			  </td>
+			  <td class='$YEARCLASS right'>
+				$DONE
+			  </td>
+			  <td class='left'>
+			    <button type='button' id='YearStats$REGYEAR'>
+					View
+			    </button>
+			  </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+        	  <td class='right'>
+	            Total
+	          </td>
+	          <td class='dataright'>
+        	    $TOTAL
+        	  </td>
+            </tr>
+          </tfoot>
+        </table>
+      </form>
+    </div>
+    <div class='balloon' id='HelpYearStats'>
+	  Click on this button to display the geographical breakdown of the
+	  transcription for the specific year.
+	</div>
+	<div class='balloon' id='HelpRegYear'>
+	  This field shows the year for which the statistics apply.
+	</div>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="MarriageRegStats.js" type="text/javascript"></script>

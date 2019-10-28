@@ -1,0 +1,278 @@
+<!--*********************************************************************
+ *  EventTypesEditen.html												*
+ *																		*
+ *  Template to isplay a web page containing the records from the		*
+ *  Event Types Table tblET.											*
+ *																		*
+ *  History:															*
+ *		2019/07/23		created											*
+ *      2019/09/25      add value="1" to checkboxes                     *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+    </div>
+    <div class="body">
+	  <h1>Event Type List
+	    <span class="right">
+	      <a href="EventTypesHelpen.html" target="help">? Help</a>
+	    </span>
+	    <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+	  <p class="warning">This table is not used by the web-site because
+	      it does not support internationalization.  
+          Translation of numeric event type codes to displayed event type 
+          names are now defined in the language-specific
+          translate tables in the templates folder.
+          See <a href="/ViewTemplate.php?template=Trantab$LANG.html&lang=$LANG" target="_blank">
+              Trantab$LANG.html
+          </a>
+	  </p>
+	  <form name="srcForm" action="EventTypes.php" method="post">
+        <!--- Put out the response as a table -->
+        <table class="details" id="dataTable">
+            <!--- Put out the column headers -->
+          <thead>
+	        <tr>
+	          <th class="colhead">
+	            Edit
+	          </th>
+	          <th class="colhead">
+	            Event Type
+	          </th>
+	          <th class="colhead">
+	            Used
+	          </th>
+	          <th class="colhead">
+	            Tag1
+	          </th>
+	          <th class="colhead">
+	            qsTag
+	          </th>
+	          <th class="colhead">
+	            Date
+	          </th>
+	          <th class="colhead">
+	            Place
+	          </th>
+	          <th class="colhead">
+	            Descr.
+	          </th>
+	          <th class="colhead">
+	            Private
+	          </th>
+	          <th class="colhead">
+	            PP Excl.
+	          </th>
+	          <th class="colhead">
+	            RG Excl.
+	          </th>
+	          <th class="colhead">
+	            Delete
+	          </th>
+	        </tr>
+          </thead>
+          <tbody>
+	        <tr id="Row$IDET">
+	          <td class="left">
+	            <button type="button" id="More$IDET">
+	                  Edit $IDET
+	            </button>
+	          </td>
+	          <td class="left">
+	            <input type="text" class="white left" size="40"
+	                    name="EventType$IDET" id="EventType$IDET"
+	                    value="$EVENTTYPE" >
+	          </td>
+	          <td class="center">
+	            <input type="checkbox"
+					    name="Used$IDET" id="Used$IDET" value="1" 
+	                    $USEDCHECKED>
+	          </td>
+	          <td class="center">
+	            <input type="checkbox"
+					    name="tag1$IDET" id="tag1$IDET" value="1"   
+	                    $TAG1CHECKED>
+	          </td>
+	          <td class="center">
+	            <input type="checkbox"
+					    name="qstag$IDET" id="qstag$IDET" value="1"   
+	                    $QSTAGCHECKED>
+	          </td>
+	          <td class="center">
+	            <input type="checkbox"
+					    name="ShowDate$IDET" id="ShowDate$IDET" value="1"  
+	                    $SHOWDATECHECKED>
+	          </td>
+	          <td class="center">
+	            <input type="checkbox"
+					    name="ShowPlace$IDET" id="ShowPlace$IDET" value="1"  
+	                    $SHOWPLACECHECKED>
+	          </td>
+	          <td class="center">
+	            <input type="checkbox"
+					    name="ShowDescription$IDET" id="ShowDescription$IDET" 
+                         value="1" $SHOWDESCRIPTIONCHECKED>
+	          </td>
+	          <td class="center">
+	            <input type="checkbox"
+					    name="Private$IDET" id="Private$IDET" value="1" 
+	                    $PRIVATECHECKED>
+	          </td>
+	          <td class="center">
+	            <input type="checkbox"
+					    name="PPExclude$IDET" id="PPExclude$IDET" value="1"  
+	                    $PPEXCLUDECHECKED>
+	          </td>
+	          <td class="center">
+	            <input type="checkbox"
+					    name="RGExclude$IDET" id="RGExclude$IDET" value="1"  
+	                    $RGEXCLUDECHECKED>
+	          </td>
+	          <td class="center">
+	            <button type="button" id="Delete$IDET">
+	              Delete
+	            </button>
+	          </td>
+	        </tr>
+          </tbody>
+        </table>
+        <p>
+            <button type="button" id="Add">
+                Create New Event Type
+            </button>
+        </p>
+        <p>
+          <button type="submit" id="Submit">Update Table</button>
+        </p>
+	  </form>
+	</div> <!-- class="body" -->
+	<div class="balloon" id="HelpIDET">
+	  This field contains the unique numeric code point used in the
+	      Event table (tblER) to identify this
+	      event type.
+    </div>
+    <div class="balloon" id="HelpEventType">
+	  This field contains the textual description of the Event 
+	      type, as it will appear in web pages, and on selection
+	      lists when updating the database.
+    </div>
+    <div class="balloon" id="HelpUsed">
+	  Internal use by Legacy.
+    </div>
+    <div class="balloon" id="Helptag">
+	  Internal use by Legacy.
+    </div>
+    <div class="balloon" id="Helpqstag">
+	  Internal use by Legacy.
+    </div>
+    <div class="balloon" id="HelpDelete">
+	  Click on this button to delete the event type described in this row
+	      of the table.
+    </div>
+    <div class="balloon" id="HelpMore">
+	  Click on this button to display more detailed information
+	      about this event, including the default sentence overrides.
+    </div>
+    <div class="balloon" id="HelpAdd">
+	  Click on this button to add a new event type to the table.
+	      A new row is added to the table with a blank description.
+	      Edit the description and click on the "Update Table" button
+	      to add the new entry.
+    </div>
+    <div class="balloon" id="HelpShowDate">
+	  If set the date should be included when this type of event
+	      is shown.
+    </div>
+    <div class="balloon" id="HelpShowPlace">
+	  If set the location should be included when this type of event is
+	      shown.
+    </div>
+    <div class="balloon" id="HelpShowDescription">
+	  If set the description should be included when this type of event
+	      is shown.
+    </div>
+    <div class="balloon" id="HelpPrivate">
+	  This type of event should not be displayed to casual users.
+    </div>
+    <div class="balloon" id="HelpPPExclude">
+	  If set exclude events of this type from the Potential Problems report.
+    </div>
+    <div class="balloon" id="HelpRGExclude">
+	  Future use by Legacy.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+	  Click on this button to update the database to reflect the
+	      changes you have entered.  
+    </div>
+    <div class="hidden" id="templates">
+	  <!--
+	   *	templates for HTML to be added to the page by Javascript
+	  -->
+	  <table id="templateRows">
+	    <!--
+	    *	layout of the table row to add a new event type.
+        -->
+	    <tr id="newEvent$idet">
+	        <td class="left">
+	          <button type="button" id="More$idet">
+	                Edit $idet
+	          </button>
+	        </td>
+	        <td class="left">
+	          <input type="text" class="white leftnc" size="40"
+					name="EventType$idet" id="EventType$idet"
+					value="$eventtype">
+	        </td>
+	        <td class="center">
+	          <input type="checkbox"
+					name="Used$idet" id="Used$idet"  value="1" >
+	        </td>
+	        <td class="center">
+	          <input type="checkbox"
+					name="tag1$idet" id="tag1$idet"  value="1" >
+	        </td>
+	        <td class="center">
+	          <input type="checkbox"
+					name="qstag$idet" id="qstag$idet"  value="1" >
+	        </td>
+	        <td class="center">
+	          <input type="checkbox"
+					name="ShowDate$idet" id="ShowDate$idet" value="1" 
+					checked>
+	        </td>
+	        <td class="center">
+	          <input type="checkbox"
+					name="ShowPlace$idet" id="ShowPlace$idet" value="1" 
+					checked>
+	        </td>
+	        <td class="center">
+	          <input type="checkbox"
+					name="ShowDescription$idet" id="ShowDescription$idet"
+				    value="1" checked>
+	        </td>
+	        <td class="center">
+	          <input type="checkbox"
+					name="Private$idet" id="Private$idet" value="1">
+	        </td>
+	        <td class="center">
+	          <input type="checkbox"
+					name="PPExclude$idet" id="PPExclude$idet" value="1">
+	        </td>
+	        <td class="center">
+	          <input type="checkbox"
+					name="RGExclude$idet" id="RGExclude$idet" value="1">
+	        </td>
+	        <td class="center">
+	        </td>
+	    </tr>
+	  </table>
+    </div> <!-- id="templates" -->
+    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+    <script src="/FamilyTree/EventTypes.js" type="text/javascript"></script>

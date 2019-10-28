@@ -101,8 +101,8 @@ foreach($_GET as $key => $value)
 
 	    case 'pattern':
         {		// soundex specified
-            $pattern    = $value;
-			$title		= "Surnames with Pattern '$value'";
+            $pattern                = $value;
+			$title		            = "Surnames with Pattern '$value'";
 			$getParms['surname']	= $pattern;
 			break;
 	    }		// soundex specified
@@ -110,13 +110,15 @@ foreach($_GET as $key => $value)
 	    case 'maxcols':
 	    {		// maximum number of surnames per row
 			if (ctype_digit($value))
-			    $maxcols	= intval($value);
+                $maxcols	        = intval($value);
+            if ($maxcols> 9)
+                $maxcols            = 9;
 			break;
         }		// maximum number of surnames per row
 
         case 'treename':
         {
-            $treename       = $value;
+            $treename               = $value;
         }
 
         case 'lang':
@@ -132,45 +134,43 @@ $template	        = new FtTemplate( "Surnames$lang.html");
 if (!is_null($initial))
 {
 	if (strlen($initial) == 0)
-	    $title	= $template->getElementById('nosurname')->innerHTML();
+	    $title	= $template['nosurname']->innerHTML();
 	else
     if (ctype_alpha($initial))
     {
-        $title	= $template->getElementById('starting')->innerHTML();
+        $title	= $template['starting']->innerHTML();
         $title  = str_replace('$INITIAL', $initial, $title);
     }
 	else
-	    $title	= $template->getElementById('invalid')->innerHTML();
+	    $title	= $template['invalid']->innerHTML();
 }
 else
 if (!is_null($soundex))
 {
-	$title	= $template->getElementById('soundex')->innerHTML();
+	$title	= $template['soundex']->innerHTML();
     $title  = str_replace('$VALUE', $soundex, $title);
 }
 else
 if (!is_null($pattern))
 {
-	$title	= $template->getElementById('pattern')->innerHTML();
+	$title	= $template['pattern']->innerHTML();
     $title  = str_replace('$VALUE', $pattern, $title);
 }
 else
-	$title	= $template->getElementById('missing')->innerHTML();
+	$title	= $template['missing']->innerHTML();
 $template->set('TITLE',     $title);
 
 // get the matches
-$surnames	= new RecordSet('Surnames', $getParms);
-$info   	= $surnames->getInformation();
-$count	    = $info['count'];
+$surnames	            = new RecordSet('Surnames', $getParms);
+$info   	            = $surnames->getInformation();
+$count	                = $info['count'];
+$template->set('MAXCOLS',           $maxcols);
 
 if ($count > 0)
 {                   // display the results
-    $curcol		    = 0;
-    $row            = $template->getElementById('row');
-    $rowHtml        = $row->outerHTML();
-    $cell           = $template->getElementById('asurname');
-    $cellHtml       = str_replace('id="asurname"', '', $cell->outerHTML());
-    $data           = '';
+    $cell               = $template['asurname'];
+    $cellHtml           = str_replace('id="asurname"', '', $cell->outerHTML());
+    $data               = '';
     foreach($surnames as $idnr => $surnamerec)
     {
         $surname	    = $surnamerec->getSurname(); 
@@ -178,39 +178,21 @@ if ($count > 0)
             substr($surname,0,8) == 'Motherof')
             continue;
 
-        if ($curcol == 0)
-        {
-            $rtemplate  = new Template($rowHtml);
-            $rdata      = '';
-        }
-		$curcol++;
-
         // link to detailed query action
         $ctemplate      = new Template($cellHtml);
         $usurname	    = rawurlencode($surname);
         $ctemplate->set('SURNAME',      $surname);
         $ctemplate->set('USURNAME',     $usurname);
         $ctemplate->set('LANG',         $lang);
-        $rdata          .= $ctemplate->compile();
-		if ($curcol == $maxcols)
-        {		    // last column, complete row
-            $rtemplate->updateTag('asurname', $rdata);
-            $data       .= $rtemplate->compile();
-		    $curcol	    = 0;
-		}		    // last column
+        $data           .= $ctemplate->compile();
     }	            // loop through results
 
-    if ($curcol != 0)
-    {		        // incomplete last row
-        $rtemplate->updateTag('asurname', $rdata);
-        $data           .= $rtemplate->compile();
-    }		        // incomplete last row
-    $template->updateTag('row',         $data);
-    $template->updateTag('nomatches',   null);
+    $template['asurname']->update($data);
+    $template['nomatches']->update(null);
 }		            // some surnames matched
 else
 {		            // no matches
-    $template->updateTag('namesTable',  null);
+    $template['namesTable']->update(null);
 }		            // no matches
 
 $template->set("SURNAME",	        $surname);

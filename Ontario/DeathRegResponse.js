@@ -18,6 +18,7 @@
  *		                to match width of displayed table               *
  *		2019/04/07      ensure that the paging lines can be displayed   *
  *		                within the visible portion of the browser.      *
+ *		2019/06/29      first parameter of displayDialog removed        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -92,7 +93,7 @@ function showReg()
     location	= 'DeathRegDetail.php?RegYear=' + regyear +
 				  '&RegNum=' + regnum +'&lang=' + lang;
     return false;
-}		// showReg
+}		// function showReg
 
 /************************************************************************
  *  function deleteReg													*
@@ -124,20 +125,11 @@ function deleteReg(ev)
 		parms["debug"]	= debug;
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-				      'RegDel$template',
-				      parms,
-				      this,		        // position relative to
-				      confirmDelete,	// 1st button confirms Delete
-				      false);		    // default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("DeathRegResponse.js: deleteReg: " +
-				"Error: <div id='msgDiv'> not defined");
-}		// deleteReg
+	displayDialog('RegDel$template',
+			      parms,
+			      this,		        // position relative to
+			      confirmDelete);	// 1st button confirms Delete
+}		// function deleteReg
 
 /************************************************************************
  *  function confirmDelete												*
@@ -174,7 +166,7 @@ function confirmDelete(ev)
 				gotDeleteReg,
 				noDeleteReg);
     return false;		// suppress default action for button
-}		// confirmDelete
+}		// function confirmDelete
 
 /************************************************************************
  *  function gotDeleteReg												*
@@ -232,7 +224,7 @@ function gotDeleteReg(xmlDoc)
 		}			// loop through all children
 
     }
-}		// gotDeleteReg
+}		// function gotDeleteReg
 
 /************************************************************************
  *  function noDeleteReg												*
@@ -243,4 +235,4 @@ function noDeleteReg()
 {
     alert("DeathRegResponse.js: noDeleteReg: " +
 				"script 'deleteDeathRegXml.php' not found on server");
-}		// noDeleteReg
+}		// function noDeleteReg

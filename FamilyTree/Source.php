@@ -48,6 +48,8 @@ use \Exception;
  *		2018/12/02      use class Template                              *
  *		                exploit internationalization of Source          *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/09/26      use Address::get in place of obsolete special   *
+ *		                get methods                                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -200,13 +202,13 @@ if (strlen($srccallnum) > 0)
 $repository	            = $source->getRepository();
 if ($repository)
 {		// repository reference present in record
-	$repoName		    = $repository->getName();
-	$repoAddress1		= $repository->getAddress1();
-	$repoAddress2		= $repository->getAddress2();
-	$repoCity		    = $repository->getCity();
-	$repoState		    = $repository->getState();
-	$repoPostalCode		= $repository->getPostalCode();
-    $repoCountry		= $repository->getCountry();
+	$repoName		    = $repository['name'];
+	$repoAddress1		= $repository['address1'];
+	$repoAddress2		= $repository['address2'];
+	$repoCity		    = $repository['city'];
+	$repoState		    = $repository['state'];
+	$repoPostalCode		= $repository['postalcode'];
+    $repoCountry		= $repository['country'];
 
 	$template->set('REPONAME',		    $repoName);
 	$template->set('REPOADDRESS1',		$repoAddress1);
@@ -216,29 +218,29 @@ if ($repository)
 	$template->set('REPOPOSTALCODE',	$repoPostalCode);
     $template->set('REPOCOUNTRY',		$repoCountry);
 
-	if (strlen($repository->getName()) == 0)
+	if (strlen($repoName) == 0)
 	    $template['repoName']->update(null);
-	if (strlen($repository->getAddress1()) == 0)
+	if (strlen($repoAddress1) == 0)
 	    $template['repoAddress1']->update(null);
-	if (strlen($repository->getAddress2()) == 0)
+	if (strlen($repoAddress2) == 0)
 	    $template['repoAddress2']->update(null);
-	if (strlen($repository->getCity()) == 0)
+	if (strlen($repoCity) == 0)
 	    $template['repoCity']->update(null);
-	if (strlen($repository->getState()) == 0)
+	if (strlen($repoState) == 0)
 	    $template['repoState']->update(null);
-	if (strlen($repository->getPostalCode()) == 0)
+	if (strlen($repoPostalCode) == 0)
 	    $template['repoPostalCode']->update(null);
-	if (strlen($repository->getCountry()) == 0)
+	if (strlen($repoCountry) == 0)
         $template['repoCountry']->update(null);
 
-    $homePage	                    = $repository->getHomePage();
+    $homePage	                    = $repository['homepage'];
     $template->set('HOMEPAGE',		$homePage);
 	if (strlen($homePage) > 0)
     {
-		$pres	                    = preg_match('/^(\w+):/', $homePage, $parts);
+		$pres	                = preg_match('/^(\w+):/', $homePage, $parts);
 		if ($pres == 1)
 		{
-		    $protocol	            = strtolower($parts[1]);
+		    $protocol	        = strtolower($parts[1]);
 		    if ($protocol == 'http' ||
 		        $protocol == 'https' ||
 		        $protocol == 'ftp')

@@ -40,58 +40,100 @@ use \Exception;
  *						use new Record to get record to update			*
  *						use RecordSet to get list of relation records	*
  *		2018/02/03		change breadcrumbs to new standard				*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Help.html to Helpen.html                 *
+ *		2019/07/07      use Template                                    *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-/************************************************************************
- *  chkUpdate																*
- *																		*
- *  Check the parameters passed by method="post" to see whether the		*
- *  table needs to be updated.												*
- *																		*
- *  Input:																*
- *		$post				associative array of fieldname value pairs		*
- ************************************************************************/
-function chkUpdate($post)
-{
-    global	$debug;
-    global	$warn;
-    global	$connection;
+// interpret parameters
+$lang                   = 'en';
 
-    if ($debug)
-    {
-		$warn	.= "<p>chkUpdate($post=";
-		$comma	= '(';
+if (count($_GET) > 0)
+{                   // initial display
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+    {	            // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+	    {		    // act on specific parameter
+			case 'lang':
+            {
+                if (strlen($value) >= 2)
+                    $lang       = strtolower(substr($value,0,2));
+                break;
+            }
+        }
     }
-    $idcs		= 'N/A';
-    $updated		= 0;
-    $used		= 0;
-    $tag1		= 0;
-    $qstag		= 0;
-    $childstatus	= '';
-    foreach($post as $fldname => $value)
-    {			// loop through all fieldnames
-		if ($debug)
-		{
-		    $warn	.= "$comma$fldname=$value";
-		    $comma	= ',';
-		}
-		switch(strtolower($fldname))
-		{		// act on specific field names
-		    case 'updated':
-		    {
-				$updated	= $value;
-				break;
-		    }
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}                   // initial display
+else
+if (count($_POST) > 0)
+{                   // update table
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                  "<th class='colhead'>value</th></tr>\n";
+    $used               = 0;
+    $tag1               = 0;
+    $qstag              = 0;
+    $childstats         = '';
+    $idcs               = null;
+	foreach($_POST as $key => $value)
+	{	            // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+            "<td class='white left'>$value</td></tr>\n";
+        $key                    = strtolower($key);
+        $result                 = preg_match('/([a-zA-Z_$]+)(\d*)/', $key, $matches);
+        $column                 = $matches[1];
+        $row                    = $matches[2];
+	    switch($column)
+	    {		    // act on specific parameter
+			case 'lang':
+            {
+                if (strlen($value) >= 2)
+                    $lang       = strtolower(substr($value,0,2));
+                break;
+            }
 
 		    case 'idcs':
-		    {
-				$idcs		= $value;
+            {
+                if ($idcs > 1 && canUser('all'))
+                {           // only administrator can update
+                    $record     = new Record(array('idcs' => $idcs), 'tblCS');
+                    if ($childstatus == '')
+                    {       // delete record
+                        $record->delete(false);
+                        $lastcmd        = $record->getLastSqlCmd();
+                        if (strlen($lastcmd) > 0)
+                            $warn       .= "<p>Table updated '$lastcmd'</p>\n";
+                    }       // delete record
+                    else
+                    {       // update record
+                        $record['used']         = $used;
+                        $record['tag1']         = $tag1;
+                        $record['qstag']        = $qstag;
+                        $record['childstatus']  = $childstatus;
+                        $record->save(false);
+                        $lastcmd        = $record->getLastSqlCmd();
+                        if (strlen($lastcmd) > 0)
+                            $warn       .= "<p>Table updated '$lastcmd'</p>\n";
+                    }       // update record
+                }           // only administrator can update
+			    $used               = 0;
+			    $tag1               = 0;
+			    $qstag              = 0;
+			    $childstats         = '';
+				$idcs		        = $value;
 				break;
 		    }
 
@@ -101,7 +143,7 @@ function chkUpdate($post)
 				break;
 		    }
 
-		    case 'tag1':
+		    case 'tagi':
 		    {
 				$tag1		= $value;
 				break;
@@ -119,319 +161,58 @@ function chkUpdate($post)
 				break;
 		    }
 
-		}		// act on specific field names
-    }			// loop through all fieldnames
+		}		    // act on specific field names
+    }			    // loop through all fieldnames
     if ($debug)
-		$warn	.= ")</p>\n";
+        $warn       .= $parmsText . "</table>\n";
+}                   // update table
 
-    if ($updated != 0)
-    {
-		$status	= new Record(array('idcs'	=> $idcs),
-							     'tblCS');
-		if ($childstatus == '' && $idcs > 1)
-		{
-		    $status->delete();
-		}		// delete row
-		else
-		{		// update
-		    $status->set('idcs',	$idcs);
-		    $status->set('childstatus',	$childstatus);
-		    $status->set('used',	$used);
-		    $status->set('tag1',	$tag1); 
-		    $status->set('qstag',	$qstag);
-		    $status->save(false);
-		}		// update
-    }			// row updated
-}		// chkUpdate
+// create Template
+if (canUser('all'))
+    $action             = 'Update';
+else
+    $action             = 'Display';
+$template		        = new FtTemplate("ChildStatus$action$lang.html");
+$trtemplate             = $template->getTranslate();
 
-    if (canUser('all'))
-    {			// user is master
-		$readonly	= '';
-		$txtleftclass	= 'white left';
+// query the database for details
+$statusSet	= new RecordSet('tblCS');
 
-		// check parameters to see if the table should be updated
-		// before being displayed
-		$post			= array();
-		$post['Used']		= 0;
-		$post['Tag1']		= 0;
-		$post['qsTag']		= 0;
-		$oldrownum		= 0;
-		foreach($_POST as $key => $value)
-		{		// check for table updates
-		    $matches	= array();
-		    if (preg_match('/^([a-zA-Z]+)(\d*)$/', $key, $matches))
-		    {
-				$column		= strtolower($matches[1]);
-				$rownum		= $matches[2];
-				if ($column == 'tag')
-				{
-				    $column	= 'tag1';
-				    $rownum	= intval(substr($rownum, 1));
-				}
-				else
-				    $rownum	= intval($rownum);
-		    }
-		    else
-				$msg		.= "Invalid field name '$key'. ";
-    
-		    if ($rownum != $oldrownum)
-		    {		// check for update on new row
-				chkUpdate($post);
-				$post['Used']	= 0;
-				$post['Tag1']	= 0;
-				$post['qsTag']	= 0;
-				$oldrownum	= $rownum;
-		    }		// check for update
-		    $post[$column]	= $value;
-		}		// check for table updates
-		if (array_key_exists('updated', $post))
-		    chkUpdate($post);	// final row
-    }			// user is master
+$dataRow                = $template['dataRow$IDCS'];
+if ($dataRow === null)
+    print \Templating\escape($template->getRawTemplate());
+$dataRowHtml            = $dataRow->outerHTML();
+$data                   = '';
+
+foreach($statusSet as $row)
+{		        	// loop through results
+    $idcs				= $row['idcs'];
+    $status				= $row['childstatus'];
+    $used				= $row['used'];
+    $tag1				= $row['tag1'];
+    $qstag				= $row['qstag'];
+    $rtemplate          = new \Templating\Template($dataRowHtml);
+    $rtemplate->set('IDCS',     $idcs);
+    $rtemplate->set('STATUS',   $status);
+    if ($used)
+        $rtemplate->set('USEDCHECKED',  'checked="checked"');
     else
-    {			// user can not edit
-		$readonly	= 'readonly';
-		$txtleftclass	= 'ina left';
-    }			// user can not edit
+        $rtemplate->set('USEDCHECKED',  '');
+    if ($tag1)
+        $rtemplate->set('TAG1CHECKED',  'checked="checked"');
+    else
+        $rtemplate->set('TAG1CHECKED',  '');
+    if ($qstag)
+        $rtemplate->set('QSTAGCHECKED', 'checked="checked"');
+    else
+        $rtemplate->set('QSTAGCHECKED', '');
+    $data               .= $rtemplate->compile();
+}		// loop through results
+$dataRow->update($data);
 
-    // query the database for details
-    $statusSet	= new RecordSet('tblCS');
+$template->set('CONTACTTABLE',	'tblCS');
+$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('LANG',		    $lang);
 
-    $warn	.= "<p>This table is not used by this implementation because it does not support internationalization.</p>\n";
-
-    htmlHeader('Child Status List',
-				array(	'/jscripts/CommonForm.js',
-						'/jscripts/js20/http.js',
-						'/jscripts/util.js',
-						'ChildStatus.js'));
-?>
-<body>
-<?php
-    pageTop(array('/genealogy.php'		=> 'Genealogy',
-				  '/genCountry.php?cc=CA'	=> 'Canada',
-				  '/Canada/genProvince.php?Domain=CAON'	
-									=> 'Ontario',
-				  '/FamilyTree/Services.php'	=> 'Services'));
-?>
-  <div class="body">
-    <h1>
-      <span class="right">
-		<a href="ChildStatusHelpen.html" target="help">? Help</a>
-      </span>
-		Child Status List
-    </h1>
-<?php
-    showTrace();
-
-    if (strlen($msg) > 0)
-    {
-?>
-  <p class="message">
-		<?php print $msg; ?> 
-  </p>
-<?php
-    }		// error message to display
-
-?>
-  <form name="srcForm" action="ChildStatus.php" method="post">
-<?php
-		if ($debug)
-		{
-?>
-    <input id="Debug" name="Debug" type="hidden" value="Y">
-<?php
-		}		// debugging
-?>
-  <!--- Put out the response as a table -->
-  <table class="details" id="formTable">
-    <!--- Put out the column headers -->
-    <thead>
-      <tr>
-		<th class="colhead">
-		  IDCS
-		</th>
-		<th class="colhead">
-		  Child Status
-		</th>
-		<th class="colhead">
-		  Used
-		</th>
-		<th class="colhead">
-		  Tag1
-		</th>
-		<th class="colhead">
-		  qsTag
-		</th>
-		<th class="colhead">
-		  Action
-		</th>
-      </tr>
-    </thead>
-    <tbody>
-<?php
-		// display the results
-		$i	= 0;		// row counter
-		foreach($statusSet as $row)
-		{			// loop through results
-		    $idcs	= $row['idcs'];
-		    $status	= $row['childstatus'];
-		    $used	= $row['used'];
-		    $tag1	= $row['tag1'];
-		    $qstag	= $row['qstag'];
-?>
-      <tr>
-		<td class="left">
-		    <input type="text" class="ina rightnc" size="4"
-						name="IDCS<?php print $i; ?>"
-						id="IDCS<?php print $i; ?>"
-						value="<?php print $idcs; ?>" readonly="readonly">
-		    <input type="hidden"
-						name="Updated<?php print $i; ?>"
-						id="Updated<?php print $i; ?>"
-						value="0">
-		</td>
-		<td class="left">
-		    <input type="text" class="<?php print $txtleftclass; ?>" size="40"
-						name="ChildStatus<?php print $i; ?>"
-						id="ChildStatus<?php print $i; ?>"
-						value="<?php print $status; ?>"
-						<?php print $readonly; ?>>
-		</td>
-		<td class="center">
-		    <input type="checkbox"
-						name="Used<?php print $i; ?>"
-						id="Used<?php print $i; ?>"
-						<?php print $readonly; ?> 
-				<?php if ($used > 0) print ' checked'; ?>>
-		</td>
-		<td class="center">
-		    <input type="checkbox"
-						name="tag1<?php print $i; ?>"
-						id="tag1<?php print $i; ?>"
-						<?php print $readonly; ?> 
-				<?php if ($tag1 > 0) print ' checked'; ?>>
-		</td>
-		<td class="center">
-		    <input type="checkbox"
-						name="qstag<?php print $i; ?>"
-						id="qstag<?php print $i; ?>"
-						<?php print $readonly; ?> 
-				<?php if ($qstag > 0) print ' checked'; ?>>
-		</td>
-		<td class="center">
-<?php
-		    if (canUser('all') && $idcs > 1)
-		    {		// user is master
-?>
-		    <button id="Delete<?php print $i; ?>">
-				Delete
-		    </button>
-<?php
-		    }		// user is master
-?>
-		</td>
-      </tr>
-<?php
-		    $i++;		// row counter
-		}		// loop through results
-?>
-    </tbody>
-  </table>
-<?php
-    if (canUser('all'))
-    {		// permit adding a Status
-?>
-    <p>
-		<button type="button" id="Add">
-		    Create New Status
-		</button>
-    </p>
-<?php
-    }		// permit adding a Status
-
-    if (canUser('all'))
-    {		// user is master
-?>
-  <button type="submit" id="Submit">Update Table</button>
-<?php
-    }		// user is master
-?>
-</form>
-</div>
-<?php
-    pageBot();
-?>
-  <div class="hidden" id="templates">
-    <table>
-      <tr id="newRowTemplate">
-		<td class="left">
-		    <input type="text" class="white rightnc" size="4"
-						name="IDCS$idcs"
-						value="$idcs">
-		    <input type="hidden" name="Updated$idcs"
-						value="1">
-		</td>
-		<td class="left">
-		    <input type="text" class="white left" size="40"
-						name="ChildStatus$idcs"
-						value="">
-		</td>
-		<td class="center">
-		    <input type="checkbox" name="Used$idcs">
-		</td>
-		<td class="center">
-		    <input type="checkbox" name="tag1$idcs">
-		</td>
-		<td class="center">
-		    <input type="checkbox" name="qstag$idcs">
-		</td>
-		<td class="center">
-		    <button name="Delete$idcs">
-				Delete
-		    </button>
-		</td>
-      </tr>
-    </table>
-  </div>
-  <div class="balloon" id="HelpIDCS">
-    <p>This field contains the unique numeric code point used in the
-		Child Status table (tblCS) to identify this
-		status.
-    </p>
-  </div>
-  <div class="balloon" id="HelpChildStatus">
-    <p>This field contains the textual description of the Child's
-		status at birth, as it will appear in web pages, and on selection
-		lists when updating the database.
-    </p>
-  </div>
-  <div class="balloon" id="HelpUsed">
-    <p>Internal use by Legacy.
-    </p>
-  </div>
-  <div class="balloon" id="Helptag">
-    <p>Internal use by Legacy.
-    </p>
-  </div>
-  <div class="balloon" id="Helpqstag">
-    <p>Internal use by Legacy.
-    </p>
-  </div>
-  <div class="balloon" id="HelpDelete">
-    <p>Click on this button to delete the status described in this row
-		of the table.
-    </p>
-  </div>
-  <div class="balloon" id="HelpAdd">
-    <p>Click on this button to add a new status to the table.
-		A new row is added to the table with a blank description.
-		Edit the description and click on the "Update Table" button
-		to add the new entry.
-    </p>
-  </div>
-  <div class="balloon" id="HelpSubmit">
-    <p>Click on this button to update the database to reflect the
-		changes you have entered.  
-    </p>
-  </div>
-</body>
-</html>
+$template->display();
+showTrace();

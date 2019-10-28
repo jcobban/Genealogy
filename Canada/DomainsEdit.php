@@ -22,8 +22,9 @@ use \Exception;
  *		2018/02/02		page through results if more than limit			*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/21      use new FtTemplate constructor                  *
+ *		                support ISO presenationof domain codes          *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/DomainSet.inc";
@@ -50,7 +51,7 @@ foreach($_REQUEST as $key => $value)
     $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
 	$matches	= array();
-	if (preg_match("/[A-Z]+$/", $key, $matches))
+	if (strlen($key) > 4 && preg_match("/[A-Z\-]+$/", $key, $matches))
 	{
 	    $code	= $matches[0];
 	    $key	= strtolower(substr($key, 0, strlen($key) - strlen($code)));
@@ -68,7 +69,7 @@ foreach($_REQUEST as $key => $value)
 	    case 'cc':
 	    {
 			if (preg_match('/^[a-zA-Z]{2}$/', $value) == 1)
-			{
+            {
 			    $cc			= $value;
 			}
 			break;
@@ -90,11 +91,11 @@ foreach($_REQUEST as $key => $value)
 			    break;	// have switched countries
 			}
 			$newCode		= $value;
-			$domain		    = new Domain(array('domain'	=> $code,
-							            	   'language'	=> $lang));
-			if ($newCode != $code)
+			$domain		    = new Domain(array('domain'	    => $code,
+                                               'language'	=> $lang));
+			if (str_replace('-', '', $newCode) != $code)
 			{		// user has changed the code
-			    $chkdomain	= new Domain(array('domain'	=> $newCode,
+			    $chkdomain	= new Domain(array('domain'	    => $newCode,
 					            			   'language'	=> $lang));
 			    if ($chkdomain->isExisting())
 			    {		// duplicates existing record
@@ -115,7 +116,7 @@ foreach($_REQUEST as $key => $value)
 	    }
 
 	    case 'name':
-	    {			// name of domain
+        {			// name of domain
 			if ($newCountry || $rowlang != $lang)
 			    break;
 			if (strlen($value) == 0)
@@ -131,13 +132,13 @@ foreach($_REQUEST as $key => $value)
 	    }			// name of domain
 
 	    case 'resourcesurl':
-	    {			// name of domain
+	    {			// link to other info
 			if ($newCountry || $rowlang != $lang)
 			    break;
 			$domain->set('resourcesurl', $value);
 			$domain->save(null);
 			break;
-	    }			// name of domain
+	    }			// link to other info
 
 	    case 'offset':
 	    {
@@ -160,44 +161,29 @@ if ($debug)
 	$warn	.= $parmsText . "  </table>\n";
 }			// ensure listing of parameters not interrupted
 
-$countryObj		= new Country(array('code' => $cc));
-$countryName	= $countryObj->getName($lang);
+$countryObj		        = new Country(array('code' => $cc));
+$countryName	        = $countryObj->getName($lang);
 if ($cc != 'CA')
-	$domainType	= 'State';
+	$domainType	        = 'State';
 
 
 if (strlen($msg) == 0)
 {			// no errors detected
-	// create an array of country information for select <options>
-	$countrySet	= new RecordSet('Countries');
-	foreach ($countrySet as $code => $countryObj)
-	{
-	    if ($code == $cc)
-			$countryObj['selected']	= ' selected="selected"';
-	    else
-			$countryObj['selected']	= '';
-	}
-
 	// create an array of language information for select <options>
-	$languageSet	= new RecordSet('Languages');
-	foreach ($languageSet as $code => $languageObj)
-	{
-	    if ($code == $lang)
-			$languageObj['selected']	= ' selected="selected"';
-	    else
-			$languageObj['selected']	= '';
-	}
+    $languageSet	    = new RecordSet('Languages');
+    $language           = $languageSet[$lang];
+	$language->selected       = true;
 
 	// get the set of administrative domains for the country
-	$getParms		= array('cc'		=> $cc,
-							'language'	=> $lang,
-							'order'		=> 'Name',
-							'offset'	=> $offset,
-							'limit'		=> $limit);
-	$domains		= new DomainSet($getParms);
-	$information	= $domains->getInformation();
-	$totcount		= $information['count'];
-	$count			= $domains->count();
+	$getParms		    = array('cc'		=> $cc,
+    							'language'	=> $lang,
+	    						'order'		=> 'Name',
+		    					'offset'	=> $offset,
+			    				'limit'		=> $limit);
+	$domains		    = new DomainSet($getParms);
+	$information	    = $domains->getInformation();
+	$totcount		    = $information['count'];
+	$count			    = $domains->count();
 
 	if ($totcount == 0 && strtolower($lang) != 'en')
 	{		// get domains in default language
@@ -217,11 +203,11 @@ if (strlen($msg) == 0)
 	{		// no existing defined domains
 	    $docodes		= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	    $totcount		= min(26, $limit);
-	    $count	    	= $totcount;
+        $count	    	= $totcount;
 	    for($do = 0; $do < $totcount; $do++)
 	    {
 			$code		= 'A' . substr($docodes,$do,1);
-			$domains[$code]	= new Domain(array('domain'	    => $cc . $code,
+			$domains[$code]	= new Domain(array('domain'	    => "$cc-$code",
 								               'language'	=> $lang,
                                                'name'	    => $code));
             $domains[$code]->set('lang', $lang);
@@ -250,8 +236,9 @@ $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 $template->set('CC',	            $cc);
 $template->set('COUNTRYNAME',	    $countryName);
 $template->set('DOMAINTYPE',	    $domainType);
-$template->updateTag('countryOpt',
-					 $countrySet);
+$template->set('OFFSET',	        $offset);
+$template->set('LIMIT',	            $limit);
+
 $template->updateTag('languageOpt',
 					 $languageSet);
 

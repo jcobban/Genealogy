@@ -100,6 +100,7 @@ use \Iterator;
  *		2019/01/06      move to namespace Genealogy                     *
  *		                replace DATE with yyyymmdd                      *
  *		2019/03/18  	`D_OriginalPage` VARCHAR(11) DEFAULT NULL,	    *
+ *		2019/06/12      improve validation of values assigned to Dates  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -137,10 +138,10 @@ class Death extends Record
 				'd_sex'					=> '?',
 				'd_place'				=> '',
 				'd_date'				=> '',
-				'd_calcdate'			=> 0,
+				'd_calcdate'			=> null,
 				'd_age'					=> '',
 				'd_birthdate'			=> '',
-				'd_calcbirth'			=> 0,
+				'd_calcbirth'			=> null,
 				'd_occupation'			=> '',
 				'd_marstat'				=> '?',
 				'd_birthplace'			=> '',
@@ -284,7 +285,7 @@ class Death extends Record
 		if (is_array($parms))
 		{
 		    foreach($parms as $field => $value)
-		    {
+            {
 				$fieldLc	        = strtolower($field);
 				if (array_key_exists($fieldLc, self::$translate))
                     $fieldLc	    = self::$translate[$fieldLc];
@@ -309,6 +310,8 @@ class Death extends Record
 		if (is_string($parms) || $parms instanceof Domain)
         {		// initialize new entry
             $domain         = $parms;
+            if ($year == 0 || $number == 0)
+                throw new Exception("Death::__construct: domain=$domain, year=$year, number=$number");
             $parms          = array('d_regdomain'   => $domain,
                                     'd_regyear'     => $year,
                                     'd_regnum'      => $number);
@@ -341,13 +344,13 @@ class Death extends Record
 			$year	= (int)$year;
 		else
 		if (!is_int($year) || $year < 1800 || $year > 2100)
-			$this->msg  .= "Registration year '$year' must be a numeric year";
+			$this->msg  .= "Registration year '$year' must be a numeric year. ";
 		    
 		if (is_string($number) && ctype_digit($number))
 			$number	= (int)$number;
 		else
 		if (!is_int($number) || $number < 1)
-			$this->msg  .= "Registration number '$number' must be a positive integer";
+			$this->msg  .= "Registration number '$number' must be a positive integer. ";
 
         // search for an existing record matching the key
 		if (is_array($parms) && count($parms) >= count(self::$initRow))
@@ -390,7 +393,7 @@ class Death extends Record
 				    $dbrow['d_date']		= $year;
 				    $dbrow['d_burdate']		= $year;
 				    $dbrow['d_regdate']		= $year;
-				    $dbrow['d_calcdate']	= $year*10000 + 0615;
+				    $dbrow['d_calcdate']	= $year*1000+630;
 
 				    // fill in some fields from the preceding record, 
 				    // if it exists
@@ -556,10 +559,10 @@ class Death extends Record
 		    case 'd_changedate':
 		    case 'd_calcdate':
 		    case 'd_calcbirth':
-		    {
+		    {               // fields whose value is set from another field
 				$warn           .= "<p>Death::set: " . __LINE__ .
 						            " cannot modify '$field'</p>\n";
-		    }
+		    }               // fields whose value is set from another field
 
 		    case 'd_date':
 		    case 'd_deathdate':
@@ -570,7 +573,7 @@ class Death extends Record
 				if ($y == 0)
 				    $y	        = $this->row['d_regyear'];
 				else
-				if ($y < 100)
+				if ($y < 1000)
 				{
 				    $regYear	= $this->row['d_regyear'];
 				    $century	= floor($regYear / 100);
@@ -579,6 +582,8 @@ class Death extends Record
 				    else
 						$y	    = $y + ($century * 100);
 				}
+                if ($y > 9999)
+                    $y      = $y % 10000;
 
                 $m	            = $date->getMonth();
                 if ($m == 0)
@@ -596,7 +601,8 @@ class Death extends Record
                     $d          = 15;
 				if ($d < 10)
                     $d	        = '0' . $d;
-				parent::set('d_calcdate',$y*10000 + $m*100 + $d);
+
+				parent::set('d_calcdate', $y*10000 + $m*100 + $d);
 				return parent::set('d_date', $value);
 		    }
 
@@ -608,7 +614,7 @@ class Death extends Record
 				if ($y == 0)
 				    $y	= $this->row['d_regyear'];
 				else
-				if ($y < 100)
+				if ($y < 1000)
 				{
 				    $regYear	= $this->row['d_regyear'];
 				    $century	= floor($regYear / 100);
@@ -617,6 +623,8 @@ class Death extends Record
 				    else
 						$y	= $y + ($century * 100);
 				}
+                if ($y > 9999)
+                    $y      = $y % 10000;
 
 				$m	= $date->getMonth();
 				if ($m < 10)
@@ -630,7 +638,7 @@ class Death extends Record
 				    $d		= 28;
 				if ($d < 10)
 				    $d	= '0' . $d;
-				parent::set('d_calcbirth',$y*10000 + $m*100 + $d);
+				parent::set('d_calcbirth', $y*10000 + $m*100 + $d);
 				return parent::set($fieldLc, $value);
 		    }
 
@@ -819,10 +827,8 @@ class Death extends Record
 		    }		        // insert successful
 		    else
 		    {		        // error inserting record
-                error_log("Death.inc: " . __LINE__ . " '$insertText'\n");
-				throw new Exception("Death::save: '" .
-								substr($insertText,0,40) .  "...', " .
-								print_r($stmt->errorInfo(),true));
+				$msg    .= "Death::save: " . __LINE__ . " '$insertText', " .
+								print_r($stmt->errorInfo(),true) . ". ";
 		    }		        // error inserting record
 		}		            // create new record
 		else
@@ -926,9 +932,8 @@ class Death extends Record
 				}		// update successful
 				else
 				{		// error updating record
-				    throw new Exception("Death::save:
-								'$update', " .
-								print_r($stmt->errorInfo(),true));
+				    $msg    .= "Death::save: ". __LINE__ . " '$updateText', " .
+								print_r($stmt->errorInfo(),true) . ". ";
 				}		// error updating record
 		    }		    // changes made
 		}		        // update existing record

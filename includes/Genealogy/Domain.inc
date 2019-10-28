@@ -16,6 +16,7 @@ use \Exception;
  *		PRIMARY KEY (Domain, Language),									*
  *		Name			VARCHAR(255) NOT NULL DEFAULT '',				*
  *		ResourcesURL	VARCHAR(255),									*
+ *		PartOf          VARCHAR(16),                                    *
  *		ENGINE=InnoDb DEFAULT CHARSET=utf8;								*
  *																		*
  *  History:															*
@@ -32,6 +33,11 @@ use \Exception;
  *		                accept instance of Country through countrycode  *
  *		                construct Country in getCountry                 *
  *		                use Country->getName($lang)                     *
+ *		2019/07/22      when creating new domain use supplied code      *
+ *		                show and accept domain code in ISO format       *
+ *		                with a hyphen between the country and state     *
+ *		2019/07/25      do not permit set for 'iso'                     *
+ *		                'iso' is changed when 'domain' is changed       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -48,17 +54,31 @@ require_once __NAMESPACE__ . '/Country.inc';
 
 class Domain extends Record
 {
-
     /********************************************************************
      *	Domain::$initRow												*
      *																	*
      *	Default initial row												*
      ********************************************************************/
     protected static $initRow	= array(
-                'domain'		=> 'CAON',
-                'language'		=> 'en',
-                'name'			=> '',
-                'resourcesurl'		=> null);
+                				'domain'		    => 'CAON',
+                				'language'		    => 'en',
+                				'name'			    => '',
+                                'resourcesurl'		=> null,
+                                'partof'            => null);
+
+    /********************************************************************
+     *	Domain::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     		=> 'Domains',
+                'name'      		=> 'Domains',
+                'prime'	    		=> array('domain','language'),
+	            'srvmg'     		=> false,
+	            'fldcount'			=> 4,
+                'order'     		=> '`Name`,`Language`',
+                'classname' 		=> 'Domain');
 
     /********************************************************************
      *	Domain::$translate												*
@@ -66,19 +86,21 @@ class Domain extends Record
      *	Define synonyms for field names.								*
      ********************************************************************/
     protected static $translate	= array(
-                'code'			=> 'domain',
-                'state'			=> 'state',
-                'prov'			=> 'state',
-                'province'		=> 'state',
-                'cc'			=> 'countrycode',
-                'lang'			=> 'language');
+                				'code'				=> 'domain',
+                				'state'				=> 'state',
+                				'statecode'			=> 'state',
+                				'prov'				=> 'state',
+                				'province'			=> 'state',
+                				'statename'			=> 'name',
+                				'cc'				=> 'countrycode',
+                				'lang'				=> 'language');
 
     /********************************************************************
      *	Domain::$defaultOrder											*
      *																	*
      *	Define default sort order for use by class RecordSet			*
      ********************************************************************/
-    protected static $defaultOrder	= "`Name`";
+    protected static $defaultOrder	= "`Name`,`Language`";
 
     /********************************************************************
      *	Domain::country													*
@@ -99,17 +121,8 @@ class Domain extends Record
      *							to select an existing entry or			*
      *							a complete row from the table as an		*
      *							associative array						*
-     *	Note that by convention ISO language codes are expressed in		*
-     *	lower case to distinguish them from the ISO country codes.		*
-     *	    'FR' is the ISO country code for France						*
-     *	    'fr' is the ISO language code for French					*
-     *	The ISO country code and the ISO language code can be combined:	*
-     *	    'fr-CA'		Canadian French									*
-     *	    'en-US'		American English								*
      *																	*
      *	Returns object containing a description of a domain				*
-     *																	*
-     *	Throws Exception if unable to complete function					*
      ********************************************************************/
     function __construct($parms	= array())
     {
@@ -143,6 +156,7 @@ class Domain extends Record
                     {			// act on key fields
                         case 'domain':
                         {		// domain
+                            $value              = str_replace('-', '', $value);
                             if (is_string($value) && strlen($value) >= 4)
                             {
                                 $domain		    = strtoupper($value);
@@ -205,17 +219,18 @@ class Domain extends Record
                 // the United Kingdom traditionally uses country code UK
                 // even though the code assigned by ISO is GB
                 if (substr($domain, 0, 2) == 'UK')
-                    $domain     = 'GB' . substr($domain, 2);
+                    $domain         = 'GB' . substr($domain, 2);
 
-                $sqlParms	    = array('domain'	=> $domain,
-                                        'language'	=> $language);
-                $query		    = 'SELECT * FROM Domains ' .
-                                  'WHERE Domain=:domain AND Language=:language';
+                $sqlParms	        = array('domain'	=> $domain,
+                                            'language'	=> $language);
+                $query		        = 'SELECT * FROM Domains ' .
+                                'WHERE Domain=:domain AND Language=:language';
 
                 // query the database
-                $stmt		= $connection->prepare($query);
-                $queryText	= debugPrepQuery($query, $sqlParms);
+                $stmt		        = $connection->prepare($query);
+                $queryText	        = debugPrepQuery($query, $sqlParms); 
 
+                $this->lastSqlCmd   = $queryText;
                 if ($stmt->execute($sqlParms))
                 {			    // successful execute
                     if ($debug)
@@ -231,10 +246,11 @@ class Domain extends Record
                     {			// create a new record
                         if ($language != 'en')
                         {		// check for english entry
-                            $sqlParms	= array('domain'	=> $domain,
-                                                'language'	=> 'en');
-                            $queryText	= debugPrepQuery($query, $sqlParms);
+                            $sqlParms	    = array('domain'	=> $domain,
+                                                    'language'	=> 'en');
+                            $queryText	    = debugPrepQuery($query, $sqlParms);
 
+                            $this->lastSqlCmd   = $queryText;
                             if ($stmt->execute($sqlParms))
                             {		// successful execute
                                 if ($debug)
@@ -256,14 +272,15 @@ class Domain extends Record
                         else
                         {
                             $dbrow		                = self::$initRow;
+                            $dbrow['domain']            = $domain;
                             $dbrow['name']	            = 'Domain : '. $domain;
                         }
 
                         foreach($parms as $key => $value)
                         {		            // override defaults
-                            $fieldLc	= strtolower($key);
+                            $fieldLc	        = strtolower($key);
                             if (array_key_exists($fieldLc, self::$translate))
-                                $fieldLc	= self::$translate[$fieldLc];
+                                $fieldLc	    = self::$translate[$fieldLc];
                             switch($fieldLc)
                             {		        // act on fields
 	                            case 'name':
@@ -275,7 +292,7 @@ class Domain extends Record
 
                             }		        // act on key fields
                         }		            // loop through parameters
-                        $needInsert	= true;
+                        $needInsert	            = true;
                     }			            // create new record
                 }			                // successful execute
                 else
@@ -284,9 +301,9 @@ class Domain extends Record
                             print_r($stmt->errorInfo(),true) . "\n");
                     if (strlen($queryText) > 40)
                         $queryText	= substr($queryText, 0, 37) . '...';
-                    throw new Exception("Domain::__construct: " . __LINE__ .
+                    $this->msg  .= "Domain::__construct: " . __LINE__ .
                                 " '$queryText', " .
-                                print_r($stmt->errorInfo(),true));
+                                print_r($stmt->errorInfo(),true) . '. ';
                 }			                // error performing prepare
             }				                // search parameters
             else
@@ -306,6 +323,12 @@ class Domain extends Record
                             'Domains');
         $this->needInsert	= $needInsert;
 
+        // initialize special access fields
+        $domain         = $this->row['domain'];
+        $cc             = substr($domain, 0, 2);
+        $state          = substr($domain, 2);
+        $this->extras['iso']    = "$cc-$state";
+
         // diagnostic output if debug is set
         $this->dump('Domain Record constructed:');
     }		// Domain::__construct
@@ -324,6 +347,8 @@ class Domain extends Record
      ********************************************************************/
     function get($field)
     {
+        global  $warn;
+
         $fieldLc		= strtolower($field);
         if (array_key_exists($fieldLc, self::$translate))
             $fieldLc	= self::$translate[$fieldLc];
@@ -337,6 +362,15 @@ class Domain extends Record
         switch($fieldLc)
         {			// act on field name
             case 'domain':
+            {
+                return $this->row['domain'];
+            }
+
+            case 'iso':
+            {
+                return $this->extras['iso'];
+            }
+
             case 'language':
             case 'name':
             case 'resourcesurl':
@@ -352,6 +386,20 @@ class Domain extends Record
             case 'countrycode':
             {
                 return substr($this->row['domain'], 0, 2);
+            }
+
+            case 'partof':
+            {
+                $partof     = $this->row['partof'];
+                if (is_null($partof))
+                {
+                    $cc     = substr($this->row['domain'], 0, 2);
+                    return $cc;
+                }
+                else
+                {
+                    return $partof;
+                }
             }
 
             default:
@@ -432,9 +480,14 @@ class Domain extends Record
             case 'state':
             {
                 if (is_string($value) && strlen($value) >= 2)
-                    return parent::set('domain',
-                                       substr($this->row['domain'], 0, 2) .
-                                            strtoupper($value));
+                {
+                    $cc             = substr($this->row['domain'], 0, 2);
+                    $state          = strtoupper($value);
+                    $this->extras['iso']    = "$cc-$state";
+                    $retval         = substr($this->row['domain'], 2);
+                    parent::set('domain', $cc . $state);
+                    return $retval;
+                }
                 else
                     $warn	.= "<p>Domain::set: " . __LINE__ .
                                 " invalid value '$value' for `$field`. </p>\n";
@@ -445,9 +498,14 @@ class Domain extends Record
             case 'countrycode':
             {
                 if (is_string($value) && strlen($value) == 2)
-                    return parent::set('domain',
-                                       strtoupper($value) . 
-                                            substr($this->row['domain'], 2));
+                {
+                    $cc             = strtoupper($value);
+                    $state          = substr($this->row['domain'], 2);
+                    $this->extras['iso']    = "$cc-$state";
+                    $retval         = substr($this->row['domain'], 0, 2);
+                    parent::set('domain', $cc . $state);
+                    return $retval;
+                }
                 else
                     $warn	.= "<p>Domain::set: " . __LINE__ .
                                 " invalid value '$value' for `$field`. </p>\n";
@@ -457,15 +515,47 @@ class Domain extends Record
 
             case 'domain':
             {
-                if (is_string($value) && strlen($value) >= 4)
-                    return parent::set('domain',
-                                       strtoupper($value)); 
+                $domain             = $this->row['domain'];
+                $cc                 = substr($domain, 0, 2);
+                $state              = substr($domain, 2);
+                $retval             = "$cc-$state";
+                $nvalue             = strtoupper(str_replace('-', '', $value));
+                if (is_string($nvalue) && strlen($nvalue) >= 4)
+                {
+                    parent::set('domain',
+                                $value); 
+                    $cc             = substr($nvalue, 0, 2);
+                    $state          = substr($nvalue, 2);
+                    $this->extras['iso']    = "$cc-$state";
+                }
                 else
                     $warn	.= "<p>Domain::set: " . __LINE__ .
                                 " invalid value '$value' for `$field`.</p>\n";
-                return $this->get('domain');
-                break;
+                return $retval;
             }
+
+            case 'iso':
+            {                       // ignore
+                return $this->row['iso'];
+            }                       // ignore
+
+            case 'partof':
+            {
+                $cc             = substr($this->row['domain'], 0, 2);
+                if ($value == $cc)
+                    return parent::set('partof', null);
+                else
+                if (substr($value, 0, 2) == $cc)
+                {
+                    $state      = substr($value, 2);
+                    if (substr($state, 0, 2) == '-')
+                        return parent::set('partof', $value);
+                    else
+                        return parent::set('partof', "$cc-$state");
+                }
+                $warn       .= "<p>Domain::set: new value of Partof '$value' must match country code '$cc'</p>\n";
+                return $this->row['partof'];
+            }               // partof
 
             default:
             {
@@ -556,6 +646,7 @@ class Domain extends Record
             // insert the new record into the database
             $stmt	            = $connection->prepare($insert);
             $insertText	= debugPrepQuery($insert, $parms);
+            $this->lastSqlCmd   = $insertText;
             if ($stmt->execute($parms))
             {		// execute successful
                 $result		    = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -619,6 +710,7 @@ class Domain extends Record
                 // perform the update
                 $stmt		            = $connection->prepare($update);
                 $updateText	            = debugPrepQuery($update, $parms);
+                $this->lastSqlCmd       = $updateText;
                 if ($stmt->execute($parms))
                 {		// successful update 
                     $count		        = $stmt->rowCount();
@@ -688,15 +780,16 @@ class Domain extends Record
                 $sqlParms	= array('domain'   => $this->row['domain'],
                                     'language' => $this->row['language']);
             }
-            $delete 	    = "DELETE FROM Domains " .
+            $delete 	            = "DELETE FROM Domains " .
                             "WHERE `Domain`=:domain AND `Language`=:language";
-            $deleteText	    = debugPrepQuery($delete, $sqlParms);
+            $deleteText	            = debugPrepQuery($delete, $sqlParms);
 
-            $stmt   	    = $connection->prepare($delete);
+            $stmt   	            = $connection->prepare($delete);
+            $this->lastSqlCmd       = $deleteText;
             if ($stmt->execute($sqlParms))
             {		// success
 
-                $count	    = $stmt->rowCount();
+                $count	            = $stmt->rowCount();
                 if ($xml)
                     print "<$xmltag count='$count'>$deleteText</$xmltag>\n";
                 if ($debug)

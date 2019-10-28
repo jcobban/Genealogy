@@ -28,10 +28,12 @@ use \Iterator;
  *		2017/10/24		created											*
  *		2017/12/18		add support for temporary fields				*
  *		2018/10/13      add support for language specific `Sorry`       *
+ *		2019/07/17      add support for country-qualified languages     *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
+require_once __NAMESPACE__ . '/Country.inc';
 
 /************************************************************************
  *  class Language														*
@@ -43,26 +45,33 @@ require_once __NAMESPACE__ . '/Record.inc';
 class Language extends Record
 {
     /********************************************************************
-     *	Language::$defaultOrder											*
-     *																	*
-     *	Default sort order for query response by class RecordSet		*
-     ********************************************************************/
-    static $defaultOrder	= "`Name`";
-
-    /********************************************************************
      *	Language::$initRow												*
      *																	*
      *	Default initial row												*
      ********************************************************************/
     protected static $initRow	= array(
-				'code639_1'	    	=> '',
-				'name'		    	=> '',
-				'nativename'		=> '',
-				'article'	    	=> '',
-				'possessive'		=> 'of',
-				'conjunction'		=> 'and',
-				'dateprefix'		=> 'on',
-				'sorry'	        	=> 'We are sorry that a $langName/$nativeName version of this page is not available.');
+						'code639_1'	    	=> '',
+						'name'		    	=> '',
+						'nativename'		=> '',
+						'article'	    	=> '',
+						'possessive'		=> 'of',
+						'conjunction'		=> 'and',
+						'dateprefix'		=> 'on',
+						'sorry'	        	=> 'We are sorry that a $langName/$nativeName version of this page is not available.');
+
+    /********************************************************************
+     *	Language::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                		'table'     		=> 'Languages',
+                		'name'      		=> 'Languages',
+                		'prime'	    		=> 'code639_1',
+	            		'srvmg'     		=> false,
+	            		'fldcount'			=> 8,
+                		'order'     		=> 'Name',
+                		'classname' 		=> 'Language');
 
     /********************************************************************
      *	Language::$translate											*
@@ -70,9 +79,24 @@ class Language extends Record
      *	Define synonyms for field names									*
      ********************************************************************/
     protected static $translate	= array(
-				'code'			=> 'code639_1',
-				'the'			=> 'article',
-				'of'			=> 'possessive');
+						'code'			    => 'code639_1',
+						'the'			    => 'article',
+						'of'			    => 'possessive');
+
+    /********************************************************************
+     *	Language::$defaultOrder											*
+     *																	*
+     *	Default sort order for query response by class RecordSet		*
+     ********************************************************************/
+    static $defaultOrder	= "`Name`";
+
+    /********************************************************************
+     *	$language->country  											*
+     *																	*
+     *	If the language code includes a country code, this is a         *
+     *	reference to the instance of Country.                           *
+     ********************************************************************/
+    protected $country          = null;
 
     /********************************************************************
      *	function Language::__construct									*
@@ -102,77 +126,92 @@ class Language extends Record
 
 		if ($debug)
 		{
-		    $warn	.= '<p>Language::__construct(' .
-						   print_r($parms, true) . ")</p>\n";
+		    $warn	        .= '<p>Language::__construct(' .
+				        		print_r($parms, true) . ")</p>\n";
 		}
 
 		if (is_null($connection))
 		{
 		    throw new Exception('Language::constructor: " .
 							"No connection to database server');
-		}
-		$needInsert	= false;
-		$this->table	= 'Languages';
+        }
+
+		$needInsert	        = false;
+		$this->table	    = 'Languages';
+        $code	            = 'en';
+        $cc                 = null;
 
 		// validate parameters
 		if (is_null($parms) ||
 		    (is_array($parms) && count($parms) == 0))
-		{			// create default entry
+		{			// create default entry from Cookie
 		    if (array_key_exists('lang', $_REQUEST))
 				$code	= strtolower($_REQUEST['lang']);
-		    else
-				$code	= 'en';
 		    $parms	= array('code'	=> $code);
 		}			// create default entry
 
+        // process parameters
 		if (is_array($parms))
-		{			// an array with at least one entry
+		{			            // an array with at least one entry
 		    if (count($parms) < count(self::$initRow))
-		    {			// search parameters
-				$code		= 'not supplied';
-				$where		= '';
-				$and		= 'WHERE ';
-				$sqlParms	= array();
+		    {			        // search parameters
+				$where      		= '';
+				$and        		= 'WHERE ';
+				$sqlParms          	= array();
 				foreach($parms as $key => $value)
-				{		// loop through parameters
-				    $fieldLc	= strtolower($key);
+				{		        // loop through parameters
+				    $fieldLc	    = strtolower($key);
 				    if (array_key_exists($fieldLc, self::$translate))
 						$fieldLc	= self::$translate[$fieldLc];
 				    switch($fieldLc)
-				    {		// act on key fields
+				    {		    // act on key fields
 						case 'code639_1':
-						{	// language code
-						    $code	        	= $value;
+                        {	    // language code
+                            if (strlen($value) > 2)
+                            {
+                                $code	        = substr($value, 0, 2);
+                                if (strlen($value) >= 5 && 
+                                    substr($value, 2, 1) == '-')
+                                    $cc         = substr($value, 3);
+                            }
+                            else
+                                $code           = $value;
 						    $where	    	    .= $and . "Code639_1=:code";
-						    $sqlParms['code']	= $value;
+						    $sqlParms['code']	= $code;
 						    $and	    	    = ' AND ';
 						    break;
-						}	// language code
+						}	    // language code
 
-				    }		// act on key fields
-				}		// loop through parameters
+				    }		    // act on key fields
+                }		        // loop through parameters
 
-				$query	= "SELECT * FROM Languages $where";
+                if (strlen($where) == 0)
+                {
+				    $where	    	    .= "WHERE Code639_1=:code";
+                    $sqlParms['code']	= $code;
+                }
+
+				$query	                = "SELECT * FROM Languages $where";
 
 				// query the database
-				$stmt	= $connection->prepare($query);
+				$stmt	                = $connection->prepare($query);
+                $queryText              = debugPrepQuery($query, $sqlParms);
 
 				if ($stmt->execute($sqlParms))
 				{		// success
 				    if ($debug)
 						$warn	.= "<p>Language::__construct: " . __LINE__ . 
-							       " query='$query'</p>\n" .
-							       "<p>parms=" . print_r($sqlParms,true) .
-							       "</p>\n";
+							       " query='$queryText'</p>\n";
 
-				    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
-				    if (count($result) == 1)
+				    $result	            = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				    $count              = count($result);
+				    if ($count == 1)
 				    {		// existing record
 						$dbrow		    = $result[0];
 						$needInsert	    = false;
 				    }		// existing record
 				    else
-				    if (count($result) == 0)
+				    if ($count == 0)
                     {		// create a new record
 						// set defaults
 						$dbrow		    	= self::$initRow;
@@ -182,20 +221,20 @@ class Language extends Record
 				    }		// create new record
 				    else
 				    {		// error performing query
-						throw new Exception("Language::__construct: '$query' " .
-							"returns " . count($result) . " records");
+						$this->msg  .= "Language::__construct: '$queryText' " .
+							            "returns $count records. ";
 				    }		// error performing query
 				}		// success
 				else
 				{		// error performing query
-				    throw new Exception("Language::__construct: '$query' " .
-								print_r($stmt->errorInfo(),true));
+				    $this->msg      .="Language::__construct: '$queryText' " .
+								print_r($stmt->errorInfo(),true);
 				}		// error performing query
 		    }			// search parameters
 		    else
 		    {			// build from existing record
-				$dbrow		= $parms;
-				$needInsert	= false;
+				$dbrow		            = $parms;
+				$needInsert	            = false;
 		    }			// build from existing record
 		}			// an array with at least one entry
 		else
@@ -209,7 +248,10 @@ class Language extends Record
 		// invoke constructor of base class
 		parent::__construct($dbrow,
 						    'Languages');
-		$this->needInsert	= $needInsert;
+		$this->needInsert	            = $needInsert;
+
+        if (!is_null($cc))
+            $this->extras['cc']         = $cc;
 
 		// diagnostic output if debug is set
 		$this->dump('Language Record constructed:');
@@ -425,6 +467,57 @@ class Language extends Record
     }		// Language::delete
 
     /********************************************************************
+     *	function Language:get											*
+     *																	*
+     *	Obtain the current value of a field in the object.				*
+     *																	*
+     *  Parameters:														*
+     *	    $field		name of field to retrieve						*
+     *																	*
+     *	Side Effects:													*
+     *	    Adds warning if $field is not already defined as a field	*
+     *	    or pseudo-field and returns null.							*
+     ********************************************************************/
+    function get($field)
+    {
+        $fieldLc		= strtolower($field);
+        if (array_key_exists($fieldLc, self::$translate))
+            $fieldLc	= self::$translate[$fieldLc];
+
+        switch($fieldLc)
+        {			// act on field name
+            case 'name':
+            {
+                return $this->getName();
+            }
+
+            case 'nativename':
+            {
+                return $this->getNativeName();
+            }
+
+            case 'sorry':
+            {
+                return $this->getSorry();
+            }
+
+            case 'cc':
+            {
+                if (array_key_exists('cc', $this->extras))
+                    return $this->extras['cc'];
+                else
+                    return null;
+            }
+
+
+            default:
+            {		// other fields
+                return parent::get($fieldLc);
+            }		// other fields
+        }			// act on field name
+    }			// function Language::get
+
+    /********************************************************************
      *	function Language::getSorry										*
      *																	*
      *	Get the value of the apology text field as HTML.				*
@@ -441,17 +534,67 @@ class Language extends Record
     }		// Languages::getSorry
 
     /********************************************************************
-     *	function Language::getName										*
+     *	function Language::getCountry									*
      *																	*
-     *	Convenience function for accessing the 'name' attribute.		*
+     *	Function for getting the country associated with a              *
+     *	country-specific dialect of a language.                         *
      *																	*
      *	Returns:														*
-     *	    Name of the county as a string.								*
+     *	    Instance of Country or null.                                *
+     ********************************************************************/
+    function getCountry()
+    {
+        if ($this->country)
+            return $this->country;
+        else
+        if (array_key_exists('cc', $this->extras))
+        {
+            $cc                     = $this->extras['cc'];
+            $country                = new Country(array('cc' => $cc));
+            if ($country->isExisting())
+            {
+                $this->country      = $country; // save
+                return $this->country;
+            }
+            else
+                unset($this->extras['cc']);
+        }
+		return null;
+    }		// Language::getCountry
+
+    /********************************************************************
+     *	function Language::getName										*
+     *																	*
+     *	Function for accessing the 'name' attribute.		            *
+     *																	*
+     *	Returns:														*
+     *	    Name of the language as a string.							*
      ********************************************************************/
     function getName($options	= null)
     {
+		$lang                   = $this->row['code639_1'];
+        if ($this->getCountry())
+            return $this->row['name'] . 
+                    '(' . $this->country->getName() . ')';
 		return $this->row['name'];
     }		// Language::getName
+
+    /********************************************************************
+     *	function Language::getNativeName								*
+     *																	*
+     *	Function for accessing the 'nativename' attribute.		        *
+     *																	*
+     *	Returns:														*
+     *	    Name of the language as a string.							*
+     ********************************************************************/
+    function getNativeName($options	= null)
+    {
+		$lang                   = $this->row['code639_1'];
+        if ($this->getCountry())
+            return $this->row['nativename'] . 
+                    '(' . $this->country->getName($lang) . ')';
+		return $this->row['nativename'];
+    }		// Language::getNativeName
 
     /********************************************************************
      *	function Language::__toString									*

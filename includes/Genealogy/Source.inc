@@ -356,7 +356,7 @@ class Source extends RecordPic
      *																	*
      *  Returns object containing source record.						*
      *																	*
-     *	Throws an exception for irrecoverable logic errors only.		*
+     *	Errors are accumulated in $this->msg                            *
      ********************************************************************/
     function __construct($parms = null)
     {

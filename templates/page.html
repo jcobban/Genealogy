@@ -30,25 +30,41 @@
   <body>
       
 <script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '2096433630426301',
-      cookie     : true,
-      xfbml      : true,
-      version    : 'v3.2'
-    });
-      
-    FB.AppEvents.logPageView();   
-      
-  };
+    if (location.host != 'localhost')
+    try {
+	  window.fbAsyncInit = function() {
+	    FB.init({
+	      appId      : '2096433630426301',
+	      cookie     : true,
+	      xfbml      : true,
+	      version    : 'v3.2'
+	    });
+	      
+	    FB.AppEvents.logPageView();   
+	      
+	  };
+	
+	  (function(d, s, id){
+	     var js, fjs = d.getElementsByTagName(s)[0];
+	     if (d.getElementById(id)) {return;}
+	     js = d.createElement(s); js.id = id;
+	     js.src = "https://connect.facebook.net/en_US/sdk.js";
+	     fjs.parentNode.insertBefore(js, fjs);
+	   }(document, 'script', 'facebook-jssdk'));
+    } catch(e) {}
 
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "https://connect.facebook.net/en_US/sdk.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
+   var tinyMCEparms = {
+		selector            : 'textarea',
+	    plugins             : 'link lists image',
+	    menubar             : false,
+        language            : '$LANG',
+        skin                : 'oxide-dark',
+	    toolbar             : "undo redo | styleselect | bold italic | " 
+	                           + "alignleft aligncenter alignright alignjustify | " 
+	                           + "bullist numlist | link image",
+	    content_css		    : "/styles.css"
+	};
+	
 </script>
     <header id="headSection">
       <div class="topcrumbs"> <!-- start of page header -->
@@ -103,7 +119,7 @@
               title="el Estado de su Cuenta">
               Cuenta $USERID
             <span id="gotMail">
-                <img src="/envelope.svg" alt="You have mail" style="display: inline; height: 19px;"/>
+                <img src="/envelope.svg" alt="You have mail" style="display: inline-block; height: 19px;"/>
             </span>
           </a><br>
       </span>

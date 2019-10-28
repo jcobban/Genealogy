@@ -1,0 +1,174 @@
+<!--*********************************************************************
+ *  ToDosen.html													    *
+ *																		*
+ *  Display a web page containing a list of research ToDo items.        *
+ *																		*
+ *  History:															*
+ *		2019/08/13      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+  </div>
+  <div class="body">
+    <h1>
+	    <span class="right">
+	      <a href="ToDosHelpen.html" target="help">? Help</a>
+	    </span>
+	    Research ToDo List
+        <span id="titleName">for $PERSONNAME</span>
+        <span id="titlePattern">for Pattern $PATTERN</span>
+    </h1>
+    $TRACE
+    $MSG
+	<form name="todoForm" action="ToDos.php">
+      <input type="hidden" name="idir" id="idir" value="$IDIR">
+	  <div class="row">
+		<label class="label" for="pattern" style="width: 11em;">
+		    Name Pattern:
+		</label>
+		<input name="pattern" id="pattern" type="text" size="64"
+				    class="white leftnc" value="$PATTERN">
+        <div style="clear: both"></div>
+	  </div>
+      <p class="label">
+		<button type="button" class="button" id="Search" accesskey="s">
+		    <u>S</u>earch
+		</button>
+		&nbsp;
+		<button type="button" class="button" id="Close" accesskey="c">
+		    <u>C</u>lose
+		</button>
+		&nbsp;
+		<button type="button" class="button" id="New" accesskey="n">
+		    Create <u>N</u>ew
+		</button>
+	  </p>
+	</form>
+	<p class="label" id="nomatches">
+		No ToDos match the specified pattern.
+    </p>
+    <div id="somematches">
+	  <p class="label" id="countmatches">
+		  $COUNT ToDos match the specified pattern.
+	  </p>
+      <div class="center" id="topBrowse">
+        <div class="left" id="topPrev">
+	        <a href="ToDos.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET&amp;lang=$LANG">&lt;---</a>
+	    </div>
+	    <div class="right" id="topNext"> 
+	        <a href="ToDos.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG">---&gt;</a>
+	    </div>
+		  rows $FIRST to $LAST of $COUNT 
+        <div style="clear: both;"></div>
+	  </div> <!-- class="center" -->
+	  <!--- Put out the response as a table -->
+	  <table class="details" id="dataTable">
+		<!--- Put out the column headers -->
+		<thead>
+		  <tr>
+            <th class="colhead">
+			  Details
+			</th>
+			<th class="colhead">
+			  ToDo Name
+			</th>
+			<th class="colhead">
+			  Person Name
+			</th>
+			<th class="colhead">
+			  Opened Date
+			</th>
+			<th class="colhead">
+			  Closed Date
+			</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr id="item$IDTD">
+            <td class="odd right">
+                <a href="ToDo.php?id=$IDTD&amp;lang=$LANG" class="button">
+					Details
+			    </a>
+			</td>
+			<td class="odd left">
+			    $TODONAME
+			</td>
+			<td class="odd center">
+	            $PERSONNAME 
+			</td>
+			<td class="odd center">
+				$OPENEDDATE
+			</td>
+			<td class="odd center">
+			    $CLOSEDATE
+			</td>
+		  </tr>
+		</tbody>
+        </table>
+      </div> <!-- id="somematches"-->
+	</div>	<!-- end of id="body" -->
+	<div class="balloon" id="Helppattern">
+	  <p>
+		This is a regular expression, as supported by MySQL, which is used to
+        limit
+		the research todo items to be displayed.
+        See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer&quote;s regex page</a>.
+	  </p>
+	  <ul>
+	    <li>If the pattern contains no special 
+	    	characters then only research todo items containing that string
+            will be included.  For example the pattern "London" will match
+            research todo items containing the string "London".  Note that 
+            the search ignores case, so that pattern will also match
+	        "LONDON" and "london".
+        </li>
+	    <li>If the pattern begins with a caret '^' then only research todo 
+            items that <b>begin</b> with the remainder of the pattern are
+            included.  For example the pattern "^Ba" displays
+            research todo items starting with "Ba" (or "ba" or "BA").
+        </li>
+	    <li>If the pattern ends with a dollar sign '$', then only research
+            todo items that <b>end</b> with the remainder of the pattern are
+            included.  For example the pattern "CA$" matches research todo 
+            items that end with "CA" (or "ca" or "Ca").
+        </li>
+	    <li>In a pattern a period '.' matches any single character.  For example
+		    the pattern "B.b" matches any research todo item that contains
+            two letter Bs separated
+		    by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
+		    anywhere in the research todo item name.
+        </li>
+	    <li>In a pattern an asterisk '*' matches zero or more of the preceding
+		    character; "bo*b" matches "bb", "bob", and "boob"
+		    anywhere in the research todo item name.
+        </li>
+	  </ul>
+	</div>
+	<div class="balloon" id="HelpSearch">
+	    Clicking on this button refreshes the displayed list of research todo
+        items based upon the pattern.  You may also hit the "enter" key
+        to perform the same function.
+	</div>
+	<!-- balloons to pop up when mouse moves over forward and back links -->
+	<div class="popup" id="mousetopPrev">
+	    <p class="label">
+		    Go to Row $PREVOFFSET&nbsp;
+	    </p>
+	</div>
+	<div class="popup" id="mousetopNext">
+	    <p class="label">
+		    Go to Row $NEXTOFFSET&nbsp;
+	    </p>
+	</div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+	<script src="ToDos.js" type="application/javascript">
+    </script>

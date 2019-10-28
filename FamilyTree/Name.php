@@ -62,16 +62,16 @@ foreach($_GET as $key => $value)
 	    }
 
 	    case 'debug':
-	    {		// handled by common.inc
+	    case 'text':
+	    {		// handled by common
 			break;
 	    }		// debug
 
 	    case 'lang':
-        {		// handled by common.inc
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value,0,2));
+        {		// preferred language
+            $lang           = FtTemplate::validateLang($value);
 			break;
-	    }		// debug
+	    }		// preferred language
 
 	    default:
 	    {

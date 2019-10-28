@@ -20,13 +20,13 @@ use \Exception;
     $subject	= rawurlencode("Edit Event");
 
     htmlHeader('Test Update Event',
-	       array('/jscripts/js20/http.js',
-		     '/jscripts/CommonForm.js',
-		     '/tinymce/jscripts/tiny_mce/tiny_mce.js',
-		     '/jscripts/util.js',
-		     '/citTable.js',
-		     '/Common.js',
-		     '/editEvent.js'));
+               array("/jscripts/tinymce/js/tinymce/tinymce.js",
+	                 '/jscripts/js20/http.js',
+		             '/jscripts/CommonForm.js',
+		             '/jscripts/util.js',
+		             '/citTable.js',
+		             '/Common.js',
+		             '/editEvent.js'));
 ?>
 <body>
 <?php

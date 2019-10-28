@@ -126,6 +126,7 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2017/12/12		use class PersonSet in place of					*
  *						Person::getPersons								*
+ *		2019/07/18      fix infinite recursion getting spouse name      *       
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
@@ -454,6 +455,7 @@ else
         }		// last referenced individual
     }		    // parameters did not set initial name
 
+flush();
     // construct WHERE clause
     $getParms	= array();
     if ($loose)
@@ -568,6 +570,7 @@ else
     $info		            = $result->getInformation();
     print "<cmd>" . $info['query'] . "</cmd>\n";
     $count		            = $result->count();
+flush();
 
     // iterate through results
     foreach($result as $idir => $indiv)
@@ -652,28 +655,20 @@ else
     		    // display name of spouse
     		    if ($includeSpouse)
     		    {		// include spouse's name
-    				$families	= $indiv->getFamilies();
+    				$families	                = $indiv->getFamilies();
     				if (count($families) > 0)
     				{
     				    print "\t<families>\n";
-    				    $conjunction	= '';
+    				    $conjunction	        = '';
     				    foreach($families as $idmr => $family)
     				    {
     						if ($gender == 0)
-    						    $spouseIdir	= $family->get('idirwife');
+    						    $spouseName	    = $family->getWifePriName();
     						else
-    						    $spouseIdir	= $family->get('idirhusb');
-    						if ($spouseIdir)
+    						    $spouseName	    = $family->getHusbPriName();
+    						if ($spouseName)
     						{
-    						  try {
-    						    $spouse	= new Person(
-    									    array('idir'=>$spouseIdir));
-    						    print $conjunction . $spouse->getName();
-    						  } catch(Exception $e) {
-    						    print $conjunction .
-    								"idmr=$idmr, spouseIdir=$spouseIdir: " .
-    								  $e->getMessage();
-    						  }
+    						    print $conjunction . $spouseName->getName();
     						    $conjunction	= ', and ';
     						}
     				    }	// loop through all sets of families

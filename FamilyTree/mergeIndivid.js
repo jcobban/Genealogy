@@ -29,6 +29,8 @@
  *		2019/01/07      name of second individual moved to Name         *
  *		                record in XML response                          *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/09/09      open chooser frame in other half of page        *
+ *		                pass language choice to new frames              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -38,7 +40,7 @@
  *																		*
  *  Define the function to be called once the web page is loaded.		*
  ************************************************************************/
-    window.onload	= onLoad;
+window.onload	    = onLoad;
 
 /************************************************************************
  *  function onLoad														*
@@ -153,6 +155,9 @@ function chooseIndivid()
 		var	gender		= form.gender.value;
 		var	birthmin	= form.birthmin.value;
 		var	birthmax	= form.birthmax.value;
+        var lang        = 'en';
+        if ('lang' in args)
+            lang        = args.lang;
 		var	url		    = "chooseIndivid.php?idir=" + idir +
 					            		    '&surname=' + surname +
 					            		    '&given=' + given +
@@ -160,13 +165,23 @@ function chooseIndivid()
 					            		    '&gender=' + gender +
 					            		    '&birthmin=' + birthmin +
 					            		    '&birthmax=' + birthmax +
-					            		    '&callidir=' + form.name;
+					            		    '&callidir=' + form.name +
+					            		    '&lang=' + lang +
+					            		    '&debug=' + debug;
 		if (debug.toLowerCase() == 'y')
 		    popupAlert("mergeIndivid.js: chooseIndivid: url='" + url + "'",
 				       this);
+
+        var target      = 'right';
+        if (window.frameElement)
+        {
+            var frameClass  = window.frameElement.className;
+            if (frameClass == 'right')
+                target  = 'left';
+        }
 		openFrame("chooser",
 				  url,
-				  "left");
+				  target);
     }		// idir field present
     else
 		popupAlert("mergeIndivid.js: chooseIndivid: " +
@@ -193,7 +208,7 @@ function doNotMerge()
     var	idir2	= form.idir2.value;
     if (idir1 && idir2)
     {		// idir fields present
-		var parms		= {"idirleft"  :	idir1,
+		var parms		    = {"idirleft"  :	idir1,
 							   "idirright" :	idir2};
 		HTTP.post("addDontMergeXml.php",
 				  parms,
@@ -267,10 +282,13 @@ function viewSecond()
     if (form)
     {
 		var	idir2	= form.idir2.value;
+        var lang        = 'en';
+        if ('lang' in args)
+            lang        = args.lang;
 		if (idir2)
 		{		// idir field present
 		    // popup new window
-		    window.open("Person.php?idir=" + idir2,
+		    window.open("Person.php?idir=" + idir2 + '&lang=' + lang,
 						"individ2");
 		}		// idir field present
     }		// form present

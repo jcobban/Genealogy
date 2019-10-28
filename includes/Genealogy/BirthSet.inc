@@ -18,6 +18,7 @@ use \Iterator;
  *		                years                                           *
  *		2019/04/06      change response from getStatistics, and         *
  *		                getCountyStatistics                             *
+ *		2019/06/15      add column to getCountyStatistics               *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -35,7 +36,6 @@ require_once __NAMESPACE__ . '/LegacyDate.inc';
 
 class BirthSet extends RecordSet
 {
-
     /********************************************************************
      *	function BirthSet::__construct									*
      *																	*
@@ -245,8 +245,8 @@ class BirthSet extends RecordSet
 				case 'b_registrar':
 				{		// text fields for pattern match
 				    $expression	= $this->getWherePattern($fieldLc,
-											             $value,
-											             $this->sqlParms);
+                                                         $value,
+                                                         true);
 				    if (strlen($expression) > 0)
 				    {		// expression generated
 						$where		.= $and . $expression;
@@ -263,8 +263,8 @@ class BirthSet extends RecordSet
 				case 'b_idir':
 				{		// positive integer fields
 				    $expression	= $this->getWhereInt($fieldLc,
-										             $value,
-										             $this->sqlParms);
+                                                     $value,
+                                                     true);
 				    if (strlen($expression) > 0)
 				    {		// expression generated
 						$where		        .= $and . $expression;
@@ -313,8 +313,8 @@ class BirthSet extends RecordSet
 				case 'b_originalvolume':
 				case 'b_changedby':
 				{		// other fields exact match
-				    $where		.= "$and `$fieldLc`=?";
-				    $this->sqlParms[]		= $value;
+				    $where		.= "$and `$fieldLc`=:$fieldLc";
+				    $this->sqlParms[$fieldLc]		= $value;
 				    $and		= ' AND ';
 				    break;
 				}		// other fields
@@ -329,11 +329,11 @@ class BirthSet extends RecordSet
             $m		            = $date->getActualMonth();
             if ($m > 0)
 			    $where		    .= $and .
-			                "ABS(DATEDIFF(B_CalcBirth, '$y-$m-15'))<(30 * ?)";
+			            "ABS(DATEDIFF(B_CalcBirth, '$y-$m-15'))<(30 * :range)";
             else
 			    $where		    .= $and .
-			                "ABS(DATEDIFF(B_CalcBirth, '$y-6-15'))<(365 * ?)";
-			$this->sqlParms[]	= $range;
+			            "ABS(DATEDIFF(B_CalcBirth, '$y-6-15'))<(365 * :range)";
+			$this->sqlParms['range']	= $range;
             $and		        = ' AND ';
 	    }
 
@@ -345,8 +345,8 @@ class BirthSet extends RecordSet
 			$m  	    	    = $date->getMonth();
 			$d	        	    = $date->getDay();
 			$where      		.= $and .
-"ABS(DATEDIFF(STR_TO_DATE(B_MarriageDate,'%d %M %Y'), '$y-$m-$d'))<(365 * ?)";
-			$this->sqlParms[]	= $range;
+"ABS(DATEDIFF(STR_TO_DATE(B_MarriageDate,'%d %M %Y'), '$y-$m-$d'))<(365 * :range)";
+			$this->sqlParms['range']	= $range;
 	        $and	    	    = ' AND ';
 	    }
 
@@ -355,20 +355,21 @@ class BirthSet extends RecordSet
 		{			// surname comparison requested
 		    if (preg_match("/[.+*?^$]/", $surname))
 		    {		// match pattern
-				$where	.= $and . 'B_Surname REGEXP ?';
+				$where	.= $and . 'B_Surname REGEXP :surname';
 		    }		// match pattern
 		    else
 		    if ($soundex)
 		    {		// match soundex
-				$where	.= $and . 'B_SurnameSoundex = LEFT(SOUNDEX(?),4)';
+				$where	.= $and . 'B_SurnameSoundex = LEFT(SOUNDEX(:surname),4)';
 		    }		// match soundex
 		    else
 		    {		// match exact
-				$where	.= $and . 'B_Surname=?';
+				$where	.= $and . 'B_Surname=:surname';
 		    }		// match exact
 
-		    $this->sqlParms[]	= $tparms['b_surname'];
-		}			// surname comparison requested
+		    $this->sqlParms['surname']	= $tparms['b_surname'];
+        }			// surname comparison requested
+
 		return $where;
     }		// BirthSet::getWhere
 
@@ -399,7 +400,7 @@ class BirthSet extends RecordSet
 		// execute the query
 		$query	= 'SELECT B_RegYear, SUM(B_Surname != ""), SUM(B_IDIR > 0) ' .
 						'FROM Births ' . $this->where .
-						    'GROUP BY B_RegYear ORDER BY B_RegYear';
+						    ' GROUP BY B_RegYear ORDER BY B_RegYear';
 		$sqlParmsText	= print_r($this->sqlParms, true);
 		$stmt		= $connection->prepare($query);
 		if ($stmt->execute($this->sqlParms))
@@ -448,14 +449,14 @@ class BirthSet extends RecordSet
 		global	$connection;
 
 		// execute the query
-		$query	= 'SELECT B_RegCounty, ' .
+		$query	= 'SELECT B_RegCounty AS County, ' .
 								'SUM(B_Surname != "") AS `Count`,  ' .
 								'SUM(B_Idir != 0) AS LinkCount, ' .
 								'MIN(B_RegNum) as low, ' .
 								'MAX(B_RegNum) as high  ' .
 						'FROM Births ' .
 						$this->where .
-						'GROUP BY B_RegCounty ' .
+						' GROUP BY B_RegCounty ' .
 						'ORDER BY B_RegCounty';
 		$stmt	= $connection->prepare($query);
 		if ($stmt->execute($this->sqlParms))
@@ -478,40 +479,45 @@ class BirthSet extends RecordSet
      *  Get statistics for specific year of birth registrations.		*
      *																	*
      *	Example:														*
-     *	    $births		= new BirthSet(array('domain'		=> 'CAON',	*
+     *	    $births		= new BirthSet(array('domain'	=> 'CAON',	    *
      *									     'year'		=> 1887,		*
-     *									     'county'		=> 'Msx'));	*
+     *									     'county'	=> 'Msx'));	    *
      *	    $result		= $births->getCountyStatistics();				*
      *																	*
      *	Returns:														*
      *		An array each row of which is							    *
      *		an array containing the following values for each		    *
      *		town, city, or township in the county:					    *
-     *				b_regcounty		county code						    *
-     *				b_regtownship	township name					    *
+     *				county		    county code						    *
+     *				township	    township name					    *
      *				count	        number of transcribed records	    *
      *				linkcount		number linked to the tree		    *
      *				low				lowest registration number		    *
      *				high			highest registration number		    *
+     *				currhigh		highest registration number         *
+     *				                excluding delayed registrations     *
      ********************************************************************/
     function getCountyStatistics()
     {
 		global	$debug;
 		global	$warn;
 		global	$msg;
-		global	$connection;
+        global	$connection;
 
 		// execute the query
-		$query	= 'SELECT B_RegCounty, B_RegTownship, ' .
+		$query	= 'SELECT B_RegCounty AS County, B_RegTownship AS Township, ' .
 								'SUM(B_Surname != "") AS `Count`,  ' .
 								'SUM(B_Idir != 0) AS LinkCount, ' .
 								'MIN(B_RegNum) as low, ' .
-								'MAX(B_RegNum) as high  ' .
+                                'MAX(B_RegNum) as high,  ' .
+                                '(SELECT MAX(B_RegNum) FROM Births  WHERE b_regyear=:b_regyear and b_regcounty=:b_regcounty AND b_regtownship=Township AND B_RegNum<500000) AS `currhigh` ' .
 						'FROM Births ' .
 						$this->where .
-						'GROUP BY B_RegCounty, B_RegTownship ' .
-						'ORDER BY B_RegCounty, B_RegTownship';
-		$stmt	= $connection->prepare($query);
+						' GROUP BY B_RegCounty, B_RegTownship ' .
+                        'ORDER BY B_RegCounty, B_RegTownship';
+        $stmt	= $connection->prepare($query);
+        $queryText  = debugPrepQuery($query, $this->sqlParms);
+
 		if ($stmt->execute($this->sqlParms))
 		{
 		    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -519,9 +525,9 @@ class BirthSet extends RecordSet
 		}
 		else
 		{
-		    $msg	.= "query '" . $query . "' failed: " .
-						   print_r($this->sqlParms, true) . ': ' .
-						   print_r($stmt->errorInfo(), true);
+		    $msg	.= "query '$queryText' failed: " .
+                           print_r($stmt->errorInfo(), true);
+            print "<p class='error'>$msg</p>\n";
 		    return null;
 		}		    // query failed
     }		        // function Birth::getCountyStatistics

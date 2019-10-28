@@ -51,34 +51,45 @@ function onloadSources()
 		// take action specific to element
 		var	name;
 		if (element.name && element.name.length > 0)
-		    name	= element.name;
+		    name	        = element.name;
 		else
-		    name	= element.id;
+		    name	        = element.id;
 
-		switch(name)
+        var column          = name;
+        var idsr            = '';
+        var result          = /^([a-zA-Z@#$%_]+)(\d*)/.exec(name);
+        if (result)
+        {
+            column          = result[1].toLowerCase();
+            idsr            = result[2];
+        }
+
+		switch(column)
 		{		// act on field name
-		    case 'CreateNew':
+		    case 'createnew':
 		    {
 				element.onclick	= createSource;
 				break;
 		    }
 
-		    default:
-		    {
-				if (name.substring(0,4) == 'Edit')
-				{
-				    element.onclick	= editSource;
-				    var idsr		= name.substring(4);
-				    var row		= document.getElementById('Row' + idsr);
-				    if (row)
-					row.feedback	= sourceUpdated;
-				}
-				else
-				if (name.substring(0,4) == 'Show')
-				    element.onclick	= showSource;
-				else
-				if (name.substring(0,6) == 'Delete')
-				    element.onclick	= deleteSource;
+            case 'edit':
+			{
+			    element.onclick	= editSource;
+			    var row		    = element.parentNode.parentNode;
+			    if (row)
+				    row.feedback	= sourceUpdated;
+				break;
+			}
+
+		    case 'show':
+			{
+			    element.onclick	= showSource;
+				break;
+		    }
+
+            case 'delete':
+			{
+			    element.onclick	= deleteSource;
 				break;
 		    }
 		}		// act on field name
@@ -228,7 +239,7 @@ function showSource()
 }		// showSource
 
 /************************************************************************
- *  function editSource												*
+ *  function editSource												    *
  *																		*
  *  This method is called when the user requests to edit				*
  *  an existing Source.  It pops up a child window.						*

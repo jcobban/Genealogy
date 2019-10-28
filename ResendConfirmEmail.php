@@ -16,6 +16,7 @@ use \Exception;
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/User.inc";
+require_once __NAMESPACE__ . "/UserSet.inc";
 require_once __NAMESPACE__ . "/Language.inc";
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/common.inc";
@@ -86,34 +87,48 @@ foreach($_GET as $key => $value)
 $template		= new FtTemplate("ResendConfirmEmail$lang.html");
 
 if (canUser('all'))
-{
-    $users			= new RecordSet('Users', 
-						array('pattern'	=> 'pending'));
-    $subjectTag	    = $template->getElementById('emailSubject');
-    $bodyTag	    = $template->getElementById('emailBody');
+{                       //  invoked by administrator
+    $users			        = new UserSet(array('auth'	=> 'pending'));
+    $subjectTag	            = $template['emailSubject'];
+    $bodyTag	            = $template['emailBody'];
     foreach($users as $user)
     {
-		$newuserid      = $user->get('username');
-		$id		        = $user->get('id');
-		$email		    = $user->get('email');
-		$newpassword	= randomPassword(12);
+		$newuserid          = $user->get('username');
+		$id		            = $user->get('id');
+		$email		        = $user->get('email');
+		$newpassword	    = randomPassword(12);
 		$user->setPassword($newpassword);
-		$shapassword	= $user->get('shapassword');
+        $confirmid              = time();
+        $user['confirmid']      = $confirmid;
 		$subject	    = str_replace('$newuserid',
-					      $newuserid, 
-					      trim($subjectTag->innerHTML()));
-		$body		    = str_replace(array('$newuserid','$servername','$id','$newpassword','$shapassword'),
-						              array($newuserid,$servername,$id,$newpassword,$shapassword),
+					                  $newuserid, 
+					                  trim($subjectTag->innerHTML()));
+		$body		    = str_replace(array('$newuserid','$servername','$id','$newpassword','$confirmid'),
+						              array($newuserid,$servername,$id,$newpassword,$confirmid),
 						              trim($bodyTag->innerHTML()));
-		// send e-mail to the new user to validate the address
-		$warn	.= "<p>" . __LINE__ . " \$email='$email'</p>\n".
+		// send e-mail to the pending user to validate the e-mail address
+		$warn	    .= "<p>" . __LINE__ . " \$email='$email'</p>\n".
 		 		       "<p>\$subject='$subject'</p>\n".
-		 		       "$body\n";
+                       "$body\n";
+
+	    // To send HTML mail, the Content-type header must be set
+	    $headers    = 'MIME-Version: 1.0' . "\r\n";
+	    $headers    .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+	 
+	    // Create email headers
+	    $headers    .= "From: webmaster@jamescobban.net\r\n".
+	                   "Reply-To: webmaster@jamescobban.net\r\n" .
+                       'X-Mailer: PHP/' . phpversion();
 		$sent		= mail($email,
 		 		           $subject,
-		 		           $body);
+                           $body,
+                           $headers);
+        if ($sent === false)
+            $warn   .= "<p>E-mail was not sent to $email</p>\n";
+        showTrace();
     }			// loop through pending users
-    $template->updateTag('notAuthorized', null);
+
+    $template['notAuthorized']->update(null);   // hide error message
 }		// authorized
 
 $template->display();

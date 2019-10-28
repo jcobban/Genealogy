@@ -18,6 +18,7 @@
  *		                within the visible portion of the browser.      *
  *		2019/05/29      handle clicking on stats where there is no      *
  *		                county or township in the registrations         *
+ *		2019/07/13      encodeURI county and township names             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -94,8 +95,8 @@ function showTownStats()
 		dest		= 'DeathRegResponse.php?RegDomain=' + domain +
 				            '&Offset=0&Count=' + pcount +
                             '&RegYear=' + regyear +
-				            '&RegCounty=' + county + 
-                            '&RegTownship=' + town +
+				            '&RegCounty=' + encodeURIComponent(county) + 
+                            '&RegTownship=' + encodeURIComponent(town) +
 				            '&lang=' + lang; 
     }
     else
@@ -103,7 +104,7 @@ function showTownStats()
     {
 		dest		= 'DeathRegYearStats.php?RegDomain=' + domain +
 				            '&RegYear=' + regyear + 
-                            '&County=' + county + 
+                            '&County=' + encodeURIComponent(county) + 
 					        '&lang=' + lang;
     }
     else
@@ -114,7 +115,7 @@ function showTownStats()
         else
         if (count > pcount)
             count       = pcount;
-		dest	= 'MarriageRegResponse.php?RegDomain=' + domain + 
+		dest	= 'DeathRegResponse.php?RegDomain=' + domain + 
                             '&Offset=0&Count=' + count + 
                             '&RegYear=' + regyear + 
                             '&RegNum=' + low + 

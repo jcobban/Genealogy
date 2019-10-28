@@ -28,16 +28,14 @@
 	  $MSG
 	    <p class='warning'>
 		Vous n'etes pas authorizé a modifier cette table.
-		<a href='/Signon.php' target='_blank'>
-		<span class='button'>inscrivez-vous</span></a>
+		<a href='/Signon.php' target='_blank' class='button'>inscrivez-vous</a>
 		pour mise a jour la base des données.
 	    </p>
 	<!--- Put out the response as a table -->
 	<form name='countryForm'
-		action='CountriesEdit.php' 
-		method='post' 
-		autocomplete='off' 
-		enctype='multipart/form-data'>
+		    action='CountriesEdit.php' 
+		    method='get' 
+            autocomplete='off'> 
 	    <input type='hidden' name='Debug' id='Debug' value='$DEBUG'>
 	    <input type='hidden' name='lang' value='$lang'>
 	    <input type='hidden' name='offset' value='$offset'>
@@ -112,10 +110,12 @@
 		    </button> 
 		</td>
 		<td class='left'>
-		    <a class='button' href='/genCountry.php?cc=$code&amp;lang=fr'
-			            target="_blank" style="min-width: 350px; display: inline-block; text-align: left;">
+		  <a class='button'
+                href='/genCountry.php?cc=$code&amp;lang=fr'
+			    target="_blank" 
+                style="min-width: 350px; text-align: left;">
 			Généalogie $name
-		    </a> 
+		  </a> 
 		</td>
 	      </tr>
 	    </tbody>

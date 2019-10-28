@@ -126,9 +126,11 @@ use \Exception;
  *		2017/09/28		change class LegacyEvent to class Event			*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2017/11/18		use RecordSet instead of Temple::getTemples		*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2019/07/20      rearrange order of fields to simplify           *
+ *		                updateMarriageXml.php                           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -311,11 +313,11 @@ require_once __NAMESPACE__ . '/common.inc';
 
     $title	= str_replace('"','&quot;',$title);
     htmlHeader($title,
-				array(	'/jscripts/CommonForm.js',
+                array(  '/jscripts/tinymce/js/tinymce/tinymce.js',
+				    	'/jscripts/CommonForm.js',
 						'/jscripts/js20/http.js',
 						'/jscripts/util.js',
  			            '/jscripts/Cookie.js',
-						'/tinymce/jscripts/tiny_mce/tiny_mce.js',
  			            '/jscripts/locationCommon.js',
  			            'commonMarriage.js',
 						'editParents.js'),
@@ -474,7 +476,8 @@ require_once __NAMESPACE__ . '/common.inc';
  *																		*
  **********************************************************************-->
   <form name="famForm" action="updateMarriageXml.php" method="post">
-		  <input type="hidden" name="treename" id="treename" 
+	    <input type="hidden" name="idmr" id="idmr" value="<?php print $idmr; ?>">
+		<input type="hidden" name="treename" id="treename" 
 				value="<?php print str_replace('"','&quot;',$treename); ?>">
       <fieldset id="HusbandSet" class="male">
 		<legend class="labelSmall">Father</legend>
@@ -679,11 +682,12 @@ require_once __NAMESPACE__ . '/common.inc';
 		<legend class="labelSmall">Information</legend>
 		<div class="row" id="IdmrRow">
 		  <div class="column1">
-		    <label class="column1" for="idmr">
+		    <label class="column1" for="idmrshow">
 				IDMR:
 		    </label>
-		    <input type="text" name="idmr" id="idmr" size="6" class="ina rightnc"
-						readonly="readonly" value="<?php print $idmr; ?>">
+            <input type="text" name="idmrshow" id="idmrshow"
+                    size="6" class="ina rightnc"
+					readonly="readonly" value="<?php print $idmr; ?>">
 		  </div>
 		  <div style="clear: both;"></div>
 		</div>
@@ -846,11 +850,6 @@ require_once __NAMESPACE__ . '/common.inc';
 ?>
 		<tr id="child<?php print $rownum; ?>">
 		  <td class="name">
-		    <input class="<?php print $genderclass; ?>"
-						name="CGiven<?php print $rownum; ?>" 
-						id="CGiven<?php print $rownum; ?>"
-						value="<?php print $givenname; ?>" 
-						type="text" size="18" maxlength="120">
 		    <input type="hidden"
 						name="CIdir<?php print $rownum; ?>" 
 						id="CIdir<?php print $rownum; ?>"
@@ -863,6 +862,11 @@ require_once __NAMESPACE__ . '/common.inc';
 						name="CGender<?php print $rownum; ?>" 
 						id="CGender<?php print $rownum; ?>"
 						value="<?php print $gender; ?>">
+		    <input class="<?php print $genderclass; ?>"
+						name="CGiven<?php print $rownum; ?>" 
+						id="CGiven<?php print $rownum; ?>"
+						value="<?php print $givenname; ?>" 
+						type="text" size="18" maxlength="120">
 		  </td>
 		  <td class="name">
 		    <input class="<?php print $genderclass; ?>"
@@ -932,11 +936,6 @@ require_once __NAMESPACE__ . '/common.inc';
 ?>
 		<tr id="child<?php print $rownum; ?>">
 		  <td class="name">
-		    <input class="<?php print $genderclass; ?>"
-						name="CGiven<?php print $rownum; ?>" 
-						id="CGiven<?php print $rownum; ?>"
-						value="<?php print $givenname; ?>" 
-						type="text" size="18" maxlength="120">
 		    <input type="hidden"
 						name="CIdir<?php print $rownum; ?>" 
 						id="CIdir<?php print $rownum; ?>"
@@ -949,6 +948,11 @@ require_once __NAMESPACE__ . '/common.inc';
 						name="CGender<?php print $rownum; ?>" 
 						id="CGender<?php print $rownum; ?>"
 						value="<?php print $gender; ?>">
+		    <input class="<?php print $genderclass; ?>"
+						name="CGiven<?php print $rownum; ?>" 
+						id="CGiven<?php print $rownum; ?>"
+						value="<?php print $givenname; ?>" 
+						type="text" size="18" maxlength="120">
 		  </td>
 		  <td class="name">
 		    <input class="<?php print $genderclass; ?>"
@@ -994,6 +998,9 @@ require_once __NAMESPACE__ . '/common.inc';
 ?>
 		  </tbody>
 		</table> <!-- id="children" -->
+	    <input type="hidden"
+		    	name="CIdir99" id="CIdir99"
+			    value="-1">
 		<div class="row">
 		    <label class="column1" for="chooseHusb">
 				Actions:
@@ -1019,6 +1026,10 @@ require_once __NAMESPACE__ . '/common.inc';
 ?>
       <button type="submit" id="Submit">
 		    Submit Family
+      </button>
+      &nbsp;
+      <button type="button" class="button" id="update">
+		    <u>U</u>pdate Family
       </button>
 <?php
 		    }			// debugging, use submit

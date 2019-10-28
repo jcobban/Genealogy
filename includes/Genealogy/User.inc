@@ -11,13 +11,20 @@ use \Iterator;
  *  Definition of a class representing a record in the Users table		*
  *  that represents a single user entry.								*
  *																		*
- *		UserName		VARCHAR(64)										*
- *		Password		CHAR(32)										*
- *		ShaPassword		CHAR(128)										*
- *		Email			VARCHAR(64)										*
- *		Auth			VARCHAR(32)										*
+ *	CREATE TABLE `Users` (                                              *
+ *		UserName		VARCHAR(64),									*
+ *		Password		CHAR(32),										*
+ *		ShaPassword		CHAR(128),										*
+ *		Email			VARCHAR(64),									*
+ *		CellPhone		VARCHAR(16),									*
+ *		Auth			VARCHAR(32),									*
  *		id				INT(10) AUTOINCREMENT							*
- *		Options			INT(10)				bit mask					*
+ *		Options			INT(10),				// bit mask				*
+ *		ConfirmId		INT(10),				    					*
+ *		PRIMARY KEY (`UserName`),                                       *
+ *      UNIQUE KEY `id` (`id`),                                         *
+ *      UNIQUE KEY `Email` (`Email`) )                                  *
+ *      ENGINE=InnoDB DEFAULT CHARSET=utf8                              *
  *																		*
  *  History:															*
  *		2014/03/27		created											*
@@ -59,8 +66,13 @@ use \Iterator;
  *	            		trim string values of fields                    *
  *		2018/11/11      do not throw exception from constructor for     *
  *		                bad parameters                                  *
+ *		2019/07/16      add fields cellphone and confirmid              *
+ *		                fix several bugs in constructor and set         *
+ *		2019/08/02      add function can($action)                       *
+ *		2019/08/26      add function getName() to override default      *
+ *		                add function getId() to override default        *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -85,10 +97,26 @@ class User extends Record
 						'password'			=> null,
 						'shapassword'		=> null,
 						'email'				=> '',
+						'cellphone'			=> null,
 						'auth'				=> 'pending',
 						'id'				=> 0,
-						'options'			=> 1);
+                        'options'			=> 1,
+                        'confirmid'         => null);
 
+    /********************************************************************
+     *	User::$info	    										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+		                'table'     		=> 'Users',
+		                'name'      		=> 'Users',
+		                'prime'	    		=> 'username',
+			            'srvmg'     		=> false,
+			            'fldcount'			=> 4,
+		                'order'     		=> 'UserName',
+		                'classname' 		=> 'User');
+		
     /********************************************************************
      *	User::$translate												*
      *																	*
@@ -147,21 +175,25 @@ class User extends Record
 		global	$connection;
 		global	$userid;
 
-		$needInsert	        = true;
-		$errors		        = '';
+		$needInsert	                = true;
 
 		if (is_null($connection))
             throw new Exception("User::__construct: connection is null");
 
 		// support old-style index parameter
-		if (is_string($parms) && $parms == 'new')
-		    $parms	        = array('id'	=> 0);
+        if (is_string($parms))
+        {
+            if ($parms == 'new')
+                $parms	            = array('id'	    => 0);
+            else
+                $parms	            = array('username'	=> $parms);
+        }
 		else
 		if ((is_int($parms) || ctype_digit($parms)) && $parms >= 0)
-            $parms	        = array('id'	=> $parms);
+            $parms	                = array('id'	=> $parms);
         else
         if (is_null($parms))
-            $parms	        = array('id'	=> 0);
+            $parms	                = array('id'	=> 0);
 
 		if ($debug)
 		    $warn	.= "<p>User::__construct(" . print_r($parms, true) . 
@@ -172,9 +204,6 @@ class User extends Record
 		    if (count($parms) >= count(self::$initRow))
 		    {			            // complete row from database
 				$dbrow		        = $parms;
-				// invoke constructor of base class
-				parent::__construct($dbrow,
-							        'Users');
 				$needInsert	        = false;
 		    }			            // complete row from datase
 		    else
@@ -239,34 +268,36 @@ class User extends Record
 						if ($debug)
 						    $warn	.= "<p>User::__construct: " . __LINE__ .
 								        " $queryText</p>";
-						$result		= $stmt->fetch(PDO::FETCH_ASSOC);
+						$result		        = $stmt->fetch(PDO::FETCH_ASSOC);
 						if (is_array($result))
 						{		    // found matching record
 						    $dbrow		    = $result;
 						    parent::__construct($dbrow,
-									'Users');
+							            		'Users');
 						    $needInsert		= false;
 						}		    // found matching record
 						else
-						{		    // invalid key
-						    $dbrow		    = self::$initRow;
+						{		    // no matching record
+                            $dbrow		    = self::$initRow;
 						    $needInsert		= true;
-						}		    // invalid key
+						}		    // no matching record
 				    }			    // success
 				    else
 				    {			    // error performing query
 						$this->msg    .= "User::__construct: " .
 							    "SQL error: query='$queryText', error '" .
-							    print_r($connection->errorInfo(),true)."'";
+							    print_r($stmt->errorInfo(),true)."'";
 				    }			    // error performing query
 				}			        // found a unique keyfield
 
 				// check for initialization of fields
-				$parmString		    = '';
+				$parmString		                    = '';
 				foreach($parms as $name => $value)
 				{		            // loop through all parameters
-				    $parmString		.= "$name='$value',";
-				    $fieldLc		= strtolower($name);
+				    $parmString		                .= "$name='$value',";
+                    $fieldLc		                = strtolower($name);
+                    if (is_string($value))
+						$value			            = trim($value);
 				    switch($fieldLc)
 				    {	            // act on specific parameter
 						case 'id':
@@ -276,121 +307,136 @@ class User extends Record
 
 						case 'username':
 						{
-						    $value			        = trim($value);
-						    if ($needInsert)
+						    $dbrow['username']	    = $value;
+						    if ($needInsert && $dbrow['email'] == '')
 						    {
-						    	$dbrow['username']	= $value;
 						    	$dbrow['email']		= $value; // default
 						    }
-						    else
-					    		parent::set('username', $value);
 						    break;
 						}		    // user name
 
 						case 'email':
 						{		    // email address
-						    $value			        = trim($value);
-						    if ($needInsert)
+					    	$dbrow['email']		    = $value;
+						    if ($needInsert && $dbrow['username'] == '')
                             {
                                 if ($keyname != 'UserName')
 						    	    $dbrow['username']	= $value;
-					    		$dbrow['email']		= $value;
 						    }
-						    else
-							    parent::set('email', $value);
 						    break;
 						}		    // email address
 
 						case 'password':
 						{		    // interpret as external text password
-						    $value			= trim($value);
+							$dbrow['password']	    = null;
+							$hash	    	        = hash('sha512', $value);
 						    if ($needInsert)
 						    {	    // creating new instance
-							    $dbrow['password']	    = null;
-							    $sha	    	= hash('sha512', trim($value));
+							    $sha	    	        = $hash;
 							    $dbrow['shapassword']	= $sha;
 						    }	    // creating new instance
 						    else
                             {	    // password must match existing
-								$sha		= $dbrow['shapassword'];
+								$sha		            = $dbrow['shapassword'];
 								if (strlen($sha) == 0)
 								{
-								    $sha	= hash('sha512', trim($value));
+								    $sha	            = $hash;
 								    $dbrow['shapassword']	= $sha;
-								}
-								if ($sha != hash('sha512', trim($value)))
+                                }
+                                else
+								if ($sha != $hash)
 								{
-								    $this->msg    .= "User::__construct: " .
-                                            "Password does not match. ";
-                                    $needInsert     = false;
+								    $this->msg  .= "User::__construct: " .
+                                                    "Password does not match. ";
+                                    $needInsert = false;
 								}
 						    }	    // password must match existing
 						    break;
 						}		    // interpret as external text password
 
 						case 'shapassword':
-						case 'auth':
+						case 'cellphone':
+						{		    // initialize string fields
+							$dbrow[$fieldLc]	    = $value;
+						    break;
+						}		    // initialize string fields
+
 						case 'options':
-						{		    // initialize other fields
-						    if (is_string($value))
-							    $value			    = trim($value);
-						    if ($needInsert)
-							    $dbrow[$fieldLc]	= trim($value);
-						    else
-							    parent::set($fieldLc, $value);
+						case 'confirmid':
+						{		    // initialize integer fields
+							$dbrow[$fieldLc]	    = intval($value);
+						    break;
+						}		    // initialize integer fields
+
+						case 'auth':
+                        {		    // initialize other fields
+                            $value                  = strtolower($value);
+                            $dbrow[$fieldLc]	    = $value;
+                            if ($value == 'pending')
+                                $dbrow['confirmid'] = time();
+                            else
+                                $dbrow['confirmid'] = null;
 						    break;
 						}		    // initialize other fields
 
 						case 'usemail':
 						{		    // initialize pseudo field
 						    if (is_int($value))
-						    {
-								if ($needInsert)
-								{	// new record, just set bit in options
+                            {
+                                if ($value)
 								    $value = $dbrow['options'] |
-										($value & OPT_USEMAIL_ON);
-								    $dbrow['options']	= $value;
-								}	// new record, just set bit in options
-								else
-								{	// update existing record
-								    if (array_key_exists('usemail', $this->row))
-									    parent::set('usemail', $value);
-								    else
-									    parent::set('options', $value);
-								}	// update existing record
+										     OPT_USEMAIL_ON;
+								$dbrow['options']	= $value;
 						    }	    // update existing record
 						    break;
 						}	        // initialize other fields
 
 				    }	            // act on specific parameter
-
-				    $firstparm		= false;
 				}	                // loop through all parameters
             }		                // key and optional other parms
 		}		                    // associative array
 		else
 		{		// unexpected parameter type
 		    throw new Exception('User::__construct: called with ' .
-				 gettype($parms));
+                				 gettype($parms));
 		}		// unexpected parameter type
 
-		// invoke constructor of base class
-		if ($needInsert)
-		{
-		    parent::__construct($dbrow,
-							'Users');
-		    $this->needInsert	= true;
-		}
-		else
-		{
-		    $this->needInsert	= false;
-		}
+        // invoke constructor of base class
+        if ($needInsert)
+        {
+            if ($dbrow['auth'] == 'pending')
+                $dbrow['confirmid']         = time();
+			// check for duplicate email
+			$query	        = "SELECT * FROM Users WHERE `EMail`=:email";
+            $sqlParms       = array('email'         => $this->row['email']);
+			$stmt	        = $connection->prepare($query);
+			$queryText	    = debugPrepQuery($query, $sqlParms);
+			if ($stmt->execute($sqlParms))
+			{			    // success
+				if ($debug)
+					$warn	.= "<p>User::set: " . __LINE__ .
+					            			" $queryText</p>";
+				$result		= $stmt->fetch(PDO::FETCH_ASSOC);
+				if (is_array($result))
+				{		    // found matching record
+                    $this->msg    .= "New email value '$value' duplicates an existing user " . $result['username'] . '. ';
+                }		    // found matching record
+            }               // success
+            else
+                $warn   .= "<p>User::__construct: " . __LINE__ . 
+                                " query='$queryText' failed " .
+                                print_r($stmt->errorInfo(), true) . "</p>\n";
+        }                   // inserting
+
+		parent::__construct($dbrow,
+		    				'Users');
+		$this->needInsert	        = $needInsert;
 
 		// diagnostic output if debug is set
         $this->dump('User Record constructed:');
 
         // report any errors detected in constructor to user
-        $msg        .= $this->msg;
+        $msg                        .= $this->msg;
     }		// function User::__construct
 
     /********************************************************************
@@ -414,7 +460,14 @@ class User extends Record
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
-		{
+        {
+            case 'id':
+            {
+                if ($this->needInsert)
+                    $this->save(false);
+                return $this->row['id'];
+            }
+
 		    case 'usemail':
 				return $this->row['options'] & self::OPT_USEMAIL_ON;
 
@@ -423,7 +476,43 @@ class User extends Record
 				return parent::get($field);
 		    }
 		}			// act on specific field names
-    }		// Birth::get
+    }		// User::get
+
+    /********************************************************************
+     *	function User::getId											*
+     *																	*
+     *	Get the unique numeric identifier of the record.				*
+     *																	*
+     *	Returns:														*
+     *	    unique numeric id or null                                   *
+     ********************************************************************/
+    function getId()
+    {
+		global $warn;
+
+		$retval	                = $this->row['id'];
+		if ($this->needInsert && $retval == 0)
+		{
+		    $warn	.= "<p>User::getId: table " . $this->table .
+				" record does not exist in database</p>\n";
+            return null;
+        }
+        else
+            return $retval;
+    }       // function User::getId
+
+    /********************************************************************
+     *	function User::getName										    *
+     *																	*
+     *	Get the name of the User.	    								*
+     ********************************************************************/
+    function getName($options	= null)
+    {
+		$retval	= $this->row['username'];
+		if ($retval === null)
+		    $retval	= '';
+		return $retval;
+    }		// User::getName
 
     /********************************************************************
      *  function User::setPassword										*
@@ -439,7 +528,7 @@ class User extends Record
     {
 		parent::set('password', null);
 		parent::set('shapassword',
-						hash('sha512', trim($newPassword)));
+					hash('sha512', trim($newPassword)));
 		return null;
     }		// function User::setPassword
 
@@ -463,34 +552,137 @@ class User extends Record
      ********************************************************************/
     function set($field, $value)
     {
+        global  $debug;
+        global  $warn;
+        global  $msg;
+        global  $connection;
+
 		$fieldLc	= strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
-		    $fieldLc	= self::$translate[$fieldLc];
+            $fieldLc	= self::$translate[$fieldLc];
+        if ($debug)
+            $warn       .= "<p>User::set('$field','$value')'</p>\n";
 		switch($fieldLc)
 		{
 		    case 'password':
 		    {
 				return self::setPassword($value);
-		    }		// set password
+		    }		            // set password
 
 		    case 'usemail':
-		    {		// simulate obsolete field usemail
+		    {		            // simulate obsolete field usemail
 				if (array_key_exists('usemail', $this->row))
-				    return parent::set($field, $value);
-				$value	= ($this->row['options'] & ~self::OPT_USEMAIL_ON) |
-						  ($value & self::OPT_USEMAIL_ON);
-				return parent::set('options', $value) & 
-						self::OPT_USEMAIL_ON;
-		    }		// simulate obsolete field usemail
+                    return parent::set($field, $value);
+                if ($value)
+                    $value	= $this->row['options'] | self::OPT_USEMAIL_ON;
+                else
+				    $value	= $this->row['options'] & ~self::OPT_USEMAIL_ON;
+				return parent::set('options', $value);
+		    }		            // simulate obsolete field usemail
+
+            case 'auth':
+            {
+                $value          = strtolower($value);
+                if ($value == 'pending')
+                {
+                    if ($this->row['auth'] != 'pending')
+                        return parent::set('confirmid', time());
+                }
+                else
+                    parent::set('confirmid', null);
+                return parent::set('auth', $value);
+                break;
+            }
+
+		    case 'email':
+		    {		            // check for duplicates
+				if (is_string($value))
+                    $value		= trim($value);
+                if ($value == $this->row['email'])
+                    return $value;      // no change
+
+				// construct the query of the user table
+                $query	        = "SELECT * FROM Users " .
+                    "WHERE `EMail`=:email AND `UserName`<>:username";
+                $sqlParms       = array('email'     => $value,
+                                        'username'  => $this->row['username']);
+				$stmt	        = $connection->prepare($query);
+				$queryText	    = debugPrepQuery($query, $sqlParms);
+				if ($stmt->execute($sqlParms))
+				{			    // success
+					if ($debug)
+						$warn	.= "<p>User::set: " . __LINE__ .
+						            			" $queryText</p>";
+					$result		= $stmt->fetch(PDO::FETCH_ASSOC);
+					if (is_array($result))
+					{		    // found matching record
+	                    $msg    .= "New email value '$value' duplicates an existing user " . $result['username'] . '. ';
+	                    return false;
+	                }		    // found matching record
+	            }               // success
+	            else
+	                $warn   .= "<p>User::save: " . __LINE__ . 
+	                                " query='$queryText' failed " .
+	                                print_r($stmt->errorInfo(), true) . "</p>\n";
+				return parent::set($field, $value);
+		    }		            // no validation implemented yet
 
 		    default:
-		    {		// no validation implemented yet
+		    {		            // no validation implemented yet
 				if (is_string($value))
 				    $value		= trim($value);
 				return parent::set($field, $value);
-		    }		// no validation implemented yet
-		}		// switch on field name
+		    }		            // no validation implemented yet
+		}		                // switch on field name
     }		// function User::set
+
+    /********************************************************************
+     *  function User::save     										*
+     *																	*
+     *	Save changes made to the User record into the	database.		*
+     *																	*
+     *  Parameters:														*
+     *	    $xml		if true diagnostic output is emitted in XML		*
+     *					if a string use it as tag name					*
+     *																	*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method updated the database record		*
+     *	    0			if the database did not need to be updated		*
+     ********************************************************************/
+    function save($xml)
+    {
+        global  $connection;
+        global  $debug;
+        global  $warn;
+
+        $inserting              = $this->needInsert;
+        $retval                 = parent::save($xml);
+        if ($inserting)
+        {
+			// construct the query of the user table
+			$query	        = "SELECT * FROM Users WHERE `UserName`=:username";
+            $sqlParms       = array('username'      => $this->row['username']);
+			$stmt	        = $connection->prepare($query);
+			$queryText	    = debugPrepQuery($query, $sqlParms);
+			if ($stmt->execute($sqlParms))
+			{			    // success
+				if ($debug)
+					$warn	.= "<p>User::__construct: " . __LINE__ .
+					            			" $queryText</p>";
+				$result		= $stmt->fetch(PDO::FETCH_ASSOC);
+				if (is_array($result))
+				{		    // found matching record
+					$this->row['id']    = $result['id'];
+                }		    // found matching record
+            }               // success
+            else
+                $warn   .= "<p>User::save: " . __LINE__ . 
+                                " query='$queryText' failed " .
+                                print_r($stmt->errorInfo(), true) . "</p>\n";
+        }
+        return $retval;
+    }		// function User::save
 
     /********************************************************************
      *  function User::getRealFieldName									*
@@ -518,6 +710,29 @@ class User extends Record
 		else
 		    return null;
     }		// static function getRealFieldName
+	
+	/************************************************************************
+	 *  public function User::can											*
+	 *																		*
+	 *  This method returns true if the user can perform	                *
+	 *  the indicated function.												*
+	 *																		*
+	 *  Parameters:															*
+	 *		action	    string describing function to be performed  		*
+	 *					    'edit'		alter databases						*
+	 *						'blog'		post blogs							*
+	 *						'admin'		administrator						*
+	 *						'debug'		authorized debugger					*
+	 *						'pending'	user waiting for confirmation		*
+	 *						'all'		master administrator				*
+	 *																		*
+	 ************************************************************************/
+	function can($action)
+	{
+	    $authorized         = $this->row['auth'];
+	    return (($authorized == 'yes') || ($authorized == 'all') ||
+	    		(preg_match("/\b$action\b/i", $authorized) == 1));
+	}		// User::can
 
 }		// class User 
 

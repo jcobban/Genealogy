@@ -174,11 +174,11 @@ function signoff()
     var	lang			= 'en';
     if ('lang' in args)
 		lang			= args.lang;
-    var	form		= document.accountForm;
-    form.action		= 'Signon.php?lang=' + lang;
+    var	form		    = document.accountForm;
+    form.action		    = 'Signon.php?lang=' + lang;
     form.userid.value	= '';	// clear userid and password
     form.password.value	= '';
-    form.act.value	= 'logoff';
+    form.act.value	    = 'logoff';
     form.submit();		// clears session data
 }		// signoff
 

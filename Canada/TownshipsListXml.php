@@ -39,7 +39,7 @@ foreach($_GET as $key => $value)
 	    {
 			if (strlen($value) > 0)
 			{
-			    $prov		= $value;
+			    $prov		        = $value;
 			    $getParms['prov']	= $prov;
 			}
 			break;
@@ -49,7 +49,7 @@ foreach($_GET as $key => $value)
 	    {
 			if (strlen($value) > 0)
 			{
-			    $county		= $value;
+			    $county		        = $value;
 			    $getParms['county']	= $county;
 			}
 			break;

@@ -7,6 +7,7 @@
  *  History:															*
  *		2017/10/27		created											*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/07/22      add close button                                *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -23,26 +24,40 @@ function onLoad()
     // activate handling of key strokes in text input fields
     // including support for context specific help
     var	element;
-    var trace	= '';
+    var trace	        = '';
+
     for (var fi = 0; fi < document.forms.length; fi++)
     {		// loop through all forms
-		var form	= document.forms[fi];
-		trace	+= "<form ";
+		var form	    = document.forms[fi];
+		trace	        += "<form ";
 		if (form.name.length > 0)
-		    trace	+= "name='" + form.name + "' ";
+		    trace	    += "name='" + form.name + "' ";
 		if (form.id.length > 0)
-		    trace	+= "id='" + form.id + "' ";
-		trace	+= ">";
+		    trace	    += "id='" + form.id + "' ";
+		trace	        += ">";
 
 		for (var i = 0; i < form.elements.length; ++i)
 		{	// loop through all elements of form
 		    element		= form.elements[i];
 		    trace += "<" + element.nodeName + " ";
-		if (element.name.length > 0)
-		    trace	+= "name='" + element.name + "' ";
-		if (element.id.length > 0)
-		    trace	+= "id='" + element.id + "' ";
-		trace	+= ">";
+			if (element.name.length > 0)
+			    trace	+= "name='" + element.name + "' ";
+			if (element.id.length > 0)
+			    trace	+= "id='" + element.id + "' ";
+		    trace	+= ">";
+            var name            = element.id;
+            if (name.length == 0)
+                name            = element.name;
+            var id              = '';
+            var result          = /^(Code|Name|Article|Possessive|Delete)([a-z]{2})/.exec(name);
+            if (result)
+            {
+                name            = result[1].toLowerCase();
+                id              = result[2];
+            }
+            else
+                name            = name.toLowerCase();
+
 		    element.onkeydown	= keyDown;
     
 		    // pop up help balloon if the mouse hovers over a field
@@ -57,102 +72,80 @@ function onLoad()
 				element.onmouseover		= eltMouseOver;
 				element.onmouseout		= eltMouseOut;
 		    }	// set mouseover on input element itself
-    
-		    if (element.id == 'Add')
-		    {
-				element.onclick	= addName;
-		    }
-		    else
-		    if (element.name.substring(0, 4) == 'Code')
-		    {
-				element.helpDiv	= 'Code';
-		    }
-		    else
-		    if (element.name.substring(0, 4) == 'Name')
-		    {
-				element.helpDiv	= 'Name';
-				element.change	= change;
-		    }
-		    else
-		    if (element.name.substring(0, 7) == 'Article')
-		    {
-				element.helpDiv	= 'Article';
-				element.change	= change;
-		    }
-		    else
-		    if (element.name.substring(0, 10) == 'Possessive')
-		    {
-				element.helpDiv	= 'Possessive';
-				element.change	= change;
-		    }
-		    else
-		    if (element.id.substring(0, 6) == 'Delete')
-		    {
-				element.helpDiv	= 'Delete';
-				element.onclick	= deleteName;
-		    }
-		}	// loop through all elements in the form
-    }		// loop through all forms
-}		// onLoad
+
+            switch (name)
+            {
+		        case 'add':
+		        {
+				    element.onclick	= addName;
+                    break;
+		        }
+
+		        case 'code':
+		        {
+				    element.helpDiv	= 'Code';
+                    break;
+		        }
+
+		        case 'name':
+    		    {
+    				element.helpDiv	= 'Name';
+    				element.change	= change;
+                    break;
+    		    }
+
+                case 'article':
+		        {
+			    	element.helpDiv	= 'Article';
+			    	element.change	= change;
+                    break;
+		        }
+
+                case 'possessive':
+    		    {
+    				element.helpDiv	= 'Possessive';
+    				element.change	= change;
+                    break;
+    		    }
+
+                case 'delete':
+    		    {
+    				element.helpDiv	= 'Delete';
+    				element.onclick	= deleteName;
+                    break;
+    		    }
+
+                case 'close':
+    		    {
+    				element.onclick	= closeForm;
+                    break;
+    		    }
+            }           // act on specific fields
+		}	            // loop through all elements in the form
+    }		            // loop through all forms
+}		// function onLoad
 
 /************************************************************************
- *  changeCode																*
+ *  function deleteName													*
  *																		*
- *  Take action when the user changes the country code.						*
+ *  When a Delete button is clicked this function removes the			*
+ *  row from the table.													*
  *																		*
  *  Input:																*
- *		$this				instance of <input name='Code...'>				*
+ *		$this				<button type=button id='Delete....'			*
  ************************************************************************/
-function changeCode()
+function deleteName(ev)
 {
-    changeElt(this);
-    var	oldCode	= this.name.substring(4);
-    var newCode	= this.value;
-    var	form	= this.form;
-    this.name					= 'Code' + newCode;
-    if (form.elements['Code' + newCode])
-    {		// successfully renamed the current element
-		 alert("changeCode: oldCode='" + oldCode + "', newCode='" + newCode + "'" +
-				tagToString(this.parentNode.parentNode));
-		form.elements['Name' + oldCode].name		= 'Name' + newCode;
-		form.elements['StartYear' + oldCode].name	= 'StartYear' + newCode;
-		form.elements['EndYear' + oldCode].name		= 'EndYear' + newCode;
-		var deleteBtn	= document.getElementById('Delete' + oldCode);
-		deleteBtn.id					= 'Delete' + newCode;
-		deleteBtn.onclick				= deleteName;
-		deleteBtn.disabled				= false;
-		var domainBtn	= document.getElementById('EditDomains' + oldCode);
-		domainBtn.id			= 'EditDomains' + newCode;
-		domainBtn.onclick				= showDomains;
-		domainBtn.disabled				= false;
-		var addBtn	= document.getElementById('Add');
-		addBtn.disabled					= false;
-    }		// successfully renamed the current element
-    else
-    {		// unable to rename, probably some back level of IE!
-		alert('Unable to rename element Code' + oldCode + ' to Code' + newCode);
-    }		// unable to rename, probably some back level of IE!
-}		// changeCode
+    ev.stopPropagation();
 
-/************************************************************************
- *  deleteName																*
- *																		*
- *  When a Delete button is clicked this function removes the				*
- *  row from the table.														*
- *																		*
- *  Input:																*
- *		$this				<button type=button id='Delete....'				*
- ************************************************************************/
-function deleteName()
-{
-    var	code	= this.id.substring(6);	// language code
-    var	form	= this.form;
-    var	cell	= this.parentNode;	// <td> containing button
-    var	row	= cell.parentNode;	// <tr> containing button
-    var inputs	= row.getElementsByTagName('input');
+    var	rownum			= this.id.substring(6);	// row number
+    var	form			= this.form;
+    var	cell			= this.parentNode;	// <td> containing button
+    var	row			    = cell.parentNode;	// <tr> containing button
+    var inputs			= row.getElementsByTagName('input');
     for(var ii = 0; ii < inputs.length; ii++)
     {
-		child	= inputs[ii];
+		child	        = inputs[ii];
 		if (child.name.substring(0,4) == 'Name')
 		{
 		    child.setAttribute('value', '');
@@ -161,35 +154,52 @@ function deleteName()
     }
     row.removeChild(cell);
     return false;
-}		// deleteName
+}		// function deleteName
 
 /************************************************************************
- *  addName																*
+ *  function addName													*
  *																		*
  *  When the Add country button is clicked this function adds a row		*
  *  into the table.														*
  *																		*
  *  Input:																*
- *		$this				<button type=button id='Add'>						*
+ *		$this			<button type=button id='Add'>					*
  ************************************************************************/
-function addName()
+function addName(ev)
 {
-    this.disabled	= true;	// only permit one row to be added
-    var	form		= this.form;
-    var	parms	= {"code"	: "XX"};
-    var	template	= document.getElementById("Row$code");
-    var	newRow		= createFromTemplate(template,
-									     parms,
-									     null);
-    var	table		= document.getElementById("dataTable");
-    var	tbody		= table.tBodies[0];
+    ev.stopPropagation();
+
+    var	form			= this.form;
+    var table           = document.getElementById('dataTable');
+    var	tbody			= table.tBodies[0];	// <tbody> containing row
+    var	rownum	    	= tbody.rows.length + 1;
+    var	parms	    	= {"rownum"         : rownum};
+    var	template		= document.getElementById("Row$rownum");
+    var	newRow			= createFromTemplate(template,
+						    			     parms,
+							    		     null);
+    var	table			= document.getElementById("dataTable");
     tbody.appendChild(newRow);
 
     // take action when the user changes the code of the added country
-    var	codeElt		= form.CodeXxx;
+    var	codeElt		    = form.elements['Code' + rownum];
     codeElt.focus();
     codeElt.select();
-    codeElt.onchange	= changeCode;
+    codeElt.onchange	= change;
 
     return false;
-}		// addName
+}		// function addName
+
+/************************************************************************
+ *  function closeForm          										*
+ *																		*
+ *  This method is called when the user requests to close the			*
+ *  window without updating the event									*
+ *																		*
+ *  Input:																*
+ *		this		the <button id='close'> element						*
+ ************************************************************************/
+function closeForm(ev)
+{
+    closeFrame();
+}		// function closeForm

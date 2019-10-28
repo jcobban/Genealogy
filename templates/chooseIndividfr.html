@@ -1,0 +1,151 @@
+<!--*********************************************************************
+ *  chooseIndividfr.html												*
+ *																		*
+ *  Template to display a web page to select a specific existing		*
+ *  Person from the Legacy table of Persons.						    *
+ *																		*
+ *  History:															*
+ *		2019/09/09      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+			  Généalogie
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+			  Services
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?lang=$LANG">
+			  Indice Nominale
+      </a>:
+    </div>
+    <div class="body">
+      <h1>Choisir une Personne Existante
+		  <span class="right">
+		      <a href="chooseIndividHelpen.html">Aide?</a>
+		  </span>
+      </h1>
+      $TRACE
+      $MSG
+      <div class="hidden" id="errorMessages">
+          <span id="badIdir">
+            idir='$idir' invalide.
+          </span>
+          <span id="noPerson">
+            Aucune enregistrement de Personne pour idir=$idir.
+          </span>
+          <span id="badIdmr">
+            idmr='$idmr' invalide.
+          </span>
+          <span id="noFamily">
+            Aucune registrement de Famille pour parentsIdmr=$idmr. 
+          </span>
+          <span id="badBirthYear">
+            Année de naissance '$birthyear' invalide.  
+          </span>
+          <span id="badBirthMin">
+            Année de naissance minimale '$birthmin' invalide. 
+          </span>
+          <span id="badBirthMax">
+            Année de naissance maximale '$birthmax' invalide. 
+          </span>
+          <span id="badRange">
+            Gamme d'années de naissance '$range' invalide. 
+          </span>
+          <span id="badOrder">
+            Année de naissance maximale $birthmax moins qu'année de naissance minimale $birthmin. 
+          </span>
+      </div> <!-- id="errorMessages" -->
+      <form name="indForm" action="getIndivNamesXml.php" method="get">
+        <div class="row" id="searchRow">
+	      <label class="column1" for="Name" style="width: 18em;">
+              Nom:</label>
+            <input type="text" name="Name" id="Name"
+                    size="64" class="white left"
+			        value="$NAME">
+	        <input type="hidden" name="Sex" id="Sex"
+			        value="$GENDER">
+	        <input type="hidden" name="IDIR" id="IDIR"
+			        value="$IDIR">
+	        <input type="hidden" name="parentsIdmr" id="parentsIdmr" 
+			        value="$IDMR">
+	        <input type="hidden" name="treename" id="treename"
+			        value="$TREENAME">
+	      <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="birthYearRow">
+	      <label class="column1" for="birthmin" style="width: 18em;">
+              Gamme d'années de naissance:</label>
+	      <input class="white rightnc" size="4" style="float: left;"
+                    name="birthmin" id="birthmin"
+			        value="$BIRTHMIN">
+	      <span class="label" for="birthmax" 
+                style="float: left; padding-left: 4px; padding-right: 4px;">à</span>
+	      <input class="white rightnc" size="4"  style="float: left;"
+                    name="birthmax" id="birthmax"
+			        value="$BIRTHMAX">
+	      <div style="clear: both;"></div>
+        </div>
+        <div class="Row" id="selectListRow">
+	      <label class="column1" for="individ" style="width: 18em;">
+              Choisir:</label>
+	        <select name="individ" id="individ" size="10" class="white left">
+	          <option value="0">Choisir une Personne</option>
+	        </select>
+	      <div style="clear: both;"></div>
+        </div>
+        <div class="Row" id="buttonRow">
+	        <button type="button" id="select">
+	          Annuler
+	        </button>
+	      <div style="clear: both;"></div>
+        </div>
+      </form>
+    </div> <!-- class="body" -->
+    <div id="templates" class="hidden">
+      <!-- the following two templates exist to permit internationalization
+		    of the button text -->
+      <button type="button" id="selectSelectTemplate">
+        Choisir
+      </button>
+      <button type="button" id="selectCancelTemplate">
+        Annuler
+      </button>
+    </div> <!-- id="templates" -->
+    <div id="HelpName" class="balloon">
+      Entrez le nom partiel de la personne que vous souhaitez choisir. 
+      Entrez le nom de famille en premier, puis une virgule suivie du prénom. 
+      Lorsque vous interrompez la saisie du nom, la liste de sélection est 
+      mise à jour à partir de la base de données.
+    </div>
+    <div id="Helpindivid" class="balloon">
+	  This is a selection list of Persons presented in alphabetical order
+	  starting with the first Person whose surname is equal to the supplied
+	  surname or sorts immediately after it, and if the surname is equal
+	  the first Person whose given name is equal to or sorts immediately
+      after the supplied given name.  Click on an entry with the mouse
+      to choose it.
+    </div>
+    <div id="Helpselect" class="balloon">
+	  Once you have chosen the desired Person from the list, click on this
+	  button, or press enter, to select the Person.
+    </div>
+    <div id="Helpbirthmin" class="balloon">
+	  This field specifies the lowest birth year to use in matching Persons.
+	  If this field is blank there is no lower limit.
+    </div>
+    <div id="Helpbirthmax" class="balloon">
+	  This field specifies the highest birth year to use in matching Persons.
+	  If this field is blank there is no upper limit.
+    </div>
+    <div id="loading" class="popup">
+	  Loading...
+    </div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/chooseIndivid.js" type="application/javascript">
+    </script>

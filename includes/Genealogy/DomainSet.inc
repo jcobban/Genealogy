@@ -81,7 +81,7 @@ class DomainSet extends RecordSet
 		    {		// act on specific keys
 				case 'countrycode':
 				{
-				    if (is_string($value) && strlen($value) > 0)
+				    if (is_string($value) && strlen($value) >= 2)
 				    {
 						$where			.= $and . $fieldExpr . "=?";
 						array_push($this->sqlParms, $value);
@@ -149,7 +149,7 @@ class DomainSet extends RecordSet
 				    else
 				    {		// or expression
 						$warn	.= "<p>DomainSet::getWhere: " .
-							       "Unsupported value for `$key`=" .
+							       "Unsupported value for `Domain`=" .
 							       print_r($value, true) . "</p>\n";
 				    }		// or expression
 				    break;
@@ -287,17 +287,8 @@ class DomainSet extends RecordSet
 				    if (is_array($row))
 				    {
 						$object			= new Domain($row);
-						if ($index == 'domain')
-						    $key		= $row['domain'];
-						else
-						if ($index == 'state')
-						    $key		= substr($row['domain'], 2);
-						else
-						    $key		= null;
-						if ($key)
-						    $retval[$key]	= $object;
-						else
-						    $retval[]		= $object;
+						$key		    = $row['domain'];
+						$retval[$key]	= $object;
 				    }
 				}		// loop through records from table
 

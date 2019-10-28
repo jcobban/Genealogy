@@ -91,103 +91,145 @@ require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . "/common.inc";
 
 // validate parameters
-$newuserid		= '';
-$password		= '';
-$action		= '';
-$rememberme		= '';
-$lang		= 'en';
-$signedoff		= 1;
-$specify		= 2;
-$incorrect		= 4;
-$messages		= 0;	// bit mask
+$newuserid				= '';
+$password				= '';
+$action				    = '';
+$rememberme				= '';
+$lang				    = 'en';
+$redirectto		    	= "UserInfo.php";
 
 foreach($_COOKIE as $key => $value)
 {			// loop through all parameters
 	if ($debug)
 	    $warn	.= "<p>\$_COOKIE['$key']='$value'</p>\n";
-	switch($key)
+	switch(strtolower($key))
 	{		// act on specific parameter
 	    case 'rememberme':
 	    {
-		$rememberme	= $value;
-		break;
+		    $rememberme	= $value;
+		    break;
 	    }
 
 	    case 'lang':
 	    {
-		$lang		= strtolower(substr($value,0,2));
-		break;
+            if (strlen($value) >= 2)
+            {
+                $lang		= strtolower(substr($value,0,2)); 
+                if (strlen($value) == 5 && substr($value, 2, 1) == '-')
+                    $lang   = $lang . substr($value, 2);
+            }
+		    break;
 	    }
 	}		// act on specific cookie
 }			// loop through all cookies
 
-// check for new signon
-foreach($_POST as $key => $value)
-{			// loop through all parameters
-	if ($debug)
-	    $warn	.= "<p>\$_POST['$key']='$value'</p>\n";
-	switch($key)
-	{		// act on specific parameter
-	    case 'userid':
-	    {
-		$newuserid	= trim($value);
-		break;
-	    }
-
-	    case 'password':
-	    {
-		$password		= trim($value);
-		break;
-	    }
-
-	    case 'act':
-	    {
-		$action		= trim($value);
-		if ($action == 'logoff')
-		{
-		    $userid		= $newuserid;
-		    $authorized		= '';
-		    unset($_COOKIE['rememberme']);
-		    setcookie('rememberme', '', time() - 3600, '/');
-		    $rememberme		= '';
-		    setcookie('user', '', time() - 3600, '/');
-		    unset($_SESSION['userid']);
-		    $messages		|= $signedoff;
-		}
-		break;
-	    }		// action to take
-
-	    case 'lang':
-	    {
-		$lang		= strtolower(substr($value,0,2));
-		break;
-	    }
-
-	}		// act on specific parameter
-}			// loop through all parameters
-
-// check for explicit redirection to another page on signon
-$redirectto		= "UserInfo.php";
-foreach($_GET as $key => $value)
-{
-	if ($debug)
-	    $warn	.= "<p>\$_GET['$key']='$value'</p>\n";
-	switch(strtolower($key))
+// if invoked by method=get display the initial signon dialog
+if (count($_GET) > 0)
+{	        	    // invoked by URL to display signon dialog
+	$parmsText  = "<p class='label'>\$_GET</p>\n" .
+	                  "<table class='summary'>\n" .
+	                  "<tr><th class='colhead'>key</th>" .
+	                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
 	{
-	    case 'redirect':
-	    {
-		$redirectto	= $value;
-		break;
-	    }
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{
+		    case 'redirect':
+		    {
+			    $redirectto	    = $value;
+			    break;
+		    }
+	
+		    case 'lang':
+	        {
+	            if (strlen($value) >= 2)
+	            {
+	                $lang		= strtolower(substr($value,0,2)); 
+	                if (strlen($value) == 5 && substr($value, 2, 1) == '-')
+	                    $lang   = $lang . substr($value, 2);
+	            }
+			    break;
+		    }
+	
+		    case 'debug':
+	        {
+	            if (strtolower($value) == 'y')
+			        $debug      = true;
+			    break;
+		    }
+	
+		}		// act on specific parameters
+	}			// loop through parameters
+	if ($debug)
+	    $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display signon dialog
 
-	    case 'lang':
-	    {
-		$lang		= strtolower(substr($value,0,2));
-		break;
-	    }
+if (count($_POST) > 0)
+{		            // invoked by post for new signon
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_POST as $key => $value)
+	{	            // loop through all parameters
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{		// act on specific parameter
+		    case 'userid':
+		    {
+			    $newuserid	= trim($value);
+			    break;
+		    }
+	
+		    case 'password':
+		    {
+			    $password		= trim($value);
+			    break;
+		    }
+	
+		    case 'act':
+		    {
+				$action		= trim($value);
+				break;
+		    }		// action to take
+	
+		    case 'lang':
+		    {
+	            if (strlen($value) >= 2)
+	            {
+	                $lang		= strtolower(substr($value,0,2)); 
+	                if (strlen($value) == 5 && substr($value, 2, 1) == '-')
+	                    $lang   = $lang . substr($value, 2);
+	            }
+			    break;
+		    }
+	
+		    case 'debug':
+	        {
+	            if (strtolower($value) == 'y')
+			        $debug      = true;
+			    break;
+		    }
+	
+		}		    // act on specific parameter
+	}		    	// loop through all parameters
+	if ($debug)
+	    $warn       .= $parmsText . "</table>\n";
+}		            // invoked by post for new signon
 
-	}		// act on specific parameters
-}			// loop through parameters
+if ($action == 'logoff')
+{
+    $userid		    = $newuserid;
+    $authorized		= '';
+    unset($_COOKIE['rememberme']);
+    setcookie('rememberme', '', time() - 3600, '/');
+    $rememberme		= '';
+    setcookie('user', '', time() - 3600, '/');
+    unset($_SESSION['userid']);
+}
 
 // check for a user specified memory of the userid and password
 if ($action != 'logoff' &&
@@ -203,17 +245,17 @@ if ($action != 'logoff' &&
 		$warn	.= "<p>rememberme.$name='$value'</p>\n";
 	    switch(strtolower($name))
 	    {		// act on specific parameter name
-		case 'username':
-		{
-		    $newuserid	= $value;
-		    break;
-		}
-
-		case 'password':
-		{
-		    $password	= $value;
-		    break;
-		}
+			case 'username':
+			{
+			    $newuserid	= $value;
+			    break;
+			}
+	
+			case 'password':
+			{
+			    $password	= $value;
+			    break;
+			}
 
 	    }		// act on specific parameter name
 	}		// process each part
@@ -223,76 +265,65 @@ if ($action != 'logoff' &&
 if (strlen($userid) > 0 && strlen($authorized) > 0 &&
 	strlen($newuserid) == 0)
 {		// already signed in and not specifying a new login
-	header("Location: Account.php");
+	header("Location: Account.php?lang=$lang");
 	exit;
 }		// already signed on
 
-if (strlen($newuserid) == 0)
-	$messages	|= $specify;
+$template		    = new FtTemplate("Signon$lang.html");
 
-// if no error messages continue
-if (strlen($msg) == 0)
+if ($action == 'logoff')
+    $msg            .= $template['signedoff']->innerHTML();
+
+if (strlen($newuserid) == 0)
+    $msg            .= $template['specify']->innerHTML();
+else
 {					// parameters syntactically OK
 	// get existing account details
-	$stpw		= md5(trim($password));
-	$hashpw		= hash('sha512',trim($password));
-	$user		= new User(array('username'	=> $newuserid));
+	$stpw		    = md5(trim($password));
+	$hashpw		    = hash('sha512',trim($password));
+	$user		    = new User(array('username'	=> $newuserid));
 	if ($user->isExisting())
 	{
 	    if ($user->get('shapassword') == $hashpw ||
-		$user->get('password') == $stpw)
+		    $user->get('password') == $stpw)
 	    {				// password matches
-		$warn	.= "<p>Password matches</p>\n";
-		setcookie('rememberme',
-			  "username:$newuserid&password:$password",
-			  time() + 30*24*60*60, '/');	// keep for 30 days
-		if ($redirectto == 'POST')
-		{			// use history
-		    // knowledge of the previous page is only held in the
-		    // browser so the request to back-up to the previous
-		    // page must be performed by Javascript
-		    $tempBase	= $document_root . '/templates/';
-		    $template	= new Template($tempBase . 'reposten.html');
-		    $template->set('TITLE', 'Repost User Command after Signon');
-		    $template->display();
-		    exit;
-		}			// use history
-		else
-		{			// redirect
-		    header("Location: " . $redirectto);
-		    exit;
-		}			// redirect
+			$warn	        .= "<p>Password matches</p>\n";
+			setcookie('rememberme',
+			    	  "username:$newuserid&password:$password",
+			    	  time() + 30*24*60*60, '/');	// keep for 30 days
+			if ($redirectto == 'POST')
+			{			// use history
+			    // knowledge of the previous page is only held in the
+			    // browser so the request to back-up to the previous
+			    // page must be performed by Javascript
+			    $template	= new FtTemplate("repost$lang.html");
+			    $template->display();
+			    exit;
+			}			// use history
+			else
+			{			// redirect
+			    header("Location: " . $redirectto . "?lang=$lang");
+			    exit;
+			}			// redirect
 	    }				// password matches
 	    else
 	    {
-	        $messages	|= $incorrect;
+            $msg            .= $template['incorrect']->innerHTML();
 	    }
-	}
+	}                   // userid matches
 	else
-	{
-	    if (strlen($newuserid) > 0)
-		$warn	.= "<p>user '$newuserid' not found</p>\n";
-	    if (strlen($newuserid) > 0 || strlen($password) > 0)
-		$messages	|= $incorrect;
-	}				// userid not found
-}					// parameters syntactically OK
-
-$tempBase		= $document_root . '/templates/';
-$template		= new FtTemplate("Signon$lang.html", true);
+	{                   // userid not found
+        $msg                .= $template['incorrect']->innerHTML();
+	}				    // userid not found
+}       				// userid specified
 
 $template->set('REDIRECTTO',	$redirectto);
-$template->updateTag('otherStylesheets',
-    	       		array('filename'	=> '/Signon'));
-if ($messages)
-{
-	if (($messages & $specify) == 0)
-	    $template->updateTag('specify', null);
-	if (($messages & $signedoff) == 0)
-	    $template->updateTag('signedoff', null);
-	if (($messages & $incorrect) == 0)
-	    $template->updateTag('incorrect', null);
-}
+if ($debug)
+    $template->set('DEBUG',	    'Y');
 else
-	$template->updateTag('messages', null);
+    $template->set('DEBUG',	    'N');
+$template->set('LANG',	        $lang);
+$template->updateTag('otherStylesheets',
+    	       		 array('filename'	=> '/Signon'));
 
 $template->display();

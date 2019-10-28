@@ -65,6 +65,7 @@ use \Exception;
  *		2018/12/25      Surname is primary key                          *
  *		2019/01/03      replace static method getNextSurname with       *
  *		                new Surname(array('surname' => ">=$surname")    *
+ *		2019/05/17      add Surname::$info                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -96,6 +97,20 @@ class Surname extends Record
 				'qstag'		    	=> 0);
 
     /********************************************************************
+     *	Surname::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     		=> 'tblNR',
+                'name'      		=> 'Surnames',
+                'prime'	    		=> 'surname',
+	            'srvmg'     		=> false,
+	            'fldcount'			=> 8,
+                'order'     		=> 'Surname',
+                'classname'         => 'Surname');
+
+    /********************************************************************
      *	Surname::$defaultOrder											*
      *																	*
      *	Definition of default order for records retrieved by RecordSet	*
@@ -110,6 +125,7 @@ class Surname extends Record
      *  Input:															*
      *      $parms	o array('idnr' => $idnr) to get a record by		    *
      *				  record identification number, deprecated			*
+     *				  except for 'idnr'=> 1                             *
      *				o array('surname' => $surname) to get a record		*
      *				  by surname, creating the record if necessary		*
      *				o array('surname' => ">=$surname") to get a record	*
@@ -134,23 +150,26 @@ class Surname extends Record
 		global	$warn;
 		global	$connection;
 
-		$dbrow	        = null;
+		$dbrow	                = null;
+	    $needInsert		        = false;
 
 		// action depends upon type of first parameter
 		// convert old format calls to new format internally
 		if (is_int($parms))
         {		// numeric identifier of record
-		    $parms		= array('idnr'		=> $parms);
+            $parms		        = array('idnr'		=> $parms);
 		}		// numeric identifier of record
 		else
 		if (is_string($parms))
         {		// surname
-            $parms      = trim($parms);
+            $parms              = trim($parms);
 		    if (ctype_digit($parms))
-				$parms	= array('idnr'		=> intval($parms));
+				$parms	        = array('idnr'		=> (int)$parms);
 		    else
-				$parms	= array('surname'	=> $parms);
-		}		// surname
+				$parms	        = array('surname'	=> $parms);
+        }		// surname
+
+        $this->constDebug('Surname', $parms);
 
 		if (is_array($parms))
 		{			// array
@@ -183,32 +202,37 @@ class Surname extends Record
 						    else
                                 $this->msg	.= "Invalid value of IDNR=$value. ";
                             if ($value !== 1)
+                            {
                                 $warn   .= "<p>Surname::__construct: deprecated invocation with obsolete IDNR=$value key.</p>\n";
+    					        ob_start();
+    					        debug_print_backtrace();
+    					        $warn	.= ob_get_clean();
+                            }
 						    break;
 						}	// numeric id
 
 						case 'surname':
 						{
 						    if ($value == '')
-                            {
+                            {           // empty surname
                                 $where		.= $and . "IDNR=1";
                                 $surname    = '';
-                            }
+                            }           //empty surname
                             else
                             if (substr($value, 0, 2) == '>=')
-						    {
+						    {           // next surname >= value
                                 $where		.= $and . "Surname>=?";
                                 $value      = substr($value, 2);
 						    	$sqlParms[]	= $value;
                                 $surname	= $value;
                                 $limit      = ' LIMIT 1';
-						    }
+						    }           // next surname ?= value
 						    else
-						    {
+						    {           // match on surname
 						    	$where		.= $and . "Surname=?";
 						    	$sqlParms[]	= $value;
 						    	$surname	= $value;
-						    }
+                            }           // match on surname
 						    $and	        = ' AND ';
 						    break;
 						}	// surname
@@ -238,7 +262,7 @@ class Surname extends Record
 						$result	            = $stmt->fetchAll(PDO::FETCH_ASSOC);
 						if ($debug)
 						    $warn	.= '<p>Surname::_construct: ' .
-								   __LINE__ . " query='$queryText'</p>\n";
+                                __LINE__ . " query='$queryText'</p>\n";
 						if (count($result) > 0)
 						{	// found surname record
 						    $dbrow		    = $result[0];
@@ -254,14 +278,14 @@ class Surname extends Record
 						    }	// create a new surname record
 						    else
 						    {	// create a new surname record
-                                $dbrow		        = self::$initRow;
+                                $dbrow		            = self::$initRow;
                                 if (!is_null($idnr))
                                 {
-                                    $dbrow['idnr']  = $idnr;
+                                    $dbrow['idnr']      = $idnr;
                                     $dbrow['surname']   = "Missing IDNR $idnr";
                                 }
-                                $needInsert	        = true;
-                                $this->msg          .=
+                                $needInsert	            = true;
+                                $this->msg              .=
                         "Cannot create new Surname record without surname. ";
 						    }	// create a new surname record
 						}	// no match

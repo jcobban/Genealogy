@@ -3307,6 +3307,66 @@ class LegacyDate
     }		// function LegacyDate::getYear
 
     /********************************************************************
+     *	function LegacyDate::add    									*
+     *                                                                  *
+     *  Increment the date by a number of days.                         *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $period         number of days expressed as an integer      *
+     *                      which may be negative or a string           *
+     *                      containing only decimal digits              *
+     *                                                                  *
+     *  Result:                                                         *
+     *      The object becomes an instance of a calculated date.        *
+     *      For example if the instance represented the date            *
+     *      '21 Jun 1845' calling $date->add(15); changes it into an    *
+     *      instance representing 'Calculated 6 Jul 1845'               *
+     *      If the original date represented a range the calculated     *
+     *      ate is based upon the beginning of the range.               *
+     ********************************************************************/
+    function add($period)
+    {
+        if (is_int($period) ||
+            is_string($period) && ctype_digit($period))
+        {
+            $d              = $this->getDay();
+            $m              = $this->getMonth();
+            $y              = $this->getYear();
+            $d              += $period;
+            while ($d < 1)
+            {               // called with negative number
+                $m--;
+                if ($m < 1)
+                {
+                    $m      += 12;
+                    $y--;
+                }
+                $d          += $monthLens[$m];
+            }               // called with negative number
+
+            while ($d > $monthLens[$m])
+            {               // called with positive number
+                $d          -= $monthLens[$m];
+                $m++;
+                if ($m > 12)
+                {
+                    $m      -= 12;
+                    $y++;
+                }
+            }               // called with positive number
+
+            $this->date         = 'h0' . str_pad($d, 2, '0', STR_PAD_LEFT) .
+                                     str_pad($m, 2, '0', STR_PAD_LEFT) .
+                                     str_pad($y, 4, '0', STR_PAD_LEFT) .
+                                     '00000000';
+            $this->sortdate     = $y * 10000 + $m * 100 + $d;
+        }
+        else
+            throw new Exception("unsupported period '$period'");
+    }		// function LegacyDate::add
+
+
+    /********************************************************************
      *	function LegacyDate::toString									*
      *                                                                  *
      *  Convert a Legacy internal date to a string.						*
@@ -3335,6 +3395,8 @@ class LegacyDate
      *					or 'on' as required by language convention		*
      *					Defaults to false.								*
      *	    trantab		language specific translate table for text		*
+     *	                either an array or an instance of               *
+     *	                \Templating\TemplateTag                         *
      *					Defaults to English								*
      *                                                                  *
      *  Returns:                                                        *
@@ -3348,7 +3410,6 @@ class LegacyDate
 
     	if ($trantab == null)
             $trantab	= self::$tranTab;
-
     	if (($this->sortdate / 10000) > $privlim)
     	    return $trantab['Private'];
 

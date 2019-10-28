@@ -19,6 +19,7 @@
  *		2017/01/13		add "Clear" button to remove linkage			*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/06/29      first parameter of displayDialog removed        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -144,16 +145,16 @@ function linkToTree()
 			    noIdir);
     }		// search for matches
     return false;
-}		// linkToTree
+}		// function linkToTree
 
 /************************************************************************
- *  function gotIdir														*
+ *  function gotIdir													*
  *																		*
- *  The XML response to the database query for matching individuals has		*
+ *  The XML response to the database query for matching individuals has	*
  *  been returned.														*
  *																		*
  *  Input:																*
- *		xmlDoc		XML document												*
+ *		xmlDoc		XML document										*
  ************************************************************************/
 function gotIdir(xmlDoc)
 {
@@ -177,63 +178,55 @@ function gotIdir(xmlDoc)
     var	birthmin	= 1750;
     var birthmax	= 1852;
 
-    var	msgDiv	= document.getElementById('msgDiv');
-    hide(msgDiv);
-    if (msgDiv)
-    {		// have popup <div> to display selection dialog in
-		var parmElts	= xmlDoc.getElementsByTagName("parms");
-		var parmElt	= parmElts[0];
-		for (var elt = parmElt.firstChild; elt; elt = elt.nextSibling)
-		{
-		    if (elt.nodeType == 1)
-		    {		// is an element node
+	var parmElts	= xmlDoc.getElementsByTagName("parms");
+	var parmElt	= parmElts[0];
+	for (var elt = parmElt.firstChild; elt; elt = elt.nextSibling)
+	{
+	    if (elt.nodeType == 1)
+	    {		// is an element node
 			switch (elt.nodeName.toLowerCase())
 			{	// act on specific parameter names
 			    case 'birthmin':
 			    {
-				birthmin	= elt.textContent;
-				break;
+				    birthmin	= elt.textContent;
+				    break;
 			    }
 
 			    case 'birthmax':
 			    {
-				birthmax	= elt.textContent;
-				break;
+				    birthmax	= elt.textContent;
+				    break;
 			    }
 
 			}	// act on specific parameter names
-		    }		// is an element node
-		}		// loop through elements under <parms>
-		// substitutions into the template
-		var parms	= {"sub"	: "",
-				   "surname"	: surname,	
-				   "givenname"	: givennames,
+	    }		// is an element node
+	}		// loop through elements under <parms>
+
+	// substitutions into the template
+	var parms	    = {"sub"	    : "",
+		    		   "surname"	: surname,	
+		    		   "givenname"	: givennames,
 				       'birthmin'	: birthmin,
 				       'birthmax'	: birthmax,
-				   "line"	: line};
+		    		   "line"	    : line};
 
-		var matches	= xmlDoc.getElementsByTagName("indiv");
-		if (matches.length > 0)
-		{		// have some matching entries
-		    return displaySelectIdir(msgDiv,
-					     'idirChooserForm$sub',
-					     parms,
-					     button,
-					     closeIdirDialog,
-					     matches);
-		}		// have some matching entries
-		else
-		{		// have no matching entries
-		    return displayDialog(msgDiv,
-					 'idirNullForm$sub',
-					 parms,
-					 button,
-					 null,		// default close dialog
-					 false);	// default show on open
-		}		// have no matching entries
-
-    }		// support for dynamic display of messages
-}		// gotIdir
+	var matches	= xmlDoc.getElementsByTagName("indiv");
+	if (matches.length > 0)
+	{		// have some matching entries
+	    return displaySelectIdir('idirChooserForm$sub',
+        					     parms,
+        					     button,
+        					     closeIdirDialog,
+        					     matches);
+	}		// have some matching entries
+	else
+	{		// have no matching entries
+	    return displayDialog('idirNullForm$sub',
+        					 parms,
+        					 button,
+        					 null);		// default close dialog
+	}		// have no matching entries
+}		// function gotIdir
 
 /************************************************************************
  *  function noIdir														*
@@ -247,41 +240,38 @@ function noIdir()
 }		// function noIdir
 
 /************************************************************************
- *  function displaySelectIdir												*
+ *  function displaySelectIdir											*
  *																		*
  *  This function displays a customized dialog for choosing from		*
  *  a list of individuals who match the individual described by the		*
- *  current line of the census.												*
+ *  current line of the census.											*
  *																		*
  *  Input:																*
- *		msgDiv				an HTML element to modify and make visible.		*
- *						This is normally a <div> element				*
- *		templateId		identifier of an HTML element that provides the		*
- *						structure and constant strings to be laid out		*
- *						in the dialog										*
- *		parms				an object containing values to substitute for		*
- *						symbols ($xxxx) in the template						*
- *		element				an HTML element used for positioning the		*
+ *		templateId		identifier of an HTML element that provides the	*
+ *						structure and constant strings to be laid out	*
+ *						in the dialog									*
+ *		parms			an object containing values to substitute for	*
+ *						symbols ($xxxx) in the template					*
+ *		element			an HTML element used for positioning the		*
  *						dialog for the user.  This is normally the 		*
- *						<button> for the user to request the dialog.		*
- *		action				onclick action to set for 1st (or only) button		*
- *						in the dialog.  If null the default action is		*
+ *						<button> for the user to request the dialog.	*
+ *		action			onclick action to set for 1st (or only) button	*
+ *						in the dialog.  If null the default action is	*
  *						to just hide the dialog.						*
- *		matches				array of XML <indiv> tags						*
+ *		matches			array of XML <indiv> tags						*
  ************************************************************************/
-function displaySelectIdir(dialog,
-				   templateId,
-				   parms,
-				   element,
-				   action,
-				   matches)
+function displaySelectIdir(templateId,
+        				   parms,
+        				   element,
+        				   action,
+        				   matches)
 {
-    if (displayDialog(dialog,
-			      templateId,
-			      parms,
-			      element,
-			      action,
-			      true))
+    var dialog  = displayDialog(templateId,
+		    	                parms,
+		    	                element,
+		    	                action,
+		    	                true);
+    if (dialog)
     {
 		// update the selection list with the matching individuals
 		var select	= document.getElementById("chooseIdir");
@@ -405,16 +395,16 @@ function displaySelectIdir(dialog,
     }		// template OK
     else
 		return false;
-}		// displaySelectIdir
+}		// function displaySelectIdir
 
 /************************************************************************
  *  function idirSelected												*
  *																		*
- *  This is the onchange method of the select in the popup to choose		*
- *  the individual to associated with the current line.						*
+ *  This is the onchange method of the select in the popup to choose	*
+ *  the individual to associated with the current line.					*
  *																		*
  *  Input:																*
- *		this		= <select id='chooseIdir'>								*
+ *		this		= <select id='chooseIdir'>							*
  ************************************************************************/
 function idirSelected()
 {
@@ -444,12 +434,12 @@ function idirSelected()
 }		// function idirSelected
 
 /************************************************************************
- *  function closeIdirDialog												*
+ *  function closeIdirDialog											*
  *																		*
- *  The user clicked on the button to close the IDIR dialog.				*
+ *  The user clicked on the button to close the IDIR dialog.			*
  *																		*
  *  Input:																*
- *		this		instance of <button>										*
+ *		this		instance of <button>								*
  ************************************************************************/
 function closeIdirDialog()
 {
@@ -494,16 +484,16 @@ function closeIdirDialog()
 
     // suppress default action
     return false;
-}		// closeIdirDialog
+}		// function closeIdirDialog
 
 /************************************************************************
  *  function clearFromTree												*
  *																		*
  *  The user clicked on the button to remove an existing linkage to		*
- *  the family tree.														*
+ *  the family tree.													*
  *																		*
  *  Input:																*
- *		this		instance of <button>										*
+ *		this		instance of <button>								*
  ************************************************************************/
 function clearFromTree()
 {
@@ -529,18 +519,18 @@ function clearFromTree()
 
     // suppress default action
     return false;
-}		// clearFromTree
+}		// function clearFromTree
 
 /************************************************************************
- *  function showDetails														*
+ *  function showDetails												*
  *																		*
- *  When a Details button is clicked this function displays the				*
- *  detailed information about the marriage.								*
+ *  When a Details button is clicked this function displays the			*
+ *  detailed information about the marriage.							*
  *  Temporarily this just displays the two rows associated with the		*
  *  current item.														*
  *																		*
  *  Input:																*
- *		$this				<button type=button id='Details....'				*
+ *		$this		<button type=button id='Details....'				*
  ************************************************************************/
 function showDetails()
 {
@@ -595,16 +585,16 @@ function showDetails()
 						'&ItemNo=' + itemNo;
     location	= script;
     return false;
-}		// showDetails
+}		// function showDetails
 
 /************************************************************************
- *  function deleteRow														*
+ *  function deleteRow													*
  *																		*
- *  When a Delete button is clicked this function removes the				*
- *  row from the table.														*
+ *  When a Delete button is clicked this function removes the			*
+ *  row from the table.													*
  *																		*
  *  Input:																*
- *		$this				<button type=button id='Delete....'				*
+ *		$this			<button type=button id='Delete....'				*
  ************************************************************************/
 function deleteRow()
 {
@@ -664,16 +654,16 @@ function deleteRow()
 			gotDelete,
 			noDelete);
     return false;
-}		// deleteRow
+}		// function deleteRow
 
 /************************************************************************
- *  function gotDelete														*
+ *  function gotDelete													*
  *																		*
  *  This method is called when the XML file representing				*
- *  the deletion of the report from the database is retrieved.				*
+ *  the deletion of the report from the database is retrieved.			*
  *																		*
  *  Input:																*
- *		xmlDoc		response document										*
+ *		xmlDoc		response document									*
  ************************************************************************/
 function gotDelete(xmlDoc)
 {
@@ -692,36 +682,36 @@ function gotDelete(xmlDoc)
 		    var rownums	= parms.getElementsByTagName('rownum');
 		    if (rownums.length > 0)
 		    {		// have at least 1 rownum element
-			var child	= rownums[0];
-			var rownum	= child.textContent.trim();
-			// remove identified row
-			var rowid	= 'Row' + rownum;
-			var row		= document.getElementById(rowid);
-			var section	= row.parentNode;
-			section.removeChild(row);
-		    }		// have at least 1 rownum element
+				var child	= rownums[0];
+				var rownum	= child.textContent.trim();
+				// remove identified row
+				var rowid	= 'Row' + rownum;
+				var row		= document.getElementById(rowid);
+				var section	= row.parentNode;
+				section.removeChild(row);
+			}		// have at least 1 rownum element
 		}		// have at least 1 parms element
     }			// xmlDoc is defined
-}		// gotDelete
+}		// function gotDelete
 
 /************************************************************************
- *  function noDelete														*
+ *  function noDelete													*
  *																		*
- *  This method is called if there is no delete registration script.		*
+ *  This method is called if there is no delete registration script.	*
  ************************************************************************/
 function noDelete()
 {
     alert("CountyMarriagesEdit.js: noDelete: " +
 			"script 'deleteCountyMarriagesXml.php' not found on server");
-}		// noDelete
+}		// function noDelete
 
 /************************************************************************
- *  function checkFlagBG														*
+ *  function checkFlagBG												*
  *																		*
- *  Validate the current value of a field containing a flag.				*
+ *  Validate the current value of a field containing a flag.			*
  *																		*
  *  Input:																*
- *		this				an instance of an HTML input element. 				*
+ *		this			an instance of an HTML input element. 			*
  ************************************************************************/
 function checkFlagBG()
 {
@@ -741,20 +731,20 @@ function checkFlagBG()
 		if (!re.test(flag))
 		    elt.className	= elt.className + "error";
     }		// error not currently flagged
-}		// checkFlagBG
+}		// function checkFlagBG
 
 /************************************************************************
- *  function checkFlagBL														*
+ *  function checkFlagBL												*
  *																		*
- *  Validate the current value of a field containing a flag.				*
+ *  Validate the current value of a field containing a flag.			*
  *																		*
  *  Input:																*
- *		this				an instance of an HTML input element. 				*
+ *		this		an instance of an HTML input element. 				*
  ************************************************************************/
 function checkFlagBL()
 {
-    var	elt		= this;
-    var	re		= /^[BLbl ]?$/;
+    var	elt		    = this;
+    var	re		    = /^[BLbl ]?$/;
     var	flag		= elt.value;
     var	className	= elt.className;
     if (className.substring(className.length - 5) == 'error')
@@ -769,218 +759,227 @@ function checkFlagBL()
 		if (!re.test(flag))
 		    elt.className	= elt.className + "error";
     }		// error not currently flagged
-}		// checkFlagBL
+}		// function checkFlagBL
 
 /************************************************************************
  *  function tableKeyDown												*
  *																		*
- *  Handle key strokes in text input fields in a row.						*
+ *  Handle key strokes in text input fields in a row.					*
  *																		*
- *  Parameters:																*
+ *  Parameters:															*
+ *      this    input element                                           *
  *		e		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function tableKeyDown(e)
 {
     if (!e)
-    {		// browser is not W3C compliant
-		e	=  window.event;	// IE
-    }		// browser is not W3C compliant
-    var	code		= e.keyCode;
-    var	element		= e.target;
-    var	form		= element.form;
+    {		                    // browser is not W3C compliant
+    	e	            =  window.event;	// IE
+    }		                    // browser is not W3C compliant
+    var	code		    = e.key;
+    var	element		    = e.target;
+    var	form		    = element.form;
 
     // hide the help balloon on any keystroke
     if (helpDiv)
-    {		// helpDiv currently displayed
+    {		                    // helpDiv currently displayed
 		helpDiv.style.display	= 'none';
 		helpDiv			= null;	// no longer displayed
-    }		// helpDiv currently displayed
+    }		                    // helpDiv currently displayed
     clearTimeout(helpDelayTimer);	// clear pending help display
     helpDelayTimer		= null;
 
     // take action based upon code
     switch (code)
     {
-		case KEY_F1:		// F1
+		case "F1":		        // F1
 		{
-		    displayHelp(this);		// display help page
+		    displayHelp(this);	// display help page
 		    return false;		// suppress default action
-		}			// F1
+		}			            // F1
 
-		case KEY_ENTER:
-		{			// enter key
+		case "Enter":
+		{			            // enter key
 		    if (element)
 		    {
-			var	cell	= element.parentNode;
-			var	row	= cell.parentNode;
-			var	body	= row.parentNode;
-			var	rownum	= row.sectionRowIndex;
-			if (rownum < (body.rows.length - 1))
-			{		// not the last row
-			    rownum++;
-			    row			= body.rows[rownum];
-			    var focusSet	= false;
-			    var itemNo		= 0;
-			    var names	= '';
-			    for(var itd = 0; itd < row.cells.length; itd++)
-			    {		// loop through <td>s
-				cell		= row.cells[itd];
-				var	children	= cell.children;
-				for(var ic = 0; ic < children.length; ic++)
-				{	// loop through children of cell
-				    var child	= children[ic];
-				    if (child.nodeName.toLowerCase() == 'input' &&
-					child.type == 'text')
-				    {	// <input type='text'>
-					if (!child.readOnly)
-					{
-					    child.focus();
-					    focusSet	= true;
-					}
-					break;
-				    }	// first <input type='text'>
-				}	// loop through children of cell
-				if (focusSet)
-				    break
-			    }		// loop through <td>
-			}		// not the last row
-			else
-			{
-			    var itemNo		= 0;
-			    for(var itd = 0; itd < row.cells.length; itd++)
-			    {		// loop through <td>s
-				cell		= row.cells[itd];
-				var	children	= cell.children;
-				for(var ic = 0; ic < children.length; ic++)
-				{	// loop through children of cell
-				    var child	= children[ic];
-				    if (child.nodeName.toLowerCase() == 'input' &&
-					child.type == 'text')
-				    {	// <input type='text'>
-					if (child.name.substring(0,6) == 'ItemNo')
-					{
-					    itemNo	= child.value;
-					    break;
-					}
-				    }	// first <input type='text'>
-				}	// loop through children of cell
-			    }		// loop through <td>
-			    var rowa	= rownum + 2;
-			    if (rowa.length == 1)
-				rowa	= '0' + rowa;
-			    var rowb	= rownum + 3;
-			    if (rowb.length == 1)
-				rowb	= '0' + rowb;
-			    var parms	= {'rowa'	: rowa,
-					   'rowb'	: rowb,
-					   'itemNo'	: (itemNo-0) + 1};
+				var	cell    	= element.parentNode;
+				var	row	        = cell.parentNode;
+				var	body	    = row.parentNode;
+				var	rownum	    = row.sectionRowIndex;
+				if (rownum < (body.rows.length - 1))
+				{		        // not the last row
+				    rownum++;
+				    row			    = body.rows[rownum];
+				    var focusSet	= false;
+				    var itemNo		= 0;
+				    var names	    = '';
+				    for(var itd = 0; itd < row.cells.length; itd++)
+				    {		    // loop through <td>s
+						cell		= row.cells[itd];
+						var	children	= cell.children;
+						for(var ic = 0; ic < children.length; ic++)
+						{	    // loop through children of cell
+						    var child	= children[ic];
+						    if (child.nodeName.toLowerCase() == 'input' &&
+							child.type == 'text')
+						    {	// <input type='text'>
+								if (!child.readOnly)
+								{
+								    child.focus();
+								    focusSet	= true;
+								}
+								break;
+							}	// first <input type='text'>
+						}	    // loop through children of cell
+						if (focusSet)
+						    break
+				    }		    // loop through <td>
+				}		        // not the last row
+				else
+				{
+				    var itemNo		= 0;
+				    for(var itd = 0; itd < row.cells.length; itd++)
+				    {		    // loop through <td>s
+				    	cell		    = row.cells[itd];
+				    	var	children	= cell.children;
+				    	for(var ic = 0; ic < children.length; ic++)
+				    	{	    // loop through children of cell
+				    	    var child	= children[ic];
+				    	    if (child.nodeName.toLowerCase() == 'input' &&
+				    		child.type == 'text')
+				    	    {	// <input type='text'>
+				    	    	if (child.name.substring(0,6) == 'ItemNo')
+				    	    	{
+				    	    	    itemNo	= child.value;
+				    	    	    break;
+				    	    	}
+					        }	// first <input type='text'>
+					    }	    // loop through children of cell
+				    }		    // loop through <td>
+				    var rowa	= rownum + 2;
+				    if (rowa.length == 1)
+					    rowa	= '0' + rowa;
+				    var rowb	= rownum + 3;
+				    if (rowb.length == 1)
+					rowb	    = '0' + rowb;
+				    var parms	= {'rowa'	: rowa,
+					        	   'rowb'	: rowb,
+					        	   'itemNo'	: (itemNo-0) + 1};
 
-			    // add new row for groom
-			    var template	= document.getElementById('Row$rowa');
-			    var	newRow		= createFromTemplate(template,
-								     parms,
-								     null);
-			    newrow	= body.appendChild(newRow);
-			    var inputs		= newRow.getElementsByTagName('input');
-			    for (var ii = 0; ii < inputs.length; ii++)
-			    {
-				var element	= inputs[ii];
-				initElement(element);
-			    }
+				    // add new row for groom
+				    var template	= document.getElementById('Row$rowa');
+				    var	newRow		= createFromTemplate(template,
+						                			     parms,
+							                		     null);
+				    newrow	= body.appendChild(newRow);
+				    var inputs		= newRow.getElementsByTagName('input');
+				    for (var ii = 0; ii < inputs.length; ii++)
+				    {
+					    var element	= inputs[ii];
+					    initElement(element);
+				    }
 
-			    // add new row for bride
-			    template		= document.getElementById('Row$rowb');
-			    newRow		= createFromTemplate(template,
-								     parms,
-								     null);
-			    newRow		= body.appendChild(newRow);
-			    inputs		= newRow.getElementsByTagName('input');
-			    for (var ii = 0; ii < inputs.length; ii++)
-			    {
-				var element	= inputs[ii];
-				initElement(element);
-			    }
-			}
+				    // add new row for bride
+				    template	= document.getElementById('Row$rowb');
+				    newRow		= createFromTemplate(template,
+				            					     parms,
+						            			     null);
+				    newRow		= body.appendChild(newRow);
+				    inputs		= newRow.getElementsByTagName('input');
+				    for (var ii = 0; ii < inputs.length; ii++)
+				    {
+					    var element	= inputs[ii];
+					    initElement(element);
+				    }
+				}
 		    }
 		    else
-			alert("commonMarriage.js: tableKeyDown: element is null.");
+				alert("commonMarriage.js: tableKeyDown: element is null.");
 		    return false;		// suppress default action
-		}			// enter key
+		}			    // enter key
 
-		case ARROW_UP:
-		{			// arrow up key
+		case "ArrowUp":
+		{			    // arrow up key
 		    if (element)
 		    {
-			var	cell	= element.parentNode;
-			var	row	= cell.parentNode;
-			var	body	= row.parentNode;
-			var	rownum	= row.sectionRowIndex;
-			if (rownum > 0)
-			{		// not the first row
-			    rownum--;
-			    row		= body.rows[rownum];
-			    cell	= row.cells[cell.cellIndex];
-			    var	children= cell.children;
-			    for(var ic = 0; ic < children.length; ic++)
-			    {		// loop through children of cell
-				var child	= children[ic];
-				if (child.nodeName.toLowerCase() == 'input' &&
-				    child.type == 'text')
-				{	// first <input type='text'>
-				    child.focus();
-				    break;
-				}	// first <input type='text'>
-			    }		// loop through children of cell
-			}		// not the first row
+				var	cell	= element.parentNode;
+				var	row	    = cell.parentNode;
+				var	body	= row.parentNode;
+				var	rownum	= row.sectionRowIndex;
+				if (rownum > 0)
+				{		    // not the first row
+				    rownum--;
+				    row		= body.rows[rownum];
+				    cell	= row.cells[cell.cellIndex];
+				    var	children= cell.children;
+				    for(var ic = 0; ic < children.length; ic++)
+				    {		// loop through children of cell
+						var child	= children[ic];
+						if (child.nodeName.toLowerCase() == 'input' &&
+						    child.type == 'text')
+						{	// first <input type='text'>
+						    child.focus();
+						    break;
+						}	// first <input type='text'>
+				    }		// loop through children of cell
+				}		    // not the first row
 		    }
 		    else
-			alert("commonMarriage.js: tableKeyDown: element is null.");
-		    return false;		// suppress default action
-		}			// arrow up key
+				alert("commonMarriage.js: tableKeyDown: element is null.");
+		    return false;	// suppress default action
+		}			        // arrow up key
 
-		case ARROW_DOWN:
-		{			// arrow down key
+		case "ArrowDown":
+		{			        // arrow down key
 		    if (element)
 		    {
-			var	cell	= element.parentNode;
-			var	row	= cell.parentNode;
-			var	body	= row.parentNode;
-			var	rownum	= row.sectionRowIndex;
-			if (rownum < (body.rows.length - 1))
-			{		// not the last row
-			    rownum++;
-			    row		= body.rows[rownum];
-			    cell	= row.cells[cell.cellIndex];
-			    var	children= cell.children;
-			    for(var ic = 0; ic < children.length; ic++)
-			    {		// loop through children of cell
-				var child	= children[ic];
-				if (child.nodeName.toLowerCase() == 'input' &&
-				    child.type == 'text')
-				{	// first <input type='text'>
-				    child.focus();
-				    break;
-				}	// first <input type='text'>
-			    }		// loop through children of cell
-			}		// not the last row
+				var	cell	= element.parentNode;
+				var	row	    = cell.parentNode;
+				var	body	= row.parentNode;
+				var	rownum	= row.sectionRowIndex;
+				if (rownum < (body.rows.length - 1))
+				{		    // not the last row
+				    rownum++;
+				    row		= body.rows[rownum];
+				    cell	= row.cells[cell.cellIndex];
+				    var	children= cell.children;
+				    for(var ic = 0; ic < children.length; ic++)
+				    {		// loop through children of cell
+						var child	= children[ic];
+						if (child.nodeName.toLowerCase() == 'input' &&
+						    child.type == 'text')
+						{	// first <input type='text'>
+						    child.focus();
+						    break;
+					    }	// first <input type='text'>
+				    }		// loop through children of cell
+				}		    // not the last row
 		    }
 		    else
-			alert("commonMarriage.js: tableKeyDown: element is null.");
-		    return false;		// suppress default action
-		}			// arrow down key
-    }	    // switch on key code
+				alert("commonMarriage.js: tableKeyDown: element is null.");
+		    return false;	// suppress default action
+		}			        // arrow down key
+    }	                    // switch on key code
 
     return;
-}		// tableKeyDown
+}		// function tableKeyDown
 
+/************************************************************************
+ *  function initElement												*
+ *																		*
+ *  Initialize a form element.                                          *
+ *																		*
+ *  Parameters:															*
+ *		element     instance of HTMLElement                             *
+ ************************************************************************/
 function initElement(element)
 {
-    element.onkeydown	= keyDown;
+    element.onkeydown	= keyDown;          // default event handler
 
     var namePattern		= /^([a-zA-Z_]+)(\d*)$/;
-    var	id			= element.id;
+    var	id			    = element.id;
     if (id.length == 0)
-		id			= element.name;
+		id			    = element.name;
     var rresult			= namePattern.exec(id);
     var	column			= id;
     var	rownum			= '';
@@ -1138,9 +1137,9 @@ function initElement(element)
 }		// function initElement
 
 /************************************************************************
- *  function marriageDateChanged												*
+ *  function marriageDateChanged										*
  *																		*
- *  Take action when the user changes the marriage date field				*
+ *  Take action when the user changes the marriage date field			*
  *																		*
  *  Input:																*
  *		this		an instance of an HTML input element. 				*
@@ -1152,7 +1151,7 @@ function marriageDateChanged()
     // ensure that there is a space between a letter and a digit
     // or a digit and a letter
     var	value		= this.value;
-    value		= value.replace(/([a-zA-Z])(\d)/g,"$1 $2");
+    value		    = value.replace(/([a-zA-Z])(\d)/g,"$1 $2");
     this.value		= value.replace(/(\d)([a-zA-Z])/g,"$1 $2");
 
     changeElt(this);	// change case and expand abbreviations
@@ -1176,7 +1175,7 @@ function marriageDateChanged()
 		else
 		    alert("Unable to find element with name='" + brideDateName + "'");
     }
-}		// marriageDateChanged
+}		// function marriageDateChanged
 
 /************************************************************************
  *  function licenseTypeChanged											*
@@ -1211,7 +1210,7 @@ function licenseTypeChanged()
 		else
 		    alert("Unable to find element with name='" + brideLtName + "'");
     }
-}		// licenseTypeChanged
+}		// function licenseTypeChanged
 
 
 

@@ -169,6 +169,8 @@ use Templating\TemplateTag;
  *		2019/04/15      replace is_a with instanceof                    *
  *		2019/05/20      do not display marriagenamecreatedby for        *
  *		                non marriage records                            *
+ *		2918/06/01      improve JSON output                             *
+ *		2019/07/18      use Person::getPerson                           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -238,6 +240,7 @@ class Name extends Record
      ********************************************************************/
     protected static	$translate	= array(
     					'id'		            => 'idnx',
+    					'given'		            => 'givenname',
     					'`order`'		        => 'order',
     					'type'		            => 'order',
     					'createdby'		        => 'marriednamecreatedby',
@@ -289,7 +292,7 @@ class Name extends Record
     	global	$connection;
 
     	// query the database
-        $idir				= $this->row['idir'];
+        $idir				= $this['idir'];
         if ($idir == 0)
             return null;
 
@@ -555,7 +558,7 @@ class Name extends Record
      *  Creates object containing a name record.					    *
      ********************************************************************/
     static $counter    = 0;
-    function __construct($parms)
+    function __construct($parms = null)
     {
     	global	$debug;
     	global	$warn;
@@ -570,21 +573,17 @@ class Name extends Record
     	$idmr					= null;
         $order					= null;
         $surname            	= '';
-        $parmsText              = '';
 
     	// action depends upon type of first parameter
     	if (is_null($parms))
         {
-            $parms		        = array('idnx'	=> $parms);
-            $parmsText          = "NULL";
-            $this->msg          = "Name.inc: ". __LINE__ ." __construct(NULL)";
+            $parms		        = array();
         }
     	else
     	if (is_int($parms) ||
             (is_string($parms) && ctype_digit($parms)))
         {
             $parms		        = array('idnx'	=> $parms);
-            $parmsText          = "IDNX=$parms";
         }
     	else
     	if ($parms instanceof Person)
@@ -593,7 +592,6 @@ class Name extends Record
     	    $this->person		= $parms;
     	    $parms		        = array('idir'	=> $parms,
     								    'order'	=> Name::PRIMARY);
-            $parmsText          = "Person(IDIR=$idir)";
     	}			                // old way to init from individual
     	else
     	if ($parms instanceof Family)
@@ -602,32 +600,10 @@ class Name extends Record
     	    $this->family		= $parms;
     	    $parms		        = array('idir'	=> $family->get('idirwife'),
     								    'idmr'	=> $family);
-            $parmsText          = "Family(IDMR=$idmr)";
         }			                // old way to reset married surname of wife
-        else
-        if (is_array($parms))
-        {
-            $parmsText          = 'array(';
-            $comma              = '';
-            foreach ($parms as $key => $value)
-            {
-                $parmsText      .= "$comma'$key'=";
-                if ($value instanceof Record)
-                {
-                    $parmsText  .= get_class($value) . '(' . $value->getId() . ')';
-                }
-                else
-                if (is_null($value))
-                    $parmsText  .= 'NULL';
-                else
-                    $parmsText  .= $value;
-                $comma          = ',';
-            }
-        }
-        //print "<p>new Name($parmsText)";
-        //self::$counter++;
-        //if (self::$counter > 1)
-        //throw new Exception('how did we get here');
+
+        $this->constDebug('Name', $parms);
+
     	// all of the supported (if deprecated) parameter formats have been
     	// reformatted into an array
     	if (is_array($parms))
@@ -724,9 +700,16 @@ class Name extends Record
     					    $gender	        = Person::UNKNOWN;
     					    if ($this->person)
                             {		// person passed as parameter
-                                $idir               = $this->person['idir'];
+                                $person             = $this->person;
+                                $idir               = $person['idir'];
                                 $dbrow['idir']      = $idir;
-                                $gender             = $this->person['gender'];
+                                $dbrow['givenname'] = $person['givenname'];
+                                $dbrow['surname']   = $person['surname'];
+    							$dbrow['soundslike']= $person['soundslike'];
+    							$dbrow['prefix']	= $person['prefix'];
+    							$dbrow['title']	    = $person['title'];
+    							$dbrow['userref']	= $person['userref'];
+                                $gender             = $person['gender'];
                                 if (array_key_exists('order', $sqlParms))
                                 {
                                     $order          = $sqlParms['order'];
@@ -761,6 +744,7 @@ class Name extends Record
                                         $dbrow['surname']	= $value;
                                         break;
                                     }
+
 								    case 'givenname':
 								    {
 										$dbrow['givenname']	= $value;
@@ -818,12 +802,12 @@ class Name extends Record
                     $dbrow	                    = self::$initRow;
                     if ($this->person)
                     {
-                        $dbrow['surname']       = $this->person['surname'];
-                        $dbrow['givenname']     = $this->person['givenname'];
-		    			$dbrow['prefix']		= $this->person['prefix'];
-		    			$dbrow['title']		    = $this->person['title'];
-		    			$dbrow['akanote']		= $this->person['namenote'];
-	        			$dbrow['userref']		= $this->person['userref'];
+                        $dbrow['surname']   = $this->person->row['surname'];
+                        $dbrow['givenname'] = $this->person->row['givenname'];
+		    			$dbrow['prefix']	= $this->person->row['prefix'];
+		    			$dbrow['title']		= $this->person->row['title'];
+		    			$dbrow['akanote']	= $this->person->row['namenote'];
+	        			$dbrow['userref']	= $this->person->row['userref'];
                     }
                 }                   // called with incomplete Person
     	    }				        // partial row, use as search parameters
@@ -832,14 +816,9 @@ class Name extends Record
         {                           // invalid parameters
             $dbrow	                = self::$initRow;
         }                           // invalid parameters
-        if ($debug)
-            $warn       .= "<p>Name::__construct($parmsText)</p>\n";
 
         if (is_null($dbrow))
-            throw new Exception("Name.inc: " . __LINE__ . " how can row not be initialized? parms=($parmsText)");
-
-        // the IDNR, and SoundsLike fields in this record 
-        // are no longer maintained
+            throw new Exception("Name.inc: " . __LINE__ . " how can row not be initialized? parms=($parmText)");
 
         // invoke constructor of base class
     	parent::__construct($dbrow, 'tblNX');
@@ -852,8 +831,8 @@ class Name extends Record
         if ($this['order'] == 0 && $idir > 0 && !$needInsert)
         {                   // primary name record
 		    $updParms	= array('idir'		=> $idir,
-								'`order`'	=> -1,
-								'order'		=> 'idnx');
+								'type'	    => -1,
+								'orderby'	=> 'idnx');
 		    $setParms	= array('givenname'	=> $this['givenname'],
 								'prefix'	=> $this['prefix'],
 								'title'		=> $this['title'],
@@ -862,9 +841,8 @@ class Name extends Record
 	        $count	    = $names->update($setParms);
 	    }
 	
-	    if ($this->row['order'] == -1 && is_null($this->row['idmr']))
+	    if ($this['order'] == -1 && is_null($this->row['idmr']))
 	        $this->msg      = "Name::__construct: attempt to create married name record without IDMR"; 
-        $this->getSurnameRec();
 	
 	    // diagnostic output if debug is set
     	if ($needInsert)
@@ -1021,6 +999,26 @@ class Name extends Record
      ********************************************************************/
     function set($field, $value)
     {
+        global  $document_root;
+
+		error_log("Name::set: " . __LINE__ . " '$field','$value'\n",
+		          3,
+		          $document_root . "/logs/Name.log");
+        $backtrace          = debug_backtrace();
+        foreach($backtrace as $call)
+        {                       // interpret backtrace
+            if (array_key_exists('class', $call) &&
+                strlen($call['class']) > 0)
+                $classPref      = $call['class'] . '::';
+            else
+                $classPref      = '';
+	        error_log("Name::set: " . __LINE__ . 
+		                    " function=$classPref" . $call['function'] .
+		                    " called from line=" . $call['line'] . 
+		                    " of " . $call['file'] . "\n",
+			          3,
+			          $document_root . "/logs/Name.log");
+		}                       // interpret backtrace
     	$value			= trim($value);
     	$fieldLc		= strtolower($field);
     	if (array_key_exists($fieldLc, self::$translate))
@@ -1083,7 +1081,7 @@ class Name extends Record
      *	Returns:														*
      *	    unique numeric key of this row in the table					*
      ********************************************************************/
-    function getIdnx() { return $this->row['idnx']; }
+    function getIdnx() { return $this['idnx']; }
 
     /********************************************************************
      *	function Name::getIdir											*
@@ -1095,7 +1093,7 @@ class Name extends Record
      *	Returns:														*
      *	    unique numeric key of the associated individual.			*
      ********************************************************************/
-    function getIdir() { return $this->row['idir']; }
+    function getIdir() { return $this['idir']; }
 
     /********************************************************************
      *	function Name::getSurname										*
@@ -1107,7 +1105,7 @@ class Name extends Record
      ********************************************************************/
     function getSurname()
     {
-    	$retval		= $this->row['surname'];
+    	$retval		= $this['surname'];
     	if ($retval === null)
     	    return '';
     	else
@@ -1138,9 +1136,9 @@ class Name extends Record
         {
             $this->surnameRec	    = new Surname(array('surname' => $newname));
             $this->surnameRec->save(false);
-	        if ($this->row['order'] == Name::PRIMARY)
+	        if ($this['order'] == Name::PRIMARY)
 	        {                       // primary name
-	    		$idir	            = $this->row['idir'];
+	    		$idir	            = $this['idir'];
 	    	    $otherNames         = new RecordSet('Names',
 	    							            array('idir'	    => $idir,
 	    									          '`order`'	    => '>0')); 
@@ -1167,7 +1165,7 @@ class Name extends Record
      ********************************************************************/
     function getGivenName()
     {
-    	$retval	            = $this->row['givenname'];
+    	$retval	            = $this['givenname'];
     	if ($retval === null)
     	    return '';
     	else
@@ -1187,11 +1185,17 @@ class Name extends Record
      *			NAME_INCLUDE_DATES		include birth and death dates	*
      *			NAME_INCLUDE_LOCS		include birth and death locs	*
      *			NAME_SURNAME_FIRST		put surname first				*
+     *			            or internationalization translate table     *
+     *	    $options2		combination of option flags if $options 	*
+     *	                    is a translate table                        *
+     *			NAME_INCLUDE_LOCS		include birth and death locs	*
+     *			NAME_SURNAME_FIRST		put surname first				*
      *																	*
      *	Returns:														*
      *	    string containing the name of the individual				*
      ********************************************************************/
-    function getName($options	= 0)
+    function getName($options	= 0,
+                     $options2  = 0)
     {
 		global	$debug;
 		global	$warn;
@@ -1201,32 +1205,22 @@ class Name extends Record
 		if (is_array($options) || $options instanceof TemplateTag)
 		{		// support being passed internationalization table
 		    $tranTab			= $options;
-		    $options			= self::NAME_INCLUDE_DATES;
+		    $options			= self::NAME_INCLUDE_DATES | $options2;
 		}		// support being passed internationalization table
 		else
 		    $tranTab			= null;
 
-        if ($debug)
-        {
-            if (is_null($tranTab))
-		        $warn			    .= "<p>Name(IDNX=" . $this->row['idnx'] .
-                                        ")::getName($options)</p>\n";
-            else
-		        $warn			    .= "<p>Name(IDNX=" . $this->row['idnx'] .
-                                        ")::getName(\$tranTab)</p>\n";
-        }
-
 		$includeDates			= ($options & self::NAME_INCLUDE_DATES) != 0;
 		$includeLocs			= ($options & self::NAME_INCLUDE_LOCS) != 0;
 		$surnameFirst			= ($options & self::NAME_SURNAME_FIRST) != 0;
-        $idir		    		= $this->row['idir'];
-		$prefix		    		= $this->row['prefix'];
-		$givenname	    		= $this->row['givenname'];
-		$surname	    		= $this->row['surname'];
+        $idir		    		= $this['idir'];
+		$prefix		    		= $this['prefix'];
+		$givenname	    		= $this['givenname'];
+		$surname	    		= $this['surname'];
 		$birth		    		= '';
 		$death		    		= '';
 		$maidenName	    		= null;
-		$suffix		    		= $this->row['title'];
+		$suffix		    		= $this['title'];
 
         if ($this->getPerson())
         {
@@ -1243,7 +1237,7 @@ class Name extends Record
                 return 'Private';
         }
 
-		if ($this->row['order'] == Name::MARRIED)
+		if ($this['order'] == Name::MARRIED)
         {		// check for maiden name
             $primeName          = new Name(array('idir'     => $idir,
                                                  'order'    => Name::PRIMARY));
@@ -1377,7 +1371,7 @@ class Name extends Record
     	else
     	if ($xml)
     	{		// true
-    	    $tagname	= 'cmd';
+    	    $tagname	= 'sql';
         }		// true
         else
             $tagname    = '';
@@ -1395,20 +1389,53 @@ class Name extends Record
         // or an instance of Family that had not been inserted into the
         // database at the time the Name was created, check to see if
         // the Person or Family has subsequently been created.
-        if ($this->row['idir'] == 0 && $this->person)
-            $this->row['idir']      = $this->person['idir']; 
-        if ($this->row['idmr'] == 0 && $this->family)
-            $this->row['idmr']      = $this->family['idmr'];
+        $idir                       = $this['idir'];
+        if ($idir == 0 && $this->person)
+        {
+            $idir                   = $this->person['idir']; 
+            $this['idir']      = $idir; 
+        }
+        $idmr                       = $this['idmr'];
+        if ($this['idmr'] == 0 && $this->family)
+        {
+            $idmr                   = $this->family['idmr'];
+            $this['idmr']      = $idmr;
+        }
+
+        // ensure the married surname of the wife is set
+        if ($idmr)
+        {                           // a married name
+            $family                 = $this->getFamily();
+            if ($this['surname'] == '' &&
+                $this['gender'] == Person::FEMALE)
+            {
+                switch($family['marriednamerule'])
+                {                   // depends upon married name rule
+                    case 1:
+                        $this['surname']    = $family['wifesurname'];
+                        break;
+
+                    case 1:
+                        $this['surname']    = $family['husbsurname'];
+                        break;
+
+                    default:
+                        $this['surname']    = 'Wifeof' .
+                strtolower($family['husbgivenname'] . $family['husbsurname']);
+                        break;
+                }                   // depends upon married name rule
+            }                       // married surname of wife empty
+        }                           // a married name
 
         // the instance of Name cannot be inserted into the database
         // if it does not have an associated Person, and for a "married name"
-        // instance, and associated Family record
-        if ($this->row['idir'] == 0 || 
-            ($this->row['order'] == -1 && $this->row['idmr'] == 0))
-        {
-			error_log("Name.inc: 1322 $warn\n",
+        // instance, an associated Family record
+        if ($this['idir'] == 0 || 
+            ($this['order'] == -1 && $this->row['idmr'] == 0))
+        {                           // not completely initialized
+			error_log("Name::save: " . __LINE__ . " $warn\n",
 			          3,
-			          $document_root . "/logs/updateIndivid.log");
+			          $document_root . "/logs/Name.log");
             $warn   .= "<p>Name::save: Update suppressed due to missing reference to individual or family.</p>\n";
             $backtrace          = debug_backtrace();
             foreach($backtrace as $call)
@@ -1423,12 +1450,12 @@ class Name extends Record
                     " called from line=" . $call['line'] . 
                     " of " . $call['file'] . "</p>\n";
             }                       // interpret backtrace
-            return 0;
-        }
+            return 0;               // no records updated
+        }                           // not completely initialized
 
     	// insert the record into the database if it does not already
     	// exists, otherwise update those fields that need to be updated
-    	if ($this->needInsert)
+    	if ($this->needInsert || $this['idnx'] == 0)
     	{		// create new record
     	    $fldnames		            = '';
     	    $values		                = '';
@@ -1500,34 +1527,53 @@ class Name extends Record
             }		// loop through all fields in record
 
     	    // ensure 'marriednamecreatedby' set correctly
-    	    if ($this->row['order'] == -1 &&
-    			$this->row['marriednamecreatedby'] == 0)
+    	    if ($this['order'] == -1 &&
+    			$this['marriednamecreatedby'] == 0)
             {
                 $gender             = $this['gender'];
     			if ($gender == Person::FEMALE)
-    			    $this->row['marriednamecreatedby'] == 1;
+    			    $this['marriednamecreatedby'] == 1;
     			else
     			if ($gender == Person::MALE)
-    			    $this->row['marriednamecreatedby'] == 0;
+    			    $this['marriednamecreatedby'] == 0;
     	    }
 
     	    // create the command to insert the new record into the database
     	    $insert 	= "INSERT INTO tblNX ($fldnames) VALUES($values)";
     	    $insertText	= debugPrepQuery($insert, $sqlParms);
+			error_log("Name::save: " . __LINE__ . " $insertText\n",
+			          3,
+			          $document_root . "/logs/Name.log");
+	        $backtrace          = debug_backtrace();
+	        foreach($backtrace as $call)
+	        {                       // interpret backtrace
+	            if (array_key_exists('class', $call) &&
+	                strlen($call['class']) > 0)
+	                $classPref      = $call['class'] . '::';
+	            else
+	                $classPref      = '';
+		        error_log("Name::save: " . __LINE__ . 
+			                    " function=$classPref" . $call['function'] .
+			                    " called from line=" . $call['line'] . 
+			                    " of " . $call['file'] . "\n",
+				          3,
+				          $document_root . "/logs/Name.log");
+			}                       // interpret backtrace
+            $this->lastSqlCmd   = $insertText;
 
     	    // insert the record into the database
-    	    $stmt		= $connection->prepare($insert);
+    	    $stmt		        = $connection->prepare($insert);
     	    if ($stmt->execute($sqlParms))
     	    {		        	// successful insert
-    			$count		= $stmt->rowCount();
+    			$count		    = $stmt->rowCount();
     			if ($xml)
     			    print "<$tagname count='$count'>" .
     							xmlentities($insertText) .
     					  "</$tagname>\n";
     			if ($debug)
     			{
-    			    $warn	.= "<p>" . htmlentities($insertText) . "</p>\n";
-    			    $warn	.= "<p>count=$count</p>\n";
+    			    $warn	    .= "<p>" . htmlentities($insertText) . "</p>\n";
+    			    $warn	    .= "<p>count=$count</p>\n";
     			}
 
     			$this->changed		= array();	// reset
@@ -1538,7 +1584,7 @@ class Name extends Record
     			// update primary key value in record,
     			// as it was previously 0
     			$idnx			    = $connection->lastInsertId();
-    			$this->row['idnx']	= $idnx;
+    			$this['idnx']	    = $idnx;
 
     			if ($xml)
     			    print "<$tagname idnx='$idnx'>lastInsertId</$tagname>\n";
@@ -1571,7 +1617,7 @@ class Name extends Record
     			    if ($debug)
     					$warn	    .= "<p>$queryText</p>\n";
     			    $this->row		= $stmt->fetch();
-    			    $idnx		    = $this->row['idnx'];
+    			    $idnx		    = $this['idnx'];
     			}		    // successful query
     			else
     			{		    // error performing query
@@ -1617,6 +1663,40 @@ class Name extends Record
     					break;
     			    }   	// set under 'surname'
 
+    				case 'idnr':
+    				case 'idir':
+    				case 'order':
+    				case 'marriednamecreatedby':
+    				case 'preferredaka':
+    				case 'idmr':
+    				case 'srchtag':
+                    case 'qstag':
+                    {               // numeric fields
+                        if (is_string($value))
+                        {
+                            $value      = trim($value);
+                            if (strlen($value) == 0)
+                                $value  = 0;
+                            else
+                            if (ctype_digit($value) ||
+                                (substr($value, 0, 1) == '-' &&
+                                 ctype_digit(substr($value, 1))))
+                                $value      = (int)$value;
+                            else
+                            if ($value == 'on')
+                                $value      = 1;
+                            else
+                                $value      = 0;
+                        }
+                        else
+                        if (!is_int($value))
+                            $value          = 0;
+    					$set		        .= $comma . "`$fieldLc`=:$fieldLc";
+    					$sqlParms[$fieldLc]	= $value;
+    					$comma		    	= ', ';
+    					break;
+                    }               // numeric fields
+
     			    default:
     			    {	    // other fields
     					$set		        .= $comma . "`$fieldLc`=:$fieldLc";
@@ -1629,8 +1709,8 @@ class Name extends Record
     	    $this->changed	= array();	// reset
 
     	    // ensure 'marriednamecreatedby' set correctly
-    	    if ($this->row['order'] == -1 &&
-    			$this->row['marriednamecreatedby'] == 0)
+    	    if ($this['order'] == -1 &&
+    			$this['marriednamecreatedby'] == 0)
             {               // correct setting of MarriedNameCreatedBy
                 $gender         = $this['gender'];
     			$set	        .= "$comma`marriednamecreatedby`=:createdby";
@@ -1642,19 +1722,22 @@ class Name extends Record
 
     	    if (strlen($set) > 0)
     	    {	        	// changes made to contents of record
-    			$sqlParms['idnx']	= $this->row['idnx'];
+    			$sqlParms['idnx']	= $this['idnx'];
     			$update		        = "UPDATE tblNX SET $set WHERE IDNX=:idnx";
     			$updateText	        = debugPrepQuery($update, $sqlParms);
+                $this->lastSqlCmd   = $updateText;
 
     			// update the record
     			$stmt		        = $connection->prepare($update);
     			if ($stmt->execute($sqlParms))
     			{		    // update successful
     			    $count		    = $stmt->rowCount();
-    			    if ($xml)
+                    if ($xml)
+                    {
     					print "<$tagname count='$count'>" .
     							xmlentities($updateText) .
-    					      "</$tagname>\n";
+                                "</$tagname>\n";
+                    }
     			    if ($debug)
                         $warn	    .= "<p>Name::save: " . __LINE__ .
                                        " SQL='$updateText', count=$count</p>\n";
@@ -1662,9 +1745,29 @@ class Name extends Record
     			    // log the update
     			    logSqlUpdate($update,
     							 $sqlParms,
-    							 $this->row['idnx'],
+    							 $this['idnx'],
     							 json_encode($this->former),
     							 json_encode($this->row));
+                    error_log("Name::save: " . __LINE__ . " '$updateText'\n" .
+    							 'former=' . json_encode($this->former) . "\n" .
+    							 'row=' . json_encode($this->row) . "\n",
+			          3,
+			          $document_root . "/logs/Name.log");
+        $backtrace          = debug_backtrace();
+        foreach($backtrace as $call)
+        {                       // interpret backtrace
+            if (array_key_exists('class', $call) &&
+                strlen($call['class']) > 0)
+                $classPref      = $call['class'] . '::';
+            else
+                $classPref      = '';
+	        error_log("Name::save: " . __LINE__ . 
+		                    " function=$classPref" . $call['function'] .
+		                    " called from line=" . $call['line'] . 
+		                    " of " . $call['file'] . "\n",
+			          3,
+			          $document_root . "/logs/Name.log");
+		}                       // interpret backtrace
     			}		    // update successful
     			else
     			{		    // error updating record
@@ -1688,9 +1791,9 @@ class Name extends Record
     {
         if (is_null($this->person))
         {
-            $idir               = $this->row['idir'];
+            $idir               = $this['idir'];
             if ($idir > 0)
-                $this->person	= new Person(array('idir' => $idir));
+                $this->person	= Person::getPerson($idir);
         }
     	return $this->person;
     }		//		function Name::getPerson
@@ -1706,9 +1809,9 @@ class Name extends Record
      ********************************************************************/
     function getFamily()
     {
-        if ($this->row['order'] == -1 && is_null($this->family))
+        if ($this['order'] == -1 && is_null($this->family))
         {
-            $idmr               = $this->row['idmr'];
+            $idmr               = $this['idmr'];
             if ($idmr > 0)
                 $this->family	= new Family(array('idmr' => $idmr));
         }
@@ -1724,7 +1827,7 @@ class Name extends Record
     {
         if (is_null($this->surnameRec))
         {
-            $surname            = $this->row['surname'];
+            $surname            = $this['surname'];
             $this->surnameRec   = new Surname(array('surname' => $surname));
             $this->surnameRec->save(false);
         }
@@ -1764,7 +1867,7 @@ class Name extends Record
 		{
 		    if (is_string($prime) && strlen($prime) > 0)
 		    {
-				$keyvalue	= $this->row[$prime];
+				$keyvalue	= $this[$prime];
 				$retval		= "    <$top $prime='$keyvalue'>\n";
 		    }
 		    else
@@ -1784,14 +1887,14 @@ class Name extends Record
             else
             if ($key == 'marriednamecreatedby')
             {
-                if ($this->row['order'] < 0)
+                if ($this['order'] < 0)
                 {                       // married name record
 	                $retval	.= "\t<$key>";
 	                if ($value == 0)
 	                    $retval	.= "0=not a married name";
 	                else
 	                if ($value == 1)
-	                    $retval	.= "1=rule generated married name";
+	                    $retval	.= "1=replace wife's surname with husband's";
 	                else
 	                if ($value == 2)
 	                    $retval	.= "2=user created married name";
@@ -1833,26 +1936,60 @@ class Name extends Record
 		$comma		= "{\n";
 		foreach($this->row as $key => $value)
         {
-            if ($key == 'idnr'||        // fields unused by this implementation
-                $key == 'soundslike'||
-                $key == 'birthsd'||
-                $key == 'srchtag'||
-                $key == 'qstag')
-                continue;
-		    if (is_numeric($value))
-		    {
-				if ((strlen($value) == 1 || substr($value, 0, 1) != '0'))
-				    $retval		.= $comma . "\t\"$key\":\t$value";
-				else
-				{		// handle values with leading 0
-				    $retval		.= $comma . "\t\"$key\":\t\"$value\"";
-				}		// handle values with leading 0
-		    }
-		    else
-		    {
-				$retval		.= $comma . "\t\"$key\":\t" .
-							   json_encode($value);
-		    }
+            switch($key)
+            {                       // act on specific fields
+                case 'idnr':        // fields unused by this implementation
+                case 'soundslike':
+                case 'birthsd':
+                case 'srchtag':
+                case 'qstag':
+                    break;
+
+                case 'order':
+                {
+                    $retval		        .= "$comma\t\"$key\":\t$value";
+                    $retval             .= ",\n\t\"means\":\t";
+                    if ($value == -1)
+                        $retval         .= "\"Married Name\"";
+                    else
+                    if ($value == 0)
+                        $retval         .= "\"Primary Name\"";
+                    else
+                    if ($value > 0)
+                        $retval         .= "\"AKA Name\"";
+                    else
+                        $retval         .= "\"Undefined value\"";
+                    break;
+                }                   // order
+
+                case 'marriednamecreatedby':
+                case 'idmr':
+                {
+                    if ($this['order'] != -1)
+                        break;      // ignore
+				    $retval		.= "$comma\t\"$key\":\t$value";
+                    break;
+                }                   // married name created by
+
+                default:
+                {
+				    if (is_numeric($value))
+				    {
+                        if ((strlen($value) == 1 ||
+                             substr($value, 0, 1) != '0'))
+						    $retval		.= "$comma\t\"$key\":\t$value";
+						else
+						{		// handle values with leading 0
+						    $retval		.= "$comma\t\"$key\":\t\"$value\"";
+						}		// handle values with leading 0
+				    }
+				    else
+				    {
+						$retval		.= "$comma\t\"$key\":\t" .
+									   json_encode($value);
+		            }
+                }                   // other fields
+            }                       // act on specific fields
 		    $comma		= ",\n";
         }
 

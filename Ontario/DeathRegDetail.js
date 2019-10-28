@@ -195,28 +195,6 @@ var	DurationAbbrs = {
 window.onload	= onLoadDeath;
 
 /************************************************************************
- * specify style for tinyMCE editing									*
- ************************************************************************/
-tinyMCE.init({
-		mode			: "textareas",
-		theme			: "advanced",
-		plugins 		: "spellchecker,advhr,preview", 
-
-		// Theme options - button# indicated the row# only
-		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-		forced_root_block	: false,
-		forced_root_block	: false,
-		content_css		: "/styles.css"
-
-});
-
-/************************************************************************
  *  function onLoadDeath												*
  *																		*
  *  This function is called when the web page has been loaded into the	*

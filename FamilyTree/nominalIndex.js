@@ -183,7 +183,7 @@ function onLoad()
 
     // invoke script to obtain initial list of names for selection list
     update();
-}		// onLoad
+}		// function onLoad
 
 /************************************************************************
  *  function suppressSubmit												*
@@ -198,7 +198,7 @@ function onLoad()
 function suppressSubmit()
 {
     return false;
-}		// suppressSubmit
+}		// function suppressSubmit
 
 /************************************************************************
  *  function onKeyDownName												*
@@ -215,8 +215,8 @@ function onKeyDownName(event)
 {
     if (timer)
 		clearTimeout(timer);
-    timer	= setTimeout(update, 700);
-}		// onKeyDownName
+    timer	= setTimeout(update, 900);
+}		// function onKeyDownName
 
 /************************************************************************
  *  function changeTree													*
@@ -234,36 +234,33 @@ function changeTree()
     if (this.value == '[new]')
     {			// create new tree
 		// ask user for name of new tree
-		var dialogDiv	= document.getElementById('msgDiv');
-		if (dialogDiv)
-		{		// have popup <div> to display message in
-		    var parms	= {"template"	: ""};
-		    displayDialog(dialogDiv,
-						  'CreateTree$template',
-						  parms,
-						  this,			// position relative to
-						  null,			// button cancels request
-						  false);		// default show on open
-		    var	treeNameElt	= document.getElementById('newTreeName');
-		    treeNameElt.focus();
-		    treeNameElt.onchange	= newTreeNameChanged;
-		}		// have popup <div> to display message in
-		else
-		    alert("nominalIndex.js: changeTree: Error: no msgDiv");
-    }			// create new tree
+		var dialog  = displayDialog('CreateTreeTemplate',
+		            			    [],         // no parms
+		            			    this,		// position relative to
+		            			    null,		// button cancels request
+                                    true);      // defer display
+        var forms                   = dialog.getElementsByTagName('form');
+        form                        = forms[0];
+		var	treeNameElt	            = form.newTreeName;
+		treeNameElt.focus();
+		treeNameElt.onchange	    = newTreeNameChanged;
+		dialog.style.visibility	    = 'visible';
+		dialog.scrollIntoView();
+        dialog.style.display 	    = 'block';
+    }			// display dialog to create new tree
     else
     {			// select existing tree
-		var	title	= document.getElementById('title');
+		var	title	                = document.getElementById('title');
 		if (this.value == '')
-		    title.innerHTML	= "Families of South-Western Ontario";
+		    title.innerHTML	        = "Families of South-Western Ontario";
 		else
 		if (this.value == '*')
-		    title.innerHTML	= "Families of All Trees";
+		    title.innerHTML	        = "Families of All Trees";
 		else
-		    title.innerHTML	= "Families of " + this.value;
+		    title.innerHTML	        = "Families of " + this.value;
 		update();	// update the display
     }			// select existing tree
-}		// changeTree
+}		// function changeTree
 
 /************************************************************************
  *  function newTreeNameChanged											*
@@ -441,7 +438,7 @@ function update()
 		option.innerHTML	= '[choose an individual]';
 		select.appendChild(option);
     }		// form present
-}		// update
+}		// function update
 
 /************************************************************************
  *  function gotNames													*
@@ -652,7 +649,7 @@ function gotNames(xmlDoc)
 		var	form	= document.nameForm;
 		popupAlert(msg, form.Name);
     }		// error
-}		// gotNames
+}		// function gotNames
 
 /************************************************************************
  *  function noNames														*
@@ -670,7 +667,7 @@ function noNames()
 
     popupAlert('No response file from ' + url,
 				form.Name);
-}		// noNames
+}		// function noNames
 
 /************************************************************************
  *  function onChangeIndivid											*
@@ -704,7 +701,7 @@ function onChangeIndivid()
 		    script		+= '&debug=Y';
 		location	= script;
     }			// individual selected
-}		// onChangeIndivid
+}		// function onChangeIndivid
 
 /************************************************************************
  *  function addUnrelated												*
@@ -727,4 +724,4 @@ function addUnrelated()
     if (debug.toLowerCase() == 'y')
 		script		+= '&debug=Y';
     location		= script;
-}		// addUnrelated
+}		// function addUnrelated

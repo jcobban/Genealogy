@@ -1,13 +1,13 @@
 <!--*********************************************************************
- *  CensusForm1906Displayen.html					*
- *									*
- *  Display a page from the 1906 census of Canada			*
- *									*
- *  History:								*
- *	2018/01/11	created						*
- *	2018/02/27	remove province display				*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  CensusForm1906Displayen.html										*
+ *																		*
+ *  Display a page from the 1906 census of Canada						*
+ *																		*
+ *  History:															*
+ *		2018/01/11		created											*
+ *		2018/02/27		remove province display							*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -42,21 +42,22 @@
       $MSG
       <!--- Put out a line with links to previous and next section of table -->
       <div class="center" id="frontPager">
-	<span class="left" id="npPrevFront">
-	    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
-		&lt;---
-	    </a>
-	</span>
-	<span class="right" id="npNextFront">
-	    <a href="/database/CensusForm.php$npNext" id="prenpnext">
-		---&gt;
-	    </a>
-	</span>
-	    dist $DISTRICT $DISTRICTNAME,
-	    subdist $SUBDISTRICT $SUBDISTRICTNAME,
-	    <span id="frontDiv">div $DIVISION </span>
-	    page $PAGE
-	</span>
+		<span class="left" id="npPrevFront">
+		    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
+			&lt;---
+		    </a>
+		</span>
+		<span class="right" id="npNextFront">
+		    <a href="/database/CensusForm.php$npNext" id="prenpnext">
+			---&gt;
+		    </a>
+		</span>
+        <span>
+		    dist $DISTRICT $DISTRICTNAME,
+		    subdist $SUBDISTRICT $SUBDISTRICTNAME,
+		    <span id="frontDiv">div $DIVISION </span>
+		    page $PAGE
+		</span>
       </div> <!-- id="frontPager"-->
     
       <!--- Put out the response as a table -->
@@ -414,21 +415,22 @@
       </form>
       <!--- Put out a line with links to previous and next section of table -->
       <div class="center" id="backPager">
-	<span class="left" id="npPrevBack">
-	    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
-		&lt;---
-	    </a>
-	</span>
-	<span class="right" id="npNextBack">
-	    <a href="/database/CensusForm.php$npNext" id="prenpnext">
-		---&gt;
-	    </a>
-	</span>
-	    dist $DISTRICT $DISTRICTNAME,
-	    subdist $SUBDISTRICT $SUBDISTRICTNAME,
-	    <span id="backDiv">div $DIVISION </span>
-	    page $PAGE
-	</span>
+		<span class="left" id="npPrevBack">
+		    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
+			&lt;---
+		    </a>
+		</span>
+		<span class="right" id="npNextBack">
+		    <a href="/database/CensusForm.php$npNext" id="prenpnext">
+			---&gt;
+		    </a>
+		</span>
+        <span>
+		    dist $DISTRICT $DISTRICTNAME,
+		    subdist $SUBDISTRICT $SUBDISTRICTNAME,
+		    <span id="backDiv">div $DIVISION </span>
+		    page $PAGE
+		</span>
       </div> <!-- id="backPager" -->
 
       <div id="comments">

@@ -6,8 +6,10 @@
  *																		*
  *  History:															*
  *		2019/05/05		created											*
+ *      2019/09/25      checkboxes must be both readonly for appearance *
+ *                      and disabled so they cannot be clicked          *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -62,17 +64,17 @@
 	  		  <td class="center">
 	  		    <input type="checkbox"
 	  						name="Used$idcp" id="Used$idcp"
-	  						readonly="readonly"> 
+	  						value="1" readonly="readonly" disabled="disabled"> 
 	  		  </td>
 	  		  <td class="center">
 	  		    <input type="checkbox"
 	  						name="tag1$idcp" id="tag1$idcp"
-	  						readonly="readonly"> 
+	  						value="1" readonly="readonly" disabled="disabled"> 
 	  		  </td>
 	  		  <td class="center">
 	  		    <input type="checkbox" 
 	  						name="qstag$idcp" id="qstag$idcp"
-	  						readonly="readonly"> 
+	  						value="1" readonly="readonly" disabled="disabled"> 
 	  		  </td>
 	        </tr>
 	      </tbody>
@@ -97,13 +99,13 @@
   						value="$relation">
   		</td>
   		<td class="center">
-  		    <input type="checkbox" name="Used$idcp">
+  		    <input type="checkbox" name="Used$idcp" value="1">
   		</td>
   		<td class="center">
-  		    <input type="checkbox" name="tag1$idcp">
+  		    <input type="checkbox" name="tag1$idcp" value="1">
   		</td>
   		<td class="center">
-  		    <input type="checkbox" name="qstag$idcp">
+  		    <input type="checkbox" name="qstag$idcp" value="1">
   		</td>
   		<td class="center">
   		</td>

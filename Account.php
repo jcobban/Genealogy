@@ -92,8 +92,7 @@ if (count($_GET) > 0)
 	    {		    // act on specific parameter
 			case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
                 break;
             }
         }
@@ -205,7 +204,8 @@ if (strlen($userid) > 0 && strlen($msg) == 0)
     $oldoptions		= $user->get('options');// user options
 
     $blogParms		= array('keyvalue'	=> $user->get('id'),
-            				'table'		=> 'Users');
+                            'table'		=> 'Users',
+                            'order'     => 'BL_Index DESC');
     $bloglist		= new RecordSet('Blogs', $blogParms);
     $blogCount		= $bloglist->count();
 }			        // signed on

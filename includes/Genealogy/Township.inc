@@ -103,7 +103,6 @@ class Township extends Record
 		global $msg;
 		global $connection;
 
-
 		$needInsert				= false;
 		$this->table			= 'Townships';
 		$domain					= null;
@@ -131,8 +130,8 @@ class Township extends Record
                         {
                             $domainObj	= $value;
                             if ($debug)
-                                $warn   .= $comma . "domain={" . 
-                                            $domainObj->getName()."}";
+                                $warn   .= $comma . "domain=Domain('" . 
+                                            $domainObj->getName()."')";
                         }
                         else
                         {
@@ -174,24 +173,25 @@ class Township extends Record
 				    {		// County abbreviation
 						if ($value instanceof County)
 						{
-                            $countyObj	= $value;
-                            $domainObj  = $countyObj->getDomainObj();
-                            $domain     = $domainObj['domain'];
-                            $prov       = $domainObj['prov'];
+                            $countyObj  	= $value;
+                            $domainObj      = $countyObj->getDomainObj();
+                            $domain         = $domainObj['domain'];
+                            $prov           = $domainObj['prov'];
                             if ($debug)
-                                $warn   .= $comma . "county={County " .
-                                                $countyObj->getName()."}";
-						    $county		= $countyObj->get('code');
+                                $warn       .= $comma . "county=County('" .
+                                                $countyObj->getName()."')";
+						    $county		    = $countyObj->get('code');
 						}
                         else
                         if (is_string($value))
                         {
                             if ($debug)
-                                $warn   .= $comma . "county='$value'";
-						    $countyObj	= new County(
-							                array('domain'	=> $domainObj,
-							                      'code'	=> $value));
-						    $county		= $value;
+                                $warn       .= $comma . "county='$value'";
+						    $countyObj	    = new County(
+							                    array('domain'	=> $domainObj,
+                                                      'code'	=> $value));
+                            if ($countyObj->isExisting())
+						        $county		= $value;
 						}
 						else
                         {
@@ -217,7 +217,7 @@ class Township extends Record
 				    {		// internal form of township name
 						$code		= $value;
                         if ($debug)
-                            $warn   .= $comma . "$fldname='$value'";
+                            $warn   .= $comma . "code='$value'";
 						break;
 				    }		// internal form of township name
 
@@ -225,12 +225,12 @@ class Township extends Record
 				    {		// external form of township name
 						$name		= $value;
                         if ($debug)
-                            $warn   .= $comma . "$fldname='$value'";
+                            $warn   .= $comma . "name='$value'";
 						break;
 				    }		// external form of township name
 
                 }		// act on specific field names
-                $comma      = ', ';
+                $comma              = ', ';
 		    }			// loop through all parameters
 		}			// valid first parameter
 		else
@@ -256,8 +256,8 @@ class Township extends Record
 		    $query	            = "SELECT * FROM Townships  " .
 				"WHERE `Domain`=:domain AND `County`=:county AND `Code`=:code";
             $sqlParms	        = array('domain'    => $domain, 
-                                'county'    => $county, 
-                                'code'      => $code);
+                                        'county'    => $county, 
+                                        'code'      => $code);
 		    if ($debug)
 		    {
                 $warn	        .= "<p>Township.inc " . __LINE__ .
@@ -303,7 +303,7 @@ class Township extends Record
 		else
 		if (count($parms) == count(self::$initRow))
 		{		// build from explicit array
-		    $dbrow	= $parms;
+		    $dbrow	            = $parms;
 		    $dbrow['domain']	= $domainObj->get('domain');
 		    $dbrow['county']	= $countyObj->get('code');
 		}		// build from explicit array

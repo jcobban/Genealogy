@@ -11,6 +11,7 @@ use \Iterator;
  *  Definition of a class representing a record in the Blogs table		*
  *  that represents a single blog entry.								*
  *																		*
+ *	CREATE TABLE `Blogs` (                                              *
  *		BL_Index		SERIAL,			# auto_increment				*
  *		BL_DateTime		DATETIME,		# date and time of post			*
  *		BL_UserName		VARCHAR(64),	# user name of poster			*
@@ -18,7 +19,12 @@ use \Iterator;
  *		BL_KeyName		VARCHAR(16),	# primary key name of table		*
  *		BL_KeyValue		INT(10),		# unique identifier of record	*
  *		BL_Text			TEXT,			# blog text						*
- *		BlogName		VARCHAR(255));	# subject or title line			*
+ *		BlogName		VARCHAR(255)	# subject or title line			*
+ *		PRIMARY KEY (`BL_Index`),						                *
+ *      UNIQUE KEY `BL_Index` (`BL_Index`),						        *
+ *      KEY `BL_UserName` (`BL_UserName`),						        *
+ *      KEY `BlogName` (`BlogName`) )						            *
+ *      ENGINE=InnoDB DEFAULT CHARSET=utf8						        *
  *																		*
  *  History:															*
  *		2010/10/21		created											*
@@ -48,6 +54,7 @@ use \Iterator;
  *		2018/09/12		add BlogName field								*
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/05/20      remove throw from constructor                   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -258,8 +265,8 @@ class Blog extends Record
 		}		// associative array
 		else
 		{		// unexpected parameter type
-		    throw new Exception('Blog::__construct: called with ' .
-							    print_r($parms, true));
+		    $this->msg  .= 'Blog::__construct: called with ' .
+							    print_r($parms, true);
 		}		// unexpected parameter type
 
 		$this->needInsert	= $needInsert;

@@ -158,7 +158,7 @@ if (strlen($msg) == 0)
         }	// no next page of output to display
 
         // display the results
-        $element            = $template->getElementById('location');
+        $element            = $template['location$IDLR'];
         $rowHtml            = $element->outerHTML();
         $data               = '';
 		foreach($locations as $idlr => $loc)

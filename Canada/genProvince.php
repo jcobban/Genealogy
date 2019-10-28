@@ -41,8 +41,9 @@ use \Exception;
  *		2018/01/01		support language parameter						*
  *		2018/01/04		remove Template from template file names		*
  *		2019/02/21      use new FtTemplate constructor                  *
+ *		2019/07/22      support ISO format of Domain code               *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -66,42 +67,50 @@ $domainName		= 'Canada: Ontario:';	// domain name
 $stateName		= 'Ontario';        	// state/province name
 $lang		    = 'en';	                // language code
 
-foreach ($_GET as $key => $value)
-{			            // loop through all parameters
-	switch(strtolower($key))
-	{		            // act on specific parameters
-	    case 'code':
-	    {		        // state postal abbreviation
-			if (preg_match('/[a-zA-Z]{2,3}/', $value))
-			    $domain		= 'CA' . $value;
-			break;
-	    }		        // state postal abbreviation
-
-	    case 'domain':
-	    case 'regdomain':
-	    {		        // domain code
-			if (preg_match('/[a-zA-Z]{4,5}/', $value))
-			    $domain		= $value;
-			break;
-	    }		        // domain code
-
-	    case 'lang':
-	    {		        // language code
-			if (strlen($value) >= 2)
-			    $lang	= strtolower(substr($value,0,2));
-			break;
-	    }		        // language code
-	}		            // act on specific parameters
-}			            // loop through all parameters
-
-$domainObj		= new Domain(array('domain'	    => $domain,
-								   'language'	=> $lang));
-$cc			    = substr($domain, 0, 2);
-$code		    = substr($domain, 2, 2);
-$countryObj		= new Country(array('code' => $cc));
-$countryName	= $countryObj->getName($lang);
-$stateName		= $domainObj->getName(0);
-$domainName		= $domainObj->getName(1);
+// if invoked by method=get process the parameters
+if (count($_GET) > 0)
+{	        	    // invoked by URL to display current status of account
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach ($_GET as $key => $value)
+	{			            // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{		            // act on specific parameters
+		    case 'code':
+		    {		        // state postal abbreviation
+				if (preg_match('/[a-zA-Z]{2,3}/', $value))
+				    $domain		= 'CA' . $value;
+				break;
+		    }		        // state postal abbreviation
+	
+		    case 'domain':
+		    case 'regdomain':
+		    {		        // domain code
+				if (preg_match('/[a-zA-Z]{4,5}/', $value))
+	                $domain		= $value;
+	            else
+				if (preg_match('/([a-zA-Z]{2})-([a-zA-Z]{2,3})/', $value, $matches))
+	                $domain		= $matches[1] . $matches[2];
+	
+				break;
+		    }		        // domain code
+	
+		    case 'lang':
+		    {		        // language code
+				if (strlen($value) >= 2)
+				    $lang	= strtolower(substr($value,0,2));
+				break;
+		    }		        // language code
+		}		            // act on specific parameters
+	}			            // loop through all parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display current status of account
+print $warn;
 
 $tempBase		= $document_root . '/templates/';
 $includeSub		= "genProvince$domain$lang.html";
@@ -109,6 +118,7 @@ if (!file_exists($tempBase . "genProvince{$domain}en.html"))
 {                   // domain code not supported
     $includeSub = "genProvince$lang.html";
 }                   // domain code not supported
+
 if (!file_exists($tempBase . $includeSub))
 {	    		            // no template for domain in chosen language
 	$includeSub	            = "genProvince{$domain}en.html";
@@ -125,7 +135,17 @@ if (!file_exists($tempBase . $includeSub))
 	    }	    	        // no template for country in chosen language
 	}	    	            // no template for domain in English
 }			                // no template for domain in chosen language
+
 $template		= new FtTemplate($includeSub);
+
+$domainObj		= new Domain(array('domain'	    => $domain,
+								   'language'	=> $lang));
+$cc			    = substr($domain, 0, 2);
+$code		    = substr($domain, 2, 2);
+$countryObj		= new Country(array('code' => $cc));
+$countryName	= $countryObj->getName($lang);
+$stateName		= $domainObj->getName(0);
+$domainName		= $domainObj->getName(1);
 
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('PROVINCENAME',	$stateName);

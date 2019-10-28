@@ -1,0 +1,339 @@
+<!--*********************************************************************
+ *  WmbDetailUpdateen.html												*
+ *																		*
+ *  Template to display the contents of a Wesleyan Methodist Baptism    *
+ *  as a detail form with optional ability to update the record.		*
+ *																		*
+ *  History:															*
+ *		2019/07/11		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+      	Genealogy
+      </a>:
+      <a href="/Canada/CountriesEdit.php?lang=$LANG">
+        List of Supported Countries
+      </a>:
+      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">
+      	Canada
+      </a>:
+      <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">
+      	Ontario
+      </a>:
+      <a href="/displayPage.php?template=WmbQuery&amp;lang=$LANG">
+        Wesleyan Methodist Baptism Query
+      </a>:
+      <a href="/Ontario/WmbVolStats.php&amp;lang=$LANG">
+        Statistics by Volume
+      </a>:
+      <a href="/Ontario/WmbPageStats.php?volume=$VOLUME&amp;lang=$LANG">
+        Volume $VOLUME
+      </a>:
+      <a href="/Ontario/WmbStats.php?lang=$LANG">
+        Status 
+      </a>:
+      <a href="/Ontario/WmbResponse.php?volume=$VOLUME&Page=$PAGE&amp;lang=$LANG">
+		Volume $VOLUME Page $PAGE"
+      </a>:
+    </div>
+	 <div class='body'>
+	   <h1>
+	  <span class='right'>
+		<a href='WmbDetailHelpen.html' target='help'>? Help</a>
+	  </span>
+	        Wesleyan Methodist Baptism: Display
+	   </h1>
+	  $TRACE
+	  $MSG
+	  <form action='donothing.php'
+				method='post' 
+				name='distForm' id='distForm'
+				enctype='multipart/form-data'>
+		<p>
+		  <button type='button' id='Previous'><u>P</u>revious</button>
+			&nbsp;
+		  <button type='button' id='Next'><u>N</u>ext</button>
+			&nbsp;
+		  <button type='button' id='NewQuery'>New <u>Q</u>uery</button>
+		  <input name='IDMB' id='IDMB' type='hidden'
+					value='$IDMB'>
+		  <input type='hidden' name='Debug' id='Debug'
+							value='$DEBUG'/>
+		  <input type='hidden' name='lang' id='lang'
+							value='$LANG'/>
+		</p>
+		<div class='row' id='VolPageRow'>
+		  <div class='column1'>
+			<label class='labelSmall' for='Volume'>Volume:</label>
+			<input name='Volume' id='Volume'
+					type='text' size='2' maxlength='4'
+					value='$VOLUME' 
+					class='$TXTLEFTCLASS' 
+					readonly="readonly"/>
+		  </div>
+		  <div class='column2'>
+			<label class='labelSmall' for='Page'>Page:</label>
+			<input name='Page' id='Page'
+					type='text' size='3' maxlength='5' 
+					value='$PAGE' 
+					class='$TXTLEFTCLASS' 
+					readonly="readonly"/>
+		  </div>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row' id='DistrictRow'>
+		  <div class='column1'>
+			<label class='labelSmall' for='District'>District:</label>
+			<input name='District' id='District'
+					type='text' size='32' maxlength='128'
+					value='$DISTRICT' 
+					class='$TXTLEFTCLASS' 
+					readonly="readonly"/>
+		  </div>
+		  <div class='column2'>
+			<label class='labelSmall' for='Area'>Area:</label>
+			<input name='Area' id='Area'
+					type='text' size='32' maxlength='128' 
+					value='$AREA' 
+					class='$TXTLEFTCLASS' 
+					readonly="readonly"/>
+		  </div>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row' id='NameRow'>
+		  <div class='column1'>
+			<label class='labelSmall' for='GivenName'>Name: Given:</label>
+			<input name='GivenName' id='GivenName'
+					type='text' size='32' maxlength='40'
+					value='$GIVENNAME' 
+					class='$TXTLEFTCLASS' 
+					readonly="readonly"/>
+		  </div>
+		  <div class='column2'>
+			<label class='labelSmall' for='Surname'>Family:</label>
+			<input name='Surname' id='Surname'
+					type='text' size='20' maxlength='40' 
+					value='$SURNAME' 
+					class='$TXTLEFTCLASS' 
+					readonly="readonly"/>
+		  </div>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row' id='BirthDatePlaceRow'>
+		  <div class='column1'>
+			<label class='labelSmall' for='BirthDate'>Birth&nbsp;Date:</label>
+			<input name='BirthDate' id='BirthDate'
+					type='text' size='12' maxlength='32'
+					value='$BIRTHDATE'
+					class='$TXTLEFTCLASS'
+					readonly="readonly"/>
+		  </div>
+		  <div class='column2'>
+			<label class='labelSmall' for='BirthPlace'>Birth&nbsp;Place:</label>
+			<input name='BirthPlace' id='BirthPlace'
+					type='text' size='20' maxlength='128'
+					value='$BIRTHPLACE'
+					class='$TXTLEFTCLASSNC'
+					readonly="readonly"/>
+		  </div>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row' id='LinkRow'>
+		  <div class='column2'>
+			<label class='labelSmall' for='IDIR'>Link:</label>
+			<a href='/FamilyTree/Person.php?idir=$IDIR'
+					id='showLink' class='$GENDERCLASS'
+					target='_blank'>
+			    $LINKEDNAME
+			</a>
+			  <input type='hidden' id='IDIR' name='IDIR' 
+					value='$IDIR'>
+		  </div>
+			<button id='clearIdir' type='button'>Clear</button>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row'id='LinkRow'>
+		  <div class='column2'>
+			<label class='labelSmall' for='IDIR'>Link:</label>
+			<select name='IDIR' id='IDIR' rows='1'
+					class='$TXTLEFTCLASS'>
+			    <option value='0'>Possible matches to this registration:
+			    <option value='$IIDIR'
+					    class='$SEXCLASS'>
+			    $INAME
+			    </option>
+			</select>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row' id='BaptismDatePlaceRow'>
+		  <div class='column1'>
+            <label class='labelSmall' for='BaptismDate'>
+                Baptism&nbsp;Date:
+            </label>
+			<input name='BaptismDate' id='BaptismDate'
+					type='text' size='10' maxlength='32'
+					value='$BAPTISMDATE'
+					class='$TXTLEFTCLASS'
+					readonly="readonly"/>
+		  </div>
+		  <div class='column2'>
+            <label class='labelSmall' for='BaptismPlace'>
+                Baptism&nbsp;Place:
+            </label>
+			<input name='BaptismPlace' id='BaptismPlace'
+					type='text' size='20' maxlength='128'
+					value='$BAPTISMPLACE'
+					class='$TXTLEFTCLASSNC'
+					readonly="readonly"/>
+			</div>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row' id='FatherNameRow'>
+		  <div class='column1'>
+			<label class='labelSmall' for='Father'>Father's&nbsp;Name:</label>
+			<input name='Father' id='Father'
+					type='text' size='32' maxlength='48'
+					value='$FATHER'
+					class='$TXTLEFTCLASS'
+					readonly="readonly"/>
+		  </div>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row' id='MotherNameRow'>
+		  <div class='column1'>
+			<label class='labelSmall' for='Mother'>Mother's&nbsp;Name:</label>
+			<input name='Mother' id='Mother'
+					type='text' size='32' maxlength='48'
+					value='$MOTHER'
+					class='$TXTLEFTCLASS'
+					readonly="readonly"/>
+		  </div>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row' id='ResidenceRow'>
+		  <div class='column1'>
+			<label class='labelSmall' for='Residence'>Residence:</label>
+			<input name='Residence' id='Residence'
+					type='text' size='32' maxlength='48'
+					value='$RESIDENCE'
+					class='$TXTLEFTCLASS'
+					readonly="readonly"/>
+		  </div>
+		  <div style='clear: both;'></div>
+		</div>
+		<div class='row' id='MinisterRow'>
+		  <div class='column1'>
+			<label class='labelSmall' for='Minister'>Minister:</label>
+			<input name='Minister' id='Minister'
+					type='text' size='20' maxlength='48'
+					value='$MINISTER'
+					class='$TXTLEFTCLASS'
+					readonly="readonly"/>
+		  </div>
+		  <div style='clear: both;'></div>
+		</div>
+	  </form>
+	</div> <!-- end of <div id='body'> -->
+	<!--  The remainder of the web page consists of divisions containing
+	  context specific help.  These divisions are only displayed if the user
+	  requests help by pressing F1.  Including this information here ensures
+	  that the language of the help balloons matches the language of the
+	  input form.
+	-->
+	<div class='balloon' id='HelpGivenName'>
+	  <p>
+	    The Given Names of the child.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSurname'>
+	  <p>
+	    The Surname of the child.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpIDIR'>
+	  <p>
+	    This selection list offers a list of persons in the family tree database
+        who may correspond to this death registration.  Selecting an entry
+        in this
+        list will cause a citation to this registration to be added
+        to that person.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpBirthPlace'>
+	  <p>
+	    Birth place of child.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpBirthDate'>
+	  <p>
+	    Birth date of child.
+	    It is suggested that dates be entered consistently as day, 
+	    abbreviation of name of month, and year.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpFatherName'>
+	  <p>
+	    Name of father of child.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMotherName'>
+	  <p>
+	    Name of mother of child.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpMinister'>
+	  <p>
+	    Name of minister officiating at the baptism.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpRemarks'>
+	  <p>
+	    Any comments by the transcriber may be entered here.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpIDMB'>
+	  The sequential internal identification of the record.
+	</div>
+	<div class='balloon' id='HelpVolume'>
+	  The volume number within which the registration is found.
+	</div>
+	<div class='balloon' id='HelpPage'>
+	  The page number within the volume in which the registration is found.
+	</div>
+	<div class='balloon' id='HelpSubmit'>
+	  Clicking on this button commits the changes you have made to the database.
+	</div>
+	<div class='balloon' id='HelpReset'>
+      Clicking on this button resets the values of some fields to their
+      defaults.
+	</div>
+	<div class='balloon' id='HelpImage'>
+	  This field contains the location of the image of the associated original
+	  document.  This can be an absolute URL, starting with "http:" or a URL 
+	  relative to the
+	  http://$SERVER_NAME/Ontario/Images folder.
+	</div>
+	<div class='balloon' id='HelpShowImage'>
+	  Click on this button to see the original image of the registration.
+	</div>
+	<div class='balloon' id='HelpNext'>
+	  Click on this button to see the registration with the next higher
+	  registration number.
+	</div>
+	<div class='balloon' id='HelpPrevious'>
+	  Click on this button to see the registration with the next lower
+	  registration number.
+	</div>
+	<div class='balloon' id='HelpNewQuery'>
+	  Click on this button to issue a new query of the database.
+	</div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    </script>
+	<script src="/jscripts/js20/http.js"  language="JavaScript"></script>
+	<script src="/jscripts/CommonForm.js"  language="JavaScript"></script>
+	<script src="/jscripts/Ontario.js"  language="JavaScript"></script>
+	<script src="/jscripts/util.js"  language="JavaScript"></script>
+	<script src="WmbDetail.js"  language="JavaScript"></script>

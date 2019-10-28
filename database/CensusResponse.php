@@ -827,11 +827,11 @@ if ($showLine && $page)
 		$template->set('SUBDISTRICTNAME',	$SubDName);
 		$template->set('DIVISION',		$divId);
     }
-    $template->updateTag('respdescrows',	$respDescRows);
-    $template->updateTag('respdescsub',		$respDescSub);
-    $template->updateTag('respdescdiv',		$respDescDiv);
-    $template->updateTag('respdescfam',		$respDescFam);
-    $template->updateTag('respdescpage',	$respDescPage);
+    $template['respdescrows']->update(	$respDescRows);
+    $template['respdescsub']->update(		$respDescSub);
+    $template['respdescdiv']->update(		$respDescDiv);
+    $template['respdescfam']->update(		$respDescFam);
+    $template['respdescpage']->update(	$respDescPage);
     $template->set('CENSUS',			$censusYear);
     $template->set('SEARCH',			$search);
     $template->set('CONTACTTABLE',		'Census' . $censusYear);
@@ -843,96 +843,95 @@ if ($showLine && $page)
 		$template->set('IMAGE',	$image);
     }
     else
-		$template->updateTag('buttonRow', null);
+		$template['buttonRow']->update(null);
 
     if (strlen($npPrev) > 0)
     {
-		$template->updateTag('topPrev', 
+		$template['topPrev']->update( 
 						     array('npPrev' => "$npuri&$npPrev"));
-		$template->updateTag('botPrev', 
+		$template['botPrev']->update( 
 						     array('npPrev' => "$npuri&$npPrev"));
     }
     else
     {
-		$template->updateTag('topPrev', null);
-		$template->updateTag('botPrev', null);
+		$template['topPrev']->update(null);
+		$template['botPrev']->update(null);
     }
     if (strlen($npNext) > 0)
     {
-		$template->updateTag('topNext',
+		$template['topNext']->update(
 						     array('npNext' => "$npuri&$npNext"));
-		$template->updateTag('botNext', 
+		$template['botNext']->update( 
 						     array('npNext' => "$npuri&$npNext"));
     }
     else
     {
-		$template->updateTag('topNext', null);
-		$template->updateTag('botNext', null);
+		$template['topNext']->update(null);
+		$template['botNext']->update(null);
     }
 
     // update the popup for explaining the action taken by arrows
     if ($family)
     {
-		$template->updateTag('familyminusonepre',
+		$template['familyminusonepre']->update(
 						array('family - 1'=> ($family - 1)));
-		$template->updateTag('familyplusonepre',
+		$template['familyplusonepre']->update(
 						array('family + 1'=> ($family + 1)));
-		$template->updateTag('familyminusonepost',
+		$template['familyminusonepost']->update(
 						array('family - 1'=> ($family - 1)));
-		$template->updateTag('familyplusonepost',
+		$template['familyplusonepost']->update(
 						array('family + 1'=> ($family + 1)));
-		$template->updateTag('rowminuscountpre', null);
-		$template->updateTag('rowpluscountpre', null);
-		$template->updateTag('rowminuscountpost', null);
-		$template->updateTag('rowpluscountpost', null);
-		$template->updateTag('pageminusonepre', null);
-		$template->updateTag('pageplusonepre', null);
-		$template->updateTag('pageminusonepost', null);
-		$template->updateTag('pageplusonepost', null);
+		$template['rowminuscountpre']->update(null);
+		$template['rowpluscountpre']->update(null);
+		$template['rowminuscountpost']->update(null);
+		$template['rowpluscountpost']->update(null);
+		$template['pageminusonepre']->update(null);
+		$template['pageplusonepre']->update(null);
+		$template['pageminusonepost']->update(null);
+		$template['pageplusonepost']->update(null);
     }
     else
     if ($page)
     {
-		$template->updateTag('pageminusonepre',
+		$template['pageminusonepre']->update(
 						array('page - 1'=> ($page - 1)));
-		$template->updateTag('pageplusonepre',
+		$template['pageplusonepre']->update(
 						array('page + 1'=> ($page + 1)));
-		$template->updateTag('pageminusonepost',
+		$template['pageminusonepost']->update(
 						array('page - 1'=> ($page - 1)));
-		$template->updateTag('pageplusonepost',
+		$template['pageplusonepost']->update(
 						array('page + 1'=> ($page + 1)));
-		$template->updateTag('familyminusonepre', null);
-		$template->updateTag('familyplusonepre', null);
-		$template->updateTag('familyminusonepost', null);
-		$template->updateTag('familyplusonepost', null);
-		$template->updateTag('rowminuscountpre', null);
-		$template->updateTag('rowpluscountpre', null);
-		$template->updateTag('rowminuscountpost', null);
-		$template->updateTag('rowpluscountpost', null);
+		$template['familyminusonepre']->update(null);
+		$template['familyplusonepre']->update(null);
+		$template['familyminusonepost']->update(null);
+		$template['familyplusonepost']->update(null);
+		$template['rowminuscountpre']->update(null);
+		$template['rowpluscountpre']->update(null);
+		$template['rowminuscountpost']->update(null);
+		$template['rowpluscountpost']->update(null);
     }
     else
     {
-		$template->updateTag('rowminuscountpre',
+		$template['rowminuscountpre']->update(
 						 array('offset - limit + 1' => ($offset - $limit + 1)));
-		$template->updateTag('rowpluscountpre',
+		$template['rowpluscountpre']->update(
 						 array('offset + limit + 1' => ($offset + $limit + 1)));
-		$template->updateTag('rowminuscountpost',
+		$template['rowminuscountpost']->update(
 						 array('offset - limit + 1' => ($offset - $limit + 1)));
-		$template->updateTag('rowpluscountpost',
+		$template['rowpluscountpost']->update(
 						 array('offset + limit + 1' => ($offset + $limit + 1)));
-		$template->updateTag('familyminusonepre', null);
-		$template->updateTag('familyplusonepre', null);
-		$template->updateTag('familyminusonepost', null);
-		$template->updateTag('familyplusonepost', null);
-		$template->updateTag('pageminusonepre', null);
-		$template->updateTag('pageplusonepre', null);
-		$template->updateTag('pageminusonepost', null);
-		$template->updateTag('pageplusonepost', null);
+		$template['familyminusonepre']->update(null);
+		$template['familyplusonepre']->update(null);
+		$template['familyminusonepost']->update(null);
+		$template['familyplusonepost']->update(null);
+		$template['pageminusonepre']->update(null);
+		$template['pageplusonepre']->update(null);
+		$template['pageminusonepost']->update(null);
+		$template['pageplusonepost']->update(null);
     }
 
     if (strlen($msg) > 0)
-		$template->updateTag('buttonForm', null);
+		$template['buttonForm']->update(null);
     else
-		$template->updateTag('Row$i',
-						     $result);
+		$template['Row$i']->update($result);
     $template->display();

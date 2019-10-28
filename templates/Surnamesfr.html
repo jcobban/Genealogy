@@ -37,15 +37,13 @@
     $TRACE
     $MSG
     <!--- Put out the response as a table -->
-    <table id="namesTable">
-      <tr id="row">
-		<td class="button" id="asurname">
+    <div id="namesTable" class="grid$MAXCOLS">
+		<div class="button" id="asurname">
 		    <a href="/FamilyTree/Names.php?Surname=$USURNAME&lang=fr">
 				$SURNAME 
 		    </a>
-		</td>
-      </tr>
-    </table>
+		</div>
+    </div>
     <p class="label" id="nomatches">Aucun Noms de famille a correspondu.</p>
   </div> <!-- class="body" -->
   <div class="hidden" id="templates">

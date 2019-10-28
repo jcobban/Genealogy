@@ -1,0 +1,365 @@
+<!--*********************************************************************
+ *  editNameUpdateen.html												*
+ *																		*
+ *  Template to display a web page for editting one alternate name		*
+ *  for an individual from the Legacy database which is represented		*
+ *  by an instance of Name (a record in table tblNX).					*
+ * 																		*
+ *  History: 															*
+ *		2019/08/06		created											*
+ *      2019/09/25      add value="1" to checkboxes                     *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+              Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+              Services
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+              Nominal Index
+      </a>:
+      <a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG"
+                id="personLink">
+              $PERSONNAME
+      </a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+          <a href="editNameHelpen.html" target="help">? Help</a>
+        </span>
+        Edit $TYPE Name for $PERSONNAME
+      </h1>
+      $TRACE
+      $MSG
+      <form name="nameForm" id="nameForm"
+            action="updateName.php" method="post">
+        <div id="hidden">
+          <input type="hidden" name="idir" id="idir"
+                    value="$IDIR">
+          <input type="hidden" name="idnx" id="idnx"
+                    value="$IDNX">
+          <input type="hidden" name="idime" id="idime"
+                    value="$IDNX">
+          <input type="hidden" name="citType" id="citType"
+                    value="10">
+        </div> <!-- type="hidden" -->
+        <div class="row" id="SurnameRow">
+          <label class="column1" for="surname">
+                Surname:
+          </label>
+          <input type="text" name="surname" id="surname" size="32"
+                    maxlength="120" class="white left"
+                    value="$SURNAME">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="GivenRow">
+          <label class="column1" for="givenName">
+                Given Name:
+          </label>
+          <input type="text" name="givenName" id="givenName" size="50"
+                    maxlength="120" class="white left"
+                    value="$GIVENNAME">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="namePrefixRow">
+          <label class="column1" for="prefix">
+            Name Prefix:
+          </label>
+          <input type="text" name="prefix" id="prefix"
+                    size="16" class="white left"
+                    maxlength="120"
+                    value="$PREFIX">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="nameSuffixRow">
+          <label class="column1" for="title">
+            Name Suffix:
+          </label>
+          <input type="text" name="title" id="title"
+                    size="16" class="white left" maxlength="120"
+                    value="$NAMETITLE">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="UserrefRow">
+          <label class="column1" for="userref">
+            User Reference:
+          </label>
+          <input type="text" name="userref" id="userref"
+                    size="16" class="white left" maxlength="50"
+                    value="$USERREF">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="OrderRow">
+          <label class="column1" for="order">
+            Order:
+          </label>
+          <input type="text" name="order" id="order"
+                    size="6" class="ina rightnc" 
+                    readonly="readonly" value="$ORDER">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="PreferredRow">
+          <label class="column1" for="preferredaka">
+            Preferred AKA:
+          </label>
+          <input type="checkbox" name="preferredaka" id="preferredaka"
+                 value="1" $PREFERREDAKACHECKED>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="notesRow">
+          <label class="column1" for="akanote">
+                Notes:
+          </label>
+          <textarea name="akanote" id="akanote"
+                    cols="64" rows="4">$NOTES</textarea>
+          <div style="clear: both;"></div>
+        </div>
+        <table id="citTable">
+          <thead>
+            <tr>
+                <th class="left">
+                    Citations:
+                </th>
+                <th class="center">
+                    Source Name
+                </th>
+                <th class="center">
+                    Details (Page)
+                </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="sourceRow$IDSX" >
+              <td id="firstButton$IDSX">
+                <button type="button"
+                            id="editCitation$IDSX">
+                    Edit Citation
+                </button>
+              </td>
+              <td id="sourceCell$IDSX">
+                <input type="text" name="Source$IDSX"
+                            id="Source$IDSX"
+                            class="ina leftnc"
+                            value="$SRCTITLE"
+                            readonly="readonly"
+                            size="50">
+              </td>
+              <td>
+                <input type="text" name="Page$IDSX"
+                            id="Page$IDSX"
+                            class="white leftnc"
+                            value="$DETAIL"
+                            size="32">
+              </td>
+              <td>
+                <button type="button"
+                            id="delCitation$IDSX">
+                    Delete Citation
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <button type="button" id="AddCitation">
+                    <u>A</u>dd Citation
+                </button>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+        <p>
+          <button type="update" id="updName">
+            <u>U</u>pdate Name
+          </button>
+            &nbsp;
+          <button type="button" id="Clear">
+            <u>C</u>lear&nbsp;Notes
+          </button>
+        </p>
+      </form>
+    </div> <!-- id="body" -->
+    <div id="cittemplates" class="hidden">
+      <table>
+        <tbody>
+          <!-- The following is the template for what a new citation looks
+          *    like before the user enters the citation description
+          -->
+          <tr id="sourceRow$rownum" >
+            <th>
+            </th>
+            <td>
+                  <select name="Source$rownum" id="Source$rownum"
+                          class="white left">
+                  </select>
+            </td>
+            <td>
+                  <input type="text" name="Page$rownum" id="Page$rownum"
+                          class="white leftnc" value="$detail" size="32">
+                  <input type="hidden" name="idime$rownum" id="idime$rownum"
+                          value="$idime">
+                  <input type="hidden" name="type$rownum" id="type$rownum" 
+                          value="$type">
+            </td>
+          </tr>
+          <!-- The following is the template for what a citation looks
+          *    like after the user enters the citation description
+          *    This should match exactly the layout for existing citations
+          *    as formatted by above.
+          -->
+          <tr id="sourceRow$idsx" >
+            <td>
+              <button type="button"
+                      id="editCitation$idsx">
+                  Edit Citation
+              </button>
+            </td>
+            <td>
+              <input type="text" name="Source$idsx" id="Source$idsx"
+                      class="ina leftnc"
+                      value="$title"
+                      readonly="readonly"
+                      size="50">
+            </td>
+            <td>
+              <input type="text" name="Page$idsx" id="Page$idsx"
+                      class="white leftnc"
+                      value="$page"
+                      size="32">
+            </td>
+            <td>
+              <button type="button"
+                      id="delCitation$idsx">
+                  Delete Citation
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+          
+      <!-- template for confirming the deletion of an event-->
+      <form name="ClrInd$template" id="ClrInd$template">
+        <p class="message">$msg</p>
+        <p>
+          <button type="button" id="confirmClear$type">
+              OK
+          </button>
+          <input type="hidden" 
+                    id="formname$type" name="formname$type"
+                    value="$formname">
+          &nbsp;
+          <button type="button" id="cancelDelete$type">
+              Cancel
+          </button>
+        </p>
+      </form>
+
+      <span id="invalididnx">Invalid IDNX value '$IDNX'</span>
+
+      <div id="types">
+          <span data-key="-1">Married</span>
+          <span data-key="0">Primary</span>
+          <span data-key="1">Alternate</span>
+          <span data-key="invalid">Invalid</span>
+          <span data-key="missing">Missing</span>
+      </div>
+    </div> <!-- end of <div id="cittemplates"> -->
+    <div class="balloon" id="Helpprefix">
+		This field is used to supply a name prefix, such as an honorific or
+		indicator of rank or profession.  Typical examples include:
+		Capt., Col., Dr., Elder, Father, Lord, Lt. Col., Major, Miss, Mr., Mrs.,
+		Rev'd, or Sister.
+    </div>
+    <div class="balloon" id="Helptitle">
+		This field is used to supply a name suffix.  Typical examples include:
+		J'r, Jr., Jun., S'r, Sen., Sr., III, IV, K.C., M.D.
+    </div>
+    <div class="balloon" id="Helpsurname">
+		This field is used to update the alternate surname of an individual.
+    </div>
+    <div class="balloon" id="HelpgivenName">
+		This field is used to update the alternate given name of an individual.
+    </div>
+    <div class="balloon" id="Helporder">
+        The order field specifies the position within the list of alternate
+        names for the current individual.  At present there is no mechanism
+        to change this.
+    </div>
+    <div class="balloon" id="Helpuserref">
+        This field permits assigning a distinct user reference identifier
+        to this alternate name.
+    </div>
+    <div class="balloon" id="Helppreferredaka">
+        This field permits identifying this entry as the preferred
+        alternate name.
+    </div>
+    <div class="balloon" id="HelpSource">
+		Read-only field displaying one of the master sources
+		cited for this fact or event.
+    </div>
+    <div class="balloon" id="HelpSourceSel">
+		This is a selection list used to identify a source which documents
+        this event.  If you need to reference a source which has not
+        previously been
+		referenced in the database you can scroll up to the first entry in the
+        selection list which says "Add New Source".  A short cut for this is
+        pressing the letter "A" while the focus is in this selection list.
+    </div>
+    <div class="balloon" id="HelpPage">
+		Field displaying the page number within the master source
+		that documents this fact or event.
+    </div>
+    <div class="balloon" id="HelpeditCitation">
+		Clicking on this button pops up a dialog to edit the details of the
+		citation.
+    </div>
+    <div class="balloon" id="HelpdelCitation">
+		Clicking on this button deletes this citation.
+    </div>
+    <div class="balloon" id="HelpAddCitation">
+		Clicking on this button adds a row to the citation table that permits
+		selecting the master source and specifying the page within that source
+		that documents the current fact or event.
+    </div>
+    <div class="balloon" id="HelpaddCitation">
+		Clicking on this button adds a row to the citation table that permits
+		selecting the master source and specifying the page within that source
+		that documents the current fact or event.
+    </div>
+    <div class="balloon" id="HelpupdName">
+		Clicking on this button applies all of the changes made to this
+		or name and closes the dialog.  Note that pressing the Enter key while
+		editting any text field in this dialog also performs this function.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+		Clicking on this button applies all of the changes made to this name
+		displays the XML returned by the script updateName.php. 
+		Note that pressing the Enter key while
+		editting any text field in this dialog also performs this function.
+    </div>
+    <div class="balloon" id="HelpClear">
+		Clicking on this button, or alternatively using the keyboard shortcut
+        Alt-C, clears all of the text from the notes field associated with
+        this event.
+    </div>
+    <div id="loading" class="popup">
+		Loading...
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    </script>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/Cookie.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/editName.js" type="application/javascript">
+    </script>

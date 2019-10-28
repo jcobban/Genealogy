@@ -1,0 +1,160 @@
+<!--*********************************************************************
+ *  grantUserfr.html													*
+ *																		*
+ *  Template to display a web page for reporting the results of a grant *
+ *  of authority to update an individual, his/her spouses, his/her      *
+ *  descendants, and his/her ancestors.									*
+ *																		*
+ *  History:															*
+ *		2019/07/15		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=fr">
+			Génealogie
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=fr">
+			Services
+      </a>:
+      <a href="/genCountry.php?cc=CA&lang=fr">
+			Canada
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=fr">
+			Indice Nominale
+      </a>:
+      <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=fr">
+			Surnoms qui commencent avec '$PREFIX'
+      </a>:
+      <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=fr">
+			Surnom '$SURNAME'
+      </a>:
+      <a href="/FamilyTree/Person.php?idir=$IDIR&lang=fr">
+			$NAME
+      </a>:
+    </div>
+
+    <div class="body">
+      <h1>
+        <span class="right">
+		  <a href="grantUserHelpen.html" target="help">? Help</a>
+        </span>
+        <span id="grantTitle">
+            Accorder l'Accès à $NAME à $GRANTEENAME
+        </span>
+        <span id="deniedTitle">
+            Accès Refusé à $NAME
+        </span>
+        <span id="idirTitle">
+            Valeur invalid de IDIR=$IDIR
+        </span>
+        <span id="granteeTitle">
+            Bénéficiaire invalid grantee=$GRANTEENAME
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <p id="notOwner" class="message">
+          Vous n'êtes pas un propriétaire actuel de cette personne et 
+          vous ne pouvez donc pas en attribuer la propriété à un autre 
+          utilisateur.
+      </p>
+      <p id="grantMain">
+          Accorder l'accès à 
+		  <a href="Person.php?idir=$IDIR"
+				class="$CLASS">
+				$NAME
+		  </a>
+          à  $GRANTEENAME.
+      </p>
+      <p id="alreadyMain">
+          Précédemment accordé l'accès à  
+		  <a href="Person.php?idir=$IDIR"
+				class="$CLASS">
+				$NAME
+		  </a>
+		  à  $GRANTEENAME.
+      </p>
+      $CONTENTS
+      <p id="confirmationOK">
+      Courriel de confirmation envoyé à $GRANTEEMAIL et $USERMAIL.
+      </p>
+      <p id="confirmationFailed" class="message">
+      Impossible d'envoyer un courriel à $GRANTEEMAIL et $USERMAIL.
+      </p>
+      <form name="grantForm">
+        <button type="button" class="button" id="Close">Fermer</button>
+      </form>
+    </div> <!-- class="body" -->
+    <div id="templates" class="hidden">
+      <p id="grantSpouse">
+        Accorder l'accès à  $ROLE de $NAME
+		<a href="Person.php?idir=$SPSID"
+				class="$SPSCLASS">
+				$SPSNAME
+		</a>
+        à  $GRANTEENAME.
+      </p>
+      <p id="alreadySpouse">
+        Précédemment accordé l'accès à $ROLE de $NAME
+		<a href="Person.php?idir=$SPSID"
+				class="$SPSCLASS">
+				$SPSNAME
+		</a>
+		à $GRANTEENAME.
+      </p>
+      <p id="grantChild">
+        Accorder l'accès à  $RANK $ROLE
+		<a href="Person.php?idir=$CID"
+				class="$CCLASS">
+				$CNAME
+		</a>
+        à $GRANTEENAME.
+      </p>
+      <p id="alreadyChild">
+        Précédemment accordé l'accès à $RANK $ROLE
+		<a href="Person.php?idir=$CID"
+				class="$CCLASS">
+				$CNAME
+		</a>
+		à $GRANTEENAME.
+      </p>
+      <p id="grantFather">
+      Accorder l'accès à  $RANKpere
+		<a href="Person.php?idir=$FIDIR" class="male">
+				$FNAME
+		</a>
+		à $GRANTEENAME.
+      </p>
+      <p id="alreadyFather">
+      Précédemment accordé l'accès à $RANKpere
+		<a href="Person.php?idir=$FIDIR" class="male">
+				$FNAME
+		</a>
+		à $GRANTEENAME.
+      </p>
+      <p id="grantMother">
+        Accorder l'accès à $RANKmere.
+		<a href="Person.php?idir=$MIDIR" class="male">
+				$MNAME
+		</a>
+		à $GRANTEENAME.
+      </p>
+      <p id="alreadyMother">
+        Précédemment accordé l'accès à $RANKmother
+		<a href="Person.php?idir=$MIDIR" class="male">
+				$MNAME
+		</a>
+		à $GRANTEENAME.
+      </p>
+
+      <span id="invalidIdir">Invalid Value of IDIR=$idir.</span>
+      <span id="invalidGrantee">Invalid grantee=$granteeName. </span>
+
+    </div> <!-- id="templates" -->
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/grantUser.js" type="application/javascript">
+    </script>
+

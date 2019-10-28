@@ -53,12 +53,15 @@
 	        </span>
 	      <div style='clear: both;'></div>
 	    </div> <!-- left and right arrow links -->
-	    <p>
-	      <label class='label' for='pattern' style='width: 10em;'>Pattern:</label>
+	    <div class="row">
+	      <label class='label' for='pattern' style='width: 10em;'>
+              Pattern:
+          </label>
 	      <input type='text' id='pattern' name='pattern' 
-		  value='$PATTERN'
-		  class='white leftnc' size=24' maxlength='256'>
-  
+		        value='$PATTERN'
+		    class='white leftnc' size=24' maxlength='256'>
+	      <div style='clear: both;'></div>
+        </div>
 	    <table class='form' id='dataTable'>
 	      <!--- Put out the column headers -->
 	      <thead>
@@ -108,10 +111,12 @@
 		      </button> 
 		  </td>
 		  <td class='left'>
-		      <a class='button' href='/genCountry.php?cc=$code&amp;lang=fr'
-			            target="_blank" style="min-width: 350px; display: inline-block; text-align: left;">
+		    <a class='button'
+                    href='/genCountry.php?cc=$code&amp;lang=fr'
+			        target="_blank" 
+                    style="min-width: 350px; text-align: left;">
 			  Généalogie $name
-		      </a> 
+		    </a> 
 		  </td>
 		  <td class='center'>
 		      <button type='button' id='Delete$code'>

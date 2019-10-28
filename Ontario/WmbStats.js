@@ -57,7 +57,7 @@ function loadStats()
  ************************************************************************/
 function showStatus()
 {
-    location	= "WmbDistrictStats.php?district=" + encodeURIComponent(this.id.substring(17));
+    location	= "WmbDistrictStats.php?district=" + encodeURIComponent(this.value);
     return false;	// suppress default action
 }		// showStatus
 

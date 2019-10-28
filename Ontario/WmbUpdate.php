@@ -150,7 +150,7 @@ require_once __NAMESPACE__ . '/common.inc';
 							'limit'		=> 1);
 		    $citations	= new CitationSet($parms,
 								  'IDSX');
-		    $info	= $list->getInformation();
+		    $info	= $citations->getInformation();
 		    $count	= $info['count'];
 		    $count	= $parms['count'];
 		    if ($count > 0)

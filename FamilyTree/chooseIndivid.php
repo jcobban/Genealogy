@@ -86,288 +86,264 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/11/19      change Help.html to Helpen.html                 *
+ *		2019/09/09      do not report birthmin -9999 as an error        *
+ *		                get message texts from template                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    // default values
-    $idir	= 0;
-    $idmr	= '';
-    $family	= null;
-    $name	= '';		// explicit initial position in list
-    $gender	= '';
-    $birthmin	= '';
-    $birthmax	= '';
-    $birthyear	= null;
-    $treename	= '';
-    $range	= 1;
+// default values
+$idir								= null;
+$idirtext                           = '';
+$idmr								= null;
+$idmrtext                           = '';
+$family								= null;
+$name								= '';		// initial position in list
+$gender								= '';
+$birthmin							= null;
+$birthmintext						= '';
+$birthmax							= null;
+$birthmaxtext						= '';
+$birthyear							= null;
+$birthyeartext						= '';
+$rangetext                          = '';
+$treename							= '';
+$range								= 1;
+$lang                               = 'en';
 
-    // check input parameters
+// check input parameters
+if (count($_GET) > 0)
+{
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {			// loop through all parameters
-		switch($key)
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
 		{		// act on specific input key
 		    case 'name':
 		    {		// initial name specified as surname, givenname
-				$name		= $value;
+				$name		        = $value;
 				break;
 		    }		// initial name specified as surname, givenname
 
-		    case 'parentsIdmr':
+		    case 'parentsidmr':
 		    {		// family to add a child to
-				if (strlen($value) > 0)
-				    if (ctype_digit($value))
-				    {
-						$idmr		= $value;
-						$family		= new Family(array('idmr' => $idmr));
-						if (!$family->isExisting())
-						    $msg	.= "No database record for parentsIdmr=$idmr. ";
-				    }
-				    else
-						$msg	.= "Invalid value of parentsIdmr=$value. ";
+                if (ctype_digit($value))
+                    $idmr		    = (int)$value;
+                else
+                    $idmrtext       = $value;
 				break;
 		    }		// family to add a child to
 
 		    case 'idir':
 		    {		// initial individual specified by IDIR
-				if (strlen($value) > 0) 
-				{	// value present
-				    if (ctype_digit($value))
-				    {	// syntactically valid
-						$idir		= $value;
-						$person		= new Person(array('idir' => $idir));
-						if ($person->isExisting())
-						{
-						    $surname	= $person->getSurname();
-						    $givenname	= $person->getGivenName();
-
-						    if (strlen($surname) <= 1)
-						    {		// no surname, only wife's given
-							$lgiven	= strlen($givenname) - 6;
-							if ($lgiven < 8)
-							    $lgiven	= 8;
-						    	$name	= ", " . 
-								  substr($givenname, 0, $lgiven);
-						    }		// no surname, only wife's given
-						    else
-						    if (substr($givenname, 0, 4) == 'Mary')
-						    {		// names starting with 'Ma' too common
-							$name	= $surname . ", Mary";
-						    }		// names starting with 'Ma' too common
-						    else
-						    if (strlen($givenname) > 2)
-							$name	= $surname . ", " .
-									substr($givenname, 0, 2);
-						    else
-							$name	= $surname . ", " . $givenname;
-						    $gender	= $person->getGender();
-						    if ($gender == Person::MALE)
-							$gender	= 'M';
-						    else
-						    if ($gender == Person::FEMALE)
-							$gender	= 'F';
-						}	// existing
-						else
-						{	// error creating individual
-						    $msg	.= "No record for idir=" . $idir . ": " .
-								   $e->getMessage();
-						}	// error creating individual
-				    }	// syntactically valid
-				    else
-						$msg	.= "Invalid value of idir=$value. ";
-				}	// value present
+                if (ctype_digit($value))
+                    $idir		    = (int)$value;
+                else
+                    $idirtext       = $value;
 				break;
 		    }		// default individual specified
 
 		    case 'birthyear':
 		    {		// birth year specified
-				if (strlen($value) > 0 && preg_match('#\d{4}#', $value) != 1)
-				    $msg	.= "Birth year=$value invalid. ";
-				else
-				    $birthyear	= intval($value);
+			    if (ctype_digit($value) && $value > 1700)
+                    $birthyear		= (int)$value;
+                else
+                    $birthyeartext  = $value;
 				break;
 		    }		// birth year specified
 
 		    case 'birthmin':
 		    {		// minimum birth year specified
-				if (strlen($value) > 0 && preg_match('#\d{4}#', $value) != 1)
-				    $msg	.= "Minimum Birth Year=$value invalid. ";
-				else
-				    $birthmin	= $value;
+			    if (preg_match('/^-?\d+$/', $value))
+                    $birthmin		= (int)$value;
+                else
+                    $birthmintext   = $value;
 				break;
 		    }		// minimum birth year specified
 
 		    case 'birthmax':
 		    {		// maximum birth year specified
-				if (preg_match('#\d{4}#', $value) != 1)
-				    $msg	.= "Maximum Birth year=$value invalid. ";
-				else
-				    $birthmax	= $value;
+			    if (preg_match('/^-?\d+$/', $value))
+                    $birthmax		= (int)$value;
+                else
+                    $birthmaxtext   = $value;
 				break;
 		    }		// maximum birth year specified
 
 		    case 'range':
 		    {		// range of birth years specified
-				if (preg_match('#\d{1,2}#', $value) != 1)
-				    $msg	.= "Birth year range=$value invalid. ";
-				else
-				    $range	= intval($value);
+			    if (ctype_digit($value) && $value <= 99)
+                    $range		    = (int)$value;
+                else
+                    $rangetext      = $value;
 				break;
 		    }		// range of birth years specified
 
 		    case 'treename':
 		    {		// subdivision of database
-				$treename	= $value;
+				$treename	        = $value;
 				break;
-		    }		// subdivision of database
-		}		// act on specific input key
-    }			// loop through all parameters
+            }		// subdivision of database
 
-    // if birth year is specified and explicit birth range not
-    // supplied then calculate the explicit birth range from the
-    // estimated birth year and the range
-    if (strlen($birthmin) == 0 && !is_null($birthyear))
-		$birthmin	= $birthyear - $range;
-    if (strlen($birthmax) == 0 && !is_null($birthyear))
-		$birthmax	= $birthyear + $range;
-    if (strlen($birthmin) != 0)
+            case 'lang':
+            {
+                $lang               = FtTemplate::validateLang($value);
+                break;
+            }
+
+		}		    // act on specific input key
+    }			    // loop through all parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display current status of account
+
+$template           = new FtTemplate("chooseIndivid$lang.html");
+
+// complete processing of IDIR
+if ($idir)
+{                   // syntactically valid
+	$person		                    = new Person(array('idir' => $idir));
+	if ($person->isExisting())
+	{               // existing Person
+	    $surname	                = $person->getSurname();
+	    $givenname	                = $person->getGivenName();
+
+	    if (strlen($surname) <= 1)
+	    {		        // no surname, only wife's given
+			$lgiven	                = strlen($givenname) - 6;
+			if ($lgiven < 8)
+			    $lgiven	= 8;
+		    $name	                = ", " .  substr($givenname, 0, $lgiven);
+	    }		        // no surname, only wife's given
+	    else
+	    if (substr($givenname, 0, 4) == 'Mary')
+	    {		        // names starting with 'Ma' too common
+		    $name	                = $surname . ", Mary";
+	    }		        // names starting with 'Ma' too common
+	    else
+	    if (strlen($givenname) > 2)
+		    $name	             = $surname . ", " . substr($givenname, 0, 2);
+	    else
+		    $name	                = $surname . ", " . $givenname;
+	    $gender	                    = $person->getGender();
+	    if ($gender == Person::MALE)
+		    $gender	                = 'M';
+	    else
+	    if ($gender == Person::FEMALE)
+		    $gender	                = 'F';
+	}	                // existing Person
+	else
+	{	                // error creating individual
+        $text                       = $template['noPerson']->innerHTML;
+        $msg	                    .= str_replace('$idir', $idir, $text);
+	}	                // error creating individual
+}	                    // syntactically valid
+else
+if (strlen($idirtext) > 0)
+{                       // invalid IDIR value
+    $text                           = $template['badIdir']->innerHTML;
+    $msg	                        .= str_replace('$idir', $idirtext, $text);
+}                       // invalid IDIR value
+
+// complete processing of IDMR
+if ($idmr)
+{                       // syntactically valid
+	$family		                    = new Family(array('idmr' => $idmr));
+    if (!$family->isExisting())
     {
-		if (strlen($birthmax) == 0)
-		    $birthmax	= $birthmin + 1;
-		else
-		if ($birthmax < $birthmin)
-		    $msg	.= "Maximum birth year $birthmax less than minimum birth year $birthmin. ";
+        $text                       = $template['noFamily']->innerHTML;
+        $msg	                    .= str_replace('$idmr', $idmr, $text);
     }
-    else
-    if (!is_null($family))
-    {			// get range from parents birth years
-		$husbbirthsd= $family->get('husbbirthsd');
-		$wifebirthsd= $family->get('wifebirthsd');
+}                       // syntactically valid
+else
+if (strlen($idmrtext) > 0)
+{                       // invalid IDMR value
+    $text                           = $template['badIdmr']->innerHTML;
+    $msg	                        .= str_replace('$idmr', $idmrtext, $text);
+}                       // invalid IDMR value
 
-		if ($husbbirthsd != 0 && $husbbirthsd != -99999999)
-		{	// have father's birth date
-		    $birthmin	= floor($husbbirthsd/10000)+15;
-		    $birthmax	= floor($husbbirthsd/10000)+65;
-		}	// have father's birth date
-		else
-		if ($wifebirthsd != 0 && $wifebirthsd != -99999999)
-		{	// have mother's birth date
-		    $birthmin	= floor($wifebirthsd/10000)+15;
-		    $birthmax	= floor($wifebirthsd/10000)+55;
-		}	// have mother's birth date
-		else
-		{
-		    $birthmin	= 1750;
-		    $birthmax	= 1900;
-		}
-    }			// get range from parents birth years
+if (strlen($birthyeartext) > 0 )
+{                       // invalid birth year value
+    $text                           = $template['badBirthYear']->innerHTML;
+    $msg	                        .= str_replace('$birthyear', $birthyeartext, $text);
+}                       // invalid birth year value
+if (strlen($birthmintext) > 0 )
+{                       // invalid min birth year value
+    $text                           = $template['badBirthMin']->innerHTML;
+    $msg	                        .= str_replace('$birthmin', $birthmintext, $text);
+}                       // invalid min birth year value
+if (strlen($birthmaxtext) > 0 )
+{                       // invalid max birth year value
+    $text                           = $template['badBirthMax']->innerHTML;
+    $msg	                        .= str_replace('$birthmax', $birthmaxtext, $text);
+}                       // invalid max birth year value
+if (strlen($rangetext) > 0)
+{                       // invalid birth range value
+    $text                           = $template['badRange']->innerHTML;
+    $msg	                        .= str_replace('$range', $rangetext, $text);
+}                       // invalid birth range value
 
-    htmlHeader('Choose Existing Person',
-				array(  '/jscripts/js20/http.js',
-						'/jscripts/util.js',
-						'chooseIndivid.js'),
-				true);
-?>
-<body>
-  <div class="body">
-    <h1>Choose Existing Person
-		<span class="right">
-		    <a href="chooseIndividHelpen.html">Help?</a>
-		</span>
-    </h1>
-<?php
-    showTrace();
+// if birth year is specified and explicit birth range not
+// supplied then calculate the explicit birth range from the
+// estimated birth year and the range
+if (is_null($birthmin) && !is_null($birthyear))
+	$birthmin	            = $birthyear - $range;
+if (is_null($birthmax) && !is_null($birthyear))
+	$birthmax	            = $birthyear + $range;
+if (!is_null($birthmin))
+{
+	if (is_null($birthmax))
+	    $birthmax	        = $birthmin + 1;
+	else
+	if ($birthmax < $birthmin)
+    {                   // birth range out of order
+        $text               = $template['badOrder']->innerHTML;
+        $msg	            .= str_replace(array('$birthmin','$birthmax'),
+                                           array($birthmin, $birthmax),
+                                           $text);
+    }                   // birth range out of order
+}
+else
+if (!is_null($family))
+{			// get range from parents birth years
+	$husbbirthsd            = $family->get('husbbirthsd');
+	$wifebirthsd            = $family->get('wifebirthsd');
 
-    if (strlen($msg) > 0)
-    {
-?>
-      <p class="message">
-		<?php print $msg; ?> 
-      </p>
-<?php
-    }
-?>
-  <form name="indForm" action="getIndivNamesXml.php" method="get">
-      <div class="row" id="searchRow">
-		<label class="column1" for="Name">Name:</label>
-		  <input type="text" name="Name" id="Name" size="64" class="white left"
-				value="<?php print str_replace('"', '&quot;', $name); ?>">
-		  <input type="hidden" name="Sex" id="Sex"
-				value="<?php print $gender; ?>">
-		  <input type="hidden" name="IDIR" id="IDIR"
-				value="<?php print $idir; ?>">
-		  <input type="hidden" name="parentsIdmr" id="parentsIdmr" 
-				value="<?php print $idmr; ?>">
-		  <input type="hidden" name="treename" id="treename"
-				value="<?php print str_replace('"', '&quot;', $treename); ?>">
-		<div style="clear: both;"></div>
-      </div>
-      <div class="row" id="birthYearRow">
-		<label class="column1" for="birthmin">Birth Year Range:</label>
-		<input class="white rightnc" size="4" name="birthmin" id="birthmin"
-				value="<?php print $birthmin; ?>">
-		<span class="label" for="birthmax">to</span>
-		<input class="white rightnc" size="4" name="birthmax" id="birthmax"
-				value="<?php print $birthmax; ?>">
-		<div style="clear: both;"></div>
-      </div>
-      <div class="Row" id="selectListRow">
-		<label class="column1" for="individ">Select:</label>
-		  <select name="individ" id="individ" size="10" class="white left">
-		    <option value="0">Choose a Person</option>
-		  </select>
-		<div style="clear: both;"></div>
-      </div>
-      <div class="Row" id="buttonRow">
-		  <button type="button" id="select">
-		    Cancel
-		  </button>
-		<div style="clear: both;"></div>
-      </div>
-  </form>
-</div>
-<?php
-    dialogBot();
-?>
-<div id="templates" class="hidden">
-  <!-- the following two templates exist to permit internationalization
-		of the button text -->
-  <button type="button" id="selectSelectTemplate">
-    Select
-  </button>
-  <button type="button" id="selectCancelTemplate">
-    Cancel
-  </button>
-</div> <!-- id="templates" -->
-<div id="HelpName" class="balloon">
-<p>Enter the partial name of the individual you wish to choose.  Enter the
-surname first, then a comma followed by the given name.  As you pause in
-typing the name the selection list is updated from the database.
-</div>
-<div id="Helpindivid" class="balloon">
-<p>This is a selection list of individuals presented in alphabetical order
-starting with the first individual whose surname is equal to the supplied
-surname or sorts immediately after it, and if the surname is equal
-the first individual whose given name is equal to or sorts immediately
-after the supplied given name.  Click on an entry with the mouse to choose it.
-</div>
-<div id="Helpselect" class="balloon">
-<p>Once you have chosen the desired individual from the list, click on this
-button, or press enter, to select the individual.
-</div>
-<div id="Helpbirthmin" class="balloon">
-<p>This field specifies the lowest birth year to use in matching individuals.
-If this field is blank there is no lower limit.
-</div>
-<div id="Helpbirthmax" class="balloon">
-<p>This field specifies the highest birth year to use in matching individuals.
-If this field is blank there is no upper limit.
-</div>
-<div id="loading" class="popup">
-Loading...
-</div>
-</body>
-</html>
+	if ($husbbirthsd != 0 && $husbbirthsd != -99999999)
+	{	// have father's birth date
+	    $birthmin	        = floor($husbbirthsd/10000) + 15;
+	    $birthmax	        = floor($husbbirthsd/10000) + 65;
+	}	// have father's birth date
+	else
+	if ($wifebirthsd != 0 && $wifebirthsd != -99999999)
+	{	// have mother's birth date
+	    $birthmin	        = floor($wifebirthsd/10000) + 15;
+	    $birthmax	        = floor($wifebirthsd/10000) + 55;
+	}	// have mother's birth date
+	else
+	{
+	    $birthmin	        = 1750;
+	    $birthmax	        = 1900;
+	}
+}			// get range from parents birth years
+
+$template['otherStylesheets']->update(array('filename', 'chooseIndivid'));
+
+$template->set('NAME',              $name);
+$template->set('GENDER',            $gender);
+$template->set('IDIR',              $idir);
+$template->set('IDMR',              $idmr);
+$template->set('TREENAME',          $treename);
+$template->set('BIRTHMIN',          $birthmin);
+$template->set('BIRTHMAX',          $birthmax);
+$template->set('LANG',              $lang);
+
+$template->display();

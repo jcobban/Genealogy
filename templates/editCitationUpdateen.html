@@ -1,0 +1,144 @@
+<!--*********************************************************************
+ *  editCitation.php													*
+ * 																		*
+ *  Display a web page for editting a specific citation to a source.	*
+ * 																		*
+ *  History: 															*
+ *		2019/07/28      created                                         *
+ * 																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='editCitation.css'>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+          Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+          Services
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=&treename=&lang=$LANG">
+          Nominal Index
+      </a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+          <a href="editCitationHelpen.html" target="help">? Help</a>
+        </span>
+          Edit Citation $NAME
+      </h1>
+      $TRACE
+      $MSG
+      <form name="citForm" id="citForm"
+                    action="updateCitation.php" method="post">
+        <div class="row" id="identRow">
+          <input type="hidden" name="idsx" id="idsx"
+                    value="$IDSX">
+          <label class="column1" for="Type">
+                Event Type:
+          </label>
+          <input type="hidden" name="Type" id="Type"
+                    value="$CITTYPE">
+          <span class="label">
+            $CITTYPETEXT
+          </span>
+          <label class="label" for="idime">
+            $CITKEY: 
+          </label>
+          <input type="text" name="idime" id="idime"
+                    size="6" maxlength="10"
+                    readonly="readonly" class="ina rightnc"
+                    value="$IDIME">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="sourceRow">
+          <label class="column1" for="IDSR">
+                Source:
+          </label>
+          <select name="IDSR" id="IDSR" class="white left"
+                    style="max-width: 600px;">
+            <option id="source$idsr" value="$idsr" $selected>
+                    $srcname
+            </option>
+          </select>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="detailRow">
+          <label class="column1" for="SrcDetail">
+                Page Id:
+          </label>
+          <input type="text" name="SrcDetail" id="SrcDetail"
+                    size="60" maxlength="255"
+                    class="white leftnc"
+                    value="$DETAIL">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="textRow">
+          <label class="column1">
+                Text of Source:
+          </label>
+          <textarea name="SrcDetText" id="SrcDetText" rows="4"
+                    cols="64">$DETAILTEXT</textarea>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="noteRow">
+          <label class="column1"> 
+                Comments:
+          </label>
+          <textarea name="SrcDetNote" id="SrcDetNote" rows="4"
+                    cols="64">$DETAILNOTE</textarea>
+          <div style="clear: both;"></div>
+        </div>
+        <p id="buttonRow">
+          <button type="button" id="update">
+            <u>U</u>pdate Citation
+          </button>
+            &nbsp;
+          <button type="button" id="Pictures">
+            <u>P</u>ictures
+          </button>
+          <input type="hidden" name="PicIdType" id="PicIdType" 
+                    value="41">
+        </p>
+      </form>
+    </div> <!--- class="balloon" -->
+    <div class="balloon" id="HelpIDSR">
+      Select the master source entry by name for this citation.
+    </div>
+    <div class="balloon" id="HelpType">
+      This field displays the type of event for which this is a citation.
+    </div>
+    <div class="balloon" id="Helpidime">
+      This read-only field displays the record number of the record that
+      contains the information about the associated fact or event.
+    </div>
+    <div class="balloon" id="HelpSrcDetail">
+      Enter the primary citation information, usually identifying the specific
+      page within the master source where the information is located.
+    </div>
+    <div class="balloon" id="HelpSrcDetText">
+      Enter the actual text from the source that documents this fact.
+    </div>
+    <div class="balloon" id="HelpSrcDetNote">
+      Enter comments or other information that is related to the citation, but
+      not found within the text of the source.
+    </div>
+    <div class="balloon" id="Helpupdate">
+      Click on this button, or use the keyboard short-cut Alt-U, to
+      apply the update.
+    </div>
+    <div class="balloon" id="HelpPictures">
+      Click this button to open a dialog for managing the pictures associated
+      with the citation.
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    </script>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/editCitation.js" type="application/javascript">
+    </script>

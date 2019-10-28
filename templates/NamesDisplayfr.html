@@ -86,10 +86,14 @@
     <form name="surnameForm" id="surnameForm"
 	  action="/FamilyTree/Names.php" method="get">
       <p>
-        <input type="hidden" name="Surname" 
-	            value="$SURNAME">
-        <input type="hidden" name="Edit" value="Y">
-        <input type="hidden" name="lang" value="$LANG">
+        <input type="hidden" name="idnr"    value="$IDNR">
+        <input type="hidden" name="Surname" value="$SURNAME">
+        <input type="hidden" name="Edit"    value="Y">
+        <input type="hidden" name="offset"  value="$OFFSET">
+        <input type="hidden" name="limit"   value="$LIMIT">
+        <input type="hidden" name="lang"    value="$LANG">
+        <input type="hidden" name="debug"   value="$DEBUG">
+
         <button type="submit" id="EditRecordButton">
 	      Modifi<u>E</u>r l'Enregistrement 
         </button>
@@ -169,18 +173,15 @@
   </div> <!-- left and right arrow links -->
     <p id="deletedUnused">Enregistrement non utilisé pour le nom '$SURNAME' supprimé</p>
     <!--- Put out the response as a table -->
-    <table id="namesTable">
-    <!--- Put out the column headers -->
-	  <tr id="row">
-	      <td class="button" id="entry">
+    <div id="namesTable" class="grid$MAXCOLS">
+	      <div class="button" id="entry">
 	  		<a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG"
 	  		   id="show$IDIR"
 	  		    class="$GENDER">
 	  		    $NAME
 	  		</a>
-	      </td>
-	  </tr>
-    </table>
+	      </div>
+    </div>
   </div> <!-- class="body" -->
   <div class="hidden" id="templates">
 	<span id="missing">Liste des Personnes Manquantes Paramètre de Nom de Famille</span>
@@ -193,73 +194,73 @@
 		<span data-key="unknown">inconnu</span>
     </div>
   </div> <!-- id="templates" -->
-  <div class="balloon" id="Helpidnr">
-    This field displays the internal record number which is used by other
-    records to link to this record
-  </div>
-  <div class="balloon" id="HelpSurname">
-	This field displays the surname of the record.
-  </div>
-  <div class="balloon" id="HelpSoundsLike">
-	This field displays the
+    <div class="balloon" id="Helpidnr">
+	  This field displays the internal record number which is used by other
+	  records to link to this record
+    </div>
+    <div class="balloon" id="HelpSurname">
+	  This field displays the surname of the record.
+    </div>
+    <div class="balloon" id="HelpSoundsLike">
+	  This field displays the
     <a href="https://en.wikipedia.org/wiki/Soundex">SOUNDEX</a>
-	code which is a representation of the surname
-	that ignores minor differences between surnames.
-  </div>
-  <div class="balloon" id="HelpPattern">
-	This field is used to manage a 
+	  code which is a representation of the surname
+	  that ignores minor differences between surnames.
+    </div>
+    <div class="balloon" id="HelpPattern">
+	  This field is used to manage a 
 	<a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> pattern that provides a
-	match which is more limited than the SoundsLike pattern.  Specifying
-	a pattern of 'Smith' will include any individuals whose surnames
+	  match which is more limited than the SoundsLike pattern.  Specifying
+	  a pattern of 'Smith' will include any individuals whose surnames
 	<em>contain</em> the text 'smith'.  For example it will match against
 	"Smithson" and "Sexsmith".  The
-	pattern "^Sm[aeiouy]th" matches any string that starts with "sm" 
-	followed by any vowel followed by the characters "th". 
-	For example it will match "Smythe" and "Smothers".
+	  pattern "^Sm[aeiouy]th" matches any string that starts with "sm" 
+	  followed by any vowel followed by the characters "th". 
+	  For example it will match "Smythe" and "Smothers".
 
-  </div>
-  <div class="balloon" id="HelpNotes">
-	This field permits editing a general description of the family sharing the
-	surname.
-  </div>
-  <div class="balloon" id="HelpUpdateRecordButton">
-	Click on this button to apply changes to the record for this family.
-  </div>
-  <div class="balloon" id="HelpEditRecordButton">
-	Click on this button to request an input form to modify the family record.
-  </div>
-  <div class="balloon" id="HelpsoundexLink">
-    Click on this link to see a list of surnames that have a similar
-    pronunciation to this one based upon the SOUNDEX algorithm.
-  </div>
-  <div class="balloon" id="Helpshow">
-    Click on this link to see detailed information about
-    the identified individual.
-  </div>
-  <div class="balloon" id="Help">
-	Click on this link to go to the described part of the web site.
-  </div>
-  <div class="balloon" id="Helpmessage">
-	Entrez toute information que vous souhaitez partager avec d'autres 
-    chercheurs travaillant sur cette famille.
-  </div>
-  <div class="balloon" id="HelpemailAddress">
-	If you are not signed in as a registered contributor to the web-site you
-	are required to supply an e-mail address to identify the source of any
-	blog messages you post.
-  </div>
-  <div class="balloon" id="HelpPostBlog">
-	Click on this button to post the message you have typed as a blog entry
-	against this individual.
-	The application also supports the keyboard shortcut Alt-B.
-  </div>
+    </div>
+    <div class="balloon" id="HelpNotes">
+	  This field permits editing a general description of the family sharing the
+	  surname.
+    </div>
+    <div class="balloon" id="HelpUpdateRecordButton">
+	  Click on this button to apply changes to the record for this family.
+    </div>
+    <div class="balloon" id="HelpEditRecordButton">
+	  Click on this button to request an input form to modify the family record.
+    </div>
+    <div class="balloon" id="HelpsoundexLink">
+	  Click on this link to see a list of surnames that have a similar
+	  pronunciation to this one based upon the SOUNDEX algorithm.
+    </div>
+    <div class="balloon" id="Helpshow">
+	  Click on this link to see detailed information about
+	  the identified individual.
+    </div>
+    <div class="balloon" id="Help">
+	  Click on this link to go to the described part of the web site.
+    </div>
+    <div class="balloon" id="Helpmessage">
+	  Entrez toute information que vous souhaitez partager avec d'autres 
+	  chercheurs travaillant sur cette famille.
+    </div>
+    <div class="balloon" id="HelpemailAddress">
+	  If you are not signed in as a registered contributor to the web-site you
+	  are required to supply an e-mail address to identify the source of any
+	  blog messages you post.
+    </div>
+    <div class="balloon" id="HelpPostBlog">
+	  Click on this button to post the message you have typed as a blog entry
+	  against this individual.
+	  The application also supports the keyboard shortcut Alt-B.
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    </script>
 	<script src="/jscripts/js20/http.js" type="text/javascript">
     </script>
 	<script src="/jscripts/util.js" type="text/javascript">
     </script>
 	<script src="/jscripts/CommonForm.js" type="text/javascript">
-    </script>
-	<script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript">
     </script>
 	<script src="/FamilyTree/Names.js" type="text/javascript">
     </script>

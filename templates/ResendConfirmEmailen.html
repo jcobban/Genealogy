@@ -34,16 +34,19 @@
     <span id="emailBody">
       <p>
 	You have not confirmed your registration by accessing the confirmation
-	page on jamescobban.net.  Since you may have forgotten your password,
+	page on jamescobban.net.  
+    There was a technical problem on the site which meant that the e-mail
+    requesting you to confirm your identity was not delivered.
+    Since you may have forgotten your password,
 	and the site does not know what you chose as a password when you
 	registered, the password on user name '$newuserid' has been reset to
-	'$newpassword'.  Since e-mail is not encrypted you should log on to
+	'$newpassword'.  Since this e-mail is not encrypted you should log on to
 	your account and change this password as soon as possible.
       </p>
       <p>
 	Please complete your registration for user name '$newuserid'
 	by verifying your e-mail address by clicking on the following link:  .
-	<a href="https://$servername/ConfirmEmail.php?userid=$newuserid&id=$id&hash=$shapassword">Confirm</a>
+	<a href="https://$servername/ConfirmEmail.php?userid=$newuserid&id=$id&confirm=$confirmid">Confirm</a>
       </p>
       <p>
 	Thank you.

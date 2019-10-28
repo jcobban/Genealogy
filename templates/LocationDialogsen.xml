@@ -23,12 +23,11 @@
 			   "formname"	: formname,
 			   "field"	: field};
 
-  	displayDialog(msgDiv,
-		      'NewLocationMsg$template',
-		      parms,
-		      element,		// position
-		      closeNewDialog,	// button closes dialog
-		      false);		// default show on open
+  	displayDialog('NewLocationMsg$template',
+    		      parms,
+    		      element,		// position
+    		      closeNewDialog,	// button closes dialog
+    		      false);		// default show on open
 -->
   <form name='NewLocationMsg$template' id='NewLocationMsg$template'>
     <p class='label'>$name</p>
@@ -46,12 +45,11 @@
 	var parms	= {"template"	: "",
 			   "name"	: name};
 
-	displayDialog(msgDiv,
-		      'ChooseLocationMsg$template',
-		      parms,
-		      element,		// position
-		      null,		// button closes dialog
-		      true);		// do not show yet
+	displayDialog('ChooseLocationMsg$template',
+    		      parms,
+    		      element,		// position
+    		      null,		// button closes dialog
+    		      true);		// do not show yet
 
 	// update selection list for choice
 	var	select	= document.getElementById('locationSelect');

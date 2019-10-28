@@ -1,0 +1,469 @@
+<!--*********************************************************************
+ *  ToDoDisplayen.html												    *
+ *																	    *
+ *  Display a web page containing details of an particular ToDo item    *
+ *  from the Legacy database.  If the current user is authorized to		*
+ *  edit the database, this web page supports that.						*
+ *																	    *
+ *  History:															*
+ *		2019/08/13		created                                         *
+ *      2019/09/25      checkboxes must be both readonly for appearance *
+ *                      and disabled so they cannot be clicked          *
+ *																	    *
+ *  Copyright &copy; 2018 James A. Cobban								*
+ **********************************************************************-->
+  <link rel="stylesheet" type="text/css" href="ToDo.css">
+  <div class="hidden" id="breadcrumbs">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+    <a href="/FamilyTree/ToDos.php?idir=$IDIR&amp;lang=$LANG">To Do items for $PERSONNAME</a>:
+  </div>
+  <div class="body">
+    <h1>
+      <span class="right">
+	<a href="ToDoHelpen.html" target="help">? Help</a>
+      </span>
+	    Edit To Do Item $TODONAME for $PERSONNAME
+    </h1>
+    <div class="hidden" id="General">General</div>
+    $TRACE
+    $MSG 
+    <form name="todoForm" id="todoForm" action="ToDo.php" method="get">
+      <div class="row" id="idtdRow">
+        <label class="column1" for="idtd">
+          IDTD:
+        </label>
+        <input type="text" name="idtd" id="idtd" readonly="readonly"
+              class="black ina rightnc" style="width: 8em;"
+              value="$IDTD">
+        <input type="hidden" name="debug" id="debug" value="$DEBUG">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="todoTypeRow">
+        <label class="column1" for="ToDoType">
+          Type:
+        </label>
+        <select name="ToDoType" id="ToDoType" size="1" readonly="readonly"
+              class="white rightnc">
+          <option value="0" $TDSELECTED0>
+			To Do Item
+		  </option>
+          <option value="1" $TDSELECTED1>
+			Correspondence
+		  </option>
+		  <option value="2" $TDSELECTED2>
+			Other
+		  </option>
+        </select>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="idirRow">
+		<label class="column1" for="IDIR">
+          IDIR:
+        </label>
+		<input type="text" name="IDIR" id="IDIR" size="11"
+                class="white rightnc" value="$IDIR" readonly="readonly">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="idtcRow">
+		<label class="column1" for="IDTC">
+          Document Type:
+        </label>
+		<select name="IDTC" id="IDTC" readonly="readonly"
+                size="1" class="white rightnc">
+          <option value="0" $TCSELECTED0>
+			Choose a Type
+		  </option>
+          <option value="1" $TCSELECTED1>
+			Any
+		  </option>
+		  <option value="2" $TCSELECTED2>
+			Birth Certificate
+		  </option>
+		  <option value="3" $TCSELECTED3>
+			Cemetery
+		  </option>
+		  <option value="4" $TCSELECTED4>
+			Census
+		  </option>
+		  <option value="5" $TCSELECTED5>
+			Church Record
+		  </option>
+		  <option value="6" $TCSELECTED6>
+			Court Record
+		  </option>
+		  <option value="7" $TCSELECTED7>
+			Death Certificate
+		  </option>
+		  <option value="8" $TCSELECTED8>
+			Immigration
+		  </option>
+		  <option value="9" $TCSELECTED9>
+			Land Deed
+		  </option>
+		  <option value="10" $TCSELECTED10>
+			Land Patent
+		  </option>
+		  <option value="11" $TCSELECTED11>
+			Marriage Certificate
+		  </option>
+		  <option value="12" $TCSELECTED12>
+			Military Record
+		  </option>
+		  <option value="13" $TCSELECTED13>
+			Naturalization
+		  </option>
+		  <option value="14" $TCSELECTED14>
+			Obituary
+		  </option>
+		  <option value="15" $TCSELECTED15>
+			Probate/Estate
+		  </option>
+		  <option value="16" $TCSELECTED16>
+			Ship Passenger List
+		  </option>
+		  <option value="17" $TCSELECTED17>
+			SS Death Index
+		  </option>
+		  <option value="18" $TCSELECTED18>
+			Tax Records
+		  </option>
+		  <option value="19" $TCSELECTED19>
+			Tombstone
+		  </option>
+		  <option value="20" $TCSELECTED20>
+			Will
+          </option>
+        </select>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="idtlRow">
+		<label class="column1" for="IDTL">
+	        Location:
+	    </label>
+        <input type="hidden" name="IDTL" id="IDTL" value="$IDTL">
+		<input type="text" name="Location" id="Location"
+	                size="64" class="white rightnc" readonly="readonly"
+	                value="$LOCATION">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="todoNameRow">
+		<label class="column1" for="todoName">
+	        ToDo Name:
+	    </label>
+		<input type="text" name="todoName" id="todoName"
+	                size="64" class="white leftnc" readonly="readonly"
+	                value="$TODONAME">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="openedRow">
+		<label class="column1" for="openedDate">
+    	    Opened Date:
+	    </label>
+		<input type="text" name="openedDate" id="openedDate"
+        		size="64" class="white leftnc" readonly="readonly"
+        		value="$OPENEDDATE">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="closedRow">
+		<label class="column1" for="closedDate">
+    	    Closed Date:
+	    </label>
+		<input type="text" name="closedDate" id="closedDate"
+        		size="64" class="white leftnc" readonly="readonly"
+        		value="$CLOSEDDATE">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="idarRow">
+		<label class="column1" for="IDAR">
+    	    IDAR:
+	    </label>
+		<input type="text" name="IDAR" id="IDAR"
+        		size="11" class="white rightnc" readonly="readonly"
+        		value="$IDAR">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="statusRow">
+		<label class="column1" for="status">
+    	    Status:
+	    </label>
+        <select name="status" id="status" size="1" readonly="readonly"
+              class="white rightnc">
+          <option value="0" $STSELECTED0>
+			Closed
+		  </option>
+          <option value="1" $STSELECTED1>
+			Opened
+		  </option>
+        </select>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="priorityRow">
+		<label class="column1" for="priority">
+    	    Priority:
+	    </label>
+        <select name="priority" id="priority" size="1" readonly="readonly"
+              class="white rightnc">
+          <option value="0" $PRSELECTED0>
+			Low
+		  </option>
+          <option value="1" $PRSELECTED1>
+			Medium
+		  </option>
+          <option value="2" $PRSELECTED1>
+			High
+		  </option>
+        </select>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="descRow" style="width: 100%;">
+		<label class="column1" for="desc">
+	        Notes:
+	    </label>
+	    <textarea name="desc" id="desc" cols="64" rows="5"
+		 >$DESC</textarea>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="resultsRow" style="width: 100%;">
+		<label class="column1" for="results">
+	        Results:
+	    </label>
+	    <textarea name="results" id="results" cols="64" rows="5"
+		 >$RESULTS</textarea>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="filingrefRow">
+		<label class="column1" for="filingref">
+    	    Filing Ref:
+	    </label>
+		<input type="text" name="filingref" id="filingref"
+        		size="11" class="white leftnc" readonly="readonly"
+        		value="$STATUS">
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row">
+      <div class="column1">
+		<label class="column1" for="Used">
+	        Used:
+	    </label>
+		<input type="checkbox" name="Used" id="Used" value="1"
+                readonly="readonly" disabled="disabled" 
+                $USEDCHECKED>
+      </div>
+      <div class="column1">
+		<label class="column1">Tag1:</label>
+		<input type="checkbox" name="Tag1" id="Tag1" value="1"
+                readonly="readonly" disabled="disabled" 
+                $TAG1CHECKED>
+      </div>
+      <div class="column1">
+		<label class="column1" for="QsTag">
+	        QsTag:
+	    </label>
+		<input type="checkbox" name="QsTag" id="QsTag" value="1"
+                readonly="readonly" disabled="disabled"
+	            $QSTAGCHECKED>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+	$PICTURES
+    <p id="buttonRow">
+	  <input type="hidden" id="closeAtEnd" name="closeAtEnd" value="$CLOSE">
+	    &nbsp;
+	  <button type="button" id="Pictures" class="button">
+	    <u>P</u>ictures
+	  </button>
+	  <input type="hidden" name="PicIdType" id="PicIdType" 
+		    value="71">
+	    &nbsp;
+      <button type="button" id="Close" class="button">
+	    Close
+      </button>
+    </p>
+  </form>
+  </div> <!-- body division -->
+  <!-- a division containing templates for dynamically created HTML -->
+  <div class="hidden" id="templates">
+      <span id="todoTitle">ToDo: $NAME</span>
+      <span id="newtodoTitle">New ToDo: $NAME</span>
+      <!-- the following button should exactly match <button id="showMap"> -->
+	<div id="pictureTemplate" class="picture">
+	  <img src="$PICNAMEURL"
+			alt="$PICCAPTION">
+	  <p class="large">
+			$PICCAPTION : $PICDATE;
+	  </p>
+	  <p id="picDesc" class="picdesc">$PICDESC 
+	  </p>
+	</div> <!-- id="pictureTemplate" -->
+	<audio id="audioTemplate" controls="controls">
+	  <source src="$PICNAMEURL" 
+			type="audio/$FILETYPE">
+	    Your browser does not support the audio element.
+	</audio>
+	<video id="videoTemplate" controls="controls"
+	        width="320" height="240">
+	  <source src="$PICNAMEURL"
+			type="video/$FILETYPE">
+	    Your browser does not support the video element.
+	</video>
+	<p id="otherTemplate">
+	    Unable to display or play media $PICNAMEURL.
+	</p>
+  </div> <!-- end of <div id="templates"> -->
+  <!-- the remaining portion of the page is divisions containing popup help -->
+    <div class="balloon" id="Helpidtd">
+    The unique numeric identifier of the todo record in the database.
+    This is assigned by the system when a new todo is created, and cannot
+    be altered by the user.
+    </div>
+    <div class="balloon" id="HelpToDo">
+    The todo name as it appears in web pages.
+    This should be expressed as a formal address uniquely identifying the
+    todo.
+    To avoid creating multiple todo records that all refer to the same
+    place, it is desirable to use a consistent address structure
+    and abbreviation style.  
+    For example include all relevant levels of the address hierarchy.
+    In the United States of America and Canada, for example, a todo may be
+    expressed as street address, village, township, county, state or province, 
+    and country.  However this field is not a mailing address, do not use
+    post office box numbers.
+    Always include the country name, or 
+  <a href="http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm">two character ISO 3166 country code</a>
+    as the last element of an address.  This avoids ambiguities.
+    In particular many of the 
+  <a href="/Canada/DomainsEdit.php?cc=US&lang=$LANG">US Postal Service state abbreviations</a>
+    duplicate ISO 3166 country codes.  You will save yourself trouble as you
+    expand your research beyond your home country.  Note that England, Scotland,
+    Wales, Northern Ireland, and other component states of the United Kingdom,
+    do not have ISO 3166 country codes.  Also, for obvious reasons, there are
+    no ISO 3166 country codes for countries that no longer exist, such as
+    Prussia.
+    Use consistent abbreviation style.  For example either always include the
+    period after an abbreviation or always exclude it.  For example consistently
+    use addresses like "Central Ave, St Petersburg, FL, USA" or like
+    "Central Ave., St. Petersburg, Florida, USA".
+    </div>
+    <div class="balloon" id="HelpShortName">
+    This is a shorter form of the name.
+    If you enter this into a todo field on a record it is expanded to
+    the full associated todo name.
+    It defaults to the same value as the ToDo.
+    </div>
+    <div class="balloon" id="HelpSortedToDo">
+    This is intended to be used as a sort field when the desirable sort
+    order cannot be determined from the value of ToDo.  
+    It defaults to the same value as the ToDo.
+    </div>
+    <div class="balloon" id="HelpFSPlaceId">
+    This field is currently unused.
+    </div>
+    <div class="balloon" id="HelpLatitude">
+    The latitude of the todo.  This is displayed and entered as
+    degrees and a decimal fraction between -90.0 and 90.0.
+    This simplifies the use of geocoding software.
+    The value of this field is normally set by clicking on the
+  <span class="button">Get Map Info</span> button. 
+    </div>
+    <div class="balloon" id="HelpLongitude">
+    The longitude of the todo expressed as signed
+    degrees and a decimal fraction between -180.0 and 180.0.
+    This simplifies the use of geocoding software.
+    Note that longitudes west of the Greenwich meridian,
+    that is for all of the Americas, are negative.
+    The value of this field is normally set by clicking on the
+  <span class="button">Get Map Info</span> button. 
+    </div>
+    <div class="balloon" id="HelpPreposition">
+    If specified, this is intended to override the default preposition "at".
+    To support French a special value "in[masc]" should be specified for
+    countries that have masculine gender and start with a consonant.
+    </div>
+    <div class="balloon" id="HelpZoom">
+    This field is used to specify the zoom level for the Google map display.
+    The value of this field is normally set by clicking on the
+  <span class="button">Get Map Info</span> button. 
+    </div>
+    <div class="balloon" id="HelpBoundary">
+    This field is used to contain the list of boundary coordinates.
+    This field is normally only visible to the administrator.
+    The value of this field is set by adding points to the boundary using the
+    mouse and then clicking on the
+  <span class="button">Get Map Info</span> button. 
+    </div>
+    <div class="balloon" id="HelpNotes">
+    User notes about the todo.
+    This is an extended editor field permitting you to enter data as if into
+    a word processor, setting font style, embedding pictures, defining 
+    hyperlinks, and so on.
+    </div>
+    <div class="balloon" id="HelpFSPlaceID">
+    This field is currently unused.
+    </div>
+    <div class="balloon" id="HelpVerified">
+    This field is currently unused.
+    The checkbox is selected if the value of this field is 'yes'.
+    </div>
+    <div class="balloon" id="HelpFSResolved">
+    This field is currently unused.
+    The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
+    resolved".
+    </div>
+    <div class="balloon" id="HelpVEResolved">
+    This field is currently unused.
+    The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
+    resolved".
+    </div>
+    <div class="balloon" id="HelpqsTag">
+    This field is currently unused.
+    The checkbox is selected if the value of this field is 'yes'.
+    </div>
+    <div class="balloon" id="HelpTag1">
+    This field is currently unused.
+    The checkbox is selected if the value of this field is 'yes'.
+    </div>
+    <div class="balloon" id="HelpshowMap">
+    Clicking on this button displays or hides a Google map
+    centered at the todo.
+    </div>
+    <div class="balloon" id="HelpgetMap">
+    Clicking on this button extracts information from the Google map display
+    about the center of the map and its zoom level and stores that information
+    into the latitude, longitude, and zoom level input fields.  This permits you
+    to use the zoom and pan functions of the Google map to adjust the display
+    appropriately, and then save those settings for subsequent users.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+    Clicking on this button updates the database entry for this todo.
+    </div>
+    <div class="balloon" id="HelpClose">
+    Clicking on this button closes the dialog and returns to the 
+    list of todos.
+    </div>
+    <div class="balloon" id="HelpReferences">
+    Clicking on this button displays a list of the database entries, either
+    individuals or families, that reference the todo.
+    </div>
+    <div class="balloon" id="HelpmergeDuplicates">
+    Clicking on this button merges all of the todos with the same name
+    with the current todo.
+    </div>
+    <div class="balloon" id="HelpDupIdlr">
+    This read-only field displays the unique identification number of
+    a todo with the same todo name as the current todo.
+    </div>
+    <div class="balloon" id="HelpPictures">
+    Click this button to open a dialog for managing the pictures associated
+    with the todo.
+    </div>
+	<script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="text/javascript"></script>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/ToDo.js" type="application/javascript">
+    </script>

@@ -1,0 +1,62 @@
+<!--*********************************************************************
+ *  editIndividDisplayen.html											*
+ *																		*
+ *  Template to display a web page to support editing details of a      *
+ *  particular record from the table of Persons.						*
+ *																		*
+ *  History:															*
+ *		2019/09/17      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+			Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+			Services
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+			Nominal Index
+      </a>:
+      <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+			Surnames Starting with '$PREFIX'
+      </a>:
+      <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+			Surname '$SURNAME'
+      </a>:
+      <a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG" id="person">
+			$NAME
+      </a>:
+    </div>
+    <div class="body">
+        <h1>
+          <span class="right">
+            <a href="editIndividHelpen.html" target="help">? Help</a>
+          </span>
+            Edit $NAME: <span id="inTree">in tree '$TREENAME'</span>
+          <div style="clear: both;"></div>
+        </h1>
+        $TRACE
+        $MSG
+        <p class="message" id="notAuthorized">
+            You are not authorized to update this person.
+            Contact one of the existing owners.
+        </p>
+        <form name="indForm" id="indForm"
+                action="Person.php" method="get">
+          <p>
+            <input type="hidden" name="idir" id="idir" 
+                   value="$IDIR">
+            <input type="hidden" name="lang" id="lang" 
+                   value="$LANG">
+            <button type="submit" id="Submit" style="width: 175px;">
+                Cancel
+            </button>
+          </p>
+        </form>
+    </div>
+	  $EVENTTEXT
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>

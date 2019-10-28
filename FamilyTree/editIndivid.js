@@ -297,6 +297,14 @@
  *		2019/05/18      ensure event passed to onclick handlers         *
  *		2019/06/01      use JSON in place of XML for AJAX response      *
  *		                ensure individual created before exiting        *
+ *		2019/06/29      first parameter of displayDialog removed        *
+ *		2019/08/09      pass language parm to subdialogs                *
+ *		2019/10/05      split functionality of eventChanged to          *
+ *		                separate out date handling                      *
+ *		                defer editName until person saved               *
+ *		2019/11/23      deferred editName did not work because it       *
+ *		                requires that the IDNX value be part of the     *
+ *		                id of the editName button.                      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -526,13 +534,14 @@ addEventHandler(window, "load", loadEdit);
 function loadEdit()
 {
     // emit debugging information
-    traceAlert("editIndivid.js:loadEdit: " +
-				location.pathname + location.search);
+    if (false && debug.toLowerCase() == 'y')
+        traceAlert("editIndivid.js:loadEdit: " +
+		    		location.pathname + location.search);
 
     // if this is invoked for a completely new individual the
     // heading is meaningless, set up to update it on the fly
     var	titleElement	= document.getElementById('title');
-    var	title		= titleElement.innerHTML.trim();
+    var	title		    = titleElement.innerHTML.trim();
     // if there is only one space prior to the date range then there is
     // no name information and a date range containing only an m-dash
     // is an empty date range
@@ -700,7 +709,7 @@ function activateElements(form)
 		}
 		else
 		    element.onkeydown	= keyDown;	// context specific help
-		element.onchange	= change;	// default handler
+		element.addEventListener('change', change);	// default handler
 
 		// set behavior for individual elements by name
 		var	name	= element.name;
@@ -719,7 +728,7 @@ function activateElements(form)
 		var colName	= pieces[1];
 		var id		= pieces[2];
 
-		switch(colName)
+		switch(colName.toLowerCase())
 		{		// switch on name of element
 		    case 'idir':
 		    {		// unique key of record
@@ -727,205 +736,213 @@ function activateElements(form)
 				break;
 		    }		// unique key of record
 
-		    case 'Detail':
+		    case 'detail':
 		    {		// buttons to edit event details
 				if (id == '6' || id == '7')
 				{		// buttons to edit textual notes
-				    element.onclick		= editEventIndiv;
+				    element.addEventListener('click', editEventIndiv);
 				}		// buttons to edit textual notes
 				else
 				if (id == '8')
 				{		// buttons to edit textual notes
-				    element.onclick		= editEventIndiv;
+				    element.addEventListener('click', editEventIndiv);
 				}		// buttons to edit textual notes
 				else
 				if (id == '17')
-				    element.onclick		= editEventChildr
+				    element.addEventListener('click', editEventChildr)
 				else
-				    element.onclick		= editEventIndiv;
+				    element.addEventListener('click', editEventIndiv);
 				break;
 		    }		// buttons to edit event details
 
-		    case 'Clear':
+            case 'editname':
+            {
+				element.addEventListener('click', editName);
+                break;
+            }       // edit primary name
+
+		    case 'clear':
 		    {		// buttons to clear event details
 				if (id == '17')
-				    element.onclick		= clearEventChildr;
+				    element.addEventListener('click', clearEventChildr);
 				else
-				    element.onclick		= clearEventIndiv;
+				    element.addEventListener('click', clearEventIndiv);
 				break;
 		    }		// buttons to clear event details
 
-		    case 'BirthDate':
-		    case 'ChrisDate':
-		    case 'DeathDate':
-		    case 'BuriedDate':
-		    case 'SealingDate':
-		    case 'BaptismDate':
-		    case 'EndowmentDate':
-		    case 'ConfirmationDate':
-		    case 'InitiatoryDate':
-		    case 'EventDate':
+		    case 'birthdate':
+		    case 'christeningdate':
+		    case 'deathdate':
+		    case 'burieddate':
+		    case 'sealingdate':
+		    case 'baptismdate':
+		    case 'endowmentdate':
+		    case 'confirmationdate':
+		    case 'initiatorydate':
+		    case 'eventdate':
 		    {			// edit major event dates
 				element.abbrTbl		= MonthAbbrs;
-				element.onchange	= eventChanged;
+				element.addEventListener('change', dateChanged);
+				element.addEventListener('change', eventChanged);
 				element.checkfunc	= checkDate;
 				break;
 		    }			// edit major event dates
 
-		    case 'BirthLocation':
-		    case 'ChrisLocation':
-		    case 'BaptismLocation':
-		    case 'ConfirmationLocation':
-		    case 'DeathLocation':
-		    case 'BuriedLocation':
-		    case 'EventLocation':
+		    case 'birthlocation':
+		    case 'christeninglocation':
+		    case 'baptismlocation':
+		    case 'confirmationlocation':
+		    case 'deathlocation':
+		    case 'buriedlocation':
+		    case 'eventlocation':
 		    {			// edit major event locations
 				element.abbrTbl		= evtLocAbbrs;
-				element.onchange	= locationChanged;
+				element.addEventListener('change', locationChanged);
+				element.addEventListener('change', eventChanged);
 				break;
 		    }			// edit major event locations
 
-		    case 'Surname':
+		    case 'surname':
 		    {			// Surname of individual
 				element.focus();	// put cursor in surname field
 				element.abbrTbl		= surnamePartAbbrs;
-				element.onchange	= surnameChanged;
+				element.addEventListener('change', surnameChanged);
 				element.checkfunc	= checkName;
 				break;
 		    }			// Surname of individual
 
-		    case 'GivenName':
+		    case 'givenname':
 		    {			// name fields
 				element.checkfunc	= checkName;
-				element.onchange	= givenChanged;
+				element.addEventListener('change', givenChanged);
 				break;
 		    }			// name fields
 
-		    case 'DeathCause':
+		    case 'deathcause':
 		    {			// cause of death
 				element.abbrTbl		= CauseAbbrs;
 				element.checkfunc	= checkText;
 				break;
 		    }			// cause of death
 
-		    case 'Parents':
+		    case 'parents':
 		    {			// button to add or edit parents
-				element.onclick		= editParents;
+				element.addEventListener('click', editParents);
 				break;
 		    }			// button to add or edit parents
 
-		    case 'Marriages':
+		    case 'marriages':
 		    {			// button to add or edit families
-				element.onclick		= editMarriages;
+				element.addEventListener('click', editMarriages);
 				break;
 		    }			// button to add or edit families
 
-		    case 'AddEvent':
+		    case 'addevent':
 		    {			// button to add instance of Event
-				element.onclick		= eventAdd;
+				element.addEventListener('click', eventAdd);
 				break;
 		    }			// button to add instance of Event
 
-		    case 'Order':
+		    case 'order':
 		    {			// button to order events by date
-				element.onclick		= orderEventsByDate;
+				element.addEventListener('click', orderEventsByDate);
 				break;
 		    }			// button to order events by date
 
-		    case 'ShowMore':
+		    case 'showmore':
 		    {			// button to display more input fields
-				element.onclick		= showMore;
+				element.addEventListener('click', showMore);
 				break;
 		    }			// button to display more input fields
 
-		    case 'Pictures':
+		    case 'pictures':
 		    {			// button to add or edit pictures
-				element.onclick		= editPictures;
+				element.addEventListener('click', editPictures);
 				break;
 		    }			// button to add or edit pictures
 
-		    case 'Address':
+		    case 'address':
 		    {			// button to add or edit address
-				element.onclick		= editAddress;
+				element.addEventListener('click', editAddress);
 				break;
 		    }			// button to add or edit address
 
-		    case 'Delete':
+		    case 'delete':
 		    {			// button to delete the individual
-				element.onclick		= delIndivid;
+				element.addEventListener('click', delIndivid);
 				break;
 		    }			// button to delete the individual
 
-		    case 'Merge':
+		    case 'merge':
 		    {			// button to merge with another individual
-				element.onclick		= mergeIndivid;
+				element.addEventListener('click', mergeIndivid);
 				break;
 		    }			// button to merge with another individual
 
-		    case 'Search':
+		    case 'search':
 		    {			// popdown search menu
-				element.onclick		= popdownSearch;
+				element.addEventListener('click', popdownSearch);
 				break;
 		    }			// popdown search menu
 
-		    case 'censusSearch':
+		    case 'censussearch':
 		    {			// perform census table search
-				element.onclick		= censusSearch;
+				element.addEventListener('click', censusSearch);
 				break;
 		    }			// perform census table search
 
-		    case 'bmdSearch':
+		    case 'bmdsearch':
 		    {			// perform vital statistics search
-				element.onclick		= bmdSearch;
+				element.addEventListener('click', bmdSearch);
 				break;
 		    }			// perform vital statistics search
 
-		    case 'ancestrySearch':
+		    case 'ancestrysearch':
 		    {			// perform Ancestry.com search
-				element.onclick		= ancestrySearch;
+				element.addEventListener('click', ancestrySearch);
 				break;
 		    }			// perform Ancestry.com search
 
-		    case 'Gender':
+		    case 'gender':
 		    {		// Gender of individual
-				element.onchange	= genderChanged;
+				element.addEventListener('change', genderChanged);
 				break;
 		    }		// Gender of individual
 
-		    case 'EventDescn':
+		    case 'eventdescn':
 		    {		// description for generic event
-				element.onchange	= eventChanged;
+				element.addEventListener('change', eventChanged);
 				element.checkfunc	= checkText;
 				break;
 		    }		// description for generic event
 
-		    case 'EventPref':
+		    case 'eventpref':
 		    {		// preferred checkbox
-				element.onchange	= eventPrefChanged;
+				element.addEventListener('change', eventPrefChanged);
 				break;
 		    }		// preferred checkbox
 
-		    case 'EventIdet':
+		    case 'eventidet':
 		    {		// preferred checkbox
 				idetArray[id - 0]	= element.value - 0;
 				break;
 		    }		// preferred checkbox
 
-		    case 'EventDetail':
+		    case 'eventdetail':
 		    {		// button to popup event detail edit dialog
-				element.onclick	= eventDetail;
+				element.addEventListener('click', eventDetail);
 				break;
 		    }		// button to popup event detail edit dialog
 
-		    case 'EventDelete':
+		    case 'eventdelete':
 		    {		// button to delete an event
-				element.onclick	= eventDelete;
+				element.addEventListener('click', eventDelete);
 				break;
 		    }		// button to delete an event
 
-		    case 'Grant':
+		    case 'grant':
 		    {		// button to grant access to this individual
-				element.onclick	= grantAccess;
+				element.addEventListener('click', grantAccess);
 				break;
 		    }		// button to grant access to this individual
 		}		// switch on name of element
@@ -946,19 +963,12 @@ function activateElements(form)
 function validateForm()
 {
     var form                = this;
-    var	idir		        = form.idir.value;
-    if (idir == 0)
-    {                   // IDIR not assigned yet
-        newSearch           = document.getElementById('Submit');
-        refresh();      // use AJAX to create Person
-        return;
-    }                   // IDIR not assigned yet
 
     // do not submit the form if a modal dialog is being displayed
     if (deferSubmit)
     {
 		deferSubmit	        = false;
-		return false;
+		return false;   // do not submit
     }
 
     // handle feedback if the editIndivid.php page was invoked from
@@ -1003,17 +1013,17 @@ function validateForm()
 							opener.document.getElementById('children');
 						if (!childTable)
 						    break;
-						var genderSel	= srcform.Gender;
-						var index	= genderSel.selectedIndex;
+						var genderSel	= form.Gender;
+						var index	    = genderSel.selectedIndex;
 						var gender;	// gender presentation class
-						gender	= genderSel.options[index].value;
+						gender	        = genderSel.options[index].value;
 						if (gender == 0)
-						    gender	= 'male';
+						    gender	    = 'male';
 						else
 						if (gender == 1)
-						    gender	= 'female';
+						    gender	    = 'female';
 						else
-						    gender	= 'unknown';
+						    gender	    = 'unknown';
 
 						var	birthDate	= '';
 						var	deathDate	= '';
@@ -1059,8 +1069,8 @@ function validateForm()
 						var parms	= {
 							'idir'		: idir,
 							'idcr'		: val,
-							'givenname'	: srcform.GivenName.value,
-							'surname'	: srcform.Surname.value,
+							'givenname'	: form.GivenName.value,
+							'surname'	: form.Surname.value,
 							'birthd'	: birthDate,
 							'deathd'	: deathDate,
 							'gender'	: gender
@@ -1097,7 +1107,7 @@ function validateForm()
 				    default:
 				    {	// unexpected
 						if (key.substring(0,4) != 'init')
-						    alert("editIndivid.js: 1078: validateForm: " +
+						    alert("editIndivid.js: 1102: validateForm: " +
 							  "unexpected parameter " + key + 
 							  "='" + val + "'");
 						break;
@@ -1132,26 +1142,29 @@ function refresh()
 
     // parms contain every input element with its value
     var	parms	    = {};
-    var	msg	        = "parms=(";
+    var	msg	        = "[";
+    var comma       = '';
     for (var ei = 0; ei < form.elements.length; ei++)
     {
 		var	element	= form.elements[ei]
 		if (element.name)
 		{
-		    var	name	= element.name;
-		    msg		+= name + "='" + element.value + "',";
+		    var	name	        = element.name;
+		    msg		            += comma + name + "='" + element.value;
+            comma               = "',";
 		    if (name.substring(name.length - 2) == '[]')
 		    {		// convention for passing an array
-				name	= name.substring(0,name.length - 2);
+				name	        = name.substring(0,name.length - 2);
 				if (element.type != 'checkbox' || element.checked)
 				    parms[name]	= element.value;
 		    }		// convention for passing an array
 		    else
-				parms[name]	= element.value;
+				parms[name]	    = element.value;
 		}	// element has a name
     }
-    msg		= msg.substring(0,msg.length - 2) + "}";
-    locTrace += " editIndivid.js: refresh: " + msg;
+    msg		    = msg + "]";
+    locTrace    += " editIndivid.js: refresh: " + msg;
+    console.log("editIndivid.js:refresh: HTTP.post('/FamilyTree/updatePersonJson.php', msg)");
 
     // invoke script to update Event and return XML result
     HTTP.post('/FamilyTree/updatePersonJson.php',
@@ -1190,6 +1203,21 @@ function gotRefreshed(jsonObj)
 		    var form		        = document.indForm;
 		    form.idir.value	        = idir; // is now set
 		    form.id.value	        = id;	// is now set
+
+            var names               = indiv.names;
+            if (names)
+            {
+                for (var prop in names)
+                {
+                    var name        = names[prop];
+                    var nameButton  = document.getElementById('editName0');
+                    if (nameButton)
+                        nameButton.id = 'editName' + name.idnx;
+                    break;
+                }
+            }
+            else
+                alert("names is null");
             if (newSearch.type == 'submit')
                 form.submit();
             else
@@ -1198,14 +1226,14 @@ function gotRefreshed(jsonObj)
 		}		// have a pending button click to issue
 		else
 		{		// unexpected object
-		    alert("editIndivid.js: 1183: gotRefreshed: typeof(newSearch)=" + 
+		    alert("editIndivid.js: 1202: gotRefreshed: typeof(newSearch)=" + 
 						typeof(newSearch));
 		}		// unexpected object
 
     }			// valid response
     else
     {			// error response
-		alert("editIndivid.js: 1190: gotRefreshed: " + jsonObj);
+		alert("editIndivid.js: 1209: gotRefreshed: " + jsonObj);
     }			// error response
 
 }		// function gotRefreshed
@@ -1219,6 +1247,7 @@ function gotRefreshed(jsonObj)
  ************************************************************************/
 function update()
 {
+    console.log("editIndivid.js:1223 update called");
     // check for open frames
     if (windowList.length > 0)
     {			// there are incomplete actions pending
@@ -1282,9 +1311,8 @@ function update()
 		}		// element has a name
     }			// loop through all form elements
     msg		                = msg.substring(0,msg.length - 2) + "}";
-    locTrace                += " editIndivid.js: 1275 update: " + msg;
-	if (debug.toLowerCase() == 'y')
-        alert(locTrace);
+    locTrace                += " editIndivid.js: 1292 update: " + msg;
+    console.log(locTrace);
 
     // invoke script to update Event and return JSON result
     HTTP.post('/FamilyTree/updatePersonJson.php',
@@ -1304,6 +1332,7 @@ function update()
  ************************************************************************/
 function gotUpdated(jsonObj)
 {
+    console.log("editIndivid.js: 1188: gotUpdated typeof(jsonObj)=" + typeof(jsonObj) + ", typeof(newSearch)=" + typeof(newSearch));
     var	opener		    = null;
     if (window.frameElement && window.frameElement.opener)
 		opener		    = window.frameElement.opener;
@@ -1322,11 +1351,11 @@ function gotUpdated(jsonObj)
 		var	idir		= indiv.idir;
 		if (typeof(idir) === "undefined")
 		{
-		    alert("editIndivid.js: 1314 idir=" + idir + 
+		    console.log("editIndivid.js: 1333 idir=" + idir + 
 				  " jsonObj=" + JSON.stringify(jsonObj));
 		}
 		if ((idir - 0) == 0)
-		    alert("editIndivid.js: 1318: gotUpdated: idir=" + idir + ": " +
+		    console.log("editIndivid.js: 1337: gotUpdated: idir=" + idir + ": " +
 						JSON.stringify(jsonObj));
 		// update IDIR value in form
 		srcform.idir.value	= idir;
@@ -1334,7 +1363,7 @@ function gotUpdated(jsonObj)
 		// if there is a child tag present, get the IDCR value 
 		var	idcr		    = 0;
 		var	childr		    = jsonObj.child;
-		if (childr.idcr)
+		if (childr)
 		    idcr		    = childr.idcr;
 
 		// if invoker has requested to be notified of key information about
@@ -1351,32 +1380,31 @@ function gotUpdated(jsonObj)
 		    else
 				genderClass	= 'unknown';
 
-		    var	birthDate	= '';
-		    var	deathDate	= '';
+		    var	birthDate	        = '';
+		    var	deathDate	        = '';
 
-		    var eventBody	= document.getElementById('EventBody');
-		    var	eventRows	= eventBody.children;
+		    var eventBody	        = document.getElementById('EventBody');
+		    var	eventRows	        = eventBody.children;
 		    for(var ir = 0; ir < eventRows.length; ir++)
 		    {			// loop through all events
-				var eventRow	= eventRows[ir];
-				for(var celt = eventRow.firstChild;
-				    celt;
-				    celt = celt.nextSibling)
+				var eventRow	    = eventRows[ir];
+                var children        = eventRow.getElementsByTagName('input');
+				for(var ic = 0;
+				    ic < children.length;
+				    ic++)
 				{
-				    if (celt.tagName && celt.tagName == 'INPUT')
-				    {		// <input ...
-						if (celt.name == 'BirthDate')
-						{
-						    birthDate	= celt.value;
-						    break;
-						}
-						else
-						if (celt.name == 'DeathDate')
-						{
-						    deathDate	= celt.value;
-						    break;
-						}
-				    }		// <input ...
+                    celt            = children[ic];
+					if (celt.name == 'BirthDate')
+					{
+					    birthDate	= celt.value;
+					    break;
+					}
+					else
+					if (celt.name == 'DeathDate')
+					{
+					    deathDate	= celt.value;
+					    break;
+					}
 				}
 		    }			// death row present
 
@@ -1414,7 +1442,7 @@ function gotUpdated(jsonObj)
 		    // invoke the add method of the 'children' table
 		    // now that the individual has been added into the database
 		    if ((idir - 0) == 0)
-				alert("editIndivid.js: 1378: gotUpdated: call addChildToPage: idir=" +
+				console.log("editIndivid.js: 1425: gotUpdated: call addChildToPage: idir=" +
 						idir );
             if (childTable)
 		        childTable.addChildToPage(indiv,
@@ -1430,22 +1458,26 @@ function gotUpdated(jsonObj)
 		}
     }			// valid response
     else
-    {
+    {           // invalid response
 		if (jsonObj && typeof(jsonObj) == "object")
 		    alert("editIndivid.js: 1395: gotUpdated: " + JSON.stringify(jsonObj));
 		else
 		    alert("editIndivid.js: 1397: gotUpdated: '" + xmlDoc + "'");
-    }
+    }           // invalid response
 }		// function gotUpdated
 
 /************************************************************************
  *  function noUpdated													*
  *																		*
  *  The server was unable to find the action script updateIndivid.xml.	*
+ *																		*
+ *	Input:																*
+ *      status          response code from server                       *
+ *      statusText      status text                                     *
  ************************************************************************/
-function noUpdated()
+function noUpdated(rstatus, statusText)
 {
-    alert("editIndivid.js: 1408: noUpdated: script 'updatePersonJson.php' not found on server");
+    alert("editIndivid.js: 1460: noUpdated: script 'updatePersonJson.php' not found on server, status=" + rstatus + ", text=" + statusText);
 }		// function noUpdated
 
 /************************************************************************
@@ -1460,6 +1492,50 @@ function resetForm()
 }	// function resetForm
 
 /************************************************************************
+ *  function editName   												*
+ *																		*
+ *  This method is called when the user requests to edit				*
+ *  information about the primary name of the current individual.		*
+ *																		*
+ *  Input:																*
+ *		this	<button id='editName'>									*
+ *		ev      click Event                                             *
+ ************************************************************************/
+function editName(ev)
+{
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
+    var	form	    = this.form;
+    var	idnx        = this.id.substring(8);
+    if (idnx == 0)
+    {
+		newSearch	= this;		// identify button that was clicked
+		refresh();
+        return;
+    }
+    var	given   	= encodeURIComponent(form.GivenName.value);
+    var	surname 	= encodeURIComponent(form.Surname.value);
+    var	treeName    = encodeURIComponent(form.treeName.value);
+    var lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
+
+	// open edit dialog in right half of window
+	var url	= "/FamilyTree/editName.php?idnx=" + idnx +
+									  "&given=" + given + 
+									  "&surname=" + surname +
+									  "&treename=" + treeName +
+									  "&lang=" + lang +
+									  "&debug=" + debug;
+	windowList.push(openFrame("marriages",
+						      url,
+						      "right"));
+    return true;
+}	// function editName
+
+/************************************************************************
  *  function editMarriages												*
  *																		*
  *  This method is called when the user requests to edit				*
@@ -1471,6 +1547,10 @@ function resetForm()
  ************************************************************************/
 function editMarriages(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form	= this.form;
     var	idir	= form.idir.value;
     if (idir > 0)
@@ -1478,12 +1558,16 @@ function editMarriages(ev)
         var	given   	= encodeURIComponent(form.GivenName.value);
         var	surname 	= encodeURIComponent(form.Surname.value);
         var	treeName    = encodeURIComponent(form.treeName.value);
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
 
 		// open edit dialog in right half of window
 		var url	= "/FamilyTree/editMarriages.php?id=" + idir +
 							   "&given=" + given + 
 							   "&surname=" + surname +
 							   "&treename=" + treeName +
+							   "&lang=" + lang +
 							   "&debug=" + debug;
 		windowList.push(openFrame("marriages",
 							  url,
@@ -1509,6 +1593,10 @@ function editMarriages(ev)
  ************************************************************************/
 function editParents(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form	= this.form;
     var	idir	= form.idir.value;
     if (idir > 0)
@@ -1516,12 +1604,16 @@ function editParents(ev)
         var	given   	= encodeURIComponent(form.GivenName.value);
         var	surname 	= encodeURIComponent(form.Surname.value);
         var	treeName    = encodeURIComponent(form.treeName.value);
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
 
 		// open edit dialog in right half of window
 		var url	= "/FamilyTree/editParents.php?id=" + idir + 
 							"&given=" + given + 
 							"&surname=" + surname +
 							"&treename=" + treeName +
+							"&lang=" + lang +
 							"&debug=" + debug;
 		windowList.push(openFrame("parents",
 							  url,
@@ -1555,6 +1647,8 @@ function editParents(ev)
  ************************************************************************/
 function editEventIndiv(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
 
     // check for open event frame
@@ -1609,9 +1703,9 @@ function editEventIndiv(ev)
 		    case STYPE_CHRISTEN:
 		    {
 				url	+= "&date=" + 
-				       encodeURIComponent(form.ChrisDate.value) +
+				       encodeURIComponent(form.ChristeningDate.value) +
 				       "&location=" +
-				       encodeURIComponent(form.ChrisLocation.value);
+				       encodeURIComponent(form.ChristeningLocation.value);
 				break;
 		    }		// christening event
 
@@ -1681,11 +1775,15 @@ function editEventIndiv(ev)
 		if (debug != 'n')
 		    popupAlert("editIndivid.js: editEventIndiv: " + url,
 						this);
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
+        url                 += '&lang=' + lang
 
 		// open edit dialog for event in right half of window
 		windowList.push(openFrame("event",
-							  url, 
-							  "right"));
+    							  url, 
+	    						  "right"));
     }			// database record already exists
     else
     {			// individual record not created in database yet
@@ -1716,30 +1814,30 @@ function editEventIndiv(ev)
  ************************************************************************/
 function clearEventIndiv(ev)
 {	
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
-    var	button		= this;
-    var	form		= this.form;
-    var	type		= button.id.substring(5);
-    var parms		= {"type"	: type,
+
+    var	button		    = this;
+    var	form		    = this.form;
+    var	type		    = button.id.substring(5);
+    var promptText      = "Are you sure you want to delete this event?";
+    var textElt         = document.getElementById('confirmDeleteEvent');
+    if (textElt)
+        promptText      = textElt.innerHTML;
+    else
+        alert("cannot find element 'confirmDeleteEvent'");
+    var parms		    = {"type"	: type,
 						   "formname"	: form.name, 
 						   "template"	: "",
 						   "msg"	:
-							"Are you sure you want to delete this event?"};
+						   promptText};
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-				      'ClrInd$template',
-				      parms,
-				      this,		// position relative to
-				      confirmClearInd,	// 1st button confirms Delete
-				      false);		// default show on open
-    }		// have popup <div> to display message in
-    else
-		popupAlert("editEvent.js: deleteCitation: Error: " + msg,
-				   this);
+	displayDialog('ClrInd$template',
+			      parms,
+			      this,		            // position relative to
+			      confirmClearInds);	// 1st button confirms Delete
 }		// function clearEventIndiv
 
 /************************************************************************
@@ -1756,6 +1854,10 @@ function clearEventIndiv(ev)
  ************************************************************************/
 function confirmClearInd(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     // get the parameter values hidden in the dialog
     var	form		= this.form;
     var	type		= this.id.substr(12);
@@ -1778,8 +1880,8 @@ function confirmClearInd(ev)
 
 		    case STYPE_CHRISTEN:
 		    {
-				form.ChrisDate.value		= "";
-				form.ChrisLocation.value	= "";
+				form.ChristeningDate.value		= "";
+				form.ChristeningLocation.value	= "";
 				break;
 		    }		// case STYPE_CHRISTEN:
 
@@ -1924,7 +2026,10 @@ function confirmClearInd(ev)
  ************************************************************************/
 function editEventChildr(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
+
     // check for open event frame
     if (windowList.length > 0)
     {			// there are incomplete actions pending
@@ -1970,11 +2075,15 @@ function editEventChildr(ev)
 		    popupAlert("editIndivid.js: editEventChildr: " + url,
 						this);
 		}
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
+        url                 += '&lang=' + lang
 
 		// open edit dialog for event in right half of window
 		windowList.push(openFrame("event",
-							  url,
-							  "right"));
+		    					  url,
+			    				  "right"));
     }	// have idir value
     else
 		popupAlert("editIndivid.js: editEventChildr: unable to get value of idcr from form",
@@ -2002,7 +2111,10 @@ function editEventChildr(ev)
  ************************************************************************/
 function clearEventChildr(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
+
     var	button		= this;
     var	type		= button.id.substring(5);
     var	form		= this.form;
@@ -2039,7 +2151,7 @@ function clearEventChildr(ev)
 		popupLoading(button);
     }	// have idcr value
     else
-		alert("editIndivid.js: 1987: clearEventChildr: unable to get value of idcr from form");
+		alert("editIndivid.js: 2102: clearEventChildr: unable to get value of idcr from form");
     return true;
 }	// function clearEventChildr
 
@@ -2060,10 +2172,10 @@ function gotClearedEvent(xmlDoc)
     else
     {
 		if (topXml && typeof(topXml) == "object")
-		    alert("editIndivid.js: 2008: gotClearedEvent: " +
+		    alert("editIndivid.js: 2123: gotClearedEvent: " +
 						tagToString(topXml));
 		else
-		    alert("editIndivid.js: 2011: gotClearedEvent: '" + xmlDoc + "'");
+		    alert("editIndivid.js: 2126: gotClearedEvent: '" + xmlDoc + "'");
     }
 }       // function gotClearedEvent
 
@@ -2075,7 +2187,7 @@ function gotClearedEvent(xmlDoc)
 function noClearedEvent()
 {
     hideLoading();		// hide the "loading..." popup
-    alert("editIndivid.js: 2023: noClearedEvent: action script 'ClearIndivEvent.php' not found");
+    alert("editIndivid.js: 2138: noClearedEvent: action script 'ClearIndivEvent.php' not found");
 }       // function noClearedEvent
 
 /************************************************************************
@@ -2094,7 +2206,10 @@ function noClearedEvent()
  ************************************************************************/
 function eventDetail(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
+
     // check for open event frame
     if (windowList.length > 0)
     {			// there are incomplete actions pending
@@ -2142,7 +2257,7 @@ function eventDetail(ev)
 		if (debug.toLowerCase() == 'y')
 		    url		+= "&debug=y";
     
-		var	children	= eventRow.children;
+		var	children	= eventRow.getElementsByTagName('input');
 		for (var ic = 0; ic < children.length; ic++)
 		{			// loop through children
 		    var	child		= children[ic];
@@ -2158,7 +2273,7 @@ function eventDetail(ev)
 		    {		// act on specific fields
 				case 'eventdate':
 				case 'birthdate':
-				case 'chrisdate':
+				case 'christeningdate':
 				case 'baptismdate':
 				case 'endowmentdate':
 				case 'confirmationdate':
@@ -2192,7 +2307,7 @@ function eventDetail(ev)
     
 				case 'eventlocation':
 				case 'birthlocation':
-				case 'chrislocation':
+				case 'christeninglocation':
 				case 'baptismtemple':
 				case 'endowmenttemple':
 				case 'confirmationtemple':
@@ -2281,11 +2396,15 @@ function eventDetail(ev)
     
 				default:
 				{
-				    alert("editIndivid.js: 2227: eventDetail: idet=" + idet);
+				    alert("editIndivid.js: 2347: eventDetail: idet=" + idet);
 				    break;
 				}
 		    }
 		}			// event in tblIR
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
+        url                 += '&lang=' + lang
 
 		// debugging output if requested
 		if (debug != 'n')
@@ -2294,8 +2413,8 @@ function eventDetail(ev)
 
 		// open edit dialog for event in right half of window
 		windowList.push(openFrame("event",
-							  url, 
-							  "right"));
+		    					  url, 
+			    				  "right"));
     }			// can edit immediately
     else
     {			// individual record not created in database yet
@@ -2316,7 +2435,10 @@ function eventDetail(ev)
  ************************************************************************/
 function eventAdd(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
+
     var	form		= this.form;
     var	idir		= form.idir.value;
     if (idir > 0)
@@ -2324,6 +2446,10 @@ function eventAdd(ev)
 		var url		= "/FamilyTree/editEvent.php?ider=0" +
 								"&idir=" + idir +
 								"&rownum="; 
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
+        url                 += '&lang=' + lang
 		if (debug.toLowerCase() == 'y')
 		{
 		    url		+= "&debug=y";
@@ -2333,8 +2459,8 @@ function eventAdd(ev)
 
 		// open edit dialog for event in right half of window
 		windowList.push(openFrame("event",
-							  url,
-							  "right"));
+		    					  url,
+			    				  "right"));
 		return true;
     }			// database record already exists
     else
@@ -2356,7 +2482,10 @@ function eventAdd(ev)
  ************************************************************************/
 function eventDelete(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
+
     var	button			= this;
     var	form			= button.form;
     var	idir			= form.idir.value;
@@ -2365,29 +2494,25 @@ function eventDelete(ev)
     var	idet			= form.elements['EventIdet' + rownum].value;
     var	citType			= form.elements['EventCitType' + rownum].value;
     var	row		    	= button.parentNode;
+    var promptText      = "Are you sure you want to delete this event?";
+    var textElt         = document.getElementById('confirmDeleteEvent');
+    if (textElt)
+        promptText      = textElt.innerHTML;
+    else
+        alert("cannot find element 'confirmDeleteEvent'");
     var parms			= {"type"	    : idet,
 						   "ider"	    : ider,
 						   "formname"	: form.name, 
 						   "rownum"	    : rownum, 
 						   "rowname"	: row.id,
 						   "template"	: "",
-						   "msg"	    :
-						"Are you sure you want to delete this event?"};
+						   "msg"	    : promptText};
 
     // ask user to confirm delete
-    dialogDiv	        = document.getElementById('msgDiv');
-    var template	    = document.getElementById('ClrInd$template');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-				      'ClrInd$template',
-				      parms,
-				      this,		        // position relative to
-				      confirmEventDel,	// 1st button confirms Delete
-				      false);		    // default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("editIndivid.js: 2329: eventDelete: Error: " + msg);
+	displayDialog('ClrInd$template',
+			      parms,
+			      this,		        // position relative to
+			      confirmEventDel);	// 1st button confirms Delete
 }		// function eventDelete
 
 /************************************************************************
@@ -2403,6 +2528,10 @@ function eventDelete(ev)
  ************************************************************************/
 function confirmEventDel(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     // get the parameter values hidden in the dialog
     var	form				= this.form;
     var	type				= this.id.substr(12);
@@ -2513,7 +2642,7 @@ function confirmEventDel(ev)
 		    }		// act on IDET value
 		}		// expected standard event row
 		else
-		    alert("editIndivid.js: 2454: confirmEventDelete: " +
+		    alert("editIndivid.js: 2580: confirmEventDelete: " +
 				  "Unexpected rowname='" + rowname + "'");
     }			// event is in tblIR
 }	// function confirmEventDelete
@@ -2543,13 +2672,13 @@ function gotDeleteEvent(xmlDoc)
 		    }			// parms feedback missing
 		    else
 		    {			// update DOM to remove displayed row
-				var parms	= getParmsFromXml(parmslist[0]);
-				var parmstr	= '';
-				var comma	= '{';
+				var parms	    = getParmsFromXml(parmslist[0]);
+				var parmstr	    = '';
+				var comma	    = '{';
 				for (key in parms)
 				{
-				    parmstr	+= comma + key + '=' + parms[key];
-				    comma	= ',';
+				    parmstr	    += comma + key + '=' + parms[key];
+				    comma	    = ',';
 				}
 				//alert("editIndivid.js: gotDeleteEvent: parms=" +
 				//		parmstr + "}");
@@ -2558,11 +2687,25 @@ function gotDeleteEvent(xmlDoc)
 				{		// standard event
 				    var name	= rowname.substring(0, rowname.length - 3);
 				    var dateElt	= document.getElementById(name + "Date");
-				    dateElt.value	= '';
-				    dateElt.onchange();
+                    if (dateElt  === null)
+                    {
+                        alert("editIndivid.js: 2626 could not find element id='" + name + "Date'");
+                    }
+                    else
+                    {
+				        dateElt.value	= '';
+				        dateElt.onchange();
+                    }
 				    var locnElt	= document.getElementById(name + "Location");
+                    if (locnElt  === null)
+                    {
+                        alert("editIndivid.js: 2636 could not find element id='" + name + "Location'");
+                    }
+                    else
+                    {
 				    locnElt.value	= '';
 				    locnElt.onchange();
+                    }
 				    var rownum	= parms.rownum;
 				    var iderElt	= document.getElementById("EventIder" + rownum);
 				    iderElt.value	= 0;
@@ -2654,24 +2797,22 @@ function noDeleteCitations()
 }	// function noDeleteCitations
 
 /************************************************************************
- *  function eventChanged												*
+ *  function dateChanged												*
  *																		*
- *  This method is called when the user modifies the value of any field	*
- *  in an event of an individual that is an instance of Event.			*
+ *  This method is called when the user modifies the value of a date	*
+ *  field in an event of an individual.			                        *
  *																		*
  *  Input:																*
  *		this		instance of <input> that invoked this function		*
  *		ev          change Event                                        *
  ************************************************************************/
-function eventChanged(ev)
+function dateChanged(ev)
 {
-    var	form		= this.form;
-    var	value		= this.value;
+    var	value		        = this.value;
+
     // add a space anytime a digit is followed by a letter or vice-versa
-    // this is harmless in almost all fields and corrects a trivial
-    // issue with date fields
-    value		= value.replace(/([a-zA-Z])(\d)/g,"$1 $2");
-    this.value		= value.replace(/(\d)([a-zA-Z])/g,"$1 $2");
+    value		            = value.replace(/([a-zA-Z])(\d)/g,"$1 $2");
+    this.value		        = value.replace(/(\d)([a-zA-Z])/g,"$1 $2");
 
     // expand abbreviations if required
     if (this.abbrTbl)
@@ -2679,25 +2820,7 @@ function eventChanged(ev)
 				this.abbrTbl);
     else
     if (this.value == '[')
-		this.value	= '[Blank]';
-
-    var	idir		= form.idir.value;
-    var	name		= this.name;
-    var	row		= this.parentNode;
-    var	changeElement	= null;
-    for(var i = 0; i < row.children.length; i++)
-    {
-		var	child	= row.children[i];
-		if (child.id && child.id.substring(0,12) == 'EventChanged')
-		    changeElement	= child;
-    }	
-    // notify the script updatePersonJson.php that this event has been changed
-    if (changeElement)
-		changeElement.value	= "1";
-    else
-		alert("editIndivid.js: 2636: eventChanged: " +
-				"cannot find EventChanged element " +
-				"for <input name='"+ name + "'>");
+		this.value	        = '[Blank]';
 
     if (this.checkfunc)
 		this.checkfunc();
@@ -2706,25 +2829,61 @@ function eventChanged(ev)
     // that have been filled in so far
     if ((this.name == 'BirthDate' || this.name == 'DeathDate') && updateTitle)
     {
-		var newName	= '';
+        var	form		    = this.form;
+		var newName	        = '';
 		var givennameElt	= form.GivenName;
 		if (givennameElt)
-		    newName	+= givennameElt.value;
-		var surnameElt	= form.Surname;
+		    newName	        += givennameElt.value;
+		var surnameElt	    = form.Surname;
 		if (surnameElt)
-		    newName	+= ' ' + surnameElt.value;
-		newName		+= ' (';
-		var birthElt	= form.BirthDate;
+		    newName	        += ' ' + surnameElt.value;
+		newName		        += ' (';
+		var birthElt	    = form.BirthDate;
 		if (birthElt)
-		    newName	+= birthElt.value;
-		newName		+= "\u2014";
-		var deathElt	= form.DeathDate;
+		    newName	        += birthElt.value;
+		newName		        += "\u2014";        // m-dash
+		var deathElt	    = form.DeathDate;
 		if (deathElt)
-		    newName	+= deathElt.value;
-		newName		+= ')';
+		    newName	        += deathElt.value;
+		newName		        += ')';
 		var	titleElement	= document.getElementById('title');
 		titleElement.innerHTML	= titlePrefix + newName;
-    }
+    }               // update title
+}	    // function dateChanged
+
+/************************************************************************
+ *  function eventChanged												*
+ *																		*
+ *  This method is called when the user modifies the value of any field	*
+ *  in an event of an individual to record that the event has change.   *
+ *																		*
+ *  Input:																*
+ *		this		instance of <input> that invoked this function		*
+ *		ev          change Event                                        *
+ ************************************************************************/
+function eventChanged(ev)
+{
+    var	row		    = this.parentNode;
+    if (row.className != 'row')
+        row		    = row.parentNode;
+    var inputs      = row.getElementsByTagName('input');
+    var	changeElement	= null;
+    var elementids      = '';
+    for(var i = 0; i < inputs.length; i++)
+    {
+		var	child	        = inputs[i];
+        var id              = child.id;
+        elementids          += id + ', ';
+		if (id && id.substring(0,12) == 'EventChanged')
+		    changeElement	= child;
+    }	
+    // notify the script updatePersonJson.php that this event has been changed
+    if (changeElement)
+		changeElement.value	= "1";
+    else
+		alert("editIndivid.js: 2814: eventChanged: " +
+				"cannot find EventChanged element " +
+				"for <input name='"+ name + "'> row=" + row.outerHTML + " elementids=" + elementids);
 }	// function eventChanged
 
 /************************************************************************
@@ -2741,10 +2900,11 @@ function eventPrefChanged(ev)
 {
     var	form		= this.form;
     var	name		= this.name;
-    var	row		= this.parentNode;
-    for(var ic = 0; ic < row.children.length; ic++)
+    var	row		    = this.parentNode;
+    var inputs      = this.getElementsByTagName('input');
+    for(var ic = 0; ic < inputs.length; ic++)
     {				// loop through all siblings in this row
-		var	child	= row.children[ic];
+		var	child	= inputs[ic];
 		if (child.id && child.id.substring(0,12) == 'EventChanged')
 		{			// EventChanged hidden input field
 		    child.value		= "1";
@@ -2774,10 +2934,11 @@ function eventPrefChanged(ev)
 				if (prefElt.checked)
 				{		// element was previously checked
 				    prefElt.checked	= false;
-				    var	row		= prefElt.parentNode;
-				    for(var ic = 0; ic < row.children.length; ic++)
+				    var	row		    = prefElt.parentNode;
+                    var inputs      = row.getElementsByTagName('input');
+				    for(var ic = 0; ic < inputs.length; ic++)
 				    {		// loop through all siblings in this row
-						var	child	= row.children[ic];
+						var	child	= inputs[ic];
 						if (child.id &&
 						    child.id.substring(0,12) == 'EventChanged')
 						{	// EventChanged hidden input field
@@ -2815,12 +2976,20 @@ function eventPrefChanged(ev)
  ************************************************************************/
 function grantAccess(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
+
     // open dialog to grant access in right half of window
     var	form	= this.form;
     var	idir	= form.idir.value;
+    var lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
+	var url			    = "/FamilyTree/grantIndivid.php?idir=" + idir +
+                                                        "&lang=" + lang;
     windowList.push(openFrame("event",
-						      "/FamilyTree/grantIndivid.php?idir=" + idir, 
+						      url,
 						      "right"));
 }	// function grantAccess
 
@@ -2873,6 +3042,10 @@ function genderChanged(ev)
  ************************************************************************/
 function orderEventsByDate(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	button		= this;
     button.disabled	= true;		// only permit one sort
     var	form		= button.form;
@@ -2889,66 +3062,13 @@ function orderEventsByDate(ev)
 
     // some events may have a sorted date of -99999999, patch them to
     // one day after the birth, so they will not be sorted before birth
-    var	events		= [];
-    for (var ir = 0; ir < eventBody.children.length; ir++)
+    for (var ir = 1; ir <= eventRows.length; ir++)
     {
-		var	row	= eventBody.children[ir];
-		var	rowid	= row.id.substring(8);
-		sdElement	= document.getElementById('EventSD' + rowid);
-		if (sdElement)
-		    eventSD	= sdElement.value - 0;
-		idetElement	= document.getElementById('EventIdet' + rowid);
-		if (idetElement)
-		    idet	= idetElement.value - 0;
-		if (idet == 3)		// Event::ET_BIRTH
-		    birthSD	= eventSD;
-		else
-		if (eventSD <= -99999999)
-		{
-		    eventSD	= birthSD + 1;
-		}
-		events.push({'ir' : ir, 'eventSD' : eventSD, 'row' : row});
+        var orderElt        = document.getElementById('EventOrder' + ir);
+        orderElt.value      = ir - 1;
+        var changedElt      = document.getElementById('EventChanged' + ir);
+        changedElt.value    = 1;
     }
-
-    // sort rows
-    events.sort(compareSortDates);
-
-    // create a replacement for the entire event body section
-    // with the rows in their corrected order
-    var	newBody	= eventBody.cloneNode(false);
-    for(var i = 0; i < events.length; i++)
-    {
-		var	element		= events[i];
-		var 	newRow		= element.row.cloneNode(true);
-		var	orderChanged	= false;
-		for(var ic = 0; ic < newRow.children.length; ic++)
-		{
-		    var child		= newRow.children[ic];
-		    if (child.id && child.id.substring(0,10) == 'EventOrder')
-		    {		// database order of event
-				if ((child.value - 0) != i)
-				{	// database order does not match chronological order
-				    child.value		= i;	// change order value
-				    orderChanged	= true;	// flag event as changed
-				}	// database order does not match chronological order
-		    }		// database order of event
-		    else
-		    if (child.id && child.id.substring(0,12) == 'EventChanged')
-		    {		// flag that event has to be updated in the database
-				if (orderChanged)
-				    child.value		= 1;
-		    }		// flag that event has to be updated in the database
-		}
-		newBody.appendChild(newRow);	// add event to replacement section
-    }
-
-    // replace the original event body with the replacement event body as
-    // quickly as possible so the user does not see multiple display changes
-    eventBody.parentNode.replaceChild(newBody, eventBody);
-
-    // reactivate the dynamic functionality of the replacement body
-    activateElements(form);
-
 }		// function orderEventsByDate
 
 /************************************************************************
@@ -3019,28 +3139,32 @@ function gotOrder(xmlDoc)
  ************************************************************************/
 function showMore(ev)
 {
-    var	form		= this.form;
-    var layoutTable	= document.getElementById('layoutTable');
-    var	tableBody	= layoutTable.tBodies[0];
-    var oldRow;		// existing row to delete
-    var	newRow;		// new row to delete
-    var	ie;		// index through children of a node
-    var	cell;		// cell within a table row
-    var	elt		= null;	// an HTML Element
+    if (!ev)
+        ev              = window.event;
+    ev.stopPropagation();
 
-    var	idir		= form.idir.value;
-    var	parms		= {'idir'	: idir,
-						   'template'	: '',
-						   'userRef'	: 
+    var	form		    = this.form;
+    var layoutTable	    = document.getElementById('layoutTable');
+    var	tableBody	    = layoutTable.tBodies[0];
+    var oldRow;		            // existing row to delete
+    var	newRow;		            // new row to delete
+    var	ie;		                // index through children of a node
+    var	cell;		            // cell within a table row
+    var	elt		        = null;	// an HTML Element
+
+    var	idir		    = form.idir.value;
+    var	parms		    = {'idir'	        : idir,
+						   'template'	    : '',
+						   'userRef'	    : 
 						document.getElementById('HideUserRef').value,
-						   'ancestralRef' :
+						   'ancestralRef'   :
 						document.getElementById('HideAncestralRef').value};
     if (oldRow)
     {			// hide expanded form
-		oldRow		= document.getElementById('NotesRow');
+		oldRow		    = document.getElementById('NotesRow');
 		tableBody.removeChild(oldRow);
 
-		oldRow		= document.getElementById('PrivateRow');
+		oldRow		    = document.getElementById('PrivateRow');
 		tableBody.removeChild(oldRow);
 
 		this.innerHTML	= 'Show More Options';
@@ -3061,9 +3185,9 @@ function showMore(ev)
 
 		// activate functionality of buttons
 		elt		= document.getElementById('Detail7');
-		elt.onclick	= editEventIndiv;
+		elt.addEventListener('click', editEventIndiv);
 		elt		= document.getElementById('Detail8');
-		elt.onclick	= editEventIndiv;
+		elt.addEventListener('click', editEventIndiv);
 
 		// add row with option to hide information about this individual
 		newRow	= createFromTemplate("PrivateRow$template",
@@ -3113,12 +3237,19 @@ function showMore(ev)
  ************************************************************************/
 function editAddress(ev)
 {
-    var	form	= this.form;
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
+    var	form	            = this.form;
     if (form.idar && form.idar.value.length > 0)
     {	// idar present
-		var	idar	= form.idar.value;
-		var	given	= encodeURIComponent(form.GivenName.value);
-		var	surname	= encodeURIComponent(form.Surname.value);
+		var	idar	        = form.idar.value;
+		var	given	        = encodeURIComponent(form.GivenName.value);
+		var	surname	        = encodeURIComponent(form.Surname.value);
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
 
 		// open edit dialog for event in right half of window
 		var	url;
@@ -3127,12 +3258,14 @@ function editAddress(ev)
 							    "&kind=0" +
 							    "&given=" + given +
 							    "&surname=" + surname +
-							    "&formname=indForm";
+							    "&formname=indForm" +
+                                "&lang=" + lang;
 		else
 		    url	  = "/FamilyTree/Address.php?kind=0" +
 							    "&given=" + given +
 							    "&surname=" + surname +
-							    "&formname=indForm";
+							    "&formname=indForm" +
+                                "&lang=" + lang;
 		windowList.push(openFrame("address",
 							  url,
 							  "right"));
@@ -3157,15 +3290,23 @@ function editAddress(ev)
  ************************************************************************/
 function editPictures(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
+
     var	form	= this.form;
 
     if (form.idir && form.idir.value > 0)
     {	// idir present in form
 		var	idir	= form.idir.value;
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
+
 		// open edit dialog for event in right half of window
 		var url		= "/FamilyTree/editPictures.php?idir=" + idir +
-									"&idtype=Indiv";
+					                				"&idtype=Indiv" +
+                                                    "&lang=" + lang;
 		windowList.push(openFrame("pictures",
 							  url,
 							  "right"));
@@ -3219,7 +3360,10 @@ function setIdar(newIdar)
  ************************************************************************/
 function delIndivid(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
+
     var	form	= this.form;
     if (form.idir && form.idir.value.length > 0)
     {		// idir field present
@@ -3248,13 +3392,20 @@ function delIndivid(ev)
  ************************************************************************/
 function mergeIndivid(ev)
 {
+    if (!ev)
+        ev          = window.event;
     ev.stopPropagation();
+
     var	form	= this.form;
     if (form.idir && form.idir.value > 0)
     {		// idir field present
-		var	idir	= form.idir.value;
+		var	idir	        = form.idir.value;
 		// open merge dialog in right half of window
-		var url		= "/FamilyTree/mergeIndivid.php?idir=" + idir;
+        var lang            = 'en';
+        if ('lang' in args)
+            lang            = args.lang;
+		var url		        = "/FamilyTree/mergeIndivid.php?idir=" + idir +
+                                                            "&lang=" + lang;
 		if (debug.toLowerCase() == 'y')
 		    url		+= "&Debug=Y";
 		var mwindow	= openFrame("mergeFrame",
@@ -3280,6 +3431,10 @@ function mergeIndivid(ev)
  ************************************************************************/
 function popdownSearch(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form			= this.form;
     var menu			= document.getElementById("SearchDropdownMenu");
     if (menu)
@@ -3304,6 +3459,10 @@ function popdownSearch(ev)
  ************************************************************************/
 function censusSearch(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form			= this.form;
     var menu			= document.getElementById("SearchDropdownMenu");
     if (menu)
@@ -3319,12 +3478,15 @@ function censusSearch(ev)
     if (givenName.length > 3)
 		givenName		= givenName.substring(0,3);
     var	gender			= form.Gender.value;
-    var	sex			= '';
+    var	sex			    = '';
     if (gender == 0)
-		sex			= 'M';
+		sex			    = 'M';
     else
     if (gender == 1)
-		sex			= 'F';
+		sex			    = 'F';
+    var lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
 
     var searchUrl		= 
 		"/database/CensusResponse.php?Query=&Census=CAALL&Count=20"+
@@ -3333,7 +3495,8 @@ function censusSearch(ev)
 		"&SurnameSoundex=yes" +
 		"&Sex=" + sex +
 		"&BYear=" + birthYear +
-		"&Range=5";
+		"&Range=5" + 
+        "&lang=" + lang;
 
     // open Ancestry search dialog in right half of window
     var swindow	= openFrame("searchFrame",
@@ -3353,6 +3516,10 @@ function censusSearch(ev)
  ************************************************************************/
 function bmdSearch(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form			= this.form;
     var menu			= document.getElementById("SearchDropdownMenu");
     if (menu)
@@ -3382,6 +3549,9 @@ function bmdSearch(ev)
     var	birthPlace		= form.BirthLocation.value;
     if (birthPlace.length > 6)
 		birthPlace		= birthPlace.substring(0,6);
+    var lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
 
     var searchUrl		= 
 		"/Canada/BirthRegResponse.php?RegDomain=CAON&Offset=0&Limit=20" +
@@ -3391,7 +3561,8 @@ function bmdSearch(ev)
 		"&Sex=" + sex +
 		"&BirthPlace=" + encodeURIComponent(birthPlace) +
 		"&BirthDate=" + birthYear +
-		"&MotherName=" + encodeURIComponent(form.motherSurname.value);
+		"&MotherName=" + encodeURIComponent(form.motherSurname.value) +
+        "&lang=" + lang;
 
     // open Ancestry search dialog in right half of window
     var swindow	= openFrame("searchFrame",
@@ -3410,6 +3581,10 @@ function bmdSearch(ev)
  ************************************************************************/
 function ancestrySearch(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form			= this.form;
     var menu			= document.getElementById("SearchDropdownMenu");
     if (menu)
@@ -3760,9 +3935,9 @@ function eventFeedback(parms)
     
 		    case STYPE_CHRISTEN:
 		    {
-				if (form.ChrisDate)
+				if (form.ChristeningDate)
 				{	// form already includes christening date input field
-				    rownum	= getRowNumOf(form.ChrisDate);
+				    rownum	= getRowNumOf(form.ChristeningDate);
 				}	// form already includes christening date input field
 				break;
 		    }	// christening event
@@ -3824,7 +3999,7 @@ function eventFeedback(parms)
 
 		if (rownum === '')
 		{		// still not set, add new row
-		    rownum		= 0;
+		    rownum		= 1;
 		    var eventBody	= document.getElementById('EventBody');
 		    for(var ic = 0; ic < eventBody.childNodes.length; ic++)
 		    {		// loop through "rows" of event "table"
@@ -3860,6 +4035,7 @@ function eventFeedback(parms)
 
     // update existing row or create new row
     // the name of the row cannot always be determined from the row number
+    
     var eventButton	= document.getElementById('EventDetail' + rownum);
     var eventRow	= null;
     if (!eventButton)
@@ -3874,25 +4050,25 @@ function eventFeedback(parms)
 
 		searchForPosition:
 		for(var row = table.firstChild; row; row = row.nextSibling)
-		{		// loop through events
+		{		                // loop through events
 		    if (row.nodeName.toLowerCase() == 'div')
-		    {		// an event
+		    {		            // an event
 				for (var elt = row.firstChild; elt; elt = elt.nextSibling)
-				{
+				{               // loop through children of div
 				    if (elt.nodeName.toLowerCase() == 'input')
 				    {
 						if (elt.name.substring(0,7) == 'EventSD')
 						{
 						    if (elt.value > datesd)
 						    {
-							nextRow		= row;
-							break searchForPosition;
-						    }
-						}
-				    }
-				}
-		    }		// an event
-		}		// loop through events
+							    nextRow		= row;
+							    break searchForPosition;
+						    }   // sort date greater than new event
+						}       // name="EventSD..."
+				    }           // <input> element
+				}               // loop through children of div
+		    }		            // an event
+		}		                // loop through events
 
 		if ('etype' in parms)
 		{			// have title for new row
@@ -3900,54 +4076,71 @@ function eventFeedback(parms)
 		    if (!('cittype' in parms))
 				parms.cittype		= 0;
 		    if (!('ider' in parms))
-				parms.ider		= 0;
+				parms.ider		    = 0;
 		    if (!('date' in parms))
-				parms.date		= '';
+				parms.date		    = '';
 		    if (!('description' in parms))
 				parms.description	= '';
+            parms['descn']          = parms['description'];
 		    if (!('location' in parms))
 				parms['location']	= '';
+            parms.locationname      = parms['location'];
 		    if (!('idet' in parms))
-				parms.idet		= 0;
+				parms.idet		    = 0;
+            parms.preferredchecked  = '';
+            parms.changed           = 0;
+            var type                = eventText[parms.idet];
+            type.charAt(0).toUpperCase() + type.slice(1)
+            parms.type              = type;
 
 		    var	msg	= "{";
 		    var	comma	= "";
 		    for(key in parms)
 		    {
 				msg		+= comma + key + "='" + parms[key] + "'";
-				comma	= ",";
+				comma	= ", ";
 		    }
 		    // create and insert the new event into the form
 		    var newRow	= createFromTemplate("EventRow$rownum",
-								     parms,
-								     null);
+								             parms,
+								             null);
+            var elements    = [];
+            var inputs      = newRow.getElementsByTagName('input');
+            for (ii = 0; ii < inputs.length; ii++)
+                elements.push(inputs[ii]);
+            var buttons     = newRow.getElementsByTagName('button');
+            for (ib = 0; ib < buttons.length; ib++)
+                elements.push(buttons[ib]);
+            var temp        = {'elements' : elements};  // simulate a form
+            activateElements(temp);
 
 		    if (nextRow)
 		    {			// insert before next event
 				eventRow	= table.insertBefore(newRow, nextRow);
 				var order	= (parms.order - 0) + 2;
+
 				// increment order field of following events
 				while(nextRow)
 				{
 				    if (nextRow.nodeName.toLowerCase() == 'div')
 				    {		// next row of event section
-						var	children	= nextRow.children;
+						var	children	= nextRow.getElementsByTagName('input');
 						for (var ic = 0; ic < children.length; ic++)
 						{	// loop through children
 						    var child	= children[ic];
 						    var	name	= child.name;
 						    if (name === undefined)
-							name	= child.id;
+							    name	= child.id;
 						    if (name === undefined)
-							name	= '';
+							    name	= '';
 						    if (name.substring(0,10) == 'EventOrder')
 						    {
-							child.value	= order;
-							order++;
+							    child.value	= order;
+							    order++;
 						    }
 						    else
 						    if (name.substring(0,12) == 'EventChanged')
-							child.value	= 1;
+							    child.value	= 1;
 						}	// loop through children
 				    }		// next row of event section
 				    nextRow	= nextRow.nextSibling;
@@ -3956,6 +4149,8 @@ function eventFeedback(parms)
 		    else		// add to end of event table
 				eventRow	= table.appendChild(newRow);
 		}			// have title for new row
+        else
+            alert("editIndivid.js: 4057 etype not set");
     }				// add new row
     else			// update existing row
 		eventRow		= eventButton.parentNode;
@@ -3963,44 +4158,55 @@ function eventFeedback(parms)
     // identify fields in the row
     var	detailButton	= null;
     var	deleteButton	= null;
-    var	dateElt		= null;
-    var	sdElt		= null;
-    var	descnElt	= null;
-    var	locationElt	= null;
-    var	labelElt	= null;
+    var	dateElt		    = null;
+    var	sdElt		    = null;
+    var	descnElt	    = null;
+    var	locationElt	    = null;
+    var	labelElt	    = null;
 
+    var dateTrace       = '';
     // activate dynamic functionality and update values of
     // fields based upon returned parms
-    var	children	= eventRow.children;
+    var	children	= eventRow.getElementsByTagName('input');
     for (var ic = 0; ic < children.length; ic++)
     {				// loop through children
 		var	child		= children[ic];
 		var	name		= child.id;
 		if (name === undefined)
 		    name		= child.name;
+        var id          = '';
 		var	namePatt	= /^([a-zA-Z]+)([0-9]*)/;
 		var	result		= namePatt.exec(name);
 		if (result)
+        {
 		    name		= result[1];
+            id          = result[2];
+        }
+
+        if (dateElt === null)
+            dateTrace   += name + ' is null,';
+        else
+            dateTrace   += name + ' is not null,';
+        try {
 		switch(name.toLowerCase())
 		{			// act on specific fields
 		    case 'eventdetail':
 		    {
 				detailButton		    = child;
-				detailButton.onclick	= eventDetail;
+				detailButton.addEventListener('click', eventDetail);
 				break;
 		    }
 
 		    case 'eventdelete':
 		    {
 				deleteButton		    = child;
-				deleteButton.onclick	= eventDelete;
+				deleteButton.addEventListener('click', eventDelete);
 				break;
 		    }
 
 		    case 'eventdate':
 		    case 'birthdate':
-		    case 'chrisdate':
+		    case 'christeningdate':
 		    case 'baptismdate':
 		    case 'endowmentdate':
 		    case 'confirmationdate':
@@ -4008,9 +4214,10 @@ function eventFeedback(parms)
 		    case 'deathdate':
 		    case 'burieddate':
 		    {
-				dateElt			= child;
+				dateElt			    = child;
 				dateElt.value		= parms.date;
-				dateElt.onchange	= eventChanged;
+				dateElt.addEventListener('change', dateChanged);
+				dateElt.addEventListener('change', eventChanged);
 				dateElt.checkfunc	= checkDate;
 				break;
 		    }
@@ -4018,6 +4225,12 @@ function eventFeedback(parms)
 		    case 'eventsd':
 		    {
 				sdElt			= child;
+                if (dateElt  === null)
+                {
+                    alert("editIndivid.js: 4138 dateElt is null for " + name + ', trace=' + dateTrace);
+                }
+                else
+                {
 				var date		= datePatt.exec(dateElt.value);
 
 				if (date === null)
@@ -4028,6 +4241,7 @@ function eventFeedback(parms)
 				{
 				    sdElt.value		= (date[0]-0) * 10000 + 615;
 				    sdElt.defaultvalue	= (date[0]-0) * 10000 + 615;
+				}
 				}
 				break;
 		    }
@@ -4043,7 +4257,7 @@ function eventFeedback(parms)
 		    case 'burieddescn':
 		    {
 				descnElt		= child;
-				descnElt.onchange	= eventChanged;
+				descnElt.addEventListener('change', eventChanged);
 				descnElt.checkfunc	= checkText;
 				descnElt.value		= parms.description;
 				break;
@@ -4051,7 +4265,7 @@ function eventFeedback(parms)
 
 		    case 'eventlocation':
 		    case 'birthlocation':
-		    case 'chrislocation':
+		    case 'christeninglocation':
 		    case 'baptismtemple':
 		    case 'endowmenttemple':
 		    case 'confirmationtemple':
@@ -4059,21 +4273,27 @@ function eventFeedback(parms)
 		    case 'deathlocation':
 		    case 'buriedlocation':
 		    {
-				locationElt		= child;
- 		    locationElt.abbrTbl	= evtLocAbbrs;
-				locationElt.onchange	= locationChanged;
-				locationElt.value	= parms.location;
+				locationElt		        = child;
+ 		        locationElt.abbrTbl	    = evtLocAbbrs;
+				locationElt.addEventListener('change', locationChanged);
+				locationElt.addEventListener('change', eventChanged);
+				locationElt.value	    = parms.location;
 				break;
 		    }
 
 		    case 'eventlabel':
 		    {
-				labelElt		= child;
-				labelElt.innerHTML	= typeText;
+				labelElt		        = child;
+				labelElt.innerHTML	    = typeText;
 				break;
 		    }
 
 		}			// act on specific fields
+        }
+        catch (e)
+            {
+		alert("editIndivi.js: 4195 " + ex + ", trace=" + dateTrace);
+        }
     }				// loop through children
 
     // update other field values in the current dialog based upon values
@@ -4108,10 +4328,10 @@ function eventFeedback(parms)
 
 		case STYPE_CHRISTEN:
 		{
-		    if (form.ChrisDate)
+		    if (form.ChristeningDate)
 		    {	// form already includes christening date input field
-				form.ChrisDate.value		= parms.date;
-				form.ChrisLocation.value	= parms.location;
+				form.ChristeningDate.value		= parms.date;
+				form.ChristeningLocation.value	= parms.location;
 		    }	// form already includes christening date input field
 		    else
 		    {	// refresh to add the event fields
@@ -4269,10 +4489,10 @@ function eventFeedback(parms)
 
 				    case ET_CHRISTENING:
 				    {
-						if (form.ChrisDate)
+						if (form.ChristeningDate)
 						{	// form includes christening date input field
-						    form.ChrisDate.value	= parms.date;
-						    form.ChrisLocation.value	= parms.location;
+						    form.ChristeningDate.value	= parms.date;
+						    form.ChristeningLocation.value	= parms.location;
 						    eventRow			= 0;
 						}	// form includes christening date input field
 						break;

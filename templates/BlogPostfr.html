@@ -5,127 +5,145 @@
  *																		*
  * History:																*
  *		2018/09/12		created											*
+ *      2019/08/26      add support for posting messages to other       *
+ *                      tables                                          *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
-<div id="breadcrumbs" class="hidden">
-  <a href="index.html">
-		Accueil
-  </a>:
-  <a href="Blogs.php?lang=fr">
-		Blogues
-  </a>:
-  <span id="parentBlog">
-  <a href="BlogPost.php?table=Blogs&blogid=$parentblogid&lang=fr">
-		Blogue $parentblogid
-  </a>:
-  </span>
-</div>
-  <div class="body">
-  <h1>
-      <span class="right">
-	<a href="/BlogPostHelpfr.html" target="help">? Aide</a>
-      </span>
-	$TITLE
-      <div style="clear: both;"></div>
-  </h1>
-  <div class="hidden"><!-- choices for page title and h1-->
-	<span id="NewBlog">Poster Nouveau Blogue Generale</span>
-	<span id="AddBlog">Poster Blogue en Response a Blogue $BLOGTITLE</span>
-	<span id="EditBlog">Modifer Blogue Existant $BLOGTITLE</span>
-  </div>
-  $TRACE
-  $MSG
-  <form name="blogForm" id="blogForm" action="BlogPost.php" method="post"
-	enctype='multipart/form-data'>
-    <input id="lang" type="hidden" value="fr">
-  $POSTS
-  <div class="hidden" id="blogTemplate">
-      <p class="label" style="margin-left: $margin">
-	Le $day $month $year à $time l'employeur '$username' 
-	a écrit: <a href="BlogPost.php?table=Blogs&blogid=$blogid&lang=fr">$blogname</a>
+	<div id="breadcrumbs" class="hidden">
+	  <a href="index.html">
+			Accueil
+	  </a>:
+	  <a href="Blogs.php?lang=fr">
+			Blogues
+	  </a>:
+	  <span id="parentBlog">
+	  <a href="BlogPost.php?table=Blogs&blogid=$parentblogid&lang=fr">
+			Blogue $parentblogid
+	  </a>:
+	  </span>
+	</div>
+    <div class="body">
+	  <h1>
+	      <span class="right">
+		<a href="/BlogPostHelpfr.html" target="help">? Aide</a>
+	      </span>
+		$TITLE
+	      <div style="clear: both;"></div>
+	  </h1>
+	  <div class="hidden"><!-- choices for page title and h1-->
+		<span id="NewBlog">Poster Nouveau Blogue Generale</span>
+		<span id="NewMessage">Poster Nouveau Message $CLASS Generale</span>
+    	<span id="NewSpecific">Poster Nouveau Message $CLASS pour $NAME</span>
+		<span id="AddBlog">
+            Poster Message en Réponse a Message $BLOGTITLE
+        </span>
+		<span id="EditBlog">Modifer Message Existant $BLOGTITLE</span>
+	  </div>
+	  $TRACE
+	  $MSG
+      <p class="message" id="badTable">
+        Parametre invalide table="$table".
       </p>
-      <div style="margin-left: $margin; white-space: normal;">
-        $message
-      </div>
-      <p style="margin-left: $margin" id="buttonRow$blogid">
-        <button id="edit$blogid">Modifier</button>
-        <button id="del$blogid">Ecraser</button>
-      </p>
-  </div>	
-  <h2>
-    <span id="Response">Suivre:</span>
-    <span id="Edit">Modifier Blogue Post $blogid:</span>
-    <span id="NewPost">Poster Nouveau Blogue:</span>
-  </h2>
-    <input type="hidden" name="userid" id="userid"
-	        value="$userid">
-    <input type="hidden" name="blogid" id="blogid"
-	        value="$blogid">
-    <input type="hidden" name="debug" id="debug"
-	        value="$debug">
-  <p class="warning" id="notLoggedOn">
-    Vous n'êtes pas connecté en tant qu'utilisateur enregistré de ce site.
-    Tout matériel que vous fournirez sera associé à votre adresse courriel.
-  </p>
-  <div class="row" id="blogSubjectRow">
-    <label class='column1' for='subject'>
-	Soujet:
-    </label>
-    <input type="text" class="white leftnc"
-		id="subject" name="subject"
-		size="80" value="$BLOGTITLE">
-  </div>
-  <div class="row" id="blogMsgRow">
-    <label class='column1' for='message' id="msgLabel">
-	Message:
-    </label>
-    <textarea name="message" id="message" placeholder="[enter message]"
-	rows="30">$posttext</textarea>
-  </div>
-  <div class="row" id="blogEmailRow">
-    <label class='column1' for='emailAddress'>
-	Votre Addresse Courriel:
-    </label>
-    <input type="text" class="$EMAILCLASS leftnc" $READONLY
-		id="emailAddress" name="emailAddress"
-		size="80" value="$EMAIL">
-  </div>
-  <p id="blogPostRow">
-    <button type="button" id="PostBlog" accessKey="B">
-	Poster <u>B</u>logue
-    </button>
-  </p>
-</form> <!-- name="blogform" id="blogform" -->
-
-  <!-- the remaining portion of the page is divisions containing popup help -->
-  <div class="balloon" id="Helpsubject">
-    Ce champ sert à fournir un titre ou un résumé du contenu du
-    blogue. Si ceci est omis, la première ligne du corps du message est
-    utilisée comme assujettir.
-  </div>
-  <div class="balloon" id="Helpmessage">
-    Ce champ permet de modifier un message à publier en tant qu’entrée 
-    de blogue.
-  </div>
-  <div class="balloon" id="HelpemailAddress">
-    Si vous n'êtes pas connecté en tant que contributeur inscrit au site Web,
-    vous devez fournir une adresse e-mail pour identifier
-    la source de tout
-    messages de blogue que vous publiez.
-    Cette adresse e-mail sera exposée dans le message posté.
-  </div>
-  <div class="balloon" id="HelpPostBlog">
-    Cliquez sur ce bouton pour poster le message que vous avez entré.
-    L'application prend également en charge le raccourci clavier Alt-B.
-  </div>
-    <script src="/jscripts/js20/http.js" type="text/javascript">
-    </script>
-    <script src="/jscripts/util.js" type="text/javascript">
-    </script>
-    <script src="/jscripts/CommonForm.js" type="text/javascript">
-    </script>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
-    </script>
-    <script src="/BlogPost.js" type="text/javascript">
-    </script>
+	  <form name="blogForm" id="blogForm" action="BlogPost.php" method="post"
+		    enctype='multipart/form-data'>
+	    <input id="lang" type="hidden" value="fr">
+	    $POSTS
+	    <div class="hidden" id="blogTemplate">
+	        <p class="label" style="margin-left: $margin">
+		  Le $day $month $year à $time l'employeur '$username' 
+		  a écrit: <a href="BlogPost.php?table=Blogs&blogid=$blogid&lang=fr">$blogname</a>
+	        </p>
+	        <div style="margin-left: $margin; white-space: normal;">
+	          $message
+	        </div>
+	        <p style="margin-left: $margin" id="buttonRow$blogid">
+	          <button id="edit$blogid" type="button">Modifier</button>
+	          <button id="del$blogid" type="button">Ecraser</button>
+	        </p>
+	    </div>	
+	    <h2>
+	      <span id="Response">Suivre:</span>
+	      <span id="Edit">Modifier Message $blogid:</span>
+	      <span id="NewPost">Poster Nouveau Message:</span>
+	    </h2>
+	      <input type="hidden" name="userid" id="userid"
+		            value="$userid">
+	      <input type="hidden" name="id" id="id"
+		            value="$id">  
+          <input type="hidden" name="table" id="table"
+    	            value="$TABLE">
+	      <input type="hidden" name="debug" id="debug"
+		            value="$debug">
+	    <p class="warning" id="notLoggedOn">
+	      Vous n'êtes pas connecté en tant qu'utilisateur enregistré de ce site.
+	      Tout matériel que vous fournirez sera associé à votre adresse courriel.
+	    </p>
+	    <div class="row" id="blogSubjectRow">
+	        <label class='column1' for='subject'>
+		        Soujet:
+	        </label>
+	        <input type="text" class="white left"
+			        id="subject" name="subject"
+			        size="64" value="$BLOGTITLE">
+            <div style="clear: both;"></div>
+	    </div>
+	    <div class="row" id="blogMsgRow">
+	        <label class='column1' for='message' id="msgLabel">
+		        Message:
+	        </label>
+	        <textarea name="message" id="message" placeholder="[enter message]"
+		            rows="30">$posttext</textarea>
+            <div style="clear: both;"></div>
+	    </div>
+	    <div class="row" id="blogEmailRow">
+	        <label class='column1' for='emailAddress'>
+		        Votre Addresse Courriel:
+	        </label>
+	        <input type="text" class="$EMAILCLASS leftnc" $READONLY
+			        id="emailAddress" name="emailAddress"
+			        size="64" value="$EMAIL">
+            <div style="clear: both;"></div>
+	    </div>
+	    <p id="blogPostRow">
+	      <button type="submit" id="PostBlog" accessKey="P">
+              <u>P</u>oster Message
+          &nbsp;
+          <button type="button" id="Close">
+              Fermer
+          </button>
+	      </button>
+	    </p>
+	  </form> <!-- name="blogform" id="blogform" -->
+    </div> <!-- class="body" -->
+	<!-- the remaining portion of the page is divs containing popup help -->
+	<div class="balloon" id="Helpsubject">
+	    Ce champ sert à fournir un titre ou un résumé du contenu du
+	    blogue. Si ceci est omis, la première ligne du corps du message est
+	    utilisée comme assujettir.
+	</div>
+	<div class="balloon" id="Helpmessage">
+	    Ce champ permet de modifier un message à publier en tant qu’entrée 
+	    de blogue.
+	</div>
+	<div class="balloon" id="HelpemailAddress">
+	    Si vous n'êtes pas connecté en tant que contributeur inscrit au site Web,
+	    vous devez fournir une adresse e-mail pour identifier
+	    la source de tout
+	    messages de blogue que vous publiez.
+	    Cette adresse e-mail sera exposée dans le message posté.
+	</div>
+	<div class="balloon" id="HelpPostBlog">
+	    Cliquez sur ce bouton pour poster le message que vous avez entré.
+	    L'application prend également en charge le raccourci clavier Alt-B.
+	</div>
+	<script src="/jscripts/js20/http.js" type="text/javascript">
+	</script>
+	<script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+	</script>
+	<script src="/jscripts/util.js" type="text/javascript">
+	</script>
+	<script src="/jscripts/CommonForm.js" type="text/javascript">
+	</script>
+	<script src="/BlogPost.js" type="text/javascript">
+	</script>

@@ -1,0 +1,281 @@
+<!--*********************************************************************
+ *  editPictureDisplayen.html											*
+ *																		*
+ *  Template to isplay a web page for editting one picture for an		*
+ *  record from the Legacy database which is represented				*
+ *  by an instance of Picture (a record in table tblBR).				*
+ *																		*
+ *  History: 															*
+ *		2019/07/26		created											*
+ *      2019/09/25      checkboxes must be both readonly for appearance *
+ *                      and disabled so they cannot be clicked          *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <link rel="stylesheet" type="text/css" href="/Ontario/editPicture.css"/>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">
+        Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+        Services</a>:
+      <a href="/FamilyTree/nominalIndex.php?lang=$LANG">
+            Nominal Index
+      </a>:
+      <a href="/FamilyTree/$script.php?$key=$idir&amp;lang=$LANG"
+            id="reference">
+            $name
+      </a>:
+    </div> <!-- id="breadcrumbs" -->
+    <div class="body">
+      <h1>
+        <span class="right">
+          <a href="editPictureHelpen.html" target="help">? Help</a>
+        </span>
+        <span id="goodRecord">
+            Edit Picture: for $NAME
+        </span>
+        <span id="badRecord">
+            Edit Picture: Invalid
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <form name="picForm" id="picForm"
+            action="editPicture.php" method="get">
+        <div>
+          <input type="hidden" name="idir" value="$IDIR">
+          <input type="hidden" name="idbr" value="$IDBR">
+          <input type="hidden" name="idtype" value="$IDTYPE">
+          <input type="hidden" name="lang" value="$LANG">
+          <input type="hidden" name="Debug" value="$DEBUG">
+        </div>
+        <div class="row" id="fileTypeRow">
+            <label class="column1" for="pictype">
+                  File Type:
+            </label>
+            <select size="1" name="pictype" id="pictype"
+                  class="white left" readonly="readonly"
+                  value="$PICTYPE">
+                  <option value="0" $PICSELECTED0>Image</option>
+                  <option value="1" $PICSELECTED1>Sound</option>
+                  <option value="2" $PICSELECTED2>Video</option>
+                  <option value="3" $PICSELECTED3>Other</option>
+              </select>
+            <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="imageURLRow">
+            <label class="column1" for="picnameurl">
+                  Image URL:
+            </label>
+              <input type="text" size="64" name="picnameurl" id="picnameurl"
+                  maxlength="511" class="white leftnc" readonly="readonly"
+                  value="$LOCATION">
+              <button type="button" id="browseFile">
+                  Browse
+              </button>
+            <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="contentsRow">
+            <div class="left">
+            <label class="column1">
+                  Contents:
+            </label>
+            </div>
+            <div id="pictureTemplate" class="picture" style="float: left;">
+        	  <img src="$LOCATION"
+		    	    alt="$CAPTION">
+	          <p class="large">
+			        $CAPTION
+	          </p>
+            </div>
+           <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="captionRow">
+            <label class="column1" for="piccaption">
+                  Caption:
+            </label>
+              <input type="text" size="64" name="piccaption" id="piccaption"
+                  maxlength="255" class="white leftnc" readonly="readonly"
+                  value="$CAPTION">
+            <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="dateRow">
+            <label class="column1" for="picdate">
+                  Date:
+            </label>
+              <input type="text" size="16" name="picdate" id="picdate"
+                          maxlength="30" class="white left" readonly="readonly"
+                          value="$DATE">
+            <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="descriptionRow">
+            <label class="column1" for="picdesc">
+                  Description:
+            </label>
+            <div style="float: left;">
+              $DESC
+            </div>
+            <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="printRow">
+            <label class="column1" for="picprint">
+                  Print:
+            </label>
+              <input type="checkbox" name="picprint" id="picprint"
+                    readonly="readonly" disabled="disabled" value="1"
+                    $PRINTCHECKED>
+            <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="soundRow">
+            <label class="column1" for="picsoundnameurl">
+                  Sound File URL:
+            </label>
+              <input type="text" name="picsoundnameurl" id="picsoundnameurl"
+                          size="64" class="white leftnc" readonly="readonly"
+                          value="$SOUND">
+              <button type="button" name="browseSound" id="browseSound">
+                  Browse
+              </button>
+            <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="playSoundRow">
+            <label class="column1">
+                  Play Sound:
+            </label>
+            <audio controls="controls">
+              <source src="$SOUND"
+                          type="audio/$FILETYPE">
+              <span class="message">
+                  Your browser does not support the audio element.
+              </span>
+            </audio>
+            <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="preferredRow">
+            <label class="column1" for="picpref">
+                  Preferred:
+            </label>
+              <input type="checkbox" name="picpref" id="picpref"
+                        readonly="readonly" disabled="disabled" value="1"
+                        $PREFCHECKED>
+            <div style="clear: both;"></div>
+          </div>
+          <div class="row" id="filingRefRow">
+            <label class="column1" for="filingref">
+                  Filing Ref:
+            </label>
+              <input type="text" size="40" name="filingref" id="filingref"
+                  maxlength="50" class="white leftnc" readonly="readonly"
+                  value="$USERREF">
+            <div style="clear: both;"></div>
+          </div>
+        <p id="buttonRow">
+          <button type="button" id="Close">
+              Close
+          </button>
+        </p>
+      </form>
+    </div> <!-- id="body"-->
+    <div class="hidden" id="templates">
+      <!-- error message texts -->
+      <span id="badidbr">
+        Missing or invalid picture identifier IDBR='$text'.
+      </span> 
+      <span id="badidtype">
+        Missing or invalid value for idtype='$text'.
+      </span> 
+      <span id="badpictype">
+        Missing or invalid value for pictype='$text'.
+      </span> 
+      <span id="badidir">
+        Missing or invalid value for idir='$text'.
+      </span> 
+      <!-- template for confirming the deletion of a picture -->
+      <form name="ClrInd$template" id="ClrInd$template">
+        <p class="message">Are you sure you want to delete this picture?</p>
+        <p>
+          <button type="button" id="confirmClear$type">
+            OK
+          </button>
+          <input type="hidden" id="formname$type" name="formname$type"
+                    value="$formname">
+            &nbsp;
+          <button type="button" id="cancelDelete$type">
+            Cancel
+          </button>
+        </p>
+      </form>
+  
+    </div> <!-- id="templates" -->
+    <div class="balloon" id="Helppicdate">
+      Enter the date on which the picture was taken.
+      The recommended format for entering dates is day of
+      the month, month name or supported abbreviation thereof, and year.
+      For example "12 July 1879" or "17 Nov 1906".
+    </div>
+    <div class="balloon" id="Helppictype">
+      This selection list identifies the type of document that you are embedding
+      in the record.  At the moment only "image" has full functionality.
+    </div>
+    <div class="balloon" id="Helppicname">
+      This is a name given to the associated document to make it easier to find
+      if you wish to refer to the same document from multiple places.
+    </div>
+    <div class="balloon" id="Helppiccaption">
+      Text which describes the contents of the picture.  This is displayed
+      below the image.
+    </div>
+    <div class="balloon" id="Helppicnameurl">
+      This is the uniform record locator describing where the document is
+      located on the web.  Only documents viewable on the web can be embedded
+      in the tree.
+    </div>
+    <div class="balloon" id="HelpbrowseFile">
+      Clicking on this button pops up a dialog to locate the document to
+      embed into the tree.
+    </div>
+    <div class="balloon" id="Helppicdesc">
+      This is an extended text area in which you can enter comments about the
+      document.
+    </div>
+    <div class="balloon" id="Helppicprint">
+      This is a checkbox which is used to indicate whether or not the document
+      may be printed by the user.  This option is not currently implemented.
+    </div>
+    <div class="balloon" id="Helppicsoundnameurl">
+      This is the uniform record locator describing where a sound clip file
+      associated with the document is located on the web.
+      Only sound files that are available on the web can be embedded
+      in the tree.  This option is not currently implemented.
+    </div>
+    <div class="balloon" id="HelpbrowseSound">
+      Clicking on this button pops up a dialog to locate the sound file to
+      associate with the document.
+    </div>
+    <div class="balloon" id="Helppicpref">
+      This is a checkbox which is used to indicate that this is the preferred
+      document to be displayed for the associated record.
+      This option is not currently implemented.
+    </div>
+    <div class="balloon" id="Helpfilingref">
+      This is a text input field that can be used by the user to provide a
+      user record identifier for this document.
+    </div>
+    <div class="balloon" id="HelpupdPicture">
+      Clicking on this button applies all of the changes made to this fact
+      or picture and closes the dialog.  Note that pressing the Enter key while
+      editting any text field in this dialog also performs this function.
+    </div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/Cookie.js" type="application/javascript">
+    <script src="/Family/citTable.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    </script>
+    <script src="/FamilyTree/editPicture.js" type="application/javascript">
+    </script>

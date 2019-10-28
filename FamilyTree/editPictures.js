@@ -26,6 +26,7 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
+ *		2019/06/29      first parameter of displayDialog removed        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -85,20 +86,20 @@ function loadEdit()
 		{
 		    case 'Add':
 		    {
-				element.onclick		= picAdd;
+                element.addEventListener('click', picAdd);
 				break;
 		    }
 
 		    case 'Close':
 		    {
-				element.onclick		= finish;
+                element.addEventListener('click', finish);
 				element.focus();
 				break;
 		    }
 
 		    case 'Order':
 		    {
-				element.onclick		= orderByDate;
+                element.addEventListener('click', orderByDate);
 				break;
 		    }
 
@@ -120,7 +121,7 @@ function loadEdit()
 		}	// switch on element name
     }		// loop through all elements in the form
 
-}		// loadEdit
+}		// function loadEdit
 
 /************************************************************************
  *  function validateForm												*
@@ -134,7 +135,7 @@ function loadEdit()
 function validateForm()
 {
     return true;
-}		// validateForm
+}		// function validateForm
 
 /************************************************************************
  *  function resetForm														*
@@ -148,38 +149,48 @@ function validateForm()
 function resetForm()
 {
     return true;
-}	// resetForm
+}	// function resetForm
 
 /************************************************************************
- *  function picEdit														*
+ *  function picEdit													*
  *																		*
  *  This method is called when the user requests to edit				*
- *  a picture of a genealogical entity.										*
+ *  a picture of a genealogical entity.									*
  *																		*
  *  Input:																*
- *		this				instance of <button id='Edit...'>				*
+ *		this			instance of <button id='Edit...'>				*
+ *		ev              instance of Event                               *
  ************************************************************************/
-function picEdit()
+function picEdit(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	idbr		= this.id.substring(4);
     openFrame("picture",
 		      "editPicture.php?idbr=" + idbr,
 		      childFrameClass);
     return true;
-}	// picEdit
+}	// function picEdit
 
 /************************************************************************
  *  function picAdd														*
  *																		*
- *  This method is called when the user requests to add						*
- *  a picture to a genealogical entity.										*
+ *  This method is called when the user requests to add					*
+ *  a picture to a genealogical entity.									*
  *																		*
  *  Input:																*
- *		this				instance of <button id='Add'>						*
+ *		this			instance of <button id='Add'>					*
+ *		ev              instance of Event                               *
  ************************************************************************/
-function picAdd()
+function picAdd(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	idir		= form.idir.value;
     var	idtype		= form.idtype.value;
@@ -187,7 +198,7 @@ function picAdd()
 		      "editPicture.php?idbr=0&idir=" + idir + "&idtype=" + idtype, 
 		      childFrameClass);
     return true;
-}	// picAdd
+}	// function picAdd
 
 /************************************************************************
  *  function picDel														*
@@ -196,49 +207,48 @@ function picAdd()
  *  a picture from a genealogical entity.								*
  *																		*
  *  Input:																*
- *		this				instance of <button id='Del...'>				*
+ *		this			instance of <button id='Del...'>				*
+ *		ev              instance of Event                               *
  ************************************************************************/
-function picDel()
+function picDel(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	idbr		= this.id.substring(3);
-
-    var parms		= {"idbr"	: idbr,
-					   "rownum"	: idbr,
+    var parms		= {"idbr"	    : idbr,
+					   "rownum"	    : idbr,
 					   "formname"	: form.name, 
-					   "template"	: "",
-					   "msg"	:
-					"Are you sure you want to delete this picture?"};
+					   "template"	: ""};
 
     if (debug != 'n')
 		parms["debug"]	= debug;
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-				      'PicDel$template',
-				      parms,
-				      this,		// position relative to
-				      confirmDelete,	// 1st button confirms Delete
-				      false);		// default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("editPictures.js: picDel: Error: <div id='msgDiv'> not defined");
-}		// picDel
+	displayDialog('PicDel$template',
+			      parms,
+			      this,		        // position relative to
+			      confirmDelete);	// 1st button confirms Delete
+}		// function picDel
 
 /************************************************************************
  *  function confirmDelete												*
  *																		*
- *  This method is called when the user confirms the request to delete		*
- *  a picture.																*
+ *  This method is called when the user confirms the request to delete	*
+ *  a picture.															*
  *																		*
  *  Input:																*
- *		this				<button id='confirmDelete...'>						*
+ *		this			<button id='confirmDelete...'>					*
+ *		ev              instance of Event                               *
  ************************************************************************/
-function confirmDelete()
+function confirmDelete(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     // get the parameter values hidden in the dialog
     var	form		= this.form;
     var	idbr		= this.id.substr(13);
@@ -257,16 +267,16 @@ function confirmDelete()
 		      parms,
 		      gotDelete,
 		      noDelete);
-}	// picDel
+}	// function confirmDelete
 
 /************************************************************************
- *  function gotDelete														*
+ *  function gotDelete													*
  *																		*
- *  This method is called when the response to the request to delete		*
+ *  This method is called when the response to the request to delete	*
  *  a picture is received from the server.								*
  *																		*
- *  Parameters:																*
- *		xmlDoc				reply as an XML document						*
+ *  Parameters:															*
+ *		xmlDoc			reply as an XML document						*
  ************************************************************************/
 function gotDelete(xmlDoc)
 {
@@ -326,31 +336,36 @@ function gotDelete(xmlDoc)
 		    msg	+= xmlDoc;
 		alert (msg);
     }		// error
-}	// gotDelete
+}	// function gotDelete
 
 /************************************************************************
- *  function noDelete														*
+ *  function noDelete													*
  *																		*
- *  This method is called if there is no response to the AJAX				*
+ *  This method is called if there is no response to the AJAX			*
  *  delete picture request.												*
  ************************************************************************/
 function noDelete()
 {
     alert("editPictures.js: noDelete: " +
 		"script deletePictureXml.php not found on server");
-}	// noDelete
+}	// function noDelete
 
 /************************************************************************
- *  function orderByDate														*
+ *  function orderByDate												*
  *																		*
- *  This method is called when the user requests to reorder the				*
- *  pictures by date.														*
+ *  This method is called when the user requests to reorder the			*
+ *  pictures by date.													*
  *																		*
  *  Input:																*
- *		this				instance of <button id='Order'>						*
+ *		this			instance of <button id='Order'>					*
+ *		ev              instance of Event                               *
  ************************************************************************/
-function orderByDate()
+function orderByDate(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	idir		= form.idir.value;
     var	idtype		= form.idtype.value;
@@ -363,16 +378,16 @@ function orderByDate()
 		      parms,
 		      gotOrder,
 		      noOrder);
-}	// orderByDate
+}	// function orderByDate
 
 /************************************************************************
- *  function gotOrder														*
+ *  function gotOrder													*
  *																		*
- *  This method is called when the XML response to a request to reorder		*
- *  the pictures by date is received.										*
+ *  This method is called when the XML response to a request to reorder	*
+ *  the pictures by date is received.									*
  *																		*
- *  Parameters:																*
- *		xmlDoc				reply as an XML document						*
+ *  Parameters:															*
+ *		xmlDoc			reply as an XML document						*
  ************************************************************************/
 function gotOrder(xmlDoc)
 {
@@ -398,43 +413,48 @@ function gotOrder(xmlDoc)
 		    msg		+= xmlDoc;
 		alert (msg);
     }		// error
-}	// gotOrder
+}	// function gotOrder
 
 /************************************************************************
- *  function noOrder														*
+ *  function noOrder													*
  *																		*
- *  This method is called if there is no response to the AJAX				*
+ *  This method is called if there is no response to the AJAX			*
  *  reorder pictures call.												*
  ************************************************************************/
 function noOrder()
 {
     alert("editPictures.js: noOrder: " +
 		"script orderPicturesByDateXml.php not found on server");
-}	// noOrder
+}	// function noOrder
 
 /************************************************************************
  *  function finish														*
  *																		*
  *  This method is called when the user requests to close				*
- *  the window.																*
+ *  the window.															*
  *																		*
  *  Input:																*
- *		this				instance of <button id='Close'>						*
+ *		this			instance of <button id='Close'>					*
+ *		ev              instance of Event                               *
  ************************************************************************/
-function finish()
+function finish(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     closeFrame();
     return true;
-}	// finish
+}	// function finish
 
 /************************************************************************
- *  function epKeyDown														*
+ *  function epKeyDown													*
  *																		*
- *  The key combinations Ctrl-S and Alt-U are interpreted to apply the		*
- *  update, as shortcut alternatives to using the mouse to click the 		*
+ *  The key combinations Ctrl-S and Alt-U are interpreted to apply the	*
+ *  update, as shortcut alternatives to using the mouse to click the 	*
  *  Update Citation button.												*
  *																		*
- *  Parameters:																*
+ *  Parameters:															*
  *		e		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function epKeyDown(e)
@@ -482,5 +502,5 @@ function epKeyDown(e)
     }		// alt
 
     return true;
-}		// epKeyDown
+}		// function epKeyDown
 

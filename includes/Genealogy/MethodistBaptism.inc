@@ -11,7 +11,8 @@ use \Iterator;
  *  Definition of a class representing a record in the					*
  *  MethodistBaptisms table that represents a single registration.		*
  *																		*
- *		`IDMB`          BIGINT(20) AUTO_INCREMENT,						*
+ *	CREATE TABLE `MethodistBaptisms` (                                  *
+ *		`IDMB`          INT(11) NOT NULL AUTO_INCREMENT,				*
  *		`Volume`        INT(11),										*
  *		`Page`          INT(11),										*
  *		`District`      VARCHAR(128),									*
@@ -26,6 +27,17 @@ use \Iterator;
  *		`BaptismDate`   VARCHAR(128),									*
  *		`BaptismPlace`  VARCHAR(128),									*
  *		`Minister`      VARCHAR(128),									*
+ *		`IDIR`          INT(11),										*
+ *      PRIMARY KEY (`IDMB`),											*
+ *		KEY `Volume` (`Volume`),										*
+ *		KEY `Page` (`Page`),											*
+ *		KEY `District` (`District`),									*
+ *		KEY `Area` (`Area`),											*
+ *		KEY `GivenName` (`GivenName`),									*
+ *		KEY `Surname` (`Surname`),										*
+ *		KEY `Father` (`Father`),										*
+ *		KEY `Mother` (`Mother`) )										*
+ *		ENGINE=InnoDB DEFAULT CHARSET=utf8                              *
  *																		*
  *  History:															*
  *		2016/02/21		created											*

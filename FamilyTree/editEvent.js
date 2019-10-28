@@ -155,6 +155,8 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
+ *		2019/06/29      first parameter of displayDialog removed        *
+ *		2019/08/01      support tinyMCE 5.0.3                           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -180,31 +182,6 @@ window.onload	= loadEdit;
 var childFrameClass	    = 'right';
 
 /************************************************************************
- * specify the style for tinyMCE editing								*
- ************************************************************************/
-try {
-tinyMCE.init({
-		mode			: "textareas",
-		theme			: "advanced",
-		plugins 		: "spellchecker,advhr,preview", 
-
-		// Theme options - button# indicates the row# only
-		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-		forced_root_block	: false,
-		forced_root_block	: false,
-		content_css		: "/styles.css",
-		onchange_callback	: "changeOccupation",
-		editor_deselector	: "mceNoEditor"
-});
-} catch(err){ alert("tinyMCE.init: " + err.message);}
-
-/************************************************************************
  *  function loadEdit													*
  *																		*
  *  Initialize dynamic functionality of elements.						*
@@ -224,7 +201,7 @@ function loadEdit()
     }				    // dialog opened in half frame
 
     // handle keystrokes anywhere in body of page
-    document.body.onkeydown	= eeKeyDown;
+    document.body.addEventListener('keydown',eeKeyDown);
 
     // activate functionality of various input fields
     var	focusSet	= false;
@@ -237,8 +214,8 @@ function loadEdit()
 		// set action methods for form
 		if (form.name == 'evtForm')
 		{			    // main form
-		    form.onsubmit	= suppressSubmit;
-		    form.onreset 	= resetForm;
+		    form.onsubmit	    = suppressSubmit;
+		    form.onreset 	    = resetForm;
 		    form.nameFeedback	= nameFeedback;
 		    form.sourceCreated	= sourceCreated;
 		}			    // main form
@@ -268,41 +245,42 @@ function loadEdit()
 		    {			// action depends upon element name
 				case 'etype':
 				{		// event type input field
-				    element.onkeydown	= keyDown;
+				    element.addEventListener('keydown',keyDown);
 				    element.onchange	= changeEtype;
 				    if (!focusSet)
 				    {		// need focus in some field
-					element.focus();	// set focus
-					focusSet	= true;
+	    				element.focus();	// set focus
+		    			focusSet	    = true;
 				    }		// need focus in some field
 				    break;
 				}		// event type input field
 
 				case 'date':
 				{		// event date 
-				    element.onkeydown	= inputKeyDown;
-				    element.abbrTbl	= MonthAbbrs;
+				    element.addEventListener('keydown',inputKeyDown);
+				    element.abbrTbl	    = MonthAbbrs;
 				    element.checkfunc	= checkDate;
 				    element.onchange	= dateChanged;
-				    element.onblur	= gotoDescription;
+				    element.onblur	    = gotoDescription;
 				    element.focus();	// set focus
-				    focusSet		= true;
+				    focusSet		    = true;
 				    break;
 				}		// event date
 
 				case 'occupation':
 				{		// occupation
-				    element.onkeydown	= inputKeyDown;
+				    element.addEventListener('keydown',inputKeyDown);
 				    element.checkfunc	= checkOccupation;
 				    element.onchange	= change;
-				    element.abbrTbl	= OccAbbrs;
+				    element.abbrTbl	    = OccAbbrs;
 				    break;
 				}		// occupation
 
 				case 'location':
 				{		// event location
-				    element.onkeydown	= inputKeyDown;
-				    element.abbrTbl	= evtLocAbbrs;
+				    element.addEventListener('focus', focusLocation);
+				    element.addEventListener('keydown',inputKeyDown);
+				    element.abbrTbl	    = evtLocAbbrs;
 				    element.onchange	= locationChanged;
 				    break;
 				}		// event location
@@ -317,7 +295,7 @@ function loadEdit()
 
 				case 'deathcause':
 				{		// cause of death
-				    element.onkeydown	= inputKeyDown;
+				    element.addEventListener('keydown',inputKeyDown);
 				    element.abbrTbl	    = CauseAbbrs;
 				    element.checkfunc	= checkText;
 				    element.onchange	= change;
@@ -326,37 +304,37 @@ function loadEdit()
 
 				case 'updevent':
 				{		// <button id='updEvent'>
-				    element.onkeydown	= keyDown;
-				    element.onclick     = updateEvent;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',updateEvent);
 				    element.onchange	= change;	// default handler
 				    break;
 				}		// <button id='updEvent'>
 
 				case 'raw':
 				{		// <button id='raw'>
-				    element.onkeydown	= keyDown;
-				    element.onclick     = showRaw;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',showRaw);
 				    break;
 				}		// <button id='raw'>
 
 				case 'clear':
 				{		// <button id='Clear'>
-				    element.onkeydown	= keyDown;
-				    element.onclick     = clearNotes;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',clearNotes);
 				    break;
 				}		// <button id='Clear'>
 
 				case 'submit':
 				{		// <button id='Submit' type='submit'>
-				    element.onkeydown	= keyDown;
+				    element.addEventListener('keydown',keyDown);
 				    form.onsubmit	    = proceedWithSubmit;
 				    break;
 				}		// <button id='Submit' type='submit'>
 
 				case 'close':
 				{		// <button id='close'>
-				    element.onkeydown	= keyDown;
-				    element.onclick     = closeWithoutUpdating;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',closeWithoutUpdating);
 				    break;
 				}		// <button id='close'>
 
@@ -375,56 +353,56 @@ function loadEdit()
 				case 'addcitation':
 				case 'addcitationdeathcause':
 				{		// add citation to primary fact
-				    element.onkeydown	= keyDown;
-				    element.onclick     = addCitation;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',addCitation);
 				    break;
 				}		// add citation to primary fact
 
 				case 'pictures':
 				{		// <button id='Pictures'>
-				    element.onkeydown	= keyDown;
-				    element.onclick     = editPictures;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',editPictures);
 				    break;
 				}		// <button id='Pictures'>
 
 				case 'editname':
 				{		// edit alternate name button
-				    element.onkeydown	= keyDown;
-				    element.onclick     = editName;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',editName);
 				    break;
 				}		// edit alternate name button
 
 				case 'delname':
 				{		// delete alternate name button
-				    element.onkeydown	= keyDown;
-				    element.onclick     = delName;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',delName);
 				    break;
 				}		// delete alternate name button
 
 				case 'editcitation':
 				{		// edit alternate name citation button
-				    element.onkeydown	= keyDown;
-				    element.onclick     = editCitation;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',editCitation);
 				    break;
 				}		// edit alternate name citation button
 
 				case 'delcitation':
 				{		// delete alternate name citation button
-				    element.onkeydown	= keyDown;
-				    element.onclick     = deleteCitation;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',deleteCitation);
 				    break;
 				}		// delete alternate name citation button
 
 				case 'addcitation':
 				{		// add alternate name citation button
-				    element.onkeydown	= keyDown;
-				    element.onclick     = addAltCitation;
+				    element.addEventListener('keydown',keyDown);
+				    element.addEventListener('click',addAltCitation);
 				    break;
 				}		// add alternate name citation button
 
 				default:
 				{
-				    element.onkeydown	= keyDown;
+				    element.addEventListener('keydown',keyDown);
 				    element.onchange	= change;	// default handler
 				    break;
 				}		// default
@@ -441,15 +419,16 @@ function loadEdit()
  *																		*
  *  Parameters:															*
  *		this	instance of <input type='text'>							*
- *		e		W3C compliant browsers pass an event as a parameter		*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
-function inputKeyDown(e)
+function inputKeyDown(ev)
 {
-    if (!e)
+    if (!ev)
     {		            // browser is not W3C compliant
-		e	=  window.event;	// IE
+		ev	=  window.event;	// IE
     }	            	// browser is not W3C compliant
-    var	code	= e.keyCode;		// numeric keystroke
+
+    var	code	= ev.keyCode;		// numeric keystroke
 
     var form	= this.form;		// form containing input field
 
@@ -650,6 +629,23 @@ function changeOccupation(editor)
 }		// function changeOccupation
 
 /************************************************************************
+ *  function focusLocation				    							*
+ *																		*
+ *  Because tinyMCE 5.0.3 is not calling the changeOccupation handler   *
+ *  this routine is called when focus lands in another field.			*
+ *																		*
+ *  Input:																*
+ *		this    <input>                                                 *
+ *		ev		W3C compliant browsers pass an event as a parameter		*
+ ************************************************************************/
+function focusLocation(ev)
+{
+	var mceElt          = tinyMCE.get('occupation');
+    if (mceElt)
+		changeOccupation(mceElt);
+}       // function focusLocation
+
+/************************************************************************
  *  function gotoDescription											*
  *																		*
  *  Take action when the user leaves the date field.					*
@@ -812,11 +808,18 @@ function resetForm()
  *  an event of an individual.											*
  *																		*
  *  Input:																*
- *		this		the <button id='updateEvent'> element				*
+ *		this	the <button id='updateEvent'> element				    *
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 var parmStr;
 function updateEvent(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     if (deferSubmit)
     {
         deferSubmit     = false;
@@ -896,12 +899,25 @@ function updateEvent(ev)
 		    case 'occupation':
 		    case 'note':
 		    {		// fields using tinyMCE for extended notes
-				var	text	= elt.value;
-                try {
-				if (elt.className.indexOf('mceNoEditor') == -1)
-				    text	= tinyMCE.get(elt.name).getContent();
-                } catch(err) { alert(err.message);}
-				parms[elt.name]	= text;
+				var	text	            = elt.value;
+                if (typeof tinyMCE !== 'undefined')
+                {
+					var mceElt          = tinyMCE.get(elt.name);
+					if (mceElt)
+	                {
+					    text	        = mceElt.getContent();
+	                    var results     = /<p>(.*)<\/p>/.exec(text);
+	                    if (results)
+	                    {
+	                        text        = results[1];
+					        mceElt.setContent(text);
+	                    }
+                        elt.value       = text;
+	                }
+                }
+                changeElt(elt);
+                text                    = elt.value;
+				parms[elt.name]	        = text;
 				break;
 		    }		// extended notes
 
@@ -931,9 +947,10 @@ function updateEvent(ev)
     var parmstr='{';
     for(var k in parms)
 		parmstr	+= k + ' : ' + parms[k] + ',';
-    //alert("editEvent.js: updateEvent: invoke '/FamilyTree/updateEvent.php', " +
-    //	      parmstr);
-    parmStr     = parmstr;
+    if (debug.toLowerCase() == 'y')
+        alert("editEvent.js: updateEvent: " +
+              "invoke '/FamilyTree/updateEvent.php', " +
+    	      parmstr);
 
     // invoke script to update Event and return XML result
     HTTP.post('/FamilyTree/updateEvent.php',
@@ -950,6 +967,7 @@ function updateEvent(ev)
  *																		*
  *  Input:																*
  *		this		the <button id='close'> element						*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function closeWithoutUpdating(ev)
 {
@@ -1053,15 +1071,28 @@ function gotEvent(xmlDoc)
 				    var	parms	= {};
 				    for (var ei = 0; ei < form.elements.length; ei++)
 				    {		// copy select element values to parms
-					var	element	= form.elements[ei];
+					var	element	                    = form.elements[ei];
 					if (element.type == 'checkbox' &&
 					    !(element.checked))
-					    parms[element.name]	= 0;
+					    parms[element.name]	        = 0;
 					else
 					if (element.name == 'occupation' ||
 					    element.name == 'description')
-					    parms.description	= 
-						    tinyMCE.get(element.name).getContent();
+                    {
+                        var text                    = element.value;
+                        if (typeof tinyMCE !== 'undefined')
+                        {
+                            var mceElt              = tinyMCE.get(element.name);
+                            if (mceElt)
+                            {
+					            text	            = mceElt.getContent();
+	                            var results         = /<p>(.*)<\/p>/.exec(text);
+	                            if (results)
+	                                text            = results[1];
+                            }
+                        }
+                        parms.description           = text;
+                    }
 					else	
 					if (element.name == 'temple')
 					{
@@ -1074,13 +1105,12 @@ function gotEvent(xmlDoc)
 					if (element.name.length > 0)
 					    parms[element.name]	= element.value;
 				    }		// copy element values to parms
-
 				    srcForm.eventFeedback(parms);
 				}	        // feedback method defined on the form
 		    }		        // loop through forms in invoking page
 
 		    closeFrame();
-		  } catch(e) { alert("editEvent.js: 1066 Exception " + e);}
+		  } catch(ex) { alert("editEvent.js: 1114 Exception " + ex);}
 		}		            // invoked from an existing window
 		else
 		{
@@ -1119,7 +1149,8 @@ function noEvent()
  *  button associated with an alternate name.							*
  *																		*
  *  Input:																*
- *		this		instance of <button id='editName...'>				*
+ *		this	instance of <button id='editName...'>					*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function editName(ev)
 {
@@ -1144,7 +1175,8 @@ function editName(ev)
  *  button.																*
  *																		*
  *  Input:																*
- *		this		instance of <button id='delName...'>				*
+ *		this	instance of <button id='delName...'>					*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function delName(ev)
 {
@@ -1219,22 +1251,23 @@ function noDelName()
  *  click the "Update Event" button.									*
  *																		*
  *  Parameters:															*
- *		e		W3C compliant browsers pass an event as a parameter		*
+ *		this	instance of <input>				                        *
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
-function eeKeyDown(e)
+function eeKeyDown(ev)
 {
-    if (!e)
+    if (!ev)
     {		// browser is not W3C compliant
-		e	=  window.event;	// IE
+		ev	=  window.event;	// IE
     }		// browser is not W3C compliant
-    var	code	= e.keyCode;
+    var	code	= ev.keyCode;
 
     // take action based upon code
     switch (code)
     {
 		case LTR_A:
 		{		// letter 'A'
-		    if (e.altKey)
+		    if (ev.altKey)
 		    {		// alt-A
 				var	button	= document.getElementById('addCitation');
 				button.click();
@@ -1245,7 +1278,7 @@ function eeKeyDown(e)
 
 		case LTR_C:
 		{		// letter 'C'
-		    if (e.altKey)
+		    if (ev.altKey)
 		    {		// alt-C
 				var	button	= document.getElementById('Clear');
 				button.click();
@@ -1256,7 +1289,7 @@ function eeKeyDown(e)
 
 		case LTR_S:
 		{		// letter 'S'
-		    if (e.ctrlKey)
+		    if (ev.ctrlKey)
 		    {		// ctrl-S
 				document.getElementById('updEvent').click();
 				return false;	// do not perform standard action
@@ -1266,7 +1299,7 @@ function eeKeyDown(e)
 
 		case LTR_U:
 		{		// letter 'U'
-		    if (e.altKey)
+		    if (ev.altKey)
 		    {		// alt-U
 				document.getElementById('updEvent').click();
 		    }		// alt-U
@@ -1286,11 +1319,18 @@ function eeKeyDown(e)
  *																		*
  *  Input:																*
  *		this			the invoking <button> element.					*
+ *		ev              W3C compliant browsers pass Event               *
  ************************************************************************/
 var pendingElement	= null;
 
 function addCitation(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     this.disabled	= true;			// prevent double add cit
     var	form		= this.form;
     var	cell		= this.parentNode;	// <td>
@@ -1408,9 +1448,16 @@ function addCitation(ev)
  *																		*
  *  Parameters:															*
  *		this		a <button> element									*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function editPictures(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	picIdType	= form.PicIdType.value;
     var	idir		= null;
@@ -1472,7 +1519,7 @@ function gotSources(xmlDoc)
 		return;
     }		// name not returned
     }
-    catch(e) {
+    catch(ex) {
 		alert("editEvent.js: gotSources: nameElts=" + nameElts);
     }
 
@@ -1573,7 +1620,7 @@ function gotSources(xmlDoc)
     }		// loop through source nodes
 
     elt.focus();		// give selection list the focus
-}		// gotSources
+}		// function gotSources
 
 /************************************************************************
  *  function noSources													*
@@ -1811,9 +1858,16 @@ function noAddCit()
  *																		*
  *  Input:																*
  *		this		the invoking <button> element						*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function addAltCitation(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     this.disabled	= true;			// prevent double add cit
     var	form		= this.form;
     var	cell		= this.parentNode;	// <td>
@@ -1877,9 +1931,16 @@ function addAltCitation(ev)
  *																		*
  *  Input:																*
  *		this			instance of <button> tag						*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function editCitation(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	idsx		= this.id.substr(12);
 
@@ -1909,9 +1970,16 @@ function editCitation(ev)
  *																		*
  *  Input:																*
  *		this			<button id='delCitation...'>					*
+ *		ev              instance of Event                               *
  ************************************************************************/
 function deleteCitation(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	idsx		= this.id.substr(11);
 
@@ -1926,18 +1994,10 @@ function deleteCitation(ev)
 		parms["debug"]	= debug;
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-				      'CitDel$template',
-				      parms,
-				      this,		        // position relative to
-				      confirmDelete,	// 1st button confirms Delete
-				      false);		    // default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("editEvent.js: deleteCitation: Error: " + msg);
+	displayDialog('CitDel$template',
+			      parms,
+			      this,		        // position relative to
+			      confirmDelete);	// 1st button confirms Delete
 }		// function deleteCitation
 
 /************************************************************************
@@ -1948,9 +2008,16 @@ function deleteCitation(ev)
  *																		*
  *  Input:																*
  *		this			<button id='confirmDelete...'>					*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
-function confirmDelete()
+function confirmDelete(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     // get the parameter values hidden in the dialog
     var	form		= this.form;
     var	idsx		= this.id.substr(13);
@@ -2109,9 +2176,16 @@ function checkForAdd()
  *																		*
  *  Input:																*
  *		this		the <button type='button' id='raw'>					*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function showRaw(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     if ('editnotes' in args)
     {
 		this.innerHTML		= 'Show TextAreas';
@@ -2134,9 +2208,16 @@ function showRaw(ev)
  *																		*
  *  Input:																*
  *		this	the <button type='button' id='Clear'>					*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
-function clearNotes()
+function clearNotes(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     tinyMCE.get('note').setContent("");
 }	    // function clearNotes
 

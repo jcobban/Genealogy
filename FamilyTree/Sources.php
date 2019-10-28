@@ -45,22 +45,22 @@ use \Exception;
  *		2017/07/30		class LegacySource renamed to class Source		*
  *		2017/10/14		use class RecordSet								*
  *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2019/07/22      use Template                                    *
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Citation.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
-
-/************************************************************************
- *		Open Code														*
- ************************************************************************/
 
 // get the parameters passed by method=GET
 $pattern				    = '';
 $offset 				    = 0;
 $limit	    			    = 20;
+$lang                       = 'en';
+
 if (count($_GET) > 0)
 {	        	    // invoked by URL
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
@@ -70,24 +70,45 @@ if (count($_GET) > 0)
     foreach($_GET as $key => $value)
     {
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+            "<td class='white left'>$value</td></tr>\n"; 
+        $value                      = trim($value);
 		switch(strtolower($key))
 		{		// act on specific parameters
 		    case 'pattern':
 		    {
-				$pattern	= $value;
+				$pattern	        = $value;
 				break;
 		    }
 
 		    case 'offset':
 		    {
-				$offset		= (int)$value;
+				$offset		        = (int)$value;
 				break;
 		    }
 
 		    case 'limit':
 		    {
-				$limit		= (int)$value;
+				$limit		        = (int)$value;
+				break;
+		    }
+
+		    case 'lang':
+            {
+                if (preg_match('/^([a-zA-Z]{2})(-([a-zA-Z]{2,3})|)$/',
+                               $value,
+                               $matches))
+                {
+                    if (strlen($matches[2]) > 0)
+                        $lang       = strtolower($matches[1]) . '-' .
+                                      strtoupper($matches[3]);
+                    else
+                        $lang       = strtolower($matches[1]);
+                }
+                else
+                {
+                    if (strlen($value) >= 2)
+                        $lang       = strtolower(substr($value, 0, 2));
+                }
 				break;
 		    }
 		}		// act on specific parameters
@@ -95,285 +116,108 @@ if (count($_GET) > 0)
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
 }	        	    // invoked by URL
-    $prevoffset	= $offset - $limit;
-    $nextoffset	= $offset + $limit;
 
-    // get an associative array of source records matching the
-    // supplied parameters
-    $parms	= array('limit'		=> $limit,
-					'offset'	=> $offset,
-					'order'		=> 'SrcName');
-    if (strlen($pattern) > 0)
-		$parms['SrcName']	= $pattern;
-    $sources		= new RecordSet('Sources', $parms);
-    $information	= $sources->getInformation();
-    // Note: $information['count'] >= $sources->count() <= $limit
-    $count		= $information['count'];
+if (canUser('edit'))
+    $action             = 'Edit';
+else
+    $action             = 'Display';
 
-    htmlHeader('Sources Master List',
-				array(	'/jscripts/js20/http.js',
-					'/jscripts/CommonForm.js',
-					'/jscripts/util.js',
-					'Sources.js'));
-?>
-<body>
-  <div id="transcription" style="overflow: auto; overflow-x: scroll">
-<?php
-    pageTop(array('/genealogy.php'		=> 'Genealogy',
-				  '/FamilyTree/Services.php'	=> 'Services'));
-?>
-  <div class="body">
-    <h1>
-		<span class="right">
-		  <a href="SourcesHelpen.html" target="help">? Help</a>
-		</span>
-		Sources Master List
-    </h1>
-<?php
-    showTrace();
+// get the appropriate template
+$template               = new FtTemplate("Sources$action$lang.html");
+$tranTab                = $template->getTranslate();
+$srcTypes               = $tranTab['srcTypes'];
 
-    if (strlen($msg) == 0)
-    {
-		if ($count == 0)
-		    $showCount	= 'No';
-		else
-		    $showCount	= $count;
-?>
-    <p class="label">
-      <?php print $showCount; ?> Sources match the specified pattern.
-    </p>
-    <form name="srcForm" action="Sources.php">
-      <div class="row" id="patternRow">
-		<label class="label" for="pattern" style="width: 8em;">
-		    Pattern:
-		</label>
-		<input name="pattern" type="text" size="64" class="white leftnc"
-				    value="<?php print $pattern; ?>">
-		    <div style="clear: both;"></div>
-      </div>
-      <div class="row" id="buttonRow">
-		<button type="submit" id="Search">
-		    Search
-		</button>
-<?php
-		if (canUser('edit'))
-		{		// permit adding a source
-?>
-		&nbsp;
-		<button type="button" id="CreateNew">
-		    Create New Source
-		</button>
-<?php
-		}		// permit adding a source
-?>
-		<div style="clear: both;"></div>
-      </div>
-<?php
-		if ($count > 0)
-		{		// query issued
-		    $last	= min($nextoffset - 1, $count);
-?>
-      <div class="center">
-<?php
-		    if ($prevoffset >= 0)
-		    {	// previous page of output to display
-?>
-		<div class="left">
-		  <a href="Sources.php?pattern=<?php print $pattern; ?>&amp;limit=<?php print $limit; ?>&amp;offset=<?php print $prevoffset; ?>">
-		  &lt;---
-		  </a>
-		</div>
-  <?php
-		    }	// previous page of output to display
-		    if ($nextoffset   < $count)
-		    {	// next page of output to display
-?>
-		<div class="right"> 
-		  <a href="Sources.php?pattern=<?php print $pattern; ?>&amp;limit=<?php print $limit; ?>&amp;offset=<?php print $nextoffset; ?>">---&gt;</a>
-		</div>
-  <?php
-		    }	// next page of output to display
-?>
-		rows <?php print $offset; ?> to <?php print $last; ?>
-		of <?php print $count; ?>
-		<div style="clear: both;"></div>
-      </div>
-<!--- Put out the response as a table -->
-<table class="details" id="SourceTable">
-<!--- Put out the column headers -->
-  <thead>
-    <tr>
-      <th class="colhead">
-		IDSR
-      </th>
-      <th class="colhead">
-		Type
-      </th>
-      <th class="colhead">
-		Source Name
-      </th>
-      <th class="colhead">
-		Citation Count
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-<?php
-		    //$fmt = new NumberFormatter( 'en_CA', NumberFormatter::DECIMAL );
-		    // display the results
-		    foreach($sources as $idsr => $source)
-		    {		// loop through matching sources
-				$idst		= $source->getType();
-				$typeText	= $source->getTypeText(); 
-				$name		= $source->getName(); 
-				// query the database for citation count
-				$parms	= array('IDSR'	=> $idsr,
-						'limit'	=> 0);
-				$cresult	= new RecordSet('Citations', 
-								$parms);
-				$cinformation	= $cresult->getInformation();
-				$ccount		= number_format($cinformation['count']);
+// get an associative array of source records matching the
+// supplied parameters
+$parms	                = array('limit'		=> $limit,
+		        	    		'offset'	=> $offset,
+				            	'order'		=> 'SrcName');
+if (strlen($pattern) > 0)
+	$parms['SrcName']	= $pattern;
+$sources		        = new RecordSet('Sources', $parms);
+$information	        = $sources->getInformation();
+// Note: $information['count'] >= $sources->count() <= $limit
+$count		            = $information['count'];
 
-				// set up text for action button
-				if (canUser('edit'))
-				{		// authorized
-				    $action	= "Edit";
-				    $label	= "Edit $idsr";
-				}		// authorized
-				else
-				{		// not authorized
-				    $action	= "Show";
-				    $label	= "Show $idsr";
-				}		// not authorized
-?>
-    <tr id="Row<?php print $idsr; ?>">
-		<td class="odd right">
-		    <button type="button" class="width110" 
-				id="<?php print $action . $idsr; ?>">
-				<?php print $label; ?> 
-		    </button>
-		</td>
-		<td class="odd left" id="Type<?php print $idsr; ?>">
-		    <?php print $typeText; ?>  
-		</td>
-		<td class="odd left" id="Name<?php print $idsr; ?>">
-		    <?php print $name; ?> 
-		</td>
-<?php
-				if ($ccount > 0 || $action == 'Show')
-				{
-?>
-		<td class="odd right">
-		    <?php print $ccount; ?> 
-		</td>
-<?php
-				}
-				else
-				{		// citation count zero
-?>
-		<td class="odd center">
-		    <button type="button" class="width110"
-					id="Delete<?php print $idsr; ?>">
-				Delete
-		    </button>
-		</td>
-<?php
-				}		// citation count zero
-?>
-    </tr>
-<?php
-flush();
-		    }		// loop through matching sources
-?>
-  </tbody>
-</table>
-</form>
-<?php
-		}		// query issued
-    }			// no errors
+$template->set('PATTERN',           $pattern);
+$template->set('OFFSET',            $offset);
+$template->set('LIMIT',             $limit);
+$template->set('LANG',              $lang);
+if ($debug)
+    $template->set('DEBUG',         'Y');
+else
+    $template->set('DEBUG',         'N');
+
+if ($sources->count() == 0)
+{                           // no records in response
+    $template['topBrowse']->update(null);
+    $template['dataTable']->update(null);
+}                           // no records in response
+else
+{                           // records to display
+    $template['nomatch']->update(null);
+    $prevoffset	        = $offset - $limit;
+    $nextoffset	        = $offset + $limit;
+    $last	            = min($nextoffset - 1, $count);
+    $template->set('SHOWOFFSET',    number_format($offset + 1));
+    $template->set('COUNT',         number_format($count));
+    $template->set('LAST',          number_format($last));
+
+    if ($prevoffset >= 0)
+    {	// previous page of output to display
+        $template->set('PREVOFFSET',    $prevoffset);
+    }	// previous page of output to display
     else
-    {			// display errors
-?>
-  <p class="message"><?php print $msg; ?>
-  </p>
-<?php
-    }			// display errors
-?>
-</div>
-<?php
-    pageBot();
-?>
-  </div> <!-- id="transcription" -->
-<?php
-    foreach(Source::$intType as $idst => $text)
-    {			// loop through all supported values of IDST
-?>
-    <div id="IDST<?php print $idst; ?>" class="hidden">
-		<?php print $text; ?>
-    </div>
-<?php
-    }			// loop through all supported values of IDST
-?>
-<div class="hidden" id="templates">
+        $template['topPrev']->update(null);
+    if ($nextoffset  < $count)
+    {	// next page of output to display
+        $template->set('NEXTOFFSET',    $nextoffset);
+    }	// next page of output to display
+    else
+        $template['topNext']->update(null);
 
-  <!-- template for confirming the deletion of an event-->
-  <form name="ClrInd$template" id="ClrInd$template">
-    <p class="message">$msg</p>
-    <p>
-      <button type="button" id="confirmClear$type">
-		OK
-      </button>
-      <input type="hidden" id="formname$type" name="formname$type"
-				value="$formname">
-		&nbsp;
-      <button type="button" id="cancelDelete$type">
-		Cancel
-      </button>
-    </p>
-  </form>
+    // display the results
+    $rowElement             = $template['sourceRow$IDSR'];
+    $rowHtml                = $rowElement->outerHTML();
+    $rowclass               = 'odd';
+    $data                   = '';
+    foreach($sources as $idsr => $source)
+    {		// loop through matching sources
+        $rtemplate          = new \Templating\Template($rowHtml);
 
-</div> <!-- id="templates" -->
-<div class="balloon" id="Helppattern">
-<p>
-This is a regular expression, as supported by MySQL, which is used to limit
-the Sources to be displayed. See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer"s regex page</a>.
-</p>
-<ul>
-    <li>If the pattern contains no special 
-characters then only Sources containing that string will be included.
-For example the pattern "London" will match Sources containing the string
-"London".  Note that the search ignores case, so that pattern will also match
-"LONDON" and "london".
-    <li>If the pattern begins with a caret '^' then only Sources that
-begin with the remainder of the pattern are included.  For example the pattern
-"^Ba" displays Sources starting with "Ba" (or "ba" or "BA").
-    <li>If the pattern ends with a dollar sign '$', then only Sources that
-end with the remainder of the pattern are included.  For example the pattern
-"CA$" matches Sources that end with "CA" (or "ca" or "Ca").
-    <li>In a pattern a period '.' matches any single character.  For example
-the pattern 'B.b' matches any Source that contains two letter Bs separated
-by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub".
-    <li>In a pattern an asterisk '*' matches zero or more of the preceding
-character; "bo*b" matches "bb", "bob", and "boob".
-</ul>
-</div>
-<div class="balloon" id="HelpSearch">
-Click on this button to update the list of displayed sources to include only
-those sources that match the supplied pattern.
-</div>
-<div class="balloon" id="HelpShow">
-Click on this button to display the detailed information about a source.
-</div>
-<div class="balloon" id="HelpEdit">
-Click on this button to display a form 
-to update the information recorded abbout a source.
-</div>
-<div class="balloon" id="HelpDelete">
-This button is displayed for sources that are not associated with any
-citations.  Click on this button to delete the source from the database.
-</div>
-<div class="balloon" id="HelpCreateNew">
-Click on this button to open a dialog to create a new source.
-</div>
-</body>
-</html>
+		$idst		        = $source->getType();
+		$typeText	        = $srcTypes[$idst]; 
+        $name		        = $source->getName();
+
+		// query the database for citation count
+		$parms	            = array('IDSR'	=> $idsr,
+                    				'limit'	=> 0);
+		$cresult	        = new RecordSet('Citations', 
+                    						$parms);
+		$cinformation	    = $cresult->getInformation();
+        $ccount		        = $cinformation['count'];
+
+        $rtemplate->set('IDSR',             $idsr);
+        $rtemplate->set('IDST',             $idst);
+        $rtemplate->set('TYPETEXT',         $typeText);
+        $rtemplate->set('NAME',             $name);
+        $rtemplate->set('ROWCLASS',         $rowclass);
+        $rtemplate->set('CCOUNT',       number_format($cinformation['count']));
+        $delCell            = $rtemplate['DeleteCell$IDSR'];
+        if ($delCell)
+        {
+            if ($ccount > 0)
+                $delCell->update(null);
+            else
+                $rtemplate['count$IDSR']->update(null);
+        }
+        $data               .= $rtemplate->compile();
+        if ($rowclass == 'odd')
+            $rowclass       = 'even';
+        else
+            $rowclass       = 'odd';
+    }
+    $rowElement->update($data);
+}                           // records in response
+
+$template->display();

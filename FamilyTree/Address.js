@@ -27,8 +27,9 @@
  *						maps geolocate									*
  *		2017/08/04		class LegacyAddress renamed to Address			*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/09/25      disable delete button for new record            *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -49,27 +50,6 @@ var childFrameClass	= 'right';
  ************************************************************************/
 var	map;		// instance of google.maps.Map
 var	geocoder;	// instance of google.maps.Geocoder
-
-/************************************************************************
- * specify the style for tinyMCE editing								*
- ************************************************************************/
-tinyMCE.init({
-		mode			: "textareas",
-		theme			: "advanced",
-		plugins			: "spellchecker,advhr,preview", 
-
-		// Theme options - button# indicated the row# only
-		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-		forced_root_block	: false,
-		content_css		: "/styles.css",
-
-});
 
 /************************************************************************
  *  function onLoad										                *
@@ -183,6 +163,9 @@ function onLoad()
 		    case 'Delete':
 		    {			// <button id='Delete'>
 				element.onclick	= deleteAddress;
+                var idarElt     = document.getElementById('idar');
+                if (idarElt && idarElt.value == 0)
+                    element.disabled    = true;
 				break;
 		    }			// <button id='Delete'>
 
@@ -268,9 +251,9 @@ function openHomePage()
  ************************************************************************/
 function deleteAddress()
 {
-    var	form			= this.form;
+    var	form			        = this.form;
     if (form.action)
-		form.action.value	= 'delete'
+		form.action.value	    = 'delete'
     form.submit();
     return false;
 }		// function deleteAddress
@@ -300,43 +283,43 @@ function closeDialog()
  ************************************************************************/
 function mergeDuplicates()
 {
-    var	form		= document.locForm;
-    var mainIdar	= form.idar.value;
-    var kind		= form.Kind.value;
-    var	parms		= {};
-    parms['to']		= mainIdar;
-    parms['kind']	= kind;
-    var	from		= '';
+    var	form					= document.locForm;
+    var mainIdar				= form.idar.value;
+    var kind					= form.Kind.value;
+    var	parms					= {};
+    parms['to']					= mainIdar;
+    parms['kind']				= kind;
+    var	from		            = '';
 
     // disable the submit button until this long running operation is complete
-    var	submit		= form.Submit;
-    submit.disabled	= true;
+    var	submit	            	= form.Submit;
+    submit.disabled         	= true;
 
     // construct the 'from' parameter
     for (var i = 0; i < form.elements.length; i++)
-    {		// loop through duplicates
-		var	elt	= form.elements[i];
+    {		            // loop through duplicates
+		var	elt	            = form.elements[i];
 		if (elt.name)
-		{		// element has a name
+		{		        // element has a name
 		    if (elt.name.substr(0,7) == 'DupIdar')
-		    {		// element containing duplicate idar
-				from	+= elt.value + ',';
-		    }		// element containing duplicate idar
-		}		// element has a name
-    }		// loop through duplicates
+		    {		    // element containing duplicate idar
+				from	    += elt.value + ',';
+		    }		    // element containing duplicate idar
+		}		        // element has a name
+    }		            // loop through duplicates
 
     // trim off trailing comma, if any
     if (from.length > 0)
-		from	= from.substr(0,from.length - 1);
+		from	            = from.substr(0,from.length - 1);
     else
 		return;		// nothing to do
-    parms['from']	= from;
+    parms['from']	        = from;
 
     // invoke script to merge addresss and return XML result
     if (form.debug.value == 'Y')
     {
 		form.debug.value	= '';
-		form.action		= 'mergeAddressesXml.php';
+		form.action		    = 'mergeAddressesXml.php';
 		form.submit();
     }
     else
@@ -356,13 +339,13 @@ function mergeDuplicates()
  ************************************************************************/
 function gotMerge(xmlDoc)
 {
-    var	form		= document.locForm;
+    var	form		    = document.locForm;
 
     // disable the submit button until this long running operation is complete
-    var	button		= form.Submit;
-    button.disabled	= false;
+    var	button		    = form.Submit;
+    button.disabled	    = false;
 
-    var	root	= xmlDoc.documentElement;
+    var	root	        = xmlDoc.documentElement;
     if (root.nodeName == 'update')
     {
 		window.location	= window.location;	// refresh
@@ -410,8 +393,8 @@ function showMap()
 
     // if latitude and longitude specified in database, display the
     // map based upon those values
-    var lat		= form.Latitude.value;
-    var lng		= form.Longitude.value;
+    var lat		    = form.Latitude.value;
+    var lng		    = form.Longitude.value;
 
     var locn		= form.Address1.value;
     if (form.Address2.value.length > 0)
@@ -443,33 +426,33 @@ function showMap()
 		alert("Address.js: showMap: " +
 		      "No information available for displaying map");
 		return false;
-    }		// nothing to display
+    }		            // nothing to display
 
     var zoom		= Number(form.Zoom.value);
 
     if (lat != '0' || lng != '0')
-    {		// display map for coordinates
+    {		            // display map for coordinates
 		// convert latitude as stored in database to decimal degrees
 		var	latn		= (lat - 0.0) < 0.0;
-		lat			= Math.abs(lat - 0.0);
+		lat			    = Math.abs(lat - 0.0);
 		var	latd		= Math.floor(lat/10000);
-		lat			= lat - latd*10000;
+		lat			    = lat - latd*10000;
 		var	latm		= Math.floor(lat/100);
 		var	lats		= lat - latm*100;
-		lat			= latd + (latm/60.0) + (lats/3600.0);
+		lat			    = latd + (latm/60.0) + (lats/3600.0);
 		if (latn)
-		    lat		= -lat;
+		    lat		    = -lat;
 
 		// convert longitude as stored in database to decimal degrees
 		var	lngn		= (lng - 0.0) < 0.0;
-		lng			= Math.abs(lng - 0.0);
+		lng			    = Math.abs(lng - 0.0);
 		var	lngd		= Math.floor(lng/10000);
-		lng			= lng - lngd*10000;
+		lng			    = lng - lngd*10000;
 		var	lngm		= Math.floor(lng/100);
 		var	lngs		= lng - lngm*100;
-		lng			= lngd + (lngm/60.0) + (lngs/3600.0);
+		lng			    = lngd + (lngm/60.0) + (lngs/3600.0);
 		if (lngn)
-		    lng		= -lng;
+		    lng		    = -lng;
 
 		try {
 		    displayMap(new google.maps.LatLng(lat, lng), zoom);
@@ -481,10 +464,10 @@ function showMap()
 				  "message='" + e.message + "', " +
 				  "lat=" + lat + ", lng=" + lng + ", zoom=" + zoom);
 		}
-    }		// display map for coordinates
+    }		            // display map for coordinates
     else
     if (geocoder !== null)
-    {		// use Geocoder
+    {		            // use Geocoder
 		var searchName		= form.searchName.value;
 		geocoder.geocode( { 'address': searchName},
 					function(results, status) {
@@ -496,9 +479,9 @@ function showMap()
 					   "' was not successful for the following reason: " +
 						status,
 					   this);
-		    }	// geocode failed
-		});	// end of inline function and invocation of geocode
-    }		// use Geocoder
+		    }	        // geocode failed
+		});	            // end of inline function and invocation of geocode
+    }		            // use Geocoder
     return false;
 }		// function showMap
 
@@ -511,11 +494,11 @@ function showMap()
 function displayMap(latlng, zoomlevel)
 {
     if (latlng !== null)
-    {		// location resolved
-		var	button		= document.getElementById('showMap');
-		var	form		= document.locForm;
-		var	notes		= form.Notes;
-		mapDiv			= document.getElementById("mapDiv");
+    {		            // location resolved
+		var	button		    = document.getElementById('showMap');
+		var	form	    	= document.locForm;
+		var	notes	    	= form.Notes;
+		mapDiv		    	= document.getElementById("mapDiv");
 		mapDiv.style.left	= getOffsetLeft(notes) + "px";
 		mapDiv.style.top	= getOffsetTop(notes) + "px";
 		show(mapDiv);
@@ -525,16 +508,16 @@ function displayMap(latlng, zoomlevel)
 				  mapTypeId: google.maps.MapTypeId.ROADMAP
 				};
 		try {
-		    map	= new google.maps.Map(mapDiv,
-						      myOptions);
+		    map	            = new google.maps.Map(mapDiv,
+						                          myOptions);
 		}
 		catch(e) {
 		    alert("Address.js: displayMap: " +
 		          "new google.maps.Map failed: message='" + e.message + "'");
 		}
 		try {
-		    var marker = new google.maps.Marker({map: map, 
-							    	 position: latlng });
+		    var marker      = new google.maps.Marker({map: map, 
+							                    	 position: latlng });
 		}
 		catch(e) {
 		    alert("Address.js: displayMap: " +
@@ -543,7 +526,7 @@ function displayMap(latlng, zoomlevel)
 		button.onclick		= hideMap;
 		while(button.firstChild)
 		    button.removeChild(button.firstChild)
-		var template	= document.getElementById('hideMapTemplate');
+		var template	    = document.getElementById('hideMapTemplate');
 		for(var childTemp = template.firstChild;
 				childTemp;
 				childTemp = childTemp.nextSibling)
@@ -566,19 +549,19 @@ function displayMap(latlng, zoomlevel)
  ************************************************************************/
 function hideMap()
 {
-    var	button	= this;
-    var	mapDiv	= document.getElementById("mapDiv");
+    var	button          	= this;
+    var	mapDiv          	= document.getElementById("mapDiv");
     mapDiv.style.display	= 'none';	// hide
     while(button.firstChild)
 		button.removeChild(button.firstChild)
-    var template	= document.getElementById('showMapTemplate');
+    var template	        = document.getElementById('showMapTemplate');
     for(var childTemp = template.firstChild;
 		    childTemp;
 		    childTemp = childTemp.nextSibling)
 		button.appendChild(childTemp.cloneNode(true));
-    button.onclick		= showMap;
+    button.onclick		    = showMap;
     return false;
-}		// hideMap
+}		// function hideMap
 
 /************************************************************************
  *  function getMap												        *
@@ -630,7 +613,7 @@ function getMap()
 		      "map not initialized");
     }
     return false;
-}		// getMap
+}		// function getMap
 
 /************************************************************************
  *  function editPictures										        *

@@ -10,6 +10,7 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/04/07      ensure that the paging lines can be displayed   *
  *		                within the visible portion of the browser.      *
+ *		2019/07/22      open sub-forms in right half of window          *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -202,8 +203,9 @@ function showNames()
     if ('lang' in args)
 		lang		= args['lang'];
 
-    window.open('CountryNamesEdit.php?cc=' + cc + '&lang=' + lang,
-				'_blank');
+    openFrame("source",
+              'CountryNamesEdit.php?cc=' + cc + '&lang=' + lang,
+		      "right");
     return false;
 }		// showNames
 
@@ -228,8 +230,9 @@ function showDomains()
     if ('lang' in args)
 		lang		= args['lang'];
 
-    window.open('DomainsEdit.php?cc=' + cc + '&lang=' + lang,
-				'_blank');
+    openFrame("source",
+              'DomainsEdit.php?cc=' + cc + '&lang=' + lang,
+		      "right");
     return false;
 }		// showDomains
 

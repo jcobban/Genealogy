@@ -51,6 +51,9 @@
  *		                as regular expression operators                 *
  *		2019/06/12      correctly set focus to next element when a      *
  *		                new location is defined                         *
+ *		2019/07/12      insert spaces into location name value if       *
+ *		                missing after a comma, between a digit and      *
+ *		                a letter, or between a letter and a digit       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -169,7 +172,7 @@ function gotDialogs(xmlDoc)
 }       // function gotDialogs
 
 /************************************************************************
- *  function traverse    														*
+ *  function traverse    												*
  *																		*
  *  Recursively traverse all of the children of an XML node.            *`
  *																		*
@@ -256,26 +259,31 @@ function locationChanged()
     else
 		name	= '';
 
-    // check for event location fields
-    var	locOffset	= name.indexOf('Location');
-    if (locOffset > 0)
-    {			// special case for EventLocation input fields
-		var	row		= this.parentNode;
-		for(var ic = 0; ic < row.children.length; ic++)
-		{
-		    var child		= row.children[ic];
-		    if (child.id && child.id.length > 12 &&
-				child.id.substring(0,12) == 'EventChanged')
-		    {		// found EventChanged
-				// notify the script updateIndividXml.php that
-				// this event has been changed
-				child.value	= 1;
-		    }		// found EventChanged
-		}		// loop through all elements in row
-    }			// special case for EventLocation input fields
- 
     // trim off leading and trailing spaces
-    this.value	= this.value.trim();
+    var value	        = this.value.trim();
+
+    // insert spaces where they should appear but don't
+    var commaRegex      = /,(\w)/g;
+    value               = value.replace(commaRegex, ", $1");
+    var digalfaRegex    = /(\d)([a-zA-Z]+)/g;
+    var results         = digalfaRegex.exec(value);
+    if (results)
+    {
+	    var letters         = results[2];
+	    if (letters == 'RN' || letters == 'RS' || letters == 'R' ||
+	        letters == 'NBTR' || letters == 'RSLR' || 
+	        letters == 'STR' || letters == 'NTR' ||
+	        letters == 'st' || letters == 'nd' ||
+	        letters == 'rd' || letters == 'th')
+	    {                   // do not separate
+	    }                   // do not separate
+	    else
+	        value           = value.replace(digalfaRegex, "$1 $2");
+    }
+    var alfadigRegex    = /([a-zA-Z])(\d)/g;
+    value               = value.replace(alfadigRegex, "$1 $2");
+    
+    this.value          = value;
 
     // if the form has a button named Submit, enable it just in case
     // it was previously disabled
@@ -284,9 +292,9 @@ function locationChanged()
 		submitButton.disabled	= false;
 
     // if the value is explicitly [blank] accept it
-    if (this.value == '[' || this.value == '[blank]' || this.value == '[Blank]')
+    if (value == '[' || value == '[blank]' || value == '[Blank]')
     {
-		this.value	= '[Blank]';
+		this.value	    = '[Blank]';
 		return;
     }
 
@@ -361,11 +369,11 @@ function gotLocationXml(xmlDoc)
     var	topXml	= xmlDoc.documentElement;
     if (topXml && typeof(topXml) == "object" && topXml.nodeName == 'locations')
     {			// valid response
-		var count	    = 0;
-		var field	    = '';		// initiating field name
-		var formname	= '';		// form containing field
-		var name	    = '';		// search argument
-		var attrs	    = '';		// for generating alert message
+		var count	    		= 0;
+		var field	    		= '';		// initiating field name
+		var formname			= '';		// form containing field
+		var name	    		= '';		// search argument
+		var attrs	    		= '';		// for generating alert message
 		for(var i = 0; i < topXml.attributes.length; i++)
 		{
 		    var attr	        = topXml.attributes[i];
@@ -457,111 +465,85 @@ function gotLocationXml(xmlDoc)
 		else
 		if (count == 0)
 		{		// no matching entries
-		    var	msgDiv	= document.getElementById('msgDiv');
-		    if (msgDiv)
-		    {		// have popup <div> to display message in
-				var parms   = {"template"	: "",
-						        "name"	    : name,
-						        "formname"	: formname,
-						        "field"	    : field};
-				try {
-				displayDialog(msgDiv,
-						      forms['NewLocationMsg$template'],
-						      parms,
-						      element,		// position
-						      closeNewDialog,	// button closes dialog
-						      false);		// default show on open
-					} catch (e) { 
-				    alert("locationCommon.js: gotLocationXml: display NewLocationMsg dialog failed: " +
-					  e.message); 
-				}
-		    }		// have popup <div> to display message in
-		    else
-				alert("locationCommon.js: gotLocationXml: Note: '" + name +
-					"' is a previously undefined location.");
+			var parms   = {"template"	: "",
+					        "name"	    : name,
+					        "formname"	: formname,
+					        "field"	    : field};
+			displayDialog(forms['NewLocationMsg$template'],
+					      parms,
+					      element,		// position
+					      closeNewDialog);	// button closes dialog
 		}		// no matching entries
 		else
 		{		// multiple matching entries
-		    var	msgDiv	        = document.getElementById('msgDiv');
-		    if (msgDiv)
-		    {		// have popup <div> to display message in
-				var parms	    = { "template"	: "",
-						            "name"	    : name};
-				try {
-				displayDialog(msgDiv,
-						      forms['ChooseLocationMsg$template'],
-						      parms,
-						      element,		// position
-						      null,		    // button closes dialog
-						      true);		// do not show yet
+			var parms	    = { "template"	: "",
+					            "name"	    : name};
+			var dialog      = displayDialog(forms['ChooseLocationMsg$template'],
+							    	        parms,
+							    	        element,	// position
+							    	        null,		// button closes dialog
+							    	        true);		// do not show yet
 
-				// update selection list for choice
-				var	select	    = document.getElementById('locationSelect');
-				select.onchange	= locationChosen;
-				select.setAttribute("for", field);
-				select.setAttribute("formname", formname);
+			// update selection list for choice
+            var form        = dialog.getElementsByTagName('form')[0];
+			var	select	    = form.locationSelect;
+			select.onchange	= locationChosen;
+			select.setAttribute("for", field);
+			select.setAttribute("formname", formname);
+			    
+			for(var j = 0; j < topXml.childNodes.length; j++)
+			{		// loop through children of top node
+			    var child	= topXml.childNodes[j];
+			    if (child.nodeType == 1 && child.nodeName == 'location')
+			    {	// <location> element representing record
+					var	idlr	= 0;
+					var	locname	= "";
+
+					for(var k = 0; k < child.childNodes.length; k++)
+					{	        // loop through children of <location> record
+					    // each elt represents a field in the database
+					    // record or possibly text for presentation purposes
+					    var elt	= child.childNodes[k];
+					    if (elt.nodeType == 1)
+					    {	    // element (tag) node
+							if (elt.nodeName == 'idlr')
+							{	// numeric key field
+							    idlr	= parseInt(elt.textContent.trim());
+							}	// numeric key field
+							else
+							if (elt.nodeName == 'location')
+							{	// location name field
+							    locname	= elt.textContent.trim();
+							}	// location name field
+					    }	    // element (tag) node
+					}	        // loop through children of <location> record
 				    
-				for(var j = 0; j < topXml.childNodes.length; j++)
-				{		// loop through children of top node
-				    var child	= topXml.childNodes[j];
-				    if (child.nodeType == 1 && child.nodeName == 'location')
-				    {	// <location> element representing record
-						var	idlr	= 0;
-						var	locname	= "";
-	
-						for(var k = 0; k < child.childNodes.length; k++)
-						{	// loop through children of <location> record
-						    // each elt represents a field in the database
-						    // record or possibly text for presentation purposes
-						    var elt	= child.childNodes[k];
-						    if (elt.nodeType == 1)
-						    {	// element (tag) node
-								if (elt.nodeName == 'idlr')
-								{	// numeric key field
-								    idlr	= parseInt(elt.textContent.trim());
-								}	// numeric key field
-								else
-								if (elt.nodeName == 'location')
-								{	// location name field
-								    locname	= elt.textContent.trim();
-								}	// location name field
-						    }	// element (tag) node
-						}	// loop through children of <location> record
-					    
-						// create option element under select
-						var	option	= new Option(locname,
-									     idlr, 
-									     false, 
-									     false);
-						// IE<8 does not create option element correctly
-						option.innerHTML	= locname;
-						option.value		= idlr;	
-					    select.appendChild(option);
-				    }	// <location> element representing record
-				}	// loop through children of top node
-				select.selectedIndex	= 0;
+					// create option element under select
+					var	option	        = new Option(locname,
+        						        		     idlr, 
+	        					        		     false, 
+		        				        		     false);
+					// IE<8 does not create option element correctly
+					option.innerHTML	= locname;
+					option.value		= idlr;	
+				    select.appendChild(option);
+			    }	            // <location> element representing record
+			}	                // loop through children of top node
+			select.selectedIndex	= 0;
 
-				// make the dialog visible
-				show(msgDiv);
-				// the following is a workaround for a bug in FF 40.0 and
-				// Chromium in which the onchange method of the <select> is
-				// not called when the mouse is clicked on an option
-				for(var io=0; io < select.options.length; io++)
-				{
-				    var option	= select.options[io];
-				    option.addEventListener("click", function() {this.selected = true; this.parentNode.onchange();});
-				}
-				select.focus();
-
-				} catch (e) { 
-				    alert("locationCommon.js: gotLocationXml: display ChooseLocationMsg dialog failed: " +
-					  e.message); 
-				}
-		    }		// have popup <div> to display message in
-		    else
-				alert("locationCommon.js: gotLocationXml: cannot find <div id='msgDiv'> in which to display dialog");
-		}		// multiple matching entries
-    }			// valid response
+			// make the dialog visible
+			show(msgDiv);
+			// the following is a workaround for a bug in FF 40.0 and
+			// Chromium in which the onchange method of the <select> is
+			// not called when the mouse is clicked on an option
+			for(var io=0; io < select.options.length; io++)
+			{
+			    var option	= select.options[io];
+			    option.addEventListener("click", function() {this.selected = true; this.parentNode.onchange();});
+			}
+			select.focus();
+		}		                // multiple matching entries
+    }	        		        // valid response
     else
     {
 		if (topXml && typeof(topXml) == "object")
@@ -571,7 +553,7 @@ function gotLocationXml(xmlDoc)
     }
 
     hideLoading();	// hide the "loading" indicator
-}		// gotLocationXml
+}		// function gotLocationXml
 
 /************************************************************************
  *  function closeNewDialog												*
@@ -646,7 +628,7 @@ function closeNewDialog()
     else
 		alert("locationCommon.js: closeNewDialog: cannot find <form> in open dialog");
     return null;
-}		// closeNewDialog
+}		// function closeNewDialog
 
 /************************************************************************
  *  function noLocationXml												*
@@ -657,7 +639,7 @@ function noLocationXml()
 {
     alert("locationCommon.js: logic error: " +
 				"getLocationXml.php script not found on server");
-}		// noLocationXml
+}		// function noLocationXml
 
 /************************************************************************
  *  function locationChosen												*
@@ -692,7 +674,7 @@ function locationChosen()
     }		// ordinary entry
 
     closeNewDialog.call(this);
-}		// locationChosen
+}		// function locationChosen
 
 /************************************************************************
  *  function focusNext													*

@@ -10,6 +10,15 @@ use \Templating\Template;
  *  Prompt the user to enter parameters for a search of the 			*
  *  Marriage Registration database.										*
  *																		*
+ *	Parameters (passed by method=get):									*
+ *		domain		    ISO 3166-2 domain code							*
+ *		regdomain		synonym for domain								*
+ *		lang		    ISO 639-1 preferred language					*
+ *		regyear		    registration year							    *
+ *		regnum		    registration num							    *
+ *		limit		    default max number of rows in response			*
+ *		count		    synonym for limit				                *
+ *																		*
  *  History:															*
  *		2011/01/09		change URL of transcription status page			*
  *		2011/03/15		use <button>, change quotes, separate JS & HTML	*
@@ -37,6 +46,8 @@ use \Templating\Template;
  *		2018/01/01		add language parameter							*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/07/28      accept ISO 3166 standard form for domain        *
+ *		                list only domains that are in the same country  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -55,7 +66,7 @@ $stateName	            = 'Ontario';
 $lang		            = 'en';
 $regyear                = '';
 $regnum                 = '';
-$count                  = 20;
+$limit                  = 20;
 
 $parmsText              = "<p class='label'>\$_GET</p>\n" .
                             "<table class='summary'>\n" .
@@ -70,14 +81,14 @@ foreach($_GET as $key => $value)
         case 'domain':
         case 'regdomain':
         {
-            $domain		    = $value;
+            if (strlen($value) >= 4)
+                $domain		    = str_replace('-','',$value);
             break;
         }		// RegDomain
 
         case 'lang':
         {
-            if (strlen($value) >= 2)
-                $lang	= strtolower(substr($value, 0, 2));
+            $lang	            = FtTemplate::validateLang($value);
             break;
         }		// handled by common code
 
@@ -88,19 +99,22 @@ foreach($_GET as $key => $value)
 
         case 'regyear':
         {
-            $regyear        = $value;
+            if (ctype_digit($value))
+                $regyear        = (int)$value;
             break;
         }
 
         case 'regnum':
         {
-            $regnum         = $value;
+            if (ctype_digit($value))
+                $regnum         = (int)$value;
             break;
         }
 
         case 'count':
         {
-            $count          = $value;
+            if (ctype_digit($value))
+                $limit          = (int)$value;
             break;
         }
 
@@ -124,7 +138,7 @@ $stateName	        = $domainObj->getName(0);
 if ($domainObj->isExisting())
 {
     $cc		        = substr($domain, 0, 2);
-    $countryObj	    = new Country(array('code' => $cc));
+    $countryObj	    = $domainObj->getCountry();
     $countryName	= $countryObj->getName();
 }
 else
@@ -145,10 +159,11 @@ else
     $template->set('DEBUG',     'N');
 $template->set('REGYEAR',       $regyear);
 $template->set('REGNUM',        $regnum);
-$template->set('COUNT',         $count);
+$template->set('COUNT',         $limit);
 
 // get list of domains for selection list
-$getParms	    	= array('language'	=> 'en');
+$getParms	    	= array('language'	=> $lang,
+                            'cc'        => $cc);
 $domains	    	= new DomainSet($getParms);
 $optionElt      	= $template['domain$code'];
 $optionText     	= $optionElt->outerHTML();
@@ -157,11 +172,12 @@ foreach($domains as $code => $dom)
 {
     $ttemplate  = new Template($optionText);
     $ttemplate->set('code',         $code);
+    $ttemplate->set('state',        $dom['state']);
     if ($code == $domain)
         $ttemplate->set('selected', 'selected="selected"');
     else
         $ttemplate->set('selected', '');
-    $ttemplate->set('name',         $dom->get('name'));
+    $ttemplate->set('name',         $dom['name']);
     $result     .= $ttemplate->compile();
 }
 $optionElt->update($result);

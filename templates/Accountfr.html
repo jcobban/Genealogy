@@ -119,8 +119,8 @@
 		    Fermer
 		  </button>
 		</span>
-		<span class="button">
-		  <a href="/ContactAuthor.php?subject=Account Management">
+		<span class="pad">
+		  <a href="/ContactAuthor.php?subject=Account Management" class="button">
 			Communiquer a l'Administrateur</a>
 		</span>
 		<input type="hidden" name="act" id="act" value="">
@@ -157,102 +157,86 @@
     </div>
     </form>
  </div>
- <div class="balloon" id="Helpuserid">
-<p>
-Cet champ montre l'identificateur unique de l'usager actuel pour lequel 
-les fonctions de gestion du compte peut être faites.
-</p>
- </div>
- <div class="balloon" id="Helppassword">
-<p>
-Entrer le mot de passe actuel for cet compte pour autorizer la modification du
-compte.  Le valeur du mote de passe n'est pas montré.
- </div>
- <div class="balloon" id="HelpnewPassword">
-<p>
-Si vous souhaitez changer le mot de passe sur ce compte, entrez-le ici.
-La valeur du mot de passe neuf n'est pas affichée.
-Le mot de passe peut être
-jusqu'à 64 caractères et peut contenir n'importe quel caractère que vous pouvez entrer.
-</p>
-</p>
- </div>
- <div class="balloon" id="HelpgeneratePassword">
-    <p>
-		Cliquez sur ce bouton pour générer un mot de passe aléatoire
-		construit à partir du 95 caractères ASCII imprimables,
-		y compris l'espace.
-		La valeur de ce mot de passe généré est affichée dans le
-		champ suivant de que vous pouvez copier dans
-		les champs mot de passe euf et répéter le mot de passe neuf.
-    </p>
- </div>
- <div class="balloon" id="HelprandomPassword">
-    <p>
-		This is where the Generate Password button displays the generated
-		password which you can copy to the New and Repeat New Password fields.
-    </p>
- </div>
- <div class="balloon" id="HelpnewPassword2">
-<p>
-Si vous souhaitez changer le mot de passe sur ce compte, 
-vous devez l'entrer
-deux fois pour éviter d'éventuelles fautes de frappe qui rendraient le compte
-inaccessible.
-La valeur du mot de passe neuf n'est pas affichée.
-</p>
- </div>
- <div class="balloon" id="Helpemail">
-<p>
-This is the e-mail address associated with the account.  This e-mail address
-is used only for authorization purposes.
-</p>
- </div>
- <div class="balloon" id="Helpusemail">
-<p>
-If this is checked then messages will be sent to the associated e-mail
-address regarding changes in the web-site such as new features and capabilities.
-Generally this will be no more frequently than once a month.
-These notices will also be posted to the web-site.
-If you clear this checkbox then the only e-mail you will receive will be the
-one used to verify the existence of your e-mail address.
-</p>
- </div>
- <div class="balloon" id="Helpnohelp">
-<p>
-If this option is checked then the feature to pop up element specific
-help if the mouse if held over a button or input field for more than 2
-seconds is turned off.
-</p>
- </div>
- <div class="balloon" id="HelpSubmit">
-Clicking on this button with the mouse applies the changes to the account.
-You may also apply the changes by pressing the Enter key while the focus is
-in any input text field in the form, or by pressing the key combinations
-ctrl-S or alt-A.
- </div>
- <div class="balloon" id="HelpSignoff">
-Clicking on this button with the mouse signs the current user off
-the application so extended capabilities are disables
-As a short-cut you may also signoff by pressing the
-key combination alt-S.
- </div>
- <div class="balloon" id="HelpClose">
-Clicking on this button with the mouse closes the dialog without making
-any changes to the account.
-As a short-cut you may also close the dialog by pressing the
-key combination alt-C.
- </div>
-<div id="Helpmessage" class="balloon">
-Use this text area to enter a reply to the blog, and then click on the
-Reply button.
-</div>
-<div id="HelpDelete" class="balloon">
-Click on this button to delete the blog.
-</div>
-<div id="HelpReply" class="balloon">
-Click on this button to reply to the blog.
-</div>
+    <div class="balloon" id="Helpuserid">
+	  Cet champ montre l'identificateur unique de l'usager actuel pour lequel 
+	  les fonctions de gestion du compte peut être faites.
+    </div>
+    <div class="balloon" id="Helppassword">
+	  Entrer le mot de passe actuel for cet compte pour autorizer la modification du
+	  compte.  Le valeur du mote de passe n'est pas montré.
+    </div>
+    <div class="balloon" id="HelpnewPassword">
+	  Si vous souhaitez changer le mot de passe sur ce compte, entrez-le ici.
+	  La valeur du mot de passe neuf n'est pas affichée.
+	  Le mot de passe peut être
+	  jusqu'à 64 caractères et peut contenir n'importe quel caractère que vous pouvez entrer.
+    </div>
+    <div class="balloon" id="HelpgeneratePassword">
+	  Cliquez sur ce bouton pour générer un mot de passe aléatoire
+	  construit à partir du 95 caractères ASCII imprimables,
+	  y compris l'espace.
+	  La valeur de ce mot de passe généré est affichée dans le
+	  champ suivant de que vous pouvez copier dans
+	  les champs mot de passe euf et répéter le mot de passe neuf.
+    </div>
+    <div class="balloon" id="HelprandomPassword">
+	  This is where the Generate Password button displays the generated
+	  password which you can copy to the New and Repeat New Password fields.
+    </div>
+    <div class="balloon" id="HelpnewPassword2">
+	  Si vous souhaitez changer le mot de passe sur ce compte, 
+	  vous devez l'entrer
+	  deux fois pour éviter d'éventuelles fautes de frappe qui rendraient le compte
+	  inaccessible.
+	  La valeur du mot de passe neuf n'est pas affichée.
+    </div>
+    <div class="balloon" id="Helpemail">
+	  This is the e-mail address associated with the account.  This e-mail address
+	  is used only for authorization purposes.
+    </div>
+    <div class="balloon" id="Helpusemail">
+	  If this is checked then messages will be sent to the associated e-mail
+	  address regarding changes in the web-site such as new features and capabilities.
+	  Generally this will be no more frequently than once a month.
+	  These notices will also be posted to the web-site.
+	  If you clear this checkbox then the only e-mail you will receive will be the
+	  one used to verify the existence of your e-mail address.
+    </div>
+    <div class="balloon" id="Helpnohelp">
+	  If this option is checked then the feature to pop up element specific
+	  help if the mouse if held over a button or input field for more than 2
+	  seconds is turned off.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+	  Clicking on this button with the mouse applies the changes to the account.
+	  You may also apply the changes by pressing the Enter key while the focus is
+	  in any input text field in the form, or by pressing the key combinations
+	  ctrl-S or alt-A.
+    </div>
+    <div class="balloon" id="HelpSignoff">
+	  Clicking on this button with the mouse signs the current user off
+	  the application so extended capabilities are disables
+	  As a short-cut you may also signoff by pressing the
+	  key combination alt-S.
+    </div>
+    <div class="balloon" id="HelpClose">
+	  Clicking on this button with the mouse closes the dialog without making
+	  any changes to the account.
+	  As a short-cut you may also close the dialog by pressing the
+	  key combination alt-C.
+    </div>
+    <div id="Helpmessage" class="balloon">
+	  Use this text area to enter a reply to the blog, and then click on the
+	  Reply button.
+    </div>
+    <div id="HelpDelete" class="balloon">
+	  Click on this button to delete the blog.
+    </div>
+    <div id="HelpReply" class="balloon">
+	  Click on this button to reply to the blog.
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    </script>
     <script src="/jscripts/util.js" type="text/javaScript">
     </script>
     <script src="/jscripts/js20/http.js" type="text/javaScript">

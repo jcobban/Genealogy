@@ -35,18 +35,29 @@ function onLoad()
 
     // activate handling of key strokes in text input fields
     // including support for context specific help
-    var formElts	= form.elements;
+    var formElts	        = form.elements;
     for (var i = 0; i < formElts.length; ++i)
     {
-		var elt	= formElts[i];
-		elt.onkeydown	= keyDown;
-		elt.onchange	= statusChange;
+		var elt	            = formElts[i];
+		elt.onkeydown	    = keyDown;
+		elt.onchange	    = statusChange;
 
-		if (elt.id == 'Add')
-		    elt.onclick	= addStatus;
+        var id              = '';
+        if (elt.hasAttribute('id'))
+            id              = elt.id;
+        else
+            id              = elt.name;
+
+        var matches         = /^([a-zA-Z_$%]+)(\d*)$/.exec(id);
+        var column          = matches[1].toLowerCase();
+        var idcs            = matches[2];
+		if (column == 'add')
+		    elt.onclick	    = addStatus;
 		else
-		if (elt.id.substring(0, 6) == 'Delete')
-		    elt.onclick	= delStatus;
+		if (column == 'delete')
+		    elt.onclick	    = delStatus;
+        if (idcs == 1)
+            elt.disabled    = true;
     }		// loop through all elements in the form
 
 }		// onLoad
@@ -121,8 +132,7 @@ function addStatus()
     var formElts	= form.elements;
     
     var	template	= document.getElementById('newRowTemplate');
-    var	parms		= {"rownum"	: newrownum,
-					   "idcs"	: newrownum + 1,
+    var	parms		= {"idcs"	: newrownum + 1,
 					   "status"	: ""};	
     var newrow		= createFromTemplate(template,
 							     parms,
@@ -151,9 +161,10 @@ function delStatus()
 		name		= result[1];
 		rownum		= result[2];
     } 
-    form.elements['Updated' + rownum].value	= 1;
+    form.elements['IDCS' + rownum].type	        = 'hidden';
+    form.elements['ChildStatus' + rownum].type	= 'hidden';
     form.elements['ChildStatus' + rownum].value	= '';
-    form.elements['Used' + rownum].checked	= false;
-    form.elements['tag1' + rownum].checked	= false;
-    form.elements['qstag' + rownum].checked	= false;
+    form.elements['Used' + rownum].type	        = 'hidden';
+    form.elements['tagi' + rownum].type	        = 'hidden';
+    form.elements['qstag' + rownum].type	    = 'hidden';
 }		// delStatus

@@ -9,6 +9,13 @@ use Templating\TemplateTag;
  *														                *
  *  History:															*
  *      2019/04/08      split off from Template.inc                     *
+ *      2019/05/17      change CONTACT... only if not already set       *
+ *                      if called with something that is not the        *
+ *                      name of a file, invoke base class               *
+ *      2019/06/25      add class="menuitem" to all links in the menu   *
+ *                      separate portions of menu by a menu bar         *
+ *      2019/07/19      add support for country-qualified language code *
+ *      2019/07/23      add static method validateLang                  *
  *	    									                            *
  *  Copyright &copy; 2019 James A. Cobban All Rights Reserved			*
  ************************************************************************/
@@ -29,6 +36,13 @@ include_once  __NAMESPACE__ . '/Language.inc';
 
 class FtTemplate extends Template
 {
+    /********************************************************************
+     *  FtTemplate::lang                                                *
+     *													                *
+     *	The requested ISO language code.                                *
+     ********************************************************************/
+    private $lang               = 'en';
+
     /********************************************************************
      *  FtTemplate::trtemplate                                          *
      *													                *
@@ -66,43 +80,59 @@ class FtTemplate extends Template
         if (!is_string($include))
             throw new Exception("FtTemplate::__construct: " .
                                 "first parameter is not a string");
-        if (!preg_match('/(^.*)(\w\w).html$/', $include, $matches))
-        {
-            throw new Exception("FtTemplate::__construct: " .
-                                "'$include' is an improper include file name");
-        }
+        if (!preg_match('/(^.*)([a-z]{2}-[A-Z]{2}|[a-z]{2}).html$/',
+                        $include, 
+                        $matches))
+        {                   // pass to parent
+            parent::__construct($include);
+            return;
+        }                   // pass to parent
 
         $includebase        = $matches[1];
-        $lang               = strtolower($matches[2]);
+        $lang               = $matches[2];
+        $this->lang         = $lang;
+        $includeSub         = null;
+
     	$tempBase	        = $document_root . '/templates/';
 
         if (substr($include,-12,5) == '/page' ||
             substr($include,-14,7) == '/dialog')
-            parent::__construct($include);
+            parent::__construct($include);  // master template
         else
         {                   // include file name
 		    if (file_exists($tempBase . $include))
 		        $includeSub     = $include;
 		    else
-			{
-				$language   	= new Language(array('code' => $lang));
-				$langName	    = $language->get('name');
+			{               // try to find closest match
+                $language   	= new Language(array('code' => $lang));
+                if ($language->isExisting())
+                    $lang       = $language['code'];
+                else
+                    $lang       = 'en';
+                $langName	    = $language->get('name');
 				$nativeName	    = $language->get('nativename');
 				$sorry  	    = $language->getSorry();
 			    $warn   	    .= str_replace(array('$langName','$nativeName'),
 			                                   array($langName, $nativeName),
 			                                   $sorry);
-				$includeSub     = $includebase . 'en.html';
-		        if (file_exists($tempBase . $includebase . 'en.html'))
-				    $includeSub     = $includebase . 'en.html';
+				$includeSub     = "$includebase$lang.html";
+		        if (file_exists("$tempBase$includebase$lang.html"))
+				    $includeSub = "$includebase$lang.html";
+		        else
+		        if (file_exists("$tempBase$includebase" . "en.html"))
+				    $includeSub = $includebase . "en.html";
 		        else
 				    throw new Exception ("FtTemplate::__construct: cannot find template file '{$includebase}en.html'");
-            }
+            }               // try to find closest match
 
-            if ($dialog)
-                parent::__construct($tempBase . "dialog$lang.html");
+            if (strlen($lang) > 2)
+                $langcode       = substr($lang, 0, 2);
             else
-                parent::__construct($tempBase . "page$lang.html");
+                $langcode       = $lang;
+            if ($dialog)
+                parent::__construct($tempBase . "dialog$langcode.html");
+            else
+                parent::__construct($tempBase . "page$langcode.html");
 
             parent::includeSub($tempBase . $includeSub,
 		                       'MAIN');
@@ -115,8 +145,45 @@ class FtTemplate extends Template
     }           // function FtTemplate::__construct
 
     /********************************************************************
+     *	static function FtTemplate::validateLang						*
+     *													            	*
+     *	Input:											            	*
+     *		$value          a string provided by an application from    *
+     *		                user input and therefore unreliable	       	*
+     *													            	*
+     *	Returns:										            	*
+     *		An IETF BCP 47 language code possibly country-qualified	    *
+     *		for example 'es-MX'.  If the syntax of the input value      *
+     *		is not consistent with IETF BCP 47 this returns 'en'.       *
+     ********************************************************************/
+    public static function validateLang($value)
+    {
+        $lang               = 'en';
+        if (preg_match('/^([a-zA-Z]{2,3})(-([a-zA-Z0-9]{2,3})|)$/',
+                       $value,
+                       $matches))
+        {
+            if (strlen($matches[2]) > 0)
+                $lang       = strtolower($matches[1]) . '-' .
+                              strtoupper($matches[3]);
+            else
+                $lang       = strtolower($matches[1]);
+        }
+        else
+        {
+            if (strlen($value) >= 2)
+                $lang       = strtolower(substr($value, 0, 2));
+        }
+        return $lang;
+    }           // static function validateLang
+
+    /********************************************************************
      *	function FtTemplate::getTranslate								*
      *													            	*
+     *	Get the language specific translate table.						*
+     *													            	*
+     *	Returns:										            	*
+     *		instance of class Template					            	*
      ********************************************************************/
     public function getTranslate()
     {
@@ -218,10 +285,12 @@ class FtTemplate extends Template
         if ($browser->browser == 'IE' && $browser->majorver < 9)
         {		        // old browser
             // users who are still trying to run Windows XP with IE6 or IE7
-            if (file_exists("$main{$lang}IE7.html"))
-                $this->main	    = "$main{$lang}IE7.html";
+            if (file_exists("{$main}IE7$lang.html"))
+                $this->main	    = "{$main}IE7$lang.html";
             else
-            if (file_exists("{$main}IE7.html"))
+            if (file_exists("{$main}IE7en.html"))
+                $this->main	= "{$main}IE7en.html";
+            else
                 $this->main	= "{$main}IE7.html";
         }		        // old browser
         else
@@ -236,9 +305,9 @@ class FtTemplate extends Template
         }               // W3C compliant browser
 
         if ($debug)
-            $this->set('DEBUG',	'Y');
+            $this->set('DEBUG',	        'Y');
         else
-            $this->set('DEBUG',	'N');
+            $this->set('DEBUG',	        'N');
 
         $this->set('IECRAP',		    $iecrap);	// support IE < 8
 
@@ -249,10 +318,14 @@ class FtTemplate extends Template
         $this->set('AUTHORIZED',	    $authorized);
         $this->set('OPTIONS',		    $options);
 
-        $this->set('KEYWORDS',		    '');	// additional meta keywords
-        $this->set('CONTACTKEY',	    '');	// identify the specific record
-        $this->set('CONTACTTABLE',	    '');	// identify the table
-        $this->set('CONTACTSUBJECT',	$_SERVER['REQUEST_URI']);
+        if (!array_key_exists('KEYWORDS',       $this->fields))
+			$this->set('KEYWORDS',		'');	// additional meta keywords
+        if (!array_key_exists('CONTACTKEY',     $this->fields))
+			$this->set('CONTACTKEY',	'');	// identify the specific record
+        if (!array_key_exists('CONTACTTABLE',   $this->fields))
+			$this->set('CONTACTTABLE',	'');	// identify the table
+        if (!array_key_exists('CONTACTSUBJECT', $this->fields))
+			$this->set('CONTACTSUBJECT',$_SERVER['REQUEST_URI']);
         $this->set('GOOGLEKEY',         $dsn['googlekey']);
         $this->set('GOOGLECC',          'CA');
 
@@ -275,6 +348,8 @@ class FtTemplate extends Template
         global		$warn;		// tracing
         global		$msg;		// error messages
         global		$document_root;	// root directory of website
+
+        $lang                   = $this->lang;
 
         // if the page contains an <h1> tag use that as the default title
         if (!array_key_exists('TITLE', $this->fields) ||
@@ -376,18 +451,7 @@ class FtTemplate extends Template
             $this->set('MSG',		'');
 
         // set LANG to the requested language code
-        $lang                   = 'en';
-        foreach($_REQUEST as $key => $value)
-        {
-            $fieldLc	        = strtolower($key);
-
-            if ($fieldLc == 'lang')
-            {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value,0,2));
-            }
-        }
-        $this->set('LANG',		$lang);
+        $this->set('LANG',		    $this->lang);
 
         // initialize BREADCRUMBS from <div id='breadcrumbs'>
         if (array_key_exists('BREADCRUMBS', $this->fields))
@@ -400,6 +464,16 @@ class FtTemplate extends Template
 	        if ($crumbTag)
 	        {			    // breadcrumbs definition found
                 $breadcrumbs	    = $crumbTag->innerHTML();
+                $anchors            = preg_split('/<a\s/', $breadcrumbs);
+                $breadcrumbs        = $anchors[0];
+                for($i = 1; $i < count($anchors); $i++)
+                {
+                    $anchor         = $anchors[$i];
+                    $apos           = strpos($anchor, '>');
+                    $breadcrumbs    .= '<a ' . substr($anchor, 0, $apos) .
+                                        ' class="menuitem"' .
+                                        substr($anchor, $apos);
+                }
 	            $crumbTag->update(null);	// delete the template tag
             }
 	        else
@@ -415,40 +489,53 @@ class FtTemplate extends Template
         if ($menuButton)
         {                   // new heading style
             $breadcrumbs            = str_replace(':', '<br>', $breadcrumbs);
+            $breadcrumbs            .= '<hr class="menubar">';
             global  $userid;
             if (isset($userid) && strlen($userid) > 0)
             {               // signed on
-                $elt            = $this['UserInfoAccount'];
-                $atemplate      = new Template($elt->innerHTML());
+                $elt                = $this['UserInfoAccount'];
+                $atemplate          = new Template($elt->innerHTML());
                 $atemplate->setFields($this->fields);
                 // determine if their are messages queued to the current user
-                $user	        = new User(array("username" => $userid));
-                $blogParms	    = array('keyvalue'	=> $user->get('id'),
-                                    'table'		=> '^Users$');
-                $bloglist	    = new RecordSet('Blogs', $blogParms);
-                $blogCount	    = $bloglist->getInformation()['count'];
+                $user	            = new User(array("username" => $userid));
+                $blogParms	        = array('keyvalue'	=> $user->get('id'),
+                                            'table'		=> '^Users$');
+                $bloglist	        = new RecordSet('Blogs', $blogParms);
+                $blogCount	        = $bloglist->getInformation()['count'];
                 if ($blogCount == 0)
                     $atemplate['gotMail']->update(null);
-                $breadcrumbs    .= $atemplate->compile();
+                $breadcrumbs        .= $atemplate->compile();
             }               // signed on
             else
             {               // not signed on
-                $elt            = $this['UserInfoSignon'];
+                $elt                = $this['UserInfoSignon'];
                 if ($elt)
-                    $signon     = $elt->innerHTML();
+                    $signon         = $elt->innerHTML();
                 else
-                    $signon     = 'Sign On';
-                $breadcrumbs    .= "<a href=\"/Signon.php?lang=$lang\" id=\"session\" target=\"_blank\">$signon</a><br>\n";
+                    $signon         = 'Sign On';
+                $breadcrumbs        .= "<a href=\"/Signon.php?lang=$lang\" id=\"session\" target=\"_blank\" class=\"menuitem\">$signon</a><br>\n";
             }               // not xigned on
 
             // search for additional language support
-            $includeSub		    = current($this->includes);
+            $includeSub		        = current($this->includes);
             if (strpos($includeSub, '<') === false)
-            {
-                $prefix         = substr($includeSub, 0, strlen($includeSub)-7);
-                $enddir         = strrpos($prefix, '/');
-                $folder         = substr($prefix, 0, $enddir + 1);
-                $prefix         = substr($prefix, $enddir + 1);
+            {               // value does not include HTML    
+                $count          = preg_match("/([^\/]*)([a-z]{2}-[A-Z]{2}|[a-z]{2}).html$/", $includeSub, $matches);
+                if ($count)
+                {
+                    $filename   = $matches[0];
+                    $prefix     = $matches[1];
+                    $langcode   = $matches[2];
+                    $flen       = strlen($includeSub) - strlen($filename);
+                    $folder     = substr($includeSub, 0, $flen);
+                }
+                else
+                {               // this shouldn't happen
+	                $prefix     = substr($includeSub, 0, strlen($includeSub)-7);
+	                $enddir     = strrpos($prefix, '/');
+	                $folder     = substr($prefix, 0, $enddir + 1);
+	                $prefix     = substr($prefix, $enddir + 1);
+                }               // this shouldn't
                 $script         = $_SERVER['SCRIPT_NAME'];
                 $query          = $_SERVER['QUERY_STRING'];
                 $oparms         = explode('&', $query);
@@ -467,37 +554,52 @@ class FtTemplate extends Template
                 $dir            = opendir($folder);
                 if ($dir === false)
                 {
-                    print "<p>emplate.inc: " . __LINE__ . " folder='" .
+                    print "<p>FtTemplate.inc: " . __LINE__ . " folder='" .
                         \Templating\escape($folder) . "'</p>\n";
                     exit;
                 }
 
                 // add links to other language versions of the current page
+                $first              = true;
                 while(($name = readdir($dir)) !== false)
                 {           // search files in template directory
-                    if (preg_match("/^$prefix(\w\w).html$/", $name, $matches))
+                    if (preg_match("/^$prefix([a-z]{2}-[A-Z]{2}|[a-z]{2}).html$/", $name, $matches))
                     {       // file matches current template
-                        $tlang  	= $matches[1];
+                        $tlang  	    = $matches[1];
                         if ($tlang != $lang)
                         {   // not the current language
+                            if ($first)
+                            {
+                                $breadcrumbs    .= '<hr class="menubar">';
+                                $first          = false;
+                            }
                             $language   = new Language(array('code' => $tlang));
+                            $langcode   = $language['code'];
                             $native     = $language['nativename'];
+                            $cc         = $language['cc'];
+                            if ($cc)
+                            {
+                                $country    = new Country(array('cc' => $cc));
+                                if ($country->isExisting())
+                                    $native .= '(' . $country->getName($langcode) . ')';
+                            }
                             $comma      = strpos($native, ',');
                             if ($comma !== false)
                                 $native = substr($native, 0, $comma);
                             $native     = ucfirst($native);
                             $breadcrumbs.= 
-                                "<a href=\"$script$nparms{$amp}lang=$tlang\">$native</a><br>\n";
+                                "<a href=\"$script$nparms{$amp}lang=$tlang\" class=\"menuitem\">$native</a><br>\n";
                         }   // not the current language
                     }       // file matches current template
                 }           // search files in template directory
             }               // includeSub is not HTML text
 
             // add contents of help section of <h1> tag
-            $h1array		        = $this->getElementsByTagName('h1');
+            $breadcrumbs                .= '<hr class="menubar">';
+            $h1array		            = $this->getElementsByTagName('h1');
             if (count($h1array) > 0)
             {               // at least one <h1> tag in page
-                $h1		            = current($h1array);
+                $h1		                = current($h1array);
                 foreach($h1->childNodes() as $child)
                 {           // loop through children of first <h1>
                     if ($child->tagName == 'span' &&
@@ -505,9 +607,14 @@ class FtTemplate extends Template
                         $child->attributes['class'] == 'right')
                     {       // move help section to menu
                         $help       = $child->innerHTML();
+                        $apos       = strpos($help, '<a');
+                        $apos       = strpos($help, '>', $apos + 1);
+                        $help       = substr($help, 0, $apos) .
+                                      ' id="menuhelp" class="menuitem"' .
+                                      substr($help, $apos);
                         $help       = str_replace('</a>',
-                                                      '</a><br>',
-                                                      $help);
+                                                  '</a><br>',
+                                                  $help);
                         $breadcrumbs.= $help;
                         $child->update(null);
                     }       // move help section to menu
@@ -526,7 +633,7 @@ class FtTemplate extends Template
                 $about      = $elt->innerHTML();
             else
                 $about      = 'About this Site';
-            $breadcrumbs    .= "<a href=\"/AboutHelp$lang.html\">$about</a><br>\n";
+            $breadcrumbs    .= "<a href=\"/AboutHelp$lang.html\" class=\"menuitem\" target=\"help\">$about</a><br>\n";
             // add contact author link
             $footSection    = $this['footSection'];
             foreach($footSection->childNodes() as $child)
@@ -536,6 +643,11 @@ class FtTemplate extends Template
                     $child->attributes['class'] == 'botcrumbs')
                 {       // move help section to menu
                     $help       = $child->innerHTML();
+                    $apos       = strpos($help, '<a');
+                    $apos       = strpos($help, '>', $apos + 1);
+                    $help       = substr($help, 0, $apos) .
+                                  ' class="menuitem"' .
+                                  substr($help, $apos);
                     $breadcrumbs.= $help;
                     $child->update(null);
                 }       // move help section to menu
@@ -544,7 +656,7 @@ class FtTemplate extends Template
         }                   // new heading style
         else
             $warn   .= "<p>FtTemplate::displayBegin: breadcrumbs=" .
-                        Templating\escape($breadcrumbs) . "</p>\n";
+                        \Templating\escape($breadcrumbs) . "</p>\n";
 
 	    $this->set('BREADCRUMBS',	$breadcrumbs, true);
 

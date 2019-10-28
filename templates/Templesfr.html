@@ -54,7 +54,7 @@
         <thead>
           <tr>
 	        <th class="colhead">
-	          IDTR
+	          Montrer
 	        </th>
 	        <th class="colhead">
 	          Identificateur
@@ -68,8 +68,8 @@
 	      <tr id="temple$idtr">
 	        <td class="$even right"
                 style="padding-left: 5px; padding-right: 5px;">
-	            <a href="/FamilyTree/Temple.php?idtr=$idtr">
-		        $idtr 
+		    <a href="/FamilyTree/Temple.php?code=$code&amp;lang=fr" class="button">
+			    Montrer
 	            </a>
 	        </td>
 	        <td class="$even left"
@@ -85,42 +85,44 @@
     </div> <!-- end of <div class="body"> -->
       <div class="balloon" id="Helppattern">
         <p>
-      This is an 
-      <a href="https://www.regular-expressions.info/posix.html#ere">
-          extended regular expression</a>,
-      as supported by MySQL,
-      which is used to search for users based upon their user name.
+          This is an 
+          <a href="https://www.regular-expressions.info/posix.html#ere">
+              extended regular expression</a>,
+          as supported by MySQL,
+          which is used to search for users based upon their user name.
+        </p>
         <ul>
           <li>If the pattern contains no special 
       characters then only temples containing that string will be included.
       For example the pattern "London" will match temples containing the
       string "London".  Note that the search ignores case, so that pattern
       will also match "LONDON" and "london".
+          </li>
           <li>If the pattern begins with a caret '^' then only temples that
       <b>begin</b> with the remainder of the pattern are included.  
       For example the pattern
-      "^Ba" displays temples starting with "Ba" (or "ba" or "BA" type="text/javascript">
-        </script>
+      "^Ba" displays temples starting with "Ba" (or "ba" or "BA")
+          </li>
           <li>If the pattern ends with a dollar sign '$', then only temples that
       <b>end</b> with the remainder of the pattern are included.  
       For example the pattern
-      "CA$" matches temples that end with "CA" (or "ca" or "Ca" type="text/javascript">
-        </script>
+      "CA$" matches temples that end with "CA" (or "ca" or "Ca")
+          </li>
           <li>In a pattern a period '.' matches any single character.  For example
       the pattern "B.b" matches any temple that contains two letter Bs
       separated by one character, for example "Bab", "Beb", "Bib", "Bob",
       or "Bub" anywhere in the temple name.
+          </li>
           <li>In a pattern an asterisk '*' matches zero or more of the preceding
       character; "bo*b" matches "bb", "bob", and "boob"
       anywhere in the temple name.
+          </li>
         </ul>
-        </p>
       </div>
       <div class="balloon" id="HelpSearch">
-      <p>Clicking on this button refreshes the displayed list of temples
+        Clicking on this button refreshes the displayed list of temples
         based upon the pattern.  You may also hit the "enter" key to perform the
         same function.
-      </p>
       </div>
       <!-- balloons to pop up when mouse moves over forward and back links -->
       <div class="popup" id="mousetopPrev">

@@ -43,6 +43,8 @@ use \Exception;
  *		2018/02/12		use Template									*
  *						support delete									*
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2019/07/23      use FtTemplate::validateLang                    *
+ *		2019/09/26      fix scrolling                                   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -55,21 +57,21 @@ $kindToText		= array('Mail','Event','Repo');
 
 // get the parameters
 // set defaults
-$pattern		= '';
-$offset		= 0;
-$limit		= 20;
-$repositories	= 0;
-$event		= 0;
-$mailing		= 0;
-$lang		= 'en';
+$pattern				= '';
+$offset	    			= 0;
+$limit	    			= 20;
+$repositories			= 0;
+$event	    			= 0;
+$mailing				= 0;
+$lang	    			= 'en';
 
 // override from passed parameters
 if (isset($_GET) && count($_GET) > 0)
 {			        // invoked by method=get
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
@@ -128,8 +130,7 @@ if (isset($_GET) && count($_GET) > 0)
 	
 		    case 'lang':
 		    {			// user requested language
-				if (strlen($value))
-				    $lang	= strtolower($value);
+                $lang       = FtTemplate::validateLang($value);
 				break;
 		    }			// user requested language
 		}		    // act on specific parameters
@@ -313,20 +314,22 @@ else
 if ($count > 0)
 {		// query issued
 	if ($prevOffset >= 0)
-	    $template->updateTag('prevPage',
-						 array('limit'		=> $limit,
-                               'prevOffset'	=> $prevOffset,
-                               'LANG'       => $lang));
+	    $template->updateTag('topPrev',
+                             array( 'pattern'       => $pattern,
+                                    'limit'		    => $limit,
+                                    'prevoffset'	=> $prevOffset,
+                                    'LANG'          => $lang));
 	else
-	    $template->updateTag('prevPage', null);
+	    $template->updateTag('topPrev', null);
 
 	if ($nextOffset < $count)
-	    $template->updateTag('nextPage',
-						 array('limit'		=> $limit,
-						       'nextOffset'	=> $nextOffset,
-                               'LANG'       => $lang));
+	    $template->updateTag('topNext',
+                             array( 'pattern'       => $pattern,
+                                    'limit'		    => $limit,
+						            'nextoffset'	=> $nextOffset,
+                                    'LANG'          => $lang));
 	else
-	    $template->updateTag('nextPage', null);
+	    $template->updateTag('topNext', null);
 	$first	= $offset + 1;
 	$last	= min($nextOffset, $count);
 	$template->updateTag('summary',

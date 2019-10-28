@@ -35,7 +35,7 @@ require_once __NAMESPACE__ . '/common.inc';
  *  blog posts.															*
  *  																	*
  *  Input:																*
- *      $blogid		the identifier of the post at the top of a	    	*
+ *      $id			the identifier of the post at the top of a	    	*
  * 					tree of posts to display					    	*
  *      $indent		the indentation level of the current post	    	*
  *  																	*
@@ -43,7 +43,7 @@ require_once __NAMESPACE__ . '/common.inc';
  *      A string containing HTML representing the contents of the		*
  *      tree of blog posts.												*
  ************************************************************************/
-function responses($blogid, $indent)
+function responses($id	, $indent)
 {
     global	$document_root;
     global	$lang;
@@ -54,16 +54,15 @@ function responses($blogid, $indent)
     global	$debug;
     global	$warn;
 
-    $blog		        = new Blog(array('id'	=> $blogid));
+    $blog		        = new Blog(array('id'	=> $id	));
     $matches		    = array();
     $username		    = $blog->get('username');
-    $user		        = new User(array('userid'	=> $userid));
     $btemplate		    = new Template($blogTemplate);
     if ($username != $userid && !canUser('all'))
     {
-		$btemplate->updateTag('buttonRow$blogid', null);
+		$btemplate->updateTag('buttonRow$id	', null);
     }
-    $btemplate->set('blogid',	$blogid);
+    $btemplate->set('blogid',	$id	);
     $btemplate->set('margin',	($indent + 6) . 'em');
     $btemplate->set('datetime',	$blog->get('datetime'));
     $btemplate->set('username',	$blog->get('username'));
@@ -97,14 +96,14 @@ function responses($blogid, $indent)
     $posts		= $btemplate->compile();
     $indent		+= 6;
 
-    $blogParms		= array('keyvalue'	=> $blogid,
+    $blogParms		= array('keyvalue'	=> $id	,
 					'table'		=> 'Blogs');
     $bloglist		= new RecordSet('Blogs', $blogParms);
     $blogCount		= $bloglist->count();
     foreach($bloglist as $blog)
     {
-		$blogid		= $blog->get('id');
-		$posts		.= responses($blogid, $indent);
+		$id			= $blog->get('id');
+		$posts		.= responses($id	, $indent);
     }			// loop through responses
 
     return $posts;	// accumulated HTML string
@@ -119,113 +118,431 @@ function responses($blogid, $indent)
  ************************************************************************/
 
 // process input parameters
-$blogid			    = 0;
+$id				    = 0;
 $lang			    = 'en';
 $table			    = 'Blogs';
+$keyname            = 'blogid';
 $edit			    = false;
+$update             = false;
 
-foreach($_GET as $key => $value)
-{				// loop through all parameters
-    $value		    = trim($value);
-    switch(strtolower($key))
-    {				// act on specific parameters
-		case 'blogid':
-		case 'id':
-		{			// message being followed up
-		    $matches		    = array();
-		    if (is_string($value) && preg_match('/\d+/', $value, $matches) == 1)
+if (isset($_GET) && count($_GET) > 0)
+{                       // invoked to display message form
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{				    // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    $value		    = trim($value);
+	    switch(strtolower($key))
+	    {				// act on specific parameters
+			case 'blogid':
+			case 'id':
+			{			// message being followed up
+	 		    $id				    = trim($value);
+	 	        break;
+			}			// message being followed up
+
+		    case 'idar':
 		    {
-		    	$blogid			= $matches[0];
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblAR';
+				break;
 		    }
-		    else
- 	        if (is_int($value) || ctype_digit($value))
- 	        {
- 		        $blogid			= $value;
- 	        }
- 	        else
- 		        $msg	        .= "Invalid BlogID=$value. ";
- 	    break;
-		}			// message being followed up
 
-		case 'table':
-		{			// get the table name
- 	        $table	    	= $value;
- 	        break;
-		}			// get the table name
+		    case 'idbp':
+		    {
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblBP';
+				break;
+		    }
 
-		case 'lang':
-		{
-		    if (strlen($value) >= 2 && ctype_alpha($value))
- 		        $lang		= strtolower(substr($value,0,2));
- 	        break;
-		}
+		    case 'idbr':
+		    {
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblBR';
+				break;
+		    }
 
-		case 'edit':
-		{
-		    if (strtoupper($value) == 'Y')
- 	        	$edit		= true;
- 	        break;
-		}
+		    case 'idcp':
+		    {
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblCP';
+				break;
+		    }
 
-    }				// act on specific parameters
-}			    	// loop through all parameters
+		    case 'idcr':
+		    {
+				$id			    	= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblCR';
+				break;
+		    }
+
+		    case 'ider':
+		    {
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblER';
+				break;
+		    }
+
+		    case 'idhb':
+		    {
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblHB';
+				break;
+		    }
+
+		    case 'idhl':
+		    {
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblHL';
+				break;
+		    }
+
+		    case 'idir':
+		    {
+				$id			    	= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblIR';
+				break;
+		    }
+
+		    case 'idlr':
+		    {
+				$id			    	= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblLR';
+				break;
+		    }
+
+		    case 'idmr':
+		    {
+				$id			    	= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblMR';
+				break;
+		    }
+
+		    case 'idms':
+		    {
+				$id			    	= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblMS';
+				break;
+		    }
+
+		    case 'idnr':
+		    {
+				$id			    	= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblNR';
+				break;
+		    }
+
+		    case 'idnx':
+		    {
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblNX';
+				break;
+		    }
+
+		    case 'idrm':
+		    {
+				$id			    	= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblRM';
+				break;
+		    }
+
+		    case 'idsr':
+		    {
+				$id			    	= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblSR';
+				break;
+		    }
+
+		    case 'idsx':
+		    {
+				$id			    	= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblSX';
+				break;
+		    }
+
+		    case 'idtc':
+		    {
+				$id		    		= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblTC';
+				break;
+		    }
+
+		    case 'idtd':
+		    {
+				$id		    		= (int)$value;
+				$keyname			= $key;
+				$table				= 'tblTD';
+				break;
+		    }
+
+		    case 'idtl':
+		    {
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblTL';
+				break;
+		    }
+
+		    case 'idtr':
+		    {
+				$id				    = (int)$value;
+				$keyname			= $key;
+				$table				= 'tblTR';
+				break;
+		    }
+
+		    case 'username':
+		    {
+				$id				    = $value;
+				$keyname			= $key;
+				$table				= 'Users';
+				break;
+		    }
+
+			case 'table':
+	        {			// get the table name
+	            if (strlen($value) > 0)
+	 	            $table	    	= $value;
+	 	        break;
+			}			// get the table name
+
+			case 'lang':
+			{
+	 		    $lang		        = FtTemplate::validateLang($value);
+	 	        break;
+			}
+
+			case 'edit':
+			{
+			    if (strtoupper($value) == 'Y')
+	 	        	$edit		= true;
+	 	        break;
+			}
+
+	    }				// act on specific parameters
+	}			    	// loop through all parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}                       // invoked to display message form
+else
+if (isset($_POST) && count($_POST) > 0)
+{                       // invoked to update database
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	$edit		= true;
+	foreach($_POST as $key => $value)
+	{				    // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    $value		    = trim($value);
+	    switch(strtolower($key))
+	    {				// act on specific parameters
+			case 'blogid':
+			case 'id':
+	        case 'keyvalue':
+			{			// identifier of record that message applies to
+			    $keyname			= $key;
+	 		    $id				    = trim($value);
+	 	        break;
+			}			// message being followed up
+
+			case 'table':
+	        case 'tablename':
+	        {			// get the table name
+	            if (strlen($value) > 0)
+	 	            $table	    	= $value;
+	 	        break;
+			}			// get the table name
+
+		    case 'subject':
+		    {
+				$subject			= $value;
+				break;
+		    }		// message
+
+		    case 'message':
+		    case 'text':
+		    {
+				$message			= $value;
+				break;
+		    }		// message
+
+		    case 'email':
+		    case 'emailaddress':
+		    {
+				$email				= $value;
+				break;
+		    }		// email address of sender
+
+		    case 'update':
+		    {
+				if (strtoupper($value) == 'Y')
+				    $update			= true;
+				break;
+            }		// email address of sender
+
+			case 'lang':
+			{
+	 		    $lang		        = FtTemplate::validateLang($value);
+	 	        break;
+			}
+
+	    }				// act on specific parameters
+	}			    	// loop through all parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+
+    $tableInfo                      = Record::getInformation($table);
+    if ($tableInfo)
+    {
+        if ($table == 'Blogs')
+            $blog   = new Blog(array('bl_index'         => $id,
+                                     'table'            => 'Blogs',
+                                     'keyvalue'         => $id,
+                                     'keyname'          => 'BL_Index',
+                                     'username'         => $userid,
+                                     'blogname'         => $subject,
+                                     'text'             => $message));
+        else
+            $blog   = new Blog(array('table'            => $table,
+                                     'keyvalue'         => $id,
+                                     'keyname'          => $tableInfo['prime'],
+                                     'username'         => $userid,
+                                     'blogname'         => $subject,
+                                     'text'             => $message));
+	    $blog->save(false);
+	    $warn       .= "<p>Message posted</p>\n";
+	    $table      = 'Blogs';
+	    $className  = 'Blog';
+	    $id         = $blog['bl_index'];
+    }
+}                       // invoked to update database
 
 // start the template
 $template	    	= new FtTemplate("BlogPost$lang.html");
-
-$tempBase           = $document_root . '/templates/';
-if (file_exists($tempBase . "Trantab$lang.html"))
-    $trtemplate = new Template("${tempBase}Trantab$lang.html");
-else
-    $trtemplate = new Template("${tempBase}Trantaben.html");
+$trtemplate         = $template->getTranslate(); 
 
 // internationalization support
-$blogTemplate	    = $template->getElementById('blogTemplate')->innerHTML();
+$blogTemplate	    = $template['blogTemplate']->innerHTML();
+$months 		    = $trtemplate['Months'];
+$lmonths		    = $trtemplate['LMonths'];
 
-$monthsTag		    = $trtemplate->getElementById('Months');
-if ($monthsTag)
+// actions dependent on invoking user
+if ($user instanceof User && $user->isExisting())
 {
-    $months	    	= array();
-    foreach($monthsTag->childNodes() as $span)
-		$months[]	= trim($span->innerHTML());
-}
-$lmonthsTag		    = $trtemplate->getElementById('LMonths');
-if ($lmonthsTag)
-{
-    $lmonths		= array();
-    foreach($lmonthsTag->childNodes() as $span)
-		$lmonths[]	= trim($span->innerHTML());
-}
-
-$user	            = new User(array('username'	=> $userid));
-if ($user->isExisting())
-{
-    $template->updateTag('notLoggedOn', null);
+    $template['notLoggedOn']->update( null);
     $template->set('EMAILCLASS',    'ina');
     $template->set('READONLY',      'readonly="readonly"');
+    $template->set('EMAIL',			$user->get('email'));
 }
 else
 {                       // not signed in
     $template->set('EMAILCLASS',    'white');
     $template->set('READONLY',      '');
+    $template->set('EMAIL',			'');
 }                       // not signed in
-$template->set('EMAIL',			    $user->get('email'));
+
+// table name
+$name                           = '';
+$tableInfo                      = Record::getInformation($table);
+if ($tableInfo)
+{
+    if ($table != 'Users')
+    {
+	    $matches		    = array();
+        if (is_string($id) &&
+            preg_match('/\d+/', $id, $matches) == 1)
+	    {           // numeric id somewhere in string
+	    	$id				= (int)$matches[0];
+	    }           // numeric id somewhere in string
+	    else
+        if (is_int($id) || ctype_digit($id))
+        {
+	        $id			    = (int)$id;
+        }
+        else
+            $msg	        .= "Invalid $keyname=$id. ";
+    }
+
+    $template['badTable']->update(null);        // remove error message
+    $className		            = $tableInfo['classname'];
+    if (!class_exists(__NAMESPACE__ . "\\$className"))
+    {
+        require __NAMESPACE__ . "/$className.inc";
+    }
+    $keyname	                = $tableInfo['prime'];
+    if ((is_int($id) && $id > 0) ||
+        (strlen($id) > 0 && $id != '0'))
+    {
+        $qualName               = __NAMESPACE__ . "\\$className";
+        $instance               = new $qualName(array($keyname  => $id));
+        if ($instance->isExisting())
+        {
+            $name               = $instance->getName();
+            if ($className == 'User')
+                $id             = $instance['id'];
+        }
+        else
+        {
+            $warn               .= "<p>BlogPost.php: " . __LINE__ .
+        " Instance of $className with $keyname='$id' does not exist</p>\n";
+        }
+    }
+}
+else
+{                           // unsupported table
+    $template['badTable']->update(array('table' => $table));
+    $className		            = $table;
+    $keyname                    = null;
+}                           // unsupported table
+
+$template->set('NAME',		        $name);
+$template->set('CLASS',		        $className);
 $template->set('CONTACTTABLE',		$table);
-$template->set('CONTACTKEY',		$blogid);
+$template->set('TABLE',		        $table);
+$template->set('KEYNAME',		    $keyname);
+
+// other parameters
+$template->set('CONTACTKEY',		$id);
 $template->set('userid',		    $userid);
-$template->set('blogid',		    $blogid);
+$template->set('blogid',		    $id);
 $template->set('margin',		    '');
+$template->set('LANG',		        $lang);
 if ($debug)
     $template->set('debug',		    'Y');
 else
     $template->set('debug',		    'N');
 
-if ($blogid > 0)
+if ($id > 0 && $table == 'Blogs')
 {
-    $blog		        = new Blog(array('id'		=> $blogid));
+    $blog		        = new Blog(array('id'		=> $id));
     $subject		    = $blog->get('subject');
     if (strlen($subject) == 0)
-	    $subject	    = $blogid;
+	    $subject	    = $id;
     $template->set('BLOGTITLE',	    $subject);
 
     if ($blog->isExisting())
@@ -233,33 +550,33 @@ if ($blogid > 0)
 		$parentblogid	        = $blog->get('keyvalue');
 		$template->set('parentblogid',$parentblogid);
 		if ($parentblogid == 0)
-		    $template->updateTag('parentBlog', null);
+		    $template['parentBlog']->update( null);
 		else
-		    $template->updateTag('parentBlog',
+		    $template['parentBlog']->update(
 			            		 array('parentblogid' => $parentblogid));
 
 		if ($edit)
 		{
 		    $template->set('POSTS', 		'');
 		    $template->set('posttext',		$blog->get('text'));
-		    $userid				= $blog->get('username');
-		    $user	            = new User(array('username'	=> $userid));
-		    $template->set('EMAIL',		$user->get('email'));
-		    $h1tag		        = $template->getElementById('EditBlog');
+		    $username			= $blog->get('username');
+		    $owner	            = new User(array('username'	=> $username));
+		    $template->set('EMAIL',		$owner->get('email'));
+		    $h1tag		        = $template['EditBlog'];
 		    $template->set('TITLE',
 			    	  str_replace('$BLOGTITLE', $subject, $h1tag->innerHTML()));
-		    $template->updateTag('Response',	null);
-		    $template->updateTag('NewPost',	null);
+		    $template['Response']->update(	null);
+		    $template['NewPost']->update(	null);
 		}
 		else
 		{
-		    $template->set('POSTS',	    	responses($blogid, 0));
+		    $template->set('POSTS',	    	responses($id, 0));
 		    $template->set('posttext',		'');
-		    $h1tag		        = $template->getElementById('AddBlog');
+		    $h1tag		        = $template['AddBlog'];
 		    $template->set('TITLE',
 		    	    	  str_replace('$BLOGTITLE', $subject, $h1tag->innerHTML()));
-		    $template->updateTag('Edit',	null);
-		    $template->updateTag('NewPost',	null);
+		    $template['Edit']->update(	null);
+		    $template['NewPost']->update(	null);
 		}
     }			// key of existing Blog record
     else
@@ -267,11 +584,11 @@ if ($blogid > 0)
 		$template->set('POSTS',	    	'');
 		$template->set('posttext',	    '');
 		$template->set('parentblogid',	'');
-		$h1tag		= $template->getElementById('AddBlog');
+		$h1tag		    = $template['AddBlog'];
 		$template->set('TITLE',
 	    		       str_replace('$BLOGTITLE', $subject, $h1tag->innerHTML()));
-		$template->updateTag('Edit',		null);
-		$template->updateTag('Response',	null);
+		$template['Edit']->update(		null);
+		$template['Response']->update(	null);
     }
 }
 else
@@ -279,12 +596,21 @@ else
     $template->set('POSTS', 			'');
     $template->set('posttext',			'');
     $template->set('BLOGTITLE',	        '');
-    $template->updateTag('parentBlog',  null);
-    $h1tag		= $template->getElementById('NewBlog');
+    $template['parentBlog']->update(  null);
+    if ($table == 'Blogs')
+        $h1tag		        = $template['NewBlog'];
+    else
+    if ((is_int($id) && $id > 0) ||
+        (strlen($id) > 0 && $id != '0'))
+        $h1tag              = $template['NewSpecific'];
+    else
+        $h1tag              = $template['NewMessage'];
     $template->set('TITLE',
-    			   $h1tag->innerHTML());
-    $template->updateTag('Edit',		null);
-    $template->updateTag('Response',	null);
+                   str_replace(array('$CLASS', '$NAME'),
+                               array($className, $name), 
+                               $h1tag->innerHTML()));
+    $template['Edit']->update(		null);
+    $template['Response']->update(	null);
 }
 
 $template->display();

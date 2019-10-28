@@ -134,6 +134,8 @@ use Templating\TemplateTag;
  *		                the generated HTML as a string                  *
  *		2019/02/18      change template name for displaying picture     *
  *		2019/04/15      replace is_a with instanceof                    *
+ *		2019/07/18      use Person::getPerson                           *
+ *		2019/07/21      use Location::getLocation                       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/	
@@ -288,7 +290,9 @@ class Picture extends Record
 						 $pictype	= Picture::PIC_TYPE_PICTURE)
     {
 		global		$debug;
-		global		$connection;
+		global		$warn;
+        global		$connection;
+
 		$dbrow				= null;
 		$needInsert			= false;
 		$where				= '';
@@ -310,9 +314,9 @@ class Picture extends Record
 		    else
 		    {		// search for URL
 				$picnameurl	= $id;		// to clarify following logic
-				$parms	= array('idir'		=> $idir,
-							    'idtype'	=> $idtype,
-							    'pictype'	=> $pictype);
+				$parms	    = array('idir'		=> $idir,
+							        'idtype'	=> $idtype,
+							        'pictype'	=> $pictype);
 				$this->row	= array();
 				$this->splitUrl('picture',
 							    $picnameurl);
@@ -328,56 +332,44 @@ class Picture extends Record
 				 gettype($id) . ", value='" . print_r($id, true) . "'");
 		}
 
-		$fieldsValid		    = true;
+		$fieldsValid		            = true;
 		foreach($parms as $field => $value)
 		{
-		    $fieldLc		        = strtolower($field);
+		    $fieldLc		            = strtolower($field);
 		    if (array_key_exists($fieldLc, self::$translate))
-				$fieldLc	        = self::$translate[$fieldLc];
+				$fieldLc	            = self::$translate[$fieldLc];
 		    switch($fieldLc)
 		    {
 				case 'idbr':
 				{
-				    $where	    	.= $and . 'IDBR=:idbr';
-				    $idbr	    	= $value;
+				    $where	    	    .= $and . 'IDBR=:idbr';
+				    $idbr	    	    = $value;
 				    $sqlParms['idbr']	= $value;
-				    $and	    	= ' AND ';
+				    $and	    	    = ' AND ';
 				    break;
 				}
 
 				case 'picnameurl':
 				{	// create new record for picture/video/sound URL
-				    $picnameurl 	= $value;// to clarify following logic
-				    $where	    	.= $and . 'PicNameURL=:picnameurl';
-				    $sqlParms['picnameurl']	= $picnameurl;
-				    $and	    	= ' AND ';
+				    $picnameurl 	    = $value;// to clarify following logic
 				    break;
 				}		// picture/video/sound file name
 
 				case 'idtype':
 				{
-				    $idtype	    	= $value;
-				    $where	    	.= $and . 'IdType=:idtype';
-				    $sqlParms['idtype']	= $value;
-				    $and	    	= ' AND ';
+				    $idtype	    	    = $value;
 				    break;
 				}
 
 				case 'pictype':
 				{
-				    $pictype		= $value;
-				    $where	    	.= $and . 'PicType=:pictype';
-				    $sqlParms['pictype']= $value;
-				    $and	    	= ' AND ';
+				    $pictype		    = $value;
 				    break;
 				}
 
 				case 'idir':
 				{
-				    $idir		    = $value;
-				    $where		    .= $and . 'IDIR=:idir';
-				    $sqlParms['idir']	= $idir;
-				    $and		    = ' AND ';
+				    $idir		        = $value;
 				    break;
 				}
 
@@ -409,27 +401,56 @@ class Picture extends Record
 		}
 
 		if (count($parms) >= count(self::$initRow) && $fieldsValid)
-		{		// full row returned from database query
-		    $dbrow		    = $parms;
-		    $needInsert		= false;
-		}		// full row returned from database query
+		{		        // full row returned from database query
+		    $dbrow		            = $parms;
+		    $needInsert		        = false;
+		}		        // full row returned from database query
 		else
-		if (is_string($picnameurl))
-		{		// add record with new picture URL
-		    if (strlen($where) == 0)
-		    {		// get highest order value
-				$where		= 'WHERE IdType=:idtype AND PicType=:pictype';
-				$sqlParms	= array('idtype'	=> $idtype,
-								'pictype'	=> $pictype);
-		    }		// get highest order value
+		if (strlen($where) > 0)
+		{		        // numeric identifier of record
+		    // construct the query of the picture/video/sound file table
+		    $query		        = 'SELECT * FROM tblBR ' . $where;
 
+		    // query the database
+		    $stmt		        = $connection->prepare($query);
+		    $queryText		    = debugPrepQuery($query, $sqlParms);
+		    if ($stmt->execute($sqlParms))
+            {		// success
+                if ($debug)
+				    $warn		.= "<p>Picture::__construct: " .
+					    		      "'$queryText'</p>\n";
+				$row	    	= $stmt->fetch(PDO::FETCH_ASSOC);
+
+				if (is_array($row))
+				{		// found picture/video/sound file record
+				    $dbrow	= $row;
+				    $needInsert	= false;
+				}		// found picture/video/sound file record
+				else
+				{		// failed
+				    $dbrow		= self::$initRow;
+				    $needInsert	= true;
+				}		// failed
+		    }		    // success
+		    else
+		    {		    // error performing query
+				throw new Exception('Picture::__construct: ' .
+							    "'$queryText', " . 
+							    print_r($stmt->errorInfo(),true));
+		    }		    // error performing query
+		}		        // numeric identifier of record
+        else
+		{		        // add record with new picture URL
 		    // the new record is added after all of the existing records
 		    // so the PicOrder field is initialized to the number of
 		    // existing records for the current individual
-		    $query	= 'SELECT COALESCE(MAX(`PicOrder`),0)+1 FROM tblBR ' .
-							$where;
-		    $stmt	= $connection->prepare($query);
-		    $queryText	= debugPrepQuery($query, $sqlParms);
+		    $query	    = 'SELECT COALESCE(MAX(`PicOrder`),0)+1 FROM tblBR ' .
+				                'WHERE IdType=:idtype AND IDIR=:idir';
+			$sqlParms	            = array('idtype'	=> $idtype,
+                                            'idir'	    => $idir);
+
+		    $stmt	                = $connection->prepare($query);
+		    $queryText	            = debugPrepQuery($query, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		// success
 				if ($debug)
@@ -453,44 +474,50 @@ class Picture extends Record
 							    print_r($stmt->errorInfo(),true));
 		    }		// error performing query
 		}
-		else
-		if (strlen($where) > 0)
-		{		// search expression
-		    // construct the query of the picture/video/sound file table
-		    $query		= 'SELECT * FROM tblBR ' . $where;
-
-		    // query the database
-		    $stmt		= $connection->prepare($query);
-		    $queryText		= debugPrepQuery($query, $sqlParms);
-		    if ($stmt->execute($sqlParms))
-		    {		// success
-				$warn		.= "<p>Picture::__construct: " .
-							      "'$queryText'</p>\n";
-				$row		= $stmt->fetch(PDO::FETCH_ASSOC);
-
-				if (is_array($row))
-				{		// found picture/video/sound file record
-				    $dbrow	= $row;
-				    $needInsert	= false;
-				}		// found picture/video/sound file record
-				else
-				{		// failed
-				    $dbrow		= self::$initRow;
-				    $needInsert	= true;
-				}		// failed
-		    }		// success
-		    else
-		    {		// error performing query
-				throw new Exception('Picture::__construct: ' .
-							    "'$queryText', " . 
-							    print_r($stmt->errorInfo(),true));
-		    }		// error performing query
-		}		// numeric identifier of record
 
 		// invoke constructor of base class
 		parent::__construct($dbrow,
 						    'tblBR');
 		$this->needInsert	= $needInsert;
+
+		foreach($parms as $field => $value)
+		{
+		    $fieldLc		            = strtolower($field);
+		    if (array_key_exists($fieldLc, self::$translate))
+				$fieldLc	            = self::$translate[$fieldLc];
+		    switch($fieldLc)
+		    {
+				case 'idbr':
+				case 'idtype':
+				case 'pictype':
+				case 'idir':
+				case 'picorder':
+				{               // already handled
+				    break;
+				}               // already handled
+
+				case 'picnameurl':
+				case 'picname':
+				case 'idbppic':
+				case 'piccaption':
+				case 'picd':
+				case 'picsd':
+				case 'picdate':
+				case 'picdesc':
+				case 'picprint':
+				case 'picsoundname':
+				case 'picsoundnameurl':
+				case 'idbpsound':
+				case 'used':
+				case 'picpref':
+				case 'filingref':
+                {           // not keys
+                    parent::set($fieldLc, $value);
+				    break;
+				}           // not keys
+
+            }               // act on specific fields
+        }                   // initialize other fields
 
 		// diagnostic output if debug is set
 		$this->dump('Picture Record constructed:');
@@ -538,7 +565,7 @@ class Picture extends Record
      ********************************************************************/
     function getRecord()
     {
-		$id		= $this->row['idir'];
+		$id		    = $this->row['idir'];
 		$idtype		= $this->row['idtype'];
 
 		switch ($idtype)
@@ -551,7 +578,7 @@ class Picture extends Record
 		    {
                 if (!class_exists(__NAMESPACE__ . '\\Person'))
                     require __NAMESPACE__ . "/Person.inc";
-				return new Person(array('idir' => $id));
+				return Person::getPerson($id);
 		    }		// Person
 
 		    case Picture::IDTYPEMar:	// Marriage
@@ -600,7 +627,7 @@ class Picture extends Record
 		    {
                 if (!class_exists(__NAMESPACE__ . '\\Location'))
                     require __NAMESPACE__ . "/Location.inc";
-				return new Location(array('idlr' => $id));
+				return Location::getLocation($id);
 		    }		// Location
 
 		    case Picture::IDTYPETemple:	// Temple

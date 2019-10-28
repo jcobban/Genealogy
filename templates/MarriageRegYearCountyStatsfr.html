@@ -1,0 +1,180 @@
+<!--*********************************************************************
+ *  MarriageRegYearCountyStatsfr.html	    							*
+ *																		*
+ *  Template to display statistics about the transcription of marriage	*
+ *  registrations for a specific year and county.   					*
+ *																		*
+ *  History:															*
+ *		2019/07/08		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Accueil</a>:
+    <a href="/genealogy.php?lang=fr">
+	    Généalogie
+    </a>:
+    <a href='/Canada/CountriesEdit.php?lang=fr'>
+	    Liste des Pays Soutenus
+    </a>:
+    <a href="/genCountry.php?cc=$cc&amp;lang=fr">
+        $COUNTRYNAME
+      </a>:
+      <a href="/Canada/genProvince.php?Domain=$DOMAIN&amp;lang=fr">
+        $DOMAINNAME
+      </a>:
+      <a href="MarriageRegQuery.php?domain=$DOMAIN&amp;lang=fr">
+	    Nouvelle requête
+      </a>:
+      <a href="MarriageRegStats.php?RegDomain=$DOMAIN&amp;lang=fr">
+        $DOMAINNAME statut de transcription
+      </a>:
+      <a href="MarriageRegYearStats.php?RegDomain=$DOMAIN&amp;RegYear=$YEAR&amp;lang=fr">
+        $DOMAINNAME Statut $YEAR
+      </a>:
+    </div>
+	<div class='body'>
+	  <h1>
+		$DOMAINNAME: Statut des Inscriptions de Mariage pour le Comté de $COUNTYNAME $YEAR
+	    <span class='right'>
+		  <a href='MarriageRegYearCountyStatsHelpen.html' target='_blank'>Help?</a>
+	    </span>
+	  </h1>
+	  $TRACE
+	  $MSG
+	  <div class='center' id="topBrowse">
+	    <div class='left' id="topPrev">
+	      <a href='MarriageRegYearStats.php?regdomain=$DOMAIN&amp;regyear=$PREVYEAR&amp;county=$COUNTY&amp;lang=fr' id='toPrevYear'>
+		    &lt;--- $PREVYEAR 
+		  </a>
+	    </div>
+	    <div class='right' id="topNext">
+		  <a href='MarriageRegYearStats.php?regdomain=$DOMAIN&amp;regyear=$NEXTYEAR&amp;county=$COUNTY&amp;lang=fr' id='toNextYear'>
+		    $NEXTYEAR ---&gt;
+		  </a>
+	    </div>
+	    <div style='clear: both;'></div>
+	  </div>
+	  <form id='display' action='donothing.php' method='get'>
+	    <input type='hidden' id='RegYear' 
+		        value='$YEAR'>
+	    <input type='hidden' id='Domain' 
+		        value='$DOMAIN'>
+	    <!--- Put out the response as a table -->
+	    <table class='form' id="dataTable">
+	      <thead>
+	        <!--- Put out the column headers -->
+	    	<tr>
+	    	  <th class='colhead1st'>
+	    	    Comté
+	    	  </th>
+			  <th class='colhead'>
+			    Canton
+			  </th>
+			  <th class='colhead'>
+			    Fait
+			  </th>
+			  <th class='colhead'>
+			    Basse
+			  </th>
+			  <th class='colhead'>
+			    Élevée
+			  </th>
+			  <th class='colhead'>
+			    %&nbsp;Fait
+			  </th>
+			  <th class='colhead'>
+			    %&nbsp;Liée
+			  </th>
+			  <th class='colhead' colspan='2'>
+			    Regarder
+			  </th>
+			</tr>
+		  </thead>
+	      <tbody>
+	        <tr id="dataRow$ROWNUM">
+			  <td class='$CLASS bold left first'>
+			    $COUNTYNAME
+			    <input type='hidden' id='County$ROWNUM' 
+					value='$COUNTY'>
+			  </td>
+			  <td class='$CLASS bold left'>
+			    $TOWNSHIP
+			    <input type='hidden' id='Town$ROWNUM' 
+					value='$TOWNSHIP'>
+			  </td>
+			  <td class='$CLASS bold right'>
+			    $COUNT
+			  </td>
+			  <td class='$CLASS bold right'>
+			      $LOW
+			      <input type='hidden' id='low$ROWNUM' 
+					  value='$LOW'>
+			  </td>
+			  <td class='$CLASS bold right'>
+			      $HIGH
+			      <input type='hidden' id='high$ROWNUM' 
+					  value='$HIGH'>
+			  </td>
+			  <td class='$PCTDONECLASS'>
+			      $PCTDONE% 
+			  </td>
+			  <td class='$PCTLINKEDCLASS'>
+			      $PCTLINKED% 
+			  </td>
+			  <td class="odd">
+			    <button type='button' id='TownStats$ROWNUM'>
+					Alphabétique
+			    </button>
+			  </td>
+			  <td class="odd">
+			    <button type='button' id='ByNumber$ROWNUM'>
+					Numérique
+			    </button>
+			    <input type='hidden' name='First$ROWNUM'
+							id='First$ROWNUM'
+							value='$LOW'>
+			  </td>
+	    	</tr>
+		  </tbody>
+		  <tfoot>
+			<tr>
+			  <td class='odd bold left first'>&nbsp;  </td>
+			  <td class='odd bold left'>
+			      Total
+			  </td>
+			  <td class='odd bold right'>
+			      $TOTAL
+			  </td>
+			  <td class='odd bold right'>
+			      $LOWEST
+			  </td>
+			  <td class='odd bold right'>
+			      $HIGHEST
+			  </td>
+			  <td class='$PCTDONECLASS'>
+			      $PCTDONE% 
+		      </td>
+		      <td class='$PCTLINKEDCLASS'>
+		          $PCTLINKED% 
+		      </td>
+		      <td class='odd left' colspan="2">&nbsp;  </td>
+	    	</tr>
+	      </tfoot>
+	    </table>
+	  </form>
+	</div> <!-- end of <div id='body'> -->
+	<div class='balloon' id='HelpTownStats'>
+	  Click on this button to display a summary of the marriages transcribed
+	  for the specific town or township.
+	</div>
+	<div class='balloon' id='HelpCounty'>
+	  This field displays the name of the county where the
+	  marriage was registered.
+	</div>
+	<div class='balloon' id='HelpTown'>
+      This field displays the name of the city, town, village, or township 
+      where the marriage was registered.
+	</div>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="/Ontario/MarriageRegYearStats.js" type="text/javascript"></script>

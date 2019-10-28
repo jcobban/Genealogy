@@ -9,111 +9,110 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
-    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
-  </div>	
-  <div class="body">
-    <h1>
-      <span class="right">
-		<a href="/FamilyTree/VideosHelpen.html" target="help">? Help</a>
-      </span>
-      Manage Tutorial Videos
-    </h1>
-    $TRACE
-    $MSG
-  <form name="videoForm" action="Videos.php" method="post">
-    <p style="white-space: nowrap;">
-      <label class="label" style="width: 11em;" for="pattern">
-		Pattern:
-      </label>
-      <input name="pattern" id="pattern" type="text" 
-			class="white leftnc" size="80"
-			value="$PATTERN">
-      <input name="lang" id="lang" type="hidden" 
-			value="$LANG"> <!-- pass language to update -->
-    </p>
-    <div class="center" id="linksfront">
-      <div class="left" id="npprev">
-        <a href="/Videos.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$offset">&lt;---</a>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+    </div>	
+    <div class="body">
+      <h1>
+        <span class="right">
+  		<a href="/FamilyTree/VideosHelpen.html" target="help">? Help</a>
+        </span>
+        Manage Tutorial Videos
+      </h1>
+      $TRACE
+      $MSG
+    <form name="videoForm" action="Videos.php" method="post">
+      <p style="white-space: nowrap;">
+        <label class="label" style="width: 11em;" for="pattern">
+  		Pattern:
+        </label>
+        <input name="pattern" id="pattern" type="text" 
+  			class="white leftnc" size="80"
+  			value="$PATTERN">
+        <input name="lang" id="lang" type="hidden" 
+  			value="$LANG"> <!-- pass language to update -->
+      </p>
+      <div class="center" id="linksfront">
+        <div class="left" id="npprev">
+          <a href="/Videos.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$offset">&lt;---</a>
+        </div>
+        <div class="right" id="npnext"> 
+        <a href="/Videos.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$offset">---&gt;</a>
+        </div>
+  		  rows $OFFSET to $LAST of $COUNT 
+        <div style="clear: both;"></div>
       </div>
-      <div class="right" id="npnext"> 
-      <a href="/Videos.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$offset">---&gt;</a>
-      </div>
-		  rows $OFFSET to $LAST of $COUNT 
-      <div style="clear: both;"></div>
-    </div>
-    <!--- Put out the response as a table -->
-    <table class="details" id="dataTable">
-      <!--- Put out the column headers -->
-      <thead>
-        <tr>
-		  <th class="colhead">
-		    File Name
-		  </th>
-		  <th class="colhead">
-		    Language
-		  </th>
-		  <th class="colhead">
-		    Description
-		  </th>
-		  <th class="colhead">
-		    Display?
-		  </th>
-		  <th class="colhead">
-		    Delete?
-		  </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr id="video$row">
-		  <td class="$even left">
-		    <input type="text" class="black $even leftnc"
-		  	name="FileName$row" style="width: 16em;"
-		  	value="$filename"> 
-		  </td>
-		  <td class="$even left">
-		    <input type="text" class="black $even leftnc"
-		  	name="Lang$row" style="width: 2em;"
-		  	value="$lang"> 
-		  </td>
-		  <td class="$even left">
-		    <input type="text" class="black $even leftnc"
-		  	name="Description$row" style="width: 40em;"
-		  	value="$description"> 
-		  </td>
-		  <td class="$even center">
-		    <input type="text" class="black $even center"
-		  	name="Display$row" width="1" style="width: 1em;"
-		  	value="$display">
-		  </td>
-		  <td class="$even center">
-		    <input type="hidden"
-		  	name="Delete$row" id="Delete$row"
-		  	value="N">
-		    <button type="button" id="DeleteButton$row">
-		  	Delete
-		    </button>
-		  </td>
-        </tr>
-      </tbody>
-    </table>
-    <p>
-      <button type="submit" id="Update">
-		<u>U</u>pdate
-      </button>
-		&nbsp;
-      <button type="button" id="Add">
-		<u>A</u>dd Video
-      </button>
-    </p>
-    </p>
-  <!-- this field triggers saving the last row of the table -->
-  <input type="hidden"
-			name="FileName999999999"
-			value=""> 
-  </form>
-</div> <!-- end of <div class="body"> -->
+      <!--- Put out the response as a table -->
+      <table class="details" id="dataTable">
+        <!--- Put out the column headers -->
+        <thead>
+          <tr>
+  		  <th class="colhead">
+  		    File Name
+  		  </th>
+  		  <th class="colhead">
+  		    Language
+  		  </th>
+  		  <th class="colhead">
+  		    Description
+  		  </th>
+  		  <th class="colhead">
+  		    Display?
+  		  </th>
+  		  <th class="colhead">
+  		    Delete?
+  		  </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="video$row">
+  		  <td class="$even left">
+  		    <input type="text" class="black $even leftnc"
+  		  	name="FileName$row" style="width: 16em;"
+  		  	value="$filename"> 
+  		  </td>
+  		  <td class="$even left">
+  		    <input type="text" class="black $even leftnc"
+  		  	name="Lang$row" style="width: 2em;"
+  		  	value="$lang"> 
+  		  </td>
+  		  <td class="$even left">
+  		    <input type="text" class="black $even leftnc"
+  		  	name="Description$row" style="width: 40em;"
+  		  	value="$description"> 
+  		  </td>
+  		  <td class="$even center">
+  		    <input type="text" class="black $even center"
+  		  	name="Display$row" width="1" style="width: 1em;"
+  		  	value="$display">
+  		  </td>
+  		  <td class="$even center">
+  		    <input type="hidden"
+  		  	name="Delete$row" id="Delete$row"
+  		  	value="N">
+  		    <button type="button" id="DeleteButton$row">
+  		  	Delete
+  		    </button>
+  		  </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <button type="submit" id="Update">
+  		<u>U</u>pdate
+        </button>
+  		&nbsp;
+        <button type="button" id="Add">
+  		<u>A</u>dd Video
+        </button>
+      </p>
+    <!-- this field triggers saving the last row of the table -->
+    <input type="hidden"
+  			name="FileName999999999"
+  			value=""> 
+    </form>
+  </div> <!-- end of <div class="body"> -->
   <div class="balloon" id="Helppattern">
     <p>
 		This is an 
@@ -121,27 +120,33 @@
 		    extended regular expression</a>,
 		as supported by MySQL,
 		which is used to search for users based upon their user name.
+    </p>
     <ul>
       <li>If the pattern contains no special 
 		characters then only videos containing that string will be included.
 		For example the pattern "London" will match videos containing the
 		string "London".  Note that the search ignores case, so that pattern
 		will also match "LONDON" and "london".
+      </li>
       <li>If the pattern begins with a caret '^' then only videos that
 		<b>begin</b> with the remainder of the pattern are included.  
 		For example the pattern
 		"^Ba" displays videos starting with "Ba" (or "ba" or "BA").
+      </li>
       <li>If the pattern ends with a dollar sign '$', then only videos that
 		<b>end</b> with the remainder of the pattern are included.  
 		For example the pattern
 		"CA$" matches videos that end with "CA" (or "ca" or "Ca").
+      </li>
       <li>In a pattern a period '.' matches any single character.  For example
 		the pattern "B.b" matches any video that contains two letter Bs
 		separated by one character, for example "Bab", "Beb", "Bib", "Bob",
 		or "Bub" anywhere in the video name.
+      </li>
       <li>In a pattern an asterisk '*' matches zero or more of the preceding
 		character; "bo*b" matches "bb", "bob", and "boob"
 		anywhere in the video name.
+      </li>
     </ul>
     </p>
   </div>

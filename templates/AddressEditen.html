@@ -11,543 +11,518 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-<div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
-    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
-    <a href="/FamilyTree/Addresses.php?lang=$LANG">Addresses</a>:
-</div>
-  <div class="body">
-    <h1>
-      <span class="right">
-	<a href="/FamilyTree/AddressHelpen.html" target="help">? Help</a>
-      </span>
-	Address: $NAME
-    </h1>
-    $MSG
-    $TRACE
-  <form name="locForm" id="locForm" action="Address.php" method="post">
-    <div class="row">
-	<label class="column1" for="idar">IDAR:</label>
-	<input type="text" name="idar" id="idar" readonly="readonly"
-		class="black white right" size="6"
-		value="$IDAR">
-	<input type="hidden" name="formname" id="formname"
-		value="$FORMNAME">
-	<input type="hidden" name="debug" id="debug"
-		value="$DEBUG">
-	<input type="hidden" name="action" id="action"
-		value="update">
-	<input type="hidden" name="to" id="to"
-		value="$IDAR">
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-      <div class="column1">
-	<label class="column1" for="Kind">Kind:</label>
-	<select name="Kind" id="Kind" size="1"
-		class="black white left">
-	  <option value="0" $KINDMAIL>
-	    Mailing
-	  </option>
-	  <option value="1" $KINDEVENT>
-	    Event
-	  </option>
-	  <option value="2" $KINDREPO> 
-	    Repository
-	  </option>
-	</select>
-      </div>
-      <div class="column1">
-	<label class="column1" for="Style">Style:</label>
-	<select name="Style" id="Style" size="1"
-		class="black white left">
-	  <option value="0" $STYLEAMERICAN>
-	    American
-	  </option>
-	  <option value="1" $STYLEEUROPEAN> 
-	    European
-	  </option>
-	</select>
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-	<label class="column1" for="AddrName">Address Name:</label>
-	<input type="text" name="AddrName" id="AddrName" size="64"
-		class="black white leftnc"
-		value="$NAME" 
-		>
-	<input type="hidden" name="searchName" id="searchName" 
-		value="$SEARCHNAME">
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-	<label class="column1" for="AddrSort">Sort Key:</label>
-	<input type="text" name="AddrSort" id="AddrSort" size="64"
-		class="black white leftnc"
-		value="$SORTKEY" >
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-	<label class="column1" for="Address1">Address line 1:</label>
-	<input type="text" name="Address1" id="Address1" 
-		size="64" class="black white leftnc"
-		value="$ADDRESS1" >
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-	<label class="column1" for="Address2">Address line 2:</label>
-	<input type="text" name="Address2" id="Address2"
-		size="64" class="black white leftnc"
-		value="$ADDRESS2" >
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-	<label class="column1" for="City">City:</label>
-	    <input type="text" name="City" id="City" size="32"
-		class="black white left"
-		value="$CITY" >
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-	<label class="column1" for="State">State:</label>
-	<input type="text" name="State" id="State"
-		size="32" class="black white left"
-		value="$STATE" >
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-      <div class="column1">
-	<label class="column1" for="ZipCode">Postal Code:</label>
-	<input type="text" name="ZipCode" id="ZipCode"
-		size="12" class="black white left"
-		value="$ZIPCODE" >
-      </div>
-      <div class="column1">
-	<label class="column1" for="Country">Country:</label>
-	<input type="text" name="Country" id="Country"
-		size="24" class="black white left"
-		value="$COUNTRY" >
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-      <div class="column1">
-	<label class="column1" for="Phone1">Phone Number 1:</label>
-	<input type="text" name="Phone1" id="Phone1"
-		size="12" class="black white leftnc"
-		value="$PHONE1" >
-      </div>
-      <div class="column1">
-	<label class="column1" for="Phone2">Phone Number 2:</label>
-	<input type="text" name="Phone2" id="Phone2"
-		size="12" class="black white leftnc"
-		value="$PHONE2" >
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-	<label class="column1" for="Email">E-Mail Address:</label>
-	    <input type="text" name="Email" id="Email"
-		size="64" class="black white leftnc"
-		value="$EMAIL" >
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-	<label class="column1" for="HomePage">Home Page:</label>
-	    <input type="text" name="HomePage" id="HomePage"
-		size="64" class="hyperlink"
-		value="$HOMEPAGE" >
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-      <div class="column1">
-	<label class="column1" for="Latitude">Latitude:</label>
-	<input type="text" name="Latitude" id="Latitude" 
-		size="12" class="black white right"
-		value="$LATITUDE" >
-      </div>
-      <div class="column1">
-	<label class="column1" for="Longitude">Longitude:</label>
-	<input type="text" name="Longitude" id="Longitude" 
-		size="12" class="black white right"
-		value="$LONGITUDE" >
-      </div>
-      <div class="column1">
-	<button type="button" id="showMap" class="button">
-	  Show Map
-	</button>
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-      <div class="column1">
-	<label class="column1" for="Preposition">
-	    Preposition:
-	</label>
-	<input type="text" name="Preposition" id="Preposition"
-		style="width: 8em;" class="black white leftnc"
-		value="in" readonly disabled="disabled">
-      </div>
-      <div class="column1">
-	<label class="column1" for="Zoom">Zoom:</label>
-	<input type="text" name="Zoom" id="Zoom" size="3"
-		class="black white right"
-		value="$ZOOM" >
-      </div>
-      <div class="column1">
-	<button type="button" id="getMap" class="button">
-	  Get Map Info
-	</button>
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-	<label class="column1" for="AddrNotes">Notes:</label>
-	    <textarea name="AddrNotes" id="AddrNotes" rows="5" cols="64"
-		>$NOTES</textarea>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-      <div class="column1">
-	<label class="column1" for="List1">List 1:</label>
-	<input type="hidden" name="List1[]" value="0"> 
-	<input type="checkbox" name="List1[]" id="List1" $LIST1CHECKED>
-      </div>
-      <div class="column1">
-	<label class="column1" for="List2">List 2:</label>
-	<input type="hidden" name="List2[]" value="0"> 
-	<input type="checkbox" name="List2[]" id="List2" $LIST2CHECKED>
-      </div>
-      <div class="column1">
-	<label class="column1" for="List3">List 3:</label>
-	<input type="hidden" name="List3[]" value="0"> 
-	<input type="checkbox" name="List3[]" id="List3" $LIST3CHECKED>
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-      <div class="column1">
-	<label class="column1" for="List4">List 4:</label>
-	<input type="hidden" name="List4[]" value="0"> 
-	<input type="checkbox" name="List4[]" id="List4" $LIST4CHECKED>
-      </div>
-      <div class="column1">
-	<label class="column1" for="List5">List 5:</label>
-	<input type="hidden" name="List5[]" value="0"> 
-	<input type="checkbox" name="List5[]" id="List5" $LIST5CHECKED>
-      </div>
-      <div class="column1">
-	<label class="column1" for="List6">List 6:</label>
-	<input type="hidden" name="List6[]" value="0"> 
-	<input type="checkbox" name="List6[]" id="List6" $LIST6CHECKED>
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-      <div class="column1">
-	<label class="column1" for="Used">Used:</label>
-	<input type="hidden" name="Used[]" value="0"> 
-	<input type="checkbox" name="Used[]" id="Used" value="1"
-		$USEDCHECKED>
-      </div>
-      <div class="column1">
-	<label class="column1" for="Tag1">Tag1:</label>
-	<input type="hidden" name="Tag1[]" value="0"> 
-	<input type="checkbox" name="Tag1[]" id="Tag1" value="1"
-		$TAG1CHECKED>
-      </div>
-      <div class="column1">
-	<label class="column1" for="Verified">Verified:</label>
-	<input type="hidden" name="Verified[]" value="0"> 
-	<input type="checkbox" name="Verified[]" id="Verified" value="1"
-		$VERIFIEDCHECKED>
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row">
-      <div class="column1">
-	<label class="column1" for="FSResolved">FS Resolved:</label>
-	<select name="FSResolved" id="FSResolved"
-		size="1" class="black white left"
-		>
-		<option value="0" $FSRESOLVED0>
-		    No
-		</option>
-		<option value="1" $FSRESOLVED1>
-		    Yes
-		</option>
-		<option value="2" $FSRESOLVED2>
-		    Unresolved
-		</option>
-	</select>
-      </div>
-      <div class="column1">
-	<label class="column1" for="VEResolved">VE Resolved:</label>
-	<select name="VEResolved" id="VEResolved"
-		size="1" class="black white left" >
-		<option value="0" $VERESOLVED0>
-		    No
-		</option>
-		<option value="1" $VERESOLVED1>
-		    Yes
-		</option>
-		<option value="2" $VERESOLVED2>
-		    Unresolved
-		</option>
-	</select>
-      </div>
-      <div class="column1">
-	<label class="column1" for="qsTag">qsTag:</label>
-	<input type="hidden" name="qsTag[]" value="0"> 
-	<input type="checkbox" id="qsTag" name="qsTag[]" value="1"
-		$QSTAGCHECKED>
-      </div>
-      <div style="clear: both;"></div>
-    </div>
-    <div id="duplicates">
-      <p class="label">
-	Duplicates of current row:
-      </p>
-      <div class="duprow$idar">
-	  <label class="column1" for="Dup$idar">
-	  </label>
-	  <input type="text" class="ina rightnc" readonly="readonly"
-		name="Dup$idar" id="Dup$idar" 
-		value="$idar">
-	<div style="clear: both;"></div>
-      </div>
-      <div class="row">
-	  <button type="button" id="Merge">
-	      Merge Duplicates
-	  </button>
-	  <input type="hidden" name="from" id="from"
-		value="$dupidars">
-	<div style="clear: both;"></div>
-      </div>
-    </div> <!-- id="duplicates" -->
-	$PICTURES
-    <p id="buttonRow">
-	<button type="submit" id="Submit">
-	    <u>U</u>pdate Address
-	</button>
-	&nbsp;
-	<button type="button" id="Delete">
-	    <u>D</u>elete Address
-	</button>
-	&nbsp;
-	<button type="button" id="Close">
-	    <u>C</u>lose without Updating
-	</button>
-	&nbsp;
-	<button type="button" id="Pictures">
-	  <u>P</u>ictures
-	</button>
-	<input type="hidden" name="PicIdType" id="PicIdType" 
-		value="70">
-    </p> <!-- id="buttonRow" -->
-  </form>
-</div> <!-- class='body' -->
-<div class="map" id="mapDiv">
-</div>
-<div class="hidden" id="templates">
-    <!-- the following button should exactly match <button id="showMap"> -->
-    <button id="showMapTemplate" class="button">Show Map</button>
-    <!-- the following button replaces Show Map -->
-    <button id="hideMapTemplate" class="button">Hide Map</button>
-</div>
-<div class="balloon" id="Helpidar">
-<p>The unique numeric identifier of the address record in the database.
-This is assigned by the system when a new address is created, and cannot
-be altered by the user.
-</p>
-</div>
-<div class="balloon" id="HelpKind">
-  <p>This is a selection list identifying the way the address record is
-	used by the family tree.
-  </p>
-  <dl>
-    <dt>Mailing</dt>
-    <dd>This kind of address record is used to record the contact
-	information for an individual in the family tree.
-    </dd>
-    <dt>Event</dt>
-    <dd>This kind of address record is used in place of a location record
-	when the researcher wishes to record the place where an event
-	took place, or a fact was observed, using a structured hierarchical
-	address format, instead of a simple text field.
-    </dd>
-    <dt>Repository</dt>
-    <dd>This kind of address record is used to record the contact information
-	for a library, archive, or other repository of documentary
-	evidence.  It is referred to by master source records.
-    </dd>
-  </dl>
-</div>
-<div class="balloon" id="HelpStyle">
-<p>This selection list specifies how the particular address is to be
-formatted to satisfy the surface mail routing preferences of
-the destination country.  In particular this influences where
-the postal code appears in the address.
-</p>
-</div>
-<div class="balloon" id="HelpAddrName">
-<p>This field contains the name of the address.  This should be
-unique for all address records of a particular 'Kind'.  This is not
-part of the address as it is used for routing messages, it is an
-identifier for the address.
-</div>
-<div class="balloon" id="HelpAddrSort">
-<p>This is intended to be used as a sort field when the desirable sort
-order cannot be determined from the value of Address.  
-It defaults to an empty string.
-</p>
-</div>
-<div class="balloon" id="HelpAddress">
-<p>This field contains a portion of the surface mail address that is more 
-specific than the post office.  For example it may be a street address,
-a rural route number, or a post office box number.
-</p>
-</div>
-<div class="balloon" id="HelpCity">
-<p>This is the name of the surface mail post office serving the address.
-</p>
-</div>
-<div class="balloon" id="HelpState">
-<p>This field contains the name of a political unit containing 
-the post office that
-is a part of the country containing the address, if required.  For the
-United States, and most other federal nations, this is a state.  
-For Canada it is a province.  For countries in the British isles this is
-a county.  For France it is a Département.
-</p>
-</div>
-<div class="balloon" id="HelpZipCode">
-<p>This field contains the postal code as assigned by the surface mail 
-administration of the destination country, if applicable.
-</p>
-</div>
-<div class="balloon" id="HelpCountry">
-<p>This field contains the name of the country containing the address.
-</p>
-</div>
-<div class="balloon" id="HelpPhone">
-<p>This field contains a telephone number that can be used to establish
-voice or facsimile communications with the destination.
-</p>
-</div>
-<div class="balloon" id="HelpEmail">
-<p>This field contains an electronic mail address that can be used to
-communicate with the destination.
-</p>
-</div>
-<div class="balloon" id="HelpHomePage">
-<p>This field contains a Uniform Resource Location (URL) of a web page
-associated with the address.  If you click on this field with the
-mouse the URL will be opened in a new window.
-</p>
-</div>
-<div class="balloon" id="HelpLatitude">
-<p>The latitude of the address expressed as signed
-degrees, minutes, and seconds in the form "xdddmmss.fff", for example
-"452217.456", which represents 45°N 22' 17.456".
-</p>
-</div>
-<div class="balloon" id="HelpLongitude">
-<p>The longitude of the address expressed as signed
-degrees, minutes, and seconds in the form "xdddmmss.fff", for example
-"-752217.456", which represents 75°W 22' 17.456".  Note that longitudes west of the Greenwich meridian,
-that is for all of the Americas, are negative.
-</p>
-</div>
-<div class="balloon" id="HelpPreposition">
-<p>If specified, this is intended to override the default preposition "at".
-To support French a special value "in[masc]" should be specified for
-countries that have masculine gender and start with a consonant.
-</p>
-</div>
-<div class="balloon" id="HelpZoom">
-<p>This field is used to specify the zoom level for the Google map display.
-The value of this field is normally set by clicking on the
-<span class="button">Get Map Info</span> button. 
-</p>
-</div>
-<div class="balloon" id="HelpshowMap">
-<p>Clicking on this button displays or hides a Google map
-centered at the location.
-</p>
-</div>
-<div class="balloon" id="HelpgetMap">
-<p>Clicking on this button extracts information from the Google map display
-about the center of the map and its zoom level and stores that information
-into the latitude, longitude, and zoom level input fields.  This permits you
-to use the zoom and pan functions of the Google map to adjust the display
-appropriately, and then save those settings for subsequent users.
-</p>
-</div>
-<div class="balloon" id="HelpList">
-<p>This is a flag used by Legacy.
-The checkbox is selected if the value of this field is 'yes'.
-</p>
-</div>
-<div class="balloon" id="HelpAddrNotes">
-<p>User notes about the address.
-This is an extended editor field permitting you to enter data as if into
-a word processor, setting font style, embedding pictures, defining 
-hyperlinks, and so on.
-</p>
-</div>
-<div class="balloon" id="HelpVerified">
-<p>This field is currently unused.
-The checkbox is selected if the value of this field is 'yes'.
-</p>
-</div>
-<div class="balloon" id="HelpFSResolved">
-<p>This field is currently unused.
-The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
-resolved".
-</p>
-</div>
-<div class="balloon" id="HelpVEResolved">
-<p>This field is currently unused.
-The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
-resolved".
-</p>
-</div>
-<div class="balloon" id="HelpqsTag">
-<p>This field is currently unused.
-The checkbox is selected if the value of this field is 'yes'.
-</p>
-</div>
-<div class="balloon" id="HelpUsed">
-<p>This field is currently unused.
-The checkbox is selected if the value of this field is 'yes'.
-</p>
-</div>
-<div class="balloon" id="HelpTag">
-<p>This field is currently unused.
-The checkbox is selected if the value of this field is 'yes'.
-</p>
-</div>
-<div class="balloon" id="HelpMerge">
-<p>Clicking on this button causes the listed address records with
-duplicate names to be merged with the current address record, and all
-references from the database updated to refer to the current address
-record.
-</p>
-</div>
-<div class="balloon" id="HelpSubmit">
-<p>Clicking on this button causes the database to be updated to
-reflect the changes you have made to this record.
-</p>
-</div>
-  <div class="balloon" id="HelpPictures">
-    Click this button to open a dialog for managing the pictures associated
-    with the address.
-  </div>
+	<div id="breadcrumbs" class="hidden">
+	    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+	    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+	    <a href="/FamilyTree/Addresses.php?lang=$LANG">Addresses</a>:
+	</div>
+	  <div class="body">
+	    <h1>
+	      <span class="right">
+		<a href="/FamilyTree/AddressHelpen.html" target="help">? Help</a>
+	      </span>
+		Address: $NAMEANDKIND
+	    </h1>
+	    $MSG
+	    $TRACE
+	  <form name="locForm" id="locForm" action="Address.php" method="post">
+	    <div class="row">
+		<label class="column1" for="idar">IDAR:</label>
+		<input type="text" name="idar" id="idar" readonly="readonly"
+			class="black white right" size="6"
+			value="$IDAR">
+		<input type="hidden" name="formname" id="formname"
+			value="$FORMNAME">
+		<input type="hidden" name="debug" id="debug"
+			value="$DEBUG">
+		<input type="hidden" name="action" id="action"
+			value="update">
+		<input type="hidden" name="to" id="to"
+			value="$IDAR">
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+	      <div class="column1">
+		<label class="column1" for="Kind">Kind:</label>
+		<select name="Kind" id="Kind" size="1"
+			class="black white left">
+		  <option value="0" $KINDMAIL>
+		    Mailing
+		  </option>
+		  <option value="1" $KINDEVENT>
+		    Event
+		  </option>
+		  <option value="2" $KINDREPO> 
+		    Repository
+		  </option>
+		</select>
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="Style">Style:</label>
+		<select name="Style" id="Style" size="1"
+			class="black white left">
+		  <option value="0" $STYLEAMERICAN>
+		    American
+		  </option>
+		  <option value="1" $STYLEEUROPEAN> 
+		    European
+		  </option>
+		</select>
+	      </div>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+		<label class="column1" for="AddrName">Address Name:</label>
+		<input type="text" name="AddrName" id="AddrName" size="64"
+			class="black white leftnc"
+			value="$NAME" 
+			>
+		<input type="hidden" name="searchName" id="searchName" 
+			value="$SEARCHNAME">
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+		<label class="column1" for="AddrSort">Sort Key:</label>
+		<input type="text" name="AddrSort" id="AddrSort" size="64"
+			class="black white leftnc"
+			value="$SORTKEY" >
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+		<label class="column1" for="Address1">Address line 1:</label>
+		<input type="text" name="Address1" id="Address1" 
+			size="64" class="black white leftnc"
+			value="$ADDRESS1" >
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+		<label class="column1" for="Address2">Address line 2:</label>
+		<input type="text" name="Address2" id="Address2"
+			size="64" class="black white leftnc"
+			value="$ADDRESS2" >
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+		<label class="column1" for="City">City:</label>
+		    <input type="text" name="City" id="City" size="32"
+			class="black white left"
+			value="$CITY" >
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+		<label class="column1" for="State">State:</label>
+		<input type="text" name="State" id="State"
+			size="32" class="black white left"
+			value="$STATE" >
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+	      <div class="column1">
+		<label class="column1" for="ZipCode">Postal Code:</label>
+		<input type="text" name="ZipCode" id="ZipCode"
+			size="12" class="black white left"
+			value="$ZIPCODE" >
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="Country">Country:</label>
+		<input type="text" name="Country" id="Country"
+			size="24" class="black white left"
+			value="$COUNTRY" >
+	      </div>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+	      <div class="column1">
+		<label class="column1" for="Phone1">Phone Number 1:</label>
+		<input type="text" name="Phone1" id="Phone1"
+			size="12" class="black white leftnc"
+			value="$PHONE1" >
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="Phone2">Phone Number 2:</label>
+		<input type="text" name="Phone2" id="Phone2"
+			size="12" class="black white leftnc"
+			value="$PHONE2" >
+	      </div>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+		<label class="column1" for="Email">E-Mail Address:</label>
+		    <input type="text" name="Email" id="Email"
+			size="64" class="black white leftnc"
+			value="$EMAIL" >
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+		<label class="column1" for="HomePage">Home Page:</label>
+		    <input type="text" name="HomePage" id="HomePage"
+			size="64" class="hyperlink"
+			value="$HOMEPAGE" >
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+	      <div class="column1">
+		<label class="column1" for="Latitude">Latitude:</label>
+		<input type="text" name="Latitude" id="Latitude" 
+			size="12" class="black white right"
+			value="$LATITUDE" >
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="Longitude">Longitude:</label>
+		<input type="text" name="Longitude" id="Longitude" 
+			size="12" class="black white right"
+			value="$LONGITUDE" >
+	      </div>
+	      <div class="column1">
+		<button type="button" id="showMap" class="button">
+		  Show Map
+		</button>
+	      </div>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+	      <div class="column1">
+		<label class="column1" for="Preposition">
+		    Preposition:
+		</label>
+		<input type="text" name="Preposition" id="Preposition"
+			style="width: 8em;" class="black white leftnc"
+			value="in" readonly disabled="disabled">
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="Zoom">Zoom:</label>
+		<input type="text" name="Zoom" id="Zoom" size="3"
+			class="black white right"
+			value="$ZOOM" >
+	      </div>
+	      <div class="column1">
+		<button type="button" id="getMap" class="button">
+		  Get Map Info
+		</button>
+	      </div>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+		<label class="column1" for="AddrNotes">Notes:</label>
+		    <textarea name="AddrNotes" id="AddrNotes" rows="5" cols="64"
+			>$NOTES</textarea>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+	      <div class="column1">
+		<label class="column1" for="List1">List 1:</label>
+		<input type="hidden" name="List1[]" value="0"> 
+		<input type="checkbox" name="List1[]" id="List1" $LIST1CHECKED>
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="List2">List 2:</label>
+		<input type="hidden" name="List2[]" value="0"> 
+		<input type="checkbox" name="List2[]" id="List2" $LIST2CHECKED>
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="List3">List 3:</label>
+		<input type="hidden" name="List3[]" value="0"> 
+		<input type="checkbox" name="List3[]" id="List3" $LIST3CHECKED>
+	      </div>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+	      <div class="column1">
+		<label class="column1" for="List4">List 4:</label>
+		<input type="hidden" name="List4[]" value="0"> 
+		<input type="checkbox" name="List4[]" id="List4" $LIST4CHECKED>
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="List5">List 5:</label>
+		<input type="hidden" name="List5[]" value="0"> 
+		<input type="checkbox" name="List5[]" id="List5" $LIST5CHECKED>
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="List6">List 6:</label>
+		<input type="hidden" name="List6[]" value="0"> 
+		<input type="checkbox" name="List6[]" id="List6" $LIST6CHECKED>
+	      </div>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+	      <div class="column1">
+		<label class="column1" for="Used">Used:</label>
+		<input type="hidden" name="Used[]" value="0"> 
+		<input type="checkbox" name="Used[]" id="Used" value="1"
+			$USEDCHECKED>
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="Tag1">Tag1:</label>
+		<input type="hidden" name="Tag1[]" value="0"> 
+		<input type="checkbox" name="Tag1[]" id="Tag1" value="1"
+			$TAG1CHECKED>
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="Verified">Verified:</label>
+		<input type="hidden" name="Verified[]" value="0"> 
+		<input type="checkbox" name="Verified[]" id="Verified" value="1"
+			$VERIFIEDCHECKED>
+	      </div>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div class="row">
+	      <div class="column1">
+		<label class="column1" for="FSResolved">FS Resolved:</label>
+		<select name="FSResolved" id="FSResolved"
+			size="1" class="black white left"
+			>
+			<option value="0" $FSRESOLVED0>
+			    No
+			</option>
+			<option value="1" $FSRESOLVED1>
+			    Yes
+			</option>
+			<option value="2" $FSRESOLVED2>
+			    Unresolved
+			</option>
+		</select>
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="VEResolved">VE Resolved:</label>
+		<select name="VEResolved" id="VEResolved"
+			size="1" class="black white left" >
+			<option value="0" $VERESOLVED0>
+			    No
+			</option>
+			<option value="1" $VERESOLVED1>
+			    Yes
+			</option>
+			<option value="2" $VERESOLVED2>
+			    Unresolved
+			</option>
+		</select>
+	      </div>
+	      <div class="column1">
+		<label class="column1" for="qsTag">qsTag:</label>
+		<input type="hidden" name="qsTag[]" value="0"> 
+		<input type="checkbox" id="qsTag" name="qsTag[]" value="1"
+			$QSTAGCHECKED>
+	      </div>
+	      <div style="clear: both;"></div>
+	    </div>
+	    <div id="duplicates">
+	      <p class="label">
+		Duplicates of current row:
+	      </p>
+	      <div class="duprow$idar">
+		  <label class="column1" for="Dup$idar">
+		  </label>
+		  <input type="text" class="ina rightnc" readonly="readonly"
+			name="Dup$idar" id="Dup$idar" 
+			value="$idar">
+		<div style="clear: both;"></div>
+	      </div>
+	      <div class="row">
+		  <button type="button" id="Merge">
+		      Merge Duplicates
+		  </button>
+		  <input type="hidden" name="from" id="from"
+			value="$dupidars">
+		<div style="clear: both;"></div>
+	      </div>
+	    </div> <!-- id="duplicates" -->
+		$PICTURES
+	    <p id="buttonRow">
+		<button type="submit" id="Submit">
+		    <u>U</u>pdate Address
+		</button>
+		&nbsp;
+		<button type="button" id="Delete">
+		    <u>D</u>elete Address
+		</button>
+		&nbsp;
+		<button type="button" id="Close">
+		    <u>C</u>lose without Updating
+		</button>
+		&nbsp;
+		<button type="button" id="Pictures">
+		  <u>P</u>ictures
+		</button>
+		<input type="hidden" name="PicIdType" id="PicIdType" 
+			value="70">
+	    </p> <!-- id="buttonRow" -->
+	  </form>
+	</div> <!-- class='body' -->
+	<div class="map" id="mapDiv">
+	</div>
+	<div class="hidden" id="templates">
+	    <!-- the following button should exactly match <button id="showMap"> -->
+	    <button id="showMapTemplate" class="button">Show Map</button>
+	    <!-- the following button replaces Show Map -->
+	    <button id="hideMapTemplate" class="button">Hide Map</button>
+	</div>
+	<div class="balloon" id="Helpidar">
+	The unique numeric identifier of the address record in the database.
+	This is assigned by the system when a new address is created, and cannot
+	be altered by the user.
+	
+	</div>
+	<div class="balloon" id="HelpKind">
+	  This is a selection list identifying the way the address record is
+		used by the family tree.
+	  
+	  <dl>
+	    <dt>Mailing</dt>
+	    <dd>This kind of address record is used to record the contact
+		information for an individual in the family tree.
+	    </dd>
+	    <dt>Event</dt>
+	    <dd>This kind of address record is used in place of a location record
+		when the researcher wishes to record the place where an event
+		took place, or a fact was observed, using a structured hierarchical
+		address format, instead of a simple text field.
+	    </dd>
+	    <dt>Repository</dt>
+	    <dd>This kind of address record is used to record the contact information
+		for a library, archive, or other repository of documentary
+		evidence.  It is referred to by master source records.
+	    </dd>
+	  </dl>
+	</div>
+	<div class="balloon" id="HelpStyle">
+	  This selection list specifies how the particular address is to be
+	  formatted to satisfy the surface mail routing preferences of
+	  the destination country.  In particular this influences where
+	  the postal code appears in the address.
+	</div>
+	<div class="balloon" id="HelpAddrName">
+	  This field contains the name of the address.  This should be
+	  unique for all address records of a particular 'Kind'.  This is not
+	  part of the address as it is used for routing messages, it is an
+	  identifier for the address.
+	</div>
+	<div class="balloon" id="HelpAddrSort">
+	  This is intended to be used as a sort field when the desirable sort
+	  order cannot be determined from the value of Address.  
+	  It defaults to an empty string.
+	</div>
+	<div class="balloon" id="HelpAddress">
+	  This field contains a portion of the surface mail address that is more 
+	  specific than the post office.  For example it may be a street address,
+	  a rural route number, or a post office box number.
+	</div>
+	<div class="balloon" id="HelpCity">
+	  This is the name of the surface mail post office serving the address.
+	</div>
+	<div class="balloon" id="HelpState">
+	  This field contains the name of a political unit containing 
+	  the post office that
+	  is a part of the country containing the address, if required.  For the
+	  United States, and most other federal nations, this is a state.  
+	  For Canada it is a province.  For countries in the British isles this is
+	  a county.  For France it is a Département.
+	</div>
+	<div class="balloon" id="HelpZipCode">
+	  This field contains the postal code as assigned by the surface mail 
+	  administration of the destination country, if applicable.
+	</div>
+	<div class="balloon" id="HelpCountry">
+	  This field contains the name of the country containing the address.
+	</div>
+	<div class="balloon" id="HelpPhone">
+	  This field contains a telephone number that can be used to establish
+	  voice or facsimile communications with the destination.
+	</div>
+	<div class="balloon" id="HelpEmail">
+	  This field contains an electronic mail address that can be used to
+	  communicate with the destination.
+	</div>
+	<div class="balloon" id="HelpHomePage">
+	  This field contains a Uniform Resource Location (URL) of a web page
+	  associated with the address.  If you click on this field with the
+	  mouse the URL will be opened in a new window.
+	</div>
+	<div class="balloon" id="HelpLatitude">
+	  The latitude of the address expressed as signed
+	  degrees, minutes, and seconds in the form "xdddmmss.fff", for example
+	"452217.456", which represents 45°N 22' 17.456".
+	</div>
+	<div class="balloon" id="HelpLongitude">
+	  The longitude of the address expressed as signed
+	  degrees, minutes, and seconds in the form "xdddmmss.fff", for example
+	"-752217.456", which represents 75°W 22' 17.456".  Note that longitudes west of the Greenwich meridian,
+	  that is for all of the Americas, are negative.
+	</div>
+	<div class="balloon" id="HelpPreposition">
+	  If specified, this is intended to override the default preposition "at".
+	  To support French a special value "in[masc]" should be specified for
+	  countries that have masculine gender and start with a consonant.
+	</div>
+	<div class="balloon" id="HelpZoom">
+	  This field is used to specify the zoom level for the Google map display.
+	  The value of this field is normally set by clicking on the
+	<span class="button">Get Map Info</span> button. 
+	</div>
+	<div class="balloon" id="HelpshowMap">
+	  Clicking on this button displays or hides a Google map
+	  centered at the location.
+	</div>
+	<div class="balloon" id="HelpgetMap">
+	  Clicking on this button extracts information from the Google map display
+	  about the center of the map and its zoom level and stores that information
+	  into the latitude, longitude, and zoom level input fields.  This permits you
+	  to use the zoom and pan functions of the Google map to adjust the display
+	  appropriately, and then save those settings for subsequent users.
+	</div>
+	<div class="balloon" id="HelpList">
+	  This is a flag used by Legacy.
+	  The checkbox is selected if the value of this field is 'yes'.
+	</div>
+	<div class="balloon" id="HelpAddrNotes">
+	  User notes about the address.
+	  This is an extended editor field permitting you to enter data as if into
+	  a word processor, setting font style, embedding pictures, defining 
+	  hyperlinks, and so on.
+	</div>
+	<div class="balloon" id="HelpVerified">
+	  This field is currently unused.
+	  The checkbox is selected if the value of this field is 'yes'.
+	</div>
+	<div class="balloon" id="HelpFSResolved">
+	  This field is currently unused.
+	  The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
+	  resolved".
+	</div>
+	<div class="balloon" id="HelpVEResolved">
+	  This field is currently unused.
+	  The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
+	  resolved".
+	</div>
+	<div class="balloon" id="HelpqsTag">
+	  This field is currently unused.
+	  The checkbox is selected if the value of this field is 'yes'.
+	</div>
+	<div class="balloon" id="HelpUsed">
+	  This field is currently unused.
+	  The checkbox is selected if the value of this field is 'yes'.
+	</div>
+	<div class="balloon" id="HelpTag">
+	  This field is currently unused.
+	  The checkbox is selected if the value of this field is 'yes'.
+	</div>
+	<div class="balloon" id="HelpMerge">
+	  Clicking on this button causes the listed address records with
+	  duplicate names to be merged with the current address record, and all
+	  references from the database updated to refer to the current address
+	  record.
+	</div>
+	<div class="balloon" id="HelpSubmit">
+	  Clicking on this button causes the database to be updated to
+	  reflect the changes you have made to this record.
+	</div>
+	<div class="balloon" id="HelpPictures">
+	  Click this button to open a dialog for managing the pictures associated
+	  with the address.
+	</div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    </script>
     <script src="/jscripts/js20/http.js" type="text/javascript"></script>
     <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
     <script src="/jscripts/util.js" type="text/javascript"></script>
-    <script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.4&sensor=false&region=$GOOGLECC&key=$GOOGLEKEY" type="text/javascript"></script>
     <script src="Address.js" type="text/javascript"></script>

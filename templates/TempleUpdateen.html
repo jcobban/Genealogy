@@ -1,0 +1,202 @@
+<!--*********************************************************************
+ *  TempleUpdateen.html													*
+ *																		*
+ *  Template to display a web page containing details of an particular  *
+ *  LDS Temple from the database.                                       *
+ *																		*
+ *  History:															*
+ *		2019/07/25		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='Temple.css'>
+    <div class="hidden" id="breadcrumbs">
+      <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+      <a href="/FamilyTree/Temples.php?lang=$LANG">Temples</a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+          <a href="TempleHelpen.html" target="help">? Help</a>
+        </span>
+          Temple: $NAME
+      </h1>
+      $TRACE
+      $MSG
+      <form name="locForm" id="locForm" action="Temple.php" method="post">
+        <div class="row">
+          <div class="column1">
+            <label class="column1" for="Code">Code:</label>
+              <input type="text" name="Code" id="Code"
+                    size="5" maxlength="5"
+                    class="white left"
+                    value="$CODE">
+          </div>
+          <div class="column2">
+            <label class="column2" for="Code2">2 Character Code:</label>
+              <input type="text" name="Code2" id="Code2"
+                    size="2" maxlength="2"
+                    class="white left"
+                    value="$CODE2">
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row">
+            <label class="column1" for="Temple">Location:</label>
+            <input type="text" name="Temple" id="Temple"
+                    size="50" maxlength="50"
+                    class="white leftnc"
+                    value="$NAME">
+            <div style="clear: both;"></div>
+        </div>
+        <div class="row">
+            <label class="column1" for="Temple">Address:</label>
+            <input type="text" name="Address" id="Address"
+                    size="50" maxlength="255"
+                    class="white leftnc"
+                    value="$ADDRESS">
+            <div style="clear: both;"></div>
+        </div>
+        <div class="row">
+          <div class="column1">
+            <label class="column1" for="TempleStart">Date&nbsp;Opened:</label>
+            <input type="text" name="TempleStart" id="TempleStart"
+                    size="8" style="width: 15em;"
+                    class="white leftnc"
+                    value="$TEMPLESTART">
+          </div>
+          <div class="column2">
+            <label class="column1" for="TempleEnd">Date&nbsp;Closed:</label>
+            <input type="text" name="TempleEnd" id="TempleEnd"
+                    size="8" style="width: 15em;"
+                    class="white leftnc"
+                    value="$TEMPLEEND">
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row">
+          <div class="column1">
+            <label class="column1" for="Used">Used:</label>
+              <input type="checkbox" name="Used" id="Used" value="1"
+                    $USEDCHECKED>
+          </div>
+          <div class="column2">
+            <label class="column2" for="Tag1">Tag1:</label>
+              <input type="checkbox" name="Tag1" id="Tag1" value="1"
+                    $TAG1CHECKED>
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row">
+          <label class="column1" for="qsTag">qsTag:</label>
+            <input type="checkbox" name="qsTag" id="qsTag" value="1"
+                    $QSCHECKED>
+          <div style="clear: both;"></div>
+        </div>
+        <p>
+            <button type="submit" id="Submit" class="button">
+              <u>U</u>pdate Temple
+            </button>
+            &nbsp;
+            <button type="button" id="Pictures">
+              <u>P</u>ictures
+            </button>
+            <input type="hidden" name="PicIdType" id="PicIdType" 
+                    value="72">
+        </p> 
+      </form>
+    </div> <!-- end of <div class="body"> -->
+    <div class="map" id="mapDiv">
+    </div>
+    <div class="hidden" id="templates">
+        <!-- the following button should exactly match <button id="showMap"> -->
+        <button id="showMapTemplate" class="button">Show Map</button>
+        <!-- the following button replaces Show Map -->
+        <button id="hideMapTemplate" class="button">Hide Map</button>
+    </div>
+    <div class="balloon" id="Helpidtr">
+      The unique numeric identifier of the temple record in the database.
+      This is assigned by the system when a new temple is created, and cannot
+      be altered by the user.
+    </div>
+    <div class="balloon" id="HelpCode">
+      This field contains an up to 5 character 
+      abbreviated identification code for the temple
+    </div>
+    <div class="balloon" id="HelpCode2">
+      If not empty this field contains a 2-character abbreviated identification
+      code for the temple.
+    </div>
+    <div class="balloon" id="HelpTemple">
+      The temple name as it appears in web pages.
+      This should be expressed as a formal address uniquely identifying the
+      temple.
+      To avoid creating multiple temple records that all refer to the same
+      place, it is desirable to use a consistent address structure and abbreviation
+      style.  
+      Always include the country name, or 
+      <a href="http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm">two character ISO 3166 country code</a>
+      as the last element of an address.  This avoids ambiguities.
+      In particular many of the 
+    <a href="/usstates.html">US Postal Service state abbreviations</a>
+      duplicate ISO 3166 country codes.  You will save yourself trouble as you
+      expand your research beyond your home country.  Note that England, Scotland,
+      Wales, Northern Ireland, and other component states of the United Kingdom,
+      do not have ISO 3166 country codes.  Also, for obvious reasons, there are
+      no ISO 3166 country codes for countries that no longer exist, such as
+      Prussia.
+      Use consistent abbreviation style.  For example either always include the
+      period after an abbreviation or always exclude it.  For example consistently
+      use addresses like "Central Ave, St Petersburg, FL, USA" or like "Central Ave., St. Petersburg, Florida, USA".
+    </div>
+    <div class="balloon" id="HelpNotes">
+      User notes about the temple.
+    </div>
+    <div class="balloon" id="HelpTempleStart">
+      This is the date that the temple opened.
+    </div>
+    <div class="balloon" id="HelpTempleEnd">
+      This is the date that the temple closed.  This is blank if the temple is 
+      still open.
+    </div>
+    <div class="balloon" id="HelpUsed">
+      This checkbox indicates whether any ordinances in the family tree
+      currently reference this temple.
+    </div>
+    <div class="balloon" id="HelpqsTag">
+      This field is currently unused.
+      The checkbox is selected if the value of this field is 'yes'.
+    </div>
+    <div class="balloon" id="HelpTag1">
+      This field is currently unused.
+      The checkbox is selected if the value of this field is 'yes'.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+      Clicking on this button updates the database entry for this temple.
+    </div>
+    <div class="balloon" id="HelpReferences">
+      Clicking on this button displays a list of the database entries, either
+      individuals or families, that reference the temple.
+    </div>
+    <div class="balloon" id="HelpmergeDuplicates">
+      Clicking on this button merges all of the temples with the same name
+      with the current temple.
+    </div>
+    <div class="balloon" id="HelpPictures">
+      Click this button to open a dialog for managing the pictures associated
+      with the temple.
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/Temple.js" type="application/javascript">
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.4&sensor=false&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript">
+    </script>

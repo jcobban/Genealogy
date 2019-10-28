@@ -1,0 +1,179 @@
+<!--*********************************************************************
+ *  editPictures.php													*
+ *																		*
+ *  Display a web page for editing the pictures of a particular 		*
+ *  record in the genealogy database									*
+ * 																		*
+ *  History:															*
+ *		2019/07/26		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">
+        Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+        Services</a>:
+      <a href="/FamilyTree/$script.php?$key=$idir&amp;lang=$LANG"
+            id="reference">
+            $name
+      </a>:
+    </div> <!-- id="breadcrumbs" -->
+    <div class="body">
+      <h1>
+        <span class="right">
+          <a href="editPicturesHelpen.html" target="help">? Help</a>
+        </span>
+          Edit Pictures for $NAME
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <form name="picsForm" id="picsForm"
+            action="editPictures.php" method="post">
+        <div>
+            <input type="hidden" name="idir" value="$IDIR">
+            <input type="hidden" name="idtype" value="$IDTYPE">
+            <input type="hidden" name="lang" value="$LANG">
+            <input type="hidden" name="Debug" value="$DEBUG">
+        </div>
+        <table class="details">
+          <thead>
+            <tr>
+              <th class="colhead">
+                  Caption
+              </th>
+              <th class="colhead">
+                  File Type
+              </th>
+              <th class="colhead">
+                  Date
+              </th>
+              <th class="colhead" colspan="2">
+                  Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="PictureRow$IDBR">
+              <td>
+                    <input type="text" readonly="readonly" size="40"
+                            class="ina leftnc"
+                            name="Caption$IDBR"
+                            id="Caption$IDBR"
+                            value="$CAPTION">
+              </td>
+              <td>
+                    <input type="text" readonly="readonly" size="12"
+                            class="ina leftnc"
+                            name="Type$IDBR"
+                            id="Type$IDBR"
+                            value="$PICTYPE" >
+              </td>
+              <td>
+                    <input type="text" readonly="readonly" size="12"
+                            class="ina leftnc"
+                            name="Date$IDBR"
+                            id="Date$IDBR"
+                            value="$DATE">
+              </td>
+              <td>
+                <button type="button" id="Edit$IDBR">
+                    Edit Picture
+                </button>
+              </td>
+              <td>
+                <button type="button" id="Del$IDBR">
+                    Delete Picture
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr id="AddPictureRow">
+              <td style="width: 40em;">
+              </td>
+              <td style="width: 12em;">
+              </td>
+              <td style="width: 12em;">
+              </td>
+              <td>
+              </td>
+              <td>
+                <button type="button" id="Add">
+                  <u>A</u>dd Picture
+                </button>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+        <p>
+          <button type="button" id="Close">
+            <u>C</u>lose
+          </button>
+          &nbsp;
+          <button type="button" id="Order">
+            <u>O</u>rder Pictures by Date
+          </button>
+        </p>
+      </form>
+    </div>
+    <div id="templates" class="hidden">
+      <!-- template for confirming the deletion of a citation-->
+      <form name="PicDel$template" id="PicDel$template">
+        <p class="message">Are you sure you want to delete this picture?</p>
+        <p>
+          <button type="button" id="confirmDelete$idbr">
+            OK
+          </button>
+          <input type="hidden" id="rownum$idbr" name="rownum$idbr"
+                    value="$rownum">
+          <input type="hidden" id="formname$idbr" name="formname$idbr"
+                    value="$formname">
+            &nbsp;
+          <button type="button" id="cancelDelete$idbr">
+            Cancel
+          </button>
+        </p>
+      </form>
+    </div> <!-- end of <div id="templates"> -->
+    <div class="balloon" id="HelpDate">
+      This is a read-only field that displays the date on which the picture was
+      taken.
+    </div>
+    <div class="balloon" id="HelpCaption">
+      This is a read-only field that displays the caption which is displayed
+      with the picture.
+    </div>
+    <div class="balloon" id="HelpType">
+      This is a read-only field that displays the type of associated document.
+    </div>
+    <div class="balloon" id="HelpEdit">
+      Clicking on this button opens a dialog that permits you to modify
+      information about the picture or fact, including the type of
+      picture, date, location, additional information, and source citations.
+    </div>
+    <div class="balloon" id="HelpDel">
+      Clicking on this button deletes the picture.
+    </div>
+    <div class="balloon" id="HelpAdd">
+      Clicking on this button opens a dialog that permits you to define
+      the details of a new picture or fact for the current individual.
+    </div>
+    <div class="balloon" id="HelpClose">
+      Clicking on this button closes the dialog.  Note that all of the changes
+      you have made to the picture list have already been applied to the database.
+    </div>
+    <div class="balloon" id="HelpOrder">
+      Clicking on this button reorders the pictures and facts according to the date
+      on which they occurred or were observed.  This makes the displayed description
+      of the individual more coherent.
+    </div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/editPictures.js" type="application/javascript">
+    </script>

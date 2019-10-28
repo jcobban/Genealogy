@@ -56,7 +56,7 @@
         Search
       </button>
     &nbsp;
-  		  class='buttonText' id='bulkMail'>
+    <button type="button" class='button' id='bulkMail'>
     Send Bulk Mail
       </a>
     </p>
@@ -138,64 +138,74 @@
       <p class='message'>Only the administrator can use this application</p>
     </div>
     <div class='balloon' id='Helppattern'>
-    <p>
-      This is an "extended regular expression", as supported by MySQL, which is
-      used to search for users based upon their user name.
-      See <a href='http://www.tin.org/bin/man.cgi?section=7&topic=regex'>Henry Spencer's regex page</a>.
+      <p>
+        This is an "extended regular expression", as supported by MySQL, which is
+        used to search for users based upon their user name.
+        See <a href='http://www.tin.org/bin/man.cgi?section=7&topic=regex'>Henry Spencer's regex page</a>.
+      </p>
       <ul>
-         <li>If the pattern contains no special 
+        <li>If the pattern contains no special 
   		  characters then only users containing that string will be included.
   		  For example the pattern "bob" will match users containing the
   		  string "bob".  Note that the search ignores case, so that pattern
   		  will also match "Bob" and "BOB".
+        </li>
         <li>If the pattern begins with a caret '^' then only users that
   		  <b>begin</b> with the remainder of the pattern are included.  
   		  For example the pattern
   		  "^Ba" displays users starting with "Ba" (or "ba" or "BA").
+        </li>
         <li>If the pattern ends with a dollar sign '$', then only users that
   		  <b>end</b> with the remainder of the pattern are included.  
   		  For example the pattern
   		  "CA$" matches users that end with "CA" (or "ca" or "Ca").
+        </li>
         <li>In a pattern a period '.' matches any single character.  For example
   		  the pattern "B.b" matches any user that contains two letter Bs
   		  separated by one character, for example "Bab", "Beb", "Bib", "Bob",
   		  or "Bub" anywhere in the user name.
+        </li>
         <li>In a pattern an asterisk '*' matches zero or more of the preceding
   		  character; "bo*b" matches "bb", "bob", and "boob"
   		  anywhere in the user name.
-      <ul>
-    </p>
+        </li>
+      </ul>
     </div>
     <div class='balloon' id='HelpmailPattern'>
     <p>
       This is an "extended regular expression", as supported by MySQL, which is
       used to search for users based upon their e-mail address.
       See <a href='http://www.tin.org/bin/man.cgi?section=7&topic=regex'>Henry Spencer's regex page</a>.
+      </p>
       <ul>
-         <li>If the pattern contains no special 
+        <li>If the pattern contains no special 
   		  characters then only users whose e-mail address contains that string
   		  will be included.
   		  For example the pattern "London" will match users whose e-mail address
   		  contains the
   		  string "London".  Note that the search ignores case, so that pattern
   		  will also match "LONDON" and "london".
+        </li>
         <li>If the pattern begins with a caret '^' then only users whose e-mail
   		  address <b>begins</b> with the remainder of the pattern are included.  
   		  For example the pattern "^Ba" displays users whose e-mail address
   		  starts with "Ba" (or "ba" or "BA").
+        </li>
         <li>If the pattern ends with a dollar sign '$', then only users whose
   		  e-mail address <b>ends</b> with the remainder of the pattern are
   		  included.  For example the pattern "CA$" matches users whose e-mail
   		  address ends with "CA" (or "ca" or "Ca").
+        </li>
         <li>In a pattern a period '.' matches any single character.  For example
   		  the pattern "B.b" matches any user whose e-mail address contains two
   		  letter Bs separated by one character, for example "Bab", "Beb", "Bib",
   		  "Bob", or "Bub" anywhere in the e-mail address.
+        </li>
         <li>In a pattern an asterisk '*' matches zero or more of the preceding
   		  character; "bo*b" matches "bb", "bob", and "boob"
   		  anywhere in the e-mail address.
+        </li>
       <ul>
-    </p>
     </div>
     <div class='balloon' id='HelpauthPattern'>
       This is the identifier of a level of authorization, such as 'edit', or 'blog',

@@ -1123,12 +1123,12 @@ function validateFieldNames($operands)
     global	$badTables;
 
     if ($debug)
-		$warn	.= "<p>validateFieldNames('$operands')</p>\n";
-    $emsg		= '';
-    $start		= 0;
-    $bracketDepth	= 0;
+		$warn	        .= "<p>validateFieldNames('$operands')</p>\n";
+    $emsg		        = '';
+    $start		        = 0;
+    $bracketDepth	    = 0;
     $addNextFieldName	= false;
-    $lastTokenType	= null;
+    $lastTokenType	    = null;
 
     while (preg_match("/('.*?')|(\".*?\")|(\d+(.\d+|))|(`\w+`)|(\w+)|([-+*\/()|&!<=>,.])/", 
 				      $operands, 
@@ -1136,10 +1136,10 @@ function validateFieldNames($operands)
 				      PREG_OFFSET_CAPTURE, 
 				      $start) == 1)
     {		// loop through all words 
-		$expr	= $avar[0][0];
-		$off	= $avar[0][1];
-		$start	= $off + strlen($expr);
-		$type	= null;
+		$expr	        = $avar[0][0];
+		$off	        = $avar[0][1];
+		$start	        = $off + strlen($expr);
+		$type	        = null;
 		for($ip = 1; $ip < count($avar); $ip++)
 		{
 		    if (strlen($avar[$ip][0]) > 0)
@@ -1493,10 +1493,10 @@ if (count($_POST) > 0)
 else
 if (count($_GET) > 0)
 {               // interpret parameters passed by GET
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {			// loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
@@ -1512,45 +1512,45 @@ if (count($_GET) > 0)
         }
     }			// loop through all parameters
     if ($debug)
-        $warn   .= $parmsText . "</table>\n";
+        $warn       .= $parmsText . "</table>\n";
 }		        // parameters passed by method=post
 
 // parse patterns for SQL commands
-$cmdPattern		= '/^(\w+)\s+(.*)$$/i';
-$deletePattern	= '/^(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
-$insertPattern	= '/^INTO\s+(\w+)\s+(.*)$/i';
-$updatePattern	= '/^(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
+$cmdPattern				= '/^(\w+)\s+(.*)$$/i';
+$deletePattern			= '/^(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
+$insertPattern			= '/^INTO\s+(\w+)\s+(.*)$/i';
+$updatePattern			= '/^(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
 
 // results of parse
-$command		= null;
-$table			= null;
-$join			= null;
-$operands		= null;
-$where			= null;
-$count			= null;
-$groupby		= null;
-$having			= null;
-$orderby		= null;
-$limit			= 999999999;
-$offset			= null;
-$query			= false;
+$command				= null;
+$table					= null;
+$join					= null;
+$operands				= null;
+$where					= null;
+$count					= null;
+$groupby				= null;
+$having					= null;
+$orderby				= null;
+$limit					= 999999999;
+$offset					= null;
+$query					= false;
 
-$tables			= array();
-$stmt			= $connection->query("SHOW TABLES");
-$tableRes		= $stmt->fetchAll(PDO::FETCH_NUM);
+$tables					= array();
+$stmt					= $connection->query("SHOW TABLES");
+$tableRes				= $stmt->fetchAll(PDO::FETCH_NUM);
 foreach($tableRes as $row)
 {
-    $ttable			= $row[0];
+    $ttable			    = $row[0];
     array_push($tables, $ttable);
-    $colStmt		= $connection->query("SHOW COLUMNS FROM `$ttable`");
-    $colRes			= $colStmt->fetchAll(PDO::FETCH_ASSOC);
-    $fieldList		= array();
+    $colStmt		    = $connection->query("SHOW COLUMNS FROM `$ttable`");
+    $colRes			    = $colStmt->fetchAll(PDO::FETCH_ASSOC);
+    $fieldList		    = array();
     foreach($colRes as $field)
         array_push($fieldList, $field['field']);
     $fields[$ttable]		= $fieldList;
 }
 
-if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
+if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
 {			// no errors and work to do
     $getCount		    = true;
     $matches	        = array();
@@ -1675,7 +1675,7 @@ if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
                                                  'FROM ');
 	                        if ($frompos !== false)
                             {           // end of list of select expressions
-                                $operands   .= ' ' . 
+                                $operands   .= $comma . 
                                                substr($accum, 0, $frompos);
                                 $therest    = substr($accum, $frompos);
 	                            $afterexpr  = true;
@@ -1705,16 +1705,16 @@ if (strlen($msg) 	== 0 && $sqlCommand && strlen($sqlCommand) > 0)
                     }
                     if ($debug)
                     {
-                        $warn	.= "<p>\$operands='$operands'</p>\n";
-                        $warn	.= "<p>\$table='$table'</p>\n";
-                        $warn	.= "<p>\$join='$join'</p>\n";
+                        $warn		.= "<p>\$operands='$operands'</p>\n";
+                        $warn		.= "<p>\$table='$table'</p>\n";
+                        $warn		.= "<p>\$join='$join'</p>\n";
                     }
-                    $where		= '';
-                    $groupby	= '';
-                    $having		= '';
-                    $orderby	= '';
-                    $limit		= '';
-                    $offset		= '';
+                    $where			= '';
+                    $groupby		= '';
+                    $having			= '';
+                    $orderby		= '';
+                    $limit			= '';
+                    $offset			= '';
 
                     // parse the portion of the SELECT after the
                     // first table name in the FROM clause
@@ -2625,7 +2625,7 @@ if (!is_null($count))
 <?php
                                 try {
                                     $child	= new Child(array('idcr' => $value));
-                                    $name	= $child->getName(Child::NAME_INCLUDE_DATES | Child::NAME_INCLUDE_MDATE);
+                                    $name	= $child->getName(Child::NAME_INCLUDE_DATES);
 ?>
         <a href='/getRecordXml.php?idcr=<?php print $value; ?>' target='_blank'>
             <?php print $value; ?>
@@ -2672,7 +2672,7 @@ if (!is_null($count))
                                 }
 ?>
       <td class='<?php print $cellClass; ?> right'>
-        <a href='/getRecordXml.php?idnx=<?php print $value; ?>' target='_blank'>
+        <a href='/FamilyTree/editName.php?idnx=<?php print $value; ?>' target='_blank'>
             <?php print $value; ?>
         </a>
         =<?php print $name; ?>
@@ -2766,6 +2766,31 @@ if (!is_null($count))
 <?php
                                 break;
                             }	// tblSX citation type field
+
+                            case 'gender':
+                            {	// gender code
+                                switch($value)
+                                {
+                                    case 0:
+                                        $text       = 'male';
+                                        break;
+
+                                    case 1:
+                                        $text       = 'female';
+                                        break;
+
+                                    default:
+                                        $text       = 'unknown';
+                                        break;
+
+                                }
+?>
+      <td class='<?php print $cellClass; ?> right'>
+            <?php print "$value=<span class=\"$text\">$text</span>";?>
+      </td>
+<?php
+                                break;
+                            }	// gender code
 
                             default:
                             {	// ordinary numeric field

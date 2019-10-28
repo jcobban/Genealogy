@@ -89,318 +89,325 @@ class PageSet extends RecordSet
      ********************************************************************/
     function __construct($parms	= array())
     {
-	parent::__construct('Pages', $parms);
+	    parent::__construct('Pages', $parms);
     }		// PageSet::__construct
 
     /********************************************************************
-     *		PageSet::getWhere												*
-     *																		*
+     *	function PageSet::getWhere										*
+     *																	*
      *  Given an associative array of parameters for searching the		*
-     *  table, return the appropriate SQL WHERE clause.						*
-     *																		*
-     *		$this->parms		associative array of field/value combinations		*
-     *						the field names are interpreted according to		*
-     *						the standard translate table.  Note that		*
-     *						because the parameter is an associative array		*
-     *						that only one value can be specified for each		*
-     *			field name.
-     *		$this->sqlParms		construct array of parms for PDO execute		*
-     *		$this->limit		return value of limit parameter						*
-     *		$this->offset		return value of offset parameter				*
-     *																		*
-     *		Returns:														*
-     *		    string containing WHERE clause								*
-     *		    A zero length string is returned if the input array is		*
+     *  table, return the appropriate SQL WHERE clause.					*
+     *																	*
+     *	$this->parms	associative array of field/value combinations	*
+     *					the field names are interpreted according to	*
+     *					the standard translate table.  Note that		*
+     *					because the parameter is an associative array	*
+     *					that only one value can be specified for each	*
+     *			        field name.                                     *
+     *	$this->sqlParms		construct array of parms for PDO execute	*
+     *	$this->limit		return value of limit parameter				*
+     *	$this->offset		return value of offset parameter			*
+     *																	*
+     *	Returns:														*
+     *		string containing WHERE clause								*
+     *		A zero length string is returned if the input array is		*
      *      empty, otherwise the string starts with the word WHERE		*
-     *																		*
-     *		Side-Effects:														*
-     *		    Issues with the supplied parms are reported by adding		*
-     *		    warning messages onto the global variable $warn.				*
+     *																	*
+     *	Side-Effects:													*
+     *	    Issues with the supplied parms are reported by adding		*
+     *	    warning messages onto the global variable $warn.			*
      ********************************************************************/
     protected function getWhere()
     {
-	global	$debug;
-	global	$warn;
-
-	if ($debug)
-	    $warn	.= '<p>PageSet::getWhere: ' . 
-			   print_r($this->parms, true) . "</p>\n";
-	$where			= '';
-	$and			= 'WHERE ';
-	$this->parmsSet		= 0;
-	$censusObj		= null;
-	$districtObj		= null;
-	$subDistrictObj		= null;
-	if (!is_array($this->sqlParms))
-	    $this->sqlParms		= array();
-
-	// create WHERE clause
-	foreach($this->parms as $fldname => $value)
-	{
-	    $fieldLc		= Page::getRealFieldName($fldname);
-	    switch($fieldLc)
-	    {			// act on specific fields
-		case 'pt_census':
-		{		// census field
-		    if (is_string($value))
-		    {
-			$censusId	= $value;
-			$censusObj = new Census(array('censusid'=> $value));
-		    }
-		    else
-		    if ($value instanceof Census)
-		    {
-			$censusObj		= $value;
-			$censusId		= $censusObj->get('censusid');
-		    }
-		    else
-		    {
-			$warn	.= "<p>PageSet::getWhere: " . __LINE__ .
-					" Unsupported Census=" .
-					print_r($value,true) . "</p>\n";
-			break;
-		    }
-		    $this->parmsSet		|= 1;
-		    $where			.= "$and`PT_Census`=:censusid";
-		    $this->sqlParms['censusid']	= $censusId;
-		    $and			= ' AND ';
-		    if (!$censusObj->isExisting())
-			$warn	.= "<p>PageSet::getWhere: " . __LINE__ .
-					" Unsupported Census='$value'</p>\n";
-		    break;
-		}		// census field
-
-		case 'pt_distid':
-		{		// district id field
-		    if (is_string($value))
-		    {
-			$distId			= $value;
-			$parms			= array('census'=>$censusObj,
-							'id'	=> $value);
-			$districtObj		= new District($parms);
-		    }
-		    else
-		    if ($value instanceof District)
-		    {
-			$districtObj		= $value;
-			$distId			= $districtObj->get('id');
-		    }
-		    else
-		    {
-			$warn	.= "<p>PageSet::getWhere: " . __LINE__ .
-					" Unsupported PT_DistId=" . 
-					print_r($value, true) . "</p>\n";
-			break;
-		    }
-		    $this->parmsSet		|= 2;
-		    $where			.= "$and`PT_DistId`=:distid";
-		    $this->sqlParms['distid']	= $distId;
-		    $and			= ' AND ';
-		    if (!$districtObj->isExisting())
-			$warn	.= "<p>PageSet::getWhere: " . __LINE__ .
-					" Unsupported PT_DistId='$distId'</p>\n";
-		    break;
-		}		// domain field
-
-		case 'pt_sdid':
-		{		// sub-district id field
-		    if (is_string($value))
-		    {
-			$sdId			= $value;
-		    }
-		    else
-		    if ($value instanceof SubDistrict)
-		    {
-			$subDistrictObj		= $value;
-			$sdId			= $subDistrictObj->get('id');
-		    }
-		    else
-		    {
-			$warn	.= "<p>PageSet::getWhere: " . __LINE__ .
-					" Unsupported PT_SdId=" . 
-					print_r($value, true) . "</p>\n";
-			break;
-		    }
-		    $this->parmsSet		|= 4;
-		    $where			.= "$and`PT_SdId`=:sdid";
-		    $this->sqlParms['sdid']	= $sdId;
-		    $and			= ' AND ';
-		    break;
-		}		// domain field
-
-		case 'pt_div':
-		{		// division id field
-		    if (is_string($value) || is_int($value))
-		    {
-			$div			= $value;
-		    }
-		    else
-		    {
-			$warn	.= "<p>PageSet::getWhere: " . __LINE__ .
-					" Unsupported PT_Div=" . 
-					print_r($value, true) . "</p>\n";
-			break;
-		    }
-		    $this->parmsSet		|= 8;
-		    $where			.= "$and`PT_Div`=:div";
-		    $this->sqlParms['div']	= $div;
-		    $and			= ' AND ';
-		    break;
-		}		// domain field
-
-		case 'pt_sched':
-		{		// division id field
-		    if (is_string($value) || is_int($value))
-		    {
-			$sched			= $value;
-		    }
-		    else
-		    {
-			$warn	.= "<p>PageSet::getWhere: " . __LINE__ .
-					" Unsupported PT_Sched=" . 
-					print_r($value, true) . "</p>\n";
-		    }
-		    $this->parmsSet		|= 16;
-		    $where			.= "$and`PT_Sched`=:sched";
-		    $this->sqlParms['sched']	= $sched;
-		    $and			= ' AND ';
-		    break;
-		}		// domain field
-
-		case 'pt_page':
-		case 'pt_population':
-		case 'pt_image':
-		case 'pt_transcriber':
-		case 'pt_proofreader':
-		{		// valid field names
-		    $this->parmsSet	|= 32;
-		    if (is_string($initRow[$fieldLc]))
-			$expression	= $this->getWherePattern($fieldLc,
-								 $value);
-		    else
-		    if (is_int($initRow[$fieldLc]))
-			$expression	= $this->getWhereInt($fieldLc,
-							     $value);
-		    else
-			$expression	= $this->getWhereCommon($fieldLc,
-								$value);
-		    if (strlen($expression) > 0)
-		    {
-			$where		.= $and . $expression;
-			$and		= ' AND ';
-		    }
-		    break;
-		}		// valid field namess
-
-		default:
+		global	$debug;
+		global	$warn;
+	
+		if ($debug)
+		    $warn	            .= '<p>PageSet::getWhere: ' . 
+		        		           print_r($this->parms, true) . "</p>\n";
+		$where			        = '';
+		$and			        = 'WHERE ';
+		$this->parmsSet		    = 0;
+        $censusObj		        = null;
+        $initRow                = array();
+		$districtObj		    = null;
+		$subDistrictObj		    = null;
+		if (!is_array($this->sqlParms))
+		    $this->sqlParms		= array();
+	
+		// create WHERE clause
+		foreach($this->parms as $fldname => $value)
 		{
-		    $warn	.= "<p>PageSet::getWhere: " . __LINE__ .
-			" Unrecognized search parameter `$fldname`.</p>";
-		    break;
+		    $fieldLc	    	= Page::getRealFieldName($fldname);
+		    switch($fieldLc)
+		    {			// act on specific fields
+				case 'pt_census':
+				{		// census identifier field
+				    if (is_string($value))
+				    {
+	    				$censusId	= $value;
+	    				$censusObj  = new Census(array('censusid'=> $value));
+				    }
+				    else
+				    if ($value instanceof Census)
+				    {
+	    				$censusObj		= $value;
+	    				$censusId		= $censusObj->get('censusid');
+				    }
+				    else
+				    {
+	    				$warn	        .= "<p>PageSet::getWhere: " . __LINE__ .
+	        				        		" Unsupported Census=" .
+							        print_r($value,true) . "</p>\n";
+					    break;
+                    }
+                    $info               = Record::getInformation('Pages');
+                    if ($info)
+                        $initRow        = $info['initrow'];
+				    $this->parmsSet		|= 1;
+				    $where			    .= "$and`PT_Census`=:censusid";
+				    $this->sqlParms['censusid']	= $censusId;
+				    $and			    = ' AND ';
+				    if (!$censusObj->isExisting())
+					    $warn           .= "<p>PageSet::getWhere: " . __LINE__ .
+			                				" Unsupported Census='$value'</p>\n";
+				    break;
+				}		// census field
+		
+				case 'pt_distid':
+				{		// district id field
+				    if (is_string($value))
+				    {
+	    				$distId			= $value;
+	    				$parms			= array('census'=>$censusObj,
+	            								'id'	=> $value);
+	    				$districtObj		= new District($parms);
+				    }
+				    else
+				    if ($value instanceof District)
+				    {
+	    				$districtObj		= $value;
+	    				$distId			= $districtObj->get('id');
+				    }
+				    else
+				    {
+	    				$warn	.= "<p>PageSet::getWhere: " . __LINE__ .
+	    						" Unsupported PT_DistId=" . 
+	    						print_r($value, true) . "</p>\n";
+	    				break;
+				    }
+				    $this->parmsSet		|= 2;
+				    $where			    .= "$and`PT_DistId`=:distid";
+				    $this->sqlParms['distid']	= $distId;
+				    $and			    = ' AND ';
+				    if (!$districtObj->isExisting())
+					    $warn	        .= "<p>PageSet::getWhere: " . __LINE__ .
+					            		" Unsupported PT_DistId='$distId'</p>\n";
+				    break;
+				}		// domain field
+		
+				case 'pt_sdid':
+				{		// sub-district id field
+				    if (is_string($value))
+				    {
+					    $sdId			    = $value;
+				    }
+				    else
+				    if ($value instanceof SubDistrict)
+				    {
+					    $subDistrictObj		= $value;
+					    $sdId			    = $subDistrictObj->get('id');
+				    }
+				    else
+				    {
+					    $warn	.= "<p>PageSet::getWhere: " . __LINE__ .
+					    		" Unsupported PT_SdId=" . 
+					    		print_r($value, true) . "</p>\n";
+					    break;
+				    }
+				    $this->parmsSet		|= 4;
+				    $where			    .= "$and`PT_SdId`=:sdid";
+				    $this->sqlParms['sdid']	= $sdId;
+				    $and			    = ' AND ';
+				    break;
+				}		// domain field
+		
+				case 'pt_div':
+				{		// division id field
+				    if (is_string($value) || is_int($value))
+				    {
+					    $div			= $value;
+				    }
+				    else
+				    {
+					    $warn	.= "<p>PageSet::getWhere: " . __LINE__ .
+					    		" Unsupported PT_Div=" . 
+					    		print_r($value, true) . "</p>\n";
+					break;
+				    }
+				    $this->parmsSet		|= 8;
+				    $where			.= "$and`PT_Div`=:div";
+				    $this->sqlParms['div']	= $div;
+				    $and			= ' AND ';
+				    break;
+				}		// domain field
+		
+				case 'pt_sched':
+				{		// division id field
+				    if (is_string($value) || is_int($value))
+				    {
+					    $sched			= $value;
+				    }
+				    else
+				    {
+					    $warn	.= "<p>PageSet::getWhere: " . __LINE__ .
+					    		" Unsupported PT_Sched=" . 
+					    		print_r($value, true) . "</p>\n";
+				    }
+				    $this->parmsSet		|= 16;
+				    $where			    .= "$and`PT_Sched`=:sched";
+				    $this->sqlParms['sched']	= $sched;
+				    $and			    = ' AND ';
+				    break;
+				}		// domain field
+		
+				case 'pt_page':
+				case 'pt_population':
+				case 'pt_image':
+				case 'pt_transcriber':
+				case 'pt_proofreader':
+				{		// valid field names
+				    $this->parmsSet	|= 32;
+				    if (is_string($initRow[$fieldLc]))
+					    $expression	= $this->getWherePattern($fieldLc,
+						                    				 $value);
+				    else
+                    if (is_int($initRow[$fieldLc]))
+                    {
+                        $id         = substr($fieldLc, 3);
+					    $expression	= "`$fieldLc`=:$id";
+                        $this->sqlParms[$id]	= $value;
+                    }
+				    else
+					    $expression	= $this->getWhereCommon($fieldLc,
+						                    				$value);
+				    if (strlen($expression) > 0)
+				    {
+					    $where		.= $and . $expression;
+					    $and		= ' AND ';
+				    }
+				    break;
+				}		// valid field namess
+		
+				default:
+				{
+				    $warn	.= "<p>PageSet::getWhere: " . __LINE__ .
+					" Unrecognized search parameter `$fldname`.</p>";
+				    break;
+				}
+		
+		    }			// act on specific fields
+		}			    // loop through all parameters
+	
+		if (!is_null($subDistrictObj))
+		{			    // SubDistrict instance passed
+		    if (($this->parmsSet & 1) == 0)
+		    {
+				$censusId		    = $subDistrictObj->get('censusid');
+				$where			    .= "$and`PT_Census`=:censusid";
+				$this->sqlParms['censusid']	= $censusId;
+				$and			    = ' AND ';
+				$this->parmsSet		|= 1;
+		    }
+	
+		    if (($this->parmsSet & 2) == 0)
+		    {
+				$distId			    = $subDistrictObj->get('distid');
+				$where			    .= "$and`PT_DistId`=:distid";
+				$this->sqlParms['distid']	= $distId;
+				$and			    = ' AND ';
+				$this->parmsSet		|= 2;
+		    }
+	
+		    // SubDistrictId already set
+		    if (($this->parmsSet & 8) == 0)
+		    {
+				$div			    = $subDistrictObj->get('div');
+				$where			    .= "$and`PT_Div`=:div";
+				$this->sqlParms['div']	= $div;
+				$and			    = ' AND ';
+				$this->parmsSet		|= 8;
+		    }
+	
+		    if (($this->parmsSet & 16) == 0)
+		    {
+				$sched			    = $subDistrictObj->get('sched');
+				$where			    .= "$and`PT_Sched`=:sched";
+				$this->sqlParms['sched']= $sched;
+				$and			    = ' AND ';
+				$this->parmsSet		|= 16;
+		    }
+		}			    // SubDistrict instance passed
+	
+		if ($this->parmsSet == 15)
+		{			    // everything but Sched passed
+		    $sched			        = 1;	// default
+		    $where			        .= "$and`PT_Sched`=:sched";
+		    $this->sqlParms['sched']	= $sched;
+		    $and			        = ' AND ';
+		    $this->parmsSet		    |= 16;
+		}			    // everything but Sched passed
+	
+		$subDists			= null;
+		if ($this->parmsSet == 31)
+		{			// single sub-district
+		    if(is_null($subDistrictObj))
+    			$subDistrictObj	= new SubDistrict(
+            	    				    	  array('census'	=> $censusId,
+             		    				        	'distid'	=> $distId,
+            			    			        	'id'		=> $sdId,
+            				    		    	    'div'		=> $div,
+        	    				    	    	    'sched'		=> $sched));
+	
+		    if ($subDistrictObj)
+		    {
+    			$this->information['count']	= $subDistrictObj->get('pages');
+	    		$this->subDistrict		= $subDistrictObj;
+		    }
+		}			// single sub-district
+		else
+		if ($this->parmsSet == 7 || $this->parmsSet == 23)
+		{			// single township
+		    $subDists	= new SubDistrictSet(array('census'	=> $censusId,
+		                    					   'distid'	=> $distId,
+							                       'id'		=> $sdId));
+		}			// single township
+		else
+		if ($this->parmsSet == 3 || $this->parmsSet == 19)
+		{			// single township
+		    $subDists	= new SubDistrictSet(array('census'	=> $censusId,
+                    							   'distid'	=> $distId));
+        }			// single township
+
+		if ($subDists)
+		{
+		    $count		        = 0;
+		    foreach($subDists as $subDist)
+			    $count		    += $subDist->get('pages');
+		    $this->information['count']	= $count;
+		    $this->subDistrict	= $subDists;
 		}
-
-	    }			// act on specific fields
-	}			// loop through all parameters
-
-	if (!is_null($subDistrictObj))
-	{			// SubDistrict instance passed
-	    if (($this->parmsSet & 1) == 0)
-	    {
-		$censusId		= $subDistrictObj->get('censusid');
-		$where			.= "$and`PT_Census`=:censusid";
-		$this->sqlParms['censusid']	= $censusId;
-		$and			= ' AND ';
-		$this->parmsSet		|= 1;
-	    }
-
-	    if (($this->parmsSet & 2) == 0)
-	    {
-		$distId			= $subDistrictObj->get('distid');
-		$where			.= "$and`PT_DistId`=:distid";
-		$this->sqlParms['distid']	= $distId;
-		$and			= ' AND ';
-		$this->parmsSet		|= 2;
-	    }
-
-	    // SubDistrictId already set
-	    if (($this->parmsSet & 8) == 0)
-	    {
-		$div			= $subDistrictObj->get('div');
-		$where			.= "$and`PT_Div`=:div";
-		$this->sqlParms['div']	= $div;
-		$and			= ' AND ';
-		$this->parmsSet		|= 8;
-	    }
-
-	    if (($this->parmsSet & 16) == 0)
-	    {
-		$sched			= $subDistrictObj->get('sched');
-		$where			.= "$and`PT_Sched`=:sched";
-		$this->sqlParms['sched']= $sched;
-		$and			= ' AND ';
-		$this->parmsSet		|= 16;
-	    }
-	}			// SubDistrict instance passed
-
-	if ($this->parmsSet == 15)
-	{			// everything but Sched passed
-	    $sched			= 1;	// default
-	    $where			.= "$and`PT_Sched`=:sched";
-	    $this->sqlParms['sched']	= $sched;
-	    $and			= ' AND ';
-	    $this->parmsSet		|= 16;
-	}			// everything but Sched passed
-
-	$subDists			= null;
-	if ($this->parmsSet == 31)
-	{			// single sub-district
-	    if(is_null($subDistrictObj))
-		$subDistrictObj	= new SubDistrict(
-					  array('census'	=> $censusId,
-						'distid'	=> $distId,
-						'id'		=> $sdId,
-						'div'		=> $div,
-						'sched'		=> $sched));
-
-	    if ($subDistrictObj)
-	    {
-		$this->information['count']	= $subDistrictObj->get('pages');
-		$this->subDistrict		= $subDistrictObj;
-	    }
-	}			// single sub-district
-	else
-	if ($this->parmsSet == 7 || $this->parmsSet == 23)
-	{			// single township
-	    $subDists	= new SubDistrictSet(array('census'	=> $censusId,
-						   'distid'	=> $distId,
-						   'id'		=> $sdId));
-	}			// single township
-	else
-	if ($this->parmsSet == 3 || $this->parmsSet == 19)
-	{			// single township
-	    $subDists	= new SubDistrictSet(array('census'	=> $censusId,
-						   'distid'	=> $distId));
-	}			// single township
-	if ($subDists)
-	{
-	    $count		= 0;
-	    foreach($subDists as $subDist)
-		$count		+= $subDist->get('pages');
-	    $this->information['count']	= $count;
-	    $this->subDistrict	= $subDists;
-	}
-
-	return $where;
+		return $where;
     }		// PageSet::getWhere
 
     /********************************************************************
-     *		function PageSet::rewind										*
-     *																		*
-     *		Part of the implementation of the interface Iterator.				*
-     *		Reposition to the first element of the "array".						*
-     *																		*
+     *	function PageSet::rewind										*
+     *																	*
+     *	Part of the implementation of the interface Iterator.			*
+     *	Reposition to the first element of the "array".					*
+     *																	*
      *  Returns:														*
-     *		    first instance of Record in the set								*
+     *	    first instance of Record in the set							*
      ********************************************************************/
     public function rewind()
     {

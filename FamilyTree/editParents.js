@@ -145,6 +145,7 @@
  *		2016/06/23		chooseMother didn't work						*
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
+ *		2019/07/20      insert spaces into death date                   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -209,22 +210,24 @@ function loadEdit()
 				name	= element.name;
 		    else
 				name	= element.id;
+            if (name.length == 0)
+                continue;
 
 		    // default handling of <input> elements
 		    element.onkeydown	= keyDown;
 		    element.onchange	= change;	// default handler
 
 		    // do element specific initialization
-		    var namePattern	= /^([a-zA-Z$_]+)([0-9]*)$/;
-		    var pieces		= namePattern.exec(name);
+		    var namePattern	    = /^([a-zA-Z$_]+)([0-9]*)$/;
+		    var pieces		    = namePattern.exec(name);
 		    if (pieces === null)
 		    {
 				alert("editMarriages.js: onLoad: unable to parse name='" +
 					name + "'");
-				pieces	= [name, name, ''];
+				pieces	        = [name, name, ''];
 		    }
-		    var	colName		= pieces[1];
-		    var rowId		= pieces[2];
+		    var	colName		    = pieces[1];
+		    var rowId		    = pieces[2];
 
 		    switch(colName)
 		    {
@@ -469,7 +472,7 @@ function loadEdit()
 				case 'Cdeath':
 				{		// death date of a child
 				    element.onkeydown		= childKeyDown;
-				    element.onchange		= change;
+				    element.onchange		= changeCDeath;
 				    element.checkfunc		= checkDate;
 				    element.checkfunc();
 				    break;

@@ -1,0 +1,186 @@
+<!--*********************************************************************
+ *  ChildStatusUpdateen.html											*
+ *																		*
+ *  English language template for displaying supported values of        *
+ *  ChildStatus from table tblCS                                        *
+ *																		*
+ *  History:															*
+ *		2019/07/03		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+    	<a href="/index.html">Home</a>:
+        <a href="/genealogy.php?lang=$LANG">
+		  Genealogy
+        </a>:
+        <a href="/FamilyTree/Services.php?lang=$LANG">
+          Services
+        </a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+	 	      <a href="ChildStatusHelpen.html" target="help">? Help</a>
+        </span>
+	 	      Child Status List
+      </h1>
+      <p class="warning">This table is not used by this implementation
+      because it does not support internationalization.</p>
+      $TRACE
+      $MSG
+      <form name="srcForm" action="ChildStatus.php" method="post">
+        <input id="Debug" name="Debug" type="hidden" value="$DEBUG">
+        <input id="lang" name="lang" type="hidden" value="$LANG">
+	    <!--- Put out the response as a table -->
+	    <table class="details" id="formTable">
+	      <!--- Put out the column headers -->
+	      <thead>
+	        <tr>
+		 	  <th class="colhead">
+	 	        IDCS
+		 	  </th>
+		 	  <th class="colhead">
+	 	        Child Status
+		 	  </th>
+		 	  <th class="colhead">
+	 	        Used
+	 	      </th>
+	 	      <th class="colhead">
+	 	        Tag1
+	 	      </th>
+	 	      <th class="colhead">
+	 	        qsTag
+	 	      </th>
+	 	      <th class="colhead">
+	 	        Action
+	 	      </th>
+	        </tr>
+	      </thead>
+	      <tbody>
+            <tr id="dataRow$IDCS">
+	 	      <td class="left">
+	 	          <input type="text" class="white rightnc" size="4"
+	 					      name="IDCS$IDCS" id="IDCS$IDCS"
+	 					      value="$IDCS" readonly="readonly">
+	 	      </td>
+	 	      <td class="left">
+	 	          <input type="text" class="white left" size="40"
+	 					      name="ChildStatus$IDCS" id="ChildStatus$IDCS"
+                              value="$STATUS">
+	 	      </td>
+	 	      <td class="center">
+	 	          <input type="checkbox" value="1"
+	 					      name="Used$IDCS" id="Used$IDCS"
+	 			              $USEDCHECKED>
+	 	      </td>
+	 	      <td class="center">
+	 	          <input type="checkbox" value="1"
+	 					      name="tagi$IDCS" id="tagsi$IDCS"
+	 			              $TAG1CHECKED>
+	 	      </td>
+	 	      <td class="center">
+	 	          <input type="checkbox" value="1"
+	 					      name="qstag$IDCS" id="qstag$IDCS"
+	 			              $QSTAGCHECKED>
+	 	      </td>
+	 	      <td class="center">
+	 	          <button id="Delete$IDCS" type="button">
+	 			      Delete
+	 	          </button>
+	 	      </td>
+            </tr>
+          </tbody>
+        </table>
+        <input type="hidden" name="IDCS999999999" id="IDCS999999999"
+                        value="999999999">
+        <p>
+ 	      <button type="button" id="Add">
+	 	          Create New Status
+ 	      </button>
+        </p>
+          <button type="submit" id="Submit">Update Table</button>
+      </form>
+    </div>
+    <div class="hidden" id="templates">
+      <table>
+        <tr id="newRowTemplate">
+	 	      <td class="left">
+	 	          <input type="text" class="white rightnc" size="4"
+	 					    name="IDCS$idcs" id="IDCS$idcs"
+	 					    value="$idcs">
+	 	      </td>
+	 	      <td class="left">
+	 	          <input type="text" class="white left" size="40"
+	 					    name="ChildStatus$idcs" id="ChildStatus$idcs"
+	 					    value="">
+	 	      </td>
+	 	      <td class="center">
+	 	          <input type="checkbox" value="1"
+                            name="Used$idcs" id="Used$idcs">
+	 	      </td>
+	 	      <td class="center">
+	 	          <input type="checkbox" value="1"
+                            name="tagi$idcs" id="tag1$idcs">
+	 	      </td>
+	 	      <td class="center">
+	 	          <input type="checkbox" value="1"
+                            name="qstag$idcs" id="qstag$idcs">
+	 	      </td>
+	 	      <td class="center">
+	 	          <button id="Delete$idcs">
+	 			      Delete
+	 	          </button>
+	 	      </td>
+        </tr>
+      </table>
+    </div>
+    <div class="balloon" id="HelpIDCS">
+      <p>This field contains the unique numeric code point used in the
+	 	      Child Status table (tblCS) to identify this
+	 	      status.
+      </p>
+    </div>
+    <div class="balloon" id="HelpChildStatus">
+      <p>This field contains the textual description of the Child's
+	 	      status at birth, as it will appear in web pages, and on selection
+	 	      lists when updating the database.
+      </p>
+    </div>
+    <div class="balloon" id="HelpUsed">
+      <p>Internal use by Legacy.
+      </p>
+    </div>
+    <div class="balloon" id="Helptag">
+      <p>Internal use by Legacy.
+      </p>
+    </div>
+    <div class="balloon" id="Helpqstag">
+      <p>Internal use by Legacy.
+      </p>
+    </div>
+    <div class="balloon" id="HelpDelete">
+      <p>Click on this button to delete the status described in this row
+	 	      of the table.
+      </p>
+    </div>
+    <div class="balloon" id="HelpAdd">
+      <p>Click on this button to add a new status to the table.
+	 	      A new row is added to the table with a blank description.
+	 	      Edit the description and click on the "Update Table" button
+	 	      to add the new entry.
+      </p>
+    </div>
+    <div class="balloon" id="HelpSubmit">
+      <p>Click on this button to update the database to reflect the
+	 	      changes you have entered.  
+      </p>
+    </div>
+    <script src="/jscripts/CommonForm.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="/FamilyTree/ChildStatus.js" type="text/javascript">
+    </script>

@@ -52,6 +52,7 @@
 				---&gt;
 		    </a>
 		</span>
+        <span>
 		    dist $DISTRICT $DISTRICTNAME,
 		    subdist $SUBDISTRICT $SUBDISTRICTNAME,
 		    <span id="frontDiv">div $DIVISION </span>
@@ -246,434 +247,436 @@
 		  </thead>
 		  <tbody>
 		    <tr id="Row$line">
-		<th class='$cellclass left'>
-		    $line 
-		</th>
-		<td class='$cellclass right'>
-		    <input type='text' name='Family$line'
-				value='$family'
-				class='$famclass white right'
-				size='3' maxlength='4'>
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='Surname$line'
-				value='$surname'
-				class='$surclass white left'
-				size='14' maxlength='120'>
-		<td class='$cellclass left'>
-		    <input type='text' name='GivenNames$line'
-				value='$givennames' 
-				class='black white left' 
-				size='18' maxlength='120'>
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='Address$line'
-				value='$address' 
-				class='black white leftnc'
-				size='16' maxlength='48'>
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='Sex$line'
-				value='$sex' 
-				class='black white center'
-				size='1' maxlength='1'>
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='Relation$line'
-				value='$relation' 
-				class='black white left'
-				size='10' maxlength='32'>
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='MStat$line'
-				value='$mstat' 
-				class='black white center'
-				size='1' maxlength='1'>
-		</td>
-		<th class='$cellclass left'>$line</th>
-		<td class='$cellclass left'>
-		    <input type='text' name='BDate$line'
-				value='$bdate' 
-				class='black white left'
-				size='4' maxlength='8'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='BYearTxt$line'
-				value='$byeartxt' 
-				class='black white rightnc'
-				size='4' maxlength='8'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='Age$line'
-				value='$age' 
-				class='black white rightnc'
-				size='3' maxlength='8'>
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='BPlace$line'
-				value='$bplace' 
-				class='black white left'
-				size='12' maxlength='32'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='ImmYear$line'
-				value='$immyear' 
-				class='black white rightnc'
-				size='4' maxlength='6'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='NatYear$line'
-				value='$natyear' 
-				class='black white rightnc'
-				size='4' maxlength='6'>
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='Origin$line'
-				value='$origin' 
-				class='$orgclass white left'
-				size='10' maxlength='16'>
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='Nationality$line'
-				value='$nationality' 
-				class='$natclass white left'
-				size='10' maxlength='16'>
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='Religion$line'
-				value='$religion'
-				class='$relclass white leftnc'
-				size='12' maxlength='32'>
-		</td>
-		<th class='$cellclass left'>
-		    $line 
-		</th>
-		<td class='$cellclass left'>
-		    <input type='text' name='Occupation$line'
-				value='$occupation'
-				class='black white leftnc'
-				size='14' maxlength='48'>
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='OccOther$line'
-				value='$occother'
-				class='black white leftnc'
-				size='10' maxlength='24'>
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='Employer$line'
-				value='$employer'
-				class='black white center'
-				size='1' maxlength='1'>
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='Employee$line'
-				value='$employee'
-				class='black white center'
-				size='1' maxlength='1'>
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='OwnAcct$line'
-				value='$ownacct'
-				class='black white center'
-				size='1' maxlength='1'>
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='EmpWhere$line'
-				value='$empwhere'
-				class='black white leftnc'
-				size='10' maxlength='128'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='WksEmp$line'
-				value='$wksemp'
-				class='black white rightnc'
-				size='2' maxlength='2'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='WksOth$line'
-				value='$wksoth'
-				class='black white rightnc'
-				size='2' maxlength='2'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='HpWEmp$line'
-				value='$hpwemp'
-				class='black white rightnc'
-				size='2' maxlength='2'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='HpWOth$line'
-				value='$hpwoth'
-				class='black white rightnc'
-				size='2' maxlength='2'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='IncomeEmp$line'
-				value='$incomeemp'
-				class='black white rightnc'
-				size='5' maxlength='8'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='IncomeOth$line'
-				value='$incomeoth'
-				class='black white rightnc'
-				size='5' maxlength='8'>
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='HourlyRate$line'
-				value='$hourlyrate'
-				class='black white rightnc'
-				size='5' maxlength='8'>
-				<!--  col 29 -->
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='LifeInsurance$line'
-				value='$lifeinsurance'
-				class='black white rightnc'
-				size='5' maxlength='8'>
-				<!--  col 30 -->
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='AccInsurance$line'
-				value='$accinsurance'
-				class='black white rightnc'
-				size='5' maxlength='8'>
-				<!--  col 31 -->
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='CostInsurance$line'
-				value='$costinsurance'
-				class='black white rightnc'
-				size='5' maxlength='8'>
-				<!--  col 32 -->
-		</td>
-		<th class='$cellclass left'>
-		    $line 
-		</th>
-		<td class='$cellclass right'>
-		    <input type='text' name='SchoolMons$line'
-				value='$schoolmons'
-				class='black white rightnc'
-				size='5' maxlength='8'>
-				<!--  col 33  -->
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='CanRead$line'
-				value='$canread'
-				class='black white center'
-				size='1' maxlength='1'>
-				<!--  col 34 -->
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='CanWrite$line'
-				value='$canwrite'
-				class='black white center'
-				size='1' maxlength='1'>
-				<!--  col 35 -->
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='Language$line'
-				value='$language'
-				class='black white left'
-				size='5' maxlength='8'>
-				<!--  col 36 -->
-		</td>
-		<td class='$cellclass right'>
-		    <input type='text' name='CostEducation$line'
-				value='$costeducation'
-				class='black white rightnc'
-				size='5' maxlength='8'>
-				<!--  col 37 -->
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='Blind$line'
-				value='$blind'
-				class='black white center'
-				size='1' maxlength='1'>
-				<!--  col 38  -->
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='Deaf$line'
-				value='$deaf'
-				class='black white center'
-				size='1' maxlength='1'>
-				<!--  col 39 -->
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='Insane$line'
-				value='$insane'
-				class='black white center'
-				size='1' maxlength='1'>
-				<!--  col 40 -->
-		</td>
-		<td class='$cellclass center'>
-		    <input type='text' name='Idiot$line'
-				value='$idiot'
-				class='black white center'
-				size='1' maxlength='1'>
-				<!--  col 41 -->
-		</td>
-		<td class='$cellclass left'>
-		    <input type='text' name='Remarks$line'
-				value='$remarks'
-				class='black white leftnc'
-				size='20' maxlength='255'>
-		</td>
-		<th class='$cellclass left'>
-		    $line 
-		</th>
-		<td class='$cellclass left' style='white-space: nowrap;'>
-		    <input type='hidden' name='IDIR$line'
-				value='$idir'>
-		    <button type='button' id='doIdir$line'
-					class='button'>
-				$idirtext 
-		    </button>
-				&nbsp;
-		    <button type='button' id='clearIdir$idirclear'
-					class='button'>
-				Clear
-		    </button>
-		</td>
+			  <th class='$cellclass left'>
+			      $line 
+			  </th>
+			  <td class='$cellclass right'>
+			      <input type='text' name='Family$line'
+			  		value='$family'
+			  		class='$famclass white right'
+			  		size='3' maxlength='4'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='Surname$line'
+			  		value='$surname'
+			  		class='$surclass white left'
+			  		size='14' maxlength='120'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='GivenNames$line'
+			  		value='$givennames' 
+			  		class='black white left' 
+			  		size='18' maxlength='120'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='Address$line'
+			  		value='$address' 
+			  		class='black white leftnc'
+			  		size='16' maxlength='48'>
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='Sex$line'
+			  		value='$sex' 
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='Relation$line'
+			  		value='$relation' 
+			  		class='black white left'
+			  		size='10' maxlength='32'>
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='MStat$line'
+			  		value='$mstat' 
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  </td>
+			  <th class='$cellclass left'>$line</th>
+			  <td class='$cellclass left'>
+			      <input type='text' name='BDate$line'
+			  		value='$bdate' 
+			  		class='black white left'
+			  		size='4' maxlength='8'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='BYearTxt$line'
+			  		value='$byeartxt' 
+			  		class='black white rightnc'
+			  		size='4' maxlength='8'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='Age$line'
+			  		value='$age' 
+			  		class='black white rightnc'
+			  		size='3' maxlength='8'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='BPlace$line'
+			  		value='$bplace' 
+			  		class='black white left'
+			  		size='12' maxlength='32'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='ImmYear$line'
+			  		value='$immyear' 
+			  		class='black white rightnc'
+			  		size='4' maxlength='6'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='NatYear$line'
+			  		value='$natyear' 
+			  		class='black white rightnc'
+			  		size='4' maxlength='6'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='Origin$line'
+			  		value='$origin' 
+			  		class='$orgclass white left'
+			  		size='10' maxlength='16'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='Nationality$line'
+			  		value='$nationality' 
+			  		class='$natclass white left'
+			  		size='10' maxlength='16'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='Religion$line'
+			  		value='$religion'
+			  		class='$relclass white leftnc'
+			  		size='12' maxlength='32'>
+			  </td>
+			  <th class='$cellclass left'>
+			      $line 
+			  </th>
+			  <td class='$cellclass left'>
+			      <input type='text' name='Occupation$line'
+			  		value='$occupation'
+			  		class='black white leftnc'
+			  		size='14' maxlength='48'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='OccOther$line'
+			  		value='$occother'
+			  		class='black white leftnc'
+			  		size='10' maxlength='24'>
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='Employer$line'
+			  		value='$employer'
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='Employee$line'
+			  		value='$employee'
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='OwnAcct$line'
+			  		value='$ownacct'
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='EmpWhere$line'
+			  		value='$empwhere'
+			  		class='black white leftnc'
+			  		size='10' maxlength='128'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='WksEmp$line'
+			  		value='$wksemp'
+			  		class='black white rightnc'
+			  		size='2' maxlength='2'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='WksOth$line'
+			  		value='$wksoth'
+			  		class='black white rightnc'
+			  		size='2' maxlength='2'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='HpWEmp$line'
+			  		value='$hpwemp'
+			  		class='black white rightnc'
+			  		size='2' maxlength='2'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='HpWOth$line'
+			  		value='$hpwoth'
+			  		class='black white rightnc'
+			  		size='2' maxlength='2'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='IncomeEmp$line'
+			  		value='$incomeemp'
+			  		class='black white rightnc'
+			  		size='5' maxlength='8'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='IncomeOth$line'
+			  		value='$incomeoth'
+			  		class='black white rightnc'
+			  		size='5' maxlength='8'>
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='HourlyRate$line'
+			  		value='$hourlyrate'
+			  		class='black white rightnc'
+			  		size='5' maxlength='8'>
+			  		<!--  col 29 -->
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='LifeInsurance$line'
+			  		value='$lifeinsurance'
+			  		class='black white rightnc'
+			  		size='5' maxlength='8'>
+			  		<!--  col 30 -->
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='AccInsurance$line'
+			  		value='$accinsurance'
+			  		class='black white rightnc'
+			  		size='5' maxlength='8'>
+			  		<!--  col 31 -->
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='CostInsurance$line'
+			  		value='$costinsurance'
+			  		class='black white rightnc'
+			  		size='5' maxlength='8'>
+			  		<!--  col 32 -->
+			  </td>
+			  <th class='$cellclass left'>
+			      $line 
+			  </th>
+			  <td class='$cellclass right'>
+			      <input type='text' name='SchoolMons$line'
+			  		value='$schoolmons'
+			  		class='black white rightnc'
+			  		size='5' maxlength='8'>
+			  		<!--  col 33  -->
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='CanRead$line'
+			  		value='$canread'
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  		<!--  col 34 -->
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='CanWrite$line'
+			  		value='$canwrite'
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  		<!--  col 35 -->
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='Language$line'
+			  		value='$language'
+			  		class='black white left'
+			  		size='5' maxlength='8'>
+			  		<!--  col 36 -->
+			  </td>
+			  <td class='$cellclass right'>
+			      <input type='text' name='CostEducation$line'
+			  		value='$costeducation'
+			  		class='black white rightnc'
+			  		size='5' maxlength='8'>
+			  		<!--  col 37 -->
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='Blind$line'
+			  		value='$blind'
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  		<!--  col 38  -->
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='Deaf$line'
+			  		value='$deaf'
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  		<!--  col 39 -->
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='Insane$line'
+			  		value='$insane'
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  		<!--  col 40 -->
+			  </td>
+			  <td class='$cellclass center'>
+			      <input type='text' name='Idiot$line'
+			  		value='$idiot'
+			  		class='black white center'
+			  		size='1' maxlength='1'>
+			  		<!--  col 41 -->
+			  </td>
+			  <td class='$cellclass left'>
+			      <input type='text' name='Remarks$line'
+			  		value='$remarks'
+			  		class='black white leftnc'
+			  		size='20' maxlength='255'>
+			  </td>
+			  <th class='$cellclass left'>
+			      $line 
+			  </th>
+			  <td class='$cellclass left' style='white-space: nowrap;'>
+			    <input type='hidden' name='IDIR$line'
+			  		value='$idir'>
+			    <button type='button' id='doIdir$line'
+			  			class='button'>
+			  		$idirtext 
+			    </button>
+			  		&nbsp;
+			    <button type='button' id='clearIdir$idirclear'
+			  			class='button'>
+			  		Clear
+			    </button>
+			  </td>
 		    </tr>
 		  </tbody>
 		  <tfoot>
 		    <!--- Put out the column footers -->
 		    <tr>
-		  <th class='colhead1st'>
-		    Line
-		</th>
-		<th class='colhead'>
-		    Fam
-		</th>
-		<th class='colhead'>
-		Surname
-		</th>
-		<th class='colhead'>
-		Given Names
-		</th>
-		<th class='colhead'>
-		Address
-		</th>
-		<th class='colhead'>
-		Sex
-		</th>
-		<th class='colhead'>
-		Relation
-		</th>
-		<th class='colhead'>
-		MSt
-		</th>
-		<th class='colhead'>
-		Line
-		</th>
-		<th class='colhead'>
-		BDate
-		</th>
-		<th class='colhead'>
-		BYear
-		</th>
-		<th class='colhead'>
-		Age
-		</th>
-		<th class='colhead'>
-		Birth Place
-		</th>
-		<th class='colhead'>
-		Imm Year
-		</th>
-		<th class='colhead'>
-		Nat Year
-		</th>
-		<th class='colhead'>
-		Origin
-		</th>
-		<th class='colhead'>
-		Nationality
-		</th>
-		<th class='colhead'>
-		Religion
-		</th>
-		<th class='colhead'>
-		Line
-		</th>
-		<th class='colhead'>
-		Occupation
-		</th>
-		<th class='colhead'>
-		Occ Other</th>
-		<th class='colhead'>
-		E'r</th>
-		<th class='colhead'>
-		E'e</th>
-		<th class='colhead'>
-		OA</th>
-		<th class='colhead'>
-		Where</th>
-		<th class='colhead'>
-		Wks E</th>
-		<th class='colhead'>
-		Wks O</th>
-		<th class='colhead'>
-		H/W E</th>
-		<th class='colhead'>
-		H/W O</th>
-		<th class='colhead'>
-		Income E</th>
-		<th class='colhead'>
-		Income O
-		</th>
-		<th class='colhead'>
-		  Hourly Rate	<!-- col 29 -->
-		</th>
-		<th class='colhead'>
-		  Life Insurance	<!-- col 30 -->
-		</th>
-		<th class='colhead'>
-		  Acc Insurance	<!-- col 31 -->
-		</th>
-		<th class='colhead'>
-		  Cost Insurance	<!-- col 32 -->
-		</th>
-		<th class='colhead'>
-		Line
-		</th>
-		<th class='colhead'>
-		  School Mons	<!-- col 33  -->
-		</th>
-		<th class='colhead'>
-		  Can Read	<!-- col 34 -->
-		</th>
-		<th class='colhead'>
-		  Can Write	<!-- col 35 -->
-		</th>
-		<th class='colhead'>
-		  Language	<!-- col 36 -->
-		</th>
-		<th class='colhead'>
-		  Cost Education	<!-- col 37 -->
-		</th>
-		<th class='colhead'>
-		  Blind		<!-- col 38  -->
-		</th>
-		<th class='colhead'>
-		  Deaf		<!-- col 39 -->
-		</th>
-		<th class='colhead'>
-		  Insane	<!-- col 40 -->
-		</th>
-		<th class='colhead'>
-		  Idiot		<!-- col 41 -->
-		</th>
-		<th class='colhead'>
-		Remarks
-		</th>
-		<th class='colhead'>
-		  Line
-		</th>
-		<th class='colhead'>
-		  FT
+		      <th class='colhead1st'>
+		        Line
+			  </th>
+			  <th class='colhead'>
+			    Fam
+			  </th>
+			  <th class='colhead'>
+    			Surname
+			  </th>
+			  <th class='colhead'>
+    			Given Names
+			  </th>
+			  <th class='colhead'>
+    			Address
+			  </th>
+			  <th class='colhead'>
+    			Sex
+			  </th>
+			  <th class='colhead'>
+    			Relation
+			  </th>
+			  <th class='colhead'>
+    			MSt
+			  </th>
+			  <th class='colhead'>
+    			Line
+			  </th>
+			  <th class='colhead'>
+    			BDate
+			  </th>
+			  <th class='colhead'>
+    			BYear
+			  </th>
+			  <th class='colhead'>
+    			Age
+			  </th>
+			  <th class='colhead'>
+    			Birth Place
+			  </th>
+			  <th class='colhead'>
+    			Imm Year
+			  </th>
+			  <th class='colhead'>
+    			Nat Year
+			  </th>
+			  <th class='colhead'>
+    			Origin
+			  </th>
+			  <th class='colhead'>
+    			Nationality
+			  </th>
+			  <th class='colhead'>
+    			Religion
+			  </th>
+			  <th class='colhead'>
+    			Line
+			  </th>
+			  <th class='colhead'>
+    			Occupation
+			  </th>
+			  <th class='colhead'>
+    			Occ Other  </th>
+			  <th class='colhead'>
+    			E'r  </th>
+			  <th class='colhead'>
+    			E'e  </th>
+			  <th class='colhead'>
+    			OA  </th>
+			  <th class='colhead'>
+			    Where  </th>
+			  <th class='colhead'>
+		    	Wks E  </th>
+			  <th class='colhead'>
+	    		Wks O  </th>
+			  <th class='colhead'>
+    			H/W E  </th>
+			  <th class='colhead'>
+			    H/W O  </th>
+			  <th class='colhead'>
+			    Income E  </th>
+			  <th class='colhead'>
+			    Income O
+			  </th>
+			  <th class='colhead'>
+			    Hourly Rate	  <!-- col 29 -->
+			  </th>
+			  <th class='colhead'>
+			    Life Insurance	  <!-- col 30 -->
+			  </th>
+			  <th class='colhead'>
+			    Acc Insurance	  <!-- col 31 -->
+			  </th>
+			  <th class='colhead'>
+			    Cost Insurance	  <!-- col 32 -->
+			  </th>
+			  <th class='colhead'>
+			    Line
+			  </th>
+			  <th class='colhead'>
+			    School Mons	  <!-- col 33  -->
+			  </th>
+			  <th class='colhead'>
+			    Can Read	  <!-- col 34 -->
+			  </th>
+			  <th class='colhead'>
+			    Can Write	  <!-- col 35 -->
+			  </th>
+			  <th class='colhead'>
+			    Language	  <!-- col 36 -->
+			  </th>
+			  <th class='colhead'>
+			    Cost Education	  <!-- col 37 -->
+			  </th>
+			  <th class='colhead'>
+			    Blind		  <!-- col 38  -->
+			  </th>
+			  <th class='colhead'>
+			    Deaf		  <!-- col 39 -->
+			  </th>
+			  <th class='colhead'>
+			    Insane	  <!-- col 40 -->
+			  </th>
+			  <th class='colhead'>
+			    Idiot		  <!-- col 41 -->
+			  </th>
+			  <th class='colhead'>
+			    Remarks
+			  </th>
+			  <th class='colhead'>
+			    Line
+			  </th>
+			  <th class='colhead'>
+			    FT
+			  </th>
 		    </tr>
 		  </tfoot>
 		</table>
@@ -701,6 +704,7 @@
 				---&gt;
 		    </a>
 		</span>
+        <span>
 		    dist $DISTRICT $DISTRICTNAME,
 		    subdist $SUBDISTRICT $SUBDISTRICTNAME,
 		    <span id="backDiv">div $DIVISION </span>

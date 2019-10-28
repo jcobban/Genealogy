@@ -73,136 +73,193 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // analyze input parameters
-$prefix		        = '';
-$given		        = null;
-$surname		    = null;
-$surnameRec		    = null;
-$nameUri            = '';
-$treename           = '';
-$where		        = '';
-$lang		        = 'en';
-$givenOk		    = false;
-$edit		        = false;
-$action		        = 'Display';
-$getParms		    = array();
-$offset		        = 0;
-$limit		        = 100;
+$prefix		        	= '';
+$idnr               	= null;
+$given		        	= null;
+$surname		    	= null;
+$surnameRec		    	= null;
+$nameUri            	= '';
+$treename           	= '';
+$where		        	= '';
+$lang		        	= 'en';
+$givenOk		    	= false;
+$edit		        	= false;
+$action		        	= 'Display';
+$getParms		    	= array();
+$offset		        	= 0;
+$limit		        	= 100;
+$maxcols	    		= 4;
 
 // interpret parameters
-$parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
-foreach($_GET as $key => $value)
-{		        // loop through parameters
-    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-	switch(strtolower($key))
-	{
-	    case 'surname':
-        {		// surname specified
-            $surname	    = ucfirst($value);
-
-			// identify prefix of the name, usually the first letter
-			if (strlen($surname) == 0)
-			    $prefix	    = '';
-			else
-			if (substr($surname,0,2) == 'Mc')
-			    $prefix 	= 'Mc';
-			else
-			if (substr($surname,0,2) == "O'")
-			    $prefix 	= substr($surname, 0, 3);
-			else
-			    $prefix	    = substr($surname,0,1);
-
-			// construct the query
-			$getParms['surname']	= $surname;
-			break;
-	    }		// surname specified
-
-	    case 'idnr':
-        {		// IDNR specified, deprecated
-            $idnr           = $value;
-			$surnameRec	    = new Surname(array('idnr' => $value));
-            $surname    	= $surnameRec->get('surname');
-
-			// identify prefix of the name, usually the first letter
-			if (strlen($surname) == 0)
-			    $prefix	    = '';
-			else
-			if (substr($surname,0,2) == 'Mc')
-			    $prefix     = 'Mc';
-			else
-			if (substr($surname,0,2) == "O'")
-			    $prefix     = substr($surname, 0, 3);
-			else
-			    $prefix	    = substr($surname,0,1);
-
-			// construct the query
-			$getParms['surname']	= $surname;
-			break;
-	    }		// surname specified
-
-	    case 'given':
-	    {	// specified a Given Name or names?
-			$given		    = $value;
-			if ((is_array($given) && count($given) > 0) ||
-			    (is_string($given) && strlen($given) > 0))
-			{		// valid parameter
-			    $getParms['givenpfx']	= $given;
-			    $givenOk	            = true;
-			}		// valid parameter
-			else
-			    $givenOk	            = false;
-			break;
-	    }		// given name specified
-
-	    case 'edit':
-	    {		// option to edit surname record
-			if (strtolower($value) == 'y' &&
-                canUser('edit'))
-            {
-                $action         = 'Update';
-                $edit	        = true;
-            }
-			break;
-	    }		// option to edit surname record
-
-	    case 'lang':
-        {           // requested language of display
-            if (strlen($value) == 2)
-                $lang           = strtolower($value);            
-			break;
-	    }		    // requested language of display
-
-	    case 'offset':
-        {           // starting offset in set
-            if (ctype_digit($value))
-                $offset         = $value - 0;            
-			break;
-	    }		    // starting offset in set
-
-	    case 'limit':
-        {           // maximum number to display
-            if (ctype_digit($value))
-                $limit          = $value - 0;            
-			break;
-	    }		    // maximum number to display
-
-	    case 'debug':
-	    {		// debug handled by common.inc
-			break;
-	    }		// debug
-
-	    default:
-	    {		// unexpected
-			$msg	.= "Unexpected parameter $key='$value'. ";
-			break;
-	    }		// unexpected
-	}		// switch on parameter
-}			// loop through all parameters
-if ($debug && count($_GET) > 0)
-    $warn       .= $parmsText . "</table>\n";
+if (isset($_GET) && count($_GET) > 0)
+{                       // invoked by method=get
+	$parmsText  = "<p class='label'>\$_GET</p>\n" .
+	                  "<table class='summary'>\n" .
+	                  "<tr><th class='colhead'>key</th>" .
+	                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{		        // loop through parameters
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{
+		    case 'surname':
+	        {		// surname specified
+	            $surname	        = ucfirst($value);
+				break;
+		    }		// surname specified
+	
+		    case 'idnr':
+            {		// IDNR specified, deprecated
+                if (ctype_digit($value))
+	                $idnr           = (int)$value;
+				break;
+		    }		// surname specified
+	
+		    case 'given':
+		    {	// specified a Given Name or names?
+				$given		        = $value;
+				if ((is_array($given) && count($given) > 0) ||
+				    (is_string($given) && strlen($given) > 0))
+				{		// valid parameter
+				    $getParms['givenpfx']	= $given;
+				    $givenOk	            = true;
+				}		// valid parameter
+				else
+				    $givenOk	            = false;
+				break;
+		    }		// given name specified
+	
+		    case 'edit':
+		    {		// option to edit surname record
+				if (strtolower($value) == 'y' &&
+	                canUser('edit'))
+	            {
+	                $action         = 'Update';
+	                $edit	        = true;
+	            }
+				break;
+		    }		// option to edit surname record
+	
+		    case 'lang':
+	        {           // requested language of display
+	            $lang               = FtTemplate::validateLang($value);
+				break;
+		    }		    // requested language of display
+	
+		    case 'offset':
+	        {           // starting offset in set
+	            if (ctype_digit($value))
+	                $offset             = (int)$value;            
+				break;
+		    }		    // starting offset in set
+	
+		    case 'limit':
+	        {           // maximum number to display
+	            if (ctype_digit($value))
+	                $limit              = (int)$value;            
+				break;
+		    }		    // maximum number to display
+	
+		    case 'maxcols':
+	        {           // maximum number to display
+	            if (ctype_digit($value))
+	                $maxcols            = (int)$value;            
+                if ($maxcols> 9)
+                    $maxcols            = 9;
+				break;
+		    }		    // maximum number to display
+	
+		    case 'debug':
+		    case 'text':
+		    {		// handled by common
+				break;
+		    }		// handled by common
+	
+		    default:
+		    {		    // unexpected
+				$warn	.= "<p>Unexpected parameter $key='$value'.</p>";
+				break;
+		    }		    // unexpected
+		}		        // switch on parameter
+	}			        // loop through all parameters
+	if ($debug)
+	    $warn       .= $parmsText . "</table>\n";
+}                       // invoked by method=get
+else
+if (isset($_POST) && count($_POST) > 0)
+{                       // invoked by method=post
+	$parmsText  = "<p class='label'>\$_POST</p>\n" .
+	                  "<table class='summary'>\n" .
+	                  "<tr><th class='colhead'>key</th>" .
+	                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_POST as $key => $value)
+	{		            // loop through parameters
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{
+		    case 'surname':
+	        {		    // surname specified
+	            $surname	    = ucfirst($value);
+				break;
+		    }		    // surname specified
+	
+		    case 'idnr':
+	        {		    // IDNR specified, deprecated
+                if (ctype_digit($value))
+	                $idnr           = (int)$value;
+				break;
+		    }		    // surname specified
+	
+		    case 'given':
+		    {	        // specified a Given Name or names?
+				$given		    = $value;
+				if ((is_array($given) && count($given) > 0) ||
+				    (is_string($given) && strlen($given) > 0))
+				{		// valid parameter
+				    $getParms['givenpfx']	= $given;
+				    $givenOk	            = true;
+				}		// valid parameter
+				else
+				    $givenOk	            = false;
+				break;
+		    }		    // given name specified
+	
+		    case 'lang':
+	        {           // requested language of display
+	            if (strlen($value) == 2)
+	                $lang           = strtolower($value);            
+				break;
+		    }		    // requested language of display
+	
+		    case 'offset':
+	        {           // starting offset in set
+	            if (ctype_digit($value))
+	                $offset         = (int)$value;            
+				break;
+		    }		    // starting offset in set
+	
+		    case 'limit':
+	        {           // maximum number to display
+	            if (ctype_digit($value))
+	                $limit              = (int)$value;            
+				break;
+		    }		    // maximum number to display
+	
+		    case 'maxcols':
+	        {           // maximum number to display
+	            if (ctype_digit($value))
+	                $maxcols            = (int)$value;            
+                if ($maxcols> 9)
+                    $maxcols            = 9;
+				break;
+		    }		    // maximum number to display
+		}		        // switch on parameter
+	}			        // loop through all parameters
+	if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}                       // invoked by method=post
 
 if (strlen($given) > 0)
     $nameUri        = $surname . ', ' . substr($given, 0, 2);
@@ -212,7 +269,7 @@ else
 $template	        = new FtTemplate("Names$action$lang.html");
 
 // I18N
-$tranTabTag	            = $template->getElementById('tranTab');
+$tranTabTag	            = $template['tranTab'];
 if ($tranTabTag)
 {
 	$tranTab		    = array();
@@ -230,30 +287,45 @@ else
 	$genderText	= array(0 => 'male', 
 				        1 => 'female', 
 				        2 => 'unknown'); 
-	
-// determine title for page
+
+// identify prefix of the name, usually the first letter
 if (is_null($surname))
-{		// missing mandatory parameter
-    $msg		    .= 'Missing mandatory parameter Surname';
-    $surname        = '';
-    $surnameRec	    = new Surname(array('idnr' => 1));
-    $title	        = $template->getElementById('missing')->innerHTML();
-}		// missing mandatory parameter
+{		            // missing mandatory parameter
+    $msg		        .= 'Missing mandatory parameter Surname or IDNR';
+    $surname            = '';
+    $idnr               = 1;
+    $surnameRec	        = new Surname(array('idnr' => 1));
+    $title	            = $template['missing']->innerHTML();
+}		            // missing mandatory parameter
 else
 if (strlen($surname) == 0)
-{
-    $title	        = $template->getElementById('nosurname')->innerHTML();
-    $surnameRec	    = new Surname(array('idnr' => 1));
-}
+{                   // empty surname
+    $prefix	            = '';
+    $title	            = $template['nosurname']->innerHTML();
+    $idnr               = 1;
+    $surnameRec	        = new Surname(array('idnr' => 1));
+}                   // empty surname
 else
-{
-    $title	        = $template->getElementById('surname')->innerHTML();
-    $surnameRec	    = new Surname(array('surname' => $surname));
-}
-$idnr               = $surnameRec->get('idnr');
-$soundslike         = $surnameRec->get('soundslike');
-$pattern            = $surnameRec->get('pattern');
-$notes              = $surnameRec->get('notes');
+{                   // surname provided
+    $title	            = $template['surname']->innerHTML();
+    $surnameRec	        = new Surname(array('surname' => $surname));
+    $idnr               = $surnameRec['idnr'];
+
+	if (substr($surname, 0, 2) == 'Mc')
+	    $prefix 	    = 'Mc';
+	else
+	if (substr($surname, 0, 2) == "O'")
+	    $prefix 	    = substr($surname, 0, 3);
+	else
+	    $prefix	        = substr($surname, 0, 1);
+}                   // surname provided
+
+// construct the query
+$getParms['surname']	= $surname;
+
+$soundslike             = $surnameRec['soundslike'];
+$pattern                = $surnameRec['pattern'];
+$notes                  = $surnameRec['notes'];
 $template->set("SURNAME",	        $surname);
 $template->set("PREFIX",	        $prefix);
 $template->set('TITLE',	            $title, true);
@@ -263,28 +335,18 @@ $template->set("SOUNDEX",	        $soundslike);
 $template->set("PATTERN",	        $pattern);
 $template->set("NOTES",	            $notes);
 $template->set('LANG',			    $lang);
-$template->set('OFFSET',			$offset+1);
+$template->set('OFFSET',			$offset+1); // display ordinal value
 $template->set('LIMIT',			    $limit);
 $template->set('CONTACTKEY',		$idnr);
 $template->set('CONTACTTABLE',		'Names');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
+
 if (strlen($userid) > 0)
-{
-    $user	        = new User(array("username" => $userid));
-    if ($user->isExisting())
-    {
-        $template->set('EMAILADDRESS',      $user->get('email'));
-        $template->set('USERID',            $userid);
-        $template->set('EMAILCLASS',        'ina');
-        $template->set('EMAILREADONLY',     'readonly="readonly"');
-    }
-    else
-    {
-        $template->set('EMAILADDRESS',      '');
-        $template->set('USERID',            '');
-        $template->set('EMAILCLASS',        'white');
-        $template->set('EMAILREADONLY',     '');
-    }
+{                   // set up blog form
+    $template->set('EMAILADDRESS',          $user->get('email'));
+    $template->set('USERID',                $userid);
+    $template->set('EMAILCLASS',            'ina');
+    $template->set('EMAILREADONLY',         'readonly="readonly"');
 }
 else
 {
@@ -295,7 +357,20 @@ else
 }
 
 if (strlen($msg) == 0)
-{		// no errors detected
+{		                // no errors detected
+    if (isset($_POST) && count($_POST) > 0)
+    {		            // update object from $_POST parameters
+        $surnameRec->postUpdate(false);
+
+        // save object state to server
+        $surnameRec->save(false);
+        $template->set("IDNR",	            $surnameRec['idnr']);
+        $template->set("SOUNDSLIKE",	    $surnameRec['soundslike']);
+        $template->set("SOUNDEX",	        $surnameRec['soundslike']);
+        $template->set("PATTERN",	        $surnameRec['pattern']);
+        $template->set("NOTES",	            $surnameRec['notes']);
+    }		            // update object from $_POST parameters
+
     $getParms['offset']	    = $offset;
     $getParms['limit']	    = $limit;
     $personList		        = new PersonSet($getParms);
@@ -305,45 +380,52 @@ if (strlen($msg) == 0)
     if ($count > 0)
     {
         $first              = $personList->rewind();
-        $nameUri            = $first->get('surname') . ', ' .
+        if ($first instanceof Person)
+        {
+            $nameUri        = $first->get('surname') . ', ' .
                                 substr($first->get('givenname'), 0, 2);
-        $treename           = $first->getTreename();
+            $treename       = $first->getTreename();
+        }
     }
-}		// no errors detected
+}		                // no errors detected
 else
-{
-    $title	= $template->getElementById('missing')->innerHTML();
+{                       // errors
+    $title	                = $template['missing']->innerHTML();
     $personList		        = array();
     $count                  = 0;
     $actualCount            = 0;
-}
+}                       // errors
+
 $template->set('TOTALCOUNT',		    $count);
 $template->set('ACTUALCOUNT',		    $actualCount);
 $template->set('FIRST',		            $offset + 1);
 $template->set('LAST',		            min($offset + $actualCount, $count));
 if ($actualCount >= $count)
-    $template->updateTag('showActualCount', null);
-$template->set('PREV',			    max($offset-$limit,0));
-$template->set('NEXT',			    min($offset+$limit, $count-1));
-$template->set('NAMEURI',           $nameUri);
-$template->set('TREENAME',          $treename);
+    $template['showActualCount']->update(null);
+$template->set('PREV',			        max($offset-$limit,0));
+$template->set('NEXT',			        min($offset+$limit, $count-1));
+$template->set('NAMEURI',               $nameUri);
+$template->set('TREENAME',              $treename);
+if ($debug)
+    $template->set('DEBUG',             'Y');
+else
+    $template->set('DEBUG',             'N');
 
 // check for notes about family
-$notes	        	= $surnameRec->get('notes');
-$template->set('NOTES',         $notes);
-$template->set('SOUNDEX',       $soundslike);
+$notes	        	        = $surnameRec->get('notes');
+$template->set('NOTES',                 $notes);
+$template->set('SOUNDEX',               $soundslike);
 if ($count == 0)
-    $template->set('COUNT',     $tranTab['No']);
+    $template->set('COUNT',             $tranTab['No']);
 else
-    $template->set('COUNT',     $count);
+    $template->set('COUNT',             $count);
 
-$idnr		        = $surnameRec->get('idnr');
-$nxparms	        = array('surname' => $surname);
-$nxlist		        = new RecordSet('Names', $nxparms);
-$information	    = $nxlist->getInformation();
-$query	            = $information['query'];
-$template->set('QUERY',   $query);
-$nxcount	        = $information['count'];
+$nxparms	                = array('surname' => $surname);
+$nxlist		                = new RecordSet('Names', $nxparms);
+$information	            = $nxlist->getInformation();
+$query	                    = $information['query'];
+$template->set('QUERY',                 $query);
+$nxcount	                = $information['count'];
 if ($nxcount == 0)
 {                       // no matching names
     if (canUser('edit') && 
@@ -353,60 +435,40 @@ if ($nxcount == 0)
         $surnameRec->delete(false);
     }
     else
-        $template->updateTag('deletedUnused',   null);
+        $template['deletedUnused']->update(null);
     $template->set('NXCOUNT',   'No');
 }                       // no matching names
 else
 {                       // some matching names
-    $template->updateTag('deletedUnused',   null);
-    $template->set('NXCOUNT',   $nxcount);
+    $template['deletedUnused']->update(null);
+    $template->set('NXCOUNT',           $nxcount);
 }                       // some matching names
 
 if (!canUser('edit'))
-    $template->updateTag('surnameForm',    null);
+    $template['surnameForm']->update(null);
 
 // display the results
-$maxcols	    		= 4;
+$template->set('MAXCOLS',           $maxcols);
 $curcol	        		= 0;
 $data           		= '';
-$rowElt         		= $template->getElementById('row');
-$rowEltHtml     		= $rowElt->outerHTML();
-$entryElt       		= $template->getElementById('entry');
+$entryElt       		= $template['entry'];
 $entryEltHtml   		= $entryElt->outerHTML();
 
 foreach($personList as $idir => $person)
 {
-    if ($curcol == 0)
-    {
-        $rowTemplate    = new Template($rowEltHtml);
-        $rowdata        = '';
-    }
-		$curcol++;
-
     // link to detailed query action
     $entryTemplate      = new Template($entryEltHtml);
-		$name		        = $person->getName(Person::NAME_INCLUDE_DATES);
-		$gender		        = $person->getGender();
+	$name		        = $person->getName(Person::NAME_INCLUDE_DATES);
+	$gender		        = $person->getGender();
     $gender             = $genderText[$gender];
     $entryTemplate->set('NAME',     $name);
     $entryTemplate->set('IDIR',     $idir);
     $entryTemplate->set('GENDER',   $gender);
     $entryTemplate->set('LANG',     $lang);
-    $rowdata            .= $entryTemplate->compile();
-	if ($curcol == $maxcols)
-    {		    // end row and setup to start new row
-        $rowTemplate->updateTag('entry',    $rowdata);
-        $data           .= $rowTemplate->compile();
-		    $curcol	= 0;
-	}		    // end row and setup to start new row
+    $data               .= $entryTemplate->compile();
 }	            // loop through results
 
-if ($curcol != 0)
-{		        // there is an incomplete row started
-    $rowTemplate->updateTag('entry',    $rowdata);
-    $data           .= $rowTemplate->compile();
-}		        // there is an incomplete row started
-$template->updateTag('row',  $data);
+$template['entry']->update($data);
 
 // show any blog postings
 if ($surnameRec->isExisting())
@@ -417,7 +479,7 @@ if ($surnameRec->isExisting())
     $bloglist			= new RecordSet('Blogs', $blogParms);
 
 	// display existing blog entries
-	$blogElt    		= $template->getElementById('blogEntry');
+	$blogElt    		= $template['blogEntry'];
 	$data       		= '';
 	foreach($bloglist as $blid => $blog)
 	{		// loop through all blog entries
@@ -431,12 +493,12 @@ if ($surnameRec->isExisting())
 	    $text	        = str_replace("\n", "</p>\n<p>", $text);
 	    $blogTemplate->set('TEXT',  $text);
 	    if ($username != $userid)
-	        $blogTemplate->updateTag('blogActions', null);
+	        $blogTemplate['blogActions']->update(null);
 	    $data           .= $blogTemplate->compile();
 	}		// loop through all blog entries
-	$template->updateTag('blogEntry',   $data);
+	$template['blogEntry']->update($data);
 }
 else
-	$template->updateTag('blogEntry',   null);
+	$template['blogEntry']->update(null);
 
 $template->display();

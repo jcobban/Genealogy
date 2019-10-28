@@ -224,6 +224,7 @@
 		<select name="IDIR" id="IDIR" rows="1"
 			class="black white left">
 		    <option value="0">Correspondances possibles à cette inscription:
+		    </option>
 		    <option id="match" value="$idir" class="$sexclass white">
 			$name
 		    </option>
@@ -491,70 +492,70 @@
 	    </p>
 	    </form>
 	 </div> <!-- end of <div id="body"> -->
-	  <div class="hidden" id="templates">
+    <div class="hidden" id="templates">
 	  $DIALOGS
-	  </div> <!-- id="templates" -->
+    </div> <!-- id="templates" -->
 	  <!--  The remainder of the web page consists of divisions containing
 	  context specific help.  These divisions are only displayed if the user
 	  requests help by pressing F1.  Including this information here ensures
 	  that the language of the help balloons matches the language of the
 	  input form.
 	    -->
-	  <div class="balloon" id="HelpOriginalVolume">
+    <div class="balloon" id="HelpOriginalVolume">
 	    This field contains the identification of the original bound volume
 	    containing the marriage registrations or certificates.
-	  </div>
-	  <div class="balloon" id="HelpOriginalPage">
+    </div>
+    <div class="balloon" id="HelpOriginalPage">
 	    This field contains the page number containing the original
 	    marriage registrations or certificate.
-	  </div>
-	  <div class="balloon" id="HelpOriginalItem">
+    </div>
+    <div class="balloon" id="HelpOriginalItem">
 	    Where there are more than one marriage registration on the page this field 
 	    contains the ordinal position of the specific registration on the page.
-	  </div>
-	  <div class="balloon" id="HelpRegCounty">
+    </div>
+    <div class="balloon" id="HelpRegCounty">
 	    This is a selection list for identifying the county within which the
 	    death was registered.
-	  </div>
-	  <div class="balloon" id="HelpRegTownship">
+    </div>
+    <div class="balloon" id="HelpRegTownship">
 	    The Township field is used to identify the city, town, or township
         where the
 	    death was registered.  For some counties this is a selection list
         of all municipalities within the county.  However such a list
         has not been accumulated for all counties, and for those counties
         where it has not, this is a text input field.
-	  </div>
-	  <div class="balloon" id="HelpGivenNames">
+    </div>
+    <div class="balloon" id="HelpGivenNames">
 	    The Given Names of the deceased.
-	  </div>
-	  <div class="balloon" id="HelpSurname">
+    </div>
+    <div class="balloon" id="HelpSurname">
 	    The Surname of the deceased.
-	  </div>
-	  <div class="balloon" id="HelpSex">
+    </div>
+    <div class="balloon" id="HelpSex">
 	    Sex of the deceased.
-	  </div>
-	  <div class="balloon" id="HelpMarStat">
+    </div>
+    <div class="balloon" id="HelpMarStat">
 	    Marital status of the deceased.
-	  </div>
-	  <div class="balloon" id="HelpDate">
+    </div>
+    <div class="balloon" id="HelpDate">
 	    Date of death.
 	    It is suggested that dates be entered consistently as day, 
 	    abbreviation of name of month, and year.
-	  </div>
-	  <div class="balloon" id="HelpPlace">
+    </div>
+    <div class="balloon" id="HelpPlace">
 	  <p>
 	    Place of death.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpIDIR">
+    </div>
+    <div class="balloon" id="HelpIDIR">
 	    This selection list offers a list of individuals in the
         family tree database
 	    who may correspond to this death registration.  
         Selecting an entry in this
 	    list will cause a citation to this registration to be added 
         to that individual.
-	  </div>
-	  <div class="balloon" id="HelpAge">
+    </div>
+    <div class="balloon" id="HelpAge">
 	  <p>
 	    Age at death.  This is specified as a number of years, months, weeks, days, or hours, or a combination of these.  A number is an integer, optionally followed
 	    by a '½', which may be entered as '1/2', with no intervening space. 
@@ -564,18 +565,18 @@
 	    If a number is not followed by a letter then it is interpreted as a number
 	    of years.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpOccupation">
+    </div>
+    <div class="balloon" id="HelpOccupation">
 	  <p>
 	    Occupation of deceased.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpBirthPlace">
+    </div>
+    <div class="balloon" id="HelpBirthPlace">
 	  <p>
 	    Birth place of deceased.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpBirthDate">
+    </div>
+    <div class="balloon" id="HelpBirthDate">
 	  <p>
 	    Birth date of deceased.
 	    It is suggested that dates be entered consistently as day, 
@@ -584,179 +585,174 @@
 	    approximate birth date be calculated using the age and date of death, 
 	    and enclosed in square brackets to mark it as an editorial comment.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpResPlace">
+    </div>
+    <div class="balloon" id="HelpResPlace">
 	  <p>
 	    Length of time the deceased lived at the place of death.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpResOnt">
+    </div>
+    <div class="balloon" id="HelpResOnt">
 	  <p>
 	    Length of time the deceased lived in Ontario.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpResCan">
+    </div>
+    <div class="balloon" id="HelpResCan">
 	  <p>
 	    Length of time the deceased lived in Canada.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpCause">
+    </div>
+    <div class="balloon" id="HelpCause">
 	  <p>
 	    Cause of death.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpDuration">
+    </div>
+    <div class="balloon" id="HelpDuration">
 	  <p>
 	    Duration of cause of death.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpPhys">
+    </div>
+    <div class="balloon" id="HelpPhys">
 	  <p>
 	    Attending Physician's name.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpPhysAddr">
+    </div>
+    <div class="balloon" id="HelpPhysAddr">
 	  <p>
 	    Attending Physician's address.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpInformant">
+    </div>
+    <div class="balloon" id="HelpInformant">
 	  <p>
 	    Informant's name.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpInfRel">
+    </div>
+    <div class="balloon" id="HelpInfRel">
 	  <p>
 	    Informant's relation to deceased.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpInfRelTxt">
+    </div>
+    <div class="balloon" id="HelpInfRelTxt">
 	  <p>
 	    Informant's relation to deceased if not one of the values available in the
 	    selection list.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpInfOcc">
+    </div>
+    <div class="balloon" id="HelpInfOcc">
 	  <p>
 	    Informant's occupation if specified.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpInfRes">
+    </div>
+    <div class="balloon" id="HelpInfRes">
 	  <p>
 	    Informant's address if specified.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpReligion">
+    </div>
+    <div class="balloon" id="HelpReligion">
 	  <p>
 	    Religious affiliation of the deceased.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpFatherName">
+    </div>
+    <div class="balloon" id="HelpFatherName">
 	  <p>
 	    Name of father of deceased.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpFatherBPlce">
+    </div>
+    <div class="balloon" id="HelpFatherBPlce">
 	  <p>
 	    Birth place of father of deceased.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpMotherName">
+    </div>
+    <div class="balloon" id="HelpMotherName">
 	  <p>
 	    Name of mother of deceased.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpMotherBPlce">
+    </div>
+    <div class="balloon" id="HelpMotherBPlce">
 	  <p>
 	    Birth place of mother of deceased.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpHusbandName">
+    </div>
+    <div class="balloon" id="HelpHusbandName">
 	  <p>
 	    For married women, the name of her husband.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpBurPlace">
+    </div>
+    <div class="balloon" id="HelpBurPlace">
 	  <p>
 	    Place of burial.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpBurDate">
+    </div>
+    <div class="balloon" id="HelpBurDate">
 	  <p>
 	    Date of burial.
 	    It is suggested that dates be entered consistently as day, 
 	    abbreviation of name of month, and year.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpUndertkr">
+    </div>
+    <div class="balloon" id="HelpUndertkr">
 	  <p>
 	    Name of undertaker/mortician.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpUndertkrAddr">
+    </div>
+    <div class="balloon" id="HelpUndertkrAddr">
 	  <p>
 	    Address of undertaker/mortician.
 	  </p>
-	  </div>
-	  <div class="balloon" id="HelpRegDate">
-	  <p>
+    </div>
+    <div class="balloon" id="HelpRegDate">
 	    Date of registration with municipality.
 	    It is suggested that dates be entered consistently as day, 
 	    abbreviation of name of month, and year.
-	  </p>
-	  </div>
-	  <div class="balloon" id="HelpRegistrar">
-	  <p>
+    </div>
+    <div class="balloon" id="HelpRegistrar">
 	    Name of municipal registrar/clerk.
-	  </p>
-	  </div>
-	  <div class="balloon" id="HelpRemarks">
-	  <p>
+    </div>
+    <div class="balloon" id="HelpRemarks">
 	    Remarks by the municipal registrar/clerk.
 	    Any comments by the transcriber may be entered here if enclosed in 
 	    square brackets.
-	  </p>
-	  </div>
-	  <div class="balloon" id="HelpRegYear">
+    </div>
+    <div class="balloon" id="HelpRegYear">
 	    The year the death was registered.
-	  </div>
-	  <div class="balloon" id="HelpRegNum">
+    </div>
+    <div class="balloon" id="HelpRegNum">
 	    The registration number within the year of this death registration.
-	  </div>
-	  <div class="balloon" id="HelpRegId">
+    </div>
+    <div class="balloon" id="HelpRegId">
 	    This field displays the combination of the year of registration and the
 	    identification number within the year of this death registration.
-	  </div>
-	  <div class="balloon" id="HelpMsVol">
+    </div>
+    <div class="balloon" id="HelpMsVol">
 	    The microfilm reel number within MS 929 which is used to borrow a copy of
 	    the microfilm containing the image of the original death registration from the 
 	    <a href="http://www.archives.gov.on.ca/">Ontario Archives</a>.
-	  </div>
-	  <div class="balloon" id="HelpSubmit">
+    </div>
+    <div class="balloon" id="HelpSubmit">
 	    Clicking on this button commits the changes you have made to the database.
-	  </div>
-	  <div class="balloon" id="HelpReset">
+    </div>
+    <div class="balloon" id="HelpReset">
 	    Clicking on this button resets the values of some fields to their defaults.
-	  </div>
-	  <div class="balloon" id="HelpImage">
+    </div>
+    <div class="balloon" id="HelpImage">
 	    This field contains the location of the image of the associated original
 	    document.  This can be an absolute URL, starting with "http:" or a URL 
 	    relative to the /Ontario/Images folder.
-	  </div>
-	  <div class="balloon" id="HelpShowImage">
+    </div>
+    <div class="balloon" id="HelpShowImage">
 	    Click on this button to see the original image of the registration.
-	  </div>
-	  <div class="balloon" id="HelpNext">
+    </div>
+    <div class="balloon" id="HelpNext">
 	    Click on this button to see the registration with the next higher
 	    registration number.
-	  </div>
-	  <div class="balloon" id="HelpPrevious">
+    </div>
+    <div class="balloon" id="HelpPrevious">
 	    Click on this button to see the registration with the next lower
 	    registration number.
-	  </div>
-	  <div class="balloon" id="HelpNewQuery">
+    </div>
+    <div class="balloon" id="HelpNewQuery">
 	    Click on this button to issue a new query of the database.
-	  </div>
+    </div>
+	<script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="text/javascript"></script>
     <script src="/jscripts/js20/http.js" type="text/javascript">
     </script>
     <script src="/jscripts/CommonForm.js" type="text/javascript">
@@ -766,8 +762,6 @@
     <script src="/jscripts/util.js" type="text/javascript">
     </script>
     <script src="/jscripts/locationCommon.js" type="text/javascript">
-    </script>
-    <script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript">
     </script>
     <script src="DeathRegDetail.js" type="text/javascript">
     </script>

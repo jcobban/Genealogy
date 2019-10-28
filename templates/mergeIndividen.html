@@ -6,10 +6,10 @@
  *                                                                      *
  *	History:															*
  *		2019/01/07      created                                         *
+ *      2019/09/09      add error messages                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
-    <link rel='stylesheet' type='text/css' href='mergeIndivid.css'>
     <div id="breadcrumbs" class="hidden">
   	  <a href="/index.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">
@@ -39,10 +39,34 @@
         <span class="right">
     	  <a href="mergeIndividHelpen.html" target="help">? Help</a>
         </span>
-    	  Merge $NAME
+    	  Merge $NAME with $NAME2
       </h1>
       $TRACE
       $MSG
+      <!-- error messages -->
+      <div class="hidden">
+          <span id="firstMissing">
+              The parameter idir1 is missing.
+          </span>
+          <span id="firstInvalid">
+              The parameter idir1='$idir' is invalid.
+          </span>
+          <span id="firstNotAuth">
+              You are not authorized to update the person with idir1=$idir. 
+          </span>
+          <span id="secondMissing">
+              Please choose the individual to merge with.
+          </span>
+          <span id="secondInvalid">
+              The parameter idir2='$idir' is invalid.
+          </span>
+          <span id="secondNotAuth">
+              You are not authorized to update the person with idir2=$idir. 
+          </span>
+          <span id="cannotMergeSelf">
+              You cannot merge idir1=$idir with itself. 
+          </span>
+      </div> <!-- error messages -->
       <form name="indForm" action="mergeUpdIndivid.php" method="post">
         <div class="row" id="ButtonRow">
     	  <button type="submit" id="Submit" $VIEW2DISABLED>

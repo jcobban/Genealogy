@@ -2,7 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use Templating\Template;
+use \Templating\Template;
 
 /************************************************************************
  *  common.inc															*
@@ -214,6 +214,8 @@ use Templating\Template;
  *		                move the contact link to the menu button        *
  *		                add the "About Site" link to the menu button    *
  *		                add the advertisement to the header             *
+ *		2019/05/18      correct parsing of familyTree cookie            *
+ *		2019/08/01      htmlHeader did not set $LANG                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -255,6 +257,7 @@ $dburl		= $dsn['phptype'] .
     			  ';host=' . $dsn['hostspec'] .
     			  ';charset=utf8';
 //print "<p>dburl=$dburl</p>\n";
+
 try {
 	$connection	= new PDO($dburl,
     				  $dsn['username'], 
@@ -305,9 +308,9 @@ try {
 	// check for existing session
 	session_start();
 	if (strlen($msg) == 0 && isset($_SESSION))
-	{		// handle session variables
+	{		                // handle session variables
 	    foreach($_SESSION as $key => $value)
-	    {		// loop through all session variables
+	    {		            // loop through all session variables
 			if ($key == 'userid')
 			{
 			    $userid		        = trim($value);
@@ -397,11 +400,11 @@ try {
 			}	        	    // saved logon
 	
 			case 'familytree':
-			{		// family tree information
-			    $parts		= explode(';', $value);
+            {		// family tree information
+			    $parts		= explode('&', $value);
 			    foreach($parts as $part)
 			    {		// process each part
-		    		$o		= strpos($part, ':');
+		    		$o		    = strpos($part, ':');
 		    		$pname		= rawurldecode(substr($part, 0, $o));
 		    		$pvalue		= rawurldecode(substr($part, $o+1));
 		    		$familyTreeCookie[$pname]	= $pvalue;
@@ -681,9 +684,9 @@ function htmlHeader($title,
     global  $options;
 
 	if (!class_exists('Template\\Template'))
-		include 'Templating/Template.inc';
+		include_once 'Templating/Template.inc';
 	if (!class_exists(__NAMESPACE__ . '\\Language'))
-        include __NAMESPACE__ . '/Language.inc';
+        include_once __NAMESPACE__ . '/Language.inc';
 
 	$tempBase	    = $_SERVER['DOCUMENT_ROOT'] . '/templates/';
 	$nohtml5	    = $browser->browser == 'IE' && $browser->majorver < 9;
@@ -704,6 +707,7 @@ function htmlHeader($title,
         $template->set('TITLE',	$title);
 
     // check for language support
+    $lang               = 'en';
 	if (array_key_exists("lang", $_REQUEST))
 	{
         $lang           = strtolower($_REQUEST['lang']);
@@ -718,6 +722,8 @@ function htmlHeader($title,
 	                                       $sorry);
 	    }
     }
+    $template->set('LANG',	    $lang);
+
     // support passing debug flag to subsequent pages
 	if ($debug)
 		$template->set('DEBUG',	'Y');
@@ -799,7 +805,7 @@ function pageTop($breadCrumbs)
 		$template->set('CONTRIBUTE',	'');
 		$user		= new User(array("username" => $userid));
 		$blogParms	= array('keyvalue'	=> $user->get('id'),
-					'table'		=> '^Users$');
+					        'table'		=> '^Users$');
 		$bloglist	= new RecordSet('Blogs', $blogParms);
 		$blogCount	= $bloglist->getInformation()['count'];
 		if ($blogCount > 0)
@@ -824,22 +830,23 @@ function pageTop($breadCrumbs)
 		else
 		if ($url == 'back')
 		{		// backup through history
-		    $bctext	.= "<a onclick='history.back(); return false;' href='dummy'>$label</a>:"; 
+		    $bctext	.= "<a onclick='history.back(); return false;' href='dummy' class='menuitem'>$label</a>:"; 
 		}		// backup through history
 		else
 		{		// actual URL
-		    $bctext	.= "<a href='$url'>$label</a>: ";
+		    $bctext	.= "<a href='$url' class='menuitem'>$label</a>: ";
 		}		// actual URL
     }		// loop through breadcrumbs
 
-	$menuButton		            = $template->getElementById('menuButton');
+    $bctext                 .= '<hr class="menubar">';
+	$menuButton		        = $template->getElementById('menuButton');
     if ($menuButton)
     {           // new heading style
         $bctext            = str_replace(':', '<br>', $bctext);
         global  $userid;
         if (isset($userid) && strlen($userid) > 0)
         {
-            $bctext    .= "<a href=\"/Account.php?lang=en\">$userid</a><br>\n";
+            $bctext    .= "<a href=\"/Account.php?lang=en\" title=\"Your account status\" id=\"session\" class='menuitem'>$userid</a><br>\n";
         }
         else
         {
@@ -848,31 +855,10 @@ function pageTop($breadCrumbs)
                 $signon     = $elt->innerHTML();
             else
                 $signon     = 'Sign On';
-            $bctext    .= "<a href=\"/Signon.php?lang=en\">$signon</a><br>\n";
+            $bctext    .= "<a href=\"/Signon.php?lang=en\" id=\"session\" class=\"menuitem\">$signon</a><br>\n";
         }
-
-        // add contents of help section of <h1> tag
-        $h1array		        = $template->getElementsByTagName('h1');
-        if (count($h1array) > 0)
-        {               // at least one <h1> tag in page
-            $h1		            = current($h1array);
-            foreach($h1->childNodes() as $child)
-            {           // loop through children of first <h1>
-                if ($child->tagName == 'span' &&
-                    isset($child->attributes['class']) &&
-                    $child->attributes['class'] == 'right')
-                {       // move help section to menu
-                    $help       = $child->innerHTML();
-                    $help       = str_replace('</a>',
-                                                  '</a><br>',
-                                                  $help);
-                    $bctext.= $help;
-                    $child->update(null);
-                }       // move help section to menu
-            }           // loop through children of first <h1>
-        }               // at least one <h1> tag in page
+        $bctext             .= '<hr class="menubar">';
     }                   // new heading style
-
 }		// function pageTop
 
 /************************************************************************
@@ -946,6 +932,11 @@ function pageBot($pageName	= null,
                 $child->attributes['class'] == 'right')
             {       // move help section to menu
                 $help       = $child->innerHTML();
+                $apos       = strpos($help, '<a');
+                $apos       = strpos($help, '>', $apos + 1);
+                $help       = substr($help, 0, $apos) .
+                                      ' id="menuhelp" class="menuitem"' .
+                                      substr($help, $apos);
                 $help       = str_replace('</a>',
                                               '</a><br>',
                                               $help);
@@ -961,7 +952,7 @@ function pageBot($pageName	= null,
         $about      = $elt->innerHTML();
     else
         $about      = 'About This Site';
-    $bctext         .= "<a href=\"/AboutHelp$lang.html\">$about</a><br>\n";
+    $bctext         .= "<a href=\"/AboutHelp$lang.html\" id=\"menuabout\" class=\"menuitem\" target=\"help\">$about</a><br>\n";
 
     // add contact author link
 	if (is_null($pageName) || strlen($pageName) == '')
@@ -982,11 +973,16 @@ function pageBot($pageName	= null,
             $child->attributes['class'] == 'botcrumbs')
         {       // move help section to menu
             $help       = $child->innerHTML();
-        	$help	= str_replace('$CONTACTSUBJECT',
+        	$help	    = str_replace('$CONTACTSUBJECT',
                                   rawurlencode("[Family Tree] $pageName?" . $_SERVER['QUERY_STRING']),
                                   $help);
-        	$help	= str_replace('$CONTACTKEY', $recordKey, $help);
-        	$help	= str_replace('$CONTACTTABLE', $tableName, $help);
+        	$help	    = str_replace('$CONTACTKEY', $recordKey, $help);
+        	$help	    = str_replace('$CONTACTTABLE', $tableName, $help);
+            $apos       = strpos($help, '<a');
+            $apos       = strpos($help, '>', $apos + 1);
+            $help       = substr($help, 0, $apos) .
+                                      ' id="menucontact" class="menuitem"' .
+                                      substr($help, $apos);
             $bctext     .= $help;
             $child->update(null);
         }       // move help section to menu

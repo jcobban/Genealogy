@@ -153,6 +153,38 @@ class SubDistrict extends Record
     protected static	$defaultOrder	= "SD_census,SD_distid,LPAD(SD_id,4,' '),LPAD(SD_div,4,' '),SD_sched";
 
     /********************************************************************
+     *	SubDistrict::$info										        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'SubDistricts',
+                'name'      => 'SubDistricts',
+                'prime'	    => array('sd_census', 'sd_distid', 'sd_id', 'sd_div', 'sd_sched'),
+	            'srvmg'     => false,
+	            'fldcount'	=> 16,
+                'order'     => 'SD_census,SD_distid,LPAD(SD_id,4,\' \'),LPAD(SD_div,4,\' \'),SD_sched',
+                'classname' => 'SubDistrict');
+
+    /********************************************************************
+     *	SubDistrict::$formerCensus										*
+     *	SubDistrict::$formerDistrict									*
+     *																	*
+     *	To avoid unnecessarily invoking the constructors for Census     *
+     *	and District the class remembers the last instances that        *
+     *	it created.                                                     *
+     ********************************************************************/
+    private static  $formerCensus       = null;
+    private static  $formerDistrict     = null;
+
+    /********************************************************************
+     *	SubDistrict->census	    										*
+     *																	*
+     *	Instance of class Census containing associated census info  	*
+     ********************************************************************/
+    private $census;
+
+    /********************************************************************
      *	SubDistrict->district											*
      *																	*
      *	Instance of class District containing associated district info	*
@@ -212,111 +244,140 @@ class SubDistrict extends Record
 		global $warn;
 		global $connection;
 
-		$needInsert	    = false;
+		$needInsert	            = false;
 
-		$this->table	= 'SubDistricts';
-		$censusRec		= null;
-		$district		= null;
-		$censusId		= self::$initRow['sd_census'];
-		$distId			= self::$initRow['sd_distid'];
-		$sdId			= self::$initRow['sd_id'];
-		$division		= self::$initRow['sd_div'];
-		$sched			= self::$initRow['sd_sched'];
+		$this->table	        = 'SubDistricts';
+		$this->census	        = null;
+		$this->district 		= null;
+		$censusId	    	    = self::$initRow['sd_census'];
+		$distId		    	    = self::$initRow['sd_distid'];
+		$sdId		    	    = self::$initRow['sd_id'];
+		$division	    	    = self::$initRow['sd_div'];
+		$sched		    	    = self::$initRow['sd_sched'];
 
 		foreach($parms as $field => $value)
-		{			// process parameters into search expression
-		    if ($debug)
-				$warn	.= "<p>parms['$field']='$value'</p>\n";
-		    $fieldLc	= strtolower($field);
+		{			                // process parameters
+		    $fieldLc	        = strtolower($field);
 		    if (array_key_exists($fieldLc, self::$translate))
-				$fieldLc	= self::$translate[$fieldLc];
+				$fieldLc	    = self::$translate[$fieldLc];
 		    switch($fieldLc)
-		    {			// act on specific parameters
+		    {			            // act on specific parameters
 				case 'sd_census':
-				{
+				{                   // census id
 				    if ($value instanceof Census)
-				    {		// object
-						$censusRec	= $value;
-						$censusId	= $censusRec->get('censusid');
-				    }		// object
+				    {		        // object
+						$this->census           = $value;
+                        $censusId	            = $this->census['censusid'];
+                        self::$formerCensus     = $this->census;
+				    }		        // object
 				    else
-				    {		// string
-						$censusId	= $value;
-						$parms		= array('censusid' => $censusId,
-								        'collective' => 0);
-						$censusRec	= new Census($parms);
-						if (!$censusRec->isExisting())
-						    $warn	.= "<p>SubDistrict::__construct: " .
+				    {		        // string
+                        $censusId	            = $value;
+                        $formerCensus           = self::$formerCensus;
+                        if ($formerCensus && 
+                            $censusId == $formerCensus['censusid'])
+                        {
+                            $this->census       = $formerCensus;
+                        }
+                        else
+                        {           // need to construct
+						    $parms		= array('censusid' => $censusId,
+							    	            'collective' => 0);
+						    $this->census       = new Census($parms);
+                            self::$formerCensus = $this->census;
+						    if (!$this->census->isExisting())
+						        $warn	.= "<p>SubDistrict::__construct: " .
 						"unsupported census identifier '$censusId'</p>\n";
+                        }           // need to construct
 				    }
 				    break;
-				}
+				}                   // census id
 
 				case 'sd_distid':
-				{
+				{                   // district id
 				    if ($value instanceof District)
 				    {
-						$district	= $value;
-						$distId		= $district->get('id');
-						$censusRec	= $district->getCensus();
-						$censusId	= $censusRec->get('censusid');
+                        $this->district	        = $value;
+                        self::$formerDistrict   = $value;
+						$distId		            = $this->district['id'];
+						$this->census           = $this->district->getCensus();
+                        self::$formerCensus     = $this->census;
+						$censusId	            = $this->census['censusid'];
 				    }
 				    else
 				    if (is_array($value))
 				    {
-						throw new Exception("SubDistrict::__construct: " .
-								    " sd_distid is " .
-								    print_r($value, true));
+						$this->msg      .= "SubDistrict::__construct: " .
+        								    " sd_distid is " .
+		        						    print_r($value, true);
+						$distId		            = $value;
 				    }
-				    else
-						$distId		= $value;
+                    else
+                    {
+						$distId		            = $value;
+                        $formerDistrict         = self::$formerDistrict;
+                        if ($formerDistrict && 
+                            $distId == $formerDistrict['id'])
+                            $this->district     = $formerDistrict;
+                    }
 				    break;
-				}
+				}                   // district id
 
 				case 'sd_id':
-				{
+				{                   // sub-district id
 				    if (is_array($value))
 				    {
 						if (count($value) == 1)
-						     $sdId	= $value[0];
+						    $sdId	= $value[0];
 						else
-						    throw new Exception("SubDistrict.inc: " .
-						    			" SD_ID=" . print_r($value, true));
+					        $this->msg  .= "SubDistrict.inc: " .
+						    			" SD_ID=" . print_r($value, true);
 				    }
 				    else
-						$sdId		= $value;
+						$sdId		            = $value;
 				    break;
-				}
+				}                   // sub-district id
 
 				case 'sd_div':
-				{
-				    $division		= $value;
+				{                   // enumeration division
+				    $division		            = $value;
 				    break;
-				}
+				}                   // enumeration division
 
 				case 'sd_sched':
-				{
-				    $sched		= $value;
+				{                   // census schedule id
+				    $sched		                = $value;
 				    break;
-				}
+				}                   // census schedule id
 
-		    }		    // act on specific parameters
-		}	        	// process parameters into search expression
+		    }		                // act on specific parameters
+		}	        	            // process parameters
 		
 		// query the database for district information
-		if (is_null($district))
-		{
-		    $distParms  	= array('d_census'	=> $censusRec,
-                                    'd_id'		=> $distId);
-            if (is_array($distId))
-                $distParms['d_id']  = reset($distId);
-            $district	    = new District($distParms);
-		}
-		$this->district		= $district;
+		if (is_null($this->district))
+		{                           // not set from parameters
+            $formerDistrict             = self::$formerDistrict;
+            if ($formerDistrict && 
+                $distId == $formerDistrict['id'])
+            {                       // avoid creating new instance
+                $this->district         = $formerDistrict;
+            }                       // avoid creating new instance
+            else
+            {                       // create new District
+                if (is_null($this->census))
+                    throw new Exception("census is null");
+		        $distParms  	        = array('d_census'	=> $this->census,
+                                                'd_id'		=> $distId);
+                if (is_array($distId))
+                    $distParms['d_id']  = reset($distId);
+                $this->district	        = new District($distParms);
+                self::$formerDistrict   = $this->district;
+            }                       // create new District
+		}                           // not set from parameters
 
         // construct the query for an existing record
         if (!is_null($division) && strlen($division) > 0)
-        {
+        {                   // division included in search
 			$sdQuery	= "SELECT * FROM SubDistricts " .
 							    "WHERE SD_Census=:censusId AND " .
 								  "SD_DistId=:distId AND " .
@@ -328,9 +389,9 @@ class SubDistrict extends Record
 								'sdId'		=> $sdId,
 								'division'	=> $division,
 	                            'sched'		=> $sched);
-        }
+        }                   // division included in search
         else
-        {
+        {                   // division not included in search
 			$sdQuery	= "SELECT * FROM SubDistricts " .
 							    "WHERE SD_Census=:censusId AND " .
 								  "SD_DistId=:distId AND " .
@@ -340,8 +401,7 @@ class SubDistrict extends Record
 								'distId'	=> $distId ,
 								'sdId'		=> $sdId,
 	                            'sched'		=> $sched);
-        }
-		$sqlParmsText	= print_r($sqlParms,true);
+        }                   // division not included in search
 
 		// query the database for sub-district information
 		$stmt		= $connection->prepare($sdQuery);
@@ -352,96 +412,87 @@ class SubDistrict extends Record
 		    if ($debug)
 		    {
 				$warn	.= "<p>SubDistrict.inc: " . __LINE__.
-						   " query='$queryText'</p>\n" .
-						   "<p>numRows=" . count($result) . "</p>\n";
+                    " query='$queryText'</p>\n";
+                if (count($result) != 1)
+					$warn   .= "<p>numRows=" . count($result) . "</p>\n";
 		    }
+
+			if (count($result) > 0)
+			{		// existing record
+			    $dbrow		    = $result[0];
+			    $needInsert		= false;
+			}		// existing record
+			else
+			{		// create a new record
+			    // set defaults
+			    $dbrow		        = self::$initRow;
+			    $dbrow['sd_census']	= $censusId;
+			    $dbrow['sd_distid']	= $distId;
+	            $dbrow['sd_id']	    = $sdId;
+	            if (is_null($division) || strlen($division) == 0)
+	            {
+			        $prevQuery	= "SELECT * FROM SubDistricts " .
+					    		    "WHERE SD_Census=:censusId AND " .
+					    			  "SD_DistId=:distId AND " .
+					    			  "SD_Id<:sdId AND " .
+					    			  "SD_Sched=:sched " .
+	                                  "LIMIT 1";
+	            }
+	            else
+	            {
+			        $dbrow['sd_div']	= $division;
+			        $prevQuery	= "SELECT * FROM SubDistricts " .
+				    			    "WHERE SD_Census=:censusId AND " .
+				    				  "SD_DistId=:distId AND " .
+				    				  "SD_Id=:sdId AND " .
+				    				  "SD_Div<:division AND " .
+				    				  "SD_Sched=:sched " .
+	                               "LIMIT 1";
+	            }
+			    $dbrow['sd_name']	= "District $distId Sub-District $sdId";
+	
+			    // fill in info from preceding record
+                $stmt		        = $connection->prepare($prevQuery);
+                $prevQueryText      = debugPrepQuery($prevQuery, $sqlParms);
+			    if ($stmt->execute($sqlParms))
+			    {		// succeeded
+					$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
+					if ($debug)
+					{
+					    $warn	.= "<p>SubDistrict.inc: " . __LINE__.
+							   " query='$prevQueryText'</p>\n";
+					}
+					if (count($result) > 0)
+					{	// previous record
+					    $prevrow			    = $result[0];
+					    $dbrow['sd_name']		= $prevrow['sd_name'];
+					    $dbrow['sd_pages']		= $prevrow['sd_pages'];
+					    $dbrow['sd_page1']		= $prevrow['sd_page1'];
+					    $dbrow['sd_population']	= $prevrow['sd_population'];
+					    $dbrow['sd_lacreel']	= $prevrow['sd_lacreel'];
+					    $dbrow['sd_ldsreel']	= $prevrow['sd_ldsreel'];
+					    $dbrow['sd_imagebase']	= $prevrow['sd_imagebase'];
+					    $dbrow['sd_relframe']	= $prevrow['sd_relframe'];
+					    $dbrow['sd_framect']	= $prevrow['sd_framect'];
+					    $dbrow['sd_bypage']		= $prevrow['sd_bypage'];
+					}	// previous record
+			    }		// succeeded
+			    else
+			    {		// error performing query
+					print "<p>sql='$prevQueryText'</p>\n" .
+					$this->msg  .=" '$prevQueryText' " .
+								    print_r($stmt->errorInfo(),true);
+			        $dbrow		= self::$initRow;
+			    }		// error performing query
+			    $needInsert		= true;
+			}		// create new record
 		}		// success
 		else
 		{		// error performing query
-		    error_log("SubDistrict.inc: " . __LINE__ . " sql='$queryText'\n");
-		    throw new Exception("SubDistrict::__construct: '$queryText' " .
-							print_r($stmt->errorInfo(),true));
+		    $this->msg          .= " '$queryText' " .
+							        print_r($stmt->errorInfo(),true);
+			$dbrow		        = self::$initRow;
 		}		// error performing query
-
-		if (count($result) > 0)
-		{		// existing record
-		    $dbrow		= $result[0];
-		    $needInsert		= false;
-		}		// existing record
-		else
-		{		// create a new record
-		    if (!$create)
-				$warn	.= "<p>SubDistrict::__construct: " . __LINE__ .
-							    " No existing record for key: " .
-							    "SD_Census='$censusId', " . 
-							    "SD_DistId=$distId, " . 
-							    "SD_Id='$sdId', " .
-							    "SD_Div='$division', " .
-							    "SD_Sched='$sched'</p>";
-
-		    // set defaults
-		    $dbrow		= self::$initRow;
-		    $dbrow['sd_census']	= $censusId;
-		    $dbrow['sd_distid']	= $distId;
-            $dbrow['sd_id']	    = $sdId;
-            if (is_null($division) || strlen($division) == 0)
-            {
-		        $prevQuery	= "SELECT * FROM SubDistricts " .
-				    		    "WHERE SD_Census=:censusId AND " .
-				    			  "SD_DistId=:distId AND " .
-				    			  "SD_Id<:sdId AND " .
-				    			  "SD_Sched=:sched " .
-                                  "LIMIT 1";
-            }
-            else
-            {
-		        $dbrow['sd_div']	= $division;
-		        $prevQuery	= "SELECT * FROM SubDistricts " .
-			    			    "WHERE SD_Census=:censusId AND " .
-			    				  "SD_DistId=:distId AND " .
-			    				  "SD_Id=:sdId AND " .
-			    				  "SD_Div<:division AND " .
-			    				  "SD_Sched=:sched " .
-                               "LIMIT 1";
-            }
-		    $dbrow['sd_name']	= "District $distId Sub-District $sdId";
-
-		    // fill in info from preceding record
-		    $stmt		= $connection->prepare($prevQuery);
-		    if ($stmt->execute($sqlParms))
-		    {		// succeeded
-				$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
-				if ($debug)
-				{
-				    $warn	.= "<p>SubDistrict.inc: " . __LINE__.
-						   " query='$prevQuery'</p>\n" .
-						   "<p>\$sqlParms=" . $sqlParmsText . "</p>\n" .
-						   "<p>numRows=" . count($result) . "</p>\n";
-				}
-				if (count($result) > 0)
-				{	// previous record
-				    $prevrow			    = $result[0];
-				    $dbrow['sd_name']		= $prevrow['sd_name'];
-				    $dbrow['sd_pages']		= $prevrow['sd_pages'];
-				    $dbrow['sd_page1']		= $prevrow['sd_page1'];
-				    $dbrow['sd_population']	= $prevrow['sd_population'];
-				    $dbrow['sd_lacreel']	= $prevrow['sd_lacreel'];
-				    $dbrow['sd_ldsreel']	= $prevrow['sd_ldsreel'];
-				    $dbrow['sd_imagebase']	= $prevrow['sd_imagebase'];
-				    $dbrow['sd_relframe']	= $prevrow['sd_relframe'];
-				    $dbrow['sd_framect']	= $prevrow['sd_framect'];
-				    $dbrow['sd_bypage']		= $prevrow['sd_bypage'];
-				}	// previous record
-		    }		// succeeded
-		    else
-		    {		// error performing query
-				print "<p>sql='$prevQuery'</p>\n" .
-						"<p>parms=" . $sqlParmsText . "</p>\n";
-				throw new Exception("SubDistrict::__construct: '$sdQuery' " .
-							    print_r($stmt->errorInfo(),true));
-		    }		// error performing query
-		    $needInsert		= true;
-		}		// create new record
 
 		// invoke constructor of base class
 		parent::__construct($dbrow,
@@ -469,7 +520,7 @@ class SubDistrict extends Record
 				default:
 				{
 				    if (array_key_exists($field, $dbrow))
- 			parent::set($field, $value);
+ 			            parent::set($field, $value);
 				    break;
 				}
 		    }		// act on specific parameters
@@ -501,11 +552,7 @@ class SubDistrict extends Record
 		    $fieldLc	= self::$translate[$fieldLc];
 		if (substr($fieldLc,0,2) == 'd_')
 		{		// accept district field names
-		    $district	= $this->district;
-$debug	= true;
-$district->dump('from SubDistrict::get');
-$debug	= false;
-		    return $district->get($fieldLc);
+		    return $this->district[$fieldLc];
 		}		// accept district field names
 		else
 		{		// other fields
@@ -628,17 +675,17 @@ $debug	= false;
 		global	$userid;
 		global	$connection;
 
-		$updatePopulation	= false;
+		$updatePopulation	    = false;
 
 		if (is_string($xml))
 		{		// string tag name
-		    $tagname	= $xml;
-		    $xml	= true;
+		    $tagname	        = $xml;
+		    $xml	            = true;
 		}		// string tag name
 		else
 		if ($xml)
 		{		// true
-		    $tagname	= 'cmd';	// default
+		    $tagname	        = 'cmd';	// default
 		}		// true
 
 		if ($this->needInsert)
@@ -659,19 +706,16 @@ $debug	= false;
 		    $insert	= "INSERT INTO SubDistricts ($fldnames) VALUES($values)";
 
 		    // insert the new record into the database
-		    $stmt		= $connection->prepare($insert);
-		    $sqlParmsText	= print_r($sqlParms, true);
+            $stmt		= $connection->prepare($insert);
+            $insertTxt  = debugPrepQuery($insert, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		// success
 				$count		= $stmt->rowCount();
 				if ($xml)
-				    print "<$tagname result='$count'>" . xmlentities($insert) . 
-						    "</$tagname>\n" .
-						  "<sqlparms>$sqlParmsText</sqlparms>\n";
+				    print "<$tagname result='$count'>$insertTxt</$tagname>\n";
 				if ($debug)
-				    $warn	.= "<p>sql='$inser't</p>\n" .
-							   "<p>count=$count</p>\n" .
-							   "<p>parms=$sqlParmsText</p>\n";
+				    $warn	.= "<p>sql='$insertTxt'</p>\n" .
+							   "<p>count=$count</p>\n";
 
 				$this->changed	= array();	// reset
 				$this->needInsert	= false;
@@ -689,7 +733,7 @@ $debug	= false;
 		    else
 		    {		// error inserting record
 				throw new Exception("SubDistrict::save: " . __LINE__ .
-							    " '$insert', " . $sqlParmsText . ': ' .
+							    " '$insertTxt', " . ': ' .
 							    print_r($stmt->errorInfo(),true));
 		    }		// error inserting record
 		}		// create new record
@@ -725,28 +769,27 @@ $debug	= false;
 
 				// perform the update
 				$stmt		= $connection->prepare($update);
-				$sqlParmsText	= print_r($sqlParms, true);
+				$updateText	= debugPrepQuery($update, $sqlParms);
 				if ($stmt->execute($sqlParms))
 				{		// success
 				    $count		= $stmt->rowCount();
 				    if ($xml)
-						print "<$tagname count='$count'>" .
-							    xmlentities($update) . "</$tagname>\n";
-				    if ($debug)
-						$warn	.= "<p>$update</p>\n";
+                        print "<$tagname count='$count'>$updateText</$tagname>\n";
+                    if ($debug)
+						$warn	.= "<p>$updateText</p>\n";
 
 				    // log the update
 				    logSqlUpdate($update,
-							 $sqlParms,
-							 0,		// compound key
-							 json_encode($this->former),
-							 json_encode($this->row));
+    							 $sqlParms,
+    							 0,		// compound key
+    							 json_encode($this->former),
+    							 json_encode($this->row));
 				}		// success
 				else
 				{		// error updating record
 				    $updatePopulation	= false;
 				    throw new Exception("SubDistrict::save: " . __LINE__ .
-								" '$update', parms=$sqlParmsText: " .
+								" '$updateText': " .
 								print_r($stmt->errorInfo(),true));
 				}		// error updating record
 		    }		// changes made
@@ -760,18 +803,18 @@ $debug	= false;
     }		// SubDistrict::save
 
     /********************************************************************
-     * function SubDistrict::delete												*
+     * function SubDistrict::delete										*
      *																	*
      *  Delete the database record associated with this instance.		*
      *																	*
-     *		Input:																*
-     *		    $xml		if true emit XML								*
-     *						if a string emit XML using as tag name				*
+     *	Input:															*
+     *	    $xml		if true emit XML								*
+     *					if a string emit XML using as tag name			*
      *																	*
-     *		Returns:														*
-     *		    false		if the method was unable to update the database		*
-     *		    1				if the method deleted the database record		*
-     *		    0				if the record did not need to be deleted		*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method deleted the database record		*
+     *	    0			if the record did not need to be deleted		*
      ********************************************************************/
     function delete($xml=false)
     {
@@ -791,8 +834,8 @@ $debug	= false;
 
 		// to simplify expressions
 		if (!$this->needInsert)
-		{		// have existing record
-		    $delete	= 'DELETE FROM SubDistricts WHERE' .
+        {		// have existing record
+		    $delete	= 'DELETE FROM SubDistricts WHERE ' .
 								'SD_Census=:censusId AND ' .
 								'SD_DistId=:distId AND ' .
 								'SD_Id=:sdId AND ' .
@@ -854,14 +897,14 @@ $debug	= false;
     function getDefaultImage($page)
     {
 		global $warn;
-		$census		= $this->row['sd_census'];
-		$censusYear	= substr($census, 2);
-		$imageBase	= $this->row['sd_imagebase'];
-		$relFrame	= $this->row['sd_relframe'];
-		$page1		= $this->row['sd_page1']; 
-		$pages		= $this->row['sd_pages'];
-		$bypage		= $this->row['sd_bypage'];
-		$website	= 'http://data2.collectionscanada.ca/';
+		$censusId		= $this->row['sd_census'];
+		$censusYear	    = substr($censusId, 2);
+		$imageBase  	= $this->row['sd_imagebase'];
+		$relFrame   	= $this->row['sd_relframe'];
+		$page1	    	= $this->row['sd_page1']; 
+		$pages	    	= $this->row['sd_pages'];
+		$bypage	    	= $this->row['sd_bypage'];
+		$website    	= 'http://data2.collectionscanada.ca/';
 
 		switch($censusYear)
 		{		// switch on census year
@@ -1017,7 +1060,7 @@ $debug	= false;
 		    if ($distId == floor($distId))
 				$distId		= intval($distId);
 		    $sdId		= $this->row['sd_id'];
-		    $province		= $this->district->get('province');
+		    $province		= $this->district['province'];
 
 		    if (ctype_digit($sdId))
 				$selPrev	= "SELECT SD_Id, SD_Div from SubDistricts where SD_Census=:censusId && SD_DistId=:distId && CONCAT(LPAD(SD_ID,3,'0'), LPAD(SD_Div,2,' '))<=CONCAT(LPAD(:sdId,3,'0'),LPAD(:division,2,' ')) ORDER BY (SD_Id-0) DESC, LPAD(SD_Div,2,' ') DESC LIMIT 2;";
@@ -1112,7 +1155,7 @@ $debug	= false;
 		    if ($distId == floor($distId))
 				$distId		= intval($distId);
 		    $sdId		= $this->row['sd_id'];
-		    $province		= $this->district->get('province');
+		    $province		= $this->district['province'];
 
 		    // identify the immediately following enumeration division within 
 		    // the current district
@@ -1207,24 +1250,24 @@ $debug	= false;
     {
 		// ensure that there is a label to use for the top element
 		if (!is_string($top) || strlen($top) == 0)
-		    $top	= 'SubDistrict';
+		    $top	    = 'SubDistrict';
 		if (is_null($top))
-		    $retval	= '';
+		    $retval	    = '';
 		else
-		    $retval	= "    <$top>\n";
+		    $retval	    = "    <$top>\n";
 
 		foreach($this->row as $key => $value)
 		{
 		    if (substr($key, 0, 3) == 'sd_')
 				    $key	= substr($key, 3);
-		    $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
+		    $retval	    .= "\t<$key>" . xmlentities($value) . "</$key>\n";
 		    if ($key == 'distid')
 		    {			// also report information from District
 				$retval	.= "\t<distname>" .
-						xmlentities($this->district->get('d_name')) .
+						xmlentities($this->district['d_name']) .
 						"</distname>\n";
 				$retval	.= "\t<province>" .
-						xmlentities($this->district->get('d_province')) .
+						xmlentities($this->district['d_province']) .
 						"</province>\n";
 		    }			// also report information from District
 		}
@@ -1245,15 +1288,15 @@ $debug	= false;
     }		// SubDistrict::__toString
 
     /********************************************************************
-     * function SubDistrict::getPages												*
+     * function SubDistrict::getPages									*
      *																	*
-     *  Get an array of instances of Page for this SubDistrict.				*
-     *		If the corresponding portion of the Pages table has not been		*
-     *		created yet, this creates new records for each required Page.		*
+     *  Get an array of instances of Page for this SubDistrict.			*
+     *	If the corresponding portion of the Pages table has not been	*
+     *	created yet, this creates new records for each required Page.	*
      *																	*
-     *		Returns:														*
-     *		    RecordSet of instances of Page indexed by page				*
-     *		    use foreach($subd->getPages() as $page)						*
+     *	Returns:														*
+     *	    RecordSet of instances of Page indexed by page				*
+     *	    use foreach($subd->getPages() as $page)						*
      ********************************************************************/
     function getPages()
     {
@@ -1261,15 +1304,24 @@ $debug	= false;
     }		// SubDistrict::getPages
 
     /********************************************************************
-     * function SubDistrict::getDistrict										*
+     * function SubDistrict::getDistrict								*
      *																	*
-     *  Get the associated instance of District								*
+     *  Get the associated instance of District							*
      *																	*
-     *		Returns:														*
-     *		    instance of District										*
+     *	Returns:														*
+     *	    instance of District										*
      ********************************************************************/
     function getDistrict()
     {
+        if (is_null($this->district))
+        {
+		    $distParms  	        = array('d_census'	=> $this->census,
+                                            'd_id'		=> $distId);
+            if (is_array($distId))
+                $distParms['d_id']  = reset($distId);
+            $this->district	        = new District($distParms);
+            self::$formerDistrict   = $this->district;
+		}
 		return $this->district;
     }		// SubDistrict::getDistrict
 }		// class SubDistrict 

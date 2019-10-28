@@ -9,6 +9,7 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/04/13      support new tinyMCE                             *
+ *		2019/08/27      add Close button                                *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -23,20 +24,6 @@ window.onload	= onLoad;
 var	lang	        = 'en';
 if ('lang' in args)
 	lang	        = args.lang;
-
-/************************************************************************
- *  specify style for tinyMCE editing                                   *
- ************************************************************************/
-tinyMCE.init({
-	selector            : 'textarea',
-    plugins             : 'link lists image',
-    menubar             : 'file edit view format insert',
-    toolbar             : "undo redo | styleselect | bold italic | " 
-                           + "alignleft aligncenter alignright alignjustify | " 
-                           + "bullist numlist outdent indent | link image",
-    content_css		    : "/styles.css"
-
-});
 
 /************************************************************************
  *  function onLoad														*
@@ -100,19 +87,25 @@ function onLoad()
 
 				case 'postblog':
 				{	// post blog button
-				    element.onclick	= postBlog;
+				    element.addEventListener('click', postBlog);
 				    break;
 				}	// post blog button
 
 				case 'edit':
 				{
-				    element.onclick	= editBlog;
+				    element.addEventListener('click', editBlog);
 				    break;
 				}
 
 				case 'del':
 				{
-				    element.onclick	= delBlog;
+				    element.addEventListener('click', delBlog);
+				    break;
+				}
+
+				case 'close':
+				{
+				    element.addEventListener('click', close);
 				    break;
 				}
 
@@ -297,6 +290,8 @@ function noBlog()
  ************************************************************************/
 function editBlog(e)
 {
+    e.stopPropagation();
+
     location	= "/BlogPost.php?blogid=" + this.id.substring(4) +
 						"&table=Blogs&lang=" + lang + "&edit=Y";
     return false;
@@ -314,6 +309,8 @@ function editBlog(e)
  ************************************************************************/
 function delBlog(e)
 {
+    e.stopPropagation();
+
     var	form		= this.form;
     var	blid		= this.id.substring(3);
 
@@ -336,4 +333,22 @@ function noDelBlog()
     alert('BlogPost.js: noDelBlog: ' +
 				'script "deleteBlogXml.php" not found on web server');
 }		// function noDelBlog
+
+/************************************************************************
+ *  function close													    *
+ *																		*
+ *  This method is called if the user requests to edit the blog			*
+ *  message.															*
+ *																		*
+ *  Input:																*
+ *		this		<button id='close'>								    *
+ *		e           instance of click Event                             *
+ ************************************************************************/
+function close(e)
+{
+    e.stopPropagation();
+
+    location        = "/Blogs.php";
+    return false;
+}		// function close
 

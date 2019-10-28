@@ -31,28 +31,29 @@ require_once __NAMESPACE__ . "/common.inc";
 // get parameters
 $userid				= null;
 $id					= null;
-$hash				= null;
+$confirmid			= null;
 $lang				= 'en';
 
 foreach($_GET as $key => $value)
-{			// loop through parameters
+{			    // loop through parametersa
+    $value                  = trim($value);
 	switch(strtolower($key))
-	{		// act on specific parameters
+	{		    // act on specific parameters
 	    case 'userid':
 	    {
-			$userid		= $value;
+			$userid		    = $value;
 			break;
 	    }
 
 	    case 'id':
 	    {
-			$id		= $value;
+			$id		        = $value;
 			break;
 	    }
 
-	    case 'hash':
+	    case 'confirmid':
 	    {
-			$hash		= $value;
+			$confirmid		= $value;
 			break;
 	    }
 
@@ -63,36 +64,62 @@ foreach($_GET as $key => $value)
 			break;
 	    }
 
-	}		// act on specific parameters
-}			// loop through parameters
+	}		        // act on specific parameters
+}		    	    // loop through parameters
 
-// validate parameters
-if (!is_null($id) && !is_null($hash) && !is_null($userid))
-{		// confirmation supplied
-	try {
-	    $user		    = new User(array('id'	=> $id));
-	    $shapassword	= $user->get('shapassword');
-	    if ($hash != $shapassword)
-		    $msg	.= "Invalid hash code for user. ";
-	    else
-	    {		// confirm
-		    $user->set('auth', 'edit,blog');
-		    $user->save(false);
-	    }		// confirm
-	} catch (Exception $e) {
-	    $msg	.= "Invalid id number $id. ";
-	}
-}		// registration supplied
-else
-{		// registration not supplied
-	$msg		.= "Missing mandatory parameters. ";
-}		// registration not supplied
-
+// get the template
 $template		= new FtTemplate("ConfirmEmail$lang.html");
+
+        $debug=true;
+// validate parameters
+if (is_null($id))
+{                   // account identifier missing
+    $text               = $template['missing']->innerHTML();
+    $msg	            .= str_replace('$name', 'id', $text);
+}                   // account identifier missing
+else
+{		            // account identifier supplied
+    $user		            = new User(array('id'	=> $id));
+    if (!$user->isExisting())
+    {
+        $text           = $template['invalidid']->innerHTML();
+        $msg	        .= str_replace('$id', $id, $text);
+    }
+}                   // account identifier supplied`
+
+if (is_null($userid))
+{		            // user name missing
+    $text               = $template['missing']->innerHTML();
+    $msg	            .= str_replace('$name', 'userid', $text);
+}                   // user name missing
+else
+if ($user)
+{		            // user name supplied
+    if ($userid != $user['username'])
+    {               // username does not match
+        $text       = $template['invalidusername']->innerHTML();
+        $msg	    .= str_replace('$userid', $userid, $text);
+    }               // username does not match
+}		            // user name supplied
+
+if ($user)
+{                   // id and confirmid supplied
+    if (is_null($confirmid) || $confirmid == $user['confirmid'])
+    {		        // confirmid matches
+	    $user->set('auth', 'edit,blog');
+        $user->save(false);
+        $user->dump('auth set');
+    }		        // confirmid matches
+    else
+    {
+        $text   = $template['invalidconfirm']->innerHTML();
+        $msg	.= str_replace('$confirmid', $confirmid, $text);
+    }
+}		            // id and confirmid supplied
 
 $template->set('USERID',	$userid);
 $template->set('LANG',		$lang);
 
 if (strlen($msg) > 0)
-	$template->updateTag('confirmation', null);
+	$template['confirmation']->update(null);
 $template->display();

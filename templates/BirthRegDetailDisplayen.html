@@ -6,6 +6,8 @@
  *																		*
  * History:																*
  *		2018/10/02		created                                         *
+ *      2019/09/25      checkboxes must be both readonly for appearance *
+ *                      and disabled so they cannot be clicked          *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
@@ -149,6 +151,7 @@
 				  class="ina white leftwide" readonly="readonly">
 		      <option value="$regTownship"> 
 				  $regTownship 
+              </option>
 		    </select>
 		  </div>
 		  <div style="clear: both;"></div>
@@ -194,7 +197,8 @@
 		      Parents Married:
 		    </label>
 		    <input type="checkbox" name="ParentsMarried" id="ParentsMarried"
-				  $marriedChecked readonly="readonly">
+				  $marriedChecked
+				readonly="readonly" disabled="disabled">
 		  </div>
 		  <div style="clear: both;"></div>
         </div> <!-- id="SexMarriedRow" -->
@@ -519,7 +523,7 @@
        </p>
 	  </div>
 	  <div class="balloon" id="HelpFatherOccupation">
-	  <p>This option is used to update births with the
+	      This option is used to update births with the
 		  occupation of the Father of the child. 
 	  </div>
 	  <div class="balloon" id="HelpFatherOccPlace">
@@ -543,12 +547,10 @@
           month-abbreviation, year.  For example "23 Aug 1874".
 	  </div>
 	  <div class="balloon" id="HelpIDIR">
-	      <p>
 		  This selection list offers a list of individuals in the family tree
           database who may correspond to this birth registration. 
           Selecting an entry in this list will cause a citation to this
           registration to be added to that individual.
-	   </p>
 	  </div>
 	  <div class="balloon" id="HelpPhys">
 		  This field is used to update individuals with the name of the
@@ -585,7 +587,7 @@
 		  occupation of the person reporting the birth.
 	  </div>
 	  <div class="balloon" id="HelpReligion">
-	  <p>This option is used to update individuals with their
+	      This option is used to update individuals with their
 		  religious affiliation.  
 	  </div>
 	  <div class="balloon" id="HelpFatherName">
@@ -605,33 +607,29 @@
 		  birth place of the mother of the child.
 	  </div>
 	  <div class="balloon" id="HelpMarriagePlace">
-	  <p>This option is used to update individuals with where the parents were
+	    This option is used to update individuals with where the parents were
 		  married.  
 	  </div>
 	  <div class="balloon" id="HelpMarriageDate">
-	  <p>This field is used to update individual records with the date
+	    This field is used to update individual records with the date
 		  on which the parents were married.
 	  </div>
 	  <div class="balloon" id="HelpParentsMarried">
-	  <p>This field is used to specify if the birth registration indicated
+	    This field is used to specify if the birth registration indicated
 		  that the parents were married at the time of the birth.  It defaults to
 		  checked but should be cleared if the registration indicates the child
 		  is illegitimate.
 	  </div>
 	  <div class="balloon" id="HelpRegDate">
-	  <p>
 		  Date of registration with municipality.
 		  It is suggested that dates be entered consistently as day, 
 		  abbreviation of name of month, and year.
-	  </p>
 	  </div>
 	  <div class="balloon" id="HelpRegistrar">
-	  <p>
 		  Name of municipal registrar/clerk.
-	  </p>
 	  </div>
 	  <div class="balloon" id="HelpRemarks">
-	  <p>This field is used to record any comments by the registrar or clerk.
+	    This field is used to record any comments by the registrar or clerk.
 		  You may use this field to record your own comments by enclosing them in
 		  editorial square brackets.
 	  </div>
@@ -672,10 +670,11 @@
 		  displays a new query dialog for selecting
 		  birth registrations.
 	  </div>
-	  <script src="/jscripts/js20/http.js" type="text/javascript"></script>
-	  <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
-	  <script src="/jscripts/Ontario.js" type="text/javascript"></script>
-	  <script src="/jscripts/util.js" type="text/javascript"></script>
-	  <script src="/jscripts/locationCommon.js" type="text/javascript"></script>
-	  <script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript"></script>
-	  <script src="BirthRegDetail.js" type="text/javascript"></script>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    </script>
+	<script src="/jscripts/js20/http.js" type="text/javascript"></script>
+	<script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+	<script src="/jscripts/Ontario.js" type="text/javascript"></script>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/jscripts/locationCommon.js" type="text/javascript"></script>
+	<script src="BirthRegDetail.js" type="text/javascript"></script>

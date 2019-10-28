@@ -143,49 +143,29 @@ function gotCounties(obj)
  ************************************************************************/
 
 // instance of google.maps.Map for displaying the map
-var	map		= null;
+var	map		        = null;
 
 // array of instances of google.maps.LatLng for boundary of area
-var	path		= [];
+var	path		    = [];
 
 // instance of google.maps.PolyOptions for editing boundary
 var	polyOptionsEdit	= {strokeColor: "red", 
-			   strokeOpacity: 0.5,
-			   strokeWeight: 2,
-			   editable: true};
+					   strokeOpacity: 0.5,
+					   strokeWeight: 2,
+					   editable: true};
 
 // instance of google.maps.PolygonOptions for displaying boundary
 var	polyOptionsShow	= {strokeColor: "red", 
-			   strokeOpacity: 0.5,
-			   strokeWeight: 2,
-			   fillColor: "black",
-			   fillOpacity: 0.10};
+					   strokeOpacity: 0.5,
+					   strokeWeight: 2,
+					   fillColor: "black",
+					   fillOpacity: 0.10};
 
 // instance of google.maps.Polyline for displaying boundary
-var	boundary	= null;
+var	boundary	    = null;
 
 // instance of google.maps.Geocoder for resolving place names
-var	geocoder	= null;
-
-// specify style for tinyMCE editing
-tinyMCE.init({
-	mode			: "textareas",
-	theme			: "advanced",
-	plugins 		: "spellchecker,advhr,preview", 
-		
-	// Theme options - button# indicated the row# only
-	theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-	theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-	theme_advanced_buttons3 : "",
-	theme_advanced_toolbar_location : "top",
-	theme_advanced_toolbar_align : "left",
-	theme_advanced_statusbar_location : "bottom",
-	theme_advanced_resizing : true,
-	forced_root_block	: false,
-	forced_root_block	: false,
-	content_css		: "/styles.css",
-
-});
+var	geocoder	    = null;
 
 /************************************************************************
  *  function onLoadLocation												*
@@ -217,14 +197,14 @@ function onLoadLocation()
 
 		for(var j = 0; j < form.elements.length; j++)
 		{
-		    var element	= form.elements[j];
+		    var element	                = form.elements[j];
 
 		    // take action specific to element
 		    var	name;
 		    if (element.name && element.name.length > 0)
-			name	= element.name;
+			name	                    = element.name;
 		    else
-			name	= element.id;
+			name	                    = element.id;
 
 		    switch(name)
 		    {		// act on field name
@@ -238,38 +218,38 @@ function onLoadLocation()
 	
 				case 'mergeDuplicates':
 				{
-				    element.onclick	= mergeDuplicates;
+				    element.onclick	    = mergeDuplicates;
 				    break;
 				}		// mergeDuplicates button
 	
 				case 'showMap':
 				{
-				    element.onclick	= showMap;
+				    element.onclick	    = showMap;
 				    break;
 				}		// showMap button
 	
 				case 'getMap':
 				{
-				    element.onclick	= getMap;
+				    element.onclick	    = getMap;
 				    break;
 				}		// getMap button
 	
 				case 'References':
 				{
-				    element.onclick	= displayReferences;
+				    element.onclick	    = displayReferences;
 				    break;
 				}		// References button
 	
 				case 'Boundary':
 				{
-				    var	latPatt	= /\(([0-9.\-]+)/;
-				    var	lngPatt	= /([0-9.\-]+)\)/;
-				    var	boundStr	= element.value;
-				    var	readonly	= form.Zoom.readOnly;
+				    var	latPatt	        = /\(([0-9.\-]+)/;
+				    var	lngPatt	        = /([0-9.\-]+)\)/;
+				    var	boundStr	    = element.value;
+				    var	readonly	    = form.Zoom.readOnly;
 	
 				    if (boundStr.length > 0)
 				    {		// have a boundary to display
-						var	bounds	= boundStr.split(',');
+						var	bounds	    = boundStr.split(',');
 						for (var ib=0; ib < bounds.length; ib++)
 						{		// loop through each element
 						    var	bound	= bounds[ib];
@@ -327,7 +307,7 @@ function onLoadLocation()
 		    }	        // act on field name
 		}	            // loop through all elements in the form
     }		            // loop through all forms
-}		// onLoadLocation
+}		// function onLoadLocation
 
 /************************************************************************
  *  function validateForm												*
@@ -338,7 +318,7 @@ function onLoadLocation()
 function validateForm()
 {
     return true;
-}		// validateForm
+}		// function validateForm
 
 /************************************************************************
  *  function resetForm													*
@@ -352,10 +332,10 @@ function validateForm()
 function resetForm()
 {
     return true;
-}	// resetForm
+}	// function resetForm
 
 /************************************************************************
- *  function locationChanged												*
+ *  function locationChanged											*
  *																		*
  *  Handle a change to the value of the Location field.					*
  *																		*
@@ -445,7 +425,7 @@ function locationChanged()
     }		// street address
     else		
 		form.SortedLocation.value	= value;
-}		// locationChanged
+}		// function locationChanged
 
 /************************************************************************
  *  function mergeDuplicates											*
@@ -500,7 +480,7 @@ function mergeDuplicates()
 		      parms,
 		      gotMerge,
 		      noMerge);
-}	// mergeDuplicates
+}	// function mergeDuplicates
 
 /************************************************************************
  *  function gotMerge													*
@@ -533,7 +513,7 @@ function gotMerge(xmlDoc)
 		}		// loop through children
 		alert (msg);
     }		// error
-}		// gotMerge
+}		// function gotMerge
 
 /************************************************************************
  *  function noMerge													*
@@ -548,7 +528,7 @@ function noMerge()
 			   button);
     else
 		alert('Location.js: script mergeLocationsXml.php not found');
-}		// noMerge
+}		// function noMerge
 
 /************************************************************************
  *  function showMap													*
@@ -606,7 +586,7 @@ function showMap()
 		});	// end of inline function and invocation of geocode
     }		// use Geocoder
     return false;
-}		// showMap
+}		// function showMap
 
 /************************************************************************
  *  function displayMap													*
@@ -689,7 +669,7 @@ function displayMap(latlng, zoomlevel)
 				" not resolved",
 			   this);
     }		// location not resolved
-}		// displayMap
+}		// function displayMap
 
 /************************************************************************
  *  function mapClick													*
@@ -705,7 +685,6 @@ function displayMap(latlng, zoomlevel)
  ************************************************************************/
 function mapClick(mouseEvent)
 {
-    //alert("mapClick: mouseEvent.latLng: " + mouseEvent.latLng.toString());
     if (path.length == 0)
     {		// first click
 		boundary	= new google.maps.Polyline(polyOptionsEdit);
@@ -713,7 +692,7 @@ function mapClick(mouseEvent)
     }		// first click
     path.push(mouseEvent.latLng);
     boundary.setPath(path);
-}
+}       // function mapClick
 
 /************************************************************************
  *  function hideMap													*
@@ -742,7 +721,7 @@ function hideMap()
 		button.appendChild(childTemp.cloneNode(true));
     button.onclick	        	= showMap;
     return false;
-}		// hideMap
+}		// function hideMap
 
 /************************************************************************
  *  function getMap														*
@@ -750,7 +729,7 @@ function hideMap()
  *  This function is called to copy information from the map into		*
  *  the location record.												*
  *																		*
- *  Input:sourc															*
+ *  Input:  															*
  *		this		instance of <button>								*
  ************************************************************************/
 function getMap()
@@ -772,25 +751,25 @@ function getMap()
 		var deg;
 		var neg;
 
-		form.Latitude.value	= center.lat().toFixed(6);
+		form.Latitude.value	    = center.lat().toFixed(6);
 		form.Longitude.value	= center.lng().toFixed(6);
 
 		// set the map zoom factor
-		form.Zoom.value		= zoom;
+		form.Zoom.value		    = zoom;
 
 		// copy the boundary path
 		if (boundary)
 		{
-		    var path		= boundary.getPath().getArray();
-		    var pathStr		= '';
-		    var comma		= '';
+		    var path		    = boundary.getPath().getArray();
+		    var pathStr		    = '';
+		    var comma		    = '';
 		    for(var pi = 0; pi < path.length; pi++)
 		    {
-	    		var point	= path[pi];
-	    		pathStr		+= comma +
+	    		var point	    = path[pi];
+	    		pathStr		    += comma +
 	    				  '(' + point.lat().toFixed(6) + ',' +
 	    					point.lng().toFixed(6) + ')';
-	    		comma		= ',';
+	    		comma		    = ',';
 		    }
 		    form.Boundary.value	= pathStr;
 		}
@@ -803,7 +782,7 @@ function getMap()
 			   this);
     }
     return false;
-}		// getMap
+}		// function getMap
 
 /************************************************************************
  *  function displayReferences											*
@@ -824,7 +803,7 @@ function displayReferences()
     location	    	= 'getIndividualsByLocation.php?idlr=' + idlr +
                                 '&lang=' + lang;
     return false;
-}		// displayReferences
+}		// function displayReferences
 
 /************************************************************************
  *  function editPictures												*

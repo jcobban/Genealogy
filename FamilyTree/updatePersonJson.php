@@ -186,8 +186,9 @@ use \Exception;
  *		2017/08/25		change implementation so $event always set	    *
  *		2017/09/28		change class LegacyEvent to class Event		    *
  *		2017/10/13		class LegacyIndiv renamed to class Person	    *
- *	History of updatePersonJson.php:
+ *	History of updatePersonJson.php:                                    *
  *		2019/06/01      created from updateIndividXml.php               *
+ *		2019/10/16      support fields prefixed with Christening        *
  *																	    *
  *  Copyright &copy; 2019 James A. Cobban							    *
  ************************************************************************/
@@ -352,6 +353,7 @@ try {
 	            }
 	
 	            case 'chrisdate':
+	            case 'christeningdate':
 	            {
 	                $eventDate	= $value;
 	                $event		= $person->getChristeningEvent(true);
@@ -431,6 +433,7 @@ try {
 	
 	            case 'birthlocation':
 	            case 'chrislocation':
+	            case 'christeninglocation':
 	            case 'deathlocation':
 	            case 'buriedlocation':
 	            case 'eventlocation':
@@ -463,6 +466,7 @@ try {
 	
 	            case 'birthaddress':
 	            case 'chrisaddress':
+	            case 'christeningaddress':
 	            case 'deathaddress':
 	            case 'buriedaddress':
 	            {			// address not currently supported
@@ -472,6 +476,7 @@ try {
 	
 	            case 'birthnote':
 	            case 'chrisnote':
+	            case 'christeningnote':
 	            case 'deathnote':
 	            case 'buriednote':
 	            case 'baptismnote':
@@ -579,7 +584,7 @@ try {
 	                    {	            // have an event
 	                        if ($idir > 0 && !is_null($event))
 	                        {
-	                            $event->save();
+	                            $event->save(false);
 	                            $command        = $event->getLastSqlCmd();
 	                            print "$comma\"cmd\": " . json_encode($command);
 	                            $ider           = $event['ider'];
@@ -790,7 +795,7 @@ try {
         $msg	.= "No individual identified. ";
     else
     if (canUser('edit'))
-    {		// user authorized to update database
+    {		                // user authorized to update database
         // write the changes to the individual record
         $person->save(false);
         $command                    = $person->getLastSqlCmd();
@@ -798,9 +803,29 @@ try {
         // in case its a new individual get IDIR assigned by server
         $idir	                    = $person->getIdir();
 
+        // check married name records
+        if ($person['gender'] == Person::FEMALE)
+        {                   // female   
+            $nameset    = new RecordSet('Names',
+                                        array('idir'        => $idir,
+                                              '`order`'     => -1));
+            foreach ($nameset as $idnx => $name)
+            {               // loop through married names
+                $marr   = new Family(array('idmr'       => $name['idmr']));
+                if ($marr['marriednamerule'] == 1)
+                {           // wife's married surname is husband's surname
+                    $name['surname']        = $marr['husbsurname'];
+                    $name->save(false);
+                    $command                = $name->getLastSqlCmd();
+                    print "$comma\"name$idnx\": " . json_encode($command);
+                }           // wife's married surname is husband's surname
+            }               // loop through married names
+        }                   // female
+
+        $ie                         = 0;
         // save any pending instances of Event
         foreach($events as $ie => $event)
-        {		// create or update events
+        {		            // create or update events
             if (!is_null($event))
             {
                 $event->set('idir', $idir);
@@ -808,14 +833,14 @@ try {
                     $event->get('idet') == Event::ET_BIRTH)
                 {
                     $person->set('birthsd', $event->get('eventsd'));
-                    $person->save();
+                    $person->save(false);
                     $command            = $person->getLastSqlCmd();
                     print "$comma\"person$ie\": " . json_encode($command);
                     $command            = $person->getPriName()->getLastSqlCmd();
                     if ($command !== '')
                         print "$comma\"name$ie\": " . json_encode($command);
                 }
-                $event->save();
+                $event->save(false);
                 $command            = $event->getLastSqlCmd();
                 print "$comma\"eventCmd$ie\": " . json_encode($command) .
                         ",\n\"event$ie\": " . $event->toJson(false);
@@ -839,7 +864,7 @@ try {
         {		            // individual added to family
             try {
                 $childr		        = $family->addChild($idir);
-                $childr->save(true);
+                $childr->save(false);
                 $command            = $childr->getLastSqlCmd();
                 print "$comma\"child$ie\": " . json_encode($command);
                 print "$comma\"child\": " . $childr->toJson(false);

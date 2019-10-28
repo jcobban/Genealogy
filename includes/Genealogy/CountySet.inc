@@ -95,10 +95,10 @@ class CountySet extends RecordSet
 		    throw new Exception("CountySet::getWhere:: parms=" .
 							print_r($this->parms, true));   
 
-		$where		= '';
-		$and		= 'WHERE ';
-		$cc		= null;
-		$state		= null;
+		$where      		= '';
+		$and        		= 'WHERE ';
+		$cc	        	    = null;
+		$state      		= null;
 
 		if (!is_array($this->sqlParms))
 		    $this->sqlParms		= array();
@@ -119,7 +119,7 @@ class CountySet extends RecordSet
 				{
 				    if (is_string($value) && strlen($value) > 0)
 				    {
-						$cc			= $value;
+						$cc			        = $value;
 						if ($state)
 						    $this->domain	= $cc . $state;
 				    }
@@ -147,7 +147,7 @@ class CountySet extends RecordSet
 				    else
 				    {		// or expression
 						$warn	.= "<p>CountySet::getWhere: " .
-							       "Unsupported value for `$fldName`=" .
+							       "Unsupported value for `$fldname`=" .
 							       print_r($value, true) . "</p>\n";
 				    }		// or expression
 				    break;

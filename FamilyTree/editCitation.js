@@ -46,41 +46,10 @@ window.onload	= loadEdit;
  *  If this dialog is opened in a half window then any child dialogs	*
  *  are opened in the other half of the window.							*
  ************************************************************************/
-var childFrameClass	= 'right';
+var childFrameClass	    = 'right';
 
 /************************************************************************
- * specify the style for tinyMCE editing								*
- ************************************************************************/
-var	activateMCE	= true;
-for (var key in args)
-{		// loop through args
-    if (key == 'text')
-		activateMCE	= false;
-}
-if (activateMCE)
-{
-tinyMCE.init({
-		mode			: "textareas",
-		theme			: "advanced",
-		plugins			: "spellchecker,advhr,preview", 
-				
-		// Theme options - button# indicated the row# only
-		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-		forced_root_block	: false,
-		forced_root_block	: false,
-		content_css		: "/styles.css",
-
-});
-}
-
-/************************************************************************
- *  loadEdit																*
+ *  function loadEdit													*
  *																		*
  *  This function is called when the page has been loaded.				*
  *  Initialize elements.												*
@@ -127,19 +96,19 @@ function loadEdit()
 		    {	// take action on specific elements
 				case 'IDSR':
 				{		// source selection list
-				    element.onclick	= sourceClick;
+				    element.addEventListener('click', sourceClick);
 				    break;
 				}		// source selection list
-    
+
 				case 'update':
 				{		// <button id='update'>
-				    element.onclick	= updateCitation;
+				    element.addEventListener('click', updateCitation);
 				    break;
 				}		// update button
 
 				case 'Pictures':
 				{		// <button id='Pictures'>
-				    element.onclick	= editPictures;
+				    element.addEventListener('click', editPictures);
 				    break;
 				}		// <button id='Pictures'>
 
@@ -149,25 +118,25 @@ function loadEdit()
 				    element.onchange	= change;	// default handler
 				    break;
 				}
-    
+
 		    }	// take action on specific elements
 		}		// loop through all elements in the form
     }			// loop through all forms in the document
-}		// loadEdit
+}		// function loadEdit
 
 /************************************************************************
- *  validateForm														*
+ *  function validateForm												*
  *																		*
- *  Ensure that the data entered by the user has been minimally				*
+ *  Ensure that the data entered by the user has been minimally			*
  *  validated before submitting the form.								*
  ************************************************************************/
 function validateForm()
 {
     return true;
-}		// validateForm
+}		// function validateForm
 
 /************************************************************************
- *  resetForm																*
+ *  function resetForm													*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
@@ -175,16 +144,17 @@ function validateForm()
 function resetForm()
 {
     return true;
-}	// resetForm
+}	// function resetForm
 
 /************************************************************************
- *  sourceClick																*
+ *  function sourceClick												*
  *																		*
- *  This method is called when the user clicks on a selection				*
- *  list of sources. 														*
+ *  This method is called when the user clicks on a selection			*
+ *  list of sources. 													*
  *																		*
- *  Parameters:																*
- *		index		the numeric index of the source selection list.				*
+ *  Parameters:															*
+ *      this    <select id="IDSR">                                      *
+ *		index	the numeric index of the source selection list.			*
  *				The name field of this selection element is				*
  *				'Source' + index										*
  ************************************************************************/
@@ -192,7 +162,7 @@ function resetForm()
 function sourceClick(index)
 {
     var	citForm		= document.citForm;
-    var	elt		= citForm.elements['IDSR'];
+    var	elt		    = citForm.elements['IDSR'];
     if (elt.length > 1)
     {		// select element has already been populated
 		return;
@@ -202,17 +172,17 @@ function sourceClick(index)
     HTTP.getXML('/FamilyTree/getSourcesXml.php?name=IDSR',
 				gotSources,
 				noSources);
-}	// sourceClick
+}	// function sourceClick
 
 /************************************************************************
- *  gotSources																*
+ *  function gotSources													*
  *																		*
  *  This method is called when the XML file representing				*
- *  the list of sources from the database is retrieved.						*
+ *  the list of sources from the database is retrieved.					*
  ************************************************************************/
 function gotSources(xmlDoc)
 {
-    var	citForm	= document.citForm;
+    var	citForm	    = document.citForm;
 
     // get the name of the associated select element
     var nameElts	= xmlDoc.getElementsByTagName('name');
@@ -223,7 +193,7 @@ function gotSources(xmlDoc)
     }		// name returned
     else
     {		// name not returned
-		alert("editEventIndiv.js: gotSources: name value not returned from getSourcesXml.php");
+		alert("editCitation.js: gotSources: name value not returned from getSourcesXml.php");
 		return;
     }		// name not returned
 
@@ -257,38 +227,45 @@ function gotSources(xmlDoc)
 		if (value == oldValue)
 		    elt.selectedIndex	= i;	
     }		// loop through source nodes
-		
-}		// gotSources
+
+}		// function gotSources
 
 /************************************************************************
- *  noSources																*
+ *  function noSources													*
  *																		*
- *  This method is called if there is no sources file.						*
+ *  This method is called if there is no sources file.					*
  ************************************************************************/
 function noSources()
 {
     alert("editCitation: noSources error");
-}		// noSources
+}		// function noSources
 
 /************************************************************************
- *  updateCitation														*
+ *  function updateCitation												*
  *																		*
  *  This method is called when the user requests that the				*
  *  citation be updated.  This is passed using AJAX to the				*
- *  updateCitation.php script.												*
+ *  updateCitation.php script.											*
  *																		*
  *  Input:																*
- *		this		<button id='update'>										*
+ *		this		<button id='update'>								*
+ *		ev          onclick Event                                       *
  ************************************************************************/
 
-function updateCitation()
+function updateCitation(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     var	citForm		= document.citForm;
-    var	opener	= null;
+    var	opener	    = null;
     if (window.frameElement && window.frameElement.opener)
-		opener	= window.frameElement.opener;
+		opener	    = window.frameElement.opener;
     else
-		opener	= window.opener;
+		opener	    = window.opener;
     if (opener)
     {		// notify opener of change
 		var	formId		= 'citTable';
@@ -354,67 +331,81 @@ function updateCitation()
 					"form with id='" + formId +
 					"' not found in opener's page"); 
     }		// notify opener of change
-    var	parms	= {};
-    for (i=0; i < citForm.elements.length; i++)
-    {			// loop through all elements in the form
-		var	elt		= citForm.elements[i];
-		// copy element name and value to parms object
-		if (elt.nodeName.toUpperCase() == 'SELECT')
-		{		// <select>
-		    parms[elt.name]	= elt.options[elt.selectedIndex].value;
-		}		// <select>
-		else
-		if (elt.nodeName.toUpperCase() == 'TEXTAREA' &&
-		    activateMCE)
-		{		// <textarea>
-		    parms[elt.name]	= tinyMCE.get(elt.name).getContent();
-		}		// <textarea>
-		else
-		    parms[elt.name]	= elt.value;
-    }			// loop through all elements in the form
 
-    // update the citation in the database
-    HTTP.post('/FamilyTree/updateCitation.php',
-		      parms,
-		      gotCitation,
-		      noCitation);
-}	// updateCitation
+    if (debug.toLowerCase() == 'y')
+        citForm.submit();
+    else
+    {               // use AJAX
+	    var	parms	= {};
+	    for (i=0; i < citForm.elements.length; i++)
+	    {			// loop through all elements in the form
+			var	elt		= citForm.elements[i];
+			// copy element name and value to parms object
+			if (elt.nodeName.toUpperCase() == 'SELECT')
+			{		// <select>
+			    parms[elt.name]	= elt.options[elt.selectedIndex].value;
+			}		// <select>
+			else
+			if (elt.nodeName.toUpperCase() == 'TEXTAREA' &&
+			    activateMCE)
+			{		// <textarea>
+			    parms[elt.name]	= tinyMCE.get(elt.name).getContent();
+			}		// <textarea>
+			else
+			    parms[elt.name]	= elt.value;
+	    }			// loop through all elements in the form
+
+	    // update the citation in the database
+	    HTTP.post('/FamilyTree/updateCitation.php',
+			      parms,
+			      gotCitation,
+			      noCitation);
+    }               // use AJAX
+}	// function updateCitation
 
 /************************************************************************
- *  gotCitation																*
+ *  function gotCitation												*
  *																		*
  *  This method is called when the XML file representing				*
- *  the list of sources from the database is retrieved.						*
+ *  the updated Citation is returned from the server.                   *
  ************************************************************************/
 function gotCitation(xmlDoc)
 {
     var	citForm	= document.citForm;
     closeFrame();
-}		// gotCitation
+}		// function gotCitation
 
 /************************************************************************
- *  noCitation																*
+ *  function noCitation													*
  *																		*
- *  This method is called if there is no sources file.						*
+ *  This method is called if the server is unable to return the         *
+ *  XML file representing the updated Citation.                         *
  ************************************************************************/
 function noCitation()
 {
     alert("editCitation: noCitation error");
-}		// noCitation
+}		// function noCitation
 
 /************************************************************************
- *  editPictures														*
+ *  function editPictures												*
  *																		*
- *  This is the onclick method of the "Edit Pictures" button.  				*
- *  It is called when the user requests to edit								*
- *  information about the Pictures associated with the citation				*
- *  that are recorded by instances of Picture.								*
+ *  This is the onclick method of the "Edit Pictures" button.  			*
+ *  It is called when the user requests to edit							*
+ *  information about the Pictures associated with the citation			*
+ *  that are recorded by instances of Picture.							*
  *																		*
- *  Parameters:																*
- *		this		a <button> element										*
+ *  Parameters:															*
+ *		this		a <button> element									*
+ *		ev          onclick Event                                       *
  ************************************************************************/
-function editPictures()
+function editPictures(ev)
 {
+    if (!ev)
+    {		// browser is not W3C compliant
+		ev	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	picIdType	= form.PicIdType.value;
     var	idsx;
@@ -434,16 +425,17 @@ function editPictures()
 				   this);
     }		// unable to identify record to associate with
     return true;
-}	// editPictures
+}	// function editPictures
 
 /************************************************************************
- *  ecKeyDown																*
+ *  function ecKeyDown													*
  *																		*
- *  The key combinations Ctrl-S and Alt-U are interpreted to apply the		*
- *  update, as shortcut alternatives to using the mouse to click the 		*
+ *  The key combinations Ctrl-S and Alt-U are interpreted to apply the	*
+ *  update, as shortcut alternatives to using the mouse to click the 	*
  *  Update Citation button.												*
  *																		*
- *  Parameters:																*
+ *  Parameters:															*
+ *      this    <input type="text">                                     *
  *		e		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function ecKeyDown(e)
@@ -452,12 +444,12 @@ function ecKeyDown(e)
     {		// browser is not W3C compliant
 		e	=  window.event;	// IE
     }		// browser is not W3C compliant
-    var	code	= e.keyCode;
+    var	code	= e.key;
 
     // take action based upon code
     switch (code)
     {
-		case 83:
+		case 's':
 		{		// letter 'S'
 		    if (e.ctrlKey)
 		    {		// ctrl-S
@@ -468,7 +460,7 @@ function ecKeyDown(e)
 		    break;
 		}		// letter 'S'
 
-		case 85:
+		case 'u':
 		{		// letter 'U'
 		    if (e.altKey)
 		    {		// alt-U
@@ -481,5 +473,5 @@ function ecKeyDown(e)
     }	    // switch on key code
 
     return;
-}		// ecKeyDown
+}		// function ecKeyDown
 

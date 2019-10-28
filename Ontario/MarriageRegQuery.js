@@ -85,9 +85,9 @@ function loadCounties()
 			    popupLoading(element);
 			    // get the counties information file
 			    HTTP.getXML("/Canada/CountiesListXml.php?Domain=" +
-						form.RegDomain.value,
-					gotCountiesFile,
-					noCountiesFile);
+				    		form.RegDomain.value,
+					        gotCountiesFile,
+					        noCountiesFile);
 			    break;
 			}
 

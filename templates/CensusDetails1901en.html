@@ -9,462 +9,462 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs">
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
-    <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">Canada</a>:
-    <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>:
-    <a href="/database/QueryDetail.php?Census=CA1901&amp;lang=$LANG">
-        1901 Census Search
-    </a>:
-    <a onclick="history.back(); return false;" href="dummy">
-        Search Results
-    </a>:
-    <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;lang=$LANG">
-        District $DISTRICT $DISTNAME Summary</a>:
-    <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;lang=$LANG">
-        Division Details
-    </a>:
-	<a href="CensusResponse.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;OrderBy=Line&amp;Page=$PAGE&amp;lang=$LANG">
-		Page $PAGE
-    </a>:
-  </div> <!-- id="breadcrumbs" -->
-
-  <div class="body">
-    <h1>
-      <span class="right">
-		<a href="/database/CensusDetailsHelpen.html" target="help">? Help</a>
-      </span>
-		1901 Census of Canada: Details
-      <div style="clear: both;"></div>
-    </h1>
-    $TRACE
-    $MSG
-    <div class="center" id="topBrowse">
-      <span class="left" id="topPrev">
-		<a href="CensusDetails.php?Census=$CENSUSID&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$PREVLINE&amp;lang=$LANG">&lt;---</a>
-      </span>
-      <span class="right" id="topNext">
-		<a href="CensusDetails.php?Census=$CENSUSID&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$NEXTLINE&amp;lang=$LANG">---&gt;</a>
-      </span>
-		dist $DISTRICT $DISTNAME, 
-        subdist $SUBDISTRICT $SUBDISTNAME, 
-        <span id="division">div $DIVISION</span>
-		 page $PAGE
-      <div style="clear: both;"></div>
+    <div id="breadcrumbs">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">Canada</a>:
+      <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>:
+      <a href="/database/QueryDetail.php?Census=CA1901&amp;lang=$LANG">
+          1901 Census Search
+      </a>:
+      <a onclick="history.back(); return false;" href="dummy">
+          Search Results
+      </a>:
+      <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;lang=$LANG">
+          District $DISTRICT $DISTNAME Summary</a>:
+      <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;lang=$LANG">
+          Division Details
+      </a>:
+	  <a href="CensusResponse.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;OrderBy=Line&amp;Page=$PAGE&amp;lang=$LANG">
+		  Page $PAGE
+      </a>:
+    </div> <!-- id="breadcrumbs" -->
+  
+    <div class="body">
+      <h1>
+        <span class="right">
+		  <a href="/database/CensusDetailsHelpen.html" target="help">? Help</a>
+        </span>
+		  1901 Census of Canada: Details
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <div class="center" id="topBrowse">
+        <span class="left" id="topPrev">
+		  <a href="CensusDetails.php?Census=$CENSUSID&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$PREVLINE&amp;lang=$LANG">&lt;---</a>
+        </span>
+        <span class="right" id="topNext">
+		  <a href="CensusDetails.php?Census=$CENSUSID&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$NEXTLINE&amp;lang=$LANG">---&gt;</a>
+        </span>
+		  dist $DISTRICT $DISTNAME, 
+          subdist $SUBDISTRICT $SUBDISTNAME, 
+          <span id="division">div $DIVISION</span>
+		   page $PAGE
+        <div style="clear: both;"></div>
+      </div>
+      <table class="details" id="dataTable" $CELLSPACING>
+	    <thead>
+          <!--- Put out the column headers -->
+		  <tr>
+		    <th class="colhead">
+		    Field Name
+		    </th>
+		    <th class="colhead">
+		    Value
+		    </th>
+		    <th class="colhead">
+		    Field Name
+		    </th>
+		    <th class="colhead">
+		    Value
+		    </th>
+		  </tr>
+	    </thead>
+        <tbody>
+		  <tr>
+		    <th class="label">
+		      Province 
+		    </th>
+		    <td class="odd">
+		      $PROVINCE 
+		    </td>
+		    <th class="label">
+		      District ID 
+		    </th>
+		    <td class="odd right">
+		      $DISTRICT 
+		    </td>
+   
+		  </tr>
+		  <tr>
+		    <th class="label">
+		      Sub-District ID 
+		    </th>
+		    <td class="odd">
+		      $SUBDISTRICT 
+		    </td>
+		    <th class="label">
+		      Division 
+		    </th>
+		    <td class="odd right">
+		      $DIVISION 
+		    </td>
+   
+		  </tr>
+		  <tr>
+		    <th class="label">
+		      Page 
+		    </th>
+		    <td class="odd right">
+		      <a href="CensusResponse.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;OrderBy=Line&amp;Page=$PAGE&amp;lang=$LANG">
+			  $PAGE</a>
+		    </td>
+		    <th class="label">
+		      Line 
+		    </th>
+		    <td class="odd right">
+		      $LINE 
+		    </td>
+   
+		  </tr>
+		  <tr>
+		    <th class="label">
+		      Family 
+		    </th>
+		    <td class="odd right">
+		      <a href="CensusResponse.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;OrderBy=Line&amp;Family=$family&amp;lang=$LANG">
+			  $family</a>
+		    </td>
+   
+		  </tr>
+		  <tr>
+		    <th class="label">
+		      Surname 
+		    </th>
+		    <td class="odd">
+		      $surname
+		    </td>
+		    <th class="label">
+		      Surname SOUNDEX 
+		    </th>
+		    <td class="odd">
+		      $surnamesoundex
+		    </td>
+   
+		  </tr>
+		  <tr>
+		    <th class="label">
+		      Given Names 
+		    </th>
+		    <td class="odd">
+		      $givennames 
+		    </td>
+		    <th class="label">
+		      Sex 
+		    </th>
+		    <td class="odd center">
+		      $sex 
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Race
+		    </th>
+		    <td class="odd center">
+		      $race
+		    </td>
+		    <th class="label">
+		      Relation 
+		    </th>
+		    <td class="odd">
+		      $relation 
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Marital Status 
+		    </th>
+		    <td class="odd center">
+		      $mstat 
+		    </td>
+		    <th class="label">
+		      Birth Date
+		    </th>
+		    <td class="odd">
+		      $bdate
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Birth Year Text
+		    </th>
+		    <td class="odd right">
+		      $byeartxt
+		    </td>
+		    <th class="label">
+		      Birth Year 
+		    </th>
+		    <td class="odd right">
+		      $byear 
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Age 
+		    </th>
+		    <td class="odd right">
+		      $age 
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Birth Place 
+		    </th>
+		    <td class="odd">
+		      $bplace 
+		    </td>
+		    <th class="label">
+		      Rural or Urban?
+		    </th>
+		    <td class="odd center">
+		      $bplaceru 
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Immigration Year
+		    </th>
+		    <td class="odd right">
+		      $immyear
+		    </td>
+		    <th class="label">
+		      Naturalization Year 
+		    </th>
+		    <td class="odd right">
+		      $natyear 
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Origin 
+		    </th>
+		    <td class="odd">
+		      $origin 
+		    </td>
+		    <th class="label">
+		      Nationality
+		    </th>
+		    <td class="odd">
+		      $nationality
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Religion 
+		    </th>
+		    <td class="odd">
+		      $religion 
+		    </td>
+		    <th class="label">
+		      Occupation 
+		    </th>
+		    <td class="odd">
+		      $occupation 
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Address
+		    </th>
+		    <td class="odd" colspan="3">
+		      $address
+		    </td>
+		  </tr>
+  
+		  <tr>
+		    <th class="label">
+		      Remarks 
+		    </th>
+		    <td class="odd" colspan="3">
+		      $remarks
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Own Means
+		    </th>
+		    <td class="odd center">
+		      $ownmeans
+		    </td>
+		    <th class="label">
+		      Employer 
+		    </th>
+		    <td class="odd center">
+		      $employer
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Employee
+		    </th>
+		    <td class="odd center">
+		      $employee
+		    </td>
+		    <th class="label">
+		      Own Account
+		    </th>
+		    <td class="odd center">
+		      $ownacct
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Factory or Home?
+		    </th>
+		    <td class="odd center">
+		      $facthome
+		    </td>
+		    <th class="label">
+		      Months at Factory
+		    </th>
+		    <td class="odd right">
+		      $monthsfact
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Months at Home
+		    </th>
+		    <td class="odd right">
+		      $monthshome
+		    </td>
+		    <th class="label">
+		      Months at Other
+		    </th>
+		    <td class="odd right">
+		      $monthsother
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Income Employment
+		    </th>
+		    <td class="odd right">
+		      $incomeemp
+		    </td>
+		    <th class="label">
+		      Income Other
+		    </th>
+		    <td class="odd right">
+		      $incomeoth
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Months School
+		    </th>
+		    <td class="odd right">
+		      $monthsschool 
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Can Read
+		    </th>
+		    <td class="odd center">
+		      $canread
+		    </td>
+		    <th class="label">
+		      Can Write
+		    </th>
+		    <td class="odd center">
+		      $canwrite
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Speak English
+		    </th>
+		    <td class="odd center">
+		      $spkenglish
+		    </td>
+		    <th class="label">
+		      Speak French
+		    </th>
+		    <td class="odd center">
+		      $spkfrench
+		    </td>
+		  </tr>
+   
+		  <tr>
+		    <th class="label">
+		      Mother Tongue
+		    </th>
+		    <td class="odd">
+		      $mothertongue
+		    </td>
+		    <th class="label">
+		      Infirmities
+		    </th>
+		    <td class="odd">
+		      $infirmities
+		    </td>
+		  </tr>
+  
+		  <tr>
+		    <th class="label">
+		      Family Tree ID 
+		    </th>
+		    <td class="odd right">
+		      <a href="/FamilyTree/Person.php?idir=$idir&amp;lang=$LANG"
+			      id="IDIR" target="_blank">
+			  $idir</a>
+		    </td>
+		  </tr>
+  
+		  <tr>
+		    <th class="label">
+		      District Name 
+		    </th>
+		    <td class="odd" style="min-width: 200px;">
+		      $DISTNAME 
+		    </td>
+		    <th class="label">
+		      Sub-District Name 
+		    </th>
+		    <td class="odd" style="min-width: 200px; max-width: 400px;">
+		      $SUBDISTNAME
+		    </td>
+		  </tr>
+        </tbody>
+      </table>
+    </div> <!-- class="body" -->
+    <div class="hidden" id="templates">
+        <span id="invalidCensusId">
+            Invalid value of CensusID='$value'. 
+        </span>
+        <span id="invalidDomainId">
+            '$state' is not a supported province/state identifier
+            for country code '$cc'. 
+        </span>
+        <span id="invalidDistId">
+            District='$value' is not defined within the Census.
+        </span>
+        <span id="invalidSubdistId">
+            SubDistrict='$value' Division='$div'
+            is not defined within the District. 
+        </span>
+        <span id="invalidPage">
+            Page='$value' is not defined within the SubDistrict.
+        </span>
     </div>
-    <table class="details" id="dataTable" $CELLSPACING>
-     <thead>
-     <!--- Put out the column headers -->
-      <tr>
-		<th class="colhead">
-		  Field Name
-		</th>
-		<th class="colhead">
-		  Value
-		</th>
-		<th class="colhead">
-		  Field Name
-		</th>
-		<th class="colhead">
-		  Value
-		</th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-		<th class="label">
-		    Province 
-		</th>
-		<td class="odd">
-		    $PROVINCE 
-		</td>
-		<th class="label">
-		    District ID 
-		</th>
-		<td class="odd right">
-		    $DISTRICT 
-		</td>
- 
-      </tr>
-      <tr>
-		<th class="label">
-		    Sub-District ID 
-		</th>
-		<td class="odd">
-		    $SUBDISTRICT 
-		</td>
-		<th class="label">
-		    Division 
-		</th>
-		<td class="odd right">
-		    $DIVISION 
-		</td>
- 
-      </tr>
-      <tr>
-		<th class="label">
-		    Page 
-		</th>
-		<td class="odd right">
-		    <a href="CensusResponse.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;OrderBy=Line&amp;Page=$PAGE&amp;lang=$LANG">
-			$PAGE</a>
-		</td>
-		<th class="label">
-		    Line 
-		</th>
-		<td class="odd right">
-		    $LINE 
-		</td>
- 
-      </tr>
-      <tr>
-		</td>
-		<th class="label">
-		    Family 
-		</th>
-		<td class="odd right">
-		    <a href="CensusResponse.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;OrderBy=Line&amp;Family=$family&amp;lang=$LANG">
-			$family</a>
-		</td>
- 
-      </tr>
-      <tr>
-		<th class="label">
-		    Surname 
-		</th>
-		<td class="odd">
-		    $surname
-		</td>
-		<th class="label">
-		    Surname SOUNDEX 
-		</th>
-		<td class="odd">
-		    $surnamesoundex
-		</td>
- 
-      </tr>
-      <tr>
-		<th class="label">
-		    Given Names 
-		</th>
-		<td class="odd">
-		    $givennames 
-		</td>
-		<th class="label">
-		    Sex 
-		</th>
-		<td class="odd center">
-		    $sex 
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Race
-		</th>
-		<td class="odd center">
-		    $race
-		</td>
-		<th class="label">
-		    Relation 
-		</th>
-		<td class="odd">
-		    $relation 
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Marital Status 
-		</th>
-		<td class="odd center">
-		    $mstat 
-		</td>
-		<th class="label">
-		    Birth Date
-		</th>
-		<td class="odd">
-		    $bdate
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Birth Year Text
-		</th>
-		<td class="odd right">
-		    $byeartxt
-		</td>
-		<th class="label">
-		    Birth Year 
-		</th>
-		<td class="odd right">
-		    $byear 
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Age 
-		</th>
-		<td class="odd right">
-		    $age 
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Birth Place 
-		</th>
-		<td class="odd">
-		    $bplace 
-		</td>
-		<th class="label">
-		    Rural or Urban?
-		</th>
-		<td class="odd center">
-		    $bplaceru 
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Immigration Year
-		</th>
-		<td class="odd right">
-		    $immyear
-		</td>
-		<th class="label">
-		    Naturalization Year 
-		</th>
-		<td class="odd right">
-		    $natyear 
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Origin 
-		</th>
-		<td class="odd">
-		    $origin 
-		</td>
-		<th class="label">
-		    Nationality
-		</th>
-		<td class="odd">
-		    $nationality
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Religion 
-		</th>
-		<td class="odd">
-		    $religion 
-		</td>
-		<th class="label">
-		    Occupation 
-		</th>
-		<td class="odd">
-		    $occupation 
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Address
-		</th>
-		<td class="odd" colspan="3">
-		    $address
-		</td>
-      </tr>
-
-      <tr>
-		<th class="label">
-		    Remarks 
-		</th>
-		<td class="odd" colspan="3">
-		    $remarks
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Own Means
-		</th>
-		<td class="odd center">
-		    $ownmeans
-		</td>
-		<th class="label">
-		    Employer 
-		</th>
-		<td class="odd center">
-		    $employer
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Employee
-		</th>
-		<td class="odd center">
-		    $employee
-		</td>
-		<th class="label">
-		    Own Account
-		</th>
-		<td class="odd center">
-		    $ownacct
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Factory or Home?
-		</th>
-		<td class="odd center">
-		    $facthome
-		</td>
-		<th class="label">
-		    Months at Factory
-		</th>
-		<td class="odd right">
-		    $monthsfact
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Months at Home
-		</th>
-		<td class="odd right">
-		    $monthshome
-		</td>
-		<th class="label">
-		    Months at Other
-		</th>
-		<td class="odd right">
-		    $monthsother
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Income Employment
-		</th>
-		<td class="odd right">
-		    $incomeemp
-		</td>
-		<th class="label">
-		    Income Other
-		</th>
-		<td class="odd right">
-		    $incomeoth
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Months School
-		</th>
-		<td class="odd right">
-		    $monthsschool 
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Can Read
-		</th>
-		<td class="odd center">
-		    $canread
-		</td>
-		<th class="label">
-		    Can Write
-		</th>
-		<td class="odd center">
-		    $canwrite
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Speak English
-		</th>
-		<td class="odd center">
-		    $spkenglish
-		</td>
-		<th class="label">
-		    Speak French
-		</th>
-		<td class="odd center">
-		    $spkfrench
-		</td>
-      </tr>
- 
-      <tr>
-		<th class="label">
-		    Mother Tongue
-		</th>
-		<td class="odd">
-		    $mothertongue
-		</td>
-		<th class="label">
-		    Infirmities
-		</th>
-		<td class="odd">
-		    $infirmities
-		</td>
-      </tr>
-
-      <tr>
-		<th class="label">
-		    Family Tree ID 
-		</th>
-		<td class="odd right">
-		    <a href="/FamilyTree/Person.php?idir=$idir&amp;lang=$LANG"
-			    id="IDIR" target="_blank">
-			$idir</a>
-		</td>
-      </tr>
-
-      <tr>
-		<th class="label">
-		    District Name 
-		</th>
-		<td class="odd" style="min-width: 200px;">
-		    $DISTNAME 
-		</td>
-		<th class="label">
-		    Sub-District Name 
-		</th>
-		<td class="odd" style="min-width: 200px; max-width: 400px;">
-		    $SUBDISTNAME
-		</td>
-     </tbody>
-    </table>
-  </div> <!-- class="body" -->
-  <div class="hidden" id="templates">
-      <span id="invalidCensusId">
-          Invalid value of CensusID='$value'. 
-      </span>
-      <span id="invalidDomainId">
-          '$state' is not a supported province/state identifier
-          for country code '$cc'. 
-      </span>
-      <span id="invalidDistId">
-          District='$value' is not defined within the Census.
-      </span>
-      <span id="invalidSubdistId">
-          SubDistrict='$value' Division='$div'
-          is not defined within the District. 
-      </span>
-      <span id="invalidPage">
-          Page='$value' is not defined within the SubDistrict.
-      </span>
-  </div>
     <script src="/jscripts/util.js" type="application/javaScript">
     </script>
- 
+   

@@ -1,0 +1,150 @@
+<!--*********************************************************************
+ *  chooseIndividen.html												*
+ *																		*
+ *  Template to display a web page to select a specific existing		*
+ *  individualfrom the Legacy table of individuals.						*
+ *																		*
+ *  History:															*
+ *		2019/07/31      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+			  Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+			  Services
+      </a>:
+      <a href="/genCountry.php?cc=CA&lang=$LANG">
+			  Canada
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?lang=$LANG">
+			  Nominal Index
+      </a>:
+    </div>
+    <div class="body">
+      <h1>Choose Existing Person
+		  <span class="right">
+		      <a href="chooseIndividHelpen.html">Help?</a>
+		  </span>
+      </h1>
+      $TRACE
+      $MSG
+      <div class="hidden" id="errorMessages">
+          <span id="badIdir">
+            Invalid idir='$idir'.
+          </span>
+          <span id="noPerson">
+            No Person record for idir=$idir.
+          </span>
+          <span id="badIdmr">
+            Invalid idmr='$idmr'.
+          </span>
+          <span id="noFamily">
+            No Family record for parentsIdmr=$idmr. 
+          </span>
+          <span id="badBirthYear">
+            Birth year='$birthyear' invalid.  
+          </span>
+          <span id="badBirthMin">
+            Minimum Birth Year='$birthmin' invalid. 
+          </span>
+          <span id="badBirthMax">
+            Maximum Birth year='$birthmax' invalid. 
+          </span>
+          <span id="badRange">
+            Birth year range='$range' invalid. 
+          </span>
+          <span id="badOrder">
+            Maximum birth year $birthmax less than minimum birth year $birthmin. 
+          </span>
+      </div> <!-- id="errorMessages" -->
+      <form name="indForm" action="getIndivNamesXml.php" method="get">
+        <div class="row" id="searchRow">
+	      <label class="column1" for="Name">Name:</label>
+            <input type="text" name="Name" id="Name"
+                    size="64" class="white left"
+			        value="$NAME">
+	        <input type="hidden" name="Sex" id="Sex"
+			        value="$GENDER">
+	        <input type="hidden" name="IDIR" id="IDIR"
+			        value="$IDIR">
+	        <input type="hidden" name="parentsIdmr" id="parentsIdmr" 
+			        value="$IDMR">
+	        <input type="hidden" name="treename" id="treename"
+			        value="$TREENAME">
+	      <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="birthYearRow">
+	      <label class="column1" for="birthmin">Birth Year Range:</label>
+	      <input class="white rightnc" size="4" style="float: left;"
+                    name="birthmin" id="birthmin"
+			        value="$BIRTHMIN">
+	      <span class="label" for="birthmax" 
+                style="float: left; padding-left: 4px; padding-right: 4px;">to</span>
+	      <input class="white rightnc" size="4"  style="float: left;"
+                    name="birthmax" id="birthmax"
+			        value="$BIRTHMAX">
+	      <div style="clear: both;"></div>
+        </div>
+        <div class="Row" id="selectListRow">
+	      <label class="column1" for="individ">Select:</label>
+	        <select name="individ" id="individ" size="10" class="white left">
+	          <option value="0">Choose a Person</option>
+	        </select>
+	      <div style="clear: both;"></div>
+        </div>
+        <div class="Row" id="buttonRow">
+	        <button type="button" id="select">
+	          Cancel
+	        </button>
+	      <div style="clear: both;"></div>
+        </div>
+      </form>
+    </div> <!-- class="body" -->
+    <div id="templates" class="hidden">
+      <!-- the following two templates exist to permit internationalization
+		    of the button text -->
+      <button type="button" id="selectSelectTemplate">
+        Select
+      </button>
+      <button type="button" id="selectCancelTemplate">
+        Cancel
+      </button>
+    </div> <!-- id="templates" -->
+    <div id="HelpName" class="balloon">
+	  Enter the partial name of the individual you wish to choose.  Enter the
+	  surname first, then a comma followed by the given name.  As you pause in
+	  typing the name the selection list is updated from the database.
+    </div>
+    <div id="Helpindivid" class="balloon">
+	  This is a selection list of individuals presented in alphabetical order
+	  starting with the first individual whose surname is equal to the supplied
+	  surname or sorts immediately after it, and if the surname is equal
+	  the first individual whose given name is equal to or sorts immediately
+      after the supplied given name.  Click on an entry with the mouse
+      to choose it.
+    </div>
+    <div id="Helpselect" class="balloon">
+	  Once you have chosen the desired individual from the list, click on this
+	  button, or press enter, to select the individual.
+    </div>
+    <div id="Helpbirthmin" class="balloon">
+	  This field specifies the lowest birth year to use in matching individuals.
+	  If this field is blank there is no lower limit.
+    </div>
+    <div id="Helpbirthmax" class="balloon">
+	  This field specifies the highest birth year to use in matching individuals.
+	  If this field is blank there is no upper limit.
+    </div>
+    <div id="loading" class="popup">
+	  Loading...
+    </div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/chooseIndivid.js" type="application/javascript">
+    </script>

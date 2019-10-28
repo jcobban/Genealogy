@@ -784,6 +784,12 @@ class CensusLineSet extends RecordSet
 		    else
 				$page		= false;
 
+            if (!array_key_exists('count', $this->information))
+            {
+                print_r($this->information);
+                throw new Exception("information incomplete");
+            }
+
 		    if ($this->information['count'] == 0 &&
 				!$this->notPage &&
 				$page)

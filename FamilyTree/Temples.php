@@ -110,6 +110,7 @@ if ($count > 0)
 {		// query issued
 	$template->set('limit',		    $limit);
 	$template->set('offset',	    $offset);
+	$template->set('doffset',	    $offset+1);
 	$template->set('prevoffset',	$prevoffset);
 	$template->set('nextoffset',	$nextoffset);
 	$template->set('last',		    $last);

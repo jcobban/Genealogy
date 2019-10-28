@@ -8,63 +8,65 @@ use \Iterator;
 /************************************************************************
  *  Participant.inc														*
  *																		*
- *  Definition of a class representing a participant, other than the		*
+ *  Definition of a class representing a participant, other than the	*
  *  primary individual or individuals, in an event.  This class provides*
  *  access to the information in a row of the table Participants.		*
  *																		*
- *  History:																*
- *		2012/11/21		Created												*
- *		2013/08/09		base class renamed to Record						*
+ *  History:															*
+ *		2012/11/21		Created											*
+ *		2013/08/09		base class renamed to Record					*
  *		2015/09/28		migrate from MDB2 to PDO						*
- *		2017/01/19		use set in place of setField						*
+ *		2017/01/19		use set in place of setField					*
  *		2017/10/13		change class LegacyIndiv to class Person		*
  *		2017/12/18		add support for temporary fields				*
+ *		2019/07/18      use Person::getPerson                           *
+ *		2019/09/20      correct implementation of Participant::dump     *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
 /************************************************************************
- *  Participant																*
+ *  Participant															*
  *																		*
- *  Definition of a class implementing behavior for participant records		*
+ *  Definition of a class implementing behavior for participant records	*
  *  within a genealogy database.										*
  *																		*
- *		Table: Participants - Participant table								*
+ *		Table: Participants - Participant table							*
  *																		*
- *		CREATE TABLE `Participants` (										*
- *				`IDPR`				INT(10) NOT NULL AUTO_INCREMENT,		*
- *						This is a unique identifier of the record, used		*
- *						primarily to permit deletion						*
- *				`IDIME`				INT(10) DEFAULT NULL,						*
- *						The unique identifier of the record within the		*
- *						database containing information about the event		*
+ *		CREATE TABLE `Participants` (									*
+ *				`IDPR`				INT(10) NOT NULL AUTO_INCREMENT,	*
+ *						This is a unique identifier of the record, used	*
+ *						primarily to permit deletion					*
+ *				`IDIME`				INT(10) DEFAULT NULL,				*
+ *						The unique identifier of the record within the	*
+ *						database containing information about the event	*
  *						participated in.								*
- *				`IDIR`				INT(10) DEFAULT NULL,						*
+ *				`IDIR`				INT(10) DEFAULT NULL,				*
  *						The unique identifier of the non-primary		*
  *						participant in the event.						*
- *				`Role`				VARCHAR(100) DEFAULT NULL,				*
- *						The role of the participant expressed as the 		*
- *						English language identification of the role.		*
+ *				`Role`				VARCHAR(100) DEFAULT NULL,			*
+ *						The role of the participant expressed as the 	*
+ *						English language identification of the role.	*
  *						For example 'Witness', or 'Minister', or		*
- *						'Accoucheur'.										*
- *				`Type`				TINYINT(3) UNSIGNED DEFAULT NULL,		*
- *						Specifies what kind of record IDIME points to		*
- *						and the type of event within that record if the		*
+ *						'Accoucheur'.									*
+ *				`Type`				TINYINT(3) UNSIGNED DEFAULT NULL,	*
+ *						Specifies what kind of record IDIME points to	*
+ *						and the type of event within that record if the	*
  *						record documents multiple events.				*
- *				PRIMARY KEY (`IDPR`)										*
+ *				PRIMARY KEY (`IDPR`)									*
  *				KEY `IDIR` (`IDIR`)										*
- *				KEY `IDIME` (`IDIME`)										*
- *		) DEFAULT CHARSET=utf8;												*
+ *				KEY `IDIME` (`IDIME`)									*
+ *		) DEFAULT CHARSET=utf8;											*
  ************************************************************************/
 
 class Participant extends Record
 {
     /********************************************************************
-     *		constants identifying the types of events and where the details		*
+     *	constants identifying the types of events and where the details	*
      *  are located within the record identified by IDIME.				*
-     *																		*
-     *  Facts where IDIME points to an Person Record in tblIR				*
+     *																	*
+     *  Facts where IDIME points to an Person Record in tblIR			*
      ********************************************************************/
     const PTYPE_UNSPECIFIED	= 0;
     const PTYPE_BIRTH		= 2;
@@ -83,29 +85,29 @@ class Participant extends Record
     const PTYPE_LDSI		= 27;	// LDS Initiatory
 
     /********************************************************************
-     *		IDIME points to Child Record tblCR.IDCR								*
+     *	IDIME points to Child Record tblCR.IDCR							*
      ********************************************************************/
     const PTYPE_LDSP		= 17;	// LDS Sealed to Parents
 
     /********************************************************************
-     *		IDIME points to Marriage Record tblMR.idmr						*
+     *	IDIME points to Marriage Record tblMR.idmr						*
      ********************************************************************/
     const PTYPE_LDSS		= 18;	// LDS Sealed to Spouse
-    const PTYPE_MAR		= 20;	// Marriage	
+    const PTYPE_MAR		    = 20;	// Marriage	
     // expected participant roles 'Minister', 'Witness'
 				
     /********************************************************************
-     *		IDIME points to Event Record tblER.ider								*
+     *	IDIME points to Event Record tblER.ider							*
      ********************************************************************/
     const PTYPE_EVENT		= 30;	// Individual Event
     const PTYPE_MAREVENT	= 31;	// Marriage Event
 
     /********************************************************************
-     *		$intType														*
-     *																		*
+     *	Participant::$intType											*
+     *																	*
      *  Table of string descriptions for each event type				*
-     *																		*
-     *		This is intended to be public information.						*
+     *																	*
+     *	This is intended to be public information.						*
      ********************************************************************/
     static $intType = array(
 				0	=> "Unspecified",
@@ -128,8 +130,8 @@ class Participant extends Record
 
     /********************************************************************
      *  Identify type of record containing event details				*
-     *																		*
-     *		This is intended to be public information.						*
+     *																	*
+     *	This is intended to be public information.						*
      ********************************************************************/
     static $recType = array(
 				0	=> "IDIR",
@@ -150,9 +152,9 @@ class Participant extends Record
 				31	=> "IDER");
 
     /********************************************************************
-     *		Participant::$initRow												*
-     *																		*
-     *		array containing default values for a new record				*
+     *	Participant::$initRow											*
+     *																	*
+     *	array containing default values for a new record				*
      ********************************************************************/
     protected static	$initRow	= array(
 						'idpr'			=> 0,	// possibly zero
@@ -162,17 +164,17 @@ class Participant extends Record
 						'type'			=> 0);
 
     /********************************************************************
-     *		Participant::__construct										*
-     *																		*
+     *	Participant::__construct										*
+     *																	*
      *  Given the unique numeric identifier make information on a		*
-     *		event record available.												*
-     *																		*
-     *  Input:																*
-     *		$id				numeric identifier (key of Participants)		*
-     *						which is 0, or 'new', to create a new record		*
-     *						or a database record presented as an array		*
-     *																		*
-     *  Returns object containing event record.								*
+     *	event record available.											*
+     *																	*
+     *  Input:															*
+     *		$id			numeric identifier (key of Participants)		*
+     *					which is 0, or 'new', to create a new record	*
+     *					or a database record presented as an array		*
+     *																	*
+     *  Returns object containing participant record.					*
      ********************************************************************/
     function __construct($id)
     {
@@ -245,11 +247,11 @@ class Participant extends Record
     }		// Participant::__construct
 
     /********************************************************************
-     *		Participant::getIdpr												*
-     *																		*
-     *		Get unique numeric identifier of the Participant record.		*
-     *		Note that this is only initialized once the record is in the		*
-     *		database as a result of calling save.								*
+     *	Participant::getIdpr											*
+     *																	*
+     *	Get unique numeric identifier of the Participant record.		*
+     *	Note that this is only initialized once the record is in the	*
+     *	database as a result of calling save.							*
      ********************************************************************/
     function getIdpr()
     {
@@ -257,10 +259,10 @@ class Participant extends Record
     }
 
     /********************************************************************
-     *		Participant::getIdir												*
-     *																		*
-     *		Get unique numeric identifier of the Person record				*
-     *		for the participant in the event.								*
+     *	Participant::getIdir											*
+     *																	*
+     *	Get unique numeric identifier of the Person record				*
+     *	for the participant in the event.								*
      ********************************************************************/
     function getIdir()
     { 
@@ -268,12 +270,12 @@ class Participant extends Record
     }
 
     /********************************************************************
-     *		Participant::getRole												*
-     *																		*
-     *		Get the role of the participant										*
-     *																		*
-     *		Returns:														*
-     *				role of the participant as an English role name				*
+     *	Participant::getRole											*
+     *																	*
+     *	Get the role of the participant									*
+     *																	*
+     *	Returns:														*
+     *			role of the participant as an English role name			*
      ********************************************************************/
     function getRole()
     {
@@ -281,27 +283,28 @@ class Participant extends Record
     }		// Participant::getRole
 
     /********************************************************************
-     *		Participant::getIdime												*
-     *																		*
-     *		Get the unique numeric identifier of the record containing the		*
-     *		details of the event being documented.								*
+     *	Participant::getIdime											*
+     *																	*
+     *	Get the unique numeric identifier of the record containing the	*
+     *	details of the event being documented.							*
      ********************************************************************/
     function getIdime() { return $this->row['idime']; }
 
     /********************************************************************
-     *		Participant::getEventType										*
-     *																		*
-     *		Get the type of event, which indicates where the details of		*
-     *		the associated event are located.								*
+     *	Participant::getEventType										*
+     *																	*
+     *	Get the type of event, which indicates where the details of		*
+     *	the associated event are located.								*
      ********************************************************************/
     function getEventType() { return $this->row['type']; }
 
     /********************************************************************
-     *		Participant::getEventTypeText										*
-     *																		*
-     *		Get textual description of the type of event.						*
+     *	Participant::getEventTypeText									*
+     *																	*
+     *	Get textual description of the type of event.					*
      ********************************************************************/
-    function getEventTypeText() {
+    function getEventTypeText()
+    {
 		if ($this->row['type'] < 0)
 		    $retval	= "Temporary";
 		else
@@ -313,16 +316,16 @@ class Participant extends Record
     }		// Participant::getEventTypeText
 
     /********************************************************************
-     *		Participant::setIdime												*
-     *																		*
-     *		Set the unique numeric identifier of the record containing the		*
-     *		details of the fact being documented.								*
-     *																		*
+     *	Participant::setIdime											*
+     *																	*
+     *	Set the unique numeric identifier of the record containing the	*
+     *	details of the fact being documented.							*
+     *																	*
      *  Parameters:														*
-     *		    $value		new value to set								*
-     *																		*
-     *		Returns:														*
-     *				former numeric record identifier value						*
+     *	    $value		new value to set								*
+     *																	*
+     *	Returns:														*
+     *			former numeric record identifier value					*
      ********************************************************************/
     function setIdime($value)
     {
@@ -330,16 +333,16 @@ class Participant extends Record
     }		// Participant::setIdime
 
     /********************************************************************
-     *		Participant::setIdir												*
-     *																		*
-     *		Set the unique numeric identifier of the individual who is		*
-     *		a participant in the identified event.								*
-     *																		*
+     *	Participant::setIdir											*
+     *																	*
+     *	Set the unique numeric identifier of the individual who is		*
+     *	a participant in the identified event.							*
+     *																	*
      *  Parameters:														*
-     *		    $value		new value to set								*
-     *																		*
-     *		Returns:														*
-     *				former numeric record identifier value						*
+     *	    $value		new value to set								*
+     *																	*
+     *	Returns:														*
+     *		former numeric record identifier value						*
      ********************************************************************/
     function setIdir($value)
     {
@@ -347,16 +350,16 @@ class Participant extends Record
     }		// Participant::setIdir
 
     /********************************************************************
-     *		Participant::setEventType										*
-     *																		*
-     *		Set the type of event, which indicates where the details of		*
-     *		the associated fact are located.								*
-     *																		*
+     *	Participant::setEventType										*
+     *																	*
+     *	Set the type of event, which indicates where the details of		*
+     *	the associated fact are located.								*
+     *																	*
      *  Parameters:														*
-     *		    $value		new value to set								*
-     *																		*
-     *		Returns:														*
-     *				former event type value										*
+     *	    $value		new value to set								*
+     *																	*
+     *	Returns:														*
+     *		former event type value										*
      ********************************************************************/
     function setEventType($value)
     {
@@ -366,15 +369,15 @@ class Participant extends Record
     }		// Participant::setEventType
 
     /********************************************************************
-     *		Participant::setRole												*
-     *																		*
-     *		Set the role of the participant										*
-     *																		*
+     *	Participant::setRole											*
+     *																	*
+     *	Set the role of the participant									*
+     *																	*
      *  Parameters:														*
-     *		    $value		new value to set								*
-     *																		*
-     *		Returns:														*
-     *				former role of the participant as an English role name		*
+     *	    $value		new value to set								*
+     *																	*
+     *	Returns:														*
+     *		former role of the participant as an English role name		*
      ********************************************************************/
     function setRole($value)
     {
@@ -385,22 +388,22 @@ class Participant extends Record
     }		// Participant::setRole
 
     /********************************************************************
-     *		Participant::set												*
-     *																		*
-     *		Change the value of a field in the object.						*
-     *  The method validates that the supplied value is compatible with		*
-     *		the target field.												*
-     *																		*
+     *	Participant::set												*
+     *																	*
+     *	Change the value of a field in the object.						*
+     *  The method validates that the supplied value is compatible with	*
+     *	the target field.												*
+     *																	*
      *  Parameters:														*
-     *		    $field		name of field to change								*
-     *		    $value		value to set it to								*
-     *																		*
-     *		Returns:														*
-     *				previous value of the field								*
-     *																		*
-     *		Side Effects:														*
-     *		    Adds trace if $field is not already defined as a field		*
-     *		    or pseudo-field and debugging is enabled						*
+     *	    $field		name of field to change							*
+     *	    $value		value to set it to								*
+     *																	*
+     *	Returns:														*
+     *			previous value of the field								*
+     *																	*
+     *	Side Effects:													*
+     *	    Adds trace if $field is not already defined as a field		*
+     *	    or pseudo-field and debugging is enabled					*
      ********************************************************************/
     function set($field, $value)
     {
@@ -435,6 +438,8 @@ class Participant extends Record
      *  Input:															*
      *		    $label		descriptive identifier for record			*
      *		    $force		if true output even if $debug false			*
+     *		                This is deprecated,                         *
+     *		                use $warn   .= $participant->dump(...);     *
      *																	*
      *	Return:															*
      *	    string containing trace output as HTML						*
@@ -448,48 +453,46 @@ class Participant extends Record
 		// ensure that there is a label to use for the display
 		if (!is_string($label) || strlen($label) == 0)
 		{
-		    $person	= new Person(array('idir'	=> $this->get('idir')));
-		    $label	= $person->getName(Person::NAME_INCLUDE_DATES);
+		    $person	        = Person::getPerson($this->get('idir'));
+		    $label	        = $person->getName(Person::NAME_INCLUDE_DATES);
 		}
 
+	    $output	        .= "<p class='label'>\n";
+	    $output	        .= $label;
+	    $output	        .= "</p>\n";
+	    $output	        .= "<table border='1'>\n";
+	    foreach($this->row as $key => $value)
+	    {
+			$output 	.= "  <tr>\n";
+			$output 	.= "    <th class='label'>\n";
+			$output 	.= $key;
+			$output 	.= "    </th>\n";
+			$output 	.= "    <td class='dataleft'>\n";
+			$output 	.= $value;
+
+			if (strlen($value) > 0)
+			{
+			    switch($key)
+			    {
+					case 'type':
+					{
+					    $output	.= ' = ' . self::$intType[$value];
+					    break;
+					}
+
+					default:
+					{
+					    break;
+					}
+			    }	// field specific formatting
+			}	// field value not empty
+			$output 	.= "    </td>\n";
+			$output 	.= "  </tr>\n";
+	    }	// loop through keys
+	    $output	        .= "</table>\n";
+
 		if ($debug || $force)
-		{
-		    $output	.= "<p class='label'>\n";
-		    $output	.= $label;
-		    $output	.= "</p>\n";
-		    $output	.= "<table border='1'>\n";
-		    foreach($this->row as $key => $value)
-		    {
-				$output	.= "  <tr>\n";
-				$output	.= "    <th class='label'>\n";
-				$output	.= $key;
-				$output	.= "    </th>\n";
-				$output	.= "    <td class='dataleft'>\n";
-				$output	.= $value;
-
-				if (strlen($value) > 0)
-				{
-				    switch($key)
-				    {
-						case 'type':
-						{
-						    $output	.= ' = ' . self::$intType[$value];
-						    break;
-						}
-
-						default:
-						{
-						    break;
-						}
-				    }	// field specific formatting
-				}	// field value not empty
-				$output	.= "    </td>\n";
-				$output	.= "  </tr>\n";
-		    }	// loop through keys
-		    $output	.= "</table>\n";
-		}		// debug output enabled
-
-		$warn		.= $output;
+		    $warn		        .= $output;
 		return $output;
     }		// Participant::dump
 

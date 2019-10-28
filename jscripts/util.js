@@ -200,6 +200,11 @@
  *		                commonInit                                      *
  *		                reposition scrolling lines for scrolling        *
  *		                hide and restore facebook on page resize        *
+ *		2019/06/29      remove first parameter of displayDialog         *
+ *		2019/07/23      function closeFrame redirects to home page      *
+ *		                if it is invoked from a top level frame when    *
+ *		                there is no remaining history.                  *
+ *		2019/07/30      consolidate support for tinyMCE                 *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -271,6 +276,26 @@ var KEY_F11			= 122;
 var KEY_F12			= 123;
 
 /************************************************************************
+ * specify the style for tinyMCE editing								*
+ ************************************************************************/
+var	activateMCE	            = true;
+var lang                    = 'en';
+for (var key in args)
+{		// loop through args
+    if (key == 'text')
+		activateMCE	= false;
+    else
+    if (key == 'lang')
+		lang	            = args.lang;
+}
+
+if (activateMCE && tinyMCEparms && typeof tinyMCE !== 'undefined')
+{
+    // alert("tinyMCEparms=" + JSON.stringify(tinyMCEparms));
+	tinyMCE.init(tinyMCEparms);
+}
+
+/************************************************************************
  *  Global warning that Microsoft Internet Explorer doesn't work		*
  ************************************************************************/
 if (navigator.appName == 'Microsoft Internet Explorer')
@@ -280,8 +305,8 @@ if (navigator.appName == 'Microsoft Internet Explorer')
     if (result === null || result[1] < 9)
 		alert("Microsoft Internet Explorer Version: " +
 		      navigator.appVersion +
-		  " is non-standard in its implementation and many services may not work. " +
-		  "Upgrade to Internet Explorer version 9 or later, or use any other browser.");
+	  " is non-standard in its implementation and many services may not work. " +
+	  "Upgrade to Internet Explorer version 9 or later, or use any other browser.");
 }
 
 /************************************************************************
@@ -1036,7 +1061,6 @@ function keyDown(e)
 		e   	=  window.event;	// IE
     }		// browser is not W3C compliant
     var	code	= e.key;
-    alert("keydown: '$code'");
 
     // hide the help balloon on any keystroke
     if (helpDiv)
@@ -1060,7 +1084,7 @@ function keyDown(e)
 
     }	    // switch on key code
 
-    return;
+    return true;
 }		// function keyDown
 
 /************************************************************************
@@ -1130,12 +1154,12 @@ function displayHelp(element)
     // updated to use this convention
 
     // accumulate information to be used in diagnostic messages
-    var msg	= tagToString(element);
+    var msg	        = tagToString(element);
 
     // 1) try for the div with id='Help<name>'
     // 2) try without any row number at end of <name>
     // 3) try back-level page without Help prefix
-    helpDiv	= document.getElementById("Help" + helpDivName);
+    helpDiv	        = document.getElementById("Help" + helpDivName);
     if (!helpDiv)
     {		// first choice not found
 		// strip off trailing decimal digits if any representing
@@ -1578,35 +1602,45 @@ function actMouseOverHelp(element)
 function displayMenu(ev)
 {
     ev.stopPropagation();
-    var dialog              = document.getElementById('menu');
+    var menu                    = document.getElementById('menu');
 
-    // ensure the dialog is hidden before modifying it
-    dialog.style.display	= 'none';
-    dialog.style.position	= 'absolute';
-    dialog.style.visibility	= 'hidden';
-    dialog.style.display	= 'block';
+    // ensure the menu is hidden before modifying it
+    menu.style.display	        = 'none';
+    menu.style.position	        = 'absolute';
+    menu.style.visibility	    = 'hidden';
+    menu.style.display	        = 'block';
 
-	// display the dialog offset from the main menu button
+	// display the menu offset from the main menu button
     var element                 = document.getElementById('menuButton');
 	var leftOffset		        = getOffsetLeft(element);
 	var rightOffset		        = getOffsetRight(element);
 
-	var dialogWidth		        = dialog.clientWidth;
+	var dialogWidth		        = menu.clientWidth;
 	if (leftOffset - dialogWidth < 10)
 	    leftOffset	            = rightOffset + 10;
 	else
 	    leftOffset	            = leftOffset - dialogWidth - 10;
-	dialog.style.left	        = leftOffset + "px";
-    dialog.style.top	        = (getOffsetTop(element) + 10) + 'px';
+	menu.style.left	            = leftOffset + "px";
+    menu.style.top	            = (getOffsetTop(element) + 10) + 'px';
 
-    dialog.style.display 	    = 'block';
-    dialog.style.visibility	    = 'visible';
-    dialog.scrollIntoView();
+    var anchors     = menu.getElementsByTagName('a');
+    var previous    = anchors[anchors.length - 1];
+	for(var i = 0; i < anchors.length; i++)
+	{           // loop through children
+        var anchor          = anchors[i];
+        previous.nextAnchor = anchor;
+        anchor.prevAnchor   = previous;
+        previous            = anchor;
+        addEventHandler(anchor, "keydown", keyDownMenu);
+    }           // loop through children
+    menu.style.display 	        = 'block';
+    menu.style.visibility	    = 'visible';
+    menu.scrollIntoView();
     var help                    = document.getElementById('menuhelp');
     if (help)
         help.focus();
 
-	dialogDiv		    = dialog;
+	dialogDiv		    = menu;
 
     return dialogDiv;
 }		// function displayMenu
@@ -1641,18 +1675,28 @@ function displayMenu(ev)
  *		defer			if true leave the dialog hidden for the			*
  *						caller to complete and show.					*
  ************************************************************************/
-function displayDialog(dialog,
-				       templateId,
+function displayDialog(templateId,
 				       parms,
 				       element,
 				       action,
 				       defer)
 {
+    // only one modal dialog at a time is displayed
     if (dialogDiv)
-    {		// a dialog balloon is displayed
-		dialogDiv.style.display	= 'none';
-		dialogDiv		        = null;
-    }		// a dialog balloon is displayed
+    {		        // a dialog balloon is currently displayed
+		dialogDiv.style.display	= 'none';   // hide it
+		dialogDiv		        = null;     // it is no longer displayed
+    }		        // a dialog balloon is displayed
+
+    // the dialog is laid out in a common shared div
+    var	dialog	= document.getElementById('msgDiv');
+    if (dialog === null)
+    {               // belt and suspenders
+        dialog              = document.createElement('div');
+        dialog.id           = 'msgDiv';
+        dialog.className    = 'balloon';
+        document.body.appendChild(dialog);
+    }               // belt and susenders
 
     // ensure the dialog is hidden before modifying it
     dialog.style.display    	= 'none';
@@ -1665,7 +1709,16 @@ function displayDialog(dialog,
         template	            = document.getElementById(templateId);
     else
     if (typeof templateId == 'object')
+    {
         template	            = templateId;
+        templateId              = template.id;
+    }
+    else
+    {
+		alert('util.js: displayDialog: first parameter omitted');
+		return false;
+    }
+
     if (template === null)
     {
 		alert("util.js: displayDialog: could not find template with id='" +
@@ -1681,10 +1734,12 @@ function displayDialog(dialog,
 		var	form	            = createFromTemplate(template,
 								            	     parms,
 							            		     null);
+        form.id                 = '';
+
 		if (form.nodeName.toUpperCase() != 'FORM')
 		{		// catch and correct definition problem
 		    alert("util.js: displayDialog: template with id='" +
-                    templateId + "' is not an instance of <form>");
+                    templateId + "' is an instance of <" + form.nodeName + ">");
 		    form	            = document.createElement("FORM").
                                             appendChild(form);
 		}		// catch and correct definition problem
@@ -1703,6 +1758,7 @@ function displayDialog(dialog,
 		    buttons[0]	        = button;
 		}		// missing button
 
+        // set the onclick handler for all of the buttons in the dialog
 		if (action)
 		{
 		    if (action instanceof Array)
@@ -1767,18 +1823,18 @@ function displayDialog(dialog,
 		dialog.onmousemove  	= null;
 		dialog.onmouseup    	= dialogMouseUp;
 
+        // do not permit mouse clicks in this dialog to
+        // bubble up to the click handler on <body>
+        addEventHandler(dialog, 'click', stopProp);
+
 		// show the dialog if not requested to defer this until dialog complete
+        if (defer === undefined)
+            defer               = false;
 		if (!defer)
 		{		// display the dialog immediately
-		    if (form.elements.length > 0)
-				form.elements[0].focus();
 		    dialog.style.visibility	    = 'visible';
 		    dialog.scrollIntoView();
             dialog.style.display 	    = 'block';
-
-            // do not permit mouse clicks in this dialog to
-            // bubble up to the click handler on <body>
-            addEventHandler(dialog, 'click', stopProp);
 
 		    // set the focus on the first button so Enter will apply it
 		    buttons[0].focus();
@@ -1981,6 +2037,7 @@ function keyDownPaging(e)
                 e.stopPropagation();
 		        return false;		// suppress default action
             }
+            break;
         }
 
         case "F10":
@@ -2036,9 +2093,49 @@ function keyDownPaging(e)
 }		// function keyDownPaging
 
 /************************************************************************
+ *  function keyDownMenu												*
+ *																		*
+ *  Handle key strokes within the menu.                                 *
+ *																		*
+ *  Parameters:															*
+ *		e		W3C compliant browsers pass an event as a parameter		*
+ ************************************************************************/
+function keyDownMenu(e)
+{
+    if (!e)
+    {		// browser is not W3C compliant
+		e   	=  window.event;	// IE
+    }		// browser is not W3C compliant
+    var	code	            = e.key;
+
+    // take action based upon code
+    switch (code)
+    {
+		case "ArrowDown":	// arrow down
+		{
+            this.nextAnchor.focus();
+            e.preventDefault();
+            e.stopPropagation();
+		    return false;	// suppress default action
+		}	                // page down
+
+		case "ArrowUp":	    // arrow up
+		{
+            this.prevAnchor.focus();
+            e.preventDefault();
+            e.stopPropagation();
+		    return false;		// suppress default action
+		}	    // page down
+
+    }	    // switch on key code
+
+    return;
+}		// function keyDownMenu
+
+/************************************************************************
  *  function statusChangeCallback										*
  *																		*
- *  Handle Facebook status change notification                          *
+ *  Handle Facebook login status change notification                    *
  *																		*
  *  Parameters:															*
  *		response        Facebook Response object                        *
@@ -2061,9 +2158,14 @@ function statusChangeCallback(response)
             });
     }       // Logged into your app and Facebook.
     else 
+    if (response.status === 'not_authorized')
     {       // The person is not logged into your app or we are unable to tell.
-        traceAlert('Please log ' + 'into this app.');
+        // add Please <button id="fblogin">log in</button> to this Facebook app.' to the current page
     }       // The person is not logged into your app or we are unable to tell.
+    else
+    {       // the user is unknown or not logged into FB
+        console.log('FB status=' + response.status);
+    }       // the user is unknown or not logged into FB
 }       // function statusChangeCallback
 
 /************************************************************************
@@ -2159,7 +2261,8 @@ function commonInit(event)
 		var topt	        = optionsElt.textContent.trim() - 0;
 		if (topt && 2)
 		{			// turn off popup Help
-		    traceAlert("util.js: pageInit: turn off popup help");
+            if (debug.toLowerCase() == 'y')
+		        traceAlert("util.js: pageInit: turn off popup help");
 		    popupHelpOption	= false;
 		}			// turn off popup Help
     }				// have info from User instance
@@ -2365,32 +2468,44 @@ function commonScroll(event)
  ************************************************************************/
 function traceAlert(message)
 {
-    if (debug.toLowerCase() == 'y')
-    {			// debugging
-		var traceDiv	        = document.getElementById('debugTrace');
-		if (traceDiv == null)
-		{
-            traceDiv            = document.createElement('div');
-            traceDiv.id         = 'debugTrace';
-            traceDiv.className  = 'warning';
-            document.body.appendChild(traceDiv);
-        }
-	    var line	            = document.createElement('p');
-	    var tags	            = message.split('>');
-	    if (tags.length > 10)
-	    {		// so many > implies XML
-			for(var it = 0; it < tags.length; it++)
-			{
-			    line.appendChild(document.createTextNode(tags[it] + '>'));
-			    line.appendChild(document.createElement('br'));
-			}
-	    }		// so many > implies XML
-	    else
-	    {
-			line.appendChild(document.createTextNode(message));
-	    }
-	    traceDiv.appendChild(line);
-    }			// debugging
+    console.log('traceAlert(' + message + ')');
+	var traceDiv	        = document.getElementById('debugTrace');
+	if (traceDiv == null)
+	{                       // no existing trace div
+        traceDiv            = document.createElement('div');
+        traceDiv.id         = 'debugTrace';
+        traceDiv.className  = 'warning';
+        var container       = document.body;
+        var h1s             = container.getElementsByTagName('h1');
+        if (h1s.length > 0)
+        {                   // insert after first <h1>
+            var h1          = h1s[0];
+            container       = h1.parentNode;
+            if (h1.nextSibling)
+                container.insertBefore(traceDiv, h1.nextSibling);
+            else
+                container.appendChild(traceDiv);
+        }                   // insert after first <h1>
+        else
+            container.appendChild(traceDiv);
+    }                       // no existing trace div
+    var line	            = document.createElement('p');
+    var tags	            = message.split('>');
+    if (tags.length > 10)
+    {		                // so many > implies XML
+		for(var it = 0; it < tags.length; it++)
+		{                   // separate the tags with breaks
+		    line.appendChild(document.createTextNode(tags[it] + '>'));
+		    line.appendChild(document.createElement('br'));
+		}                   // separate the tags with breaks
+    }		                // so many > implies XML
+    else
+    {                       // single text line
+		line.appendChild(document.createTextNode(message));
+    }                       // single text line
+    traceDiv.appendChild(line);
+    console.log('line=' + line.outerHTML);
+    console.log('traceDiv=' + traceDiv.outerHTML);
 }		// function traceAlert
 
 /************************************************************************
@@ -2879,8 +2994,7 @@ function hideLoading()
  *  This function replaces the standard Javascript alert function		*
  *  but uses the msgDiv popup mechanism to permit customizing the		*
  *  appearance of the alert message.  The invoking web page must have	*
- *  a <div id='msgDiv'> in which to display the message, and a			*
- *  <form id='Msg$template'> providing the appearance of the alert		*
+ *  a <form id='Msg$template'> providing the appearance of the alert	*
  *  message.															*
  *																		*
  *  Input:																*
@@ -2890,20 +3004,13 @@ function hideLoading()
 function popupAlert(msg, element)
 {
     // display the message in a popup
-    var	msgDiv	= document.getElementById('msgDiv');
-    if (msgDiv)
-    {		// have popup <div> to display message in
-		var parms	= {"template"	: "",
-						   "msg"	: msg};
-		displayDialog(msgDiv,
-				      'Msg$template',
-				      parms,
-				      element,		// position relative to
-				      null,		    // button closes dialog
-				      false);		// default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("util.js: popupAlert: Error: " + msg);
+	var parms	= {"template"	: "",
+				   "msg"	    : msg};
+	displayDialog('Msg$template',
+				  parms,
+				  element,		// position relative to
+			      null,		    // button closes dialog
+			      false);		// default show on open
 }		// function popupAlert
 
 /************************************************************************
@@ -3114,7 +3221,7 @@ function openFrameError()
  *  This is a utility function to close the current frame.  It handles	*
  *  the case where the current window is in an <iframe>					*
  ************************************************************************/
-function closeFrame()
+function closeFrame(lastChoice)
 {
     var	iframe	= window.frameElement;
     if (iframe)
@@ -3151,7 +3258,20 @@ function closeFrame()
     else
     {
 		if (window.opener === null)
-		    history.back();
+        {
+            if (history.length > 1)
+		        history.back();
+            else
+            {
+                var lang        = 'en';
+                if ('lang' in args)
+                    lang        = args.lang;
+                if (lastChoice == undefined)
+                    location    = "/genealogy.php?lang=" + lang;    
+                else
+                    location    = lastChoice;
+            }
+        }
 		else
 		    window.close();
     }

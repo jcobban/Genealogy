@@ -39,6 +39,8 @@ use \Exception;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/03/19      use Template                                    *
  *		2019/06/23      add column currhigh which excludes delayed      *
+ *		2019/07/13      reduce invalid county code message to warning   *
+ *		                so it can be corrected                          *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -151,7 +153,8 @@ if (strlen($countyCode) > 0)
 	}
 	else
 	{
-	    $msg	.= "County code '$countyCode' is not valid for domain '$domain'. ";
+        $warn	.= "<p>County code '$countyCode' is not valid for domain '$domain'.</p>\n";
+        $countyName         = $countyCode;
     }
 }
 

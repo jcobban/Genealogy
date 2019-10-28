@@ -1,0 +1,18 @@
+/************************************************************************
+ *  showAddedIndividuals.css                                            *
+ *                                                                      *
+ *  Stylesheet for the script showAddedIndividuals.php                  *
+ *                                                                      *
+ *  History:                                                            *
+ *	    2019/08/31	created                                             *
+ *                                                                      *
+ *  Copyright &copy; 2019 James A. Cobban                               *
+ ************************************************************************/
+
+p.person {  margin-left:6em; 
+            text-indent:-3em; 
+            margin-top:0; 
+            margin-bottom:0.5ex;
+            font-family: sans-serif;
+		 }
+

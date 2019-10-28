@@ -209,10 +209,10 @@ else
 
 $title	= "$countryName: $province: $by Marriage Report Update";
 htmlHeader($title,
-	       array(	'/jscripts/CommonForm.js',
+            array(  '/jscripts/tinymce/js/tinymce/tinymce.js',
+	       	        '/jscripts/CommonForm.js',
 					'/jscripts/js20/http.js',
 					'/jscripts/util.js',
-					'/tinymce/jscripts/tiny_mce/tiny_mce.js',
 					'CountyReportDetails.js'));
 ?>
   <body>

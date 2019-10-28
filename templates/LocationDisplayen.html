@@ -9,420 +9,432 @@
  *		2018/11/02		created                                         *
  *		                pass authentication key to GoogleApis           *
  *      2019/04/10      display Search Name and County Name             *
+ *      2019/09/25      checkboxes must be both readonly for appearance *
+ *                      and disabled so they cannot be clicked          *
  *																	    *
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
-  <link rel="stylesheet" type="text/css" href="Location.css">
-  <div class="hidden" id="breadcrumbs">
-	<a href="/index.html">Home</a>:
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
-    <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
-    <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>:
-    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
-    <a href="/FamilyTree/Locations.php?lang=$LANG">Locations</a>:
-    <span id="nameStart">
-    <a href="/FamilyTree/Locations.php?pattern=^$NAMESTART&lang=$LANG">					Locations starting with '$NAMESTART'</a>:
-    </span>
-  </div>
-  <div class="body">
-    <h1>
-      <span class="right">
-	<a href="LocationHelpen.html" target="help">? Help</a>
+    <link rel="stylesheet" type="text/css" href="Location.css">
+    <div class="hidden" id="breadcrumbs">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+      <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+      <a href="/FamilyTree/Locations.php?lang=$LANG">Locations</a>:
+      <span id="nameStart">
+      <a href="/FamilyTree/Locations.php?pattern=^$NAMESTART&lang=$LANG">					Locations starting with '$NAMESTART'</a>:
       </span>
-	$TITLE  
-    </h1>
-    $TRACE
-    $MSG 
-    <form name="locForm" id="locForm" action="updateLocation.php" method="post">
-      <div class="row" id="idlrRow">
-	      <label class="column1" for="idlr">
-	        IDLR:
-	      </label>
-	      <input type="text" name="idlr" id="idlr" readonly="readonly"
-	    	        class="black ina rightnc" style="width: 8em;"
-	    	        value="$IDLR">
-	      <input type="hidden" name="debug" id="debug" value="$DEBUG">
-        <div style="clear: both;"></div>
-      </div>
-      <div class="row" id="locationRow">
-	      <label class="column1" for="Location">
-	        Location:
-	      </label>
-	      <input type="text" name="Location" id="Location" size="64"
-	            	class="ina leftnc" value="$LOCATION" readonly="readonly">
-	      <input type="hidden" name="searchName" id="searchName" 
-	    	        value="$SEARCHNAME">
-        <div style="clear: both;"></div>
-      </div>
-      <div class="row" id="shortNameRow">
-	      <label class="column1" for="ShortName">
-	        Short&nbsp;Name:
-	      </label>
-	      <input type="text" name="ShortName" id="ShortName" size="64"
-	            	class="ina leftnc" value="$SHORTNAME" readonly="readonly">
-        <div style="clear: both;"></div>
-      </div>
-      <div class="row" id="sortedLocationRow">
-	      <label class="column1" for="SortedLocation">
-	        Sort Key:
-	      </label>
-	      <input type="text" name="SortedLocation" id="SortedLocation"
-	    	        size="64" class="ina leftnc"
-	            	value="$SORTEDLOC" readonly="readonly">
-        <div style="clear: both;"></div>
-      </div>
-      <div class="row" id="searchNameRow">
-	      <label class="column1" for="SearchName">
-	        Search Name:
-	      </label>
-	      <input type="text" name="SearchName" id="SearchName"
-	    	        size="64" class="ina leftnc"
-	            	value="$SEARCHNAME" readonly="readonly">
-        <div style="clear: both;"></div>
-      </div>
-      <div class="row" id="countyNameRow">
-	      <label class="column1" for="CountyName">
-	        County Name:
-	      </label>
-	      <input type="text" name="CountyName" id="CountyName"
-	    	        size="64" class="ina leftnc"
-	            	value="$COUNTY" readonly="readonly">
-        <div style="clear: both;"></div>
-      </div>
-      <div class="row" id="sortedLocationRow">
-	      <label class="column1" for="SortedLocation">
-	        Sort Key:
-	      </label>
-	      <input type="text" name="SortedLocation" id="SortedLocation"
-	    	        size="64" class="ina leftnc"
-	            	value="$SORTEDLOC" readonly="readonly">
-        <div style="clear: both;"></div>
-      </div>
-      <div class="row" id="fsPlaceIdRow">
-	      <label class="column1" for="FSPlaceId">
-	        FS Place Id:
-	      </label>
-	      <input type="text" name="FSPlaceId" id="FSPlaceId"
-	    	        size="64" class="ina leftnc"
-	    	        value="$FSPLACEID" readonly="readonly">
-        <div style="clear: both;"></div>
-      </div> <!-- class="column1" -->
-      <div class="row" id="coordinatesRow">
-        <div class="column1">
-	            <label class="column1" for="Latitude">
-	                Latitude:
-	            </label>
-	            <input type="text" name="Latitude" id="Latitude"
-    	            	size="12" class="ina right"
- 	            	value="$LATITUDE" readonly="readonly">
-        </div> <!-- class="column1" -->
-        <div class="column1">
-	        <label class="column1" for="Longitude">
-	            Longitude:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+	  <a href="LocationHelpen.html" target="help">? Help</a>
+        </span>
+	  $TITLE  
+      </h1>
+      $TRACE
+      $MSG 
+      <form name="locForm" id="locForm" action="updateLocation.php" method="post">
+        <div class="row" id="idlrRow">
+	        <label class="column1" for="idlr">
+	          IDLR:
 	        </label>
-	        <input type="text" name="Longitude" id="Longitude"
-	    	        size="12" class="ina right"
-	    	        value="$LONGITUDE" readonly="readonly">
+	        <input type="text" name="idlr" id="idlr" readonly="readonly"
+		              class="black ina rightnc" style="width: 8em;"
+		              value="$IDLR">
+	        <input type="hidden" name="debug" id="debug" value="$DEBUG">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="locationRow">
+	        <label class="column1" for="Location">
+	          Location:
+	        </label>
+	        <input type="text" name="Location" id="Location" size="64"
+		              class="ina leftnc" value="$LOCATION" readonly="readonly">
+	        <input type="hidden" name="searchName" id="searchName" 
+		              value="$SEARCHNAME">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="shortNameRow">
+	        <label class="column1" for="ShortName">
+	          Short&nbsp;Name:
+	        </label>
+	        <input type="text" name="ShortName" id="ShortName" size="64"
+		              class="ina leftnc" value="$SHORTNAME" readonly="readonly">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="sortedLocationRow">
+	        <label class="column1" for="SortedLocation">
+	          Sort Key:
+	        </label>
+	        <input type="text" name="SortedLocation" id="SortedLocation"
+		              size="64" class="ina leftnc"
+		              value="$SORTEDLOC" readonly="readonly">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="searchNameRow">
+	        <label class="column1" for="SearchName">
+	          Search Name:
+	        </label>
+	        <input type="text" name="SearchName" id="SearchName"
+		              size="64" class="ina leftnc"
+		              value="$SEARCHNAME" readonly="readonly">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="countyNameRow">
+	        <label class="column1" for="CountyName">
+	          County Name:
+	        </label>
+	        <input type="text" name="CountyName" id="CountyName"
+		              size="64" class="ina leftnc"
+		              value="$COUNTY" readonly="readonly">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="sortedLocationRow">
+	        <label class="column1" for="SortedLocation">
+	          Sort Key:
+	        </label>
+	        <input type="text" name="SortedLocation" id="SortedLocation"
+		              size="64" class="ina leftnc"
+		              value="$SORTEDLOC" readonly="readonly">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="fsPlaceIdRow">
+	        <label class="column1" for="FSPlaceId">
+	          FS Place Id:
+	        </label>
+	        <input type="text" name="FSPlaceId" id="FSPlaceId"
+		              size="64" class="ina leftnc"
+		              value="$FSPLACEID" readonly="readonly">
+          <div style="clear: both;"></div>
         </div> <!-- class="column1" -->
-        <div class="column1">
-	            <button type="button" id="showMap" class="button">
-	                Show Map
-	            </button>
-        </div> <!-- class="column1" -->
-        <div style="clear: both;"></div>
-      </div> <!-- class="row" id="coordinatesRow" -->
-      <div class="row" id="prepZoomRow">
-        <div class="column1">
+        <div class="row" id="coordinatesRow">
+          <div class="column1">
+	              <label class="column1" for="Latitude">
+	                  Latitude:
+	              </label>
+	              <input type="text" name="Latitude" id="Latitude"
+		                  size="12" class="ina right"
+ 		              value="$LATITUDE" readonly="readonly">
+          </div> <!-- class="column1" -->
+          <div class="column1">
+	          <label class="column1" for="Longitude">
+	              Longitude:
+	          </label>
+	          <input type="text" name="Longitude" id="Longitude"
+		              size="12" class="ina right"
+		              value="$LONGITUDE" readonly="readonly">
+          </div> <!-- class="column1" -->
+          <div class="column1">
+	              <button type="button" id="showMap" class="button">
+	                  Show Map
+	              </button>
+          </div> <!-- class="column1" -->
+          <div style="clear: both;"></div>
+        </div> <!-- class="row" id="coordinatesRow" -->
+        <div class="row" id="prepZoomRow">
+          <div class="column1">
 	        <label class="column1" for="Preposition">
-	            Preposition:
+	              Preposition:
 	        </label>
 	        <input type="text" name="Preposition" id="Preposition"
-    	            	style="width: 8em;" class="ina leftnc"
-    	            	value="$PREPOSITION" readonly="readonly">
-        </div> <!-- class="column1" -->
-        <div class="column1">
+		                  style="width: 8em;" class="ina leftnc"
+		                  value="$PREPOSITION" readonly="readonly">
+          </div> <!-- class="column1" -->
+          <div class="column1">
 	        <label class="column1" for="Zoom">Zoom:</label>
 	        <input type="text" name="Zoom" id="Zoom"
-    	            	size="3" class="ina right"
-	        	        value="$ZOOM" readonly="readonly">
-        </div> <!-- class="column1" -->
-	    <input type="hidden" name="Boundary" id="Boundary"
-                                          value="$BOUNDARY">
-	    <div style="clear: both;"></div>
-      </div><!-- id="prepZoomRow" -->
-      <div class="row" id="notesRow" style="width: 100%;">
-    	  <label class='column1' for='Notes'>
-    	    Notes:
-    	  </label>
+		                  size="3" class="ina right"
+		                  value="$ZOOM" readonly="readonly">
+          </div> <!-- class="column1" -->
+	      <input type="hidden" name="Boundary" id="Boundary"
+                                            value="$BOUNDARY">
+	      <div style="clear: both;"></div>
+        </div><!-- id="prepZoomRow" -->
+        <div class="row" id="notesRow" style="width: 100%;">
+	      <label class='column1' for='Notes'>
+	          Notes:
+	      </label>
 	      <p style="white-space: normal;">
-	        $NOTES
+	          $NOTES
 	      </p>
-        <div style="clear: both;"></div>
-      </div> <!-- class="row" id="notesRow" -->
-      <div class="row" id="usedRow">
-        <div class="column1">
+          <div style="clear: both;"></div>
+        </div> <!-- class="row" id="notesRow" -->
+        <div class="row" id="usedRow">
+          <div class="column1">
 	        <label class="column1" for="Used">
-	            Used:
+	              Used:
 	        </label>
 	        <input type="checkbox" name="Used" id="Used" value="1"
-	               $USEDCHECKED readonly="readonly" >
-        </div> <!-- class="column1" -->
-        <div class="column1">
+	                 $USEDCHECKED readonly="readonly" disabled="disabled">
+          </div> <!-- class="column1" -->
+          <div class="column1">
 	        <label class="column1">Tag1:</label>
 	        <input type="checkbox" name="Tag1" id="Tag1" value="1"
-                  $TAG1CHECKED readonly="readonly">
-        </div> <!-- class="column1" -->
-        <div class="column1">
+                    $TAG1CHECKED readonly="readonly" disabled="disabled">
+          </div> <!-- class="column1" -->
+          <div class="column1">
 	        <label class="column1" for="Verified">
-	            Verified:
+	              Verified:
 	        </label>
 	        <input type="checkbox" name="Verified" id="Verified" value="1"
-	                $VERIFIEDCHECKED readonly="readonly" >
-        </div> <!-- class="column1" -->
-        <div style="clear: both;"></div>
-      </div> <!-- class="row" id="usedRow" -->
-      <div class="row" id="resolvedRow">
-        <div class="column1">
+	                  $VERIFIEDCHECKED readonly="readonly"  disabled="disabled">
+          </div> <!-- class="column1" -->
+          <div style="clear: both;"></div>
+        </div> <!-- class="row" id="usedRow" -->
+        <div class="row" id="resolvedRow">
+          <div class="column1">
 	        <label class="column1" for="FSResolved">
-	            FS&nbsp;Resolved:
+	              FS&nbsp;Resolved:
 	        </label>
 	        <select name="FSResolved" id="FSResolved" size="1" 
                     class="ina leftnc" readonly="readonly">
-	    	    <option value="0" $FSRESOLVED0SELECTED>
-	    	            No
-	    	    </option>
-	    	    <option value="1" $FSRESOLVED1SELECTED>
-	    	            Yes
-	    	    </option>
-	    	    <option value="2" $FSRESOLVED2SELECTED>
-	    	            Unresolved
-	    	    </option>
+	          <option value="0" $FSRESOLVED0SELECTED>
+	                 No
+	          </option>
+	          <option value="1" $FSRESOLVED1SELECTED>
+	                 Yes
+	          </option>
+	          <option value="2" $FSRESOLVED2SELECTED>
+	                 Unresolved
+	          </option>
 	        </select>
-        </div> <!-- class="column1" -->
-        <div class="column2">
+          </div> <!-- class="column1" -->
+          <div class="column2">
 	        <label class="column1" for="VEResolved">VE Resolved:</label>
 	        <select name="VEResolved" id="VEResolved" size="1"
-                    class="ina leftnc" readonly="readonly">
-	    	    <option value="0" $VERESOLVED0SELECTED>
-	    	            No
-	    	    </option>' 
-	    	    <option value="1" $VERESOLVED1SELECTED>
-	    	            Yes
-	    	    </option>
-	    	    <option value="2" $VERESOLVED2SELECTED>
-	    	            Unresolved
-	    	    </option>
+                      class="ina leftnc" readonly="readonly">
+	          <option value="0" $VERESOLVED0SELECTED>
+	                  No
+	          </option>' 
+	          <option value="1" $VERESOLVED1SELECTED>
+	                  Yes
+	          </option>
+	          <option value="2" $VERESOLVED2SELECTED>
+	                  Unresolved
+	          </option>
 	        </select>
-        </div> <!-- class="column2" -->
-        <div style="clear: both;"></div>
-      </div> <!-- class="row" id="resolvedRow" -->
-      <div class="row">
-	        <label class="column1" for="qsTag">qsTag:</label>
-	        <input type="checkbox" name="qsTag" id="qsTag" value="1"
-                  $QSCHECKED readonly="readonly">
-        <div style="clear: both;"></div>
-      </div> <!-- class="row" -->
-  
-      <!-- display any media files associated with the source -->
+          </div> <!-- class="column2" -->
+          <div style="clear: both;"></div>
+        </div> <!-- class="row" id="resolvedRow" -->
+        <div class="row">
+	      <label class="column1" for="qsTag">qsTag:</label>
+	      <input type="checkbox" name="qsTag" id="qsTag" value="1"
+                    $QSCHECKED readonly="readonly" disabled="disabled">
+          <div style="clear: both;"></div>
+        </div> <!-- class="row" -->
+    
+        <!-- display any media files associated with the source -->
 	    $PICTURES
   
-    </form>
-  </div> <!-- body division -->
-  <!-- a division in which to display the map of the location -->
-  <div class="map" id="mapDiv">
-  </div>
-  <!-- a division containing a button to hide the map division -->
-  <div class="balloon" id="hideMapDiv">
-    <center>
-      <button id="hideMap" class="button">Hide Map</button>
-    </center>
-  </div> <!-- end of <div id="hideMapDiv"> -->
-  <!-- a division containing templates for dynamically created HTML -->
-  <div class="hidden" id="templates">
+	    <p id="buttonRow">
+	      <input type="hidden" id="closeAtEnd" name="closeAtEnd" value="$CLOSE">
+		  &nbsp;
+	      <button type="button" id="Close" class="button">
+		      Close
+	      </button>
+		  &nbsp;
+	      <button type="button" id="References" class="button">
+		      Display Individuals using this Location
+	      </button>
+	    </p>
+      </form>
+    </div> <!-- body division -->
+    <!-- a division in which to display the map of the location -->
+    <div class="map" id="mapDiv">
+    </div>
+    <!-- a division containing a button to hide the map division -->
+    <div class="balloon" id="hideMapDiv">
+      <center>
+        <button id="hideMap" class="button">Hide Map</button>
+      </center>
+    </div> <!-- end of <div id="hideMapDiv"> -->
+    <!-- a division containing templates for dynamically created HTML -->
+    <div class="hidden" id="templates">
       <span id="locationTitle">Location: $NAME</span>
       <span id="newlocationTitle">New Location: $NAME</span>
       <!-- the following button should exactly match <button id="showMap"> -->
       <button id="showMapTemplate" class="button">Show Map</button>
       <!-- the following button replaces Show Map -->
       <button id="hideMapTemplate" class="button">Hide Map</button>
-	<div id="pictureTemplate" class="picture">
-	  <img src="$PICNAMEURL"
-			alt="$PICCAPTION">
-	  <p class="large">
-			$PICCAPTION : $PICDATE;
+	  <div id="pictureTemplate" class="picture">
+	    <img src="$PICNAMEURL"
+			  alt="$PICCAPTION">
+	    <p class="large">
+			  $PICCAPTION : $PICDATE;
+	    </p>
+	    <p id="picDesc" class="picdesc">$PICDESC 
+	    </p>
+	  </div> <!-- id="pictureTemplate" -->
+	  <audio id="audioTemplate" controls="controls">
+	    <source src="$PICNAMEURL" 
+			  type="audio/$FILETYPE">
+	      Your browser does not support the audio element.
+	  </audio>
+	  <video id="videoTemplate" controls="controls"
+	          width="320" height="240">
+	    <source src="$PICNAMEURL"
+			  type="video/$FILETYPE">
+	      Your browser does not support the video element.
+	  </video>
+	  <p id="otherTemplate">
+	      Unable to display or play media $PICNAMEURL.
 	  </p>
-	  <p id="picDesc" class="picdesc">$PICDESC 
-	  </p>
-	</div> <!-- id="pictureTemplate" -->
-	<audio id="audioTemplate" controls="controls">
-	  <source src="$PICNAMEURL" 
-			type="audio/$FILETYPE">
-	    Your browser does not support the audio element.
-	</audio>
-	<video id="videoTemplate" controls="controls"
-	        width="320" height="240">
-	  <source src="$PICNAMEURL"
-			type="video/$FILETYPE">
-	    Your browser does not support the video element.
-	</video>
-	<p id="otherTemplate">
-	    Unable to display or play media $PICNAMEURL.
-	</p>
-  </div> <!-- end of <div id="templates"> -->
-  <!-- the remaining portion of the page is divisions containing popup help -->
-  <div class="balloon" id="Helpidlr">
-    The unique numeric identifier of the location record in the database.
-    This is assigned by the system when a new location is created, and cannot
-    be altered by the user.
-  </div>
-  <div class="balloon" id="HelpLocation">
-    The location name as it appears in web pages.
-    This should be expressed as a formal address uniquely identifying the
-    location.
-    To avoid creating multiple location records that all refer to the same
-    place, it is desirable to use a consistent address structure
-    and abbreviation style.  
-    For example include all relevant levels of the address hierarchy.
-    In the United States of America and Canada, for example, a location may be
-    expressed as street address, village, township, county, state or province, 
-    and country.  However this field is not a mailing address, do not use
-    post office box numbers.
-    Always include the country name, or 
-  <a href="http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm">two character ISO 3166 country code</a>
-    as the last element of an address.  This avoids ambiguities.
-    In particular many of the 
-  <a href="/Canada/DomainsEdit.php?cc=US&lang=$LANG">US Postal Service state abbreviations</a>
-    duplicate ISO 3166 country codes.  You will save yourself trouble as you
-    expand your research beyond your home country.  Note that England, Scotland,
-    Wales, Northern Ireland, and other component states of the United Kingdom,
-    do not have two character ISO 3166 country codes because they are
-    not recognized as countries by the UN.  
-    Also, for obvious reasons, there are no ISO 3166 country codes for
-    countries that no longer exist, such as Prussia.
-    Use consistent abbreviation style.  For example either always include the
-    period after an abbreviation or always exclude it.  For example consistently
-    use addresses like "Central Ave, St Petersburg, FL, USA" or like
-    "Central Ave., St. Petersburg, Florida, USA".
-  </div>
-  <div class="balloon" id="HelpShortName">
-    This is a shorter form of the name.
-    If you enter this into a location field on a record it is expanded to
-    the full associated location name.
-    It defaults to the same value as the Location.
-  </div>
-  <div class="balloon" id="HelpSortedLocation">
-    This is intended to be used as a sort field when the desirable sort
-    order cannot be determined from the value of Location.  
-    It defaults to the same value as the Location.
-  </div>
-  <div class="balloon" id="HelpFSPlaceId">
-    This field is currently unused.
-  </div>
-  <div class="balloon" id="HelpLatitude">
-    The latitude of the location.  This is displayed and entered as
-    degrees and a decimal fraction between -90.0 and 90.0.
-    This simplifies the use of geocoding software.
-    The value of this field is normally set by clicking on the
-  <span class="button">Get Map Info</span> button. 
-  </div>
-  <div class="balloon" id="HelpLongitude">
-    The longitude of the location expressed as signed
-    degrees and a decimal fraction between -180.0 and 180.0.
-    This simplifies the use of geocoding software.
-    Note that longitudes west of the Greenwich meridian,
-    that is for all of the Americas, are negative.
-    The value of this field is normally set by clicking on the
-  <span class="button">Get Map Info</span> button. 
-  </div>
-  <div class="balloon" id="HelpPreposition">
-    If specified, this is intended to override the default preposition "at".
-    To support French a special value "in[masc]" should be specified for
-    countries that have masculine gender and start with a consonant.
-  </div>
-  <div class="balloon" id="HelpZoom">
-    This field is used to specify the zoom level for the Google map display.
-    The value of this field is normally set by clicking on the
-  <span class="button">Get Map Info</span> button. 
-  </div>
-  <div class="balloon" id="HelpBoundary">
-    This field is used to contain the list of boundary coordinates.
-    This field is normally only visible to the administrator.
-    The value of this field is set by adding points to the boundary using the
-    mouse and then clicking on the
-  <span class="button">Get Map Info</span> button. 
-  </div>
-  <div class="balloon" id="HelpNotes">
-    User notes about the location.
-    This is an extended editor field permitting you to enter data as if into
-    a word processor, setting font style, embedding pictures, defining 
-    hyperlinks, and so on.
-  </div>
-  <div class="balloon" id="HelpFSPlaceID">
-    This field is currently unused.
-  </div>
-  <div class="balloon" id="HelpVerified">
-    This field is currently unused.
-    The checkbox is selected if the value of this field is 'yes'.
-  </div>
-  <div class="balloon" id="HelpFSResolved">
-    This field is currently unused.
-    The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
-    resolved".
-  </div>
-  <div class="balloon" id="HelpVEResolved">
-    This field is currently unused.
-    The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
-    resolved".
-  </div>
-  <div class="balloon" id="HelpqsTag">
-    This field is currently unused.
-    The checkbox is selected if the value of this field is 'yes'.
-  </div>
-  <div class="balloon" id="HelpTag1">
-    This field is currently unused.
-    The checkbox is selected if the value of this field is 'yes'.
-  </div>
-  <div class="balloon" id="HelpshowMap">
-    Clicking on this button displays or hides a Google map
-    centered at the location.
-  </div>
-  <div class="balloon" id="HelpgetMap">
-    Clicking on this button extracts information from the Google map display
-    about the center of the map and its zoom level and stores that information
-    into the latitude, longitude, and zoom level input fields.  This permits you
-    to use the zoom and pan functions of the Google map to adjust the display
-    appropriately, and then save those settings for subsequent users.
-  </div>
-  <div class="balloon" id="HelpSubmit">
-    Clicking on this button updates the database entry for this location.
-  </div>
-  <div class="balloon" id="HelpClose">
-    Clicking on this button closes the dialog and returns to the 
-    list of locations.
-  </div>
-  <div class="balloon" id="HelpReferences">
-    Clicking on this button displays a list of the database entries, either
-    individuals or families, that reference the location.
-  </div>
-  <div class="balloon" id="HelpmergeDuplicates">
-    Clicking on this button merges all of the locations with the same name
-    with the current location.
-  </div>
-  <div class="balloon" id="HelpDupIdlr">
-    This read-only field displays the unique identification number of
-    a location with the same location name as the current location.
-  </div>
-  <div class="balloon" id="HelpPictures">
-    Click this button to open a dialog for managing the pictures associated
-    with the location.
-  </div>
+    </div> <!-- end of <div id="templates"> -->
+    <!-- the remaining portion of the page is divisions containing popup help -->
+    <div class="balloon" id="Helpidlr">
+      The unique numeric identifier of the location record in the database.
+      This is assigned by the system when a new location is created, and cannot
+      be altered by the user.
+    </div>
+    <div class="balloon" id="HelpLocation">
+      The location name as it appears in web pages.
+      This should be expressed as a formal address uniquely identifying the
+      location.
+      To avoid creating multiple location records that all refer to the same
+      place, it is desirable to use a consistent address structure
+      and abbreviation style.  
+      For example include all relevant levels of the address hierarchy.
+      In the United States of America and Canada, for example, a location may be
+      expressed as street address, village, township, county, state or province, 
+      and country.  However this field is not a mailing address, do not use
+      post office box numbers.
+      Always include the country name, or 
+    <a href="http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm">two character ISO 3166 country code</a>
+      as the last element of an address.  This avoids ambiguities.
+      In particular many of the 
+    <a href="/Canada/DomainsEdit.php?cc=US&lang=$LANG">US Postal Service state abbreviations</a>
+      duplicate ISO 3166 country codes.  You will save yourself trouble as you
+      expand your research beyond your home country.  Note that England, Scotland,
+      Wales, Northern Ireland, and other component states of the United Kingdom,
+      do not have two character ISO 3166 country codes because they are
+      not recognized as countries by the UN.  
+      Also, for obvious reasons, there are no ISO 3166 country codes for
+      countries that no longer exist, such as Prussia.
+      Use consistent abbreviation style.  For example either always include the
+      period after an abbreviation or always exclude it.  For example consistently
+      use addresses like "Central Ave, St Petersburg, FL, USA" or like
+      "Central Ave., St. Petersburg, Florida, USA".
+    </div>
+    <div class="balloon" id="HelpShortName">
+      This is a shorter form of the name.
+      If you enter this into a location field on a record it is expanded to
+      the full associated location name.
+      It defaults to the same value as the Location.
+    </div>
+    <div class="balloon" id="HelpSortedLocation">
+      This is intended to be used as a sort field when the desirable sort
+      order cannot be determined from the value of Location.  
+      It defaults to the same value as the Location.
+    </div>
+    <div class="balloon" id="HelpFSPlaceId">
+      This field is currently unused.
+    </div>
+    <div class="balloon" id="HelpLatitude">
+      The latitude of the location.  This is displayed and entered as
+      degrees and a decimal fraction between -90.0 and 90.0.
+      This simplifies the use of geocoding software.
+      The value of this field is normally set by clicking on the
+    <span class="button">Get Map Info</span> button. 
+    </div>
+    <div class="balloon" id="HelpLongitude">
+      The longitude of the location expressed as signed
+      degrees and a decimal fraction between -180.0 and 180.0.
+      This simplifies the use of geocoding software.
+      Note that longitudes west of the Greenwich meridian,
+      that is for all of the Americas, are negative.
+      The value of this field is normally set by clicking on the
+    <span class="button">Get Map Info</span> button. 
+    </div>
+    <div class="balloon" id="HelpPreposition">
+      If specified, this is intended to override the default preposition "at".
+      To support French a special value "in[masc]" should be specified for
+      countries that have masculine gender and start with a consonant.
+    </div>
+    <div class="balloon" id="HelpZoom">
+      This field is used to specify the zoom level for the Google map display.
+      The value of this field is normally set by clicking on the
+    <span class="button">Get Map Info</span> button. 
+    </div>
+    <div class="balloon" id="HelpBoundary">
+      This field is used to contain the list of boundary coordinates.
+      This field is normally only visible to the administrator.
+      The value of this field is set by adding points to the boundary using the
+      mouse and then clicking on the
+    <span class="button">Get Map Info</span> button. 
+    </div>
+    <div class="balloon" id="HelpNotes">
+      User notes about the location.
+      This is an extended editor field permitting you to enter data as if into
+      a word processor, setting font style, embedding pictures, defining 
+      hyperlinks, and so on.
+    </div>
+    <div class="balloon" id="HelpFSPlaceID">
+      This field is currently unused.
+    </div>
+    <div class="balloon" id="HelpVerified">
+      This field is currently unused.
+      The checkbox is selected if the value of this field is 'yes'.
+    </div>
+    <div class="balloon" id="HelpFSResolved">
+      This field is currently unused.
+      The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
+      resolved".
+    </div>
+    <div class="balloon" id="HelpVEResolved">
+      This field is currently unused.
+      The value of this field is 0 for "no", 1 for "yes", and 2 for "could not be
+      resolved".
+    </div>
+    <div class="balloon" id="HelpqsTag">
+      This field is currently unused.
+      The checkbox is selected if the value of this field is 'yes'.
+    </div>
+    <div class="balloon" id="HelpTag1">
+      This field is currently unused.
+      The checkbox is selected if the value of this field is 'yes'.
+    </div>
+    <div class="balloon" id="HelpshowMap">
+      Clicking on this button displays or hides a Google map
+      centered at the location.
+    </div>
+    <div class="balloon" id="HelpgetMap">
+      Clicking on this button extracts information from the Google map display
+      about the center of the map and its zoom level and stores that information
+      into the latitude, longitude, and zoom level input fields.  This permits you
+      to use the zoom and pan functions of the Google map to adjust the display
+      appropriately, and then save those settings for subsequent users.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+      Clicking on this button updates the database entry for this location.
+    </div>
+    <div class="balloon" id="HelpClose">
+      Clicking on this button closes the dialog and returns to the 
+      list of locations.
+    </div>
+    <div class="balloon" id="HelpReferences">
+      Clicking on this button displays a list of the database entries, either
+      individuals or families, that reference the location.
+    </div>
+    <div class="balloon" id="HelpmergeDuplicates">
+      Clicking on this button merges all of the locations with the same name
+      with the current location.
+    </div>
+    <div class="balloon" id="HelpDupIdlr">
+      This read-only field displays the unique identification number of
+      a location with the same location name as the current location.
+    </div>
+    <div class="balloon" id="HelpPictures">
+      Click this button to open a dialog for managing the pictures associated
+      with the location.
+    </div>
+	<script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="text/javascript"></script>
     <script src="/jscripts/js20/http.js" type="application/javascript">
     </script>
     <script src="/jscripts/CommonForm.js" type="application/javascript">
     </script>
     <script src="/jscripts/util.js" type="application/javascript">
-    </script>
-    <script src="/tinymce/jscripts/tiny_mce/tiny_mce.js" type="application/javascript">
     </script>
     <script src="/FamilyTree/Location.js" type="application/javascript">
     </script>

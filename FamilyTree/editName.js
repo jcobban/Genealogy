@@ -19,6 +19,7 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
+ *		2019/08/06      use addEventListener                            *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -26,37 +27,15 @@
 window.onload	= loadEdit;
 
 /************************************************************************
- *  function nameChildFrameClass												*
+ *  nameChildFrameClass										            *
  *																		*
- *  If this dialog is opened in a half window then any child dialogs		*
- *  are opened in the other half of the window.								*
+ *  If this dialog is opened in a half window then any child dialogs	*
+ *  are opened in the other half of the window.							*
  ************************************************************************/
 var nameChildFrameClass	= 'left';
 
 /************************************************************************
-
-// specify style for tinyMCE editing
-tinyMCE.init({
-		mode			: "textareas",
-		theme			: "advanced",
-		plugins			: "spellchecker,advhr,preview", 
-				
-		// Theme options - button# indicated the row# only
-		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-		forced_root_block	: false,
-		forced_root_block	: false,
-		content_css		: "/styles.css",
-
-});
-
-/************************************************************************
- *  function loadEdit														*
+ *  function loadEdit													*
  *																		*
  *  Initialize dynamic functionality of elements.						*
  ************************************************************************/
@@ -75,143 +54,162 @@ function loadEdit()
     }				// dialog opened in half frame
 
     // handle keystrokes anywhere in body of page
-    // handle keystrokes anywhere in body of page
-    document.body.onkeydown	= eeKeyDown;
+    document.body.addEventListener('keydown', eeKeyDown);
 
     // activate functionality of various input fields
-    var	focusSet	= false;
+    var	focusSet	    = false;
     for (var fi = 0; fi < document.forms.length; fi++)
-    {				// loop through all forms in page
+    {				            // loop through all forms in page
 		var form		= document.forms[fi];
 		form.updateCitation	= updateCitation;
 
 		// set action methods for form
 		if (form.name == 'nameForm')
-		{			// main form
-		    form.onsubmit	= suppressSubmit;
-		    form.onreset 	= resetForm;
-		    form.sourceCreated	= sourceCreated;
-		}			// main form
+		{			            // main form
+		    form.onsubmit	    = suppressSubmit;
+		    form.onreset 	    = resetForm;
+		    form.sourceCreated	= sourceCreated;    // feedback function
+		}			            // main form
 
-		var formElts	= form.elements;
+		var formElts	    = form.elements;
 		for (var i = 0; i < formElts.length; ++i)
-		{			// loop through all elements in form
-		    var element	= formElts[i];
+		{			            // loop through all elements in form
+		    var element	    = formElts[i];
 
 		    if (element.nodeName.toLowerCase() == 'fieldset')
 				continue;
 
 		    var	name;
 		    if (element.name && element.name.length > 0)
-				name	= element.name;
+				name	    = element.name;
 		    else
-				name	= element.id;
-		    var matches	= namePattern.exec(name);
-		    var	id	= '';
+				name	    = element.id;
+		    var matches	    = namePattern.exec(name);
+		    var	id	        = '';
 		    if (matches)
-		    {		// name matched the pattern
-				name	= matches[1];
-				id	= matches[2];
-		    }		// name matched the pattern
+		    {		            // name matched the pattern
+				name	    = matches[1];
+				id	        = matches[2];   // IDSX of citation
+		    }		            // name matched the pattern
 
 		    // take action specific to specific elements
 		    switch(name.toLowerCase())
-		    {			// action depends upon element name
+		    {			        // action depends upon element name
 				case 'surname':
-				{	// name fields
+				{	            // name fields
+				    element.addEventListener('keydown', keyDown);
+				    element.addEventListener('change', change);	// default
 				    element.checkfunc		= checkName;
+    			    if (!focusSet)
+	    		    {		    // need focus in some field
+		    		    element.focus();	// set focus
+			    	    focusSet	        = true;
+			        }		    // need focus in some field
 				    break;
-				}	// name fields
+				}	            // name fields
 
 				case 'givenname':
-				{	// name fields
+				{	            // name fields
+				    element.addEventListener('keydown', keyDown);
+				    element.addEventListener('change', change);	// default
 				    element.checkfunc		= checkName;
+    			    if (!focusSet)
+	    		    {		    // need focus in some field
+		    		    element.focus();	// set focus
+			    	    focusSet	        = true;
+			        }		    // need focus in some field
 				    break;
-				}	// name fields
+				}	            // name fields
 
 				case 'updname':
-				{		// <button id='updName'>
-				    element.onkeydown	= keyDown;
-				    element.onclick	= updateName;
+				{		        // <button id='updName'>
+				    element.addEventListener('keydown', keyDown);
+				    element.addEventListener('click', updateName);
 				    break;
-				}		// <button id='updName'>
+				}		        // <button id='updName'>
 				
 				case 'clear':
-				{		// <button id='Clear'>
-				    element.onclick	= clearNotes;
+				{		        // <button id='Clear'>
+				    element.addEventListener('click', clearNotes);
 				    break;
-				}		// <button id='Clear'>
-				
-				case 'submit':
-				{		// <button id='Submit' type='submit'>
-				    form.onsubmit	= proceedWithSubmit;
-				    break;
-				}		// <button id='Submit' type='submit'>
+				}		        // <button id='Clear'>
 				
 				case 'note':
-				{		// textual notes on name
-				    element.onchange	= change;	// default handler
-				    if (!focusSet)
-				    {		// need focus in some field
-					element.focus();	// set focus
-					focusSet	= true;
-				    }		// need focus in some field
+				{		        // textual notes on name
+                    var noteEditor      = tinyMCE.get('note');
+                    if (noteEditor)
+                    {
+	    			    if (!focusSet)
+		    		    {		    // need focus in some field
+			    		    noteEditor.focus();	// set focus
+				    	    focusSet	        = true;
+				        }		    // need focus in some field
+                    }
+                    else
+                    {               // not using tinyMCE 
+    				    element.addEventListener('change', change);	// default
+	    			    if (!focusSet)
+		    		    {		    // need focus in some field
+			    		    element.focus();	// set focus
+				    	    focusSet	        = true;
+				        }		    // need focus in some field
+                    }
 				    break;
-				}		// textual notes on name
+				}		        // textual notes on name
 				
 				case 'addcitation':
-				{		// add citation to primary fact
-				    element.onclick	= addCitation;
+				{		        // add citation to primary fact
+				    element.addEventListener('click', addCitation);
 				    break;
-				}		// add citation to primary fact
+				}		        // add citation to primary fact
 
 				case 'editcitation':
-				{		// edit citation to primary fact
-				    element.onclick	= editCitation;
+				{		        // edit citation to primary fact
+				    element.addEventListener('click', editCitation);
 				    break;
-				}		// edit citation to primary fact
+				}		        // edit citation to primary fact
 
 				case 'delcitation':
-				{		// edit citation to primary fact
-				    element.onclick	= deleteCitation;
+				{		        // edit citation to primary fact
+				    element.addEventListener('click', deleteCitation);
 				    break;
-				}		// edit citation to primary fact
+				}		        // edit citation to primary fact
 
 				default:
 				{
-				    element.onkeydown	= keyDown;
-				    element.onchange	= change;	// default handler
+				    element.addEventListener('keydown', keyDown);
+				    element.addEventListener('change', change);	// default
 				    break;
-				}		// default
+				}		        // default
 
-		    }			// action depends upon element name
-		}			// loop through all elements in the form
-    }				// loop through all forms in page
-}		// loadEdit
+		    }			        // action depends upon element name
+		}			            // loop through all elements in the form
+    }				            // loop through all forms in page
+}		// function loadEdit
 
 /************************************************************************
  *  function suppressSubmit												*
  *																		*
  *  This function ensures that the form cannot be submitted in the		*
- *  normal way, for example by pressing the Enter key.						*
+ *  normal way, for example by pressing the Enter key.					*
  ************************************************************************/
 function suppressSubmit()
 {
     return false;
-}		// suppressSubmit
+}		// function suppressSubmit
 
 /************************************************************************
- *  function proceedWithSubmit												*
+ *  function proceedWithSubmit											*
  *																		*
  *  For testing do not intercept submit.								*
  ************************************************************************/
 function proceedWithSubmit()
 {
     return true;
-}		// proceedWithSubmit
+}		// function proceedWithSubmit
 
 /************************************************************************
- *  function resetForm														*
+ *  function resetForm													*
  *																		*
  *  This method is called when the user requests the form				*
  *  to be reset to default values.										*
@@ -219,17 +217,17 @@ function proceedWithSubmit()
 function resetForm()
 {
     return true;
-}	// resetForm
+}	// function resetForm
 
 /************************************************************************
- *  function eeKeyDown														*
+ *  function eeKeyDown													*
  *																		*
  *  Handle key strokes that apply to the dialog as a whole.  For		*
- *  example the key combinations Ctrl-S and Alt-U are interpreted to		*
- *  apply the update, as shortcut alternatives to using the mouse to 		*
+ *  example the key combinations Ctrl-S and Alt-U are interpreted to	*
+ *  apply the update, as shortcut alternatives to using the mouse to 	*
  *  click the "Update Name" button.										*
  *																		*
- *  Parameters:																*
+ *  Parameters:															*
  *		e		W3C compliant browsers pass an name as a parameter		*
  ************************************************************************/
 function eeKeyDown(e)
@@ -287,19 +285,25 @@ function eeKeyDown(e)
     }	    // switch on key code
 
     return true;
-}		// eeKeyDown
+}		// function eeKeyDown
 
 /************************************************************************
- *  function updateName														*
+ *  function updateName													*
  *																		*
  *  This method is called when the user requests to update				*
- *  an name of an individual.												*
+ *  an name of an individual.											*
  *																		*
  *  Input:																*
- *		this		the <button id='updName'> element						*
+ *		this	the <button id='updName'> element						*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
-function updateName()
+function updateName(ev)
 {
+    if (!ev)
+    {		            // browser is not W3C compliant
+		ev	        =  window.event;	// IE
+    }	            	// browser is not W3C compliant
+    ev.stopPropagation();
 
     var	form		= this.form;
     var parms		= {};
@@ -321,16 +325,16 @@ function updateName()
 		      parms,
 		      gotName,
 		      noName);
-}	// updateName
+}	// function updateName
 
 /************************************************************************
- *  function gotName														*
+ *  function gotName													*
  *																		*
  *  This method is called when the XML file representing				*
  *  an updated name is retrieved from the database.						*
  *																		*
  *  Input:																*
- *		xmlDoc				XML document containing name						*
+ *		xmlDoc		XML document containing name						*
  ************************************************************************/
 function gotName(xmlDoc)
 {
@@ -339,60 +343,53 @@ function gotName(xmlDoc)
 		alert("editName.js: gotName: xmlDoc is undefined!");
 		return;
     }
-    var	form		= document.nameForm;
+    var	form		    = document.nameForm;
 
-    var	root	= xmlDoc.documentElement;
+    var	root	        = xmlDoc.documentElement;
     if (root && root.nodeName == 'update')
     {
 		//alert("editName.js: gotName: " + tagToString(root));
-		var msgs	= root.getElementsByTagName("msg");
+		var msgs	    = root.getElementsByTagName("msg");
 		if (msgs.length > 0)
-		{		// have messages in reply
+		{		            // have messages in reply
 		    for(var j = 0; j < msgs.length; j++)
 				alert("editName.js: gotName: msg=" + msgs[j].textContent);
-		}		// have messages in reply
-		var cmds	= root.getElementsByTagName("cmd");
-		if (cmds.length == 0)
-		{		// no update
-		    //alert("editName.js: gotName: database not updated" +
-		    //	tagToString(root));
-		}		// no update
-		//else
-		//    alert("editName.js: gotName: database updated" +
-		//	tagToString(root));
-		var	opener	= null;
+		}		            // have messages in reply
+		var cmds	    = root.getElementsByTagName("cmd");
+
+		var	opener	    = null;
 		if (window.frameElement && window.frameElement.opener)
-		    opener	= window.frameElement.opener;
+		    opener	    = window.frameElement.opener;
 		else
-		    opener	= window.opener;
+		    opener	    = window.opener;
 		if (opener)
-		{		// invoked from an existing window
+		{		            // invoked from an existing window
 		    // reflect changes made to the main fields of the name
 		    // back to the opener's form
 		    for (var fi = 0; fi < opener.document.forms.length; fi++)
-		    {		// loop through forms in invoking page
+		    {		        // loop through forms in invoking page
 				var	srcForm	= opener.document.forms[fi];
 				if (srcForm.nameFeedback)
-				{	// feedback method defined on the form
-				    var	parms	= {};
+				{	        // feedback method defined on the form
+				    var	parms	                    = {};
 				    for (var ei = 0; ei < form.elements.length; ei++)
 				    {		// copy element values to parms
-					var	element	= form.elements[ei];
-					if (element.name.length > 0)
-					{
-					    if (element.type == 'checkbox' &&
-						!(element.checked))
-						parms[element.name]	= 0;
-					    else
-						parms[element.name]	= element.value;
-					}
+						var	element	                = form.elements[ei];
+						if (element.name.length > 0)
+						{
+						    if (element.type == 'checkbox' &&
+							    !(element.checked))
+							    parms[element.name]	= 0;
+						    else
+							    parms[element.name]	= element.value;
+						}
 				    }		// copy element values to parms
 				    srcForm.nameFeedback(parms);
 				    break;
-				}	// feedback method defined on the form
-		    }		// loop through forms in invoking page
+				}	        // feedback method defined on the form
+		    }		        // loop through forms in invoking page
 		    closeFrame();		// close this window
-		}		// invoked from an existing window
+		}		            // invoked from an existing window
 		else
 		    alert("editName.js: gotName: Not invoked as a dialog");
     }		// properly constructed XML
@@ -407,31 +404,37 @@ function gotName(xmlDoc)
 		    msg += xmlDoc;
 		alert ("editName.js: gotName: " + msg);
     }		// error
-}		// gotName
+}		// function gotName
 
 /************************************************************************
  *  function noName														*
  *																		*
- *  This method is called if there is no name response from the				*
+ *  This method is called if there is no name response from the			*
  *  server.																*
  ************************************************************************/
 function noName()
 {
     alert("editName.js: noName: 'updateName.php' script not found");
-}		// noName
+}		// function noName
 
 /************************************************************************
- *  function addCitation														*
+ *  function addCitation												*
  *																		*
  *  This method is called when the user requests to add 				*
  *  a citation to the name.												*
  *																		*
  *  Input:																*
- *		this				the invoking <button> element.						*
+ *		this	the invoking <button> element.			    			*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
-
-function addCitation()
+function addCitation(ev)
 {
+    if (!ev)
+    {		            // browser is not W3C compliant
+		ev	        =  window.event;	// IE
+    }	            	// browser is not W3C compliant
+    ev.stopPropagation();
+
     this.disabled	= true;			// prname double add cit
     var	form		= this.form;
     var	cell		= this.parentNode;	// <td>
@@ -497,18 +500,18 @@ function addCitation()
 
 
     // support popup help for the fields in the added row
-    var elt	= form.elements['Source0'];
-    elt.helpDiv	= 'SourceSel';
+    var elt	            = form.elements['Source0'];
+    elt.helpDiv	        = 'SourceSel';
     actMouseOverHelp(elt);
 
     // set actions for detail input text field
-    elt		= form.elements['Page0'];
-    elt.onblur	= createCitation;	// leave field
-    elt.onchange= createCitation;	// change field
+    elt		            = form.elements['Page0'];
+    elt.addEventListener('blur', createCitation);	// leave field
+    elt.addEventListener('change', createCitation);	// change field
     actMouseOverHelp(elt);
 
     // set actions for detail input text field
-    var detailTxt	= form.elements['Page0'];
+    var detailTxt	    = form.elements['Page0'];
 
     // populate the select with the list of defined sources to 
     // in the second cell.  The name of the <select> element,
@@ -522,16 +525,16 @@ function addCitation()
 					"&formname=" + form.name,
 				gotSources,
 				noSources);
-}		// addCitation
+}		// function addCitation
 
 /************************************************************************
- *  function gotSources														*
+ *  function gotSources													*
  *																		*
  *  This method is called when the XML file representing				*
- *  the list of sources from the database is retrieved.						*
+ *  the list of sources from the database is retrieved.					*
  *																		*
- *  Parameters:																*
- *		xmlDoc		information about the defined sources as an XML				*
+ *  Parameters:															*
+ *		xmlDoc	information about the defined sources as an XML			*
  *				function document										*
  ************************************************************************/
 function gotSources(xmlDoc)
@@ -616,7 +619,7 @@ function gotSources(xmlDoc)
     option	= addOption(elt,	// Select element
 					    'Add New Source',	// text value to display
 					    -1);	// key to request add
-    elt.onchange	= checkForAdd;
+    elt.addEventListener('change', checkForAdd);
 
     // customize selection
     elt.size	= 10;	// height of selection list
@@ -651,34 +654,34 @@ function gotSources(xmlDoc)
     }		// loop through source nodes
 
     elt.focus();		// give selection list the focus
-}		// gotSources
+}		// function gotSources
 
 /************************************************************************
- *  function noSources														*
+ *  function noSources													*
  *																		*
- *  This method is called if there is no sources script on the server.		*
+ *  This method is called if there is no sources script on the server.	*
  ************************************************************************/
 function noSources()
 {
     alert("editName.js: getSourcesXml.php not found on server");
-}		// noSources
+}		// function noSources
 
 /************************************************************************
  *  function createCitation												*
  *																		*
  *  The user has requested to add a citation and supplied all of		*
- *  the required information.												*
+ *  the required information.											*
  *																		*
- *  Parameters:																*
- *		this				the input element for which this is the				*
- *						onchange or onblur method						*
+ *  Parameters:															*
+ *		this		the input element for which this is the				*
+ *					onchange or onblur method						    *
  ************************************************************************/
-function createCitation()
+function createCitation(ev)
 {
     var	rownum		= this.name.substring(4);
 
     // prname double invocation
-    this.onchange	= null;
+    this.removeEventListener('change', createCitation);
     this.onblur		= null;
 
     // get parameters from the form containing this cell
@@ -753,16 +756,16 @@ function createCitation()
 		alert("editName.js: createCitation: form.elements[" + names +
 							"], name='Source" + rownum + "'");
     }			// source <select: tag not found
-}	// createCitation
+}	// function createCitation
 
 /************************************************************************
- *  function gotAddCit														*
+ *  function gotAddCit													*
  *																		*
  *  This method is called when the XML file representing				*
- *  the addition of a citation is retrieved.								*
+ *  the addition of a citation is retrieved.							*
  *																		*
- *  Parameters:																*
- *		xmlDoc		information about the added citation						*
+ *  Parameters:															*
+ *		xmlDoc		information about the added citation				*
  ************************************************************************/
 function gotAddCit(xmlDoc)
 {
@@ -813,9 +816,9 @@ function gotAddCit(xmlDoc)
     
 				// activate functionality of buttons
 				var edit	= document.getElementById('editCitation'+ idsx);
-				edit.onclick	= editCitation;
+				edit.addEventListener('click', editCitation);
 				var del		= document.getElementById('delCitation' + idsx);
-				del.onclick	= deleteCitation;
+				del.addEventListener('click', deleteCitation);
 		    }
 		}		// valid response
 		else	// unexpected response
@@ -824,48 +827,62 @@ function gotAddCit(xmlDoc)
     }
     else
 		alert("editName.js: gotAddCit: xmlDoc='" + xmlDoc + "'");
-}		// gotAddCit
+}		// function gotAddCit
 
 /************************************************************************
- *  function noAddCit														*
+ *  function noAddCit													*
  *																		*
- *  This method is called if there is no add citation response				*
+ *  This method is called if there is no add citation response			*
  *  file from the server.												*
  ************************************************************************/
 function noAddCit()
 {
-}		// noAddCit
+}		// function noAddCit
 
 /************************************************************************
  *  function editCitation												*
  *																		*
  *  This method is called when the user requests to edit				*
- *  a citation to a source for an name.										*
+ *  a citation to a source for an name.									*
  *																		*
  *  Input:																*
- *		this				instance of <button> tag						*
+ *		this	instance of <button> tag						        *
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
-function editCitation()
+function editCitation(ev)
 {
+    if (!ev)
+    {		            // browser is not W3C compliant
+		ev	        =  window.event;	// IE
+    }	            	// browser is not W3C compliant
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	idsx		= this.id.substr(12);
 
     openFrame("citation",
 		      "editCitation.php?idsx=" + idsx + '&formId=' + form.id, 
 		      nameChildFrameClass);
-}	// editCitation
+}	// function editCitation
 
 /************************************************************************
  *  function deleteCitation												*
  *																		*
  *  This method is called when the user requests to edit				*
- *  a citation to a source for an name.										*
+ *  a citation to a source for an name.									*
  *																		*
  *  Input:																*
- *		this				<button>										*
+ *		this	<button>					        					*
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
-function deleteCitation()
+function deleteCitation(ev)
 {
+    if (!ev)
+    {		            // browser is not W3C compliant
+		ev	        =  window.event;	// IE
+    }	            	// browser is not W3C compliant
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	idsx		= this.id.substr(11);
 
@@ -878,16 +895,16 @@ function deleteCitation()
 		      parms,
 		      gotDeleteCit,
 		      noDeleteCit);
-}	// deleteCitation
+}	// function deleteCitation
 
 /************************************************************************
  *  function gotDeleteCit												*
  *																		*
  *  This method is called when the XML file representing				*
- *  a deleted citation is retrieved from the database.						*
+ *  a deleted citation is retrieved from the database.					*
  *																		*
- *  Parameters:																*
- *		xmlDoc		information about the deleted citation						*
+ *  Parameters:															*
+ *		xmlDoc		information about the deleted citation				*
  ************************************************************************/
 function gotDeleteCit(xmlDoc)
 {
@@ -923,10 +940,10 @@ function gotDeleteCit(xmlDoc)
 		    msg	= xmlDoc;
 		alert ("editName.js: gotDeleteCit: Error: " + msg);
     }		// error unexpected document
-}		// gotDeleteCit
+}		// function gotDeleteCit
 
 /************************************************************************
- *  function noDeleteCit														*
+ *  function noDeleteCit												*
  *																		*
  *  This method is called if there is no delete citation response		*
  *  file.																*
@@ -934,20 +951,20 @@ function gotDeleteCit(xmlDoc)
 function noDeleteCit()
 {
     alert("editName.js: deleteCitationXml.php not found on server");
-}		// noDeleteCit
+}		// function noDeleteCit
 
 /************************************************************************
  *  function updateCitation												*
  *																		*
- *  This method is called by the editCitation.php script to feed back		*
- *  the results so they can be reflected in this page.						*
+ *  This method is called by the editCitation.php script to feed back	*
+ *  the results so they can be reflected in this page.					*
  *																		*
- *  Parameters:																*
- *		this				instance of <form> containing citation list		*
- *		idsx				unique numeric key of instance of Citation		*
- *		idsr				unique numeric key of instance of Source		*
+ *  Parameters:															*
+ *		this			instance of <form> containing citation list		*
+ *		idsx			unique numeric key of instance of Citation		*
+ *		idsr			unique numeric key of instance of Source		*
  *		sourceName		textual name of source for display				*
- *		page				source detail text (page number)				*
+ *		page			source detail text (page number)				*
  ************************************************************************/
 function updateCitation(idsx,
 					idsr,
@@ -967,7 +984,7 @@ function updateCitation(idsx,
     else
 		alert("editName.js: updateCitation: unable to get element id='Page"+
 				idsx + "'");
-}		// updateCitation
+}		// function updateCitation
 
 /************************************************************************
  *  function checkForAdd												*
@@ -991,7 +1008,7 @@ function checkForAdd()
 							"&select=" + elementName,
 				  nameChildFrameClass);
     }		// create new source
-}		// checkForAdd
+}		// function checkForAdd
 
 /************************************************************************
  *  function clearNotes													*
@@ -1000,12 +1017,19 @@ function checkForAdd()
  *  area to empty.														*
  *																		*
  *  Input:																*
- *		this		<button type='button' id='Clear'>					*
+ *		this	<button type='button' id='Clear'>					    *
+ *		ev		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
-function clearNotes()
+function clearNotes(ev)
 {
+    if (!ev)
+    {		            // browser is not W3C compliant
+		ev	        =  window.event;	// IE
+    }	            	// browser is not W3C compliant
+    ev.stopPropagation();
+
     tinyMCE.get('note').setContent("");
-}	// clearNotes
+}	// function clearNotes
 
 /************************************************************************
  *  function sourceCreated												*
@@ -1042,5 +1066,5 @@ function sourceCreated(parms)
     }		// element not found in caller
 
     return false;
-}	// sourceCreated
+}	// function sourceCreated
 

@@ -122,10 +122,11 @@
     <div class='balloon' id='HelpCemetery'>
       Limitez les réponses aux cimetières dont le nom correspond au modèle
       fourni.
-    <p>Spécifier un texte simple, comprenant des lettres et des espaces,
+      <p>Spécifier un texte simple, comprenant des lettres et des espaces,
       correspond à tous les noms contenant ce texte.
       "Hill" ou "hill" ou "HILL" correspondra à 
       "Hillcrest" et "Anything Hill" ainsi que le simple "Hill".
+      </p>
     </div>
     <div class='balloon' id='HelpGivenNames'>
       Limitez la réponse aux individus dont les prénoms correspondent au 
@@ -136,18 +137,22 @@
       des espaces, correspond à tout nom contenant ce texte. "John" ou "john"
       ou "JOHN" correspondra à "Johnathan" et "William John" ainsi que 
       le simple "John".
+      </p>
     <p>
       C'est un 
       <a href="https://www.regular-expressions.info/posix.html#ere">
           expression régulière étendue</a>,
       tel que supporté par MySQL,
       There are too many options to enumerate here, but a few examples include:
+      </p>
     <ul>
         <li>If you want to match just the name "John", excluding names that
           include "John" as part of them, enter "^John\$".
+          </li>
         <li>Enumerators often use unusual spellings of names.  For example 
             if you want to match names including both "Henry" and "Henery",
             enter "Hen.*ry".
+          </li>
     </ul>
     </div>
     <div class='balloon' id='HelpSurname'>
@@ -161,7 +166,9 @@
       For example to match surnames starting with "McL..." and ending with "...n",
       such as "McLean", "McLain", "McLennan", or "McLellan" you could specify 
       "^McL.*n\$".
+      </p>
     <p>The meaning of this field changes if the Soundex option is selected.
+      </p>
     <p>The Soundex code has been used for decades to attempt to match names that
       sound similar.  For example it is used by police forces to perform a rough
       match for the names of drivers.  It is a problematic tool, as it
@@ -171,9 +178,10 @@
       specifying Soundex together with "McLean" will match all of the surnames in
       the pattern match example under "Surname", but many other names as well,
       such "McCallum", "McAllan", "McClain", and "McWilliams". 
+      </p>
     </div>
     <div class='balloon' id='HelpSurnameSoundex'> 
-    <p>The Soundex code has been used for decades to attempt to match names that
+      The Soundex code has been used for decades to attempt to match names that
       sound similar.  For example it is used by police forces to perform a rough
       match for the names of drivers.  It is a problematic tool, as it
       is based upon the phonetics of British surnames.
@@ -201,7 +209,7 @@
     <div class='hidden' id='templates'>
       <div class='left' id='chooseTownshipCell'>
         <select size='0' name='Township'>
-          <option value=''>Choose a Township
+            <option value=''>Choose a Township</option>
         </select>
       </div>
       <div class='left' id='noTownshipCell'>

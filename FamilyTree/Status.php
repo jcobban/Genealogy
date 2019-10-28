@@ -21,7 +21,8 @@ use \Exception;
  *						include http.js before util.js					*
  *		2017/07/27		class LegacyCitation renamed to class Citation	*
  *		2017/10/14		use class RecordSet								*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2019/07/26      use FtTemplate                                  *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -30,75 +31,64 @@ require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/Event.inc';
 require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    // query the database for details
-    // get total number of individuals in database
-    $recset		= new RecordSet('Persons', null);
-    $information	= $recset->getInformation();
-    $numPersons		= $information['count']; 
+// default values of parameters
+$lang		        = 'en';
 
-    // get total number of families
-    $recset		= new RecordSet('Families', null);
-    $information	= $recset->getInformation();
-    $numFamilies	= $information['count']; 
-
-    // get total number of events
-    $recset		= new RecordSet('Events', null);
-    $information	= $recset->getInformation();
-    $numEvents		= $information['count']; 
-
-    // get number of citations
-    $citlist		= new RecordSet('Citations', null);
-    $information	= $citlist->getInformation();
-    $numCitations	= $information['count'];
-
-    htmlHeader('Database Status',
-				array(	'/jscripts/js20/http.js',
-						'/jscripts/util.js',
-						'/jscripts/default.js'));
-?>
-<body>
-<?php
-    pageTop(array('/genealogy.php'		=> 'Genealogy',
-				  '/FamilyTree/Services.php'	=> 'Services'));
-?>
-  <div class="body">
-    <div class="fullwidth">
-      <span class="h1">
-		Database Status
-      </span>
-      <span class="right">
-		<a href="StatusHelpen.html" target="help">? Help</a>
-      </span>
-      <div style="clear: both;"></div>
-    </div>
-<?php
-    showTrace();
-
-    if (strlen($msg) > 0)
-    {
-?>
-    <p class="message"><?php print $msg; ?></p>
-<?php
-		$msg	= 0;
+// if invoked by method=get process the parameters
+if (count($_GET) > 0)
+{	        	    // invoked by URL to display current status
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+    {	            // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+	    {		    // act on specific parameter
+			case 'lang':
+            {
+                $lang           = FtTemplate::validateLang($value);
+                break;
+            }
+        }
     }
-    else
-    {			// no errors
-?>
-    <p>The database contains:
-    <ul>
-		<li><?php print number_format($numPersons); ?> individuals.
-		<li><?php print number_format($numFamilies); ?> families.
-		<li><?php print number_format($numEvents); ?> events.
-		<li><?php print number_format($numCitations); ?> citations.
-    </ul>
-<?php
-    }			// no errors
-?>
-  </div>
-<?php
-    pageBot();
-?>
-</body>
-</html>
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display current status
+
+$template               = new FtTemplate("Status$lang.html");
+
+$template->set('LANG',	        $lang);
+
+// query the database for details
+// get total number of individuals in database
+$recset		    		= new RecordSet('Persons', null);
+$information			= $recset->getInformation();
+$numPersons				= $information['count']; 
+
+// get total number of families
+$recset		    		= new RecordSet('Families', null);
+$information			= $recset->getInformation();
+$numFamilies			= $information['count']; 
+
+// get total number of events
+$recset		    		= new RecordSet('Events', null);
+$information			= $recset->getInformation();
+$numEvents				= $information['count']; 
+
+// get number of citations
+$citlist				= new RecordSet('Citations', null);
+$information			= $citlist->getInformation();
+$numCitations			= $information['count'];
+
+$template->set('NUMPERSONS',	number_format($numPersons));
+$template->set('NUMFAMILIES',	number_format($numFamilies));
+$template->set('NUMEVENTS',	    number_format($numEvents));
+$template->set('NUMCITATIONS',	number_format($numCitations));
+
+$template->display();

@@ -1,0 +1,80 @@
+<!--*********************************************************************
+ *  WmbStatsen.html 													*
+ *																		*
+ *  Template to display statistics about the transcription of Wesleyan  *
+ *  Methodist Baptisms broken down by district name.					*
+ *																		*
+ *  History:															*
+ *		2019/07/09		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+	<div class="hidden" id="breadcrumbs">
+	  <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+	  <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+	  <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>: 
+	  <a href="/Ontario/WmbVolStats.php?lang=$LANG">Statistics by Volume</a>: 
+	  <a href="/displayPage.php?template=WmbQuery&lang=$LANG">
+			New Wesleyan Methodist Baptisms Query
+      </a>:
+	</div>
+	<div class="body">
+	  <h1>Ontario: Wesleyan Methodist Baptisms Status
+          <span class='right'>
+			<a href='WmbStatsHelpen.html' target='_blank'>Help?</a>
+		</span>
+		<div style='clear: both;'></div>
+	  </h1>
+      $TRACE
+      $MSG
+	  <form name='statsForm'>
+		<!--- Put out the response as a table -->
+		<table class='form'>
+		  <thead>
+			<!--- Put out the column headers -->
+			<tr id="headRow">
+			  <th class='colhead1st'>
+	    		District
+			  </th>
+			  <th class='colhead'>
+	    		Done
+			  </th>
+			  <th class='colhead'>
+	    		View
+			  </th>
+			</tr>
+		  </thead>
+		  <tbody>
+			<tr id="dataRow$ROWNUM">
+			  <td class='$CLASS bold left first'>
+			    $DISTRICT
+			  </td>
+			  <td class='$CLASS bold right'>
+			    $COUNT
+			  </td>
+			  <td class='$CLASS'>
+			    <button id='ShowDistrictStats$DISTNUM' value='$DISTRICT' 
+							type='button'>
+					View
+			    </button>
+			  </td>
+			</tr>
+		  </tbody>
+		  <tfoot>
+			<tr>
+			  <td class='odd bold right first'>
+			    Total
+			  </td>
+			  <td class='odd bold right'>
+			    $TOTAL
+			  </td>
+			</tr>
+          </tfoot>
+        </table>
+      </form>
+    </div>
+    <div id='HelpShowDistrictStats' class='balloon'>
+      Click on this button to show township level statistics for this district.
+    </div>
+	<script src="/jscripts/util.js" language="JavaScript"></script>
+	<script src="/Ontario/WmbStats.js" language="JavaScript"></script>

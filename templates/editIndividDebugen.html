@@ -1,0 +1,1668 @@
+<!--*********************************************************************
+ *  editIndividDebugen.html						    					*
+ *																		*
+ *  Template to display a web page to support editing details of a      *
+ *  particular record from the table of Persons.						*
+ *																		*
+ *  History:															*
+ *		2019/09/17      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+			Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+			Services
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+			Nominal Index
+      </a>:
+      <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+			Surnames Starting with '$PREFIX'
+      </a>:
+      <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+			Surname '$SURNAME'
+      </a>:
+      <a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG" id="person">
+			$NAME
+      </a>:
+    </div>
+    <div id="transcription" style="overflow: auto; overflow-x: scroll">
+      <div class="body">
+        <h1>
+          <span class="right">
+            <a href="editIndividHelpen.html" target="help">? Help</a>
+          </span>
+          <span style="flow: left" id="title">
+            Edit $NAME<span id="inTree">: in tree '$TREENAME'</span>
+          </span>
+          <div style="clear: both;"></div>
+        </h1>
+        $TRACE
+        $MSG
+        <form name="indForm" id="indForm"
+                action="updatePersonJson.php" method="post">
+          <p>
+            <button type="submit" id="Submit" style="width: 175px;">
+                <u>U</u>pdate Person
+            </button>
+            <span id="cancelButton">
+            &nbsp;
+            <button type="button" id="Delete"
+                    style="width: 175px; display: inline">
+                Cancel
+            </button>
+            </span>
+            <span id="deleteButton">
+            &nbsp;
+            <button type="button" id="Delete"
+                    style="width: 175px; display: inline">
+                <u>D</u>elete Person
+            </button>
+            &nbsp;
+            <button type="button" id="Merge"
+                    style="width: 175px; display: inline">
+                <u>M</u>erge
+            </button>
+            </span>
+            <span id="mergeButton">
+            &nbsp;
+            <button type="button" id="Grant" style="width: 175px;">
+                <u>G</u>rant Access
+            </button>
+            </span>
+            <span id="grantButton">
+            &nbsp;
+            <button type="button" id="Search" style="width: 175px;">
+                <u>S</u>earch
+            </button>
+            <div id="SearchDropdownMenu" class="hidden">
+              <button type="button" id="censusSearch" style="width: 175px;">
+                <u>C</u>ensus Search
+              </button>
+              <br>
+              <button type="button" id="bmdSearch" style="width: 175px;">
+                <u>V</u>ital Stats Search
+              </button>
+              <br>
+              <button type="button" id="ancestrySearch" style="width: 175px;">
+                Ancestr<u>y</u> Search
+              </button>
+            </div> <!-- id="SearchDropdownMenu" -->
+            <!-- hidden parameter values -->
+            <input type="hidden" name="id" id="id"
+                    value="$ID">
+            <input type="hidden" name="parentsIdmr" id="parentsIdmr"
+                    value="$PARENTSIDMR">
+            <input type="hidden" name="idcr" id="idcr"
+                    value="$IDCR">
+            <input type="hidden" name="idar" id="idar" 
+                    value="$IDAR">
+            <input type="hidden" name="fatherGivenName" id="fatherGivenName"
+                    value="$FATHERGIVENNAME">
+		    <input type="hidden" name="fatherSurname" id="fatherSurname"
+		            value="$FATHERSURNAME">
+		    <input type="hidden" name="motherGivenName" id="motherGivenName"
+		            value="$MOTHERGIVENNAME">
+		    <input type="hidden" name="motherSurname" id="motherSurname"
+		            value="$MOTHERSURNAME">
+		    <input type="hidden" name="treeName" id="treeName"
+		            value="$TREENAME">
+		    <input type="hidden" name="parentCount" id="parentCount"
+		            value="$PARENTSCOUNT">
+		    <input type="hidden" name="familyCount" id="familyCount"
+		            value="$FAMILIESCOUNT">
+            <input type="hidden" name="Debug" id="Debug" 
+                    value="$DEBUG">
+          </p>
+
+		    <fieldset id="IdentityFields" class="other">
+		      <legend class="labelSmall">Identity:</legend>
+		      <div class="row">
+		        <label class="column1" for="idir">
+		            IDIR:
+		        </label>
+		        <input type="text" name="idir" id="idir" value="$IDIR"
+		                class="ina rightnc" style="width: 4em;" readonly="readonly">
+		        <div style="clear: both;"></div>
+		      </div>
+		      <div class="row">
+		        <label class="column1" for="Surname">
+		            Surname:
+		        </label>
+		        <input type="text" name="Surname" id="Surname"
+		                placeholder="Supply Surname of new Individual"
+		                class="leftname" maxlength="120"
+		                value="$SURNAME">
+		        <div style="clear: both;"></div>
+		      </div>
+		      <div class="row">
+		        <label class="column1" for="GivenName">
+		            Given&nbsp;Names:
+		        </label>
+		        <input type="text" name="GivenName" id="GivenName" size="64"
+		                placeholder="Supply Given Name of new Individual"
+                        maxlength="120" class="leftname" 
+		                value="$GIVEN">
+                <button type="button" class="button" 
+                        id="editName$IDNX">
+		            Details
+		        </button>
+		        <div style="clear: both;"></div>
+		      </div>
+		      <div class="row">
+		        <div class="column1">
+		          <label class="column1" for="Gender">
+		            Gender:
+		          </label>
+		          <select name="Gender" id="Gender" size="1"
+		                $GENDERFIXED
+		                class="$GENDERCLASS left">
+		            <option value="0" $SELECTEDGENDER0 class="male">
+		                Male
+		            </option>
+		            <option value="1" $SELECTEDGENDER1 class="female">
+		                Female
+		            </option>
+		            <option value="2" $SELECTEDGENDER2 class="unknown">
+		                Unknown
+		            </option>
+		          </select>
+		          <div style="clear: both;"></div>
+		        </div>
+		      </div>
+		      </fieldset>
+      <fieldset id="RelationshipFields" class="other">
+        <legend class="labelSmall">Relationship&nbsp;to:</legend>
+      <div class="row">
+          <label class="column1" for="CPIdcs">
+            Final Status:
+          </label>
+          <select name="CPIdcs" id="CPIdcs" size="1" class="white left">
+            <option value="1" $SELECTEDSTATUS1>
+ 		Ordinary
+            </option>
+            <option value="2" $SELECTEDSTATUS2>
+ 		None
+            </option>
+            <option value="3" $SELECTEDSTATUS3>
+ 		Stillborn
+            </option>
+            <option value="4" $SELECTEDSTATUS4>
+ 		Twin
+            </option>
+            <option value="5" $SELECTEDSTATUS5>
+ 		Illegitimate
+            </option>
+          </select>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="fatherRow">
+        <div class="column1">
+          <label class="column1" for="CPRelDad">
+                $FATHERNAME:
+          </label>
+          <select name="CPRelDad" id="CPRelDad" size="1"
+                class="white left">
+            <option value="1" $SELECTEDRELDAD1>
+                ordinary
+            </option>
+            <option value="2" $SELECTEDRELDAD2>
+                adopted
+            </option>
+            <option value="3" $SELECTEDRELDAD3>
+                biological
+            </option>
+            <option value="4" $SELECTEDRELDAD4>
+                challenged
+            </option>
+            <option value="5" $SELECTEDRELDAD5>
+                disproved
+            </option>
+            <option value="6" $SELECTEDRELDAD6>
+                foster
+            </option>
+            <option value="7" $SELECTEDRELDAD7>
+                guardian
+            </option>
+            <option value="8" $SELECTEDRELDAD8>
+                sealing
+            </option>
+            <option value="9" $SELECTEDRELDAD9>
+                step
+            </option>
+            <option value="10" $SELECTEDRELDAD10>
+                unknown
+            </option>
+            <option value="11" $SELECTEDRELDAD11>
+                private
+            </option>
+            <option value="12" $SELECTEDRELDAD12>
+                family member
+            </option>
+            <option value="13" $SELECTEDRELDAD13>
+                illegitimate
+            </option>
+          </select>
+        </div>
+        <div class="column2">
+          <label class="labelSmall" for="CPDadPrivate">
+                Private?
+          </label>
+          <input type="checkbox" name="CPDadPrivate" id="CPDadPrivate"
+                value="1"
+                $dadPrivatechecked>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row">
+      <div class="row" id="motherRow">
+        <div class="column1">
+          <label class="column1" for="CPRelMom">
+                $MOTHERNAME:
+          </label>
+          <select name="CPRelMom" id="CPRelMom" size="1" class="white left">
+            <option value="1" $SELECTEDRELMOM1>
+                ordinary
+            </option>
+            <option value="2" $SELECTEDRELMOM2>
+                adopted
+            </option>
+            <option value="3" $SELECTEDRELMOM3>
+                biological
+            </option>
+            <option value="4" $SELECTEDRELMOM4>
+                challenged
+            </option>
+            <option value="5" $SELECTEDRELMOM5>
+                disproved
+            </option>
+            <option value="6" $SELECTEDRELMOM6>
+                foster
+            </option>
+            <option value="7" $SELECTEDRELMOM7>
+                guardian
+            </option>
+            <option value="8" $SELECTEDRELMOM8>
+                sealing
+            </option>
+            <option value="9" $SELECTEDRELMOM9>
+                step
+            </option>
+            <option value="10" $SELECTEDRELMOM10>
+                unknown
+            </option>
+            <option value="11" $SELECTEDRELMOM11>
+                private
+            </option>
+            <option value="12" $SELECTEDRELMOM12>
+                family member
+            </option>
+            <option value="13" $SELECTEDRELMOM13>
+                illegitimate
+            </option>
+          </select>
+        </div>
+        <div class="column2">
+          <label class="labelSmall" for="CPMomPrivate">
+                Private?
+          </label>
+          <input type="checkbox" name="CPMomPrivate" id="CPMomPrivate" value="1"
+                $momPrivatechecked>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+      <div class="row" id="SealingRow">
+        <div class="column1">
+          <label class="column1" for="SealingDate">
+                Sealed to Parents:
+          </label>
+          <input type="text" name="SealingDate" id="SealingDate"
+                class="date" value="$SEALINGDATE">
+          <select name="SealingIdtr" id="SealingIdtr" class="white left">
+                <option value="0" $NOTEMPLE>
+                    Choose a Temple:
+                </option>
+                <option value="$idtr" id="temple$idtr" $selected>
+                    $name 
+                </option>
+          </select>
+          <input type="hidden" name="SealingIder" id="SealingIder"
+                value="$SEALINGIDER">
+        </div> 
+        <button type="button" class="button" id="Detail17">
+                Details
+        </button>
+        <button type="button" class="button" id="Clear17">
+                Delete
+        </button>
+        <div style="clear: both;"></div>
+      </div>
+      </fieldset>
+      <fieldset id="EventFields" class="other">
+        <legend class="labelSmall">Events</legend>
+        <div class="row"
+                id="EventColHeadersRow">
+          <span class="labelSmall"
+                style="width: 3em; padding-left: 3em;">
+                IDER:
+          </span>
+          <span class="labelSmall"
+                style="width: 11em; padding-left: 8em;">
+                Type:
+          </span>
+          <span class="labelSmall"
+                style="width: 3em; padding-left: 5em;">
+                IDET:
+          </span>
+          <span class="labelSmall"
+                style="width: 3em; padding-left: 5em;">
+                CitType:
+          </span>
+          <span class="labelSmall"
+                style="width: 3em; padding-left: 5em;">
+                Order:
+          </span>
+          <span class="labelSmall"
+                style="width: 3em; padding-left: 4em;">
+                Sort Date:
+          </span>
+          <span class="labelSmall"
+                style="width: 3em; padding-left: 3em;">
+                Changed:
+          </span>
+          <span class="labelSmall"
+                style="width: 6em; padding-left: 3em;">
+                Date:
+          </span>
+          <span class="labelSmall"
+                style="width: 13em; padding-left: 5em; padding-right: 26em;">
+                Location:
+          </span>
+          <span class="labelSmall">
+                Preferred:
+          </span>
+          <div style="clear: both;"></div>
+        </div>
+        <div id="EventBody">
+            $EVENTS
+        </div> <!-- end of <div id="EventBody"> -->
+        <div class="row" id="AddEventRow">
+          <label class="column1" for="AddEvent">
+          </label>
+          <button type="button" class="button" id="AddEvent"
+                    style="width: 11em;">
+                Add <u>E</u>vent
+          </button>
+          <button type="button" class="button" id="Order">
+                <u>O</u>rder Events by Date
+          </button>
+          <div style="clear: both;"></div>
+        </div>
+      </fieldset>
+      <fieldset id="OtherFields" class="other">
+        <legend class="labelSmall">
+            Other:
+        </legend>
+        <!-- row allowing edit of Private flag -->
+        <div class="row" id="PrivateRow">
+          <div class="column1">
+            <label class="column1" for="Private">
+              Private:
+            </label>
+            <select name="Private" id="Private" size="1" class="white left">
+              <option value="0" $SELECTEDPRIVATE0>
+                No
+              </option>
+              <option value="1" $SELECTEDPRIVATE1>
+                Yes
+              </option>
+              <option value="2" $SELECTEDPRIVATE2>
+                Invisible
+              </option>
+            </select>
+          </div>
+          <div class="column2">
+            <label class="labelSmall" for="NeverMarried">
+              Never Married:
+            </label>
+            <input type="hidden" name="NeverMarried[]" value="0">
+            <input type="checkbox" name="NeverMarried[]" id="NeverMarried"
+                value="1"
+                $NEVERMARRIEDRO $NEVERMARRIEDCHECKED>  
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="RefRow">
+          <div class="column1">
+            <label class="column1" for="UserRef">
+                User Ref:
+            </label>
+            <input type="text" name="UserRef" id="UserRef"
+                maxlength="50" style="width: 9em;"
+                class="white leftnc"
+                value="$USERREF">
+          </div>
+          <div class="column2">
+            <label class="labelSmall" for="AncestralRef">
+                Ancestral Ref:
+            </label>
+            <input type="text" name="AncestralRef" id="AncestralRef"
+                maxlength="20" style="width: 9em;"
+                class="white left"
+                value="$ANCESTRALREF">
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="InterestRow">
+          <div class="column1">
+            <label class="column1" for="AncInterest">
+                Ancestor Interest:
+            </label>
+            <select name="AncInterest" id="AncInterest" 
+                        size="1" class="white left">
+              <option value="0" $SELECTEDANCINTEREST0>
+                Low
+              </option>
+              <option value="1" $SELECTEDANCINTEREST1>
+                Moderate
+              </option>
+              <option value="2" $SELECTEDANCINTEREST2>
+                High
+              </option>
+              <option value="3" $SELECTEDANCINTEREST3>
+                Highest
+              </option>
+            </select>
+          </div>
+          <div class="column2">
+            <label class="labelSmall" for="DecInterest">
+                Descendant Interest:
+            </label>
+            <select name="DecInterest" id="DecInterest"
+                        size="1" class="white left">
+              <option value="0" $SELECTEDDECINTEREST0>
+                Low
+              </option>
+              <option value="1" $SELECTEDDECINTEREST1>
+                Moderate
+              </option>
+              <option value="2" $SELECTEDDECINTEREST2>
+                High
+              </option>
+              <option value="3" $SELECTEDDECINTEREST3>
+                Highest
+              </option>
+            </select>
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+      </fieldset>
+      <fieldset id="ButtonFields" class="other">
+        <legend class="labelSmall">
+            Buttons:
+        </legend>
+        <div class="row">
+          <div class="column1">
+          <button type="button" class="buttonCol1" id="Detail6">
+                Edit General   <u>N</u>otes
+          </button>
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row">
+          <button type="button" class="buttonCol1" id="Parents">
+              <span id="addParents">
+                Add   <u>P</u>arents
+              </span>
+              <span id="editParents">
+                Edit   <u>P</u>arents
+              </span>
+          </button>
+          <button type="button" class="buttonCol2" id="Marriages">
+              <span id="addFamily">
+                Add Spouse or Child
+              </span>
+              <span id="editFamilies">
+                Edit   <u>F</u>amilies
+              </span>
+          </button>
+          <input type="hidden" name="IDMRPref" id="IDMRPref" 
+                value="$IDMRPREF">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="PicturesRow">
+            <button type="button" class="buttonCol1" id="Pictures">
+                Edit P<u>i</u>ctures
+            </button>
+            <button type="button" class="buttonCol2" id="Address">
+              <span id="addAddress">
+                  Edit <u>A</u>ddress
+              </span>
+              <span id="editAddress">
+                  Add <u>A</u>ddress
+              </span>
+            </button>
+          <div style="clear: both;"></div>
+        </div>
+          <!-- row allowing edit of some notes fields -->
+        <div class="row" id="NotesRow">
+            <button type="button" class="buttonCol1" id="Detail7">
+                Edit <u>R</u>esearch Notes
+            </button>
+            <button type="button" class="buttonCol2" id="Detail8">
+                Edit Medical Notes
+            </button>
+          <div style="clear: both;"></div>
+        </div>
+      </fieldset>
+  </form>
+      </div> <!-- class="body" -->
+    </div> <!-- id="transcription" -->
+    <div class="hidden" id="templates">
+      <!-- template for Add Address button -->
+      <span id="AddressAdd">
+        Add <u>A</u>ddress
+      </span>
+      <!-- template for Edit Address button -->
+      <span id="AddressRepl">
+        Edit <u>A</u>ddress
+      </span>
+      <!-- template for Add Parents button -->
+      <span id="AddParentsRepl">
+        Add <u>P</u>arents
+      </span>
+      <!-- template for Edit Parents button -->
+      <span id="EditParentsRepl">
+        Edit <u>P</u>arents
+      </span>
+      <!-- template for Add Spouse button -->
+      <span id="AddSpouseRepl">
+        Add Spouse or Child
+      </span>
+      <!-- template for Edit Families button -->
+      <span id="EditFamiliesRepl">
+        Edit <u>F</u>amilies
+      </span>
+      <!-- template for an added row allowing edit of some notes fields -->
+      <div id="NotesRow$template">
+          <button type="button" class="button" id="Detail7$template">
+                Edit <u>R</u>esearch Notes
+          </button>
+          <button type="button" class="button" id="Detail8$template">
+                Edit Medical Notes
+          </button>
+      </div>
+	  <!-- template for an added row allowing edit of Private flag -->
+      <div id="PrivateRow$template">
+        <label class="column1" for="Private">
+	            Private:
+        </label>
+            <input type="hidden" name="Private[]$template" value="0">
+            <input type="checkbox" name="Private[]$template" value="1"
+	                id="PrivateCheckBox$template">
+      </div>
+      <div id="RefRow$template">
+        <label class="column1" for="UserRef">
+	                User Ref:
+        </label>
+        <input type="text" name="UserRef$template" size="11"
+	                maxlength="50"
+	                class="white leftnc"
+	                value="$userRef">
+        <label class="labelSmall" for="AncestralRef">
+	                Ancestral Ref:
+        </label>
+          <input type="text" name="AncestralRef$template" size="11"
+	                maxlength="20"
+	                class="white left"
+	                value="$ancestralRef">
+      </div>
+      <!-- always put the Birth event first-->
+      <div class="row" id="BirthRow">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <input type="hidden" name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <label class="column1" for="BirthDate">
+                  Birth:
+          </label>
+          <input type="text" name="BirthDate" id="BirthDate"
+                  class="white date"
+                  value="$date">
+          <input type="text" name="BirthLocation" id="BirthLocation"
+                  maxlength="255" class="location"
+                  value="$locationname">
+          <input type="checkbox"
+                  name="EventPref$rownum" 
+                  id="EventPref$rownum" value="Y"
+                  $preferredchecked>
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIdet$rownum"
+                          id="EventIdet$rownum"
+                          value="$idet">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventCitType$rownum"
+                          id="EventCitType$rownum"
+                          value="$cittype">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventOrder$rownum"
+                          id="EventOrder$rownum"
+                          value="$order">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventSD$rownum"
+                          id="EventSD$rownum"
+                          value="$datesd">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventChanged$rownum"
+                          id="EventChanged$rownum"
+                          value="$changed">
+          <button type="button" class="button"
+                          id="EventDetail$rownum">
+                  Details
+          </button>
+          <button type="button" class="button"
+                          id="EventDelete$rownum">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row" id="ChristeningRow">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <input type="hidden" name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <label class="column1" for="ChrisDate">
+                  Christening:
+          </label>
+          <input type="text"
+                    name="ChristeningDate" id="ChristeningDate"
+                    class="white date" value="$date">
+          <input type="text" 
+                    name="ChristeningLocation" id="ChristeningLocation" 
+                    size="52" maxlength="255" class="location"
+                    value="$locationname">
+          <input type="checkbox"
+                  name="EventPref$rownum" 
+                  id="EventPref$rownum" value="Y"
+                  $preferredchecked>
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIdet$rownum"
+                          id="EventIdet$rownum"
+                          value="$idet">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventCitType$rownum"
+                          id="EventCitType$rownum"
+                          value="$cittype">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventOrder$rownum"
+                          id="EventOrder$rownum"
+                          value="$order">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventSD$rownum"
+                          id="EventSD$rownum"
+                          value="$datesd">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventChanged$rownum"
+                          id="EventChanged$rownum"
+                          value="$changed">
+          <button type="button" class="button"
+                          id="EventDetail$rownum">
+                  Details
+          </button>
+          <button type="button" class="button"
+                          id="EventDelete$rownum">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div><!-- id="ChristeningRow" -->
+        <div class="row" id="BaptismRow">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <input type="hidden" name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <label class="column1" for="BaptismDate">
+                  LDS Baptism:
+          </label>
+          <input type="text" name="BaptismDate" id="BaptismDate"
+                  class="white date"
+                  value="$date">
+          <input type="text" name="BaptismTemple" id="BaptismTemple" size="52"
+                  maxlength="255"
+                  class="ina leftnc"
+                  readonly="readonly"
+                  value="$locationname">
+          <input type="hidden"
+                  name="EventIdlr$rownum" 
+                  id="EventIdlr$rownum"
+                  value="$idlrevent">
+          <input type="text" name="BaptismLocation" id="BaptismLocation" size="52"
+                  maxlength="255" class="location"
+                  value="$locationname">
+          <input type="checkbox"
+                  name="EventPref$rownum" 
+                  id="EventPref$rownum" value="Y"
+                  $preferredchecked>
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIdet$rownum"
+                          id="EventIdet$rownum"
+                          value="$idet">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventCitType$rownum"
+                          id="EventCitType$rownum"
+                          value="$cittype">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventOrder$rownum"
+                          id="EventOrder$rownum"
+                          value="$order">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventSD$rownum"
+                          id="EventSD$rownum"
+                          value="$datesd">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventChanged$rownum"
+                          id="EventChanged$rownum"
+                          value="$changed">
+          <button type="button" class="button"
+                          id="EventDetail$rownum">
+                  Details
+          </button>
+          <button type="button" class="button"
+                          id="EventDelete$rownum">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div><!-- id="BaptismRow" -->
+        <div class="row" id="EndowmentRow">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <input type="hidden" name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <label class="column1" for="EndowmentDate">
+                  LDS Endowment:
+          </label>
+          <input type="text" name="EndowmentDate" id="EndowmentDate" 
+                  class="white date" value="$date">
+          <input type="text" name="EndowmentTemple" id="EndowmentTemple"
+                  size="52" maxlength="255" class="ina leftnc" readonly="readonly"
+                  value="$locationname">
+          <input type="hidden"
+                  name="EventIdlr$rownum"
+                  id="EventIdlr$rownum"
+                  value="$idlrevent">
+          <input type="checkbox"
+                  name="EventPref$rownum" 
+                  id="EventPref$rownum" value="Y"
+                  $preferredchecked>
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIdet$rownum"
+                          id="EventIdet$rownum"
+                          value="$idet">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventCitType$rownum"
+                          id="EventCitType$rownum"
+                          value="$cittype">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventOrder$rownum"
+                          id="EventOrder$rownum"
+                          value="$order">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventSD$rownum"
+                          id="EventSD$rownum"
+                          value="$datesd">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventChanged$rownum"
+                          id="EventChanged$rownum"
+                          value="$changed">
+          <button type="button" class="button"
+                          id="EventDetail$rownum">
+                  Details
+          </button>
+          <button type="button" class="button"
+                          id="EventDelete$rownum">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div><!-- id="EndowmentRow" -->
+        <div class="row" id="ConfirmationRow">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <input type="hidden" name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <label class="column1" id="ConfirmationDate">
+                  LDS Confirmation:
+          </label>
+          <input type="text" name="ConfirmationDate" id="ConfirmationDate"
+                  class="white date"
+                  value="$date">
+          <input type="text" name="ConfirmationTemple" id="ConfirmationTemple"
+                  size="52" maxlength="255" class="ina leftnc" readonly="readonly"
+                  value="$locationname">
+          <input type="hidden"
+                  name="EventIdlr$rownum"
+                  id="EventIdlr$rownum"
+                  value="$idlrevent">
+          <input type="checkbox"
+                  name="EventPref$rownum" 
+                  id="EventPref$rownum" value="Y"
+                  $preferredchecked>
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIdet$rownum"
+                          id="EventIdet$rownum"
+                          value="$idet">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventCitType$rownum"
+                          id="EventCitType$rownum"
+                          value="$cittype">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventOrder$rownum"
+                          id="EventOrder$rownum"
+                          value="$order">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventSD$rownum"
+                          id="EventSD$rownum"
+                          value="$datesd">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventChanged$rownum"
+                          id="EventChanged$rownum"
+                          value="$changed">
+          <button type="button" class="button"
+                          id="EventDetail$rownum">
+                  Details
+          </button>
+          <button type="button" class="button"
+                          id="EventDelete$rownum">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div><!-- id="ConfirmationRow" -->
+        <div class="row" id="InitiatoryRow">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <input type="hidden" name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <label class="column1" for="InitiatoryDate">
+                  LDS Initiatory:
+          </label>
+          <input type="text" name="InitiatoryDate" id="InitiatoryDate"
+                  class="white date"
+                  value="$date">
+          <input type="text" name="InitiatoryTemple" id="InitiatoryTemple"
+                  size="52" maxlength="255"
+                  class="ina leftnc" readonly="readonly"
+                  value="$locationname">
+          <input type="hidden"
+                  name="EventIdlr$rownum"
+                  id="EventIdlr$rownum"
+                  value="$idlrevent">
+          <input type="checkbox"
+                  name="EventPref$rownum" 
+                  id="EventPref$rownum" value="Y"
+                  $preferredchecked>
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIdet$rownum"
+                          id="EventIdet$rownum"
+                          value="$idet">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventCitType$rownum"
+                          id="EventCitType$rownum"
+                          value="$cittype">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventOrder$rownum"
+                          id="EventOrder$rownum"
+                          value="$order">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventSD$rownum"
+                          id="EventSD$rownum"
+                          value="$datesd">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventChanged$rownum"
+                          id="EventChanged$rownum"
+                          value="$changed">
+          <button type="button" class="button"
+                          id="EventDetail$rownum">
+                  Details
+          </button>
+          <button type="button" class="button"
+                          id="EventDelete$rownum">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div><!-- id="InitiatoryRow" -->
+        <div class="row" id="DeathRow">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <input type="hidden" name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <label class="column1" for="DeathDate">
+                  Death:
+          </label>
+          <input type="text" name="DeathDate" id="DeathDate" size="11"
+                  class="white date"
+                  value="$date">
+          <input type="text" name="DeathLocation" id="DeathLocation" size="52"
+                  maxlength="255" class="location"
+                  value="$locationname">
+          <input type="checkbox"
+                  name="EventPref$rownum" 
+                  id="EventPref$rownum" value="Y"
+                  $preferredchecked>
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIdet$rownum"
+                          id="EventIdet$rownum"
+                          value="$idet">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventCitType$rownum"
+                          id="EventCitType$rownum"
+                          value="$cittype">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventOrder$rownum"
+                          id="EventOrder$rownum"
+                          value="$order">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventSD$rownum"
+                          id="EventSD$rownum"
+                          value="$datesd">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventChanged$rownum"
+                          id="EventChanged$rownum"
+                          value="$changed">
+          <button type="button" class="button"
+                          id="EventDetail$rownum">
+                  Details
+          </button>
+          <button type="button" class="button"
+                          id="EventDelete$rownum">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div><!-- id="DeathRow" -->
+        <div id="DeathCauseRow" class="row">
+          <label class="column1" for="DeathCause">
+                  Death Cause:
+          </label>
+          <input type="text" name="DeathCause" id="DeathCause"
+                  maxlength="255" class="leftname"
+                  value="$deathcause">
+          <button type="button" class="button" id="Detail9" style="margin-left: 28px;">
+                  Details
+          </button>
+          <button type="button" class="button" id="Clear9">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div> <!-- id="DeathCauseRow" -->
+        <div class="row" id="BuriedRow">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <input type="hidden" name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <label class="column1" for="BuriedDate">
+                  Buried:
+          </label>
+          <input type="text" name="BuriedDate" id="BuriedDate" size="11"
+                  class="white date"
+                  value="$date">
+          <input type="text" name="BuriedLocation" id="BuriedLocation" size="52"
+                  maxlength="255" class="location"
+                  value="$locationname">
+          <input type="checkbox"
+                  name="EventPref$rownum" 
+                  id="EventPref$rownum" value="Y"
+                  $preferredchecked>
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIdet$rownum"
+                          id="EventIdet$rownum"
+                          value="$idet">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventCitType$rownum"
+                          id="EventCitType$rownum"
+                          value="$cittype">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventOrder$rownum"
+                          id="EventOrder$rownum"
+                          value="$order">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventSD$rownum"
+                          id="EventSD$rownum"
+                          value="$datesd">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventChanged$rownum"
+                          id="EventChanged$rownum"
+                          value="$changed">
+          <button type="button" class="button"
+                          id="EventDetail$rownum">
+                  Details
+          </button>
+          <button type="button" class="button"
+                          id="EventDelete$rownum">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div><!-- id="BuriedRow" -->
+        <div class="row" id="EventRow$rownum">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <input type="hidden" name="EventIder$rownum"
+                          id="EventIder$rownum"
+                          value="$ider">
+          <label class="column1"
+                  id="EventLabel$rownum"
+                  for="EventDate$rownum">
+                  $type:
+          </label>
+          <input type="text" name="EventDate$rownum"
+                  id="EventDate$rownum"
+                  class="white date"
+                  value="$date">
+          <input type="text"
+                  name="EventDescn$rownum"
+                  id="EventDescn$rownum"
+                  maxlength="1023"
+                  class="description"
+                  value="$descn">
+  
+          <input type="text"
+                  name="EventLocation$rownum"
+                  id="EventLocation$rownum"
+                  maxlength="255"
+                  class="shortloc"
+                  value="$locationname">
+          <input type="checkbox"
+                  name="EventPref$rownum" 
+                  id="EventPref$rownum" value="Y"
+                  $preferredchecked>
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventIdet$rownum"
+                          id="EventIdet$rownum"
+                          value="$idet">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventCitType$rownum"
+                          id="EventCitType$rownum"
+                          value="$cittype">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventOrder$rownum"
+                          id="EventOrder$rownum"
+                          value="$order">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventSD$rownum"
+                          id="EventSD$rownum"
+                          value="$datesd">
+          <input type="text" readonly="readonly" class="ina rightnc"
+                          style="width: 8em;"
+                          name="EventChanged$rownum"
+                          id="EventChanged$rownum"
+                          value="$changed">
+          <button type="button" class="button"
+                          id="EventDetail$rownum">
+                  Details
+          </button>
+          <button type="button" class="button"
+                          id="EventDelete$rownum">
+                  Delete
+          </button>
+          <div style="clear: both;"></div>
+        </div><!-- id="EventRow" -->
+	  $LOCATIONDIALOGS
+	  include '/templates/LocationDialogs.html';
+	
+	  <!-- template for confirming the deletion of an event-->
+	  <form name="ClrInd$template" id="ClrInd$template">
+	    <p class="message">$msg</p>
+	      <button type="button" id="confirmClear$type">
+		        OK
+	      </button>
+	      <input type="hidden" id="formname$type" name="formname$type"
+		                value="$formname">
+	      <input type="hidden" id="IDER$type" name="IDER$type"
+		                value="$ider">
+	      <input type="hidden" id="RowName$type" name="RowName$type"
+		                value="$rowname">
+	      <input type="hidden" id="RowNum$type" name="RowNum$type"
+		                value="$rownum">
+	        &nbsp;
+	      <button type="button" id="cancelDelete$type">
+		        Cancel
+	      </button>
+	  </form>
+	  <span id="EventText$IDET">$TEXT</span>
+	</div> <!-- id="templates" -->
+	<div class="balloon" id="Helpid">
+		This read-only field displays the internal record number of the database
+		record for this person.
+	</div>
+	<div class="balloon" id="Helpidir">
+        This read-only field displays the numeric key that is used by other
+		records to locate the record for this person.  If the database
+        was originally loaded from a GEDCOM file this is the numeric key
+        used for referencing the INDI record in that file.
+	</div>
+	<div class="balloon" id="HelpparentsIdmr">
+		This hidden field records the internal record number of the database
+		record for the family record of the primary parents of this person.
+	</div>
+	<div class="balloon" id="HelpSurname">
+        Edit the primary surname of the person. 
+        Note that changing the surname causes
+        a number of other fields and records to be updated.
+		If the surname does not already appear in the database, a record is
+		added into the Surnames table.
+	</div>
+	<div class="balloon" id="HelpGivenName">
+		Edit the given names of the person. 
+        Note that changing the given name causes
+        a number of other fields and records to be updated.
+	</div>
+	<div class="balloon" id="HelpPrefix">
+		The name prefix.
+	</div>
+	<div class="balloon" id="HelpTitle">
+		The title is the portion of a name that represents an honorific or rank.
+		Examples include "/Dr.", "Rev'd", "Capt.", and "Sir".
+	</div>
+	<div class="balloon" id="HelpSealingDate">
+		<p>
+		The date the person was sealed to his parents in an LDS temple.
+		</p>
+		<p>
+		If known this is normally expressed as numeric day of the month,
+		three character abbreviation of month name, and the year.  For example
+	    "13 Aug 1894".  However you can also specify "about 1876" or 
+        "between 1854 and 1882".  
+        Note that an all numeric date of the format "nn/nn/nnnn" is 
+        interpreted as "dd/mm/yyyy", not
+        as the American style "mm/dd/yyyy" except if the second number 
+        is in the range 13 to 31 and the first number is in the range 1 to 12.
+		</p>
+		<p>
+		For more details see
+		<a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+		</p>
+	</div>
+	<div class="balloon" id="HelpBaptismTemple">
+		The LDS temple where the person was baptized.
+	</div>
+	<div class="balloon" id="HelpConfirmationTemple">
+		The LDS temple where the person was confirmed.
+	</div>
+	<div class="balloon" id="HelpInitiatoryTemple">
+		The LDS temple where the person was initiated.
+	</div>
+	<div class="balloon" id="HelpEndowmentTemple">
+		The LDS temple where the person was endowed.
+	</div>
+	<div class="balloon" id="HelpSealingTemple">
+		The LDS temple where the person was sealed to his parents.
+	</div>
+	<div class="balloon" id="HelpBirthDate">
+		<p>
+		The birth date.
+		</p>
+		<p>
+		If known this is normally expressed as numeric day of the month,
+		three character abbreviation of month name, and the year.  For example
+	    "13 Aug 1894".  However you can also specify "about 1876" or 
+        "between 1854 and 1882".  
+        Note that an all numeric date of the format "nn/nn/nnnn" is 
+        interpreted as "dd/mm/yyyy", not
+        as the American style "mm/dd/yyyy" except if the second number 
+        is in the range 13 to 31 and the first number is in the range 1 to 12.
+		</p>
+		<p>
+		For more details see
+		<a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+		</p>
+	</div>
+	<div class="balloon" id="HelpBirthLocation">
+		The location where the person was born.
+	</div>
+	<div class="balloon" id="HelpChrisDate">
+		<p>
+		The date of christening.  Note that because of the key contributions
+        to genealogy by the Church of Jesus Christ of Latter Day Saints (LDS),
+        the term "christening" is used to describe a baptism in a 
+        Trinitarian Christian church.  That is Churches which baptize 
+        "in the name of the Father, the Son, and the Holy Spirit."
+		The term "baptism" is used exclusively for the LDS sacrament.
+		</p>
+		<p>  
+		If known this is normally expressed as numeric day of the month,
+		three character abbreviation of month name, and the year.  For example
+	    "13 Aug 1894".
+        Note that an all numeric date of the format "nn/nn/nnnn" is interpreted
+        as "dd/mm/yyyy", not
+        as the American style "mm/dd/yyyy" except if the second number
+        is in the range 13 to 31 and the first number is in the range 1 to 12.
+		</p>
+		<p>
+		For more details see
+		<a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+		</p>
+	</div>
+	<div class="balloon" id="HelpChrisLocation">
+		The location where the person was christened.
+	</div>
+	<div class="balloon" id="HelpDeathDate">
+		<p>
+		The date of death.
+		If known this is normally expressed as numeric day of the month,
+        three character abbreviation of month name, and the year. 
+        For example "13 Aug 1894".
+        Note that an all numeric date of the format "nn/nn/nnnn" is
+        interpreted as "dd/mm/yyyy", not
+        as the American style "mm/dd/yyyy" except if the second number
+        is in the range 13 to 31 and the first number is in the range 1 to 12.
+		</p>
+		<p>
+		For more details see
+		<a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+		</p>
+	</div>
+	<div class="balloon" id="HelpDeathLocation">
+		The location where the person died.
+	</div>
+	<div class="balloon" id="HelpBuriedDate">
+		<p>
+		The date the person was buried.
+		</p>
+		<p>  
+		If known this is normally expressed as numeric day of the month,
+        three character abbreviation of month name, and the year. 
+        For example "13 Aug 1894".
+        Note that an all numeric date of the format "nn/nn/nnnn"
+        is interpreted as "dd/mm/yyyy", not
+        as the American style "mm/dd/yyyy" except if the second number
+        is in the range 13 to 31 and the first number is in the range 1 to 12.
+		</p>
+		<p>
+		For more details see
+		<a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+		</p>
+	</div>
+	<div class="balloon" id="HelpBuriedLocation">
+        The location where the person was buried. 
+        This is typically the name and
+		location of the cemetery.
+	</div>
+	<div class="balloon" id="HelpGender">
+		This is a selection list from which to choose the gender of the person.
+	</div>
+	<div class="balloon" id="HelpPrivate">
+        If this selection list to control how much information is displayed 
+        to casual
+		viewers about this person.  Selecting 'No' indicates that none of the
+		information about the person is private, and as long as the person
+        lived long enough ago that the basic information is not covered
+        by privacy regulations then the information is displayed.  
+        Selecting 'Yes' indicates that
+		no information is displayed about the person but the person's name.
+		Selecting 'Invisible' indicates that even the existence of the person
+		is hidden from casual viewers.  
+	</div>
+	<div class="balloon" id="HelpAncInterest">
+		Use this selection list to indicate how important the ancestors of this 
+		person are to you.
+	</div>
+	<div class="balloon" id="HelpDecInterest">
+        Use this selection list to indicate how important the descendants
+        of this person are to you.
+	</div>
+	<div class="balloon" id="HelpPictures">
+		Clicking on this button opens up a
+		<a href="editPicturesHelpen.html" target="help">dialog</a>
+        that permits you to add or delete images associated with this person.
+        Note that it is also possible to embed images within any extended
+        text field.
+	</div>
+	<div class="balloon" id="HelpDeathCause">
+		The cause of death as provided by the coroner or medical attendant, 
+		usually from the death certificate.
+	</div>
+	<div class="balloon" id="HelpCPIdcs">
+		Select the most appropriate status of the child.  This is the status
+		as a result of birth.
+	</div>
+	<div class="balloon" id="HelpDetail">
+		Clicking on this button opens up a
+		<a href="editEventHelpen.html" target="help">dialog</a>
+		that permits you to enter more details about the associated event.
+		This includes textual notes and source citations.
+	</div>
+	<div class="balloon" id="HelpClear">
+		Clicking on this button clears all of the information about the 
+		associated event.  The date and location are cleared to empty strings and
+		any citations to the event are deleted from the database.
+	</div>
+	<div class="balloon" id="HelpBaptismDate">
+		<p>
+		The date of the LDS baptism.
+		</p>
+		<p>
+		If known this is normally expressed as numeric day of the month,
+		three character abbreviation of month name, and the year.  For example
+        "13 Aug 1894".  However you can also specify "about 1876"
+        or "between 1854 and 1882".  
+        Note that an all numeric date of the format "nn/nn/nnnn"
+        is interpreted as "dd/mm/yyyy", not
+        as the American style "mm/dd/yyyy" except if the second number
+        is in the range 13 to 31 and the first number is in the range 1 to 12.
+		</p>
+		<p>
+		For more details see
+		<a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+		</p>
+	</div>
+	<div class="balloon" id="HelpBaptismLocation">
+        The location where the person was baptized into the
+        Church of Latter Day Saints. 
+        This is usually at a temple, but may be at another location.
+	</div>
+	<div class="balloon" id="HelpEndowmentDate">
+		<p>
+		The date of the LDS endowment.
+		</p>
+		<p>
+		If known this is normally expressed as numeric day of the month,
+		three character abbreviation of month name, and the year.  For example
+	    "13 Aug 1894".  However you can also specify "about 1876" 
+        or "between 1854 and 1882".  
+        Note that an all numeric date of the format "nn/nn/nnnn" 
+        is interpreted as "dd/mm/yyyy", not
+        as the American style "mm/dd/yyyy" except if the second number 
+        is in the range 13 to 31 and the first number is in the range 1 to 12.
+		</p>
+		<p>
+		For more details see
+		<a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+		</p>
+	</div>
+	<div class="balloon" id="HelpEndowmentLocation">
+		<p>
+        The temple where the Church of Latter Day Saints
+        Endowment was performed.
+		</p>
+	</div>
+	<div class="balloon" id="HelpConfirmationDate">
+		<p>
+		The date of the LDS confirmation.
+		</p>
+		<p>
+		If known this is normally expressed as numeric day of the month,
+		three character abbreviation of month name, and the year.  For example
+	    "13 Aug 1894".  However you can also specify "about 1876" 
+        or "between 1854 and 1882".  
+        Note that an all numeric date of the format "nn/nn/nnnn"
+        is interpreted as "dd/mm/yyyy", not as the American style "mm/dd/yyyy"
+        except if the second number is in the range
+		13 to 31 and the first number is in the range 1 to 12.
+		</p>
+		<p>
+		For more details see
+		<a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+		</p>
+	</div>
+	<div class="balloon" id="HelpConfirmationLocation">
+        The location where the person was confirmed in the
+        Church of Latter Day
+		Saints.  This is usually at a temple, but may be at another location.
+	</div>
+	<div class="balloon" id="HelpInitiatoryDate">
+	    <p>
+		The date of the LDS Initiatory.
+        </p>
+	    <p>
+		If known this is normally expressed as numeric day of the month,
+		three character abbreviation of month name, and the year.  For example
+        "13 Aug 1894".  However you can also specify "about 1876" or
+        "between 1854 and 1882".  
+        Note that an all numeric date of the format "nn/nn/nnnn" 
+        is interpreted as "dd/mm/yyyy", not
+        as the American style "mm/dd/yyyy" except if the second number 
+        </p>
+	    <p>
+		For more details see
+		<a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+        </p>
+	</div>
+	<div class="balloon" id="HelpInitiatoryLocation">
+        The temple where the Church of Latter Day Saints Initiatory
+        was performed.
+	</div>
+	<div class="balloon" id="HelpEventDate">
+	    <p>
+		The date of the event.
+        </p>
+	    <p>
+		If known this is normally expressed as numeric day of the month,
+		three character abbreviation of month name, and the year.  For example
+	    "13 Aug 1894".  However you can also specify "about 1876" or 
+        "between 1854 and 1882".  
+        Note that an all numeric date of the format "nn/nn/nnnn" 
+        is interpreted as "dd/mm/yyyy", not
+        as the American style "mm/dd/yyyy" except if the second number 
+        is in the range 13 to 31 and the first number is in the range 1 to 12.
+        </p>
+        <p>
+		For more details see
+        <a href="datesHelpen.html" target="help">"Entering Dates"</a>.
+        </p>
+	</div>
+	<div class="balloon" id="HelpEventDescn">
+	    The description text associated with the event.  This is any information
+		that does not specify where the event took place.  For example for an
+		occupation event it is the title of the occupation.
+	</div>
+	<div class="balloon" id="HelpEventLocation">
+	    The location where the event took place.
+	</div>
+	<div class="balloon" id="HelpEventDetail">
+		Clicking on this button opens up a
+		<a href="editEventHelpen.html" target="help">dialog</a>
+		that permits you to enter more details about the event.
+		This includes textual notes, and source citations;
+	</div>
+	<div class="balloon" id="HelpEventDelete">
+		Clicking on this button removes all of the information about the 
+		associated event and
+		any citations to the event are deleted from the database.
+	</div>
+	<div class="balloon" id="HelpAddEvent">
+		Clicking on this button opens up a
+		<a href="editEventHelpen.html" target="help">dialog</a>
+		that permits you to add a new event onto this person.
+		This includes textual notes, and source citations.
+	</div>
+	<div class="balloon" id="HelpOrder">
+        Clicking on this button reorders the events and facts according
+        to the date on which they occurred or were observed. 
+        This makes the displayed description of the person more coherent.
+	</div>
+	<div class="balloon" id="HelpUserRef">
+		The value of this field is a unique identifier that has meaning to you
+		as the author of the family tree.  For example it might represent how
+		the person is related to you using one of the conventions for
+		representing descent from a common ancestor.
+	</div>
+	<div class="balloon" id="HelpAncestralRef">
+        The value of this field is a reference to the identifier
+        of this person
+		in the Church of Latter Day Saints Ancestral File database.
+	</div>
+	<div class="balloon" id="HelpNotes">
+		Clicking on this button opens up a
+		<a href="editEventHelpen.html" target="help">dialog</a>
+		that permits you to enter extensive textual notes on this person.
+	</div>
+	<div class="balloon" id="HelpReferences">
+		Clicking on this button opens up a
+		<a href="editEventHelpen.html" target="help">dialog</a>
+		that permits you to enter textual research notes about your
+		investigation of this person.
+	</div>
+	<div class="balloon" id="HelpMedical">
+		Clicking on this button opens up a
+		<a href="editEventHelpen.html" target="help">dialog</a>
+		that permits you to enter textual notes about the medical history
+		of this person.
+	</div>
+	<div class="balloon" id="HelpNeverMarried">
+		Select this checkbox to indicate that it is known that this person
+        never married.  Note that the checkbox is disabled,
+        and displayed as a grey
+		square, if the person is a defined as a spouse in a family.
+	</div>
+	<div class="balloon" id="HelpCPRelDad">
+		Use this selection box to specify the nature of the relationship between
+		this person and his/her father.
+	</div>
+	<div class="balloon" id="HelpCPDadPrivate">
+		If this checkbox shows a checkmark then the nature of the relationship
+		between this person and his/her father will not be published.
+	</div>
+	<div class="balloon" id="HelpCPRelMom">
+		Use this selection box to specify the nature of the relationship between
+		this person and his/her mother.
+	</div>
+	<div class="balloon" id="HelpCPMomPrivate">
+		If this checkbox shows a checkmark then the nature of the relationship
+		between this person and his/her mother will not be published.
+	</div>
+	<div class="balloon" id="HelpParents">
+		Clicking on this button opens up a
+		<a href="editParentsHelpen.html" target="help">dialog</a>
+		that permits you to edit or add a set of parents for this person.
+	</div>
+	<div class="balloon" id="HelpMarriages">
+		Clicking on this button opens up a
+		<a href="editMarriagesHelpen.html" target="help">dialog</a>
+		that permits you to edit or add a family
+		for which this person functions as a spouse or parent.
+	</div>
+	<div class="balloon" id="HelpEvents">
+		Clicking on this button opens up a
+		<a href="editEventsHelpen.html" target="help">dialog</a>
+		that permits you to edit or add events in the life of this person.
+	</div>
+	<div class="balloon" id="HelpAddress">
+		Clicking on this button opens up a
+		<a href="AddressHelpen.html" target="help">dialog</a>
+		that permits you to add or update the mailing address 
+		and other contact information for this person.
+	</div>
+	<div class="balloon" id="HelpSubmit">
+        Clicking on this button applies all of the changes you have made to
+        this person to the database.
+	</div>
+	<div class="balloon" id="HelpDelete">
+        This button only appears if the person has no connections
+        to any other family members.
+		Clicking on this button deletes the person from the database.
+	</div>
+	<div class="balloon" id="HelpMerge">
+		Clicking on this button opens up a dialog that permits you to merge this
+		person with another person in the database.  You do this when as
+		a result of your research you realize that two records in the database
+		actually describe the same person.
+	</div>
+	<div class="balloon" id="HelpGrant">
+        Clicking on this button displays a dialog permitting you to grant 
+        permission
+		to see the private information and update the current person and the
+		current person's ancestors and descendants to another researcher.
+	</div>
+	<div id="loading" class="popup">
+		Loading...
+	</div>
+	  $EVENTTEXT
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/locationCommon.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/editIndivid.js" type="application/javascript">
+    </script>

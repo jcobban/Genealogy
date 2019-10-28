@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
 /************************************************************************
  *  mergeUpdIndivid.php													*
  *																		*
@@ -82,9 +83,10 @@ use \Exception;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2017/11/29		use class RecordSet to update birth, death,		*
  *						and marriage transcriptions to new IDIR			*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2019/09/16      use class FtTemplate for output                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -141,11 +143,12 @@ if (isset($_POST) && count($_POST) > 0)
 		    case 'idir2':
 		    {
 				$idir2		= $value;
-				$person2	= new Person(array('idir' => $idir2));
-				$evBirth2	= $person2->getBirthEvent(true);
-				$evChris2	= $person2->getChristeningEvent(true);
-				$evDeath2	= $person2->getDeathEvent(true);
-				$evBuried2	= $person2->getBuriedEvent(true);
+                $person2	= new Person(array('idir' => $idir2));
+                // only create events if they are recorded
+				$evBirth2	= $person2->getBirthEvent(false);
+				$evChris2	= $person2->getChristeningEvent(false);
+				$evDeath2	= $person2->getDeathEvent(false);
+				$evBuried2	= $person2->getBuriedEvent(false);
 				$isOwner	= $isOwner && $person2->isOwner();
 				break;
 		    }	    // idir2
@@ -283,7 +286,10 @@ if (isset($_POST) && count($_POST) > 0)
 }                   // invoked by method=post
 
 $template           = new FtTemplate("mergeUpdIndivid$lang.html");
+$translate          = $template->getTranslate();
+$t                  = $translate['tranTab'];
 $template->set('LANG',          $lang);
+
 // get the identifiers of the two individuals
 if ($idir1 !== null && $idir2 !== null && $idir1 != $idir2)
 {		            // IDIRs of two individuals specified
@@ -328,45 +334,61 @@ else
 
 if (strlen($msg) == 0)
 {                   // valid parameters
-	if ($person2->getGender() == Person::FEMALE)
-	{		// female
-	    $midirfld	= 'IDIRWife';
-	    $sidirfld	= 'IDIRHusb';
-	    $msurnfld	= 'WifeSurname';
-	    $mgivnfld	= 'WifeGivenName';
-	}		// female
+    ob_start();
+
+    $priName	    		            = $person1->getPriName();
+
+	if ($person2['gender'] == Person::FEMALE)
+	{		        // female
+	    $midirfld			            = 'IDIRWife';
+	    $sidirfld						= 'IDIRHusb';
+	    $msurnfld						= 'WifeSurname';
+	    $mgivnfld						= 'WifeGivenName';
+	}		        // female
 	else
-	{		// male
-	    $midirfld	= 'IDIRHusb';
-	    $sidirfld	= 'IDIRWife';
-	    $msurnfld	= 'HusbSurname';
-	    $mgivnfld	= 'HusbGivenName';
-	}		// male
+	{		        // male
+	    $midirfld						= 'IDIRHusb';
+	    $sidirfld						= 'IDIRWife';
+	    $msurnfld						= 'HusbSurname';
+	    $mgivnfld						= 'HusbGivenName';
+	}		        // male
+	$template->set('midirfld',			$midirfld);
+	$template->set('SIDIRFLD',			$sidirfld);
+    $template->set('MSURNFLD',			$msurnfld);
+	$template->set('MGIVNFLD',			$mgivnfld);
 
 	if ($useSurname2)
-	{	// take surname from second
-        $person1->setSurname($person2->getSurname());
-        $template->set('NEWSURNAME',    $person2->getSurname());
-    }	// take surname from second
+	{	            // take surname from second
+        $priName['surname']             = $person2['surname'];
+        $template->set('NEWSURNAME',    $person2['surname']);
+    }	            // take surname from second
     else
         $template['replaceSurname']->update(null);
 
 	if ($useGivenName2)
-	{	// take given name from second
-	    $person1->set('givenname', $person2->getGivenName());
-        $template->set('NEWGIVENNAME',  $person2->getGivenName());
-	}	// take given name from second
+	{	            // take given name from second
+	    $priName['givenname']           = $person2['givenName'];
+        $template->set('NEWGIVENNAME',  $person2['givenName']);
+	}	            // take given name from second
     else
         $template['replaceGivenname']->update(null);
 
-	// merge birth information
+    $template->set('BIRTHDATE2',        $_POST['BirthDate2']);
+    $template->set('BIRTHLOCATION2',    $_POST['BirthLocation2']);
+    $template->set('CHRISDATE2',        $_POST['ChrisDate2']);
+    $template->set('CHRISLOCATION2',    $_POST['ChrisLocation2']);
+    $template->set('DEATHDATE2',        $_POST['DeathDate2']);
+    $template->set('DEATHLOCATION2',    $_POST['DeathLocation2']);
+    $burieddate2                        = $_POST['BuriedDate2'];
+    $buriedlocation2                    = $_POST['BuriedLocation2'];
 
+	// merge birth information
 	// the following is to retain the true event when we try to
 	// merge a true event with a simulated event (IDER=0)
-	if ($evBirth1->getIder() == 0 && $evBirth2->getIder() > 0)
+	if ($evBirth1['ider'] == 0 && $evBirth2['ider'] > 0)
 	{		// second is instance of Event
 	   $newEvent	= $evBirth2;
-	   $newEvent->set('idir', $idir1);
+	   $newEvent['idir']            = $idir1;
 	   $oldEvent	= $evBirth1;
 	}		// second is instance of Event
 	else
@@ -375,43 +397,42 @@ if (strlen($msg) == 0)
 	   $oldEvent	= $evBirth2;
 	}		// first is instance of Event or neither
 
-	$birthDate2	    = new LegacyDate($evBirth2->get('eventd'));
+	$birthDate2	    = new LegacyDate($evBirth2['eventd']);
 	if ($useBthDate2)
 	{		// take birth date from second
 	    $newEvent->set('eventd',
 					   $birthDate2);
-        $template->set('BIRTHDATE2',    $_POST['BirthDate2']);
 	}		// take birth date from second
 	else
 	{		// take birth date from first
 	    $newEvent->set('eventd',
-					   new LegacyDate($evBirth1->get('eventd')));
+					   new LegacyDate($evBirth1['eventd']));
         $template['replaceBirthDate']->update(null);
 	}		// take birth date from first
 
 	if ($useBthLoc2)
 	{		// take birth location from second
 	    $newEvent->set('idlrevent',
-					   $evBirth2->get('idlrevent'));
-?>
-  <p>Birth location replaced by '<?php print $_POST['BirthLocation2']; ?>'.
-<?php
+					   $evBirth2['idlrevent']);
 	}		// take birth location from second
 	else
 	{		// take birth location from first
 	    $newEvent->set('idlrevent',
-					   $evBirth1->get('idlrevent'));
+					   $evBirth1['idlrevent']);
+        $template['replaceBirthLoc']->update(null);
 	}		// take birth location from first
 
 	// copy citations from second birth date
 	$citations	= $oldEvent->getCitations();
 	if (count($citations) > 0)
-	{		// have citations to copy
-?>
-  <p>Copy <?php print count($citations); ?> citations to birth.
-<?php
+    {		// have citations to copy
+        $template->set('BIRTHCITATIONSCOUNT', count($citations));
 	    $newEvent->addCitations($citations);
-	}		// have citations to copy
+    }		// have citations to copy
+    else
+        $template['birthCount']->update(null);
+    $template->set('BIRTHD',        $newEvent->getDate(9999, $t));
+    $template->set('BIRTHLOC',      $newEvent->getLocation()->getName());
 
 	// cleanup
 	if ($oldEvent)
@@ -426,29 +447,32 @@ if (strlen($msg) == 0)
 	if ($useCrsDate2)
 	{	// take christening date from second
 	    $evChris1->set('eventd',
-					   new LegacyDate($evChris2->get('eventd')));
-?>
-  <p>Christening date replaced by '<?php print $_POST['ChrisDate2']; ?>'.
-<?php
-	}	// take christening date from second
+					   new LegacyDate($evChris2['eventd']));
+    }	// take christening date from second
+    else
+    {
+        $template['replaceChrisDate']->update(null);
+    }
+
 	if ($useCrsLoc2)
 	{	// take christening location from second
 	    $evChris1->set('idlrevent',
-					   $evChris2->get('idlrevent'));
-?>
-  <p>Christening location replaced by '<?php print $_POST['ChrisLocation2']; ?>'.
-<?php
+					   $evChris2['idlrevent']);
 	}	// take christening location from second
+    else
+    {
+        $template['replaceChrisLoc']->update(null);
+    }
 
 	// copy citations from second christening date
 	$citations	= $evChris2->getCitations();
 	if (count($citations) > 0)
 	{		// have citations to copy
-?>
-  <p>Copy <?php print count($citations); ?> citations to christening.
-<?php
+        $template->set('CHRISCITATIONSCOUNT', count($citations));
 	    $evChris1->addCitations($citations);
-	}		// have citations to copy
+    }		// have citations to copy
+    else
+        $template['chrisCount']->update(null);
 
 	if ($evChris2)
 	{
@@ -460,10 +484,10 @@ if (strlen($msg) == 0)
 
 	// the following is to retain the true event when we try to
 	// merge a true event with a simulated event (IDER=0)
-	if ($evDeath1->getIder() == 0 && $evDeath2->getIder() > 0)
+	if ($evDeath1['ider'] == 0 && $evDeath2['ider'] > 0)
 	{
 	   $newEvent	= $evDeath2;
-	   $newEvent->set('idir', $evDeath1->get('idir'));
+	   $newEvent->set('idir', $evDeath1['idir']);
 	   $oldEvent	= $evDeath1;
 	}
 	else
@@ -475,39 +499,34 @@ if (strlen($msg) == 0)
 	if ($useDthDate2)
 	{	// take death date from second
 	    $newEvent->set('eventd',
-						new LegacyDate($evDeath2->get('eventd')));
-?>
-  <p>Death date replaced by '<?php print $_POST['DeathDate2']; ?>'.
-<?php
+						new LegacyDate($evDeath2['eventd']));
 	}	// take death date from second
 	else
 	{		// take birth date from first
 	    $newEvent->set('eventd',
-						new LegacyDate($evDeath1->get('eventd')));
+            new LegacyDate($evDeath1['eventd']));
+        $template['replaceDeathDate']->update(null);
 	}		// take birth date from first
 	if ($useDthLoc2)
 	{		// take death location from second
 	    $newEvent->set('idlrevent',
-						$evDeath2->get('idlrevent'));
-?>
-  <p>Death location replaced by '<?php print $_POST['DeathLocation2']; ?>'.
-<?php
+						$evDeath2['idlrevent']);
 	}		// take death location from second
 	else
 	{		// take death location from first
 	    $newEvent->set('idlrevent',
-						$evDeath1->get('idlrevent'));
+						$evDeath1['idlrevent']);
 	}		// take death location from first
 
 	// copy citations from second death date
-	$citations	= $oldEvent->getCitations();
+	$citations	    = $oldEvent->getCitations();
 	if (count($citations) > 0)
-	{		// have citations to copy
-?>
-  <p>Copy <?php print count($citations); ?> citations to death.
-<?php
+    {		// have citations to copy
+        $template->set('DEATHCITATIONSCOUNT',   count($citations));
 	    $newEvent->addCitations($citations);
-	}		// have citations to copy
+    }		// have citations to copy
+    else
+        $template['deathCount']->update(null);
 
 	if ($oldEvent)
 	{
@@ -517,110 +536,106 @@ if (strlen($msg) == 0)
 	    $evDeath1	= $newEvent;
 	}
 
-	if ($useBurDate2)
-	{	// take burial date from second
-	    $evBuried1->set('eventd',
-					    new LegacyDate($evBuried2->get('eventd')));
-?>
-  <p>Burial date replaced by '<?php print $_POST['BuriedDate2']; ?>'.
-<?php
-	}	// take burial date from second
-	if ($useBurLoc2)
-	{	// take burial location from second
-	    $evBuried1->set('idlrevent',
-					    $evBuried2->get('idlrevent'));
-?>
-  <p>Burial location replaced by '<?php print $_POST['BuriedLocation2']; ?>'.
-<?php
-	}	// take burial location from second
-
-	// copy citations from second burial date
-	$citations	= $evBuried2->getCitations();
-	if (count($citations) > 0)
-	{		// have citations to copy
-?>
-  <p>Copy <?php print count($citations); ?> citations to burial.
-<?php
-	    $evBuried1->addCitations($citations);
-	}		// have citations to copy
-
+    // merge burial/cremation event
 	if ($evBuried2)
 	{
+		if ($useBurDate2)
+		{	// take burial date from second
+		    $evBuried1->set('eventd',
+                new LegacyDate($evBuried2['eventd']));
+            $template['replaceBurialDate']->update(array('burieddate2' => $burieddate2));
+        }	// take burial date from second
+        else
+            $template['replaceBurialDate']->update(null);
+		if ($useBurLoc2)
+		{	// take burial location from second
+		    $evBuried1->set('idlrevent',
+						    $evBuried2['idlrevent']);
+            $template['replaceBurialLoc']->update(array('buriedlocation2' => $buriedlocation2));
+        }	// take burial location from second
+        else
+            $template['replaceBurialLoc']->update(null);
+	
+		// copy citations from second burial date
+		$citations	    = $evBuried2->getCitations();
+		if (count($citations) > 0)
+		{		// have citations to copy
+	        $template['burialCount']->update(array('count'  => count($citations)));
+	        $evBuried1->addCitations($citations);
+	    }		// have citations to copy
+	    else
+	        $template['burialCount']->update(null);
+
 	    $evBuried2->delete('p');
 	    $evBuried2	= null;
-	}
+    }
+    else
+    {
+        $template['replaceBurialDate']->update(null);
+        $template['replaceBurialLoc']->update(null);
+    }
 
 	// check all other fields in the main record
-	$person1->mergeFrom($person2);
+	$retval         = $person1->mergeFrom($person2);
 
 	$person1->save(false);
 	if (strlen($evBirth1->getDate()) > 0 ||
-	    $evBirth1->get('idlrevent') > 1)
+	    $evBirth1['idlrevent'] > 1)
 	    $evBirth1->save('p');
 	if (strlen($evChris1->getDate()) > 0 ||
-	    $evChris1->get('idlrevent') > 1)
+	    $evChris1['idlrevent'] > 1)
 	    $evChris1->save('p');
 	if (strlen($evDeath1->getDate()) > 0 ||
-	    $evDeath1->get('idlrevent') > 1)
+	    $evDeath1['idlrevent'] > 1)
 	    $evDeath1->save('p');
 	if (strlen($evBuried1->getDate()) > 0 ||
-	    $evBuried1->get('idlrevent') > 1)
+	    $evBuried1['idlrevent'] > 1)
 	    $evBuried1->save('p');
 
 	// move event records from individual 2 to individual 1 
-	$parms		= array('idir'		=> $idir2,
-						'idtype'	=> 0);
+	$parms		    = array('idir'		=> $idir2,
+					    	'idtype'	=> 0);
 	$movedEvents	= new RecordSet('Events', $parms);
 
-	$setparms	= array('idir'		=> $idir1,
-						'preferred'	=> 0);
-	$olddebug	= $debug;
-	$debug		= true;
-	$eventSet	= new RecordSet('Events', $parms);
-	$result		= $eventSet->update($setparms,
+	$setparms	    = array('idir'		=> $idir1,
+					    	'preferred'	=> 0);
+	$eventSet	    = new RecordSet('Events', $parms);
+	$result		    = $eventSet->update($setparms,
 							    false,
 							    false);
-	showTrace();
-	$debug		= $olddebug;
 
 	if ($result > 0)
-	{
-?>
-<p>Moved <?php print $result; ?>
-	individual event records from <?php print $idir2; ?> 
-	to <?php print $idir1; ?>.
-<?php
-	}
+        $template->set('MOVEDEVENTCOUNT',       $result);
+    else
+        $template['eventCount']->update(null);
 
 	// delete name index entries for deleted individual
-	$names		= new RecordSet('Names', array('idir' => $idir2));
-	$result		= $names->delete('p');
+	$names		    = new RecordSet('Names', array('idir' => $idir2));
+	$result		    = $names->delete('p');
 	if ($result > 0)
-	{
-?>
-  <p>Deleted <?php print $result; ?> nominal index records for second individual. 
-<?php
-	}
+        $template->set('DELETEDNAMES',          $result);
+    else
+        $template['deletedName']->update(null);
 
 	// Update nominal index records for merged individual. 
-?>
-  <p>Update nominal index records for merged individual.</p> 
-<?php
-	$altName	= new Name($person1);
-	$altName->save('p');
+	$priName->save('p');
 
 	// check for marriages of the second individual to associate
 	// with the first individual
-	$families1	= $person1->getFamilies();
-	$families2	= $person2->getFamilies();
+	$families1	            = $person1->getFamilies();
+    $families2	            = $person2->getFamilies();
+    $familiesMergeParms     = array();
+    $parmsUpd               = array();
 	foreach($families2 as $idmr2 => $family2)
 	{		// loop through families
-	    $keepBoth	= true;
+	    $keepBoth	        = true;
 	    foreach($families1 as $idmr1 => $family1)
 	    {		// search for duplicate marriage
 			if ($family1->get($midirfld) == $idir1 &&
 			    $family1->get($sidirfld) == $family2->get($sidirfld))
-			{	// merger will create duplicate family
+            {	// merger will create duplicate family
+                $familiesMergeParms[]   = array('idmr1'     => $idmr1,
+                                                'idmr2'     => $idmr2);  
 			    $family1->merge($family2);
 			    $keepBoth	= false;
 			    break;	// leave loop
@@ -630,45 +645,45 @@ if (strlen($msg) == 0)
 	    if ($keepBoth)
 	    {		// retain both families
 			$family2->set($midirfld, $idir1);
-			$family2->save('p');
-?>
-  <p>In marriage record IDMR=<?php print $family2->getIdmr(); ?>
-	field '<?php print $midirfld; ?>' set to '<?php print $idir1; ?>'.
-<?php
+            $family2->save('p');
+            $parmsUpd[]     = array('idmr2'         => $idmr2,
+                                    'midirfld'      => $midirfld,
+                                    'idir1'         => $idir1);
 	    }		// retain both families
 	    else
-	    {		// delete duplicate family
-?>
-  <p>All information merged into family IDMR=<?php print $family1->getIdmr(); ?>
-	and family IDMR=<?php print $family2->getIdmr(); ?> deleted.
-<?php
+        {		// delete duplicate family
 			$family2->delete();
 	    }		// delete duplicate family
-	}		// loop through families
+    }		// loop through families
+    $template['updateFamily2']->update($parmsUpd);
+    $template['mergeFamilies']->update($familiesMergeParms);
 
 	// ensure the the name of the merged individual is adjusted
 	// in all marriages.  The array $families now includes the
 	// marriages added from the second individual
 	// refresh the local copy of the individual record
 	// so that Person::getFamilies does not use local copy
-	$person1	= new Person(array('idir' => $idir1));
-	$families	= $person1->getFamilies();
-	$givenname	= $person1->getGivenName();
-	$surname	= $person1->getSurname();
+	$person1		= new Person(array('idir' => $idir1));
+	$families		= $person1->getFamilies();
+	$givenname		= $person1->getGivenName();
+    $surname		= $person1->getSurname();
+    $updParms   	= array();
 	foreach($families as $idmr => $family)
 	{		// loop through families
 	    $family->setName($person1);
-	    $family->save('p');
-?>
-  <p>In marriage record IDMR=<?php print $idmr; ?>
-	fields '<?php print $msurnfld; ?>' and 
-	'<?php print $mgivnfld; ?>' set to 
-	<?php print $surname . ", " . $givenname; ?>.
-<?php
-	}		// loop through families
+        $family->save('p');
+        $updParms[]     = array('idmr'      => $idmr,
+                                'msurnfld'  => $msurnfld,
+                                'mgivnfld'  => $mgivnfld,
+                                'surname'   => $surname,
+                                'givenname' => $givenname);
+    }		// loop through families
+    $template['famNameUpdate']->update($updParms);
 
 	// check for child records to update
-	$child		= $person2->getChild();	// RecordSet of Child
+    $child		    = $person2->getChild();	// RecordSet of Child
+    $delParms       = array();
+    $updParms       = array();
 	foreach($child as $idcr => $childr)
 	{		// loop through child records for second individual
 	    $cfamily	= $childr->getFamily();
@@ -676,171 +691,131 @@ if (strlen($msg) == 0)
 	    if ($duplicate)
 	    {		// there is already a child with the new IDIR
 			try {
-			    $childr->delete(false);
-?>
-  <p>Child record IDCR=<?php print $idcr; ?>
-	is deleted as a duplicate.
-<?php
-			} catch(Exception $e) {
+                $childr->delete(false);
+                $delParms[]     = array('idcr'      => $idcr);
+            } catch(Exception $e) {
+                $warn   .= "<p>\$childr->delete(false) failed</p>\n";
 			}	// ignore exception
 	    }		// there is already a child with the new IDIR
 	    else
 	    {		// change child record to point at new IDIR
 			$childr->set('idir', $idir1);
-			$childr->save('p');
-?>
-  <p>In child record IDCR=<?php print $childr->getId(); ?>
-	field 'IDIR' set to '<?php print $idir1; ?>'.
-<?php
+            $childr->save('p');
+            $updParms[]         = array('idcr'      => $idcr,
+                                        'idir1'     => $idir1);
 	    }		// change child record to point at new IDIR
-	}		// loop through child records for second individual
+    }		// loop through child records for second individual
+    $template['childDeleted']->update($delParms);
+    $template['childUpdated']->update($updParms);
 
 	// update citation records to new IDIR
 	$citations	= new CitationSet(array('idir'	=> $idir2));
 	$result		= $citations->update(array('idime'	=> $idir1),
 							     false);
 	if ($result > 0)
-	{		// at least 1 record updated
-?>
-  <p>Update <?php print $result; ?> source citations
-	to point to individual record IDIR=<?php print $idir1;?>
-<?php
-	}		// at least 1 record updated
+    {		// at least 1 record updated
+        $template['sourceCitationsUpdated']->update(array('RESULT'  => $result,
+                                                          'idir1'   => $idir1));
+    }		// at least 1 record updated
+    else
+        $template['sourceCitationsUpdated']->update(null);
 
 	// check for Birth registration records to update
 	$birthSet	= new RecordSet('Births',
 							array('b_idir'	=> $idir2));
 	$result		= $birthSet->update(array('b_idir'	=> $idir1));
-	if ($result > 0)
-	{
-?>
-  <p>Update the transcription of the birth registration.
-<?php
-	}
+	if ($result == 0)
+        $template['birthRegUpdated']->update(null);
 
 	// check for Death registration records to update
 	$deathSet	= new RecordSet('Deaths',
 							array('d_idir'	=> $idir2));
 	$result		= $deathSet->update(array('d_idir'	=> $idir1));
-	if ($result > 0)
-	{
-?>
-  <p>Update the transcription of the death registration.
-<?php
-	}
+	if ($result == 0)
+        $template['deathRegUpdated']->update(null);
 
 	// check for Marriage registration records to update
 	$marrSet	= new RecordSet('MarriageIndi',
 							array('m_idir'	=> $idir2));
 	$result		= $marrSet->update(array('m_idir'	=> $idir1));
-	if ($result > 0)
-	{
-?>
-  <p>Update the transcription of the marriage registration.
-<?php
-	}
+	if ($result == 0)
+        $template['marrRegUpdated']->update(null);
 
 	// merge blog records for the second individual
 	$blogparms	= array('table'		=> 'tblIR',
 						'keyvalue'	=> $idir2);
 	$blogSet	= new RecordSet('Blogs', $blogparms);
-	if ($blogSet->count() > 0)
-	{
-?>
-  <p>Move <?php print $blogSet->count(); ?> blog messages.
-<?php
+    if ($blogSet->count() > 0)
+    {
+        $template['moveBlogs']->update(array('BLOGSETCOUNT',    $blogSet->count()));
 
 	    foreach($blogSet as $blid => $blog)
 	    {		// loop through all blogs
 			$blog->set('keyvalue', $idir1);
 			$blog->save(false);
 	    }		// loop through all blogs
-	}
+    }
+    else
+        $template['moveBlogs']->update(null);
+
 	// delete the duplicate record from tblIR
-?>
-  <p>Delete the individual record <?php print $idir2; ?></p>
-<?php
 	$person2->resetFamilies();
 	$person2->resetParents();
 	try {
 	    $person2->delete("p");
 	} catch (Exception $e) {
-?>
-  <p class="warning"><?php print $e->getMessage(); ?></p>
-<?php
+        $warn .= "<p>Delete Person failed " . $e->getMessage() . "</p>\n";
 	}		// catch
 
+    $text       = ob_get_clean();
+    $template->set('TEXT',          $text);
 }		// OK to update
 
 showTrace();
 
 // get info on common events of the merged individual
-$evBirth1	= $person1->getBirthEvent(true);
-$birthd	= $evBirth1->getDate();
-$birthloc	= htmlspecialchars($evBirth1->getLocation()->getName(),
-						   ENT_QUOTES);
-$evChris1	= $person1->getChristeningEvent(true);
-$chrisd	= $evChris1->getDate();
-$chrisloc	= htmlspecialchars($evChris1->getLocation()->getName(),
-						   ENT_QUOTES);
-$evDeath1	= $person1->getDeathEvent(true);
-$deathd	= $evDeath1->getDate();
-$deathloc	= htmlspecialchars($evDeath1->getLocation()->getName(),
-						   ENT_QUOTES);
-$evBuried1	= $person1->getBuriedEvent(true);
-$buriald	= $evBuried1->getDate();
-$burialloc	= htmlspecialchars($evBuried1->getLocation()->getName(),
-						   ENT_QUOTES);
-$givenname	= $person1->getGivenName();
-$surname	= $person1->getSurname();
-?>
-<form action="Person.php?idir=<?php print $idir1; ?>"
-			name="mainForm" method="get">
-  <div class="hidden" id="hiddenElements">
-	<input type="hidden" name="birthd" id="birthd"
-			value="<?php print $birthd; ?>">
-	<input type="hidden" name="birthloc" id="birthloc" 
-			value="<?php print $birthloc; ?>">
-	<input type="hidden" name="chrisd" id="chrisd" 
-			value="<?php print $chrisd; ?>">
-	<input type="hidden" name="chrisloc" id="chrisloc" 
-			value="<?php print $chrisloc; ?>">
-	<input type="hidden" name="deathd" id="deathd" 
-			value="<?php print $deathd; ?>">
-	<input type="hidden" name="deathloc" id="deathloc" 
-			value="<?php print $deathloc; ?>">
-	<input type="hidden" name="buriald" id="buriald" 
-			value="<?php print $buriald; ?>">
-	<input type="hidden" name="burialloc" id="burialloc" 
-			value="<?php print $burialloc; ?>">
-	<input type="hidden" name="givenname" id="givenname" 
-			value="<?php print $givenname; ?>">
-	<input type="hidden" name="surname" id="surname" 
-			value="<?php print $surname; ?>">
-<?php
+$evBirth1   					= $person1->getBirthEvent(true);
+$birthd	        				= $evBirth1->getDate();
+$birthloc	    				= htmlspecialchars(
+                                    $evBirth1->getLocation()->getName(),
+					    	                       ENT_QUOTES);
+$evChris1	    				= $person1->getChristeningEvent(true);
+$chrisd	        				= $evChris1->getDate();
+$chrisloc	    				= htmlspecialchars(
+                                    $evChris1->getLocation()->getName(),
+					    	                       ENT_QUOTES);
+$evDeath1	    				= $person1->getDeathEvent(true);
+$deathd	        				= $evDeath1->getDate();
+$deathloc	    				= htmlspecialchars(
+                                    $evDeath1->getLocation()->getName(),
+					    	                       ENT_QUOTES);
+$evBuried1	    				= $person1->getBuriedEvent(true);
+$buriald	    				= $evBuried1->getDate();
+$burialloc	    				= htmlspecialchars(
+                                    $evBuried1->getLocation()->getName(),
+				    		                       ENT_QUOTES);
+$givenname	    				= $person1->getGivenName();
+$surname	    				= $person1->getSurname();
+$movedElt       				= $template['movedevent'];
+$movedEltHtml   				= $movedElt->outerHTML;
+$data               			= '';
+
 foreach($movedEvents as $ider => $event)
 {
-	$date		= $event->getDate();
-	$location	= $event->getLocation();
-	$idet		= $event->get('idet');
-	$description	= $event->get('description');
-	$cittype	= $event->getCitType();
-?>
-	<input type="hidden" name="eventd<?php print $ider; ?>"
-			id="eventd<?php print $ider; ?>"
-			value="<?php print $date; ?>">
-	<input type="hidden" name="eventtype<?php print $ider; ?>"
-			id="eventtype<?php print $ider; ?>"
-			value="<?php print $idet; ?>">
-	<input type="hidden" name="eventcittype<?php print $ider; ?>"
-			id="eventcittype<?php print $ider; ?>"
-			value="<?php print $cittype; ?>">
-	<input type="hidden" name="eventdescription<?php print $ider; ?>"
-			id="eventdescription<?php print $ider; ?>"
-			value="<?php print $description; ?>">
-	<input type="hidden" name="eventloc<?php print $ider; ?>"
-			id="eventloc<?php print $ider; ?>"
-			value="<?php print $location->toString(); ?>">
-<?php
+	$date		    			= $event->getDate();
+	$location	    			= $event->getLocation();
+	$idet		    			= $event['idet'];
+	$description				= $event['description'];
+    $cittype	    			= $event->getCitType();
+    $etemplate      			= new \Templating\Template($movedEltHtml);
+    $etemplate->set('IDER',              $ider);
+    $etemplate->set('DATE',              $date);
+    $etemplate->set('IDET',              $idet);
+    $etemplate->set('CITTYPE',           $cittype);
+    $etemplate->set('DESCRIPTION',       $description);
+    $etemplate->set('LOCATION',          $location->toString());
+    $data           .= $etemplate->compile();
 }
-?>
+$movedElt->update($data);
+
+$template->display();

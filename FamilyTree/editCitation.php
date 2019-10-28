@@ -7,6 +7,11 @@ use \Exception;
  * 																		*
  *  Display a web page for editting a specific citation to a source.	*
  * 																		*
+ * 	Parameters:															*
+ * 		idsx            key of existing Citation						*
+ * 		idime           event record to create new Citation             *
+ * 		type            event type to create new Citation               *
+ * 																		*
  *  History: 															*
  * 		2010/08/21		Change to use new page format					*
  *		2010/09/05		Eliminate space characters from <textarea>s		*
@@ -40,239 +45,129 @@ use \Exception;
  *		2016/02/06		use showTrace									*
  *		2017/07/23		class LegacyPicture renamed to class Picture	*
  *		2017/07/27		class LegacyCitation renamed to class Citation	*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2019/07/28      use Template                                    *
+ *		2019/07/30      use $record->selected                           *
  * 																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/LegacyHeader.inc';
 require_once __NAMESPACE__ . '/Citation.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    if (!canUser('edit'))
-    {		// not authorized
-		$msg	.= 'User not authorized to edit citations. ';
-    }		// not authorized
+// locate the required citation based upon the parameters passed
+// to the page
+$idsx		            = null;
+$idsxtext	            = 'missing';
+$idime                  = null;
+$type                   = null;
+$citation		        = null;
+$lang                   = 'en';
 
-    // locate the required citation based upon the parameters passed
-    // to the page
-    $idsx		= 0;
-    $citation		= null;
-    $title		= "Missing Identifier of Citation";
-
-    foreach($_GET as $key => $value)
-    {			// loop through all parameters
+// get parameters
+if (count($_GET) > 0)
+{	        	    // invoked by URL to display current status of account
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{			// loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
 		switch(strtolower($key))
 		{		// act on specific parameter
 		    case 'idsx':
 		    {		// identifier of instance of Citation
-				if (strlen($value) > 0)
-				{		// get the requested citation
-				    $idsx	= $value;
-				    try
-				    {
-						$citation	= new Citation(array('idsx' => $idsx));
-				        $title		= "Edit Citation";
-				    }
-				    catch(Exception $e)
-				    {
-						$title		= "Citation $idsx Not Found";
-						$msg		.= $e->getMessage();
-						$citation	= null;
-				    }
-				}		// get the requested citation
+				if (ctype_digit($value))
+	                $idsx	        = (int)$value;
+	            else
+	                $idsxtext       = $value;
 				break;
 		    }		// identifier of instance of Citation
 
-		    case 'tableid':
-		    case 'formid':
+            case 'idime':
+            {
+				if (ctype_digit($value))
+	                $idime	        = (int)$value;
+				break;
+            }
+
+            case 'type':
+            {
+				if (ctype_digit($value))
+	                $type	        = (int)$value;
+                break;
+            }
+
+	        case 'lang':
+	        {
+	            $lang               = FtTemplate::validateLang($value);
+	            break;
+	        }
+	
+		    case 'tableid':		// table id in invoking page
+		    case 'formid':		// form id in invoking page
+		    case 'submit':		// submit button
+		    case 'text':		// used by Javascript
+		    case 'debug':       // handled by common code
 		    {
 				break;
-		    }		// table id in invoking page
-
-		    case 'submit':
-		    {
-				break;
-		    }		// table id in invoking page
-
-		    case 'text':
-		    {		// used by Javascript
-				break;
-		    }		// used by Javascript
-
-		    case 'debug':
-		    {
-				break;
-		    }		// table id in invoking page
-
+		    }
+	
 		    default:
 		    {		// anything else
-				$msg	.= "Unexpected parameter $key='$value'. ";
+				$warn	        .= "<p>Unexpected parameter $key='$value'.</p>";
 				break;
 		    }		// anything else
 		}		// act on specific parameter
-    }			// loop through all parameters
+	}			// loop through all parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display current status of account
 
-    if ($idsx == 0)
-    {
-		$msg		.= "Missing idsx parameter. ";
-    }		// missing parameter
+if (canUser('edit'))
+    $action         = 'Update';
+else
+    $action         = 'Display';
 
-    htmlHeader($title,
-				array(  '/jscripts/js20/http.js',
-						'/jscripts/CommonForm.js',
-						'/jscripts/util.js',
-						'/tinymce/jscripts/tiny_mce/tiny_mce.js',
-						'editCitation.js'),
-				true);
-?>
-<body>
-  <div class="body">
-    <h1>
-      <span class="right">
-		<a href="editCitationHelpen.html" target="help">? Help</a>
-      </span>
-		<?php print $title; ?>
-    </h1>
-<?php
-    showTrace();
+$template           = new FtTemplate("editCitation$action$lang.html");
+$translate          = $template->getTranslate();
+$citText            = $translate['typeText'];
 
-    if (strlen($msg) > 0)
-    {		// error message
-?>
-    <p class="message"><?php print $msg; ?></p>
-<?php
-    }		// error message
-    else
-    if ($citation)
-    {		// citation found
-		$citType	= Citation::$intType[$citation->getCitType()];
-		$citKey		= Citation::$recType[$citation->getCitType()];
-		$citDetail	= $citation->getDetail(); 
-		$citDetailText	= $citation->getDetailText();
-		$citDetailNote	= $citation->getDetailNote();
-?>
-  <form name="citForm" id="citForm" action="updateCitation.php" method="post">
-    <div class="row" id="identRow">
-      <input type="hidden" name="idsx" id="idsx"
-				value="<?php print $idsx; ?>">
-      <label class="column1" for="Type">
-		    Event Type:
-      </label>
-      <input type="hidden" name="Type" id="Type"
-				value="<?php print $citation->getCitType(); ?>">
-      <span class="label">
-		<?php print $citType; ?>
-      </span>
-      <label class="label" for="idime">
-		<?php print $citKey; ?>: 
-      </label>
-		<input type="text" name="idime" id="idime" size="6"
-				readonly="readonly" class="ina rightnc"
-				value="<?php print $citation->getIdime(); ?>">
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row" id="sourceRow">
-      <label class="column1" for="IDSR">
-		    Source:
-      </label>
-		<select name="IDSR" id="IDSR" class="white left">
-		    <option value="<?php print $citation->getIdsr(); ?>">
-				<?php print $citation->getSource()->getTitle(); ?> 
-		    </option>
-		</select>
-    </div>
-    <div class="row" id="detailRow">
-      <label class="column1" for="SrcDetail">
-		    Page Id:
-      </label>
-		<input type="text" name="SrcDetail" id="SrcDetail" size="76"
-				class="white leftnc"
-				value="<?php print $citDetail; ?>">
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row" id="textRow">
-      <label class="column1">
-		    Text of Source:
-      </label>
-		<textarea name="SrcDetText" id="SrcDetText" rows="4"
-				cols="64"><?php print $citDetailText; ?></textarea>
-      <div style="clear: both;"></div>
-    </div>
-    <div class="row" id="noteRow">
-      <label class="column1"> 
-		    Comments:
-      </label>
-		<textarea name="SrcDetNote" id="SrcDetNote" rows="4"
-				cols="64"><?php print $citDetailNote; ?></textarea>
-      <div style="clear: both;"></div>
-    </div>
-    <p id="buttonRow">
-<?php
-		if ($debug)
-		{	// testing
-?>
-      <button type="submit" id="update">
-<?php
-		}	// testing
-		else
-		{	// not testing
-?>
-      <button type="button" id="update">
-<?php
-		}	// not testing
-?>
-		<u>U</u>pdate Citation
-      </button>
-		&nbsp;
-		<button type="button" id="Pictures">
-		  <u>P</u>ictures
-		</button>
-		<input type="hidden" name="PicIdType" id="PicIdType" 
-				value="41">
-    </p>
-</form>
-<?php
-    }		// citation found
-?>
-  </div>
-<?php
-    dialogBot();
-?>
-<div class="balloon" id="HelpIDSR">
-<p>Select the master source entry by name for this citation.
-</p>
-</div>
-<div class="balloon" id="HelpType">
-<p>This field displays the type of event for which this is a citation.
-</p>
-</div>
-<div class="balloon" id="Helpidime">
-<p>This read-only field displays the record number of the record that
-contains the information about the associated fact or event.
-</p>
-</div>
-<div class="balloon" id="HelpSrcDetail">
-<p>Enter the primary citation information, usually identifying the specific
-page within the master source where the information is located.
-</p>
-</div>
-<div class="balloon" id="HelpSrcDetText">
-<p>Enter the actual text from the source that documents this fact.
-</p>
-</div>
-<div class="balloon" id="HelpSrcDetNote">
-<p>Enter comments or other information that is related to the citation, but
-not found within the text of the source.
-</p>
-</div>
-<div class="balloon" id="Helpupdate">
-<p>Click on this button, or use the keyboard short-cut Alt-U, to
-apply the update.
-</p>
-</div>
-  <div class="balloon" id="HelpPictures">
-    Click this button to open a dialog for managing the pictures associated
-    with the citation.
-  </div>
-</body>
-</html>
+if (is_null($idsx))
+    $citation	    = new Citation(array('idime'    => $idime,
+                                         'type'     => $type));
+else
+    $citation	    = new Citation(array('idsx'     => $idsx));
+
+$citmsg             = $citation->getErrors();
+if (strlen($citmsg) == 0)
+{
+    $template->set('IDSX',              $idsx);
+    $template->set('IDIME',             $citation['idime']);
+	$citType	    = $citation['type'];
+    $template->set('CITTYPE',           $citType);
+    $typeText	    = $citText[$citType];
+    $template->set('CITTYPETEXT',       $typeText);
+    $name           = $citation->getRecord()->getName() . ', ' . $typeText;
+    $template->set('NAME',              $name);
+	$key		    = Citation::$recType[$citation->getCitType()];
+    $template->set('CITKEY',            $key);
+	$template->set('DETAIL',			$citation['srcdetail']); 
+	$template->set('DETAILTEXT',		$citation['srcdettext']);
+    $template->set('DETAILNOTE',		$citation['srcdetnote']);
+    $sources                        = new RecordSet('Sources');
+    $citidsr                        = $citation['idsr'];
+    $template->set('IDSR',              $citidsr);
+    $sources[$citidsr]->selected    = true;
+    $template['source$idsr']->update($sources);
+}
+else
+{
+    $name           = "Invalid";
+    $template['citForm']->update(null);
+}
+
+$template->display();

@@ -170,18 +170,6 @@ var	boundary	= null;
 // instance of google.maps.Geocoder for resolving place names
 var	geocoder	= null;
 
-// specify style for tinyMCE editing
-tinyMCE.init({
-	selector            : 'textarea',
-    plugins             : 'link lists image',
-    menubar             : 'file edit view format insert',
-    toolbar             : "undo redo | styleselect | bold italic | " 
-                           + "alignleft aligncenter alignright alignjustify | " 
-                           + "bullist numlist outdent indent | link image",
-    content_css		    : "/styles.css"
-
-});
-
 /************************************************************************
  *  function onLoad														*
  *																		*

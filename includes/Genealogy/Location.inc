@@ -128,8 +128,13 @@ use \Iterator;
  *		2018/02/24		DomainSet not defined							*
  *		2018/11/19      only give boundary coordinates to 6 decimal     *
  *		                places in get('boundary')                       *
+ *		2019/07/21      add IDLR to sort order for duplicate names      *
+ *		                add Location::getLocation                       *
+ *		2019/09/26      in getNotes only replace new lines with <br>    *
+ *		                if the content is not already HTML              *
+ *		2019/10/08      remove tracelog entries                         *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/CountySet.inc';
@@ -169,6 +174,21 @@ class Location extends RecordPic
 						    'qstag'				=> 0,
 						    'zoom'				=> 8,
 						    'boundary'			=> '');
+
+    /********************************************************************
+     *	Location::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     		=> 'tblLR',
+                'name'      		=> 'Locations',
+                'prime'	    		=> 'idlr',
+	            'srvmg'     		=> true,
+	            'fldcount'			=> 4,
+                'order'     		=> 'SortedLocation, IDLR',
+                'classname' 		=> 'Location');
+
     /********************************************************************
      *	Location::$translate											*
      *																	*
@@ -186,7 +206,7 @@ class Location extends RecordPic
      *	If this is an empty string then the value of the 'prime'		*
      *	attribute of the entry in $primeKey is used.					*
      ********************************************************************/
-    protected static	$defaultOrder	= 'SortedLocation';
+    protected static	$defaultOrder	= 'SortedLocation, IDLR';
 
     /********************************************************************
      *	Location::$namePattern											*
@@ -197,6 +217,35 @@ class Location extends RecordPic
      ********************************************************************/
     private static	$namePattern	=
 		    "/^(E ½ |S ½ |W ½ |N ½ |E½ |S½ |W½ |N½ |½ |E ¼ |S ¼ |W ¼ |N ¼ |E ½ E ½ |E ½ S ½ |E ½ W ½ |E ½ N ½ |S ½ E ½ |S ½ S ½ |S ½ W ½ |S ½ N ½ |W ½ E ½ |W ½ S ½ |W ½ W ½ |W ½ N ½ |N ½ E ½ |N ½ S ½ |N ½ W ½ |N ½ N ½ |NE ¼ |NW ¼ |SE ¼ |SW ¼ |NE ½ |NW ½ |SE ½ |SW ½ |N pt |NE pt |E pt |NW pt |S pt |SE pt |SW pt |W pt |pt |pt E ½ |pt S ½ |pt W ½ |pt N ½ |)((lot )?[0-9½, &\-]+) ([a-zA-Z0-9'., ]*)(,.*)$/";
+
+    /********************************************************************
+     *	Location::$locationIndex									    *
+     *																	*
+     *	To save time if a specific record is requested more than once   *
+     *	during a process, maintain a table of Location records.         *
+     ********************************************************************/
+    protected static	$locationIndex	= array();
+
+    /********************************************************************
+     *	static function Location::getLocation							*
+     *																	*
+     *	Get an existing entry or create an instance of the class        *
+     *	Location from a row returned from a database query of the table	*
+     *  'tblIR' for a value of IDIR.									*
+     *																	*
+     *	Input:															*
+     *	    $idlr       integer identifier of a location                 *
+     *																	*
+     *	Returns:														*
+     *		an instance of Location										*
+     ********************************************************************/
+    static function getLocation($idlr)
+    {
+        if (array_key_exists($idlr, self::$locationIndex))
+	        return self::$locationIndex[$idlr];
+        else
+            return new Location(array('idlr' => $idlr));
+    }           // static function Location::getLocation
 
     /********************************************************************
      *  function Location::__construct									*
@@ -213,7 +262,7 @@ class Location extends RecordPic
      *																	*
      *  Returns instance of Location record.							*
      *																	*
-     *	Throws exception on bad parameters								*
+     *	Sets $this->msg on bad parameters								*
      ********************************************************************/
     function __construct($id)
     {
@@ -221,28 +270,30 @@ class Location extends RecordPic
 		global	$warn;
 		global	$connection;
 
+        $needInsert         = true;
+
 		// action depends upon type of first parameter
 		if (is_array($id))
 		{			// array parameter
-		    $parms	= $id;
+		    $parms	        = $id;
 		}			// array parameter
 		else
 		if (is_null($id) || $id === '')
-		    $parms		= array('idlr' => 1);
+		    $parms		    = array('idlr' => 1);
 		else
 		if (is_string($id))
 		{			// string parameter
 		    if (ctype_digit($id))
 		    {
-				$id		= intval($id);
+				$id		    = intval($id);
 				if ($id == 0)
 				    $parms	= array('idlr' => 1);
 				else
 				    $parms	= array('idlr' => $id);
 		    }
 		    else
-				$parms		= array(array('location'	=> $id,
-								      'shortlocation'	=> $id));
+				$parms		= array(array('location'	    => $id,
+				    				      'shortlocation'	=> $id));
 		}			// string parameter
 		else
 		if (is_int($id))
@@ -254,10 +305,11 @@ class Location extends RecordPic
 		}			// integer parameter
 		else
 		{			// unexpected parameter type
-		    throw new Exception("Location::__construct: " .
+		    $this->msg  .= "Location::__construct: " .
 							"called with " .
 							gettype($id) . ", value=" .
-							print_r($id, true));
+                            print_r($id, true) . '. ';
+            $parms      = array();
 		}			// unexpected parameter type
 
 		// validate field names in parameter array
@@ -327,20 +379,18 @@ class Location extends RecordPic
 		    }			// loop through parameters
 
 		    // query the database
-		    if (strlen($where) == 0)
-				throw new Exception("Location::__construct: " .
-							    "No IDLR Parameter Specified");
+            if (strlen($where) > 0)
+            {           // have where expression
 		    $query	                = "SELECT * FROM tblLR $where";
 		    $stmt	                = $connection->prepare($query);
+		    $queryText              = debugPrepQuery($query, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {
 				$result		        = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 				if ($debug)
-				    $warn	        .=
-						"<p>Location::__construct: " . __LINE__ . ' ' .
-										$query . "</p>\n" .
-						"<p>parms=" . print_r($sqlParms, true) . "</p>\n";
+				    $warn	        .= "<p>Location::__construct: " . __LINE__ .
+                                        " $queryText</p>\n";
 
 				if (count($result) == 0)
 				{	// no location matches parameters, create new
@@ -406,17 +456,33 @@ class Location extends RecordPic
 		    }			// successful query
 		    else
 		    {			// error issuing query
-				throw new Exception("Location::__construct: " .
-							    "'$query' " .
-							    "parms=" . print_r($sqlParms, true) . ' ' .
-							    print_r($stmt->errorInfo(),true));
+				$this->msg      .= "Location::__construct: " .
+							        "'$queryText' " .
+							        print_r($stmt->errorInfo(),true) . '. ';
 		    }			// error issuing query
+            }           // have where expression
+            else
+				$this->msg      .= "Location::__construct: " .
+				    			    "No IDLR Parameter Specified. ";
 		}			// search parameters
 
 		// invoke constructor of base class
 		parent::__construct($dbrow,
 						    'tblLR');
 		$this->needInsert	= $needInsert;
+
+        // save a reference to existing record
+        if (!$needInsert)
+        {		            // existing record
+            $idlr           = $this['idlr'];
+            if ($idlr > 0)
+            {               // have key
+                if (!array_key_exists($idlr, self::$locationIndex))
+                {           // not already saved
+                    self::$locationIndex[$idlr]     = $this;
+                }           // not already saved
+            }               // have key
+        }		            // existing record
 
 		// use any other parameters to modify fields
 		if (count($parms) < count(self::$initRow))
@@ -650,6 +716,9 @@ class Location extends RecordPic
      *  function Location::getName										*
      *																	*
      *	Get the name of the location.									*
+     *																	*
+     *	Returns:														*
+     *		string						                                *
      ********************************************************************/
     function getName($options	= null)
     {
@@ -660,6 +729,9 @@ class Location extends RecordPic
      *  function Location::toString										*
      *																	*
      *	Get the name of the location.									*
+     *																	*
+     *	Returns:														*
+     *		string						                                *
      ********************************************************************/
     function toString()
     {
@@ -670,6 +742,9 @@ class Location extends RecordPic
      *  function Location::__toString									*
      *																	*
      *	Get the name of the location.									*
+     *																	*
+     *	Returns:														*
+     *		string						                                *
      ********************************************************************/
     function __toString()
     {
@@ -752,6 +827,9 @@ class Location extends RecordPic
      *																	*
      *  Returns:														*
      *	    Google Maps zoom level										*
+     *																	*
+     *	Returns:														*
+     *		string						                                *
      ********************************************************************/
     function getZoom()
     {
@@ -762,6 +840,9 @@ class Location extends RecordPic
      *  function Location::getPreposition								*
      *																	*
      *	Get the preposition portion of the location.					*
+     *																	*
+     *	Returns:														*
+     *		string						                                *
      ********************************************************************/
     function getPreposition()
     {
@@ -772,6 +853,9 @@ class Location extends RecordPic
      *  function Location::getShortName									*
      *																	*
      *	Get the short name of the location.								*
+     *																	*
+     *	Returns:														*
+     *		string						                                *
      ********************************************************************/
     function getShortName()
     {
@@ -781,11 +865,18 @@ class Location extends RecordPic
     /********************************************************************
      *  function Location::getNotes										*
      *																	*
-     *	Get the notes information of the location.						*
+     *	Get the notes information of the Location.						*
+     *																	*
+     *	Returns:														*
+     *		string possibly containing HTML tags						*
      ********************************************************************/
     function getNotes()
     {
-		return str_replace("\n", "<br>\n", $this->row['notes']);
+        $notes              = $this->row['notes'];
+        if (preg_match('/<\w/', $notes))
+		    return $notes;
+        else
+		    return str_replace("\n", "<br>\n", $notes);
     }		// Location::getNotes
 
     /********************************************************************

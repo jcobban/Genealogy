@@ -19,6 +19,7 @@ use \Iterator;
  *		Code				VARCHAR(6)		6 character id				*
  *		Code2				VARCHAR(6)		2 character id				*
  *		Temple				VARCHAR(50)		name						*
+ *		Address				VARCHAR(255)	street address				*
  *		Used				TINYINT(3)								    *
  *		Tag1				TINYINT(3)								    *
  *		qsTag				TINYINT(3)								    *
@@ -68,6 +69,7 @@ use \Iterator;
  *		2017/12/18		add support for temporary fields				*
  *		2019/05/14      do not throw exceptions in constructor or set   *
  *		                add $info                                       *
+ *		2019/07/25      add street address                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -95,6 +97,7 @@ class Temple extends RecordPic
 									'code'			    => '',
 									'code2'			    => '',
 									'temple'		    => '',
+									'address'		    => '',
 									'templestart'		=> 0,
 									'templeend'		    => 99991231,	// never
 									'used'			    => 0,
@@ -107,15 +110,15 @@ class Temple extends RecordPic
      *	Description of record class                                     *
      ********************************************************************/
     protected static	$info	= array(
-                'table'     => 'tblTR',
-                'name'      => 'Temples',
-                'prime'	    => 'idtr',
-	            'srvmg'     => true,
-	            'fldcount'	=> 9,
-                'order'     => 'Temple',
-                'classname' => 'Temple');
-
-    /********************************************************************
+					                'table'     		=> 'tblTR',
+					                'name'      		=> 'Temples',
+					                'prime'	    		=> 'idtr',
+						            'srvmg'     		=> true,
+						            'fldcount'			=> 10,
+					                'order'     		=> 'Temple',
+			                        'classname' 		=> 'Temple');
+			
+	/********************************************************************
      *	Temple::$translate												*
      *																	*
      *	array containing alternate field names							*
@@ -431,8 +434,9 @@ class Temple extends RecordPic
      *	function Temple::getCode										*
      *																	*
      *	Get the abbreviation code for the temple.						*
-     *	Even though this code should not be deployed against the old	*
-     *	record structure it is written so it will not fail if it is.	*
+     *	Even though this function should not be deployed against the	*
+     *	old record structure it is written so it will not fail          *
+     *	if it is.	                                                    *
      *																	*
      *	Returns:														*
      *	    string														*
@@ -457,8 +461,9 @@ class Temple extends RecordPic
      *	function Temple::getCode2										*
      *																	*
      *	Get the short abbreviation code for the temple.					*
-     *	Even though this code should not be deployed against the old	*
-     *	record structure it is written so it will not fail if it is.	*
+     *	Even though this function should not be deployed against the	*
+     *	old record structure it is written so it will not fail          *
+     *	if it is.	                                                    *
      *																	*
      *	Returns:														*
      *	    string														*

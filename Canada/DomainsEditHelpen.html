@@ -45,11 +45,13 @@
 	<li>A four- or five-character mnemonic code used by other tables to
 	    identify a domain.  This field is read-only except on a line
 	    for adding a new domain.
+        The value is displayed in ISO standard form with a hyphen between
+        the country code and the state code.
 	<li>The full name of the domain in the selected language.
 	<li>If you are signed on as an administrator a 
 	    <span class='button'>Delete</span> button to delete the domain.
 	    Although the row is immediately removed from the display you
-	    must click on the <span class='button'>Update Database</button>
+	    must click on the <span class='button'>Update Database</span> button
 	    to actually delete the record from the database.
 	<li>A  <span class='button'>Counties</span>button to open the 
 	    <a href='CountiesEditHelpen.html'>
@@ -61,15 +63,19 @@
 	</li>
     </ul>
     <p>If you are signed on as an administrator
-    	at the bottom of the page there are two buttons:
+    	at the bottom of the page there are three buttons:
     <ul>
 	<li>The <span class='button'>Update Database</span> button applies 
 	    the changes you have entered on this page into the database.
 	    Note that pressing the Enter key while editing any input field
 	    also performs this function.  
+	<li>The <span class='button'>Close</span> button
+        closes the dialog when it is opened in the right hand
+        side of the window of the 
+        <a href="CountriesEditHelpen.html">Countries dialog</a>.
 	<li>The <span class='button'>Add New Domain</span> button
 	    adds a new row at the bottom of the table, permitting you to
-	    add a county. 
+	    add a state or province. 
     </ul>
     <p>Observe that the only way to change the code identifying
 	a domain is to add a new domain and then delete the old domain.

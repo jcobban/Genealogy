@@ -42,6 +42,7 @@
  *		2015/05/27		use absolute URLs for AJAX						*
  *		2015/06/01		open child dialogs in other half of window		*
  *		2018/10/30      use Node.textContent rather than getText        *
+ *		2019/06/29      first parameter of displayDialog removed        *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -590,36 +591,33 @@ function editCitation()
  *  a citation to a source for an event.								*
  *																		*
  *  Input:																*
- *		this		<button id='delCitation999'>						*
+ *		this		    <button id='delCitation999'>					*
+ *		ev              instance of Event                               *
  ************************************************************************/
-function deleteCitation()
+function deleteCitation(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form		= this.form;
     var	idsx		= this.id.substr("delCitation".length);
 
-    var parms		= {"idsx"	: idsx,
-						   "rownum"	: idsx,
-						   "formname"	: form.name, 
-						   "template"	: "",
-						   "msg"	:
-						"Are you sure you want to delete this citation?"};
+    var parms		= {"idsx"	    : idsx,
+					   "rownum"	    : idsx,
+					   "formname"	: form.name, 
+					   "template"	: "",
+					   "msg"	    :
+					        "Are you sure you want to delete this citation?"};
 
     if (debug != 'n')
 		parms["debug"]	= debug;
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-				      'CitDel$template',
-				      parms,
-				      this,		// position relative to
-				      confirmDelete,	// 1st button confirms Delete
-				      false);		// default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("editEvent.js: deleteCitation: Error: " + msg);
+	displayDialog('CitDel$template',
+			      parms,
+			      this,		        // position relative to
+			      confirmDelete);	// 1st button confirms Delete
 }		// deleteCitation
 
 /************************************************************************

@@ -123,10 +123,10 @@ if (count($_GET) > 0)
 				break;
 		    }
 	
-		    case 'treename':
+		    case 'name':
             {
                 if (strlen($value) > 0)
-				    $name	    = $value;
+                    $name	        = $value;
 				break;
 		    }
 	
@@ -155,9 +155,9 @@ if ($treeName == '')
 	$treeNameText	= "South-Western Ontario";
 else
 	$treeNameText	= $treeName;
-$nameSet		= new RecordSet('Names');
-$treeNames		= $nameSet->getDistinct('treename');
-$trees		= array();
+$nameSet		    = new RecordSet('Names');
+$treeNames		    = $nameSet->getDistinct('treename');
+$trees		        = array();
 foreach($treeNames as $atree)
 {
 	if ($atree == '')

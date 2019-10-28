@@ -3116,39 +3116,31 @@ function gotIdir(xmlDoc)
     var	actionButton	= null;
 
     hideLoading();
-    var	msgDiv	= document.getElementById('IdirDialog');
-    if (msgDiv)
-    {		// have popup <div> to display selection dialog in
-		// substitutions into the template
-		var parms	= {"sub"	: "",
-						   "surname"	: surname,
-						   "givenname"	: givennames,
-						   "birthyear"	: birthDate,
-						   "line"	: line};
+	// substitutions into the template
+	var parms	    = {"sub"	    : "",
+					   "surname"	: surname,
+					   "givenname"	: givennames,
+					   "birthyear"	: birthDate,
+					   "line"	    : line};
 
-		var matches	= xmlDoc.getElementsByTagName("indiv");
-		if (matches.length > 0)
-		{		// have some matching entries
-		    return displaySelectIdir(msgDiv,
-								     'idirChooserForm$sub',
-								     parms,
-								     button,
-								     closeIdirDialog,
-								     matches);
-		}		// have some matching entries
-		else
-		{		// have no matching entries
-		    var cmds	= xmlDoc.getElementsByTagName("cmd");
-		    parms.cmd	= tagToString(cmds[0]).replace('<','&lt;');
-		    return displayDialog(msgDiv,
-								 'idirNullForm$sub',
-								 parms,
-								 button,
-								 null,		// default close dialog
-								 false);	// default show on open
-		}		// have no matching entries
-
-    }		// support for dynamic display of messages
+	var matches	= xmlDoc.getElementsByTagName("indiv");
+	if (matches.length > 0)
+	{		// have some matching entries
+	    return displaySelectIdir('idirChooserForm$sub',
+							     parms,
+							     button,
+							     closeIdirDialog,
+							     matches);
+	}		// have some matching entries
+	else
+	{		// have no matching entries
+	    var cmds	= xmlDoc.getElementsByTagName("cmd");
+	    parms.cmd	= tagToString(cmds[0]).replace('<','&lt;');
+	    return displayDialog('idirNullForm$sub',
+							 parms,
+							 button,
+							 null);		// default close dialog
+	}		// have no matching entries
 }		// function gotIdir
 
 /************************************************************************
@@ -3186,8 +3178,6 @@ function clearIdir(event)
  *  current line of the census.											*
  *																		*
  *  Input:																*
- *		msgDiv			an HTML element to modify and make visible.		*
- *						This is normally a <div> element				*
  *		templateId		identifier of an HTML element that provides the	*
  *						structure and constant strings to be laid out	*
  *						in the dialog									*
@@ -3201,29 +3191,30 @@ function clearIdir(event)
  *						to just hide the dialog.						*
  *		matches			array of XML <indiv> tags						*
  ************************************************************************/
-function displaySelectIdir(dialog,
-						   templateId,
+function displaySelectIdir(templateId,
 						   parms,
 						   element,
 						   action,
 						   matches)
 {
-    if (displayDialog(dialog,
-				      templateId,
-				      parms,
-				      element,
-				      action,
-				      true))
+    var dialog              = displayDialog(templateId,
+            				                parms,
+            				                element,
+            				                action,
+            				                true);  // defer display
+    if (dialog)
     {
+        var forms           = dialog.getElementsByTagName('form');
+        var form            = forms[0];
+
 		// update the selection list with the matching individuals
-		var select	        = document.getElementById("chooseIdir");
+		var select	        = form.chooseIdir;
 		select.onchange	    = idirSelected;
-		//select.onclick	= function() {alert("select.onclick");};
 
 		// add the matches
 		for (var i = 0; i < matches.length; ++i)
 		{	// loop through the matches
-		    var	indiv	= matches[i];
+		    var	indiv	    = matches[i];
 
 		    // get the "id" attribute
 		    var	value		= indiv.getAttribute("id");
@@ -3521,23 +3512,20 @@ function gotFamily(xmlDoc)
 		var matches	= xmlDoc.getElementsByTagName("indiv");
 		if (matches.length > 0)
 		{		// have some matching entries
-		    return displayFamilyDialog(msgDiv,
-								     'FamilyEntryForm$sub',
-								     parms,
-								     button,
-								     closeFamilyDialog,
-								     matches);
+		    return displayFamilyDialog('FamilyEntryForm$sub',
+								       parms,
+								       button,
+								       closeFamilyDialog,
+								       matches);
 		}		// have some matching entries
 		else
 		{		// have no matching entries
 		    // This should never occur because the response must
 		    // contain all individuals in the identified family: CYA
-		    return displayDialog(msgDiv,
-								 'idirNullForm$sub',
+		    return displayDialog('idirNullForm$sub',
 								 parms,
 								 button,
-								 null,		// default close dialog
-								 false);	// default show on open
+								 null);		// default close dialog
 		}		// have no matching entries
 
     }		// support for dynamic display of messages
@@ -3551,8 +3539,6 @@ function gotFamily(xmlDoc)
  *  current line of the census.											*
  *																		*
  *  Input:																*
- *		msgDiv			an HTML element to modify and make visible.		*
- *						This is normally a <div> element				*
  *		templateId		identifier of an HTML element that provides the	*
  *						structure and constant strings to be laid out in*
  *						the dialog										*
@@ -3566,15 +3552,13 @@ function gotFamily(xmlDoc)
  *						to just hide the dialog.						*
  *		matches			array of XML <indiv> tags						*
  ************************************************************************/
-function displayFamily(dialog,
-						templateId,
-						parms,
-						element,
-						action,
-						matches)
+function displayFamily(templateId,
+					   parms,
+					   element,
+					   action,
+					   matches)
 {
-    if (displayDialog(dialog,
-				      templateId,
+    if (displayDialog(templateId,
 				      parms,
 				      element,
 				      action,

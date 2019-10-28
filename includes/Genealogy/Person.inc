@@ -532,6 +532,19 @@ use \Exception;
  *		2019/04/14      do not pass internal date string to LegacyDate  *
  *		                prefixed by space                               *
  *		2019/04/15      replace is_a with instanceof                    *
+ *		2019/05/22      correct bad parms to RecordSet::update          *
+ *		2019/06/01      set lastSqlCmd in save and delete               *
+ *		                improve JSON outut                              *
+ *		2019/07/18      add Person::getPerson                           *
+ *		2019/07/21      use Location::getLocation                       *
+ *		2019/08/05      method get returns values from row if the       *
+ *		                primary Name is not initialized yet             *
+ *		2019/09/09      change return value of mergeFrom                *
+ *		2019/09/20      correct implementation of Person::dump          *
+ *		                correct eventsd in default Death and Buried     *
+ *		2019/10/08      remove tracelog entries                         *
+ *		2019/10/28      permit spaces in front of save parm             *
+ *		                return count from save                          *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -783,6 +796,34 @@ class Person extends RecordPic
                 'order'     => 'IDIR',
                 'classname' => 'Person');
 
+    /********************************************************************
+     *	Person::$personIndex									        *
+     *																	*
+     *	To save time if a specific record is requested more than once   *
+     *	during a process, maintain a table of Person records.           *
+     ********************************************************************/
+    protected static	$personIndex	= array();
+
+    /********************************************************************
+     *	static function Person::getPerson								*
+     *																	*
+     *	Get an existing entry or create an instance of the class Person *
+     *	from a row returned from a database query of the table			*
+     *  'tblIR' for a value of IDIR.									*
+     *																	*
+     *	Input:															*
+     *	    $idir       integer identifier of a person                  *
+     *																	*
+     *	Returns:														*
+     *		an instance of Person										*
+     ********************************************************************/
+    static function getPerson($idir)
+    {
+        if (array_key_exists($idir, self::$personIndex))
+	        return self::$personIndex[$idir];
+        else
+            return new Person(array('idir' => $idir));
+    }           // static function Person::getPerson
 
     /********************************************************************
      *	function Person::__construct									*
@@ -831,7 +872,8 @@ class Person extends RecordPic
      *																	*
      *	    $indiv		= new Person(array('idir'		=> 1234));		*
      *			Creates an instance from an existing record in the		*
-     *			database.												*
+     *			database.  However it is more efficient to use:         *
+     *		$indiv      = Person::getPerson($idir);                     *
      ********************************************************************/
     function __construct($parms		= null,
                          $fldName	= 'idir')
@@ -842,89 +884,84 @@ class Person extends RecordPic
         global  $connection;	// connection to database server
         global  $document_root;
 
-        if ($debug)
+        // rearrange deprecated parameter formats into supported array format
+        $fldNameLc		    = strtolower(trim($fldName));
+        $usefldname         = true;
+        if (is_null($parms))
         {
-            if (is_null($parms))
-                $parmText	= 'null';
-            else
-            if (is_bool($parms))
-            {
-                if ($parms)
-                    $parmText   = 'true';
-                else
-                    $parmText   = 'false';
-            }
-            else
-            if (is_string($parms))
-                $parmText       = "'$parms'";
-            else
-            if (is_int($parms))
-                $parmText       = $parms;
-            else
-            if ($parms instanceof Record)
-            {
-                $parmText       = 'class ' . get_class($parms) . 
-                                    '(' . $parms->getId() . ')';
-            }
-            else
-            if (is_array($parms))
-            {
-                $parmText       = 'array[';
-                $comma          = '';
-                foreach($parms as $field  => $value)
-                {
-                    if (is_object($value))
-                        $parmText	.= "$comma'$field'=>instance of " .
-                                        get_class($value);
-                    else
-                    if (is_string($value))
-                        $parmText   .= "$comma'$field'=>'$value'";
-                    else 
-                        $parmText   .= "$comma'$field'=>$value";
-                    $comma          = ', ';
-                }
-                $parmText       = ']';
-            }
-            else
-                $parmText	    = print_r($parms, true);
-            
-            $warn	            .= "<p>Person::__construct($parmText, '$fldName')</p>\n";
+            $parmText	    = 'null';
+            $parms		    = array();
         }
+        else
+        if (is_bool($parms))
+        {
+            if ($parms)
+                $parmText   = 'true';
+            else
+                $parmText   = 'false';
+            $this->msg      .= "Called with unsupported parameter boolean $parmText. ";
+            $parms		    = array();  // create new empty record
+        }
+        else
+        if (is_string($parms))
+        {
+            $parmText       = "'$parms'";
+            $parms		    = array($fldNameLc => $parms);
+        }
+        else
+        if (is_int($parms))
+        {
+            $parmText       = $parms;
+            $parms		    = array($fldNameLc => $parms);
+        }
+        else
+        if ($parms instanceof Record)
+        {
+            $parmText       = 'class ' . get_class($parms) . 
+                                '(' . $parms->getName() . ')';
+            $parms		    = array('idir' => $parms);
+            $usefldname     = false;
+        }
+        else
+        if (is_array($parms))
+        {
+            $parmText       = 'array[';
+            $comma          = '';
+            foreach($parms as $field  => $value)
+            {
+                if (is_object($value))
+                    $parmText	.= "$comma'$field'=> class " .
+                                    get_class($value) .
+                                    '(' . $value->getName() . ')';
+                else
+                if (is_string($value))
+                    $parmText   .= "$comma'$field'=>'$value'";
+                else 
+                    $parmText   .= "$comma'$field'=>$value";
+                $comma          = ', ';
+            }
+            $parmText       .= ']';
+            $usefldname     = false;
+        }
+        else
+        {
+            $parmText	    = print_r($parms, true);
+            $this->msg      .= "Called with unsupported parameter " .
+                                gettype($parms) . ". ";
+            $parms		    = array();  // create new empty record
+        }
+
+        if ($usefldname)
+            $parmText	    = "$parmText, '$fldName'";
+
+        if ($debug)
+            $warn	    .= "<p>Person::__construct($parmText)</p>\n";
 
         // dbrow represents the contents of the individual fields in
         // the database record
         $dbrow			    = null;
         $idir			    = null;
         $needInsert		    = false;
-
-        // rearrange deprecated parameter formats into supported array format
-        if (is_null($parms))
-            $parms		    = array();
-        else
-        if (is_int($parms) || is_string($parms))
-        {
-            $fldNameLc		= strtolower(trim($fldName));
-            $parms		    = array($fldNameLc => $parms);
-            error_log("Person::__construct: Deprecated new Person($parms, '$fldName')\n");
-            ob_start();
-            debug_print_backtrace();
-            error_log(ob_get_clean());
-        }
-        else
-        if ($parms instanceof Record)
-        {
-            error_log("Person::__construct: Deprecated new Person(class " . get_class($parms) . ")\n");
-            $parms          = array('idir'      => $parms);
-        }
-        else
-        if (is_array($parms))
-            $parms		    = $parms;
-        else
-        {
-            $this->msg      .= "Called with unsupported parameter " .
-                                gettype($parms) . ". ";
-            $parms		    = array();  // create new empty record
-        }
 
         // action depends upon size of array
         if (count($parms) >= count(self::$initRow))
@@ -1062,49 +1099,24 @@ class Person extends RecordPic
             $this->dprivlim	= $currYear - 72;
         }		            // privatize dates
 
-        // get initial value of treeName from the primary name entry
+        // save a reference to existing record
         if (!$needInsert)
         {		            // existing record
-            if ($debug)
-                $warn	.= "<p>Person::_construct: " . __LINE__ .
-            ' $priName = new Name(array(\'idir\' => $this, \'order\' => 0)' .
-            "</p>\n";
- 
-            if ($this['idir'] > 0)
-            {
-                if (is_null($this->priName))
-                {
-                    $this->priName		= new Name(array('idir' 	=> $this));
-                    if ($this->priName['birthsd'] == -99999999 &&
-                        $this['birthsd'] != -99999999)
-                        $this->priName['birthsd']		= $this['birthsd'];
-                }
-                else
-                    $this->priName['idir']  = $this['idir'];
-                if (!$this->priName->isExisting())
-                {
-                    $this->priName->save(false);    // new primary name record
-                }
-                else
-                    $this->treeName	        = $this->priName['treename'];
-            }
+            $idir           = $this['idir'];
+            if ($idir > 0)
+            {               // have key
+                if (!array_key_exists($idir, self::$personIndex))
+                {           // not already saved
+                    self::$personIndex[$idir]     = $this;
+                }           // not already saved
+            }               // have key
         }		            // existing record
 
         // override values in returned record
         if (count($parms) < count(self::$initRow))
         {		            // set of initialization parameters
-            $parmsText  = "<p class='label'>Person::__construct: " . __LINE__ . "</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>field</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
             foreach($parms as $field => $parms)
             {		        // loop through parameters
-                if ($parms instanceof Record) 
-                    $parmsText  .= "<tr><th class='detlabel'>$field</th>" .
-                        "<td class='white left'>class " .get_class($parms) . "</td></tr>\n"; 
-                else
-                    $parmsText  .= "<tr><th class='detlabel'>$field</th>" .
-                        "<td class='white left'>$parms</td></tr>\n"; 
                 $fieldLc	= strtolower(trim($field));
                 switch($fieldLc)
                 {		    // act on specific field names
@@ -1136,13 +1148,10 @@ class Person extends RecordPic
                     }	    // initialize fields, including temporaries
                 }		    // act on specific field names
             }		        // loop through parameters
-            if ($debug)
-                $warn       .= $parmsText . "</table>\n";
         }		            // set of initialization parameters
 
         // diagnostic output if debug is set
         $this->dump('Person Record constructed:');
-
     }		// Person::__construct
 
     /********************************************************************
@@ -1169,15 +1178,23 @@ class Person extends RecordPic
         global $warn;
         global $connection;
 
+        $indent             = '';
         if (is_string($xml))
         {		// string tag name
-            $tagname	= $xml;
-            $xml	= true;
+            $matches   		= array();
+            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            {
+                $indent		= $matches[1];
+                $xml   		= $matches[2];
+            }
+            $tagname		= $xml;
+            $xml	   		= true;
         }		// string tag name
         else
         if ($xml)
         {		// true
-            $tagname	= 'cmd';
+            $indent         = '    ';
+            $tagname	    = 'cmd';
         }		// true
 
         $counts	= array();
@@ -1252,20 +1269,21 @@ class Person extends RecordPic
         $counts['blogCount']	= $result;
 
         // finally delete the individual record itself
-        $oldJson	= $this->toJson(false);
-        $delIndiv	= "DELETE FROM tblIR WHERE IDIR=:idir";
-        $sqlParms	= array('idir'		=> $idir);
+        $oldJson			= $this->toJson(false);
+        $delIndiv			= "DELETE FROM tblIR WHERE IDIR=:idir";
+        $sqlParms			= array('idir'		=> $idir);
 
         // update the database
-        $stmt		= $connection->prepare($delIndiv);
-        $deleteText	= debugPrepQuery($delIndiv, $sqlParms);
+        $stmt				= $connection->prepare($delIndiv);
+        $deleteText			= debugPrepQuery($delIndiv, $sqlParms);
+        $this->lastSqlCmd   = $deleteText;
         if ($stmt->execute($sqlParms))
         {			// success
-            $result	= $stmt->rowCount();
+            $result	        = $stmt->rowCount();
             if ($result > 0)
             {			// individual record was deleted
                 if ($xml)
-                    print "<$tagname count='$result'>$deleteText</$tagname>\n";
+                    print "$indent<$tagname count='$result'>$deleteText</$tagname>\n";
                 else
                 if ($debug)
                     $warn	.= "<p>Person.inc: " . __LINE__ .
@@ -1290,7 +1308,7 @@ class Person extends RecordPic
                 if ($stmt->execute($sqlParms))
                 {		// success
                     if ($xml)
-                        print "<$tagname>$addText</$tagname>\n";
+                        print "$indent<$tagname>$addText</$tagname>\n";
                     if ($debug)
                         $warn	.= "<p>Person.inc: " . __LINE__ .
                                         " '$addText'</p>\n";
@@ -1308,7 +1326,7 @@ class Person extends RecordPic
                     {		// ignore duplicates error
                         if ($xml)
                         {
-                            print '<msg>' . xmlentities($errorInfo) .
+                            print "$intent<msg>" . xmlentities($errorInfo) .
                                     "</msg>\n";
                         }
                         $warn	.= "<p>Person::delete: " .
@@ -1322,9 +1340,9 @@ class Person extends RecordPic
         {			// error performing deletion
             if ($xml)
             {
-                print "<$tagname>$deleteText" .
+                print "$indent<$tagname>$deleteText" .
                       "</$tagname>\n";
-                print '<msg>' . print_r($stmt->errorInfo(),true) . "</msg>\n";
+                print "$indent<msg>" . print_r($stmt->errorInfo(),true) . "</msg>\n";
                 return null;
             }
             throw new Exception("Person::delete: " .
@@ -1364,9 +1382,11 @@ class Person extends RecordPic
     {
         if (is_null($this->priName))
         {
-            if ($this->row['idir'] == 0)
-                return null;        // avoid infinite recurstion
-            $this->priName          = new Name(array('idir' => $this));
+            if ($this->row['idir'] > 0)
+                $this->priName      = new Name(array('idir' => $this,
+     					                             'order'=> Name::PRIMARY));
+            else
+                $this->priName      = new Name();
         }
         return $this->priName;
     }		// Person::getPriName
@@ -1593,15 +1613,16 @@ class Person extends RecordPic
         global	$debug;
         global	$warn;
 
+        if (is_int($options))
+            $parmText			= $options;
+        else
+            $parmText			= '$tranTab';
+
         $idir                       = $this->row['idir'];
         if ($debug)
         {
-            if (is_int($options))
-                $warn			    .= "<p>IDIR(IDIR=" . $idir .
-                                        ")::getName($options)</p>\n";
-            else
-                $warn			    .= "<p>Name(IDIR=" . $idir .
-                                        ")::getName(\$tranTab)</p>\n";
+            $warn			    .= "<p>Person(IDIR=" . $idir .
+                                        ")->getName($parmText)</p>\n";
         }
 
         if (is_null($this->getPriName()))
@@ -1615,17 +1636,7 @@ class Person extends RecordPic
 			}		// support being passed internationalization table
 			else
 			    $tranTab			= null;
-	
-	        if ($debug)
-	        {
-			    $warn			    .= "<p>Person(IDIR=" . $this->row['idir'] .
-	                                        ")::getName";
-	            if (is_null($tranTab))
-			        $warn			.= "($options)</p>\n";
-	            else
-			        $warn			.= "(\$tranTab)</p>\n";
-	        }
-	
+
 			$includeDates			= ($options & self::NAME_INCLUDE_DATES) != 0;
 			$includeLocs			= ($options & self::NAME_INCLUDE_LOCS) != 0;
 			$surnameFirst			= ($options & self::NAME_SURNAME_FIRST) != 0;
@@ -1636,11 +1647,11 @@ class Person extends RecordPic
 			$birth		    		= '';
 			$death		    		= '';
 			$suffix		    		= $this->row['title'];
-	
+
 			$evBirth			    = $this->getBirthEvent();
 	        $bprivlim               = $this->getBPrivLim();
 	        $dprivlim               = $this->getDPrivLim();
-	
+
 			if ($evBirth)
 	        {
 				$tbirth		        = $evBirth->getDate($bprivlim,
@@ -1654,25 +1665,25 @@ class Person extends RecordPic
 
 			$retval		            = '';
 			$space		            = '';
-	
+
 			if ($surnameFirst)
 			{			// Surname, Given Names
 			    $retval		        .= $surname;
 			    $retval		        .= ',';
 			    $space		        = ' ';
-	
+
 			    if (strlen($prefix) > 0)
 			    {
 					$retval		    .= $space . $prefix;
 					$space		    = ' ';
 			    }
-	
+
 			    if (strlen($givenname) > 0)
 			    {
 					$retval		    .= $space . $givenname;
 					$space		    = ' ';
 			    }
-	
+
 			    if (strlen($suffix) > 0)
 			    {
 					$retval		    .= $space . $suffix;
@@ -1685,25 +1696,25 @@ class Person extends RecordPic
 					$retval		    .= $prefix;
 					$space		    = ' ';
 			    }
-	
+
 			    if (strlen($givenname) > 0)
 			    {
 					$retval		    .= $space . $givenname;
 					$space		    = ' ';
 			    }
-	
+
 			    if (strlen($surname) > 0)
 			    {
 					$retval		    .= $space . $surname;
 					$space		    = ' ';
 			    }
-	
+
 			    if (strlen($suffix) > 0)
 			    {
 					$retval		    .= $space . $suffix;
 			    }
 			}			// Given Names Surname
-	
+
 			// optionally include birth and death dates
 			if ($includeDates || $includeLocs)
             {		// add dates
@@ -1724,7 +1735,7 @@ class Person extends RecordPic
 			    }
 			    else
 					$birth	= '';
-	
+
 			    $evDeath		= $this->getDeathEvent();
 			    if ($evDeath)
 			    {
@@ -1739,7 +1750,7 @@ class Person extends RecordPic
 			    }
 			    else
 					$death		    = '';
-	
+
 			    $retval	            .= $space . "($birth&#8212;$death)";
             }		// add dates
             return $retval;
@@ -1760,9 +1771,19 @@ class Person extends RecordPic
     {
         // ensure synchronized with Names table
         if (is_null($this->getPriName()))
-            return $this->row['treename'];
+        {
+            $this->priName['idir']      = $this['idir'];
+            if ($this->priName['birthsd'] == -99999999 &&
+                $this['birthsd'] != -99999999)
+                $this->priName['birthsd']		= $this['birthsd'];
+            if ($this->priName['treename'] == '' &&
+                is_string($this['treename']) &&
+                $this['treename'] != '')
+                $this->priName['treename']		= $this['treename'];
+        }
         if ($this->priName->isExisting())
             $this->treeName	        = $this->priName['treename'];
+        $this->priName->save(false);    // update primary name record
         return $this->treeName;
     }		// function Person::getTreeName
 
@@ -1828,7 +1849,8 @@ class Person extends RecordPic
 			case 'title':
             case 'userref':
             {                   // fields moved to Name
-                if (is_null($this->getPriName()))
+                if (is_null($this->getPriName()) ||
+                    $this->priName->row[$fieldLc] == '')
                     return $this->row[$fieldLc];
                 else
                     return $this->priName->row[$fieldLc];
@@ -1891,9 +1913,7 @@ class Person extends RecordPic
 
             case 'surname':
             {
-                print '<dbg line="' . __LINE__ . "\">Person(idir=$idir)->setSurname('$value')</dbg>\n";
-                $oldsurname   = $this->setSurname($value);
-                print '<dbg line="' . __LINE__ . "\">Person(idir=$idir)->getName=" . $this->getName() . "</dbg>\n";
+                return $this->setSurname($value);
             }
 
 			case 'soundslike':
@@ -1906,9 +1926,7 @@ class Person extends RecordPic
                 // $this->priName is set if initialization is complete
                 if ($this->priName)
                     $this->priName[$fieldLc]		= $value;
-                print '<dbg line="' . __LINE__ . "\">Person(idir=$idir)->set('$fieldLc', '$value')</dbg>\n";
                 return parent::set($fieldLc, $value);
-                print '<dbg line="' . __LINE__ . "\">Person(idir=$idir)->priName->get('$fieldLc')='" . $this->priName[$fieldLc] . "')</dbg>\n";
             }                   // fields moved to Name
 
             case 'birthd':
@@ -1923,7 +1941,7 @@ class Person extends RecordPic
 
             case 'birthsd':
             {
-                if ($this->priName)
+                if ((!$this->needInsert) && $this->priName)
                 {
                     $this->priName['birthsd']		= $value;
                     $this->priName->save(false);
@@ -2235,7 +2253,7 @@ class Person extends RecordPic
         if (is_string($value) && ctype_digit($value))
             $value	= intval($value);
         if (is_int($value))
-            $location	= new Location(array('idlr' => $value));
+            $location	= Location::getLocation($value);
         else
             $location	= new Location(array('location' => $value));
         return $location;
@@ -2273,14 +2291,14 @@ class Person extends RecordPic
 
             if ($this->needInsert)
                 return $this->parents;
-        
+
             // get instances of Child where current individual is a child
             $parms		= array('idir'	=> $this->row['idir']);
             $this->child	= new RecordSet('Children', $parms);
 
             foreach($this->child as $idcr => $childr)
             {			// loop through child records
-                $idmr		= $childr->getIdmr();
+                $idmr		= $childr['idmr'];
                 if ($idmr >= 1)
                 {
                     $family		= new Family(array('idmr' => $idmr));
@@ -2343,7 +2361,7 @@ class Person extends RecordPic
         {			// fixup bad idmrparent value
             $parent		= $parents->rewind();
             // set first set of parents as preferred
-            $this->set('idmrparents', $parent->getIdmr());
+            $this->set('idmrparents', $parent['idmr']);
             return $parent;
         }			// fixup bad idmrparent value
         else
@@ -2523,19 +2541,30 @@ class Person extends RecordPic
             $events		    = $this->getEvents();
         }
         $event		        = $this->birthEvent;
+        $chrisEvent         = $this->chrisEvent;
         if (is_null($event))
         {		                // not initialized
+            $birthd         = $this['birthd'];
+            $birthsd        = $this['birthsd'];
             if ($create ||
-                $this['birthd'] != '' ||
+                $birthd != '' ||
                 $this['idlrbirth'] > 1 ||
                 $this['idarbirth'] > 1 ||
                 $this['birthnote'] != '')
             {		            // create birth event from Person
+                if ($birthd == '')
+                    $birthsd        = -99999999;
+                if ($chrisEvent)
+                {
+                    $chrissd        = $chrisEvent['eventsd'];
+                    if ($birthsd > $chrissd)
+                        $birthsd    = $chrissd - 1;
+                }
                 $trow	    = array('idir'		=> $this,
                                     'idtype'	=> Event::IDTYPE_INDIV,
                                     'idet'		=> Event::ET_BIRTH,
-                                    'eventd'	=> $this['birthd'],
-                                    'eventsd'	=> $this['birthsd'],
+                                    'eventd'	=> $birthd,
+                                    'eventsd'	=> $birthsd,
                                     'idlrevent' => $this['idlrbirth'],
                                     'idar'	    => $this['idarbirth'],
                                     'desc'	    => $this['birthnote'],
@@ -2548,20 +2577,27 @@ class Person extends RecordPic
                 $event			=  null;
         }		                // not initialized
         else
-        {
+        {                       // have existing event
+            $birthsd            = $event['eventsd'];
             if ($this['birthsd'] == -99999999 &&
-                $event->get('eventsd') != -99999999)
-            {                   // correct bad sort date
+                $birthsd != -99999999)
+            {                   // correct bad sort date in Person
                 $this->set('birthsd', $event->get('eventsd'));
                 $this->save(false);
-            }                   // correct bad sort date
-        }
+            }                   // correct bad sort date in Person
+            $chrisEvent         = $this->chrisEvent;
+            $chrissd            = $chrisEvent['eventsd'];
+            if ($birthsd > $chrissd)
+            {
+                $event->adjustSortDate($chrissd - 1);
+            }
+        }                       // have existing event
 
         if ($event)
             $event->dump("getBirthEvent: " . __LINE__ . " returns:");
         else
         if ($debug)
-            $warn   .= "<p>getBirthEvent: " . __LINE__ . " returns null</p>\n";
+            $warn   .= "<p>Person::getBirthEvent: " . __LINE__ . " returns null</p>\n";
 
         return $event;
     }		// Person::getBirthEvent
@@ -2619,19 +2655,22 @@ class Person extends RecordPic
                 $description	        = $this['chrterm'];
                 if (is_null($description))
                     $description        = '';
-                if ($this->birthEvent)
+                $eventd                 = $this->row['chrisd'];
+                $eventsd                = $this->row['chrissd'];
+                if ($this->birthEvent && $eventd == '')
+                {
                     $eventsd	        = $this->birthEvent->get('eventsd') + 1;
-                else
-                    $eventsd	        = $this['birthsd'] + 1;
+                }
                 $trow	    = array('idir'		    => $this,
                                     'idtype'	    => Event::IDTYPE_INDIV,
                                     'idet'		    => Event::ET_CHRISTENING,
-                                    'eventd'	    => $this['chrisd'],
+                                    'eventd'	    => $eventd,
                                     'eventsd'	    => $eventsd,
                                     'idlrevent'	    => $this['idlrchris'],
                                     'idar'		    => $this['idarchris'],
                                     'desc'		    => $this['chrisnote'],
                                     'description'   => $description,
+                                    'preferred'     => 1,
                                     'order'		    => -1);
                 $event	                = new Event($trow);
                 $this->chrisEvent		= $event;
@@ -2670,8 +2709,13 @@ class Person extends RecordPic
         $event		        = $this->deathEvent;
         if (is_null($event))
         {		// not initialized
+            $eventd	                    = $this['deathd'];
+            if ($eventd == '')
+                $eventsd                = 99999998;
+            else
+                $eventsd	            = $this['deathsd'];
             if ($create ||
-                $this['deathd'] != '' ||
+                $eventd != '' ||
                 $this['idlrdeath'] > 1 ||
                 $this['idardeath'] > 1 ||
                 $this['deathnote'] != '')
@@ -2679,8 +2723,8 @@ class Person extends RecordPic
                 $trow	= array('idir'		    => $this,
                                 'idtype'	    => Event::IDTYPE_INDIV,
                                 'idet'		    => Event::ET_DEATH,
-                                'eventd'	    => $this['deathd'],
-                                'eventsd'	    => $this['deathsd'],
+                                'eventd'	    => $eventd,
+                                'eventsd'	    => $eventsd,
                                 'idlrevent'	    => $this['idlrdeath'],
                                 'idar'		    => $this['idardeath'],
                                 'desc'		    => $this['deathnote'],
@@ -2742,13 +2786,17 @@ class Person extends RecordPic
         $event		= $this->buriedEvent;
         if (is_null($event))
         {		// not initialized
+            $eventd             = $this['buriedd'];
+            if ($eventd == '')
+                $eventsd        = 99999999;
+            else
+                $eventsd	    = $this['buriedsd'];
             if ($create ||
-                $this['buriedd'] != '' ||
+                $eventd != '' ||
                 $this['idlrburied'] > 1 ||
                 $this['idarburied'] > 1 ||
                 $this['buriednote'] != '')
             {		// buried event present
-                $eventsd	    = $this['buriedsd'];
                 $deathEv        = $this->getDeathEvent(false);
                 if ($deathEv && $eventsd < $deathEv->get('eventsd'))
                     $eventsd    = $deathEv->get('eventsd') + 2;
@@ -2759,12 +2807,13 @@ class Person extends RecordPic
                 $trow	= array('idir'		    => $this,
                                 'idtype'	    => Event::IDTYPE_INDIV,
                                 'idet'		    => Event::ET_BURIAL,
-                                'eventd'	    => $this['buriedd'],
+                                'eventd'	    => $eventd,
                                 'eventsd'	    => $eventsd,
                                 'idlrevent'	    => $this['idlrburied'],
                                 'idar'		    => $this['idarburied'],
                                 'desc'		    => $this['buriednote'],
                                 'description'   => $description,
+                                'preferred'     => 1,
                                 'order'		    => (1 << 15) - 2);
                 $event	                = new Event($trow);
                 $this->buriedEvent		= $event;
@@ -3274,7 +3323,7 @@ class Person extends RecordPic
     {
         if (is_null($parms))
         {		// no parameter passed
-            $parms	= array('idtype'	=> Event::IDTYPE_INDIV,
+            $parms	    = array('idtype'	=> Event::IDTYPE_INDIV,
                                 'idir'		=> $this);
             // create instance of Event
             $event		= new Event($parms);
@@ -3624,6 +3673,9 @@ class Person extends RecordPic
                         if ($value === 0 || $value === '0')
                             $retval	.= "    <$field>N</$field>\n";
                         else
+                        if (is_null($value))
+                            $retval	.= "    <$field>null</$field>\n";
+                        else
                             $retval	.= "    <$field>$value</$field>\n";
                     }
                     break;
@@ -3774,38 +3826,38 @@ class Person extends RecordPic
      ********************************************************************/
 
     /********************************************************************
-     *		Constant masks for options in 2nd parameter						*
+     *	Constant masks for options in 2nd parameter						*
      ********************************************************************/
     const	TOJSON_INCLUDE_FAMILIES	= 1;
     const	TOJSON_INCLUDE_PARENTS	= 2;
     const	TOJSON_INCLUDE_NAMES	= 4;
     const	TOJSON_INCLUDE_EVENTS	= 8;
 
-    function toJson($parms		= true,
+    function toJson($parms		    = true,
                     $options		= 0)
     {
         global	$userid;
         global	$debug;
 
-        $idir			= $this->row['idir'];
-        $isOwner		= $this->isOwner();
-        $includeFamilies	= $options & self::TOJSON_INCLUDE_FAMILIES;
-        $includeParents		= $options & self::TOJSON_INCLUDE_PARENTS;
-        $includeNames		= $options & self::TOJSON_INCLUDE_NAMES;
-        $includeEvents		= $options & self::TOJSON_INCLUDE_EVENTS;
-        $child			= false;
+        $idir			        = $this->row['idir'];
+        $isOwner		        = $this->isOwner();
+        $includeFamilies	    = $options & self::TOJSON_INCLUDE_FAMILIES;
+        $includeParents		    = $options & self::TOJSON_INCLUDE_PARENTS;
+        $includeNames		    = $options & self::TOJSON_INCLUDE_NAMES;
+        $includeEvents		    = $options & self::TOJSON_INCLUDE_EVENTS;
+        $child			        = false;
 
         // display fields from main record
-        $retval			= '';
-        $comma			= "{\n\t";
+        $retval			        = '';
+        $comma			        = "{\n\t";
 
         if (is_array($parms))
-        {		// additional parameters to include
-            $print		= true;
+        {		        // additional parameters to include
+            $print		        = true;
             foreach($parms as $field => $value)
             {
                 if ($field == 'print')
-                    $print	= $value;
+                    $print	    = $value;
                 else
                 {
                     if ($field == 'idcr')
@@ -3815,12 +3867,12 @@ class Person extends RecordPic
                     $comma		= ",\n\t";
                 }
             }
-        }		// additional parameters to include
+        }		        // additional parameters to include
         else
             $print	= $parms;
 
         foreach($this->row as $field => $value)
-        {		// loop through all fields
+        {		        // loop through all fields
             switch($field)
             {
                 case 'surname':
@@ -3880,13 +3932,12 @@ class Person extends RecordPic
                 case 'gender':
                 {
                     if ($value == Person::MALE)
-                        $retval	.= $comma . "\"gender\":\t\"M\"";
+                        $retval	.= ",\n\t\"gender\":\t\"M\"";
                     else
                     if ($value == Person::FEMALE)
-                        $retval	.= $comma . "\"gender\":\t\"F\"";
+                        $retval	.= ",\n\t\"gender\":\t\"F\"";
                     else
-                        $retval	.= $comma . "\"gender\":\t\"?\"";
-                    $comma	= ",\n\t";
+                        $retval	.= ",\n\t\"gender\":\t\"?\"";
                     break;
                 }		// interpret gender
 
@@ -3894,13 +3945,12 @@ class Person extends RecordPic
                 case 'templetag':
                 {
                     if ($value == 1)
-                        $retval	.= $comma . "\"$field\":\t\"Y\"";
+                        $retval	.= ",\n\t\"$field\":\t\"Y\"";
                     else
                     if ($value == 0)
-                        $retval	.= $comma . "\"$field\":\t\"N\"";
+                        $retval	.= ",\n\t\"$field\":\t\"N\"";
                     else
-                        $retval	.= $comma . "\"$field\":\t\"$value\"";
-                    $comma	= ",\n\t";
+                        $retval	.= ",\n\t\"$field\":\t\"$value\"";
                     break;
                 }		// interpret yes/no flags
 
@@ -3934,35 +3984,52 @@ class Person extends RecordPic
                 case 'fssync':
                 case 'fsdups':
                 case 'fsordinance':
-                case 'fslinks':
                 {		// flags suppressed for child
                     if (!$child)
                     {
                         if ($value === 1 || $value === '1')
-                            $retval	.= $comma . "\"$field\":\t\"Y\"";
+                            $retval	.= ",\n\t\"$field\":\t\"Y\"";
                         else
                         if ($value === 0 || $value === '0')
-                            $retval	.= $comma . "\"$field\":\t\"N\"";
+                            $retval	.= ",\n\t\"$field\":\t\"N\"";
                         else
-                            $retval	.= $comma . "\"$field\":\t" .
-                                           json_encode($value);
-                        $comma	= ",\n\t";
+                        if (is_null($value))
+                            $retval	.= ",\n\t\"$field\":\tnull";
+                        else
+                            $retval	.= ",\n\t\"$field\":\t$value";
                     }
                     break;
                 }		// flags suppressed for child
+
+                case 'fslinks':
+                {		// text field suppressed for child
+                    if (!$child)
+                    {
+                        $retval	.= ",\n\t\"$field\":\t\"$value\"";
+                    }
+                    break;
+                }		// text field suppressed for child
 
                 case 'idmrparents':
                 case 'idmrpref':
                 case 'idar':
                 case 'ancinterest':
                 case 'decinterest':
-                case 'userref':
-                case 'ancestralref':
                 case 'colortag':
                 case 'ltmp1':
                 case 'ltmp2':
-                case 'ppexclude':
                 case 'rgexclude':
+                {		// numeric fields suppressed for child
+                    if (!$child)
+                    {
+                        $retval	.= ",\n\t\"$field\":\t$value";
+                    }
+                    break;
+                }		// numeric fields suppressed for child
+
+                case 'userref':
+                case 'ancestralref':
+                case 'ppexclude':
                 case 'stmp1':
                 case 'relations':
                 case 'intellishare':
@@ -3971,43 +4038,59 @@ class Person extends RecordPic
                 case 'addedtime':
                 case 'updated':
                 case 'updatedtime':
-                {		// fields suppressed for child
+                {		// text fields suppressed for child
                     if (!$child)
                     {
-                        $retval	.= $comma . "\"$field\":\t" .
+                        $retval	.= ",\n\t\"$field\":\t" .
                                    json_encode($value);
-                        $comma	= ",\n\t";
                     }
                     break;
-                }		// fields suppressed for child
+                }		// text fields suppressed for child
+
+                case 'id':
+                {		// first field
+                    $retval	    .= "$comma\"$field\":\t$value";
+                    $comma		= ",\n\t";
+                    break;
+                }		// first field
+
+                case 'idir':
+                case 'living':
+                case 'idmrpref':
+                case 'idmrparents':
+                case 'idar':
+                {		// numeric fields passed back with no interpretation
+                    $retval	    .= ",\n\t\"$field\":\t$value";
+                    break;
+                }		// numeric fields passed back with no interpretation
 
                 default:
-                {		// fields passed back with no interpretation
-                    $retval	.= $comma . "\"$field\":\t" .
+                {		// fields passed back with text
+                    $retval	    .= ",\n\t\"$field\":\t" .
                                    json_encode($value);
-                    $comma	= ",\n\t";
                     break;
-                }		// fields passed back with no interpretation
-            }		// switch on field name
-        }		// loop through all fields
+                }		// fields passed back with text
+            }		    // switch on field name
+        }		        // loop through all fields
 
         // if requested include name information
         if ($includeNames)
-            $names	    = $this->getNames();
+            $names	            = $this->getNames();
         else
-            $names	    = $this->getNames(0);
+            $names	            = $this->getNames(0);
+        $comma	= ",\n\t";
         if (count($names) > 0)
-        {		// individual has at least one name record
-            $retval	    .= $comma . "\"names\":\n\t{";
-            $sep	    = '';
+        {		        // individual has at least one name record
+            $retval	            .= "$comma\"names\":\n\t{";
+            $sep	            = '';
             foreach($names as $idnx => $name)
-            {		// loop through names
-                $retval	.=  $sep . "\"$idnx\":" . $name->toJson(false);
-                $sep	= ',';
-            }		// loop through names
-            $retval	    .= "\t}\n";
-            $comma	    = ",\n\t";
-        }		// individual has at least one name record
+            {		    // loop through names
+                $retval	        .=  $sep . "\"$idnx\":" . $name->toJson(false);
+                $sep	        = ',';
+            }		    // loop through names
+            $retval	        .= "\t}\n";
+            $comma	        = ",\n\t";
+        }		        // individual has at least one name record
 
         // include events as <event> tags
         $this->birthEvent	= null;	// force refresh from DB
@@ -4023,54 +4106,54 @@ class Person extends RecordPic
             if ($includeEvents || 
                 ($tevent['idtype'] == 0 && 
                     ($tevent['idet'] == 3 || $tevent['idet'] == 6)))
-            {       // display event
+            {           // display event
                 $retval	    .= $sep;
                 $retval	    .= "\"$ider\":\t\n\t";
                 $retval	    .= $tevent->toJson(false);
                 $sep	    = ',';
-            }       // display event
-        }		    // loop through events
+            }           // display event
+        }		        // loop through events
         $retval	.= "\t}\n";
         $comma	= ",\n\t";
 
         // if requested include parent information
         if ($includeParents)
-        {		// include parents information
-            $parents	= $this->getParents();
+        {		        // include parents information
+            $parents	    = $this->getParents();
             if ($parents->count() > 0)
-            {		// individual is a child in a family
-                $retval	.= $comma . "\"parents\":\n\t{";
-                $sep			= '';
+            {		    // individual is a child in a family
+                $retval	    .= $comma . "\"parents\":\n\t{";
+                $sep		= '';
                 foreach($parents as $ic => $family)
                 {		// loop through parents
                     $retval	.= $sep . $family->toJson(false, 0);
                     $sep	= ',';
                 }		// loop through parents
-                $retval	.= "\t}\n";
-                $comma	= ",\n\t";
-            }		// individual is a child in a family
-        }		// include parents information
+                $retval	    .= "\t}\n";
+                $comma	    = ",\n\t";
+            }		    // individual is a child in a family
+        }		        // include parents information
 
         // if requested include family information
         if ($includeFamilies)
-        {		// include family information
-            $families	= $this->getFamilies();
+        {		        // include family information
+            $families	    = $this->getFamilies();
             if (count($families) > 0)
-            {		// individual is a parent in a family
-                $retval	.= $comma . "\"families\":\n\t{";
-                $sep			= '';
+            {		    // individual is a parent in a family
+                $retval	    .= $comma . "\"families\":\n\t{";
+                $sep		= '';
                 foreach($families as $idmr => $family)
                 {		// loop through families
                     $retval	.= $sep . $family->toJson(false, 0);
                     $sep	= ',';
                 }		// loop through families
-                $retval	.= "\t}\n";
-                $comma	= ",\n\t";
-            }		// individual is a parent in a family
-        }		// include family information
+                $retval	    .= "\t}\n";
+                $comma	    = ",\n\t";
+            }		    // individual is a parent in a family
+        }		        // include family information
 
         // close off response
-        $retval		.= "}\n";
+        $retval		    .= "}\n";
 
         if ($print)
             print $retval;
@@ -4081,17 +4164,23 @@ class Person extends RecordPic
      *	function Person::mergeFrom										*
      *																	*
      *  Merge information from another individual into this individual	*
-     *	for all fields that do not have an explicit value in the current*
-     *	record.  The internal field values are changed.  Invoke the save*
-     *	method to apply the changes to the database.					*
+     *	for all fields that do not have an explicit value in the        *
+     *	current record.  The internal field values are changed.         *
+     *	Invoke the save method to apply the changes to the database.	*
      *																	*
      *	Input:															*
      *	    $indiv2		instance of Person from which to copy			*
      *					values											*
      *																	*
+     *	Returns:														*
+     *		array containing one entry for each field which has         *
+     *		changed.  Each entry is an associative array:               *
+     *		array('field' => fieldname, 'value' => new value)           *
      ********************************************************************/
     function mergeFrom($indiv2)
     {
+        $retval             = array();
+
         // check all other fields in the main record
         foreach($this->row as $field => $value)
         {                           // loop through all fields in current
@@ -4135,9 +4224,8 @@ class Person extends RecordPic
                     if (strlen($value) == 0 && strlen($value2) > 0)
                     {	            // only replace if no value in first indiv
                         $this->set($field, $value2);
-?>
-  <p>Field '<?php print $field; ?>' replaced by '<?php print $value2; ?>'.
-<?php
+                        $retval     .= array('field'    => $field,
+                                             'value'    => $value2);
                     }	            // only replace if no value in first indiv
                     break;
                 }	                // text fields preference for first indiv
@@ -4171,17 +4259,15 @@ class Person extends RecordPic
                     if (strlen($value) == 0 && strlen($value2) > 0)
                     {	            // replace if no value in first indiv
                         $this->set($field, $value2);
-?>
-  <p>Field '<?php print $field; ?>' replaced by '<?php print $value2; ?>'.
-<?php
+                        $retval[]     = array('field'   => $field,
+                                              'value'   => $value2);
                     }	            // replace if no value in first indiv
                     else
                     if (strlen($value) > 0 && strlen($value2) > 0)
                     {	            // concatenate if present in both
                         $this->set($field, $value . "\n" . $value2);
-?>
-  <p>Field '<?php print $field; ?>' replaced by '<?php print $value . '<CR>' . $value2; ?>'.
-<?php
+                        $retval[]     = array('field'   => $field,
+                                              'value'   => "$value1\\n$value2");
                     }	            // concatenate if present in both
                     break;
                 }	                // textual notes
@@ -4192,9 +4278,8 @@ class Person extends RecordPic
                     if ($value2 > $value)
                     {		        // take higher value
                         $this->set($value2);
-?>
-  <p>Field '<?php print $field; ?>' replaced by '<?php print $value2; ?>'.
-<?php
+                        $retval[]     = array('field'   => $field,
+                                              'value'   => $value2);
                     }		        // take higher value
                     break;
                 }	                // researcher interest
@@ -4209,10 +4294,9 @@ class Person extends RecordPic
                 {	                // other fields
                     if (($value == 0) && ($value2 != 0))
                     {	            // replace if no value in first indiv
-            $this->set( $field, $value2);
-?>
-  <p>Field '<?php print $field; ?>' replaced by '<?php print $value2; ?>'.
-<?php
+                        $this->set( $field, $value2);
+                        $retval[]     = array('field'   => $field,
+                                              'value'   => $value2);
                     }	            // replace if no value in first indiv
                     break;
                 }	                // other fields
@@ -4220,7 +4304,7 @@ class Person extends RecordPic
 
         }	                        // loop through all fields in individual
 
-        return null;
+        return $retval;
     }		// function Person::mergeFrom
 
     /********************************************************************
@@ -4232,6 +4316,8 @@ class Person extends RecordPic
      *  Input:															*
      *	    $label		descriptive identifier for record				*
      *	    $force		if true output even if $debug false				*
+     *	                This is deprecated,                             *
+     *	                use $warn   .= $person->dump(...);              *
      *																	*
      *	Return:															*
      *	    string containing trace output as HTML						*
@@ -4241,7 +4327,6 @@ class Person extends RecordPic
     {
         global $debug;
         global $warn;
-        return '';
 
         if (false && $debug)
         {                   // for tracking down unexpected dumps
@@ -4264,117 +4349,111 @@ class Person extends RecordPic
         if (!is_string($label) || strlen($label) == 0)
             $label	= $this->getName(Person::NAME_INCLUDE_DATES);
 
-        $output		= '';
-        if ($debug || $force)
-        {			// emit trace output
-            $debug		= false;	// do not expand lower levels
-            $output	.= "  <p class='label'>\n";
-            $output	.= $label;
-            $output	.= "  </p>\n";
-            $output	.= "  <table border='1'>\n";
-            foreach($this->row as $key => $value)
-            {
-                $output	.= "    <tr>\n";
-                $output	.= "      <th class='label'>\n";
-                if ($key == 'id')
-                    $output	.= "<i>`$key`</i>";
-                else
-                    $output	.= "`$key`";
-                $output	.= "      </th>\n";
-                $output	.= "      <td class='dataleft'>\n";
-                if (is_null($value))
-                    $output	.= 'null';
-                else
-                    $output	.= htmlspecialchars($value);
+        $olddebug           = $debug;
+        $debug		        = false;	// do not expand lower levels
+        $output	            = "<p class='label'>\n  " .
+        					    $label .
+        					    "\n</p>\n" .
+        					    "<table border='1'>\n";
+        foreach($this->row as $key => $value)
+        {
+            $output	.= "    <tr>\n";
+            $output	.= "      <th class='label'>\n";
+            if ($key == 'id')
+                $output	.= "<i>`$key`</i>";
+            else
+                $output	.= "`$key`";
+            $output	.= "      </th>\n";
+            $output	.= "      <td class='dataleft'>\n";
+            if (is_null($value))
+                $output	.= 'null';
+            else
+                $output	.= htmlspecialchars($value);
 
-                if (strlen($value) > 0)
-                switch($key)
+            if (strlen($value) > 0)
+            switch($key)
+            {
+                case 'birthd':
+                case 'chrisd':
+                case 'deathd':
+                case 'buriedd':
+                case 'baptismd':
+                case 'endowd':
+                case 'confirmationd':
+                case 'initiatoryd':
                 {
-                    case 'birthd':
-                    case 'chrisd':
-                    case 'deathd':
-                    case 'buriedd':
-                    case 'baptismd':
-                    case 'endowd':
-                    case 'confirmationd':
-                    case 'initiatoryd':
-                    {
-                        $date	= new LegacyDate($value);
-                        $output	.= ' = ' . $date->toString();
-                        break;
-                    }		// dates
+                    $date	= new LegacyDate($value);
+                    $output	.= ' = ' . $date->toString();
+                    break;
+                }		// dates
 
-                    case 'idlrbirth':
-                    case 'idlrchris':
-                    case 'idlrdeath':
-                    case 'idlrburied':
+                case 'idlrbirth':
+                case 'idlrchris':
+                case 'idlrdeath':
+                case 'idlrburied':
+                {
+                    if ($value > 0)
                     {
-                        if ($value > 0)
-                        {
-                            $loc	= new Location(array('idlr' => $value));
-                            $output	.= ' = ' . $loc->toString();
-                        } 
-                        break;
-                    }		// locations
+                        $loc    	= Location::getLocation($value);
+                        $output	    .= ' = ' . $loc->toString();
+                    } 
+                    break;
+                }		// locations
 
-                    case 'idtrbaptism':
-                    case 'idtrconfirmation':
+                case 'idtrbaptism':
+                case 'idtrconfirmation':
+                {
+                    $kind	            = $this[substr($key,4) . 'kind'];
+                    if ($value > 0)
                     {
-                        $kind	= $this[substr($key,4) . 'kind'];
-                        if ($value > 0)
-                        {
-                            if ($kind == 0)
-                            {
-                                $loc	= new Location(array('idlr' => $value));
-                            }
-                            else
-                            {
-                                $loc	= new Temple(array('idtr' => $value));
-                            }
-                            $output	.= ' = ' . $loc->toString();
-                        }
-                        break;
-                    }		// locations
-
-                    case 'idtrendow':
-                    case 'idtrinitiatory':
-                    {
-                        if ($value > 0)
-                        {
+                        if ($kind == 0)
+                            $loc	    = Location::getLocation($value);
+                        else
                             $loc	= new Temple(array('idtr' => $value));
-                            $output	.= ' = ' . $loc->toString();
-                        }
-                        break;
-                    }		// locations
-
-                    default:
-                    {
-                        break;
+                        $output	        .= ' = ' . $loc->toString();
                     }
-                }	// field specific formatting
-                $output	.= "      </td>\n";
-                $output	.= "    </tr>\n";
-            }	// loop through keys
+                    break;
+                }		// locations
 
-            foreach($this->extras as $key => $value)
-            {
-                $output	.= "  <tr>\n";
-                $output	.= "    <th class='label'>\n";
-                $output	.= "'$key'";
-                $output	.= "    </th>\n";
-                $output	.= "    <td class='dataleft'>\n";
-                if (is_null($value))
-                    $output	.= 'null';
-                else
-                    $output	.= htmlspecialchars($value);
-                $output	.= "    </td>\n";
-                $output	.= "  </tr>\n";
-            }	// loop through keys
-            $output	.= "  </table>\n";
-            $debug		= true;
-        }		// debug output enabled
+                case 'idtrendow':
+                case 'idtrinitiatory':
+                {
+                    if ($value > 0)
+                    {
+                        $loc	= new Temple(array('idtr' => $value));
+                        $output	.= ' = ' . $loc->toString();
+                    }
+                    break;
+                }		// locations
 
-        $warn		.= $output;
+                default:
+                {
+                    break;
+                }
+            }	// field specific formatting
+            $output	.= "      </td>\n";
+            $output	.= "    </tr>\n";
+        }	// loop through keys
+
+        foreach($this->extras as $key => $value)
+        {
+            $output	        .= "  <tr>\n" .
+            				    "    <th class='label'>\n" .
+            				    "      '$key'" .
+            				    "    </th>\n" .
+            				    "    <td class='dataleft'>\n";
+            if (is_null($value))
+                $output	    .= '      null';
+            else
+                $output	    .= '      ' . htmlspecialchars($value) . "\n";
+            $output	        .= "    </td>\n" .
+                                "  </tr>\n";
+        }	// loop through keys
+        $output	            .= "  </table>\n";
+
+        $debug              = $olddebug;
+        if ($debug || $force)
+            $warn		    .= $output;
         return $output;
     }		// Person::dump
 
@@ -4387,6 +4466,14 @@ class Person extends RecordPic
      *  Parameters:														*
      *	    $xml		if true diagnostic output is emitted in XML		*
      *					if a string use it as tag name					*
+     *																	*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method updated the database record		*
+     *	    0			if the database did not need to be updated		*
+     *																	*
+     *  Throws:															*
+     *	    Exception if user is not authorized to update the database	*
      ********************************************************************/
     function save($xml = false)
     {
@@ -4396,6 +4483,7 @@ class Person extends RecordPic
         global	$connection;
         global	$familyTreeCookie;
 
+        $retval                 = 0;
         if ($debug)
         {
             $backtrace          = debug_backtrace();
@@ -4421,27 +4509,52 @@ class Person extends RecordPic
 
         // get current date and time for added and updated fields in record
         // in expected internal format (not SQL date/time)
-        $now			= getdate();
-        $today			= $now['year'] * 10000 + $now['mon']*100 + $now['mday'];
-        $hours			= $now['hours'];
+        $now				= getdate();
+        $today				= $now['year'] * 10000 + $now['mon']*100 + $now['mday'];
+        $hours				= $now['hours'];
         if (strlen($hours) == 1)
-            $hours		= '0' . $hours;
-        $mins			= $now['minutes'];
+            $hours			= '0' . $hours;
+        $mins				= $now['minutes'];
         if (strlen($mins) == 1)
-            $mins		= '0' . $mins;
-        $currtime		= $hours . ':' . $mins;
+            $mins			= '0' . $mins;
+        $currtime			= $hours . ':' . $mins;
 
         // determine top level tag name for XML output
+        $indent        		= '';
         if (is_string($xml))
         {			    // string tag name
-            $tagname	= $xml;
-            $xml	    = true;
+            $matches   		= array();
+            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            {
+                $indent		= $matches[1];
+                $xml   		= $matches[2];
+            }
+            $tagname		= $xml;
+            $xml	   		= true;
+            print "$indent<$tagname>\n";
         }			    // string tag name
         else
         if ($xml)
         {			    // boolean true
-            $tagname	= 'cmd';
+            $indent         = "    ";
+            $tagname		= 'personsave';
+            print "$indent<personsave>\n";
+            $backtrace 		= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,2);
+            foreach($backtrace as $call)
+            {
+                if (array_key_exists('class', $call) && 
+                    strlen($call['class']) > 0)
+                    $classPref      = $call['class'].'::';
+                else
+                    $classPref      = '';
+                print "$indent    <trace>Person.inc: " . __LINE__ .
+		                    " function=$classPref" . $call['function'] .
+		                    " called from line=" . $call['line'] .
+                                " of " . $call['file'] . "\n" .
+                      "        </trace>\n";
+            }
         }			    // boolean true
+
         if ($this['idir'] == 0)
             $this->needInsert       	= true;
         if ($this->needInsert)
@@ -4512,6 +4625,7 @@ class Person extends RecordPic
                 }		    // switch on field name
             }			    // loop through all fields in record
 
+            $this->changed		= array();	// reset
             // construct the SQL INSERT command
             $insert		= 'INSERT INTO tblIR ' .
                                 '(IDIR, Added, Addedtime, Updated, UpdatedTime'.
@@ -4521,18 +4635,22 @@ class Person extends RecordPic
             // insert the new record into the database
             $stmt		            = $connection->prepare($insert);
             $insertText		        = debugPrepQuery($insert, $sqlParms);
+            $this->lastSqlCmd       = $insertText;
             if ($stmt->execute($sqlParms))
             {			        // success
-                $count		        = $stmt->rowCount();
+                $retval		        = $stmt->rowCount();
                 if ($xml)
-                    print "<$tagname result='$count'>" . $insertText .
-                            "</$tagname>\n";
+                {
+                    $tn             = 'save' . __LINE__;
+                    print "$indent    <$tn result='$retval'>" . $insertText .
+                        "</$tn>\n";
+                }
 
                 if ($debug)
                 {
                     $warn	.= "<p>Person.inc: " . __LINE__ .
                                         " '$insertText'" .
-                                        ", count=$count</p>\n";
+                                        ", count=$retval</p>\n";
                 }
 
                 $this->changed		= array();	// reset
@@ -4554,11 +4672,13 @@ class Person extends RecordPic
                     $this->row	    = $stmt->fetch(PDO::FETCH_ASSOC);
                     $idir	        = $this->row['idir'];
                     if ($xml)
-                        print "<$tagname idir=\"$idir\">$queryText</$tagname>\n";
+                    {
+                        $tn             = 'save' . __LINE__;
+                        print "$indent    <$tn idir=\"$idir\">$queryText</$tn>\n";
+                    }
                     if ($debug)
                         $warn	.= "<p>Person::save: " . __LINE__ .
                                    " query='$queryText'</p>\n";
-
                 }		        // success
                 else
                 {		        // error performing query
@@ -4579,18 +4699,20 @@ class Person extends RecordPic
                 // also create primary name entry
                 if ($idir > 0)
                 {               // have a valid record
-	                if (is_null($this->priName))
-                        $this->priName	= new Name(array('idir'		=> $this));
-                    else
-                        $this->priName['idir']  = $idir;
-	                if (!$this->priName->isExisting())
-	                {
+                    if (!is_null($this->getPriName()))
+                    {
+                        $this->priName['idir']          = $idir;
 	                    if ($this->priName['birthsd'] == -99999999 &&
 	                        $this['birthsd'] != -99999999)
 	                        $this->priName['birthsd']	= $this['birthsd'];
 	                    $this->priName['treename']		= $this->treeName;
-	                    $this->priName->save($xml);
-	                }
+	                    $this->priName['givenname']		= $this['givenname'];
+		                $this->priName['surname']		= $this['surname'];
+	                    if ($xml)
+	                        $this->priName->save('save' . __LINE__);
+	                    else
+	                        $this->priName->save(false);
+                    }
                 }               // have a valid record
             }			        // success
             else
@@ -4612,7 +4734,7 @@ class Person extends RecordPic
         else
         if (count($this->changed) > 0)
         {			            // update existing record
-            parent::save($xml);
+            $retval                 = parent::save($xml);
             if ($xml)
             {
 	            $backtrace          = debug_backtrace();
@@ -4620,62 +4742,75 @@ class Person extends RecordPic
 	            {
 	                if (array_key_exists('class', $call) && 
 	                    strlen($call['class']) > 0)
-	                    $classPref      = $call['class'].'::';
+	                    $classPref  = $call['class'].'::';
 	                else
-	                    $classPref      = '';
-	                print "<p>Person::save: " . __LINE__ .
-	                    " function=$classPref" . $call['function'] .
-	                    " called from line=" . $call['line'] .
-	                    " of " . $call['file'] . "</p>\n";
+	                    $classPref  = '';
 	            }
             }
-            $idir	            = $this->row['idir'];
+            $idir	                = $this->row['idir'];
 
             // update primary alternate name entry
             if ($idir > 0)
             {                   // have a valid record
-	            if (is_null($this->priName))
-	                $this->priName	= new Name(array('idir'		=> $this));
-	            if ($this->priName['birthsd'] == -99999999 &&
-	                $this['birthsd'] != -99999999)
-	                $this->priName['birthsd']	= $this['birthsd'];
-	            $this->priName['treename']		= $this->treeName;
-	            $this->priName->save($xml);
-	
+                if (!is_null($this->getPriName()))
+                {
+    	            if ($this->priName['birthsd'] == -99999999 &&
+    	                $this['birthsd'] != -99999999)
+    	                $this->priName['birthsd']	= $this['birthsd'];
+                    $this->priName['treename']		= $this->treeName;
+                    $this->priName['surname']		= $this['surname'];
+                    $this->priName['givenname']		= $this['givenname'];
+                    if ($xml)
+                        $this->priName->save('save' . __LINE__);
+                    else
+                        $this->priName->save(false);
+                }
+
 	            // ensure that the alternate name entries for all of the
-	            // families this individual is a spouse in exist
-	            $families		        = $this->getFamilies();
-	            foreach($families as $idmr => $family)
-	            {               // loop through fanilies
-	                $nameParms	                = array('idir'		=> $this,
-            	                                        'idmr'		=> $family);
-	                $altName	                = new Name($nameParms);
-	                $altName['treename']		= $this->treeName;
-	                if ($altName->get('birthsd') == -99999999 &&
-	                    $this['birthsd'] != -99999999)
-	                    $altName['birthsd']		= $this['birthsd'];
-	                $altName->save($xml);
-	            }		        // loop through families
-	
+                // families this individual is a spouse in exist
+                if ($this['gender'] == Person::FEMALE)
+                {                   // wife
+		            $families		        = $this->getFamilies();
+		            foreach($families as $idmr => $family)
+		            {               // loop through families
+		                $nameParms	            = array('idir'		=> $this,
+	            	                                    'idmr'		=> $family);
+		                $altName	            = new Name($nameParms);
+		                $altName['treename']	= $this->treeName;
+		                if ($altName->get('birthsd') == -99999999 &&
+		                    $this['birthsd'] != -99999999)
+		                    $altName['birthsd']	= $this['birthsd'];
+	                    if ($xml)
+	                        $altName->save('save' . __LINE__);
+	                    else
+		                    $altName->save(false);
+		            }		        // loop through families
+                }                   // wife
+
 	            // update given name field in main entry and
 	            // married name entries
 	            $updParms	= array('idir'		=> $idir,
-	                                '`order`'	=> array(0, -1));
+	                                'type'	    => array(0, -1));
 	            $newName	= $this->row['givenname'];
 	            $setParms	= array('givenname'	=> $newName);
-	            $nameSet	= new RecordSet('Names', $updParms);
+                $nameSet	= new RecordSet('Names', $updParms);
+                $setInfo    = $nameSet->getInformation();
 	            $result	    = $nameSet->update($setParms,
 	                                           $xml);
-	
+
 	            // update birthsd field in all name entries
 	            $updParms	= array('idir'		=> $idir);
 	            $newBirth	= $this->row['birthsd'];
 	            $setParms	= array('birthsd'	=> $newBirth);
 	            $nameSet	= new RecordSet('Names', $updParms);
-	            $result	    = $nameSet->update($setParms,
-	                                           $updParms);
+	            $result	    = $nameSet->update($setParms);
             }                   // have a valid record
         }		                // update existing record
+
+        if ($xml)
+            print "$indent</$tagname>\n";
+
+        return $retval;
     }		// function Person::save
 
     /********************************************************************

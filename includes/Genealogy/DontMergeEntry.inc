@@ -38,6 +38,7 @@ use \Iterator;
  *		2017/12/18		add support for temporary fields				*
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/05/06      add method offsetExists                         *
+ *		2019/07/18      use Person::getPerson                           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -215,7 +216,7 @@ class DontMergeEntry extends Record
     {
 		if (is_null($this->personLeft))
 		    $this->personLeft	=
-				new Person(array('idir' => $this->row['idirleft']));
+				Person::getPerson($this->row['idirleft']);
 		return $this->personLeft;
     }
 
@@ -237,7 +238,7 @@ class DontMergeEntry extends Record
     {
 		if (is_null($this->personRight))
 		    $this->personRight	=
-				new Person(array('idir' => $this->row['idirright']));
+				Person::getPerson($this->row['idirright']);
 		return $this->personRight;
     }
 

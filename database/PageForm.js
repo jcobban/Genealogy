@@ -25,6 +25,7 @@
  *		2015/05/08		correct syntax error							*
  *						display image using DisplayImage.php			*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/06/29      first parameter of displayDialog removed        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -32,7 +33,7 @@
 var	imagePattern	= /([0-9]+)(\.[a-z]+)$/;
 
 /************************************************************************
- *  getFieldByColRow													*
+ *  function getFieldByColRow											*
  *																		*
  *  Get a field in the form given its column name and row number.		*
  *																		*
@@ -52,7 +53,7 @@ function getFieldByColRow(colName,
 		return formElts[colName + "0" + rowNum];
     else
 		return formElts[colName + rowNum];
-}	// getFieldByColRow
+}	// function getFieldByColRow
 
 /************************************************************************
  *  function changeDefault												*
@@ -76,7 +77,7 @@ function changeDefault()
     {
 		this.className = "act right";
     }
-}		// changeDefault
+}		// function changeDefault
 
 /************************************************************************
  *  specify function to invoke when page is loaded						*
@@ -85,7 +86,7 @@ function changeDefault()
 window.onload	= onLoad;
 
 /************************************************************************
- *  viewButtons															*
+ *  viewButtons	        												*
  *																		*
  *  An array containing all of the "View" buttons on the page			*
  ************************************************************************/
@@ -192,10 +193,10 @@ function onLoad()
 		th.onclick	    = columnClick;
     }		// loop through all cells of header row
 
-}		// onLoad
+}		// function onLoad
 
 /************************************************************************
- *  saveOldImage														*
+ *  function saveOldImage												*
  *																		*
  *  This function is called when the user moves onto an image URL text	*
  *  field.																*
@@ -205,10 +206,10 @@ function onLoad()
 function saveOldImage()
 {
     this.oldValue	= this.value;
-}		// saveOldImage
+}		// function saveOldImage
 
 /************************************************************************
- *  changeImage															*
+ *  function changeImage												*
  *																		*
  *  This function is called when the user changes the value of the		*
  *  URL for an image.													*
@@ -234,26 +235,19 @@ function changeImage()
     var	newPrefix	= newValue.substring(0,newValue.length - newMatchLen);
     if (oldPrefix != newPrefix || oldResult[2] != newResult[2])
 		return true;
-    var	msgDiv	= document.getElementById('msgDiv');
-    if (msgDiv)
-    {		// have popup <div> to display selection dialog in
-		// substitutions into the template
-		var parms	= {"sub"	: "",
-						   "page"	: this.name.substring(8),
-						   "increment"	: (newResult[1] - oldResult[1])};	
+	// substitutions into the template
+	var parms	= {"sub"	: "",
+				   "page"	: this.name.substring(8),
+				   "increment"	: (newResult[1] - oldResult[1])};	
 
-		return displayDialog(msgDiv,
-						     'ChangeImageForm$sub',
-						     parms,
-						     this,	// display relative to current field
-						     rippleImages,// action for first button
-						     false);	// default show on open
-
-    }		// support for dynamic display of messages
-}		// changeImage
+	return displayDialog('ChangeImageForm$sub',
+					     parms,
+					     this,	        // display relative to current field
+					     rippleImages); // action for first button
+}		// function changeImage
 
 /************************************************************************
- *  rippleImages														*
+ *  function rippleImages												*
  *																		*
  *  This function is called when the user chooses the dialog option to	*
  *  apply the increment to all subsequent image URLs.					*
@@ -303,7 +297,7 @@ function rippleImages()
 }		// function rippleImages
 
 /************************************************************************
- *  showImage															*
+ *  function showImage													*
  *																		*
  *  Display the image of the original census page.						*
  *  This is the onclick method for the button with id 'View...'.		*
@@ -344,5 +338,5 @@ function showImage()
 		      imageUrl,
 		      "right");
     return false;	// do not perform default action for button
-}	// showImage
+}	// function showImage
 

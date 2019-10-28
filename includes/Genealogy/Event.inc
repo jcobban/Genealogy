@@ -2,9 +2,6 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
-use \ArrayAccess;
-use \Countable;
-use \Iterator;
 /************************************************************************
  *  Event.inc															*
  *																		*
@@ -29,6 +26,7 @@ use \Iterator;
  *				const IDTYPE_CHILD		= 21; Child						*
  *		IDET			INT(10) UNSIGNED								*
  *				--> tblET.IDET, ID to Event Type						*
+ *	            Event::ET_XXXXX											*
  *		Order			SMALLINT(5)										*
  *				used as sort order.										*
  *		EventSD			INT(10) UNSIGNED								*
@@ -40,8 +38,7 @@ use \Iterator;
  *		Desc			LONGTEXT						-				*
  *				Notes about the event.  See Description.				*
  *		GEDTag			VARCHAR(30)										*
- *				not currently used. We were going to store non-standard	*
- *				GEDCOM tags here so we could export with same tag.		*
+ *				not currently used.                                     *
  *		EventExclude	TINYINT(3)										*
  *				1=Private Event, 0=not									*
  *		IDAR			INT(10) UNSIGNED								*
@@ -51,15 +48,15 @@ use \Iterator;
  *				For example the occupation in an occupation event.		*
  *		SentenceOverride VARCHAR(255)									*
  *				Not used in this implementation as text presentation	*
- *				is done in HTML.										*
+ *				is done in template 									*
  *		qsTag			TINYINT(3)										*
  *				temporary use, 0=no, 1=yes								*
  *		RGExclude		TINYINT(3)										*
  *				0=no, 1=yes												*
  *				Not used.												*
  *		Kind			TINYINT(3)										*
- *				0=live		IDLREvent is IDLR value of location			*
- *				1=temple; IDLREvent is IDTR value of temple				*
+ *				0=live		IDLREvent is IDLR value of Location			*
+ *				1=temple;   IDLREvent is IDTR value of Temple			*
  *		LDSTempleReady	TINYINT(3)										*
  *				0=no, 1=yes												*
  *		Preferred		TINYINT(3)										*
@@ -242,8 +239,14 @@ use \Iterator;
  *		                method set.  Support setting fields to null.    *
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/04/15      replace is_a with instanceof                    *
+ *		2019/06/01      improve JSON output                             *
+ *		2019/07/18      use Person::getPerson                           *
+ *		2019/07/21      use Location::getLocation                       *
+ *		2019/09/20      correct Event::dump to always return the output *
+ *		                constructor ignored eventsd parameter as used   *
+ *		                by Person:: getXxxxxEvent                       *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -271,7 +274,6 @@ class Event extends RecordPic
      *	Child.															*
      *	Returned by Event::getIdType									*
      ********************************************************************/
-
     const IDTYPE_INDIV	 	            =  0;	// Person
     const IDTYPE_MAR		            = 20;	// Family
     const IDTYPE_CHILD		            = 21;	// Child
@@ -279,15 +281,13 @@ class Event extends RecordPic
     /********************************************************************
      *	Event::ET_XXXXX													*
      *																	*
-     *	The standard values of the event type field						*
-     *	Each value is an index into Event::$eventText					*
+     *	The standard values of the event type field 'idet'				*
      *	In Legacy Family Tree new event types are defined by adding them*
      *	to table tblET.  However that technique does not support I18N.	*
      *	So all new event types must be added here with interpretation in*
      *	Event::eventText and translations in the context specific		*
      *	templates                                                       *
      ********************************************************************/
-
     const ET_NULL		 	    		=  1;
     const ET_ADOPTION					=  2;
     const ET_BIRTH			    		=  3;
@@ -372,6 +372,15 @@ class Event extends RecordPic
      *																	*
      *  This table provides a translation from an event type to the text*
      *  to display to the user.  This is ordered alphabetically.		*
+     *																	*
+     *	This table is superceded by the language specific               *
+     *	tables in template "Trantab$lang.html"							*
+     *																	*
+     *	    $tranTab        = $template->getTranslate();                *
+     *	    $eventText      = $tranTab['eventText'];                    *
+     *	    $action         = $eventText[$idet];                        *
+     *	    $eventStmt      = $tranTab['eventStmt'];                    *
+     *	    $sentence       = $eventStmt[idet];                         *
      ********************************************************************/
     static $eventText	= array(
 				 2 		=>'adopted',
@@ -453,6 +462,7 @@ class Event extends RecordPic
 				19 		=>'degree',
 				53 		=>'religious affiliation',
 				55 		=>'retired',
+				78 		=>'sealed to parents',
 				76 		=>'sealed to spouse',
 		     18000 		=>'sealed to spouse',	// obsolete
 				57 		=>'Social Security Number',
@@ -512,7 +522,8 @@ class Event extends RecordPic
 				'id'		=> 'ider',
 				'notes'		=> 'desc',
 				'date'		=> 'eventd',
-				'location'	=> 'idleevent');
+                'location'	=> 'idleevent',
+                'private'   => 'eventexclude');
 
     /********************************************************************
      *	Event::defaultOrder												*
@@ -565,7 +576,7 @@ class Event extends RecordPic
 		global	$connection;
 
         if ($debug)
-            $warn           .= "<p>Event::createNewRecord(\$parms=" . print_r($parms, true) . ",  \$idet,=$idet, \$idir=$idir, \$idtype=$idtype, \$order=$order, \$preferred=$preferred)</p>\n";
+            $warn           .= "<p>Event::createNewRecord(\$parms=" . print_r($parms, true) . ",  \$idet=$idet='" . self::$eventText[$idet] . "', \$idir=$idir, \$idtype=$idtype, \$order=$order, \$preferred=$preferred)</p>\n";
 		$dbrow		        = self::$initRow;
 		$needInsert	        = true;
 		$ider		        = 0;
@@ -591,7 +602,7 @@ class Event extends RecordPic
 				{		// success
 				    $row	= $stmt->fetch(PDO::FETCH_ASSOC);
 				    if ($debug)
-						$warn	.= "<p>Event::__construct: " .
+						$warn	.= "<p>Event::CreateNewRecord: " .
 							    __LINE__ . " $queryText</p>\n";
 				}		// success
 				else
@@ -666,29 +677,25 @@ class Event extends RecordPic
 				}		// type of associated record
 
 				case 'eventd':
-				{		// event date
+                {		// event date
+                    if (is_string($value) && strlen($value) > 0)
+                        $value      = new LegacyDate($value);
 				    if ($value instanceof LegacyDate)
 				    {
 						$dbrow['eventd']	= $value->getDate();
-						$eventsd		    = $value->getSortDate();
-						$idet			    = $dbrow['idet'];
-						if ($eventsd == -99999999)
-						{	// empty date
-						    if ($idet == Event::ET_BURIAL)
-							$eventsd	    = 99999999;
-						    else
-						    if ($idet == Event::ET_DEATH)
-							$eventsd	    = 99999998;
-						}	// empty date
 						$dbrow['eventsd']	= $value->getSortDate();
-				    }
-				    else
+                    }
+                    else
 						$dbrow['eventd']	= $value;
 				    break;
 				}		// event date
 
 				case 'eventsd':
-				{		// see 'eventd'
+                {		// see 'eventd'
+                    if ($dbrow['eventd'] == '')
+                    {
+                        $dbrow['eventsd']   = $value;
+                    }
 				    break;
 				}		// see 'eventd'-
 
@@ -763,11 +770,10 @@ class Event extends RecordPic
      *	record.															*
      *																	*
      *  Input:															*
-     *	    $parms		associative array of initial values				*
-     *					or a database record presented as an array		*
-     *					or numeric identifier of an event (IDER)		*
-     *					or 'new' to construct an empty entry			*
-     *					(The last 2 options are deprecated.)			*
+     *	    $parms		a database record presented as an array		    *
+     *	             or array('ider' => $ider) to construct from        *
+     *	                an existing record                              *
+     *	             or array('ider' => 0) to create a new record       *
      *	    $idtype		if $id is 'new' the initial value of 'idtype'	*
      *	                deprecated                                      *
      *	    $idir		if $id is 'new' the initial value of 'idir'		*
@@ -806,7 +812,7 @@ class Event extends RecordPic
 								'idir'		=> $idir);
 		}		// old style create new event
 
-		if ($debug && is_array($parms))
+        if ($debug && is_array($parms))
 		{
 		    $parmsTxt	        = 'Array';
 		    $comma	            = '[';
@@ -839,25 +845,30 @@ class Event extends RecordPic
 		// act on parameter to select and update record
 		if (is_array($parms))
 		{			// associative array
-		    $ider		        = 0;
-		    $iderSpecified	    = false;
-		    $idet		        = self::ET_NULL;
-		    $idir		        = 0;	// key of associated record
-		    $idtype		        = self::IDTYPE_INDIV;
-		    $order		        = 0;
-		    $preferred		    = 0;
-		    $fieldsValid	    = true;
+		    $ider		        			= 0;
+		    $iderSpecified	    			= false;
+		    $idet		        			= self::ET_NULL;
+		    $idir		        			= 0;	// key of associated record
+		    $idtype		        			= self::IDTYPE_INDIV;
+		    $order		        			= 0;
+		    $preferred		    			= 0;
+		    $fieldsValid	    			= true;
+		    $needInsert	        			= true;
+	        $dbrow                  		= self::$initRow;
+            $this->msg		        		= '';
+            $and                    		= 'WHERE ';
+            $where                  		= '';
+            $sqlParms               		= array();
 
 		    // validate parameters
-		    $this->msg		                = '';
 		    foreach($parms as $fldname => $value)
 		    {			// loop through parameters
 				switch(strtolower($fldname))
 				{		// act on identification fields
 				    case 'ider':
 				    {		// key of record in tblER
-						$ider		    = $value;
-						$iderSpecified	= $ider > 0;
+						$ider		        = $value;
+						$iderSpecified	    = $ider > 0;
 						break;
 				    }		// key of record in tblER
 
@@ -874,7 +885,13 @@ class Event extends RecordPic
 						    $parms['idir']	                = $idir;
 						}	// actual record passed, not just key
 						else
-						    $idir		= $value;
+                            $idir		        = $value;
+                        if ($idir > 0)
+                        {
+                            $where              .= $and . "IDIR=:idir";
+                            $sqlParms['idir']   = $idir;
+                            $and                = ' AND ';
+                        }
 						break;
 				    }	// key of associated record
 
@@ -892,6 +909,14 @@ class Event extends RecordPic
 						else
 						    $idir		                    = $value;
 						$idtype			                    = self::IDTYPE_MAR;
+                        if ($idir > 0)
+                        {
+                            $where              .= $and .
+                                            "IDIR=:idir AND IdType=:idtype";
+                            $sqlParms['idir']   = $idir;
+                            $sqlParms['idtype'] = self::IDTYPE_MAR;
+                            $and                = ' AND ';
+                        }
 						break;
 				    }		// special shortcut for legibility
 
@@ -909,6 +934,14 @@ class Event extends RecordPic
 						else
 						    $idir		                    = $value;
 						$idtype			                = self::IDTYPE_CHILD;
+                        if ($idir > 0)
+                        {
+                            $where              .= $and .
+                                            "IDIR=:idir AND IdType=:idtype";
+                            $sqlParms['idir']   = $idir;
+                            $sqlParms['idtype'] = self::IDTYPE_CHILD;
+                            $and                = ' AND ';
+                        }
 						break;
 				    }		// special shortcut for legibility
 
@@ -916,8 +949,13 @@ class Event extends RecordPic
 				    {		// type of associated record
 						if ($value == self::IDTYPE_INDIV ||
 						    $value == self::IDTYPE_MAR ||
-						    $value == self::IDTYPE_CHILD)
-						    $idtype		= $value;
+                            $value == self::IDTYPE_CHILD)
+                        {
+                            $idtype		        = $value;
+                            $where              .= $and . "IdType=:idtype";
+                            $sqlParms['idtype'] = self::IDTYPE_CHILD;
+                            $and                = ' AND ';
+                        }
 						else
 						    $this->msg	.= "Bad value $value for '$fldname'. ";
 						break;
@@ -925,19 +963,34 @@ class Event extends RecordPic
 
 				    case 'idet':
 				    {		// event type
-						$idet		= $value;
+                        $idet		        = $value;
+                        if ($idet != Event::ET_NULL)
+                        {
+                            $where              .= $and . "IDET=:idet";
+                            $sqlParms['idet']   = $idet;
+                            $and                = ' AND ';
+                        }
 						break;
 				    }		// event type
 
 				    case 'order':
 				    {		// event order
-						$order		= $value;
+						$order		            = $value;
+                        $where                  .= $and . "`Order`=:order";
+                        $sqlParms['order']      = $order;
+                        $and                    = ' AND ';
 						break;
 				    }		// event order
 
 				    case 'preferred':
-				    {		// other field names
-						$preferred	= $value;
+                    {		// other field names
+                        if ($value)
+                            $preferred	        = 1;    // non-zero or true
+                        else
+                            $preferred	        = 0;    // zero or false
+                        $where                  .= $and . "Preferred=:pref";
+                        $sqlParms['pref']       = $preferred;
+                        $and                    = ' AND ';
 						break;
 				    }		// other field names
 
@@ -961,16 +1014,12 @@ class Event extends RecordPic
 				    default:
 				    {		// unknown field name
 						$warn	.= "<p>Event::__construct: " . __LINE__ . 
-								" Bad fieldname '$fldname'.<p>\n";
+							" Unexpected fieldname '$fldname' ignored.<p>\n";
 						$fieldsValid	= false;
 						break;
 				    }		// unknown field name
 				}		// act on identification fields
 		    }			// loop through parameters
-
-		    // validation failed
-		    if (strlen($this->msg) > 0)
-				$msg            = $this->msg;   // display to user
 
 		    // the following is special handling for pseudo-events
 		    // created by class Person or Family
@@ -988,7 +1037,7 @@ class Event extends RecordPic
 				$this->needInsert	= false;
 		    }			// complete row from database
             else
-		    {			// search and initialization list
+		    {			            // search and initialization list
                 if ($ider > 0)
                 {                   // search for existing record
 					$needInsert	    = false;
@@ -1013,7 +1062,6 @@ class Event extends RecordPic
 					    }		    // found matching event record
 					    else
 	                    {		    // create empty event
-	                        $dbrow          = self::$initRow;
                             if ($debug)
                                 $warn   .= "Event::__construct: " . __LINE__ .
 								    " record not found for ider=$ider" .
@@ -1030,53 +1078,80 @@ class Event extends RecordPic
                 }                   // search for existing record
                 else
                 {                   // explicit new record
-	                $dbrow                  = self::$initRow;
 					$needInsert		        = true;
                 }                   // explicit new record
 
-				// invoke constructor of base class
-				parent::__construct($dbrow,
-							        'tblER');
-				foreach($parms as $fldname => $value)
-				{		            // loop through parameters
-				    $fieldLc	    = strtolower($fldname);
-				    // apply any requested changes
-				    if ($fieldLc != 'ider')
-					    $this->set($fieldLc, $value);
-				}		            // loop through parameters
-				$this->needInsert	= $needInsert;
-
-				if ($needInsert && $idir > 0)
+                if ($needInsert && $idir > 0)
+                {
 				    $this->createNewRecord($parms,
 								   		   $idet,
 								   		   $idir,
 								   		   $idtype,
 								   		   $order,
-								   		   $preferred);
+                                           $preferred);
+                }
+                else
+                {                       // invoke constructor of base class
+					parent::__construct($dbrow,
+								        'tblER');
+					foreach($parms as $fldname => $value)
+					{		            // loop through parameters
+					    $fieldLc	    = strtolower($fldname);
+					    // apply any requested changes
+					    if ($fieldLc != 'ider')
+						    $this->set($fieldLc, $value);
+					}		            // loop through parameters
+                }           // invoke constructor of base class
+				$this->needInsert	= $needInsert;
 
-		    }			// search and initialization list
-
-		    // special fixup to ensure that end of life events appear last
-		    $eventsd	= $this->row['eventsd'];
-		    $idet	= $this->row['idet'];
-		    if ($eventsd == -99999999)
-		    {		// no date
-				// ensure death and burial sort after all other events
-				if ($idet == Event::ET_BURIAL)
-				    $this->set('eventsd', 99999999);
-				else
-				if ($idet == Event::ET_DEATH)
-				    $this->set('eventsd', 99999998);
-		    }		// no date
-		}			// associative array
+		    }			                // search and initialization list
+		}			                    // associative array
 		else
-		{		// unexpected parameter type
-		    throw new Exception("Event::__construct: called with " .
-							print_r($parms, true));
-		}		// unexpected parameter type
+		{		                        // unexpected parameter type
+		    $this->msg      .= "Event::__construct: called with " .
+                gettype($parms) . ' ' . print_r($parms, true) .
+                ". ";
+		}		                        // unexpected parameter type
+
+        // fixups
+        $eventd             = $this->row['eventd'];
+        $eventsd            = $this->row['eventsd'];
+        $idet               = $this->row['idet'];
+        if ($eventd == '' && $eventsd == -99999999)
+        {
+            if ($idet == self::ET_BURIAL)
+            {
+                $this->set('eventsd',       99999999);
+            }
+            else
+            if ($idet == self::ET_DEATH)
+            {
+                $this->set('eventsd',       99999998);
+            }
+        }
+        else
+        if (strlen($eventd) > 1 && substr($eventd, 0, 1) == '1' &&
+            $eventsd % 10000 == 615)
+        {
+            if ($idet == self::ET_BIRTH)
+            {
+                $eventsd    = $eventsd - 615;
+                $this->set('eventsd',       $eventsd);
+            }
+            else
+            if ($idet == self::ET_CHRISTENING)
+            {
+                $eventsd    = $eventsd + 615;
+                $this->set('eventsd',       $eventsd);
+            }
+        }
 
 		// diagnostic output if debug is set
 		$this->dump('Event Record constructed:');
+
+		// validation failed
+		if (strlen($this->msg) > 0)
+			$msg            = $this->msg;   // display to user
     }		// Event::__construct
 
     /********************************************************************
@@ -1128,25 +1203,23 @@ class Event extends RecordPic
 		     $idType == Event::IDTYPE_CHILD) &&
 		    $ider > 0)
 		{		// have ider value and record is written to table
-		    $delete	= "DELETE FROM tblER WHERE IDER=:ider";
-		    $sqlParms	= array('ider' => $ider);
-		    $stmt	= $connection->prepare($delete);
-		    $deleteText	= debugPrepQuery($delete, $sqlParms);
+		    $delete	                = "DELETE FROM tblER WHERE IDER=:ider";
+		    $sqlParms	            = array('ider' => $ider);
+		    $stmt	                = $connection->prepare($delete);
+            $deleteText	            = debugPrepQuery($delete, $sqlParms);
+            $this->lastSqlCmd       = $deleteText;
 		    if ($stmt->execute($sqlParms))
 		    {		// success
-				$count		= $stmt->rowCount();
+				$count		        = $stmt->rowCount();
 				if ($debug)
-				    $warn	.= "<p>Event::delete: " . __LINE__. 
-							   " '$deleteText', count=$count</p>\n";
+				    $warn	        .= "<p>Event::delete: " . __LINE__. 
+					        		   " '$deleteText', count=$count</p>\n";
 				if ($xml)
 				    print "<$tagname count='$count'>$deleteText</$tagname>\n";
 
 				// log the update
-				logSqlUpdate($delete,
-						     $sqlParms,
-						     $ider,
-						     json_encode($this->former),
-						     '');
+				$this->log($delete,
+						   $sqlParms);
 
 				// update the memory copy of the record to reflect that it
 				// no longer represents a database record
@@ -1203,8 +1276,6 @@ class Event extends RecordPic
      *																	*
      *	Get the unique numeric identifier of the event.					*
      *	Synonym of Event::getIder.										*
-     *	This is only meaningful if getIdType returns IDTYPE_INDIV or	*
-     *	IDTYPE_MAR or IDTYPE_CHILD										*
      ********************************************************************/
     function getId()
     {
@@ -1216,8 +1287,6 @@ class Event extends RecordPic
      *																	*
      *	Get the unique numeric identifier of the event.					*
      *	Synonym of Event::getId.										*
-     *	This is only meaningful if getIdType returns IDTYPE_INDIV or	*
-     *	IDTYPE_MAR or IDTYPE_CHILD										*
      ********************************************************************/
     function getIder()
     {
@@ -1230,6 +1299,8 @@ class Event extends RecordPic
      *	Get the unique numeric identifier of the record the event		*
      *	is associated with.  This is either an instance of Person		*
      *	or Family depending upon the value of getIdType.				*
+     *																	*
+     *	Deprecated: use $event['idir']									*
      ********************************************************************/
     function getIdir()
     {
@@ -1262,8 +1333,7 @@ class Event extends RecordPic
 		    {
 				case self::IDTYPE_INDIV:
 				{
-				    $this->associatedRecord	=
-							new Person(array('idir' => $idime));
+				    $this->associatedRecord	= Person::getPerson($idime);
 				    break;
 				}
 
@@ -1386,7 +1456,7 @@ class Event extends RecordPic
      ********************************************************************/
     function getCitId()
     {
-		$idet	= $this->row['idet'];
+		$idet	            = $this->row['idet'];
 		if ($idet > 999)
 		    return $this->row['idir'];
 		else
@@ -1566,15 +1636,15 @@ class Event extends RecordPic
     function getLocation()
     {
 		// fixup for bad values of IDLREvent
-		if ($this->row['idlrevent'] < 1)
-		    parent::set('idlrevent', 1);
+		$idlr               = $this->row['idlrevent'];
+		if ($idlr < 1)
+		    $idlr           = 1;
 
 		// return appropriate object
-		$idlr		= $this->row['idlrevent'];
 		if ($this->row['kind'] == 1)
-		    $location	= new Temple(array('idtr' => $idlr));
+		    $location	    = new Temple(array('idtr' => $idlr));
 		else
-		    $location	= new Location(array('idlr' => $idlr));
+		    $location	    = Location::getLocation($idlr);
 		return $location;
     }		// Event::getLocation
 
@@ -1823,7 +1893,11 @@ class Event extends RecordPic
     {
 		if ($other instanceof Event)
 		{			// comparing two events
-		    return $this->row['eventsd'] - $other->row['eventsd'];
+		    if ($this->row['idet'] == Event::ET_BIRTH)
+                $diff           = -99999999;
+            else
+                $diff   = $this->row['eventsd'] - $other->row['eventsd'];
+		    return $diff;
 		}			// comparing two events
 		else
 		    throw new Exception("Event: compare: " .
@@ -1916,6 +1990,16 @@ class Event extends RecordPic
 				   $print	= true,
 				   $options	= 0)
     {
+        if (is_array($print))
+        {		        // additional parameters to include
+            $print		        = true;
+            foreach($parms as $field => $value)
+            {
+                if ($field == 'print')
+                    $print	    = $value;
+            }
+        }
+
 		$includeCitations	= $options & self::TOXML_INCLUDE_CITATIONS;
 
         $ider		= $this->row['ider'];
@@ -1965,15 +2049,12 @@ class Event extends RecordPic
 
 				case 'idlrevent':
 				{
-				    $retval	.= "    <$fld>" . $value . "</$fld>\n";
-				    try {
-				    $loc	= new Location(array('idlr' => $value));
-				    $value	= $loc->getName();
-				    $locfld	= substr($fld,4) . 'loc';
-				    $retval	.= "    <$locfld>" . xmlentities($value) . "</$locfld>\n";
-				    } catch (Exception $e) {
-						$retval	.= "    <msg>" . $e->getMessage() . "</msg>\n";
-				    }		// catch
+				    $retval	        .= "    <$fld>" . $value . "</$fld>\n";
+				    $loc	        = Location::getLocation($value);
+				    $value	        = $loc->getName();
+				    $locfld	        = substr($fld,4) . 'loc';
+                    $retval	        .= "    <$locfld>" . xmlentities($value) . 
+                                            "\n    </$locfld>\n";
 				    break;
 				}
 
@@ -2084,22 +2165,32 @@ class Event extends RecordPic
      ********************************************************************/
     const	TOJSON_INCLUDE_CITATIONS	= 1;
 
-    function toJson($print	= true,
+    function toJson($print	    = true,
 				    $options	= 0)
     {
+        if (is_array($print))
+        {		        // additional parameters to include
+            $print		        = true;
+            foreach($parms as $field => $value)
+            {
+                if ($field == 'print')
+                    $print	    = $value;
+            }
+        }
+
 		$includeCitations	= $options & self::TOJSON_INCLUDE_CITATIONS;
 
-		$ider		= $this->row['ider'];
-		$retval		= '';
-		$comma		= "{\n";
-		$idtype		= $this->row['idtype'];
+		$ider		        = $this->row['ider'];
+		$retval		        = '';
+		$comma		        = "{\n";
+		$idtype		        = $this->row['idtype'];
 		if ($idtype == self::IDTYPE_INDIV)
 		{		// individual event
-		    $idir	= $this->row['idir'];
-		    $isOwner	= RecOwner::chkOwner($idir, 'tblIR');
+		    $idir	        = $this->row['idir'];
+		    $isOwner	    = RecOwner::chkOwner($idir, 'tblIR');
 		}		// individual event
 		else
-		    $isOwner	= true;
+		    $isOwner	    = true;
 
 		foreach($this->row as $fld => $value)
 		{		// loop through all fields
@@ -2108,14 +2199,23 @@ class Event extends RecordPic
 				case 'ider':
                 {		// fields passed back with no interpretation
                     $ider       = $value;
-                    $retval	    .= $comma . "\t\"$fld\":\t" .
-                                    json_encode($value);
-				    $comma	= ",\n";
+                    $retval	    .= "$comma\t\"$fld\":\t$value";
+				    $comma	    = ",\n";
 				    break;
-				}		// fields passed back with no interpretation
+                }		// fields passed back with no interpretation
+
+				case 'idir':
+				case 'order':
+				case 'idar':
+                {		// fields passed back with no interpretation
+                    $retval	    .= "$comma\t\"$fld\":\t$value";
+				    $comma	    = ",\n";
+				    break;
+                }		// fields passed back with no interpretation
+
 				case 'eventd':
 				{		// legacy internal date format
-				    $date	= new LegacyDate($value);
+				    $date	    = new LegacyDate($value);
 				    if ($isOwner)
 				    {		// can see private data
 						$retval	.= $comma . "\t\"{$fld}c\":\t" .
@@ -2128,8 +2228,7 @@ class Event extends RecordPic
 				    else
 				    {		// cannot see private data
 						$value	= $date->toString(1933);
-						$retval	.= $comma . "\t\"$fld\":\t" .
-							   json_encode($value);
+                        $retval	.= "$comma\t\"$fld\":\t" . json_encode($value);
 						$comma	= ",\n";
 				    }		// can see private data
 				    break;
@@ -2139,30 +2238,31 @@ class Event extends RecordPic
 				{		// legacy internal sort date
 				    if ($isOwner)
 				    {		// can see private data
-						$retval	.= $comma . "\t\"$fld\":\t" .
-							   json_encode($value);
+						$retval	.= "$comma\t\"$fld\":\t\"$value\"";
 						$comma	= ",\n";
 				    }		// can see private data
 				    break;
 				}		// legacy internal sort date
 
 				case 'idlrevent':
-				{
-				    $retval	.= $comma . "\t\"$fld\":\t" .
-							   json_encode($value);
-				    $comma	= ",\n";
-				    $loc	= new Location(array('idlr' => $value));
-				    $value	= $loc->getName();
-				    $locfld	= substr($fld,4) . 'loc';
-				    $retval	.= $comma . "\t\"$locfld\":\t" .
-							   json_encode($value);
+                {
+                    if (is_null($value))
+                        $value          = 1;
+				    $retval	            .= "$comma\t\"$fld\":\t$value";
+                    $comma	            = ",\n";
+                    if ($this->row['kind'])
+				        $loc	        = new Temple(array('idtr' => $value));
+                    else
+				        $loc	        = Location::getLocation($value);
+				    $value	            = $loc->getName();
+				    $locfld	            = substr($fld,4) . 'loc';
+				    $retval	            .= "$comma\t\"$locfld\":\t\"$value\"";
 				    break;
 				}
 
 				case 'idet':
 				{		// event type code
-				    $retval	.= $comma . "\t\"$fld\":\t" .
-							   json_encode($value);
+				    $retval	.= "$comma\t\"$fld\":\t$value";
 				    $comma	= ",\n";
 				    if (array_key_exists($value, self::$eventText))
 				    {
@@ -2174,20 +2274,33 @@ class Event extends RecordPic
 
 				case 'idtype':
 				{		// associated record type
-				    $retval	.= $comma . "\t\"$fld\":\t" .
-							   json_encode($value);
+				    $retval	.= "$comma\t\"$fld\":\t$value";
 				    $comma	= ",\n";
 				    $retval	.= $comma . "\t\"idtypemeans\":\t";
 				    if ($idtype == self::IDTYPE_INDIV)
-						$retval	.= json_encode('Person');
+						$retval	.= "\"Person\"";
 				    else
 				    if ($idtype == self::IDTYPE_MAR)
-						$retval	.= json_encode('Family');
+						$retval	.= "\"Family\"";
 				    else
 				    if ($idtype == self::IDTYPE_CHILD)
-						$retval	.= json_encode('Child');
+                        $retval	.= "\"Child\"";
+                    else
+                        $retval	.= "\"Undefined $value\"";
 				    break;
 				}		// event type code
+
+				case 'kind':
+				{		// associated record type
+				    $retval	        .= "$comma\t\"$fld\":\t$value";
+				    $comma	        = ",\n";
+				    $retval	        .= $comma . "\t\"kindmeans\":\t";
+				    if ($value == 0)
+						$retval	    .= "\"Location\"";
+				    else
+						$retval	    .= "\"LDS Temple\"";
+				    break;
+                }		// event type code
 
 				case 'eventexclude':
 				case 'qstag':
@@ -2195,10 +2308,10 @@ class Event extends RecordPic
 				{		// yes/no flags
 				    if ($value > 0)
 						$retval	.= $comma . "\t\"$fld\":\t" .
-							   json_encode('Y');
+							   "\"Y\"";
 				    else
 						$retval	.= $comma . "\t\"$fld\":\t" .
-							   json_encode('N');
+							   "\"N\"";
 				    $comma	= ",\n";
 				    break;
 				}		// yes/no flags
@@ -2261,10 +2374,10 @@ class Event extends RecordPic
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
-        {               // act on specific fields
+        {                       // act on specific fields
 			case 'desc':
             {
-        		$notes	= $this->row['desc'];
+        		$notes	        = $this->row['desc'];
         		if ($notes === null)
         		    return '';
         		else
@@ -2273,7 +2386,7 @@ class Event extends RecordPic
 
 			case 'description':
             {
-        		$text	= $this->row['description'];
+        		$text	        = $this->row['description'];
         		if ($text === null)
         		    return '';
         		else
@@ -2375,15 +2488,27 @@ class Event extends RecordPic
 		}		// switch on field name
     }		// Event::set
 
+    function adjustSortDate($maxSortDate)
+    {
+        if ($this->row['eventsd'] >= $maxSortDate)
+        {
+            return parent::set('eventsd', $maxSortDate);
+        }
+        else
+            return $this->row['eventsd'];
+    }       // function Event::adjustSortDate
+
     /********************************************************************
      *  function Event::dump											*
      *																	*
-     *  If debug output is enabled, display a diagnostic dump of the	*
-     *  contents of a database record in the web page.					*
+     *  Display a diagnostic dump of the	                            *
+     *  contents of the database record in the web page.				*
      *																	*
      *  Input:															*
      *		$label		descriptive identifier for record				*
-     *		$force		if true output even if $debug false				*
+     *		$force		if true add to $warn even if $debug false		*
+     *		            This is deprecated,                             * 
+     *		            use $warn   .= $event->dump();                  *
      *																	*
      *	Return:															*
      *	    string containing trace output as HTML						*
@@ -2396,93 +2521,88 @@ class Event extends RecordPic
 
 		// ensure that there is a label to use for the display
 		if (!is_string($label) || strlen($label) == 0)
-		    $label	= $this->getName();
+		    $label	    = $this->getName();
 
-		$output		= '';
+	    $output	        = "<p class='label'>\n$label</p>\n";
+	    $output	        .= "<table border='1'>\n";
+	    foreach($this->row as $key => $value)
+	    {
+			$output	.= "<tr>\n" .
+						"<th class='label'>\n$key\n" .
+						"</th>\n" .
+						"<td class='dataleft'>\n$value\n";
+
+			if (is_object($value) || strlen($value) > 0)
+			switch($key)
+			{
+			    case 'idir':
+			    {
+					if ($this->associatedRecord)
+					    $output	.= ' = ' .
+						get_class($this->associatedRecord);
+	//$this->associatedRecord->getName(Person::NAME_INCLUDE_DATES);
+					break;
+			    }		// dates
+
+			    case 'idtype':
+			    {
+					switch($value)
+					{
+					    case self::IDTYPE_INDIV:	// Person
+						$output		.= ' = IDIR';
+						break;
+
+					    case self::IDTYPE_MAR:	// Family
+						$output		.= ' = IDMR';
+						break;
+
+					    case self::IDTYPE_CHILD:	// Child
+						$output		.= ' = IDCR';
+						break;
+
+					}
+					break;
+			    }
+
+			    case 'eventd':
+			    {
+					$olddebug	= $debug;
+					$debug		= false;
+					$date		= new LegacyDate($value);
+					$output		.= ' = ' . $date->toString();
+					$debug		= $olddebug;
+					break;
+			    }		// dates
+
+			    case 'idlrevent':
+			    {
+					$olddebug	= $debug;
+					$debug		= false;
+					$loc	    = Location::getLocation($value);
+					$output	    .= ' = ' . $loc->toString();
+					$debug		= $olddebug;
+					break;
+			    }		// locations
+
+			    case 'idet':
+			    {
+					$output		.= ' = ' . self::$eventText[$value];
+					break;
+			    }		// locations
+
+			    default:
+			    {
+					break;
+			    }
+			}	// field specific formatting
+			$output	.= "</td>\n";
+			$output	.= "</tr>\n";
+	    }	// loop through keys
+        $output	.= "</table>\n";
+
 		if ($debug || $force)
-		{
-		    $output	.= "<p class='label'>\n$label</p>\n";
-		    $output	.= "<table border='1'>\n";
-		    foreach($this->row as $key => $value)
-		    {
-				$output	.= "<tr>\n";
-				$output	.= "<th class='label'>\n$key\n";
-				$output	.= "</th>\n";
-				$output	.= "<td class='dataleft'>\n$value\n";
+		    $warn       .= $output;
 
-				if (is_object($value) || strlen($value) > 0)
-				switch($key)
-				{
-				    case 'idir':
-				    {
-						if ($this->associatedRecord)
-						    $output	.= ' = ' .
-							get_class($this->associatedRecord);
-		//$this->associatedRecord->getName(Person::NAME_INCLUDE_DATES);
-						break;
-				    }		// dates
-
-				    case 'idtype':
-				    {
-						switch($value)
-						{
-						    case self::IDTYPE_INDIV:	// Person
-							$output		.= ' = IDIR';
-							break;
-
-						    case self::IDTYPE_MAR:	// Family
-							$output		.= ' = IDMR';
-							break;
-
-						    case self::IDTYPE_CHILD:	// Child
-							$output		.= ' = IDCR';
-							break;
-
-						}
-						break;
-				    }
-
-				    case 'eventd':
-				    {
-						$olddebug	= $debug;
-						$debug		= false;
-						$date		= new LegacyDate($value);
-						$output		.= ' = ' . $date->toString();
-						$debug		= $olddebug;
-						break;
-				    }		// dates
-
-				    case 'idlrevent':
-				    {
-						$olddebug	= $debug;
-						$debug		= false;
-						try {
-						    $loc	= new Location(array('idlr' => $value));
-						    $output	.= ' = ' . $loc->toString();
-						} catch (Exception $e) {
-						}
-						$debug		= $olddebug;
-						break;
-				    }		// locations
-
-				    case 'idet':
-				    {
-						$output		.= ' = ' . self::$eventText[$value];
-						break;
-				    }		// locations
-
-				    default:
-				    {
-						break;
-				    }
-				}	// field specific formatting
-				$output	.= "</td>\n";
-				$output	.= "</tr>\n";
-		    }	// loop through keys
-		    $output	.= "</table>\n";
-		}	// debug output enabled
-
-		$warn		.= $output;
 		return $output;
     }		// Event::dump
 
@@ -2637,14 +2757,14 @@ class Event extends RecordPic
 		    }		// have associated record
 
 		    // ensure only one preferred event for type
-		    $query	= 'SELECT COUNT(*) FROM tblER ' .
-						  "WHERE IDIR=$idir AND IDType=$idtype AND " .
-							"IDET=$idet AND Preferred=1";
-		    $sqlParms	= array('idir'		=> $idir,
-							'idtype'	=> $idtype,
-							'idet'		=> $idet);
-		    $stmt	= $connection->prepare($query);
-		    $queryText	= debugPrepQuery($query, $sqlParms);
+		    $query	        = 'SELECT COUNT(*) FROM tblER ' .
+				        		  "WHERE IDIR=$idir AND IDType=$idtype AND " .
+				        			"IDET=$idet AND Preferred=1";
+		    $sqlParms	    = array('idir'		=> $idir,
+					        		'idtype'	=> $idtype,
+					        		'idet'		=> $idet);
+		    $stmt	        = $connection->prepare($query);
+		    $queryText	    = debugPrepQuery($query, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		// success
 				if ($debug)
@@ -2770,77 +2890,77 @@ class Event extends RecordPic
 		    {			// act on specific event types
 				case Event::ET_BIRTH:
 				{
-				    $stype	= Citation::STYPE_BIRTH;
+				    $stype	    = Citation::STYPE_BIRTH;
 				    $newstype	= Citation::STYPE_EVENT;
 				    break;
 				}
 
 				case Event::ET_BURIAL:
 				{
-				    $stype	= Citation::STYPE_BURIED;
+				    $stype	    = Citation::STYPE_BURIED;
 				    $newstype	= Citation::STYPE_EVENT;
 				    break;
 				}
 
 				case Event::ET_CHRISTENING:
 				{
-				    $stype	= Citation::STYPE_CHRISTEN;
+				    $stype	    = Citation::STYPE_CHRISTEN;
 				    $newstype	= Citation::STYPE_EVENT;
 				    break;
 				}
 
 				case Event::ET_DEATH:
 				{
-				    $stype	= Citation::STYPE_DEATH;
+				    $stype	    = Citation::STYPE_DEATH;
 				    $newstype	= Citation::STYPE_EVENT;
 				    break;
 				}
 
 				case Event::ET_LDS_BAPTISM:
 				{
-				    $stype	= Citation::STYPE_LDSB;	// Baptism
+				    $stype	    = Citation::STYPE_LDSB;	// Baptism
 				    $newstype	= Citation::STYPE_EVENT;
 				    break;
 				}
 
 				case Event::ET_LDS_CONFIRMATION:
 				{
-				    $stype	= Citation::STYPE_LDSC;	// Confirmation
+				    $stype	    = Citation::STYPE_LDSC;	// Confirmation
 				    $newstype	= Citation::STYPE_EVENT;
 				    break;
 				}
 
 				case Event::ET_LDS_ENDOWED:
 				{
-				    $stype	= Citation::STYPE_LDSE;
+				    $stype	    = Citation::STYPE_LDSE;
 				    $newstype	= Citation::STYPE_EVENT;
 				    break;
 				}
 
 				case Event::ET_LDS_INITIATORY:
 				{
-				    $stype	= Citation::STYPE_LDSI;
+				    $stype	    = Citation::STYPE_LDSI;
 				    $newstype	= Citation::STYPE_EVENT;
 				    break;
 				}
 
 				case Event::ET_MARRIAGE:
 				{
-				    $stype	= Citation::STYPE_MAR;
+				    $stype	    = Citation::STYPE_MAR;
 				    $newstype	= Citation::STYPE_MAREVENT;
 				    break;
 				}
 
 				case Event::ET_LDS_SEALED:
 				{
-				    $stype	= Citation::STYPE_LDSS;
+				    $stype	    = Citation::STYPE_LDSS;
 				    $newstype	= Citation::STYPE_MAREVENT;
 				    break;
 				}
 
 				case Event::ET_MARRIAGE_END:
 				{
-				    $stype	= Citation::STYPE_MAREND;
+				    $stype	    = Citation::STYPE_MAREND;
 				    $newstype	= Citation::STYPE_MAREVENT;
 				    break;
 				}
@@ -2910,7 +3030,7 @@ class Event extends RecordPic
 		{			// authorized to edit database
 		    $nextOrder	= 1;
 		    if (isset($citations))
-		    {			// have citations
+            {			// have citations
 				foreach($citations as $idsx => $citation)
 				{
 				    $citation->set('order', $nextOrder);

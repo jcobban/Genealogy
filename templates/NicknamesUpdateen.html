@@ -113,35 +113,39 @@
       which is used to search for users based upon their user name.
       This is a regular expression, as supported by MySQL, which is used to limit
       the nicknames to be displayed. See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer"s regex page</a>.
+      </p>
       <ul>
         <li>If the pattern contains no special 
-      characters then only nicknames containing that string will be included.
-      For example the pattern "London" will match nicknames containing the
-      string "London".  Note that the search ignores case, so that pattern
-      will also match "LONDON" and "london".
+          characters then only nicknames containing that string will be included.
+          For example the pattern "London" will match nicknames containing the
+          string "London".  Note that the search ignores case, so that pattern
+          will also match "LONDON" and "london".
+        </li>
         <li>If the pattern begins with a caret "^" then only nicknames that
-      <b>begin</b> with the remainder of the pattern are included.  
-      For example the pattern
-      "^Ba" displays nicknames starting with "Ba" (or "ba" or "BA")
+          <b>begin</b> with the remainder of the pattern are included.  
+          For example the pattern
+          "^Ba" displays nicknames starting with "Ba" (or "ba" or "BA")
+        </li>
         <li>If the pattern ends with a dollar sign "$", then only nicknames that
-      <b>end</b> with the remainder of the pattern are included.  
-      For example the pattern
-      "CA$" matches nicknames that end with "CA" (or "ca" or "Ca")
+          <b>end</b> with the remainder of the pattern are included.  
+          For example the pattern
+          "CA$" matches nicknames that end with "CA" (or "ca" or "Ca")
+        </li>
         <li>In a pattern a period "." matches any single character.  For example
-      the pattern "B.b" matches any nickname that contains two letter Bs
-      separated by one character, for example "Bab", "Beb", "Bib", "Bob",
-      or "Bub" anywhere in the nickname name.
+          the pattern "B.b" matches any nickname that contains two letter Bs
+          separated by one character, for example "Bab", "Beb", "Bib", "Bob",
+          or "Bub" anywhere in the nickname name.
+        </li>
         <li>In a pattern an asterisk "*" matches zero or more of the preceding
-      character; "bo*b" matches "bb", "bob", and "boob"
-      anywhere in the nickname name.
+          character; "bo*b" matches "bb", "bob", and "boob"
+          anywhere in the nickname name.
+        </li>
       </ul>
-      </p>
     </div>
     <div class="balloon" id="HelpSearch">
-    <p>Clicking on this button refreshes the displayed list of nicknames
+      Clicking on this button refreshes the displayed list of nicknames
       based upon the pattern.  You may also hit the "enter" key to perform the
       same function.
-    </p>
     </div>
     <div class="balloon" id="Helpname">
       This field contains the actual given name component to match against.

@@ -21,26 +21,30 @@ use \Iterator;
  *		    Name					  Type								*
  *		    IDCR					  INTEGER(10)						*
  *		    IDMR					  INTEGER(10)						*
- *				    --> tblMR.IDMR, ID to parents marriage record		*
+ *				    --> tblMR.IDMR, ID to parents Family record		    *
  *		    IDIR					  INTEGER(10)						*
- *				    --> tblIR.IDIR, ID to child's individual record		*
+ *				    --> tblIR.IDIR, ID to child's Person record		    *
  *		    Order					  SMALLINT(5)						*
  *				    used as sort order.									*
  *		    PrefChild				  TINYINT(1)						*
  *				    1=preferred, 0=not									*
  *		    IDCS					  INTEGER(10)						*
  *				    --> tblCS.IDCS, ID to Child Status record			*
- *						see Child::$intStatus							*
+ *						see Child::STATUS_...							*
  *		    IDCPDad					  INTEGER(10)						*
  *				    --> tblCP.IDCP, ID to Child/Parent Rel'ship record	*
- *						see Child::$intType								*
+ *						see Child::RELATE_...							*
  *		    IDCPMom					  INTEGER(10)						*
  *				    --> tblCP.IDCP, ID to Child/Parent Rel'ship record	*
- *						see Child::$intType								*
+ *						see Child::RELATE_...							*
  *		    CPDadPrivate			  TINYINT(1)						*
  *				    0=No, 1=Yes											*
  *		    CPMomPrivate			  TINYINT(1)						*
  *				    0=No, 1=Yes											*
+ *																		*
+ *		The following fields were formerly used to hold information		*
+ *		about the LDS Sealed to Parents event but they are now          *
+ *		recorded in an instance of Event.                               *
  *		    ParSealSD				  INTEGER(10)						*
  *				    (see Sort Date) Deprecated							*
  *		    ParSealD				  VARCHAR(100)						*
@@ -133,6 +137,12 @@ use \Iterator;
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/04/15      replace is_a with instanceof                    *
  *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/07/18      use Person::getPerson                           *
+ *		                add line numbers to warning messages            *
+ *		2019/08/05      permit creating an incomplete instance with     *
+ *		                IDIR == 0                                       *
+ *      2019/08/11      Child methods getStatus, getStatusText,         *
+ *                      getCPRelDad, and getCPRelMom obsoleted          *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -154,7 +164,7 @@ class Child extends Record
      ********************************************************************/
     const	NAME_INCLUDE_DATES	= 1;
     const	NAME_SURNAME_FIRST	= 2;
-    const	NAME_INCLUDE_MDATE	= 4;
+    const	NAME_INCLUDE_LOCS	= 4;
 
     /********************************************************************
      *	Child->$sealEvent	instance of Event describing LDS sealing 	*
@@ -205,7 +215,7 @@ class Child extends Record
      *	static array containing synonyms for field names in the record	*
      ********************************************************************/
     protected static	$translate	= array(
-				        'childorder'			=> 'order');
+				        'childorder'		=> 'order');
 
     /********************************************************************
      *	Child::$defaultOrder											*
@@ -216,20 +226,11 @@ class Child extends Record
     protected static	$defaultOrder	= '`Order`';
 
     /********************************************************************
-     *	Child::$intStatus	                        					*
-     *	interpret the status field					                    *
-     *	This saves having to use the database server		            *
-     *	to retrieve the most common values.				                *
+     *	Child::STATUS_...                             					*
+     *																	*
+     *	Interpretation of values of field 'IDCS'                        *
+     *  Symbolic constants for calling Child::setStatus                 *
      ********************************************************************/
-    static $intStatus	= array(
-						 1 	=>	'',
-						 2 	=>	'None',
-						 3 	=>	'Stillborn',
-						 4 	=>	'Twin',
-						 5 	=>	'Illegitimate'
-								);
-
-    // Symbolic constants for calling Child::setStatus
     const	STATUS_NULL		    = 1;
     const	STATUS_NONE		    = 2;
     const	STATUS_STILLBORN	= 3;
@@ -237,28 +238,11 @@ class Child extends Record
     const	STATUS_ILLEGITIMATE	= 5;
 
     /********************************************************************
-     *  Child::$intType													*
+     *  Child::RELATE_...												*
      *																	*
      *  Interpretation of values of Child to Parent Relationships.		*
-     *  These values are defined in the database table tblCP, which		*
-     *  permits extending the definitions.								*
+     *  Symbolic constants for calling Child::setCpRelxxx               *
      ********************************************************************/
-    static $intType	= array(
-						 1 => '',
-						 2 => 'adopted',
-						 3 => 'biological',
-						 4 => 'challenged',
-						 5 => 'disproved',
-						 6 => 'foster',
-						 7 => 'guardian',
-						 8 => 'sealing',
-						 9 => 'step',
-						10 => 'unknown',
-						11 => 'private',
-						12 => 'family member',
-						13 => 'illegitimate');
-
-    // Symbolic constants for calling Child::setCpRelxxx
     const	RELATE_NULL		    =  1;
     const	RELATE_ADOPTED		=  2;
     const	RELATE_BIOLOGICAL	=  3;
@@ -283,20 +267,21 @@ class Child extends Record
      *	of Child::get('idcr') may not be initialized.					*
      *																	*
      *  Input:															*
-     *	    $id			a full database record presented as an			*
+     *	    $id		  * a full database record presented as an			*
      *					associative array of fields, or					*
-     *					an associative array of key values to			*
+     *				  * an associative array of key values to			*
      *					identify the record to use.  This can be either	*
-     *					array('idcr' => $idcr) or						*
+     *					array('idcr' => $idcr) to identify an existing  *
+     *					record, or						                *
      *					array('idmr' => $idmr, 'idir' => $idir)			*
-     *					The second form identifies the record for a		*
-     *					particular individual as a child of a specific	*
-     *					family to locate or add a specific individual	*
-     *					as a child of a specific family.				*
+     *					to identify the record for a particular Person	*
+     *					as a child of a specific family to locate or    *
+     *					add a specific Person as a child of a           *
+     *					specific Family.				                *
      *																	*
      *  Returns object containing child record.							*
      *																	*
-     *	Throws Exception if unable to complete function					*
+     *	Adds error message to $this->msg if new value is not supported	*
      ********************************************************************/
     function __construct($id)
     {
@@ -307,119 +292,129 @@ class Child extends Record
 
 		$connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,
 								  PDO::FETCH_ASSOC);
-		$dbrow		= null;
-		$needInsert	= false;
+		$dbrow		        = null;
+        $needInsert	        = false;
+        $parmStr            = 'null';
 
 		// action depends upon type of parameter
-		if (is_int($id))
-		    $parms	= array('idcr' => $id);
+        if (is_int($id))
+        {
+            $parms	        = array('idcr' => $id);
+            $parmStr        = $id;
+        }
 		else
 		if (is_string($id) && ctype_digit($id))
-		    $parms	= array('idcr' => intval($id));
+        {
+		    $parms	        = array('idcr' => intval($id));
+            $parmStr        = "'$id'";
+        }
 		else
-		if ($id == 'new')
-		    $parms	= array('idcr' => 0);
+		if (is_string($id) && strtolower($id) == 'new')
+        {
+		    $parms	        = array('idcr' => 0);
+            $parmStr        = "'$id'";
+        }
 		else
-		if (is_array($id))
-		    $parms	= $id;
-		else
-		    throw new Exception("Child::__construct: " .
-								"called with " .  print_r($id, true));
+        if (is_array($id))
+        {
+		    $parms	        = $id;
+            $parmStr        = print_r($id, true);
+        }
+        else
+        {
+		    $this->msg      .= "Child::__construct: " .
+                                "called with " . gettype($id) . ' ' .
+                                print_r($id, true) . '. ';
+            $parms          = array();
+            $parmStr        = print_r($id, true);
+        }
 
 		// $parms is now an associative array
-		$idcr		= null;
-		$idmr		= null;
-		$idir		= null;
-		$where		= '';
-		$sqlParms	= array();
-		$and		= 'WHERE ';
+		$idcr								= null;
+		$idmr								= null;
+		$idir								= null;
+		$where								= '';
+		$sqlParms							= array();
+        $and								= 'WHERE ';
+        $validFieldNames    				= true;
+
 		foreach($parms as $fldname => $value)
-		{			// loop through all parameters
-		    $fieldLc	= strtolower($fldname);
+		{			                    // loop through all parameters
+		    $fieldLc	    				= strtolower($fldname);
 		    if (array_key_exists($fieldLc, self::$translate))
-				$fieldLc	= self::$translate[$fieldLc];
+				$fieldLc					= self::$translate[$fieldLc];
 		    switch($fieldLc)
-		    {			// act on specific field names
+		    {			                // act on specific field names
 				case 'idcr':
-				{		// IDCR identify specific instance
+				{		                // IDCR identify specific instance
 				    if (is_string($value) && ctype_digit($value))
+                        $value			    = (int)$value;
+
+				    if (is_int($value) && $value > 0)
 				    {
-						$idcr			= intval($value);
-						if ($idcr > 0)
-						{
-						    $where		.= $and . 'IDCR=:idcr';
-						    $sqlParms['idcr']	= $idcr;
-						    $and		= ' AND ';
-						}
+						$idcr			    = $value;
+						$where		        .= $and . 'IDCR=:idcr';
+						$sqlParms['idcr']	= $idcr;
+						$and		        = ' AND ';
 				    }
 				    else
-				    if (is_int($value))
-				    {
-						$idcr			= $value;
-						if ($idir < 0)
-						    $warn	.= "<p>Field Name 'IDCR' value '$value' out of range.</p>";
-						else
-						if ($idcr > 0)
-						{
-						    $where		.= $and . 'IDCR=:idcr';
-						    $sqlParms['idcr']	= $idcr;
-						    $and		= ' AND ';
-						}
-				    }
-				    else
-						$warn	.= "<p>Field Name 'IDCR' value '$value' unsupported.</p>\n";
+                        $warn	.= "<p>Child::__construct: " . __LINE__ .
+                " Field Name 'IDCR' value '$value' unsupported.</p>\n";
 				    break;
-				}		// IDCR identify specific instance
+				}		                // IDCR identify specific instance
 
 				case 'idmr':
-				{		// IDMR identify parents
+				{		                // IDMR identify parents
 				    if (is_string($value) && ctype_digit($value))
+						$value			    = (int)$value;
+
+				    if (is_int($value) && $value > 0)
 				    {
-						$idmr			= intval($value);
-						$where			.= $and . 'IDMR=:idmr';
+						$idmr			    = $value;
+						$where			    .= $and . 'IDMR=:idmr';
 						$sqlParms['idmr']	= $idmr;
-						$and			= ' AND ';
+						$and			    = ' AND ';
 				    }
 				    else
-				    if (is_int($value))
-				    {
-						$idmr			= $value;
-						if ($idmr < 0)
-						    $warn	.= "<p>Field Name 'IDMR' value '$value' out of range.</p>\n";
-						$where			.= $and . 'IDMR=:idmr';
-						$sqlParms['idmr']	= $idmr;
-						$and			= ' AND ';
-				    }
-				    else
-						$warn	.= "<p>Field Name 'IDMR' value '$value' unsupported.</p>\n";
+                        $warn	.= "<p>Child::__construct: " . __LINE__ .
+                " Field Name 'IDMR' value '$value' unsupported.</p>\n";
 				    break;
-				}		// IDMR identify parents
+				}		                // IDMR identify parents
 
 				case 'idir':
-				{		// IDIR identify child
+				{		                // IDIR identify child
 				    if (is_string($value) && ctype_digit($value))
-				    {
-						$idir			= intval($value);
-						if ($idir < 1)
-						    $warn	.= "<p>Field Name 'IDIR' value '$value' out of range.</p>\n";
-						$where			.= $and . 'IDIR=:idir';
-						$sqlParms['idir']	= $idir;
-						$and			= ' AND ';
-				    }
-				    else
-				    if (is_int($value))
+                        $value			= (int)$value;
+
+				    if (is_int($value) && $value > 0)
 				    {
 						$idir			= $value;
-						if ($idir < 1)
-						    $warn	.= "<p>Field Name 'IDIR' value '$value' out of range.</p>\n";
 						$where			.= $and . 'IDIR=:idir';
 						$sqlParms['idir']	= $idir;
 						$and			= ' AND ';
 				    }
-				    else
-						$warn	.= "<p>Field Name 'IDIR' value '$value' unsupported. </p>\n";
+                    else
+                    {
+                        $warn	.= "<p>Child::__construct: " . __LINE__ .
+                            " Field Name 'IDIR' value '$value' unsupported. </p>\n";
+                        $warn	.= "<p>Child::__construct: " . __LINE__ .
+                                    " parms=$parmStr</p>\n";
+			            $backtrace          = debug_backtrace();
+			            foreach($backtrace as $call)
+			            {
+			                if (array_key_exists('class', $call) &&
+			                    strlen($call['class']) > 0)
+			                    $classPref      = $call['class'] . '::';
+			                else
+			                    $classPref      = '';
+			                $warn   .= "<p>Child::__construct: " . __LINE__ .
+			                    " function=$classPref" . $call['function'] .
+			                    " called from line " . $call['line'] . 
+			                    " of " . $call['file'] . "</p>\n";
+			            }
+			        }
 				    break;
-				}		// IDIR identify child
+				}		                // IDIR identify child
 
 				case 'order':
 				case 'prefchild':
@@ -428,132 +423,141 @@ class Child extends Record
 				case 'idcpmom':
 				case 'cpdadprivate':
 				case 'cpmomprivate':
+				{		                // other valid field names
+				    break;
+				}		                // other valid field names
+
 				case 'parsealsd':
 				case 'parseald':
 				case 'idtrparseal':
 				case 'ldsp':
 				case 'templetag':
 				case 'parsealnote':
-				{		// other valid field names
-				    if ($fldname != $fieldLc)
-				    {		// ensure all field names are lower case
-						unset($parms[$fldname]);
-						$parms[$fieldLc]	= $value;
-				    }		// ensure all field names are lower case
+				{		                // obsolete field names
+                    $validFieldNames    = false;
 				    break;
-				}		// other valid field names
+				}		                // obsolete field names
 
 				default:
-				{		// unrecognized field names
-				    $warn	.= "<p>Child::__construct: " . __LINE__ . 
+				{		                // unrecognized field names
+                    $validFieldNames    = false;
+				    $warn	        .= "<p>Child::__construct: " . __LINE__ . 
 								" Field Name '$fldname' not recognized.</p>";
 				    break;
-				}		// unrecognized field names
-		    }			// act on specific field names
-		}			// loop through all parameters
+				}		                // unrecognized field names
+		    }			                // act on specific field names
+		}			                    // loop through all parameters
 
-		$count		= count($parms);
+        $count		= count($parms);
+        if ($count == 10 && $validFieldNames)
+        {
+			$parms['parsealsd']			= self::$initRow['parsealsd'];
+			$parms['parseald']			= self::$initRow['parseald'];
+			$parms['idtrparseal']		= self::$initRow['idtrparseal'];
+			$parms['ldsp']		    	= self::$initRow['ldsp'];
+			$parms['templetag']			= self::$initRow['templetag'];
+            $parms['parsealnote']		= self::$initRow['parsealnote'];
+            $count                  	= count($parms);
+        }
+
 		if ($count >= count(self::$initRow))
-		{		// complete row from database
-		    $dbrow		= $parms;
-		    $needInsert		= $dbrow['idcr'] == 0;
-		}		// complete row from database
+		{		                        // complete row from database
+		    $dbrow		                = $parms;
+		    $needInsert		            = $dbrow['idcr'] == 0;
+		}		                        // complete row from database
 		else
-		{		// search parameters
+		{		                        // search parameters
 		    // act on specific parameter sets
 		    if (strlen($where) > 0)
-		    {			// existing record
+		    {			                // existing record
 				// construct the query of the child table
-				$query		        = 'SELECT * FROM tblCR ' . $where;
+				$query		            = 'SELECT * FROM tblCR ' . $where;
 				
 				// query the database
-				$stmt		        = $connection->prepare($query);
-				$queryText	        = debugPrepQuery($query, $sqlParms);
-                $this->lastSqlCmd   = $queryText;
+				$stmt		            = $connection->prepare($query);
+				$queryText	            = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd       = $queryText;
 				if ($stmt->execute($sqlParms))
-				{		// successful query
-				    $result		    = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				{		                // successful query
+				    $result		        = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				    if ($debug)
-						$warn		.= '<p>Child:__construct: ' . __LINE__ .
+						$warn		    .= '<p>Child:__construct: ' . __LINE__ .
 									   "query='$queryText'</p>\n";
 		
-				    $numMatches	= count($result);
+				    $numMatches	        = count($result);
 				    if ($numMatches == 1)
-				    {		// found child record
-						$dbrow		= $result[0];
-						$needInsert	= false;
-				    }		// found child record
+				    {		            // found child record
+						$dbrow		    = $result[0];
+						$needInsert	    = false;
+				    }		            // found child record
 				    else
 				    if ($numMatches == 0)
-				    {		// record not found
-						if ($idir > 0)
-						{	// add new child to family
-						    $dbrow		= self::$initRow;
-						    $needInsert		= true;
-						    $dbrow['idmr']	= $idmr;
-						    $dbrow['idir']	= $idir;
-		
-						    if ($idmr > 0)
-						    {		// existing family
-								// order new child after all existing children
-								$queryc		= "SELECT COALESCE(MAX(`Order`)+1,0) FROM tblCR WHERE IDMR=:idmr";
-								$sqlParms	= array('idmr' => $idmr);
+				    {		            // record not found
+					    $dbrow		            = self::$initRow;
+                        $needInsert		        = true;
+                        if (!is_null($idmr))
+					        $dbrow['idmr']	    = $idmr;
+                        if (!is_null($idir))
+					        $dbrow['idir']	    = $idir;
+	
+					    if ($idmr > 0)
+					    {		        // existing family
+							// order new child after all existing children
+                            $queryc		        =
+            "SELECT COALESCE(MAX(`Order`)+1,0) FROM tblCR WHERE IDMR=:idmr";
+							$sqlParms	        = array('idmr' => $idmr);
 
-								// query the database
-								$stmt	        = $connection->prepare($queryc);
-								$queryText	    = debugPrepQuery($queryc,
-								            	    			 $sqlParms);
+							// query the database
+							$stmt	            = $connection->prepare($queryc);
+							$queryText	        = debugPrepQuery($queryc,
+							            	        			 $sqlParms);
                             $this->lastSqlCmd   = $queryText;
-								if ($stmt->execute($sqlParms))
-								{		// successful query
-								    $row	    = $stmt->fetch(PDO::FETCH_NUM);
-								    $newOrder	= $row[0];
-								    if ($debug)
-									$warn	.= "<p>Child::__construct: " .
-						__LINE__ . " '$queryText' returns $newOrder</p>";
-								}		// successful query
-								else
-								{		// error performing query
-								    throw new Exception("Child::__construct: " .
-										__LINE__ . " '$queryText', " .
-									print_r($stmt->errorInfo(), true));
-								}		// error performing query
-						    }		// existing family
-						    else
-								$newOrder	= 0;
-						    $dbrow['order']	= $newOrder;
-						}	// add new child to family
-						else
-						    throw new Exception("Child::__construct: " .
-									    "Record not found $queryText");
-				    }		// record not found
+							if ($stmt->execute($sqlParms))
+							{		    // successful query
+							    $row	        = $stmt->fetch(PDO::FETCH_NUM);
+							    $newOrder	    = $row[0];
+							    if ($debug)
+								    $warn	    .= "<p>Child::__construct: " .
+					__LINE__ . " '$queryText' returns $newOrder</p>";
+							}		    // successful query
+							else
+							{		    // error performing query
+							    $this->msg      .= "Child::__construct: " .
+									__LINE__ . " '$queryText', " .
+								    print_r($stmt->errorInfo(), true) . '. ';
+							}		    // error performing query
+					    }		        // existing family
+					    else
+							$newOrder	        = 0;
+					    $dbrow['order']	        = $newOrder;
+				    }		            // record not found
 				    else
-				    {		// too many records found
-						throw new Exception("Child::__construct: " .
-									    "$numMatches found $queryText");
-				    }		// too many records found
-				}		// successful query
+				    {		            // too many records found
+						$this->msg      .= "Child::__construct: " .
+									        "$numMatches found $queryText";
+				    }		            // too many records found
+				}		                // successful query
 				else
-				{		// error performing query
-				    throw new Exception("Child::__construct: " .
-									"'$queryText' " .
-									print_r($stmt->errorInfo(),true));
-				}		// error performing query
-		    }			// existing record
+				{		                // error performing query
+				    $this->msg          .= "Child::__construct: " .
+							        		"'$queryText' " .
+							        		print_r($stmt->errorInfo(),true);
+				}		                // error performing query
+		    }			                // existing record
 		    else
 		    if ($idcr === 0)
-		    {			// create a new record
+		    {			                // create a new record
 				// set defaults
-				$dbrow		= self::$initRow;
-				$needInsert	= true;
-		    }			// create new record
+				$dbrow		            = self::$initRow;
+				$needInsert	            = true;
+		    }			                // create new record
 		    else
-		    {			// invalid record
-				throw new Exception("Child::__construct: " .
-								    "Invalid array parameter :" .
-								    print_r($parms, true));
-		    }			// invalid record
-		}			// search parameters
+		    {			                // invalid record
+				$this->msg              = "Child::__construct: " .
+        								    "Invalid array parameter :" .
+		        						    print_r($parms, true) . '. ';
+		    }		                	// invalid record
+		}		                    	// search parameters
 
 		// invoke constructor of base class
 		parent::__construct($dbrow,
@@ -572,66 +576,34 @@ class Child extends Record
      *	record, that is one created with parameter 0 or 'new', until	*
      *	after the function save() has been called, because only then	*
      *	does the database server assign a value for the key.  Until		*
-     *	then this method throws an exception.							*
+     *	then this method adds an error message and returns zero.        *
      *																	*
      *  Returns:														*
-     *	    unique key/index of this instance of Child					*
+     *	    unique numeric index of this instance of Child				*
      ********************************************************************/
     function getIdcr()
     {
+        global  $msg;
+
 		if ($this->needInsert)
-		    throw new Exception("Child::getIdcr: " .
-								"record does not exist in database"); 
+		    $msg        .= "Child::getIdcr: " .
+								"record does not exist in database, "; 
 		return $this->row['idcr'];
     }		// function Child::getIdcr
 
     /********************************************************************
-     *  function Child::getIdmr											*
-     *																	*
-     *	Retrieve the unique numeric key of the instance of Family		*
-     *	representing the parents documented by this instance of			*
-     *  Child.	        												*
-     *																	*
-     *  Returns:														*
-     *	    unique numeric key of an instance of Family					*
-     ********************************************************************/
-    function getIdmr()
-    {
-		return $this->row['idmr']; 
-    }		// function Child::getIdmr
-
-    /********************************************************************
      *  function Child::getFamily										*
      *																	*
-     *	Retrieve the instance of Family									*
-     *	representing the parents documented by this instance of			*
-     *  Child.															*
+     *	Retrieve the instance of Family representing the parents        *
+     *	documented by this instance of Child.							*
      *																	*
      *	Input:															*
      *	    an instance of Family										*
-     *																	*
-     *	Throws:															*
-     *	    exception if value of IDMR does not match existing family	*
      ********************************************************************/
     function getFamily() 
     { 
 		return new Family(array('idmr' => $this->row['idmr']));
     }		// function Child::getFamily
-
-    /********************************************************************
-     *  function Child::getIdir											*
-     *																	*
-     *	Retrieve the unique numeric key of the instance of Person		*
-     *	representing the child documented by this instance of			*
-     *  Child.															*
-     *																	*
-     *	Input:															*
-     *	    unique numeric key of an instance of Person					*
-     ********************************************************************/
-    function getIdir()
-    {
-		return $this->row['idir'];
-    }		// function Child::getIdir
 
     /********************************************************************
      *  function Child::getPerson										*
@@ -641,34 +613,14 @@ class Child extends Record
      *																	*
      *	Input:															*
      *	    an instance of Person										*
-     *																	*
-     *	Throws:															*
-     *	    exception if value of IDIR does not match existing Person	*
      ********************************************************************/
     function getPerson() 
     {
         if (!class_exists(__NAMESPACE__ . '\\Person'))
 			include __NAMESPACE__ . '/Person' . ".inc";
 
-		return new Person(array('idir' => $this->row['idir']));
+		return Person::getPerson($this->row['idir']);
     }		// function Child::getPerson
-
-    /********************************************************************
-     *  function Child::getStatus										*
-     *																	*
-     *	Get the numeric status code of the child in the family.			*
-     *																	*
-     *  Returns:														*
-     *	    1 =>		'',												*
-     *	    2 =>		'None',											*
-     *	    3 =>		'Stillborn',									*
-     *	    4 =>		'Twin',											*
-     *	    5 =>		'Illegitimate'									*
-     ********************************************************************/
-    function getStatus()
-    {
-		return $this->row['idcs'];
-    }		// function Child::getStatus
 
     /********************************************************************
      *  function Child::setStatus										*
@@ -686,65 +638,19 @@ class Child extends Record
      *  Returns:														*
      *		    old status code value									*
      *																	*
-     *	Throws:															*
-     *	    exception if new value is not supported						*
+     *	Adds error message to $msg if new value is not supported		*
      ********************************************************************/
     function setStatus($newval)
     {
-		if (array_key_exists($newval, self::$intStatus))
+        global  $msg;
+
+        if ($newval >= Child::STATUS_NULL && 
+            $newval <= CHILD::STATUS_ILLEGITIMATE)
 		    return parent::set('idcs',	$newval);
 		else
-		    throw new Exception("Child::setStatus: " .
-						"called with value='$newval'");
-    }		// function Child::getStatus
-
-
-    /********************************************************************
-     *  function Child::getStatusText									*
-     *																	*
-     *	Get the textual interpretation of the status code of the child.	*
-     *																	*
-     *  Returns:														*
-     *		string														*
-     ********************************************************************/
-    function getStatusText()
-    {
-		$status	= $this->row['idcs'];
-		if (array_key_exists($status, self::$intStatus))
-		    return self::$intStatus[$status];
-
-		return 'Unknown Status: ' . $status;
-    }		// function Child::getStatusText
-
-    /********************************************************************
-     *  function Child::getCPRelDad										*
-     *																	*
-     *	Get the numeric code for the relationship between the individual*
-     *	identified by field 'idir' and the husband in the family		*
-     *	identified by field 'idmr'.										*
-     *																	*
-     *  Returns:														*
-     *	    integer														*
-     ********************************************************************/
-    function getCPRelDad()
-    {
-		return $this->row['idcpdad'];
-    }		// function Child::getCPRelDad
-
-    /********************************************************************
-     *  function Child::getCPRelMom										*
-     *																	*
-     *	Get the numeric code for the relationship between the individual*
-     *	identified by field 'idir' and the wife in the family			*
-     *	identified by field 'idmr'`.									*
-     *																	*
-     *  Returns:														*
-     *	    integer														*
-     ********************************************************************/
-    function getCPRelMom()
-    {
-		return $this->row['idcpmom'];
-    }		// function Child::getCPRelMom
+            $msg        .= "Child::setStatus: " .
+						    "called with value='$newval'. ";
+    }		// function Child::setStatus
 
     /********************************************************************
      *  function Child::setCPRelDad										*
@@ -772,16 +678,18 @@ class Child extends Record
      *  Returns:														*
      *	    old relationship code value									*
      *																	*
-     *	Throws:															*
-     *	    exception if new value is not supported						*
+     *	Adds error message to $msg if new value is not supported		*
      ********************************************************************/
     function setCPRelDad($newval)
     {
-		if (array_key_exists($newval, self::$intType))
+        global  $msg;
+
+        if ($newval >= Child::RELATE_NULL && 
+            $newval <= Child::RELATE_ILLEGITIMATE)
 		    return parent::set('idcpdad',	$newval);
 		else
-		    throw new Exception("Child::setCPRelDad: " .
-						"called with value='$newval'");
+		    $msg        .= "Child::setCPRelDad: " .
+						    "called with value='$newval'. ";
     }		// function Child::setCPRelDad
 
     /********************************************************************
@@ -810,75 +718,19 @@ class Child extends Record
      *  Returns:														*
      *	   old relationship code value								    *
      *																	*
-     *	Throws:															*
-     *	    exception if new value is not supported						*
+     *	Adds error message to $msg if new value is not supported		*
      ********************************************************************/
     function setCPRelMom($newval)
     {
-		if (array_key_exists($newval, self::$intType))
+        global  $msg;
+
+        if ($newval >= Child::RELATE_NULL && 
+            $newval <= Child::RELATE_ILLEGITIMATE)
 		    return parent::set('idcpmom',	$newval);
 		else
-		    throw new Exception("Child::setCPRelDad: " .
-						"called with value='$newval'");
+		    $msg        .= "Child::setCPRelMom: " .
+						    "called with value='$newval'. ";
     }		// function Child::setCPRelMom
-
-    /********************************************************************
-     *  function Child::getCPRelText									*
-     *																	*
-     *	Get the textual interpretation of a child to parent				*
-     *	relationship code.												*
-     *																	*
-     *	Parameter:														*
-     *	    $idcp	numeric code for child to parent relationship		*
-     *																	*
-     *  Returns:														*
-     *	    String interpretation of supplied code						*
-     ********************************************************************/
-    static function getCPRelText($idcp)
-    {
-		if (array_key_exists($idcp, self::$intType))
-		{		// defined value
-		    return self::$intType[$idcp];
-		}		// defined value
-		else
-		{		// key not found
-		    return 'Unknown CPRel: ' . $idcp;
-		}		// key not found
-    }		// function Child::getCPRelText
-
-    /********************************************************************
-     *  function Child::getCPRelDadText									*
-     *																	*
-     *	Get the textual description of the relationship between the		*
-     *	individual identified by field 'idir' and the husband in the	*
-     *	family identified by field 'idmr'.								*
-     *																	*
-     *  Returns:														*
-     *	    String interpretation of relationship code					*
-     ********************************************************************/
-    function getCPRelDadText()
-    {
-		if ($this->row['cpdadprivate'])
-		    return '';
-		return self::getCPRelText($this->row['idcpdad']);
-    }		// function Child::getCPRelDadText
-
-    /********************************************************************
-     *  function Child::getCPRelMomText									*
-     *																	*
-     *	Get the textual description of the relationship between the		*
-     *	individual identified by field 'idir' and the wife in the		*
-     *	family identified by field 'idmr'.								*
-     *																	*
-     *  Returns:														*
-     *	    String interpretation of relationship code					*
-     ********************************************************************/
-    function getCPRelMomText()
-    {
-		if ($this->row['cpmomprivate'])
-		    return '';
-		return self::getCPRelText($this->row['idcpmom']);
-    }		// function Child::getCPRelMomText
 
     /********************************************************************
      *  function Child::set												*
@@ -888,12 +740,10 @@ class Child extends Record
      *	the target field.												*
      *																	*
      *  Parameters:														*
-     *	    $field		name of field to change							*
+     *	    $field		    name of field to change						*
      *	    $newvalue		value to set it to							*
      *																	*
-     *	Throws:															*
-     *	    exception if target field is not defined in the record or	*
-     *	    the new value is not supported by the target field			*
+     *	Adds error message to $msg if new value is not supported		*
      *																	*
      *  Side Effects:													*
      *	    Adds trace if $field is not already defined as a field		*
@@ -901,72 +751,74 @@ class Child extends Record
      ********************************************************************/
     function set($field, $newvalue)
     {
-		$fieldLc	= strtolower($field);
+        global  $msg;
+
+		$fieldLc	        = strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
-		    $fieldLc	= self::$translate[$fieldLc];
+		    $fieldLc	    = self::$translate[$fieldLc];
 		switch($fieldLc)
 		{
 		    case 'idcs':
-		    {		// child status
+		    {		                // child status
 				return $this->setStatus($newvalue);
-		    }		// child status
+		    }		                // child status
 
 		    case 'idcpdad':
-		    {		// child to parent relationship for father
+		    {		                // child to parent relationship for father
 				return $this->setCPRelDad($newvalue);
-		    }		// child to parent relationship for father
+		    }		                // child to parent relationship for father
 
 		    case 'idcpmom':
-		    {		// child to parent relationship for mother
+		    {		                // child to parent relationship for mother
 				return $this->setCPRelMom($newvalue);
-		    }		// child to parent relationship for mother
+		    }		                // child to parent relationship for mother
 
 		    case 'parseald':
-		    {		// legacy internal date format
+		    {		                // legacy internal date format
 				// validate and interpret new value
 				if ($newvalue instanceof LegacyDate)
-				{	// parameter is an instance of LegacyDate
-				    $date	= $newvalue;
-				}	// parameter is an instance of LegacyDate
+				{	                // parameter is an instance of LegacyDate
+				    $date	            = $newvalue;
+				}	                // parameter is an instance of LegacyDate
 				else
 				if (is_string($newvalue) || is_int($newvalue))
-				{	// convert the value to instance of LegacyDate
-				    $date	= new LegacyDate(' ' . $newvalue);
-				}	// convert the value to instance of LegacyDate
+				{	                // convert the value to LegacyDate
+				    $date	            = new LegacyDate(' ' . $newvalue);
+				}	                // convert the value to LegacyDate
 				else
-				{	// unexpected type
-				    throw new Exception("Child::set: " .
-						"invalid value type " .  gettype($newvalue) .
-						" for field '$field'");
-				}	// unexpected
+				{	                // unexpected type
+                    $msg        .= "Child::set: " . "invalid value type " . 
+                        gettype($newvalue) . ' ' . print_r($newvalue, true) .
+                        " for field '$field'. ";
+				}	                // unexpected
 
 				$sdname		= substr($fieldlc, 0, strlen($fieldLc)-1) .'sd';
 				parent::set($sdname, $date->getSortDate());
 				return parent::set($fieldLc, $date->getDate());
-		    }		// sealed to parents date
+		    }		                // sealed to parents date
 
 		    case 'cpdadprivate':
 		    case 'cpmomprivate':
 		    case 'ldsp':
 		    case 'templetag':
-		    {		// true/false flags
+		    {		                // true/false flags
 				if ($newvalue == 0 || $newvalue == 1)
 				{
 				    return parent::set($fieldLc, $newvalue);
-				}		// valid valud
+				}		            // valid valud
 				else
-				{		// invalid value
-				    throw new Exception("Child::set: " .
-						"invalid value '$newvalue'" .
-						" for field name='$field'");
-				}		// invalid value
-		    }		// true/false flags
+				{		            // invalid value
+				    $msg        .= "Child::set: " .
+						            "invalid value '$newvalue'" .
+						            " for field name='$field'. ";
+				}		            // invalid value
+		    }		                // true/false flags
 
 		    default:
-		    {		// no validation implemented yet
+		    {		                // no validation implemented yet
 				return parent::set($field, $newvalue);
-		    }		// no validation implemented yet
-		}		// switch on field name
+		    }		                // no validation implemented yet
+		}		                    // switch on field name
     }		// function Child::set
 
     /********************************************************************
@@ -978,16 +830,25 @@ class Child extends Record
      *  Parameters:														*
      *	    $xml		if true diagnostic output is emitted in XML		*
      *					if a string use it as tag name					*
+     *																	*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method updated the database record		*
+     *	    0			if the database did not need to be updated		*
+     *																	*
+     *  Throws:															*
+     *	    Exception if user is not authorized to update the database	*
      ********************************************************************/
     function save($xml)
     {
-		// only save records represented by records in tblER
+		// only save records representing an existing instance of Person
 		$idir	            = $this->row['idir'];
 		if ($idir > 0)
 		{		        // ignore incomplete records
 		    // invoke parent's implementation
-		    parent::save($xml);
-		}		        // ignore incomplete records
+		    return parent::save($xml);
+        }		        // ignore incomplete records
+        return false;
     }		// function Child::save
 
     /********************************************************************
@@ -1000,7 +861,8 @@ class Child extends Record
      *	    $options		combination of option flags					*
      *			NAME_INCLUDE_DATES		include birth and death dates	*
      *			NAME_SURNAME_FIRST		put surname first				*
-     *			NAME_INCLUDE_MDATE		include marriage date			*
+     *			NAME_INCLUDE_LOCS		include birth and death locs	*
+     *			            or internationalization translate table     *
      *																	*
      *  Returns:														*
      *	    string containing the primary name of the individual		*
@@ -1008,24 +870,84 @@ class Child extends Record
      ********************************************************************/
     function getName($options	= 0) 
     {
-		$indiv	= new Person(array('idir' => $this->row['idir']));
-		$ioptions	= $options & 
-						  (self::NAME_INCLUDE_DATES |
-						   self::NAME_SURNAME_FIRST);
-		$retval	= $indiv->getName($options);
+		global	$debug;
+		global	$warn;
 
-        if (!class_exists(__NAMESPACE__ . '\\Family'))
-			include __NAMESPACE__ . '/Family' . ".inc";
+		if (is_array($options) || $options instanceof TemplateTag)
+		    $tranTab			= $options;
+		else
+		    $tranTab			= null;
 
-		try {
-		    $family	    = new Family(array('idmr' => $this->row['idmr']));
-		    $foptions	= ($options & self::NAME_INCLUDE_MDATE) != 0;
-		    $retval	    .= " child of " . $family->getName($foptions);
-		} catch(Exception $e) {
-		    $retval	    .= " Invalid IDMR=" . $this->row['idmr'];
-		}
+		$person	                = Person::getPerson($this->row['idir']);
+		$retval	                = $person->getName($options);
+
+        $family	                = new Family(array('idmr' => $this->row['idmr']));
+        if ($family->isExisting())
+        {
+            if ($tranTab)
+            {
+                $retval         .= ' ' . $tranTab['child of'] . ' ';
+     	        $nameParms      = array('includeDate'		=> true,
+     	                                'connector'		    => $tranTab['and'],
+     	                                'dateprefix'		=> $tranTab['on'],
+                                        'locprefix'		    => $tranTab['at']);
+            }
+            else
+            {
+                $retval         .= ' child of ';
+                $nameParms      = array('includeDate'       =>
+                                        $options && Child::NAME_INCLUDE_DATES);
+            }
+		    $retval	            .= $family->getName($nameParms);
+        }
+        else 
+		    $retval	            .= " Invalid IDMR=" . $this->row['idmr'];
 		return $retval;
     }		// function Child::getName
+
+    /********************************************************************
+     *  function Child::getParSealEvent									*
+     *																	*
+     *  Get the LDS sealed to parents event for the child.				*
+     *																	*
+     *  Input:															*
+     *	    $create		if true return instance of Event even			*
+     *					if there is no existing event					*
+     *																	*
+     *  Returns:														*
+     *	    An instance of Event or null								*
+     ********************************************************************/
+    function getParSealEvent($create = false)
+    {
+		$event		= $this->sealEvent;
+		if (is_null($event))
+        {		            // not initialized
+            $event      = new Event(array('idtype'  => Event::IDTYPE_CHILD,
+                                          'idet'    => Event::ET_LDS_PAR_SEALED,
+                                          'idir'    => $this->row['idir']));
+            if (!$event->isExisting())
+            {               // does not exist in database
+				$event['eventd']	        = $this->get('parseald');
+				$event['eventsd']	        = $this->get('parsealsd');
+				$event['idlrevent']	        = $this->get('idtrparseal');
+				$event['kind']		        = 1;
+				$event['desc']		        = $this->get('parsealnote');
+				$event['description']	    = '';
+				$event['ldstempleready']    = $this->get('ldsp');
+		    	$event['preferred']		    = 1;
+		        if ($create ||
+					$event['eventsd'] != -99999999 ||
+					$event['idlrevent'] > 1 ||
+					$event['desc'] != '')
+		        {		    // LDS seal to parents event present
+				    $this->sealEvent	    = $event;
+                }		    // LDS seal to parents event present
+		        else
+				    $event			        = null;
+            }               // does not exist in database
+		}		            // not initialized
+		return $event;
+    }		// function Child::getParSealEvent
 
     /********************************************************************
      *  function Child::clearEvent										*
@@ -1042,13 +964,48 @@ class Child extends Record
 		{			        // validate event id
 		    case 'parseal':
 		    {			    // events using IDTR
-				parent::set($eventid . 'd', '');
-				parent::set($eventid . 'sd', -99999999);
-				parent::set('idtr' . $eventid, 1);
+				parent::set('parseald',     '');
+				parent::set('parsealsd',    -99999999);
+				parent::set('idtrparseal',  1);
+			    parent::set('parsealnote',  '');
+			    parent::set('ldsp',         0);
 				break;
 		    }			    // events using IDTR
 		}			        // validate event id
     }		// function Child::clearEvent
+
+    /********************************************************************
+     *	function Child::getEvents										*
+     *																	*
+     *  Get the events for the instance of Child.  This array			*
+     *	includes all events.  This is an associative array of instances *
+     *	of Event in which the key is the IDER value for Events          *
+     *	represented as records in table tblER (Events) and a            *
+     *	descriptive string for events represented as fields	            *
+     *	in the record in tblCR.  This method exists for symmetry with   *
+     *	Person::getEvents and Family::getEvents and in case at some     *
+     *	future time more than one event is associated with a Child.     *
+     *																	*
+     *	There is at present a maximum of one event.         			*
+     *																	*
+     *	Returns:														*
+     *	    An associative array of instances of Event indexed			*
+     *	    by IDER (or 'parseal' for event in tblCR).				    *
+     *																	*
+     *	    Use foreach($child->getEvents() as $ider => $event)			*
+     ********************************************************************/
+    function getEvents()
+    {
+        $event          = $this->getParSealEvent(false);
+        if ($event)
+        {
+            if ($event['ider'] > 0)
+                return array($event['ider']     => $event);
+            else
+                return array('parseal'          => $event);
+        }
+        return array();
+    }       // function Child::getEvents
 
     /********************************************************************
      *  function Child::toXml											*
@@ -1111,7 +1068,7 @@ class Child extends Record
 				case 'idir':
 				{
 				    $retval	.= "    <idir>" . xmlentities($value) . "</idir>\n";
-				    $indiv	= new Person(array('idir' => $value));
+				    $indiv	= Person::getPerson($value);
 				    $retval	.= "    <indiv>" .
 						    $indiv->getName(Person::NAME_INCLUDE_DATES) .
 								"    </indiv>\n";
@@ -1248,12 +1205,12 @@ class Child extends Record
 
 				case 'idir':
 				{
-				    $retval	.= $comma . "\t\"idir\":\t" . 
+				    $retval	    .= $comma . "\t\"idir\":\t" . 
 								   json_encode($value);
-				    $comma	= ",\n";
-				    $indiv	= new Person(array('idir' => $value));
-				    $retval	.= $comma . "\t\"child\":\t" . 
-		    json_encode($indiv->getName(Person::NAME_INCLUDE_DATES));
+				    $comma	    = ",\n";
+				    $indiv	    = Person::getPerson($value);
+				    $retval	    .= $comma . "\t\"child\":\t" . 
+		        json_encode($indiv->getName(Person::NAME_INCLUDE_DATES));
 				    break;
 				}			// IDIR
 
@@ -1333,49 +1290,6 @@ class Child extends Record
 		    print $retval;
 		return $retval;
     }		// function Child::toJson
-
-    /********************************************************************
-     *  function Child::getParSealEvent									*
-     *																	*
-     *  Get the LDS sealed to parents event for the child.				*
-     *																	*
-     *  Input:															*
-     *	    $create		if true return instance of Event even			*
-     *					if there is no existing event					*
-     *																	*
-     *  Returns:														*
-     *	    An instance of Event or null								*
-     ********************************************************************/
-    function getParSealEvent($create = false)
-    {
-		$event		= $this->sealEvent;
-		if (is_null($event))
-		{		            // not initialized
-		    $trow			        = array();
-		    $trow['idir']		    = $this;
-		    $trow['idtype']	        = Event::IDTYPE_CHILD;
-		    $trow['idet']		    = Event::ET_LDS_PAR_SEALED;
-			$trow['eventd']	        = $this->get('parseald');
-			$trow['eventsd']	    = $this->get('parsealsd');
-			$trow['idlrevent']	    = $this->get('idtrparseal');
-			$trow['kind']		    = 1;
-			$trow['desc']		    = $this->get('parsealnote');
-			$trow['description']	= '';
-			$trow['ldstempleready'] = $this->get('ldsp');
-		    $trow['preferred']		= 1;
-		    $event			        = new Event($trow);
-		    if ($create ||
-				$trow['eventsd'] != -99999999 ||
-				$trow['idlrevent'] > 1 ||
-				$trow['desc'] != '')
-		    {		        // LDS endow event present
-				$this->sealEvent	= $event;
-		    }		        // LDS endow event present
-		    else
-				$event			    =  null;
-		}		            // not initialized
-		return $event;
-    }		// function Child::getParSealEvent
 
 }		// class Child 
 

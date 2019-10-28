@@ -531,6 +531,7 @@ var	OccAbbrs = {
 				"Tan" 		: "Tanner",
 				"Team"      : "Teamster",
 				"Th" 		: "Thresher",
+				"The" 		: "the",
 				"To" 		: "to",
 				"Tr" 		: "Traveller",
 				"Ts" 		: "Tinsmith",

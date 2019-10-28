@@ -267,8 +267,10 @@ use \Exception;
  *		2018/03/24		add button to control whether textareas are		*
  *						displayed as rich text or raw text				*
  *		2018/11/19      change Help.html to Helpen.html                 *
+ *		2019/08/01      support tinyMCE 5.0.3                           *
+ *		2019/08/06      use editName.php to handle updates of Names     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Event.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -422,7 +424,7 @@ require_once __NAMESPACE__ . '/common.inc';
     {
 		global $eventText;
 
-		$idet	= $event->get('idet');
+		$idet	= $event['idet'];
 		if (array_key_exists($idet, $eventText))
 		{
 		    return $eventText[$idet];
@@ -629,134 +631,133 @@ require_once __NAMESPACE__ . '/common.inc';
 				Event::ET_LDS_SEALED			=> 'LDS Sealed',
 				Event::ET_MARRIAGE_END			=> 'Marriage End');
 
+/********************************************************************
+ *	function getDateAndLocation										*
+ *																	*
+ *		If the values for date and location have been explicitly	*
+ *		provided, use them.  Otherwise obtain the values from the	*
+ *		associated database record.									*
+ *																	*
+ *  Parameters:														*
+ *	    $record				data base record as instance of Record	*
+ *	    $dateFldName		field name containing date of event		*
+ *	    $locFldName			field name containing IDLR of location	*
+ *							of event								*
+ ********************************************************************/
+function getDateAndLocation($record,
+						    $dateFldName,
+						    $locFldName)
+{
+	global	$debug;
+	global	$warn;
+	global	$date;
+	global	$location;	// instance of Location
+	global	$msg;
+	global	$idlr;
 
-    /********************************************************************
-     *	function getDateAndLocation										*
-     *																	*
-     *		If the values for date and location have been explicitly	*
-     *		provided, use them.  Otherwise obtain the values from the	*
-     *		associated database record.									*
-     *																	*
-     *  Parameters:														*
-     *	    $record				data base record as instance of Record	*
-     *	    $dateFldName		field name containing date of event		*
-     *	    $locFldName			field name containing IDLR of location	*
-     *							of event								*
-     ********************************************************************/
-    function getDateAndLocation($record,
-							    $dateFldName,
-							    $locFldName)
-    {
-		global	$debug;
-		global	$warn;
-		global	$date;
-		global	$location;	// instance of Location
-		global	$msg;
-		global	$idlr;
+	if (is_null($date))
+	{		// date value not explicitly supplied
+	    $date	= new LegacyDate($record->get($dateFldName));
+	    $date	= $date->toString();
+	}		// date value not explicitly supplied
 
-		if (is_null($date))
-		{		// date value not explicitly supplied
-		    $date	= new LegacyDate($record->get($dateFldName));
-		    $date	= $date->toString();
-		}		// date value not explicitly supplied
+	if (is_null($location))
+	{		// location value not explicitly supplied
+	    $idlr	= $record->get($locFldName);
+	    if ($debug)
+			$warn	.= "<p>\$idlr set to $idlr from field name '$locFldName'</p>\n";
+	    $location	= new Location(array('idlr' 		=> $idlr));
+	}		// location value not explicitly supplied
+}		// getDateAndLocation
 
-		if (is_null($location))
-		{		// location value not explicitly supplied
-		    $idlr	= $record->get($locFldName);
-		    if ($debug)
-				$warn	.= "<p>\$idlr set to $idlr from field name '$locFldName'</p>\n";
-		    $location	= new Location(array('idlr' 		=> $idlr));
-		}		// location value not explicitly supplied
-    }		// getDateAndLocation
-
-    /********************************************************************
-     *	function getDateAndLocationLds									*
-     *																	*
-     *	If the values for date and location have been explicitly		*
-     *	provided, use them.  Otherwise obtain the values from the		*
-     *	associated database record.										*
-     *																	*
-     *  Parameters:														*
-     *	    $record				data base record as instance of Record	*
-     *	    $kind				temple indicator						*
-     *	    $dateFldName		field name containing date of event		*
-     *	    $locFldName			field name containing IDLR of location	*
-     *							of event								*
-     ********************************************************************/
-    function getDateAndLocationLds($record,
-							       $kind,
+/********************************************************************
+ *	function getDateAndLocationLds									*
+ *																	*
+ *	If the values for date and location have been explicitly		*
+ *	provided, use them.  Otherwise obtain the values from the		*
+ *	associated database record.										*
+ *																	*
+ *  Parameters:														*
+ *	    $record				data base record as instance of Record	*
+ *	    $kind				temple indicator						*
+ *	    $dateFldName		field name containing date of event		*
+ *	    $locFldName			field name containing IDLR of location	*
+ *							of event								*
+ ********************************************************************/
+function getDateAndLocationLds($record,
+						       $kind,
                                $dateFldName,
                                $locFldName)
-    {
-		global $date;
-		global $location;
-		global $msg;
-		global $idtr;
+{
+	global $date;
+	global $location;
+	global $msg;
+	global $idtr;
 
-		if (is_null($date))
-		{		// date value not explicitly supplied
-		    $date	= new LegacyDate($record->get($dateFldName));
-		    $date	= $date->toString();
-		}		// date value not explicitly supplied
-		$idtr		= $record->get($locFldName);
-		if ($kind == 1)
-		    $location	= new Temple(array('idtr' 		=> $idtr));
-		else
-		{		// not in temple
-		    if (is_null($location))
-		    {	// do not have explicit location
-				$location	= new Location(array('idlr' 		=> $idtr));
-		    }	// do not have explicit location
-		}		// not in temple
-    }		// getDateAndLocationLds
+	if (is_null($date))
+	{		        // date value not explicitly supplied
+	    $date	        = new LegacyDate($record->get($dateFldName));
+	    $date	        = $date->toString();
+	}		        // date value not explicitly supplied
+	$idtr		        = $record->get($locFldName);
+	if ($kind == 1)
+	    $location	    = new Temple(array('idtr' 		=> $idtr));
+	else
+	{		        // not in temple
+	    if (is_null($location))
+	    {	        // do not have explicit location
+			$location	= Location::getLocation($idtr);
+	    }	// do not have explicit location
+	}		// not in temple
+}		// function getDateAndLocationLds
 
-    /********************************************************************
-     *	function getEventInfo											*
-     *																	*
-     *	Get information from an instance of Event						*
-     *																	*
-     *  Parameters:														*
-     *	    $event				instance of Event						*
-     ********************************************************************/
-    function getEventInfo($event)
-    {
-		global	$etype;
-		global	$idet;
-		global	$order;
-		global	$notes;
-		global	$descn;
-		global	$kind;
-		global	$templeReady;
-		global	$preferred;
-		$etype		= getEventType($event);
-		if ($idet <= 1)
-		    $idet	= $event->getIdet();	// numeric key of tblET
-		$order		= $event->get('order');
+/********************************************************************
+ *	function getEventInfo											*
+ *																	*
+ *	Get information from an instance of Event						*
+ *																	*
+ *  Parameters:														*
+ *	    $event				instance of Event						*
+ ********************************************************************/
+function getEventInfo($event)
+{
+	global	$etype;
+	global	$idet;
+	global	$order;
+	global	$notes;
+	global	$descn;
+	global	$kind;
+	global	$templeReady;
+	global	$preferred;
+	$etype		            = getEventType($event);
+	if ($idet <= 1)
+	    $idet	            = $event['idet'];	// numeric key of tblET
+	$order		            = $event['order'];
 
-		if (is_null($notes))
-		{
-		    $notes	= $event->getNotes();
-		    if (is_null($notes))
-				$notes	= '';
-		}
+	if (is_null($notes))
+	{
+	    $notes	            = $event['desc'];
+	    if (is_null($notes))
+			$notes	        = '';
+	}
 
-		if (is_null($descn))
-		    $descn	= $event->getDescription(); 
+	if (is_null($descn))
+	    $descn	            = $event['description']; 
 
-		$templeReady	= $event->get('ldstempleready');
-		$preferred	= $event->get('preferred');
+	$templeReady	        = $event['ldstempleready'];
+	$preferred	            = $event['preferred'];
 
-		$kind		= $event->get('kind');
-		if ($kind == 0)
-		    getDateAndLocation($event,
-						       'eventd',
-						       'idlrevent');
-		else
-		    getDateAndLocationLds($event,
-							  $kind,
-							  'eventd',
-							  'idlrevent');
-    }	// function getEventInfo
+	$kind		            = $event['kind'];
+	if ($kind == 0)
+	    getDateAndLocation($event,
+					       'eventd',
+					       'idlrevent');
+	else
+	    getDateAndLocationLds($event,
+				    		  $kind,
+				    		  'eventd',
+				    		  'idlrevent');
+}	// function getEventInfo
 
 /********************************************************************
  *   OO  PPP  EEEE N  N     CC   OO  DDD  EEEE						*
@@ -806,7 +807,6 @@ $todo				= null;	// instance of ToDo
 // other
 $readonly			= '';	// attribute value to insert in <input> elements
 $submit				= false;
-$notesClass			= '';	// control editing of Notes field
 
 // process input parameters from the search string passed by method=get
 foreach($_GET as $key => $value)
@@ -817,7 +817,7 @@ foreach($_GET as $key => $value)
         {		// supplied event type
             if (ctype_digit($value))
             {
-	            $type	= (int)$value;
+	            $type	        = (int)$value;
 	            if ($type == 0)
 	                $readonly	= "readonly='readonly'";
 	            // textual description of event type
@@ -840,15 +840,15 @@ foreach($_GET as $key => $value)
 	                try
 	                {
 	                    $event		= new Event(array('ider' 		=> $ider));
-	                    $idet		= $event->getIdet();
-	                    if ($event->get('idtype') == 0)
+	                    $idet		= $event['idet'];
+	                    if ($event['idtype'] == 0)
 	                    {	// individual event
-	                        $idir	= $event->get('idir');
+	                        $idir	= $event['idir'];
 	                        $type	= 30;
 	                    }	// individual event
 	                    else
 	                    {	// marriage event
-	                        $idmr	= $event->get('idir');
+	                        $idmr	= $event['idir'];
 	                        $type	= 31;
 	                    }	// married event
 	                }
@@ -924,7 +924,7 @@ foreach($_GET as $key => $value)
                 try
                 {
                     $child		= new Child(array('idcr' 		=> $idcr));
-                    $idir		= $child->get('idir');
+                    $idir		= $child['idir'];
                 if ($debug)
                     $warn	.= "<p>\$idir set to $idir from \$_GET['idcr']=$idcr</p>\n";
                     $person		= new Person(array('idir' 		=> $idir));
@@ -933,7 +933,7 @@ foreach($_GET as $key => $value)
                     if (!$isOwner)
                         $msg	.= 'You are not authorized to edit " .
                                 "the events of this child.  ';
-                    $idmr		= $child->get('idmr');
+                    $idmr		= $child['idmr'];
                     $family		= new Family(array('idmr' 		=> $idmr));
                 }
                 catch(Exception $e)
@@ -1029,11 +1029,11 @@ foreach($_GET as $key => $value)
 
         case 'Submit':
         case 'submit':
-        {		// notes about the event
+        {		// control whether uses AJAX or submit
             if (strtoupper($value) == 'Y')
                 $submit	= true;
             break;
-        }		// notes about the event
+        }		// control whether uses AJAX or submit
 
         case 'Debug':
         case 'debug':
@@ -1043,14 +1043,6 @@ foreach($_GET as $key => $value)
             break;
         }		// debug
 
-        case 'editNotes':
-        {		// control edit for notes
-            if (strtoupper($value) == 'HTML')
-                $notesClass	= 'mceNoEditor';
-            else
-                $notesClass	= '';
-            break;
-        }		// control edit for notes
 
         case 'lang':
         {
@@ -1059,13 +1051,19 @@ foreach($_GET as $key => $value)
             break;
         }
 
+        case 'text':
+        case 'editNotes':
+        {
+            break;
+        }           // used by Javascript
+
         default:
-        {		// other parameters
+        {		    // other parameters
             $warn	.= "<p>Unexpected parameter $key='$value'</p>\n";
             break;
-        }		// other parameters
-    }	        // switch
-}		        // loop through all parameters
+        }		    // other parameters
+    }	            // switch
+}		            // loop through all parameters
 
 // get the associated individual record
 if (strlen($msg) == 0 && !is_null($idir))
@@ -1109,9 +1107,9 @@ if (strlen($msg) == 0 && !is_null($idir))
     {
         $family		= new Family(array('idmr' 		=> $idmr));
         $husbname		= $family->getHusbName();
-        $idirhusb		= $family->get('idirhusb');
+        $idirhusb		= $family['idirhusb'];
         $wifename		= $family->getWifeName();
-        $idirwife		= $family->get('idirwife');
+        $idirwife		= $family['idirwife'];
         $heading	= "Edit Event for Family of ";
         $title	= "Edit Event for Family of ";
         if ($idirhusb > 0)
@@ -1169,9 +1167,27 @@ if (strlen($msg) == 0 && !is_null($idir))
 
     //    idir parameter points to Person record
  	case Citation::STYPE_NAME:		// 1
- 	case Citation::STYPE_BIRTH:		// 2
+    {
+        if (is_null($idir) || $idir == 0)
+        {		        // individual event requires IDIR
+            $msg		.= 'mandatory idir parameter missing. ';
+            $given		= 'Unknown';
+        }		        // individual event requires IDIR
+        else
+        {		        // proceed with edit
+            $name       = new Name(array('idir'     => $idir,
+                                         'order'    => Name::PRIMARY));
+            $idnx       = $name['idnx'];
+            header("Location: /FamilyTree/editName.php?idnx=$idnx");
+            exit;
+
+        }		        // proceed with edit
+        break;
+    }                   // primary name of individual
+
+ 	case Citation::STYPE_BIRTH:		    // 2
  	case Citation::STYPE_CHRISTEN:		// 3
- 	case Citation::STYPE_DEATH:		// 4
+ 	case Citation::STYPE_DEATH:		    // 4
  	case Citation::STYPE_BURIED:		// 5
  	case Citation::STYPE_NOTESGENERAL:	// 6
  	case Citation::STYPE_NOTESRESEARCH:	// 7
@@ -1207,9 +1223,10 @@ if (strlen($msg) == 0 && !is_null($idir))
         if (is_null($idnx) || $idnx == 0)
             $msg		.= 'Mandatory idnx parameter missing. ';
         else
-            $idime	= $idnx;	// key for citations
-        $title		= 'Edit Alternate Name fact';
-        $heading		= 'Edit Alternate Name fact';
+        {
+            header("Location: /FamilyTree/editName.php?idnx=$idnx");
+            exit;
+        }
         break;
     }
 
@@ -1272,18 +1289,18 @@ if (strlen($msg) == 0 && !is_null($idir))
         if ($idet > 1)
             $event->setIdet($idet);
 
-        $idime	= $ider;	// key for citations
-        $idir	= $event->getIdir();
+        $idime	                = $ider;	// key for citations
+        $idir	                = $event['idir'];
         if ($debug)
             $warn	.= "<p>\$idir set to $idir from event IDER=$ider</p>\n";
         try
         {
             if (is_null($person))
-                $person	= new Person(array('idir' 		=> $idir));
+                $person	        = Person::getPerson($idir);
             if ($ider == 0 && $idet > 1)
             {		// create new individual event
-                $event	= $person->addEvent();
-                $ider	= $event->getIder();
+                $event	        = $person->addEvent();
+                $ider	        = $event['ider'];
             }		// create new individual event
 
             // if name of individual not supplied, get it from Person record
@@ -1329,7 +1346,7 @@ if (strlen($msg) == 0 && !is_null($idir))
             if (!is_null($family))
             {
                 $event	= $family->addEvent();
-                $ider	= $event->getIder();
+                $ider	= $event['ider'];
 
                 // set the supplied value of the event subtype
                 if (!is_null($idet))
@@ -1342,11 +1359,11 @@ if (strlen($msg) == 0 && !is_null($idir))
         }		// create new event
         else
         {		// existing event
-            $idmr		= $event->getIdir();
-            $family		= new Family(array('idmr' 		=> $idmr));
-            $tidet		= $event->getIdet();
+            $idmr		        = $event['idir'];
+            $family		        = new Family(array('idmr' 		=> $idmr));
+            $tidet		        = $event['idet'];
             if ($tidet == 70)
-                $title	= 'Edit ' . ucfirst($event->getDescription()) . ' Event';
+                $title	= 'Edit ' . ucfirst($event['description']) . ' Event';
             else
                 $title	= 'Edit ' . ucfirst(Event::$eventText[$tidet]) . ' Event';
 
@@ -1393,7 +1410,7 @@ if (strlen($msg) == 0 && !is_null($idir))
                               'idet'			=> $idet,
                               'idir'			=> $idir));
     $event->save(false);
-    $ider		= $event->get('ider');
+    $ider		= $event['ider'];
     $idime		= $ider;	// key for citations
     }
 
@@ -1422,16 +1439,16 @@ if (strlen($msg) == 0 && !is_null($idir))
         {
             if (is_null($notes))
             {
-                $notes	= $person->get('namenote');
+                $notes	= $person['namenote'];
                 if (is_null($notes))
                     $notes	= '';
             }
 
-            $prefix	= $person->get('prefix');
+            $prefix	= $person['prefix'];
             if (is_null($prefix))
                 $prefix	= '';
 
-            $nametitle	= $person->get('title');
+            $nametitle	= $person['title'];
             if (is_null($nametitle))
                 $nametitle	= '';
         }		// individual defined
@@ -1443,7 +1460,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         if ($person)
         {
             $event		= $person->getBirthEvent(true);
-            $ider	= $event->get('ider');
+            $ider	= $event['ider'];
             if ($ider > 0)
             {
                 $idime	= $ider;
@@ -1460,7 +1477,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         if ($person)
         {
             $event		= $person->getChristeningEvent(true);
-            $ider	= $event->get('ider');
+            $ider	= $event['ider'];
             if ($ider > 0)
             {
                 $idime	= $ider;
@@ -1477,7 +1494,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         if ($person)
         {
             $event		= $person->getDeathEvent(true);
-            $ider	= $event->get('ider');
+            $ider	= $event['ider'];
             if ($ider > 0)
             {
                 $idime	= $ider;
@@ -1486,7 +1503,7 @@ if (strlen($msg) == 0 && !is_null($idir))
             getEventInfo($event);
             $kind		= null;
 
-            $deathCause	= $person->get('deathcause');
+            $deathCause	= $person['deathcause'];
             if (is_null($deathCause))
                 $deathCause	= '';
         }		// individual defined
@@ -1498,7 +1515,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         if ($person)
         {
             $event		= $person->getBuriedEvent(true);
-            $ider	= $event->get('ider');
+            $ider	= $event['ider'];
             if ($ider > 0)
             {
                 $idime	= $ider;
@@ -1529,7 +1546,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         {
             if (is_null($notes))
             {
-                $notes	= $person->get('notes');
+                $notes	= $person['notes'];
                 if (is_null($notes))
                     $notes	= '';
             }
@@ -1545,7 +1562,7 @@ if (strlen($msg) == 0 && !is_null($idir))
             $location	= null;
             if (is_null($notes))
             {
-                $notes	= $person->get('references');
+                $notes	= $person['references'];
                 if (is_null($notes))
                     $notes	= '';
             }
@@ -1559,7 +1576,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         {
             if (is_null($notes))
             {
-                $notes	= $person->get('medical');
+                $notes	= $person['medical'];
                 if (is_null($notes))
                     $notes	= '';
             }
@@ -1573,7 +1590,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         {
             if (is_null($notes))
             {
-                $notes	= $person->get('deathcause');
+                $notes	= $person['deathcause'];
                 if (is_null($notes))
                     $notes	= '';
             }
@@ -1586,7 +1603,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         if ($person)
         {
             $event		= $person->getBaptismEvent(true);
-            $ider	= $event->get('ider');
+            $ider	= $event['ider'];
             if ($ider > 0)
             {
                 $idime	= $ider;
@@ -1602,7 +1619,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         if ($person)
         {
             $event		= $person->getEndowEvent(true);
-            $ider	= $event->get('ider');
+            $ider	= $event['ider'];
             if ($ider > 0)
             {
                 $idime	= $ider;
@@ -1618,7 +1635,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         if ($person)
         {
             $event		= $person->getConfirmationEvent(true);
-            $ider	= $event->get('ider');
+            $ider	= $event['ider'];
             if ($ider > 0)
             {
                 $idime	= $ider;
@@ -1634,7 +1651,7 @@ if (strlen($msg) == 0 && !is_null($idir))
         if ($person)
         {
             $event		= $person->getInitiatoryEvent(true);
-            $ider	= $event->get('ider');
+            $ider	= $event['ider'];
             if ($ider > 0)
             {
                 $idime	= $ider;
@@ -1687,10 +1704,10 @@ if (strlen($msg) == 0 && !is_null($idir))
                               1,
                               'parseald',
                               'idtrparseal');
-            $notes		= $child->get('parsealnote');
+            $notes		= $child['parsealnote'];
             if (is_null($notes))
                 $notes	= '';
-            $templeReady	= $child->get('ldsp');
+            $templeReady	= $child['ldsp'];
         }		// child record present
         break;
     }
@@ -1704,7 +1721,7 @@ if (strlen($msg) == 0 && !is_null($idir))
                               1,
                               'seald',
                               'idtrseal');
-            $templeReady	= $family->get('ldss');
+            $templeReady	= $family['ldss'];
         }		// family defined
         break;
     }
@@ -1714,7 +1731,7 @@ if (strlen($msg) == 0 && !is_null($idir))
     {
         if ($family)
         {
-        $notmar	= $family->get('notmarried');
+        $notmar	= $family['notmarried'];
         if ($notmar == '')
             $notmar	= 0;
         }		// family defined
@@ -1736,7 +1753,7 @@ if (strlen($msg) == 0 && !is_null($idir))
     {
         if (is_null($family && $notes))
         {
-            $notes	= $family->get('notes');
+            $notes	= $family['notes'];
             if (is_null($notes))
                 $notes	= '';
         }		// family defined
@@ -1747,7 +1764,7 @@ if (strlen($msg) == 0 && !is_null($idir))
     {
         if ($family)
         {
-        $nokids	= $family->get('nochildren');
+        $nokids	= $family['nochildren'];
         if ($nokids == '')
             $nokids	= 0;
         }		// family defined
@@ -1758,7 +1775,7 @@ if (strlen($msg) == 0 && !is_null($idir))
     {
         if ($family)
         {
-        $date	= new LegacyDate($family->get('marendd'));
+        $date	= new LegacyDate($family['marendd']);
         $date	= $date->toString();
         }		// family defined
         break;
@@ -1772,7 +1789,7 @@ if (strlen($msg) == 0 && !is_null($idir))
 
             if ($idet == Event::ET_DEATH)
             {
-                $deathCause	= $person->get('deathcause');
+                $deathCause	= $person['deathcause'];
                 if (is_null($deathCause))
                     $deathCause	= '';
             }
@@ -1805,11 +1822,11 @@ if (strlen($msg) == 0 && !is_null($idir))
     }		// act on major event type
 
     /********************************************************************
-     *  If the location is in the form of a string, obtain the				*
-     *  associated instance of Location.  This will ensure that				*
-     *  short form names are resolved, and the name is displayed with		*
-     *  the proper case. Also format the location name so that it can		*
-     *  be inserted into the value attribute of the text input field.		*
+     *  If the location is in the form of a string, obtain the			*
+     *  associated instance of Location.  This will ensure that			*
+     *  short form names are resolved, and the name is displayed with	*
+     *  the proper case. Also format the location name so that it can	*
+     *  be inserted into the value attribute of the text input field.	*
      ********************************************************************/
     if (!is_null($location))
     {		// location supplied
@@ -1829,23 +1846,27 @@ if (strlen($msg) == 0 && !is_null($idir))
     $locName	= '';
 
     htmlHeader($title,
-            array(  '/jscripts/js20/http.js',
+            array(  '/jscripts/tinymce/js/tinymce/tinymce.js',
+                    '/jscripts/js20/http.js',
                     '/jscripts/CommonForm.js',
                     '/jscripts/util.js',
                     '/jscripts/Cookie.js',
-                    '/tinymce/jscripts/tiny_mce/tiny_mce.js',
                     '/jscripts/locationCommon.js',
                     'editEvent.js'),
             true);
 ?>
-<body>
-  <div class="body">
-    <h1>
-      <span class="right">
-    <a href="editEventHelpen.html" target="help">? Help</a>
-      </span>
-      <?php print $heading; ?>
-    </h1>
+  <body>
+    <div class="body">
+      <script>
+        tinyMCEparms.onchange_callback  = 'changeOccupation';
+        tinyMCEparms.valid_elements     = 'a[href|class|target], span[*], br'
+      </script>
+      <h1>
+        <span class="right">
+          <a href="editEventHelpen.html" target="help">? Help</a>
+        </span>
+        <?php print $heading; ?>
+      </h1>
 <?php
     showTrace();
 
@@ -1862,8 +1883,8 @@ if (strlen($msg) == 0 && !is_null($idir))
     }		// errors
     else
     {		// no errors
-    if (false)
-    {
+        if (false)
+        {
 ?>
 <p>
 debug:
@@ -1880,7 +1901,7 @@ debug:
     $location = <?php if (is_null($location)) print 'null'; else  print "'$location'";?>
 </p>
 <?php
-    }		// debug
+        }		// debug
 ?>
   <form name="evtForm" id="evtForm" action="updateEvent.php" method="post">
     <div id="hidden">
@@ -2236,7 +2257,7 @@ debug:
         Notes:
       </label>
       <textarea name="note" id="note" 
-            cols="64" rows="8" class="<?php print $notesClass; ?>"><?php
+            cols="64" rows="8"><?php
         print $notes; ?></textarea>
       <div style="clear: both;"></div>
     </div>
@@ -2436,10 +2457,10 @@ debug:
 <?php
         foreach($altNames as $idnx => $altName)
         {		// loop through defined alternate names
-            if ($altName->get('order') > 0)
+            if ($altName['order'] > 0)
             {
                 $in++;
-                $idnx	= $altName->get('idnx');
+                $idnx	= $altName['idnx'];
 ?>
     <div class="row" id="altNamesRow<?php print $idnx; ?>">
       <label class="column1">
@@ -2580,40 +2601,28 @@ debug:
 <?php
     }
     else
-    {
+    {               // use AJAX
 ?>
       <button type="button" id="updEvent">
-<?php
-}
-
-if ($notesClass	== 'mceNoEditor')
-    $notesText		= 'Show Rich Text Notes';
-else
-    $notesText		= 'Show TextAreas';
-?>
     <u>U</u>pdate Event
-      </button>
-    &nbsp;
-      <button id="raw" type="button">
-    <?php print $notesText;?>
       </button>
     &nbsp;
       <button type="button" id="close">
     Close
       </button>
 <?php
-if (!is_null($notes))
-{		// note area present
+        if (!is_null($notes))
+        {		// note area present
 ?>
     &nbsp;
       <button type="button" id="Clear">
     <u>C</u>lear&nbsp;Notes
       </button>
 <?php
-}		// note area present
+        }		// note area present
 
-    if (!is_null($picIdType))
-    {		// include button for managing pictures
+        if (!is_null($picIdType))
+        {		// include button for managing pictures
 ?>
     &nbsp;
       <button type="button" id="Pictures">
@@ -2622,7 +2631,8 @@ if (!is_null($notes))
       <input type="hidden" name="PicIdType" id="PicIdType" 
             value="<?php print $picIdType; ?>">
 <?php
-    }		// include button for managing pictures
+        }		// include button for managing pictures
+    }       // use AJAX
 ?>
     </p>
   </form>

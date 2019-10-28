@@ -16,6 +16,7 @@
  *		2019/02/20      shrink browse rows to match width of table      *
  *		2019/04/07      ensure that the paging lines can be displayed   *
  *		                within the visible portion of the browser.      *
+ *		2019/06/29      first parameter of displayDialog removed        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -130,19 +131,10 @@ function deleteReg(ev)
 		parms["debug"]	= debug;
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-				      'RegDel$template',
-				      parms,
-				      this,		        // position relative to
-				      confirmDelete,	// 1st button confirms Delete
-				      false);		    // default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("BirthRegResponse.js: deleteReg: " +
-				"Error: <div id='msgDiv'> not defined");
+	displayDialog('RegDel$template',
+			      parms,
+			      this,		        // position relative to
+			      confirmDelete);	// 1st button confirms Delete
 }	        	// function deleteReg
 
 /************************************************************************

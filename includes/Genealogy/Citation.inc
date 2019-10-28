@@ -210,14 +210,18 @@ use Templating\Template;
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/04/15      replace is_a with instanceof                    *
  *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/07/18      use Person::getPerson                           *
+ *		2019/08/06      support accessing most fields from the          *
+ *		                associated Source                               *
+ *		                do not create Source in constructor             *
+ *		                support idsr => instance of Source in           *
+ *		                constructor and $citation->set                  *
+ *		2019/09/20      correct implementation of Citation::dump        *
  *																	    *
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/	
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Source.inc';
-
-define("EXC_CONSTRUCT", "Citation::__construct: ");
-define("EXC_SETFIELD", "Citation::set: ");
 
 /************************************************************************
  *  class Citation														*
@@ -339,36 +343,35 @@ class Citation extends RecordPic
      *																	*
      *	This is intended to be public information.						*
      ********************************************************************/
-    static $recType = array(
-				0			=> "IDIR",
-				1			=> "IDIR",
-				2			=> "IDIR",
-				3			=> "IDIR",
-				4			=> "IDIR",
-				5			=> "IDIR",
-				6			=> "IDIR",
-				7			=> "IDIR",
-				8			=> "IDIR",
-				9			=> "IDIR",
-				10			=> "IDNX",
-				11			=> "IDCR",
-				12			=> "IDCR",
-				13			=> "IDCR",
-				15			=> "IDIR",
-				16			=> "IDIR",
-				17			=> "IDCR",
-				18			=> "IDMR",
-				19			=> "IDMR",
-				20			=> "IDMR",
-				21			=> "IDMR",
-				22			=> "IDMR",
-				23			=> "IDMR",
-				24			=> "IDMR",		// **added**
-				26			=> "IDIR",
-				27			=> "IDIR",
-				30			=> "IDER",
-				31			=> "IDER",
-				40			=> "IDTD");
+    static $recType = array( 0			=> "IDIR",
+							 1			=> "IDIR",
+							 2			=> "IDIR",
+							 3			=> "IDIR",
+							 4			=> "IDIR",
+							 5			=> "IDIR",
+							 6			=> "IDIR",
+							 7			=> "IDIR",
+							 8			=> "IDIR",
+							 9			=> "IDIR",
+							10			=> "IDNX",
+							11			=> "IDCR",
+							12			=> "IDCR",
+							13			=> "IDCR",
+							15			=> "IDIR",
+							16			=> "IDIR",
+							17			=> "IDCR",
+							18			=> "IDMR",
+							19			=> "IDMR",
+							20			=> "IDMR",
+							21			=> "IDMR",
+							22			=> "IDMR",
+							23			=> "IDMR",
+							24			=> "IDMR",		// **added**
+							26			=> "IDIR",
+							27			=> "IDIR",
+							30			=> "IDER",
+							31			=> "IDER",
+							40			=> "IDTD");
 
     /********************************************************************
      *	Citation::$initRow												*
@@ -376,7 +379,7 @@ class Citation extends RecordPic
      *	array containing default values for all fields in a new record	*
      ********************************************************************/
     protected static	$initRow	= array(
-						'idsx'					=> 0,	// possibly zero
+						'idsx'					=> 0,
 						'idsr'					=> 1,
 						'idime'					=> 0,
 						'type'					=> 0,
@@ -406,13 +409,13 @@ class Citation extends RecordPic
      *	Description of record class                                     *
      ********************************************************************/
     protected static	$info	= array(
-                'table'     => 'tblSX',
-                'name'      => 'Citations',
-                'prime'	    => 'idsx',
-	            'srvmg'     => true,
-	            'fldcount'	=> 4,
-                'order'     => '`Order`',
-                'classname' => 'Citation');
+                		'table'     			=> 'tblSX',
+                		'name'      			=> 'Citations',
+                		'prime'	    			=> 'idsx',
+	            		'srvmg'     			=> true,
+	            		'fldcount'				=> 4,
+                		'order'     			=> '`Order`',
+                		'classname' 			=> 'Citation');
 
     /********************************************************************
      *	Citation::$translate											*
@@ -420,19 +423,51 @@ class Citation extends RecordPic
      *	array containing synonyms for field names						*
      ********************************************************************/
     protected static	$translate	= array(
-						'detail'		=> 'srcdetail',
-						'printdetail'	=> 'srcprintdetail',
-						'dettext'		=> 'srcdettext',
-						'printtext'		=> 'srcprinttext',
-						'detnote'		=> 'srcdetnote',
-						'printnote'		=> 'srcprintnote',
-						'print'			=> 'srcprint',
-						'surety'		=> 'srcsurety',
-						'idir'			=> 'idir',
-						'idmr'			=> 'idmr',
-						'ider'			=> 'ider',
-						'idcr'			=> 'idcr',
-						'idnx'			=> 'idnx');
+						'detail'				=> 'srcdetail',
+						'printdetail'			=> 'srcprintdetail',
+						'dettext'				=> 'srcdettext',
+						'printtext'				=> 'srcprinttext',
+						'detnote'				=> 'srcdetnote',
+						'printnote'				=> 'srcprintnote',
+						'print'					=> 'srcprint',
+						'surety'				=> 'srcsurety',
+						'idir'					=> 'idime',
+						'idmr'					=> 'idime',
+						'ider'					=> 'idime',
+						'idcr'					=> 'idime',
+                        'idnx'					=> 'idime',
+                        // the following are fields in the Source
+						'srcname'				=> 'srcname',
+						'srctitle'				=> 'srctitle',
+						'idst'		    		=> 'idst',
+						'srcauthor'				=> 'srcauthor',
+						'srcpubl'				=> 'srcpubl',
+						'srctext'				=> 'srctext',
+						'psrctext'				=> 'psrctext',
+						'fsrctext'				=> 'fsrctext',
+						'tsrctext'				=> 'tsrctext',
+						'srcnote'				=> 'srcnote',
+						'psrcnote'				=> 'psrcnote',
+						'fsrcnote'				=> 'fsrcnote',
+						'tsrcnote'				=> 'tsrcnote',
+						'srccallnum'			=> 'srccallnum',
+						'srctag'				=> 'srctag',
+						'qstag'		    		=> 'qstag',
+						'srcexclude'			=> 'srcexclude',
+						'idar'		    		=> 'idar',
+						'idar2'		    		=> 'idar2',
+						'enteredsd'				=> 'enteredsd',
+						'enteredd'				=> 'enteredd',
+						'filingref'				=> 'filingref',
+						'used'		    		=> 'used',
+						'published'				=> 'published',
+						'verified'				=> 'verified',
+						'srcmpub'				=> 'srcmpub',
+						'srcrollnum'			=> 'srcrollnum',
+						'templateid'			=> 'templateid',
+						'contents'				=> 'contents',
+						'usestandard'			=> 'usestandard',
+						'bibliography'			=> 'bibliography');
 
     /********************************************************************
      *	Citation::$defaultOrder											*
@@ -616,28 +651,54 @@ class Citation extends RecordPic
 						// apply any updates
 						foreach($parms as $fldname => $value)
 						{		// loop through parameters
-                    		$fieldLc	= strtolower($field);
-                    		if (array_key_exists($fieldLc, self::$translate))
-                    		    $fieldLc	= self::$translate[$fieldLc];
-						    // apply any requested changes
-                            if (is_string($fieldLc) &&
-                                $fieldLc != 'idsx' &&
-                                $fieldLc != 'template')
-							    $this->set($fieldLc, $value);
-						}		// loop through parameters
+                    	  $fieldLc	= strtolower($field);
+                    	  if (array_key_exists($fieldLc, self::$translate))
+                    	      $fieldLc	= self::$translate[$fieldLc];
+						  // apply any requested changes
+                          switch ($fieldLc)
+                          {
+                            case 'idsx':
+                                break;      // already done
+
+                            case 'template':
+                                $this->template     = $value;
+                                break;
+
+                            case 'idsr':
+                                if ($value instanceof Source)
+                                {
+                                    $this->source   = $value;
+                                    $this->set('idsr', $this->source['idsr']);
+                                }
+                                else
+                                if (is_int($value) && $value > 0)
+                                    $this->set('idsr', $value);
+                                else
+                                if (ctype_digit($value) && $value > 0)
+                                    $this->set('idsr', (int)$value);
+                                else
+                                    $this->msg  .=
+                            "Invalid value for field 'IDSR'='$value'. ";
+                                break;
+
+                            default:
+                                $this->set($fieldLc, $value);
+                                break;
+                          }
+						}		    // loop through parameters
 
 						// diagnostic output if debug is set
 						$this->dump('Citation Record constructed:');
-				    }		// successful query
+				    }		        // successful query
 				    else
-				    {		// error performing query
+				    {		        // error performing query
                         $errorInfo	= $stmt->errorInfo();
 						$this->msg .= "Citation.inc: " . __LINE__ . " '$queryText', " . 
 								    print_r($errorInfo,true) . ". ";
-				    }		// error performing query
-				}		// existing record
+				    }		        // error performing query
+				}		            // existing record
 				else
-				{		// new record
+				{		            // new record
 				    $dbrow	                = self::$initRow;
 
 				    // calculate value of `order`
@@ -658,8 +719,9 @@ class Citation extends RecordPic
 						if ($stmt->execute($sqlParms))
 						{		// successful query
 						    if ($debug)
-							$warn .= "<p>Citation::__construct: " . __LINE__ .
-									" '$orderQueryText'</p>\n";
+                                $warn   .= "<p>Citation::__construct: " .
+                                            __LINE__ .
+								    	    " '$orderQueryText'</p>\n";
 
 						    $row        	= $stmt->fetch(PDO::FETCH_NUM);
 						    if ($row)
@@ -679,11 +741,38 @@ class Citation extends RecordPic
 				    {		// loop through all parameters
 						$fieldLc	    = strtolower($field);
 						if (array_key_exists($fieldLc, self::$translate))
-						    $fieldLc	= self::$translate[$fieldLc];
-                        if (is_string($fieldLc) &&
-                            $fieldLc != 'idsx' &&
-                            $fieldLc != 'template')
-						    $dbrow[$fieldLc]	= $value;
+                            $fieldLc	= self::$translate[$fieldLc];
+
+                        switch ($fieldLc)
+                        {
+                            case 'idsx':
+                                break;      // already done
+
+                            case 'template':
+                                $this->template     = $value;
+                                break;
+
+                            case 'idsr':
+                                if ($value instanceof Source)
+                                {
+                                    $this->source   = $value;
+                                    $dbrow['idsr']  = $this->source['idsr'];
+                                }
+                                else
+                                if (is_int($value) && $value > 0)
+                                    $dbrow['idsr']  = $value;
+                                else
+                                if (ctype_digit($value) && $value > 0)
+                                    $dbrow['idsr']  = (int)$value;
+                                else
+                                    $this->msg  .=
+                            "Invalid value for field 'IDSR'='$value'. ";
+                                break;
+
+                            default:
+                                $dbrow[$fieldLc]	= $value;
+                                break;
+                        }
 				    }		// loop through all parameters
 
 				    // date of creation of citation
@@ -720,14 +809,7 @@ class Citation extends RecordPic
         {
             $idsr                       = $dbrow['idsr'];
 		    if (is_null($idsr) || $idsr < 1)
-				$dbrow['idsr']	        = 1;
-            if ($this->template)
-                $this->source	        = new Source(array('idsr'   => $idsr,
-                                                      'template'=> $template));
-            else
-                $this->source	        = new Source(array('idsr'   => $idsr));
-            if (!($this->source->isExisting()))
-                $this->msg              .= "Invalid IDSR=$idsr. ";
+				$dbrow['idsr']	        = 1;    // empty Source
 
             // create object
             if (is_null($this->row))
@@ -745,9 +827,7 @@ class Citation extends RecordPic
                  $record->dump('why not existing');
             }	                // validate IDIME
 
-		    // if every field supplied, construct from the array
-
-		    // diagnostic output if debug is set
+            // diagnostic output if debug is set
             $this->dump('Citation Record constructed:');
             $msg                .= $this->msg;
 		}
@@ -767,18 +847,17 @@ class Citation extends RecordPic
      ********************************************************************/
     function get($field)
     {
+        global  $warn;
+
 		$fieldLc	= strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
 		{
 		    case 'idime':
-		    case 'idir':
-		    case 'idmr':
-		    case 'ider':
-		    case 'idcr':
-		    case 'idnx':
+            {                   // synonyms for idime
 				return $this->row['idime'];
+            }                   // synonyms for idime
 
 		    case 'idsx':
 		    case 'idsr':
@@ -801,13 +880,50 @@ class Citation extends RecordPic
 		    case 'override':
 		    case 'overridefootnote':
 		    case 'overridesubsequent':
-		    case 'overridebibliography':
+            case 'overridebibliography':
+            {                   // other fields in the record
 				return parent::get($fieldLc);
+            }                   // other fields in the record
+
+			case 'srcname':
+			case 'srctitle':
+			case 'idst':
+			case 'srcauthor':
+			case 'srcpubl':
+			case 'srctext':
+			case 'psrctext':
+			case 'fsrctext':
+			case 'tsrctext':
+			case 'srcnote':
+			case 'psrcnote':
+			case 'fsrcnote':
+			case 'tsrcnote':
+			case 'srccallnum':
+			case 'srctag':
+			case 'qstag':
+			case 'srcexclude':
+			case 'idar':
+			case 'idar2':
+			case 'enteredsd':
+			case 'enteredd':
+			case 'filingref':
+			case 'used':
+			case 'published':
+			case 'verified':
+			case 'srcmpub':
+			case 'srcrollnum':
+			case 'templateid':
+			case 'contents':
+			case 'usestandard':
+            case 'bibliography':
+            {                   // fields in associated Source
+                return $this->getSource()->get($fieldLc);
+            }                   // fields in associated Source
 
 		    default:
-		    {		// other fields
+		    {		            // other fields
 				return parent::get($fieldLc);
-		    }		// other fields
+		    }		            // other fields
 		}
     }		// function Citation::get
 
@@ -884,7 +1000,7 @@ class Citation extends RecordPic
 			case self::STYPE_LDSC:	    	// 26 Confirmation
 			case self::STYPE_LDSI:	    	// 27 Initiatory
 			{
-			    $refRec	= new Person(array('idir' => $idime));
+			    $refRec	= Person::getPerson($idime);
 			    break;
 			}
 
@@ -979,14 +1095,14 @@ class Citation extends RecordPic
 				    case self::STYPE_ALTNAME:	// 10
 				    {
 						$idir	= $refRec->getIdir();
-						return new Person(array('idir' => $idir));
+						return Person::getPerson($idir);
 				    }
 
 				    //	IDIME points to Child Record tblCR.IDCR
 				    case self::STYPE_CHILDSTATUS:	// 11 Child Status
-				    case self::STYPE_CPRELDAD:	// 12 Relationship to Father
-				    case self::STYPE_CPRELMOM:	// 13 Relationship to Mother
-				    case self::STYPE_LDSP:		// 17 Sealed to Parents
+				    case self::STYPE_CPRELDAD:	    // 12 Relationship to Father
+				    case self::STYPE_CPRELMOM:	    // 13 Relationship to Mother
+				    case self::STYPE_LDSP:		    // 17 Sealed to Parents
 				    {
 						return $refRec->getPerson();
 				    }
@@ -1024,8 +1140,8 @@ class Citation extends RecordPic
 				    //  IDIME points to To-Do records tblTD.IDTD
 				    case self::STYPE_TODO:		// 40 To-Do
 				    {
-						$idir	= $refRec->get('idir');
-						return new Person(array('idir' => $idir));
+						$idir	    = $refRec->get('idir');
+						return Person::getPerson($idir);
 				    }
 				}		// act on record type
 		    } catch (Exception $e)
@@ -1184,16 +1300,17 @@ class Citation extends RecordPic
      ********************************************************************/
     function setIdsr($value)
     {
-		$oldidsr	= $this->row['idsr'];
+		$oldidsr	                = $this->row['idsr'];
 		if ($value != $oldidsr)
 		{			// value changed
-		    try {
-				$this->source	= new Source($value);
-				parent::set('idsr', $value);
-		    } catch (Exception $e) {
-				throw new Exception("Citation::setIdsr: " .
-							    "Invalid new IDSR value $value");
-		    }
+            $source	                = new Source(array('idsr' => $value));
+            if ($source->isExisting())
+            {
+                $this->source       = $source;
+                if ($this->template)
+                    $this->setTemplate($this->template);
+                parent::set('idsr', $value);
+            }
 		}			// value changed
 
 		return $oldidsr;
@@ -1355,10 +1472,12 @@ class Citation extends RecordPic
      ********************************************************************/
     function getSource()
     {
-		if (is_null($this->source))
-            $this->source	= new Source($this->row['idsr']);
-        if ($this->template)
-            $this->source->setTemplate($this->template);
+        if (is_null($this->source))
+        {
+            $this->source	= new Source(array('idsr' => $this->row['idsr']));
+            if ($this->template)
+                $this->source->setTemplate($this->template);
+        }
 		return $this->source;
     }		// function Citation::getSource
 
@@ -1420,41 +1539,88 @@ class Citation extends RecordPic
      ********************************************************************/
     function set($field, $value)
     {
-		$fieldLc	= strtolower($field);
+		$fieldLc	        = strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
-		    $fieldLc	= self::$translate[$fieldLc];
+		    $fieldLc	    = self::$translate[$fieldLc];
 		switch($fieldLc)
-		{
+		{		                // switch on field name
 		    case 'idime':
-		    case 'idir':
-		    case 'idmr':
-		    case 'ider':
-		    case 'idcr':
-		    case 'idnx':
 				return parent::set('idime', $value);
 
-		    case 'idsr':
-				return $this->setIdsr($value);
+            case 'idsr':
+            {
+                if ($value instanceof Source)
+                {
+                    if ($value->isExisting())
+                    {
+                        $this->source           = $value;
+				        return $this->setIdsr($this->source['idsr']);
+                    }
+                }
+                else
+                if (is_int($value) && $value > 0)
+                    return $this->setIdsr($value);
+                else
+                if (ctype_digit($value) && $value > 0)
+                    return $this->setIdsr((int)$value);
+                break;
+            }                   // IDSR
 
 		    case 'type':
 				return $this->setCitType($value);
 
 		    case 'enteredd':
-		    {		// internal date format
+		    {		            // internal date format
 				return $this->setDate($value);
-		    }		// internal date format
+		    }		            // internal date format
 
 		    case 'enteredsd':
-		    {		// cannot alter
-				throw new Exception(EXC_SETFIELD .
-								"invalid field name='$field'");
-		    }		// cannot alter
+		    {		            // cannot alter
+				$this->msg      .= "Citation::set: " .
+								    "invalid field name='$field'";
+		    }		            // cannot alter
+
+			case 'srcname':
+			case 'srctitle':
+			case 'idst':
+			case 'srcauthor':
+			case 'srcpubl':
+			case 'srctext':
+			case 'psrctext':
+			case 'fsrctext':
+			case 'tsrctext':
+			case 'srcnote':
+			case 'psrcnote':
+			case 'fsrcnote':
+			case 'tsrcnote':
+			case 'srccallnum':
+			case 'srctag':
+			case 'qstag':
+			case 'srcexclude':
+			case 'idar':
+			case 'idar2':
+			case 'enteredsd':
+			case 'enteredd':
+			case 'filingref':
+			case 'used':
+			case 'published':
+			case 'verified':
+			case 'srcmpub':
+			case 'srcrollnum':
+			case 'templateid':
+			case 'contents':
+			case 'usestandard':
+            case 'bibliography':
+            {                   // fields in associated Source
+                // do not modify
+                return $this->getSource()->get($fieldLc);
+            }                   // fields in associated Source
 
 		    default:
-		    {		// no validation implemented yet
+		    {		            // permit creation of temporary fields
 				return parent::set($field, $value);
-		    }		// no validation implemented yet
-		}		// switch on field name
+		    }		            // permit creation of temporary fields
+		}		                // switch on field name
     }		// function Citation::set
 
     /********************************************************************
@@ -1480,51 +1646,49 @@ class Citation extends RecordPic
 		if (!is_string($label) || strlen($label) == 0)
 		    $label	= $this->getName();
 
-		$output		= '';
-		if ($debug || $force)
-		{
-		    $output	.= "<p class='label'>$label</p>\n";
-		    $output	.= "<table border='1'>";
+	    $output	        = "<p class='label'>$label</p>\n" .
+	                        "<table border='1'>";
 
-		    foreach($this->row as $key => $value)
-		    {
-				$output	.= "<tr>\n";
-				$output	.= "<th class='label'>\n";
-				$output	.= $key;
-				$output	.= "</th>\n";
-				$output	.= "<td class='dataleft'>\n";
-				$output	.= $value;
+	    foreach($this->row as $key => $value)
+	    {
+			$output	    .= "  <tr>\n" .
+				    		"    <th class='label'>\n      " .
+				    		$key .
+				    		"\n    </th>\n" .
+				    		"    <td class='dataleft'>\n      " .
+				    		$value;
 
-				if (strlen($value) > 0)
-				switch($key)
-				{
-				    case 'enteredd':
-				    {
-						$debug		= false;
-						$date		= new LegacyDate($value);
-						$output		.= "='" . $date->toString() . "'";
-						$debug		= true;
-						break;
-				    }		// dates
+			if (strlen($value) > 0)
+			switch($key)
+			{
+			    case 'enteredd':
+			    {
+					$debug		= false;
+					$date		= new LegacyDate($value);
+					$output		.= "='" . $date->toString() . "'";
+					break;
+			    }		// dates
 
-				    case 'type':
-				    {
-						$output		.= '=' . self::$intType[$value];
-						break;
-				    }		// dates
+			    case 'type':
+			    {
+					$output		.= '=' . self::$intType[$value];
+					break;
+			    }		// dates
 
-				    default:
-				    {
-						break;
-				    }
-				}	// field specific formatting
-				$output	.= "</td>\n";
-				$output	.= "</tr>\n";
-		    }	// loop through keys
-		    $output	.= "</table>\n";
-		}		// debug output enabled
+			    default:
+			    {
+					break;
+			    }
+			}	// field specific formatting
+			$output	        .= "\n    </td>\n" .
+			                    "  </tr>\n";
+	    }	// loop through keys
+	    $output	            .= "</table>\n";
 
-		$warn		.= $output;
+        if ($debug || $force)
+        {
+            $warn		    .= $output;
+        }
 		return $output;
     }		// function Citation::dump
 
@@ -2278,7 +2442,7 @@ class Citation extends RecordPic
                 $tag->update($value);
             else
                 $warn            .= "<p>Citation::toHtml: " . __LINE__ .
-                            " coult not resolve tag with id='$id'</p>\n";
+                            " could not resolve tag with id='$id'</p>\n";
         }
         $html           = $template->compile();
         return $html;

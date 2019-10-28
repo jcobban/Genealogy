@@ -168,6 +168,7 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
+ *		2019/07/20      insert spaces into death date                   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -227,6 +228,10 @@ function loadEdit()
 				name	= element.name;
 		    else
 				name	= element.id;
+            if (name.length == 0)
+                continue;
+
+		    // default handling of <input> elements
 		    element.onkeydown	= keyDown;
 		    element.onchange	= change;	// default handler
 
@@ -236,7 +241,7 @@ function loadEdit()
 		    if (pieces === null)
 		    {
 				alert("editMarriages.js: onLoad: unable to parse name='" +
-					name + "'");
+					name + "' element=" + element.outerHTML);
 				pieces	= [name, name, ''];
 		    }
 		    var	colName		= pieces[1];
@@ -502,7 +507,7 @@ function loadEdit()
 
 				case 'Cbirth':
 				{		// birth date of a child
-				    element.abbrTbl		= MonthAbbrs;
+				    element.abbrTbl		    = MonthAbbrs;
 				    element.onkeydown		= childKeyDown;
 				    element.onchange		= changeCBirth;
 				    element.checkfunc		= checkDate;
@@ -512,9 +517,9 @@ function loadEdit()
 
 				case 'Cdeath':
 				{		// death date of a child
-				    element.abbrTbl		= MonthAbbrs;
+				    element.abbrTbl		    = MonthAbbrs;
 				    element.onkeydown		= childKeyDown;
-				    element.onchange		= change;
+				    element.onchange		= changeCDeath;
 				    element.checkfunc		= checkDate;
 				    element.checkfunc();
 				    break;

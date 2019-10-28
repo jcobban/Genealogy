@@ -29,10 +29,13 @@ use \Exception;
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/MethodistBaptism.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // default parameter values
-$district	= 'unknown';
+$district	    = null;
+$columns		= 1;
+$lang           = 'en';
 
 $parmsText      = "<p class='label'>\$_GET</p>\n" .
                         "<table class='summary'>\n" .
@@ -49,158 +52,104 @@ foreach($_GET as $key => $value)
             $district       = $value;
             break;
         }
+
+	    case 'columns':
+        {
+            if (ctype_digit($value) && $value > 0 && $value < 10)
+                $columns    = intval($value);
+            break;
+        }
+
+        case 'lang':
+        {
+            if (strlen($value) >= 2)
+                $lang       = strtolower(substr($value, 0, 2));
+            break;
+        }
     }		    // process specific named parameters
 }			    // loop through all input parameters
 if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
-if ($district == 'unknown')
+$template       = new FtTemplate("WmbDistrictStats$lang.html");
+
+if (is_null($district))
 	$msg	.= 'Missing mandatory parameter "district".  ';
 
 if (strlen($msg) == 0)
-{			// no errors
+{			    // no errors
 	// execute the query
-	$query	= "SELECT Area, SUM(Surname != '') FROM MethodistBaptisms" .
+	$query	    = "SELECT Area, SUM(Surname != '') FROM MethodistBaptisms " .
 					    "WHERE District=:district" .
                         " GROUP BY Area ORDER BY Area";
-    $sqlParms   = array('district'  => $district);
-    $stmt	 	= $connection->prepare($query);
-    $queryText  = debugPrepQuery($query, $sqlParms);
+    $sqlParms       = array('district'  => $district);
+    $stmt	 	    = $connection->prepare($query);
+    $queryText      = debugPrepQuery($query, $sqlParms);
 	if ($stmt->execute($sqlParms))
-	{		// successful query
-	    $result	= $stmt->fetchAll(PDO::FETCH_NUM);
+	{		    // successful query
+	    $result	    = $stmt->fetchAll(PDO::FETCH_NUM);
 	    if ($debug)
             $warn   .= "<p>WmbDistrictStats.php: " . __LINE__ .
                             " query=$queryText</p>\n";
-	}		// successful query
+	}		    // successful query
 	else
 	{
-	    $msg	.= "query '$queryText' failed: " .
+	    $msg	    .= "query '$queryText' failed: " .
 					   print_r($stmt->errorInfo(),true);
-	}		// query failed
-}			// no errors
+	}		    // query failed
+}			    // no errors
+else
+    $result     = array();
 
-htmlHeader($title,
-	       array('/jscripts/default.js',
-			     '/jscripts/util.js',
-			     '/jscripts/default.js'));
-?>
-<body>
-<?php
-pageTop(array(
-			'/genealogy.php'	=> 'Genealogy',
-			'/genCountry.php?cc=CA'	=> 'Canada',
-			'/Canada/genProvince.php?Domain=CAON'
-							=> 'Ontario',
-			'/Ontario/WmbQuery.html'
-							=> 'New Query',
-			'WmbStats.php'		=> 'Overall Status'));
-?>
-    <div class='body'>
-      <h1>
-        <span class='right'>
-    	  <a href='WmbDistrictStatsHelpen.html' target='_blank'>Help?</a>
-        </span>
-        Ontario: Wesleyan Methodist Baptisms Status for 
-        <?php print $district; ?> District
-      <span style='clear: both;'></span>
-      </h1>
-<?php
-	if (strlen($msg) > 0)
-	{		// print error messages if any
-	    print "<p class='message'>$msg</p>\n";
-	}		// print error messages if any
-	else
-	{		// display results of query
-?>
-      <!--- Put out the response as a table -->
-      <table class='form'>
-        <thead>
-	      <!--- Put out the column headers -->
-	      <tr>
-	        <th class='colhead1st'>
-	          Area
-	        </th>
-	        <th class='colhead'>
-	          Done
-	        </th>
-	      </tr>
-        </thead>
-        <tbody>
-<?php
-	    $columns		= 1;
-	    $col		= 1;
-	    $total		= 0;
-	    foreach($result as $row)
-	    {
-			$township	= $row[0];
-			$count		= $row[1];
-			$total		+= $count;
-			if (strlen($count) > 3)
-			    $count	= substr($count, 0, strlen($count) - 3) . ',' .
-						  substr($count, strlen($count) - 3);
-			if ($col == 1)
-			{
-?>
-	      <tr>
-<?php
-			}
-?>
-	        <td class='odd bold left first'>
-	        <?php print $township; ?>
-	        </td>
-	        <td class='odd bold right'>
-	        <?php print $count; ?>
-	        </td>
-<?php
-			$col++;
-			if ($col > $columns)
-			{	// at column limit, end row
-			    $col	= 1;
-?>
-	     </tr>
-<?php
-			}	// at column limit, end row
-			else
-			{	// start new column
-?>
-	        <td>
-	        </td>
-<?php
-			}	// start new column
-	    }		// process all rows
+// lay out the table header row
+$headRowElt    			= $template['headRow'];
+$headRowHtml   			= $headRowElt->innerHTML();
+$data          			= "         <tr>\n";
+$spacer        			= "";
+for($ic	= $columns; $ic; $ic--)
+{
+    $data               .= $spacer . $headRowHtml;
+    $spacer             = "           <th>\n              </th>\n";
+}
+$data                   .= "        </tr>\n";
+$headRowElt->update($data);
 
-	    // end last row if necessary
-	    if ($col != 1)
-	    {		// partial last column
-?>
-	      </tr>
-<?php
-	    }		// partial last column
+// lay out the data rows
+$dataRowElt    			= $template['dataRow$ROWNUM'];
+$dataRowHtml   			= $dataRowElt->innerHTML();
+$rownum        			= 1;
+$distnum       			= 1;
+$rowclass      			= 'odd';
+$total         			= 0;
+$data          			= '';
+for ($row = reset($result); $row; )
+{
+    $data               .= "         <tr id=\"dataRow$rownum\">\n";
+    $spacer             = "";
+    for($ic = $columns; $ic && $row; $ic--)
+    {
+        $rtemplate      = new \Templating\Template($dataRowHtml);
+        $township	    = $row[0];
+        $distnum++;
+        $count		    = $row[1];
+		$total		    += $count;
+        $rtemplate->set('TOWNSHIP',     $township);
+        $rtemplate->set('CLASS',        $rowclass);
+        $rtemplate->set('COUNT',        number_format($count));
+        $data           .= $spacer . $rtemplate->compile();
+        $spacer         = "           <td>\n              </td>\n";
+        $row            = next($result);
+    }
+    $data               .= "        </tr>\n";
+    $rownum++;
+    if ($rowclass == 'odd')
+        $rowclass       = 'even';
+    else
+        $rowclass       = 'odd';
+}
+$dataRowElt->update($data);
 
-	    // insert comma into formatting of total
-	    if (strlen($total) > 3)
-			$total	= substr($total, 0, strlen($total) - 3) . ',' .
-					  substr($total, strlen($total) - 3);
-?>
-        </tbody>
-        <tfoot>
-          <tr>
-        	<td class='odd bold right first'>
-        	    Total
-        	</td>
-        	<td class='odd bold right'>
-        	    <?php print $total; ?>
-        	</td>
-          </tr>
-        </tfoot>
-      </table>
-<?php
-}		// display results of query
-?>
-    </div>
-<?php
-pageBot();
-?>
-  </body>
-</html>
+$template->set('TOTAL',         number_format($total));
+$template->set('DISTRICT',      $district);
+
+$template->display();

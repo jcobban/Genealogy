@@ -68,9 +68,10 @@ function onLoadUserNames()
     if (dataWidth > windowWidth)
         dataWidth           = windowWidth;
     var topBrowse           = document.getElementById('topBrowse');
-    topBrowse.style.width   = dataWidth + "px";
+        topBrowse.style.width   = dataWidth + "px";
     var botBrowse           = document.getElementById('botBrowse');
-    botBrowse.style.width   = dataWidth + "px";
+    if (botBrowse)
+        botBrowse.style.width   = dataWidth + "px";
 }		// function onLoadNames
 
 /************************************************************************

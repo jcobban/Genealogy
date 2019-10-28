@@ -8,6 +8,7 @@
  *		2012/06/18		created											*
  *		2018/10/24      change implementation of delete                 *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/06/29      first parameter of displayDialog removed        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -191,13 +192,10 @@ function addDialog()
 				       "line"	    : line,
 				       "formname"	: form.name,
 				       "template"	: ''};
-    dialogDiv	= document.getElementById('msgDiv');
-    displayDialog(dialogDiv,
-				  "AddDialog$template",
+    displayDialog("AddDialog$template",
 				  parms,
 				  this,		    	// position relative to
-				  performAdd,		// 1st button performs add
-				  false);		    // default show on open
+				  performAdd);		// 1st button performs add
 
     var element		    = document.getElementById('Count');
     element.onclick	    = focusCount;

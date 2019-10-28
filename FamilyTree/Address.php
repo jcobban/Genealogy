@@ -82,6 +82,10 @@ use \Exception;
  *		2018/02/12		use Template									*
  *						merge functionality of UpdateAddress.php		*
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2019/07/23      use FtTemplate::validateLang                    *
+ *		2019/09/25      for action=delete do not access object          *
+ *		                Address::getIdar no longer saves the object     *
+ *		                fix display for deleted object                  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -91,170 +95,168 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // initial values
-$lang				= 'en';
-$idar				= null;		// key of instance
-$kind				= 0;		// kind of address
-$given				= '';		// given name of ass'ed tblIR record
-$surname			= '';		// surname of ass'ed tblIR record
-$name				= 'new';	// create new address
-$formname			= '';		// form name of invoking page
-$address			= null;		// instance of Address
-$list1Checked		= ''; 
-$list2Checked		= ''; 
-$list3Checked		= ''; 
-$list4Checked		= ''; 
-$list5Checked		= ''; 
-$list6Checked		= ''; 
-$usedChecked		= ''; 
-$tag1Checked		= ''; 
-$verifiedChecked	= ''; 
-$qsTagChecked		= '';
-$duplicates		    = null; 
+$lang					= 'en';
+$idar					= null;		// key of instance
+$kind					= 0;		// kind of address
+$given					= '';		// given name of ass'ed tblIR record
+$surname				= '';		// surname of ass'ed tblIR record
+$name					= 'new';	// create new address
+$formname				= '';		// form name of invoking page
+$address				= null;		// instance of Address
+$list1Checked			= ''; 
+$list2Checked			= ''; 
+$list3Checked			= ''; 
+$list4Checked			= ''; 
+$list5Checked			= ''; 
+$list6Checked			= ''; 
+$usedChecked			= ''; 
+$tag1Checked			= ''; 
+$verifiedChecked		= ''; 
+$qsTagChecked			= '';
+$duplicates		    	= null; 
 $action	            	= '';
 
 // examine the value of all parameters passed with the request
 if (isset($_GET) && count($_GET) > 0)
-{		        // parameters passed by method=get
+{		                        // parameters passed by method=get
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
-    {		    // loop through all parameters
+    {		                    // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
 		switch(strtolower($key))
-		{	    // act on specific key
+		{	                    // act on specific key
 		    case 'formname':
 		    {
 				$formname	= $value;
 				break;
-		    }	// formname
+		    }	                // formname
 
 		    case 'idar':
-		    case 'id':	// backwards compatibility
+		    case 'id':	        // backwards compatibility
 		    {
 				if (strlen($value) == 0 ||
 				    !ctype_digit($value))
-				{	// invalid format
+				{	            // invalid format
 				    $name	= "Invalid Value of idar='$value'";
 				    $msg	.= $name . '. ';
-				}	// invalid format
+				}	            // invalid format
 				else
 				    $idar	= intval($value);
 				break;
-		    }	// idar
+		    }	                // idar
 
 		    case 'kind':
 		    {
 				if ($value == '0' || $value == '1' || $value == '2')
 				    $kind	= intval($value);
 				else
-				{	// invalid format
+				{	            // invalid format
 				    $name	= "Invalid Value of kind='$value'";
 				    $msg	.= $name . '. ';
-				}	// invalid format
+				}	            // invalid format
 				break;
-		    }	// record kind
+		    }	                // record kind
 
 		    case 'given':
 		    {
 				$given		= $value;
 				break;
-		    }	// given name of associated individual
+		    }	                // given name of associated individual
 
 		    case 'surname':
 		    {
 				$surname	= $value;
 				break;
-		    }	// surname of associated individual
+		    }	                // surname of associated individual
 
 		    case 'name':
 		    {
 				$name		= $value;
 				break;
-		    }	// name of address
+		    }	                // name of address
 
 		    case 'lang':
 		    {
-				if (strlen($value) == 2)
-				    $lang	= strtolower($value);
+                $lang       = FtTemplate::validateLang($value);
 				break;
-		    }	// presentation language
+		    }	                // presentation language
 
-		}	    // act on specific key
-    }		    // loop through all parameters
+		}	                    // act on specific key
+    }		                    // loop through all parameters
     if ($debug)
         $warn   .= $parmsText . "</table>\n";
-}		        // parameters passed by method=get
+}		                        // parameters passed by method=get
 else
 if (isset($_POST) && count($_POST) > 0)
-{		// parameters passed by method=post
+{		                        // parameters passed by method=post
     $parmsText  = "<p class='label'>\$_POST</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
-    {		// loop through all parameters
+    {		                    // loop through all parameters
 		if (is_array($value))
             $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>" . print_r($value) .
+                            "<td class='white left'>" . print_r($value, true) .
                             "</td></tr>\n"; 
 		else
             $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                             "<td class='white left'>$value</td></tr>\n"; 
 		switch(strtolower($key))
-		{	// act on specific key
+		{	                    // act on specific key
 		    case 'formname':
 		    {
 				$formname	= $value;
 				break;
-		    }	// formname
+		    }	                // formname
 
 		    case 'action':
 		    {
 				$action		= strtolower($value);
 				break;
-		    }	// action
+		    }	                // action
 
 		    case 'idar':
-		    case 'id':	// backwards compatibility
+		    case 'id':	        // backwards compatibility
 		    {
 				if (strlen($value) == 0 ||
 				    !ctype_digit($value))
-				{	// invalid format
+				{	            // invalid format
 				    $name	= "Invalid Value of idar='$value'";
 				    $msg	.= $name . '. ';
-				}	// invalid format
+				}	            // invalid format
 				else
 				    $idar	= intval($value);
 				break;
-		    }	// idar
+		    }	                // idar
 
 		    case 'kind':
 		    {
 				if ($value == '0' || $value == '1' || $value == '2')
 				    $kind	= intval($value);
 				else
-				{	// invalid format
+				{	            // invalid format
 				    $name	= "Invalid Value of kind='$value'";
 				    $msg	.= $name . '. ';
-				}	// invalid format
+				}	            // invalid format
 				break;
-		    }	// record kind
+		    }	                // record kind
 
 		    case 'lang':
 		    {
-				if (strlen($value) == 2)
-				    $lang	= strtolower($value);
+				$lang	    = FtTemplate::validateLand($value);
 				break;
-		    }	// presentation language
+		    }	                // presentation language
 
-		}	    // act on specific key
-    }		    // loop through all parameters
+		}	                    // act on specific key
+    }		                    // loop through all parameters
     if ($debug)
         $warn   .= $parmsText . "</table>\n";
-}		        // parameters passed by method=post
+}		                        // parameters passed by method=post
 
 // calculate default address name
 if ($kind == 0 &&			// mailing address
@@ -268,23 +270,23 @@ if ($kind == 2 &&			// repository
 // allocate an instance of Address based upon the parameters
 // passed to the script
 if ($idar > 0)
-{			// existing numeric key
+{			                    // existing numeric key
 	$address	= new Address(array('idar' => $idar));
 	if (!$address->isExisting())
-	{		// failed to create instance of Address
+	{		                    // failed to create instance of Address
 	    $name	.= "Invalid value of idar=$idar";
 	    $msg	.= "Invalid value of idar=$idar";
-	}		// failed to create instance of Address
-}			// existing numeric key
+	}		                    // failed to create instance of Address
+}			                    // existing numeric key
 else
-{			// search by name
+{			                    // search by name
 	$address	= new Address(array('addrname'	=> $name, 
-							    'kind'	=> $kind));
+                                    'kind'	    => $kind));
 	if (!$address->isExisting())
-	{		// created new instance of Address
+	{		                    // created new instance of Address
 	    $name	= " New " . $name;
-	}		// created new instance of Address
-}			// search by name
+	}		                    // created new instance of Address
+}			                    // search by name
 
 // act on the instance of Address
 if ($address)
@@ -295,95 +297,113 @@ if ($address)
 	if ($address->isOwner())
 	{			// permit update
 	    if ($action == 'delete')
-	    {			// delete
-			$name		= $address->getName();
+	    {			            // delete
+			$name			= $address['name'];
 
 			// delete the record
 			$address->delete(false);
-			$address	= null;
-			$idar		= 0;
-			$title		= 'Address: ' . $name . ' Deleted';
-	    }			// delete
+			$address		= null;
+			$idar			= 0;
+	    }			            // delete
 	    else
-	    if ($action == 'update')
-	    {			// update
+        if ($action == 'update')
+        {
 			// apply any changes passed in parameters
 			$address->postUpdate(false);
-			$name		= $address->getName();
+			$name			= $address['name'];
 
 			// update or insert the record into the database
 			$address->save(false);
-	    }			// update
+	    }			            // update
 	    else
-			$name		= $address->getName();
-	    $action		= 'Edit';
+			$name			= $address['name'];
+	    $action			    = 'Edit';
 
 	    // until record is saved in database, we may not know the IDAR
 	    // value, which is assigned by the database server
 	    // until this is done, we may not know the IDAR
-	    // value, which is assigned by the database server
-	    if ($idar == 0)
-			$idar		= $address->getIdar();
+        // value, which is assigned by the database server
+        if ($address)
+        {                       // we have an instance of Address
+            if ($idar == 0)
+            {
+                $address->save(false);
+                $idar		= $address->getIdar();
+            }
 
-	    $kind		= $address->getKind();
+	        $kind		    = $address['kind'];
 
-	    // check for duplicates of this address
-	    $getParms		= array('idar'		=> '!=' . $idar,
-							'kind'		=> $kind,
-							'addrname'	=> "^$name$");
-	    $duplicates		= new RecordSet('Addresses',
-								$getParms,
-								'IDAR');
-	}			// permit update
+	        // check for duplicates of this address
+	        $getParms	    = array('idar'		=> '!=' . $idar,
+    	    			    		'kind'		=> $kind,
+	        				    	'addrname'	=> "^$name$");
+	        $duplicates		= new RecordSet('Addresses',
+		    			            		$getParms,
+                                            'IDAR');
+        }                       // we have an instance of Address
+	}			                // permit update
 	else
-	    $action		= 'Display';
+	    $action			    = 'Display';
 
-	$pattern		= $address->getName();
+    if ($address)
+    {
+        $pattern			= $address['name'];
+	    $kind				= $address['kind'];
+    }
+    else
+    {
+        $pattern            = $name;
+        $kind               = 0;
+    }
 	if (strlen($pattern) > 5)
-	    $pattern		= substr($pattern, 0, 5);
+	    $pattern			= substr($pattern, 0, 5);
 
-	$kind			= $address->getKind();
 	switch($kind)
 	{
 	    case 0:
 	    {
-			$kindMail	= 'selected="selected"';
-			$kindEvent	= '';
-			$kindRepo	= '';
+			$kindMail		= 'selected="selected"';
+			$kindEvent		= '';
+			$kindRepo		= '';
 			break;
 	    }
 	
 	    case 1:
 	    {
-			$kindMail	= '';
-			$kindEvent	= 'selected="selected"';
-			$kindRepo	= '';
+			$kindMail		= '';
+			$kindEvent		= 'selected="selected"';
+			$kindRepo		= '';
 			break;
 	    }
 	
 	    case 2:
 	    {
-			$kindMail	= '';
-			$kindEvent	= '';
-			$kindRepo	= 'selected="selected"';
+			$kindMail		= '';
+			$kindEvent		= '';
+			$kindRepo		= 'selected="selected"';
 			break;
 	    }
 	
 	    default:
 	    {
-			$kindMail	= '';
-			$kindEvent	= '';
-			$kindRepo	= '';
+			$kindMail		= '';
+			$kindEvent		= '';
+			$kindRepo		= '';
 			break;
 	    }
 	
-	}
-	$name			= $address->getName();
-	$sortkey		= $address->get('addrsort');
-	if (strlen($sortkey) == 0)
-	    $sortkey		= $name;
-	$title			= 'Address: ' . $name;
-	$style			= $address->get('style');
+    }
+    if ($address)
+    {
+		$name			    = $address['name'];
+		$sortkey		    = $address['addrsort'];
+		if (strlen($sortkey) == 0)
+		    $sortkey		= $name;
+	    $style			    = $address['style'];
+    }
+    else
+        $style              = 0;
+
 	switch($style)
 	{
 	    case 0:
@@ -412,78 +432,88 @@ if ($address)
 }		// got instance of Address
 else
 {		// did not construct instance
-	$name		= 'Unable to Create Instance of Address';
-	$action		= 'Display';
+	$name				= 'Unable to Create Instance of Address';
+	$action				= 'Display';
 }
 
-$template		= new FtTemplate("Address$action$lang.html");
+$template				= new FtTemplate("Address$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		             array('filename'   => '/FamilyTree/Address'));
+$translate              = $template->getTranslate();
+$t                      = $translate['tranTab'];
 
 // handle idiosyncracies of Google geocoder implementation
-$searchName		= $name;
-$part1	    	= '';
-$part2		    = '';
-$county		    = '';
-$geoPattern		= "/^\s*(.*),([a-zA-Z ]*),([a-zA-Z ]+),\s*CA\s*$/";
-$results		= array();
-$res1		    = preg_match($geoPattern, $name, $results);
+$searchName				= $name;
+$part1	    			= '';
+$part2		    		= '';
+$county		    		= '';
+$geoPattern				= "/^\s*(.*),([a-zA-Z ]*),([a-zA-Z ]+),\s*CA\s*$/";
+$results				= array();
+$res1		    		= preg_match($geoPattern, $name, $results);
 if ($res1)
 {
-	$part1		= trim($results[1]);	// street or lot location
-	$county		= trim($results[2]);	// county or city name
-	$province	= trim($results[3]);	// province
-	$getParms	= array('domain'	=> 'CA' . $province,
-						'name'		=> $county);
-	$counties	= new CountySet($getParms);
-	$res2		= preg_match("/\b(lot|lots|con|cons)\b[^,]*,(.*)$/",
-						     $part1,
-						     $results);
+	$part1				= trim($results[1]);	// street or lot location
+	$county				= trim($results[2]);	// county or city name
+	$province			= trim($results[3]);	// province
+	$getParms			= array('domain'	        => 'CA' . $province,
+        						'name'				=> $county);
+	$counties			= new CountySet($getParms);
+	$res2				= preg_match("/\b(lot|lots|con|cons)\b[^,]*,(.*)$/",
+        						     $part1,
+		        				     $results);
 	if (count($counties) > 0)
 	{
 	    if ($res2)
 	    {
-			$part2		= trim($results[2]);
-			$searchName	= "$part2, $county county, $province, CA";
+			$part2				= trim($results[2]);
+			$searchName			= "$part2, $county county, $province, CA";
 	    }
 	    else
-			$searchName	= "$part1, $county county, $province, CA";
+			$searchName			= "$part1, $county county, $province, CA";
 	}
 	else
 	{
 	    if ($res2)
 	    {
-			$part2		= trim($results[2]);
-			$searchName	= "$part2, $county, $province, CA";
+			$part2				= trim($results[2]);
+			$searchName			= "$part2, $county, $province, CA";
 	    }
 	    else
-			$searchName	= "$part1, $county, $province, CA";
+			$searchName			= "$part1, $county, $province, CA";
 	}
 }
 
-$template->set('NAME',			$name);
+$template->set('NAME',			    $name);
+if ($address)
+    $template->set('NAMEANDKIND',		$address->getName($t));
+else
+    $template->set('NAMEANDKIND',		ucfirst($t['deleted']));
+
 if (strlen($msg) == 0)
 {		// no errors detected
+    if ($address)
+    {
 	$template->set('IDAR',			$idar);
 	$template->set('PATTERN',		$pattern);
 	$template->set('KIND',			$kind);
 	$template->set('SORTKEY',		$sortkey);
-	$template->set('ADDRESS1',		$address->get('address1'));
-	$template->set('ADDRESS2',		$address->get('address2'));
-	$template->set('CITY',			$address->get('city'));
-	$template->set('STATE',			$address->get('state'));
-	$template->set('ZIPCODE',		$address->get('zipcode'));
-	$template->set('COUNTRY',		$address->get('country'));
-	$template->set('PHONE1',		$address->get('address1'));
-	$template->set('PHONE2',		$address->get('phone1'));
-	$template->set('EMAIL',			$address->get('phone2'));
-	$template->set('HOMEPAGE',		$address->get('homepage'));
-	$template->set('LATITUDE',		$address->get('latitude'));
-	$template->set('LONGITUDE',		$address->get('longitude'));
-	$template->set('ZOOM',			$address->get('zoom'));
+	$template->set('ADDRESS1',		$address['address1']);
+	$template->set('ADDRESS2',		$address['address2']);
+	$template->set('CITY',			$address['city']);
+	$template->set('STATE',			$address['state']);
+	$template->set('ZIPCODE',		$address['zipcode']);
+	$template->set('COUNTRY',		$address['country']);
+	$template->set('PHONE1',		$address['address1']);
+	$template->set('PHONE2',		$address['phone1']);
+	$template->set('EMAIL',			$address['phone2']);
+	$template->set('HOMEPAGE',		$address['homepage']);
+	$template->set('LATITUDE',		$address['latitude']);
+	$template->set('LONGITUDE',		$address['longitude']);
+	$template->set('ZOOM',			$address['zoom']);
 	$template->set('NOTES',			'');
-	$template->set('TITLE',			$title);
     $template->set('STYLE',			$style);
-	$fsresolved		= $address->get('fsresolved');
-	$veresolved		= $address->get('veresolved');
+	$fsresolved		                = $address['fsresolved'];
+	$veresolved		                = $address['veresolved'];
     for($i = 0; $i <= 2; $i++)
     {
         if ($i  == $fsresolved)
@@ -498,26 +528,26 @@ if (strlen($msg) == 0)
         else
             $template->set("VERESOLVED$i",	'');
     }
-	if ($address->get('list1'))
-	    $list1Checked	= "checked='checked' "; 
-	if ($address->get('list2'))
-	    $list2Checked	= "checked='checked' "; 
-	if ($address->get('list3'))
-	    $list3Checked	= "checked='checked' "; 
-	if ($address->get('list4'))
-	    $list4Checked	= "checked='checked' "; 
-	if ($address->get('list5'))
-	    $list5Checked	= "checked='checked' "; 
-	if ($address->get('list6'))
-	    $list6Checked	= "checked='checked' "; 
-	if ($address->get('used'))
-	    $usedChecked	= "checked='checked' "; 
-	if ($address->get('tag1'))
-	    $tag1Checked	= "checked='checked' "; 
-	if ($address->get('verified'))
-	    $verifiedChecked= "checked='checked' "; 
-	if ($address->get('qstag'))
-	    $qsTagChecked	=  "checked='checked' "; 
+	if ($address['list1'])
+	    $list1Checked				= "checked='checked' "; 
+	if ($address['list2'])
+	    $list2Checked				= "checked='checked' "; 
+	if ($address['list3'])
+	    $list3Checked				= "checked='checked' "; 
+	if ($address['list4'])
+	    $list4Checked				= "checked='checked' "; 
+	if ($address['list5'])
+	    $list5Checked				= "checked='checked' "; 
+	if ($address['list6'])
+	    $list6Checked				= "checked='checked' "; 
+	if ($address['used'])
+	    $usedChecked				= "checked='checked' "; 
+	if ($address['tag1'])
+	    $tag1Checked				= "checked='checked' "; 
+	if ($address['verified'])
+	    $verifiedChecked			= "checked='checked' "; 
+	if ($address['qstag'])
+	    $qsTagChecked				=  "checked='checked' "; 
 	$template->set('LIST1CHECKED',		$list1Checked);
 	$template->set('LIST2CHECKED',		$list2Checked);
 	$template->set('LIST3CHECKED',		$list3Checked);
@@ -541,18 +571,19 @@ if (strlen($msg) == 0)
 	if ($duplicates && $duplicates->count() > 0)
 	    $template->updateTag('duprow$idar', $duplicates);
 	else
-	    $template->updateTag('duplicates', null);
-    $template->updateTag('otherStylesheets',	
-    		             array('filename'   => '/FamilyTree/Address'));
+        $template->updateTag('duplicates', null);
 
 	// display any media files associated with the source
 	ob_start();
 	$address->displayPictures(Picture::IDTYPEAddress);
 	$template->set('PICTURES', ob_get_clean());
+    }               // have instance
+    else
+        $template['locForm']->update(null);
 }
 else
 {
-	$template->updateTag('locForm', null);
+	$template['locForm']->update(null);
 }
 
 $template->display();

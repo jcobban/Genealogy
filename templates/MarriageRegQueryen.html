@@ -6,6 +6,7 @@
  *																		*
  *  History:															*
  *		2018/12/24      use class Template                              *
+ *      2019/07/28      ensure all tags closed                          *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
@@ -39,15 +40,13 @@
         	<legend class='labelSmall'>Identification:</legend>
         <!-- Specify to query marriage registrations from Ontario, Canada -->
           <div class='row'>
-        	<div class='column1'>
         	  <label class='labelSmall' for='RegDomain'>Domain:</label>
-        	  <select name='RegDomain' id='RegDomain'
+        	  <select name='RegDomain' id='RegDomain' style="float: left;"
         			class='white left' size='1'>
         	    <option id="domain$code" value='$code' $selected>
         			$name
         	    </option>
         	  </select>
-        	</div>
         	<div style='clear:both;'></div>
           </div>
           <div class='row'>
@@ -225,26 +224,31 @@
       a county.  A municipality may be a city, town, or township.
     </div>
     <div class='balloon' id='HelpGivenNames'>
-      Limit the response to individuals whose given names match the pattern in
-      this field.  
-      This search is done as a 
+      <p>Limit the response to individuals whose given names match the
+      pattern in this field.  This search is done as a 
       case-insensitive pattern match, not a simple comparison. 
-    <p>Specifying simple text, comprising letters and spaces, matches against
+      </p>
+      <p>Specifying simple text, comprising letters and spaces, matches against
       any names containing that text.  "John" or "john" or "JOHN" will match
-    "Johnathan" and "William John" as well as the simple "John".
-    <p>The text may be a 
+      "Johnathan" and "William John" as well as the simple "John".
+      </p>
+      <p>The text may be a 
         <a href="http://en.wikipedia.org/wiki/Regular_expression">
           	regular expression</a>.
       There are too many options to enumerate here, but a few examples include:
-    <ul>
-        <li>If you want to match just the name "John", excluding names that include
-        	"John" as part of them, enter "^John$".
-        <li>Enumerators often use unusual spellings of names.  For example if you
-          	to match names including both "Henry" and "Henery", enter "Hen.*ry".
-    </ul>
+      </p>
+      <ul>
+        <li>If you want to match just the name "John", excluding names
+            that include "John" as part of them, enter "^John$".
+        </li>
+        <li>Enumerators often use unusual spellings of names.  For example
+            if you to match names including both "Henry" and "Henery",
+            enter "Hen.*ry".
+        </li>
+      </ul>
     </div>
     <div class='balloon' id='HelpSurname'>
-    <p>This field is used to specify text to look for in the surname of 
+      <p>This field is used to specify text to look for in the surname of 
       the person getting married.
       If the value contains only letters and spaces then only surnames that match
       exactly (except for case) are found.  Otherwise this
@@ -254,31 +258,36 @@
       For example to match surnames starting with "McL..." and ending with "...n",
       such as "McLean", "McLain", "McLennan", or "McLellan" you could specify 
     "^McL.*n$".
+      </p>
     <p>The meaning of this field changes if the Soundex option is selected.
-    <p>The Soundex code has been used for decades to attempt to match names that
-      sound similar.  For example it is used by police forces to perform a rough
-      match for the names of drivers.  It is a problematic tool, as it
+      </p>
+      <p>The Soundex code has been used for decades to attempt to match names
+      that sound similar.  For example it is used by police forces to perform
+      a rough match for the names of drivers.  It is a problematic tool, as it
       is based upon the phonetics of British surnames.
       If you select Soundex then the search
       is made for surnames that "sound like" the given surname.  For example
-      specifying Soundex together with "McLean" will match all of the surnames in
-      the pattern match example under "Surname", but many other names as well, such
-    "McCallum", "McAllan", "McClain", and "McWilliams". 
+      specifying Soundex together with "McLean" will match all of the surnames
+      in the pattern match example under "Surname", but many other names
+      as well, such "McCallum", "McAllan", "McClain", and "McWilliams". 
+      </p>
     </div>
     <div class='balloon' id='HelpSurnameSoundex'> 
-    <p>The Soundex code has been used for decades to attempt to match names that
+      The Soundex code has been used for decades to attempt to match names that
       sound similar.  For example it is used by police forces to perform a rough
       match for the names of drivers.  It is a problematic tool, as it
       is based upon the phonetics of British surnames.
       If you select this option along with a
-      complete surname, not a pattern match, in the Surname field, then the search
+      complete surname, not a pattern match, in the Surname field, then
+      the search
       is made for surnames that "sound like" the given surname.  For example
-      specifying Soundex together with "McLean" will match all of the surnames in
-      the pattern match example under "Surname", but many other names as well, such
-    "McCallum", "McAllan", "McClain", and "McWilliams". 
+      specifying Soundex together with "McLean" will match all of the 
+      surnames in
+      the pattern match example under "Surname", but many other names as well, 
+      such "McCallum", "McAllan", "McClain", and "McWilliams". 
     </div>
     <div class='balloon' id='HelpOccupation'>
-    <p>This option is used to search for marriages based upon the
+      This option is used to search for marriages based upon the
       occupation of the person getting married. 
       This field uses 
         <a href="http://en.wikipedia.org/wiki/Regular_expression">
@@ -288,7 +297,7 @@
       or "Labourer", including "Farm Labourer" and "R'y Laborer".
     </div>
     <div class='balloon' id='HelpBYear'>
-    <p>The Birth Year and Range fields are used to search for
+      The Birth Year and Range fields are used to search for
       individuals based upon their approximate birth year as calculated
       based upon the age at the time of marriage. 
       If Range is not specified then the Birth Year must match
@@ -299,13 +308,13 @@
       Birth Year.
     </div>
     <div class='balloon' id='HelpPlace'>
-    <p>This option is used to search for individuals based upon where they were
+      This option is used to search for individuals based upon where they were
       married.  This is a pattern match.  For example searching for "Canada"
       will also match "Canada East", "Canada West", "Lower Canada",
       and "Upper Canada".
     </div>
     <div class='balloon' id='HelpDate'>
-    <p>This field is used to specify text to look for in date of marriage.
+      This field is used to specify text to look for in date of marriage.
       For example searching for "1910" will find people who were married in
       1910.
       Specifying "Jan" will find people who were married in January.
@@ -337,7 +346,7 @@
       address of the informant.
     </div>
     <div class='balloon' id='HelpReligion'>
-    <p>This option is used to search for individuals based upon their
+      This option is used to search for individuals based upon their
       religious affiliation.  This is a pattern match. 
       For example searching for
       "Meth" will match any religion containing that string, including 

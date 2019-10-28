@@ -9,10 +9,11 @@ use \Exception;
  *  in the family tree table of individuals.							*
  *																		*
  *  URI Parameters:														*
- *		idir			unique numeric key of the first instance of		*
- *						Person											*
+ *		idir1			unique numeric key of the first instance of		*
+ *						Person.  Synonyms idir and id.					*
  *		idir2			unique numeric key of the first instance of		*
  *						Person											*
+ *		lang            preferred user language of communication        *
  *																		*
  *  History:															*
  *		2010/12/25		created											*
@@ -52,6 +53,7 @@ use \Exception;
  *		2019/01/07      use namespace Genealogy                         *
  *		                use Template                                    *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/09/09      customize error messages from template          *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -66,7 +68,9 @@ $nameuri			= '';
 $birthmin			= '';
 $birthmax			= '';
 $idir	    		= null;
+$idirtext           = null;
 $idir2	    		= null;
+$idir2text          = null;
 $lang               = 'en';
 
 $parmsText  = "<p class='label'>\$_GET</p>\n" .
@@ -81,21 +85,27 @@ foreach($_GET as $key => $value)
 	{
 	    case 'id':
 	    case 'idir':
-	    {		    // identifier of individual
-            $idir		= $value;
+	    case 'idir1':
+        {		    // identifier of individual
+            if (is_int($value) || (is_string($value) && ctype_digit($value)))
+                $idir		= (int)$value;
+            else
+                $idirtext   = $value;
             break;
         }		    // identifier of individual
 
 	    case 'idir2':
 	    {		    // identifier of individual
-            $idir2		= $value;
+            if (is_int($value) || (is_string($value) && ctype_digit($value)))
+                $idir2		= (int)$value;
+            else
+                $idir2text  = $value;
             break;
         }		    // identifier of individual
 
 	    case 'lang':
         {		    // identifier of individual
-            if (strlen($value) >= 2)
-                $lang		= strtolower(substr($value,0,2));
+            $lang		= FtTemplate::validateLang($value);
             break;
         }		    // identifier of individual
 
@@ -106,6 +116,9 @@ if ($debug)
 
 // get template
 $template		= new FtTemplate("mergeIndivid$lang.html");
+$template['otherStylesheets']->update(array('filename'    => 'mergeIndivid'));
+$translate      = $template->getTranslate();
+$t              = $translate['tranTab'];
 
 $template->set('LANG', $lang);
 if ($debug)
@@ -114,149 +127,181 @@ else
     $template->set('DEBUG', 'N');
 
 // individual
-if (!is_null($idir) > 0 && ctype_digit($idir))
-{			// get the requested individual
-    $template->set('IDIR', $idir);
-    $person		    = new Person(array('idir' => $idir));
-    $isOwner		= canUser('edit') && 
-					  $person->isOwner();
-    if (!$isOwner)
-		$msg	    .= "You are not authorized to update this individual. ";
+if (isset($idir))
+{			        // get the first individual
+    $template->set('IDIR',          $idir);
+    $person		                = new Person(array('idir' => $idir));
+    if ($person->isExisting())
+    {
+	    $isOwner		        = canUser('edit') && $person->isOwner();
+	    $name	                = $person->getName(Person::NAME_INCLUDE_DATES);
+	    $template->set('NAME',      $name);
+        if (!$isOwner)
+        {
+            $text               = $template['firstNotAuth']->innerHTML;
+            $msg                .= str_replace('$idir', $idir, $text);
+        }
+	    $given		            = $person->getGivenName();
+	    $template->set('GIVEN',     $given);
+	    if (strlen($given) > 2)
+			$givenPre	        = substr($given, 0, 2);
+	    else
+			$givenPre	        = $given;
+	    $template->set('GIVENPRE',  $givenPre);
+	    $surname	            = $person->getSurname();
+	    $nameuri	            = rawurlencode($surname . ', ' . $given);
+	    $template->set('NAMEURI',       $nameuri);
+	    if (strlen($surname) == 0)
+			$prefix	            = '';
+	    else
+	    if (substr($surname,0,2) == 'Mc')
+			$prefix	            = 'Mc';
+	    else
+	        $prefix	            = substr($surname,0,1);
+	    $template->set('SURNAME',       $surname);
+	    $template->set('PREFIX',        $prefix);
+	    $treename		        = $person->getTreeName();
+        $template->set('TREENAME', $treename);
 
-    $name	        = $person->getName(Person::NAME_INCLUDE_DATES);
-    $template->set('NAME', $name);
-    $given		    = $person->getGivenName();
-    $template->set('GIVEN', $given);
-    if (strlen($given) > 2)
-		$givenPre	= substr($given, 0, 2);
-    else
-		$givenPre	= $given;
-    $surname	    = $person->getSurname();
-    $nameuri	    = rawurlencode($surname . ', ' . $given);
-    $template->set('NAMEURI', $nameuri);
-    if (strlen($surname) == 0)
-		$prefix	    = '';
-    else
-    if (substr($surname,0,2) == 'Mc')
-		$prefix	    = 'Mc';
-    else
-        $prefix	    = substr($surname,0,1);
-    $template->set('SURNAME', $surname);
-    $template->set('PREFIX', $prefix);
-    $treename		= $person->getTreeName();
-    $template->set('TREENAME', $treename);
-    // interpret sex of individual
-    $gender		    = $person->getGender();
-    if ($gender == Person::MALE)
-		$gender		= 'M';
-    else
-    if ($gender == Person::FEMALE)
-		$gender		= 'F';
-    else
-		$gender		= '';
-    $template->set('GENDER', $gender);
+	    // interpret sex of individual
+	    $gender		            = $person->getGender();
+        if ($gender == Person::MALE)
+        {
+			$gender		        = 'M';
+            $genderClass	    = 'male';
+        }
+	    else
+        if ($gender == Person::FEMALE)
+        {
+			$gender		        = 'F';
+			$genderClass        = 'female';
+        }
+	    else
+        {
+			$gender		        = '';
+			$genderClass        = 'other';
+        }
+	    $template->set('GENDER',        $gender);
+	    $template->set('GENDERCKASS',   $gender);
+	
+	    // numeric identified of Address record if any
+	    $idar		            = $person->get('idar');
+	    $template->set('IDAR', $idar);
 
-    // interpret encoded field values
-    $idar		    = $person->get('idar');
-    $template->set('IDAR', $idar);
+        // birth event
+	    $birth		            = $person->getBirthEvent();
+		$birthd		            = '';
+	    $birthLocationName	    = '';
+	    if ($birth)
+	    {               // birth event present
+			$birthd		        = $birth->getDate(9999);
+			$birthyear	        = floor($birth->get('eventsd')/10000);
+            $birthmin	        = $birthyear - 10;
+            if ($birthmin < -9999)
+                $birthmin       = -9999;
+            $birthmax	        = $birthyear + 10;
+            if ($birthmax < -9980)
+                $birthmax       = 3000;
+			$idlrbirth	        = $birth->get('idlrevent');
+		    if($idlrbirth > 1)
+		    {
+				$birthLocation	= new Location(array('idlr' => $idlrbirth));
+				$birthLocationName	= $birthLocation->getName();
+		    }		    // birth date specified
+	    }               // birth event present
+	    else
+	    {               // birth event absent
+			$birthmin	        = -9999;
+			$birthmax	        = 2100;
+	    }               // birth event absent
+	    $template->set('BIRTHD',            $birthd);
+	    $template->set('BIRTHLOCATIONNAME', $birthLocationName);
+	    $template->set('BIRTHMIN',          $birthmin);
+	    $template->set('BIRTHMAX',          $birthmax);
 
-    $birth		    = $person->getBirthEvent();
-    if ($birth)
-    {
-		$birthd		= $birth->getDate(9999);
-		$birthyear	= floor($birth->get('eventsd')/10000);
-		$birthmin	= $birthyear - 10;
-		$birthmax	= $birthyear + 10;
-		$idlrbirth	= $birth->get('idlrevent');
-    }
+        // christening event
+	    $chris		            = $person->getChristeningEvent();
+		$chrisd		            = '';
+	    $chrisLocationName	    = '';
+	    if ($chris)
+	    {
+			$chrisd		        = $chris->getDate(9999);
+			$idlrchris	        = $chris->get('idlrevent');
+		    if ($idlrchris > 1)
+		    {
+				$chrisLocation	= new Location(array('idlr' => $idlrchris));
+				$chrisLocationName	= $chrisLocation->getName();
+		    }		    // christening location specified
+	    }
+	    $template->set('CHRISD', $chrisd);
+	    $template->set('CHRISLOCATIONNAME', $chrisLocationName);
+
+        // death event
+	    $death		            = $person->getDeathEvent();
+		$deathd		            = '';
+	    $deathLocationName	    = '';
+	    if ($death)
+	    {
+			$deathd		        = $death->getDate(9999);
+			$idlrdeath	        = $death->get('idlrevent');
+	        if($idlrdeath > 1)
+	        {
+			    $deathLocation	= new Location(array('idlr' => $idlrdeath));
+			    $deathLocationName	= $deathLocation->getName();
+	        }		    // death location specified
+	    }
+	    $template->set('DEATHD', $deathd);
+	    $template->set('DEATHLOCATIONNAME', $deathLocationName);
+
+        // buried event
+	    $buried		            = $person->getBuriedEvent();
+		$buriedd	            = '';
+	    $buriedLocationName	    = '';
+	    if ($buried)
+	    {
+			$buriedd	        = $buried->getDate(9999);
+			$idlrburied	        = $buried->get('idlrevent');
+	        if($idlrburied > 1)
+	        {
+			    $buriedLocation	= new Location(array('idlr' => $idlrburied));
+			    $buriedLocationName	= $buriedLocation->getName();
+	        }		    // buried location specified
+	    }
+	    $template->set('BURIEDD', $buriedd);
+	    $template->set('BURIEDLOCATIONNAME', $buriedLocationName);
+    }                   // first person is existing
     else
-    {
-		$birthd		= '';
-		$birthmin	= -9999;
-		$birthmax	= 2100;
-		$idlrbirth	= 1;
-    }
-    $birthLocationName	= '';
-    if($idlrbirth > 1)
-    {
-		$birthLocation	= new Location(array('idlr' => $idlrbirth));
-		$birthLocationName	= $birthLocation->getName();
-    }		// specified
-    $template->set('BIRTHD', $birthd);
-    $template->set('BIRTHLOCATIONNAME', $birthLocationName);
-    $template->set('BIRTHMIN', $birthmin);
-    $template->set('BIRTHMAX', $birthmax);
-
-    $chris		    = $person->getChristeningEvent();
-    if ($chris)
-    {
-		$chrisd		= $chris->getDate(9999);
-		$idlrchris	= $chris->get('idlrevent');
-    }
-    else
-    {
-		$chrisd		= '';
-		$idlrchris	= 1;
-    }
-    $chrisLocationName	= '';
-    if ($idlrchris > 1)
-    {
-		$chrisLocation	= new Location(array('idlr' => $idlrchris));
-		$chrisLocationName	= $chrisLocation->getName();
-    }		// specified
-    $template->set('CHRISD', $chrisd);
-    $template->set('CHRISLOCATIONNAME', $chrisLocationName);
-
-    $death		    = $person->getDeathEvent();
-    if ($death)
-    {
-		$deathd		= $death->getDate(9999);
-		$idlrdeath	= $death->get('idlrevent');
-    }
-    else
-    {
-		$deathd		= '';
-		$idlrdeath	= 1;
-    }
-    $deathLocationName	= '';
-    if($idlrdeath > 1)
-    {
-		$deathLocation	= new Location(array('idlr' => $idlrdeath));
-		$deathLocationName	= $deathLocation->getName();
-    }		// specified
-    $template->set('DEATHD', $deathd);
-    $template->set('DEATHLOCATIONNAME', $deathLocationName);
-
-    $buried		    = $person->getBuriedEvent();
-    if ($buried)
-    {
-		$buriedd	= $buried->getDate(9999);
-		$idlrburied	= $buried->get('idlrevent');
-    }
-    else
-    {
-		$buriedd	= '';
-		$idlrburied	= 1;
-    }
-    $buriedLocationName	= '';
-    if($idlrburied > 1)
-    {
-		$buriedLocation	= new Location(array('idlr' => $idlrburied));
-		$buriedLocationName	= $buriedLocation->getName();
-    }		// specified
-    $template->set('BURIEDD', $buriedd);
-    $template->set('BURIEDLOCATIONNAME', $buriedLocationName);
-
-}		// get the requested individual
+    {                   // first person is not existing
+        $text	                = $template['firstInvalid']->innerHTML;
+        $msg                    .= str_replace('$idir', $idir, $text);
+        $template->set('NAME',	$t['Not Existing']);
+    }                   // first person is not existing
+}		                // get the first person
 else
+{                       // first person not identified
+    if (is_null($idirtext))
+    {
+        $msg	                .= $template['firstMissing']->innerHTML;
+        $template->set('NAME',	$t['Missing']);
+    }
+    else
+    {
+        $text	                = $template['firstInvalid']->innerHTML;
+        $msg                    .= str_replace('$idir', $idirtext, $text);
+        $template->set('NAME',	$t['Invalid']);
+    }
+}                       // first person not identified
+
+if (strlen($msg) > 0)
 {
     $template->set('IDIR',              '');
-    $template->set('NAME',				'');
     $template->set('GIVEN',			    '');
+	$template->set('GIVENPRE',          '');
     $template->set('SURNAME',			'');
     $template->set('PREFIX',			'');
     $template->set('TREENAME',			'');
     $template->set('GENDER',			'');
+    $template->set('GENDERCLASS',		'other');
     $template->set('IDAR',				'');
     $template->set('BIRTHD',			'');
     $template->set('BIRTHLOCATIONNAME', '');
@@ -266,145 +311,173 @@ else
     $template->set('DEATHLOCATIONNAME', '');
     $template->set('BURIEDD',			'');
     $template->set('BURIEDLOCATIONNAME','');
-	$msg		.= 'Missing or invalid value of IDIR. ';
 }
 
 // other individual to merge with first individual
-if (!is_null($idir2) > 0 && ctype_digit($idir2))
+if (isset($idir2))
 {			// get the requested individual
-    $template->set('IDIR2', $idir2);
-    $person		    = new Person(array('idir' => $idir2));
-    $isOwner		= canUser('edit') && 
-					  $person->isOwner();
-    if (!$isOwner)
-		$msg	    .= "You are not authorized to update this individual. ";
+  if ($idir2 == $idir)
+  {
+        $text	                = $template['cannotMergeSelf']->innerHTML;
+        $msg                    .= str_replace('$idir', $idir, $text);
+	    $template->set('NAME2', 'Self');
+  }
+  else
+  {       // distinct
+    $template->set('IDIR2',         $idir2);
+    $person		        = new Person(array('idir' => $idir2));
+    if ($person->isExisting())
+    {
+	    $isOwner		= canUser('edit') && 
+						  $person->isOwner();
+	    $name	        = $person->getName(Person::NAME_INCLUDE_DATES);
+	    $template->set('NAME2',     $name);
+        if (!$isOwner)
+        {
+            $text               = $template['secondNotAuth']->innerHTML;
+            $msg                .= str_replace('$idir', $idir2, $text);
+        }
+	
+	    $given		    = $person->getGivenName();
+	    $template->set('GIVEN2',    $given);
+	    if (strlen($given) > 2)
+			$givenPre	= substr($given, 0, 2);
+	    else
+			$givenPre	= $given;
+	    $template->set('GIVENPRE2', $givenPre);
+	    $surname	    = $person->getSurname();
+	    $nameuri	    = rawurlencode($surname . ', ' . $given);
+	    if (strlen($surname) == 0)
+			$prefix	    = '';
+	    else
+	    if (substr($surname,0,2) == 'Mc')
+			$prefix	    = 'Mc';
+	    else
+	        $prefix	    = substr($surname,0,1);
+	    $template->set('SURNAME2',  $surname);
+	    $template->set('PREFIX2',   $prefix);
+	    $treename		    = $person->getTreeName();
+	    $template->set('TREENAME2', $treename);
+	    // interpret sex of individual
+	    $gender		        = $person->getGender();
+	    if ($gender == Person::MALE)
+			$gender		    = 'M';
+	    else
+	    if ($gender == Person::FEMALE)
+			$gender		    = 'F';
+	    else
+			$gender		    = '';
+	    $template->set('GENDER2', $gender);
+	
+	    // numeric index to associated Address record if any
+	    $idar		        = $person->get('idar');
+	    $template->set('IDAR2', $idar);
 
-    $name	        = $person->getName(Person::NAME_INCLUDE_DATES);
-    $template->set('NAME2', $name);
-    $given		    = $person->getGivenName();
-    $template->set('GIVEN2', $given);
-    if (strlen($given) > 2)
-		$givenPre	= substr($given, 0, 2);
-    else
-		$givenPre	= $given;
-    $surname	    = $person->getSurname();
-    $nameuri	    = rawurlencode($surname . ', ' . $given);
-    if (strlen($surname) == 0)
-		$prefix	    = '';
-    else
-    if (substr($surname,0,2) == 'Mc')
-		$prefix	    = 'Mc';
-    else
-        $prefix	    = substr($surname,0,1);
-    $template->set('SURNAME2', $surname);
-    $template->set('PREFIX2', $prefix);
-    $treename		= $person->getTreeName();
-    $template->set('TREENAME2', $prefix);
-    // interpret sex of individual
-    $gender		    = $person->getGender();
-    if ($gender == Person::MALE)
-		$gender		= 'M';
-    else
-    if ($gender == Person::FEMALE)
-		$gender		= 'F';
-    else
-		$gender		= '';
-    $template->set('GENDER2', $gender);
+        // birth event
+	    $birth		        = $person->getBirthEvent();
+		$birthd		        = '';
+        $birthLocationName	= '';
+        $idlrbirth          = 1;
+	    if ($birth)
+	    {
+			$birthd		    = $birth->getDate(9999);
+			$idlrbirth	    = $birth->get('idlrevent');
+	    }
+	    if ($idlrbirth > 1)
+	    {
+			$birthLocation	= new Location(array('idlr' => $idlrbirth));
+			$birthLocationName	= $birthLocation->getName();
+	    }		// specified
+	    $template->set('BIRTHD2', $birthd);
+	    $template->set('BIRTHLOCATIONNAME2', $birthLocationName);
+	
+        // christening event
+	    $chris		        = $person->getChristeningEvent();
+		$chrisd		        = '';
+		$idlrchris	        = 1;
+	    $chrisLocationName	= '';
+	    if ($chris)
+	    {
+			$chrisd		    = $chris->getDate(9999);
+			$idlrchris	    = $chris->get('idlrevent');
+	    }
+	    if ($idlrchris > 1)
+	    {
+			$chrisLocation	= new Location(array('idlr' => $idlrchris));
+			$chrisLocationName	= $chrisLocation->getName();
+	    }		// specified
+	    $template->set('CHRISD2', $chrisd);
+	    $template->set('CHRISLOCATIONNAME2', $chrisLocationName);
 
-    // interpret encoded field values
-    $idar		    = $person->get('idar');
-    $template->set('IDAR2', $idar);
+        // death event
+	    $death		        = $person->getDeathEvent();
+		$deathd		        = '';
+		$idlrdeath	        = 1;
+	    $deathLocationName	= '';
+	    if ($death)
+	    {
+			$deathd		    = $death->getDate(9999);
+			$idlrdeath	    = $death->get('idlrevent');
+	    }
+	    if ($idlrdeath > 1)
+	    {
+			$deathLocation	= new Location(array('idlr' => $idlrdeath));
+			$deathLocationName	= $deathLocation->getName();
+	    }		// specified
+	    $template->set('DEATHD2', $deathd);
+	    $template->set('DEATHLOCATIONNAME2', $deathLocationName);
 
-    $birth		    = $person->getBirthEvent();
-    if ($birth)
-    {
-		$birthd		= $birth->getDate(9999);
-		$idlrbirth	= $birth->get('idlrevent');
-    }
+        // buried event
+	    $buried		        = $person->getBuriedEvent();
+		$buriedd	        = '';
+		$idlrburied	        = 1;
+	    $buriedLocationName	= '';
+	    if ($buried)
+	    {
+			$buriedd	    = $buried->getDate(9999);
+			$idlrburied	    = $buried->get('idlrevent');
+	    }
+	    if ($idlrburied > 1)
+	    {
+			$buriedLocation	= new Location(array('idlr' => $idlrburied));
+			$buriedLocationName	= $buriedLocation->getName();
+	    }		// specified
+	    $template->set('BURIEDD2', $buriedd);
+	    $template->set('BURIEDLOCATIONNAME2', $buriedLocationName);
+	    $template->set('VIEW2DISABLED', '');
+    }                   // second person is existing
     else
-    {
-		$birthd		= '';
-		$idlrbirth	= 1;
-    }
-    $birthLocationName	= '';
-    if($idlrbirth > 1)
-    {
-		$birthLocation	= new Location(array('idlr' => $idlrbirth));
-		$birthLocationName	= $birthLocation->getName();
-    }		// specified
-    $template->set('BIRTHD2', $birthd);
-    $template->set('BIRTHLOCATIONNAME2', $birthLocationName);
-
-    $chris		    = $person->getChristeningEvent();
-    if ($chris)
-    {
-		$chrisd		= $chris->getDate(9999);
-		$idlrchris	= $chris->get('idlrevent');
-    }
-    else
-    {
-		$chrisd		= '';
-		$idlrchris	= 1;
-    }
-    $chrisLocationName	= '';
-    if ($idlrchris > 1)
-    {
-		$chrisLocation	= new Location(array('idlr' => $idlrchris));
-		$chrisLocationName	= $chrisLocation->getName();
-    }		// specified
-    $template->set('CHRISD2', $chrisd);
-    $template->set('CHRISLOCATIONNAME2', $chrisLocationName);
-
-    $death		    = $person->getDeathEvent();
-    if ($death)
-    {
-		$deathd		= $death->getDate(9999);
-		$idlrdeath	= $death->get('idlrevent');
-    }
-    else
-    {
-		$deathd		= '';
-		$idlrdeath	= 1;
-    }
-    $deathLocationName	= '';
-    if($idlrdeath > 1)
-    {
-		$deathLocation	= new Location(array('idlr' => $idlrdeath));
-		$deathLocationName	= $deathLocation->getName();
-    }		// specified
-    $template->set('DEATHD2', $deathd);
-    $template->set('DEATHLOCATIONNAME2', $deathLocationName);
-
-    $buried		    = $person->getBuriedEvent();
-    if ($buried)
-    {
-		$buriedd	= $buried->getDate(9999);
-		$idlrburied	= $buried->get('idlrevent');
-    }
-    else
-    {
-		$buriedd	= '';
-		$idlrburied	= 1;
-    }
-    $buriedLocationName	= '';
-    if($idlrburied > 1)
-    {
-		$buriedLocation	= new Location(array('idlr' => $idlrburied));
-		$buriedLocationName	= $buriedLocation->getName();
-    }		// specified
-    $template->set('BURIEDD2', $buriedd);
-    $template->set('BURIEDLOCATIONNAME2', $buriedLocationName);
-    $template->set('VIEW2DISABLED', '');
-}		// get the requested individual
+    {                   // second person is not existing
+        $text	                = $template['secondInvalid']->innerHTML;
+        $msg                    .= str_replace('$idir', $idir2, $text);
+        $template->set('NAME2',	$t['Not Existing']);
+    }                   // second person is not existing
+  }                     // distinct
+}		                // second person specified
 else
+{                       // second person not identified
+    if (is_null($idir2text))
+    {
+        $msg	                .= $template['secondMissing']->innerHTML;
+        $template->set('NAME2',	$t['Missing']);
+    }
+    else
+    {
+        $text	                = $template['secondInvalid']->innerHTML;
+        $msg                    .= str_replace('$idir', $idir2text, $text);
+        $template->set('NAME2',	$t['Invalid']);
+    }
+}                       // second person not identified
+
+if (strlen($msg) > 0)
 {
     $template->set('IDIR2',				'');
-    $template->set('NAME2',				'');
     $template->set('GIVEN2',			'');
     $template->set('SURNAME2',			'');
     $template->set('PREFIX2',			'');
     $template->set('TREENAME2',			'');
     $template->set('GENDER2',			'');
+    $template->set('GENDER2CLASS',		'other');
     $template->set('IDAR2',				'');
     $template->set('BIRTHD2',			'');
     $template->set('BIRTHLOCATIONNAME2','');

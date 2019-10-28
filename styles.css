@@ -118,6 +118,7 @@
  *      2019/04/18      brighten up body background                     *
  *      2019/06/25      change div.menu, add a.menuitem, hr.menubar     *
  *                      to make menu look more like an application      *
+ *      2019/07/25      add grid layouts                                *
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
@@ -174,6 +175,70 @@
                 float:              right;
                 text-align:         right;
                 padding:            0px 4px 0px 4px;
+                }
+
+   /*********************************************************************
+    *   Styles for laying out grids of items                            *
+    *********************************************************************/
+    .grid1 {    display: grid; 
+                grid-template-columns: auto; 
+                }
+    .grid2 {    display: grid; 
+                grid-template-columns: auto auto; 
+                }
+    .grid3 {    display: grid; 
+                grid-template-columns: auto auto auto; 
+                }
+    .grid4 {    display: grid; 
+                grid-template-columns: auto auto auto auto; 
+                }
+    .grid5 {    display: grid; 
+                grid-template-columns: auto auto auto auto auto; 
+                }
+    .grid6 {    display: grid; 
+                grid-template-columns: auto auto auto auto auto auto; 
+                }
+    .grid7 {    display: grid; 
+                grid-template-columns: auto auto auto auto auto auto auto; 
+                }
+    .grid8 {    display: grid; 
+                grid-template-columns: auto auto auto auto auto auto auto auto; 
+                }
+    .grid9 {    display: grid; 
+                grid-template-columns: auto auto auto auto auto auto auto auto auto; 
+                }
+
+   /*********************************************************************
+    *   Styles for displaying tags that have button behavior            *
+    *********************************************************************/
+    .button    { 
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                text-decoration:    none;
+                background-color:   #E0E0E0;
+                color:              #000000;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                padding:            2px 12px 2px 12px;
+                display:            inline-block;
+                }
+    .button:disabled {
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                background-color:   #E0E0E0;
+                color:              #606060;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                padding:            0px 12px 0px 12px;
+                display:            inline-block;
                 }
 
    /*********************************************************************
@@ -680,59 +745,6 @@
                 color:              #000000;
                 text-decoration:    none;
                 }
-    a.button:link    { 
-                font-family:        sans-serif;
-                font-weight:        bold;
-                font-size:          80%;
-                text-align:         center;
-                text-decoration:    none;
-                background-color:   #E0E0E0;
-                border-top:         2px solid white;
-                border-left:        2px solid white;
-                border-bottom:      3px solid #606060;
-                border-right:       3px solid #606060;
-                padding:            4px 12px 4px 12px;
-                }
-    a.button:visited    { 
-                font-family:        sans-serif;
-                font-weight:        bold;
-                font-size:          80%;
-                text-align:         center;
-                text-decoration:    none;
-                background-color:   #E0E0E0;
-                border-top:         2px solid #606060;
-                border-left:        2px solid #606060;
-                border-bottom:      3px solid white;
-                border-right:       3px solid white;
-                padding:            4px 12px 4px 12px;
-                display:            inline-block;
-                }
-    a.buttonText:link    { 
-                font-family:        sans-serif;
-                font-weight:        bold;
-                font-size:          80%;
-                text-align:         center;
-                text-decoration:    none;
-                background-color:   #E0E0E0;
-                border-top:         2px solid white;
-                border-left:        2px solid white;
-                border-bottom:      3px solid #606060;
-                border-right:       3px solid #606060;
-                padding:            4px 12px 4px 12px;
-                }
-    a.buttonText:visited    { 
-                font-family:        sans-serif;
-                font-weight:        bold;
-                font-size:          80%;
-                text-align:         center;
-                text-decoration:    none;
-                background-color:   #E0E0E0;
-                border-top:         2px solid #606060;
-                border-left:        2px solid #606060;
-                border-bottom:      3px solid white;
-                border-right:       3px solid white;
-                padding:            4px 12px 4px 12px;
-                }
     a.male:link    { 
                 font-family:        sans-serif;
                 color:			    blue;
@@ -771,18 +783,6 @@
                 font-weight:        bold;
                 text-align:         right;
                 font-size:          smaller;
-                }
-    span.button {
-                font-family:        sans-serif;
-                font-weight:        bold;
-                font-size:          80%;
-                text-align:         center;
-                background-color:   #E0E0E0;
-                border-top:         2px solid white;
-                border-left:        2px solid white;
-                border-bottom:      3px solid #606060;
-                border-right:       3px solid #606060;
-                padding:            4px 12px 4px 12px;
                 }
     span.h1{    float:              left;
                 font-family:        sans-serif;
@@ -1160,17 +1160,6 @@
                 }
 
     /* display a table cell as if it were a button */
-    td.button { font-family:        sans-serif;
-                font-weight:        bold;
-                text-align:         center;
-                font-size:          80%;
-                background-color:   #E0E0E0;
-                border-top:         2px solid white;
-                border-left:        2px solid white;
-                border-bottom:      3px solid #606060;
-                border-right:       3px solid #606060;
-                padding:            4px 12px 4px 12px;
-                }
     td.white {  font-family:        sans-serif;
                 background-color:   white;
                 border-right:       thin solid black;
@@ -1720,32 +1709,6 @@
     button[disabled] {
                 color:              #804040;
                 }
-    button.button {
-                font-family:        sans-serif;
-                font-weight:        bold;
-                font-size:          80%;
-                text-align:         center;
-                background-color:   #E0E0E0;
-                color:              black;
-                border-top:         2px solid white;
-                border-left:        2px solid white;
-                border-bottom:      3px solid #606060;
-                border-right:       3px solid #606060;
-                padding:            0px 12px 0px 12px;
-                }
-    button.button:disabled {
-                font-family:        sans-serif;
-                font-weight:        bold;
-                font-size:          80%;
-                text-align:         center;
-                background-color:   #E0E0E0;
-                border-top:         2px solid white;
-                border-left:        2px solid white;
-                border-bottom:      3px solid #606060;
-                border-right:       3px solid #606060;
-                color:              #606060;
-                padding:            0px 12px 0px 12px;
-                }
     button.width110 {    
                 font-family:        sans-serif;
                 font-weight:        bold;
@@ -1773,6 +1736,14 @@
                 border-bottom:      3px solid #808080;
                 border-right:       3px solid #808080;
                 }
+
+/************************************************************************
+ *  Customize tinyMCE                                                   *
+ ************************************************************************/
+    .tox.tox-mbtn {
+                height:             28px;
+                font-style:         bold;
+            }
 
 /************************************************************************
  *  If the user requests to print a page do not include the <header>,   *

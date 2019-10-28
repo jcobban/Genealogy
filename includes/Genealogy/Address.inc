@@ -126,6 +126,11 @@ use \Iterator;
  *		                Address::deleteAddresses instead of             *
  *		                RecordSet->delete                               *
  *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/09/25      getIdar returns zero if record does not exist   *
+ *		2019/09/26      in getNotes only replace new lines with <br>    *
+ *		                if the content is not already HTML              *
+ *		                eliminate special get methods and expand        *
+ *		                functionality of method get                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -152,13 +157,6 @@ class Address extends RecordPic
     const EVENT		    = 1;
     const REPOSITORY	= 2;
     const MAXKIND	    = 2;
-
-    /********************************************************************
-     *	Address::$defaultOrder											*
-     *																	*
-     *	Default sort order for query response by class RecordSet		*
-     ********************************************************************/
-    static	$defaultOrder	= 'addrname';
 
     /********************************************************************
      *	Address::$initRow												*
@@ -200,6 +198,13 @@ class Address extends RecordPic
 				'qstag'				=> 0);
 
     /********************************************************************
+     *	Address::$defaultOrder											*
+     *																	*
+     *	Default sort order for query response by class RecordSet		*
+     ********************************************************************/
+    static	$defaultOrder	= 'addrname';
+
+    /********************************************************************
      *	Address::$info											        *
      *																	*
      *	Description of record class                                     *
@@ -210,7 +215,7 @@ class Address extends RecordPic
                 'prime'	    		=> 'idar',
 	            'srvmg'     		=> true,
 	            'fldcount'			=> 4,
-                'order'     		=> 'B_RegDomain, B_RegYear, B_RegNum',
+                'order'     		=> 'Addrname',
                 'classname' 		=> 'Address');
 
     /********************************************************************
@@ -221,7 +226,19 @@ class Address extends RecordPic
     protected static	$translate	= array(
 				'id'		=> 'idar',
 				'name'		=> 'addrname',
+				'postalcode'=> 'zipcode',
+				'notes'		=> 'addrnotes',
 				'sort'		=> 'addrsort');
+
+    /********************************************************************
+     *	Address::$kindText												*
+     *																	*
+     *	array containing English interpretation of kind field           *
+     ********************************************************************/
+    protected static	$kindText	= array(
+				0	    	=> 'mailing',
+				1	    	=> 'event',
+				2	    	=> 'repository');
 
     /********************************************************************
      *	function Address::__construct									*
@@ -237,7 +254,8 @@ class Address extends RecordPic
      *					  array('addrname'		=> $name)				*
      *					or the name of a new record to create			*
      *					deprecated, use:								*
-     *					  array('addrname'		=> $newname)			*
+     *					  array('addrname'		=> $newname,			*
+     *							'kind'			=> $newkind)			*
      *					or a database record presented as an array		*
      *					or an associative array of search parameters	*
      *		$newkind	if $id is a string then this parameter			*
@@ -455,31 +473,8 @@ class Address extends RecordPic
      ********************************************************************/
     function getIdar()
     {
-		if ($this->needInsert)
-		    $this->save(false);
 		return $this->row['idar'];
     }		// Address::getIdar
-
-    /********************************************************************
-     *	function Address::getKind										*
-     *																	*
-     *	Get the kind of the address.									*
-     ********************************************************************/
-    function getKind()
-    {
-		return $this->row['kind'];
-    }		// Address::getKind
-
-    /********************************************************************
-     *	function Address::setKind										*
-     *																	*
-     *	Set the kind of the address.									*
-     ********************************************************************/
-    function setKind($newkind)
-    {
-		if ($newkind >= 0 && $newkind <= Address::MAXKIND)
-		    parent::set('kind', $newkind);
-    }		// Address::getKind
 
     /********************************************************************
      *	function Address::toString										*
@@ -534,159 +529,116 @@ class Address extends RecordPic
      *	function Address::getName										*
      *																	*
      *	Get the name of the address.									*
+     *																	*
+     *	Input:															*
+     *		optional translate table for localization					*
+     *																	*
+     *	Returns:														*
+     *	    String										                *
      ********************************************************************/
     function getName($options	= null)
     {
-		$retval	= $this->row['addrname'];
+        $kind               = $this->row['kind'];
+        $kindText           = self::$kindText[$kind];
+        if ($options)
+            $kindText       = $options[$kindText];
+		$retval	            = $this->row['addrname'];
 		if ($retval === null)
-		    $retval	= '';
-		return $retval;
+            $retval	= '';
+		return $retval . ': ' . ucfirst($kindText);
     }		// Address::getName
 
     /********************************************************************
-     *	function Address::getAddress1									*
+     *  function Address::getNotes										*
      *																	*
-     *	Get the first line of the address.								*
-     ********************************************************************/
-    function getAddress1()
-    {
-		$retval	= $this->row['address1'];
-		if ($retval === null)
-		    $retval	= '';
-		return $retval;
-    }		// Address::getAddress1
-
-    /********************************************************************
-     *	function Address::getAddress2									*
+     *	Get the notes information of the Address.				        *
+     *	This function exists for symmetry with Location.                *
      *																	*
-     *	Get the second line of the address.								*
-     ********************************************************************/
-    function getAddress2()
-    {
-		$retval	= $this->row['address2'];
-		if ($retval === null)
-		    $retval	= '';
-		return $retval;
-    }		// Address::getAddress2
-
-    /********************************************************************
-     *	function Address::getCity										*
-     *																	*
-     *	Get the city portion of the address.							*
-     ********************************************************************/
-    function getCity()
-    {
-		$retval	= $this->row['city'];
-		if ($retval === null)
-		    $retval	= '';
-		return $retval;
-    }		// Address::getCity
-
-    /********************************************************************
-     *	function Address::getState										*
-     *																	*
-     *	Get the state/province portion of the address.					*
-     ********************************************************************/
-    function getState()
-    {
-		$retval	= $this->row['state'];
-		if ($retval === null)
-		    $retval	= '';
-		return $retval;
-    }		// Address::getState
-
-    /********************************************************************
-     *	function Address::getPostalCode									*
-     *																	*
-     *	Get the postal code portion of the address.						*
-     ********************************************************************/
-    function getPostalCode()
-    {
-		$retval	= $this->row['zipcode'];
-		if ($retval === null)
-		    $retval	= '';
-		return $retval;
-    }		// Address::getPostalCode
-
-    /********************************************************************
-     *	function Address::getCountry									*
-     *																	*
-     *	Get the country portion of the address.							*
-     ********************************************************************/
-    function getCountry()
-    {
-		$retval	= $this->row['country'];
-		if ($retval === null)
-		    $retval	= '';
-		return $retval;
-    }		// Address::getCountry
-
-    /********************************************************************
-     *	function Address::getHomePage									*
-     *																	*
-     *	Get the home web page portion of the address.					*
-     ********************************************************************/
-    function getHomePage()
-    {
-		$retval	= $this->row['homepage'];
-		if ($retval === null)
-		    $retval	= '';
-		return $retval;
-    }		// Address::getHomePage
-
-    /********************************************************************
-     *	function Address::getNotes										*
-     *																	*
-     *	Get the descriptive notes about the address.					*
+     *	Returns:														*
+     *		string possibly containing HTML tags						*
      ********************************************************************/
     function getNotes()
     {
-		$retval	= $this->row['addrnotes'];
-		if ($retval === null)
-		    $retval	= '';
-		return $retval;
+        $notes              = $this->row['addrnotes'];
+        if (preg_match('/<\w/', $notes))
+		    return $notes;
+        else
+		    return str_replace("\n", "<br>\n", $notes);
     }		// Address::getNotes
+
 
     /********************************************************************
      *	function Address::getLatitude									*
      *																	*
      *	Get the latitude portion of the address.						*
+     *	The internal xDDMMSS.ssss format is translated to the external	*
+     *	xDD.dddddd format.												*
+     *	This function exists for symmetry with Location.                *
      *																	*
      *  Returns:														*
-     *	    latitude in format xDDMMSS.sss where:						*
+     *	    latitude in format xDD.dddd where:							*
      *			x		is '-' for southern latitudes, omitted for		*
      *					northern latitudes								*
-     *			DD		is the degree portion of the latitude			*
-     *			MM		is the minutes portion of the latitude			*
-     *			SS.sss	is the seconds portion of the latitude			*
+     *			DD.dddd		is the latitude in degrees as a real number	*
      ********************************************************************/
     function getLatitude()
     {
-		return $this->row['latitude'];
+		$value		= $this->row['latitude'];
+		$negative	= $value < 0;
+		$uvalue		= abs($value);
+		if ($uvalue > 900000.0)
+		    throw new Exception("Address:getLatitude: " .
+						"internal logic error value $value out of range");
+		$ddd		= floor($uvalue/10000);	// degrees
+		$uvalue		= $uvalue - ($ddd * 10000);
+		$mm		= floor($uvalue/100);	// minutes
+		$ss		= $uvalue - ($mm * 100);
+		$uvalue		= $ddd + ($mm / 60) + ($ss / 3600);
+		if ($negative)
+		    $value	= -$uvalue;
+		else
+		    $value	= $uvalue;
+		return $value;
     }		// Address::getLatitude
 
     /********************************************************************
      *	function Address::getLongitude									*
      *																	*
      *	Get the longitude portion of the address.						*
+     *	The internal xDDDMMSS.ssss format is translated to the external	*
+     *	xDDD.dddddd format.												*
+     *	This function exists for symmetry with Location.                *
      *																	*
      *  Returns:														*
-     *	    longitude in format xDDMMSS.sss where:						*
-     *			x		is '-' for western longitudes (New World), 		*
-     *					omitted for eastern longitudes (Old World)		*
-     *			DD		is the degree portion of the longitude			*
-     *			MM		is the minutes portion of the longitude			*
-     *			SS.sss	is the seconds portion of the longitude			*
+     *	    longitude in format xDDD.dddd where:						*
+     *		x		is '-' for western longitudes, omitted for		    *
+     *				eastern		longitudes								*
+     *		DDD.ddd		is the longitude in degrees as a real number	*
      ********************************************************************/
     function getLongitude()
     {
-		return $this->row['longitude'];
+		$value		= $this->row['longitude'];
+		$negative	= $value < 0;
+		$uvalue		= abs($value);
+		if ($uvalue > 1800000.0)
+		    throw new Exception("Address:getLongitude: internal logic error value $value out of range");
+		$ddd		= floor($uvalue/10000);	// degrees
+		$uvalue		= $uvalue - ($ddd * 10000);
+		$mm		= floor($uvalue/100);	// minutes
+		$ss		= $uvalue - ($mm * 100);
+		$uvalue		= $ddd + ($mm / 60) + ($ss / 3600);
+		if ($negative)
+		    $value	= -$uvalue;
+		else
+		    $value	= $uvalue;
+		return $value;
     }		// Address::getLongitude
 
     /********************************************************************
      *	function Address::getZoom										*
      *																	*
      *	Get the map zoom level.											*
+     *	This function exists for symmetry with Location.                *
      *																	*
      *  Returns:														*
      *	    Google Maps zoom level										*
@@ -703,6 +655,10 @@ class Address extends RecordPic
      *	function Address::getPreposition								*
      *																	*
      *	Get the preposition portion of the address.						*
+     *	This function exists for symmetry with Location.                *
+     *																	*
+     *	Returns:														*
+     *		string						                                *
      ********************************************************************/
     function getPreposition()
     {
@@ -817,35 +773,69 @@ class Address extends RecordPic
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
 		{
-		    case 'latitude':
-		    {	
-				return $this->getLatitude();
-				break;
-		    }		// latitude
+			case 'kind':
+			case 'style':
+			case 'latitude':
+			case 'longitude':
+			case 'list1':
+			case 'list2':
+			case 'list3':
+			case 'list4':
+			case 'list5':
+			case 'list6':
+			case 'private':
+			case 'tag1':
+			case 'used':
+			case 'fsresolved':
+			case 'veresolved':
+			case 'verified':
+			case 'qstag':
+				return $this->row[$fieldLc];
 
-		    case 'longitude':
-		    {
-				return $this->getLongitude();
-				break;
-		    }		// longitude
+			case 'addrname':
+			case 'addrsort':
+			case 'address1':
+			case 'address2':
+			case 'city':
+			case 'state':
+			case 'zipcode':
+			case 'country':
+			case 'phone1':
+			case 'phone2':
+			case 'email':
+			case 'homepage':
+            case 'addrnotes':
+            {           // text fields
+				$retval         = $this->row[$fieldLc];
+        		if ($retval === null)
+                    $retval	= '';
+                return $retval;
+            }           // text fields
 
 		    case 'zoom':
-		    {
-				return $this->getZoom();
-				break;
-		    }		// zoom
+		    {           // simulated field to match Location
+				if (array_key_exists('zoom', $this->row))
+				    return $this->row['zoom'];
+				else
+				    return 12;
+		    }		    // zoom
 
 		    case 'preposition':
-		    {
-				return $this->getPreposition();
-				break;
-		    }		// preposition
+		    {           // simulated field to match Location
+				if (array_key_exists('preposition', $this->row))		
+				    return $this->row['preposition'];		
+				else		
+				    return 'at';		
+		    }		    // preposition
 
 		    default:
-		    {		// other fields
-				return parent::get($fieldLc);
-		    }		// other fields
-		}		// switch on field name
+		    {		    // other fields
+				$retval         = parent::get($fieldLc);
+        		if ($retval === null)
+                    $retval	= '';
+                return $retval;
+		    }		    // other fields
+		}		        // switch on field name
     }		// Address::get
 
     /********************************************************************
@@ -868,6 +858,8 @@ class Address extends RecordPic
      ********************************************************************/
     function set($field, $value)
     {
+        global      $warn;
+
 		$fieldLc	= strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
@@ -885,8 +877,12 @@ class Address extends RecordPic
 
 		    case 'kind':
 		    {
-				return $this->setKind($value);
-		    }		// zoom
+		        if ($value >= 0 && $value <= Address::MAXKIND)
+                    return parent::set('kind', $value);
+                $warn   .= "<p>Address::set: " . __LINE__ .
+                            " invalid value $value for field 'kind' ignored.</p>\n";
+				return $this->row['kind'];
+		    }		// kind
 
 		    default:
 		    {		// other field names

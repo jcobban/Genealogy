@@ -111,6 +111,7 @@ use \Templating\Template;
  *		                move all parameter validation out of loop       *
  *		                use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/07/08      correct handling of 1870-1872 marriages         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -129,7 +130,7 @@ require_once __NAMESPACE__ . '/common.inc';
  *																		*
  *  Input:																*
  *		$count			number of extra rows to generate				*
- *		$html               text of template for a row                  *
+ *		$html           text of template for a row                      *
  ************************************************************************/
 function emptyRows($count, $html)
 {
@@ -994,7 +995,15 @@ if (strlen($msg) == 0)
     {                   // loop through matching records
         $regyear            = $marr['regyear'];
         $regnum             = $marr['regnum'];
-        $rowdiff	        = $regnum - $eregnum;
+        if (($regyear == 1870 && $regnum > 70000) ||
+            ($regyear == 1871 && $regnum > 120000) ||
+            ($regyear == 1872 && $regnum > 170000))
+        {
+            $pagediff       = floor($regnum/10) - floor($eregnum/10);
+            $rowdiff	    = ($regnum - $eregnum) - 7 * $pagediff;
+        }
+        else
+            $rowdiff	    = $regnum - $eregnum;
 	    if ($rowdiff > ($count * 2) - $rownum)
 			$rowdiff	    = ($count * 2) - $rownum;
 	    if ($expand && $rowdiff > 0)

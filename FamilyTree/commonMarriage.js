@@ -17,7 +17,7 @@
  *						all buttons use id= rather than name= to avoid a*
  *						problem with IE passing their values			*
  *						support updating all fields of Family			*
- *						record											*
+ *						function record									*
  *		2012/02/25		change ids of fields in marriage list to contain*
  *						IDMR instead of row number						*
  *						support mouseover for edit and					*
@@ -95,7 +95,7 @@
  *						Consolidate support for feedback from			*
  *						editIndivid.php by using the same style of		*
  *						feedback routine for any individual in the		*
- *						family											*
+ *						function family									*
  *						validate dates, expand locations				*
  *						fix bug in sorting children after add existing	*
  *						simplify addition of children					*
@@ -112,7 +112,7 @@
  *		2014/07/15		only prevent saving marriage once for open		*
  *						child edit windows, and use popupAlert			*
  *		2014/07/16		better support for checking for open child		*
- *						windows											*
+ *						function windows									*
  *		2014/07/19		if not opened as a dialog go back to previous	*
  *						page instead of closing the window				*
  *		2014/09/12		remove use of obsolete selectOptByValue			*
@@ -193,12 +193,14 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/01/21      get gender for given name from database         *
  *		2019/05/19      call element.click to trigger button click      *
+ *		2019/06/29      first parameter of displayDialog removed        *
+ *		2019/07/20      insert spaces into child death date             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
- *  constants															*
+ *  function constants													*
  *																		*
  *  Note that Microsoft Internet Explorer does not support the const	*
  *  keyword prior to IE 11, therefore these constants are declared		*
@@ -238,31 +240,7 @@ var STYPE_EVENT	        	= 30;	// Individual Event
 var STYPE_MAREVENT	        = 31;	// Marriage Event
 
 /************************************************************************
- * specify the style for tinyMCE editing								*
- ************************************************************************/
-tinyMCE.init({
-		mode			: "textareas",
-		theme			: "advanced",
-		plugins 		: "spellchecker,advhr,preview", 
-
-		// Theme options - button# indicates the row# only
-		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
-		theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-		forced_root_block	: false,
-		forced_root_block	: false,
-		content_css		: "/styles.css",
-		onchange_callback	: "changeOccupation"
-
-});
-
-
-/************************************************************************
- *  childWindows														*
+ *  function childWindows												*
  *																		*
  *  This array keeps track of all child windows opened by the current	*
  *  edit family dialog.													*
@@ -270,7 +248,7 @@ tinyMCE.init({
 var	childWindows	= [];
 
 /************************************************************************
- *  editChildButtons													*
+ *  function editChildButtons											*
  *																		*
  *  This array keeps track of all editChild buttons in the current		*
  *  dialog.																*
@@ -278,7 +256,7 @@ var	childWindows	= [];
 var	editChildButtons	= [];
 
 /************************************************************************
- *  pendingButton														*
+ *  function pendingButton												*
  *																		*
  *  This is a reference to an instance of <button> that should be		*
  *  "clicked" when the family is updated.								*
@@ -451,7 +429,7 @@ function gotFamily(xmlDoc)
 						{	
 						    famForm.idmr.value	= value;
 						    break; 
-						}	// idmr
+						}	// function idmr
 
 						case 'idirhusb':
 						{
@@ -459,25 +437,25 @@ function gotFamily(xmlDoc)
 						    document.getElementById('editHusb').disabled =
 								(value == 0) || (value == idir);
 						    break; 
-						}	// idmr
+						}	// function idmr
 
 						case 'husbsurname':
 						{
 						    famForm.HusbSurname.value	= value;
 						    break; 
-						}	// husbsurname
+						}	// function husbsurname
 
 						case 'husbgivenname':
 						{
 						    famForm.HusbGivenName.value	= value;
 						    break; 
-						}	// husbgivenname
+						}	// function husbgivenname
 
 						case 'husbbirthsd':
 						{
 						    famForm.HusbBirthSD.value	= value;
 						    break; 
-						}	// husbbirthsd
+						}	// function husbbirthsd
 
 						case 'idirwife':
 						{
@@ -485,25 +463,25 @@ function gotFamily(xmlDoc)
 						    document.getElementById('editWife').disabled =
 								(value == 0) || (value == idir);
 						    break; 
-						}	// idirwife
+						}	// function idirwife
 
 						case 'wifesurname':
 						{
 						    famForm.WifeSurname.value	= value;
 						    break; 
-						}	// wifesurname
+						}	// function wifesurname
 
 						case 'wifegivenname':
 						{
 						    famForm.WifeGivenName.value	= value;
 						    break; 
-						}	// wifegivenname
+						}	// function wifegivenname
 
 						case 'wifebirthsd':
 						{
 						    famForm.WifeBirthSD.value	= value;
 						    break; 
-						}	// wifebirthsd
+						}	// function wifebirthsd
 
 						case 'mard':
 						{
@@ -515,7 +493,7 @@ function gotFamily(xmlDoc)
 						{
 						    famForm.MarLoc.value	= value;
 						    break; 
-						}	// marloc
+						}	// function marloc
 
 						case 'marendd':
 						{
@@ -531,7 +509,7 @@ function gotFamily(xmlDoc)
 							insertEndedRow(parms)
 						    }	// need to add ended event
 						    break; 
-						}	// marendd
+						}	// function marendd
 
 						case 'seald':
 						{
@@ -549,7 +527,7 @@ function gotFamily(xmlDoc)
 							insertSealedRow(parms)
 						    }	// need to add sealed to spouse line
 						    break; 
-						}	// seald
+						}	// function seald
 
 						case 'idtrseal':
 						{
@@ -569,25 +547,25 @@ function gotFamily(xmlDoc)
 							famForm.IDTRSeal.value	= value;
 						    }	// need to add sealed to spouse line
 						    break; 
-						}	// idtrseal
+						}	// function idtrseal
 
 						case 'idms':
 						{
 						    famForm.IDMS.value	= value;
 						    break; 
-						}	// idms
+						}	// function idms
 
 						case 'marriednamerule':
 						{
 						    famForm.MarriedNameRule.value	= value;
 						    break; 
-						}	// marriednamnerule
+						}	// function marriednamnerule
 
 						case 'notes':
 						{
 						    tinyMCE.get('Notes').setContent(value);
 						    break; 
-						}	// notes
+						}	// function notes
 
 						case 'notmarried':
 						{	// not married indicator
@@ -748,10 +726,10 @@ function addChildrenFromXml(node,
 							      false);
 		}	// element node
     }		// loop through children
-}		// addChildrenFromXml
+}		// function addChildrenFromXml
 
 /************************************************************************
- *  addEventsFromXml														*
+ *  function addEventsFromXml												*
  *																		*
  *  Add rows to the display to represent family events from tblER.		*
  *																		*
@@ -846,27 +824,27 @@ function addEventsFromXml(node,
 
 		}	// element node
     }		// loop through children
-}		// addEventsFromXml
+}		// function addEventsFromXml
 
 /************************************************************************
- *  noFamily																*
+ *  function noFamily													*
  *																		*
  *  This method is called if there is no family response				*
- *  from the server.														*
+ *  from the server.													*
  ************************************************************************/
 function noFamily()
 {
     alert('commonMarriage.js: noFamily: Unable to obtain family record from server');
-}		// noFamily
+}		// function noFamily
 
 /************************************************************************
- *  marrDel																*
+ *  function marrDel													*
  *																		*
  *  This method is called when the user requests to delete				*
  *  information about a specific marriage.								*
  *																		*
  *  Input:																*
- *		this		<button id='Delete9999'>								*
+ *		this		<button id='Delete9999'>							*
  ************************************************************************/
 function marrDel()
 {
@@ -886,24 +864,24 @@ function marrDel()
 		      parms,
 		      gotDelMarr,
 		      noDelMarr);
-}	// marrDel
+}	// function marrDel
 
 /************************************************************************
- *  gotDelMarr																*
+ *  function gotDelMarr													*
  *																		*
- *  This method is called when the XML document representing				*
+ *  This method is called when the XML document representing			*
  *  a successful delete marriage is retrieved from the database.		*
  *																		*
- *  Parameters:																*
- *		xmlDoc				response as an XML document						*
- *  						with the following structure:						*
+ *  Parameters:															*
+ *		xmlDoc			response as an XML document						*
+ *  					with the following structure:					*
  *																		*
  *		<deleted>														*
  *		  <parms>														*
  *		    <idmr> requested IDMR to delete </idmr>						*
  *		  </parms>														*
  *		  <cmd> an SQL DELETE command </cmd> ... or						*
- *		  <msg> error message </msg>										*
+ *		  <msg> error message </msg>									*
  *		</deleted>														*
  ************************************************************************/
 function gotDelMarr(xmlDoc)
@@ -967,10 +945,10 @@ function gotDelMarr(xmlDoc)
     }		// XML document
     else
 		alert("commonMarriage.js: gotDelMarr: " + xmlDoc);
-}		// gotDelMarr
+}		// function gotDelMarr
 
 /************************************************************************
- *  noDelMarr																*
+ *  function noDelMarr													*
  *																		*
  *  This method is called if there is no delete marriage response		*
  *  file.																*
@@ -979,10 +957,10 @@ function noDelMarr()
 {
     alert('commonMarriage.js: noDelMarr: ' +
 		  'No response from server to deleteMarriageXml.php');
-}		// noDelMarr
+}		// function noDelMarr
 
 /************************************************************************
- *  addFamily																*
+ *  function addFamily														*
  *																		*
  *  This method is called when the user requests to add						*
  *  a new family to an individual										*
@@ -993,10 +971,10 @@ function noDelMarr()
 function addFamily()
 {
     location.href	= location.href + "&new=Y";
-}	// addFamily
+}	// function addFamily
 
 /************************************************************************
- *  marrReorder																*
+ *  function marrReorder														*
  *																		*
  *  This method is called when the user requests to reorder				*
  *  marriages by date.														*
@@ -1020,25 +998,25 @@ function marrReorder()
 		      parms,
 		      gotReorderMarr,
 		      noReorderMarr);
-}	// marrReorder
+}	// function marrReorder
 
 /************************************************************************
- *  gotReorderMarr														*
+ *  function gotReorderMarr												*
  *																		*
- *  This method is called when the XML document representing				*
+ *  This method is called when the XML document representing			*
  *  a successful marriage reorder is retrieved from the database.		*
  *																		*
- *  Parameters:																*
- *		xmlDoc				response from orderMarriagesByDateXml.php as an		*
- *						XML document										*
+ *  Parameters:															*
+ *		xmlDoc		response from orderMarriagesByDateXml.php as an		*
+ *					XML document										*
  ************************************************************************/
 function gotReorderMarr(xmlDoc)
 {
     window.location.reload();
-}		// gotReorderMarr
+}		// function gotReorderMarr
 
 /************************************************************************
- *  noReorderMarr														*
+ *  function noReorderMarr												*
  *																		*
  *  This method is called if there is no reorder marriage response		*
  *  file.																*
@@ -1047,16 +1025,16 @@ function noReorderMarr()
 {
     alert('commonMarriage.js: noReorderMarr: ' +
 		  'script orderMarriagesByDateXml.php not found on server');
-}		// noReorderMarr
+}		// function noReorderMarr
 
 /************************************************************************
- *  marriageDetails														*
+ *  function marriageDetails											*
  *																		*
- *  This method is called when the user requests to edit the 				*
+ *  This method is called when the user requests to edit the 			*
  *  details, including citations, for the marriage event.				*
  *																		*
  *  Input:																*
- *		this		<button id='marriageDetails'> element 						*
+ *		this		<button id='marriageDetails'> element 				*
  ************************************************************************/
 function marriageDetails()
 {
@@ -1064,13 +1042,13 @@ function marriageDetails()
 }
 
 /************************************************************************
- *  noteDetails																*
+ *  function noteDetails													*
  *																		*
- *  This method is called when the user requests to edit the 				*
- *  details, including citations, for the note event.						*
+ *  This method is called when the user requests to edit the 			*
+ *  details, including citations, for the note event.					*
  *																		*
  *  Input:																*
- *		this		<button id='noteDetails'> element 						*
+ *		this		<button id='noteDetails'> element 					*
  ************************************************************************/
 function noteDetails()
 {
@@ -1078,13 +1056,13 @@ function noteDetails()
 }
 
 /************************************************************************
- *  noChildrenDetails														*
+ *  function noChildrenDetails											*
  *																		*
- *  This method is called when the user requests to edit the 				*
+ *  This method is called when the user requests to edit the 			*
  *  details, including citations, for the No Children fact.				*
  *																		*
  *  Input:																*
- *		this		<button id='noChildrenDetails'> element						*
+ *		this		<button id='noChildrenDetails'> element				*
  ************************************************************************/
 function noChildrenDetails()
 {
@@ -1092,13 +1070,13 @@ function noChildrenDetails()
 }
 
 /************************************************************************
- *  neverMarriedDetails														*
+ *  function neverMarriedDetails											*
  *																		*
- *  This method is called when the user requests to edit the 				*
- *  details, including citations, for the never married fact				*
+ *  This method is called when the user requests to edit the 			*
+ *  details, including citations, for the never married fact			*
  *																		*
  *  Input:																*
- *		this		<button id='neverMarriedDetails'> element				*
+ *		this		<button id='neverMarriedDetails'> element			*
  ************************************************************************/
 function neverMarriedDetails()
 {
@@ -1106,19 +1084,19 @@ function neverMarriedDetails()
 }
 
 /************************************************************************
- *  changeHusb																*
+ *  function changeHusb													*
  *																		*
  *  This is a feedback method from a sub dialog to change the displayed *
- *  information about the husband in a family.								*
+ *  information about the husband in a family.							*
  *																		*
- *  Parameters:																*
- *		this				<div id='Husb'>										*
- *		parms				object with at least the following members		*
- *		    idir		IDIR of husband as individual						*
- *		    givenname		new given name of husband						*
- *		    surname		new surname of husband								*
- *		    birthd		new birth date of husband						*
- *		    deathd		new death date of husband						*
+ *  Parameters:															*
+ *		this			<div id='Husb'>									*
+ *		parms			object with at least the following members		*
+ *	    idir			IDIR of husband as individual					*
+ *	    givenname		new given name of husband						*
+ *	    surname			new surname of husband							*
+ *	    birthd			new birth date of husband						*
+ *	    deathd			new death date of husband						*
  ************************************************************************/
 function changeHusb(parms)
 {
@@ -1137,7 +1115,7 @@ function changeHusb(parms)
 		    break;
 		}
 		else
-		alert("changeHusb: cw=" + cw.constructor.name);
+		    alert("changeHusb: cw=" + cw.constructor.name);
     }
 
     var	form				= document.famForm;
@@ -1163,22 +1141,22 @@ function changeHusb(parms)
     document.getElementById('editHusb').disabled	= false;
     document.getElementById('chooseHusb').disabled	= false;
     document.getElementById('createHusb').disabled	= false;
-}		// changeHusb
+}		// function changeHusb
 
 /************************************************************************
- *  changeWife																*
+ *  function changeWife													*
  *																		*
  *  This is a feedback method from a sub dialog to change the displayed *
  *  information about the wife in a family.								*
  *																		*
- *  Parameters:																*
- *		this				<div id='Wife'>										*
- *		parms				object with at least the following members		*
- *		    idir		IDIR of wife as individual						*
- *		    givenname		new given name of wife								*
- *		    surname		new surname of wife								*
- *		    birthd		new birth date of wife								*
- *		    deathd		new death date of wife								*
+ *  Parameters:															*
+ *		this		<div id='Wife'>										*
+ *		parms		object with at least the following members		    *
+ *		idir		IDIR of wife as individual						    *
+ *		givenname	new given name of wife								*
+ *		surname		new surname of wife								    *
+ *	    birthd		new birth date of wife								*
+ *	    deathd		new death date of wife								*
  ************************************************************************/
 function changeWife(parms)
 {
@@ -1217,7 +1195,7 @@ function changeWife(parms)
 }		// changeWife`
 
 /************************************************************************
- *  changeChild															*
+ *  function changeChild													*
  *																		*
  *  Change the displayed information about a child.						*
  *  This is a callback method of <div id='child$rownum'>				*
@@ -1357,10 +1335,10 @@ function changeChild(parms)
 		}		// act on specific parm fields
     }			// loop through parameters
     return	row;
-}		// changeChild
+}		// function changeChild
 
 /************************************************************************
- *  eventFeedback														*
+ *  function eventFeedback												*
  *																		*
  *  This is a method of the form object that is called by the script		*
  *  editEvent.php to feedback changes to an event that should be		*
@@ -1434,10 +1412,10 @@ function eventFeedback(parms)
 		}		// marriage event
 
     }		// source fields to refresh depend on type
-}		// eventFeedback
+}		// function eventFeedback
 
 /************************************************************************
- *  redisplayFamily														*
+ *  function redisplayFamily												*
  *																		*
  *  Refresh the dialog and redisplay the current family.				*
  ************************************************************************/
@@ -1448,10 +1426,10 @@ function redisplayFamily()
     if (url.indexOf('idmr') == -1)
 		url	= url + '&idmr=' + idmr;
     window.location.search	= url;
-}		// redisplayFamily
+}		// function redisplayFamily
 
 /************************************************************************
- *  addExistingChild														*
+ *  function addExistingChild												*
  *																		*
  *  Prompt the user to choose an existing individual to add as a child		*
  *  of this family.														*
@@ -1471,10 +1449,10 @@ function addExistingChild()
     var	childWindow	= openFrame("chooserFrame",
 							    url,
 							    "left");
-}		// addExistingChild
+}		// function addExistingChild
 
 /************************************************************************
- *  detachHusb																*
+ *  function detachHusb														*
  *																		*
  *  This method is called when the user requests that the current		*
  *  husband be detached with no replacement.								*
@@ -1491,10 +1469,10 @@ function detachHusb()
     famForm.HusbSurname.value	= '';
     document.getElementById('detachHusb').disabled	= true;
     document.getElementById('editHusb').disabled	= true;
-}		// detachHusb
+}		// function detachHusb
 
 /************************************************************************
- *  detachWife																*
+ *  function detachWife														*
  *																		*
  *  This method is called when the user requests that the current		*
  *  wife be detached with no replacement.								*
@@ -1511,63 +1489,88 @@ function detachWife()
     famForm.WifeSurname.value	= '';
     document.getElementById('detachWife').disabled	= true;
     document.getElementById('editWife').disabled	= true;
-}		// detachWife
+}		// function detachWife
 
 /************************************************************************
- *  detChild																*
+ *  function detChild													*
  *																		*
- *  Detach an existing individual as a child of this family.				*
+ *  Detach an existing individual as a child of this family.			*
  *																		*
  *  Input:																*
- *		this		<button id='detChild....'>								*
+ *		this		<button id='detChild....'>							*
+ *		ev          click Event                                         *
  ************************************************************************/
-function detChild()
+function detChild(ev)
 {
-    var	cell		= this.parentNode;
-    var	row		= cell.parentNode;
+    if (!ev)                    // IE < 9
+        ev          			= window.event;
+    ev.stopPropagation();
+
+    var	cell					= this.parentNode;
+    var	row		    			= cell.parentNode;
+    var	tableBody	            = row.parentNode;
 
     // remove the editChild button for this row from the array
     // of editChild buttons
-    var	buttons		= row.getElementsByTagName("BUTTON");
-    var	button		= null;
-    var	ib;
-    for (ib = 0; ib < buttons.length; ib++)
-    {			// loop through <button> tags
-		button		= buttons[ib];
-		if (button.id.substring(0,9) == 'editChild')
-		    break;
-		button		= null;
-    }			// loop through <button> tags
-
-    if (button)
-    {			// found editChild button
+    var rowid       			= this.id.substring(8);
+    var	editButton				= document.getElementById('editChild' + rowid);
+    if (editButton)
+    {			                // found editChild button
 		for (ib = 0; ib < editChildButtons.length; ib++)
-		{		// loop through existing editChild buttons
-		    if (editChildButtons[ib] == button)
-		    {		// found matching button
+		{		                // loop through existing editChild buttons
+		    if (editChildButtons[ib] == editButton)
+		    {		            // found matching button
 				editChildButtons.splice(ib, 1);	// remove from array
 				break;
-		    }		// found matching button
-		}		// loop through existing editChild buttons
-    }			// found editChild button
+		    }		            // found matching button
+		}		                // loop through existing editChild buttons
+    }			                // found editChild button
 
-    // remove the row from the DOM
-    var	tableBody	= row.parentNode;
-    tableBody.removeChild(row);
-}		// detChild
+    var form                    = this.form;
+    var cidcr                   = form.elements['CIdcr' + rowid];
+    var idcr                    = cidcr.value;
+    var cidir                   = form.elements['CIdir' + rowid];
+    var idir                    = cidir.value;
+    //alert("idcr=" + idcr + ", idir=" + idir);
+
+    if (idcr == 0)
+    {                           // remove the row from the DOM
+        tableBody.removeChild(row);
+    }                           // remove the row from the DOM
+    else
+    {                           // hide the row 
+        cidir.value             = -1;
+        var cgiven              = form.elements['CGiven' + rowid];
+        cgiven.parentNode.removeChild(cgiven);
+        // note that it is necessary to start at the end and go back because:
+        // 1) the value of row.cells.length changes as cells are deleted
+        // 2) the cell referenced by a given index ic changes if cells prior
+        //    to that index are deleted
+        for(var ic = row.cells.length - 1; ic > 0 ; ic--)
+        {                       // delete all but the first cell of the row
+            var dcell           = row.cells[ic];
+            row.removeChild(dcell);
+        }                       // delete all but the first cell of the row
+    }                           // hide the row 
+}		// function detChild
 
 /************************************************************************
- *  editChild																*
+ *  function editChild													*
  *																		*
  *  This method is called when the user requests to edit				*
  *  information about an individual (child) in a family.				*
  *																		*
  *  Input:																*
- *		this		the <button id='editChild...'> element						*
+ *		this		    the <button id='editChild...'> element			*
+ *		ev              instance of Event                               *
  ************************************************************************/
-function editChild()
+function editChild(ev)
 {
-    var msg		= 'args={';
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
+    var msg		    = 'args={';
     var	initIdir	= 0;
     for (attr in args)
     {
@@ -1590,26 +1593,15 @@ function editChild()
     if (initIdir && initIdir == cIdir.value)
     {				// edit dialog for this child already open
 		// ask user to confirm delete
-		dialogDiv	= document.getElementById('msgDiv');
-		if (dialogDiv)
-		{		// have popup <div> to display message in
-		    var parms	= {
+		var parms	= {
 				'givenname'	: form.elements['CGiven' + rownum].value,
 				'surname'	: form.elements['CSurname' + rownum].value,
 				'idir'		: cIdir,
 				'template'	: ''};
-		    displayDialog(dialogDiv,
-						  'AlreadyEditing$template',
-						  parms,
-						  this,			// position relative to
-						  null,			// just close on any button
-						  false);		// default show on open
-		}		// have popup <div> to display message in
-		else
-		    alert("commonMarriage.js: editChild: " +
-				  form.elements['CGiven' + rownum].value + ' ' +
-				  form.elements['CSurname' + rownum].value +
-				  " is already being edited");
+		displayDialog('AlreadyEditing$template',
+					  parms,
+					  this,			    // position relative to
+					  null);			// just close on any button
 		return;
     }				// edit dialog for this child already open
     var	cIdcr		= form.elements['CIdcr' + rownum];
@@ -1743,15 +1735,15 @@ function gotNickname(nickname)
     var	surnameElt	= form.elements['CSurname' + rownum];
     var genderElt	= form.elements['CGender' + rownum];
 
-    if (typeof nickname !== 'object')
-        alert ("gotNickname called with " + JSON.stringify(nickname));
     if (!('gender' in nickname))
     {                       // array of responses
+        console.log("gotNickname called with " + JSON.stringify(nickname));
         var nicknames   = nickname;
         for(var name in nicknames)
         {                   // loop through responses
             nickname   = nicknames[name];
-            if (nickname.gender !== null)
+            console.log ("name=" + name + ", object=" + JSON.stringify(nickname));
+            if ('gender' in nickname)
                 break;
         }                   // loop through responses
     }                       // array of responses
@@ -1827,37 +1819,18 @@ function changeCBirth()
 
     // ensure that there is a space between a letter and a digit
     // or a digit and a letter
-    birthd		= birthd.replace(/([a-zA-Z])(\d)/g,"$1 $2");
-    birthd		= birthd.replace(/(\d)([a-zA-Z])/g,"$1 $2");
+    birthd		    = birthd.replace(/([a-zA-Z])(\d)/g,"$1 $2");
+    birthd		    = birthd.replace(/(\d)([a-zA-Z])/g,"$1 $2");
     this.value		= birthd;
 
-    var	y		= 0;
-    var	m		= 6;
-    var	d		= 15;
+    var	y		    = 0;
 
-    var datePattern	= /(\d*)\s*([a-zA-Z]+)\s*(\d*)/;
+    var datePattern	= /\d{4}/;
     var pieces		= datePattern.exec(birthd);
     if (pieces !== null)
     {
-		if (pieces[1].length > 0)
-		{
-		    d		= parseInt(pieces[1]);
-		}
-		var	month	= pieces[2].toLowerCase();
-		m		= monTab[month];
-		if (m === undefined)
-		    m		= 6;
-		if (pieces[3].length > 0)
-		{
-		    y		= parseInt(pieces[3]);
-		}
-		if (d > 31 && y <= 31)
-		{
-		    var	temp	= d;
-		    d		= y;
-		    y		= temp;
-		}
-		form.elements['Cbirthsd' + rowid].value	= y * 10000 + m * 100 + d;
+		y		= parseInt(pieces[0]);
+		form.elements['Cbirthsd' + rowid].value	= y * 10000;
     }
 
     // fold to upper case and expand abbreviations
@@ -1866,6 +1839,33 @@ function changeCBirth()
     if (this.checkfunc)
 		this.checkfunc();
 }		// function changeCBirth
+
+/************************************************************************
+ *  function changeCDeath												*
+ *																		*
+ *  This function is called when the date of death of a child changes.	*
+ *																		*
+ *  Input:																*
+ *		this		<input type='text' id='Cdeath...'> element			*
+ ************************************************************************/
+function changeCDeath()
+{
+    var	form		= this.form;
+    var	rowid		= this.name.substring(6);
+    var	deathd		= this.value;
+
+    // ensure that there is a space between a letter and a digit
+    // or a digit and a letter
+    deathd		= deathd.replace(/([a-zA-Z])(\d)/g,"$1 $2");
+    deathd		= deathd.replace(/(\d)([a-zA-Z])/g,"$1 $2");
+    this.value		= deathd;
+
+    // fold to upper case and expand abbreviations
+    changeElt(this);
+
+    if (this.checkfunc)
+		this.checkfunc();
+}		// function changeCDeath
 
 /************************************************************************
  *  function updateMarr													*
@@ -1961,6 +1961,9 @@ function updateMarr()
     {
 		updateMarriageParms += parm + "='" + parms[parm] + "',";
     }
+    if (debug.toLowerCase() == 'y')
+        alert("HTTP.post('/FamilyTree/updateMarriageXml.php', " +
+		      updateMarriageParms + "}");
 
     popupLoading(this);	// display loading indicator
     HTTP.post('/FamilyTree/updateMarriageXml.php',
@@ -1988,28 +1991,29 @@ function gotUpdatedFamily(xmlDoc)
 		alert("gotUpdateMarr: xmlDox is null");
 		return;
     }
-    var	root		= xmlDoc.documentElement;
-    //	alert("gotUpdatedFamily: root=" + 
-    //	 tagToString(root).replace('/</g', '&lt;').replace('/>/g', '&lt;'));
-    var idmr		= 0;
-    var spsIdir		= 0;
-    var fatherid	= 0;
-    var motherid	= 0;
-    var	spsSurname	= '';
-    var	spsGivenname	= '';
-    var	fatherSurname	= '';
-    var	fatherGiven	= '';
-    var	motherSurname	= '';
-    var	motherGiven	= '';
-    var	spsclass	= 'male';
-    var	marDate		= 'Unknown';
+    var	root		    		= xmlDoc.documentElement;
+    if (debug.toLowerCase() == 'y')
+    	alert("gotUpdatedFamily: root=" + 
+    	 tagToString(root).replace('/</g', '&lt;').replace('/>/g', '&lt;'));
+    var idmr		    		= 0;
+    var spsIdir		    		= 0;
+    var fatherid	    		= 0;
+    var motherid	    		= 0;
+    var	spsSurname	    		= '';
+    var	spsGivenname			= '';
+    var	fatherSurname			= '';
+    var	fatherGiven	    		= '';
+    var	motherSurname			= '';
+    var	motherGiven	    		= '';
+    var	spsclass	    		= 'male';
+    var	marDate		    		= 'Unknown';
 
-    hideLoading();	// hide loading indicator
-    updatingMarriage	= false;
+    hideLoading();	    // hide loading indicator
+    updatingMarriage			= false;
     if (root)
-    {			// XML document
+    {			        // XML document
 		if (root.nodeName == 'marriage')
-		{		// normal response
+		{		        // normal response
 		    var	form	= document.indForm;
 		    var	sex	= 0;			// 0 for male, 1 for female
 		    if (form.sex)
@@ -2049,8 +2053,8 @@ function gotUpdatedFamily(xmlDoc)
 						break;
 				    }		// parameter processing
 
-				}		// act on individual children
-		    }			// check the children for error message text
+				}		    // act on individual children
+		    }			    // check the children for error message text
 
 		    // take appropriate action
 		    var	opener	= null;
@@ -2060,13 +2064,15 @@ function gotUpdatedFamily(xmlDoc)
 				opener	= window.opener;
 
 		    if (pendingButton)
-		    {		// another action to perform
-				form		= pendingButton.form;
+		    {		        // another action to perform
+    if (debug.toLowerCase() == 'y')
+    	alert("gotUpdatedFamily: pendingButton=" + pendingButton.outerHTML); 
+				form		    = pendingButton.form;
 				form.idmr.value	= idmr;
-				var	tmp	= pendingButton;
+				var	tmp	        = pendingButton;
 				pendingButton	= null;
 				tmp.click();
-		    }		// another action to perform
+		    }		        // another action to perform
 		    else
 		    if (opener)
 		    { // notify the opener (editIndivid.php) of the updated marriage
@@ -2088,19 +2094,23 @@ function gotUpdatedFamily(xmlDoc)
 				closeFrame();
 		    } // notify the opener (editIndivid.php) of the updated marriage
 		    else
+            {
+                if (debug.toLowerCase() == 'y')
+    	            alert("gotUpdatedFamily: window.history.back()"); 
 				window.history.back();
-		}		// normal response
+            }
+		}		            // normal response
 		else
-		{	// unexpected root node
+		{	                // unexpected root node
 		    alert("commonMarriage.js: gotUpdatedFamily: Unexpected: " +
 				  tagToString(root) + ", " + updateMarriageParms);
-		}	// unexpected root node
-    }		// XML document
+		}	                // unexpected root node
+    }		                // XML document
     else
-    {		// not an XML document, display text
+    {		                // not an XML document, display text
 		alert("commonMarriage.js: gotUpdatedFamily: Unexpected: " + xmlDoc +
 							 ", " + updateMarriageParms);
-    }		// not an XML document, display text
+    }		                // not an XML document, display text
 }		// function gotUpdatedFamily
 
 /************************************************************************
@@ -2115,72 +2125,97 @@ function gotUpdatedFamily(xmlDoc)
 function processParms(parms)
 {
     for (var i = 0; i < parms.childNodes.length; i++)
-    {			// loop through individual parameters
-		var	parm		= parms.childNodes[i];
+    {			            // loop through individual parameters
+		var	parm					= parms.childNodes[i];
 		if (parm.nodeType != 1)
 		    continue;
-		var	value		= parm.textContent.trim();
-		var	namePattern	= /^([a-zA-Z_]+)(\d*)$/;
-		var	pieces		= namePattern.exec(parm.nodeName);
-		var	name		= parm.nodeName.toLowerCase();
-		var	rowNum		= '';
+		var	value					= parm.textContent.trim();
+		var	namePattern				= /^([a-zA-Z_]+)(\d*)$/;
+		var	pieces					= namePattern.exec(parm.nodeName);
+		var	name					= parm.nodeName.toLowerCase();
+		var	rowNum					= '';
 		if (pieces)
-		{		// separate column and row
-		    name		= pieces[1].toLowerCase();
-		    rowNum		= pieces[2];
-		}		// separate column and row
+		{		            // separate column and row
+		    name					= pieces[1].toLowerCase();
+		    rowNum					= pieces[2];
+		}		            // separate column and row
 
-		// pop up help balloon if the mouse hovers over a field
 		switch(name)
-		{		// act on individual parm
+		{		            // act on individual parm
 		    case 'cidir':
-		    {		// original IDIR of a child
-				break;
-		    }		// original IDIR of a child
+		    {		        // original IDIR of a child
+                if (value > 0)
+                    break;  // existing child
 
-		    case 'cidcr':
-		    {		// IDCR of a child
+                // need to get actual IDIR, IDCR, and BirthSD of new child
 				for (var j = 0; j < parm.childNodes.length; j++)
-				{	// loop through children
-				    var	child	= parm.childNodes[j];
+				{	        // loop through children
+				    var	child	            = parm.childNodes[j];
 				    if (child.nodeType != 1)
 						continue;
-				    var	pieces	= namePattern.exec(child.nodeName);
-				    var	cname	= parm.nodeName.toLowerCase();
-				    var crowNum	= '';
+				    var	pieces	            = namePattern.exec(child.nodeName);
+				    var	cname	            = parm.nodeName.toLowerCase();
+				    var crowNum	            = '';
 				    if (pieces)
 				    {		// separate column and row
-						cname	= pieces[1].toLowerCase();
-						crowNum	= pieces[2];
+						cname	            = pieces[1].toLowerCase();
+						crowNum	            = pieces[2];
 				    }		// separate column and row
 
-				    if (cname == 'idir')
-				    {
-						var	value		= child.textContent.trim();
-						var fldId	= 'CIdir' + crowNum;
-						var idirElt	= document.getElementById(fldId)
-						if (idirElt && idirElt.value == 0)
-						{
-						    idirElt.value	= value;
-						}
-				    }
-				    else
-				    if (cname == 'newidcr')
-				    {
-						var	value		    = child.textContent.trim();
-						var fldId	        = 'CIdcr' + rowNum;
-						var idcrElt	        = document.getElementById(fldId)
-						if (idcrElt && idcrElt.value == 0)
-						{
-						    idcrElt.value	= value;
-						}
-				    }
-				}	// loop through children
-				break;
-		    }		// IDCR of a child
+                    switch(cname)
+                    {       // act on specific sub-parameter
+                        case 'idir':
+					    {
+							var	value		= child.textContent.trim();
+							var fldId	    = 'CIdir' + crowNum;
+							var idirElt	    = document.getElementById(fldId);
+							if (idirElt && idirElt.value == 0)
+							    idirElt.value	= value;
+	                        else
+	                            alert('commonMarriage.js: processParms: ' +
+                                      'cannot find <input id="' + fldId + '">');
+                            break;
+					    }   // idir
 
-		}		// act on individual parm
-    }			// loop through individual parameters
+                        case 'idcr':
+                        case 'newidcr':
+					    {
+							var	value		= child.textContent.trim();
+							var fldId	    = 'CIdcr' + crowNum;
+							var idcrElt	    = document.getElementById(fldId);
+							if (idcrElt && idcrElt.value == 0)
+							    idcrElt.value	= value;
+	                        else
+	                            alert('commonMarriage.js: processParms: ' +
+                                      'cannot find <input id="' + fldId + '">');
+                            break;
+					    }   // idcr
+
+                        case 'birthsd':
+					    {
+							var	value		= child.textContent.trim();
+							var fldId	    = 'Cbirthsd' + crowNum;
+							var birthsdElt	= document.getElementById(fldId);
+							if (birthsdElt)
+							    birthsdElt.value	= value;
+	                        else
+	                            alert('commonMarriage.js: processParms: ' +
+                                      'cannot find <input id="' + fldId + '">');
+                            break;
+					    }   // birthsd
+
+                    }       // act on specific sub-parameter
+				}	        // loop through children
+				break;
+		    }		        // original IDIR of a child
+
+		    case 'cidcr':
+		    {		        // IDCR of a child
+				break;
+		    }		        // IDCR of a child
+
+		}		            // act on individual parm
+    }			            // loop through individual parameters
 }		// function processParms
 
 /************************************************************************
@@ -2205,23 +2240,30 @@ function noUpdatedFamily()
  *  Input:																*
  *		this		<button id='orderChildren'>							*
  ************************************************************************/
-
+var orderRecursing          = false;
 function orderChildren()
 {
-    var	children	= document.getElementById('children');
-    var	body		= children.tBodies[0];
-    var	bodyRows	= Array();
+    var	children	        = document.getElementById('children');
+    var	body		        = children.tBodies[0];
+    var	bodyRows	        = Array();
     for (var i = 0; i < body.rows.length; i++)
     {
-		var	row	= body.rows[i];
-		var	rowId	= row.id.substring(5);
-		var	idirElt	= document.getElementById('CIdir' + rowId);
+		var	row	            = body.rows[i];
+		var	rowId	        = row.id.substring(5);
+		var	idirElt	        = document.getElementById('CIdir' + rowId);
 		if (typeof(idirElt) != 'undefined' && idirElt.value == 0)
 		{		// child is not yet in database
+	        if (orderRecursing)
+	        {
+	    alert("commonMarriage.js: orderChildren: recursing loop idirElt=" +
+	            idirElt.outerHTML);
+	            return;
+	        }
+            orderRecursing  = true;
 		    pendingButton	= this;
 		    this.form.update.click();	// save the family first
 		}
-		bodyRows[i]	= body.rows[i];
+		bodyRows[i]	        = body.rows[i];
     }
     bodyRows.sort(childOrder);
     while (body.hasChildNodes())
@@ -2312,15 +2354,15 @@ function editEvent()
 }	// function editEvent
 
 /************************************************************************
- *  editIEvent																*
+ *  function editIEvent													*
  *																		*
  *  This is the onclick method of an "Edit Event" button.  				*
- *  It is called when the user requests to edit								*
- *  information about an event of the current family that is				*
- *  recorded in the instance of Family.								*
+ *  It is called when the user requests to edit							*
+ *  information about an event of the current family that is			*
+ *  recorded in the instance of Family.									*
  *																		*
- *  Parameters:																*
- *		this		<button id='EditIEvent9999'> where the number is 		*
+ *  Parameters:															*
+ *		this	<button id='EditIEvent9999'> where the number is 		*
  *				a citation type as defined in Citation.inc				*
  ************************************************************************/
 function editIEvent()
@@ -2343,54 +2385,51 @@ function editIEvent()
 		form.update.click();	// save the family first
     }			// family needs to be saved first
     return true;
-}	// editIEvent
+}	// function editIEvent
 
 /************************************************************************
- *  delEvent																*
+ *  function delEvent													*
  *																		*
- *  This is the onclick method of the "Delete Event" button.  				*
+ *  This is the onclick method of the "Delete Event" button.  			*
  *  It is called when the user requests to delete						*
- *  information about an existing event in the current family that is		*
- *  recorded by an instance of Event.										*
+ *  information about an existing event in the current family that is	*
+ *  recorded by an instance of Event.									*
  *																		*
- *  Parameters:																*
- *		this		<button id='DelEvent9999'> where the number is the		*
- *				key of an instance of Event								*
+ *  Parameters:															*
+ *		this		<button id='DelEvent9999'> where the number is the	*
+ *					key of an instance of Event							*
+ *		ev          instance of Event                                   *
  ************************************************************************/
-function delEvent()
+function delEvent(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form	= this.form;
     var	ider	= this.id.substring(DELETE_EVENT_PREFIX_LEN);
-    var parms		= {"type"	: ider,
-						   "formname"	: form.name, 
-						   "template"	: "",
-						   "msg"	:
-						"Are you sure you want to delete this event?"};
+    var parms		= {"type"	    : ider,
+					   "formname"	: form.name, 
+					   "template"	: "",
+					   "msg"	    :
+						    "Are you sure you want to delete this event?"};
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-				      'ClrInd$template',
-				      parms,
-				      this,		// position relative to
-				      confirmEventDel,	// 1st button confirms Delete
-				      false);		// default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("commonMarriage.js: delEvent: Error: " + msg);
-}		// delEvent
+	displayDialog('ClrInd$template',
+			      parms,
+			      this,		        // position relative to
+			      confirmEventDel);	// 1st button confirms Delete
+}		// function delEvent
 
 /************************************************************************
- *  confirmEventDel														*
+ *  function confirmEventDel											*
  *																		*
- *  This method is called when the user confirms the request to delete		*
- *  an event which is defined in an instance of Event.						*
+ *  This method is called when the user confirms the request to delete	*
+ *  an event which is defined in an instance of Event.					*
  *  A request is sent to the server to delete the instance.				*
  *																		*
  *  Input:																*
- *		this				<button id='confirmClear...'>						*
+ *		this			<button id='confirmClear...'>					*
  ************************************************************************/
 function confirmEventDel()
 {
@@ -2404,8 +2443,8 @@ function confirmEventDel()
 
     if (form)
     {		// have the form
-		var parms	= {"idime"	: ider,
-						   "cittype"	: 31};
+		var parms	= {"idime"	    : ider,
+					   "cittype"	: 31};
 
 		// invoke script to update Event and return XML result
 		popupLoading(this);	// display loading indicator
@@ -2417,55 +2456,52 @@ function confirmEventDel()
     else
 		alert("commonMarriage.js: confirmEventDel: unable to get form");
     return true;
-}	// confirmEventDel
+}	// function confirmEventDel
 
 /************************************************************************
- *  delIEvent																*
+ *  function delIEvent													*
  *																		*
- *  This is the onclick method of the "Delete Internal Event" button.  		*
+ *  This is the onclick method of the "Delete Internal Event" button.  	*
  *  It is called when the user requests to delete						*
- *  information about an existing event in the current family that is		*
- *  recorded by data inside the instance of Family.				*
+ *  information about an existing event in the current family that is	*
+ *  recorded by data inside the instance of Family.						*
  *																		*
- *  Parameters:																*
- *		this		<button id='DelIEvent9999'> where the number is				*
- *				a citation type												*
+ *  Parameters:															*
+ *		this	        <button id='DelIEvent9999'> where the number 	*
+ *				        is a citation type								*
+ *		ev              instance of Event                               *
  ************************************************************************/
-function delIEvent()
+function delIEvent(ev)
 {
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
     var	form	= this.form;
     var	citType	= this.id.substring(9);
-    var parms		= {"type"	: citType,
-						   "formname"	: form.name, 
-						   "template"	: "",
-						   "msg"	:
+    var parms		= {"type"	    : citType,
+					   "formname"	: form.name, 
+					   "template"	: "",
+					   "msg"	    :
 						"Are you sure you want to delete this event?"};
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-				      'ClrInd$template',
-				      parms,
-				      this,		// position relative to
-				      confirmClearInd,	// 1st button confirms Delete
-				      false);		// default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("commonMarriage.js: delIEvent: Error: " + msg);
-}		// delIEvent
+	displayDialog('ClrInd$template',
+			      parms,
+			      this,		        // position relative to
+			      confirmClearInd);	// 1st button confirms Delete
+}		// function delIEvent
 
 /************************************************************************
- *  confirmDelIEvent														*
+ *  function confirmDelIEvent											*
  *																		*
- *  This method is called when the user confirms the request to delete		*
- *  an event which is defined inside the Familyrecord.				*
+ *  This method is called when the user confirms the request to delete	*
+ *  an event which is defined inside the Familyrecord.					*
  *  The contents of the fields describing the event are cleared.		*
- *  The user still needs to update the individual to apply the changes.		*
+ *  The user still needs to update the individual to apply the changes.	*
  *																		*
  *  Input:																*
- *		this				<button id='confirmClear...'>						*
+ *		this			<button id='confirmClear...'>					*
  ************************************************************************/
 function confirmDelIEvent()
 {
@@ -2493,17 +2529,17 @@ function confirmDelIEvent()
     else
 		alert("commonMarriage.js: confirmDelIEvent: unable to get form");
     return true;
-}	// confirmDelIEvent
+}	// function confirmDelIEvent
 
 /************************************************************************
- *  gotDelEvent																*
+ *  function gotDelEvent												*
  *																		*
- *  This method is called when the XML document representing				*
- *  a successful delete family event is retrieved from the database.		*
+ *  This method is called when the XML document representing			*
+ *  a successful delete family event is retrieved from the database.	*
  *																		*
- *  Parameters:																*
- *		xmlDoc				response from the server script						*
- *						deleteEventXml.php as an XML document				*
+ *  Parameters:															*
+ *		xmlDoc		response from the server script						*
+ *					deleteEventXml.php as an XML document				*
  ************************************************************************/
 function gotDelEvent(xmlDoc)
 {
@@ -2542,30 +2578,30 @@ function gotDelEvent(xmlDoc)
     }		// XML document
     else
 		alert('commonMarriage.js: gotDelEvent: ' + xmlDoc);
-}		// gotDelEvent
+}		// function gotDelEvent
 
 /************************************************************************
- *  noDelEvent																*
+ *  function noDelEvent													*
  *																		*
  *  This method is called if there is no server response from the		*
- *  deleteEventXml.php script												*
+ *  deleteEventXml.php script											*
  ************************************************************************/
 function noDelEvent()
 {
     alert('commonMarriage.js: noDelEvent: No server response from deleteEventXml.php');
-}		// noDelEvent
+}		// function noDelEvent
 
 /************************************************************************
- *  addEvent																*
+ *  function addEvent													*
  *																		*
  *  This is the onclick method of the "Add Event" button.  				*
- *  It is called when the user requests to add								*
- *  information about a new event to the current family that is				*
- *  recorded by an instance of Event or by a normally hidden				*
- *  event recorded in the instance of Family.						*
+ *  It is called when the user requests to add							*
+ *  information about a new event to the current family that is			*
+ *  recorded by an instance of Event or by a normally hidden			*
+ *  event recorded in the instance of Family.							*
  *																		*
- *  Parameters:																*
- *		this		<button id='addEvent'>										*
+ *  Parameters:															*
+ *		this		<button id='addEvent'>								*
  ************************************************************************/
 function addEvent()
 {
@@ -2582,33 +2618,33 @@ function addEvent()
     else
 		alert("commonMarriage.js: addEvent: unable to get form");
     return true;
-}	// addEvent
+}	// function addEvent
 
 /************************************************************************
- *  orderEvents																*
+ *  function orderEvents												*
  *																		*
- *  This method is called when the user requests to reorder 				*
+ *  This method is called when the user requests to reorder 			*
  *  the events by event date.  This method only changes the order		*
- *  in which the events appear in the display.				* 
+ *  in which the events appear in the display.				            * 
  *																		*
  *  Input:																*
- *		this		<button id='orderEvents'>								*
+ *		this		<button id='orderEvents'>							*
  ************************************************************************/
 function orderEvents()
 {
     popupAlert("Sorry, this functionality is not yet implemented", this);
-}		// orderEvents
+}		// function orderEvents
 
 /************************************************************************
- *  editPictures														*
+ *  function editPictures												*
  *																		*
- *  This is the onclick method of the "Edit Pictures" button.  				*
- *  It is called when the user requests to edit								*
+ *  This is the onclick method of the "Edit Pictures" button.  			*
+ *  It is called when the user requests to edit							*
  *  information about the Pictures of the current family that are		*
- *  recorded by instances of Picture.										*
+ *  recorded by instances of Picture.									*
  *																		*
- *  Parameters:																*
- *		this		<button id='Pictures'										*
+ *  Parameters:															*
+ *		this		<button id='Pictures'								*
  ************************************************************************/
 function editPictures()
 {
@@ -2633,15 +2669,15 @@ function editPictures()
     else
 		alert("commonMarriage.js: editPictures: unable to get form");
     return true;
-}	// editPictures
+}	// function editPictures
 
 /************************************************************************
- *  changeNameRule														*
+ *  function changeNameRule												*
  *																		*
  *  The user has altered the selection of MarriageNameRule.				*
  *																		*
  *  Input:																*
- *		this		<select name='MarriedNameRule'>								*
+ *		this		<select name='MarriedNameRule'>						*
  ************************************************************************/
 function changeNameRule()
 {
@@ -2683,16 +2719,16 @@ function changeNameRule()
 		    wifeMarrSurname.value	= wifeSurname;
 		}	// display explicit married surname fields
     }		// user has selected a rule
-}		// changeNameRule
+}		// function changeNameRule
 
 /************************************************************************
- *  gotAddChild																*
+ *  function gotAddChild												*
  *																		*
- *  This method is called when the XML document representing				*
- *  a child added to the family is retrieved from the server.				*
+ *  This method is called when the XML document representing			*
+ *  a child added to the family is retrieved from the server.			*
  *																		*
- *  Parameters:																*
- *		xmlDoc				Family record as an XML document				*
+ *  Parameters:															*
+ *		xmlDoc			Family record as an XML document				*
  ************************************************************************/
 function gotAddChild(xmlDoc)
 {
@@ -2711,21 +2747,21 @@ function gotAddChild(xmlDoc)
     }		// XML document
     else
 		alert("gotAddChild: " + xmlDoc);
-}		// gotAddChild
+}		// function gotAddChild
 
 /************************************************************************
- *  noAddChild																*
+ *  function noAddChild													*
  *																		*
  *  This method is called if there is no add child response				*
- *  from the server.														*
+ *  from the server.													*
  ************************************************************************/
 function noAddChild()
 {
     alert('commonMarriage.js: noAddChild: script addChildXml.php not found on server');
-}		// noAddChild
+}		// function noAddChild
 
 /************************************************************************
- *  addChildToPage														*
+ *  function addChildToPage												*
  *																		*
  *  This method is called to add information about a child				*
  *  as a visible row in the web page.  If requested it also adds the	*
@@ -2895,20 +2931,20 @@ function addChildToPage(parms,
     }		// loop through input tags
 
     return	row;
-}		// addChildToPage
+}		// function addChildToPage
 
 /************************************************************************
- *  editEventMar														*
+ *  function editEventMar												*
  *																		*
  *  This method is called when the user requests to edit				*
- *  information about an event of the current family						*
+ *  information about an event of the current family					*
  *  that is described by fields within the Family record itself.		*
  *																		*
- *  Parameters:																*
- *		type				the event type, used to distinguish between the		*
- *						events that are recorded inside the				*
- *						Family record										*
- *		button				invoking instance of <button>						*
+ *  Parameters:															*
+ *		type		the event type, used to distinguish between the		*
+ *					events that are recorded inside the					*
+ *					Family record										*
+ *		button		invoking instance of <button>						*
  *																		*
  ************************************************************************/
 function editEventMar(type, button)
@@ -2955,14 +2991,14 @@ function editEventMar(type, button)
     else
 		alert("editEventMar: unable to get form");
     return true;
-}	// editEventMar
+}	// function editEventMar
 
 /************************************************************************
- *  childKeyDown														*
+ *  function childKeyDown												*
  *																		*
- *  Handle key strokes in text input fields in a child line.				*
+ *  Handle key strokes in text input fields in a child line.			*
  *																		*
- *  Parameters:																*
+ *  Parameters:															*
  *		e		W3C compliant browsers pass an event as a parameter		*
  ************************************************************************/
 function childKeyDown(e)
@@ -2991,7 +3027,7 @@ function childKeyDown(e)
 		{
 		    displayHelp(this);		// display help page
 		    return false;		// suppress default action
-		}			// F1
+		}			// function F1
 
 		case KEY_ENTER:
 		{			// enter key
@@ -3090,4 +3126,4 @@ function childKeyDown(e)
     }	    // switch on key code
 
     return;
-}		// childKeyDown
+}		// function childKeyDown

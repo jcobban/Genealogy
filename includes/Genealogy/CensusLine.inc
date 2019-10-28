@@ -1711,7 +1711,7 @@ class CensusLine extends Record
 		    }			// post-confederation
 
 		    $stmt	            = $connection->prepare($delete);
-			$deleteText	        = debugPrepQuery($query, $sqlParms);
+			$deleteText	        = debugPrepQuery($delete, $parms);
             $this->lastSqlCmd   = $deleteText;
 		    if ($stmt->execute($parms))
 		    {		// delete successful

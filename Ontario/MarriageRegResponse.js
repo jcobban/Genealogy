@@ -16,6 +16,7 @@
  *		2019/01/31      permit using pageUp and pageDown to move        *
  *		                through pages of response                       *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/06/29      first parameter of displayDialog removed        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -90,7 +91,7 @@ function showReg(event)
 						'&RegYear=' + regyear +
 						'&RegNum=' + regnum;
     return false;
-}		// showReg
+}		// function showReg
 
 /************************************************************************
  *  function deleteReg													*
@@ -122,29 +123,20 @@ function deleteReg(event)
 		parms["debug"]	= debug;
 
     // ask user to confirm delete
-    dialogDiv	= document.getElementById('msgDiv');
-    if (dialogDiv)
-    {		// have popup <div> to display message in
-		displayDialog(dialogDiv,
-    			      'RegDel$template',
-    			      parms,
-    			      this,		// position relative to
-    			      confirmDelete,	// 1st button confirms Delete
-    			      false);		// default show on open
-    }		// have popup <div> to display message in
-    else
-		alert("MarriageRegResponse.js: deleteReg: " +
-			"Error: <div id='msgDiv'> not defined");
-}		// deleteReg
+	displayDialog('RegDel$template',
+    			  parms,
+    		      this,		        // position relative to
+    		      confirmDelete);	// 1st button confirms Delete
+}		// function deleteReg
 
 /************************************************************************
  *  function confirmDelete												*
  *																		*
- *  This method is called when the user confirms the request to delete		*
+ *  This method is called when the user confirms the request to delete	*
  *  a registration.														*
  *																		*
  *  Input:																*
- *		this				<button id='confirmDelete...'>						*
+ *		this		<button id='confirmDelete...'>						*
  ************************************************************************/
 function confirmDelete()
 {
@@ -172,16 +164,16 @@ function confirmDelete()
 		      noDeleteReg);
 
     return false;
-}		// deleteReg
+}		// function deleteReg
 
 /************************************************************************
  *  function gotDeleteReg												*
  *																		*
  *  The XML document representing the results of the request to 		*
- *  delete the marriage registration has been received.						*
+ *  delete the marriage registration has been received.					*
  *																		*
  *  Input:																*
- *		xmlDoc				XML document with results of delete				*
+ *		xmlDoc			XML document with results of delete				*
  ************************************************************************/
 function gotDeleteReg(xmlDoc)
 {
@@ -226,7 +218,7 @@ function gotDeleteReg(xmlDoc)
 		else
 		    alert("MarriageRegResponse.js: gotDeleteReg: '" + xmlDoc + "'");
     }
-}		// gotDeleteReg
+}		// function gotDeleteReg
 
 /************************************************************************
  *  function noDeleteReg												*

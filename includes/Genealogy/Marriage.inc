@@ -81,6 +81,9 @@ use \Iterator;
  *						set to NULL for empty string					*
  *		2018/12/11      ensure m_calcdate always valid                  *
  *		2019/01/24      add missing method toJson                       *
+ *		2019/06/12      improve validation of values assigned to Dates  *
+ *		2019/10/28      permit spaces in front of save parm             *
+ *		                return count from save                          *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -112,7 +115,7 @@ class Marriage extends Record
                         'm_regcounty'			=> '',
                         'm_regtownship'			=> '',
                         'm_date'				=> '',
-                        'm_calcdate'			=> '0000-00-00',
+                        'm_calcdate'			=> null,
                         'm_place'				=> '',
                         'm_licensetype'			=> 'L',
                         'm_remarks'				=> '',
@@ -159,23 +162,25 @@ class Marriage extends Record
                         'originalitem'			=> 'm_originalitem');
 
     /********************************************************************
-     *	Marriage::$defaultOrder												*
+     *	Marriage::$defaultOrder											*
      *																	*
-     *	Definition of default order for records retrieved by RecordSet		*
+     *	Definition of default order for records retrieved by RecordSet	*
      ********************************************************************/
     protected static	$defaultOrder	= 'M_RegDomain, M_RegYear, M_RegNum';
 
     /********************************************************************
-     *	Marriage::$pre1873Years												*
+     *	Marriage::$pre1873Years											*
      *																	*
-     *	static array containing default values for registration year		*
-     *	by volume number for pre-1873 marriage registrations				*
+     *	static array containing default values for registration year	*
+     *	by volume number for pre-1873 marriage registrations			*
+     *																	*
+     *	Note the problem caused by the one non-integer volume number    *
      ********************************************************************/
     static	$pre1873Years	= array(
                                  0	=> array('year' => 1869, 'reel' => 1),
                                  1	=> array('year' => 1869, 'reel' => 1),
                                  2	=> array('year' => 1869, 'reel' => 1),
-                                23	=> array('year' => 1869, 'reel' => 1),
+                            // 2/3	=> array('year' => 1869, 'reel' => 1),
                                  3	=> array('year' => 1869, 'reel' => 1),
                                  4	=> array('year' => 1870, 'reel' => 2),
                                  5	=> array('year' => 1870, 'reel' => 2),
@@ -196,7 +201,7 @@ class Marriage extends Record
                                 20	=> array('year' => 1872, 'reel' => 6),
                                 21	=> array('year' => 1872, 'reel' => 6),
                                 22	=> array('year' => 1872, 'reel' => 7),
-                                //23	=> array('year' => 1872, 'reel' => 7),
+                                23	=> array('year' => 1872, 'reel' => 7),
                                 24	=> array('year' => 1872, 'reel' => 7),
                                 25	=> array('year' => 1872, 'reel' => 8),
                                 26	=> array('year' => 1872, 'reel' => 8),
@@ -247,6 +252,7 @@ class Marriage extends Record
         $pc		            = 'ON';		// postal service state/province code
         $addrEnd	        = ', ON, CA';	// last part of addresses
         $sqlParms	        = array();
+        $parmsText          = '';
 
         // validate parameters
         if (is_string($domain) || $domain instanceof Domain)
@@ -254,13 +260,31 @@ class Marriage extends Record
             $parms	            = array('m_regdomain'	=> $domain,
                                         'm_regyear'	    => $year,
                                         'm_regnum'	    => $number);
+            $parmsText          = "'$domain',$year,$number";
         }
         else
         if (is_array($domain))
+        {
             $parms	            = $domain;
+            $parmsText          = "array(";
+            $comma              = '';
+            foreach($parms as $field => $value)
+            {
+                $parmsText      .= "$comma'$field' => '$value'";
+                $comma          = ',';
+            }
+            $parmsText          .= ')';
+        }
         else
+        {
+            $parmsText          = print_r($domain, true);
             $this->msg          .= "Invalid parameter " . 
-                                    print_r($domain, true) . '. ';
+                                            print_r($domain, true) . '. ';
+            $parms	            = array();
+        }
+        if ($debug)
+            $warn	.= "<p>Marriage.inc: " . __LINE__ .
+                        " new Marriage($parmsText)</p>\n";
 
         if (count($parms) >= count(self::$initRow))
         {			// row returned from database query
@@ -383,7 +407,7 @@ class Marriage extends Record
                             $number	    = (int)$number;
                         else
                         if (!is_int($number) || $number < 1)
-                            $warn	    .= "Marriage::__construct: " .
+                            $warn	    .= "<p>Marriage::__construct: " .
                                            __LINE__ .
         "registration number '$number' must be a positive integer</p>\n";
 
@@ -428,6 +452,7 @@ class Marriage extends Record
                     }
                     else
                         $msvol	            = '';
+
                     // set defaults
                     $dbrow			        = self::$initRow;
                     $dbrow['m_regdomain']	= $domain;
@@ -491,11 +516,9 @@ class Marriage extends Record
                     }		// successful query
                     else
                     {		// error issuing query
-                        if (strlen($queryText) > 40)
-                            $queryText	= substr($queryText, 0, 30) . '...' .
-                                      substr($queryText, -7);
-                        $this->msg  .= "'$queryText' " .
-                            print_r($connection->errorInfo(),true) .
+                        $this->msg  .= "Marriage::__construct: " . __LINE__ . 
+                                        " '$queryText' " .
+                                        print_r($connection->errorInfo(),true) .
                             '. ';
                     }		// error issuing query
 
@@ -513,9 +536,9 @@ class Marriage extends Record
             }			// successful query
             else
             {
-                $this->msg  .=  "Marriage.inc: " . __LINE__ .
+                $this->msg  .=  "Marriage::__construct: " . __LINE__ .
                             " query='$queryText' query failed: " .
-                            print_r($stmt->errorInfo(),true) . '. ';
+                            print_r($stmt->errorInfo(),true) . ".\n";
             }
         }			// search parameters
 
@@ -541,7 +564,8 @@ class Marriage extends Record
         }		// query successful
         else
         {		// error issuing query
-             $this->msg     .= " query='$pqueryText', " .
+            $this->msg     .= "Marriage::__construct: " . __LINE__ . 
+                                " query='$pqueryText', " .
                                 print_r($pstmt->errorInfo(),true) . ".\n";
         }		// error issuing query
 
@@ -898,23 +922,43 @@ class Marriage extends Record
      *	    $xml		if true diagnostic output is emitted in XML		*
      *					format within <cmd> tags.						*
      *					if a string use it as tag name					*
+     *																	*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method updated the database record		*
+     *	    0			if the database did not need to be updated		*
+     *																	*
+     *  Throws:															*
+     *	    Exception if user is not authorized to update the database	*
      ********************************************************************/
     function save($xml)
     {
         global	$debug;
-        global $warn;
+        global  $warn;
+        global  $msg;
         global	$userid;
         global	$connection;
 
+        $retval                 = 0;
+
+        // determine top level tag name for XML output
+        $indent        		= '';
         if (is_string($xml))
         {			// string tag name
-            $tagname	= $xml;
-            $xml	= true;
+            $matches   		= array();
+            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            {
+                $indent		= $matches[1];
+                $xml   		= $matches[2];
+            }
+            $tagname		= $xml;
+            $xml	   		= true;
         }			// string tag name
         else
         if ($xml)
         {			// true
-            $tagname	= 'cmd';
+            $indent         = "    ";
+            $tagname	    = 'cmd';
         }			// true
 
         if ($this->needInsert)
@@ -983,28 +1027,28 @@ class Marriage extends Record
             }			// loop through all fields in record
 
             // construct the SQL INSERT command	
-            $insert	= "INSERT INTO Marriage ($fldnames) VALUES($values)";
+            $insert	    = "INSERT INTO Marriage ($fldnames) VALUES($values)";
 
             // insert the new record into the database
-            $stmt	= $connection->prepare($insert);
+            $stmt	    = $connection->prepare($insert);
             $insertText	= debugPrepQuery($insert, $sqlParms);
             if ($stmt->execute($sqlParms))
             {			// successful insert
-                $count		= $stmt->rowCount();
+                $retval		= $stmt->rowCount();
                 if ($xml)
-                    print "<$tagname result='$count'>" . $insertText . 
+                    print "$indent<$tagname result='$retval'>" . $insertText . 
                             "</$tagname>\n";
 
                 if ($debug)
                 {
                     $warn	.= "<p>$insertText</p>\n";
-                    $warn	.= "<p>count=$count</p>\n";
+                    $warn	.= "<p>count=$retval</p>\n";
                 }
 
                 // log the update
                 logSqlUpdate($insert,
                              $sqlParms,
-                             $count,
+                             $retval,
                              '',
                              json_encode($this->row));
 
@@ -1034,11 +1078,8 @@ class Marriage extends Record
             }			// successful insert
             else
             {			// error inserting record
-                error_log("Marriage.inc: " . __LINE__ . " $insertText\n");
-                if (strlen($insertText) > 40)
-                    $insertText	= substr($insertText, 0, 37) . '...'; 
-                throw new Exception("Marriage::save: '$insertText', " .
-                                    print_r($stmt->errorInfo(),true));
+                $msg    .= "Marriage::save: " . __LINE__ . " '$insertText', " .
+                                    print_r($stmt->errorInfo(),true) . ".\n";
             }			// error inserting record
         }			// create new record
         else
@@ -1113,13 +1154,13 @@ class Marriage extends Record
                         ' AND M_RegYear=:oyear AND M_RegNum=:onumber';
 
                 // perform the update
-                $stmt		= $connection->prepare($update);
-                $updateText	= debugPrepQuery($update, $sqlParms);
+                $stmt		    = $connection->prepare($update);
+                $updateText	    = debugPrepQuery($update, $sqlParms);
                 if ($stmt->execute($sqlParms))
                 {		// successful update
-                    $count		= $stmt->rowCount();
+                    $retval		= $stmt->rowCount();
                     if ($xml)
-                        print "<$tagname count='$count'>" .
+                        print "$indent<$tagname count='$retval'>" .
                                 $updateText . "</$tagname>\n";
 
                     if ($debug)
@@ -1128,18 +1169,15 @@ class Marriage extends Record
                     // log the update
                     logSqlUpdate($update,
                                  $sqlParms,
-                                 $count,
+                                 $retval,
                                  json_encode($this->former),
                                  json_encode($this->row));
                 }		// successful update
                 else
                 {		// error updating record
-                    error_log("Marriage.inc: " . __LINE__ . " $updateText\n");
-                    if (strlen($updateText) > 40)
-                        $updateText	= substr($updateText, 0, 37) . '...'; 
-                    throw new Exception("Marriage::save:
-                                    '$updateText', " .
-                                    print_r($stmt->errorInfo(),true));
+                    $msg    .= "Marriage::save: " . __LINE__ .
+                                    " '$updateText', " .
+                                    print_r($stmt->errorInfo(),true) . ".\n";
                 }		// error updating record
             }		// changes made
 
@@ -1163,6 +1201,8 @@ class Marriage extends Record
                     $participant->save(false);
             }			// loop through participants
         }		// update existing record
+
+        return $retval;
     }		// Marriage::save
 
     /********************************************************************
@@ -1186,13 +1226,23 @@ class Marriage extends Record
         global	$connection;
 
         // handle XML output option
+        $indent             = '';
         if (is_string($xml))
-            $xmltag	= $xml;
+        {
+            $matches   		= array();
+            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            {
+                $indent		= $matches[1];
+                $xml   		= $matches[2];
+            }
+            $tagname		= $xml;
+            $xml	   		= true;
+        }
         else
         if ($xml)
         {
-            $xml	= true;
-            $xmltag	= 'cmd';
+            $indent         = '    ';
+            $tagname	    = 'cmd';
         }
 
         // get the key of the table rows referenced by this record
@@ -1226,7 +1276,7 @@ class Marriage extends Record
                     $warn	.= "<p>$deleteText</p>\n";
 
                 if ($xml)
-                    print "<$xmltag count='$count'>$deleteText</$xmltag>\n";
+                    print "$insert<$tagname count='$count'>$deleteText</$tagname>\n";
 
                 // log the update
                 logSqlUpdate($delete,
@@ -1246,7 +1296,7 @@ class Marriage extends Record
                 {		// successful delete
                     $count		= $stmt->rowCount();
                     if ($xml)
-                        print "<$xmltag count='$count'>$deleteText</$xmltag>\n";
+                        print "$insert<$tagname count='$count'>$deleteText</$tagname>\n";
                     if ($debug)
                         $warn	.= "<p>$deleteText</p>\n";
 

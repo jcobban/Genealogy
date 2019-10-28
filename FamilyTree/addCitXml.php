@@ -1040,7 +1040,8 @@ else
 	if ($type == Citation::STYPE_EVENT)
 	{		// possibly event moved to tblER from tblIR
 	    if ($event)
-			$idir		= $event->getIdir();
+            $idir		= $event['idir'];
+
 	    switch($idet)
 	    {		// act on specific event types
 			case Event::ET_BIRTH:
@@ -1060,7 +1061,7 @@ else
 	else
 	{		// possibly event moved to tblER from tblMR
 	    if ($event)
-			$idmr		= $event->getIdir();
+			$idmr		= $event['idir'];
 	    switch($idet)
 	    {		// act on specific event types
 			case Event::ET_MARRIAGE:

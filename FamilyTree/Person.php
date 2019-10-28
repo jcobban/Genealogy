@@ -278,8 +278,12 @@ use \Templating\TemplateTag;
  *		2018/09/15		urlencode subject in contact author				*
  *		2018/12/03      Citation::toHTML changed to return text         *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/07/18      use Person::getPerson                           *
+ *		2019/07/21      use Location::getLocation                       *
+ *		3019/08/09      support both old and new style citations to     *
+ *		                primary name                                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Address.inc';
 require_once __NAMESPACE__ . '/Blog.inc';
@@ -320,164 +324,6 @@ $maleChildRole		= 'son';
 $femaleChildRole	= 'daughter';
 $unknownChildRole	= 'child';
 $deathcause		    = array();
-
-/************************************************************************
- *  $childRole															*
- *																		*
- *  Interpret the gender of a child as a role within the family.		*
- *  This table must be translated to match the language of the page.	*
- ***********************************************************************/
-static $childRole	= array(
-								'son',
-								'daughter',
-								'child');
-
-/************************************************************************
- *	$tranTab														*
- *																		*
- * Translate location preposition.										*
- * 'at' is the usual preposition for geographically 'small' locations	*
- * such as a town, while 'in' is used for more extensive locations such	*
- * as a county, state, or country.  In French a different preposition is*
- * used for countries that start with a consonant and are grammatically	*
- * 'masculine'.															*
- ***********************************************************************/
-static $tranTab	= array(
-							'at'		=> 'at',
-							'for'		=> 'for',
-							'in'		=> 'in',
-							'in[masc]'	=> 'in',
-							'to'		=> 'to',
-							);
-
-/************************************************************************
- *  $intStatus															*
- *																		*
- *  Interpret the child status field.									*
- *  This table must be translated to match the language of the page.	*
- ***********************************************************************/
-static $intStatus	= array(
-							 1 =>	'',
-							 2 =>	'None',
-							 3 =>	'Stillborn',
-							 4 =>	'Twin',
-							 5 =>	'Illegitimate'
-								);
-
-/************************************************************************
- *  $intType                                                            *
- *																		*
- *  Interpretation of values of Child to Parent Relationships.			*
- *  This table must be translated to match the language of the page.	*
- ************************************************************************/
-
-static $intType	= array(
-							'' => 'unexpected null value',
-							 1 => '',
-							 2 => 'adopted',
-							 3 => 'biological',
-							 4 => 'challenged',
-							 5 => 'disproved',
-							 6 => 'foster',
-							 7 => 'guardianship',
-							 8 => 'sealing',
-							 9 => 'step',
-							10 => 'unknown',
-							11 => 'private',
-							12 => 'family member',
-							13 => 'illegitimate');
-
-/************************************************************************
- *  $eventText															*
- *																		*
- *  This table provides a translation from an event type to the text	*
- *  to display to the user.												*
- *  This table must be translated to match the language of the page.	*
- ***********************************************************************/
-static $eventText	= array(
-		1 => '[Pronoun] [Description] [onDate] [Location].[Citations] [Notes]',
-		2 => '[Pronoun] was adopted [onDate] [Location] by [Description].[Citations] [Notes]',
-		3 => '[Pronoun] was born [Description] [onDate] [Location].[Citations] [Notes]',
-		4 => '[Pronoun] was buried [Description] [onDate] [Location].[Citations] [Notes]',
-		5 => '[Pronoun] was christened [Description] [onDate] [Location].[Citations] [Notes]',
-		6 => '[Pronoun] died [onDate] [Description] [Location].[Citations] [Notes]',
-		7 => '[Pronoun] had a marriage annulled [Description], [onDate] [Location].[Citations] [Notes]',
-		8 => '[Pronoun] was baptized [Description] [onDate] [Location].[Citations] [Notes]',
-		9 => 'He celebrated his bar mitzvah [Description] [onDate] [Location].[Citations] [Notes]',
-		10 => 'She celebrated her bas mitzvah [Description] [onDate] [Location].[Citations] [Notes]',
-		11 => '[Pronoun] was blessed [Description] [onDate] [Location].[Citations] [Notes]',
-		12 => '[Pronoun] appeared on the [Description] census [onDate] [Location].[Citations] [Notes]',
-		13 => '[Pronoun] was circumcised [Description] [onDate] [Location].[Citations] [Notes]',
-		14 => '[Pronoun] became a [Description] citizen [onDate] [Location].[Citations] [Notes]',
-		15 => '[Pronoun] was confirmed [Description] [onDate] [Location].[Citations] [Notes]',
-		16 => '[Pronoun] was confirmed in The Church of Jesus Christ of Latter-day Saints [Description] [onDate] [Location].[Citations] [Notes]',
-		17 => '[Pronoun] was involved in a court case about [Description] [onDate] [Location].[Citations] [Notes]',
-		18 => '[Pronoun] was cremated [Description] [onDate] [Location].[Citations] [Notes]',
-		19 => '[Pronoun] received a degree of [Description] [onDate] [Location].[Citations] [Notes]',
-		20 => '[Pronoun] were divorced [Description] [onDate] [Location].[Citations] [Notes]',
-		21 => '[Pronoun] filed for divorce [Description] [onDate] [Location].[Citations] [Notes]',
-		22 => '[Pronoun] was educated at [Description] [onDate] [Location].[Citations] [Notes]',
-		23 => '[Pronoun] emigrated [Description] [onDate] [fromLocation].[Citations] [Notes]',
-		24 => '[Pronoun] was employed as a [Description] [onDate] [Location].[Citations] [Notes]',
-		25 => '[Pronoun] were engaged [Description] [onDate] [Location].[Citations] [Notes]',
-		26 => '[Pronoun] received First Holy Communion [Description] [onDate] [Location].[Citations] [Notes]',
-		27 => '[Pronoun] graduated from [Description] [onDate] [Location].[Citations] [Notes]',
-		28 => '[Pronoun] enjoyed [Description] [onDate] [Location].[Citations] [Notes]',
-		29 => '[Pronoun] was honoured for [Description] [onDate] [Location].[Citations] [Notes]',
-		30 => '[Pronoun] was in the hospital for [Description] [onDate] [Location].[Citations] [Notes]',
-		31 => '[Pronoun] was ill with [Description] [onDate] [Location].[Citations] [Notes]',
-		32 => '[Pronoun] immigrated [Description] [onDate] [toLocation].[Citations] [Notes]',
-		33 => '[Pronoun] was interviewed [Description] [onDate] [Location].[Citations] [Notes]',
-		34 => '[Pronoun] [Description] land [onDate] [Location].[Citations] [Notes]',
-		35 => '[Pronoun] had marriage banns published [Description] [onDate] [Location].[Citations] [Notes]',
-		36 => '[Pronoun] signed a marriage contract [Description] [onDate] [Location].[Citations] [Notes]',
-		37 => '[HusbFirstName] and [WifeFirstName] obtained a marriage license [Description] [onDate] [Location].[Citations] [Notes]',
-		38 => '[Pronoun] published an intent to marry [Description] [onDate] [Location].[Citations] [Notes]',
-		39 => '[Pronoun] obtained a marriage settlement [Description] [onDate] [Location].[Citations] [Notes]',
-		40 => '[Pronoun] received medical attention for [Description] [onDate] [Location].[Citations] [Notes]',
-		41 => '[Pronoun] was a member of [Description] [onDate] [Location].[Citations] [Notes]',
-		42 => '[Pronoun] served in the military [Description] [onDate] [Location].[Citations] [Notes]',
-		43 => '[Pronoun] served a mission [Description] [onDate] [Location].[Citations] [Notes]',
-		44 => '[Pronoun] was named after [Description] [onDate] [Location].[Citations] [Notes]',
-		45 => '[Pronoun] was naturalized [Description] [onDate] [Location].[Citations] [Notes]',
-		46 => '[Pronoun] obituary was published in the [Description] [onDate] [Location].[Citations] [Notes]',
-		47 => '[Pronoun] worked as a [Description] [onDate] [Location].[Citations] [Notes]',
-		48 => '[Pronoun] had the LDS ordinance [Description] [onDate] [Location].[Citations] [Notes]',
-		49 => '[Pronoun] was ordained a [Description] [onDate] [Location].[Citations] [Notes]',
-		50 => '[Pronoun] was described as [Description] [onDate] [Location].[Citations] [Notes]',
-		51 => '[Pronoun] had an estate probated [Description] [onDate] [Location].[Citations] [Notes]',
-		52 => '[Pronoun] [Description] property [onDate] [Location].[Citations] [Notes]',
-		53 => '[Pronoun] belonged to the [Description] faith [onDate] [Location].[Citations] [Notes]',
-		54 => '[Pronoun] lived [Description] [onDate] [Location].[Citations] [Notes]',
-		55 => '[Pronoun] retired [Description] [onDate] [Location].[Citations] [Notes]',
-		56 => '[Pronoun] attended school at [Description] [onDate] [Location].[Citations] [Notes]',
-		57 => '[Pronoun] was assigned US Social Security Number [Description] [onDate] [Location].[Citations] [Notes]',
-		58 => '[Pronoun] signed a will [Description] [onDate] [Location].[Citations] [Notes]',
-		59 => '[Pronoun] had a medical condition of [Description], [onDate], [Location].[Citations] [Notes]',
-		60 => '[Pronoun] served in the military: [Description], [onDate], [Location].[Citations] [Notes]',
-		61 => '[Pronoun] had a photo taken [Description] [onDate] [Location].[Citations] [Notes]',
-		62 => '[Pronoun] was assigned US Social Security Number [Description] [onDate] [Location].[Citations] [Notes]',
-		63 => '[Pronoun] had another occupation as [Description] [onDate] [Location].[Citations] [Notes]',
-		64 => '[Pronoun] was [Description] [onDate] [Location].[Citations] [Notes]',
-		65 => '[Pronoun] belongs to family group [Description] [onDate] [Location].[Citations] [Notes]',
-		66 => '[Pronoun] identified [her][!him]self as [Description] [onDate] [Location].[Citations] [Notes]',
-		67 => '[Pronoun] funeral was held [Description] [onDate] [Location].[Citations] [Notes]',
-		68 => '[Pronoun] was elected as [Description] [onDate] [Location].[Citations] [Notes]',
-		69 => '[Pronoun] were married [Description] [onDate] and [Location].[Citations] [Notes]',
-		70 => 'Marriage event [Description] [onDate] [Location].[Citations] [Notes]',
-		71 => '[Her][!His] birth was registered [Description] [onDate] [Location].[Citations] [Notes]',
-		72 => '[Her][!His] death was registered [Description] [onDate] [Location].[Citations] [Notes]',
-		73 => 'Their marriage was registered [Description] [onDate] [Location].[Citations] [Notes]',
-      2000 => '[Pronoun] was born [onDate] [Location].[Citations] [Notes]',
-      3000 => '[Pronoun] was christened [onDate] [Location].[Citations] [Notes]',
-      4000 => '[Pronoun] died [onDate] [Location].[Citations] [Notes]',
-      5000 => '[Pronoun] was buried [onDate] [Location].[Citations] [Notes]',
-      5001 => '[Pronoun] was cremated [onDate] [Location].[Citations] [Notes]',
-     15000 => '[Pronoun] received LDS Baptism [onDate] [Location].[Citations] [Notes]',
-     16000 => '[Pronoun] received LDS Endowment [onDate] [Location].[Citations] [Notes]',
-     26000 => '[Pronoun] received LDS Confirmation [onDate] [Location].[Citations] [Notes]',
-     27000 => '[Pronoun] received LDS Initiatory [onDate] [Location].[Citations] [Notes]'
-		);
 
 /************************************************************************
  *  $statusText															*
@@ -552,6 +398,8 @@ $templeTable	= array();
  ************************************************************************/
 $addressTable	= array();
 
+$tracelog   = "/home/jcobban/public_html/logs/trace.log";
+
 /************************************************************************
  *  function createPopups												*
  *																		*
@@ -569,12 +417,12 @@ function createPopups($desc)
     global	$warn;
     global	$individTable;
     global	$lang;
-    global	$tranTab;
+    global	$t;
 
     $pieces		= explode('<a ', $desc);
     $first		= true;
     $piece		= $pieces[0];
-    $tran       = $tranTab[$piece];
+    $tran       = $t[$piece];
     if (is_string($tran) && strlen($tran) > 0)
         $piece  = $tran;
     $retval		= $piece;
@@ -594,7 +442,7 @@ function createPopups($desc)
 		if ($equalpos !== false)
 		{		// link to an individual
 		    $refidir		= substr($url, $equalpos + 5);
-		    $refind		= new Person(array('idir' => $refidir));
+		    $refind		= Person::getPerson($refidir);
 		    $individTable[$refidir]	= $refind;
 		    if (substr($url, 0, $equalpos) == "Person.php?")
 				$retval	.= substr($piece, 0, $urlstart) .
@@ -668,6 +516,9 @@ function showCitations($event,
     // query the database
     if ($event instanceof Event)
     {		// citation to event
+        if ($debug)
+            throw new Exception("Person.php: " . __LINE__ .
+                        " debug is set");
 		$citations	    = $event->getCitations();
     }		// citation to event
     else
@@ -768,7 +619,7 @@ function showEvent($pronoun,
 				   $event,
 				   $template)
 {
-    global	$tranTab;
+    global	$t;
     global	$individTable;
     global	$somePrivate;
     global	$debug;
@@ -817,9 +668,9 @@ function showEvent($pronoun,
 		 )
 		)
        )		// childhood events
-		$date		= $dateo->toString($bprivlim, true, $tranTab);
+		$date		= $dateo->toString($bprivlim, true, $t);
     else		// adult events
-		$date		= $dateo->toString($dprivlim, true, $tranTab);
+		$date		= $dateo->toString($dprivlim, true, $t);
 
     if ($debug)
     {
@@ -840,7 +691,7 @@ function showEvent($pronoun,
 		if ($kind)
 		    $loc	= new Temple(array('idtr' => $idlr));
 		else
-		    $loc	= new Location(array('idlr' => $idlr));
+		    $loc	= Location::getLocation($idlr);
     }		// Location or Temple used
     else
 		$loc		= null;
@@ -973,7 +824,10 @@ function showEvent($pronoun,
 
 				    case 'Citations':
 				    {			// display citation references here
-				    	print $pendingWord . ' ';
+                        print $pendingWord . ' ';
+                        if ($debug)
+                            throw new Exception("Person.php: " . __LINE__ .
+                        " debug is set");
 				    	showCitations($event);
 				    	break;
 				    }			// display citation references here
@@ -1033,7 +887,7 @@ function showLocation($location,
 					  $comma    = '',
 					  $defPrep  = 'at')
 {
-    global	$tranTab;
+    global	$t;
     global	$locindex;
     global	$locationTable;
     global	$templeTable;
@@ -1070,13 +924,13 @@ function showLocation($location,
 		$prep	= $location->getPreposition();
 		if (strlen($prep) > 0)
 		{
-		    if (array_key_exists($prep, $tranTab))
-				print $tranTab[$prep];
+		    if (array_key_exists($prep, $t))
+				print $t[$prep];
 		    else
 				print $prep;
 		}
 		else
-		    print $tranTab[$defPrep];
+		    print $t[$defPrep];
 		$idime	= $location->getId();
 		print " <span id=\"{$idprefix}{$locindex}_{$idime}\">";
 		$locindex++;
@@ -1101,8 +955,8 @@ function showParents($person)
     global	$directory;
     global	$childRole;
     global	$pronoun;
-    global	$intType;
-    global	$tranTab;
+    global	$cpRelType;
+    global	$t;
     global	$intStatus;
     global	$individTable;
     global	$lang;
@@ -1115,22 +969,22 @@ function showParents($person)
     if ($allParents->count() > 0)
     {		// at least one set of parents
 		// the role the child plays in the family (son, daughter, or child)
-		$role	= $childRole[$person->getGender()];
+		$role	                = $childRole[$person['gender']];
 
 		foreach($allParents as $idmr => $parents)
 		{		// loop through all sets of parents
-		    $childRec	= $parents->getChildByIdir($idir);
+		    $childRec			= $parents->getChildByIdir($idir);
 
 		    // extract values to display from marriage
-		    $dadid	= $parents->get('idirhusb');
-		    $momid	= $parents->get('idirwife');
-		    $dadrel	= '';
-		    $momrel	= '';
+		    $dadid	    		= $parents->get('idirhusb');
+		    $momid	    		= $parents->get('idirwife');
+		    $dadrel	    		= '';
+		    $momrel	    		= '';
 
 		    if ($dadid || $momid)
 		    {	// at least one parent defined
 				// check for non-zero child status
-				$status		= $childRec->getStatus();
+				$status		    = $childRec['idcs'];
 				if ($status > 0)
 				{
 				    if (array_key_exists($status, $intStatus))
@@ -1147,7 +1001,7 @@ function showParents($person)
 				    $dad		= new Person(
 								array('idir' => $dadid));
 				    $individTable[$dadid]	= $dad;
-				    $dadrel		= $intType[$childRec->getCPRelDad()];
+				    $dadrel		= $cpRelType[$childRec['idcpdad']];
 				    if ($momid == 0)
 				    {		// mother not recorded
 					$momrel		= $dadrel;
@@ -1156,27 +1010,27 @@ function showParents($person)
 				    else
 					$endofparents	= '';
 				    $gender		= $person->getGenderClass();
-				    print $tranTab["was the[$gender]"] . ' ' . 
-					  $tranTab[$status] . ' ' .
-					  $tranTab[$dadrel] . ' ' .
-					  $role . ' ' . $tranTab['of'] . "\n";
+				    print $t["was the[$gender]"] . ' ' . 
+					  $t[$status] . ' ' .
+					  $t[$dadrel] . ' ' .
+					  $role . ' ' . $t['of'] . "\n";
 ?>
     <a href="<?php print $directory; ?>Person.php?idir=<?php print $dadid ?>&amp;lang=<?php print $lang; ?>" class="male"><?php print $dad->getName(); ?></a><?php print $endofparents; ?>
 <?php
 				}		// father is defined
 
 				if ($dadid && $momid)	// both parents defined
-				    print " " . $tranTab['and'] . " ";
+				    print " " . $t['and'] . " ";
 				if ($momid > 0)
 				{		// mother is defined
 				  try {
 				    $mom		= new Person(
 								array('idir' => $momid));
 				    $individTable[$momid]	= $mom;
-				    $momrel		= $intType[$childRec->getCPRelMom()];
+				    $momrel		= $cpRelType[$childRec['idcpmom']];
 				    if ($dadid == 0 || $momrel != $dadrel)
 				    {		// mother's relationship is different
-					print "$momrel $role " . $tranTab['of'] . "\n";
+					print "$momrel $role " . $t['of'] . "\n";
 				    }		// mother's relationship is different
 ?>
 <a href="<?php print $directory; ?>Person.php?idir=<?php print $momid; ?>&amp;lang=<?php print $lang; ?>" class="female"><?php print $mom->getName(); ?></a>.
@@ -1188,37 +1042,37 @@ function showParents($person)
 		    }	// at least one parent defined
 		    else
 		    {		// no parents defined in family
-				print $tranTab['has no recorded parents'] . ". ";
+				print $t['has no recorded parents'] . ". ";
 				$siblings	= $parents->getChildren();
 				if (count($siblings) > 1)
 				{	// has siblings
-				    print $pronoun . ' ' . $tranTab['had'] . ' ';
+				    print $pronoun . ' ' . $t['had'] . ' ';
 				    foreach($siblings as $idcr => $sibChildRec)
 				    {	// loop through siblings
-					$sibIdir	= $sibChildRec->getIdir();
+					$sibIdir	= $sibChildRec['idir'];
 					if ($sibIdir != $idir)
 					{	// not self
 					    $sibling	= $sibChildRec->getPerson();
-					    $sibGender	= $sibling->getGender();
+					    $sibGender	= $sibling['gender'];
 					    // set the class to color hyperlinks
 					    if ($sibGender == Person::MALE)
 					    {
-						$cgender	= $tranTab['male'];
-						$sibRole	= $tranTab['brother'];
-						$article	= $tranTab['a[masc]'];
+						$cgender	= $t['male'];
+						$sibRole	= $t['brother'];
+						$article	= $t['a[masc]'];
 					    }
 					    else
 					    if ($sibGender == Person::FEMALE)
 					    {
-						$cgender	= $tranTab['female'];
-						$sibRole	= $tranTab['sister'];
-						$article	= $tranTab['a[fem]'];
+						$cgender	= $t['female'];
+						$sibRole	= $t['sister'];
+						$article	= $t['a[fem]'];
 					    }
 					    else
 					    {
-						$cgender	= $tranTab['unknown'];
-						$sibRole	= $tranTab['sibling'];
-						$article	= $tranTab['a[masc]'];
+						$cgender	= $t['unknown'];
+						$sibRole	= $t['sibling'];
+						$article	= $t['a[masc]'];
 					    }
 					    $sibName	= $sibling->getName();
 					    print "$article $sibRole";
@@ -1245,19 +1099,19 @@ function showParents($person)
 				strlen($sealnote) > 0)
 		    {		// sealed to parents
 				$date	= new LegacyDate($seald);
-				$datestr= $date->toString($bprivlim, true, $tranTab);
+				$datestr= $date->toString($bprivlim, true, $t);
 				if (strtolower($datestr) == 'private')
 				    $somePrivate	= true;
 				$temple	= new Temple(array('idtr' => $idtrseal));
-				print $pronoun . ' ' . $tranTab['was sealed to parents'] . ' ' .
-					$datestr . ' ' . $tranTab['at'] .
+				print $pronoun . ' ' . $t['was sealed to parents'] . ' ' .
+					$datestr . ' ' . $t['at'] .
 					$temple->getName() . '. ' . $sealnote;
 		    }		// sealed to parents
 		}		// loop through parents
     }		// at least one set of parents
     else
     {		// no parents defined
-		print $tranTab['has no recorded parents'] . ". ";
+		print $t['has no recorded parents'] . ". ";
     }		// no parents defined
 
 }		// function showParents
@@ -1277,11 +1131,11 @@ function showEvents($person)
     global	$warn;
     global	$template;
     global	$user;
-    global	$eventText;	// table of phrases
-    global	$dateTemplate;	// template for displaying dates
+    global	$eventText;	        // table of phrases
+    global	$dateTemplate;	    // template for displaying dates
     global	$months;
     global	$lmonths;
-    global	$tranTab;
+    global	$t;
     global	$malePronoun;
     global	$femalePronoun;
     global	$otherPronoun;
@@ -1291,13 +1145,14 @@ function showEvents($person)
 
     // initialize fields used in the event descriptions
     $idir	= $person->getIdir();
+
     $givenName	= $person->getGivenName();
     $surname	= $person->getSurname();
-    $gender	= $person->getGender();
-    if ($person->getGender() == Person::MALE)
+    $gender	= $person['gender'];
+    if ($person['gender'] == Person::MALE)
 		$pronoun	= $malePronoun;
     else
-    if ($person->getGender() == Person::FEMALE)
+    if ($person['gender'] == Person::FEMALE)
 		$pronoun	= $femalePronoun;
     else
 		$pronoun	= $otherPronoun;
@@ -1348,7 +1203,7 @@ function showEvents($person)
 				    {		// death cause present
 					$deathcause[]	= $cause;
 					$deathid	= 'DeathCause' . count($deathcause);
-					print $tranTab['The cause of death was'];
+					print $t['The cause of death was'];
 ?>
     <span id="<?php print $deathid; ?>">
 				<?php print $cause; ?>
@@ -1399,13 +1254,13 @@ function showEvents($person)
 				    {		// death cause present
 					$deathcause[]	= $cause;
 					$deathid	= 'DeathCause' . count($deathcause);
-					print $tranTab['The cause of death was'];
+					print $t['The cause of death was'];
 ?>
     <span id="<?php print $deathid; ?>">
 				<?php print $cause; ?>
 <?php
 					showCitations(Citation::STYPE_DEATHCAUSE,
-						      $idir);
+						          $idir);
 ?>
     </span>.
 <?php
@@ -1429,7 +1284,7 @@ function showEvents($person)
     // check if never married
     $nevermarried	= $person->get('nevermarried');
     if ($nevermarried > 0)
-		print $pronoun . ' ' . $tranTab['was never married'] . ". ";
+		print $pronoun . ' ' . $t['was never married'] . ". ";
 
     // reset to former date presentation
     LegacyDate::setTemplate($oldfmt);
@@ -1494,7 +1349,7 @@ foreach($_GET as $key => $value)
 
 	    case 'lang':
 	    {
-			$lang		= strtolower(substr($value,0,2));
+			$lang		= FtTemplate::validateLang($value);
 			break;
 	    }
 	}			    // act on specific parameters
@@ -1507,126 +1362,31 @@ $template		        = new FtTemplate("Person$lang.html");
 $trtemplate             = $template->getTranslate();
 $months	                = $trtemplate['Months'];
 $lmonths	            = $trtemplate['LMonths'];
-$tranTab	            = $trtemplate['tranTab'];
-if ($tranTab)
-{                   // override default translation terms
-	$malePronoun		= $tranTab['He'];
-	$femalePronoun		= $tranTab['She'];
-	$otherPronoun		= $tranTab['He/She'];
-	$maleChildRole		= $tranTab['son'];
-	$femaleChildRole	= $tranTab['daughter'];
-	$unknownChildRole	= $tranTab['child'];
-	$childRole		    = array($maleChildRole,
-					        	$femaleChildRole,
-					        	$unknownChildRole);
-    $intStatus			= array(
-                         1	        => '',
-		        		 2			=> $tranTab['None'],
-			        	 3			=> $tranTab['Stillborn'],
-			        	 4			=> $tranTab['Twin'],
-		        		 5			=> $tranTab['Illegitimate']
-                     );
+$t		                = $trtemplate['tranTab'];
+$malePronoun			= $t['He'];
+$femalePronoun			= $t['She'];
+$otherPronoun			= $t['He/She'];
+$maleChildRole			= $t['son'];
+$femaleChildRole		= $t['daughter'];
+$unknownChildRole		= $t['child'];
 
-	$intType	        = array(
-						''			=> $tranTab['intType'],
-						 1			=> $tranTab['intType1'],
-						 2			=> $tranTab['intType2'],
-						 3			=> $tranTab['intType3'],
-						 4			=> $tranTab['intType4'],
-						 5			=> $tranTab['intType5'],
-						 6			=> $tranTab['intType6'],
-						 7			=> $tranTab['intType7'],
-						 8			=> $tranTab['intType8'],
-						 9			=> $tranTab['intType9'],
-						10			=> $tranTab['intType10'],
-						11			=> $tranTab['intType11'],
-						12			=> $tranTab['intType12'],
-		                13			=> $tranTab['intType13']);
+// translate the gender of a child to the appropriate noun
+$childRole		    	= array($maleChildRole,         // son
+				            	$femaleChildRole,       // daughter
+                                $unknownChildRole);     // child
 
-	$eventText	= array(
-						 1			=> $tranTab['eventText1'], 
-						 2			=> $tranTab['eventText2'], 
-						 3			=> $tranTab['eventText3'], 
-						 4			=> $tranTab['eventText4'], 
-						 5			=> $tranTab['eventText5'], 
-						 6			=> $tranTab['eventText6'], 
-						 7			=> $tranTab['eventText7'], 
-						 8			=> $tranTab['eventText8'], 
-						 9			=> $tranTab['eventText9'], 
-						10			=> $tranTab['eventText10'], 
-						11			=> $tranTab['eventText11'], 
-						12			=> $tranTab['eventText12'], 
-						13			=> $tranTab['eventText13'], 
-						14			=> $tranTab['eventText14'], 
-						15			=> $tranTab['eventText15'], 
-						16			=> $tranTab['eventText16'], 
-						17			=> $tranTab['eventText17'], 
-						18			=> $tranTab['eventText18'], 
-						19			=> $tranTab['eventText19'], 
-						20			=> $tranTab['eventText20'], 
-						21			=> $tranTab['eventText21'], 
-						22			=> $tranTab['eventText22'], 
-						23			=> $tranTab['eventText23'], 
-						24			=> $tranTab['eventText24'], 
-						25			=> $tranTab['eventText25'], 
-						26			=> $tranTab['eventText26'], 
-						27			=> $tranTab['eventText27'], 
-						28			=> $tranTab['eventText28'], 
-						29			=> $tranTab['eventText29'], 
-						30			=> $tranTab['eventText30'], 
-						31			=> $tranTab['eventText31'], 
-						32			=> $tranTab['eventText32'], 
-						33			=> $tranTab['eventText33'], 
-						34			=> $tranTab['eventText34'], 
-						35			=> $tranTab['eventText35'], 
-						36			=> $tranTab['eventText36'], 
-						37			=> $tranTab['eventText37'], 
-						38			=> $tranTab['eventText38'], 
-						39			=> $tranTab['eventText39'], 
-						40			=> $tranTab['eventText40'], 
-						41			=> $tranTab['eventText41'], 
-						42			=> $tranTab['eventText42'], 
-						43			=> $tranTab['eventText43'], 
-						44			=> $tranTab['eventText44'], 
-						45			=> $tranTab['eventText45'], 
-						46			=> $tranTab['eventText46'], 
-						47			=> $tranTab['eventText47'], 
-						48			=> $tranTab['eventText48'], 
-						49			=> $tranTab['eventText49'], 
-						50			=> $tranTab['eventText50'], 
-						51			=> $tranTab['eventText51'], 
-						52			=> $tranTab['eventText52'], 
-						53			=> $tranTab['eventText53'], 
-						54			=> $tranTab['eventText54'], 
-						55			=> $tranTab['eventText55'], 
-						56			=> $tranTab['eventText56'], 
-						57			=> $tranTab['eventText57'], 
-						58			=> $tranTab['eventText58'], 
-						59			=> $tranTab['eventText59'], 
-						60			=> $tranTab['eventText60'], 
-						61			=> $tranTab['eventText61'], 
-						62			=> $tranTab['eventText62'], 
-						63			=> $tranTab['eventText63'], 
-						64			=> $tranTab['eventText64'], 
-						65			=> $tranTab['eventText65'], 
-						66			=> $tranTab['eventText66'], 
-						67			=> $tranTab['eventText67'], 
-						68			=> $tranTab['eventText68'], 
-						69			=> $tranTab['eventText69'], 
-						70			=> $tranTab['eventText70'], 
-						71			=> $tranTab['eventText71'], 
-						72			=> $tranTab['eventText72'], 
-						73			=> $tranTab['eventText73'], 
-				      2000			=> $tranTab['eventText2000'], 
-				      3000			=> $tranTab['eventText3000'], 
-				      4000			=> $tranTab['eventText4000'], 
-				      5000			=> $tranTab['eventText5000'], 
-				      5001			=> $tranTab['eventText5001'], 
-				     15000			=> $tranTab['eventText15000'], 
-				     16000			=> $tranTab['eventText16000'], 
-				     26000			=> $tranTab['eventText26000'], 
-				     27000			=> $tranTab['eventText27000']);
-}                   // override default translation terms
+// interpret the value of the IDCS field in Child
+$intStatus				= array(1	        => '',
+            	        		2			=> $t['None'],
+            		        	3			=> $t['Stillborn'],
+            		        	4			=> $t['Twin'],
+            	        		5			=> $t['Illegitimate']);
+
+// interpret the value of the child to parent relationship in Child
+$cpRelType	            = $trtemplate['cpRelType'];
+
+// interpret event type IDET as a sentence with substitutions
+$eventText	            = $trtemplate['eventStmt'];
 
 // must have a parameter
 if (count($getParms) == 0)
@@ -1637,46 +1397,46 @@ if (count($getParms) == 0)
 else
 {				    // have an identifier
 	// obtain the instance of Person based upon the parameters
-    $person	        = new Person($getParms);
-    $idir	        = $person->getIdir();
-    $evBirth	    = $person->getBirthEvent(false);
-    $evDeath	    = $person->getDeathEvent(false);
-    $bprivlim	    = $person->getBPrivLim();
-    $dprivlim	    = $person->getDPrivLim();
+    $person	            = new Person($getParms);
+    $idir	            = $person->getIdir();
+    $evBirth	        = $person->getBirthEvent(false);
+    $evDeath	        = $person->getDeathEvent(false);
+    $bprivlim	        = $person->getBPrivLim();
+    $dprivlim	        = $person->getDPrivLim();
 
     // check if current user is an owner of the record and therefore
     // permitted to see private information and edit the record
-    $isOwner	    = $person->isOwner();
+    $isOwner	        = $person->isOwner();
 
     // get information for constructing title and
     // breadcrumbs
-    $givenName		= $person->getGivenName();
+    $givenName		    = $person->getGivenName();
     if (strlen($givenName) > 2)
-		$givenPre	= substr($givenName, 0, 2);
+		$givenPre	    = substr($givenName, 0, 2);
     else
-		$givenPre	= $givenName;
-    $surname		= $person->getSurname();
-    $nameuri		= rawurlencode($surname . ', ' . $givenPre);
+		$givenPre	    = $givenName;
+    $surname		    = $person->getSurname();
+    $nameuri		    = rawurlencode($surname . ', ' . $givenPre);
     if (strlen($surname) == 0)
-		$prefix		= '';
+		$prefix		    = '';
     else
     if (substr($surname,0,2) == 'Mc')
-		$prefix		= 'Mc';
+		$prefix		    = 'Mc';
     else
-		$prefix		= substr($surname,0,1);
+		$prefix		    = substr($surname,0,1);
 
     // format dates for title
     if ($person->get('private') == 2 && !$isOwner)
     {
-		$title		= "Person is Invisible";
-		$surname	= "";
-		$birthDate	= 'Private';
+		$title		    = "Person is Invisible";
+		$surname	    = "";
+		$birthDate	    = 'Private';
 		$somePrivate	= true;
     }
     else
     {
-		$title		= $person->getName($tranTab);
-		$bdoff		= strpos($title, '(');
+		$title		    = $person->getName($t);
+		$bdoff		    = strpos($title, '(');
 		if ($bdoff === false)
 		    $birthDate	= '';
 		else
@@ -1724,10 +1484,10 @@ if (!is_null($person))
 	}
 	else
 	{		// display public data
-	    if ($person->getGender() == Person::MALE)
+	    if ($person['gender'] == Person::MALE)
 			$pronoun	= $malePronoun;
 	    else
-	    if ($person->getGender() == Person::FEMALE)
+	    if ($person['gender'] == Person::FEMALE)
 			$pronoun	= $femalePronoun;
 	    else
 			$pronoun	= $otherPronoun;
@@ -1740,8 +1500,12 @@ if (!is_null($person))
 <p><?php print $person->getName(); ?>
 <?php
 	    // print citations for the name
-	    showCitations(Citation::STYPE_NAME,
-				  $person->getIdir());
+	    showCitations(Citation::STYPE_NAME,         // traditional citations
+                      $person->getIdir());
+        $priName        = $person->getPriName();    // new citations
+        $idnx           = $priName['idnx'];
+	    showCitations(Citation::STYPE_ALTNAME,
+                      $idnx);
 	    print ' ';		// separate name from following
 
 	    // show information about the parents of this individual
@@ -1753,7 +1517,7 @@ if (!is_null($person))
 	    $altNames	= $person->getNames(1);
 	    foreach($altNames as $idnx => $altName)
 	    {
-			print $pronoun . ' ' . $tranTab['was also known as'] . ' ' .
+			print $pronoun . ' ' . $t['was also known as'] . ' ' .
 				$altName->getName() . '. ';
 			showCitations(Citation::STYPE_ALTNAME,
 				          $idnx);
@@ -1813,28 +1577,28 @@ if (!is_null($person))
 	    // is a spouse or partner
 	    if ($debug)
 			$warn	.= "<p>\$person-&gt;getFamilies()</p>\n";
-	    $families	= $person->getFamilies();
+	    $families	                = $person->getFamilies();
 
 	    if (count($families) > 0)
 	    {		// include families section of page
-			$oldfmt	= LegacyDate::setTemplate($dateTemplate);
-			if ($person->getGender() == Person::MALE)
+			$oldfmt	                = LegacyDate::setTemplate($dateTemplate);
+			if ($person['gender'] == Person::MALE)
 			{
-			    $pronoun	= $malePronoun;
-			    $spousePronoun	= $femalePronoun;
-			    $spouseChildRole= $femaleChildRole;
+			    $pronoun	        = $malePronoun;
+			    $spousePronoun	    = $femalePronoun;
+			    $spouseChildRole    = $femaleChildRole;
 			}		// Male
 			else
-			if ($person->getGender() == Person::FEMALE)
+			if ($person['gender'] == Person::FEMALE)
 			{		// Female
-			    $pronoun	= $femalePronoun;
-			    $spousePronoun	= $malePronoun;
-			    $spouseChildRole= $maleChildRole;
+			    $pronoun	        = $femalePronoun;
+			    $spousePronoun	    = $malePronoun;
+			    $spouseChildRole    = $maleChildRole;
 			}		// Female
 			else
 			{		// Unknown
-			    $pronoun		= $otherPronoun;
-			    $spousePronoun	= $otherPronoun;
+			    $pronoun		    = $otherPronoun;
+			    $spousePronoun	    = $otherPronoun;
 			    $spouseChildRole	= $unknownChildRole;
 			}		// Female
 ?>
@@ -1844,64 +1608,56 @@ if (!is_null($person))
 
 			foreach($families as $idmr => $family)
 			{		// loop through families
-			    if ($person->getGender() == Person::FEMALE)
-			    {		// female
-				$spsSurname	= $family->get('husbsurname');
-				$spsGiven	= $family->get('husbgivenname');
-				$spsid	= $family->get('idirhusb');
-				$spsclass	= 'male';
+			    if ($person['gender'] == Person::FEMALE)
+                {		// female
+                    $spsName        = $family->getHusbPriName();
+				    $spsid	        = $family->get('idirhusb');
+                    $spsclass	    = 'male';
 			    }		// female
 			    else
 			    {		// male
-				$spsSurname	= $family->get('wifesurname');
-				$spsGiven	= $family->get('wifegivenname');
-				$spsid	= $family->get('idirwife');
-				$spsclass	= 'female';
+				    $spsName	    = $family->getWifePriName();
+				    $spsid	        = $family->get('idirwife');
+				    $spsclass	    = 'female';
 			    }		// male
 
 			    // information about spouse
-			    try {
 				if ($spsid > 0)
 				{
-				    $spouse	        = new Person(array('idir' => $spsid));
+				    $spouse	        = Person::getPerson($spsid);
 				    $individTable[$spsid]	= $spouse;
-				}
-			    } catch(Exception $e)
-			    {
-?>
-	<p class="message">Unable to obtain information about spouse.
-			<?php print $e->getMessage(); ?>
-	</p>
-<?php
+                }
+                else
+                {
 				    $spouse	        = null;
 				    $spsid	        = 0;
 			    }
 			    $mdateo	            = new LegacyDate($family->get('mard'));
 			    $mdate	            = $mdateo->toString($dprivlim,
 							                            true,
-							                            $tranTab);
+							                            $t);
 
 ?>
 	<p>
 <?php
-			    print $pronoun . ' ' . $tranTab[$family->getStatusVerb()];
+			    print $pronoun . ' ' . $t[$family->getStatusVerb()];
 			    // only display a sentence about the marriage
 			    // if there is a spouse defined
 			    if ($spsid > 0)
 			    {		// have a spouse
 ?>
-	    <a href="<?php print $directory; ?>Person.php?idir=<?php print $spsid; ?>&amp;lang=<?php print $lang; ?>" class="<?php print $spsclass; ?>"><?php print $spouse->getName(); ?></a>
+	    <a href="<?php print $directory; ?>Person.php?idir=<?php print $spsid; ?>&amp;lang=<?php print $lang; ?>" class="<?php print $spsclass; ?>"><?php print $spsName->getName(); ?></a>
 <?php
 			    }		// have a spouse
 			    else
 			    {		// do not have a spouse
-				    print " " . $tranTab['an unknown person'];
+				    print " " . $t['an unknown person'];
 			    }		// do not have a spouse
 
 			    if (strlen($mdate) > 0)
 			    {
 				    if (ctype_digit(substr($mdate,0,1)))
-				        print ' ' . $tranTab['on'] . ' ';
+				        print ' ' . $t['on'] . ' ';
 				    print ' ' . $mdate;
 			    }
 
@@ -1910,7 +1666,7 @@ if (!is_null($person))
 			    if ($idlrmar > 1)
 			    {		// have location of marriage
 				print ' ';	// separate from preceding date
-				$marloc	= new Location(array('idlr' => $idlrmar));
+				$marloc	= Location::getLocation($idlrmar);
 				showLocation($marloc, $person);
 			    }		// have location of marriage
 			    print ".\n";
@@ -1951,10 +1707,10 @@ if (!is_null($person))
 						            array('idtr' => $family->get('idtrseal')));
 					    $locn	= $temple->getName();
 					    print $person->getName() . ' ' .
-						$tranTab['was sealed to'] . ' ' .
+						$t['was sealed to'] . ' ' .
 						$spouse->getName() . ' ' .
-						$date->toString($dprivlim, true, $tranTab).' '.
-						                $tranTab['at'] . ' ' .  $locn . '.';
+						$date->toString($dprivlim, true, $t).' '.
+						                $t['at'] . ' ' .  $locn . '.';
 					}		// LDS sealing present
 
 					// display the event table entries for this family
@@ -1996,7 +1752,7 @@ if (!is_null($person))
 ?>
 	    The marriage ended
 <?php
-					    print $date->toString(9999, true, $tranTab) . '.';
+					    print $date->toString(9999, true, $t) . '.';
 					    // show citations for this marriage
 					    showCitations(Citation::STYPE_MAREND,
 						              $family->getIdmr());
@@ -2006,7 +1762,7 @@ if (!is_null($person))
 <?php
 				    // show any images/video files for the family
 				    if (!$private)
-					$family->displayPictures(Picture::IDTYPEMar);
+					    $family->displayPictures(Picture::IDTYPEMar);
 
 				    // Print the name of the spouse before the first event
 ?>
@@ -2025,7 +1781,7 @@ if (!is_null($person))
 				    foreach($altNames as $idnx => $altName)
 				    {	// loop through alternate names
                         print $spousePronoun . ' ' .
-                                $tranTab['was also known as'] . ' ' .
+                                $t['was also known as'] . ' ' .
 							    $altName->getName() . '.';
 						showCitations(Citation::STYPE_ALTNAME,
 							          $idnx);
@@ -2090,10 +1846,10 @@ if (!is_null($person))
 ?>
 	<p class="label">
 <?php
-			    print $tranTab['Children of'] . ' ' . $person->getName();
+			    print $t['Children of'] . ' ' . $person->getName();
 			    if ($spsid)
 			    {
-				    print " " . $tranTab['and'] . " " . $spouse->getName();
+				    print " " . $t['and'] . " " . $spouse->getName();
 			    }
 			    print ":";
 ?>
@@ -2112,27 +1868,19 @@ try {
 	    </div>
 <?php
 	    // display information about child
-	    $cid		= $child->get('idir');
-	    try {
-			$child		= new Person(array('idir' => $cid));
-			$individTable[$cid]	= $child;
-			$cName	= $child->getName($tranTab);
+	    $cid		            = $child->get('idir');
+		$child		            = Person::getPerson($cid);
+		$individTable[$cid]	    = $child;
+		$cName	                = $child->getName($t);
 
-			// set the class to color hyperlinks
-			if ($child->getGender() == Person::MALE)
-			    $cgender	= 'male';
-			else
-			if ($child->getGender() == Person::FEMALE)
-			    $cgender	= 'female';
-			else
-			    $cgender	= 'unknown';
-	    } catch (Exception $e)
-	    {		// catch on getting child info from database
-			$child		= null;
-			$cgender	= 'female';	// red for error
-			$cName		= "unable to get child information: " .
-					  $e->getMessage();
-	    }		// catch on getting child info from database
+		// set the class to color hyperlinks
+		if ($child['gender'] == Person::MALE)
+		    $cgender	        = 'male';
+		else
+		if ($child['gender'] == Person::FEMALE)
+		    $cgender	        = 'female';
+		else
+		    $cgender	        = 'unknown';
 ?>
 			<a href="<?php print $directory; ?>Person.php?idir=<?php print $cid; ?>&amp;lang=<?php print $lang; ?>" class="<?php print $cgender; ?>">
 			    <?php print $cName; ?>

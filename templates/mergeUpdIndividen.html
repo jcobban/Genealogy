@@ -28,7 +28,7 @@
       <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
 			  Surname '$SURNAME'
       </a>:
-	  <a href="/FamilyTree/Person.php?idir=$IDIR1&lang=$LANG">
+	  <a href="/FamilyTree/Person.php?idir=$idir1&lang=$LANG">
 			  $NAME1
       </a>:
       </span>
@@ -47,48 +47,109 @@
       </h1>
       $TRACE
       $MSG
+      <!-- error messages -->
+      <div class="hidden">
+          <span id="firstMissing">
+              The parameter idir1 is missing.
+          </span>
+          <span id="firstInvalid">
+              The parameter idir1='$idir' is invalid.
+          </span>
+          <span id="firstNotAuth">
+              You are not authorized to update the person with idir1=$idir. 
+          </span>
+          <span id="secondMissing">
+              The parameter idir2 is missing.
+          </span>
+          <span id="secondInvalid">
+              The parameter idir2='$idir' is invalid.
+          </span>
+          <span id="secondNotAuth">
+              You are not authorized to update the person with idir2=$idir. 
+          </span>
+      </div> <!-- error messages -->
       <div id="results">
 	    <p>Values from individual record IDIR=$IDIR2 are
 	       selectively merged into individual record IDIR=$IDIR1.
-	    <p id="replaceSurname">Surname replaced by '$NEWSURNAME'.
-	    <p id="replaceGivenname">Given name replaced by '$NEWGIVENNAME'.
-	    <p id="replaceBirthDate">Birth date replaced by '$BIRTHDATE2'.
-	    <p id="replaceBirthLoc">Birth location replaced by '$BIRTHLOCATION2'.
-	    <p>Copy $BIRTHCITATIONSCOUNT citations to birth.
-	    <p id="replaceChrisDate">Christening date replaced by '$CHRISDATE2'.
-	    <p id="replaceChrisLoc">Christening location replaced by '$CHRISLOCATION2'.
-	    <p>Copy $CHRISCITATIONSCOUNT citations to christening.
-	    <p id="replaceDeathDate">Death date replaced by '$DEATHDATE2'.
-	    <p id="replaceDeathLoc">Death location replaced by '$DEATHLOCATION2'.
-	    <p>Copy $DEATHCITATIONSCOUNT citations to death.
-	    <p id="replaceBurialDate">Burial date replaced by '$BURIEDDATE2'.
-	    <p id="replaceBurialLoc">Burial location replaced by '$BURIEDLOCATION2'.
-	    <p>Copy $BURIALCITATIONSCOUNT citations to burial.
-	    <p>Moved $RESULT individual event records from $IDIR2 
-			  to $IDIR1.
-	    <p>Deleted $RESULT nominal index records for second individual. 
-	    <p>Update nominal index records for merged individual.</p> 
-	    <p>In marriage record IDMR=$FAMILY2IDMR
-			  field '$MIDIRFLD' set to '$IDIR1'.
-	    <p>All information merged into family IDMR=$FAMILY1IDMR
-			  and family IDMR=$FAMILY2IDMR deleted.
-	    <p>In marriage record IDMR=$IDMR
-			  fields '$MSURNFLD' and 
-			  '$MGIVNFLD' set to 
-			  $SURNAME . ", " . $GIVENNAME.
-	    <p>Child record IDCR=$IDCR
-			  is deleted as a duplicate.
-	    <p>In child record IDCR=$CHILDRIDCR
-			  field 'IDIR' set to '$IDIR1'.
-	    <p>Update $RESULT source citations
-			  to point to individual record IDIR=$IDIR1
-	    <p>Update the transcription of the birth registration.
-	    <p>Update the transcription of the death registration.
-	    <p>Update the transcription of the marriage registration.
-	    <p>Move $BLOGSETCOUNT blog messages.
-	    <p>Delete the individual record $IDIR2</p>
+	    </p>
+		<p id="replaceSurname">Surname replaced by '$NEWSURNAME'.
+	    </p>
+		<p id="replaceGivenname">Given name replaced by '$NEWGIVENNAME'.
+	    </p>
+		<p id="replaceBirthDate">Birth date replaced by '$BIRTHDATE2'.
+	    </p>
+		<p id="replaceBirthLoc">Birth location replaced by '$BIRTHLOCATION2'.
+	    </p>
+		<p id="birthCount">Copy $BIRTHCITATIONSCOUNT citations to birth.
+	    </p>
+		<p id="replaceChrisDate">Christening date replaced by '$CHRISDATE2'.
+	    </p>
+		<p id="replaceChrisLoc">Christening location replaced by '$CHRISLOCATION2'.
+	    </p>
+		<p id="chrisCount">Copy $CHRISCITATIONSCOUNT citations to christening.
+	    </p>
+		<p id="replaceDeathDate">Death date replaced by '$DEATHDATE2'.
+	    </p>
+		<p id="replaceDeathLoc">Death location replaced by '$DEATHLOCATION2'.
+	    </p>
+		<p id="deathCount">Copy $DEATHCITATIONSCOUNT citations to death.
+	    </p>
+		<p id="replaceBurialDate">
+            Burial date replaced by '$burieddate2'.
+	    </p>
+		<p id="replaceBurialLoc">
+            Burial location replaced by '$buriedlocation2'.
+	    </p>
+		<p id="burialCount">
+            Copy $count citations to burial.
+	    </p>
+		<p id="eventCount">
+            Moved $MOVEDEVENTCOUNT individual event records from $IDIR2 
+			to $idir1.
+	    </p>
+		<p id="deletedNames">
+            Deleted $DELETEDNAMES nominal index records for second individual. 
+	    </p>
+		<p>Update nominal index records for merged individual.
+	    </p>
+		<p id="updateFamily2">
+            In Family record IDMR=$idmr2 field '$midirfld' set to '$idir1'.
+	    </p>
+		<p id="mergeFamilies">
+            All information merged into family IDMR=$idmr1
+			and family IDMR=$idmr2 deleted.
+	    </p>
+		<p id="famNameUpdate">
+            In marriage record IDMR=$idmr fields '$msurnfld' and '$mgivnfld'
+            set to $surname, $givenname.
+	    </p>
+		<p id="childDeleted">
+            Child record IDCR=$idcr is deleted as a duplicate.
+	    </p>
+		<p id="childUpdated">
+            In child record IDCR=$idcr field 'IDIR' set to '$idir1'.
+	    </p>
+		<p id="sourceCitationsUpdated">Update $RESULT source citations
+			  to point to individual record IDIR=$idir1
+	    </p>
+		<p id="birthRegUpdated">
+            Update the transcription of the birth registration.
+	    </p>
+        <p id="deathRegUpdated">
+            Update the transcription of the death registration.
+	    </p>
+		<p id="marrRegUpdated">
+            Update the transcription of the marriage registration.
+	    </p>
+		<p id="moveBlogs">
+            Move $BLOGSETCOUNT blog messages.
+	    </p>
+		<p id="deletePerson2">
+            Delete the Person record $IDIR2
+	    </p>
 	  </div>
-      <form action="Person.php?idir=$IDIR1"
+      $TEXT
+      <form action="Person.php?idir=$idir1"
 				  name="mainForm" method="get">
         <div class="hidden" id="hiddenElements">
 		  <input type="hidden" name="birthd" id="birthd"

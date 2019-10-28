@@ -20,192 +20,132 @@ use \Exception;
  *		2017/10/30		use composite cell style classes				*
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
+ *		2019/07/09      use Template                                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-$title	= 'Ontario: Wesleyan Methodist Baptisms Status';
+// get parameters
+$lang                       = 'en';
+$columns                    = 3;
+$pattern                    = '';
 
-if (strlen($msg) == 0)
-{			// no errors
-	// execute the query
-	$query	= "SELECT District, COUNT(*) FROM MethodistBaptisms
-					    GROUP BY District ORDER BY District";
-	$stmt	 	= $connection->query($query);
-	if ($stmt)
-	{		// successful query
-	    $result	= $stmt->fetchAll(PDO::FETCH_NUM);
-	    if ($debug)
-			print "<p>$query</p>\n";
-	}		// successful query
-	else
-	{
-	    $msg	.= "query '$query' failed: " .
-					   print_r($connection->errorInfo(),true);
-	}		// query failed
-}			// no errors
+if (count($_GET) > 0)
+{	        	        // invoked by URL to display current status of account
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+    {	                // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+	    {		        // act on specific parameter
+			case 'lang':
+            {
+                if (strlen($value) >= 2)
+                    $lang           = strtolower(substr($value,0,2));
+                break;
+            }           // lang
 
-htmlHeader($title,
-	       array('/jscripts/default.js',
-			     '/jscripts/util.js',
-			     'WmbStats.js'));
-?>
-<body>
-<?php
-pageTop(array(	'/genealogy.php'	=> 'Genealogy',
-			'/genCanada.html'	=> 'Canada',
-			'/genCountry.php?cc=CA'	=> 'Canada',
-			'/Canada/genProvince.php?Domain=CAON'
-							=> 'Ontario',
-			'/Ontario/WmbQuery.html'
-						=> 'New Wesleyan Methodist Baptisms Query'));
-?>
-<div class='body'>
-  <h1><?php print $title; ?>
-<span class='right'>
-	<a href='WmbStatsHelpen.html' target='_blank'>Help?</a>
-</span>
-<div style='clear: both;'></div>
-  </h1>
-<?php
-if (strlen($msg) > 0)
-{		// print error messages if any
-	print "<p class='message'>$msg</p>\n";
-}		// print error messages if any
+            case 'columns':
+            {
+                if (ctype_digit($value) && $value > 0 && $value < 10)
+                    $columns        = intval($value);
+                break;
+            }           // columns
+
+            case 'pattern':
+            {
+                if (strlen($value) > 0)
+                    $pattern        = $value;
+                break;
+            }           // pattern
+        }		        // act on specific parameter
+    }	                // loop through all parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	        // invoked by URL to display current status of account
+
+// execute the query
+$query	                = "SELECT District, COUNT(*) FROM MethodistBaptisms ";
+$sqlParms               = array();
+if (strlen($pattern) > 0)
+{
+    $query              .= "WHERE LOCATE(:pattern, District) > 0 ";
+    $sqlParms['pattern']    = $pattern;
+}
+$query                  .= "GROUP BY District ORDER BY District";
+$queryText              = debugPrepQuery($query, $sqlParms);
+$stmt	 	            = $connection->prepare($query);
+if ($stmt->execute($sqlParms))
+{		                // successful query
+    $result	            = $stmt->fetchAll(PDO::FETCH_NUM);
+    if ($debug)
+		$warn           .= "<p>$queryText</p>\n";
+}		                // successful query
 else
-{		// display results of query
-?>
-  <form name='statsForm'>
-<!--- Put out the response as a table -->
-<table class='form'>
-  <thead>
-	<!--- Put out the column headers -->
-	<tr>
-	<th class='colhead1st'>
-	District
-	</th>
-	<th class='colhead'>
-	Done
-	</th>
-	<th class='colhead'>
-	View
-	</th>
-	<th>
-	</th>
-	<th class='colhead1st'>
-	District
-	</th>
-	<th class='colhead'>
-	Done
-	</th>
-	<th class='colhead'>
-	View
-	</th>
-	<th>
-	</th>
-	<th class='colhead1st'>
-	District
-	</th>
-	<th class='colhead'>
-	Done
-	</th>
-	<th class='colhead'>
-	View
-	</th>
-	</tr>
-  </thead>
-  <tbody>
-<?php
-	    $columns		= 3;
-	    $col		= 1;
-	    $total		= 0;
-	    foreach($result as $row)
-	    {
-			$district	= $row[0];
-			$count		= $row[1];
-			$total		+= $count;
-			if (strlen($count) > 3)
-			    $count	= substr($count, 0, strlen($count) - 3) . ',' .
-						  substr($count, strlen($count) - 3);
-			if ($col == 1)
-			{
-?>
-	<tr>
-<?php
-			}
-?>
-	  <td class='odd bold left first'>
-	    <?php print $district; ?>
-	  </td>
-	  <td class='odd bold right'>
-	    <?php print $count; ?>
-	  </td>
-	  <td>
-	    <button id='ShowDistrictStats<?php print $district; ?>' 
-					type='button'>
-			View
-	    </button>
-	  </td>
-<?php
-			$col++;
-			if ($col > $columns)
-			{	// at column limit, end row
-			    $col	= 1;
-?>
-	</tr>
-<?php
-			}	// at column limit, end row
-			else
-			{	// start new column
-?>
-	  <td>
-	  </td>
-<?php
-			}	// start new column
-	    }		// process all rows
+{		                // query failed
+    $msg	            .= "query '$queryText' failed: " .
+        print_r($stmt->errorInfo(),true);
+    $result             = array();
+}		                // query failed
 
-	    // end last row if necessary
-	    if ($col != 1)
-	    {		// partial last column
-?>
-	</tr>
-<?php
-	    }		// partial last column
+// get the template
+$template      			= new FtTemplate("WmbStats$lang.html");
 
-	    // insert comma into formatting of total
-	    $totallen	= strlen($total);
-	    if ($totallen > 6)
-			$total	= substr($total, 0, $totallen - 6) . ',' .
-					  substr($total, $totallen - 6, 3) . ',' .
-					  substr($total, $totallen - 3);
-	    else
-	    if ($totallen > 3)
-			$total	= substr($total, 0, $totallen - 3) . ',' .
-					  substr($total, $totallen - 3);
-?>
-  </tbody>
-  <tfoot>
-	<tr>
-	  <td class='odd bold right first'>
-	    Total
-	  </td>
-	  <td class='odd bold right'>
-	    <?php print $total; ?>
-	  </td>
-	</tr>
-  </tfoot>
-</table>
-  </form>
-<?php
-}		// display results of query
-?>
-</div>
-<?php
-pageBot();
-?>
-  <div id='HelpShowDistrictStats' class='balloon'>
-    Click on this button to show township level statistics for this district.
-  </div>
-</body>
-</html>
+// lay out the table header row
+$headRowElt    			= $template['headRow'];
+$headRowHtml   			= $headRowElt->innerHTML();
+$data          			= "         <tr>\n";
+$spacer        			= "";
+for($ic	= $columns; $ic; $ic--)
+{
+    $data               .= $spacer . $headRowHtml;
+    $spacer             = "           <th>\n              </th>\n";
+}
+$data                   .= "        </tr>\n";
+$headRowElt->update($data);
+
+// lay out the data rows
+$dataRowElt    			= $template['dataRow$ROWNUM'];
+$dataRowHtml   			= $dataRowElt->innerHTML();
+$rownum        			= 1;
+$distnum       			= 1;
+$rowclass      			= 'odd';
+$total         			= 0;
+$data          			= '';
+for ($row = reset($result); $row; )
+{
+    $data               .= "         <tr id=\"dataRow$rownum\">\n";
+    $spacer             = "";
+    for($ic = $columns; $ic && $row; $ic--)
+    {
+        $rtemplate      = new \Templating\Template($dataRowHtml);
+        $district	    = $row[0];
+        $distnum++;
+        $count		    = $row[1];
+		$total		    += $count;
+        $rtemplate->set('DISTRICT',     $district);
+        $rtemplate->set('DISTNUM',      $distnum);
+        $rtemplate->set('CLASS',        $rowclass);
+        $rtemplate->set('COUNT',        number_format($count));
+        $data           .= $spacer . $rtemplate->compile();
+        $spacer         = "           <td>\n              </td>\n";
+        $row            = next($result);
+    }
+    $data               .= "        </tr>\n";
+    $rownum++;
+    if ($rowclass == 'odd')
+        $rowclass       = 'even';
+    else
+        $rowclass       = 'odd';
+}
+$dataRowElt->update($data);
+
+$template->set('TOTAL',         number_format($total));
+
+$template->display();

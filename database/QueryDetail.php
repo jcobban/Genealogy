@@ -18,8 +18,9 @@ use \Exception;
  *		2018/05/20		add popups										*
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/04/06      use new FtTemplate::includeSub                  *
+ *		2019/07/30      use Record->selected                            *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -32,13 +33,14 @@ require_once __NAMESPACE__ . '/common.inc';
 // various portions of the SQL SELECT statement
 // set default values that are overriden by parameters
 
-$censusYear			= 1881;		// census year
-$cc		    		= 'CA';		// country code
-$countryName		= 'Canada';	// country name
-$lang				= 'en';		// default language
-$province			= 'CW';		// selected province
+$censusYear			= 1881;		    // default census year
+$censusId			= 'CA1881';		// default census year
+$cc		    		= 'CA';		    // default country code
+$countryName		= 'Canada';	    // default country name
+$lang				= 'en';		    // default language
+$province			= 'CW';		    // default selected province
 $states				= 'ABBCMBNBNSNTONPIQCSKYT';
-$censusRec	        = null;
+$censusRec	        = null;         // instance of Census
 
 // loop through all of the passed parameters to validate them
 // and save their values into local variables, overriding
@@ -61,49 +63,23 @@ if (count($_GET) > 0)
 	    switch(strtolower($key))
 	    {			// switch on parameter name
 			case 'census':
-			{			// Census identifier
-			    $censusId		        = $value;
-	
-			    if (strtoupper($censusId) == 'CAALL')
-			    {		// special census identifier to search all
-					$cc			        = substr($censusId, 0, 2);
-					$censusYear		    = substr($censusId, 2);
-					$province		    = 'CW';	// for pre-confederation
-			    }		// special census identifier
-			    else
-			    {		// full census identifier
-					$censusRec	= new Census(array('censusid'	=> $value));
-					if ($censusRec->isExisting())
-					{
-					    $cc			    = substr($censusId, 0, 2);
-					    $censusYear		= substr($censusId, 2);
-					    if ($censusRec->get('partof'))
-					    {
-					    	$province	= substr($censusId, 0, 2);
-					    	$cc		    = $censusRec->get('partof');
-					    	$parentRec	= new Census(array('censusid' =>
-						                				$cc . $censusYear));
-					    	$states		= $parentRec->get('provinces');
-					    }
-					    else
-						$states		    = $censusRec->get('provinces');
-					}
-                    else
-                    {
-                        $msg            .= "Census value '$censusId' invalid. ";
-					    $cc			    = substr($censusId, 0, 2);
-					    $censusYear		= substr($censusId, 2);
-                    }
-			    }		// full census identifier
+            {			// Census identifier
+                if (strlen($value) > 4)
+			        $censusId		        = $value;
 			    break;
 			}			// Census identifier
 	
+			case 'province':
+			case 'state':
+            {			// province identifier
+                if (strlen($value) >= 2)
+			        $province		        = strtoupper(substr($value, 0, 2));
+			    break;
+			}			// province identifier
+	
 			case 'lang':
 			{			// language code
-			    if (strlen($value) >= 2)
-			    {
-					$lang		= strtolower(substr($value,0,2));
-			    }
+				$lang		= FtTemplate::validateLang($value);
 			    break;
 			}			// language code
 	
@@ -113,49 +89,74 @@ if (count($_GET) > 0)
         $warn       .= $parmsText . "</table>\n";
 }	        	    // invoked by URL to display current status of account
 
+// interpret census identifier
+if (strtoupper($censusId) == 'CAALL')
+{		// special census identifier to search all
+	$cc			        = substr($censusId, 0, 2);
+	$censusYear		    = substr($censusId, 2);
+	$province		    = 'CW';	// for pre-confederation
+}		// special census identifier
+else
+{		// full census identifier
+	$censusRec	        = new Census(array('censusid'	=> $censusId));
+	if ($censusRec->isExisting())
+	{
+	    $cc			    = substr($censusId, 0, 2);
+	    $censusYear		= substr($censusId, 2);
+	    if ($censusRec->get('partof'))
+	    {
+	    	$province	= substr($censusId, 0, 2);
+	    	$cc		    = $censusRec->get('partof');
+	    	$parentRec	= new Census(array('censusid' =>
+		                				$cc . $censusYear));
+	    	$states		= $parentRec->get('provinces');
+	    }
+	    else
+		    $states		= $censusRec->get('provinces');
+	}
+    else
+    {
+        $msg            .= "Census value '$censusId' invalid. ";
+	    $cc			    = substr($censusId, 0, 2);
+	    $censusYear		= substr($censusId, 2);
+    }
+}		// full census identifier
+
 // support for countries other than Canada
 if ($cc != 'CA')
 {
-    $countryObj		= new Country(array('code'=> $cc));
-    $countryName	= $countryObj->getName($lang);
+    $countryObj		    = new Country(array('code'=> $cc));
+    $countryName	    = $countryObj->getName($lang);
 }
 
 // determine contents of province/state selection list
-$stateArray		    = array();
+$stateArray		        = array();
 for ($i = 0; $i < strlen($states); $i += 2)
-    $stateArray[]	=  $cc . substr($states, $i, 2);
-$getParms	    	= array('domain'	=> $stateArray,
-        	    			'lang'		=> $lang);
-$stateList	    	= new DomainSet($getParms);
+    $stateArray[]	    =  $cc . substr($states, $i, 2);
+$getParms	    	    = array('domain'	=> $stateArray,
+        	    		    	'lang'		=> $lang);
+$stateList	    	    = new DomainSet($getParms);
 if ($stateList->count() == 0)
-{
-    $getParms	    = array('domain'	=> $stateArray,
-        	    			'lang'		=> 'en');
-    $stateList	    = new DomainSet($getParms);
-}
-$selection	    	= array();
-foreach($stateList as $state)
-{
-    $sel	= array('statecode'	=> $state->get('state'),
-        			'statename'	=> $state->get('name'),
-	        		'selected'	=> '');
-    if ($state->get('state') == $province)
-	    $sel['selected']		= 'selected="selected"';
-    $selection[]	= $sel;
-}
+{                   // no names for the requested language
+    $getParms	        = array('domain'	=> $stateArray,
+        	    		    	'lang'		=> 'en');
+    $stateList	        = new DomainSet($getParms);
+}                   // no names for the requested language
+$state                  = $stateList[$cc . $province];
+if ($state)
+    $state->selected    = true;
 
 // create template
 if (strtoupper($censusYear) == 'ALL')
-    $censusYear	= 'All';
+    $censusYear	        = 'All';
 
-$title	    	= "$censusYear Census of $countryName Query Request";
-$tempBase		= $document_root . '/templates/';
+$tempBase		        = $document_root . '/templates/';
 if (file_exists($tempBase . "Query$cc$censusYear" . "en.html"))
-    $template		= new FtTemplate("Query$cc$censusYear$lang.html");
+    $template		    = new FtTemplate("Query$cc$censusYear$lang.html");
 else
-    $template		= new FtTemplate("QueryUnsupported$lang.html");
+    $template		    = new FtTemplate("QueryUnsupported$lang.html");
 
-$includePop 	= "CensusQueryPopups$lang.html";
+$includePop 	        = "CensusQueryPopups$lang.html";
 $template->includeSub($includePop,
 	    		      'POPUPS');
 $template->set('CENSUSYEAR', 	    $censusYear);
@@ -167,6 +168,6 @@ $template->set('CENSUS',	    	$censusYear);
 $template->set('CONTACTTABLE',  	'Census' . $censusYear);
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 
-$template->updateTag('stateoption',
-			         $selection);
+$template->updateTag('stateoption', $stateList);
+
 $template->display();

@@ -257,38 +257,47 @@
 	  <p>Specifying simple text, comprising letters and spaces, matches against
 		any names containing that text.  "John" or "john" or "JOHN" will match
 	"Johnathan" and "William John" as well as the simple "John".
+      </p>
 	  <p>The text may be a 
 	    <a href="http://en.wikipedia.org/wiki/Regular_expression">
 				regular expression</a>.
 		There are too many options to enumerate here, but a few examples include:
+      </p>
 	  <ul>
-	    <li>If you want to match just the name "John", excluding names that include
-			"John" as part of them, enter "^John$".
-	    <li>Enumerators often use unusual spellings of names.  For example if you
-				to match names including both "Henry" and "Henery", enter "Hen.*ry".
+	    <li>If you want to match just the name "John", excluding names that
+            include "John" as part of them, enter "^John$".
+        </li>
+	    <li>Enumerators often use unusual spellings of names.  For example
+            if you wish to match names including both "Henry" and "Henery",
+            enter "Hen.*ry".
+        </li>
 	  </ul>
 	</div>
 	<div class='balloon' id='HelpSurname'>
-	<p>This field is used to specify text to look for in the surname of 
-		the child.
-		If the value contains only letters and spaces then only surnames that match
-		exactly (except for case) are found.  Otherwise this
-		uses 
+	  <p>This field is used to specify text to look for in the surname of 
+		the child.  If the value contains only letters and spaces then
+        only surnames that match exactly (except for case) are found.
+        Otherwise this uses 
 	    <a href="http://en.wikipedia.org/wiki/Regular_expression">
 		regular expression</a> pattern matching.
-		For example to match surnames starting with "McL..." and ending with "...n",
-		such as "McLean", "McLain", "McLennan", or "McLellan" you could specify 
-	"^McL.*n$".
-	<p>The meaning of this field changes if the Soundex option is selected.
-	<p>The Soundex code has been used for decades to attempt to match names that
-		sound similar.  For example it is used by police forces to perform a rough
+		For example to match surnames starting with "McL..." and ending
+        with "...n", such as "McLean", "McLain", "McLennan", or "McLellan"
+        you could specify "^McL.*n$".
+      </p>
+	  <p>The meaning of this field changes if the Soundex option is selected.
+      </p>
+	  <p>The Soundex code has been used for decades to attempt to match names
+        that sound similar.  For example it is used by police forces to
+        perform a rough
 		match for the names of drivers.  It is a problematic tool, as it
 		is based upon the phonetics of British surnames.
 		If you select Soundex then the search
 		is made for surnames that "sound like" the given surname.  For example
-		specifying Soundex together with "McLean" will match all of the surnames in
-		the pattern match example under "Surname", but many other names as well, such
-	"McCallum", "McAllan", "McClain", and "McWilliams". 
+		specifying Soundex together with "McLean" will match all of the
+        surnames in the pattern match example under "Surname", but many
+        other names as well, such "McCallum", "McAllan", "McClain", and
+        "McWilliams". 
+      </p>
 	</div>
 	<div class='balloon' id='HelpSurnameSoundex'> 
         The Soundex code has been used for decades to attempt to match names
@@ -369,7 +378,7 @@
 		address of the informant.
 	</div>
 	<div class='balloon' id='HelpReligion'>
-	    <p>This option is used to search for individuals based upon their
+	    This option is used to search for individuals based upon their
         religious affiliation.  This is a pattern match. 
         For example searching for
     	"Meth" will match any religion containing that string, including 
@@ -409,7 +418,7 @@
 	<div class='hidden' id='templates'>
 	  <div id='chooseTownshipCell'>
 			<select size='0' name='RegTownship' class='white left'>
-			    <option value=''>Choose a Township
+                <option value=''>Choose a Township</option>
 			</select>
 	  </div>
 	  <div id='noTownshipCell'>

@@ -52,7 +52,7 @@ function loadEdit()
 		else
 		    name	= element.id;
 
-		switch(name)
+		switch(name.toLowerCase())
 		{	// action depends upon element name
 		    case 'pictype':
 		    {
@@ -70,14 +70,14 @@ function loadEdit()
 				break;
 		    }	// picnameurl
 		    
-		    case 'updPicture':
+		    case 'updpicture':
 		    {
 				element.onkeydown	= keyDown;
 				element.onchange	= change;	// default handler
 				break;
 		    }	// updPicture
 		    
-		    case 'browseFile':
+		    case 'browsefile':
 		    {
 				element.onkeydown	= keyDown;
 				element.onclick		= browseFile;
@@ -94,7 +94,7 @@ function loadEdit()
 				break;
 		    }		// media file date
 		    
-		    case 'browseSound':
+		    case 'browsesound':
 		    {
 				element.onkeydown	= keyDown;
 				element.onclick		= browseSound;
@@ -109,6 +109,12 @@ function loadEdit()
 				break;
 		    }	// desc
 
+            case 'close':
+            {
+                element.addEventListener('click', close);
+                break;
+            }
+
 		    default:
 		    {
 				element.onkeydown	= keyDown;
@@ -120,6 +126,28 @@ function loadEdit()
     }		// loop through all elements in the form
 
 }		// loadEdit
+
+/************************************************************************
+ *  function close      												*
+ *																		*
+ *  Implement dynamic functionality of the Close button.                *
+ *																		*
+ *  Input:																*
+ *		this	<button id='Close'>     							    *
+ *		ev      instance of Event                                       *
+ ************************************************************************/
+function close(ev)
+{
+    if (!ev)
+        ev          = window.event;
+    ev.stopPropagation();
+
+    var form        = this.form;
+    var idir        = form.idir.value;
+    var idtype      = form.idtype.value;
+    closeFrame('/Family/editPictures.php?idir=' + idir + '&idtype=' + idtype);
+    return true;
+}		// function close
 
 /************************************************************************
  *  function changePicType												*

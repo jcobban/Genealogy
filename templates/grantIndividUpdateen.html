@@ -1,0 +1,95 @@
+<!--*********************************************************************
+ *  grantIndividUpdateen.html											*
+ *																		*
+ *  Templateto display a web page to grant the authority to update an	*
+ *  individual, his/her spouses, his/her descendants, and               *
+ *  his/her ancestors.		                                            *
+ *																		*
+ *  History:															*
+ *		2019/07/12		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <link rel='stylesheet' type='text/css' href='grantIndivid.css'>
+    <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+			Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+			Services
+      </a>:
+      <a href="/genCountry.php?cc=CA&lang=$LANG">
+			Canada
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+			Nominal Index
+      </a>:
+      <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+			Surnames Starting with '$PREFIX'
+      </a>:
+      <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+			Surname '$SURNAME'
+      </a>:
+      <a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG">
+			$NAME
+      </a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+		  <a href="grantIndividHelpen.html" target="help">? Help</a>
+        </span>
+		Grant Access to $NAME
+      </h1>
+      $TRACE
+      $MSG
+      <form method="post" action="grantUser.php" name="grantForm">
+        <input type="hidden" name="idir" value="$IDIR">
+        <input type="hidden" name="lang" value="$LANG">
+        <input type="hidden" name="debug" value="$DEBUG">
+        <div class="row">
+		  <label class="column1" for="UserPattern">
+		      User Name Pattern:
+		  </label>
+		  <input type="text" name="Pattern" id="Pattern" class="white left"
+                value="$PATTERN">
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row">
+		  <label class="column1" for="User">
+		      Select user to grant access to:
+		  </label>
+		  <select name="User" id="User" size="5" class="white left">
+			  <option id="User$id" value="$id">$username
+			  </option>
+	      </select>
+          <div style="clear: both;"></div>
+        </div>
+        <div class="row">
+		  <button type="submit" name="Submit">Grant Access</button>
+          <div style="clear: both;"></div>
+        </div>
+      </form>
+    </div>	<!-- end of <div id="body"> -->
+    <div class="balloon" id="HelpUser">
+      <p>This list permits you to identify the other user to whom you wish
+        to grant permission to view the private data and update the current 
+        individual and that individual's
+        ancestors and descendants.
+      </p>
+    </div>
+    <div class="balloon" id="HelpSubmit">
+      <p>
+        Clicking on this button grants access to the individual and his/her
+        ancestors and descendants to the indicated user.
+      </p>
+    </div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/grantIndivid.js" type="application/javascript">
+    </script>

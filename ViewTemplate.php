@@ -16,9 +16,11 @@ use \Exception;
  *	    addLang         specify 'Y' to indicate that the value of       *
  *	                    template does not include the language          *
  *	    lang            user's preferred language of communication      *
+ *	    showDOM         display the document object model               *
  *																		*
  *  History:															*
  *		2019/04/16		created											*
+ *		2019/07/28      add option to display the document object model *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -28,7 +30,9 @@ require_once __NAMESPACE__ . '/common.inc';
 // validate parameters
 $lang		                = 'en';
 $templateName               = '';
+$stemplate                  = null;
 $addLang                    = false;
+$showDOM                    = false;
 
 // initial invocation by method='get'
 if (isset($_GET) && count($_GET) > 0)
@@ -64,6 +68,14 @@ if (isset($_GET) && count($_GET) > 0)
 			    break;
 			}		// pattern match
 
+			case 'showdom':
+			{
+                if (strlen($value) > 0 && 
+                    strtolower(substr($value,0,1)) == 'y')
+					$showDOM    = true;
+			    break;
+			}		// show the DOM
+
 	    }			// act on specific parameters
 	}			// loop through parameters
 	if ($debug)
@@ -92,7 +104,10 @@ $template->set('LANG',              $lang);
 
 $tempBase		        = $document_root . '/templates/';
 if (file_exists($tempBase . $templateName))
+{
     $text               = file_get_contents($tempBase . $templateName);
+    $stemplate          = new \Templating\Template($text);
+}
 else
 {
     $templateName       = substr($templateName, 0, $period - 2) . 'en' .
@@ -119,6 +134,8 @@ else
     $temp           = $text;
 $temp       = str_replace('$TRACE', '<div class="warning">$TRACE</div>', $temp);
 $temp       = str_replace('$MSG',   '<p class="error">$MSG</p>', $temp);
+if ($showDOM && $stemplate)
+    $temp   .= $stemplate->getDocument()->show();
 $template->set('TEMPLATE',          $temp);
 
 // adjust tabs
@@ -186,22 +203,74 @@ while(($lt = strpos($text, '<', $start)) !== false)
     else
     if (ctype_alpha(substr($text, $lt + 1, 1)))
     {               // start tag
-        $html       .= '&lt;<span style="color: purple; font-weight: bold;">';
+        $html           .= '&lt;<span style="color: purple; font-weight: bold;">';
         $lt++;
-        $result     = preg_match('#^\w+#', substr($text, $lt), $matches);
-        if ($result == 0)
-            $warn   .= "<p>pattern match failed at $lt '" . substr($text, $lt, 10) . "</p>\n";
-        $html       .= $matches[0] . "</span><span style=\"font-weight: bold;\">";
-        $lt         += strlen($matches[0]);
-        $end        = strpos($text, '>', $lt);
-        $temp       = substr($text, $lt, $end - $lt);
-        $temp       = str_replace(' ',
-                                  '&nbsp;',
-                                  $temp);
-        $temp       = str_replace("\t",
-                                  '&nbsp;&nbsp;&nbsp;&nbsp;',
-                                  $temp);
-        $html       .= $temp . '</span>&gt;';
+        $result         = preg_match('#^\w+#', substr($text, $lt), $matches);
+        $tagname        = $matches[0];
+        $html           .= $matches[0] . "</span><span style=\"font-weight: bold;\">";
+        $lt             += strlen($matches[0]);
+        $end            = strpos($text, '>', $lt);
+        $temp           = substr($text, $lt, $end - $lt);
+        $templen        = strlen($temp);
+        if (preg_match('/^\s*/', $temp, $matches))
+        {
+            $html       .= str_replace('\n','<br>\n',
+                                str_replace('\t','&nbsp;&nbsp;&nbsp;&nbsp;',
+                                    str_replace(' ', '&nbsp;', $matches[0])));
+            $html       .= str_replace('\t','&nbsp;&nbsp;&nbsp;&nbsp;',
+                str_replace(' ', '&nbsp;', $matches[0]));
+            $ip         = strlen($matches[0]);
+        }
+        else
+            $ip         = 0;
+        while(preg_match('/(\w+)(\s*=\s*|)/',
+                         substr($temp, $ip),
+                         $matches))
+        {
+            $attrname   = $matches[1];
+            $equals     = $matches[2];
+            $html       .= $matches[0];
+            $ip         += strlen($matches[0]);
+            if (strlen($equals) > 0)
+            {                       // have a parameter value
+                if (preg_match('/(\w+|\'[^\\\']*\'|"[^\\"]*")/',
+                               substr($temp, $ip),
+                               $matches))
+                {
+                    $html   .= '<span style="color: blue;">' . $matches[0] . '</span>';
+                    $ip         += strlen($matches[0]);
+                }
+                else
+                    $warn       .= "<p>ViewTemplate.php: " . __LINE__ .
+                                    " tagname=$tagname attr=" . $attrname .
+                                    " value=empty</p>\n";
+            }                       // have a parameter value
+
+            while($ip < $templen && ctype_space(substr($temp, $ip, 1)))
+            {                       // process space between attributes
+                switch(substr($temp, $ip, 1))
+                {
+                    case ' ':
+                        $html       .= '&nbsp;';
+                        break;
+
+                    case "\t":
+                        $html       .= '&nbsp;&nbsp;&nbsp;&nbsp;';
+                        break;
+
+                    case "\n";
+                        $html       .= "<br>";
+                        break;
+
+                    default:
+                        $html       .= substr($temp, $ip, 1);
+                        break;
+
+                }
+                $ip++;
+            }                       // process space between attributes
+        }
+        $html       .= '</span>&gt;';
         $start      = $end + 1;
     }               // start tag
     else

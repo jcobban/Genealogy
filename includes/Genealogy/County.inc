@@ -212,13 +212,14 @@ class County extends Record
 						{		// domain
 						    if ($value instanceof Domain)
 						    {
-						    	$this->domainObj	= $value;
-						    	$domain	    = $this->domainObj->get('domain');
+						    	$domainObj	    = $value;
+						    	$this->domainObj	= $domainObj;
+                                $domain	        = $domainObj->get('domain');
 						    }
 						    else
 						    {
 							    $this->domainObj	= new Domain(
-								        array('domain'	=> $value,
+								        array('domain'	    => $value,
 								        	  'language'	=> 'en'));
 							    $domain	    = $value;
 						    }

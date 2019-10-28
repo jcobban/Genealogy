@@ -34,6 +34,7 @@ use \Iterator;
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
+require_once __NAMESPACE__ . '/CountryName.inc';
 
 /************************************************************************
  *  class Country														*
@@ -65,7 +66,7 @@ class Country extends Record
                 'name'      		=> 'Countries',
                 'prime'	    		=> 'code',
 	            'srvmg'     		=> false,
-	            'fldcount'			=> 6,
+	            'fldcount'			=> 4,
                 'order'     		=> 'Name',
                 'classname' 		=> 'Country');
 
@@ -112,26 +113,26 @@ class Country extends Record
 		    throw new Exception('Country::constructor: " .
 							"No connection to database server');
 		}
-		$needInsert	= false;
-		$this->table	= 'Countries';
+		$needInsert	            = false;
+		$this->table	        = 'Countries';
 
 		// support undocumented shorthand call
 		if (is_string($parms) && strlen($parms) == 2)
-		    $parms	= array('code'	=> strtoupper($parms));
+		    $parms	            = array('code'	=> strtoupper($parms));
 
 		// validate parameters
 		if (is_array($parms))
 		{			// valid parm type
 		    if (count($parms) < count(self::$initRow))
 		    {			// search parameters
-				$code		= 'not supplied';
-				$where		= '';
-				$and		= 'WHERE ';
-				$sqlParms	= array();
+				$code	    	= 'not supplied';
+				$where	    	= '';
+				$and	    	= 'WHERE ';
+				$sqlParms   	= array();
 				foreach($parms as $key => $value)
-				{			// loop through parameters
+				{			    // loop through parameters
 				    switch(strtolower($key))
-				    {		// act on key fields
+				    {		    // act on key fields
 						case 'cc':
 						case 'code':
 						{		// country
@@ -144,34 +145,34 @@ class Country extends Record
 						    break;
 						}		// country
 
-				    }		// act on key fields
-				}			// loop through parameters
+				    }		    // act on key fields
+				}			    // loop through parameters
 
-				$query		        = "SELECT * FROM Countries $where";
+				$query		            = "SELECT * FROM Countries $where";
 
 				// query the database
-				$stmt		        = $connection->prepare($query);
-				$queryText	        = debugPrepQuery($query, $sqlParms);
-                $this->lastSqlCmd   = $queryText;
+				$stmt		            = $connection->prepare($query);
+				$queryText	            = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd       = $queryText;
 				if ($stmt->execute($sqlParms))
 				{		// success
 				    if ($debug)
 						$warn	    .= "<p>Country::__construct: " . __LINE__ . 
 							   " query='$queryText'</p>\n";
 
-				    $result	        = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				    $result	            = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				    if (count($result) == 1)
 				    {		// existing record
-						$dbrow		= $result[0];
-						$needInsert	= false;
+						$dbrow		    = $result[0];
+						$needInsert	    = false;
 				    }		// existing record
 				    else
 				    if (count($result) == 0)
 				    {		// create a new record
 						// set defaults
 						$dbrow			= self::$initRow;
-						$dbrow['code']		= $code;
-						$dbrow['name']		= "Country: '$code'";
+						$dbrow['code']	= $code;
+						$dbrow['name']	= "Country: '$code'";
 						$needInsert		= true;
 				    }		// create new record
 				    else
@@ -188,8 +189,8 @@ class Country extends Record
 		    }			// search parameters
 		    else
 		    {			// build from existing record
-				$dbrow		= $parms;
-				$needInsert	= false;
+				$dbrow		            = $parms;
+				$needInsert	            = false;
 		    }			// build from existing record
 		}			// array parameter
 		else

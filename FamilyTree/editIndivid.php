@@ -363,8 +363,13 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/11/19      change Help.html to Helpen.html                 *
  *      2018/12/18      ensure birth event displayed first              *
+ *      2019/07/03      do not perform any action on database if        *
+ *                      not signed in                                   *
+ *                      ensure IDIR always set                          *
+ *      2019/08/11      Child methods getStatus, getCPRelDad, and       *
+ *                      getCPRelMom obsoleted                           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -431,12 +436,13 @@ $genderFixed				= '';		// pre-selected gender
 $idirset					= false;	// idir provided and non-zero
 $fathGivenName				= '';
 $fathSurname				= '';
-$fatherName					= 'unknown';
+$fatherName					= '';
 $mothGivenName				= '';
 $mothSurname				= '';
-$motherName					= 'unknown';
+$motherName					= '';
 $treeName					= '';
 $showHdrFtr					= true;
+$lang                       = 'en';
 
 // if invoked by method=get process the parameters
 if (count($_GET) > 0)
@@ -486,38 +492,38 @@ if (count($_GET) > 0)
                     $value > 0)
                 {
                     $parentsIdmr		= $value;
-                    $showHdrFtr		= false;
+                    $showHdrFtr		    = false;
                 }
                 break;
             }		// identifier of parent's family
     
             case 'rowid':
             {		// role of parent in family
-                $showHdrFtr		= false;
+                $showHdrFtr				= false;
                 break;
             }		// role of parent in family
     
             case 'fathgivenname':
             {		// explicit father's given name
-                $fathGivenName	= $value;
+                $fathGivenName			= $value;
                 break;
             }		// explicit father's given name
     
             case 'fathsurname':
             {		// explicit father's surname
-                $fathSurname	= $value;
+                $fathSurname			= $value;
                 break;
             }		// explicit father's given name
     
             case 'mothgivenname':
             {		// explicit mother's given name
-                $mothGivenName	= $value;
+                $mothGivenName			= $value;
                 break;
             }		// explicit mother's given name
     
             case 'mothsurname':
             {		// explicit mother's surname
-                $mothSurname	= $value;
+                $mothSurname			= $value;
                 break;
             }		// explicit mother's given name
     
@@ -526,8 +532,14 @@ if (count($_GET) > 0)
                 $treeName				= $value;
                 break;
             }		// tree to create individual in
+
+            case 'lang':
+            {
+                $lang                   = FtTemplate::validateLang($value);
+            }
         }	// switch on parameter name
     }		// loop through all parameters
+
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
 }	                // invoked by URL to display current status of account
@@ -540,45 +552,113 @@ if (strlen($mothSurname) > 0 || strlen($mothGivenName) > 0)
 
 // parameter to nominalIndex.php
 $nameuri		            = '';
+$treeName	                = '';
 
 // idir parameter explicitly provided for existing individual
-if ($idirset)
-{		// get the requested individual
-    $person		            = new Person(array('idir' => $idir));
-    $isOwner			    = canUser('edit') && $person->isOwner();
-    $treeName			    = $person->getTreeName();
-}		// get the requested individual
+if (canUser('edit'))
+{                       // current user can edit the database
+	if ($idirset)
+	{		            // get the requested individual
+	    $person		            = new Person(array('idir' => $idir));
+	    $isOwner			    = $person->isOwner();
+	    $treeName			    = $person->getTreeName();
+	}		            // get the requested individual
+	else
+	{		            // create new individual with defaults
+	    // create an instance of Person for the new individual
+	    $person				    = new Person();
+	    $idir                   = null;
+	    //$person->setTreeName($treeName);
+	    $isOwner				= true;
+	}		            // create new individual
+}                       // current user can edit the database
 else
-{		// create new individual with defaults
-    // create an instance of Person for the new individual
-    $person				    = new Person();
-    //$person->setTreeName($treeName);
-    $isOwner				= canUser('edit');
-}		// create new individual
+{                       // current user can only view
+	if ($idirset)
+	{		            // get the requested individual
+	    $person		            = new Person(array('idir' => $idir));
+	    $treeName			    = $person->getTreeName();
+	}		            // get the requested individual
+	else
+        $person                 = null;
+    $isOwner                    = false;
+}                       // current user can only view
+
+if ($isOwner)
+{
+    if ($debug)
+        $action             = 'Debug';
+    else
+        $action             = 'Update';
+}
+else
+    $action                 = 'Display';
+
+$template                   = new FtTemplate("editIndivid$action$lang.html");
+$translate                  = $template->getTranslate();
+$t                          = $translate['tranTab'];
+$eventText                  = $translate['eventText'];
+$eventTextJs                = "    <script>\n      var eventText = {\n";
+$comma                      = "\t\t";
+foreach($eventText as $key => $value)
+{
+    $eventTextJs            .= "$comma\"$key\" :\t\"$value\"";
+    $comma                  = ",\n\t\t";
+}
+$eventTextJs                .= "};\n    </script>\n";
+$template->set('EVENTTEXT',         $eventTextJs);
+$template->includeSub('LocationDialogs.html', 'LOCATIONDIALOGS');
+$template['otherStylesheets']->update(array('filename'  => 'editIndivid'));
+
+$template->set('LANG',              $lang);
+if ($idir)
+    $template->set('IDIR',          $idir);
+else
+{
+    $template['person']->update(null);
+    $template->set('IDIR',          0);
+}
+$template->set('NAMEURI',           $nameuri);
 
 // make sure the internal events structure of the individual is initialized
-if ($person && $person->get('idir') > 0)
+if ($person && $idir > 0)
     $events		            = $person->getEvents();
 else
     $events                 = array();
 
 // initialize or update fields from passed parameters
-$given						= $person->get('givenname');
-$surname					= $person->get('surname');
 $eSurname					= '';
 $eGiven						= '';
 $prefix						= '';
 $name						= '';
 $idar						= 0;
 $nameuri					= '';
-$evBirth					= $person->getBirthEvent(true);	
-$evChristen					= $person->getChristeningEvent(false);	
-$evBaptism					= $person->getBaptismEvent(false);
-$evEndow					= $person->getEndowEvent(false);
-$evConfirm					= $person->getConfirmationEvent(false);
-$evInitiat					= $person->getInitiatoryEvent(false);
-$evDeath					= $person->getDeathEvent(false);
-$evBuried					= $person->getBuriedEvent(false);
+if ($person && $person->isExisting())
+{
+    $given					= $person->get('givenname');
+    $surname				= $person->get('surname');
+	$evBirth				= $person->getBirthEvent(true);	
+	$evChristen				= $person->getChristeningEvent(false);	
+	$evBaptism				= $person->getBaptismEvent(false);
+	$evEndow				= $person->getEndowEvent(false);
+	$evConfirm				= $person->getConfirmationEvent(false);
+	$evInitiat				= $person->getInitiatoryEvent(false);
+	$evDeath				= $person->getDeathEvent(false);
+	$evBuried				= $person->getBuriedEvent(false);
+}
+else
+{
+    $given					= '';
+    $surname				= '';
+	$evBirth				= null;
+	$evChristen				= null;
+	$evBaptism				= null;
+	$evEndow				= null;
+	$evConfirm				= null;
+	$evInitiat				= null;
+	$evDeath				= null;
+	$evBuried				= null;
+}
 $birthChanged				= 0;		// birth event
 $christenChanged			= 0;		// traditional christening event
 $baptismChanged				= 0;		// LDS Baptism event
@@ -592,13 +672,12 @@ if ($debug)
     $warn	.= "<p>editIndivid.php: " . __LINE__ .
                 " Initialize from parameters</p>\n";
 
+// loop through parameters again to update Person
 foreach($_GET as $key => $value)
 {			// loop through parameters
     $fieldLc            = strtolower($key);
     if (substr($fieldLc,0,4) == 'init')
     {			// initialize field in database record
-        if ($debug)
-             $warn	.= "<p>editIndivid.php: " . __LINE__ . " $key='$value'</p>\n";
         $fieldLc	= substr($fieldLc, 4);
         switch($fieldLc)
         {
@@ -607,8 +686,6 @@ foreach($_GET as $key => $value)
                 if (strlen($value) > 0 && $person)
                 {
                     $surname	    = $value;
-        if ($debug)
-             $warn	.= "<p>editIndivid.php: " . __LINE__ . " \$person->setSurname('$value')</p>\n";
                     $person->setSurname($value);
                 }		// value supplied
                 break;
@@ -628,6 +705,8 @@ foreach($_GET as $key => $value)
             {
                 if (strlen($value) > 0 && $person)
                 {
+                    if (is_null($evBirth))
+                        $evBirth	= $person->getBirthEvent(true);
                     $evBirth->setDate(' ' . $value);
                     $birthChanged	= 1;
                 }		// value supplied
@@ -725,6 +804,8 @@ foreach($_GET as $key => $value)
                     $loc		= new Location(array('location' => $value));
                     if (!$loc->isExisting())
                         $loc->save(false);	// get IDLR
+                    if (is_null($evBirth))
+                        $evBirth	= $person->getBirthEvent(true);
                     $evBirth->set('idlrevent', $loc->getIdlr());
                     $birthChanged		= 1;
                 }		// value supplied
@@ -867,162 +948,163 @@ foreach($_GET as $key => $value)
                     $genderFixed	= 'readonly="readonly"';
                 }		// value supplied
                 break;
-            }		// set gender
+            }		    // set gender
+
+            case 'lang':
+            {
+                $lang           = FtTemplate::validateLang($value);
+            }
+
+            case 'text':
+            {           // handled by javascript
+                break;
+            }           // handled by javascript
 
             default:
             {
                 if (strlen($value) > 0 && $person)
                 {
-                    if ($debug)
-                        $warn	.= 
-                            "<p>editIndivid.php: " . __LINE__ . " \$person->set('$fieldLc', '$value')</p>\n";
                     // note that if $fieldLc is not a field name in the
                     // record this will create a temporary field
                     $person->set($fieldLc, $value);
                 }		// value supplied
                 break;
-            }		// no special handling
+            }		    // no special handling
 
-        }		// switch on field name
-    }			// initialize field in database record
-}			// loop through parameters
+        }		        // switch on field name
+    }			        // initialize field in database record
+}			            // loop through parameters
 
 // extract information from the instance of Person
 if ($debug)
     $warn	.= "<p>editIndivid.php: " . __LINE__ . " \$person found or created</p>\n";
-if ($person)
-{			// individual found or created
-    if ($person->get('id') > 0)
-    {       // person is initialized
-        // check for case of adding or editting a child
-        if ($idcr > 0)
-        {		// child already exists and is already family member
-            $childr				    = new Child(array('idcr' => $idcr));
-            $parentsIdmr			= $childr->getIdmr();
-            $family			    = new Family(array('idmr' => $parentsIdmr));
-            if ($family->isExisting())
-            {
-                $fatherName			= $family->getHusbName();
-                $fatherName			= trim($fatherName);
-                $motherName			= $family->getWifeName();
-                $motherName			= trim($motherName);
-            }
-            else 
-            {
-                $warn	            .= "editIndivid.php: " . __LINE__ . " IDMR=$parentsIdmr not found in database. ";
-            }		// getting parent's family failed
-        }		// child already exists and is already family member
-        else
-        if ($parentsIdmr > 0)
-        {		// identified a family to which to add the child 
-            $family			    = new Family(array('idmr' => $parentsIdmr));
-            if ($family->isExisting())
-            {
-                if ($idir == 0)
-                {		// new child
-                    $person->save(false);
-                    $idir			= $person->getIdir();
-                }		// new child
-                $childr			    = new Child(array('idmr' => $parentsIdmr,
-                                                      'idir' 		=> $idir));
-                $childr->save(false);
-                $idcr			    = $childr->getIdcr();
-                $fatherName			= $family->getHusbName();
-                $fatherName			= trim($fatherName);
-                $motherName			= $family->getWifeName();
-                $motherName			= trim($motherName);
-            }
-            else
-            {
-                $warn	            .= "editIndivid.php: " . __LINE__ . " parentsidmr=$value not found in database. ";
-            }		// getting parent's family failed
-            $title		            = 'Edit New Child of ';
-            if (strlen($fatherName) > 0)
-            {		// child has a father
-                $title	            .= $fatherName;
-                if (strlen($motherName) > 0)
-                    $title	        .= ' and ';
-            }		// child has a father
-            if (strlen($motherName) > 0)
-                $title	            .= $motherName;
-        }		// identified a family to which to add the child
-    
-        // extract fields from individual for display
-        $id					        = $person->get('id');
-        $gender				        = $person->get('gender');
-        $genderClass		        = $genderClasses[$gender];
-        $private			        = $person->get('private');
-        $families			        = $person->getFamilies();
-        $parents			        = $person->getParents();
-    
-        if (count($families) > 0)
-        {		// ensure never married indicator is off
-            $neverMarried			= 0;
-            $neverMarriedRO			= 'readonly="readonly"';
-        }		// ensure never married indicator is off
-        else
-        {		// allow never married indicator to be set
-            $neverMarried			= $person->get('neverMarried');
-            $neverMarriedRO			= "";
-        }		// allow never married indicator to be set
-    
-        // the value of IDMRPref may be invalid due to a flaw in
-        // the earlier implementation.  If so fix it.
-        $idmrpref				    = $person->get('idmrpref') - 0;
-        if ($idmrpref == 0 &&
-            count($families) > 0)
-            $idmrpref			= $families->rewind()->getIdmr();
-    
-        // information for Ancestry.ca search
-        $fatherGivenName			= '';
-        $fatherSurname				= '';
-        $motherGivenName			= '';
-        $motherSurname				= '';
-        $prefParents				= $person->getPreferredParents();
-        if ($prefParents)
-        {			// have preferred parents
-            $father					= $prefParents->getHusband();
-            if ($father)
-            {			// have father
-                $fatherGivenName	= $father->getGivenName();
-                $fatherSurname		= $father->getSurname();
-            }			// have father
-            $mother					= $prefParents->getWife();
-            if ($mother)
-            {			// have father
-                $motherGivenName	= $mother->getGivenName();
-                $motherSurname	= $mother->getSurname();
-            }			// have father
-        }			// have preferred parents
-    
-        $ancInterest	= $person->get('ancinterest');
-        $decInterest	= $person->get('decinterest');
-    
-        $userRef		= str_replace('"','&quot;',$person->get('userref'));
-        $ancestralRef	= str_replace('"','&quot;',$person->get('ancestralref'));
-    
-    }               // person is initialized
+
+if ($person && $person->isExisting())
+{                       // person is initialized
+    // check for case of adding or editting a child
+    if ($idcr > 0)
+    {		            // child already exists and is already family member
+        $childr				    = new Child(array('idcr' => $idcr));
+        $parentsIdmr			= $childr['idmr'];
+        $family			        = new Family(array('idmr' => $parentsIdmr));
+        if ($family->isExisting())
+        {
+            $fatherName			= $family->getHusbName();
+            $fatherName			= trim($fatherName);
+            $motherName			= $family->getWifeName();
+            $motherName			= trim($motherName);
+        }
+        else 
+        {
+            $warn	            .= "<p>editIndivid.php: " . __LINE__ . " IDMR=$parentsIdmr not found in database.</p>\n";
+        }		        // getting parent's family failed
+    }		            // child already exists and is already family member
     else
-    {
-        $idir                   = 0;
-        $id					    = $person->get('id');
-        $gender				    = $person->get('gender');
-        $genderClass		    = $genderClasses[$gender];
-        $private			    = $person->get('private');
-        $neverMarried			= 0;
-        $neverMarriedRO			= '';
-        $fatherGivenName        = '';
-        $fatherSurname          = '';
-        $motherGivenName        = '';
-        $motherSurname          = '';
-        $userRef                = '';
-        $ancestralRef            = '';
-        $ancInterest            = 0;
-        $decInterest            = 0;
-        $parents                = array();
-        $families               = array();
-        $idmrpref               = 0;
-    }
+    if ($parentsIdmr > 0)
+    {		            // identified a family to which to add the child 
+        $family			    = new Family(array('idmr' => $parentsIdmr));
+        if ($family->isExisting())
+        {               // got parents' family
+            if ($idir == 0)
+            {		    // new child
+                $person->save(false);
+                $idir			= $person->getIdir();
+            }		    // new child
+            $childr			    = new Child(array('idmr' => $parentsIdmr,
+                                                  'idir' 		=> $idir));
+            $childr->save(false);
+            $idcr			    = $childr['idcr'];
+            $fatherName			= $family->getHusbName();
+            $fatherName			= trim($fatherName);
+            $motherName			= $family->getWifeName();
+            $motherName			= trim($motherName);
+        }               // got parents' family
+        else
+        {		        // getting parents' family failed
+            $warn	            .= "editIndivid.php: " . __LINE__ . 
+                                " parentsidmr=$value not found in database. ";
+        }		        // getting parents' family failed
+        $title		            = 'Edit New Child of ';
+        if (strlen($fatherName) > 0)
+        {		// child has a father
+            $title	            .= $fatherName;
+            if (strlen($motherName) > 0)
+                $title	        .= ' and ';
+        }		// child has a father
+        if (strlen($motherName) > 0)
+            $title	            .= $motherName;
+    }		// identified a family to which to add the child
+
+    // extract fields from individual for display
+    $id					        = $person->get('id');
+    $gender				        = $person->get('gender');
+    $genderClass		        = $genderClasses[$gender];
+    $private			        = $person->get('private');
+    $families			        = $person->getFamilies();
+    $familiesCount              = count($families);
+    $template->set('FAMILIESCOUNT',     $familiesCount);
+    if ($familiesCount > 0)
+        $template['addFamily']->update(null);
+    else
+        $template['editFamilies']->update(null);
+    $parents			        = $person->getParents();
+    $parentsCount               = count($parents);
+    $template->set('PARENTSCOUNT',      $parentsCount);
+    if ($parentsCount > 0)
+        $template['addParents']->update(null);
+    else
+        $template['editParents']->update(null);
+
+    if (count($families) > 0)
+    {		// ensure never married indicator is off
+        $template->set('NEVERMARRIEDCHECKED',		'');
+        $template->set('NEVERMARRIEDRO',		   
+                       'readonly="readonly" disabled="disabled"');
+    }		// ensure never married indicator is off
+    else
+    {		// allow never married indicator to be set
+        $neverMarried			= $person->get('neverMarried');
+        if ($neverMarried)
+            $template->set('NEVERMARRIEDCHECKED',	'checked="checked"');
+        else
+            $template->set('NEVERMARRIEDCHECKED',	'');
+        $template->set('NEVERMARRIEDRO',		    '');
+    }		// allow never married indicator to be set
+
+    // the value of IDMRPref may be invalid due to a flaw in
+    // the earlier implementation.  If so fix it.
+    $idmrpref				    = $person->get('idmrpref') - 0;
+    if ($idmrpref == 0 &&
+        count($families) > 0)
+        $idmrpref			    = $families->rewind()->getIdmr();
+
+    // information for Ancestry.ca search
+    $fatherGivenName			= '';
+    $fatherSurname				= '';
+    $motherGivenName			= '';
+    $motherSurname				= '';
+    $prefParents				= $person->getPreferredParents();
+    if ($prefParents)
+    {			// have preferred parents
+        $father					= $prefParents->getHusband();
+        if ($father)
+        {			// have father
+            $fatherGivenName	= $father->getGivenName();
+            $fatherSurname		= $father->getSurname();
+        }			// have father
+        $mother					= $prefParents->getWife();
+        if ($mother)
+        {			// have father
+            $motherGivenName	= $mother->getGivenName();
+            $motherSurname	= $mother->getSurname();
+        }			// have father
+    }			// have preferred parents
+
+    $ancInterest	= $person->get('ancinterest');
+    $decInterest	= $person->get('decinterest');
+
+    $userRef		= str_replace('"','&quot;',$person->get('userref'));
+    $ancestralRef	= str_replace('"','&quot;',$person->get('ancestralref'));
 
     // construct title
     $eGiven		    = str_replace('"','&quot;',$given);
@@ -1031,78 +1113,417 @@ if ($person)
     if (strlen($name) == 0)
         $name		        = 'New Person';
     $idar		    = $person->get('idar') - 0;
-    $title		    = "Edit $name";
-    $nameuri		= rawurlencode($surname . ', ' . $given);
-
-    // identify prefix of name for name summary page
-    if (strlen($surname) == 0)
-        $prefix	= '';
-    else
-    if (substr($surname,0,2) == 'Mc')
-        $prefix	= 'Mc';
-    else
-        $prefix	= substr($surname,0,1);
-}	                // individual found
+}               // person is initialized
 else
-{		            // unable to allocate instance of Person
-    $title		= "Invalid or Missing value of IDIR=$idir";
-}		            // unable to allocate instance of Person
-
-$etitle	= str_replace('"','&quot;',$title);
-htmlHeader("Edit $name",
-           array('/jscripts/CommonForm.js',
-                 '/jscripts/js20/http.js',
-                 '/jscripts/util.js',
-                 '/jscripts/locationCommon.js',
-                 'editIndivid.js'),
-           true);
-$breadcrumbs	= array('/genealogy.php'	=> 'Genealogy',
-                        '/genCountry.php?cc=CA'	=> 'Canada',
-                        '/Canada/genProvince.php?Domain=CAON'
-                                    => 'Ontario',
-                        '/FamilyTree/Services.php'
-                                    => 'Services',
-                        "nominalIndex.php?name=$nameuri"
-                                    => 'Nominal Index ',
-                        "Surnames.php?initial=$prefix"	=>
-                                "Surnames Starting with '$prefix'",
-                        "Names.php?Surname=" . urlencode($surname)
-                                    => "Surname '$surname'");
-if ($idir > 0)
-    $breadcrumbs["Person.php?id=$idir"]			= $name;
-?>
-    <body>
-      <div id="transcription" style="overflow: auto; overflow-x: scroll">
-<?php
-if ($showHdrFtr)
 {
-    pageTop($breadcrumbs);
+    $idir                   = 0;
+    if ($person)
+    {
+        $id					= $person->get('id');
+        $gender				= $person->get('gender');
+        $genderClass		= $genderClasses[$gender];
+        $private			= $person->get('private');
+    }
+    else
+    {
+        $id					= 0;
+        $gender				= 2;
+        $genderClass		= 'unknown';
+        $private			= false;
+    }
+    $neverMarried			= 0;
+    $neverMarriedRO			= '';
+    $fatherGivenName        = '';
+    $fatherSurname          = '';
+    $fatherName             = '';
+    $motherGivenName        = '';
+    $motherSurname          = '';
+    $motherName             = '';
+    $userRef                = '';
+    $ancestralRef           = '';
+    $ancInterest            = 0;
+    $decInterest            = 0;
+    $parents                = array();
+    $families               = array();
+    $idmrpref               = 0;
+
+    // construct title
+    $eGiven		            = '';
+    $eSurname		        = '';
+    $name		            = 'New Person';
+    $idar		            = 0;
 }
-?>	
-      <div class="body">
-        <h1>
-          <span class="right">
-            <a href="editIndividHelpen.html" target="help">? Help</a>
-          </span>
-          <span style="flow: left" id="title">
-<?php
-    print "Edit $name";
-    if (strlen($treeName) > 0) 
-        print ": in tree '$treeName'"; 
-?> 
-          </span>
-          <div style="clear: both;"></div>
-        </h1>
-<?php
-showTrace();
+$title		                = "Edit $name";
+$nameuri		            = rawurlencode($surname . ', ' . $given);
+$priName                    = $person->getPriName();
+$idnx                       = $priName['idnx'];
+$template->set('NAMEURI',           $nameuri);
+$template->set('SURNAME',           $surname);
+$template->set('GIVEN',             $given);
+$template->set('EGIVEN',            $eGiven);
+$template->set('IDNX',              $idnx);
+$template->set('ESURNAME',          $eSurname);
+$template->set('NAME',              $name);
+$template->set('IDMRPREF',          $idmrpref);
+$template->set('ID',                $id);
+$template->set('PARENTSIDMR',       $parentsIdmr);
+$template->set('IDCR',              $idcr);
+$template->set('IDAR',              $idar);
+if ($idar)
+    $template['addAddress']->update(null);
+else
+    $template['editAddress']->update(null);
+$template->set('FATHERGIVENNAME',   $fatherGivenName);
+$template->set('FATHERSURNAME',     $fatherSurname);
+$template->set('MOTHERGIVENNAME',   $motherGivenName);
+$template->set('MOTHERSURNAME',     $motherSurname);
+
+// identify prefix of name for name summary page
+if (strlen($surname) == 0)
+    $prefix	                = '';
+else
+if (substr($surname,0,2) == 'Mc')
+    $prefix	                = 'Mc';
+else
+    $prefix	                = substr($surname,0,1);
+$template->set('PREFIX',            $prefix);
+
+$template->set('TREENAME',          $treeName);
+if (strlen($treeName) == 0)
+    $template['inTree']->update(null);
+
+// if not authorized do nothing more
+if ($action == 'Display')
+{
+    $template->display();
+    exit;
+}
+
+// set up for display of basic attributes
+$template->set('GENDERFIXED',       $genderFixed);
+$template->set('GENDERCLASS',       $genderClass);
+for ($g = 0; $g < 3; ++$g)
+{
+    if ($g == $gender)
+        $template->set("SELECTEDGENDER$g",       'selected="selected"');
+    else
+        $template->set("SELECTEDGENDER$g",       '');
+}
+if (strlen($fatherName) > 0)
+    $template->set('FATHERNAME',    $fatherName);
+else
+if ($template['fatherRow'])
+    $template['fatherRow']->update(null);
+else
+    print \Templating\escape($template->getRawTemplate());
+if (strlen($motherName) > 0)
+    $template->set('MOTHERNAME',    $motherName);
+else
+    $template['motherRow']->update(null);
+
+if ($idir == 0)
+{
+    $template['deleteButton']->update(null);
+    $template['mergeButton']->update(null);
+}
+else
+if (count($parents) == 0 &&
+    count($families) == 0)
+{		// individual is not connected to any others
+    $template['cancelButton']->update(null);
+    $template['mergeButton']->update(null);
+}		// individual is not connected to any others
+else
+{		// individual is connected
+    $template['cancelButton']->update(null);
+    $template['deleteButton']->update(null);
+}		// individual is connected
+
+// permit editing contents of Child record
+if ($childr)
+{		// permit editing contents of Child record
+    $childStatus	= $childr['idcs'];
+    for($idcs = 1; $idcs <= 5; ++$idcs)
+    {
+        if ($idcs == $childStatus)
+            $template->set("SELECTEDSTATUS$idcs",   'selected="selected"');
+        else
+            $template->set("SELECTEDSTATUS$idcs",   '');
+    }
+    $relDad		    = $childr['idcpdad'];
+    for($cprel = 1; $cprel <= 13; ++$cprel)
+    {
+        if ($cprel == $relDad)
+            $template->set("SELECTEDRELDAD$cprel",   'selected="selected"');
+        else
+            $template->set("SELECTEDRELDAD$cprel",   '');
+    }
+    $relMom		    = $childr['idcpmom'];
+    for($cprel = 1; $cprel <= 13; ++$cprel)
+    {
+        if ($cprel == $relMom)
+            $template->set("SELECTEDRELMOM$cprel",   'selected="selected"');
+        else
+            $template->set("SELECTEDRELMOM$cprel",   '');
+    }
+    $dadPrivate	    = $childr['cpdadprivate'];
+    if ($dadPrivate)
+        $template->set("DADPRIVATECHECKED",   'checked="checked"');
+    else
+        $template->set("DADPRIVATECHECKED",   '');
+    $momPrivate	    = $childr['cpmomprivate'];
+    if ($momPrivate)
+        $template->set("MOMPRIVATECHECKED",   'checked="checked"');
+    else
+        $template->set("MOMPRIVATECHECKED",   '');
+
+    // LDS Sealed to Parents Event
+    $parSealed	        = $childr->getParSealEvent(true);
+    $date		        = $parSealed->getDate();
+    $template->set('SEALINGDATE',                   $date);
+    $template->set('SEALINGIDER',                   $parSealed['ider']);
+    $idlrevent	        = $parSealed->get('idlrevent');
+    $temples	        = new RecordSet('Temples');
+    if ($idlrevent > 1)
+    {
+        $temples[$idlrevent]->set('selected',       'selected="selected"');
+        $template->set('NOTEMPLE',                  '');
+    }
+    else
+    {
+        $template->set('NOTEMPLE',                  'selected="selected"');
+    }
+    $template['temple$idtr']->update($temples);
+}   
+else
+    $template['RelationshipFields']->update(null);
+
+// display events
+if (count($events) == 0)
+{
+    if ($alwaysShowBirth && is_null($evBirth))
+        $evBirth            = $person->getBirthEvent(true);
+	if ($evBirth)
+		array_push($events, $evBirth);
+    if ($alwaysShowChristen && is_null($evChristen))	// trad. christening
+        $evChristen         = $person->getChristeningEvent(true);
+	if ($evChristen)
+		array_push($events, $evChristen);
+    if ($alwaysShowBaptism && is_null($evBaptism))	    // LDS Baptism
+        $evBaptism          = $person->getBaptismEvent(true);
+	if ($evBaptism)
+		array_push($events, $evBaptism);
+    if ($alwaysShowEndow && is_null($evEndow))	        // LDS Endowment
+        $evEndow            = $person->getEndowEvent(true);
+	if ($evEndow)
+		array_push($events, $evEndow);
+    if ($alwaysShowConfirm && is_null($evConfirm))	    // LDS Confirmation
+        $evConfirm          = $person->getConfirmEvent(true);
+	if ($evConfirm)
+		array_push($events, $evConfirm);
+    if ($alwaysShowInitiat && is_null($evInitiat))	    // LDS Initiatory
+        $evInitiat          = $person->getInitiatoryEvent(true);
+	if ($evInitiat)
+		array_push($events, $evInitiat);
+    if ($alwaysShowDeath && is_null($evDeath))
+        $evDeath            = $person->getDeathEvent(true);
+	if ($evDeath)
+		array_push($events, $evDeath);
+    if ($alwaysShowBuried && is_null($evBuried))
+        $evBuried           = $person->getBuriedEvent(true);
+	if ($evBuried)
+		array_push($events, $evBuried);
+}
+
+// the following function wrapper is required because the
+// PHP function usort does not support OOP
+function order($ev1, $ev2)
+{			// customize sort order
+    global  $warn;
+    return $ev1->compare($ev2);
+}			// customize sort order
+// sort the events
+usort($events,
+      __NAMESPACE__ . '\\order');
+
+$eventsText                 = '';
+$rownum                     = 1;
+$deathCause                 = $person->get('deathcause');
+foreach($events as $ie => $event)
+{			// loop through Events
+    //$warn   .= $event->dump('editIndivid.php: ' . __LINE__);
+    $ider				= $event->get('ider');
+    $citType			= $event->getCitType();
+    $idet				= $event->get('idet');
+    $idlr				= $event->get('idlrevent');
+    $kind				= $event->get('kind');
+    $preferred	        = $event->get('preferred');
+    $order		        = $event->get('order');
+    if (array_key_exists($idet, Event::$eventText))
+    {		// assign appropriate label
+        $type	        = ucfirst($eventText[$idet]);
+    }		// assign appropriate label
+    else
+    {		// IDET missing from translation table
+        $type	        =  "IDET=$idet";
+    }		    // IDET missing from translation table
+
+    $date		        = new LegacyDate($event->get('eventd'));
+    $date		        = $date->toString();
+    $eventd		        = $event->get('eventd');
+    if (substr($eventd, 0, 1) == ':')
+        $dateError	    = 'error';
+    else
+        $dateError	    = '';
+    $datesd		        = $event->get('eventsd');
+
+    $location		    = $event->getLocation();
+    $locationName	    = $location->getName();
+
+    $desc		        = $event->getDesc();
+    $descn		        = $event->getDescription();
+
+    $notshown	        = !$preferred;
+    $changed	        = 0;
+
+    if ($preferred)
+    {		        // preferred events have special layouts
+        switch($idet)
+        {		    // act on specific event types
+            case Event::ET_BIRTH:
+            {
+				$etag			= $template["BirthRow"];
+                break;
+            }	    // birth
+
+            case Event::ET_CHRISTENING:
+            {
+				$etag			= $template["ChristeningRow"];
+                break;
+            }	    // christening
+
+            case Event::ET_LDS_BAPTISM:
+            {
+				$etag			= $template["BaptismRow"];
+                break;
+            }	    // LDS Baptism
+
+            case Event::ET_LDS_ENDOWED:
+            {
+				$etag			= $template["EndowmentRow"];
+                break;
+            }	    // LDS endowment
+
+            case Event::ET_LDS_CONFIRMATION:
+            {
+				$etag			= $template["ConfirmationRow"];
+                break;
+            }	    // LDS confirmation
+
+            case Event::ET_LDS_INITIATORY:
+            {
+				$etag			= $template["InitiatoryRow"];
+                break;
+            }	    // LDS initiatory
+
+            case Event::ET_DEATH:
+            {
+				$etag			= $template["DeathRow"];
+                break;
+            }	    // death
+
+            case Event::ET_BURIAL:
+            {
+				$etag			= $template["BuriedRow"];
+                break;
+            }	    // burial
+
+            default:
+            {	    // any other preferred event
+                $etag		    = $template['EventRow$rownum'];
+                break;
+            }	    // any other preferred event
+        }		    // act on specific event types
+    }		        // preferred events have special layouts
+    else
+    {		        // standard event contained
+        $etag		            = $template['EventRow$rownum'];
+    }		        // standard event contained
+
+    $etemplate      = new \Templating\Template($etag->outerHTML);
+    $etemplate->set('rownum',	            $rownum);
+    $etemplate->set('type',	                $type);
+    $etemplate->set('ider',	                $ider);
+    $etemplate->set('cittype',				$citType);
+    $etemplate->set('idet',				    $idet);
+    $etemplate->set('idlr',				    $idlr);
+    $etemplate->set('kind',				    $kind);
+    if ($preferred)
+        $etemplate->set('preferredchecked',	'checked="checked"');
+    else
+        $etemplate->set('preferredchecked',	'');
+    $etemplate->set('order',				$order);
+    $etemplate->set('date',				    $date);
+    $etemplate->set('datesd',				$datesd);
+    $etemplate->set('dateerror',			$dateError);
+    $etemplate->set('desc',			        $desc);
+    $etemplate->set('descn',			    $descn);
+    $etemplate->set('locationname',			$locationName);
+    $etemplate->set('changed',				$changed);
+    $eventsText         .= $etemplate->compile();
+
+    if ($idet == Event::ET_DEATH && 
+        ($alwaysShowDeathCause || $deathCause != ''))
+    {
+		$etag			= $template["DeathCauseRow"];
+        $etemplate      = new \Templating\Template($etag->outerHTML);
+        $etemplate->set('deathcause',       $deathCause);
+        $eventsText     .= $etemplate->compile();
+    }
+    ++$rownum;
+}
+$template->set('EVENTS',                    $eventsText);
+
+// assignn values for sommon fields
+$private		                = $person->get('private');
+$template->set('PRIVATE',		            $private);
+for ($g = 0; $g <= 2; ++$g)
+{
+    if ($g == $private)
+        $template->set("SELECTEDPRIVATE$g",       'selected="selected"');
+    else
+        $template->set("SELECTEDPRIVATE$g",       '');
+}
+
+$ancinterest		                = $person->get('ancinterest');
+$template->set('ANCINTEREST',		        $ancinterest);
+for ($g = 0; $g <= 3; ++$g)
+{
+    if ($g == $ancinterest)
+        $template->set("SELECTEDANCINTEREST$g",       'selected="selected"');
+    else
+        $template->set("SELECTEDANCINTEREST$g",       '');
+}
+
+$decinterest		                = $person->get('decinterest');
+$template->set('DECINTEREST',		        $decinterest);
+for ($g = 0; $g <= 3; ++$g)
+{
+    if ($g == $decinterest)
+        $template->set("SELECTEDDECINTEREST$g",       'selected="selected"');
+    else
+        $template->set("SELECTEDDECINTEREST$g",       '');
+}
+$template->set('USERREF',		            $person->get('userref'));
+$template->set('ANCESTRALREF',		        $person->get('ancestralref'));
+
+$template->display();
+exit;
+
+
 
 if (strlen($msg) > 0)
 {		            // error message to display
-?>
-        <p class="message">
-            <?php print $msg; ?> 
-        </p>
-<?php
 }		            // error message to display
 else
 {		            // OK to edit
@@ -1220,6 +1641,9 @@ else
                    value="Y">
 <?php
             }		// debugging activated
+
+            $priName        = $person->getPriName();
+            $idnx           = $priName['idnx'];
 ?>
 		    <fieldset id="IdentityFields" class="other">
 		      <legend class="labelSmall">Identity:</legend>
@@ -1250,7 +1674,8 @@ else
                         maxlength="120" class="white leftnc" 
                         style="width: 594px;"
 		                value="<?php print $eGiven; ?>">
-		        <button type="button" class="button" id="Detail1">
+                <button type="button" class="button" 
+                        id="editName<?php print $idnx; ?>">
 		            Details
 		        </button>
 		        <div style="clear: both;"></div>
@@ -1281,11 +1706,11 @@ else
             // permit editing contents of Child record
             if ($childr)
             {		// permit editing contents of Child record
-                $childStatus	= $childr->getStatus();
-                $relDad		= $childr->getCPRelDad();
-                $relMom		= $childr->getCPRelMom();
-                $dadPrivate	= $childr->get('cpdadprivate');
-                $momPrivate	= $childr->get('cpmomprivate');
+                $childStatus	= $childr['idcs'];
+                $relDad		    = $childr['idcpdad'];
+                $relMom		    = $childr['idcpmom'];
+                $dadPrivate	    = $childr['cpdadprivate'];
+                $momPrivate	    = $childr['cpmomprivate'];
 ?>
       <fieldset id="RelationshipFields" class="other">
         <legend class="labelSmall">Relationship&nbsp;to:</legend>
@@ -1527,12 +1952,6 @@ else
             // refresh the list of events
             $events	        = $person->getEvents();
 
-            // the following function wrapper is required because the
-            // PHP function usort does not support OOP
-            function order($ev1, $ev2)
-            {			// customize sort order
-                return $ev1->compare($ev2);
-            }			// customize sort order
             usort($events,
                   __NAMESPACE__ . '\\order');
 
@@ -1733,10 +2152,9 @@ else
             $kind				= $event->get('kind');
             $preferred	        = $event->get('preferred');
             $order		        = $event->get('order');
-            $showDeathCause	    = false;
             if (array_key_exists($idet, Event::$eventText))
             {		// assign appropriate label
-                $type	        = ucfirst(Event::$eventText[$idet]);
+                $type	        = ucfirst($eventText[$idet]);
             }		// assign appropriate label
             else
             {		// IDET missing from translation table
@@ -2006,8 +2424,6 @@ else
                 maxlength="255" class="white leftloc"
                 value="<?php print $locationName; ?>">
 <?php
-                        if ($alwaysShowDeathCause)
-                            $showDeathCause		= true;
                         $changed	= $deathChanged;
                         break;
                     }		// death
@@ -2149,30 +2565,6 @@ else
         <div style="clear: both;"></div>
       </div>
 <?php
-
-            if ($showDeathCause)
-            {		    // show cause of death row
-                $deathCause = $person->get('deathcause');
-                $deathCause = str_replace('"','&quot;',$deathcause);
-?>
-      <div id="DeathCauseRow" class="row">
-        <label class="column1" for="DeathCause">
-                Death Cause:
-        </label>
-        <input type="text" name="DeathCause" id="DeathCause"
-                maxlength="255" style="width: 594px;"
-                class="white leftnc"
-                value="<?php print $deathCause; ?>">
-        <button type="button" class="button" id="Detail9">
-                Details
-        </button>
-        <button type="button" class="button" id="Clear9">
-                Delete
-        </button>
-        <div style="clear: both;"></div>
-      </div>
-<?php
-            }		    // show cause of death row
             $rownum++;
         }			    // loop through events
 ?>

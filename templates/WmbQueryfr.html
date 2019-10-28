@@ -13,7 +13,9 @@
 	<div class="hidden" id="breadcrumbs">
 	  <a href="/genealogy.php?lang=fr">Génealogie</a>:
 	  <a href="/genCountry.php?cc=CA&lang=fr">Canada</a>:
-	  <a href="/Canada/genProvince.php?Domain=CAON&lang=fr">Ontario</a>:</p> 
+	  <a href="/Canada/genProvince.php?Domain=CAON&lang=fr">Ontario</a>: 
+	  <a href="/Ontario/WmbStats.phplang=fr">Statistiques par District</a>: 
+	  <a href="/Ontario/WmbVolStats.phplang=fr">Statistiques par Volume</a>:
 	</div>
 	<div class="body">
 	  <h1>Requête des Baptêmes Méthodistes Wesleyens
@@ -25,6 +27,7 @@
 	$TRACE
     <p>Cet outil est une interface alternative <b>non autorisée</b> à 
 	  l'<a href="http://freepages.genealogy.rootsweb.ancestry.com/~wjmartin/wesleyan.htm">information transcrite et copyright © 2001 par Ida Reed</a>.
+    </p>
 	<form action="/Ontario/WmbResponse.php" method="get"
 		name="distForm" id="distForm">
 	  <input name="Offset" id="Offset" type="hidden" value="0">
@@ -173,17 +176,21 @@
 	<p>Specifying simple text, comprising letters and spaces, matches against
 	  any names containing that text.  "John" or "john" or "JOHN" will match
 	  "Johnathan" and "William John" as well as the simple "John".
+    </p>
 	<p>This is an 
 		<a href="https://www.regular-expressions.info/posix.html#ere">
 	  	    extended regular expression</a>,
 	  	as supported by MySQL.
 	  There are too many options to enumerate here, but a few examples include:
+    </p>
 	  <ul>
 	    <li>If you want to match just the name "John", excluding names that
             include "John" as part of them, enter "^John\$".
+        </li>
 	    <li>Enumerators often use unusual spellings of names.  For example
             if you want to match names including both "Henry" and "Henery",
             enter "Hen.*ry".
+        </li>
 	  </ul>
 	</div>
 	<div class="balloon" id="HelpSurname">
@@ -198,7 +205,9 @@
 	  For example to match surnames starting with "McL..." and ending with
       "...n", such as "McLean", "McLain", "McLennan", or "McLellan" you
       could specify "^McL.*n\$".
+    </p>
 	<p>The meaning of this field changes if the Soundex option is selected.
+    </p>
 	<p>The Soundex code has been used for decades to attempt to match names that
 	  sound similar.  For example it is used by police forces to perform a rough
 	  match for the names of drivers.  It is a problematic tool, as it
@@ -208,9 +217,10 @@
 	  specifying Soundex together with "McLean" will match all of the surnames
       in the pattern match example under "Surname", but many other names as
       well, such "McCallum", "McAllan", "McClain", and "McWilliams". 
+    </p>
 	</div>
 	<div class="balloon" id="HelpSurnameSoundex"> 
-	<p>The Soundex code has been used for decades to attempt to match names that
+	  The Soundex code has been used for decades to attempt to match names that
 	  sound similar.  For example it is used by police forces to perform a rough
 	  match for the names of drivers.  It is a problematic tool, as it
 	  is based upon the phonetics of British surnames.

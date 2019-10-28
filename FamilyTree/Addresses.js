@@ -112,10 +112,10 @@ function resetForm()
  ************************************************************************/
 function addAddress()
 {
-    var	lang		= 'en';
+    var	lang		        = 'en';
     if ('lang' in args)
-		lang		= args['lang'];
-    location		= 'Address.php?idar=0&kind=2&lang=' + lang;
+		lang		        = args['lang'];
+    location		        = 'Address.php?idar=0&kind=2&lang=' + lang;
     return false;
 }	// function addAddress
 
@@ -129,14 +129,14 @@ function addAddress()
  ************************************************************************/
 function delAddress()
 {
-    var	form		= this.form;
-    var	idar		= this.id.substring(6);
-    var	cell		= this.parentNode;
-    var	row		= cell.parentNode;
-    row.style.display	= 'none';
-    var	actionTag	= form.elements['action' + idar];
-    actionTag.value	= 'delete';
-    this.disabled	= true;
+    var	form				= this.form;
+    var	idar				= this.id.substring(6);
+    var	cell				= this.parentNode;
+    var	row				    = cell.parentNode;
+    row.style.display		= 'none';
+    var	actionTag			= form.elements['action' + idar];
+    actionTag.value			= 'delete';
+    this.disabled			= true;
     
     return false;
 }	// function delAddress

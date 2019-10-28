@@ -54,9 +54,12 @@ use \Exception;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/01/28		Record::addOwner is ordinary method				*
  *		2018/02/03		change breadcrumbs to new standard				*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2019/07/13      send e-mail to grantor and grantee              *
+ *		                grantIndivid now passes id of Grantee instead   *
+ *		                of username                                     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/common.inc';
@@ -64,396 +67,451 @@ require_once __NAMESPACE__ . '/common.inc';
 /************************************************************************
  *  grantMarriages														*
  *																		*
- *  Extend the grant to spouses and children of the individual.				*
+ *  Extend the grant to spouses and children of the individual.			*
  *																		*
  *  Input:																*
- *		$person																*
- *		$rank																*
+ *		$person		    instance of Person								*
+ *		$rank		    string identifier of level of descent			*
+ *		$granteeName    string name of grantee                          *
+ *		$template       instance of Template                            *
+ *																		*
+ *	Returns:															*
+ *		String containing HTML describing actions for descendants		*
  ************************************************************************/
-function grantMarriages($person, $rank)
+function grantMarriages($person, $rank, $granteeName, $template)
 {
-    global $User;
+    global  $warn;
+    global  $tranTab;
 
-    $name	= $person->getName(Person::NAME_INCLUDE_DATES);
-    $families	= $person->getFamilies();
+    $retval             = '';
+    $name	            = $person->getName(Person::NAME_INCLUDE_DATES);
+    $families	        = $person->getFamilies();
     foreach($families as $i => $family)
     {
 		if ($person->getGender() == Person::FEMALE)
-		{		// female
-		    $spsid	= $family->get('idirhusb');
-		    $spouse	= $family->getHusband();
-		    $role	= 'husband';
+		{		        // female
+		    $spsid	    = $family->get('idirhusb');
+		    $spouse	    = $family->getHusband();
+		    $role	    = $tranTab['husband'];
 		    $spsclass	= 'male';
-		}		// female
+		}		        // female
 		else
-		{		// male
-		    $spsid	= $family->get('idirwife');
-		    $spouse	= $family->getWife();
-		    $role	= 'wife';
+		{		        // male
+		    $spsid	    = $family->get('idirwife');
+		    $spouse	    = $family->getWife();
+		    $role	    = $tranTab['wife'];
 		    $spsclass	= 'female';
-		}		// male
+		}		        // male
 
 		// ensure that access to spouses is permitted
 		if ($spsid > 0)
-		{		// a spouse is defined
+		{		        // a spouse is defined
 		    $spsName	= $spouse->getName(Person::NAME_INCLUDE_DATES);
-		    $done	= $spouse->addOwner($User);
+		    $done	    = $spouse->addOwner($granteeName);
 		    if ($done)
-		    {		// authority granted
-?>
-<p>Granting access to <?php print $role; ?> of <?php print $name; ?>
-		idir=<?php print $spsid; ?> 
-		<a href="Person.php?idir=<?php print $spsid; ?>"
-				class="<?php print $spsclass; ?>">
-				<?php print $spsName; ?>
-		</a>
-		to <?php print $User; ?>.
-<?php
-		    }		// authority granted
+            {		    // authority granted
+                $element    = $template['grantSpouse'];
+		    }		    // authority granted
 		    else
-		    {		// previously granted
-?>
-<p>Previously granted access to <?php print $role; ?> of <?php print $name; ?>
-		idir=<?php print $spsid; ?> 
-		<a href="Person.php?idir=<?php print $spsid; ?>"
-				class="<?php print $spsclass; ?>">
-				<?php print $spsName; ?>
-		</a>
-		to <?php print $User; ?>.
-<?php
-		    }		// previously granted
-		} 		// a spouse is defined
+		    {		    // previously granted
+                $element    = $template['alreadySpouse'];
+		    }		    // previously granted
+            $retval         .= str_replace(
+        array('$ROLE','$NAME','$SPSID','$SPSCLASS','$SPSNAME','$GRANTEENAME'),
+        array( $role,  $name,  $spsid,  $spsclass,  $spsName,  $granteeName),
+                                           $element->outerHTML);
+		} 		        // a spouse is defined
 
 		// check children regardless, since a child may have been
 		// added by another user and children may be defined even
 		// where only a single spouse is known
 		$children	= $family->getChildren();
 		foreach($children as $i => $child)
-		{		// loop through all child records
+		{		        // loop through all child records
 		    // display information about child
-		    $cid		= $child->getIdir();
+		    $cid		        = $child->getIdir();
 		    try
 		    {
-				$child	= new Person(array('idir' => $cid));
-				$cName	= $child->getName(Person::NAME_INCLUDE_DATES);;
+				$child	        = Person::getPerson($cid);
+				$cName	        = $child->getName(Person::NAME_INCLUDE_DATES);
 				if ($child->getGender() == Person::FEMALE)
 				{
-				    $role	= 'daughter';
-				    $cclass	= 'female';
+				    $role	    = $tranTab['daughter'];
+				    $cclass	    = 'female';
 				}
 				else
 				if ($child->getGender() == Person::MALE)
 				{
-				    $role	= 'son';
-				    $cclass	= 'male';
+				    $role	    = $tranTab['son'];
+				    $cclass	    = 'male';
 				}
 				else
 				{
-				    $role	= 'child';
-				    $cclass	= 'unknown';
+				    $role	    = $tranTab['child'];
+				    $cclass	    = 'unknown';
 				}
-				$done		= $child->addOwner($User);
+				$done		    = $child->addOwner($granteeName);
 
 				if ($done)
-				{	// authority granted
-?>
-<p>Granting access to <?php print $rank . $role; ?>
-    idir=<?php print $cid; ?> 
-		<a href="Person.php?idir=<?php print $cid; ?>"
-				class="<?php print $cclass; ?>">
-				<?php print $cName; ?>
-		</a>
-    to <?php print $User; ?>.
-<?php
-				}	// authority granted
+				{	    // authority granted
+                    $element    = $template['grantChild'];
+				}	    // authority granted
 				else
-				{	// previously granted
-?>
-<p>Previously granted access to <?php print $rank . $role; ?>
-    idir=<?php print $cid; ?> 
-		<a href="Person.php?idir=<?php print $cid; ?>"
-				class="<?php print $cclass; ?>">
-				<?php print $cName; ?>
-		</a>
-		to <?php print $User; ?>.
-<?php
-				}	// previously granted
+				{	    // previously granted
+                    $element    = $template['alreadyChild'];
+				}	    // previously granted
+                $retval         .= str_replace(
+        array('$RANK','$ROLE','$CID','$CCLASS','$CNAME','$GRANTEENAME'),
+        array( $rank,  $role,  $cid,  $cclass,  $cName,  $granteeName),
+                                               $element->outerHTML);
 
 				// recurse down the list of descendants including
 				// their spouses and children
 				if (strlen($rank) == 0)
-				    $trank	= 'grand-';
+				    $trank	= $tranTab['grand-'];
 				else
-				    $trank	= 'great-' . $rank;
-				grantMarriages($child, $trank);
+				    $trank	= $tranTab['great-'] . $rank;
+                $retval     .= grantMarriages($child,
+                                              $trank,
+                                              $granteeName,
+                                              $template);
 		    }		// try
 		    catch(Exception $e)
 		    {		// error creating child's instance of Person
-						// don't care
+                $warn   .= "<p>grantUser.php: " . __LINE__ . ' ' .
+                            $e->getMessage() . "</p>\n";
 		    }		// error creating child's instance of Person
-		}		// loop through all child records
-    }			// loop through all marriages of the individual
-}		// grantMarriages
+		}		    // loop through all child records
+    }			    // loop through all marriages of the individual
+    return $retval;
+}		// function grantMarriages
 
 /************************************************************************
  *  grantParents														*
  *																		*
  *  Extend the grant to parents of the individual.						*
+ *																		*
+ *  Input:																*
+ *		$person		    instance of Person								*
+ *		$rank		    string identifier of level of descent			*
+ *		$granteeName    string name of grantee                          *
+ *		$template       instance of Template                            *
+ *																		*
+ *	Returns:															*
+ *		String containing HTML describing actions for ancestors	    	*
  ************************************************************************/
-function grantParents($person, $rank)
+function grantParents($person, $rank, $granteeName, $template)
 {
-    global $User;
+    global  $warn;
+    global  $tranTab;
 
-    $parents	= $person->getParents();
+    $retval                 = '';
+    $parents	            = $person->getParents();
     foreach($parents as $idcr => $family)
     {
 		// check for father
-		$fidir		= $family->get('idirhusb');
+		$fidir		        = $family->get('idirhusb');
 		if ($fidir > 0)
 		{		// has a father
-		    $father	= $family->getHusband();
-		    $fName	= $father->getName(Person::NAME_INCLUDE_DATES);;
+		    $father	        = $family->getHusband();
+		    $fName	        = $father->getName(Person::NAME_INCLUDE_DATES);
 
-		    $done	= $father->addOwner($User);
+		    $done	        = $father->addOwner($granteeName);
 		    if ($done)
-		    {		// access granted
-?>
-<p>Granting access to <?php print $rank; ?>father
-		idir=<?php print $fidir; ?>
-		<a href="Person.php?idir=<?php print $fidir; ?>" class="male">
-				<?php print $fName; ?>
-		</a>
-		to <?php print $User; ?>.
-<?php
+            {		        // access granted
+                $element    = $template['grantFather'];
+                $retval     .= str_replace(
+        array('$RANK','$FIDIR','$FNAME','$GRANTEENAME'),
+        array( $rank,  $fidir,  $fName,  $granteeName),
+                                           $element->outerHTML);
 
 				// recursively grant access to parents of father
-				try
-				{
-				    if (strlen($rank) == 0)
-						$trank	= 'grand-';
-				    else
-						$trank	= 'great-' . $rank;
-				    grantParents(new Person(array('idir' => $fidir)),
-							 $trank);
-				}		// try
-				catch(Exception $e)
-				{		// throw from Person
-				    // stop recursion
-				}		// throw from Person
-		    }		// access granted
+				if (strlen($rank) == 0)
+					$trank	= $tranTab['grand-'];
+			    else
+					$trank	= $tranTab['great-'] . $rank;
+			    $retval     .= grantParents(Person::getPerson($fidir),
+						                    $trank,
+                                            $granteeName,
+                                            $template);
+		    }		        // access granted
 		    else
-		    {		// previously granted
-?>
-<p>Previously granted access to <?php print $rank; ?>father
-		idir=<?php print $fidir; ?> 
-		<a href="Person.php?idir=<?php print $fidir; ?>" class="male">
-				<?php print $fName; ?>
-		</a>
-		to <?php print $User; ?>.
-<?php
-		    }		// previously granted
+		    {		        // previously granted
+                $element    = $template['alreadyFather'];
+                $retval     .= str_replace(
+        array('$RANK','$FIDIR','$FNAME','$GRANTEENAME'),
+        array( $rank,  $fidir,  $fName,  $granteeName),
+                                           $element->outerHTML);
+		    }		        // previously granted
 		}		// has a fatherhttp://www.jamescobban.net
 
 		// check for mother
-		$midir		= $family->get('idirwife');
+		$midir		        = $family->get('idirwife');
 		if ($midir > 0)
 		{		// has a mother
-		    $mother	= $family->getWife();
-		    $mName	= $mother->getName(Person::NAME_INCLUDE_DATES);;
-		    $done	= $mother->addOwner($User);
+		    $mother	        = $family->getWife();
+		    $mName	        = $mother->getName(Person::NAME_INCLUDE_DATES);;
+		    $done	        = $mother->addOwner($granteeName);
 		    if ($done)
 		    {		// access granted
-?>
-<p>Granting access to <?php print $rank; ?>mother
-		idir=<?php print $midir; ?>
-		<a href="Person.php?idir=<?php print $midir; ?>" class="male">
-				<?php print $mName; ?>
-		</a>
-		to <?php print $User; ?>.
-<?php
+                $element    = $template['grantMother'];
+                $retval     .= str_replace(
+        array('$RANK','$MIDIR','$MNAME','$GRANTEENAME'),
+        array( $rank,  $midir,  $mName,  $granteeName),
+                                           $element->outerHTML);
 
 				// recursively grant access to parents of mother
-				try
-				{
-				    if (strlen($rank) == 0)
-						$trank	= 'grand-';
-				    else
-						$trank	= 'great-' . $rank;
-				    grantParents(new Person(array('idir' => $midir)),
-							 $trank);
-				}		// try
-				catch(Exception $e)
-				{		// throw from Person
-				    // stop recursion
-				}		// throw from Person
-		    }		// access granted
+			    if (strlen($rank) == 0)
+					$trank	= $tranTab['grand-'];
+			    else
+					$trank	= $tranTab['great-'] . $rank;
+			    $retval     .= grantParents(Person::getPerson($midir),
+                                            $trank,
+                                            $granteeName, 
+                                            $template);
+		    }		    // access granted
 		    else
-		    {		// previously granted
-?>
-<p>Previously granted access to <?php print $rank; ?>mother
-		idir=<?php print $midir; ?>
-		<a href="Person.php?idir=<?php print $midir; ?>" class="male">
-				<?php print $mName; ?>
-		</a>
-		to <?php print $User; ?>.
-<?php
-		    }		// previously granted
-		}		// has a mother
-    }		// loop through all sets of parents of the individual
-}		// grantParents
+		    {		    // previously granted
+                $element    = $template['alreadyMother'];
+                $retval     .= str_replace(
+        array('$RANK','$MIDIR','$MNAME','$GRANTEENAME'),
+        array( $rank,  $midir,  $mName,  $granteeName),
+                                           $element->outerHTML);
+		    }		    // previously granted
+		}		        // has a mother
+    }		            // loop through all sets of parents of the individual
+    return $retval;
+}		// function grantParents
 
-    // get the the unique numeric key of the individual
-    if (array_key_exists('idir', $_POST))
-    {		// standardized keyword
-		$idir		= $_POST['idir'];
-    }		// standardized keyword
-    else
-    {		// missing parameter
-		$idir		= '';
-    }		// missing parameter
-   
-    // get the the unique identifier of the user
-    if (array_key_exists('User', $_POST))
-    {		// standardized keyword
-		$User		= $_POST['User'];
-    }		// standardized keyword
-    else
-    {		// missing parameter
-		$User		= '';
-    }		// missing parameter
+$idir               = null;
+$person             = null;
+$isOwner	        = false;
+$lang               = 'en';
+$granteeId          = null;
+$granteeName        = null;
+$grantee            = null;
+$useremail          = 'webmaster@jamescobban.net';
+
+if (count($_GET) > 0)
+{	        	    // invoked by URL to display current status of account
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach ($_GET as $key => $value)
+	{                       // loop through parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch (strtolower($key))
+	    {
+	        case 'email':
+	        {
+	            $useremail      = $value;
+	            break;
+	        }
+
+	        case 'lang':
+	        {
+	            $lang           = FtTemplate::validateLang($value);
+	            break;
+	        }
+	    }
+    }                       // loop through parameters
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display current status of account
+else
+if (count($_POST) > 0)
+{		            // invoked by submit to update
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+
+	$parmsText  = "<p class='label'>\$_POST</p>\n" .
+	                  "<table class='summary'>\n" .
+	                  "<tr><th class='colhead'>key</th>" .
+	                      "<th class='colhead'>value</th></tr>\n";
+	foreach ($_POST as $key => $value)
+	{                       // loop through parameters
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	        "<td class='white left'>$value</td></tr>\n";
+	    switch (strtolower($key))
+	    {
+	        case 'idir':
+	        {		        // identifier of root individual
+	            if (ctype_digit($value) && $value > 0)
+			        $idir		    = $value;
+	            break;
+	        }		        // identifier of root individual
+	   
+	        case 'user':
+	        case 'grantee':
+	        {		        // id of grantee
+	            if (strlen($value) > 0)
+	                $granteeId		= $value;
+	            break;
+	        }		        // id of grantee
+	
+	        case 'lang':
+	        {
+	            $lang           = FtTemplate::validateLang($value);
+	            break;
+	        }
+	    }		            // missing parameter
+	}                       // loop through parameters
+	if ($debug)
+	    $warn   .= $parmsText . "</table>\n";
+}		            // invoked by submit to update account
+
+$template               = new FtTemplate("grantUser$lang.html");
+$tranTab                = $template->getTranslate()['tranTab'];
+
+// validate grantee
+$grantee                = new User(array('id'     => $granteeId));
+
+if ($grantee->isExisting())
+{                   // grantee is a registered user
+    $granteeName            = $grantee['username'];
+    $template->set('GRANTEENAME',       $granteeName);
+    $granteeMail            = $grantee['email'];
+    $template->set('GRANTEEMAIL',       $granteeMail);
+    $userName               = $user['username'];
+    $template->set('USERNAME',          $userName);
+    $userMail               = $user['email'];
+    $template->set('USERMAIL',          $userMail);
 
     // note that record 0 in tblIR contains only the next available value
     // of IDIR
-    if ((strlen($idir) > 0) &&
-		($idir != 0))
-    {		// get the requested individual
-		try
-		{
-		    $person	= new Person(array('idir' => $idir));
-
-		    $isOwner	= canUser('edit') && 
-						  $person->isOwner();
+    if ($idir > 0)
+    {		            // get the requested individual
+	    $person		        = Person::getPerson($idir);
+        if ($person->isExisting())
+        {               // must be already in the tree
+            $template->set('IDIR',                  $idir);
+		    $isOwner		= canUser('edit') && $person->isOwner();
 		     
-		    $name	= $person->getName(Person::NAME_INCLUDE_DATES);
-		    $given	= $person->getGivenName();
-		    $surname	= $person->getSurname();
+		    $name		    = $person->getName(Person::NAME_INCLUDE_DATES);
+		    $given		    = $person->getGivenName();
+		    $surname		= $person->getSurname();
 		    if (strlen($surname) == 0)
-				$prefix	= '';
+				$prefix		= '';
 		    else
-		    if (substr($surname,0,2) == 'Mc')
-				$prefix	= 'Mc';
+		    if (substr($surname,0,2) 	== 'Mc')
+				$prefix		= 'Mc';
 		    else
-				$prefix	= substr($surname,0,1);
-		    if ($isOwner)
-		    {		// OK
-				$title	= "Grant Access to $name";
-		    }		// OK
+                $prefix		= substr($surname,0,1);
+            $template->set('NAME',                  $name);
+            $template->set('GIVENNAME',             $given);
+            $template->set('SURNAME',               $surname);
+            $template->set('PREFIX',                $prefix);
+
+            $template['idirTitle']->update(null);
+            $template['granteeTitle']->update(null);
+            if ($isOwner)
+            {
+                $template['deniedTitle']->update(null);
+            }
 		    else
-				$title	= "Access Denied to $name";
-		}		// try
-		catch(Exception $e)
-		{		// error in creation of Person
-		    // don't care
-		}		// error in creation of Person
+                $template['grantTitle']->update(null);
+        }               // must be already in the tree
+        else
+        {
+            $template['grantTitle']->update(null);
+            $template['deniedTitle']->update(null);
+            $template['granteeTitle']->update(null);
+            $text    	= $template['invalidIdir']->innerHTML;
+            $msg	    .= str_replace('$idir', $idir, $text);
+        }
     }		// get the requested individual
     else
     {		// invalid input
-		$title		= "Invalid Value of idir=$idir";
-		$person		= null;
-		$isOwner	= false;
+        $template['grantTitle']->update(null);
+        $template['deniedTitle']->update(null);
+        $template['granteeTitle']->update(null);
+        $text    	    = $template['invalidIdir']->innerHTML;
+        $msg	    	.= str_replace('$idir', $idir, $text);
     }		// invalid input
+}                   // grantee is a registered user
+else
+{		// invalid input
+    $template['grantTitle']->update(null);
+    $template['deniedTitle']->update(null);
+    $template['idirTitle']->update(null);
+    $text	    	    = $template['invalidGrantee']->innerHTML;
+    $msg	    	    .= str_replace('$granteeName', $granteeName, $text);
+}		// invalid input
 
-    $links	= array('/genealogy.php'	=> 'Genealogy',
-						'/genCountry.php?cc=CA'	=> 'Canada',
-						'/Canada/genProvince.php?Domain=CAON'
-									=> 'Ontario',
-						'/FamilyTree/Services.php'
-									=> 'Family Tree Services',
-						'/FamilyTree/nominalIndex.php'	
-									=> 'Surname Index');
-    if (strlen($surname) > 0)
-    {
-		$links["Surnames.php?initial=$prefix"]	=
-							"Surnames Starting with '$prefix'";
-		$links["Names.php?Surname=$surname'"]	=
-							"Surname '$surname'";
-		$links["Person.php?id=$idir"]		=
-							"$given $surname";
-    }		// existing individual
-
-    htmlHeader($title,
-		       array('/jscripts/js20/http.js',
-				     '/jscripts/util.js',
-				     '/jscripts/default.js'));
-?>
-<body>
-<?php
-		pageTop($links);
-?>
-  <div class="body">
-    <h1>
-      <span class="right">
-		<a href="grantUserHelpen.html" target="help">? Help</a>
-      </span>
-      <?php print $title; ?>
-    </h1>
-<?php
-    showTrace();
- 
-    if ($isOwner)
-    {			// user is authorized to edit this record
-		if ($person)
-		{		// individual found
-		    $name	= $person->getName(Person::NAME_INCLUDE_DATES);
-		    $done	= $person->addOwner($User);
-		    if ($person->getGender() == Person::FEMALE)
-				$class	= 'female';
-		    else
-		    if ($person->getGender() == Person::MALE)
-				$class	= 'male';
-		    else
-				$class	= 'unknown';
-		    if ($done)
-		    {		// access granted
-?>
-    <p>Granting access of idir=<?php print $idir; ?> 
-		<a href="Person.php?idir=<?php print $idir; ?>"
-				class="<?php print $class; ?>">
-				<?php print $name; ?>
-		</a>
-		    to <?php print $User; ?>.
-<?php
-		    }		// access granted
-		    else
-		    {		// previously granted
-?>
-    <p>Previously granted access of idir=<?php print $idir; ?> 
-		<a href="Person.php?idir=<?php print $idir; ?>"
-				class="<?php print $class; ?>">
-				<?php print $name; ?>
-		</a>
-		    to <?php print $User; ?>.
-<?php
-		    }		// previously granted
+if ($isOwner)
+{			// user is authorized to edit this record
+    $template['notOwner']->update(null);
+    $contents                   = '';
+	if ($person)
+	{		// individual found
+	    $name	    = $person->getName(Person::NAME_INCLUDE_DATES);
+	    $done	    = $person->addOwner($granteeName);
+	    if ($person->getGender() == Person::FEMALE)
+			$class	= 'female';
+	    else
+	    if ($person->getGender() == Person::MALE)
+			$class	= 'male';
+	    else
+            $class	= 'unknown';
+        $template->set('NAME',          $name);
+        $template->set('CLASS',         $class);
+	    if ($done)
+        {		// access granted
+            $template['alreadyMain']->update(null);
+	    }		// access granted
+	    else
+	    {		// previously granted
+            $template['grantMain']->update(null);
+        }		// previously granted
     
-		    // check for children and parents not previously granted
-		    grantMarriages($person, '');
-		    grantParents($person, '');
-		}		// individual found
-    }			// current user is an owner of record
-    else
-    {		// current user does not own record
-?>
-<p class="message">
-    You are not a current owner of this individual and cannot therefore
-    grant ownership to another user.
-</p>
-<?php
-    }		// current user does not own record
-?>
-  </div>
-<?php
-    pageBot();
-?>
-</body>
-</html>
+	    // check for children and parents not previously granted
+        $contents           .= grantMarriages($person, 
+                                              '', 
+                                              $granteeName, 
+                                              $template);
+        $contents           .= grantParents($person, 
+                                              '', 
+                                              $granteeName, 
+                                              $template);
+    }		// individual found
+    $template->set('CONTENTS',          $contents);
+
+	if (strlen($useremail) > 0 && strlen($contents) > 0)
+	{                   // send a copy to the grantor and the grantee
+	    // To send HTML mail, the Content-type header must be set
+	    $headers    = 'MIME-Version: 1.0' . "\r\n";
+	    $headers    .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+	 
+	    // Create email headers
+	    $headers    .= "From: webmaster@jamescobban.net\r\n".
+    	                "Reply-To: webmaster@jamescobban.net\r\n" .
+	                    'X-Mailer: PHP/' . phpversion();
+        $sendto     = $grantee['email'] . ',' . $user['email'];
+        $title      = $template['grantTitle']->innerHTML;
+        $title      = str_replace(array('$NAME', '$GRANTEENAME'),
+                                  array( $name,   $granteeName),
+                                  $title);
+	    if (mail($sendto,
+	             $title,
+	             $contents,
+	             $headers))
+        {
+            $template['confirmationFailed']->update(null);
+	    }
+	    else
+	    {
+            $template['confirmationOK']->update(null);
+	    }
+    }                   // send a copy to the grantor and the grantee
+}			            // current user is an owner of record
+else
+{		                // current user does not own record
+    $template['grantMain']->update(null);
+    $template['alreadyMain']->update(null);
+    $template['confirmationFailed']->update(null);
+    $template['confirmationOK']->update(null);
+    $template->set('CONTENTS',          '');
+}		                // current user does not own record
+
+$template->display();

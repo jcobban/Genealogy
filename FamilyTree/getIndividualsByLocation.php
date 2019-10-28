@@ -116,16 +116,6 @@ require_once __NAMESPACE__ . '/common.inc';
 		$locName	= 'Unknown';
     }
 
-    // identify action script
-    if (canUser('Edit'))
-    {		// permitted to update
-		$page	= 'editIndivid.php';
-    }		// permitted to update
-    else
-    {		// can only view
-		$page	= 'Person.php';
-    }		// can only view
-
     if (strlen($msg) == 0)
     {		// no messages
 		// get the location being used for the search
@@ -201,7 +191,7 @@ require_once __NAMESPACE__ . '/common.inc';
 				$eventType		= 'Unknown Event';
 		    $name		= $person->getName(Person::NAME_INCLUDE_DATES);
 		    $person['eventType']	= $eventType;
-		    $person['mpage']		= "$page?idir=$idir&lang=$lang";
+		    $person['mpage']		= "Person.php?idir=$idir&lang=$lang";
 		    $person['dname']		= $name;
 		    $person['gender']		= $gender;
 		}		// loop through individuals
@@ -227,7 +217,7 @@ require_once __NAMESPACE__ . '/common.inc';
 				}
 				$name	= $person->getName(Person::NAME_INCLUDE_DATES);
 				$event['eventType']	= $eventType;
-				$event['mpage']		= "$page?idir=$idir&lang=$lang";
+				$event['mpage']		= "Person.php?idir=$idir&lang=$lang";
 				$event['dname']		= $name;
 				$event['gender']	= $gender;
 		    }	// individual event

@@ -22,8 +22,7 @@
 			   "formname"	: formname,
 			   "field"	: field};
 
-  	displayDialog(msgDiv,
-		      'NewLocationMsg$template',
+  	displayDialog('NewLocationMsg$template',
 		      parms,
 		      element,		// position
 		      closeNewDialog,	// button closes dialog
@@ -45,8 +44,7 @@
 	var parms	= {"template"	: "",
 			   "name"	: name};
 
-	displayDialog(msgDiv,
-		      'ChooseLocationMsg$template',
+	displayDialog('ChooseLocationMsg$template',
 		      parms,
 		      element,		// position
 		      null,		// button closes dialog

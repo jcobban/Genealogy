@@ -1,23 +1,23 @@
 /************************************************************************
- *  grantIndivid.css							*
- *									*
- *  Stylesheet for the script grantIndivid.php				*
- *									*
- *  History:								*
- *	2014/03/08	created						*
- *									*
- *  Copyright &copy; 2014 James A. Cobban				*
+ *  grantIndivid.css													*
+ *																		*
+ *  Stylesheet for the script grantIndivid.php							*
+ *																		*
+ *  History:															*
+ *		2014/03/08		created											*
+ *																		*
+ *  Copyright &copy; 2014 James A. Cobban								*
  ************************************************************************/
 
 /*	labels of various widths */
     label.column1 {
 		font-family:	sans-serif;
 		font-weight:	bold;
-		font-size:	smaller;
-		text-align:	right;
+		font-size:	    smaller;
+		text-align:	    right;
 		vertical-align:	top;
-		padding:	0px 3px 0px 3px;
-		margin-top:	1px;
-		float:		left;
-		width:		18em;
+		padding:	    0px 3px 0px 3px;
+		margin-top:	    1px;
+		float:		    left;
+		width:		    18em;
 		}

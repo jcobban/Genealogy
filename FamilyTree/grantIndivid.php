@@ -11,6 +11,7 @@ use \Exception;
  *  Parameters passed by method=POST:									*
  *		idir			unique numeric key of the instance of			*
  *						Person for which the grant is to be given		*
+ *		pattern         pattern for limiting User Names                 *
  *																		*
  *  History:															*
  *		2010/11/08		created											*
@@ -45,177 +46,166 @@ use \Exception;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2017/11/21		use RecordSet to get set of users for select	*
  *		2018/11/19      change Help.html to Helpen.html                 *
+ *		2019/07/12      use FtTemplate                                  *
+ *		                add support for username pattern                *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/User.inc';
+require_once __NAMESPACE__ . '/UserSet.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    // get the the unique numeric key of the individual
-    if (array_key_exists('idir', $_POST))
-    {		// standardized keyword
-		$idir		= $_POST['idir'];
-    }		// standardized keyword
-    else
-    if (array_key_exists('idir', $_GET))
-    {		// standardized keyword
-		$idir		= $_GET['idir'];
-    }		// standardized keyword
-    else
-    {		// missing parameter
-		$idir		= '';
-    }		// missing parameter
+// get parameters
+$idir                   = null;
+$pattern                = '';
+$lang                   = 'en';
+$treename    	        = '';
+$surname    	        = '';
 
-    $nameuri	= '';
+if (count($_GET) > 0)
+{
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+    {	            // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+        {		    // act on specific parameter
+            case 'idir':
+            case 'id':
+            {
+                if (ctype_digit($value))
+                    $idir       = intval($value);
+                break;
+            }
 
-    // note that record 0 in tblIR contains only the next available value
-    // of IDIR
-    if ((strlen($idir) > 0) &&
-		($idir != 0))
-    {		// get the requested individual
-		$person		= new Person(array('idir' => $idir));
+            case 'pattern':
+            {
+                $pattern        = $value;
+                break;
+            }
 
-		$isOwner	= canUser('edit') && $person->isOwner();
-		 
-		$name		= $person->getName(Person::NAME_INCLUDE_DATES);
-		$given		= $person->getGivenName();
-		if (strlen($given) > 2)
-		    $givenPre	= substr($given, 0, 2);
-		else
-		    $givenPre	= $given;
-		$surname	= $person->getSurname();
-		$nameuri	= rawurlencode($surname . ', ' . $givenPre);
-		if (strlen($surname) == 0)
-		    $prefix	= '';
-		else
-		if (substr($surname,0,2) == 'Mc')
-		    $prefix	= 'Mc';
-		else
-		    $prefix	= substr($surname,0,1);
-		if ($isOwner)
-		{		// OK
-		    $title		= "Grant Access to $name";
-		    $getParms		= array('username' => '!' . $userid);
-		    $users		= new RecordSet('Users', $getParms);
-		}		// OK
-		else
-		    $title		= "Access Denied to $name";
-    }		// get the requested individual
-    else
-    {		// invalid input
-		$title		= "Invalid Value of idir=$idir";
-		$person		= null;
-		$surname	= '';
-		$isOwner	= false;
-    }		// invalid input
+			case 'lang':
+            {
+                if (strlen($value) >= 2)
+                    $lang       = strtolower(substr($value,0,2));
+                break;
+            }
+        }
+    }
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display current status of account
+else
+if (count($_POST) > 0)
+{		            // invoked by submit to update account
+    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_POST as $key => $value)
+	{	            // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+	    {		    // act on specific parameter
+            case 'idir':
+            case 'id':
+            {
+                if (ctype_digit($value))
+                    $idir       = $value;
+                break;
+            }
 
-    $links	= array(
-				'/genealogy.php'		=> 'Genealogy',
-				'/genCanada.html'		=> 'Canada',
-				'/Canada/genProvince.php?Domain=CAON'
-									=> 'Ontario',
-				'/FamilyTree/Services.php'	=> 'Services',
-				"/FamilyTree/nominalIndex.php?name=$nameuri"
-									=> 'Nominal Index');
-    if (strlen($surname) > 0)
-    {
-		$links["Surnames.php?initial=$prefix"] =
-							"Surnames Starting with '$prefix'";
-		$links["Names.php?Surname=$surname"]  =
-							"Surname '$surname'";
-    }		// surname present
+            case 'pattern':
+            {
+                $pattern        = $value;
+                break;
+            }
 
-    htmlHeader($title,
-		       array('/jscripts/js20/http.js',
-				     '/jscripts/CommonForm.js',
-				     '/jscripts/util.js',
-				     'grantIndivid.js'),
-		       true);
-?>
-<body>
-<?php
-    pageTop($links);
-?>
-  <div class="body">
-    <h1>
-      <span class="right">
-		<a href="grantIndividHelpen.html" target="help">? Help</a>
-      </span>
-      <?php print $title; ?>
-    </h1>
-<?php
-    showTrace();
+			case 'lang':
+            {
+                if (strlen($value) >= 2)
+                    $lang       = strtolower(substr($value,0,2));
+                break;
+            }
+        }
+    }
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display current status of account
 
-    if (strlen($msg) > 0)
-    {
-?>
-  <p class="message">
-    <?php print $msg; ?> 
-  </p>
-<?php
-    }		// error message
- 
-    if ($isOwner)
-    {			// user is authorized to edit this record
-		if ($person)
-		{		// individual found
-?>
-    <form method="post" action="grantUser.php" name="grantForm">
-    <input type="hidden" name="idir" value="<?php print $idir; ?>">
-      <div class="row">
-		<label class="column1" for="User">
-		    Select user to grant access to:
-		</label>
-		<select name="User" id="User" size="5" class="white left">
-<?php
-		foreach($users as $user)
-		{
-		    $id		= $user->get('id');
-		    $name	= $user->get('username');
-		    if ($name != $userid)
-		    {		// not current user
-?>
-				<option value="<?php print $name; ?>"><?php print $name;?>
-				</option>
-<?php
-		    }		// not current user
-		}		// loop retrieving users
-?>
-		    </select>
-      </div>
-    <p>
-		<button type="submit" name="Submit">Grant Access</button>
-    </p>
-    </form>
-<?php
-		}		// individual found
-    }		// current user is an owner of record
-    else
-    {		// current user does not own record
-?>
-<p class="message">
-    You are not authorized to update this individual.
-</p>
-<?php
-    }		// current user does not own record
-?>
-</div>	<!-- end of <div id="body"> -->
-<?php
-    pageBot($title . ": IDIR=$idir");
-?>
-<div class="balloon" id="HelpUser">
-<p>This list permits you to identify the other user to whom you wish
-to grant permission to view the private data and update the current 
-individual and that individual's
-ancestors and descendants.
-</p>
-</div>
-<div class="balloon" id="HelpSubmit">
-<p>
-Clicking on this button grants access to the individual and his/her
-ancestors and descendants to the indicated user.
-</p>
-</div>
-</body>
-</html>
+$action             = 'Display';
+$nameuri	        = '';
+
+// note that record 0 in tblIR contains only the next available value
+// of IDIR and is ignored by this implementation
+if ($idir > 0)
+{		            // get the requested individual
+    $person		    = new Person(array('idir' => $idir));
+    $treename       = $person->getTreename();
+
+	$isOwner	    = canUser('edit') && $person->isOwner();
+	 
+	$name		    = $person->getName(Person::NAME_INCLUDE_DATES);
+	$given		    = $person->getGivenName();
+	if (strlen($given) > 2)
+	    $givenPre	= substr($given, 0, 2);
+	else
+	    $givenPre	= $given;
+	$surname	    = $person->getSurname();
+	$nameuri	    = rawurlencode($surname . ', ' . $givenPre);
+	if (strlen($surname) == 0)
+	    $prefix	    = '';
+	else
+	if (substr($surname,0,2) == 'Mc')
+	    $prefix	    = 'Mc';
+	else
+	    $prefix	    = substr($surname,0,1);
+	if ($isOwner)
+    {		        // OK
+        if (strlen($pattern) > 0)
+	        $getParms	= array('username' => array('!' . $userid, $pattern));
+        else
+	        $getParms	= array('username' => '!' . $userid);
+        $users		= new UserSet($getParms);
+        if ($users->count() > 0)
+	        $action     = 'Update';
+	}		        // OK
+}		            // get the requested individual
+else
+{		            // invalid input
+	$name	    	= "Invalid Value of idir=$idir";
+	$person	    	= null;
+    $surname    	= '';
+    $users          = array();
+}		            // invalid input
+
+$template       = new FtTemplate("grantIndivid$action$lang.html");
+
+if (strlen($surname) > 0)
+{
+	$links["Surnames.php?initial=$prefix"] =
+						"Surnames Starting with '$prefix'";
+	$links["Names.php?Surname=$surname"]  =
+						"Surname '$surname'";
+}		// surname present
+
+$options            = $template['User$id'];
+if ($options)
+    $options->update($users);
+
+$template->set('IDIR',          $idir);
+$template->set('NAME',          $name);
+$template->set('SURNAME',       $surname);
+$template->set('NAMEURI',       $nameuri);
+$template->set('TREENAME',      $treename);
+$template->set('PREFIX',        $prefix);
+$template->set('PATTERN',       $pattern);
+
+$template->display();
