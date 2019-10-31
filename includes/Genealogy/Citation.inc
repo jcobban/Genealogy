@@ -2369,7 +2369,7 @@ class Citation extends RecordPic
 				if ($count == 1)
 				{	// detail matches pattern
 				    $item		= $matches[0];
-                    $updates['sourceWesleyanBaptism'] =
+                    $updates['sourcePostOffices']	=
                                   array('ITEM'      => $item,
                                         'LANG'      => $lang,
                                         'DETAIL'    => $detail);
