@@ -4,7 +4,9 @@ use \PDO;
 use \Exception;
 use \ArrayAccess;
 use \SplDoublyLinkedList;
-use Genealogy\RecordSet;
+use \Genealogy\Record;
+use \Genealogy\RecordSet;
+
 /************************************************************************
  *  Class Template						                            	*
  *										                                *
@@ -125,10 +127,30 @@ use Genealogy\RecordSet;
  *                  When replaceing a tag with text hide all of the     *
  *                  tags identified by id= which are not there any      *
  *                  more because of the replacement                     *
+ *      2019/07/28  improve handling of missing closing tags and        *
+ *                  report them as warnings                             *
+ *                  ensure $msg an $warn are defined in case this       *
+ *                  is not invoked as part of the Genealogy app         *
  *	    									                            *
  *  Copyright &copy; 2019 James A. Cobban All Rights Reserved			*
  ************************************************************************/
 require_once __NAMESPACE__ . '/TemplateTag.inc' ;
+
+/************************************************************************
+ *  $msg																*
+ *																		*
+ *  Initialize common variable for accumulating error messages.			*
+ ************************************************************************/
+if (!isset($msg) || !is_string($msg))
+    $msg		= '';
+
+/************************************************************************
+ *  $warn																*
+ *																		*
+ *  Initialize common variable for accumulating warning messages.		*
+ ************************************************************************/
+if (!isset($warn) || !is_string($warn))
+    $warn		= '';
 
 /************************************************************************
  *  class ArrayInsertion								        		*
@@ -370,10 +392,20 @@ class Template implements ArrayAccess
         }
         $this->fields[$field]	    = $value;
     }		// method Template::set
+
+    /********************************************************************
+     *	function Template::get									    	*
+     *													                *
+     *	Used to get the value to substitute for a specific named	    *
+     *	field in the template.										    *
+     *													                *
+     *	INPUT:												            *
+     *	    $field	name to match in the template						*
+     ********************************************************************/
     public function get($field)
     {
         return $this->fields[$field];
-    }
+    }		// method Template::get
 
     /********************************************************************
      *  function Template::addTagUpdate									*
@@ -1041,6 +1073,7 @@ class Template implements ArrayAccess
     private function parseHTML()
     {
         global	$warn;
+        global  $user;
 
         $inTemplate		    = false;
 
@@ -1100,28 +1133,32 @@ class Template implements ArrayAccess
 	                }
 	                else
 	                {		// closing tag doesn't match 
-	                    if ($this->debug)
+	                    //if ($this->debug)
 	                    {
-	                        $warn    .= "<p style='text-indent: {$indent}0px;margin-top: 0px;'>Template: " . __LINE__ .
-	                            " &lt;/$tagName&gt; at $cursor does not match &lt;" .
-	                                    $tag->tagName . "&gt; at " .
-	                                    $tag->start . "</p>\n";
-	                        $warn    .= "<p style='text-indent: {$indent}0px;margin-top: 0px;'>Template: " . __LINE__ . ' tagStack=';
-	                        for($i = 0; $i <= $indent; $i++)
-	                            $warn	.= "[$i]='" . $this->tagStack[$i]->tagName . "',";
-	                        $warn	.= "</p>\n";
-	                        $warn    .= "<p style='text-indent: {$indent}0px;margin-top: 0px;'>Template: " . __LINE__ .
-	                            " context='" .
-	                            escape(substr($this->page, $cursor - 20, 40)) .
-	                            "'</p>\n";
+	                        $openTagStart	= substr($this->page,
+	                                                 $tag->start - 20, 
+                                                     $tag->tagLength + 20);
+	                        $closeTag	    = substr($this->page,
+	                                                 $cursor - 20, 
+                                                     40);
+                            if (isset($user) && $user->can('debug'))
+                            {
+                                $tag_line   = substr_count(substr($this->page, 0, $tag->start), "\n");
+                                $cursor_line= substr_count(substr($this->page, 0, $cursor), "\n");
+	                            $warn    .= "<p>Template: " . __LINE__ .
+	                    " &lt;/$tagName&gt; " . escape($closeTag) . " at $cursor line $cursor_line does not match " .
+	                                    escape($openTagStart) . " at " .
+                                        $tag->start . " line $tag_line</p>\n";
+                            }
+                            // correct length of un-ended tag
+                            $tag->length    = $cursor - $tag->start;
+
+                            // correct nesting
 	                        while($indent > 0)
 	                        {
 	                            $tag		= $this->tagStack[$indent];
 	                            if ($tagName == $tag->tagName)
 	                                break;
-	                            $warn    .= "<p style='text-indent: {$indent}0px;margin-top: 0px;'>Template: " . __LINE__ . " closing tag '" .
-	                    escape(substr($this->page, $tag->start, $tag->tagLength)) . 
-	                    '",' . "' at " . $tag->start . "</p>\n";
 	                            $indent--;
 	                        }
 	                    }
@@ -1187,11 +1224,12 @@ class Template implements ArrayAccess
 	                    {
 	                        $topTagStart	= substr($this->page,
 	                                                 $topTag->start, 
-	                                                 $topTag->tagLength);
-	                        $tagStart	= substr($this->page,
+                                                     $topTag->tagLength);
+                            $remainder      = min(strlen($this->page) - $tag->start, 40);
+	                        $tagStart	    = substr($this->page,
 	                                                 $tag->start, 
-	                                                 $tag->tagLength);
-	                        if ($this->debug)
+	                                                 $remainder);
+                            if (isset($user) && $user->can('debug'))
 	                            $warn	.= "<p>Template::parseHTML: " . __LINE__ .
 	                                       ' missing closing tag for "' .
 	                                        escape($topTagStart) .
@@ -1199,7 +1237,7 @@ class Template implements ArrayAccess
 	                                        "\"</p>\n";
 	                        $indent--;
 	                        $this->tagStack[$indent]	= $tag;
-	                        $this->tagStack[$indent - 1]->replChild($topTag, $tag);
+	                        $this->tagStack[$indent - 1]->addChild($tag);
 	                    }
 	                    else
 	                    {		// add to the stack of enclosing tags
@@ -1233,21 +1271,6 @@ class Template implements ArrayAccess
             }
         }			// scan the text of the page
 
-        //print "<h3>Document Object Model</h3>\n";
-
-        //$this->dom->printTag(0);
-
-        //if (count($this->dom->elements) > 0)
-        //{
-        //     print "<p>Tags By Id</p>\n";
-        //     foreach($this->dom->elements as $id => $tag)
-        //     {
-        //         $tagText = $tag->outerHTML();
-        //         print "<p style='text-indent: 50px'>id='$id' outerHTML=" .
-        //         $tagText = $tag->innerHTML();
-        //         print "<p style='text-indent: 50px'>id='$id' innerHTML=" .
-        //     }
-        //}
     }		// method Template::parseHTML
 
     /********************************************************************
@@ -1632,7 +1655,17 @@ class Template implements ArrayAccess
                             $result->push($index);
                     }
                     else
-                        $result->push($record[$field]);
+                    if ($record instanceof Record)
+                    {
+                        if ($record->offsetExists($field))
+                            $result->push($record[$field]);
+                    }
+                    else
+                    if (is_array($record))
+                    {
+                        if (array_key_exists($field, $record))
+                            $result->push($record[$field]);
+                    }
                 }		// loop through template
 
                 // add text from template after last insertion point
@@ -1777,7 +1810,9 @@ class Template implements ArrayAccess
         }
 
         if (count($this->tagUpdates) == 0)
+        {
             return;		// no updates to apply
+        }
 
         $this->parseHTML();	// ensure DOM is built
 
@@ -1926,15 +1961,14 @@ class Template implements ArrayAccess
                     $tafter	= substr($tafter, 0, 80) . '...' .
                                       substr($tafter, -17);
                 $warn	.= "<p>Template::doTagUpdates: " . __LINE__ .
-                        " \$start=$start, \$end=$end, \$origLength=$origLength</p>\n";
-                $warn	.= "<p>Template::doTagUpdates: " . __LINE__ .
-                               " \$before='" .
-                                   escape($tbefore) . "'" .
-                               " \$template='" .
-                                   escape($template) . "'" .
-                               " \$after='" .
-                                   escape($tafter) .
-                                           "'</p>\n";
+                    " \$start=$start, \$end=$end, \$origLength=$origLength</p>\n";
+                $line   = __LINE__;
+                $warn	.= "<p>Template::doTagUpdates: $line \$before='" .
+                                   escape($tbefore) .  "'</p>\n";
+                $warn	.= "<p>Template::doTagUpdates: $line \$template='" .
+                                   escape($template) .  "'</p>\n";
+                $warn	.= "<p>Template::doTagUpdates: $line \$after='" .
+                                   escape($tafter) .  "'</p>\n";
             }			// debug
 
             // if the id attribute of the template tag does not contain
@@ -1987,11 +2021,27 @@ class Template implements ArrayAccess
                                    " \$record=";
                     if ($record instanceof Record)
                     {
-                        $warn	.= get_class($record);
+                        $warn	    .= get_class($record) . ' [';
+                        $comma      = '';
+                        foreach($record as $fname => $value)
+                        {
+                            $warn   .= "$comma$fname='$value'";
+                            $comma  = ',';
+                        }
+                        $warn       .= ']';
                     }
                     else
                     if (is_array($record))
-                        $warn	.= print_r($record, true);
+                    {
+                        $warn	    .= "array [";
+                        $comma      = '';
+                        foreach($record as $fname => $value)
+                        {
+                            $warn   .= "$comma$fname='$value'";
+                            $comma  = ',';
+                        }
+                        $warn       .= ']';
+                    }
                     else
                     if (is_string($record))
                         $warn	.= "'" .

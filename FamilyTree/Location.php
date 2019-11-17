@@ -107,6 +107,8 @@ use \Templating\Template;
  *		2018/11/19      only display coordinates to 6 decimal places    *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/04/10      support county names containing an &            *
+ *		2019/11/02      use Location to get search name and county      *
+ *      2019/11/17      move CSS to <head>                              *
  *																	    *
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -204,6 +206,8 @@ if (!$location->isOwner())
 
 // get template
 $template			= new FtTemplate("Location$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'Location'));
 
 // customize title
 if ($location->isExisting())
@@ -287,59 +291,9 @@ else
     $template->set('QSCHECKED', '');
 
 // handle idiosyncracies of Google geocoder implementation
-$searchName	    	= $name;
-$part1		    	= '';
-$part2		    	= '';
-$county		    	= '';
-$geoPattern	    	= "/^\s*(.*),\s*([a-zA-Z &]*),\s*([a-zA-Z ]+),\s*CA\s*$/";
-$results	    	= array();
-$res1		    	= preg_match($geoPattern, $name, $results);
-if ($res1)
-{
-    $part1		    = trim($results[1]);	// street or lot location
-    $county		    = trim($results[2]);	// county or city name
-    $province	    = trim($results[3]);	// province
-    $getParms	    = array('domain'	=> 'CA' . $province,
-	        	    		'name'		=> $county);
-    $counties		= new CountySet($getParms);
+$searchName	    	= $location['searchname'];
+$county		        = $location['county'];
 
-    $res2	        = preg_match("/\b(lot|lots|con|cons)\b[^,]*,(.*)$/",
-            				     $part1,
-                                 $results);
-
-    if ($counties->count() > 0)
-    {                       // at least one County matches the name
-        $countyObj  = $counties->rewind();  // get first County
-        $county     = $countyObj->getName();
-        $townships  = new TownshipSet(array('county'    => $countyObj,
-                                            'name'      => $part1));
-        if ($townships->count() > 0)
-		    $searchName	= "$part1 Township, $county, $province, CA";
-        else
-        {
-			if ($res2)
-			{                   // location includes lot or concession
-			    $part2	= trim($results[2]);
-			    $searchName	= "$part2 Township, $county, $province, CA";
-			}                   // location includes lot or concession
-            else
-            if (substr($county, -5) == ' City')
-	            $searchName	= "$part1, $county, $province, CA";
-            else
-	            $searchName	= "$part1, $county County, $province, CA";
-        }
-    }                       // at least one County matches the name
-    else
-    {
-		if ($res2)
-		{
-		    $part2	        = trim($results[2]);
-		    $searchName	    = "$part2, $county, $province, CA";
-		}
-		else
-		    $searchName	= "$part1, $county, $province, CA";
-    }
-}
 $template->set('SEARCHNAME',	str_replace('"', '&quote;', $searchName));
 $template->set('COUNTY',		str_replace('"', '&quote;',
                                     str_replace('&', '&amp;', $county)));

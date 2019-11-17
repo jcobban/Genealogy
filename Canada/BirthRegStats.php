@@ -40,6 +40,7 @@ use \Templating\Template;
  *		2018/01/02  	use split class names							*
  *		2018/10/06      use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -98,6 +99,8 @@ foreach($_GET as $key => $value)
 }				// loop through all input parameters
 
 $template		    = new FtTemplate("BirthRegStats$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'BirthRegStats'));
 
 $domainObj	        = new Domain(array('domain' 	=> $domain,
 				        			   'language'	=> 'en'));

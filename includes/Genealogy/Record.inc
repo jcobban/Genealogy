@@ -208,6 +208,7 @@ use \Iterator;
  *		                in translate table                              *
  *		                add protected method constDebug                 *
  *		2019/10/28      permit spaces in front of save parm             *
+ *		2019/11/06      trim HTML <p> off values from tinyMCE           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1263,25 +1264,29 @@ class Record implements Iterator, ArrayAccess
 		global	$connection;
 
 		// get current date and time for added and updated fields in record
-		$now		    = getdate();
-		$today		    = $now['year'] * 10000 + $now['mon']*100 + $now['mday'];
-		$hours		    = $now['hours'];
+		$now		    	= getdate();
+        $today		    	= $now['year'] * 10000 +
+                              $now['mon']*100 +
+                              $now['mday'];
+		$hours		    	= $now['hours'];
 		if (strlen($hours) == 1)
-		    $hours	    = '0' . $hours;
-		$mins	    	= $now['minutes'];
+		    $hours	    	= '0' . $hours;
+		$mins	    		= $now['minutes'];
 		if (strlen($mins) == 1)
-		    $mins	    = '0' . $mins;
-		$currtime   	= $hours . ':' . $mins;
+		    $mins	    	= '0' . $mins;
+		$currtime   		= $hours . ':' . $mins;
 
 		// determine top level tag name for XML output
         $indent        		= '';
+        $xmlparms        	= '';
 		if (is_string($xml))
 		{		        // string tag name
             $matches   		= array();
-            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            if (preg_match('/^(\s*)(\w*)(.*)$/', $xml, $matches))
             {
                 $indent		= $matches[1];
                 $xml   		= $matches[2];
+                $xmlparms   = $matches[3];
             }
 		    $tagname		= $xml;
 		    $xml	   		= true;
@@ -1404,8 +1409,9 @@ class Record implements Iterator, ArrayAccess
 				$count		    = $stmt->rowCount();
 				if ($xml)
 				{		// XML output
-				    print "$indent<$tagname count='$count'>" . $insertText .
-						    "</$tagname>\n";
+                    print "$indent<$tagname$xmlparms count='$count'>\n" .
+                            "$indent\t$insertText\n" .
+						    "$indent</$tagname>\n";
 				}		// XML output
 
 				if ($debug)
@@ -1421,7 +1427,7 @@ class Record implements Iterator, ArrayAccess
 				    {		// get value of prime key
 						$primKey	= $connection->lastInsertId();
 						if ($xml)
-						    print "$indent<$tagname result='$primKey'>" .
+						    print "$indent<$tagname$xmlparms result='$primKey'>" .
 							    "lastInsertId" .
 							  "</$tagname>\n";
 						$this->row[$this->prime]	= $primKey;
@@ -1531,7 +1537,9 @@ class Record implements Iterator, ArrayAccess
 				    $count	        = $stmt->rowCount();	// changed rows
 				    if ($xml)
 				    {
-						print "$indent<$tagname result='$count'>$updateText</$tagname>\n";
+                        print "$indent<$tagname$xmlparms result='$count'>\n" .
+                                "$indent\t$updateText\n" .
+                                "$indent</$tagname>\n";
 				    }
 
 				    if ($debug)
@@ -1605,13 +1613,15 @@ class Record implements Iterator, ArrayAccess
 
 		// handle XML output option
         $indent        		= '';
+        $xmlparms           = '';
 		if (is_string($xml))
         {			    // string tag name
             $matches   		= array();
-            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            if (preg_match('/^(\s*)(\w*)(.*)$/', $xml, $matches))
             {
                 $indent		= $matches[1];
                 $xml   		= $matches[2];
+                $xmlparms  	= $matches[3];
             }
             $tagname		= $xml;
             $xml	   		= true;
@@ -1667,7 +1677,9 @@ class Record implements Iterator, ArrayAccess
 		    {			// successful delete
 				$count	        = $stmt->rowCount();	// changed rows
 				if ($xml)
-				    print "$indent<$tagname count='$count'>$deleteText</$tagname>\n";
+                    print "$indent<$tagname$xmlparms count='$count'>\n" .
+                            "$indent\t$deleteText\n" .
+                            "$indent</$tagname>\n";
 				if ($debug)
 				    $warn	.= "<p>Record::delete: " . __LINE__ . 
 							   " cmd='$deleteText'" .
@@ -2000,8 +2012,13 @@ class Record implements Iterator, ArrayAccess
 
         if (!is_array($this->row))
             throw new Exception("Record::get: \$field='$field', table=" . $this->table . ", \$this->row not initialized");
-		if (array_key_exists($fieldLc, $this->row))
-		    $retval             = $this->row[$fieldLc];
+        if (array_key_exists($fieldLc, $this->row))
+        {
+            $retval             = $this->row[$fieldLc];
+            if (is_string($retval) && 
+                preg_match('#^\s*<p>([^<]*)</p>\s*$#', $retval, $matches))
+                $retval         = $matches[1];
+        }
 		else
         if (array_key_exists($fieldLc, $this->extras))
         {
@@ -2101,20 +2118,31 @@ class Record implements Iterator, ArrayAccess
 
 		if (is_null($this->row))
 		{
-		    $msg	.= "Record::set('$field', '$value') called with " .
-                "\$this->row null. ";
+		    $msg	        .= "Record::set('$field', '$value') called with " .
+                                "\$this->row null. ";
             ob_start();
             debug_backtrace();
             $msg    .= ob_get_clean();
 		    return null;
 		}
 
-		$fieldLc		= strtolower($field);
-		if (array_key_exists($fieldLc, static::$translate))
-		    $fieldLc		= static::$translate[$fieldLc];
+        // the new version of tinyMCE encloses results in HTML <p>
+        if (is_string($value))
+        {
+            $value              = trim($value);
+            if (preg_match('#^<p>([^<]*)</p>$#', $value, $matches))
+                $value          = $matches[1];
+        }
+
+        // interpret field name synonyms
+		$fieldLc		        = strtolower($field);
+        if (array_key_exists($fieldLc, static::$translate))
+            $fieldLc		    = static::$translate[$fieldLc];
+
+        // modify value 
 		if (array_key_exists($fieldLc, $this->row))
 		{		// valid field name
-		    $oldvalue		= $this->row[$fieldLc];
+		    $oldvalue		    = $this->row[$fieldLc];
             if (is_int($oldvalue))
             {
                 if (ctype_digit($value) &&

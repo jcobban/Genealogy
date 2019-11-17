@@ -44,8 +44,10 @@ use \Exception;
  *		2017/11/04		use class RecordSet in place of getLocations	*
  *		2017/12/08		don't include duplicate entries in count		*
  *						so Javascript won't prompt						*
+ *		2019/11/09      move escaping of characters in name here from   *
+ *		                Javascript function locationChanged             *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Location.inc';
@@ -77,10 +79,21 @@ foreach($_GET as $fldname => $value)
     		    $getParms['location']	= $value;
     		else	// match either location or short name
             {
-                $value          = str_replace('[','',str_replace(']','',$value));
-    		    $getParms[]		= array('location'  => "^$value$",
-    	            					'shortname' => "^$value$");
-    		    $name		    = $value;
+                $value          = trim($value);
+                $name		    = $value;
+                // if name is enclosed in square brackets do not include them
+                if (substr($value, 0, 1) == '[')
+                    $value      = substr($value, 1);
+                if (substr($value, -1, 1) == ']')
+                    $value      = substr($value, 0, strlen($value) - 1);
+                // escape regexp special characters
+                $search         = str_replace('?', '\\?', $value);
+                $search         = str_replace('+', '\\.', $search);
+                $search         = str_replace('.', '\\.', $search);
+                $search         = str_replace('[', '\\[', $search);
+
+    		    $getParms[]		= array('location'  => "^$search$",
+    	            					'shortname' => "^$search$");
     		}
     		break;
         }		// special 'name' parameter
@@ -110,13 +123,13 @@ foreach($_GET as $fldname => $value)
 }			// loop through all parameters
 
 $getParms['limit']		= $limit;
-$locations			= new RecordSet('Locations', $getParms);
+$locations			    = new RecordSet('Locations', $getParms);
 
 if (is_string($name) && $locations->count() == 0)
 {			// repeat with more general search
     unset($getParms[0]);
-    $getParms['location']	= "^$name";
-    $locations		= new RecordSet('Locations', $getParms);
+    $getParms['location']	= "^$search";   // starting with search
+    $locations		    = new RecordSet('Locations', $getParms);
 }
 
 // display the results
@@ -130,10 +143,10 @@ if (strlen($msg) > 0)
 }				// report failure
 else
 {				// have a location or locations to return
-    $count		= $locations->count();
+    $count		        = $locations->count();
     if ($count > 1)
     {			// check for duplicates
-        $oldname	= null;
+        $oldname	    = null;
         foreach($locations as $location)
         {
     		if ($location->getName() == $oldname)
@@ -148,8 +161,8 @@ else
         print $key . '="' . str_replace('"','&quote;',str_replace('&','&amp;',$value)) . '" ';
     }			// report parameters
     print ">\n";		// close tag
-    $info		= $locations->getInformation();
-    $query		= $info['query'];
+    $info		        = $locations->getInformation();
+    $query		        = $info['query'];
     print "<cmd>$query</cmd>\n";
     foreach($locations as $idlr => $location)
     {			// run through all matching locations

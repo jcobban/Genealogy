@@ -1,12 +1,13 @@
 <!--*********************************************************************
- *  PageForm.php														*
+ *  PageFormDisplayen.html												*
  *																		*
- *  Update the Pages database for a single enumeration division.		*
+ *  Template to display page to display the Pages database for a single *
+ *  enumeration division.		                                        *
  *																		*
  *  History:															*
- *      2019/02/26      created                                         *
+ *      2019/11/12      created                                         *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
       <a href="/genealogy.php?lang=$LANG">
@@ -34,17 +35,22 @@
 	        Help?
 	      </a>
         </span>
-    Census Administration: $COUNTRYNAME $CENSUSYEAR Census,
-    District $DISTID, SubDistrict $SUBDISTID,
-    Page Table Update
+            Census Administration: $COUNTRYNAME $CENSUSYEAR Census,
+            Page Table Display
         <div style="clear: both;"></div>
       </h1>
+	  <p class="warning">
+        The database will not be updated because you are not signed on as
+        a user authorized to update this table.
+      </p>
+      $TRACE
+      $MSG
       <div class="center" id="topBrowse">
         <span class="left" id="topPrev">
-    	    <a href="$NPURI$NPPREV">&lt;---</a>
+    	    <a href="PageForm.php$NPPREV">&lt;---</a>
         </span>
         <span class="right" id="topNext">
-	      <a href="$NPURI$NPNEXT">---&gt;</a>
+	        <a href="PageForm.php$NPNEXT">---&gt;</a>
         </span>
           Census=$CENSUSID, Province=$PROVINCE, Dist $DISTID $DISTNAME,
           SubDist $SUBDISTID $SUBDISTNAME
@@ -94,48 +100,43 @@
 			</tr>
           </thead>
           <tbody>
-			<tr>
+			<tr id="pageRow$page">
 			  <td>
-			    <input type="text" name="PT_Page$PAGENUM"
-			    		id="PT_Page$PAGENUM"
-			    		value="$PAGENUM" readonly="readonly"
+			    <input type="text" name="PT_Page$page"
+			    		id="PT_Page$page"
+			    		value="$page" readonly="readonly"
 			    		class="ina rightnc" size="3">
 			  </td>
 			  <td>
-			    <input type="text" name="PT_Population$PAGENUM" 
-			    		id="PT_Population$PAGENUM" 
-			    		value="$POPULATION" $READONLY 
-			    		class="white rightnc" size="3">
+			    <input type="text" name="PT_Population$page" 
+			    		id="PT_Population$page" 
+			    		value="$population" readonly="readonly" 
+			    		class="ina rightnc" size="3">
 			  </td>
 			  <td>
-			    <input type="text" name="PT_Transcriber$PAGENUM" 
-			    		id="PT_Transcriber$PAGENUM" 
-			    		value="$TRANSCRIBER" $READONLY 
-			    		class="white leftnc" size="10">
+			    <input type="text" name="PT_Transcriber$page" 
+			    		id="PT_Transcriber$page" 
+			    		value="$transcriber" readonly="readonly" 
+			    		class="ina leftnc" size="10">
 			  </td>
 			  <td>
-			    <input type="text" name="PT_ProofReader$PAGENUM" 
-			    		id="PT_ProofReader$PAGENUM" 
-			    		value="$PROOFREADER" $READONLY 
-			    		class="white leftnc" size="10">
+			    <input type="text" name="PT_ProofReader$page" 
+			    		id="PT_ProofReader$page" 
+			    		value="$proofreader" readonly="readonly" 
+			    		class="ina leftnc" size="10">
 			  </td>
 			  <td>
-			    <input type="text" name="PT_Image$PAGENUM" 
-			    		id="PT_Image$PAGENUM" 
-			    		value="$IMAGE" $READONLY 
-			    		class="white leftnc" size="64">
+			    <input type="text" name="PT_Image$page" 
+			    		id="PT_Image$page" 
+			    		value="$image" readonly="readonly" 
+			    		class="ina leftnc" size="64">
 			  </td>
 			  <td>
-			    <button type="button" id="View$PAGENUM">View</button>
+			    <button type="button" id="View$page">View</button>
 			  </td>
 			</tr>
           </tbody>
         </table>
-        <p>
-          <button type="submit" id="Submit">
-	         <u>U</u>pdate Database
-          </button>
-        </p>
       </form>
       <div class="center" id="botBrowse">
         <span class="left" id="botPrev">
@@ -152,6 +153,36 @@
     </div> <!-- end of <div id="body"> -->
     <!-- templates for dynamic HTML -->
     <div class="hidden" id="templates">
+        <span id="censusUndefined">
+            Census='$censusId' is not defined.
+        </span>  
+        <span id="countryUndefined">
+            Country code $cc' is not defined.
+        </span>  
+        <span id="censusMissing">
+            Census identifier parameter is missing.
+        </span>
+        <span id="provinceUndefined">
+            Province '$province' not supported for '$censusId' census.
+        </span>  
+        <span id="provinceMissing">
+            Province parameter is missing for Census='$censusId'.
+        </span>
+        <span id="districtUndefined">
+            District='$distId' is not defined.
+        </span>  
+        <span id="districtInvalid">
+            District identifier '$distId' is invalid.
+        </span>  
+        <span id="districtMissing">
+            District identifier parameter is missing.
+        </span>
+        <span id="subdistrictUndefined">
+            Sub-District='$subdistId' is not defined for Census='$censusId' District='$distId'.
+        </span>  
+        <span id="subdistrictMissing">
+            Sub-District identifier parameter is missing.
+        </span>
       <!-- no matching names dialog -->
       <form id="ChangeImageForm$SUB">
         <p class="label">Image URL Changed</p>

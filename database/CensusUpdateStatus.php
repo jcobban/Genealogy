@@ -63,6 +63,7 @@ use \Exception;
  *		2018/01/11		htmlspecchars moved to Template class			*
  *		2018/01/29		use class FtTemplate							*
  *		2019/02/19      use new FtTemplate constructor                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -322,6 +323,8 @@ if (is_null($province))
 else
 	$scope	= "Provincial";
 $template	= new FtTemplate("CensusUpdateStatus$scope$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'CensusUpdateStatus'));
 
 $template->set('TITLE',	 		    $title);
 $template->set('CENSUSYEAR', 		$censusYear);

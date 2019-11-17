@@ -40,6 +40,7 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/02/17		use Template									*
  *		2019/02/19      use new FtTemplate constructor                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -488,6 +489,8 @@ else
     $action		= 'Display';
 $tempBase		= $document_root . '/templates/';
 $template		= new FtTemplate("GraveStones$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'GraceStonesEdit'));
 
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('PROVINCENAME',	$provinceName);

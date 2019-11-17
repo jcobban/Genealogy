@@ -3,11 +3,17 @@ namespace Templating;
 use \Exception;
 use \ArrayAccess;
 use \Iterator;
+use \Genealogy\Record;
+use \Genealogy\RecordSet;
+
 /************************************************************************
  *  TemplateTag.inc						                            	*
  *										                                *
  *  History:									                        *
  *      2019/04/07  split out from Template.inc                         *
+ *      2019/08/02  provide access to outerHTML, innerHTML, and         *
+ *                  childNodes as attributes                            *
+ *                  support assigning values to outerHTML and innerHTML *
  *	    									                            *
  *  Copyright &copy; 2019 James A. Cobban All Rights Reserved			*
  ************************************************************************/
@@ -249,7 +255,7 @@ class TemplateTag implements Iterator, ArrayAccess
      *		    	if this is a string then the value of the string    *
      *		    	replaces the entire tag in the generated update     *
      ********************************************************************/
-    public function update($array)
+    public function update($array = null)
     {
         global $warn;
 
@@ -297,6 +303,12 @@ class TemplateTag implements Iterator, ArrayAccess
             $instance		= new ArrayInsertion($this, $array);
             $this->template->addTagUpdate($instance); 
         }           // string
+        else
+        {           // other
+            if ($this->template->debug)
+                $warn	    .= "<p>TemplateTag::update: " .  __LINE__ .
+                " \$array='" . print_r($array,1) . "'</p>\n";
+        }
     }		// function TemplateTag::update
 
     /********************************************************************
@@ -384,15 +396,25 @@ class TemplateTag implements Iterator, ArrayAccess
      *	This method returns the text from the beginning of the tag to	*
      *	the end of the closing tag.									    *
      *													                *
-     *	RETURNS:										                *
+     *	Returns:										                *
      *		string containing HTML or XML				                *
      ********************************************************************/
-    public function outerHTML()
+    public function outerHTML($replace = null)
     {
         global	$warn;
 
         // the following ensures that the template is loaded
         $page		= $this->template->getRawTemplate();
+        if (is_string($replace))
+        {                   // string
+            if ($this->template->debug)
+                $warn	    .= "<p>TemplateTag::outerHTML: " .  __LINE__ .
+                                " \$replace='" . escape($replace) . "'</p>\n";
+            $instance		= new ArrayInsertion($this, $replace);
+            $this->template->addTagUpdate($instance);
+            return $replace; 
+        }                   // string
+
         $length		= $this->length;
         if ($length == 0)	// called before ending tag found
             $length	= 32;
@@ -407,13 +429,27 @@ class TemplateTag implements Iterator, ArrayAccess
      *	This method returns the text contained within the tag element	*
      *	including all child tags as text.								*
      *													                *
-     *	RETURNS:										                *
+     *	Returns:										                *
      *		string containing HTML or XML				                *
      ********************************************************************/
-    public function innerHTML()
+    public function innerHTML($replace = null)
     {
         // the following ensures that the template is loaded
         $page		= $this->template->getRawTemplate();
+        if (is_string($replace))
+        {                   // string
+            if ($this->template->debug)
+                $warn	    .= "<p>TemplateTag::innrHTML: " .  __LINE__ .
+                " \$replace='" . escape($replace) . "'</p>\n";
+            $replace        = substr($page, $this->start, $this->tagLength) .
+                              $replace .
+                              substr($page, 
+                                     $this->start + $this->length - $this->etaglength,
+                                     $this->etagLength);
+            $instance		= new ArrayInsertion($this, $replace);
+            $this->template->addTagUpdate($instance);
+            return $replace; 
+        }                   // string
         $length		= $this->length;
         if ($length == 0)	// called before ending tag found
             $length	= $this->etagLength;
@@ -424,6 +460,56 @@ class TemplateTag implements Iterator, ArrayAccess
                       $end - $start);
     }		// function TemplateTag::innerHTML
 
+    /********************************************************************
+     *  function TemplateTag::__set 									*
+     *													                *
+     *	This method is defined to permit accessing the outerHTML and    *
+     *	innerHTML functions using the same syntax as Javascript         *
+     *													                *
+     *	Parameters:                                                     *
+     *	    $name           name of the function to invoke              *
+     *	    $value          string parameter to pass to the function    *
+     ********************************************************************/
+    public function __set ( string $name , $value )
+    {
+        global $warn;
+
+        if ($name == 'outerHTML')
+            $this->outerHTML($value);
+        else
+        if ($name == 'innerHTML')
+            $this->innerHTML($value);
+        $warn   .= "<p>TemplateTag;;__set('$name', '$value')</p>\n";
+    }
+
+    /********************************************************************
+     *  function TemplateTag::__get 									*
+     *													                *
+     *	This method is defined to permit accessing the outerHTML and    *
+     *	innerHTML functions using the same syntax as Javascript         *
+     *													                *
+     *	Parameters:                                                     *
+     *	    $name           name of the function to invoke              *
+     *													                *
+     *	Returns:										                *
+     *		string containing HTML or XML				                *
+     ********************************************************************/
+    public function __get ( string $name )
+    {
+        global $warn;
+
+        if ($name == 'outerHTML')
+            return $this->outerHTML();
+        else
+        if ($name == 'innerHTML')
+            return $this->innerHTML();
+        else
+        if ($name == 'childNodes')
+            return $this->childNodes();
+
+        $warn   .= "<p>TemplateTag;;__get('$name')</p>\n";
+        return null;
+    }
     /********************************************************************
      *  function TemplateTag::getElementsByTagName						*
      *													                *
@@ -536,7 +622,7 @@ class TemplateTag implements Iterator, ArrayAccess
                     {
                         $newkey     = intval($newkey);
                         if ($newkey >= $index)
-                            $index  = $newKey + 1;
+                            $index  = $newkey + 1;
                     }
                 }
                 else

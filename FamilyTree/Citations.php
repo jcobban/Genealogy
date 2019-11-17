@@ -167,6 +167,8 @@ $parms['offset']	= $offset;
 $parms['limit']	    = $limit;
 
 $template           = new FtTemplate("Citations$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'Citations'));
 
 if (strlen($pattern) == 0)
 	$msg	.= "Please specify a pattern for citations. ";

@@ -1179,13 +1179,15 @@ class Person extends RecordPic
         global $connection;
 
         $indent             = '';
+        $xmlparms           = '';
         if (is_string($xml))
         {		// string tag name
             $matches   		= array();
-            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            if (preg_match('/^(\s*)(\w*)(.*)/', $xml, $matches))
             {
                 $indent		= $matches[1];
                 $xml   		= $matches[2];
+                $xmlparms   = $matches[3];
             }
             $tagname		= $xml;
             $xml	   		= true;
@@ -1199,7 +1201,7 @@ class Person extends RecordPic
 
         $counts	= array();
         $counts['altNameCount']	= 0;
-        $counts['citCount']	= 0;
+        $counts['citCount']	    = 0;
         $counts['eventCount']	= 0;
         $counts['indivCount']	= 0;
 

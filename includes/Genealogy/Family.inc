@@ -45,16 +45,12 @@ use \Exception;
  *		    HusbPrefMar					TINYINT(1)						*
  *				1=preferred, 0=not										*
  *		    HusbSurname					VARCHAR(255)					*
- *				surname is stored here for speed (don't have to join	*
- *				tables). surname is also stored in [sic] Marriage		*
- *				record and in tblNR.Surname								*
  *				This field is no longer used.                           *
  *		    HusbGivenName				VARCHAR(255)					*
  *				This field is no longer used.                           *
  *		    HusbMarrSurname				VARCHAR(255)					*
  *				This field is no longer used.                           *
  *		    HusbBirthSD					INTEGER(10)						*
- *				(see Sort Date)											*
  *				This field is no longer used.                           *
  *		    IDIRWife					INTEGER(10)						*
  *				--> tblIR.IDIR, ID to Person Record of Wife				*
@@ -63,16 +59,12 @@ use \Exception;
  *		    WifePrefMar					TINYINT(1)						*
  *				1=preferred, 0=not										*
  *		    WifeSurname					VARCHAR(255)					*
- *				surname is stored here for speed (don't have to join	*
- *				tables). surname is also stored in [sic] Marriage		*
- *				record and in tblNR.Surname								*
  *				This field is no longer used.                           *
  *		    WifeGivenName				VARCHAR(255)					*
  *				This field is no longer used.                           *
  *		    WifeMarrSurname				VARCHAR(255)					*
  *				This field is no longer used.                           *
  *		    WifeBirthSD					INTEGER(10)						*
- *				(see Sort Date)											*
  *				This field is no longer used.                           *
  *		    MarriedNameRule				TINYINT(1)						*
  *				0=None - don't generate married names,					*
@@ -385,6 +377,8 @@ use \Exception;
  *		2019/09/07      improve support for language translate table    *
  *		                on marriage date in getName                     *
  *		2019/09/20      improve comments describing Family::dump        *
+ *		2019/11/14      change method get to agree with documentation   *
+ *		                in not referencing obsolete fields              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1367,14 +1361,14 @@ class Family extends RecordPic
     {
 		global	$connection;
 
-		$idms	= $this->row['idms'];
+		$idms	        = $this->row['idms'];
 		if (array_key_exists($idms, self::$statusText))
 		    return self::$statusText[$idms];
 		else
 		{
-		    $query	= "SELECT MarStatus FROM tblMS WHERE IDMS=:idms";
+		    $query	    = "SELECT MarStatus FROM tblMS WHERE IDMS=:idms";
 		    $sqlParms	= array('idms'	=> $idms);
-		    $stmt	= $connection->prepare($query);
+		    $stmt	    = $connection->prepare($query);
 		    $queryText	= debugPrepQuery($query, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {
@@ -1566,18 +1560,18 @@ class Family extends RecordPic
      ********************************************************************/
     function getMarEvent($create = false)
     {
-		$event		= $this->marEvent;
+		$event		                = $this->marEvent;
 		if (is_null($event))
 		{		// not initialized
 		    $trow			        = array();
 		    $trow['idir']		    = $this;
 		    $trow['idtype']		    = Event::IDTYPE_MAR;
 		    $trow['idet']		    = Event::ET_MARRIAGE;
-			$trow['eventd']    	    = $this->get('mard');
-			$trow['eventsd']   	    = $this->get('marsd');
-			$trow['idlrevent'] 	    = $this->get('idlrmar');
-			$trow['idar']	        = $this->get('idar');
-			$trow['desc']	        = $this->get('notes');
+			$trow['eventd']    	    = $this->row['mard'];
+			$trow['eventsd']   	    = $this->row['marsd'];
+			$trow['idlrevent'] 	    = $this->row['idlrmar'];
+			$trow['idar']	        = $this->row['idar'];
+			$trow['desc']	        = $this->row['notes'];
 			$trow['description']	= '';
 		    $trow['preferred']		= 1;
 		    if ($create ||
@@ -1615,22 +1609,22 @@ class Family extends RecordPic
 		    $trow['idir']		    = $this;
 		    $trow['idtype']		    = Event::IDTYPE_MAR;
 		    $trow['idet']		    = Event::ET_LDS_SEALED;
-			$trow['eventd']    	    = $this->get('seald');
-			$trow['eventsd']   	    = $this->get('sealsd');
-			$trow['idlrevent'] 	    = $this->get('idtrseal');
+			$trow['eventd']    	    = $this->row['seald'];
+			$trow['eventsd']   	    = $this->row['sealsd'];
+			$trow['idlrevent'] 	    = $this->row['idtrseal'];
 			$trow['kind']	    	= 1;
-			$trow['desc']	    	= $this->get('sealnote');
+			$trow['desc']	    	= $this->row['sealnote'];
 			$trow['description']	= '';
-			$trow['ldstempleready'] = $this->get('ldss');
+			$trow['ldstempleready'] = $this->row['ldss'];
 		    $trow['preferred']		= 1;
 		    if ($create ||
 				$trow['eventsd'] != -99999999 ||
 				$trow['idlrevent'] > 1 ||
 				$trow['desc'] != '')
-		    {		// LDS endow event present
+		    {		// LDS seal event present
 		        $event		        = new Event($trow);
 				$this->sealEvent	= $event;
-		    }		// LDS endow event present
+		    }		// LDS seal event present
 		    else
 				$event			=  null;
 		}		// not initialized
@@ -1658,8 +1652,8 @@ class Family extends RecordPic
 		    $trow['idir']		    = $this;
 		    $trow['idtype']		    = Event::IDTYPE_MAR;
 		    $trow['idet']		    = Event::ET_MARRIAGE_END;
-			$trow['eventd']    	    = $this->get('marendd');
-			$trow['eventsd']   	    = $this->get('marendsd');
+			$trow['eventd']    	    = $this->row['marendd'];
+			$trow['eventsd']   	    = $this->row['marendsd'];
 			$trow['idlrevent'] 	    = 0;
 			$trow['kind']	    	= 1;
 			$trow['desc']	    	= '';
@@ -1710,16 +1704,30 @@ class Family extends RecordPic
      *  Add a new individual event represented by an instance of		*
      *  Event to this Family											*
      *																	*
+     *	Input:															*
+     *		$xml		either boolean or instance of Event				*
+     *																	*
      *  Returns:														*
      *			Instance of Event										*
      ********************************************************************/
     function addEvent($xml=false)
     {
-		$parms	= array('idtype'	=> Event::IDTYPE_MAR,
-						'idir'		=>  $this);
-		$event	= new Event($parms);
-		$event->save($xml);	// write to database
-		$this->events		= null;	// force reinitialization
+        if (is_bool($xml))
+        {
+		    $parms	            = array('idtype'	=> Event::IDTYPE_MAR,
+						                'idir'		=>  $this);
+            $event	            = new Event($parms);
+        }
+        else
+        if ($xml instanceof $event)
+        {
+            $event              = $xml;
+		    $event['idtype']	= Event::IDTYPE_MAR;
+            $event['idir']		= $this->row['idmr'];
+            $xml                = false;
+        }
+		$event->save($xml);	                    // write to database
+		$this->events		    = null;	        // force reinitialization
 
 		return $event;
     }		// function Family::addEvent
@@ -1829,7 +1837,7 @@ class Family extends RecordPic
     function clearEvent($eventid)
     {
 		switch(strtolower($eventid))
-		{			// validate event id
+		{			    // validate event id
 		    case 'mar':
 		    case 'marend':
 		    {			// events using IDLR
@@ -1838,7 +1846,7 @@ class Family extends RecordPic
 				parent::set('idlr' . $eventid, 1);
 				break;
 		    }			// events using IDLR
-		}			// validate event id
+		}			    // validate event id
     }		// function Family::clearEvent
 
     /********************************************************************
@@ -2436,29 +2444,240 @@ catch(Exception $e)
 		    case 'name':
 				return $this->getName(array('includedate' => true));
 
+            case 'husbsurname':
+            {
+                if (is_null($this->husbPriName))
+                    $this->husbPriName  = $this->getHusbPriName();
+                if ($this->husbPriName)
+                    return $this->husbPriName['surname'];
+                else
+                    return '';
+            }
+
+            case 'husbgivenname':
+            {
+                if (is_null($this->husbPriName))
+                    $this->husbPriName  = $this->getHusbPriName();
+                if ($this->husbPriName)
+                    return $this->husbPriName['givenname'];
+                else
+                    return '';
+            }
+
+            case 'husbmarrsurname':
+            {
+                if (is_null($this->husbMarName))
+                    $this->husbMarName  = $this->getHusbMarName();
+                if ($this->husbMarName)
+                    return $this->husbMarName['surname'];
+                else
+                    return '';
+            }
+
+            case 'husbbirthsd':
+            {
+                if (is_null($this->husband))
+                    $this->husband  = $this->getHusband();
+                if ($this->husband)
+                    return $this->husband['birthsd'];
+                else
+                    return -99999999;
+            }
+
+            case 'wifesurname':
+            {
+                if (is_null($this->wifePriName))
+                    $this->wifePriName  = $this->getWifePriName();
+                if ($this->wifePriName)
+                    return $this->wifePriName['surname'];
+                else
+                    return '';
+            }
+
+            case 'wifegivenname':
+            {
+                if (is_null($this->wifePriName))
+                    $this->wifePriName  = $this->getWifePriName();
+                if ($this->wifePriName)
+                    return $this->wifePriName['surname'];
+                else
+                    return '';
+            }
+
+            case 'wifemarrsurname':
+            {
+                if (is_null($this->wifeMarName))
+                    $this->wifeMarName  = $this->getWifeMarName();
+                if ($this->wifeMarName)
+                    return $this->wifeMarName['surname'];
+                else
+                    return '';
+            }                   // wifemarrsurname
+
+            case 'wifebirthsd':
+            {
+                if (is_null($this->wife))
+                    $this->wife  = $this->getWife();
+                if ($this->wife)
+                    return $this->wife['birthsd'];
+                else
+                    return -99999999;
+            }                   // wifebirthsd
+
+            case 'mard':
+            {
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent(false);
+                if ($this->marEvent)
+                    return $this->marEvent['eventd'];
+                else
+                    return '';
+            }                   // mard
+
+            case 'marsd':
+            {
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent(false);
+                if ($this->marEvent)
+                    return $this->marEvent['eventsd'];
+                else
+                    return -99999999;
+            }                   // marsd
+
+            case 'idlrmar':
+            {
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent(false);
+                if ($this->marEvent)
+                    return $this->marEvent['idlrevent'];
+                else
+                    return 1;
+            }                   // idlrmar
+
+            case 'idar':
+            {
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent(false);
+                if ($this->marEvent)
+                    return $this->marEvent['idar'];
+                else
+                    return '';
+            }                   // idar
+
 		    case 'mardate':
 		    {
-				$date	= new LegacyDate($this->row['mard']);
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent(false);
+                if ($this->marEvent)
+                    $mard           = $this->marEvent['eventd'];
+                else
+                    $mard           = '';
+				$date	            = new LegacyDate($mard);
 				return $date->toString();
-		    }
+		    }                   // mardate
 
 		    case 'marloc':
             {
-                $idlrmar    = $this->get('idlrmar');
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent(false);
+                if ($this->marEvent)
+                    $idlrmar        = $this->marEvent['idlrevent'];
+                else
+                    $idlrmar         = 1;
 				if ($idlrmar > 1)
-				{		// not the null location
-				    $marloc	= Location::getLocation($idlrmar);
+				{		        // not the null location
+				    $marloc	        = Location::getLocation($idlrmar);
 				    return $marloc->getName();
-				}		// not the null location
+				}		        // not the null location
 				else
 				    return '';
-		    }
+		    }                   // marloc
+
+            case 'notes':
+		    {
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent(false);
+                if ($this->marEvent)
+                    return $this->marEvent['desc'];
+                else
+                    return '';
+		    }                   // notes
+
+            case 'marendd':
+            {
+                if (is_null($this->marEndEvent))
+                    $this->marEndEvent  = $this->getMarEndEvent(false);
+                if ($this->marEndEvent)
+                    return $this->marEndEvent['eventd'];
+                else
+                    return '';
+            }                   // marendd
+
+            case 'marendsd':
+            {
+                if (is_null($this->marEndEvent))
+                    $this->marEndEvent  = $this->getMarEndEvent(false);
+                if ($this->marEndEvent)
+                    return $this->marEndEvent['eventsd'];
+                else
+                    return '';
+            }                   // marendsd
+
+            case 'seald':
+            {
+                if (is_null($this->sealEvent))
+                    $this->sealEvent  = $this->getSealEvent(false);
+                if ($this->sealEvent)
+                    return $this->sealEvent['eventd'];
+                else
+                    return '';
+            }                   // seald
+
+            case 'sealsd':
+            {
+                if (is_null($this->sealEvent))
+                    $this->sealEvent  = $this->getSealEvent(false);
+                if ($this->sealEvent)
+                    return $this->sealEvent['eventsd'];
+                else
+                    return '';
+            }                   // sealsd
+
+            case 'idtrseal':
+            {
+                if (is_null($this->sealEvent))
+                    $this->sealEvent  = $this->getSealEvent(false);
+                if ($this->sealEvent)
+                    return $this->sealEvent['idlrevent'];
+                else
+                    return 1;
+            }                   // idtrseal
+
+            case 'sealnote':
+            {
+                if (is_null($this->sealEvent))
+                    $this->sealEvent  = $this->getSealEvent(false);
+                if ($this->sealEvent)
+                    return $this->sealEvent['desc'];
+                else
+                    return '';
+            }                   // sealnote
+
+            case 'ldss':
+            {
+                if (is_null($this->sealEvent))
+                    $this->sealEvent  = $this->getSealEvent(false);
+                if ($this->sealEvent)
+                    return $this->sealEvent['ldstempleready'];
+                else
+                    return 0;
+            }                   // idtrseal
 
 		    default:
-		    {		// other fields
+		    {		            // other fields
 				return parent::get($fieldLc);
-		    }		// other fields
-		}			// act on specific field
+		    }		            // other fields
+		}			            // act on specific field
     }		// function Family::get
 
     /********************************************************************
@@ -2488,12 +2707,88 @@ catch(Exception $e)
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
 		{
-		    case 'mard':
-		    case 'marendd':
-		    case 'seald':
-		    {		// legacy internal date format
-				$sdname	        = substr($field, 0, strlen($field)-1) . 'sd';
-				$oldvalue		= $this->row[$field];
+            case 'husbsurname':
+            {
+                if (is_null($this->husbPriName))
+                    $this->husbPriName  = $this->getHusbPriName();
+                if ($this->husbPriName)
+                    return $this->husbPriName->set('surname', $value);
+                else
+                    return '';
+            }
+
+            case 'husbgivenname':
+            {
+                if (is_null($this->husbPriName))
+                    $this->husbPriName  = $this->getHusbPriName();
+                if ($this->husbPriName)
+                    return $this->husbPriName->set('givenname', $value);
+                else
+                    return '';
+            }
+
+            case 'husbmarrsurname':
+            {
+                if (is_null($this->husbMarName))
+                    $this->husbMarName  = $this->getHusbMarName();
+                if ($this->husbMarName)
+                    return $this->husbMarName->set('surname', $value);
+                else
+                    return '';
+            }
+
+            case 'husbbirthsd':
+            {
+                if (is_null($this->husband))
+                    $this->husband  = $this->getHusband();
+                if ($this->husband)
+                    return $this->husband->set('birthsd', $value);
+                else
+                    return -99999999;
+            }
+
+            case 'wifesurname':
+            {
+                if (is_null($this->wifePriName))
+                    $this->wifePriName  = $this->getWifePriName();
+                if ($this->wifePriName)
+                    return $this->wifePriName->set('surname', $value);
+                else
+                    return '';
+            }
+
+            case 'wifegivenname':
+            {
+                if (is_null($this->wifePriName))
+                    $this->wifePriName  = $this->getWifePriName();
+                if ($this->wifePriName)
+                    return $this->wifePriName->set('surname', $value);
+                else
+                    return '';
+            }
+
+            case 'wifemarrsurname':
+            {
+                if (is_null($this->wifeMarName))
+                    $this->wifeMarName  = $this->getWifeMarName();
+                if ($this->wifeMarName)
+                    return $this->wifeMarName->set('surname', $value);
+                else
+                    return '';
+            }                   // wifemarrsurname
+
+            case 'wifebirthsd':
+            {
+                if (is_null($this->wife))
+                    $this->wife  = $this->getWife();
+                if ($this->wife)
+                    return $this->wife->set('birthsd', $value);
+                else
+                    return -99999999;
+            }                   // wifebirthsd
+
+            case 'mard':
+            {
 				if ($value instanceof LegacyDate)
 				{	// parameter is an instance of LegacyDate
 				    $date	    = $value;
@@ -2501,26 +2796,202 @@ catch(Exception $e)
 				else
 				{	// convert the value to instance of LegacyDate
 				    $date	    = new LegacyDate(' ' . $value);
-				}	// convert the value to instance of LegacyDate
-				parent::set($field, $date->getDate());
-				parent::set($sdname, $date->getSortDate());
-				return $oldvalue;
-		    }		// legacy internal date format
+                }	// convert the value to instance of LegacyDate
+                $value          = $date->getDate();
+                $sort           = $date->getSortDate();
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent($value !== '');
+                if ($this->marEvent)
+                {
+                    $this->marEvent->set('eventsd', $sort);
+                    return $this->marEvent->set('eventd', $value);
+                }
+                else
+                    return '';
+            }                   // mard
 
-		    case 'idlrmar':
-		    {		// value is IDLR
+            case 'marsd':
+            {                   // can only be changed by setting mard
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent(false);
+                if ($this->marEvent)
+                    return $this->marEvent['eventsd'];
+                else
+                    return -99999999;
+            }                   // marsd
+
+            case 'idlrmar':
+            {
 				if (is_int($value) || ctype_digit($value))
 				{
+                    if (is_null($this->marEvent))
+                        $this->marEvent  = $this->getMarEvent($value > 1);
 				    $tmp	    = Location::getLocation($value);
-				    if ($tmp->isExisting())
-						return parent::set($field, $value);
+                    if ($tmp->isExisting())
+                    {
+                        if ($this->marEvent)
+                            return $this->marEvent->set('idlrevent', $value);
+                        else
+                            return 1;
+                    }
+                    else
+                    {
+				        $warn       .= "<p>Family::set: " . 
+                        "invalid value '$value' for field '$field'</p>\n";
+                        if ($this->marEvent)
+                            return $this->marEvent['idlrevent'];
+                        else
+                            return 1;
+                    }
 				}
 				else
                 {
 				    $warn       .= "<p>Family::set: " . 
                         "invalid value '$value' for field '$field'</p>\n";
-                    return $this->row[$fieldLc];
+                    return $this[$fieldLc];
                 }
+            }                   // idlrmar
+
+            case 'idar':
+            {
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent($value > 1);
+                if ($this->marEvent)
+                    return $this->marEvent->set('idar', $value);
+                else
+                    return '';
+            }                   // idar
+
+            case 'notes':
+		    {
+                if (is_null($this->marEvent))
+                    $this->marEvent  = $this->getMarEvent(false);
+                if ($this->marEvent)
+                    return $this->marEvent->set('desc', $value);
+                else
+                    return '';
+		    }                   // notes
+
+            case 'marendd':
+            {
+				if ($value instanceof LegacyDate)
+				{	// parameter is an instance of LegacyDate
+				    $date	    = $value;
+				}	// parameter is an instance of LegacyDate
+				else
+				{	// convert the value to instance of LegacyDate
+				    $date	    = new LegacyDate(' ' . $value);
+                }	// convert the value to instance of LegacyDate
+                $value          = $date->getDate();
+                $sort           = $date->getSortDate();
+                if (is_null($this->marEndEvent))
+                    $this->marEndEvent  = $this->getMarEndEvent($value !== '');
+                if ($this->marEndEvent)
+                {
+                    $this->marEndEvent->set('eventsd', $sort);
+                    return $this->marEndEvent->set('eventd', $value);
+                }
+                else
+                    return '';
+            }                   // marendd
+
+            case 'marendsd':
+            {                   // can only be changed by setting mard
+                if (is_null($this->marEndEvent))
+                    $this->marEndEvent  = $this->getMarEndEvent(false);
+                if ($this->marEndEvent)
+                    return $this->marEndEvent['eventsd'];
+                else
+                    return '';
+            }                   // marendsd
+
+            case 'seald':
+            {
+				if ($value instanceof LegacyDate)
+				{	// parameter is an instance of LegacyDate
+				    $date	    = $value;
+				}	// parameter is an instance of LegacyDate
+				else
+				{	// convert the value to instance of LegacyDate
+				    $date	    = new LegacyDate(' ' . $value);
+                }	// convert the value to instance of LegacyDate
+                $value          = $date->getDate();
+                $sort           = $date->getSortDate();
+                if (is_null($this->sealEvent))
+                    $this->sealEvent  = $this->getSealEvent($value !== '');
+                if ($this->sealEvent)
+                {
+                    $this->sealEvent->set('eventsd', $sort);
+                    return $this->sealEvent->set('eventd', $value);
+                }
+                else
+                    return '';
+            }                   // seald
+
+            case 'sealsd':
+            {                   // can only be changed by setting mard
+                if (is_null($this->sealEvent))
+                    $this->sealEvent  = $this->getSealEvent(false);
+                if ($this->sealEvent)
+                    return $this->sealEvent['eventsd'];
+                else
+                    return '';
+            }                   // sealsd
+
+            case 'idtrseal':
+            {
+				if (is_int($value) || ctype_digit($value))
+				{
+                    if (is_null($this->sealEvent))
+                        $this->sealEvent  = $this->getSealEvent($value > 1);
+				    $tmp	    = Temple::getTemple($value);
+                    if ($tmp->isExisting())
+                    {
+                        if ($this->sealEvent)
+                            return $this->sealEvent->set('idlrevent', $value);
+                        else
+                            return 1;
+                    }
+                    else
+                    {
+				        $warn       .= "<p>Family::set: " . 
+                        "invalid value '$value' for field '$field'</p>\n";
+                        if ($this->sealEvent)
+                            return $this->sealEvent['idlrevent'];
+                        else
+                            return 1;
+                    }
+				}
+				else
+                {
+				    $warn       .= "<p>Family::set: " . 
+                        "invalid value '$value' for field '$field'</p>\n";
+                    return $this[$fieldLc];
+                }
+            }                   // idtrseal
+
+            case 'sealnote':
+            {
+                if (is_null($this->sealEvent))
+                    $this->sealEvent  = $this->getSealEvent(false);
+                if ($this->sealEvent)
+                    return $this->sealEvent->set('desc', $value);
+                else
+                    return '';
+            }                   // sealnote
+
+            case 'ldss':
+            {
+                if (is_null($this->sealEvent))
+                    $this->sealEvent  = $this->getSealEvent(false);
+                if ($this->sealEvent)
+                    return $this->sealEvent->set('ldstempleready', $value);
+                else
+                    return 0;
+            }                   // idtrseal
+
+		    case 'idlrmar':
+		    {		// value is IDLR
 		    }		// value is IDLR
 
 		    case 'idar':
@@ -2566,18 +3037,6 @@ catch(Exception $e)
                     return $this->row[$fieldLc];
                 }
 		    }		// value is no (0) or yes (1)
-
-		    case 'husbsurname':
-		    case 'husbgivenname':
-		    case 'husbbirthsd':
-		    case 'wifesurname':
-		    case 'wifegivenname':
-		    case 'wifebirthsd':
-            {		// fields maintained through method setName
-                $oldvalue               = $this->row[$fieldLc];
-                $this->row[$fieldLc]    = $value;
-                return $oldvalue;
-		    }		// fields maintained through method setName
 
 		    default:
 		    {		// no validation implemented yet

@@ -1,5 +1,5 @@
 <!--*********************************************************************
- *  ancestorReporten.html												*
+ *  ancestorReportennlhtml												*
  *																		*
  *  Display a web page containing a report of the ancestors of an		*
  *  individual.															*
@@ -10,7 +10,6 @@
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
-<link rel='stylesheet' type='text/css' href='ancestorReport.css'>
   <div id="breadcrumbs" class="hidden">
 	  <a href="/index.html">Home</a>:
     <a href="/genealogy.php?lang=$LANG">
@@ -56,13 +55,13 @@
     $TRACE
     $MSG
     <p class="message" id="private">
-        This individual is private.  Cannot display ancestors.
+        Deze persoon is privé. Kan voorouders niet weergeven
     </p>
     <form name="depthForm" id="depthForm" action="ancestorReport.php"
 				method="get">
       <div class="row">
 		<label class="column1" for="ancDepth">
-		  Maximum depth in generations:
+		  Maximale diepte in generaties:
 		</label> 
 		<input type="text" name="ancDepth" id="ancDepth"
 				size="2" class="white rightnc"
@@ -73,7 +72,7 @@
       </div>  <!-- class="row" -->
       <div class="row">
 		<label class="column1" for="incLocsSet">
-		  Display locations?
+		  Toon locaties?
 		</label>
 		<input type="checkbox" name="incLocsSet" id="incLocsSet"
 				value="1" $INCLOCSCHECKED>

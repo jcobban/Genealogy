@@ -169,6 +169,7 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/07/20      insert spaces into death date                   *
+ *		2019/11/15      pass requested language to child dialogs        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -761,9 +762,13 @@ function emKeyDown(e)
  ************************************************************************/
 function editHusb(e)
 {
-    var	button	= this;
-    var	form	= button.form;
-    var idir	= form.IDIRHusb.value;
+    var	button				= this;
+    var	form				= button.form;
+    var idir				= form.IDIRHusb.value;
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+
     if (idir > 0)
     {		// husband present
 		for (var ib = 0; ib < editChildButtons.length; ib++)
@@ -771,12 +776,13 @@ function editHusb(e)
 		    editChildButtons[ib].disabled	= true;
 		}			// disable all editChild buttons
 		var script	= "editIndivid.php?idir=" + idir + "&rowid=Husb" +
-		  "&initGivenName=" + encodeURIComponent(form.HusbGivenName.value) + 
-		  "&initSurname=" + encodeURIComponent(form.HusbSurname.value) +
-		  '&treeName=' + encodeURIComponent(form.treename.value);
-		var childWindow	= openFrame("husbFrame",
-						    script,
-						    "left");
+		    "&initGivenName=" + encodeURIComponent(form.HusbGivenName.value) + 
+		    "&initSurname=" + encodeURIComponent(form.HusbSurname.value) +
+		    '&treeName=' + encodeURIComponent(form.treename.value) +
+            '&lang=' + lang;
+		var childWindow	    = openFrame("husbFrame",
+						                script,
+						                "left");
 		childWindows.push(childWindow);
     }		// husband present
     else
@@ -795,27 +801,32 @@ function editHusb(e)
  ************************************************************************/
 function chooseHusb(e)
 {
-    var	form	= this.form;
-    var	url	= "chooseIndivid.php?id=Husb&name=" + 
-				encodeURIComponent(form.HusbSurname.value + ", " + 
-						   form.HusbGivenName.value);
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+    var	form	            = this.form;
+    var	url	                = "chooseIndivid.php?id=Husb&name=" + 
+				            encodeURIComponent(form.HusbSurname.value + ", " + 
+						                       form.HusbGivenName.value);
 
-    var	wifeBirthSD	= form.WifeBirthSD;
+    var	wifeBirthSD	        = form.WifeBirthSD;
     if (wifeBirthSD)
     {
-		var	value	= wifeBirthSD.value;
+		var	value	        = wifeBirthSD.value;
 		if (value.length > 0 && value != '0' && value != '-99999999')
 		{
 		    var	birthYear	= Math.floor(value / 10000);
-		    url		+= "&birthmin=" + (birthYear - 40) +
-					   "&birthmax=" + (birthYear + 40);
+		    url		        += "&birthmin=" + (birthYear - 40) +
+					           "&birthmax=" + (birthYear + 40);
 		}
     }			// birth SD field present
-    url		+= '&treeName=' + encodeURIComponent(form.treename.value);
+    url		                += '&treeName=' + 
+                                    encodeURIComponent(form.treename.value) +
+                               '&lang=' + lang;
 
-    var childWindow	= openFrame("chooserFrame",
-						    url,
-						    "left");
+    var childWindow	        = openFrame("chooserFrame",
+						                url,
+						                "left");
 }		// function chooseHusb
 
 /************************************************************************
@@ -873,25 +884,30 @@ function noHusb()
  ************************************************************************/
 function editWife()
 {
-    var	button	= this;
-    var	form	= button.form;
-    var idir	= form.IDIRWife.value;
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+    var	button	            = this;
+    var	form	            = button.form;
+    var idir	            = form.IDIRWife.value;
     if (idir > 0)
     {		// wife present
 		for (var ib = 0; ib < editChildButtons.length; ib++)
 		{			// disable all editChild buttons
 		    editChildButtons[ib].disabled	= true;
 		}			// disable all editChild buttons
-		var script	= "editIndivid.php?idir=" + idir + "&rowid=Wife" +
+		var script	        = "editIndivid.php?idir=" + idir + 
+                              "&rowid=Wife" +
 							  "&initGivenName=" +
 						encodeURIComponent(form.WifeGivenName.value) + 
 							  "&initSurname=" +
 						encodeURIComponent(form.WifeSurname.value);
 							  '&treeName=' +
-						encodeURIComponent(form.treename.value);
-		var childWindow	= openFrame("wifeFrame",
-						    script,
-						    "left");
+						encodeURIComponent(form.treename.value) +
+                              '&lang=' + lang;
+		var childWindow	    = openFrame("wifeFrame",
+						                script,
+						                "left");
 		childWindows.push(childWindow);
     }		// wife present
     else
@@ -909,37 +925,42 @@ function editWife()
  ************************************************************************/
 function chooseWife()
 {
-    var	form	= this.form;
-    var url	= "chooseIndivid.php?id=Wife&name=" +
-					encodeURIComponent(form.WifeSurname.value + ", " +
-							   form.WifeGivenName.value);
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+    var	form    	        = this.form;
+    var url	                = "chooseIndivid.php?id=Wife&name=" +
+        					encodeURIComponent(form.WifeSurname.value + ", " +
+		                					   form.WifeGivenName.value);
 
-    var	husbBirthSD	= form.HusbBirthSD;
+    var	husbBirthSD	        = form.HusbBirthSD;
     if (husbBirthSD)
     {
-		var	value	= husbBirthSD.value;
+		var	value	        = husbBirthSD.value;
 		if (value.length > 0 && value != '0' && value != '-99999999')
 		{
 		    var	birthYear	= Math.floor(value / 10000);
-		    url		+= "&birthmin=" + (birthYear - 40) +
-					   "&birthmax=" + (birthYear + 40);
+		    url		        += "&birthmin=" + (birthYear - 40) +
+			    	    	   "&birthmax=" + (birthYear + 40);
 		}
     }			// birth SD field present
-    url		+= '&treeName=' + encodeURIComponent(form.treename.value);
+    url		                += '&treeName=' + 
+                                encodeURIComponent(form.treename.value) +
+                                '&lang=' + lang;
 
-    var childWindow	= openFrame("chooserFrame",
-						    url,
-						    "left");
+    var childWindow	        = openFrame("chooserFrame",
+						                url,
+						                "left");
 }		// function chooseWife
 
 /************************************************************************
- *  function gotWife														*
+ *  function gotWife													*
  *																		*
  *  This method is called when the XML file representing				*
- *  information on the new wife is retrieved.								*
+ *  information on the new wife is retrieved.							*
  *																		*
- *  Parameters:																*
- *		xmlDoc				response as an XML document						*
+ *  Parameters:															*
+ *		xmlDoc			response as an XML document						*
  ************************************************************************/
 function gotWife(xmlDoc)
 {
@@ -988,14 +1009,18 @@ function noWife()
  ************************************************************************/
 function createHusb(e)
 {
-    var	form		= this.form;
-    var script		= "editIndivid.php?rowid=Husb&initGender=0" +
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+    var	form		        = this.form;
+    var script		        = "editIndivid.php?rowid=Husb&initGender=0" +
 		  "&initGivenName=" + encodeURIComponent(form.HusbGivenName.value) + 
 		  "&initSurname=" + encodeURIComponent(form.HusbSurname.value) + 
-    	  '&treeName=' + encodeURIComponent(form.treename.value);
-    var childWindow	= openFrame("husbFrame",
-						    script,
-						    "left");
+    	  '&treeName=' + encodeURIComponent(form.treename.value) +
+                              '&lang=' + lang;
+    var childWindow	        = openFrame("husbFrame",
+						                script,
+						                "left");
     childWindows.push(childWindow);
     for (var ib = 0; ib < editChildButtons.length; ib++)
     {				// disable all editChild buttons
@@ -1015,14 +1040,18 @@ function createHusb(e)
  ************************************************************************/
 function createWife(e)
 {
-    var	form		= this.form;
-    var script		= "editIndivid.php?rowid=Wife&initGender=1" +
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+    var	form		        = this.form;
+    var script		        = "editIndivid.php?rowid=Wife&initGender=1" +
 		  "&initGivenName=" + encodeURIComponent(form.WifeGivenName.value) + 
 		  "&initSurname=" + encodeURIComponent(form.WifeSurname.value) + 
-    	  '&treeName=' + encodeURIComponent(form.treename.value);
-    var childWindow	= openFrame("wifeFrame",
-						    script,
-						    "left");
+    	  '&treeName=' + encodeURIComponent(form.treename.value) +
+                              '&lang=' + lang;
+    var childWindow	        = openFrame("wifeFrame",
+						                script,
+						                "left");
     childWindows.push(childWindow);
     for (var ib = 0; ib < editChildButtons.length; ib++)
     {				// disable all editChild buttons
@@ -1044,99 +1073,108 @@ function createWife(e)
 function em1KeyDown(e)
 {
     if (!e)
-    {		// browser is not W3C compliant
-		e	=  window.event;	// IE
-    }		// browser is not W3C compliant
-    var	code	= e.keyCode;
-    var	form	= document.famForm;
+    {		                // browser is not W3C compliant
+		e	            =  window.event;	// IE
+    }		                // browser is not W3C compliant
+    var	code	        = e.key;
+    var	form	        = document.famForm;
 
     if (e.ctrlKey)
-    {		// ctrl
-		if (code == 83)
-		{		// letter 'S'
+    {		                // ctrl
+		if (key == 's' || key == 'S')
+		{		            // letter 'S'
 		    var	button	= form.update;
 		    button.click();
 		    return false;	// do not perform standard action
-		}		// letter 'S'
-    }		// ctrl
+		}		            // letter 'S'
+    }		                // ctrl
 
     // handle alt-Key combinations
     if (e.altKey)
-    {		// alt
+    {		                // alt
 		var	button	= null;
 		// take action based upon code
 		switch (code)
 		{
-		    case 65:
-		    {		// letter 'A'
+		    case 'a':
+		    case 'A':
+		    {				// letter 'A'
 				button	= document.getElementById('addCitation');
 				button.click();
 				return false;
-		    }		// letter 'A'
+		    }				// letter 'A'
     
-		    case 69:
-		    {		// letter 'E'
+		    case 'e':
+		    case 'E':
+		    {				// letter 'E'
 				button	= document.getElementById('addChild');
 				button.click();
 				return false;
-		    }		// letter 'E'
+		    }				// letter 'E'
     
-		    case 72:
-		    {		// letter 'H'
+		    case 'h':
+		    case 'H':
+		    {				// letter 'H'
 				button	= document.getElementById('createHusb');
 				button.click();
 				return false;
-		    }		// letter 'H'
+		    }				// letter 'H'
     
-		    case 78:
-		    {		// letter 'N'
+		    case 'n':
+		    case 'N':
+		    {				// letter 'N'
 				button	= document.getElementById('addNewChild');
 				button.click();
 				return false;
-		    }		// letter 'N'
+		    }				// letter 'N'
     
-		    case 79:
-		    {		// letter 'O'
+		    case 'o':
+		    case 'O':
+		    {				// letter 'O'
 				button	= document.getElementById('orderChildren');
 				button.click();
 				return false;
-		    }		// letter 'O'
+		    }				// letter 'O'
 
-		    case 80:
-		    {		// letter 'P'
+		    case 'p':
+		    case 'P':
+		    {				// letter 'P'
 				button	= document.getElementById('Pictures');
 				button.click();
 				return false;
-		    }		// letter 'P'
+		    }				// letter 'P'
     
-		    case 85:
-		    {		// letter 'U'
+		    case 'u':
+		    case 'U':
+		    {				// letter 'U'
 				button	= document.getElementById('update');
 				button.click();
 				return false;
-		    }		// letter 'U'
+		    }				// letter 'U'
     
-		    case 86:
-		    {		// letter 'V'
+            case 'v':
+		    case 'V':
+		    {		    	// letter 'V'
 				button	= document.getElementById('Events');
 				button.click();
 				return false;
-		    }		// letter 'V'
+		    }		    	// letter 'V'
     
-		    case 87:
-		    {		// letter 'W'
+		    case 'w':
+		    case 'W':
+		    {		    	// letter 'W'
 				button	= document.getElementById('createWife');
 				button.click();
 				return false;
-		    }		// letter 'N'
+		    }		    	// letter 'W'
 
 		    default:
 		    {
-				//alert("alt-" + code);
+					//alert("alt-" + code);
 				return true;
 		    } 
-		}	    // switch on key code
-    }		// alt key held down
+		}	            	// switch on key code
+    }		            	// alt key held down
 
     return true;
 }		// function em1KeyDown

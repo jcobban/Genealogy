@@ -283,6 +283,8 @@ else
 	$action		= 'Display';
 
 $template		= new FtTemplate("Addresses$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		             array('filename'   => '/FamilyTree/Addresses'));
 
 if ($count == 0)
 {

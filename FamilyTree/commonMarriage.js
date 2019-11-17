@@ -112,7 +112,7 @@
  *		2014/07/15		only prevent saving marriage once for open		*
  *						child edit windows, and use popupAlert			*
  *		2014/07/16		better support for checking for open child		*
- *						function windows									*
+ *						function windows								*
  *		2014/07/19		if not opened as a dialog go back to previous	*
  *						page instead of closing the window				*
  *		2014/09/12		remove use of obsolete selectOptByValue			*
@@ -195,6 +195,10 @@
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/06/29      first parameter of displayDialog removed        *
  *		2019/07/20      insert spaces into child death date             *
+ *		2019/11/07      use keyEvent.key instead of keyEvent.code       *
+ *		2019/11/11      correctly add "delete" button when no more      *
+ *		                families                                        *
+ *		2019/11/15      add language parameter to opening editIndivid   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -886,63 +890,71 @@ function marrDel()
  ************************************************************************/
 function gotDelMarr(xmlDoc)
 {
-    hideLoading();	// hide loading indicator
+    hideLoading();	            // hide loading indicator
     if (xmlDoc.documentElement)
-    {		// XML document
-		var	root	= xmlDoc.documentElement;
+    {		                    // XML document
+		var	root	            	= xmlDoc.documentElement;
 		if (root.tagName == "deleted")
-		{		// correctly formatted response
-		    var msgs	= root.getElementsByTagName("msg");
+		{		                // correctly formatted response
+		    var msgs	        	= root.getElementsByTagName("msg");
 		    if (msgs.length == 0)
-		    {		// no errors detected
-				var parms	= root.getElementsByTagName("parms");
-				var idmrtag	= parms[0].getElementsByTagName("idmr");
-				var idmr	= idmrtag[0].textContent.trim();
-				var row		= document.getElementById("marriage" + idmr);
-				var section	= row.parentNode;
+		    {		            // no errors detected
+				var parms	    	= root.getElementsByTagName("parms");
+				var idmrtag	    	= parms[0].getElementsByTagName("idmr");
+				var idmr	    	= idmrtag[0].textContent.trim();
+				var row		    	= document.getElementById("marriage" + idmr);
+				var section	    	= row.parentNode;
 				section.removeChild(row);
-				if (section.rows.length < 1)
-				{			// deleted last marriage
+                var numFamilies     = section.rows.length;
+				if (numFamilies == 0)
+				{			    // deleted last marriage
 				    // notify the opener (editIndivid.php)
 				    // that there are no marriages left
-				    var	opener	= null;
+				    var	opener		= null;
 				    if (window.frameElement && window.frameElement.opener)
-						opener	= window.frameElement.opener;
+						opener		= window.frameElement.opener;
 				    else
-						opener	= window.opener;
-				    if (opener && opener.document.indForm)
-				    {
-						try {
-						    opener.document.indForm.marriageUpdated(0,
-										section.rows.length);
-						} catch(e) { alert("commonMarriage.js: 928 e=" + e); }
-				    }
+						opener		= window.opener;
+
 				    if (opener)
+				    {           // opened from another dialog
+                        var openerForm  = opener.document.indForm;
+                        if (openerForm)
+                        {       // opened from editIndivid.php
+						    try {
+						        openerForm.marriageUpdated(0,
+							    			               numFamilies);
+						    } catch(e)
+                            { 
+                                alert("commonMarriage.js: 928 e=" + e); 
+                            }
+                        }       // opened from editIndivid.php
 						closeFrame();
+				    }           // opened from another dialog
 				    else
 						window.history.back();
-				}			// deleted last marriage
+				}			    // deleted last marriage
 				else
-				{			// at least one marriage left
-				    var famForm	= document.famForm;
-				    var	currIdmr= famForm.idmr.value;
+				{			    // at least one marriage left
+				    var famForm	    = document.famForm;
+				    var	currIdmr    = famForm.idmr.value;
 				    if (idmr == currIdmr)
 				    {			// deleted currently displayed family
-						var row	= section.rows[0];
-						idmr	= row.id.substring(8);
-						var edit= document.getElementById('Edit' + idmr);
+						var row	    = section.rows[0];
+						idmr	    = row.id.substring(8);
+						var edit    = document.getElementById('Edit' + idmr);
 						edit.click();
 				    }			// deleted currently displayed family
-				}			// at least one marriage left
-		    }		// no errors detected
+				}			    // at least one marriage left
+		    }		            // no errors detected
 		    else
-		    {		// report message
+		    {		            // report message
 				alert("commonMarriage.js: gotDelMarr: " + tagToString(msgs[0]));
-		    }		// report message
-		}		// correctly formatted response
+		    }		            // report message
+		}		                // correctly formatted response
 		else
 		    alert("commonMarriage.js: gotDelMarr: " + tagToString(root));
-    }		// XML document
+    }		                    // XML document
     else
 		alert("commonMarriage.js: gotDelMarr: " + xmlDoc);
 }		// function gotDelMarr
@@ -1452,19 +1464,19 @@ function addExistingChild()
 }		// function addExistingChild
 
 /************************************************************************
- *  function detachHusb														*
+ *  function detachHusb													*
  *																		*
  *  This method is called when the user requests that the current		*
- *  husband be detached with no replacement.								*
+ *  husband be detached with no replacement.							*
  *																		*
  *  Input:																*
- *		this		<button id='detachHusb'> element						*
+ *		this		<button id='detachHusb'> element					*
  ************************************************************************/
 function detachHusb()
 {
-    var	famForm			= this.form;
+    var	famForm			        = this.form;
 
-    famForm.IDIRHusb.value	= 0;
+    famForm.IDIRHusb.value	    = 0;
     famForm.HusbGivenName.value	= '';
     famForm.HusbSurname.value	= '';
     document.getElementById('detachHusb').disabled	= true;
@@ -1472,19 +1484,19 @@ function detachHusb()
 }		// function detachHusb
 
 /************************************************************************
- *  function detachWife														*
+ *  function detachWife													*
  *																		*
  *  This method is called when the user requests that the current		*
  *  wife be detached with no replacement.								*
  *																		*
  *  Input:																*
- *		this		<button id='detachWife'> element						*
+ *		this		<button id='detachWife'> element					*
  ************************************************************************/
 function detachWife()
 {
-    var	famForm			= this.form;
+    var	famForm			        = this.form;
 
-    famForm.IDIRWife.value	= 0;
+    famForm.IDIRWife.value	    = 0;
     famForm.WifeGivenName.value	= '';
     famForm.WifeSurname.value	= '';
     document.getElementById('detachWife').disabled	= true;
@@ -1567,33 +1579,43 @@ function detChild(ev)
 function editChild(ev)
 {
     if (!ev)
-        ev          = window.event;
+        ev                  = window.event;
     ev.stopPropagation();
 
-    var msg		    = 'args={';
-    var	initIdir	= 0;
+    var msg		            = 'args={';
+    var	initIdir	        = 0;
+    var lang                = 'en';
     for (attr in args)
-    {
-		msg	+= attr + "='" + args[attr] + "',";
-		if (attr == 'id' || attr == 'idir')
-		    initIdir	= args[attr];
+    {                       // loop through attributes
+		msg	                += attr + "='" + args[attr] + "',";
+        switch(attr.toLowerCase())
+        {
+		    case 'id':
+            case 'idir':
+		        initIdir	= args[attr];
+                break;
+
+            case 'lang':
+		        lang        = args[attr];
+                break;
+        }                   // switch on attribute name
     }
 
-    var	button		= this;
-    var	form		= button.form;
-    var	rownum		= button.id.substr(EDIT_CHILD_PREFIX_LEN);
-    var	cell		= button.parentNode;
-    var	row		    = cell.parentNode;
-    var	rowid		= row.id;
-    var script		= 'editIndivid.php?rowid=' + rowid;
-    var	idmr		= form.idmr.value - 0;
-    var	cIdir		= form.elements['CIdir' + rownum];
+    var	button				= this;
+    var	form				= button.form;
+    var	rownum				= button.id.substr(EDIT_CHILD_PREFIX_LEN);
+    var	cell				= button.parentNode;
+    var	row		    		= cell.parentNode;
+    var	rowid				= row.id;
+    var script				= 'editIndivid.php?rowid=' + rowid;
+    var	idmr				= form.idmr.value - 0;
+    var	cIdir				= form.elements['CIdir' + rownum];
     if (cIdir)
-		script		+= "&idir=" + cIdir.value;
+		script		        += "&idir=" + cIdir.value;
     if (initIdir && initIdir == cIdir.value)
     {				// edit dialog for this child already open
 		// ask user to confirm delete
-		var parms	= {
+		var parms	        = {
 				'givenname'	: form.elements['CGiven' + rownum].value,
 				'surname'	: form.elements['CSurname' + rownum].value,
 				'idir'		: cIdir,
@@ -1604,54 +1626,57 @@ function editChild(ev)
 					  null);			// just close on any button
 		return;
     }				// edit dialog for this child already open
-    var	cIdcr		= form.elements['CIdcr' + rownum];
-    var	idcr		= 0;
+    var	cIdcr				= form.elements['CIdcr' + rownum];
+    var	idcr				= 0;
     if (cIdcr)
     {
-		idcr		= cIdcr.value - 0;
-		script		+= "&idcr=" + idcr;
+		idcr				= cIdcr.value - 0;
+		script		        += "&idcr=" + idcr;
 		if (idcr == 0)
-		    script	+= "&parentsIdmr=" + idmr;	// add child
+		    script	        += "&parentsIdmr=" + idmr;	// add child
     }
  
     // pass the values of the fields in this row to the edit form
-    var	cGiven		= form.elements['CGiven' + rownum];
-    var	cSurname	= form.elements['CSurname' + rownum];
-    var	cBirth		= form.elements['Cbirth' + rownum];
-    var	cDeath		= form.elements['Cdeath' + rownum];
+    var	cGiven				= form.elements['CGiven' + rownum];
+    var	cSurname			= form.elements['CSurname' + rownum];
+    var	cBirth				= form.elements['Cbirth' + rownum];
+    var	cDeath				= form.elements['Cdeath' + rownum];
     if (cGiven)
     {			// child given name present in row
-		script		+= '&initGivenName=' + 
-							encodeURIComponent(cGiven.value) +
-						   '&initGender=' +
-							cGiven.className;
+		script		        += '&initGivenName=' + 
+							    encodeURIComponent(cGiven.value) +
+						        '&initGender=' +
+							    cGiven.className;
     }			// child given name present in row
     else
     {			// logic error
-		var	msg	    = "";
-		var	comma	= "";
+		var	msg	    		= "";
+		var	comma			= "";
 		for(var ie=0; ie < form.elements.length; ie++)
 		{
-		    var element	= form.elements[ie];
-		    msg		+= comma + element.name + "='" + element.value + "'";
-		    comma	= ",";
+		    var element		= form.elements[ie];
+		    msg		        += comma + element.name + "='" + 
+                                element.value + "'";
+		    comma			= ",";
 		}
 		alert("editChild: unable to get form.element['CGiven" +
 		      rownum + "'] elements={" + msg + "}");
     }			// logic error
 
     if (cSurname)
-		script		+= '&initSurname=' + 
-							encodeURIComponent(cSurname.value);
+		script				+= '&initSurname=' + 
+							    encodeURIComponent(cSurname.value);
     if (cBirth)
-		script		+= '&initBirthDate=' + 
-							encodeURIComponent(cBirth.value);
+		script				+= '&initBirthDate=' + 
+							    encodeURIComponent(cBirth.value);
     if (cDeath)
-		script		+= '&initDeathDate=' + 
-							encodeURIComponent(cDeath.value);
-    script		+= '&treeName=' +
-							encodeURIComponent(form.treename.value);
-    script		+= '&debug=' + debug;
+		script				+= '&initDeathDate=' + 
+							    encodeURIComponent(cDeath.value);
+    script		    		+= '&treeName=' +
+							    encodeURIComponent(form.treename.value);
+    if (debug.toLowerCase() == 'y')
+        script				+= '&debug=' + debug;
+    script          		+= '&lang=' + lang;
 
     // disable all of the edit family member buttons
     for (var ib = 0; ib < editChildButtons.length; ib++)
@@ -1877,37 +1902,37 @@ function changeCDeath()
  *  Input:																*
  *		this	<button id='update'> element							*
  ************************************************************************/
-var	updateMarriageParms	= "";
-var	updatingMarriage	= false;
+var	updateMarriageParms	        = "";
+var	updatingMarriage	        = false;
 
 function updateMarr()
 {
     if (updatingMarriage)
     {
-		updatingMarriage	= false;
+		updatingMarriage		= false;
 		return;
     }
-    updatingMarriage		= true;
+    updatingMarriage			= true;
 
     // do not submit the update if there are open child edit windows
     // count the number of open child edit windows
-    var	numOpenChildWindows	= 0;
-    var	childWindowNames	= "";
-    var	comma			= "";
-    for(var i = 0; i < childWindows.length; i++)
+    var	numOpenChildWindows		= 0;
+    var	childWindowNames		= "";
+    var	comma				    = "";
+    for(var i 	= 0; i < childWindows.length; i++)
     {		// loop through all edit child windows
-		var childWindow		= childWindows[i];
+		var childWindow			= childWindows[i];
 		if (!(childWindow.closed))
 		{
 		    numOpenChildWindows++;
 		    childWindowNames	+= comma + "'" +
 								childWindow.document.title + "'"; 
-		    comma		= ' and ';
+		    comma			    = ' and ';
 		}
     }		// loop through all edit child windows
 
     // if there are open child edit windows warn the user and skip save
-    childWindowNames		= childWindowNames.trim();
+    childWindowNames			= childWindowNames.trim();
     if (childWindowNames.length > 2)
     {		// at least one child window still open
 		popupAlert("Warning: subordinate edit window " +
@@ -1917,46 +1942,47 @@ function updateMarr()
     }		// at least one child window still open
 
     // request the update of the marriage record in the database
-    var	form		= this.form;
-    var parms		= {};
-    var	msg		= "";
+    var	form					= this.form;
+    var parms					= {};
+    var	msg					    = "";
 
     // expand incomplete wife or mother's name
-    var wifeSurname	= form.WifeSurname;
-    var wifeGiven	= form.WifeGivenName;
-    var husbSurname	= form.HusbSurname;
-    var husbGiven	= form.HusbGivenName;
+    var wifeSurname				= form.WifeSurname;
+    var wifeGiven				= form.WifeGivenName;
+    var husbSurname				= form.HusbSurname;
+    var husbGiven				= form.HusbGivenName;
     if (wifeGiven.value.length > 0 && 
 		wifeSurname.value.length == 0 &&
 		wifeGiven.value.indexOf("Wifeof") < 0)
     {
-		var wifeSurnameStr	= "Wifeof" +
+		var wifeSurnameStr		= "Wifeof" +
 							  husbGiven.value.toLowerCase() + 
 							  husbSurname.value.toLowerCase();
-		wifeSurnameStr		= wifeSurnameStr.replace(/\s+/g, '');
-		wifeSurname.value	= wifeSurnameStr;
+		wifeSurnameStr			= wifeSurnameStr.replace(/\s+/g, '');
+		wifeSurname.value		= wifeSurnameStr;
     }
 
     // copy selected information from the form to the parameters
-    for (var ei = 0; ei < form.elements.length; ei++)
+    for (var ei 	= 0; ei < form.elements.length; ei++)
     {		// loop through all elements in the form
-		var	element	= form.elements[ei];
-		var	name	= element.name;
+		var	element		        = form.elements[ei];
+		var	name		        = element.name;
 		if (name == 'Notes')
         {
             try {
-		        parms[name]	= tinyMCE.get(name).getContent();
-            } catch(err) {
-                parms[name] = element.value; 
+		        parms[name]		= tinyMCE.get(name).getContent();
+            } catch(err)
+            {
+                parms[name] 	= element.value; 
                 alert(err.message); 
             }
         }
 		else
 		if (name.length > 0)
-		    parms[name]	= element.value;
+		    parms[name]		    = element.value;
     }				// loop through all elements in the form
     // alert(JSON.stringify(parms));
-    updateMarriageParms	= "parms={";
+    updateMarriageParms		    = "parms={";
     for(parm in parms)
     {
 		updateMarriageParms += parm + "='" + parms[parm] + "',";
@@ -1993,8 +2019,7 @@ function gotUpdatedFamily(xmlDoc)
     }
     var	root		    		= xmlDoc.documentElement;
     if (debug.toLowerCase() == 'y')
-    	alert("gotUpdatedFamily: root=" + 
-    	 tagToString(root).replace('/</g', '&lt;').replace('/>/g', '&lt;'));
+    	alert("gotUpdatedFamily: root=" + tagToString(root));
     var idmr		    		= 0;
     var spsIdir		    		= 0;
     var fatherid	    		= 0;
@@ -2014,21 +2039,21 @@ function gotUpdatedFamily(xmlDoc)
     {			        // XML document
 		if (root.nodeName == 'marriage')
 		{		        // normal response
-		    var	form	= document.indForm;
-		    var	sex	= 0;			// 0 for male, 1 for female
+		    var	form	        = document.indForm;
+		    var	sex	            = 0;			// 0 for male, 1 for female
 		    if (form.sex)
-				sex	= form.sex.value;
+				sex	            = form.sex.value;
 		    if (sex == 0)
-				spsclass	= 'female';
+				spsclass	    = 'female';
 		    else
-				spsclass	= 'male';
+				spsclass	    = 'male';
 
 		    for (var i = 0; i < root.childNodes.length; i++)
 		    {			// loop through top level nodes of the response
-				var	node	= root.childNodes[i];
+				var	node	    = root.childNodes[i];
 				if (node.nodeType != 1)
 				    continue;
-				var	value	= node.textContent.trim();
+				var	value	    = node.textContent.trim();
 				switch(node.nodeName)
 				{		// act on individual children
 				    case 'msg':
@@ -2057,25 +2082,23 @@ function gotUpdatedFamily(xmlDoc)
 		    }			    // check the children for error message text
 
 		    // take appropriate action
-		    var	opener	= null;
+		    var	opener	                = null;
 		    if (window.frameElement && window.frameElement.opener)
-				opener	= window.frameElement.opener;
+				opener	                = window.frameElement.opener;
 		    else
-				opener	= window.opener;
+				opener	                = window.opener;
 
 		    if (pendingButton)
 		    {		        // another action to perform
-    if (debug.toLowerCase() == 'y')
-    	alert("gotUpdatedFamily: pendingButton=" + pendingButton.outerHTML); 
-				form		    = pendingButton.form;
-				form.idmr.value	= idmr;
-				var	tmp	        = pendingButton;
-				pendingButton	= null;
+				form		            = pendingButton.form;
+				form.idmr.value	        = idmr;
+				var	tmp	                = pendingButton;
+				pendingButton	        = null;
 				tmp.click();
 		    }		        // another action to perform
 		    else
 		    if (opener)
-		    { // notify the opener (editIndivid.php) of the updated marriage
+		    {               // notify the opener (editIndivid.php)
 				if (opener.document.indForm)
 				{
 				    try {
@@ -2088,15 +2111,18 @@ function gotUpdatedFamily(xmlDoc)
 						    numFamilies	= 1;	// adding first family
 						opener.document.indForm.marriageUpdated(idmr,
 											numFamilies);
-				    } catch(e) { alert("commonMarriage.js: 2031 e=" + e); }
+				    } catch(e)
+                    { 
+                        alert("commonMarriage.js: 2031 e=" + e); 
+                    }
 				}
 
 				closeFrame();
-		    } // notify the opener (editIndivid.php) of the updated marriage
+		    }               // notify the opener (editIndivid.php)
 		    else
             {
-                if (debug.toLowerCase() == 'y')
-    	            alert("gotUpdatedFamily: window.history.back()"); 
+    	        console.log("commonMarriage.js: gotUpdatedFamily: " +
+                                "window.history.back()"); 
 				window.history.back();
             }
 		}		            // normal response
@@ -2240,7 +2266,6 @@ function noUpdatedFamily()
  *  Input:																*
  *		this		<button id='orderChildren'>							*
  ************************************************************************/
-var orderRecursing          = false;
 function orderChildren()
 {
     var	children	        = document.getElementById('children');
@@ -2253,13 +2278,6 @@ function orderChildren()
 		var	idirElt	        = document.getElementById('CIdir' + rowId);
 		if (typeof(idirElt) != 'undefined' && idirElt.value == 0)
 		{		// child is not yet in database
-	        if (orderRecursing)
-	        {
-	    alert("commonMarriage.js: orderChildren: recursing loop idirElt=" +
-	            idirElt.outerHTML);
-	            return;
-	        }
-            orderRecursing  = true;
 		    pendingButton	= this;
 		    this.form.update.click();	// save the family first
 		}
@@ -2562,10 +2580,15 @@ function gotDelEvent(xmlDoc)
 				if (opener && opener.document.indForm)
 				{
 				    try {
-						var section	= document.getElementById('marriageListBody');
+						var section	        = 
+                            document.getElementById('marriageListBody');
+                        var numFamilies     = section.rows.length;
 						opener.document.indForm.marriageUpdated(0,
-										section.rows.length);
-				    } catch(e) { alert("commonMarriage.js: 2388 e=" + e); }
+										numFamilies);
+				    } catch(e)
+                    { 
+                        alert("commonMarriage.js: 2388 e=" + e); 
+                    }
 				}
 		    }		// no errors detected
 		    else
@@ -3004,33 +3027,33 @@ function editEventMar(type, button)
 function childKeyDown(e)
 {
     if (!e)
-    {		// browser is not W3C compliant
+    {		                    // browser is not W3C compliant
 		e	=  window.event;	// IE
-    }		// browser is not W3C compliant
-    var	code		= e.keyCode;
+    }		                    // browser is not W3C compliant
+    var	key 		= e.key;
     var	element		= e.target;
     var	form		= element.form;
 
     // hide the help balloon on any keystroke
     if (helpDiv)
-    {		// helpDiv currently displayed
+    {		                    // helpDiv currently displayed
 		helpDiv.style.display	= 'none';
 		helpDiv			= null;	// no longer displayed
-    }		// helpDiv currently displayed
+    }		                    // helpDiv currently displayed
     clearTimeout(helpDelayTimer);	// clear pending help display
     helpDelayTimer		= null;
 
     // take action based upon code
-    switch (code)
+    switch (key)
     {
-		case KEY_F1:		// F1
+		case "F1":		        // F1
 		{
 		    displayHelp(this);		// display help page
 		    return false;		// suppress default action
-		}			// function F1
+		}			            // F1
 
-		case KEY_ENTER:
-		{			// enter key
+		case "Enter":
+		{			            // enter key
 		    if (element)
 		    {
 				var	cell	= element.parentNode;
@@ -3038,32 +3061,32 @@ function childKeyDown(e)
 				var	body	= row.parentNode;
 				var	rownum	= row.sectionRowIndex;
 				if (rownum < (body.rows.length - 1))
-				{		// not the last row
+				{		        // not the last row
 				    rownum++;
 				    row		= body.rows[rownum];
 				    cell	= row.cells[0];
 				    var	children= cell.children;
 				    for(var ic = 0; ic < children.length; ic++)
-				    {		// loop through children of cell
+				    {		    // loop through children of cell
 						var child	= children[ic];
 						if (child.nodeName.toLowerCase() == 'input' &&
 						    child.type == 'text')
-						{	// first <input type='text'>
+						{	    // first <input type='text'>
 						    child.focus();
 						    break;
-						}	// first <input type='text'>
-				    }		// loop through children of cell
-				}		// not the last row
+						}	    // first <input type='text'>
+				    }		    // loop through children of cell
+				}		        // not the last row
 				else
 				    form.addNewChild.click();
 		    }
 		    else
 				alert("commonMarriage.js: childKeyDown: element is null.");
 		    return false;		// suppress default action
-		}			// enter key
+		}			            // enter key
 
-		case ARROW_UP:
-		{			// arrow up key
+		case "ArrowUp":
+		{			            // arrow up key
 		    if (element)
 		    {
 				var	cell	= element.parentNode;
@@ -3071,30 +3094,30 @@ function childKeyDown(e)
 				var	body	= row.parentNode;
 				var	rownum	= row.sectionRowIndex;
 				if (rownum > 0)
-				{		// not the first row
+				{		        // not the first row
 				    rownum--;
 				    row		= body.rows[rownum];
 				    cell	= row.cells[cell.cellIndex];
 				    var	children= cell.children;
 				    for(var ic = 0; ic < children.length; ic++)
-				    {		// loop through children of cell
+				    {		    // loop through children of cell
 						var child	= children[ic];
 						if (child.nodeName.toLowerCase() == 'input' &&
 						    child.type == 'text')
-						{	// first <input type='text'>
+						{	    // first <input type='text'>
 						    child.focus();
 						    break;
-						}	// first <input type='text'>
-				    }		// loop through children of cell
-				}		// not the first row
+						}	    // first <input type='text'>
+				    }		    // loop through children of cell
+				}		        // not the first row
 		    }
 		    else
 				alert("commonMarriage.js: childKeyDown: element is null.");
 		    return false;		// suppress default action
-		}			// arrow up key
+		}			            // arrow up key
 
-		case ARROW_DOWN:
-		{			// arrow down key
+		case "ArrowDown":
+		{			            // arrow down key
 		    if (element)
 		    {
 				var	cell	= element.parentNode;
@@ -3102,28 +3125,28 @@ function childKeyDown(e)
 				var	body	= row.parentNode;
 				var	rownum	= row.sectionRowIndex;
 				if (rownum < (body.rows.length - 1))
-				{		// not the last row
+				{		        // not the last row
 				    rownum++;
 				    row		= body.rows[rownum];
 				    cell	= row.cells[cell.cellIndex];
 				    var	children= cell.children;
 				    for(var ic = 0; ic < children.length; ic++)
-				    {		// loop through children of cell
+				    {		    // loop through children of cell
 						var child	= children[ic];
 						if (child.nodeName.toLowerCase() == 'input' &&
 						    child.type == 'text')
-						{	// first <input type='text'>
+						{	    // first <input type='text'>
 						    child.focus();
 						    break;
-						}	// first <input type='text'>
-				    }		// loop through children of cell
-				}		// not the last row
+						}	    // first <input type='text'>
+				    }		    // loop through children of cell
+				}		        // not the last row
 		    }
 		    else
 				alert("commonMarriage.js: childKeyDown: element is null.");
 		    return false;		// suppress default action
-		}			// arrow down key
-    }	    // switch on key code
+		}			            // arrow down key
+    }	                        // switch on key code
 
     return;
 }		// function childKeyDown

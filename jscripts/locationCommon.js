@@ -54,6 +54,10 @@
  *		2019/07/12      insert spaces into location name value if       *
  *		                missing after a comma, between a digit and      *
  *		                a letter, or between a letter and a digit       *
+ *		2019/11/09      escaping of characters in name moved to         *
+ *		                getLocationXml.php from function locationChanged*
+ *		2019/11/15      normalize locations that have concession before *
+ *		                lot to put lot first                            *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -234,7 +238,7 @@ var	deferSubmit	= false;
  *  expanding abbreviations, and completing short form names.			*
  *  This is the onchange method of any input text field that contains	*
  *  location text that is to be mapped to a reference to a				*
- *  LegacyLocation.														*
+ *  Location.														    *
  *																		*
  *  Input:																*
  *		this				an instance of <input type='text'>			*
@@ -246,30 +250,29 @@ function locationChanged()
     if (updateButton)
 		updateButton.disabled	= true;
 
-
     // get the name of the input field
     var	name;
-    var	ider	= 0;
+    var	ider	                = 0;
 
     if (this.name)
-		name	= this.name;
+		name	                = this.name;
     else
     if (this.id)
-		name	= this.id;
+		name	                = this.id;
     else
-		name	= '';
+		name	                = '';
 
     // trim off leading and trailing spaces
-    var value	        = this.value.trim();
+    var value	                = this.value.trim();
 
     // insert spaces where they should appear but don't
-    var commaRegex      = /,(\w)/g;
-    value               = value.replace(commaRegex, ", $1");
-    var digalfaRegex    = /(\d)([a-zA-Z]+)/g;
-    var results         = digalfaRegex.exec(value);
+    var commaRegex      		= /,(\w)/g;
+    value               		= value.replace(commaRegex, ", $1");
+    var digalfaRegex    		= /(\d)([a-zA-Z]+)/g;
+    var results         		= digalfaRegex.exec(value);
     if (results)
     {
-	    var letters         = results[2];
+	    var letters             = results[2];
 	    if (letters == 'RN' || letters == 'RS' || letters == 'R' ||
 	        letters == 'NBTR' || letters == 'RSLR' || 
 	        letters == 'STR' || letters == 'NTR' ||
@@ -280,21 +283,31 @@ function locationChanged()
 	    else
 	        value           = value.replace(digalfaRegex, "$1 $2");
     }
-    var alfadigRegex    = /([a-zA-Z])(\d)/g;
-    value               = value.replace(alfadigRegex, "$1 $2");
-    
-    this.value          = value;
+    var alfadigRegex        = /([a-zA-Z])(\d)/g;
+    value                   = value.replace(alfadigRegex, "$1 $2");
+
+    // if the location has a concession followed by a lot, switch them
+    var conlotRegex         = /^(con \d+)\s([^,]*lot[^,]*)/;
+    var conres              = conlotRegex.exec(value);
+    if (conres)
+    {
+        var len             = conres[0].length;
+        value               = conres[2] +' '+ conres[1] + value.substring(len);
+    }
+
+    // return the normalized value to the input form
+    this.value              = value;
 
     // if the form has a button named Submit, enable it just in case
     // it was previously disabled
-    var	submitButton	= document.getElementById('Submit');
+    var	submitButton	    = document.getElementById('Submit');
     if (submitButton)
 		submitButton.disabled	= false;
 
     // if the value is explicitly [blank] accept it
     if (value == '[' || value == '[blank]' || value == '[Blank]')
     {
-		this.value	    = '[Blank]';
+		this.value	        = '[Blank]';
 		return;
     }
 
@@ -322,12 +335,6 @@ function locationChanged()
 
 		// get an XML file containing location information from the database
         var loc         = this.value;
-        loc             = loc.replace(/\?/g, '\\?');
-        loc             = loc.replace(/\./g, '\\.');
-        loc             = loc.replace(/\[/g, '\\[');
-        loc             = loc.replace(/\*/g, '\\*');
-        loc             = loc.replace(/\^/g, '\\^');
-        loc             = loc.replace(/\$/g, '\\$');
 		var url	= "/FamilyTree/getLocationXml.php?name=" +
 						encodeURIComponent(loc) +
 						"&form=" + this.form.name +

@@ -48,6 +48,7 @@ use \Templating\Template;
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/07/28      accept ISO 3166 standard form for domain        *
  *		                list only domains that are in the same country  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -130,6 +131,8 @@ if ($debug && count($_GET) > 0)
 
 // create instance of Template
 $template		    = new FtTemplate("MarriageRegQuery$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'MarriageRegQuery'));
 
 $domainObj	        = new Domain(array('domain'     => $domain,
                                        'language'	=> $lang));

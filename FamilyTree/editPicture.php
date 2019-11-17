@@ -80,6 +80,7 @@ use \Exception;
  *		2018/11/19      change Help.html to Helpen.html                 *
  *		2019/07/26      use Template                                    *
  *		                merge update logic from updatePicture.php       *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -306,6 +307,8 @@ $action                     = 'Display';
 if ($record && $record->isOwner())
     $action                 = 'Update';
 $template           = new FtTemplate("editPicture$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'editPicture'));
 $translate          = $template->getTranslate();
 $t                  = $translate['tranTab'];
 

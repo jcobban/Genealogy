@@ -19,6 +19,7 @@ use \Exception;
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/04/06      use new FtTemplate::includeSub                  *
  *		2019/07/30      use Record->selected                            *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -159,6 +160,8 @@ else
 $includePop 	        = "CensusQueryPopups$lang.html";
 $template->includeSub($includePop,
 	    		      'POPUPS');
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'QueryDetail'));
 $template->set('CENSUSYEAR', 	    $censusYear);
 $template->set('CC',   	            $cc);
 $template->set('COUNTRYNAME',   	$countryName);

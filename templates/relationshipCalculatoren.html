@@ -1,0 +1,248 @@
+<!--*********************************************************************
+ *  relationshipCalculatoren.html										*
+ *																		*
+ *  Display a web page reporting the degree of relationship between		*
+ *  two individuals.													*
+ *																		*
+ * History:																*
+ *		2019/10/31      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+  <div class="body">
+    <h1>
+      <span class="right">
+		<a href="relationshipCalculatorHelpen.html" target="help">? Help</a>
+      </span>
+        Relationship of $NAME1 to $name2
+    </h1>
+    $TRACE
+    $MSG
+    <form name="depthForm" id="depthForm" action="donothing.php"
+				method="get">
+      <div class="row">
+		<button type="button" id="Close" accessKey="C">
+		  <u>C</u>lose
+		</button>
+      </div>
+    </form>
+	<p><a href="Person.php?idir=$IDIR1" class="$genderClass1">"$name1"</a>
+	    $RELATION
+			<a href="Person.php?idir=$IDIR2" class="$genderClass2">"$name2"</a>.
+	    Their common ancestor is 
+	    <a href="Person.php?idir=$COMMONIDIR" class="$genderClassAncestor">
+	        "$NAMEC"</a>.
+	</p>
+  </div>
+
+<!--*********************************************************************
+ *  relTable															*
+ *																		*
+ *  Two dimensional array where first index is level of ancestry from	*
+ *  $person1, as obtained from the array element $ancestors, and the	*
+ *  second index is the level of ancestry from $person2.				*
+ **********************************************************************-->
+  <div class="hidden">
+    <div id="relTable0">
+        <span data-key="0">self</span>
+		<span data-key="1">parent</span>
+		<span data-key="2">grandparent</span>
+		<span data-key="3">great-grandparent</span>
+		<span data-key="4">great-great-grandparent</span>
+		<span data-key="5">great^3-grandparent</span>
+		<span data-key="6">great^4-grandparent</span>
+		<span data-key="7">great^5-grandparent</span>
+		<span data-key="8">great^6-grandparent</span>
+		<span data-key="9">great^7-grandparent</span>
+		<span data-key="10">great^8-grandparent</span>
+		<span data-key="32768">spouse</span>
+		<span data-key="32769">parent-in-law</span>
+		<span data-key="32770">grandparent</span>
+		<span data-key="32771">great-grandparent</span>
+		<span data-key="32772">great-great-grandparent</span>
+		<span data-key="32773">great^3-grandparent</span>
+		<span data-key="32774">great^4-grandparent</span>
+		<span data-key="32775">great^5-grandparent</span>
+		<span data-key="32776">great^6-grandparent</span>
+		<span data-key="32777">great^7-grandparent</span>
+        <span data-key="32778">great^8-grandparent</span>
+	</div>
+
+	<div id="relTable32768">
+		<span data-key="0">spouse</span>
+		<span data-key="1">parent</span>
+		<span data-key="2">grandparent-in-law</span>
+		<span data-key="3">great-grandparent-in-law</span>
+		<span data-key="4">great-great-grandparent-in-law</span>
+		<span data-key="5">great^3-grandparent-in-law</span>
+		<span data-key="6">great^4-grandparent-in-law</span>
+		<span data-key="7">great^5-grandparent-in-law</span>
+		<span data-key="8">great^6-grandparent-in-law</span>
+		<span data-key="9">great^7-grandparent-in-law</span>
+		<span data-key="10">great^8-grandparent-in-law</span>
+	</div>
+
+	<div id="relTable32769">
+		<span data-key="0">child-in-law</span>
+		<span data-key="1">sibling-in-law</span>
+	</div>
+
+	<div id="relTable1">
+		<span data-key="0">child</span>
+		<span data-key="1">sibling</span>
+		<span data-key="2">uncle</span>
+		<span data-key="3">great-uncle</span>
+		<span data-key="4">great-great-uncle</span>
+		<span data-key="5">great^3-uncle</span>
+		<span data-key="6">great^4-uncle</span>
+		<span data-key="7">great^5-uncle</span>
+		<span data-key="8">great^6-uncle</span>
+		<span data-key="9">great^7-uncle</span>
+		<span data-key="10">great^8-uncle</span>
+		<span data-key="32768">child</span>
+		<span data-key="32769">sibling-in-law</span>
+		<span data-key="32770">uncle</span>
+		<span data-key="32771">great-uncle</span>
+		<span data-key="32772">great-great-uncle</span>
+		<span data-key="32773">great^3-uncle</span>
+		<span data-key="32774">great^4-uncle</span>
+		<span data-key="32775">great^5-uncle</span>
+		<span data-key="32776">great^6-uncle</span>
+		<span data-key="32777">great^7-uncle</span>
+        <span data-key="32778">great^8-uncle</span>
+	</div>
+
+
+	<div id="relTable2">
+		<span data-key="0">grandchild</span>
+		<span data-key="1">nephew</span>
+		<span data-key="2">cousin</span>
+		<span data-key="3">1st-cousin once removed</span>
+		<span data-key="4">1st-cousin twice removed</span>
+		<span data-key="5">1st-cousin thrice removed</span>
+		<span data-key="6">1st-cousin 4 times removed</span>
+		<span data-key="7">1st-cousin 5 times removed</span>
+		<span data-key="8">1st-cousin 6 times removed</span>
+		<span data-key="9">1st-cousin 7 times removed</span>
+		<span data-key="10">1st-cousin 8 times removed</span>
+		<span data-key="32768">grandchild</span>
+		<span data-key="32769">nephew</span>
+		<span data-key="32770">cousin-by-marriage</span>
+		<span data-key="32771">1st-cousin-once removed by-marriage</span>
+		<span data-key="32772">1st-cousin twice removed by-marriage</span>
+		<span data-key="32773">1st-cousin thrice removed by-marriage</span>
+		<span data-key="32774">1st-cousin 4 times removed by-marriage</span>
+		<span data-key="32775">1st-cousin 5 times removed by-marriage</span>
+		<span data-key="32776">1st-cousin 6 times removed by-marriage</span>
+		<span data-key="32777">1st-cousin 7 times removed by-marriage</span>
+        <span data-key="32778">1st-cousin 8 times removed by marriage</span>
+	</div>
+
+	<div id="relTable3">
+		<span data-key="0">great-grandchild</span>
+		<span data-key="1">great-nephew</span>
+		<span data-key="2">1st-cousin once removed</span>
+		<span data-key="3">2nd-cousin</span>
+		<span data-key="4">2nd-cousin once removed</span>
+		<span data-key="5">2nd-cousin twice removed</span>
+		<span data-key="6">2nd-cousin 3 times removed</span>
+		<span data-key="7">2nd-cousin 4 times removed</span>
+		<span data-key="8">2nd-cousin 5 times removed</span>
+		<span data-key="9">2nd-cousin 6 times removed</span>
+		<span data-key="10">2nd-cousin 7 times removed</span>
+		<span data-key="32768">great-grandchild</span>
+		<span data-key="32769">great-nephew</span>
+		<span data-key="32770">1st-cousin-once-removed by-marriage</span>
+		<span data-key="32771">2nd-cousin by-marriage</span>
+		<span data-key="32772">2nd-cousin once-removed by-marriage</span>
+		<span data-key="32773">2nd-cousin twice removed by-marriage</span>
+		<span data-key="32774">2nd-cousin 3 times removed by-marriage</span>
+		<span data-key="32775">2nd-cousin 4 times removed by-marriage</span>
+		<span data-key="32776">2nd-cousin 5 times removed by-marriage</span>
+		<span data-key="32777">2nd-cousin 6 times removed by-marriage</span>
+        <span data-key="32778">2nd-cousin 7 times removed by marriage</span>
+	</div>
+
+	<div id="relTable4">
+		<span data-key="0">great-great-grandchild</span>
+		<span data-key="1">great-great-nephew</span>
+		<span data-key="2">1st-cousin twice removed</span>
+		<span data-key="3">2nd-cousin once removed</span>
+		<span data-key="4">3rd-cousin</span>
+		<span data-key="5">3rd-cousin once removed</span>
+		<span data-key="6">3rd-cousin twice removed</span>
+		<span data-key="7">3rd-cousin 3 times removed</span>
+		<span data-key="8">3rd-cousin 4 times removed</span>
+		<span data-key="9">3rd-cousin 5 times removed</span>
+		<span data-key="10">3rd-cousin 6 times removed</span>
+		<span data-key="32768">great-great-grandchild</span>
+		<span data-key="32769">great-great-nephew</span>
+		<span data-key="32770">1st-cousin twice-removed by-marriage</span>
+		<span data-key="32771">2nd-cousin once-removed by-marriage</span>
+		<span data-key="32772">3rd-cousin by-marriage</span>
+		<span data-key="32773">3rd-cousin once removed by-marriage</span>
+		<span data-key="32774">3rd-cousin twice removed by-marriage</span>
+		<span data-key="32775">3rd-cousin 3 times removed by-marriage</span>
+		<span data-key="32776">3rd-cousin 4 times removed by-marriage</span>
+		<span data-key="32777">3rd-cousin 5 times removed by-marriage</span>
+        <span data-key="32778">3rd-cousin 6 times removed by marriage</span>
+	</div>
+
+	<div id="relTable5">
+		<span data-key="0">great^3-grandchild</span>
+		<span data-key="1">great^3-nephew</span>
+		<span data-key="2">1st-cousin 3 times removed</span>
+		<span data-key="3">2nd-cousin twice removed</span>
+		<span data-key="4">3rd-cousin once removed</span>
+		<span data-key="5">4th-cousin</span>
+		<span data-key="6">4th-cousin once removed</span>
+		<span data-key="7">4th-cousin twice removed</span>
+		<span data-key="8">4th-cousin 3 times removed</span>
+		<span data-key="9">4th-cousin 4 times removed</span>
+		<span data-key="10">4th-cousin 5 times removed</span>
+		<span data-key="32768">great^3-grandchild</span>
+		<span data-key="32769">great^3-nephew</span>
+	</div>
+
+	<div id="relTable6">
+		<span data-key="0">great^4-grandchild</span>
+		<span data-key="1">great^4-nephew</span>
+		<span data-key="2">1st-cousin 4 times removed</span>
+		<span data-key="3">2nd-cousin 3 times removed</span>
+		<span data-key="4">3rd-cousin twice removed</span>
+		<span data-key="5">4th-cousin once removed</span>
+		<span data-key="6">5th-cousin</span>
+		<span data-key="7">5th-cousin once removed</span>
+		<span data-key="8">5th-cousin twice removed</span>
+		<span data-key="9">5th-cousin 3 times removed</span>
+		<span data-key="10">5th-cousin 4 times removed</span>
+		<span data-key="32768">great^3-great-grandchild</span>
+		<span data-key="32769">great^3-great-nephew</span>
+	</div>
+
+	<div id="relTable7">
+		<span data-key="0">great^5-grandchild</span>
+		<span data-key="1">great^5-nephew</span>
+		<span data-key="2">1st-cousin 5 times removed</span>
+		<span data-key="3">2nd-cousin 4 times removed</span>
+		<span data-key="4">3rd-cousin 3 times removed</span>
+		<span data-key="5">4th-cousin twice removed</span>
+		<span data-key="6">5th-cousin once removed</span>
+		<span data-key="7">6th-cousin</span>
+		<span data-key="8">6th-cousin once removed</span>
+		<span data-key="9">6th-cousin twice removed</span>
+		<span data-key="10">6th-cousin 3 times removed</span>
+		<span data-key="32768">great^5-grandchild</span>
+		<span data-key="32769">great^5-nephew</span>
+	</div>
+<div> <!-- hidden -->
+<div id="HelpClose" class="balloon">
+Click on this button to close the dialog.  Keyboard shortcuts are Alt-C and
+Alt-Shift-C.
+</div>
+    <script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="application/javaScript">
+    </script>
+    <script src="relationshipCalculator.js" type="application/javaScript">
+    </script>

@@ -248,8 +248,7 @@ foreach ($_GET as $key => $value)
 
         case 'lang':
         {
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
         }
 	    case 'showclear':
 	    {			// to clear or not to clear

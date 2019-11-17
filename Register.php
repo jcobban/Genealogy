@@ -58,6 +58,7 @@ use \Exception;
  *		2018/05/28		include specific CSS							*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -162,46 +163,43 @@ foreach($_POST as $key => $value)
     }		// act on specific parameters
 }			// loop through parameters
 
-$title			= 'Register a New User';
 $user			= null;
 
 $template		= new FtTemplate("Register$lang.html", true);
 
-$template->set('TITLE',		$title);
 $template->set('CHKUSEMAIL',	$chkusemail);
-$template->set('CHKNOHELP',	$chknohelp);
-$template->set('NEWUSERID',	$newuserid);
-$template->set('EMAIL',		$email);
-$template->updateTag('otherStylesheets',
-    	       		array('filename'	=> '/Register'));
+$template->set('CHKNOHELP',	    $chknohelp);
+$template->set('NEWUSERID',	    $newuserid);
+$template->set('EMAIL',		    $email);
+$template['otherStylesheets']->update(array('filename'	=> '/Register'));
 
 // turn off all messages and then individually re-enable
-$template->updateTag('shortUsername', null);
-$template->updateTag('badUsername', null);
-$template->updateTag('shortPassword', null);
-$template->updateTag('passwordMismatch', null);
-$template->updateTag('badEmail', null);
-$template->updateTag('initialPrompt', null);
-$template->updateTag('emailInUse', null);
-$template->updateTag('useridInUse', null);
+$template['shortUsername']->update( null);
+$template['badUsername']->update( null);
+$template['shortPassword']->update( null);
+$template['passwordMismatch']->update( null);
+$template['badEmail']->update( null);
+$template['initialPrompt']->update( null);
+$template['emailInUse']->update( null);
+$template['useridInUse']->update( null);
 
 // validate parameters
 if (strlen($newuserid) > 0 ||
     (strlen($password) > 0 && strlen($password2) > 0))
 {		// new registration supplied
     if (strlen($newuserid) < 6)
-		$template->updateTag('shortUsername',
+		$template['shortUsername']->update(
 						     array('newuserid' => $newuserid));
     if (!preg_match($uidPattern, $newuserid))
-		$template->updateTag('badUsername',
+		$template['badUsername']->update(
 						     array('newuserid' => $newuserid));
     if (strlen($password) < 6)
-		$template->updateTag('shortPassword',
+		$template['shortPassword']->update(
 						     array('newuserid'	=> $newuserid,
 							   'password'	=> $password));
 
     if ($password != $password2)
-		$template->updateTag('passwordMismatch',
+		$template['passwordMismatch']->update(
 						     array('newuserid'	=> $newuserid,
 							   'password'	=> $password,
 							   'password2'	=> $password2));
@@ -210,7 +208,7 @@ if (strlen($newuserid) > 0 ||
 		$email		= $newuserid;
 
     if (strlen($email) < 6 || strpos($email, '@') === false)
-		$template->updateTag('badEmail',
+		$template['badEmail']->update(
 						     array('newuserid'	=> $newuserid,
 							   'email' => $email));
     else
@@ -221,7 +219,7 @@ if (strlen($newuserid) > 0 ||
 		    $olduser	= $user->get('username');
 		    if ($newuserid != $olduser)
 		    {
-				$template->updateTag('emailInUse',
+				$template['emailInUse']->update(
 							     array('newuserid'	=> $newuserid,
 								   'email'	=> $email));
 				$user	= null;
@@ -231,14 +229,14 @@ if (strlen($newuserid) > 0 ||
 		{			// check for userid already in use
 		    $user	= new User(array('username' => $newuserid));
 		    if ($user->isExisting())
-				$template->updateTag('useridInUse',
+				$template['useridInUse']->update(
 							     array('newuserid' => $newuserid));
 		}			// check for userid already in use
     }			// validate e-mail
 }		// registration supplied
 else
 {		// registration not supplied
-    $template->updateTag('initialPrompt',
+    $template['initialPrompt']->update(
 						 array('newuserid' => $newuserid));
 }		// registration not supplied
 
@@ -271,36 +269,33 @@ if ($user)
 		 	        	       $subject,
 		 		               $body);
 
-		$template->updateTag('okmsgRespond',
-						     array('newuserid'	=> $newuserid,
-						    	   'email'	=> $email));
-		$template->updateTag('okmsgAlready', null);
-		$template->updateTag('titleNew', null);
-		$template->updateTag('titleAlready', null);
-		$template->updateTag('submit', null);
-		$template->updateTag('passRow', null);
-		$template->updateTag('pass2Row', null);
+		$template['okmsgRespond']->update(array('newuserid'	=> $newuserid,
+						    	                'email'	=> $email));
+		$template['okmsgAlready']->update( null);
+		$template['titleNew']->update( null);
+		$template['titleAlready']->update( null);
+		$template['submit']->update( null);
+		$template['passRow']->update( null);
+		$template['pass2Row']->update( null);
     }
     else
     {
-		$template->updateTag('okmsgAlready',
-						     array('newuserid'	=> $newuserid,
-							       'email'	=> $email));
-		$template->updateTag('okmsgRespond', null);
-		$template->updateTag('titleNew', null);
-		$template->updateTag('titleComplete', null);
+		$template['okmsgAlready']->update(array('newuserid'	=> $newuserid,
+							                    'email'	    => $email));
+		$template['okmsgRespond']->update( null);
+		$template['titleNew']->update( null);
+		$template['titleComplete']->update( null);
     }
 
 }		// create new account
 else
 {		// first entry with no parameters
-    $template->updateTag('titleComplete', null);
-    $template->updateTag('titleAlready', null);
-    $template->updateTag('okmsgRespond', null);
-    $template->updateTag('okmsgAlready', null);
-    $template->updateTag('initialPrompt',
-						 array('newuserid'	=> '',
-							   'email'	    => ''));
+    $template['titleComplete']->update( null);
+    $template['titleAlready']->update( null);
+    $template['okmsgRespond']->update( null);
+    $template['okmsgAlready']->update( null);
+    $template['initialPrompt']->update(array('newuserid'	=> '',
+							                 'email'	    => ''));
 }		// first entry with no parameters
 
 $template->display();

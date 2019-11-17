@@ -43,6 +43,7 @@ use \Exception;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/02/19      use Template                                    *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -81,6 +82,8 @@ foreach($_GET as $key => $value)
 }				// loop through all parameters
 
 $template		    = new FtTemplate("chooseRelative$lang.html", true);
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'chooseRelative'));
 
 if ($idir)
 {

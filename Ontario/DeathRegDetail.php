@@ -303,6 +303,8 @@ if ($debug)
 
 // create Template
 $template		        = new FtTemplate("DeathRegDetail$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'DeathRegDetail'));
 $trtemplate             = $template->getTranslate();
 
 if ($regYear == '')

@@ -63,6 +63,7 @@ use \Templating\Template;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/10/25      use class Template                              *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -342,6 +343,8 @@ if (count($_GET) > 0)
 
 // display page
 $template		= new FtTemplate("ancestorReport$lang.html", true);
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => '/FamilyTree/ancestorReport'));
 
 // check for mandatory parameters
 if (is_null($idir))

@@ -538,7 +538,7 @@ class Location extends RecordPic
 		    $part1	    = trim($results[1]);	// street or lot 
 		    $county	    = trim($results[2]);	// county or city name
 		    $province	= $results[3];		    // province code
-		    $cc		    = $results[4];		    // country
+            $cc		    = $results[4];		    // country
 		    if (strlen($province) > 2)
 		    {
 				$domains	    = new DomainSet(array('cc'	    => $cc,
@@ -562,13 +562,9 @@ class Location extends RecordPic
 		    $counties	= new CountySet($getParms);
 		    if (count($counties) > 0)
 		    {			// $county is a valid county name
-				if ($res2)
-				{
-				    $part2	= trim($results[2]);
-				    $searchName	= "$part2, $county county, $province, CA";
-				}
-				else
-				    $searchName	= "$part1, $county county, $province, CA";
+                $countyObj  = $counties->rewind();  // get first County
+			    $county     = $countyObj->getName();
+				$searchName	= "$part1, $county county, $province, CA";
 		    }			// $county is a valid county name
 		    else
 		    {
@@ -649,7 +645,7 @@ class Location extends RecordPic
 		    case 'qstag':
 		    case 'zoom':
 		    {
-				return $this->row[$field];
+				return parent::get($field);
 		    }
 
 		    case 'boundary':

@@ -122,6 +122,8 @@ foreach($_REQUEST as $key => $value)
 }	// loop through all parameters
 
 $template		= new FtTemplate("resetPassword$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'resetPassword'));
 
 $template->set('USERID',	$username);
 $template->set('EMAIL',		$email);
@@ -129,20 +131,19 @@ $template->set('LANG',		$lang);
 
 if ($user)
 {			// missing parameters
-    $template->updateTag('needuser', null);
+    $template['needuser']->update( null);
     $newPassword	= randomPassword(10);
-    $template->updateTag('passwordreset',
-					 array('username'	=> $username,
-					       'newpassword'	=> $newPassword));
+    $template['passwordreset']->update(array('username'	=> $username,
+					                         'newpassword'	=> $newPassword));
     $user->set('password', null);
     $user->set('shapassword', hash('sha512', $newPassword));
     $user->save(false);
 
     // bcc the e-mail to the administrators
     $getparms		= array('auth'	=> 'all');
-    $admins		= new RecordSet('Users', $getparms);
-    $bcc		= 'BCC: ';
-    $comma		= '';
+    $admins		    = new RecordSet('Users', $getparms);
+    $bcc		    = 'BCC: ';
+    $comma		    = '';
     foreach($admins as $id => $admin)
     {			// loop through administrators
 		$bcc		.= $comma . $admin->get('email'); 
@@ -154,19 +155,19 @@ if ($user)
 					  'From: <webmaster@jamescobban.net>' . "\r\n";
     $subjectTag		= $template->getElementById('emailsubject');
     $emailSubject	= str_replace('username', 
-						      $username,
-						      trim($subjectTag->innerHTML()));
+					    	      $username,
+						          trim($subjectTag->innerHTML()));
     $bodyTag		= $template->getElementById('emailbody');
     $emailBody		= str_replace(array('$username','$newpassword'),
-						      array($username, $newPassword),
-						      trim($bodyTag->innerHTML()));
-    $sent		= mail(	$email,
-						$emailSubject,
-						$emailBody,
-						$headers);
+					    	      array($username, $newPassword),
+						          trim($bodyTag->innerHTML()));
+    $sent		    = mail(	$email,
+					    	$emailSubject,
+						    $emailBody,
+						    $headers);
 }			// reset the password
 else
 {			// missing parameters
-    $template->updateTag('passwordreset', null);
+    $template['passwordreset']->update( null);
 }			// missing parameters
 $template->display();

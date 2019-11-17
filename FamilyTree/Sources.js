@@ -18,6 +18,7 @@
  *		2014/12/12		enclose comment blocks							*
  *		2015/05/28		display source in split window					*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/11/06      support opening windows with language           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -160,18 +161,18 @@ function sourceCreated()
  ************************************************************************/
 function sourceUpdated(parms)
 {
-    var text	= "parms={";
-    for(fldname in parms)
-		text	+= fldname + "='" + parms[fldname] + "',";
-    var	idsr		= this.id.substring(3);
+    var text	                = "parms={";
+
+    var	idsr		            = this.id.substring(9);
     var	cell;
     for(fldname in parms)
     {			// loop through all parameters
+		text	                += fldname + "='" + parms[fldname] + "',";
 		switch(fldname.toLowerCase())
 		{		// act on specific parameters
 		    case 'srcname':
 		    {		// public name of source
-				cell	= document.getElementById('Name' + idsr);
+				cell	        = document.getElementById('Name' + idsr);
 				if (cell)
 				    cell.innerHTML	= parms[fldname];
 				break;
@@ -179,23 +180,25 @@ function sourceUpdated(parms)
 
 		    case 'idst':
 		    {		// type of source
-				cell	= document.getElementById('Type' + idsr);
-				var idst	= parms[fldname];
-				var type	= document.getElementById('IDST' + idst);
+				cell	        = document.getElementById('Type' + idsr);
+				var idst	    = parms[fldname];
+				var type	    = document.getElementById('IDST' + idst);
 				if (cell)
 				{
 				    if (type)
 				    {
-					cell.innerHTML	= type.innerHTML.trim();
+					    cell.innerHTML	= type.innerHTML.trim();
 				    }
 				    else
 				    {
-					cell.innerHTML	= parms[fldname];
+				        alert("Sources.js:sourceUpdated: no element 'IDST" +
+                                idst + "'");
+					    cell.innerHTML	= parms[fldname];
 				    }	// act on specific types
 				}
 				else
-				    alert("Sources.js:sourceUpdated: no <element id='Type" +
-					  idsr + "'");
+				    alert("Sources.js:sourceUpdated: " +
+                            "no <element id='Type" + idsr + "'");
 				break;
 		    }		// type of source
 		}		// act on specific parameters
@@ -214,26 +217,32 @@ function sourceUpdated(parms)
  ************************************************************************/
 function createSource()
 {
+    var     lang    = 'en';
+    if ('lang' in args)
+        lang        = args.lang;
     openFrame("source",
-		      "/FamilyTree/editSource.php?idsr=0&form=srcForm",
+		      "/FamilyTree/editSource.php?idsr=0&form=srcForm&lang=" + lang,
 		      "right");
     return false;
 }	// createSource
 
 /************************************************************************
- *  function showSource												*
+ *  function showSource												    *
  *																		*
  *  This method is called when the user requests to show				*
  *  an existing Source.  It pops up a child window.						*
  *																		*
  *  Input:																*
- *		this				<button id='Show....'>								*
+ *		this				<button id='Show....'>						*
  ************************************************************************/
 function showSource()
 {
+    var     lang    = 'en';
+    if ('lang' in args)
+        lang        = args.lang;
     var	idsr	= this.id.substring(4);
     openFrame("source",
-		      "/FamilyTree/Source.php?idsr=" + idsr,
+		      "/FamilyTree/Source.php?idsr=" + idsr + "&lang=" + lang,
 		      "right");
     return false;
 }		// showSource
@@ -249,10 +258,14 @@ function showSource()
  ************************************************************************/
 function editSource()
 {
+    var     lang    = 'en';
+    if ('lang' in args)
+        lang        = args.lang;
     var	idsr	= this.id.substring(4);
     openFrame("source",
 		      "/FamilyTree/editSource.php?idsr=" + idsr +
-							"&elementid=Row" + idsr,
+							"&elementid=sourceRow" + idsr +
+                            "&lang=" + lang,
 		      "right");
     return false;
 }		// editSource

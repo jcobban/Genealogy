@@ -1,50 +1,52 @@
 <!--*********************************************************************
- *  PageForm.php														*
+ *  PageFormUpdateen.html												*
  *																		*
- *  Update the Pages database for a single enumeration division.		*
+ *  Template to display page to update the Pages database for a single  *
+ *  enumeration division.		                                        *
  *																		*
  *  History:															*
- *      2019/02/26      created                                         *
+ *      2019/11/12      created                                         *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
       <a href="/genealogy.php?lang=$LANG">
-        Génealogie</a>: 
+        Genealogy</a>: 
       <a href="/genCountry.php?cc=$CC&lang=$LANG">
 		$COUNTRYNAME</a>:
       <a href="/database/genCensuses.php?lang=$LANG">
-        Recensements</a>:
+        Censuses</a>:
       <a href="/database/EditCensuses.php?lang=$LANG">
-        Administration des Recensements</a>:
+        Censuses Admin</a>:
       <a href="/database/DistForm.php?Census=$CENSUSID&Province=$PROVINCE&lang=$LANG">
-	    Administration des Districts $CENSUSID</a>:
+	    $CENSUSID Districts Admin</a>:
       <a href="/database/ReqUpdateSubDists.php$SEARCH&lang=$LANG">
-	    Choisir un Sous-District</a>:
+	    Select Sub-District</a>:
       <a href="SubDistForm.php?Census=$CENSUSID&Province=$PROVINCE&District=$DISTID">
-	    Administration des Sous-Districts de District $DISTID $DISTNAME</a>:
+	    District $DISTID $DISTNAME SubDistricts Admin</a>:
 	  <a href="ReqUpdatePages.php$SEARCH">
-	    Choisir une Division</a>:
+	    Select Division</a>:
     </div> <!-- id="breadcrumbs" -->
     <div class="body" id="transcription"
             style="overflow: auto; overflow-x: scroll">
       <h1>
         <span class="right">
 	      <a href="PageFormHelpen.html" target="_blank">
-	        Aide?
+	        Help?
 	      </a>
         </span>
-    Administration des Recensements: Recensement de $COUNTRYNAME $CENSUSYEAR,
-    District $DISTID, Sous-District $SUBDISTID,
-    Mise a Jour la Table des Pages
+    Census Administration: $COUNTRYNAME $CENSUSYEAR Census,
+    Page Table Update
         <div style="clear: both;"></div>
       </h1>
+      $TRACE
+      $MSG
       <div class="center" id="topBrowse">
         <span class="left" id="topPrev">
-    	    <a href="$NPURI$NPPREV">&lt;---</a>
+    	    <a href="PageForm.php$NPPREV&lang=$LANG">&lt;---</a>
         </span>
         <span class="right" id="topNext">
-	      <a href="$NPURI$NPNEXT">---&gt;</a>
+	        <a href="PageForm.php$NPNEXT&lang=$LANG">---&gt;</a>
         </span>
           Census=$CENSUSID, Province=$PROVINCE, Dist $DISTID $DISTNAME,
           SubDist $SUBDISTID $SUBDISTNAME
@@ -52,7 +54,7 @@
         <span style="clear: both;"></span>
       </div>
       <!--- Put out the response as a table -->
-      <form name="censusForm"
+      <form name="censusForm" id="censusForm"
 	        action="PageUpdate.php" 
 	        method="post" 
 	        autocomplete="off" 
@@ -77,72 +79,72 @@
 	            Page
 			  </th>
 			  <th class="colhead">
-	            Nombre
+	            Count
 			  </th>
 			  <th class="colhead">
-	            transcripteur
+	            Transcriber
 			  </th>
 			  <th class="colhead">
-	            Rédacteur
+	            Proofreader
 			  </th>
 			  <th class="colhead">
-	            URL de l'Image
+	            Image URL
 			  </th>
 			  <th class="colhead">
-	            Voir
+	            View
 			  </th>
 			</tr>
           </thead>
           <tbody>
-			<tr>
+			<tr id="pageRow$page">
 			  <td>
-			    <input type="text" name="PT_Page$PAGENUM"
-			    		id="PT_Page$PAGENUM"
-			    		value="$PAGENUM" readonly="readonly"
+			    <input type="text" name="PT_Page$page"
+			    		id="PT_Page$page"
+			    		value="$page" readonly="readonly"
 			    		class="ina rightnc" size="3">
 			  </td>
 			  <td>
-			    <input type="text" name="PT_Population$PAGENUM" 
-			    		id="PT_Population$PAGENUM" 
-			    		value="$POPULATION" $READONLY 
+			    <input type="text" name="PT_Population$page" 
+			    		id="PT_Population$page" 
+			    		value="$population"  
 			    		class="white rightnc" size="3">
 			  </td>
 			  <td>
-			    <input type="text" name="PT_Transcriber$PAGENUM" 
-			    		id="PT_Transcriber$PAGENUM" 
-			    		value="$TRANSCRIBER" $READONLY 
+			    <input type="text" name="PT_Transcriber$page" 
+			    		id="PT_Transcriber$page" 
+			    		value="$transcriber"  
 			    		class="white leftnc" size="10">
 			  </td>
 			  <td>
-			    <input type="text" name="PT_ProofReader$PAGENUM" 
-			    		id="PT_ProofReader$PAGENUM" 
-			    		value="$PROOFREADER" $READONLY 
+			    <input type="text" name="PT_ProofReader$page" 
+			    		id="PT_ProofReader$pagenum" 
+			    		value="$proofreader"  
 			    		class="white leftnc" size="10">
 			  </td>
 			  <td>
-			    <input type="text" name="PT_Image$PAGENUM" 
-			    		id="PT_Image$PAGENUM" 
-			    		value="$IMAGE" $READONLY 
+			    <input type="text" name="PT_Image$page" 
+			    		id="PT_Image$pagenum" 
+			    		value="$image"  
 			    		class="white leftnc" size="64">
 			  </td>
 			  <td>
-			    <button type="button" id="View$PAGENUM">View</button>
+			    <button type="button" id="View$page">View</button>
 			  </td>
 			</tr>
           </tbody>
         </table>
         <p>
           <button type="submit" id="Submit">
-		    Mise a Jo<u>u</u>r la Base des Données
+	         <u>U</u>pdate Database
           </button>
         </p>
       </form>
       <div class="center" id="botBrowse">
         <span class="left" id="botPrev">
-	      <a href="$NPURI$NPPREV">&lt;---</a>
+	      <a href="PageForm.php$NPPREV&lang=$LANG">&lt;---</a>
         </span>
         <span class="right" id="botNext">
-	      <a href="$NPURI$NPNEXT">---&gt;</a>
+	      <a href="PageForm.php$NPNEXT&lang=$LANG">---&gt;</a>
         </span>
           Census=$CENSUSID, Province=$PROVINCE, Dist $DISTID $DISTNAME,
           SubDist $SUBDISTID $SUBDISTNAME
@@ -152,6 +154,36 @@
     </div> <!-- end of <div id="body"> -->
     <!-- templates for dynamic HTML -->
     <div class="hidden" id="templates">
+        <span id="censusUndefined">
+            Census='$censusId' is not defined.
+        </span>  
+        <span id="countryUndefined">
+            Country code $cc' is not defined.
+        </span>  
+        <span id="censusMissing">
+            Census identifier parameter is missing.
+        </span>
+        <span id="provinceUndefined">
+            Province '$province' not supported for '$censusId' census.
+        </span>  
+        <span id="provinceMissing">
+            Province parameter is missing for Census='$censusId'.
+        </span>
+        <span id="districtUndefined">
+            District='$distId' is not defined.
+        </span>  
+        <span id="districtInvalid">
+            District identifier '$distId' is invalid.
+        </span>  
+        <span id="districtMissing">
+            District identifier parameter is missing.
+        </span>
+        <span id="subdistrictUndefined">
+            Sub-District='$subdistId' is not defined for Census='$censusId' District='$distId'.
+        </span>  
+        <span id="subdistrictMissing">
+            Sub-District identifier parameter is missing.
+        </span>
       <!-- no matching names dialog -->
       <form id="ChangeImageForm$SUB">
         <p class="label">Image URL Changed</p>
@@ -160,6 +192,7 @@
     		size="3" class="white rightnc"> by
     	<input type="text" name="Increment" value="$INCREMENT"
     		size="3" class="white rightnc">
+        </p>
         <p>
   	    <button type="button" id="incrementImage$SUB">Increment</button>
   	    <button type="button" id="closeDlg$SUB">Close</button>

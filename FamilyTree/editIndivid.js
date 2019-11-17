@@ -302,9 +302,11 @@
  *		2019/10/05      split functionality of eventChanged to          *
  *		                separate out date handling                      *
  *		                defer editName until person saved               *
- *		2019/11/23      deferred editName did not work because it       *
+ *		2019/10/23      deferred editName did not work because it       *
  *		                requires that the IDNX value be part of the     *
  *		                id of the editName button.                      *
+ *		2019/11/07      editName was opened in the wrong frame name     *
+ *		2019/11/15      remove alert triggered during merge             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -553,7 +555,9 @@ function loadEdit()
 
     document.body.onresize	= onWindowResize;
 
-    var	idir		= 0;
+    var	idir		            = 0;
+	var marriagesButton		    = document.getElementById('Marriages');
+	var parentsButton		    = document.getElementById('Parents');
 
     // loop through arguments passed to script
     for(var key in args)
@@ -573,22 +577,27 @@ function loadEdit()
 
 		    case 'idcr':
 		    {	// request to edit an existing child
-				document.getElementById('Marriages').disabled	= true;
-				document.getElementById('Parents').disabled	    = true;
+                if (marriagesButton)
+				    marriagesButton.disabled	= true;
+                if (parentsButton)
+				    parentsButton.disabled	= true;
 				break;
 		    }	// request to edit an existing child
 
 		    case 'rowid':
 		    {	// request to edit a spouse
-				document.getElementById('Marriages').disabled	= true;
+                if (marriagesButton)
+				    marriagesButton.disabled	= true;
 				break;
 		    }	// request to edit a spouse
 
 		    case 'parentsidmr':
 		    {	// request to add a new child
 				parentsIdmr	= parseInt(value);
-				document.getElementById('Marriages').disabled	= true;
-				document.getElementById('Parents').disabled	    = true;
+                if (marriagesButton)
+				    marriagesButton.disabled	= true;
+                if (parentsButton)
+				    parentsButton.disabled	= true;
 				break;
 		    }	// request to add a new child
 
@@ -616,9 +625,11 @@ function loadEdit()
 		if (form.name == 'indForm')
 		{		// main form
 		    if (!testSubmit)
+            {
 				form.onsubmit	 	= validateForm;
+            }
 		    else
-				alert('editIndivid.js: loadEdit: 608 testSubmit is true');
+				alert('editIndivid.js: loadEdit: 630 testSubmit is true');
 		    form.onreset 		    = resetForm;
 		    form.setIdar		    = setIdar;
 
@@ -945,8 +956,8 @@ function activateElements(form)
 				element.addEventListener('click', grantAccess);
 				break;
 		    }		// button to grant access to this individual
-		}		// switch on name of element
-    }		// loop through all elements in the form
+		}		    // switch on name of element
+    }		        // loop through all elements in the form
 }		// function activateElements
 
 /************************************************************************
@@ -963,6 +974,7 @@ function activateElements(form)
 function validateForm()
 {
     var form                = this;
+    console.log("editIndivid.js: validateForm: called");
 
     // do not submit the form if a modal dialog is being displayed
     if (deferSubmit)
@@ -1125,6 +1137,7 @@ function validateForm()
 		}		        // opener does not contain a form
     }			        // invoked from another window
 
+    console.log("editIndivid.js: validateForm: call update");
     update();		    // use AJAX to update the database record
 
     return false;	    // do not submit
@@ -1164,7 +1177,6 @@ function refresh()
     }
     msg		    = msg + "]";
     locTrace    += " editIndivid.js: refresh: " + msg;
-    console.log("editIndivid.js:refresh: HTTP.post('/FamilyTree/updatePersonJson.php', msg)");
 
     // invoke script to update Event and return XML result
     HTTP.post('/FamilyTree/updatePersonJson.php',
@@ -1217,7 +1229,7 @@ function gotRefreshed(jsonObj)
                 }
             }
             else
-                alert("names is null");
+                alert("editIndivid.js: gotRefreshed: 1229: names is null");
             if (newSearch.type == 'submit')
                 form.submit();
             else
@@ -1226,14 +1238,14 @@ function gotRefreshed(jsonObj)
 		}		// have a pending button click to issue
 		else
 		{		// unexpected object
-		    alert("editIndivid.js: 1202: gotRefreshed: typeof(newSearch)=" + 
+		    alert("editIndivid.js: gotRefreshed: 1238: typeof(newSearch)=" + 
 						typeof(newSearch));
 		}		// unexpected object
 
     }			// valid response
     else
     {			// error response
-		alert("editIndivid.js: 1209: gotRefreshed: " + jsonObj);
+		alert("editIndivid.js: gotRefreshed: 1245: " + jsonObj);
     }			// error response
 
 }		// function gotRefreshed
@@ -1247,7 +1259,7 @@ function gotRefreshed(jsonObj)
  ************************************************************************/
 function update()
 {
-    console.log("editIndivid.js:1223 update called");
+    console.log("editIndivid.js: update: 1259 update called windowList.length=" + windowList.length);
     // check for open frames
     if (windowList.length > 0)
     {			// there are incomplete actions pending
@@ -1312,7 +1324,7 @@ function update()
     }			// loop through all form elements
     msg		                = msg.substring(0,msg.length - 2) + "}";
     locTrace                += " editIndivid.js: 1292 update: " + msg;
-    console.log(locTrace);
+    console.log("editIndivid.js:update 1326 locTrace=" + locTrace);
 
     // invoke script to update Event and return JSON result
     HTTP.post('/FamilyTree/updatePersonJson.php',
@@ -1332,7 +1344,6 @@ function update()
  ************************************************************************/
 function gotUpdated(jsonObj)
 {
-    console.log("editIndivid.js: 1188: gotUpdated typeof(jsonObj)=" + typeof(jsonObj) + ", typeof(newSearch)=" + typeof(newSearch));
     var	opener		    = null;
     if (window.frameElement && window.frameElement.opener)
 		opener		    = window.frameElement.opener;
@@ -1351,11 +1362,13 @@ function gotUpdated(jsonObj)
 		var	idir		= indiv.idir;
 		if (typeof(idir) === "undefined")
 		{
-		    console.log("editIndivid.js: 1333 idir=" + idir + 
+		    console.log("editIndivid.js: gotUpdated: 1362 idir=" + idir + 
 				  " jsonObj=" + JSON.stringify(jsonObj));
 		}
+        else
+		    console.log("editIndivid.js: gotUpdated: 1366 jsonObj=" + JSON.stringify(jsonObj));
 		if ((idir - 0) == 0)
-		    console.log("editIndivid.js: 1337: gotUpdated: idir=" + idir + ": " +
+		    console.log("editIndivid.js: gotUpdated: 1368: idir=" + idir + ": " +
 						JSON.stringify(jsonObj));
 		// update IDIR value in form
 		srcform.idir.value	= idir;
@@ -1442,7 +1455,7 @@ function gotUpdated(jsonObj)
 		    // invoke the add method of the 'children' table
 		    // now that the individual has been added into the database
 		    if ((idir - 0) == 0)
-				console.log("editIndivid.js: 1425: gotUpdated: call addChildToPage: idir=" +
+				console.log("editIndivid.js: gotUpdated: 1425: call addChildToPage: idir=" +
 						idir );
             if (childTable)
 		        childTable.addChildToPage(indiv,
@@ -1460,9 +1473,9 @@ function gotUpdated(jsonObj)
     else
     {           // invalid response
 		if (jsonObj && typeof(jsonObj) == "object")
-		    alert("editIndivid.js: 1395: gotUpdated: " + JSON.stringify(jsonObj));
+		    alert("editIndivid.js: gotUpdated: 1473: " + JSON.stringify(jsonObj));
 		else
-		    alert("editIndivid.js: 1397: gotUpdated: '" + xmlDoc + "'");
+		    alert("editIndivid.js: gotUpdated: 1475: '" + jsonObj + "'");
     }           // invalid response
 }		// function gotUpdated
 
@@ -1529,7 +1542,7 @@ function editName(ev)
 									  "&treename=" + treeName +
 									  "&lang=" + lang +
 									  "&debug=" + debug;
-	windowList.push(openFrame("marriages",
+	windowList.push(openFrame("event",
 						      url,
 						      "right"));
     return true;
@@ -4149,8 +4162,6 @@ function eventFeedback(parms)
 		    else		// add to end of event table
 				eventRow	= table.appendChild(newRow);
 		}			// have title for new row
-        else
-            alert("editIndivid.js: 4057 etype not set");
     }				// add new row
     else			// update existing row
 		eventRow		= eventButton.parentNode;
@@ -4653,7 +4664,9 @@ function eiKeyDown(ev)
 
 		    case LTR_F:
 		    {		// letter 'F' edit families
-				document.getElementById("Marriages").click();
+				var marriagesButton   = document.getElementById("Marriages");
+                if (marriagesButton)
+				    marriagesButton.click();
 				return false;	// suppress default action
 		    }		// letter 'F'
 
@@ -4683,7 +4696,9 @@ function eiKeyDown(ev)
 
 		    case LTR_P:
 		    {		// letter 'P' edit parents
-				document.getElementById("Parents").click();
+				var parentsButton   = document.getElementById("Parents");
+                if (parentsButton)
+				    parentsButton.click();
 				return false;	// suppress default action
 		    }		// letter 'P'
 

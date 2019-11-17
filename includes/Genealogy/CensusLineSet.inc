@@ -5,6 +5,8 @@ use \Exception;
 use \ArrayAccess;
 use \Countable;
 use \Iterator;
+use \mb_strlen;
+use \mb_substr;
 /************************************************************************
  *  CensusLineSet.inc													*
  *																		*
@@ -253,24 +255,24 @@ class CensusLineSet extends RecordSet
     }		// CensusLineSet::getIdentifier
 
     /********************************************************************
-     *  function CensusLineSet::getGivenNames										*
+     *  function CensusLineSet::getGivenNames							*
      *																	*
-     *		Common construction of WHERE expression for fields that 		*
-     *		contain one or more given names										*
+     *	Common construction of WHERE expression for fields that 		*
+     *	contain one or more given names									*
      *																	*
-     *		Input:																*
-     *		    $fieldLc		field name in record in lower case				*
-     *		    $value		a value or an array of values						*
+     *	Input:															*
+     *	    $fieldLc		field name in record in lower case			*
+     *	    $value		a value or an array of values					*
      *																	*
-     *		Returns:														*
-     *		    string containing WHERE clause								*
-     *		    A zero length string is returned if the input array is		*
+     *	Returns:														*
+     *	    string containing WHERE clause								*
+     *	    A zero length string is returned if the input array is		*
      *      empty, otherwise the string starts with the word WHERE		*
      *																	*
-     *		Side Effects:														*
-     *		    $this->sqlParms		sets substitution values to PDO exec		*
-				    $this->notPage		set to true if not a single value		*
-     *		    Errors are appended to the global $warn						*
+     *	Side Effects:													*
+     *	    $this->sqlParms		sets substitution values to PDO exec	*
+		    $this->notPage		set to true if not a single value		*
+     *	    Errors are appended to the global $warn						*
      ********************************************************************/
     function getGivenNames($fieldLc, $value)
     {

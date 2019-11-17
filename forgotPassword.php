@@ -15,6 +15,7 @@ use \Exception;
  *		2018/02/04		use class Template								*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban		                        *
  ************************************************************************/
@@ -103,6 +104,8 @@ else
 }
 
 $template		= new FtTemplate("forgotPassword$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'forgotPassword'));
 
 $template->set('USERID',	$username);
 $template->set('EMAIL',		$email);

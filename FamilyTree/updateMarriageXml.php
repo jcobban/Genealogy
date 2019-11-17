@@ -107,6 +107,8 @@ use \Exception;
  *		                record for a new child only just before next    *
  *		                child or end of children                        *
  *		2019/10/28      add information to response to adding a child   *
+ *		2019/11/11      do not create instance of Person for wife       *
+ *		                if the name is empty                            *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -361,6 +363,9 @@ foreach($_POST as $key => $value)
 
 	    case 'mard':
         {		// date of marriage
+            if ($family['wifegivenname'] === '' &&
+                $family['wifesurname'] === '')
+                $wife                   = null;
             if ($wife)
             {               // may be new wife or wife's name may be changed 
                 $wife->save('mard' . __LINE__);

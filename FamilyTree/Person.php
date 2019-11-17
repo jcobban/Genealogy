@@ -282,6 +282,7 @@ use \Templating\TemplateTag;
  *		2019/07/21      use Location::getLocation                       *
  *		3019/08/09      support both old and new style citations to     *
  *		                primary name                                    *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1357,6 +1358,8 @@ foreach($_GET as $key => $value)
 
 // start the template
 $template		        = new FtTemplate("Person$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'Person'));
 
 // internationalization support
 $trtemplate             = $template->getTranslate();

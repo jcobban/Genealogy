@@ -27,6 +27,7 @@ use \Templating\TemplateTag;
  *		                into main template so all of the FtTemplate     *
  *		                customization is performed                      *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *      2019/11/17      include relevant CSS                            *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -175,6 +176,8 @@ else
     }               // exclude file type
 	$includeSub	        = $templateName . $lang . '.html';
 	$template           = new FtTemplate($includeSub);
+    $template->updateTag('otherStylesheets',	
+        		         array('filename'   => $templateName));
 }                   // template location relative to template directory
 
 // create popup balloons for each of the individuals referenced on this page

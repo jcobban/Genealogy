@@ -86,6 +86,7 @@ use \Exception;
  *		2019/09/25      for action=delete do not access object          *
  *		                Address::getIdar no longer saves the object     *
  *		                fix display for deleted object                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -438,7 +439,7 @@ else
 
 $template				= new FtTemplate("Address$action$lang.html");
 $template->updateTag('otherStylesheets',	
-    		             array('filename'   => '/FamilyTree/Address'));
+    		         array('filename'   => '/FamilyTree/Address'));
 $translate              = $template->getTranslate();
 $t                      = $translate['tranTab'];
 

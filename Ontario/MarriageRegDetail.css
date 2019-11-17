@@ -9,12 +9,13 @@
  *		2013/01/22		use fieldsets for participants					*
  *		2014/02/28		add error styles								*
  *		2019/01/24      reduce width of fieldset                        *
+ *		2019/11/03      add white-space: wrap to labelsmall             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 /*	column containers */
     div.column1	{float: 		left;
-				width:  		25em;
+				width:  		26em;
 				margin-top: 	1px;
 				margin-right:	3px;
 				}
@@ -59,7 +60,8 @@
 				padding:    	0px 3px 0px 3px;
 				margin-top: 	1px;
 				float:	    	left;
-				width:	    	9em;
+				width:	    	10em;
+                white-space:    normal;
 				}
 
     input.left {

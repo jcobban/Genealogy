@@ -48,6 +48,7 @@ use \Exception;
  *		2018/11/19      change Help.html to Helpen.html                 *
  *		2019/07/12      use FtTemplate                                  *
  *		                add support for username pattern                *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -187,6 +188,8 @@ else
 }		            // invalid input
 
 $template       = new FtTemplate("grantIndivid$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'grantIndivid'));
 
 if (strlen($surname) > 0)
 {

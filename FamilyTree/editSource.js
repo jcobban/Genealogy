@@ -25,7 +25,7 @@
  *		2013/05/29		use actMouseOverHelp common function			*
  *		2013/07/30		defer facebook initialization until after load	*
  *		2015/02/01		used submit because debug flag was erroneously	*
- *						function set										*
+ *						function set									*
  *		2015/02/10		support being opened in <iframe>				*
  *		2015/05/27		use absolute URLs for AJAX						*
  *		2015/06/01		new feedback mechanism to invoking page to		*
@@ -47,7 +47,7 @@
 window.onload	= onloadEdit;
 
 /************************************************************************
- *  function childFrameClass												*
+ *  function childFrameClass											*
  *																		*
  *  If this dialog is opened in a half window then any child dialogs	*
  *  are opened in the other half of the window.							*
@@ -178,6 +178,7 @@ function updSource()
     var	form		= this.form;
     var	parms		= {};
 
+    var trace       = '';
     for (var i = 0; i < form.elements.length; i++)
     {		// loop through all form elements
 		var	element	= form.elements[i];
@@ -200,6 +201,7 @@ function updSource()
 		    }		// single selection
 		}
     }		// loop through all form elements
+
     // invoke script to update Source and return XML result
     HTTP.post('/FamilyTree/updateSource.php',
 		      parms,
@@ -237,13 +239,13 @@ function gotSource(xmlDoc)
 
 		if (opener)
 		{			// invoked as child
-		    var	callerDoc		= opener.document;
+		    var	callerDoc		            = opener.document;
 		    if (args['form'])
 		    {			// caller requested feedback
-				var	formName		= args['form'];
+				var	formName		        = args['form'];
 				sourceRecord.elementname	= args['select'];
-				sourceRecord.form		= formName;
-				var	form			= callerDoc.forms[formName];
+				sourceRecord.form		    = formName;
+				var	form			        = callerDoc.forms[formName];
 				if (form)
 				{			// form found in caller
 				    if (form.sourceCreated)
@@ -266,9 +268,9 @@ function gotSource(xmlDoc)
 		    else
 		    if (args['elementid'])
 		    {			// caller requested feedback
-				var	elementId	= args['elementid'];
-				sourceRecord.elementid	= elementId;
-				var	element		= callerDoc.getElementById(elementId);
+				var	elementId	            = args['elementid'];
+				sourceRecord.elementid	    = elementId;
+				var	element		        = callerDoc.getElementById(elementId);
 				if (element)
 				{			// form found in caller
 				    if (element.feedback)

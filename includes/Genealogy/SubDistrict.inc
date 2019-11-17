@@ -285,9 +285,6 @@ class SubDistrict extends Record
 							    	            'collective' => 0);
 						    $this->census       = new Census($parms);
                             self::$formerCensus = $this->census;
-						    if (!$this->census->isExisting())
-						        $warn	.= "<p>SubDistrict::__construct: " .
-						"unsupported census identifier '$censusId'</p>\n";
                         }           // need to construct
 				    }
 				    break;
@@ -531,31 +528,31 @@ class SubDistrict extends Record
     }		// SubDistrict::__construct
 
     /********************************************************************
-     * function SubDistrict:get														*
+     * function SubDistrict:get											*
      *																	*
-     *		Obtain the current value of a field in the object.				*
+     *	Obtain the current value of a field in the object.				*
      *																	*
      *  Parameters:														*
-     *		    $field		name of field to retrieve						*
+     *	    $field		name of field to retrieve						*
      *																	*
-     *		Returns:														*
-     *		    the value of the field										*
+     *	Returns:														*
+     *	    the value of the field										*
      *																	*
-     *		Side Effects:														*
-     *		    Adds warning if $field is not already defined as a field		*
-     *		    or pseudo-field and returns null.								*
+     *	Side Effects:													*
+     *	    Adds warning if $field is not already defined as a field	*
+     *	    or pseudo-field and returns null.							*
      ********************************************************************/
     function get($field)
     {
-		$fieldLc	= strtolower($field);
+		$fieldLc    	= strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
 		if (substr($fieldLc,0,2) == 'd_')
-		{		// accept district field names
+		{		        // accept district field names
 		    return $this->district[$fieldLc];
-		}		// accept district field names
+		}		        // accept district field names
 		else
-		{		// other fields
+		{		        // other fields
 		    switch($fieldLc)
 		    {
 				case 'sd_census':
@@ -597,27 +594,27 @@ class SubDistrict extends Record
 				default:
 				    return parent::get($fieldLc);
 		    }
-		}		// other fields
+		}		        // other fields
 
     }		// SubDistrict::get
 
     /********************************************************************
-     * function SubDistrict:set														*
+     * function SubDistrict:set											*
      *																	*
-     *		Change the value of a field in the object.						*
-     *  The method validates that the supplied value is compatible with		*
-     *		the target field.												*
+     *	Change the value of a field in the object.						*
+     *  The method validates that the supplied value is compatible with	*
+     *	the target field.												*
      *																	*
      *  Parameters:														*
-     *		    $field		name of field to change								*
-     *		    $value		new value to set it to								*
+     *	    $field		name of field to change							*
+     *	    $value		new value to set it to							*
      *																	*
-     *		Returns:														*
-     *				previous value of the field								*
+     *	Returns:														*
+     *		previous value of the field								    *
      *																	*
-     *		Side Effects:														*
-     *		    Adds trace if $field is not already defined as a field		*
-     *		    or pseudo-field and debugging is enabled						*
+     *	Side Effects:													*
+     *	    Adds trace if $field is not already defined as a field		*
+     *	    or pseudo-field and debugging is enabled					*
      ********************************************************************/
     function set($field, $value)
     {
@@ -655,18 +652,18 @@ class SubDistrict extends Record
 		    {		// no validation implemented yet
 				return parent::set($fieldLc, $value);
 		    }		// no validation implemented yet
-		}		// switch on field name
+		}		    // switch on field name
     }		// SubDistrict::set
 
     /********************************************************************
-     * function SubDistrict::save												*
+     * function SubDistrict::save										*
      *																	*
-     *  Save changes made to the SubDistrict record into the				*
+     *  Save changes made to the SubDistrict record into the			*
      *  database.														*
      *																	*
      *  Parameters:														*
-     *		    $xml		If true diagnostic output is emitted in XML		*
-     *						format. If a string use it as top tag name		*
+     *		$xml		If true diagnostic output is emitted in XML		*
+     *					format. If a string use it as top tag name		*
      ********************************************************************/
     function save($xml)
     {
@@ -884,15 +881,15 @@ class SubDistrict extends Record
     }		// SubDistrict::delete
 
     /********************************************************************
-     * function SubDistrict::getDefaultImage										*
+     * function SubDistrict::getDefaultImage							*
      *																	*
-     *  If the Page table does not identify the URL of the image of the		*
-     *  original census image, then this method uses information from		*
-     *		the SubDistrict entry to determine the most probable URL for		*
-     *		that image.														*
+     *  If the Page table does not identify the URL of the image of the	*
+     *  original census image, then this method uses information from	*
+     *	the SubDistrict entry to determine the most probable URL for	*
+     *	that image.														*
      *																	*
      *  Parameters:														*
-     *		    $page		Page number in division								*
+     *	    $page		Page number in division							*
      ********************************************************************/
     function getDefaultImage($page)
     {
@@ -1037,13 +1034,13 @@ class SubDistrict extends Record
 
 
     /********************************************************************
-     * function SubDistrict::getPrevSearch										*
+     * function SubDistrict::getPrevSearch								*
      *																	*
      *  This method identifies the identifying parameters of the		*
-     *  instance of SubDistrict which precedes the current entry within		*
-     *  the district and returns the search string to append to the URL		*
-     *		of the script to obtain the information about that preceding		*
-     *		instance.														*
+     *  instance of SubDistrict which precedes the current entry within	*
+     *  the district and returns the search string to append to the URL	*
+     *	of the script to obtain the information about that preceding	*
+     *	instance.														*
      ********************************************************************/
     function getPrevSearch()
     {
@@ -1056,27 +1053,26 @@ class SubDistrict extends Record
 		    // identify the immediately preceding enumeration division within 
 		    // the current district
 		    $censusId		= $this->row['sd_census'];
-		    $distId		= $this->row['sd_distid'];
+		    $distId		    = $this->row['sd_distid'];
 		    if ($distId == floor($distId))
 				$distId		= intval($distId);
-		    $sdId		= $this->row['sd_id'];
+		    $sdId		    = $this->row['sd_id'];
 		    $province		= $this->district['province'];
 
 		    if (ctype_digit($sdId))
 				$selPrev	= "SELECT SD_Id, SD_Div from SubDistricts where SD_Census=:censusId && SD_DistId=:distId && CONCAT(LPAD(SD_ID,3,'0'), LPAD(SD_Div,2,' '))<=CONCAT(LPAD(:sdId,3,'0'),LPAD(:division,2,' ')) ORDER BY (SD_Id-0) DESC, LPAD(SD_Div,2,' ') DESC LIMIT 2;";
 		    else
 				$selPrev	= "SELECT SD_Id, SD_Div from SubDistricts where SD_Census=:censusId && SD_DistId=:distId && CONCAT(SD_ID, LPAD(SD_Div,2,' '))<=CONCAT(:sdId,LPAD(:division,2,' ')) ORDER BY SD_Id DESC, LPAD(SD_Div,2,' ') DESC LIMIT 2;";
-		    $sqlParms	= array(
-						'censusId'	=> $censusId,
-						'distId'	=> $distId,
-						'sdId'		=> $sdId,
-						'division'	=> $this->row['sd_div']);
+		    $sqlParms	    = array('censusId'	=> $censusId,
+		    	          			'distId'	=> $distId,
+			    	        		'sdId'		=> $sdId,
+				    	        	'division'	=> $this->row['sd_div']);
 
     
-		    $stmt	= $connection->prepare($selPrev);
-		    $selText	= debugPrepQuery($selPrev, $sqlParms);
+		    $stmt	        = $connection->prepare($selPrev);
+		    $selText	    = debugPrepQuery($selPrev, $sqlParms);
 		    if ($stmt->execute($sqlParms))
-		    {		// success
+		    {		    // success
 				if ($debug)
 				    $warn	.= "<p>SubDistrict::getPrevSearch: " .
 								__LINE__ . " $selText</p>\n";
@@ -1085,33 +1081,33 @@ class SubDistrict extends Record
 				if (count($result) == 2)
 				{		// current and previous division
 				    // second row contains ids of previous division
-				    $row 		= $result[1];
-				    $this->prevSd	= $row[0];
-				    $this->prevDiv	= $row[1];
+				    $row 		        = $result[1];
+				    $this->prevSd	    = $row[0];
+				    $this->prevDiv	    = $row[1];
 				    $this->prevSearch	= "?Census=$censusId&Province=$province&District=$distId&SubDistrict={$row[0]}&Division={$row[1]}";
 				}		// current and previous division
 				else
 				{		// no previous division in district
-				    $this->prevSd	= '';
-				    $this->prevDiv	= '';
+				    $this->prevSd	    = '';
+				    $this->prevDiv	    = '';
 				    $this->prevSearch	= '';
 				}		// no previous division in district
-		    }		// success
+		    }		    // success
 		    else
 		    {
 				throw new Exception("SubDistrict:getPrevSearch: " .
 							    "getNames: query='$selText', " .
 							    print_r($stmt->errorInfo(),true));
-		    }		// error on query
-		}		// not initialized
+		    }		    // error on query
+		}		        // not initialized
 		return $this->prevSearch;
     }		// SubDistrict::getPrevSearch
 
     /********************************************************************
-     * function SubDistrict::getPrevSd												*
+     * function SubDistrict::getPrevSd									*
      *																	*
-     *  This method returns the identifier of the subdistrict preceding		*
-     *  the current subdistrict within the district.						*
+     *  This method returns the identifier of the subdistrict preceding	*
+     *  the current subdistrict within the district.					*
      ********************************************************************/
     function getPrevSd()
     {
@@ -1121,10 +1117,10 @@ class SubDistrict extends Record
     }		// SubDistrict::getPrevSd
 
     /********************************************************************
-     * function SubDistrict::getPrevDiv												*
+     * function SubDistrict::getPrevDiv									*
      *																	*
-     *  This method returns the division identifier of the subdistrict		*
-     *  preceding the current subdistrict within the district.				*
+     *  This method returns the division identifier of the subdistrict	*
+     *  preceding the current subdistrict within the district.			*
      ********************************************************************/
     function getPrevDiv()
     {
@@ -1134,13 +1130,13 @@ class SubDistrict extends Record
     }		// SubDistrict::getPrevDiv
 
     /********************************************************************
-     * function SubDistrict::getNextSearch										*
+     * function SubDistrict::getNextSearch								*
      *																	*
      *  This method identifies the identifying parameters of the		*
-     *  instance of SubDistrict which follows the current entry within		*
-     *  the district and returns the search string to append to the URL		*
-     *		of the script to obtain the information about that following		*
-     *		instance.														*
+     *  instance of SubDistrict which follows the current entry within	*
+     *  the district and returns the search string to append to the URL	*
+     *	of the script to obtain the information about that following	*
+     *	instance.														*
      ********************************************************************/
     function getNextSearch()
     {
@@ -1151,10 +1147,10 @@ class SubDistrict extends Record
 		if (is_null($this->nextSearch))
 		{		// not initialized
 		    $censusId		= $this->row['sd_census'];
-		    $distId		= $this->row['sd_distid'];
+		    $distId		    = $this->row['sd_distid'];
 		    if ($distId == floor($distId))
 				$distId		= intval($distId);
-		    $sdId		= $this->row['sd_id'];
+		    $sdId		    = $this->row['sd_id'];
 		    $province		= $this->district['province'];
 
 		    // identify the immediately following enumeration division within 
@@ -1163,26 +1159,25 @@ class SubDistrict extends Record
 				$selNext	= "SELECT SD_Id, SD_Div from SubDistricts where SD_Census=:censusId && SD_DistId=:distId && CONCAT(LPAD(SD_ID,3,'0'), LPAD(SD_Div,2,' '))>=CONCAT(LPAD(:sdId,3,'0'),LPAD(:division,2,' ')) ORDER BY (SD_Id-0) ASC, LPAD(SD_Div,2,' ') ASC LIMIT 2;";
 		    else
 				$selNext	= "SELECT SD_Id, SD_Div from SubDistricts where SD_Census=:censusId && SD_DistId=:distId && CONCAT(SD_ID, LPAD(SD_Div,2,' '))>=CONCAT(:sdId,LPAD(:division,2,' ')) ORDER BY SD_Id ASC, LPAD(SD_Div,2,' ') ASC LIMIT 2;";
-		    $sqlParms	= array(
-						'censusId'	=> $censusId,
-						'distId'	=> $distId,
-						'sdId'		=> $sdId,
-						'division'	=> $this->row['sd_div']);
+		    $sqlParms	    = array('censusId'	=> $censusId,
+            						'distId'	=> $distId,
+            						'sdId'		=> $sdId,
+            						'division'	=> $this->row['sd_div']);
     
-		    $stmt	= $connection->prepare($selNext);
-		    $selText	= debugPrepQuery($selNext, $sqlParms);
+		    $stmt	        = $connection->prepare($selNext);
+		    $selText	    = debugPrepQuery($selNext, $sqlParms);
 		    if ($stmt->execute($sqlParms))
-		    {		// success
+		    {		    // success
 				if ($debug)
 				    $warn	.= "<p>SubDistrict::getPrevSearch: " .
 								__LINE__ . " $selText</p>\n";
-				$result 		= $stmt->fetchAll(PDO::FETCH_NUM);
+				$result 	= $stmt->fetchAll(PDO::FETCH_NUM);
 				if (count($result) == 2)
 				{		// current and next division
 				    // second row contains ids of next division
-				    $row 		= $result[1];
-				    $this->nextSd	= $row[0];
-				    $this->nextDiv	= $row[1];
+				    $row 		        = $result[1];
+				    $this->nextSd	    = $row[0];
+				    $this->nextDiv	    = $row[1];
 				    $this->nextSearch	= "?Census=$censusId&Province=$province&District=$distId&SubDistrict={$row[0]}&Division={$row[1]}";
 				}		// current and next division
 				else
@@ -1191,22 +1186,22 @@ class SubDistrict extends Record
 				    $this->nextDiv		= '';
 				    $this->nextSearch	= '';
 				}		// no next in district
-		    }		// success
+		    }		    // success
 		    else
 		    {
 				throw new Exception("SubDistrict::getNames: " .
 							    "query='$selText', " .
 							    print_r($stmt->errorInfo(),true));
-		    }		// error on query
-		}		// not initialized
+		    }		    // error on query
+		}		        // not initialized
 		return $this->nextSearch;
     }		// SubDistrict::getNextSearch
 
     /********************************************************************
-     * function SubDistrict::getNextSd												*
+     * function SubDistrict::getNextSd									*
      *																	*
-     *  This method returns the identifier of the subdistrict following		*
-     *  the current subdistrict within the district.						*
+     *  This method returns the identifier of the subdistrict following	*
+     *  the current subdistrict within the district.					*
      ********************************************************************/
     function getNextSd()
     {
@@ -1216,10 +1211,10 @@ class SubDistrict extends Record
     }		// SubDistrict::getNextSd
 
     /********************************************************************
-     * function SubDistrict::getNextDiv												*
+     * function SubDistrict::getNextDiv									*
      *																	*
-     *  This method returns the division identifier of the subdistrict		*
-     *  following the current subdistrict within the district.				*
+     *  This method returns the division identifier of the subdistrict	*
+     *  following the current subdistrict within the district.			*
      ********************************************************************/
     function getNextDiv()
     {
@@ -1229,20 +1224,20 @@ class SubDistrict extends Record
     }		// SubDistrict::getNextDiv
 
     /********************************************************************
-     * function SubDistrict::toXml												*
+     * function SubDistrict::toXml										*
      *																	*
-     *  Emit the contents of the object as XML.								*
+     *  Emit the contents of the object as XML.							*
      *																	*
-     *		Parameters:														*
-     *		    $top		tag name as a string for the tag enclosing the		*
-     *						values.												*
-     *						If null, do not enclose the individual values		*
-     *						inside a root node.								*
-     *		    $print		if true print the output, else just return it		*
-     *		    $options		match signature										*
+     *	Parameters:														*
+     *		$top		tag name as a string for the tag enclosing the	*
+     *					values.											*
+     *					If null, do not enclose the individual values	*
+     *					inside a root node.								*
+     *		$print		if true print the output, else just return it	*
+     *		$options	match signature									*
      *																	*
-     *		Returns:														*
-     *		    XML representation of the object								*
+     *	Returns:														*
+     *		XML representation of the object							*
      ********************************************************************/
     function toXml($top,
 				   $print	= true,
@@ -1250,35 +1245,35 @@ class SubDistrict extends Record
     {
 		// ensure that there is a label to use for the top element
 		if (!is_string($top) || strlen($top) == 0)
-		    $top	    = 'SubDistrict';
+		    $top	        = 'SubDistrict';
 		if (is_null($top))
-		    $retval	    = '';
+		    $retval	        = '';
 		else
-		    $retval	    = "    <$top>\n";
+		    $retval	        = "    <$top>\n";
 
 		foreach($this->row as $key => $value)
 		{
 		    if (substr($key, 0, 3) == 'sd_')
 				    $key	= substr($key, 3);
-		    $retval	    .= "\t<$key>" . xmlentities($value) . "</$key>\n";
+		    $retval	        .= "\t<$key>" . xmlentities($value) . "</$key>\n";
 		    if ($key == 'distid')
 		    {			// also report information from District
-				$retval	.= "\t<distname>" .
-						xmlentities($this->district['d_name']) .
-						"</distname>\n";
-				$retval	.= "\t<province>" .
-						xmlentities($this->district['d_province']) .
-						"</province>\n";
+				$retval	    .= "\t<distname>" .
+				        		xmlentities($this->district['d_name']) .
+				        		"</distname>\n";
+				$retval	    .= "\t<province>" .
+				        		xmlentities($this->district['d_province']) .
+				        		"</province>\n";
 		    }			// also report information from District
 		}
 		if ($top !== null)
-		    $retval	.= "    </$top>\n";
+		    $retval	        .= "    </$top>\n";
     }		// SubDistrict::toXml
 
     /********************************************************************
-     * function SubDistrict::__toString												*
+     * function SubDistrict::__toString									*
      *																	*
-     *		Implement conversion to string.										*
+     *	Implement conversion to string.									*
      ********************************************************************/
     function __toString()
     {
@@ -1290,7 +1285,7 @@ class SubDistrict extends Record
     /********************************************************************
      * function SubDistrict::getPages									*
      *																	*
-     *  Get an array of instances of Page for this SubDistrict.			*
+     *  Get a RecordSet of instances of Page for this SubDistrict.		*
      *	If the corresponding portion of the Pages table has not been	*
      *	created yet, this creates new records for each required Page.	*
      *																	*

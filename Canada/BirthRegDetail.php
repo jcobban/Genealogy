@@ -135,6 +135,7 @@ use \Exception;
  *						to match width of rest of form					*
  *		2018/10/03      use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -259,10 +260,10 @@ foreach($_GET as $key => $value)
 
         case 'lang':
         {
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value,0,2));
+            $lang           = FtTemplate::validateLang($value);
 			break;
         }
+
 	    default:
 	    {
 			$warn	.= "Unexpected parameter $key='$value'. ";
@@ -273,6 +274,8 @@ foreach($_GET as $key => $value)
 
 // start the template
 $template		= new FtTemplate("BirthRegDetail$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'BirthRegDetail'));
 $trtemplate         = $template->getTranslate();
 
 // validate parameters

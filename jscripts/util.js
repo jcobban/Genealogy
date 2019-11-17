@@ -205,6 +205,7 @@
  *		                if it is invoked from a top level frame when    *
  *		                there is no remaining history.                  *
  *		2019/07/30      consolidate support for tinyMCE                 *
+ *		2019/11/11      do not add traceAlert output to console.log     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -2459,16 +2460,14 @@ function commonScroll(event)
 /************************************************************************
  *  function traceAlert													*
  *																		*
- *  If the debugTrace div created by the PHP function showTrace is		*
- *  available, add the message to the end of that division, otherwise	*
- *  display the message as an alert.									*
+ *  Add the message to the end of the debugTrace division so it is      *
+ *  displayed as a warning in the page after the <h1>                   *
  *																		*
  *  Input:																*
  *		message			text of message to display						*
  ************************************************************************/
 function traceAlert(message)
 {
-    console.log('traceAlert(' + message + ')');
 	var traceDiv	        = document.getElementById('debugTrace');
 	if (traceDiv == null)
 	{                       // no existing trace div
@@ -2504,8 +2503,6 @@ function traceAlert(message)
 		line.appendChild(document.createTextNode(message));
     }                       // single text line
     traceDiv.appendChild(line);
-    console.log('line=' + line.outerHTML);
-    console.log('traceDiv=' + traceDiv.outerHTML);
 }		// function traceAlert
 
 /************************************************************************
@@ -3126,16 +3123,16 @@ function createFromTemplate(template,
 function openFrame(name, url, side)
 {
     // accept mixed case side indicator
-    side	= side.toLowerCase();
+    side	                = side.toLowerCase();
     if (side != "left")
-		side	= "right";
+		side	            = "right";
 
     // locate the window and document instances for the top window
     // of the application
-    var	win	= window;
+    var	win	                = window;
     while(win.frameElement)
-		win	= win.parent;
-    var	doc	= win.document;
+		win	                = win.parent;
+    var	doc	                = win.document;
 
     // get global information maintained at the top window
     if (!('dialogZindex' in win))
@@ -3145,7 +3142,7 @@ function openFrame(name, url, side)
 
 
     // get the instance of <iframe> to display by name
-    iframe			= doc.getElementById(name);
+    iframe			        = doc.getElementById(name);
     if (iframe)
     {				// have existing element by name
 		if (iframe.nodeName !== 'IFRAME')
@@ -3156,15 +3153,15 @@ function openFrame(name, url, side)
     }				// have existing element by name
     else
     {				// need to create new frame
-		iframe			= doc.createElement("IFRAME");
-		iframe.name		= name;
-		iframe.id		= name;
+		iframe			    = doc.createElement("IFRAME");
+		iframe.name		    = name;
+		iframe.id		    = name;
 		iframe.className	= side;
 		iframe.onerror		= openFrameError;
 		doc.body.appendChild(iframe);
     }				// need to create new frame
 
-    iframe.opener		= window;	// parent of new dialog
+    iframe.opener		    = window;	// parent of new dialog
 
     // identify the page to load into the frame
     if (url !== null && url != iframe.src)
@@ -3176,8 +3173,8 @@ function openFrame(name, url, side)
     }
 
     // get the dimensions of the root window
-    var	w			= doc.documentElement.clientWidth;
-    var	h			= doc.documentElement.clientHeight;
+    var	w			        = doc.documentElement.clientWidth;
+    var	h			        = doc.documentElement.clientHeight;
 
     if (win.dialogCount == 0)
     {	// resize the main page to only occupy the left half of the window
@@ -3198,7 +3195,7 @@ function openFrame(name, url, side)
 		iframe.style.left	= "0px";
     else
 		iframe.style.left	= w/2 + "px";
-    var zindex			= win.dialogZindex[side] + 2;
+    var zindex			    = win.dialogZindex[side] + 2;
     iframe.style.zIndex		= zindex;	// move iframe to front
     iframe.style.top		= 0 + "px";
     iframe.style.visibility	= "visible";
@@ -3223,19 +3220,29 @@ function openFrameError()
  ************************************************************************/
 function closeFrame(lastChoice)
 {
-    var	iframe	= window.frameElement;
+    var	iframe	            = window.frameElement;
     if (iframe)
-    {			// current window is in an iframe
-		var	msg	= '';
+    {			        // current window is in an iframe
+		var	msg	            = '';
 
 		// locate the window and document instances for the top window
-		var	win	= window;
-		while(win.frameElement)
-		    win		= win.parent;
-		var	doc	= win.document;
+		var	topwin	        = window.top;
+		var	doc	            = topwin.document;
 
-		if (win.dialogCount == 1)
-		{		// closing last dialog
+        var frameInfo       = '';
+        for (var i = 0; i < topwin.frames.length; i++)
+        {
+            var frame       = topwin.frames[i];
+            try {
+            var felt        = frame.frameElement;
+            frameInfo       += i + ' name=' + frame.name + 
+                                " <" + felt.nodeName + 
+                                ' id="' + felt.id + '"> ';
+            } catch(e) {};
+        }
+
+		if (topwin.dialogCount == 1)
+		{		        // closing last dialog
 		    // resize the display of the transcription
 		    var	w			= doc.documentElement.clientWidth;
 		    var	h			= doc.documentElement.clientHeight;
@@ -3245,20 +3252,22 @@ function closeFrame(lastChoice)
 				transcription.style.width	= w + "px";
 				transcription.style.height	= h + "px";
 		    }			// restore main window to full width
-		}		// closing last dialog
+		}		        // closing last dialog
 
-		win.dialogCount--;
-		win.dialogZindex[iframe.className]	-= 2;
+		topwin.dialogCount--;
+        //alert("util.js: closeFrame: topwin.dialogCount=" + win.dialogCount +
+        //  " iframe.className='" + iframe.className + "' frames=" + frameInfo);
+		topwin.dialogZindex[iframe.className]	-= 2;
 
 		// this has to be done right at the end because iframe is the
 		// 'this' parameter of this function
 		var father	= iframe.parentNode;
 		father.removeChild(iframe);
-    }			// current window is in an iframe
+    }			        // current window is in an iframe
     else
-    {
+    {                   // not in an iframe
 		if (window.opener === null)
-        {
+        {               // not opened from another window
             if (history.length > 1)
 		        history.back();
             else
@@ -3271,8 +3280,10 @@ function closeFrame(lastChoice)
                 else
                     location    = lastChoice;
             }
-        }
+        }               // not opened from another window
 		else
+        {
 		    window.close();
-    }
+        }
+    }                   // not in an iframe
 }		// function closeFrame

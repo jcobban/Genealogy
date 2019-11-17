@@ -5,7 +5,9 @@
  *  matching a pattern.													*
  *																		*
  *  History:															*
- *		2019/07/22     created                                          *
+ *		2019/07/22      created                                         *
+ *      2019/11/06      add option to create new source                 *
+ *                      add translate table for IDST for Javascript     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
@@ -13,6 +15,9 @@
 	  <a href="/index.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+      <a href="/FamilyTree/editSource.php?idsr=0&lang=$LANG">
+          Create New Source
+      </a>:
     </div>
     <div class="body">
       <h1>
@@ -102,6 +107,9 @@
 	      </tbody>
 	    </table>
 	  </form>
+    </div>
+    <div class="hidden" id="srcTypes">
+        <span id="IDST$idst">$name</span>
     </div>
     <div class="hidden" id="templates">
     

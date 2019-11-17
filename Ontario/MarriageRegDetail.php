@@ -130,6 +130,7 @@ use \Exception;
  *		                do not reject lang parameter                    *
  *		2019/01/24      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/11/05      correct search for matching citations           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -596,7 +597,7 @@ if (strlen($msg) == 0)
     // check for existing citations to this registration
     $citparms				= array('idsr'		=> 99,
                                     'type'		=> Citation::STYPE_MAR,
-                                    'srcdetail'	=> "^$regYear-0*$regNum"); 
+                                    'srcdetail'	=> "^ *$regYear-0*$regNum *$"); 
     $citations				= new CitationSet($citparms);
     if ($citations->count() > 0)
     {		// existing citation
@@ -797,7 +798,10 @@ if (strlen($msg) == 0)
     $template->set('MINISTERRESIDENCE',		$minister['residence']);
     $template->set('MINISTERBIRTHPLACE',	$minister['birthplace']);
     $template->set('MINISTERMARSTAT',		$minister['marstat']);
-    $template->set('MINISTEROCCUPATION',	$minister['occupation']);
+    $ministerOccupation	                = $minister['occupation'];
+    if ($ministerOccupation == '')
+        $ministerOccupation             = $template['defaultMinOcc']->innerHTML;
+    $template->set('MINISTEROCCUPATION',	$ministerOccupation);
     $template->set('MINISTERFATHERNAME',	$minister['fathername']);
     $template->set('MINISTERMOTHERNAME',	$minister['mothername']);
     $template->set('MINISTERRELIGION',		$minister['religion']);

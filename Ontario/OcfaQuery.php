@@ -20,6 +20,7 @@ use \Exception;
  *																		*
  *  History:															*
  *		2019/05/01      created                                         *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -128,6 +129,8 @@ if ($debug && count($_GET) > 0)
 
 // create instance of Template
 $template		    = new FtTemplate("OcfaQuery$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'OcfaQuery'));
 
 $domainObj	        = new Domain(array('domain'     => $domain,
                                        'language'	=> $lang));

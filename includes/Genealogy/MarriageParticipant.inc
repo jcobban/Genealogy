@@ -486,22 +486,33 @@ class MarriageParticipant extends Record
 		global	$userid;
 		global	$connection;
 
+		// determine top level tag name for XML output
+        $indent        		= '';
+        $xmlparms        	= '';
 		if (is_string($xml))
-		{		// string tag name
-		    $tagname	= $xml;
-		    $xml	= true;
-		}		// string tag name
+		{		        // string tag name
+            $matches   		= array();
+            if (preg_match('/^(\s*)(\w*)(.*)$/', $xml, $matches))
+            {
+                $indent		= $matches[1];
+                $xml   		= $matches[2];
+                $xmlparms   = $matches[3];
+            }
+		    $tagname		= $xml;
+		    $xml	   		= true;
+		}		        // string tag name
 		else
 		if ($xml)
-		{		// true
-		    $tagname	= 'cmd';
-		}		// true
+        {		        // boolean true
+            $indent         = '    ';
+		    $tagname		= 'cmd';
+		}		        // boolean true
 
 		if ($this->needInsert)
 		{		// create new record
 		    $fldnames		= '';
-		    $comma		= '';
-		    $values		= '';
+		    $comma		    = '';
+		    $values		    = '';
 		    $sqlParms		= array();
 		    foreach($this->row as $fld => $value)
 		    {
@@ -543,8 +554,11 @@ class MarriageParticipant extends Record
 		    {		// successful insert
 				$count		= $stmt->rowCount();
 				if ($xml)
-				    print "<$tagname result='$count'>" . $insertText . 
-						    "</$tagname>\n";
+				{		// XML output
+                    print "$indent<$tagname$xmlparms count='$count'>\n" .
+                            "$indent\t$insertText\n" .
+						    "$indent</$tagname>\n";
+				}		// XML output
 				if ($debug)
 				{
                     $warn	.= "<p>MarriageParticipant::save: " . __LINE__ . 
@@ -636,9 +650,12 @@ class MarriageParticipant extends Record
 				{		// successful update
 				    $count	= $stmt->rowCount();
 				    if ($xml)
-						print "<$tagname count='$count'>" .
-								$updateText . "</$tagname>\n";
-				    else
+				    {
+                        print "$indent<$tagname$xmlparms result='$count'>\n" .
+                                "$indent\t$updateText\n" .
+                                "$indent</$tagname>\n";
+				    }
+
 				    if ($debug)
                         $warn	.= "<p>MarriageParticipant::save: " . __LINE__ .
                                  " $updateText</p>\n" . "<p>count=$count</p>\n";
@@ -681,14 +698,26 @@ class MarriageParticipant extends Record
 		global	$connection;
 
 		// handle XML output option
+        $indent        		= '';
+        $xmlparms           = '';
 		if (is_string($xml))
-		    $xmltag	= $xml;
+        {			    // string tag name
+            $matches   		= array();
+            if (preg_match('/^(\s*)(\w*)(.*)$/', $xml, $matches))
+            {
+                $indent		= $matches[1];
+                $xml   		= $matches[2];
+                $xmlparms  	= $matches[3];
+            }
+            $tagname		= $xml;
+            $xml	   		= true;
+        }			    // string tag name
 		else
 		if ($xml)
-		{
-		    $xml	= true;
-		    $xmltag	= 'cmd';
-		}
+		{               // boolean true
+		    $xml	        = true;
+		    $tagname	    = 'cmd';
+		}               // boolean true
 
 		// delete the record if it is in the database
 		if (!$this->needInsert)
@@ -712,7 +741,9 @@ class MarriageParticipant extends Record
                                 " $deleteText</p>\n" . "<p>count=$count</p>\n";
 
 				if ($xml)
-				    print "<$xmltag count='$count'>$deleteText</$xmltag>\n";
+                    print "$indent<$tagname$xmlparms count='$count'>\n" .
+                            "$indent\t$deleteText\n" .
+                            "$indent</$tagname>\n";
 
 				// log the update
 				logSqlUpdate($delete,

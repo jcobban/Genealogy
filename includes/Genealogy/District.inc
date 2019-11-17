@@ -201,12 +201,6 @@ class District extends Record
 						    $cparms		    = array('censusid' => $censusId,
 	        							    		'collective'	=> 0);
 						    $this->census	= new Census($cparms);
-						    if (!$this->census->isExisting())
-						    {		// unable to create instance of Census
-                                $this->msg  .= "District::__construct: " .
-                                                __LINE__ .
-			    				 " unsupported census identifier '$censusId'";
-						    }		// unable to create instance of Census
 						}		// string
 						break;
 				    }
@@ -299,12 +293,6 @@ class District extends Record
 						    $parms		= array('censusid' => $censusId,
 	        									'collective'	=> 0);
 						    $this->census	= new Census($parms);
-						    if (!$this->census->isExisting())
-						    {		// unable to create instance of Census
-                                $this->msg  .= "District::__construct: " .
-                                                __LINE__ .
-			    				 " unsupported census identifier '$censusId'";
-						    }		// unable to create instance of Census
 						}		    // string
 						break;
 				    }
@@ -412,6 +400,8 @@ class District extends Record
 		    }			        // error performing query
 		}			            // parameters for creating row
 
+        if ($distId == 0)
+            throw new Exception("district id not set");
 		// invoke constructor of base class
 		parent::__construct($dbrow,
 						    'Districts');

@@ -361,9 +361,10 @@ class Census extends Record
      ********************************************************************/
     function get($name)
     {
-		$fieldLc		= strtolower($name);
+		$fieldLc		    = strtolower($name);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc		= self::$translate[$fieldLc];
+        $censusid           = $this->row['censusid'];
 		switch($fieldLc)
 		{			// act on specific field
 		    case 'censusid':
@@ -386,7 +387,7 @@ class Census extends Record
 
 		    case 'idsr':
 		    {           // the identifier of the Source record
-				$idsr		= $this->row[$fieldLc];
+				$idsr		= $this->row['idsr'];
 				if (is_null($idsr))
 				    return 1;       // "blank" Source
 				else
@@ -399,37 +400,40 @@ class Census extends Record
                 if (is_string($partof) && strlen($partof) == 2)
                     return $partof;
                 else
-                    return substr($this->row['censusid'], 0, 2);
+                    return substr($censusid, 0, 2);
             }           // ISO country code
 
             case 'province':
             {           // province or state abbreviation
                 // if this is a census of an individual state or
                 // province this returns the string id 
+                $idl        = strlen($censusid);
                 $partof		= $this->row['partof'];
                 if (is_string($partof) && strlen($partof) == 2)
-                    return substr($this->row['censusid'], 0, 2);
+                    return substr($censusid, 0, 2);
                 else
-                if (strlen($this->row['censusid']) == 8)
-                    return substr($this->row['censusid'], 2, 2);
+                if ($idl >= 8)
+                    return substr($censusid, 2, $idl - 6);
                 else
                     return null;    // national census
             }           // province or state abbreviation
 
             case 'year':
             {           // enumeration year
-				return intval(substr($this->row['censusid'],-4));
+				return intval(substr($censusid,-4));
             }           // enumeration year
 
             case 'table':
             {           // database table name
+                $idl                = strlen($censusid);
 				if (array_key_exists('table', $this->row))
 				    return $this->row['table'];     // to do
                 else
                 if ($this->get('countrycode') == 'CA')
-                    return 'Census' . substr($this->row['censusid'], -4);
+                    return 'Census' . substr($censusid, -4);
                 else
-                    return null;        // no database support
+                    return substr($censusid, 0, $idl - 4) . 
+                            'Census' . substr($censusid, -4);
             }           // database table name
 
 		    default:

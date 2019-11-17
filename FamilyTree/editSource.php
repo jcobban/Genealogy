@@ -60,6 +60,7 @@ use \Templating\Template;
  *		2018/12/02      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/04/09      use common internationalization table           *
+ *		2019/11/06      do not display 0 in title when creating         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -146,7 +147,11 @@ if (!is_null($idsr))
         else
         {
             if (canUser('edit'))
+            {
                 $action     = $template['Create']->innerHTML();
+                $idsr       = '';
+                $warn   .= "<p>\$idsr set to ''</p>\n";
+            }
             else
             {
                 $action     = $template['Display']->innerHTML();
@@ -159,11 +164,12 @@ if (!is_null($idsr))
 	{
 	    $text               = $template['InvalidIDSR']->innerHTML();
         $msg	            .= str_replace('$idsr', $idsr, $text);
+        $idsr               = '';
     }
 }                   // IDSR specified
 else
 if (!is_null($name))
-{                   // IDSR specified
+{                   // Name specified
     $source		            = new Source(array('srcname' => $name));
     if ($source->isExisting())
     {
@@ -175,14 +181,14 @@ if (!is_null($name))
         $idsr               = '';
         $action             = $template['Create']->innerHTML();
     }
-}                   // IDSR specified
+}                   // Name specified
 else
-{
+{                   // neither IDSR nor Name specified
     $warn                   .= "<p>" . $template['noParms']->innerHTML() .
                                 "</p>\n";
     $source		            = new Source();
     $idsr                   = 'Failed';
-}
+}                   // neither IDSR nor Name specified
 
 $stSet                      = array();
 $srcTypes                   = $translate['srcTypes'];
@@ -201,33 +207,34 @@ $stSet[$idst]['selected']   = 'selected="selected"';
 // get the requested instance of Source
 if (strlen($msg) == 0)
 {
-	$idsr	        = (int)$idsr;
+    if ($idsr !== '')
+	    $idsr	            = (int)$idsr;
 
 	// get all repository address records to create selection list
-	$repoSet	    = new RecordSet('tblAR',
-				        			array('Kind'	=> 2,
-					        		      'Order'	=> 'AddrName'));
+	$repoSet	            = new RecordSet('tblAR',
+				        	        		array('Kind'	=> 2,
+					        		              'Order'	=> 'AddrName'));
 
 	// get all names of authors as an array of strings for selection list
-	$sourceSet	    = new RecordSet('tblSR');
-    $authorResult	= $sourceSet->getDistinct('SrcAuthor');
+	$sourceSet	            = new RecordSet('tblSR');
+    $authorResult	        = $sourceSet->getDistinct('SrcAuthor');
 }
 else
-	$idsr	= 'Failed';
+	$idsr	                = 'Failed';
 
-$srcname                        = $source->get('srcname');
+$srcname                    = $source->get('srcname');
 $template->set('LANG',          $lang);
 if ($debug)
 {
     $template->set('DEBUG',     'Y');
-    $submit                     = $template['submitNormal'];
+    $submit                 = $template['submitNormal'];
     if ($submit)
         $submit->update(null);
 }
 else
 {
     $template->set('DEBUG',     'N');
-    $submit                     = $template['submitDebug'];
+    $submit                 = $template['submitDebug'];
     if ($submit)
         $submit->update(null);
 }
@@ -238,21 +245,21 @@ $template->set('IDST',          $idst);
 $template['IDSTOpt$idst']->update($stSet);
 $template->set('SRCTITLE',      $source->get('srctitle'));
 // author name part
-$author                         = $source->get('author');
+$author                     = $source->get('author');
 $template->set('AUTHOR',        $author);
-$optionElt                      = $template['author$i'];
-$optionText                     = $optionElt->outerHTML();
-$data                           = '';
+$optionElt                  = $template['author$i'];
+$optionText                 = $optionElt->outerHTML();
+$data                       = '';
 foreach($authorResult as $i => $srcauthor)
 {
-    $optionTemplate             = new Template($optionText);
+    $optionTemplate         = new Template($optionText);
     $optionTemplate->set('author',          $srcauthor);
     $optionTemplate->set('i',               $i);
     if ($srcauthor == $author)
         $optionTemplate->set('selected',    'selected="selected"');
     else
         $optionTemplate->set('selected',    '');
-    $data                       .= $optionTemplate->compile();
+    $data                   .= $optionTemplate->compile();
 }
 $optionElt->update($data);
 //
@@ -260,20 +267,20 @@ $template->set('SRCPUBLISHER',      $source->get('srcpubl'));
 $template->set('SRCTEXT',           htmlspecialchars($source->get('srctext')));
 $template->set('SRCNOTE',           htmlspecialchars($source->get('srcnote')));
 // repository part
-$idar                           = $source->get('idar');
-$optionElt                      = $template['IDAROption$idar'];
-$optionText                     = $optionElt->outerHTML();
-$data                           = '';
+$idar                       = $source->get('idar');
+$optionElt                  = $template['IDAROption$idar'];
+$optionText                 = $optionElt->outerHTML();
+$data                       = '';
 foreach($repoSet as $idari => $instance)
 {
-    $optionTemplate             = new Template($optionText);
+    $optionTemplate         = new Template($optionText);
     $optionTemplate->set('name',    htmlspecialchars($instance['addrname']));
     $optionTemplate->set('idar',    $idari);
     if ($idari == $idar)
         $optionTemplate->set('selected',    'selected="selected"');
     else
         $optionTemplate->set('selected',    '');
-    $data                       .= $optionTemplate->compile();
+    $data                   .= $optionTemplate->compile();
 }
 $optionElt->update($data);
 //

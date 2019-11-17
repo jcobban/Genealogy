@@ -2,6 +2,9 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use Templating\Template;
+use Templating\TemplateTag;
+
 /************************************************************************
  *  Sources.php															*
  *																		*
@@ -46,6 +49,7 @@ use \Exception;
  *		2017/10/14		use class RecordSet								*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/07/22      use Template                                    *
+ *		2019/11/06      add translate table to output for Javascript    *
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
@@ -148,6 +152,19 @@ if ($debug)
 else
     $template->set('DEBUG',         'N');
 
+// pass interpretation of IDST to Javascript
+$rowtag             = $template['IDST$idst'];
+$table              = '';
+foreach($srcTypes as $idst => $name)
+{
+    $rtemplate      = new Template($rowtag->outerHTML);
+    $rtemplate->set('idst',         $idst);
+    $rtemplate->set('name',         $name);
+    $table          .= $rtemplate->compile();
+}
+$rowtag->update($table);
+
+// display table of matching sources
 if ($sources->count() == 0)
 {                           // no records in response
     $template['topBrowse']->update(null);

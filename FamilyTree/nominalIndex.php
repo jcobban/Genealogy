@@ -59,6 +59,7 @@ use \Exception;
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/05/18      get search name from cookie or parameters       *
  *		                and display in input field                      *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -150,6 +151,8 @@ if (count($_GET) > 0)
 }	        	    // invoked by URL to display current status of account
 
 $template	        = new FtTemplate("nominalIndex$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'nominalIndex'));
 
 if ($treeName == '')
 	$treeNameText	= "South-Western Ontario";

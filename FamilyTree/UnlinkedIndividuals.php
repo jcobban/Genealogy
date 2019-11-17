@@ -11,7 +11,7 @@ use \Exception;
  *  History:															*
  *		2017/01/15		created											*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -131,7 +131,7 @@ require_once __NAMESPACE__ . '/common.inc';
 		<span class="right">
 		  <a href="UnlinkedIndividualsHelpen.html" target="help">? Help</a>
 		</span>
-		Locations Master List
+		Persons who are not linked to any Families List
     </h1>
 <?php
     showTrace();

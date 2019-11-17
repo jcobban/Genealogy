@@ -5,8 +5,9 @@
  *																		*
  *  History:															*
  *		2018/11/30		Created											*
+ *      2019/11/06      limit width of author selection                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
 	<div id="breadcrumbs" class="hidden">
 	  <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -59,7 +60,7 @@
       	  Author:
       	</label>
       	<select name="SrcAuthor" id="SrcAuthor"
-      			size="1" class="white left">
+      			size="1" class="white left" style="max-width: 600px;">
       	  <option id="author$i"value="$author"
       			  $selected>
       			$author

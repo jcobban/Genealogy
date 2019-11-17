@@ -22,6 +22,7 @@ use \Exception;
  *		2017/02/07		use class Country								*
  *		2018/10/05      use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -89,6 +90,8 @@ if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
 $template		        = new FtTemplate("BirthRegQuery$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'BirthRegQuery'));
 
 $domainObj	            = new Domain(array('domain'	    => $domain,
                                            'language'	=> $lang));

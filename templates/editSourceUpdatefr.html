@@ -1,15 +1,16 @@
 <!--*********************************************************************
- *  editSourceUpdateen.html   											*
+ *  editSourceUpdatefr.html   											*
  *																		*
  *  Display a web page for editing a specific source					*
  *																		*
  *  History:															*
  *		2018/11/30		Created											*
+ *      2019/11/05      limit width of author selection                 *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
 	<div id="breadcrumbs" class="hidden">
-	  <a href="/genealogy.php?lang=fr">Genealogie</a>:
+	  <a href="/genealogy.php?lang=fr">Génealogie</a>:
 	  <a href="/FamilyTree/Services.php?lang=fr">Services</a>:
 	  <a href="/FamilyTree/Sources.php?lang=fr">Sources</a>:
 	</div> <!-- id="breadcrumbs" -->
@@ -18,7 +19,7 @@
         <span class="right">
 	      <a href="editSourceHelpfr.html" target="help">? Aide</a>
         </span>
-	        $ACTION Enregistrement Source Numero $IDSR
+	        $ACTION Enregistrement Source $IDSR
         <div style="clear: both;"></div>
       </h1>
       $TRACE
@@ -59,7 +60,7 @@
       	  Auteur:
       	</label>
       	<select name="SrcAuthor" id="SrcAuthor"
-      			size="1" class="white left">
+      			size="1" class="white left" style="max-width: 600px;">
       	  <option id="author$i"value="$author"
       			  $selected>
       			$author

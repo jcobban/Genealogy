@@ -48,6 +48,7 @@ use \Exception;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/07/28      use Template                                    *
  *		2019/07/30      use $record->selected                           *
+ *      2019/11/17      move CSS to <head>                              *
  * 																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -133,6 +134,8 @@ else
     $action         = 'Display';
 
 $template           = new FtTemplate("editCitation$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'editCitation'));
 $translate          = $template->getTranslate();
 $citText            = $translate['typeText'];
 

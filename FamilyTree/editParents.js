@@ -146,6 +146,7 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/07/20      insert spaces into death date                   *
+ *		2019/11/15      pass requested language to child dialogs        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -561,7 +562,7 @@ function loadEdit()
 		}		// element has a nodeName attribute
     }			// loop through all immediate children
 
-}		// loadEdit
+}		// function loadEdit
 
 /************************************************************************
  *  function validateForm												*
@@ -594,7 +595,7 @@ function validateForm()
     }		// at least one child window still open
     else
 		return true;
-}		// validateForm
+}		// function validateForm
 
 /************************************************************************
  *  function resetForm													*
@@ -608,7 +609,7 @@ function validateForm()
 function resetForm()
 {
     return true;
-}	// resetForm
+}	// function resetForm
 
 /************************************************************************
  *  function finish														*
@@ -632,7 +633,7 @@ function finish()
 		window.history.back();
     }
     return true;
-}	// finish
+}	// function finish
 
 /************************************************************************
  *  function epKeyDown													*
@@ -683,7 +684,7 @@ function epKeyDown(e)
     }		// alt
 
     return true;
-}		// epKeyDown
+}		// function epKeyDown
 
 /************************************************************************
  *  function editFather													*
@@ -696,26 +697,34 @@ function epKeyDown(e)
  ************************************************************************/
 function editFather()
 {
-    var	form		= this.form;
-    var idir		= form.IDIRHusb.value;
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+    var	form		        = this.form;
+    var idir		        = form.IDIRHusb.value;
     if (idir > 0)
     {		// father present
 		for (var ib = 0; ib < editChildButtons.length; ib++)
 		{			// disable all editChild buttons
 		    editChildButtons[ib].disabled	= true;
 		}			// disable all editChild buttons
-		var script	= "editIndivid.php?idir=" + idir + "&rowid=Husb" +
-		  "&initGivenName=" + encodeURIComponent(form.HusbGivenName.value) + 
-		  "&initSurname=" + encodeURIComponent(form.HusbSurname.value) +
-		  '&treeName=' + encodeURIComponent(form.treename.value);
-		var childWindow	= openFrame("husbFrame",
-						    script,
-						    "left");
+		var script	        = "editIndivid.php?idir=" + idir + 
+                              "&rowid=Husb" +
+		                      "&initGivenName=" + 
+                            encodeURIComponent(form.HusbGivenName.value) + 
+		                      "&initSurname=" + 
+                            encodeURIComponent(form.HusbSurname.value) +
+		                      '&treeName=' + 
+                            encodeURIComponent(form.treename.value) +
+                                '&lang=' + lang;
+		var childWindow	    = openFrame("husbFrame",
+						                script,
+						                "left");
 		childWindows.push(childWindow);
     }		// father present
     else
 		document.getElementById('createHusb').click();
-}		// editFather
+}		// function editFather
 
 /************************************************************************
  *  function chooseFather												*
@@ -728,15 +737,20 @@ function editFather()
  ************************************************************************/
 function chooseFather()
 {
-    var	form		= this.form;
-    var surname		= form.HusbSurname.value;
-    var url		= "chooseIndivid.php?id=Husb" + 
-		  "&name=" + encodeURIComponent(surname) +
-		  '&treeName=' + encodeURIComponent(form.treename.value);
-    var childWindow	= openFrame("chooserFrame",
-						    url,
-						    "left");
-}		// chooseFather
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+    var	form		        = this.form;
+    var surname		        = form.HusbSurname.value;
+    var url		            = "chooseIndivid.php?id=Husb" + 
+                    		  "&name=" + encodeURIComponent(surname) +
+                    		  '&treeName=' +
+                                encodeURIComponent(form.treename.value) +
+                              '&lang=' + lang;
+    var childWindow	        = openFrame("chooserFrame",
+						                url,
+						                "left");
+}		// function chooseFather
 
 /************************************************************************
  *  function editMother													*
@@ -748,26 +762,34 @@ function chooseFather()
  ************************************************************************/
 function editMother()
 {
-    var	form	= this.form;
-    var idir	= form.IDIRWife.value;
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+    var	form	            = this.form;
+    var idir	            = form.IDIRWife.value;
     if (idir > 0)
     {		// mother present
 		for (var ib = 0; ib < editChildButtons.length; ib++)
 		{			// disable all editChild buttons
 		    editChildButtons[ib].disabled	= true;
 		}			// disable all editChild buttons
-		var script	= "editIndivid.php?idir=" + idir + "&rowid=Wife" +
-		  "&initGivenName=" + encodeURIComponent(form.WifeGivenName.value) + 
-		  "&initSurname=" + encodeURIComponent(form.WifeSurname.value) +
-		  '&treeName=' + encodeURIComponent(form.treename.value);
-		var childWindow	= openFrame("wifeFrame",
-						    script,
-						    "left");
+		var script	        = "editIndivid.php?idir=" + idir + 
+                              "&rowid=Wife" +
+		                      "&initGivenName=" + 
+                                encodeURIComponent(form.WifeGivenName.value) + 
+		                      "&initSurname=" + 
+                                encodeURIComponent(form.WifeSurname.value) +
+		                      '&treeName=' + 
+                                encodeURIComponent(form.treename.value);
+                              '&lang=' + lang;
+		var childWindow	    = openFrame("wifeFrame",
+						                script,
+						                "left");
 		childWindows.push(childWindow);
     }		// wife present
     else
 		document.getElementById('createWife').click();
-}		// editMother
+}		// function editMother
 
 /************************************************************************
  *  function chooseMother												*
@@ -780,15 +802,20 @@ function editMother()
  ************************************************************************/
 function chooseMother()
 {
-    form		= this.form;
-    var surname		= form.WifeSurname.value;
-    var url		= "chooseIndivid.php?id=Wife" +
-		  "&name=" + encodeURIComponent(surname) +
-		  '&treeName=' + encodeURIComponent(form.treename.value);
-    var childWindow	= openFrame("chooserFrame",
-						    url,
-						    "left");
-}		// chooseMother
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
+    form		            = this.form;
+    var surname		        = form.WifeSurname.value;
+    var url		            = "chooseIndivid.php?id=Wife" +
+		                      "&name=" + encodeURIComponent(surname) +
+		                      '&treeName=' + 
+                                encodeURIComponent(form.treename.value) +
+                              '&lang=' + lang;
+    var childWindow	        = openFrame("chooserFrame",
+						                url,
+						                "left");
+}		// function chooseMother
 
 /************************************************************************
  *  function createFather												*
@@ -801,20 +828,27 @@ function chooseMother()
  ************************************************************************/
 function createFather()
 {
-    var	form		= this.form;
-    var script		= "editIndivid.php?rowid=Husb&initGender=0" +
-		  "&initGivenName=" + encodeURIComponent(form.HusbGivenName.value) + 
-		  "&initSurname=" + encodeURIComponent(form.HusbSurname.value) + 
-		  '&treeName=' + encodeURIComponent(form.treename.value);
-    var childWindow	= openFrame("husbFrame",
-						    script,
-						    "left");
-    childWindows.push(childWindow);
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
     for (var ib = 0; ib < editChildButtons.length; ib++)
     {				// disable all editChild buttons
 		editChildButtons[ib].disabled	= true;
     }				// disable all editChild buttons
-}	// createFather
+    var	form		        = this.form;
+    var script		        = "editIndivid.php?rowid=Husb&initGender=0" +
+		                      "&initGivenName=" + 
+                            encodeURIComponent(form.HusbGivenName.value) + 
+		                      "&initSurname=" + 
+                            encodeURIComponent(form.HusbSurname.value) + 
+		                      '&treeName=' + 
+                            encodeURIComponent(form.treename.value) +
+                              '&lang=' + lang;
+    var childWindow	        = openFrame("husbFrame",
+						                script,
+						                "left");
+    childWindows.push(childWindow);
+}	// function createFather
 
 /************************************************************************
  *  function createMother												*
@@ -827,21 +861,28 @@ function createFather()
  ************************************************************************/
 function createMother()
 {
-    var	form		= this.form;
-    var script		= "editIndivid.php?rowid=Wife&initGender=1" +
-		  "&initGivenName=" + encodeURIComponent(form.WifeGivenName.value) + 
-		  "&initSurname=" + encodeURIComponent(form.WifeSurname.value) + 
-		  '&treeName=' + encodeURIComponent(form.treename.value);
-
-    var childWindow	= openFrame("wifeFrame",
-						    script,
-						    "left");
-    childWindows.push(childWindow);
+    var lang    			= 'en';
+    if ('lang' in args)
+        lang                = args.lang;
     for (var ib = 0; ib < editChildButtons.length; ib++)
     {				// disable all editChild buttons
 		editChildButtons[ib].disabled	= true;
     }				// disable all editChild buttons
-}	// createMother
+    var	form		        = this.form;
+    var script		        = "editIndivid.php?rowid=Wife&initGender=1" +
+		                      "&initGivenName=" +
+                            encodeURIComponent(form.WifeGivenName.value) + 
+		                      "&initSurname=" + 
+                            encodeURIComponent(form.WifeSurname.value) + 
+		                      '&treeName=' + 
+                            encodeURIComponent(form.treename.value);
+                              '&lang=' + lang;
+
+    var childWindow	        = openFrame("wifeFrame",
+						                script,
+						                "left");
+    childWindows.push(childWindow);
+}	// function createMother
 
 /************************************************************************
  *  function em1KeyDown													*
@@ -953,5 +994,5 @@ function em1KeyDown(e)
     }		// alt key held down
 
     return true;
-}		// em1KeyDown
+}		// function em1KeyDown
 

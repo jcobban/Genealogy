@@ -22,6 +22,7 @@ use \Templating\Template;
  *																	    *
  *  History:															*
  *		2019/08/13      created                                         *
+ *      2019/11/17      move CSS to <head>                              *
  *																	    *
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -347,6 +348,8 @@ if ($action == 'Update')
 
 // get template
 $template			                = new FtTemplate("ToDo$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'ToDo'));
 $tranTab                            = $template->getTranslate();
 $tr                                 = $tranTab['tranTab'];
 

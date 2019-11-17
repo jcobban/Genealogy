@@ -217,6 +217,8 @@ use Templating\Template;
  *		                support idsr => instance of Source in           *
  *		                constructor and $citation->set                  *
  *		2019/09/20      correct implementation of Citation::dump        *
+ *		2019/11/02      hide extra HTML inserted by new version of      *
+ *		                tinyMCE                                         *
  *																	    *
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/	
@@ -2424,15 +2426,17 @@ class Citation extends RecordPic
 		// interpret text quotation from source
 		if (strlen($text) > 0)
         {
-            $updates['showText'] =
-                                  array('TEXT'      => $text);
+            if (preg_match('#^\s*<p>([^<]*)</p>\s*$#', $text, $matches))
+                $text               = $matches[1];
+            $updates['showText']    = array('TEXT'      => $text);
 		}
 
 		// interpret comments about the citation
 		if (strlen($note) > 0)
 		{
-            $updates['showNote'] =
-                                  array('NOTE'      => $note);
+            if (preg_match('#^\s*<p>([^<]*)</p>\s*$#', $note, $matches))
+                $note               = $matches[1];
+            $updates['showNote']    = array('NOTE'      => $note);
         }
 
         foreach($updates as $id => $value)

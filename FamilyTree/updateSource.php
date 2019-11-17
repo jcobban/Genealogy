@@ -46,41 +46,42 @@ print("<?xml version='1.0' encoding='UTF-8'?>\n");
 print "<update>\n";
 
 // get the updated values of the fields in the record
-$idsr		= 0;
-$srcname		= '';
-$srctitle		= '';
-$idst		= 1;
-$srcauthor		= '';
-$srcpubl		= '';
-$srctext		= '';
-$psrctext		= 0;
-$fsrctext		= 0;
-$tsrctext		= 0;
-$srcnote		= '';
-$psrcnote		= 0;
-$fsrcnote		= 0;
-$tsrcnote		= 0;
-$srccallnum		= '';
-$srctag		= 0;
-$qstag		= 0;
-$srcexclude		= 0;
-$idar		= 0;
-$idar2		= 0;
-$enteredsd		= -99999999;
-$enteredd		= '';
-$filingref		= '';
-$used		= 0;
-$published		= 0;
-$verified		= 0;
-$srcmpub		= '';
-$srcrollnum		= '';
-$templateid		= 0;
-$contents		= '';
-$usestandard	= 0;
-$bibliography	= 0;
-$override		= '';
-$overridefootnote	= 0;
-$overridesubsequent	= 0;
+$idsr		    				= 0;
+$srcname						= '';
+$srctitle						= '';
+$idst		    				= 1;
+$srcauthor						= '';
+$srcpubl						= '';
+$srctext						= '';
+$psrctext						= 0;
+$fsrctext						= 0;
+$tsrctext						= 0;
+$srcnote						= '';
+$psrcnote						= 0;
+$fsrcnote						= 0;
+$tsrcnote						= 0;
+$srccallnum						= '';
+$srctag		    				= 0;
+$qstag		    				= 0;
+$srcexclude						= 0;
+$idar		    				= 0;
+$idar2		    				= 0;
+$enteredsd						= -99999999;
+$enteredd						= '';
+$filingref						= '';
+$used		    				= 0;
+$published						= 0;
+$verified						= 0;
+$srcmpub						= '';
+$srcrollnum						= '';
+$templateid						= 0;
+$contents						= '';
+$usestandard					= 0;
+$bibliography					= 0;
+$override						= '';
+$overridefootnote				= 0;
+$overridesubsequent				= 0;
+
 print "<parms>\n";
 foreach($_POST as $key => $value)
 {			// loop through all parameters
@@ -89,122 +90,122 @@ foreach($_POST as $key => $value)
 	{		// act on specific parameters
 	    case 'idsr':
 	    {
-			$idsr		= $value;
+			$idsr		    	= $value;
 			break;
 	    }
 
 	    case 'srcname':
 	    {
-			$srcname	= $value;
+			$srcname	    	= $value;
 			break;
 	    }
 
 	    case 'srctitle':
 	    {
-			$srctitle	= $value;
+			$srctitle	    	= $value;
 			break;
 	    }
 
 	    case 'idst':
 	    {
-			$idst	= $value;
+			$idst	        	= $value;
 			break;
 	    }
 
 	    case 'srcauthor':
 	    {
-			$srcauthor	= $value;
+			$srcauthor	    	= $value;
 			break;
 	    }
 
 	    case 'newauthor':
 	    {
 			if (strlen($value) > 0)
-			    $srcauthor	= $value;
+			    $srcauthor		= $value;
 			break;
 	    }
 
 	    case 'srcpubl':
 	    {
-			$srcpubl	= $value;
+			$srcpubl	    	= $value;
 			break;
 	    }
 
 	    case 'srctext':
 	    {
-			$srctext	= $value;
+			$srctext	    	= $value;
 			break;
 	    }
 
 	    case 'psrctext':
 	    {
-			$psrctext	= $value;
+			$psrctext	    	= $value;
 			break;
 	    }
 
 	    case 'fsrctext':
 	    {
-			$fsrctext	= $value;
+			$fsrctext	    	= $value;
 			break;
 	    }
 
 	    case 'tsrctext':
 	    {
-			$tsrctext	= $value;
+			$tsrctext	    	= $value;
 			break;
 	    }
 
 	    case 'srcnote':
 	    {
-			$srcnote	= $value;
+			$srcnote	    	= $value;
 			break;
 	    }
 
 	    case 'psrcnote':
 	    {
-			$psrcnote	= $value;
+			$psrcnote	    	= $value;
 			break;
 	    }
 
 	    case 'fsrcnote':
 	    {
-			$fsrcnote	= $value;
+			$fsrcnote	    	= $value;
 			break;
 	    }
 
 	    case 'tsrcnote':
 	    {
-			$tsrcnote	= $value;
+			$tsrcnote	    	= $value;
 			break;
 	    }
 
 	    case 'srccallnum':
 	    {
-			$srccallnum	= $value;
+			$srccallnum	    	= $value;
 			break;
 	    }
 
 	    case 'srctag':
 	    {
-			$srctag		= $value;
+			$srctag		    	= $value;
 			break;
 	    }
 
 	    case 'qstag':
 	    {
-			$qstag		= $value;
+			$qstag		    	= $value;
 			break;
 	    }
 
 	    case 'srcexclude':
 	    {
-			$srcexclude	= $value;
+			$srcexclude	    	= $value;
 			break;
 	    }
 
 	    case 'idar':
 	    {
-			$idar		= $value;
+			$idar		    	= $value;
 			break;
 	    }
 
@@ -212,97 +213,97 @@ foreach($_POST as $key => $value)
 	    {
 			if (strlen($value) > 0)
 			{
-			    $repo	= new Address(
-					array('addrname'	=> $value,
-					      'kind'		=> Address::REPOSITORY));
+			    $repo	    	= new Address(
+				        	array('addrname'	=> $value,
+					              'kind'		=> Address::REPOSITORY));
 			    if (!$repo->isExisting())
 					$repo->save(false);
-			    $idar	= $repo->getIdar();
+			    $idar	    	= $repo->getIdar();
 			}
 			break;
 	    }
 
 	    case 'idar2':
 	    {
-			$idar2		= $value;
+			$idar2		    	= $value;
 			break;
 	    }
 
 	    case 'enteredsd':
 	    {
-			$enteredsd	= $value;
+			$enteredsd	    	= $value;
 			break;
 	    }
 
 	    case 'enteredd':
 	    {
-			$enteredd	= $value;
+			$enteredd	    	= $value;
 			break;
 	    }
 
 	    case 'filingref':
 	    {
-			$filingref	= $value;
+			$filingref	    	= $value;
 			break;
 	    }
 
 	    case 'used':
 	    {
-			$used		= $value;
+			$used		    	= $value;
 			break;
 	    }
 
 	    case 'published':
 	    {
-			$published	= $value;
+			$published	    	= $value;
 			break;
 	    }
 
 	    case 'verified':
 	    {
-			$verified	= $value;
+			$verified	    	= $value;
 			break;
 	    }
 
 	    case 'srcmpub':
 	    {
-			$srcmpub	= $value;
+			$srcmpub	    	= $value;
 			break;
 	    }
 
 	    case 'srcrollnum':
 	    {
-			$srcrollnum	= $value;
+			$srcrollnum	    	= $value;
 			break;
 	    }
 
 	    case 'templateid':
 	    {
-			$templateid	= $value;
+			$templateid	    	= $value;
 			break;
 	    }
 
 	    case 'contents':
 	    {
-			$contents	= $value;
+			$contents	    	= $value;
 			break;
 	    }
  
 	    case 'usestandard':
 	    {
-			$usestandard	= $value;
+			$usestandard		= $value;
 			break;
 	    }
 
 	    case 'bibliography':
 	    {
-			$bibliography	= $value;
+			$bibliography		= $value;
 			break;
 	    }
 
 	    case 'override':
 	    {
-			$override	= $value;
+			$override	    	= $value;
 			break;
 	    }
 

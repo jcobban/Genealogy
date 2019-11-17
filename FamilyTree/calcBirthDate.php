@@ -25,6 +25,7 @@ use \Exception;
  *						include http.js before util.js					*
  *		2018/02/17		use Template									*
  *		2019/02/18      use new FtTemplate constructor                  *
+ *      2019/11/17      move CSS to <head>                              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -52,6 +53,8 @@ if (count($_GET) > 0)
 }		            // invoked by submit to update account
 
 $template		= new FtTemplate("calcBirthDate$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => '/FamilyTree/calcBirthDate'));
 
 $template->set('LANG',		$lang);
 $template->display();

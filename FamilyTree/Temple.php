@@ -153,6 +153,8 @@ else
     $action             = 'Display';
 
 $template               = new FtTemplate("Temple$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'Temple'));
 
 $template->set('LANG',                      $lang);
 if ($debug)
