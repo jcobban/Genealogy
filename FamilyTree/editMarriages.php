@@ -260,6 +260,10 @@ foreach($_GET as $key => $value)
 	}		// take action on specific parameter
 }			// loop through all parameters passed to script
 
+if ($debug)
+    $debugText      = 'Y';
+else
+    $debugText      = 'N';
 // validate the parameters
 if (!is_null($idmr))
 {		// display a specific marriage
@@ -505,6 +509,8 @@ if ($indiv)
 			value="<?php print $child; ?>">
 	  <input type="hidden" name="sex" id="sex" 
 			value="<?php print $sex; ?>">
+	  <input type="hidden" name="debug" id="debug" 
+			value="<?php print $debugText; ?>">
 	<table class="details" id="marriageList">
 	  <thead>
 	    <tr>

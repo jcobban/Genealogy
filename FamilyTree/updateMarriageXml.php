@@ -149,9 +149,9 @@ foreach($_POST as $key => $value)
         print "        <$key>null" ;
     else
     if (is_string($value))
-        print "        <$key>'" . xmlentities($value) . "'";
+        print "        <$key>'" . htmlentities($value, ENT_XML1) . "'";
     else
-        print "        <$key>" . xmlentities($value);
+        print "        <$key>" . htmlentities($value, ENT_XML1);
 
     try {
 	$namePattern     	        = "/([a-zA-Z]+)([0-9]*)/";
@@ -298,7 +298,8 @@ foreach($_POST as $key => $value)
                 // partner because a family is defined in terms of children
 			    $wife	                    = new Person();
 			    $wife->setGender(Person::FEMALE);
-			    $wife->setTreeName($treename);
+                $wife->setTreeName($treename);
+                print "<addwife302/>\n";
 			}		// create new wife
 			break;
 	    }
@@ -306,8 +307,11 @@ foreach($_POST as $key => $value)
 	    case 'wifegivenname':
         {
             $family['wifegivenname']        = $value;
-			if ($wife)
+            if ($wife)
+            {
     		    $wife['givenname']		    = $value;
+                print "<wifename313>$value</wifename313>\n";
+            }
 			else
 			if ($value != '')
 			{
@@ -363,6 +367,8 @@ foreach($_POST as $key => $value)
 
 	    case 'mard':
         {		// date of marriage
+            print "<mard370>givenname='" . $family['wifegivenname'] .
+                "', surname='" . $family['wifesurname']. "</mard370>\n";
             if ($family['wifegivenname'] === '' &&
                 $family['wifesurname'] === '')
                 $wife                   = null;
@@ -372,9 +378,11 @@ foreach($_POST as $key => $value)
 			    $idirwife	            = $wife['idir'];
                 $family['idirwife']     = $idirwife;
             }               // may be new wife or wife's name may be changed 
+            else
+                print "<wifenull380>$value</wifenull380>\n";
 
     		// this call also sets field 'marsd'
-    		$family['mard']		= $value;
+    		$family['mard']		        = $value;
     		break;
 	    }		// date of marriage
 

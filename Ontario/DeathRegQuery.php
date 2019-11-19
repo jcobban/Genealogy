@@ -91,6 +91,8 @@ if ($domainObj->isExisting())
 }
 
 $template		= new FtTemplate("DeathRegQuery$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'DeathRegQuery'));
 
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('PROVINCENAME',		$provinceName);

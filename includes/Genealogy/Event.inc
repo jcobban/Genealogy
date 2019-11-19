@@ -2426,6 +2426,7 @@ class Event extends RecordPic
      *	    Adds trace if $field is not already defined as a field		*
      *	    or pseudo-field and debugging is enabled					*
      ********************************************************************/
+    private $setcount   = 20;
     function set($field, $value)
     {
         global  $warn;
@@ -2433,10 +2434,13 @@ class Event extends RecordPic
 		$fieldLc	= strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
+        if ($this->setcount < 1)
+            exit;
+        
 		switch($fieldLc)
-		{
+		{               // act on specific field
 		    case 'idtype':
-		    {		// type of associated record
+		    {		    // type of associated record
 				$idtype			= $value;
 				if ($idtype == self::IDTYPE_INDIV ||
 				    $idtype == self::IDTYPE_MAR ||
@@ -2446,20 +2450,20 @@ class Event extends RecordPic
 				$warn	.= "<p>Event::set: ".
 						    "Bad value $value for '$field'</p>\n";
 				break;
-		    }		// type of associated record
+		    }		    // type of associated record
 
 		    case 'eventd':
-		    {		// legacy internal date format
+		    {		    // legacy internal date format
 				return $this->setDate($value);
-		    }		// legacy internal date format
+		    }		    // legacy internal date format
 
 		    case 'idlrevent':
-		    {		// value is IDLR
+		    {		    // value is IDLR
 				return $this->setLocation($value);
-		    }		// value is IDLR
+		    }		    // value is IDLR
 
 		    case 'idar':
-		    {		// value is IDAR
+		    {		    // value is IDAR
 		        if ($value instanceof Address && $value->isExisting())
                     return parent::set('idar', $value->get('idar'));
                 else
@@ -2471,21 +2475,21 @@ class Event extends RecordPic
                 else
 				    $warn   .= "<p>Event::set: " .
 							"invalid value '$value' for field '$field'</p>\n";
-		    }		// value is IDAR
+		    }		    // value is IDAR
 
 		    case 'eventsd':
-		    {		// legacy internal date format
+		    {		    // legacy internal date format
 				// do not change the value, it is set by set('eventd')
 				if ($value < -99990000 || $value > 99990000)
 				    return parent::set('eventsd', $value);
 				return $this->row['eventsd'];
-		    }		// legacy internal date format
+		    }		    // legacy internal date format
 
 		    default:
-		    {		// no validation implemented yet
+		    {		    // no validation implemented yet
 				return parent::set($field, $value);
-		    }		// no validation implemented yet
-		}		// switch on field name
+		    }		    // no validation implemented yet
+		}		        // switch on field name
     }		// Event::set
 
     function adjustSortDate($maxSortDate)

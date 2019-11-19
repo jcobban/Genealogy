@@ -2451,7 +2451,7 @@ catch(Exception $e)
                 if ($this->husbPriName)
                     return $this->husbPriName['surname'];
                 else
-                    return '';
+                    return $this->row['husbsurname'];
             }
 
             case 'husbgivenname':
@@ -2461,7 +2461,7 @@ catch(Exception $e)
                 if ($this->husbPriName)
                     return $this->husbPriName['givenname'];
                 else
-                    return '';
+                    return $this->row['husbgivenname'];
             }
 
             case 'husbmarrsurname':
@@ -2471,7 +2471,7 @@ catch(Exception $e)
                 if ($this->husbMarName)
                     return $this->husbMarName['surname'];
                 else
-                    return '';
+                    return $this->row['husbmarrsurname'];
             }
 
             case 'husbbirthsd':
@@ -2491,7 +2491,7 @@ catch(Exception $e)
                 if ($this->wifePriName)
                     return $this->wifePriName['surname'];
                 else
-                    return '';
+                    return $this->row['wifesurname'];
             }
 
             case 'wifegivenname':
@@ -2501,7 +2501,7 @@ catch(Exception $e)
                 if ($this->wifePriName)
                     return $this->wifePriName['surname'];
                 else
-                    return '';
+                    return $this->row['wifegivenname'];
             }
 
             case 'wifemarrsurname':
@@ -2511,7 +2511,7 @@ catch(Exception $e)
                 if ($this->wifeMarName)
                     return $this->wifeMarName['surname'];
                 else
-                    return '';
+                    return $this->row['wifemarrsurname'];
             }                   // wifemarrsurname
 
             case 'wifebirthsd':
@@ -2698,6 +2698,7 @@ catch(Exception $e)
      *	    Adds trace if $field is not already defined as a field		*
      *	    or pseudo-field and debugging is enabled					*
      ********************************************************************/
+    private $setcount       = 20;
     function set($field, $value)
     {
         global  $warn;
@@ -2709,8 +2710,10 @@ catch(Exception $e)
 		{
             case 'husbsurname':
             {
+                $this->row['husbsurname']           = $value;
+                $this->changed['husbsurname']       = $value;
                 if (is_null($this->husbPriName))
-                    $this->husbPriName  = $this->getHusbPriName();
+                    $this->husbPriName              = $this->getHusbPriName();
                 if ($this->husbPriName)
                     return $this->husbPriName->set('surname', $value);
                 else
@@ -2719,8 +2722,10 @@ catch(Exception $e)
 
             case 'husbgivenname':
             {
+                $this->row['husbgivenname']         = $value;
+                $this->changed['husbgivenname']     = $value;
                 if (is_null($this->husbPriName))
-                    $this->husbPriName  = $this->getHusbPriName();
+                    $this->husbPriName              = $this->getHusbPriName();
                 if ($this->husbPriName)
                     return $this->husbPriName->set('givenname', $value);
                 else
@@ -2729,6 +2734,8 @@ catch(Exception $e)
 
             case 'husbmarrsurname':
             {
+                $this->row['husbmarrsurname']       = $value;
+                $this->changed['husbmarrsurname']   = $value;
                 if (is_null($this->husbMarName))
                     $this->husbMarName  = $this->getHusbMarName();
                 if ($this->husbMarName)
@@ -2749,8 +2756,10 @@ catch(Exception $e)
 
             case 'wifesurname':
             {
+                $this->row['wifesurname']           = $value;
+                $this->changed['wifesurname']       = $value;
                 if (is_null($this->wifePriName))
-                    $this->wifePriName  = $this->getWifePriName();
+                    $this->wifePriName              = $this->getWifePriName();
                 if ($this->wifePriName)
                     return $this->wifePriName->set('surname', $value);
                 else
@@ -2759,8 +2768,10 @@ catch(Exception $e)
 
             case 'wifegivenname':
             {
+                $this->row['wifegivenname']         = $value;
+                $this->changed['wifegivenname']     = $value;
                 if (is_null($this->wifePriName))
-                    $this->wifePriName  = $this->getWifePriName();
+                    $this->wifePriName              = $this->getWifePriName();
                 if ($this->wifePriName)
                     return $this->wifePriName->set('surname', $value);
                 else
@@ -2769,8 +2780,10 @@ catch(Exception $e)
 
             case 'wifemarrsurname':
             {
+                $this->row['wifemarrsurname']       = $value;
+                $this->changed['wifemarrsurname']   = $value;
                 if (is_null($this->wifeMarName))
-                    $this->wifeMarName  = $this->getWifeMarName();
+                    $this->wifeMarName              = $this->getWifeMarName();
                 if ($this->wifeMarName)
                     return $this->wifeMarName->set('surname', $value);
                 else
@@ -2780,7 +2793,7 @@ catch(Exception $e)
             case 'wifebirthsd':
             {
                 if (is_null($this->wife))
-                    $this->wife  = $this->getWife();
+                    $this->wife                     = $this->getWife();
                 if ($this->wife)
                     return $this->wife->set('birthsd', $value);
                 else
@@ -2790,15 +2803,27 @@ catch(Exception $e)
             case 'mard':
             {
 				if ($value instanceof LegacyDate)
-				{	// parameter is an instance of LegacyDate
-				    $date	    = $value;
-				}	// parameter is an instance of LegacyDate
+				{	        // parameter is an instance of LegacyDate
+				    $date	                        = $value;
+				}	        // parameter is an instance of LegacyDate
 				else
-				{	// convert the value to instance of LegacyDate
-				    $date	    = new LegacyDate(' ' . $value);
-                }	// convert the value to instance of LegacyDate
+                if (strlen($value) >= 10 && (strpos($value, ' ') === false))
+                {           // parameter is internal date format
+				    $date	                        = new LegacyDate($value);
+				}           // parameter is internal date format
+				else
+				{	        // convert the value to instance of LegacyDate
+				    $date	                = new LegacyDate(' ' . $value);
+                }	        // convert the value to instance of LegacyDate
                 $value          = $date->getDate();
-                $sort           = $date->getSortDate();
+                if ($value == $this->row['mard'])
+                    return $value;
+                $this->setcount--;
+                if ($this->setcount < 1)
+                    exit;
+                $this->row['mard']      = $value;
+                $this->changed['mard']  = $value;
+                $sort                   = $date->getSortDate();
                 if (is_null($this->marEvent))
                     $this->marEvent  = $this->getMarEvent($value !== '');
                 if ($this->marEvent)
@@ -2878,6 +2903,10 @@ catch(Exception $e)
 				{	// parameter is an instance of LegacyDate
 				    $date	    = $value;
 				}	// parameter is an instance of LegacyDate
+                if (strlen($value) >= 10 && (strpos($value, ' ') === false))
+                {           // parameter is internal date format
+				    $date	    = new LegacyDate($value);
+				}           // parameter is internal date format
 				else
 				{	// convert the value to instance of LegacyDate
 				    $date	    = new LegacyDate(' ' . $value);

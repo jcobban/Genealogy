@@ -184,8 +184,7 @@ if (count($_POST) > 0)
 
 			case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
                 break;
             }
 	    }		    // act on specific parameter

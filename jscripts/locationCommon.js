@@ -58,6 +58,7 @@
  *		                getLocationXml.php from function locationChanged*
  *		2019/11/15      normalize locations that have concession before *
  *		                lot to put lot first                            *
+ *		2019/11/18      use getLocationJSON.php                         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -335,13 +336,15 @@ function locationChanged()
 
 		// get an XML file containing location information from the database
         var loc         = this.value;
-		var url	= "/FamilyTree/getLocationXml.php?name=" +
+    var options             = {};
+    options.errorHandler    = function() {alert('script getLocationJSON.php not found on the server')};
+		var url	= "/FamilyTree/getLocationJSON.php?name=" +
 						encodeURIComponent(loc) +
 						"&form=" + this.form.name +
 						"&field=" + this.name;
-		HTTP.getXML(url,
-				    gotLocationXml,
-				    noLocationXml);
+		HTTP.get(url,
+				 gotLocationJSON,
+				 options);
         deferSubmit			    = true;
     }		// search only for non-blank location
     else
@@ -349,76 +352,60 @@ function locationChanged()
 }		// function locationChanged
 
 /************************************************************************
- *  function gotLocationXml												*
+ *  function gotLocationJSON											*
  *																		*
- *  This method is called when the XML document representing			*
+ *  This method is called when the JSON document representing			*
  *  the location or locations is retrieved from the database.			*
  *																		*
  *  Input:																*
- *		XML document with response, for example							*
+ *		JSON object with response, for example							*
  *																		*
- *		<locations count="1" name="Caradoc" form="formname"				*
- *				field="fieldname">										*
- *		  <cmd>SELECT * FROM tblLR WHERE Location='Caradoc' ....</cmd>	*
- *		  <location idlr="17">											*
- *		    <idlr>17</idlr>												*
- *		    <fsplaceid/>												*
- *		    <preposition/>												*
- *		    <location>Caradoc, Middlesex, ON, CA</location>				*
- *		    <sortedlocation>Caradoc, Middlesex, ON, CA</sortedlocation>	*
- *		    <shortname>Caradoc</shortname>								*
- *		    ...															*
- *		  </location>													*
- *		</locations>													*
+ *  {                                                                   *
+ *      "parms" : {                                                     *
+ *          "name" : "caradoc"                                          *
+ *      },                                                              *
+ *      "count" : "1",                                                  *
+ *      "cmd" : "SELECT * FROM tblLR WHERE (`location`='caradoc' ...",  *
+ *      "locations" : {                                                 *
+ *          "17" :                                                      *
+ *          {                                                           *
+ *  	        "idlr":	        17,                                     *
+ *  	        "fsplaceid":	"",                                     *
+ *  	        "preposition":	"",                                     *
+ *  	        "location":	    "Caradoc, Middlesex, ON, CA",           *
+ *  	        "sortedlocation":	"Caradoc, Middlesex, ON, CA",       *
+ *  	        "shortname":	"Caradoc",                              *
+ *  	        ...                                                     *
+ *          }                                                           *
+ *      }                                                               *
+ *  }                                                                   *
+ *													                    *
  ************************************************************************/
-function gotLocationXml(xmlDoc)
+function gotLocationJSON(response)
 {
-    var	topXml	= xmlDoc.documentElement;
-    if (topXml && typeof(topXml) == "object" && topXml.nodeName == 'locations')
-    {			// valid response
-		var count	    		= 0;
+    if ('message' in response)
+    {
+        alert(response.message);
+    }
+    else
+    {
+	    var count	    		= response.count;
+	    var cmd	    		    = response.cmd;
 		var field	    		= '';		// initiating field name
+        if ('field' in response.parms)
+            field               = response.parms.field;
 		var formname			= '';		// form containing field
+        if ('form' in response.parms)
+            formname            = response.parms.form;
 		var name	    		= '';		// search argument
-		var attrs	    		= '';		// for generating alert message
-		for(var i = 0; i < topXml.attributes.length; i++)
-		{
-		    var attr	        = topXml.attributes[i];
-		    attrs	            += attr.name + "='" + 
-					                attr.value + "', ";
-		    switch(attr.name)
-		    {
-				case 'count':
-				{	// number of matches
-				    count	    = parseInt(attr.value);
-				    break;
-				}	// count
-
-				case 'name':
-				{	// search argument
-				    name	    = attr.value;
-				    break;
-				}	// search argument
-
-				case 'field':
-				{	// name of field initiating search
-				    field	    = attr.value;
-				    break;
-				}	// field
-
-				case 'form':
-				{	// form name containing field
-				    formname	= attr.value;
-				    break;
-				}	// form name
-		    }		// act on specific attributes
-		}		// loop through attributes
+        if ('name' in response.parms)
+            name                = response.parms.name;
 
 		// locate the form containing the element that initiated the request
 		var	form	            = document.forms[formname];
 		if (form === undefined)
 		{		// form not found
-		    alert("locationCommon.js: gotLocationXml: form name='" + formname +
+		    alert("locationCommon.js: gotLocationJSON: form name='" + formname +
 					"' not found");
 		    return;
 		}		// form not found
@@ -427,7 +414,7 @@ function gotLocationXml(xmlDoc)
 		var	element	            = form.elements[field];
 		if (element === undefined)
 		{		// element not found
-		    alert("locationCommon.js: gotLocationXml: element name='" + field +
+		    alert("locationCommon.js: gotLocationJSON: element name='" + field +
 					"' not found in form");
 		    return;
 		}		// element not found
@@ -437,28 +424,14 @@ function gotLocationXml(xmlDoc)
 		// name from the database
 		if (count == 1)
 		{		// exactly one matching entry
-		    for(var j = 0; j < topXml.childNodes.length; j++)
-		    {		// loop through children of top node
-				var child	    = topXml.childNodes[j];
-				if (child.nodeType == 1 && child.nodeName == 'location')
-				{	// <location> element representing record
-				    for(var k = 0; k < child.childNodes.length; k++)
-				    {		// loop through children of <location> record
-					// each elt represents a field in the database record
-					// or possibly text for presentation purposes
-					var elt	    = child.childNodes[k];
-					if (elt.nodeType == 1 && elt.nodeName == 'location')
-					{	// location field
-					    element.value	= elt.textContent.trim();
-					    break;	// stop searching
-					}	// location field
-				    }		// loop through children of <location> record
-				    break;	// only look at first <location> record
-				}	// <location> element representing record
-		    }		// loop through children of top node
+		    for(var idlr in response.locations)
+		    {		// loop through the one location
+				var loc         = response.locations[idlr];
+                element.value   = loc['location'];
+		    }		// loop through the one location
 
 		    // location field is updated
-		    deferSubmit			= false;
+		    deferSubmit			    = false;
 		    var	updateButton		= document.getElementById('updEvent');
 		    if (updateButton)
 				updateButton.disabled	= false;
@@ -498,43 +471,20 @@ function gotLocationXml(xmlDoc)
 			select.setAttribute("for", field);
 			select.setAttribute("formname", formname);
 			    
-			for(var j = 0; j < topXml.childNodes.length; j++)
-			{		// loop through children of top node
-			    var child	= topXml.childNodes[j];
-			    if (child.nodeType == 1 && child.nodeName == 'location')
-			    {	// <location> element representing record
-					var	idlr	= 0;
-					var	locname	= "";
+		    for(var idlr in response.locations)
+		    {		// loop through the locations
+				var loc         = response.locations[idlr];
+				var	locname	    = loc['location'];
 
-					for(var k = 0; k < child.childNodes.length; k++)
-					{	        // loop through children of <location> record
-					    // each elt represents a field in the database
-					    // record or possibly text for presentation purposes
-					    var elt	= child.childNodes[k];
-					    if (elt.nodeType == 1)
-					    {	    // element (tag) node
-							if (elt.nodeName == 'idlr')
-							{	// numeric key field
-							    idlr	= parseInt(elt.textContent.trim());
-							}	// numeric key field
-							else
-							if (elt.nodeName == 'location')
-							{	// location name field
-							    locname	= elt.textContent.trim();
-							}	// location name field
-					    }	    // element (tag) node
-					}	        // loop through children of <location> record
-				    
-					// create option element under select
-					var	option	        = new Option(locname,
-        						        		     idlr, 
-	        					        		     false, 
-		        				        		     false);
-					// IE<8 does not create option element correctly
-					option.innerHTML	= locname;
-					option.value		= idlr;	
-				    select.appendChild(option);
-			    }	            // <location> element representing record
+				// create option element under select
+				var	option	        = new Option(locname,
+        					        		     idlr, 
+	        				        		     false, 
+		        			        		     false);
+				// IE<8 does not create option element correctly
+				option.innerHTML	= locname;
+				option.value		= idlr;	
+				select.appendChild(option);
 			}	                // loop through children of top node
 			select.selectedIndex	= 0;
 
@@ -551,16 +501,9 @@ function gotLocationXml(xmlDoc)
 			select.focus();
 		}		                // multiple matching entries
     }	        		        // valid response
-    else
-    {
-		if (topXml && typeof(topXml) == "object")
-		    alert("locationCommon.js: gotLocationXml: " + tagToString(topXml));
-		else
-		    alert("locationCommon.js: gotLocationXml: '" + xmlDoc + "'");
-    }
 
     hideLoading();	// hide the "loading" indicator
-}		// function gotLocationXml
+}		// function gotLocationJSON
 
 /************************************************************************
  *  function closeNewDialog												*
@@ -636,17 +579,6 @@ function closeNewDialog()
 		alert("locationCommon.js: closeNewDialog: cannot find <form> in open dialog");
     return null;
 }		// function closeNewDialog
-
-/************************************************************************
- *  function noLocationXml												*
- *																		*
- *  This method is called if there is no response script on the server	*
- ************************************************************************/
-function noLocationXml()
-{
-    alert("locationCommon.js: logic error: " +
-				"getLocationXml.php script not found on server");
-}		// function noLocationXml
 
 /************************************************************************
  *  function locationChosen												*
