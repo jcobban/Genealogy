@@ -133,6 +133,7 @@ use \Iterator;
  *		2019/09/26      in getNotes only replace new lines with <br>    *
  *		                if the content is not already HTML              *
  *		2019/10/08      remove tracelog entries                         *
+ *		2019/11/23      correct implementation of getLocation           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -231,7 +232,7 @@ class Location extends RecordPic
      *																	*
      *	Get an existing entry or create an instance of the class        *
      *	Location from a row returned from a database query of the table	*
-     *  'tblIR' for a value of IDIR.									*
+     *  'tblLR' for a value of IDLR.									*
      *																	*
      *	Input:															*
      *	    $idlr       integer identifier of a location                 *
@@ -241,10 +242,9 @@ class Location extends RecordPic
      ********************************************************************/
     static function getLocation($idlr)
     {
-        if (array_key_exists($idlr, self::$locationIndex))
-	        return self::$locationIndex[$idlr];
-        else
-            return new Location(array('idlr' => $idlr));
+        if (!array_key_exists($idlr, self::$locationIndex))
+            self::$locationIndex[$idlr] = new Location(array('idlr' => $idlr));
+	    return self::$locationIndex[$idlr];
     }           // static function Location::getLocation
 
     /********************************************************************

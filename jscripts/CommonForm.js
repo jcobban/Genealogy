@@ -430,7 +430,7 @@ var	RlgnAbbrs = {
 				"Men" 		: "Mennonite",
 				"Mep" 		: "Methodist Episcopal",
 				"Ncm" 		: "New Connexion Methodist",
-				"New" 		: "New Church",
+				"Nc" 		: "New Church",
 				"O" 		: "Old School Baptist",
 				"Of" 		: "of",
 				"Osb" 		: "Old School Baptist",

@@ -78,7 +78,7 @@ else
                 foreach ($info as $field => $value)
                 {
                     if (is_string($value))
-                        $value      = trim($value);
+                        $value      = htmlspecialchara(trim($value),ENT_XML1);
                     print "\t\t<$field>";
                     if (is_array($value))
                     {

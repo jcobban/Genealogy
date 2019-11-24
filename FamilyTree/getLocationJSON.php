@@ -46,7 +46,8 @@ use \Exception;
  *						so Javascript won't prompt						*
  *		2019/11/09      move escaping of characters in name here from   *
  *		                Javascript function locationChanged             *
- *		2019/11/18      return JSON instead of XML
+ *		2019/11/18      return JSON instead of XML                      *
+ *		                correct escaping SQL command in response        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -161,7 +162,8 @@ else
     print '    "count" : "' .  $count . "\",\n";
     $info		        = $locations->getInformation();
     $query		        = $info['query'];
-    print '    "cmd" : "' . str_replace('"', '\\"', $query) . "\",\n";
+    print '    "cmd" : "' . str_replace('"', '\\"', 
+                                str_replace('\\','\\\\',$query)) . "\",\n";
     print "    \"locations\" : {\n    ";
     $comma              = '';
     foreach($locations as $idlr => $location)

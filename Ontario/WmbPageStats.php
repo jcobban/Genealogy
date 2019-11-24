@@ -57,16 +57,17 @@ if ($debug)
 if (strlen($msg) == 0)
 {			// no errors
 	// execute the query
-	$query	= "SELECT Page, COUNT(*), SUM(IDIR > 0)" .
-					" FROM MethodistBaptisms" .
-					" WHERE Volume=$volume" .
-					" GROUP BY Volume, Page ORDER BY Volume, Page";
-	$stmt	 	= $connection->query($query);
+	$query	    = "SELECT Page, COUNT(*), SUM(IDIR > 0)" .
+				    	" FROM MethodistBaptisms" .
+				    	" WHERE Volume=$volume" .
+				    	" GROUP BY Volume, Page ORDER BY Volume, Page";
+    $stmt	 	= $connection->query($query);
+    $queryText  = htmlspecialchars($query);
 	if ($stmt)
 	{		// successful query
 	    $result	= $stmt->fetchAll(PDO::FETCH_NUM);
 	    if ($debug)
-			print "<p>$query</p>\n";
+			print "<p>$queryText</p>\n";
 	}		// successful query
 	else
 	{

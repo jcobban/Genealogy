@@ -1125,4 +1125,5 @@ class District extends Record
 							print_r($stmt->errorInfo(),true) . "\n");
 		}			// failure
     }		// function District::synchPopulation
+
 }		// class District 

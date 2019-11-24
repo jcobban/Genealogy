@@ -90,7 +90,7 @@
  *																		*
  *  Define the function to be called once the web page is loaded.		*
  ************************************************************************/
-window.onload	= onLoad;
+window.onload	        = onLoad;
 
 /************************************************************************
  *  function ontarioCountyNames											*
@@ -152,23 +152,23 @@ var ontarioCountyNames	= {
 				'York' 			: 1};
 
 // instance of google.maps.Map for displaying the map
-var	map		= null;
+var	map		            = null;
 
 // array of instances of google.maps.LatLng for boundary of area
-var	path		= [];
+var	path		        = [];
 
 // instance of google.maps.PolygonOptions for displaying boundary
-var	polyOptions	= {strokeColor: "red", 
+var	polyOptions	        = {strokeColor: "red", 
 						   strokeOpacity: 0.5,
 						   strokeWeight: 2,
 						   fillColor: "black",
 						   fillOpacity: 0.10};
 
 // instance of google.maps.Polygon for displaying boundary
-var	boundary	= null;
+var	boundary	        = null;
 
 // instance of google.maps.Geocoder for resolving place names
-var	geocoder	= null;
+var	geocoder	        = null;
 
 /************************************************************************
  *  function onLoad														*
@@ -180,13 +180,13 @@ function onLoad()
     document.body.onresize	= onWindowResize;
 
     // set action methods for form
-    var	invoker	= window.opener;
+    var	invoker	            = window.opener;
     if (invoker)
     {		// invoked from another page
 		try {
-		var openerPath	= invoker.location.pathname;
-		var dlm		= openerPath.lastIndexOf('/');
-		var openerName	= openerPath.substr(dlm + 1);
+		var openerPath	    = invoker.location.pathname;
+		var dlm		        = openerPath.lastIndexOf('/');
+		var openerName	    = openerPath.substr(dlm + 1);
 		//alert("Person: openerName='" + openerName + "'");
 		if (openerName == "editMarriages.php" ||
 		    openerName == "editParents.php")
@@ -205,9 +205,9 @@ function onLoad()
     }		// invoked from another page
 
     // activate local keystroke handling
-    document.body.onkeydown		= diKeyDown;
+    document.body.onkeydown	= diKeyDown;
 
-    var names	= "";
+    var names   	        = "";
     // scan through all forms and set dynamic functionality
     // for specific elements
     for(var i = 0; i < document.forms.length; i++)
@@ -454,19 +454,18 @@ function postBlog(rownum)
     {
 		var	idir		= form.idir.value;
 		var	message		= tinyMCE.get('message').getContent();
-		var parms		= {
-				"idir"		    : idir,
-				"emailAddress"	: email,
-				"message"	    : message,
-                "lang"          : lang};
+		var parms		= { "idir"		    : idir,
+				            "emailAddress"	: email,
+				            "message"	    : message,
+                            "lang"          : lang};
 
 		if (debug.toLowerCase() == 'y')
 		{
 		    alert("Person.js: postBlog: parms={" +
-				"idir="		+ idir +
-				", emailAddress='"+ email +
-				"', message='"	+ message + 
-				"', lang='"	+ lang + "'}");
+							"idir="		        + idir +
+							", emailAddress='"  + email +
+							"', message='"	    + message + 
+							"', lang='"	        + lang + "'}");
 		    parms['debug']	= 'y';
 		}
 
@@ -671,16 +670,16 @@ function relationshipCalc()
 /************************************************************************
  *  function ancestrySearch												*
  *																		*
- *  Perform a search for a matching individual in Ancestry.ca.				*
+ *  Perform a search for a matching individual in Ancestry.ca.			*
  *																		*
  *  Input:																*
- *		this				<button id='ancestrySearch'>						*
+ *		this		<button id='ancestrySearch'>						*
  ************************************************************************/
 function ancestrySearch()
 {
-    var lang        = 'en';
+    var lang            = 'en';
     if ('lang' in args)
-        lang        = args.lang;
+        lang            = args.lang;
     var	form			= this.form;
     var	yearPatt		= /\d{4}/;
     var	birthDate		= form.birthDate.value;
@@ -806,62 +805,68 @@ function diKeyDown(e)
 {
     if (!e)
     {		// browser is not W3C compliant
-		e		=  window.event;	// IE
+		e		        =  window.event;	// IE
     }		// browser is not W3C compliant
-    var	code		= e.keyCode;
-    var	actionsForm	= document.actionsForm;
-    var	idir		= actionsForm.idir.value;
+    var	key		        = e.key;
+    var	actionsForm	    = document.actionsForm;
+    var	idir		    = actionsForm.idir.value;
     var	button;
 
     // take action based upon code
     if (e.altKey)
-    {		// alt key shortcuts
-		switch (code)
-		{
-		    case 65:
+    {		        // alt key shortcuts
+		switch (key)
+		{           // act on specific key
+		    case 'a':
+		    case 'A':
 		    {		// letter 'A'
 				button	= document.getElementById('showAncTree');
 				button.click(); 
 				return false;
 		    }		// letter 'A'
     
-		    case 66:
+		    case 'b':
+		    case 'B':
 		    {		// letter 'B'
 				button	= document.getElementById('PostBlog');
 				button.click(); 
 				return false;
 		    }		// letter 'B'
 
-		    case 68:
+		    case 'd':
+		    case 'D':
 		    {		// letter 'D'
 				button	= document.getElementById('showDescTree');
 				button.click(); 
 				return false;
 		    }		// letter 'D'
 
-		    case 69:
+		    case 'e':
+		    case 'E':
 		    {		// letter 'E'
 				button	= document.getElementById('edit');
 				button.click(); 
 				return false;
 		    }		// letter 'E'
     
-		    case 82:
+		    case 'r':
+		    case 'R':
 		    {		// letter 'R'
 				button	= document.getElementById('relationshipCalc');
 				button.click(); 
 				return false;
 		    }		// letter 'R'
     
-		    case 83:
+		    case 's':
+		    case 'S':
 		    {		// letter 'S'
 				button	= document.getElementById('ancestrySearch');
 				button.click(); 
 				return false;
 		    }		// letter 'S'
 
-		}	    // switch on key code
-    }		// alt key shortcuts
+		}	        // switch on key code
+    }		        // alt key shortcuts
 
     return true;	// do default action
 }		// diKeyDown

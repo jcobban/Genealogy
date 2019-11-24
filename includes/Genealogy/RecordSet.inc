@@ -89,6 +89,7 @@ use \Templating\Template;
  *		                ORDER BY                                        *
  *		2019/07/17      clean up debugging output from constructor      *
  *		2019/09/21      qualify class Template by namespace             *
+ *		2019/11/21      information['query'] is no longer escaped       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -730,7 +731,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 
 		// external representation of query for messages
 		$this->information['query']	= debugPrepQuery($this->query,
-			        								 $this->sqlParms);
+                                                     $this->sqlParms,
+                                                     false);
 		// query the database for count
 		if (!isset($this->information['count']))
 		{			// set count to actual number of records
@@ -1805,15 +1807,15 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		if (is_string($xml))
 		{		// string tag name
 		    $tagname	= $xml;
-		    $msgtag	= "p class='message'";
+		    $msgtag	    = "p class='message'";
 		    $emsgtag	= "p";
-		    $xml	= true;
+		    $xml	    = true;
 		}		// string tag name
 		else
 		if ($xml)
 		{		// true
 		    $tagname	= 'cmd';
-		    $msgtag	= 'msg';
+		    $msgtag	    = 'msg';
 		    $emsgtag	= 'msg';
 		}		// true
 
@@ -2289,7 +2291,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
             $warn   .= "<p>RecordSet::rewind: " . __LINE__ . ' ' .
                         number_format($this->information['count']) .
                         " is too many records to read into memory for query '" .
-                        $this->information['query'] . 
+                        htmlspecialchars($this->information['query']) . 
                         "' from parms " . print_r($this->parms, true) . ".</p>\n";
             $this->limit    = 0;
         }

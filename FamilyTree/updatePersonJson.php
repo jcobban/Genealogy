@@ -272,23 +272,25 @@ try {
 	                if ($person->isExisting())
 	                {
 	                    $idir	    = $person->getIdir();
-	                    $surname	= $person->getSurname();
-	                    $givenName	= $person->getGivenName();
 	                    $gender	    = $person->getGender();
-	                }
+                    }
+                    $priName        = $person->getPriName();
+	                $surname	    = $priName['surname'];
+	                $givenName	    = $priName['givenname'];
 	                break;
 	            }		// unique identifier of record to update
 	
 	            case 'idir':
 	            {
 	                $idir		    = $value;
-	                $person	        = new Person(array('idir' => $idir));
+	                $person	        = Person::getPerson($idir);
 	                if ($person->isExisting())
 	                {
-	                    $surname	= $person->getSurname();
-	                    $givenName	= $person->getGivenName();
 	                    $gender	    = $person->getGender();
 	                }
+                    $priName        = $person->getPriName();
+	                $surname	    = $priName['surname'];
+	                $givenName	    = $priName['givenname'];
 	                break;
 	            }		// idir
 	
@@ -316,13 +318,15 @@ try {
 	
 	            case 'surname':
 	            {
-	                $person->setSurname($value);
+	                $person['surname']      = $value;
+	                $priName['surname']     = $value;
 	                break;
 	            }		// surname
 	
 	            case 'givenname':
 	            {
-	                $person->setGivenName($value);
+	                $person['givenname']    = $value;
+	                $priName['givenname']   = $value;
 	                break;
 	            }		// given name	
 	
@@ -799,7 +803,11 @@ try {
         // write the changes to the individual record
         $person->save(false);
         $command                    = $person->getLastSqlCmd();
-        print "$comma\"cmd\": " . json_encode($command);
+        print "$comma\"savePerson\": " . json_encode($command);
+        // write the changes to the individual record
+        $priName->save(false);
+        $command                    = $priName->getLastSqlCmd();
+        print "$comma\"saveName\": " . json_encode($command);
         // in case its a new individual get IDIR assigned by server
         $idir	                    = $person->getIdir();
 

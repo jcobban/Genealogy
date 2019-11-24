@@ -66,18 +66,18 @@ if (is_null($countyName))
 if (strlen($msg) == 0)
 {			// no errors
 	// execute the query
-	$query	= "SELECT Township, SUM(Surname != '') FROM Ocfa " .
-					    "WHERE County=:county" . 
-					    " GROUP BY Township ORDER BY Township";
-    $stmt	 	= $connection->prepare($query);
-    $queryText  = debugPrepQuery($query, $sqlParms);
+	$query	        = "SELECT Township, SUM(Surname != '') FROM Ocfa " .
+					            "WHERE County=:county" . 
+					            " GROUP BY Township ORDER BY Township";
+    $stmt	 	    = $connection->prepare($query);
+    $queryText      = debugPrepQuery($query, $sqlParms);
 	if ($stmt->execute($sqlParms))
 	{		// successful query
-	    $result	= $stmt->fetch(PDO::FETCH_NUM);
+	    $result	    = $stmt->fetch(PDO::FETCH_NUM);
 	}		// successful query
 	else
 	{
-	    $msg	.= "query '$queryText' failed: " .
+	    $msg	    .= "query '$queryText' failed: " .
 					   print_r($stmt->errorInfo(),true);
 	}		// query failed
 }			// no errors

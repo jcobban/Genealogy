@@ -122,6 +122,9 @@ use \Exception;
  *						division										*
  *		2018/12/26      add surname parameter for tblIR, tblNR, tblNX   *
  *		2019/06/23      support sets of Births, Deaths, and Marriages   *
+ *		2019/11/20      always create RecordSet if $id is not set       *
+ *		                if $parms is empty replace with null to get all *
+ *		                pass limit and offset values in parms           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -165,7 +168,6 @@ $line				= null;
 $options			= 0;		// value passed to method to specify
 						// sub-records to include in response
 $offset				= 0;		// first record to return from result
-$limit				= 20;		// number of records to return
 $record		        = null;
 
 // check authorization
@@ -337,9 +339,9 @@ require_once __NAMESPACE__ . '/Census.inc';
 			    $ppos	= strpos($province,
 						 $censusRec->get('provinces'));
 			    if (strlen($province) != 2 ||
-				$ppos < 0 || ($ppos & 1) == 1)
+					$ppos < 0 || ($ppos & 1) == 1)
 			    {
-				$msg	.= "Province '$province' not supported for '$censusId' census. ";
+					$msg	.= "Province '$province' not supported for '$censusId' census. ";
 			    }
 			}
 			else
@@ -352,9 +354,9 @@ require_once __NAMESPACE__ . '/Census.inc';
 			if (preg_match("/^[0-9]+(\.[05]|)$/", $value) == 1)
 			{		// matches pattern of a district number
 			    if (substr($value,strlen($value)-2) == '.0')
-				$distId		= substr($value, 0, strlen($value) - 2);
+					$distId		= substr($value, 0, strlen($value) - 2);
 			    else
-				$distId		= $value;
+					$distId		= $value;
 			    $parms[$key]	= $distId;
 			}		// matches pattern of a district number
 			else
@@ -457,25 +459,21 @@ require_once __NAMESPACE__ . '/Census.inc';
 
 	    case 'offset':
 	    {		// record offset
-			$rxres	= preg_match("/^[0-9]+$/", $value);
-			if ($rxres == 1)
-			{
-			    $offset	= $value;
-			}
+            $value                      = trim($value);
+			if (ctype_digit($value))
+			    $parms['offset']	    = intval($value);
 			else
 			    $msg	.= "Invalid parameter value $key='$value'. ";
 			break;
 	    }		// record offset
 
 	    case 'limit':
-	    {		// maximum number of records
-			$rxres	= preg_match("/^[0-9]+$/", $value);
-			if ($rxres == 1)
-			{
-			    $limit	= $value;
-			}
+        {		// maximum number of records
+            $value                  = trim($value);
+			if (ctype_digit($value))
+			    $parms['limit']	    = intval($value);
 			else
-			    $msg	.= "Invalid parameter value $key='$value'. ";
+			    $msg	        .= "Invalid parameter value $key='$value'. ";
 			break;
 	    }		// maximum number of records
 
@@ -496,7 +494,7 @@ require_once __NAMESPACE__ . '/Census.inc';
 	    }		// options parameter
 
 	    default:
-	    {
+        {
 			$parms[$key]	= $value;
 			break;
 	    }
@@ -506,6 +504,9 @@ require_once __NAMESPACE__ . '/Census.inc';
 
 if (strlen($msg) == 0)
 {			// no errors detected
+    if (count($parms) == 0)
+        $parms          = null;
+
 	//try {		// prevent throw from breaking XML
 	switch($table)
 	{
@@ -522,11 +523,11 @@ require_once __NAMESPACE__ . '/Address.inc';
 			    }
 			    else
 			    if (!canUser('all'))
-				$parms['kind']		= array(1,2);
+					$parms['kind']		= array(1,2);
 			    $record	= new RecordSet('Addresses',$parms);
 			    if ($record->count() == 1)
 			    {
-				$record		= $record->current();
+					$record		= $record->current();
 				if ($record->get('kind') == Address::MAILING &&
 				    !canUser('all'))
 				    $msg	.=
@@ -541,23 +542,21 @@ require_once __NAMESPACE__ . '/Address.inc';
 	    {		// Picture record
 require_once __NAMESPACE__ . '/Picture.inc';
 			if (isset($id))
-			{
+            {
+                print '"id" : "' . print_r($id, true) . '",';
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Pictures', $id);
+					$record	    = new RecordSet('Pictures', $id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Picture($id);
+					$record	    = new Picture($id);
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
-			    $record	= new RecordSet('Pictures', $parms);
+                $record	        = new RecordSet('Pictures', $parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
 			$top	= 'picture';
 			break;
 	    }		// Picture record
@@ -569,11 +568,11 @@ require_once __NAMESPACE__ . '/Child.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Children', $id);
+					$record	= new RecordSet('Children', $id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Child(array('idcr' => $id));
+					$record	= new Child(array('idcr' => $id));
 			    }
 			}
 			else
@@ -592,12 +591,9 @@ require_once __NAMESPACE__ . '/DontMergeEntry.inc';
 			    $record	= new DontMergeEntry($idirleft, $idirright);
 			}
 			else
-			if (count($parms) > 0)
 			{
 			    $record	= new RecordSet('DontMergeEntries', $parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
 			$top		= 'dontmerge';
 			break;
 	    }		// DontMerge
@@ -609,21 +605,18 @@ require_once __NAMESPACE__ . '/Event.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Events', $id);
+				    $record	= new RecordSet('Events', $id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Event(array('ider' => $id));
+				    $record	= new Event(array('ider' => $id));
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
-			    $record	= new RecordSet('Events', $parms);
+			    $record	    = new RecordSet('Events', $parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
-			$top	= 'event';
+			$top	        = 'event';
 			break;
 	    }		// Event record
 
@@ -643,21 +636,18 @@ require_once __NAMESPACE__ . '/Person.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Persons',$id);
+				    $record	= new RecordSet('Persons',$id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Person(array('idir' => $id));
+				    $record	= new Person(array('idir' => $id));
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
-			    $record	= new RecordSet('Persons',$parms);
+			    $record	    = new RecordSet('Persons',$parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
-			$top	= 'indiv';
+			$top	        = 'indiv';
 			break;
 	    }		// Person record
 
@@ -668,20 +658,17 @@ require_once __NAMESPACE__ . '/Location.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Locations',$id);
+				    $record	= new RecordSet('Locations',$id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Location(array('idlr' => $id));
+				    $record	= new Location(array('idlr' => $id));
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
 			    $record	= new RecordSet('Locations',$parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
 			$top	= 'location';
 			break;
 	    }		// Location record
@@ -693,20 +680,17 @@ require_once __NAMESPACE__ . '/Family.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Families',$id);
+					$record	= new RecordSet('Families',$id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Family(array('idmr' => $id));
+					$record	= new Family(array('idmr' => $id));
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
 			    $record	= new RecordSet('Families',$parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
 			$includeParm2		= true;
 			$includeParm3		= true;	
 			$top			= 'family';
@@ -728,12 +712,9 @@ require_once __NAMESPACE__ . '/Name.inc';
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
 			    $record	    = new RecordSet('Names',$parms);
 			}
-			else
-			    $msg	    .= "Too many '$extTableName' records to return.";
 			$top	= 'name';
 			break;
 	    }		// Name record
@@ -753,12 +734,9 @@ require_once __NAMESPACE__ . '/Surname.inc';
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
 			    $record	= new RecordSet('Surnames',$parms);
 			}
-			else
-			    $msg	    .= "Too many '$extTableName' records to return.";
 			$top	= 'surname';
 			break;
 	    }		// Surname record
@@ -797,11 +775,11 @@ require_once __NAMESPACE__ . '/Source.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Sources',$id);
+					$record	= new RecordSet('Sources',$id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Source(array('idsr' => $id));
+					$record	= new Source(array('idsr' => $id));
 			    }
 			}
 			else
@@ -817,20 +795,17 @@ require_once __NAMESPACE__ . '/Citation.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Citations',$id);
+					$record	= new RecordSet('Citations',$id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Citation(array('idsx' => $id));
+					$record	= new Citation(array('idsx' => $id));
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
 			    $record	= new RecordSet('Citations',$parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
 			$top	= 'citation';
 			break;
 	    }		// Citation record
@@ -843,12 +818,9 @@ require_once __NAMESPACE__ . '/ToDo.inc';
 			    $record	= new ToDo(array('idtd' => $id));
 			}
 			else
-			if (count($parms) > 0)
 			{
 			    $record	= new RecordSet('ToDos',$parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
 			$top	= 'todo';
 			break;
 	    }		// To Do record
@@ -860,26 +832,22 @@ require_once __NAMESPACE__ . '/Temple.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Temples',$id);
+					$record	        = new RecordSet('Temples',$id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Temple(array('idtr' => $id));
+					$record	        = new Temple(array('idtr' => $id));
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
-			    $record	= new RecordSet('Temples',$parms);
+			    $record	            = new RecordSet('Temples',$parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
-			$top	= 'temple';
+			$top	                = 'temple';
 			break;
 	    }		// Temple record
 
 	    case 'tblBP':
-	    case 'tblBR':
 	    case 'tblCP':
 	    case 'tblHB':
 	    case 'tblHL':
@@ -889,31 +857,15 @@ require_once __NAMESPACE__ . '/Temple.inc';
 	    case 'tblXI':
 	    case 'tblXM':
 	    {
-			$key		= 'id' . strtolower(substr($table,3));
+			$key		            = 'id' . strtolower(substr($table,3));
 			if (isset($id))
 			{
-			    $dbrow	= array($key => $id);
-			    $record	= new Record($dbrow, $table);
+			    $dbrow	            = array($key => $id);
+			    $record	            = new Record($dbrow, $table);
 			}
 			else
 			{
-			    $query	= "SELECT * FROM `$table` ORDER BY `$key`";
-			    $stmt	= $connection->query($query);
-			    if ($stmt)
-			    {
-				$records	= $stmt->fetchAll(PDO::FETCH_ASSOC);
-				$record		= array();
-				foreach($records as $row)
-				{
-				    $id			= reset($row);
-				    $record[$id]	= new Record($row, $table);
-				}
-			    }
-			    else
-			    {
-				$msg	.= "query='$query' failed " .
-					   print_r($connection->errorInfo(), true);
-			    }
+			    $record	            = new RecordSet($table, $parms);
 			}
 			break;
 	    }
@@ -925,8 +877,8 @@ require_once __NAMESPACE__ . '/BirthSet.inc';
 			if (isset($domain) && isset($regyear) && $regnum)
 			    $record	= new Birth($domain, $regyear, $regnum);
 			else
-			    $record	= new BirthSet($parms);
-			$top		= 'birth';
+			    $record	        = new BirthSet($parms);
+			$top		        = 'birth';
 			break;
 	    }		// Births
 
@@ -934,10 +886,10 @@ require_once __NAMESPACE__ . '/BirthSet.inc';
 	    {
             require_once __NAMESPACE__ . '/Death.inc';
 			if (isset($domain) && isset($regyear) && $regnum)
-                $record		= new Death($domain, $regyear, $regnum);
+                $record		    = new Death($domain, $regyear, $regnum);
             else
-                $record     = new RecordSet('Deaths', $parms);
-			$top		= 'death';
+                $record         = new RecordSet('Deaths', $parms);
+			$top		        = 'death';
 			break;
 	    }		// Deaths
 
@@ -945,10 +897,10 @@ require_once __NAMESPACE__ . '/BirthSet.inc';
 	    {
 require_once __NAMESPACE__ . '/Marriage.inc';
 			if (isset($domain) && isset($regyear) && $regnum)
-			    $record		= new Marriage($domain, $regyear, $regnum);
+			    $record		    = new Marriage($domain, $regyear, $regnum);
             else
-                $record     = new RecordSet('Marriage', $parms);
-			$top		= 'marriage';
+                $record         = new RecordSet('Marriage', $parms);
+			$top		        = 'marriage';
 			break;
 	    }		// Marriage
 
@@ -959,127 +911,107 @@ require_once __NAMESPACE__ . '/CountyMarriage.inc';
 			{
 			    if (isset($reportNo))
 			    {		// volume and report number
-				if (isset($itemNo))
-				{	// individual record
-				    $parms	= array('Domain'	=> $domain,
-							    'Volume'	=> $volume,
-			 				'ReportNo'	=> $reportNo,
-	 					'ItemNo'	=> $itemNo);
-	 
-				    $record		= new CountyMarriage($parms);
-				}	// individual record
-				else
-				{	// only volume and report number
-				    $parms	= array('Domain'	=> $domain,
-							    'Volume'	=> $volume,
-			 				'ReportNo'	=> $reportNo);
-	 
-				    $record	= new RecordSet('CountyMarriages',$parms);
-				}	// only volume and report number
-			    }		// volume and report number
+					if (isset($itemNo))
+					{	// individual record
+					    $parms	= array('Domain'	=> $domain,
+						    		    'Volume'	=> $volume,
+				 		        		'ReportNo'	=> $reportNo,
+		 			            		'ItemNo'	=> $itemNo);
+		 
+					    $record	= new CountyMarriage($parms);
+					}	// individual record
+					else
+					{	// only volume and report number
+					    $parms	= array('Domain'	=> $domain,
+						        	    'Volume'	=> $volume,
+				 		        		'ReportNo'	=> $reportNo);
+		 
+					    $record	= new RecordSet('CountyMarriages',$parms);
+					}	// only volume and report number
+			    }		    // volume and report number
 			    else
-			    {		// only volume number
-				$parms	= array('Domain'	=> $domain,
-						'Volume'	=> $volume);
-				$record= new RecordSet('CountyMarriages',$parms);
+			    {		    // only volume number
+					$parms	    = array('Domain'	=> $domain,
+						                'Volume'	=> $volume);
+					$record     = new RecordSet('CountyMarriages',$parms);
 			    }			// only volume number
 			}
 			else
-			{			// only domain
-			    $parms	= array('Domain'	=> $domain);
+			{			    // only domain
+			    $parms	        = array('Domain'	=> $domain);
 	 
-			    $record	= new RecordSet('CountyMarriages',$parms);
-			}			// only domain
-			$top		= 'marriage';
+			    $record	        = new RecordSet('CountyMarriages',$parms);
+			}			    // only domain
+			$top		        = 'marriage';
 			break;
-	    }		// CountyMarriage
+	    }		            // CountyMarriage
 
 	    case 'CountyMarriageReports':
 	    {
 require_once __NAMESPACE__ . '/CountyMarriageReport.inc';
 			if ($domain == 'CAON')
-			    $domain	= 'CACW';
+			    $domain	        = 'CACW';
 			if (isset($volume))
 			{
 			    if (isset($reportNo))
 			    {
-				$parms	= array('Domain'	=> $domain,
-						'Volume'	=> $volume,
-	 				'ReportNo'	=> $reportNo);
+					$parms	    = array('Domain'	=> $domain,
+						                'Volume'	=> $volume,
+	 				                    'ReportNo'	=> $reportNo);
 	 
-				$record	= new CountyMarriageReport($parms);
+					$record	    = new CountyMarriageReport($parms);
 			    }
 			    else
 			    {
-				$parms	= array('Domain'	=> $domain,
-						'Volume'	=> $volume);
+					$parms	    = array('Domain'	=> $domain,
+						                'Volume'	=> $volume);
 	 
-				$record	= new RecordSet('CountyMarriageReports',$parms);
+					$record	    = new RecordSet('CountyMarriageReports',$parms);
 			    }	
 			}
 			else
 			{
-			    $parms	= array('Domain'	=> $domain);
+			    $parms	        = array('Domain'	=> $domain);
 	 
-			    $record	= new RecordSet('CountyMarriageReports',$parms);
+			    $record	        = new RecordSet('CountyMarriageReports',$parms);
 			}
-			$top		= 'reports';
+			$top		        = 'reports';
 			break;
 	    }		// CountyMarriageReport
 
 	    case 'Countries':
 	    {
-			$top		= 'country';
-			if (count($parms) > 0)
-			{
-			    $record	= new RecordSet('Countries',$parms);
-			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
+            $top		        = 'country';
+            $record	            = new RecordSet('Countries',$parms);
 			break;
 	    }		// Countries
 
 	    case 'Domains':
 	    {
 			$top		= 'domain';
-			if (count($parms) > 0)
+			if (array_key_exists('cc', $parms))
 			{
-			    if (array_key_exists('cc', $parms))
-			    {
 				$parms['domain']	= '^' . $parms['cc'];
-				unset($parms['cc']);
-			    }
-			    $record	= new RecordSet('Domains',$parms);
+			    unset($parms['cc']);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
+			$record	= new RecordSet('Domains',$parms);
 			break;
 	    }		// Countries
 
 	    case 'Counties':
 	    {
 			$top		= 'county';
-			if (count($parms) > 0)
-			{
-			    if (array_key_exists('county', $parms))
+			if (array_key_exists('county', $parms))
 				$record	= new County($parms['domain'],$parms['county']);
-			    else
-				$record	= new RecordSet('Counties',$parms);
-			}
 			else
-			    $msg	.= "Too many '$extTableName' records to return.";
+				$record	= new RecordSet('Counties',$parms);
 			break;
 	    }		// Deaths
 
 	    case 'Townships':
 	    {
 require_once __NAMESPACE__ . '/Township.inc';
-			if (count($parms) > 0)
-			{
-			    $record		= new RecordSet('Townships',$parms);
-			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
+			$record		= new RecordSet('Townships',$parms);
 			$top		= 'township';
 			break;
 	    }		// Townships
@@ -1087,17 +1019,12 @@ require_once __NAMESPACE__ . '/Township.inc';
 	    case 'Users':
 	    {
 require_once __NAMESPACE__ . '/User.inc';
-			if (count($parms) > 0)
-			{
-			    $record	= new RecordSet('Users',$parms);
-			}
-			else
 			if (isset($id))
 			{
 			    $record	= new User($id);
 			}
 			else
-			    $msg	.= "Too many 'User' records to return.";
+			    $record	= new RecordSet('Users',$parms);
 			$top		= 'user';
 			if (!canUser('all'))
 			    $msg	.= "You are not authorized to view this record. ";
@@ -1111,20 +1038,17 @@ require_once __NAMESPACE__ . '/Blog.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				$record	= new RecordSet('Blogs',$id);
+					$record	= new RecordSet('Blogs',$id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new Blog($id);
+					$record	= new Blog($id);
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
 			    $record	= new RecordSet('Blogs',$parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
 			$top		= 'blog';
 			break;
 	    }		// Blogs
@@ -1136,23 +1060,20 @@ require_once __NAMESPACE__ . '/MethodistBaptism.inc';
 			{
 			    if (is_array($id))
 			    {		// search parameters
-				if (isset($volume))
-				    $id['volume']	= $volume;
-				$record	= new RecordSet('MethodistBaptisms',$id);
+				    if (isset($volume))
+				        $id['volume']	= $volume;
+					$record	    = new RecordSet('MethodistBaptisms',$id);
 			    }		// search parameters
 			    else
 			    {
-				$record	= new MethodistBaptism(array('idmb' => $id));
+					$record	    = new MethodistBaptism(array('idmb' => $id));
 			    }
 			}
 			else
-			if (count($parms) > 0)
 			{
-			    $record	= new RecordSet('MethodistBaptisms',$parms);
+			    $record	        = new RecordSet('MethodistBaptisms',$parms);
 			}
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
-			$top		= 'baptism';
+			$top		        = 'baptism';
 			break;
 	    }		// MethodistBaptisms
 
@@ -1165,20 +1086,14 @@ require_once __NAMESPACE__ . '/MethodistBaptism.inc';
 
 	    case 'Districts':
 	    {
-			if (count($parms) > 0)
-			    $record	= new RecordSet('Districts',$parms);
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
+			$record	    = new RecordSet('Districts',$parms);
 			$top		= 'district';
 			break;
 	    }		// District
 
 	    case 'SubDistricts':
 	    {
-			if (count($parms) > 0)
-			    $record	= new RecordSet('SubDistricts',$parms);
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
+			$record	    = new RecordSet('SubDistricts',$parms);
 			$top		= 'subdistrict';
 			break;
 	    }		// SubDistrict
@@ -1186,9 +1101,6 @@ require_once __NAMESPACE__ . '/MethodistBaptism.inc';
 	    case 'Pages':
 	    {
 			$record		= new PageSet($parms);
-			$info		= $record->getInformation();
-			if ($info['count'] > 1000)
-			    $msg	.= number_format($info['count']) . " is too many 'Pages' records to return.";
 			$top		= 'page';
 			break;
 	    }		// Pages
@@ -1197,10 +1109,7 @@ require_once __NAMESPACE__ . '/MethodistBaptism.inc';
 	    case 'Census1861':
 	    {
 require_once __NAMESPACE__ . '/CensusLine.inc';
-			if (count($parms) > 0)
-			    $record	= new RecordSet('CensusLine',$parms);
-			else
-			    $msg	.= "Too many '$extTableName' records to return.";
+			$record	    = new RecordSet('CensusLine',$parms);
 			$top		= 'line';
 			break;
 	    }		// Censuses
@@ -1215,10 +1124,7 @@ require_once __NAMESPACE__ . '/CensusLine.inc';
 	    case 'Census1921':
 	    {
 require_once __NAMESPACE__ . '/CensusLine.inc';
-			if (count($parms) > 0)
-                $record	    = new RecordSet($table,$parms);
-			else
-			    $msg	    .= "Too many '$extTableName' records to return.";
+            $record	        = new RecordSet($table,$parms);
 			$top		    = 'line';
 			break;
 	    }		// Censuses
@@ -1235,16 +1141,33 @@ require_once __NAMESPACE__ . '/CensusLine.inc';
 }			// no errors detected previously
 
 // protect against very large response sets
-if (is_array($record) && strlen($msg) == 0)
+if (strlen($msg) == 0)
 {
-	$count		= count($record);
+    if (is_array($record))
+    {
+	    $count		        = count($record);
+	    if ($count == 0)
+	        $msg	        = 'No matches.';
+	    else
+        if ($count == 1)
+        {
+            $record		    = reset($record);
+        }
+    }
+    else
+    if ($record instanceof RecordSet)
+    {
+	    $count		        = $record->count();
+        if ($count == 1)
+        {
+            $record		    = $record->rewind();
+        }
+    }
 	if ($count == 0)
-	    $msg	= 'No matches.';
-	else
-	if ($count == 1)
-	    $record		= reset($record);
+	    $msg	        = 'No matches.';
 	else
 	if ($count > 100)
-	    $msg	.= "Too many '$extTableName' records to return. " .
-        $count . ' matches.';
+	    $msg	        .= "Too many '$extTableName' records to return: " .
+                            number_format($count) . ' matches.';
 }
+

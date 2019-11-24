@@ -154,7 +154,7 @@ if (count($_POST) > 0)
                         $nickname->set('gender', 1);
                         break;
 
-                    case 'm':
+                    case '':
                         $nickname->set('gender', null);
                         break;
 

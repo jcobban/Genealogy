@@ -53,6 +53,7 @@ use \Iterator;
  *		2017/12/18		add support for temporary fields				*
  *		2019/07/13      use named insertion points and debugPrepQuery   *
  *		                fix insertion logic                             *
+ *		2019/11/21      add RecOwner::$info                             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -75,9 +76,9 @@ class RecOwner extends Record
      *  array containing default values for a new record		        *
      ********************************************************************/
     protected static	$initRow	= array(
-								'ro_index'		=> 0,
+								'ro_index'		    => 0,
 								'ro_username'		=> '',
-								'ro_table'		=> '',
+								'ro_table'		    => '',
 								'ro_keyname'		=> '',
 								'ro_keyvalue'		=> 0);
 
@@ -87,19 +88,26 @@ class RecOwner extends Record
      *  array containing synonyms for field names			            *
      ********************************************************************/
     protected static	$translate	= array(
-				'index'			=> 'ro_index',
-				'username'		=> 'ro_username',
-				'table'			=> 'ro_table',
-				'keyname'		=> 'ro_keyname',
-				'id'			=> 'ro_keyvalue',
-				'keyvalue'		=> 'ro_keyvalue');
+								'index'				=> 'ro_index',
+								'username'			=> 'ro_username',
+								'table'				=> 'ro_table',
+								'keyname'			=> 'ro_keyname',
+								'id'				=> 'ro_keyvalue',
+								'keyvalue'			=> 'ro_keyvalue');
 
     /********************************************************************
-     *	Name::$defaultOrder						                        *
-     *									                                *
-     *	Definition of default order for records retrieved by RecordSet	*
+     *	RecOwner::$info											        *
+     *																	*
+     *	Description of record class                                     *
      ********************************************************************/
-    protected static	$defaultOrder	= 'RO_Username,RO_Table,RO_KeyValue';
+    protected static	$info	= array(
+                'table'     => 'RecOwners',
+                'name'      => 'RecOwners',
+                'prime'	    => 'ro_index',
+	            'srvmg'     => true,
+	            'fldcount'	=> 6,
+                'order'     => 'RO_Username,RO_Table,RO_KeyValue',
+                'classname' => 'RecOwner');
 
     /********************************************************************
      *	RecOwner::__construct											*

@@ -209,6 +209,8 @@ use \Iterator;
  *		                add protected method constDebug                 *
  *		2019/10/28      permit spaces in front of save parm             *
  *		2019/11/06      trim HTML <p> off values from tinyMCE           *
+ *		2019/11/21      correct escaping of apostrophes in debug output *
+ *		                add 3rd parameter to debugPrepQuery             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -961,20 +963,26 @@ class Record implements Iterator, ArrayAccess
             }
         }
 
-        $warn       .= "<p>$className::__construct($parmText)</p>\n";
+        $warn       .= "<p>$className::__construct($parmText), ";
 
-        $trace                          = debug_backtrace();
+        $trace                          = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT,5);
+        $comma                          = '';
+
         foreach($trace as $call)
         {
             if (array_key_exists('class', $call))
                 $classRef               = $call['class'] . '::';
             else
                 $classRef               = '';
-            $warn   .= "<p>$className::__construct: " . __LINE__ .
-                        " function=" . $classRef . $call['function'] .
+            $function                   = $call['function'];
+            if ($function == 'constDebug')
+                continue;
+            $warn   .= $comma . " function=" . $classRef . $function .
                         " called by line=" . $call['line'] . 
-                        " in " . $call['file'] . "</p>\n";
+                        " in " . $call['file'];
+            $comma                      = ',';
         }
+        $warn       .= "</p>\n";
 
     }       // protected function constDebug($parms)
 
@@ -3312,97 +3320,102 @@ require_once __NAMESPACE__ . '/RecOwner.inc';
  *  diagnostic information if there is a mismatch between the prepared	*
  *  statement and the parameters than is provided by MySQL.				*
  *																		*
+ *	Input:																*
+ *		$query      a string containing an SQL command with insertion   *
+ *		            points                                              *
+ *		$sqlParms   and array containing insertion values               *
+ *		$escape     if true escape HTML special characters              *
+ *																		*
  *  Returns:															*
- *		String containing an SQL statement in a format suitable			*
- *		to be displayed as part of an XML or HTML document as text		*
+ *		String containing an SQL statement                              *
  ************************************************************************/
-function debugPrepQuery($query, $sqlParms)
+function debugPrepQuery($query, $sqlParms, $escape = true)
 {
     global $warn;
+
     // check for substitutions by indexed values
-    $queryParts		= explode('?', $query);
+    $queryParts		            = explode('?', $query);
     if (count($queryParts) > 1)
-    {			// substitutions by indexed values
-		$queryText		= $queryParts[0];
+    {			    // substitutions by indexed values
+		$queryText		        = $queryParts[0];
 		for($i = 1; $i < count($queryParts); $i++)
 		{
-		    $text		= $queryParts[$i];
-            $val		= $sqlParms[$i-1];
+		    $text		        = $queryParts[$i];
+            $val		        = $sqlParms[$i-1];
             if (is_array($val))
                 throw new Exception("debugPrepQuery: sqlParms[" . ($i-1) . "] is " .
                                         print_r($val, true));
 		    if (is_null($val) || $val == 'null')
-				$queryText	.= 'NULL' . $text;
+				$queryText	    .= 'NULL' . $text;
 		    else
 		    if (is_int($val) || preg_match('/^[0-9.]+$/', $val) == 1)
-				$queryText	.= $val . $text;
+				$queryText	    .= $val . $text;
 		    else
 		    if (is_string($val))
-				$queryText	.= "'" . str_replace("'", "\\'", $val) .
-								"'" . $text;
+				$queryText	    .= "'" . str_replace("'", "''", $val) .
+						    		"'" . $text;
 		    else
-				$queryText	.= print_r($val, true) . $text;
+				$queryText	    .= print_r($val, true) . $text;
 		}
-		return str_replace('>','&gt;',
-				str_replace('<','&lt;',
-				 str_replace('&','&amp;',$queryText)));
-    }			// substitutions by indexed values
+    }			    // substitutions by indexed values
+    else
+    {               // check for substitutions by named values
+	    $queryParts		        = explode(':', $query);
+	    if (count($queryParts) > 1)
+	    {			    // substitutions by named values
+			$queryText		    = $queryParts[0];
+			for($i = 1; $i < count($queryParts); $i++)
+			{
+			    $matches		= array();
+			    $text	    	= $queryParts[$i];
+			    if (preg_match('/^(\w+)(.*)$/s', $text, $matches) == 0)
+			    {
+					ob_start();
+					debug_print_backtrace();
+					$warn	    .= "<p>Record.inc: " . __LINE__ . ' ' .
+					    		   ob_get_clean() . "</p>\n";
+					throw new Exception('debugPrepQuery parse failed for \'' .
+								$text . "' in '$query'");
+			    }
+			    $index		    = $matches[1];
+			    $text		    = $matches[2];
+			    if (array_key_exists($index, $sqlParms))
+					$val		= $sqlParms[$index];
+			    else
+			    {			// mismatch between parms and prepared statement
+					$warn	    .= "<p>Record::debugPrepQuery: " .
+									"Undefined index '$index'</p>\n";
+                    $warn	    .= "<p>sqlParms=" . 
+                                    print_r($sqlParms, true) . "</p>\n";
+					$val		= ':' . $index;
+			    }			// mismatch between parms and prepared statement
+	
+			    if (is_null($val) || $val === 'null')
+					$queryText	.= 'NULL' . $text;
+			    else
+			    if (is_int($val) || preg_match('/^[0-9.]+$/', $val) == 1)
+					$queryText	.= $val . $text;
+			    else
+			    if (is_array($val))
+			    {
+					$queryText	.= print_r($val,true) . $text;
+					ob_start();
+					debug_print_backtrace();
+					$warn	    .= "<p>" . ob_get_clean() . "</p>\n";
+					// query will fail
+			    }
+			    else
+					$queryText	.= "'" . str_replace("'", "''", $val) . 
+									"'" . $text;
+			}
+        }			// substitutions by named values
+        else
+            $queryText                  = $query;
+    }               // check for substitutions by named values
 
-    // check for substitutions by named values
-    $queryParts		= explode(':', $query);
-    if (count($queryParts) > 1)
-    {			// substitutions by named values
-		$queryText		= $queryParts[0];
-		for($i = 1; $i < count($queryParts); $i++)
-		{
-		    $matches		= array();
-		    $text	    	= $queryParts[$i];
-		    if (preg_match('/^(\w+)(.*)$/s', $text, $matches) == 0)
-		    {
-				ob_start();
-				debug_print_backtrace();
-				$warn	.= "<p>Record.inc: " . __LINE__ . ' ' .
-						   ob_get_clean() . "</p>\n";
-				throw new Exception('debugPrepQuery parse failed for \'' .
-							$text . "' in '$query'");
-		    }
-		    $index		= $matches[1];
-		    $text		= $matches[2];
-		    if (array_key_exists($index, $sqlParms))
-				$val		= $sqlParms[$index];
-		    else
-		    {			// mismatch between parms and prepared statement
-				$warn	.= "<p>Record::debugPrepQuery: " .
-								"Undefined index '$index'</p>\n";
-				$warn	.= "<p>sqlParms=" . print_r($sqlParms, true) . "</p>\n";
-				$val		= ':' . $index;
-		    }			// mismatch between parms and prepared statement
-
-		    if (is_null($val) || $val === 'null')
-				$queryText	.= 'NULL' . $text;
-		    else
-		    if (is_int($val) || preg_match('/^[0-9.]+$/', $val) == 1)
-				$queryText	.= $val . $text;
-		    else
-		    if (is_array($val))
-		    {
-				$queryText	.= print_r($val,true) . $text;
-				ob_start();
-				debug_print_backtrace();
-				$warn	.= "<p>" . ob_get_clean() . "</p>\n";
-				// query will fail
-		    }
-		    else
-				$queryText	.= "'" . str_replace("'", "\\'", $val) . 
-								"'" . $text;
-		}
-		return str_replace('>','&gt;',
-				str_replace('<','&lt;',
-				 str_replace('&','&amp;',$queryText)));
-    }			// substitutions by named values
-    return str_replace('>','&gt;',
-				str_replace('<','&lt;',
-				 str_replace('&','&amp;',$query)));
+    if ($escape)
+        $queryText          = htmlspecialchars($queryText);    
+    return $queryText;
 }		// function debugPrepQuery
 
 /************************************************************************

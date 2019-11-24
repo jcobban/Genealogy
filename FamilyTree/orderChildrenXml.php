@@ -82,7 +82,7 @@ else
     					array('idmr'	=> $idmr,
     					      'order'	=> 'Persons.BirthSD'));
         $info	= $children->getInformation();
-        print "<cmd>" . $info['query'] . "</cmd>\n";
+        print "<cmd>" . htmlspecialchars($info['query']) . "</cmd>\n";
 
         // update the Order field of each of the children
         // so that they match the order of the birth dates

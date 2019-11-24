@@ -162,7 +162,7 @@ else
     }			// report parameters
     print ">\n";		// close tag
     $info		        = $locations->getInformation();
-    $query		        = $info['query'];
+    $query		        = htmlspecialchars($info['query']);
     print "<cmd>$query</cmd>\n";
     foreach($locations as $idlr => $location)
     {			// run through all matching locations

@@ -131,7 +131,7 @@ if ($stmt->execute($sqlParms))
 {		// successful query
     $result		        = $stmt->fetchAll(PDO::FETCH_NUM);
     if ($debug)
-            $warn		.= "<p>$query</p>\n";
+        $warn		.= "<p>$queryText</p>\n";
 }		// successful query
 else
 {

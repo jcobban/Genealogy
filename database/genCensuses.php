@@ -144,13 +144,13 @@ $queryText          = debugPrepQuery($query, $sqlParms);
 if ($stmt->execute($sqlParms))
 {  		// success
     if ($debug)
-		$warn	.= "<p>genCensuses.php: " . __LINE__ . " $query</p>\n";
+		$warn	.= "<p>genCensuses.php: " . __LINE__ . " $queryText</p>\n";
     $statistics		= $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach($statistics as $row)
     {
-		$censusid	= $row['d_census'];
-		$cenyear	= intval(substr($censusid, 2));
+		$censusid	            = $row['d_census'];
+		$cenyear	            = intval(substr($censusid, 2));
 		if (array_key_exists($cenyear, $cendone))
 		    $cendone[$cenyear]	+= $row['transcribed'];
 		else
@@ -173,11 +173,11 @@ foreach($cendone as $year => $value)
 	$template->set('CENDONE' . $year, number_format(floatval($value)));
 foreach($cenpop as $year => $value)
 	$template->set('CENPOP' . $year, number_format(floatval($value)));
-$template->set('TITLE',		$title);
-$template->set('COUNTRYNAME',	$countryName);
-$template->set('ARTICLE',		$article);
-$template->set('POSSESSIVE',	$possessive);
-$template->set('CC',		$cc);
+$template->set('TITLE',		        $title);
+$template->set('COUNTRYNAME',	    $countryName);
+$template->set('ARTICLE',		    $article);
+$template->set('POSSESSIVE',	    $possessive);
+$template->set('CC',		        $cc);
 $template->set('CONTACTSUBJECT',	$_SERVER['REQUEST_URI']);
 
 $template->display();

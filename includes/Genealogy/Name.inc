@@ -171,6 +171,8 @@ use Templating\TemplateTag;
  *		                non marriage records                            *
  *		2918/06/01      improve JSON output                             *
  *		2019/07/18      use Person::getPerson                           *
+ *		2019/11/22      add Name::$info                                 *
+ *		                defer assignment of aka order until save        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -234,6 +236,20 @@ class Name extends Record
     					);
 
     /********************************************************************
+     *	Name::$info											            *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                		'table'     			=> 'tblNX',
+                		'name'      			=> 'Names',
+                		'prime'	    			=> 'idnx',
+	            		'srvmg'     			=> true,
+	            		'fldcount'				=> 18,
+                		'order'     			=> '`order`',
+                		'classname' 			=> 'Name');
+
+    /********************************************************************
      *	Name::$translate												*
      *																	*
      *	static array containing alternate names for each field			*
@@ -250,13 +266,6 @@ class Name extends Record
     					);
 
     /********************************************************************
-     *	Name::$defaultOrder												*
-     *																	*
-     *	Definition of default order for records retrieved by RecordSet	*
-     ********************************************************************/
-    protected static	$defaultOrder	= 'Surname, GivenName, BirthSD';
-
-    /********************************************************************
      *	Constant values of `order`										*
      ********************************************************************/
     const	PRIMARY			    = 0;
@@ -271,60 +280,6 @@ class Name extends Record
     const	NAME_INCLUDE_DATES	= 1;
     const	NAME_SURNAME_FIRST	= 2;
     const	NAME_INCLUDE_LOCS	= 4;
-
-    /********************************************************************
-     *	function Name::getNextOrder										*
-     *																	*
-     *  Get the next order value for assigning a new alternate name/	*
-     *	nickname/sobriquet for an individual.							*
-     *	Note that the implementation has a flaw in that the database	*
-     *  table should be locked to prevent this function being called	*
-     *	twice for the same individual between calls to the constructor.	*
-     *																	*
-     *  Returns															*
-     *	    next value to assign to `order`                             *
-     *	    null if unable to complete function					        *
-     ********************************************************************/
-    private function getNextOrder()
-    {
-    	global	$debug;
-    	global	$warn;
-    	global	$connection;
-
-    	// query the database
-        $idir				= $this['idir'];
-        if ($idir == 0)
-            return null;
-
-    	$query				= 'SELECT COALESCE(MAX(`Order`), 0)+1 ' .
-    							        'FROM tblNX WHERE IDIR=:idir';
-    	$stmt				= $connection->prepare($query);
-    	$sqlParms			= array('idir'	=> $idir);
-    	$queryText			= debugPrepQuery($query, $sqlParms);
-
-    	if ($stmt->execute($sqlParms))
-    	{		// successful query
-    	    if ($debug)
-    			$warn	.= "<p>Name::getNextOrder: $queryText</p>";
-
-    	    $row		= $stmt->fetch(PDO::FETCH_NUM);
-    	    if (is_array($row))
-    	    {		// got result
-    			return $row[0];
-    	    }		// got result
-    	    else
-    	    {		// failed
-    			return null;
-    	    }		// failed
-    	}		    // successful query
-    	else
-    	{		    // error performing query
-    	    $msg      .= "Name::getNextOrder:" .
-                "'$queryText', " .  print_r($stmt->errorInfo(),true) .
-                ".\n";
-    		return null;
-    	}		    // error performing query
-    }			//		function Name::getNextOrder
 
     /********************************************************************
      *	function Name::constructWhere									*
@@ -574,6 +529,8 @@ class Name extends Record
         $order					= null;
         $surname            	= '';
 
+        $this->constDebug('Name', $parms);
+
     	// action depends upon type of first parameter
     	if (is_null($parms))
         {
@@ -602,7 +559,7 @@ class Name extends Record
     								    'idmr'	=> $family);
         }			                // old way to reset married surname of wife
 
-        $this->constDebug('Name', $parms);
+        //$this->constDebug('Name', $parms);
 
     	// all of the supported (if deprecated) parameter formats have been
     	// reformatted into an array
@@ -624,7 +581,7 @@ class Name extends Record
                     {
                         case 'idnx':
                         {
-                            $idnx	    = $value;
+                            $idnx	                = $value;
                             break;
                         }
 
@@ -637,7 +594,7 @@ class Name extends Record
                             }
                             else
                                 $idmr	            = $value;
-                            $parms['idmr']           = $idmr;
+                            $parms['idmr']          = $idmr;
                             break;
                         }
 
@@ -667,7 +624,7 @@ class Name extends Record
     			$needInsert	= false;
     	    }			            // complete row from database
     	    else
-    	    {				        // partial row, use as search parameters
+            {				        // partial row, use as search parameters
     	        $sqlParms		    = array();
     	        $where		        = $this->constructWhere($parms,
     							            			    $sqlParms);
@@ -703,13 +660,6 @@ class Name extends Record
                                 $person             = $this->person;
                                 $idir               = $person['idir'];
                                 $dbrow['idir']      = $idir;
-                                $dbrow['givenname'] = $person['givenname'];
-                                $dbrow['surname']   = $person['surname'];
-    							$dbrow['soundslike']= $person['soundslike'];
-    							$dbrow['prefix']	= $person['prefix'];
-    							$dbrow['title']	    = $person['title'];
-    							$dbrow['userref']	= $person['userref'];
-                                $gender             = $person['gender'];
                                 if (array_key_exists('order', $sqlParms))
                                 {
                                     $order          = $sqlParms['order'];
@@ -1026,7 +976,7 @@ class Name extends Record
     	switch($fieldLc)
     	{	            	// act on specific field
     	    case 'surname':
-    	    {               // surname
+            {               // surname
     			return $this->setSurname($value);
     			break;
             }               // surname
@@ -1200,6 +1150,12 @@ class Name extends Record
 		global	$debug;
 		global	$warn;
 
+        if ($this->row['surname'] == '')
+        {
+            $warn       .= $this->dump('Name::getName');
+            $person             = $this->getPerson();
+            $warn       .= $person->dump('Name::getName');
+        }
         $evBirth                = null;
         $evDeath                = null;
 		if (is_array($options) || $options instanceof TemplateTag)
@@ -1346,6 +1302,57 @@ class Name extends Record
     }		// Name::getName
 
     /********************************************************************
+     *	function Name::getNextOrder										*
+     *																	*
+     *  Get the next order value for assigning a new alternate name/	*
+     *	nickname/sobriquet for an individual.							*
+     *																	*
+     *  Returns															*
+     *	    next integer value to assign to `order`                     *
+     *	    null if unable to complete function					        *
+     ********************************************************************/
+    private function getNextOrder()
+    {
+    	global	$debug;
+    	global	$warn;
+    	global	$connection;
+
+    	// query the database
+        $idir				= $this['idir'];
+        if (!is_int($idir) || $idir == 0)
+            return null;
+
+    	$query				= 'SELECT COALESCE(MAX(`Order`), 0)+1 ' .
+    							        'FROM tblNX WHERE IDIR=:idir';
+    	$stmt				= $connection->prepare($query);
+    	$sqlParms			= array('idir'	=> $idir);
+    	$queryText			= debugPrepQuery($query, $sqlParms);
+
+    	if ($stmt->execute($sqlParms))
+    	{		// successful query
+    	    if ($debug)
+    			$warn	.= "<p>Name::getNextOrder: $queryText</p>";
+
+    	    $row		= $stmt->fetch(PDO::FETCH_NUM);
+    	    if (is_array($row))
+    	    {		// got result
+    			return $row[0];
+    	    }		// got result
+    	    else
+    	    {		// failed
+    			return null;
+    	    }		// failed
+    	}		    // successful query
+    	else
+    	{		    // error performing query
+    	    $msg      .= "Name::getNextOrder:" .
+                "'$queryText', " .  print_r($stmt->errorInfo(),true) .
+                ".\n";
+    		return null;
+    	}		    // error performing query
+    }			//		function Name::getNextOrder
+
+    /********************************************************************
      *	function Name::save											    *
      *																	*
      *  Save changes made to the Name record into the					*
@@ -1392,14 +1399,18 @@ class Name extends Record
         $idir                       = $this['idir'];
         if ($idir == 0 && $this->person)
         {
+            if (!$this->person->isExisting())
+                return false;           // not ready to insert
             $idir                   = $this->person['idir']; 
-            $this['idir']      = $idir; 
+            $this['idir']           = $idir; 
         }
         $idmr                       = $this['idmr'];
         if ($this['idmr'] == 0 && $this->family)
         {
+            if (!$this->family->isExisting())
+                return false;           // not ready to insert
             $idmr                   = $this->family['idmr'];
-            $this['idmr']      = $idmr;
+            $this['idmr']           = $idmr;
         }
 
         // ensure the married surname of the wife is set
@@ -1412,10 +1423,6 @@ class Name extends Record
                 switch($family['marriednamerule'])
                 {                   // depends upon married name rule
                     case 1:
-                        $this['surname']    = $family['wifesurname'];
-                        break;
-
-                    case 1:
                         $this['surname']    = $family['husbsurname'];
                         break;
 
@@ -1427,36 +1434,10 @@ class Name extends Record
             }                       // married surname of wife empty
         }                           // a married name
 
-        // the instance of Name cannot be inserted into the database
-        // if it does not have an associated Person, and for a "married name"
-        // instance, an associated Family record
-        if ($this['idir'] == 0 || 
-            ($this['order'] == -1 && $this->row['idmr'] == 0))
-        {                           // not completely initialized
-			error_log("Name::save: " . __LINE__ . " $warn\n",
-			          3,
-			          $document_root . "/logs/Name.log");
-            $warn   .= "<p>Name::save: Update suppressed due to missing reference to individual or family.</p>\n";
-            $backtrace          = debug_backtrace();
-            foreach($backtrace as $call)
-            {                       // interpret backtrace
-                if (array_key_exists('class', $call) &&
-                    strlen($call['class']) > 0)
-                    $classPref      = $call['class'] . '::';
-                else
-                    $classPref      = '';
-                $warn   .= 
-                    "<p> function=$classPref" . $call['function'] .
-                    " called from line=" . $call['line'] . 
-                    " of " . $call['file'] . "</p>\n";
-            }                       // interpret backtrace
-            return 0;               // no records updated
-        }                           // not completely initialized
-
     	// insert the record into the database if it does not already
-    	// exists, otherwise update those fields that need to be updated
+    	// exist, otherwise update those fields that need to be updated
     	if ($this->needInsert || $this['idnx'] == 0)
-    	{		// create new record
+        {		// create new record
     	    $fldnames		            = '';
     	    $values		                = '';
     	    $sqlParms	            	= array();
@@ -1503,10 +1484,9 @@ class Name extends Record
     					$values		            .= $comma . ':order';
     					if (is_null($value))
     					{	// ask server to calculate value
-    					    $sqlParms['order']	= $this->getNextOrder();
+    					    $value	            = $this->getNextOrder();
     					}	// ask server to calculate value
-    					else
-    					    $sqlParms['order']	= $value;
+    					$sqlParms['order']	    = $value;
     					break;
     			    }	// type of alternate name record
 
@@ -1564,15 +1544,15 @@ class Name extends Record
     	    // insert the record into the database
     	    $stmt		        = $connection->prepare($insert);
     	    if ($stmt->execute($sqlParms))
-    	    {		        	// successful insert
+            {		        	// successful insert
     			$count		    = $stmt->rowCount();
     			if ($xml)
     			    print "<$tagname count='$count'>" .
-    							xmlentities($insertText) .
+    							$insertText .
     					  "</$tagname>\n";
     			if ($debug)
     			{
-    			    $warn	    .= "<p>" . htmlentities($insertText) . "</p>\n";
+    			    $warn	    .= "<p>$insertText</p>\n";
     			    $warn	    .= "<p>count=$count</p>\n";
     			}
 
@@ -1591,16 +1571,11 @@ class Name extends Record
 
     			if ($debug)
     			{
-    			    $warn	        .= "<p>lastInsertId</p>\n";
-    			    $warn	        .= "<p>IDNX=$idnx</p>\n";
+    			    $warn	        .= "<p>lastInsertId: IDNX=$idnx</p>\n";
     			}
 
     			// log the update
-    			logSqlUpdate($insert,
-    					     $sqlParms,
-    					     $idnx,
-    					     '',
-    					     json_encode($this->row));
+    			$this->log($insert, $sqlParms);
 
     			// obtain the updated record from the database
     			// so the memory copy will include values set by the
@@ -1743,16 +1718,7 @@ class Name extends Record
                                        " SQL='$updateText', count=$count</p>\n";
 
     			    // log the update
-    			    logSqlUpdate($update,
-    							 $sqlParms,
-    							 $this['idnx'],
-    							 json_encode($this->former),
-    							 json_encode($this->row));
-                    error_log("Name::save: " . __LINE__ . " '$updateText'\n" .
-    							 'former=' . json_encode($this->former) . "\n" .
-    							 'row=' . json_encode($this->row) . "\n",
-			          3,
-			          $document_root . "/logs/Name.log");
+    			    $this->log($update, $sqlParms);
         $backtrace          = debug_backtrace();
         foreach($backtrace as $call)
         {                       // interpret backtrace

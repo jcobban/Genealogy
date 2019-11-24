@@ -1480,6 +1480,27 @@ class Family extends RecordPic
 		global	$debug;
 		global	$warn;
 
+        $person                 = null;
+        if ($idir instanceof Person)
+        {
+            $person             = $idir;
+            $idir               = $person['idir'];
+        }
+        else
+        if (is_string($idir) && ctype_digit(trim($idir)))
+            $idir               = intval($idir);
+
+        if (is_int($idir))
+        {
+            if (is_null($person))
+            {
+                $person         = Person::getPerson($idir);
+                if (!$person->isExisting())
+                    throw new Exception('Family::addChild invoked with invalid IDIR=' . $idir);
+            }
+        }
+        else
+            throw new Exception('Family::addChild invoked with invalid parameter ' . print_r($idir, true));
 		$children	            = $this->getChildren();
 		foreach($children as $ic => $childr)
 		{		// loop through all existing children
@@ -1487,8 +1508,8 @@ class Family extends RecordPic
 				return $childr;
 		}		// loop through all existing children
         $idmr		            = $this->row['idmr'];
-		$childr		            = new Child(array('idmr'	=> $idmr,
-                                                  'idir'	=> $idir));
+		$childr		            = new Child(array('idmr'	=> $this,
+                                                  'idir'	=> $person));
 		// note that the new child does not have an IDCR value because
 		// it is not backed by a record in the database
 		// the IDCR value is assigned when the new record is saved
@@ -1496,7 +1517,7 @@ class Family extends RecordPic
 		// Family.  A unique integer index is assigned in the internal
 		// array of the RecordSet but is not reflected in the Child
 		// record itself
-		$this->children[]	= $childr;
+		$this->children[]	= $childr;      // add to end
 		return $childr;
     }		// function Family::addChild
 

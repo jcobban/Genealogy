@@ -517,9 +517,6 @@ function showCitations($event,
     // query the database
     if ($event instanceof Event)
     {		// citation to event
-        if ($debug)
-            throw new Exception("Person.php: " . __LINE__ .
-                        " debug is set");
 		$citations	    = $event->getCitations();
     }		// citation to event
     else
@@ -826,9 +823,6 @@ function showEvent($pronoun,
 				    case 'Citations':
 				    {			// display citation references here
                         print $pendingWord . ' ';
-                        if ($debug)
-                            throw new Exception("Person.php: " . __LINE__ .
-                        " debug is set");
 				    	showCitations($event);
 				    	break;
 				    }			// display citation references here

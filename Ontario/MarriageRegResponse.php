@@ -894,10 +894,10 @@ if (strlen($msg) == 0)
     }		// error performing query
 
     // execute the query for results
-    $query		= "SELECT $flds FROM Marriage $join ".
+    $query		    = "SELECT $flds FROM Marriage $join ".
                             "$where ORDER BY $orderby $limit";
-    $stmt		= $connection->prepare($query);
-    $queryText	= debugPrepQuery($query, $sqlParms);
+    $stmt		    = $connection->prepare($query);
+    $queryText	    = debugPrepQuery($query, $sqlParms);
     if ($stmt->execute($sqlParms))
     {
         $result		= $stmt->fetchAll(PDO::FETCH_ASSOC);

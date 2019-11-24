@@ -143,6 +143,12 @@ use \Iterator;
  *		                IDIR == 0                                       *
  *      2019/08/11      Child methods getStatus, getStatusText,         *
  *                      getCPRelDad, and getCPRelMom obsoleted          *
+ *      2019/11/23      support passing objects to idmr and idir in     *
+ *                      constructor                                     *
+ *                      make factory methods getFamily and getPerson    *
+ *                      more efficient                                  *
+ *                      move sealed to parents event in XML and JSON    *
+ *                      output                                          *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -218,12 +224,18 @@ class Child extends Record
 				        'childorder'		=> 'order');
 
     /********************************************************************
-     *	Child::$defaultOrder											*
+     *	Child::family					    							*
      *																	*
-     *	The default value of the ORDER BY clause in the iteration of	*
-     *	a RecordSet for this class.										*
+     *	Reference to associated instance of class Family                *
      ********************************************************************/
-    protected static	$defaultOrder	= '`Order`';
+    protected           $family             = null;
+
+    /********************************************************************
+     *	Child::person					    							*
+     *																	*
+     *	Reference to associated instance of class Person                *
+     ********************************************************************/
+    protected           $person             = null;
 
     /********************************************************************
      *	Child::STATUS_...                             					*
@@ -364,7 +376,13 @@ class Child extends Record
 				}		                // IDCR identify specific instance
 
 				case 'idmr':
-				{		                // IDMR identify parents
+                {		                // IDMR identify parents
+                    if ($value instanceof Family)
+                    {
+                        $this->family       = $value;
+                        $value              = $this->family['idmr'];
+                    }
+                    else
 				    if (is_string($value) && ctype_digit($value))
 						$value			    = (int)$value;
 
@@ -383,15 +401,21 @@ class Child extends Record
 
 				case 'idir':
 				{		                // IDIR identify child
+                    if ($value instanceof Person)
+                    {
+                        $this->person       = $value;
+                        $value              = $this->person['idir'];
+                    }
+                    else
 				    if (is_string($value) && ctype_digit($value))
-                        $value			= (int)$value;
+                        $value			    = (int)$value;
 
 				    if (is_int($value) && $value > 0)
 				    {
-						$idir			= $value;
-						$where			.= $and . 'IDIR=:idir';
+						$idir			    = $value;
+						$where			    .= $and . 'IDIR=:idir';
 						$sqlParms['idir']	= $idir;
-						$and			= ' AND ';
+						$and			    = ' AND ';
 				    }
                     else
                     {
@@ -601,8 +625,10 @@ class Child extends Record
      *	    an instance of Family										*
      ********************************************************************/
     function getFamily() 
-    { 
-		return new Family(array('idmr' => $this->row['idmr']));
+    {
+        if (is_null($this->family)) 
+            $this->family   = new Family(array('idmr' => $this->row['idmr']));
+        return  $this->family;
     }		// function Child::getFamily
 
     /********************************************************************
@@ -619,7 +645,9 @@ class Child extends Record
         if (!class_exists(__NAMESPACE__ . '\\Person'))
 			include __NAMESPACE__ . '/Person' . ".inc";
 
-		return Person::getPerson($this->row['idir']);
+        if (is_null($this->person)) 
+		    $this->person   = Person::getPerson($this->row['idir']);
+        return  $this->person;
     }		// function Child::getPerson
 
     /********************************************************************
@@ -878,10 +906,10 @@ class Child extends Record
 		else
 		    $tranTab			= null;
 
-		$person	                = Person::getPerson($this->row['idir']);
+		$person	                = $this->getPerson();
 		$retval	                = $person->getName($options);
 
-        $family	                = new Family(array('idmr' => $this->row['idmr']));
+        $family	                = $this->getFamily();
         if ($family->isExisting())
         {
             if ($tranTab)
@@ -1054,71 +1082,34 @@ class Child extends Record
 		    {
 				case 'idmr':
 				{
-				    $retval	.= "    <idmr>" . xmlentities($value) . "</idmr>\n";
-				    try {
-						$family	= new Family(array('idmr' => $value));
-						$retval	.= "    <family>" . $family->getName() .
-								"    </family>\n";
-				    } catch (Exception $e) {
-						$retval	.= "    <msg>" . $e->getMessage() . "</msg>\n";
-				    }			// catch
+                    $retval	        .= "    <idmr>$value\n    </idmr>\n";
+					$family	        = $this->getFamily();
+					$retval	        .= "    <family>" . $family->getName() .
+						            		"    </family>\n";
 				    break;
-				}			// IDMR
+				}			    // IDMR
 
 				case 'idir':
 				{
-				    $retval	.= "    <idir>" . xmlentities($value) . "</idir>\n";
-				    $indiv	= Person::getPerson($value);
-				    $retval	.= "    <indiv>" .
-						    $indiv->getName(Person::NAME_INCLUDE_DATES) .
-								"    </indiv>\n";
+                    $retval	        .= "    <idir>$value\n    </idir>\n";
+				    $person	        = $this->getPerson();
+				    $retval	        .= "    <child>" .
+						    $person->getName(Person::NAME_INCLUDE_DATES) .
+								        "\n    </child>\n";
 				    break;
-				}			// IDIR
+				}			    // IDIR
 
 				case 'parseald':
-				{			// legacy internal date format
-				    $date	= new LegacyDate($value);
-				    if ($isOwner)
-				    {			// can see private data
-						$retval	.= "    <{$fld}c>" . xmlentities($value) .
-								"</{$fld}c>\n";
-						$value	= $date->toString();
-						$retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
-				    }			// can see private data
-				    else
-				    {			// cannot see private data
-						$value	= $date->toString(1933);
-						$retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
-				    }			// can see private data
-				    break;
-				}			// legacy internal date format
-
 				case 'parsealsd':
-				{			// legacy internal sort date
-				    if ($isOwner)
-				    {			// can see private data
-						$retval	.= "    <$fld>" . $value . "</$fld>\n";
-				    }			// can see private data
-				    break;
-				}			// legacy internal sort date
-
 				case 'idtrparseal':
-				{			// temple code
-				    $retval	.= "    <$fld>" . $value . "</$fld>\n";
-				    try {
-				    $loc	= new Temple(array('idtr' => $value));
-				    $value	= $loc->getName();
-				    $locfld	= substr($fld,4) . 'loc';
-				    $retval	.= "    <$locfld>" . xmlentities($value) .
-								"</$locfld>\n";
-				    } catch (Exception $e) {
-						$retval	.= "    <msg>" . $e->getMessage() . "</msg>\n";
-				    }		// catch
-				    break;
-				}			// temple code
-
 				case 'ldsp':
 				case 'templetag':
+				case 'parsealnote':
+				{			    // obsolete
+				    break;
+				}			    // obsolete
+
+
 				case 'cpdadprivate':
 				case 'cpmomprivate':
 				case 'prefchild':
@@ -1138,6 +1129,14 @@ class Child extends Record
 		    }		// switch on field name
 		}		// loop through all fields
 
+        // the sealed to parents event, if present, is displayed here
+        $tevents		    = $this->getEvents();
+        foreach($tevents as $ider => $tevent)
+        {
+            $retval	        .= $tevent->toXml('event', false);
+        }		// loop through events
+
+        // if requested include parent information
 		$retval	.= "</$top>\n";
 		if ($print)
 		    print $retval;
@@ -1192,14 +1191,9 @@ class Child extends Record
 				    $retval		.= $comma . "\t\"idmr\":\t" . 
 								   json_encode($value);
 				    $comma		= ",\n";
-				    try {
-						$family		= new Family(array('idmr' => $value));
-						$retval		.= $comma . "\t\"family\":\t" . 
-									   json_encode($family->getName());
-				    } catch (Exception $e) {
-						$retval		.= $comma . "\t\"familymsg\":\t" . 
-									   json_encode($e->getMessage());
-				    }			// catch
+					$family		= $this->getFamily();
+					$retval		.= $comma . "\t\"family\":\t" . 
+									   json_encode(html_entity_decode($family->getName()));
 				    break;
 				}			// IDMR
 
@@ -1208,59 +1202,20 @@ class Child extends Record
 				    $retval	    .= $comma . "\t\"idir\":\t" . 
 								   json_encode($value);
 				    $comma	    = ",\n";
-				    $indiv	    = Person::getPerson($value);
+				    $person	    = $this->getPerson();
 				    $retval	    .= $comma . "\t\"child\":\t" . 
-		        json_encode($indiv->getName(Person::NAME_INCLUDE_DATES));
+		            json_encode(html_entity_decode($person->getName(Person::NAME_INCLUDE_DATES)));
 				    break;
 				}			// IDIR
 
 				case 'parseald':
-				{			// legacy internal date format
-				    $date	= new LegacyDate($value);
-				    if ($isOwner)
-				    {			// can see private data
-						$retval	.= $comma . "\t\"parsealdc\":\t" . 
-								   json_encode($value);
-						$comma	= ",\n";
-						$value	= $date->toString();
-						$retval	.= $comma . "\t\"parseald\":\t" . 
-								   json_encode($value);
-				    }			// can see private data
-				    else
-				    {			// cannot see private data
-						$value	= $date->toString($privlim);
-						$retval	.= $comma . "\t\"parseald\":\t" . 
-								   json_encode($value);
-						$comma	= ",\n";
-				    }			// can see private data
-				    break;
-				}			// legacy internal date format
-
 				case 'parsealsd':
-				{			// legacy internal sort date
-				    if ($isOwner)
-				    {			// can see private data
-						$retval	.= $comma . "\t\"parsealsd\":\t" . 
-								   json_encode($value);
-						$comma	= ",\n";
-				    }			// can see private data
-				    break;
-				}			// legacy internal sort date
-
 				case 'idtrparseal':
-				{			// temple code
-				    $retval	.= $comma . "\t\"idtrparseal\":\t" . 
-								   json_encode($value);
-				    $comma	= ",\n";
-				    $loc	= new Temple(array('idtr' => $value));
-				    $value	= $loc->getName();
-				    $retval	.= $comma . "\t\"parsealloc\":\t" . 
-								   json_encode($value);
-				    break;
-				}			// temple code
-
 				case 'ldsp':
-				case 'templetag':
+                case 'templetag':
+				case 'parsealnote':
+                    break;
+
 				case 'cpdadprivate':
 				case 'cpmomprivate':
 				case 'prefchild':
@@ -1283,6 +1238,13 @@ class Child extends Record
 				}		// fields passed back with no interpretation
 		    }		// switch on field name
 		}		// loop through all fields
+
+        // the sealed to parents event, if present, is displayed here
+        $tevents		    = $this->getEvents();
+        foreach($tevents as $ider => $tevent)
+        {
+            $retval	        .= $tevent->toJsob(false);
+        }		// loop through events
 
 		if (strlen($retval) > 0)
 		    $retval		.= "\n}\n";

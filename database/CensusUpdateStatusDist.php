@@ -73,12 +73,12 @@ $lang		= 'en';
 
 // validate parameters
 foreach ($_GET as $key => $value)
-{			// loop through all parameters
+{			        // loop through all parameters
 	switch(strtolower($key))
-	{		// act on parameter name
+	{		        // act on parameter name
 	    case 'census':
 	    case 'censusid':
-	    {		// Census identifier
+	    {		    // Census identifier
 			$censusId	= $value;
 			$censusRec	= new Census(array('censusid'	=> $censusId));
 			if ($censusRec->isExisting())
@@ -95,10 +95,10 @@ foreach ($_GET as $key => $value)
 			    $msg	.= "Invalid Census identifier '$censusId'. ";
 			}
 			break;
-	    }		// Census identifier
+	    }		    // Census identifier
 
 	    case 'district':
-	    {		// district number
+	    {		    // district number
 			$distId		= $value;
 			$result		= array();
 			if (preg_match("/^([0-9]+)(\.[05])?$/", $distId, $result) != 1)
@@ -109,69 +109,68 @@ foreach ($_GET as $key => $value)
 					$distId	= $result[1];	// integral portion only
 			}
 			break;
-	    }		// District number
+	    }		    // District number
 
 	    case 'province':
-	    {		// province code deprecated
+	    {		    // province code deprecated
 			if (strlen($value) == 2 && $censusRec->get('collective') == 1)
 			{
 			    $province		= strtoupper($value);
 			    $censusId		= $province . $censusYear;
-			    $censusRec	= new Census(array('censusid'	=> $censusId));
-			    $warn		.= "<p>CensusId corrected to '$censusId'</p>\n";
+			    $censusRec	    = new Census(array('censusid'	=> $censusId));
+			    $warn		    .= "<p>CensusId corrected to '$censusId'</p>\n";
 			}
 			break;
-	    }		// province code 
+	    }		    // province code 
 
 	    case 'lang':
-	    {		// language
-			if (strlen($value) >= 2)
-			    $lang	= strtolower(substr($value,0,2));
+	    {		    // language
+			$lang	            = FtTemplate::validateLang($value);
 			break;
-	    }		// language
+	    }		    // language
 
 	    case 'debug':
-	    {		// debug handled by common
+	    {		    // debug handled by common
 			break;
-	    }		// debug handled by common
+	    }		    // debug handled by common
 
 	    default:
-	    {	// unexpected parameter
+	    {	        // unexpected parameter
 			$warn	.= "Unexpected parameter $key='$value'. ";
 			break;
-	    }	// unexpected parameter
-	}	// act on parameter name
-}		// Census present
+	    }	        // unexpected parameter
+	}	            // act on parameter name
+}		            // loop through all parameters
 
 // check for missing parameters
 if (is_null($censusId))
-{		// Census missing
+{		            // Census missing
 	$censusId	= '';
 	$msg		.= 'Census parameter missing. ';
-}		// Census missing
+}		            // Census missing
 
 if ($distId == '')
-{		// District missing
+{		            // District missing
 	$msg		.= 'District parameter missing. ';
-}		// District missing
+}		            // District missing
 
 // some actions depend upon whether the user can edit the database
 if (canUser('edit'))
-{		// user can update database
+{		            // user can update database
 	$searchPage	= "ReqUpdate.php?Census=$censusId&District=$distId";
 	$action		= 'Update';
-}		// user can updated database
+}		            // user can updated database
 else
-{		// user can only view database
+{		            // user can only view database
 	$searchPage	= "QueryDetail$censusYear.html?District=$distId";
 	$action		= 'Query';
-}		// user can only view database
+}		            // user can only view database
 
 // initial defaults reset from database
 
 // if no errors execute the query
 if (strlen($msg) == 0)
-{		// no errors so far
+{		            // no errors so far
 	// get the current district
 	$district	= new District(array('census'	=> $censusId,
 							     'id'	=> $distId));
@@ -180,7 +179,7 @@ if (strlen($msg) == 0)
 
 	// get the total population of the district
 	if ($district->isExisting())
-	{		// district id is valid
+	{		        // district id is valid
 	    $prevDistrict	= $district->getPrev();
 	    $nextDistrict	= $district->getNext();
 	    $prevDist		= $prevDistrict->get('id');
@@ -189,7 +188,7 @@ if (strlen($msg) == 0)
 	    $nextDist		= $nextDistrict->get('id');
 	    $nextDistName	= $nextDistrict->get('name');
 	    $nextCensusId	= $nextDistrict->get('census');
-	    $pop		= $district->get('d_population');
+	    $pop		    = $district->get('d_population');
 
 	    // execute a query that includes divisions with no transcription
 	    if ($censusYear > 1901 || $censusYear < 1867)
@@ -242,26 +241,26 @@ if (strlen($msg) == 0)
 					    "FROM SubDistricts " .
 					    "WHERE SD_Census=:censusId AND SD_DistId=:distId " .
 					    "ORDER BY $qryAllOrder";
-	    $sqlParms	= array('censusId'	=> $censusId,
-						'distId'	=> $distId);
-	    $stmt	= $connection->prepare($qryAll);
-	    $qryAllText	= debugPrepQuery($qryAll, $sqlParms);
+	    $sqlParms	    = array('censusId'	=> $censusId,
+					        	'distId'	=> $distId);
+	    $stmt	        = $connection->prepare($qryAll);
+	    $qryAllText	    = debugPrepQuery($qryAll, $sqlParms);
 	    if ($stmt->execute($sqlParms))
-	    {		// successful query
+	    {		    // successful query
 			if ($debug)
 			    $warn	.= "<p>CensusUpdateStatusDist.php" . __LINE__ .
 					" $qryAllText</p>\n";
 			$resAll		= $stmt->fetchAll(PDO::FETCH_ASSOC);
-	    }		// successful query
+	    }		    // successful query
 	    else
-	    {		// error on request
-			$msg	.= "'$qryAllText': " .
-					   print_r($stmt->errorInfo(), true);
-	    }		// error on request
-	}		// district is valid
+	    {		    // error on request
+			$msg	    .= "'$qryAllText': " .
+			    		   print_r($stmt->errorInfo(), true);
+	    }		    // error on request
+	}		        // district is valid
 	else
-	{		// no matching district in Districts table
-	    $msg		.= "District $distId not defined for the $censusId census. ";
+	{		        // no matching district in Districts table
+	    $msg		    .= "District $distId not defined for the $censusId census. ";
 	    $prevDistrict	= null;
 	    $nextDistrict	= null;
 	    $prevDist		= 0;
@@ -270,11 +269,11 @@ if (strlen($msg) == 0)
 	    $nextDist		= 0;
 	    $nextDistName	= 'Unknown';
 	    $nextCensusId	= $censusId;
-	    $pop		= 0;
-	}		// no matching district in Districts table
-}		// no errors
+	    $pop		    = 0;
+	}		        // no matching district in Districts table
+}		            // no errors
 else
-	$distName	= 'Unknown';
+	$distName	        = 'Unknown';
 
 
 if (isset($censusRec))

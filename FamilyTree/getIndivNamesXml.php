@@ -568,7 +568,7 @@ flush();
     print "<cmd>new PersonSet($msgParms)</cmd>\n";
     $result		            = new PersonSet($getParms);
     $info		            = $result->getInformation();
-    print "<cmd>" . $info['query'] . "</cmd>\n";
+    print "<cmd>" . htmlspecialchars($info['query']) . "</cmd>\n";
     $count		            = $result->count();
 flush();
 

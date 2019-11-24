@@ -545,6 +545,7 @@ use \Exception;
  *		2019/10/08      remove tracelog entries                         *
  *		2019/10/28      permit spaces in front of save parm             *
  *		                return count from save                          *
+ *		2019/11/23      correct implementation of getPerson             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -819,10 +820,9 @@ class Person extends RecordPic
      ********************************************************************/
     static function getPerson($idir)
     {
-        if (array_key_exists($idir, self::$personIndex))
-	        return self::$personIndex[$idir];
-        else
-            return new Person(array('idir' => $idir));
+        if (!array_key_exists($idir, self::$personIndex))
+            self::$personIndex[$idir]   = new Person(array('idir' => $idir));
+	    return self::$personIndex[$idir];
     }           // static function Person::getPerson
 
     /********************************************************************
@@ -1384,11 +1384,16 @@ class Person extends RecordPic
     {
         if (is_null($this->priName))
         {
-            if ($this->row['idir'] > 0)
-                $this->priName      = new Name(array('idir' => $this,
-     					                             'order'=> Name::PRIMARY));
-            else
-                $this->priName      = new Name();
+            $this->priName          = new Name(array('idir' => $this,
+                                                     'order'=> Name::PRIMARY));
+            if (!$this->priName->isExisting())
+            {
+                $this->priName['givenname'] = $this->row['givenname'];
+                $this->priName['surname']   = $this->row['surname'];
+                $this->priName['prefix']    = $this->row['prefix'];
+                $this->priName['title']     = $this->row['title'];
+                $this->priName['treename']	= $this->treeName;
+            }
         }
         return $this->priName;
     }		// Person::getPriName
@@ -1627,138 +1632,9 @@ class Person extends RecordPic
                                         ")->getName($parmText)</p>\n";
         }
 
-        if (is_null($this->getPriName()))
-        {                       // no instances of Name created
-	        $evBirth                = null;
-	        $evDeath                = null;
-			if (is_array($options) || $options instanceof TemplateTag)
-			{		// support being passed internationalization table
-			    $tranTab			= $options;
-			    $options			= self::NAME_INCLUDE_DATES;
-			}		// support being passed internationalization table
-			else
-			    $tranTab			= null;
+        $priName                = $this->getPriName();
 
-			$includeDates			= ($options & self::NAME_INCLUDE_DATES) != 0;
-			$includeLocs			= ($options & self::NAME_INCLUDE_LOCS) != 0;
-			$surnameFirst			= ($options & self::NAME_SURNAME_FIRST) != 0;
-	        $idir		    		= $this->row['idir'];
-			$prefix		    		= $this->row['prefix'];
-			$givenname	    		= $this->row['givenname'];
-			$surname	    		= $this->row['surname'];
-			$birth		    		= '';
-			$death		    		= '';
-			$suffix		    		= $this->row['title'];
-
-			$evBirth			    = $this->getBirthEvent();
-	        $bprivlim               = $this->getBPrivLim();
-	        $dprivlim               = $this->getDPrivLim();
-
-			if ($evBirth)
-	        {
-				$tbirth		        = $evBirth->getDate($bprivlim,
-	                                                    $tranTab);
-	            if ($tbirth == 'Private')
-	                return 'Private';
-            }
-
-	        if (strlen($givenname) == 0 && strlen($surname) == 0)
-	            return "New Person";
-
-			$retval		            = '';
-			$space		            = '';
-
-			if ($surnameFirst)
-			{			// Surname, Given Names
-			    $retval		        .= $surname;
-			    $retval		        .= ',';
-			    $space		        = ' ';
-
-			    if (strlen($prefix) > 0)
-			    {
-					$retval		    .= $space . $prefix;
-					$space		    = ' ';
-			    }
-
-			    if (strlen($givenname) > 0)
-			    {
-					$retval		    .= $space . $givenname;
-					$space		    = ' ';
-			    }
-
-			    if (strlen($suffix) > 0)
-			    {
-					$retval		    .= $space . $suffix;
-			    }
-			}			// Surname, Given Names
-			else
-	        {			// Given Names Surname
-			    if (strlen($prefix) > 0)
-			    {
-					$retval		    .= $prefix;
-					$space		    = ' ';
-			    }
-
-			    if (strlen($givenname) > 0)
-			    {
-					$retval		    .= $space . $givenname;
-					$space		    = ' ';
-			    }
-
-			    if (strlen($surname) > 0)
-			    {
-					$retval		    .= $space . $surname;
-					$space		    = ' ';
-			    }
-
-			    if (strlen($suffix) > 0)
-			    {
-					$retval		    .= $space . $suffix;
-			    }
-			}			// Given Names Surname
-
-			// optionally include birth and death dates
-			if ($includeDates || $includeLocs)
-            {		// add dates
-                if ($tranTab)
-                    $at         = ' ' . $tranTab['at'] . ' ';
-                else
-                    $at         = ' at ';
-			    if ($evBirth)
-			    {
-					$birth		= $evBirth->getDate($bprivlim,
-	                                                $tranTab);
-					if ($includeLocs)
-					{	// include location name
-					    $loc	= $evBirth->getLocation();
-					    if ($loc->getIdlr() > 1)
-							$birth	.= $at . $loc->getName();
-					}	// include location name
-			    }
-			    else
-					$birth	= '';
-
-			    $evDeath		= $this->getDeathEvent();
-			    if ($evDeath)
-			    {
-					$death		= $evDeath->getDate($dprivlim,
-												    $tranTab);
-					if ($includeLocs)
-					{	// include location name
-					    $loc	= $evDeath->getLocation();
-					    if ($loc->getIdlr() > 1)
-							$death	.= $at . $loc->getName();
-					}	// include location name
-			    }
-			    else
-					$death		    = '';
-
-			    $retval	            .= $space . "($birth&#8212;$death)";
-            }		// add dates
-            return $retval;
-        }                       // not initialized yet
-
-        return	$this->priName->getName($options);
+        return	$priName->getName($options);
     }		// function Person::getName
 
     /********************************************************************
@@ -1851,11 +1727,9 @@ class Person extends RecordPic
 			case 'title':
             case 'userref':
             {                   // fields moved to Name
-                if (is_null($this->getPriName()) ||
-                    $this->priName->row[$fieldLc] == '')
-                    return $this->row[$fieldLc];
-                else
-                    return $this->priName->row[$fieldLc];
+                if (is_null($this->priName))
+                    $this->priName      = $this->getPriName();
+                return $this->priName->row[$fieldLc];
             }                   // fields moved to Name
 
             default:
@@ -1888,10 +1762,12 @@ class Person extends RecordPic
         global $debug;
         global $warn;
 
-        $idir           = $this->row['idir'];
-        $fieldLc	    = strtolower($field);
+        $idir                   = $this->row['idir'];
+        if (is_null($this->priName))
+            $this->priName      = $this->getPriName();
+        $fieldLc	            = strtolower($field);
         if (array_key_exists($fieldLc, self::$translate))
-            $fieldLc	= self::$translate[$fieldLc];
+            $fieldLc	        = self::$translate[$fieldLc];
         switch($fieldLc)
         {
             case 'idir':
@@ -4707,14 +4583,13 @@ class Person extends RecordPic
 	                    if ($this->priName['birthsd'] == -99999999 &&
 	                        $this['birthsd'] != -99999999)
 	                        $this->priName['birthsd']	= $this['birthsd'];
-	                    $this->priName['treename']		= $this->treeName;
-	                    $this->priName['givenname']		= $this['givenname'];
-		                $this->priName['surname']		= $this['surname'];
 	                    if ($xml)
 	                        $this->priName->save('save' . __LINE__);
 	                    else
-	                        $this->priName->save(false);
+	                        $this->priName->save('p');
                     }
+                    else
+                        print "<p>Person.inc: save: " . __LINE__ . " priName isnull</p>\n";
                 }               // have a valid record
             }			        // success
             else
@@ -4758,10 +4633,7 @@ class Person extends RecordPic
                 {
     	            if ($this->priName['birthsd'] == -99999999 &&
     	                $this['birthsd'] != -99999999)
-    	                $this->priName['birthsd']	= $this['birthsd'];
-                    $this->priName['treename']		= $this->treeName;
-                    $this->priName['surname']		= $this['surname'];
-                    $this->priName['givenname']		= $this['givenname'];
+    	                $this->priName['birthsd']	= $this->row['birthsd'];
                     if ($xml)
                         $this->priName->save('save' . __LINE__);
                     else

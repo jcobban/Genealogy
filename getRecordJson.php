@@ -33,6 +33,7 @@ use \Exception;
  *		2017/01/23		support text keys								*
  *		2019/01/10      move to namespace Genealogy                     *
  *		2019/06/23      decode HTML entities in string values           *
+ *		2019/11/20      include recordset info with error message       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -43,12 +44,28 @@ header("Content-Type: application/json");
 
 if (strlen($msg) > 0)
 {
-	print '{"msg": "' . $msg . '"}';
+	print '{"msg": "' . $msg . '"';
+    if ($record instanceof RecordSet)
+    {
+        $info           = $record->getInformation();
+        print ",\n\"info\": {";
+        $comma          = '';
+        foreach ($info as $field => $value)
+        {
+            if (is_numeric($value))
+                print "$comma\t\t\"$field\":\t$value";
+            else 
+                print "$comma\t\t\"$field\":\t". json_encode($value);
+            $comma      = ",\n";
+        }
+        print "\n\t}";
+    }
+    print "\n}";
 }
 else
 {
 	if (isset($record))
-	{
+    {
 	    if (is_array($record) || $record instanceof RecordSet)
 	    {
             print "{\n";
@@ -63,9 +80,6 @@ else
                     if (is_numeric($value))
                         print "$comma\t\t\"$field\":\t$value";
                     else 
-                    if (is_string($value))
-                        print "$comma\t\t\"$field\":\t". json_encode(html_entity_decode($value));
-                    else 
                         print "$comma\t\t\"$field\":\t". json_encode($value);
                     $comma      = ",\n";
                 }
@@ -79,8 +93,11 @@ else
 			}
 			print "\n}\n";
 	    }
-	    else
-			$record->toJson(true, $options);
+        else
+        if ($record instanceof Record || $record instanceof LegacyHeader)
+            $record->toJson(true, $options);
+        else
+            print "{\"record\" : \"$record\"}\n";
 	}
 }
 
