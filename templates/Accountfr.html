@@ -15,13 +15,15 @@
   </div>	
   <div class="body">
     <h1 class="clear">Gestion de la Compte
-      <span class="right">
-		<a href="/Account.php?lang=en">English</a>
-		<a href="/AccountHelpfr.html" target="help">?&nbsp;Aide</a>
-      </span>
     </h1>
     $TRACE
     $MSG
+    <p class="label">
+		<a href="/Account.php?lang=en">English</a>
+    </p>
+    <p class="label">
+		<a href="/AccountHelpfr.html" target="help">?&nbsp;Aide</a>
+    </p>
   <p class="label" id="okmsg">$OKMSG</p>
   <div id="update">
     <form action="Account.php"
@@ -78,7 +80,6 @@
 		<input type="text" size="32" value=""
 			name="randomPassword" id="randomPassword"
 			class="white leftnc" readonly="readonly">
-      </p>
       </p>
       <p id="emailRow" class="clear">
 		<label class="label" for="email">

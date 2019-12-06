@@ -820,9 +820,11 @@ try {
             foreach ($nameset as $idnx => $name)
             {               // loop through married names
                 $marr   = new Family(array('idmr'       => $name['idmr']));
-                if ($marr['marriednamerule'] == 1)
+                $husbPriName    = $marr->getHusbPriName();
+                if ($marr['marriednamerule'] == 1 && 
+                    $husbPriName && $husbPriName['surname'] != '')
                 {           // wife's married surname is husband's surname
-                    $name['surname']        = $marr['husbsurname'];
+                    $name['surname']        = $husbPriName['surname'];
                     $name->save(false);
                     $command                = $name->getLastSqlCmd();
                     print "$comma\"name$idnx\": " . json_encode($command);

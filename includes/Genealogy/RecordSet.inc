@@ -1605,9 +1605,13 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		    else
 		    {		// use soundex match
 				// remove question marks
-				$surname	= str_replace('?', '', $surname);
-				$this->sqlParms[]	= $surname;
-				$surnameCmp	= $table . ".SoundsLike=LEFT(SOUNDEX(?),4)";
+				$surname	        = str_replace('?', '', $surname);
+                $this->sqlParms[]	= $surname;
+                $sxtable            = $table;
+                if ($table == 'tblNX')
+                    $sxtable        = 'tblNR';
+                $surnameCmp	        = $sxtable .
+                                        ".SoundsLike=LEFT(SOUNDEX(?),4)";
 				if (substr($surname, strlen($surname) - 1) == 's')
 				{		// also try soundex without final s
 				    $this->sqlParms[] = substr($surname, 0, strlen($surname)-1);
@@ -1616,8 +1620,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				{		// also try soundex with final s
 				    $this->sqlParms[] = $surname . 's';
 				}		// also try soundex with final s
-				$surnameCmp	.= " OR " . $table .
-									".SoundsLike=LEFT(SOUNDEX(?),4)";
+				$surnameCmp	        .= " OR " . $sxtable .
+									    ".SoundsLike=LEFT(SOUNDEX(?),4)";
 
 				if (strlen($surname) > 4)
 				{		// add other loose surname comparisons

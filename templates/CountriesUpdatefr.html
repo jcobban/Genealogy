@@ -66,68 +66,62 @@
 	      <!--- Put out the column headers -->
 	      <thead>
 	        <tr id='hdrRow'>
-		  <th class='colhead'>
-		  ID
-		  </th>
-		  <th class='colhead'>
-		  Nom
-		  </th>
-		  <th class='colhead'>
-		  Autre Noms
-		  </th>
-		  <th class='colhead'>
-		  États
-		  </th>
-		  <th class='colhead'>
-		  Généalogie
-		  </th>
-		  <th class='colhead'>
-		  Effacer
-		  </th>
+			  <th class='colhead'>
+			  ID
+			  </th>
+			  <th class='colhead'>
+			  Nom
+			  </th>
+			  <th class='colhead'>
+			  Autre Noms
+			  </th>
+			  <th class='colhead'>
+			  États
+			  </th>
+			  <th class='colhead'>
+			  Généalogie
+			  </th>
 	        </tr>
 	      </thead>
 	      <tbody>
 	        <tr id='Row$code'>
-		  <td class='right'>
-		      <input type='text' name='Code$code' id='Code$code'
-				  value='$code'
-				  class='white code' 
-				  size='2' maxlength='2' readonly='readonly'>
-		  </td>
-		  <td class='left'>
-		      <input type='text' name='Name$code' id='Name$code' 
-				  value='$name' 
-				  class='white leftnc'
-				  size='28' maxlength='64'>
-		  </td>
-		  <td class='center'>
-		      <button type='button' id='Names$code'>
-			  Noms
-		      </button> 
-		  </td>
-		  <td class='center'>
-		      <button type='button' id='EditDomains$code'>
-			  États
-		      </button> 
-		  </td>
-		  <td class='left'>
-		    <a class='button'
-                    href='/genCountry.php?cc=$code&amp;lang=fr'
-			        target="_blank" 
-                    style="min-width: 350px; text-align: left;">
-			  Généalogie $name
-		    </a> 
-		  </td>
-		  <td class='center'>
-		      <button type='button' id='Delete$code'>
-			  Effacer
-		      </button> 
-		  </td>
+			  <td class='right'>
+			    <input type='text' name='Code$code' id='Code$code'
+					  value='$code'
+					  class='white code' 
+					  size='2' maxlength='2' readonly='readonly'>
+			  </td>
+			  <td class='left'>
+			    <input type='text' name='Name$code' id='Name$code' 
+					  value='$name' 
+					  class='white leftnc'
+					  size='28' maxlength='64'>
+			  </td>
+			  <td class='center'>
+			    <button type='button' id='Names$code'>
+				  Noms
+			    </button> 
+			  </td>
+			  <td class='center'>
+			    <button type='button' id='EditDomains$code'>
+				  États
+			    </button> 
+			  </td>
+			  <td class='left'>
+			    <a class='button'
+	                    href='/genCountry.php?cc=$code&amp;lang=fr'
+				        target="_blank" 
+	                    style="min-width: 350px; text-align: left;">
+				  Généalogie $name
+			    </a> 
+			  </td>
 	        </tr>
 	      </tbody>
 	    </table>
 	    <p>
-	      <button type='submit' id='Submit'>Mise a Jour la Base des Données</button>
+	      <button type='submit' id='Submit'>
+              Mise a Jour la Base des Données
+          </button>
 	      &nbsp;
 	      <button type='button' id='Add'>Ajouter un Pays</button>
   

@@ -8,6 +8,8 @@
  *		2017/10/28		created											*
  *		2018/01/04		remove Template from template file names		*
  *      2019/02/21      support resizing scrolling row and PgUp/Dn      *
+ *      2019/12/02      add partof                                      *
+ *      2019/12/05      add category                                    *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
@@ -27,7 +29,7 @@
 	    <span class="right">
 		<a href="/Canada/DomainsEditHelpfr.html" target="help">? Aide</a>
 	    </span>
-		$COUNTRYNAME: Mise a Jour la Table des {$DOMAINTYPE}s
+		$COUNTRYNAME: Mise a Jour la Table des $DOMAINTYPEPLURAL
 	    <div style="clear: both;"></div>
 	  </h1>
 	$TRACE
@@ -35,12 +37,12 @@
 	  <!--- Put out a line with links to previous and next section of table -->
 	  <div class="center" id="topBrowse">
 	    <span class="left" id="topPrev">
-		<a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
+		<a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
 		&lt;---
 		</a>
 	    </span>
 	    <span class="right" id="topNext">
-		<a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
+		<a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
 		    ---&gt;
 		</a>
 	    </span>
@@ -83,6 +85,9 @@
 			  <th class="colhead">
 			    Partie&nbsp;de
 			  </th>
+              <th class="colhead">
+                Categoire
+              </th>
 			  <th class="colhead">
 			    Effacer
 			  </th>
@@ -119,6 +124,13 @@
 	                  value="$partof" 
 	                  class="white left"
 	                  size="6" maxlength="16">
+	          </td>
+	          <td class="left">
+	              <input type="text"
+	                  name="Category$code" id="Category$code" 
+	                  value="$category" 
+	                  class="white left"
+	                  size="6" maxlength="32">
 	          </td>
 			  <td class="center">
 			    <button type="button" id="Delete$code">

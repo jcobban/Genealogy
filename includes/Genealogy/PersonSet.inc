@@ -134,6 +134,7 @@ class PersonSet extends RecordSet
 		// identify joined tables referenced by the WHERE expression
 		$tableName	= 'tblIR' .
 				   ' JOIN tblNX ON tblNX.IDIR=tblIR.IDIR' .
+				   ' JOIN tblNR ON tblNR.Surname=tblNX.Surname' .
 				   ' LEFT JOIN tblER AS EBirth ON ' .
 						'(EBirth.IDIR=tblIR.IDIR AND EBirth.IDType=0 AND ' .
 								'EBirth.IDET=3 AND EBirth.Preferred=1)' .
@@ -380,7 +381,7 @@ class PersonSet extends RecordSet
 						    for($i = 0; $i < count($value); $i++)
 						    {
 								$where		.= $or .
-										"tblNX.`SoundsLike`=LEFT(SOUNDEX(?),4)";
+										"tblNR.`SoundsLike`=LEFT(SOUNDEX(?),4)";
 								$this->sqlParms[]	= $value[$i];
 								$or		= ' OR ';
 						    }
@@ -391,7 +392,7 @@ class PersonSet extends RecordSet
 						if (is_string($value) && strlen($value) > 0)
 						{		// non-empty string
 						    $where		.= $and .
-										'tblNX.`SoundsLike`=LEFT(SOUNDEX(?),4)';
+										'tblNR.`SoundsLike`=LEFT(SOUNDEX(?),4)';
 						    $this->sqlParms[]		= $value;
 						}		// non-empty string
 						else

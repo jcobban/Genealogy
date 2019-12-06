@@ -1,56 +1,56 @@
 <!--*********************************************************************
- *  genProvincefr.html							*
- *									*
- *  Template for displaying information about a state or province	*
- *									*
- *  History:								*
- *	2018/01/02	created						*
- *	2018/01/03	add header link to Edit Domains dialog		*
- *	2018/01/04	remove Template from template file names	*
- *									*
- *  Copyright &copy; 2018 James Alan Cobban				*
+ *  genProvincefr.html													*
+ *																		*
+ *  Template for displaying information about a state or province		*
+ *																		*
+ *  History:															*
+ *		2018/01/02		created											*
+ *		2018/01/03		add header link to Edit Domains dialog			*
+ *		2018/01/04		remove Template from template file names		*
+ *																		*
+ *  Copyright &copy; 2018 James Alan Cobban								*
  ***********************************************************************-->
-<div class='hidden' id='breadcrumbs'>
-  <a href='/genealogy.php?lang=fr'>Généalogie</a>:
-  <a href='/Canada/CountriesEdit.php?lang=fr'>Liste des Pays Soutenues</a>:
-  <a href='/genCountry.php?code=$CC&lang=fr'>$COUNTRYNAME</a>:
-  <a href='/Canada/DomainsEdit.php?cc=$CC&lang=fr'>Etats</a>:
-</div>
-<div class='body'>
-  <h1>$DOMAINNAME Ressources Généalogique
-      <span class='right' style='white-space: nowrap;'>
-        <a href='/Canada/genProvinceHelpfr.html' target='_blank'>? Aide</a>
-      </span>
-  </h1>
-  $MSG
-  $TRACE
-  <p class='label'>
-    <a target='_blank' 
-	href='/Canada/CountiesEdit.php?Domain=$DOMAIN&lang=fr'>
-		Comtés
-    </a>
-  </p>
-  <p class='label'>
-    <a target='_blank' 
-	    href='/Canada/BirthRegQuery.php?domain=$DOMAIN&lang=fr'>
-	Recherche de Déclarations de Naissance
-    </a>
-  </p>
-  <p class='label'>
-    <a target='_blank' 
-	href='/Ontario/MarriageRegQuery.php?domain=$DOMAIN&lang=fr'>
-	    Recherche de Déclarations de Mariage
-    </a>
-  </p>
-  <p class='label'>
-    <a target='_blank' 
-	href='/Ontario/DeathRegQuery.php?domain=$DOMAIN&lang=fr'>
-	    Recherche de Déclarations de Mort
-    </a>
-  </p>
-</div> <!-- class='body' -->
-    <script src='/jscripts/js20/http.js' type='text/javascript'>
-    </script>
+	<div class='hidden' id='breadcrumbs'>
+	  <a href='/genealogy.php?lang=fr'>Généalogie</a>:
+	  <a href='/Canada/CountriesEdit.php?lang=fr'>Liste des Pays Soutenues</a>:
+	  <a href='/genCountry.php?code=$CC&lang=fr'>$COUNTRYNAME</a>:
+	  <a href='/Canada/DomainsEdit.php?cc=$CC&lang=fr'>Etats</a>:
+	</div>
+	<div class='body'>
+	  <h1>$DOMAINNAME Ressources Généalogique
+	      <span class='right' style='white-space: nowrap;'>
+	        <a href='/Canada/genProvinceHelpfr.html' target='_blank'>? Aide</a>
+	      </span>
+	  </h1>
+	  $MSG
+	  $TRACE
+	  <p class='label'>
+	    <a target='_blank' 
+		href='/Canada/DomainsEdit.php?CC=$CC&Partof=$DOMAIN&lang=fr'>
+			Comtés
+	    </a>
+	  </p>
+	  <p class='label'>
+	    <a target='_blank' 
+		    href='/Canada/BirthRegQuery.php?domain=$DOMAIN&lang=fr'>
+		Recherche de Déclarations de Naissance
+	    </a>
+	  </p>
+	  <p class='label'>
+	    <a target='_blank' 
+		href='/Ontario/MarriageRegQuery.php?domain=$DOMAIN&lang=fr'>
+		    Recherche de Déclarations de Mariage
+	    </a>
+	  </p>
+	  <p class='label'>
+	    <a target='_blank' 
+		href='/Ontario/DeathRegQuery.php?domain=$DOMAIN&lang=fr'>
+		    Recherche de Déclarations de Mort
+	    </a>
+	  </p>
+	</div> <!-- class='body' -->
+	<script src='/jscripts/js20/http.js' type='text/javascript'>
+	</script>
     <script src='/jscripts/util.js' type='text/javascript'>
     </script>
     <script src='/jscripts/default.js' type='text/javascript'>

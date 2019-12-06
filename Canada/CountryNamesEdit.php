@@ -222,5 +222,5 @@ $template->set('LANG',		        $lang);
 $template->set('CONTACTTABLE',	    'CountryNames');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 
-$template['Row$ROWNUM']->update($names);
+$template['Row$rownum']->update($names);
 $template->display();

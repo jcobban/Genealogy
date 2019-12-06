@@ -136,6 +136,8 @@
  *		                keystrokes                                      *
  *		                improve handling of left and right arrow to     *
  *		                go to next cell if no text to move over         *
+ *		2019/11/25      change columnClick to support columns with      *
+ *		                display: block                                  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1874,7 +1876,7 @@ function checkURL()
 }		// function checkAge
 
 /************************************************************************
- *  function getSortDate													*
+ *  function getSortDate												*
  *																		*
  *  Given a textual date, compute a sort date YYYYMMDD					*
  *																		*
@@ -2405,7 +2407,6 @@ function numericKeyDown(e)
     else
     {               // use obsolete property code
         var	code	= e.keyCode;
-        alert("numericKeyDown: code=" + code);
         if (code >= 48 && code <= 57)
             return true;
         if (code == 61)
@@ -2418,7 +2419,7 @@ function numericKeyDown(e)
 }       // function numericKeyDown
 
 /************************************************************************
- *  function columnClick													*
+ *  function columnClick												*
  *																		*
  *  User clicked left button on a column header.						*
  *  Hide or unhide the column.											*
@@ -2449,6 +2450,7 @@ function columnClick(event)
     // hide or reveal the label text in the header and footer of the column
     if (this.holdtext && this.holdtext.length > 0)
     {		// header has been hidden
+        this.style.width        = this.oldwidth;
 		this.innerHTML			= this.holdtext;
 		if (footerCell)
 		    footerCell.innerHTML	= this.holdtext;
@@ -2457,6 +2459,8 @@ function columnClick(event)
     else
     {		// hide header
 		this.holdtext			= this.innerHTML;
+        this.oldwidth           = this.style.width;
+        this.style.width        = '0px';
 		this.innerHTML			= "";
 		if (footerCell)
 		    footerCell.innerHTML	= "";
@@ -2517,7 +2521,7 @@ function columnClick(event)
 }		// function columnClick
 
 /************************************************************************
- *  function columnWiden													*
+ *  function columnWiden												*
  *																		*
  *  User clicked right button on a column header.  Widen the column.	*
  *																		*

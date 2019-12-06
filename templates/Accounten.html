@@ -15,10 +15,13 @@
     </div>	
     <div class="body">
       <h1 class="clear">Account Management
-        <span class="right">
-	      <a href="/AccountHelpen.html" target="help">?&nbsp;Help</a>
-        </span>
       </h1>
+    <p class="label">
+		<a href="/Account.php?lang=fr">Français</a>
+    </p>
+      <p class="label">
+	      <a href="/AccountHelpen.html" target="help">?&nbsp;Help</a>
+      </p>
       $TRACE
       $MSG
       <p class="label" id="okmsg">$OKMSG</p>
@@ -117,10 +120,9 @@
 		    <u>C</u>lose
 		  </button>
 		</span>
-		<span class="button">
-		  <a href="/ContactAuthor.php?subject=Account Management">
-			Contact Administrator</a>
-		</span>
+		<a href="/ContactAuthor.php?subject=Account Management"class="button">
+			Contact Administrator
+        </a>
 		<input type="hidden" name="act" id="act" value="">
 		<input type="hidden" name="debug" id="debug" value="$DEBUG">
 		<input type="hidden" name="lang" id="lang" value="$LANG">

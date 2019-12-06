@@ -7,6 +7,11 @@ use \Exception;
  *																		*
  *  Display the progress of the transcription of a specific census		*
  *																		*
+ *	Parameters:															*
+ *		'census'        Census identifier ccyyyy                        *
+ *		'province'      province or state code                          *
+ *		'lang'          language of communication                       *
+ *																		*
  *  History:															*
  *		2010/09/12		Reformat to new page layout.					*
  *		2010/11/19		Use common MDB2 database connection				*
@@ -64,8 +69,9 @@ use \Exception;
  *		2018/01/29		use class FtTemplate							*
  *		2019/02/19      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
+ *      2019/12/01      improved parameter validation                   *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/CensusSet.inc';
@@ -76,11 +82,14 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // general state variables
 $cc					    = 'CA';
+$country			    = null;             // instance of Country
 $countryName			= 'Canada';
 $censusId				= null;
+$census				    = null;             // instance of Census
 $censusYear				= 0;
-$province				= null;
-$censusRec				= null;
+$province				= '';               // province code
+$domain 			    = null;             // instance of Domain
+$provinceName			= 'National';
 $lang				    = 'en';
 
 // Validate parameters
@@ -97,49 +106,25 @@ foreach($_GET as $key => $value)
 	    case 'census':
 	    {
 			$censusId	        = $value;
-			if (strlen($censusId) == 4)
-			{
-			    $censusYear		= intval($censusId);
-			    $censusId		= 'CA' . $censusId;
-			}
-			else
-			if (strlen($censusId) == 6)
-			{
-			    $cc			    = substr($censusId, 0, 2);
-			    $countryObj		= new Country(array('code' => $cc));
-			    $countryName	= $countryObj->get('name');
-			    $censusYear		= intval(substr($censusId, 2));
-			    if ($censusYear < 1867 && substr($censusId,0,2) != 'CA')
-					$province	= substr($censusId,0,2);
-			}
-			$censusRec	= new Census(array('censusid'	=> $censusId));
-			if ($censusRec->isExisting())
-			{
-			    $partOf	= $censusRec->get('partof');
-			    if (strlen($partOf) == 2)
-			    {
-					$cc		= $partOf;
-					$countryObj	= new Country(array('code' => $cc));
-					$countryName	= $countryObj->getName();
-			    }
-			}		// valid census id
-			else
-			{
-			    $warn	.= "<p>Census='$censusId' is not supported.</p>\n";
-			}
+	        if (strlen($censusId) == 4)
+	        {               // only year provided
+	            $censusYear		= intval($censusId);
+	            $censusId		= 'CA' . $censusId;
+	        }               // only year provided
+
+	        $census	            = new Census(array('censusid'	=> $censusId));
 			break;
 	    }			// Census
 
 	    case 'province':
 	    {
-			$province	= $value;
+			$province	        = $value;
 			break;
 	    }			// Province
 
 	    case 'lang':
 	    {			// language code
-            if (strlen($value) >= 2)
-                $lang           = strtolower(substr($value,0,2));
+            $lang               = FtTemplate::validateLang($value);
 			break;
 	    }			// language code
 
@@ -148,185 +133,185 @@ foreach($_GET as $key => $value)
 if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
-if (is_null($censusId))
-{		// missing parameter
-	$censusId	= 'Unknown';
-	$msg		.= "Missing Census parameter. ";
-}		// missing parameter
+if ($census)
+{
+    $partOf	                = $census->get('partof');
+    if (strlen($partOf) > 0)
+        $province	        = $census->get('province');
+}
+if (strlen($province) == 0)
+	$scope	                = "National";
 else
-if ($censusYear > 1850 && $censusYear < 1867)
-{		// post Durham, pre-confederation
-	$preConfed	= true;
-	if ($province == 'ON')
-	    $province	= 'CW';
-	else
-	if ($province == 'QC')
-	    $province	= 'CE';
-}		// post Durham, pre-confederation
+	$scope	                = "Provincial";
+$template	            = new FtTemplate("CensusUpdateStatus$scope$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'CensusUpdateStatus'));
+
+if (is_null($censusId) || strlen($censusId) == 0)
+{		                // missing parameter
+	$censusId	            = 'Unknown';
+	$msg		            .= $template['censusMissing']->innerHTML;
+}		                // missing parameter
 else
-if ($censusYear >= 1867)
-{		// post-confederation
-	$preConfed	= false;
-	if ($province == 'CW')
-	    $province	= 'ON';
-	else
-	if ($province == 'CE')
-	    $province	= 'QC';
-}		// post-confederation
-else
-	$preConfed	= false;
+{
+	if (strlen($censusId) == 4)
+	{                   // only year provided
+	    $censusYear		    = intval($censusId);
+	    $censusId		    = 'CA' . $censusId;
+	}                   // only year provided
+
+	$census	                = new Census(array('censusid'	=> $censusId));
+    $cc			            = $census->get('cc');
+    $censusYear		        = $census->get('year');
+    $preConfed              = $censusYear < 1867;
+    $partOf	                = $census->get('partof');
+    if (strlen($partOf) > 0)
+	    $province	        = $census->get('province');
+	if (!$census->isExisting())
+    {
+        $text               = $template['censusUnsupported']->innerHTML;
+        $text               = str_replace('$censusId', $censusId, $text);
+	    $warn	            .= "<p>$text</p>\n";
+	}
+}
+
+$country	                = new Country(array('code' => $cc));
+$countryName	            = $country->getName($lang);
 
 // obtain name of province from code
 if (is_null($province))
-	$provinceName	= 'National';
-else			// translate province code to name
-{
-	$domainObj	= new Domain(array('domain'	    => $cc . $province,
-							       'language'	=> $lang));
-	if ($domainObj->isExisting())
-	    $provinceName	= $domainObj->get('name');
-	else
-	    $provinceName	= $province;
-}
+	$provinceName	        = 'National';
+else
+{			            // translate province code to name
+	$domain	                = new Domain(array('domain'	    => "$cc$province",
+							                   'language'	=> $lang));
+	$provinceName	        = $domain->get('name');
+}			            // translate province code to name
 
 // get previous and subsequent census ids
-$prevCensus		= '';
-$prevName		= '';
-$prevProv		= '';
-$nextCensus		= '';
-$nextName		= '';
-$nextProv		= '';
-if ($censusRec)
-{				// have a valid census id
-	$getParms	= array('collective'	=> 0);	// all real censuses
-	$list		= new CensusSet($getParms);
-	$prevRec	= null;
-	$nextRec	= null;
-	$stopNext	= false;
+$prevCensus					= '';
+$prevName					= '';
+$prevProv					= '';
+$nextCensus					= '';
+$nextName					= '';
+$nextProv					= '';
+if ($census)
+{				        // have a valid census id
+	$getParms				= array('collective'	=> 0);	// all real censuses
+	$list					= new CensusSet($getParms);
+	$prevRec				= null;
+	$nextRec				= null;
+	$stopNext				= false;
 	foreach($list as $crec)
-	{			// search for current entry in full list
+	{			        // search for current entry in full list
 	    if ($stopNext)
 	    {
-			$nextCensus	= $crec->get('censusid');
+			$nextCensus		= $crec->get('censusid');
 			break;
 	    }
 	    if ($crec->get('censusid') == $censusId)
-	    {			// found current entry
-			$prevCensus	= $prevRec->get('censusid');
-			$prevProv	= $prevRec->get('prov');
-			$prevName	= $prevRec->get('prov');
-			$stopNext	= true;
-	    }			// found current entry
-	    $prevRec		= $crec;
-	}			// search for current entry in full list
+	    {			    // found current entry
+			$prevCensus	    = $prevRec->get('censusid');
+			$prevProv	    = $prevRec->get('prov');
+			$prevName	    = $prevRec->get('prov');
+			$stopNext	    = true;
+	    }			    // found current entry
+	    $prevRec		    = $crec;
+	}			        // search for current entry in full list
 
-	$provinces	= $censusRec->get('provinces');
-	if (is_string($province) && strlen($province) == 2)
-	{			// province specified
-	    $poff		= strpos($provinces, $province);
+    $provinces	            = $census->get('provinces');
+    $codel                  = strlen($province);
+	if (is_string($province) && $codel > 0)
+	{			        // province specified
+	    $poff		        = strpos($provinces, $province);
 	    if (is_int($poff))
-	    {			// valid province
+	    {			    // valid province
 			if ($poff > 0)
-			{		// not first province 
-			    $prevProv	= substr($provinces, $poff - 2, 2);
+			{		    // not first province 
+			    $prevProv	= substr($provinces, $poff - $codel, $codel);
 			    $prevName	= $prevProv;
 			    $prevCensus	= $censusId;	// same census
-			}		// not first province 
+			}		    // not first province 
 			else
-			{		// at first province in census
+			{		    // at first province in census
 			    if ($prevRec)
 			    {		// last province in previous census
 					$prevProv	= $prevRec->get('provinces');
 					$prevProv	= substr($prevProv,
-								 strlen($prevProv) - 2);
+								         strlen($prevProv) - $codel);
 					$prevName	= $prevProv;
 			    }		// last province in previous census
-			}		// at first province
+			}		    // at first province
 
-			if ($poff < strlen($provinces) - 2)
-			{		// go to next province in census
-			    $nextProv	= substr($provinces, $poff + 2, 2);
-			    $nextName	= $nextProv;
-			    $nextCensus	= $censusId;	// same census
-			}		// go to next province in census
+			if ($poff < strlen($provinces) - $codel)
+			{		    // go to next province in census
+			    $nextProv	    = substr($provinces, $poff + $codel, $codel);
+			    $nextName	    = $nextProv;
+			    $nextCensus	    = $censusId;	// same census
+			}		    // go to next province in census
 			else
-			{		// go to first province of next census
+			{		    // go to first province of next census
 			    if ($nextRec)
 			    {		// there is a next census
 					$nextProv	= $nextRec->get('provinces');
-					$nextProv	= substr($nextProv, 0, 2);
+					$nextProv	= substr($nextProv, 0, $codel);
 					$nextName	= $nextProv;
 			    }		// there is a next census
-			}		// go to first province of next census
-	    }			// valid province
-	}			// province specified
+			}		    // go to first province of next census
+	    }			    // valid province
+	}			        // province specified
 	else
-	{			// province not specified
+	{			        // province not specified
 	    if ($prevRec)
-	    {		// last province in previous census
-			$prevProv	= $prevRec->get('provinces');
-			$prevProv	= substr($prevProv,
-							 strlen($prevProv) - 2);
-			$prevName	= $prevProv;
-	    }		// last province in previous census
+	    {		        // last province in previous census
+			$prevProv	        = $prevRec->get('provinces');
+			$prevProv	        = substr($prevProv, strlen($prevProv) - $codel);
+			$prevName	        = $prevProv;
+	    }		        // last province in previous census
 	    if ($nextRec)
-	    {		// there is a next census
-			$nextProv	= substr($nextRec->get('provinces'), 0, 2);
-			$nextName	= $prevProv;
-	    }		// there is a next census
-	}			// province not specified
-}				// have a valid census id
+	    {		        // there is a next census
+			$nextProv	        = substr($nextRec->get('provinces'), 0, $codel);
+			$nextName	        = $prevProv;
+	    }		        // there is a next census
+	}			        // province not specified
+}				        // have a valid census id
 
-$total2do	= 0;
+$total2do	                    = 0;
 
 // some actions depend upon whether the user can edit the database
 if (canUser('edit'))
-{		// user can update database
-	$searchPage	= 'ReqUpdate.php?Census=' . $censusId;
+{		                // user can update database
+	$searchPage	                = 'ReqUpdate.php?Census=' . $censusId;
 	if (!is_null($province))
-	    $searchPage	.= "&amp;Province=$province";
-	$action		= 'Update';
-}		// user can updated database
+	    $searchPage	            .= "&amp;Province=$province";
+	$action		                = 'Update';
+}		                // user can updated database
 else
-{		// user can only view database
-	$searchPage	= 'QueryDetail' . $censusYear . '.html';
+{		                // user can only view database
+	$searchPage	                = 'QueryDetail' . $censusYear . '.html';
 	if (!is_null($province))
-	    $searchPage	.= "?Province=$province";
-	$action		= 'Query';
-}		// user can only view database
+	    $searchPage	            .= "?Province=$province";
+	$action		                = 'Query';
+}		                // user can only view database
 
 if (strlen($msg) == 0)
-{		// OK
+{		                // OK
 	// variables for constructing the SQL SELECT statement
 
-	$and	= ' AND ';	// logical and operator in SQL expressions
-	$tbls	= "";
-	if (!is_null($province))
-	{		// provincial summary
-	    $result	= new RecordSet('Districts',
-							array('census'		=> $censusId,
-							      'province'	=> $province));
-	}		// provincial summary
+	$and	                    = ' AND ';	// logical and operator
+	$tbls	                    = "";
+	if (strlen($province) > 0)
+	{		            // provincial summary
+	    $result	                = new RecordSet('Districts',
+							                    array('census'	=> $censusId,
+							                          'province'=> $province));
+	}		            // provincial summary
 	else
-	{		// national summary
-	    $result	= $censusRec->getStats();	// not used here
-	}		// national summary
-}		// OK
+	{		            // national summary
+	    $result	                = $census->getStats();	// not used here
+	}		            // national summary
+}		                // OK
 
-if (is_null($province))
-	$title	= "$censusYear Census of $countryName: National Transcription Status";
-else
-	$title	= "$censusYear Census of $countryName: $provinceName Transcription Status";
-
-if (is_null($province))
-	$scope	= "National";
-else
-	$scope	= "Provincial";
-$template	= new FtTemplate("CensusUpdateStatus$scope$lang.html");
-$template->updateTag('otherStylesheets',	
-    		         array('filename'   => 'CensusUpdateStatus'));
-
-$template->set('TITLE',	 		    $title);
 $template->set('CENSUSYEAR', 		$censusYear);
 $template->set('COUNTRYNAME',		$countryName);
 $template->set('CC', 			    $cc);
@@ -343,46 +328,61 @@ $template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
 // update popup link information
 $template->updateTag('mouseprevCensusLink',
 					     array('prevCensus'	=> $prevCensus,
-						   'prevName'	=> $prevName));
+						       'prevName'	=> $prevName));
+
 $template->updateTag('mousenextCensusLink',
 					     array('nextCensus'	=> $nextCensus,
-						   'nextName'	=> $nextName));
+						       'nextName'	=> $nextName));
 
 if (strlen($msg) > 0)
-{		// errors
+{		                // errors
 	$template->updateTag('displayForm', null);
-}		// errors
+}		                // errors
 else
-if ($censusRec && is_null($province))
-{		// national report
-	$cc		= substr($censusId, 0, 2);
-	$provs		= $censusRec->get('provinces');
-	$provArray	= array();
-	for ($i = 0; $i < strlen($provs); $i += 2)
-	{	// loop through provinces
-	    $provcode	= substr($provs, $i, 2);
-	    $domain	= new Domain(array('domain'	=> $cc . $provcode,
-							   'language'	=> 'en'));
+if (is_null($province) || strlen($province) == 0)
+{		                // national report
+	$cc		            = substr($censusId, 0, 2);
+    if ($cc == 'UK')
+        $cc                 = 'GB';
+	$provs		        = $census->get('provinces');
+	$domainset	        = new DomainSet(array('cc'	        => $cc,
+                                              'language'	=> $lang));
+    $provArray	        = array();
+    if (count($domainset) > 0)
+    {
+        $domain         = $domainset->rewind();
+        $code           = $domain['domain'];
+        $cl             = strlen($code) - 2;
+    }
+    else
+        $cl             = 2;
+    $percent            = 0;
+
+	for ($i = 0; $i < strlen($provs); $i += $cl)
+	{	                // loop through provinces
+	    $provcode	    = substr($provs, $i, $cl);
+	    $domain	        = $domainset["$cc$provcode"];
 	    $provinceName	= $domain->get('name');
 	    if ($preConfed && $cc == 'CA')
-			$link	= "/database/CensusUpdateStatus.php?Census=$provcode$censusYear&amp;Province=$provcode&amp;lang=$lang";
+			$link	    = "/database/CensusUpdateStatus.php?Census=$provcode$censusYear&amp;Province=$provcode&amp;lang=$lang";
 	    else
-			$link	= "/database/CensusUpdateStatus.php?Census=$censusId&amp;Province=$provcode&amp;lang=$lang";
-	    $percent	= 100 * $result['total'] / $result['pop'];
-	    $provArray[$provcode]	=
-			array('provcode'	=> $provcode,
-			      'ProvinceName'	=> $provinceName,
-			      'CensusId'	=> $censusId,
-			      'link'		=> $link);
-	}		// loop through provinces
+			$link	    = "/database/CensusUpdateStatus.php?Census=$censusId&amp;Province=$provcode&amp;lang=$lang";
+	    $percent	            = 100 * $result['total'] / $result['pop'];
+	    $provArray[$provcode]	= array('provcode'	    => $provcode,
+			                            'ProvinceName'	=> $provinceName,
+			                            'CensusId'	    => $censusId,
+			                            'Category'	    => $domain['category'],
+			                            'link'		    => $link);
+    }		            // loop through provinces
+    
 	$template->updateTag('provInfo', $provArray);
 	$template->updateTag('natStats',
-			array('total'		=> number_format($result['total']),
-			      'pop'		=> number_format($result['pop']),
-			      'percent'		=> number_format($percent,2)));
-}		// national report
+             			 array('total'		=> number_format($result['total']),
+			                   'pop'		=> number_format($result['pop']),
+			                   'percent'	=> number_format($percent,2)));
+}		                // national report
 else
-{		// provincial report
+{		                // provincial report
 	// update forward and backward link arrows
 	if (strlen($prevCensus) > 0)
 	    $template->updateTag('prevCensusLink',
@@ -401,12 +401,12 @@ else
 	    $template->updateTag('nextCensusLink',
 						 null);
 	// display the results
-	$even		= false;
-	$total		= 0;
-	$ir		= 0;
+	$even		        = false;
+	$total		        = 0;
+	$ir		            = 0;
 
 	foreach($result as $row)
-	{		// loop through the records
+	{		            // loop through the records
 	    // prepare fields for presentation in HTML
 	    $total		+= $row->get('transcribed');
 	    $total2do		+= $row->get('population');
@@ -428,7 +428,7 @@ else
 			$row['rowclass']	= 'odd';
 			$even			= true;
 	    }
-	}		// process all rows
+	}		            // process all rows
 
 	$template->updateTag('row$id', $result);
 
@@ -440,5 +440,5 @@ else
 	$template->set('total2do', number_format($total2do));
 	$template->set('pctDone', number_format($pctDone, 2));
 	$template->set('pctDoneClass', pctClass($pctDone));
-}		// provincial report
+}		                // provincial report
 $template->display();

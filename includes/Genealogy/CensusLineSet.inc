@@ -39,8 +39,11 @@ use \mb_substr;
  *						given names										*
  *						match whole supplied string for given names		*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2019/11/29      add factory methods getDistrict and             *
+ *		                getSubDistrict                                  *
+ *		                getStatistics now returns all pages             *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -59,7 +62,7 @@ class CensusLineSet extends RecordSet
     /********************************************************************
      *	CensusLineSet->censusYear               						*
      *	CensusLineSet->censusId					                    	*
-     *	CensusLineSet->censusObj                						*
+     *	CensusLineSet->census                      						*
      *																	*
      *	The census identifier is not present in the actual records		*
      *	but is specified as a parameter to the constructor to			*
@@ -67,7 +70,7 @@ class CensusLineSet extends RecordSet
      ********************************************************************/
     protected	$censusYear		= '1881';
     protected	$censusId		= 'CA1881';
-    protected	$censusObj		= null;
+    protected	$census		    = null;         // instance of Census
 
     /********************************************************************
      *	CensusLineSet->district											*
@@ -77,10 +80,12 @@ class CensusLineSet extends RecordSet
      *																	*
      *	Parameters to create new default page.							*
      ********************************************************************/
-    protected	$district		= null;
-    protected	$subdistrict	= null;
-    protected	$division		= null;
-    protected	$page			= null;
+    protected	$district		= null;         // id of District
+    protected	$distObj	    = null;         // instance of District
+    protected	$subdistrict	= null;         // id of subdistrict
+    protected	$subdistObj	    = null;         // instance of SubDistrict
+    protected	$division		= null;         // id of division
+    protected	$page			= null;         // page number
 
     /********************************************************************
      *	CensusLineSet->notPage											*
@@ -130,9 +135,8 @@ class CensusLineSet extends RecordSet
 				{
 				    if ($value instanceof Census)
 				    {
-						$censusObj		    = $value;
-						$this->censusObj	= $censusObj;
-						$censusId		    = $censusObj->get('id');
+						$this->census		= $value;
+						$censusId		    = $this->census->get('id');
 				    }
                     else
 						$censusId		    = $value;
@@ -145,15 +149,14 @@ class CensusLineSet extends RecordSet
 				    }		// search all Canadian censuses
 				    else
 				    {		// specific census
-						if (is_null($this->censusObj))
+						if (is_null($this->census))
 						{
-						    $censusObj	= new Census(array('id' => $censusId));
-						    $this->censusObj	= $censusObj;
+						    $this->census	= new Census(array('id' => $censusId));
 						}
-						$censusYear		= $censusObj->get('year');
+						$censusYear		    = $this->census->get('year');
 						$this->censusYear	= $censusYear;
-						$this->table		= $censusObj->get('table');
-						if (!$censusObj->isExisting())
+						$this->table		= $this->census->get('table');
+						if (!$this->census->isExisting())
 						    $msg	.= "Invalid Census='$censusId'";
 				    }		// specific census
 				    break;
@@ -717,6 +720,57 @@ class CensusLineSet extends RecordSet
     }		// CensusLineSet::getWhere
 
     /********************************************************************
+     *	function CensusLineSet::getDistrict								*
+     *																	*
+     *	Factory method to get an instance of District                   *
+     *																	*
+     *  Returns:														*
+     *	    instance of District or null    							*
+     ********************************************************************/
+    public function getDistrict()
+    {
+        if (is_null($this->distObj))
+        {
+		    if ($this->district)
+		    {			// response is all or part of a page
+				$censusYear			    = $this->census['year'];
+				$count				    = $this->census->get('linesperpage');
+                $distParms			    = array('d_census'	=> $this->census);
+                if (is_array($this->district))
+                    $distParms['d_id']	= reset($this->district);
+                else
+                    $distParms['d_id']	= $this->district;
+                $this->distObj		    = new District($distParms);
+            }
+        }
+        return $this->distObj;      // may still be null
+    }       // function CensusLineSet::getDistrict
+
+    /********************************************************************
+     *	function CensusLineSet::getSubDistrict							*
+     *																	*
+     *	Factory method to get an instance of SubDistrict                *
+     *																	*
+     *  Returns:														*
+     *	    instance of SubDistrict or null    							*
+     ********************************************************************/
+    public function getSubDistrict()
+    {
+        if (is_null($this->subdistObj))
+        {
+		    if ($this->district && $this->subdistrict)
+		    {			
+				$sdistParms			= array('sd_census'	=> $this->census,
+					    			        'sd_distid'	=> $this->district,
+					    			        'sd_id'		=> $this->subdistrict,
+					    			        'sd_div'	=> $this->division);
+				$this->subdistObj	= new SubDistrict($sdistParms);
+            }
+        }
+        return $this->subdistObj;      // may still be null
+    }       // function CensusLineSet::getSubDistrict
+
+    /********************************************************************
      *	function CensusLineSet::rewind									*
      *																	*
      *	Part of the implementation of the interface Iterator.			*
@@ -738,37 +792,28 @@ class CensusLineSet extends RecordSet
 		{
 		    if ($this->district && $this->subdistrict && $this->page)
 		    {			// response is all or part of a page
-				$censusObj			= $this->censusObj;
-				$censusYear			= substr($this->censusId, 2);
-				$count				= $censusObj->get('linesperpage');
-                $distParms			= array('d_census'	=> $censusObj);
-                if (is_array($this->district))
-                    $distParms['d_id']		= reset($this->district);
-                else
-                    $distParms['d_id']		= $this->district;
-				$distObj			= new District($distParms);
+				$censusYear			= $this->census['year'];
+				$count				= $this->census->get('linesperpage');
+				$distObj			= $this->getDistrict();
 				$prov				= $distObj->get('province');
-				$distName			= $distObj->get('name');
-				$sdistParms			= array('sd_census'	=> $censusObj,
-					    			        'sd_distid'	=> $this->district,
-					    			        'sd_id'		=> $this->subdistrict,
-					    			        'sd_div'	=> $this->division);
-				$subdistObj		    = new SubDistrict($sdistParms);
+                $distName			= $distObj->get('name');
+
+				$subdistObj		    = $this->getSubDistrict();
 				$subDistName		= $subdistObj->get('name');
 				$oldfamily		    =
-									($this->page - $subdistObj->get('page1')) *
-						($censusObj->get('linesperpage') / 5) + 1;
+								($this->page - $subdistObj->get('page1')) *
+			        			($this->census->get('linesperpage') / 5) + 1;
 				$oldsurname		    = '[unknown]';
 				$oldreligion		= '[religion]';
 				$oldorigin		    = '[origin]';
 				$oldnationality		= 'Canadian';
 
-				$parms		= array('censusid'	=> $censusObj,
-								'district'	=> $this->district,
-								'subdistrict'	=> $this->subdistrict,
-								'division'	=> $this->division,
-								'page'		=> $this->page,
-								'line'		=> -1);
+				$parms		    = array('censusid'	    => $this->census,
+						        		'district'	    => $this->district,
+						        		'subdistrict'	=> $this->subdistrict,
+						        		'division'	    => $this->division,
+						        		'page'		    => $this->page,
+						        		'line'		    => -1);
 				$pline			= new CensusLine($parms);
 				if ($pline->isExisting())
 				{
@@ -795,59 +840,59 @@ class CensusLineSet extends RecordSet
 		    if ($this->information['count'] == 0 &&
 				!$this->notPage &&
 				$page)
-		    {			// fill in default page
+		    {			        // fill in default page
 				// create new empty page
 				for($line = 1; $line <= $count; $line++)
 				{
-				    $parms		= array('censusid'	=> $censusObj,
-								    'district'	=> $this->district,
-								    'subdistrict'	=> $this->subdistrict,
-								    'division'	=> $this->division,
-								    'page'		=> $this->page,
-								    'line'		=> $line);
-				    $cline			= new CensusLine($parms);
+				    $parms		= array('censusid'	    => $this->census,
+								        'district'	    => $this->district,
+								        'subdistrict'	=> $this->subdistrict,
+								        'division'	    => $this->division,
+								        'page'		    => $this->page,
+								        'line'		    => $line);
+				    $cline		= new CensusLine($parms);
 				    foreach($cline as $field => $value)
-				    {		// loop through fields
+				    {		    // loop through fields
 						switch(strtolower($field))
 						{		// act on specific fields
 						    case 'family':
 						    {
-							$cline->set('family',	$oldfamily);
-							break;
+								$cline->set('family',	$oldfamily);
+								break;
 						    }
 
 						    case 'surname':
 						    {
-							$cline->set('surname',	$oldsurname);
-							break;
+								$cline->set('surname',	$oldsurname);
+								break;
 						    }
 
 						    case 'religion':
 						    {
-							$cline->set('religion',	$oldreligion);
-							break;
+								$cline->set('religion',	$oldreligion);
+								break;
 						    }
 
 						    case 'origin':
 						    {
-							$cline->set('origin',	$oldorigin);
-							break;
+								$cline->set('origin',	$oldorigin);
+								break;
 						    }
 
 						    case 'nationality':
 						    {
-							$cline->set('nationality',	$oldnationality);
-							break;
+								$cline->set('nationality',	$oldnationality);
+								break;
 						    }
 
 						    case 'membet':
 						    {
-							$cline->set('origin',	'Y');
-							break;
+								$cline->set('origin',	'Y');
+								break;
 						    }
 
 						}		// act on specific fields
-				    }		// loop through fields
+				    }		    // loop through fields
 
 				    // add extra explanatory fields
 				    $cline->set('censusyear',	$censusYear);
@@ -857,12 +902,12 @@ class CensusLineSet extends RecordSet
 				    $this->list[$line]	= $cline;
 				}
 				$this->information['count'] = $count;
-		    }			// fill in default page
+		    }			        // fill in default page
 		    else
 		    {
 				parent::rewind();
 				if (!$this->notPage && $page)
-				{			// check for issues with whole page
+				{			    // check for issues with whole page
 				    foreach($this->list as $line)
 				    {
 						if ($line->offsetExists('family'))
@@ -885,67 +930,5 @@ class CensusLineSet extends RecordSet
 		else
 		    return reset($this->list);
     }		// function CensusLineSet::rewind
-
-    /********************************************************************
-     *	function CensusLineSet::getStatistics							*
-     *																	*
-     *  Display page by page statistics for a set of Census				*
-     *  transcription records.											*
-     *																	*
-     *	Returns:														*
-     *	    array of associative arrays containing statistics				*
-     *			'namecount'				x								*
-     *			'agecount'				x								*
-     *			'idircount'				x								*
-     *			'pt_population'			x								*
-     *			'pt_transcriber'		x								*
-     *			'pt_proofreader'		x								*
-     *																	*
-     *	Side Effects:														*
-     *	    Errors are appended to the global $warn						*
-     ********************************************************************/
-    function getStatistics()
-    {
-		global	$debug;
-		global	$warn;
-		global	$connection;
-
-		$query	= "SELECT Page, SUM(GivenNames != '') AS namecount," . 
-							"SUM(Age != '') AS agecount," .
-							"SUM(IDIR != 0) AS idircount," .
-							"PT_Population, PT_Transcriber," .
-							"PT_Proofreader" .
-						" FROM Census" . $this->censusYear .
-						" JOIN Pages ON PT_Census=? AND " .
-							"PT_DistId=District AND PT_SdId=SubDistrict " .
-							"AND PT_Div=Division AND PT_Sched='1' " .
-							"AND PT_Page=Page " .
-						$this->where .
-						" GROUP BY Page," .
-							"PT_Population, PT_Transcriber," .
-							"PT_Proofreader " .
-						"ORDER BY Page";
-
-		$sqlParms	= array_merge(array($this->censusId),
-							      $this->sqlParms);
-		$stmt		= $connection->prepare( $query );
-		$queryText	= debugPrepQuery($query, $sqlParms);
-		if ($stmt->execute($sqlParms))
-		{		// successful query
-		    $result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
-		    if ($debug)
-				$warn	.= "<p>CensusLineSet::getStatistics: " . __LINE__ . 
-							" $queryText</p>";
-		}		// successful query
-		else
-		{		// error issuing query
-		    // diagnostic printout of main select statement
-		    $warn	.= "<p>CensusLineSet::getStatistics: " . __LINE__ . 
-							" '$queryText', " . 
-							print_r($stmt->errorInfo(),true) . "</p>\n";
-		}		// error issuing query
-
-		return $result;
-    }			// function getStatistics
 
 }		// class CensusLineSet

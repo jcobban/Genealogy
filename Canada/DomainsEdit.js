@@ -13,6 +13,7 @@
  *		                support ISO format for domain code with hyphen  *
  *		                support return, up and down arrows in table     *
  *		                add new row for return out of last row          *
+ *		2019/12/02      add support for partof                          *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -220,10 +221,22 @@ function deleteDomain()
  ************************************************************************/
 function showCounties()
 {
-    var	form	= this.form;
-    var	domain	= this.id.substring(12);
-    window.open('CountiesEdit.php?Domain=' + domain,
-				'_blank');
+    var	form	        = this.form;
+    var	domain	        = this.id.substring(12);
+    var cc              = domain.substring(0, 2);
+    var lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
+
+    if (cc == 'CA' || cc == 'US')
+        window.open('CountiesEdit.php?Domain=' + domain + '&lang=' + lang,
+		    		'_blank');
+    else
+    {
+        domain          = cc + '-' + domain.substr(2);
+        window.open('DomainsEdit.php?cc=' + cc + '&partof=' + domain + '&lang=' + lang,
+		    		'_blank');
+    }
     return false;
 }		// function showCounties
 

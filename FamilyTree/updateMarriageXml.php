@@ -310,7 +310,6 @@ foreach($_POST as $key => $value)
             if ($wife)
             {
     		    $wife['givenname']		    = $value;
-                print "<wifename313>$value</wifename313>\n";
             }
 			else
 			if ($value != '')
@@ -367,8 +366,6 @@ foreach($_POST as $key => $value)
 
 	    case 'mard':
         {		// date of marriage
-            print "<mard370>givenname='" . $family['wifegivenname'] .
-                "', surname='" . $family['wifesurname']. "</mard370>\n";
             if ($family['wifegivenname'] === '' &&
                 $family['wifesurname'] === '')
                 $wife                   = null;
@@ -378,8 +375,6 @@ foreach($_POST as $key => $value)
 			    $idirwife	            = $wife['idir'];
                 $family['idirwife']     = $idirwife;
             }               // may be new wife or wife's name may be changed 
-            else
-                print "<wifenull380>$value</wifenull380>\n";
 
     		// this call also sets field 'marsd'
     		$family['mard']		        = $value;
@@ -445,19 +440,19 @@ foreach($_POST as $key => $value)
 	    case 'idtrseal':
 	    case 'trseal':	// old form
 	    {
-    		$family['idtrseal']		= $value;
+    		$family['idtrseal']		    = $value;
     		break;
 	    }
 
 	    case 'idms':
 	    {
-    		$family['idms']		= $value;
+    		$family['idms']		        = $value;
     		break;
 	    }
 
 	    case 'notes':
 	    {
-    		$family['notes']		= $value;
+    		$family['notes']		    = $value;
     		break;
 	    }
 
@@ -577,6 +572,10 @@ foreach($_POST as $key => $value)
             {                   // negative, detach existing child
                 $child                  = null;
             }                   // negative, detach existing child
+            if ($child)
+                $priName                = $child->getPriName();
+            else
+                $priName                = null;
 
             $childr		                = null; // processed
             $oldrow                     = $id;  // row number of child
@@ -585,6 +584,7 @@ foreach($_POST as $key => $value)
 
 	    case 'cidcr':
         {	                    // IDCR of child, zero for new child
+			// $id contains rownum from form
             if (strlen($value) > 0)
                 $idcr		            = intval($value);
             else
@@ -597,7 +597,7 @@ foreach($_POST as $key => $value)
 	                if ($idir < 0)
 	                {               // remove existing Child from Family
 	                    $childr->delete('delete' . __LINE__);
-	                    $childr         = null;
+	                    $childr                 = null;
 	                }               // remove existing Child from Family
 	                else
 	                {               // retain existing Child
@@ -611,33 +611,32 @@ foreach($_POST as $key => $value)
 
 	    case 'cgender':
 	    {	            // numeric gender of child
+			// $id contains rownum from form
 			if ($child)
-			    $child['gender']		= $value;
+			    $child['gender']		    = $value;
 			break;
 	    }	            // numeric gender of child
 
 	    case 'cgiven':
 	    {	            // given name of child
-			if ($child)
-			    $child['givenname']		= $value;
+			// $id contains rownum from form
+			if ($priName)
+			    $priName['givenname']		= $value;
 			break;
 	    }	            // given name of child
 
 	    case 'csurname':
 	    {	            // surname of child
 			// $id contains rownum from form
-			if ($child)
-			    $child['surname']		= $value;
-			break;
+			if ($priName)
+                $priName['surname']		    = $value;
 	    }	            // surname of  child
 
 	    case 'cbirth':
 	    {	            // birth date of child
 			// $id contains rownum from form
             if ($child)
-            {
-                $child['birthd']	    = $value;
-            }
+                $child['birthd']	        = $value;
 			break;
 	    }	            // death date of child
 
@@ -646,7 +645,7 @@ foreach($_POST as $key => $value)
 			// $id contains rownum from form
 			if ($child)
             {
-                $child['deathd']		= $value;
+                $child['deathd']		    = $value;
             }
 			break;
 	    }	            // death date child

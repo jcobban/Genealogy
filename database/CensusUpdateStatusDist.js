@@ -15,6 +15,7 @@
  *		2013/08/25		use pageInit common function					*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2918.11.27      add support for language                        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -43,46 +44,66 @@ function onLoad()
     // activate dynamic functionality of all fields
     for(var i = 0; i < document.forms.length; i++)
     {
-		var form	= document.forms[i];
+		var form	        = document.forms[i];
 		for(var j = 0; j < form.elements.length; j++)
 		{
-		    var element	= form.elements[j];
+		    var element	    = form.elements[j];
+            var id          = element.id;
+            var column      = id;
+            var rownum      = '';
+            var matches     = /^([a-zA-Z_$]+)(\d*)$/.exec(id);
+            if (matches)
+            {
+                column      = matches[1];
+                rownum      = matches[2];
+            }
 
-		    if (element.id.substring(0,4) == 'Edit')
-				element.onclick	= editDiv;
-		    else
-		    if (element.id.substring(0,8) == 'Surnames')
-				element.onclick	= showSurnames;
-		    else
-		    if (element.id.substring(0,4) == 'Copy')
-				element.onclick	= copyDiv;
+            switch(column.toLowerCase())
+            {
+                case 'edit':
+				    element.onclick	    = editDiv;
+                    break;
+
+                case 'surnames':
+				    element.onclick	    = showSurnames;
+                    break;
+
+		        case 'copy':
+				    element.onclick	    = copyDiv;
+                    break;
+
+            }
 		}	// loop through all elements in form
     }		// loop through all forms
 
-}		// onLoad
+}		// function onLoad
 
 /************************************************************************
  *  editDiv																*
  *																		*
  *  This function is called if the user clicks on the "Edit" button		*
- *  for a row.																*
+ *  for a row.															*
  *																		*
- *  Parameters:																*
- *		this				button												*
+ *  Parameters:															*
+ *		this				button										*
  ************************************************************************/
 function editDiv()
 {
     var	rowNo		= this.id.substring(4);
-    var Census		= document.getElementById('Census').value;
-    var District	= document.getElementById('District').value;
-    var SubDistrict	= document.getElementById('SdId' + rowNo).value;
-    var	Division	= document.getElementById('Div' + rowNo).value;
-    location	= 'CensusUpdateStatusDetails.php?Census=' + Census +
-					'&District=' + District +
-					'&SubDistrict=' + SubDistrict +
-					'&Division=' + Division;
+    var census		= document.getElementById('Census').value.trim();
+    var district	= document.getElementById('District').value.trim();
+    var subDistrict	= document.getElementById('SdId' + rowNo).value.trim();
+    var	division	= document.getElementById('Div' + rowNo).value.trim();
+    var lang        = 'en';
+    if ('lang' in args)
+        lang        = args.lang;
+    location	    = 'CensusUpdateStatusDetails.php?Census=' + census +
+									    '&District=' + district +
+									    '&SubDistrict=' + subDistrict +
+									    '&Division=' + division +
+                                        '&lang=' + lang;        
     return false;
-}		// editDiv
+}		// function editDiv
 
 /************************************************************************
  *  showSurnames														*
@@ -96,16 +117,20 @@ function editDiv()
 function showSurnames()
 {
     var	rowNo		= this.id.substring(8);
-    var Census		= document.getElementById('Census').value;
-    var District	= document.getElementById('District').value;
-    var SubDistrict	= document.getElementById('SdId' + rowNo).value;
-    var	Division	= document.getElementById('Div' + rowNo).value;
-    location	= 'QuerySurnamesTop.php?Census=' + Census +
-					'&District=' + District +
-					'&SubDistrict=' + SubDistrict +
-					'&Division=' + Division;
+    var Census		= document.getElementById('Census').value.trim();
+    var District	= document.getElementById('District').value.trim();
+    var SubDistrict	= document.getElementById('SdId' + rowNo).value.trim();
+    var	Division	= document.getElementById('Div' + rowNo).value.trim();
+    var lang        = 'en';
+    if ('lang' in args)
+        lang        = args.lang;
+    location	    = 'QuerySurnamesTop.php?Census=' + Census +
+					                    '&District=' + District +
+					                    '&SubDistrict=' + SubDistrict +
+					                    '&Division=' + Division +
+                                        '&lang=' + lang;
     return false;
-}		// showSurnames
+}		// function showSurnames
 
 /************************************************************************
  *  copyDiv																*
@@ -129,23 +154,23 @@ function copyDiv()
 
     // get list of transcribed pages from server
     var	pagesUrl	= 'GetPagesInCensusDivisionXml.php?Census=' + Census +
-					  '&District=' + District +
-					  '&SubDistrict=' + SubDistrict +
-					  '&Division=' + Division;
+										  '&District=' + District +
+										  '&SubDistrict=' + SubDistrict +
+										  '&Division=' + Division;
     HTTP.getXML(pagesUrl,
 				gotPages,
 				noPages);
     return false;
-}		// copyDiv
+}		// function copyDiv
 
 /************************************************************************
- *  gotPages																*
+ *  gotPages															*
  *																		*
- *  This method is called when the XML file reporting the list of pages		*
- *  in the transcription of the division is received.						*
+ *  This method is called when the XML file reporting the list of pages	*
+ *  in the transcription of the division is received.					*
  *																		*
  *  Input:																*
- *		xmlDoc				Document representing the XML file				*
+ *		xmlDoc				Document representing the XML file			*
  ************************************************************************/
 var	pages;		// array of XML elements
 var	pageIndex;	// index of next entry in pages
@@ -182,13 +207,13 @@ function gotPages(xmlDoc)
     else
 		alert("CensusUpdateStatusDist.js: gotPages: " + 
 		      "invalid parameter xmlDoc=" + xmlDoc);
-}		// gotPages
+}		// function gotPages
 
 /************************************************************************
  *  noPages																*
  *																		*
  *  This method is called if the script to obtain the list of pages		*
- *  in a census division is missing.										*
+ *  in a census division is missing.									*
  ************************************************************************/
 function noPages()
 {
@@ -196,16 +221,16 @@ function noPages()
     hideLoading();	// hide "loading" indicator
     alert("CensusUpdateStatusDist.js: noPages: " + 
 		  "script GetPagesInCensusDivisionXml.php is missing.");
-}		// noPages
+}		// function noPages
 
 /************************************************************************
- *  gotCopy				*
+ *  function gotCopy				                                    *
  *																		*
- *  This method is called when the XML file reporting the results of				*
- *  copying the division data to the production server is received.				*
+ *  This method is called when the XML file reporting the results of	*
+ *  copying the division data to the production server is received.		*
  *																		*
- *  Input:				*
- *		xmlDoc				Document representing the XML file				*
+ *  Input:				                                                *
+ *		xmlDoc			Document representing the XML file				*
  ************************************************************************/
 function gotCopy(xmlDoc)
 {
@@ -256,7 +281,7 @@ function gotCopy(xmlDoc)
 				  gotCopy,
 				  noCopy);
     }	// there are more transcribed pages in this division
-}		// gotCopy
+}		// function gotCopy
 
 /************************************************************************
  *  function noCopy				                                        *
@@ -269,4 +294,4 @@ function noCopy()
     // hide the loading indicator
     hideLoading();	// hide "loading" indicator
     alert("script UploadSubdistXml.php is missing.");
-}		// noCopy
+}		// function noCopy

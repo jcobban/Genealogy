@@ -1384,16 +1384,17 @@ class Person extends RecordPic
     {
         if (is_null($this->priName))
         {
-            $this->priName          = new Name(array('idir' => $this,
-                                                     'order'=> Name::PRIMARY));
-            if (!$this->priName->isExisting())
+            $priName            = new Name(array('idir' => $this,
+                                                 'order'=> Name::PRIMARY));
+            if (!$priName->isExisting())
             {
-                $this->priName['givenname'] = $this->row['givenname'];
-                $this->priName['surname']   = $this->row['surname'];
-                $this->priName['prefix']    = $this->row['prefix'];
-                $this->priName['title']     = $this->row['title'];
-                $this->priName['treename']	= $this->treeName;
+                $priName['givenname']   = $this->row['givenname'];
+                $priName['surname']     = $this->row['surname'];
+                $priName['prefix']      = $this->row['prefix'];
+                $priName['title']       = $this->row['title'];
+                $priName['treename']	= $this->treeName;
             }
+            $this->priName              = $priName;
         }
         return $this->priName;
     }		// Person::getPriName
@@ -1526,12 +1527,12 @@ class Person extends RecordPic
      ********************************************************************/
     function setSurname($newname)
     {
-        if (is_null($this->getPriName()))
-            return parent::set('surname', $newname);
-	    $oldsurname	            = $this->priName['surname'];
+        $priName                = $this->getPriName();
+	    $oldsurname	            = $priName['surname'];
 	    if ($newname == $oldsurname)
-	        return $oldsurname;
-	    $this->priName->setSurname($newname);
+            return $oldsurname;
+
+        $priName->setSurname($newname);
 
         // ensure surname changed in all families
         $families	            = $this->getFamilies();
@@ -1576,9 +1577,8 @@ class Person extends RecordPic
      ********************************************************************/
     function setGivenName($newname)
     {
-        if (is_null($this->getPriName()))
-            return parent::set('givenname', $newname);
-        $oldname	                = $this->priName['givenname'];
+        $priName                    = $this->getPriName();
+        $oldname	                = $priName['givenname'];
         if ($newname == $oldname)
             return $oldname;
         $names		                = $this->getNames();
@@ -1597,6 +1597,7 @@ class Person extends RecordPic
             $family->setName($this);
 
         parent::set('givenname', $newname);
+        $priName->set('givenname', $newname);
         return $oldname;
     }		// function Person::setGivenName
 
@@ -1763,8 +1764,7 @@ class Person extends RecordPic
         global $warn;
 
         $idir                   = $this->row['idir'];
-        if (is_null($this->priName))
-            $this->priName      = $this->getPriName();
+        $priName                = $this->getPriName();
         $fieldLc	            = strtolower($field);
         if (array_key_exists($fieldLc, self::$translate))
             $fieldLc	        = self::$translate[$fieldLc];
@@ -1801,9 +1801,9 @@ class Person extends RecordPic
             case 'userref':
             case 'namenote':
             {                   // fields moved to Name
-                // $this->priName is set if initialization is complete
-                if ($this->priName)
-                    $this->priName[$fieldLc]		= $value;
+                // $priName is set if initialization is complete
+                if ($priName)
+                    $priName[$fieldLc]		= $value;
                 return parent::set($fieldLc, $value);
             }                   // fields moved to Name
 
@@ -1819,10 +1819,9 @@ class Person extends RecordPic
 
             case 'birthsd':
             {
-                if ((!$this->needInsert) && $this->priName)
+                if ((!$this->needInsert) && $priName)
                 {
-                    $this->priName['birthsd']		= $value;
-                    $this->priName->save(false);
+                    $priName['birthsd']		= $value;
                 }
                 return parent::set($field, $value);
             }
@@ -2069,6 +2068,88 @@ class Person extends RecordPic
         }		// switch on field name
     }		// Person::set
 
+    /********************************************************************
+     *	function Person::setLocal										*
+     *																	*
+     *	Change the value of a field only in the object.					*
+     *  This is used to permit the set method of classes, to which      *
+     *	fields originally in Person have been moved to comply with 3NF, *
+     *	to maintain the old fields.                                     *
+     *
+     *  Parameters:														*
+     *	    $field		name of field to change							*
+     *	    $value		new value to set it to							*
+     *																	*
+     *	Returns:														*
+     *		the old value of the field									*
+     ********************************************************************/
+    function setLocal($field, $value)
+    {
+        global $debug;
+        global $warn;
+
+        $idir                   = $this->row['idir'];
+        $fieldLc	            = strtolower($field);
+        if (array_key_exists($fieldLc, self::$translate))
+            $fieldLc	        = self::$translate[$fieldLc];
+        switch($fieldLc)
+        {
+            case 'surname':
+			case 'soundslike':
+			case 'givenname':
+			case 'prefix':
+			case 'title':
+            case 'userref':
+            case 'namenote':
+			case 'birthsd':
+			case 'birthd':
+			case 'idlrbirth':
+			case 'chrissd':
+			case 'chrisd':
+			case 'idlrchris':
+			case 'chrterm':
+			case 'deathsd':
+			case 'deathd':
+			case 'idlrdeath':
+			case 'buriedsd':
+			case 'buriedd':
+			case 'idlrburied':
+			case 'cremated':
+			case 'idarbirth':
+			case 'idarchris':
+			case 'idardeath':
+			case 'idarburied':
+			case 'birthnote':
+			case 'chrisnote':
+			case 'deathnote':
+			case 'buriednote':
+			case 'baptismnote':
+			case 'endownote':
+			case 'baptismsd':
+			case 'baptismd':
+			case 'baptismkind':
+			case 'idtrbaptism':
+			case 'ldsb':
+			case 'endowsd':
+			case 'endowd':
+			case 'idtrendow':
+			case 'ldse':
+			case 'confirmationd':
+			case 'confirmationsd':
+			case 'confirmationkind':
+			case 'idtrconfirmation':
+			case 'confirmationnote':
+			case 'ldsc':
+			case 'initiatoryd':
+			case 'initiatorysd':
+			case 'idtrinitiatory':
+			case 'initiatorynote':
+            {                   // fields moved to Name or Event
+                return parent::set($fieldLc, $value);
+            }                   // fields moved to Name or Event
+
+        }		                // switch on field name
+    }		// Person::setLocal
 
     /********************************************************************
      *	function Person::needDateObj									*
@@ -3267,12 +3348,9 @@ class Person extends RecordPic
         // there can be no name records
         if ($this->needInsert)
         {
-            if ($this->priName)
-                return new RecordSet('Names',
-                                     array($this->priName));
-            else
-                return new RecordSet('Names',
-                    array());	// empty set
+            $priName        = $this->getPriName();
+            return new RecordSet('Names',
+                                 array($priName));
         }
 
         if (!is_array($this->altNames))
@@ -3390,37 +3468,37 @@ class Person extends RecordPic
         global	$userid;
         global	$debug;
 
-        $idir			= $this->row['idir'];
-        $isOwner		= $this->isOwner();
-        $includeFamilies	= $options & self::TOXML_INCLUDE_FAMILIES;
-        $includeParents		= $options & self::TOXML_INCLUDE_PARENTS;
-        $includeNames		= $options & self::TOXML_INCLUDE_NAMES;
-        $includeEvents		= $options & self::TOXML_INCLUDE_EVENTS;
-        $child			= false;
+        $idir			            = $this->row['idir'];
+        $isOwner		            = $this->isOwner();
+        $includeFamilies	        = $options & self::TOXML_INCLUDE_FAMILIES;
+        $includeParents		        = $options & self::TOXML_INCLUDE_PARENTS;
+        $includeNames		        = $options & self::TOXML_INCLUDE_NAMES;
+        $includeEvents		        = $options & self::TOXML_INCLUDE_EVENTS;
+        $child			            = false;
 
         if (is_null($top))
-            $retval	= '';
+            $retval	                = '';
         else
-            $retval	= "<$top idir='$idir' options='$options'>\n";
+            $retval	                = "<$top idir='$idir' options='$options'>\n";
 
         if (is_array($parms))
         {		// additional parameters to include
-            $print		= true;
+            $print		            = true;
             foreach($parms as $field => $value)
             {
                 if ($field == 'print')
-                    $print	= $value;
+                    $print	        = $value;
                 else
                 {
                     if ($field == 'idcr')
-                        $child	= true;
-                    $retval	.= "    <$field>" . xmlentities($value) .
+                        $child	    = true;
+                    $retval	        .= "    <$field>" . xmlentities($value) .
                                         "</$field>\n";
                 }
             }
         }		// additional parameters to include
         else
-            $print	= $parms;
+            $print	                = $parms;
 
         // display fields from main record
         foreach($this->row as $field => $value)
@@ -4565,11 +4643,8 @@ class Person extends RecordPic
                 }		        // error performing query
 
                 // log the update
-                logSqlUpdate($insert,
-                             $sqlParms,
-                             $idir,
-                             '',
-                             $this->toJson(false));
+                $this->log($insert,
+                           $sqlParms);
 
                 // make the current user an owner of the new individual
                 $this->addOwner();
@@ -4577,19 +4652,19 @@ class Person extends RecordPic
                 // also create primary name entry
                 if ($idir > 0)
                 {               // have a valid record
-                    if (!is_null($this->getPriName()))
-                    {
-                        $this->priName['idir']          = $idir;
-	                    if ($this->priName['birthsd'] == -99999999 &&
-	                        $this['birthsd'] != -99999999)
-	                        $this->priName['birthsd']	= $this['birthsd'];
-	                    if ($xml)
-	                        $this->priName->save('save' . __LINE__);
-	                    else
-	                        $this->priName->save('p');
-                    }
+                    $priName                    = $this->getPriName();
+                    $priName['idir']            = $idir;
+	                if ($priName['birthsd'] == -99999999 &&
+	                    $this['birthsd'] != -99999999)
+                        $priName['birthsd']	    = $this['birthsd'];
+
+	                if ($xml)
+                        $priName->save('save' . __LINE__);
                     else
-                        print "<p>Person.inc: save: " . __LINE__ . " priName isnull</p>\n";
+                        $priName->save(false);
+                    $cmd                        = $priName->getLastSqlCmd();
+                    if (strlen($cmd) > 0)
+                        $this->lastSqlCmd       .= ";$cmd";
                 }               // have a valid record
             }			        // success
             else
@@ -4629,22 +4704,23 @@ class Person extends RecordPic
             // update primary alternate name entry
             if ($idir > 0)
             {                   // have a valid record
-                if (!is_null($this->getPriName()))
-                {
-    	            if ($this->priName['birthsd'] == -99999999 &&
-    	                $this['birthsd'] != -99999999)
-    	                $this->priName['birthsd']	= $this->row['birthsd'];
-                    if ($xml)
-                        $this->priName->save('save' . __LINE__);
-                    else
-                        $this->priName->save(false);
-                }
+                $priName                = $this->getPriName();
+    	        if ($priName['birthsd'] == -99999999 &&
+    	            $this['birthsd'] != -99999999)
+    	            $priName['birthsd']	= $this->row['birthsd'];
+                if ($xml)
+                    $priName->save('save' . __LINE__);
+                else
+                    $priName->save(false);
+                $cmd                        = $priName->getLastSqlCmd();
+                if (strlen($cmd) > 0)
+                    $this->lastSqlCmd       .= ";$cmd";
 
 	            // ensure that the alternate name entries for all of the
                 // families this individual is a spouse in exist
                 if ($this['gender'] == Person::FEMALE)
                 {                   // wife
-		            $families		        = $this->getFamilies();
+		            $families		            = $this->getFamilies();
 		            foreach($families as $idmr => $family)
 		            {               // loop through families
 		                $nameParms	            = array('idir'		=> $this,
@@ -4658,6 +4734,9 @@ class Person extends RecordPic
 	                        $altName->save('save' . __LINE__);
 	                    else
 		                    $altName->save(false);
+                        $cmd                    = $priName->getLastSqlCmd();
+                        if (strlen($cmd) > 0)
+                            $this->lastSqlCmd   .= ";$cmd";
 		            }		        // loop through families
                 }                   // wife
 

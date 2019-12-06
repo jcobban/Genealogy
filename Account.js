@@ -23,6 +23,7 @@
  *		                in generated password, and trim password        *
  *		2019/02/06      session status moved to link in menu            *
  *		2019/02/08      use addEventListener                            *
+ *		2019/12/03      change random password generator to exclude "   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -356,35 +357,19 @@ function scorePassword(pass)
  *  Input:																*
  *		this		<button id='generatePassword'>						*
  ************************************************************************/
+var charset     = "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 function generatePassword()
 {
     var	randArray	    = new Uint32Array(12);
     window.crypto.getRandomValues(randArray);
-    var	newPass		    = [];
+    var	password		= '';
     for(var i = 0; i < randArray.length; i++)
     {
-		var code	    = randArray[i] % 157;
-        var origCode    = code;
-        if (code >= 95)
-        {
-            code        = code - 95;
-            if (code > 51)
-                code    = code - 4;         // decimal digits
-            else
-            if (code > 25)
-                code    = code + 71;        // lower case letters
-            else
-                code    = code + 65;        // upper case letters
-        }
-        else
-		    code	    = code + 32;
-        if (code == 127)
-            alert('origCode=' + origCode);
-		newPass[i]	    = code;
+		var code	    = randArray[i] % charset.length;
+		password	    += charset.substr(code, 1);
     }
-    var password	    = String.fromCharCode.apply(null, newPass);
     var outputElement	= document.getElementById('randomPassword');
-    outputElement.value	= password.trim();
+    outputElement.value	= password;
     return false;
 }		// function generatePassword
 

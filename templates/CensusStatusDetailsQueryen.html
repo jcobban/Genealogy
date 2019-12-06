@@ -1,0 +1,236 @@
+<!--*********************************************************************
+ *  CensusStatusDetailsUpdateen.html									*
+ *																		*
+ *  This template displays the current transcription status of every	*
+ *  page in a selected enumeration division of any of the supported     *
+ *  censuses.                                                           *
+ *																		*
+ *  History:															*
+ *		2019/11/27      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+	<div id="breadcrumbs" class="hidden">
+	    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+	    <a href="/genCountry.php?cc=$CC&lang=$LANG">$COUNTRYNAME</a>:
+	    <a href="/genCensuses.php?cc=$CC&lang=$LANG">Censuses</a>:
+        <a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&Province=$PROVINCE&lang=$LANG">
+            $PROVINCENAME
+        </a>:
+        <a href="/database/ReqUpdate.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICTID&amp;SubDistrict=$SUBDISTRICTID&amp;Division=$DIVISION&amp;lang=$LANG">
+            Update $CENSUSYEAR Census of $COUNTRYNAME
+        </a>:
+		<a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&amp;lang=$LANG">
+			Status Summary
+        </a>:
+        <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;District=$DISTRICTID&amp;lang=$LANG">
+            District $DISTRICTID $DISTRICTNAME Summary
+        </a>:
+	</div>
+    <div class="body">
+      <h1>
+        $CENSUSYEAR Census of Canada Division Status
+        <span class="right">
+		  <a href="CensusUpdateStatusDetailsHelpen.html" target="help">? Help</a>
+        </span>
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <div class="center" id="topBrowse">
+		<span class="left" id="topPrev">
+		    <a href="CensusUpdateStatusDetails.php$NPPREV&lang=$LANG"
+				id="toPrevDiv">
+				&lt;---
+		    </a>
+		</span>
+		<span class="right" id="topNext">
+            <a href="CensusUpdateStatusDetails.php$NPNEXT&lang=$LANG"
+				id="toNextDiv">
+				---&gt;
+		    </a>
+		</span>
+        <span class="label">District 
+		  $DISTRICTID $DISTRICTNAME, SubDistrict $SUBDISTRICTID $SUBDISTRICTNAME
+		  <span id="divisionPart">Div $DIVISION</span>
+        </span>
+        <span style="clear: both;"></span>
+      </div>
+      <form name="divForm" action="donothing.php">
+		<input type="hidden" id="Census" value="$CENSUSID">
+		<input type="hidden" id="Province" value="$PROVINCE">
+		<input type="hidden" id="District" value="$DISTRICTID">
+		<input type="hidden" id="SubDistrict" value="$SUBDISTRICTID">
+		<input type="hidden" id="Division" value="$DIVISION">
+        <!--- Put out the response as a table -->
+        <table border="1" id="dataTable">
+          <thead>
+            <!--- Put out the column headers -->
+            <tr>
+		      <th class="colhead">
+		        Page
+		      </th>
+		      <th class="colhead">
+		        Done
+		      </th>
+		      <th class="colhead">
+		        %Done
+		      </th>
+		      <th class="colhead">
+		        %Linked
+		      </th>
+		      <th class="colhead">
+		        Transcriber
+		      </th>
+		      <th class="colhead" id="proofHead1">
+		        Proofreader
+		      </th>
+		      <th class="colhead" $COLSPAN2>
+		        Action
+		      </th>
+		      <th class="colhead">
+		        &nbsp;
+		      </th>
+		      <th class="colhead">
+		        Page
+		      </th>
+		      <th class="colhead">
+		        Done
+		      </th>
+		      <th class="colhead">
+		        %Done
+		      </th>
+		      <th class="colhead">
+		        %Linked
+		      </th>
+		      <th class="colhead">
+		        Transcriber
+		      </th>
+		      <th class="colhead" id="proofHead2">
+		        Proofreader
+		      </th>
+		      <th class="colhead" $COLSPAN2>
+		        Action
+		      </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="detail$page">
+			  <td class="$pageclass">
+			    $page 
+			  </td>
+			  <td class="dataright">
+			    $namecount 
+			  </td>
+			  <td class="$pctclassdone">
+			    $pctdone 
+			  </td>
+			  <td class="$pctclasslinked">
+			    $pctlinked 
+			  </td>
+			  <td class="dataleft">
+			    $pt_transcriber 
+			  </td>
+			  <td class="dataleft" id="ProofreaderCol">
+			    $pt_proofreader 
+			  </td>
+			  <td class="center"> <!-- button to edit the page-->
+			      <button type="button" id="Edit$page">
+					View 
+			      </button>
+			  </td>
+	        </tr>
+	      </tbody>
+	      <tfoot>
+	        <tr>	<!-- separate total from details with empty row -->
+	        </tr>
+	        <tr>	<!-- totals row -->
+			  <td class="dataright">
+			    Total
+			  </td>
+			  <td class="dataright">
+			    $DONE 
+			  </td>
+			  <td class="$PCTCLASSDONE">
+			    $PCTDONE 
+			  </td>
+			  <td class="$PCTCLASSLINKED">
+			    $PCTLINKED
+			  </td>
+	        </tr>	<!-- totals row -->
+	      </tfoot>
+	    </table>
+	  </form>
+      <p id="deletedLines">Deleted $COUNT
+		lines in completely blank pages of the transcription.</p>
+      <form action="CensusUpdateStatusDetails.php" method="get"
+          name="buttonForm" id="buttonForm">
+		<input type="hidden" name="Census" value="$CENSUSID">
+		<input type="hidden" name="Province" value="$PROVINCE">
+		<input type="hidden" name="District" value="$DISTRICTID">
+		<input type="hidden" name="SubDistrict" value="$SUBDISTRICTID">
+		<input type="hidden" name="Division" value="$DIVISION">
+		<input type="hidden" name="ShowProofreader" value="$SHOWPROOFREADER">
+		<button type="submit" id="changeProof">
+		   <span id="donot">Do not</span>
+		    Show Proofreader
+		</button>
+      </form>
+    </div> <!-- class="body" -->
+    <div id="messages" class="hidden">
+	  <span id="censusMissing">
+		Census parameter missing.
+      </span>
+	  <span id="provinceMissing">
+		Province parameter missing for Census identifier '$censusId'.
+      </span>
+	  <span id="censusReplaced">
+		Census identifier '$censusId' is replaced by '$newCensusId'. 
+      </span>
+	  <span id="censusUndefined">
+		Census identifier '$censusId' is not defined. 
+      </span>
+	  <span id="districtMissing">
+		District parameter missing. 
+      </span>
+	  <span id="districtUndefined">
+		District number $districtId is not defined for Census identifier '$censusId'.
+      </span>
+	  <span id="subdistrictMissing">
+		SubDistrict parameter missing.
+      </span>
+	  <span id="subdistrictUndefined">
+		Sub-District ID '$subdistrictId' is not defined within 
+            District number $districtId of Census identifier '$censusId'.
+      </span>
+	  <span id="unexpected">
+        Unexpected parameter $key=$value. 
+      </span>
+    </div>
+    <!-- mouse over popups-->
+	<div id="mousetoPrevDiv" class="popup">
+	  <p class="large">Go to Subdistrict $PREVSD Division $PREVDIV&nbsp;
+      </p>
+	</div>
+	<div id="mousetoNextDiv" class="popup">
+	  <p class="large">Go to Subdistrict $NEXTSD Division $NEXTDIV&nbsp;
+      </p>
+	</div>
+	<div class="balloon" id="HelpEdit">
+	    Click on this button to edit the transcription of this page.
+	</div>
+	<div class="balloon" id="HelpUpload">
+	    Click on this button to upload the transcription of this page to
+	    the production server.
+	</div>
+	<div class="balloon" id="HelpchangeProof">
+	    Click on this button to enable or disable display of the proofreader id.
+	</div>
+    <script src= '/jscripts/CommonForm.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= 'CensusUpdateStatusDetails.js' type="text/javascript">
+    </script>

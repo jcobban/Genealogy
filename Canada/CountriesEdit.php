@@ -186,6 +186,9 @@ if (isset($_POST) && count($_POST) > 0)
 	    $warn	.= $parmsText . "</table>";
 }		// when submit button is clicked invoked by method='post'
 
+if (canUser('all'))
+	$action		= 'Admin';
+else
 if (canUser('edit'))
 	$action		= 'Update';
 else

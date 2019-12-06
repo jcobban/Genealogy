@@ -1,0 +1,108 @@
+<!--*********************************************************************
+ *  PageUpdateen.html												    *
+ *																		*
+ *  Template to display the results of updating the Pages table.        *
+ *  Note that this page is only displayed if there are errors to        *
+ *  report.                                                             *
+ *																		*
+ *  History:															*
+ *      2019/12/04      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/genealogy.php?lang=$LANG">
+        Genealogy</a>: 
+      <a href="/genCountry.php?cc=$CC&lang=$LANG">
+		$COUNTRYNAME</a>:
+      <a href="/database/genCensuses.php?lang=$LANG">
+        Censuses</a>:
+      <a href="/database/EditCensuses.php?lang=$LANG">
+        Censuses Admin</a>:
+      <a href="/database/DistForm.php?Census=$CENSUSID&Province=$PROVINCE&lang=$LANG">
+	    $CENSUSID Districts Admin</a>:
+      <a href="/database/ReqUpdateSubDists.php?Census=$CENSUSID&Province=$PROVINCE&District=$DISTID&lang=$LANG">
+	    Select Sub-District</a>:
+      <a href="SubDistForm.php?Census=$CENSUSID&Province=$PROVINCE&District=$DISTID&lang=$LANG">
+	    District $DISTID $DISTNAME SubDistricts Admin</a>:
+	  <a href="ReqUpdatePages.php?Census=$CENSUSID&Province=$PROVINCE&District=$DISTID&SubDistrict=$SUBDISTID&lang=$LANG">
+	    Select Division</a>:
+    </div> <!-- id="breadcrumbs" -->
+    <div class='body'>
+      <h1>
+	        Census Page Table Update
+        <span class='right'>
+	      <a href='PageHelpen.html' target='help'>? Help</a>
+        </span>
+        <div style='clear: both;'></div>
+      </h1>
+      $TRACE
+      $MSG
+      <form name='actForm'>
+        <!-- Specify next district to update -->
+        <p>
+	      <button id='newReq'
+	        onclick="location='ReqUpdatePages.php$search'; return false;">
+	        Specify next district to update
+	      </button>
+
+          <!-- Short cut to update next division of census -->
+        </p>
+        <p id="gotoNext">
+    	  <button id='nextDiv'
+			onclick="location='PageForm.php$npnext;?>'; return false;">
+	        Update next division ($nextSd - $nextDiv) 
+	        in current district
+	      </button>
+        </p>
+        <!-- Short cut to update previous division of census -->
+        <p if="gotoPrev">
+	      <button name='prevDiv'
+			onclick="location='PageForm.php$npprev'; return false;"; >
+	        Update previous division ($prevSd - $prevDiv) 
+	        in current district
+	      </button>
+        </p>
+      </form>
+    </div> <!-- class='body' -->
+    <div class="hidden" id="messages">
+        <span id="notAuthorized">
+            The database has not been updated because
+            you are not permitted to update this table.  
+        </span>
+        <span id="censusMissing">
+            Census parameter missing. 
+        </span>
+        <span id="provinceInvalid">
+            Province Code '$province' not recognized. 
+        </span>
+        <span id="districtMissing">
+            District parameter missing. 
+        </span>
+        <span id="districtInvalid">
+            District number '$distId' not numeric.  
+        </span>
+        <span id="subdistrictMissing">
+            SubDistrict parameter missing. 
+        </span>
+        <span id="subdistrictUndefined">
+            Enumeration division not defined: 
+				census='$censusId', distid='$distId', id='$subdistId', 
+				div='$division'. 
+        </span>
+    </div>
+    <div class='balloon' id='helpnewReq'>
+        Click on this button to go to the search dialog.
+    </div>
+    <div class='balloon' id='helpnextDiv'>
+        Click on this button to go to the next division in this District.
+    </div>
+    <div class='balloon' id='helpprevDiv'>
+        Click on this button to go to the previous division in this District.
+    </div>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= '/database/PageUpdate.js' type="text/javascript">
+    </script>

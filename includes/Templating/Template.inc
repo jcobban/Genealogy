@@ -131,6 +131,8 @@ use \Genealogy\RecordSet;
  *                  report them as warnings                             *
  *                  ensure $msg an $warn are defined in case this       *
  *                  is not invoked as part of the Genealogy app         *
+ *      2019/12/04  add support for array and object references in      *
+ *                  substitution names                                  *
  *	    									                            *
  *  Copyright &copy; 2019 James A. Cobban All Rights Reserved			*
  ************************************************************************/
@@ -215,6 +217,18 @@ class Template implements ArrayAccess
 
     const	OPEN_BRACE		= '{{';
     const	CLOSE_BRACE		= '}}';
+
+    // the pattern match for a name cannot be
+    // just \w+ because that would match $15
+    // the first character of the name must not be a digit
+    // or an ASCII special character but may be any
+    // Unicode character that is not in the ASCII set
+    // the template engine does not care about the contents
+    // of the "name" but for consistency this pattern
+    // is designed to match the syntax supported by PHP
+    // which includes an optional subscript or
+    // reference to a member of an object
+    const   NAME_PATT       = '/^[a-zA-Z_\x{0080}-\x{FFFF}][\w\x{0080}-\x{FFFF}]*(\[-?\w+\](\[-?\w+\]|)|->[a-zA-Z_\x{0080}-\x{FFFF}][\w\x{0080}-\x{FFFF}]*)?/u';
     /********************************************************************
      *	function Template::__construct							    	*
      *													                *
@@ -293,7 +307,7 @@ class Template implements ArrayAccess
         else
         {
             $warn	.= "<p>Invalid parameter to Template constructor " .
-                           escape(print_r($init,true)) . "</p>\n";
+                           gettype($init) . "</p>\n";
             $this->mainValid	= false;
         }
     }		// method Template::construct
@@ -360,14 +374,6 @@ class Template implements ArrayAccess
     {
         global	$warn;
 
-        if (is_array($value) || is_object($value) || is_null($value))
-        {
-            if ($this->debug)
-            $warn	.= "<p>Template::set: " . __LINE__ .
-            " Invalid value for field '$field' replaced by empty string</p>\n";
-            $value	= '';
-        }
-        
         if ($doSubs)
         {
             $ttemplate		        = new Template($value, true);
@@ -606,86 +612,87 @@ class Template implements ArrayAccess
     {
         global $warn;
 
-        $pieces			= array();
+        $pieces			            = array();
         if ($this->phpMode)
         {			// extract $name style substitutions
-            $start			= 0;
-            $piece			= '';
-            $name			= '';
-            $prevChar			= '';
-            $lbrace			= '{';
-            $rbrace			= '}';
+            $start			        = 0;
+            $piece			        = '';
+            $name			        = '';
+            $prevChar			    = '';
+            $LBRACE			        = '{';
+            $RBRACE			        = '}';
             while(($cursor = strpos($template, '$', $start)) !== false)
             {			// loop through template
                 if ($cursor > 0)
-                    $prevChar	= $template[$cursor - 1];
+                    $prevChar	    = $template[$cursor - 1];
                 if ($prevChar == '\\')
                 {		// escaped dollar sign
-                    $piece		.= substr($template,
-                                                  $start,
-                                                  $cursor - $start - 1) .
-                                                  '$';
-                    $start		= $cursor + 1;
+                    $piece		    .= substr($template,
+                                              $start,
+                                              $cursor - $start - 1) .
+                                              '$';
+                    $start		    = $cursor + 1;
                 }		// escaped dollar sign
                 else
-                if ($prevChar == $lbrace)
+                if ($prevChar == $LBRACE)
                 {		// complex syntax insertion
-                    $piece		.= substr($template,
-                                                  $start,
-                                                  $cursor - $start - 1);
+                    $piece		    .= substr($template,
+                                              $start,
+                                              $cursor - $start - 1);
                     if (strlen($name) > 0 || strlen($piece) > 0)
-                        $pieces[]		= array($name, $piece);
-                    $piece		= '';
+                        $pieces[]	= array($name, $piece);
+                    $piece		    = '';
                     $cursor++;	// advance over $ sign
-                    $end		= strpos($template, $rbrace, $cursor);
-                    $name		= substr($template, $cursor, $end-$cursor);
+                    $end		    = strpos($template, $RBRACE, $cursor);
+                    $name		    = substr($template, $cursor, $end-$cursor);
                     // note that PHP permits the value of $name in this
                     // case to be an arbitrary expression, but this
                     // implementation requires it to be the name of
                     // a substitution value so the $ is stripped off
                     // the front
-                    $start		= $end + 1;	// advance over rbrace
+                    $start		    = $end + 1;	// advance over rbrace
                 }		// complex syntax insertion
                 else
                 {		// basic syntax
-                    $piece		.= substr($template,
-                                                  $start,
-                                                  $cursor - $start);
-                    $matches	= array();
+                    $piece		    .= substr($template,
+                                              $start,
+                                              $cursor - $start);
+                    $matches	    = array();
                     // the pattern match for a name cannot be
                     // just \w+ because that would match $15
-                    if (preg_match('/^([a-zA-Z_]\w*|{([a-zA-Z_]\w*)})/',
+                    if (preg_match(self::NAME_PATT,
                                    substr($template, $cursor + 1),
-                                    $matches))
+                                   $matches))
                     {		// have a valid variable name
-                        $tname		= $matches[count($matches) - 1];
+                        $tname		= $matches[0];
                         if (strlen($name) > 0 || strlen($piece) > 0)
                         {
                             $pieces[]	= array($name, $piece); 
                         }
-                        $name		= $tname;
                         $piece		= '';
-                        $start		= $cursor + strlen($matches[0]) + 1;
+                        $name       = $tname;
+                        $start		= $cursor + strlen($name) + 1;
                     }		// have a valid variable name
                     else
                     {		// a dollar sign as ordinary text
+                            escape(substr($template, $cursor + 1, 20)) . "</p>\n";
                         // for example $15.25 will come here
                         $piece		.= '$';
-                        $start	= $cursor + 1;
+                        $start	    = $cursor + 1;
                     }		// a dollar sign as ordinary text
                 }		// basic syntax
             }			// loop through template
-            $piece			.= substr($template, $start);
+            $piece			        .= substr($template, $start);
             if (strlen($name) > 0 || strlen($piece) > 0)
-                $pieces[]		= array($name,
-                                                $piece);
+                $pieces[]	    	= array($name,
+                                            $piece);
         }			// extract $name style substitutions
         else
         {			// extract {{name}} style substitutions
-            $temp		= explode(self::OPEN_BRACE, $template);
+            $temp		            = explode(self::OPEN_BRACE, $template);
             foreach($temp as $piece)
             {
-                $split	= explode(self::CLOSE_BRACE, $piece);
+                $split	            = explode(self::CLOSE_BRACE, $piece);
                 if (count($split) > 1)
                 {
                     $name		= trim($split[0]);
@@ -792,45 +799,101 @@ class Template implements ArrayAccess
         $pieces			= $this->breakTemplate($this->page);
         // start rebuilding the page while applying substitutions
         if (count($pieces) > 0)
-        {			// there are substitution points
-            $page	= '';	// start rebuilding with subs
+        {			            // there are substitution points
+            $page	= '';	    // start rebuilding with subs
             foreach($pieces as $piece)
-            {		// loop through all substitutions
-                $name		= $piece[0];
-                $rawtext	= $piece[1];
+            {		            // loop through all substitutions
+                $name		        = $piece[0];
+                $rawtext	        = $piece[1];
+
                 if (strlen($name) > 0)
-                {		// insert value of fields[$name]
+                {		        // insert value of fields[$name]
+                    $lbpos          = strpos($name, '[');
+                    $arpos          = strpos($name, '->');
+                    $subscript      = '';
+                    $member         = '';
+                    if ($lbpos !== false)
+                    {           // subscript present
+                        $subscript  = substr($name, $lbpos);
+                        $name       = substr($name, 0, $lbpos);
+                    }           // subscript present
+                    else
+                    if ($arpos !== false)
+                    {           // member reference present
+                        $member     = subscript($name, $arpos + 2);
+                        $name       = subscript($name, 0, $lbpos);
+                        $warn       .= "<p>Template.inc: " . __LINE__ .
+                            " found substitution for '$name' with member reference '$member'</p>\n";
+                    }           // member reference present
+                    
                     if (array_key_exists($name, $this->fields))
-                    {
+                    {               // name found in substitutions
                         $replace	= $this->fields[$name];
                         if (is_string($replace) || is_numeric($replace))
-                        {
-                            if ($this->debug)
-                                $warn	.= "<p>Template::compile: " . __LINE__ .
-                                           " name='$name', replace='" .
-                                           escape($replace). "' before '" . 
-                                           escape($rawtext) . "'</p>\n";
+                        {               // replacement value is simple value
                             $page		.= $replace;
-                        }
+                        }               // replacement value is simple value
                         else
-                        if (is_array($replace) && count($replace) == 0)
-                        {}
+                        if (is_array($replace))
+                        {               // replacement value is array
+                            if (count($replace) > 0 && strlen($subscript) > 0)
+                            {
+                                if (preg_match('/\[(\w+)\](\[(\w+)\]|)/',
+                                               $subscript,
+                                               $subs))
+                                {
+                                    $sub1       = $subs[1];
+                                    if (ctype_digit($sub1))
+                                        $sub1   = intval($sub1);
+                                    if (array_key_exists($sub1, $replace))
+                                    {
+                                        $val            = $replace[$sub1];
+                                        if (is_array($val) && count($subs) > 3)
+                                        {       // 2 subscripts
+                                            $sub2       = $subs[3];
+                                            if (ctype_digit($sub2))
+                                                $sub2   = intval($sub2);
+                                            if (array_key_exists($sub2, $val))
+                                            {
+                                                $page   .= $val[$sub2];
+                                            }
+                                        }       // 2 subscripts
+                                        else
+                                            $page       .= $val;
+                                    }
+                                }
+                                else
+                                    $warn	.= "<p>Template::compile: " . __LINE__ .
+                                                " '$subscript' does not match pattern</p>\n";
+
+                            }
+                        }               // replacement value is array
+                        else
+                        if (is_object($replace))
+                        {               // replacement value is object
+                            if (strlen($member) > 0)
+                            {           // get value from member
+                                $page   .= $replace->$member;
+                            }           // get value from member
+                        }               // replacement value is object
                         else
                         if (is_bool($replace))
-                        {
+                        {               // replacement value is boolean
                             if ($replace)
                                 $page   .= 'true';
                             else
                                 $page   .= 'false';
-                        }
+                        }               // replacement value is boolean
                         else
                         if (!is_null($replace))
+                        {               // unsupported
                             $warn	.= "<p>Template::compile: " . __LINE__ . 
                             " name='$name', replace=" . gettype($replace) .
                             ' ' .
                                 escape(print_r($replace,true)). ", before '" . 
                                 escape($rawtext) . "'</p>\n";
-                    }
+                        }               // unsupported
+                    }               // name found in substitutions
                     else
                     if ($this->phpMode)
                     {		// $name style insertions
@@ -1313,77 +1376,77 @@ class Template implements ArrayAccess
 
         if (is_null($tag))
         {
-            $tag		= $this->dom;
-            $template		= $this->page;
+            $tag		            = $this->dom;
+            $template		        = $this->page;
             if (is_null($template))
                 throw new Exception("Template::findInsertions: " .
                                     "called before template loaded");
         }
         else
         {
-            $template		= $tag->outerHTML();
+            $template		        = $tag->outerHTML();
         }
-        $insertions		= array();
+        $insertions		            = array();
 
         if ($this->phpMode)
-        {			// extract $name style substitutions
-            $start			= 0;
-            $cursor			= 0;
-            $name			= '';
-            $prevChar			= '';
-            $lbrace			= '{';	// confuses editors if literal
-            $rbrace			= '}';	// confuses editors if literal
+        {			            // extract $name style substitutions
+            $start			        = 0;
+            $cursor			        = 0;
+            $name			        = '';
+            $prevChar			    = '';
+            $LBRACE			        = '{';	// confuses editors if literal
+            $RBRACE			        = '}';	// confuses editors if literal
             while(($cursor = strpos($template, '$', $cursor)) !== false)
-            {			// loop through template
+            {			        // loop through template
                 if ($cursor > 0)
-                    $prevChar	= substr($template, $cursor - 1, 1);
+                    $prevChar	    = substr($template, $cursor - 1, 1);
                 if ($prevChar == '\\')
-                {		// escaped dollar sign
+                {		        // escaped dollar sign
                     $cursor++;	// advance over literal dollar sign
-                }		// escaped dollar sign
+                }		        // escaped dollar sign
                 else
-                if ($prevChar == $lbrace)
-                {		// complex syntax insertion
+                if ($prevChar == $LBRACE)
+                {		        // complex syntax insertion
                     // insertion point starts at the left brace	
-                    $start		= $cursor - 1;
+                    $start		    = $cursor - 1;
                     $cursor++;	// advance over $ sign
                     // insertion is terminated only by a close brace
-                    $end		= strpos($template,
-                                                    $rbrace,
+                    $end		    = strpos($template,
+                                                    $RBRACE,
                                                     $cursor);
                     if ($end === false)
-                    {		// close brace not found before end of template
+                    {		    // close brace not found before end of template
                         $end		= strlen($template);
                         $name		= substr($template, 
-                                                    $cursor, 
-                                                    $end - $cursor);
+                                             $cursor, 
+                                             $end - $cursor);
                         $cursor		= $end;
-                    }		// close brace not found before end of template
+                    }		    // close brace not found before end of template
                     else
-                    {		// found close brace
+                    {		    // found close brace
                         $name		= substr($template, 
-                                                    $cursor, 
-                                                    $end - $cursor);
+                                             $cursor, 
+                                             $end - $cursor);
                         $cursor		= $end + 1;	// advance over rbrace
-                    }		// found close brace
+                    }		    // found close brace
                     $insertions[]	= array($start,
-                                                $cursor - $start, 
-                                                $name,
-                                                $tag);
+                                            $cursor - $start, 
+                                            $name,
+                                            $tag);
 
-                }		// complex syntax insertion
+                }		        // complex syntax insertion
                 else
-                {		// basic syntax
-                    $start		= $cursor;
+                {		        // basic syntax
+                    $start		    = $cursor;
                     $cursor++;	// advance over the $
-                    if (substr($template, $cursor, 1) == $lbrace)
-                    {		// name enclosed in braces
+                    if (substr($template, $cursor, 1) == $LBRACE)
+                    {		    // name enclosed in braces
                         $cursor++;// advance over left brace
-                        $end		= strpos($template, $rbrace,$cursor);
+                        $end		= strpos($template, $RBRACE,$cursor);
                         if ($end === false)
-                        {	// end of template
+                        {	    // end of template
                             $end	= strlen($template);
-                        }	// end of template
+                        }	    // end of template
                         $name		= substr($template,
                                                     $cursor,
                                                     $end - $cursor);
@@ -1392,26 +1455,16 @@ class Template implements ArrayAccess
                                                 $cursor - $start, 
                                                 $name,
                                                 $tag);
-                    }		// variable name enclosed in braces
+                    }		    // variable name enclosed in braces
                     else
-                    {		// simple variable name
-                        $matches		= array();
-                        // the pattern match for a name cannot be
-                        // just \w+ because that would match $15
-                        // the first character of the name must not be a digit
-                        // or an ASCII special character but may be any
-                        // Unicode character that is not in the ASCII set
-                        // the template engine does not care about the contents
-                        // of the "name" but for consistency this pattern
-                        // is designed to match the syntax supported by PHP
-                        // which includes an optional subscript or
-                        // reference to a member of an object
-                        if (preg_match('/^[a-zA-Z_\x{0080}-\x{FFFF}][\w\x{0080}-\x{FFFF}]*(\[-?\w+\]|->[a-zA-Z_\x{0080}-\x{FFFF}][\w\x{0080}-\x{FFFF}]*)?/u',
+                    {		    // simple variable name
+                        $matches	        = array();
+                        if (preg_match(self::NAME_PATT,
                                        substr($template, $cursor),
                                        $matches))
                         {		// have a valid variable name
-                            $name		= $matches[0];
-                            $cursor		+= strlen($name);
+                            $name	        = $matches[0];
+                            $cursor     	+= strlen($name);
                             $insertions[]	= array($start,
                                                 	$cursor - $start, 
                                                 	$name,
@@ -1421,50 +1474,50 @@ class Template implements ArrayAccess
                         {		// a dollar sign as ordinary text
                             // for example $15.25 will come here
                         }		// a dollar sign as ordinary text
-                    }		// not enclosed in braces
-                }		// basic syntax
-            }			// loop through template
-        }			// extract $name style substitutions
+                    }		    // not enclosed in braces
+                }		        // basic syntax
+            }			        // loop through template
+        }			            // extract $name style substitutions
         else
-        {			// extract {{name}} style substitutions
-            $start			= 0;
-            $cursor			= 0;
-            $name			= '';
+        {			            // extract {{name}} style substitutions
+            $start			        = 0;
+            $cursor			        = 0;
+            $name			        = '';
             while(($cursor = strpos($template, self::OPEN_BRACE , $cursor)) !== false)
-            {			// loop through template
-                $start			= $cursor;
-                $cursor			= strpos($template, self::CLOSE_BRACE, $cursor);
+            {			        // loop through template
+                $start			    = $cursor;
+                $cursor			    = strpos($template, self::CLOSE_BRACE, $cursor);
                 if ($cursor === false)
-                {		// not found before end of template
-                    $cursor		= strlen($template);
-                    $name		= substr($template,
-                                                    $start + 2,
-                                                    $cursor - $start - 2);
+                {		        // not found before end of template
+                    $cursor		    = strlen($template);
+                    $name		    = substr($template,
+                                             $start + 2,
+                                             $cursor - $start - 2);
                     $insertions[]	= array($start,
-                                                $cursor - $start, 
-                                                $name,
-                                                $tag);
+                                            $cursor - $start, 
+                                            $name,
+                                            $tag);
                     break;
-                }		// not found before end of template
+                }		        // not found before end of template
                 else
-                {		// found delimiter of insertion point
-                    $name		= substr($template,
-                                                    $start + 2,
-                                                    $cursor - $start - 2);
-                    $cursor		+= 2;
+                {		        // found delimiter of insertion point
+                    $name		    = substr($template,
+                                             $start + 2,
+                                             $cursor - $start - 2);
+                    $cursor		    += 2;
                     $insertions[]	= array($start,
-                                                $cursor - $start, 
-                                                $name,
-                                                $tag);
-                }		// found delimiter of insertion point
-            }			// loop through template
-        }			// extract {{name}} style substitutions
+                                            $cursor - $start, 
+                                            $name,
+                                            $tag);
+                }		        // found delimiter of insertion point
+            }			        // loop through template
+        }			            // extract {{name}} style substitutions
 
         // identify the sub-tag of the template containing each insertion point 
         if ($tag != null && $tag != $this->dom)
-        {			// only for tag specific updates
+        {			            // only for tag specific updates
             $tag->updateInsertions($insertions);
-        }			// only for tag specific updates
+        }			            // only for tag specific updates
 
         return $insertions;
     }		// function findInsertions

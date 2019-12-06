@@ -95,17 +95,30 @@ $provinces		        = $census['provinces'];
 $country		        = new Country(array('code' => $cc));
 $countryName	        = $country->get('name');
 
-$template               = new FtTemplate("CensusReqUpdate$cc$lang.html");
+$tempBase		        = $document_root . '/templates/';
+if (file_exists($tempBase . "CensusReqUpdate$cc" . "en.html"))
+    $template           = new FtTemplate("CensusReqUpdate$cc$lang.html");
+else
+    $template           = new FtTemplate("CensusReqUpdate__$lang.html");
 
 if (!$census->isExisting())
     $warn	.= "<p>Census '$censusId' not pre-defined.</p>\n";
 
+$domainset	            = new DomainSet(array('cc'	        => $cc,
+                                              'language'	=> $lang));
+if (count($domainset) > 0)
+{
+    $domain             = $domainset->rewind();
+    $code               = $domain['domain'];
+    $cl                 = strlen($code) - 2;
+}
+else
+    $cl                 = 2;
 $provList               = array();
-for($io = 0; $io < strlen($provinces); $io += 2)
+for($io = 0; $io < strlen($provinces); $io += $cl)
 {		        // loop through provinces
-    $province		    = substr($provinces, $io, 2);
-    $domainObj	        = new Domain(array('domain' => $cc . $province,
-                                           'lang'   => $lang));
+    $province		    = substr($provinces, $io, $cl);
+	$domainObj	        = $domainset["$cc$province"];
     $provinceName	    = $domainObj->get('name');
     if ($census->get('collective'))
         $provList[]     = array('censusid'      => $province . $censusYear,

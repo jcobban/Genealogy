@@ -900,8 +900,7 @@ function showPageTable()
 						"&ImageBase=" + imageBase +
 						"&RelFrame=" + relFrame +
                         "&lang=" + lang,
-				"PageTable",
-				"resizable=yes,scrollbars=yes,status=yes");
+				"_blank");
 }		// showPageTable
 
 /************************************************************************

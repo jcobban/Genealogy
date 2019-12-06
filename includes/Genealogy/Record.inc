@@ -2307,8 +2307,8 @@ class Record implements Iterator, ArrayAccess
 
 		if ($valid)
 		{			// valid table
-		    $surnameRec	= new Surname(array('surname' => $surname));
-		    $pattern	= $surnameRec->get('pattern');
+		    $surnameRec	        = new Surname(array('surname' => $surname));
+		    $pattern	        = $surnameRec->get('pattern');
 		    if ($pattern != '')
 		    {		// use pattern match rather than soundex
 				return $table . ".Surname REGEXP '$pattern'";
@@ -2316,9 +2316,12 @@ class Record implements Iterator, ArrayAccess
 		    else
 		    {		// use soundex match
 				// remove question marks
-				$surname	= str_replace('?', '', $surname);
-				$surnameCmp	= $table . ".SoundsLike=LEFT(SOUNDEX(" .
-							    $connection->quote($surname) . "),4)";
+                $surname	    = str_replace('?', '', $surname);
+                $sxtable        = $table;
+                if ($table == 'tblNX')
+                    $sxtable    = 'tblNR';
+				$surnameCmp	    = $sxtable . ".SoundsLike=LEFT(SOUNDEX(" .
+							        $connection->quote($surname) . "),4)";
 				if (substr($surname, strlen($surname) - 1, 1) == 's')
 				{		// also try soundex without final s
 				    $tsurname	= substr($surname, 0, strlen($surname) - 1);
@@ -2329,7 +2332,7 @@ class Record implements Iterator, ArrayAccess
 				    $tsurname	= $surname . 's';
 				    $tsurname	= $connection->quote($tsurname);
 				}		// also try soundex with final s
-				$surnameCmp	.= " OR " . $table .
+				$surnameCmp	.= " OR " . $sxtable .
 							".SoundsLike=LEFT(SOUNDEX($tsurname),4)";
 
 				if (strlen($surname) > 4)
@@ -3367,7 +3370,13 @@ function debugPrepQuery($query, $sqlParms, $escape = true)
 			for($i = 1; $i < count($queryParts); $i++)
 			{
 			    $matches		= array();
-			    $text	    	= $queryParts[$i];
+                $text	    	= $queryParts[$i];
+                if (substr($text, 0, 1) == '=')
+                {           // variable assignment
+                    $queryText  .= ':' . $text;
+                    continue;
+                }           // variable assignment
+
 			    if (preg_match('/^(\w+)(.*)$/s', $text, $matches) == 0)
 			    {
 					ob_start();

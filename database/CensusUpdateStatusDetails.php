@@ -14,6 +14,7 @@ use \Exception;
  *		SubDistrict		sub-district letter or number within			*
  *						the district									*
  *		Division		enumeration division within the sub-district	*
+ *		Page            page number to highlight                        *
  *		ShowProofreader	if true show proofreader's id in column			*
  *																		*
  *  History:															*
@@ -88,35 +89,41 @@ use \Exception;
  *		2018/01/17		correct error in delete empty pages code		*
  *						parameter list of new CensusLineSet changed		*
  *		2018/11/08      improve parameter error checking                *
+ *		2018/11/29      use Template                                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/District.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
 require_once __NAMESPACE__ . '/Page.inc';
 require_once __NAMESPACE__ . '/CensusLineSet.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // default values if not specified
-$censusId				= '';
-$censusYear				= '';
-$districtId		    	= '';
-$districtName		   	= 'unresolved';
-$subdistrictId			= '';
-$subdistrictName		= 'unresolved';
-$division				= '';
-$province				= '';
-$cc				        = 'CA';
-$countryName			= 'Canada';
-$domain 				= '';
-$npprev		    		= '';
-$prevSd 				= '';
-$prevDiv				= '';
-$npnext		    		= '';
-$nextSd		    		= '';
-$nextDiv				= '';
-$lang		    		= 'en';
-$showProofreader	    = false;
+$censusId						= '';
+$censusYear						= '';
+$districtId		    			= '';
+$districtName		   			= 'unresolved';
+$subdistrictId					= '';
+$subdistrictName				= 'unresolved';
+$division						= '';
+$highlightpage                  = null;
+$province						= '';
+$provinceName					= '';
+$cc				        		= 'CA';
+$countryName					= 'Canada';
+$domain 						= '';
+$domainName 					= 'Canada';
+$npprev		    				= '';
+$prevSd 						= '';
+$prevDiv						= '';
+$npnext		    				= '';
+$nextSd		    				= '';
+$nextDiv						= '';
+$lang		    				= 'en';
+$showProofreader	    		= false;
+$unexpected                     = array();
 
 // obtain the parameters passed with the request
 foreach($_GET as $key => $value)
@@ -170,17 +177,23 @@ foreach($_GET as $key => $value)
 			break;
 	    }	        // division identifier
 
+	    case 'page':
+        {	        // page identifier
+            if (ctype_digit($value))
+			    $highlightpage	        = intval($value);
+			break;
+	    }	        // division identifier
+
 	    case 'showproofreader':
 	    {	        // proofreader option
 			if ($value == 'true')
-			    $showProofreader	= true;
+			    $showProofreader= true;
 			break;
 	    }	        // proofreader option
 
 	    case 'lang':
 	    {           // user's preferred language of communication
-			if (strlen($value) >= 2)
-			    $lang		= strtolower(substr($value,0,2));
+			$lang		        = FtTemplate::validateLang($value);
 			break;
 	    }           // user's preferred language of communication
 
@@ -191,69 +204,97 @@ foreach($_GET as $key => $value)
 
 	    default:
 	    {	        // unexpected parameter
-			$warn	.= "Unexpected parameter $key=$value. ";
+			$unexpected[$key]   = $value;
 			break;
 	    }	        // unexpected parameter
 
 	}	            // take action on parameter id
 }	            	// loop through parameters
 
+// some actions depend upon whether the user can edit the database
+if (canUser('edit'))
+{		// user can update database
+	$searchPage		= 'ReqUpdate.php';
+	$action			= 'Update';
+}		// user can updated database
+else
+{		// user can only view database
+	$searchPage		= 'QueryDetail' . $censusYear . '.html';
+	$action			= 'Query';
+}		// user can only view database
+
+$template           = new FtTemplate("CensusStatusDetails$action$lang.html");
+
 // the invoker must explicitly provide the Census year
 if (strlen($censusId) == 0)
 {
-    $msg	        .= 'Census parameter missing. ';
-    $censusId       = 'CA1881';
-    $census	        = new Census(array('censusid'	=> 'CA1881'));
+    $msg	            .= $template['censusMissing']->innerHTML;
+    $censusId           = 'CA1881';
+}
+
+$census	                = new Census(array('censusid'	=> $censusId));
+if ($census->isExisting())
+{
+    $censusYear 	    = $census['year'];
+    if ($census['collective'])
+    {               // simulated national census
+        if ($province == '')
+        {
+            $text       = $template['provinceMissing']->innerHTML;
+            $msg	    .= str_replace('$censusId', $censusId, $text); 
+        }
+        else
+        {
+            $text       = $template['censusReplaced']->innerHTML;
+            $newCensusId   = $province . $censusYear;
+            $warn       .= '<p>' .
+                            str_replace(array('$censusId', '$newCensusId'),
+                                        array($censusId, $newCensusId),
+                                        $text) . "</p>\n";
+            $censusId   = $newCensusId;
+            $census	    = new Census(array('censusid'	=> $censusId));
+        }
+    }               // simulated national census
+    else
+    if ($census['partof'])
+        $province	    = $census['province'];
+    $pctfactor	        = 100 / $census['linesPerPage'];
 }
 else
 {
-    $census	        = new Census(array('censusid'	=> $censusId));
-    if ($census->isExisting())
-    {
-	    $censusYear 	= substr($censusId, 2);
-        if ($census->get('collective'))
-        {
-            if ($province == '')
-            { 
-                $msg	.= 'Province parameter missing ' .
-                            "for Census identifier '$censusId'. ";
-            }
-            else
-            {
-                $censusId   = $province . $censusYear;
-                $census	    = new Census(array('censusid'	=> $censusId));
-            }
-        }
-        else
-	    if ($census->get('partof'))
-            $province	= substr($censusId, 0, 2);
-        $pctfactor	    = 100 / $census->get('linesPerPage');
-    }
-    else
-        $msg	.= "Census identifier '$censusId' is not supported. ";
+    $text               = $template['censusUndefined']->innerHTML;
+    $msg	            .= str_replace('$censusId', $censusId, $text); 
 }
 
 // the invoker must explicitly provide the District number
 if (strlen($districtId) == 0)
 {
-    $msg	        .= 'District parameter missing. ';
-    $district    = '';
+    $msg	            .= $template['districtMissing']->innerHTML;
 }
 else
 {                   // district number specified
-    $district       = new District(array('censusid'     => $census,
-                                         'id'           => $districtId));
+    $district           = new District(array('censusid'     => $census,
+                                             'id'           => $districtId));
     if ($district->isExisting())
+    {
         $districtName   = $district->get('name');
+    }
     else
-        $msg	.= "District number $districtId is not defined" .
-                    " for Census identifier '$censusId'. ";
+    {
+        $text           = $template['districtUndefined']->innerHTML;
+        $msg	        .= str_replace(array('$districtId','$censusId'), 
+                                       array($districtId, $censusId), 
+                                       $text); 
+    }
+    $province           = $district->get('province');
+    $domain             = $district->getDomain();
+    $provinceName       = $domain->getName();
 }                   // district number specified
 
 // the invoker must explicitly provide the SubDistrict identifier
 if (strlen($subdistrictId) == 0)
 {
-    $msg	        .= 'SubDistrict parameter missing. ';
+    $msg	            .= $template['subdistrictMissing']->innerHTML;
 }
 else
 {                   // sub-district number specified
@@ -285,531 +326,175 @@ else
 	    $nextDiv	    	= $subDistrict->getNextDiv();
     }
     else
-        $msg	.= "Sub-District ID '$subdistrictId' is not defined within " .
-            "District number $districtId of Census identifier '$censusId'. ";
+    {
+        $text               = $template['subdistrictUndefined']->innerHTML;
+        $msg	            .=
+            str_replace(array('$subdistrictId','$districtId','$censusId'), 
+                        array($subdistrictId, $districtId, $censusId), 
+                        $text);
+    } 
 }                   // sub-district number specified
 
-// some actions depend upon whether the user can edit the database
-if (canUser('edit'))
-{		// user can update database
-	$searchPage		= 'ReqUpdate.php';
-	$action			= 'Update';
-}		// user can updated database
+$template->set('CENSUSID',		    $censusId);
+$template->set('CENSUSYEAR',		$censusYear);
+$template->set('DISTRICTID',		$districtId);
+$template->set('DISTRICTNAME',		$districtName);
+$template->set('SUBDISTRICTID',		$subdistrictId);
+$template->set('SUBDISTRICTNAME',	$subdistrictName);
+$template->set('DIVISION',		    $division);
+$template->set('PROVINCE',		    $province);
+$template->set('PROVINCENAME',		$provinceName);
+$template->set('CC',		        $cc);
+$template->set('COUNTRYNAME',		$countryName);
+$template->set('DOMAIN',		    $domain);
+$template->set('DOMAINNAME',		$domainName);
+$template->set('PREVSD',		    $prevSd);
+$template->set('PREVDIV',		    $prevDiv);
+$template->set('NEXTSD',		    $nextSd);
+$template->set('NEXTDIV',		    $nextDiv);
+$template->set('LANG',		        $lang);
+$template->set('COLSPAN2',		    '');
+if ($showProofreader)
+    $template->set('SHOWPROOFREADER',	'false');
 else
-{		// user can only view database
-	$searchPage		= 'QueryDetail' . $censusYear . '.html';
-	$action			= 'Query';
-}		// user can only view database
+    $template->set('SHOWPROOFREADER',	'true');
 
 // access database only if there were no errors in validating parameters
 if (strlen($msg) == 0)
 {		            // no errors
 	// build parameters for searching database
-	$getParms			= array();
+	$getParms			        = array();
 	$getParms['censusId']		= $censusId;
 	$getParms['distId']		    = $districtId;
 	$getParms['subdistId']		= $subdistrictId;
 	$getParms['division']		= $division;
 	$getParms['order']		    = 'Line';
 
+    if ($showProofreader)
+    {		            // show proofreader id
+    	$npprev	                .= "&amp;ShowProofreader=true";
+    	$npnext	                .= "&amp;ShowProofreader=true";
+    }		            // show proofreader id
+    else
+    {                   // hide proofreaer id
+        $template['proofHead1']->update(null);
+        $template['proofHead2']->update(null);
+        $template['donot']->update(null);
+    }                   // hide proofreaer id
+
 	// execute the main query
-	$lineset	= new CensusLineSet($getParms);
-	$result		= $lineset->getStatistics();
-	$cleanupPages	= array();	// pages portion of WHERE
-}		// no errors
+    $result		                = $subDistrict->getStatistics();
+	$cleanupPages	            = array();	// pages which should be deleted
 
-if ($showProofreader)
-{		// show proofreader id
-		$npprev	.= "&amp;ShowProofreader=true";
-		$npnext	.= "&amp;ShowProofreader=true";
-}		// show proofreader id
+    $template->set('NPPREV',		    $npprev);
+    $template->set('NPNEXT',		    $npnext);
 
-// put out the HTML header
-$title	= $censusYear . ' Census of Canada Division Status';
-htmlHeader($title,
-				array(	'/jscripts/js20/http.js',
-						'/jscripts/util.js',
-						'/jscripts/CommonForm.js',
-						'CensusUpdateStatusDetails.js'));
-?>
-<body>
-<?php
-pageTop(array(
-				"/genealogy.php?lang=$lang"	=> "Genealogy",
-				"/genCountry.php?cc=CA&amp;lang=$lang"	=> "Canada",
-				"/database/genCensuses.php?lang=$lang"	=> "Censuses",
-				"$searchPage?Census=$censusId&amp;Province=$province&amp;District=$districtId&amp;SubDistrict=$subdistrictId&amp;Division=$division&amp;lang=$lang"	=> "$action $censusYear Census",
-				"/database/CensusUpdateStatus.php?Census=$censusId&amp;lang=$lang"
-								=> "Status Summary",
-		"/database/CensusUpdateStatusDist.php?Census=$censusId&amp;District=$districtId&amp;lang=$lang"					=> "District $districtId $districtName Summary"));
-?>
-<div class='body'>
-<h1>
-  <span class='right'>
-		<a href='CensusUpdateStatusDetailsHelpen.html' target='help'>? Help</a>
-  </span>
-		<?php print $title; ?>
-  <div style='clear: both;'></div>
-  </h1>
-<?php
-showTrace();
+	if (strlen($npprev) == 0)
+        $template['topPrev']->update(null);
+	if (strlen($npnext) == 0)
+        $template['topNext']->update(null);
+    if (strlen($division) == 0)
+        $template['divisionPart']->update(null);
 
-if (strlen($msg) > 0)
-{
-?>
-<p class='message'><?php print $msg; ?></p>
-<?php
-}		// errors
-else
-{		// no errors
-?>
-<div class='center'>
-<?php
-		if (strlen($npprev) > 0)
-		{
-?>
-		<span class='left'>
-		    <a href='CensusUpdateStatusDetails.php<?php print $npprev; ?>'
-				id='toPrevDiv'>
-				&lt;---
-		    </a>
-		</span>
-<?php
-		}	// previous division exists
-		if (strlen($npnext) > 0)
-		{
-?>
-		<span class='right'>
-		    <a href='CensusUpdateStatusDetails.php<?php print $npnext; ?>'
-				id='toNextDiv'>
-				---&gt;
-		    </a>
-		</span>
-<?php
-		}	// next division exists
-?>
-      <span class='label'>District 
-<?php
-		print $districtId . ' ' . $districtName . ', ' . 
-		  'SubDistrict ' . $subdistrictId . ' ' . $subdistrictName;
-if (strlen($division) > 0)
-		print " Div $division";
-?>
-      </span>
-      <span style='clear: both;'></span>
-    </div>
-    <form name='divForm' action='donothing.php'>
-		<input type='hidden' id='Census' value='<?php print $censusId; ?>'>
-		<input type='hidden' id='Province' value='<?php print $province; ?>'>
-		<input type='hidden' id='District' value='<?php print $districtId; ?>'>
-		<input type='hidden' id='SubDistrict'
-								value='<?php print $subdistrictId; ?>'>
-		<input type='hidden' id='Division' value='<?php print $division; ?>'>
-<!--- Put out the response as a table -->
-      <table border="1">
-        <thead>
-<!--- Put out the column headers -->
-          <tr>
-		<th class='colhead'>
-		  Page
-		</th>
-		<th class='colhead'>
-		  Done
-		</th>
-		<th class='colhead'>
-		  %Done
-		</th>
-		<th class='colhead'>
-		  %Linked
-		</th>
-		<th class='colhead'>
-		  Transcriber
-		</th>
-<?php
-		if ($showProofreader)
-		{	// show proofreader id
-?>
-		<th class='colhead'>
-		  Proofreader
-		</th>
-<?php
-		}	// show proofreader id
-?>
-		<th class='colhead' <?php if (false) { print "colspan='2'"; } ?>>
-		  Action
-		</th>
-		<th class='colhead'>
-		  &nbsp;
-		</th>
-		<th class='colhead'>
-		  Page
-		</th>
-		<th class='colhead'>
-		  Done
-		</th>
-		<th class='colhead'>
-		  %Done
-		</th>
-		<th class='colhead'>
-		  %Linked
-		</th>
-		<th class='colhead'>
-		  Transcriber
-		</th>
-<?php
-		if ($showProofreader)
-		{	// show proofreader id
-?>
-		<th class='colhead'>
-		  Proofreader
-		</th>
-<?php
-		}	// show proofreader id
-?>
-		<th class='colhead' <?php if (false) { print "colspan='2'"; } ?>>
+	// display the results
+	$even					= false;
+	$exppage				= $page1;
+	$done					= 0;
+    $linked					= 0;
+    $rowElement             = $template['detail$page'];
+    $rowText                = $rowElement->innerHTML;
+    $data                   = '';
 
-		  Action
-		</th>
-  </tr>
-</thead>
-<tbody>
-<?php
-		// display the results
-		$even		= false;
-		$exppage	= $page1;
-		$done		= 0;
-		$linked		= 0;
+	foreach($result as $row)
+	{
+	    $page		        = $row['page'];
+	    $namecount		    = $row['namecount'];
+	    $agecount		    = $row['agecount'];
+	    $idircount		    = $row['idircount'];
+	    $population	        = $row['pt_population'];
 
-		foreach($result as $row)
-		{
-		    $page		= $row['page'];
-		    $namecount		= $row['namecount'];
-		    $page_population	= $row['pt_population'];
-		    $transcriber	= $row['pt_transcriber'];
-		    $agecount		= $row['agecount'];
-		    $proofreader	= $row['pt_proofreader'];
-		    $idircount		= $row['idircount'];
+        $done               += $namecount;
+        $linked             += $idircount;
 
-		    if ($even)
-		    {		// insert empty cell
-?>
-		<td>&nbsp;</td>
-<?php
-		    }		// insert empty cell
-		    else
-		    {		// start new row
-?>
-  <tr>
-<?php
-		    }		// start new row
+	    if ($even)
+	    {		// insert empty cell
+	        $data           .= "            <td>&nbsp;</td>\n";
+	    }		// insert empty cell
+	    else
+	    {		// start new row
+            $data           .= "          <tr>\n";
+	    }		// start new row
 
-		    $page	= $page - 0;	// numeric page number
+		if ($namecount == 0)
+		{		// no lines in page, should be deleted
+			$cleanupPages[]	= $page;
+			// clear transcriber for empty page
+			$ptparms	    = array('pt_sdid'	=> $subDistrict,
+							    	'pt_page'	=> $page);
+			$pageEntry	    = new Page($ptparms);
+			$pageEntry->set('pt_transcriber', '');
+            $pageEntry->save(false);
+            $row['pt_transcriber']  = '';
+            $row['pt_proofreader']  = '';
+		}		// no lines in page, should be deleted
 
-		    while ($exppage < $page)
-		    {		// list empty pages
-				$ptparms	= array('pt_sdid'	=> $subDistrict,
-								'pt_page'	=> $exppage);
-				$emptyPage	= new Page($ptparms);
-				$emp_population	= $emptyPage->get('pt_population');
-?>
-		<td class='dataright'>
-		  <?php print $exppage; ?> 
-		</td>
-		<td class='dataright'>
-		  0
-		</td>
-		<td class='p00right'>
-		  0.00
-		</td>
-		<td class='p00right'>
-		  0.00
-		</td>
-		<td class='dataleft'>
-		  &nbsp;
-		</td>
-<?php
-				if ($showProofreader)
-				{	// show proofreader id
-?>
-		<td class='dataleft'>
-		  &nbsp;
-		</td>
-<?php
-				}	// show proofreader id
+		// display a row with values from database
+        $pctdone	            = ($namecount + $agecount)*50/$population; 
+        $row['pctdone']         = number_format($pctdone, 2);
+        $row['pctclassdone']    = pctClass($pctdone, false);
+		$pctlinked	            = $idircount*100/$population;
+        $row['pctlinked']       = number_format($pctlinked, 2);
+        $row['pctclasslinked']  = pctClass($pctlinked, false);
+        if ($page == $highlightpage)
+            $row['pageclass']   = 'even right bold';
+        else
+            $row['pageclass']   = 'data right';
 
-				if ($emp_population > 0)
-				{		// page is available to transcribe
-?>
-		<td class='center'>
-		    <button type='button' id='Edit<?php print $exppage; ?>'>
-				<?php print $action; ?> 
-		    </button>
-		</td>
-<?php
-				}		// page is available to transcribe
-				else
-				{		// no image for page
-?>
-		<td class='center'>
-		    No Image
-		</td>
-<?php
-				}		// no image for page
-
-				if (false)
-				{		// extra column if master
-?>
-		<td class='center'>
-		</td>
-<?php
-				}		// extra column if master
-				$exppage += $bypage;
-				if ($even)
-				{	// start new ro
-?>
-  </tr>
-  <tr>
-<?php
-				    $even	= false;
-				}	// start new row
-				else
-				{	// insert empty cell
-?>
-		<td>&nbsp;</td>
-<?php
-				    $even	= true;
-				}	// insert empty cell
-		    }		// list empty pages
-
-		    if ($namecount == 0)
-		    {		// no lines in page, should be deleted
-				$cleanupPages[]	= $page;
-				// clear transcriber for empty page
-				$ptparms	= array('pt_sdid'	=> $subDistrict,
-								'pt_page'	=> $page);
-				$pageEntry	= new Page($ptparms);
-				$pageEntry->set('pt_transcriber', '');
-				$pageEntry->save(false);
-		    }		// no lines in page, should be deleted
-
-		    // display a row with values from database
-		    $pctdone	= ($namecount + $agecount)*50/$page_population; 
-		    $pctlinked	= $idircount*100/$page_population;
-?>
-		<td class='dataright'>
-		  <?php print $page; ?> 
-		<td class='dataright'>
-		  <?php print $namecount; ?> 
-		<td class='<?php print pctClass($pctdone, false); ?>'>
-		  <?php print number_format($pctdone, 2); ?> 
-		</td>
-		<td class='<?php print pctClass($pctlinked, false); ?>'>
-		  <?php print number_format($pctlinked, 2); ?> 
-		</td>
-		<td class='dataleft'>
-		  <?php print $transcriber; ?> 
-		</td>
-<?php
-		if ($showProofreader)
-		{	// show proofreader id
-?>
-		<td class='dataleft'>
-		  <?php print $proofreader; ?> 
-		</td>
-<?php
-		}	// show proofreader id
-?>
-		<td class='center'> <!-- button to edit the page-->
-		    <button type='button' id='Edit<?php print $exppage; ?>'>
-				<?php print $action; ?> 
-		    </button>
-		</td>
-<?php
-		if (false)
-		{	// master can perform uploads
-?>
-		<td class='center'>
-		    <button type='button' id='Upload<?php print $exppage; ?>'>
-				Copy
-		    </button>
-		</td>
-<?php
-		}	// master can perform uploads
-		// total for division
-		$done		+= intval(($namecount + $agecount)/2);
-		$linked		+= $idircount;	// total linked for division
+        $rtemplate  = new \Templating\Template($rowText);
+		if (!$showProofreader)
+        {	        // hide proofreader id
+            $rtemplate['ProofreaderCol']->update(null);
+        }
+        $rtemplate->getDocument()->update($row);
+        $data                   .= $rtemplate->compile();
 
 		// complete the current row and set up for the next
 		if ($even)
 		{
-?>
-  </tr>
-<?php
-				$even	= false;
+            $data           .= "          </tr>\n";
+			$even	        = false;
 		}
 		else
 		{
-				$even	= true;
+			$even	        = true;
 		}
-		$exppage += $bypage;
-}		// process all rows
+    }		// process all rows
+    $rowElement->update($data);
 
-		// if last page from database is less than last page from SubDistricts
-		$lastpage	= $pages * $bypage + $page1 - 1;
-		if ($exppage <= $lastpage)
-		{
-		    if ($even)
-		    {		// insert empty cell
-?>
-		<td>&nbsp;</td>
-<?php
-		    }		// insert empty cell
-		    else
-		    {		// start new row
-?>
-  <tr>
-<?php
-		    }		// start new row
-		}
+    $totpop                 = $subDistrict['population'];
+	$template->set('DONE',              number_format($done)); 
+	$template->set('PCTCLASSDONE',      pctClass($done * 100 / $totpop, false));
+    $template->set('PCTDONE',           number_format($done * 100 / $totpop, 2)); 
+	$template->set('PCTCLASSLINKED',    pctClass($linked * 100 / $totpop, false));
+    $template->set('PCTLINKED',         number_format($linked * 100 / $totpop, 2)); 
+	if (count($cleanupPages) > 0 && canUser('edit'))
+	{		        // there are completely blank pages and user is auth'd
+	    $getParms['page']	= $cleanupPages;
+	    $deleteSet	        = new CensusLineSet($getParms);
+	    $count	            = $deleteSet->delete();
+	    $template->set('COUNT',         $count); 
+	    if ($count == 0)
+            $template['deletedLines']->update(null);
+    }		        // there are completely blank pages and user is auth'd
+    else
+        $template['deletedLines']->update(null);
+}                   // no errors
+else
+{
+    $template['topBrowse']->update(null);
+    $template['dataTable']->update(null);
+	$template['deletedLines']->update(null);
+	$template['buttonForm']->update(null);
+}
 
-		while ($exppage <= $lastpage)
-		{		// list empty pages at end
-?>
-		<td class='dataright'>
-		  <?php print $exppage; ?>
-		<td class='dataright'>
-		  0
-		<td class='p00right'>
-		  0.00
-		</td>
-		<td class='p00right'>
-		  0.00
-		</td>
-		<td class='dataleft'>
-		  &nbsp;
-		</td>
-<?php
-		if ($showProofreader)
-		{	// show proofreader id
-?>
-		<td class='dataleft'>
-		  &nbsp;
-		</td>
-<?php
-		}	// show proofreader id
-?>
-		<td class='center'> <!-- button to edit page -->
-		    <button type='button' id='Edit<?php print $exppage; ?>'>
-				<?php print $action; ?> 
-		    </button>
-		</td>
-<?php
-		if (false)
-		{	// master can perform uploads
-?>
-		<td class='center'>
-		</td>
-<?php
-		}	// master can perform uploads
-		    $exppage	+= $bypage;
-		    if ($even)
-		    {		// start new row
-?>
-  </tr>
-  <tr>
-<?php
-				$even	= false;
-		    }		// start new row
-		    else
-		    {		// insert an empty cell
-?>
-		<td>&nbsp;
-		</td>
-<?php
-				$even	= true;
-		    }		// insert an empty cell
-		}		// list empty pages
-
-		// put out totals row
-?>
-</tbody>
-<tfoot>
-  <tr>	<!-- separate total from details with empty row -->
-  </tr>
-  <tr>	<!-- totals row -->
-		<td class='dataright'>
-		  Total
-		</td>
-		<td class='dataright'>
-		  <?php print $done; ?> 
-		</td>
-		<td class='<?php print pctClass($done * 100 / $population, false); ?>'>
-		  <?php print number_format($done * 100 / $population, 2); ?> 
-		</td>
-		<td class='<?php print pctClass($linked * 100 / $population, false); ?>'>
-		  <?php print number_format($linked * 100 / $population, 2); ?> 
-  </tr>	<!-- totals row -->
-</tfoot>
-  </table>
-</form>
-<?php
-		if (count($cleanupPages) > 0 && canUser('edit'))
-		{		// there are completely blank pages and user is auth'd
-		    $getParms['page']	= $cleanupPages;
-		    $deleteSet	= new CensusLineSet($getParms);
-		    $count	= $deleteSet->delete();
-		    if ($count > 0)
-		    {		// some pages deleted
-?>
-<p>Deleted <?php print $count; ?>
-		lines in completely blank pages of the transcription.</p>
-<?php
-		    }		// some pages deleted
-		}		// there are completely blank pages and user is auth'd
-?>
-  <p>
-<form action='CensusUpdateStatusDetails.php' method='get'>
-		<input type='hidden' name='Census' value='<?php print $censusId; ?>'>
-		<input type='hidden' name='Province' value='<?php print $province; ?>'>
-		<input type='hidden' name='District' value='<?php print $districtId;?>'>
-		<input type='hidden' name='SubDistrict' value='<?php print $subdistrictId;?>'>
-		<input type='hidden' name='Division' value='<?php print $division;?>'>
-		<input type='hidden' name='ShowProofreader' value='<?php if (!$showProofreader) print "true";?>'>
-		<button type='submit' id='changeProof'>
-<?php
-		if ($showProofreader)
-		    print "Do not";
-?>
-		    Show Proofreader
-		</button>
-    </form>
-<?php
-}		// no errors
-showTrace();
-?>
-  </div> <!-- class='body' -->
-<?php
-pageBot();
-?>
-	<div id='mousetoPrevDiv' class='popup'>
-	  <p class='large'>Go to Subdistrict <?php print $prevSd; ?> 
-		Division <?php print $prevDiv; ?>&nbsp;
-      </p>
-	</div>
-	<div id='mousetoNextDiv' class='popup'>
-	  <p class='large'>Go to Subdistrict <?php print $nextSd; ?> 
-		Division <?php print $nextDiv; ?>&nbsp;
-      </p>
-	</div>
-	<div class='balloon' id='HelpEdit'>
-	    Click on this button to edit the transcription of this page.
-	</div>
-	<div class='balloon' id='HelpUpload'>
-	    Click on this button to upload the transcription of this page to
-	    the production server.
-	</div>
-	<div class='balloon' id='HelpchangeProof'>
-	    Click on this button to enable or disable display of the proofreader id.
-	</div>
-  </body>
-</html>
+$template->display();

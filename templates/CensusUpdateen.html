@@ -31,20 +31,20 @@
     <div id="transcription" style="overflow: auto; overflow-x: scroll">
       <div class="body">
         <h1>
-  	  $COUNTRYNAME: $CENSUSYEAR Census Update
-  	<span class="right">
-  	  <a href="/database/CensusUpdateHelpen.html" target="help">? Help</a>
-  	</span>
-  	<div style="clear: both;"></div>
+  	        $COUNTRYNAME: $CENSUSYEAR Census Update
+  	      <span class="right">
+  	        <a href="/database/CensusUpdateHelpen.html" target="help">? Help</a>
+  	      </span>
+  	      <div style="clear: both;"></div>
         </h1>
         $TRACE
         $MSG
-      <p class="label" id="results">
-  	    Updated District $DISTRICT $DISTRICTNAME
-  	    SubDistrict  $SUBDISTRICT $SUBDISTRICTNAME,
-        <span id="resultsDivision">Division $DIVISION </span>
-  	    Page $PAGE.
-      </p>
+        <p class="label" id="results">
+  	        Updated District $DISTRICT $DISTRICTNAME
+  	        SubDistrict  $SUBDISTRICT $SUBDISTRICTNAME,
+            <span id="resultsDivision">Division $DIVISION </span>
+  	        Page $PAGE.
+        </p>
       <form name="buttonForm" action="doNothing" method="get">
         <div class="hidden">
 	    	<input type="hidden" name="Census" id="Census"
@@ -91,8 +91,44 @@
         </p>
       </form>
   
-    </div> <!-- class="body" -->
-  </div> <!-- id="transcription" -->
+      </div> <!-- class="body" -->
+    </div> <!-- id="transcription" -->
+    <div class="hidden">
+      <span id="notAuthorized">
+          You are not currently authorized to update the database.
+		  Sign in and then refresh this page to apply the changes.
+      </span>
+      <span id="censusMissing">
+          Census parameter not supplied. 
+      </span>
+      <span id="censusUndefined">
+          Census identifier '$censusId' not defined. 
+      </span>
+      <span id="districtMissing">
+          District number parameter not supplied. 
+      </span>
+      <span id="districtInvalid">
+          District number not numeric. 
+      </span>
+      <span id="censusUndefined">
+          District identifier '$distID' not defined within Census '$censusId'. 
+      </span>
+      <span id="subDistrictMissing">
+          SubDistrict identifier parameter not supplied. 
+      </span>
+      <span id="censusUndefined">
+          SubDistrict identifier '$subDistID' not defined within District '$distID'. 
+      </span>
+      <span id="pageMissing">
+          Page number not supplied. 
+      </span>
+      <span id="pageInvalid">
+          Page number $page not a number.
+      </span>
+      <span id="pageRange">
+          Page number $page not defined for this enumeration division.
+      </span>
+    </div>
     <script src= '/jscripts/CommonForm.js' type="text/javascript">
     </script>
     <script src= '/jscripts/js20/http.js' type="text/javascript">

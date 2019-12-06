@@ -8,6 +8,8 @@
  *		2017/10/28		created											*
  *		2018/01/04		remove Template from template file names		*
  *      2019/02/21      support resizing scrolling row and PgUp/Dn      *
+ *      2019/12/02      add partof                                      *
+ *      2019/12/05      add category                                    *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
@@ -41,12 +43,12 @@
       <!--- Put out a line with links to previous and next section of table -->
       <div class="center" id="topBrowse">
         <span class="left" id="topPrev">
-        <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
+        <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
         &lt;---
         </a>
         </span>
         <span class="right" id="topNext">
-        <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
+        <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
             ---&gt;
         </a>
         </span>
@@ -89,6 +91,9 @@
                 Partie&nbsp;de
               </th>
               <th class="colhead">
+                Categoire
+              </th>
+              <th class="colhead">
                 Comtés
               </th>
               <th class="colhead">
@@ -119,8 +124,15 @@
 	            <input type="text"
 	                name="Partof$code" id="Partof$code" 
 	                value="$partof" 
-	                class="white left"
+	                class="ina left" readonly="readonly"
 	                size="6" maxlength="16">
+	          </td>
+	          <td class="left">
+	              <input type="text"
+	                  name="Category$code" id="Category$code" 
+	                  value="$category" 
+	                  class="ina left" readonly="readonly"
+	                  size="6" maxlength="32">
 	          </td>
               <td class="center">
                 <button type="button" id="EditCounties$code">

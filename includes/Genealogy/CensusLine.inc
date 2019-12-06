@@ -63,6 +63,7 @@ use \Iterator;
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/01/19      report constructor errors through message       *
  *		2019/04/18      support method getLastSqlCmd                    *
+ *		2019/12/01      do not fail save on empty string for numeric    *
  *															    		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1346,6 +1347,7 @@ class CensusLine extends Record
 						break;
                     }	// integer fields
 
+				    case 'numhands':
 				    case 'houserent':
 				    case 'houserooms':
 				    case 'monthsfact':
@@ -1368,9 +1370,8 @@ class CensusLine extends Record
 				    case 'schoolmons':
 				    {	// optional integer fields
 						$fldnames	.= $comma . "`$fld`";
-						$values		.= $comma . '?'; 
-						if (is_int($value) ||
-						    preg_match('/^\s*\d+(\.\d)?/', $value))
+                        $values		.= $comma . '?'; 
+						if (is_numeric($value))
 						    $sqlParms[]	= $value;
 						else
 						    $sqlParms[]	= null;

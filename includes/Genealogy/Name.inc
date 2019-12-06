@@ -173,6 +173,8 @@ use Templating\TemplateTag;
  *		2019/07/18      use Person::getPerson                           *
  *		2019/11/22      add Name::$info                                 *
  *		                defer assignment of aka order until save        *
+ *		2019/11/26      correct constructor which was returning the     *
+ *		                an existing entry if no valid IDIR was passed   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -342,12 +344,12 @@ class Name extends Record
 
     			case 'idir':
                 {		                    // IDIR
-                    $idir                   = null;
+                    $idir                   = 0;
     			    if ($value instanceof Person)
     			    {		                // Person record
     					$this->person	    = $value;
                         if ($this->person->isExisting())
-    					    $idir		    = $this->person->getIdir();
+                            $idir		    = $this->person->getIdir();
     			    }		                // Person record
     			    else
     				if (is_int($idir))
@@ -421,7 +423,7 @@ class Name extends Record
         {                                   // IDNX not specified
             if (is_null($order))
 	        {                               // order not specified
-		    	if ($idmr > 0)
+		    	if ($idmr > 0 && $idir > 0)
 		    	{			                // Order must be -1
 		    	    // if IDMR is specified this
 		    	    // implies Order=-1
@@ -453,10 +455,13 @@ class Name extends Record
 		        }                           // IDIR specified
 	        }                               // order not specified
 	        else
-	        {                               // order specified
-	            $where		                    .= $and . "`Order`=:order";
-	            $sqlParms['order']	            = $order;
-	    	    $and		                    = ' AND ';
+            {                               // order specified
+                if ($idir > 0)
+                {
+	                $where		                .= $and . "`Order`=:order";
+	                $sqlParms['order']	        = $order;
+                    $and		                = ' AND ';
+                }
 	        }                               // order specified
         }                                   // IDNX not specified
 
@@ -512,7 +517,6 @@ class Name extends Record
      *																	*
      *  Creates object containing a name record.					    *
      ********************************************************************/
-    static $counter    = 0;
     function __construct($parms = null)
     {
     	global	$debug;
@@ -545,15 +549,21 @@ class Name extends Record
     	else
     	if ($parms instanceof Person)
         {			                // old way to init from individual
-            $idir               = $parms->get('idir');
+            if ($parms->isExisting())
+                $idir           = $parms->get('idir');
+            else
+                $idir           = 0;
     	    $this->person		= $parms;
-    	    $parms		        = array('idir'	=> $parms,
+    	    $parms		        = array('idir'	=> $idir,
     								    'order'	=> Name::PRIMARY);
     	}			                // old way to init from individual
     	else
     	if ($parms instanceof Family)
         {			                // old way to reset married surname of wife
-            $idmr               = $parms->get('idmr');
+            if ($parms->isExisting())
+                $idmr           = $parms->get('idmr');
+            else
+                $idmr           = 0;
     	    $this->family		= $parms;
     	    $parms		        = array('idir'	=> $family->get('idirwife'),
     								    'idmr'	=> $family);
@@ -633,7 +643,7 @@ class Name extends Record
     			if (strlen($where) > 0)
     			{			        // requested search for matching record
     			    // construct the query of the alternate name table
-                    $query	            = "SELECT * FROM tblNX $where";
+                    $query	            = "SELECT * FROM tblNX $where LIMIT 2";
 
     			    // query the database
     			    $stmt	            = $connection->prepare($query);
@@ -643,11 +653,11 @@ class Name extends Record
     					if ($debug)
     					    $warn       .= "<p>Name.inc: " . __LINE__ .
     							                " query='$queryText'</p>\n";
-    					$row		        = $stmt->fetch(PDO::FETCH_ASSOC);
-    					if (is_array($row))
+    					$row		        = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    					if (count($row) == 1)
     					{		    // found existing name record
     					    $count	        = 1;
-    					    $dbrow	        = $row;
+    					    $dbrow	        = $row[0];
     					    $needInsert	    = false;
     					}		    // found existing name record
     					else
@@ -950,6 +960,8 @@ class Name extends Record
     function set($field, $value)
     {
         global  $document_root;
+        global  $debug;
+        global  $warn;
 
 		error_log("Name::set: " . __LINE__ . " '$field','$value'\n",
 		          3,
@@ -967,8 +979,10 @@ class Name extends Record
 		                    " called from line=" . $call['line'] . 
 		                    " of " . $call['file'] . "\n",
 			          3,
-			          $document_root . "/logs/Name.log");
-		}                       // interpret backtrace
+                      $document_root . "/logs/Name.log");
+        }                       // interpret backtrace
+        if ($debug)
+            showTrace();
     	$value			= trim($value);
     	$fieldLc		= strtolower($field);
     	if (array_key_exists($fieldLc, self::$translate))
@@ -986,17 +1000,30 @@ class Name extends Record
         	    return $this->getSurnameRec->get('idnr');
             }               // obsolete field
 
-    	    case 'idnx':
-    	    case 'idir':
-    	    case 'soundslike':
-    	    case 'givenname':
+            case 'givenname':
     	    case 'prefix':
     	    case 'title':
     	    case 'userref':
+            case 'akanote':
+            {
+                if ($this->person)
+                    $this->person->setLocal($fieldLc, $value);    
+    			return parent::set($fieldLc, $value);
+            }
+
+            case 'akanote':
+            {
+                if ($this->person)
+                    $this->person->setLocal('namenote', $value);    
+    			return parent::set($fieldLc, $value);
+            }
+
+    	    case 'idnx':
+    	    case 'idir':
+    	    case 'soundslike':
     	    case 'order':
     	    case 'marriednamecreatedby':
     	    case 'preferredaka':
-    	    case 'akanote':
     	    case 'srchtag':
     	    case 'qstag':
     	    case 'treename':
@@ -1080,10 +1107,15 @@ class Name extends Record
      ********************************************************************/
     function setSurname($newname)
     {
-    	$oldsurname		            = parent::set('surname', $newname);
+        $oldsurname		            = parent::set('surname', $newname);
+        if ($this->person)
+            $this->person->setLocal('surname', $newname);
+
         // get value of IDNR for the surname of the individual
         if ($newname != $oldsurname)
         {
+            if ($newname == '')
+                throw new Exception('Name::setSurname: new name is blank');
             $this->surnameRec	    = new Surname(array('surname' => $newname));
             $this->surnameRec->save(false);
 	        if ($this['order'] == Name::PRIMARY)
@@ -1150,11 +1182,11 @@ class Name extends Record
 		global	$debug;
 		global	$warn;
 
-        if ($this->row['surname'] == '')
+        if ($this->row['surname'] == '' && $this->row['idir'] > 0)
         {
-            $warn       .= $this->dump('Name::getName');
             $person             = $this->getPerson();
-            $warn       .= $person->dump('Name::getName');
+            if ($person)
+                $warn           .= $person->dump('Name::getName');
         }
         $evBirth                = null;
         $evDeath                = null;
@@ -1370,18 +1402,27 @@ class Name extends Record
     	global	$connection;
     	global	$document_root;
 
-    	if (is_string($xml))
-    	{		// string tag name
-    	    $tagname	= $xml;
-    	    $xml	    = true;
-    	}		// string tag name
-    	else
-    	if ($xml)
-    	{		// true
-    	    $tagname	= 'sql';
+        // determine top level tag name for XML output
+        $indent        		= '';
+        if (is_string($xml))
+        {			    // string tag name
+            $matches   		= array();
+            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            {
+                $indent		= $matches[1];
+                $xml   		= $matches[2];
+            }
+            $tagname		= $xml;
+            $xml	   		= true;
+        }			    // string tag name
+        else
+        if ($xml)
+        {			    // boolean true
+            $indent         = "    ";
+    	    $tagname	    = 'sql';
         }		// true
         else
-            $tagname    = '';
+            $tagname        = '';
         if ($debug)
             $warn   .= "<p>Name::save('$tagname')</p>\n";
 
@@ -1396,7 +1437,7 @@ class Name extends Record
         // or an instance of Family that had not been inserted into the
         // database at the time the Name was created, check to see if
         // the Person or Family has subsequently been created.
-        $idir                       = $this['idir'];
+        $idir                       = $this->row['idir'];
         if ($idir == 0 && $this->person)
         {
             if (!$this->person->isExisting())
@@ -1404,7 +1445,7 @@ class Name extends Record
             $idir                   = $this->person['idir']; 
             $this['idir']           = $idir; 
         }
-        $idmr                       = $this['idmr'];
+        $idmr                       = $this->row['idmr'];
         if ($this['idmr'] == 0 && $this->family)
         {
             if (!$this->family->isExisting())
@@ -1519,26 +1560,9 @@ class Name extends Record
     	    }
 
     	    // create the command to insert the new record into the database
-    	    $insert 	= "INSERT INTO tblNX ($fldnames) VALUES($values)";
-    	    $insertText	= debugPrepQuery($insert, $sqlParms);
-			error_log("Name::save: " . __LINE__ . " $insertText\n",
-			          3,
-			          $document_root . "/logs/Name.log");
-	        $backtrace          = debug_backtrace();
-	        foreach($backtrace as $call)
-	        {                       // interpret backtrace
-	            if (array_key_exists('class', $call) &&
-	                strlen($call['class']) > 0)
-	                $classPref      = $call['class'] . '::';
-	            else
-	                $classPref      = '';
-		        error_log("Name::save: " . __LINE__ . 
-			                    " function=$classPref" . $call['function'] .
-			                    " called from line=" . $call['line'] . 
-			                    " of " . $call['file'] . "\n",
-				          3,
-				          $document_root . "/logs/Name.log");
-			}                       // interpret backtrace
+            $insert 	        = 
+                        "INSERT INTO tblNX ($fldnames) VALUES($values)";
+    	    $insertText	        = debugPrepQuery($insert, $sqlParms);
             $this->lastSqlCmd   = $insertText;
 
     	    // insert the record into the database
@@ -1547,9 +1571,9 @@ class Name extends Record
             {		        	// successful insert
     			$count		    = $stmt->rowCount();
     			if ($xml)
-    			    print "<$tagname count='$count'>" .
+                    print "$indent<$tagname count='$count'>\n" .
     							$insertText .
-    					  "</$tagname>\n";
+    					  "\n</$tagname>\n";
     			if ($debug)
     			{
     			    $warn	    .= "<p>$insertText</p>\n";
@@ -1567,7 +1591,7 @@ class Name extends Record
     			$this['idnx']	    = $idnx;
 
     			if ($xml)
-    			    print "<$tagname idnx='$idnx'>lastInsertId</$tagname>\n";
+                    print "$indent<$tagname idnx='$idnx'>lastInsertId</$tagname>\n";
 
     			if ($debug)
     			{
@@ -1588,7 +1612,7 @@ class Name extends Record
     			{		    // successful query
     			    // record retrieved
     			    if ($xml)
-    					print "<$tagname>$queryText</$tagname>\n";
+                        print "$indent<$tagname>\n$queryText\n</$tagname>\n";
     			    if ($debug)
     					$warn	    .= "<p>$queryText</p>\n";
     			    $this->row		= $stmt->fetch();
@@ -1709,9 +1733,7 @@ class Name extends Record
     			    $count		    = $stmt->rowCount();
                     if ($xml)
                     {
-    					print "<$tagname count='$count'>" .
-    							xmlentities($updateText) .
-                                "</$tagname>\n";
+                        print "$indent<$tagname count='$count'>\n$updateText\n</$tagname>\n";
                     }
     			    if ($debug)
                         $warn	    .= "<p>Name::save: " . __LINE__ .

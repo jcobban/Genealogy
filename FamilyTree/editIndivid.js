@@ -1540,8 +1540,9 @@ function editName(ev)
 									  "&given=" + given + 
 									  "&surname=" + surname +
 									  "&treename=" + treeName +
-									  "&lang=" + lang +
-									  "&debug=" + debug;
+									  "&lang=" + lang;
+	if (debug.toLowerCase() == 'y')
+		url		        += "&debug=y";
 	windowList.push(openFrame("event",
 						      url,
 						      "right"));
@@ -1580,8 +1581,9 @@ function editMarriages(ev)
 							   "&given=" + given + 
 							   "&surname=" + surname +
 							   "&treename=" + treeName +
-							   "&lang=" + lang +
-							   "&debug=" + debug;
+							   "&lang=" + lang;
+	    if (debug.toLowerCase() == 'y')
+		    url		        += "&debug=y";
 		windowList.push(openFrame("marriages",
 							  url,
 							  "right"));
@@ -1626,8 +1628,9 @@ function editParents(ev)
 							"&given=" + given + 
 							"&surname=" + surname +
 							"&treename=" + treeName +
-							"&lang=" + lang +
-							"&debug=" + debug;
+							"&lang=" + lang;
+	    if (debug.toLowerCase() == 'y')
+		    url		        += "&debug=y";
 		windowList.push(openFrame("parents",
 							  url,
 							  "right"));
@@ -2214,7 +2217,8 @@ function noClearedEvent()
  *  contained within the id of the invoking <button>.					*
  *																		*
  *  Input:																*
- *		this		instance of <button> that invoked this function		*
+ *		this		instance of <button id="EventDetail..."> that       *
+ *		            invoked this function		                        *
  *		ev          click Event                                         *
  ************************************************************************/
 function eventDetail(ev)
@@ -2226,17 +2230,17 @@ function eventDetail(ev)
     // check for open event frame
     if (windowList.length > 0)
     {			// there are incomplete actions pending
-		var	text	= '';
-		var	comma	= '';
-		var	button	= document.getElementById('Submit');
+		var	text	        = '';
+		var	comma	        = '';
+		var	button	        = document.getElementById('Submit');
 		for (var iw = 0; iw < windowList.length; iw++)
 		{		// loop through open iframes
-		    var	iwindow	= windowList[iw];
-		    var iframe	= iwindow.frameElement;
+		    var	iwindow	    = windowList[iw];
+		    var iframe	    = iwindow.frameElement;
 		    if (iframe && iframe.name == "event")
 		    {
-				text	+= comma + iwindow.document.title;
-				comma	= ', ';
+				text	    += comma + iwindow.document.title;
+				comma	    = ', ';
 		    }
 		}		// loop through open iframes
 
@@ -2456,13 +2460,13 @@ function eventAdd(ev)
     var	idir		= form.idir.value;
     if (idir > 0)
     {			// database record already exists
-		var url		= "/FamilyTree/editEvent.php?ider=0" +
-								"&idir=" + idir +
-								"&rownum="; 
         var lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
-        url                 += '&lang=' + lang
+		var url		        = "/FamilyTree/editEvent.php?ider=0" +
+							                    	"&idir=" + idir +
+								                    "&rownum=" + 
+                                                    '&lang=' + lang
 		if (debug.toLowerCase() == 'y')
 		{
 		    url		+= "&debug=y";

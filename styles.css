@@ -119,6 +119,7 @@
  *      2019/06/25      change div.menu, add a.menuitem, hr.menubar     *
  *                      to make menu look more like an application      *
  *      2019/07/25      add grid layouts                                *
+ *      2019/11/25      add support for scrollable table body           *
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
@@ -362,6 +363,11 @@
                 position:           absolute;
                 width:              auto;
                 height:             auto;
+                }
+    span.hidden {
+                display:            none;
+                background-color:   white;
+                font-family:        sans-serif;
                 }
    /*********************************************************************
     *    div class='map' intended to be used to display a map           *
@@ -1737,6 +1743,20 @@
                 border-right:       3px solid #808080;
                 }
 
+/************************************************************************
+ *  Scrollable table body support                                       *
+ ************************************************************************/
+.fixed_header tbody{
+        display:    block;
+        overflow-y: auto;
+        overflow-x: hidden;
+        height:     500px;
+        width:      100%;
+}
+
+.fixed_header thead tr{
+        display:    block;
+}
 /************************************************************************
  *  Customize tinyMCE                                                   *
  ************************************************************************/

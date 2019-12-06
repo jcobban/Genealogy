@@ -1097,18 +1097,20 @@ class Family extends RecordPic
         $marEvent           = $this->getMarEvent();
 		$mard		        = $marEvent['eventd'];
         $idlrmar	        = $marEvent['idlrevent'];
-		if (!is_null($this->getHusbPriName()))
+		$husbPriName        = $this->getHusbPriName();
+		$wifePriName        = $this->getWifePriName();
+		if (!is_null($husbPriName))
 		{		        // husband identified
-			$name	        .= $this->husbPriName->getName();
-		    if (!is_null($this->getWifePriName()))
+			$name	        .= $husbPriName->getName();
+		    if (!is_null($wifePriName))
 		    {	        // both spouses identified
-				$name	    .= " $connector " . $this->wifePriName->getName();
+				$name	    .= " $connector " . $wifePriName->getName();
 		    }	        // both spouses identified
 		}		        // husband identified
         else
-		if (!is_null($this->getWifePriName()))
+		if (!is_null($wifePriName))
         {		        // wife identified
-			$name	        .= $this->wifePriName->getName();
+			$name	        .= $wifePriName->getName();
 		}		        // wife identified
 
 		if ($includeDate && strlen($mard) > 0)

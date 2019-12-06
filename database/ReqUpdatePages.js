@@ -21,21 +21,26 @@
  *						for 1851 and 1861 censuses to include province	*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/12/04      redesign to use CSS instead of tables           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
-    window.onload	= onloadPages;
+window.onload	= onloadPages;
 
 /************************************************************************
- *  onloadPages																*
+ *  function onloadPages												*
  *																		*
  *  The onload method of the request to update the Pages table web page.*
  *  If the user is returning from a previous request the province.		*
  *  may be specified as a search argument, in which case only the		*
  *  districts for that province are loaded.								*
+ *																		*
+ *	Input:																*
+ *	    this        Window                                              *
+ *	    ev          Javascript Load Event                               *
  ************************************************************************/
-function onloadPages()
+function onloadPages(ev)
 {
     // scan through all forms and set dynamic functionality
     // for specific elements
@@ -84,28 +89,32 @@ function onloadPages()
 }		// onloadPages
 
 /************************************************************************
- *  changeCensus														*
+ *  function changeCensus												*
  *																		*
  *  The onchange method of the Census selection.						*
- *  The user has selected a specific census.  Initiate the load				*
- *  of the associated districts file.										*
+ *  The user has selected a specific census.  Initiate the load			*
+ *  of the associated districts file.									*
+ *																		*
+ *	Input:																*
+ *	    this        <select id="Census">                                *
+ *	    ev          Javascript Change Event                             *
  ************************************************************************/
-function changeCensus()
+function changeCensus(ev)
 {
-    var	censusSelect		= this;
-    var	form			= this.form;
-    var	censusOptions		= this.options;
+    var	censusSelect		            = this;
+    var	form			                = this.form;
+    var	censusOptions		            = this.options;
     var	census;
 
     if (this.selectedIndex >= 0)
     {			// option chosen
-		var currCensusOpt	= censusOptions[this.selectedIndex];
-		var census		= currCensusOpt.value;
+		var currCensusOpt	            = censusOptions[this.selectedIndex];
+		var census		                = currCensusOpt.value;
 		if (census.length > 0)
 		{		// non-empty option chosen
-		    form.Census.value		= census; 
-		    var censusYear		= census.substring(2);
-		    var	provSelect		= document.distForm.Province;
+		    form.Census.value		    = census; 
+		    var censusYear		        = census.substring(2);
+		    var	provSelect		        = document.distForm.Province;
 		    provSelect.options.length	= 0;	// clear the list
 		    switch(censusYear)
 		    {			// act on census year
@@ -177,7 +186,7 @@ function changeCensus()
 		    }			// act on census year
 
 		    // check for province passed as a parameter
-		    var	province	= form.ProvinceCode.value;
+		    var	province	        = form.ProvinceCode.value;
 
 		    if (province && (province.length > 0))
 		    {		// province specified in invocation
@@ -185,46 +194,51 @@ function changeCensus()
 		    }		// province specified in invocation
 		    else
 		    {		// default 
-				var provOpts	= provSelect.options;
-				province	= provOpts[provSelect.selectedIndex].value;
-		    }		// default
+				var provOpts	    = provSelect.options;
+				province	        = provOpts[provSelect.selectedIndex].value;
+		    }		    // default
 		    loadDistsProv(province);	// load districts
-		}		// non-empty census chosen 
-    }			// option chosen
+		}		        // non-empty census chosen 
+    }			        // option chosen
 
-}		// changeCensus
+}		// function changeCensus
 
 /************************************************************************
- *  changeProv																*
+ *  function changeProv													*
  *																		*
- * The onchange method for the Province select element.						*
- * Take action when the user selects a new province.						*
+ *  The onchange method for the Province select element.				*
+ *  Take action when the user selects a new province.					*
+ *																		*
+ *	Input:																*
+ *	    this        <select id="Province">                              *
+ *	    ev          Javascript Change Event                             *
  ************************************************************************/
 function changeProv()
 {
-    var	provSelect	= this;
-    var	form		= this.form;
-    var	census		= form.Census.value;
-    var	censusYear	= census.substring(2);
-    var	optIndex	= provSelect.selectedIndex;
+    var	provSelect	        = this;
+    var	form		        = this.form;
+    var	census		        = form.Census.value;
+    var	censusYear	        = census.substring(2);
+    var	optIndex	        = provSelect.selectedIndex;
     if (optIndex == -1)
 		return;	// nothing to do
-    var	optVal	= provSelect.options[optIndex].value;
+    var	optVal	            = provSelect.options[optIndex].value;
     if (censusYear == '1851' || censusYear == '1861')
 		form.Census.value	= optVal + censusYear;
     loadDistsProv(optVal);		// limit the districts selection
-}
+    var tdNode              = document.getElementById('DivisionCell');
+    tdNode.innerHTML        = '';
+}       // function changeProv
 
 /************************************************************************
- *  loadDistsProv														*
+ *  function loadDistsProv												*
  *																		*
  *  Obtain the list of districts for a specific province				*
- *  in the 1871 census as an XML file.										*
+ *  in the 1871 census as an XML file.									*
  *																		*
  *  Input:																*
- *		prov		two character province code								*
+ *		prov		two character province code							*
  ************************************************************************/
-
 function loadDistsProv(prov)
 {
     var	censusSelect	= document.distForm.Census;
@@ -240,20 +254,23 @@ function loadDistsProv(prov)
 		xmlName	= "CensusGetDistricts.php?Census=" + census +
 					"&Province=" + prov;
     }			// post-confederation
+    var tdNode              = document.getElementById('DivisionCell');
+    tdNode.innerHTML        = '';
+
     // get the district information file	
     HTTP.getXML(xmlName,
 				gotDistFile,
 				noDistFile);
-}		// loadDistsProv
+}		// function loadDistsProv
 
 /************************************************************************
- *  gotDistFile																*
+ *  function gotDistFile												*
  *																		*
- *  This method is called when the XML file containing						*
+ *  This method is called when the XML file containing					*
  *  the districts information is retrieved from the server.				*
  *																		*
  *  Input:																*
- *		xmlDoc		XML from server with districts information				*
+ *		xmlDoc		XML from server with districts information			*
  ************************************************************************/
 function gotDistFile(xmlDoc)
 {
@@ -299,19 +316,19 @@ function gotDistFile(xmlDoc)
 
     // if required select a specific district 
     DistSet();
-}		// gotDistFile
+}		// function gotDistFile
 
 /************************************************************************
- *  DistSet																*
+ *  function DistSet													*
  *																		*
  *  This method ensures that the District selection matches				*
- *  the value passed in the search arguments.								*
+ *  the value passed in the search arguments.							*
  *																		*
- *  Returns:																*
+ *  Returns:															*
  *		true if no District was specified, or if it did not match		*
  *				any of the selection items								*
  *		false if it is necessary to load the SubDistrict selection		*
- *				list from the server for a specific District				*
+ *				list from the server for a specific District			*
  ************************************************************************/
 function DistSet()
 {
@@ -331,15 +348,15 @@ function DistSet()
 		}	// found matching entry
     }	// search for distince to select
     return true;
-}		// distSet
+}		// function distSet
 
 /************************************************************************
- *  noDistFile																*
+ *  function noDistFile													*
  *																		*
- *  This method is called if there is no census summary		file from the		*
+ *  This method is called if there is no census summary	file from the	*
  *  server.																*
  *  The selection list of districts is cleared and an error message		*
- *  displayed.																*
+ *  displayed.															*
  ************************************************************************/
 function noDistFile()
 {
@@ -358,28 +375,34 @@ function noDistFile()
     var	msg	= document.createTextNode(
 		"Census summary \"CensusGetDistricts.php?Census=CW1871\" failed");
     spanElt.appendChild(msg);
-}		// noDistFile
+}		// function noDistFile
 
 /************************************************************************
- *  changeDist																*
+ *  function changeDist													*
  *																		*
- *  This is the onchange method of the District select element.				*
- *  This method is called when the user selects a new district.				*
+ *  This is the onchange method of the District select element.			*
+ *  This method is called when the user selects a new district.			*
+ *																		*
+ *	Input:																*
+ *	    this        <select id="District">                              *
+ *	    ev          Javascript Change Event                             *
  ************************************************************************/
-function changeDist()
+function changeDist(ev)
 {
     // identify the selected census
-    var	form		= document.distForm;
-    var	censusSelect	= form.CensusSel;
-    var census		= censusSelect.value;
-    var	censusYear	= census.substring(2);
+    var	form		        = document.distForm;
+    var	censusSelect	    = form.CensusSel;
+    var census		        = censusSelect.value;
+    var	censusYear	        = census.substring(2);
 
     // identify the selected district
-    var	distSelect	= form.District;
-    var	optIndex	= distSelect.selectedIndex;
+    var	distSelect	        = form.District;
+    var	optIndex	        = distSelect.selectedIndex;
     if (optIndex < 1)
 		return;		// no district selected
-    var	distId	= distSelect.options[optIndex].value;
+    var	distId	            = distSelect.options[optIndex].value;
+    var tdNode              = document.getElementById('DivisionCell');
+    tdNode.innerHTML        = '';
 
     // identify the file containing subdistrict information for
     // the selected district
@@ -409,13 +432,13 @@ function changeDist()
 				gotSubDist,
 				noSubDist);
 
-}		// changeDist
+}		// function changeDist
 
 /************************************************************************
- *  gotSubDist																*
+ *  function gotSubDist													*
  *																		*
- *  This method is called when the sub-district information XML				*
- *  document relating to a particular district is retrieved from the		*
+ *  This method is called when the sub-district information XML			*
+ *  document relating to a particular district is retrieved from the	*
  *  server.																*
  ************************************************************************/
 function gotSubDist(xmlDoc)
@@ -449,36 +472,27 @@ function gotSubDist(xmlDoc)
 		}		// cover our ass
 
 		// create a new HTML Option object and add it
+        if (text.length > 35)
+            text            = text.substr(0, 32) + '...';
 		text += " [subdist " + value + "]";
-		var	newOption	= addOption(subdistSelect,
-		 				    text,
-		  		  		    value);
+		var	newOption	    = addOption(subdistSelect,
+		 				                text,
+		  		  		                value);
 		// make the additional information in the XML Option
 		// available to the application without changing the
 		// appearance of the HTML Option
 		newOption.xmlOption	= node;
-   	
-		var	tableNode	= getElt(document.distForm, "TABLE");
-		var	tbNode		= getElt(tableNode,"TBODY");
-		var	trNode		= document.getElementById("divRow");
-		var	tdNode		= document.getElementById("divCell");
-		if (!tdNode)
-		    alert("ReqUpdatePages.js: gotSubDist: trNode=" +
-				  tagToString(trNode));
-		else
-		while (tdNode.hasChildNodes())
-				tdNode.removeChild(tdNode.firstChild);
     }			// loop through source "option" nodes
 
     // if required select a specific element in the sub dist list
     subDistSet();
-}		// gotSubDist
+}		// function gotSubDist
 
 /************************************************************************
- *  subDistSet																*
+ *  function subDistSet													*
  *																		*
- *  This method ensures that the SubDistrict selection matches				*
- *  the value passed in the search arguments.								*
+ *  This method ensures that the SubDistrict selection matches			*
+ *  the value passed in the search arguments.							*
  ************************************************************************/
 function subDistSet()
 {
@@ -528,13 +542,12 @@ function subDistSet()
 		    pageSelect.selectedIndex	= Number(newPageCode) - 1;
 		}	// Division has a Page select
     }		// Page identifier supplied
-}		// subDistSet
-
+}		// function subDistSet
 
 /************************************************************************
- *  noSubDist																*
+ *  function noSubDist													*
  *																		*
- *  This method is called if there is no sub-district						*
+ *  This method is called if there is no sub-district					*
  *  description to return.												*
  ************************************************************************/
 function noSubDist()
@@ -553,42 +566,38 @@ function noSubDist()
     tdNode.appendChild(spanElt);
     var	msg	= document.createTextNode("No subdistricts defined yet");
     spanElt.appendChild(msg);
-} 
+}       // function noSubDist 
 
 /************************************************************************
- *  changeSubDist														*
+ *  function changeSubDist												*
  *																		*
  *  This method is called when the user selects a new sub-district.		*
+ *																		*
+ *	Input:																*
+ *	    this        <select id="SubDistrict">                           *
+ *	    ev          Javascript Change Event                             *
  ************************************************************************/
-function changeSubDist()
+function changeSubDist(ev)
 {
-    // locate cell to display response in
-    var	tableNode	= getElt(document.distForm, "TABLE");
-    var	tbNode		= getElt(tableNode,"TBODY");
-    var	trNode		= document.getElementById("divRow");
-    var	tdNode		= document.getElementById("divCell");
-    
     // identify the selected district
-    var	subDistSelect	= document.distForm.SubDistrict;
-    var	optIndex	= subDistSelect.selectedIndex;
+    var	subDistSelect	    = document.distForm.SubDistrict;
+    var	optIndex	        = subDistSelect.selectedIndex;
     if (optIndex == -1)
-		optIndex	= 0;		// default to first entry
-    var	optElt	= subDistSelect.options[optIndex];
-    var	optVal	= optElt.value;
+		optIndex	        = 0;		// default to first entry
+    var	optElt	            = subDistSelect.options[optIndex];
+    var	optVal	            = optElt.value;
     //alert("ReqUpdatePages.js: changeSubDist: optIndex=" + optIndex + ", optElt=" + optElt.outerHTML + ", xmlOption=" + tagToString(optElt.xmlOption));
     
-    // remove any existing HTML from this cell
-    while (tdNode.hasChildNodes())
-				tdNode.removeChild(tdNode.firstChild);
-
     // determine how many divisions there are in selected subdist
-    var	xmlOpt		= optElt.xmlOption;
-    var	divCt		= 0;
+    var tdNode              = document.getElementById('DivisionCell');
+    tdNode.innerHTML        = '';
+    var	xmlOpt		        = optElt.xmlOption;
+    var	divCt		        = 0;
     var firstDiv;
 
     for (var i = 0; i < xmlOpt.childNodes.length; i++)
     {
-		var	cNode	= xmlOpt.childNodes[i];
+		var	cNode	        = xmlOpt.childNodes[i];
 		if ((cNode.nodeType == 1) && (cNode.nodeName == "div"))
 		{
 		    if (!firstDiv)
@@ -599,19 +608,22 @@ function changeSubDist()
 
     if (divCt > 1)
     {	// add selections based upon information from XML response
-		var select	= tdNode.appendChild(document.createElement("select"));
-		select.name	= "Division";
-		select.size	= 1;
+        var tdNode          = document.getElementById('DivisionCell');
+        tdNode.innerHTML    = '';
+		var select	        = document.createElement("select");
+		select	            = tdNode.appendChild(select);
+		select.name	        = "Division";
+		select.size	        = 1;
 
 		for (var i = 0; i < xmlOpt.childNodes.length; i++)
 		{
-		    var	cNode	= xmlOpt.childNodes[i];
+		    var	cNode	    = xmlOpt.childNodes[i];
 		    if ((cNode.nodeType == 1) && (cNode.nodeName == "div"))
 		    {
 				var ident	= cNode.getAttribute("id");
 				var newOpt	= addOption(select,
-							    "division " + ident,
-							    ident);
+							            "division " + ident,
+							            ident);
 				newOpt.xmlNode	= cNode;
 		    }	// element is a "div"
 		}		// loop through children of parent
@@ -621,14 +633,14 @@ function changeSubDist()
 
     // update page prompt in form
     changeDiv(firstDiv);
-}		// changeSubDist
+}		// function changeSubDist
 
 /************************************************************************
- *  showForm																*
+ *  function showForm													*
  *																		*
- *  Show the form for editting the Pages table.								*
+ *  Show the form for editting the Pages table.							*
  ************************************************************************/
 function showForm()
 {
     document.distForm.submit();
-}		// showForm
+}		// function showForm

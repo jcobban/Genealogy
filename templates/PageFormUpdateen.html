@@ -20,11 +20,11 @@
         Censuses Admin</a>:
       <a href="/database/DistForm.php?Census=$CENSUSID&Province=$PROVINCE&lang=$LANG">
 	    $CENSUSID Districts Admin</a>:
-      <a href="/database/ReqUpdateSubDists.php$SEARCH&lang=$LANG">
+      <a href="/database/ReqUpdateSubDists.php?Census=$CENSUSID&Province=$PROVINCE&District=$DISTID&lang=$LANG">
 	    Select Sub-District</a>:
-      <a href="SubDistForm.php?Census=$CENSUSID&Province=$PROVINCE&District=$DISTID">
+      <a href="SubDistForm.php?Census=$CENSUSID&Province=$PROVINCE&District=$DISTID&lang=$LANG">
 	    District $DISTID $DISTNAME SubDistricts Admin</a>:
-	  <a href="ReqUpdatePages.php$SEARCH">
+	  <a href="ReqUpdatePages.php?Census=$CENSUSID&Province=$PROVINCE&District=$DISTID&SybDistrict=$SUBDISTID&lang=$LANG">
 	    Select Division</a>:
     </div> <!-- id="breadcrumbs" -->
     <div class="body" id="transcription"
@@ -67,14 +67,14 @@
         <input type="hidden" name="District" id="District" 
             value="$DISTID">
         <input type="hidden" name="SubDistrict" id="SubDistrict" 
-            value="<?php print $SUBDISTID;?>">
+            value="$SUBDISTID">
         <input type="hidden" name="Division" id="Division" 
             value="$DIVISION">
         <input type="hidden" name="Debug" id="Debug" 
             value="$DEBUG">
-        <table id="dataTable" class="form">
+        <table id="dataTable" class="form fixed_header">
 		  <thead><!--- Put out the column headers -->
-			<tr>
+              <tr>
 			  <th class="colhead">
 	            Page
 			  </th>
@@ -155,47 +155,47 @@
     <!-- templates for dynamic HTML -->
     <div class="hidden" id="templates">
         <span id="censusUndefined">
-            Census='$censusId' is not defined.
+            Census='$CENSUSID' is not defined.
         </span>  
         <span id="countryUndefined">
-            Country code $cc' is not defined.
+            Country code '$CC' is not defined.
         </span>  
         <span id="censusMissing">
             Census identifier parameter is missing.
         </span>
         <span id="provinceUndefined">
-            Province '$province' not supported for '$censusId' census.
+            Province '$PROVINCE' not supported for '$CENSUSID' census.
         </span>  
         <span id="provinceMissing">
-            Province parameter is missing for Census='$censusId'.
+            Province parameter is missing for Census='$CENSUSID'.
         </span>
         <span id="districtUndefined">
-            District='$distId' is not defined.
+            District='$DISTID' is not defined.
         </span>  
         <span id="districtInvalid">
-            District identifier '$distId' is invalid.
+            District identifier '$DISTID' is invalid.
         </span>  
         <span id="districtMissing">
             District identifier parameter is missing.
         </span>
         <span id="subdistrictUndefined">
-            Sub-District='$subdistId' is not defined for Census='$censusId' District='$distId'.
+            Sub-District='$SUBDISTID' is not defined for Census='$CENSUSID' District='$DISTID'.
         </span>  
         <span id="subdistrictMissing">
             Sub-District identifier parameter is missing.
         </span>
       <!-- no matching names dialog -->
-      <form id="ChangeImageForm$SUB">
+      <form id="ChangeImageForm$sub">
         <p class="label">Image URL Changed</p>
         <p>Increment URLs for Pages Following 
-    	<input type="text" name="Page" value="$PAGE"
+    	<input type="text" name="Page" value="$page"
     		size="3" class="white rightnc"> by
-    	<input type="text" name="Increment" value="$INCREMENT"
+    	<input type="text" name="Increment" value="$increment"
     		size="3" class="white rightnc">
         </p>
         <p>
-  	    <button type="button" id="incrementImage$SUB">Increment</button>
-  	    <button type="button" id="closeDlg$SUB">Close</button>
+  	    <button type="button" id="incrementImage$sub">Increment</button>
+  	    <button type="button" id="closeDlg$sub">Close</button>
         </p>
       </form>
     </div> <!-- id="templates" -->

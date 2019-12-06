@@ -72,6 +72,8 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2019/12/01      after updating database return to division      *
+ *		                status display                                  *
  *																		*
  *  Copyright 2019 James A. Cobban										*
  ************************************************************************/
@@ -87,20 +89,20 @@ require_once __NAMESPACE__ . '/common.inc';
 // validate the parameters that identify the specific page to
 // be updated
 
-$censusId	= '';		// XX9999, XX=country code, 9999=year
-$census		= null;		// Census record
-$censusYear	= 0;		// census year as an integer
-$province	= '';		// used in pre-confederation censuses
-$distID		= '';		// district number, usually integer
-$subDistID	= '';		// sub-district identifier
-$division	= '';		// division
-$page		= '';		// page number
-$image		= '';		// image URL
-$lang		= 'en';		// default language
-$cc		= 'CA';		// default country code
-$countryName	= 'Canada';	// default country
-$varcount	= 0;		// number of parameters passed
-$parms		= array();
+$censusId				= '';		// XX9999, XX=country code, 9999=year
+$census					= null;		// Census record
+$censusYear				= 0;		// census year as an integer
+$province				= '';		// used in pre-confederation censuses
+$distID					= '';		// district number, usually integer
+$subDistID				= '';		// sub-district identifier
+$division				= '';		// division
+$page					= '';		// page number
+$image					= '';		// image URL
+$lang					= 'en';		// default language
+$cc					    = 'CA';		// default country code
+$countryName			= 'Canada';	// default country
+$varcount				= 0;		// number of parameters passed
+$parms					= array();
 
 // loop through the input parameters first to extract the identification
 // of the specific page
@@ -109,260 +111,312 @@ foreach($_POST as $key => $value)
     $varcount++;
     switch(strtolower($key))
     {			// act on specific parameter
-	case 'census':
-	{			// census identifier supplied
-	    $censusId		= $value;
-	    $census		= new Census(array('censusid' => $censusId));
-	    $parms['Census']	= $census;
-	    if ($census->isExisting())
-	    {		// already defined census
-		$censusYear	= intval(substr($censusId, 2));
-		if ($censusYear < 1867)
-		{	// pre-confederation census age is at next birthday
-		    $province		= substr($censusId, 0, 2);
-		    $parms['Province']	= $province;
-		    $parms['BYear']	= $censusYear;
-		    $partOf		= $census->get('partof');
-		    if (strlen($partOf) == 2)
-			$cc		= $partOf;
-		}	// pre-confederation census age is at next birthday
-		else
-		{	// post-confederation census age is at enumeration
-		    $parms['BYear']	= $censusYear - 1;
-		    $cc			= substr($censusId, 0, 2);
-		}	// post-confederation census age is at enumeration
-	    }		// already defined census
-	    else
-		$msg	.= "Invalid Census identifier '$censusId'. ";
-	    break;
-	}		// census identifier supplied
+		case 'census':
+		{			// census identifier supplied
+		    $censusId		= $value;
+		    break;
+		}		// census identifier supplied
 
-	// Province is ignored
-	case 'province':
-	{
-	    break;
-	}	// Province
+		// Province is ignored
+		case 'province':
+		{
+		    break;
+		}	// Province
 
-	// District is mandatory and must be numeric
-	case 'district':
-	{		// District supplied
-	    $distID			= $value;
-	    $parms['District']	= $value;
-	    if (!preg_match("/^[0-9]+(\.5|\.0)?$/", $distID))
-		$msg	.= 'District number not numeric. ';
-	    break;
-	}		// District supplied
+		// District is mandatory and must be numeric
+		case 'district':
+		{		// District supplied
+		    $distID			    = $value;
+		    $parms['District']	= $value;
+		    break;
+		}		// District supplied
 
-	// SubDistrict is mandatory
-	case 'subdistrict':
-	{		// SubDistrict supplied
-	    $subDistID		= $value;
-	    $parms['SubDistrict']	= $value;
-	    break;
-	}		// SubDistrict supplied
+		// SubDistrict is mandatory
+		case 'subdistrict':
+		{		// SubDistrict supplied
+		    $subDistID		    = $value;
+		    $parms['SubDistrict']	= $value;
+		    break;
+		}		// SubDistrict supplied
 
-	// Division is mandatory even though it is
-	// not officially used in some censuses
-	case 'division':
-	{		// Division supplied
-	    $division		= $value;
-	    $parms['Division']	= $value;
-	    break;
-	}		// Division supplied
+		// Division is mandatory even though it is
+		// not officially used in some censuses
+		case 'division':
+		{		// Division supplied
+		    $division		    = $value;
+		    $parms['Division']	= $value;
+		    break;
+		}		// Division supplied
 
-	// page number is mandatory and must be numeric
-	case 'page':
-	{		// Page supplied
-	    $page			= $value;
-	    $parms['Page']		= $value;
-	    if (!preg_match("/^[0-9]+$/", $page))
-		$msg	.= 'Page number not numeric. ';
-	    break;
-	}		// Page supplied
+		// page number is mandatory and must be numeric
+		case 'page':
+		{		// Page supplied
+		    $page			    = $value;
+		    $parms['Page']		= $value;
+		    break;
+		}		// Page supplied
 
-	case 'image':
-	{		// Image supplied
-	    $image	= $value;
-	    if (!preg_match("/^[0-9a-zA-Z:_. \-+=\/&?]*$/", $image))
-		$warn	.= "Image URL '$image' contains invalid characters. ";
-	    break;
-	}		// Image supplied
+		case 'image':
+		{		// Image supplied
+		    $image	            = $value;
+		    if (!preg_match("/^[0-9a-zA-Z:_. \-+=\/&?]*$/", $image))
+				$warn	        .= "Image URL '$image' contains invalid characters. ";
+		    break;
+		}		// Image supplied
 
-	case 'lang':
-	{		// Image supplied
-	    if (strlen($value) >= 2)
-		$lang	= strtolower(substr($value,0,2));
-	    break;
-	}		// Image supplied
+		case 'lang':
+		{		// Image supplied
+			$lang	            = FtTemplate::validateLang($value);
+		    break;
+		}		// Image supplied
 
-    }	// act on specific parameter
-}		// loop through all parameters
+    }	        // act on specific parameter
+}		        // loop through all parameters
+
+$template		        = new FtTemplate("CensusUpdate$lang.html");
+
+// update database only if authorized
+if (!canUser('edit'))
+    $msg	            .= $template['notAuthorized']->innerHTML;
 
 // check for mandatory parameters
 if ($censusId == '')
-{		// Census not supplied
-    $msg	.= 'Census parameter not supplied. ';
-}		// District not supplied
+{		        // Census not identified
+    $msg	            .= $template['censusMissing']->innerHTML;
+}		        // Census not identifier
+else
+{               // censusId specified
+    $census		            = new Census(array('censusid' => $censusId));
+    $parms['Census']	    = $census;
+    if ($census->isExisting())
+    {		    // already defined census
+		$censusYear	        = $census->get('year');
+		if ($censusYear < 1867)
+		{	    // pre-confederation census age is at next birthday
+		    $province		= substr($censusId, 0, 2);
+		    $parms['Province']	= $province;
+		    $parms['BYear']	= $censusYear;
+		    $partOf		    = $census->get('partof');
+		    if (strlen($partOf) == 2)
+			    $cc		    = $partOf;
+		}	    // pre-confederation census age is at next birthday
+		else
+		{	    // post-confederation census age is at enumeration
+		    $parms['BYear']	= $censusYear - 1;
+		    $cc			    = substr($censusId, 0, 2);
+        }	    // post-confederation census age is at enumeration
+
+		$country	        = new Country(array('cc'	=> $cc));
+		$countryName	    = $country->getName($lang);
+    }		    // already defined census
+    else
+    {           // Census undefined
+        $text               = $template['censusUndefined']->innerHTML;
+        $msg	            .= str_replace('$censusId', $censusId, $text);
+    }           // Census undefined
+}               // censusId specified
+
 if ($distID == '')
-{		// District not supplied
-    $msg	.= 'District number parameter not supplied. ';
-}		// District not supplied
+{		        // District not supplied
+    $msg	                .= $template['districtMissing']->innerHTML;
+}		        // District not supplied
+else
+{		        // District supplied
+    if (preg_match("/^[0-9]+(\.5|\.0)?$/", $distID))
+    {           // syntactically correct numeric district ID
+		$district	        = new District(array('d_census'	=> $censusId,
+                                                 'd_id'	    => $distID));
+        if ($district->isExisting())
+        {
+		    $districtName   = $district->get('d_name');
+		    $province	    = $district->get('d_province');
+		    $domain		    = new Domain(array('domain'     => $cc . $province,
+				                    		   'language'   => $lang));
+            $provinceName	= $domain->get('name');
+        }
+        else
+        {
+            $text           = $template['districtUndefined']->innertHTML;
+            $msg            .= str_replace(array('$distID','$censusId'),
+                                           array($distID, $censusId),
+                                           $text);
+        }
+    }           // syntactically correct numeric district ID
+    else
+        $msg	            .= $template['districtInvalid']->innerHTML;
+}		        // District supplied
+
 if ($subDistID == '')
-{		// SubDistrict not supplied
-    $msg	.= 'SubDistrict identifier parameter not supplied. ';
-}		// SubDistrict not supplied
+{		        // SubDistrict not supplied
+    $msg	                .= $template['subDistrictMissing']->innerHTML;
+}		        // SubDistrict not supplied
+else
+{               // SubDistrict identifier supplied
+	$subDist	            = new SubDistrict(array('sd_census'	=> $census,
+							    			        'sd_distid'	=> $district,
+												    'sd_id'		=> $subDistID,
+								    				'sd_div'	=> $division,
+                                                    'sd_sched'	=> '1'));
+	$pages		        	= intval($subDist->get('sd_pages'));
+	$page1		        	= intval($subDist->get('sd_page1'));
+    $bypage		        	= intval($subDist->get('sd_bypage'));
+
+    if (!$subDist->isExisting())
+    {
+        $text               = $template['subdistrictUndefined']->innertHTML;
+        $msg                .= str_replace(array('$subDistID','$distID'),
+                                           array($subDistI, $distID),
+                                           $text);
+    }
+}               // SubDistrict identifier supplied
+
 if ($page == '')
-{		// Page not supplied
-    $msg	.= 'Page number parameter not supplied. ';
-}		// Page not supplied
+{		        // Page not supplied
+    $msg	                .= $template['pageMissing']->innerHTML;
+}		        // Page not supplied
+else
+{
+    if (ctype_digit($page))
+    {
+        $page               = intval($page);
+        if ($page < $page1 || 
+            $page > ($page1 + $bypage * ($pages - 1)) ||
+            ($bypage == 2 && ($page % 2) != 1))
+        {
+            $text	        = $template['pageRange']->innerHTML;
+            $msg            .= str_replace('$page', $page, $text);
+        }
+    }
+    else
+    {
+        $text	            = $template['pageInvalid']->innerHTML;
+        $msg                .= str_replace('$page', $page, $text);
+    }
+}
 
-// update database only if authorized
-if (canUser('edit'))
-{		// authorized
-
-    // if no errors were encountered in validating the parameters
-    // proceed to update the database
-    if (strlen($msg) == 0)
-    {		// no errors in validating page identification
-	$country	= new Country(array('cc'	=> $cc));
-	$countryName	= $country->getName($lang);
-	$subDist	= new SubDistrict(array(
-			'sd_census'	=> $censusId,
-			'sd_distid'	=> $distID,
-			'sd_id'		=> $subDistID,
-			'sd_div'	=> $division,
-			'sd_sched'	=> '1'));
-
-	$district	= $subDist->getDistrict();
-	$districtName	= $district->get('d_name');
-	$province	= $district->get('d_province');
-	$domain		= new Domain(array('domain' => $cc . $province,
-					   'language' => $lang));
-	$provinceName	= $domain->get('name');
-	$pages		= intval($subDist->get('sd_pages'));
-	$page1		= intval($subDist->get('sd_page1'));
-	$bypage		= intval($subDist->get('sd_bypage'));
-	$subDistrictName= $subDist->get('sd_name');
-	$lastPage	= $page1 + ($pages - 1) * $bypage;
-	$nextPage	= intval($page) + $bypage;
-	$prevPage	= intval($page) - $bypage;
+// if no errors were encountered in validating the parameters
+// proceed to update the database
+if (strlen($msg) == 0)
+{		        // no errors in validating page identification
+	$subDistrictName    	= $subDist->get('sd_name');
+	$lastPage	        	= $page1 + ($pages - 1) * $bypage;
+	$nextPage	        	= intval($page) + $bypage;
+	$prevPage	        	= intval($page) - $bypage;
 	if ($nextPage > $lastPage)
-	    $nextPage	= 0;	// no next page
+	    $nextPage	    	= 0;	// no next page
 	if ($prevPage < $page1)
-	    $prevPage	= 0;	// no previous page
-	$ptparms	= array('pt_sdid'	=> $subDist,
-				'pt_page'	=> $page);
-	$pageEntry	= new Page($ptparms);
+	    $prevPage	    	= 0;	// no previous page
+	$ptparms	        	= array('pt_sdid'	=> $subDist,
+					             	'pt_page'	=> $page);
+	$pageEntry	        	= new Page($ptparms);
 
 	// loop through all of the field values passed from
 	// the input form    
-	$count		= 0;	// number of individuals inserted
-	$oldrow		= '';	// detect change in row number
-	$numParms	= 0;	// debugging count
-	$record		= null;	// instance of CensusLine
+	$count		        	= 0;	// number of individuals inserted
+	$oldrow		        	= '';	// detect change in row number
+	$numParms	        	= 0;	// debugging count
+	$record		        	= null;	// instance of CensusLine
 	foreach($_POST as $key => $value)
-	{		// loop through all input fields
+	{		    // loop through all input fields
 	    $numParms	++;
 	    if ($debug)
-		$warn	.= $key . "='" . $value . "',";
-	    $row	= substr($key, strlen($key) - 2);
+			    $warn	    .= $key . "='" . $value . "',";
+	    $row	            = substr($key, strlen($key) - 2);
 
 	    // ignore fields whose names do not end in 2 decimal digits
 	    if (!ctype_digit($row))
-		continue;
+			continue;
 
 	    // if the row number changes, update the database
 	    if ($row != $oldrow)
 	    {
-		if (!is_null($record))
-		{		// have an instance of CensusLine
-		    if ($record->isExisting())
-		    {	// updating existing record
-			if (strtolower($record->get('surname')) ==
+			if (!is_null($record))
+			{		// have an instance of CensusLine
+			    if ($record->isExisting())
+			    {	// updating existing record
+					if (strtolower($record->get('surname')) ==
+									    '[delete]')
+					    $record->delete();
+					else
+					    $record->save(false);	// save changes
+			    }	// updating existing record
+			    else
+			    {	// inserting new record
+					if (strtolower($record->get('surname')) !=
 					    '[delete]')
-			    $record->delete();
-			else
-			    $record->save(false);	// save changes
-		    }	// updating existing record
-		    else
-		    {	// inserting new record
-			if (strtolower($record->get('surname')) !=
-			    '[delete]')
-			    $record->save(false);
-		    }	// inserting new record
-		}		// have an instance of CensusLine 
-		$oldrow		= $row;
-		$record		= new CensusLine($parms, intval($row));
-		$byearset	= false;
+					    $record->save(false);
+			    }	// inserting new record
+			}		// have an instance of CensusLine 
+			$oldrow		= $row;
+			$record		= new CensusLine($parms, intval($row));
+			$byearset	= false;
 	    }
 
 	    // get column name portion of field name
 	    $colname	= strtolower(substr($key, 0, strlen($key) - 2));
 	    if ($colname == 'setidir')
 	    {
-		$idsr		= $census->get('idsr');
-		if (strlen($division) > 0)
-		    $srcdetail	= "dist $distID $districtName, subdist $subDistID $subDistrictName, div $division page $page";
-		else
-		    $srcdetail	= "dist $distID $districtName, subdist $subDistID $subDistrictName, page $page";
-		if ($censusYear < 1867)
-		    $srcdetail	= $province . ", " . $srcdetail;
-		$idir		= $value;
-		$person		= new Person(array('idir' => $idir));
-		$birth		= $person->getBirthEvent(false);
-		if ($birth)
-		{
-		    $birth->save(false);
-		    if ($debug)
-			$warn	.= "<p>citparms=array(" .
-					"'idime' => " .$birth->getIder(). "," .
-					"'idsr' => $idsr," .
-				       "'type' => Citation::STYPE_EVENT,".
-					"'srcdetail' => $srcdetail)</p>";
-		    $citparms	= array('idime'	=> $birth->getIder(),
-					'idsr'	=> $idsr,
-					'type'	=> Citation::STYPE_EVENT,
-					'srcdetail' => $srcdetail);
-		    $cit	= new Citation($citparms);
-		    $cit->save(false);
-		}
+			$idsr		= $census->get('idsr');
+			if (strlen($division) > 0)
+			    $srcdetail	= "dist $distID $districtName, subdist $subDistID $subDistrictName, div $division page $page";
+			else
+			    $srcdetail	= "dist $distID $districtName, subdist $subDistID $subDistrictName, page $page";
+			if ($censusYear < 1867)
+			    $srcdetail	= $province . ", " . $srcdetail;
+			$idir		= $value;
+			$person		= new Person(array('idir' => $idir));
+			$birth		= $person->getBirthEvent(false);
+			if ($birth)
+			{
+			    $birth->save(false);
+			    if ($debug)
+					$warn	.= "<p>citparms=array(" .
+									"'idime' => " .$birth->getIder(). "," .
+									"'idsr' => $idsr," .
+							       "'type' => Citation::STYPE_EVENT,".
+									"'srcdetail' => $srcdetail)</p>";
+			    $citparms	= array('idime'	=> $birth->getIder(),
+									'idsr'	=> $idsr,
+									'type'	=> Citation::STYPE_EVENT,
+									'srcdetail' => $srcdetail);
+			    $cit	= new Citation($citparms);
+			    $cit->save(false);
+			}
 	    }
 	    else
 	    {		// update database record
-		if ($colname == 'idir' && $value == 0)
-		    $record->set('idir', 0);
-		else
-		    $record->set($colname, $value);
+			if ($colname == 'idir' && $value == 0)
+			    $record->set('idir', 0);
+			else
+			    $record->set($colname, $value);
 	    }		// update database record
 
 	    // count number of individuals on the page
 	    if ($colname == 'surname')
 	    {
-		if (strtolower($value) != '[blank]' &&
-		    strtolower($value) != '[deleted]' &&
-		    strtolower($value) != '[scratched out]')
-		    $count++;	// count actual number of individuals
-	    }	// surname
+			if (strtolower($value) != '[blank]' &&
+			    strtolower($value) != '[deleted]' &&
+			    strtolower($value) != '[scratched out]')
+			    $count++;	// count actual number of individuals
+	    }	    // surname
 
-	}		// loop through all parameters
+	}		    // loop through all parameters
 	if ($debug)
 	    $warn	.= "<p>numParms=$numParms</p>";
 
 	// update the last row on the page
 	if ($record->isExisting())
-	{	// updating existing record
-	    if (strtolower($record->get('surname')) ==
-				'[delete]')
-		$record->delete();
+	{	        // updating existing record
+	    if (strtolower($record->get('surname')) == '[delete]')
+			$record->delete();
 	    else
-		$record->save(false);	// save changes
-	}	// updating existing record
+			$record->save(false);	// save changes
+	}	        // updating existing record
 	else
-	{	// inserting new record
-	    if (strtolower($record->get('surname')) !=
-		'[delete]')
-		$record->save(false);
-	}	// inserting new record
+	{	        // inserting new record
+	    if (strtolower($record->get('surname')) != '[delete]')
+			$record->save(false);
+	}	        // inserting new record
 
 	// register the update in the Pages table
 	$pageEntry->set('pt_population',$count);
@@ -374,16 +428,15 @@ if (canUser('edit'))
 	// are synchronized
 	$district	= $subDist->getDistrict();
 	$district->synchPopulation();
-	$district->save(false);
-    }		// no errors in validating page identifier
-}		// authorized
-else
-{
-    $msg	.= "You are not currently authorized to update the database.
-		Sign in and then refresh this page to apply the changes.";
-}
+    $district->save(false);
 
-$template		= new FtTemplate("CensusUpdate$lang.html");
+    if (strlen($warn) == 0)
+    {
+        $host           =  $_SERVER['HTTP_HOST'];
+        header("Location: https://$host/database/CensusUpdateStatusDetails.php?Census=$censusId&Province=$province&District=$distID&SubDistrict=$subDistID&Division=$division&page=$page&lang=$lang");
+        exit;
+    }
+}		        // no errors in validating page identifier
 
 $template->set('CENSUSYEAR', 		$censusYear);
 $template->set('CC',			    $cc);

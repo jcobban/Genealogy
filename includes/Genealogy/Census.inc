@@ -67,6 +67,9 @@ use \Iterator;
  *		                add get('province')                             *
  *		2019/04/18      support method getLastSqlCmd                    *
  *		2019/05/18      add $info                                       *
+ *		2019/11/28      expand information put into new entry           *
+ *		2018/12/-5      do not report SQL error from getStats if        *
+ *		                Census is not defined in table                  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -90,8 +93,8 @@ class Census extends Record
      *	Default initial row for a record in table Censuses				*
      ********************************************************************/
     protected static $initRow	= array(
-				'censusid'			=> 'CA1881',
-				'name'				=> '1881 Census of Canada',
+				'censusid'			=> '',
+				'name'				=> '',
 				'linesperpage'		=> 50,
 				'collective'		=> 0,
 				'partof'			=> null,
@@ -136,6 +139,22 @@ class Census extends Record
      *	Defines the default sort order for class RecordSet				*
      ********************************************************************/
     protected static $defaultOrder		= '`Name`';
+
+    /********************************************************************
+     *	Census::$country    											*
+     *																	*
+     *	This is a reference to the instance of Country that this        *
+     *	Census enumerates.                                              *
+     ********************************************************************/
+    protected $country		            = null;
+
+    /********************************************************************
+     *	Census::$domain        											*
+     *																	*
+     *	This is a reference to the instance of Domain that this         *
+     *	Census enumerates.                                              *
+     ********************************************************************/
+    protected $domain		            = null;
 
     /********************************************************************
      *	function Census::__construct									*
@@ -260,12 +279,18 @@ class Census extends Record
 				    $dbrow			        = self::$initRow;
                     $dbrow['censusid']		= $censusId;
                     $cc                     = substr($censusId, 0, 2);
+                    if (strlen($censusId) > 6)
+                        $province           = substr($censusId,
+                                                     2, 
+                                                     strlen($censusId) - 4);
+                    else
+                        $province           = '';
                     $year                   = substr($censusId, -4);
 
 				    // process parameters that modify record
 				    foreach($parms as $field => $value)
 				    {		// process modify parameters
-						$fieldLc	= strtolower($field);
+						$fieldLc	    = strtolower($field);
 						if (array_key_exists($fieldLc, self::$translate))
 						    $fieldLc	= self::$translate[$fieldLc];
 						switch($fieldLc)
@@ -291,20 +316,34 @@ class Census extends Record
 						}		// act on specific parameters
 				    }			// process modify parameters
 
-                    $country                = new Country(array('cc' => $cc));
-                    $dbrow['name']          = "$year Census of " .
-                                              $country->getName();
+                    $this->row              = $dbrow;
+                    $this->country          =  $this->getCountry();
+                    if ($province == '')
+                    {
+                        if ($dbrow['name'] == '')
+                            $dbrow['name']  = "$year Census of " .
+                                              $this->country->getName();
+                    }
+                    else
+                    {           // sub-national census
+                        $this->domain       = $this->getDomain();
+                        if ($dbrow['name'] == '')
+                            $dbrow['name']  = "$year Census of " .
+                                              $this->domain->getName(1);
+                    }           // sub-national census
+                    $this->row              = null;
                     $needInsert			    = true;
 
 				    // fill in default states/provinces list
 				    if ($dbrow['provinces'] == '')
 				    {
-						$provinces	    = '';
-						$parms		    = array('cc' => $cc);
-						$domains	    = new DomainSet($parms);
+						$provinces	        = '';
+                        $parms		        = array('cc'        => $cc,
+                                                    'partof'    => $cc);
+                        $domains	        = new DomainSet($parms);
 						foreach($domains as $domain)
 						{
-						    $provinces .= substr($domain->get('domain'),2);
+						    $provinces      .= substr($domain->get('domain'),2);
 						}
 						$dbrow['provinces']	= $provinces;
 				    }
@@ -347,6 +386,48 @@ class Census extends Record
 		// diagnostic output if debug is set
 		$this->dump('Census Record constructed:');
     }		//	function Census::__construct
+
+    /********************************************************************
+     *	function::Census:getCountry										*
+     *																	*
+     *	Factory method to obtain the instance of class Country that     *
+     *	this Census applies to.				                            *
+     *	                                                                *
+     *	Returns:                                                        *
+     *	    instance of class Country                                   *
+     ********************************************************************/
+    function getCountry()
+    {
+        if ($this->country)
+            return $this->country;
+        $cc                 = $this['countrycode'];
+        if (strtoupper($cc) == 'UK')
+            $cc             = 'GB';
+        $this->country      = new Country(array('code' => $cc));
+        return $this->country;
+    }       // function Census::getCountry
+
+    /********************************************************************
+     *	function::Census:getDomain										*
+     *																	*
+     *	Factory method to obtain the instance of class Domain that      *
+     *	this Census applies to.				                            *
+     *	                                                                *
+     *	Returns:                                                        *
+     *	    null if this is a national census, otherwise an instance    *
+     *      of class Domain.                                            &
+     ********************************************************************/
+    function getDomain()
+    {
+        $province           = $this['province'];
+        if (is_null($province) || strlen($province) == 0)
+            return null;        // national census
+        if ($this->domain)
+            return $this->domain;
+        $cc                 = $this['countrycode'];
+        $this->domain       = new Domain(array('code' => "$cc$province"));
+        return $this->domain;
+    }       // function Census::getDomain
 
     /********************************************************************
      *	function::Census:get											*
@@ -415,7 +496,7 @@ class Census extends Record
                 if ($idl >= 8)
                     return substr($censusid, 2, $idl - 6);
                 else
-                    return null;    // national census
+                    return '';    // national census
             }           // province or state abbreviation
 
             case 'year':
@@ -460,25 +541,29 @@ class Census extends Record
 		global	$warn;
 		global	$connection;
 
+        if (!$this->isExisting())
+		    return array('total'	=> 0,
+						 'pop'		=> 1);	// avoid zero divide
+
 		$table		= $this->get('table');
 		$censusId	= $this->get('censusid');
         $query  	= "SELECT Count(*) AS Total, ";
 		if ($this->get('collective'))
 		{
-		    $query		.= "(SELECT SUM(D_Population) FROM Districts ";
+		    $query		    .= "(SELECT SUM(D_Population) FROM Districts ";
 		    $sqlParms		= array();
-		    $cc			= $this->get('cc'); 
-		    $year		= $this->get('year'); 
+		    $cc			    = $this->get('cc'); 
+		    $year		    = $this->get('year'); 
 		    $censusParms	= array('partof'	=> $cc,
-								'year'		=> $year);
+								    'year'		=> $year);
 		    $censuses		= new CensusSet($censusParms);
-		    $or			= ' WHERE ';
+		    $or			    = ' WHERE ';
 		    foreach($censuses as $colony)
 		    {
 				$colonyId	= $colony->get('censusid');
 		        $query		.= "$or D_Census=?";
 				$sqlParms[]	= $colonyId;
-				$or		= ' OR ';
+				$or		    = ' OR ';
 		    }
 		    $query	.= ") AS Pop";
 		}
@@ -487,7 +572,7 @@ class Census extends Record
 		    $query	.="(SELECT SUM(D_Population) FROM Districts WHERE D_Census=:censusId) AS Pop";
 		    $sqlParms	= array('censusId'	=> $censusId); 
 		}
-		$query		.= " FROM $table WHERE GivenNames != ''";
+		$query		        .= " FROM $table WHERE GivenNames != ''";
     
         // execute the query
         $stmt		        = $connection->prepare($query);
@@ -507,7 +592,7 @@ class Census extends Record
         else
         {
             $msg	.= "'" . $queryText . "': " .
-				               print_r($connection->errorInfo(), true);
+				               print_r($stmt->errorInfo(), true);
 		    return array('total'	=> 0,
 						 'pop'		=> 1);	// avoid zero divide
         }		// error on request

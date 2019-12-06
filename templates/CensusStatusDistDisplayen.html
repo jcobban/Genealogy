@@ -1,0 +1,224 @@
+<!--*********************************************************************
+ *  CensusStatusDistUpdateen.html   									*
+ *																		*
+ *  Display the progress of the transcription of a specific census		*
+ *  district.															*
+ *																		*
+ *  History:															*
+ *		2019/11/25	    created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+	<div id="breadcrumbs" class="hidden">
+	    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+	    <a href="/genCountry.php?cc=$CC&lang=$LANG">$COUNTRYNAME</a>:
+	    <a href="/genCensuses.php?lang=$LANG">Censuses</a>:
+		<a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&Province=$PROVINCE&lang=$LANG">$PROVINCENAME</a>:
+	    <a href="QueryDetail.php?Census=$CENSUSID&District=$DISTID&lang=$LANG">
+            Update $CENSUSYEAR Census of $COUNTRYNAME
+        </a>:
+	</div>
+	<div class="body">
+	  <h1>
+		$CENSUSNAME District $DISTID $DISTNAME Status
+	    <span class="right">
+		  <a href="CensusUpdateStatusDistHelpen.html" target="help">? Help</a>
+	    </span>
+	   <div style="clear: both;"></div>
+	  </h1>
+	  $TRACE
+      $MSG
+	  <!--- Put out a line with links to previous and next section of table -->
+      <div class="center" id="topBrowse">
+	    <div class="left" id="topPrev">
+		    <a href="CensusUpdateStatusDist.php?Census=$PREVCENSUSID&District=$PREVDIST" id="toPrevDist">
+		    &lt;--- district $PREVDIST $PREVDISTNAME
+		    </a>
+	    </div>
+	    <div class="right" id="topNext">
+		  <a href="CensusUpdateStatusDist.php?Census=$NEXTCENSUSID&District=$NEXTDIST" id="toNextDist">
+		    district $NEXTDIST $NEXTDISTNAME ---&gt;
+		  </a>
+	    </div>
+	    &nbsp;
+	    <div style="clear: both;"></div>
+	  </div> <!-- id="topBrowse" -->
+	
+	  <!--- Put out the response as a table -->
+	  <form id="statForm" action="donothing.php">
+	    <input type="hidden" id="Census" value="$CENSUSID ">
+	    <input type="hidden" id="District" value="$DISTID ">
+	    <input type="hidden" id="DistName" value="$DISTNAME ">
+	    <table class="form" id="dataTable">
+		  <!--- Put out the column headers -->
+		  <thead>
+		   <tr>
+			 <th class="colhead1st">
+			     SubDist
+			 </th>
+			 <th class="colhead">
+			     Div
+			 </th>
+			 <th class="colhead">
+			     Name
+			 </th>
+			 <th class="colhead">
+			     Done
+			 </th>
+			 <th class="colhead">
+			     Pop.
+			 </th>
+			 <th class="colhead">
+			     %Done
+			 </th>
+			 <th class="colhead">
+			     %Linked
+			 </th>
+			 <th class="colhead" colspan="2">
+			     Action
+			 </th>
+		   </tr>
+		  </thead>
+		  <tbody>
+		   <tr id="subdist$ir">
+			 <td class="odd bold right first">
+		 	    $sd_id
+		 	    <input type="hidden" id="SdId$ir"
+		 		    value="$sd_id">
+			 </td>
+			 <td class="odd bold right">
+		 	    $sd_div 
+		 	    <input type="hidden" id="Div$ir"
+		 		    value="$s_div"> 
+			 </td>
+			 <td class="odd bold left">
+		 	    $sd_name 
+			 </td>
+			 <td class="odd bold right">
+		 	    $namecount 
+			 </td>
+			 <td class="odd bold right">
+		 	    $sd_population 
+			 </td>
+			 <td class="$pctclasspct">
+		 	    $pct 
+			 </td>
+			 <td class="$pctclasspctl">
+		 	    $pctl 
+			 </td>
+			 <td class="center">
+		 	    <button type="button" id="Edit$ir">
+		 		  Details
+		 	    </button>
+			 </td>
+			 <td class="center">
+		 	    <button type="button" id="Surnames$ir">
+		 		  Surnames
+		 	    </button>
+			 </td>
+		   </tr>
+		  </tbody>
+		  <tfoot>
+		   <tr>
+			 <td class="odd bold right first">
+		 	    &nbsp;
+			 </td>
+			 <td class="odd bold left">
+		 	    Total
+			 </td>
+			 <td class="odd bold left">
+		 	    &nbsp;
+			 </td>
+			 <td class="odd bold right">
+		 	    $DONE 
+			 </td>
+			 <td class="odd bold right">
+		 	    $POP
+			 </td>
+			 <td class="$PCTCLASSPCT">
+		 	    $PCT 
+			 </td>
+			 <td class="$PCTCLASSPCTL">
+		 	    $PCTL 
+			 </td>
+		   </tr>
+		  </tfoot>
+	    </table>
+	  </form>
+	
+	  <!--- Put out a line with links to previous and next section of table -->
+	  <div class="center" id="botBrowse">
+	    <div class="left" id="botPrev">
+		  <a href="CensusUpdateStatusDist.php?Census=$PREVCENSUSID&District=$PREVDIST" id="btPrevDist">
+		    &lt;--- district $PREVDIST $PREVDISTNAME
+		  </a>
+	    </div>
+	    <div class="right" id="botNext">
+		  <a href="CensusUpdateStatusDist.php?Census=$NEXTCENSUSID&District=$NEXTDIST" id="btNextDist">
+		    district $NEXTDIST $NEXTDISTNAME ---&gt;
+		  </a>
+	    </div>
+	    &nbsp;
+	    <div style="clear:both;"></div>
+	  </div> <!-- id="botBrowse" -->
+	</div> <!-- class="body" -->
+    <!-- language specific text for messages -->
+    <span id="censusCorrected" class="hidden">
+		CensusId corrected to '$CENSUSID'. </span>
+    <span id="Unexpected" class="hidden">
+		Unexpected parameter $KEY="$VALUE". </span>
+    <span id="censusMissing" class="hidden">
+		Census parameter missing. </span>
+    <span id="censusNotPart" class="hidden">
+        censusId="$CENSUSID" is not the census of a specific colony.
+    </span>
+    <span id="censusUndefined" class="hidden">
+		Invalid Census identifier '$CENSUSID'. </span>
+    <span id="districtMissing" class="hidden">
+		District parameter missing. </span>
+    <span id="districtInvalid" class="hidden">
+		District value '$DISTID' is invalid. </span>
+    <span id="districtUndefined" class="hidden">
+        District $DISTID not defined for the $CENSUSID census. 
+    </span>
+
+    <!-- popups for forward and backward links -->
+	<div id="mousetoPrevDist" class="popup label">
+	  Go to district $PREVDIST $PREVDISTNAME
+	</div>
+	<div id="mousetoNextDist" class="popup label">
+	  Go to district $NEXTDIST $NEXTDISTNAME
+	</div>
+	<div id="mousebtPrevDist" class="popup label">
+	  Go to district $PREVDIST $PREVDISTNAME
+	</div>
+	<div id="mousebtNextDist" class="popup label">
+	  Go to district $NEXTDIST $NEXTDISTNAME
+	</div>
+	<div class="balloon" id="HelpEdit">
+	  Click on this button to view detailed information about the page by page
+	  status of the transcription for this division.
+	</div>
+	<div class="balloon" id="HelpSurnames">
+	  Click on this button to view a summary of the surnames that are present in
+	  the transcription for this division.
+	</div>
+	<div class="balloon" id="HelpCopy">
+	  Click on this button to upload the transcription data and page
+      descriptions from the development server to the production server.
+	</div>
+	<div class="balloon" id="HelpSdId">
+	  This cell displays the sub-district identifier within the district.
+	</div>
+	<div class="balloon" id="HelpDiv">
+	  This cell displays the division identifier within the sub-district
+	  if applicable.
+	</div>
+    <script src= '/jscripts/CommonForm.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= 'CensusUpdateStatusDist.js' type="text/javascript">
+    </script>

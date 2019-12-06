@@ -17,6 +17,7 @@ use \Exception;
  *		Name			VARCHAR(255) NOT NULL DEFAULT '',				*
  *		ResourcesURL	VARCHAR(255),									*
  *		PartOf          VARCHAR(16),                                    *
+ *		Category        VARCHAR(32) DEFAULT 'State',                    *
  *		ENGINE=InnoDb DEFAULT CHARSET=utf8;								*
  *																		*
  *  History:															*
@@ -38,6 +39,7 @@ use \Exception;
  *		                with a hyphen between the country and state     *
  *		2019/07/25      do not permit set for 'iso'                     *
  *		                'iso' is changed when 'domain' is changed       *
+ *		2019/12/05      add column Category                             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -64,7 +66,8 @@ class Domain extends Record
                 				'language'		    => 'en',
                 				'name'			    => '',
                                 'resourcesurl'		=> null,
-                                'partof'            => null);
+                                'partof'            => null,
+                                'category'          => 'State');
 
     /********************************************************************
      *	Domain::$info											        *

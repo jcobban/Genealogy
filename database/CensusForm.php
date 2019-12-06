@@ -78,6 +78,7 @@ use \Templating\Template;
  *		                address performance problem                     *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/04/06      use new FtTemplate::includeSub                  *
+ *		2019/12/01      improve parameter checking
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -97,31 +98,33 @@ ob_start();			// ensure no output before redirection
 // check for abnormal behavior of Internet Explorer
 if ($browser->browser == 'IE' && $browser->majorver < 8)
 {		// IE < 8 does not support CSS replacement of cellspacing
-	$cellspacing	= "cellspacing='0px'";
+	$cellspacing		= "cellspacing='0px'";
 }		// IE < 8 does not support CSS replacement of cellspacing
 else
 {
-	$cellspacing	= "";
+	$cellspacing		= "";
 }
 
 // variables for constructing the main SQL SELECT statement
-$countryName		= 'Canada';
-$provinceName		= '';
-$censusId			= '';
-$censusYear			= 1881;
-$province			= '';
-$distID	    		= '';
-$districtName		= '';
-$subDistrictName	= '';
-$subDistID			= '';
-$division			= '';
-$page		    	= 0;
-$lang		    	= 'en';
-$transcriber		= '';
-$proofreader		= '';
-$bypage		        = 1;
-$npPrev		        = '';
-$npNext		        = '';
+$countryName			= 'Canada';
+$provinceName			= '';
+$censusId				= '';
+$censusYear				= 1881;
+$province				= '';
+$distID	    			= '';
+$districtName			= '';
+$subDistrictName		= '';
+$subDistID				= '';
+$division				= '';
+$page		    		= null;
+$lang		    		= 'en';
+$transcriber			= '';
+$proofreader			= '';
+$bypage		        	= 1;
+$npPrev		        	= '';
+$npNext		        	= '';
+$fcSet              	= null;
+$censusRec             	= null;
 
 // get parameter values into local variables
 // validate all parameters passed to the server and construct the
@@ -134,50 +137,14 @@ foreach ($_GET as $key => $value)
 	{
 	    case 'census':
 	    case 'censusid':
-	    {			// supported field name
-			$census		= new Census(array('censusid' => $value));
-			if ($census->isExisting())
-			{
-			    $censusId			= $value;
-			    if ($census->get('collective'))
-			    {		// unexpected
-			    }		// unexpected
-			    else
-			    {
-					$province		= substr($value, 0, 2);
-					$getParms['censusid']	= $censusId;
-			    }
-			    $temp			= substr($censusId, -4);
-			    $censusYear			= intval(substr($censusId, -4));
-			}
-			else
-			    $msg	.= "Invalid value of CensusID='$value'. ";
+        {			// supported field name
+            $censusId               = $value;
 			break;
 	    }			// Census Identifier
 
 	    case 'province':
 	    {			// Province code (pre-confederation)
-			$domain		= new Domain(array('code' => 'CA' . strtoupper($value)));
-			if ($domain->isExisting())
-			{		// valid province code
-			    $province			= strtoupper($value);
-			    $provinceName		= $domain->getName();
-			    if ($censusYear < 1867)
-			    {		// pre-confederation
-					if ($census->get('collective'))
-					{
-					    $censusId		        = $province . $censusYear;
-					    $getParms['censusid']   = $censusId;
-					    $census	= new Census(array('censusid' => $censusId));
-					}
-					$getParms['province']	= $value;
-			    }		// pre-confederation
-			}		// valid province code
-			else
-			if ($censusYear < 1867)
-			    $msg	.= "Invalid value of Province='$value'. ";
-			else
-			    $province	= '';
+			$province			= strtoupper($value);
 			break;
 	    }			// Province code
 
@@ -203,12 +170,13 @@ foreach ($_GET as $key => $value)
 
 	    case 'subdistrict':
 	    {			// subdistrict id
-			$subDistID			= $value;
-			$getParms['subdistrict']	= $value;
+			$subDistID			            = $value;
+			$getParms['subdistrict']	    = $value;
 			break;
 	    }			// subdistrict id
 
 	    case 'division':
+	    case 'div':
 	    {			// division
 			if (preg_match('/(\d+):(\d+)/', $value, $matches))
 			{
@@ -216,21 +184,12 @@ foreach ($_GET as $key => $value)
 			    $subDistID			        = $matches[2];
 			    $getParms['district']	    = $distID;
 			    $getParms['subdistrict']	= $subDistID;
-			    break;
 			}
-			else
-			if ($censusYear == 1906)
-			{		// 1906 uses alphabetic division identifiers
-			    if (strlen($value) != 0 && ctype_digit($value)) 
-					$warn	.= "Invalid value of Division='$value'. ";
-			}		// 1906 uses alphabetic division identifiers
-			else
-			{		// most years division is numeric
-			    if (strlen($value) != 0 && !ctype_digit($value)) 
-					$warn	.= "Invalid value of Division='$value'. ";
-			}		// most years division is numeric
-			$division			        = $value;
-			$getParms['division']		= $value;
+            else
+            {
+			    $division			        = $value;
+                $getParms['division']		= $value;
+            }
 			break;
 	    }			// division
 
@@ -238,11 +197,11 @@ foreach ($_GET as $key => $value)
 	    {			// "Page"
 			if (ctype_digit($value))
 			{
-			    $page			        = $value;
-			    $getParms['page']		= $page;
+			    $page			            = $value;
+			    $getParms['page']		    = $page;
 			}
 			else
-			    $msg	.= "Invalid value of Page='$value'. ";
+			    $msg	                .= "Invalid value of Page='$value'. ";
 			break;
 	    }			// "Page"
 
@@ -263,38 +222,83 @@ foreach ($_GET as $key => $value)
 	}			// already handled
 }				// loop through parameters
 
-// validate mandatory parameters 
-if (strlen($censusId) == 0)
+// manage transcriber and proofreader status
+$transcriber		    = '';
+$proofreader		    = '';
+$image			        = '';
+if (canUser('all'))
 {
-	$msg	.= 'Missing mandatory parameter CensusId. ';
+    if (strlen($transcriber) == 0)
+		$transcriber	= $userid;
+    $action		        = 'Update';
 }
 else
+if (canUser('edit'))
+{
+    if ($userid == $transcriber)
+		$action		    = 'Update';
+    else
+		$action		    = 'Proofread';
+}
+else
+    $action		        = 'Display';
+
+$census		            = new Census(array('censusid' => $censusId));
+$censusYear			    = $census->get('year');
+if ($censusYear < 1867 && substr($censusId, 0, 2) == 'CA')
+{
+    $censusId           = $province . $censusYear;
+    $census		        = new Census(array('censusid' => $censusId));
+}
+if (strlen($province) == 0)
+    $province		    = $census->get('province');
+
+// get template
+$warn	        .= ob_get_clean();	// ensure previous output in page
+$template	    = new FtTemplate("CensusForm$censusYear$action$lang.html");
+
+// validate mandatory parameters 
+if (strlen($censusId) == 0)
+    $msg	.= 'Missing mandatory parameter Census. ';
+else
+    $getParms['censusid']	= $censusId;
+
+if (!($census->isExisting()))
+    $msg	.= "Invalid value of CensusID='$value'. ";
 if ($censusYear < 1867 && strlen($province) == 0)
 {		// missing mandatory parameter
 	$msg	.= 'Missing mandatory parameter Province. ';
 }		// missing mandatory parameter
+
+if (strlen($province) == 2)
+{
+	$domain		        = new Domain(array('code' => "CA$province"));
+	$provinceName		= $domain->getName();
+}
+else
+if ($censusYear < 1867)
+    $msg	.= "Missing Province. ";
+
 if (strlen($distID) == 0)
 {		// missing mandatory parameter
 	$msg	.= 'Missing mandatory parameter District. ';
 }		// missing mandatory parameter
-if (strlen($subDistID) == 0)
-{		// missing mandatory parameter
-	$msg	.= 'Missing mandatory parameter SubDistrict. ';
-}		// missing mandatory parameter
-if (strlen($page) == 0)
-{		// missing mandatory parameter
-	$msg	.= 'Missing mandatory parameter Page. ';
-}		// missing mandatory parameter
-
-if (strlen($msg) == 0)
-{		// no messages, do search
+else
+{
 	$district	= new District(array('census'	=> $census,
 							         'id'	    => $distID));
 	if ($lang == 'fr')
 	    $districtName	= $district->get('nom');
 	else
-	    $districtName	= $district->get('name');
+        $districtName	= $district->get('name');
+}
 
+if (strlen($subDistID) == 0)
+{		// missing mandatory parameter
+	$msg	.= 'Missing mandatory parameter SubDistrict. ';
+}		// missing mandatory parameter
+else
+{
 	// get information about the sub-district
 	$parms	= array('sd_census'	=> $census, 
 					'sd_distid'	=> $distID, 
@@ -303,11 +307,20 @@ if (strlen($msg) == 0)
 
 	$subDistrict	= new SubDistrict($parms);
 	if (!$subDistrict->isExisting())
-	    $warn		.= "<p>Invalid identification of sub-district:".
-	" sd_census=$censusId, sd_distid=$distID, sd_id=$subDistID, sd_div=$division</p>\n";
+	    $msg		.= "Invalid identification of sub-district:".
+	" sd_census=$censusId, sd_distid=$distID, sd_id=$subDistID, sd_div=$division.  ";
 	$subDistrictName	= $subDistrict->get('sd_name');
 	if (strlen($subDistrictName) > 48)
-	    $subDistrictName	= substr($subDistrictName, 0, 45) . '...';
+        $subDistrictName	= substr($subDistrictName, 0, 45) . '...';
+}
+
+if (strlen($page) == 0)
+{		// missing mandatory parameter
+	$msg	.= 'Missing mandatory parameter Page. ';
+}		// missing mandatory parameter
+
+if (strlen($msg) == 0)
+{		// no messages, do search
 	$page1			    = $subDistrict->get('sd_page1');
 	$imageBase		    = $subDistrict->get('sd_imagebase');
 	$relFrame		    = $subDistrict->get('sd_relframe');
@@ -351,34 +364,10 @@ if (strlen($msg) == 0)
 						                'fc_Page'	=> $page,
 						                'order'		=> "FC_Line, FC_FldName"));
 
-	// manage transcriber and proofreader status
-	if (canUser('all'))
-	{
-	    if (strlen($transcriber) == 0)
-			$transcriber	= $userid;
-	    $action		= 'Update';
-	}
-	else
-	if (canUser('edit'))
-	{
-	    if ($userid == $transcriber)
-			$action		= 'Update';
-	    else
-			$action		= 'Proofread';
-	}
-	else
-	    $action		    = 'Display';
 }		// no errors, continue with request
 else
 {
-	$action			    = 'Display';
-	$transcriber		= '';
-	$proofreader		= '';
-	$image			    = '';
 }
-
-$warn	        .= ob_get_clean();	// ensure previous output in page
-$template	    = new FtTemplate("CensusForm$censusYear$action$lang.html");
 
 $popups	= "CensusFormPopups$lang.html";
 $template->includeSub($popups,

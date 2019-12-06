@@ -57,533 +57,329 @@ use \Exception;
  *		2018/01/18		tolerate lang parameter							*
  *		2018/02/23		accept being invoked with CA1851 or CA1861 plus	*
  *						Province parameter								*
+ *		2019/11/26      use Template                                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/District.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // default values for parameters
-$censusId		= '';
-$censusYear		= null;
-$distId		= '';
-$province		= 'CW';
-$lang		= 'en';
+$cc						        = 'CA';
+$countryName                    = 'Canada';
+$censusId						= '';
+$censusYear						= null;
+$censusName						= '';
+$distId		    				= '';
+$distName		    			= '';
+$province						= 'ON';
+$provinceName					= 'Ontario';
+$lang		    				= 'en';
+$unexpected                     = array();
 
-// validate parameters
-foreach ($_GET as $key => $value)
-{			        // loop through all parameters
-	switch(strtolower($key))
-	{		        // act on parameter name
-	    case 'census':
-	    case 'censusid':
-	    {		    // Census identifier
-			$censusId	= $value;
-			$censusRec	= new Census(array('censusid'	=> $censusId));
-			if ($censusRec->isExisting())
-			{
-			    $censusYear	= intval(substr($censusId, 2));
-			    if ($censusYear < 1867)
-					if ($censusRec->get('collective') == 0)
-					    $province	= substr($censusId, 0, 2);
-					else
-					    $warn	.= "<p>censusId='$censusId' is not the census of a specific colony</p>\n";
-			}
-			else
-			{
-			    $msg	.= "Invalid Census identifier '$censusId'. ";
-			}
-			break;
-	    }		    // Census identifier
-
-	    case 'district':
-	    {		    // district number
-			$distId		= $value;
-			$result		= array();
-			if (preg_match("/^([0-9]+)(\.[05])?$/", $distId, $result) != 1)
-			    $msg	.= "District value '$distId' is invalid. ";
-			else
-			{
-			    if (count($result) > 2 && $result[2] == '.0')
-					$distId	= $result[1];	// integral portion only
-			}
-			break;
-	    }		    // District number
-
-	    case 'province':
-	    {		    // province code deprecated
-			if (strlen($value) == 2 && $censusRec->get('collective') == 1)
-			{
-			    $province		= strtoupper($value);
-			    $censusId		= $province . $censusYear;
-			    $censusRec	    = new Census(array('censusid'	=> $censusId));
-			    $warn		    .= "<p>CensusId corrected to '$censusId'</p>\n";
-			}
-			break;
-	    }		    // province code 
-
-	    case 'lang':
-	    {		    // language
-			$lang	            = FtTemplate::validateLang($value);
-			break;
-	    }		    // language
-
-	    case 'debug':
-	    {		    // debug handled by common
-			break;
-	    }		    // debug handled by common
-
-	    default:
-	    {	        // unexpected parameter
-			$warn	.= "Unexpected parameter $key='$value'. ";
-			break;
-	    }	        // unexpected parameter
-	}	            // act on parameter name
-}		            // loop through all parameters
-
-// check for missing parameters
-if (is_null($censusId))
-{		            // Census missing
-	$censusId	= '';
-	$msg		.= 'Census parameter missing. ';
-}		            // Census missing
-
-if ($distId == '')
-{		            // District missing
-	$msg		.= 'District parameter missing. ';
-}		            // District missing
+// process parameters passed by method=get
+if (count($_GET) > 0)
+{	        	        // invoked by URL
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	// validate parameters
+	foreach ($_GET as $key => $value)
+	{			        // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{		        // act on parameter name
+		    case 'census':
+		    case 'censusid':
+		    {		    // Census identifier
+				$censusId	    = $value;
+				break;
+		    }		    // Census identifier
+	
+		    case 'district':
+		    {		    // district number
+				$distId		    = $value;
+				break;
+		    }		    // District number
+	
+		    case 'province':
+		    {		    // province code deprecated
+				$province	    = strtoupper($value);
+				break;
+		    }		    // province code 
+	
+		    case 'lang':
+		    {		    // language
+				$lang	        = FtTemplate::validateLang($value);
+				break;
+		    }		    // language
+	
+		    case 'debug':
+		    {		    // debug handled by common
+				break;
+		    }		    // debug handled by common
+	
+		    default:
+		    {	        // unexpected parameter
+				$unexpected[$key]   = $value;
+				break;
+		    }	        // unexpected parameter
+		}	            // act on parameter name
+	}		            // loop through all parameters
+    if ($debug)
+        $warn                   .= $parmsText . "</table>\n";
+}	        	        // invoked by URL to display current status of account
 
 // some actions depend upon whether the user can edit the database
 if (canUser('edit'))
 {		            // user can update database
-	$searchPage	= "ReqUpdate.php?Census=$censusId&District=$distId";
-	$action		= 'Update';
+	$action		        = 'Update';
 }		            // user can updated database
 else
 {		            // user can only view database
-	$searchPage	= "QueryDetail$censusYear.html?District=$distId";
-	$action		= 'Query';
+	$action		        = 'Display';
 }		            // user can only view database
 
-// initial defaults reset from database
+$template               = new FtTemplate("CensusStatusDist$action$lang.html");
+
+// check for missing parameters
+if (is_null($censusId))
+{		            // Census missing
+	$censusId	            = '';
+	$msg		            .= $template['censusMissing']->innerHTML;
+}		            // Census missing
+else
+{                   // census specified
+	$censusRec	            = new Census(array('censusid'	=> $censusId));
+	if ($censusRec->isExisting())
+    {
+        $censusName         = $censusRec['name'];
+		$censusYear	        = intval(substr($censusId, 2));
+        if ($censusYear < 1867)
+        {
+			if ($censusRec->get('collective') == 0)
+				$province	= substr($censusId, 0, 2);
+            else
+            {
+                $text       = $template['censusNotPart']->innerHTML;
+                $warn       .= '<p>' . 
+                                str_replace('$CENSUSID', $censusId, $text).
+                                "<p>\n";
+            }
+        }
+        $cc                 = $censusRec['cc'];
+        $country            = new Country(array('code'  => $cc));
+        $countryName        = $country->getName($lang);
+	}
+	else
+    {
+        $text               = $template['censusUndefined']->innerHTML;
+        $msg                .= str_replace('$CENSUSID', $censusId, $text);
+    }
+
+    if ($censusRec->get('collective') == 1)
+    {               // collective census must be qualified by province
+        if (strlen($province) != 2)
+           $province    = 'CW'; 
+		$censusId	    = $province . $censusYear;
+	    $censusRec	    = new Census(array('censusid'	=> $censusId));
+        $text           = $template['censusCorrected']->innerHTML;
+        $warn           .= '<p>' .
+                            str_replace('$CENSUSID', $censusId, $text) .
+	                            "</p>\n";
+    }               // collective census must be qualified by province
+}                   // census specified
+
+if ($distId == '')
+{		            // District missing
+    $msg		        .= $template['districtMissing']->innerHTML;
+    $distName           = 'Missing';
+}		            // District missing
+else
+{                   // district specified
+	$result		        = array();
+    if (preg_match("/^([0-9]+)(\.[05])?$/", $distId, $result) != 1)
+    {
+        $text               = $template['districtInvalid']->innerHTML;
+        $msg                .= str_replace('$DISTID', $distId, $text);
+    }
+	else
+	{
+	    if (count($result) > 2 && $result[2] == '.0')
+			$distId	    = $result[1];	// integral portion only
+	}
+	
+	$district	        = new District(array('census'	=> $censusId,
+					        		         'id'	    => $distId));
+	if (!$district->isExisting())
+    {
+        $text               = $template['districtUndefined']->innerHTML;
+        $msg                .= str_replace(array('$CENSUSID','$DISTID'), 
+                                           array($censusId, $distId),
+                                           $text);
+        $distName           = $district['name'];
+    }
+    else
+        $distName           = 'Unknown';
+}                   // district specified
 
 // if no errors execute the query
 if (strlen($msg) == 0)
 {		            // no errors so far
-	// get the current district
-	$district	= new District(array('census'	=> $censusId,
-							     'id'	=> $distId));
-	$distName	= $district->get('name');
-	$province	= $district->get('province');
+	$distName	            = $district->get('name');
+    $province	            = $district->get('province');
+    $domain                 = new Domain(array('domain' => $cc . $province,
+                                               'lang'   => $lang));
+    $provinceName           = $domain->getName();
 
 	// get the total population of the district
-	if ($district->isExisting())
-	{		        // district id is valid
-	    $prevDistrict	= $district->getPrev();
-	    $nextDistrict	= $district->getNext();
-	    $prevDist		= $prevDistrict->get('id');
-	    $prevDistName	= $prevDistrict->get('name');
-	    $prevCensusId	= $prevDistrict->get('census');
-	    $nextDist		= $nextDistrict->get('id');
-	    $nextDistName	= $nextDistrict->get('name');
-	    $nextCensusId	= $nextDistrict->get('census');
-	    $pop		    = $district->get('d_population');
+    $prevDistrict		    = $district->getPrev();
+    if ($prevDistrict)
+    {
+        $prevDist		    = $prevDistrict->get('id');
+        $prevDistName	    = $prevDistrict->get('name');
+        $prevCensusId	    = $prevDistrict->get('census');
+        $template->set('PREVDIST',      $prevDist);
+        $template->set('PREVDISTNAME',  $prevDistName);
+        $template->set('PREVCENSUSID',  $prevCensusId);
+    }
+    else
+    {
+        $template['topPrev']->update(null);
+        $template['botPrev']->update(null);
+    }
 
-	    // execute a query that includes divisions with no transcription
-	    if ($censusYear > 1901 || $censusYear < 1867)
-			$qryAllOrder	= "LPAD(SD_Id,3,'00'), LPAD(SD_Div,3,'00')";
-	    else
-			$qryAllOrder	= "SD_Id, LPAD(SD_Div,3,'00')";
+    $nextDistrict		    = $district->getNext();
+    if ($nextDistrict)
+    {
+        $nextDist		    = $nextDistrict->get('id');
+        $nextDistName	    = $nextDistrict->get('name');
+        $nextCensusId	    = $nextDistrict->get('census');
+        $template->set('NEXTDIST',      $nextDist);
+        $template->set('NEXTDISTNAME',  $nextDistName);
+        $template->set('NEXTCENSUSID',  $nextCensusId);
+    }
+    else
+    {
+        $template['topNext']->update(null);
+        $template['botNext']->update(null);
+    }
 
-	    if ($censusYear < 1867)
-			$qryAll	= "SELECT SD_DistID, SD_ID, SD_Div," .
-					    "SD_Name, SD_Population," .
-					    "(SELECT SUM(GivenNames != '') " . 
-					    "FROM Census$censusYear WHERE " .
-						    "Province='$province' AND " .	
-						    "District=SD_DistId AND " .
-						    "SubDistrict=SD_Id AND Division=SD_Div) " .
-						    " AS NameCount," . 
-					    "(SELECT SUM(Age != '') " .
-					    "FROM Census$censusYear WHERE " .
-						    "Province='$province' AND " .	
-						    "District=SD_DistId AND " .
-						    "SubDistrict=SD_Id AND Division=SD_Div) " .
-						    "AS AgeCount," .
-					    "(SELECT SUM(IDIR != 0) " .
-					    "FROM Census$censusYear WHERE " .
-						    "Province='$province' AND " .	
-						    "District=SD_DistId AND " .
-						    "SubDistrict=SD_Id AND Division=SD_Div) " .
-						    "AS IDIRCount " .
-					    "FROM SubDistricts " .
-					    "WHERE SD_Census=:censusId AND SD_DistId=:distId " .
-					    "ORDER BY $qryAllOrder";
-	    else
-			$qryAll	= "SELECT SD_DistID, SD_ID, SD_Div," .
-					    "SD_Name, SD_Population," .
-					    "(SELECT SUM(GivenNames != '') " . 
-					    "FROM Census$censusYear WHERE " .
-						    "District=SD_DistId AND " .
-						    "SubDistrict=SD_Id AND Division=SD_Div) " .
-						    " AS NameCount," . 
-					    "(SELECT SUM(Age != '') " .
-					    "FROM Census$censusYear WHERE " .
-						    "District=SD_DistId AND " .
-						    "SubDistrict=SD_Id AND Division=SD_Div) " .
-						    "AS AgeCount," .
-					    "(SELECT SUM(IDIR != 0) " .
-					    "FROM Census$censusYear WHERE " .
-						    "District=SD_DistId AND " .
-						    "SubDistrict=SD_Id AND Division=SD_Div) " .
-						    "AS IDIRCount " .
-					    "FROM SubDistricts " .
-					    "WHERE SD_Census=:censusId AND SD_DistId=:distId " .
-					    "ORDER BY $qryAllOrder";
-	    $sqlParms	    = array('censusId'	=> $censusId,
-					        	'distId'	=> $distId);
-	    $stmt	        = $connection->prepare($qryAll);
-	    $qryAllText	    = debugPrepQuery($qryAll, $sqlParms);
-	    if ($stmt->execute($sqlParms))
-	    {		    // successful query
-			if ($debug)
-			    $warn	.= "<p>CensusUpdateStatusDist.php" . __LINE__ .
-					" $qryAllText</p>\n";
-			$resAll		= $stmt->fetchAll(PDO::FETCH_ASSOC);
-	    }		    // successful query
-	    else
-	    {		    // error on request
-			$msg	    .= "'$qryAllText': " .
-			    		   print_r($stmt->errorInfo(), true);
-	    }		    // error on request
-	}		        // district is valid
+    $pop		    	    = $district->get('d_population');
+
+    $resAll                 = $district->getStatistics();
+    if ($debug)
+    {
+        $warn               .= "<table class='summary'>\n";
+	    $first              = true;
+	    foreach($resAll as $row)
+	    {
+	        if ($first)
+	        {
+	            $warn       .= "<tr>\n";
+	            foreach($row as $field => $value)
+	                $warn   .= "<th class='colhead'>$field</th>\n";
+	            $warn       .= "</tr>\n";
+	            $first      = false;
+	        }
+	        $warn           .= "<tr>\n";
+	        foreach($row as $field => $value)
+	            $warn       .= "<td class='white left'>$value</td>\n"; 
+	        $warn           .= "</tr>\n";
+	    }
+        $warn               .= "</table>\n";
+    }                       // debug response
+
+    $prevDist			= $prevDistrict->get('id');
+    $prevDistName		= $prevDistrict->get('name');
+    $nextDist			= $nextDistrict->get('id');
+    $nextDistName		= $nextDistrict->get('name');
+
+
+	$done		        		= 0;
+    $linked		        		= 0;
+    $data                       = '';
+
+    $rowElement         		= $template['subdist$ir'];
+    $templateText         		= $rowElement->outerHTML;
+	
+	foreach($resAll as $row)
+	{
+        $distId	        		= $row['sd_distid'];
+        if ($distId == floor($distId))
+            $distId     		= intval($distId);
+		$nameCount	    		= $row['namecount'];
+		if (is_null($nameCount))
+		    $row['namecount']	= 0; 
+		$ageCount	    		= $row['agecount'];
+		if (is_null($ageCount))
+		    $row['agecount']	= 0; 
+		$idirCount	    		= $row['idircount'];
+		if (is_null($idirCount))
+		    $row['idircount']	= 0; 
+		$population	    		= $row['sd_population'];
+		if ($population > 0)
+	 	{	// division exists in original images
+	 		$pct	    		= ($nameCount + $ageCount)*50/$population;
+	 		$pctl	    		= $idirCount*100/$population;
+	 	}	// division exists in original images
+	 	else
+	 	{	// division missing
+	 		$pct	    		= 100;
+	 		$pctl	    		= 100;
+        }	// division missing
+        $row['pct']             = number_format($pct,2);
+        $row['pctl']            = number_format($pctl,2);
+        $row['pctclasspct']     = pctClass($pct);
+        $row['pctclasspctl']    = pctClass($pctl);
+
+        $rtemplate              = new \Templating\Template($templateText);
+        $rtemplate['subdist$ir']->update($row);
+        $data                   .= $rtemplate->compile();
+	 
+	 	$done	                += intval($nameCount);
+	 	$linked	                += intval($idirCount);
+    }		// process all rows
+
+    $rowElement->update($data);
+	
+	// summary line
+	if ($pop > 0)
+	{
+		$pct	                = $done*100/$pop;
+		$pctl	                = $linked*100/$pop;
+	}
 	else
-	{		        // no matching district in Districts table
-	    $msg		    .= "District $distId not defined for the $censusId census. ";
-	    $prevDistrict	= null;
-	    $nextDistrict	= null;
-	    $prevDist		= 0;
-	    $prevDistName	= 'Unknown';
-	    $prevCensusId	= $censusId;
-	    $nextDist		= 0;
-	    $nextDistName	= 'Unknown';
-	    $nextCensusId	= $censusId;
-	    $pop		    = 0;
-	}		        // no matching district in Districts table
+	{
+		$pct	                = 0;
+		$pctl	                = 0;
+    }
+    $template->set('DONE',              number_format($done));
+    $template->set('POP',               number_format($pop));
+    $template->set('PCT',               number_format($pct,2));
+    $template->set('PCTL',              number_format($pctl,2));
+    $template->set('PCTCLASSPCT',       pctClass($pct));
+    $template->set('PCTCLASSPCTL',      pctClass($pctl));
 }		            // no errors
 else
-	$distName	        = 'Unknown';
-
-
-if (isset($censusRec))
-	$title	= $censusRec->get('name') .
-			  " District $distId $distName Status";
-else
-	$title	= "$censusId District $distId $distName Status";
-
-htmlHeader($title,
-			array('/jscripts/util.js',
-					'/jscripts/CommonForm.js',
-					'/jscripts/js20/http.js',
-					'CensusUpdateStatusDist.js'));
-?>
-<body>
-<?php
-pageTop(array(
-			"/genealogy.php"	=> "Genealogy",
-			"/genCanada.html"	=> "Canada",
-			"/genCensuses.php"	=> "Censuses",
-			"/database/$searchPage"	=> "$action $censusYear Census", 
-			"/database/CensusUpdateStatus.php?Census=$censusId&Province=$province"
-							=> "$censusYear Census Status"));
-?>	
-<div class='body'>
-  <h1><?php print $title; ?> 
-  <span class='right'>
-	<a href='CensusUpdateStatusDistHelpen.html' target='help'>? Help</a>
-  </span>
-<div style='clear: both;'></div>
-  </h1>
-<?php
-	showTrace();
-	if (strlen($msg) > 0)
-	{		// error, suppress function
-?>	
-<p class='message'>
-	<?php print $msg; ?>	
-</p>
-<?php
-	}		// error, suppress function
-	else
-	{		// no errors
-?>	
-  <!--- Put out a line with links to previous and next section of table -->
-  <div class='center'>
-<?php
-	if ($prevDist > 0)
-	{		// is a previous district
-?>
-  <div class='left'>
-	<a href='CensusUpdateStatusDist.php?Census=<?php print $prevCensusId; ?>&District=<?php print $prevDist; ?>' id='toPrevDist'>
-	    &lt;--- district <?php print $prevDist; ?> 
-			<?php print $prevDistName; ?>
-	</a>
-  </div>
-<?php
-	}		// is a previous district
-?>
-<?php
-	if ($nextDist > 0)
-	{		// is a next district
-?>
-  <div class='right'>
-	<a href='CensusUpdateStatusDist.php?Census=<?php print $nextCensusId; ?>&District=<?php print $nextDist; ?>' id='toNextDist'>
-	    district <?php print $nextDist; ?>
-			<?php print $nextDistName; ?> ---&gt;
-	</a>
-  </div>
-<?php
-	}		// is a next district
-?>
-&nbsp;
-<div style='clear: both;'></div>
-  </div>
-
-  <!--- Put out the response as a table -->
-  <form id='statForm' action='donothing.php'>
-<div id='hidden'>
-  <input type='hidden' id='Census' value='<?php print $censusId ; ?>'>
-  <input type='hidden' id='District' value='<?php print $distId ; ?>'>
-  <input type='hidden' id='DistName' value='<?php print $distName ; ?>'>
-</div>
-<table class='form'>
-  <!--- Put out the column headers -->
-  <thead>
-   <tr>
-	 <th class='colhead1st'>
-	     SubDist
-	 </th>
-	 <th class='colhead'>
-	     Div
-	 </th>
-	 <th class='colhead'>
-	     Name
-	 </th>
-	 <th class='colhead'>
-	     Done
-	 </th>
-	 <th class='colhead'>
-	     Pop.
-	 </th>
-	 <th class='colhead'>
-	     %Done
-	 </th>
-	 <th class='colhead'>
-	     %Linked
-	 </th>
-	 <th class='colhead' colspan='2'>
-	     Action
-	 </th>
-   </tr>
-  </thead>
-  <tbody>
-<?php
-// display the results
-$even		= false;
-$done		= 0;
-$linked		= 0;
-$ir			= 0;
-
-foreach($resAll as $row)
 {
-	$ir++;
-	$District	= $row['sd_distid'];
-	$SubDistrict	= $row['sd_id']; 
-	$Division	= $row['sd_div'];
-	$SD_Name	= $row['sd_name'];
-	$SD_Population	= $row['sd_population'];
-	$NameCount	= $row['namecount'];
-	if (is_null($NameCount))
-	    $NameCount	= 0; 
-	$AgeCount	= $row['agecount'];
-	if (is_null($AgeCount))
-	    $AgeCount	= 0; 
-	$IDIRCount	= $row['idircount'];
-	if (is_null($IDIRCount))
-	    $IDIRCount	= 0; 
-	    if ($SD_Population > 0)
- 	    {	// division exists in original images
- 		$pct	= ($NameCount + $AgeCount)*50/$SD_Population;
- 		$pctl	= $IDIRCount*100/$SD_Population;
- 	    }	// division exists in original images
- 	    else
- 	    {	// division missing
- 		$pct	= 100;
- 		$pctl	= 100;
- 	    }	// division missing
- 
-?>
-   <tr>
-	 <td class='odd bold right first'>
- 	    <?php print $SubDistrict; ?> 
- 	    <input type='hidden' id='SdId<?php print $ir; ?>'
- 		    value='<?php print $SubDistrict; ?>'>
-	 </td>
-	 <td class='odd bold right'>
- 	    <?php print $Division; ?> 
- 	    <input type='hidden' id='Div<?php print $ir; ?>'
- 		    value='<?php print $Division; ?>'> 
-	 </td>
-	 <td class='odd bold left'>
- 	    <?php print htmlspecialchars($SD_Name); ?> 
-	 </td>
-	 <td class='odd bold right'>
- 	    <?php print number_format($NameCount); ?> 
-	 </td>
-	 <td class='odd bold right'>
- 	    <?php print number_format($SD_Population); ?> 
-	 </td>
-	 <td class='<?php print pctClass($pct); ?>'>
- 	    <?php print number_format($pct, 2); ?> 
-	 </td>
-	 <td class='<?php print pctClass($pctl); ?>'>
- 	    <?php print number_format($pctl, 2); ?> 
-	 </td>
-	 <td class='center'>
- 	    <button type='button' id='Edit<?php print $ir; ?>'>
- 		Details
- 	    </button>
-	 </td>
-	 <td class='center'>
- 	    <button type='button' id='Surnames<?php print $ir; ?>'>
- 		Surnames
- 	    </button>
-	 </td>
-   </tr>
-<?php
- 	$done	+= intval($NameCount);
- 	$linked	+= intval($IDIRCount);
-}		// process all rows
-
-// summary line
-if ($pop > 0)
-{
-	$pct	= $done*100/$pop;
-	$pctl	= $linked*100/$pop;
+    $template['dataTable']->update(null);   // hide the tabular display
+    $template['topBrowse']->update(null);   // hide the paging
+    $template['botBrowse']->update(null);   // hide the paging
 }
-else
-{
-	$pct	= 0;
-	$pctl	= 0;
-}
-?>
-  </tbody>
-  <tfoot>
-   <tr>
-	 <td class='odd bold right first'>
- 	    &nbsp;
-	 </td>
-	 <td class='odd bold left'>
- 	    Total
-	 </td>
-	 <td class='odd bold left'>
- 	    &nbsp;
-	 </td>
-	 <td class='odd bold right'>
- 	    <?php print number_format($done); ?> 
-	 </td>
-	 <td class='odd bold right'>
- 	    <?php print number_format($pop); ?>
-	 </td>
-	 <td class='<?php print pctClass($pct); ?>'>
- 	    <?php print number_format($pct, 2); ?> 
-	 </td>
-	 <td class='<?php print pctClass($pctl); ?>'>
- 	    <?php print number_format($pctl, 2); ?> 
-	 </td>
-   </tr>
-  </tfoot>
-</table>
-  </form>
 
-  <!--- Put out a line with links to previous and next section of table -->
-  <div class='center'>
-<?php
-	if ($prevDist > 0)
-	{		// is a previous district
-?>
-<div class='left'>
-	<a href='CensusUpdateStatusDist.php?Census=<?php print $prevCensusId; ?>&District=<?php print $prevDist; ?>' id='btPrevDist'>
-	    &lt;--- district <?php print $prevDist; ?> 
-			<?php print $prevDistName; ?>
-	</a>
-</div>
-<?php
-	}		// is a previous district
-	if ($nextDist > 0)
-	{		// is a next district
-?>
-<div class='right'>
-	<a href='CensusUpdateStatusDist.php?Census=<?php print $nextCensusId; ?>&District=<?php print $nextDist; ?>' id='btNextDist'>
-	    district <?php print $nextDist; ?>
-			<?php print $nextDistName; ?> ---&gt;
-	</a>
-</div>
-<?php
-	}		// is a next district
-?>
-&nbsp;
-<div style='clear:both;'></div>
-  </div>
-<?php
-	}		// no errors
-?>
-  </div> <!-- class='body' -->
-<?php
-pageBot();
-?>
-  <div id='mousetoPrevDist' class='popup'>
-<p class='label'>Go to district <?php print $prevDist; ?>
-			<?php print $prevDistName; ?>
-</p>
-  </div>
-  <div id='mousetoNextDist' class='popup'>
-<p class='label'>Go to district <?php print $nextDist; ?>
-			<?php print $nextDistName; ?>
-</p>
-  </div>
-  <div id='mousebtPrevDist' class='popup'>
-<p class='label'>Go to district <?php print $prevDist; ?>
-			<?php print $prevDistName; ?>
-</p>
-  </div>
-  <div id='mousebtNextDist' class='popup'>
-<p class='label'>Go to district <?php print $nextDist; ?>
-			<?php print $nextDistName; ?>
-</p>
-  </div>
-<div class='balloon' id='HelpEdit'>
-Click on this button to view detailed information about the page by page
-status of the transcription for this division.
-</div>
-<div class='balloon' id='HelpSurnames'>
-Click on this button to view a summary of the surnames that are present in
-the transcription for this division.
-</div>
-<div class='balloon' id='HelpCopy'>
-Click on this button to upload the transcription data and page descriptions
-from the development server to the production server.
-</div>
-<div class='balloon' id='HelpSdId'>
-This cell displays the sub-district identifier within the district.
-</div>
-<div class='balloon' id='HelpDiv'>
-This cell displays the division identifier within the sub-district
-if applicable.
-</div>
-<div class='popup' id='loading'>
-Uploading Division Data
-</div>
-</body>
-</html>
+$template->set('CENSUSNAME',            $censusName);
+$template->set('CENSUSID',              $censusId);
+$template->set('CENSUSYEAR',            $censusYear);
+$template->set('DISTID',                $distId);
+$template->set('DISTNAME',              $distName);
+$template->set('CC',                    $cc);
+$template->set('COUNTRYNAME',           $countryName);
+$template->set('PROVINCE',              $province);
+$template->set('PROVINCENAME',          $provinceName);
+
+$template->display();

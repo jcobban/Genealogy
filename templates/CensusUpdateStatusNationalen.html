@@ -13,24 +13,25 @@
 	<div id='breadcrumbs' class='hidden'>
 	    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
 	    <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">$COUNTRYNAME</a>:
-	    <a href="/genCensuses.php?lang=$LANG">Censuses</a>:
-	    <a href="$SEARCH">$ACTION $CENSUSYEAR Census of $COUNTRYNAME</a>:
+	    <a href="/database/genCensuses.php?cc=$CC&amp;lang=$LANG">Censuses</a>:
+	    <a href="$SEARCH">Update $CENSUSYEAR Census of $COUNTRYNAME</a>:
 	</div>
 	<div class='body'>
-	  <h1>$TITLE
+	  <h1>
+          $CENSUSYEAR Census of $COUNTRYNAME: National Transcription Status
 	      <span class='right'>
-		  <a href='/database/CensusUpdateStatusHelpen.html' target='help'>
-              ? Help</a>
+		    <a href='/database/CensusUpdateStatusHelpen.html' target='help'>
+                ? Help</a>
 	      </span>
 	  </h1>
 	  $TRACE
 	  $MSG
 	  <div id='displayForm'>
-        <div id="provInfo">>
+        <div id="provInfo">
 		  <p class='label' id='provInfo'>
 		    <a href='$link'>
 		      Census $CensusId
-		      province $ProvinceName
+		      $Category of $ProvinceName
 		    </a>
 		  </p>
 		  <p class='label' id='natStats'>
@@ -39,15 +40,23 @@
 	    </div> <!-- id='provInfo'-->
 	  </div> <!-- id='displayForm'-->
     </div> <!-- class='body' -->
-	  <div id='mouseprevCensusLink' class='popup'>
-	    <p class='label'>
-            Go to census $prevCensus province $prevName
-	    </p>
+    <div class="hidden">
+        <span id="censusMissing">
+            The Census parameter is missing.
+        </span>
+        <span id="censusUnsupported">
+            Census='$censusId' is not defined. 
+        </span>
     </div>
-	  <div id='mousenextCensusLink' class='popup'>
-	    <p class='label'>
+	<div id='mouseprevCensusLink' class='popup'>
+	  <p class='label'>
+            Go to census $prevCensus province $prevName
+	  </p>
+    </div>
+	<div id='mousenextCensusLink' class='popup'>
+	  <p class='label'>
             Go to census $nextCensus province $nextName
-	    </p>
+	  </p>
     </div>
     <div class='balloon' id='HelpDist'>
 	    This column displays the district number assigned to the census 

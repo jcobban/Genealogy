@@ -171,6 +171,8 @@ if ($update)
 else
 	$action                 = 'Display';
 $template		= new FtTemplate("PageForm$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'PageForm'));
 
 // validate census identifier
 if ($censusId)

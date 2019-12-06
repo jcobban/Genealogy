@@ -133,6 +133,7 @@ use \Exception;
  *		2019/01/19      avoid failure on district id array              *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/04/01      do not fail if district not specified           *
+ *		2019/12/04      did not set lang parameter on rows              *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -659,7 +660,8 @@ if (strlen($msg) == 0)
 							  "\t  </a>\n";
 		else
 		    $row['fullname']	= "\t    <strong>$surname</strong>,\n" .
-							  "\t    $givennames\n";
+            "\t    $givennames\n";
+        $row['lang']            = $lang;
 		//$result[$i]		= $row;
     }				// loop through lines of response
     $result->rewind();

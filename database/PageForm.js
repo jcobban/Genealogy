@@ -26,6 +26,7 @@
  *						display image using DisplayImage.php			*
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/06/29      first parameter of displayDialog removed        *
+ *		2019/11/25      support scrollable body matched to headings     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -184,13 +185,24 @@ function onLoad()
     }			// loop through all forms
 
     // enable support for hiding and revealing columns
-    var dataTable		= document.getElementById("dataTable");
-    var tblHdr		    = dataTable.tHead;
-    var tblHdrRow	    = tblHdr.rows[0];
+    var dataTable		    = document.getElementById("dataTable");
+    var tblHdr		        = dataTable.tHead;
+    var tblHdrRow	        = tblHdr.rows[0];
+    var tblBody		        = dataTable.tBodies[0];
+    var tblBodyRow	        = null;
+    if (tblBody.rows.length > 0)
+        tblBodyRow          = tblBody.rows[0];
     for(i = 0; i < tblHdrRow.cells.length; i++)
     {		// loop through all cells of header row
-		var th		    = tblHdrRow.cells[i];
-		th.onclick	    = columnClick;
+		var th		        = tblHdrRow.cells[i];
+		th.onclick	        = columnClick;
+        var compstyle       = getComputedStyle(th);
+        var bw              = compstyle.getPropertyValue('border-left-width') * 2;
+        if (tblBodyRow)
+        {
+            var rect        = tblBodyRow.cells[i].getBoundingClientRect();
+            th.style.width  = (rect.width - 6) + 'px';
+        }
     }		// loop through all cells of header row
 
 }		// function onLoad

@@ -29,41 +29,41 @@
     <form action='doNothing.php' name='buttonForm' id='buttonForm'>
 	<p class='label' id='buttonRow'>
 	    <input type='hidden' name='search' disabled='disabled'
-	value='CensusForm$CENSUS.php$SEARCH'>
+	            value='CensusForm$CENSUS.php$SEARCH'>
 	    <input type='hidden' name='image' disabled='disabled'
-		value='$IMAGE'>
+		        value='$IMAGE'>
 	    <button type='button' name='seeAllFields'>See All Fields</button>
 	    <button type='button' name='displayImage'>Display Image</button>
 	</p>
-<!--- Put out a line with links to previous and next section of table -->
-<div class="center" id="topBrowse">
-    <span class='left' id="topPrev">
-	<a href='$npPrev' id='prenpprev'>
-	&lt;---
-	</a>
-    </span>
-    <span class='right' id="topNext">
-	<a href='$npNext' id='prenpnext'>
-	    ---&gt;
-	</a>
-    </span>
-      <span id='respdescrows'>
-	returned rows $first to $last of $totalrows
-      </span>
-      <span id='respdescsub'>
-	$province dist $dId $DName, subdist $subdId $SubDName
-      </span>
-      <span id='respdescdiv'>
-	 div $divId
-      </span>
-      <span id='respdescpage'>
-	 page $page
-      </span>
-      <span id='respdescfam'>
-	 family $family
-      </span>
-    <div style='clear: both;'></div>
-</div>
+	<!--- Put out a line with links to previous and next section of table -->
+	<div class="center" id="topBrowse">
+	    <span class='left' id="topPrev">
+		<a href='$npPrev' id='prenpprev'>
+		&lt;---
+		</a>
+	    </span>
+	    <span class='right' id="topNext">
+		<a href='$npNext' id='prenpnext'>
+		    ---&gt;
+		</a>
+	    </span>
+	      <span id='respdescrows'>
+		returned rows $first to $last of $totalrows
+	      </span>
+	      <span id='respdescsub'>
+		$province dist $dId $DName, subdist $subdId $SubDName
+	      </span>
+	      <span id='respdescdiv'>
+		 div $divId
+	      </span>
+	      <span id='respdescpage'>
+		 page $page
+	      </span>
+	      <span id='respdescfam'>
+		 family $family
+	      </span>
+	    <div style='clear: both;'></div>
+	</div>
   <!--- Put out the response as a table -->
   <table class='summary' cellspacing='0px' id='responseTable'>
     <thead> <!--- Put out the column headers -->
@@ -98,7 +98,7 @@
       <tr id='Row$i'>
 	<td>
 	  <input type='hidden' name='href$i'
-		value="CensusDetails.php?Census=CA{$census}&amp;Province=$province&amp;District=$district&amp;SubDistrict=$subdistrict&amp;Division=$division&amp;Page=$page&amp;Line=$line&amp;lang=$ang">
+		value="CensusDetails.php?Census=CA{$census}&amp;Province=$province&amp;District=$district&amp;SubDistrict=$subdistrict&amp;Division=$division&amp;Page=$page&amp;Line=$line&amp;lang=$lang">
 	  <button type='button' name='Details$i'>
 	    Details
 	  </button>

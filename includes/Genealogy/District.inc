@@ -136,6 +136,13 @@ class District extends Record
     protected	$census		= null;
 
     /********************************************************************
+     *	District::$domain												*
+     *																	*
+     *	Instance of Domain for this District.							*
+     ********************************************************************/
+    protected	$domain		= null;
+
+    /********************************************************************
      *	District::$subDistricts											*
      *																	*
      *	An array of instances of SubDistrict for this District.			*
@@ -915,12 +922,12 @@ class District extends Record
 		global	$warn;
 		global	$connection;
 
-		$sqlParms			= array();
-		$census				= $this->row['d_census'];
-		$sqlParms['census']		= $census;
-		$sqlParms['domain']		= substr($census, 0, 2);
+		$sqlParms			        = array();
+		$census				        = $this->row['d_census'];
+		$sqlParms['census']		    = $census;
+		$sqlParms['domain']		    = substr($census, 0, 2);
 		$sqlParms['censusYear']		= substr($census, 2);
-		$sqlParms['id']			= $this->row['d_id'];
+		$sqlParms['id']		    	= $this->row['d_id'];
 
 		// the ORDER BY clause sorts first by census year and then by country
 		$query		= 'SELECT * FROM Districts ' . 
@@ -1021,6 +1028,26 @@ class District extends Record
     }           // function getCensus
 
     /********************************************************************
+     *	function District::getDomain    								*
+     *																	*
+     *  Get the associated instance of class Domain.                    *
+     *																	*
+     *	Returns:														*
+     *	    instance of class Domain									*
+     ********************************************************************/
+    function getDomain($lang = 'en')
+    {
+        if (is_null($this->domain))
+        {
+            $census             = $this->getCensus();
+            $domainId           = $census['cc'] . $this->row['d_province'];
+            $this->domain       = new Domain(array('domain' => $domainId,
+                                                   'lang'   => $lang));
+        }
+        return $this->domain;
+    }           // function getDomain
+
+    /********************************************************************
      *	function District::getSubDistricts								*
      *																	*
      *  Get the set of sub-districts that are defined for this instance	*
@@ -1051,6 +1078,117 @@ class District extends Record
 
 		return $this->subDistricts;
     }			// function District::getSubDistricts
+
+    /********************************************************************
+     *	function District::getStatistics								*
+     *																	*
+     *  Get the statistics for the SubDistricts in this District.       *
+     *																	*
+     *	Returns:														*
+     *	    array of associative arrays                                 *
+	 *    		ir		        sequential row number			        *
+     *          sd_distid		district id			                    * 
+     *          sd_id		    sub-district id			                * 
+     *          sd_div		    division name			                *
+     *			sd_name		    sub-district name			            * 
+     *			sd_population	population			                    *
+	 *			namecount		number of rows with name filled in	    * 
+	 *			agecount		number of rows with age filled in	    *
+	 *			idircount       number of rows linked to family tree    *
+     ********************************************************************/
+    function getStatistics()
+    {
+		global $debug;
+		global $warn;
+        global $msg;
+        global $connection;
+
+        $censusId				    = $this->row['d_census'];
+        $distId			            = $this->row['d_id'];
+        $domain		                = substr($censusId, 0, strlen($censusId) - 4);
+        $censusYear		            = substr($censusId, -4);
+
+	    // execute a query that includes divisions with no transcription
+	    if ($censusYear > 1901 || $censusYear < 1867)
+			$qryAllOrder	= "LPAD(SD_Id,3,'00'), LPAD(SD_Div,3,'00')";
+	    else
+			$qryAllOrder	= "SD_Id, LPAD(SD_Div,3,'00')";
+	
+        if ($censusYear < 1867)
+        {
+            $province       = substr($domain, -2);
+			$qryAll	        = "SELECT  (@row_number:=@row_number + 1) AS ir,
+                                SD_DistID, SD_ID, SD_Div," .
+					            "SD_Name, SD_Population," .
+					            "(SELECT SUM(GivenNames != '') " . 
+							    "FROM Census$censusYear WHERE " .
+								    "Province=:province AND " .	
+								    "District=SD_DistId AND " .
+								    "SubDistrict=SD_Id AND Division=SD_Div) " .
+								    " AS NameCount," . 
+							    "(SELECT SUM(Age != '') " .
+							    "FROM Census$censusYear WHERE " .
+								    "Province=:province AND " .	
+								    "District=SD_DistId AND " .
+								    "SubDistrict=SD_Id AND Division=SD_Div) " .
+								    "AS AgeCount," .
+							    "(SELECT SUM(IDIR != 0) " .
+							    "FROM Census$censusYear WHERE " .
+								    "Province=:province AND " .	
+								    "District=SD_DistId AND " .
+								    "SubDistrict=SD_Id AND Division=SD_Div) " .
+								    "AS IDIRCount " .
+							    "FROM SubDistricts " .
+							    "WHERE SD_Census=:censusId AND SD_DistId=:distId " .
+                                "ORDER BY $qryAllOrder";
+            $sqlParms	    = array('censusId'	=> $censusId,
+                                    'province'  => $province,
+                                    'distId'	=> $distId);
+        }
+        else
+        {
+            $qryAll	        = "SELECT (@row_number:=@row_number + 1) AS ir,
+                                SD_DistID, SD_ID, SD_Div," .
+							    "SD_Name, SD_Population," .
+							    "(SELECT SUM(GivenNames != '') " . 
+							    "FROM Census$censusYear WHERE " .
+								    "District=SD_DistId AND " .
+								    "SubDistrict=SD_Id AND Division=SD_Div) " .
+								    " AS NameCount," . 
+							    "(SELECT SUM(Age != '') " .
+							    "FROM Census$censusYear WHERE " .
+								    "District=SD_DistId AND " .
+								    "SubDistrict=SD_Id AND Division=SD_Div) " .
+								    "AS AgeCount," .
+							    "(SELECT SUM(IDIR != 0) " .
+							    "FROM Census$censusYear WHERE " .
+								    "District=SD_DistId AND " .
+								    "SubDistrict=SD_Id AND Division=SD_Div) " .
+								    "AS IDIRCount " .
+							    "FROM SubDistricts " .
+							    "WHERE SD_Census=:censusId AND SD_DistId=:distId " .
+							    "ORDER BY $qryAllOrder";
+	        $sqlParms	    = array('censusId'	=> $censusId,
+                                    'distId'	=> $distId);
+        }
+        $connection->query('SET @row_number = 0');
+	    $stmt	        = $connection->prepare($qryAll);
+	    $qryAllText	    = debugPrepQuery($qryAll, $sqlParms);
+	    if ($stmt->execute($sqlParms))
+	    {		    // successful query
+			if ($debug)
+			    $warn	.= "<p>District::getStatistics: " . __LINE__ .
+					            " $qryAllText</p>\n";
+			return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	    }		    // successful query
+	    else
+	    {		    // error on request
+            $msg	    .= "'$qryAllText': " .
+                            print_r($stmt->errorInfo(), true);
+            return false;
+	    }		    // error on request
+
+    }       // function getStatistics
 
     /********************************************************************
      *	function District::synchPopulation								*

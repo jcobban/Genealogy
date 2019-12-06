@@ -1182,6 +1182,7 @@ class Child extends Record
 		$currYear	= intval(date('Y'));
 		$privlim	= $currYear - 72;
 
+        if (is_array($this->row))
 		foreach($this->row as $fld => $value)
 		{		// loop through all fields
 		    switch($fld)

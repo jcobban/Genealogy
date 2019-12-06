@@ -97,6 +97,29 @@ class Page extends Record
     protected static	$defaultOrder	= 'PT_census,PT_distid,PT_sdid,PT_div,PT_sched,PT_page';
 
     /********************************************************************
+     *	Page::$census   												*
+     *																	*
+     *	Save reference to instance of Census                            *
+     ********************************************************************/
+    protected $census                   = null;
+
+    /********************************************************************
+     *	Page::$district												    *
+     *																	*
+     *	Save reference to instance of District                          *
+     ********************************************************************/
+    protected $district                 = null;
+
+    /********************************************************************
+
+    /********************************************************************
+     *	Page::$subDistrict												*
+     *																	*
+     *	Save reference to instance of SubDistrict                       *
+     ********************************************************************/
+    protected $subDistrict              = null;
+
+    /********************************************************************
      *	function Page::__construct										*
      *																	*
      *  Construct an instance of Page based upon the					*
@@ -121,124 +144,129 @@ class Page extends Record
 		global	$warn;
 		global	$connection;
 
-		$needInsert	= false;
-		$msg		            = '';	// local message variable
+		$needInsert	                        = false;
 
-		$this->table	        = 'Pages';
+		$this->table	                    = 'Pages';
 		if (is_array($parms))
 		{		// associative array of parameters
-		    $censusId		    = 'CA1881';
-		    $distId		        = null;
-		    $sdId		        = null;
-		    $div		        = null;
-		    $page		        = null;
-		    $subDistrict	    = null;	// instance of SubDistrict
+		    $censusId		    			= 'CA1881';
+		    $distId		        			= null;
+		    $sdId		        			= null;
+		    $div		        			= null;
+		    $page		        			= null;
+		    $subDistrict	    			= null;	// instance of SubDistrict
 
 		    foreach($parms as $fldname => $value)
 		    {		// loop through parameters
-				$fieldLc	    = strtolower($fldname);
+				$fieldLc	                = strtolower($fldname);
 				if (array_key_exists($fieldLc, self::$translate))
-				    $fieldLc	= self::$translate[$fieldLc];
+				    $fieldLc	            = self::$translate[$fieldLc];
 				switch($fieldLc)
 				{	// act on specific parameters
 				    case 'pt_census':
 				    {
-							$censusId	= $value;
-							break;
+						$censusId	        = $value;
+						break;
 				    }		// Census identifier
 
 				    case 'pt_distid':
 				    {
-							$distId		= $value;
-							break;
+						$distId		        = $value;
+						break;
 				    }		// District identifier
 
 				    case 'pt_sdid':
 				    {
-							if ($value instanceof SubDistrict)
-							{	// object
-							    $subDistrict	= $value;
-							}	// object
-							else
-							if (is_string($value))
-							{	// identifier
-							    $sdId	= $value;
-							}	// identifier
-							else
-							    $warn	.= "<p>$fldname=" .
-									   print_r($value, true) . "</p>\n";
-							break;
+						if ($value instanceof SubDistrict)
+						{	// object
+						    $subDistrict	= $value;
+						}	// object
+						else
+						if (is_string($value))
+						{	// identifier
+						    $sdId	        = $value;
+						}	// identifier
+						else
+						    $warn	        .= "<p>$fldname=" .
+								   print_r($value, true) . "</p>\n";
+						break;
 				    }		// SubDistrict identifier
 
 				    case 'pt_div':
 				    {
-							$div		= $value;
-							break;
+						$div		        = $value;
+						break;
 				    }		// Division identifier
 
 				    case 'pt_sched':
 				    {
-							$sched		= $value;
-							break;
+						$sched		        = $value;
+						break;
 				    }		// Schedule identifier
 
 				    case 'pt_page':
 				    {
-							$page		= $value;
-							break;
+						$page		        = $value;
+						break;
 				    }		// Census identifier
 
-				}	// act on specific parameters
-		    }		// loop through parameters
+				}	        // act on specific parameters
+		    }		        // loop through parameters
 
 		    if (is_null($subDistrict))
-		    {		// need to obtain instance of SubDistrict
-				$sdParms	= array('sd_census'	=> $censusId,
-									'sd_distid'	=> $distId,
-									'sd_id'		=> $sdId,
-									'sd_div'	=> $div,
-									'sd_sched'	=> $sched);
-				try {
-				    $subDistrict	= new SubDistrict($sdParms);
-				}	// try
-				catch (Exception $e) {
-				    $msg	.= "Unable to get SubDistrict object: " .
-								   $e->getMessage() . ". ";
-				}	// catch
-		    }		// need to obtain instance of SubDistrict
-		}		// associative array of parameters
+		    {		        // need to obtain instance of SubDistrict
+				$sdParms	    = array('sd_census'	=> $censusId,
+							    		'sd_distid'	=> $distId,
+							    		'sd_id'		=> $sdId,
+							    		'sd_div'	=> $div,
+							    		'sd_sched'	=> $sched);
+				$subDistrict	= new SubDistrict($sdParms);
+            }		        // need to obtain instance of SubDistrict
+            else
+            {               // use instance passed in parameters
+		        $censusId	    = $subDistrict->get('sd_census');
+		        $distId		    = $subDistrict->get('sd_distid');
+		        $sdId		    = $subDistrict->get('sd_id');
+		        $div		    = $subDistrict->get('sd_div');
+		        $sched		    = $subDistrict->get('sd_sched');
+            }               // use instance passed in parameters
+		}		            // associative array of parameters
 		else
 		if ($parms instanceof SubDistrict)
 		{
-		    $subDistrict	= $parms;
+		    $subDistrict	        = $parms;
+		    $censusId	            = $subDistrict->get('sd_census');
+		    $distId		            = $subDistrict->get('sd_distid');
+		    $sdId		            = $subDistrict->get('sd_id');
+		    $div		            = $subDistrict->get('sd_div');
+		    $sched		            = $subDistrict->get('sd_sched');
 		}
 		else
 		{		// unsupported parameter type
-		    $msg	.= "Unsupported parameter type: $parms. ";
+		    $this->msg	    .= "Unsupported parameter type: $parms. ";
 		}		// unsupported parameter type
 
-		if (strlen($msg) > 0)
-		    throw new Exception("Page::__construct: " . $msg);
+        $this->subDistrict          = $subDistrict;
+		$this->census	            = $subDistrict->getCensus();
 
-		$censusId	= $subDistrict->get('sd_census');
-		$distId		= $subDistrict->get('sd_distid');
-		$sdId		= $subDistrict->get('sd_id');
-		$div		= $subDistrict->get('sd_div');
-		$sched		= $subDistrict->get('sd_sched');
+		$page1	    	            = $this->subDistrict['sd_page1']; 
+		$pages	    	            = $this->subDistrict['sd_pages'];
+		$bypage	    	            = $this->subDistrict['sd_bypage'];
 
-		// this should never fail because the key is from a record
-		// in the SubDistricts table
-		$censusRec	= new Census(array('censusid'	=> $censusId));
+        if ($page < $page1 || 
+            $page > ($page1 + $bypage * ($pages - 1)) ||
+            (($page - $page1) % $bypage) != 0)
+            $this->msg      .= "Page::__construct: $page is not a valid page number within SubDistrict ($censusId,$distId,$sdId,$div). ";
 
 		// construct the query for an existing record
 		$query	= 'SELECT * FROM Pages  ' .
 							    'WHERE PT_Census=:censusId AND  ' .
-								  'PT_DistId=:distId AND  ' .
-								  'PT_SdId=:sdId AND ' .
-								  'PT_Div=:div AND ' .
-								  'PT_Sched=:sched AND ' .
-								  'PT_Page=:page';
-		$sqlParms	= array('censusId'	=> $censusId,
+								      'PT_DistId=:distId AND  ' .
+								      'PT_SdId=:sdId AND ' .
+								      'PT_Div=:div AND ' .
+								      'PT_Sched=:sched AND ' .
+								      'PT_Page=:page';
+		$sqlParms	    = array('censusId'	=> $censusId,
 								'distId'	=> $distId,
 								'sdId'		=> $sdId,
 								'div'		=> $div,
@@ -246,8 +274,8 @@ class Page extends Record
 								'page'		=> $page);
 
 		// query the database
-		$stmt		= $connection->prepare($query);
-		$queryText	= debugPrepQuery($query, $sqlParms);
+		$stmt		                    = $connection->prepare($query);
+		$queryText	                    = debugPrepQuery($query, $sqlParms);
 
 
 		if ($stmt->execute($sqlParms))
@@ -255,24 +283,24 @@ class Page extends Record
 		    if ($debug)
 				$warn	.= "<p>Page::__construct: " . __LINE__ . 
 								" $queryText</p>\n";
-		    $result		= $stmt->fetch(PDO::FETCH_ASSOC);
+		    $result		                = $stmt->fetch(PDO::FETCH_ASSOC);
 		    if (is_array($result))
 		    {		// existing record
-				$dbrow		= $result;
-				$needInsert	= false;
+				$dbrow		            = $result;
+				$needInsert	            = false;
 		    }		// existing record
 		    else
 		    {		// create a new record
 				// set defaults
-				$dbrow			= self::$initRow;
-				$dbrow['pt_census']	= $censusId;
-				$dbrow['pt_distid']	= $distId;
-				$dbrow['pt_sdid']	= $sdId;
-				$dbrow['pt_div']	= $div;
-				$dbrow['pt_sched']	= $sched;
-				$dbrow['pt_page']	= $page;
-				$dbrow['pt_population']	= $censusRec->get('linesPerPage');
-				$needInsert		= true;
+				$dbrow			        = self::$initRow;
+				$dbrow['pt_census']	    = $censusId;
+				$dbrow['pt_distid']	    = $distId;
+				$dbrow['pt_sdid']	    = $sdId;
+				$dbrow['pt_div']	    = $div;
+				$dbrow['pt_sched']	    = $sched;
+				$dbrow['pt_page']	    = $page;
+				$dbrow['pt_population']	= $this->census->get('linesPerPage');
+				$needInsert		    = true;
 		    }		// create new record
 
 		    // invoke constructor of base class
@@ -341,8 +369,8 @@ class Page extends Record
 		    {		// no validation implemented yet
 				return parent::set($field, $value);
 		    }		// no validation implemented yet
-		}		// switch on field name
-    }		// function Page::set
+            }		// switch on field name
+        }		// function Page::set
 
     /********************************************************************
      *	function Page::save												*

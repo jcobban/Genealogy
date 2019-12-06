@@ -125,6 +125,7 @@ use \Exception;
  *		2019/11/20      always create RecordSet if $id is not set       *
  *		                if $parms is empty replace with null to get all *
  *		                pass limit and offset values in parms           *
+ *		2019/11/28      table=Censuses&id=censusid may create new entry *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -782,8 +783,10 @@ require_once __NAMESPACE__ . '/Source.inc';
 					$record	= new Source(array('idsr' => $id));
 			    }
 			}
-			else
-			    $msg	.= "Missing parameters. ";
+            else
+			{
+			    $record	            = new RecordSet('Sources',$parms);
+			}
 			$top	= 'source';
 			break;
 	    }		// Master Source record
@@ -1078,8 +1081,22 @@ require_once __NAMESPACE__ . '/MethodistBaptism.inc';
 	    }		// MethodistBaptisms
 
 	    case 'Censuses':
-	    {
-			$record		= new RecordSet('Censuses',$parms);
+        {
+			if (isset($id))
+			{
+			    if (is_array($id))
+			    {		// search parameters
+					$record	    = new RecordSet('Censuses',$id);
+			    }		// search parameters
+			    else
+			    {
+					$record	    = new Census(array('censusid' => $id));
+			    }
+			}
+			else
+			{
+			    $record	        = new RecordSet('Censuses',$parms);
+			}
 			$top		= 'census';
 			break;
 	    }		// Censuses
