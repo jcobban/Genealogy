@@ -16,38 +16,38 @@ use \Iterator;
  *  of the table MarriageIndi.											*
  *																		*
  *    CREATE TABLE `MarriageIndi` (										*
- *		`M_RegDomain` VARCHAR(4) NOT NULL DEFAULT 'CAON',				*
- *		`M_RegYear` INT(11) NOT NULL,									*
- *		`M_RegNum` INT(11) NOT NULL,									*
- *		`M_Role` CHAR(1) NOT NULL DEFAULT '',							*
- *		`M_Surname` VARCHAR(32) DEFAULT '',								*
- *		`M_SurnameSoundex` CHAR(4) DEFAULT '',							*
- *		`M_GivenNames` VARCHAR(48) DEFAULT '',							*
- *		`M_Age` VARCHAR(16) DEFAULT NULL,								*
- *		`M_BYear` INT(11) DEFAULT NULL,									*
- *		`M_Residence` VARCHAR(128) DEFAULT NULL,						*
- *		`M_BirthPlace` VARCHAR(128) DEFAULT NULL,						*
- *		`M_MarStat` CHAR(1) DEFAULT '?',								*
- *		`M_Occupation` VARCHAR(64) DEFAULT '',							*
- *		`M_FatherName` VARCHAR(64) DEFAULT '',							*
- *		`M_MotherName` VARCHAR(64) DEFAULT '',							*
- *		`M_Religion` VARCHAR(64) DEFAULT '',							*
- *		`M_WitnessName` VARCHAR(64) DEFAULT '',							*
- *		`M_WitnessRes` VARCHAR(128) DEFAULT NULL,						*
- *		`M_Remarks` TEXT,												*
- *		`M_IDIR` INT(10) UNSIGNED DEFAULT NULL,							*
- *		PRIMARY KEY (`M_RegDomain`,										*
- *				     `M_RegYear`,										*
- *				     `M_RegNum`,										*
- *				     `M_Role`),											*
- *		KEY `M_Surname` (`M_Surname`),									*
- *		KEY `M_SurnameSoundex` (`M_SurnameSoundex`),					*
- *		KEY `M_GivenNames` (`M_GivenNames`),							*
- *		KEY `M_Residence` (`M_Residence`),								*
- *		KEY `M_BirthPlace` (`M_BirthPlace`),							*
- *		KEY `M_Occupation` (`M_Occupation`),							*
- *		KEY `M_Religion` (`M_Religion`),								*
- *		KEY `M_IDIR` (`M_IDIR`) )										*
+ *		`RegDomain` VARCHAR(4) NOT NULL DEFAULT 'CAON',		    		*
+ *		`RegYear` INT(11) NOT NULL,							    		*
+ *		`RegNum` INT(11) NOT NULL,							    		*
+ *		`Role` CHAR(1) NOT NULL DEFAULT '',					    		*
+ *		`Surname` VARCHAR(32) DEFAULT '',								*
+ *		`SurnameSoundex` CHAR(4) DEFAULT '',							*
+ *		`GivenNames` VARCHAR(48) DEFAULT '',							*
+ *		`Age` VARCHAR(16) DEFAULT NULL,						    		*
+ *		`BYear` INT(11) DEFAULT NULL,									*
+ *		`Residence` VARCHAR(128) DEFAULT NULL,				    		*
+ *		`BirthPlace` VARCHAR(128) DEFAULT NULL,					    	*
+ *		`MarStat` CHAR(1) DEFAULT '?',						    		*
+ *		`Occupation` VARCHAR(64) DEFAULT '',							*
+ *		`FatherName` VARCHAR(64) DEFAULT '',							*
+ *		`MotherName` VARCHAR(64) DEFAULT '',							*
+ *		`Religion` VARCHAR(64) DEFAULT '',					    		*
+ *		`WitnessName` VARCHAR(64) DEFAULT '',							*
+ *		`WitnessRes` VARCHAR(128) DEFAULT NULL,				    		*
+ *		`Remarks` TEXT,										    		*
+ *		`IDIR` INT(10) UNSIGNED DEFAULT NULL,							*
+ *		PRIMARY KEY (`RegDomain`,										*
+ *				     `RegYear`,									    	*
+ *				     `RegNum`,									    	*
+ *				     `Role`),											*
+ *		KEY `Surname` (`Surname`),								    	*
+ *		KEY `SurnameSoundex` (`SurnameSoundex`),				    	*
+ *		KEY `GivenNames` (`GivenNames`),						    	*
+ *		KEY `Residence` (`Residence`),							    	*
+ *		KEY `BirthPlace` (`BirthPlace`),						    	*
+ *		KEY `Occupation` (`Occupation`),						    	*
+ *		KEY `Religion` (`Religion`),							    	*
+ *		KEY `IDIR` (`IDIR`) )									    	*
  *		ENGINE=InnoDB DEFAULT CHARSET=utf8 								*
  *																		*
  *  History:															*
@@ -66,6 +66,7 @@ use \Iterator;
  *		2018/12/17      change throws to generate message               *
  *		2018/12/23      support invocation by array of search parms     *
  *		                support passing instance of Domain              *
+ *		2019/12/13      remove M_ prefix from field names               *
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
@@ -87,26 +88,42 @@ class MarriageParticipant extends Record
      *	Default initial row												*
      ********************************************************************/
     protected static $initRow	= array(
-						'm_regdomain'		=> 'CAON',
-						'm_regyear'		    => 2020,
-						'm_regnum'		    => 0,
-						'm_role'	    	=> 'b',
-						'm_surname'	    	=> '',
-						'm_surnamesoundex'	=> '',
-						'm_givennames'		=> '',
-						'm_age'		    	=> 20,
-						'm_byear'	    	=> 0,
-						'm_residence'		=> '',
-						'm_birthplace'		=> '',
-						'm_marstat'	    	=> 'S',
-						'm_occupation'		=> '',
-						'm_fathername'		=> '',
-						'm_mothername'		=> '',
-						'm_religion'		=> '',
-						'm_witnessname'		=> '',
-						'm_witnessres'		=> '',
-						'm_remarks'	    	=> '',
-						'm_idir'	    	=> 0);
+						'regdomain'	    	=> 'CAON',
+						'regyear'		    => 2020,
+						'regnum'		    => 0,
+						'role'	        	=> 'b',
+						'surname'	    	=> '',
+						'surnamesoundex'	=> '',
+						'givennames'		=> '',
+						'age'		    	=> 20,
+						'byear'	        	=> 0,
+						'residence'	    	=> '',
+						'birthplace'		=> '',
+						'marstat'	    	=> 'S',
+						'occupation'		=> '',
+						'fathername'		=> '',
+						'mothername'		=> '',
+						'religion'	    	=> '',
+						'witnessname'		=> '',
+						'witnessres'		=> '',
+						'remarks'	    	=> '',
+						'idir'	        	=> 0);
+
+    /********************************************************************
+     *	MarriageParticipant::$info								        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                		'table'     		=> 'MarriageIndi',
+                		'name'      		=> 'MarriageIndi',
+                		'prime'	    		=> 
+                            array('RegDomain','RegYear','RegNum, Role'),
+	            		'srvmg'     		=> false,
+	            		'fldcount'			=> 20,
+                		'order'     		=> 
+        								'RegDomain, RegYear, RegNum, Role',
+                		'classname' 		=> 'MarriageParticipant');
 
     /********************************************************************
      *	MarriageParticipant::$translate									*
@@ -114,26 +131,27 @@ class MarriageParticipant extends Record
      *	array containing synonyms for field names						*
      ********************************************************************/
     protected static $translate	= array(
-						'regdomain'	    	=> 'm_regdomain',
-						'regyear'	    	=> 'm_regyear',
-						'regnum'	    	=> 'm_regnum',
-						'role'		    	=> 'm_role',
-						'surname'	    	=> 'm_surname',
-						'surnamesoundex'	=> 'm_surnamesoundex',
-						'givennames'		=> 'm_givennames',
-						'age'		    	=> 'm_age',
-						'byear'		    	=> 'm_byear',
-						'residence'	    	=> 'm_residence',
-						'birthplace'		=> 'm_birthplace',
-						'marstat'	    	=> 'm_marstat',
-						'occupation'		=> 'm_occupation',
-						'fathername'		=> 'm_fathername',
-						'mothername'		=> 'm_mothername',
-						'religion'	    	=> 'm_religion',
-						'witnessname'		=> 'm_witnessname',
-						'witnessres'		=> 'm_witnessres',
-						'remarks'	    	=> 'm_remarks',
-						'idir'		    	=> 'm_idir');
+						'domain'	    	    => 'regdomain',
+						'm_regdomain'	    	=> 'regdomain',
+						'm_regyear'	        	=> 'regyear',
+						'm_regnum'	        	=> 'regnum',
+						'm_role'		    	=> 'role',
+						'm_surname'	        	=> 'surname',
+						'm_surnamesoundex'  	=> 'surnamesoundex',
+						'm_givennames'	    	=> 'givennames',
+						'm_age'		        	=> 'age',
+						'm_byear'		    	=> 'byear',
+						'm_residence'	    	=> 'residence',
+						'm_birthplace'	    	=> 'birthplace',
+						'm_marstat'	        	=> 'marstat',
+						'm_occupation'	    	=> 'occupation',
+						'm_fathername'	    	=> 'fathername',
+						'm_mothername'	    	=> 'mothername',
+						'm_religion'	    	=> 'religion',
+						'm_witnessname'	    	=> 'witnessname',
+						'm_witnessres'	    	=> 'witnessres',
+						'm_remarks'	        	=> 'remarks',
+						'm_idir'		    	=> 'idir');
 
     /********************************************************************
      *	MarriageParticipant::$defaultOrder								*
@@ -141,7 +159,7 @@ class MarriageParticipant extends Record
      *	default sort order used by RecordSet							*
      ********************************************************************/
     protected static $defaultOrder	=
-								'M_RegDomain, M_RegYear, M_RegNum, M_Role';
+								'RegDomain, RegYear, RegNum, Role';
 
     /********************************************************************
      *	MarriageParticipant->domain     								*
@@ -194,18 +212,18 @@ class MarriageParticipant extends Record
         {			            // convert parameters
             $this->domain           = $domain;
             $code                   = $domain->get('domain');
-            $parms                  = array('m_regdomain'   => $code,
-                                            'm_regyear'     => $year,
-                                            'm_regnum'      => $number,
-                                            'm_role'        => $role);
+            $parms                  = array('regdomain'   => $code,
+                                            'regyear'     => $year,
+                                            'regnum'      => $number,
+                                            'role'        => $role);
         }                       // convert parameters
         else
 		if (is_string($domain))
         {			            // convert parameters
-            $parms                  = array('m_regdomain'   => $domain,
-                                            'm_regyear'     => $year,
-                                            'm_regnum'      => $number,
-                                            'm_role'        => $role);
+            $parms                  = array('regdomain'   => $domain,
+                                            'regyear'     => $year,
+                                            'regnum'      => $number,
+                                            'role'        => $role);
         }                       // convert parameters
         else
 		if (is_array($domain))
@@ -233,25 +251,25 @@ class MarriageParticipant extends Record
 					    $fieldLc	= self::$translate[$fieldLc];
 					switch($fieldLc)
 					{		    // act on specific field
-					    case 'm_regdomain':
+					    case 'regdomain':
 					    {
 							$domain	= $value;
 							break;
 					    }
 	
-					    case 'm_regyear':
+					    case 'regyear':
 					    {
 							$year	= $value;
 							break;
 					    }
 	
-					    case 'm_regnum':
+					    case 'regnum':
 					    {
 							$number	= $value;
 							break;
 					    }
 	
-					    case 'm_role':
+					    case 'role':
 					    {
 							$role	= $value;
 							break;
@@ -293,10 +311,10 @@ class MarriageParticipant extends Record
 	
 			    // search for an existing record matching the key
 			    $query	    = 'SELECT * FROM MarriageIndi ' .
-							    		  'WHERE M_RegDomain=:domain AND  ' .
-						    				'M_RegYear=:year AND ' .
-							    			'M_RegNum=:number AND ' .
-								    		'M_Role=:role';
+							    		  'WHERE RegDomain=:domain AND  ' .
+						    				'RegYear=:year AND ' .
+							    			'RegNum=:number AND ' .
+								    		'Role=:role';
 			    $sqlParms	= array('domain'	=> $domain,
 									'year'		=> $year,
 									'number'	=> $number,
@@ -322,22 +340,22 @@ class MarriageParticipant extends Record
 					{		    // create a new record
 					    // set defaults
 					    $dbrow			        = self::$initRow;
-					    $dbrow['m_regdomain']	= $domain;
-					    $dbrow['m_regyear']		= $year;
-					    $dbrow['m_regnum']		= $number;
-					    $dbrow['m_role']		= $role;
-					    $dbrow['m_byear']		= $year - 20;
+					    $dbrow['regdomain']	= $domain;
+					    $dbrow['regyear']		= $year;
+					    $dbrow['regnum']		= $number;
+					    $dbrow['role']		= $role;
+					    $dbrow['byear']		= $year - 20;
 					    switch($role)
 					    {
 							case 'B':
 							{	// bride
-							    $dbrow['m_marstat']	= 'S';	// spinster
+							    $dbrow['marstat']	= 'S';	// spinster
 							    break;
 							}	// bride
 	
 							case 'G':
 							{	// groom
-							    $dbrow['m_marstat']	= 'B';	// bachelor
+							    $dbrow['marstat']	= 'B';	// bachelor
 							    break;
 							}	// groom
 	
@@ -392,13 +410,13 @@ class MarriageParticipant extends Record
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
 		{		// act on specific field
-		    case 'm_surnamesoundex':
-		    case 'm_byear':
+		    case 'surnamesoundex':
+		    case 'byear':
 		    {
 				return $this->row[$fieldLc];
 		    }		// fields that cannot be altered through this method
 
-		    case 'm_age':
+		    case 'age':
 		    {
 				$matches	= array();
 				if (strlen($value) == 0 ||
@@ -419,44 +437,44 @@ class MarriageParticipant extends Record
 				if ($age > 110)
 				    $warn   .= "<p>MarriageParticipant::set: ".
 								"'$field' value '$value' is too great</p>\n";
-				$regyear	= $this->row['m_regyear'];
-				parent::set('m_byear', $regyear - $age);
-				$retval		= parent::set('m_age', $value);
+				$regyear	= $this->row['regyear'];
+				parent::set('byear', $regyear - $age);
+				$retval		= parent::set('age', $value);
 				return $retval;
-		    }		// M_Age
+		    }		// Age
 
-		    case 'm_idir':
+		    case 'idir':
 		    {
 				if (is_int($value) ||
 				    (is_string($value) && ctype_digit($value)))
 				{
-				    return parent::set('m_idir', $value);
+				    return parent::set('idir', $value);
 				}
                 else
                 {
 				    $warn   .= "<p>MarriageParticipant::set: ". __LINE__ .
                         " IDIR value '$value' must be a positive integer";
-                    return $this->row['m_idir'];
+                    return $this->row['idir'];
                 }
 				break;
-		    }		// M_IDIR
+		    }		// IDIR
 
-		    case 'm_regdomain':
-		    case 'm_regyear':
-		    case 'm_regnum':
-		    case 'm_role':
-		    case 'm_surname':
-		    case 'm_givennames':
-		    case 'm_residence':
-		    case 'm_birthplace':
-		    case 'm_marstat':
-		    case 'm_occupation':
-		    case 'm_fathername':
-		    case 'm_mothername':
-		    case 'm_religion':
-		    case 'm_witnessname':
-		    case 'm_witnessres':
-		    case 'm_remarks':
+		    case 'regdomain':
+		    case 'regyear':
+		    case 'regnum':
+		    case 'role':
+		    case 'surname':
+		    case 'givennames':
+		    case 'residence':
+		    case 'birthplace':
+		    case 'marstat':
+		    case 'occupation':
+		    case 'fathername':
+		    case 'mothername':
+		    case 'religion':
+		    case 'witnessname':
+		    case 'witnessres':
+		    case 'remarks':
 		    {
 				return parent::set($fieldLc, $value);
 		    }
@@ -518,10 +536,10 @@ class MarriageParticipant extends Record
 		    {
 				switch($fld)
 				{
-				    case 'm_surnamesoundex':
+				    case 'surnamesoundex':
 				    {
-						$fldnames	.= $comma . "`M_SurnameSoundex`"; 
-						$surname	= $this->row['m_surname'];
+						$fldnames	.= $comma . "`SurnameSoundex`"; 
+						$surname	= $this->row['surname'];
 						if (is_null($surname) || (strlen($surname) == 0))
 						    $values	.= $comma . "''";
 						else
@@ -531,7 +549,7 @@ class MarriageParticipant extends Record
 						}
 						$comma	= ", ";
 						break;
-				    }		// M_Surname
+				    }		// Surname
 
 				    default:
 				    {
@@ -596,18 +614,18 @@ class MarriageParticipant extends Record
 		    {
 				switch($fld)
 				{		// act on specific fields
-				    case 'm_surname':
+				    case 'surname':
 				    {		// surname changed
-						$set		.= $comma . "`M_Surname`=:surname";
+						$set		.= $comma . "`Surname`=:surname";
 						$sqlParms['surname']	= $value;
-						$set			.= ",`M_SurnameSoundex`="; 
+						$set			.= ",`SurnameSoundex`="; 
 						if (is_null($value) || (strlen($value) == 0))
 						    $set		.= "''";
 						else
 						    $set		.= "LEFT(SOUNDEX(:surname), 4)";
 						$comma			= ", ";
 						break;
-				    }		// M_Surname
+				    }		// Surname
 
 				    default:
 				    {		// most fields
@@ -626,19 +644,19 @@ class MarriageParticipant extends Record
 				// construct the where clause
 				if ($this->former)
 				{		// record has been updated
-				    $sqlParms['odomain']	= $this->former['m_regdomain'];
-				    $sqlParms['oyear']		= $this->former['m_regyear'];
-				    $sqlParms['onumber']	= $this->former['m_regnum'];
-				    $sqlParms['orole']		= $this->former['m_role'];
+				    $sqlParms['odomain']	= $this->former['regdomain'];
+				    $sqlParms['oyear']		= $this->former['regyear'];
+				    $sqlParms['onumber']	= $this->former['regnum'];
+				    $sqlParms['orole']		= $this->former['role'];
 				}		// record has been updated
 				else
 				{		// record unchanged
-				    $sqlParms['odomain']	= $this->row['m_regdomain'];
-				    $sqlParms['oyear']		= $this->row['m_regyear'];
-				    $sqlParms['onumber']	= $this->row['m_regnum'];
-				    $sqlParms['orole']		= $this->row['m_role'];
+				    $sqlParms['odomain']	= $this->row['regdomain'];
+				    $sqlParms['oyear']		= $this->row['regyear'];
+				    $sqlParms['onumber']	= $this->row['regnum'];
+				    $sqlParms['orole']		= $this->row['role'];
 				}		// record unchanged
-				$where		= "M_RegDomain=:odomain AND M_RegYear=:oyear AND M_RegNum=:onumber AND M_Role=:orole";
+				$where		= "RegDomain=:odomain AND RegYear=:oyear AND RegNum=:onumber AND Role=:orole";
 
 				// assemble the UPDATE command
 				$update		.= $set . ' WHERE ' . $where;
@@ -722,15 +740,15 @@ class MarriageParticipant extends Record
 		// delete the record if it is in the database
 		if (!$this->needInsert)
 		{		// existing record in database
-		    $sqlParms	= array('domain'	=> $this->row['m_regdomain'],
-								'year'		=> $this->row['m_regyear'],
-								'number'	=> $this->row['m_regnum'],
-								'role'		=> $this->row['m_role']);
+		    $sqlParms	= array('domain'	=> $this->row['regdomain'],
+								'year'		=> $this->row['regyear'],
+								'number'	=> $this->row['regnum'],
+								'role'		=> $this->row['role']);
 		    $delete	= 'DELETE FROM MarriageIndi WHERE ' .
-									'M_RegDomain=:domain AND ' .
-									'M_RegYear=:year AND ' .
-									'M_RegNum=:number AND ' .
-									'M_Role=:role';
+									'RegDomain=:domain AND ' .
+									'RegYear=:year AND ' .
+									'RegNum=:number AND ' .
+									'Role=:role';
 		    $stmt	= $connection->prepare($delete);
 		    $deleteText	= debugPrepQuery($delete, $sqlParms);
 		    if ($stmt->execute($sqlParms))
@@ -741,7 +759,7 @@ class MarriageParticipant extends Record
                                 " $deleteText</p>\n" . "<p>count=$count</p>\n";
 
 				if ($xml)
-                    print "$indent<$tagname$xmlparms count='$count'>\n" .
+                    print "$indent<$tagname$xmlparms count='$count'\n" .
                             "$indent\t$deleteText\n" .
                             "$indent</$tagname>\n";
 

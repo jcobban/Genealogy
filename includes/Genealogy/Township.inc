@@ -174,7 +174,7 @@ class Township extends Record
 						if ($value instanceof County)
 						{
                             $countyObj  	= $value;
-                            $domainObj      = $countyObj->getDomainObj();
+                            $domainObj      = $countyObj->getDomain();
                             $domain         = $domainObj['domain'];
                             $prov           = $domainObj['prov'];
                             if ($debug)

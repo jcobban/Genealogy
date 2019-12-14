@@ -83,8 +83,9 @@ use \Templating\Template;
  *		2018/06/01		add support for lang parameter					*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2018/12/27		use class Template                      		*
+ *		2019/12/13      remove D_ prefix from field names               *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -153,8 +154,8 @@ $update	            = canUser('edit');
 
 // variables for constructing the SQL statement
 $limitopt			= '';		// limit on which rows to return
-$prefix				= 'D_';		// common prefix of table field names
-$orderby			= 'D_Surname, D_GivenNames, D_RegYear, D_RegNum';
+$prefix				= '';		// common prefix of table field names
+$orderby			= 'Surname, GivenNames, RegYear, RegNum';
 $npuri				= 'DeathRegResponse.php';	// for next and previous links
 $npand				= '?';		// adding parms to $npuri
 $npprev				= '';		// previous selection
@@ -255,7 +256,7 @@ foreach ($_GET as $key => $value)
 			    $regyear	        = $value;
 				$npuri	            .= "{$npand}{$key}={$value}";
 				$npand	            = '&amp;'; 
-			    $orderby	        = "D_RegYear,D_RegNum";
+			    $orderby	        = "RegYear,RegNum";
 			    break;
 			}		// numeric fields
 

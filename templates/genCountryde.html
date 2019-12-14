@@ -1,41 +1,40 @@
 <!--*********************************************************************
- *  genCountryfr.html													*
+ *  genCountryde.html													*
  *																		*
  *  Template for displaying information about a country					*
- *																		*
  *  History:															*
- *		2017/10/23		created											*
- *		2018/01/04		remove Template from template file names		*
- *		2018/01/25		add local CSS and Javascript references			*
- *      2019/02/21      support scrolling main section                  *
+ *		2017/12/06		created											*
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ***********************************************************************-->
     <div class='hidden' id='breadcrumbs'>
-      <a href='/genealogy.php?lang=fr'>Généalogie</a>:
-      <a href='/Canada/CountriesEdit.php?lang=fr'>Liste des Pays Soutenus</a>:
+      <a href='/genealogy.php?lang=$LANG'>Genealogie</a>:
+      <a href='/Canada/CountriesEdit.php?lang=$LANG'>
+          Liste der unterstützten Länder
+      </a>:
     </div>
     <div class='body'>
       <h1>$COUNTRYNAME
-        <span class='right'>
-          <a href='/genCountryHelpfr.html' target='_blank'>? Aide</a>
+        <span class='right' style='white-space: nowrap;'>
+          <a href='/genCountryHelpen.html' target='_blank'>? Hilfe</a>
         </span>
       </h1>
       $MSG
       $TRACE
-      <p>Il n'y a pas de soutien pour $COUNTRYNAME.
+      <p>Es gibt keine spezielle Unterstützung für $COUNTRYNAME.
       </p>
       <h3>
-        <a href="/Canada/DomainsEdit.php?cc=GB&lang=$LANG">
-            États membres s'il y en a
+        <a href="/Canada/DomainsEdit.php?cc=$CC&lang=$LANG">
+            Komponentenstatus, falls vorhanden
         </a>
       </h3>
-      <h3>
-	    <a href="/database/genCensuses.php?cc=US&lang=$LANG">
-          Recensements
-        </a>
-      </h3>
-    <h3>Bases de Données Commerciales</h3>
+    <h3>
+	  <a href="/database/genCensuses.php?cc=$CC&lang=$LANG">
+          Volkszählungen
+      </a>
+    </h3>
+
+    <h3>Kommerzielle Datenbanken</h3>
     <p class="label">
 	  <a target="_blank" href="http://www.kindredkonnections.com/">
 	  	Ancestry and Genealogy at MyTrees.com
@@ -57,7 +56,7 @@
 	  </a> 
     </p>
   
-    <h3>Bases de Données Gratuites</h3>
+    <h3>Freie Datenbanken</h3>
       <p class="label">
 	    <a target="_blank" href="http://www.familysearch.org/">
 	        FamilySearch Internet Genealogy Service

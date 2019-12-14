@@ -14,74 +14,74 @@ use \Iterator;
  *  of the table Deaths.												*
  *																		*
  *	CREATE TABLE `Deaths` (                                             *
- *		`D_RegDomain`       VARCHAR(4) NOT NULL DEFAULT 'CAON',			*
- *		`D_RegYear`         INT(11) NOT NULL DEFAULT '2009',			*
- *		`D_RegNum`          INT(11) NOT NULL DEFAULT '0',			    *
- *		`D_RegCounty`       CHAR(3) DEFAULT NULL,			            *
- *		`D_RegTownship`     VARCHAR(64) DEFAULT NULL,			        *
- *		`D_MsVol`           INT(4) DEFAULT '0',			                *
- *		`D_Surname`         VARCHAR(32) DEFAULT NULL,			        *
- *		`D_SurnameSoundex`  CHAR(4) DEFAULT NULL,			            *
- *		`D_GivenNames`      VARCHAR(48) DEFAULT NULL,			        *
- *		`D_Sex`             CHAR(1) DEFAULT NULL,			            *
- *		`D_Place`           VARCHAR(128) DEFAULT NULL,			        *
- *		`D_Date`            VARCHAR(32) DEFAULT NULL,			        *
- *		`D_CalcDate`        INT(11) DEFAULT NULL,			            *
- *		`D_Age`             VARCHAR(16) DEFAULT NULL,			        *
- *		`D_BirthDate`       VARCHAR(32) DEFAULT NULL,			        *
- *		`D_CalcBirth`       INT(11) DEFAULT NULL,			            *
- *		`D_Occupation`      VARCHAR(64) DEFAULT NULL,			        *
- *		`D_MarStat`         CHAR(1) DEFAULT NULL,			            *
- *		`D_BirthPlace`      VARCHAR(128) DEFAULT NULL,			        *
- *		`D_ResPlace`        VARCHAR(16) DEFAULT NULL,			        *
- *		`D_ResOnt`          VARCHAR(16) DEFAULT NULL,			        *
- *		`D_ResCan`          VARCHAR(16) DEFAULT NULL,			        *
- *		`D_Cause`           VARCHAR(255) DEFAULT NULL,			        *
- *		`D_Duration`        VARCHAR(64) DEFAULT NULL,			        *
- *		`D_Phys`            VARCHAR(48) DEFAULT NULL,			        *
- *		`D_PhysAddr`        VARCHAR(128) DEFAULT NULL,					*
- *		`D_Informant`       VARCHAR(48) DEFAULT NULL,					*
- *		`D_InfRel`          VARCHAR(16) DEFAULT NULL,					*
- *		`D_InfOcc`          VARCHAR(32) DEFAULT NULL,					*
- *		`D_InfRes`          VARCHAR(128) DEFAULT NULL,					*
- *		`D_Religion`        VARCHAR(32) DEFAULT NULL,					*
- *		`D_FatherName`      VARCHAR(48) DEFAULT NULL,					*
- *		`D_FatherBPlce`     VARCHAR(128) DEFAULT NULL,					*
- *		`D_MotherName`      VARCHAR(48) DEFAULT NULL,					*
- *		`D_MotherBPlce`     VARCHAR(128) DEFAULT NULL,					*
- *		`D_HusbandName`     VARCHAR(48) DEFAULT NULL,					*
- *		`D_Remarks`         LONGTEXT,					                *
- *		`D_BurPlace`        VARCHAR(128) DEFAULT NULL,					*
- *		`D_BurDate`         VARCHAR(48) DEFAULT NULL,					*
- *		`D_Undertkr`        VARCHAR(48) DEFAULT NULL,					*
- *		`D_UndertkrAddr`    VARCHAR(128) DEFAULT NULL,					*
- *		`D_RegDate`         VARCHAR(16) DEFAULT NULL,					*
- *		`D_Registrar`       VARCHAR(128) DEFAULT NULL,					*
- *		`D_RecordedBy`      VARCHAR(64) DEFAULT NULL,					*
- *		`D_Image`           VARCHAR(256) NOT NULL DEFAULT '',			*
- *		`D_IDIR`            INT(10) UNSIGNED DEFAULT NULL,				*
- *		`D_ChangedBy`       VARCHAR(64) NOT NULL DEFAULT '',			*
- *		`D_ChangeDate`      DATE DEFAULT NULL,					        *
- *		`D_OriginalVolume`  VARCHAR(16) DEFAULT NULL,				    *
- *		`D_OriginalPage`    VARCHAR(11) DEFAULT NULL,				    *
- *		`D_OriginalItem`    INT(11) DEFAULT NULL,					    *
- *		PRIMARY KEY (`D_RegDomain`,			                            *
- *		             `D_RegYear`,			                            *
- *		             `D_RegNum`),			                            *
- *		KEY `D_Surname` (`D_Surname`),			                        *
- *		KEY `D_SurnameSoundex` (`D_SurnameSoundex`),			        *
- *		KEY `D_GivenNames` (`D_GivenNames`),			                *
- *		KEY `D_IDIR` (`D_IDIR`),			                            *
- *		KEY `D_ChangeDate` (`D_ChangeDate`) )			                *
+ *		`RegDomain`       VARCHAR(4) NOT NULL DEFAULT 'CAON',			*
+ *		`RegYear`         INT(11) NOT NULL DEFAULT '2009',			*
+ *		`RegNum`          INT(11) NOT NULL DEFAULT '0',			    *
+ *		`RegCounty`       CHAR(3) DEFAULT NULL,			            *
+ *		`RegTownship`     VARCHAR(64) DEFAULT NULL,			        *
+ *		`MsVol`           INT(4) DEFAULT '0',			                *
+ *		`Surname`         VARCHAR(32) DEFAULT NULL,			        *
+ *		`SurnameSoundex`  CHAR(4) DEFAULT NULL,			            *
+ *		`GivenNames`      VARCHAR(48) DEFAULT NULL,			        *
+ *		`Sex`             CHAR(1) DEFAULT NULL,			            *
+ *		`Place`           VARCHAR(128) DEFAULT NULL,			        *
+ *		`Date`            VARCHAR(32) DEFAULT NULL,			        *
+ *		`CalcDate`        INT(11) DEFAULT NULL,			            *
+ *		`Age`             VARCHAR(16) DEFAULT NULL,			        *
+ *		`BirthDate`       VARCHAR(32) DEFAULT NULL,			        *
+ *		`CalcBirth`       INT(11) DEFAULT NULL,			            *
+ *		`Occupation`      VARCHAR(64) DEFAULT NULL,			        *
+ *		`MarStat`         CHAR(1) DEFAULT NULL,			            *
+ *		`BirthPlace`      VARCHAR(128) DEFAULT NULL,			        *
+ *		`ResPlace`        VARCHAR(16) DEFAULT NULL,			        *
+ *		`ResOnt`          VARCHAR(16) DEFAULT NULL,			        *
+ *		`ResCan`          VARCHAR(16) DEFAULT NULL,			        *
+ *		`Cause`           VARCHAR(255) DEFAULT NULL,			        *
+ *		`Duration`        VARCHAR(64) DEFAULT NULL,			        *
+ *		`Phys`            VARCHAR(48) DEFAULT NULL,			        *
+ *		`PhysAddr`        VARCHAR(128) DEFAULT NULL,					*
+ *		`Informant`       VARCHAR(48) DEFAULT NULL,					*
+ *		`InfRel`          VARCHAR(16) DEFAULT NULL,					*
+ *		`InfOcc`          VARCHAR(32) DEFAULT NULL,					*
+ *		`InfRes`          VARCHAR(128) DEFAULT NULL,					*
+ *		`Religion`        VARCHAR(32) DEFAULT NULL,					*
+ *		`FatherName`      VARCHAR(48) DEFAULT NULL,					*
+ *		`FatherBPlce`     VARCHAR(128) DEFAULT NULL,					*
+ *		`MotherName`      VARCHAR(48) DEFAULT NULL,					*
+ *		`MotherBPlce`     VARCHAR(128) DEFAULT NULL,					*
+ *		`HusbandName`     VARCHAR(48) DEFAULT NULL,					*
+ *		`Remarks`         LONGTEXT,					                *
+ *		`BurPlace`        VARCHAR(128) DEFAULT NULL,					*
+ *		`BurDate`         VARCHAR(48) DEFAULT NULL,					*
+ *		`Undertkr`        VARCHAR(48) DEFAULT NULL,					*
+ *		`UndertkrAddr`    VARCHAR(128) DEFAULT NULL,					*
+ *		`RegDate`         VARCHAR(16) DEFAULT NULL,					*
+ *		`Registrar`       VARCHAR(128) DEFAULT NULL,					*
+ *		`RecordedBy`      VARCHAR(64) DEFAULT NULL,					*
+ *		`Image`           VARCHAR(256) NOT NULL DEFAULT '',			*
+ *		`IDIR`            INT(10) UNSIGNED DEFAULT NULL,				*
+ *		`ChangedBy`       VARCHAR(64) NOT NULL DEFAULT '',			*
+ *		`ChangeDate`      DATE DEFAULT NULL,					        *
+ *		`OriginalVolume`  VARCHAR(16) DEFAULT NULL,				    *
+ *		`OriginalPage`    VARCHAR(11) DEFAULT NULL,				    *
+ *		`OriginalItem`    INT(11) DEFAULT NULL,					    *
+ *		PRIMARY KEY (`RegDomain`,			                            *
+ *		             `RegYear`,			                            *
+ *		             `RegNum`),			                            *
+ *		KEY `Surname` (`Surname`),			                        *
+ *		KEY `SurnameSoundex` (`SurnameSoundex`),			        *
+ *		KEY `GivenNames` (`GivenNames`),			                *
+ *		KEY `IDIR` (`IDIR`),			                            *
+ *		KEY `ChangeDate` (`ChangeDate`) )			                *
  *																		*
  *  History:															*
  *		2014/01/14		created											*
  *		2014/10/10		add country code to default location			*
  *						and support all domains							*
  *		2014/12/06		send trace info to $warn						*
- *		2015/01/23		ensure that D_CalcBirth is updated when			*
- *						D_BirthDate is set even if the value of			*
- *						D_BirthDate is invalid							*
+ *		2015/01/23		ensure that CalcBirth is updated when			*
+ *						BirthDate is set even if the value of			*
+ *						BirthDate is invalid							*
  *		2015/03/27		permit synonyms d_deathdate, and d_deathplace	*
  *						in method setField								*
  *		2015/05/01		default image URL to previous record			*
@@ -99,7 +99,7 @@ use \Iterator;
  *		2018/11/24      log entry for insert did not include parms      *
  *		2019/01/06      move to namespace Genealogy                     *
  *		                replace DATE with yyyymmdd                      *
- *		2019/03/18  	`D_OriginalPage` VARCHAR(11) DEFAULT NULL,	    *
+ *		2019/03/18  	`OriginalPage` VARCHAR(11) DEFAULT NULL,	    *
  *		2019/06/12      improve validation of values assigned to Dates  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
@@ -126,57 +126,57 @@ class Death extends Record
      *	Default initial row												*
      ********************************************************************/
     protected static $initRow	= array(
-				'd_regdomain'			=> 'CAON',
-				'd_regyear'				=> 2014,
-				'd_regnum'				=> 0,
-				'd_regcounty'			=> '',
-				'd_regtownship'			=> '',
-				'd_msvol'				=> 0,
-				'd_surname'				=> '',
-				'd_surnamesoundex'		=> '',
-				'd_givennames'			=> '',
-				'd_sex'					=> '?',
-				'd_place'				=> '',
-				'd_date'				=> '',
-				'd_calcdate'			=> null,
-				'd_age'					=> '',
-				'd_birthdate'			=> '',
-				'd_calcbirth'			=> null,
-				'd_occupation'			=> '',
-				'd_marstat'				=> '?',
-				'd_birthplace'			=> '',
-				'd_resplace'			=> '',
-				'd_resont'				=> '',
-				'd_rescan'				=> '',
-				'd_cause'				=> '',
-				'd_duration'			=> '',
-				'd_phys'				=> '',
-				'd_physaddr'			=> '',
-				'd_informant'			=> '',
-				'd_infrel'				=> '?',
-				'd_infocc'				=> '',
-				'd_infres'				=> '',
-				'd_religion'			=> '',
-				'd_fathername'			=> '',
-				'd_fatherbplce'			=> '',
-				'd_mothername'			=> '',
-				'd_motherbplce'			=> '',
-				'd_husbandname'			=> '',
-				'd_remarks'				=> '',
-				'd_burplace'			=> '',
-				'd_burdate'				=> '',
-				'd_undertkr'			=> '',
-				'd_undertkraddr'		=> '',
-				'd_regdate'				=> '',
-				'd_registrar'			=> '',
-				'd_recordedby'			=> '',
-				'd_image'				=> '',
-				'd_idir'				=> 0,
-				'd_originalvolume'		=> 0,
-				'd_originalpage'		=> null,
-				'd_originalitem'		=> 0,
-				'd_changedby'			=> '',
-				'd_changedate'			=> '');
+				'regdomain'			    => 'CAON',
+				'regyear'				=> 2014,
+				'regnum'				=> 0,
+				'regcounty'		    	=> '',
+				'regtownship'			=> '',
+				'msvol'			    	=> 0,
+				'surname'				=> '',
+				'surnamesoundex'		=> '',
+				'givennames'			=> '',
+				'sex'					=> '?',
+				'place'			    	=> '',
+				'date'			    	=> '',
+				'calcdate'		    	=> null,
+				'age'					=> '',
+				'birthdate'		    	=> '',
+				'calcbirth'		    	=> null,
+				'occupation'			=> '',
+				'marstat'				=> '?',
+				'birthplace'			=> '',
+				'resplace'		    	=> '',
+				'resont'				=> '',
+				'rescan'				=> '',
+				'cause'			    	=> '',
+				'duration'		    	=> '',
+				'phys'			    	=> '',
+				'physaddr'		    	=> '',
+				'informant'		    	=> '',
+				'infrel'				=> '?',
+				'infocc'				=> '',
+				'infres'				=> '',
+				'religion'			    => '',
+				'fathername'			=> '',
+				'fatherbplce'			=> '',
+				'mothername'			=> '',
+				'motherbplce'			=> '',
+				'husbandname'			=> '',
+				'remarks'				=> '',
+				'burplace'		    	=> '',
+				'burdate'				=> '',
+				'undertkr'		    	=> '',
+				'undertkraddr'	    	=> '',
+				'regdate'				=> '',
+				'registrar'		    	=> '',
+				'recordedby'			=> '',
+				'image'			    	=> '',
+				'idir'			    	=> 0,
+				'originalvolume'		=> 0,
+				'originalpage'	    	=> null,
+				'originalitem'		    => 0,
+				'changedby'		    	=> '',
+				'changedate'			=> '');
 
     /********************************************************************
      *	Death::$translate												*
@@ -184,69 +184,77 @@ class Death extends Record
      *	Define synonyms for field names									*
      ********************************************************************/
     protected static $translate	= array(
-				'domain'				=> 'd_regdomain',
-				'regdomain'				=> 'd_regdomain',
-				'regyear'				=> 'd_regyear',
-				'regnum'				=> 'd_regnum',
-				'regcounty'				=> 'd_regcounty',
-				'county'				=> 'd_regcounty',
-				'regtownship'			=> 'd_regtownship',
-				'township'		    	=> 'd_regtownship',
-				'msvol'					=> 'd_msvol',
-				'surname'				=> 'd_surname',
-				'surnamesoundex'		=> 'd_surnamesoundex',
-				'givennames'			=> 'd_givennames',
-				'sex'					=> 'd_sex',
-				'place'					=> 'd_place',
-				'date'					=> 'd_date',
-				'calcdate'				=> 'd_calcdate',
-				'age'					=> 'd_age',
-				'birthdate'				=> 'd_birthdate',
-				'calcbirth'				=> 'd_calcbirth',
-				'occupation'			=> 'd_occupation',
-				'marstat'				=> 'd_marstat',
-				'birthplace'			=> 'd_birthplace',
-				'resplace'				=> 'd_resplace',
-				'resont'				=> 'd_resont',
-				'rescan'				=> 'd_rescan',
-				'cause'					=> 'd_cause',
-				'duration'				=> 'd_duration',
-				'phys'					=> 'd_phys',
-				'physician'				=> 'd_phys',
-				'attendant'				=> 'd_phys',
-				'physaddr'				=> 'd_physaddr',
-				'informant'				=> 'd_informant',
-				'infrel'				=> 'd_infrel',
-				'infocc'				=> 'd_infocc',
-				'infres'				=> 'd_infres',
-				'religion'				=> 'd_religion',
-				'fathername'			=> 'd_fathername',
-				'fatherbplce'			=> 'd_fatherbplce',
-				'mothername'			=> 'd_mothername',
-				'motherbplce'			=> 'd_motherbplce',
-				'husbandname'			=> 'd_husbandname',
-				'remarks'				=> 'd_remarks',
-				'burplace'				=> 'd_burplace',
-				'burdate'				=> 'd_burdate',
-				'undertkr'				=> 'd_undertkr',
-				'undertkraddr'			=> 'd_undertkraddr',
-				'regdate'				=> 'd_regdate',
-				'registrar'				=> 'd_registrar',
-				'recordedby'			=> 'd_recordedby',
-				'image'					=> 'd_image',
-				'idir'					=> 'd_idir',
-				'originalvolume'		=> 'd_originalvolume',
-				'originalpage'			=> 'd_originalpage',
-				'originalitem'			=> 'd_originalitem',
-				'changedby'				=> 'd_changedby',
-				'changedate'			=> 'd_changedate');
+				'domain'				=> 'regdomain',
+				'd_regdomain'			=> 'regdomain',
+				'd_regyear'				=> 'regyear',
+				'd_regnum'				=> 'regnum',
+				'd_regcounty'			=> 'regcounty',
+				'd_county'				=> 'regcounty',
+				'd_regtownship'			=> 'regtownship',
+				'd_township'		   	=> 'regtownship',
+				'd_msvol'				=> 'msvol',
+				'd_surname'				=> 'surname',
+				'd_surnamesoundex'		=> 'surnamesoundex',
+				'd_givennames'			=> 'givennames',
+				'd_sex'					=> 'sex',
+				'd_place'				=> 'place',
+				'deathplace'			=> 'place',
+				'd_date'				=> 'date',
+				'd_calcdate'			=> 'calcdate',
+				'd_age'					=> 'age',
+				'd_birthdate'			=> 'birthdate',
+				'd_calcbirth'			=> 'calcbirth',
+				'd_occupation'			=> 'occupation',
+				'd_marstat'				=> 'marstat',
+				'd_birthplace'			=> 'birthplace',
+				'd_resplace'			=> 'resplace',
+				'd_resont'				=> 'resont',
+				'd_rescan'				=> 'rescan',
+				'd_cause'				=> 'cause',
+				'd_duration'			=> 'duration',
+				'd_phys'				=> 'phys',
+				'physician'			    => 'phys',
+				'attendant'			    => 'phys',
+				'd_physaddr'			=> 'physaddr',
+				'd_informant'			=> 'informant',
+				'd_infrel'				=> 'infrel',
+				'd_infocc'				=> 'infocc',
+				'd_infres'				=> 'infres',
+				'd_religion'			=> 'religion',
+				'd_fathername'			=> 'fathername',
+				'd_fatherbplce'			=> 'fatherbplce',
+				'd_mothername'			=> 'mothername',
+				'd_motherbplce'			=> 'motherbplce',
+				'd_husbandname'			=> 'husbandname',
+				'd_remarks'				=> 'remarks',
+				'd_burplace'			=> 'burplace',
+				'd_burdate'				=> 'burdate',
+				'd_undertkr'			=> 'undertkr',
+				'd_undertkraddr'		=> 'undertkraddr',
+				'd_regdate'				=> 'regdate',
+				'd_registrar'			=> 'registrar',
+				'd_recordedby'			=> 'recordedby',
+				'd_image'				=> 'image',
+				'd_idir'				=> 'idir',
+				'd_originalvolume'		=> 'originalvolume',
+				'd_originalpage'		=> 'originalpage',
+				'd_originalitem'		=> 'originalitem',
+				'd_changedby'			=> 'changedby',
+				'd_changedate'			=> 'changedate');
 
     /********************************************************************
      *	Death::$defaultOrder											*
      *																	*
      *	Definition of default order for records retrieved by RecordSet	*
      ********************************************************************/
-    protected static	$defaultOrder	= 'D_RegDomain, D_RegYear, D_RegNum';
+    protected static	$defaultOrder	= 'RegDomain, RegYear, RegNum';
+
+    /********************************************************************
+     *	Death::$domain	        										*
+     *																	*
+     *	Associated instance of class Domain                             *
+     ********************************************************************/
+    protected 	$domain                 = null;
 
     /********************************************************************
      *  function Death::__construct										*
@@ -256,7 +264,7 @@ class Death extends Record
      *	the database.													*
      *																	*
      *	Input:															*
-     *	    $domain		 		4 char administrative domain			*
+     *	    $domain		 		4/5 char administrative domain			*
      *							(2 char country code + state/prov code)	*
      *							or an associative array obtained from	*
      *							an SQL query by a static method			*
@@ -264,8 +272,6 @@ class Death extends Record
      *	    $number				registration number within year			*
      *																	*
      *	Returns object containing a description of a death registration	*
-     *																	*
-     *	Throws Exception if unable to complete function					*
      ********************************************************************/
     function __construct($parms,
 						 $year		= null,
@@ -276,10 +282,11 @@ class Death extends Record
 		global $msg;
 		global $connection;
 
-		$needInsert	    = false;
-		$this->table	= 'Deaths';
-		$cc		        = 'CA';		// ISO country code
-		$pc		        = 'ON';		// postal service state/province code
+		$needInsert	                = false;
+		$this->table	            = 'Deaths';
+		$cc		                    = 'CA';		// ISO country code
+        $pc		                    = 'ON';		// state/province code
+        $domain                     = 'CAON';
 
 		// validate parameters
 		if (is_array($parms))
@@ -291,15 +298,15 @@ class Death extends Record
                     $fieldLc	    = self::$translate[$fieldLc];
 				switch($fieldLc)
 				{		// act on specific parameters
-				    case 'd_regdomain':
+				    case 'regdomain':
 						$domain		= $value;
 						break;
 
-				    case 'd_regyear':
+				    case 'regyear':
 						$year		= $value;
 						break;
 
-				    case 'd_regnum':
+				    case 'regnum':
 						$number		= $value;
 						break;
 
@@ -309,36 +316,42 @@ class Death extends Record
         else
 		if (is_string($parms) || $parms instanceof Domain)
         {		// initialize new entry
-            $domain         = $parms;
+            $domain                 = $parms;
             if ($year == 0 || $number == 0)
-                throw new Exception("Death::__construct: domain=$domain, year=$year, number=$number");
-            $parms          = array('d_regdomain'   => $domain,
-                                    'd_regyear'     => $year,
-                                    'd_regnum'      => $number);
+                $this->msg          .= 
+        "Death::__construct: domain=$domain, year=$year, number=$number, ";
+            $parms                  = array('regdomain'   => $domain,
+                                            'regyear'     => $year,
+                                            'regnum'      => $number);
         }
 
         // validate parameters
         if ($domain instanceof Domain)
         {
-            $domainObj      = $domain;
-            $domain         = $domainObj->get('domain');
+            $domainObj      		= $domain;
+            $domain         		= $domainObj->get('domain');
         }
         else
 		if (is_string($domain))
 		{		// initialize new entry
-		    $domainObj	= new Domain(array('domain' => $domain,
-                                           'language'	=> 'en'));
+		    $domainObj			    = new Domain(array('domain'     => $domain,
+                                                       'language'	=> 'en'));
         }
         else
         {
-            $this->msg      .= "Invalid parameter " . gettype($domain) . ". ";
-            $domain         = null;
+            $this->msg              .= "Invalid parameter Domain=" . 
+                                        gettype($domain) . ". ";
+            $domain                 = null;
         }
 
-        if ($domainObj && !$domainObj->isExisting())
-			$this->msg      .=
+        if ($domainObj)
+        {
+            $this->domain   		= $domainObj;
+            if (!$domainObj->isExisting())
+			    $this->msg          .=
 		"Domain '$domain' must be a supported two character country code " .
-		"followed by a two character state or province code";
+        "followed by a two or three character state or province code. ";
+        }
 		    
 		if (is_string($year) && ctype_digit($year))
 			$year	= (int)$year;
@@ -362,9 +375,9 @@ class Death extends Record
         {                   // valid parameters
 		    // query the database
 		    $query	            = 'SELECT * FROM Deaths ' .
-							        'WHERE D_RegDomain=:domain AND ' .
-								        'D_RegYear=:year AND ' .
-								        'D_RegNum=:number';
+							        'WHERE RegDomain=:domain AND ' .
+								        'RegYear=:year AND ' .
+								        'RegNum=:number';
 		    $sqlParms	        = array('domain'	=> $domain,
 							            'year'		=> $year,
 							            'number'	=> $number);
@@ -387,87 +400,86 @@ class Death extends Record
 				{		// create a new record
 				    // set defaults
 				    $dbrow			        = self::$initRow;
-				    $dbrow['d_regdomain']	= $domain;
-				    $dbrow['d_regyear']		= $year;
-				    $dbrow['d_regnum']		= $number;
-				    $dbrow['d_date']		= $year;
-				    $dbrow['d_burdate']		= $year;
-				    $dbrow['d_regdate']		= $year;
-				    $dbrow['d_calcdate']	= $year*1000+630;
+				    $dbrow['regdomain']	    = $domain;
+				    $dbrow['regyear']		= $year;
+				    $dbrow['regnum']		= $number;
+				    $dbrow['date']		    = $year;
+				    $dbrow['burdate']		= $year;
+				    $dbrow['regdate']		= $year;
+				    $dbrow['calcdate']	    = $year*1000+630;
 
 				    // fill in some fields from the preceding record, 
 				    // if it exists
-				    $queryPrev	= 'SELECT D_RegCounty, D_RegTownship, D_MsVol,'.
-								  'D_Registrar, D_RegDate, D_Image,' .
-						  'D_OriginalVolume, D_OriginalPage, D_OriginalItem' .
+				    $queryPrev	= 'SELECT RegCounty, RegTownship, MsVol,'.
+								  'Registrar, RegDate, Image,' .
+					        	  'OriginalVolume, OriginalPage, OriginalItem' .
 								' FROM Deaths ' .
-						  		' WHERE D_RegDomain=:domain AND  ' .
-									'D_RegYear=:year AND ' .
-									'D_RegNum<:number ' .
-								' ORDER BY D_RegNum DESC' .
+						  		' WHERE RegDomain=:domain AND  ' .
+									'RegYear=:year AND ' .
+									'RegNum<:number ' .
+								' ORDER BY RegNum DESC' .
 								' LIMIT 1';
-				    $queryText	= debugPrepQuery($queryPrev,
-									 $sqlParms);
-				    $stmt	= $connection->prepare($queryPrev);
+				    $queryText	    = debugPrepQuery($queryPrev,
+									                 $sqlParms);
+				    $stmt	        = $connection->prepare($queryPrev);
 				    if ($stmt->execute($sqlParms))
-				    {		// successful query for previous record
+				    {		    // successful query for previous record
 						if ($debug)
 						    $warn	.= "<p>Death.inc: " . __LINE__ .
-								   htmlspecialchars($queryText).
-								   "</p>\n";
+								        " '$queryText' </p>\n";
 
 						$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
 						if (count($result) > 0)
-						{	// a preceding record exists
+						{	    // a preceding record exists
 						    $row			        = $result[0];
-						    $row['d_regdomain']		= $domain;
-						    $regCounty			    = $row['d_regcounty'];
-						    $dbrow['d_regcounty']	= $regCounty;
-						    $regTownship		    = $row['d_regtownship'];
-						    $dbrow['d_regtownship']	= $regTownship;
-						    $dbrow['d_msvol']		= $row['d_msvol'];
-						    $dbrow['d_registrar']	= $row['d_registrar'];
-						    $dbrow['d_image']		= $row['d_image'];
-						    $dbrow['d_originalvolume']= $row['d_originalvolume'];
-						    $dbrow['d_originalpage']= $row['d_originalpage'];
-						    $dbrow['d_originalitem']= $row['d_originalitem'] + 1;
-						    if (strlen($row['d_regdate']) > 0)
-							$dbrow['d_regdate']	    = $row['d_regdate'];
+						    $row['regdomain']		= $domain;
+						    $regCounty			    = $row['regcounty'];
+						    $dbrow['regcounty']	    = $regCounty;
+						    $regTownship		    = $row['regtownship'];
+						    $dbrow['regtownship']	= $regTownship;
+						    $dbrow['msvol']	    	= $row['msvol'];
+						    $dbrow['registrar'] 	= $row['registrar'];
+						    $dbrow['image']	    	= $row['image'];
+						    $dbrow['originalvolume']= $row['originalvolume'];
+						    $dbrow['originalpage']  = $row['originalpage'];
+						    $dbrow['originalitem']  = $row['originalitem'] + 1;
+						    if (strlen($row['regdate']) > 0)
+							    $dbrow['regdate']	= $row['regdate'];
 
 						    // initialize places with default value
-						    $dftPlace		= $this->getDefaultPlace($row);
-						    $dbrow['d_place']		= $dftPlace;
-						    $dbrow['d_birthplace']	= $dftPlace;
-						    $dbrow['d_burplace']	= $dftPlace;
-						    $dbrow['d_physaddr']	= $dftPlace;
-						    $dbrow['d_infres']		= $dftPlace;
-						    $dbrow['d_undertkraddr']	= $dftPlace;
-						}	// a preceding record exists
+						    $dftPlace		    = $this->getDefaultPlace($row);
+						    $dbrow['place']		    = $dftPlace;
+						    $dbrow['birthplace']	= $dftPlace;
+						    $dbrow['burplace']	    = $dftPlace;
+						    $dbrow['physaddr']	    = $dftPlace;
+						    $dbrow['infres']		= $dftPlace;
+						    $dbrow['undertkraddr']	= $dftPlace;
+						}	    // a preceding record exists
 
 						if ($number > 1000000)
 						{
 						    $origVol	            = floor($number/1000000);
 						    $origPage	            = floor($number/100) % 1000;
 						    $origItem	            = $number % 100;
-						    $dbrow['d_originalvolume']	= $origVol;
-						    $dbrow['d_originalpage']	= $origPage;
-						    $dbrow['d_originalitem']	= $origItem;
+						    $dbrow['originalvolume']= $origVol;
+						    $dbrow['originalpage']	= $origPage;
+						    $dbrow['originalitem']	= $origItem;
 						}
 						$needInsert		            = true;
-				    }		// successful query for previous record
+				    }		    // successful query for previous record
 				    else
-				    {		// error issuing query
-						$this->msg  .= "'$queryText' " .
-							    print_r($stmt->errorInfo(),true) . ". ";
-				    }		// error issuing query
-				}	    	// create new record
-		    }		    	// successful query
+				    {		    // error issuing query
+						$this->msg                  .= "'$queryText' " .
+						        	    print_r($stmt->errorInfo(),true) . ". ";
+				    }		    // error issuing query
+				}	    	    // create new record
+		    }		    	    // successful query
 		    else
-		    {			    // error performing query
-				$this->msg  .= " '$queryText' " .
-							    print_r($stmt->errorInfo(),true) . ". ";
-		    }			    // error performing query
-		}			        // build from database query
+		    {			        // error performing query
+				$this->msg                          .= " '$queryText' " .
+							            print_r($stmt->errorInfo(),true) . ". ";
+		    }			        // error performing query
+		}			            // build from database query
 
 		// invoke constructor of base class
 		parent::__construct($dbrow,
@@ -478,7 +490,7 @@ class Death extends Record
         $this->dump('Death Record constructed:');
 
         if (strlen($this->msg) > 0)
-            $msg        .= $this->msg;
+            $msg            .= $this->msg;
     }		// function Death::__construct
 
     /********************************************************************
@@ -496,13 +508,13 @@ class Death extends Record
      ********************************************************************/
     private function getDefaultPlace($row)
     {
-		$domain				= $row['d_regdomain'];
+		$domain				= $row['regdomain'];
 		$cc			    	= substr($domain, 0, 2);
 		$pc			    	= substr($domain, 2);
 		$addrEnd			= ", $pc, $cc";
 
-		$regCounty			= $row['d_regcounty'];
-		$regTownship		= $row['d_regtownship'];
+		$regCounty			= $row['regcounty'];
+		$regTownship		= $row['regtownship'];
 		$county				= new County($domain,
 							    	     $regCounty);
 		$countyName			= $county->getName();
@@ -554,28 +566,28 @@ class Death extends Record
 
 		switch($fieldLc)
 		{		// act on specific field
-		    case 'd_surnamesoundex':
-		    case 'd_changedby':
-		    case 'd_changedate':
-		    case 'd_calcdate':
-		    case 'd_calcbirth':
+		    case 'surnamesoundex':
+		    case 'changedby':
+		    case 'changedate':
+		    case 'calcdate':
+		    case 'calcbirth':
 		    {               // fields whose value is set from another field
 				$warn           .= "<p>Death::set: " . __LINE__ .
 						            " cannot modify '$field'</p>\n";
 		    }               // fields whose value is set from another field
 
-		    case 'd_date':
-		    case 'd_deathdate':
+		    case 'date':
+		    case 'deathdate':
 		    {
 				$date	        = new LegacyDate(" $value");
 				$y	            = $date->getYear();
 				// fixup missing or abbreviated birth years
 				if ($y == 0)
-				    $y	        = $this->row['d_regyear'];
+				    $y	        = $this->row['regyear'];
 				else
 				if ($y < 1000)
 				{
-				    $regYear	= $this->row['d_regyear'];
+				    $regYear	= $this->row['regyear'];
 				    $century	= floor($regYear / 100);
 				    if ($y > $regYear % 100)
 						$y	    = $y + (($century - 1) * 100);
@@ -602,21 +614,21 @@ class Death extends Record
 				if ($d < 10)
                     $d	        = '0' . $d;
 
-				parent::set('d_calcdate', $y*10000 + $m*100 + $d);
-				return parent::set('d_date', $value);
+				parent::set('calcdate', $y*10000 + $m*100 + $d);
+				return parent::set('date', $value);
 		    }
 
-		    case 'd_birthdate':
+		    case 'birthdate':
 		    {
 				$date	= new LegacyDate(" $value");
 				$y	= $date->getYear();
 				// fixup missing or abbreviated birth years
 				if ($y == 0)
-				    $y	= $this->row['d_regyear'];
+				    $y	= $this->row['regyear'];
 				else
 				if ($y < 1000)
 				{
-				    $regYear	= $this->row['d_regyear'];
+				    $regYear	= $this->row['regyear'];
 				    $century	= floor($regYear / 100);
 				    if ($y > $regYear % 100)
 						$y	= $y + (($century - 1) * 100);
@@ -638,59 +650,54 @@ class Death extends Record
 				    $d		= 28;
 				if ($d < 10)
 				    $d	= '0' . $d;
-				parent::set('d_calcbirth', $y*10000 + $m*100 + $d);
+				parent::set('calcbirth', $y*10000 + $m*100 + $d);
 				return parent::set($fieldLc, $value);
 		    }
 
-		    case 'd_place':
-		    case 'd_deathplace':	// synonym
-		    {
-				return parent::set('d_place', $value);
-		    }
-
-		    case 'd_regdomain':
-		    case 'd_regyear':
-		    case 'd_regnum':
-		    case 'd_regcounty':
-		    case 'd_regtownship':
-		    case 'd_msvol':
-		    case 'd_surname':
-		    case 'd_givennames':
-		    case 'd_sex':
-		    case 'd_age':
-		    case 'd_occupation':
-		    case 'd_marstat':
-		    case 'd_birthplace':
-		    case 'd_resplace':
-		    case 'd_resont':
-		    case 'd_rescan':
-		    case 'd_cause':
-		    case 'd_duration':
-		    case 'd_phys':
-		    case 'd_physaddr':
-		    case 'd_informant':
-		    case 'd_infrel':
-		    case 'd_infocc':
-		    case 'd_infres':
-		    case 'd_religion':
-		    case 'd_fathername':
-		    case 'd_fatherbplce':
-		    case 'd_mothername':
-		    case 'd_motherbplce':
-		    case 'd_husbandname':
-		    case 'd_remarks':
-		    case 'd_burplace':
-		    case 'd_burdate':
-		    case 'd_undertkr':
-		    case 'd_undertkraddr':
-		    case 'd_regdate':
-		    case 'd_registrar':
-		    case 'd_recordedby':
-		    case 'd_image':
-		    case 'd_idir':
-		    case 'd_originalvolume':
-		    case 'd_originalpage':
-		    case 'd_originalitem':
+		    case 'place':
+		    case 'regdomain':
+		    case 'regyear':
+		    case 'regnum':
+		    case 'regcounty':
+		    case 'regtownship':
+		    case 'msvol':
+		    case 'surname':
+		    case 'givennames':
+		    case 'sex':
+		    case 'age':
+		    case 'occupation':
+		    case 'marstat':
+		    case 'birthplace':
+		    case 'resplace':
+		    case 'resont':
+		    case 'rescan':
+		    case 'cause':
+		    case 'duration':
+		    case 'phys':
+		    case 'physaddr':
+		    case 'informant':
+		    case 'infrel':
+		    case 'infocc':
+		    case 'infres':
+		    case 'religion':
+		    case 'fathername':
+		    case 'fatherbplce':
+		    case 'mothername':
+		    case 'motherbplce':
+		    case 'husbandname':
+		    case 'remarks':
+		    case 'burplace':
+		    case 'burdate':
+		    case 'undertkr':
+		    case 'undertkraddr':
+		    case 'regdate':
+		    case 'registrar':
+		    case 'recordedby':
+		    case 'image':
+		    case 'idir':
+		    case 'originalvolume':
+		    case 'originalpage':
+		    case 'originalitem':
 		    {
 				return parent::set($fieldLc, $value);
 		    }
@@ -730,13 +737,13 @@ class Death extends Record
 
 		if (is_string($xml))
 		{	            	// string tag name
-		    $tagname	= $xml;
-		    $xml    	= true;
+		    $tagname	                = $xml;
+		    $xml    	                = true;
 		}           		// string tag name
 		else
 		if ($xml)
 		{           		// true
-		    $tagname	= 'cmd';
+		    $tagname	                = 'cmd';
 		}           		// true
 
 		if ($this->needInsert)
@@ -749,35 +756,35 @@ class Death extends Record
 		    {	    		// loop through all fields in record
 				switch($fld)
 				{   		// act on specific fields
-				    case 'd_surnamesoundex':
+				    case 'surnamesoundex':
 				    {       // ask server to calculate
 						$fldnames	        	.= $comma . "`$fld`"; 
-						$surname        		= $this->row['d_surname'];
+						$surname        		= $this->row['surname'];
 						$values		            .= ',LEFT(SOUNDEX(:surname),4)';
 						$sqlParms['surname']	= $surname;
 						$comma	        		= ", ";
 						break;
-				    }		// D_SurnameSoundex
+				    }		// SurnameSoundex
 
-				    case 'd_changedby':
+				    case 'changedby':
 				    {
 						$fldnames       		.= $comma . "`$fld`"; 
 						$values	        		.= $comma . ':changedby';
 						$sqlParms['changedby']	= $userid;
 						$comma	        		= ", ";
 						break;
-				    }		// D_ChangedBy
+				    }		// ChangedBy
 
-				    case 'd_changedate':
+				    case 'changedate':
 				    {
 						$fldnames       		.= $comma . "`$fld`"; 
 						$values	        		.= $comma . 'CURDATE()';
 						$comma	        		= ", ";
 						break;
-				    }		// D_ChangeDate
+				    }		// ChangeDate
 
-				    case 'd_idir':
-				    case 'd_originalitem':
+				    case 'idir':
+				    case 'originalitem':
 				    {		// integer fields
 						$fldnames	        	.= $comma . "`$fld`";
 						$shortFld       		= substr($fld, 2);
@@ -841,26 +848,26 @@ class Death extends Record
 		    {
 				switch($fld)
 				{		    // act on specific fields
-				    case 'd_surname':
+				    case 'surname':
 				    {		// surname changed
-						$set		    .= $comma . '`D_Surname`=:surname';
+						$set		    .= $comma . '`Surname`=:surname';
 						$sqlParms['surname']	= $value;
-						$set			.= ',`D_SurnameSoundex`='; 
+						$set			.= ',`SurnameSoundex`='; 
 						$set			.= 'LEFT(SOUNDEX(:surname), 4)';
 						$comma			= ', ';
 						break;
-				    }		// D_Surname
+				    }		// Surname
 
-				    case 'd_changedby':
-				    case 'd_changedate':
-				    case 'd_surnamesoundex':
+				    case 'changedby':
+				    case 'changedate':
+				    case 'surnamesoundex':
 				    {       // calculated
 						break;
-				    }		// D_ChangedBy, D_ChangeDate
+				    }		// ChangedBy, ChangeDate
 
-				    case 'd_idir':
-				    case 'd_msvol':
-				    case 'd_originalitem':
+				    case 'idir':
+				    case 'msvol':
+				    case 'originalitem':
 				    {		// integer value fields
 						$shortFld   		    = substr($fld, 2);
 						$set	    	    	.= $comma . "`$fld`=:$shortFld";
@@ -888,26 +895,26 @@ class Death extends Record
 		    if (strlen($set) > 0)
             {		// changes made
                 // record who changed the record and when
-				$set			.= ',D_ChangedBy=:userid';
-				$set			.= ',D_ChangeDate=CURDATE()';
+				$set			.= ',ChangedBy=:userid';
+				$set			.= ',ChangeDate=CURDATE()';
 				$sqlParms['userid']	= $userid;
 
 				// construct the where clause
 				if ($this->former)
 				{
-				    $sqlParms['domain']	= $this->former['d_regdomain'];
-				    $sqlParms['year']	= $this->former['d_regyear'];
-				    $sqlParms['number']	= $this->former['d_regnum'];
+				    $sqlParms['domain']	= $this->former['regdomain'];
+				    $sqlParms['year']	= $this->former['regyear'];
+				    $sqlParms['number']	= $this->former['regnum'];
 				}
 				else
 				{
-				    $sqlParms['domain']	= $this->row['d_regdomain'];
-				    $sqlParms['year']	= $this->row['d_regyear'];
-				    $sqlParms['number']	= $this->row['d_regnum'];
+				    $sqlParms['domain']	= $this->row['regdomain'];
+				    $sqlParms['year']	= $this->row['regyear'];
+				    $sqlParms['number']	= $this->row['regnum'];
 				}
-				$where		= 'D_RegDomain=:domain AND ' .
-							  'D_RegYear=:year AND ' .
-							  'D_RegNum=:number';
+				$where		= 'RegDomain=:domain AND ' .
+							  'RegYear=:year AND ' .
+							  'RegNum=:number';
 
 				// assemble the UPDATE command
 				$update		.= $set . ' WHERE ' . $where;
@@ -974,12 +981,12 @@ class Death extends Record
 		if (!$this->needInsert)
 		{		// existing record in database
 		    $sqlParms		= array();
-		    $sqlParms['domain']	= $this->row['d_regdomain'];
-		    $sqlParms['year']	= $this->row['d_regyear'];
-		    $sqlParms['number']	= $this->row['d_regnum'];
+		    $sqlParms['domain']	= $this->row['regdomain'];
+		    $sqlParms['year']	= $this->row['regyear'];
+		    $sqlParms['number']	= $this->row['regnum'];
 		    $delete	= "DELETE FROM Deaths WHERE" .
-							' D_RegDomain=:domain AND ' .
-							' D_RegYear=:year AND D_RegNum=:number';
+							' RegDomain=:domain AND ' .
+							' RegYear=:year AND RegNum=:number';
 		    $deleteText	= debugPrepQuery($delete, $sqlParms);
 		    $stmt	= $connection->prepare($delete);
 		    if ($stmt->execute($sqlParms))

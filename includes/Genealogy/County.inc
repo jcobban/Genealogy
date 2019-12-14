@@ -53,6 +53,7 @@ use \Iterator;
  *		                bad parameters                                  *
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/05/18      add $info                                       *
+ *		2919/12/95      support ISO format Domain                       *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -112,11 +113,11 @@ class County extends Record
     protected static $defaultOrder	= "`Name`";
 
     /********************************************************************
-     *	County->domainObj												*
+     *	County->domain												*
      *																	*
      *	save the associated instance of Domain to avoid recreating it	*
      ********************************************************************/
-    private $domainObj		= null;
+    private $domain 		= null;
 
     /********************************************************************
      *	function County::__construct									*
@@ -133,7 +134,7 @@ class County extends Record
      *	    				 	or administrative domain id (depr.)	    *
      *							(2 char country code + state/prov code)	*
      *	    $code				3 char county abbreviation for use		*
-     *							with admiinistrative domain				*
+     *							with administrative domain				*
      *																	*
      *	Returns object containing a description of a county				*
      *																	*
@@ -213,52 +214,51 @@ class County extends Record
 						    if ($value instanceof Domain)
 						    {
 						    	$domainObj	    = $value;
-						    	$this->domainObj	= $domainObj;
                                 $domain	        = $domainObj->get('domain');
 						    }
 						    else
 						    {
-							    $this->domainObj	= new Domain(
-								        array('domain'	    => $value,
-								        	  'language'	=> 'en'));
-							    $domain	    = $value;
+							    $domainObj	    = $this->getDomain($value);
+							    $domain	        = $value;
 						    }
+						    $this->domain	    = $domainObj;
 
-						    $cc		    = substr($domain, 0, 2);
-						    $province	= substr($domain, 2);
-						    if (!$this->domainObj->isExisting())
+                            $cc		            = substr($domain, 0, 2);
+                            if (substr($domain, 2, 1) == '-')
+						        $province	    = substr($domain, 3);
+                            else
+						        $province	    = substr($domain, 2);
+						    if (!$domainObj->isExisting())
 							    $this->msg	    .= "Domain '$domain' must be a supported two character country code followed by a 2 or 3 character character state or province code. ";
 						    break;
 						}		// domain
 
 						case 'prov':
 						{		// province code
-						    if (is_null($this->domainObj))
+						    if (is_null($this->domain))
 						    {
-						    	$domain		= 'CA' . strtoupper($value);
-							    $cc		    = 'CA';
-							    $province	= strtoupper($value);
-							    $this->domainObj	= new Domain(
-								                array('domain'  	=> $domain,
-									                  'language'	=> 'en'));
-						    	if (!$this->domainObj->isExisting())
-							        $this->msg	.= __LINE__ . " Province '$value' must be a valid 2 character character code for Canada. ";
+						    	$domain		    = 'CA' . strtoupper($value);
+							    $cc		        = 'CA';
+							    $province	    = strtoupper($value);
+							    $domainObj	    = $this->getDomain($domain);
+						    	if (!$domainObj->isExisting())
+                                    $this->msg	.= "County::new: " . __LINE__ .
+   " Province '$value' must be a valid 2 character character code for Canada. ";
 						    }
 						    break;
 						}		// province code
 
 						case 'state':
 						{		// state code
-						    if (is_null($this->domainObj))
+						    if (is_null($this->domain))
 						    {
-							    $domain		= 'US' . strtoupper($value);
-							    $cc	    	= 'US';
-							    $province	= strtoupper($value);
-						    	$this->domainObj	= new Domain(
-							            	    array('domain'	    => $domain,
-									                  'language'	=> 'en'));
-							    if (!$this->domainObj->isExisting())
-							        $this->msg	.= __LINE__ . " State '$value' must be a valid 2 character character code for the United States. ";
+							    $domain		    = 'US' . strtoupper($value);
+							    $cc	    	    = 'US';
+							    $province	    = strtoupper($value);
+						    	$domainObj	    = $this->getDomain($domain);
+							    if (!$domainObj->isExisting())
+                                    $this->msg	.= "County::new: " . __LINE__ .
+    " State '$value' must be a valid 2 character character code for the United States of America. ";
 						    }
 						    break;
 						}		// state code
@@ -299,7 +299,7 @@ class County extends Record
 				    {		// create a new record
 						// set defaults
 						$dbrow		    = self::$initRow;
-						$dbrow['domain']= $this->domainObj->get('domain');
+						$dbrow['domain']= $this->domain->get('domain');
 						$dbrow['code']	= $code;
 						$dbrow['name']	= $code;
 						$needInsert	    = true;
@@ -317,16 +317,14 @@ class County extends Record
 				$dbrow		            = $parms;
 				if ($dbrow['domain'] instanceof Domain)
 				{
-				    $this->domainObj	= $dbrow['domain'];
-				    $domain         	= $this->domainObj->get('domain');
+				    $this->domain	    = $dbrow['domain'];
+				    $domain         	= $this->domain->get('domain');
 				    $dbrow['domain']	= $domain;
 				}
                 else
                 {
 				    $domain         	= $dbrow['domain'];
-				    $this->domainObj	= new Domain(
-							    array('domain'	    => $dbrow['domain'],
-                                      'language'	=> 'en'));
+				    $domainObj	        = $this->getDomain($dbrow['domain']);
                 }
 		    }			// build from existing record
 		}			// array
@@ -437,17 +435,28 @@ class County extends Record
     }		// function County::getName
 
     /********************************************************************
-     *	function County::getDomainObj									*
+     *	function County::getDomain  									*
      *																	*
      *	Convenience function for accessing the associated Domain object	*
      *																	*
+     *	Input:															*
+     *		if this is invoked before the object is initialized 		*
+     *		pass the domain identifier                                  *
+     *		                                                            *
      *	Returns:														*
      *	    instance of Domain											*
      ********************************************************************/
-    function getDomainObj()
+    function getDomain($domain = null)
     {
-		return $this->domainObj;
-    }		// function County::getDomainObj
+        if (is_null($this->domain))
+        {
+            if (is_null($domain))
+                $domain         = $this->get('domain');
+			$this->domain	    = new Domain(array('domain'	    => $domain,
+                                                   'language'	=> 'en'));
+        }
+		return $this->domain;
+    }		// function County::getDomain
 
     /********************************************************************
      *	fuunction County::toXml											*

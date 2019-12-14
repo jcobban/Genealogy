@@ -3306,6 +3306,54 @@ class Record implements Iterator, ArrayAccess
 		return $this->get($field);
     }		// public function offsetGet($field)
 
+    /********************************************************************
+     *	function Record::cmp											*
+     *																	*
+     *	Compare an instance of Record to another instance of Record		*
+     *																	*
+     *	Returns:														*
+     *			-1 if this is less than other							*
+     *			1 if this is greater than other							*
+     *			0 if this is equal other			                    *
+     ********************************************************************/
+    function cmp(Record $other)
+    {
+        if (get_class($this) != get_class($other))
+            throw new Exception("Record::cmp: this is instance of " .
+                                get_class($this) . 
+                                ", other is instance of " . get_class($other));
+
+        if (!array_key_exists('name', $this->row))
+            throw new Exception("Record::cmp: class " . get_class($this) .
+                                " does not have a name field");
+
+        $val1		= strtolower($this->row['name']);
+        $val2		= strtolower($other->row['name']);
+        if ($val1 < $val2)
+            return -1;
+        else
+        if ($val1 > $val2)
+            return 1;
+        else
+            return 0;
+    }		// Record::cmp
+
+    /********************************************************************
+     *	function Record::sortcallback									*
+     *																	*
+     *	Satisfy the non-object-oriented callback function demanded by   *
+     *	PHP usort, and uasort.	                                        *
+     *	This can only be used to sort arrays of Records.  It is better  *
+     *	to create a RecordSet with the required order so this support   *
+     *	is deprecated.                                                  *
+     *	                                                                *
+     *  uasort($collection, array('Record', 'sortcallback'));           *
+     ********************************************************************/
+    static function sortcallback(Record $a, Record $b)
+    {
+        return $a->cmp($b);
+    }
+
 }		// class Record
 
 // class RecOwner is derived from class Record

@@ -13,31 +13,31 @@ use \Iterator;
  *  information in a row of the table Marriage.							*
  *																		*
  *		CREATE TABLE `Marriage` (										*
- *		    `M_RegDomain` VARCHAR(4) NOT NULL DEFAULT 'CAON',			*
- *		    `M_RegYear` INT(11) NOT NULL,								*
- *		    `M_RegNum` INT(11) NOT NULL,								*
- *		    `M_MsVol` VARCHAR(5) DEFAULT '',							*
- *		    `M_RegCounty` CHAR(3) DEFAULT '',							*
- *		    `M_RegTownship` VARCHAR(64) DEFAULT NULL,					*
- *		    `M_Date` VARCHAR(16) DEFAULT '',							*
- *		    `M_CalcDate` DATE DEFAULT NULL,								*
- *		    `M_Place` VARCHAR(128) DEFAULT NULL,						*
- *		    `M_LicenseType` CHAR(1) DEFAULT 'L',						*
- *		    `M_Remarks` LONGTEXT,										*
- *		    `M_ChangedBy` VARCHAR(64) DEFAULT '',						*
- *		    `M_ChangeDate` DATE DEFAULT NULL,							*
- *		    `M_Image` VARCHAR(256) NOT NULL DEFAULT '',					*
- *		    `M_Registrar` VARCHAR(128) NOT NULL DEFAULT '',				*
- *		    `M_RegDate` VARCHAR(16) NOT NULL DEFAULT '',				*
- *		    `M_OriginalVolume` VARCHAR(16) DEFAULT NULL,				*
- *		    `M_OriginalPage` INT(11) DEFAULT NULL,						*
- *		    `M_OriginalItem` INT(11) DEFAULT NULL,						*
- *		    PRIMARY KEY (`M_RegDomain`,									*
- *		    `M_RegYear`,												*
- *		    `M_RegNum`),												*
- *		    KEY `M_RegCounty` (`M_RegCounty`),							*
- *		    KEY `M_RegTownship` (`M_RegTownship`),						*
- *		    KEY `M_Place` (`M_Place`) )									*
+ *		    `RegDomain` VARCHAR(4) NOT NULL DEFAULT 'CAON',	    		*
+ *		    `RegYear` INT(11) NOT NULL,						    		*
+ *		    `RegNum` INT(11) NOT NULL,						    		*
+ *		    `MsVol` VARCHAR(5) DEFAULT '',					    		*
+ *		    `RegCounty` CHAR(3) DEFAULT '',					    		*
+ *		    `RegTownship` VARCHAR(64) DEFAULT NULL,			    		*
+ *		    `Date` VARCHAR(16) DEFAULT '',					    		*
+ *		    `CalcDate` DATE DEFAULT NULL,								*
+ *		    `Place` VARCHAR(128) DEFAULT NULL,				    		*
+ *		    `LicenseType` CHAR(1) DEFAULT 'L',				    		*
+ *		    `Remarks` LONGTEXT,								    		*
+ *		    `ChangedBy` VARCHAR(64) DEFAULT '',				    		*
+ *		    `ChangeDate` DATE DEFAULT NULL,						    	*
+ *		    `Image` VARCHAR(256) NOT NULL DEFAULT '',					*
+ *		    `Registrar` VARCHAR(128) NOT NULL DEFAULT '',				*
+ *		    `RegDate` VARCHAR(16) NOT NULL DEFAULT '',			    	*
+ *		    `OriginalVolume` VARCHAR(16) DEFAULT NULL,			    	*
+ *		    `OriginalPage` INT(11) DEFAULT NULL,						*
+ *		    `OriginalItem` INT(11) DEFAULT NULL,						*
+ *		    PRIMARY KEY (`RegDomain`,									*
+ *		    `RegYear`,											    	*
+ *		    `RegNum`),											    	*
+ *		    KEY `RegCounty` (`RegCounty`),						    	*
+ *		    KEY `RegTownship` (`RegTownship`),					    	*
+ *		    KEY `Place` (`Place`) )								    	*
  *		    ENGINE=InnoDB DEFAULT CHARSET=utf8 							*
  *																		*
  *  History:															*
@@ -84,6 +84,7 @@ use \Iterator;
  *		2019/06/12      improve validation of values assigned to Dates  *
  *		2019/10/28      permit spaces in front of save parm             *
  *		                return count from save                          *
+ *		2019/12/13      remove M_ prefix from field names               *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -108,25 +109,40 @@ class Marriage extends Record
      *	static array containing default values for a new record			*
      ********************************************************************/
     protected static	$initRow	= array(
-                        'm_regdomain'			=> 'CAON',
-                        'm_regyear'				=> 2014,
-                        'm_regnum'				=> 0,
-                        'm_msvol'				=> '0',
-                        'm_regcounty'			=> '',
-                        'm_regtownship'			=> '',
-                        'm_date'				=> '',
-                        'm_calcdate'			=> null,
-                        'm_place'				=> '',
-                        'm_licensetype'			=> 'L',
-                        'm_remarks'				=> '',
-                        'm_changedby'			=> '',
-                        'm_changedate'			=> '',
-                        'm_image'				=> '',
-                        'm_registrar'			=> '',
-                        'm_regdate'				=> '',
-                        'm_originalvolume'		=> '',
-                        'm_originalpage'		=> '',
-                        'm_originalitem'		=> '');
+                        'regdomain'		    	=> 'CAON',
+                        'regyear'				=> 2014,
+                        'regnum'				=> 0,
+                        'msvol'			    	=> '0',
+                        'regcounty'		    	=> '',
+                        'regtownship'			=> '',
+                        'date'			    	=> '',
+                        'calcdate'		    	=> null,
+                        'place'			    	=> '',
+                        'licensetype'			=> 'L',
+                        'remarks'				=> '',
+                        'changedby'		    	=> '',
+                        'changedate'			=> '',
+                        'image'			    	=> '',
+                        'registrar'		    	=> '',
+                        'regdate'				=> '',
+                        'originalvolume'		=> '',
+                        'originalpage'	    	=> '',
+                        'originalitem'	    	=> '');
+
+    /********************************************************************
+     *	Marriage::$info											        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                		'table'     		=> 'Marriage',
+                		'name'      		=> 'Marriage',
+                        'prime'	    		=>
+                            array('RegDomain','RegYear','RegNum'),
+	            		'srvmg'     		=> true,
+	            		'fldcount'			=> 19,
+                		'order'     		=> 'RegDomain, RegYear, RegNum',
+                		'classname' 		=> 'Marriage');
 
     /********************************************************************
      *	Marriage::$translate											*
@@ -134,39 +150,39 @@ class Marriage extends Record
      *	static array containing field name abbreviation translations	*
      ********************************************************************/
     protected static	$translate	= array(
-                        'domain'				=> 'm_regdomain',
-                        'regdomain'				=> 'm_regdomain',
-                        'year'					=> 'm_regyear',
-                        'regyear'				=> 'm_regyear',
-                        'num'					=> 'm_regnum',
-                        'number'				=> 'm_regnum',
-                        'regnum'				=> 'm_regnum',
-                        'reel'					=> 'm_msvol',
-                        'msvol'					=> 'm_msvol',
-                        'county'				=> 'm_regcounty',
-                        'regcounty'				=> 'm_regcounty',
-                        'township'				=> 'm_regtownship',
-                        'regtownship'			=> 'm_regtownship',
-                        'date'					=> 'm_date',
-                        'calcdate'				=> 'm_calcdate',
-                        'place'					=> 'm_place',
-                        'licensetype'			=> 'm_licensetype',
-                        'remarks'				=> 'm_remarks',
-                        'changedby'				=> 'm_changedby',
-                        'changedate'			=> 'm_changedate',
-                        'image'					=> 'm_image',
-                        'registrar'				=> 'm_registrar',
-                        'regdate'				=> 'm_regdate',
-                        'originalvolume'		=> 'm_originalvolume',
-                        'originalpage'			=> 'm_originalpage',
-                        'originalitem'			=> 'm_originalitem');
+                        'domain'		    		=> 'regdomain',
+                        'm_regdomain'				=> 'regdomain',
+                        'year'			    		=> 'regyear',
+                        'm_regyear'			    	=> 'regyear',
+                        'm_num'				    	=> 'regnum',
+                        'm_number'		    		=> 'regnum',
+                        'm_regnum'		    		=> 'regnum',
+                        'm_reel'					=> 'msvol',
+                        'm_msvol'					=> 'msvol',
+                        'county'				    => 'regcounty',
+                        'm_regcounty'				=> 'regcounty',
+                        'township'				    => 'regtownship',
+                        'm_regtownship'		    	=> 'regtownship',
+                        'm_date'					=> 'date',
+                        'm_calcdate'				=> 'calcdate',
+                        'm_place'					=> 'place',
+                        'm_licensetype'		    	=> 'licensetype',
+                        'm_remarks'			    	=> 'remarks',
+                        'm_changedby'				=> 'changedby',
+                        'm_changedate'		    	=> 'changedate',
+                        'm_image'					=> 'image',
+                        'm_registrar'				=> 'registrar',
+                        'm_regdate'			    	=> 'regdate',
+                        'm_originalvolume'	    	=> 'originalvolume',
+                        'm_originalpage'			=> 'originalpage',
+                        'm_originalitem'			=> 'originalitem');
 
     /********************************************************************
      *	Marriage::$defaultOrder											*
      *																	*
      *	Definition of default order for records retrieved by RecordSet	*
      ********************************************************************/
-    protected static	$defaultOrder	= 'M_RegDomain, M_RegYear, M_RegNum';
+    protected static	$defaultOrder	= 'RegDomain, RegYear, RegNum';
 
     /********************************************************************
      *	Marriage::$pre1873Years											*
@@ -257,9 +273,9 @@ class Marriage extends Record
         // validate parameters
         if (is_string($domain) || $domain instanceof Domain)
         {		// initialize new entry
-            $parms	            = array('m_regdomain'	=> $domain,
-                                        'm_regyear'	    => $year,
-                                        'm_regnum'	    => $number);
+            $parms	            = array('regdomain'	=> $domain,
+                                        'regyear'	    => $year,
+                                        'regnum'	    => $number);
             $parmsText          = "'$domain',$year,$number";
         }
         else
@@ -299,9 +315,9 @@ class Marriage extends Record
                 }		// move any extra fields to extras
             }		// loop through fields
 
-            $mregdomain	        		= $dbrow['m_regdomain'];
-            $mregyear	        		= $dbrow['m_regyear'];
-            $mregnum	        		= $dbrow['m_regnum'];
+            $mregdomain	        		= $dbrow['regdomain'];
+            $mregyear	        		= $dbrow['regyear'];
+            $mregnum	        		= $dbrow['regnum'];
 
             $needInsert	        		= false;
         }		// row returned from database query
@@ -325,7 +341,7 @@ class Marriage extends Record
                     $lcfldname		    = self::$translate[$lcfldname];
                 switch($lcfldname)
                 {
-                    case 'm_originalvolume':
+                    case 'originalvolume':
                     {
                         if (ctype_digit($value))
                             $numvolume	= $value;
@@ -346,19 +362,19 @@ class Marriage extends Record
                         break;
                     }
 
-                    case 'm_originalpage':
+                    case 'originalpage':
                     {
                         $number		    += $value * 10;
                         break;
                     }
 
-                    case 'm_originalitem':
+                    case 'originalitem':
                     {
                         $number		    += $value;
                         break;
                     }
 
-                    case 'm_regdomain':
+                    case 'regdomain':
                     {
                         if ($value instanceof Domain)
                         {
@@ -385,7 +401,7 @@ class Marriage extends Record
                         break;
                     }
 
-                    case 'm_regyear':
+                    case 'regyear':
                     {
                         $mregyear	    = $value;
                         $year		    = $value;
@@ -399,7 +415,7 @@ class Marriage extends Record
                         break;
                     }
 
-                    case 'm_regnum':
+                    case 'regnum':
                     {
                         $mregnum	    = $value;
                         $number		    = $value;
@@ -438,9 +454,9 @@ class Marriage extends Record
                 if (count($result) > 0)
                 {		// existing record
                     $dbrow	            = $result[0];
-                    $mregdomain	        = $dbrow['m_regdomain'];
-                    $mregyear	        = $dbrow['m_regyear'];
-                    $mregnum	        = $dbrow['m_regnum'];
+                    $mregdomain	        = $dbrow['regdomain'];
+                    $mregyear	        = $dbrow['regyear'];
+                    $mregnum	        = $dbrow['regnum'];
                     $needInsert	        = false;
                 }		// existing record
                 else
@@ -455,26 +471,26 @@ class Marriage extends Record
 
                     // set defaults
                     $dbrow			        = self::$initRow;
-                    $dbrow['m_regdomain']	= $domain;
-                    $dbrow['m_regyear']		= $year;
-                    $dbrow['m_regnum']		= $number;
-                    $dbrow['m_date']		= $year;
-                    $dbrow['m_regdate']		= $year;
-                    $dbrow['m_msvol']		= $msvol;
+                    $dbrow['regdomain']	= $domain;
+                    $dbrow['regyear']		= $year;
+                    $dbrow['regnum']		= $number;
+                    $dbrow['date']		= $year;
+                    $dbrow['regdate']		= $year;
+                    $dbrow['msvol']		= $msvol;
                     $mregdomain		    	= $domain;
                     $mregyear		    	= $year;
                     $mregnum		    	= $number;
 
                     // fill in some fields from the preceding record, 
                     // if it exists
-                    $query	= "SELECT M_RegCounty,M_RegTownship,M_MsVol," .
-                                  "M_OriginalVolume,M_OriginalPage,M_OriginalItem," .
-                                  "M_Registrar,M_RegDate,M_Image " .
+                    $query	= "SELECT RegCounty,RegTownship,MsVol," .
+                                  "OriginalVolume,OriginalPage,OriginalItem," .
+                                  "Registrar,RegDate,Image " .
                                     "FROM Marriage  " .
-                                    "WHERE M_RegDomain=:domain AND   " .
-                                          "M_RegYear=:year AND  " .
-                                          "M_RegNum<:number " .
-                                    "ORDER BY M_RegNum DESC " .
+                                    "WHERE RegDomain=:domain AND   " .
+                                          "RegYear=:year AND  " .
+                                          "RegNum<:number " .
+                                    "ORDER BY RegNum DESC " .
                                     "LIMIT 1";
 
                     $sqlParms	        = array('domain'	=> $domain,
@@ -494,23 +510,23 @@ class Marriage extends Record
                         if (is_array($result))
                         {		// a preceding record exists
                             $row                        = $result;
-                            $row['m_regdomain']		    = $domain;
-                            $regCounty			        = $row['m_regcounty'];
-                            $dbrow['m_regcounty']	    = $regCounty;
-                            $regTownship		        = $row['m_regtownship'];
-                            $dbrow['m_regtownship']	    = $regTownship;
-                            $dbrow['m_msvol']		    = $row['m_msvol'];
-                            $dbrow['m_registrar']	    = $row['m_registrar'];
-                            $dbrow['m_image']		    = $row['m_image'];
-                            $dbrow['m_originalvolume']	= $row['m_originalvolume'];
-                            $dbrow['m_originalpage']	= $row['m_originalpage'];
-                            $dbrow['m_originalitem']	= $row['m_originalitem'] + 1;
-                            if (strlen($row['m_regdate']) > 0)
-                                $dbrow['m_regdate']	    = $row['m_regdate'];
+                            $row['regdomain']		    = $domain;
+                            $regCounty			        = $row['regcounty'];
+                            $dbrow['regcounty']	    = $regCounty;
+                            $regTownship		        = $row['regtownship'];
+                            $dbrow['regtownship']	    = $regTownship;
+                            $dbrow['msvol']		    = $row['msvol'];
+                            $dbrow['registrar']	    = $row['registrar'];
+                            $dbrow['image']		    = $row['image'];
+                            $dbrow['originalvolume']	= $row['originalvolume'];
+                            $dbrow['originalpage']	= $row['originalpage'];
+                            $dbrow['originalitem']	= $row['originalitem'] + 1;
+                            if (strlen($row['regdate']) > 0)
+                                $dbrow['regdate']	    = $row['regdate'];
 
                             // initialize places with default value
                             $dftPlace		    = $this->getDefaultPlace($row);
-                            $dbrow['m_place']	= $dftPlace;
+                            $dbrow['place']	= $dftPlace;
                         }	// a preceding record exists
                         $needInsert		        = true;
                     }		// successful query
@@ -520,6 +536,7 @@ class Marriage extends Record
                                         " '$queryText' " .
                                         print_r($connection->errorInfo(),true) .
                             '. ';
+                        $dbrow			        = self::$initRow;
                     }		// error issuing query
 
                     // apply any other fields
@@ -539,17 +556,18 @@ class Marriage extends Record
                 $this->msg  .=  "Marriage::__construct: " . __LINE__ .
                             " query='$queryText' query failed: " .
                             print_r($stmt->errorInfo(),true) . ".\n";
+                $dbrow			        = self::$initRow;
             }
         }			// search parameters
 
         // get participant records
-        $sel		= "WHERE M_RegDomain=:domain AND " .
-                                "M_RegYear=:year AND " .
-                                "M_RegNum=:number";
+        $sel		= "WHERE RegDomain=:domain AND " .
+                                "RegYear=:year AND " .
+                                "RegNum=:number";
         $sqlParms	= array("domain"	=> $mregdomain,
                                 "year"		=> $mregyear,
                                 "number"	=> $mregnum);
-        $pquery		= "SELECT * FROM MarriageIndi $sel ORDER BY M_Role";
+        $pquery		= "SELECT * FROM MarriageIndi $sel ORDER BY Role";
         $pstmt		= $connection->prepare($pquery);
         $pqueryText	= debugPrepQuery($pquery, $sqlParms);
         if ($pstmt->execute($sqlParms))
@@ -558,7 +576,7 @@ class Marriage extends Record
             foreach($presults as $prow)
             {		// loop through rows
                 $participant	= new MarriageParticipant($prow); 
-                $role		    = $prow['m_role'];
+                $role		    = $prow['role'];
                 $this->participants[$role]	= $participant;
             }		// loop through rows
         }		// query successful
@@ -567,6 +585,7 @@ class Marriage extends Record
             $this->msg     .= "Marriage::__construct: " . __LINE__ . 
                                 " query='$pqueryText', " .
                                 print_r($pstmt->errorInfo(),true) . ".\n";
+            $dbrow			        = self::$initRow;
         }		// error issuing query
 
         // invoke constructor of base class
@@ -594,13 +613,13 @@ class Marriage extends Record
      ********************************************************************/
     private function getDefaultPlace($row)
     {
-        $domain			= $row['m_regdomain'];
+        $domain			= $row['regdomain'];
         $cc			= substr($domain, 0, 2);
         $pc			= substr($domain, 2);
         $addrEnd		= ", $pc, $cc";
 
-        $regCounty		= $row['m_regcounty'];
-        $regTownship		= $row['m_regtownship'];
+        $regCounty		= $row['regcounty'];
+        $regTownship		= $row['regtownship'];
         $county			= new County($domain,
                                          $regCounty);
         $countyName		= $county->getName();
@@ -659,7 +678,7 @@ class Marriage extends Record
             $retval	= "    <$top>\n";
         foreach($this->row as $key => $value)
         {
-            if (substr($key, 0, 2) == 'm_')
+            if (substr($key, 0, 2) == '')
                     $key	= substr($key, 2);
             $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
         }
@@ -705,7 +724,7 @@ class Marriage extends Record
         $comma	    = "{\n";
         foreach($this->row as $key => $value)
         {
-            if (substr($key, 0, 2) == 'm_')
+            if (substr($key, 0, 2) == '')
                 $key	= substr($key, 2);
             if (is_numeric($value))
 		    {
@@ -774,20 +793,20 @@ class Marriage extends Record
             $lcfldname	= self::$translate[$lcfldname];
         switch($lcfldname)
         {		// act on specific field
-            case 'm_regdomain':
-            case 'm_regyear':
-            case 'm_regnum':
-            case 'm_changedby':
-            case 'm_changedate':
+            case 'regdomain':
+            case 'regyear':
+            case 'regnum':
+            case 'changedby':
+            case 'changedate':
             {
                 break;
             }
 
-            case 'm_date':
+            case 'date':
             {
                 if (strlen($value) == 0)
                 {
-                    $y      = $this->row['m_regyear'];
+                    $y      = $this->row['regyear'];
                     $m      = 6;
                     $d      = 1;
                 }
@@ -802,22 +821,22 @@ class Marriage extends Record
                     if ($d < 10)
                         $d	= '0' . $d;
                 }
-                parent::set('m_calcdate',"$y-$m-$d");
+                parent::set('calcdate',"$y-$m-$d");
                 return parent::set($lcfldname, $value);
             }
 
-            case 'm_regcounty':
-            case 'm_regtownship':
-            case 'm_msvol':
-            case 'm_place':
-            case 'm_licensetype':
-            case 'm_remarks':
-            case 'm_regdate':
-            case 'm_registrar':
-            case 'm_image':
-            case 'm_originalvolume':
-            case 'm_originalpage':
-            case 'm_originalitem':
+            case 'regcounty':
+            case 'regtownship':
+            case 'msvol':
+            case 'place':
+            case 'licensetype':
+            case 'remarks':
+            case 'regdate':
+            case 'registrar':
+            case 'image':
+            case 'originalvolume':
+            case 'originalpage':
+            case 'originalitem':
             {
                 return parent::set($lcfldname, $value);
             }
@@ -843,9 +862,9 @@ class Marriage extends Record
             return $this->participants['B'];
         else
         {		// create new bride record
-            $domain	= $this->row['m_regdomain'];
-            $year	= $this->row['m_regyear'];
-            $number	= $this->row['m_regnum'];
+            $domain	= $this->row['regdomain'];
+            $year	= $this->row['regyear'];
+            $number	= $this->row['regnum'];
             $bride	= new MarriageParticipant($domain,
                                               $year,
                                               $number,
@@ -869,9 +888,9 @@ class Marriage extends Record
             return $this->participants['G'];
         else
         {		// create new groom record
-            $domain	= $this->row['m_regdomain'];
-            $year	= $this->row['m_regyear'];
-            $number	= $this->row['m_regnum'];
+            $domain	= $this->row['regdomain'];
+            $year	= $this->row['regyear'];
+            $number	= $this->row['regnum'];
             $groom	= new MarriageParticipant($domain,
                                           $year,
                                           $number,
@@ -899,9 +918,9 @@ class Marriage extends Record
         else
         if ($create)
         {		// create new minister record
-            $domain	= $this->row['m_regdomain'];
-            $year	= $this->row['m_regyear'];
-            $number	= $this->row['m_regnum'];
+            $domain	= $this->row['regdomain'];
+            $year	= $this->row['regyear'];
+            $number	= $this->row['regnum'];
             $minister	= new MarriageParticipant($domain,
                                           $year,
                                           $number,
@@ -971,26 +990,26 @@ class Marriage extends Record
             {
                 switch($fld)
                 {
-                    case 'm_changedby':
+                    case 'changedby':
                     {
                         $fldnames		.= $comma . "`m_changedby`"; 
                         $values			.= $comma . ':userid';
                         $sqlParms['userid']	= $userid;
                         $comma			= ", ";
                         break;
-                    }		// M_Userid
+                    }		// Userid
 
-                    case 'm_changedate':
+                    case 'changedate':
                     {
                         $fldnames		.= $comma . "`m_changedate`"; 
                         $values			.= $comma . 'CURDATE()';
                         $comma			= ", ";
                         break;
-                    }		// M_ChangeDate
+                    }		// ChangeDate
 
-                    case 'm_idir':
-                    case 'm_originalpage':
-                    case 'm_originalitem':
+                    case 'idir':
+                    case 'originalpage':
+                    case 'originalitem':
                     {		// most fields
                         $fldnames		.= $comma . "`$fld`";
                         $shortFld		= substr($fld, 2);
@@ -1003,7 +1022,7 @@ class Marriage extends Record
                         break;
                     }		// most fields
 
-                    case 'm_calcdate':
+                    case 'calcdate':
                     {
                         if ($value != '0000-00-00')
                         {
@@ -1092,15 +1111,15 @@ class Marriage extends Record
             {
                 switch($fld)
                 {		// act on specific fields
-                    case 'm_changedby':
-                    case 'm_changedate':
-                    {		// M_ChangedBy, M_ChangeDate
+                    case 'changedby':
+                    case 'changedate':
+                    {		// ChangedBy, ChangeDate
                         break;
-                    }		// M_ChangedBy, M_ChangeDate
+                    }		// ChangedBy, ChangeDate
 
-                    case 'm_idir':
-                    case 'm_originalpage':
-                    case 'm_originalitem':
+                    case 'idir':
+                    case 'originalpage':
+                    case 'originalitem':
                     {		// most fields
                         $shortFld		= substr($fld, 2);
                         $set			.= $comma . "`$fld`=:$shortFld";
@@ -1131,27 +1150,27 @@ class Marriage extends Record
 
             if (strlen($set) > 0)
             {		// changes made
-                $set	.= ',M_ChangedBy=:userid';
-                $set	.= ',M_ChangeDate=CURDATE()';
+                $set	.= ',ChangedBy=:userid';
+                $set	.= ',ChangeDate=CURDATE()';
                 $sqlParms['userid']	= $userid;
 
                 // construct the where clause
                 if ($this->former)
                 {
-                    $sqlParms['odomain']	= $this->former['m_regdomain'];
-                    $sqlParms['oyear']		= $this->former['m_regyear'];
-                    $sqlParms['onumber']	= $this->former['m_regnum'];
+                    $sqlParms['odomain']	= $this->former['regdomain'];
+                    $sqlParms['oyear']		= $this->former['regyear'];
+                    $sqlParms['onumber']	= $this->former['regnum'];
                 }
                 else
                 {
-                    $sqlParms['odomain']	= $this->row['m_regdomain'];
-                    $sqlParms['oyear']		= $this->row['m_regyear'];
-                    $sqlParms['onumber']	= $this->row['m_regnum'];
+                    $sqlParms['odomain']	= $this->row['regdomain'];
+                    $sqlParms['oyear']		= $this->row['regyear'];
+                    $sqlParms['onumber']	= $this->row['regnum'];
                 }
 
                 // assemble the UPDATE command
-                $update		.= $set . ' WHERE M_RegDomain=:odomain ' .
-                        ' AND M_RegYear=:oyear AND M_RegNum=:onumber';
+                $update		.= $set . ' WHERE RegDomain=:odomain ' .
+                        ' AND RegYear=:oyear AND RegNum=:onumber';
 
                 // perform the update
                 $stmt		    = $connection->prepare($update);
@@ -1249,24 +1268,24 @@ class Marriage extends Record
         $sqlParms			= array();
         if ($this->former)
         {
-            $sqlParms['regdomain']	= $this->former['m_regdomain'];
-            $sqlParms['regyear']	= $this->former['m_regyear'];
-            $sqlParms['regnum']		= $this->former['m_regnum'];
+            $sqlParms['regdomain']	= $this->former['regdomain'];
+            $sqlParms['regyear']	= $this->former['regyear'];
+            $sqlParms['regnum']		= $this->former['regnum'];
         }
         else
         {
-            $sqlParms['regdomain']	= $this->row['m_regdomain'];
-            $sqlParms['regyear']	= $this->row['m_regyear'];
-            $sqlParms['regnum']		= $this->row['m_regnum'];
+            $sqlParms['regdomain']	= $this->row['regdomain'];
+            $sqlParms['regyear']	= $this->row['regyear'];
+            $sqlParms['regnum']		= $this->row['regnum'];
         }
 
         // delete all associated records
         if (!$this->needInsert)
         {		// only delete if already in database
             $delete	= 'DELETE FROM Marriage ' .
-                                   'WHERE M_RegDomain=:regdomain AND ' .
-                                     'M_RegYear=:regyear AND ' .
-                                     'M_RegNum=:regnum';
+                                   'WHERE RegDomain=:regdomain AND ' .
+                                     'RegYear=:regyear AND ' .
+                                     'RegNum=:regnum';
             $stmt	= $connection->prepare($delete);
             $deleteText	= debugPrepQuery($delete, $sqlParms);
             if ($stmt->execute($sqlParms))
@@ -1287,9 +1306,9 @@ class Marriage extends Record
 
                 // also delete all participants
                 $delete		= 'DELETE FROM MarriageIndi ' .
-                                      'WHERE M_RegDomain=:regdomain AND ' .
-                                        'M_RegYear=:regyear AND ' .
-                                        'M_RegNum=:regnum';
+                                      'WHERE RegDomain=:regdomain AND ' .
+                                        'RegYear=:regyear AND ' .
+                                        'RegNum=:regnum';
                 $stmt		= $connection->prepare($delete);
                 $deleteText	= debugPrepQuery($delete, $sqlParms);
                 if ($stmt->execute($sqlParms))

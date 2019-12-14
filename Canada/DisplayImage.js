@@ -12,6 +12,8 @@
  *						with new image file name						*
  *		2018/02/10		add close frame button							*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2019/12/12      fix header at top and scroll image such that    *
+ *		                the scroll bars are visible all the time        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -19,9 +21,9 @@
 window.onload	= onLoadImage;
 
 /************************************************************************
- *  onLoadImage																*
+ *  function onLoadImage												*
  *																		*
- *  Initialize dynamic functionality of page.								*
+ *  Initialize dynamic functionality of page.							*
  ************************************************************************/
 function onLoadImage()
 {
@@ -29,12 +31,12 @@ function onLoadImage()
     // including support for context specific help
     var	element;
     for(var i = 0; i < document.forms.length; i++)
-    {		// loop through all forms
-		var form	= document.forms[i];
+    {		            // loop through all forms
+		var form	            = document.forms[i];
 
 		for(var j = 0; j < form.elements.length; j++)
-		{	// loop through all elements of a form
-		    element		= form.elements[j];
+		{	            // loop through all elements of a form
+		    element		        = form.elements[j];
 
 		    element.onkeydown	= keyDown;
 
@@ -42,52 +44,60 @@ function onLoadImage()
 		    // request to the server is identified by a name= attribute
 		    // but elements which are used only by this script are
 		    // identified by an id= attribute
-		    var	name	= element.name;
+		    var	name	        = element.name;
 		    if (name.length == 0)
-				name	= element.id;
+				name	        = element.id;
 
 		    // set up dynamic functionality based on the name of the element
 		    switch(name.toLowerCase())
 		    {
 				case 'plus':
-				{	// button to increase magnification of image
+				{	    // button to increase magnification of image
 				    element.onclick	= zoomIn;
 				    break;
-				}	// button to increase magnification of image
+				}	    // button to increase magnification of image
 
 				case 'minus':
-				{	// button to decrease magnification of image
+				{	    // button to decrease magnification of image
 				    element.onclick	= zoomOut;
 				    break;
-				}	// button to decrease magnification of image
+				}	    // button to decrease magnification of image
 
 				case "close":
 				{
 				    element.onclick	= close;
 				    break;
-				}	// incLocsSet
+				}	    // incLocsSet
 
-		    }	// switch on field name
-		}		// loop through all elements in the form
-    }		// loop through forms in the page
+		    }	        // switch on field name
+		}		        // loop through all elements in the form
+    }		            // loop through forms in the page
+
+    // set size of image viewer
+    var header              = document.getElementById('top');
+    var headerHeight        = header.offsetHeight;
+    var browserHeight       = Math.max(document.documentElement.clientHeight, 
+                                       window.innerHeight || 0)
+    var viewer              = document.getElementById('viewport');
+    viewer.style.height     = (browserHeight - headerHeight) + 'px';
 
     // activate popup help for forward and backward links
-    element	= document.getElementById('goToPrevImg');
+    element	                = document.getElementById('goToPrevImg');
     actMouseOverHelp(element);
-    element	= document.getElementById('goToNextImg');
+    element	                = document.getElementById('goToNextImg');
     actMouseOverHelp(element);
 
     // update the name of the image in the invoking page
-    var	opener		= null;
+    var	opener		        = null;
     if (window.frameElement && window.frameElement.opener)
-		opener		= window.frameElement.opener;
+		opener		        = window.frameElement.opener;
     else
-		opener		= window.opener;
+		opener		        = window.opener;
     if (opener)
     {		// opened from another window
-		var fldName		= 'Image';
+		var fldName		    = 'Image';
 		if ('fldname' in args)
-		    fldName		= args.fldname;
+		    fldName		    = args.fldname;
 		var imageElement	= opener.document.getElementById(fldName);
 		if ('src' in args)
 		{
@@ -105,55 +115,55 @@ function onLoadImage()
 		else
 		    alert("DisplayImage.js: missing src= argument");
     }		// opened from another window
-    else
-		alert("DisplayImage.js: no opener");
-}		// onLoadImage
+}		// function onLoadImage
 
 /************************************************************************
- *  zoomIn																*
+ *  function zoomIn														*
  *																		*
  *  Increase the size of the image element which has the effect of		*
- *  zooming in to the image.												*
+ *  zooming in to the image. This is the click event handler for the    *
+ *  "+" button.                                                         *
  *																		*
  *  Input:																*
- *		$this				<button id='plus'>								*
+ *		$this				<button id='plus'>							*
  ************************************************************************/
 function zoomIn()
 {
-    var	image		= document.getElementById('image');
+    var	image		    = document.getElementById('image');
     image.style.height	= 'auto';
     image.style.width	= Math.floor(image.width * 3 / 2) + 'px';
     return false;
-}		// zoomIn
+}		// function zoomIn
 
 /************************************************************************
- *  zoomOut																*
+ *  function zoomOut													*
  *																		*
  *  Decrease the size of the image element which has the effect of		*
- *  zooming out from the image.												*
+ *  zooming out from the image.	 This is the click event handler for    *
+ *  the "-" button.                                                     *
  *																		*
  *  Input:																*
- *		$this				<button id='minus'>								*
+ *		$this				<button id='minus'>							*
  ************************************************************************/
 function zoomOut()
 {
-    var	image		= document.getElementById('image');
+    var	image		    = document.getElementById('image');
     image.style.height	= 'auto';
     image.style.width	= Math.floor(image.width * 2 / 3) + 'px';
     return false;
-}		// zoomIn
+}		// function zoomIn
 
 /************************************************************************
  *  close																*
  *																		*
- *  This method is called when the user clicks on the button to close		*
- *  the dialog.																*
+ *  This method is called when the user clicks on the button to close	*
+ *  the dialog.															*
  *																		*
- *  Parameters:																*
- *		this		<button id='Close'>										*
+ *  Parameters:															*
+ *		this		<button id='Close'>									*
  ************************************************************************/
 function close()
 {
     closeFrame();
-}		// close
+}		// function close
 

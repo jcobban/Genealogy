@@ -167,7 +167,8 @@ function addCensus()
 {
     var	table		= document.getElementById('dataTable');
     var	body		= table.tBodies[0];
-    var	newRow		= body.rows[0].cloneNode(true);
+    var template    = document.getElementById('newRow');
+    var	newRow		= template.cloneNode(true);
     var rowNum      = body.rows.length + 1;
     if (rowNum < 10)
         rowNum      = "0" + rowNum;
@@ -177,12 +178,10 @@ function addCensus()
     for (var i = 0; i < inputs.length; i++)
     {
         var input           = inputs[i];
-        var col             = input.id.substring(0, input.id.length - 2); 
+        var col             = input.id.substring(0, input.id.length - 5); 
         var name            = col + rowNum;
         input.id            = name;
         input.name          = name;
-        if (col != 'LinesPerPage')
-            input.value     = '';
         if (col == 'CensusId')
 		    addEventHandler(input,'change',changeId);
         else

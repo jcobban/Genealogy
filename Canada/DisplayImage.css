@@ -1,0 +1,24 @@
+/************************************************************************
+ *  DisplayImage.css							    					*
+ *																		*
+ *  Stylesheet for the script DisplayImage.php	    					*
+ *																		*
+ *  History:															*
+ *		2019/12/11		created											*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
+ ************************************************************************/
+
+    div.header {
+                position: fixed; 
+                top: 0; 
+                width: 100%; 
+                background-color:   #FFFDF0;
+                padding: 1px;
+            }
+
+    div.imagebody {
+                overflow: scroll; 
+                width: 100%; 
+                padding-top: 16px;
+		}

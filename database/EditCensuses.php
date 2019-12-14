@@ -113,6 +113,7 @@ if (isset($_POST) && count($_POST) > 0)
 		    case 'linesperpage':
 		    case 'grouplines':
 		    case 'lastunderline':
+		    case 'idsr':
 		    {
 				$census->set($column, $value);
 				break;
@@ -121,9 +122,9 @@ if (isset($_POST) && count($_POST) > 0)
 		    case 'collective':
 		    {
 				if (strtoupper($value) == 'Y')
-				    $value	= true;
+				    $value	= 1;
 				else
-				    $value	= false;
+				    $value	= 0;
 				$census->set('collective', $value);
 				break;
 		    }
@@ -191,10 +192,6 @@ $censuses		= new CensusSet($getParms);
 $info           = $censuses->getInformation();
 $total          = $info['count'];
 $count          = $censuses->count();
-if ($count == 0)
-{
-    $censuses[$cc . '1790'] = new Census(array('CensusId' => $cc.'1790'));
-}
 $template->set('OFFSET',    $offset);
 $template->set('LIMIT',     $limit);
 $template->set('TOTAL',     $total);

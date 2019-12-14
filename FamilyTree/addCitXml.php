@@ -376,21 +376,21 @@ function birthCitation($page, $idir, $type)
     	    $birth	= new Birth('CAON',
     						    $regyear,
     						    $regnum);
-    	    $birth->set('b_idir', $idir);
+    	    $birth->set('idir', $idir);
     	    if (!($birth->isExisting()))
     	    {		// new record
-    			$birth->set('b_surname', $personid->get('surname'));
-    			$birth->set('b_givennames',
+    			$birth->set('surname', $personid->get('surname'));
+    			$birth->set('givennames',
     						 $personid->get('givenname'));
     			$gender		= $personid->get('gender');
     			if ($gender == Person::MALE)
-    			    $birth->set('b_sex', 'M');
+    			    $birth->set('sex', 'M');
     			else
     			if ($gender == Person::FEMALE)
-    			    $birth->set('b_sex', 'F');
+    			    $birth->set('sex', 'F');
     			$evBirth	= $personid->getBirthEvent(true);
-    			$birth->set('b_birthdate', $evBirth->getDate());
-    			$birth->set('b_birthplace',
+    			$birth->set('birthdate', $evBirth->getDate());
+    			$birth->set('birthplace',
     						 $evBirth->getLocation()->toString());
     	    }		// new record
     	    $result	= $birth->save(true);
@@ -434,29 +434,29 @@ function deathCitation($page, $idir, $type)
     	    $death	= new Death('CAON',
     						    $regyear,
     						    $regnum);
-    	    $death->set('d_idir', $idir);
+    	    $death->set('idir', $idir);
     	    if (!($death->isExisting()))
     	    {		// new record
-    			$death->set('d_surname', $personid->get('surname'));
-    			$death->set('d_givennames',
+    			$death->set('surname', $personid->get('surname'));
+    			$death->set('givennames',
     						 $personid->get('givenname'));
     			$gender		= $personid->get('gender');
     			if ($gender == Person::MALE)
-    			    $death->set('d_sex', 'M');
+    			    $death->set('sex', 'M');
     			else
     			if ($gender == Person::FEMALE)
-    			    $death->set('d_sex', 'F');
+    			    $death->set('sex', 'F');
     			$evBirth	= $personid->getDeathEvent(true);
-    			$death->set('d_birthdate', $evBirth->getDate());
-    			$death->set('d_birthplace',
+    			$death->set('birthdate', $evBirth->getDate());
+    			$death->set('birthplace',
     						 $evBirth->getLocation()->toString());
     			$birthYear	= floor($evBirth->get('eventsd') / 10000);
     			$evDeath	= $personid->getDeathEvent(true);
-    			$death->set('d_date', $evDeath->getDate());
-    			$death->set('d_place',
+    			$death->set('date', $evDeath->getDate());
+    			$death->set('place',
     						 $evBirth->getLocation()->toString());
     			$deathYear	= floor($evDeath->get('eventsd') / 10000);
-    			$death->set('d_age', $deathYear - $birthYear);
+    			$death->set('age', $deathYear - $birthYear);
     	    }		// new record
     	    $result	= $death->save(true);
     	}	        // detail matches pattern
@@ -535,12 +535,12 @@ function marriageCitation($page, $idmr, $type)
 
     	    if (isset($marriage))
     	    {			// found Marriage transcription
-    			if ($marriage->get('m_date') == $marriage->get('m_regyear') &&
-    			    $marriage->get('m_place') == '')
+    			if ($marriage->get('date') == $marriage->get('regyear') &&
+    			    $marriage->get('place') == '')
     			{		// uninitialized
-    			    $marriage->set('m_date', $mar->getDate());
+    			    $marriage->set('date', $mar->getDate());
     			    $marloc	= $mar->getLocation()->getName();
-    			    $marriage->set('m_place', $marloc);
+    			    $marriage->set('place', $marloc);
     			    $locparts	= explode(',',$marloc);
     			    $locCount	= count($locparts);
     			    if ($locCount > 3)
@@ -552,16 +552,16 @@ function marriageCitation($page, $idmr, $type)
     					if (count($counties) > 0)
     					{
     					    $county	= $counties[0];
-    					    $marriage->set('m_regcounty',
+    					    $marriage->set('regcounty',
     								$county->get('code'));
     					}
     					else
-    					    $marriage->set('m_regcounty', $countyname);
-    					$marriage->set('m_regtownship', $township);	
+    					    $marriage->set('regcounty', $countyname);
+    					$marriage->set('regtownship', $township);	
     			    }		// have at least 4 parts to location
     			}		// uninitialized
     			else
-    			    $marloc	= $marriage->get('m_place');
+    			    $marloc	= $marriage->get('place');
     			// update marriage transcription record
     			$marriage->save(true);
 
@@ -588,18 +588,18 @@ function marriageCitation($page, $idmr, $type)
     									  $regyear,
     									  $regnum,
     									  'G');
-    			    $groom->set('m_idir', $idirhusb);
-    			    if ($groom->get('m_givennames') == '' &&
-    					    $groom->get('m_surname') == '')
+    			    $groom->set('idir', $idirhusb);
+    			    if ($groom->get('givennames') == '' &&
+    					    $groom->get('surname') == '')
     			    {		// not initialized
-    					$groom->set('m_givennames',
+    					$groom->set('givennames',
     							 $husb->get('givenname'));
-    					$groom->set('m_surname', $husb->get('surname'));
+    					$groom->set('surname', $husb->get('surname'));
     					if ($age > 110)
     					    $age		= 30;
-    					$groom->set('m_age', $age);
-    					$groom->set('m_residence', $marloc);
-    					$groom->set('m_birthplace', $birthloc);
+    					$groom->set('age', $age);
+    					$groom->set('residence', $marloc);
+    					$groom->set('birthplace', $birthloc);
     			    }		// not initialized
     			    $result	= $groom->save(true);
     			}			// add information on husband
@@ -627,16 +627,16 @@ function marriageCitation($page, $idmr, $type)
     									  $regyear,
     									  $regnum,
     									  'B');
-    			    $bride->set('m_idir', $idirwife);
-    			    if ($bride->get('m_givennames') == '' &&
-    					    $bride->get('m_surname') == '')
+    			    $bride->set('idir', $idirwife);
+    			    if ($bride->get('givennames') == '' &&
+    					    $bride->get('surname') == '')
     			    {		// not initialized
-    					$bride->set('m_givennames',
+    					$bride->set('givennames',
     							 $wife->get('givenname'));
-    					$bride->set('m_surname', $wife->get('surname'));
-    					$bride->set('m_age', $age);
-    					$bride->set('m_residence', $marloc);
-    					$bride->set('m_birthplace', $birthloc);
+    					$bride->set('surname', $wife->get('surname'));
+    					$bride->set('age', $age);
+    					$bride->set('residence', $marloc);
+    					$bride->set('birthplace', $birthloc);
     			    }		// not initialized
     			    $result	= $bride->save(true);
     			}			// add information on wife

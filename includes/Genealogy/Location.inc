@@ -422,8 +422,8 @@ class Location extends RecordPic
 						if ($rgxres > 0)
 						{		// street address
 						    $lotnum		        = $matches[2];
-						    if (strlen($lotnum) < 3)
-							    $lotnum	        = substr('000' . $lotnum,
+						    if (strlen($lotnum) < 4)
+							    $lotnum	        = substr('0000' . $lotnum,
 									                     strlen($lotnum));
 						    else
 						    if (substr($lotnum, 0, 4) == 'lot ' &&

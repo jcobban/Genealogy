@@ -318,19 +318,19 @@ class Blog extends Record
 
 		    case 'blogname':
 		    {
-				$retval			= $this->row['blogname'];
+				$retval			        = $this->row['blogname'];
 				if ($retval === null || strlen($retval) == 0)
 				{
-				    $message		= $this->getText();
+				    $message		    = $this->getText();
 				    if (strlen($message) > 0)
 				    {
-						$nlpos		= strpos('\n', $message);
+						$nlpos		    = strpos('\n', $message);
 						if (is_int($nlpos))
 						    $subject	= substr($message, 0, $nlpos);
 						else
 						    $subject	= $message;
-						$subject	= preg_replace('/<[^>]+>/', '',
-										$subject);
+						$subject	    = preg_replace('/<[^>]+>/', '',
+										               $subject);
 						return $subject;
 				    }
 				    else
@@ -409,7 +409,9 @@ class Blog extends Record
 		else
 		{
 		    if (strpos($retval, '<') === false)
-				$retval		= str_replace("\n","</p>\n<p>", $retval);
+                $retval		= "<p>" .
+                              str_replace("\n","</p>\n<p>", $retval) . 
+                              "</p>\n";
 		    return $retval;
 		}
     }		// Blog::getText

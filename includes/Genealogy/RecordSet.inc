@@ -90,6 +90,8 @@ use \Templating\Template;
  *		2019/07/17      clean up debugging output from constructor      *
  *		2019/09/21      qualify class Template by namespace             *
  *		2019/11/21      information['query'] is no longer escaped       *
+ *		2019/12/13      add option 'loosesurname' to request that       *
+ *		                surname be checked in a looser manner           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1583,18 +1585,22 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 								     $surname)
     {
 		$information	= Record::getInformation($table);
+		$soundslike	    = false;
+		$soundex	    = false;
 		if ($information)
 		{			// valid table name
 		    $initRow	= $information['initrow'];
-		    $valid	= array_key_exists('surname',		$initRow) &&
-						  array_key_exists('soundslike',	$initRow);
-		    $table	= $information['table'];	// actual table name
+			$soundslike	= array_key_exists('soundslike',	$initRow);
+			$soundex	= array_key_exists('soundex',	    $initRow);
+		    $valid	    = array_key_exists('surname',		$initRow);
+		    $table	    = $information['table'];	// actual table name
 		}			// valid table name
 		else
-		    $valid	= false;// invalid table name
+		    $valid	    = false;        // invalid table name
 
 		if ($valid)
 		{			// valid table
+require_once __NAMESPACE__ . '/Surname.inc';
 		    $surnameRec	= new Surname(array('surname' => $surname));
 		    $pattern	= $surnameRec->get('pattern');
 		    if ($pattern != '')
@@ -1602,7 +1608,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				$this->sqlParms[]	= $pattern;
 				return $table . ".Surname REGEXP ?";
 		    }		// use pattern match rather than soundex
-		    else
+
+            if ($soundslike || $soundex)
 		    {		// use soundex match
 				// remove question marks
 				$surname	        = str_replace('?', '', $surname);
@@ -1610,8 +1617,12 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 $sxtable            = $table;
                 if ($table == 'tblNX')
                     $sxtable        = 'tblNR';
-                $surnameCmp	        = $sxtable .
+                if ($soundslike)
+                    $surnameCmp	    = $sxtable .
                                         ".SoundsLike=LEFT(SOUNDEX(?),4)";
+                else
+                    $surnameCmp	    = $sxtable .
+                                        ".Soundex=LEFT(SOUNDEX(?),4)";
 				if (substr($surname, strlen($surname) - 1) == 's')
 				{		// also try soundex without final s
 				    $this->sqlParms[] = substr($surname, 0, strlen($surname)-1);
@@ -1620,26 +1631,30 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				{		// also try soundex with final s
 				    $this->sqlParms[] = $surname . 's';
 				}		// also try soundex with final s
-				$surnameCmp	        .= " OR " . $sxtable .
-									    ".SoundsLike=LEFT(SOUNDEX(?),4)";
-
-				if (strlen($surname) > 4)
-				{		// add other loose surname comparisons
-				    // match a surname that starts with the same 2 characters
-				    // and ends with the same character or
-				    // starts with the same character and
-				    // ends with the same 3 characters
-				    $this->sqlParms[]	= substr($surname, 0, 2);
-				    $this->sqlParms[]	= substr($surname, -1);
-				    $this->sqlParms[]	= substr($surname, 0, 1);
-				    $this->sqlParms[]	= substr($surname, -3);
-				    $surnameCmp	.= " OR (LEFT($table.Surname,2)=?" .
-									" AND RIGHT($table.Surname,1)=?) OR " .
-									"(LEFT($table.Surname,1)=?" .
-									" AND RIGHT($table.Surname,3)=?)";
-				}		// add other loose surname comparisons
-				return "($surnameCmp)";
+                if ($soundslike)
+                    $surnameCmp	    = $sxtable .
+                                        ".SoundsLike=LEFT(SOUNDEX(?),4)";
+                else
+                    $surnameCmp	    = $sxtable .
+                                        ".Soundex=LEFT(SOUNDEX(?),4)";
 		    }			// use soundex match
+
+			if (strlen($surname) > 4)
+			{		    // add other loose surname comparisons
+			    // match a surname that starts with the same 2 characters
+			    // and ends with the same character or
+			    // starts with the same character and
+			    // ends with the same 3 characters
+			    $this->sqlParms[]	= substr($surname, 0, 2);
+			    $this->sqlParms[]	= substr($surname, -1);
+			    $this->sqlParms[]	= substr($surname, 0, 1);
+			    $this->sqlParms[]	= substr($surname, -3);
+			    $surnameCmp	.= " OR (LEFT($table.Surname,2)=?" .
+								" AND RIGHT($table.Surname,1)=?) OR " .
+								"(LEFT($table.Surname,1)=?" .
+								" AND RIGHT($table.Surname,3)=?)";
+			}		// add other loose surname comparisons
+			return "($surnameCmp)";
 		}			// valid table name
 		else
 		{
@@ -1669,25 +1684,27 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		global	$debug;
 		global	$warn;
 
-		$where		= '';		// return value
-		$and		= 'WHERE ';	// combining operator
+		$where      		    = '';		// return value
+        $and		            = 'WHERE ';	// combining operator
+        $loose                  = false;
+        $surname                = '';
 
 		// belt and suspenders
 		if (!is_array($this->sqlParms))
 		    $this->sqlParms		= array();
 
 		// process parameters
-		$translate		= null;
-		$initRow		= $this->information['initrow'];
-		$className		= $this->information['classname'];
-        $nsclass        = __NAMESPACE__ . "\\" . $className;
+		$translate	        	= null;
+		$initRow	        	= $this->information['initrow'];
+		$className	        	= $this->information['classname'];
+        $nsclass                = __NAMESPACE__ . "\\" . $className;
 
 		foreach($this->parms as $fldname => $value)
-		{			// loop through all parameters
-		    $expression		= '';
+		{			        // loop through all parameters
+		    $expression		    = '';
 		    if (is_int($fldname) && is_array($value))
-		    {			// OR expression
-				$or		= '';
+		    {			    // OR expression
+				$or		        = '';
 				$orExpression	= '';
 				foreach($value as $fld2 => $val2)
 				{
@@ -1721,20 +1738,35 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				    $where	.= $and . '(' . $orExpression . ')';
 				    $and	= ' AND ';
 				}
-		    }			// OR expression
+		    }			        // OR expression
 		    else
 		    if (is_string($fldname))
-            {			// field name
-                $fieldLc	= $nsclass::getRealFieldName($fldname);
+            {			        // field name
+                if (strtolower($fldname) == 'loosesurname')
+                {
+                    if ($value == 'y' || $value == 'Y')
+                        $loose          = true;
+                    else
+                    if (is_bool($value))
+                        $loose          = $value;
+                    else
+                    if ($value === 1)
+                        $loose          = true;
+                    continue;
+                }
+                $fieldLc	        = $nsclass::getRealFieldName($fldname);
 				if (is_null($fieldLc))
 				{
-				    $warn	.= "<p>RecordSet::getWhere: " . __LINE__ .
+				    $warn	        .= "<p>RecordSet::getWhere: " . __LINE__ .
 		    "  Unrecognized field name '$fldname' in selection criteria</p>\n";
 				}
 				else
                 {		        // valid field names
                     if (array_key_exists($fieldLc, $initRow))
                     {           // field defined in initrow
+                        if ($fieldLc == 'surname')
+                            $surname    = $value;
+                        else
 					    if (is_string($initRow[$fieldLc]))
 							$expression	= $this->getWherePattern($fieldLc,
 													 $value);
@@ -1762,13 +1794,29 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 							$and	= ' AND ';
 					    }
                     }           // field defined in initrow
-				}		        // valid field namess
+				}		        // valid field names
 		    }			        // field name
 		    else
 				$warn	.= "<p>RecordSet::getWhere: " . __LINE__ .
-						    " Unrecognized field name " . print_r($fldname,true) .
-						    " in selection criteria</p>\n";
-		}			// loop through all parameters
+                                        " Unrecognized field name " .
+                                        print_r($fldname,true) .
+                                        " in selection criteria</p>\n";
+		}			            // loop through all parameters
+            if (strlen($surname) > 0)
+            {                   // add surname check
+                $loosetext      = 'false';
+                if ($loose)
+                {
+                    $loosetext      = 'true';
+					$expression	= $this->getSurnameChk($this->table,
+                                                       $surname);
+                }
+                else
+					$expression	= $this->getWherePattern('surname',
+                        $surname);
+				$where	        .= $and . $expression;
+				$and	        = ' AND ';
+            }                   // add surname check
 
 		return $where;
     }		// function RecordSet::getWhere
@@ -2263,7 +2311,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		if ($this->list === null)
 		    $this->list		= $newEntry;
 		else
-		    $this->list		= array_merge($newEntry, $this->list);
+            $this->list		= array_merge($newEntry, $this->list);
+        $this->information['count']     = count($this->list);
     }		// function RecordSet::push
 
     /********************************************************************

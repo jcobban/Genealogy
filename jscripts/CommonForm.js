@@ -138,6 +138,8 @@
  *		                go to next cell if no text to move over         *
  *		2019/11/25      change columnClick to support columns with      *
  *		                display: block                                  *
+ *		2019/12/09      drop support for IE<9                           *
+ *		                use popupAlert in place of alert                *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1035,27 +1037,28 @@ var	preTab	= {
  ************************************************************************/
 function capitalize(element)
 {
-    var tmp	= element.value;
-    var needCap	= true;		// capitalize 1st letter
-    var	msg	= "";
+    var tmp	            = element.value;
+    var needCap	        = true;		// capitalize 1st letter
+    var	msg	            = "";
     for (var e = 0; e < tmp.length; e++)
-    {		// scan value
+    {		        // scan value
 		if (needCap &&
 		    "abcdefghijklmnopqrstuvwxyz".indexOf(tmp.charAt(e)) >= 0)
-		{	// only upper case OK
-		    msg	+= "upper case tmp[" + e + "]='" + tmp.charAt(e) + "', ";
-		    tmp	= tmp.substring(0,e) + tmp.charAt(e).toUpperCase() +
-						tmp.substring(e+1);
-		    needCap	= false;	// do not capitalize rest of word
-		}	// only upper case OK
+		{	        // only upper case OK
+		    msg	        += "upper case tmp[" + e + "]='" + 
+                            tmp.charAt(e) + "', ";
+		    tmp	        = tmp.substring(0,e) + tmp.charAt(e).toUpperCase() +
+						    tmp.substring(e+1);
+		    needCap	    = false;	// do not capitalize rest of word
+		}	        // only upper case OK
 		else
-		{	// any letter OK
-		    needCap	= " .,;:+".indexOf(tmp.charAt(e)) >= 0;
-		}	// any letter OK
-    }		// scan value
+		{	        // any letter OK
+		    needCap	    = " .,;:+".indexOf(tmp.charAt(e)) >= 0;
+		}	        // any letter OK
+    }		        // scan value
     //alert("CommonForm.js: capitalize('" + element.value + "'): " + msg +
     //		", returns '" + tmp + "'");
-    element.value	= tmp;		// replace with capitalized value
+    element.value	    = tmp;		// replace with capitalized value
     return tmp;
 }		// function capitalize
 
@@ -1094,7 +1097,7 @@ function setErrorFlag(element, valid)
 }		// function setErrorFlag
 
 /************************************************************************
- *  function expAbbr														*
+ *  function expAbbr													*
  *																		*
  *  Expand abbreviations.  This method modifies the value				*
  *  of the element that is passed to it.  If the value contains			*
@@ -1288,7 +1291,7 @@ function change()
 }		// function change
 
 /************************************************************************
- *  function dateChanged													*
+ *  function dateChanged												*
  *																		*
  *  Take action when the user changes a date field						*
  *																		*
@@ -1493,7 +1496,7 @@ function checkProvince()
 }		// function checkProvince
 
 /************************************************************************
- *  function checkOccupation												*
+ *  function checkOccupation											*
  *																		*
  *  Validate the current value of a field containing a occupation.		*
  *																		*
@@ -1666,7 +1669,7 @@ function checkDate()
 }		// function checkDate
 
 /************************************************************************
- *  function checkNumber													*
+ *  function checkNumber												*
  *																		*
  *  Validate the current value of a field containing a number.			*
  *  A number of fields that use this validation occasionally have		*
@@ -1690,7 +1693,7 @@ function checkNumber()
 }		// function checkNumber
 
 /************************************************************************
- *  function checkPositiveNumber											*
+ *  function checkPositiveNumber										*
  *																		*
  *  Validate the current value of a field containing a positive number.	*
  *  A number of fields that use this validation occasionally have		*
@@ -1714,7 +1717,7 @@ function checkPositiveNumber()
 }		// function checkPositiveNumber
 
 /************************************************************************
- *  function checkFamily													*
+ *  function checkFamily												*
  *																		*
  *  Validate the current value of a field containing a family number.	*
  *																		*
@@ -1940,34 +1943,35 @@ function getSortDate(date)
 function getCellRelRow(	curr,
 						rel)
 {
-    var	td;		// table cell containing input element
+    var	td;		    // table cell containing input element
     var	col;		// current column index
-    var	tr;		// table row containing input element
+    var	tr;		    // table row containing input element
     var	row;		// current row index
     var	field;		// returned value
 
-    td	= curr.parentNode;
+    td	        = curr.parentNode;
     if (td.cellIndex === undefined)
     {
-		alert("CensusForm.js: getCellRelRow: current element is not in a table cell");
+		popupAlert("CensusForm.js: getCellRelRow: current element is not in a table cell",
+                    curr);
 		return curr;	// curr is not contained in a table cell
     }
-    col	= td.cellIndex;
-    tr	= td.parentNode;
-    row	= tr.rowIndex;	// row index of current row
+    col	        = td.cellIndex;
+    tr	        = td.parentNode;
+    row	        = tr.rowIndex;	// row index of current row
 
     // move to the requested relative column, and wrap the value
     // to the table width
     while(true)
     {
-		col	+= rel;		// move in requested direction
+		col	    += rel;		// move in requested direction
 		while(col < 0)
 		    col += tr.cells.length;
 		while(col >= tr.cells.length)
 		    col -= tr.cells.length;
 
 		// identify the first element node of the requested cell
-		td	= tr.cells[col];
+		td	    = tr.cells[col];
 		field	= td.firstChild;
 
 		// the first child may not be the desired input element
@@ -1984,7 +1988,7 @@ function getCellRelRow(	curr,
 }		// function getCellRelRow
 
 /************************************************************************
- *  function getCellFirstRow												*
+ *  function getCellFirstRow											*
  *																		*
  *  Get the element in the first cell in the current row.				*
  *																		*
@@ -1997,25 +2001,26 @@ function getCellRelRow(	curr,
  ************************************************************************/
 function getCellFirstRow(curr)
 {
-    var	td;		// table cell containing input element
+    var	td;		    // table cell containing input element
     var	col;		// current column index
-    var	tr;		// table row containing input element
+    var	tr;		    // table row containing input element
     var	row;		// current row index
     var	field;		// returned value
 
     td	= curr.parentNode;
     if (td.cellIndex === undefined)
     {
-		alert("CensusForm.js: getCellFirstRow: current element is not in a table cell");
+		popupAlert("CensusForm.js: getCellFirstRow: current element is not in a table cell",
+                    curr);
 		return curr;	// curr is not contained in a table cell
     }
-    col	= 1;		// 2nd column, 1st contains line number
-    tr	= td.parentNode;
-    row	= tr.rowIndex;	// row index of current row
+    col	        = 1;		// 2nd column, 1st contains line number
+    tr	        = td.parentNode;
+    row	        = tr.rowIndex;	// row index of current row
 
     // identify the first element node of the requested cell
-    td		= tr.cells[col];
-    field	= td.firstChild;
+    td		    = tr.cells[col];
+    field	    = td.firstChild;
     // the first child may not be the desired input element
     // for example if there is some text at the beginning of the cell
     while(field && field.nodeType != 1)
@@ -2042,27 +2047,28 @@ function getCellFirstRow(curr)
  ************************************************************************/
 function getCellLastRow(curr)
 {
-    var	td;		// table cell containing input element
+    var	td;		    // table cell containing input element
     var	col;		// current column index
-    var	tr;		// table row containing input element
+    var	tr;		    // table row containing input element
     var	row;		// current row index
     var	field;		// returned value
 
-    td	= curr.parentNode;
+    td	        = curr.parentNode;
     if (td.cellIndex === undefined)
     {
-		alert("CensusForm.js: getCellLastRow: current element is not in a table cell");
+		popupAlert("CensusForm.js: getCellLastRow: current element is not in a table cell",
+                    curr);
 		return curr;	// curr is not contained in a table cell
     }
-    tr	= td.parentNode;
+    tr	        = td.parentNode;
     // get index of 3rd last column, last contains citation button, second last
     // displays line number
-    col	= tr.cells.length - 3;
-    row	= tr.rowIndex;	// row index of current row
+    col	        = tr.cells.length - 3;
+    row	        = tr.rowIndex;	// row index of current row
 
     // identify the first element node of the requested cell
-    td		= tr.cells[col];
-    field	= td.firstChild;
+    td		    = tr.cells[col];
+    field	    = td.firstChild;
     // the first child may not be the desired input element
     // for example if there is some text at the beginning of the cell
     while(field && field.nodeType != 1)
@@ -2095,53 +2101,55 @@ function getCellLastRow(curr)
 function getCellRelCol(	curr,
 						rel)
 {
-    var	td;		// table cell containing input element
+    var	td;		    // table cell containing input element
     var	col;		// current column index
     var	row;		// current row index
-    var	tr;		// table row containing input element
-    var tb;		// body section containing this row
+    var	tr;		    // table row containing input element
+    var tb;		    // body section containing this row
     var	field;		// returned value
 
-    td	= curr.parentNode;
+    td	        = curr.parentNode;
     if (td.cellIndex === undefined)
     {
-		alert("CensusForm.js: getCellRelCol: current element is not in a table cell: " + tagToString(td));
+		popupAlert("CensusForm.js: getCellRelCol: current element is not in a table cell: " + tagToString(td),
+                    curr);
 		return curr;	// curr is not contained in a table cell
     }
 
-    col	= td.cellIndex;	// column index of current cell
-    tr	= td.parentNode;
-    row	= tr.rowIndex;	// row index of current row
-    tb	= tr.parentNode;// table body tag
-var msg	= "rel=" + rel + ", td.cellIndex=" + col + ", tr.rowIndex=" + row;
-//alert("tb: " + tagToString(tb));
+    col	        = td.cellIndex;	// column index of current cell
+    tr	        = td.parentNode;
+    row	        = tr.rowIndex;	// row index of current row
+    tb	        = tr.parentNode;// table body tag
+    var msg	    = "rel=" + rel + ", td.cellIndex=" + col + ", tr.rowIndex=" + row;
+    //alert("tb: " + tagToString(tb));
 
     // move to the requested relative row and wrap the value
     // to the table height
     // note that row 0 contains the column header, not input fields
-    row	+= rel;
+    row	        += rel;
     while(row < 1)
-		row += tb.rows.length;
+		row     += tb.rows.length;
     while(row > tb.rows.length)
-		row -= tb.rows.length;
-msg += ", newrow=" + row;
+		row     -= tb.rows.length;
+    msg += ", newrow=" + row;
 
     // identify the first element node of the requested cell
-    tr		= tb.rows[row-1];
-    td		= tr.cells[col];
-    field	= td.firstChild;
+    tr		    = tb.rows[row-1];
+    td		    = tr.cells[col];
+    field	    = td.firstChild;
     // the first child may not be the desired input element
     // for example if there is some text at the beginning of the cell
     while(field && field.nodeType != 1)
 		field	= field.nextSibling;
 
     if (!field)
-		alert("CensusForm.js: getCellRelCol: " + msg + 
+		popupAlert("CensusForm.js: getCellRelCol: " + msg + 
 		      "unable to locate element for row=" + row +
-		      ", col=" + col);
+		      ", col=" + col,
+                    curr);
     //    else
-    //	alert("getCellRelCol: " + msg + ", newtd: " +
-    //	      tagToString(td));
+    //	      popupAlert("getCellRelCol: " + msg + ", newtd: " +
+    //	                tagToString(td), curr);
 
     // return requested field
     return field;
@@ -2165,24 +2173,29 @@ var	isChanged	= false;
  *		e		In a W3C compliant browser, the keydown event			*
  *		this	<input> element											*
  ************************************************************************/
-
 function tableKeyDown(e)
 {
     if (!e)
-		e	=  window.event;
-    var	code	= e.keyCode;
+		e	        			=  window.event;
+    if (!('key' in e))
+    {
+        popupAlert('Upgrade to Internet Explorer 9, or use ANY other browser',
+                   this);
+        return true;
+    }
+    var	code	    			= e.key;
 
     // identify the column name and row number of the input element
-    var colName		= this.name;
-    var rowNum		= '';
+    var colName					= this.name;
+    var rowNum					= '';
     if (colName.length == 0)
-		colName		= this.id;
-    var matches		= /([a-zA-Z#_]+)(\d*)/.exec(colName);
-    colName		= matches[1];
-    rowNum		= matches[2];
+		colName					= this.id;
+    var matches					= /([a-zA-Z#_]+)(\d*)/.exec(colName);
+    colName		    			= matches[1];
+    rowNum		    			= matches[2];
 
-    var form		= this.form;
-    var formElts	= form.elements;
+    var form					= this.form;
+    var formElts				= form.elements;
     var	field;
 
     // hide the help balloon on any keystroke
@@ -2192,17 +2205,17 @@ function tableKeyDown(e)
     // take action based upon code
     switch (code)
     {
-		case 9:		// tab
-		{
-		    isChanged	= false;
+		case 'Tab':
+		{		    // go to next cell in row
+		    isChanged	        = false;
 		    return true;
-		}
+		}		    // go to next cell in row
 
-		case 13:	// return
-		case 40:	// down
-		{
-		    isChanged	= false;
-		    field	    = getCellRelCol(this, 1);
+		case 'Enter':	
+		case 'ArrowDown':
+		{           // go to same column next row
+		    isChanged	        = false;
+		    field	            = getCellRelCol(this, 1);
             e.preventDefault();
 		    if (field === undefined)
 				return false;
@@ -2210,14 +2223,14 @@ function tableKeyDown(e)
 		    if (field.select)
 				field.select();		// select all of the text to replace
 		    return false;		    // suppress default action
-		}		// return
+		}           // go to same column next row
 
-		case 35:
-		{		// End key
-		    isChanged	= false;
+		case 'End':
+		{		    // End key
+		    isChanged	        = false;
 		    if (e.ctrlKey)
 		    {		// ctrl-End
-				field	= getCellLastRow(this);
+				field	        = getCellLastRow(this);
                 e.preventDefault();
 				if (field === undefined)
 				    return false;
@@ -2226,14 +2239,14 @@ function tableKeyDown(e)
 				return false;		// suppress default action
 		    }		// ctrl-End
 		    break;
-		}		// End key
+		}		    // End key
 
-		case 36:
-		{		// Home key
-		    isChanged	= false;
+		case 'Home':
+		{		    // Home key
+		    isChanged	        = false;
 		    if (e.ctrlKey)
 		    {		// ctrl-Home
-				field	= getCellFirstRow(this);
+				field	        = getCellFirstRow(this);
                 e.preventDefault();
 				if (field === undefined)
 				    return false;
@@ -2243,43 +2256,43 @@ function tableKeyDown(e)
 
 		    }		// ctrl-Home
 		    break;
-		}		// Home key
+		}		    // Home key
 
-		case 37:	// left
-		{
+		case 'ArrowLeft':
+		{	        // arrow left
             if ('selectionStart' in this)
             {
                 if (this.selectionStart == 0)
                 {
-			        field	        = getCellRelRow(this, -1);
-			        field.focus();		// set focus on next col same row
+			        field	    = getCellRelRow(this, -1);
+			        field.focus();		// set focus on prev col same row
 			        field.select();		// select all of the text to replace
 	                e.preventDefault();
 			        return false;		// suppress default action
                 }
             }
             break;
-		}		// return
+		}		    // arrow left
 
-		case 38:	// up
-		{
-		    isChanged	= false;
-		    field	= getCellRelCol(this, -1);
+		case 'ArrowUp':
+		{	        // arrow up
+		    isChanged	        = false;
+		    field	            = getCellRelCol(this, -1);
             e.preventDefault();
 		    if (field === undefined)
 				return false;
-		    field.focus();		// set focus on same column next row
-		    field.select();		// select all of the text to replace
-		    return false;		// suppress default action
-		}	   	 // up
+		    field.focus();		        // set focus on same column prev row
+		    field.select();		        // select all of the text to replace
+		    return false;		        // suppress default action
+		}	   	    // arrow up
 
-		case 39:	// right
-		{
+		case 'ArrowRight':
+		{	        // arrow right
             if ('selectionStart' in this)
             {
                 if (this.selectionStart == this.value.length)
                 {
-			        field	        = getCellRelRow(this, 1);
+			        field	    = getCellRelRow(this, 1);
 			        field.focus();		// set focus on next col same row
 			        field.select();		// select all of the text to replace
 	                e.preventDefault();
@@ -2289,45 +2302,48 @@ function tableKeyDown(e)
             break;
 		}		    // right
 
-		case 112:	// F1
+		case 'F1':	// F1
 		{
 		    displayHelp(this);
             e.preventDefault();
 		    return false;		// suppress default action
-		}		// F1
+		}		    // F1
 
-		case 67:
-		{		// letter 'C'
+		case 'c':
+		case 'C':
+		{		    // letter 'C'
 		    if (e.altKey)
 		    {		// alt-C
-				var correctImage= document.getElementById('correctImage');
+				var correctImage    = document.getElementById('correctImage');
 				if (correctImage)
 				    correctImageUrl();
-            e.preventDefault();
+                e.preventDefault();
 				return false;
 		    }		// alt-C
 		    else
 				isChanged	= true;
 		    break;
-		}		// letter 'C'
+		}		    // letter 'C'
 
-		case 73:
-		{		// letter 'I'
+		case 'i':
+		case 'I':
+		{		    // letter 'I'
 		    if (e.altKey)
 		    {		// alt-I
-                e.preventDefault();
 				var imageButton	= document.getElementById('imageButton');
 				if (imageButton)
 				    imageButton.click();
+                e.preventDefault();
 				return false;
 		    }		// alt-I
 		    else
 				isChanged	= true;
 		    break;
-		}		// letter 'I'
+		}		    // letter 'I'
 
-		case 83:
-		{		// letter 'S'
+		case 's':
+		case 'S':
+		{		    // letter 'S'
 		    if (e.ctrlKey)
 		    {		// ctrl-S
 				form.submit();
@@ -2337,10 +2353,11 @@ function tableKeyDown(e)
 		    else
 				isChanged	= true;
 		    break;
-		}		// letter 'S'
+		}		    // letter 'S'
 
-		case 85:
-		{		// letter 'U'
+		case 'u':
+		case 'U':
+		{		    // letter 'U'
 		    if (e.altKey)
 		    {		// alt-U
 				form.submit();
@@ -2348,10 +2365,11 @@ function tableKeyDown(e)
 		    else	// letter U
 				isChanged	= true;
 		    break;
-		}		// letter 'U'
+		}		    // letter 'U'
 
-		case 90:
-		{		// letter 'Z'
+		case 'z':
+		case 'Z':
+		{		    // letter 'Z'
 		    if (e.ctrlKey)
 		    {		// ctrl-Z
 				this.value	= this.defaultValue;
@@ -2361,20 +2379,20 @@ function tableKeyDown(e)
 		    else	// letter Z
 				isChanged	= true;
 		    break;
-		}		// letter 'Z'
+		}		    // letter 'Z'
 
-		case 17:	// ctrl key
-		case 18:	// alt key
-		{		// only handled in conjunction with other key
+		case 'Control':	// ctrl key
+		case 'Alt':	    // alt key
+		{		    // only handled in conjunction with other key
 		    break;
-		}		// only handled in conjunction with other key
+		}		    // only handled in conjunction with other key
 
 		default:
-		{		// other keystrokes
+		{		    // other keystrokes
 		    isChanged	= true;
 		    break;
-		}		// other keystrokes
-    }	    // switch on key code
+		}		    // other keystrokes
+    }	            // switch on key code
 
     return true;
 }		// function tableKeyDown
@@ -2392,30 +2410,24 @@ function numericKeyDown(e)
 {
     if (!e)
 		e	=  window.event;
-    if ('key' in e)
-    {               // use preferred property key
-        var	key     = e.key;
-        if (/\d/.test(key))
-            return true;
-        if (key == '+')
-            return true;
-        if (key.length == 1)
-            e.preventDefault();
-        else
-            return true;
-    }               // use preferred property key
+    if (!('key' in e))
+    {
+        popupAlert('Upgrade to Internet Explorer 9, or use ANY other browser',
+                   this);
+        return true;
+    }
+    var	key             = e.key;
+    if (/\d/.test(key))
+        return true;
+    if (key == '+')
+        return true;
+    if (key.length == 1)
+    {
+        e.preventDefault();
+        return false;
+    }
     else
-    {               // use obsolete property code
-        var	code	= e.keyCode;
-        if (code >= 48 && code <= 57)
-            return true;
-        if (code == 61)
-            return true;
-        if (code > 58 && code <= 90)
-            e.stopPropagation();
-        else
-            return true;
-    }               // use obsolete property code
+        return true;
 }       // function numericKeyDown
 
 /************************************************************************

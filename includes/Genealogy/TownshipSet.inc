@@ -166,7 +166,7 @@ class TownshipSet extends RecordSet
 				    if ($value instanceof County)
 				    {
 						$countyObj	= $value;
-						$domainObj	= $countyObj->getDomainObj();
+						$domainObj	= $countyObj->getDomain();
 						$where		.= "$and`Domain`=?";
 						array_push($this->sqlParms, $value->get('domain'));
 						$and		= ' AND ';

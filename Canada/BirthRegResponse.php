@@ -99,6 +99,7 @@ use \Templating\Template;
  *		2018/12/21      correct insertion of empty rows                 *
  *		                get error message text from template            *
  *		2019/02/21      use new FtTemplate constructor                  *
+ *		2019/12/13      remove B_ prefix from field names               *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -169,11 +170,11 @@ function emptyRows($limit, $html)
 
 // variables for constructing the SQL statement
 $limitopt			= '';		// limit on which rows to return
-$prefix				= 'B_';		// common prefix of table field names
+$prefix				= '';		// common prefix of table field names
 $surname			= null;
 $surnameSoundex		= false;
 $birthDate			= null;
-$orderby			= 'B_Surname, B_GivenNames,B_RegYear,B_RegNum';
+$orderby			= 'Surname, GivenNames,RegYear,RegNum';
 $npuri				= 'BirthRegResponse.php';// for next and previous links
 $npand				= '?';		// adding parms to $npuri
 $npprev				= '';		// previous selection
@@ -242,7 +243,7 @@ foreach ($_GET as $key => $value)
 
 			case 'regyear':
 			{		// registration year
-			    $orderby	        = 'B_RegYear, B_RegNum';
+			    $orderby	        = 'RegYear, RegNum';
 				$regyear	        = $value;
 			    break;
 			}		// registration year

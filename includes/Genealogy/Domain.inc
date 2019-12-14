@@ -40,6 +40,10 @@ use \Exception;
  *		2019/07/25      do not permit set for 'iso'                     *
  *		                'iso' is changed when 'domain' is changed       *
  *		2019/12/05      add column Category                             *
+ *		                remove deprecated support for array sort        *
+ *		                add method getLanguage                          *
+ *		                support passing instance of Language to new     *
+ *		                correct bugs in constructor                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -113,6 +117,14 @@ class Domain extends Record
     protected $country			= null;
 
     /********************************************************************
+     *	Domain::language												*
+     *																	*
+     *	Associated instance of Language 								*
+     ********************************************************************/
+    protected $language			= null;
+
+
+    /********************************************************************
      *	function Domain::__construct									*
      *																	*
      *	Construct an instance of Domain based upon the					*
@@ -147,9 +159,9 @@ class Domain extends Record
         {
             if (count($parms) < count(self::$initRow))
             {				// search parameters
-                $domain		    = 'CAON';
-                $cc	            = 'CA';
-                $language	    = 'en';
+                $domain		    = 'CAON';   // default
+                $cc	            = 'CA';     // default
+                $language	    = 'en';     // default
                 foreach($parms as $key => $value)
                 {			    // loop through parameters
                     $fieldLc	= strtolower($key);
@@ -157,59 +169,62 @@ class Domain extends Record
                         $fieldLc	= self::$translate[$fieldLc];
                     switch($fieldLc)
                     {			// act on key fields
+                        case 'countrycode':
+                        {		// countrycode
+                            if ($value instanceof Country)
+                            {
+                                $this->country  = $value;
+                                $cc             = $value['code'];
+                            }
+                            else
+                            if (is_string($value) && strlen($value) == 2)
+                                $cc 	        = strtoupper($value);
+                            else
+                                $this->msg      .= "Invalid CountryCode='$value'. ";
+                            break;
+                        }		// countrycode
+
                         case 'domain':
                         {		// domain
-                            $value              = str_replace('-', '', $value);
-                            if (is_string($value) && strlen($value) >= 4)
+                            $domain             = str_replace('-', '', $value);
+                            if (is_string($domain) && strlen($domain) >= 4)
                             {
-                                $domain		    = strtoupper($value);
+                                $domain		    = strtoupper($domain);
                                 $cc 	        = substr($domain, 0, 2);
                             }
                             else
-                                $this->msg      .= "Invalid domain=$value. ";
+                                $this->msg      .= "Invalid domain='$value'. ";
                             break;
                         }		// domain
 
                         case 'language':
                         {		// language code
+                            if ($value instanceof Language)
+                            {
+                                $this->language = $value;
+                                $language       = $value['code'];
+                            }
                             if (is_string($value) && strlen($value) >= 2)
                             {   // ensure is ll-CC
-                                $language	    = strtolower(substr($value, 0, 2)) .
-                                                  strtoupper(substr($value, 2));
-                                if (strlen($language) > 2 &&
-                                    substr($language, 2, 1) != '-')
-                                    $language   = substr($language, 0, 2) .
-                                                  '-' .
-                                                  substr($language, 2);
-                            }   // ensure is ll-CC
-                            else
-                                $this->msg      .= "Invalid language=$value. ";
-                            break;
-                        }		// language code
-
-                        case 'countrycode':
-                        {		// countrycode
-                            if (is_string($value) && strlen($value) == 2)
-                            {
-                                $cc 	        = strtoupper($value);
+                                $language	    = strtolower(substr($value, 0, 2)); 
+                                if (strlen($language) > 2)
+                                {
+                                    if (substr($language, 2, 1) == '-')
+                                        $language   .= strtoupper(substr($value, 2));
+                                    else
+                                    $language   .= '-' .
+                                    strtoupper(substr($value, 2));
+                                }
                             }
                             else
-                            if ($value instanceof Country)
-                            {
-                                $this->country  = $value;
-                                $cc  	        = $this->country['cc'];
-                            }
-                            else
-                                $this->msg      .= "Invalid countrycode=$value. ";
-                            $domain 	        = $cc .
-                                                  substr($domain, 2);
+                                $this->msg      .= "Invalid language='$value'. ";
                             break;
-                        }		// countrycode
+                        }		// language
 
                         case 'state':
                         {
-                            if (is_string($value) && strlen($value) == 2)
-                                $domain	        = substr($domain, 0, 2) .
+                            if (is_string($value) && strlen($value) >= 2)
+                                $domain	        = $cc .
                                                   strtoupper($value);
                             else
                                 $this->msg      .= "Invalid state=$value. ";
@@ -224,10 +239,12 @@ class Domain extends Record
                 if (substr($domain, 0, 2) == 'UK')
                     $domain         = 'GB' . substr($domain, 2);
 
-                $sqlParms	        = array('domain'	=> $domain,
-                                            'language'	=> $language);
+                if (strlen($language) > 2)
+                    throw new Exception("language '$language' too long");
                 $query		        = 'SELECT * FROM Domains ' .
                                 'WHERE Domain=:domain AND Language=:language';
+                $sqlParms	        = array('domain'	=> $domain,
+                                            'language'	=> $language);
 
                 // query the database
                 $stmt		        = $connection->prepare($query);
@@ -430,30 +447,29 @@ class Domain extends Record
             $cc 	        = substr($this['domain'], 0, 2);
             $this->country	= new Country(array('code'	=> $cc));
         }
-        if (!($this->country->isExisting()))
-        {
-            if ($debug)
-            {
-                $warn	    .= "<p>Domain::getCountry: " .
-                               __LINE__ .
-                               " no match for country code '$cc'</p>\n";
-	            $trace          = debug_backtrace();
-	            foreach($trace as $call)
-	            {
-	                if (array_key_exists('class', $call))
-	                    $classRef       = $call['class'] . '::';
-	                else
-	                    $classRef       = '';
-	                if ($debug)
-	                    $warn   .= "<p>Domain::getCountry: " . __LINE__ .
-	                            " function=" . $classRef . $call['function'] .
-	                            " called by line=" . $call['line'] . 
-	                            " in " . $call['file'] . "</p>\n";
-	            }
-            }
-        }
         return $this->country;
     }           // function Domain::getCountry
+
+    /********************************************************************
+     *	function Domain:getLanguage										*
+     *																	*
+     *	Get the associated instance of class Language.                  *
+     *																	*
+     *	Returns:	                                            		*
+     *	    instance of class Language                                  *
+     ********************************************************************/
+    function getLanguage()
+    {
+        global  $debug;
+        global  $warn;
+
+        if (is_null($this->language))
+        {
+            $lang 	        = $this['language'];
+            $this->language	= new Language(array('code'	=> $lang));
+        }
+        return $this->language;
+    }           // function Domain::getLanguage
 
     /********************************************************************
      *	function Domain:set												*
@@ -615,22 +631,34 @@ class Domain extends Record
     {
         global	$debug;
         global	$warn;
+        global	$msg;
         global	$userid;
         global	$connection;
 
+        $count              = false;
+
+        // determine top level tag name for XML output
+        $indent        		= '';
         if (is_string($xml))
-        {		// string tag name
-            $tagname	= $xml;
-            $xml	= true;
-        }		// string tag name
+        {			    // string tag name
+            $matches   		= array();
+            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            {
+                $indent		= $matches[1];
+                $xml   		= $matches[2];
+            }
+            $tagname		= $xml;
+            $xml	   		= true;
+        }			    // string tag name
         else
         if ($xml)
-        {		// true
-            $tagname	= 'cmd';
-        }		// true
+        {			    // boolean true
+            $indent         = "    ";
+            $tagname		= 'cmd';
+        }			    // boolean true
 
         if ($this->needInsert)
-        {		// create new record
+        {		        // create new record
             $fldnames	        = '';
             $comma	            = '';
             $values	            = '';
@@ -641,7 +669,7 @@ class Domain extends Record
                 $values		    .= $comma . ":$fld";
                 $parms[$fld]	= $value;
                 $comma	        = ", ";
-            }		// loop through all fields in record
+            }		    // loop through all fields in record
 
             // construct the SQL INSERT command	
             $insert	= "INSERT INTO Domains ($fldnames) VALUES($values)";
@@ -651,12 +679,12 @@ class Domain extends Record
             $insertText	= debugPrepQuery($insert, $parms);
             $this->lastSqlCmd   = $insertText;
             if ($stmt->execute($parms))
-            {		// execute successful
+            {		    // execute successful
                 $result		    = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $count		    = count($result);
                 if ($xml)
-                    print "<$tagname result='$count'>" . $insertText . 
-                            "</$tagname>\n";
+                    print "$indent<$tagname result='$count'>" . $insertText . 
+                            "$indent</$tagname>\n";
                 if ($debug)
                 {
                     $warn	    .= "<p>$insertText</p>\n";
@@ -672,16 +700,16 @@ class Domain extends Record
                              0,		// compound key
                              '',
                              $this->toJson(false));
-            }		// execute successful
+            }		    // execute successful
             else
-            {		// error inserting record
-                throw new Exception("Domain::save:
+            {		    // error inserting record
+                $msg    .= "Domain::save:
                                 '$insertText', " .
-                                print_r($stmt->errorInfo(),true));
-            }		// error inserting record
-        }		    // create new record
+                                print_r($stmt->errorInfo(),true);
+            }		    // error inserting record
+        }		        // create new record
         else
-        {		    // update existing record
+        {		        // update existing record
             $set		        = '';
             $comma		        = '';
             $count		        = 0;
@@ -691,11 +719,11 @@ class Domain extends Record
                 $set		    .= $comma . "`$fld`=:$fld";
                 $parms[$fld]	= $value;
                 $comma	        = ', ';
-            }		// loop through all fields in record
+            }		    // loop through all fields in record
             $this->changed	    = array();	// reset
 
             if (strlen($set) > 0)
-            {		// changes made
+            {		    // changes made
                 // assemble the UPDATE command
                 $update		= "UPDATE Domains SET " . $set .
                            " WHERE `Domain`=:odomain AND `Language`=:olanguage";
@@ -718,7 +746,9 @@ class Domain extends Record
                 {		// successful update 
                     $count		        = $stmt->rowCount();
                     if ($xml)
-                        print "<$tagname count='$count'>$updateText</$tagname>\n";
+                        print "$indent<$tagname count='$count'>\n" .
+                                $updateText .
+                                "\n$indent</$tagname>\n";
                     if ($debug)
                         $warn	    .= "<p>'$updateText' count=$count</p>\n";
 
@@ -731,12 +761,12 @@ class Domain extends Record
                     error_log("Domain::save: query='$updateText'\n");
                     if (strlen($updateText) > 40)
                         $updateText	= substr($updateText, 0, 37) . '...';
-                    throw new Exception("Domain::save: " . __LINE__ .
+                    $msg   .= "Domain::save: " . __LINE__ .
                                 " '$updateText' failed: " .
-                                print_r($stmt->errorInfo(),true));
+                                print_r($stmt->errorInfo(),true);
                 }		// error updating record
-            }		// changes made
-        }		// update existing record
+            }		    // changes made
+        }		        // update existing record
         return $count;
     }		// Domain::save
 
@@ -847,39 +877,6 @@ class Domain extends Record
         else
             return $this->row['name'];
     }		// Domain::getName
-
-    /********************************************************************
-     *	function Domain::cmp											*
-     *																	*
-     *	Compare an instance of domain to another instance of Domain		*
-     *																	*
-     *	Returns:														*
-     *			-1 if this is less than other							*
-     *			1 if this is greater than other							*
-     *			0 if this is equal other			                    *
-     ********************************************************************/
-    function cmp(Domain $other)
-    {
-        $val1		= strtolower($this->row['name']);
-        $val2		= strtolower($other->row['name']);
-        if ($val1 < $val2)
-            return -1;
-        else
-        if ($val1 > $val2)
-            return 1;
-        else
-            return 0;
-    }		// Domain::cmp
-
-    /********************************************************************
-     *	function Domain::sortcallback									*
-     *																	*
-     *	Satisfy the stupid callback function demanded by PHP uasort.	*
-     ********************************************************************/
-    static function sortcallback(Domain $a, Domain $b)
-    {
-        return $a->cmp($b);
-    }
 
     /********************************************************************
      *	function Domain::toString										*

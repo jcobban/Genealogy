@@ -19,6 +19,7 @@ use \Iterator;
  *		2019/04/06      change response from getStatistics, and         *
  *		                getCountyStatistics                             *
  *		2019/06/15      add column to getCountyStatistics               *
+ *		2019/12/13      remove B_ prefix from file names                *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -58,7 +59,7 @@ class BirthSet extends RecordSet
      *	    An exception for invalid parameters.						*
      ********************************************************************/
     function __construct($parms	= array(),
-						 $order	= 'B_RegDomain, B_RegYear, B_RegNum')
+						 $order	= 'RegDomain, RegYear, RegNum')
     {
         foreach($parms as $name=> $value)
             if (strtolower($name) == 'order')
@@ -82,35 +83,35 @@ class BirthSet extends RecordSet
      *					can be an array, as discussed in the following.	*
      *					The value specified for each field is			*
      *					interpreted as follows:							*
-     *					 'b_birthplace':								*
-     *					 'b_fatheroccupation':							*
-     *					 'b_fatheroccplace':							*
-     *					 'b_motheroccupation':							*
-     *					 'b_motheroccplace':							*
-     *					 'b_marriageplace':								*
-     *					 'b_informantres':								*
-     *					 'b_remarks':									*
-     *					 'b_givennames':								*
-     *					 'b_informant':									*
-     *					 'b_fathername':								*
-     *					 'b_fatherocc':									*
-     *					 'b_mothername':								*
-     *					 'b_motherocc':									*
-     *					 'b_husbandname':								*
-     *					 'b_formerhusband':								*
-     *					 'b_accoucheur':								*
-     *					 'b_registrar':									*
+     *					 'birthplace':							    	*
+     *					 'fatheroccupation':							*
+     *					 'fatheroccplace':						    	*
+     *					 'motheroccupation':							*
+     *					 'motheroccplace':						    	*
+     *					 'marriageplace':								*
+     *					 'informantres':								*
+     *					 'remarks':								    	*
+     *					 'givennames':							    	*
+     *					 'informant':									*
+     *					 'fathername':							    	*
+     *					 'fatherocc':									*
+     *					 'mothername':							    	*
+     *					 'motherocc':									*
+     *					 'husbandname':							    	*
+     *					 'formerhusband':								*
+     *					 'accoucheur':							    	*
+     *					 'registrar':									*
      *							The value is a regular expression.		*
      *							For example if a simple string is		*
      *							provided, then it will match anywhere	*
      *							in the value. To match the exact value	*
      *							pass '^fullvalue$'.						*
-     *					 'b_regyear':									*
-     *					 'b_regnum':									*
-     *					 'b_msvol':										*
-     *					 'b_originalpage':								*
-     *					 'b_originalitem':								*
-     *					 'b_idir':										*
+     *					 'regyear':								    	*
+     *					 'regnum':								    	*
+     *					 'msvol':										*
+     *					 'originalpage':								*
+     *					 'originalitem':								*
+     *					 'idir':										*
      *							The value is either an integer or an	*
      *							array.  If the array contains only		*
      *							numbers then records where the field	*
@@ -127,32 +128,32 @@ class BirthSet extends RecordSet
      *							for example array(100,':200')			*
      *							this is interpreted the same as the		*
      *							previous example. 						*
-     *					 'b_birthdate':									*
-     *					 'b_marriagedate':								*
+     *					 'birthdate':									*
+     *					 'marriagedate':								*
      *							If the parameter 'range' is specified	*
      *							then records in which the value			*
      *							of the field is within 'range' years	*
      *							of the specified date are included		*
      *							If range is not specified then this is	*
      *							an exact match.							*
-     *					 'b_surname':									*
-     *							If 'b_surnamesoundex' is true or 'Y'	*
+     *					 'surname':							    		*
+     *							If 'surnamesoundex' is true or 'Y'  	*
      *							then the match is for surnames with		*
      *							the same SOUNDEX code as this surname.	*
      *							Otherwise this is an exact match.		*
-     *					 'b_regdomain':									*
-     *					 'b_regcounty':									*
-     *					 'b_regtownship':								*
-     *					 'b_sex':										*
-     *					 'b_calcbirth':									*
-     *					 'b_parentsmarried':							*
-     *					 'b_informantrel':								*
-     *					 'b_regdate':									*
-     *					 'b_image':										*
-     *					 'b_originalvolume':							*
-     *					 'b_changedby':									*
+     *					 'regdomain':									*
+     *					 'regcounty':									*
+     *					 'regtownship':							    	*
+     *					 'sex':									    	*
+     *					 'calcbirth':									*
+     *					 'parentsmarried':						    	*
+     *					 'informantrel':								*
+     *					 'regdate':								    	*
+     *					 'image':										*
+     *					 'originalvolume':						    	*
+     *					 'changedby':									*
      *							exact value match						*
-     *					 'b_surnamesoundex':							*
+     *					 'surnamesoundex':						    	*
      *					 'range':										*
      *							The value is either true or 'Y' to		*
      *							alter the behavior of other comparisons	*
@@ -225,24 +226,24 @@ class BirthSet extends RecordSet
 				    break;
                 }
 
-				case 'b_birthplace':
-				case 'b_fatheroccupation':
-				case 'b_fatheroccplace':
-				case 'b_motheroccupation':
-				case 'b_motheroccplace':
-				case 'b_marriageplace':
-				case 'b_informantres':
-				case 'b_remarks':
-				case 'b_givennames':
-				case 'b_informant':
-				case 'b_fathername':
-				case 'b_fatherocc':
-				case 'b_mothername':
-				case 'b_motherocc':
-				case 'b_husbandname':
-				case 'b_formerhusband':
-				case 'b_accoucheur':
-				case 'b_registrar':
+				case 'birthplace':
+				case 'fatheroccupation':
+				case 'fatheroccplace':
+				case 'motheroccupation':
+				case 'motheroccplace':
+				case 'marriageplace':
+				case 'informantres':
+				case 'remarks':
+				case 'givennames':
+				case 'informant':
+				case 'fathername':
+				case 'fatherocc':
+				case 'mothername':
+				case 'motherocc':
+				case 'husbandname':
+				case 'formerhusband':
+				case 'accoucheur':
+				case 'registrar':
 				{		// text fields for pattern match
 				    $expression	= $this->getWherePattern($fieldLc,
                                                          $value,
@@ -255,12 +256,12 @@ class BirthSet extends RecordSet
 				    break;
 				}		// text fields
 
-				case 'b_regyear':
-				case 'b_regnum':
-				case 'b_msvol':
-				case 'b_originalpage':
-				case 'b_originalitem':
-				case 'b_idir':
+				case 'regyear':
+				case 'regnum':
+				case 'msvol':
+				case 'originalpage':
+				case 'originalitem':
+				case 'idir':
 				{		// positive integer fields
 				    $expression	= $this->getWhereInt($fieldLc,
                                                      $value,
@@ -273,25 +274,25 @@ class BirthSet extends RecordSet
 				    break;
 				}		// positive integer fields
 
-				case 'b_birthdate':
+				case 'birthdate':
                 {		// birth date fields
                     $birthDate              = $value;
 				    break;
 				}		// birth date field
 
-				case 'b_marriagedate':
+				case 'marriagedate':
 				{		// marriage date field
                     $marriageDate           = $value;
 				    break;
 				}		// date fields
 
-				case 'b_surname':
+				case 'surname':
 				{		// surname, comparison postponed
 				    $surname		= $value;
 				    break;
 				}		// surname
 
-				case 'b_surnamesoundex':
+				case 'surnamesoundex':
 				{		// soundex comparison flag
 				    if (is_bool($value))
 						$soundex	= $value;
@@ -301,17 +302,17 @@ class BirthSet extends RecordSet
 				    break;
 				}		// soundex comparison flag
 
-				case 'b_regdomain':
-				case 'b_regcounty':
-				case 'b_regtownship':
-				case 'b_sex':
-				case 'b_calcbirth':
-				case 'b_parentsmarried':
-				case 'b_informantrel':
-				case 'b_regdate':
-				case 'b_image':
-				case 'b_originalvolume':
-				case 'b_changedby':
+				case 'regdomain':
+				case 'regcounty':
+				case 'regtownship':
+				case 'sex':
+				case 'calcbirth':
+				case 'parentsmarried':
+				case 'informantrel':
+				case 'regdate':
+				case 'image':
+				case 'originalvolume':
+				case 'changedby':
 				{		// other fields exact match
 				    $where		.= "$and `$fieldLc`=:$fieldLc";
 				    $this->sqlParms[$fieldLc]		= $value;
@@ -329,10 +330,10 @@ class BirthSet extends RecordSet
             $m		            = $date->getActualMonth();
             if ($m > 0)
 			    $where		    .= $and .
-			            "ABS(DATEDIFF(B_CalcBirth, '$y-$m-15'))<(30 * :range)";
+			            "ABS(DATEDIFF(CalcBirth, '$y-$m-15'))<(30 * :range)";
             else
 			    $where		    .= $and .
-			            "ABS(DATEDIFF(B_CalcBirth, '$y-6-15'))<(365 * :range)";
+			            "ABS(DATEDIFF(CalcBirth, '$y-6-15'))<(365 * :range)";
 			$this->sqlParms['range']	= $range;
             $and		        = ' AND ';
 	    }
@@ -345,7 +346,7 @@ class BirthSet extends RecordSet
 			$m  	    	    = $date->getMonth();
 			$d	        	    = $date->getDay();
 			$where      		.= $and .
-"ABS(DATEDIFF(STR_TO_DATE(B_MarriageDate,'%d %M %Y'), '$y-$m-$d'))<(365 * :range)";
+"ABS(DATEDIFF(STR_TO_DATE(MarriageDate,'%d %M %Y'), '$y-$m-$d'))<(365 * :range)";
 			$this->sqlParms['range']	= $range;
 	        $and	    	    = ' AND ';
 	    }
@@ -355,19 +356,19 @@ class BirthSet extends RecordSet
 		{			// surname comparison requested
 		    if (preg_match("/[.+*?^$]/", $surname))
 		    {		// match pattern
-				$where	.= $and . 'B_Surname REGEXP :surname';
+				$where	.= $and . 'Surname REGEXP :surname';
 		    }		// match pattern
 		    else
 		    if ($soundex)
 		    {		// match soundex
-				$where	.= $and . 'B_SurnameSoundex = LEFT(SOUNDEX(:surname),4)';
+				$where	.= $and . 'SurnameSoundex = LEFT(SOUNDEX(:surname),4)';
 		    }		// match soundex
 		    else
 		    {		// match exact
-				$where	.= $and . 'B_Surname=:surname';
+				$where	.= $and . 'Surname=:surname';
 		    }		// match exact
 
-		    $this->sqlParms['surname']	= $tparms['b_surname'];
+		    $this->sqlParms['surname']	= $tparms['surname'];
         }			// surname comparison requested
 
 		return $where;
@@ -398,14 +399,14 @@ class BirthSet extends RecordSet
 		global	$connection;
 
 		// execute the query
-		$query	= 'SELECT B_RegYear, SUM(B_Surname != ""), SUM(B_IDIR > 0) ' .
+		$query	= 'SELECT RegYear, SUM(Surname != ""), SUM(IDIR > 0) ' .
 						'FROM Births ' . $this->where .
-						    ' GROUP BY B_RegYear ORDER BY B_RegYear';
-		$sqlParmsText	= print_r($this->sqlParms, true);
-		$stmt		= $connection->prepare($query);
+						    ' GROUP BY RegYear ORDER BY RegYear';
+		$sqlParmsText	    = print_r($this->sqlParms, true);
+		$stmt		        = $connection->prepare($query);
 		if ($stmt->execute($this->sqlParms))
 		{			// query successful
-		    $result	= $stmt->fetchAll(PDO::FETCH_NUM);
+		    $result	        = $stmt->fetchAll(PDO::FETCH_NUM);
 		    if ($debug)
 		    {			// debug output
 				$warn	.= "<p>Birth.inc: " . __LINE__ . "query='$query'</p>\n".
@@ -414,7 +415,7 @@ class BirthSet extends RecordSet
 		}			// query successful
 		else
 		{			// query failed
-		    $msg	.= "query '$query' failed, sqlParms=$sqlParmsText: " .
+		    $msg	    .= "query '$query' failed, sqlParms=$sqlParmsText: " .
 						   print_r($stmt->errorInfo(), true);
 		    $result	= null;
 		}			// query failed
@@ -435,7 +436,7 @@ class BirthSet extends RecordSet
      *		An array each row of which is								*
      *		an array containing the following values for each		    *
      *		county in the domain:										*
-     *				b_regcounty		county code						    *
+     *				regcounty		county code						    *
      *				count	        number of transcribed records		*
      *				linkcount		number linked to the tree		    *
      *				low				lowest registration number		    *
@@ -449,26 +450,26 @@ class BirthSet extends RecordSet
 		global	$connection;
 
 		// execute the query
-		$query	= 'SELECT B_RegCounty AS County, ' .
-								'SUM(B_Surname != "") AS `Count`,  ' .
-								'SUM(B_Idir != 0) AS LinkCount, ' .
-								'MIN(B_RegNum) as low, ' .
-								'MAX(B_RegNum) as high  ' .
+		$query	= 'SELECT RegCounty AS County, ' .
+								'SUM(Surname != "") AS `Count`,  ' .
+								'SUM(Idir != 0) AS LinkCount, ' .
+								'MIN(RegNum) as low, ' .
+								'MAX(RegNum) as high  ' .
 						'FROM Births ' .
 						$this->where .
-						' GROUP BY B_RegCounty ' .
-						'ORDER BY B_RegCounty';
-		$stmt	= $connection->prepare($query);
+						' GROUP BY RegCounty ' .
+						'ORDER BY RegCounty';
+		$stmt	        = $connection->prepare($query);
 		if ($stmt->execute($this->sqlParms))
 		{
-		    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
+		    $result	    = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		    return $result;
 		}
 		else
 		{
-		    $msg	.= "query '" . $query . "' failed: " .
-						   print_r($this->sqlParms, true) . ': ' .
-						   print_r($stmt->errorInfo(), true);
+		    $msg	    .= "query '" . $query . "' failed: " .
+					    	   print_r($this->sqlParms, true) . ': ' .
+					    	   print_r($stmt->errorInfo(), true);
 		    return null;
 		}		// query failed
     }		// Birth::getStatistics
@@ -505,28 +506,28 @@ class BirthSet extends RecordSet
         global	$connection;
 
 		// execute the query
-		$query	= 'SELECT B_RegCounty AS County, B_RegTownship AS Township, ' .
-								'SUM(B_Surname != "") AS `Count`,  ' .
-								'SUM(B_Idir != 0) AS LinkCount, ' .
-								'MIN(B_RegNum) as low, ' .
-                                'MAX(B_RegNum) as high,  ' .
-                                '(SELECT MAX(B_RegNum) FROM Births  WHERE b_regyear=:b_regyear and b_regcounty=:b_regcounty AND b_regtownship=Township AND B_RegNum<500000) AS `currhigh` ' .
+		$query	= 'SELECT RegCounty AS County, RegTownship AS Township, ' .
+								'SUM(Surname != "") AS `Count`,  ' .
+								'SUM(Idir != 0) AS LinkCount, ' .
+								'MIN(RegNum) as low, ' .
+                                'MAX(RegNum) as high,  ' .
+                                '(SELECT MAX(RegNum) FROM Births  WHERE RegCear=:regyear and RegCounty=:regcounty AND RegTownship=Township AND RegNum<500000) AS `currhigh` ' .
 						'FROM Births ' .
 						$this->where .
-						' GROUP BY B_RegCounty, B_RegTownship ' .
-                        'ORDER BY B_RegCounty, B_RegTownship';
-        $stmt	= $connection->prepare($query);
-        $queryText  = debugPrepQuery($query, $this->sqlParms);
+						' GROUP BY RegCounty, RegTownship ' .
+                        'ORDER BY RegCounty, RegTownship';
+        $stmt	        = $connection->prepare($query);
+        $queryText      = debugPrepQuery($query, $this->sqlParms);
 
 		if ($stmt->execute($this->sqlParms))
 		{
-		    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
+		    $result	    = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		    return $result;
 		}
 		else
 		{
-		    $msg	.= "query '$queryText' failed: " .
-                           print_r($stmt->errorInfo(), true);
+		    $msg	    .= "query '$queryText' failed: " .
+                               print_r($stmt->errorInfo(), true);
             print "<p class='error'>$msg</p>\n";
 		    return null;
 		}		    // query failed

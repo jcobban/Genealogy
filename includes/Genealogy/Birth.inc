@@ -13,64 +13,64 @@ use \Iterator;
  *  of the table Births.												*
  *																		*
  *	CREATE TABLE `Births` (                                             *
- *		`B_RegDomain`			VARCHAR(4) NOT NULL DEFAULT 'CAON',		*
- *		`B_RegYear`			    INT(11) NOT NULL,					    *
- *		`B_RegNum`			    INT(11) NOT NULL,					    *
- *		`B_RegCounty`           CHAR(3) DEFAULT NULL,					*
- *		`B_RegTownship`			VARCHAR(64) DEFAULT NULL,				*
- *		`B_MsVol`			    INT(4) DEFAULT '0',					    *
- *		`B_Surname`			    VARCHAR(32) DEFAULT NULL,				*
- *		`B_SurnameSoundex`      CHAR(4) DEFAULT NULL,					*
- *		`B_GivenNames`			VARCHAR(48) DEFAULT NULL,				*
- *		`B_Sex`                 CHAR(1) DEFAULT NULL,					*
- *		`B_BirthPlace`			VARCHAR(128) DEFAULT NULL,				*
- *		`B_BirthDate`			VARCHAR(16) DEFAULT NULL,				*
- *		`B_CalcBirth`           DATE DEFAULT NULL,					    *
- *		`B_ParentsMarried`      CHAR(1) DEFAULT NULL,					*
- *		`B_FatherName`			VARCHAR(48) DEFAULT NULL,				*
- *		`B_FatherOccupation`	VARCHAR(32) DEFAULT NULL,				*
- *		`B_FatherOccPlace`		VARCHAR(128) DEFAULT NULL,				*
- *		`B_MotherName`			VARCHAR(48) DEFAULT NULL,			    *
- *		`B_MotherOccupation`	VARCHAR(32) DEFAULT NULL,				*
- *		`B_MotherOccPlace`		VARCHAR(128) DEFAULT NULL,				*
- *		`B_FormerHusband`		VARCHAR(48) DEFAULT NULL,			    *
- *		`B_MarriagePlace`		VARCHAR(128) DEFAULT NULL,				*
- *		`B_MarriageDate`		VARCHAR(16) DEFAULT NULL,			    *
- *		`B_Accoucheur`			VARCHAR(48) DEFAULT NULL,			    *
- *		`B_Informant`			VARCHAR(48) DEFAULT NULL,			    *
- *		`B_InformantRes`		VARCHAR(128) DEFAULT NULL,			    *
- *		`B_InformantRel`		VARCHAR(16) DEFAULT NULL,			    *
- *		`B_RegDate`			    VARCHAR(16) DEFAULT NULL,			    *
- *		`B_Remarks`             LONGTEXT,					            *
- *		`B_Image`			    VARCHAR(256) DEFAULT NULL,			    *
- *		`B_IDIR`			    INT(10) UNSIGNED DEFAULT NULL,			*
- *		`B_ChangedBy`			VARCHAR(64) NOT NULL DEFAULT '',		*
- *		`B_ChangeDate`          DATE DEFAULT NULL,					    *
- *		`B_Registrar`			VARCHAR(128) NOT NULL DEFAULT '',		*
- *		`B_OriginalVolume`		VARCHAR(16) DEFAULT NULL,				*
- *		`B_OriginalPage`		INT(11) DEFAULT NULL,					*
- *		`B_OriginalItem`		INT(11) DEFAULT NULL,					*
- *		PRIMARY KEY (`B_RegDomain`,					                    *
- *		             `B_RegYear`,					                    *
- *		             `B_RegNum`),					                    *
- *		KEY `B_RegCounty`   (`B_RegCounty`),					        *
- *		KEY `B_RegTownship` (`B_RegTownship`),					        *
- *		KEY `B_Surname`     (`B_Surname`),					            *
- *		KEY `B_SurnameSoundex` (`B_SurnameSoundex`),					*
- *		KEY `B_GivenNames`  (`B_GivenNames`),					        *
- *		KEY `B_IDIR`        (`B_IDIR`),					                *
- *		KEY `B_ChangeDate`  (`B_ChangeDate`) )					        *
+ *		`RegDomain`			    VARCHAR(4) NOT NULL DEFAULT 'CAON',		*
+ *		`RegYear`			    INT(11) NOT NULL,					    *
+ *		`RegNum`			    INT(11) NOT NULL,					    *
+ *		`RegCounty`             CHAR(3) DEFAULT NULL,					*
+ *		`RegTownship`			VARCHAR(64) DEFAULT NULL,				*
+ *		`MsVol`			        INT(4) DEFAULT '0',					    *
+ *		`Surname`			    VARCHAR(32) DEFAULT NULL,				*
+ *		`SurnameSoundex`        CHAR(4) DEFAULT NULL,					*
+ *		`GivenNames`			VARCHAR(48) DEFAULT NULL,				*
+ *		`Sex`                   CHAR(1) DEFAULT NULL,					*
+ *		`BirthPlace`			VARCHAR(128) DEFAULT NULL,				*
+ *		`BirthDate`			    VARCHAR(16) DEFAULT NULL,				*
+ *		`CalcBirth`             DATE DEFAULT NULL,					    *
+ *		`ParentsMarried`        CHAR(1) DEFAULT NULL,					*
+ *		`FatherName`			VARCHAR(48) DEFAULT NULL,				*
+ *		`FatherOccupation`	    VARCHAR(32) DEFAULT NULL,				*
+ *		`FatherOccPlace`		VARCHAR(128) DEFAULT NULL,				*
+ *		`MotherName`			VARCHAR(48) DEFAULT NULL,			    *
+ *		`MotherOccupation`	    VARCHAR(32) DEFAULT NULL,				*
+ *		`MotherOccPlace`		VARCHAR(128) DEFAULT NULL,				*
+ *		`FormerHusband`		    VARCHAR(48) DEFAULT NULL,			    *
+ *		`MarriagePlace`		    VARCHAR(128) DEFAULT NULL,				*
+ *		`MarriageDate`		    VARCHAR(16) DEFAULT NULL,			    *
+ *		`Accoucheur`			VARCHAR(48) DEFAULT NULL,			    *
+ *		`Informant`			    VARCHAR(48) DEFAULT NULL,			    *
+ *		`InformantRes`		    VARCHAR(128) DEFAULT NULL,			    *
+ *		`InformantRel`		    VARCHAR(16) DEFAULT NULL,			    *
+ *		`RegDate`			    VARCHAR(16) DEFAULT NULL,			    *
+ *		`Remarks`               LONGTEXT,					            *
+ *		`Image`			        VARCHAR(256) DEFAULT NULL,			    *
+ *		`IDIR`			        INT(10) UNSIGNED DEFAULT NULL,			*
+ *		`ChangedBy`			    VARCHAR(64) NOT NULL DEFAULT '',		*
+ *		`ChangeDate`            DATE DEFAULT NULL,					    *
+ *		`Registrar`			    VARCHAR(128) NOT NULL DEFAULT '',		*
+ *		`OriginalVolume`		VARCHAR(16) DEFAULT NULL,				*
+ *		`OriginalPage`		    INT(11) DEFAULT NULL,					*
+ *		`OriginalItem`		    INT(11) DEFAULT NULL,					*
+ *		PRIMARY KEY (`RegDomain`,					                    *
+ *		             `RegYear`,					                        *
+ *		             `RegNum`),					                        *
+ *		KEY `RegCounty`   (`RegCounty`),			    		        *
+ *		KEY `RegTownship` (`RegTownship`),			    		        *
+ *		KEY `Surname`     (`Surname`),				    	            *
+ *		KEY `SurnameSoundex` (`SurnameSoundex`),	    				*
+ *		KEY `GivenNames`  (`GivenNames`),			    		        *
+ *		KEY `IDIR`        (`IDIR`),					                    *
+ *		KEY `ChangeDate`  (`ChangeDate`) )			    		        *
  *		ENGINE=InnoDB DEFAULT CHARSET=utf8 					            *
  *                                                                      *
  *  History:															*
  *		2014/01/14		created											*
- *		2014/01/18		default b_parentsMarried to 'Y'					*
+ *		2014/01/18		default parentsMarried to 'Y'					*
  *		2014/10/10		add country code to default location			*
  *						and support all domains							*
  *		2014/12/06		send trace info to $warn						*
- *		2015/01/23		ensure that B_CalcBirth is updated when			*
- *						B_BirthDate is set even if the value of			*
- *						B_BirthDate is invalid							*
+ *		2015/01/23		ensure that CalcBirth is updated when			*
+ *						BirthDate is set even if the value of			*
+ *						BirthDate is invalid							*
  *		2015/04/19		default image URL to previous record			*
  *		2015/09/28		migrate from MDB2 to PDO						*
  *						move default place identification to private	*
@@ -93,6 +93,7 @@ use \Iterator;
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/04/18      support method getLastSqlCmd                    *
  *		2019/06/12      improve validation of values assigned to Dates  *
+ *		2019/12/13      remove B_ prefix from file names                *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -117,43 +118,43 @@ class Birth extends Record
      *	Default initial row												*
      ********************************************************************/
     protected static $initRow	= array(
-				'b_regdomain'			=> 'CAON',
-				'b_regyear'				=> 2014,
-				'b_regnum'				=> 0,
-				'b_regcounty'			=> '',
-				'b_regtownship'			=> '',
-				'b_msvol'				=> 0,
-				'b_surname'				=> '',
-				'b_surnamesoundex'		=> '',
-				'b_givennames'			=> '',
-				'b_sex'					=> '?',
-				'b_birthplace'			=> '',
-				'b_birthdate'			=> '',
-				'b_calcbirth'			=> null,
-				'b_parentsmarried'		=> 'Y',
-				'b_fathername'			=> '',
-				'b_fatheroccupation'	=> '',
-				'b_fatheroccplace'		=> '',
-				'b_mothername'			=> '',
-				'b_motheroccupation'	=> '',
-				'b_motheroccplace'		=> '',
-				'b_formerhusband'		=> '',
-				'b_marriageplace'		=> '',
-				'b_marriagedate'		=> '',
-				'b_accoucheur'			=> '',
-				'b_informant'			=> '',
-				'b_informantres'		=> '',
-				'b_informantrel'		=> '',
-				'b_regdate'				=> '',
-				'b_registrar'			=> '',
-				'b_remarks'				=> '',
-				'b_image'				=> '',
-				'b_originalvolume'		=> 0,
-				'b_originalpage'		=> 0,
-				'b_originalitem'		=> 0,
-				'b_idir'				=> 0,
-				'b_changedby'			=> '',
-				'b_changedate'			=> '');
+				'regdomain'			    => 'CAON',
+				'regyear'				=> 2014,
+				'regnum'				=> 0,
+				'regcounty'			    => '',
+				'regtownship'			=> '',
+				'msvol'				    => 0,
+				'surname'				=> '',
+				'surnamesoundex'		=> '',
+				'givennames'			=> '',
+				'sex'					=> '?',
+				'birthplace'			=> '',
+				'birthdate'			    => '',
+				'calcbirth'			    => null,
+				'parentsmarried'		=> 'Y',
+				'fathername'			=> '',
+				'fatheroccupation'	    => '',
+				'fatheroccplace'		=> '',
+				'mothername'			=> '',
+				'motheroccupation'	    => '',
+				'motheroccplace'		=> '',
+				'formerhusband'		    => '',
+				'marriageplace'		    => '',
+				'marriagedate'		    => '',
+				'accoucheur'			=> '',
+				'informant'		    	=> '',
+				'informantres'	    	=> '',
+				'informantrel'	    	=> '',
+				'regdate'				=> '',
+				'registrar'		    	=> '',
+				'remarks'				=> '',
+				'image'			    	=> '',
+				'originalvolume'		=> 0,
+				'originalpage'	    	=> 0,
+				'originalitem'	    	=> 0,
+				'idir'			    	=> 0,
+				'changedby'			    => '',
+				'changedate'			=> '');
 
     /********************************************************************
      *	Birth::$info											        *
@@ -163,68 +164,75 @@ class Birth extends Record
     protected static	$info	= array(
                 'table'     => 'Births',
                 'name'      => 'Births',
-                'prime'	    => array('b_regdomain','b_regyear','b_regnum'),
+                'prime'	    => array('regdomain','regyear','regnum'),
 	            'srvmg'     => false,
 	            'fldcount'	=> 34,
-                'order'     => 'B_RegDomain, B_RegYear, B_RegNum',
+                'order'     => 'RegDomain, RegYear, RegNum',
                 'classname' => 'Birth');
 
     /********************************************************************
-     *		Birth::$translate												*
-     *																		*
-     *		standard alternative field name identifiers						*
+     *	Birth::$translate												*
+     *																	*
+     *	standard alternative field name identifiers						*
      ********************************************************************/
     protected static $translate	= array(
-				'regdomain'				=> 'b_regdomain',
-				'domain'				=> 'b_regdomain',
-				'regyear'				=> 'b_regyear',
-				'year'					=> 'b_regyear',
-				'regnum'				=> 'b_regnum',
-				'num'					=> 'b_regnum',
-				'regcounty'				=> 'b_regcounty',
-				'county'				=> 'b_regcounty',
-				'regtownship'			=> 'b_regtownship',
-				'township'				=> 'b_regtownship',
-				'msvol'					=> 'b_msvol',
-				'surname'				=> 'b_surname',
-				'surnamesoundex'		=> 'b_surnamesoundex',
-				'givennames'			=> 'b_givennames',
-				'sex'					=> 'b_sex',
-				'birthplace'			=> 'b_birthplace',
-				'place'					=> 'b_birthplace',
-				'birthdate'				=> 'b_birthdate',
-				'date'					=> 'b_birthdate',
-				'calcbirth'				=> 'b_calcbirth',
-				'parentsmarried'		=> 'b_parentsmarried',
-				'fathername'			=> 'b_fathername',
-				'father'				=> 'b_fathername',
-				'fatheroccupation'		=> 'b_fatheroccupation',
-				'fatheroccplace'		=> 'b_fatheroccplace',
-				'mothername'			=> 'b_mothername',
-				'mother'				=> 'b_mothername',
-				'motheroccupation'		=> 'b_motheroccupation',
-				'motheroccplace'		=> 'b_motheroccplace',
-				'formerhusband'			=> 'b_formerhusband',
-				'marriageplace'			=> 'b_marriageplace',
-				'marriagedate'			=> 'b_marriagedate',
-				'accoucheur'			=> 'b_accoucheur',
-				'informant'				=> 'b_informant',
-				'informantname'			=> 'b_informant',
-				'informantres'			=> 'b_informantres',
-				'informantrel'			=> 'b_informantrel',
-				'regdate'				=> 'b_regdate',
-				'registrar'				=> 'b_registrar',
-				'remarks'				=> 'b_remarks',
-				'image'					=> 'b_image',
-				'originalvolume'		=> 'b_originalvolume',
-				'volume'				=> 'b_originalvolume',
-				'originalpage'			=> 'b_originalpage',
-				'page'					=> 'b_originalpage',
-				'originalitem'			=> 'b_originalitem',
-				'item'					=> 'b_originalitem',
-				'idir'					=> 'b_idir',
-				'changedby'				=> 'b_changedby',
-				'changedate'			=> 'b_changedate');
+				'b_regdomain'				=> 'regdomain',
+				'b_domain'				    => 'regdomain',
+				'b_regyear'			    	=> 'regyear',
+				'b_year'					=> 'regyear',
+				'b_regnum'			    	=> 'regnum',
+				'b_num'				    	=> 'regnum',
+				'b_regcounty'				=> 'regcounty',
+				'b_county'			    	=> 'regcounty',
+				'b_regtownship'		    	=> 'regtownship',
+				'b_township'				=> 'regtownship',
+				'b_msvol'					=> 'msvol',
+				'b_surname'			    	=> 'surname',
+				'b_surnamesoundex'	    	=> 'surnamesoundex',
+				'b_givennames'		    	=> 'givennames',
+				'b_sex'				    	=> 'sex',
+				'b_birthplace'		    	=> 'birthplace',
+				'b_place'					=> 'birthplace',
+				'b_birthdate'				=> 'birthdate',
+				'b_date'					=> 'birthdate',
+				'b_calcbirth'				=> 'calcbirth',
+				'b_parentsmarried'	    	=> 'parentsmarried',
+				'b_fathername'		    	=> 'fathername',
+				'b_father'			    	=> 'fathername',
+				'b_fatheroccupation'		=> 'fatheroccupation',
+				'b_fatheroccplace'	    	=> 'fatheroccplace',
+				'b_mothername'		    	=> 'mothername',
+				'b_mother'			    	=> 'mothername',
+				'b_motheroccupation'		=> 'motheroccupation',
+				'b_motheroccplace'	    	=> 'motheroccplace',
+				'b_formerhusband'			=> 'formerhusband',
+				'b_marriageplace'			=> 'marriageplace',
+				'b_marriagedate'			=> 'marriagedate',
+				'b_accoucheur'		    	=> 'accoucheur',
+				'b_informant'				=> 'informant',
+				'b_informantname'			=> 'informant',
+				'b_informantres'			=> 'informantres',
+				'b_informantrel'			=> 'informantrel',
+				'b_regdate'			    	=> 'regdate',
+				'b_registrar'				=> 'registrar',
+				'b_remarks'			    	=> 'remarks',
+				'b_image'					=> 'image',
+				'b_originalvolume'	    	=> 'originalvolume',
+				'b_volume'			    	=> 'originalvolume',
+				'b_originalpage'			=> 'originalpage',
+				'b_page'					=> 'originalpage',
+				'b_originalitem'			=> 'originalitem',
+				'b_item'					=> 'originalitem',
+				'b_idir'					=> 'idir',
+				'b_changedby'				=> 'changedby',
+				'b_changedate'		    	=> 'changedate');
+
+    /********************************************************************
+     *	Birth::$domain  												*
+     *																	*
+     *	Save reference to instance of Domain                            *
+     ********************************************************************/
+    protected   $domain                 = null;
 
     /********************************************************************
      *	function Birth::__construct										*
@@ -263,29 +271,29 @@ class Birth extends Record
 		global $warn;
 		global $msg;
 
-		$needInsert	    = false;
-		$this->table	= 'Births';
-		$cc		        = 'CA';		    // ISO country code
-		$pc		        = 'ON';		    // postal service state/province code
-		$addrEnd	    = ', ON, CA';	// last part of addresses
+		$needInsert	    	= false;
+		$this->table		= 'Births';
+		$cc		        	= 'CA';		    // ISO country code
+		$pc		        	= 'ON';		    // postal service state/prov code
+		$addrEnd	    	= ', ON, CA';	// last part of addresses
 
-		// validate parameters
+        // validate parameters
 		if (is_string($domain))
 		{		            // initialize new entry
 		    $domainObj	    = new Domain(array('domain'	    => $domain,
                                                'language'	=> 'en'));
-            $parms          = array('b_domain'              => $domainObj,
-                                    'b_regyear'             => $year,
-                                    'b_regnum'              => $number);
+            $parms          = array('domain'              => $domainObj,
+                                    'regyear'             => $year,
+                                    'regnum'              => $number);
         }                   // is_string($domain)
         else
         if ($domain instanceof Domain)
         {
             $domainObj      = $domain;
             $domain         = $domainObj->get('domain');
-            $parms          = array('b_domain'              => $domainObj,
-                                    'b_regyear'             => $year,
-                                    'b_regnum'              => $number);
+            $parms          = array('domain'              => $domainObj,
+                                    'regyear'             => $year,
+                                    'regnum'              => $number);
         }                   // $domain instanceof Domain
         else
         if (is_array($domain))
@@ -310,30 +318,36 @@ class Birth extends Record
 				    $fieldLc	= self::$translate[$fieldLc];
 				switch($fieldLc)
 				{	            	// act on specific field
-	                case 'b_regdomain':
+	                case 'regdomain':
 	                {
 						if (is_string($value))
-						{		            // initialize new entry
+                        {		            // initialize new entry
+                            $domain         = $value;
                             $domainObj	   
                                 = new Domain(array('domain'	    => $domain,
 				                                   'language'	=> 'en'));
+                            $this->domain   = $domainObj;
 				        }                   // is_string($domain)
 				        else
 				        if ($domain instanceof Domain)
 				        {
 			                $domainObj      = $domain;
+                            $this->domain   = $domainObj;
 			                $domain         = $domainObj->get('domain');
                         }                   // $domain instanceof Domain
+                        else
+                            $this->msg      .= "Invalid regdomain=" .
+                                                gettype($domain) . ". ";
                         break;
                     }
 
-				    case 'b_regyear':
+				    case 'regyear':
                     {
                         $year               = $value;
                         break;
                     }
 
-				    case 'b_regnum':
+				    case 'regnum':
                     {
                         $number             = $number;
                         break;
@@ -342,10 +356,10 @@ class Birth extends Record
             }                       // loop through parameters
 
 		    if ($domainObj->isExisting())
-		    {		        // valid domain
-				$cc		    = substr($domain, 0, 2);
-				$pc		    = substr($domain, 2);
-		    }		        // valid domain
+		    {		                // valid domain
+				$cc		                    = substr($domain, 0, 2);
+				$pc		                    = substr($domain, 2);
+		    }		                // valid domain
 		    else
 				$this->msg		.= "Birth::__construct: " .
 						"Domain '$domain' must be a supported two character country code followed by a 2 or 3 character character state or province code. ";
@@ -367,9 +381,9 @@ class Birth extends Record
 
 		    // search for an existing record matching the key
 		    $query	            = "SELECT * FROM Births 
-            							WHERE B_RegDomain=:domain AND 
-			            					  B_RegYear=:year AND
-						            		  B_RegNum=:number";
+            							WHERE RegDomain=:domain AND 
+			            					  RegYear=:year AND
+						            		  RegNum=:number";
 		    $stmt	            = $connection->prepare($query);
 		    
 		    // query the database
@@ -393,22 +407,22 @@ class Birth extends Record
 				{		    // create a new record
 				    // set defaults
 				    $dbrow		        	= self::$initRow;
-				    $dbrow['b_regdomain']	= $domain;
-				    $dbrow['b_regyear']		= $year;
-				    $dbrow['b_regnum']		= $number;
-				    $dbrow['b_birthdate']	= $year;
-				    $dbrow['b_regdate']		= $year;
+				    $dbrow['regdomain']	= $domain;
+				    $dbrow['regyear']		= $year;
+				    $dbrow['regnum']		= $number;
+				    $dbrow['birthdate']	= $year;
+				    $dbrow['regdate']		= $year;
 
 				    // fill in some fields from the preceding record, 
 				    // if it exists
-				    $queryPrev	= 'SELECT B_RegCounty, B_RegTownship, B_MsVol,'.
-								  'B_Registrar, B_RegDate, B_Image,' .
-						  'B_OriginalVolume, B_OriginalPage, B_OriginalItem' .
+				    $queryPrev	= 'SELECT RegCounty, RegTownship, MsVol,'.
+								  'Registrar, RegDate, Image,' .
+						  'OriginalVolume, OriginalPage, OriginalItem' .
 							       ' FROM Births ' .
-						  	       ' WHERE B_RegDomain=:domain AND ' .
-									'B_RegYear=:year AND ' .
-									'B_RegNum<:number' .
-							       ' ORDER BY B_RegNum DESC' .
+						  	       ' WHERE RegDomain=:domain AND ' .
+									'RegYear=:year AND ' .
+									'RegNum<:number' .
+							       ' ORDER BY RegNum DESC' .
 							       ' LIMIT 1';
 
 				    $stmt	            = $connection->prepare($queryPrev);
@@ -417,41 +431,39 @@ class Birth extends Record
 				    if ($stmt->execute($sqlParms))
 				    {		// successful query
 						if ($debug)
-                            $warn .= '<p>' .
-                                     debugPrepQuery($queryPrev, $sqlParms) .
-                                     "</p>\n";
+                            $warn       .= "<p>$queryText</p>\n";
 
-						$result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
+						$result	        = $stmt->fetchAll(PDO::FETCH_ASSOC);
 						if (count($result) > 0)
 						{		// a preceding record exists
 						    $row			            = $result[0];
-						    $row['b_regdomain']		    = $domain;
-						    $regCounty			= $row['b_regcounty'];
-						    $dbrow['b_regcounty']	    = $regCounty;
-						    $regTownship		= $row['b_regtownship'];
-						    $dbrow['b_regtownship']	    = $regTownship;
-						    $dbrow['b_msvol']		    = $row['b_msvol'];
-						    $dbrow['b_registrar']	    = $row['b_registrar'];
-						    $dbrow['b_image']		    = $row['b_image'];
-						    $volume	            = $row['b_originalvolume'];
-						    $dbrow['b_originalvolume']	= $volume;
-						    $page	            = $row['b_originalpage'];
-						    $dbrow['b_originalpage']	= $page;
-						    $item	            = $row['b_originalitem'] + 1;
-						    $dbrow['b_originalitem']	= $item + 1;
-						    if (strlen($row['b_regdate']) > 0)
-							    $dbrow['b_regdate']	= $row['b_regdate'];
+						    $row['regdomain']		    = $domain;
+						    $regCounty			        = $row['regcounty'];
+						    $dbrow['regcounty']	        = $regCounty;
+						    $regTownship		        = $row['regtownship'];
+						    $dbrow['regtownship']	    = $regTownship;
+						    $dbrow['msvol']		        = $row['msvol'];
+						    $dbrow['registrar']	        = $row['registrar'];
+						    $dbrow['image']		        = $row['image'];
+						    $volume	                    = $row['originalvolume'];
+						    $dbrow['originalvolume']	= $volume;
+						    $page	                    = $row['originalpage'];
+						    $dbrow['originalpage']	    = $page;
+						    $item	                    = $row['originalitem'] + 1;
+						    $dbrow['originalitem']	    = $item + 1;
+						    if (strlen($row['regdate']) > 0)
+							    $dbrow['regdate']	    = $row['regdate'];
 
 						    // initialize places with default value
 						    $dftPlace		= $this->getDefaultPlace($row);
-						    $dbrow['b_birthplace']	    = $dftPlace;
-						    $dbrow['b_fatheroccplace']	= $dftPlace;
-						    $dbrow['b_motheroccplace']	= $dftPlace;
-						    $dbrow['b_informantres']	= $dftPlace;
+						    $dbrow['birthplace']	    = $dftPlace;
+						    $dbrow['fatheroccplace']	= $dftPlace;
+						    $dbrow['motheroccplace']	= $dftPlace;
+						    $dbrow['informantres']	= $dftPlace;
 						    if ($year < 1908)
-							    $dbrow['b_marriageplace']	= 'N/A';
+							    $dbrow['marriageplace']	= 'N/A';
 						    else
-							    $dbrow['b_marriageplace']	= $dftPlace;
+							    $dbrow['marriageplace']	= $dftPlace;
 						}	// a preceding record exists
 
 						if ($number > 1000000)
@@ -459,9 +471,9 @@ class Birth extends Record
 						    $origVol	= floor($number/1000000);
 						    $origPage	= floor($number/100) % 1000;
 						    $origItem	= $number % 100;
-						    $dbrow['b_originalvolume']	= $origVol;
-						    $dbrow['b_originalpage']	= $origPage;
-						    $dbrow['b_originalitem']	= $origItem;
+						    $dbrow['originalvolume']	= $origVol;
+						    $dbrow['originalpage']	= $origPage;
+						    $dbrow['originalitem']	= $origItem;
 						}
 						$needInsert		= true;
 				    }		// successful query
@@ -510,13 +522,13 @@ class Birth extends Record
      ********************************************************************/
     private function getDefaultPlace($row)
     {
-		$domain			= $row['b_regdomain'];
+		$domain			= $row['regdomain'];
 		$cc			= substr($domain, 0, 2);
 		$pc			= substr($domain, 2);
 		$addrEnd		= ", $pc, $cc";
 
-		$regCounty		= $row['b_regcounty'];
-		$regTownship		= $row['b_regtownship'];
+		$regCounty		= $row['regcounty'];
+		$regTownship		= $row['regtownship'];
 		$county			= new County($domain,
 								     $regCounty);
 		$countyName		= $county->getName();
@@ -565,26 +577,26 @@ class Birth extends Record
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
 		{	            	// act on specific field
-		    case 'b_surnamesoundex':
-		    case 'b_changedby':
-		    case 'b_changedate':
-		    case 'b_calcbirth':
+		    case 'surnamesoundex':
+		    case 'changedby':
+		    case 'changedate':
+		    case 'calcbirth':
 		    {               // fields whose value is set from another field
 				throw new Exception(
 						"Birth::set: cannot modify '$field'");
 		    }               // fields whose value is set from another field
 
-		    case 'b_birthdate':
+		    case 'birthdate':
 		    {
 				$date	= new LegacyDate(" $value");
 				$y	    = $date->getYear();
 				// fixup missing or abbreviated birth years
 				if ($y == 0)
-				    $y	= $this->row['b_regyear'];
+				    $y	= $this->row['regyear'];
 				else
 				if ($y < 1000)
 				{
-				    $regYear	= $this->row['b_regyear'];
+				    $regYear	= $this->row['regyear'];
 				    $century	= floor($regYear / 100);
 				    if ($y > $regYear % 100)
 						$y	= $y + (($century - 1) * 100);
@@ -611,11 +623,11 @@ class Birth extends Record
 				if ($d < 10)
                     $d	= '0' . $d;
                 
-				parent::set('b_calcbirth', "$y-$m-$d");
+				parent::set('calcbirth', "$y-$m-$d");
 				return parent::set($fieldLc, $value);
 		    }
 
-		    case 'b_parentsmarried':
+		    case 'parentsmarried':
 		    {
 				if ($value == '' || $value == 'n' || $value == 'N')
 				    return parent::set($fieldLc, 'N');
@@ -623,39 +635,39 @@ class Birth extends Record
 				    return parent::set($fieldLc, 'Y');
 		    }
 
-		    case 'b_regcounty':
-		    case 'b_regtownship':
-		    case 'b_surname':
-		    case 'b_givennames':
-		    case 'b_sex':
-		    case 'b_birthplace':
-		    case 'b_birthdate':
-		    case 'b_fathername':
-		    case 'b_fatheroccupation':
-		    case 'b_fatheroccplace':
-		    case 'b_mothername':
-		    case 'b_motheroccupation':
-		    case 'b_motheroccplace':
-		    case 'b_formerhusband':
-		    case 'b_marriageplace':
-		    case 'b_marriagedate':
-		    case 'b_accoucheur':
-		    case 'b_informant':
-		    case 'b_informantres':
-		    case 'b_informantrel':
-		    case 'b_regdate':
-		    case 'b_registrar':
-		    case 'b_remarks':
-		    case 'b_image':
+		    case 'regcounty':
+		    case 'regtownship':
+		    case 'surname':
+		    case 'givennames':
+		    case 'sex':
+		    case 'birthplace':
+		    case 'birthdate':
+		    case 'fathername':
+		    case 'fatheroccupation':
+		    case 'fatheroccplace':
+		    case 'mothername':
+		    case 'motheroccupation':
+		    case 'motheroccplace':
+		    case 'formerhusband':
+		    case 'marriageplace':
+		    case 'marriagedate':
+		    case 'accoucheur':
+		    case 'informant':
+		    case 'informantres':
+		    case 'informantrel':
+		    case 'regdate':
+		    case 'registrar':
+		    case 'remarks':
+		    case 'image':
 		    {
 				return parent::set($fieldLc, $value);
 		    }
 
-		    case 'b_msvol':
-		    case 'b_idir':
-		    case 'b_originalvolume':
-		    case 'b_originalpage':
-		    case 'b_originalitem':
+		    case 'msvol':
+		    case 'idir':
+		    case 'originalvolume':
+		    case 'originalpage':
+		    case 'originalitem':
 		    {
 				if (is_null($value) ||
 				    (is_string($value) && strlen($value) == 0))
@@ -697,8 +709,8 @@ class Birth extends Record
         {                   // record needs to be saved
 			// get current date 
 			$now		    = getdate();
-            parent::set('b_changedby', $userid);
-            parent::set('b_changedate', 
+            parent::set('changedby', $userid);
+            parent::set('changedate', 
                         $now['year'] . '-' .  $now['mon'] . '-' . $now['mday']);
             parent::save($xml);
         }                   // record needs to be saved

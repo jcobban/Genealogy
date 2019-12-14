@@ -150,11 +150,11 @@ if (count($_POST) > 0)
 $template               = new FtTemplate("PageUpdate$lang.html");
 
 if (!canUser('edit'))
-    $msg	            .= $template['notAuthorized']=>innerHTML;
+    $msg	            .= $template['notAuthorized']->innerHTML;
 
 // the invoker must explicitly provide the census id
 if (is_null($censusId))
-    $msg	            .= $template['censusMissing']=>innerHTML;
+    $msg	            .= $template['censusMissing']->innerHTML;
 else
 {                       // census ID provided
 	$census	            = new Census(array('censusid'	=> $censusId,
@@ -177,7 +177,7 @@ if (strlen($province) != 2 || strpos($provs, $province) === false)
 
 // the invoker must explicitly provide the District number
 if (is_null($distId))
-    $msg	            .= $template['districtMissing']=>innerHTML;
+    $msg	            .= $template['districtMissing']->innerHTML;
 else
 {               // district ID provided
 	if (preg_match("/^[0-9]+([.][05])?$/", $distId))
@@ -194,7 +194,7 @@ else
 
 // the invoker must explicitly provide the SubDistrict number
 if (is_null($subdistId))
-    $msg	            .= $template['subdistrictMissing']=>innerHTML;
+    $msg	            .= $template['subdistrictMissing']->innerHTML;
 else
 {               // try to get the instance of SubDistrict
 	$subDistrict	= new SubDistrict(array('sd_census'	=> $censusId,

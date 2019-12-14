@@ -8,15 +8,15 @@ use \Exception;
  *  Prompt the user to enter parameters for a search of the 			*
  *  Ontario Cemetery Finding Aid table.									*
  *																		*
- *	Input parameters passed by method='GET':								*
- *		'DOMAIN'		domain id, default 'CAON'                       *
- *		'COUNTY'        county name, default any					    *
- *		'TOWNSHIP'      township name, default any					    *
- *		'CEMETERY'      cemetery name, default any					    *
- *		'GIVENNAMES'    givennames, default any					        *
- *		'SURNAME'       surname, default any					        *
- *		'LIMIT'         max rows displayed per page, default 20			*
- *		'LANG'		    ISO language code, default 'en';				*
+ *	Input parameters passed by method='GET':							*
+ *		DOMAIN		    domain id, default 'CAON'                       *
+ *		COUNTY          county name, default any					    *
+ *		TOWNSHIP        township name, default any					    *
+ *		CEMETERY        cemetery name, default any					    *
+ *		GIVENNAMES      givennames, default any					        *
+ *		SURNAME         surname, default any					        *
+ *		LIMIT           max rows displayed per page, default 20			*
+ *		LANG		    ISO language code, default 'en';				*
  *																		*
  *  History:															*
  *		2019/05/01      created                                         *

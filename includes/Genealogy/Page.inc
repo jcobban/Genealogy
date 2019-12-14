@@ -369,8 +369,8 @@ class Page extends Record
 		    {		// no validation implemented yet
 				return parent::set($field, $value);
 		    }		// no validation implemented yet
-            }		// switch on field name
-        }		// function Page::set
+        }		    // switch on field name
+    }		// function Page::set
 
     /********************************************************************
      *	function Page::save												*
@@ -404,8 +404,8 @@ class Page extends Record
 		if ($this->needInsert)
 		{		        // create new record
 		    $fldnames		= '';
-		    $comma		= '';
-		    $values		= '';
+		    $comma		    = '';
+		    $values		    = '';
 		    $sqlParms		= array();
 		    foreach($this->row as $fld => $value)
 		    {		    // loop through all fields in record
@@ -416,11 +416,11 @@ class Page extends Record
 		    }		    // loop through all fields in record
 
 		    // construct the SQL INSERT command
-		    $insert	= "INSERT INTO Pages ($fldnames) VALUES($values)";
+		    $insert	        = "INSERT INTO Pages ($fldnames) VALUES($values)";
 
 		    // insert the new record into the database
-		    $stmt	= $connection->prepare($insert);
-		    $insertText	= debugPrepQuery($insert, $sqlParms);
+		    $stmt	        = $connection->prepare($insert);
+		    $insertText	    = debugPrepQuery($insert, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		    // success
 				$count		= $stmt->rowCount();
@@ -438,11 +438,8 @@ class Page extends Record
 				$this->needInsert	= false;
 
 				// log the update
-				logSqlUpdate($insert,
-							     $sqlParms,
-							     0,
-							     '',
-							     json_encode($this->row));
+				$this->log($insert,
+						   $sqlParms);
 		    }		    // success
 		    else
 		    {		    // error inserting record
@@ -453,9 +450,9 @@ class Page extends Record
 		}		        // create new record
 		else
 		{		        // update existing record
-		    $update		= "UPDATE Pages SET ";
-		    $set		= '';
-		    $comma		= '';
+		    $update		    = "UPDATE Pages SET ";
+		    $set		    = '';
+		    $comma		    = '';
 		    $sqlParms		= array();
 		    foreach($this->changed as $fld => $value)
 		    {
@@ -470,10 +467,10 @@ class Page extends Record
 				// construct the where clause
 				$sqlParms['o_census']		= $this->former['pt_census'];
 				$sqlParms['o_distId']		= $this->former['pt_distid'];
-				$sqlParms['o_sdId']		= $this->former['pt_sdid'];
-				$sqlParms['o_div']		= $this->former['pt_div'];
+				$sqlParms['o_sdId']		    = $this->former['pt_sdid'];
+				$sqlParms['o_div']		    = $this->former['pt_div'];
 				$sqlParms['o_sched']		= $this->former['pt_sched'];
-				$sqlParms['o_page']		= $this->former['pt_page'];
+				$sqlParms['o_page']		    = $this->former['pt_page'];
 				$where		= 'PT_Census=:o_census AND ' .
 								  'PT_DistId=:o_distId AND ' .
 								  'PT_SdId=:o_sdId AND ' .
@@ -499,11 +496,8 @@ class Page extends Record
 									" cmd='$update', count=$count</p>\n";
 
 				    // log the update
-				    logSqlUpdate($update,
-								 $sqlParms,
-								 0,
-								 json_encode($this->former),
-								 json_encode($this->row));
+				    $this->log($update,
+							   $sqlParms);
 				}		// success
 				else
 				{		// error updating record
@@ -552,19 +546,19 @@ class Page extends Record
 		    {		// record has been updated
 				$sqlParms['o_census']	= $this->former['pt_census'];
 				$sqlParms['o_distId']	= $this->former['pt_distid'];
-				$sqlParms['o_sdId']	= $this->former['pt_sdid'];
-				$sqlParms['o_div']	= $this->former['pt_div'];
+				$sqlParms['o_sdId']	    = $this->former['pt_sdid'];
+				$sqlParms['o_div']	    = $this->former['pt_div'];
 				$sqlParms['o_sched']	= $this->former['pt_sched'];
-				$sqlParms['o_page']	= $this->former['pt_page'];
+				$sqlParms['o_page']	    = $this->former['pt_page'];
 		    }		// record has been updated
 		    else
 		    {		// record has not been updated
 				$sqlParms['o_census']	= $this->row['pt_census'];
 				$sqlParms['o_distId']	= $this->row['pt_distid'];
-				$sqlParms['o_sdId']	= $this->row['pt_sdid'];
-				$sqlParms['o_div']	= $this->row['pt_div'];
+				$sqlParms['o_sdId']	    = $this->row['pt_sdid'];
+				$sqlParms['o_div']	    = $this->row['pt_div'];
 				$sqlParms['o_sched']	= $this->row['pt_sched'];
-				$sqlParms['o_page']	= $this->row['pt_page'];
+				$sqlParms['o_page']	    = $this->row['pt_page'];
 		    }			// record has not been updated
 		    $delete		= 'DELETE FROM Pages WHERE ' .
 									'PT_Census=:o_census AND ' .
@@ -574,7 +568,7 @@ class Page extends Record
 									'PT_Sched=:o_sched AND ' .
 									'PT_Page=:o_page';
 
-		    $stmt		= $connection->prepare($delete);
+		    $stmt		    = $connection->prepare($delete);
 		    $deleteText		= debugPrepQuery($delete, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {			// success
@@ -587,11 +581,8 @@ class Page extends Record
 								    " cmd='$deleteText', count='$count'</p>\n";
 
 				// log the update
-				logSqlUpdate($delete,
-							 $sqlParms,
-							 $count,
-							 json_encode($this->row),
-							 '');
+				$this->log($delete,
+						   $sqlParms);
 
 				// update the memory copy of the record to reflect that it
 				// no longer represents a database record
@@ -605,9 +596,10 @@ class Page extends Record
 				error_log(print_r($stmt->errorInfo(),true) . "\n");
 				return false;
 		    }			// error updating record
-		}		// have key value
+		}		        // have key value
 
 		// record never written to database
-		return 0;	// nothing to delete
+		return 0;	    // nothing to delete
     }		// function Page::delete
+
 }		// class Page

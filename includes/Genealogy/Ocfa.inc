@@ -12,6 +12,7 @@ use \Iterator;
  *  Ontario Cemetery Finding Aid (OCFA) table.                          *
  *																		*
  *		CREATE TABLE `Ocfa` (								            *
+ *		    `RecordIndex` INT(11) NOT NULL AUTO_INCREMENT,              *
  *	    	`Surname`           VARCHAR(48),							*
  *	    	`GivenName`         VARCHAR(48),							*
  *	    	`Cemetery`          VARCHAR(64),							*
@@ -19,6 +20,13 @@ use \Iterator;
  *	    	`Township`          VARCHAR(48),							*
  *	    	`Reference`         VARCHAR(16),							*
  *	    	`Soundex`           CHAR(4) )								*
+ *	    	PRIMARY KEY (`RecordIndex`),								*
+ *		    KEY `Surname` (`Surname`),									*
+ *		    KEY `GivenName` (`GivenName`),								*
+ *		    KEY `Cemetery` (`Cemetery`),								*
+ *		    KEY `County` (`County`),									*
+ *		    KEY `Township` (`Township`),								*
+ *		    KEY `Soundex` (`Soundex`) )									*
  *          ENGINE=InnoDBDEFAULT CHARSET=utf8							*
  *																		*
  *  History:															*

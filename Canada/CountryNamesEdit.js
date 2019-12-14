@@ -174,7 +174,7 @@ function addName(ev)
     var	tbody			= table.tBodies[0];	// <tbody> containing row
     var	rownum	    	= tbody.rows.length + 1;
     var	parms	    	= {"rownum"         : rownum};
-    var	template		= document.getElementById("Row$rownum");
+    var	template		= document.getElementById("RowTemplate");
     var	newRow			= createFromTemplate(template,
 						    			     parms,
 							    		     null);

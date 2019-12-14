@@ -131,6 +131,7 @@ use \Exception;
  *		2019/01/24      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/11/05      correct search for matching citations           *
+ *		2019/12/13      remove M_ prefix from field names               *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -163,20 +164,20 @@ function searchParticipant($participant)
 
     // if this participant is not already linked to
     // look for individuals who match
-    $regYear			= $participant->get('m_regyear');
-    $role				= $participant->get('m_role');
-    $givenNames			= $participant->get('m_givennames');
-    $surname			= $participant->get('m_surname');
-    $age				= $participant->get('m_age');
-    $birthYear			= $participant->get('m_byear');
-    $idir				= $participant->get('m_idir');
-    $residence			= $participant->get('m_residence');
-    $birthPlace			= $participant->get('m_birthplace');
-    $occupation			= $participant->get('m_occupation');
-    $marStat			= $participant->get('m_marstat');
-    $religion			= $participant->get('m_religion');
-    $fatherName			= $participant->get('m_fathername');
-    $motherName			= $participant->get('m_mothername');
+    $regYear			= $participant->get('regyear');
+    $role				= $participant->get('role');
+    $givenNames			= $participant->get('givennames');
+    $surname			= $participant->get('surname');
+    $age				= $participant->get('age');
+    $birthYear			= $participant->get('byear');
+    $idir				= $participant->get('idir');
+    $residence			= $participant->get('residence');
+    $birthPlace			= $participant->get('birthplace');
+    $occupation			= $participant->get('occupation');
+    $marStat			= $participant->get('marstat');
+    $religion			= $participant->get('religion');
+    $fatherName			= $participant->get('fathername');
+    $motherName			= $participant->get('mothername');
 
     // assume minister is middle aged (between 25 and 69)
     if ($role == 'M' && ($age == '' || $age == 0))
@@ -543,23 +544,23 @@ if (strlen($msg) == 0)
     }
 
     // extract field values for display
-    $msVol					= $marriage->get('m_msvol');
-    $regCounty				= $marriage->get('m_regcounty');
+    $msVol					= $marriage->get('msvol');
+    $regCounty				= $marriage->get('regcounty');
     $countyObj				= new County($domain, $regCounty);
     $countyName				= $countyObj->get('name');
-    $regTownship			= $marriage->get('m_regtownship');
-    $mDate					= $marriage->get('m_date');
-    $mPlace					= $marriage->get('m_place');
-    $licenseType			= $marriage->get('m_licensetype');
-    $regDate				= $marriage->get('m_regdate');
+    $regTownship			= $marriage->get('regtownship');
+    $mDate					= $marriage->get('date');
+    $mPlace					= $marriage->get('place');
+    $licenseType			= $marriage->get('licensetype');
+    $regDate				= $marriage->get('regdate');
     if (is_null($regDate) || $regDate == '')
         $regDate			= $regYear;
-    $registrar				= $marriage->get('m_registrar');
-    $remarks				= $marriage->get('m_remarks');
-    $image					= $marriage->get('m_image');
-    $originalVolume			= $marriage->get('m_originalvolume');
-    $originalPage			= $marriage->get('m_originalpage');
-    $originalItem			= $marriage->get('m_originalitem');
+    $registrar				= $marriage->get('registrar');
+    $remarks				= $marriage->get('remarks');
+    $image					= $marriage->get('image');
+    $originalVolume			= $marriage->get('originalvolume');
+    $originalPage			= $marriage->get('originalpage');
+    $originalItem			= $marriage->get('originalitem');
 
     // reformat all numeric date if necessary
     $mdyPattern		= '/^([0-9]{2,2})\/([0-9]{2,2})\/([0-9]{2,2})$/';
@@ -625,51 +626,51 @@ if (strlen($msg) == 0)
 
         // update information on groom based upon marriage
         // registration
-        if ($groom->get('m_surname') == '')
+        if ($groom->get('surname') == '')
         {	// create new groom
             $person	        = new Person(array('idir' => $idirhusb));
 
-            $groom->set('m_surname',
+            $groom->set('surname',
                          $person->get('surname'));
-            $groom->set('m_givennames',
+            $groom->set('givennames',
                          $person->get('givenname'));
             $byear	        = floor($person->get('birthsd')/10000);
             if ($byear <= -9999)
-                $groom->set('m_age',
+                $groom->set('age',
                             20);
             else
-                $groom->set('m_age',
+                $groom->set('age',
                             $regYear - $byear);
-            $groom->set('m_idir',
+            $groom->set('idir',
                          $idirhusb);
         }	// create new groom
         else
-        if ($groom->get('m_idir') == 0)
-            $groom->set('m_idir', $idirhusb);
+        if ($groom->get('idir') == 0)
+            $groom->set('idir', $idirhusb);
 
         // update information on bride based upon marriage
         // registration
-        if ($bride->get('m_surname') == '')
+        if ($bride->get('surname') == '')
         {	// create new temporary bride
             $person	        = new Person(array('idir' => $idirwife));
 
-            $bride->set('m_surname',
+            $bride->set('surname',
                         $person->get('surname'));
-            $bride->set('m_givennames',
+            $bride->set('givennames',
                         $person->get('givenname'));
             $byear	        = floor($person->get('birthsd')/10000);
             if ($byear <= -9999)
-                $bride->set('m_age',
+                $bride->set('age',
                              20);
             else
-                $bride->set('m_age',
+                $bride->set('age',
                              $regYear - $byear);
-            $bride->set('m_idir',
+            $bride->set('idir',
                          $idirwife);
         }	// create new temporary bride
         else
-        if ($bride->get('m_idir') == 0)
-            $bride->set('m_idir', $idirwife);
+        if ($bride->get('idir') == 0)
+            $bride->set('idir', $idirwife);
 
     }		// existing citation
 

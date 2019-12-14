@@ -24,41 +24,52 @@ require_once __NAMESPACE__ . '/common.inc';
 /************************************************************************
  *		open code														*
  ***********************************************************************/
-$cc		    	= 'CA';
-$countryName	= 'Canada';
-$lang		    = 'en';		// default english
+$cc		    	            = 'CA';
+$countryName	            = 'Canada';
+$lang		                = 'en';		// default english
 
-// determine which districts to display
-foreach ($_GET as $key => $value)
-{		        	// loop through all parameters
-	switch(strtolower($key))
-	{
-	    case 'cc':
-	    case 'code':
-	    case 'countrycode':
-	    {
-            $cc		        = strtoupper($value);
-            if ($cc == 'UK')
-                $cc         = 'GB';
-			$countryObj	    = new Country(array('code' => $cc));
-			$countryName	= $countryObj->getName();
-			break;
-	    }
+// if invoked by method=get process the parameters
+if (count($_GET) > 0)
+{	        	    // invoked by URL to display current status of account
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{		        	// loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{
+		    case 'cc':
+		    case 'code':
+		    case 'countrycode':
+		    {
+	            $cc		        = strtoupper($value);
+	            if ($cc == 'UK')
+	                $cc         = 'GB';
+				break;
+		    }
+	
+		    case 'lang':
+	       {	    	// language code
+				$lang		    = FtTemplate::validateLang($value);
+				break;
+		    }	    	// language code
+	
+		    default:
+		    {	    	// unexpected
+				$warn	.= "Unexpected parameter $key='$value'. ";
+				break;
+		    }	    	// unexpected
+		}	        	// switch on parameter name
+	}		        	// foreach parameter
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display current status of account
 
-	    case 'lang':
-       {	    	// language code
-           if (strlen($value) >= 2)
-			    $lang		= strtolower(substr($value,0,2));
-			break;
-	    }	    	// language code
-
-	    default:
-	    {	    	// unexpected
-			$warn	.= "Unexpected parameter $key='$value'. ";
-			break;
-	    }	    	// unexpected
-	}	        	// switch on parameter name
-}		        	// foreach parameter
+$countryObj	        = new Country(array('code' => $cc));
+$countryName	    = $countryObj->getName($lang);
 
 $tempBase		    = $document_root . '/templates/';
 $baseName		    = "genCountry{$cc}en.html";

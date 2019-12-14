@@ -2515,7 +2515,6 @@ if (!is_null($count))
                             case 'idir':
                             case 'idirhusb':
                             case 'idirwife':
-                            case 'b_idir':
                             case 'd_idir':
                             case 'm_idir':
                             {	// IDIR field

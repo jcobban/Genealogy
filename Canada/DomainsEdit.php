@@ -79,7 +79,7 @@ if (isset($_GET) && count($_GET) > 0)
 		    case 'lang':
 		    case 'language':
 		    {
-	            $lang               = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value);
 				break;
 		    }		// language code
 	
@@ -143,7 +143,7 @@ if (isset($_POST) && count($_POST) > 0)
 		    case 'lang':
 		    case 'language':
 		    {
-	            $lang               = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value);
 				break;
 		    }		// language code
 	

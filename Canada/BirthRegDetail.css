@@ -1,16 +1,17 @@
 /************************************************************************
- *  BirthRegDetail.css							*
- *									*
- *  Stylesheet for the scripts BirthRegDetail.php			*
- *									*
- *  History:								*
- *	2013/12/21	created						*
- *	2015/02/01	add input.actlefterror and input.actleftncerror	*
- *	2015/09/28	add input.actleftncerror and			*
- *			input.inaleftncerror				*
- *	2018/03/17	increase width of labelSmall to 12em		* 
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  BirthRegDetail.css													*
+ *																		*
+ *  Stylesheet for the scripts BirthRegDetail.php						*
+ *																		*
+ *  History:															*
+ *		2013/12/21		created											*
+ *		2015/02/01		add input.actlefterror and input.actleftncerror	*
+ *		2015/09/28		add input.actleftncerror and					*
+ *						input.inaleftncerror							*
+ *		2018/03/17		increase width of labelSmall to 12em			*
+ *		2019/12/10      separate input styling from color and bg        * 
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /*	column containers */
@@ -51,145 +52,50 @@
 		width:		6em;
 		}
 
-    input.actleft {
+    input.left {
 		font-family:	sans-serif;
-		text-align:	left;
-		background-color:white;
-		color:		black;
+		text-align:	    left;
 		text-transform:	capitalize;
-		padding:	0px;
-		border-top:	1px solid black;
+		padding:	    0px;
+		border-top:	    1px solid black;
 		border-left:	1px solid black;
 		border-bottom:	1px solid white;
 		border-right:	1px solid white;
-		width:		18em;
+		width:		    16em;
 		margin-bottom:	2px;
 		}
-    input.actleftnc {
+    input.leftnc {
 		font-family:	sans-serif;
-		text-align:	left;
-		background-color:white;
-		color:		black;
-		padding:	0px;
-		border-top:	1px solid black;
+		text-align:	    left;
+		padding:	    0px;
+		border-top:	    1px solid black;
 		border-left:	1px solid black;
 		border-bottom:	1px solid white;
 		border-right:	1px solid white;
-		width:		18em;
+		width:		    16em;
 		margin-bottom:	2px;
 		}
-    input.actleftvar {
+    input.leftvar {
 		font-family:	sans-serif;
-		text-align:	left;
-		background-color:white;
-		color:		black;
-		padding:	0px;
-		border-top:	1px solid black;
+		text-align:	    left;
+		padding:	    0px;
+		border-top:	    1px solid black;
 		border-left:	1px solid black;
 		border-bottom:	1px solid white;
 		border-right:	1px solid white;
-		margin-bottom:	2px;
-		}
-    input.inaleft {font-family:	sans-serif;
-		text-align:	left;
-		background-color:#F0F0F0;	/* bright gray */
-		color:		black;
-		text-transform:	capitalize;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black; 
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		18em;
-		margin-bottom:	2px;
-		}
-    input.inaleftnc {font-family:	sans-serif;
-		text-align:	left;
-		background-color:#F0F0F0;	/* bright gray */
-		color:		black;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black; 
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		18em;
-		margin-bottom:	2px;
-		}
-    input.inaleftncerror {
-		font-family:	sans-serif;
-		text-align:	left;
-		background-color:#F0F0F0;	/* bright gray */
-		color:		red;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		18em;
-		}
-    input.inarightnc {
-		font-family:	sans-serif;
-		text-align:	right;
-		background-color:#F0F0F0;	/* bright gray */
-		color:		black;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		float:		left;
-		}
-    input.actlefterror {
-		font-family:	sans-serif;
-		text-align:	left;
-		background-color:white;
-		color:		red;
-		text-transform:	capitalize;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		18em;
-		margin-bottom:	2px;
-		}
-    input.actleftncerror {
-		font-family:	sans-serif;
-		text-align:	left;
-		background-color:white;
-		color:		red;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		18em;
 		margin-bottom:	2px;
 		}
 
-    select.actleftwide {
+    select.leftwide {
 		font-family:	sans-serif;
-		text-align:	left;
-		background-color:white;
-		color:		black;
-		padding:	0px;
-		width:		18em;
+		text-align:	    left;
+		padding:	    0px;
+		width:		    18em;
 		margin-bottom:	2px;
 		}
-    select.inaleftwide {
+    select.left {
 		font-family:	sans-serif;
-		text-align:	left;
-		background-color:#F0F0F0;	/* bright gray */
-		color:		black;
-		padding:	0px;
-		width:		18em;
-		margin-bottom:	2px;
-		}
-    select.actleft {
-		font-family:	sans-serif;
-		text-align:	left;
-		background-color:white;
-		color:		black;
-		padding:	0px;
+		text-align:	    left;
+		padding:	    0px;
 		margin-bottom:	2px;
 		}

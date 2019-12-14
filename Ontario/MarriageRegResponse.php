@@ -97,7 +97,7 @@ use \Templating\Template;
  *						birth year calculations							*
  *		2016/04/25		replace ereg with preg_match					*
  *		2016/05/20		use class Domain to validate domain code		*
- *		2016/07/04		misspelled $domain in delete dialog			*
+ *		2016/07/04		misspelled $domain in delete dialog			    *
  *		2016/08/25		correct calculation of number of empty pages	*
  *						for 1870 through 1872							*
  *		2016/11/28		change increment for 1872						*
@@ -112,6 +112,7 @@ use \Templating\Template;
  *		                use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/07/08      correct handling of 1870-1872 marriages         *
+ *		2019/12/13      remove M_ prefix from field names               *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -191,20 +192,20 @@ function emptyRows($count, $html)
 // variables for constructing the SQL statement
 // join expression for the two tables from which the information is extracted
 $join				= 'LEFT JOIN MarriageIndi AS Groom ON ' .
-                        'Marriage.M_RegYear= Groom.M_RegYear AND ' .
-                        'Marriage.M_RegNum= Groom.M_RegNum AND ' .
-                        'Marriage.M_RegDomain= Groom.M_RegDomain AND ' .
-                        "Groom.M_Role= 'G' " .
+                        'Marriage.RegYear= Groom.RegYear AND ' .
+                        'Marriage.RegNum= Groom.RegNum AND ' .
+                        'Marriage.RegDomain= Groom.RegDomain AND ' .
+                        "Groom.Role= 'G' " .
                       'LEFT JOIN MarriageIndi AS Bride ON ' .
-                        'Marriage.M_RegYear= Bride.M_RegYear AND ' .
-                        'Marriage.M_RegNum= Bride.M_RegNum AND ' .
-                        'Marriage.M_RegDomain= Bride.M_RegDomain AND ' .
-                        "Bride.M_Role= 'B' " .
+                        'Marriage.RegYear= Bride.RegYear AND ' .
+                        'Marriage.RegNum= Bride.RegNum AND ' .
+                        'Marriage.RegDomain= Bride.RegDomain AND ' .
+                        "Bride.Role= 'B' " .
                       'LEFT JOIN MarriageIndi AS Minister ON ' .
-                        'Marriage.M_RegYear= Minister.M_RegYear AND ' .
-                        'Marriage.M_RegNum= Minister.M_RegNum AND ' .
-                        'Marriage.M_RegDomain= Minister.M_RegDomain AND ' .
-                        "Minister.M_Role= 'M' ";
+                        'Marriage.RegYear= Minister.RegYear AND ' .
+                        'Marriage.RegNum= Minister.RegNum AND ' .
+                        'Marriage.RegDomain= Minister.RegDomain AND ' .
+                        "Minister.Role= 'M' ";
 
 // construct the various portions of the SQL SELECT statement
 // where expression
@@ -213,24 +214,24 @@ $sqlParms	        = array();
 
 $selroles			= 0;		    // bit mask of roles to include GBM
 $limit				= '';		    // limit on which rows to return
-$prefix				= 'M_';		    // common prefix of table field names
-$cprefix			= 'Marriage.M_';// prefix of table field names
+$prefix				= '';		    // common prefix of table field names
+$cprefix			= 'Marriage.';// prefix of table field names
 $and				= 'WHERE ';		// logical and operator in SQL expressions
-$flds				= 'Marriage.M_RegDomain, ' .
-                      'Marriage.M_RegYear AS RegYear, Marriage.M_RegNum AS RegNum, ' .
-                       'Marriage.M_Date, Marriage.M_Place, ' .
-                      'Groom.M_Surname AS G_Surname, ' .
-                      'Groom.M_GivenNames AS G_Given, ' .
-                      'Groom.M_BYear AS G_BYear, Groom.M_IDIR AS G_IDIR, ' .
-                      'Bride.M_Surname AS B_Surname, ' .
-                      'Bride.M_GivenNames AS B_Given, ' .
-                      'Bride.M_BYear AS B_BYear, Bride.M_IDIR AS B_IDIR, ' .
-                      'Minister.M_Surname AS M_Surname, ' .
-                      'Minister.M_GivenNames AS M_Given, ' .
-                      'Minister.M_IDIR AS M_IDIR';
-$numericOrd			= 'Marriage.M_RegYear, Marriage.M_RegNum ';
-$nominalOrd			= 'Groom.M_Surname, Groom.M_GivenNames, ' .
-                      'Marriage.M_RegYear, Marriage.M_RegNum ';
+$flds				= 'Marriage.RegDomain, ' .
+                      'Marriage.RegYear AS RegYear, Marriage.RegNum AS RegNum, ' .
+                       'Marriage.Date, Marriage.Place, ' .
+                      'Groom.Surname AS G_Surname, ' .
+                      'Groom.GivenNames AS G_Given, ' .
+                      'Groom.BYear AS G_BYear, Groom.IDIR AS G_IDIR, ' .
+                      'Bride.Surname AS B_Surname, ' .
+                      'Bride.GivenNames AS B_Given, ' .
+                      'Bride.BYear AS B_BYear, Bride.IDIR AS B_IDIR, ' .
+                      'Minister.Surname AS Surname, ' .
+                      'Minister.GivenNames AS Given, ' .
+                      'Minister.IDIR AS IDIR';
+$numericOrd			= 'Marriage.RegYear, Marriage.RegNum ';
+$nominalOrd			= 'Groom.Surname, Groom.GivenNames, ' .
+                      'Marriage.RegYear, Marriage.RegNum ';
 $orderby			= $numericOrd;	// default
 $npuri				= 'MarriageRegResponse.php';
 $npand				= '?';		    // adding parms to $npuri
@@ -358,7 +359,7 @@ foreach ($_GET as $key => $value)
             case 'place':
             case 'date':
             {		// match anywhere in string
-                $where		    .= "$and LOCATE(:$fieldLc, Marriage.M_$key)>0";
+                $where		    .= "$and LOCATE(:$fieldLc, Marriage.$key)>0";
                 $sqlParms[$fieldLc]	= $value;
                 $and		    = ' AND ';
                 $npuri		    .= "$npand$key=$value";
@@ -401,7 +402,7 @@ foreach ($_GET as $key => $value)
             case 'regcounty':
             {		// exact match on county code
                 $needSpouse	        = true;
-                $where		        .= "$and Marriage.M_RegCounty=:regcounty ";
+                $where		        .= "$and Marriage.RegCounty=:regcounty ";
                 $sqlParms['regcounty']	= $value;
                 $regCounty	        = $value;
                 $and		        = ' AND ';
@@ -417,7 +418,7 @@ foreach ($_GET as $key => $value)
             case 'regtownship':
             {		// exact match on county code
                 $needSpouse	        = true;
-                $where		        .= "$and Marriage.M_RegTownship=:regtownship ";
+                $where		        .= "$and Marriage.RegTownship=:regtownship ";
                 $sqlParms['regtownship']	= $value;
                 $regTownship	    = $value;
                 $and		        = ' AND ';
@@ -434,7 +435,7 @@ foreach ($_GET as $key => $value)
             case 'originalitem':
             {		// exact match on field in Marriage table
                 $needSpouse	        = true;
-                $where		        .= "$and Marriage.M_$key=:$fieldLc ";
+                $where		        .= "$and Marriage.$key=:$fieldLc ";
                 $sqlParms[$fieldLc]	= $value;
                 $and		        = ' AND ';
                 $npuri		        .= "{$npand}{$key}={$value}";
@@ -578,7 +579,7 @@ if (is_string($domain) && strlen($domain) >= 4)
         $countryObj	    = new Country(array('code' => $cc));
         $countryName	= $countryObj->getName();
         $domainName	    = $domainObj->get('name');
-	    $where		    .= "$and Marriage.M_RegDomain=:regdomain ";
+	    $where		    .= "$and Marriage.RegDomain=:regdomain ";
 	    $sqlParms['regdomain']	    = $domain;
 	    $and		    = ' AND ';
 	    $npuri		    .= "{$npand}{$key}={$value}";
@@ -604,7 +605,7 @@ if (is_string($regyear) && strlen($regyear) > 0)
     }
     else
     {	// valid
-        $where	            .= "$and Marriage.M_RegYear=:regyear ";
+        $where	            .= "$and Marriage.RegYear=:regyear ";
         $sqlParms['regyear']= $regyear;
         $and	            = ' AND ';
 	    $npuri		        .= "{$npand}RegYear=$regyear";
@@ -628,14 +629,14 @@ if (is_string($regnum) && strlen($regnum) > 0)
     else
     {           // valid
 	    $lastRegNum	        = $regnum + $count;
-        $where	            .= "$and Marriage.M_RegNum>=:regnum ";
+        $where	            .= "$and Marriage.RegNum>=:regnum ";
         $sqlParms['regnum']	= $regnum;
         $and	            = ' AND ';
         if ($expand)
         {
             if ($regyear <= 1872 && $regnum > 10000)
                 $lastRegNum	= $regnum + 10 * floor($count / 3 + 1);
-            $where          .= "AND Marriage.M_RegNum<:lastregnum";
+            $where          .= "AND Marriage.RegNum<:lastregnum";
             $sqlParms['lastregnum']	= $lastRegNum;
         }
     }
@@ -692,17 +693,17 @@ if (is_string($surname) && strlen($surname) > 0)
     $where	                .= $and;
     if ($selroles & 1)
     {
-        $where	            .= "(Groom.M_Surname$operation";
+        $where	            .= "(Groom.Surname$operation";
         $or	    		    = ' OR ';
     }
     if ($selroles & 2)
     {
-        $where	            .= "$or Bride.M_Surname$operation";
+        $where	            .= "$or Bride.Surname$operation";
         $or	    		    = ' OR ';
     }
     if ($selroles & 4)
     {
-        $where	            .= "$or Minister.M_Surname$operation";
+        $where	            .= "$or Minister.Surname$operation";
     }
     $where	                .= ')';
     $and	    		    = ' AND ';
@@ -738,17 +739,17 @@ if ($matchAnywhere)
                 $sqlParms[$fieldLc]	= $value;
                 if ($selroles & 1)
                 {
-                    $where	    .= "LOCATE(:$fieldLc, Groom.M_$key)>0";
+                    $where	    .= "LOCATE(:$fieldLc, Groom.$key)>0";
                     $or	        = ' OR ';
                 }
                 if ($selroles & 2)
                 {
-                    $where	    .= "$or LOCATE(:$fieldLc, Bride.M_$key)>0";
+                    $where	    .= "$or LOCATE(:$fieldLc, Bride.$key)>0";
                     $or	        = ' OR ';
                 }
                 if ($selroles & 4)
                 {
-                    $where	    .= "$or LOCATE(:$fieldLc, Minister.M_$key)>0";
+                    $where	    .= "$or LOCATE(:$fieldLc, Minister.$key)>0";
                 }
                 $where	        .= ') ';
                 $and		    = ' AND ';
@@ -780,14 +781,14 @@ if (is_string($byear) && strlen($byear) > 0)
         $where	                .= "$and(";
         if ($selroles & 1)
         {
-            $where	            .= "ABS(Groom.M_BYear-:byear) < :range ";
+            $where	            .= "ABS(Groom.BYear-:byear) < :range ";
             $sqlParms['byear']	= $byear;
             $sqlParms['range']	= $range;
             $or	                = ' OR ';
         }
         if ($selroles & 2)
         {
-            $where	            .= "$or ABS(Bride.M_BYear-:byear) < :range";
+            $where	            .= "$or ABS(Bride.BYear-:byear) < :range";
             $sqlParms['byear']	= $byear;
             $sqlParms['range']	= $range;
         }

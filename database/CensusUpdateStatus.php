@@ -210,10 +210,13 @@ if ($census)
 			break;
 	    }
 	    if ($crec->get('censusid') == $censusId)
-	    {			    // found current entry
-			$prevCensus	    = $prevRec->get('censusid');
-			$prevProv	    = $prevRec->get('prov');
-			$prevName	    = $prevRec->get('prov');
+        {			    // found current entry
+            if ($prevRec)
+            {
+			    $prevCensus	    = $prevRec->get('censusid');
+			    $prevProv	    = $prevRec->get('prov');
+                $prevName	    = $prevRec->get('prov');
+            }
 			$stopNext	    = true;
 	    }			    // found current entry
 	    $prevRec		    = $crec;
@@ -361,8 +364,11 @@ if (is_null($province) || strlen($province) == 0)
 	for ($i = 0; $i < strlen($provs); $i += $cl)
 	{	                // loop through provinces
 	    $provcode	    = substr($provs, $i, $cl);
-	    $domain	        = $domainset["$cc$provcode"];
-	    $provinceName	= $domain->get('name');
+        $domain	        = $domainset["$cc$provcode"];
+        if ($domain)
+            $provinceName	= $domain->get('name');
+        else
+            $warn   .= "<p>No matching Domain for '$cc$provcode'</p>\n";
 	    if ($preConfed && $cc == 'CA')
 			$link	    = "/database/CensusUpdateStatus.php?Census=$provcode$censusYear&amp;Province=$provcode&amp;lang=$lang";
 	    else

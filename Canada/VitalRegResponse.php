@@ -38,6 +38,7 @@ use \Exception;
  *		2017/02/07		use class Country								*
  *		2017/08/16		script legacyIndivid.php renamed to Person.php	*
  *		2019/02/21      use new FtTemplate constructor                  *
+ *		2019/12/13      remove B_ prefix from file names                *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -53,7 +54,7 @@ require_once __NAMESPACE__ . '/common.inc';
  ************************************************************************/
 
 // variables for constructing the SQL statement
-$b_sel				= '';		// WHERE expression
+$sel				= '';		// WHERE expression
 $m_sel				= '';		// WHERE expression
 $d_sel				= '';		// WHERE expression
 $limitopt			= '';		// limit on which rows to return
@@ -128,7 +129,7 @@ if (count($_GET) > 0)
     		{		// selection lists
     		    if (strlen($value) > 0 && $value != '?')
     		    {
-    				$b_sel	.= $and	. 'B_' . $key . '=?' ;
+    				$sel	.= $and	. '' . $key . '=?' ;
     				array_push($sqlParms, $value);
     				$npuri	.= "{$npand}{$key}={$value}";
     				$npand	= '&amp;'; 
@@ -160,7 +161,7 @@ if (count($_GET) > 0)
     		{		// match anywhere in string
                 if (strlen($value) > 0)
                 {
-	    		    $b_sel	.= $and . 'B_' . $key . ' REGEXP ?' ;
+	    		    $sel	.= $and . '' . $key . ' REGEXP ?' ;
 	    		    array_push($sqlParms, $value);
 	    		    $npuri	.= "{$npand}{$key}={$value}";
 	    		    $npand	= '&amp;'; 
@@ -211,7 +212,7 @@ if (count($_GET) > 0)
     		{		// ordinary parameter
                 if (strlen($value) > 0)
                 {
-	    		    $b_sel	.= $and . 'B_' . $key . '=?';
+	    		    $sel	.= $and . '' . $key . '=?';
 	    		    array_push($sqlParms, $value);
 	    		    $npuri	.= "{$npand}{$key}={$value}";
 	    		    $npand	= '&amp;'; 
@@ -244,7 +245,7 @@ if ($domainObj->isExisting())
     $domainName     = $domainObj->get('name');
     $countryObj     = new Country(array('code' => $cc));
     $countryName    = $countryObj->getName();
-    $b_sel          .= $and . 'B_RegDomain=?';
+    $sel          .= $and . 'RegDomain=?';
     array_push($sqlParms, $domain);
     $npuri          .= "$npand$key=$domain";
     $npand          = '&amp;';
@@ -269,21 +270,21 @@ else
 // surname match depends upon both Surname and SurnameSoundex
 if (!is_null($surname))
 {			// surname specified
-    $b_sel	.= $and;
+    $sel	.= $and;
     if (preg_match("/[.+*^$]/", $surname))
     {		// match pattern
-        $b_sel	.= 'B_Surname REGEXP ?'; 
+        $sel	.= 'Surname REGEXP ?'; 
         array_push($sqlParms, $value);
     }		// match pattern
     else
     if ($surnameSoundex)
     {		// match soundex
-        $b_sel	.= 'B_SurnameSoundex = LEFT(SOUNDEX(?),4)';
+        $sel	.= 'SurnameSoundex = LEFT(SOUNDEX(?),4)';
         array_push($sqlParms, $value);
     }		// match soundex
     else
     {		// match exact
-        $b_sel	.= 'B_Surname=?';
+        $sel	.= 'Surname=?';
         array_push($sqlParms, $value);
     }		// match exact
         
@@ -297,7 +298,7 @@ if (!is_null($birthDate))
     $y	= $date->getYear();
     $m	= $date->getMonth();
     $d	= $date->getDay();
-    $b_sel	.= $and . "ABS(DATEDIFF(B_CalcBirth, '$y-$m-$d')) < " .
+    $sel	.= $and . "ABS(DATEDIFF(CalcBirth, '$y-$m-$d')) < " .
     				  "(365 * $range)";
     $and	= ' AND ';
 }			// birth date specified
@@ -321,7 +322,7 @@ else
     $npnext		= "Limit=$limit&Offset=$limit";
 }			// starting offset omitted
 
-if (strlen($b_sel) == 0)
+if (strlen($sel) == 0)
     $msg	.= 'Missing parameters. ';
     
 // action taken depends upon whether the user is authorized to
@@ -333,7 +334,7 @@ $title	= $domainName . ": Vital Statistics Registration Query";
 if (strlen($msg) == 0)
 {		// no error messages
     // execute the query
-    $cntQuery	= "SELECT COUNT(*) FROM Births WHERE $b_sel";
+    $cntQuery	= "SELECT COUNT(*) FROM Births WHERE $sel";
     $stmt		= $connection->prepare($cntQuery);
     if ($stmt->execute($sqlParms))
     {		// success
@@ -342,19 +343,19 @@ if (strlen($msg) == 0)
         $totalrows	= $row[0];
 
         // execute the query
-        $query	= "SELECT B_RegDomain AS RegDomain, " .
-    					"B_RegYear AS RegYear, " .
-    					"B_RegNum AS RegNum, " .
-    					"B_Surname AS Surname, " .
-    					"B_GivenNames AS GivenNames, " .
-    					"B_Sex AS Sex, " .
-    					"B_BirthDate AS BirthDate, " .
-    					"B_BirthPlace AS BirthPlace, " .
-    					"B_RegTownship AS RegTownship, " .
-    					"B_IDIR AS IDIR, " .
-    					"B_CalcBirth AS CalcBirth " .
+        $query	= "SELECT RegDomain AS RegDomain, " .
+    					"RegYear AS RegYear, " .
+    					"RegNum AS RegNum, " .
+    					"Surname AS Surname, " .
+    					"GivenNames AS GivenNames, " .
+    					"Sex AS Sex, " .
+    					"BirthDate AS BirthDate, " .
+    					"BirthPlace AS BirthPlace, " .
+    					"RegTownship AS RegTownship, " .
+    					"IDIR AS IDIR, " .
+    					"CalcBirth AS CalcBirth " .
     				  "FROM Births " .
-    				  "WHERE $b_sel " .
+    				  "WHERE $sel " .
     				  "ORDER BY Surname, GivenNames, CalcBirth " .
     				  $limitopt;
         $stmt	= $connection->prepare($query);

@@ -9,56 +9,61 @@
  *		2018/02/24		remove incorrect quotes in forward and backward	*
  *						image links										*
  *      2019/03/02      add hidden <h1> to satisfy FtTemplate           *
+ *		2019/12/12      fix header at top and scroll image such that    *
+ *		                the scroll bars are visible all the time        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php">Genealogy</a>:
-  </div>	
-<div class="body">
-  <h1 id="head1" style="display: none;">Display Image '$IMAGENAME'</h1>
-  <h2 id="head2">Display Image '$IMAGENAME'</h2>
-    $MSG
-    $TRACE
-  <div class="center">
-    <div class="left" id="goToPrevImg">
-	<a href="DisplayImage.php?src=$dirname/$previmg&fldName=$fldName&lang=$lang">
-	    &lt;---
-	</a>
+    <div id="breadcrumbs" class="hidden">
+       <a href="/genealogy.php">Genealogy</a>:
+    </div>	
+    <div class="body" style="overflow: hidden;">
+      <h1 id="head1" style="display: none;">Display Image '$IMAGENAME'</h1>
+      <h2 id="head2">Display Image '$IMAGENAME'</h2>
+      $MSG
+      $TRACE
+      <div id="top" class="center header">
+        <div class="left" id="goToPrevImg">
+	      <a href="DisplayImage.php?src=$dirname/$previmg&fldName=$fldName&lang=$lang">
+	        &lt;---
+	      </a>
+        </div>
+        <div class="right" id="goToNextImg">
+	      <a href="DisplayImage.php?src=$dirname/$nextimg&fldName=$fldName&lang=$lang">
+	        ---&gt;
+	      </a>
+        </div>
+        <div class="center">
+          <form name="imageForm">
+	        $IMAGENAME
+	        <button type="button" id="plus">+</button>
+	        <button type="button" id="minus">-</button>
+	        <button type="button" id="close">Close</button>
+          </form>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+      <div id="viewport" class="imagebody">
+          <img src="$SRC" id="image" class="white" 
+                    alt="Cannot Find Document Image $SRC" 
+                    style="width: 100%;">
+      </div>
+    </div> <!-- end of <div id="body"> -->
+    <div class="balloon" id="Helpplus">
+      Click on this button to zoom into the image.
     </div>
-    <div class="right" id="goToNextImg">
-	<a href="DisplayImage.php?src=$dirname/$nextimg&fldName=$fldName&lang=$lang">
-	    ---&gt;
-	</a>
+    <div class="balloon" id="Helpminus">
+      Click on this button to zoom out from the image.
     </div>
-    <div class="center">
-      <form name="imageForm">
-	$IMAGENAME
-	<button type="button" id="plus">+</button>
-	<button type="button" id="minus">-</button>
-	<button type="button" id="close">Close</button>
-      </form>
+    <div class="balloon" id="Helpclose">
+      Click on this button to close the image display.
     </div>
-    <div style="clear: both;"></div>
-  </div>
-  <img src="$SRC" alt="Document Image" id="image" class="white"
-	style="width:100%;height:80%">
-  </div> <!-- end of <div id="body"> -->
-  <div class="balloon" id="Helpplus">
-    Click on this button to zoom into the image.
-  </div>
-  <div class="balloon" id="Helpminus">
-    Click on this button to zoom out from the image.
-  </div>
-  <div class="balloon" id="Helpclose">
-    Click on this button to close the image display.
-  </div>
-  <div class="balloon" id="HelpgoToPrevImg">
-    Click on this link to display the previous image in the image folder.
-  </div>
-  <div class="balloon" id="HelpgoToNextImg">
-    Click on this link to display the next image in the image folder.
-  </div>
+    <div class="balloon" id="HelpgoToPrevImg">
+      Click on this link to display the previous image in the image folder.
+    </div>
+    <div class="balloon" id="HelpgoToNextImg">
+      Click on this link to display the next image in the image folder.
+    </div>
     <script src="/jscripts/js20/http.js" type="text/javaScript">
     </script>
     <script src="/jscripts/util.js" type="text/javaScript">

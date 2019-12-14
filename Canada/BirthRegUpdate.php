@@ -66,8 +66,9 @@ use \Exception;
  *		2017/11/19		use CitationSet in place of getCitations		*
  *		2018/10//20     use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
+ *		2019/12/13      remove B_ prefix from file names                *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Birth.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
@@ -205,7 +206,7 @@ if (strlen($msg) == 0)
 	$birth		    = new Birth($domain,
 					            $regYear,
 					            $regNum);
-	$idir		    = $birth->get('b_idir');
+	$idir		    = $birth->get('idir');
 	$idirChanged	= false;
 	$parentsMarried = 'N';
 
@@ -274,7 +275,7 @@ if (strlen($msg) == 0)
 
 	// checkboxes are a pain because if they are not clicked on
 	// NOTHING is passed to the script
-	$birth->set('b_parentsmarried', $parentsMarried);
+	$birth->set('parentsmarried', $parentsMarried);
 
 	// if B_IDIR was not already set check for the case where the
 	// family tree already cites the specific registration
@@ -292,7 +293,7 @@ if (strlen($msg) == 0)
 	    {
 			$citation	= $citations->rewind();
 			$idir		= $citation->get('idime');
-			$birth->set('b_idir', $idir);
+			$birth->set('idir', $idir);
 	    }
 	}	            // B_IDIR not set
 

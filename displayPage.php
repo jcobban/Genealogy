@@ -82,7 +82,7 @@ function createPopups($text)
 		if ($equalpos !== false)
 		{		// link to an individual
 		    $refidir		= substr($url, $equalpos + 5);
-		    $refind		= new Person(array('idir' => $refidir));
+		    $refind		    = new Person(array('idir' => $refidir));
 		    $individTable[$refidir]	= $refind;
 		    if (substr($url, 0, $equalpos) == "Person.php?")
 				$retval	.= substr($piece, 0, $urlstart) .
@@ -125,8 +125,7 @@ if (count($_GET) > 0)
 	
 			case 'lang':
 			{		// requested language
-			    if (strlen($value) >= 2)
-					$lang	        = strtolower(substr($value,0,2));
+				$lang	            = FtTemplate::validateLang($value);
 			    break;
 			}		// requested language
 	
@@ -143,16 +142,16 @@ if (substr($templateName, 0, 1) == '/')
     if (substr($templateName, -5) != '.html' &&
         substr($templateName, -4) != '.htm')
     {               // add filetype
-        $templateName	= $templateName . '.html';
+        $templateName		= $templateName . '.html';
     }               // add filetype
 
 	if (file_exists($document_root . $templateName))
     {               // template file exists
-        $sourceTemplate = new Template($document_root . $templateName);
-        $bodyText       = $sourceTemplate->getRawTemplate();
-        $document       = $sourceTemplate->getDocument();
-        $html           = $document->childNodes()[0];
-        $toplevel       = $html->childNodes();
+        $sourceTemplate 	= new Template($document_root . $templateName);
+        $bodyText       	= $sourceTemplate->getRawTemplate();
+        $document       	= $sourceTemplate->getDocument();
+        $html           	= $document->childNodes()[0];
+        $toplevel       	= $html->childNodes();
         foreach($toplevel as $tag)
         {           // loop through children of <html>
             if (strtolower($tag->tagName) == 'body')

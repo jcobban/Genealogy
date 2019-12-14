@@ -59,11 +59,6 @@ if (isset($_GET) && count($_GET) > 0)
     if ($debug)
         $warn           .= $parmsText . "</table>\n";
 
-	$country		    = new CountryName(array('cc'	=> $cc,
-						        		        'lang'	=> $lang));
-	$countryName		= $country->getName();
-	$article		    = $country->get('article');
-	$possessive		    = $country->get('possessive');
 }				// method='get'
 else
 if (isset($_POST) && count($_POST) > 0)
@@ -183,17 +178,22 @@ if (isset($_POST) && count($_POST) > 0)
 	}
 }		// when submit button is clicked invoked by method='post'
 
-$getParms['code3166_1']	= $cc;
+$getParms['code3166_1']	= "^$cc$";
 $country		        = new Country(array('code' => $cc));
+$countryNameObj		    = new CountryName(array('cc'	=> $country,
+						        		        'lang'	=> $lang));
+$countryName		    = $countryNameObj->getName();
+$article		        = $countryNameObj->get('article');
+$possessive		        = $countryNameObj->get('possessive');
 
 if (strlen($msg) == 0)
 {			// no errors detected
-	$enName		    = new CountryName(array('code3166_1'	=> $cc,
+	$enName		    = new CountryName(array('code3166_1'	=> $country,
 					            			'code639_1'	    => $lang));
     $names		    = new RecordSet('CountryNames', $getParms);
 	$information	= $names->getInformation();
     $rownum         = 1;
-	if (!$enName->isExisting())
+	if (count($names) == 0)
 	    $names->push('en', $enName);
     foreach($names as $record)
     {

@@ -944,11 +944,13 @@ class SubDistrict extends Record
 		$bypage	    	= $this->row['sd_bypage'];
 		$website    	= 'http://data2.collectionscanada.ca/';
 
+        $lastpage       = $page1 + $bypage * ($pages - 1);
         if ($page < $page1 || 
-            $page > ($page1 + $bypage * ($pages - 1)) ||
-            (($bypage == 2) && (($page - $page1) % $bypage) != 1))
+            $page > $lastpage ||
+            (($bypage == 2) && (($page - $page1) % $bypage) != 0))
         {
             $warn       .= "<p>SubDistrict::getDefaultImage: $page is not a valid page number within SubDistrict ($censusId,$distId,$subdistId,$div)</p>\n";
+            $warn       .= "<p>\$page1=$page1, \$pages=$pages, \$bypage=$bypage, \$lastpage=$lastpage remainder=" . (($page - $page1) % $bypage) . "</p>\n";
             return '';
         }
 

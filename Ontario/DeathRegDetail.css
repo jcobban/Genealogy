@@ -1,125 +1,100 @@
 /************************************************************************
- *  DeathRegDetail.css							*
- *									*
- *  Stylesheet for the scripts DeathRegDetail.php			*
- *									*
- *  History:								*
- *	2014/01/10	created						*
- *	2014/01/13	support for CSS layout of form			*
- *	2014/02/25	add input.lefterror to avoid misalignment	*
- *	2018/05/30	remove distinction between act and ina		*
- *			which is moved to other classes			*
- *			column1 width changed to 28em to match fields	*
- *			remove select classes				*
- *									*
- *  Copyright &copy; 2018 James A. Cobban				*
+ *  DeathRegDetail.css													*
+ *																		*
+ *  Stylesheet for the scripts DeathRegDetail.php						*
+ *																		*
+ *  History:															*
+ *		2014/01/10		created											*
+ *		2014/01/13		support for CSS layout of form					*
+ *		2014/02/25		add input.lefterror to avoid misalignment		*
+ *		2018/05/30		remove distinction between act and ina			*
+ *						which is moved to other classes					*
+ *						column1 width changed to 28em to match fields	*
+ *						remove select classes							*
+ *																		*
+ *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
 
 /*	column containers */
-    div.column1	{float:		left;
-		width:		28em;
-		margin-top:	1px;
-		margin-right:	3px;
-		}
-    div.column2	{float:	left;
-		margin-top:	1px;
-		margin-right:	3px;
-		}
-    div.column3	{float:	left;
-		margin-top:	1px;
-		margin-right:	3px;
-		}
+    div.column1	{   float:		        left;
+		            width:		        440px;
+		            margin-top:	        1px;
+		            margin-right:	    3px;
+		        }
+    div.column2	{   float:	            left;
+		            margin-top:	        1px;
+		            margin-right:	    3px;
+		        }
+    div.column3	{   float:	            left;
+		            margin-top:	        1px;
+		            margin-right:	    3px;
+		        }
 /*	labels of various widths */
     label.labelSmall {
-		font-family:	sans-serif;
-		font-weight:	bold;
-		font-size:	smaller;
-		text-align:	right;
-		vertical-align:	top;
-		padding:	0px 3px 0px 3px;
-		margin-top:	1px;
-		float:		left;
-		width:		13em;
-		}
+		            font-family:	sans-serif;
+		            font-weight:	bold;
+		            font-size:	    smaller;
+		            text-align:	    right;
+		            vertical-align:	top;
+		            padding:	    0px 3px 0px 3px;
+		            margin-top:	    1px;
+		            float:		    left;
+		            width:		    13em;
+		            }
     label.labelSmall6em {
-		font-family:	sans-serif;
-		font-weight:	bold;
-		font-size:	smaller;
-		text-align:	right;
-		vertical-align:	top;
-		padding:	0px 3px 0px 3px;
-		margin-top:	1px;
-		float:		left;
-		width:		6em;
-		}
+					font-family:	sans-serif;
+					font-weight:	bold;
+					font-size:	    smaller;
+					text-align:	    right;
+					vertical-align:	top;
+					padding:	    0px 3px 0px 3px;
+					margin-top:	    1px;
+					float:		    left;
+					width:		    6em;
+		            }
 
     input.left {
-		font-family:	sans-serif;
-		text-align:	left;
-		text-transform:	capitalize;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		18em;
-		margin-bottom:	2px;
-		}
+					font-family:	sans-serif;
+					text-align:	    left;
+					text-transform:	capitalize;
+					padding:	    0px;
+					border-top:	    1px solid black;
+					border-left:	1px solid black;
+					border-bottom:	1px solid white;
+					border-right:	1px solid white;
+					width:		    250px;
+		            margin-bottom:	2px;
+		        }
     input.leftnc {
-		font-family:	sans-serif;
-		text-align:	left;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		18em;
-		margin-bottom:	2px;
-		}
-    input.lefterror {
-		font-family:	sans-serif;
-		text-align:	left;
-		color:		red;
-		text-transform: capitalize;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		18em;
-		margin-bottom:	2px;
+					font-family:	sans-serif;
+					text-align:	    left;
+					padding:	    0px;
+					border-top:	    1px solid black;
+					border-left:	1px solid black;
+					border-bottom:	1px solid white;
+					border-right:	1px solid white;
+					width:		    250px;
+					margin-bottom:	2px;
 		}
     input.leftnc40em {
-		font-family:	sans-serif;
-		text-align:	left;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		40em;
-		margin-bottom:	2px;
-		}
-    input.leftnc40emerror {
-		font-family:	sans-serif;
-		text-align:	left;
-		color:		red;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		40em;
-		margin-bottom:	2px;
-		}
+					font-family:	sans-serif;
+					text-align:	    left;
+					padding:	    0px;
+					border-top:	    1px solid black;
+					border-left:	1px solid black;
+					border-bottom:	1px solid white;
+					border-right:	1px solid white;
+					width:		    40em;
+					margin-bottom:	2px;
+		        }
     input.leftvar {
-		font-family:	sans-serif;
-		text-align:	left;
-		padding:	0px;
-		border-top:	1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		margin-bottom:	2px;
-		}
+					font-family:	sans-serif;
+					text-align:	    left;
+					padding:	    0px;
+					border-top:	    1px solid black;
+					border-left:	1px solid black;
+					border-bottom:	1px solid white;
+					border-right:	1px solid white;
+					margin-bottom:	2px;
+				}
 

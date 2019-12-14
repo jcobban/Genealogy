@@ -10,6 +10,7 @@ use \Exception;
  *																		*
  *  History:															*
  *		2019/04/28		created											*
+ *		2019/12/09      missing AND before soundex in where expression  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -99,7 +100,7 @@ class MethodistBaptismSet extends RecordSet
 
                 case 'surnamesoundex':
                 {
-					$where	    .= "LEFT(SOUNDEX(Surname),4)=LEFT(SOUNDEX(:surname),4)";
+					$where	    .= "$and LEFT(SOUNDEX(Surname),4)=LEFT(SOUNDEX(:surname),4)";
 					$this->sqlParms['surname']	= $value;
 					$and		= ' AND ';
 				    break;

@@ -136,6 +136,7 @@ use \Exception;
  *		2018/10/03      use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
+ *		2019/12/13      remove B_ prefix from field names               *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -165,7 +166,7 @@ else
 }		// user can only view the contents
 
 //	data base column name prefix
-$dbprefix       	= "b_";
+$dbprefix       	= "";
 
 // validate parameters
 $regYear		    = '';
@@ -347,12 +348,12 @@ if (strlen($msg) == 0)
 	$birth			= new Birth($domain, $regYear, $regNum);
 
 	// copy contents into working variables
-	$surname		                = $birth->get('b_surname');
-	$givennames                     = $birth->get('b_givennames');
-	$sex	                		= $birth->get('b_sex');
-	$birthdate	                	= $birth->get('b_birthdate');
-	$idir               			= $birth->get('b_idir');
-    $regCounty              		= $birth->get('b_regcounty');
+	$surname		                = $birth->get('surname');
+	$givennames                     = $birth->get('givennames');
+	$sex	                		= $birth->get('sex');
+	$birthdate	                	= $birth->get('birthdate');
+	$idir               			= $birth->get('idir');
+    $regCounty              		= $birth->get('regcounty');
 
 	$countyObj              		= new County($domain, $regCounty);
 
@@ -481,15 +482,15 @@ if (strlen($msg) == 0)
 		    		$birthdate	= $birtho->toString();
 		    		$idlr		= $birthe->get('idlrevent');
 		    		$location	= new Location($idlr);
-		    		$birth->set('b_birthplace',
+		    		$birth->set('birthplace',
 		        			    $location->getName());
-		    		$birth->set('b_fatheroccplace',
+		    		$birth->set('fatheroccplace',
 		        			    $location->getName());
-		    		$birth->set('b_motheroccplace',
+		    		$birth->set('motheroccplace',
 		        			    $location->getName());
-			    	$birth->set('b_marriageplace',
+			    	$birth->set('marriageplace',
 			        		    $location->getName());
-				    $birth->set('b_informantres',
+				    $birth->set('informantres',
 				        	    $location->getName());
 			    }			// have a birth event
 
@@ -497,14 +498,14 @@ if (strlen($msg) == 0)
 			    $parents	= $indiv->getPreferredParents();
 			    if ($parents)
 			    {			// have preferred parents
-				    $birth->set('b_fathername',
+				    $birth->set('fathername',
 				        	    $parents->getHusbName());
-				    $birth->set('b_mothername',
+				    $birth->set('mothername',
 					            $parents->getWifeName());
 			    }			// have preferred parents
 			    else
 			    {			// parents unknown
-				    $birth->set('b_fathername',
+				    $birth->set('fathername',
 					            $surname);
 			    }			// parents unknown
 			    $linkedName	= $indiv->getName(Person::NAME_INCLUDE_DATES);
@@ -545,17 +546,17 @@ $template->set('birthDate',		$birthdate);
 $template->set('idir',			$idir);
 $template->set('regCounty',		$regCounty);
 $template->set('countyName',	$countyObj->get('name'));
-$template->set('regTownship',	$birth->get('b_regtownship'));
+$template->set('regTownship',	$birth->get('regtownship'));
 $template->set('subject',	    rawurlencode($subject));
 
-$template->set('regDomain',		$birth->get('b_regdomain'));
-$template->set('regYear',		$birth->get('b_regyear'));
-$template->set('regNum',		$birth->get('b_regnum'));
-$template->set('regCounty',		$birth->get('b_regcounty'));
-$template->set('regTownship',	$birth->get('b_regtownship'));
-$template->set('msvol',		    $birth->get('b_msvol'));
+$template->set('regDomain',		$birth->get('regdomain'));
+$template->set('regYear',		$birth->get('regyear'));
+$template->set('regNum',		$birth->get('regnum'));
+$template->set('regCounty',		$birth->get('regcounty'));
+$template->set('regTownship',	$birth->get('regtownship'));
+$template->set('msvol',		    $birth->get('msvol'));
 $template->set('qsurname',		$surname);
-$template->set('surnameSoundex',$birth->get('b_surnamesoundex'));
+$template->set('surnameSoundex',$birth->get('surnamesoundex'));
 if ($sex == 'M')
 {
     $template->set('sexmaleselected',			"selected='selected'");
@@ -576,39 +577,39 @@ else
     $template->set('sexotherselected',			"selected='selected'");
 }
 
-$template->set('birthPlace',		$birth->get('b_birthplace'));
+$template->set('birthPlace',		$birth->get('birthplace'));
 $template->set('birthDate',			$birthdate);
-$template->set('calcbirth',			$birth->get('b_calcbirth'));
-$parentsMarried                     = $birth->get('b_parentsmarried');
+$template->set('calcbirth',			$birth->get('calcbirth'));
+$parentsMarried                     = $birth->get('parentsmarried');
 if ($parentsMarried == 'Y')
     $template->set('marriedChecked',"checked='checked'");
 else
     $template->set('marriedChecked',"");
-$template->set('fatherName',		$birth->get('b_fathername'));
-$template->set('fatherOccupation',	$birth->get('b_fatheroccupation'));
-$template->set('fatherOccPlace',	$birth->get('b_fatheroccplace'));
-$template->set('motherName',		$birth->get('b_mothername'));
-$template->set('motherOccupation',	$birth->get('b_motheroccupation'));
-$template->set('motherOccPlace',	$birth->get('b_motheroccplace'));
-$formerHusband	                	= $birth->get('b_formerhusband');
+$template->set('fatherName',		$birth->get('fathername'));
+$template->set('fatherOccupation',	$birth->get('fatheroccupation'));
+$template->set('fatherOccPlace',	$birth->get('fatheroccplace'));
+$template->set('motherName',		$birth->get('mothername'));
+$template->set('motherOccupation',	$birth->get('motheroccupation'));
+$template->set('motherOccPlace',	$birth->get('motheroccplace'));
+$formerHusband	                	= $birth->get('formerhusband');
 $template->set('formerHusband',		$formerHusband);
-$template->set('marriagePlace',		$birth->get('b_marriageplace'));
-$template->set('marriageDate',		$birth->get('b_marriagedate'));
-$template->set('accoucheur',		$birth->get('b_accoucheur'));
-$template->set('informant',			$birth->get('b_informant'));
-$template->set('informantRes',		$birth->get('b_informantres'));
-$template->set('informantRel',		$birth->get('b_informantrel'));
-$template->set('regDate',			$birth->get('b_regdate'));
-$template->set('registrar',			$birth->get('b_registrar'));
-$remarks			                = $birth->get('b_remarks');
+$template->set('marriagePlace',		$birth->get('marriageplace'));
+$template->set('marriageDate',		$birth->get('marriagedate'));
+$template->set('accoucheur',		$birth->get('accoucheur'));
+$template->set('informant',			$birth->get('informant'));
+$template->set('informantRes',		$birth->get('informantres'));
+$template->set('informantRel',		$birth->get('informantrel'));
+$template->set('regDate',			$birth->get('regdate'));
+$template->set('registrar',			$birth->get('registrar'));
+$remarks			                = $birth->get('remarks');
 $template->set('remarks',			$remarks);
-$image			                    = $birth->get('b_image');
+$image			                    = $birth->get('image');
 $template->set('image',			    $image);
-$template->set('originalVolume',	$birth->get('b_originalvolume'));
-$template->set('originalPage',		$birth->get('b_originalpage'));
-$template->set('originalItem',		$birth->get('b_originalitem'));
-$template->set('changedBy',			$birth->get('b_changedby'));
-$template->set('changeDate',		$birth->get('b_changedate'));
+$template->set('originalVolume',	$birth->get('originalvolume'));
+$template->set('originalPage',		$birth->get('originalpage'));
+$template->set('originalItem',		$birth->get('originalitem'));
+$template->set('changedBy',			$birth->get('changedby'));
+$template->set('changeDate',		$birth->get('changedate'));
 
 if (!canUser('all'))
 {		// master user

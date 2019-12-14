@@ -62,114 +62,183 @@
               <th class="colhead">
                 Name
               </th>
-    <th class="colhead">
-      Lines
-    </th>
-    <th class="colhead">
-      Collective
-    </th>
-    <th class="colhead">
-      Part<br>of
-    </th>
-    <th class="colhead">
-    Provinces
-    </th>
-    <th class="colhead">
-    Group<br>Lines
-    </th>
-    <th class="colhead">
-    Last<br>Underlined
-    </th>
-    <th class="colhead">
-    Source<br>ID
-    </th>
-    <th class="colhead">
-    Delete
-    </th>
-    <th class="colhead">
-    Districts
-    </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr id="Row$line">
-    <td class="right">
-      <input type="text" name="CensusId$line"
-        id="CensusId$line"
-        value="$censusId" 
-        class="white left" style="font-weight: bold; text-transform: uppercase;"
-        size="6">
-    </td>
-    <td class="left">
-      <input type="text" name="Name$line"
-        id="Name$line" 
-        value="$name"  
-        class="white left" size="24" maxlength="48">
-    </td>
-    <td class="left">
-      <input type="text" name="LinesPerPage$line"
-        id="LinesPerPage$line" 
-        value="$linesperpage"  
-        class="white rightnc" size="2" maxlength="3">
-    </td>
-    <td class="center">
-      <input type="text" name="Collective$line"
-        id="Collective$line" 
-        value="$collective"  
-        class="white center" size="1" maxlength="1">
-    </td>
-    <td class="left">
-      <input type="text" name="PartOf$line"
-        id="PartOf$line" 
-        value="$partof"  
-        class="white left" size="2" maxlength="2">
-    </td>
-    <td class="left">
-      <input type="text" name="Provinces$line"
-        id="Provinces$line" 
-        value="$provinces"  
-        class="white left" size="40" maxlength="254">
-    </td>
-    <td class="left">
-      <input type="text" name="GroupLines$line"
-        id="GroupLines$line" 
-        value="$grouplines"  
-        class="white rightnc" size="2" maxlength="3">
-    </td>
-    <td class="left">
-      <input type="text" name="LastUnderline$line"
-        id="LastUnderline$line" 
-        value="$lastunderline"  
-        class="white rightnc" size="2" maxlength="3">
-    </td>
-    <td class="left">
-      <input type="text" name="IDSR$line"
-        id="IDSR$line" 
-        value="$idsr"  
-        class="white rightnc" size="2" maxlength="3">
-    </td>
-    <td class="center">
-      <button type="button" id="Delete$line" 
-        class="button">
-      Delete
-      </button>
-    </td>
-    <td class="button">
-      <a id="ShowDists$line" 
-        href="/database/DistForm.php?Census=$censusId&amp;lang=$LANG">
-        Districts
-      </a> 
-    </td>
-      </tr>
-    </tbody>
-  </table>
-    <p>
-      <input type="hidden" name="CensusId99" id="CensusId99" value="">
-      <button type="submit" id="Submit">Update Database</button>
-      <button type="button" id="Add">Add Census</button>
-    </p>
-  </form>
-  </div> <!-- end of <div id="body"> -->
+		      <th class="colhead">
+		        Lines
+		      </th>
+		      <th class="colhead">
+		        Collective
+		      </th>
+		      <th class="colhead">
+		        Part<br>of
+		      </th>
+		      <th class="colhead">
+		        Provinces
+		      </th>
+		      <th class="colhead">
+		        Group<br>Lines
+		      </th>
+		      <th class="colhead">
+		        Last<br>Underlined
+		      </th>
+		      <th class="colhead">
+		        Source<br>ID
+		      </th>
+		      <th class="colhead">
+		        Delete
+		      </th>
+		      <th class="colhead">
+		        Districts
+		      </th>
+	        </tr>
+	      </thead>
+	      <tbody>
+	        <tr id="Row$line">
+		      <td class="right">
+		        <input type="text" name="CensusId$line"
+		          id="CensusId$line"
+		          value="$censusId" 
+		          class="white left" style="font-weight: bold; text-transform: uppercase;"
+		          size="6">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="Name$line"
+		          id="Name$line" 
+		          value="$name"  
+		          class="white leftnc" size="24" maxlength="48">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="LinesPerPage$line"
+		          id="LinesPerPage$line" 
+		          value="$linesperpage"  
+		          class="white rightnc" size="2" maxlength="3">
+		      </td>
+		      <td class="center">
+		        <input type="text" name="Collective$line"
+		          id="Collective$line" 
+		          value="$collective"  
+		          class="white center" size="1" maxlength="1">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="PartOf$line"
+		          id="PartOf$line" 
+		          value="$partof"  
+		          class="white left" size="2" maxlength="2">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="Provinces$line"
+		          id="Provinces$line" 
+		          value="$provinces"  
+		          class="white left" size="40" maxlength="254">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="GroupLines$line"
+		          id="GroupLines$line" 
+		          value="$grouplines"  
+		          class="white rightnc" size="2" maxlength="3">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="LastUnderline$line"
+		          id="LastUnderline$line" 
+		          value="$lastunderline"  
+		          class="white rightnc" size="2" maxlength="3">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="IDSR$line"
+		          id="IDSR$line" 
+		          value="$idsr"  
+		          class="white rightnc" size="2" maxlength="3">
+		      </td>
+		      <td class="center">
+		        <button type="button" id="Delete$line" 
+		          class="button">
+		        Delete
+		        </button>
+		      </td>
+		      <td class="button">
+		        <a id="ShowDists$line" 
+		          href="/database/DistForm.php?Census=$censusId&amp;lang=$LANG">
+		          Districts
+		        </a> 
+		      </td>
+	        </tr>
+	      </tbody>
+	    </table>
+        <p>
+          <input type="hidden" name="CensusId99" id="CensusId99" value="">
+          <button type="submit" id="Submit">Update Database</button>
+          <button type="button" id="Add">Add Census</button>
+        </p>
+      </form>
+    </div> <!-- end of <div id="body"> -->
+    <div class="hidden">
+        <table>
+          <tbody>
+	        <tr id="newRow">
+		      <td class="right">
+		        <input type="text" name="CensusId$line"
+		          id="CensusId$line"
+		          value="" 
+		          class="white left" style="font-weight: bold; text-transform: uppercase;"
+		          size="6">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="Name$line"
+		          id="Name$line" 
+		          value=""  
+		          class="white left" size="24" maxlength="48">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="LinesPerPage$line"
+		          id="LinesPerPage$line" 
+		          value="50"  
+		          class="white rightnc" size="2" maxlength="3">
+		      </td>
+		      <td class="center">
+		        <input type="text" name="Collective$line"
+		          id="Collective$line" 
+		          value=""  
+		          class="white center" size="1" maxlength="1">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="PartOf$line"
+		          id="PartOf$line" 
+		          value=""  
+		          class="white left" size="2" maxlength="2">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="Provinces$line"
+		          id="Provinces$line" 
+		          value=""  
+		          class="white left" size="40" maxlength="254">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="GroupLines$line"
+		          id="GroupLines$line" 
+		          value="5"  
+		          class="white rightnc" size="2" maxlength="3">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="LastUnderline$line"
+		          id="LastUnderline$line" 
+		          value=""  
+		          class="white rightnc" size="2" maxlength="3">
+		      </td>
+		      <td class="left">
+		        <input type="text" name="IDSR$line"
+		          id="IDSR$line" 
+		          value="1"  
+		          class="white rightnc" size="2" maxlength="3">
+		      </td>
+		      <td class="center">
+		        &nbsp;
+		      </td>
+		      <td class="center">
+		        &nbsp;
+		      </td>
+	        </tr>
+          </tbody>
+        </table>
+    </div> <!-- end of <div class="hidden"> -->
     <div class="balloon" id="HelpCensusId">
       The census identifier.  
       This is normally the 2-character domain identifier followed by the 4 digit

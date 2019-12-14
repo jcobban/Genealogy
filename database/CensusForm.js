@@ -198,6 +198,7 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/05/24      prevent non-numeric input into numeric fields   *
+ *		2019/12/07      do not ripple down invalid values               *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -633,13 +634,14 @@ function changeReplDown()
 		    this.value	= this.defaultValue + 1;
     }				// get next incremental value
 
-    // replicate the value into subsequent rows
-    if (this.value.length > 0)
-		replDown(this);
-
     // validate the contents of the field
     if (this.checkfunc)
 		this.checkfunc();
+
+    // replicate the value into subsequent rows
+    var errpos		            = this.className.indexOf('error');
+    if (errpos == -1 && this.value.length > 0)
+		replDown(this);
 }		// function changeReplDown
 
 /************************************************************************
@@ -816,13 +818,13 @@ function changeResType()
 }		// function changeResType
 
 /************************************************************************
- *  function changeOwnerTenant												*
+ *  function changeOwnerTenant											*
  *																		*
- *  Take action when the user changes the residence type field.				*
+ *  Take action when the user changes the residence type field.			*
  *  This is the onchange member function of the element.				*
  *																		*
  *  Input:																*
- *		this		an <input type='text'> element								*
+ *		this		an <input type='text'> element						*
  ************************************************************************/
 function changeOwnerTenant()
 {
@@ -876,12 +878,12 @@ function changeOwnerTenant()
 /************************************************************************
  *  function changeSurname												*
  *																		*
- *  Take action when the user changes a field whose value is				*
- *  replicated into subsequent fields in the same column whose				*
+ *  Take action when the user changes a field whose value is			*
+ *  replicated into subsequent fields in the same column whose			*
  *  value has not yet been explicitly set.								*
  *																		*
  *  Input:																*
- *		this		an <input type='text'> element								*
+ *		this		an <input type='text'> element						*
  ************************************************************************/
 function changeSurname()
 {
@@ -911,19 +913,22 @@ function changeSurname()
 		    }		// cell exists in this row
 		}	// for each column name to blank
     }		// surname blanked out
-    replDown(this);
 
     this.checkfunc();
+
+    var errpos		            = this.className.indexOf('error');
+    if (errpos == -1 && this.value.length > 0)
+        replDown(this);
 }		// function changeSurname
 
 /************************************************************************
- *  function changeOccupation												*
+ *  function changeOccupation											*
  *																		*
  *  Take action when the user changes the Occupation field.				*
  *  This is the onchange member function of the element.				*
  *																		*
  *  Input:																*
- *		this		an <input type='text'> element								*
+ *		this		an <input type='text'> element						*
  ************************************************************************/
 function changeOccupation()
 {
@@ -970,7 +975,7 @@ function changeOccupation()
  *  This is the onchange member function of the element.				*
  *																		*
  *  Input:																*
- *		this		an <input type='text'> element								*
+ *		this		an <input type='text'> element						*
  ************************************************************************/
 function changeEmpType()
 {
@@ -989,14 +994,14 @@ function changeEmpType()
 }		// function changeEmpType
 
 /************************************************************************
- *  function changeGenderFlag												*
+ *  function changeGenderFlag											*
  *																		*
  *  Take action when the user changes the value of a flag column		*
- *  that displays a gender indicator.										*
+ *  that displays a gender indicator.									*
  *  This is the onchange member function of the element.				*
  *																		*
  *  Input:																*
- *		this		an <input type='text'> element								*
+ *		this		an <input type='text'> element						*
  ************************************************************************/
 function changeGenderFlag()
 {
@@ -1017,13 +1022,13 @@ function changeGenderFlag()
 }		// function changeGenderFlag
 
 /************************************************************************
- *  function changeSchoolMons												*
+ *  function changeSchoolMons											*
  *																		*
  *  Take action when the user changes the SchoolMons field.				*
  *  This is the onchange member function of the element.				*
  *																		*
  *  Input:																*
- *		this		an <input type='text'> element								*
+ *		this		an <input type='text'> element						*
  ************************************************************************/
 function changeSchoolMons()
 {
@@ -1045,12 +1050,12 @@ function changeSchoolMons()
 }		// function changeSchoolMons
 
 /************************************************************************
- *  function changeFlag														*
+ *  function changeFlag													*
  *																		*
- *  Take action when the user changes a field that is a yes/no flag.		*
+ *  Take action when the user changes a field that is a yes/no flag.	*
  *																		*
  *  Input:																*
- *		this				an instance of an HTML input element. 				*
+ *		this			<input type="text"> 		                    *
  ************************************************************************/
 function changeFlag()
 {
@@ -1074,10 +1079,10 @@ function changeFlag()
  *  function changeFlagRace												*
  *																		*
  *  Take action when the user changes a field that is a yes/no flag		*
- *  or a race indicator.
+ *  or a race indicator                                                 *
  *																		*
  *  Input:																*
- *		this				an instance of an HTML input element. 				*
+ *		this			<input type="text"> 		                    *
  ************************************************************************/
 function changeFlagRace()
 {
@@ -1095,27 +1100,30 @@ function changeFlagRace()
 }		// function changeFlagRace
 
 /************************************************************************
- *  function replDown														*
+ *  function replDown													*
  *																		*
- *  Replicate the value of the current element into 						*
+ *  Replicate the value of the current element into 					*
  *  subsequent elements in the current column whose						*
  *  value has not yet been explicitly set.								*
  *																		*
  *  Input:																*
- *		curr		current field in the spreadsheet						*
+ *		curr		current field in the spreadsheet					*
  ************************************************************************/
 function replDown(curr)
 {
+    if (curr.className.indexOf('error') >= 0)
+        return;             // do not replicate invalid values
+
     // change the presentation of the current field
     if (curr.className.substr(0,3) == "dft")
-    {	// value has been modified
+    {	                    // value has been modified
 		curr.className = "black white " + curr.className.substr(3);
-    }	// value has been modified
+    }	                    // value has been modified
     else
     if (curr.className.substr(0,5) == 'same ')
-    {	// value has been modified
+    {	                    // value has been modified
 		curr.className = "black white " + curr.className.substr(5);
-    }	// value has been modified
+    }	                    // value has been modified
 
     // update the presented values of curr field in subsequent rows
     var	cell		= curr.parentNode;
@@ -1149,12 +1157,12 @@ function replDown(curr)
 						column + "] is undefined");
 		if (field.className.substr(0,4) == 'same' || 
 		    field.className.substr(0,3) == 'dft')
-		{	// alter value to match modified field
+		{	                // alter value to match modified field
 		    field.value	= curr.value;
 		    if (field.checkfunc)
 				field.checkfunc();
 		    if (blankrow)
-		    {		// blank out other cells
+		    {		        // blank out other cells
 				for (var i = 0; i < row.cells.length; i++)
 				{
 				    var cell	= row.cells[i];
@@ -1169,25 +1177,25 @@ function replDown(curr)
 						if (fld && fld.value)
 						    fld.value	= "";
 				    }		// cell exists in this row
-				}	// for each column name to blank
-		    }		// blank out other cells
-		}	// alter value to match modified fld
+				}	        // for each column name to blank
+		    }		        // blank out other cells
+		}	                // alter value to match modified fld
 		else
-		    break;	// stop replicating value on first explicit cell
-    }		// loop to end of page
+		    break;	        // stop replicating value on first explicit cell
+    }		                // loop to end of page
 
 }		// function changeReplDown
 
 /************************************************************************
  *  function changeFBPlace												*
  *																		*
- *  Take action when the user changes the value of the						*
+ *  Take action when the user changes the value of the					*
  *  Father's birth place field in the 1891 census.  If the Mother's		*
- *  birth place has not been explicitly set, change its default value		*
- *  to the Father's birthplace.												*
+ *  birth place has not been explicitly set, change its default value	*
+ *  to the Father's birthplace.											*
  *																		*
  *  Input:																*
- *		this		an <input type='text'> element								*
+ *		this		an <input type='text'> element						*
  ************************************************************************/
 function changeFBPlace()
 {
@@ -1213,11 +1221,11 @@ function changeFBPlace()
 /************************************************************************
  *  function changeBPlace												*
  *																		*
- *  Take action when the user changes the value of the						*
+ *  Take action when the user changes the value of the					*
  *  birth place.														*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a birth place		*
+ *		this		<input type='text'>		                            *
  ************************************************************************/
 function changeBPlace()
 {
@@ -1283,11 +1291,11 @@ function changeBPlace()
 /************************************************************************
  *  function changeMBPlace												*
  *																		*
- *  Take action when the user changes the value of the						*
+ *  Take action when the user changes the value of the					*
  *  Mother's birth place.												*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a birth place		*
+ *		this		<input type='text'>		                            *
  ************************************************************************/
 function changeMBPlace()
 {
@@ -1313,11 +1321,11 @@ function changeMBPlace()
 /************************************************************************
  *  function changeEmployee												*
  *																		*
- *  Take action when the user changes the value of the						*
+ *  Take action when the user changes the value of the					*
  *  Employee field.														*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a birth place		*
+ *		this		<input type='text'>		                            *
  ************************************************************************/
 function changeEmployee()
 {
@@ -1341,11 +1349,11 @@ function changeEmployee()
 /************************************************************************
  *  function changeEmployer												*
  *																		*
- *  Take action when the user changes the value of the						*
+ *  Take action when the user changes the value of the					*
  *  OwnAcct field.														*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a flag				*
+ *		this		<input type='text'> element containing a flag		*
  ************************************************************************/
 function changeEmployer()
 {
@@ -1377,13 +1385,13 @@ function changeEmployer()
 }		// function changeEmployer
 
 /************************************************************************
- *  function changeSelfEmployed												*
+ *  function changeSelfEmployed											*
  *																		*
- *  Take action when the user changes the value of the						*
+ *  Take action when the user changes the value of the					*
  *  OwnAcct field.														*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a flag				*
+ *		this		<input type='text'> element containing a flag		*
  ************************************************************************/
 function changeSelfEmployed()
 {
@@ -1408,11 +1416,11 @@ function changeSelfEmployed()
 /************************************************************************
  *  function changeImmYear												*
  *																		*
- *  Take action when the user changes the value of the						*
+ *  Take action when the user changes the value of the					*
  *  year of immigration.												*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a birth place		*
+ *		this		<input type='text'>		                            *
  ************************************************************************/
 function changeImmYear()
 {
@@ -1443,13 +1451,13 @@ function changeImmYear()
 }		// function changeImmYear
 
 /************************************************************************
- *  function changeBYear														*
+ *  function changeBYear												*
  *																		*
- *  Take action when the user changes the value of an						*
- *  explicit birth year field.												*
+ *  Take action when the user changes the value of an					*
+ *  explicit birth year field.											*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a birth year		*
+ *		this		<input type='text'> element containing a birth year	*
  ************************************************************************/
 function changeBYear()
 {
@@ -1543,14 +1551,14 @@ function changeBYear()
 }		// function changeBYear
 
 /************************************************************************
- *  function changeAge														*
+ *  function changeAge													*
  *																		*
- *  Take action when the user changes the value of an						*
- *  age field.  Expand abbreviations and set default value for				*
- *  birth year and birth date fields.										*
+ *  Take action when the user changes the value of an					*
+ *  age field.  Expand abbreviations and set default value for			*
+ *  birth year and birth date fields.									*
  *																		*
  *  Input:																*
- *		this		instance of <input type='text' name='Age...'>				*
+ *		this		instance of <input type='text' name='Age...'>		*
  ************************************************************************/
 function changeAge()
 {
@@ -1648,10 +1656,10 @@ function changeAge()
  *																		*
  *  Take action when the user changes a field whose value				*
  *  may be a default.  If it is, change the presentation of				*
- *  the field.																*
+ *  the field.															*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a birth place		*
+ *		this		<input type='text'>		                            *
  ************************************************************************/
 function changeDefault()
 {
@@ -1680,7 +1688,7 @@ function changeDefault()
  *  Get an object compatible with the W3C Range interface.				*
  *																		*
  *  Input:																*
- *		selectionObject		a Selection or TextRange object						*
+ *		selectionObject		a Selection or TextRange object				*
  ************************************************************************/
 function getRangeObject(selectionObject)
 {
@@ -1696,13 +1704,13 @@ function getRangeObject(selectionObject)
 }
 
 /************************************************************************
- *  function checkRange														*
+ *  function checkRange													*
  *																		*
- *  On a keystroke check the selected range of the document.				*
- *  Under construction.														*
+ *  On a keystroke check the selected range of the document.			*
+ *  Under construction.													*
  *																		*
  *  Input:																*
- *		fNode		the node which currently has the focus						*
+ *		fNode		the node which currently has the focus				*
  ************************************************************************/
 function checkRange(fNode)
 {
@@ -1739,15 +1747,15 @@ function checkRange(fNode)
 }		// function checkRange
 
 /************************************************************************
- *  function checkBYear														*
+ *  function checkBYear													*
  *																		*
  *  Validate the current value of a field containing a birth year.		*
  *  Should be 4 digit numeric year, possibly enclosed in editorial		*
- *  square brackets, a question mark, or [blank] and not out of range		*
- *  of the age column.														*
+ *  square brackets, a question mark, or [blank] and not out of range	*
+ *  of the age column.													*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a birth year		*
+ *		this		<input type='text'> element containing a birth year	*
  ************************************************************************/
 function checkBYear()
 {
@@ -1792,7 +1800,7 @@ function checkBYear()
  *  a naturalized indicator, or [blank].								*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a naturalization		*
+ *		this		<input type='text'> 	                            *
  ************************************************************************/
 function checkNatYear()
 {
@@ -1805,10 +1813,10 @@ function checkNatYear()
 /************************************************************************
  *  function checkRelation												*
  *																		*
- *  Validate the value of the relation column against the sex column.		*
+ *  Validate the value of the relation column against the sex column.	*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing a relationship		*
+ *		this		<input type='text'> 		                        *
  ************************************************************************/
 function checkRelation()
 {
@@ -1827,13 +1835,12 @@ function checkRelation()
 }		// function checkRelation
 
 /************************************************************************
- *  function checkOwnerTenant												*
+ *  function checkOwnerTenant											*
  *																		*
  *  Validate the current value of a field containing a sex.				*
  *																		*
  *  Input:																*
- *		this		<input type='text'> element containing an owner/tenant		*
- *				indicator.												*
+ *		this		<input type='text'>                                 *
  ************************************************************************/
 function checkOwnerTenant()
 {
@@ -1846,11 +1853,11 @@ function checkOwnerTenant()
 /************************************************************************
  *  function checkDecimal												*
  *																		*
- *  Validate the current value of a field containing a number				*
+ *  Validate the current value of a field containing a number			*
  *  with a possible decimal point.										*
  *																		*
  *  Input:																*
- *		this				an instance of an HTML input element. 				*
+ *		this			an instance of an HTML input element. 			*
  ************************************************************************/
 function checkDecimal()
 {
@@ -2632,7 +2639,7 @@ function reset(event)
 }		// function reset
 
 /************************************************************************
- *  function gotPrevLine													*
+ *  function gotPrevLine												*
  *																		*
  *  Take action when the last line of the previous page is retrieved	*
  *  from the server.													*

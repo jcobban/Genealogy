@@ -722,22 +722,22 @@ if (strlen($msg) == 0)
 
 	// check for Birth registration records to update
 	$birthSet	= new RecordSet('Births',
-							array('b_idir'	=> $idir2));
-	$result		= $birthSet->update(array('b_idir'	=> $idir1));
+							array('idir'	=> $idir2));
+	$result		= $birthSet->update(array('idir'	=> $idir1));
 	if ($result == 0)
         $template['birthRegUpdated']->update(null);
 
 	// check for Death registration records to update
 	$deathSet	= new RecordSet('Deaths',
-							array('d_idir'	=> $idir2));
-	$result		= $deathSet->update(array('d_idir'	=> $idir1));
+							array('idir'	=> $idir2));
+	$result		= $deathSet->update(array('idir'	=> $idir1));
 	if ($result == 0)
         $template['deathRegUpdated']->update(null);
 
 	// check for Marriage registration records to update
 	$marrSet	= new RecordSet('MarriageIndi',
-							array('m_idir'	=> $idir2));
-	$result		= $marrSet->update(array('m_idir'	=> $idir1));
+							array('idir'	=> $idir2));
+	$result		= $marrSet->update(array('idir'	=> $idir1));
 	if ($result == 0)
         $template['marrRegUpdated']->update(null);
 

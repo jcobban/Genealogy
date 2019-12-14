@@ -59,6 +59,10 @@ use \Iterator;
  *		                Language to the constructor                     *
  *		2019/04/18      support method getLastSqlCmd                    *
  *		2019/05/18      add $info                                       *
+ *		2019/12/05      used country code to get language               *
+ *		                add methods getLanguage and getCountry          *
+ *		                fix errors in constructor                       *
+ *		                fix get('article') and get('possessive')        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -111,7 +115,7 @@ class CountryName extends Record
                 'name'      		=> 'CountryNames',
                 'prime'	    		=> array('code3166_1', 'code639_1'),
 	            'srvmg'     		=> false,
-	            'fldcount'			=> 6,
+	            'fldcount'			=> 5,
                 'order'     		=> 'Name',
                 'classname' 		=> 'CountryName');
 
@@ -157,9 +161,27 @@ class CountryName extends Record
 		global $warn;
 		global $connection;
 
-		if ($debug)
-		    $warn	.= "<p>CountryName::__construct__(" .
-						   print_r($parms, true) . "</p>\n";
+        if ($debug)
+        {
+            $parmsText      = '[';
+            $comma          = '';
+            foreach($parms as $key => $value)
+            {
+                $parmsText  .= "$comma'$key'=";
+                if (is_numeric($value))
+                    $parmsText  .= $value;
+                else
+                if (is_string($value))
+                    $parmsText  .= "'$value'";
+                else
+                if (is_object($value))
+                    $parmsText  .= get_class($value);
+                else
+                    $parmsText  .= print_r($value, true);
+                $comma          = ',';
+            }
+		    $warn	.= "<p>CountryName::__construct__($parmsText])</p>\n";
+        }
 		if (is_null($connection))
 		{
 		    throw new Exception('CountryName::constructor: " .
@@ -170,20 +192,20 @@ class CountryName extends Record
 
 		// validate parameters
 		if (is_array($parms))
-		{			// valid parm type
+		{			            // valid parm type
 		    if (count($parms) < count(self::$initRow))
-		    {			// search parameters
-				$code		= 'not supplied';
-				$where		= '';
-				$and		= 'WHERE ';
-				$cc		    = 'CA';
-				$lang		= 'en';
-				$sqlParms	= array();
+		    {			        // search parameters
+				$code					= 'not supplied';
+				$where					= '';
+				$and					= 'WHERE ';
+				$cc		    			= 'CA';
+				$lang					= 'en';
+				$sqlParms				= array();
 				foreach($parms as $key => $value)
-				{			// loop through parameters
-				    $fieldLc		= strtolower($key);
+				{			    // loop through parameters
+				    $fieldLc		    = strtolower($key);
 				    if (array_key_exists($fieldLc, self::$translate))
-						$fieldLc	= self::$translate[$fieldLc];
+						$fieldLc	    = self::$translate[$fieldLc];
 				    switch($fieldLc)
 				    {			// act on key fields
 						case 'code3166_1':
@@ -196,7 +218,7 @@ class CountryName extends Record
                             else
 						        $cc			        = $value;
 						    $where		            .= "$and$fieldLc=:$fieldLc";
-						    $sqlParms[$fieldLc]	    = $value;
+						    $sqlParms[$fieldLc]	    = $cc;
 						    $and		            = ' AND ';
 						    break;
 						}		// country code
@@ -206,18 +228,18 @@ class CountryName extends Record
                             if ($value instanceof Language)
                             {
                                 $this->language     = $value;
-                                $land               = $value['code'];
+                                $lang               = $value['code'];
                             }
                             else
 						        $lang		        = $value;
 						    $where		            .= "$and$fieldLc=:$fieldLc";
-						    $sqlParms[$fieldLc]	    = $value;
+						    $sqlParms[$fieldLc]	    = $lang;
 						    $and		            = ' AND ';
 						    break;
 						}		// language identifier
 
 				    }			// act on key fields
-				}			// loop through parameters
+				}			    // loop through parameters
 
 				// query the database
 				$query		        = "SELECT * FROM CountryNames $where";
@@ -232,13 +254,13 @@ class CountryName extends Record
 
 				    $result	        = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				    if (count($result) == 1)
-				    {		// existing record
+				    {		    // existing record
 						$dbrow		            = $result[0];
 						$needInsert	            = false;
-				    }		// existing record
+				    }		    // existing record
 				    else
 				    if (count($result) == 0)
-				    {		// create a new record
+				    {		    // create a new record
 						// set defaults
 						$dbrow			        = self::$initRow;
 						$dbrow['code3166_1']	= $cc;
@@ -250,35 +272,38 @@ class CountryName extends Record
 						    $dbrow['article']	= $this->language->get('article');
                             $dbrow['possessive']= $this->language->get('possessive');
                         }
-						$needInsert		= true;
-				    }		// create new record
+						$needInsert		        = true;
+				    }		    // create new record
 				    else
-				    {		// error performing query
+				    {		    // error performing query
 						$this->msg  .= "CountryName::__construct: '$queryText' " .
 							"returns " . count($result) . " records";
-						$dbrow	    = self::$initRow;
-				    }		// error performing query
-				}		// success
+						$dbrow	                = self::$initRow;
+				    }		    // error performing query
+				}		        // success
 				else
-				{		// error performing query
-				    $this->msg      .= "CountryName::__construct: '$queryText' " .
-								print_r($stmt->errorInfo(),true);
-					$dbrow		    = self::$initRow;
-				}		// error performing query
-		    }			// search parameters
+				{		        // error performing query
+                    $this->msg      .= "CountryName::__construct: " .
+                                        "'$queryText' " .
+								        print_r($stmt->errorInfo(),true);
+					$dbrow		                = self::$initRow;
+					$dbrow['code3166_1']	    = $cc;
+                    $dbrow['code639_1']	        = $lang;
+				}		        // error performing query
+		    }			        // search parameters
 		    else
-		    {			// build from existing record
+		    {			        // build from existing record
 				$dbrow		        = $parms;
 				$needInsert	        = false;
-		    }			// build from existing record
-		}			// array parameter
+		    }			        // build from existing record
+		}			            // array parameter
 		else
-		{			// unsupported parameter type
+		{			            // unsupported parameter type
 		    $this->msg              .= "CountryName::__construct: " .
-						"parameter must be an array: is " .
-						gettype($parms);
+			                			"parameter must be an array: is " .
+		                				gettype($parms);
 			$dbrow			        = self::$initRow;
-		}			// unsupported parameter type
+		}			            // unsupported parameter type
 
 
 		// invoke constructor of base class
@@ -289,6 +314,42 @@ class CountryName extends Record
 		// diagnostic output if debug is set
 		$this->dump('CountryName Record constructed:');
     }		// CountryName::__construct
+
+    /********************************************************************
+     *	function CountryName::getCountry    							*
+     *																	*
+     *	Get the instance of Country associated with this CountryName    *
+     *																	*
+     *	Returns:														*
+     *	    an instance of class Country                                *
+     ********************************************************************/
+    function getCountry()
+    {
+        if (is_null($this->country))
+        {
+            $cc             = $this->row['code3166_1'];
+            $this->country  = new Country(array('code' => $cc));
+        }
+        return $this->country;
+    }		// CountryName::getCountry
+
+    /********************************************************************
+     *	function CountryName::getLanguage								*
+     *																	*
+     *	Get the instance of Language associated with this CountryName   *
+     *																	*
+     *	Returns:														*
+     *	    an instance of class Language                               *
+     ********************************************************************/
+    function getLanguage()
+    {
+        if (is_null($this->language))
+        {
+            $ll             = $this->row['code639_1'];
+            $this->language = new Language(array('code' => $ll));
+        }
+        return $this->language;
+    }		// CountryName::getLanguage
 
     /********************************************************************
      *	function CountryName::get										*
@@ -320,15 +381,10 @@ class CountryName extends Record
 			case 'article':
             case 'possessive':
             {
-                if ($this->row[$fieldLc] == '')
+                if ($this->needInsert && $this->row[$fieldLc] == '')
                 {
-                    if (is_null($this->language))
-                    {
-                        $ll             = $this->row['code3166_1'];
-                        $this->language = new Language(array('code' => $ll));
-                    }
-					$this->row['article']	= $this->language->get('article');
-                    $this->row['possessive']= $this->language->get('possessive');
+                    $language               = $this->getLanguage();
+					$this->row[$fieldLc]	= $language->get($fieldLc);
                 }
                 return $this->row[$fieldLc];
             }
@@ -354,12 +410,8 @@ class CountryName extends Record
     {
         if ($this->row['name'] == '')
         {
-            if (is_null($this->country))
-            {
-                $cc                 = $this->row['code3166_1'];
-                $this->country      = new Country(array('cc'    => $cc));
-            }
-            $this->row['name'] = $this->country->getName();
+            $country            = $this->getCountry();
+            $this->row['name']  = $country->getName();
         }
 		return $this->row['name'];
     }		// CountryName::getName

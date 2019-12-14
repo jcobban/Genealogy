@@ -296,7 +296,8 @@ class CensusLineSet extends RecordSet
 		    {		// loop through given names
 				if (mb_strlen($name) > 0)
 				{		// find name starting with prefix
-				    if (preg_match('/[\^.$*+?[\]]/', $name) == 1)
+                    if (strlen($name) > 2 &&
+                        preg_match('/[\^.$*+?[\]]/', $name) == 1)
 				    {		// regular expression
 						if (mb_substr($name, 0, 1) == '^')
 						    $name	= "[[:<:]]" . mb_substr($name, 1);

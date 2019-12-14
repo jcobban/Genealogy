@@ -41,6 +41,7 @@ use \Exception;
  *		2019/06/23      add column currhigh which excludes delayed      *
  *		2019/07/13      reduce invalid county code message to warning   *
  *		                so it can be corrected                          *
+ *		2019/12/13      remove D_ prefix from field names               *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -194,31 +195,31 @@ if (strlen($msg) == 0)
 	// execute the query
     if (is_null($county))
     {
-	    $query	= "SELECT D_RegCounty AS County, " .
-							"SUM(D_Surname != '') AS SurnameCount,  " .
-							"SUM(D_Idir != 0) AS LinkCount, " .
-							"MIN(D_RegNum) as low, " .
-							"MAX(D_RegNum) as high  " .
+	    $query	= "SELECT RegCounty AS County, " .
+							"SUM(Surname != '') AS SurnameCount,  " .
+							"SUM(Idir != 0) AS LinkCount, " .
+							"MIN(RegNum) as low, " .
+							"MAX(RegNum) as high  " .
 						"FROM Deaths " .
-						"WHERE D_RegDomain=:domain AND D_RegYear=:regyear " .
-						"GROUP BY D_RegCounty " .
-                        "ORDER BY D_RegCounty";
+						"WHERE RegDomain=:domain AND RegYear=:regyear " .
+						"GROUP BY RegCounty " .
+                        "ORDER BY RegCounty";
         $sqlParms       = array('domain'        => $domain,
                                 'regyear'       => $regYear);
     }
     else
     {
-	    $query	= "SELECT D_RegCounty AS County, D_RegTownship AS Township, " .
-							"SUM(D_Surname != '') AS SurnameCount,  " .
-							"SUM(D_Idir != 0) AS LinkCount, " .
-							"MIN(D_RegNum) as low, " .
-							"MAX(D_RegNum) as high,  " .
-                            '(SELECT MAX(D_RegNum) FROM Deaths  WHERE D_regyear=:regyear and D_regcounty=:county AND D_regtownship=Township AND D_RegNum<500000) AS `currhigh` ' .
+	    $query	= "SELECT RegCounty AS County, RegTownship AS Township, " .
+							"SUM(Surname != '') AS SurnameCount,  " .
+							"SUM(Idir != 0) AS LinkCount, " .
+							"MIN(RegNum) as low, " .
+							"MAX(RegNum) as high,  " .
+                            '(SELECT MAX(RegNum) FROM Deaths  WHERE regyear=:regyear and regcounty=:county AND regtownship=Township AND RegNum<500000) AS `currhigh` ' .
 						"FROM Deaths " .
-						"WHERE D_RegDomain=:domain AND D_RegYear=:regyear " .
-							"AND D_RegCounty=:county " .
-						"GROUP BY D_RegCounty, D_RegTownship " .
-                        "ORDER BY D_RegCounty, D_RegTownship";
+						"WHERE RegDomain=:domain AND RegYear=:regyear " .
+							"AND RegCounty=:county " .
+						"GROUP BY RegCounty, RegTownship " .
+                        "ORDER BY RegCounty, RegTownship";
         $sqlParms       = array('domain'        => $domain,
                                 'regyear'       => $regYear,
                                 'county'        => $countyCode);
