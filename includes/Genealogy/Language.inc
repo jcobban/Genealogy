@@ -29,6 +29,7 @@ use \Iterator;
  *		2017/12/18		add support for temporary fields				*
  *		2018/10/13      add support for language specific `Sorry`       *
  *		2019/07/17      add support for country-qualified languages     *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -127,7 +128,7 @@ class Language extends Record
 		if ($debug)
 		{
 		    $warn	        .= '<p>Language::__construct(' .
-				        		print_r($parms, true) . ")</p>\n";
+                print_r($parms, true) . ")</p>\n";
 		}
 
 		if (is_null($connection))
@@ -311,7 +312,7 @@ class Language extends Record
 				$count		= count($result);
 				if ($xml)
 				    print "<$tagname result='$count'>" .
-							xmlentities($insertText) . 
+							htmlentities($insertText,ENT_XML1) . 
 						  "</$tagname>\n";
 				if ($debug)
 				{
@@ -368,7 +369,7 @@ class Language extends Record
 				    $count		= $stmt->rowCount();
 				    if ($xml)
 						print "<$tagname count='$count'>" .
-							    xmlentities($updateText) . "</$tagname>\n";
+							    htmlentities($updateText,ENT_XML1) . "</$tagname>\n";
 				    if ($debug)
 						$warn	.= "<p>'$updateText' count=$count</p>\n";
 

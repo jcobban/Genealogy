@@ -11,7 +11,7 @@ use \Templating\Template;
  *  requested pattern.  This is invoked by method='get' from			*
  *  MarriageRegQuery.html.												*
  *																		*
- *  Parameters:															*
+ *  Parametersi															*
  *		Count															*
  *		Offset															*
  *		RegYear															*
@@ -119,6 +119,7 @@ use \Templating\Template;
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/County.inc';
+require_once __NAMESPACE__ . '/MarriageSet.inc';
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -137,7 +138,7 @@ function emptyRows($count, $html)
 {
     global $regyear;
     global $eregnum;            // expected registration number
-    global $regnum;
+    global $regNum;
     global $lastRegNum;
     global $rowclass;
     global $action;
@@ -162,11 +163,11 @@ function emptyRows($count, $html)
         $marrTemplate->set('regnum',        $eregnum);
         $marrTemplate->set('action',        $action);
         $marrTemplate->set('rowclass',      $rowclass);
-		$marrTemplate->updateTag('Delete$regyear$regnum', null);
-		$marrTemplate->updateTag('glink$regyear$regnum', null);
-		$marrTemplate->updateTag('gname$regyear$regnum', '&nbsp;');
-		$marrTemplate->updateTag('blink$regyear$regnum', null);
-		$marrTemplate->updateTag('bname$regyear$regnum', '&nbsp;');
+		$marrTemplate->updateTag('Delete$regyear$regNum', null);
+		$marrTemplate->updateTag('glink$regyear$regNum', null);
+		$marrTemplate->updateTag('gname$regyear$regNum', '&nbsp;');
+		$marrTemplate->updateTag('blink$regyear$regNum', null);
+		$marrTemplate->updateTag('bname$regyear$regNum', '&nbsp;');
         $marrTemplate->set('g_byear',       '&nbsp;');
         $marrTemplate->set('b_byear',       '&nbsp;');
         $marrTemplate->set('m_date',        '&nbsp;');
@@ -209,40 +210,19 @@ $join				= 'LEFT JOIN MarriageIndi AS Groom ON ' .
 
 // construct the various portions of the SQL SELECT statement
 // where expression
-$where				= '';
-$sqlParms	        = array();
 
 $selroles			= 0;		    // bit mask of roles to include GBM
-$limit				= '';		    // limit on which rows to return
+$limit				= 20;		    // limit on which rows to return
 $prefix				= '';		    // common prefix of table field names
 $cprefix			= 'Marriage.';// prefix of table field names
-$and				= 'WHERE ';		// logical and operator in SQL expressions
-$flds				= 'Marriage.RegDomain, ' .
-                      'Marriage.RegYear AS RegYear, Marriage.RegNum AS RegNum, ' .
-                       'Marriage.Date, Marriage.Place, ' .
-                      'Groom.Surname AS G_Surname, ' .
-                      'Groom.GivenNames AS G_Given, ' .
-                      'Groom.BYear AS G_BYear, Groom.IDIR AS G_IDIR, ' .
-                      'Bride.Surname AS B_Surname, ' .
-                      'Bride.GivenNames AS B_Given, ' .
-                      'Bride.BYear AS B_BYear, Bride.IDIR AS B_IDIR, ' .
-                      'Minister.Surname AS Surname, ' .
-                      'Minister.GivenNames AS Given, ' .
-                      'Minister.IDIR AS IDIR';
-$numericOrd			= 'Marriage.RegYear, Marriage.RegNum ';
-$nominalOrd			= 'Groom.Surname, Groom.GivenNames, ' .
-                      'Marriage.RegYear, Marriage.RegNum ';
-$orderby			= $numericOrd;	// default
-$npuri				= 'MarriageRegResponse.php';
-$npand				= '?';		    // adding parms to $npuri
-$npprev				= '';		    // previous selection
-$npnext				= '';		    // next selection
+$npuri				= '';		    // common portion of query
+$npand              = '?';          // combine query parms
 $count				= 20;           // default maximum number of rows
 $offset				= 0;            // starting offset in result set
 $expand				= canUser('edit');  // display missing records
 $oexpand			= $expand;      // original value of $expand
 $regyear			= 0;            // registration year
-$regnum				= 0;            // registration number
+$regNum				= 0;            // registration number
 $regCounty          = null;         // registration county code
 $lastRegNum			= 0;            // last number displayed
 $originalVolume		= null;
@@ -262,6 +242,7 @@ $domainName			= 'Ontario';
 $needSpouse			= false;
 $matchAnywhere      = false;
 $lang				= 'en';
+$getparms           = array();
 
 // validate all parameters passed to the server and construct the
 // various portions of the SQL SELECT statement
@@ -272,69 +253,93 @@ $parmsText      = "<p class='label'>\$_GET</p>\n" .
                         "<th class='colhead'>value</th></tr>\n";
 foreach ($_GET as $key => $value)
 {			// loop through all parameters
+    $value                          = trim($value);
     $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                          "<td class='white left'>$value</td></tr>\n"; 
     if (strlen($value) > 0)
     {
-        $fieldLc                = strtolower($key);
+        $fieldLc                    = strtolower($key);
         switch($fieldLc)
         {		// switch on parameter name
             case 'count':
+            case 'limit':
             {		// limit number of rows returned
-                $count	        = $value;
+                $limit	            = $value;
                 break;
             }		// limit number of rows returned
     
             case 'offset':
             {		// starting offset
-                $offset	        = $value;
+                $getparms[$fieldLc]	= $value;
+                $offset	            = $value;
                 break;
             }		// starting offset
     
             case 'regdomain':
             {
-                $domain      = $value;
+                $getparms[$fieldLc]	= $value;
+                $domain             = $value;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// RegDomain
     
             case 'regyear':
             {		// year of registration
-                $regyear        = $value;
+                $getparms[$fieldLc]	= $value;
+                $regyear            = $value;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// year of registration
     
             case 'regnum':
             {		// RegNum
-                $regnum	        = $value;
+                $getparms[$fieldLc]	= $value;
+                $regNum	            = $value;
                 break;
             }		// registration number
     
             case 'originalvolume':
             {		// original volume
-                $originalVolume	= $value;
+                $getparms[$fieldLc]	= $value;
+                $originalVolume	    = $value;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// original volume
     
             case 'originalpage':
             {		// original page number
-                $originalPage	= $value;
+                $getparms[$fieldLc]	= $value;
+                $originalPage	    = $value;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// original page number
     
             case 'originalitem':
             {		// original Item position
-                $originalItem	= $value;
+                $getparms[$fieldLc]	= $value;
+                $originalItem	    = $value;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// original Item position
     
 
             case 'surname':
             {
-                $surname        = $value;
-                $needSpouse	    = true;
+                $surname            = $value;
+                $needSpouse	        = true;
+                $getparms[$fieldLc]	= $value;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }
 
+            case 'givenname':
+                $fieldLc            = 'givennames';
             case 'givennames':
             case 'occupation':
             case 'religion':
@@ -347,86 +352,79 @@ foreach ($_GET as $key => $value)
             case 'age':
             case 'marstat':
             {		// match anywhere in string
-                $matchAnywhere  = true;
-                $npuri		    .= "$npand$key=$value";
-                $npand		    = '&amp;'; 
-                $orderby	    = $nominalOrd;
-                $expand		    = false;
-                $oexpand	    = false;
+                $getparms[$fieldLc]	= $value;
+                $matchAnywhere      = true;
+                $expand		        = false;
+                $oexpand	        = false;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// match in string
 
             case 'place':
             case 'date':
             {		// match anywhere in string
-                $where		    .= "$and LOCATE(:$fieldLc, Marriage.$key)>0";
-                $sqlParms[$fieldLc]	= $value;
-                $and		    = ' AND ';
-                $npuri		    .= "$npand$key=$value";
-                $npand		    = '&amp;';
-                $orderby	    = $nominalOrd;
+                $getparms[$fieldLc]	= $value;
                 $expand		    = false;
                 $oexpand	    = false;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// match in string
 
             case 'surnamesoundex':
             {		// handled under Surname
-                $surnameSoundex     = true;
-                $npuri		        .= "$npand$key=$value";
-                $npand		        = '&amp;'; 
-                $orderby	        = $nominalOrd;
+                $getparms[$fieldLc]	= true;
                 $expand		        = false;
                 $oexpand	        = false;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// handled under Surname
 
             case 'byear':
             {		// birth year
                 $byear              = $value;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// birth year
 
             case 'range':
             {		// birth year Range
+                $getparms[$fieldLc]	= $value;
                 $range	            = $value;
                 $needSpouse	        = true;
-                $npuri		        .= "{$npand}{$key}={$value}";
-                $npand		        = '&amp;'; 
                 $expand		        = false;
                 $oexpand	        = false;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// birth year Range
 
             case 'county':
             case 'regcounty':
             {		// exact match on county code
+                $getparms['regcounty']	= $value;
                 $needSpouse	        = true;
-                $where		        .= "$and Marriage.RegCounty=:regcounty ";
-                $sqlParms['regcounty']	= $value;
                 $regCounty	        = $value;
-                $and		        = ' AND ';
-                $npuri		        .= "{$npand}RegCounty=$value";
-                $npand		        = '&amp;'; 
-                $orderby	        = $nominalOrd;
                 $expand		        = false;
                 $oexpand	        = false;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// exact match on county code
 
             case 'township':
             case 'regtownship':
             {		// exact match on county code
+                $getparms['regtownship']	= $value;
                 $needSpouse	        = true;
-                $where		        .= "$and Marriage.RegTownship=:regtownship ";
-                $sqlParms['regtownship']	= $value;
                 $regTownship	    = $value;
-                $and		        = ' AND ';
-                $npuri		        .= "{$npand}RegTownship=$value";
-                $npand		        = '&amp;'; 
-                $orderby	        = $nominalOrd;
                 $expand		        = false;
                 $oexpand	        = false;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// exact match on county code
 
@@ -434,88 +432,70 @@ foreach ($_GET as $key => $value)
             case 'originalpage':
             case 'originalitem':
             {		// exact match on field in Marriage table
+                $getparms[$fieldLc]	= $value;
                 $needSpouse	        = true;
-                $where		        .= "$and Marriage.$key=:$fieldLc ";
-                $sqlParms[$fieldLc]	= $value;
-                $and		        = ' AND ';
-                $npuri		        .= "{$npand}{$key}={$value}";
-                $npand		        = '&amp;'; 
-                $orderby	        = $nominalOrd;
                 $expand		        = false;
                 $oexpand	        = false;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// exact match on field in Marriage table
 
-            case 'inchusband':
-            {
-                $npuri		.= "{$npand}{$key}={$value}";
-                $npand		= '&amp;'; 
-                break;
-            }		// include grooms in report
-
-            case 'incwife':
-            {
-                $npuri		.= "{$npand}{$key}={$value}";
-                $npand		= '&amp;'; 
-                break;
-            }		// include brides in report
-
-            case 'incminister':
-            {
-                $npuri		.= "{$npand}{$key}={$value}";
-                $npand		= '&amp;'; 
-                break;
-            }		// include ministers in report
-
             case 'order':
             {
+                $getparms[$fieldLc]	= $value;
                 if (strtoupper($value) == 'NAME')
                 {
-                    $orderby	= $nominalOrd;
-                    $expand	= false;
+                    $expand	    = false;
                     $oexpand	= false;
-                    $npnext	.= "&Order=Name";
                 }
                 else
                 if (strtoupper($value) == 'NUMBER')
                 {
-                    $orderby	= $numericOrd;
-                    $expand	= canUser('edit');
+                    $expand	    = canUser('edit');
                     $oexpand	= $expand;
-                    $npnext	.= "&Order=Number";
                 }
-                else
-                    $warn	.= "Unexpected value for $key='$value'. ";
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// include ministers in report
 
             case 'inchusband':
             {
-                $selroles	|= 1;	// mask bit for grooms
+                $getparms['inchusband'] = true;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// include grooms in search
     
             case 'incwife':
             {
-                $selroles	|= 2;	// mask bit for brides
+                $getparms['incwife'] = true;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// include brides in search
     
             case 'incminister':
             {
-                $selroles	|= 4;	// mask bit for ministers
+                $getparms['incminister'] = true;
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// include ministers in search
     
             case 'lang':
             {       // requested language
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value, 0, 2));
+                $lang           = FtTemplate::validateLang($value);
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// requested language
     
             case 'debug':
             {		// debug handled by common.inc
+                $npuri              .= "$npand$key=$value";
+                $npand              = '&';
                 break;
             }		// debug
 
@@ -536,111 +516,12 @@ foreach ($_GET as $key => $value)
 }			        // loop through all parameters
 if ($debug && count($_GET) > 0)
     $warn       .= $parmsText . "</table>\n";
+$getparms['limit']	        = $limit;
+$npuri                      .= "$npuri{$npand}Limit=$limit";
 
 // start the template
 $template			= new FtTemplate("MarriageRegResponse$lang.html");
-$trtemplate     = $template->getTranslate();
-
-// validate combinations of parameter values
-// validate count
-if (is_string($count) && strlen($count) > 0)
-{		
-	if (!preg_match("/^([0-9]{1,2})$/", $count))
-	{
-	 	$msg        .= "Row count '$count' must be number between 1 and 99. ";
-	    $count	    = 20;		// replace with default
-	}
-}		// maximum number of rows to display
-
-// validate offset
-if (is_string($offset) && strlen($offset) > 0)
-{		// starting offset
-    if (!preg_match("/^([0-9]{1,6})$/", $offset))
-    {
-        $msg        .= "Row offset '$offset' must be number between 0 and 999999. ";
-        $offset	    = 0;
-    }
-
-    if ($offset > 0)
-    {
-        $oexpand	= $expand;
-        $expand		= false;
-    }
-}		// starting offset
-
-// interpret domain code
-if (is_string($domain) && strlen($domain) >= 4)
-{		        // domain code specified
-    $domainObj	        = new Domain(array('domain'	    => $domain,
-                                           'language'	=> 'en'));
-    if ($domainObj->isExisting())
-    {
-        $cc		        = substr($domain, 0, 2);
-        $countryObj	    = new Country(array('code' => $cc));
-        $countryName	= $countryObj->getName();
-        $domainName	    = $domainObj->get('name');
-	    $where		    .= "$and Marriage.RegDomain=:regdomain ";
-	    $sqlParms['regdomain']	    = $domain;
-	    $and		    = ' AND ';
-	    $npuri		    .= "{$npand}{$key}={$value}";
-	    $npand		    = '&amp;'; 
-    }
-    else
-    {
-        $msg	        .= "Domain '$domain' must be a supported two character country code followed by a state or province code. ";
-    }
-}		        // domain code specified
-
-// registration year
-if (is_string($regyear) && strlen($regyear) > 0)
-{               // regyear specified
-    if (!preg_match("/^([0-9]{1,4})$/", $regyear))
-    {
-        $msg	.= $key . " must be a number. ";
-    }
-    else
-    if  (($regyear < "1867") || ($regyear > 2000))
-    {
-        $msg	.= "$key $regyear out of range. ";
-    }
-    else
-    {	// valid
-        $where	            .= "$and Marriage.RegYear=:regyear ";
-        $sqlParms['regyear']= $regyear;
-        $and	            = ' AND ';
-	    $npuri		        .= "{$npand}RegYear=$regyear";
-	    $npand		        = '&amp;'; 
-    }	// valid
-}               // regyear specified
-
-// validate registration number
-if (is_string($regnum) && strlen($regnum) > 0)
-{		        // RegNum specified
-    if ($regyear <= 0)
-    {
-        $msg	.=
-        'Registration Number may only be specified with Registration Year. ';
-    }
-    else
-    if (!preg_match("/^([0-9]{1,6})$/", $regnum))
-    {
-        $msg	.= 'RegNum must be a number. ';
-    }
-    else
-    {           // valid
-	    $lastRegNum	        = $regnum + $count;
-        $where	            .= "$and Marriage.RegNum>=:regnum ";
-        $sqlParms['regnum']	= $regnum;
-        $and	            = ' AND ';
-        if ($expand)
-        {
-            if ($regyear <= 1872 && $regnum > 10000)
-                $lastRegNum	= $regnum + 10 * floor($count / 3 + 1);
-            $where          .= "AND Marriage.RegNum<:lastregnum";
-            $sqlParms['lastregnum']	= $lastRegNum;
-        }
-    }
-}		// registration number
+$trtemplate         = $template->getTranslate();
 
 // validate county code
 if ($regCounty)
@@ -648,16 +529,15 @@ if ($regCounty)
     $countyObj		        = new County($domain, $regCounty);
     $countyName		        = $countyObj->get('name');
 }                       // county code
+else
+{
+    $template->updateTag('countyStats',null);
+    $template->updateTag('townshipStats',null);
+}
 
 if ($regyear == 0)
 {
     $template->updateTag('yearStats',null);
-    $template->updateTag('countyStats',null);
-    $template->updateTag('townshipStats',null);
-}
-else
-if (is_null($regCounty))
-{
     $template->updateTag('countyStats',null);
     $template->updateTag('townshipStats',null);
 }
@@ -667,289 +547,51 @@ if ($regTownship == '')
     $template->updateTag('townshipStats',null);
 }
 
-// user did not include any of husband, wife, or minister
-if ($selroles == 0)
-    $selroles		= 3;	// default to husband and wife
-
-// the comparison for surname depends upon multiple parameters
-if (is_string($surname) && strlen($surname) > 0)
-{               // surname specified
-    if (preg_match("/[.+*^$]/", $surname))
-    {		    // match regular expression pattern
-        $operation          = " REGEXP :surname";
-    }		    // match regular expression pattern
-    else
-    if ($surnameSoundex)
-    {		    // match soundex
-        $operation          = "Soundex=LEFT(SOUNDEX(:surname),4)";
-    }		    // match soundex
-    else
-    {		    // match exact
-        $operation          = "=:surname";
-    }		    // match exact
-    $sqlParms['surname']= $surname;
-
-    $or		    		    = '(';
-    $where	                .= $and;
-    if ($selroles & 1)
-    {
-        $where	            .= "(Groom.Surname$operation";
-        $or	    		    = ' OR ';
-    }
-    if ($selroles & 2)
-    {
-        $where	            .= "$or Bride.Surname$operation";
-        $or	    		    = ' OR ';
-    }
-    if ($selroles & 4)
-    {
-        $where	            .= "$or Minister.Surname$operation";
-    }
-    $where	                .= ')';
-    $and	    		    = ' AND ';
-        
-    $npuri		            .= $npand . "Surname=$surname";
-    $npand		    		= '&amp;'; 
-    $orderby	    		= $nominalOrd;
-    $expand		    		= false;
-    $oexpand	            = false;
-}               // surname specified
-
-if ($matchAnywhere)
-{
-    foreach($_GET as $key => $value)
-    {
-        $fieldLc            = strtolower($key);
-        switch($fieldLc)
-        {
-            case 'givennames':
-            case 'occupation':
-            case 'religion':
-            case 'fathername':
-            case 'mothername':
-            case 'witnessname':
-            case 'witnessres':
-            case 'birthplace':
-            case 'remarks':
-            case 'age':
-            case 'marstat':
-            {		// match anywhere in string
-                $or		        = '';
-                $where	        .= "$and (";
-                $sqlParms[$fieldLc]	= $value;
-                if ($selroles & 1)
-                {
-                    $where	    .= "LOCATE(:$fieldLc, Groom.$key)>0";
-                    $or	        = ' OR ';
-                }
-                if ($selroles & 2)
-                {
-                    $where	    .= "$or LOCATE(:$fieldLc, Bride.$key)>0";
-                    $or	        = ' OR ';
-                }
-                if ($selroles & 4)
-                {
-                    $where	    .= "$or LOCATE(:$fieldLc, Minister.$key)>0";
-                }
-                $where	        .= ') ';
-                $and		    = ' AND ';
-                break;
-            }       // fields which match anywhere
-        }           // act on parameter name
-    }               // loop through parameters again
-}                   // match anywhere in value
-// the comparison for birth year depends upon multiple parameters
-if (is_string($byear) && strlen($byear) > 0)
-{               // birth year specified
-    if (!preg_match("/^([0-9]{1,4})$/", $byear))
-    {
-        $msg	    .= "Birth Year must be a number. ";
-    }
-    else
-    if (!preg_match("/^([0-9]{1,2})$/", $range))
-    {
-        $msg	    .= "Birth Year range must be a number. ";
-    }
-    else
-    if  (($byear < "1700") || ($byear > 2000))
-    {
-        $msg	    .= "Birth Year out of range. ";
-    }
-    else
-    {
-        $or		                = '';
-        $where	                .= "$and(";
-        if ($selroles & 1)
-        {
-            $where	            .= "ABS(Groom.BYear-:byear) < :range ";
-            $sqlParms['byear']	= $byear;
-            $sqlParms['range']	= $range;
-            $or	                = ' OR ';
-        }
-        if ($selroles & 2)
-        {
-            $where	            .= "$or ABS(Bride.BYear-:byear) < :range";
-            $sqlParms['byear']	= $byear;
-            $sqlParms['range']	= $range;
-        }
-        $where	                .= ') ';
-        $and	                = ' AND ';
-        $npuri	                .= "{$npand}{$key}={$byear}";
-        $npand	                = '&amp;'; 
-    }
-    $orderby	                = $nominalOrd;
-    $expand		                = false;
-    $oexpand	                = false;
-}               // birth year specified
-
-if (strlen($where) == 0)
-    $msg	.= 'Missing parameters. ';
-
-// variable portion of URI for next and previous links
-if ($offset > 0)
-{		// starting offset within existing query
-    if ($orderby == $numericOrd)
-        $limit	= ' LIMIT ' . ($count * 2) . ' OFFSET ' . ($offset * 2);
-    else
-        $limit	= " LIMIT $count OFFSET $offset";
-
-    // URI for link to previous page of response
-    if ($offset >= 0)
-    {	// not first page of response
-        $tmp	= $offset - $count;
-        if ($regnum > 0)
-            $npprev	= "RegNum=$regnum&Count=$count&Offset=$tmp";
-        else
-            $npprev	= "Count=$count&Offset=$tmp";
-    }	// not first page of response
-
-    // URI for link to next page of response
-    $tmp		= $offset + $count;
-    if ($regnum > 0)
-        $npnext	= "RegNum=$regnum&Count=$count&Offset=$tmp";
-    else
-        $npnext	= "Count=$count&Offset=$tmp";
-}		// starting offset within existing query
-else
-{
-    $limit	= " LIMIT $count";
-    if ($expand)
-    {		// display unused records
-        if (($regyear == 1870 && $regnum > 70000) ||
-            ($regyear == 1871 && $regnum > 120000) ||
-            ($regyear == 1872 && $regnum > 170000))
-        {
-            $tcount	= floor($count / 3 + 1) * 10;
-            $npnext	= 'RegNum=' . ($regnum + $tcount);
-            $npprev	= 'RegNum=' . ($regnum - $tcount);
-        }
-        else
-        if ($regnum > 0)
-        {
-            $npnext	= 'RegNum=' . ($regnum + $count);
-            $npprev	= 'RegNum=' . ($regnum - $count);
-        }
-        else
-        {
-            $npnext	= 'Offset=' . ($offset + $count);
-            if ($offset > 0)
-                $npprev	= 'Offset=' . ($offset - $count);
-        }
-    }		// display unused records
-    else
-    {		// only display records from database
-        $npprev	= '';
-        if ($regnum > 0)
-            $npnext	= "RegNum=$regnum&Count=$count&Offset=$count";
-        else
-            $npnext	= "Count=$count&Offset=$count";
-    }		// only display records from database
-}
-
-if ($regnum == 0)
+if ($regNum == 0)
     $expand	= false;
 
 // if no error messages display the query
 if (strlen($msg) == 0)
 {
-    // execute the query for total number of matches
-    $query	= "SELECT COUNT(*) FROM Marriage $join $where";
-    $stmt	= $connection->prepare($query);
-    $queryText	= debugPrepQuery($query, $sqlParms);
-    if ($stmt->execute($sqlParms))
+    $marriages      = new MarriageSet($getparms);
+    $info           = $marriages->getInformation();
+    if ($debug)
     {
-        if ($debug)
-        {
-            $warn	.= "<p>MarriageRegResponse.php: " . __LINE__ .
-                           " query='$queryText'</p>\n";
+	    $warn           = "<p class='label'>\$info</p>\n" .
+	                        "<table class='summary'>\n" .
+	                        "<tr><th class='colhead'>key</th>" .
+	                        "<th class='colhead'>value</th></tr>\n";
+	    foreach ($info as $key => $value)
+	    {			// loop through all parameters
+	        $warn           .= "<tr><th class='detlabel'>$key</th>" .
+	                            "<td class='white left'>";
+	        if (is_array($value))
+	            $warn       .= print_r($value, true);
+	        else
+	            $warn       .= $value;
+	        $warn           .= "</td></tr>\n"; 
         }
-    
-        // get the value of COUNT(*)
-        $row		= $stmt->fetch(PDO::FETCH_NUM);
-        $totalrows	= $row[0];
+        $warn           .= "</table>\n";
     }
-    else
-    {		// error performing query
-        $msg	.= $queryText . ": " .
-                   print_r($stmt->errorInfo(),true);
-    }		// error performing query
 
-    // execute the query for results
-    $query		    = "SELECT $flds FROM Marriage $join ".
-                            "$where ORDER BY $orderby $limit";
-    $stmt		    = $connection->prepare($query);
-    $queryText	    = debugPrepQuery($query, $sqlParms);
-    if ($stmt->execute($sqlParms))
-    {
-        $result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $numRows	= count($result);
-        if ($debug)
-        {
-            $warn	.= "<p>MarriageRegResponse: " . __LINE__ .
-                          " query='$queryText'</p>\n";
-        }
-    }
-    else
-    {		// error performing query
-        $msg	.= $queryText . ": " .
-                   print_r($stmt->errorInfo(),true);
-    }		// error performing query
+    $numRows	    = min(count($marriages), $limit);
+    $totalrows      = $info['count'];
 }		// no error messages
+else
+{
+    $marriages      = array();
+    $numRows        = 0;
+    $totalrows      = 0;
+}
 
 // internationalization support
-$monthsTag	    	= $trtemplate->getElementById('Months');
-if ($monthsTag)
-{
-	$months	    	= array();
-	foreach($monthsTag->childNodes() as $span)
-	    $months[]	= trim($span->innerHTML());
-}
-$lmonthsTag	    	= $trtemplate->getElementById('LMonths');
-if ($lmonthsTag)
-{
-	$lmonths		= array();
-	foreach($lmonthsTag->childNodes() as $span)
-	    $lmonths[]	= trim($span->innerHTML());
-}
-$tranTabTag	    	= $template->getElementById('tranTab');
-if ($tranTabTag)
-{
-	$tranTab		= array();
-	foreach($tranTabTag->childNodes() as $span)
-	{
-	    $key		= $span->attributes['data-key'];
-	    $tranTab[$key]	= trim($span->innerHTML());
-    }
-    if (canUser('update'))
-        $action                 = $tranTab['Update'];
-    else
-        $action                 = $tranTab['Display'];
-}                   // tranTabTag
-else
+$months	    	            = $trtemplate['Months'];
+$lmonths	    	        = $trtemplate['LMonths'];
+$tranTab	    	        = $trtemplate['tranTab'];
 if (canUser('update'))
-    $action                     = 'Update';
+    $action                 = $tranTab['Update'];
 else
-    $action                     = 'Details';
+    $action                 = $tranTab['Display'];
 $template->set('ACTION',        $action);
 $template->set('CONTACTTABLE',		'Births');
 $template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
@@ -963,60 +605,81 @@ $template->set('COUNTYNAME',	$countyName);
 $template->set('REGTOWNSHIP',	$regTownship);
 $template->set('LANG',	        $lang);
 $template->set('REGYEAR',       $regyear);
-$template->set('REGNUM',        $regnum);
+$template->set('REGNUM',        $regNum);
+$template->set('NPURI',         $npuri);
 
 // if no error messages display the results of the query
 if (strlen($msg) == 0)
 {		// no error messages
 	$template->set('FIRSTOFFSET',	$offset+1);
-	$template->set('LASTOFFSET',    $offset+$numRows);
-	$template->set('TOTALROWS',     $totalrows);
-	$template->set('NPURI',     	$npuri);
-    $template->set('NPAND',	        $npand);
-	$template->set('NPPREV',	    $npprev);
-	$template->set('NPNEXT',	    $npnext);
-    if ($npprev == '')
+	$template->set('LASTOFFSET',    min($totalrows, $offset+$limit));
+    $template->set('TOTALROWS',     $totalrows);
+    if ($regNum)
+    {               // registration number specified
+        if ($regyear <= 1872 && $regNum > 10000)
+        {
+            $volume         = intdiv($regNum, 10000);
+            $page           = intdiv($regNum - ($volume * 10000), 10);
+            $item           = $regNum % 10;
+            $previtem       = $item - $limit;
+            $prevpage       = $page;
+            while ($previtem < 0)
+            {
+                $previtem   += 3;
+                $prevpage--;
+            }
+            $prevregnum     = $volume * 10000 + $prevpage * 10 + $previtem; 
+            $nextitem       = $item + $limit;
+            $nextpage       = $page;
+            while ($nextitem > 3)
+            {
+                $nextitem   -= 3;
+                $nextpage++;
+            }
+            $nextregnum     = $volume * 10000 + $nextpage * 10 + $nextitem; 
+        }
+        else
+        {
+            $prevregnum     = $regNum - $limit;
+            $nextregnum     = $regNum + $limit;
+        }
+        $prevoffset         = $npand . "RegNum=$prevregnum";
+        $nextoffset         = $npand . "RegNum=$nextregnum";
+    }               // registration number specified
+    else
+    {
+        if ($offset == 0)
+            $prevoffset         = '';
+        else
+            $prevoffset         = $npand . "Offset=" . $offset - $limit;
+        if ($offset + $limit >= $totalrows)
+            $nextoffset         = '';
+        else
+            $nextoffset         = $npand . "Offset=" . $offset + $limit;
+    }
+	$template->set('PREVOFFSET',	$prevoffset);
+	$template->set('NEXTOFFSET',	$nextoffset);
+    if ($prevoffset == '')
     {
         $template->updateTag('topPrev', null);
         $template->updateTag('botPrev', null);
     }
-    if ($npnext == '')
+    if ($nextoffset = '')
     {
         $template->updateTag('topNext', null);
         $template->updateTag('botNext', null);
     }
-    $marrRowElt         = $template->getElementById('row$regyear$regnum');
+    $marrRowElt         = $template['row$regyear$regnum'];
     $marrHTML           = $marrRowElt->outerHTML();
     $data               = '';
     $rowclass   		= 'odd';
 	$rownum		        = 0;
-    $eregnum		    = $regnum;	// expected entry
+    $eregnum		    = $regNum;	// expected entry
 
-    foreach($result as $marr)
+    foreach($marriages as $marr)
     {                   // loop through matching records
-        $regyear            = $marr['regyear'];
-        $regnum             = $marr['regnum'];
-        if (($regyear == 1870 && $regnum > 70000) ||
-            ($regyear == 1871 && $regnum > 120000) ||
-            ($regyear == 1872 && $regnum > 170000))
-        {
-            $pagediff       = floor($regnum/10) - floor($eregnum/10);
-            $rowdiff	    = ($regnum - $eregnum) - 7 * $pagediff;
-        }
-        else
-            $rowdiff	    = $regnum - $eregnum;
-	    if ($rowdiff > ($count * 2) - $rownum)
-			$rowdiff	    = ($count * 2) - $rownum;
-	    if ($expand && $rowdiff > 0)
-	    {		        // first entry is not first expected
-			$numRows	    += $rowdiff;
-			$data           .= emptyRows($rowdiff, $marrHTML);
-            $eregnum        += $rowdiff;
-	    }		        // first entry is not first expected
-        $rownum++;
-	    if ($rownum > $count)
-            break;
-
+        $regyear                = $marr['regyear'];
+        $regNum                 = $marr['regnum'];
         $marr['action']		    = $action;
         $marr['rowclass']		= $rowclass;
         $marr['lang']		    = $lang;
@@ -1026,23 +689,24 @@ if (strlen($msg) == 0)
         if ($gidir > 0)
             $marrTemplate->updateTag('gname$regyear$regnum', null);
         else
+        {
             $marrTemplate->updateTag('glink$regyear$regnum', null);
+            if (!$marr->isExisting())
+                $marrTemplate->updateTag('gname$regyear$regnum', null);
+        }
         $bidir                   = $marr['b_idir'];
         if ($bidir > 0)
             $marrTemplate->updateTag('bname$regyear$regnum', null);
         else
+        {
             $marrTemplate->updateTag('blink$regyear$regnum', null);
-        if (!canUser('update'))
+            if (!$marr->isExisting())
+                $marrTemplate->updateTag('bname$regyear$regnum', null);
+        }
+        if (!canUser('update') || !$marr->isExisting())
             $marrTemplate->updateTag('Delete$regyear$regnum', null);
         $marrTemplate->updateTag('row$regyear$regnum', $marr);
         $data               .= $marrTemplate->compile() . "\n";
-        $eregnum		    = $regnum + 1;	  // expected entry
-        if ($regyear == 1870 && $eregnum > 70000 && ($eregnum % 10) == 4)
-            $eregnum	+= 7;
-        if ($regyear == 1871 && $eregnum > 120000 && ($eregnum % 10) == 4)
-            $eregnum	+= 7;
-        if ($regyear == 1872 && $eregnum > 120000 && ($eregnum % 10) == 4)
-            $eregnum	+= 7;
 
         if ($rowclass == 'odd')
             $rowclass       = 'even';
@@ -1050,12 +714,6 @@ if (strlen($msg) == 0)
             $rowclass       = 'odd';
     }                   // loop through matching records
 
-	// if fewer rows were returned than requested
-    // create empty entries
-    if ($expand)
-    {
-        $data       .= emptyRows(($count * 2) - $numRows, $marrHTML);
-    }
     $marrRowElt->update($data);
 }		// no error messages
 else

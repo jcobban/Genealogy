@@ -53,6 +53,7 @@ use \Exception;
  *		2017/11/21		use prepared statements							*
  *		2017/12/18		add support for temporary fields				*
  *		2019/08/27      add username field                              *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -665,24 +666,24 @@ class ToDo extends Record
 				case 'reminderd':
 				{		// internal date format
 				    $date	    = new LegacyDate($value);
-                    $retval	    .= "    <{$fld}c>" . xmlentities($value) . 
+                    $retval	    .= "    <{$fld}c>" . htmlentities($value,ENT_XML1) . 
                                     "</{$fld}c>\n";
 				    $value	    = $date->toString();
-                    $retval	    .= "    <$fld>" . xmlentities($value) . 
+                    $retval	    .= "    <$fld>" . htmlentities($value,ENT_XML1) . 
                                     "</$fld>\n";
 				    break;
 				}		// internal date format
 
 				case 'idtc':
 				{	    // document type
-                    $meaning        = xmlentities(self::$intCategory[$value]);
+                    $meaning        = htmlentities(self::$intCategory[$value],ENT_XML1);
                     $retval	        .= "    <$fld>$value=$meaning</$fld>\n";
 				    break;
 				}
 
 				default:
 				{		// fields passed back with no interpretation
-				    $retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+				    $retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) . "</$fld>\n";
 				    break;
 				}		// fields passed back with no interpretation
 		    }		    // switch on field name

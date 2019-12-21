@@ -1,5 +1,5 @@
 <!--*********************************************************************
- *  MarriageRegResponse.php												*
+ *  MarriageRegResponseen.html											*
  *																		*
  *  Display a report of individuals whose marriage matches the			*
  *  requested pattern.                                      			*
@@ -59,10 +59,10 @@
       <!--- Put out a line with links to previous and next section of table -->
       <div class="center" id="topBrowse">
         <span class="left" id="topPrev">
-            <a href='$NPURI$NPAND$NPPREV'>&lt;---</a>
+            <a href='MarriageRegResponse.php$NPURI&offset=$PREVOFFSET'>&lt;---</a>
          </span>
         <span class='right' id="topNext">
-            <a href='$NPURI$NPAND$NPNEXT'>---&gt;</a>
+            <a href='MarriageRegResponse.php$NPURI&offset=$NEXTOFFSET'>---&gt;</a>
         </span>
         displaying rows $FIRSTOFFSET
         to $LASTOFFSET of $TOTALROWS 
@@ -162,10 +162,10 @@
     <!--- Put out a line with links to previous and next section of response -->
       <div class="center" id="botBrowse">
         <span class="left" id="botPrev">
-            <a href='$NPURI$NPAND$NPPREV'>&lt;---</a>
+            <a href='MarriageRegResponse.php$NPURI&offset=$PREVOFFSET'>&lt;---</a>
          </span>
         <span class='right' id="botNext">
-            <a href='$NPURI$NPAND$NPNEXT'>---&gt;</a>
+            <a href='MarriageRegResponse.php$NPURI&offset=$NEXTOFFSET'>---&gt;</a>
         </span>
         displaying rows $FIRSTOFFSET
         to $LASTOFFSET of $TOTALROWS 

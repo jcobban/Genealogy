@@ -34,8 +34,9 @@ use \Exception;
  *		2016/01/19		add id to debug trace							*
  *		2017/09/12		use get( and set(								*
  *		2017/11/02		use RecordSet for families						*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -55,7 +56,7 @@ require_once __NAMESPACE__ . '/common.inc';
 print "    <parms>\n";
 foreach($_POST as $key => $value)
 {	
-    print "\t<$key>" . xmlentities($value) . "</$key>\n";
+    print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 }
 print "    </parms>\n";
 
@@ -144,7 +145,7 @@ if (strlen($msg) == 0)
 else
 {		// errors in parameters
     print "    <msg>\n";
-    print xmlentities($msg);
+    print htmlentities($msg,ENT_XML1);
     print "    </msg>\n";
 }		// errors in parameters
 

@@ -37,14 +37,21 @@ $parmsText      = "<p class='label'>\$_GET</p>\n" .
                       "<th class='colhead'>value</th></tr>\n";
 foreach($_GET as $key => $value)
 {			// loop through all input parameters
-    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+    $valueText      = debugParm($value);
+    $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$valueText</td>" .
+                        "</tr>\n"; 
     switch(strtolower($key))
-    {		// process specific named parameters
+    {		    // process specific named parameters
 		case 'domain':
 		case 'regdomain':
-		{
-		    $domain	= $value;
+        {
+            if (is_array($value) && count($value) > 0)
+            {
+                $value          = $value[0];
+            }
+            if (is_string($value))
+                $domain	        = $value;
 		    break;
 		}		// RegDomain
 
@@ -67,14 +74,13 @@ foreach($_GET as $key => $value)
 
 		case 'lang':
 		{		// language selection
-		    if (strlen($value) >= 2)
-				$lang		= strtolower(substr($value,0,2));
+			$lang		    = FtTemplate::validateLang($value);
 		    break;
 		}		// language selection
 
 		default:
 		{
-		    $warn	.= "Unexpected parameter $key='$value'. ";
+		    $warn	        .= "Unexpected parameter $key='$value'. ";
 		    break;
 		}		// any other paramters
     }		// process specific named parameters
@@ -83,6 +89,8 @@ if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
 $template		= new FtTemplate("CountyMarriageEditQuery$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'CountyMarriageEditQuery'));
 
 $domainObj	    = new Domain(array('domain'	    => $domain,
 								   'language'	=> $lang));

@@ -149,6 +149,7 @@ use \Iterator;
  *                      more efficient                                  *
  *                      move sealed to parents event in XML and JSON    *
  *                      output                                          *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1123,7 +1124,7 @@ class Child extends Record
 
 				default:
 				{		// fields passed back with no interpretation
-				    $retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+				    $retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) . "</$fld>\n";
 				    break;
 				}		// fields passed back with no interpretation
 		    }		// switch on field name

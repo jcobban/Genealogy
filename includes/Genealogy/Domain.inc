@@ -44,6 +44,8 @@ use \Exception;
  *		                add method getLanguage                          *
  *		                support passing instance of Language to new     *
  *		                correct bugs in constructor                     *
+ *		2019/12/15      inserted extra hyphen in partof                 *
+ *		2019/12/19      handle invalid domain better                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -186,14 +188,14 @@ class Domain extends Record
 
                         case 'domain':
                         {		// domain
-                            $domain             = str_replace('-', '', $value);
-                            if (is_string($domain) && strlen($domain) >= 4)
+                            if (is_string($value) && strlen($value) >= 4)
                             {
+                                $domain         = str_replace('-', '', $value);
                                 $domain		    = strtoupper($domain);
                                 $cc 	        = substr($domain, 0, 2);
                             }
                             else
-                                $this->msg      .= "Invalid domain='$value'. ";
+                                $this->msg      .= "Invalid domain=" . print_r($value,true) . ".";
                             break;
                         }		// domain
 
@@ -567,7 +569,7 @@ class Domain extends Record
                 if (substr($value, 0, 2) == $cc)
                 {
                     $state      = substr($value, 2);
-                    if (substr($state, 0, 2) == '-')
+                    if (substr($state, 0, 1) == '-')
                         return parent::set('partof', $value);
                     else
                         return parent::set('partof', "$cc-$state");

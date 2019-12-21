@@ -245,6 +245,7 @@ use \Exception;
  *		2019/09/20      correct Event::dump to always return the output *
  *		                constructor ignored eventsd parameter as used   *
  *		                by Person:: getXxxxxEvent                       *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1796,28 +1797,9 @@ class Event extends RecordPic
 		    $date	    = $value;
 		}			// parameter is an instance of LegacyDate
 		else
-        if (strlen($value) >= 10 && (strpos($value, ' ') === false))
-        {           // parameter is internal date format
-            if ($debug)
-            {
-	            $pos        = strpos($value, ' ');
-	            if (is_bool($pos))
-	            {
-	                if ($pos)
-	                    $pos        = 'true';
-	                else
-	                    $pos        = 'false';
-	            }
-                $warn   .= "<p>Event::setDate(internal '$value')</p>\n";
-            }
+		{			// convert the string to instance of LegacyDate
 		    $date	    = new LegacyDate($value);
-        }           // parameter is internal date format
-        else
-		{			// convert the value to instance of LegacyDate
-            if ($debug)
-                $warn   .= "<p>Event::setDate(external '$value')</p>\n";
-		    $date	    = new LegacyDate(' ' . $value);
-        }			// convert the value to instance of LegacyDate
+        }			// convert the string to instance of LegacyDate
 
 		// handle events that are actually recorded in another record
 		$preferred  	= $this->row['preferred'];
@@ -2025,15 +2007,15 @@ class Event extends RecordPic
 				    $date	= new LegacyDate($value);
 				    if ($isOwner)
 				    {		// can see private data
-						$retval	.= "    <{$fld}c>" . xmlentities($value) .
+						$retval	.= "    <{$fld}c>" . htmlentities($value,ENT_XML1) .
 							"</{$fld}c>\n";
 						$value	= $date->toString();
-						$retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+						$retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) . "</$fld>\n";
 				    }		// can see private data
 				    else
 				    {		// cannot see private data
 						$value	= $date->toString(1933);
-						$retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+						$retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) . "</$fld>\n";
 				    }		// can see private data
 				    break;
 				}		// legacy internal date format
@@ -2053,7 +2035,7 @@ class Event extends RecordPic
 				    $loc	        = Location::getLocation($value);
 				    $value	        = $loc->getName();
 				    $locfld	        = substr($fld,4) . 'loc';
-                    $retval	        .= "    <$locfld>" . xmlentities($value) . 
+                    $retval	        .= "    <$locfld>" . htmlentities($value,ENT_XML1) . 
                                             "\n    </$locfld>\n";
 				    break;
 				}
@@ -2064,7 +2046,7 @@ class Event extends RecordPic
 				    if (array_key_exists($value, self::$eventText))
 				    {
 						$retval	.= "    <eventtype>" .
-							xmlentities(self::$eventText[$value]) .
+							htmlentities(self::$eventText[$value],ENT_XML1) .
 							"</eventtype>\n";
 				    }		// can interpret the event type
 				    break;
@@ -2098,7 +2080,7 @@ class Event extends RecordPic
 
 				default:
 				{		// fields passed back with no interpretation
-				    $retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+				    $retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) . "</$fld>\n";
 				    break;
 				}		// fields passed back with no interpretation
 		    }		// switch on field name
@@ -2699,7 +2681,7 @@ class Event extends RecordPic
 						{
 						    $warn	.= "<p>Event::save: " .
 							"Description='" .
-							xmlentities($this->row['description']) .
+							htmlentities($this->row['description'],ENT_XML1) .
 							"' when saving death event</p>\n";
 						    $this->row['description']	= '';
 						}

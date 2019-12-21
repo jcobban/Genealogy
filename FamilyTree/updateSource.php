@@ -34,8 +34,9 @@ use \Exception;
  *		2017/09/12		use set(										*
  *		2018/12/02      only update those fields for whom parameters    *
  *		                have been passed because others are NULL        *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Source.inc';
@@ -85,7 +86,7 @@ $overridesubsequent				= 0;
 print "<parms>\n";
 foreach($_POST as $key => $value)
 {			// loop through all parameters
-	print "<$key>" . xmlentities($value) . "</$key>\n";
+	print "<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 	switch(strtolower($key))
 	{		// act on specific parameters
 	    case 'idsr':

@@ -177,15 +177,15 @@ class Birth extends Record
      ********************************************************************/
     protected static $translate	= array(
 				'b_regdomain'				=> 'regdomain',
-				'b_domain'				    => 'regdomain',
+				'domain'				    => 'regdomain',
 				'b_regyear'			    	=> 'regyear',
-				'b_year'					=> 'regyear',
+				'year'					    => 'regyear',
 				'b_regnum'			    	=> 'regnum',
-				'b_num'				    	=> 'regnum',
+				'num'				    	=> 'regnum',
 				'b_regcounty'				=> 'regcounty',
-				'b_county'			    	=> 'regcounty',
+				'county'			    	=> 'regcounty',
 				'b_regtownship'		    	=> 'regtownship',
-				'b_township'				=> 'regtownship',
+				'township'				    => 'regtownship',
 				'b_msvol'					=> 'msvol',
 				'b_surname'			    	=> 'surname',
 				'b_surnamesoundex'	    	=> 'surnamesoundex',
@@ -218,11 +218,11 @@ class Birth extends Record
 				'b_remarks'			    	=> 'remarks',
 				'b_image'					=> 'image',
 				'b_originalvolume'	    	=> 'originalvolume',
-				'b_volume'			    	=> 'originalvolume',
+				'volume'			    	=> 'originalvolume',
 				'b_originalpage'			=> 'originalpage',
-				'b_page'					=> 'originalpage',
+				'page'					    => 'originalpage',
 				'b_originalitem'			=> 'originalitem',
-				'b_item'					=> 'originalitem',
+				'item'					    => 'originalitem',
 				'b_idir'					=> 'idir',
 				'b_changedby'				=> 'changedby',
 				'b_changedate'		    	=> 'changedate');
@@ -329,15 +329,15 @@ class Birth extends Record
                             $this->domain   = $domainObj;
 				        }                   // is_string($domain)
 				        else
-				        if ($domain instanceof Domain)
+				        if ($value instanceof Domain)
 				        {
-			                $domainObj      = $domain;
+			                $domainObj      = $value;
                             $this->domain   = $domainObj;
 			                $domain         = $domainObj->get('domain');
                         }                   // $domain instanceof Domain
                         else
                             $this->msg      .= "Invalid regdomain=" .
-                                                gettype($domain) . ". ";
+                                                gettype($value) . ". ";
                         break;
                     }
 
@@ -683,7 +683,7 @@ class Birth extends Record
     }		// function Birth::set
 
     /********************************************************************
-     *	function Birthd::save											*
+     *	function Birth::save											*
      *																	*
      *  Save changes made to the Birth record into the	database.		*
      *																	*

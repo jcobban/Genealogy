@@ -1,0 +1,99 @@
+<!--*********************************************************************
+ *  OcfaStatsen.html							    					*
+ *																		*
+ *  Display the statistics by county of the Ontario                     *
+ *  Cemetery Finding Aid database										*
+ *																		*
+ *  History:															*
+ *		2012/12/17		created											*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+      <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>: 
+      <a href="/Ontario/OcfaQuery.php?lang=$LANG">
+		New Query
+      </a>:
+    </div>
+    <div class="body">
+      <h1>Ontario Cemetery Finding Aid Query
+        <span class='right'>
+    	  <a href='OcfaStatsHelpen.html' target='_blank'>Help?</a>
+        </span>
+        <div style='clear: both;'></div>
+      </h1>
+      $TRACE
+      $MSG
+      <form name="responseForm">
+		<!--- Put out the response as a table -->
+		<table class='form' id="dataTable">
+		  <thead>
+			<!--- Put out the column headers -->
+			<tr>
+			  <th class='colhead1st'>
+			    County
+			  </th>
+			  <th class='colhead'>
+			    Done
+			  </th>
+			  <th class='colhead'>
+			    View
+			  </th>
+			  <th>
+                  &nbsp;
+			  </th>
+			  <th class='colhead'>
+			    County
+			  </th>
+			  <th class='colhead'>
+			    Done
+			  </th>
+			  <th class='colhead'>
+			    View
+			  </th>
+			  <th>
+                  &nbsp;
+			  </th>
+			  <th class='colhead'>
+			    County
+			  </th>
+			  <th class='colhead'>
+			    Done
+			  </th>
+			  <th class='colhead'>
+			    View
+			  </th>
+			</tr>
+		  </thead>
+		  <tbody>
+			<tr id="datarow">
+			  <td class='odd bold left first'>
+			    $county
+			  </td>
+			  <td class='odd bold right'>
+			    $count
+			  </td>
+              <td>
+	            <button id='ShowCountyStats$county'>
+        			View
+        	    </button>
+        	  </td>
+			</tr>
+		  </tbody>
+		  <tfoot>
+			<tr>
+			  <td class='odd bold right first'>
+			    Total
+			  </td>
+			  <td class='odd bold right'>
+			    $total
+			  </td>
+			</tr>
+		  </tfoot>
+		</table>
+      </form>
+    </div>
+    <script src='/jscripts/util.js'         language='JavaScript'></script>
+    <script src='/jscripts/CommonForm.js'   language='JavaScript'></script>
+    <script src='/Ontario/OcfaStats.js'    language='JavaScript'></script>
+

@@ -70,6 +70,7 @@ use \Exception;
  *		                add method getCensus                            *
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/01/19      report constructor errors through message       *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -600,7 +601,7 @@ class District extends Record
 				$count		= $stmt->rowCount();
 				if ($xml)
 				    print "<$tagname result='$count'>" .
-							xmlentities($insertText) . 
+							htmlentities($insertText,ENT_XML1) . 
 						  "</$tagname>\n";
 				if ($debug)
 				    $warn	.= "<p>District::save: " . __LINE__ .
@@ -666,7 +667,7 @@ class District extends Record
 				    $count		= $stmt->rowCount();
 				    if ($xml)
 						print "<$tagname count='$count'>" .
-							xmlentities($updateText) . 
+							htmlentities($updateText,ENT_XML1) . 
 						      "</$tagname>\n";
 
 				    if ($debug)
@@ -813,7 +814,7 @@ class District extends Record
 		{
 		    if (substr($key, 0, 3) == 'd_')
 				$key	= substr($key, 2);
-		    $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
+		    $retval	.= "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 		}
 
 		// get list of subdistricts

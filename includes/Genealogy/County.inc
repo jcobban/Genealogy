@@ -54,8 +54,9 @@ use \Iterator;
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/05/18      add $info                                       *
  *		2919/12/95      support ISO format Domain                       *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 
@@ -494,7 +495,7 @@ class County extends Record
 
 		foreach($this->row as $key => $value)
 		{
-		    $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
+		    $retval	.= "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 		}
 
 		// get list of townships

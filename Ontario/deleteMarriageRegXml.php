@@ -3,22 +3,23 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  deleteMarriageRegXml.php						*
- *									*
- *  Delete a marriage registration record.				*
- *									*
- *  Parameters:								*
- *									*
- *  History:								*
- *	2013/01/09	created						*
- *	2013/11/27	handle database server failure gracefully	*
- *	2013/12/07	$msg and $debug initialized by common.inc	*
- *	2014/10/11	renamed from MarriageRegDelete.php to		*
- *			deleteMarriageRegXml.php for consistency	*
- *			use class Marriage				*
- *	2015/07/02	access PHP includes using include_path		*
- *									*
- *  Copyright &copy; 2015 James A. Cobban				*
+ *  deleteMarriageRegXml.php											*
+ *																		*
+ *  Delete a marriage registration record.								*
+ *																		*
+ *  Parameters:															*
+ *																		*
+ *  History:															*
+ *		2013/01/09		created											*
+ *		2013/11/27		handle database server failure gracefully		*
+ *		2013/12/07		$msg and $debug initialized by common.inc		*
+ *		2014/10/11		renamed from MarriageRegDelete.php to			*
+ *						deleteMarriageRegXml.php for consistency		*
+ *						use class Marriage								*
+ *		2015/07/02		access PHP includes using include_path			*
+ *		2019/12/19      replace xmlentities with htmlentities           *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once	__NAMESPACE__ . '/Marriage.inc';
@@ -100,7 +101,7 @@ require_once __NAMESPACE__ . '/common.inc';
     if (strlen($msg) > 0)
     {		// problems detected
 	print "    <msg>\n\t" . 
-	      xmlentities($msg) . 
+	      htmlentities($msg,ENT_XML1) . 
 	      "\n    </msg>\n";
     }		// problems detected
     else

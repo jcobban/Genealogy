@@ -21,6 +21,7 @@ use \Exception;
  *		2015/09/28		migrate from MDB2 to PDO						*
  *		2015/12/30		error in use of PDO execute						*
  *		2017/09/13		use class User									*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
@@ -69,7 +70,7 @@ use \Exception;
     else
     {			// parameter validation failed
 	    print "    <msg>\n";
-	    print xmlentities($msg);
+	    print htmlentities($msg,ENT_XML1);
 	    print "    </msg>\n";
     }			// parameter validation failed
 

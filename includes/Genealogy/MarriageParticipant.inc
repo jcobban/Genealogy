@@ -139,6 +139,7 @@ class MarriageParticipant extends Record
 						'm_surname'	        	=> 'surname',
 						'm_surnamesoundex'  	=> 'surnamesoundex',
 						'm_givennames'	    	=> 'givennames',
+						'givenname'	    	    => 'givennames',
 						'm_age'		        	=> 'age',
 						'm_byear'		    	=> 'byear',
 						'm_residence'	    	=> 'residence',

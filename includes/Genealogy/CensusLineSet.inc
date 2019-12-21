@@ -115,21 +115,38 @@ class CensusLineSet extends RecordSet
 		global	$debug;
 		global	$warn;
 
-		if ($debug)
-		    $warn	.= "<p>CensusLineSet::__construct(\$parms=[";
-		$comma	= '';
+		$parmstext	    = "[";
+		$comma	        = '';
 		$join			= '';
 		foreach($parms as $fldname => $value)
-		{
+		{                   // analyze parameters
 		    if ($debug)
-				if (is_array($value))
-				    $warn	.= $comma . "'$fldname' => array";
+                if (is_array($value))
+                {
+                    $parmstext	            .= $comma . "'$fldname' => [";
+                    $sub                    = '';
+                    foreach($value as $index => $val)
+                    {
+                        $parmstext          .= $sub;
+                        if (is_string($index))
+                            $parmstext      .= "'$index' => ";
+                        if (is_string($val))
+                            $parmstext      .= "'$val'";
+                        else
+                        if (is_numeric($val))
+                            $parmstext      .= $val;
+                        else
+                            $parmstext      .= gettype($val);
+                        $sub                = ',';
+                    }
+                    $parmstext              .= ']';
+                }
 				else
-				    $warn	.= $comma . "'$fldname' => '$value'";
+				    $parmstext	.= $comma . "'$fldname' => '$value'";
 		    $comma	= ',';
 		    $fieldLc	= CensusLine::getRealFieldName($fldname);
 		    switch($fieldLc)
-		    {			// act on specific field name
+		    {			    // act on specific field name
 				case 'census':
 				case 'censusid':
 				{
@@ -178,10 +195,10 @@ class CensusLineSet extends RecordSet
 				    $join	= $value;
 				    break;
 				}
-		    }			// act on specific field name
-		}
+		    }			    // act on specific field name
+		}                   // analyze parameters
 		if ($debug)
-		    $warn	.= "],<br>'$fields')</p>\n";
+		    $warn	.= "<p>CensusLineSet::__construct(\$parms=$parmstext)<p>\n";
 
 		if ($censusId == 'CAALL')
 		{
@@ -383,21 +400,21 @@ class CensusLineSet extends RecordSet
 				}		// Census Identifier
 
 				case 'province':
-				{		// used only by menu
+				{		    // used only by menu
 				    if (is_string($value))
 				    {
 						switch(strtoupper($value))
 						{	// support pre-confederation names
 						    case 'ON':
 						    {
-							$value	= array('ON', 'CW');
-							break;
+							    $value	= array('ON', 'CW');
+							    break;
 						    }
 		
 						    case 'QC':
 						    {
-							$value	= array('QC', 'CE');
-							break;
+							    $value	= array('QC', 'CE');
+							    break;
 						    }
 		
 						}	// support pre-confederation names
@@ -405,17 +422,17 @@ class CensusLineSet extends RecordSet
 
 				    if (is_array($value) && count($value) > 0)
 				    {
-						$province	= current($value);
-						$where		.= $and;
-						$or		= '(';
+						$province	    = current($value);
+						$where		    .= $and;
+						$or		        = '(';
 						foreach($value as $code)
 						{
 						    $where		.= $or . "`$fieldLc`=?";
 						    $this->sqlParms[]	= $code;
 						    $or			= ' OR ';
 						}
-						$where		.= ')';
-						$and		= ' AND ';
+						$where		    .= ')';
+						$and		    = ' AND ';
 				    }
 				    else
 				    if (is_string($value) && strlen($value) == 2)
@@ -426,7 +443,7 @@ class CensusLineSet extends RecordSet
 						$and			= ' AND ';
 				    }
 				    break;
-				}		// used only by menu
+				}		    // used only by menu
 
 				case 'district':
 				{
@@ -716,7 +733,14 @@ class CensusLineSet extends RecordSet
 				    isset($this->page))
 		{
 		    $this->orderby		= 'Page, Line';
-		}
+        }
+        if ($debug)
+        {
+            $warn       .= "<p>CensusLineSet::getWhere: " . __LINE__ .
+                " where='$where'</p>\n" .
+                "<p>sqlParms=" . print_r($this->sqlParms, true) . "</p>\n";  
+        }
+
 		return $where;
     }		// CensusLineSet::getWhere
 

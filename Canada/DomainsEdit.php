@@ -198,9 +198,12 @@ if (isset($_POST) && count($_POST) > 0)
 		    case 'partof':
 		    {
 	            $partof			    = strtoupper($value);
-	            if (strlen($partof) > 2 && substr($partof, 2, 1) != '-')
+                $sep                = substr($partof, 2, 1);
+                if (strlen($partof) > 2 && substr($partof, 2, 1) != '-')
+                {
 	                $partof         = substr($partof, 0, 2) . '-' .
-	                                    substr($partof, 2);
+                                      substr($partof, 2);
+                }
 				$domain->set('partof', $partof);
 				break;
 		    }		    // part of

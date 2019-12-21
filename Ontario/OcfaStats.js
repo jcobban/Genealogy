@@ -1,7 +1,7 @@
 /************************************************************************
- *  OcfaStats.js										*
- *																																				*
- *  This file implements the dynamic functionality of the web page										*
+ *  OcfaStats.js										                *
+ *																		*
+ *  This file implements the dynamic functionality of the web page		*
  *  OcfaStats.php										                *
  *																		*
  *  History:										                    *

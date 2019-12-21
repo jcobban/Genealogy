@@ -22,8 +22,9 @@ use \Exception;
  *						escape password in XML response					*
  *		2016/02/02		new User option ousername removed				*
  *		2017/09/12		use get( and set(								*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/User.inc";
@@ -52,7 +53,7 @@ if (!canUser('all'))
 print "    <parms>\n";
 foreach ($_POST as $key => $value)
 {			// loop through all parameters
-    print "\t<$key>" . xmlentities($value) . "</$key>\n";
+    print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
     switch(strtolower($key))
     {		// act on specific parameters
         case 'id':
@@ -124,15 +125,15 @@ if (strlen($msg) == 0)
             	"by the administrator to '$password'. " .
             	"You are advised to change your password as soon as convenient. ");
         print "<mail>\n";
-        print "<to>" . xmlentities($email) . "</to>\n";   
-        print "<bcc>" . xmlentities($bcc) . "</bcc>\n";
+        print "<to>" . htmlentities($email,ENT_XML1) . "</to>\n";   
+        print "<bcc>" . htmlentities($bcc,ENT_XML1) . "</bcc>\n";
         print "<subject>" .
              "[JamesCobban.net] Password Reset for User $username"
               . "</subject>\n";  
         print "<body>" .
              "The password on your account '$username' has been reset " .
             	"by the administrator to '" . 
-            	xmlentities($password) . "'." 
+            	htmlentities($password,ENT_XML1) . "'." 
               . "</body>\n";
         print "<result>$sent</result>\n";   
         print "</mail>\n";   

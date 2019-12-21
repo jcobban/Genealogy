@@ -145,7 +145,7 @@ if (strlen($msg) == 0)
     		if (substr($distId,strlen($distId) - 2) == ".0")
     		    $distId	= substr($distId, 0, strlen($distId) - 2); 
     		$sdId		= $row->get('sd_id'); 	// subdistrict id
-    		$sdName		= xmlentities($row->get('sd_name'));
+    		$sdName		= htmlentities($row->get('sd_name'),ENT_XML1);
     		$division	= $row->get('sd_div');
     		$lacReel	= $row->get('sd_lacreel');
     		$imageBase	= $row->get('sd_imagebase');

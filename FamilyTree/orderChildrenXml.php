@@ -34,8 +34,9 @@ use \Exception;
  *		2017/08/08		class LegacyChild renamed to class Child		*
  *		2017/09/12		use set(										*
  *		2017/11/04		use RecordSet in place of getChildren			*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Child.inc";
@@ -50,7 +51,7 @@ print "<ordered>\n";
 print "    <parms>\n";
 foreach($_POST as $key => $value)
 {	
-    print "\t<$key>" . xmlentities($value) . "</$key>\n";
+    print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 }
 print "    </parms>\n";
 

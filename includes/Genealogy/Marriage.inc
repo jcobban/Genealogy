@@ -85,6 +85,7 @@ use \Iterator;
  *		2019/10/28      permit spaces in front of save parm             *
  *		                return count from save                          *
  *		2019/12/13      remove M_ prefix from field names               *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -154,10 +155,10 @@ class Marriage extends Record
                         'm_regdomain'				=> 'regdomain',
                         'year'			    		=> 'regyear',
                         'm_regyear'			    	=> 'regyear',
-                        'm_num'				    	=> 'regnum',
-                        'm_number'		    		=> 'regnum',
+                        'num'				    	=> 'regnum',
+                        'number'		    		=> 'regnum',
                         'm_regnum'		    		=> 'regnum',
-                        'm_reel'					=> 'msvol',
+                        'reel'					    => 'msvol',
                         'm_msvol'					=> 'msvol',
                         'county'				    => 'regcounty',
                         'm_regcounty'				=> 'regcounty',
@@ -336,10 +337,10 @@ class Marriage extends Record
                 $value			= trim($value);
                 if (strlen($value) == 0)
                     continue;
-                $lcfldname		        = strtolower($field);
-                if (array_key_exists($lcfldname, self::$translate))
-                    $lcfldname		    = self::$translate[$lcfldname];
-                switch($lcfldname)
+                $fieldLc		        = strtolower($field);
+                if (array_key_exists($fieldLc, self::$translate))
+                    $fieldLc		    = self::$translate[$fieldLc];
+                switch($fieldLc)
                 {
                     case 'originalvolume':
                     {
@@ -432,7 +433,7 @@ class Marriage extends Record
 
                 }
 
-                $sel	                .= $and . $lcfldname . '=:' . $field;
+                $sel	                .= $and . $fieldLc . '=:' . $field;
                 $and	                = ' AND ';
             }
 
@@ -542,10 +543,10 @@ class Marriage extends Record
                     // apply any other fields
                     foreach($parms as $field => $value)
                     {
-                        $lcfldname		    = strtolower($field);
-                        if (array_key_exists($lcfldname, self::$translate))
-                            $lcfldname		= self::$translate[$lcfldname];
-                        $dbrow[$lcfldname]	= $value;
+                        $fieldLc		    = strtolower($field);
+                        if (array_key_exists($fieldLc, self::$translate))
+                            $fieldLc		= self::$translate[$fieldLc];
+                        $dbrow[$fieldLc]	= $value;
                     }
 
                     $needInsert		= true;
@@ -561,15 +562,15 @@ class Marriage extends Record
         }			// search parameters
 
         // get participant records
-        $sel		= "WHERE RegDomain=:domain AND " .
+        $sel		    = "WHERE RegDomain=:domain AND " .
                                 "RegYear=:year AND " .
                                 "RegNum=:number";
-        $sqlParms	= array("domain"	=> $mregdomain,
+        $sqlParms	    = array("domain"	=> $mregdomain,
                                 "year"		=> $mregyear,
                                 "number"	=> $mregnum);
-        $pquery		= "SELECT * FROM MarriageIndi $sel ORDER BY Role";
-        $pstmt		= $connection->prepare($pquery);
-        $pqueryText	= debugPrepQuery($pquery, $sqlParms);
+        $pquery		    = "SELECT * FROM MarriageIndi $sel ORDER BY Role";
+        $pstmt		    = $connection->prepare($pquery);
+        $pqueryText	    = debugPrepQuery($pquery, $sqlParms);
         if ($pstmt->execute($sqlParms))
         {		// query successful
             $presults	        = $pstmt->fetchAll(PDO::FETCH_ASSOC);
@@ -680,7 +681,7 @@ class Marriage extends Record
         {
             if (substr($key, 0, 2) == '')
                     $key	= substr($key, 2);
-            $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
+            $retval	.= "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
         }
 
         // display information about participants in the marriage
@@ -788,10 +789,10 @@ class Marriage extends Record
      ********************************************************************/
     function set($field, $value)
     {
-        $lcfldname	= strtolower($field);
-        if (array_key_exists($lcfldname, self::$translate))
-            $lcfldname	= self::$translate[$lcfldname];
-        switch($lcfldname)
+        $fieldLc	= strtolower($field);
+        if (array_key_exists($fieldLc, self::$translate))
+            $fieldLc	= self::$translate[$fieldLc];
+        switch($fieldLc)
         {		// act on specific field
             case 'regdomain':
             case 'regyear':
@@ -822,7 +823,7 @@ class Marriage extends Record
                         $d	= '0' . $d;
                 }
                 parent::set('calcdate',"$y-$m-$d");
-                return parent::set($lcfldname, $value);
+                return parent::set($fieldLc, $value);
             }
 
             case 'regcounty':
@@ -838,7 +839,7 @@ class Marriage extends Record
             case 'originalpage':
             case 'originalitem':
             {
-                return parent::set($lcfldname, $value);
+                return parent::set($fieldLc, $value);
             }
 
             default:
@@ -992,7 +993,7 @@ class Marriage extends Record
                 {
                     case 'changedby':
                     {
-                        $fldnames		.= $comma . "`m_changedby`"; 
+                        $fldnames		.= $comma . "`changedby`"; 
                         $values			.= $comma . ':userid';
                         $sqlParms['userid']	= $userid;
                         $comma			= ", ";
@@ -1001,7 +1002,7 @@ class Marriage extends Record
 
                     case 'changedate':
                     {
-                        $fldnames		.= $comma . "`m_changedate`"; 
+                        $fldnames		.= $comma . "`changedate`"; 
                         $values			.= $comma . 'CURDATE()';
                         $comma			= ", ";
                         break;
@@ -1012,12 +1013,11 @@ class Marriage extends Record
                     case 'originalitem':
                     {		// most fields
                         $fldnames		.= $comma . "`$fld`";
-                        $shortFld		= substr($fld, 2);
-                        $values			.= $comma . ':' . $shortFld;
+                        $values			.= $comma . ':' . $fld;
                         if (is_int($value) || ctype_digit($value))
-                            $sqlParms[$shortFld]= $value;
+                            $sqlParms[$fld]= $value;
                         else
-                            $sqlParms[$shortFld]= null;
+                            $sqlParms[$fld]= null;
                         $comma			= ', ';
                         break;
                     }		// most fields
@@ -1121,15 +1121,14 @@ class Marriage extends Record
                     case 'originalpage':
                     case 'originalitem':
                     {		// most fields
-                        $shortFld		= substr($fld, 2);
-                        $set			.= $comma . "`$fld`=:$shortFld";
+                        $set			.= $comma . "`$fld`=:$fld";
                         if (is_int($value) || ctype_digit($value))
                         {
-                            $sqlParms[$shortFld]	= $value;
+                            $sqlParms[$fld]	= $value;
                         }
                         else
                         {
-                            $sqlParms[$shortFld]	= null;
+                            $sqlParms[$fld]	= null;
                         }
                         $comma	= ', ';
                         break;

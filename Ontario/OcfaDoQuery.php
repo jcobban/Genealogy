@@ -105,7 +105,7 @@ foreach($_GET as $key => $value)
 	    }
 
 	    case 'givenname':
-	    case 'givenname':
+	    case 'givennames':
 	    {		// match anywhere in string
             $givenname                 = $value;
             if (strlen($value) > 0)
@@ -207,6 +207,7 @@ if ($nextoffset >= $totalrows)
 
 if ($count > 0)
 {               // have at least one response
+    $template['nomatches']->update(null);
     $rowelt         = $template['Row$recordindex'];
     if (is_null($rowelt))
         $template->getDocument()->printTag();

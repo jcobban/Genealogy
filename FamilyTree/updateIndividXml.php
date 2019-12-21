@@ -186,8 +186,9 @@ use \Exception;
  *		2017/08/25		change implementation so $event always set	    *
  *		2017/09/28		change class LegacyEvent to class Event		    *
  *		2017/10/13		class LegacyIndiv renamed to class Person	    *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																	    *
- *  Copyright &copy; 2017 James A. Cobban							    *
+ *  Copyright &copy; 2019 James A. Cobban							    *
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Person.inc';
@@ -226,7 +227,7 @@ try {
     {
         // provide list of parameters in feedback
         if (is_string($value))
-            print "<$name>" . xmlentities($value);
+            print "<$name>" . htmlentities($value,ENT_XML1);
         else
             print "<$name>" . print_r($value, true);
     error_log("<p>updateIndividXml.php: " . __LINE__ .

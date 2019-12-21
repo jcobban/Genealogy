@@ -33,6 +33,7 @@ use Templating\TemplateTag;
 require_once  'Templating/Template.inc' ;
 include_once  __NAMESPACE__ . '/User.inc';
 include_once  __NAMESPACE__ . '/Language.inc';
+include_once  __NAMESPACE__ . '/Advertiser.inc';
 
 class FtTemplate extends Template
 {
@@ -389,12 +390,28 @@ class FtTemplate extends Template
 				    substr($filename, strlen($filename) - 5) == '.html')
 				$ads[]		= $filename;
 			}		// loop through files
-			$index	= rand(0, count($ads) - 1);
-			$adname	= $ads[$index];
+			$index	        = rand(0, count($ads) - 1);
+            $adname	        = $ads[$index];
+            $prime          = substr($adname, 0, strlen($adname) - 5);
+            $advertiser     = new Advertiser(array('adname' => $prime));
+            $date           = date('m d');
+            $month          = substr($date, 0, 2);
+            $day            = substr($date, -2);
+            $advertiser->increment($month);
+            if ($day == '28')
+            {
+                $month      += 1;
+                if ($month > 12)
+                    $month  = $month - 13;
+                if (strlen($month) == 1)
+                    $month  = '0' . $month;
+                $advertiser->set("Count$month", 0);
+                $advertiser->save(false);
+            }
 		}			// found advertisements directory
 		else
-			$adname	    = 'AddForRent.html';
-        $adurl	        = "/Advertisements/$adname";
+			$adname	        = 'AddForRent.html';
+        $adurl	            = "/Advertisements/$adname";
 
         // change insertion of ads to not use <iframe>
         $adElement              = $this['advertFrame'];

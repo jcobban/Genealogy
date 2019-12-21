@@ -127,8 +127,9 @@ use \Exception;
  *		2017/12/12		use class PersonSet in place of					*
  *						Person::getPersons								*
  *		2019/07/18      fix infinite recursion getting spouse name      *       
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -191,7 +192,7 @@ foreach($_GET as $key => $value)
     		    }	// all numeric
     		    else
     				$msg	.= "Invalid value of IDIR='" .
-    						   xmlentities($value) . "'. ";
+    						   htmlentities($value,ENT_XML1) . "'. ";
     		}	// value provided
     		break;
         }		// match an existing individual for merge
@@ -580,9 +581,9 @@ flush();
         $isOwner	        = $indiv->isOwner();
 
         // extract fields from individual 
-        $surname	        = xmlentities($indiv->get('indexsurname'));
-        $maidenname	        = xmlentities($indiv->get('surname'));
-        $givenname	        = xmlentities($indiv->get('givenname'));
+        $surname	        = htmlentities($indiv->get('indexsurname'),ENT_XML1);
+        $maidenname	        = htmlentities($indiv->get('surname'),ENT_XML1);
+        $givenname	        = htmlentities($indiv->get('givenname'),ENT_XML1);
         $birth	            = $indiv->getBirthEvent();
         $death	            = $indiv->getDeathEvent();
         if ($isOwner)

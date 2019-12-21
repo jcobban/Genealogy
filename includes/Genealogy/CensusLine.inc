@@ -64,6 +64,9 @@ use \Iterator;
  *		2019/01/19      report constructor errors through message       *
  *		2019/04/18      support method getLastSqlCmd                    *
  *		2019/12/01      do not fail save on empty string for numeric    *
+ *		2019/12/19      use named insertion points in method save       *
+ *		                truncate values for short string fields and     *
+ *		                warn about truncated values in method set       *
  *															    		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1149,16 +1152,6 @@ class CensusLine extends Record
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
 		{
-		    case 'province':
-		    case 'district':
-		    case 'subdistrict':
-		    case 'division':
-		    case 'page':
-		    case 'line':
-		    {		// identification fields
-				return parent::set($fieldLc, $value); 
-		    }		// identification fields
-
 		    case 'numhands':
 		    case 'wksemp':
 		    case 'wksoth':
@@ -1179,7 +1172,7 @@ class CensusLine extends Record
 		    case 'incomeemp':
 		    case 'incomeoth':
 		    case 'monthsschool':
-            {		// numeric fields where blank means zero
+            {		            // numeric fields where blank means zero
                 if (is_string($value))
                 {
                     $matches        = array();
@@ -1190,47 +1183,58 @@ class CensusLine extends Record
                         $value		= $matches[0] - 0;
                 }
 				return parent::set($field, $value);
-		    }		// numeric fields
+		    }		            // numeric fields
 
 		    case 'byeartxt':
-		    {	// birth year as text
+		    {	                // birth year as text
+                if (strlen($value) > 8)
+                {
+                    $warn   .= "<p>value '$value' for '$field' is truncated</p>\n";
+                    $value  = substr($value, 0, 8);
+                }
 				if (preg_match("/[0-9]{4}/", $value, $matches))
-				{	// 4 digit birth year supplied
+				{	            // 4 digit birth year supplied
 				    parent::set('byear', $matches[0]);
-				}	// 4 digit birth year supplied
+				}	            // 4 digit birth year supplied
 
 				return parent::set('byeartxt', $value);
-		    }	// birth year as text
+		    }	                // birth year as text
 
 		    case 'age':
-		    {	// age field
+		    {	                // age field
+                if (strlen($value) > 8)
+                {
+                    $warn   .= "<p>value '$value' for '$field' is truncated</p>\n";
+                    $value  = substr($value, 0, 8);
+                }
 				if (!array_key_exists('byeartxt', $this->row) ||
 				    !preg_match("/[0-9]{4}/", $this->row['byeartxt'], $matches))
-				{	// birth year not set from 'birthyeartxt'
+				{	            // birth year not set from 'birthyeartxt'
 				    if (preg_match("/^\[?([0-9]+)\]?$/", $value, $matches))
-				    {	// age is a number of years
+				    {	        // age is a number of years
 						// calculate approximate birth year
 						parent::set('byear', 
 									 $this->byear - $matches[1]);
-				    }	// age is a number of years
+				    }	        // age is a number of years
 				    else
 				    if (preg_match("/^m?([0-9]+)m?$/", $value, $matches) &&
 						$matches[1] < 5)
-				    {	// less than 5 months old
+				    {	        // less than 5 months old
 						// birth in year of enumeration
 						parent::set('byear', 
 									 $this->byear + 1);
-				    }	// less than 5 months old
+				    }	        // less than 5 months old
 				    else
-				    {	// unrecognized or between 5m and a year old
+				    {	        // unrecognized or between 5m and a year old
 						// birth in year before enumeration
 						parent::set('byear', 
 									 $this->byear);
-				    }	// unrecognized or between 5m and a year old
-				}	// birth year not set from 'birthyeartxt'
+				    }	        // unrecognized or between 5m and a year old
+				}	            // birth year not set from 'birthyeartxt'
 
 				return parent::set('age', $value);
-		    }	// age field
+		    }	                // age field
+
 
 		    default:
 		    {		// no validation implemented yet
@@ -1280,11 +1284,10 @@ class CensusLine extends Record
 				{	// act on field name
 				    case 'surname':
 				    {	// surname also updates soundex
-						$fldnames	.= $comma."`surname`, `surnamesoundex`"; 
-						$values		.= $comma . "?, LEFT(SOUNDEX(?),4)";
-						$sqlParms[]	= $value;
-						$sqlParms[]	= $value;
-						$surnameChanged	= true;
+						$fldnames			.= $comma."`surname`, `surnamesoundex`"; 
+						$values				.= "$comma:$fld, LEFT(SOUNDEX(:$fld),4)";
+						$sqlParms[$fld]	    = $value;
+						$surnameChanged	    = true;
 						break;
 				    }	// surname also updates soundex
 
@@ -1293,15 +1296,70 @@ class CensusLine extends Record
 						break;
 				    }	// set under 'surname'
 
+		            case 'sex':
+		            case 'race':
+		            case 'mstat':
+		            case 'bplaceru':
+		            case 'ownMeans':
+		            case 'employer':
+		            case 'employee':
+		            case 'ownacct':
+		            case 'canread':
+		            case 'canwrite':
+		            case 'spkenglish':
+		            case 'spkfrench':
+		            {                   // single character fields
+		                if (strlen($value) > 1)
+		                    $value  = substr($value, 0, 1);
+						$fldnames			.= "$comma`$fld`";
+		                $values				.= "$comma:$fld"; 
+						$sqlParms[$fld]	    = $value;
+						break;
+		            }                   // single character fields
+		
+		            case 'facthome':
+		            {                   // 2 character fields
+		                if (strlen($value) > 2)
+		                    $value  = substr($value, 0, 2);
+						$fldnames			.= "$comma`$fld`";
+		                $values				.= "$comma:$fld"; 
+						$sqlParms[$fld]	    = $value;
+						break;
+		            }                   // 2 character fields
+		
+				    case 'subdistrict':
+				    case 'division':
+		            {                   // 4 character fields
+		                if (strlen($value) > 4)
+		                    $value  = substr($value, 0, 2);
+						$fldnames			.= "$comma`$fld`";
+		                $values				.= "$comma:$fld"; 
+						$sqlParms[$fld]	    = $value;
+						break;
+		            }                   // 4 character fields
+		
+		            case 'bdate':
+		            case 'immyear':
+		            {                   // 8 character fields
+		                if (strlen($value) > 8)
+		                    $value  = substr($value, 0, 8);
+						$fldnames			.= "$comma`$fld`";
+		                $values				.= "$comma:$fld"; 
+						$sqlParms[$fld]	    = $value;
+						break;
+		            }                   // 8 character fields
+
                     case 'origin':
                     case 'spkother':
                     case 'empwhere':
+		            case 'nationality':
+		            case 'mothertongue':
                     {           // strings limited to 16 characters
-						$fldnames	    .= $comma . "`$fld`";
-                        $values		    .= $comma . '?'; 
+						$fldnames	    	.= "$comma`$fld`";
+                        $values		    	.= "$comma:$fld"; 
                         if (strlen($value) > 16)
-                            $value      = substr($value, 0, 16);
-						$sqlParms[]	    = $value;
+                            $value          = substr($value, 0, 16);
+						$sqlParms[$fld]	    = $value;
 						break;
                     }           // strings limited to 16 characters
 
@@ -1311,11 +1369,11 @@ class CensusLine extends Record
                     case 'fathersbplace':
                     case 'mothersbplace':
                     {           // strings limited to 32 characters
-						$fldnames	    .= $comma . "`$fld`";
-                        $values		    .= $comma . '?'; 
+						$fldnames	    	.= "$comma`$fld`";
+                        $values		    	.= "$comma:$fld"; 
                         if (strlen($value) > 32)
                             $value      = substr($value, 0, 32);
-						$sqlParms[]	    = $value;
+						$sqlParms[$fld]	    = $value;
 						break;
                     }           // strings limited to 32 characters
 
@@ -1324,11 +1382,11 @@ class CensusLine extends Record
                     case 'address':
                     case 'occupation':
                     {           // strings limited to 48 characters
-						$fldnames	    .= $comma . "`$fld`";
-                        $values		    .= $comma . '?'; 
+						$fldnames	    	.= "$comma`$fld`";
+                        $values		    	.= "$comma:$fld"; 
                         if (strlen($value) > 48)
                             $value      = substr($value, 0, 48);
-						$sqlParms[]	    = $value;
+						$sqlParms[$fld]	    = $value;
 						break;
                     }           // strings limited to 48 characters
 
@@ -1337,13 +1395,13 @@ class CensusLine extends Record
 				    case 'line':
 				    case 'byear':
 				    {	// integer fields
-						$fldnames	.= $comma . "`$fld`";
-						$values		.= $comma . '?'; 
+						$fldnames			.= "$comma`$fld`";
+						$values				.= "$comma:$fld"; 
 						if (is_int($value) ||
 						    preg_match('/^\s*\d+(\.\d)?/', $value))
-						    $sqlParms[]	= $value;
+						    $sqlParms[$fld]	= $value;
 						else
-						    $sqlParms[]	= 0;
+						    $sqlParms[$fld]	= 0;
 						break;
                     }	// integer fields
 
@@ -1369,26 +1427,26 @@ class CensusLine extends Record
 				    case 'accinsurance':
 				    case 'schoolmons':
 				    {	// optional integer fields
-						$fldnames	.= $comma . "`$fld`";
-                        $values		.= $comma . '?'; 
+						$fldnames			.= "$comma`$fld`";
+                        $values				.= "$comma:$fld"; 
 						if (is_numeric($value))
-						    $sqlParms[]	= $value;
+						    $sqlParms[$fld]	= $value;
 						else
-						    $sqlParms[]	= null;
+						    $sqlParms[$fld]	= null;
 						break;
 				    }	// optional integer fields
+		
 
-				    case 'subdistrict':
 				    default:
-				    {	// other fields
-						$fldnames	.= $comma . "`$fld`";
-						$values		.= $comma . '?'; 
-						$sqlParms[]	= $value;
+				    {	                // other fields
+						$fldnames			.= "$comma`$fld`";
+						$values				.= "$comma:$fld"; 
+						$sqlParms[$fld]	    = $value;
 						break;
-                    }	// other fields
-				}	// switch on field name
-				$comma	= ", ";
-		    }		// loop through all fields in record
+                    }	                // other fields
+				}	                    // switch on field name
+				$comma	                    = ", ";
+		    }		                    // loop through all fields in record
 
 		    // construct the SQL INSERT command	
 		    $insert	= "INSERT INTO " . $this->table .
@@ -1415,11 +1473,7 @@ class CensusLine extends Record
 				$this->needInsert	= false;
 
 				// log the update
-				logSqlUpdate($insert,
-						     $sqlParms,
-						     0,		// compound key
-						     '',
-						     json_encode($this->row));
+				$this->log($insert, $sqlParms);
 		    }		// record inserted
 		    else
 		    {		// error inserting record
@@ -1435,12 +1489,12 @@ class CensusLine extends Record
 								    $insertText . "', " .
 								    print_r($stmt->errorInfo(),true));
 		    }		// error inserting record
-		}		// create new record
+		}		    // create new record
 		else
-		{		// update existing record
-		    $update		= "UPDATE " . $this->table . " SET ";
-		    $set		= '';
-		    $comma		= '';
+		{		    // update existing record
+		    $update		    = "UPDATE " . $this->table . " SET ";
+		    $set		    = '';
+		    $comma		    = '';
 		    $sqlParms		= array();
 		    $surnameChanged	= false;
 		    foreach($this->changed as $fld => $value)
@@ -1449,12 +1503,11 @@ class CensusLine extends Record
 				{	// act on field name
 				    case 'surname':
 				    {	// surname also updates soundex 
-						$set		.= $comma .
-								   "`Surname`=?, `SurnameSoundex`=LEFT(SOUNDEX(?),4)";
-						$sqlParms[]	= $value;
-						$sqlParms[]	= $value;
-						$comma		= ', ';
-						$surnameChanged	= true;
+						$set			    .= $comma .
+			"`Surname`=:surname, `SurnameSoundex`=LEFT(SOUNDEX(:surname),4)";
+						$sqlParms[$fld]	    = $value;
+						$comma		        = ', ';
+						$surnameChanged	    = true;
 						break;
 				    }	// surname also updates soundex
 
@@ -1468,13 +1521,13 @@ class CensusLine extends Record
 				    case 'line':
 				    case 'byear':
 				    {	// integer fields
-						$set		.= $comma . "`$fld`=?";
+						$set			    .= "$comma`$fld`=:$fld";
 						if (is_int($value) ||
 						    preg_match('/^\s*\d+(\.\d)?/', $value))
-						    $sqlParms[]	= $value;
+						    $sqlParms[$fld]	= $value;
 						else
-						    $sqlParms[]	= 0;
-						$comma		= ', ';
+						    $sqlParms[$fld]	= 0;
+						$comma		        = ', ';
 						break;
                     }	// integer fields
 
@@ -1499,25 +1552,80 @@ class CensusLine extends Record
 				    case 'accinsurance':
 				    case 'schoolmons':
 				    {	// optional integer fields
-						$set		.= $comma . "`$fld`=?";
+						$set			    .= "$comma`$fld`=:$fld";
 						if (is_int($value) ||
 						    preg_match('/^\s*\d+(\.\d)?/', $value))
-						    $sqlParms[]	= $value;
+						    $sqlParms[$fld]	= $value;
 						else
-						    $sqlParms[]	= null;
-						$comma		= ', ';
+						    $sqlParms[$fld]	= null;
+						$comma		        = ', ';
 						break;
 				    }	// optional integer fields
+
+		            case 'sex':
+		            case 'race':
+		            case 'mstat':
+		            case 'bplaceru':
+		            case 'ownMeans':
+		            case 'employer':
+		            case 'employee':
+		            case 'ownacct':
+		            case 'canread':
+		            case 'canwrite':
+		            case 'spkenglish':
+		            case 'spkfrench':
+		            {                   // single character fields
+		                if (strlen($value) > 1)
+		                    $value          = substr($value, 0, 1);
+						$sqlParms[$fld]	    = $value;
+						$set	    		.= "$comma`$fld`=:$fld";
+						$comma	    	    = ', ';
+						break;
+		            }                   // single character fields
+		
+		            case 'facthome':
+		            {                   // 2 character fields
+		                if (strlen($value) > 2)
+		                    $value          = substr($value, 0, 2);
+						$sqlParms[$fld]	    = $value;
+						$set	    		.= "$comma`$fld`=:$fld";
+						$comma	    	    = ', ';
+						break;
+		            }                   // 2 character fields
+		
+				    case 'subdistrict':
+				    case 'division':
+		            {                   // 4 character fields
+		                if (strlen($value) > 4)
+		                    $value          = substr($value, 0, 2);
+						$sqlParms[$fld]	    = $value;
+						$set	    		.= "$comma`$fld`=:$fld";
+						$comma	    	    = ', ';
+						break;
+		            }                   // 4 character fields
+		
+		            case 'bdate':
+		            case 'immyear':
+		            {                   // 8 character fields
+		                if (strlen($value) > 8)
+		                    $value          = substr($value, 0, 8);
+						$sqlParms[$fld]	    = $value;
+						$set	    		.= "$comma`$fld`=:$fld";
+						$comma	    	    = ', ';
+						break;
+		            }                   // 8 character fields
 
                     case 'origin':
                     case 'spkother':
                     case 'empwhere':
+		            case 'nationality':
+		            case 'mothertongue':
                     {           // strings limited to 16 characters
                         if (strlen($value) > 16)
-                            $value      = substr($value, 0, 16);
-						$sqlParms[]	    = $value;
-						$set	    	.= "$comma`$fld`=?";
-						$comma	    	= ', ';
+                            $value          = substr($value, 0, 16);
+						$sqlParms[$fld]	    = $value;
+						$set	    		.= "$comma`$fld`=:$fld";
+						$comma	    	    = ', ';
 						break;
                     }           // strings limited to 16 characters
 
@@ -1528,10 +1636,10 @@ class CensusLine extends Record
                     case 'mothersbplace':
                     {           // strings limited to 32 characters
                         if (strlen($value) > 32)
-                            $value      = substr($value, 0, 32);
-						$sqlParms[]	    = $value;
-						$set	    	.= "$comma`$fld`=?";
-						$comma	    	= ', ';
+                            $value          = substr($value, 0, 32);
+						$sqlParms[$fld]	    = $value;
+						$set	    		.= "$comma`$fld`=:$fld";
+						$comma	    	    = ', ';
 						break;
                     }           // strings limited to 32 characters
 
@@ -1541,92 +1649,88 @@ class CensusLine extends Record
                     case 'occupation':
                     {           // strings limited to 48 characters
                         if (strlen($value) > 48)
-                            $value      = substr($value, 0, 48);
-						$sqlParms[]	    = $value;
-						$set	    	.= "$comma`$fld`=?";
-						$comma	    	= ', ';
+                            $value          = substr($value, 0, 48);
+						$sqlParms[$fld]	    = $value;
+						$set	    		.= "$comma`$fld`=:$fld";
+						$comma	    	    = ', ';
 						break;
                     }           // strings limited to 48 characters
 
 
 				    default:
-				    {	// other fields
-						$set	    	.= "$comma`$fld`=?";
-						$sqlParms[] 	= $value;
-						$comma	    	= ', ';
-				    }	// other fields
-				}	// switch on field name
-		    }		// loop through all fields in record
+				    {	        // other fields
+						$set	    		.= "$comma`$fld`=:$fld";
+						$sqlParms[$fld] 	= $value;
+						$comma	    	    = ', ';
+				    }	        // other fields
+				}	            // switch on field name
+		    }		            // loop through all fields in record
 		    $this->changed	= array();	// reset
 
 		    if (strlen($set) > 0)
-		    {		// changes made
+		    {		            // changes made
 				// construct the where clause
                 if (array_key_exists('province', $this->row))
                 {
                     if ($this->row['province'] !== null)
 					{
-					    $where	        = ' Province=? AND ';
+					    $where	                = ' Province=:oprovince AND ';
 					    if ($this->former)
-							$sqlParms[]	= $this->former['province'];
+							$sqlParms['oprovince']	= $this->former['province'];
 					    else
-							$sqlParms[]	= $this->row['province'];
+							$sqlParms['oprovince']	= $this->row['province'];
 					}
 	                else
-	                {
-						$set	    	.= "$comma`Province`=?";
-						$sqlParms[] 	= $this->distObj['province'];
-	                    $where	        = '';
-	                }
+	                {           // not initialized
+						$set	    	        .= "$comma`Province`=:province";
+						$sqlParms['province'] 	= $this->distObj['province'];
+	                    $where	                = '';
+	                }           // not initialized
                 }
                 else
                 {
                     $where           	= '';
                 }
-				$where	                .= 'District=? AND ' . 
-		            						'SubDistrict=? AND ' .
-				            				'Division=? AND ' . 
-					            			'Page=? AND ' . 
-						            		'Line=?';
+				$where	                .= 'District=:odistrict AND ' . 
+		            						'SubDistrict=:osubdistrict AND ' .
+				            				'Division=:odivision AND ' . 
+					            			'Page=:opage AND ' . 
+						            		'Line=:oline';
 				if ($this->former)
 				{
-				    $sqlParms[]	= $this->former['district'];
-				    $sqlParms[]	= $this->former['subdistrict'];
-				    $sqlParms[]	= $this->former['division'];
-				    $sqlParms[]	= $this->former['page'];
-				    $sqlParms[]	= $this->former['line'];
+				    $sqlParms['odistrict']	    = $this->former['district'];
+				    $sqlParms['osubdistrict']	= $this->former['subdistrict'];
+				    $sqlParms['odivision']	    = $this->former['division'];
+				    $sqlParms['opage']	        = $this->former['page'];
+				    $sqlParms['oline']	        = $this->former['line'];
 				}
 				else
 				{
-				    $sqlParms[]	= $this->row['district'];
-				    $sqlParms[]	= $this->row['subdistrict'];
-				    $sqlParms[]	= $this->row['division'];
-				    $sqlParms[]	= $this->row['page'];
-				    $sqlParms[]	= $this->row['line'];
+				    $sqlParms['odistrict']	    = $this->row['district'];
+				    $sqlParms['osubdistrict']	= $this->row['subdistrict'];
+				    $sqlParms['odivision']	    = $this->row['division'];
+				    $sqlParms['opage']	        = $this->row['page'];
+				    $sqlParms['oline']	        = $this->row['line'];
 				}
 
 				// assemble the UPDATE command
-				$update			.= $set . ' WHERE ' . $where;
+				$update			                .= $set . ' WHERE ' . $where;
 
 				// perform the update
-				$stmt			    = $connection->prepare($update);
-				$updateText		    = debugPrepQuery($update, $sqlParms);
-                $this->lastSqlCmd   = $updateText;
+				$stmt			        = $connection->prepare($update);
+				$updateText		        = debugPrepQuery($update, $sqlParms);
+                $this->lastSqlCmd       = $updateText;
 				if ($stmt->execute($sqlParms))
 				{
-				    $count		    = $stmt->rowCount();
+				    $count		        = $stmt->rowCount();
 				    if ($xml)
 						print "<$tagname count='$count'>" .
 								$updateText . "</$tagname>\n";
 				    if ($debug)
-						$warn		.= "<p>$updateText</p>\n";
+						$warn		    .= "<p>$updateText</p>\n";
 
 				    // log the update
-				    logSqlUpdate($update,
-								 $sqlParms,
-								 0,	// compound key
-								 json_encode($this->former),
-								 json_encode($this->row));
+				    $this->log($update, $sqlParms);
 				}
 				else
 				{		// error updating record

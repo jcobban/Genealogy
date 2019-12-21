@@ -21,8 +21,9 @@ use \Exception;
  *		2017/07/23		class LegacyPicture renamed to class Picture	*
  *		2017/09/12		use get( and set(								*
  *		2017/10/17		use class RecordSet								*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Picture.inc";
@@ -45,7 +46,7 @@ foreach($_POST as $key => $value)
 {
     if (strtolower($key) == 'idir')
         $idir	= $value;
-    print "\t<$key>" . xmlentities($value) . "</$key>\n";
+    print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 }
 print "    </parms>\n";
 
@@ -94,7 +95,7 @@ if (strlen($msg) == 0)
 else
 {		// errors in parameters
     print "    <msg>\n";
-    print xmlentities($msg);
+    print htmlentities($msg,ENT_XML1);
     print "    </msg>\n";
 }		// errors in parameters
 

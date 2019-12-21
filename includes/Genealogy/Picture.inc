@@ -136,6 +136,7 @@ use Templating\TemplateTag;
  *		2019/04/15      replace is_a with instanceof                    *
  *		2019/07/18      use Person::getPerson                           *
  *		2019/07/21      use Location::getLocation                       *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/	
@@ -1517,7 +1518,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
 		{
 		    $key	= strtolower($key);
 		    if ($xml)
-				print "\t<$key>" . xmlentities($value) . "</$key>\n";
+				print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 
 		    switch ($key)
 		    {		// not the identifying key of the record

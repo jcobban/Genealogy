@@ -32,13 +32,14 @@ use \Templating\Template;
  *		2017/02/07	    use class Country				                *
  *		2018/06/01	    add support for lang parameter			        *
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
- *		2019/01/19      use class Template
+ *		2019/01/19      use class Template                              *
+ *		2019/12/14      use class DeathSet                              *
  *										                                *
  *  Copyright &copy; 2018 James A. Cobban					            *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
-require_once __NAMESPACE__ . '/Language.inc';
+require_once __NAMESPACE__ . "/DeathSet.inc";
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -119,37 +120,15 @@ else
 }
 
 // execute the query
-// The following should be moved to a class DeathSet method summary
-$query	= "SELECT D_RegYear, SUM(D_Surname != ''), SUM(D_IDIR > 0) " .
-                        "FROM Deaths " .
-                            "WHERE D_RegDomain=:domain " .
-                        "GROUP BY D_RegYear ORDER BY D_RegYear";
-$sqlParms               = array('domain'    => $domain);
-$queryText              = debugPrepQuery($query, $sqlParms);
-$stmt	 	            = $connection->prepare($query);
-if ($stmt->execute($sqlParms))
-{		// successful query
-    $result		        = $stmt->fetchAll(PDO::FETCH_NUM);
-    if ($debug)
-        $warn		.= "<p>$queryText</p>\n";
-}		// successful query
-else
-{
-    $msg	.= "Query '$queryText' failed: " .
-                print_r($stmt->errorInfo(),true) . ". ";
-    $result             = array();
-}		// query failed
-
-// the following calculation permits the template designer to control the
-// number of columns in the display by modifying the contents of the header
-// row
-$thRow              = $template->getElementById('thRow');
-$numCols            = (int)((count($thRow->children) + 1) / 5);
+$births	        	= new DeathSet(array('domain' => $domain));
+$result		        = $births->getSummary();
 
 // $dataRow is the template for displaying a single year of statistics
 $dataRow            = $template['dataRow'];
 $yearHTML           = $dataRow->innerHTML();
 
+$thRow              = $template->getElementById('thRow');
+$numCols            = (int)((count($thRow->children) - 2) / 4);
 $col		        = 0;
 $total		        = 0;
 $totalLinked	    = 0;

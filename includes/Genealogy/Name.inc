@@ -175,6 +175,7 @@ use Templating\TemplateTag;
  *		                defer assignment of aka order until save        *
  *		2019/11/26      correct constructor which was returning the     *
  *		                an existing entry if no valid IDIR was passed   *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -689,7 +690,7 @@ class Name extends Record
                                 " new row " . print_r($dbrow, true) . "</p>\n";
     					        ob_start();
     					        debug_print_backtrace();
-                                $warn	.= "<p>" . xmlentities(ob_get_clean()) . "</p>\n";
+                                $warn	.= "<p>" . htmlentities(ob_get_clean(),ENT_XML1) . "</p>\n";
                             }
 
                             foreach($parms as $field => $value)
@@ -1887,12 +1888,12 @@ class Name extends Record
 	                if ($value == 2)
 	                    $retval	.= "2=user created married name";
 	                else
-	                    $retval	.= xmlentities($value);
+	                    $retval	.= htmlentities($value,ENT_XML1);
 	                $retval     .= "</$key>\n";
                 }                       // married name record
             }
             else
-		        $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
+		        $retval	.= "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 		}
 		if ($top !== null)
 		    $retval	.= "    </$top>\n";

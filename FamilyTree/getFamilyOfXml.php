@@ -68,8 +68,9 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2017/11/29		use RecordSet									*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -256,8 +257,8 @@ else
     $dprivlim	= intval(date('Y')) - 72;
 }		// privatize dates
 
-$surname	= xmlentities($indiv->getSurname());
-$givenname	= xmlentities($indiv->getGivenName());
+$surname	= htmlentities($indiv->getSurname(),ENT_XML1);
+$givenname	= htmlentities($indiv->getGivenName(),ENT_XML1);
 
 $birthd		= $indiv->getBirthDate();
 $deathd		= $indiv->getDeathDate();
@@ -542,7 +543,7 @@ print "<names buttonId='doIdir$line'>\n";
 print "  <parms>\n";
 foreach($_GET as $key => $value)
 {
-    print "    <$key>" . xmlentities($value) . "</$key>\n";
+    print "    <$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 }
 print "  </parms>\n";
 
@@ -550,7 +551,7 @@ print "  </parms>\n";
 if (strlen($msg) > 0)
 {		// error in validation
     print "  <msg>\n";
-    print xmlentities($msg);
+    print htmlentities($msg,ENT_XML1);
     print "  </msg>\n";
     print "</names>\n";
     exit;
@@ -656,8 +657,8 @@ foreach($family as $member)
     $cenbyear	= $member->get('byear');
     print "\t<page>$page</page>\n";
     print "\t<line>$cline</line>\n";
-    print "\t<censurname>" . xmlentities($censurname) . "</censurname>\n";
-    print "\t<cengiven>" . xmlentities($cengiven) . "</cengiven>\n";
+    print "\t<censurname>" . htmlentities($censurname,ENT_XML1) . "</censurname>\n";
+    print "\t<cengiven>" . htmlentities($cengiven,ENT_XML1) . "</cengiven>\n";
     print "\t<cenbyear>$cenbyear</cenbyear>\n";
     if ($cline == $line)
     {		// key individual

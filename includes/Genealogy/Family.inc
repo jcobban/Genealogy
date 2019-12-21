@@ -379,6 +379,7 @@ use \Exception;
  *		2019/09/20      improve comments describing Family::dump        *
  *		2019/11/14      change method get to agree with documentation   *
  *		                in not referencing obsolete fields              *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -2010,7 +2011,7 @@ try {
              				"1=Replace wife's surname with husband's surname" .
                             "</$fld>\n";
                     else
-                        $retval	.= "    <$fld>" . xmlentities($value) .
+                        $retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) .
                                     "</$fld>\n";
 				    break;
 				}       // unsupported fields
@@ -2021,13 +2022,13 @@ try {
                         $retval	.= "    <$fld>$value=" . 
                                         self::$statusText[$value] . "</$fld>\n";
                     else
-				        $retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+				        $retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) . "</$fld>\n";
 				    break;
                 }       // marriage final status
 
 				default:
 				{		// fields passed with no interpretation
-				    $retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+				    $retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) . "</$fld>\n";
 				    break;
 				}		// fields passed back with no interpretation
 		    }		// switch on field name

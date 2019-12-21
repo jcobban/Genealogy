@@ -6,41 +6,33 @@ use \ArrayAccess;
 use \Countable;
 use \Iterator;
 /************************************************************************
- *  BirthSet.inc														*
+ *  DeathSet.inc														*
  *																		*
- *  Definition of a class representing a set of birth registrations.	*
+ *  Definition of a class representing a set of death registrations.	*
  *																		*
  *  History:															*
- *		2017/10/16		created											*
- *		2019/01/06      move to namespace Genealogy                     *
- *		2019/03/14      if a birth date containing a month is specified *
- *		                then the range value is in months instead of    *
- *		                years                                           *
- *		2019/04/06      change response from getStatistics, and         *
- *		                getCountyStatistics                             *
- *		2019/06/15      add column to getCountyStatistics               *
- *		2019/12/13      remove B_ prefix from file names                *
+ *		2019/12/14		created											*
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
-require_once __NAMESPACE__ . '/Birth.inc';
+require_once __NAMESPACE__ . '/Death.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
 
 /************************************************************************
- *  class BirthSet														*
+ *  class DeathSet														*
  *																		*
- *  Definition of a class representing a set of birth registrations		*
- *  or birth certificates.												*
+ *  Definition of a class representing a set of death registrations		*
+ *  or death certificates.												*
  *																		*
  ************************************************************************/
 
-class BirthSet extends RecordSet
+class DeathSet extends RecordSet
 {
     /********************************************************************
-     *	function BirthSet::__construct									*
+     *	function DeathSet::__construct									*
      *																	*
-     *	Create an instance of the class BirthSet		 				*
+     *	Create an instance of the class DeathSet		 				*
      *																	*
      *	Parameters:														*
      *	    $parameters			associative array of fieldname, value	*
@@ -52,25 +44,17 @@ class BirthSet extends RecordSet
      *							LIMIT clauses.  Use '`offset`', and		*
      *							'`limit`' to reference fields with		*
      *							those names. This may be null.			*
-     *	    $order				text to place in ORDER clause			*
-     *							default is defined for table			*
      *																	*
      *	Throws:															*
      *	    An exception for invalid parameters.						*
      ********************************************************************/
-    function __construct($parms	= array(),
-						 $order	= 'RegDomain, RegYear, RegNum')
+    function __construct($parms	= array())
     {
-        $this->usenames         = true;
-        foreach($parms as $name=> $value)
-            if (strtolower($name) == 'order')
-                $order      = $value;
-		$parms['order']		= $order;
-		parent::__construct('Births', $parms);
-    }		// BirthSet::__construct
+		parent::__construct('Deaths', $parms);
+    }		// DeathSet::__construct
 
     /********************************************************************
-     *	function BirthSet::getWhere										*
+     *	function DeathSet::getWhere										*
      *																	*
      *  Given an associative array of parameters for searching the		*
      *  table, return the appropriate SQL WHERE clause.					*
@@ -181,7 +165,7 @@ class BirthSet extends RecordSet
 		global	$warn;
 
 		if ($debug)
-		    $warn	.= '<p>BirthSet::getWhere: ' . 
+		    $warn	.= '<p>DeathSet::getWhere: ' . 
 						   print_r($this->parms, true) . "</p>\n";
 		$where			= '';
 		$and			= 'WHERE ';
@@ -190,7 +174,7 @@ class BirthSet extends RecordSet
 		$tparms			= array();
 		foreach($this->parms as $fldname => $value)
 		{			// translate field names and ignore empty
-            $fieldLc		= Birth::getRealFieldName($fldname);
+            $fieldLc		= Death::getRealFieldName($fldname);
 		    if (is_array($value) || strlen($value) > 0)
 				$tparms[$fieldLc]	= $value;
 		}			// translate field names and ignore empty
@@ -203,7 +187,7 @@ class BirthSet extends RecordSet
         $marriageDate               = '';
 
 		foreach($tparms as $fieldLc => $value)
-		{
+        {
 		    switch($fieldLc)
 		    {			// act on specific fields
 				case 'limit':
@@ -321,7 +305,7 @@ class BirthSet extends RecordSet
 				    break;
 				}		// other fields
 		    }			// act on specific fields
-		}			// loop through all parameters
+		}			    // loop through all parameters
 
         // birth date interpretation involves two parameters
 	    if (strlen($birthDate) > 0)
@@ -331,10 +315,10 @@ class BirthSet extends RecordSet
             $m		            = $date->getActualMonth();
             if ($m > 0)
 			    $where		    .= $and .
-			            "ABS(DATEDIFF(CalcBirth, '$y-$m-15'))<(30 * :range)";
+			            "ABS(DATEDIFF(CalcDeath, '$y-$m-15'))<(30 * :range)";
             else
 			    $where		    .= $and .
-			            "ABS(DATEDIFF(CalcBirth, '$y-6-15'))<(365 * :range)";
+			            "ABS(DATEDIFF(CalcDeath, '$y-6-15'))<(365 * :range)";
 			$this->sqlParms['range']	= $range;
             $and		        = ' AND ';
 	    }
@@ -371,26 +355,26 @@ class BirthSet extends RecordSet
 
 		    $this->sqlParms['surname']	= $tparms['surname'];
         }			// surname comparison requested
-showTrace();
+
 		return $where;
-    }		// BirthSet::getWhere
+    }		// DeathSet::getWhere
 
     /********************************************************************
-     *	function BirthSet::getSummary									*
+     *	function DeathSet::getSummary									*
      *																	*
-     *  Get year by year statistics for birth registrations.			*
+     *  Get year by year statistics for death registrations.			*
      *	This returns an array with one record per year.					*
      *																	*
      *	Example:														*
-     *	    $births		= new BirthSet(array('domain' => 'CAON'));		*
-     *	    $result		= $births->getSummary();						*
+     *	    $deaths		= new DeathSet(array('domain' => 'CAON'));		*
+     *	    $result		= $deaths->getSummary();						*
      *																	*
      *	Returns:														*
      *		array each row of which is an array containing the		    *
      *		following values:										    *
      *		    0		year of registrations							*
-     *		    1		number of birth registrations transcribed		*
-     *		    2		number of birth registrations linked to tree	*
+     *		    1		number of death registrations transcribed		*
+     *		    2		number of death registrations linked to tree	*
      ********************************************************************/
     function getSummary()
     {
@@ -401,37 +385,38 @@ showTrace();
 
 		// execute the query
 		$query	= 'SELECT RegYear, SUM(Surname != ""), SUM(IDIR > 0) ' .
-						'FROM Births ' . $this->where .
+						'FROM Deaths ' . $this->where .
 						    ' GROUP BY RegYear ORDER BY RegYear';
-		$sqlParmsText	    = print_r($this->sqlParms, true);
+        $sqlParmsText	    = print_r($this->sqlParms, true);
+        $queryTxt           = debugPrepQuery($query, $this->sqlParms);
 		$stmt		        = $connection->prepare($query);
 		if ($stmt->execute($this->sqlParms))
 		{			// query successful
 		    $result	        = $stmt->fetchAll(PDO::FETCH_NUM);
 		    if ($debug)
 		    {			// debug output
-				$warn	.= "<p>Birth.inc: " . __LINE__ . "query='$query'</p>\n".
+				$warn	.= "<p>DeathSet.inc: " . __LINE__ . "query='$queryTxt'</p>\n".
 						   "<p>sqlParms=$sqlParmsText</p>\n";
 		    }			// debug output
 		}			// query successful
 		else
 		{			// query failed
-		    $msg	    .= "query '$query' failed, sqlParms=$sqlParmsText: " .
+		    $msg	    .= "query '$queryTxt' failed, " .
 						   print_r($stmt->errorInfo(), true);
 		    $result	= null;
 		}			// query failed
 		return $result;
-    }		// Birth::getSummary
+    }		// Death::getSummary
 
     /********************************************************************
-     *	function Birth::getStatistics									*
+     *	function Death::getStatistics									*
      *																	*
-     *  Get statistics for specific set of birth registrations.			*
+     *  Get statistics for specific set of death registrations.			*
      *																	*
      *	Example:														*
-     *	    $births		= new BirthSet(array('domain'	=> 'CAON',		*
+     *	    $deaths		= new DeathSet(array('domain'	=> 'CAON',		*
      *									     'year'		=> 1887));		*
-     *	    $result		= $births->getStatistics();						*
+     *	    $result		= $deaths->getStatistics();						*
      *																	*
      *	Returns:														*
      *		An array each row of which is								*
@@ -456,7 +441,7 @@ showTrace();
 								'SUM(Idir != 0) AS LinkCount, ' .
 								'MIN(RegNum) as low, ' .
 								'MAX(RegNum) as high  ' .
-						'FROM Births ' .
+						'FROM Deaths ' .
 						$this->where .
 						' GROUP BY RegCounty ' .
 						'ORDER BY RegCounty';
@@ -473,18 +458,18 @@ showTrace();
 					    	   print_r($stmt->errorInfo(), true);
 		    return null;
 		}		// query failed
-    }		// Birth::getStatistics
+    }		// Death::getStatistics
 
     /********************************************************************
-     *	function Birth::getCountyStatistics								*
+     *	function Death::getCountyStatistics								*
      *																	*
-     *  Get statistics for specific year of birth registrations.		*
+     *  Get statistics for specific year of death registrations.		*
      *																	*
      *	Example:														*
-     *	    $births		= new BirthSet(array('domain'	=> 'CAON',	    *
+     *	    $deaths		= new DeathSet(array('domain'	=> 'CAON',	    *
      *									     'year'		=> 1887,		*
      *									     'county'	=> 'Msx'));	    *
-     *	    $result		= $births->getCountyStatistics();				*
+     *	    $result		= $deaths->getCountyStatistics();				*
      *																	*
      *	Returns:														*
      *		An array each row of which is							    *
@@ -512,8 +497,8 @@ showTrace();
 								'SUM(Idir != 0) AS LinkCount, ' .
 								'MIN(RegNum) as low, ' .
                                 'MAX(RegNum) as high,  ' .
-                                '(SELECT MAX(RegNum) FROM Births  WHERE RegYear=:regyear and RegCounty=:regcounty AND RegTownship=Township AND RegNum<500000) AS `currhigh` ' .
-						'FROM Births ' .
+                                '(SELECT MAX(RegNum) FROM Deaths  WHERE RegYear=:regyear and RegCounty=:regcounty AND RegTownship=Township AND RegNum<500000) AS `currhigh` ' .
+						'FROM Deaths ' .
 						$this->where .
 						' GROUP BY RegCounty, RegTownship ' .
                         'ORDER BY RegCounty, RegTownship';
@@ -532,6 +517,6 @@ showTrace();
             print "<p class='error'>$msg</p>\n";
 		    return null;
 		}		    // query failed
-    }		        // function Birth::getCountyStatistics
+    }		        // function Death::getCountyStatistics
 
-}		// class BirthSet 
+}		// class DeathSet 

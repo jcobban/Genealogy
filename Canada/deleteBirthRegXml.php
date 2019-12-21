@@ -12,8 +12,9 @@ use \Exception;
  *  History:															*
  *		2014/08/28		created											*
  *		2015/07/02		access PHP includes using include_path			*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2015 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header('Content-Type: text/xml');
 require_once __NAMESPACE__ . '/Birth.inc';
@@ -89,7 +90,7 @@ catch(Exception $e)
 if (strlen($msg) > 0)
 {		// problems detected
 	print "    <msg>\n\t" . 
-	      xmlentities($msg) . 
+	      htmlentities($msg,ENT_XML1) . 
 	      "\n    </msg>\n";
 }		// problems detected
 else

@@ -3,17 +3,18 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  deleteCountyMarriageXml.php						*
- *									*
- *  Delete an existing county marriage report record from table		*
- *  CountyMarriages.							*
+ *  deleteCountyMarriageXml.php											*
+ *																		*
+ *  Delete an existing county marriage report record from table			*
+ *  CountyMarriages.													*
  *  This generates an XML file with response information so that it may	*
- *  be invoked using AJAX.						*
- *									*
- *  History:								*
- *	2016/01/30	created						*
- *									*
- *  Copyright &copy; 2016 James A. Cobban				*
+ *  be invoked using AJAX.												*
+ *																		*
+ *  History:															*
+ *		2016/01/30		created											*
+ *		2019/12/19      replace xmlentities with htmlentities           *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once	__NAMESPACE__ . '/CountyMarriage.inc';
@@ -120,7 +121,7 @@ require_once __NAMESPACE__ . '/common.inc';
     if (strlen($msg) > 0)
     {		// problems detected
 	print "    <msg>\n\t" . 
-	      xmlentities($msg) . 
+	      htmlentities($msg,ENT_XML1) . 
 	      "\n    </msg>\n";
     }		// problems detected
     else

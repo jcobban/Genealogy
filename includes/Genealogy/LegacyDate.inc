@@ -10,6 +10,48 @@ use \Iterator;
  *																		*
  *  This class represents dates as they are represented in a			*
  *  Legacy database.													*
+ *                                                                      *
+ *  The following is an excerpt of the Legacy Family Tree documentation *
+ *                                                                      *
+ *  Format of StoreDate                                                 *
+ *	    pbddmmyyyyddmmyyyy                                              *
+ *	    p = prefix                                                      *
+ *	            If the Len(StoreDate) > 1				                *
+ *	               :=bad date, 0=normal,1=abt, 2=cir,				    *
+ *	               3=bef, 4=aft, 5=bet, 6=bc, 7=ad, 8=WFT Est			*
+ *	               g=est, h=cal, F=from, T=to, M=to between dates,		*
+ *	               s=banns, t=lic				                        *
+ *	               b=british quarter dates				                *
+ *	               <=date displayed with brackets around it...          *
+ *	                    an estimated date <12 Dec 1800>				    *
+ *	               [=a private date used only for sorting purposes [[12 Dec 1800]]
+ *	               ?=a date with a question mark after it 12 Dec 1800 ? *
+ *	               |=two dates with "or" between them                   *
+ *	                        "12 Dec 1888 or 13 Nov 1889" or             * 
+ *	                        "17 Feb 1718 or 1719"                       *
+ *	    				                                                *
+ *	           If the Len(StoreDate) = 1				                *
+ *	              ?=unk, a=dead, b=deceased, c=child, d=infant, 		*
+ *	              e=stillborn, f=young,				                    *
+ *	              g=Submitted, h=Cleared, i=uncleared, j=completed, 	*
+ *	              k=cancelled, l=bic, m=dns,				            *
+ *	              n=dns/can, o=see notes, p=pre-1970, q=done, 			*
+ *	              r=private, s=banns, t=lic,				            *
+ *	              u=not married, v=never married, ?=unknown				*
+ *	    				                                                *
+ *	    b = bc flag				                                        *
+ *	    				                                                *
+ *	    Also, if the date is partially recognizable so that we can get	*
+ *	    a sort date out of it, we put the				                *
+ *	    pieces we recognize into the ddmmyyyyddmmyyyy slots, 			*
+ *	    put a colon at the beginning prefix position				    *
+ *	    and then put a backslash (\) in the 19th position, 				*
+ *	    followed by the date entered by the user.				        *
+ *	    So, if a date starts with a colon but has \ in position 19 		*
+ *	    then display the Mid$(TheDate, 20)				                *
+ *	      "Close to 31 Jan 1961" becomes :03101196100000000\Close to 31 Jan 1961
+ *	      This way we can act like the date is OK and display it        *
+ *	      as the user entered it.                                       *
  *																		*
  *  History:															*
  *		2010/09/18		add method toString with privatization			*
@@ -68,6 +110,10 @@ use \Iterator;
  *		2018/02/10		support passing context specific translation	*
  *						table to method toString						*
  *		2018/04/04      support PERL style substitutions in template    *
+ *		2019/12/18      ensure return values of getDay and getMonth     *
+ *		                are legal                                       *
+ *		                use smarter check for external string date      *
+ *		                parameter to constructor                        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -488,11 +534,11 @@ class LegacyDate
      *  Construct an instance of LegacyDate.							*
      *																	*
      *	Input:															*
-     *	    $value		value of date.  If it starts with a space		*
+     *	    $value		value of date.  If it is less than 18           *
+     *	                characters long or contains a space		        *
      *					then it is a human readable date to be			*
      *					translated to internal form. Otherwise it is	*
      *					already an internal date.						*
-     *																	*
      ********************************************************************/
     function __construct($value)
     {
@@ -507,7 +553,17 @@ class LegacyDate
     	$this->workDate		= $this->date1;
     	$this->date2		= new WorkingDate();
 
-    	if (strlen($value) > 0 && substr($value, 0, 1) == ' ')
+        $len                = strlen($value);
+        $internal           = false;
+        if ($len == 1) 
+            $internal       = strpos('?abcdefghijklmnopqrstuv', $value) !== false;
+        else
+        if ($len >= 11) 
+            $internal       = strpos(':ghFTMstb<[?', substr($value, 0, 1) !== false; 
+        if ($len >= 11 && ctype_digit(substr($value, 0, 1)))
+            $internal       = strpos(substr($value,1,10), ' ') === false &&
+                              strpos(substr($value,1,10), '/') === false;
+        if (!$internal)
         {		// external text format
             if (substr($value, 0, 2) == ' 0' && strlen($value) == 19)
                 $value      = substr($value, 1);  // error passing internal
@@ -3246,8 +3302,20 @@ class LegacyDate
     function getDay()
     {
     	if ($this->sortdate == -99999999)
-    	    return 15;
-    	return $this->sortdate % 100;
+            return 15;
+        $y      = intdiv($this->sortdate, 10000);
+        $m      = $this->getMonth();
+        $d      = $this->sortdate % 100;
+        if ($d > self::$monthLens[$m])
+        {
+            if ($m == 2 && $d == 29)
+            {
+                if (($y % 4) == 0 && (($y % 100) != 0 || ($y % 400) == 0))
+                    return 29;
+            }
+            $d  = self::$monthLens[$m];
+        }
+        return $d;
     }		// function LegacyDate::getDay
 
     /********************************************************************
@@ -3275,7 +3343,12 @@ class LegacyDate
     {
     	if ($this->sortdate == -99999999)
     	    return 6;
-    	return ($this->sortdate / 100) % 100;
+        $m          = ($this->sortdate / 100) % 100;
+        if ($m == 0)
+            $m      = 1;
+        if ($m > 12)
+            $m      = 12;
+        return $m;
     }		// function LegacyDate::getMonth
 
     /********************************************************************

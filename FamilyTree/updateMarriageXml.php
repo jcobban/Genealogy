@@ -109,6 +109,8 @@ use \Exception;
  *		2019/10/28      add information to response to adding a child   *
  *		2019/11/11      do not create instance of Person for wife       *
  *		                if the name is empty                            *
+ *		2019/12/21      ensure birth and death dates of children        *
+ *		                are updated                                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -576,6 +578,16 @@ foreach($_POST as $key => $value)
                 $priName                = $child->getPriName();
             else
                 $priName                = null;
+            if ($child && $child->isExisting())
+            {
+                $birthEvent             = $child->getBirthEvent(false);
+                $deathEvent             = $child->getDeathEvent(false);
+            }
+            else
+            {
+                $birthEvent             = null;
+                $deathEvent             = null;
+            }
 
             $childr		                = null; // processed
             $oldrow                     = $id;  // row number of child
@@ -630,6 +642,7 @@ foreach($_POST as $key => $value)
 			// $id contains rownum from form
 			if ($priName)
                 $priName['surname']		    = $value;
+			break;
 	    }	            // surname of  child
 
 	    case 'cbirth':
@@ -637,6 +650,11 @@ foreach($_POST as $key => $value)
 			// $id contains rownum from form
             if ($child)
                 $child['birthd']	        = $value;
+            if ($birthEvent)
+            {
+                $birthEvent['eventd']       = $value;
+                $birthEvent->save('cbirth');
+            }
 			break;
 	    }	            // death date of child
 
@@ -644,8 +662,11 @@ foreach($_POST as $key => $value)
 	    {	            // death date of child
 			// $id contains rownum from form
 			if ($child)
-            {
                 $child['deathd']		    = $value;
+            if ($deathEvent)
+            {
+                $deathEvent['eventd']       = $value;
+                $deathEvent->save('cbirth');
             }
 			break;
 	    }	            // death date child

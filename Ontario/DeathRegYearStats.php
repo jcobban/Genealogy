@@ -48,33 +48,35 @@ use \Exception;
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
 require_once __NAMESPACE__ . "/County.inc";
+require_once __NAMESPACE__ . "/DeathSet.inc";
 require_once __NAMESPACE__ . "/Language.inc";
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
-$regYear				= '';
-$cc			    		= 'CA`';
-$country    			= null;
-$countryName			= 'Canada';
-$domain		    		= 'CAON';	// default domain
-$domainName				= 'Ontario';
-$county 		    	= null;
-$countyCode		    	= '';
-$countyName		    	= '';
-$lang		    		= 'en';
+$regYear						= '';
+$cc			    				= 'CA`';
+$country    					= null;     // instance of Country
+$countryName					= 'Canada';
+$domain		    				= 'CAON';	// default domain code
+$domainName						= 'Ontario';
+$domainObj 		    			= null;     // instance of Domain
+$county 		    			= null;     // instance of County
+$countyCode		    			= '';
+$countyName		    			= '';
+$lang		    				= 'en';
 
 if (count($_GET) > 0)
 {                   // parameters passed
-	$parmsText      		= "<p class='label'>\$_GET</p>\n" .
-	                            "<table class='summary'>\n" .
-	                            "<tr><th class='colhead'>key</th>" .
-	                            "<th class='colhead'>value</th></tr>\n";
+	$parmsText      		    = "<p class='label'>\$_GET</p>\n" .
+	                                "<table class='summary'>\n" .
+	                                "<tr><th class='colhead'>key</th>" .
+	                                "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{			    // loop through all input parameters
-	    $parmsText                  .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n"; 
-        $value                      = trim($value);
+	    $parmsText              .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$value</td></tr>\n"; 
+    $value                      = trim($value);
 		switch(strtolower($key))
 		{		    // process specific named parameters
 		    case 'regyear':
@@ -101,8 +103,7 @@ if (count($_GET) > 0)
 	
 		    case 'lang':
 		    {
-				if (strlen($value) >= 2)
-				    $lang		    = strtolower($value);
+				$lang		        = FtTemplate::validateLang($value);
 				break;
 		    }		//lang
 	
@@ -113,50 +114,48 @@ if (count($_GET) > 0)
 	
 		    default:
 		    {
-				$msg	            .= "Unexpected parameter $key='$value'. ";
+				$warn       .= "<p>Unexpected parameter $key='$value'.</p>\n";
 				break;
 		    }		// any other paramters
 		}		    // process specific named parameters
 	}			    // loop through all input parameters
 	if ($debug)
-	    $warn       .= $parmsText . "</table>\n";
+	    $warn                   .= $parmsText . "</table>\n";
 }                   // parameters passed
 
 // create template
 if (strlen($countyCode) > 0)
-    $template           = new FtTemplate("DeathRegYearStatsTown$lang.html");
+$template           = new FtTemplate("DeathRegYearStatsTown$lang.html");
 else
-    $template           = new FtTemplate("DeathRegYearStats$lang.html");
+$template           = new FtTemplate("DeathRegYearStats$lang.html");
 
 // validate parameters
-$domainObj	= new Domain(array('domain'	    => $domain,
-       						   'language'	=> 'en'));
+$domainObj	            = new Domain(array('domain'	    => $domain,
+   					            	   'language'	=> 'en'));
 if ($domainObj->isExisting())
 {
-    $cc			        = substr($domain, 0, 2);
-    $country    		= new Country(array('code' => $cc));
-    $countryName	    = $country->getName();
-    $domainName		    = $domainObj->get('name');
+$cc			        = substr($domain, 0, 2);
+$country    		= new Country(array('code' => $cc));
+$countryName	    = $country->getName();
 }
 else
 {
-    $msg	.= "Domain '$value' must be a supported two character country code followed by a two character state or province code. ";
-    $domainName	= 'Domain : ' . $value;
+$msg	.= "Domain '$value' must be a supported two character country code followed by a two or three character state or province code. ";
 }
+$domainName		        = $domainObj->get('name');
 
 if (strlen($countyCode) > 0)
 {
-	$county 		        = new County(array('domain'     => $domainObj, 
-	                                           'code'       => $countyCode));
+	$county 		    = new County(array('domain'     => $domainObj, 
+	                                       'code'       => $countyCode));
 	if ($county->isExisting())
 	{
-	    $countyName		    = $county->get('name');
 	}
 	else
 	{
-        $warn	.= "<p>County code '$countyCode' is not valid for domain '$domain'.</p>\n";
-        $countyName         = $countyCode;
-    }
+    $warn	        .= "<p>County code '$countyCode' is not valid for domain '$domain'.</p>\n";
+}
+	$countyName		    = $county->get('name');
 }
 
 if ($regYear == '')
@@ -166,10 +165,10 @@ if ($regYear == '')
 else
 {
 	if (!preg_match("/^([0-9]{4})$/", $regYear) ||
-	    ($regYear < 1860) || ($regYear > 2000))
+	    ($regYear < 1800) || ($regYear > 2000))
 	{
-	    $msg	.= "RegYear $regYear must be a number between 1860 and 2000. ";
-    }
+	    $msg	.= "RegYear $regYear must be a number between 1800 and 2000. ";
+}
 }
 
 // update template
@@ -191,94 +190,68 @@ $totcount                           = 0;
 $totlinked                          = 0;
 
 if (strlen($msg) == 0)
-{			// no errors
-	// execute the query
-    if (is_null($county))
-    {
-	    $query	= "SELECT RegCounty AS County, " .
-							"SUM(Surname != '') AS SurnameCount,  " .
-							"SUM(Idir != 0) AS LinkCount, " .
-							"MIN(RegNum) as low, " .
-							"MAX(RegNum) as high  " .
-						"FROM Deaths " .
-						"WHERE RegDomain=:domain AND RegYear=:regyear " .
-						"GROUP BY RegCounty " .
-                        "ORDER BY RegCounty";
-        $sqlParms       = array('domain'        => $domain,
-                                'regyear'       => $regYear);
-    }
-    else
-    {
-	    $query	= "SELECT RegCounty AS County, RegTownship AS Township, " .
-							"SUM(Surname != '') AS SurnameCount,  " .
-							"SUM(Idir != 0) AS LinkCount, " .
-							"MIN(RegNum) as low, " .
-							"MAX(RegNum) as high,  " .
-                            '(SELECT MAX(RegNum) FROM Deaths  WHERE regyear=:regyear and regcounty=:county AND regtownship=Township AND RegNum<500000) AS `currhigh` ' .
-						"FROM Deaths " .
-						"WHERE RegDomain=:domain AND RegYear=:regyear " .
-							"AND RegCounty=:county " .
-						"GROUP BY RegCounty, RegTownship " .
-                        "ORDER BY RegCounty, RegTownship";
-        $sqlParms       = array('domain'        => $domain,
-                                'regyear'       => $regYear,
-                                'county'        => $countyCode);
-    }
-    $stmt	 	    = $connection->prepare($query);
-    $queryText      = debugPrepQuery($query, $sqlParms);
-	if ($stmt->execute($sqlParms))
-	{		    // successful query
-        $result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
-        for($i = 0; $i < count($result); $i++)
-        {
-            $row                            = $result[$i];
-            $result[$i]['rownum']           = $i;
-            if (is_null($county))
-            {
-	            $tcounty   = new County(array('domain'     => $domainObj, 
-                                              'code'       => $row['county']));
-                $result[$i]['countyname']   = $tcounty->get('name');
-            }
-            else
-                $result[$i]['countyname']   = $countyName;
-            $low                            = $row['low'];
-            $high                           = $row['high'];
-            if (array_key_exists('currhigh', $row))
-                $currhigh                   = $row['currhigh'];
-            else
-                $currhigh                   = $high;
-            $count                          = $currhigh - $low + 1;
-            if ($currhigh > $highest)
-                $highest                    = $currhigh;
-            if ($low < $lowest)
-                $lowest                     = $low;
-            $surnamecount                   = $row['surnamecount'];
-            $totcount                       += $surnamecount;
-            $pctdone                        = ($surnamecount * 100.0) / $count;
-            if ($pctdone > 100.0)
-                $pctdone                    = 100.0;
-            $pctdoneclass                   = pctClass($pctdone);
-            $linkcount                      = $row['linkcount'];
-            $totlinked                      += $linkcount;
-            $pctlinked                      = ($linkcount * 100.0)/ $count;
-            if ($pctlinked > 100.0)
-                $pctlinked                  = 100.0;
-            $pctlinkedclass                 = pctClass($pctlinked);
-            $result[$i]['pctdone']          = number_format($pctdone,2);
-            $result[$i]['pctdoneclass']     = $pctdoneclass;
-            $result[$i]['pctlinked']        = number_format($pctlinked,2);
-            $result[$i]['pctlinkedclass']   = $pctlinkedclass;
-        }
-	}		    // successful query
+{			                // no errors
+	if (is_null($county))
+	{
+	    $deaths         = new DeathSet(array('domain'       => $domain,
+	                                         'regyear'      => $regYear));
+	    $result         = $deaths->getStatistics();
+	}
 	else
 	{
-	    $msg	    .= "query '$queryText' failed: " .
-                        print_r($connection->errorInfo(),true);
-        $result     = array();
-	}		    // query failed
+	    $deaths         = new DeathSet(array('domain'       => $domain,
+	                                         'regyear'      => $regYear,
+	                                         'county'       => $countyCode));
+	    $result         = $deaths->getCountyStatistics();
+	}
+
+	//
+    for($i = 0; $i < count($result); $i++)
+    {                       // loop through rows
+        $row                            = $result[$i];
+        $result[$i]['rownum']           = $i;
+        if (is_null($county))
+        {
+	        $tcounty   = new County(array('domain'     => $domainObj, 
+                                          'code'       => $row['county']));
+            $result[$i]['countyname']   = $tcounty->get('name');
+        }
+        else
+            $result[$i]['countyname']   = $countyName;
+        $low                            = $row['low'];
+        $high                           = $row['high'];
+        if (array_key_exists('currhigh', $row))
+            $currhigh                   = $row['currhigh'];
+        else
+            $currhigh                   = $high;
+        $count                          = $currhigh - $low + 1;
+        if ($currhigh > $highest)
+            $highest                    = $currhigh;
+        if ($low < $lowest)
+            $lowest                     = $low;
+        $surnamecount                   = $row['count'];
+        $totcount                       += $surnamecount;
+        $pctdone                        = ($surnamecount * 100.0) / $count;
+        if ($pctdone > 100.0)
+            $pctdone                    = 100.0;
+        $pctdoneclass                   = pctClass($pctdone);
+        $linkcount                      = $row['linkcount'];
+        $totlinked                      += $linkcount;
+        $pctlinked                      = ($linkcount * 100.0)/ $count;
+        if ($pctlinked > 100.0)
+            $pctlinked                  = 100.0;
+        $pctlinkedclass                 = pctClass($pctlinked);
+        $result[$i]['pctdone']          = number_format($pctdone,2);
+        $result[$i]['pctdoneclass']     = $pctdoneclass;
+        $result[$i]['pctlinked']        = number_format($pctlinked,2);
+        $result[$i]['pctlinkedclass']   = $pctlinkedclass;
+    }                       // loop through rows
 }		        // ok
 else
-    $result         = array();
+{
+    $result                             = array();
+    $lowest                             = 0;
+}
 
 if (count($result) > 0)
     $template['stats$rownum']->update($result);

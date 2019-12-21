@@ -53,93 +53,105 @@
 		    method="post" 
 		    name="distForm" id="distForm"
 		    enctype="multipart/form-data">
-	    <input type="hidden" name="RegDomain" id="RegDomain"
-		    value="$DOMAIN"/>
+			<input type="hidden" name="RegDomain" id="RegDomain"
+					value="$DOMAIN"/>
 	    <!-- the following stores the textual value of the county name in
 	         the web page so it can be used by the Javascript code 
 	         to initialize the RegCounty selection list -->
-	    <input type="hidden" name="RegCountyTxt" id="RegCountyTxt" 
+			<input type="hidden" name="RegCountyTxt" id="RegCountyTxt" 
 		    disabled="disabled" value="$REGCOUNTY"/>
 	    <!-- the following stores the textual value of the county name in
 	         the web page so it can be used by the Javascript code 
 	         to initialize the RegTownship selection list -->
-	    <input type="hidden" name="RegTownshipTxt" id="RegTownshipTxt" 
+			<input type="hidden" name="RegTownshipTxt" id="RegTownshipTxt" 
 		    disabled="disabled" value="$REGTOWNSHIP"/>
-	    <input type="hidden" name="Debug" id="Debug"
-			    value="Y"/>
-    <div class="row" id="RegYearNumRow">
-      <div class="column1">
-	  <label class="labelSmall" for="RegId">Identification:</label>
-	  <input name="RegId" id="RegId" type="text"
-		class="ina rightnc" size="10" maxlength="12"
-		readonly="readonly" 
-		value="$REGYEAR-$PADDEDREGNUM"/>
-	  <input name="RegYear" id="RegYear" type="hidden"
-		value="$REGYEAR">
-	  <input name="RegNum" id="RegNum" type="hidden"
-		value="$REGNUM">
+			<input type="hidden" name="Debug" id="Debug"
+					value="Y"/>
+		<div class="row" id="RegYearNumRow">
+		  <div class="column1">
+			<label class="labelCol1" for="RegId">
+				Identification:
+			</label>
+			<input name="RegId" id="RegId" type="text"
+					class="ina rightnc" size="10" maxlength="12"
+					readonly="readonly" 
+					value="$REGYEAR-$PADDEDREGNUM"/>
+			<input name="RegYear" id="RegYear" type="hidden"
+					value="$REGYEAR">
+			<input name="RegNum" id="RegNum" type="hidden"
+					value="$REGNUM">
       </div>
-      <div class="column2">
-	  <label class="labelSmall" for="MsVol">
-	    MS 935 Bobine:
-	  </label>
-	  <input name="MsVol" id="MsVol" type="text"
-		size="4" maxlength="4" class="ina rightnc" 
-		value="$MSVOL"/>
+		  <div class="column2">
+			<label class="labelCol2" for="MsVol">
+	            MS 935 Bobine:
+	        </label>
+			<input name="MsVol" id="MsVol" type="text"
+					size="4" maxlength="4" class="ina rightnc" 
+					value="$MSVOL"/>
       </div>
       <div style="clear: both"></div>
-      <input name="OriginalVolume" id="OriginalVolume"
-		type="hidden"
-		value="$ORIGINALVOLUME"/>
-      <input name="OriginalPage" id="OriginalPage"
-		type="hidden"
-		value="$ORIGINALPAGE"/>
-      <input name="OriginalItem" id="OriginalItem"
-		type="hidden"
-		value="$ORIGINALITEM"/>
+			<input name="OriginalVolume" id="OriginalVolume"
+					type="hidden"
+					value="$ORIGINALVOLUME"/>
+			<input name="OriginalPage" id="OriginalPage"
+					type="hidden"
+					value="$ORIGINALPAGE"/>
+			<input name="OriginalItem" id="OriginalItem"
+					type="hidden"
+					value="$ORIGINALITEM"/>
     </div>
-    <div class="row" id="CountyTownshipRow">
-      <div class="column1">
-	<label class="labelSmall" for="RegCounty">Lieu: Comté:</label>
+		<div class="row" id="CountyTownshipRow">
+		  <div class="column1">
+			<label class="labelCol1" for="RegCounty">
+				Lieu: Comté:
+			</label>
 	<select name="RegCounty" id="RegCounty" size="1"
-		class="ina left">
+					class="ina left">
 	</select>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="RegTownship">Canton:</label>
-	<input name="RegTownship" id="RegTownship"
-		type="text" size="20" maxlength="40" 
-		value="$REGTOWNSHIP" 
-		class="ina left" 
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="RegTownship">
+				Canton:
+			</label>
+			<input name="RegTownship" id="RegTownship"
+					type="text" size="20" maxlength="40" 
+					value="$REGTOWNSHIP" 
+					class="ina left" 
+					readonly="readonly"/>
       </div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="NameRow">
-      <div class="column1">
-	<label class="labelSmall" for="GivenNames">Nom: Prenom:</label>
-	<input name="GivenNames" id="GivenNames"
-		type="text" size="32" maxlength="40"
-		value="$GIVENNAMES" 
-		class="ina left" 
-		readonly="readonly"/>
+		<div class="row" id="NameRow">
+		  <div class="column1">
+			<label class="labelCol1" for="GivenNames">
+				Nom: Prenom:
+			</label>
+			<input name="GivenNames" id="GivenNames"
+					type="text" size="32" maxlength="40"
+					value="$GIVENNAMES" 
+					class="ina left" 
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="Surname">Surnom:</label>
-	<input name="Surname" id="Surname"
-		type="text" size="20" maxlength="40" 
-		value="$SURNAME" 
-		class="ina left" 
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="Surname">
+				Surnom:
+			</label>
+			<input name="Surname" id="Surname"
+					type="text" size="20" maxlength="40" 
+					value="$SURNAME" 
+					class="ina left" 
+					readonly="readonly"/>
       </div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="SexMarStatRow">
-      <div class="column1">
-	<label class="labelSmall" for="Sex">Sexe:</label>
+		<div class="row" id="SexMarStatRow">
+		  <div class="column1">
+			<label class="labelCol1" for="Sex">
+				Sexe:
+			</label>
 	<!-- enable the selection for input only if updating -->
 	<select name="Sex" id="Sex" size="1"
-		class="white left">
+					class="white left">
 	    <option id="SexM" class="male white" value="M" $selected>
 		    Mâle
 	    </option>
@@ -151,11 +163,12 @@
 	    </option>
 	</select>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="MarStat">État civil:</label>
+		  <div class="column2">
+			<label class="labelCol2" for="MarStat">État civil:
+			</label>
 	<!-- enable the selection for input only if updating -->
 	<select name="MarStat" id="MarStat" size="1"
-		class="ina left">
+					class="ina left">
 	  <option id="MarStatS" value="S" $selected>Célibataire</option>
 	  <option id="MarStatM" value="M" $selected>Marié[e]</option>
 	  <option id="MarStatW" value="W" $selected>Veuf/ve</option>
@@ -165,43 +178,51 @@
       </div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="DeathDatePlaceRow">
-      <div class="column1">
-	<label class="labelSmall" for="Date">Date&nbsp;de&nbsp;mort:</label>
-	<input name="Date" id="Date"
-		type="text" size="12" maxlength="32"
-		value="$DATE"
-		class="ina left"
-		readonly="readonly"/>
+		<div class="row" id="DeathDatePlaceRow">
+		  <div class="column1">
+			<label class="labelCol1" for="Date">
+				Date&nbsp;de&nbsp;mort:
+			</label>
+			<input name="Date" id="Date"
+					type="text" size="12" maxlength="32"
+					value="$DATE"
+					class="ina left"
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="Place">Lieu&nbsp;de&nbsp;mort:</label>
-	<input name="Place" id="Place"
-		type="text" size="20" maxlength="128"
-		value="$PLACE"
-		class="ina leftnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="Place">
+				Lieu&nbsp;de&nbsp;mort:
+			</label>
+			<input name="Place" id="Place"
+					type="text" size="20" maxlength="128"
+					value="$PLACE"
+					class="ina leftnc"
+					readonly="readonly"/>
       </div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="LinkRowSet">
-      <div class="column2">
-	<label class="labelSmall" for="IDIR">Lien:</label>
+		<div class="row" id="LinkRowSet">
+		  <div class="column2">
+			<label class="labelCol1" for="IDIR">
+				Lien:
+			</label>
 	<a href="/FamilyTree/Person.php?idir=$idir"
 		id="showLink" class="$genderClass"
 		target="_blank">
 	    $linkedName
 	</a>
-	  <input type="hidden" id="IDIR" name="IDIR" 
-		value="$IDIR">
+			<input type="hidden" id="IDIR" name="IDIR" 
+					value="$IDIR">
       </div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="LinkRowMatch">
-      <div class="column2">
-	<label class="labelSmall" for="IDIR">Lien:</label>
+		<div class="row" id="LinkRowMatch">
+		  <div class="column2">
+			<label class="labelCol1" for="IDIR">
+				Lien:
+			</label>
 	<select name="IDIR" id="IDIR" rows="1"
-		class="ina left">
+					class="ina left">
 	    <option value="0">Correspondances possibles à cette inscription:
 	    </option>
 	    <option value="$idir" class="$sexclass white">
@@ -211,283 +232,338 @@
 	</div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="OccupationAgeRow">
-      <div class="column1">
-	<label class="labelSmall" for="Occupation">Occupation:</label>
-	<input name="Occupation" id="Occupation"
-		type="text" size="20" maxlength="64"
-		value="$OCCUPATION"
-		class="ina leftnc'"
-		readonly="readonly"/>
+		<div class="row" id="OccupationAgeRow">
+		  <div class="column1">
+			<label class="labelCol1" for="Occupation">
+				Emploi:
+			</label>
+			<input name="Occupation" id="Occupation"
+					type="text" size="20" maxlength="64"
+					value="$OCCUPATION"
+					class="ina leftnc'"
+					readonly="readonly"/>
       </div>
-      <div class="column1">
-	<label class="labelSmall" for="Age">Âge au décès:</label>
-	<input name="Age" id="Age"
-		type="text" size="10" maxlength="16"
-		value="$AGE"
-		class="ina leftnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="Age">Âge au décès:
+			</label>
+			<input name="Age" id="Age"
+					type="text" size="10" maxlength="16"
+					value="$AGE"
+					class="ina leftnc"
+					readonly="readonly"/>
 	</div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="BirthDatePlaceRow">
-      <div class="column1">
-	<label class="labelSmall" for="BirthDate">Date&nbsp;de&nbsp;naissance:</label>
-	<input name="BirthDate" id="BirthDate"
-		type="text" size="10" maxlength="32"
-		value="$BIRTHDATE"
-		class="ina left"
-		readonly="readonly"/>
+		<div class="row" id="BirthDatePlaceRow">
+		  <div class="column1">
+			<label class="labelCol1" for="BirthDate">
+				Date&nbsp;de&nbsp;naissance:
+			</label>
+			<input name="BirthDate" id="BirthDate"
+					type="text" size="10" maxlength="32"
+					value="$BIRTHDATE"
+					class="ina left"
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="BirthPlace">Lieu&nbsp;de&nbsp;naissance:</label>
-	<input name="BirthPlace" id="BirthPlace"
-		type="text" size="20" maxlength="128"
-		value="$BIRTHPLACE"
-		class="ina leftnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="BirthPlace">
+				Lieu&nbsp;de&nbsp;naissance:
+			</label>
+			<input name="BirthPlace" id="BirthPlace"
+					type="text" size="20" maxlength="128"
+					value="$BIRTHPLACE"
+					class="ina leftnc"
+					readonly="readonly"/>
 	</div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="ResLengthRow">
-      <div class="column2">
-	<label class="labelSmall" for="ResPlace">Résidence:<br>a&nbsp;lieu:</label>
-	<input name="ResPlace" id="ResPlace"
-		type="text" size="5" maxlength="16"
-		value="$RESPLACE"
-		class="ina rightnc"
-		readonly="readonly"/>
+		<div class="row" id="ResLengthRow">
+		  <div class="column2">
+			<label class="labelCol2" for="ResPlace">
+				Résidence:
+			<br>a&nbsp;lieu:</label>
+			<input name="ResPlace" id="ResPlace"
+					type="text" size="5" maxlength="16"
+					value="$RESPLACE"
+					class="ina rightnc"
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall6em" for="ResOnt">en&nbsp;Ontario:</label>
-	<input name="ResOnt" id="ResOnt" 
-		type="text" size="5" maxlength="16"
-		value="$RESONT"
-		class="ina rightnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelSmall6em" for="ResOnt">
+				en&nbsp;Ontario:
+			</label>
+			<input name="ResOnt" id="ResOnt" 
+					type="text" size="5" maxlength="16"
+					value="$RESONT"
+					class="ina rightnc"
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall6em" for="ResCan">au&nbsp;Canada:</label>
-	<input name="ResCan" id="ResCan" 
-		type="text" size="5" maxlength="16"
-		value="$RESCAN"
-		class="ina rightnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelSmall6em" for="ResCan">
+				au&nbsp;Canada:
+			</label>
+			<input name="ResCan" id="ResCan" 
+					type="text" size="5" maxlength="16"
+					value="$RESCAN"
+					class="ina rightnc"
+					readonly="readonly"/>
       </div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="DeathCauseRow">
-      <div class="column1">
-	<label class="labelSmall" for="Cause">Cause:</label>
-	<input name="Cause" id="Cause"
-		type="text" size="32" maxlength="255"
-		value="$CAUSE" 
-		class="ina leftnc" 
-		readonly="readonly"/>
+		<div class="row" id="DeathCauseRow">
+		  <div class="column1">
+			<label class="labelCol1" for="Cause">
+				Cause:
+			</label>
+			<input name="Cause" id="Cause"
+					type="text" size="32" maxlength="255"
+					value="$CAUSE" 
+					class="ina leftnc" 
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="Duration">Duration:</label>
-	<input name="Duration" id="Duration"
-		type="text" size="16" maxlength="64"
-		value="$DURATION"
-		class="ina leftnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="Duration">
+				Duration:
+			</label>
+			<input name="Duration" id="Duration"
+					type="text" size="16" maxlength="64"
+					value="$DURATION"
+					class="ina leftnc"
+					readonly="readonly"/>
 	</div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="PhysicianRow">
-      <div class="column1">
-	<label class="labelSmall" for="Phys">Médecin:</label>
-	<input name="Phys" id="Phys"
-		type="text" size="20" maxlength="48"
-		value="$PHYS"
-		class="ina left"
-		readonly="readonly"/>
+		<div class="row" id="PhysicianRow">
+		  <div class="column1">
+			<label class="labelCol1" for="Phys">
+				Médecin:
+			</label>
+			<input name="Phys" id="Phys"
+					type="text" size="20" maxlength="48"
+					value="$PHYS"
+					class="ina left"
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="PhysAddr">Addresse:</label>
-	<input name="PhysAddr" id="PhysAddr"
-		type="text" size="20" maxlength="128"
-		value="$PHYSADDR"
-		class="ina leftnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="PhysAddr">
+				Addresse:
+			</label>
+			<input name="PhysAddr" id="PhysAddr"
+					type="text" size="20" maxlength="128"
+					value="$PHYSADDR"
+					class="ina leftnc"
+					readonly="readonly"/>
 	</div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="InformantRow">
-      <div class="column1">
-	<label class="labelSmall" for="Informant">Informateur:&nbsp;Nom:</label>
-	<input name="Informant" id="Informant"
-		type="text" size="32" maxlength="48"
-		value="$INFORMANT"
-		class="ina left"
-		readonly="readonly"/>
+		<div class="row" id="InformantRow">
+		  <div class="column1">
+			<label class="labelCol1" for="Informant">
+				Informateur:&nbsp;Nom:
+			</label>
+			<input name="Informant" id="Informant"
+					type="text" size="32" maxlength="48"
+					value="$INFORMANT"
+					class="ina left"
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="InfRel">Relation:</label>
-	<input name="InfRel" id="InfRel" type="text"
-		class="ina left" 
-		size="16" maxlength="16" 
-		readonly="readonly"
-		value="$INFREL"/>
-	</div>
-      <div style="clear: both"></div>
-    </div>
-    <div class="row" id="InformantOccRow">
-      <div class="column1">
-	<label class="labelSmall" for="InfOcc">Informateur:&nbsp;Occupation:</label>
-	<input name="InfOcc" id="InfOcc"
-		type="text" size="16" maxlength="32"
-		value="$INFOCC"
-		class="ina leftnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="InfRel">
+				Relation:
+			</label>
+			<input name="InfRel" id="InfRel" type="text"
+					class="ina left" 
+					size="16" maxlength="16" 
+					readonly="readonly"
+					value="$INFREL"/>
+	      </div>
+          <div style="clear: both"></div>
+        </div>
+		<div class="row" id="InformantOccRow">
+		  <div class="column1">
+			<label class="labelCol1" for="InfOcc">
+				Informateur:&nbsp;Emploi:
+			</label>
+			<input name="InfOcc" id="InfOcc"
+					type="text" size="16" maxlength="32"
+					value="$INFOCC"
+					class="ina leftnc"
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="InfRes">Résidence:</label>
-	<input name="InfRes" id="InfRes"
-		type="text" size="20" maxlength="128"
-		value="$INFRES"
-		class="ina leftnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="InfRes">
+				Résidence:
+			</label>
+			<input name="InfRes" id="InfRes"
+					type="text" size="20" maxlength="128"
+					value="$INFRES"
+					class="ina leftnc"
+					readonly="readonly"/>
 	</div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="ReligionRow">
-      <div class="column1">
-	<label class="labelSmall" for="Religion">Religion:</label>
-	<input name="Religion" id="Religion"
-		type="text" size="20" maxlength="32"
-		value="$RELIGION"
-		class="ina leftnc"
-		readonly="readonly"/>
+		<div class="row" id="ReligionRow">
+		  <div class="column1">
+			<label class="labelCol1" for="Religion">
+				Religion:
+			</label>
+			<input name="Religion" id="Religion"
+					type="text" size="20" maxlength="32"
+					value="$RELIGION"
+					class="ina leftnc"
+					readonly="readonly"/>
 	</div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="FatherNameRow">
-      <div class="column1">
-	<label class="labelSmall" for="FatherName">Nom&nbsp;du&nbsp;père:</label>
-	<input name="FatherName" id="FatherName"
-		type="text" size="32" maxlength="48"
-		value="$FATHERNAME"
-		class="ina left"
-		readonly="readonly"/>
+		<div class="row" id="FatherNameRow">
+		  <div class="column1">
+			<label class="labelCol1" for="FatherName">
+				Nom&nbsp;du&nbsp;père:
+			</label>
+			<input name="FatherName" id="FatherName"
+					type="text" size="32" maxlength="48"
+					value="$FATHERNAME"
+					class="ina left"
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="FatherBPlce">Lieu&nbsp;de&nbsp;naissance:</label>
-	<input name="FatherBPlce" id="FatherBPlce"
-		type="text" size="20" maxlength="128"
-		value="$FATHERBPLCE"
-		class="ina leftnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="FatherBPlce">
+				Lieu&nbsp;de&nbsp;naissance:
+			</label>
+			<input name="FatherBPlce" id="FatherBPlce"
+					type="text" size="20" maxlength="128"
+					value="$FATHERBPLCE"
+					class="ina leftnc"
+					readonly="readonly"/>
 	</div>
       <div style="clear: both"></div>
     </div>
-    <div class="row" id="MotherNameRow">
-      <div class="column1">
-	<label class="labelSmall" for="MotherName">Nom&nbsp;du&nbsp;mère:</label>
-	<input name="MotherName" id="MotherName"
-		type="text" size="32" maxlength="48"
-		value="$MOTHERNAME"
-		class="ina left"
-		readonly="readonly"/>
+		<div class="row" id="MotherNameRow">
+		  <div class="column1">
+			<label class="labelCol1" for="MotherName">
+				Nom&nbsp;du&nbsp;mère:
+			</label>
+			<input name="MotherName" id="MotherName"
+					type="text" size="32" maxlength="48"
+					value="$MOTHERNAME"
+					class="ina left"
+					readonly="readonly"/>
       </div>
-      <div class="column2">
-	<label class="labelSmall" for="MotherBPlce">Lieu&nbsp;de&nbsp;naissance:</label>
-	<input name="MotherBPlce" id="MotherBPlce"
-		type="text" size="20" maxlength="128"
-		value="$MOTHERBPLCE"
-		class="ina leftnc"
-		readonly="readonly"/>
+		  <div class="column2">
+			<label class="labelCol2" for="MotherBPlce">
+				Lieu&nbsp;de&nbsp;naissance:
+			</label>
+			<input name="MotherBPlce" id="MotherBPlce"
+					type="text" size="20" maxlength="128"
+					value="$MOTHERBPLCE"
+					class="ina leftnc"
+					readonly="readonly"/>
 	</div>
       <div style="clear: both"></div>
-    </div>
-    <div class="row" id="HusbandNameRow">
-      <div class="column1">
-	<label class="labelSmall" for="HusbandName">Nom&nbsp;d'Époux:</label>
-	<input name="HusbandName" id="HusbandName"
-		type="text" size="32" maxlength="48"
-		value="$HUSBANDNAME"
-		class="ina left"
-		readonly="readonly"/>
-	</div>
-      <div style="clear: both"></div>
-    </div>
-    <div class="row" id="BurialRow">
-      <div class="column1">
-	<label class="labelSmall" for="BurPlace">Lieu de sépulture:</label>
-	<input name="BurPlace" id="BurPlace"
-		type="text" size="32" maxlength="128"
-		value="$BURPLACE"
-		class="ina leftnc"
-		readonly="readonly"/>
-      </div>
-      <div class="column2">
-	<label class="labelSmall" for="BurDate">Date:</label>
-	<input name="BurDate" id="BurDate"
-		type="text" size="16" maxlength="16"
-		value="$BURDATE"
-		class="ina left"
-		readonly="readonly"/>
-	</div>
-      <div style="clear: both"></div>
-    </div>
-    <div class="row" id="UndertakerRow">
-      <div class="column1">
-	<label class="labelSmall" for="Undertkr">Pompes funèbres:</label>
-	<input name="Undertkr" id="Undertkr"
-		type="text" size="20" maxlength="48"
-		value="$UNDERTKR"
-		class="ina left"
-		readonly="readonly"/>
-      </div>
-      <div class="column2">
-	<label class="labelSmall" for="UndertkrAddr">Addresse:</label>
-	<input name="UndertkrAddr" id="UndertkrAddr"
-		type="text" size="20" maxlength="128"
-		value="$UNDERTKRADDR"
-		class="ina leftnc"
-		readonly="readonly"/>
-	</div>
-      <div style="clear: both"></div>
-    </div>
-    <div class="row" id="RegistrationDateRow">
-      <div class="column1">
-	<label class="labelSmall" for="RegDate">Date d'enreg't:</label>
-	<input name="RegDate" id="RegDate"
-		type="text" size="16" maxlength="16"
-		value="$REGDATE"
-		class="ina left"
-		readonly="readonly"/>
-      </div>
-      <div class="column2">
-	<label class="labelSmall" for="Registrar">Greffier:</label>
-	<input name="Registrar" id="Registrar"	
-		type="text" size="20" maxlength="128"
-		value="$REGISTRAR"
-		class="ina left"
-		readonly="readonly"/>
-	</div>
-      <div style="clear: both"></div>
-    </div>
-    <div class="row" id="RemarksRow">
-      <div class="column1">
-	<label class="labelSmall">Remarques:</label>
-	$REMARKS
-      </div>
-    <div style="clear: both"></div>
-    </div>
-    <div class="row" id="ImageRow">
-      <div class="column2">
-	<label class="labelSmall" for="Image">Image:</label>
-	<button type="button" id="ShowImage">Montrez Image</button>
-	<input name="Image" id="Image"
-		type="text" size="50" maxlength="256"
-		value="$IMAGE"
-		class="same ina leftnc40em" 
-		readonly="readonly" />
-       </div>
-      <div style="clear: both"></div>
-    </div>
+        </div>
+		<div class="row" id="HusbandNameRow">
+		  <div class="column1">
+			<label class="labelCol1" for="HusbandName">
+				Nom&nbsp;d'Époux:
+			</label>
+			<input name="HusbandName" id="HusbandName"
+					type="text" size="32" maxlength="48"
+					value="$HUSBANDNAME"
+					class="ina left"
+					readonly="readonly"/>
+	      </div>
+          <div style="clear: both"></div>
+        </div>
+		<div class="row" id="BurialRow">
+		  <div class="column1">
+			<label class="labelCol1" for="BurPlace">
+				Lieu de sépulture:
+			</label>
+			<input name="BurPlace" id="BurPlace"
+					type="text" size="32" maxlength="128"
+					value="$BURPLACE"
+					class="ina leftnc"
+					readonly="readonly"/>
+          </div>
+		  <div class="column2">
+			<label class="labelCol2" for="BurDate">
+				Date:
+			</label>
+			<input name="BurDate" id="BurDate"
+					type="text" size="16" maxlength="16"
+					value="$BURDATE"
+					class="ina left"
+					readonly="readonly"/>
+	      </div>
+          <div style="clear: both"></div>
+        </div>
+		<div class="row" id="UndertakerRow">
+		  <div class="column1">
+			<label class="labelCol1" for="Undertkr">
+				Pompes funèbres:
+			</label>
+			<input name="Undertkr" id="Undertkr"
+					type="text" size="20" maxlength="48"
+					value="$UNDERTKR"
+					class="ina left"
+					readonly="readonly"/>
+          </div>
+		  <div class="column2">
+			<label class="labelCol2" for="UndertkrAddr">
+				Addresse:
+			</label>
+			<input name="UndertkrAddr" id="UndertkrAddr"
+					type="text" size="20" maxlength="128"
+					value="$UNDERTKRADDR"
+					class="ina leftnc"
+					readonly="readonly"/>
+	      </div>
+          <div style="clear: both"></div>
+        </div>
+		<div class="row" id="RegistrationDateRow">
+		  <div class="column1">
+			<label class="labelCol1" for="RegDate">
+				Date d'enreg't:
+			</label>
+			<input name="RegDate" id="RegDate"
+					type="text" size="16" maxlength="16"
+					value="$REGDATE"
+					class="ina left"
+					readonly="readonly"/>
+          </div>
+		  <div class="column2">
+			<label class="labelCol2" for="Registrar">
+				Greffier:
+			</label>
+			<input name="Registrar" id="Registrar"	
+					type="text" size="20" maxlength="128"
+					value="$REGISTRAR"
+					class="ina left"
+					readonly="readonly"/>
+	      </div>
+          <div style="clear: both"></div>
+        </div>
+		<div class="row" id="RemarksRow">
+		  <div class="column1">
+			<label class="labelCol1">
+				Remarques:
+			</label>
+	            $REMARKS
+          </div>
+          <div style="clear: both"></div>
+        </div>
+		<div class="row" id="ImageRow">
+			<label class="labelCol2" for="Image">
+				Image:
+			</label>
+			<button type="button" id="ShowImage">Montrez Image</button>
+			<input name="Image" id="Image"
+					type="text" size="50" maxlength="256"
+					value="$IMAGE"
+					class="same ina leftnc40em" 
+					readonly="readonly" />
+          <div style="clear: both"></div>
+        </div>
   </form>
  </div> <!-- end of <div id="body"> -->
 <div class="hidden" id="templates">

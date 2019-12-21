@@ -489,11 +489,11 @@ require_once __NAMESPACE__ . '/common.inc';
 		    <input type="hidden" name="IDIRHusb" id="IDIRHusb"
 						value="<?php print $idirhusb; ?>">
 		    <input type="text" name="HusbGivenName" id="HusbGivenName"
-						size="30" maxlength="120"
-						class="white left" value="<?php print $husbgivenname; ?>">
+                    maxlength="120" class="white left column1"
+                    value="<?php print $husbgivenname; ?>">
 		    <input type="text" name="HusbSurname" id="HusbSurname"
-						size="20" maxlength="120"
-						class="white left" value="<?php print $husbsurname; ?>">
+                    maxlength="120" class="white left column2"
+                    value="<?php print $husbsurname; ?>">
 		    <input type="hidden" name="HusbBirthSD" id="HusbBirthSD"
 						value="<?php print $husbbirthsd; ?>">
 		  </div>
@@ -509,10 +509,10 @@ require_once __NAMESPACE__ . '/common.inc';
 		    <label class="column1" for="HusbMarrSurname">
 				Married Surname:
 		    </label>
-		    <div style="width: 299px; float: left;">&nbsp;</div>
+	        <span class="left column1">&nbsp;</span>
 		    <input type="text" name="HusbMarrSurname" id="HusbMarrSurname"
-						size="20" maxlength="255"
-						class="white left" value="<?php print $husbsurname; ?>">
+                    maxlength="255" class="white left column2"
+                    value="<?php print $husbsurname; ?>">
 		  </div>
 		  <div style="clear: both;"></div>
 		</div>
@@ -547,11 +547,11 @@ require_once __NAMESPACE__ . '/common.inc';
 		    <input type="hidden" name="IDIRWife" id="IDIRWife"
 						value="<?php print $idirwife; ?>">
 		    <input type="text" name="WifeGivenName" id="WifeGivenName"
-						size="30" maxlength="120"
-						class="white left" value="<?php print $wifegivenname; ?>">
+                    maxlength="120" class="white left column1"
+                    value="<?php print $wifegivenname; ?>">
 		    <input type="text" name="WifeSurname" id="WifeSurname"
-						size="20" maxlength="120"
-						class="white left" value="<?php print $wifesurname; ?>">
+                    maxlength="120" class="white left column2"
+                    value="<?php print $wifesurname; ?>">
 		    <input type="hidden" name="WifeBirthSD" id="WifeBirthSD"
 						value="<?php print $wifebirthsd; ?>">
 		  </div>
@@ -567,10 +567,10 @@ require_once __NAMESPACE__ . '/common.inc';
 		    <label class="column1" for="WifeMarrSurname">
 				Married Surname:
 		    </label>
-		    <div style="width: 299px; float: left;">&nbsp;</div>
+	        <span class="left column1">&nbsp;</span>
 		    <input type="text" name="WifeMarrSurname" id="WifeMarrSurname"
-						size="20" maxlength="255"
-						class="white left" value="<?php print $husbsurname; ?>">
+                    maxlength="255" class="white left column2"
+                    value="<?php print $husbsurname; ?>">
 		  </div>
 		  <div style="clear: both;"></div>
 		</div>

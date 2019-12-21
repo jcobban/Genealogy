@@ -16,8 +16,9 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2015/12/30		fix conflict with autoload						*
  *		2017/09/12		use get( and set(								*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Blog.inc";
@@ -31,7 +32,7 @@ print "    <parms>\n";
 $blid	= null;
 foreach($_POST as $key => $value)
 {
-    print "\t<$key>" . xmlentities($value) . "</$key>\n";
+    print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
     if ($key == 'blid' || $key == 'id' || $key == 'bl_index')
         $blid	= $value;
     else
@@ -92,14 +93,14 @@ if (strlen($msg) == 0)
     }		// errors in parameters
     } catch (Exception $e) {
         print "    <msg>\n";
-        print xmlentities($e->getMessage());
+        print htmlentities($e->getMessage(),ENT_XML1);
         print "    </msg>\n";
     }
 }			// no errors detected
 else
 {			// errors in parameters
     print "    <msg>\n";
-    print xmlentities($msg);
+    print htmlentities($msg,ENT_XML1);
     print "    </msg>\n";
 }			// errors in parameters
 

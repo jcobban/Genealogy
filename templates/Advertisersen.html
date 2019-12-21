@@ -1,0 +1,271 @@
+<!--*********************************************************************
+ *  Advertisersen.html												    *
+ *																		*
+ *  Template for a web page for managing the advertisers.				*
+ *																		*
+ *  History:															*
+ *		2019/12/20		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+    <a href="/genealogy.php?lang=$LANG">
+		Genealogy
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">
+		Services
+    </a>:
+  </div>	
+  <div class="body">
+  <h1>
+      <span class="right">
+		<a href="/AdvertisersHelpen.html" target="help">? Help</a>
+      </span>
+		Advertisers Master List
+  </h1>
+    $TRACE
+    $MSG
+    <p class="message" id="notadmin">
+		Only an administrator can use this application
+    </p>
+    <p class="label" id="advertiserCount">
+		$COUNT Advertisers match the specified pattern.
+    </p>
+    <form id="locForm" name="locForm" action="Advertisers.php"
+                method="post">
+    <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
+    <div class="row" style="margin-left: 3em; margin-top: 3px;">
+      <a href="mailto:?to=$TOLIST&amp;bcc=$BCCLIST&amp;subject=[JamesCobban.net]%20General%20Notice"
+		    class="button" id="bulkMail">
+          <span style="white-space: nowrap; text-indent: 0em;">
+              Send Mail to all Advertisers
+          </span>
+      </a>
+    </div>
+      <div class="center" id="topBrowse">
+        <span class="left" id="topPrev">
+		  <a href="/Advertisers.php?limit=$limit&amp;offset=$prevoffset">
+            &lt;---
+          </a>
+        </span>
+        <span class="right" id="topNext">
+		  <a href="/Advertisers.php?limit=$limit&amp;offset=$nextoffset">
+		    ---&gt;
+		  </a>
+        </span>
+        rows $FIRSTOFFSET to $LAST of $COUNT
+        <div style="clear: both;"></div>
+      </div>
+    <!--- Put out the response as a table -->
+    <table class="details" id="dataTable">
+    <!--- Put out the column headers -->
+      <thead>
+		<tr>
+		  <th class="colhead">
+		    Advertiser Name
+		  </th>
+		  <th class="colhead">
+		    E-Mail
+		  </th>
+		  <th class="colhead">
+		    January
+		  </th>
+		  <th class="colhead">
+		    February
+		  </th>
+		  <th class="colhead">
+		    March
+		  </th>
+    	  <th class="colhead">
+			April
+		  </th>    <!--  4 -->
+    	  <th class="colhead">
+			May
+		  </th>      <!--  5 -->
+    	  <th class="colhead">
+			June
+		  </th>     <!--  6 -->
+    	  <th class="colhead">
+			July
+		  </th>     <!--  7 -->
+    	  <th class="colhead">
+			August
+		  </th>   <!--  8 -->
+    	  <th class="colhead">
+			September
+		  </th><!--  9 -->
+    	  <th class="colhead">
+			October
+		  </th>  <!-- 10 -->
+    	  <th class="colhead">
+			November
+		  </th> <!-- 11 -->
+    	  <th class="colhead">
+			December
+		  </th> <!-- 12 -->
+	    </tr>
+	  </thead>
+      <tbody>
+		<tr id="Row$id">
+		  <td class="$rowtype left">
+			        $adname
+		  </td>
+		  <td class="$rowtype left">
+		    <input type="text" class="white leftnc" size="18"
+			        name="AdEmail$id" id="AdEmail$id"
+			        value="$ademail">
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count01
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count02
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count03
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count04
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count05
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count06
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count07
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count08
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count09
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count10
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count11
+		  </td>
+		  <td class="$rowtype right" style="min-width: 90px">
+			        $count12
+		  </td>
+		</tr>
+      </tbody>
+    </table>
+    <input type="hidden" name="Advertiser999999999" value="">
+  </form>
+  </div> <!-- class="body" -->
+  <div class="balloon" id="Helppattern">
+    <p>
+		This is an 
+		<a href="https://www.regular-expressions.info/posix.html#ere">
+		    extended regular expression</a>,
+		as supported by MySQL,
+		which is used to search for advertisers based upon their advertiser name.
+    </p>
+    <ul>
+      <li>If the pattern contains no special 
+		  characters then only advertisers containing that string will be included.
+		  For example the pattern "bob" will match advertisers containing the
+		  string "bob".  Note that the search ignores case, so that pattern
+		  will also match "Bob" and "BOB".
+      </li>
+      <li>If the pattern begins with a caret '^' then only advertisers that
+		  <b>begin</b> with the remainder of the pattern are included.  
+		  For example the pattern
+		  "^Ba" displays advertisers starting with "Ba" (or "ba" or "BA").
+      </li>
+      <li>If the pattern ends with a dollar sign '$', then only advertisers that
+		  <b>end</b> with the remainder of the pattern are included.  
+		  For example the pattern
+		  "CA$" matches advertisers that end with "CA" (or "ca" or "Ca").
+      </li>
+      <li>In a pattern a period '.' matches any single character.  For example
+		  the pattern "B.b" matches any advertiser that contains two letter Bs
+		  separated by one character, for example "Bab", "Beb", "Bib", "Bob",
+		  or "Bub" anywhere in the advertiser name.
+      </li>
+      <li>In a pattern an asterisk '*' matches zero or more of the preceding
+		  character; "bo*b" matches "bb", "bob", and "boob"
+		  anywhere in the advertiser name.
+      </li>
+    </ul>
+  </div>
+    <div class="balloon" id="HelpmailPattern">
+      <p>
+	      This is an 
+	      <a href="https://www.regular-expressions.info/posix.html#ere">
+		        extended regular expression</a>,
+	      as supported by MySQL,
+	      which is used to search for advertisers based upon their advertiser name.
+      </p>
+      <ul>
+        <li>If the pattern contains no special 
+		  characters then only advertisers whose e-mail address contains that string
+		  will be included.
+		  For example the pattern "London" will match advertisers whose e-mail address
+		  contains the
+		  string "London".  Note that the search ignores case, so that pattern
+		  will also match "LONDON" and "london".
+        </li>
+        <li>If the pattern begins with a caret '^' then only advertisers whose e-mail
+		  address <b>begins</b> with the remainder of the pattern are included.  
+		  For example the pattern "^Ba" displays advertisers whose e-mail address
+		  starts with "Ba" (or "ba" or "BA").
+        </li>
+        <li>If the pattern ends with a dollar sign '$', then only advertisers whose
+		  e-mail address <b>ends</b> with the remainder of the pattern are
+		  included.  For example the pattern "CA$" matches advertisers whose e-mail
+		  address ends with "CA" (or "ca" or "Ca").
+        </li>
+        <li>In a pattern a period '.' matches any single character.  For example
+		  the pattern "B.b" matches any advertiser whose e-mail address contains two
+		  letter Bs separated by one character, for example "Bab", "Beb", "Bib",
+		  "Bob", or "Bub" anywhere in the e-mail address.
+        </li>
+        <li>In a pattern an asterisk '*' matches zero or more of the preceding
+		  character; "bo*b" matches "bb", "bob", and "boob"
+		  anywhere in the e-mail address.
+        </li>
+      </ul>
+    </div>
+    <div class="balloon" id="HelpauthPattern">
+      This is the identifier of a level of authorization, such as 'edit', or
+      'blog', or 'all'.
+    </div>
+    <div class="balloon" id="HelpAdvertiser">
+      This field permits the administrator to change the advertiser name chosen by the
+      contributor.
+    </div>
+    <div class="balloon" id="HelpEMail">
+      This field permits the administrator to change the e-mail address supplied
+      by the contributor.
+    </div>
+    <div class="balloon" id="HelpAuth">
+      This field permits the administrator to change the list of authorizations
+      for the contributor.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+      Click on this button to search for matching advertisers.
+    </div>
+    <div class="balloon" id="Helpdelete">
+      Click on this button to delete the associated advertiser.
+    </div>
+    <div class="balloon" id="Helpreset">
+      Click on this button to reset the password of the associated advertiser to a new
+      random string.
+    </div>
+    <div class="balloon" id="Helpconfirm">
+      Click on this button to confirm the associated advertiser and assign initial
+      permissions.  This is in-case the e-mail exchange failed.
+    </div>
+    <script src="/jscripts/js20/http.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="Advertisers.js" type="text/javaScript">
+    </script>

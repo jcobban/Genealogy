@@ -134,6 +134,7 @@ use \Iterator;
  *		                if the content is not already HTML              *
  *		2019/10/08      remove tracelog entries                         *
  *		2019/11/23      correct implementation of getLocation           *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1107,7 +1108,7 @@ class Location extends RecordPic
 
 				default:
 				{
-				    $retval	.= xmlentities($value);
+				    $retval	.= htmlentities($value,ENT_XML1);
 				    break;
 				}	// most fields
 		    }		// act on specific fields

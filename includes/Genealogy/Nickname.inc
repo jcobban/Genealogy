@@ -29,6 +29,7 @@ use \Exception;
  *		2017/12/18		add support for temporary fields				*
  *		2019/01/09      move to namespace Genealogy                     *
  *		2019/01/21      add column gender                               *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -300,7 +301,7 @@ class Nickname extends Record
 
 				default:
 				{		// fields passed back with no interpretation
-				    $retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+				    $retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) . "</$fld>\n";
 				    break;
 				}		// fields passed back with no interpretation
 		    }		// switch on field name

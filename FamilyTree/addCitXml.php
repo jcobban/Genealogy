@@ -145,8 +145,9 @@ use \Exception;
  *						name in the <source> tag interpretation of IDSR	*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2017/10/18		use class RecordSet instead of Name::getNames	*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -299,7 +300,7 @@ function censusCitation($year, $page, $idir, $type)
     	    {	            // select succeeded
     			$sresult	= $stmt->fetchAll(PDO::FETCH_ASSOC);
     			$count		= count($sresult);
-    			print "<select count='$count'>" . xmlentities($select) . "\n" .
+    			print "<select count='$count'>" . htmlentities($select,ENT_XML1) . "\n" .
     					"<parms>$sqlParmsText</parms>\n";
     			foreach($sresult as $row)
     			{	        // found match in census
@@ -333,7 +334,7 @@ function censusCitation($year, $page, $idir, $type)
     	    }		        // select succeeded
     	    else
     	    {	            // failed to select records
-    			print "<select result='fail'>" . xmlentities($select) .
+    			print "<select result='fail'>" . htmlentities($select,ENT_XML1) .
     					"<parms>$sqlParmsText</parms>\n" .
     					"</select>\n";
     			print "<msg>" . print_r($stmt->errorInfo(),true) . "</msg>\n";
@@ -757,7 +758,7 @@ print "  <parms>\n";
 foreach ($_POST as $key => $value)
 {			    // look at all parameters
 	$value		= trim($value);
-	print "    <$key>" . xmlentities($value);
+	print "    <$key>" . htmlentities($value,ENT_XML1);
 	switch($key)
 	{		    // act on keys
 	    case 'idsr':

@@ -65,7 +65,7 @@ class DomainSet extends RecordSet
 		$and					= 'WHERE ';
 		$this->sqlParms			= array();
 		$language				= null;
-		$cc		    			= null;
+		$cc		    			= 'CA';
 		$domain					= null;
 		$state					= null;
 		$partof					= null;
@@ -89,8 +89,8 @@ class DomainSet extends RecordSet
                     {
                         if (strtoupper($cc) == 'UK')
                             $cc         = 'GB';
-						$where			.= $and . $fieldExpr . "=?";
-						array_push($this->sqlParms, $cc);
+						$where			.= $and . $fieldExpr . "=:cc";
+						$this->sqlParms['cc']   = $cc;
 						$and			= ' AND ';
 				    }
 				    else
@@ -112,8 +112,8 @@ class DomainSet extends RecordSet
 					$state		    = strtoupper($value);
 				    if (is_string($state) && strlen($state) > 0)
 				    {
-						$where		.= $and . $fieldExpr . "=?";
-						array_push($this->sqlParms, $state);
+						$where		.= $and . $fieldExpr . "=:state";
+						$this->sqlParms['state']    = $state;
 						$and		= ' AND ';
 				    }
 				    else
@@ -127,16 +127,17 @@ class DomainSet extends RecordSet
 
 				case 'partof':
                 {
-                    $partof             = strtoupper($value);
 				    if (is_string($partof) && strlen($partof) >= 2)
-				    {
+                    {
+                        $partof         = strtoupper($value);
                         if (substr($partof, 0, 2) == 'UK')
                             $partof     = 'GB' . substr($partof, 2);
                         if (strlen($partof) == 2)
-						    $where		.= $and . "(PartOf=? OR PartOf IS NULL OR PartOf='')";
+                            $where		.= $and .
+			"(PartOf=:partof OR (LEFT(Domain,2)=:partof AND (PartOf IS NULL OR PartOf='')))";
                         else
-						    $where		.= $and . "PartOf=?";
-						array_push($this->sqlParms, $partof);
+						    $where		.= $and . "PartOf=:partof";
+						$this->sqlParms['partof']   = $partof;
 						$and		= ' AND ';
 				    }
 				    else
@@ -155,23 +156,25 @@ class DomainSet extends RecordSet
 				    {
 						$where			.= $and;
 						$expr			= '';
-						$or			= '';
+                        $or			    = '';
+                        $i              = 1;
 						foreach($value as $code)
 						{
-						    $expr		.= $or . "`Domain`=?";
-						    array_push($this->sqlParms, $code);
-						    $or			= ' OR ';
+						    $expr		.= $or . "`Domain`=:domain$i";
+						    $this->sqlParms["domain$i"] = $code;
+                            $or			= ' OR ';
+                            $i++;
 						}
 						if (count($value) > 1)
-						    $where		.= "($expr)";
+                            $where		.= "($expr)";
 						$domain			= $value;
 						$and			= ' AND ';
 				    }
 				    else
 				    if (is_string($value) && strlen($value) > 0)
 				    {
-						$where			.= $and . "`Domain`=?";
-						array_push($this->sqlParms, $value);
+						$where			.= $and . "`Domain`=:domain";
+						$this->sqlParms['domain']   = $value;
 						$domain			= $value;
 						$and			= ' AND ';
 				    }
@@ -179,7 +182,7 @@ class DomainSet extends RecordSet
 				    {		// or expression
 						$warn	.= "<p>DomainSet::getWhere: " .
 							       "Unsupported value for `Domain`=" .
-							       print_r($value, true) . "</p>\n";
+							       gettype($value) . "</p>\n";
 				    }		// or expression
 				    break;
 				}			// domain
@@ -205,8 +208,8 @@ class DomainSet extends RecordSet
 				{
 				    if (is_string($value) && strlen($value) > 0)
 				    {
-						$where	.= $and . "LOCATE(?, `Name`) > 0";
-						array_push($this->sqlParms, $value);
+						$where	.= $and . "LOCATE(:name, `Name`) > 0";
+						$this->sqlParms['name']     = $value;
 						$and	= ' AND ';
 				    }
 				    else
@@ -237,31 +240,26 @@ class DomainSet extends RecordSet
         // the country
         if (is_null($partof) || strlen($partof) == 0)
         {
-			$where		.= $and . "(PartOf=? OR PartOf IS NULL OR PartOf='')";
-            array_push($this->sqlParms, $cc);
+			$where		.= $and . "(PartOf=:cc OR (LEFT(Domain,2)=:cc AND (PartOf IS NULL OR PartOf='')))";
+            $this->sqlParms['cc']   = $cc;
+            $and        = ' AND ';
         }
 
 		// limit the response to one language for a country list
 		if (is_null($language))
 		{			// language not set
-		    if ($cc)
-		    {
-				$where				.= $and . "`Language`=?";
-				array_push($this->sqlParms, 'en');
-				$this->information['index']	= 'state';
-		    }
-		    else
-				$this->information['index']	= 'number';
+			$where				.= $and . "`Language`=:language";
+			$this->sqlParms['language']     = 'en';
 		}			// language not set
 		else
 		{			// language explicitly set
-		    $where				.= $and . "`Language`=?";
-		    array_push($this->sqlParms, $language);
-		    if ($cc)
-				$this->information['index']	= 'state';
-		    else
-				$this->information['index']	= 'domain';
+		    $where				.= $and . "`Language`=:language";
+		    $this->sqlParms['language']     = $language;
 		}			// language explicitly set
+		if ($cc)
+			$this->information['index']	    = 'state';
+	    else
+			$this->information['index']	    = 'domain';
 
 		return	$where;
     }		// DomainSet::getWhere
@@ -285,31 +283,17 @@ class DomainSet extends RecordSet
 
 		if ($this->list === null)
 		{
-		    // construct a query for the specific matches
-		    $query		= $this->query;
-		    $sqlParmsText	= print_r($this->sqlParms, true);
-
 		    // query the database for matches
-		    $stmt		= $connection->prepare($query);
+		    $query		= $this->query;
+            $stmt		= $connection->prepare($query);
+            $queryText  = debugPrepQuery($query, $this->sqlParms);
 		    if ($stmt->execute($this->sqlParms))
 		    {		// success
 				$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 				if ($debug)
-				{
-				    $queryParts	= explode('?', $query);
-				    $queryText	= $queryParts[0];
-				    for($i = 1; $i < count($queryParts); $i++)
-				    {
-						$val	= $this->sqlParms[$i - 1];
-						if (ctype_digit($val))
-						    $queryText	.= $val . $queryParts[$i];
-						else
-						    $queryText	.= "'$val'" . $queryParts[$i];
-				    }
 				    $warn	.= "<p>DomainSet.inc: " . __LINE__ .
 							   " $queryText</p>\n";
-				}
 
 				// have a result set, fetch rows
 				$retval		= array();
@@ -333,8 +317,7 @@ class DomainSet extends RecordSet
 		    }		// success
 		    else
 		    {		// error performing query
-				throw new Exception("DomainSet::rewind: '$query', " .
-							       "parms=$sqlParmsText, " .
+				throw new Exception("DomainSet::rewind: '$queryText', " .
 							    print_r($stmt->errorInfo(),true));
 		    }		// error performing query
 		}

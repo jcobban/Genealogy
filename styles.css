@@ -1287,6 +1287,17 @@
                 border-bottom:      1px solid white;
                 border-right:       1px solid white;
                 }
+    input[type='checkbox'].left {
+					font-family:	sans-serif;
+					text-align:	    left;
+					text-transform:	capitalize;
+					padding:	    0px;
+					border-top:	    1px solid black;
+					border-left:	1px solid black;
+					border-bottom:	1px solid white;
+					border-right:	1px solid white;
+					width:		    25px;
+		        }
     input.leftnc {
                 font-family:        sans-serif;
                 text-align:         left;

@@ -42,6 +42,7 @@ use \Exception;
  *		2019/05/20      create user for casual visitors                 *
  *		2019/05/30      for messages posted to user also send by        *
  *		                email                                           *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -68,7 +69,7 @@ $update		   		        	= false;
 print "    <parms>\n";
 foreach($_POST as $key => $value)
 {	
-	print "\t<$key>" . xmlentities($value) . "</$key>\n";
+	print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 
 	switch(strtolower($key))
 	{		// act on specific keys
@@ -388,7 +389,7 @@ if (strlen($msg) == 0)
             if (strlen($msg) > 0)
             {
 		 	    print "    <msg>\n";
-		 	    print xmlentities($e->getMessage());
+		 	    print htmlentities($e->getMessage(),ENT_XML1);
 		 	    print "    </msg>\n";
 			}
 	    }               // loop through keys
@@ -397,7 +398,7 @@ if (strlen($msg) == 0)
 else
 {		                // errors in parameters
 	print "    <msg>\n";
-	print xmlentities($msg);
+	print htmlentities($msg,ENT_XML1);
 	print "    </msg>\n";
 }		                // errors in parameters
 

@@ -1,18 +1,10 @@
 /************************************************************************
- *  DeathRegDetail.css													*
+ *  CountyMarriageEditQuery.css											*
  *																		*
- *  Stylesheet for the scripts DeathRegDetail.php						*
+ *  Stylesheet for the scripts CountyMarriageEditQuery.php				*
  *																		*
  *  History:															*
- *		2014/01/10		created											*
- *		2014/01/13		support for CSS layout of form					*
- *		2014/02/25		add input.lefterror to avoid misalignment		*
- *		2018/05/30		remove distinction between act and ina			*
- *						which is moved to other classes					*
- *						column1 width changed to 28em to match fields	*
- *						remove select classes							*
- *		2019/12/18      create separate classes for labels for column 1 *
- *		                and column 2                                    *
+ *		2019/12/19		created											*
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -57,6 +49,17 @@
 		            float:		    left;
 		            width:		    140px;
 		            }
+    label.labelCol3 {
+		            font-family:	sans-serif;
+		            font-weight:	bold;
+		            font-size:	    smaller;
+		            text-align:	    right;
+		            vertical-align:	top;
+		            padding:	    0px 3px 0px 3px;
+		            margin-top:	    1px;
+		            float:		    left;
+		            width:		    140px;
+		            }
     label.labelSmall6em {
 					font-family:	sans-serif;
 					font-weight:	bold;
@@ -69,6 +72,7 @@
 					width:		    6em;
 		            }
 
+    /*	input styles */
     input.left {
 					font-family:	sans-serif;
 					text-align:	    left;
@@ -92,16 +96,17 @@
 					width:		    250px;
 					margin-bottom:	2px;
 		}
-    input.leftnc40em {
+    input[type='checkbox'].left {
 					font-family:	sans-serif;
 					text-align:	    left;
+					text-transform:	capitalize;
 					padding:	    0px;
 					border-top:	    1px solid black;
 					border-left:	1px solid black;
 					border-bottom:	1px solid white;
 					border-right:	1px solid white;
-					width:		    40em;
-					margin-bottom:	2px;
+					width:		    25px;
+		            margin-bottom:	2px;
 		        }
     input.leftvar {
 					font-family:	sans-serif;

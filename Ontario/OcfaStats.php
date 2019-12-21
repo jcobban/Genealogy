@@ -25,189 +25,88 @@ use \Exception;
  *		2017/10/30		use composite cell style classes				*
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/11/20      change xxxxHelp.html to xxxxHelpen.html         *
+ *		2019/12/17      use class OcfaSet                               *
+ *		                use Template                                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
+require_once __NAMESPACE__ . '/OcfaSet.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-$title	= 'Ontario: OCFA Status';
+// common
+$lang	    	    = 'en';
+
+// if invoked by method=get process the parameters
+if (count($_GET) > 0)
+{	        	    // invoked by URL 
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+    {	            // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+	    {		    // act on specific parameter
+            case 'lang':
+            {
+                $lang               = FtTemplate::validateLang($value);
+                break;
+            }
+        }
+    }
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}
+
+$template           = new FtTemplate("OcfaStats$lang.html");
+
+$template->set('LANG',              $lang);
 
 if (strlen($msg) == 0)
-{			// no errors
-	// execute the query
-	$query	= "SELECT County, SUM(Township != '') FROM Ocfa
-					    GROUP BY County ORDER BY County";
-	$stmt	 	= $connection->query($query);
-	if ($stmt)
-	{		// successful query
-	    $result	= $stmt->fetchAll(PDO::FETCH_NUM);
-	}		// successful query
-	else
-	{
-	    $msg	.= "query '$query' failed: " .
-					   print_r($connection->errorInfo(),true);
-	}		// query failed
-}			// no errors
+{			            // no errors
+	$ocfas          		= new OcfaSet(array('offset'    => 0));
+	$result	        		= $ocfas->getStatistics();
 
-htmlHeader($title,
-	       array('/jscripts/default.js',
-			     '/jscripts/util.js',
-			     '/Ontario/OcfaStats.js'));
-?>
-<body>
-<?php
-pageTop(array(
-			'/genealogy.php'	=> 'Genealogy',
-			'/genCountry.php?cc=CA'	=> 'Canada',
-			'/Canada/genProvince.php?Domain=CAON'
-							=> 'Ontario',
-			'/Ontario/OcfaQuery.php'
-							=> 'New OCFA Query'));
-?>
-<div class='body'>
-  <h1><?php print $title; ?> 
-<span class='right'>
-	<a href='OcfaStatsHelpen.html' target='_blank'>Help?</a>
-</span>
-<div style='clear: both;'></div>
-  </h1>
-<?php
-	if (strlen($msg) > 0)
-	{		// print error messages if any
-	    print "<p class='message'>$msg</p>\n";
-	}		// print error messages if any
-	else
-	{		// display results of query
-?>
-  <form name='statsForm'>
-<!--- Put out the response as a table -->
-<table class='form'>
-  <thead>
-	<!--- Put out the column headers -->
-	<tr>
-	  <th class='colhead1st'>
-	    County
-	  </th>
-	  <th class='colhead'>
-	    Done
-	  </th>
-	  <th class='colhead'>
-	    View
-	  </th>
-	  <th>
-	  </th>
-	  <th class='colhead1st'>
-	    County
-	  </th>
-	  <th class='colhead'>
-	    Done
-	  </th>
-	  <th class='colhead'>
-	    View
-	  </th>
-	  <th>
-	  </th>
-	  <th class='colhead1st'>
-	    County
-	  </th>
-	  <th class='colhead'>
-	    Done
-	  </th>
-	  <th class='colhead'>
-	    View
-	  </th>
-	</tr>
-  </thead>
-  <tbody>
-<?php
-	    $columns		= 3;
-	    $col		= 1;
-	    $total		= 0;
-	    foreach($result as $row)
-	    {
-			$county		= $row[0];
-			$count		= $row[1];
-			$total		+= $count;
-			if (strlen($count) > 3)
-			    $count	= substr($count, 0, strlen($count) - 3) . ',' .
-						  substr($count, strlen($count) - 3);
-			if ($col == 1)
-			{
-?>
-	<tr>
-<?php
-			}
-?>
-	  <td class='odd bold left first'>
-	    <?php print $county; ?>
-	  </td>
-	  <td class='odd bold right'>
-	    <?php print $count; ?>
-	  </td>
-	  <td>
-	    <button id='ShowCountyStats<?php print $county; ?>'>
-			View
-	    </button>
-	  </td>
-<?php
-			$col++;
-			if ($col > $columns)
-			{	// at column limit, end row
-			    $col	= 1;
-?>
-	</tr>
-<?php
-			}	// at column limit, end row
-			else
-			{	// start new column
-?>
-	  <td>
-	  </td>
-<?php
-			}	// start new column
-	    }		// process all rows
+    $columns				= 3;
+    $col		    		= 1;
+    $total		    		= 0;
+    $rowtag         		= $template['datarow'];
+    $rbody          		= $rowtag->innerHTML;
+    $data           		= '';
+    foreach($result as $row)
+    {                   // loop through rows
+		$county		        = $row['county'];
+		$count		        = $row['count'];
+        $total		        += $count;
+		if ($col == 1)
+        {
+            $data           .= "\t\t<tr>\n";
+        }
+        $rtemplate          = new \Templating\Template($rbody);
+        $rtemplate->set('county',       $row['county']);
+        $rtemplate->set('count',        number_format($count));
+        $data               .= $rtemplate->compile();
+        
+		$col++;
+        if ($col > $columns)
+		{	            // at column limit, end row
+		    $col	        = 1;
+            $data           .= "\t\t</tr>\n";
+		}	            // at column limit, end row
+		else
+		{	            // start new column
+            $data           .= "\t\t  <td>&nbsp;</td>\n";
+        }	            // start new column
+    }                   // loop through rows
+    $template->set('total',            number_format($total));
+    $rowtag->update($data);
+}			            // no errors
+else
+{
+    $template['dataTable']->update(null);
+}
 
-	    // end last row if necessary
-	    if ($col != 1)
-	    {		// partial last column
-?>
-	</tr>
-<?php
-	    }		// partial last column
-
-	    // insert comma into formatting of total
-	    $totallen	= strlen($total);
-	    if ($totallen > 6)
-			$total	= substr($total, 0, $totallen - 6) . ',' .
-					  substr($total, $totallen - 6, 3) . ',' .
-					  substr($total, $totallen - 3);
-	    else
-	    if ($totallen > 3)
-			$total	= substr($total, 0, $totallen - 3) . ',' .
-					  substr($total, $totallen - 3);
-?>
-  </tbody>
-  <tfoot>
-	<tr>
-	  <td class='odd bold right first'>
-	    Total
-	  </td>
-	  <td class='odd bold right'>
-	    <?php print $total; ?>
-	  </td>
-	</tr>
-  </tfoot>
-</table>
-</form>
-<?php
-	}		// display results of query
-?>
-</div>
-<?php
-pageBot();
-?>
-<div id='HelpShowCountyStats' class='balloon'>
-Click on this button to show township level statistics for this county.
-</div>
-</body>
-</html>
+$template->display();

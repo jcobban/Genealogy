@@ -9,6 +9,7 @@ use \Exception;
  *																		*
  *  Parameters:															*
  *		RegDomain		domain consisting of country code and state		*
+ *		columns         number of columns to display                    *
  *																		*
  *  History:															*
  *		2011/01/09		created											*
@@ -31,11 +32,13 @@ use \Exception;
  *		2018/01/01		add language parameter							*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/07/08      use Template                                    *
+ *		2019/12/14      use class MarriageSet                           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
+require_once __NAMESPACE__ . '/MarriageSet.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -75,8 +78,7 @@ foreach($_GET as $key => $value)
 
 	    case 'lang':
 	    {
-			if (strlen($value) == 2)
-			    $lang	= strtolower($value);    	
+			$lang	        = FtTemplate::validateLang($value);    	
 			break;
 	    }		// any other paramters
 
@@ -109,30 +111,13 @@ if (!$domainObj->isExisting())
 	    			            	   'language'	=> $lang));
 	$cc			    = 'CA';
 	$countryName	= 'Canada';
-	$domainName		= 'Canada: Ontario:';
-	$stateName		= 'Ontario';
 }
+
 $domainName	    = $domainObj->getName(1);
 $stateName	    = $domainObj->getName(0);
 
-	// execute the query
-	$query	    = "SELECT M_RegYear, SUM(M_Date != '') AS Done FROM Marriage
-					    WHERE M_RegDomain='$domain'
-					    GROUP BY M_RegYear ORDER BY M_RegYear";
-	$stmt	 	= $connection->query($query);
-	if ($stmt)
-	{		// successful query
-	    $result	= $stmt->fetchAll(PDO::FETCH_NUM);
-	    if ($debug)
-	    {		// debug output
-			print "<p>$query</p>\n";
-	    }		// debug output
-	}		    // successful query
-	else
-	{
-	    $msg	.= "query '$query' failed: " .
-					   print_r($connection->errorInfo(),true);
-	}		    // query failed
+$marriages      = new MarriageSet(array('domain' => $domain));
+$result         = $marriages->getSummary();
 
 // get sub-templates
 $colHeaders             = $template['columnHeaders'];
@@ -142,7 +127,7 @@ $spacer                 ='';
 for ($i = $columns; $i; $i--)
 {
     $colData            .= $spacer . $headerHtml;
-    $spacer             = "\t\t\t<th>\n\t\t\t<th>\n";
+    $spacer             = "\t\t\t<th>&nbsp;</th>\n";
 }
 $colHeaders->update($colData . "\t\t  </tr>\n");
 
@@ -155,7 +140,7 @@ $yearClass              = 'odd';
 $row                    = reset($result);
 while($row)
 {               // continue until finished
-    $rowData            .= "\t\t  <tr>\n";
+    $rowData                .= "\n\t\t  <tr>\n";
     $spacer                 = '';
 	for ($i = $columns; $i && $row; $i--)
 	{
@@ -163,14 +148,18 @@ while($row)
 	    $rtemplate->set('YEARCLASS',    $yearClass);
 		$regYear	        = $row[0];
 		$count		        = $row[1];
+		$linked		        = $row[2];
 	    $rtemplate->set('REGYEAR',      $regYear);
 	    $rtemplate->set('DONE',         number_format($count));
+        $rtemplate->set('LINKED',       number_format($linked));
+        $pctLinked          = 100 * $linked / $count;
+        $rtemplate->set('PCTLINKED', pctClass($pctLinked));
 	    $rowData            .= $spacer . $rtemplate->compile();
-        $spacer             = "\t\t\t<td>\n\t\t\t<td>\n";
+        $spacer             = "\n\t\t\t<td>&nbsp;</td>\n";
 		$total		        += $count;
         $row                = next($result);
     }
-    $rowData            .= "\t\t  </tr>\n";
+    $rowData                .= "\n\t\t  </tr>\n";
     if ($yearClass == 'odd')
         $yearClass          = 'even';
     else

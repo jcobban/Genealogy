@@ -47,12 +47,14 @@ use \Exception;
  *						do not display PHP_INT_MAX for $lowest			*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/07/08      use Template                                    *
+ *		2019/12/16      use MarriageSet                                 *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
+require_once __NAMESPACE__ . '/MarriageSet.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $regYear		    = null;
@@ -176,49 +178,17 @@ if ($county)
 
 // execute the query
 if (is_null($county))
-    $query	= "SELECT M_RegCounty, " .
-				"SUM(M_Date != '') AS MCount, " .
-				"SUM(M_IDIR != 0) AS LinkCount, " .
-				"MIN(Marriage.M_RegNum) as low, " .
-				"MAX(Marriage.M_RegNum) as high " .
-				"FROM Marriage, MarriageIndi " .
-				"WHERE Marriage.M_RegDomain='$domain' AND " .
-				      "Marriage.M_RegYear=$regYear AND " .
-				      "MarriageIndi.M_Role!='M' AND " .
-				      "Marriage.M_RegDomain=MarriageIndi.M_RegDomain AND " .
-				      "Marriage.M_RegYear=MarriageIndi.M_RegYear AND " .
-				      "Marriage.M_RegNum=MarriageIndi.M_RegNum " .
-    		"GROUP BY M_RegCounty " .
-				"ORDER BY M_RegCounty";
-else
-    $query	= "SELECT M_RegCounty, M_RegTownship, " .
-				"SUM(M_Date != '') AS MCount, " .
-				"SUM(M_IDIR != 0) AS LinkCount, " .
-				"MIN(Marriage.M_RegNum) as low, " .
-				"MAX(Marriage.M_RegNum) as high " .
-				"FROM Marriage, MarriageIndi " .
-				"WHERE Marriage.M_RegDomain='$domain' AND " .
-				      "Marriage.M_RegYear=$regYear AND " .
-				      "Marriage.M_RegCounty='$county' AND " .
-				      "MarriageIndi.M_Role!='M' AND " .
-				      "Marriage.M_RegDomain=MarriageIndi.M_RegDomain AND " .
-				      "Marriage.M_RegYear=MarriageIndi.M_RegYear AND " .
-				      "Marriage.M_RegNum=MarriageIndi.M_RegNum " .
-    		"GROUP BY M_RegCounty, M_RegTownship " .
-            "ORDER BY M_RegCounty, M_RegTownship";
-
-$stmt	 	                = $connection->query($query);
-if ($stmt)
-{		// successful query
-    if ($debug)
-        $warn	            .= "<p>$query</p>\n";
-    $result	= $stmt->fetchAll(PDO::FETCH_ASSOC);
-}		// successful query
+{
+    $marriages	= new MarriageSet(array('domain'	=> $domain,
+                                        'year'		=> $regYear));
+    $result		= $marriages->getStatistics();
+}
 else
 {
-    $msg	                .= "query '$query' failed: " .
-                                print_r($connection->errorInfo(),true);
-    $result                 = array();
+    $marriages	= new MarriageSet(array('domain'	=> $domain,
+                                        'year'		=> $regYear,
+                                        'county'    => $county));
+    $result		= $marriages->getCountyStatistics();
 }		// query failed
 
 $total		    			= 0;
@@ -229,8 +199,6 @@ $countyName					= '';
 $lowest		    			= PHP_INT_MAX;
 $highest					= 0;
 $dataRowElt                 = $template['dataRow$ROWNUM'];
-if (!$dataRowElt)
-    $template->getDocument()->printTag();
 $dataRowHtml                = $dataRowElt->outerHTML();
 $rowclass                   = "odd";
 $data                       = '';
@@ -239,7 +207,7 @@ foreach($result as $row)
     $rtemplate              = new \Templating\Template($dataRowHtml);
     $rownum++;
     $rtemplate->set('ROWNUM',       $rownum);
-	$county		            = $row['m_regcounty'];
+	$county		            = $row['county'];
     $rtemplate->set('COUNTY',       $county);
 	if (is_null($countyObj) || $county != $countyObj->get('code'))
 	{		            // new county code
@@ -247,12 +215,12 @@ foreach($result as $row)
 		$countyName	        = $countyObj->get('name');
 	}		            // new county code 
     $rtemplate->set('COUNTYNAME',   $countyName);
-    if (array_key_exists('m_regtownship', $row))
+    if (array_key_exists('township', $row))
     {
-        $township	        = $row['m_regtownship'];
+        $township	        = $row['township'];
         $rtemplate->set('TOWNSHIP', $township);
     }
-	$count		            = $row['mcount'];
+	$count		            = $row['count'];
     $rtemplate->set('COUNT',        number_format($count));
 	$total		            += $count;
 	$linked		            = $row['linkcount'];
@@ -278,7 +246,7 @@ foreach($result as $row)
 	if ($todo == 0)
 	    $pctDone	        = 0;
 	else
-	    $pctDone	        = 50 * $count / $todo;
+	    $pctDone	        = 100 * $count / $todo;
     $rtemplate->set('PCTDONE',      number_format($pctDone, 2));
     $rtemplate->set('PCTDONECLASS', pctClass($pctDone));
     $rtemplate->set('CLASS',        $rowclass);

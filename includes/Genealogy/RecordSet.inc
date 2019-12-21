@@ -92,6 +92,8 @@ use \Templating\Template;
  *		2019/11/21      information['query'] is no longer escaped       *
  *		2019/12/13      add option 'loosesurname' to request that       *
  *		                surname be checked in a looser manner           *
+ *		                faster cleaner check for array of records parm  *
+ *		2019/12/17      add setting for named substitutions             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -190,7 +192,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
     protected 	$msg	        = '';
 
     /********************************************************************
-     *	$list															*
+     *	$this->list												        *
      *																	*
      *	Array of instances of class derived from Record					*
      *	This is only filled in when you start iterating over the set.	*
@@ -198,35 +200,35 @@ class RecordSet implements Iterator, Countable, ArrayAccess
     protected	$list		= null;
 
     /********************************************************************
-     *	$where															*
+     *	$this->where													*
      *																	*
      *	SQL WHERE clause with prepared statement insertion points		*
      ********************************************************************/
     protected	$where		= '';
 
     /********************************************************************
-     *	$orderby														*
+     *	$this->orderby													*
      *																	*
      *	SQL ORDER BY clause												*
      ********************************************************************/
     protected	$orderby	= '';
 
     /********************************************************************
-     *	$groupby														*
+     *	$this->groupby													*
      *																	*
      *	SQL GROUP BY clause												*
      ********************************************************************/
     protected	$groupby	= '';
 
     /********************************************************************
-     *	$query															*
+     *	$this->query	    											*
      *																	*
      *	SQL SELECT with prepared statement insertion points				*
      ********************************************************************/
     protected	$query		= '';
 
     /********************************************************************
-     *	$sqlParms														*
+     *	$this->sqlParms			        								*
      *																	*
      *	Parameter array of field values to insert into a prepared		*
      *	statement.														*
@@ -234,7 +236,15 @@ class RecordSet implements Iterator, Countable, ArrayAccess
     protected	$sqlParms	= array();
 
     /********************************************************************
-     *	$pat															*
+     *	$this->$usenames								    			*
+     *																	*
+     *	Determine whether the generated WHRE clause uses positional or  *
+     *	named substitution points.                                      *
+     ********************************************************************/
+    protected $usenames     = false;
+
+    /********************************************************************
+     *	RecordSet::$pat													*
      *																	*
      *	pattern of supported comparison operators.  Each elementary		*
      *	value can be compared to the field using:						*
@@ -485,31 +495,22 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		else
 		    $this->msg			            .= "Table name must be a string. ";
 
-		// if the second parameter is NULL this object represents
-		// all of the records in the table
-		if (!is_null($parameters) && !is_array($parameters))
-		    $this->msg	.= "Second parameter must be null or an array, " .
-						   print_r($parameters, true) . '. ';
 
 		// check for an array of records from the specified table
-		if (is_null($parameters))
-		    $parameters		= array();
+        if (is_null($parameters))
+        {               // null
+		    // if the second parameter is NULL this object represents
+		    // all of the records in the table
+            $parameters		= array();
+        }               // null
 		else
-		{			    // not null, check for array of records
-		    $recordArray		            = true;
-		    // note that $recordArray remains true if $parms is an empty array
-		    // this is deliberate to be able to create an empty set of records
-		    foreach($parameters as $index => $row)
-		    {			// loop through parameters
-				if (!is_a($row, __NAMESPACE__ . "\\" . $information['classname']))
-				{
-				    $recordArray		    = false;
-				    break;
-				}
-		    }			// loop through parameters
-
-		    if ($recordArray)
-		    {			// have array of records
+		if (is_array($parameters))
+		{			    // array of parameters or records
+            if (count($parameters) == 0 || 
+                is_a(current($parameters), 
+                     __NAMESPACE__ . "\\" . $information['classname']))
+		    {			// have possibly empty array of records
+		        // deliberate to permit creating an empty set of records
 				$this->parms			    = $parameters;
 				$this->sqlParms			    = array();
 				$this->where			    = '';
@@ -518,7 +519,10 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				$this->list			        = $parameters;
 				return;
 		    }			// have array of records
-		}			    // not null, check for array of records
+        }			    // array of parameters or records
+        else
+		    $this->msg	.= "Second parameter must be null or an array, " .
+						   print_r($parameters, true) . '. ';
 
 		// 3rd parameter is explicit list of fields
 		if ($fields != '*')
@@ -756,7 +760,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		    else
 		    {			// error performing query
 				$this->msg  .= "RecordSet::__construct: \"$queryText\", " .
-								    print_r($stmt->errorInfo(),true);
+                    print_r($stmt->errorInfo(),true);
+                print '<p>' . $this->msg . "</p>\n";
 		    }			// error performing query
         }			// set count to actual number of records
         if (strlen($this->msg) > 0)
@@ -871,6 +876,12 @@ class RecordSet implements Iterator, Countable, ArrayAccess
     {
 		global	$debug;
 		global	$warn;
+
+        // default is to generate positional insertion points (?)
+        // use name insertion points (:name) if either the $refname parameter
+        // is passed or the the constructor sets $this->usenames
+        if (is_null($refname) && $this->usenames)
+            $refname        = true;
 
 		if (substr($fldname, 0, 1) != '`' &&
             strpos($fldname, '.') === false)
@@ -1095,6 +1106,12 @@ class RecordSet implements Iterator, Countable, ArrayAccess
     {
 		global	$debug;
 		global	$warn;
+
+        // default is to generate positional insertion points (?)
+        // use name insertion points (:name) if either the $refname parameter
+        // is passed or the the constructor sets $this->usenames
+        if (is_null($refname) && $this->usenames)
+            $refname        = true;
 
 		if (substr($fldname, 0, 1) != '`' &&
             strpos($fldname, '.') === false)
@@ -1360,6 +1377,12 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		global	$debug;
 		global	$warn;
 
+        // default is to generate positional insertion points (?)
+        // use name insertion points (:name) if either the $refname parameter
+        // is passed or the the constructor sets $this->usenames
+        if (is_null($refname) && $this->usenames)
+            $refname        = true;
+
 		if (substr($fldname, 0, 1) != '`' &&
             strpos($fldname, '.') === false)
         {
@@ -1582,83 +1605,113 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      *	    a string that can be substituted into a MySQL WHERE clause	*
      ********************************************************************/
     protected function getSurnameChk($table, 
-								     $surname)
+                                     $surname)
     {
-		$information	= Record::getInformation($table);
-		$soundslike	    = false;
-		$soundex	    = false;
+        // default is to generate positional insertion points (?)
+        // use name insertion points (:name) if either the $refname parameter
+        // is passed or the the constructor sets $this->usenames
+        $refname            = $this->usenames;
+
+		$information	    = Record::getInformation($table);
+		$soundslike	        = false;
+		$soundex	        = false;
 		if ($information)
-		{			// valid table name
-		    $initRow	= $information['initrow'];
-			$soundslike	= array_key_exists('soundslike',	$initRow);
-			$soundex	= array_key_exists('soundex',	    $initRow);
-		    $valid	    = array_key_exists('surname',		$initRow);
-		    $table	    = $information['table'];	// actual table name
-		}			// valid table name
+		{			    // valid table name
+		    $initRow	    = $information['initrow'];
+			$soundslike	    = array_key_exists('soundslike',	$initRow);
+			$soundex	    = array_key_exists('soundex',	    $initRow);
+		    $valid	        = array_key_exists('surname',		$initRow);
+		    $table	        = $information['table'];	// actual table name
+		}			    // valid table name
 		else
-		    $valid	    = false;        // invalid table name
+		    $valid	        = false;        // invalid table name
 
 		if ($valid)
-		{			// valid table
+		{			    // valid table
 require_once __NAMESPACE__ . '/Surname.inc';
-		    $surnameRec	= new Surname(array('surname' => $surname));
-		    $pattern	= $surnameRec->get('pattern');
+		    $surnameRec	    = new Surname(array('surname' => $surname));
+		    $pattern	    = $surnameRec->get('pattern');
 		    if ($pattern != '')
-		    {		// use pattern match rather than soundex
-				$this->sqlParms[]	= $pattern;
-				return $table . ".Surname REGEXP ?";
-		    }		// use pattern match rather than soundex
+            {		    // use pattern match rather than soundex
+                if ($refname)
+                {
+                    $this->sqlParms['pattern']	= $pattern;
+                    $sub                = ':pattern';
+                }
+                else
+                {
+				    $this->sqlParms[]	= $pattern;
+                    $sub                = '?';
+                }
+				return "$table.Surname REGEXP $sub";
+		    }		    // use pattern match rather than soundex
 
             if ($soundslike || $soundex)
-		    {		// use soundex match
-				// remove question marks
-				$surname	        = str_replace('?', '', $surname);
-                $this->sqlParms[]	= $surname;
-                $sxtable            = $table;
-                if ($table == 'tblNX')
-                    $sxtable        = 'tblNR';
-                if ($soundslike)
-                    $surnameCmp	    = $sxtable .
-                                        ".SoundsLike=LEFT(SOUNDEX(?),4)";
-                else
-                    $surnameCmp	    = $sxtable .
-                                        ".Soundex=LEFT(SOUNDEX(?),4)";
+		    {		    // use soundex match
+				// remove special characters that soundex doesn't handle
+                $surname	            = preg_replace('#[^a-zA-Z]#', '', $surname);
 				if (substr($surname, strlen($surname) - 1) == 's')
 				{		// also try soundex without final s
-				    $this->sqlParms[] = substr($surname, 0, strlen($surname)-1);
+                    $altsurname         = substr($surname, 
+                                                 0, strlen($surname)-1);
 				}		// also try soundex without final s
 				else
 				{		// also try soundex with final s
-				    $this->sqlParms[] = $surname . 's';
-				}		// also try soundex with final s
-                if ($soundslike)
-                    $surnameCmp	    = $sxtable .
-                                        ".SoundsLike=LEFT(SOUNDEX(?),4)";
-                else
-                    $surnameCmp	    = $sxtable .
-                                        ".Soundex=LEFT(SOUNDEX(?),4)";
-		    }			// use soundex match
+				    $altsurname         = $surname . 's';
+                }		// also try soundex with final s
 
-			if (strlen($surname) > 4)
-			{		    // add other loose surname comparisons
-			    // match a surname that starts with the same 2 characters
-			    // and ends with the same character or
-			    // starts with the same character and
-			    // ends with the same 3 characters
-			    $this->sqlParms[]	= substr($surname, 0, 2);
-			    $this->sqlParms[]	= substr($surname, -1);
-			    $this->sqlParms[]	= substr($surname, 0, 1);
-			    $this->sqlParms[]	= substr($surname, -3);
-			    $surnameCmp	.= " OR (LEFT($table.Surname,2)=?" .
-								" AND RIGHT($table.Surname,1)=?) OR " .
-								"(LEFT($table.Surname,1)=?" .
-								" AND RIGHT($table.Surname,3)=?)";
-			}		// add other loose surname comparisons
-			return "($surnameCmp)";
+                if ($refname)
+                {
+                    $this->sqlParms['surname']	    = $surname;
+                    $this->sqlParms['altsurname']	= $altsurname;
+                    $sub1               = ':surname';
+                    $sub2               = ':altsurname';
+                }
+                else
+                {
+                    $this->sqlParms[]	= $surname;
+                    $this->sqlParms[]	= $altsurname;
+                    $sub1               = '?';
+                    $sub2               = '?';
+                }
+                $sxtable                = $table;
+                if ($table == 'tblNX')
+                    $sxtable            = 'tblNR';
+                if ($soundslike)
+                {
+                    $surnameCmp	        = '(' . $sxtable .
+                                        ".SoundsLike=LEFT(SOUNDEX($sub1),4)" .
+                                        ' OR ' . $sxtable .
+                                        ".SoundsLike=LEFT(SOUNDEX($sub2),4))";
+                }
+                else
+                {
+                    $surnameCmp	        = '(' . $sxtable .
+                                        ".Soundex=LEFT(SOUNDEX($sub1),4)" .
+                                        ' OR ' . $sxtable .
+                                        ".Soundex=LEFT(SOUNDEX($sub2),4))";
+                }
+            }			// use soundex match
+            else
+            {		    // use exact match
+                if ($refname)
+                {
+                    $this->sqlParms['surname']	= $surname;
+                    $sub                = ':surname';
+                }
+                else
+                {
+				    $this->sqlParms[]	= $surname;
+                    $sub                = '?';
+                }
+				$surnameCmp             = "$table.Surname=$sub";
+            }		    // use exact match
+
+			return $surnameCmp;
 		}			// valid table name
 		else
 		{
-		    $warn	.= "<p>record::getSurnameChk: " .
+		    $warn	.= "<p>RecordSet::getSurnameChk: " .
 								"Unsupported table '$table'</p>\n";
 		}
 		return '';		// no comparison created

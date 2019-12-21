@@ -36,7 +36,7 @@ print "    <parms>\n";
 $blid	= null;
 foreach($_POST as $key => $value)
 {			// loop through all parameters
-	print "\t<$key>" . xmlentities($value) . "</$key>\n";
+	print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 	if ($key == 'blid' || $key == 'id' || $key == 'bl_index')
 	    $blid	= $value;
 }			// loop through all parameters
@@ -86,14 +86,14 @@ if (strlen($msg) == 0)
 		}		// errors in parameters
 	} catch (Exception $e) {
 		print "    <msg>\n";
-		print xmlentities($e->getMessage());
+		print htmlentities($e->getMessage(),ENT_XML1);
 		print "    </msg>\n";
 	}
 }			// no errors detected
 else
 {			// errors in parameters
 	print "    <msg>\n";
-	print xmlentities($msg);
+	print htmlentities($msg,ENT_XML1);
 	print "    </msg>\n";
 }			// errors in parameters
 

@@ -1,62 +1,75 @@
 /************************************************************************
- *  editParents.css							*
- *									*
- *  Stylesheet for the script editParents.php				*
- *									*
- *  History:								*
- *	2014/02/17	created						*
- *	2014/03/06	label class name changed to column1		*
- *									*
- *  Copyright &copy; 2014 James A. Cobban				*
+ *  editParents.css														*
+ *																		*
+ *  Stylesheet for the script editParents.php							*
+ *																		*
+ *  History:															*
+ *		2014/02/17		created											*
+ *		2014/03/06		label class name changed to column1				*
+ *		2019/12/16      add styles for width of input fields and        *
+ *		                the padding which matches them in width         *
+ *																		*
+ *  Copyright &copy; 2014 James A. Cobban								*
  ************************************************************************/
 
 /*	division styles		*/
-    div.row {	white-space:	nowrap; }
+    div.row {	white-space:		nowrap; }
 
     div.column1 {
-		float:		left;
-		margin-top:	1px;
-		margin-right:	3px;
-		width:		43em;
-		}
+				float:			    left;
+				margin-top:		    1px;
+				margin-right:		3px;
+				width:			    43em;
+				}
 
 /*	labels of various widths */
     label.column1 {
-		font-family:	sans-serif;
-		font-weight:	bold;
-		font-size:	smaller;
-		text-align:	right;
-		vertical-align:	top;
-		padding:	0px 3px 0px 3px;
-		margin-top:	1px;
-		float:		left;
-		width:		13em;
-		}
+				font-family:		sans-serif;
+				font-weight:		bold;
+				font-size:		    smaller;
+				text-align:		    right;
+				vertical-align:		top;
+				padding:		    0px 3px 0px 3px;
+				margin-top:		    1px;
+				float:			    left;
+				width:			    13em;
+				}
     button.button {
-		font-family:	sans-serif;
-		font-weight:	bold;
-		font-size:	80%;
-		text-align:	center;
-		background-color:#E0E0E0;
-		border-top:	2px solid white;
-		border-left:	2px solid white;
-		border-bottom:	3px solid #404040;
-		border-right:	3px solid #404040;
-		color:		black;
-		padding:	0px 12px 0px 12px;
-		width:		15em;
-		}
+				font-family:		sans-serif;
+				font-weight:		bold;
+				font-size:		    80%;
+				text-align:		    center;
+				background-color:   #E0E0E0;
+				border-top:		    2px solid white;
+				border-left:		2px solid white;
+				border-bottom:		3px solid #404040;
+				border-right:		3px solid #404040;
+				color:			    black;
+				padding:		    0px 12px 0px 12px;
+				width:			    15em;
+				}
     button.button:disabled {
-		font-family:	sans-serif;
-		font-weight:	bold;
-		font-size:	80%;
-		text-align:	center;
-		background-color:#E0E0E0;
-		border-top:	2px solid white;
-		border-left:	2px solid white;
-		border-bottom:	3px solid #404040;
-		border-right:	3px solid #404040;
-		color:		#404040;
-		padding:	0px 12px 0px 12px;
-		width:		15em;
-		}
+				font-family:		sans-serif;
+				font-weight:		bold;
+				font-size:		    80%;
+				text-align:		    center;
+				background-color:   #E0E0E0;
+				border-top:		    2px solid white;
+				border-left:		2px solid white;
+				border-bottom:		3px solid #404040;
+				border-right:		3px solid #404040;
+				color:			    #404040;
+				padding:		    0px 12px 0px 12px;
+				width:			    15em;
+				}
+
+    span.left  {
+				padding:		    0px 1px 0px 1px;
+                }
+
+    .column1   {
+				width:			    290px;
+                }
+    .column2   {
+				width:			    210px;
+                }

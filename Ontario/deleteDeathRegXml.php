@@ -3,18 +3,19 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  deleteDeathRegXml.php						*
- *									*
- *  Delete an existing death registration record from Deaths.		*
+ *  deleteDeathRegXml.php												*
+ *																		*
+ *  Delete an existing death registration record from Deaths.			*
  *  This generates an XML file with response information so that it may	*
- *  be invoked using AJAX.						*
- *									*
- *  History:								*
- *	2014/08/28	created						*
- *	2014/12/25	report count of deleted records			*
- *	2015/07/02	access PHP includes using include_path		*
- *									*
- *  Copyright &copy; 2015 James A. Cobban				*
+ *  be invoked using AJAX.												*
+ *																		*
+ *  History:															*
+ *		2014/08/28		created											*
+ *		2014/12/25		report count of deleted records					*
+ *		2015/07/02		access PHP includes using include_path			*
+ *		2019/12/19      replace xmlentities with htmlentities           *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once	__NAMESPACE__ . '/Death.inc';
@@ -89,7 +90,7 @@ require_once __NAMESPACE__ . '/common.inc';
     if (strlen($msg) > 0)
     {		// problems detected
 	print "    <msg>\n\t" . 
-	      xmlentities($msg) . 
+	      htmlentities($msg,ENT_XML1) . 
 	      "\n    </msg>\n";
     }		// problems detected
     else

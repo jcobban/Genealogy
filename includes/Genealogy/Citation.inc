@@ -219,6 +219,7 @@ use Templating\Template;
  *		2019/09/20      correct implementation of Citation::dump        *
  *		2019/11/02      hide extra HTML inserted by new version of      *
  *		                tinyMCE                                         *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																	    *
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/	
@@ -1832,7 +1833,7 @@ class Citation extends RecordPic
 								  Source::TOXML_INCLUDE_REPOSITOR);
 						    else
 							$retval	.= "<source>" .
-								   xmlentities($source->getName()) . 
+								   htmlentities($source->getName(),ENT_XML1) . 
 								   "</source>\n";
 						} catch (Exception $e) {
 						    $retval.= "<msg>" . $e->getMessage() . "</msg>\n";
@@ -1844,10 +1845,10 @@ class Citation extends RecordPic
 				case 'enteredd':
 				{		// legacy internal date format
 				    $date	= new LegacyDate($value);
-				    $retval	.= "    <{$fld}c>" . xmlentities($value) .
+				    $retval	.= "    <{$fld}c>" . htmlentities($value,ENT_XML1) .
 							"</{$fld}c>\n";
 				    $value	= $date->toString();
-				    $retval	.= "    <$fld>" . xmlentities($value) . "</$fld>\n";
+				    $retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) . "</$fld>\n";
 				    break;
 				}		// legacy internal date format
 
@@ -1855,7 +1856,7 @@ class Citation extends RecordPic
 				{		// document type
 				    $retval	.= "    <type>" . $value . "</type>\n";
 				    $typemeans	= $this->getCitTypeText();
-				    $retval	.= "    <typemeans>" . xmlentities($typemeans) .
+				    $retval	.= "    <typemeans>" . htmlentities($typemeans,ENT_XML1) .
 						"</typemeans>\n";
 				    $tableKey	= self::$recType[$value];
 				    $retval	.= "    <reckey>$tableKey</reckey>\n";
@@ -1864,7 +1865,7 @@ class Citation extends RecordPic
 
 				default:
 				{		// fields passed back with no interpretation
-				    $retval	.= "    <$fld>" . xmlentities($value) .
+				    $retval	.= "    <$fld>" . htmlentities($value,ENT_XML1) .
 								"</$fld>\n";
 				    break;
 				}		// fields passed back with no interpretation
@@ -1918,7 +1919,7 @@ class Citation extends RecordPic
 						    }
 						    else
 							$retval	.= $comma . "\t\"source\":\t" . 
-							   json_encode(xmlentities($source->getName()));
+							   json_encode(htmlentities($source->getName(),ENT_XML1));
 						} catch (Exception $e) {
 							$retval	.= $comma . "\t\"msg\":\t" . 
 							   json_encode($e->getMessage());

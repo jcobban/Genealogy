@@ -34,8 +34,9 @@ use \Iterator;
  *		2016/04/28		change toXML to always return the XML and		*
  *						only print it by default						*
  *		2017/09/11		implement interface Iterator					*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -180,7 +181,7 @@ class LegacyHeader implements Iterator
 		{
 		    if (substr($key, 1, 1) == '_')
 		    	$key	= substr($key, 2);
-		    $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
+		    $retval	.= "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 		}
 		if ($top !== null)
 		    $retval	.= "    </$top>\n";

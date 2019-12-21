@@ -143,7 +143,7 @@ if (strlen($msg) == 0)
 {		// no errors
     $information	= $result->getInformation();
     $query		= $information['query'];
-    print "<query>" . xmlentities($query) . "</query>\n";
+    print "<query>" . htmlentities($query,ENT_XML1) . "</query>\n";
 
     $OldId	= '';
     if (count($result) > 0)

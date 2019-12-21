@@ -664,6 +664,7 @@ function canUser($function)
  *		ownStyleSheet	true if the current script has its own style	*
  *						sheet											*
  *																		*
+ *	Deprecated: use Template											*
  ************************************************************************/
 $scriptIncludes		= array();
 
@@ -770,6 +771,7 @@ function htmlHeader($title,
  *  Input:																*
  *		$breadCrumbs		associative array of URLs => labels			*
  *																		*
+ *	Deprecated: use Template											*
  ************************************************************************/
 function pageTop($breadCrumbs)
 {
@@ -875,6 +877,7 @@ function pageTop($breadCrumbs)
  *		$tableName		name of the table containing the identified		*
  *						record: default 'tblIR'							*
  *																		*
+ *	Deprecated: use Template											*
  ************************************************************************/
 function pageBot($pageName	= null,
     		     $recordKey	= 0,
@@ -1002,12 +1005,29 @@ function pageBot($pageName	= null,
 			    substr($filename, strlen($filename) - 5) == '.html')
 			$ads[]		= $filename;
 		}		// loop through files
-		$index	= rand(0, count($ads) - 1);
-		$adname	= $ads[$index];
+		$index	        = rand(0, count($ads) - 1);
+        $adname	        = $ads[$index];
+        $prime          = substr($adname, 0, strlen($adname) - 5);
+        include_once  __NAMESPACE__ . '/Advertiser.inc';
+        $advertiser     = new Advertiser(array('adname' => $prime));
+        $date           = date('m d');
+        $month          = substr($date, 0, 2);
+        $day            = substr($date, -2);
+        $advertiser->increment($month);
+        if ($day == '28')
+        {
+            $month      += 1;
+            if ($month > 12)
+                $month  = $month - 13;
+            if (strlen($month) == 1)
+                $month  = '0' . $month;
+            $advertiser->set("Count$month", 0);
+            $advertiser->save(false);
+        }
 	}			// found advertisements directory
 	else
-		$adname	    = 'AddForRent.html';
-    $adurl	        = "/Advertisements/$adname";
+		$adname	        = 'AddForRent.html';
+    $adurl	            = "/Advertisements/$adname";
 
     // change insertion of ads to not use <iframe>
     $adElement              = $template['advertFrame'];
@@ -1038,6 +1058,7 @@ function pageBot($pageName	= null,
  *  This function includes common elements that are required in all		*
  *  pages that do not use pageTop and pageBot.							*
  *																		*
+ *	Deprecated: use Template											*
  ************************************************************************/
 function dialogBot()
 {
@@ -1198,8 +1219,8 @@ function curPageURL()
 
 function display_xml_error($error, $xml)
 {
-	$return  = $xml[$error->line - 1] . "\n";
-	$return .= str_repeat('-', $error->column) . "^\n";
+	$return         = $xml[$error->line - 1] . "\n";
+	$return         .= str_repeat('-', $error->column) . "^\n";
 	
 	switch ($error->level) {
 		case LIBXML_ERR_WARNING:
@@ -1228,7 +1249,6 @@ function display_xml_error($error, $xml)
  *  function showTrace													*
  *																		*
  *  Display the accumulated trace information.							*
- *																		*
  ************************************************************************/
 $warnid		= '';
 function showTrace()
@@ -1270,6 +1290,59 @@ function showTrace()
 }		// function showTrace
 
 /************************************************************************
+ *  function debugParm  												*
+ *																		*
+ *	For generating a debug trace of the parameters passed to a script   *
+ *	by either method=get or method=post translate the parameter value   *
+ *	to a string that can be included in the debugging output.           *
+ *																		*
+ *  Parameter:															*
+ *		$value      parameter value										*
+ *																		*
+ *  Returns:															*
+ *		string                                                          *
+ ************************************************************************/
+function debugParm($value)
+{
+    if (is_array($value))
+    {
+        $valueText  = 'array(';
+        $comma      = '';
+        foreach($value as $id => $val)
+        {
+            $valueText      .= $comma;
+            if (is_string($id))
+                $valueText  .= "'$id' => ";
+            if (is_string($val))
+                $valueText  .= "'$val'";
+            else
+            if (is_numeric($val))
+                $valueText  .= $val;
+            else
+                $valueText  .= print_r($val, true);
+            $comma          = ',';
+        }
+        $valueText  .= ')';
+    }
+    else
+    if (is_null($value))
+        $valueText  = 'NULL';
+    else
+    if ($value === false)
+        $valueText  = 'FALSE';
+    else
+    if ($value === true)
+        $valueText  = 'TRUE';
+    else
+    if (is_string($value))
+        $valueText  = "'$value'";
+    else
+        $valueText  = $value;
+
+    return $valueText;
+}       // function debugParm
+
+/************************************************************************
  *  xmlentities															*
  *																		*
  *  For some reason PHP does not have a function that translates		*
@@ -1284,6 +1357,8 @@ function showTrace()
  *																		*
  *  Returns:															*
  *		string with '&', '<', and '>' replaced by character entities.	*
+ *                                                                      *
+ *	Deprecated: use htmlentities(,ENT_XML1)                             *
  ************************************************************************/
 function xmlentities($in)
 {

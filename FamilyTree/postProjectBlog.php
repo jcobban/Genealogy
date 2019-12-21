@@ -18,8 +18,9 @@ use \Exception;
  *		2013/12/07		$msg and $debug initialized by common.inc		*
  *		2014/03/25		use class Blog									*
  *		2015/07/02		access PHP includes using include_path			*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2015 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Blog.inc";
@@ -34,7 +35,7 @@ $projectId	= null;
 $message	= null;
 foreach($_POST as $key => $value)
 {	
-    print "\t<$key>" . xmlentities($value) . "</$key>\n";
+    print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
     if (substr($key,0,9) == 'projectId')
         $projectId	= $value;
     else
@@ -71,7 +72,7 @@ if (strlen($msg) == 0)
 else
 {		// errors in parameters
     print "    <msg>\n";
-    print xmlentities($msg);
+    print htmlentities($msg,ENT_XML1);
     print "    </msg>\n";
 }		// errors in parameters
 

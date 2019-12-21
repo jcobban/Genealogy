@@ -546,6 +546,7 @@ use \Exception;
  *		2019/10/28      permit spaces in front of save parm             *
  *		                return count from save                          *
  *		2019/11/23      correct implementation of getPerson             *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1328,7 +1329,7 @@ class Person extends RecordPic
                     {		// ignore duplicates error
                         if ($xml)
                         {
-                            print "$intent<msg>" . xmlentities($errorInfo) .
+                            print "$intent<msg>" . htmlentities($errorInfo,ENT_XML1) .
                                     "</msg>\n";
                         }
                         $warn	.= "<p>Person::delete: " .
@@ -3492,7 +3493,7 @@ class Person extends RecordPic
                 {
                     if ($field == 'idcr')
                         $child	    = true;
-                    $retval	        .= "    <$field>" . xmlentities($value) .
+                    $retval	        .= "    <$field>" . htmlentities($value,ENT_XML1) .
                                         "</$field>\n";
                 }
             }
@@ -3658,13 +3659,13 @@ class Person extends RecordPic
                 case 'updatedtime':
                 {		// fields suppressed for child
                     if (!$child)
-                        $retval	.= "    <$field>" . xmlentities($value) . "</$field>\n";
+                        $retval	.= "    <$field>" . htmlentities($value,ENT_XML1) . "</$field>\n";
                     break;
                 }		// fields suppressed for child
 
                 default:
                 {		// fields passed back with no interpretation
-                    $retval	.= "    <$field>" . xmlentities($value) . "</$field>\n";
+                    $retval	.= "    <$field>" . htmlentities($value,ENT_XML1) . "</$field>\n";
                     break;
                 }		// fields passed back with no interpretation
             }		// switch on field name

@@ -33,8 +33,9 @@ use \Exception;
  *		2018/11/21      remove static getWhere                          *
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/05/18      add $info                                       *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -361,7 +362,7 @@ class CountyMarriageReport extends Record
 		{
 		    if (substr($key, 0, 2) == 'm_')
 				    $key	= substr($key, 2);
-		    $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
+		    $retval	.= "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 		}
 
 		if ($top !== null)

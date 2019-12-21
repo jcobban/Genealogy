@@ -211,6 +211,7 @@ use \Iterator;
  *		2019/11/06      trim HTML <p> off values from tinyMCE           *
  *		2019/11/21      correct escaping of apostrophes in debug output *
  *		                add 3rd parameter to debugPrepQuery             *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1003,7 +1004,7 @@ class Record implements Iterator, ArrayAccess
             (is_string($this->prime) && strlen($this->prime) == 0))
 		{
 		    $warn	.= "<p>Record::getId: table " . $this->table .
-						" does not have a unique primary key</p>\n";
+                " does not have a unique primary key</p>\n";
 		    return null;
         }
         else
@@ -1027,6 +1028,8 @@ class Record implements Iterator, ArrayAccess
 		{
 		    $warn	.= "<p>Record::getId: table " . $this->table .
 				" record does not exist in database</p>\n";
+            throw new Exception("table " . $this->table .
+				" record $retval does not exist in database");
 		    return null;
 		}
 		return $retval;
@@ -1171,18 +1174,18 @@ class Record implements Iterator, ArrayAccess
 
 		// ensure that there is a label to use for the display
 		if (!is_string($label) || strlen($label) == 0)
-		    $label	= $this->table;
-		$prime		= $this->prime;
+		    $label	            = $this->table;
+		$prime		            = $this->prime;
 
-		$output		= '';
+		$output		            = '';
 		if (is_array($this->row))
 		{                       // record is initialized
-		    $output	.= "<p class='label'>$label</p>\n";
-		    $output	.= "<table border='1'>\n";
+		    $output	            .= "<p class='label'>$label</p>\n";
+		    $output	            .= "<table border='1'>\n";
 		    foreach($this->row as $key => $value)
 		    {
-				$output	.= "  <tr>\n";
-				$output	.= "    <th class='label'>\n";
+				$output	        .= "  <tr>\n";
+				$output	        .= "    <th class='label'>\n";
 				if (is_array($prime))
 				{
 				    if (in_array($key, $prime))
@@ -1192,43 +1195,44 @@ class Record implements Iterator, ArrayAccess
 				}
 				else
 				if ($key == $prime)
-				    $output	.= "<i>`$key`</i>";
+				    $output	    .= "<i>`$key`</i>";
 				else
-				    $output	.= "`$key`";
-				$output	.= "    </th>\n";
-				$output	.= "    <td class='dataleft'>\n";
+				    $output	    .= "`$key`";
+				$output	        .= "    </th>\n";
+				$output	        .= "    <td class='dataleft'>\n";
 				if (is_null($value))
-				    $output	.= 'null';
+				    $output	    .= 'null';
                 else
                 if (strlen($value) > 100)
-				    $output	.= htmlspecialchars(substr($value, 0, 75) . '...' . substr($value, -22));
+                    $output	    .= htmlspecialchars(substr($value, 0, 75) . 
+                                    '...' . substr($value, -22));
                 else
-				    $output	.= htmlspecialchars($value);
-				$output	.= "    </td>\n";
-				$output	.= "  </tr>\n";
+				    $output	    .= htmlspecialchars($value);
+				$output	        .= "    </td>\n";
+				$output	        .= "  </tr>\n";
 		    }	// loop through keys
 
 		    foreach($this->extras as $key => $value)
 		    {
-				$output	.= "  <tr>\n";
-				$output	.= "    <th class='label'>\n";
-				$output	.= "'$key'";
-				$output	.= "    </th>\n";
-				$output	.= "    <td class='dataleft'>\n";
+				$output	        .= "  <tr>\n";
+				$output	        .= "    <th class='label'>\n";
+				$output	        .= "'$key'";
+				$output	        .= "    </th>\n";
+				$output	        .= "    <td class='dataleft'>\n";
 				if (is_null($value))
-				    $output	.= 'null';
+				    $output	    .= 'null';
 				else
-				    $output	.= htmlspecialchars($value);
-				$output	.= "    </td>\n";
-				$output	.= "  </tr>\n";
+				    $output	    .= htmlspecialchars($value);
+				$output	        .= "    </td>\n";
+				$output	        .= "  </tr>\n";
 		    }	// loop through keys
-		    $output	.= "</table>\n";
+		    $output	            .= "</table>\n";
         }                       // record is initialized
         else
             $output .= "<p class='message'>record not initialized</p>\n";
 
 		if (($debug || $force))
-		    $warn		.= $output;
+		    $warn		        .= $output;
 		return $output;
     }		// function Record::dump
 
@@ -1271,6 +1275,7 @@ class Record implements Iterator, ArrayAccess
 		global	$msg;
 		global	$connection;
 
+        $this->dump('Record::save ' . __LINE__);
 		// get current date and time for added and updated fields in record
 		$now		    	= getdate();
         $today		    	= $now['year'] * 10000 +
@@ -1342,7 +1347,8 @@ class Record implements Iterator, ArrayAccess
 		if ($this->needInsert)
 		{		// create new record
 		    if ($debug)
-				$warn	.= "<p>Record::save: " . __LINE__ . " needInsert=true</p>\n";
+                $warn	.= "<p>Record::save: " . __LINE__ . " needInsert=true</p>\n";
+            $this->dump('Record::save insert');
 		    $fldnames	= '';
 		    $values	    = '';
 		    $comma	    = '';
@@ -1352,7 +1358,7 @@ class Record implements Iterator, ArrayAccess
 				return false;
 		    }
 		    foreach($this->row as $fld => $value)
-		    {
+            {
 				if ($fld == 'added')
 				{	// date added
 				    $fldnames	    .= "$comma`$fld`";
@@ -1876,7 +1882,7 @@ class Record implements Iterator, ArrayAccess
 		    else
 		    if (substr($key, 2, 1) == '_')
 				    $key	= substr($key, 3);
-		    $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
+		    $retval	.= "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 		}
 		if ($top !== null)
 		    $retval	.= "    </$top>\n";
@@ -2686,7 +2692,7 @@ class Record implements Iterator, ArrayAccess
 
 		$fieldLc    	= str_replace('`','',strtolower($fldname));
 
-		$translated	    = false;
+        $translated	    = false;
 		if (array_key_exists($fieldLc, static::$translate))
 		{
 		    $fieldLc	= static::$translate[$fieldLc];

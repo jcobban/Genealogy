@@ -34,8 +34,9 @@ use \Exception;
  *		2016/12/20		fix exception if IDIR of other spouse is zero	*
  *		2017/03/19		use preferred parameters for new LegacyFamily	*
  *		2017/09/12		use get( 										*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header('Content-Type: text/xml');
 require_once __NAMESPACE__ . '/Family.inc';
@@ -116,7 +117,7 @@ catch(Exception $e)
 if (strlen($msg) > 0)
 {		// problems detected
     print "    <msg>\n\t" . 
-          xmlentities($msg) . 
+          htmlentities($msg,ENT_XML1) . 
           "\n    </msg>\n";
 }		// problems detected
 else

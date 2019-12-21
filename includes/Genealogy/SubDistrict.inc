@@ -74,6 +74,7 @@ use \Iterator;
  *		                it is empty                                     *
  *		2019/12/01      if there are multiple matches to parameters     *
  *		                return new record                               *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -1395,14 +1396,14 @@ class SubDistrict extends Record
 		{
 		    if (substr($key, 0, 3) == 'sd_')
 				    $key	= substr($key, 3);
-		    $retval	        .= "\t<$key>" . xmlentities($value) . "</$key>\n";
+		    $retval	        .= "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 		    if ($key == 'distid')
 		    {			// also report information from District
 				$retval	    .= "\t<distname>" .
-				        		xmlentities($this->district['d_name']) .
+				        		htmlentities($this->district['d_name'],ENT_XML1) .
 				        		"</distname>\n";
 				$retval	    .= "\t<province>" .
-				        		xmlentities($this->district['d_province']) .
+				        		htmlentities($this->district['d_province'],ENT_XML1) .
 				        		"</province>\n";
 		    }			// also report information from District
 		}

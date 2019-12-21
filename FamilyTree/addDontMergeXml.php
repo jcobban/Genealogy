@@ -27,8 +27,9 @@ use \Exception;
  *						class DontMergeEntry							*
  *		2017/10/08		improve parameter validation					*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("content-type: text/xml");
 require_once __NAMESPACE__ . '/Person.inc';
@@ -49,7 +50,7 @@ $parms	= "  <parms>\n";
 foreach ($_POST as $key => $value)
 {		// look at all parameters
 	$value		= trim($value);
-	$parms		.= "    <$key>" . xmlentities($value) . "</$key>\n";
+	$parms		.= "    <$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 	switch(strtolower($key))
 	{	// act on keys
 	    case 'idirleft':

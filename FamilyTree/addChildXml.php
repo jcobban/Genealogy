@@ -24,8 +24,9 @@ use \Exception;
  *		2017/03/19		use preferred parameters for new LegacyIndiv	*
  *						use preferred parameters for new LegacyFamily	*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 header("content-type: text/xml");
 require_once __NAMESPACE__ . '/Person.inc';
@@ -45,7 +46,7 @@ $idir	= null;		// IDIR
 print "  <parms>\n";
 foreach ($_POST as $key => $value)
 {			// look at all parameters
-	print "    <$key>" . xmlentities($value) . "</$key>\n";
+	print "    <$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
 	switch(strtolower($key))
 	{		// act on specific keys
 	    case 'idir':

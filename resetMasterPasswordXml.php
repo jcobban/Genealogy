@@ -3,21 +3,22 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  resetMasterPasswordXml.php												*
+ *  resetMasterPasswordXml.php											*
  *																		*
  *  Handle a request to update fields of a registered user				*
- *  in the database.  This file generates an								*
+ *  in the database.  This file generates an							*
  *  XML file, so it can be invoked from Javascript.						*
  *																		*
- *  Parameters:																*
- *		userid				unique name of a registered user				*
- *		password		new password										*
+ *  Parameters:															*
+ *		userid				unique name of a registered user			*
+ *		password		new password									*
  *																		*
- *  History:																*
- *		2015/08/09		Created												*
+ *  History:															*
+ *		2015/08/09		Created											*
  *		2015/12/30		fix conflict with autoload						*
  *		2016/02/02		new User option ousername removed				*
  *		2017/09/12		use get( and set(								*
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
@@ -36,7 +37,7 @@ print "<update>\n";
 print "    <parms>\n";
 foreach ($_GET as $key => $value)
 {			// loop through all parameters
-    print "\t<$key>" . xmlentities($value) . "</$key>\n";
+    print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
     switch(strtolower($key))
     {		// act on specific parameters
         case 'id':

@@ -34,6 +34,7 @@ use \Exception;
  *		2017/07/27		class LegacyCitation renamed to class Citation	*
  *		2019/01/18      Citation::deleteCitations replaced by           *
  *		                CitationSet->delete                             *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -101,7 +102,7 @@ else
     // include all of the input parameters as debugging information
     print "  <parms>\n";
     foreach($_POST as $parm => $value)
-        print "    <$parm>" . xmlentities($value) . "</$parm>\n";
+        print "    <$parm>" . htmlentities($value,ENT_XML1) . "</$parm>\n";
     print "  </parms>\n";
 
     // delete the associated citations

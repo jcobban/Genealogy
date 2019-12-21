@@ -15,64 +15,64 @@ use \Iterator;
  *																		*
  *	CREATE TABLE `Deaths` (                                             *
  *		`RegDomain`       VARCHAR(4) NOT NULL DEFAULT 'CAON',			*
- *		`RegYear`         INT(11) NOT NULL DEFAULT '2009',			*
- *		`RegNum`          INT(11) NOT NULL DEFAULT '0',			    *
- *		`RegCounty`       CHAR(3) DEFAULT NULL,			            *
- *		`RegTownship`     VARCHAR(64) DEFAULT NULL,			        *
+ *		`RegYear`         INT(11) NOT NULL DEFAULT '2009',			    *
+ *		`RegNum`          INT(11) NOT NULL DEFAULT '0',			        *
+ *		`RegCounty`       CHAR(3) DEFAULT NULL,			                *
+ *		`RegTownship`     VARCHAR(64) DEFAULT NULL,			            *
  *		`MsVol`           INT(4) DEFAULT '0',			                *
- *		`Surname`         VARCHAR(32) DEFAULT NULL,			        *
- *		`SurnameSoundex`  CHAR(4) DEFAULT NULL,			            *
- *		`GivenNames`      VARCHAR(48) DEFAULT NULL,			        *
- *		`Sex`             CHAR(1) DEFAULT NULL,			            *
+ *		`Surname`         VARCHAR(32) DEFAULT NULL,			            *
+ *		`SurnameSoundex`  CHAR(4) DEFAULT NULL,			                *
+ *		`GivenNames`      VARCHAR(48) DEFAULT NULL,			            *
+ *		`Sex`             CHAR(1) DEFAULT NULL,			                *
  *		`Place`           VARCHAR(128) DEFAULT NULL,			        *
- *		`Date`            VARCHAR(32) DEFAULT NULL,			        *
- *		`CalcDate`        INT(11) DEFAULT NULL,			            *
- *		`Age`             VARCHAR(16) DEFAULT NULL,			        *
- *		`BirthDate`       VARCHAR(32) DEFAULT NULL,			        *
- *		`CalcBirth`       INT(11) DEFAULT NULL,			            *
- *		`Occupation`      VARCHAR(64) DEFAULT NULL,			        *
- *		`MarStat`         CHAR(1) DEFAULT NULL,			            *
+ *		`Date`            VARCHAR(32) DEFAULT NULL,			            *
+ *		`CalcDate`        INT(11) DEFAULT NULL,			                *
+ *		`Age`             VARCHAR(16) DEFAULT NULL,			            *
+ *		`BirthDate`       VARCHAR(32) DEFAULT NULL,			            *
+ *		`CalcBirth`       INT(11) DEFAULT NULL,			                *
+ *		`Occupation`      VARCHAR(64) DEFAULT NULL,			            *
+ *		`MarStat`         CHAR(1) DEFAULT NULL,			                *
  *		`BirthPlace`      VARCHAR(128) DEFAULT NULL,			        *
- *		`ResPlace`        VARCHAR(16) DEFAULT NULL,			        *
- *		`ResOnt`          VARCHAR(16) DEFAULT NULL,			        *
- *		`ResCan`          VARCHAR(16) DEFAULT NULL,			        *
+ *		`ResPlace`        VARCHAR(16) DEFAULT NULL,			            *
+ *		`ResOnt`          VARCHAR(16) DEFAULT NULL,			            *
+ *		`ResCan`          VARCHAR(16) DEFAULT NULL,			            *
  *		`Cause`           VARCHAR(255) DEFAULT NULL,			        *
- *		`Duration`        VARCHAR(64) DEFAULT NULL,			        *
- *		`Phys`            VARCHAR(48) DEFAULT NULL,			        *
+ *		`Duration`        VARCHAR(64) DEFAULT NULL,			            *
+ *		`Phys`            VARCHAR(48) DEFAULT NULL,			            *
  *		`PhysAddr`        VARCHAR(128) DEFAULT NULL,					*
- *		`Informant`       VARCHAR(48) DEFAULT NULL,					*
- *		`InfRel`          VARCHAR(16) DEFAULT NULL,					*
- *		`InfOcc`          VARCHAR(32) DEFAULT NULL,					*
+ *		`Informant`       VARCHAR(48) DEFAULT NULL,					    *
+ *		`InfRel`          VARCHAR(16) DEFAULT NULL,					    *
+ *		`InfOcc`          VARCHAR(32) DEFAULT NULL,					    *
  *		`InfRes`          VARCHAR(128) DEFAULT NULL,					*
- *		`Religion`        VARCHAR(32) DEFAULT NULL,					*
- *		`FatherName`      VARCHAR(48) DEFAULT NULL,					*
+ *		`Religion`        VARCHAR(32) DEFAULT NULL,					    *
+ *		`FatherName`      VARCHAR(48) DEFAULT NULL,					    *
  *		`FatherBPlce`     VARCHAR(128) DEFAULT NULL,					*
- *		`MotherName`      VARCHAR(48) DEFAULT NULL,					*
+ *		`MotherName`      VARCHAR(48) DEFAULT NULL,					    *
  *		`MotherBPlce`     VARCHAR(128) DEFAULT NULL,					*
- *		`HusbandName`     VARCHAR(48) DEFAULT NULL,					*
- *		`Remarks`         LONGTEXT,					                *
+ *		`HusbandName`     VARCHAR(48) DEFAULT NULL,					    *
+ *		`Remarks`         LONGTEXT,					                    *
  *		`BurPlace`        VARCHAR(128) DEFAULT NULL,					*
- *		`BurDate`         VARCHAR(48) DEFAULT NULL,					*
- *		`Undertkr`        VARCHAR(48) DEFAULT NULL,					*
+ *		`BurDate`         VARCHAR(48) DEFAULT NULL,					    *
+ *		`Undertkr`        VARCHAR(48) DEFAULT NULL,					    *
  *		`UndertkrAddr`    VARCHAR(128) DEFAULT NULL,					*
- *		`RegDate`         VARCHAR(16) DEFAULT NULL,					*
+ *		`RegDate`         VARCHAR(16) DEFAULT NULL,					    *
  *		`Registrar`       VARCHAR(128) DEFAULT NULL,					*
- *		`RecordedBy`      VARCHAR(64) DEFAULT NULL,					*
- *		`Image`           VARCHAR(256) NOT NULL DEFAULT '',			*
+ *		`RecordedBy`      VARCHAR(64) DEFAULT NULL,					    *
+ *		`Image`           VARCHAR(256) NOT NULL DEFAULT '',			    *
  *		`IDIR`            INT(10) UNSIGNED DEFAULT NULL,				*
- *		`ChangedBy`       VARCHAR(64) NOT NULL DEFAULT '',			*
+ *		`ChangedBy`       VARCHAR(64) NOT NULL DEFAULT '',			    *
  *		`ChangeDate`      DATE DEFAULT NULL,					        *
- *		`OriginalVolume`  VARCHAR(16) DEFAULT NULL,				    *
- *		`OriginalPage`    VARCHAR(11) DEFAULT NULL,				    *
- *		`OriginalItem`    INT(11) DEFAULT NULL,					    *
+ *		`OriginalVolume`  VARCHAR(16) DEFAULT NULL,				        *
+ *		`OriginalPage`    VARCHAR(11) DEFAULT NULL,				        *
+ *		`OriginalItem`    INT(11) DEFAULT NULL,					        *
  *		PRIMARY KEY (`RegDomain`,			                            *
- *		             `RegYear`,			                            *
- *		             `RegNum`),			                            *
- *		KEY `Surname` (`Surname`),			                        *
- *		KEY `SurnameSoundex` (`SurnameSoundex`),			        *
- *		KEY `GivenNames` (`GivenNames`),			                *
- *		KEY `IDIR` (`IDIR`),			                            *
- *		KEY `ChangeDate` (`ChangeDate`) )			                *
+ *		             `RegYear`,			                                *
+ *		             `RegNum`),			                                *
+ *		KEY `Surname` (`Surname`),			                            *
+ *		KEY `SurnameSoundex` (`SurnameSoundex`),			            *
+ *		KEY `GivenNames` (`GivenNames`),			                    *
+ *		KEY `IDIR` (`IDIR`),			                                *
+ *		KEY `ChangeDate` (`ChangeDate`) )			                    *
  *																		*
  *  History:															*
  *		2014/01/14		created											*
@@ -101,6 +101,7 @@ use \Iterator;
  *		                replace DATE with yyyymmdd                      *
  *		2019/03/18  	`OriginalPage` VARCHAR(11) DEFAULT NULL,	    *
  *		2019/06/12      improve validation of values assigned to Dates  *
+ *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -189,9 +190,9 @@ class Death extends Record
 				'd_regyear'				=> 'regyear',
 				'd_regnum'				=> 'regnum',
 				'd_regcounty'			=> 'regcounty',
-				'd_county'				=> 'regcounty',
+				'county'				=> 'regcounty',
 				'd_regtownship'			=> 'regtownship',
-				'd_township'		   	=> 'regtownship',
+				'township'		   	    => 'regtownship',
 				'd_msvol'				=> 'msvol',
 				'd_surname'				=> 'surname',
 				'd_surnamesoundex'		=> 'surnamesoundex',
@@ -787,12 +788,12 @@ class Death extends Record
 				    case 'originalitem':
 				    {		// integer fields
 						$fldnames	        	.= $comma . "`$fld`";
-						$shortFld       		= substr($fld, 2);
-						$values			        .= $comma . ':' . $shortFld;
+						$fld       		= substr($fld, 2);
+						$values			        .= $comma . ':' . $fld;
 						if (is_int($value) || ctype_digit($value))
-						    $sqlParms[$shortFld]= $value;
+						    $sqlParms[$fld]= $value;
 						else
-						    $sqlParms[$shortFld]= null;
+						    $sqlParms[$fld]= null;
 						$comma			        = ', ';
 						break;
 				    }		// integer fields
@@ -800,9 +801,9 @@ class Death extends Record
 				    default:
 				    {
 						$fldnames		        .= $comma . "`$fld`";
-						$shortFld       		= substr($fld, 2);
-						$values			        .= $comma . ':' . $shortFld;
-						$sqlParms[$shortFld]	= $value;
+						$fld       		= $fld;
+						$values			        .= $comma . ':' . $fld;
+						$sqlParms[$fld]	= $value;
 						$comma			        = ", ";
 						break;
 				    }		// most fields
@@ -819,7 +820,7 @@ class Death extends Record
 		    {		        // insert successful
 				$count			    = $stmt->rowCount();
 				if ($xml)
-				    print "<$tagname result='$count'>" . xmlentities($insert) . 
+				    print "<$tagname result='$count'>" . htmlentities($insert,ENT_XML1) . 
 						    "</$tagname>\n";
 				else
 				if ($debug)
@@ -869,21 +870,19 @@ class Death extends Record
 				    case 'msvol':
 				    case 'originalitem':
 				    {		// integer value fields
-						$shortFld   		    = substr($fld, 2);
-						$set	    	    	.= $comma . "`$fld`=:$shortFld";
+						$set	    	    	.= $comma . "`$fld`=:$fld";
 						if (is_int($value) || ctype_digit($value))
-						    $sqlParms[$shortFld]= $value;
+						    $sqlParms[$fld]= $value;
 						else
-						    $sqlParms[$shortFld]= null;
+						    $sqlParms[$fld]= null;
 						$comma          	    = ', ';
 						break;
 				    }		// integer value fields
 
 				    default:
 				    {		// most fields
-						$shortFld       		= substr($fld, 2);
-						$set	        		.= $comma . "`$fld`=:$shortFld";
-						$sqlParms[$shortFld]	= $value;
+						$set	        		.= $comma . "`$fld`=:$fld";
+						$sqlParms[$fld]	= $value;
 						$comma	                = ', ';
 						break;
 				    }		// most fields
@@ -927,7 +926,7 @@ class Death extends Record
 				    $count		= $stmt->rowCount();
 				    if ($xml)
 						print "<$tagname count='$count'>" .
-							xmlentities($updateText) . "</$tagname>\n";
+							htmlentities($updateText,ENT_XML1) . "</$tagname>\n";
 
 				    if ($debug)
 						$warn		.= "<p>Death.inc: " . __LINE__ . 

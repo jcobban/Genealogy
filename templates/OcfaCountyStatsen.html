@@ -1,0 +1,68 @@
+<!--*********************************************************************
+ *  OcfaCountyStatsen.html												*
+ *																		*
+ *  Display the statistics by township of a county in the Ontario       *
+ *  Cemetery Finding Aid database										*
+ *																		*
+ *  History:															*
+ *		2012/12/13		created											*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+      <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>: 
+      <a href="/Ontario/OcfaStats.php?ang=$LANG">
+          Statistics
+      </a>:
+      <a href="/Ontario/OcfaQuery.php?County=$COUNTY&amp;lang=$LANG">
+		  New Query
+      </a>:
+    </div>
+    <div class="body">
+      <h1>
+        Ontario: OCFA Status for $COUNTYNAME  County
+        <span class='right'>
+    	  <a href='OcfaCountyStatsHelpen.html' target='_blank'>Help?</a>
+        </span>
+        <div style='clear: both;'></div>
+      </h1>
+      $TRACE
+      $MSG
+		<!--- Put out the response as a table -->
+		<table class='form' id="dataTable">
+		  <thead>
+			<!--- Put out the column headers -->
+			<tr>
+			  <th class='colhead1st'>
+			    Township
+			  </th>
+			  <th class='colhead'>
+			    Done
+			  </th>
+			</tr>
+		  </thead>
+		  <tbody>
+			<tr id="datarow">
+			  <td class='odd bold left first'>
+			    $township
+			  </td>
+			  <td class='odd bold right'>
+			    $count
+			  </td>
+			</tr>
+		  </tbody>
+		  <tfoot>
+			<tr>
+			  <td class='odd bold right first'>
+			    Total
+			  </td>
+			  <td class='odd bold right'>
+			    $total
+			  </td>
+			</tr>
+		  </tfoot>
+		</table>
+    </div>
+    <script src='/jscripts/util.js'         language='JavaScript'></script>
+    <script src='/jscripts/CommonForm.js'   language='JavaScript'></script>
+
