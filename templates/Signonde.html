@@ -28,22 +28,24 @@
 	Wenn Sie nicht bereits Abonnent dieser Website sind,
 	klicken Sie bitte auf <b>registrieren</b> oder halten Sie die
 	Alt-Taste gedrückt und drücken Sie R.
+      </p>
     <p>Bitte beachten Sie die Bestimmungen der Europäischen Union
 	dass Sie mit Ihrer Unterschrift zustimmen, diese Seite zu nutzen
 	Kekse. 
-    <form action='/Signon.php'
-	  name='signonForm' id='signonForm'
-	  method='post'  
-	  enctype='multipart/form-data'>
-      <p class='clear' id='useridRow'>
-	<label class='label' for='userid'>
-	  Benutzername:
-	</label>
-	<input type='text' size='32' maxlength='64' name='userid' id='userid'
-		class='white leftnc' value='$USERID'/>
-	<input type='hidden' name='debug' id='debug' value='$DEBUG'>
-	  	<input type='hidden' name='lang' id='lang' value='$LANG'>
       </p>
+	  <form action='/Signon.php'
+		    name='signonForm' id='signonForm'
+		    method='post'  
+		    enctype='multipart/form-data'>
+	    <p class='clear' id='useridRow'>
+		  <label class='label' for='userid'>
+		        Benutzername:
+		 </label>
+		  <input type='text' size='32' maxlength='64' name='userid' id='userid'
+			    class='white leftnc' value='$USERID'/>
+		  <input type='hidden' name='debug' id='debug' value='$DEBUG'>
+	  	  <input type='hidden' name='lang' id='lang' value='$LANG'>
+        </p>
       <p class='clear' id='passRow'>
 	<label class='label' for='password'>
 	  Passwort:
@@ -101,9 +103,13 @@
       </p>
     </form>
 </div>
-	<div class="hidden" id='signedoff'>abgemeldet.</div>
-	<div class="hidden" id='specify'>Bitte geben Sie Ihre Benutzerkennung 
-	und Ihr Passwort an.</div>
+	<div class="hidden" id='signedoff'>Abgemeldet.</div>
+	<div class="hidden" id='specify'>
+        Bitte Sie Ihre Benutzerkennung und Ihr Passwort eingeben.
+    </div>
+	<div class="hidden" id='specify'>
+        Bitte Sie Ihr Passwort eingeben.
+    </div>
 	<div class="hidden" id='incorrect'>Benutzername und/oder Passwort 
 	    falsch.</div>
 <div class='balloon' id='Helpuserid'>

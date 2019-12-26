@@ -5,7 +5,7 @@ use Templating\Template;
 use Templating\TemplateTag;
 
 /************************************************************************
- *  class FTTemplate									    			*
+ *  class FtTemplate									    			*
  *														                *
  *  History:															*
  *      2019/04/08      split off from Template.inc                     *
@@ -16,6 +16,8 @@ use Templating\TemplateTag;
  *                      separate portions of menu by a menu bar         *
  *      2019/07/19      add support for country-qualified language code *
  *      2019/07/23      add static method validateLang                  *
+ *      2019/12/23      use class Advertisers to locate next            *
+ *                      advertisement                                   *
  *	    									                            *
  *  Copyright &copy; 2019 James A. Cobban All Rights Reserved			*
  ************************************************************************/
@@ -379,39 +381,35 @@ class FtTemplate extends Template
                 " could not find &lt;h1&gt; to initialize TITLE</p>\n";
         }		// script has not initialized TITLE
 
-        // pick a random ad to display
-		$dh			    = opendir("$document_root/Advertisements");
-		if ($dh)
-		{			// found advertisements directory
-			while (($filename = readdir($dh)) !== false)
-			{		// loop through files
-			    if (strlen($filename) > 5 &&
-				    $filename != "index.html" &&
-				    substr($filename, strlen($filename) - 5) == '.html')
-				$ads[]		= $filename;
-			}		// loop through files
-			$index	        = rand(0, count($ads) - 1);
-            $adname	        = $ads[$index];
-            $prime          = substr($adname, 0, strlen($adname) - 5);
-            $advertiser     = new Advertiser(array('adname' => $prime));
-            $date           = date('m d');
-            $month          = substr($date, 0, 2);
-            $day            = substr($date, -2);
-            $advertiser->increment($month);
-            if ($day == '28')
-            {
-                $month      += 1;
-                if ($month > 12)
-                    $month  = $month - 13;
-                if (strlen($month) == 1)
-                    $month  = '0' . $month;
-                $advertiser->set("Count$month", 0);
-                $advertiser->save(false);
-            }
-		}			// found advertisements directory
-		else
-			$adname	        = 'AddForRent.html';
-        $adurl	            = "/Advertisements/$adname";
+        // pick an advertisement to display
+        $getparms               = array('adname' => '[a-zA-Z0-9]+');
+
+        $advertisers            = new RecordSet('Advertisers',
+                                                $getparms);
+        $info                   = $advertisers->getInformation();
+        $count                  = $info['count'];
+        if ($count == 0)
+            showTrace();
+        $counterRec             = new Advertiser(array('adname' => ''));
+        $counterRec->increment('01');
+        $index	                = ($counterRec['count01'] % $count) + 1;
+        $advertiser             = new Advertiser(array('row' => $index));
+        $adname                 = $advertiser['adname'];
+        $date                   = date('m d');
+        $month                  = substr($date, 0, 2);
+        $day                    = substr($date, -2);
+        $advertiser->increment($month);
+        if ($day == '28')
+        {
+            $month              += 1;
+            if ($month > 12)
+                $month          = $month - 13;
+            if (strlen($month) == 1)
+                $month          = '0' . $month;
+            $advertiser->set("Count$month", 0);
+            $advertiser->save(false);
+        }
+        $adurl	                = "/Advertisements/$adname.html";
 
         // change insertion of ads to not use <iframe>
         $adElement              = $this['advertFrame'];

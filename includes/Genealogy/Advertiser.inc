@@ -26,10 +26,12 @@ use \Exception;
  *		Count09		INT(10) NOT NULL DEFAULT 0,	-- count for September	*
  *		Count10		INT(10) NOT NULL DEFAULT 0,	-- count for October	*
  *		Count11		INT(10) NOT NULL DEFAULT 0,	-- count for November	*
- *		Count12		INT(10) NOT NULL DEFAULT 0)	-- count for December   *
+ *		Count12		INT(10) NOT NULL DEFAULT 0,	-- count for December   *
+ *		Row         INT(10) DEFAULT NULL)       -- numeric id           *
  *																		*
  *  History:															*
  *		2019/12/20      created                                         *
+ *		2019/12/23      add column Row                                  *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -66,7 +68,8 @@ class Advertiser extends Record
 				'count09'			=> 0,
 				'count10'			=> 0,
 				'count11'			=> 0,
-				'count12'			=> 0);
+                'count12'			=> 0,
+                'row'               => null);
 
     /********************************************************************
      *	Advertiser::$info										        *
@@ -130,8 +133,7 @@ class Advertiser extends Record
 		{			                // complete row from database
 		    $dbrow		        = $parms;
             $where		        = '';
-            if (!array_key_exists('adname', $dbrow) ||
-                strlen($dbrow['adname']) == 0)
+            if (!array_key_exists('adname', $dbrow))
             {                       // row missing primary key
                 $this->msg      .= "Advertiser::__construct: invalid row ";
                 $comma          = 'array(';
@@ -156,21 +158,45 @@ class Advertiser extends Record
 			    {
 					case 'adname':
 					{
-					    if (is_string($value) && strlen($value) > 0)
+					    if (is_string($value))
 	                    {
-							$adname		= $value;
-					        $where		.= $and . "`AdName`=:adname";
-					        $sqlParms['adname']		= $adname;
-					        $and		= ' AND ';
+							$adname		        = $value;
+					        $where		        .= $and . "`AdName`=:adname";
+					        $sqlParms['adname']	= $adname;
+					        $and		        = ' AND ';
 	                    }
 					    else
 					    {
-							$this->msg	.= "Advertiser::__construct: `AdName` value '$value' invalid. ";
-							$adname	    = '';
+                            $this->msg	        .= "Advertiser::__construct: " .
+                                "`AdName` value '$value' invalid. ";
+							$adname	            = '';
 					    }
 					    break;
 					}
-	
+
+					case 'row':
+					{
+					    if (is_int($value) || ctype_digit($value))
+	                    {
+					        $where		        .= $and . "`Row`=:row";
+					        $sqlParms['row']	= $value;
+					        $and		        = ' AND ';
+	                    }
+					    else
+                        {
+                            if (is_null($value))
+                                $value          = 'NULL';
+                            $this->msg	        .= "Advertiser::__construct: " .
+                                "`Row` value '$value' invalid. ";
+					    }
+					    break;
+					}
+
+                    default:
+                    {
+                        $this->msg	        .= "Advertiser::__construct: " .
+                                "unexpected '$fieldname'. ";
+                    }
 			    }			        // act on specific field names
 			}		        	    // loop through search parameters
 	
@@ -327,6 +353,7 @@ class Advertiser extends Record
         global	$warn;
 		global	$connection;
 
+        $month              = intval($month);
         if ($month < 0 || $month > 12)
             return false;
         if ($month < 10)
@@ -354,11 +381,261 @@ class Advertiser extends Record
 		}		        // successful update
 		else
 		{		// error updating record
-		    $msg	        .= $updateText . ": error=" .
-			        		   print_r($stmt->errorInfo(),true) . ". ";
+		    $this->msg	    .= "Advertiser::new: '$updateText': error=" .
+                print_r($stmt->errorInfo(),true) . ". ";
+            $warn           .= $this->msg;
 		    $count          = false;
 		}		// error updating record
         return $count;
     }           // function Advertiser::increment
+
+    /********************************************************************
+     *	function Advertiser::save										*
+     *																	*
+     *  Save changes made to the Advertiser record into the				*
+     *  database.														*
+     *																	*
+     *  Parameters:														*
+     *	    $xml		if true diagnostic output is emitted in XML		*
+     *					if a string use it as tag name					*
+     *																	*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method updated the database record		*
+     *	    0			if the database did not need to be updated		*
+     *																	*
+     *  Throws:															*
+     *	    Exception if user is not authorized to update the database	*
+     ********************************************************************/
+    function save($xml = false)
+    {
+        global	$debug;
+        global	$warn;
+        global	$msg;
+        global	$userid;
+        global	$connection;
+        global	$familyTreeCookie;
+
+        $count                  = 0;
+
+        // determine top level tag name for XML output
+        $indent        		    = '';
+        if (is_string($xml))
+        {			    // string tag name
+            $matches   		    = array();
+            if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
+            {
+                $indent		    = $matches[1];
+                $xml   		    = $matches[2];
+            }
+            $tagname		    = $xml;
+            $xml	   		    = true;
+        }			    // string tag name
+        else
+        if ($xml)
+        {			    // boolean true
+            $indent             = "    ";
+            $tagname		    = 'personsave';
+        }			    // boolean true
+
+        if ($this->needInsert)
+        {			    // create new record
+            $fldnames		    = '';
+            $values             = '';
+            $sqlParms		    = array();
+            $comma              = '';
+            $adname             = '';
+            foreach($this->row as $field => $value)
+            {
+                switch($field)
+                {		    // act on field name
+                    case 'adname':
+                    {		// primary key
+                        $adname                 = $value;
+                        $fldnames		        .= "$comma`$field`";
+                        $values			        .= "$comma:$field";
+                        $sqlParms[$field]		= $value;
+                        break;
+                    }		// primary key
+
+                    case 'row':
+                    {       // row
+                        $fldnames		        .= "$comma`Row`";
+                        if (strlen($adname) > 0)
+                            $values		        .= "{$comma}@nextrow";
+                        else
+                            $values             .= "{$comma}NULL";
+                        break;
+                    }		// row
+
+                    default:
+                    {		// all other fields
+                        $fldnames		        .= "$comma`$field`";
+                        $values			        .= "$comma:$field";
+                        $sqlParms[$field]		= $value;
+                        break;
+                    }		// all other fields
+                }		    // switch on field name
+                $comma                          = ',';
+            }			    // loop through all fields in record
+
+            $this->changed		= array();	// reset
+
+            // construct the SQL INSERT command
+            if (strlen($adname) == 0)
+                $insert		= 'INSERT INTO Advertisers ' .
+                                "($fldnames) " .
+                                "VALUES($values)";
+            else
+                $insert		= "SET @nextrow =(SELECT COALESCE(MAX(Row), 0) + 1 FROM Advertisers;" .
+                                'INSERT INTO Advertisers ' .
+                                "($fldnames) " .
+                                "VALUES($values)";
+
+            // insert the new record into the database
+            $stmt		            = $connection->prepare($insert);
+            $insertText		        = debugPrepQuery($insert, $sqlParms);
+            $this->lastSqlCmd       = $insertText;
+            if ($stmt->execute($sqlParms))
+            {			        // success
+                $count		        = $stmt->rowCount();
+                if ($xml)
+                {
+                    print "$indent<$tagname result='$count'>$insertText</$tagname>\n";
+                }
+
+                if ($debug)
+                {
+                    $warn	.= "<p>Advertiser.inc: " . __LINE__ .
+                                        " '$insertText'" .
+                                        ", count=$count</p>\n";
+                }
+
+                $this->needInsert	= false;
+                // log the update
+                $this->log($insert, $sqlParms);
+
+
+                // obtain the updated record from the database
+                // so the memory copy will include values set by the
+                // SQL server or calculated in the INSERT statement
+                $adname             = $this->row['adname'];
+                $query		        = "SELECT Row FROM Advertisers WHERE AdName=:adname";
+                $refParms	        = array('adname'	=> $adname);
+                $stmt		        = $connection->prepare($query);
+                $queryText	        = debugPrepQuery($query, $refParms);
+                if ($stmt->execute($refParms))
+                {		        // success
+                    $row	        = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $this->row['row']   = $row['row'];
+                }		        // success
+                else
+                {		        // error performing query
+                    throw new Exception("Advertiser::save: '$queryText', " .
+                                        print_r($stmt->errorInfo(),true));
+                }		        // error performing query
+            }			        // success
+            else
+            {			        // error inserting record
+                $errorInfo	=  print_r($stmt->errorInfo(),true);
+                $warn	.= "<p>Advertiser::save: " . __LINE__ .
+                                " insert='$insertText'," .
+                                " errorInfo=$errorInfo<p>\n";
+                error_log("Advertiser.inc: " . __LINE__ .
+                                " insert='$insertText', " .
+                                "errorInfo=$errorInfo\n");
+                if (strlen($insert) > 43)
+                    $insert	= substr($insert, 0, 40) . '...';
+                throw new Exception("Advertiser::save:
+                                    '$insertText', " .  $errorInfo);
+            }			        // error inserting record
+
+        }			            // create new record
+        else
+        if (count($this->changed) > 0 ||
+            (is_null($this->row['row']) && $this->row['adname'] != ''))
+        {			            // update existing record
+		    $set		= '';
+		    $comma		= '';
+            $parms		= array();
+            $rownull    = is_null($this->row['row']);
+		    foreach($this->changed as $fld => $value)
+            {		// loop through all modified fields in record
+				if ($fld == 'row' && !is_null($value))
+                {	// row number
+                    $rownull        = false;
+				}	// row number
+				$set		        .= $comma . "`$fld`=:$fld";
+				$parms[$fld]	    = $value;
+				$comma		        = ', ';
+		    }		// loop through all modified fields in record
+
+            if ($rownull)
+            {
+                $set		        .= "{$comma}Row=@nextrow";
+                if ($connection->query("SET @nextrow =(SELECT COALESCE(MAX(Row), 0) + 1 FROM Advertisers)"))
+                {
+                    if ($debug)
+                        $warn   .=
+                "<p>SET @nextrow =(SELECT COALESCE(MAX(Row), 0) + 1 FROM Advertisers)</p>\n";
+                }
+                else
+                {
+                    $msg    .= "SET @nextrow =(SELECT COALESCE(MAX(Row), 0) + 1 FROM Advertisers).\n";
+                }
+            }
+
+		    // if there are any changed fields, update the database
+		    if (strlen($set) > 0)
+		    {		// at least one field modified
+				// if any fields modified then former must be set
+				// using former to get the key of the record permits
+				// changing the value of the primary key as long as it
+                // is not changed to an already defined value
+                $adname	            = $this->row['adname'];
+				$update		        = "UPDATE Advertisers SET $set" .
+								          " WHERE AdName=:adname";
+				$parms['adname']	= $adname;
+
+				$stmt		        = $connection->prepare($update);
+				$updateText	        = debugPrepQuery($update, $parms);
+                $this->lastSqlCmd   = $updateText;
+				if ($stmt->execute($parms))
+				{		// successful update
+				    $count	        = $stmt->rowCount();	// changed rows
+				    if ($xml)
+				    {
+                        print "$indent<$tagname$xmlparms result='$count'>\n" .
+                                "$indent\t$updateText\n" .
+                                "$indent</$tagname>\n";
+				    }
+
+				    if ($debug)
+						$warn	    .= "<p>" . $updateText . "</p>\n";
+
+				    // log the update
+				    $this->log($update, $parms);
+				}		// successful update
+				else
+				{		// error updating record
+				    $msg	.= $updateText . ": error=" .
+							   print_r($stmt->errorInfo(),true) . ". ";
+				    return false;
+				}		// error updating record
+		    }		// at least one field modified
+            else
+            {
+				$count	            = 0;	// nothing changed
+                $this->lastSqlCmd   = '';
+            }
+		}		// update existing record
+
+		// all changes have been applied
+		$this->changed	= array();	// reset
+		$this->former	= null;		// reset
+
+		// successful, return count of number of records updated
+		return $count;
+    }		// function Advertiser::save
 
 }		// class Advertiser 

@@ -35,7 +35,12 @@
                 method="post">
     <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
     <div class="row" style="margin-left: 3em; margin-top: 3px;">
-      <a href="mailto:?to=$TOLIST&amp;bcc=$BCCLIST&amp;subject=[JamesCobban.net]%20General%20Notice"
+      <button type="submit" id="Submit">
+          <span style="display: inline;">
+    		Update
+          </span>
+      </button>
+      <a href="mailto:?to=$TOLIST&amp;bcc=$BCCLIST&amp;subject=[JamesCobban.net]%20Notice%20to%20Advertisers"
 		    class="button" id="bulkMail">
           <span style="white-space: nowrap; text-indent: 0em;">
               Send Mail to all Advertisers
@@ -56,106 +61,109 @@
         rows $FIRSTOFFSET to $LAST of $COUNT
         <div style="clear: both;"></div>
       </div>
-    <!--- Put out the response as a table -->
-    <table class="details" id="dataTable">
-    <!--- Put out the column headers -->
-      <thead>
-		<tr>
-		  <th class="colhead">
-		    Advertiser Name
-		  </th>
-		  <th class="colhead">
-		    E-Mail
-		  </th>
-		  <th class="colhead">
-		    January
-		  </th>
-		  <th class="colhead">
-		    February
-		  </th>
-		  <th class="colhead">
-		    March
-		  </th>
-    	  <th class="colhead">
-			April
-		  </th>    <!--  4 -->
-    	  <th class="colhead">
-			May
-		  </th>      <!--  5 -->
-    	  <th class="colhead">
-			June
-		  </th>     <!--  6 -->
-    	  <th class="colhead">
-			July
-		  </th>     <!--  7 -->
-    	  <th class="colhead">
-			August
-		  </th>   <!--  8 -->
-    	  <th class="colhead">
-			September
-		  </th><!--  9 -->
-    	  <th class="colhead">
-			October
-		  </th>  <!-- 10 -->
-    	  <th class="colhead">
-			November
-		  </th> <!-- 11 -->
-    	  <th class="colhead">
-			December
-		  </th> <!-- 12 -->
-	    </tr>
-	  </thead>
-      <tbody>
-		<tr id="Row$id">
-		  <td class="$rowtype left">
-			        $adname
-		  </td>
-		  <td class="$rowtype left">
-		    <input type="text" class="white leftnc" size="18"
-			        name="AdEmail$id" id="AdEmail$id"
-			        value="$ademail">
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count01
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count02
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count03
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count04
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count05
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count06
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count07
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count08
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count09
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count10
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count11
-		  </td>
-		  <td class="$rowtype right" style="min-width: 90px">
-			        $count12
-		  </td>
-		</tr>
-      </tbody>
-    </table>
-    <input type="hidden" name="Advertiser999999999" value="">
-  </form>
+      <!--- Put out the response as a table -->
+      <table class="details" id="dataTable">
+      <!--- Put out the column headers -->
+        <thead>
+		  <tr>
+		    <th class="colhead">
+		      Advertiser Name
+		    </th>
+		    <th class="colhead">
+		      E-Mail
+		    </th>
+		    <th class="colhead">
+		      January
+		    </th>
+		    <th class="colhead">
+		      February
+		    </th>
+		    <th class="colhead">
+		      March
+		    </th>
+	        <th class="colhead">
+			  April
+		    </th>    <!--  4 -->
+	        <th class="colhead">
+			  May
+		    </th>      <!--  5 -->
+	        <th class="colhead">
+			  June
+		    </th>     <!--  6 -->
+	        <th class="colhead">
+			  July
+		    </th>     <!--  7 -->
+	        <th class="colhead">
+			  August
+		    </th>   <!--  8 -->
+	        <th class="colhead">
+			  September
+		    </th><!--  9 -->
+	        <th class="colhead">
+			  October
+		    </th>  <!-- 10 -->
+	        <th class="colhead">
+			  November
+		    </th> <!-- 11 -->
+	        <th class="colhead">
+			  December
+		    </th> <!-- 12 -->
+	      </tr>
+	    </thead>
+        <tbody>
+		  <tr id="Row$id">
+		    <td class="$rowtype left">
+			          $adname
+		      <input type="hidden"
+			          name="AdName$id" id="AdName$id"
+			          value="$adname">
+		    </td>
+		    <td class="$rowtype left">
+		      <input type="text" class="white leftnc" size="18"
+			          name="AdEmail$id" id="AdEmail$id"
+			          value="$ademail">
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count01
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count02
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count03
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count04
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count05
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count06
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count07
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count08
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count09
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count10
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count11
+		    </td>
+		    <td class="$rowtype right" style="min-width: 90px">
+			          $count12
+		    </td>
+		  </tr>
+        </tbody>
+      </table>
+      <input type="hidden" name="AdName999999999" value="">
+    </form>
   </div> <!-- class="body" -->
   <div class="balloon" id="Helppattern">
     <p>

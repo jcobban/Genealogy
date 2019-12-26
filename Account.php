@@ -67,6 +67,13 @@ require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
+// this script can only be invoked for a user who is signed in
+if (strlen($userid) == 0)
+{			        // redirect to signon
+	header('Location: Signon.php?lang=' . $lang);
+	exit;
+}			        // redirect to signon
+
 // default values of parameters
 $okmsg	            = '';		// positive notices
 $lang		        = 'en';
@@ -74,8 +81,8 @@ $newPassword	    = '';
 $newPassword2	    = '';
 $password		    = '';
 $email		        = '';
-$useEmail		    = false;
-$nohelp		        = false;
+$useEmail		    = null;
+$nohelp		        = null;
 
 // if invoked by method=get process the parameters
 if (count($_GET) > 0)
@@ -103,6 +110,8 @@ if (count($_GET) > 0)
 else
 if (count($_POST) > 0)
 {		            // invoked by submit to update account
+	$useEmail	            = false;
+	$nohelp	                = false;
     $parmsText  = "<p class='label'>\$_POST</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
@@ -115,30 +124,21 @@ if (count($_POST) > 0)
 	    {		    // act on specific parameter
 			case 'userid':
 			{
-			    if ($value != $userid)
-			      $msg .= 'Attempt to bypass security by changing userid. ';
 			    break;
 			}	    // userid
 	
 			case 'password':
 			{
-			    $password	= trim($value);
+			    $password	    = trim($value);
 			    break;
 			}	    // password
 	
 			case 'newpassword':
-			{
-			    $newPassword	= trim($value);
-			    if (strlen($newPassword) > 0)
+            {
+                $value              = trim($value);
+			    if (strlen($value) > 0)
 			    {		// request to change password
-					if ($user)
-					{
-					    if ($debug)
-						    $warn	.= "<p>Password set to '$password'</p>";
-					    $user->set('password', null);
-					    $user->set('shapassword',
-							    hash('sha512', $newPassword));
-					}
+			        $newPassword	= $value;
 			    }		// request to change password
 			    break;
 			}	    // new password
@@ -152,21 +152,6 @@ if (count($_POST) > 0)
 			case 'email':
 			{		// request to change email address
 			    $email	        = trim($value);
-			    if (strpos($email, "'") !== false)
-				    $msg	    .= "Invalid email address. ";
-			    else
-			    if (strlen($email) > 0 && $email != $oldemail)
-			    {		// valid e-mail address
-					// check for an existing userid with the desired
-					// email address
-					try {
-					    $user2	= new User(array('email' => $email));
-					    $msg	.= "Requested e-mail address '$email' is already in use. ";
-					} catch(Exception $e) {
-					    // email address not in use by any other account
-					    $user->set('email', $email);
-					}
-			    }		// valid e-mail address
 			    break;
 			}		// request to change email address
 	
@@ -193,103 +178,88 @@ if (count($_POST) > 0)
         $warn   .= $parmsText . "</table>\n";
 }		            // invoked by submit to update account
 
-if (strlen($userid) > 0 && strlen($msg) == 0)
-{			        // signed on	
-    // get existing account details
-    $user		    = new User(array("username" => $userid));
-    $oldemail		= $user->get('email');	// old email
-    $oldpasswd		= $user->get('password');// MD5 of password
-    $oldshapasswd	= $user->get('shapassword');// SHA of password
-    $oldoptions		= $user->get('options');// user options
+$template		    = new FtTemplate("Account$lang.html");
 
-    $blogParms		= array('keyvalue'	=> $user->get('id'),
+$user		        = new User(array("username" => $userid));
+
+// get existing account details
+$oldemail		    = $user->get('email');	// old email
+$options		    = $user->get('options');// user options
+
+$blogParms		    = array('keyvalue'	=> $user->get('id'),
                             'table'		=> 'Users',
                             'order'     => 'BL_Index DESC');
-    $bloglist		= new RecordSet('Blogs', $blogParms);
-    $blogCount		= $bloglist->count();
-}			        // signed on
-else
-{			        // redirect to signon
-	header('Location: Signon.php?lang=' . $lang);
-	exit;
-}			        // redirect to signon
+$bloglist		    = new RecordSet('Blogs', $blogParms);
+$blogCount		    = $bloglist->count();
 
-if (count($_POST) > 0)
-{		            // invoked by submit to update account
-	if ($oldpasswd && md5($password) != $oldpasswd)
-	{		        // MD5 password doesn't match
-	     $msg	.=
-	            "Password must match the current password on the account. ";
-	}		        // MD5 password doesn't match
-	else
-	if (hash('sha512',$password) != $oldshapasswd)
-	{
-        $msg	.=
-                "Password must match the current password on the account. ";
+// validate changes
+if (strlen($password) > 0 && !$user->chkPassword($password)) 
+{		        // old password doesn't match
+     $msg	        .= $template['badPassword']->innerHTML;
+}		        // old password doesn't match
+
+if (strlen($email) > 0 && $email != $oldemail)
+{                   // request to change e-mail address
+    if (strpos($email, "'") !== false)
+	    $msg	    .= $template['badEmail']->innerHTML;
+    else
+	// check for an existing userid with the desired
+	// email address
+    $user2          = new User(array('email' => $email));
+    if ($user2->isExisting())
+    {
+        $text       = $template['emailInUse']->innerHTML;
+        $msg	    .= str_replace('$email', $email, $text);
     }
+}                   // request to change e-mail address
 
-	// apply changed options
-	$options	    = $user->get('options');
+// apply changed options
+if (is_bool($useEmail))
+{
 	$options	    &=  ~User::OPT_NOHELP_ON & ~User::OPT_USEMAIL_ON;
 	if ($useEmail)
 	    $options	= $options | User::OPT_USEMAIL_ON;
 	if ($nohelp)
 	    $options	= $options | User::OPT_NOHELP_ON;
 	$user->set('options', $options);
+}
 
-	// validate combinations of parameters
-	if ($password == '')
-	{		        // password omitted
-	    $msg	.= "Password must be specified to change
-				account settings.";
-	}		        // password omitted
-
-	if (strlen($newPassword) > 0 && $newPassword != $newPassword2)
+// request to change password
+if (strlen($newPassword) > 0)
+{
+    if ($newPassword != $newPassword2)
 	{		        // new password validation failed
-	    $msg	.= "To change the password on the account you must
-			    supply the new password twice.  ";
-	}		        // new password validation failed
+	    $msg	    .= $template['emailRepeat']->innerHTML;
+    }		        // new password validation failed
+    else
+        $user->set('password', $newPassword);
+}
 	
-	if (strlen($msg) == 0)
-	{		        // apply changes
-	    if ($debug)
-	    {
-		    $user->save("p");
-	    }
-	    else
-		    $user->save(false);
-	    $okmsg	= 'Account updated.';
-	}		        // apply changes
-}		            // invoked by submit from previous invocation
+if (count($_POST) > 0 && strlen($msg) == 0)
+{		        // apply changes
+    if ($debug)
+	    $user->save("p");
+    else
+	    $user->save(false);
+    $okmsg	        = $template['okmsg']->innerHTML;
+}		        // apply changes
 
 
 // set checkboxes according to options from database
-if ($oldoptions & User::OPT_USEMAIL_ON)
+if ($options & User::OPT_USEMAIL_ON)
 	$chkusemail		= "checked='checked'";
 else
 	$chkusemail		= "";
-if ($oldoptions & User::OPT_NOHELP_ON)
+if ($options & User::OPT_NOHELP_ON)
 	$chknohelp		= "checked='checked'";
 else
 	$chknohelp		= "";
 
-// construct update of database
-$newPassword	    = '';
-$newPassword2	    = '';
-$password		    = '';
-$email		        = $oldemail;
-$useEmail		    = false;
-$nohelp		        = false;
-
-// create instance of Template
-$title		    	= 'Account Management';
-$template		    = new FtTemplate("Account$lang.html", true);
-
 // define substitution values
-$template->set('TITLE',		    $title);
 $template->set('USERID',		$userid);
 $template->set('EMAIL',		    $email);
 $template->set('LANG',		    $lang);
+$template->set('OKMSG',		    $okmsg);
 $template->updateTag('otherStylesheets',	
 		             array('filename'   => '/Account'));
 $template->set('chkusemail',	$chkusemail);
@@ -298,8 +268,15 @@ $template->set('chknohelp',		$chknohelp);
 if (strlen($okmsg) > 0)
 	$template->updateTag('update', null);
 else
-	$template->updateTag('okmsg', null);
+    $template->updateTag('okmsg', null);
+
 // display existing blog entries
-$template->updateTag('blog$blid',
-				 $bloglist);
+if ($blogCount > 0)
+    $template->updateTag('blog$blid',
+                         $bloglist);
+else
+{
+    $template['messages']->update(null);
+    $template['blogform']->update(null);
+}
 $template->display();

@@ -25,7 +25,7 @@
  *		2015/08/04		add button to reset password					*
  *		2016/01/18		signoff set wrong field to logoff				*
  *		2018/10/18      pass language to scripts initiated by buttons   *
- *		2019/05/18      call element.click() to simulate buton click    *
+ *		2019/05/18      call element.click() to simulate button click   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/

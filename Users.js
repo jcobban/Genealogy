@@ -21,17 +21,16 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
-window.onload	= onLoadUserNames;
+window.onload	= onLoadUsers;
 
 /************************************************************************
- *  function onLoadUserNames											*
+ *  function onLoadUsers											    *
  *																		*
  *  The onload method of the web page.  This is invoked after the		*
  *  web page has been loaded into the browser. 							*
  ************************************************************************/
-function onLoadUserNames()
+function onLoadUsers()
 {
-
     // activate handling of key strokes in text input fields
     // including support for context specific help
     for (var fi = 0; fi < document.forms.length; fi++)
@@ -84,9 +83,15 @@ function onLoadUserNames()
  ************************************************************************/
 function deleteUserid()
 {
-    var	iu	= this.id.substring("delete".length);
-    var userid	= document.getElementById('User' + iu).value;
+    var	iu	        = this.id.substring("delete".length);
+    var userid	    = document.getElementById('User' + iu).value;
     var parms		= { "userid" : userid };
+	if (debug.toLowerCase() == 'y')
+	{
+	    alert("Users.js: deleteUserid: {\"userid\"=" + userid + "}");
+	    parms['debug']	= 'y';
+	}
+
     // get the subdistrict information file
     HTTP.post("deleteUserXml.php",
 		      parms,
@@ -144,11 +149,18 @@ function noDelete()
  ************************************************************************/
 function resetUserid()
 {
-    var	iu		= this.id.substring("reset".length);
-    var	newPassword	= randomPassword(10);
-    var userid		= document.getElementById('User' + iu).value;
-    var parms		= { "username" : userid,
-					    "password" : newPassword};
+    var	iu		        = this.id.substring("reset".length);
+    var	newPassword	    = randomPassword(10);
+    var userid		    = document.getElementById('User' + iu).value;
+    var parms		    = { "username" : userid,
+					        "password" : newPassword};
+	if (debug.toLowerCase() == 'y')
+	{
+	    alert("Users.js: resetUserid: {\"username\" : " + userid +
+					        ",\"password\" : " + newPassword + "}");
+	    parms['debug']	= 'y';
+	}
+
     // update the password for the user
     HTTP.post("updateUserXml.php",
 		      parms,
@@ -198,6 +210,11 @@ function gotReset(xmlDoc)
     var	root	= xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'update')
     {
+		if (debug.toLowerCase() == 'y')
+		{
+		    alert("Users.js:gotReset: xmlDoc=" + tagToString(root));
+		}
+
 		var username	        = '';
 		var password	        = '';
 		var id		            = '';

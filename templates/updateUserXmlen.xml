@@ -1,38 +1,15 @@
-<?php
-namespace Genealogy;
-use \PDO;
-use \Exception;
-/************************************************************************
+<!--*********************************************************************
  *  updateUserXml.php													*
  *																		*
  *  Handle a request to update fields of a registered user				*
  *  in the database.  This file generates an							*
  *  XML file, so it can be invoked from Javascript.						*
  *																		*
- *  Parameters:															*
- *		userid			unique name of a registered user			    *
- *		password		new password									*
- *																		*
  *  History:															*
- *		2014/07/25		Created											*
- *		2015/06/30		include record id and username in response		*
- *		2015/07/02		access PHP includes using include_path			*
- *		2015/12/30		fix conflict with autoload						*
- *		2016/01/02		restrict characters permitted in password		*
- *						escape password in XML response					*
- *		2016/02/02		new User option ousername removed				*
- *		2017/09/12		use get( and set(								*
- *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2010/12/25		Created											*
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
- ************************************************************************/
-header("Content-Type: text/xml");
-require_once __NAMESPACE__ . "/User.inc";
-require_once __NAMESPACE__ . '/common.inc';
-
-$user	            = null;
-$password	        = null;
-
+ **********************************************************************-->
 // emit the XML header
 print("<?xml version='1.0' encoding='UTF-8'?>\n");
 print "<update>\n";
@@ -40,7 +17,7 @@ print "<update>\n";
 // only an administrator can use this script
 if (!canUser('all'))
 {		// not authorized
-    $msg	.= "User not authorized to update user record.  auth='$authorized'. ";
+    $msg	.= 'User not authorized to update user record. ';
 }		// not authorized
 
 // get the updated values of the fields in the record
@@ -88,7 +65,8 @@ if (strlen($msg) == 0)
     if ($password)
     {	// password specified
         // update the object
-        $user->set('password', $password);
+        $password		= trim($password);
+        $user->set('password', null);
 
         // notify the user
         $email		    = $user->get('email');

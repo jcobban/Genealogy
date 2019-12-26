@@ -26,12 +26,23 @@
     $MSG
 
     <p class="warning">Note:</p>
-    <p>En conformité avec la legislation anti-SPAM Canadienne
-	vous avez le droit de ne recevoir pas le courriel non solicité.
-	Si vous preferez de ne recevoir plus le courriel reguliere des
-	notifications de cette site, suivre 
-	<a href="/Account.php?lang=fr">cet lien interactif</a> et
-	enlever l'option authoriser la transmission des cettes messages.
+    <p id="Email">En vertu de la législation canadienne et internationale
+    anti-SPAM, vous avez le droit de ne pas recevoir de messages électroniques 
+    non sollicités de ce service. 
+    Il s'agit de courriels qui ne sont pas spécifiquement liés à la gestion 
+    de votre compte, tels que les promotions.
+    Si vous ne souhaitez plus recevoir régulièrement de notifications par 
+    courriel de ce site, suivez<a href="/Account.php?lang=fr"> ce lien</a> 
+    et désactivez l'option autorisant l'envoi de ces messages.
+    </p>
+    <p id="NoEmail">Vous avez choisi de ne pas recevoir d'e-mails
+    non sollicités de ce service.  Il s'agit des courriels qui ne sont pas 
+    spécifiquement liés à la gestion de votre compte.
+    Si vous changez d'avis et souhaitez recevoir des notifications 
+    par courriel, y compris des publicités et des promotions de ce site,
+    suivez ce lien
+	<a href="/Account.php?lang=fr">ce lien</a> et
+    activez l'option pour réactiver l'envoi de ces messages.
     </p>
     <p class="label" id="newsletter$i">
       <a href="/Newsletters/$filename" target="_blank">
@@ -45,44 +56,44 @@
       </a>:
     </p>
     <p class="label">
-      <a href="/FamilyTree/showAddedIndividuals.php">
-		List of Recently Added Individuals
+      <a href="/FamilyTree/showAddedIndividuals.php?lanfr">
+		Liste des individus récemment ajoutés
       </a>:
     </p>
     <form name="blogForm">
       <div id="blog$blid">
-	<p class="label">
-	    A $datetime usager "$username" 
-	    a écrit:
-	</p>
-	<p>
-	    $text 
-	</p>
-	<p>
-	    <textarea name="message$blid"
-		    rows="5" cols="80"></textarea>
-	</p>
-	<p>
-	    <button type="button" id="Delete$blid">
-	      Ecraser Blog
-	    </button>
-	    &nbsp;
-	    <button type="button" id="Reply$blid">
-	      Répondre 
-	    </button>
-	</p>
+		<p class="label">
+		    A $datetime usager "$username" 
+		    a écrit:
+		</p>
+		<p>
+		    $text 
+		</p>
+		<p>
+		    <textarea name="message$blid"
+			    rows="5" cols="80"></textarea>
+		</p>
+		<p>
+		    <button type="button" id="Delete$blid">
+		      Ecraser Blog
+		    </button>
+		    &nbsp;
+		    <button type="button" id="Reply$blid">
+		      Répondre 
+		    </button>
+		</p>
       </div>
     </form>
   </div> <!-- class="body" -->
     <div id="Helpmessage" class="balloon">
-	  Use this text area to enter a reply to the blog, and then click on the
-	  Reply button.
+	  Utilisez cette zone de texte pour entrer une réponse au blog,
+      puis cliquez sur le bouton Répondre.
     </div>
     <div id="HelpDelete" class="balloon">
-	  Click on this button to delete the blog.
+      Cliquez sur ce bouton pour supprimer le blog.
     </div>
     <div id="HelpReply" class="balloon">
-	  Click on this button to reply to the blog.
+	  Cliquez sur ce bouton pour répondre au blog.
     </div>
     <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
     </script>

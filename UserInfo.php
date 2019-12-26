@@ -34,6 +34,8 @@ use \Exception;
  *		2018/01/04		remove Template from template file names		*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2019/12/26      display different message depending upon        *
+ *		                whether the user accepts e-mails or not         *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ***********************************************************************/
@@ -58,8 +60,7 @@ if (count($_GET) > 0)
         {
     		case 'lang':
     		{
-    		    if (strlen($value) >= 2)
-    			    $lang		= strtolower(substr($value,0,2));
+    			$lang		= FtTemplate::validateLang($value);
     		    break;
             }		// language
         }           // act on specific parameter
@@ -82,8 +83,7 @@ if (count($_POST) > 0)
         {
     		case 'lang':
     		{
-    		    if (strlen($value) >= 2)
-    			    $lang		= strtolower(substr($value,0,2));
+    			$lang		= FtTemplate::validateLang($value);
     		    break;
     		}		// language
         }           // act on specific parameter
@@ -92,10 +92,6 @@ if (count($_POST) > 0)
         $warn       .= $parmsText . "</table>\n";
 }	        	    // invoked by post 
 
-$monthnames	= array('',
-					'January','February','March','April',
-					'May','June','July','August',
-					'September','October','November','December');
 
 // show any blog postings
 if (strlen($userid) > 0)
@@ -109,9 +105,14 @@ if (strlen($userid) > 0)
 	$blogCount	= $bloglist->count();
 }
 else
-	$msg	.= "This script must be invoked from the Signon dialog. ";
+{
+    header("Signon.php?lang=$lang");
+    exit;
+}
 
 $template		= new FtTemplate("UserInfo$lang.html");
+$trantab        = $template->getTranslate();
+$monthnames	    = $trantab['LMonths'];
 
 if (strlen($msg) == 0)
 {
@@ -140,7 +141,7 @@ if (strlen($msg) == 0)
 						        'y'		    => $y));
 
 	$reports	= array();
-	$dh	= opendir('MonthlyUpdates');
+	$dh	        = opendir('MonthlyUpdates');
 	if ($dh)
 	{		// found Newsletters directory
 	    while (($filename = readdir($dh)) !== false)
@@ -166,5 +167,10 @@ if (strlen($msg) == 0)
 	$template->updateTag('blog$blid',
 					     $bloglist);
 }
+
+if ($user['usemail'])
+    $template['NoEmail']->update(null);
+else
+    $template['Email']->update(null);
 
 $template->display();

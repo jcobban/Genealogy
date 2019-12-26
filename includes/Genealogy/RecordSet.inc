@@ -1443,7 +1443,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 }
             }               // array of simple string comparisons
             else
-		    if ($pattern == '')
+		    if (strlen($pattern) == 0)
 		    {			    // empty string
 				$where			.= $or . "$fldname=''";
                 $or             = ' OR ';

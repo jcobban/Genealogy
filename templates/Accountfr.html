@@ -10,154 +10,169 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php?lang=fr">Généalogie</a>:
-  </div>	
-  <div class="body">
-    <h1 class="clear">Gestion de la Compte
-    </h1>
-    $TRACE
-    $MSG
-    <p class="label">
-		<a href="/Account.php?lang=en">English</a>
-    </p>
-    <p class="label">
-		<a href="/AccountHelpfr.html" target="help">?&nbsp;Aide</a>
-    </p>
-  <p class="label" id="okmsg">$OKMSG</p>
-  <div id="update">
-    <form action="Account.php"
-		name="accountForm" id="accountForm"
-		method="post"  
-		enctype="multipart/form-data">
-      <p id="useridRow" class="clear">
-		<label class="label" for="userid">
-		  Identifiant de l'Utilisateur:
-		</label>
-		<input type="text" size="32" maxlength="64"
-			class="white leftnc" name="userid" id="userid"
-			autocomplete="off" readonly="readonly"
-			value="$USERID"/>
-      </p>
-      <p id="passRow" class="clear">
-		<label class="label" for="password">
-		  Mot de Passe Actuel:
-		</label>
-		<input type="password" size="32" maxlength="64"
-			name="password" id="password"
-			class="white leftnc" autocomplete="off"/>
-      </p>
-      <p id="newPassRow" class="clear">
-		<label class="label" for="newPassword">
-		  Mot de Passe Neuf:
-		</label>
-		<input type="password" size="16"  maxlength="64"
-			name="newPassword" id="newPassword" class="white leftnc"
-			autocomplete="off"/>
-		    <span id='passwordPoor' style='color:#e00000; display:none'>
-			Votre mot de passe neuf est pauvre.
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=fr">Généalogie</a>:
+    </div>	
+    <div class="body">
+      <h1 class="clear">Gestion de la Compte
+        <span class="right">
+		  <a href="/AccountHelpfr.html" target="help">?&nbsp;Aide</a>
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <p class="label" id="okmsg">$OKMSG</p>
+      <div id="update">
+        <form action="Account.php"
+		    name="accountForm" id="accountForm"
+		    method="post"  
+		    enctype="multipart/form-data">
+          <p id="useridRow" class="clear">
+		    <label class="label" for="userid">
+		      Identifiant de l'Utilisateur:
+		    </label>
+		    <input type="text" size="32" maxlength="64"
+			    class="white leftnc" name="userid" id="userid"
+			    autocomplete="off" readonly="readonly"
+			    value="$USERID"/>
+          </p>
+          <p id="passRow" class="clear">
+		    <label class="label" for="password">
+		      Mot de Passe Actuel:
+		    </label>
+		    <input type="password" size="32" maxlength="64"
+			    name="password" id="password"
+			    class="white leftnc" autocomplete="off"/>
+          </p>
+          <p id="newPassRow" class="clear">
+		    <label class="label" for="newPassword">
+		      Mot de Passe Neuf:
+		    </label>
+		    <input type="password" size="16"  maxlength="64"
+			    name="newPassword" id="newPassword" class="white leftnc"
+			    autocomplete="off"/>
+		        <span id='passwordPoor' style='color:#e00000; display:none'>
+			    Votre mot de passe neuf est pauvre.
+		        </span>
+		        <span id='passwordWeak' style='color:#a89800; display:none'>
+			    Votre mot de passe neuf est faible.
+		        </span>
+		        <span id='passwordGood' style='color:#60d800; display:none'>
+			    Votre mot de passe neuf est bon.
+		        </span>
+		        <span id='passwordStrong' style='color:#11ff10; display:none'>
+			    Votre mot de passe neuf est fort.
+		        </span>
+          </p>
+          <p id="newPass2Row" class="clear">
+		    <label class="label" for="newPassword2">
+		      Répéter le Mot de Passe Neuf:
+		    </label>
+		    <input type="password" size="16" maxlength="64"
+			    name="newPassword2" id="newPassword2" class="white leftnc"
+			    autocomplete="off"/>
+		    <button type="button" id="generatePassword">
+			    Générer un mot de passe au hasard
+		    </button>
+		    <input type="text" size="32" value=""
+			    name="randomPassword" id="randomPassword"
+			    class="white leftnc" readonly="readonly">
+          </p>
+          <p id="emailRow" class="clear">
+		    <label class="label" for="email">
+		      Addresse du Courriel:
+		    </label>
+		    <input type="text" size="64" name="email" id="email"
+			    class="white leftnc" autocomplete="off"
+			    value="$EMAIL"/>
+          </p>
+          <p id="useEmailRow" class="clear">
+		    <label class="label" for="usemail">
+		      Envoyer des avis par courrier électronique:
+		    </label>
+		    <input type="checkbox" name="usemail" id="usemail"
+				    $chkusemail/>
+          </p>
+          <p id="nopRow" class="clear">
+		    <label class="label" for="nohelp">
+		      Supprimer de l'Aide Pop-up:
+		    </label>
+		    <input type="checkbox" name="nohelp" id="nohelp"
+				    $chknohelp/>
+          </p>
+    
+          <p class="clear">
+		    <span class="pad">
+		      <button type="submit" id="Submit"> 
+		        <u>A</u>ppliquer les modifications
+		      </button>
 		    </span>
-		    <span id='passwordWeak' style='color:#a89800; display:none'>
-			Votre mot de passe neuf est faible.
+		    <span class="pad">
+		      <button type="button" id="Signoff"> 
+		        Terminer
+		      </button>
 		    </span>
-		    <span id='passwordGood' style='color:#60d800; display:none'>
-			Votre mot de passe neuf est bon.
+		    <span class="pad">
+		      <button type="button" id="Close">
+		        Fermer
+		      </button>
 		    </span>
-		    <span id='passwordStrong' style='color:#11ff10; display:none'>
-			Votre mot de passe neuf est fort.
+		    <span class="pad">
+		      <a href="/ContactAuthor.php?subject=Account Management" class="button">
+			    Communiquer a l'Administrateur</a>
 		    </span>
-      </p>
-      <p id="newPass2Row" class="clear">
-		<label class="label" for="newPassword2">
-		  Répéter le Mot de Passe Neuf:
-		</label>
-		<input type="password" size="16" maxlength="64"
-			name="newPassword2" id="newPassword2" class="white leftnc"
-			autocomplete="off"/>
-		<button type="button" id="generatePassword">
-			Générer un mot de passe au hasard
-		</button>
-		<input type="text" size="32" value=""
-			name="randomPassword" id="randomPassword"
-			class="white leftnc" readonly="readonly">
-      </p>
-      <p id="emailRow" class="clear">
-		<label class="label" for="email">
-		  Addresse du Courriel:
-		</label>
-		<input type="text" size="64" name="email" id="email"
-			class="white leftnc" autocomplete="off"
-			value="$EMAIL"/>
-      </p>
-      <p id="useEmailRow" class="clear">
-		<label class="label" for="usemail">
-		  Envoyer des avis par courrier électronique:
-		</label>
-		<input type="checkbox" name="usemail" id="usemail"
-				$chkusemail/>
-      </p>
-      <p id="nopRow" class="clear">
-		<label class="label" for="nohelp">
-		  Supprimer de l'Aide Pop-up:
-		</label>
-		<input type="checkbox" name="nohelp" id="nohelp"
-				$chknohelp/>
-      </p>
-
-      <p class="clear">
-		<span class="pad">
-		  <button type="submit" id="Submit"> 
-		    <u>A</u>ppliquer les modifications
-		  </button>
-		</span>
-		<span class="pad">
-		  <button type="button" id="Signoff"> 
-		    Terminer
-		  </button>
-		</span>
-		<span class="pad">
-		  <button type="button" id="Close">
-		    Fermer
-		  </button>
-		</span>
-		<span class="pad">
-		  <a href="/ContactAuthor.php?subject=Account Management" class="button">
-			Communiquer a l'Administrateur</a>
-		</span>
-		<input type="hidden" name="act" id="act" value="">
-		<input type="hidden" name="debug" id="debug" value="$DEBUG">
-		<input type="hidden" name="lang" id="lang" value="$LANG">
-      </p>
-    </form>
-  </div><!--id="update"-->
-<h2>Messages:</h2>
-  <form name="blogForm">
-    <div id="blog$blid">
-    <p class="label">
-		A $datetime usager '$username' 
-		a écrit:
-    </p>
-    <p>
-		$text 
-    </p>
-    <p>
-		<!-- Note that any characters that occur between the opening and
-		     closing textarea tags become part of the value of the tag-->
-		<textarea name="message$blid"
-			rows="5" cols="80"></textarea>
-    </p>
-    <p>
-		<button type="button" id="Delete$blid">
-		  Écraser Blog
-		</button>
-		&nbsp;
-		<button type="button" id="Reply$blid">
-		  Répondre 
-		</button>
-    </p>
+		    <input type="hidden" name="act" id="act" value="">
+		    <input type="hidden" name="debug" id="debug" value="$DEBUG">
+		    <input type="hidden" name="lang" id="lang" value="$LANG">
+          </p>
+        </form>
+      </div><!--id="update"-->
+      <h2 id="messages">Messages:</h2>
+      <form name="blogForm" id="blogform">
+        <div id="blog$blid">
+          <p class="label">
+		    A $datetime usager '$username' 
+		    a écrit:
+         </p>
+         <p>
+		    $text 
+          </p>
+          <p>
+		    <!-- Note that any characters that occur between the opening and
+		         closing textarea tags become part of the value of the tag-->
+		    <textarea name="message$blid"
+			    rows="5" cols="80"></textarea>
+          </p>
+          <p>
+		    <button type="button" id="Delete$blid">
+		      Écraser Blog
+		    </button>
+		    &nbsp;
+		    <button type="button" id="Reply$blid">
+		      Répondre 
+		    </button>
+          </p>
+        </div>
+      </form>
+    </div> <!-- div class="body" -->
+    <div class="hidden" id="templates">
+      <span id="badPassword">
+        Le mot de passe doit correspondre au mot de passe actuel sur le compte. 
+      </span>
+      <span id="badEmail">
+        Adresse courriel invalide.  
+      </span>
+      <span id="emailInUse">
+        L'adresse courriel demandée «$email» est déjà utilisée.  
+      </span>
+      <span id="emailRepeat">
+        Pour modifier le mot de passe du compte, vous devez
+        fournissez le nouveau mot de passe deux fois.   
+      </span>
+      <span id="okmsg">
+        Compte mis à jour.  
+      </span>
     </div>
-    </form>
- </div>
     <div class="balloon" id="Helpuserid">
 	  Cet champ montre l'identificateur unique de l'usager actuel pour lequel 
 	  les fonctions de gestion du compte peut être faites.

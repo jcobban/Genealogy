@@ -81,6 +81,7 @@ use \Templating\TemplateTag;
  *		2018/05/28		include specific CSS							*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2019/12/22      use new message for missing password            *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -94,34 +95,8 @@ require_once __NAMESPACE__ . "/common.inc";
 $newuserid				= '';
 $password				= '';
 $action				    = '';
-$rememberme				= '';
 $lang				    = 'en';
 $redirectto		    	= "UserInfo.php";
-
-foreach($_COOKIE as $key => $value)
-{			// loop through all parameters
-	if ($debug)
-	    $warn	.= "<p>\$_COOKIE['$key']='$value'</p>\n";
-	switch(strtolower($key))
-	{		// act on specific parameter
-	    case 'rememberme':
-	    {
-		    $rememberme	= $value;
-		    break;
-	    }
-
-	    case 'lang':
-	    {
-            if (strlen($value) >= 2)
-            {
-                $lang		= strtolower(substr($value,0,2)); 
-                if (strlen($value) == 5 && substr($value, 2, 1) == '-')
-                    $lang   = $lang . substr($value, 2);
-            }
-		    break;
-	    }
-	}		// act on specific cookie
-}			// loop through all cookies
 
 // if invoked by method=get display the initial signon dialog
 if (count($_GET) > 0)
@@ -180,7 +155,7 @@ if (count($_POST) > 0)
 		{		// act on specific parameter
 		    case 'userid':
 		    {
-			    $newuserid	= trim($value);
+			    $newuserid	    = trim($value);
 			    break;
 		    }
 	
@@ -192,18 +167,13 @@ if (count($_POST) > 0)
 	
 		    case 'act':
 		    {
-				$action		= trim($value);
+				$action		    = trim($value);
 				break;
 		    }		// action to take
 	
 		    case 'lang':
 		    {
-	            if (strlen($value) >= 2)
-	            {
-	                $lang		= strtolower(substr($value,0,2)); 
-	                if (strlen($value) == 5 && substr($value, 2, 1) == '-')
-	                    $lang   = $lang . substr($value, 2);
-	            }
+	            $lang		    = FtTemplate::validateLang($value);
 			    break;
 		    }
 	
@@ -220,49 +190,9 @@ if (count($_POST) > 0)
 	    $warn       .= $parmsText . "</table>\n";
 }		            // invoked by post for new signon
 
-if ($action == 'logoff')
-{
-    $userid		    = $newuserid;
-    $authorized		= '';
-    unset($_COOKIE['rememberme']);
-    setcookie('rememberme', '', time() - 3600, '/');
-    $rememberme		= '';
-    setcookie('user', '', time() - 3600, '/');
-    unset($_SESSION['userid']);
-}
-
-// check for a user specified memory of the userid and password
-if ($action != 'logoff' &&
-	strlen($newuserid) == 0 && strlen($password) == 0)
-{			// use memorized userid and password
-	$parts		= explode('&', $rememberme);
-	foreach($parts as $i => $part)
-	{		// process each part
-	    $o	= strpos($part, ':');
-	    $name	= rawurldecode(substr($part, 0, $o));
-	    $value	= rawurldecode(substr($part, $o+1));
-	    if ($debug)
-		$warn	.= "<p>rememberme.$name='$value'</p>\n";
-	    switch(strtolower($name))
-	    {		// act on specific parameter name
-			case 'username':
-			{
-			    $newuserid	= $value;
-			    break;
-			}
-	
-			case 'password':
-			{
-			    $password	= $value;
-			    break;
-			}
-
-	    }		// act on specific parameter name
-	}		// process each part
-}			// use memorized userid and password
-
 // if currently signed on, should not enter this script
-if (strlen($userid) > 0 && strlen($authorized) > 0 &&
+if ($action != 'logoff' &&
+    strlen($userid) > 0 && strlen($authorized) > 0 &&
 	strlen($newuserid) == 0)
 {		// already signed in and not specifying a new login
 	header("Location: Account.php?lang=$lang");
@@ -272,8 +202,30 @@ if (strlen($userid) > 0 && strlen($authorized) > 0 &&
 $template		    = new FtTemplate("Signon$lang.html");
 
 if ($action == 'logoff')
+{
+    $userid		                = $newuserid;
+    $authorized		            = '';
+    if (isset($_COOKIE['rememberme']))
+    {               // remove old implementation
+        unset($_COOKIE['rememberme']);
+        setcookie('rememberme', '', time() - 3600, '/');
+    }               // remove old implementation
+    unset($_SESSION['userid']);
     $msg            .= $template['signedoff']->innerHTML();
+}
 
+if ($debug)
+    $template->set('DEBUG',	    'Y');
+else
+    $template->set('DEBUG',	    'N');
+$template->set('LANG',	        $lang);
+$template->set('USERID',	    $newuserid);
+$template->updateTag('otherStylesheets',
+    	       		 array('filename'	=> '/Signon'));
+
+if ($debug)
+    $warn   .= "<p>Signon.php: " . __LINE__ .
+            " newuserid='$newuserid', password='$password'</p>\n";
 if (strlen($newuserid) == 0)
     $msg            .= $template['specify']->innerHTML();
 else
@@ -284,30 +236,33 @@ else
 	$user		    = new User(array('username'	=> $newuserid));
 	if ($user->isExisting())
 	{
-	    if ($user->get('shapassword') == $hashpw ||
-		    $user->get('password') == $stpw)
+        if (strlen($password) == 0)
+	    {
+            $msg            .= $template['enterpassword']->innerHTML();
+	    }
+        else
+	    if ($user->chkPassword($password))
 	    {				// password matches
-			$warn	        .= "<p>Password matches</p>\n";
-			setcookie('rememberme',
-			    	  "username:$newuserid&password:$password",
-			    	  time() + 30*24*60*60, '/');	// keep for 30 days
+            $_SESSION['userid']     = $newuserid;
 			if ($redirectto == 'POST')
 			{			// use history
 			    // knowledge of the previous page is only held in the
 			    // browser so the request to back-up to the previous
 			    // page must be performed by Javascript
 			    $template	= new FtTemplate("repost$lang.html");
-			    $template->display();
-			    exit;
+                $template->set('REDIRECTTO',	$redirectto);
 			}			// use history
-			else
+            else
 			{			// redirect
-			    header("Location: " . $redirectto . "?lang=$lang");
-			    exit;
+                header("Location: " . $redirectto . "?lang=$lang");
+                exit;
 			}			// redirect
 	    }				// password matches
-	    else
-	    {
+        else
+        {
+            if ($debug)
+                $warn   .= "<p>Signon.php: " . __LINE__ .
+            " newuserid='$newuserid', password='$password', hashpw='$hashpw', shapassword='".$user->get('shapassword')."'</p>\n";
             $msg            .= $template['incorrect']->innerHTML();
 	    }
 	}                   // userid matches
@@ -316,14 +271,5 @@ else
         $msg                .= $template['incorrect']->innerHTML();
 	}				    // userid not found
 }       				// userid specified
-
-$template->set('REDIRECTTO',	$redirectto);
-if ($debug)
-    $template->set('DEBUG',	    'Y');
-else
-    $template->set('DEBUG',	    'N');
-$template->set('LANG',	        $lang);
-$template->updateTag('otherStylesheets',
-    	       		 array('filename'	=> '/Signon'));
-
 $template->display();
+

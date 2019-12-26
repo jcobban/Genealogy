@@ -127,13 +127,13 @@ class User extends Record
 						'name'				=> 'username',
 						'recordid'			=> 'recordid',
 						'table'				=> 'table');
-
+		
     /********************************************************************
-     *	User::$defaultOrder												*
+     *	User::$hashseed 												*
      *																	*
-     *	Definition of default order for records retrieved by RecordSet	*
+     *	Constant string to concatenate prior to generating hash.        *
      ********************************************************************/
-    protected static	$defaultOrder	= 'UserName';
+    protected static	$hashseed   = '';
 
     // masks to turn on an off specific options
     const OPT_USEMAIL_ON		= 1;
@@ -175,6 +175,12 @@ class User extends Record
 		global	$connection;
 		global	$userid;
 
+        if (self::$hashseed == '')
+        {
+            global  $hashseed;
+            if (isset($hashseed) && is_string($hashseed))
+                self::$hashseed     = $hashseed;
+        }
 		$needInsert	                = true;
 
 		if (is_null($connection))
@@ -329,7 +335,8 @@ class User extends Record
 						case 'password':
 						{		    // interpret as external text password
 							$dbrow['password']	    = null;
-							$hash	    	        = hash('sha512', $value);
+							$hash	    	        = 
+					hash('sha512', trim($value) . self::$hashseed);
 						    if ($needInsert)
 						    {	    // creating new instance
 							    $sha	    	        = $hash;
@@ -343,18 +350,10 @@ class User extends Record
 								    $sha	            = $hash;
 								    $dbrow['shapassword']	= $sha;
                                 }
-                                else
-								if ($sha != $hash)
-								{
-								    $this->msg  .= "User::__construct: " .
-                                                    "Password does not match. ";
-                                    $needInsert = false;
-								}
 						    }	    // password must match existing
 						    break;
 						}		    // interpret as external text password
 
-						case 'shapassword':
 						case 'cellphone':
 						{		    // initialize string fields
 							$dbrow[$fieldLc]	    = $value;
@@ -389,17 +388,22 @@ class User extends Record
 								$dbrow['options']	= $value;
 						    }	    // update existing record
 						    break;
-						}	        // initialize other fields
+                        }	        // initialize other fields
+
+						case 'shapassword':
+						{		    // set only through change password
+						    break;
+                        }	        // set only through change password
 
 				    }	            // act on specific parameter
 				}	                // loop through all parameters
             }		                // key and optional other parms
 		}		                    // associative array
 		else
-		{		// unexpected parameter type
+		{		                    // unexpected parameter type
 		    throw new Exception('User::__construct: called with ' .
                 				 gettype($parms));
-		}		// unexpected parameter type
+		}		                    // unexpected parameter type
 
         // invoke constructor of base class
         if ($needInsert)
@@ -526,11 +530,40 @@ class User extends Record
      ********************************************************************/
     function setPassword($newPassword)
     {
+        global  $debug;
+        global  $warn;
+
 		parent::set('password', null);
+        $hash	    = hash('sha512', trim($newPassword) . self::$hashseed);
+        $warn   .= "<p>User::setPassword: password=$newPassword, hash=$hash</p>\n";
 		parent::set('shapassword',
-					hash('sha512', trim($newPassword)));
+					$hash);
 		return null;
     }		// function User::setPassword
+
+    /********************************************************************
+     *  function User::chkPassword										*
+     *																	*
+     *	Check the value of the password for a user.					    *
+     *																	*
+     *  Parameters:														*
+     *	    $newPassword	new password value as entered by user		*
+     ********************************************************************/
+    function chkPassword($newPassword)
+    {
+        global  $debug;
+        global  $warn;
+
+        if (!is_null($this->row['shapassword']))
+        {
+            $hash	    = hash('sha512', trim($newPassword) . self::$hashseed);
+            $warn       .= "<p>User::chkPassword: password=$newPassword, " .
+        "hash=$hash, shapassword=" . $this->row['shapassword'] . "</p>\n";
+            return $hash == $this->row['shapassword'];
+        }
+        else
+            return $newPassword == $this->row['password'];
+    }		// function User::chkPassword
 
     /********************************************************************
      *  function User::set												*

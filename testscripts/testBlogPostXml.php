@@ -3,18 +3,18 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  testBlog.php							*
- *									*
- *  test the postBlogXml.php script					*
- *									*
- *  Parameters:								*
- *	idir	unique numeric key of instance of legacyIndiv		*
- *									*
- *  History:								*
- *	2014/03/27	use common layout routines			*
- *			use HTML 4 features, such as <label>		*
- *									*
- *  Copyright 2014 James A. Cobban					*
+ *  testBlogPostXml.php													*
+ *																		*
+ *  test the postBlogXml.php script										*
+ *																		*
+ *  Parameters:															*
+ *		idir		unique numeric key of instance of legacyIndiv		*
+ *																		*
+ *  History:															*
+ *		2014/03/27		use common layout routines						*
+ *						use HTML 4 features, such as <label>			*
+ *																		*
+ *  Copyright 2014 James A. Cobban										*
  ************************************************************************/
     require_once __NAMESPACE__ . '/common.inc';
 

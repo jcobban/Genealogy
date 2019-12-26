@@ -310,7 +310,7 @@ try {
 	if (strlen($msg) == 0 && isset($_SESSION))
 	{		                // handle session variables
 	    foreach($_SESSION as $key => $value)
-	    {		            // loop through all session variables
+        {		            // loop through all session variables
 			if ($key == 'userid')
 			{
 			    $userid		        = trim($value);
@@ -338,67 +338,14 @@ try {
 	foreach($_COOKIE as $key => $value)
 	{			// loop through all cookie variables
 	    switch(strtolower($key))
-	    {			// act on specific cookies
-			case 'rememberme':
-			{		            // remember user name and password
-			    if (is_null($user))
-                {               // user not already defined
-				    $rememberme		= $value;
-				    $parts		    = explode('&', $rememberme);
-				    foreach($parts as $part)
-				    {		        // process each part
-						$o		    = strpos($part, ':');
-						$pname		= rawurldecode(substr($part, 0, $o));
-						$pvalue		= rawurldecode(substr($part, $o+1));
-						switch(strtolower($pname))
-						{	    // act on specific parameter name
-						    case 'username':
-						    {
-							    $userid		= $pvalue;
-							    break;
-						    }
-				    
-						    case 'password':
-						    {
-							    $password	= $pvalue;
-							    break;
-						    }
-			
-						    default:
-						    {
-							    $warn .= "<p>unrecognized parm name in rememberme '$pname'</p>";
-							    break;
-						    }
-						}	    // act on specific parameter name
-				    }		    // process each part
-		
-				    if (!is_null($userid) && !is_null($password))
-				    {		    // userid and password passed in cookie
-						$user		= new User(array('username' => $userid,
-							            			 'password' => $password));
-						if ($user->isExisting())
-						{       // defined user
-						    $authorized	= $user->get('auth');
-						    $options	= $user->get('options');
-						    // keep for 30 days
-						    setcookie('rememberme',
-						    	      "username:$userid&password:$password",
-						    	      time() + 30*24*60*60, '/');
-						}       // defined user
-						else
-						{       // no user with username & password
-						    $warn	.= "<p>new User failed: </p>\n";
-						    $msg	.= "Invalid username and password combination. ";
-						    $authorized	= '';
-						    $options	= null;
-						    // delete cookie
-						    setcookie('rememberme','', time() - 3600, '/');
-						}       // no user with username & password
-				    }		    // userid and password passed in cookie
-                }               // user not already defined
-			    break;
-			}	        	    // saved logon
-	
+        {			// act on specific cookies
+            case 'rememberme':
+            {
+                unset($_COOKIE[$key]);
+                setcookie($key, '', time() - 3600, '/');
+                break;
+            }
+
 			case 'familytree':
             {		// family tree information
 			    $parts		= explode('&', $value);
@@ -994,7 +941,7 @@ function pageBot($pageName	= null,
 	$template->set('MAIN', $mtemplate->compile());
     $template->set('BREADCRUMBS', $bctext);
 
-    // pick a random ad to display
+    // pick an advertisement to display
 	$dh			    = opendir("$document_root/Advertisements");
 	if ($dh)
 	{			// found advertisements directory
@@ -1005,10 +952,12 @@ function pageBot($pageName	= null,
 			    substr($filename, strlen($filename) - 5) == '.html')
 			$ads[]		= $filename;
 		}		// loop through files
-		$index	        = rand(0, count($ads) - 1);
+        include_once  __NAMESPACE__ . '/Advertiser.inc';
+        $counterRec     = new Advertiser(array('adname' == ''));
+        $counterRec->increment('01');
+        $index	        = $counterRec['count01'] % count($ads);
         $adname	        = $ads[$index];
         $prime          = substr($adname, 0, strlen($adname) - 5);
-        include_once  __NAMESPACE__ . '/Advertiser.inc';
         $advertiser     = new Advertiser(array('adname' => $prime));
         $date           = date('m d');
         $month          = substr($date, 0, 2);
