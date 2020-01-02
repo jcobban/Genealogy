@@ -1,0 +1,110 @@
+<!--*********************************************************************
+ *  UserInfode.html														*
+ *																		*
+ *  This is the German language template for the welcome page after	    *
+ *  sign-on.															*
+ *																		*
+ * History:																*
+ *		2019/12/26		created											*
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+  <div class="hidden" id="breadcrumbs">
+    <a href="/genealogy.php?lang=$LANG">
+		Genealogie
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">
+		Dienste
+    </a>:
+    <a href="/FamilyTree/nominalIndex.php?lang=$LANG">
+		Nominaler Index
+    </a>:
+  </div>
+  <div class="body">
+    <h1>
+      <span class="right">
+	<a href="/UserInfoHelpen.html" target="help">? Help</a>
+      </span>
+	Willkommen $USERID
+    </h1>
+    $TRACE
+    $MSG
+
+    <p class="warning">Notice:</p>
+    <p id="Email">Gemäß der kanadischen und internationalen
+    Anti-SPAM-Gesetzgebung haben Sie das Recht, von diesem Dienst
+    keine unerwünschten E-Mail-Nachrichten zu erhalten.  
+    Dies sind E-Mails, die sich nicht speziell auf die Verwaltung 
+    Ihres Kontos beziehen, z. B. Werbeaktionen.
+	Wenn Sie keine regelmäßigen E-Mail-Benachrichtigungen mehr 
+    von dieser Site erhalten möchten, folgen Sie
+    <a href="/Account.php?lang=en">diesem Link</a>
+    und deaktivieren Sie das Flag, das das Senden dieser Nachrichten
+    autorisiert.
+    </p>
+    <p id="NoEmail">Sie haben sich dafür entschieden, von diesem Dienst
+    keine unerwünschten E-Mail-Nachrichten zu erhalten. Dies sind E-Mails,
+    die sich nicht speziell auf die Verwaltung Ihres Kontos beziehen.
+    Wenn Sie es sich anders überlegen und E-Mail-Benachrichtigungen 
+    einschließlich Werbung und Promotions von dieser Site erhalten möchten, 
+    folgen Sie <a href="/Account.php?lang=en">diesem Link</a> 
+    und aktivieren Sie die Option zum erneuten Senden dieser Nachrichten.
+    </p>
+    <p class="label" id="newsletter$i">
+      <a href="/Newsletters/$filename" target="_blank">
+		$month $y Mitteilungsblatt
+      </a>:
+    </p>
+    <p class="label" id="MonthlyUpdates$i">
+      <a href="/MonthlyUpdates/$filename" target="_blank">
+		$month $y
+		technischer Bericht
+      </a>:
+    </p>
+    <p class="label">
+      <a href="/FamilyTree/showAddedIndividuals.php">
+        Liste der Personen, die kürzlich zum Stammbaum hinzugefügt wurden
+      </a>:
+    </p>
+    <form name="blogForm">
+      <div id="blog$blid">
+	<p class="label">
+	    um $datetime schrieb user "$username":
+	</p>
+	<p>
+	    $text 
+	</p>
+	<p>
+	    <textarea name="message$blid"
+		    rows="5" cols="80"></textarea>
+	</p>
+	<p>
+	    <button type="button" id="Delete$blid">
+	      Blog löschen
+	    </button>
+	    &nbsp;
+	    <button type="button" id="Reply$blid">
+	      Antworten
+	    </button>
+	</p>
+      </div>
+    </form>
+  </div> <!-- class="body" -->
+    <div id="Helpmessage" class="balloon">
+	  Verwenden Sie diesen Textbereich, um eine Antwort auf das Blog 
+      einzugeben, und klicken Sie dann auf die Schaltfläche "Antworten".
+    </div>
+    <div id="HelpDelete" class="balloon">
+	  Klicken Sie auf diese Schaltfläche, um das Blog zu löschen.
+    </div>
+    <div id="HelpReply" class="balloon">
+	  Klicken Sie auf diese Schaltfläche, um auf den Blog zu antworten.
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    </script>
+    <script src="/jscripts/util.js" type="text/javascript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="text/javascript">
+    </script>
+    <script src="/UserInfo.js" type="text/javascript">
+    </script>

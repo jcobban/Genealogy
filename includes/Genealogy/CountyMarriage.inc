@@ -196,7 +196,7 @@ class CountyMarriage extends Record
 								$value		= trim($value);
 								$matches	= array();
 								$rxr	    = preg_match('#(\d+)(\x{00BD}|.5|1/2)#u',
-										                 $value);
+										                 $value, $matches);
 								if ($rxr)
 							        $value	= intval($matches[0]) + 0.5;
 						    }

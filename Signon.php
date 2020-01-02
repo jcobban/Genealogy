@@ -95,6 +95,7 @@ require_once __NAMESPACE__ . "/common.inc";
 $newuserid				= '';
 $password				= '';
 $action				    = '';
+$persist                = false;
 $lang				    = 'en';
 $redirectto		    	= "UserInfo.php";
 
@@ -166,10 +167,17 @@ if (count($_POST) > 0)
 		    }
 	
 		    case 'act':
-		    {
+		    {		        // action to take
 				$action		    = trim($value);
 				break;
-		    }		// action to take
+		    }		        // action to take
+	
+		    case 'remember':
+		    {               // user requests persistence
+				$persist        = true;
+				break;
+		    }		        // user requests persistence
+	
 	
 		    case 'lang':
 		    {
@@ -205,6 +213,11 @@ if ($action == 'logoff')
 {
     $userid		                = $newuserid;
     $authorized		            = '';
+    if (isset($_COOKIE['persistence']))
+    {               // remove new implementation
+        unset($_COOKIE['persistence']);
+        setcookie('persistence', '', time() - 3600, '/');
+    }               // remove new implementation
     if (isset($_COOKIE['rememberme']))
     {               // remove old implementation
         unset($_COOKIE['rememberme']);
@@ -241,9 +254,17 @@ else
             $msg            .= $template['enterpassword']->innerHTML();
 	    }
         else
-	    if ($user->chkPassword($password))
+	    if ($user->chkPassword($password, $persist))
 	    {				// password matches
             $_SESSION['userid']     = $newuserid;
+
+            if ($persist)
+            {           // session persistence
+                setcookie('persistence', 
+                          $user->get('persistence'), 
+                          time() + 60*60*24*7, '/');
+            }           // session persistence
+
 			if ($redirectto == 'POST')
 			{			// use history
 			    // knowledge of the previous page is only held in the
@@ -253,6 +274,7 @@ else
                 $template->set('REDIRECTTO',	$redirectto);
 			}			// use history
             else
+            if (strlen($warn) == 0)
 			{			// redirect
                 header("Location: " . $redirectto . "?lang=$lang");
                 exit;

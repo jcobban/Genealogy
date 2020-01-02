@@ -94,6 +94,7 @@ use \Templating\Template;
  *		                surname be checked in a looser manner           *
  *		                faster cleaner check for array of records parm  *
  *		2019/12/17      add setting for named substitutions             *
+ *		2019/12/26      add length operator for strings                 *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -744,7 +745,6 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		{			// set count to actual number of records
 		    $stmt		= $connection->prepare($countQuery);
 		    $queryText	= debugPrepQuery($countQuery, $this->sqlParms);
-
 		    if ($stmt->execute($this->sqlParms))
 		    {			// success
 				if ($debug)
@@ -881,30 +881,40 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         // use name insertion points (:name) if either the $refname parameter
         // is passed or the the constructor sets $this->usenames
         if (is_null($refname) && $this->usenames)
-            $refname        = true;
+            $refname            = true;
 
 		if (substr($fldname, 0, 1) != '`' &&
             strpos($fldname, '.') === false)
         {
             if ($refname === true)
-                $refname    = strtolower($fldname);
-            $fldname		= "`$fldname`";
+                $refname        = strtolower($fldname);
+            $fldname		    = "`$fldname`";
         }
         else
         {
             if ($refname === true)
-                $refname    = strtolower(substr($fldname,1,strlen($fldname)-1));
+                $refname        = strtolower(substr($fldname,1,strlen($fldname)-1));
+        }
+        if (is_string($refname))
+        {
+            $submark            = ":$refname";
+            $subindex           = $refname;
+        }
+        else
+        {
+            $submark            = '?';
+            $subindex           = null;
         }
 
-		$matches		= array();
-		$where			= '';
+		$matches		        = array();
+		$where			        = '';
 		if (is_array($value))
 		{		// list of values
-		    $values		= $value;
+		    $values		        = $value;
 		    if (count($values) == 0)
 				return '';
-		    $oldwhere		= $where;	// prepare for ':' range
-		    $or			    = '';
+		    $oldwhere		    = $where;	// prepare for ':' range
+		    $or			        = '';
 		    for($i = 0; $i < count($values); $i++)
 		    {
 				$value			= trim($values[$i]);
@@ -912,13 +922,12 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				{			// integer
                     if (is_string($refname))
                     {
-                        $where			    .= $or . "$fldname=:$refname$i";
+                        $where			    .= "$or$fldname=:$refname$i";
                         $this->sqlParms["$refname$i"]   = $val;
-                        $i++;
                     }
                     else
                     {
-                        $where			    .= $or . "$fldname=?";
+                        $where			    .= "$or$fldname=?";
                         $this->sqlParms[]   = $val;
                     }
 				    $or			= ' OR ';
@@ -953,7 +962,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                                 // and add comparison for second element
                                 if (is_string($refname))
                                 {
-                                    $where			    .= $oldwhere . "$fldname=:$refname$i";
+                                    $where		.= $oldwhere . "$fldname=:$refname$i";
                                     $this->sqlParms["$refname$i"]   = $val;
                                 }
                                 else
@@ -966,7 +975,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 						    }		// only permitted on second element
 						    else
 						    {		// ignore with warning
-								$warn	.= "<p>RecordSet: " . __LINE__ . " Invalid $fldname"."[$i] value " .
+                                $warn	.= "<p>RecordSet: " . __LINE__ . 
+                                        " Invalid $fldname"."[$i] value " .
 										"'$value', count(\$values)=" . 
 										count($values) . "</p>\n";
 						    }		// ignore with warning
@@ -974,90 +984,130 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 						else
 						if ($operator == '&')
                         {		// bit-mask operator
-						    $where		.= $or . "($fldname&?)!= 0";
+                            $where		.= $or . "($fldname&$submark)!= 0";
+                            if ($subindex)
+                                $this->sqlParms[$subindex]	= $value;
+                            else
+						        $this->sqlParms[]	= $value;
                         }
 						else
 						{		// comparison operator
 						    if ($operator == '')
 								$operator	= '=';
 
-						    $where		.= $or . "$fldname$operator?";
-						    $this->sqlParms[]	= $value;
+						    $where		.= $or . "$fldname$operator$submark";
+                            if ($subindex)
+                                $this->sqlParms[$subindex]	= $value;
+                            else
+						        $this->sqlParms[]	= $value;
 						    if ($operator == '=')
-						    {
 								$or		= ' OR ';
-						    }
 						    else
 								$or		= ' AND ';
 						}		// comparison operator
 				    }			// optional operator and integer
 				    else
 				    {			// invalid value
-						$warn		.= "<p>RecordSet: " . __LINE__ . " Invalid $fldname"."[$i] value " .
+                        $warn		.= "<p>RecordSet: " . __LINE__ .
+                                        " Invalid $fldname"."[$i] value " .
 										"'$value'</p>\n";
 				    }			// invalid value
 				}			// elementary value
 				else
 				{			// invalid non-elementary
-				    $where		.= "$fldname=?";
-				    $this->sqlParms[]	= $value;
+				    $where		.= "$fldname=$submark";
+                    if ($subindex)
+                        $this->sqlParms[$subindex]	= $value;
+                    else
+				        $this->sqlParms[]	= $value;
 				    $warn		.= "<p>RecordSet: " . __LINE__ . " Invalid $fldname"."[$i] value " .
 										"'$value'</p>\n";
 				}			// invalid non-elementary value
 		    }				// loop through values
 		    if (count($values) > 1)
-				$where		= "($where)";
+				$where		    = "($where)";
 		}			// list of values
 		else
 		if ($value instanceof Record)
 		{			// record
-		    $value		= $value->getId();
-		    $where		.= "$fldname=?";
-		    $this->sqlParms[]	= $value;
+		    $value		        = $value->getId();
+		    $where		        .= "$fldname=$submark";
+            if ($subindex)
+                $this->sqlParms[$subindex]	= $value;
+            else
+				$this->sqlParms[]	= $value;
 		}			// record
+		else
+        if (strtolower(substr($value,0,7)) == 'length=')
+        {
+            $where              .= "LENGTH($fldname)=$submark";
+            $value              = substr($value, 7);
+            if ($subindex)
+                $this->sqlParms[$subindex]	= $value;
+            else
+		        $this->sqlParms[]	= $value;
+        }
+        else
+        if (strtolower(substr($value,0,7)) == 'length>')
+        {
+            $where              .= "LENGTH($fldname)>$submark";
+            $value              = substr($value, 7);
+            if ($subindex)
+                $this->sqlParms[$subindex]	= $value;
+            else
+				$this->sqlParms[]	= $value;
+        }
 		else
 		if (preg_match(self::$pat,
 				       $value,
 				       $matches))
 		{			// optional operator and value
-		    $operator		= $matches[1];
-		    $value		    = $matches[2];
+		    $operator		    = $matches[1];
+		    $value		        = $matches[2];
 		    if (strlen($value) >= 2)
 		    {		// check for quoted string
 				if (substr($value,0,1) == "'" &&
 				    substr($value,-1) == "'")
-				    $value	= substr($value, 1, strlen($value)-2);
+				    $value	    = substr($value, 1, strlen($value)-2);
 				else
 				if (substr($value,0,1) == '"' &&
 				    substr($value,-1) == '"')
-				    $value	= substr($value, 1, strlen($value)-2);
-				$value		= stripcslashes($value);
+				    $value	    = substr($value, 1, strlen($value)-2);
+				$value		    = stripcslashes($value);
 		    }		// check for quoted string
 		    if ($operator == '')
-				$where		.= "$fldname=?";
+				$where		    .= "$fldname=$submark";
 			else
 			if ($operator == '&')
             {		// bit-mask operator
-                $where		.= "($fldname&?)!= 0";
+                $where		    .= "($fldname&$submark)!= 0";
             }
 		    else
 		    if ($operator == ':')
 		    {
-				$where		.= "$fldname=?";
-				$warn	.= "<p>RecordSet: " . __LINE__ . " Invalid $fldname value ':$value'," .
-								"count(\$values)=1</p>\n";
+				$where		    .= "$fldname=$submark";
+                $warn	        .= "<p>RecordSet: " . __LINE__ . 
+                    " Invalid $fldname value ':$value'," .
+					"count(\$values)=1</p>\n";
 		    }
 		    else
-				$where		.= "$fldname$operator?";
-		    $this->sqlParms[]	= $value;
-		}			// optional operator and integer
-		else
+				$where		    .= "$fldname$operator$submark";
+            if ($subindex)
+                $this->sqlParms[$subindex]	= $value;
+            else
+				$this->sqlParms[]	= $value;
+        }			// optional operator and integer
+        else
 		{
-		    $where		.= "$fldname=?";
-		    $this->sqlParms[]	= $value;
-		}
+		    $where		        .= "$fldname=$submark";
+            if ($subindex)
+                $this->sqlParms[$subindex]	= $value;
+            else
+				$this->sqlParms[]	= $value;
+        }
+
 		return $where;
-    }		// function RecordSet::getWhereCommon,
+    }		// function RecordSet::getWhereCommon
 
     /********************************************************************
      *  function RecordSet::getWhereInt									*
@@ -1124,6 +1174,16 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         {
             if ($refname === true)
                 $refname    = strtolower(substr($fldname,1,strlen($fldname)-1));
+        }
+        if (is_string($refname))
+        {
+            $submark            = ":$refname";
+            $subindex           = $refname;
+        }
+        else
+        {
+            $submark            = '?';
+            $subindex           = null;
         }
 
 		$matches		= array();
@@ -1395,6 +1455,16 @@ class RecordSet implements Iterator, Countable, ArrayAccess
             if ($refname === true)
                 $refname    = strtolower(substr($fldname,1,strlen($fldname)-1));
         }
+        if (is_string($refname))
+        {
+            $submark            = ":$refname";
+            $subindex           = $refname;
+        }
+        else
+        {
+            $submark            = '?';
+            $subindex           = null;
+        }
 
 		$matches		    = array();
 		$where		    	= '';
@@ -1566,6 +1636,26 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 }
 		    }		        // value is a string to exclude from results
 		    else
+	        if (strtolower(substr($pattern,0,7)) == 'length=')
+	        {
+	            $where              .= "LENGTH($fldname)=$submark";
+	            $value                  = substr($pattern, 7);
+                if ($subindex)
+                    $this->sqlParms[$subindex]	= $value;
+                else
+				    $this->sqlParms[]	= $value;
+	        }
+	        else
+	        if (strtolower(substr($pattern,0,7)) == 'length>')
+	        {
+	            $where              .= "LENGTH($fldname)>$submark";
+	            $value              = substr($pattern, 7);
+                if ($subindex)
+                    $this->sqlParms[$subindex]	= $value;
+                else
+				    $this->sqlParms[]	= $value;
+	        }
+			else
 		    {		        // value is a string to find
                 if (is_string($refname))
                 {

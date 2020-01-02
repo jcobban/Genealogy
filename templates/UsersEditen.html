@@ -10,75 +10,82 @@
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php?lang=$LANG">
-		Genealogy
-    </a>:
-    <a href="/FamilyTree/Services.php?lang=$LANG">
-		Services
-    </a>:
-  </div>	
-  <div class="body">
-  <h1>
-      <span class="right">
-		<a href="/UsersHelpen.html" target="help">? Help</a>
-      </span>
-		Users Master List
-  </h1>
-    $TRACE
-    $MSG
-    <p class="message" id="notadmin">
-		Only an administrator can use this application
-    </p>
-    <p class="label" id="userCount">
-		$COUNT Users match the specified pattern.
-    </p>
-    <form id="locForm" name="locForm" action="Users.php" method="post">
-      <div class="row">
-		<label class="label" for="pattern" style="width: 12em;">
-		    Pattern:
-		</label>
-		<input type="text" name="pattern" id="pattern" class="white leftnc"
-			size="64" value="$PATTERN">
-      </div>
-      <div class="row">
-		<label class="label" for="authPattern" style="width: 12em;">
-		    Authorizations:
-		</label>
-		<input type="text" name="authPattern" id="authPattern"
-			class="white leftnc" 
-			size="64" value="$AUTHPATTERN">
-      </div>
-      <div class="row">
-		<label class="label" for="mailPattern" style="width: 12em;">
-		    E-Mail Address:
-		</label>
-		<input type="text" name="mailPattern" id="mailPattern"
-			class="white leftnc" 
-			size="64" value="$MAILPATTERN">
-      </div>
-    <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
-    <div class="row" style="margin-left: 3em; margin-top: 3px;">
-      <button type="submit" id="Submit">
-          <span style="display: inline;">
-		Search
-          </span>
-      </button>
-    &nbsp;
-      <a href="mailto:?to=$TOLIST&amp;bcc=$BCCLIST&amp;subject=[JamesCobban.net]%20General%20Notice"
-		    class="button" id="bulkMail">
-          <span style="white-space: nowrap; text-indent: 0em;">
-              Send Mail to all Users
-          </span>
-      </a>
-    &nbsp;
-      <a href="mailto:?to=$TOLIST&amp;bcc=$PENDLIST&amp;subject=[JamesCobban.net]%20General%20Notice" 
-	    class="button" id="pendMail">
-          <span style="white-space: nowrap; text-indent: 0em;">
-              Send Mail to all Pending Users
-          </span>
-      </a>
-    </div>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">
+  		Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+  		Services
+      </a>:
+    </div>	
+    <div class="body">
+	  <h1>
+	      <span class="right">
+			<a href="/UsersHelpen.html" target="help">? Help</a>
+	      </span>
+			Users Master List
+	  </h1>
+	    $TRACE
+	    $MSG
+	    <p class="message" id="notadmin">
+			Only an administrator can use this application
+	    </p>
+	    <p class="label" id="userCount">
+			$COUNT Users match the specified pattern.
+	    </p>
+	    <form id="locForm" name="locForm" action="Users.php" method="post">
+	      <div class="row">
+			<label class="label" for="pattern" style="width: 12em;">
+			    Pattern:
+			</label>
+			<input type="text" name="pattern" id="pattern" class="white leftnc"
+				size="64" value="$PATTERN">
+	      </div>
+	      <div class="row">
+			<label class="label" for="authPattern" style="width: 12em;">
+			    Authorizations:
+			</label>
+			<input type="text" name="authPattern" id="authPattern"
+				class="white leftnc" 
+				size="64" value="$AUTHPATTERN">
+	      </div>
+	      <div class="row">
+			<label class="label" for="mailPattern" style="width: 12em;">
+			    E-Mail Address:
+			</label>
+			<input type="text" name="mailPattern" id="mailPattern"
+				class="white leftnc" 
+				size="64" value="$MAILPATTERN">
+	      </div>
+	    <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
+	    <div class="row" style="margin-left: 3em; margin-top: 3px;">
+	      <button type="submit" id="Submit">
+	          <span style="display: inline;">
+			Search
+	          </span>
+	      </button>
+	    &nbsp;
+	      <a href="mailto:?to=$TOLIST&amp;bcc=$BCCLIST&amp;subject=[JamesCobban.net]%20General%20Notice"
+			    class="button" id="bulkMail">
+	          <span style="white-space: nowrap; text-indent: 0em;">
+	              Send Mail to all Users
+	          </span>
+	      </a>
+	    &nbsp;
+	      <a href="mailto:?to=$TOLIST&amp;bcc=$PENDLIST&amp;subject=[JamesCobban.net]%20General%20Notice" 
+		    class="button" id="pendMail">
+	          <span style="white-space: nowrap; text-indent: 0em;">
+	              Send Mail to all Pending Users
+	          </span>
+	      </a>
+	    &nbsp;
+	      <a href="mailto:?to=$TOLIST&amp;bcc=$INSLIST&amp;subject=[JamesCobban.net]%20Insecure%20Password%20Notice" 
+		    class="button" id="insMail">
+	          <span style="white-space: nowrap; text-indent: 0em;">
+	              Send Mail to all Users with Insecure Passwords
+	          </span>
+	      </a>
+	    </div>
       <div class="center" id="topBrowse">
         <span class="left" id="topPrev">
 		  <a href="/Users.php?pattern=$pattern&amp;authpattern=$authpattern&amp;mailpattern=$mailpattern&amp;limit=$limit&amp;offset=$prevoffset">

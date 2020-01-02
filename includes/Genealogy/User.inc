@@ -21,7 +21,9 @@ use \Iterator;
  *		id				INT(10) AUTOINCREMENT							*
  *		Options			INT(10),				// bit mask				*
  *		ConfirmId		INT(10),				    					*
+ *		Persistence		VARCHAR(64) DEFAULT NULL,	   					*
  *		PRIMARY KEY (`UserName`),                                       *
+ *      KEY `persistence` (`persistence`),                              *
  *      UNIQUE KEY `id` (`id`),                                         *
  *      UNIQUE KEY `Email` (`Email`) )                                  *
  *      ENGINE=InnoDB DEFAULT CHARSET=utf8                              *
@@ -71,6 +73,7 @@ use \Iterator;
  *		2019/08/02      add function can($action)                       *
  *		2019/08/26      add function getName() to override default      *
  *		                add function getId() to override default        *
+ *		2019/12/28      change implementation of persistence            *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -101,7 +104,8 @@ class User extends Record
 						'auth'				=> 'pending',
 						'id'				=> 0,
                         'options'			=> 1,
-                        'confirmid'         => null);
+                        'confirmid'         => null,
+                        'persistence'       => null);
 
     /********************************************************************
      *	User::$info	    										        *
@@ -129,15 +133,16 @@ class User extends Record
 						'table'				=> 'table');
 		
     /********************************************************************
-     *	User::$hashseed 												*
+     *	User::$hashsalt 												*
      *																	*
      *	Constant string to concatenate prior to generating hash.        *
      ********************************************************************/
-    protected static	$hashseed   = '';
+    protected static	$hashsalt   = '';
 
     // masks to turn on an off specific options
     const OPT_USEMAIL_ON		= 1;
     const OPT_NOHELP_ON			= 2;
+    const OPT_RESERVED			= 4;
 
     /********************************************************************
      *  function User::__construct										*
@@ -175,11 +180,11 @@ class User extends Record
 		global	$connection;
 		global	$userid;
 
-        if (self::$hashseed == '')
+        if (self::$hashsalt == '')
         {
-            global  $hashseed;
-            if (isset($hashseed) && is_string($hashseed))
-                self::$hashseed     = $hashseed;
+            global  $dsn;
+            if (isset($dsn) && isset($dsn['hashsalt']))
+                self::$hashsalt     = $dsn['hashsalt'];
         }
 		$needInsert	                = true;
 
@@ -209,19 +214,19 @@ class User extends Record
 		{		                    // associative array
 		    if (count($parms) >= count(self::$initRow))
 		    {			            // complete row from database
-				$dbrow		        = $parms;
-				$needInsert	        = false;
+				$dbrow		        		= $parms;
+				$needInsert	        		= false;
 		    }			            // complete row from datase
 		    else
 		    {			            // key and optional other parms
-				$dbrow		        = self::$initRow;
-				$keyname	        = null;
-				$sqlparms	        = array();
+				$dbrow		        		= self::$initRow;
+				$keyname	        		= null;
+				$sqlparms	        		= array();
 				foreach($parms as $name => $value)
 				{			        // search for unique key field
-				    $fieldLc		= strtolower($name);
+				    $fieldLc				= strtolower($name);
 				    if (array_key_exists($fieldLc, self::$translate))
-						$fieldLc	= self::$translate[$fieldLc];
+						$fieldLc			= self::$translate[$fieldLc];
 				    switch($fieldLc)
 				    {			    // act on specific parameter
 						case 'id':
@@ -247,17 +252,24 @@ class User extends Record
 
 						case 'username':
 						{
-						    $keyname		= 'UserName';
-						    $sqlParms['id']	= trim($value);
+						    $keyname		    = 'UserName';
+						    $sqlParms['id']	    = trim($value);
 						    break 2;	// exit loop
 						}		    // user name
 
 						case 'email':
 						{
-						    $keyname		= 'Email';
-						    $sqlParms['id']	= trim($value);
+						    $keyname		    = 'Email';
+						    $sqlParms['id']	    = trim($value);
 						    break 2;	// exit loop
 						}		    // email address
+
+						case 'persistence':
+						{
+						    $keyname		    = 'Persistence';
+						    $sqlParms['id']	    = trim($value);
+						    break 2;	// exit loop
+						}		    // session persistence identifier
 				    }			    // switch on field name
 				}			        // search for unique key field
 
@@ -313,30 +325,24 @@ class User extends Record
 
 						case 'username':
 						{
-						    $dbrow['username']	    = $value;
-						    if ($needInsert && $dbrow['email'] == '')
-						    {
-						    	$dbrow['email']		= $value; // default
-						    }
 						    break;
 						}		    // user name
 
 						case 'email':
 						{		    // email address
-					    	$dbrow['email']		    = $value;
-						    if ($needInsert && $dbrow['username'] == '')
-                            {
-                                if ($keyname != 'UserName')
-						    	    $dbrow['username']	= $value;
-						    }
 						    break;
 						}		    // email address
+
+						case 'persistence':
+						{		    // set only through chkPassword
+						    break;
+                        }	        // set only through chkPassword
 
 						case 'password':
 						{		    // interpret as external text password
 							$dbrow['password']	    = null;
 							$hash	    	        = 
-					hash('sha512', trim($value) . self::$hashseed);
+					hash('sha512', trim($value) . self::$hashsalt);
 						    if ($needInsert)
 						    {	    // creating new instance
 							    $sha	    	        = $hash;
@@ -355,10 +361,10 @@ class User extends Record
 						}		    // interpret as external text password
 
 						case 'cellphone':
-						{		    // initialize string fields
+						{		    // initialize string field
 							$dbrow[$fieldLc]	    = $value;
 						    break;
-						}		    // initialize string fields
+						}		    // initialize string field
 
 						case 'options':
 						case 'confirmid':
@@ -368,7 +374,7 @@ class User extends Record
 						}		    // initialize integer fields
 
 						case 'auth':
-                        {		    // initialize other fields
+                        {		    // initialize authorization string
                             $value                  = strtolower($value);
                             $dbrow[$fieldLc]	    = $value;
                             if ($value == 'pending')
@@ -376,7 +382,7 @@ class User extends Record
                             else
                                 $dbrow['confirmid'] = null;
 						    break;
-						}		    // initialize other fields
+						}		    // initialize authorization string
 
 						case 'usemail':
 						{		    // initialize pseudo field
@@ -388,15 +394,23 @@ class User extends Record
 								$dbrow['options']	= $value;
 						    }	    // update existing record
 						    break;
-                        }	        // initialize other fields
+                        }	        // initialize pseudo field
 
 						case 'shapassword':
-						{		    // set only through change password
+						{		    // set only through setPassword
 						    break;
-                        }	        // set only through change password
+                        }	        // set only through setPassword
 
 				    }	            // act on specific parameter
-				}	                // loop through all parameters
+                }	                // loop through all parameters
+
+                if ($needInsert)
+			    {                   // ensure both email and username set
+                    if ($dbrow['email'] == '')
+			    	    $dbrow['email']		= $dbrow['username'];
+			        if ($dbrow['username'] == '')
+			    	    $dbrow['username']	= $dbrow['email'];
+			    }                   // ensure both email and username set
             }		                // key and optional other parms
 		}		                    // associative array
 		else
@@ -534,8 +548,10 @@ class User extends Record
         global  $warn;
 
 		parent::set('password', null);
-        $hash	    = hash('sha512', trim($newPassword) . self::$hashseed);
-        $warn   .= "<p>User::setPassword: password=$newPassword, hash=$hash</p>\n";
+        $hash	    = hash('sha512', trim($newPassword) . self::$hashsalt);
+        if ($debug)
+            $warn   .= "<p>User::setPassword: " .
+                        "password=$newPassword, hash=$hash</p>\n";
 		parent::set('shapassword',
 					$hash);
 		return null;
@@ -548,21 +564,29 @@ class User extends Record
      *																	*
      *  Parameters:														*
      *	    $newPassword	new password value as entered by user		*
+     *	    $persist        true to generate persistence id             *
      ********************************************************************/
-    function chkPassword($newPassword)
+    function chkPassword($newPassword, $persist = false)
     {
         global  $debug;
         global  $warn;
 
+        $newPassword    = trim($newPassword);
+        $valid          = false;
+        $persistence    = null;
         if (!is_null($this->row['shapassword']))
         {
-            $hash	    = hash('sha512', trim($newPassword) . self::$hashseed);
-            $warn       .= "<p>User::chkPassword: password=$newPassword, " .
+            $hash	    = hash('sha512', $newPassword . self::$hashsalt);
+            if ($debug)
+                $warn   .= "<p>User::chkPassword: password=$newPassword, " .
         "hash=$hash, shapassword=" . $this->row['shapassword'] . "</p>\n";
-            return $hash == $this->row['shapassword'];
+            $valid      = hash_equals($this->row['shapassword'], $hash);
+            if ($valid && $persist)
+                $persistence    = bin2hex(random_bytes(32));
         }
-        else
-            return $newPassword == $this->row['password'];
+        parent::set('persistence', $persistence);
+        $this->save(false);
+        return $valid;
     }		// function User::chkPassword
 
     /********************************************************************

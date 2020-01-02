@@ -206,6 +206,8 @@
  *		                there is no remaining history.                  *
  *		2019/07/30      consolidate support for tinyMCE                 *
  *		2019/11/11      do not add traceAlert output to console.log     *
+ *		2019/12/30      leave header section displayed and scroll       *
+ *		                <main> only                                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -2253,6 +2255,18 @@ function commonInit(event)
 			alert("util.js: pageInit: catch " + e.message);
 	    }
     }                           // enough room for Facebook
+
+    // scroll main portion of page if it does not fit without scrolling
+    var headSection         = document.getElementById('headSection');
+    var headHeight          = headSection.offsetHeight;
+    var mainSection         = document.getElementById('mainSection');
+    var mainHeight          = mainSection.offsetHeight;
+    var windHeight          = window.innerHeight;
+    if (mainHeight + headHeight > windHeight)
+    {
+        mainSection.style.height    = (windHeight - headHeight - 12) + 'px';
+        mainSection.style.overflowY = 'auto';
+    }
 
     // if the user has requested it, suppress popup help
     // information about the current user is now available in all pages

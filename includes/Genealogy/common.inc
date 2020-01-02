@@ -336,9 +336,23 @@ try {
 
 	// check cookies
 	foreach($_COOKIE as $key => $value)
-	{			// loop through all cookie variables
+    {			// loop through all cookie variables
 	    switch(strtolower($key))
         {			// act on specific cookies
+            case 'persistence':
+            {
+                if (!isset($userid))
+                {
+                    $user       = new User(array('persistence' => $value));
+                    if ($user->isExisting())
+                        $userid = $user['username'];
+                    else
+                        $user   = null;
+                }
+                setcookie($key, $value, time() + 60*60*24*7, '/');
+                break;
+            }
+
             case 'rememberme':
             {
                 unset($_COOKIE[$key]);

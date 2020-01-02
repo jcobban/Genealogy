@@ -156,123 +156,139 @@ if (canUser('all'))
 
     if (count($_POST) > 0)
     {
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
-	foreach($_POST as $key => $value)
-	{		// loop through all parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-	    // fields for individual users are identified by the
-	    // field name plus the record id number
-	    $rgxResult		= preg_match($namePattern,
-						    	     $key,
-						    	     $matches);
-	    if ($rgxResult == 1)
-	    {
-			$key		= $matches[1];
-			if ($matches[2] != $id)
-			{		// change to id number
-			    if ($user)
-					$user->save(false);
-			    $id		= $matches[2];
-			    $user	= new User(array('id' => $id));
-			}		// get new User record
-	    }
-	    else
-	    {
-			if ($user)
-			{
-			    $user->save(false);
-			    $user	= null;
-			}
-			$id		= '';
-	    }
+	    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+	                  "<table class='summary'>\n" .
+	                  "<tr><th class='colhead'>key</th>" .
+	                      "<th class='colhead'>value</th></tr>\n";
+		foreach($_POST as $key => $value)
+		{		// loop through all parameters
+	        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$value</td></tr>\n"; 
+		    // fields for individual users are identified by the
+		    // field name plus the record id number
+		    $rgxResult		= preg_match($namePattern,
+							    	     $key,
+							    	     $matches);
+		    if ($rgxResult == 1)
+		    {
+				$column	        = strtolower($matches[1]);
+				if ($matches[2] != $id)
+				{		// change to id number
+				    if ($user)
+						$user->save(false);
+				    $id		    = $matches[2];
+				    $user	    = new User(array('id' => $id));
+				}		// get new User record
+		    }
+		    else
+            {
+                $column         = strtolower($key);
+				if ($user)
+				{
+				    $user->save(false);
+				    $user	= null;
+				}
+				$id		= '';
+		    }
+	
+		    switch($column)
+		    {		// act on specific parameter name
+				case 'pattern':
+				{
+				    if (strlen($value) > 0)
+				    {
+						$pattern		= $value;
+						$mainParms['username']	= $pattern;
+						$bccParms['username']	= $pattern;
+				    }
+				    break;
+				}
+	
+				case 'authpattern':
+				{
+				    if (strlen($value) > 0)
+				    {
+						$authPattern		= $value;
+						$mainParms['auth']	= $authPattern;
+						$bccParms['auth']	= $authPattern;
+				    }
+				    break;
+				}
+	
+				case 'mailpattern':
+				{
+				    if (strlen($value) > 0)
+				    {
+						$mailPattern		= $value;
+						$mainParms['email']	= $mailPattern;
+						$bccParms['email']	= $mailPattern;
+				    }
+				    break;
+				}
+	
+				case 'offset':
+				{
+				    $offset			= (int)$value;
+				    break;
+				}
+	
+				case 'limit':
+				{
+				    $limit			= (int)$value;
+				    break;
+				}
+	
+				case 'user':
+				{			// update to user name
+				    if ($user)
+				    {
+						$user->set('username', $value);
+				    }
+				    break;
+				}			// update to user name
+	
+				case 'email':
+				{			// update to email address
+				    if ($user)
+				    {
+						$user->set('email', $value);
+				    }
+				    break;
+				}			// update to email address
+	
+				case 'auth':
+				{			// update to auth settings
+				    if ($user)
+                    {       // have instance of User
+                        if ($value == '')
+                        {   // request to delete record
+                            $count  = $user->delete(false);
+                            if ($count == 0)
+                                $warn   .= $user->dump('delete failed');
+                            $lastCmd    = $user->getLastSqlCmd();
+                            if (strlen($lastCmd) > 0)
+                                $warn   .= "<p>Command '$lastCmd' returned $count</p>\n";
+                            $user   = null;
+                        }   // request to delete record
+                        else
+                        {   // request to change auth
+                            $user->set('auth', $value);
+                        }   // request to change auth
+				    }       // have instance of User
+				    break;
+                }			// update to auth settings
 
-	    switch(strtolower($key))
-	    {		// act on specific parameter name
-			case 'pattern':
-			{
-			    if (strlen($value) > 0)
-			    {
-					$pattern		= $value;
-					$mainParms['username']	= $pattern;
-					$bccParms['username']	= $pattern;
-			    }
-			    break;
-			}
-
-			case 'authpattern':
-			{
-			    if (strlen($value) > 0)
-			    {
-					$authPattern		= $value;
-					$mainParms['auth']	= $authPattern;
-					$bccParms['auth']	= $authPattern;
-			    }
-			    break;
-			}
-
-			case 'mailpattern':
-			{
-			    if (strlen($value) > 0)
-			    {
-					$mailPattern		= $value;
-					$mainParms['email']	= $mailPattern;
-					$bccParms['email']	= $mailPattern;
-			    }
-			    break;
-			}
-
-			case 'offset':
-			{
-			    $offset			= (int)$value;
-			    break;
-			}
-
-			case 'limit':
-			{
-			    $limit			= (int)$value;
-			    break;
-			}
-
-			case 'user':
-			{			// update to user name
-			    if ($user)
-			    {
-					$user->set('username', $value);
-			    }
-			    break;
-			}			// update to user name
-
-			case 'email':
-			{			// update to email address
-			    if ($user)
-			    {
-					$user->set('email', $value);
-			    }
-			    break;
-			}			// update to email address
-
-			case 'auth':
-			{			// update to auth settings
-			    if ($user)
-			    {
-					$user->set('auth', $value);
-			    }
-			    break;
-			}			// other
-	    }		// act on specific parameter name
-	}		// loop through all parameters
-    if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+		    }		        // act on specific parameter name
+		}		            // loop through all parameters
+	    if ($debug)
+	        $warn               .= $parmsText . "</table>\n";
     }
-	$mainParms['limit']		= $limit;
-	$mainParms['offset']	= $offset;
+	$mainParms['limit']		    = $limit;
+	$mainParms['offset']	    = $offset;
 
-	$prevoffset		        = $offset - $limit;
-	$nextoffset		        = $offset + $limit;
+	$prevoffset		            = $offset - $limit;
+	$nextoffset		            = $offset + $limit;
+
 
     // construct the blind carbon copy (BCC) list for bulk mailing
 	$users			    		= new RecordSet('Users', $bccParms);
@@ -313,6 +329,21 @@ if (canUser('all'))
 	    }		            // administrator
 	}		                // assemble bulk mailing list
 
+    // construct the blind carbon copy (BCC) list for users with
+    // insecure passwords
+    $insecureParms              = array('password' => 'length>0');
+	$insecure		    		= new RecordSet('Users', $insecureParms);
+   
+	$inslist		    		= '';
+    $bcomma             		= '';
+	foreach($insecure as $id => $user)
+	{		// assemble bulk mailing list
+	    $email		    		= $user->get('email');
+
+        $inslist	            .= $bcomma . urlencode($email);
+        $bcomma                 = ',';
+	}		                // assemble bulk mailing list
+
 	// then query the database for matches to the request
 	$users		                = new RecordSet('Users', $mainParms);
 	$readonly	                = $users->count() > 10;
@@ -333,6 +364,7 @@ if (canUser('all'))
 	}		                // create display of a page of users
 
 	$template->set('BCCLIST',                   $bcclist);
+	$template->set('INSLIST',                   $inslist);
 	$template->set('PENDLIST',                  $pendlist);
 	$template->set('TOLIST',                    $tolist);
 	$template->set('PATTERN',                   $pattern);

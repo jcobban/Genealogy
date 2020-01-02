@@ -80,64 +80,34 @@ function onLoadUsers()
  *																		*
  *  Input:																*
  *		this		<button type='button' id='delete...'>				*
+ *		ev          instance of click Event                             *
  ************************************************************************/
-function deleteUserid()
+function deleteUserid(ev)
 {
-    var	iu	        = this.id.substring("delete".length);
-    var userid	    = document.getElementById('User' + iu).value;
-    var parms		= { "userid" : userid };
+    var	iu	        		= this.id.substring("delete".length);
+    var userid	    		= document.getElementById('User' + iu).value;
 	if (debug.toLowerCase() == 'y')
 	{
-	    alert("Users.js: deleteUserid: {\"userid\"=" + userid + "}");
-	    parms['debug']	= 'y';
+	    alert("Users.js: deleteUserid: {\"user name\"=" + userid + "}");
 	}
-
-    // get the subdistrict information file
-    HTTP.post("deleteUserXml.php",
-		      parms,
-		      gotDelete,
-		      noDelete);
-}		// deleteUserid
-
-/************************************************************************
- *  function gotDelete													*
- *																		*
- *  This method is called when the response to the request to delete	*
- *  a user is received.													*
- *																		*
- *  Parameters:															*
- *		xmlDoc			reply as an XML document						*
- ************************************************************************/
-function gotDelete(xmlDoc)
-{
-    var	evtForm	= document.evtForm;
-    var	root	= xmlDoc.documentElement;
-    if (root && root.nodeName && root.nodeName == 'deleted')
+    var cell        		= this.parentNode;
+    var row         		= cell.parentNode;
+    var inputs      		= row.getElementsByTagName('input');
+    for (var i = 0; i < inputs.length; i++)
     {
-		window.location	= window.location;	// refresh 
+        var elt     		= inputs[i];
+        var name    		= elt.name;
+        var matches 		= /^([a-zA-Z_$@#]*)(\d*)$/.exec(name);
+        var column  		= matches[1].toLowerCase();
+        var id      		= matches[2];
+        elt.type    		= 'hidden';
+        if (column == 'auth')
+        {
+            elt.value   	= '';
+        }
     }
-    else
-    {		// error
-		var	msg	= "Error: ";
-		if (root && root.childNodes)
-		    msg	+= tagToString(root)
-		else
-		    msg	+= xmlDoc;
-		alert ("Users.js: gotDelete: "  + msg);
-    }		// error
-}	// gotDelete
-
-/************************************************************************
- *  function noDelete													*
- *																		*
- *  This method is called if there is no response to the AJAX			*
- *  delete event request.												*
- ************************************************************************/
-function noDelete()
-{
-    alert("Users.js: noDelete: " +
-		  "script deleteUserXml.php not found on server");
-}	// noDelete
+    this.form.submit();
+}		// function deleteUserid
 
 /************************************************************************
  *  function resetUserid												*

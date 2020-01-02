@@ -89,7 +89,7 @@ if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
 $template		= new FtTemplate("CountyMarriageEditQuery$lang.html");
-$template->updateTag('otherStylesheets',	
+$template['otherStylesheets']->update(	
     		         array('filename'   => 'CountyMarriageEditQuery'));
 
 $domainObj	    = new Domain(array('domain'	    => $domain,

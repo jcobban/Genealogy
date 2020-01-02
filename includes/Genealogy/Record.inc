@@ -1671,7 +1671,7 @@ class Record implements Iterator, ArrayAccess
 		    }
 		    else
 		    if (array_key_exists($prime, $this->row) &&
-				$this->row[$prime] > 0)
+				(!is_int($this->row[$prime]) || $this->row[$prime] > 0))
 		    {
 				if ($this->former)
 				    $key	    = $this->former[$prime];

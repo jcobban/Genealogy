@@ -13,6 +13,7 @@
  *		2019/02/11      scroll just the main section, leaving header    *
  *		                and footer visible always                       *
  *		                calling pageInit no longer required             *
+ *		2019/12/30      scrolling main moved to util.js                 *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -55,17 +56,4 @@ function onLoad(event)
     }
     catch(error) {}
 
-    // scroll main portion of page if it does not fit without scrolling
-    var headSection         = document.getElementById('headSection');
-    var headHeight          = headSection.offsetHeight;
-    var mainSection         = document.getElementById('mainSection');
-    var mainHeight          = mainSection.offsetHeight;
-    var footSection         = document.getElementById('footSection');
-    var footHeight          = footSection.offsetHeight;
-    var windHeight          = window.innerHeight;
-    if (mainHeight + headHeight + footHeight > windHeight)
-    {
-        mainSection.style.height    = (windHeight - headHeight - footHeight - 12) + 'px';
-        mainSection.style.overflowY = 'auto';
-    }
 }		// onLoad
