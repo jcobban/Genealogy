@@ -611,11 +611,6 @@ $template->set('originalItem',		$birth->get('originalitem'));
 $template->set('changedBy',			$birth->get('changedby'));
 $template->set('changeDate',		$birth->get('changedate'));
 
-if (!canUser('all'))
-{		// master user
-    $template->updateTag('Skip5', null);
-}		// master user
-
 if ($regNum > 1000000)
     $template->updateTag("hiddenVolPageItem", null);
 else

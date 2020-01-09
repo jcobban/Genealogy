@@ -527,8 +527,8 @@ function closeNewDialog()
     var myform              = this.form;
     if (myform)
     {                           // the dialog includes a form
-        var nameelt         = null;
-        var fieldelt        = null;
+        var formname        = '';
+	    var	field		   	= '';
         var elements        = myform.elements;
         for(var ie = 0; ie < elements.length; ie++)
         {
@@ -536,24 +536,20 @@ function closeNewDialog()
             switch(element.name)
             {
                 case 'formname':
-                    nameelt     = element;
+                    formname    = element.value;
                     break;
 
                 case 'field':
-                    fieldelt    = element
+                    field       = element.value;
                     break;
 
             }
         }
-        var formname        = '';
-        if (typeof(nameelt) == 'object')
-	        formname	   	= nameelt.value;
+        if (formname == '')
+            alert('locationCommon.js: closeNewDialog: missing element name="formname":' .  myform.outerHTML);
         else
-            alert("locationCommon.js: closeNewDialog: missing element formname: " . myform.outerHTML);
-	    var	field		   	= '';
-        if (typeof(fieldelt) == 'object')
+        if (field.length > 0)
         {
-	        field		   	= fieldelt.value;
 		    var	mainForm	= document.forms[formname];
 		    var	element		= mainForm.elements[field];
 		    if (element)

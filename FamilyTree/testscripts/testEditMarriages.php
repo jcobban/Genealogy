@@ -3,75 +3,76 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  editMarriages.php							*
- * 									*
+ *  testEditMarriages.php												*
+ * 																		*
  *  Display a web page for editing the families for which a particular 	*
- *  individual has the role of spouse from the Legacy database		*
- * 									*
- *  Parameters (passed by method=get) 					*
- *	idir		unique numeric key of individual as spouse	*
- *	given		given name of individual in case that		*
- *			information is not already written to the	*
- *			database					*
- *	surname		surname of individual in case that information	*
- *			is not already written to the database		*
- *	idmr		numeric key of specific marriage to initially	*
- *			display						*
- * 									*
- *  History: 								*
- * 	2010/08/21	Change to use new page format			*
- *	2010/09/04	Add button to reorder marriages			*
- *			Get birth and death dates into variables	*
- *	2010/10/21	use RecOwners class to validate access		*
- *			add balloon help for buttons			*
- *	2010/10/23	move connection establishment to common.inc	*
- *	2010/11/15	eliminate use of obsolete showDate		*
- *	2010/11/27	add parameters given and surname because the	*
- *			user may have modified the name in the		*
- *			invoking editIndivid.php web page but not	*
- *			updated the database record yet.		*
- *	2010/12/04	add link to help panel 				*
- *			improve separation of HTML and JS		*
- *	2010/12/12	replace LegacyDate::dateToString with		*
- *			LegacyDate::toString				*
- *			escape special chars in title			*
- *	2010/12/20	handle exception thrown by new Person	*
- *			handle both idir= and id=			*
- *	2011/01/10	use LegacyRecord::getField method		*
- *	2011/03/25	support keyboard shortcuts			*
- *	2011/06/18	merge with editMarriage.php			*
- *	2011/10/01	support database assisted location name		*
- *	2011/11/15	add parameter idmr to initiate editing specific	*
- *			family						*
- *			add buttons to edit Husband or Wife as		*
- *			individuals					*
- *	2011/11/26	support editing married surnames		*
- *	2011/12/21	support additional events			*
- *			display all events in the marriage panel	*
- *			suppress function if user is not authorized	*
- *	2012/01/13	change class names				*
- *			all buttons use id= rather than name= to avoid	*
- *			problems with IE passing them as parameters	*
- *			support updating all fields of Family	*
- *			record						*
- *			use $idir as identifier of primary spouse	*
- *	2012/01/23	display loading indicator while waiting for	*
- *			response					*
- *			to changed in a location field			*
- *	2012/02/01	permit idir parameter optional if idmr specified*
- *	2012/02/25	change ids of fields in marriage list to contain*
- *			IDMR instead of row number			*
- *	2012/05/27	specify explicit class on all			*
- *			<input type='text'>				*
- *	2012/05/29	identify row of table of children by IDCR in	*
- *			case the same child appears more than once	*
- *	2014/11/30	add debug option				*
- *			enclose comment blocks				*
- *	2017/07/27	class LegacyCitation renamed to class Citation	*
- *	2017/09/12	use get( and set(				*
- *	2017/09/28	change class LegacyEvent to class Event		*
- *									*
- *  Copyright 2017 James A. Cobban					*
+ *  individual has the role of spouse from the Legacy database			*
+ * 																		*
+ *  Parameters (passed by method=get) 									*
+ *		idir			unique numeric key of individual as spouse		*
+ *		given			given name of individual in case that			*
+ *						information is not already written to the		*
+ *						database										*
+ *		surname			surname of individual in case that information	*
+ *						is not already written to the database			*
+ *		idmr			numeric key of specific marriage to initially	*
+ *						display											*
+ * 																		*
+ *  History: 															*
+ * 		2010/08/21		Change to use new page format					*
+ *		2010/09/04		Add button to reorder marriages					*
+ *						Get birth and death dates into variables		*
+ *		2010/10/21		use RecOwners class to validate access			*
+ *						add balloon help for buttons					*
+ *		2010/10/23		move connection establishment to common.inc		*
+ *		2010/11/15		eliminate use of obsolete showDate				*
+ *		2010/11/27		add parameters given and surname because the	*
+ *						user may have modified the name in the			*
+ *						invoking editIndivid.php web page but not		*
+ *						updated the database record yet.				*
+ *		2010/12/04		add link to help panel 							*
+ *						improve separation of HTML and JS				*
+ *		2010/12/12		replace LegacyDate::dateToString with			*
+ *						LegacyDate::toString							*
+ *						escape special chars in title					*
+ *		2010/12/20		handle exception thrown by new Person		    *
+ *						handle both idir= and id=						*
+ *		2011/01/10		use LegacyRecord::getField method				*
+ *		2011/03/25		support keyboard shortcuts						*
+ *		2011/06/18		merge with editMarriage.php						*
+ *		2011/10/01		support database assisted location name			*
+ *		2011/11/15		add parameter idmr to initiate editing specific	*
+ *						family											*
+ *						add buttons to edit Husband or Wife as			*
+ *						individuals										*
+ *		2011/11/26		support editing married surnames				*
+ *		2011/12/21		support additional events						*
+ *						display all events in the marriage panel		*
+ *						suppress function if user is not authorized		*
+ *		2012/01/13		change class names								*
+ *						all buttons use id= rather than name= to avoid	*
+ *						problems with IE passing them as parameters		*
+ *						support updating all fields of Family		    *
+ *						record											*
+ *						use $idir as identifier of primary spouse		*
+ *		2012/01/23		display loading indicator while waiting for		*
+ *						response										*
+ *						to changed in a location field					*
+ *		2012/02/01		permit idir parameter optional if idmr specified*
+ *		2012/02/25		change ids of fields in marriage list to contain*
+ *						IDMR instead of row number						*
+ *		2012/05/27		specify explicit class on all					*
+ *						<input type='text'>								*
+ *		2012/05/29		identify row of table of children by IDCR in	*
+ *						case the same child appears more than once		*
+ *		2014/11/30		add debug option								*
+ *						enclose comment blocks							*
+ *		2017/07/27		class LegacyCitation renamed to class Citation	*
+ *		2017/09/12		use get( and set(								*
+ *		2017/09/28		change class LegacyEvent to class Event			*
+ *      2020/01/09      Event::getDesc is renamed to getNotes           *
+ *																		*
+ *  Copyright 2020 James A. Cobban										*
  ************************************************************************/
     require_once __NAMESPACE__ . '/Person.inc';
     require_once __NAMESPACE__ . '/Family.inc';
@@ -746,7 +747,7 @@ use \Exception;
 		$citType= $event->getCitType();
 		$type	= $event->getType(false);
 		$date	= $event->getDate();
-		$desc	= htmlspecialchars($event->getDesc(), 
+		$desc	= htmlspecialchars($event->getNotes(), 
 					   ENT_QUOTES);
 		$descn	= htmlspecialchars($event->getDescription());
 		$locn	= htmlspecialchars($event->getLocation()->getName(), 

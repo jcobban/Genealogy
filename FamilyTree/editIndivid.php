@@ -372,8 +372,9 @@ use \Exception;
  *                      when adding a spouse or parent                  *
  *                      add more information when adding a new Person   *
  *                      based upon initialization parameters            *
+ *      2020/01/09      Event::getDesc is renamed to getNotes           *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -1434,7 +1435,7 @@ foreach($events as $ie => $event)
     $location		    = $event->getLocation();
     $locationName	    = $location->getName();
 
-    $desc		        = $event->getDesc();
+    $desc		        = $event->getNotes();
     $descn		        = $event->getDescription();
 
     $notshown	        = !$preferred;

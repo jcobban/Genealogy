@@ -40,8 +40,6 @@
 	  <a href="BirthRegResponse.php?RegDomain=$domain&amp;RegYear=$regYear&amp;RegCounty=$regCounty&amp;RegTownship=$regTownship&amp;lang=$LANG">
 	      Status $regYear Township $regTownship
 	  </a>:
-      <a href="DeathRegDetail.php?RegDomain=?RegDomain=$DOMAIN&RegYear=$REGYEAR&RegNum=$PREVREGNUM&lang=fr&ShowImage=$SHOWIMAGE" id="Previous">Précédent</a>:
-      <a href="DeathRegDetail.php?RegDomain=?RegDomain=$DOMAIN&RegYear=$REGYEAR&RegNum=$NEXTREGNUM&lang=fr&ShowImage=$SHOWIMAGE" id="Next">Prochain</a>:
     </div>
     <div class="body">
       <h1>
@@ -56,6 +54,18 @@
       <form action="BirthRegUpdate.php" method="post" 
 		      name="distForm" id="distForm"
 		      enctype="multipart/form-data">
+        <p>
+		  <button type="button" id="Previous">
+		    <u>P</u>revious
+		  </button>
+          &nbsp;
+		  <button type="button" id="Next">
+		    <u>N</u>ext
+		  </button>
+		  &nbsp;
+		  <button type="button" id="NewQuery">
+		    New <u>Q</u>uery
+		  </button>
 		  <input type="hidden" name="lang" id="lang"
 				  value="$LANG"/>
 		  <input type="hidden" name="RegDomain" id="RegDomain"

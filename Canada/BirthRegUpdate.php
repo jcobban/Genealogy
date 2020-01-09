@@ -310,14 +310,8 @@ if (strlen($msg) == 0)
 		$oldBirthDate	= $birthEvent->get('eventd');
 		$oldBirthIdlr	= $birthEvent->get('idlrevent');
 		$birthDate	    = $birth->get('birthdate');
-		$birthDate	    = new LegacyDate(' ' . $birthDate);
+		$birthDate	    = new LegacyDate($birthDate);
 		$birthLocation	= $birth->get('birthplace');
-		if ($debug)
-		{
-		    $warn .= "<p>Update birth date of " . $indiv->getName() .
-			" to " .  $birthDate->toString() . " at " .
-			$birthLocation . "</p>";
-		}
 		
 		if (strlen($oldBirthDate) == 0 ||
 		    substr($oldBirthDate,0,1) != '0' ||

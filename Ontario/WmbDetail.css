@@ -1,5 +1,5 @@
 /************************************************************************
- *  WmbQuery.css                                                        *
+ *  WmbDetail.css                                                       *
  *                                                                      *
  *  Stylesheet for the script WmbQuery.php                              *
  *                                                                      *
@@ -11,7 +11,7 @@
 
 /*	column containers */
     div.column1	{   float:          left;
-		            width:          340px;
+		            width:          470px;
 		            margin-top:     1px;
 		            margin-right:   3px;
 		        }
@@ -33,7 +33,7 @@
 		            padding:        0px 3px 0px 3px;
 		            margin-top:     1px;
 		            float:          left;
-		            width:          9em;
+		            width:          10em;
 		}
     label.labelSmall5em {
                     font-family: sans-serif;

@@ -449,7 +449,7 @@ class Birth extends Record
 						    $dbrow['originalvolume']	= $volume;
 						    $page	                    = $row['originalpage'];
 						    $dbrow['originalpage']	    = $page;
-						    $item	                    = $row['originalitem'] + 1;
+						    $item	                    = $row['originalitem'];
 						    $dbrow['originalitem']	    = $item + 1;
 						    if (strlen($row['regdate']) > 0)
 							    $dbrow['regdate']	    = $row['regdate'];

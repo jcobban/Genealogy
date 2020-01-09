@@ -525,9 +525,9 @@ foreach($_POST as $key => $value)
             {		            // complete previous child
                 $isNewChild                 = !$child->isExisting();
                 $child->save("\tcidir" . __LINE__);
+                $cidir                      = $child['idir'];
                 if ($isNewChild)
                 {
-                    $cidir                  = $child['idir'];
                     print "\t\t<idir$oldrow>$cidir</idir$oldrow>\n";
                     $birthEvent             = $child->getBirthEvent(true);
                     $birthsd                = $birthEvent['eventsd'];
@@ -649,9 +649,11 @@ foreach($_POST as $key => $value)
 	    {	            // birth date of child
 			// $id contains rownum from form
             if ($child)
-                $child['birthd']	        = $value;
-            if ($birthEvent)
             {
+                $child['birthd']	        = $value;
+                if (!$child->isExisting())
+                    $child->save('cbirth');
+                $birthEvent                 = $child->getBirthEvent(true);
                 $birthEvent['eventd']       = $value;
                 $birthEvent->save('cbirth');
             }

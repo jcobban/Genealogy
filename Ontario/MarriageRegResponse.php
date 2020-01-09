@@ -651,11 +651,11 @@ if (strlen($msg) == 0)
         if ($offset == 0)
             $prevoffset         = '';
         else
-            $prevoffset         = $npand . "Offset=" . $offset - $limit;
-        if ($offset + $limit >= $totalrows)
+            $prevoffset         = $npand . "Offset=" . ($offset - $limit);
+        if (($offset + $limit) >= $totalrows)
             $nextoffset         = '';
         else
-            $nextoffset         = $npand . "Offset=" . $offset + $limit;
+            $nextoffset         = $npand . "Offset=" . ($offset + $limit);
     }
 	$template->set('PREVOFFSET',	$prevoffset);
 	$template->set('NEXTOFFSET',	$nextoffset);

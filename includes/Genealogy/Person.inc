@@ -2492,7 +2492,7 @@ class Person extends RecordPic
             else
                 $createStr	= $create;
             $warn	        .= "<p>Person(IDIR=" . $this->row['idir'] .
-                                ")::getBirthEvent($createStr)</p>\n";
+                                ")->getBirthEvent($createStr)</p>\n";
         }
 
         // ensure that the events table is initialized
@@ -2551,6 +2551,7 @@ class Person extends RecordPic
             {
                 $event->adjustSortDate($chrissd - 1);
             }
+            $event['idir']      = $this->row['idir'];
         }                       // have existing event
 
         if ($event)

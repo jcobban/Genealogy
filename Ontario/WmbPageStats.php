@@ -87,9 +87,9 @@ pageTop(array(
 			'/genealogy.php'	=> 'Genealogy',
 			'/genCountry.php?cc=CA'	=> 'Canada',
 			'/Canada/genProvince.php?Domain=CAON'
-							=> 'Ontario',
-			'/Ontario/WmbQuery.html'
-						=> 'New Wesleyan Methodist Baptisms Query',
+							    => 'Ontario',
+			'/Ontario/WmbQuery.php?lang=en'
+						        => 'New Wesleyan Methodist Baptisms Query',
 			'WmbVolStats.php'	=> 'Statistics by Volume'));
 ?>
     <div class='body'>

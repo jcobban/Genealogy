@@ -30,9 +30,9 @@ use \Exception;
  *		2017/11/19		use CitationSet in place of getCitations		*
  *		2017/11/13		use PersonSet in place of Person::getPersons	*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
- *		2019/07/11      use Template                                    *
+ *		2020/01/03      use Template                                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/MethodistBaptism.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -42,180 +42,203 @@ require_once __NAMESPACE__ . '/CitationSet.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-					'10'	=> 'Oct',
-					'11'	=> 'Nov',
-					'12'	=> 'Dec');
-
 // action depends upon whether the user is authorized to
 // update the database
 if(canUser('all'))
-	$action             = 'Update';
+{
+	$update				= true;
+	$action				= 'Update';
+}
 else
-    $action             = 'Display';
+{
+	$update				= false;
+	$action				= 'Display';
+}
 
 // default parameter values
+$cc                     = 'CA';
+$domain                 = 'CAON';
+$operator               = '';
 $idmb	                = null;
 $volume	                = null;
 $page	                = null;
 $lang                   = 'en';
+$genderClass	        = 'male';
 
 // get parameter values
-if (count($_GET) > 0)
-{                   // invocation from query
+if (isset($_GET) && count($_GET) > 0)
+{                       // invoked by method=get
     $parmsText      = "<p class='label'>\$_GET</p>\n" .
                         "<table class='summary'>\n" .
                         "<tr><th class='colhead'>key</th>" .
                         "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
-	{			    // loop through all input parameters
+	{			// loop through all input parameters
 	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
 	                         "<td class='white left'>$value</td></tr>\n"; 
 		switch(strtolower($key))
-		{		    // process specific named parameters
+		{		// process specific named parameters
 		    case 'id':
 		    case 'idmb':
 		    {
-				if (ctype_digit($value))
-				{
-				    $idmb	    = $value;
-				}
+				$idmb	    = trim($value);
 				break;
-		    }		// IDMB passed
+		    }		    // IDMB passed
 	
 		    case 'volume':
 		    {
-				if (ctype_digit($value))
-				{
-				    $volume	    = $value;
-				}
+				$volume	    = trim($value);
 				break;
-		    }		// Volume passed
+		    }		    // Volume passed
 	
 		    case 'page':
 		    {
-				if (ctype_digit($value))
-				{
-				    $page	    = $value;
-				}
+				$page	    = trim($value);
 				break;
-		    }		// Page passed
-	
-		    case 'debug':
-		    {		// handled by common code
-				break;
-		    }		// handled by common code
+		    }		    // Page passed
 	
 		    case 'lang':
-            {		// handled by common code
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value, 0, 2));
+	        {		    // debug handled by common code
+	            $lang       = FtTemplate::validateLang($value);
 				break;
-		    }		// handled by common code
+		    }		    // debug handled by common code
 	
-		    default:
-		    {		// any other paramters
-				$warn	.= "Unexpected parameter $key='$value'. ";
-				break;
-		    }		// any other paramters
-		}		    // process specific named parameters
-	}			    // loop through all input parameters
+		}		        // process specific named parameters
+	}			        // loop through all input parameters
 	if ($debug)
-	    $warn           .= $parmsText . "</table>\n";
-}                   // invocation from query
+	    $warn       .= $parmsText . "</table>\n";
+}                       // invoked by method=get
 
 $template               = new FtTemplate("WmbDetail$action$lang.html");
-$trtemplate             = $template->getTranslate();
-$monthName              = $trtemplate['Months'];
+$trantab                = $template->getTranslate();
+$t                      = $trantab['tranTab'];
+$months                 = $trantab['Months'];
+$template['otherStylesheets']->update(array('filename' => 'WmbDetail'));
 
-if (is_null($idmb))
-{
-	$msg		        .= "IDMB parameter omitted. ";
-}
+if (is_string($idmb))
+{                       // IDMB specified
+    if (preg_match("/^([<=>!]*)([0-9]+)$/", $idmb, $matches))
+    {
+        $operator       = $matches[1];
+        $idmb           = $matches[2];
+    }
+    else
+    {
+        $text           = $template['idmbInvalid']->innerHTML;
+	    $msg	        .= str_replace('$idmb', $idmb, $text);
+    }
+}                       // IDMB specified
+else
+{                       // IDMB not specified
+    $msg                .= $template['idmbMissing']->innerHTML;
+    $template->set('IDMB',              '');
+}                       // IDMB not specified
+if (is_string($volume) && !ctype_digit($volume))
+{                       // volume specified
+    $text               = $template['volumeInvalid']->innerHTML;
+	$msg	            .= str_replace('$volume', $volume, $text);
+    $template->set('VOLUME',            $volume);
+}                       // volume specified
+else
+    $template->set('VOLUME',            '');
+if (is_string($page) && !ctype_digit($page))
+{                       // page specified
+    $text               = $template['pageInvalid']->innerHTML;
+	$msg	            .= str_replace('$page', $page, $text);
+    $template->set('PAGE',              $page);
+}                       // page specified
+else
+    $template->set('PAGE',              '');
+
+$template->set('LANG',                  $lang);
 
 // if no error messages Issue the query
 if (strlen($msg) == 0)
-{		            // no errors
-	$getNext	                = substr($idmb,0,1) == '>';
+{		                // no errors
+	$getNext	        = $operator == '>';
 	// get the baptism registration object
 	if ($volume && $page)
-	{               // get next or preceding entry on page
-	    $getParms	            = array('volume'	=> $volume,
-    			        	    		'page'		=> $page,
-    			        	    		'idmb'		=> $idmb,
-    			        	    		'limit'		=> 1);
+	{
+	    $getParms	    = array('volume'	=> $volume,
+					        	'page'		=> $page,
+					        	'idmb'		=> $operator . $idmb,
+					        	'limit'		=> 1);
 	    if (!$getNext)
 			$getParms['order']	= "`IDMB` DESC";
-	    $baptisms	            = new RecordSet('MethodistBaptisms', $getParms);
+	    $baptisms	    = new RecordSet('MethodistBaptisms', $getParms);
 	    if ($baptisms->count() > 0)
-			$baptism	        = $baptisms->rewind();
+			$baptism	= $baptisms->rewind();
 	    else
-	    {		    // ran off end or beginning of page
+	    {		        // ran off end or beginning of page
 			if ($getNext)
-			{		// get first line of next page
-			    $getParms	    = array('volume'	=> $volume,
-	        				    		'page'		=> $page + 1,
-			        		    		'limit'		=> 1);
-			    $baptisms	    = new RecordSet('MethodistBaptisms', $getParms);
-			}		// get first line of next page
+			{		    // get first line of next page
+			    $getParms	= array('volume'	=> $volume,
+			        				'page'		=> $page + 1,
+					        		'limit'		=> 1);
+			    $baptisms	= new RecordSet('MethodistBaptisms', $getParms);
+			}		    // get first line of next page
 			else
 			if ($page > 1)
-			{		// get last line of previous page
-			    $getParms	    = array('volume'	=> $volume,
-	        				    		'page'		=> $page - 1,
-	        				    		'limit'		=> 1,
-	        				    		'order'		=> "`IDMB` DESC");
-			    $baptisms	    = new RecordSet('MethodistBaptisms', $getParms);
-			}		// get last line of previous page
+			{		    // get last line of previous page
+			    $getParms	= array('volume'	=> $volume,
+				        			'page'		=> $page - 1,
+						        	'limit'		=> 1,
+			        				'order'		=> "`IDMB` DESC");
+			    $baptisms	= new RecordSet('MethodistBaptisms', $getParms);
+			}		    // get last line of previous page
 
 			// get first record in set
 			if ($baptisms->count() > 0)
 			    $baptism	= $baptisms->rewind();
 			else
 			    $baptism	= null;
-	    }		    // ran off end or beginning of page
+	    }		        // ran off end or beginning of page
 	}
-	else
-	    $baptism	        = new MethodistBaptism(array('idmb' => $idmb));
+    else
+    {                   // specific record
+        $template['pageDisplay']->update(null);
+        $baptism	        = new MethodistBaptism(array('idmb' => $idmb));
+    }                   // specific record
 
 	if ($baptism && $baptism->isExisting())
-	{			// have a record from the database
+	{			        // have a record from the database
 	    // copy contents into working variables
-	    $volume		        = $baptism->get('volume');
-	    $page		        = $baptism->get('page');
-	    $surname		    = $baptism->get('surname');
-	    $idir		        = $baptism->get('idir');
-	    $givenName		    = $baptism->get('givenname');
-	    $birthDate		    = $baptism->get('birthdate');
-	    $person		        = null;
-	    $imatches		    = array();
+	    $idmb		    = $baptism['idmb'];
+	    $volume		    = $baptism['volume'];
+	    $page		    = $baptism['page'];
+	    $surname		= $baptism['surname'];
+	    $idir		    = $baptism['idir'];
+	    $givenName		= $baptism['givenname'];
+	    $birthDate		= $baptism['birthdate'];
+	    $person		    = null;
+	    $imatches		= array();
 
 	    // if this registration is not already linked to
 	    // look for individuals who match
 	    if ($idir == 0 && $update)
 	    {			// updating 
 			// check for existing citations to this registration
-			$citparms	    =
-				array('idsr'		=> 158,
-				      'type'		=> Citation::STYPE_BIRTH,
-					  'srcdetail'   => "V[^\d]*$volume.*Page $page.*# $idmb"); 
-			$citations	    = new CitationSet($citparms);
+			$citpattern         = "V[^\d]*$volume.*Page $page.*# $idmb"; 
+			$citparms	        = array('idsr'		=> 158,
+		    		    	            'type'		=> Citation::STYPE_BIRTH,
+			    		                'srcdetail' => $citpattern); 
+			$citations	        = new CitationSet($citparms);
 			if ($citations->count() > 0)
-			{		// citation to death in old location
-			    $citrow	    = $citations->rewind();
-			    $idir	    = $citrow->get('idime');
-			}		// citation to death in old location
+			{		// citation to birth in old location
+			    $citrow	        = $citations->rewind(); // first citation
+			    $idir	        = $citrow->get('idime');
+			}		// citation to birth in old location
 			else
 			{		// check for event citation
-			    $citparms	=
-				    array('idsr'	=> 158,
-						  'type'	=> Citation::STYPE_EVENT,
-				    	  'srcdetail'=> "V[^\d]*$volume.*Page $page.*# $idmb"); 
-			    $citations	= new CitationSet($citparms);
+			    $citparms	    = array('idsr'	    => 158,
+		                		    	'type'	    => Citation::STYPE_EVENT,
+			    		                'srcdetail' => $citpattern); 
+			    $citations	    = new CitationSet($citparms);
 			    foreach($citations as $idsx => $citation)
 			    {
-					$ider	= $citation->get('idime');
-					$event	= new Event($ider);
-					$idet	= $event->getIdet();
+					$ider		    = $citation->get('idime');
+					$event		    = new Event($ider);
+					$idet		    = $event->getIdet();
 					if ($idet == Event::ET_BIRTH)
 					{
 					    $idir		= $event->getIdir();
@@ -236,28 +259,28 @@ if (strlen($msg) == 0)
 
 			    // obtain the birth year
 			    $rxResult		= preg_match('/[0-9]{4}/',
-								     $birthDate,
-								     $matches);
+					        			     $birthDate,
+							        	     $matches);
 			    if ($rxResult > 0)
 					$birthYear	= intval($matches[0]);
 			    else
 					$birthYear	= 1800;
 
 			    // look 2 years on either side of the year
-			    $birthrange	= array(($birthYear - 2) * 10000,
-							    ($birthYear + 2) * 10000);
+			    $birthrange	    = array(($birthYear - 2) * 10000,
+				        			    ($birthYear + 2) * 10000);
 			    // search for a match on any of the parts of the
 			    // given name
-			    $gnameList	= explode(' ', $givenName);
+			    $gnameList	    = explode(' ', $givenName);
 
 			    // quote the surname value
-			    $getParms	= array('loose'		=> true,
-							'surname'	=> $surname,
-							'givenname'	=> $gnameList,
-							'birthsd'	=> $birthrange,
-							'incmarried'	=> true,
-			    			'order'		=> 'tblNX.Surname, tblNX.GivenName, tblIR.BirthSD');
-			    $imatches	= new PersonSet($getParms);
+			    $getParms	    = array('loose'		=> true,
+				            			'surname'	=> $surname,
+				            			'givenname'	=> $gnameList,
+				            			'birthsd'	=> $birthrange,
+				            			'incmarried'	=> true,
+			                			'order'		=> 'tblNX.Surname, tblNX.GivenName, tblIR.BirthSD');
+			    $imatches	    = new PersonSet($getParms);
 			}			// record is initialized with name
 			else
 			if ($idir > 0 &&
@@ -266,149 +289,211 @@ if (strlen($msg) == 0)
 
 			    if ($idir > 0)
 			    {		// found a citation
-					try {
-					    $person	= new Person(array('idir' => $idir));
-					    $linkedName	= $person->getName(Person::NAME_INCLUDE_DATES);
-					} catch (Exception $e) {
-					    $msg	.= "Exception: " .  $e->getMessage();
-					}
+					$person	    = new Person(array('idir' => $idir));
+					$linkedName	= $person->getName(Person::NAME_INCLUDE_DATES);
 			    }		// found a citation
 			}			// record is uninitialized
-	    }			// updating
+	    }			    // updating
 
 	    // get information from the existing link
 	    if ($idir > 0)
-	    {			// existing link
+	    {			    // existing link
 			if ($debug)
-			    $warn		.= "<p>Existing link IDIR=$idir</p>\n";
-			try {
-			    if (is_null($person))
-					$person	= new Person(array('idir' => $idir));
-			    $linkedName = $person->getName(Person::NAME_INCLUDE_DATES);
-			    $maidenName	= $person->getSurname();
+			    $warn		    .= "<p>Existing link IDIR=$idir</p>\n";
+			if (is_null($person))
+				$person	        = new Person(array('idir' => $idir));
+            if ($person->isExisting())
+            {
+			    $linkedName     = $person->getName(Person::NAME_INCLUDE_DATES);
+			    $maidenName	    = $person->getSurname();
 			    $genderClass	= $person->getGenderClass();
 			    if ($maidenName != $surname)
 			    {		// $surname is not maiden name
 					$linkedName	= str_replace($maidenName,
-								  "($maidenName) $surname",
-								  $linkedName);
+								              "($maidenName) $surname",
+						            		  $linkedName);
 			    }		// $surname is not maiden name
-			} catch (Exception $e)
+            } 
+            else
 			{
-			    $linkedName	= $givenName . ' ' . $surname .
-						      ' (not found in database)';
+			    $linkedName	    = $givenName . ' ' . $surname .
+				    		      ' (not found in database)';
 			}
-	    }			// existing link
+	        $template->set('LINKEDNAME',		     $linkedName);
+	    }			    // existing link
 
 	    // copy contents into working variables
 	    // some of the fields may have been changed by the cross-ref code
-	    $surname	= $baptism->get('surname');
-	    $givenName	= $baptism->get('givenname');
-	    $birthDate	= $baptism->get('birthdate');
+	    $surname	            = $baptism['surname'];
+	    $givenName	            = $baptism['givenname'];
 
-	    $subject	= "number: " . 
-					      $idmb . ', ' . 
-					      $givenName . ' ' . $surname;
-	}			// have a record from the database
+        $subject	            = "number: $idmb, $givenName $surname";
+
+	    $birthDate	            = $baptism['birthdate'];
+		$rxResult   		    = preg_match('/(\d\d\d\d)-(\d\d)-(\d\d)/',
+						    	    	     $birthDate,
+							    	         $matches);
+		if ($rxResult > 0)
+            $birthDate	        = $matches[3] . ' ' . 
+                                    $months[intval($matches[2])] . ' ' . 
+                                    $matches[1];
+        else
+            $birthDate	        = str_replace("'","&#39;",$birthDate);
+		
+		$baptismdate	        = $baptism['baptismdate'];
+		$rxResult		        = preg_match('/(\d\d\d\d)-(\d\d)-(\d\d)/',
+							        	     $baptismdate,
+								             $matches);
+		if ($rxResult > 0)
+            $baptismdate        = $matches[3] . ' ' . 
+                                    $months[intval($matches[2])] .
+                                    ' ' . $matches[1];
+        else
+		    $baptismdate	    = str_replace("'","&#39;",$baptismdate);
+		
+		$baptismplace	    = str_replace("'","&#39;",$baptism['baptismplace']);
+		$minister	        = str_replace("'","&#39;",$baptism['minister']);
+		$commap		        = strpos($minister, ',');
+		if ($commap > 0)
+		{                   // surname before given name
+		    $minister	    = trim(substr($minister, $commap + 1)) . ' ' .
+				    		  substr($minister, 0, $commap);
+        }                   // surname before given name
+
+        $template->set('IDMB',              $idmb);
+        $template->set('VOLUME',            $volume);
+        $template->set('PAGE',              $page);
+		$template->set('DISTRICT',		    $baptism['district']);
+		$template->set('AREA',		        $baptism['area']);
+	    $template->set('GIVENNAME',		    $givenName);
+	    $template->set('SURNAME',		    $surname);
+		$template->set('FATHER',		    $baptism['father']);
+		$template->set('MOTHER',		    $baptism['mother']);
+		$template->set('RESIDENCE',		    $baptism['residence']);
+		$template->set('BIRTHPLACE',		$baptism['birthplace']);
+	    $template->set('BIRTHDATE',		    $birthDate);
+		$template->set('BAPTISMDATE',		$baptismdate);
+		$template->set('BAPTISMPLACE',		$baptismplace);
+		$template->set('MINISTER',		    $minister);
+	    $template->set('IDIR',		        $idir);
+	    $template->set('GENDERCLASS',		$genderClass);
+        
+        if ($idir > 0)
+		{	                // link to family tree database
+		    $template['MatchRow']->update(null);
+		}	                // link to family tree database
+		else
+		if (count($imatches) > 0)
+		{                   // possible matches
+            $template['LinkRow']->update(null);
+            $optionElt          = $template['option$idir'];
+            $optionText         = $optionElt->outerHTML;
+            $data               = '';
+		    foreach($imatches as $iidir => $person)
+		    {               // loop through results
+				$igivenname	    = $person->get('givenname'); 
+				$isurname	    = $person->get('surname');
+				$isex		    = $person->get('gender');
+				if ($isex == Person::MALE)
+				{
+				    $sexclass	= 'male';
+				    $childrole	= $t['son'];
+				    $spouserole	= $t['husband'];
+				}
+				else
+				if ($isex == Person::FEMALE)
+				{
+				    $sexclass	= 'female';
+				    $childrole	= $t['daughter'];
+				    $spouserole	= $t['wife'];
+				}
+				else
+				{
+				    $sexclass	= 'unknown';
+				    $childrole	= $t['child'];
+				    $spouserole	= $t['spouse'];
+				}
+	
+				$iname  	    = $person->getName(Person::NAME_INCLUDE_DATES);
+				$parents	    = $person->getParents();
+				$comma		    = ' ';
+				foreach($parents as $idmr => $set)
+				{	            // loop through parents
+				    $pfather	= $set->getHusbName();
+				    $pmother	= $set->getWifeName();
+                    $iname	    .=
+                            "$comma$childrole of $pfather and $pmother";
+				    $comma	    = ', ';
+				}	            // loop through parents
+	
+				$families	    = $person->getFamilies();
+				$comma		    = ' ';
+				foreach ($families as $idmr => $set)
+				{	            // loop through families
+				    if ($isex == Person::FEMALE)
+						$spouse	= $set->getHusbName();
+				    else
+						$spouse	= $set->getWifeName();
+				    $iname	    .= "$comma$spouserole of $spouse";
+				    $comma	    = ', ';
+	            }	            // loop through families
+                $rtemplate      = new \Templating\Template($optionText);
+                $tparms         = array('idir'      => $iidir,
+                                            'sexclass'  => $sexclass,
+                                            'iname'     => $iname);
+                $rtemplate['option$idir']->update($tparms);
+                $data           .= $rtemplate->compile();
+            }	            // loop through results
+            $optionElt->update($data);
+
+        }                   // possible matches
+        else
+        {
+		    $template['MatchRow']->update(null);
+            $template['LinkRow']->update(null);
+        }
+	}			            // have a record from the database
 	else
 	{
-	    $subject	= "not found";
-	    $msg	    .= "No match found for supplied parameters.";
+	    $subject	            = "not found";
+	    $msg	                .= $template['noMatch']->innerHTML;
+	    $template->set('VOLUME',            '');
+	    $template->set('PAGE',              '');
+		$template->set('DISTRICT',		    '');
+		$template->set('AREA',		        '');
+	    $template->set('GIVENNAME',		    '');
+	    $template->set('SURNAME',		    '');
+		$template->set('FATHER',		    '');
+		$template->set('MOTHER',		    '');
+		$template->set('RESIDENCE',		    '');
+		$template->set('BIRTHPLACE',		'');
+	    $template->set('BIRTHDATE',		    '');
+		$template->set('BAPTISMDATE',		'');
+		$template->set('BAPTISMPLACE',		'');
+		$template->set('MINISTER',		    '');
+	    $template->set('IDIR',		        0);
+        $templare['distform']->update(null);
 	}
-}			// no errors, perform query
+}			            // no errors, perform query
 else
 {			// error detected
-    $baptism        = null;
-	$subject	    = "number: " . $idmb;
-	$volume		    = '';
-	$page		    = '';
-}			// error detected
+    $template->set('VOLUME',            '');
+    $template->set('PAGE',              '');
+	$template->set('DISTRICT',		    '');
+	$template->set('AREA',		        '');
+    $template->set('GIVENNAME',		    '');
+    $template->set('SURNAME',		    '');
+	$template->set('FATHER',		    '');
+	$template->set('MOTHER',		    '');
+	$template->set('RESIDENCE',		    '');
+	$template->set('BIRTHPLACE',		'');
+    $template->set('BIRTHDATE',		    '');
+	$template->set('BAPTISMDATE',		'');
+	$template->set('BAPTISMPLACE',		'');
+	$template->set('MINISTER',		    '');
+    $template->set('IDIR',		        0);
+    $subject	    = "number: " . $idmb;
+    $templare['distform']->update(null);
+}			        // error detected
 
-if ($baptism)
-{			// no errors
-	// copy contents into working variables
-	$idmb			= str_replace("'","&#39;",$baptism->get('idmb'));
-	$volume			= str_replace("'","&#39;",$baptism->get('volume'));
-	$page			= str_replace("'","&#39;",$baptism->get('page'));
-	$district		= str_replace("'","&#39;",$baptism->get('district'));
-	$area			= str_replace("'","&#39;",$baptism->get('area'));
-	$givenname		= str_replace("'","&#39;",$baptism->get('givenname'));
-	$surname		= str_replace("'","&#39;",$baptism->get('surname'));
-	$father			= str_replace("'","&#39;",$baptism->get('father'));
-	$mother			= str_replace("'","&#39;",$baptism->get('mother'));
-	$residence		= str_replace("'","&#39;",$baptism->get('residence'));
-	$birthplace		= str_replace("'","&#39;",$baptism->get('birthplace'));
-	$birthdate		= str_replace("'","&#39;",$baptism->get('birthdate'));
-	$rxResult		= preg_match('/(\d\d\d\d)-(\d\d)-(\d\d)/',
-							     $birthDate,
-							     $matches);
-	if ($rxResult > 0)
-	    $birthdate	= $matches[3] . ' ' . $monthName[$matches[2]] .
-					  ' ' . $matches[1];
-	
-	$baptismdate	= str_replace("'","&#39;",$baptism->get('baptismdate'));
-	$rxResult		= preg_match('/(\d\d\d\d)-(\d\d)-(\d\d)/',
-							     $baptismdate,
-							     $matches);
-	if ($rxResult > 0)
-	    $baptismdate= $matches[3] . ' ' . $monthName[$matches[2]] .
-					  ' ' . $matches[1];
-	
-	$baptismplace	= str_replace("'","&#39;",$baptism->get('baptismplace'));
-	$minister	= str_replace("'","&#39;",$baptism->get('minister'));
-	$commap		= strpos($minister, ',');
-	if ($commap > 0)
-	{
-	    $minister	= trim(substr($minister, $commap + 1)) . ' ' .
-					  substr($minister, 0, $commap);
-	}
-	$idir		= $baptism->get('idir');
-	    foreach($imatches as $iidir => $person)
-	    {
-			$igivenname	= $person->get('givenname'); 
-			$isurname	= $person->get('surname');
-			$isex		= $person->get('gender');
-			if ($isex == Person::MALE)
-			{
-			    $sexclass	= 'male';
-			    $childrole	= 'son';
-			    $spouserole	= 'husband';
-			}
-			else
-			if ($isex == Person::FEMALE)
-			{
-			    $sexclass	= 'female';
-			    $childrole	= 'daughter';
-			    $spouserole	= 'wife';
-			}
-			else
-			{
-			    $sexclass	= 'unknown';
-			    $childrole	= 'child';
-			    $spouserole	= 'spouse';
-			}
-
-			$iname  	= $person->getName(Person::NAME_INCLUDE_DATES);
-			$parents	= $person->getParents();
-			$comma		= ' ';
-			foreach($parents as $idmr => $set)
-			{	// loop through parents
-			    $pfather	= $set->getHusbName();
-			    $pmother	= $set->getWifeName();
-			    $iname	.= "$comma$childrole of $pfather and $pmother";
-			    $comma	= ', ';
-			}	// loop through parents
-
-			$families	= $person->getFamilies();
-			$comma		= ' ';
-			foreach ($families as $idmr => $set)
-			{	// loop through families
-			    if ($isex == Person::FEMALE)
-					$spouse	= $set->getHusbName();
-			    else
-					$spouse	= $set->getWifeName();
-			    $iname	.= "$comma$spouserole of $spouse";
-			    $comma	= ', ';
-			}	// loop through families
-	    }	    // loop through results
-	}	        // not matched to some persons in database
+$template->display();

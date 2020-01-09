@@ -23,10 +23,10 @@
       <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">
       	Ontario
       </a>:
-      <a href="/displayPage.php?template=WmbQuery&amp;lang=$LANG">
+      <a href="/Ontario/WmbQuery.php?lang=$LANG">
         Wesleyan Methodist Baptism Query
       </a>:
-      <a href="/Ontario/WmbVolStats.php&amp;lang=$LANG">
+      <a href="/Ontario/WmbVolStats.php?lang=$LANG">
         Statistics by Volume
       </a>:
       <a href="/Ontario/WmbPageStats.php?volume=$VOLUME&amp;lang=$LANG">
@@ -35,8 +35,8 @@
       <a href="/Ontario/WmbStats.php?lang=$LANG">
         Status 
       </a>:
-      <a href="/Ontario/WmbResponse.php?volume=$VOLUME&Page=$PAGE&amp;lang=$LANG">
-		Volume $VOLUME Page $PAGE"
+      <a href="/Ontario/WmbResponse.php?volume=$VOLUME&Page=$PAGE&amp;lang=$LANG" id="pageDisplay">
+		Volume $VOLUME Page $PAGE
       </a>:
     </div>
 	<div class='body'>
@@ -147,17 +147,18 @@
 			<button id='clearIdir' type='button'>Clear</button>
 		  <div style='clear: both;'></div>
 		</div>
-		<div class='row'id='LinkRow'>
+		<div class='row' id='MatchRow'>
 		  <div class='column2'>
 			<label class='labelSmall' for='IDIR'>Link:</label>
 			<select name='IDIR' id='IDIR' rows='1'
 					class='white left'>
 			    <option value='0'>Possible matches to this registration:
-			    <option value='$IIDIR'
-					    class='$SEXCLASS'>
-			    $INAME
+			    </option>
+                <option value='$idir' id="option$idir" class="$sexclass">
+			      $iname
 			    </option>
 			</select>
+          </div>
 		  <div style='clear: both;'></div>
 		</div>
 		<div class='row' id='BaptismDatePlaceRow'>
@@ -232,6 +233,20 @@
 		</p>
 	  </form>
 	</div> <!-- end of <div id='body'> -->
+    <div class="hidden" id="messages">
+	  <span id="idmbInvalid">
+		Registration Number $idmb must be a number. 
+	  </span>
+	  <span id="idmbMissing">
+		IDMB parameter omitted. 
+	  </span>
+	  <span id="volumeInvalid">
+		Volume Number $volume must be a number. 
+	  </span>
+	  <span id="pageInvalid">
+		Page Number $page must be a number. 
+	  </span>
+    </div>
 	<!--  The remainder of the web page consists of divisions containing
 	  context specific help.  These divisions are only displayed if the user
 	  requests help by pressing F1.  Including this information here ensures
@@ -239,55 +254,40 @@
 	  input form.
 	-->
 	<div class='balloon' id='HelpGivenName'>
-	  <p>
 	    The Given Names of the child.
-	  </p>
 	</div>
 	<div class='balloon' id='HelpSurname'>
-	  <p>
 	    The Surname of the child.
-	  </p>
 	</div>
 	<div class='balloon' id='HelpIDIR'>
-	  <p>
 	    This selection list offers a list of persons in the family tree database
         who may correspond to this death registration.  Selecting an entry
         in this
         list will cause a citation to this registration to be added
         to that person.
-	  </p>
 	</div>
 	<div class='balloon' id='HelpBirthPlace'>
-	  <p>
 	    Birth place of child.
-	  </p>
 	</div>
 	<div class='balloon' id='HelpBirthDate'>
-	  <p>
 	    Birth date of child.
 	    It is suggested that dates be entered consistently as day, 
 	    abbreviation of name of month, and year.
-	  </p>
 	</div>
-	<div class='balloon' id='HelpFatherName'>
-	  <p>
+	<div class='balloon' id='HelpFather'>
 	    Name of father of child.
-	  </p>
 	</div>
-	<div class='balloon' id='HelpMotherName'>
-	  <p>
+	<div class='balloon' id='HelpMother'>
 	    Name of mother of child.
-	  </p>
+	</div>
+	<div class='balloon' id='HelpResidence'>
+	    Residence of parents.
 	</div>
 	<div class='balloon' id='HelpMinister'>
-	  <p>
 	    Name of minister officiating at the baptism.
-	  </p>
 	</div>
 	<div class='balloon' id='HelpRemarks'>
-	  <p>
 	    Any comments by the transcriber may be entered here.
-	  </p>
 	</div>
 	<div class='balloon' id='HelpIDMB'>
 	  The sequential internal identification of the record.

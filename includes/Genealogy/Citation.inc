@@ -680,8 +680,8 @@ class Citation extends RecordPic
                                 if (ctype_digit($value) && $value > 0)
                                     $this->set('idsr', (int)$value);
                                 else
-                                    $this->msg  .=
-                            "Invalid value for field 'IDSR'='$value'. ";
+                                    throw new Exception(
+                            "Invalid value for field 'IDSR'='$value'. ");
                                 break;
 
                             default:
@@ -768,8 +768,8 @@ class Citation extends RecordPic
                                 if (ctype_digit($value) && $value > 0)
                                     $dbrow['idsr']  = (int)$value;
                                 else
-                                    $this->msg  .=
-                            "Invalid value for field 'IDSR'='$value'. ";
+                                    throw new Exception(
+                            "Invalid value for field 'IDSR'='$value'. ");
                                 break;
 
                             default:
@@ -1736,7 +1736,7 @@ class Citation extends RecordPic
 							'`filingref`=:filingref AND ' .
 							'`content`=:content AND ' .
 							'`override`=:override';
-		   $sqlParms	= array('idsr'		=> $this->row['idsr'],
+		    $sqlParms	= array('idsr'		=> $this->row['idsr'],
 							'idime'		    => $this->row['idime'],
 							'type'		    => $this->row['type'],
 							'srcdetail'	    => $this->row['srcdetail'],

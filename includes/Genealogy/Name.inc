@@ -62,6 +62,7 @@ use Templating\TemplateTag;
  *		  qsTag					  TINYINT(3)							*
  *				temporary use, 0=no, 1=yes								*
  *				Unused by this implementation                           *
+ *		  `TreeName` VARCHAR(63) NOT NULL DEFAULT '',                   *
  *																		*
  *  The design of this table in the original implementation violated    *
  *  good design for SQL databases in that the information was           *
@@ -262,6 +263,7 @@ class Name extends Record
     					'given'		            => 'givenname',
     					'`order`'		        => 'order',
     					'type'		            => 'order',
+    					'suffix'		        => 'title',
     					'createdby'		        => 'marriednamecreatedby',
                         'marriednamemaridid'	=> 'idmr',
                         'namenote'              => 'akanote',

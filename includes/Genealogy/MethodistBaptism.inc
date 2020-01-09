@@ -84,6 +84,27 @@ class MethodistBaptism extends Record
 						'baptismplace'			=> '',
 						'minister'				=> '',
 						'idir'					=> '');
+
+    /********************************************************************
+     *	MethodistBaptism::$info									        *
+     *																	*
+     *	Description of record class                                     *
+     ********************************************************************/
+    protected static	$info	= array(
+                'table'     => 'MethodistBaptisms',
+                'name'      => 'MethodistBaptisms',
+                'prime'	    => 'idmb',
+	            'srvmg'     => true,
+	            'fldcount'	=> 16,
+                'order'     => 'Volume, Page, IDMB',
+                'classname' => 'MethodistBaptism');
+
+    /********************************************************************
+     *	MethodistBaptism::$translate									*
+     *																	*
+     *	standard alternative field name identifiers						*
+     ********************************************************************/
+    protected static	$translate	= array();
 						
     /********************************************************************
      *	function MethodistBaptism::__construct							*

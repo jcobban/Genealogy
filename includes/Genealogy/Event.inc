@@ -35,7 +35,7 @@ use \Exception;
  *				(see Date)												*
  *		IDLREvent		INT(10) UNSIGNED								*
  *				--> tblLR.IDLR, ID to Location Record					*
- *		Desc			LONGTEXT						-				*
+ *		Notes			LONGTEXT						-				*
  *				Notes about the event.  See Description.				*
  *		GEDTag			VARCHAR(30)										*
  *				not currently used.                                     *
@@ -246,6 +246,9 @@ use \Exception;
  *		                constructor ignored eventsd parameter as used   *
  *		                by Person:: getXxxxxEvent                       *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/01/09      rename field 'Desc' to 'Notes' because DESC     *
+ *		                is a reserved word in SQL                       *
+ *		                delete Event::getDesc                           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -488,7 +491,7 @@ class Event extends RecordPic
 				'eventd'				=> '',
 				'eventsd'				=> -99999999,
 				'idlrevent'				=> 1,
-				'desc'					=> '',
+				'notes'					=> '',
 				'gedtag'				=> '',
 				'eventexclude'			=> 0,
 				'idar'					=> 0,
@@ -521,7 +524,7 @@ class Event extends RecordPic
      ********************************************************************/
     protected static	$translate	= array(
 				'id'		=> 'ider',
-				'notes'		=> 'desc',
+				'desc'		=> 'notes',
 				'date'		=> 'eventd',
                 'location'	=> 'idleevent',
                 'private'   => 'eventexclude');
@@ -715,7 +718,7 @@ class Event extends RecordPic
 				    break;
 				}		// other numeric field names
 
-				case 'desc':
+				case 'notes':
 				case 'gedtag':
 				case 'description':
 				case 'sentenceoverride':
@@ -864,7 +867,10 @@ class Event extends RecordPic
 		    // validate parameters
 		    foreach($parms as $fldname => $value)
 		    {			// loop through parameters
-				switch(strtolower($fldname))
+				$fieldLc        = strtolower($fldname);
+		        if (array_key_exists($fieldLc, self::$translate))
+		            $fieldLc	= self::$translate[$fieldLc];
+		        switch($fieldLc)
 				{		// act on identification fields
 				    case 'ider':
 				    {		// key of record in tblER
@@ -998,7 +1004,7 @@ class Event extends RecordPic
 				    case 'eventd':
 				    case 'eventsd':
 				    case 'idlrevent':
-				    case 'desc':
+				    case 'notes':
 				    case 'gedtag':
 				    case 'eventexclude':
 				    case 'idar':
@@ -1097,7 +1103,9 @@ class Event extends RecordPic
 								        'tblER');
 					foreach($parms as $fldname => $value)
 					{		            // loop through parameters
-					    $fieldLc	    = strtolower($fldname);
+        				$fieldLc        = strtolower($fldname);
+		                if (array_key_exists($fieldLc, self::$translate))
+		                    $fieldLc	= self::$translate[$fieldLc];
 					    // apply any requested changes
 					    if ($fieldLc != 'ider')
 						    $this->set($fieldLc, $value);
@@ -1558,10 +1566,13 @@ class Event extends RecordPic
      *  function Event::getNotes										*
      *																	*
      *	Get the extended Notes of the event.							*
+     *																	*
+     *	Returns:														*
+     *		string														*
      ********************************************************************/
     function getNotes()
     {
-		$notes	= $this->row['desc'];
+		$notes	                = $this->row['notes'];
 		if ($notes === null)
 		    return '';
 		else
@@ -1573,36 +1584,27 @@ class Event extends RecordPic
      *																	*
      *	Set the extended Notes of the event.							*
      *																	*
+     *	Input:															*
+     *		New string value											*
+     *																	*
      *	Return:															*
      *	    Former value.												*
      ********************************************************************/
     function setNotes($value)
     {
-		return parent::set('desc', $value);
+        if (is_null($value) || is_string($value))
+            return parent::set('notes', $value);
+        else
+            return $this->row['notes'];
     }		// Event::setNotes
-
-    /********************************************************************
-     *  function Event::getDesc											*
-     *																	*
-     *	Get the Notes of the event.										*
-     *	This function name is retained for backwards compatibility, but	*
-     *	because it is not descriptive of the meaning of the field and	*
-     *	confusing beside the similarly named getDescription, it			*
-     *	is disparaged.													*
-     ********************************************************************/
-    function getDesc()
-    {
-		$notes	= $this->row['desc'];
-		if ($notes === null)
-		    return '';
-		else
-		    return $notes;
-    }		// Event::getDesc
 
     /********************************************************************
      *  function Event::getDescription									*
      *																	*
      *	Get the description of the event.								*
+     *																	*
+     *	Returns:														*
+     *		string														*
      ********************************************************************/
     function getDescription()
     {
@@ -1618,12 +1620,18 @@ class Event extends RecordPic
      *																	*
      *	Set the description of the event.								*
      *																	*
+     *	Input:															*
+     *		New string value											*
+     *																	*
      *	Return:															*
      *	    Former value.												*
      ********************************************************************/
     function setDescription($value)
     {
-		return parent::set('description', $value);
+        if (is_null($value) || is_string($value))
+            return parent::set('description', $value);
+        else
+            return $this->row['description'];
     }		// Event::setDescription
 
     /********************************************************************
@@ -1924,7 +1932,7 @@ class Event extends RecordPic
     {
 		return 	self::$eventText[$this->row['idet']] . ' ' .
 				$this->getDate() . ' ' .
-				$this->getDesc() . ', ' .
+				$this->getNotes() . ', ' .
 				$this->getDescription() . ', at ' .
 				$this->getLocation();
     }		// Event::__toString
@@ -2357,9 +2365,9 @@ class Event extends RecordPic
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
         {                       // act on specific fields
-			case 'desc':
+			case 'notes':
             {
-        		$notes	        = $this->row['desc'];
+        		$notes	        = $this->row['notes'];
         		if ($notes === null)
         		    return '';
         		else
@@ -2838,34 +2846,35 @@ class Event extends RecordPic
 		    $warn	.= "<p>Event::getCitations()</p>\n";
 		// previously constructed
 		if ($this->citations)
-		{
+        {
+            $citations      = $this->citations;
 		    if ($debug)
 		    {
-		    if (is_array($citations))
-				$warn	.= "<p>Event::getCitations: " . __LINE__ . " array count=" . count($citations) . "</p>\n";
-		    else
-		    if ($this instanceof RecordSet)
-				$warn	.= "<p>Event::getCitations: " . __LINE__ . " RecordSet count=" . count($citations) . ", query='" . $citations->getInformation()['query']. "'</p>\n";
-		    else
-				$warn	.= "<p>Event::getCitations: " . __LINE__ . " " . print_r($citations, true) . " </p>\n";
+			    if (is_array($citations))
+					$warn	.= "<p>Event::getCitations: " . __LINE__ . " array count=" . count($citations) . "</p>\n";
+			    else
+			    if ($citations instanceof RecordSet)
+					$warn	.= "<p>Event::getCitations: " . __LINE__ . " RecordSet count=" . count($citations) . ", query='" . $citations->getInformation()['query']. "'</p>\n";
+			    else
+					$warn	.= "<p>Event::getCitations: " . __LINE__ . " " . print_r($citations, true) . " </p>\n";
 		    }
-		    return $this->citations;
+		    return $citations;
 		}
 
 		// construct the query of the citation table
-		$ider		= $this->row['ider'];
-		$idtype		= $this->row['idtype'];
+		$ider				= $this->row['ider'];
+		$idtype				= $this->row['idtype'];
 		if ($idtype == Event::IDTYPE_INDIV)
-		    $stype	= Citation::STYPE_EVENT;
+		    $stype			= Citation::STYPE_EVENT;
 		else
 		if ($idtype == Event::IDTYPE_MAR)
-		    $stype	= Citation::STYPE_MAREVENT;
+		    $stype			= Citation::STYPE_MAREVENT;
 		else
 		if ($idtype == Event::IDTYPE_CHILD)
-		    $stype	= Citation::STYPE_LDSP;
-		$idet		= $this->row['idet'];
-		$idir		= $this->row['idir'];
-		$preferred	= $this->row['preferred'];
+		    $stype			= Citation::STYPE_LDSP;
+		$idet				= $this->row['idet'];
+		$idir				= $this->row['idir'];
+		$preferred			= $this->row['preferred'];
 
 		// for preferred events the event may be in the process of being
 		// migrated to tblER, and so the citations may still refer to the
@@ -2980,19 +2989,19 @@ class Event extends RecordPic
 		if ($ider > 0)
 		{			// have an actual record in tblER
 		    if ($idtype == Event::IDTYPE_INDIV)
-				$stype	= Citation::STYPE_EVENT;
+				$stype	    = Citation::STYPE_EVENT;
 		    else
 		    if ($idtype == Event::IDTYPE_MAR)
-				$stype	= Citation::STYPE_MAREVENT;
+				$stype	    = Citation::STYPE_MAREVENT;
 		    else
-				$stype	= Citation::STYPE_LDSP;
+				$stype	    = Citation::STYPE_LDSP;
 
 		    // get the citations associated with this event
-		    $parms	= array('idime'	=> $ider,
-							'type'	=> $stype,
-							'order'	=> '`Order`,`EnteredSD`,`IDSX`');
+		    $parms	        = array('idime'	=> $ider,
+							        'type'	=> $stype,
+							        'order'	=> '`Order`,`EnteredSD`,`IDSX`');
 
-		    $citations	= new RecordSet('Citations', $parms);
+		    $citations	    = new RecordSet('Citations', $parms);
 		    if ($debug)
 		    {
 				if (is_array($citations))
@@ -3058,9 +3067,8 @@ class Event extends RecordPic
 		global	$warn;
 
 		// previously constructed
-		if (is_null($this->citations))
-		    $this->getCitations();
-		$order		= count($this->citations);
+		$citations          = $this->getCitations();
+		$order		        = count($citations);
 
 		if ($newCitations instanceof RecordSet || is_array($newCitations))
 		{
@@ -3099,8 +3107,10 @@ class Event extends RecordPic
 		if ($newCitations instanceof Citation)
 		{		// single citation
 		    $citation			= $newCitations;
-		    $idsx			= $citation->getIdsx();
-		    $citation->set('order', $order);
+			$citation->set('idime', $this->getIder());
+            $citation->set('order', $order);
+            $citation->save(false);
+		    $idsx			    = $citation->getIdsx();
 		    $this->citations[$idsx]	= $citation;
 		}		// single citation
 		else

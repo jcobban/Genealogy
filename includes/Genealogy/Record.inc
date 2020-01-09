@@ -1275,7 +1275,6 @@ class Record implements Iterator, ArrayAccess
 		global	$msg;
 		global	$connection;
 
-        $this->dump('Record::save ' . __LINE__);
 		// get current date and time for added and updated fields in record
 		$now		    	= getdate();
         $today		    	= $now['year'] * 10000 +
@@ -1399,9 +1398,7 @@ class Record implements Iterator, ArrayAccess
 				    $comma	        = ', ';
 				}	// soundex updated
 				else
-				if (($fld == 'id' ||
-				    (is_string($prime) && $fld == $prime && $srvmg)) &&
-				    $value == 0)
+				if (is_string($prime) && $fld == $prime && $srvmg)
 				{	// let SQL server manage field value
 				}	// let SQL server manage field value
 				else
@@ -1464,8 +1461,6 @@ class Record implements Iterator, ArrayAccess
 		}		// create new record
 		else
 		{		// update existing record
-		    if ($debug)
-				$warn	.= "<p>Record::save: ". __LINE__. " needInsert=false</p>\n";
 		    $set		= '';
 		    $comma		= '';
 		    $parms		= array();

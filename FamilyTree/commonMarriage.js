@@ -1207,7 +1207,7 @@ function changeWife(parms)
 }		// changeWife`
 
 /************************************************************************
- *  function changeChild													*
+ *  function changeChild												*
  *																		*
  *  Change the displayed information about a child.						*
  *  This is a callback method of <div id='child$rownum'>				*

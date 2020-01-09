@@ -303,8 +303,7 @@ if ($debug)
 
 // create Template
 $template		        = new FtTemplate("DeathRegDetail$action$lang.html");
-$template->updateTag('otherStylesheets',	
-    		         array('filename'   => 'DeathRegDetail'));
+$template['otherStylesheets']->update(array('filename' => 'DeathRegDetail'));
 $trtemplate             = $template->getTranslate();
 
 if ($regYear == '')
@@ -635,8 +634,6 @@ $template->set('DOMAINNAME',	$domainName);
 $template->set('CC',		    $cc);
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('LANG',		    $lang);
-$template->updateTag('otherStylesheets',
-                   	 array('filename'	=> '/Ontario/DeathRegDetail'));
 
 $template->set('REGYEAR',		$regYear);
 $template->set('REGNUM',		$regNum);

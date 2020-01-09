@@ -415,6 +415,7 @@ $tracelog   = "/home/jcobban/public_html/logs/trace.log";
  ************************************************************************/
 function createPopups($desc)
 {
+    global	$debug;
     global	$warn;
     global	$individTable;
     global	$lang;

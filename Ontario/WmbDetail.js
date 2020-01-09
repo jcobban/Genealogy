@@ -8,8 +8,9 @@
  *	    2016/03/11	    created						                    *
  *	    2016/11/02	    next and prev buttons stay within page		    *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/01/04      pass language to next page                      *
  *									                                    *
- *  Copyright &copy; 2019 James A. Cobban.				                *
+ *  Copyright &copy; 2020 James A. Cobban.				                *
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -17,13 +18,13 @@ window.onload	= onLoad;
 /************************************************************************
  *  function onLoad						                                *
  *									                                    *
- *  Initialize the dynamic functionality of the script.			*
+ *  Initialize the dynamic functionality of the script.			        *
  ************************************************************************/
 function onLoad()
 {
     // activate handling of key strokes in text input fields
     for(var i = 0; i < document.forms.length; i++)
-    {		// loop through all forms
+    {		                    // loop through all forms
 		var form	= document.forms[i];
 		if (form.name == "distForm")
 		{
@@ -32,8 +33,8 @@ function onLoad()
 		}
 
 		for(var j = 0; j < form.elements.length; j++)
-		{	// loop through all elements of a form
-		    var element		= form.elements[j];
+		{	                    // loop through all elements of a form
+		    var element		    = form.elements[j];
 
 		    element.onkeydown	= keyDown;
 		    element.onchange	= change;	// default handling
@@ -42,17 +43,17 @@ function onLoad()
 		    // request to the server is identified by a name= attribute
 		    // but elements which are used only by this script are
 		    // identified by an id= attribute
-		    var	name	= element.name;
+		    var	name	        = element.name;
 		    if (name.length == 0)
-				name	= element.id;
+				name	        = element.id;
 
 		    // set up dynamic functionality based on the name of the element
 		    switch(name)
-		    {
+		    {                   // act on specific elements
 				case "Surname":
 				{
 				    element.focus();
-				    element.abbrTbl	= SurnAbbrs;
+				    element.abbrTbl	    = SurnAbbrs;
 				    element.onchange	= change;
 				    element.checkfunc	= checkName;
 				    element.checkfunc();
@@ -64,7 +65,7 @@ function onLoad()
 				case "Mother":
 				case "Minister":
 				{
-				    element.abbrTbl	= GivnAbbrs;
+				    element.abbrTbl	    = GivnAbbrs;
 				    element.onchange	= change;
 				    element.checkfunc	= checkName;
 				    element.checkfunc();
@@ -74,7 +75,7 @@ function onLoad()
 				case "Place":
 				case "BaptismPlace":
 				{
-				    element.abbrTbl	= BpAbbrs;
+				    element.abbrTbl	    = BpAbbrs;
 				    element.onchange	= change;
 				    element.checkfunc	= checkAddress;
 				    element.checkfunc();
@@ -84,7 +85,7 @@ function onLoad()
 				case "Date":
 				case "BaptismDate":
 				{
-				    element.abbrTbl	= MonthAbbrs;
+				    element.abbrTbl	    = MonthAbbrs;
 				    element.onchange	= dateChanged;
 				    element.checkfunc	= checkDate;
 				    element.checkfunc();
@@ -102,38 +103,38 @@ function onLoad()
 
 				case "clearIdir":
 				{
-				    element.onclick	= clearIdir;
+				    element.onclick	    = clearIdir;
 				    break;
 				}
 
 				case "searchIdir":
 				{
-				    element.onclick	= searchIdir;
+				    element.onclick	    = searchIdir;
 				    break;
 				}
 
 				case "Previous":
 				{
-				    element.onclick	= gotoPrev;
+				    element.onclick	    = gotoPrev;
 				    break;
 				}
 
 				case "Next":
 				{
-				    element.onclick	= gotoNext;
+				    element.onclick	    = gotoNext;
 				    break;
 				}
 
 				case "NewQuery":
 				{
-				    element.onclick	= gotoQuery;
+				    element.onclick	    = gotoQuery;
 				    break;
 				}
 
 
-		    }	// switch on field name
-		}		// loop through all elements in the form
-    }		// loop through forms in the page
+		    }	                // switch on field name
+		}		                // loop through all elements in the form
+    }		                    // loop through forms in the page
 
 }		// onLoad
 
@@ -171,12 +172,12 @@ function resetForm()
  ************************************************************************/
 function clearIdir()
 {
-    var	form		= this.form;
-    var	idirElement	= document.getElementById('IDIR');
-    var	showElement	= document.getElementById('showLink');
+    var	form		        = this.form;
+    var	idirElement	        = document.getElementById('IDIR');
+    var	showElement	        = document.getElementById('showLink');
     if (idirElement)
     {			// have IDIR element
-		var	parentNode	= idirElement.parentNode;
+		var	parentNode	    = idirElement.parentNode;
 		if (showElement)
 		    parentNode.removeChild(showElement);// remove old <a href=''>
 		idirElement.value	= 0;
@@ -203,27 +204,34 @@ function searchIdir()
  ************************************************************************/
 function gotoPrev()
 {
-    var	form	= this.form;
-    var	vol	    = form.Volume.value;
-    var	page	= form.Page.value;
-    var	idmb	= form.IDMB.value;
-    location	= "WmbDetail.php?Volume=" + vol + "&Page=" + page +
-				  "&idmb=<" + idmb;
+    var	form	    = this.form;
+    var	vol	        = form.Volume.value;
+    var	page	    = form.Page.value;
+    var	idmb	    = form.IDMB.value;
+    var lang        = 'en';
+    if ('lang' in args)
+        lang        = args.lang;
+
+    location	    = "WmbDetail.php?Volume=" + vol + "&Page=" + page +
+			    	  "&idmb=<" + idmb + '&lang=' + lang;
 }		// function gotoPrev
 
 /************************************************************************
- *  function gotoNext												*
+ *  function gotoNext												    *
  *																		*
- *  Go to the next registration in the table.								*
+ *  Go to the next registration in the table.							*
  ************************************************************************/
 function gotoNext()
 {
-    var	form	= this.form;
-    var	vol	= form.Volume.value;
-    var	page	= form.Page.value;
-    var	idmb	= form.IDMB.value;
-    location	= "WmbDetail.php?Volume=" + vol + "&Page=" + page +
-				  "&idmb=>" + idmb;
+    var	form	    = this.form;
+    var	vol	        = form.Volume.value;
+    var	page	    = form.Page.value;
+    var	idmb	    = form.IDMB.value;
+    var lang        = 'en';
+    if ('lang' in args)
+        lang        = args.lang;
+    location	    = "WmbDetail.php?Volume=" + vol + "&Page=" + page +
+		    		  "&idmb=>" + idmb + '&lang=' + lang;
 }		// function gotoNext
 
 /************************************************************************
@@ -233,5 +241,12 @@ function gotoNext()
  ************************************************************************/
 function gotoQuery()
 {
-    location	= "WmbQuery.html";
+    var	form	    = this.form;
+    var	vol	        = form.Volume.value;
+    var	page	    = form.Page.value;
+    var lang        = 'en';
+    if ('lang' in args)
+        lang        = args.lang;
+    location	    = "WmbQuery.php?Volume=" + vol + "&Page=" + page + 
+                        '&lang=' + lang;
 }		// function gotoQuery
