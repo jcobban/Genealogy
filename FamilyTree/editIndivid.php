@@ -1435,7 +1435,7 @@ foreach($events as $ie => $event)
     $location		    = $event->getLocation();
     $locationName	    = $location->getName();
 
-    $desc		        = $event->getNotes();
+    $notes		        = $event->getNotes();
     $descn		        = $event->getDescription();
 
     $notshown	        = !$preferred;
@@ -1521,7 +1521,7 @@ foreach($events as $ie => $event)
     $etemplate->set('date',				    $date);
     $etemplate->set('datesd',				$datesd);
     $etemplate->set('dateerror',			$dateError);
-    $etemplate->set('desc',			        $desc);
+    $etemplate->set('desc',			        $notes);
     $etemplate->set('descn',			    $descn);
     $etemplate->set('locationname',			$locationName);
     $etemplate->set('changed',				$changed);

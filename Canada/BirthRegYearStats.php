@@ -204,7 +204,6 @@ if (strlen($msg) == 0)
 {			// no errors
     // get the statistics
     $births		= new BirthSet($getParms);
-    $msg        .= $births->get
 
 	if ($county)
 	    $result	= $births->getCountyStatistics();

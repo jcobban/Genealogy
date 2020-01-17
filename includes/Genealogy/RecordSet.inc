@@ -1445,16 +1445,18 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 
 		if (substr($fldname, 0, 1) != '`' &&
             strpos($fldname, '.') === false)
-        {
+        {                   // simple field name
             if ($refname === true)
-                $refname    = strtolower($fldname);
-            $fldname		= "`$fldname`";
-        }
+                $refname        = strtolower($fldname);
+            $fldname		    = "`$fldname`";
+        }                   // simple field name
         else
-        {
+        {                   // fieldname enclosed in back-ticks
             if ($refname === true)
                 $refname    = strtolower(substr($fldname,1,strlen($fldname)-1));
-        }
+        }                   // fieldname enclosed in back-ticks
+
+        // set up for using either name-based or positional substitutions
         if (is_string($refname))
         {
             $submark            = ":$refname";
@@ -1493,7 +1495,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         $i              = 1;
 
 		foreach($parms as $pattern)
-        {		// loop through patterns
+        {		            // loop through patterns
             if (is_array($pattern))
             {               // array of simple string comparisons
                 foreach($pattern as $val)
@@ -2426,9 +2428,9 @@ require_once __NAMESPACE__ . '/Surname.inc';
      *	Returns:														*
      *	    string containing error messages                            *
      ********************************************************************/
-    function getErrors($xml)
+    function getErrors()
     {
-        return $this->$msg;
+        return $this->msg;
     }		// function Record::getErrors
 
     /********************************************************************

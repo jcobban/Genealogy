@@ -249,8 +249,14 @@ use \Exception;
  *		2020/01/09      rename field 'Desc' to 'Notes' because DESC     *
  *		                is a reserved word in SQL                       *
  *		                delete Event::getDesc                           *
+ *		                getNotes and getDescription replace quotes (")  *
+ *		                with apostrophes (') to avoid problems when     *
+ *		                values containing HTML are used in an edit      *
+ *		                dialog.                                         *
+ *		                method get invokes getNotes and getDescription  *
+ *		                to ensure consistent behavior                   *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -1576,7 +1582,7 @@ class Event extends RecordPic
 		if ($notes === null)
 		    return '';
 		else
-		    return $notes;
+		    return str_replace('"', "'", $notes);
     }		// Event::getNotes
 
     /********************************************************************
@@ -1612,7 +1618,7 @@ class Event extends RecordPic
 		if ($text === null)
 		    return '';
 		else
-		    return $text;
+		    return str_replace('"',"'",$text);
     }		// Event::getDescription
 
     /********************************************************************
@@ -2367,20 +2373,12 @@ class Event extends RecordPic
         {                       // act on specific fields
 			case 'notes':
             {
-        		$notes	        = $this->row['notes'];
-        		if ($notes === null)
-        		    return '';
-        		else
-        		    return $notes;
+        		return $this->getNotes();
             }		// Notes
 
 			case 'description':
             {
-        		$text	        = $this->row['description'];
-        		if ($text === null)
-        		    return '';
-        		else
-        		    return $text;
+        		return $this->getDescription();
             }
 
 			case 'kind':

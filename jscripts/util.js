@@ -208,6 +208,7 @@
  *		2019/11/11      do not add traceAlert output to console.log     *
  *		2019/12/30      leave header section displayed and scroll       *
  *		                <main> only                                     *
+ *		2020/01/09      hide horizontal scroll bar for <body>           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -2259,13 +2260,15 @@ function commonInit(event)
     // scroll main portion of page if it does not fit without scrolling
     var headSection         = document.getElementById('headSection');
     var headHeight          = headSection.offsetHeight;
+    var headWidth           = headSection.offsetWidth;
     var mainSection         = document.getElementById('mainSection');
     var mainHeight          = mainSection.offsetHeight;
+    var mainWidth           = mainSection.offsetWidth;
     var windHeight          = window.innerHeight;
     if (mainHeight + headHeight > windHeight)
     {
         mainSection.style.height    = (windHeight - headHeight - 12) + 'px';
-        mainSection.style.overflowY = 'auto';
+        headSection.style.width     = (headWidth - 10) + 'px';
     }
 
     // if the user has requested it, suppress popup help
@@ -3085,7 +3088,7 @@ function createFromTemplate(template,
 		for (var i=1; i<chunks.length; i++)
 		{		// process each chunk
 		    var chunk	= chunks[i];
-		    var result	= chunk.match("^[A-Za-z]+");
+		    var result	= chunk.match(/^\w+/);
 		    var varname	= result[0];
 		    if (typeof parms[varname] != 'undefined')
 				retval	+= parms[varname] + chunk.substring(varname.length);

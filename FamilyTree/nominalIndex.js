@@ -55,6 +55,7 @@
  *						invoke Person.php instead of legacyIndiv.php	*
  *		2018/09/07		add diagnostic information to noNames report	*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/01/09      resize selection list to match window width     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -68,7 +69,7 @@
 var	timer	= null;
 
 /************************************************************************
- *  function loadcnt														*
+ *  function loadcnt													*
  *																		*
  *  This counts the number of outstanding requests to the server		*
  ************************************************************************/
@@ -79,14 +80,19 @@ var	loadcnt	= 0;
  *																		*
  *  Define the function to be called once the web page is loaded.		*
  ************************************************************************/
-    window.onload	= onLoad;
+addEventHandler(window, 'load',	    onLoad);
+addEventHandler(window, 'resize',	onResize);
 
 /************************************************************************
  *  function onLoad														*
  *																		*
  *  Perform initialization functions once the page is loaded.			*
+ *																		*
+ *  Input:																*
+ *		this		window object										*
+ *		ev          load Event											*
  ************************************************************************/
-function onLoad()
+function onLoad(ev)
 {
     // activate dynamic functionality for elements
     for (var fi = 0; fi < document.forms.length; fi++)
@@ -96,31 +102,34 @@ function onLoad()
 		form.onsubmit	= suppressSubmit;
 
 		for(var j = 0; j < form.elements.length; j++)
-		{
-		    var element	= form.elements[j];
+		{               // loop through all elements of the form
+		    var element	                = form.elements[j];
 
-		    var	name	= element.name;
+		    var	name	                = element.name;
 		    if (name === undefined || name.length == 0)
-				name	= element.id;
+				name	                = element.id;
 
 		    // take action specific to the element based on its name
 		    switch(name)
-		    {		// switch on name
+		    {		    // switch on name
 				case 'Name':
-				{	// name of individual
+				{	    // name of individual
 				    if (args['name'])
 						element.value	= decodeURIComponent(args['name']); 
 				    element.onkeydown	= onKeyDownName;
 				    element.focus();
 				    element.select();
 				    break;
-				}	// name of individual
+				}	    // name of individual
 
 				case 'individ':
-				{	// list of individuals
+				{	    // list of individuals
 				    element.onchange	= onChangeIndivid;
+                    var left            = element.offsetLeft;
+                    var parentWidth     = element.offsetParent.clientWidth;
+                    element.style.width = (parentWidth - left - 20) +'px';
 				    break;
-				}	// list of individuals
+				}	    // list of individuals
 
 				case 'birthmin':
 				case 'birthmax':
@@ -128,62 +137,80 @@ function onLoad()
 				    element.checkfunc	= checkYear;
 				    element.onchange	= update;
 				    break;
-				}	// birth year range
+				}	    // birth year range
 
 				case 'incMarried':
-				{	// whether to include married names
+				{	    // whether to include married names
 				    if (args['incmarried'] && args['incmarried'].length > 0)
 						element.checked	= true;
 				    element.onchange	= update;
 				    break;
-				}	// whether to include married names
+				}	    // whether to include married names
 
 				case 'addUnrelated':
-				{	// add unrelated individual
-				    element.onclick	= addUnrelated;
+				{	    // add unrelated individual
+				    element.onclick	    = addUnrelated;
 				    break;
-				}	// add unrelated individual
+				}	    // add unrelated individual
 
 
 				case 'includeParents':
-				{	// whether to include names of parents
+				{	    // whether to include names of parents
 				    if (args['includeparents'] &&
 						args['includeparents'].length > 0)
 						element.checked	= true;
 				    element.onchange	= update;
 				    break;
-				}	// whether to include names of parents
+				}	    // whether to include names of parents
 
 				case 'includeSpouse':
-				{	// whether to include name of spouse
+				{	    // whether to include name of spouse
 				    if (args['includespouse'] &&
 						args['includespouse'].length > 0)
 						element.checked	= true;
 				    element.onchange	= update;
 				    break;
-				}	// whether to include name of spouse
+				}	    // whether to include name of spouse
 
 				case 'Sex':
-				{	// whether to restrict report by sex
+				{	    // whether to restrict report by sex
 				    if (args['sex'] &&
 						args['sex'].length > 0)
 						element.value	= args['sex'];
 				    element.onchange	= update;
 				    break;
-				}	// whether to restrict report by sex
+				}	    // whether to restrict report by sex
 
 				case 'treeName':
-				{	// selection of tree name to display
+				{	    // selection of tree name to display
 				    element.onchange	= changeTree;
 				    break;
-				}	// selection of tree name to display
-		    }		// switch on name
-		}		// loop through all form elements
-    }			// loop through all forms
+				}	    // selection of tree name to display
+		    }		    // switch on element name
+		}		        // loop through all form elements
+    }			        // loop through all forms
 
     // invoke script to obtain initial list of names for selection list
     update();
 }		// function onLoad
+
+/************************************************************************
+ *  function onResize													*
+ *																		*
+ *  Take action when window changes size.                               *
+ *																		*
+ *  Input:																*
+ *		this		window object										*
+ *		ev          resize Event										*
+ ************************************************************************/
+function onResize(ev)
+{
+    var form            = document.nameForm;
+    var element         = form.individ;
+    var left            = element.offsetLeft;
+    var parentWidth     = element.offsetParent.clientWidth;
+    element.style.width = (parentWidth - left - 20) +'px';
+}       // function onResize
 
 /************************************************************************
  *  function suppressSubmit												*

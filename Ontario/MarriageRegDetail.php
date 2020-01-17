@@ -402,27 +402,14 @@ foreach($_GET as $key => $value)
     }		    // process specific named parameters
 }			    // loop through all input parameters
 if ($debug)
-    $warn       .= $parmsText . "</table>\n";
+    $warn           .= $parmsText . "</table>\n";
 
 // create Template
-$template		= new FtTemplate("MarriageRegDetail$action$lang.html");
-$trtemplate     = $template->getTranslate();
+$template		    = new FtTemplate("MarriageRegDetail$action$lang.html");
 
 // internationalization support
-$monthsTag		    = $trtemplate->getElementById('Months');
-if ($monthsTag)
-{
-    $months	        = array();
-    foreach($monthsTag->childNodes() as $span)
-        $months[]	= trim($span->innerHTML());
-}
-$lmonthsTag		    = $trtemplate->getElementById('LMonths');
-if ($lmonthsTag)
-{
-    $lmonths		= array();
-    foreach($lmonthsTag->childNodes() as $span)
-        $lmonths[]	= trim($span->innerHTML());
-}
+$translate          = $template->getTranslate();
+$monthNames		    = $translate['Months'];
 
 // issue error messages
 if ($regYear == '' && $volume == '')

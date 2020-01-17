@@ -21,7 +21,7 @@
 window.onload	= indexLoaded;
 
 /************************************************************************
- *  indexLoaded															*
+ *  function indexLoaded												*
  *																		*
  *  This method is called when the document has been loaded.			*
  *																		*
@@ -40,10 +40,10 @@ function indexLoaded()
 		    cell.onclick	= tabSel;	// activate an event method
 		}		// for each data cell in the row
     }
-}		// indexLoaded
+}		// function indexLoaded
 
 /************************************************************************
- *  tabSel																*
+ *  function tabSel														*
  *																		*
  *  This method is called when the user clicks on a tab.				*
  *																		*
@@ -81,4 +81,4 @@ function tabSel(e)
 		    break;
         }           // link
     }	        	// loop through child tags
-}		// tabSel
+}		// function tabSel

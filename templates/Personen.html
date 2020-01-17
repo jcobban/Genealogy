@@ -12,61 +12,63 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-	<a href="/index.html">Home</a>:
-    <a href="/genealogy.php?lang=$LANG">
+    <div id="breadcrumbs" class="hidden">
+	  <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
 			Genealogy
-    </a>:
-    <a href="/FamilyTree/Services.php?lang=$LANG">
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
 			Services
-    </a>:
-    <a href="/genCountry.php?cc=CA&lang=$LANG">
+      </a>:
+      <a href="/genCountry.php?cc=CA&lang=$LANG">
 			Canada
-    </a>:
-    <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+      </a>:
+      <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
 			Nominal Index
-    </a>:
-    <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+      </a>:
+      <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
 			Surnames Starting with '$PREFIX'
-    </a>:
-    <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+      </a>:
+      <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
 			Surname '$SURNAME'
-    </a>:
-  </div>
-  <div class="body">
-    <h1>
-      <span class="right">
-			<a href="/FamilyTree/PersonHelpen.html" target="help">? Help</a>
-      </span>
+      </a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+		  <a href="/FamilyTree/PersonHelpen.html" target="help">? Help</a>
+        </span>
 			$TITLE
 			<span id="inTree">: in tree "$treeName"</span>
-      <div style="clear: both;"></div>
-    </h1>
-    $TRACE
-    $MSG
-    <div id="display">
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <div id="display">
 			$BODY
-    </div> <!-- id="display" -->
-    <p id='wishtosee'>
-      If you wish to see the private information on this individual
-      <span id='notloggedon'>
-			<a href='/Register.php' target='_blank'>
-			register as a new user</a> or
-			<a href='/Signon.php' target='_blank'>
-			sign on as an already registered user</a>.
-      </span>
-      <span id='contactOwners'>
-			<a href='/contactAuthor.php?idir=$IDIR&tableName=tblIR&subject=%5BFamily%20Tree%5D%20Please%20Grant%20Access%20to%20$TITLE%3A%20IDIR%3D$IDIR' target='_blank'>
-			contact the users who already have access
+      </div> <!-- id="display" -->
+      <p id='wishtosee'>
+        If you wish to see the private information on this individual
+        <span id='notloggedon'>
+			  <a href='/Register.php' target='_blank'>
+			  register as a new user</a> or
+			  <a href='/Signon.php' target='_blank'>
+			  sign on as an already registered user</a>.
+        </span>
+        <span id='contactOwners'>
+		    <a href='/contactAuthor.php?idir=$IDIR&tableName=tblIR&subject=%5BFamily%20Tree%5D%20Please%20Grant%20Access%20to%20$TITLE%3A%20IDIR%3D$IDIR'
+                target='_blank'>
+			  contact the users who already have access
 			</a>
 			to request that they grant you access.
-      </span>
-    </p>
-    <form name="actionsForm" id="actionsForm" action="nothing.php" method="post"
+        </span>
+      </p>
+      <form name="actionsForm" id="actionsForm"
+            action="nothing.php" method="post"
 			enctype='multipart/form-data'>
-      <div class="row" id="buttonsRow">
+        <div class="row" id="buttonsRow">
 			<button type="button" id="showDescTree" accessKey="D">
-				<u>D</u>escendant Tree
+				  <u>D</u>escendant Tree
 			</button>
 			&nbsp;
 			<button type="button" id="showAncTree" accessKey="A">
@@ -87,246 +89,246 @@
 			&nbsp;
 			<a href='/FamilyTree/getPersonSvg.php?idir=$IDIR&lang=$LANG'
 				id="showGraphTree" target="picture" class="button">
-			    <img src='/logobutton.gif' height='25' width='81'
+			  <img src='/logobutton.gif' height='25' width='81'
 					alt='James Cobban Logo'>
 			</a>
-      </div>
-      <div id="searchParmsHidden" class="hidden">
+        </div>
+        <div id="searchParmsHidden" class="hidden">
 			<input type="hidden" name="idir" id="idir"
-				value="$IDIR">
+					value="$IDIR">
 			<input type="hidden" name="givenname" id="givenname"
-				value="$GIVENNAME">
+					value="$GIVENNAME">
 			<input type="hidden" name="surname" id="surname"
-				value="$SURNAME">
+					value="$SURNAME">
 			<input type="hidden" name="treeName" id="treeName"
-				value="$TREENAME">
+					value="$TREENAME">
 			<input type="hidden" name="birthDate" id="birthDate"
-				value="$BIRTHDATE">
+					value="$BIRTHDATE">
 			<input type="hidden" name="birthPlace" id="birthPlace"
-				value="$BIRTHPLACE">
+					value="$BIRTHPLACE">
 			<input type="hidden" name="deathDate" id="deathDate"
-				value="$DEATHDATE">
+					value="$DEATHDATE">
 			<input type="hidden" name="deathPlace" id="deathPlace"
-				value="$DEATHPLACE">
+					value="$DEATHPLACE">
 			<input type="hidden" name="fatherGivenName" id="fatherGivenName"
-				value="$FATHERGIVENNAME">
+					value="$FATHERGIVENNAME">
 			<input type="hidden" name="fatherSurname" id="fatherSurname"
-				value="$FATHERSURNAME">
+					value="$FATHERSURNAME">
 			<input type="hidden" name="motherGivenName" id="motherGivenName"
-				value="$MOTHERGIVENNAME">
+					value="$MOTHERGIVENNAME">
 			<input type="hidden" name="motherSurname" id="motherSurname"
-				value="$MOTHERSURNAME">
-      </div>
-    </form>
-  <hr>	<!-- start of blog section of page -->
-    <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
+					value="$MOTHERSURNAME">
+        </div>
+      </form>
+    <hr>	<!-- start of blog section of page -->
+      <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
 			enctype='multipart/form-data'>
-      <div id="blog$blid">
-			<p class='label'>
-			  At $datetime user '$username' wrote:
-			</p>
-			<p>
-			$text
-			</p>
-			<div id="deleteButtons$showButtons"> <!-- $username == $userid -->
-			  <p>
-			    <button type="button" id="blEdit$blid">
-				Edit Message
-			    </button>
-			    <button type="button" id="blDel$blid">
-				Delete Message
-			    </button>
-			  </p>
-			</div> <!-- $username == $userid -->
-      </div> <!-- id="blog$blid" -->
-    <input type="hidden" name="userid" id="userid"
-			value="$USERID">
-    <input type="hidden" name="idir" id="blogidir"
-			value="$IDIR">
-  <p>
-    <textarea name="message" id="message" placeholder="[enter message]"
-			rows='5' cols='100'></textarea>
-  </p>
-  <div class="row" id="blogEmailRow">
-    <label class='column1' for='emailAddress'>
-			Your E-Mail Address:
-    </label>
-    <input type="text" class="white leftnc"
-				id="emailAddress" name="emailAddress"
-				size="80" value="$EMAIL">
-  </div>
-  <div class="row" id="blogPostRow">
-    <button type="button" id="PostBlog" accessKey="B">
-			Post <u>B</u>log
-    </button>
-  </div>
-</form> <!-- name="blogform" id="blogform" -->
-<hr class='footnotes'/>
-<p class='label'>Footnotes:</p>
-<div id='footnote$key'>
-    <div class="column1" id="#fn$key">
-			$key
+        <div id="blog$blid">
+		  <p class='label'>
+			    At $datetime user '$username' wrote:
+		  </p>
+		  <p>
+			  $text
+		  </p>
+		  <div id="deleteButtons$showButtons"> <!-- $username == $userid -->
+		    <p>
+		      <button type="button" id="blEdit$blid">
+				  Edit Message
+		      </button>
+		      <button type="button" id="blDel$blid">
+				  Delete Message
+		      </button>
+		    </p>
+		  </div> <!-- $username == $userid -->
+        </div> <!-- id="blog$blid" -->
+        <input type="hidden" name="userid" id="userid"
+				value="$USERID">
+        <input type="hidden" name="idir" id="blogidir"
+				value="$IDIR">
+        <p>
+          <textarea name="message" id="message" placeholder="[enter message]"
+				rows='5' cols='100'></textarea>
+        </p>
+        <div class="row" id="blogEmailRow">
+          <label class='column1' for='emailAddress'>
+			  Your E-Mail Address:
+          </label>
+          <input type="text" class="white leftnc"
+				  id="emailAddress" name="emailAddress"
+				  size="80" value="$EMAIL">
+        </div>
+        <div class="row" id="blogPostRow">
+          <button type="button" id="PostBlog" accessKey="B">
+			  Post <u>B</u>log
+          </button>
+        </div>
+      </form> <!-- name="blogform" id="blogform" -->
+      <hr class='footnotes'/>
+      <p class='label'>Footnotes:</p>
+      <div id='footnote$key'>
+        <div class="column1" id="#fn$key">
+			  $key
+        </div>
+			  $text
+        <div style='clear: both;'></div>
+      </div> <!-- class='footnote$key' -->
+    </div> <!-- class="body" -->
+    <!-- division within which to display a Google map -->
+    <div class="map" id="mapDiv">
     </div>
-			$text
-    <div style='clear: both;'></div>
-</div> <!-- class='footnote$key' -->
-  </div> <!-- class="body" -->
-  <!-- division within which to display a Google map -->
-  <div class="map" id="mapDiv">
-  </div>
-  <!-- a division containing a button to hide the map division -->
-  <div class="balloon" id="hideMapDiv">
-    <center>
-      <button id="hideMap" class="button">Hide Map</button>
-    </center>
-  </div>
+    <!-- a division containing a button to hide the map division -->
+    <div class="balloon" id="hideMapDiv">
+      <center>
+        <button id="hideMap" class="button">Hide Map</button>
+      </center>
+    </div>
 <!--*********************************************************************
  *  generate popups														*
  **********************************************************************-->
-  <div id="Individ$idir" class="balloon">
-    <b>$name</b>
-    <p>
-      <span>born $birthd
-        <span>at $birthloc</span>
-      </span>
-      <span>died $deathd
-        <span>$description at $deathloc</span>
-      </span>
-    </p>
-    <p id="families$families">Marriage of $name. </p>
-    <p id="parents$parents">Child of $name</p>
-  </div> 
-
-  <div id="Source$idsr" class="balloon">
-    <b>Source: $title</b>
-    <p>Author: $author</p>
-    <p>Type: $typetext</p>
-    <p>Note: $note</p>
-    <p>
-      <a href='$callnumurl' target='_blank'>$name</a>
-    </p>
-  </div> 
-
-  <div id="showLocDiv$idlr" class="balloon">
-    <b>$name</b>
-    <p>
-    $notes
-    </p>
-    <form name='locForm$idlr'>
-			<input type="hidden" name="searchName" value="$searchName">
-			<input type="hidden" name="county" value="$county">
-			<input type="hidden" name="Location" value="$location">
-			<input type="hidden" name="Latitude" value="$latitude">
-			<input type="hidden" name="Longitude" value="$longitude">
-			<input type="hidden" name="Zoom" value="$zoom">
-			<input type="hidden" name="Boundary" value="$boundary">
-			<button type="button" id="showMap$idlr" class="button">
-			    Show Map
-			</button>
-			&nbsp;
-			<button type="button" id="editLoc$idlr" class="button">
-			    Edit Location
-			</button>
-    </form>
-  </div>
-
-  <div id="showTplDiv$idtr" class="balloon">
-    <b>Temple: $name</b>
-    <p>
-    $notes
-    </p>
-    <form name='tplForm$idtr'>
-			<input type="hidden" name="Location" value="$temple">
-			<input type="hidden" name="Latitude" value="$latitude">
-			<input type="hidden" name="Longitude" value="$longitude">
-			<button type="button" id="tshowMap$idtr" class="button">
-			    Show Map
-			</button>
-    </form>
-  </div> <!-- end of id=showTplDiv$idtr -->
-
-  <div id="showAdrDiv$idar" class="balloon">
-    <b>Address: $name</b>
-    <p>
-    $notes
-    </p>
-    <form name='adrForm$idar'>
-			<input type="hidden" name="Location" value="$address">
-			<input type="hidden" name="Latitude" value="$latitude">
-			<input type="hidden" name="Longitude" value="$longitude">
-			<button type="button" id="ashowMap$idar" class="button">
-			    Show Map
-			</button>
-    </form>
-  </div> <!-- end of id=showAdrDiv$idar -->
-$DEATHCAUSES
-
-  <!-- the remaining portion of the page is divisions containing popup help -->
-  <div class="balloon" id="HelpshowDescTree">
-    Click on this button to see a summary tree of the descendants of this
-    individual.
-    The application also supports the keyboard shortcut Alt-D.
-  </div>
-  <div class="balloon" id="HelpshowAncTree">
-    Click on this button to see a summary tree of the ancestors of this individual.
-    The application also supports the keyboard shortcut Alt-A.
-  </div>
-  <div class="balloon" id="HelprelationshipCalc">
-    Click on this button to display a dialog to calculate the degree of
-    relationship between the current individual and another individual in the
-    family tree.
-    The application also supports the keyboard shortcut Alt-R.
-  </div>
-  <div class="balloon" id="HelpancestrySearch">
-    Click on this button to split the screen horizontally between the display
-    of the individual page and the results of a search of the Ancestry.ca
-    database for document records with a similar name, birth date, birth place,
-    and parents names.
-    The application also supports the keyboard shortcut Alt-S.
-  </div>
-  <div class="balloon" id="HelpshowGraphTree">
-    Click on this button to see a graphical family tree centered on this
-    individual.
-  </div>
-  <div class="balloon" id="Helpedit">
-    Click on this button to edit the information recorded for this individual.
-    The application also supports the keyboard shortcut Alt-E.
-  </div>
-  <div class="balloon" id="Helpmessage">
-    This field is used to edit a message to be posted as a blog entry against
-    this individual.
-  </div>
-  <div class="balloon" id="HelpemailAddress">
-    If you are not signed in as a registered contributor to the web-site you
-    are required to supply an e-mail address to identify the source of any
-    blog messages you post.
-  </div>
-  <div class="balloon" id="HelpPostBlog">
-    Click on this button to post the message you have typed as a blog entry
-    against this individual.
-    The application also supports the keyboard shortcut Alt-B.
-  </div>
-  <div class="balloon" id="HelpblEdit">
-    Click on this button to edit the text of the message immediately above
-    the button, which is a message that you posted.
-  </div>
-  <div class="balloon" id="HelpblDel">
-    Click on this button to delete the message immediately above
-    the button, which is a message that you posted.
-  </div>
-  <div class="balloon" id="Helpreqgrant">
-    Click on this button to request permission to update the current individual,
-    and the current individual's ancestors and descendants.
-  </div>
-  <div class="balloon" id="HelpshowMap">
-    Click on this button to display a popup map of the location.
-  </div>
-  <div class="balloon" id="HelpeditLoc">
-    Click on this button to open a dialog to edit the information recorded about
-    a location.  This can include changing the name of the location,
-    although this will not be y reflected in the description
-    of this individual until the page is refreshed.
-  </div>
+    <div id="Individ$idir" class="balloon">
+      <b>$name</b>
+      <p>
+        <span>born $birthd
+          <span>at $birthloc</span>
+        </span>
+        <span>died $deathd
+          <span>$description at $deathloc</span>
+        </span>
+      </p>
+      <p id="families$families">Marriage of $name. </p>
+      <p id="parents$parents">Child of $name</p>
+    </div> 
+  
+    <div id="Source$idsr" class="balloon">
+      <b>Source: $title</b>
+      <p>Author: $author</p>
+      <p>Type: $typetext</p>
+      <p>Note: $note</p>
+      <p>
+        <a href='$callnumurl' target='_blank'>$name</a>
+      </p>
+    </div> 
+  
+    <div id="showLocDiv$idlr" class="balloon">
+      <b>$name</b>
+      <p>
+      $notes
+      </p>
+      <form name='locForm$idlr'>
+			  <input type="hidden" name="searchName" value="$searchName">
+			  <input type="hidden" name="county" value="$county">
+			  <input type="hidden" name="Location" value="$location">
+			  <input type="hidden" name="Latitude" value="$latitude">
+			  <input type="hidden" name="Longitude" value="$longitude">
+			  <input type="hidden" name="Zoom" value="$zoom">
+			  <input type="hidden" name="Boundary" value="$boundary">
+			  <button type="button" id="showMap$idlr" class="button">
+			      Show Map
+			  </button>
+			  &nbsp;
+			  <button type="button" id="editLoc$idlr" class="button">
+			      Edit Location
+			  </button>
+      </form>
+    </div>
+  
+    <div id="showTplDiv$idtr" class="balloon">
+      <b>Temple: $name</b>
+      <p>
+      $notes
+      </p>
+      <form name='tplForm$idtr'>
+			  <input type="hidden" name="Location" value="$temple">
+			  <input type="hidden" name="Latitude" value="$latitude">
+			  <input type="hidden" name="Longitude" value="$longitude">
+			  <button type="button" id="tshowMap$idtr" class="button">
+			      Show Map
+			  </button>
+      </form>
+    </div> <!-- end of id=showTplDiv$idtr -->
+  
+    <div id="showAdrDiv$idar" class="balloon">
+      <b>Address: $name</b>
+      <p>
+      $notes
+      </p>
+      <form name='adrForm$idar'>
+			  <input type="hidden" name="Location" value="$address">
+			  <input type="hidden" name="Latitude" value="$latitude">
+			  <input type="hidden" name="Longitude" value="$longitude">
+			  <button type="button" id="ashowMap$idar" class="button">
+			      Show Map
+			  </button>
+      </form>
+    </div> <!-- end of id=showAdrDiv$idar -->
+  $DEATHCAUSES
+  
+    <!-- the remaining portion of the page is divisions containing popup help -->
+    <div class="balloon" id="HelpshowDescTree">
+      Click on this button to see a summary tree of the descendants of this
+      individual.
+      The application also supports the keyboard shortcut Alt-D.
+    </div>
+    <div class="balloon" id="HelpshowAncTree">
+      Click on this button to see a summary tree of the ancestors of this individual.
+      The application also supports the keyboard shortcut Alt-A.
+    </div>
+    <div class="balloon" id="HelprelationshipCalc">
+      Click on this button to display a dialog to calculate the degree of
+      relationship between the current individual and another individual in the
+      family tree.
+      The application also supports the keyboard shortcut Alt-R.
+    </div>
+    <div class="balloon" id="HelpancestrySearch">
+      Click on this button to split the screen horizontally between the display
+      of the individual page and the results of a search of the Ancestry.ca
+      database for document records with a similar name, birth date, birth place,
+      and parents names.
+      The application also supports the keyboard shortcut Alt-S.
+    </div>
+    <div class="balloon" id="HelpshowGraphTree">
+      Click on this button to see a graphical family tree centered on this
+      individual.
+    </div>
+    <div class="balloon" id="Helpedit">
+      Click on this button to edit the information recorded for this individual.
+      The application also supports the keyboard shortcut Alt-E.
+    </div>
+    <div class="balloon" id="Helpmessage">
+      This field is used to edit a message to be posted as a blog entry against
+      this individual.
+    </div>
+    <div class="balloon" id="HelpemailAddress">
+      If you are not signed in as a registered contributor to the web-site you
+      are required to supply an e-mail address to identify the source of any
+      blog messages you post.
+    </div>
+    <div class="balloon" id="HelpPostBlog">
+      Click on this button to post the message you have typed as a blog entry
+      against this individual.
+      The application also supports the keyboard shortcut Alt-B.
+    </div>
+    <div class="balloon" id="HelpblEdit">
+      Click on this button to edit the text of the message immediately above
+      the button, which is a message that you posted.
+    </div>
+    <div class="balloon" id="HelpblDel">
+      Click on this button to delete the message immediately above
+      the button, which is a message that you posted.
+    </div>
+    <div class="balloon" id="Helpreqgrant">
+      Click on this button to request permission to update the current individual,
+      and the current individual's ancestors and descendants.
+    </div>
+    <div class="balloon" id="HelpshowMap">
+      Click on this button to display a popup map of the location.
+    </div>
+    <div class="balloon" id="HelpeditLoc">
+      Click on this button to open a dialog to edit the information recorded about
+      a location.  This can include changing the name of the location,
+      although this will not be y reflected in the description
+      of this individual until the page is refreshed.
+    </div>
     <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
     </script>
     <script src="/jscripts/js20/http.js" type="application/javascript">

@@ -86,6 +86,7 @@ use \Iterator;
  *		                return count from save                          *
  *		2019/12/13      remove M_ prefix from field names               *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/01/16      OriginalPage changed to VARCHAR                 *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -513,14 +514,14 @@ class Marriage extends Record
                             $row                        = $result;
                             $row['regdomain']		    = $domain;
                             $regCounty			        = $row['regcounty'];
-                            $dbrow['regcounty']	    = $regCounty;
+                            $dbrow['regcounty']	        = $regCounty;
                             $regTownship		        = $row['regtownship'];
                             $dbrow['regtownship']	    = $regTownship;
-                            $dbrow['msvol']		    = $row['msvol'];
-                            $dbrow['registrar']	    = $row['registrar'];
-                            $dbrow['image']		    = $row['image'];
+                            $dbrow['msvol']		        = $row['msvol'];
+                            $dbrow['registrar']	        = $row['registrar'];
+                            $dbrow['image']		        = $row['image'];
                             $dbrow['originalvolume']	= $row['originalvolume'];
-                            $dbrow['originalpage']	= $row['originalpage'];
+                            $dbrow['originalpage']	    = $row['originalpage'];
                             $dbrow['originalitem']	= $row['originalitem'] + 1;
                             if (strlen($row['regdate']) > 0)
                                 $dbrow['regdate']	    = $row['regdate'];
@@ -789,6 +790,9 @@ class Marriage extends Record
      ********************************************************************/
     function set($field, $value)
     {
+        global  $debug;
+        global  $warn;
+
         $fieldLc	= strtolower($field);
         if (array_key_exists($fieldLc, self::$translate))
             $fieldLc	= self::$translate[$fieldLc];
@@ -1009,9 +1013,8 @@ class Marriage extends Record
                     }		// ChangeDate
 
                     case 'idir':
-                    case 'originalpage':
                     case 'originalitem':
-                    {		// most fields
+                    {		// integer fields
                         $fldnames		.= $comma . "`$fld`";
                         $values			.= $comma . ':' . $fld;
                         if (is_int($value) || ctype_digit($value))
@@ -1020,7 +1023,7 @@ class Marriage extends Record
                             $sqlParms[$fld]= null;
                         $comma			= ', ';
                         break;
-                    }		// most fields
+                    }		// integer fields
 
                     case 'calcdate':
                     {
@@ -1118,27 +1121,22 @@ class Marriage extends Record
                     }		// ChangedBy, ChangeDate
 
                     case 'idir':
-                    case 'originalpage':
                     case 'originalitem':
-                    {		// most fields
-                        $set			.= $comma . "`$fld`=:$fld";
+                    {		// integer fields
+                        $set			    .= $comma . "`$fld`=:$fld";
                         if (is_int($value) || ctype_digit($value))
-                        {
                             $sqlParms[$fld]	= $value;
-                        }
                         else
-                        {
                             $sqlParms[$fld]	= null;
-                        }
-                        $comma	= ', ';
+                        $comma	            = ', ';
                         break;
-                    }		// most fields
+                    }		// integer fields
 
                     default:
                     {		// most fields
-                        $set			.= $comma . "`$fld`=:$fld";
+                        $set			    .= $comma . "`$fld`=:$fld";
                         $sqlParms[$fld]		= $value;
-                        $comma			= ', ';
+                        $comma			    = ', ';
                         break;
                     }		// most fields
                 }		// act on specific fields

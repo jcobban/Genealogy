@@ -71,6 +71,8 @@ if (count($_POST) > 0)
                       "<th class='colhead'>value</th></tr>\n";
 	foreach($_POST as $key => $value)
 	{			// loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
 		switch(strtolower($key))
 		{		// act on specific keys
 		    case 'regyear':

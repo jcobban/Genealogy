@@ -120,6 +120,8 @@
  *                      to make menu look more like an application      *
  *      2019/07/25      add grid layouts                                *
  *      2019/11/25      add support for scrollable table body           *
+ *      2020/01/09      add style for <main> instead of setting it from *
+ *                      JS                                              *
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
@@ -251,6 +253,13 @@
                 padding:            0px;
                 font-family:        sans-serif;
                 font-size:          16px;
+                }
+
+   /*********************************************************************
+    *   Styles for displaying <main> tag                                *
+    *********************************************************************/
+    main      { overflow-x:         auto;
+                overflow-y:         auto;
                 }
 
    /*********************************************************************
@@ -1007,6 +1016,16 @@
                 padding:            0px;
                 border-width:              0px 0px medium 0px;
                 border-bottom:      medium solid black;
+                }
+    th.total {  background-color:   #F4E8B0;
+                text-align:         center;
+                border-right:       thin solid black;
+                border-bottom:      thin solid black;
+                border-top:         2px double black;
+                padding:            2px 2px 2px 2px;
+                empty-cells:		show;
+                font-family:        sans-serif;
+                font-weight:        bold;
                 }
 
    /*********************************************************************

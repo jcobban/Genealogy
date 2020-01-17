@@ -32,8 +32,9 @@ use \Exception;
  *  History:															*
  *		2019/12/20      created                                         *
  *		2019/12/23      add column Row                                  *
+ *		2020/01/13      fix change adname column                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -163,7 +164,7 @@ class Advertiser extends Record
 							$adname		        = $value;
 					        $where		        .= $and . "`AdName`=:adname";
 					        $sqlParms['adname']	= $adname;
-					        $and		        = ' AND ';
+					        break 2;
 	                    }
 					    else
 					    {
@@ -178,9 +179,9 @@ class Advertiser extends Record
 					{
 					    if (is_int($value) || ctype_digit($value))
 	                    {
-					        $where		        .= $and . "`Row`=:row";
+                            $where		        .= $and . "`Row`>=:row";
 					        $sqlParms['row']	= $value;
-					        $and		        = ' AND ';
+					        break 2;
 	                    }
 					    else
                         {
@@ -192,17 +193,12 @@ class Advertiser extends Record
 					    break;
 					}
 
-                    default:
-                    {
-                        $this->msg	        .= "Advertiser::__construct: " .
-                                "unexpected '$fieldname'. ";
-                    }
 			    }			        // act on specific field names
 			}		        	    // loop through search parameters
 	
 			if (strlen($where) > 0)
 			{	// obtain the first instance that matches search parameters
-			    $query		            = "SELECT * FROM Advertisers $where";
+			    $query		= "SELECT * FROM Advertisers $where LIMIT 1";
 	
 			    // query the database
 			    $stmt		            = $connection->prepare($query);
@@ -220,7 +216,43 @@ class Advertiser extends Record
 					    $dbrow		    = $row;
 					    $needInsert		= false;
 					}		        // found advertising statistic record
-					else
+                    else
+                    if (isset($sqlParms['row']))
+                    {               // wrap around to first
+			            $query	= "SELECT * FROM Advertisers WHERE Row>0 LIMIT 1";
+					    $stmt		    = $connection->prepare($query);
+						$queryText	    = $query;
+		                $this->lastSqlCmd= $queryText;
+					    if ($stmt->execute($sqlParms))
+					    {			// successful query
+							$row		= $stmt->fetch(PDO::FETCH_ASSOC);
+							if ($debug)
+							    $warn	.= "<p>Advertiser: " . __LINE__ .
+												      "'$queryText'</p>\n";
+			
+							if (is_array($row))
+							{		// found advertising statistic record
+        					    $dbrow		= $row;
+		        			    $needInsert	= false;
+				        	}		// found advertising statistic record
+		                    else
+							{		// create new record
+							    $dbrow		        = Advertiser::$initRow;
+							    foreach($parms as $fieldname => $value)
+							    {	// apply updates
+									$dbrow[strtolower($fieldname)]	= $value;
+							    }	// apply updates
+							    $needInsert	= true;
+							}		// create new record
+					    }			// successful query
+					    else
+					    {			// query failed
+							$this->msg  .= "Advertiser::__construct: '$queryText', " .
+								print_r($stmt->errorInfo(), true) .". ";
+						    $dbrow		        = Advertiser::$initRow;
+					    }		    // error performing query
+                    }               // wrap around to first
+                    else
 					{		        // create new record
 					    $dbrow		        = Advertiser::$initRow;
 					    foreach($parms as $fieldname => $value)
@@ -351,6 +383,7 @@ class Advertiser extends Record
     {
 		global	$debug;
         global	$warn;
+        global	$msg;
 		global	$connection;
 
         $month              = intval($month);
@@ -362,7 +395,27 @@ class Advertiser extends Record
             $adname		    = $this->former['adname'];
         else
             $adname         = $this->row['adname'];
-        $update		        = "UPDATE Advertisers " .
+        if ($adname == '' && $month == '02')
+        {
+            $getrow		= "SET @maxrow =(SELECT COALESCE(MAX(Row), 0) + 1 FROM Advertisers)";
+            if ($connection->query($getrow))
+            {
+                if ($debug)
+                    $warn   .= "<p>$getrow</p>\n";
+            }
+            else
+            {
+                $errorInfo	=  print_r($connection->errorInfo(),true);
+                $warn	.= "<p>Advertiser::save: " . __LINE__ .
+                                " command='$getrow'," .
+                                " errorInfo=$errorInfo<p>\n";
+            }
+            $update		    = "UPDATE Advertisers " .
+                              "SET Count$month=MOD(Count$month+1,@maxrow) " .
+                              "WHERE AdName=:prime";
+        }
+        else
+            $update		    = "UPDATE Advertisers " .
                                         "SET Count$month=Count$month+1 " .
 								        "WHERE AdName=:prime";
 		$parms['prime']	    = $adname;
@@ -376,8 +429,13 @@ class Advertiser extends Record
 		    if ($debug)
 				$warn	    .= "<p>$updateText</p>\n";
 
-		    // log the update
-            $this->log($update, $parms);
+            // log the update
+            try {
+                $this->log($update, $parms);
+            } catch (Exception $e) {
+                $msg    .= "<p>Advertiser::increment: failed for adname='$adname'</p>\n";
+                print $this->dump('increment');
+            }
 		}		        // successful update
 		else
 		{		// error updating record
@@ -482,13 +540,23 @@ class Advertiser extends Record
             $this->changed		= array();	// reset
 
             // construct the SQL INSERT command
-            if (strlen($adname) == 0)
-                $insert		= 'INSERT INTO Advertisers ' .
-                                "($fldnames) " .
-                                "VALUES($values)";
-            else
-                $insert		= "SET @nextrow =(SELECT COALESCE(MAX(Row), 0) + 1 FROM Advertisers;" .
-                                'INSERT INTO Advertisers ' .
+            if (strlen($adname) > 0)
+            {
+                $getrow		= "SET @nextrow =(SELECT COALESCE(MAX(Row), 0) + 1 FROM Advertisers)";
+                if ($connection->query($getrow))
+                {
+                    if ($debug)
+                        $warn   .= "<p>$getrow</p>\n";
+                }
+                else
+                {
+                    $errorInfo	=  print_r($connection->errorInfo(),true);
+                    $warn	.= "<p>Advertiser::save: " . __LINE__ .
+                                " command='$getrow'," .
+                                " errorInfo=$errorInfo<p>\n";
+                }
+            }
+            $insert		= 'INSERT INTO Advertisers ' .
                                 "($fldnames) " .
                                 "VALUES($values)";
 
@@ -592,10 +660,13 @@ class Advertiser extends Record
 				// using former to get the key of the record permits
 				// changing the value of the primary key as long as it
                 // is not changed to an already defined value
-                $adname	            = $this->row['adname'];
+                if (isset($this->former))
+                    $prime          = $this->former['adname'];
+                else
+                    $prime	        = $this->row['adname'];
 				$update		        = "UPDATE Advertisers SET $set" .
-								          " WHERE AdName=:adname";
-				$parms['adname']	= $adname;
+								          " WHERE AdName=:prime";
+				$parms['prime']	    = $prime;
 
 				$stmt		        = $connection->prepare($update);
 				$updateText	        = debugPrepQuery($update, $parms);

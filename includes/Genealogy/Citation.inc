@@ -220,8 +220,10 @@ use Templating\Template;
  *		2019/11/02      hide extra HTML inserted by new version of      *
  *		                tinyMCE                                         *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/01/10      toHTML did not generate unique id values and    *
+ *		                and left many empty lines in the output         *
  *																	    *
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/	
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Source.inc';
@@ -2027,6 +2029,7 @@ class Citation extends RecordPic
                 'showText'			    => null);
 
 		// extract fields from citation
+		$idsx				= $this->row['idsx'];
 		$idsr				= $this->row['idsr'];
 		$source				= $this->getSource();   // instance of Source
 		$title				= trim($source->getTitle());
@@ -2043,6 +2046,7 @@ class Citation extends RecordPic
             $includeSub     = "CitationRefen.html";
         }
         $template	    	= new Template($tempBase . $includeSub);
+        $template->set('IDSX',      $idsx);
         $template->set('IDSR',      $idsr);
         $template->set('LANG',      $lang);
         $template->set('TITLE',     $title);
@@ -2442,14 +2446,15 @@ class Citation extends RecordPic
 
         foreach($updates as $id => $value)
         {
-            $tag                = $template[$id];
+            $tag                = $template[$id . '$IDSX'];
             if ($tag)
                 $tag->update($value);
             else
                 $warn            .= "<p>Citation::toHtml: " . __LINE__ .
-                            " could not resolve tag with id='$id'</p>\n";
+                            " could not resolve tag with id='$id\$IDSX'</p>\n";
         }
         $html           = $template->compile();
+        $html           = preg_replace('/^[ \t]*[\r\n]+/m', '', $html);
         return $html;
     }		// function Citation::toHtml
 

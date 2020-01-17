@@ -15,8 +15,12 @@ use \Exception;
  *																		*
  *  History:															*
  *		2019/12/20		created											*
+ *		2020/01/12      add totals line to display                      *
+ *		                add ability to add a new Advertiser             *
+ *		                add ability to delete an Advertiser             *
+ *		                complete changing name and e-mail address       *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Advertiser.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -28,9 +32,10 @@ $lang		    			= 'en';
 $offset			    		= 0;
 $limit			    		= 20;
 $id				    		= '';
-$adname             		= '^.+';    // at least one character
+$pattern           		    = '^.+';    // at least one character
 $mainParms					= array();
 $administrator      		= canUser('all');
+$duplicates                 = array();
 
 if (isset($_GET) && count($_GET) > 0)
 {			        // invoked by method=get
@@ -45,7 +50,12 @@ if (isset($_GET) && count($_GET) > 0)
 	    $fieldLc	= strtolower($key);
 	    switch($fieldLc)
 	    {		    // act on specific parameter
-			case 'name':
+			case 'pattern':
+            {		// lang
+				$pattern            = $value;
+			    break;
+			}		// lang
+
 			case 'adname':
             {		// lang
 				$adname             = $value;
@@ -104,12 +114,13 @@ if (isset($_POST) && count($_POST) > 0)
                       "<table class='summary'>\n" .
                       "<tr><th class='colhead'>key</th>" .
                           "<th class='colhead'>value</th></tr>\n";
+    $advertiser                     = null;
 	foreach($_POST as $key => $value)
 	{		                // loop through parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
         $fieldLc	                = strtolower($key);
-        if (preg_match('/^(\w\+)(\d*)$/', $fieldLc, $matches))
+        if (preg_match('/^([a-zA-Z]+)(\d*)$/', $fieldLc, $matches))
         {
             $col                    = $matches[1];
             $row                    = $matches[2];
@@ -119,42 +130,73 @@ if (isset($_POST) && count($_POST) > 0)
             $col                    = $fieldLc;
             $row                    = '';
         }
+
 	    switch($col)
 	    {		            // act on specific parameter
-			case 'name':
+			case 'pattern':
+            {		// lang
+				$pattern            = $value;
+			    break;
+			}		// lang
+
 			case 'adname':
             {		        // advertiser name
-				$adname             = $value;
+                if ($administrator && $advertiser)
+                {
+                    $adname     = $advertiser['adname'];
+                    $advertiser->save(false);
+                }
+				$adname                 = $value;
 			    break;
 			}		        // advertiser name
 
-			case 'email':
+			case 'oldadname':
+            {		        // old advertiser name
+                $advertiser         = new Advertiser(array('adname' => $value));
+                if ($adname != $value)
+                {
+                    $chkAdvertiser  = new Advertiser(array('adname' => $adname));
+                    if ($chkAdvertiser->isExisting())
+                        $duplicates[]   = $adname;
+                    else
+                        $advertiser['adname']   = $adname;
+                }
+			    break;
+			}		        // old advertiser name
+
 			case 'ademail':
+            {		        // email address
+                $advertiser['ademail']  = $value;
+			    break;
+			}		        // email address
+
+			case 'deleteadvertiser':
             {		        // email address
                 if ($administrator)
                 {
-                    $advertiser     = new Advertiser(array('adname' => $adname));
-                    $advertiser['ademail']  = $value;
-                    $advertiser->save(false);
+                    $advertiser         = new Advertiser(array('row' => $row));
+                    $warn               .= "<p>Advertiser: " . $advertiser['adname'] . " deleted.<p>\n";
+                    $advertiser->delete(false);
                 }
 			    break;
 			}		        // email address
 
+
 			case 'lang':
 			{		        // lang
-				$lang			    = FtTemplate::validateLang($value);
+				$lang			        = FtTemplate::validateLang($value);
 			    break;
 			}		        // lang
 
 			case 'offset':
 			{
-			    $offset			    = (int)$value;
+			    $offset			        = (int)$value;
 			    break;
 			}
 
 			case 'limit':
 			{
-			    $limit			    = (int)$value;
+			    $limit			        = (int)$value;
 			    break;
 			}
 	    }		    // act on specific parameter
@@ -166,12 +208,18 @@ if (isset($_POST) && count($_POST) > 0)
 // create the Template instance
 $template		= new FtTemplate("Advertisers$lang.html");
 
+foreach($duplicates as $name)
+{
+    $text           = $template['duplicateName']->innerHTML;
+    $msg            .= str_replace('$adname', $name, $text);
+}
+
 // if not the administrator do nothing
 if ($administrator)
 {		// only the administrator can use this dialog
 	$mainParms['limit']			= $limit;
-	$mainParms['offset']		= $offset;
-    $mainParms['adname']		= $adname;
+    $mainParms['offset']		= $offset;
+    $mainParms['adname']		= $pattern;
 
 	$prevoffset		        	= $offset - $limit;
 	$nextoffset		        	= $offset + $limit;
@@ -230,9 +278,23 @@ if ($administrator)
 
     $rowTag                 = $template['Row$id'];
     $rowText                = $rowTag->outerHTML;
+    $template->set('TEMPLATE',                  $rowText);
     $data                   = '';
     $rowtype	            = 'odd';
     $id                     = 1;
+
+	$total01				= 0;
+	$total02				= 0;
+	$total03				= 0;
+	$total04				= 0;
+	$total05				= 0;
+	$total06				= 0;
+	$total07				= 0;
+	$total08				= 0;
+	$total09				= 0;
+	$total10				= 0;
+	$total11				= 0;
+    $total12				= 0;
 
 	foreach($advertisers as $adname => $advertiser)
     {		                // create display of a page of advertisers
@@ -241,6 +303,7 @@ if ($administrator)
         $rtemplate->set('ademail',		$advertiser['ademail']);
         $rtemplate->set('rowtype',		$rowtype);
         $rtemplate->set('id',		    $id);
+        $rtemplate->set('row',		    $advertiser['row']);
         $rtemplate->set('count01',		number_format($advertiser['count01']));
         $rtemplate->set('count02',		number_format($advertiser['count02']));
         $rtemplate->set('count03',		number_format($advertiser['count03']));
@@ -253,7 +316,20 @@ if ($administrator)
         $rtemplate->set('count10',		number_format($advertiser['count10']));
         $rtemplate->set('count11',		number_format($advertiser['count11']));
         $rtemplate->set('count12',		number_format($advertiser['count12']));
-        $data               .= $rtemplate->compile();
+		$total01			+= $advertiser['count01'];
+		$total02			+= $advertiser['count02'];
+		$total03			+= $advertiser['count03'];
+		$total04			+= $advertiser['count04'];
+		$total05			+= $advertiser['count05'];
+		$total06			+= $advertiser['count06'];
+		$total07			+= $advertiser['count07'];
+		$total08			+= $advertiser['count08'];
+		$total09			+= $advertiser['count09'];
+		$total10			+= $advertiser['count10'];
+		$total11			+= $advertiser['count11'];
+		$total12			+= $advertiser['count12'];
+        $text               = $rtemplate->compile();
+        $data               .= $text;
 	    if ($rowtype == 'odd')
 			$rowtype	        = 'even';
 	    else
@@ -261,6 +337,19 @@ if ($administrator)
         $id++;
     }		                // create display of a page of advertisers
     $rowTag->update($data);
+
+	$template->set('TOTAL01',			number_format($total01));
+	$template->set('TOTAL02',			number_format($total02));
+	$template->set('TOTAL03',			number_format($total03));
+	$template->set('TOTAL04',			number_format($total04));
+	$template->set('TOTAL05',			number_format($total05));
+	$template->set('TOTAL06',			number_format($total06));
+	$template->set('TOTAL07',			number_format($total07));
+	$template->set('TOTAL08',			number_format($total08));
+	$template->set('TOTAL09',			number_format($total09));
+	$template->set('TOTAL10',			number_format($total10));
+	$template->set('TOTAL11',			number_format($total11));
+	$template->set('TOTAL12',			number_format($total12));
 }		// only administrator can use this dialog
 else
 {		// not administrator

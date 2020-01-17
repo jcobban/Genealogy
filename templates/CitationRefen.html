@@ -8,71 +8,71 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <i>
+  <em>
     <a href="/FamilyTree/Source.php?id=$IDSR&amp;lang=$LANG" target="_blank" id="title">
 		$TITLE 
     </a>
-  </i>:
+  </em>:
     <a href="/Canada/BirthRegDetail.php?RegDomain=CAON&RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG"
-				target="_blank" id="sourceBirth">
+				target="_blank" id="sourceBirth$IDSX">
 		$DETAIL 
     </a>
     <a href="/Canada/BirthRegDetail.php?RegDomain=CAON&RegYear=$REGYEAR&amp;OriginalVolume=$VOLUME&amp;OriginalPage=$PAGE&amp;OriginalItem=$ITEM&amp;lang=$LANG"
-			    target="_blank" id="sourceBirthVolume">
+			    target="_blank" id="sourceBirthVolume$IDSX">
 		$DETAIL
     </a>
     <a href="/Ontario/MarriageRegDetail.php?RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG"
-				target="_blank" id="sourceMarriage">
+				target="_blank" id="sourceMarriage$IDSX">
 		$DETAIL 
     </a>
 	<a href="/Ontario/MarriageRegDetail.php?RegDomain=CAON&RegYear=$REGYEAR&amp;OriginalVolume=$VOLUME&amp;OriginalPage=$PAGE&amp;OriginalItem=$ITEM&amp;lang=$LANG"
-				target="_blank" id="sourceMarriageVolume">
+				target="_blank" id="sourceMarriageVolume$IDSX">
 		$DETAIL
     </a>
     <a href="/Ontario/CountyMarriagesEdit.php?Volume=$VOLUME&amp;ReportNo=$REPORT&amp;ItemNo=$ITEM&amp;lang=$LANG"
-				target="_blank" id="sourceMarriageCounty">
+				target="_blank" id="sourceMarriageCounty$IDSX">
 		$DETAIL
     </a>
-    <a href="$DETAIL" target="_blank" id="hyperlink">
+    <a href="$DETAIL" target="_blank" id="hyperlink$IDSX">
 		$DETAIL
     </a>
     <a href="/Ontario/DistrictMarriagesEdit.php?Volume=$VOLUME&amp;ReportNo=$REPORT&amp;ItemNo=$ITEM&amp;lang=$LANG"
-				target="_blank" id="sourceMarriageDistrict">
+				target="_blank" id="sourceMarriageDistrict$IDSX">
 		$DETAIL
     </a>
     <a href="/Ontario/DeathRegDetail.php?RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG"
-				target="_blank" id="sourceDeath">
+				target="_blank" id="sourceDeath$IDSX">
 		$DETAIL 
     </a>
     <a href="/Canada/DeathRegDetail.php?RegDomain=CAON&RegYear=$REGYEAR&amp;OriginalVolume=$VOLUME&amp;OriginalPage=$PAGE&amp;OriginalItem=$ITEM&amp;lang=$LANG"
-				    target="_blank" id="sourceDeathVolume">
+				    target="_blank" id="sourceDeathVolume$IDSX">
 		$DETAIL
     </a>
     <a href="/database/CensusResponse.php?Census=CA$CENYEAR&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&amp;Division=$DIVISION&amp;Page=$PAGE&amp;OrderBy=Line&amp;lang=$LANG"
-		    target="_blank" id="sourceCensus">
+		    target="_blank" id="sourceCensus$IDSX">
 		$DETAIL 
     </a>
     <a href="/database/CensusResponse.php?Census=$PROVINCE$CENYEAR&amp;Province=$PROVINCE&amp;District=$DISTID&amp;SubDistrict=$SUBDISTID&amp;Division=$DIVISION&amp;Page=$PAGE&amp;OrderBy=Line&amp;lang=$LANG"
-				target="_blank" id="sourceCensusPreConfed">
+				target="_blank" id="sourceCensusPreConfed$IDSX">
 		$DETAIL 
     </a>
     <a href="/Ontario/WmbResponse.php?Volume=$VOLUME&amp;Page=$PAGENUM&amp;lang=$LANG"
-				target="_blank" id="sourceWesleyanBaptism">
+				target="_blank" id="sourceWesleyanBaptism$IDSX">
 		$DETAIL 
     </a>
     <a href="http://www.bac-lac.gc.ca/eng/discover/postal-heritage-philately/post-offices-postmasters/Pages/item.aspx?IdNumber=$ITEM&amp;lang=$LANG"
-				target="_blank" id="sourcePostOffices">
+				target="_blank" id="sourcePostOffices$IDSX">
 		$DETAIL 
     </a>
     <a href="/FamilyTree/CemeteryReference.php?IDSR=$IDSR&amp;Plot=$DETAIL&amp;lang=$LANG"
-				target="_blank" id="sourceCemetery">
+				target="_blank" id="sourceCemetery$IDSX">
 		$DETAIL
     </a>
-    <span id="detail">$DETAIL</span>
-	<p id="unrecTitle">Citation.inc: $LINE Unrecognized source title '$TITLE'.</p>
-    <div id="showText">
+    <span id="detail$IDSX">$DETAIL</span>
+	<p id="unrecTitle$IDSX">Citation.inc: $LINE Unrecognized source title '$TITLE'.</p>
+    <div id="showText$IDSX">
 		$TEXT 
     </div>
-    <div id="showNote">>
-		Note: $NOTE 
+    <div id="showNote$IDSX">
+        <strong>Note:</strong> $NOTE 
     </div>

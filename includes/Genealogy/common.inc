@@ -978,7 +978,7 @@ function pageBot($pageName	= null,
         $day            = substr($date, -2);
         $advertiser->increment($month);
         if ($day == '28')
-        {
+        {               // this should be moved to a cron job
             $month      += 1;
             if ($month > 12)
                 $month  = $month - 13;
@@ -986,7 +986,7 @@ function pageBot($pageName	= null,
                 $month  = '0' . $month;
             $advertiser->set("Count$month", 0);
             $advertiser->save(false);
-        }
+        }               // this should be moved to a cron job
 	}			// found advertisements directory
 	else
 		$adname	        = 'AddForRent.html';

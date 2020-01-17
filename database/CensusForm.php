@@ -453,22 +453,22 @@ else
 // update the popup for explaining the action taken by arrows
 if (strlen($msg) == 0)
 {
-    $rowElt             = $template->getElementById('Row$line');
-    $rowHtml            = $rowElt->outerHTML();
-    $data               = '';
-	$lineSet		    = new CensusLineSet($getParms);
-	$info			    = $lineSet->getInformation();
-	$count			    = $info['count'];
-	$groupLines		    = $census->get('grouplines');
-	$lastunderline		= $census->get('lastunderline');
-	$oldFamily		    = '';
-	$oldSurname		    = '';
-	$oldReligion		= '';
-	$oldOrigin		    = '';
-	$oldNationality		= '';
+    $rowElt             			= $template->getElementById('Row$line');
+    $rowHtml            			= $rowElt->outerHTML();
+    $data               			= '';
+	$lineSet		    			= new CensusLineSet($getParms);
+	$info			    			= $lineSet->getInformation();
+	$count			    			= $info['count'];
+	$groupLines		    			= $census->get('grouplines');
+	$lastunderline					= $census->get('lastunderline');
+	$oldFamily		    			= '';
+	$oldSurname		    			= '';
+	$oldReligion					= '';
+	$oldOrigin		    			= '';
+	$oldNationality					= '';
 	foreach($lineSet as $censusLine)
     {
-        $rtemplate      = new Template($rowHtml);
+        $rtemplate      			= new Template($rowHtml);
 	    foreach($censusLine as $field => $value)
 	    {
 			switch($field)
@@ -578,6 +578,16 @@ if (strlen($msg) == 0)
 					break;
 			    }		// idir
 
+                case 'ownertenant':
+                {
+                    if (strlen($value) > 0)
+                        $warn   .= "<p>CensusForm.php: " . __LINE__ .
+                        " ownertenant='$value'</p>\n";
+                    if (is_null($value))
+                        $censusLine->set($field, '');
+					break;
+                }
+
                 default:
                 {
                     if (is_null($value))
@@ -586,10 +596,10 @@ if (strlen($msg) == 0)
                 }
 			}		// act on specific field names
 	    }			// loop through all fields in record
-        $rtemplate->updateTag('Row$line', $censusLine);
+        $rtemplate['Row$line']->update($censusLine);
         $data           .= $rtemplate->compile() . "\n";
 	}			// loop through records in page
-	$rowElt->update($data);
+    $rowElt->update($data);
 }
 
 // display field comments

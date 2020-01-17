@@ -382,8 +382,7 @@ class FtTemplate extends Template
         }		// script has not initialized TITLE
 
         // pick an advertisement to display
-        $getparms               = array('adname' => '[a-zA-Z0-9]+');
-
+        $getparms               = array('adname' => '!');
         $advertisers            = new RecordSet('Advertisers',
                                                 $getparms);
         $info                   = $advertisers->getInformation();
@@ -391,16 +390,26 @@ class FtTemplate extends Template
         if ($count == 0)
             showTrace();
         $counterRec             = new Advertiser(array('adname' => ''));
-        $counterRec->increment('01');
-        $index	                = ($counterRec['count01'] % $count) + 1;
-        $advertiser             = new Advertiser(array('row' => $index));
+        $counterRec->increment('01');   // stats count
+        $index	                = $counterRec['count01'] % $count;
+        $getparms               = array('adname'    => '!',
+                                        'offset'    => $index,
+                                        'limit'     => 1);
+        $advertisers            = new RecordSet('Advertisers',
+                                                $getparms);
+        $advertiser             = $advertisers->rewind();
         $adname                 = $advertiser['adname'];
+        $adurl	                = "/Advertisements/$adname.html";
         $date                   = date('m d');
         $month                  = substr($date, 0, 2);
-        $day                    = substr($date, -2);
         $advertiser->increment($month);
+
+        // the following code is to ensure that the count for
+        // the next month is zero before the month begins
+        // this should be moved to a cron job
+        $day                    = substr($date, -2);
         if ($day == '28')
-        {
+        {                   // move to cron job
             $month              += 1;
             if ($month > 12)
                 $month          = $month - 13;
@@ -408,8 +417,7 @@ class FtTemplate extends Template
                 $month          = '0' . $month;
             $advertiser->set("Count$month", 0);
             $advertiser->save(false);
-        }
-        $adurl	                = "/Advertisements/$adname.html";
+        }                   // move to cron job
 
         // change insertion of ads to not use <iframe>
         $adElement              = $this['advertFrame'];

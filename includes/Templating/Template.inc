@@ -820,8 +820,8 @@ class Template implements ArrayAccess
                     else
                     if ($arpos !== false)
                     {           // member reference present
-                        $member     = subscript($name, $arpos + 2);
-                        $name       = subscript($name, 0, $lbpos);
+                        $member     = substr($name, $arpos + 2);
+                        $name       = substr($name, 0, $lbpos);
                         $warn       .= "<p>Template.inc: " . __LINE__ .
                             " found substitution for '$name' with member reference '$member'</p>\n";
                     }           // member reference present
