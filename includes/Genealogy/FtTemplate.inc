@@ -1,6 +1,7 @@
 <?php
 namespace Genealogy;
 use \Exception;
+use \NumberFormatter;
 use Templating\Template;
 use Templating\TemplateTag;
 
@@ -18,8 +19,9 @@ use Templating\TemplateTag;
  *      2019/07/23      add static method validateLang                  *
  *      2019/12/23      use class Advertisers to locate next            *
  *                      advertisement                                   *
+ *      2020/01/22      add method getFormatter                         *
  *	    									                            *
- *  Copyright &copy; 2019 James A. Cobban All Rights Reserved			*
+ *  Copyright &copy; 2020 James A. Cobban All Rights Reserved			*
  ************************************************************************/
 
 /************************************************************************
@@ -45,6 +47,7 @@ class FtTemplate extends Template
      *	The requested ISO language code.                                *
      ********************************************************************/
     private $lang               = 'en';
+    private $formatter          = null;
 
     /********************************************************************
      *  FtTemplate::trtemplate                                          *
@@ -64,7 +67,7 @@ class FtTemplate extends Template
      *		    	    page/dialog template.  Otherwise it is the name *
      *		            of the language specific main include file.     *
      *		            This string ends with "ll.html" where "ll"      *
-     *		            is the ISO language code.  This string is a     *
+     *		            is the BCP 47 language code.  This string is a  *
      *		            file name relative to the common templates      *
      *		            directory "$document_root/templates/"           * 
      *													                *
@@ -83,7 +86,7 @@ class FtTemplate extends Template
         if (!is_string($include))
             throw new Exception("FtTemplate::__construct: " .
                                 "first parameter is not a string");
-        if (!preg_match('/(^.*)([a-z]{2}-[A-Z]{2}|[a-z]{2}).html$/',
+        if (!preg_match('/(^.*)([a-z]{2,3}-[A-Z]{2,3}|[a-z]{2,3}).html$/',
                         $include, 
                         $matches))
         {                   // pass to parent
@@ -94,6 +97,8 @@ class FtTemplate extends Template
         $includebase        = $matches[1];
         $lang               = $matches[2];
         $this->lang         = $lang;
+        $this->formatter    = new \NumberFormatter(str_replace('-','_',$lang),
+                                                   \NumberFormatter::DECIMAL);
         $includeSub         = null;
 
     	$tempBase	        = $document_root . '/templates/';
@@ -162,6 +167,7 @@ class FtTemplate extends Template
     public static function validateLang($value)
     {
         $lang               = 'en';
+        $value              = str_replace('_','-',$value);
         if (preg_match('/^([a-zA-Z]{2,3})(-([a-zA-Z0-9]{2,3})|)$/',
                        $value,
                        $matches))
@@ -179,6 +185,19 @@ class FtTemplate extends Template
         }
         return $lang;
     }           // static function validateLang
+
+    /********************************************************************
+     *	function FtTemplate::getFormatter								*
+     *													            	*
+     *	Get the locale specific number formatter                        *
+     *													            	*
+     *	Returns:										            	*
+     *		instance of class NumberFormatter					        *
+     ********************************************************************/
+    public function getFormatter()
+    {
+        return $this->formatter;
+    }           // function getFormatter
 
     /********************************************************************
      *	function FtTemplate::getTranslate								*
@@ -387,8 +406,6 @@ class FtTemplate extends Template
                                                 $getparms);
         $info                   = $advertisers->getInformation();
         $count                  = $info['count'];
-        if ($count == 0)
-            showTrace();
         $counterRec             = new Advertiser(array('adname' => ''));
         $counterRec->increment('01');   // stats count
         $index	                = $counterRec['count01'] % $count;

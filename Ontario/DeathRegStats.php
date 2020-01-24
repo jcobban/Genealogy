@@ -34,8 +34,9 @@ use \Templating\Template;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/01/19      use class Template                              *
  *		2019/12/14      use class DeathSet                              *
+ *		2020/01/22      internationalize numbers                        *
  *										                                *
- *  Copyright &copy; 2018 James A. Cobban					            *
+ *  Copyright &copy; 2020 James A. Cobban					            *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -135,6 +136,7 @@ $totalLinked	    = 0;
 $rownum		        = 0;
 $yearClass		    = "odd right";
 $data               = '';
+$formatter                          = $template->getFormatter();
 
 foreach($result as $row)
 {
@@ -151,12 +153,12 @@ foreach($result as $row)
         $pctLinked	= 100 * $linked / $count;
     $total		    += $count;
     $totalLinked	+= $linked;
-    $ttemplate->set('DOMAIN', $domain);
-    $ttemplate->set('REGYEAR', $regYear);
-    $ttemplate->set('YEARCLASS', $yearClass . ' right');
-    $ttemplate->set('COUNT', number_format($count));
-    $ttemplate->set('LINKED', number_format($linked));
-    $ttemplate->set('PCTLINKED', pctClass($pctLinked));
+    $ttemplate->set('DOMAIN',       $domain);
+    $ttemplate->set('REGYEAR',      $regYear);
+    $ttemplate->set('YEARCLASS',    $yearClass . ' right');
+    $ttemplate->set('COUNT',        $formatter->format($count));
+    $ttemplate->set('LINKED',       $formatter->format($linked));
+    $ttemplate->set('PCTLINKED',    pctClass($pctLinked));
     $col++;
     if ($col >= $numCols)
     {	// at column limit, end row
@@ -182,7 +184,7 @@ if ($col != 0)
 }		// partial last column
 
 $dataRow->update($data);
-$template->set('TOTAL',         number_format($total));
-$template->set('TOTALLINKED',   number_format($totalLinked));
+$template->set('TOTAL',         $formatter->format($total));
+$template->set('TOTALLINKED',   $formatter->format($totalLinked));
  
 $template->display();

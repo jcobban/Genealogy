@@ -28,8 +28,9 @@ use \Exception;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/12/17      use class OcfaSet                               *
  *		                use Template                                    *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Ocfa.inc';
 require_once __NAMESPACE__ . '/OcfaSet.inc';
@@ -72,6 +73,7 @@ if (count($_GET) > 0)
 }
 
 $template                   = new FtTemplate("OcfaCountyStats$lang.html");
+$formatter                          = $template->getFormatter();
 
 if (is_null($countyName))
 {
@@ -99,12 +101,12 @@ if (strlen($msg) == 0)
         $total		        += $count;
         $rtemplate          = new \Templating\Template($rowbody);
         $rtemplate->set('township',         $township);
-        $rtemplate->set('count',            number_format($count));
+        $rtemplate->set('count',            $formatter->format($count));
         $data               .= $rtemplate->compile() . "\n";
     }		        // loop through rows
     $rowtag->update($data);
 
-    $template->set('total',                 number_format($total));
+    $template->set('total',                 $formatter->format($total));
 }			        // no errors
 else
     $template['dataTable']->update(null);

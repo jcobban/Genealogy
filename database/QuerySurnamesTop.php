@@ -32,8 +32,9 @@ use \Templating\Template;
  *						ignore case of parameter names					*
  *		2018/11/11      use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -129,6 +130,7 @@ foreach ($_GET as $key => $value)
 
 // create template
 $template	        = new FtTemplate("QuerySurnamesTop$lang.html");
+$formatter                          = $template->getFormatter();
 
 // validate parameters
 
@@ -389,7 +391,7 @@ if (is_array($result))
             $dtemplate->set('PATTERN',      $pattern);
         }
 	    $number	        = $row['number'];
-        $dtemplate->set('NUMBER',       number_format($number));
+        $dtemplate->set('NUMBER',       $formatter->format($number));
         $dtemplate->set('CLASS',        $class);
         $dtemplate->set('LANG',         $lang);
         $dtemplate->set('NPURI',        "?$npuri");

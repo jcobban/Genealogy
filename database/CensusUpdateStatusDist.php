@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \NumberFormatter;
 /************************************************************************
  *  CensusUpdateStatusDist.php											*
  *																		*
@@ -58,8 +59,9 @@ use \Exception;
  *		2018/02/23		accept being invoked with CA1851 or CA1861 plus	*
  *						Province parameter								*
  *		2019/11/26      use Template                                    *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/District.inc';
@@ -145,6 +147,7 @@ else
 }		            // user can only view database
 
 $template               = new FtTemplate("CensusStatusDist$action$lang.html");
+$formatter                          = $template->getFormatter();
 
 // check for missing parameters
 if (is_null($censusId))
@@ -332,8 +335,9 @@ if (strlen($msg) == 0)
 	 		$pct	    		= 100;
 	 		$pctl	    		= 100;
         }	// division missing
-        $row['pct']             = number_format($pct,2);
-        $row['pctl']            = number_format($pctl,2);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+        $row['pct']             = $formatter->format($pct);
+        $row['pctl']            = $formatter->format($pctl);
         $row['pctclasspct']     = pctClass($pct);
         $row['pctclasspctl']    = pctClass($pctl);
 
@@ -358,10 +362,12 @@ if (strlen($msg) == 0)
 		$pct	                = 0;
 		$pctl	                = 0;
     }
-    $template->set('DONE',              number_format($done));
-    $template->set('POP',               number_format($pop));
-    $template->set('PCT',               number_format($pct,2));
-    $template->set('PCTL',              number_format($pctl,2));
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+    $template->set('DONE',              $formatter->format($done));
+    $template->set('POP',               $formatter->format($pop));
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+    $template->set('PCT',               $formatter->format($pct));
+    $template->set('PCTL',              $formatter->format($pctl));
     $template->set('PCTCLASSPCT',       pctClass($pct));
     $template->set('PCTCLASSPCTL',      pctClass($pctl));
 }		            // no errors

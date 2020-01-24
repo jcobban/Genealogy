@@ -371,7 +371,6 @@ class BirthSet extends RecordSet
 
 		    $this->sqlParms['surname']	= $tparms['surname'];
         }			// surname comparison requested
-showTrace();
 		return $where;
     }		// BirthSet::getWhere
 

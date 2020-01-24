@@ -283,8 +283,10 @@ use \Templating\TemplateTag;
  *		3019/08/09      support both old and new style citations to     *
  *		                primary name                                    *
  *      2019/11/17      move CSS to <head>                              *
+ *      2020/01/21      translate warnings that appear in title         *
+ *      2020/01/23      add space below last child                      *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Address.inc';
 require_once __NAMESPACE__ . '/Blog.inc';
@@ -627,11 +629,11 @@ function showEvent($pronoun,
     // determine privacy limits from the associated individual
     // previously the privacy limits of the primary individual were used
     // which meant a younger spouse could have private information revealed
-    $person	= $event->getPerson();
-    $bprivlim	= $person->getBPrivLim();
-    $dprivlim	= $person->getDPrivLim();
+    $person	        = $event->getPerson();
+    $bprivlim	    = $person->getBPrivLim();
+    $dprivlim	    = $person->getDPrivLim();
     if ($debug)
-		$warn	.= "<p>Person::showEvent: event=" .
+		$warn	    .= "<p>Person::showEvent: event=" .
 						   $event .
 						   ", indiv=" .
 						   $person . ', ' .
@@ -643,13 +645,13 @@ function showEvent($pronoun,
     // $dateo is an instance of LegacyDate
     // $date is the text expression of the date
     try {
-    $dateo		= new LegacyDate($event->get('eventd'));
+    $dateo		    = new LegacyDate($event->get('eventd'));
     } catch(Exception $e) {
 		print "<p>" . $e->getMessage() . ": \$event=" .
 						print_r($event, true) . "</p>\n";
     }
     $citType		= $event->getCitType();
-    $idet		= $event->get('idet');
+    $idet		    = $event->get('idet');
     if ($citType == Citation::STYPE_BIRTH ||
 		$citType == Citation::STYPE_CHRISTEN ||
 		$citType == Citation::STYPE_LDSB ||
@@ -683,8 +685,8 @@ function showEvent($pronoun,
 		$date		= strtolower(substr($date, 0, 1)) . substr($date, 1);
 
     // resolve the location
-    $idlr		= $event->get('idlrevent');
-    $kind		= $event->get('kind');	// may be IDTR or IDLR
+    $idlr		    = $event->get('idlrevent');
+    $kind		    = $event->get('kind');	// may be IDTR or IDLR
     if ($idlr > 0)
     {		// Location or Temple used
 		if ($kind)
@@ -1123,28 +1125,28 @@ function showParents($person)
  ************************************************************************/
 function showEvents($person)
 {
-    global	$debug;
-    global	$warn;
-    global	$template;
-    global	$user;
+    global	$debug;             // is debugging output enabled
+    global	$warn;              // accumulated warning messages
+    global	$template;          // the main page template
+    global	$user;              // instance of User
     global	$eventText;	        // table of phrases
     global	$dateTemplate;	    // template for displaying dates
-    global	$months;
-    global	$lmonths;
-    global	$t;
-    global	$malePronoun;
-    global	$femalePronoun;
-    global	$otherPronoun;
-    global	$private;
-    global	$somePrivate;
-    global	$lang;
+    global	$months;            // table of month abbreviations
+    global	$lmonths;           // table of full month names
+    global	$t;                 // translate words and phrases
+    global	$malePronoun;       // male pronoun nominative case
+    global	$femalePronoun;     // female pronoun nominative case
+    global	$otherPronoun;      // unknown pronoun nominative case
+    global	$private;           // $person is private
+    global	$somePrivate;       // some information e.g. death is private
+    global	$lang;              // requested language of communication
 
     // initialize fields used in the event descriptions
-    $idir	= $person->getIdir();
+    $idir	        = $person->getIdir();
 
-    $givenName	= $person->getGivenName();
-    $surname	= $person->getSurname();
-    $gender	= $person['gender'];
+    $givenName	    = $person->getGivenName();
+    $surname	    = $person->getSurname();
+    $gender	        = $person['gender'];
     if ($person['gender'] == Person::MALE)
 		$pronoun	= $malePronoun;
     else
@@ -1152,18 +1154,18 @@ function showEvents($person)
 		$pronoun	= $femalePronoun;
     else
 		$pronoun	= $otherPronoun;
-    $bprivlim	= $person->getBPrivLim();	// birth privacy limit year
-    $dprivlim	= $person->getDPrivLim();	// death privacy limit year
+    $bprivlim	    = $person->getBPrivLim();	// birth privacy limit year
+    $dprivlim	    = $person->getDPrivLim();	// death privacy limit year
 
 
-    $oldfmt	= LegacyDate::setTemplate($dateTemplate);
+    $oldfmt	        = LegacyDate::setTemplate($dateTemplate);
 
     // display the event table entries for this individual
-    $events		= $person->getEvents();
+    $events		    = $person->getEvents();
     foreach($events as $ider => $event)
     {			// loop through all event records
 		// interpret event type
-		$idet	= $event->get('idet');
+		$idet	    = $event->get('idet');
 		if ($idet > 0)
 		{		// non-empty event
 		    showEvent($pronoun,
@@ -1361,6 +1363,13 @@ $trtemplate             = $template->getTranslate();
 $months	                = $trtemplate['Months'];
 $lmonths	            = $trtemplate['LMonths'];
 $t		                = $trtemplate['tranTab'];
+
+// interpret the value of the child to parent relationship in Child
+$cpRelType	            = $trtemplate['cpRelType'];
+
+// interpret event type IDET as a sentence with substitutions
+$eventText	            = $trtemplate['eventStmt'];
+
 $malePronoun			= $t['He'];
 $femalePronoun			= $t['She'];
 $otherPronoun			= $t['He/She'];
@@ -1380,17 +1389,15 @@ $intStatus				= array(1	        => '',
             		        	4			=> $t['Twin'],
             	        		5			=> $t['Illegitimate']);
 
-// interpret the value of the child to parent relationship in Child
-$cpRelType	            = $trtemplate['cpRelType'];
-
-// interpret event type IDET as a sentence with substitutions
-$eventText	            = $trtemplate['eventStmt'];
-
 // must have a parameter
 if (count($getParms) == 0)
 {				    // missing identifier
-	$msg		        .= "Missing mandatory identifier parameter. ";
-	$title		        = 'Person Not Found';
+	$msg		        .= $template['missingID']->innerHTML;
+    $title		        = $template['notFoundTitle']->innerHTML;
+    $template['wishtosee']->update(null);
+    $template['actionsForm']->update(null);
+    $template['blogForm']->update(null);
+    $template['footnotesSection']->update(null);
 }				    // missing identifier
 else
 {				    // have an identifier
@@ -1426,9 +1433,12 @@ else
     // format dates for title
     if ($person->get('private') == 2 && !$isOwner)
     {
-		$title		    = "Person is Invisible";
+		$title		    = $template['invisibleTitle'];
+        $template['actionsForm']->update(null);
+        $template['blogForm']->update(null);
+        $template['footnotesSection']->update(null);
 		$surname	    = "";
-		$birthDate	    = 'Private';
+		$birthDate	    = $t['Private'];
 		$somePrivate	= true;
     }
     else
@@ -1636,11 +1646,11 @@ if (!is_null($person))
 							                            $t);
 
 ?>
-	<p>
+	<p style="clear: both;">
 <?php
 			    print $pronoun . ' ' . $t[$family->getStatusVerb()];
 			    // only display a sentence about the marriage
-			    // if there is a spouse defined
+                // if there is a spouse defined
 			    if ($spsid > 0)
 			    {		// have a spouse
 ?>
@@ -1854,38 +1864,45 @@ if (!is_null($person))
 	</p>
 <?php
 try {
-	    foreach($children as $idcr => $child)
-	    {		// loop through all child records
-?>
-	  <div class="row">
-	    <div class="column1">
-			<?php
-	    print $num;
-	    $num++;
-			?>
-	    </div>
-<?php
-	    // display information about child
-	    $cid		            = $child->get('idir');
-		$child		            = Person::getPerson($cid);
-		$individTable[$cid]	    = $child;
-		$cName	                = $child->getName($t);
+        $child                      = $children->rewind();
+	    while($children->valid())
+        {		// loop through all child records
+            $idcr                   = $children->key();
 
-		// set the class to color hyperlinks
-		if ($child['gender'] == Person::MALE)
-		    $cgender	        = 'male';
-		else
-		if ($child['gender'] == Person::FEMALE)
-		    $cgender	        = 'female';
-		else
-		    $cgender	        = 'unknown';
+		    // display information about child
+		    $cid		            = $child->get('idir');
+			$child		            = Person::getPerson($cid);
+			$individTable[$cid]	    = $child;
+			$cName	                = $child->getName($t);
+	
+			// set the class to color hyperlinks
+			if ($child['gender'] == Person::MALE)
+			    $cgender	        = 'male';
+			else
+			if ($child['gender'] == Person::FEMALE)
+			    $cgender	        = 'female';
+			else
+			    $cgender	        = 'unknown';
+            $children->next();
+            if ($children->valid())
+            {
+                $child              = $children->current();
+                $last               = '';
+            }
+            else
+                $last               = ' last';
 ?>
+          <div class="row<?php print $last; ?>">
+	        <div class="column1">
+                <?php print $num; ?>
+    	    </div>
 			<a href="<?php print $directory; ?>Person.php?idir=<?php print $cid; ?>&amp;lang=<?php print $lang; ?>" class="<?php print $cgender; ?>">
 			    <?php print $cName; ?>
 			</a>
-	    <div style="clear: both;"></div>
-	  </div>
+	        <div style="clear: both;"></div>
+	      </div> <!-- class="row" -->
 <?php
+	        $num++;
 	    }	// loop through all child records
 } catch(Exception $e)
 {

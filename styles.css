@@ -327,7 +327,15 @@
     *   div.row                                                         *
     *   Display information in columnar format without using table      *
     *********************************************************************/
-    div.row {   white-space:        nowrap; }
+    div.row {   white-space:        nowrap;
+                clear:		        both; 
+                float:              left;
+                width:              100%;
+            }
+
+    div.last {  
+                margin-bottom:		1ex;	/* letter height */
+            }
 
    /*********************************************************************
     *   div class='balloon' is used to display context specific help.   *
@@ -623,6 +631,7 @@
                 text-indent:		-3em;
                 margin-top:         0;
                 margin-bottom:		0.5ex;	/* half letter height */
+                clear:		        both; 
                 }
 
    /*********************************************************************

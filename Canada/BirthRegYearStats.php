@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \NumberFormatter;
 use \Templating\Template;
 
 /************************************************************************
@@ -229,6 +230,7 @@ $countyName		    = '';
 $lowest		        = PHP_INT_MAX;
 $highest		    = 0;
 $data               = '';
+$formatter          = $template->getFormatter();
 
 foreach($result as $row)
 {
@@ -284,13 +286,15 @@ foreach($result as $row)
     $ttemplate->set('COUNTY',       $county);
     $ttemplate->set('COUNTYNAME',   $countyName);
     $ttemplate->set('TOWNSHIP',     $township);
-    $ttemplate->set('COUNT',        number_format($count));
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+    $ttemplate->set('COUNT',        $formatter->format($count));
     $ttemplate->set('LOW',          $low);
     $ttemplate->set('HIGH',         $high);
     $ttemplate->set('LINKED',       $linked);
-    $ttemplate->set('PCTDONE',      number_format($pctDone,2));
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+    $ttemplate->set('PCTDONE',      $formatter->format($pctDone));
     $ttemplate->set('PCTDONECLASS', pctClass($pctDone));
-    $ttemplate->set('PCTLINKED',    number_format($pctLinked,2));
+    $ttemplate->set('PCTLINKED',    $formatter->format($pctLinked));
     $ttemplate->set('PCTLINKEDCLASS', pctClass($pctLinked));
     if (!$showTownship)
         $ttemplate->updateTag('townshipCol', null);
@@ -312,13 +316,15 @@ else
 $template->set('REGYEAR',           $regYear);
 $template->set('REGYEARP',          $regYear - 1);
 $template->set('REGYEARN',          $regYear + 1);
-$template->set('TOTAL',             number_format($total));
+$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+$template->set('TOTAL',             $formatter->format($total));
 $template->set('LOWEST',            $lowest);
 $template->set('HIGHEST',           $highest);
-$template->set('PCTDONE',           number_format($pctDone,2));
+$template->set('TOTALLINKED',       $formatter->format($totalLinked));
+$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+$template->set('PCTDONE',           $formatter->format($pctDone));
 $template->set('PCTDONECLASS',      pctClass($pctDone));
-$template->set('TOTALLINKED',       number_format($totalLinked));
-$template->set('PCTLINKED',         number_format($pctLinked,2));
+$template->set('PCTLINKED',         $formatter->format($pctLinked));
 $template->set('PCTLINKEDCLASS',    pctClass($pctLinked));
 if (!$showTownship)
     $template->updateTag('CountyCol', null);

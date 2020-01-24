@@ -42,9 +42,10 @@ use \Templating\Template;
  *		2017/09/28		change class LegacyEvent to class Event			*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2017/11/19		use CitationSet in place of getCitations		*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/CitationSet.inc';
@@ -169,6 +170,7 @@ $parms['limit']	    = $limit;
 $template           = new FtTemplate("Citations$lang.html");
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => 'Citations'));
+$formatter                          = $template->getFormatter();
 
 if (strlen($pattern) == 0)
 	$msg	.= "Please specify a pattern for citations. ";
@@ -190,7 +192,7 @@ if (strlen($msg) == 0)
 }			// get the matching citations
 
 if ($count > 0)
-    $template->set('COUNT',     number_format($totalcount));
+    $template->set('COUNT',     $formatter->format($totalcount));
 else
     $template->set('COUNT',     'NO');
 
@@ -247,7 +249,7 @@ if ($count > 0)
     $template->set('LAST',          $last);
     $template->set('PREVOFFSET',    $prevoffset);
     $template->set('NEXTOFFSET',    $nextoffset);
-    $template->set('TOTALCOUNT',    number_format($totalcount));
+    $template->set('TOTALCOUNT',    $formatter->format($totalcount));
 
     $dataRow                = $template['dataRow'];
     $dataRowText            = $dataRow->outerHTML();

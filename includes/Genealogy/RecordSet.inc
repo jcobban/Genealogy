@@ -2673,7 +2673,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
     public function valid()
     {
 		if ($this->list === null)
-		    $this->rewind();
+		    $this->rewind();    // loads from the table
         if ($this->list === null)
             return false;
 		$key		= key($this->list);

@@ -33,8 +33,9 @@ use \Exception;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/07/08      use Template                                    *
  *		2019/12/14      use class MarriageSet                           *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
@@ -98,6 +99,7 @@ if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
 $template       = new FtTemplate("MarriageRegStats$lang.html");
+$formatter                          = $template->getFormatter();
 
 $country	    = new Country(array('code'	    => $cc));
 $countryName	= $country->getName($lang);
@@ -150,8 +152,8 @@ while($row)
 		$count		        = $row[1];
 		$linked		        = $row[2];
 	    $rtemplate->set('REGYEAR',      $regYear);
-	    $rtemplate->set('DONE',         number_format($count));
-        $rtemplate->set('LINKED',       number_format($linked));
+	    $rtemplate->set('DONE',         $formatter->format($count));
+        $rtemplate->set('LINKED',       $formatter->format($linked));
         $pctLinked          = 100 * $linked / $count;
         $rtemplate->set('PCTLINKED', pctClass($pctLinked));
 	    $rowData            .= $spacer . $rtemplate->compile();
@@ -167,7 +169,7 @@ while($row)
 }               // continue until finished
 $rowElement->update($rowData);
 
-$template->set('TOTAL',         number_format($total));
+$template->set('TOTAL',         $formatter->format($total));
 $template->set('LANG',          $lang);
 $template->set('CC',            $cc);
 $template->set('COUNTRYNAME',   $countryName);

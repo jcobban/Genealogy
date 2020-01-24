@@ -355,7 +355,7 @@ class Name extends Record
                             $idir		    = $this->person->getIdir();
     			    }		                // Person record
     			    else
-    				if (is_int($idir))
+    				if (is_int($value))
     			    {		                // key
                         $idir		        = $value;
                     }
@@ -657,8 +657,13 @@ class Name extends Record
     					    $warn       .= "<p>Name.inc: " . __LINE__ .
     							                " query='$queryText'</p>\n";
     					$row		        = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    					if (count($row) == 1)
-    					{		    // found existing name record
+    					if (count($row) >= 1)
+                        {		    // found existing name record
+                            if (count($row) > 1)
+                            {
+    					        $warn       .= "<p>Name.inc: " . __LINE__ .
+                                " query='$queryText' returned more than 1 row</p>\n";
+                            }
     					    $count	        = 1;
     					    $dbrow	        = $row[0];
     					    $needInsert	    = false;

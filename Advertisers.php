@@ -19,6 +19,8 @@ use \Exception;
  *		                add ability to add a new Advertiser             *
  *		                add ability to delete an Advertiser             *
  *		                complete changing name and e-mail address       *
+ *		2020/-1/17      when adding an account also create a blank      *
+ *		                template for the advertisement                  *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -143,8 +145,18 @@ if (isset($_POST) && count($_POST) > 0)
             {		        // advertiser name
                 if ($administrator && $advertiser)
                 {
-                    $adname     = $advertiser['adname'];
                     $advertiser->save(false);
+                    $adname         = $advertiser['adname'];
+                    $adurl          = "Advertisements/$adname.html";
+                    if (!file_exists("$document_root/$adurl"))
+                    {
+                        $contents   = file_get_contents($document_root . '/Advertisements/AdForRent.html');
+                        $contents   = str_replace('This Space for Rent',
+                                                  'Reserved for ' . $adname,
+                                                  $contents);
+                        file_put_contents("$document_root/$adurl", $contents);
+                        $warn   .= "<p>created $document_root/$adurl</p>\n";
+                    }
                 }
 				$adname                 = $value;
 			    break;

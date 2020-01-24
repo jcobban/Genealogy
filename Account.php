@@ -59,8 +59,9 @@ use \Exception;
  *		2018/05/28		include specific CSS							*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *      2020/01/17      add support for Advertiser                      *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Blog.inc';
 require_once __NAMESPACE__ . '/User.inc';
@@ -191,6 +192,17 @@ $blogParms		    = array('keyvalue'	=> $user->get('id'),
                             'order'     => 'BL_Index DESC');
 $bloglist		    = new RecordSet('Blogs', $blogParms);
 $blogCount		    = $bloglist->count();
+
+// check if this is an Advertiser account
+$advertiserParms    = array('ademail'   => $oldemail);
+$advertisers        = new RecordSet('Advertisers', $advertiserParms);
+if ($advertisers->count() > 0)
+    $advertiser     = $advertisers->rewind();
+else
+{
+    $advertiser     = null;
+    $template['advertiserLink']->update(null);
+}
 
 // validate changes
 if (strlen($password) > 0 && !$user->chkPassword($password)) 

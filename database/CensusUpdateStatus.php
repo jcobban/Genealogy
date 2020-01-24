@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \NumberFormatter;
 /************************************************************************
  *  CensusUpdateStatus.php												*
  *																		*
@@ -70,8 +71,9 @@ use \Exception;
  *		2019/02/19      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
  *      2019/12/01      improved parameter validation                   *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/CensusSet.inc';
@@ -146,6 +148,7 @@ else
 $template	            = new FtTemplate("CensusUpdateStatus$scope$lang.html");
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => 'CensusUpdateStatus'));
+$formatter                          = $template->getFormatter();
 
 if (is_null($censusId) || strlen($censusId) == 0)
 {		                // missing parameter
@@ -382,10 +385,15 @@ if (is_null($province) || strlen($province) == 0)
     }		            // loop through provinces
     
 	$template->updateTag('provInfo', $provArray);
+	$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+	$total		= $formatter->format($result['total']),
+	$pop		= $formatter->format($result['pop']),
+	$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+	$percent	= $formatter->format($percent);
 	$template->updateTag('natStats',
-             			 array('total'		=> number_format($result['total']),
-			                   'pop'		=> number_format($result['pop']),
-			                   'percent'	=> number_format($percent,2)));
+             			 array('total'		=> $total,
+			                   'pop'		=> $pop,
+			                   'percent'	=> $percent));
 }		                // national report
 else
 {		                // provincial report
@@ -414,25 +422,29 @@ else
 	foreach($result as $row)
 	{		            // loop through the records
 	    // prepare fields for presentation in HTML
-	    $total		+= $row->get('transcribed');
-	    $total2do		+= $row->get('population');
-	    if ($row->get('transcribed') == 0)
-			$pctDone	= 0;
+	    $transcribed            = $row['transcribed'];
+	    $population             = $row['population'];
+	    $total		            += $transcribed;
+	    $total2do		        += $population;
+	    if ($transcribed == 0)
+			$pctDone	        = 0;
 	    else
-			$pctDone	= 100*$row->get('transcribed')/$row->get('population');
-	    $row['transcribed']	= number_format($row->get('transcribed'));
-	    $row['population']	= number_format($row->get('population'));
-	    $row['pctdone']	= number_format($pctDone, 2);
-	    $row['pctclass']	= pctClass($pctDone);
+			$pctDone	        = 100 * $transcribed / $population;
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+	    $row['transcribed']	    = $formatter->format($transcribed);
+	    $row['population']	    = $formatter->format($population);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+	    $row['pctdone']	        = $formatter->format($pctDone);
+	    $row['pctclass']	    = pctClass($pctDone);
 	    if ($even)
 	    {
 			$row['rowclass']	= 'even';
-			$even			= false;
+			$even			    = false;
 	    }
 	    else
 	    {
 			$row['rowclass']	= 'odd';
-			$even			= true;
+			$even			    = true;
 	    }
 	}		            // process all rows
 
@@ -440,11 +452,14 @@ else
 
 	// display total population
 	if ($total2do <= 0)
-	    $total2do	= 999999;	// prevent divide by zero
-	$pctDone	= 100*$total/$total2do;
-	$template->set('total', number_format($total));
-	$template->set('total2do', number_format($total2do));
-	$template->set('pctDone', number_format($pctDone, 2));
-	$template->set('pctDoneClass', pctClass($pctDone));
+        $pctDone                = 100;	// prevent divide by zero
+    else
+	    $pctDone	            = 100 * $total / $total2do;
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+	$template->set('total',         $formatter->format($total));
+	$template->set('total2do',      $formatter->format($total2do));
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+	$template->set('pctDone',       $formatter->format($pctDone));
+	$template->set('pctDoneClass',  pctClass($pctDone));
 }		                // provincial report
 $template->display();

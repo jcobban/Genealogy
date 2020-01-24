@@ -84,8 +84,9 @@ use \Templating\Template;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2018/12/27		use class Template                      		*
  *		2019/12/13      remove D_ prefix from field names               *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -537,6 +538,7 @@ $template->set('REGTOWNSHIP',	$regTownship);
 $template->set('LANG',	        $lang);
 $template->set('REGYEAR',       $regyear);
 $template->set('REGNUM',        $regnum);
+$formatter                          = $template->getFormatter();
 
 // if no error messages display the results of the query
 if (strlen($msg) == 0)
@@ -555,7 +557,7 @@ if (strlen($msg) == 0)
 
 	$template->set('STARTOFFSET',	$offset+1);
 	$template->set('ENDOFFSET',     $offset+$numRows);
-	$template->set('TOTALROWS',     number_format($totalrows));
+	$template->set('TOTALROWS',     $formatter->format($totalrows));
 	$template->set('NPURI',     	$npuri);
     $template->set('NPAND',	        $npand);
 	$template->set('NPPREV',	    $npprev);

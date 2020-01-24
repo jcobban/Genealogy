@@ -23,8 +23,9 @@ use \Exception;
  *		2017/10/14		use class RecordSet								*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/07/26      use FtTemplate                                  *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -62,6 +63,7 @@ if (count($_GET) > 0)
 }	        	    // invoked by URL to display current status
 
 $template               = new FtTemplate("Status$lang.html");
+$formatter                          = $template->getFormatter();
 
 $template->set('LANG',	        $lang);
 
@@ -86,9 +88,9 @@ $citlist				= new RecordSet('Citations', null);
 $information			= $citlist->getInformation();
 $numCitations			= $information['count'];
 
-$template->set('NUMPERSONS',	number_format($numPersons));
-$template->set('NUMFAMILIES',	number_format($numFamilies));
-$template->set('NUMEVENTS',	    number_format($numEvents));
-$template->set('NUMCITATIONS',	number_format($numCitations));
+$template->set('NUMPERSONS',	$formatter->format($numPersons));
+$template->set('NUMFAMILIES',	$formatter->format($numFamilies));
+$template->set('NUMEVENTS',	    $formatter->format($numEvents));
+$template->set('NUMCITATIONS',	$formatter->format($numCitations));
 
 $template->display();

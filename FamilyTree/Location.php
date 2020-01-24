@@ -3,6 +3,7 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 use \Templating\Template;
+use \NumberFormatter;
 /************************************************************************
  *  Location.php														*
  *																	    *
@@ -109,8 +110,9 @@ use \Templating\Template;
  *		2019/04/10      support county names containing an &            *
  *		2019/11/02      use Location to get search name and county      *
  *      2019/11/17      move CSS to <head>                              *
+ *		2020/01/22      internationalize numbers                        *
  *																	    *
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Picture.inc';
@@ -208,6 +210,7 @@ if (!$location->isOwner())
 $template			= new FtTemplate("Location$action$lang.html");
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => 'Location'));
+$formatter                          = $template->getFormatter();
 
 // customize title
 if ($location->isExisting())
@@ -235,8 +238,9 @@ $fsPlaceId			= $location->get('fsplaceid');
 $template->set('FSPLACEID',		    str_replace('"','&quote;',$fsPlaceId));
 $template->set('PREPOSITION',	    $location->get('preposition'));
 $template->set('BOUNDARY',		    $location->get('boundary'));
-$template->set('LATITUDE',		    number_format($location->get('latitude'),6));
-$template->set('LONGITUDE',		    number_format($location->get('longitude'),6));
+$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 6);
+$template->set('LATITUDE',		    $formatter->format($location->get('latitude')));
+$template->set('LONGITUDE',		    $formatter->format($location->get('longitude')));
 $template->set('ZOOM',		        $location->get('zoom'));
 $template->set('NOTES',		        $location->get('notes'));
 if ($closeAtEnd)

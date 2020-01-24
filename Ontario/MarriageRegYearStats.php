@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \NumberFormatter;
 /************************************************************************
  *  MarriageRegYearStats.php											*
  *																		*
@@ -48,8 +49,9 @@ use \Exception;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/07/08      use Template                                    *
  *		2019/12/16      use MarriageSet                                 *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/County.inc';
@@ -158,6 +160,7 @@ $template->set('COUNTRYNAME',		$countryName);
 $template->set('STATENAME',			$stateName);
 $template->set('DOMAIN',		    $domain);
 $template->set('DOMAINNAME',		$domainName);
+$formatter                          = $template->getFormatter();
 
 if ($county)
 {
@@ -221,7 +224,8 @@ foreach($result as $row)
         $rtemplate->set('TOWNSHIP', $township);
     }
 	$count		            = $row['count'];
-    $rtemplate->set('COUNT',        number_format($count));
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+    $rtemplate->set('COUNT',        $formatter->format($count));
 	$total		            += $count;
 	$linked		            = $row['linkcount'];
     $rtemplate->set('LINKCOUNT',    $linked);
@@ -229,7 +233,8 @@ foreach($result as $row)
 	    $pctLinked	        = 0;
 	else
 	    $pctLinked	        = 100 * $linked / $count;
-    $rtemplate->set('PCTLINKED',    number_format($pctLinked,2));
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+    $rtemplate->set('PCTLINKED',    $formatter->format($pctLinked));
     $rtemplate->set('PCTLINKEDCLASS',pctClass($pctLinked));
 	$totalLinked	        += $linked;
 	$low		            = $row['low'];
@@ -247,7 +252,8 @@ foreach($result as $row)
 	    $pctDone	        = 0;
 	else
 	    $pctDone	        = 100 * $count / $todo;
-    $rtemplate->set('PCTDONE',      number_format($pctDone, 2));
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+    $rtemplate->set('PCTDONE',      $formatter->format($pctDone));
     $rtemplate->set('PCTDONECLASS', pctClass($pctDone));
     $rtemplate->set('CLASS',        $rowclass);
 
@@ -276,12 +282,14 @@ if (strlen($total) > 3)
 if ($lowest > $highest)
     $lowest		= $highest;
 
+$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
 $template->set('TOTAL',         $total);
 $template->set('LOWEST',        $lowest);
 $template->set('HIGHEST',       $highest);
-$template->set('PCTDONE',       number_format($pctDone, 2));
+$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+$template->set('PCTDONE',       $formatter->format($pctDone));
 $template->set('PCTDONECLASS',  pctClass($pctDone));
-$template->set('PCTLINKED',     number_format($pctLinked,2));
+$template->set('PCTLINKED',     $formatter->format($pctLinked));
 $template->set('PCTLINKEDCLASS',pctClass($pctLinked));
 
 $template->display();

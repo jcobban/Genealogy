@@ -18,8 +18,9 @@ use \Templating\Template;
  *																		*
  *  History:															*
  *		2019/08/13		created									        *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/ToDo.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -88,6 +89,7 @@ foreach($_GET as $key => $value)
 $template		= new FtTemplate("ToDos$lang.html");
 $tranTab        = $template->getTranslate();
 $tr             = $tranTab['tranTab'];      // instance of TemplateTag
+$formatter                          = $template->getFormatter();
 
 $template->set('IDIR',          $idir);
 $template->set('PATTERN',       $pattern);
@@ -146,7 +148,7 @@ if (strlen($msg) == 0)
 	else
     {			// got some results
         $template->updateTag('nomatches', null);
-        $template->set('COUNT', number_format($count));
+        $template->set('COUNT', $formatter->format($count));
 	    $template->set('OFFSET', $offset);
 	    $template->set('FIRST', $offset + 1);
 		$last	        = min($nextoffset, $count);

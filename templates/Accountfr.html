@@ -7,8 +7,9 @@
  *		2017/11/15		Created											*
  *		2018/01/04		remove Template from template file names		*
  *		2018/02/28		add "Generate Password" button					*
+ *      2020/01/17      add support for Advertiser                      *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=fr">Généalogie</a>:
@@ -118,9 +119,15 @@
 		      </button>
 		    </span>
 		    <span class="pad">
-		      <a href="/ContactAuthor.php?subject=Account Management" class="button">
+		      <a href="/ContactAuthor.php?subject=Gestion de la Compte" class="button">
 			    Communiquer a l'Administrateur</a>
 		    </span>
+    		<span class="pad" id="advertiserLink">
+    		  <a href="/Advertiser.php?lang=$LANG" 
+                    class="button">
+    			Gérer votre compte publicitaire
+             </a>
+		</span>
 		    <input type="hidden" name="act" id="act" value="">
 		    <input type="hidden" name="debug" id="debug" value="$DEBUG">
 		    <input type="hidden" name="lang" id="lang" value="$LANG">

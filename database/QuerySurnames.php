@@ -50,8 +50,9 @@ use \Templating\Template;
  *		2018/11/16      use class Template                              *
  *		                use prepared statements                         *
  *		2019/02/21      use new FtTemplate constructor                  *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -225,6 +226,7 @@ if ($debug)
 
 // create template
 $template	        = new FtTemplate("QuerySurnames$lang.html");
+$formatter                          = $template->getFormatter();
 
 // validate parameters and build WHERE clause
 // constructing the WHERE clause by starting with $and set to 'WHERE '
@@ -669,7 +671,7 @@ if (strlen($msg) == 0)
             else
                 $esurname       = htmlspecialchars($surname);
             $dtemplate->set('ESURNAME',     $esurname);
-            $dtemplate->set('NUMBER',       number_format($number));
+            $dtemplate->set('NUMBER',       $formatter->format($number));
             $dtemplate->set('CLASS',        $class);
             $dtemplate->set('NPURI',        $npuri);
             $data               .= $dtemplate->compile();

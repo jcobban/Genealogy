@@ -44,7 +44,7 @@
       </h1>
       $TRACE
       $MSG
-      <div id="display">
+      <div id="display" style="clear: both;">
 			$BODY
       </div> <!-- id="display" -->
       <p id='wishtosee'>
@@ -120,10 +120,12 @@
 					value="$MOTHERSURNAME">
         </div>
       </form>
-    <hr>	<!-- start of blog section of page -->
+      <div class="row" style="width: 100%">
+        <hr>	<!-- start of blog section of page -->
+      </div>
       <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
 			enctype='multipart/form-data'>
-        <div id="blog$blid">
+        <div id="blog$blid" class="row">
 		  <p class='label'>
 			    At $datetime user '$username' wrote:
 		  </p>
@@ -145,10 +147,10 @@
 				value="$USERID">
         <input type="hidden" name="idir" id="blogidir"
 				value="$IDIR">
-        <p>
+        <div class="row">
           <textarea name="message" id="message" placeholder="[enter message]"
 				rows='5' cols='100'></textarea>
-        </p>
+        </div>
         <div class="row" id="blogEmailRow">
           <label class='column1' for='emailAddress'>
 			  Your E-Mail Address:
@@ -163,16 +165,34 @@
           </button>
         </div>
       </form> <!-- name="blogform" id="blogform" -->
-      <hr class='footnotes'/>
-      <p class='label'>Footnotes:</p>
-      <div id='footnote$key'>
-        <div class="column1" id="#fn$key">
-			  $key
-        </div>
-			  $text
-        <div style='clear: both;'></div>
-      </div> <!-- class='footnote$key' -->
+      <div class="row" id="footnotesSection">
+	    <hr class='footnotes'/>
+	    <p class='label'>Footnotes:</p>
+	    <div id='footnote$key'>
+	      <div class="column1" id="#fn$key">
+			$key
+	      </div>
+			$text
+	      <div style='clear: both;'></div>
+	    </div> <!-- class='footnote$key' -->
+      </div> <!-- class="row" id="footnotesSection" -->
     </div> <!-- class="body" -->
+
+    <div class="hidden" id="messages">
+      <span id="missingID">
+        Missing mandatory identifier parameter.
+      </span>
+      <span id="notFoundTitle">
+        Person Not Found
+      </span>
+      <span id="invisibleTitle">
+        Person is not publicly visible
+      </span>
+    </div> <!-- id="messages" -->
+
+    <!--*****************************************************************
+     *  generate popups													*
+     ******************************************************************-->
     <!-- division within which to display a Google map -->
     <div class="map" id="mapDiv">
     </div>
@@ -182,9 +202,6 @@
         <button id="hideMap" class="button">Hide Map</button>
       </center>
     </div>
-<!--*********************************************************************
- *  generate popups														*
- **********************************************************************-->
     <div id="Individ$idir" class="balloon">
       <b>$name</b>
       <p>

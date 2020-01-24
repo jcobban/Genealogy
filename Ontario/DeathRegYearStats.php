@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \NumberFormatter;
 /************************************************************************
  *  DeathRegYearStats.php												*
  *																		*
@@ -42,6 +43,7 @@ use \Exception;
  *		2019/07/13      reduce invalid county code message to warning   *
  *		                so it can be corrected                          *
  *		2019/12/13      remove D_ prefix from field names               *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -188,6 +190,7 @@ $lowest                             = PHP_INT_MAX;
 $highest                            = 0;
 $totcount                           = 0;
 $totlinked                          = 0;
+$formatter                          = $template->getFormatter();
 
 if (strlen($msg) == 0)
 {			                // no errors
@@ -230,6 +233,8 @@ if (strlen($msg) == 0)
         if ($low < $lowest)
             $lowest                     = $low;
         $surnamecount                   = $row['count'];
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+        $row['count']                   = $formatter->format($surnamecount);
         $totcount                       += $surnamecount;
         $pctdone                        = ($surnamecount * 100.0) / $count;
         if ($pctdone > 100.0)
@@ -241,9 +246,10 @@ if (strlen($msg) == 0)
         if ($pctlinked > 100.0)
             $pctlinked                  = 100.0;
         $pctlinkedclass                 = pctClass($pctlinked);
-        $result[$i]['pctdone']          = number_format($pctdone,2);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+        $result[$i]['pctdone']          = $formatter->format($pctdone);
         $result[$i]['pctdoneclass']     = $pctdoneclass;
-        $result[$i]['pctlinked']        = number_format($pctlinked,2);
+        $result[$i]['pctlinked']        = $formatter->format($pctlinked);
         $result[$i]['pctlinkedclass']   = $pctlinkedclass;
     }                       // loop through rows
 }		        // ok
@@ -259,12 +265,14 @@ else
     $template['form']->update(null);
 
 $total                              = $highest - $lowest + 1;
-$template->set('TOTAL',             $totcount);
+$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+$template->set('TOTAL',             $formatter->format($totcount));
 $template->set('LOWEST',            $lowest);
 $template->set('HIGHEST',           $highest);
-$template->set('PCTDONE',           number_format(($totcount * 100.0) / $total,2));
+$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+$template->set('PCTDONE',           $formatter->format(($totcount * 100.0) / $total));
 $template->set('PCTDONECLASS',      pctClass(($totcount * 100.0) / $total));
-$template->set('PCTLINKED',         number_format(($totlinked* 100.0) / $total,2));
+$template->set('PCTLINKED',         $formatter->format(($totlinked* 100.0) / $total));
 $template->set('PCTLINKEDCLASS',    pctClass(($totlinked * 100.0) / $total));
 
 $template->display();

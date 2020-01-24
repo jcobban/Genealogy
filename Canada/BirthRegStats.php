@@ -41,6 +41,7 @@ use \Templating\Template;
  *		2018/10/06      use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
+ *      2020/01/22      use NumberFormatter                             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -136,6 +137,7 @@ $data               = '';
 $total              = 0;
 $totalLinked        = 0;
 $yearClass          = 'odd';
+$formatter          = $template->getFormatter();
 
 foreach($result as $i => $row)
 {                       // loop through each year of statistics
@@ -154,8 +156,8 @@ foreach($result as $i => $row)
     $ttemplate->set('DOMAIN', $domain);
     $ttemplate->set('REGYEAR', $regYear);
     $ttemplate->set('YEARCLASS', $yearClass . ' right');
-    $ttemplate->set('COUNT', number_format($count));
-    $ttemplate->set('LINKED', number_format($linked));
+    $ttemplate->set('COUNT', $formatter->format($count));
+    $ttemplate->set('LINKED', $formatter->format($linked));
     $ttemplate->set('PCTLINKED', pctClass($pctLinked));
     $data           .= $ttemplate->compile();
     $col++;
@@ -172,6 +174,6 @@ foreach($result as $i => $row)
         $data       .= "    <td></td>\n";
 }                       // loop through each year of statistics
 $dataRow->update($data);
-$template->set('TOTAL',         number_format($total));
-$template->set('TOTALLINKED',   number_format($totalLinked));
+$template->set('TOTAL',         $formatter->format($total));
+$template->set('TOTALLINKED',   $formatter->format($totalLinked));
 $template->display();

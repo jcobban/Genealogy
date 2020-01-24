@@ -21,8 +21,9 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/07/09      use Template                                    *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
@@ -96,6 +97,7 @@ else
 
 // get the template
 $template      			= new FtTemplate("WmbStats$lang.html");
+$formatter                          = $template->getFormatter();
 
 // lay out the table header row
 $headRowElt    			= $template['headRow'];
@@ -132,7 +134,7 @@ for ($row = reset($result); $row; )
         $rtemplate->set('DISTRICT',     $district);
         $rtemplate->set('DISTNUM',      $distnum);
         $rtemplate->set('CLASS',        $rowclass);
-        $rtemplate->set('COUNT',        number_format($count));
+        $rtemplate->set('COUNT',        $formatter->format($count));
         $data           .= $spacer . $rtemplate->compile();
         $spacer         = "           <td>\n              </td>\n";
         $row            = next($result);
@@ -146,6 +148,6 @@ for ($row = reset($result); $row; )
 }
 $dataRowElt->update($data);
 
-$template->set('TOTAL',         number_format($total));
+$template->set('TOTAL',         $formatter->format($total));
 
 $template->display();

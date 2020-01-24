@@ -7,8 +7,9 @@
  *		2017/11/15		Created											*
  *		2018/01/04		remove Template from template file names		*
  *		2018/02/28		add "Generate Password" button					*
+ *      2020/01/17      add support for Advertiser                      *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -117,9 +118,18 @@
 		    <u>C</u>lose
 		  </button>
 		</span>
-		<a href="/ContactAuthor.php?subject=Account Management" class="button">
+		<span class="pad">
+		  <a href="/ContactAuthor.php?subject=Account Management&lang=$LANG" 
+                class="button">
 			Contact Administrator
-        </a>
+         </a>
+		</span>
+		<span class="pad" id="advertiserLink">
+		  <a href="/Advertiser.php?lang=$LANG" 
+                class="button">
+			Manage Your Advertising Account
+         </a>
+		</span>
 		<input type="hidden" name="act" id="act" value="">
 		<input type="hidden" name="debug" id="debug" value="$DEBUG">
 		<input type="hidden" name="lang" id="lang" value="$LANG">

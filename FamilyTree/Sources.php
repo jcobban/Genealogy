@@ -50,8 +50,9 @@ use Templating\TemplateTag;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/07/22      use Template                                    *
  *		2019/11/06      add translate table to output for Javascript    *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -130,6 +131,7 @@ else
 $template               = new FtTemplate("Sources$action$lang.html");
 $tranTab                = $template->getTranslate();
 $srcTypes               = $tranTab['srcTypes'];
+$formatter                          = $template->getFormatter();
 
 // get an associative array of source records matching the
 // supplied parameters
@@ -176,9 +178,9 @@ else
     $prevoffset	        = $offset - $limit;
     $nextoffset	        = $offset + $limit;
     $last	            = min($nextoffset - 1, $count);
-    $template->set('SHOWOFFSET',    number_format($offset + 1));
-    $template->set('COUNT',         number_format($count));
-    $template->set('LAST',          number_format($last));
+    $template->set('SHOWOFFSET',    $formatter->format($offset + 1));
+    $template->set('COUNT',         $formatter->format($count));
+    $template->set('LAST',          $formatter->format($last));
 
     if ($prevoffset >= 0)
     {	// previous page of output to display
@@ -219,7 +221,7 @@ else
         $rtemplate->set('TYPETEXT',         $typeText);
         $rtemplate->set('NAME',             $name);
         $rtemplate->set('ROWCLASS',         $rowclass);
-        $rtemplate->set('CCOUNT',       number_format($cinformation['count']));
+        $rtemplate->set('CCOUNT',       $formatter->format($cinformation['count']));
         $delCell            = $rtemplate['DeleteCell$IDSR'];
         if ($delCell)
         {

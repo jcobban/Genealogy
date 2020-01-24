@@ -61,8 +61,9 @@ use \Exception;
  *		2017/12/01		get statistics more efficiently					*
  *		2018/01/04		remove Template from template file names		*
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright 2018 &copy; James A. Cobban								*
+ *  Copyright 2020 &copy; James A. Cobban								*
  ***********************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -116,6 +117,7 @@ if (file_exists($tempBase . $baseName))
 else
     $includeSub		= "genCensuses{$action}__$lang.html";
 $template		= new FtTemplate($includeSub);
+$formatter                          = $template->getFormatter();
 
 // initialize substitution values
 $languageObj		= new Language(array('code' => $lang));
@@ -170,9 +172,9 @@ else
 $title		= $countryName . ": Censuses";
 
 foreach($cendone as $year => $value)
-	$template->set('CENDONE' . $year, number_format(floatval($value)));
+	$template->set('CENDONE' . $year, $formatter->format(floatval($value)));
 foreach($cenpop as $year => $value)
-	$template->set('CENPOP' . $year, number_format(floatval($value)));
+	$template->set('CENPOP' . $year, $formatter->format(floatval($value)));
 $template->set('TITLE',		        $title);
 $template->set('COUNTRYNAME',	    $countryName);
 $template->set('ARTICLE',		    $article);

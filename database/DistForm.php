@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \NumberFormatter;
 /************************************************************************
  *  DistForm.php														*
  *																		*
@@ -66,8 +67,9 @@ use \Exception;
  *		                perform the database update in this module      *
  *		                instead of passing to DistUpdate.php            *
  *		                support deleting Districts                      *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
@@ -278,6 +280,7 @@ if (canUser('admin'))
 else
     $action     = "Display";
 $template		= new FtTemplate("DistForm$action$lang.html");
+$formatter                          = $template->getFormatter();
 
 // notify the invoker if they are not authorized
 
@@ -445,9 +448,11 @@ if (strlen($msg) == 0)
                 $tcensusId	    = $censusId;
             $fpctClass	        = pctClass($fpct, true);
             $donepctClass	    = pctClass($donepct, true);
-            $fpct		        = number_format($fpct, 2);
-            $pop		        = number_format($pop, 0);
-            $done		        = number_format($done, 0);
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+            $fpct		        = $formatter->format($fpct);
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+            $pop		        = $formatter->format($pop);
+            $done		        = $formatter->format($done);
             $data[]	            = array('line'		=> $line,
 			                        'distId'	=> $district->get('id'),
 			                        'name'		=> $district->get('name'),

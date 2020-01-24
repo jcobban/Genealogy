@@ -57,8 +57,9 @@ use \Exception;
  *		2019/01/21      delete button was not displayed for unused      *
  *		2019/02/19      pass language to next scripts                   *
  *		                use new FtTemplate constructor                  *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -69,248 +70,249 @@ require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    // validate parameters
-    $idlr		    = null;
-    $limit		    = 25;
-    $autodelete		= false;
-    $lang		    = 'en';
-    $indcount		= 0;
-    $marcount		= 0;
-    $evtcount		= 0;
+// validate parameters
+$idlr		    = null;
+$limit		    = 25;
+$autodelete		= false;
+$lang		    = 'en';
+$indcount		= 0;
+$marcount		= 0;
+$evtcount		= 0;
 
-    foreach($_GET as $key => $value)
-    {			// loop through all parameters
-		switch(strtolower($key))
-		{		// act on parameters
-		    case 'idlr':
-		    {
-				$idlr		    = intval($value);
-				break;
-		    }		// IDLR
+foreach($_GET as $key => $value)
+{			// loop through all parameters
+	switch(strtolower($key))
+	{		// act on parameters
+	    case 'idlr':
+	    {
+			$idlr		    = intval($value);
+			break;
+	    }		// IDLR
 
-		    case 'limit':
-		    {
-				$limit		    = intval($value);
-				break;
-		    }		// Limit
+	    case 'limit':
+	    {
+			$limit		    = intval($value);
+			break;
+	    }		// Limit
 
-		    case 'lang':
-		    {
-				if (strlen($value) >= 2)
-				    $lang		= strtolower(substr($value, 0, 2));
-				break;
-		    }		// Limit
+	    case 'lang':
+	    {
+			if (strlen($value) >= 2)
+			    $lang		= strtolower(substr($value, 0, 2));
+			break;
+	    }		// Limit
 
-		    case 'delete':
-		    {
-				if (strtolower($value) == 'yes')
-				    $autodelete	= true;
-				break;
-		    }
-		}		// act on parameters
-    }			// loop through all parameters
+	    case 'delete':
+	    {
+			if (strtolower($value) == 'yes')
+			    $autodelete	= true;
+			break;
+	    }
+	}		// act on parameters
+}			// loop through all parameters
 
-    if (is_null($idlr))
+if (is_null($idlr))
+{
+	$msg		.= 'Missing mandatory parameter idlr. ';
+	$locName	= 'Unknown';
+}
+
+if (strlen($msg) == 0)
+{		// no messages
+	// get the location being used for the search
+	$location	= new Location(array('idlr' => $idlr));
+	if (!$location->isExisting())
+	    $warn	.= "<p>getIndividualsByLocation.php: " . __LINE__ . 
+					   " Unable to get Location for IDLR=$idlr. ";
+	$locName	= $location->getName();
+
+	// get individuals who have the location in one of the events
+	// recorded in the individual record
+	$indParms	= array(array('idlrbirth'	    => $idlr,
+						      'idlrchris'	    => $idlr,
+						      'idlrdeath'	    => $idlr,
+						      'idlrburied'	    => $idlr),
+						      'limit'			=> $limit,
+						      'order'			=>
+							  'Surname, GivenName, BirthSD, DeathSD');
+	$indivs		= new PersonSet($indParms);
+	$indInfo	= $indivs->getInformation();
+	$indcount	= $indInfo['count'];
+	$count		= $indcount;
+
+	// get families which have the location in one of the events
+	// recorded in the Family Record
+	$marParms	= array('idlrmar'	=> $idlr,
+						'limit'		=> $limit,
+						'order'		=> '`idmr`');
+	$families	= new RecordSet('Families', $marParms);
+	$famInfo	= $families->getInformation();
+	$famcount	= $famInfo['count'];
+	$count		+= $famcount;
+
+	// get events which have the location in one of the events
+	// recorded in the Event Record table
+	$getParms	= array('idlrevent'	=> $idlr,
+						'limit'		=> $limit);
+	$events		= new RecordSet('Events',$getParms);
+	$evtInfo	= $events->getInformation();
+	$evtcount	= $evtInfo['count'];
+	$count		+= $evtcount;
+}		// no messages
+
+$template		= new FtTemplate("getIndividualsByLocation$lang.html");
+$formatter                          = $template->getFormatter();
+
+$template->set('IDLR', $idlr);
+$template->set('LOCNAME', $locName);
+$prefix		= $locName;
+if (strlen($prefix) > 4)
+	$prefix		= substr($prefix, 0, 4);
+$template->set('PREFIX', $prefix);
+
+if ($count > 0)
+{		// some individuals with refs in main record
+	foreach($indivs as $idir => $person)
+	{		// loop through individuals
+	    if ($person->get('gender') == 0)
+			$gender			= 'male';
+	    else
+            $gender			= 'female';
+	    if ($person->get('idlrbirth') == $idlr)
+			$eventType		= 'Birth';
+	    else
+	    if ($person->get('idlrchris') == $idlr)
+			$eventType		= 'Christening';
+	    else
+	    if ($person->get('idlrdeath') == $idlr)
+			$eventType		= 'Death';
+	    else
+	    if ($person->get('idlrburied') == $idlr)
+			$eventType		= 'Burial';
+	    else
+			$eventType		= 'Unknown Event';
+	    $name		= $person->getName(Person::NAME_INCLUDE_DATES);
+	    $person['eventType']	= $eventType;
+	    $person['mpage']		= "Person.php?idir=$idir&lang=$lang";
+	    $person['dname']		= $name;
+	    $person['gender']		= $gender;
+	}		// loop through individuals
+
+	$template['personEvents']->update( $indivs);
+
+	foreach($events as $ider => $event)
+	{		// loop through events
+	    $idet			    = $event->get('idet');
+	    $eventType			= Event::$eventText[$idet];
+	    $eventType			= ucfirst($eventType);
+	    if ($event->get('idtype') == Event::IDTYPE_INDIV)
+	    {	// individual event
+			$idir			= $event->getIdir();
+			try {
+			    $person		= $event->getAssociatedRecord();
+			    if ($person->get('gender') == 0)
+					$gender		= 'male';
+			    else
+					$gender		= 'female';
+			} catch(Exception $e) {
+			    $gender		= 'other';
+			}
+			$name	= $person->getName(Person::NAME_INCLUDE_DATES);
+			$event['eventType']	= $eventType;
+			$event['mpage']		= "Person.php?idir=$idir&lang=$lang";
+			$event['dname']		= $name;
+			$event['gender']	= $gender;
+	    }	// individual event
+	    else
+	    if ($event->get('idtype') == Event::IDTYPE_MAR)
+	    {	// family event
+			$family		= $event->getAssociatedRecord();
+			$idmr		= $family->get('idmr');
+			$idir		= $family->get('idirhusb');
+			if ($idir == 0)
+			    $idir	= $family->get('idirwife');
+			if (canUser('edit'))
+			    $mpage	= "editMarriages.php?idir=$idir&idmr=$idmr&lang=$lang";
+			else
+			    $mpage	= "Person.php?idir=$idir&lang=$lang";
+			$event['eventType']		= $eventType;
+			$event['mpage']			= $mpage;
+			$event['dname']			= $family->getName();
+			$event['gender']		= 'unknown';
+	    }	    // family event
+	}		    // loop through events
+
+	$template['generalEvents']->update( $events);
+
+	foreach($families as $idmr => $family)
+	{		    // loop through families
+	    $marrEvent	= $family->getMarEvent();
+	    if ($marrEvent->get('ider') == 0)
+	    {		// not already handled
+			$idmr		                = $family->get('idmr');
+			$idir		                = $family->get('idirhusb');
+			if ($idir == 0)
+			    $idir	                = $family->get('idirwife');
+			if (canUser('edit'))
+			    $mpage		= "editMarriages.php?idir=$idir&idmr=$idmr&lang=$lang";
+			else
+			    $mpage		= "Person.php?idir=$idir&lang=$lang";
+			$family['mpage']		    = $mpage;
+			$family['familyName']		= $family->getName();
+			$family['gender']		    = 'unknown';
+	    }	    // not already handled
+	}		    // loop through families
+
+    if ($indcount > $limit)
     {
-		$msg		.= 'Missing mandatory parameter idlr. ';
-		$locName	= 'Unknown';
+		$indcount		= $formatter->format($indcount);
+		$template['indOver']->update(array('indcount'	=> $indcount,
+							               'limit'	    => $limit));
     }
-
-    if (strlen($msg) == 0)
-    {		// no messages
-		// get the location being used for the search
-		$location	= new Location(array('idlr' => $idlr));
-		if (!$location->isExisting())
-		    $warn	.= "<p>getIndividualsByLocation.php: " . __LINE__ . 
-						   " Unable to get Location for IDLR=$idlr. ";
-		$locName	= $location->getName();
-
-		// get individuals who have the location in one of the events
-		// recorded in the individual record
-		$indParms	= array(array('idlrbirth'	    => $idlr,
-							      'idlrchris'	    => $idlr,
-							      'idlrdeath'	    => $idlr,
-							      'idlrburied'	    => $idlr),
-							      'limit'			=> $limit,
-							      'order'			=>
-								  'Surname, GivenName, BirthSD, DeathSD');
-		$indivs		= new PersonSet($indParms);
-		$indInfo	= $indivs->getInformation();
-		$indcount	= $indInfo['count'];
-		$count		= $indcount;
-    
-		// get families which have the location in one of the events
-		// recorded in the Family Record
-		$marParms	= array('idlrmar'	=> $idlr,
-							'limit'		=> $limit,
-							'order'		=> '`idmr`');
-		$families	= new RecordSet('Families', $marParms);
-		$famInfo	= $families->getInformation();
-		$famcount	= $famInfo['count'];
-		$count		+= $famcount;
-
-		// get events which have the location in one of the events
-		// recorded in the Event Record table
-		$getParms	= array('idlrevent'	=> $idlr,
-							'limit'		=> $limit);
-		$events		= new RecordSet('Events',$getParms);
-		$evtInfo	= $events->getInformation();
-		$evtcount	= $evtInfo['count'];
-		$count		+= $evtcount;
-    }		// no messages
-
-    $template		= new FtTemplate("getIndividualsByLocation$lang.html");
-
-    $template->set('IDLR', $idlr);
-    $template->set('LOCNAME', $locName);
-    $prefix		= $locName;
-    if (strlen($prefix) > 4)
-		$prefix		= substr($prefix, 0, 4);
-    $template->set('PREFIX', $prefix);
-
-    if ($count > 0)
-    {		// some individuals with refs in main record
-		foreach($indivs as $idir => $person)
-		{		// loop through individuals
-		    if ($person->get('gender') == 0)
-				$gender			= 'male';
-		    else
-                $gender			= 'female';
-		    if ($person->get('idlrbirth') == $idlr)
-				$eventType		= 'Birth';
-		    else
-		    if ($person->get('idlrchris') == $idlr)
-				$eventType		= 'Christening';
-		    else
-		    if ($person->get('idlrdeath') == $idlr)
-				$eventType		= 'Death';
-		    else
-		    if ($person->get('idlrburied') == $idlr)
-				$eventType		= 'Burial';
-		    else
-				$eventType		= 'Unknown Event';
-		    $name		= $person->getName(Person::NAME_INCLUDE_DATES);
-		    $person['eventType']	= $eventType;
-		    $person['mpage']		= "Person.php?idir=$idir&lang=$lang";
-		    $person['dname']		= $name;
-		    $person['gender']		= $gender;
-		}		// loop through individuals
-
-		$template['personEvents']->update( $indivs);
-
-		foreach($events as $ider => $event)
-		{		// loop through events
-		    $idet			    = $event->get('idet');
-		    $eventType			= Event::$eventText[$idet];
-		    $eventType			= ucfirst($eventType);
-		    if ($event->get('idtype') == Event::IDTYPE_INDIV)
-		    {	// individual event
-				$idir			= $event->getIdir();
-				try {
-				    $person		= $event->getAssociatedRecord();
-				    if ($person->get('gender') == 0)
-						$gender		= 'male';
-				    else
-						$gender		= 'female';
-				} catch(Exception $e) {
-				    $gender		= 'other';
-				}
-				$name	= $person->getName(Person::NAME_INCLUDE_DATES);
-				$event['eventType']	= $eventType;
-				$event['mpage']		= "Person.php?idir=$idir&lang=$lang";
-				$event['dname']		= $name;
-				$event['gender']	= $gender;
-		    }	// individual event
-		    else
-		    if ($event->get('idtype') == Event::IDTYPE_MAR)
-		    {	// family event
-				$family		= $event->getAssociatedRecord();
-				$idmr		= $family->get('idmr');
-				$idir		= $family->get('idirhusb');
-				if ($idir == 0)
-				    $idir	= $family->get('idirwife');
-				if (canUser('edit'))
-				    $mpage	= "editMarriages.php?idir=$idir&idmr=$idmr&lang=$lang";
-				else
-				    $mpage	= "Person.php?idir=$idir&lang=$lang";
-				$event['eventType']		= $eventType;
-				$event['mpage']			= $mpage;
-				$event['dname']			= $family->getName();
-				$event['gender']		= 'unknown';
-		    }	    // family event
-		}		    // loop through events
-
-		$template['generalEvents']->update( $events);
-
-		foreach($families as $idmr => $family)
-		{		    // loop through families
-		    $marrEvent	= $family->getMarEvent();
-		    if ($marrEvent->get('ider') == 0)
-		    {		// not already handled
-				$idmr		                = $family->get('idmr');
-				$idir		                = $family->get('idirhusb');
-				if ($idir == 0)
-				    $idir	                = $family->get('idirwife');
-				if (canUser('edit'))
-				    $mpage		= "editMarriages.php?idir=$idir&idmr=$idmr&lang=$lang";
-				else
-				    $mpage		= "Person.php?idir=$idir&lang=$lang";
-				$family['mpage']		    = $mpage;
-				$family['familyName']		= $family->getName();
-				$family['gender']		    = 'unknown';
-		    }	    // not already handled
-		}		    // loop through families
-
-	    if ($indcount > $limit)
-	    {
-			$indcount		= number_format($indcount);
-			$template['indOver']->update(array('indcount'	=> $indcount,
-								               'limit'	    => $limit));
-	    }
-	    else
-			$template['indOver']->update( null);
-	    if ($famcount > $limit)
-	    {
-			$famcount		= number_format($famcount);
-			$template['famOver']->update(array('famcount'	=> $famcount,
-								               'limit'	    => $limit));
-	    }
-	    else
-			$template['famOver']->update( null);
-	    if ($evtcount > $limit)
-	    {    
-			$evtcount		= number_format($evtcount);
-			$template['evtOver']->update(array('evtcount'	=> $evtcount,
-								               'limit'	    => $limit));
-	    }
-	    else
-			$template['evtOver']->update( null);
-		$template['marriageEvents']->update($families);
-		$template['nofacts']->update(null);
-		$template['deletedLocation']->update(null);
-		$template['delForm']->update(null);
-    }		    // references
     else
-    {		    // no facts use this location
-		$template['references']->update(null);
-		$template['nofacts']->update(array('locName'	=> $locName));
-		if ($autodelete)
-		{	    // delete automatically
-		    $result		= $location->delete(false);
-		    $template['deletedLocation']->update(array('locName' => $locName));
-		    $template['delForm']->update(null);
-		}		// delete automatically
-		else
-		{		// ask user if we can delete
-		    $template['deletedLocation']->update(null);
-		    if ($debug)
-				$debugyn	= 'Y';
-		    else
-				$debugyn	= 'N';
-		    $template['delForm']->update(array('locName'	=> $locName,
-							                   'idlr'		=> $idlr,
-							                   'debug'		=> $debugyn));
-		}		// ask user if we can delete
-    }		    // no facts use this location
+		$template['indOver']->update( null);
+    if ($famcount > $limit)
+    {
+		$famcount		= $formatter->format($famcount);
+		$template['famOver']->update(array('famcount'	=> $famcount,
+							               'limit'	    => $limit));
+    }
+    else
+		$template['famOver']->update( null);
+    if ($evtcount > $limit)
+    {    
+		$evtcount		= $formatter->format($evtcount);
+		$template['evtOver']->update(array('evtcount'	=> $evtcount,
+							               'limit'	    => $limit));
+    }
+    else
+		$template['evtOver']->update( null);
+	$template['marriageEvents']->update($families);
+	$template['nofacts']->update(null);
+	$template['deletedLocation']->update(null);
+	$template['delForm']->update(null);
+}		    // references
+else
+{		    // no facts use this location
+	$template['references']->update(null);
+	$template['nofacts']->update(array('locName'	=> $locName));
+	if ($autodelete)
+	{	    // delete automatically
+	    $result		= $location->delete(false);
+	    $template['deletedLocation']->update(array('locName' => $locName));
+	    $template['delForm']->update(null);
+	}		// delete automatically
+	else
+	{		// ask user if we can delete
+	    $template['deletedLocation']->update(null);
+	    if ($debug)
+			$debugyn	= 'Y';
+	    else
+			$debugyn	= 'N';
+	    $template['delForm']->update(array('locName'	=> $locName,
+						                   'idlr'		=> $idlr,
+						                   'debug'		=> $debugyn));
+	}		// ask user if we can delete
+}		    // no facts use this location
 
-    $template->display();
+$template->display();

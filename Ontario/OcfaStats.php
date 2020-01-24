@@ -27,8 +27,9 @@ use \Exception;
  *		2018/11/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/12/17      use class OcfaSet                               *
  *		                use Template                                    *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/OcfaSet.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -62,6 +63,7 @@ if (count($_GET) > 0)
 }
 
 $template           = new FtTemplate("OcfaStats$lang.html");
+$formatter                          = $template->getFormatter();
 
 $template->set('LANG',              $lang);
 
@@ -87,7 +89,7 @@ if (strlen($msg) == 0)
         }
         $rtemplate          = new \Templating\Template($rbody);
         $rtemplate->set('county',       $row['county']);
-        $rtemplate->set('count',        number_format($count));
+        $rtemplate->set('count',        $formatter->format($count));
         $data               .= $rtemplate->compile();
         
 		$col++;
@@ -101,7 +103,7 @@ if (strlen($msg) == 0)
             $data           .= "\t\t  <td>&nbsp;</td>\n";
         }	            // start new column
     }                   // loop through rows
-    $template->set('total',            number_format($total));
+    $template->set('total',            $formatter->format($total));
     $rowtag->update($data);
 }			            // no errors
 else

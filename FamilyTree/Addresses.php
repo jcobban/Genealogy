@@ -45,8 +45,9 @@ use \Exception;
  *		2019/02/18      use new FtTemplate constructor                  *
  *		2019/07/23      use FtTemplate::validateLang                    *
  *		2019/09/26      fix scrolling                                   *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Address.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -285,6 +286,7 @@ else
 $template		= new FtTemplate("Addresses$action$lang.html");
 $template->updateTag('otherStylesheets',	
     		             array('filename'   => '/FamilyTree/Addresses'));
+$formatter                          = $template->getFormatter();
 
 if ($count == 0)
 {
@@ -292,7 +294,7 @@ if ($count == 0)
 }
 else
 {		// got some results
-	$template->set('COUNT', number_format($count));
+	$template->set('COUNT', $formatter->format($count));
 }
 $template->set('PATTERN', $pattern);
 if ($repositories)

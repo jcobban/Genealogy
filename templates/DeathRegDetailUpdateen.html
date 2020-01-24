@@ -562,7 +562,7 @@
 					class="same white leftnc40em"> 
           <div style="clear: both"></div>
         </div>
-        <p>
+        <div class="row">
 		    <button type="submit" id="Submit">
 	            <u>U</u>pdate
 	        </button>
@@ -570,7 +570,17 @@
 			<button type="reset" id="Reset">
 	            <u>C</u>lear Form
 	        </button>
-        </p>
+	        &nbsp;
+            <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$PREVREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE"
+                    class="button">
+                Previous
+            </a>
+	        &nbsp;
+            <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$NEXTREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE"
+                    class="button">
+                Next
+            </a>
+        </div>
       </form>
    </div> <!-- end of <div id="body"> -->
   <div class="hidden" id="templates">

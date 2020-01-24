@@ -25,8 +25,9 @@ use \Exception;
  *		2017/10/30		use composite cell style classes				*
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/MethodistBaptism.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -72,6 +73,7 @@ if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
 $template       = new FtTemplate("WmbDistrictStats$lang.html");
+$formatter                          = $template->getFormatter();
 
 if (is_null($district))
 	$msg	.= 'Missing mandatory parameter "district".  ';
@@ -135,7 +137,7 @@ for ($row = reset($result); $row; )
 		$total		    += $count;
         $rtemplate->set('TOWNSHIP',     $township);
         $rtemplate->set('CLASS',        $rowclass);
-        $rtemplate->set('COUNT',        number_format($count));
+        $rtemplate->set('COUNT',        $formatter->format($count));
         $data           .= $spacer . $rtemplate->compile();
         $spacer         = "           <td>\n              </td>\n";
         $row            = next($result);
@@ -149,7 +151,7 @@ for ($row = reset($result); $row; )
 }
 $dataRowElt->update($data);
 
-$template->set('TOTAL',         number_format($total));
+$template->set('TOTAL',         $formatter->format($total));
 $template->set('DISTRICT',      $district);
 
 $template->display();

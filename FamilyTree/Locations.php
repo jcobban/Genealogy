@@ -50,8 +50,9 @@ use \Templating\Template;
  *		2018/11/06      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/06/15      use ordinal numbering of records                *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -109,6 +110,7 @@ foreach($_GET as $key => $value)
 }                           // loop through parameters
 
 $template		= new FtTemplate("Locations$lang.html");
+$formatter                          = $template->getFormatter();
 
 $template->set('PATTERN',       $pattern);
 $template->set('UPATTERN',      urlencode($pattern));
@@ -143,7 +145,7 @@ if (strlen($msg) == 0)
 	else
     {			// got some results
         $template->updateTag('nomatches', null);
-        $template->set('COUNT', number_format($count));
+        $template->set('COUNT', $formatter->format($count));
 	    $template->set('OFFSET', $offset);
 	    $template->set('FIRST', $offset + 1);
 		$last	        = min($nextoffset, $count);

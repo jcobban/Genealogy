@@ -1199,6 +1199,8 @@ class Family extends RecordPic
      ********************************************************************/
     function getWifePriName()
     {
+        global  $warn;
+
         if (is_null($this->wifePriName))
         {
             $idirwife       = $this->row['idirwife'];

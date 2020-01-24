@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \NumberFormatter;
 /************************************************************************
  *  CensusUpdateStatusDetails.php										*
  *																		*
@@ -90,8 +91,9 @@ use \Exception;
  *						parameter list of new CensusLineSet changed		*
  *		2018/11/08      improve parameter error checking                *
  *		2018/11/29      use Template                                    *
+ *		2020/01/22      internationalize numbers                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/District.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
@@ -224,6 +226,7 @@ else
 }		// user can only view database
 
 $template           = new FtTemplate("CensusStatusDetails$action$lang.html");
+$formatter                          = $template->getFormatter();
 
 // the invoker must explicitly provide the Census year
 if (strlen($censusId) == 0)
@@ -440,10 +443,11 @@ if (strlen($msg) == 0)
 
 		// display a row with values from database
         $pctdone	            = ($namecount + $agecount)*50/$population; 
-        $row['pctdone']         = number_format($pctdone, 2);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+        $row['pctdone']         = $formatter->format($pctdone);
         $row['pctclassdone']    = pctClass($pctdone, false);
 		$pctlinked	            = $idircount*100/$population;
-        $row['pctlinked']       = number_format($pctlinked, 2);
+        $row['pctlinked']       = $formatter->format($pctlinked);
         $row['pctclasslinked']  = pctClass($pctlinked, false);
         if ($page == $highlightpage)
             $row['pageclass']   = 'even right bold';
@@ -472,11 +476,13 @@ if (strlen($msg) == 0)
     $rowElement->update($data);
 
     $totpop                 = $subDistrict['population'];
-	$template->set('DONE',              number_format($done)); 
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+	$template->set('DONE',              $formatter->format($done)); 
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 	$template->set('PCTCLASSDONE',      pctClass($done * 100 / $totpop, false));
-    $template->set('PCTDONE',           number_format($done * 100 / $totpop, 2)); 
+    $template->set('PCTDONE',           $formatter->format($done * 100 / $totpop)); 
 	$template->set('PCTCLASSLINKED',    pctClass($linked * 100 / $totpop, false));
-    $template->set('PCTLINKED',         number_format($linked * 100 / $totpop, 2)); 
+    $template->set('PCTLINKED',         $formatter->format($linked * 100 / $totpop)); 
 	if (count($cleanupPages) > 0 && canUser('edit'))
 	{		        // there are completely blank pages and user is auth'd
 	    $getParms['page']	= $cleanupPages;

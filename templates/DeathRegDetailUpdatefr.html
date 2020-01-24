@@ -563,17 +563,27 @@
 					class="same white leftnc40em"> 
 	      <div style="clear: both"></div>
 	    </div>
-	    <p>
-		<button type="submit" id="Submit">
-		  Mise a jour
-		</button>
-		&nbsp;
-		<button type="reset" id="Reset">
-		  Réinitialiser&nbsp;formule
-		</button>
-	    </p>
+	    <div class="row">
+			<button type="submit" id="Submit">
+			  Mise a jour
+			</button>
+			&nbsp;
+			<button type="reset" id="Reset">
+			  Réinitialiser&nbsp;formule
+			</button>
+	        &nbsp;
+            <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$PREVREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE"
+                class="button">
+                Previous
+            </a>
+	        &nbsp;
+            <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$NEXTREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE"
+                class="button">
+                Next
+            </a>
+		  </div>
 	    </form>
-	 </div> <!-- end of <div id="body"> -->
+	  </div> <!-- end of <div id="body"> -->
     <div class="hidden" id="templates">
 	  $DIALOGS
     </div> <!-- id="templates" -->
@@ -625,9 +635,7 @@
 	    abbreviation of name of month, and year.
     </div>
     <div class="balloon" id="HelpPlace">
-	  <p>
 	    Place of death.
-	  </p>
     </div>
     <div class="balloon" id="HelpIDIR">
 	    This selection list offers a list of individuals in the
@@ -638,7 +646,6 @@
         to that individual.
     </div>
     <div class="balloon" id="HelpAge">
-	  <p>
 	    Age at death.  This is specified as a number of years, months, weeks, days, or hours, or a combination of these.  A number is an integer, optionally followed
 	    by a '½', which may be entered as '1/2', with no intervening space. 
 	    The interpretation of each number is specified by the first letter of the unit
@@ -646,52 +653,35 @@
 	    readable, for example '7days' is interpreted the same as '7d'. 
 	    If a number is not followed by a letter then it is interpreted as a number
 	    of years.
-	  </p>
     </div>
     <div class="balloon" id="HelpOccupation">
-	  <p>
 	    Occupation of deceased.
-	  </p>
     </div>
     <div class="balloon" id="HelpBirthPlace">
-	  <p>
 	    Birth place of deceased.
-	  </p>
     </div>
     <div class="balloon" id="HelpBirthDate">
-	  <p>
 	    Birth date of deceased.
 	    It is suggested that dates be entered consistently as day, 
 	    abbreviation of name of month, and year.
 	    If no birth date is provided by the original, it is recommended that an
 	    approximate birth date be calculated using the age and date of death, 
 	    and enclosed in square brackets to mark it as an editorial comment.
-	  </p>
     </div>
     <div class="balloon" id="HelpResPlace">
-	  <p>
 	    Length of time the deceased lived at the place of death.
-	  </p>
     </div>
     <div class="balloon" id="HelpResOnt">
-	  <p>
 	    Length of time the deceased lived in Ontario.
-	  </p>
     </div>
     <div class="balloon" id="HelpResCan">
-	  <p>
 	    Length of time the deceased lived in Canada.
-	  </p>
     </div>
     <div class="balloon" id="HelpCause">
-	  <p>
 	    Cause of death.
-	  </p>
     </div>
     <div class="balloon" id="HelpDuration">
-	  <p>
 	    Duration of cause of death.
-	  </p>
     </div>
     <div class="balloon" id="HelpPhys">
 	  <p>
