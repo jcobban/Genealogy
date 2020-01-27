@@ -25,114 +25,113 @@
       <p class="label" id="okmsg">$OKMSG</p>
       <div id="update">
         <form action="Account.php"
-    	    name="accountForm" id="accountForm"
-    	    method="post"  
-    	    enctype="multipart/form-data">
+        	    name="accountForm" id="accountForm"
+        	    method="post"  
+    	        enctype="multipart/form-data">
           <p id="useridRow" class="clear">
     	    <label class="label" for="userid">
     	      User Identifier:
     	    </label>
 	        <input type="text" size="32" maxlength="64"
-	    	    class="white leftnc" name="userid" id="userid"
-		        autocomplete="off" readonly="readonly"
-		        value="$USERID"/>
+        	    	    class="white leftnc" name="userid" id="userid"
+	        	        autocomplete="off" readonly="readonly"
+		                value="$USERID"/>
           </p>
           <p id="passRow" class="clear">
-	        <label class="label" for="password">
+	    	<label class="label" for="password">
     	      Current Password:
-    	    </label>
-    	    <input type="password" size="32" maxlength="64"
-    	    	name="password" id="password"
-    	    	class="white leftnc" autocomplete="off"/>
-    	      <span id='passwordPoor' style='color:#e00000; display:none'>
-			Your new password is poor.
+        	</label>
+	    	<input type="password" size="32" maxlength="64"
+        	    	name="password" id="password"
+        	    	class="white leftnc" autocomplete="off"/>
+    	    <span id='passwordPoor' style='color:#e00000; display:none'>
+			    Your new password is poor.
 		    </span>
 		    <span id='passwordWeak' style='color:#a89800; display:none'>
-			Your new password is weak.
+			    Your new password is weak.
 		    </span>
 		    <span id='passwordGood' style='color:#60d800; display:none'>
-			Your new password is good.
+			    Your new password is good.
 		    </span>
 		    <span id='passwordStrong' style='color:#11ff10; display:none'>
-			Your new password is strong.
+			    Your new password is strong.
 		    </span>
 	      </p>
 	      <p id="newPassRow" class="clear">
-		<label class="label" for="newPassword">
-		  New Password:
-		</label>
-		<input type="password" size="32" maxlength="64" 
-			name="newPassword" id="newPassword" class="white leftnc"
-			autocomplete="off"/>
-		<button type="button" id="generatePassword">
-			Generate Random Password
-		</button>
-		<input type="text" size="32" value=""
-			name="randomPassword" id="randomPassword"
-			class="white leftnc" readonly="readonly">
+			<label class="label" for="newPassword">
+    		  New Password:
+			</label>
+			<input type="password" size="32" maxlength="64" 
+        			name="newPassword" id="newPassword" class="white leftnc"
+		        	autocomplete="off"/>
+    		<button type="button" id="generatePassword">
+	    		Generate Random Password
+    		</button>
+			<input type="text" size="32" value=""
+        			name="randomPassword" id="randomPassword"
+        			class="white leftnc" readonly="readonly">
 	      </p>
 	      <p id="newPass2Row" class="clear">
-		<label class="label" for="newPassword2">
+			<label class="label" for="newPassword2">
 		  Repeat New Password:
-		</label>
-		<input type="password" size="32" maxlength="64"
-			name="newPassword2" id="newPassword2" class="white leftnc"
-			autocomplete="off"/>
+			</label>
+			<input type="password" size="32" maxlength="64"
+        			name="newPassword2" id="newPassword2" class="white leftnc"
+        			autocomplete="off"/>
 	      </p>
 	      <p id="emailRow" class="clear">
-		<label class="label" for="email">
-		  E-Mail Address:
-		</label>
-		<input type="text" size="64" name="email" id="email"
-			class="white leftnc" autocomplete="off"
-			value="$EMAIL"/>
+			<label class="label" for="email">
+    		  E-Mail Address:
+			</label>
+			<input type="text" size="64" name="email" id="email"
+        			class="white leftnc" autocomplete="off"
+        			value="$EMAIL"/>
 	      </p>
 	      <p id="useEmailRow" class="clear">
-		<label class="label" for="usemail">
-		  Send Notices to E-mail:
-		</label>
-		<input type="checkbox" name="usemail" id="usemail"
-				$chkusemail/>
+			<label class="label" for="usemail">
+    		  Send Notices to E-mail:
+			</label>
+			<input type="checkbox" name="usemail" id="usemail"
+    				$chkusemail/>
 	      </p>
 	      <p id="nopRow" class="clear">
-		<label class="label" for="nohelp">
-		  Suppress Help Popups:
-		</label>
-		<input type="checkbox" name="nohelp" id="nohelp"
-				$chknohelp/>
+			<label class="label" for="nohelp">
+    		  Suppress Help Popups:
+			</label>
+			<input type="checkbox" name="nohelp" id="nohelp"
+	    			$chknohelp/>
 	      </p>
-	
 	      <p class="clear">
-		<span class="pad">
-		  <button type="submit" id="Submit"> 
-		    <u>A</u>pply Changes
-		  </button>
-		</span>
-		<span class="pad">
-		  <button type="button" id="Signoff"> 
-		    Sign <u>O</u>ff
-		  </button>
-		</span>
-		<span class="pad">
-		  <button type="button" id="Close">
-		    <u>C</u>lose
-		  </button>
-		</span>
-		<span class="pad">
-		  <a href="/ContactAuthor.php?subject=Account Management&lang=$LANG" 
-                class="button">
-			Contact Administrator
-         </a>
-		</span>
-		<span class="pad" id="advertiserLink">
-		  <a href="/Advertiser.php?lang=$LANG" 
-                class="button">
-			Manage Your Advertising Account
-         </a>
-		</span>
-		<input type="hidden" name="act" id="act" value="">
-		<input type="hidden" name="debug" id="debug" value="$DEBUG">
-		<input type="hidden" name="lang" id="lang" value="$LANG">
+			<span class="pad">
+			  <button type="submit" id="Submit"> 
+			    <u>A</u>pply Changes
+			  </button>
+			</span>
+			<span class="pad">
+			  <button type="button" id="Signoff"> 
+			    Sign <u>O</u>ff
+			  </button>
+			</span>
+			<span class="pad">
+			  <button type="button" id="Close">
+			    <u>C</u>lose
+			  </button>
+			</span>
+			<span class="pad">
+			  <a href="/ContactAuthor.php?subject=Account+Management&lang=$LANG" 
+	                class="button">
+    			Contact Administrator
+             </a>
+    		</span>
+    		<span class="pad" id="advertiserLink">
+    		  <a href="/Advertiser.php?lang=$LANG" 
+                     class="button">
+    			Manage Your Advertising Account
+             </a>
+    		</span>
+			<input type="hidden" name="act" id="act" value="">
+			<input type="hidden" name="debug" id="debug" value="$DEBUG">
+			<input type="hidden" name="lang" id="lang" value="$LANG">
 	      </p>
 	    </form>
 	  </div><!--id="update"-->

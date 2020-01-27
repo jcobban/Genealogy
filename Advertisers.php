@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \NumberFormatter;
 /************************************************************************
  *  Advertisers.php												        *
  *																		*
@@ -19,8 +20,9 @@ use \Exception;
  *		                add ability to add a new Advertiser             *
  *		                add ability to delete an Advertiser             *
  *		                complete changing name and e-mail address       *
- *		2020/-1/17      when adding an account also create a blank      *
+ *		2020/01/17      when adding an account also create a blank      *
  *		                template for the advertisement                  *
+ *      2020/01/22      use NumberFormatter                             *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -218,7 +220,8 @@ if (isset($_POST) && count($_POST) > 0)
 }			        // invoked by method=post
 
 // create the Template instance
-$template		= new FtTemplate("Advertisers$lang.html");
+$template		    = new FtTemplate("Advertisers$lang.html");
+$formatter          = $template->getFormatter();
 
 foreach($duplicates as $name)
 {
@@ -316,18 +319,18 @@ if ($administrator)
         $rtemplate->set('rowtype',		$rowtype);
         $rtemplate->set('id',		    $id);
         $rtemplate->set('row',		    $advertiser['row']);
-        $rtemplate->set('count01',		number_format($advertiser['count01']));
-        $rtemplate->set('count02',		number_format($advertiser['count02']));
-        $rtemplate->set('count03',		number_format($advertiser['count03']));
-        $rtemplate->set('count04',		number_format($advertiser['count04']));
-        $rtemplate->set('count05',		number_format($advertiser['count05']));
-        $rtemplate->set('count06',		number_format($advertiser['count06']));
-        $rtemplate->set('count07',		number_format($advertiser['count07']));
-        $rtemplate->set('count08',		number_format($advertiser['count08']));
-        $rtemplate->set('count09',		number_format($advertiser['count09']));
-        $rtemplate->set('count10',		number_format($advertiser['count10']));
-        $rtemplate->set('count11',		number_format($advertiser['count11']));
-        $rtemplate->set('count12',		number_format($advertiser['count12']));
+        $rtemplate->set('count01',		$formatter->format($advertiser['count01']));
+        $rtemplate->set('count02',		$formatter->format($advertiser['count02']));
+        $rtemplate->set('count03',		$formatter->format($advertiser['count03']));
+        $rtemplate->set('count04',		$formatter->format($advertiser['count04']));
+        $rtemplate->set('count05',		$formatter->format($advertiser['count05']));
+        $rtemplate->set('count06',		$formatter->format($advertiser['count06']));
+        $rtemplate->set('count07',		$formatter->format($advertiser['count07']));
+        $rtemplate->set('count08',		$formatter->format($advertiser['count08']));
+        $rtemplate->set('count09',		$formatter->format($advertiser['count09']));
+        $rtemplate->set('count10',		$formatter->format($advertiser['count10']));
+        $rtemplate->set('count11',		$formatter->format($advertiser['count11']));
+        $rtemplate->set('count12',		$formatter->format($advertiser['count12']));
 		$total01			+= $advertiser['count01'];
 		$total02			+= $advertiser['count02'];
 		$total03			+= $advertiser['count03'];
@@ -350,18 +353,18 @@ if ($administrator)
     }		                // create display of a page of advertisers
     $rowTag->update($data);
 
-	$template->set('TOTAL01',			number_format($total01));
-	$template->set('TOTAL02',			number_format($total02));
-	$template->set('TOTAL03',			number_format($total03));
-	$template->set('TOTAL04',			number_format($total04));
-	$template->set('TOTAL05',			number_format($total05));
-	$template->set('TOTAL06',			number_format($total06));
-	$template->set('TOTAL07',			number_format($total07));
-	$template->set('TOTAL08',			number_format($total08));
-	$template->set('TOTAL09',			number_format($total09));
-	$template->set('TOTAL10',			number_format($total10));
-	$template->set('TOTAL11',			number_format($total11));
-	$template->set('TOTAL12',			number_format($total12));
+	$template->set('TOTAL01',			$formatter->format($total01));
+	$template->set('TOTAL02',			$formatter->format($total02));
+	$template->set('TOTAL03',			$formatter->format($total03));
+	$template->set('TOTAL04',			$formatter->format($total04));
+	$template->set('TOTAL05',			$formatter->format($total05));
+	$template->set('TOTAL06',			$formatter->format($total06));
+	$template->set('TOTAL07',			$formatter->format($total07));
+	$template->set('TOTAL08',			$formatter->format($total08));
+	$template->set('TOTAL09',			$formatter->format($total09));
+	$template->set('TOTAL10',			$formatter->format($total10));
+	$template->set('TOTAL11',			$formatter->format($total11));
+	$template->set('TOTAL12',			$formatter->format($total12));
 }		// only administrator can use this dialog
 else
 {		// not administrator

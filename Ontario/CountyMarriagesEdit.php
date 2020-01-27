@@ -613,7 +613,9 @@ if (strlen($msg) == 0)
 	    if (strlen($image) > 0)
 	    {
 ?>
-<p class="label">
+    <div style="clear: both;"></div>
+  </div>
+<p class="label center">
 	<a href="<?php print $image; ?>" class="button" target="_blank">
 	    See&nbsp;Original&nbsp;Image
 	</a>
@@ -621,8 +623,6 @@ if (strlen($msg) == 0)
 <?php
 	    }
 ?>
-<div style="clear: both;"></div>
-  </div>
 <?php
 	}		// show pointers for previous and next entry
 ?>

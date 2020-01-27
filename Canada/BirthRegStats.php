@@ -3,7 +3,6 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 use \Templating\Template;
-
 /************************************************************************
  *  BirthRegStats.php													*
  *																		*
@@ -43,7 +42,7 @@ use \Templating\Template;
  *      2019/11/17      move CSS to <head>                              *
  *      2020/01/22      use NumberFormatter                             *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Birth.inc';
 require_once __NAMESPACE__ . '/Country.inc';

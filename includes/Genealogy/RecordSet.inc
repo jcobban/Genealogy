@@ -95,8 +95,11 @@ use \Templating\Template;
  *		                faster cleaner check for array of records parm  *
  *		2019/12/17      add setting for named substitutions             *
  *		2019/12/26      add length operator for strings                 *
+ *		2020/01/25      in getWherePattern if string starts with ^ and  *
+ *		                ends with '$' always do equality test           *
+ *		                correct count where GROUP BY is present         *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -663,8 +666,18 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		{
 		    $this->query	    = 'SELECT ' . $this->fields .
 									' FROM ' . $this->table . ' ' .
-									$where;
-		    $countQuery		    = "SELECT COUNT(*) FROM " . $this->table . 
+                                    $where;
+            // note the following syntax for counting grouped lines is
+            // MySQL/MariaB specific because other servers only support
+            // a single field for DISTINCT
+            // Portable syntax is:
+            // SELECT COUNT(*) FROM (SELECT $groupby FROM $table 
+            //  $where GROUP BY $groupby)
+            if (is_string($groupby) && strlen($groupby) > 0)
+                $countQuery		= "SELECT COUNT(DISTINCT $groupby) FROM " .
+                                  $this->table .  ' ' . $where;
+            else
+		        $countQuery		= "SELECT COUNT(*) FROM " . $this->table . 
 								   ' ' . $where;
 		}
 
@@ -762,6 +775,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 				$this->msg  .= "RecordSet::__construct: \"$queryText\", " .
                     print_r($stmt->errorInfo(),true);
                 print '<p>' . $this->msg . "</p>\n";
+                print "<p>'$countQuery', parms=" . print_r($this->sqlParms,true) . "</p>\n";
 		    }			// error performing query
         }			// set count to actual number of records
         if (strlen($this->msg) > 0)
@@ -1550,41 +1564,41 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		    else
 		    if (strlen($pattern) > 1 &&
 				substr($pattern, 0 ,1) == '^' &&
+				substr($pattern, -1) == '$')
+		    {		        // match whole value
+			    $vlen		= strlen($pattern) - 2;
+			    $value	    = substr($pattern, 1, $vlen);
+                if (is_string($refname))
+                {
+			        $where		.= $or . "$fldname=:$refname$i";
+                                    $this->sqlParms["$refname$i"]   = $value;
+                    $i++;
+                }
+                else
+                {
+			        $where		.= $or . "$fldname=?";
+                                    $this->sqlParms[]   = $value;
+                }
+		    }		        // match at whole value
+		    else
+		    if (strlen($pattern) > 1 &&
+				substr($pattern, 0 ,1) == '^' &&
 				preg_match("/[.*+?()[\]]/",
 						   substr($pattern,1,strlen($pattern)-2)) == 0)
 		    {		        // match at beginning
-				if (substr($pattern, -1) == '$')
-				{		    // match whole value
-				    $vlen		= strlen($pattern) - 2;
-				    $value	    = substr($pattern, 1, $vlen);
-                    if (is_string($refname))
-                    {
-				        $where		.= $or . "$fldname=:$refname$i";
-                        $this->sqlParms["$refname$i"]   = $value;
-                        $i++;
-                    }
-                    else
-                    {
-				        $where		.= $or . "$fldname=?";
-                        $this->sqlParms[]   = $value;
-                    }
-				}		    // match whole value
-				else
-				{		    // match at beginning of string
-				    $vlen		= strlen($pattern) - 1;
-				    $value  	= substr($pattern, 1);
-                    if (is_string($refname))
-                    {
-				        $where		.= $or . "LEFT($fldname, $vlen)=:$refname$i";
-                        $this->sqlParms["$refname$i"]   = $value;
-                        $i++;
-                    }
-                    else
-                    {
-				        $where		.= $or . "LEFT($fldname, $vlen)=?";
-                        $this->sqlParms[]   = $value;
-                    }
-				}		    // match at beginning of string
+			    $vlen		    = strlen($pattern) - 1;
+			    $value  	    = substr($pattern, 1);
+                if (is_string($refname))
+                {
+			        $where		.= $or . "LEFT($fldname, $vlen)=:$refname$i";
+                    $this->sqlParms["$refname$i"]   = $value;
+                    $i++;
+                }
+                else
+                {
+			        $where		.= $or . "LEFT($fldname, $vlen)=?";
+                    $this->sqlParms[]   = $value;
+                }
 		    }		        // match at beginning
 		    else
 		    if (strlen($pattern) > 1 &&
@@ -1672,12 +1686,12 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 }
 		    }		        // value is a string to find
 		    $or		= ' OR ';
-		}		            // loop through patterns
-		if (strlen($where) > 0 && count($parms) > 1)
-		{
-		    $where		= "($where)";
-		}
-		return $where;
+    	}		            // loop through patterns
+    	if (strlen($where) > 0 && count($parms) > 1)
+    	{
+    	    $where		= "($where)";
+    	}
+    	return $where;
     }		// function RecordSet::getWherePattern
 
     /********************************************************************

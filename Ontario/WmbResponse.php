@@ -185,7 +185,7 @@ foreach ($_GET as $key => $value)
             $npuri		            .= "{$npand}{$key}=" . urlencode($value);
             $npand		            = '&amp;'; 
             $orderby	            = 'Surname, GivenName';
-            $getParms[$key]         = $value;
+            $getParms[$key]         = urldecode($value);
             break;
         }		// match in string
 

@@ -659,10 +659,14 @@ class Name extends Record
     					$row		        = $stmt->fetchAll(PDO::FETCH_ASSOC);
     					if (count($row) >= 1)
                         {		    // found existing name record
-                            if (count($row) > 1)
+                            if (count($row) > 1 && canUser('all'))
                             {
     					        $warn       .= "<p>Name.inc: " . __LINE__ .
-                                " query='$queryText' returned more than 1 row</p>\n";
+                                    " query='$queryText' returned more than 1 row</p>\n";
+                                foreach($row as $namerec)
+                                    $warn       .= "<p>Name.inc: " . __LINE__ .
+                                    " IDNX=" . $namerec['idnx'] .
+                                    " Order=" . $namerec['order'] . "</p>\n";
                             }
     					    $count	        = 1;
     					    $dbrow	        = $row[0];

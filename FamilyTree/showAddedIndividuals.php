@@ -151,8 +151,10 @@ $template->set('LANG',              $lang);
 if(strlen($msg) == 0)
 {
     $getparms	    = array('added'		=> array($startday, $endday),
-        			    	'order'		=> 'Surname, givenName, birthSD');
-    $persons	    = new PersonSet($getparms);
+	      			        'order'		=> 'Surname, givenName, birthSD',
+		    		        'offset'    => 0,
+			    	        'limit'     => 20);
+	$persons	    = new PersonSet($getparms);
     $info	        = $persons->getInformation();
 
 	$count	        = $info['count'];

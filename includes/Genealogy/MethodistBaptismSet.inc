@@ -11,8 +11,11 @@ use \Exception;
  *  History:															*
  *		2019/04/28		created											*
  *		2019/12/09      missing AND before soundex in where expression  *
+ *   	2020/01/25      add method getStatistics                        *
+ *   		            add method getPageStatistics                    *
+ *  		            add method getVolumeStatistics                  *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/MethodistBaptism.inc';
@@ -143,5 +146,194 @@ class MethodistBaptismSet extends RecordSet
 
 		return $where;
     }		// function MethodistBaptismSet::getWhere
+
+    /********************************************************************
+     *	function MethodistBaptismSet::getStatistics						*
+     *																	*
+     *  Get statistics for specific set of birth registrations.			*
+     *																	*
+     *	Example:														*
+     *	    $baptisms		= new MethodistBaptismSet(                  *
+     *	                        array('pattern'     => $pattern));      *
+     *	    $result		    = $baptisms->getStatistics();				*
+     *																	*
+     *	Returns:														*
+     *		An array each row of which is								*
+     *		an array containing the following values for each		    *
+     *		county in the domain:										*
+     *				district		district name					    *
+     *				count	        number of transcribed records		*
+     *				linkcount		number linked to the family tree	*
+     ********************************************************************/
+    function getStatistics()
+    {
+		global	$debug;
+		global	$warn;
+		global	$msg;
+		global	$connection;
+
+		// execute the query
+		$query	= 'SELECT District, ' .
+						'SUM(Surname != "") AS `Count`,  ' .
+						'SUM(Idir != 0) AS LinkCount ' .
+						'FROM MethodistBaptisms ' .
+						$this->where .
+						' GROUP BY District' .
+						' ORDER BY District';
+		$stmt	        = $connection->prepare($query);
+        $queryText      = debugPrepQuery($query, $this->sqlParms);
+		if ($stmt->execute($this->sqlParms))
+		{
+		    $result	    = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		    return $result;
+		}
+		else
+		{
+		    $msg	    .= "query '$queryText' failed: " .
+					    	   print_r($stmt->errorInfo(), true);
+		    return null;
+		}		// query failed
+    }		// MethodistBaptismSet::getStatistics
+
+    /********************************************************************
+     *	function MethodistBaptismSet::getDistrictStatistics				*
+     *																	*
+     *  Get statistics for each "Area" within a "District".             *
+     *																	*
+     *	Example:														*
+     *	    $baptisms	= new MethodistBaptismSet(                      *
+     *	                            array('district'	=> "^$dname$"));*
+     *	    $result		= $baptisms->getDistrictStatistics();			*
+     *																	*
+     *	Returns:														*
+     *		An array each row of which is							    *
+     *		an associative array containing the following values		*
+     *		for each page in the volume:					            *
+     *				area		    area within District				*
+     *				count	        number of transcribed records	    *
+     *				linkcount		number linked to the family tree	*
+     ********************************************************************/
+    function getDistrictStatistics()
+    {
+		global	$debug;
+		global	$warn;
+		global	$msg;
+        global	$connection;
+
+        // execute the query
+        $query	    = "SELECT Area, COUNT(*) AS `Count`, SUM(IDIR > 0) AS LinkCount" .
+				    	" FROM MethodistBaptisms" .
+				    	" WHERE District=:district1" .
+				    	" GROUP BY Area, District ORDER BY Area";
+        $stmt	        = $connection->prepare($query);
+        $queryText      = debugPrepQuery($query, $this->sqlParms);
+
+		if ($stmt->execute($this->sqlParms))
+		{
+		    $result	    = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		    return $result;
+		}
+		else
+		{
+		    $msg	    .= "query '$queryText' failed: " .
+                               print_r($stmt->errorInfo(), true);
+            print "<p class='error'>$msg</p>\n";
+		    return null;
+		}		    // query failed
+    }		// function MethodistBaptismSet::getDistrictStatistics
+
+    /********************************************************************
+     *	function MethodistBaptismSet::getVolumeStatistics				*
+     *																	*
+     *  Get statistics for each Volume.                                 *
+     *																	*
+     *	Example:														*
+     *	    $baptisms	= new MethodistBaptismSet();                    *
+     *	    $result		= $baptisms->getVolumeStatistics();			    *
+     *																	*
+     *	Returns:														*
+     *		An array each row of which is							    *
+     *		an associative array containing the following values		*
+     *		for each page in the volume:					            *
+     *				volume		    area within Volume				    *
+     *				pages	        number of pages	                    *
+     *				done    		number of registrations transcribed *
+     *				linkcount		number linked to the family tree	*
+     ********************************************************************/
+    function getVolumeStatistics()
+    {
+		global	$debug;
+		global	$warn;
+		global	$msg;
+        global	$connection;
+
+        // execute the query
+        $query	    = "SELECT Volume, MAX(Page) as Pages, COUNT(*) as Done, " .
+						    'SUM(Idir>0) AS LinkCount ' .
+	        				" FROM MethodistBaptisms" .
+			        		" GROUP BY Volume ORDER BY Volume";
+        $stmt	        = $connection->prepare($query);
+        $queryText      = debugPrepQuery($query, $this->sqlParms);
+
+		if ($stmt->execute($this->sqlParms))
+		{
+		    $result	    = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		    return $result;
+		}
+		else
+		{
+		    $msg	    .= "query '$queryText' failed: " .
+                               print_r($stmt->errorInfo(), true);
+            print "<p class='error'>$msg</p>\n";
+		    return null;
+		}		    // query failed
+    }		// function MethodistBaptismSet::getVolumeStatistics
+
+    /********************************************************************
+     *	function MethodistBaptismSet::getPageStatistics				    *
+     *																	*
+     *  Get statistics for specific volume of registrations.		    *
+     *																	*
+     *	Example:														*
+     *	    $baptisms	= new MethodistBaptismSet(                      *
+     *	                                array('volume'	=> $volume));	*
+     *	    $result		= $baptisms->getPageStatistics();				*
+     *																	*
+     *	Returns:														*
+     *		An array each row of which is							    *
+     *		an associative array containing the following values		*
+     *		for each page in the volume:					            *
+     *				page		    page number						    *
+     *				count	        number of transcribed records	    *
+     *				linkcount		number linked to the family tree	*
+     ********************************************************************/
+    function getPageStatistics()
+    {
+		global	$debug;
+		global	$warn;
+		global	$msg;
+        global	$connection;
+
+        // execute the query
+        $query	    = "SELECT Page, COUNT(*) AS `Count`, SUM(IDIR > 0) AS LinkCount" .
+				    	" FROM MethodistBaptisms" .
+				    	" WHERE Volume=:volume" .
+				    	" GROUP BY Volume, Page ORDER BY Volume, Page";
+        $stmt	        = $connection->prepare($query);
+        $queryText      = debugPrepQuery($query, $this->sqlParms);
+
+		if ($stmt->execute($this->sqlParms))
+		{
+		    $result	    = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		    return $result;
+		}
+		else
+		{
+		    $msg	    .= "query '$queryText' failed: " .
+                               print_r($stmt->errorInfo(), true);
+            print "<p class='error'>$msg</p>\n";
+		    return null;
+		}		    // query failed
+    }		// function MethodistBaptismSet::getPageStatistics
 
 }		// class MethodistBaptismSet 

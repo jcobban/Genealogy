@@ -420,10 +420,10 @@ class BirthSet extends RecordSet
 		    $result	= null;
 		}			// query failed
 		return $result;
-    }		// Birth::getSummary
+    }		// BirthSet::getSummary
 
     /********************************************************************
-     *	function Birth::getStatistics									*
+     *	function BirthSet::getStatistics								*
      *																	*
      *  Get statistics for specific set of birth registrations.			*
      *																	*
@@ -472,10 +472,10 @@ class BirthSet extends RecordSet
 					    	   print_r($stmt->errorInfo(), true);
 		    return null;
 		}		// query failed
-    }		// Birth::getStatistics
+    }		// BirthSet::getStatistics
 
     /********************************************************************
-     *	function Birth::getCountyStatistics								*
+     *	function BirthSet::getCountyStatistics							*
      *																	*
      *  Get statistics for specific year of birth registrations.		*
      *																	*
@@ -531,6 +531,6 @@ class BirthSet extends RecordSet
             print "<p class='error'>$msg</p>\n";
 		    return null;
 		}		    // query failed
-    }		        // function Birth::getCountyStatistics
+    }		        // function BirthSet::getCountyStatistics
 
 }		// class BirthSet 

@@ -1,5 +1,5 @@
 <!--*********************************************************************
- *  Advertiseren.html												    *
+ *  Advertiserfr.html												    *
  *																		*
  *  Template for a web page for account management by an advertiser.	*
  *																		*
@@ -10,7 +10,7 @@
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=$LANG">
-		  Genealogy
+		  Génealogie
       </a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">
 		  Services
@@ -21,13 +21,13 @@
         <span class="right">
 		  <a href="/AdvertiserHelpen.html" target="help">? Help</a>
         </span>
-		  Advertiser $ADNAME Account Management
+		  Gestion de Compte Annonceur $ADNAME
       </h1>
       $TRACE
       $MSG
       <form id="locForm" name="locForm" action="Advertiser.php"
                   method="post" enctype="multipart/form-data">
-          <h2>Your Current Advertisement:</h2>
+          <h2>Votre annonce actuelle:</h2>
           <div id="displayAdvertisement" style="float: left;">
               $ADVERTISEMENT
           </div>
@@ -37,67 +37,67 @@
             <span class="pad">
               <button type="submit" id="Submit">
                 <span style="display: inline;">
-		          Update Account Settings
+		          Mettre à jour les paramètres du compte
                 </span>
               </button>
             </span>
             <span class="pad">
               <a href="/Advertisements/$ADNAME.html" download class="button">
-		          Download Current Advertisement
+		          Télécharger la publicité actuelle
               </a>
             </span>
             <span class="pad">
               <input type="file" accept=".html"
                     id="file" name="file" style="display: none;">
               <button type="button" id="upload">
-		          Upload New Advertisement
+		          Télécharger une nouvelle annonce
               </button>
             </span>
           </div> <!-- class="row" -->
-          <h2 style="clear: both;">Statistics by Month:</h2>
+          <h2 style="clear: both;">Statistiques par Mois:</h2>
           <!--- Put out the response as a table -->
           <table class="details" id="dataTable">
           <!--- Put out the column headers -->
             <thead>
 		      <tr>
 		        <th class="colhead">
-		            E-Mail
+		            Adresse électronique
 		        </th>
 		        <th class="colhead">
-		            January
+		            Janvier
 		        </th>
 		        <th class="colhead">
-		            February
+		            Février
 		        </th>
 		        <th class="colhead">
-		            March
+		            Mars
 		        </th>
 	            <th class="colhead">
-			        April
+			        Avril
 		        </th>    <!--  4 -->
 	            <th class="colhead">
-			        May
+			        Mai
 		        </th>      <!--  5 -->
 	            <th class="colhead">
-			        June
+			        Juin
 		        </th>     <!--  6 -->
 	            <th class="colhead">
-			        July
+			        Juillet
 		        </th>     <!--  7 -->
 	            <th class="colhead">
-			        August
+			        Août
 		        </th>   <!--  8 -->
 	            <th class="colhead">
-			        September
+			        Septembre
 		        </th><!--  9 -->
 	            <th class="colhead">
-			        October
+			        Octobre
 		        </th>  <!-- 10 -->
 	            <th class="colhead">
-			        November
+			        Novembre
 		        </th> <!-- 11 -->
 	            <th class="colhead">
-			        December
+			        Decembre
 		        </th> <!-- 12 -->
 	          </tr>
 	        </thead>
@@ -151,21 +151,21 @@
     </div> <!-- class="body" -->
     <div class="hidden" id="messages">
         <span id="notAnAdvertiser">
-            You are not accessing this page from an Advertiser account.
-            Please use the "Contact Author" item in the page menu to
-            contact the administrator if you wish to advertise 
-            on this site.
+            Vous n'accédez pas à cette page à partir d'un compte d'annonceur.
+            Veuillez utiliser l'élément "Contacter l'auteur" dans le menu 
+            de la page pour contacter l'administrateur si vous souhaitez 
+            faire de la publicité sur ce site.
         </span>
         <p id="fileUploaded">
-            You have updated your advertisement page.
+            Vous avez mis à jour votre page de publicité.
         </p>
     </div>
     <div class="balloon" id="HelpAdMail">
-      This field permits the user to change the e-mail address associated
-      with the advertiser account.
+        Ce champ permet à l'utilisateur de modifier l'adresse e-mail 
+        associée au compte de l'annonceur.
     </div>
     <div class="balloon" id="HelpSubmit">
-      Click on this button to apply changes to the account.
+      Cliquez sur ce bouton pour appliquer les modifications au compte.
     </div>
     <script src="/jscripts/js20/http.js" type="text/javaScript">
     </script>

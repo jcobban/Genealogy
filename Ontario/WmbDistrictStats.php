@@ -2,6 +2,8 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
+use \NumberFormat;
 /************************************************************************
  *  WmbDistrictStats.php												*
  *																		*
@@ -26,10 +28,11 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2020/01/22      internationalize numbers                        *
+ *		                urlencode parameters to WmbResponse.php         *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
-require_once __NAMESPACE__ . '/MethodistBaptism.inc';
+require_once __NAMESPACE__ . '/MethodistBaptismSet.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -72,86 +75,90 @@ foreach($_GET as $key => $value)
 if ($debug)
     $warn       .= $parmsText . "</table>\n";
 
-$template       = new FtTemplate("WmbDistrictStats$lang.html");
-$formatter                          = $template->getFormatter();
+$template                   = new FtTemplate("WmbDistrictStats$lang.html");
+$formatter                  = $template->getFormatter();
 
 if (is_null($district))
-	$msg	.= 'Missing mandatory parameter "district".  ';
+	$msg	                .= $template['distMissing']->innerHTML;
 
 if (strlen($msg) == 0)
 {			    // no errors
-	// execute the query
-	$query	    = "SELECT Area, SUM(Surname != '') FROM MethodistBaptisms " .
-					    "WHERE District=:district" .
-                        " GROUP BY Area ORDER BY Area";
-    $sqlParms       = array('district'  => $district);
-    $stmt	 	    = $connection->prepare($query);
-    $queryText      = debugPrepQuery($query, $sqlParms);
-	if ($stmt->execute($sqlParms))
-	{		    // successful query
-	    $result	    = $stmt->fetchAll(PDO::FETCH_NUM);
-	    if ($debug)
-            $warn   .= "<p>WmbDistrictStats.php: " . __LINE__ .
-                            " query=$queryText</p>\n";
-	}		    // successful query
-	else
+    // execute the query
+    $parms                  		= array('district' => "^$district$");
+    $baptisms               		= new MethodistBaptismSet($parms);
+	$results                		= $baptisms->getDistrictStatistics();
+
+	// lay out the table header row
+	$headRowElt    					= $template['headRow'];
+	$headRowHtml   					= $headRowElt->innerHTML();
+	$data          					= "         <tr>\n";
+	$spacer        					= "";
+	for($ic	= $columns; $ic; $ic--)
 	{
-	    $msg	    .= "query '$queryText' failed: " .
-					   print_r($stmt->errorInfo(),true);
-	}		    // query failed
+	    $data                       .= $spacer . $headRowHtml;
+	    $spacer             		= "           <th>\n              </th>\n";
+	}
+	$data                           .= "        </tr>\n";
+	$headRowElt->update($data);
+	
+	// lay out the data rows
+	$dataRowElt    					= $template['dataRow$ROWNUM'];
+	$dataRowHtml   					= $dataRowElt->innerHTML();
+	$rownum        					= 1;
+	$distnum       					= 1;
+	$rowclass      					= 'odd';
+	$total         					= 0;
+    $totalLinked         			= 0;
+	$data          					= '';
+	for ($row = reset($results); $row; )
+	{
+	    $data                       .= "         <tr id=\"dataRow$rownum\">\n";
+	    $spacer             		= "";
+	    for($ic = $columns; $ic && $row; $ic--)
+	    {
+	        $rtemplate      		= new \Templating\Template($dataRowHtml);
+	        $township	    		= $row['area'];
+	        $distnum++;
+	        $count		    		= $row['count'];
+	        $linkCount				= $row['linkcount'];
+	        if ($count > 0)
+	            $pctLinked          = 100 * $linkCount / $count;
+	        else
+	            $pctLinked          = 0;
+			$total		            += $count;
+	        $totalLinked         	+= $linkCount;
+	        $rtemplate->set('TOWNSHIP',     $township);
+	        $rtemplate->set('TOWNSHIPURL',  urlencode("^$township$"));
+	        $rtemplate->set('CLASS',        $rowclass);
+	        $rtemplate->set('COUNT',        $formatter->format($count));
+            $rtemplate->set('LINKCOUNT',    $formatter->format($linkCount));
+            $rtemplate->set('PCTCLASSLINKED',pctClass($pctLinked));
+	        $data                   .= $spacer . $rtemplate->compile();
+	        $spacer                 = "           <td>\n              </td>\n";
+	        $row                    = next($results);
+	    }
+	    $data                       .= "        </tr>\n";
+	    $rownum++;
+	    if ($rowclass == 'odd')
+	        $rowclass               = 'even';
+	    else
+	        $rowclass               = 'odd';
+	}
+	$dataRowElt->update($data);
+	
+	$template->set('TOTAL',         $formatter->format($total));
+	$template->set('TOTALLINKED',   $formatter->format($totalLinked));
+	if ($total > 0)
+	    $pctLinked                  = 100 * $totalLinked / $total;
+	else
+	    $pctLinked                  = 0;
+	$template->set('PCTCLASSLINKED',pctClass($pctLinked));
+	$template->set('DISTRICT',      $district);
+	$template->set('DISTRICTURL',   urlencode("^$district$"));
 }			    // no errors
 else
-    $result     = array();
-
-// lay out the table header row
-$headRowElt    			= $template['headRow'];
-$headRowHtml   			= $headRowElt->innerHTML();
-$data          			= "         <tr>\n";
-$spacer        			= "";
-for($ic	= $columns; $ic; $ic--)
 {
-    $data               .= $spacer . $headRowHtml;
-    $spacer             = "           <th>\n              </th>\n";
+    $template['dataTable']->update(null);
 }
-$data                   .= "        </tr>\n";
-$headRowElt->update($data);
-
-// lay out the data rows
-$dataRowElt    			= $template['dataRow$ROWNUM'];
-$dataRowHtml   			= $dataRowElt->innerHTML();
-$rownum        			= 1;
-$distnum       			= 1;
-$rowclass      			= 'odd';
-$total         			= 0;
-$data          			= '';
-for ($row = reset($result); $row; )
-{
-    $data               .= "         <tr id=\"dataRow$rownum\">\n";
-    $spacer             = "";
-    for($ic = $columns; $ic && $row; $ic--)
-    {
-        $rtemplate      = new \Templating\Template($dataRowHtml);
-        $township	    = $row[0];
-        $distnum++;
-        $count		    = $row[1];
-		$total		    += $count;
-        $rtemplate->set('TOWNSHIP',     $township);
-        $rtemplate->set('CLASS',        $rowclass);
-        $rtemplate->set('COUNT',        $formatter->format($count));
-        $data           .= $spacer . $rtemplate->compile();
-        $spacer         = "           <td>\n              </td>\n";
-        $row            = next($result);
-    }
-    $data               .= "        </tr>\n";
-    $rownum++;
-    if ($rowclass == 'odd')
-        $rowclass       = 'even';
-    else
-        $rowclass       = 'odd';
-}
-$dataRowElt->update($data);
-
-$template->set('TOTAL',         $formatter->format($total));
-$template->set('DISTRICT',      $district);
 
 $template->display();

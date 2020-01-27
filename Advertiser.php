@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \NumberFormatter;
 /************************************************************************
  *  Advertiser.php												        *
  *																		*
@@ -12,6 +13,8 @@ use \Exception;
  *																		*
  *  History:															*
  *		2020/01/17      created                                         *
+ *      2020/01/22      use NumberFormatter                             *
+ *      2020/01/26      improve handling of non-authorized user         *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -135,13 +138,17 @@ if (isset($_POST) && count($_POST) > 0)
 }			        // invoked by method=post
 
 // create the Template instance
-$template		= new FtTemplate("Advertiser$lang.html");
+$template		    = new FtTemplate("Advertiser$lang.html");
+$formatter          = $template->getFormatter();
 
 // check if this is an Advertiser account
-$email		        = $user['email'];	    // user's email
-$advertiserParms    = array('ademail'   => $email);
-$advertisers        = new RecordSet('Advertisers', $advertiserParms);
-if ($advertisers->count() > 0)
+if (strlen($userid) > 0)
+{
+    $email		        = $user['email'];	    // user's email
+    $advertiserParms    = array('ademail'   => $email);
+    $advertisers        = new RecordSet('Advertisers', $advertiserParms);
+}
+if (strlen($userid) > 0 && $advertisers->count() > 0)
 {                           // is an advertiser account
     $advertiser                         = $advertisers->rewind();
 
@@ -191,22 +198,23 @@ if ($advertisers->count() > 0)
         $template->set('ADVERTISEMENT',		'Not Available');
     }
 
-	$template->set('TOTAL01',			number_format($advertiser['count01']));
-	$template->set('TOTAL02',			number_format($advertiser['count02']));
-	$template->set('TOTAL03',			number_format($advertiser['count03']));
-	$template->set('TOTAL04',			number_format($advertiser['count04']));
-	$template->set('TOTAL05',			number_format($advertiser['count05']));
-	$template->set('TOTAL06',			number_format($advertiser['count06']));
-	$template->set('TOTAL07',			number_format($advertiser['count07']));
-	$template->set('TOTAL08',			number_format($advertiser['count08']));
-	$template->set('TOTAL09',			number_format($advertiser['count09']));
-	$template->set('TOTAL10',			number_format($advertiser['count10']));
-	$template->set('TOTAL11',			number_format($advertiser['count11']));
-	$template->set('TOTAL12',			number_format($advertiser['count12']));
+	$template->set('TOTAL01',			$formatter->format($advertiser['count01']));
+	$template->set('TOTAL02',			$formatter->format($advertiser['count02']));
+	$template->set('TOTAL03',			$formatter->format($advertiser['count03']));
+	$template->set('TOTAL04',			$formatter->format($advertiser['count04']));
+	$template->set('TOTAL05',			$formatter->format($advertiser['count05']));
+	$template->set('TOTAL06',			$formatter->format($advertiser['count06']));
+	$template->set('TOTAL07',			$formatter->format($advertiser['count07']));
+	$template->set('TOTAL08',			$formatter->format($advertiser['count08']));
+	$template->set('TOTAL09',			$formatter->format($advertiser['count09']));
+	$template->set('TOTAL10',			$formatter->format($advertiser['count10']));
+	$template->set('TOTAL11',			$formatter->format($advertiser['count11']));
+	$template->set('TOTAL12',			$formatter->format($advertiser['count12']));
 }                           // is an advertiser account
 else
 {                           // not an advertiser account
     $advertiser     = null;
+    $template->set('ADNAME',		    $userid);
     $msg            .= $template['notAnAdvertiser']->innerHTML;
     $template['locForm']->update(null);
 }                           // not an advertiser account

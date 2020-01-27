@@ -61,9 +61,15 @@ function onLoad()
 				    break;
 				}
 		    }		// act on specific fields
-		}		// loop through all elements in the form
-    }			// loop through all forms
-}		// onLoad
+		}		    // loop through all elements in the form
+    }			    // loop through all forms
+    var volhead         = document.getElementById('volhead');
+    var volfoot         = document.getElementById('volfoot');
+    if (volhead)
+    {
+        volfoot.style.width     = volhead.offsetWidth + 'px';
+    }
+}		// function onLoad
 
 /************************************************************************
  *  function editVolume													*

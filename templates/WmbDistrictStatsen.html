@@ -27,6 +27,8 @@
         $DISTRICT District
       <span style='clear: both;'></span>
       </h1>
+      $MSG
+      $TRACE
       <!--- Put out the response as a table -->
       <table class='form' id="dataTable">
         <thead>
@@ -37,6 +39,9 @@
 	        </th>
 	        <th class='colhead'>
 	          Done
+	        </th>
+	        <th class='colhead'>
+	          Linked
 	        </th>
 	        <th class='colhead'>
 	          View
@@ -51,8 +56,11 @@
 	        <td class='$CLASS bold right'>
 	          $COUNT
 	        </td>
+	        <td class='$PCTCLASSLINKED bold right'>
+	          $LINKCOUNT
+	        </td>
 	        <td class='$CLASS'>
-                <a href="/Ontario/WmbResponse.php?district=$DISTRICT&amp;area=$TOWNSHIP" class="button">View</a>
+                <a href="/Ontario/WmbResponse.php?district=$DISTRICTURL&amp;area=$TOWNSHIPURL" class="button">View</a>
 	        </td>
 	      </tr>
         </tbody>
@@ -64,9 +72,17 @@
         	<td class='odd bold right'>
         	    $TOTAL
         	</td>
+        	<td class='$PCTCLASSLINKED bold right'>
+        	    $TOTALLINKED
+        	</td>
           </tr>
         </tfoot>
       </table>
+    </div>
+    <div id="messages" class="hidden">
+        <span id="distMissing">
+            Missing mandatory parameter "district".  
+        </span>
     </div>
 	<script src="/jscripts/util.js" language="JavaScript"></script>
 	<script src="/Ontario/WmbDistrictStats.js" language="JavaScript"></script>

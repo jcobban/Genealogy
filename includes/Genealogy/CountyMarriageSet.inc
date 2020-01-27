@@ -17,8 +17,9 @@ use \Iterator;
  *						report, ensure that all of the items within		*
  *						the report are present in order					*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2020/01/26      add method getVolumeSummary                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/CountyMarriage.inc';
@@ -61,7 +62,7 @@ class CountyMarriageSet extends RecordSet
 						 $order =
 				"M_RegDomain, M_Volume, M_ReportNo, M_ItemNo, M_Role DESC")
     {
-		$parms['order']		= $order;
+        $parms['order']		= $order;
 		parent::__construct('CountyMarriages',
 						    $parms);
     }		// CountyMarriageSet::__construct
@@ -80,19 +81,20 @@ class CountyMarriageSet extends RecordSet
 		global $warn;
 
 		// construct the WHERE clause
-		$where		= '';
-		$and		= 'WHERE ';
-		$reportMask	= 0;		// bit mask
+		$where						    = '';
+		$and						    = 'WHERE ';
+		$reportMask					    = 0;		// bit mask
 		foreach($this->parms as $fldname => $value)
 		{		// loop through all parameters
-		    $fieldLc	= CountyMarriage::getRealFieldName($fldname);
+            $fieldLc	= CountyMarriage::getRealFieldName($fldname);
+            $pname      = substr($fieldLc, 2);
 		    switch($fieldLc)
 		    {
 				case 'm_regdomain':
 				{		// text fields full match
-				    $where			.= "$and `$fieldLc`=?";
-				    $this->sqlParms[]		= $value;
-				    $and			= ' AND ';
+				    $where			    .= "$and `$fieldLc`=:domain";
+				    $this->sqlParms['domain']		= $value;
+				    $and			    = ' AND ';
 				    $reportMask			|= 1;
 				    break;
 				}		// text fields
@@ -100,9 +102,9 @@ class CountyMarriageSet extends RecordSet
 				case 'm_date':
 				case 'm_licensetype':
 				{		// text fields full match
-				    $where			.= "$and `$fieldLc`=?";
-				    $this->sqlParms[]		= $value;
-				    $and			= ' AND ';
+				    $where			    .= "$and `$fieldLc`=:$pname";
+				    $this->sqlParms[$pname]		= $value;
+				    $and			    = ' AND ';
 				    $reportMask			|= 8;
 				    break;
 				}		// text fields
@@ -117,8 +119,9 @@ class CountyMarriageSet extends RecordSet
 				case 'm_witnessname':
 				case 'm_remarks':
 				{		// text fields pattern match
-				    $expr		= $this->getWherePattern($fieldLc,
-											 $value);
+				    $expr		    = $this->getWherePattern($fieldLc,
+									    		             $value,
+                                                             $pname);
 				    if (strlen($expr) > 0)
 				    {
 						$where		.= $and . $expr;
@@ -130,9 +133,9 @@ class CountyMarriageSet extends RecordSet
 
 				case 'm_surnamesoundex':
 				{		// text fields soundex
-				    $where		.= "$and `$fldname`=LEFT(SOUNDEX(?),4)";
-				    $this->sqlParms[]	= $value;
-				    $and		= ' AND ';
+				    $where		    .= "$and `$fldname`=LEFT(SOUNDEX(:$pname),4)";
+				    $this->sqlParms[$pname]	= $value;
+				    $and		    = ' AND ';
 				    $reportMask		|= 8;
 				    break;
 				}		// text fields
@@ -142,13 +145,13 @@ class CountyMarriageSet extends RecordSet
 				    if ((is_int($value) || ctype_digit($value))
 						&& $value >= 0)
 				    {
-						$where			.= "$and `$fieldLc`=?";
-						$this->sqlParms[]	= $value;
+						$where			.= "$and `$fieldLc`=:$pname";
+						$this->sqlParms[$pname]	= $value;
 						$and			= ' AND ';
 						$reportMask		|= 2;
 				    }
 				    else
-				        $warn	.= "<p>CountyMarriageSet::getWhere: " .
+				        $warn	        .= "<p>CountyMarriageSet::getWhere: " .
 							   "Invalid `$fldname` value '$value'.</p>\n";
 				    break;
 				}		// numeric fields
@@ -159,12 +162,12 @@ class CountyMarriageSet extends RecordSet
 				    if ((is_int($value) || ctype_digit($value))
 						&& $value >= 0)
 				    {
-						$where			.= "$and `$fieldLc`=?";
-						$this->sqlParms[]	= $value;
+						$where			.= "$and `$fieldLc`=:$pname";
+						$this->sqlParms[$pname]	= $value;
 						$and			= ' AND ';
 				    }
 				    else
-				        $warn	.= "<p>CountyMarriageSet::getWhere: " .
+				        $warn	        .= "<p>CountyMarriageSet::getWhere: " .
 							   "Invalid `$fldname` value '$value'.</p>\n";
 				    $reportMask			|= 8;
 				    break;
@@ -172,20 +175,20 @@ class CountyMarriageSet extends RecordSet
 
 				case 'm_reportno':
 				{		// numeric fields
-				    $where			.= "$and `M_ReportNo`=?";
+				    $where			.= "$and `M_ReportNo`=:$pname";
 				    if (is_numeric($value))
-						$this->sqlParms[]	= $value;
+						$this->sqlParms[$pname]	= $value;
 				    else
 				    {
 						$matches		= array();
 						$rxr	= preg_match('#(\d+)(\x{00BD}|.5|1/2)#u',
-								     $value,
-								     $matches);
+								             $value,
+								             $matches);
 						if ($rxr)
 						    $value		= intval($matches[1]) + 0.5;
-						$this->sqlParms[]	= $value;
+						$this->sqlParms[$pname]	= $value;
 				    }
-				    $and			= ' AND ';
+				    $and			    = ' AND ';
 				    $reportMask			|= 4;
 				    break;
 				}		// numeric fields
@@ -256,5 +259,54 @@ class CountyMarriageSet extends RecordSet
 		}			// check for issues with whole page
 		return reset($this->list);
     }		// function CountyMarriageSet::rewind
+
+    /********************************************************************
+     *	function CountyMarriageSet::getVolumeSummary					*
+     *																	*
+     *  Get statistics for specific year of marriage registrations.		*
+     *																	*
+     *	Example:														*
+     *	    $marriages	= new MarriageSet(array('domain'	=> 'CAON',	*
+     *									        'year'		=> 1887));	*
+     *	    $result		= $marriages->getStatistics();					*
+     *																	*
+     *	Returns:														*
+     *		An array each row of which is								*
+     *		an array containing the following values for each		    *
+     *		county in the domain:										*
+     *				volume          volume number                       *
+     *				number          number of transcribed marriages		*
+     *				linked          number linked to family tree		*
+     ********************************************************************/
+    function getVolumeSummary()
+    {
+		global	$debug;
+		global	$warn;
+		global	$msg;
+		global	$connection;
+
+		// execute the query
+	    $query	= 'SELECT M_Volume AS Volume, COUNT(M_ItemNo)/2 AS Number, SUM(M_IDIR>0)/2 AS Linked ' .
+							'FROM CountyMarriages ' .
+							"WHERE M_RegDomain=:domain " .
+							'GROUP BY M_Volume ' .
+							'ORDER BY M_Volume';
+        $stmt	        = $connection->prepare($query);
+        $queryText      = debugPrepQuery($query, $this->sqlParms);
+		if ($stmt->execute($this->sqlParms))
+        {		    // query succeeded
+            if ($debug)
+                $warn   .= "<p>ContyMarriageSet::getVolumeSummary: query='$queryText'</p>\n";
+		    $result	    = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		    return $result;
+		}
+		else
+		{
+		    $msg	    .= "query '$queryText' failed: " .
+                               print_r($stmt->errorInfo(), true);
+            print "<p class='error'>$msg</p>\n";
+		    return null;
+		}		    // query failed
+    }		        // function CountyMarriageSet::getVolumeSummary
 
 }		// class CountyMarriageSet

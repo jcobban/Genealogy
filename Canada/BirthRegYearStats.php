@@ -54,8 +54,9 @@ use \Templating\Template;
  *		2019/05/29      do not number_format registration numbers       *
  *		2019/06/17      ignore late registrations in calculating        *
  *		                highest registration number                     *
+ *      2020/01/22      use NumberFormatter                             *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Birth.inc";
 require_once __NAMESPACE__ . "/Country.inc";
