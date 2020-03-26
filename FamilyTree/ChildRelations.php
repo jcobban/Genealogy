@@ -48,8 +48,9 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/05/05      use FtTemplate                                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
     require_once __NAMESPACE__ . "/Record.inc";
     require_once __NAMESPACE__ . "/RecordSet.inc";
@@ -181,8 +182,7 @@ if (count($_GET) > 0)
         {		    // act on specific parameter
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
                 break;
             }
         }
@@ -218,8 +218,7 @@ if (count($_POST))
                 $rownum		= $matches[2];
 	            if ($column == 'lang')
 	            {
-	                if (strlen($value) >= 2)
-                        $lang       = strtolower(substr($value,0,2));
+                    $lang       = FtTemplate::validateLang($value);
                     continue;
                 }
                 else

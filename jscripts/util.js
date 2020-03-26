@@ -209,8 +209,12 @@
  *		2019/12/30      leave header section displayed and scroll       *
  *		                <main> only                                     *
  *		2020/01/09      hide horizontal scroll bar for <body>           *
+ *		2020/02/16      add right hand notification column              *
+ *		2020/02/22      include scroll of main section, if any, in      *
+ *		                dialog position.                                *
+ *		2020/03/09      remove facebook                                 *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -966,12 +970,18 @@ function getOffsetRight(elt)
 function getOffsetTop(elt)
 {
     // note that "top" is a reserved word
-    var	y	= 0;
+    var	y	        = 0;
     while(elt)
     {
-		y	+= elt.offsetTop;
-		elt	= elt.offsetParent;
+		y	        += elt.offsetTop;
+		elt	        = elt.offsetParent;
     }		// increment up to top element
+    var main        = document.getElementsByTagName('main');
+    if (main.length > 0)
+    {
+        main        = main[0];
+        y           -= main.scrollTop;
+    }
     return y;
 }	// function getOffsetTop
 
@@ -2223,52 +2233,63 @@ function commonInit(event)
         advertWidth         = Math.max(advert.offsetWidth, 500);
     }
 
-    var facebook            = document.getElementById('facebookSpan');
-    var facebookWidth       = 360;
-    if (facebook)
-    {
-        facebookWidth       = facebook.offsetWidth;
-    }
-
-    var menusWidth= menuWidth + logoWidth + advertWidth + facebookWidth;
+    var menusWidth= menuWidth + logoWidth + advertWidth;
 
     if (typeof(FB) != 'undefined')
         FB.getLoginStatus(function(response) {
             statusChangeCallback(response);
         });
 
-    // display Facebook status after page is loaded
-    if ((menusWidth + 10) > x)
-    {                           // not enough room for Facebook
-        if (facebook)
-        {
-            var parentNode       = facebook.parentNode;
-            parentNode.removeChild(facebook);
-        }
-    }                           // not enough room for Facebook
-    else
-    {                           // enough room for Facebook
-	    try {
-		    var	facebookFrame	= document.getElementById("facebookFrame");
-		    if (facebookFrame)
-				facebookFrame.src	= "https://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.jamescobban.net%2Fgenealogy.html&amp;send=false&amp;layout=standard&amp;width=360&amp;show_faces=true&amp;font&amp;colorscheme=light&amp;action=like&amp;height=40";
-	    } catch (e) {
-			alert("util.js: pageInit: catch " + e.message);
-	    }
-    }                           // enough room for Facebook
-
     // scroll main portion of page if it does not fit without scrolling
-    var headSection         = document.getElementById('headSection');
-    var headHeight          = headSection.offsetHeight;
-    var headWidth           = headSection.offsetWidth;
-    var mainSection         = document.getElementById('mainSection');
-    var mainHeight          = mainSection.offsetHeight;
-    var mainWidth           = mainSection.offsetWidth;
-    var windHeight          = window.innerHeight;
-    if (mainHeight + headHeight > windHeight)
+    var headSection             = document.getElementById('headSection');
+	var mainSection             = document.getElementById('mainSection');
+	var mainHeight              = mainSection.offsetHeight;
+	var windHeight              = window.innerHeight;
+    if (headSection)
     {
-        mainSection.style.height    = (windHeight - headHeight - 12) + 'px';
-        headSection.style.width     = (headWidth - 10) + 'px';
+	    var headHeight          = headSection.offsetHeight;
+	    var headWidth           = headSection.offsetWidth;
+	    if (mainHeight + headHeight > windHeight)
+	    {
+	        mainSection.style.height    = (windHeight - headHeight - 12) + 'px';
+	        headSection.style.width     = (headWidth - 10) + 'px';
+	    }
+    }                           // headSection defined in template
+
+	var rightColumn             = document.getElementById('rightColumn');
+    if (rightColumn)
+    {                           // right column defined
+	    var windWidth           = window.innerWidth;
+        if (windWidth > 1100)
+        {
+	        mainSection.style.width     = (windWidth - 320) + 'px';
+            rightColumn.style.height    = (windHeight - headHeight - 10) + 'px';
+        }
+        else
+        {
+	        mainSection.style.width     = '100%';
+            rightColumn.style.display   = 'none';
+        }
+
+        var useridElt           = document.getElementById('UserInfoUserid');
+        var userid              = useridElt.innerHTML.trim();
+        if (userid.length > 0)
+        {
+            var collectElt      = document.getElementById('collection');
+            if (collectElt)
+                collectElt.style.display    = 'none';
+        }
+        else
+        {
+            var welcomeElt      = document.getElementById('userWelcome');
+            if (welcomeElt)
+                welcomeElt.style.display    = 'none';
+        }
+
+    }                           // right column defined
+    else
+    {
+	    mainSection.style.width             = '100%';
     }
 
     // if the user has requested it, suppress popup help
@@ -2386,47 +2407,7 @@ function commonResize(event)
         advertWidth         = Math.max(advert.offsetWidth, 500);
     }
 
-    var facebook            = document.getElementById('facebookSpan');
-    var facebookWidth       = 360;
-    if (facebook)
-    {
-        facebookWidth       = facebook.offsetWidth;
-    }
-
-    var menusWidth= menuWidth + logoWidth + advertWidth + facebookWidth;
-
-    // display Facebook status after page is loaded
-    if ((menusWidth + 10) > x)
-    {                           // not enough room for Facebook
-        if (facebook)
-        {
-            var parentNode       = facebook.parentNode;
-            parentNode.removeChild(facebook);
-        }
-    }                           // not enough room for Facebook
-    else
-    if (topCrumbs)
-    {                           // enough room for Facebook
-		var	facebookFrame	        = document.getElementById("facebookFrame");
-        if (facebook === null)
-        {                       // previously deleted
-            facebook                = document.createElement('span');
-            facebook.className      = 'facebook';
-            facebook.id             = 'facebookSpan';
-            topCrumbs.insertBefore(facebook, advert);
-            var facebookFrame       = document.createElement('iframe');
-            facebookFrame.className = 'facebook';
-            facebookFrame.id        = 'facebookFrame';
-            facebook.appendChild(facebookFrame);
-        }                       // previously deleted
-
-	    try {
-		    if (facebookFrame)
-				facebookFrame.src	= "https://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.jamescobban.net%2Fgenealogy.html&amp;send=false&amp;layout=standard&amp;width=360&amp;show_faces=true&amp;font&amp;colorscheme=light&amp;action=like&amp;height=40";
-	    } catch (e) {
-			alert("util.js: pageInit: catch " + e.message);
-	    }
-    }                           // enough room for Facebook
+    var menusWidth= menuWidth + logoWidth + advertWidth;
 
     var dataTable                   = document.getElementById('dataTable');
     if (dataTable)
@@ -2447,6 +2428,31 @@ function commonResize(event)
     }                   // page contains display of tabular results
 
 }		// function commonResize
+
+/************************************************************************
+ *  function commonOrientation											*
+ *																		*
+ *  This function is called for all pages to perform action on          *
+ *  orientation change that is common to all pages.					    *
+ *																		*
+ *	Input:																*
+ *	    ev          instance of Event containing orientation change     *
+ *	                event                                               *
+ *	    this        instance of Window                                  *
+ ************************************************************************/
+addEventHandler(window, "orientationchange",   commonOrientation);
+
+function commonOrientation(ev)
+{
+    var w		= window,
+    d			= document,
+    e			= d.documentElement,
+    g			= d.getElementsByTagName('body')[0],
+    x			= w.innerWidth || e.clientWidth || g.clientWidth,
+    y			= w.innerHeight|| e.clientHeight|| g.clientHeight;
+
+    alert("OrientationChange: width=" + x + ", height=" + y);
+}       // function commonOrientation
 
 /************************************************************************
  *  function commonScroll												*
@@ -2950,12 +2956,12 @@ function popupLoadingText(element,
 						  text)
 {
     if (loaddiv == null)
-    {		// indicator not currently displayed
+    {		        // loading indicator not currently displayed
 		loaddiv	= document.getElementById('loading');
 
 		// if there is no "loading" division, create a default one
 		if (loaddiv === null || loaddiv === undefined)
-		{		// create missing division
+		{		    // create missing division
 		    var	body		= document.body;
 		    var	div		= document.createElement('div');
 		    div.id		= 'loading';
@@ -2963,10 +2969,10 @@ function popupLoadingText(element,
 		    div.appendChild(document.createTextNode("Loading..."));
 		    body.appendChild(div);
 		    loaddiv		= div;
-		}		// create missing division
+		}		    // create missing division
 
 		if (loaddiv)
-		{		// display loading indicator to user
+		{		    // display loading indicator to user
 		    // replace text in loading division
 		    while(loaddiv.firstChild)
 				loaddiv.removeChild(loaddiv.firstChild);
@@ -2983,9 +2989,24 @@ function popupLoadingText(element,
 		    loaddiv.style.top	= (getOffsetTop(element) - 30) + 'px';
 		    loaddiv.style.display	= 'block';
 //alert("loaddiv: " + tagToString(loaddiv));
-		}		// load indicator to user
-    }		// indicator not currently displayed
+		}		    // display loading indicator to user
+    }		        // indicator not currently displayed
 }		// function popupLoadingText
+
+/************************************************************************
+ *  function hideRightColumn    										*
+ *																		*
+ *  Hide the right-hand notification column.                            *
+ ************************************************************************/
+function hideRightColumn()
+{
+	var mainSection             = document.getElementById('mainSection');
+	var rightColumn             = document.getElementById('rightColumn');
+    if (rightColumn)
+        rightColumn.style.display   = 'none';
+    if (mainSection)
+	    mainSection.style.width     = '100%';
+}       // function hideRightColumn
 
 /************************************************************************
  *  function hideLoading												*

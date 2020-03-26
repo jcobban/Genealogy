@@ -33,8 +33,9 @@ use \Exception;
  *		2018/01/11		htmlspecchars moved to Template class			*
  *		2019/02/21      use new FtTemplate constructor                  *
  *		                improve support of non-Canadian Censuses        *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/CensusSet.inc';
@@ -42,22 +43,6 @@ require_once __NAMESPACE__ . '/DomainSet.inc';
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
-
-/************************************************************************
- *		$censusList														*
- *																		*
- *		List of censuses to choose from									*
- ************************************************************************/
-$censusList		= array();
-$getParms		= array('partof'	=> null);
-$censuses		= new CensusSet($getParms);
-foreach($censuses as $census)
-{
-	$censusList[$census->get('censusid')] =
-					array(	'id'		=> $census->get('censusid'),
-						    'name'		=> $census->get('name'),
-						    'selected'	=> '');
-}
 
 $censusId				= '';
 $censusYear				= '';
@@ -70,7 +55,14 @@ $lang				    = 'en';
 foreach($_GET as $key => $value)
 {		// loop through parameters
 	switch(strtolower($key))
-	{
+    {
+        case 'cc':
+        {
+            if (strlen($value) == 2)
+                $cc     = strtoupper($value);
+            break;
+        }
+
 	    case 'census':
 	    {
 			// support old parameter value
@@ -119,8 +111,7 @@ foreach($_GET as $key => $value)
 
 	    case 'lang':
         {
-            if (strlen($value) >= 2)
-			    $lang		= strtolower(substr($value, 0, 2));
+	            $lang               = FtTemplate::validateLang($value);
 			break;
 	    }			// language code
 
@@ -131,6 +122,21 @@ foreach($_GET as $key => $value)
 $update	            = canUser('edit');
 $template	        = new FtTemplate("ReqUpdateDists$lang.html");
 
+/************************************************************************
+ *		$censusList														*
+ *																		*
+ *		List of censuses to choose from									*
+ ************************************************************************/
+$censusList		    = array();
+$getParms		    = array('cc'	=> $cc);
+$censuses		    = new CensusSet($getParms);
+foreach($censuses as $census)
+{
+	$censusList[$census->get('censusid')] =
+					array(	'id'		=> $census->get('censusid'),
+						    'name'		=> $census->get('name'),
+						    'selected'	=> '');
+}
 $template->set('CENSUSYEAR', 	$censusYear);
 $template->set('CC',	        $cc);
 $template->set('COUNTRYNAME',	$countryName);

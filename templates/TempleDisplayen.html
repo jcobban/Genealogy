@@ -8,8 +8,9 @@
  *		2019/07/25		created											*
  *      2019/09/25      checkboxes must be both readonly for appearance *
  *                      and disabled so they cannot be clicked          *
+ *      2020/02/14      add show Map                                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
       <a href="/index.html">Home</a>:
@@ -102,17 +103,27 @@
                     $QSCHECKED readonly="readonly" disabled="disabled">
           <div style="clear: both;"></div>
         </div>
-        <p>
+        <div class="row">
+	        <button type="button" id="showMap" class="button">
+	          Show Map
+	        </button>
+            &nbsp;
             <button type="button" id="Pictures">
               <u>P</u>ictures
             </button>
             <input type="hidden" name="PicIdType" id="PicIdType" 
                     value="72">
-        </p> 
+        </div> 
       </form>
     </div> <!-- end of <div class="body"> -->
     <div class="map" id="mapDiv">
     </div>
+    <!-- a division containing a button to hide the map division -->
+    <div class="balloon" id="hideMapDiv">
+      <center>
+        <button id="hideMap" class="button">Hide Map</button>
+      </center>
+    </div> <!-- end of <div id="hideMapDiv"> -->
     <div class="hidden" id="templates">
         <!-- the following button should exactly match <button id="showMap"> -->
         <button id="showMapTemplate" class="button">Show Map</button>

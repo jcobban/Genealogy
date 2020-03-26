@@ -147,8 +147,8 @@ class Language extends Record
 		    (is_array($parms) && count($parms) == 0))
 		{			// create default entry from Cookie
 		    if (array_key_exists('lang', $_REQUEST))
-				$code	= strtolower($_REQUEST['lang']);
-		    $parms	= array('code'	=> $code);
+				$code	    = strtolower($_REQUEST['lang']);
+		    $parms	        = array('code'	=> $code);
 		}			// create default entry
 
         // process parameters
@@ -173,7 +173,7 @@ class Language extends Record
                                 $code	        = substr($value, 0, 2);
                                 if (strlen($value) >= 5 && 
                                     substr($value, 2, 1) == '-')
-                                    $cc         = substr($value, 3);
+                                    $cc     = strtoupper(substr($value, 3));
                             }
                             else
                                 $code           = $value;
@@ -225,25 +225,25 @@ class Language extends Record
 						$this->msg  .= "Language::__construct: '$queryText' " .
 							            "returns $count records. ";
 				    }		// error performing query
-				}		// success
+				}		    // success
 				else
-				{		// error performing query
+				{		    // error performing query
 				    $this->msg      .="Language::__construct: '$queryText' " .
 								print_r($stmt->errorInfo(),true);
-				}		// error performing query
-		    }			// search parameters
+				}		    // error performing query
+		    }			    // search parameters
 		    else
-		    {			// build from existing record
+		    {			    // build from existing record
 				$dbrow		            = $parms;
 				$needInsert	            = false;
-		    }			// build from existing record
-		}			// an array with at least one entry
+		    }			    // build from existing record
+		}			        // an array with at least one entry
 		else
-		{			// unsupported parameter type
+		{			        // unsupported parameter type
 		    throw new Exception("Language::__construct: " .
 						"parameter must be an array: is " .
 						gettype($parms));
-		}			// unsupported parameter type
+		}			        // unsupported parameter type
 
 
 		// invoke constructor of base class
@@ -252,7 +252,9 @@ class Language extends Record
 		$this->needInsert	            = $needInsert;
 
         if (!is_null($cc))
+        {
             $this->extras['cc']         = $cc;
+        }
 
 		// diagnostic output if debug is set
 		$this->dump('Language Record constructed:');
@@ -545,6 +547,8 @@ class Language extends Record
      ********************************************************************/
     function getCountry()
     {
+        global  $warn;
+
         if ($this->country)
             return $this->country;
         else
@@ -558,7 +562,9 @@ class Language extends Record
                 return $this->country;
             }
             else
+            {
                 unset($this->extras['cc']);
+            }
         }
 		return null;
     }		// Language::getCountry
@@ -590,10 +596,12 @@ class Language extends Record
      ********************************************************************/
     function getNativeName($options	= null)
     {
+        global      $warn;
+
 		$lang                   = $this->row['code639_1'];
         if ($this->getCountry())
             return $this->row['nativename'] . 
-                    '(' . $this->country->getName($lang) . ')';
+            '(' . $this->country->getName($lang) . ')';
 		return $this->row['nativename'];
     }		// Language::getNativeName
 

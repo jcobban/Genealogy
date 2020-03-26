@@ -55,6 +55,7 @@ use \Templating\Template;
  *		2019/06/17      ignore late registrations in calculating        *
  *		                highest registration number                     *
  *      2020/01/22      use NumberFormatter                             *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -79,79 +80,80 @@ $lang               = 'en';
 $showTownship	    = false;
 $getParms		    = array();
 
-foreach($_GET as $key => $value)
-{			// loop through all input parameters
-	switch(strtolower($key))
-	{		// process specific named parameters
-	    case 'regyear':
-	    {
-			$regYear		= $value;
-			$getParms['year']	= $regYear;
-			if (!ctype_digit($regYear) ||
-			    ($regYear < 1860) || ($regYear > 2000))
-			{
-			    $msg	.=
-			"RegYear $regYear must be a number between 1860 and 2000. ";
-			}
-			break;
-	    }		// RegYear passed
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {			    // loop through all input parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{		    // process specific named parameters
+		    case 'regyear':
+		    {
+				$regYear		= $value;
+				$getParms['year']	= $regYear;
+				if (!ctype_digit($regYear) ||
+				    ($regYear < 1860) || ($regYear > 2000))
+				{
+				    $msg	.=
+				"RegYear $regYear must be a number between 1860 and 2000. ";
+				}
+				break;
+		    }		// RegYear passed
+	
+		    case 'regdomain':
+		    case 'domain':
+		    {
+	            $domain         	= $value;
+	            $cc                 = substr($domain, 0, 2);
+	            $getParms['domain']	= $value;
+				break;
+		    }		// RegDomain
+	
+		    case 'code':
+		    {
+	            $domain         	= 'CA' . $value;
+	            $cc                 = 'CA';
+	            $getParms['domain']	= $domain;
+				break;
+		    }		// code
+	
+		    case 'lang':
+		    {
+	            $lang       = FtTemplate::validateLang($value);
+				break;
+		    }		// lang
+	
+		    case 'county':
+		    {
+				if (strlen($value) > 0)
+                {
+	                $county		        = $value;
+                }
+				break;
+		    }		// county
+	
+		    case 'debug':
+		    {
+				break;
+		    }		// allow debug output
+	
+		    default:
+		    {
+				$warn	.= "Unexpected parameter $key='$value'. ";
+				break;
+		    }		// any other paramters
+		}		    // process specific named parameters
+	}			    // loop through all input parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
-	    case 'regdomain':
-	    case 'domain':
-	    {
-            $domain         	= $value;
-            $cc                 = substr($domain, 0, 2);
-            $getParms['domain']	= $value;
-			break;
-	    }		// RegDomain
-
-	    case 'code':
-	    {
-            $domain         	= 'CA' . $value;
-            $cc                 = 'CA';
-            $getParms['domain']	= $domain;
-			break;
-	    }		// code
-
-	    case 'lang':
-	    {
-			if (strlen($value) >= 2)
-                $lang           = strtolower(substr($value,0,2));
-			break;
-	    }		// lang
-
-	    case 'county':
-	    {
-			if (strlen($value) == 0)
-			    break;
-			$getParms['county']	= $value;
-			$countyObj		    = new County($domain, $value);
-			if ($countyObj->isExisting())
-			{
-			    $county		    = $value;
-			    $countyName		= $countyObj->get('name');
-			    $showTownship	= true;
-			}
-			else
-			{
-			    $msg	.=
-			"County code '$value' is not valid for domain '$domain'. ";
-			}
-			break;
-	    }		// county
-
-	    case 'debug':
-	    {
-			break;
-	    }		// allow debug output
-
-	    default:
-	    {
-			$warn	.= "Unexpected parameter $key='$value'. ";
-			break;
-	    }		// any other paramters
-	}		// process specific named parameters
-}			// loop through all input parameters
+$template		= new FtTemplate("BirthRegYearStats$lang.html");
 
 // interpret country code
 $countryObj	    = new Country(array('cc' 	=> $cc));
@@ -160,31 +162,33 @@ $countryName    = $countryObj->getName();
 // interpret domain code
 $domainObj	    = new Domain(array('domain' 	=> $domain,
 				    			   'language'	=> 'en'));
-if ($domainObj->isExisting())
+$domainName	    = $domainObj->getName(1);
+$stateName	    = $domainObj->getName(0);
+if (!$domainObj->isExisting())
 {
-    $domainName	= $domainObj->getName(1);
-    $stateName	= $domainObj->getName(0);
-}
-else
-{
-    $domainName	= 'Domain : ' . $domain;
-    $stateName	= 'Domain : ' . $domain;
     $msg	    .= "Domain '$domain' must be a supported two character country code followed by a state or province code. ";
 }
+
 if ($regYear == '')
 {
 	$msg		.= "RegYear omitted. ";
 }
 
-$template		= new FtTemplate("BirthRegYearStats$lang.html");
-
-$template->set('CC',        		$cc);
-$template->set('COUNTRYNAME',		$countryName);
-$template->set('DOMAINNAME',		$domainName);
-$template->set('DOMAIN',	    	$domain);
-$template->set('STATENAME',	    	$stateName);
+// validate county code
 if ($county)
 {
+    $getParms['county']	= $county;
+    $countyObj		    = new County($domain, $county);
+	if ($countyObj->isExisting())
+	{
+	    $countyName		= $countyObj->get('name');
+	    $showTownship	= true;
+	}
+	else
+	{
+	    $msg	.= "County code '$value' is not valid for domain '$domain'. ";
+    }
+
     $template->set('COUNTY',		    $county);
     $template->set('COUNTYNAME',		$countyName);
 }
@@ -193,30 +197,34 @@ else
     $template->set('COUNTY',            '');
     $template->set('COUNTYNAME',		'All');
     $template->updateTag('countyName',  null);
+	$template->updateTag('countyStatusLink', null);
 }
+
+$template->set('CC',        		$cc);
+$template->set('COUNTRYNAME',		$countryName);
+$template->set('DOMAINNAME',		$domainName);
+$template->set('DOMAIN',	    	$domain);
+$template->set('STATENAME',	    	$stateName);
 $template->set('LANG',		    	$lang);
 $template->set('CONTACTTABLE',		'Births');
 $template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
-if ($debug)
-    $template->set('DEBUG',		    'Y');
-else
-    $template->set('DEBUG',		    'N');
+$template->set('DEBUG',		        $debug?'Y':'N');
 
 if (strlen($msg) == 0)
 {			// no errors
     // get the statistics
-    $births		= new BirthSet($getParms);
+    $births		    = new BirthSet($getParms);
 
 	if ($county)
-	    $result	= $births->getCountyStatistics();
+	    $result	    = $births->getCountyStatistics();
 	else
-        $result	= $births->getStatistics();
+        $result	    = $births->getStatistics();
 }		// no errors
 else
-    $result     = array();
+{
+    $result         = array();
+}
 
-if (is_null($county))
-	$template->updateTag('countyStatusLink', null);
 if (!$showTownship)
     $template->updateTag('TownshipTH', null);
 

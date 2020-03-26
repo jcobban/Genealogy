@@ -285,6 +285,13 @@ use \Templating\TemplateTag;
  *      2019/11/17      move CSS to <head>                              *
  *      2020/01/21      translate warnings that appear in title         *
  *      2020/01/23      add space below last child                      *
+ *      2020/02/02      Family::getEvents returns all family events     *
+ *                      in order                                        *
+ *		2020/03/13      LegacyDate::setTemplate is now done by          *
+ *		                class FtTemplate								*
+ *		                add better fixup for lost records for parents   *
+ *		                and spouses                                     *
+ *		2020/03/19      hide empty marriage events                      *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -336,23 +343,7 @@ $deathcause		    = array();
  *	This saves issuing an SQL query to obtain the text for these		*
  *	common values.														*
  ************************************************************************/
-static $statusText	= array(
-		    1 => '',
-		    2 => 'Their marriage was annulled.',
-		    3 => 'They were in a common law relationship.',
-		    4 => 'Their marriage ended in divorce.',
-		    5 => '',
-		    6 => 'They were in an unspecified relationship.',
-		    7 => 'Their marriage ended in a separation.',
-		    8 => 'They were unmarried.',
-		    9 => 'They were divorced.',
-		   10 => 'They were separated.',
-		   11 => '',
-		   12 => 'They were partners.',
-		   13 => 'Their marriage ended with the death of one spouse.',
-		   14 => '',
-		   15 => 'They were just friends.'
-		);
+static $statusText	= array();
 
 /************************************************************************
  *  $nextFootnote		next footnote number to use						*
@@ -644,12 +635,12 @@ function showEvent($pronoun,
     // extract information on event
     // $dateo is an instance of LegacyDate
     // $date is the text expression of the date
-    try {
     $dateo		    = new LegacyDate($event->get('eventd'));
-    } catch(Exception $e) {
-		print "<p>" . $e->getMessage() . ": \$event=" .
+    $dmsg           = $dateo->getMessage();
+    if (strlen($dmsg) > 0)
+		print "<p>$dmsg: \$event=" .
 						print_r($event, true) . "</p>\n";
-    }
+
     $citType		= $event->getCitType();
     $idet		    = $event->get('idet');
     if ($citType == Citation::STYPE_BIRTH ||
@@ -676,7 +667,7 @@ function showEvent($pronoun,
     if ($debug)
     {
 		$warn	.= "<p>showEvent('$pronoun',$gender,event,'$template')</p>\n" .
-						   "<p>citType=$citType, IDET=$idet, date=\"$date\"</p>\n";
+						"<p>citType=$citType, IDET=$idet, date=\"$date\"</p>\n";
     }
 
     // the first letter of the date text string is folded to lower case
@@ -794,7 +785,7 @@ function showEvent($pronoun,
 						}		// description begins with a vowel
 						else
 						    print $pendingWord . ' ';
-	
+
 						// create popups for any hyper-links in the desc
 						print createPopups($desc);
 						break;
@@ -996,18 +987,23 @@ function showParents($person)
 				// determine relationship code for each parent
 				if ($dadid)
 				{		// father is defined
-				    $dad		= new Person(
-								array('idir' => $dadid));
+                    $dad		= new Person(array('idir' => $dadid));
+                    if (!$dad->isExisting())
+                    {
+                        $dad['givenname']   = "Father of " . $person['givenname'];
+                        $dad['surname']     = $person['surname'];
+                        $dad->save(false);
+                    }
 				    $individTable[$dadid]	= $dad;
-				    $dadrel		= $cpRelType[$childRec['idcpdad']];
+				    $dadrel		        = $cpRelType[$childRec['idcpdad']];
 				    if ($momid == 0)
 				    {		// mother not recorded
-					$momrel		= $dadrel;
-					$endofparents	= ".\n";
+					    $momrel		    = $dadrel;
+					    $endofparents	= ".\n";
 				    }		// mother not recorded
 				    else
-					$endofparents	= '';
-				    $gender		= $person->getGenderClass();
+					    $endofparents	    = '';
+				    $gender		        = $person->getGenderClass();
 				    print $t["was the[$gender]"] . ' ' . 
 					  $t[$status] . ' ' .
 					  $t[$dadrel] . ' ' .
@@ -1021,21 +1017,23 @@ function showParents($person)
 				    print " " . $t['and'] . " ";
 				if ($momid > 0)
 				{		// mother is defined
-				  try {
-				    $mom		= new Person(
-								array('idir' => $momid));
+				    $mom		= new Person(array('idir' => $momid));
+                    if (!$mom->isExisting())
+                    {           // fixup
+                        $mom['givenname']   = "Mother";
+                        $mom['surname']     = "Motherof" . 
+                            str_replace(' ','', $person['givenname'] . $person['surname']);
+                        $mom->save(false);
+                    }           // fixup
 				    $individTable[$momid]	= $mom;
-				    $momrel		= $cpRelType[$childRec['idcpmom']];
+				    $momrel		        = $cpRelType[$childRec['idcpmom']];
 				    if ($dadid == 0 || $momrel != $dadrel)
 				    {		// mother's relationship is different
-					print "$momrel $role " . $t['of'] . "\n";
+					    print "$momrel $role " . $t['of'] . "\n";
 				    }		// mother's relationship is different
 ?>
 <a href="<?php print $directory; ?>Person.php?idir=<?php print $momid; ?>&amp;lang=<?php print $lang; ?>" class="female"><?php print $mom->getName(); ?></a>.
 <?php
-				  } catch (Exception $e) {
-				    print "mother: " . $e->getMessage();
-				  }
 				}		// mother is defined
 		    }	// at least one parent defined
 		    else
@@ -1140,6 +1138,10 @@ function showEvents($person)
     global	$private;           // $person is private
     global	$somePrivate;       // some information e.g. death is private
     global	$lang;              // requested language of communication
+	global	$family;
+	global	$spsid;
+	global	$spsName;
+	global	$spsclass;
 
     // initialize fields used in the event descriptions
     $idir	        = $person->getIdir();
@@ -1157,13 +1159,10 @@ function showEvents($person)
     $bprivlim	    = $person->getBPrivLim();	// birth privacy limit year
     $dprivlim	    = $person->getDPrivLim();	// death privacy limit year
 
-
-    $oldfmt	        = LegacyDate::setTemplate($dateTemplate);
-
     // display the event table entries for this individual
     $events		    = $person->getEvents();
     foreach($events as $ider => $event)
-    {			// loop through all event records
+    {			    // loop through all event records
 		// interpret event type
 		$idet	    = $event->get('idet');
 		if ($idet > 0)
@@ -1275,18 +1274,107 @@ function showEvents($person)
 				    break;
 				}		// buried event
 
-		    }			// act on specific event types
-		}			// standard events
-    }				// loop through all event records
+            }			// act on specific event types
+        }			    // standard events
+    }				    // loop through all event records
 
     // check if never married
     $nevermarried	= $person->get('nevermarried');
     if ($nevermarried > 0)
 		print $pronoun . ' ' . $t['was never married'] . ". ";
 
-    // reset to former date presentation
-    LegacyDate::setTemplate($oldfmt);
 }		// function showEvents
+
+/************************************************************************
+ *  function displayEvent												*
+ *																		*
+ *  Display a marriage event.                                           *
+ *																		*
+ *  Parameters:															*
+ *      $ider		    IDER											*
+ *		$event		    instance of Event								*
+ *		$family		    instance of Family								*
+ *		$pronoun        language specific pronoun for Person            *
+ *		$spsid		    IDIR of spouse's instance of Person				*
+ *		$spsName		instance of Name								*
+ *		$spsclass       gender class name                               *
+ ************************************************************************/
+function displayEvent($ider,
+					  $event,
+					  $family,
+					  $pronoun,
+					  $spsid,
+					  $spsName,
+					  $spsclass)
+{
+    global  $lang;
+    global  $directory;
+    global  $t;
+    global  $eventText;
+    global  $warn;
+
+    // display event
+    $idet	                = $event->getIdet();
+    if ($idet == Event::ET_MARRIAGE)
+    {                   // marriage event
+	    $date	            = $event->getDate();
+        $idlrmar	        = $event->get('idlrevent');
+        if (strlen($date) > 0 || $idlrmar > 1)
+        {               // non empty event
+	        print $pronoun . ' ' . $t[$family->getStatusVerb()];
+			// only display a sentence about the marriage
+	        // if there is a spouse defined
+	        if ($spsid > 0)
+			{		    // have a spouse
+?>
+	    <a href="<?php print $directory; ?>Person.php?idir=<?php print $spsid; ?>&amp;lang=<?php print $lang; ?>" class="<?php print $spsclass; ?>"><?php print $spsName->getName(); ?></a>
+<?php
+	        }		    // have a spouse
+			else
+			{		    // do not have a spouse
+	        	print " " . $t['an unknown person'];
+			}		    // do not have a spouse
+			
+		    if (strlen($date) > 0)
+		    {
+			    if (ctype_digit(substr($date,0,1)))
+			        print ' ' . $t['on'] . ' ';
+			    print ' ' . $date;
+		    }
+				
+		    // location of marriage
+		    if ($idlrmar > 1)
+		    {		    // have location of marriage
+				print ' ';	// separate from preceding date
+				$marloc	        = Location::getLocation($idlrmar);
+				showLocation($marloc);
+		    }		    // have location of marriage
+		    print ".\n";
+				
+	        // show citations for this marriage
+	        if ($ider < 1000000000)
+	        {           // real Event
+	            showCitations($event);
+	        }           // real Event
+	        else
+	        {           // internal Event
+	    	    showCitations(Citation::STYPE_MAR,
+		                      $family->getIdmr());
+	        }           // internal Event
+        }               // non empty event
+    }                   // marriage event
+    else
+    if ($idet == Event::ET_LDS_SEALED)
+    {                   // to do
+    }                   // to do
+    else
+    {
+        showEvent($t['They'],		// pronoun for family
+    	          0,		        // not relevant
+            	  $event,		    // record with details
+                  $eventText[$idet]);// template
+    }
+}		// function displayEvent
 
 /********************************************************************
  *		  OOO  PPPP  EEEEE N   N    CCC   OOO  DDDD  EEEEE		    *
@@ -1359,16 +1447,19 @@ $template->updateTag('otherStylesheets',
     		         array('filename'   => 'Person'));
 
 // internationalization support
-$trtemplate             = $template->getTranslate();
-$months	                = $trtemplate['Months'];
-$lmonths	            = $trtemplate['LMonths'];
-$t		                = $trtemplate['tranTab'];
+$translate             = $template->getTranslate();
+if ($translate['dateFormatFull'])
+    LegacyDate::setTemplate($translate['dateFormatFull']->innerHTML);
+$months	                = $translate['Months'];
+$lmonths	            = $translate['LMonths'];
+$t		                = $translate['tranTab'];
+$statusText             = $translate['msStmts'];
 
 // interpret the value of the child to parent relationship in Child
-$cpRelType	            = $trtemplate['cpRelType'];
+$cpRelType	            = $translate['cpRelType'];
 
 // interpret event type IDET as a sentence with substitutions
-$eventText	            = $trtemplate['eventStmt'];
+$eventText	            = $translate['eventStmt'];
 
 $malePronoun			= $t['He'];
 $femalePronoun			= $t['She'];
@@ -1589,7 +1680,6 @@ if (!is_null($person))
 
 	    if (count($families) > 0)
 	    {		// include families section of page
-			$oldfmt	                = LegacyDate::setTemplate($dateTemplate);
 			if ($person['gender'] == Person::MALE)
 			{
 			    $pronoun	        = $malePronoun;
@@ -1632,7 +1722,14 @@ if (!is_null($person))
 			    // information about spouse
 				if ($spsid > 0)
 				{
-				    $spouse	        = Person::getPerson($spsid);
+                    $spouse	        = Person::getPerson($spsid);
+                    if (!($spouse->isExisting()))
+                    {           // fixup
+                        $spouse['givenname']    = $spsName['givenname'];
+                        $spouse['surname']      = $spsName['surname'];
+                        $spouse->save(false);
+                        $warn   .= $spouse->dump('fixup ' . 1718);
+                    }           // fixup
 				    $individTable[$spsid]	= $spouse;
                 }
                 else
@@ -1654,51 +1751,13 @@ if (!is_null($person))
 			    if ($spsid > 0)
 			    {		// have a spouse
 ?>
-	    <a href="<?php print $directory; ?>Person.php?idir=<?php print $spsid; ?>&amp;lang=<?php print $lang; ?>" class="<?php print $spsclass; ?>"><?php print $spsName->getName(); ?></a>
+	    <a href="<?php print $directory; ?>Person.php?idir=<?php print $spsid; ?>&amp;lang=<?php print $lang; ?>" class="<?php print $spsclass; ?>"><?php print $spsName->getName(); ?></a>.
 <?php
 			    }		// have a spouse
 			    else
 			    {		// do not have a spouse
-				    print " " . $t['an unknown person'];
+				    print " " . $t['an unknown person'] . '.';
 			    }		// do not have a spouse
-
-			    if (strlen($mdate) > 0)
-			    {
-				    if (ctype_digit(substr($mdate,0,1)))
-				        print ' ' . $t['on'] . ' ';
-				    print ' ' . $mdate;
-			    }
-
-			    // location of marriage
-			    $idlrmar	= $family->get('idlrmar');
-			    if ($idlrmar > 1)
-			    {		// have location of marriage
-				print ' ';	// separate from preceding date
-				$marloc	= Location::getLocation($idlrmar);
-				showLocation($marloc, $person);
-			    }		// have location of marriage
-			    print ".\n";
-
-			    // show citations for this marriage
-			    showCitations(Citation::STYPE_MAR,
-					  $family->getIdmr());
-
-			    // display the final marriage status
-			    $idms		= $family->get('idms');
-			    if (array_key_exists($idms, $statusText))
-			    {		// marriage status text defined
-				    $marStatus		= $statusText[$idms];
-				    if (strlen($marStatus) > 0)
-				        print $marStatus . "\n";
-			    }		// marriage status text defined
-
-			    // show marriage notes
-			    $mnotes	= $family->get('notes');
-			    if (strlen($mnotes) > 0)
-			    {		// notes defined for this family
-				    $mnotes		= createPopups($mnotes);
-				    print str_replace("\n\n", "\n<p>", $mnotes) . "\n";
-			    }		// notes defined for this family
 
 			    if ($spsid > 0)
 			    {		// have a spouse
@@ -1707,31 +1766,26 @@ if (!is_null($person))
 					    print "This couple were never married. ";
 					}		// never married indicator
 
-					// LDS sealing
-					if (strlen($family->get('seald')) > 0)
-					{		// LDS sealing present
-					    $date	= new LegacyDate($family->get('seald'));
-					    $temple	= new Temple(
-						            array('idtr' => $family->get('idtrseal')));
-					    $locn	= $temple->getName();
-					    print $person->getName() . ' ' .
-						$t['was sealed to'] . ' ' .
-						$spouse->getName() . ' ' .
-						$date->toString($dprivlim, true, $t).' '.
-						                $t['at'] . ' ' .  $locn . '.';
-					}		// LDS sealing present
-
 					// display the event table entries for this family
-					$events	= $family->getEvents();
-					foreach($events as $ie => $event)
-					{		// loop through all event records
-					    // display event
-					    $idet	= $event->getIdet();
-					    showEvent('They',		// pronoun for family
-						      0,		// not relevant
-						      $event,		// record with details
-						      $eventText[$idet]);// template
-					}		// loop through all event records
+					$events	        = $family->getEvents();
+					foreach($events as $ider => $event)
+                    {		// loop through all event records
+				        displayEvent($ider,
+									 $event,
+									 $family,
+									 $pronoun,
+									 $spsid,
+									 $spsName,
+									 $spsclass);
+                    }		// loop through all event records
+
+				    // show marriage notes
+				    $mnotes	        = $family->get('notes');
+				    if (strlen($mnotes) > 0)
+				    {		// notes defined for this family
+					    $mnotes		= createPopups($mnotes);
+					    print str_replace("\n\n", "\n<p>", $mnotes) . "\n";
+				    }		// notes defined for this family
 
 					//****************************************************
 					//  marriage ended event						     *
@@ -1757,14 +1811,17 @@ if (!is_null($person))
 					if (strlen($family->get('marendd')) > 0)
 					{		// marriage ended date present
 					    $date	= new LegacyDate($family->get('marendd'));
-?>
-	    The marriage ended
-<?php
+	                    print $t['The marriage ended'];
 					    print $date->toString(9999, true, $t) . '.';
 					    // show citations for this marriage
 					    showCitations(Citation::STYPE_MAREND,
 						              $family->getIdmr());
 				    }		    // marriage ended date present
+
+				    // display the final marriage status
+	                $idms		    = $family->get('idms');
+	                $marStatus		= $statusText[$idms];
+					print "\n$marStatus\n";
 ?>
 	</p>
 <?php
@@ -1874,7 +1931,7 @@ try {
 			$child		            = Person::getPerson($cid);
 			$individTable[$cid]	    = $child;
 			$cName	                = $child->getName($t);
-	
+
 			// set the class to color hyperlinks
 			if ($child['gender'] == Person::MALE)
 			    $cgender	        = 'male';
@@ -1910,9 +1967,8 @@ try {
 }
 				}	// found at least one child record
 		    }		// loop through families
-		    LegacyDate::setTemplate($oldfmt);
 		}		// at least one marriage
-	
+
 		// give user options if some information is hidden
 		if ($somePrivate)
 		{
@@ -1927,7 +1983,7 @@ try {
 		}		// some data is private
 		else
 		    $template->updateTag('wishtosee', null);
-	
+
 		// for already logged on users
 		if (strlen($userid) == 0)
 		{
@@ -1942,7 +1998,7 @@ try {
 		{
 		    $template->updateTag('edit', null);
 		}
-	
+
 		$birthPlace		= '';
 		if ($evBirth)
 		    $birthPlace		= $evBirth->getLocation()->getName();
@@ -2015,61 +2071,66 @@ $template->set('BODY', ob_get_clean());
 
 // create popup balloons for each of the people referenced on this page
 $tag                = $template['Individ$idir'];
-$templateText       = $tag->outerHTML();
-$data               = '';
-foreach($individTable as $idir => $individ)
-{		// loop through all referenced individuals
-	$name	    	= $individ->getName();
-	$evBirth	    = $individ->getBirthEvent();
-	if ($evBirth)
-	{
-	    $birthd	    = $evBirth->getDate();
-	    $birthloc	= $evBirth->getLocation()->getName();
-	    if ($birthloc == '')
-	    {
-			$birthloc	= array();
-			if ($birthd == '')
-			    $birthloc	= array();
-	    }
-	}
-	else
-	{
-	    $birthd     = array();
-	    $birthloc	= array();
-	}
-	$evDeath	    = $individ->getDeathEvent();
-	if ($evDeath)
-	{
-	    $deathd	    = $evDeath->getDate();
-	    $deathloc	= $evDeath->getLocation()->getName();
-	    if ($deathloc == '')
-	    {
-			$deathloc	= array();
-			if ($deathd == '')
-			    $deathloc	= array();
-	    }
-	}
-	else
-	{
-	    $deathd	= array();
-	    $deathloc	= array();
-	}
-	$families	= $individ->getFamilies();
-	$parents	= $individ->getParents();
-	$entry	= array('name'			=> $name,
-        			'idir'			=> $individ->get('idir'),
-        			'birthd'		=> $birthd,
-        			'birthloc'		=> $birthloc,
-        			'deathd'		=> $deathd,
-        			'deathloc'		=> $deathloc,
-        			'description'	=> '',
-   				    'families'		=> $families,
-   				    'parents'		=> $parents);
-    $itemplate      = new Template($templateText);
-    $itemplate['Individ$idir']->update($entry);
-    $data           .= $itemplate->compile();
-}		// loop through all referenced individuals
-$tag->update($data);
+if ($tag)
+{
+	$templateText       = $tag->outerHTML();
+	$data               = '';
+	foreach($individTable as $idir => $individ)
+	{		// loop through all referenced individuals
+		$name	    	= $individ->getName();
+		$evBirth	    = $individ->getBirthEvent();
+		if ($evBirth)
+		{
+		    $birthd	    = $evBirth->getDate();
+		    $birthloc	= $evBirth->getLocation()->getName();
+		    if ($birthloc == '')
+		    {
+				$birthloc	= array();
+				if ($birthd == '')
+				    $birthloc	= array();
+		    }
+		}
+		else
+		{
+		    $birthd     = array();
+		    $birthloc	= array();
+		}
+		$evDeath	    = $individ->getDeathEvent();
+		if ($evDeath)
+		{
+		    $deathd	    = $evDeath->getDate();
+		    $deathloc	= $evDeath->getLocation()->getName();
+		    if ($deathloc == '')
+		    {
+				$deathloc	= array();
+				if ($deathd == '')
+				    $deathloc	= array();
+		    }
+		}
+		else
+		{
+		    $deathd	= array();
+		    $deathloc	= array();
+		}
+		$families	= $individ->getFamilies();
+		$parents	= $individ->getParents();
+		$entry	= array('name'			=> $name,
+	        			'idir'			=> $individ->get('idir'),
+	        			'birthd'		=> $birthd,
+	        			'birthloc'		=> $birthloc,
+	        			'deathd'		=> $deathd,
+	        			'deathloc'		=> $deathloc,
+	        			'description'	=> '',
+	   				    'families'		=> $families,
+	   				    'parents'		=> $parents);
+	    $itemplate      = new Template($templateText);
+	    $itemplate['Individ$idir']->update($entry);
+	    $data           .= $itemplate->compile();
+	}		// loop through all referenced individuals
+	$tag->update($data);
+}
+else
+    error_log("Person.php: " . __LINE__ . "Could not find id='Individ$idir' template 'Person$lang.html'");
 
 // create popup balloons for each of the sources referenced on this page
 $template->updateTag('Source$idsr',

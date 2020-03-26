@@ -3,7 +3,6 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 use \Templating\Template;
-
 /************************************************************************
  *  CountiesEdit.php													*
  *																		*
@@ -40,8 +39,9 @@ use \Templating\Template;
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/04/06      use new FtTemplate::includeSub                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -60,13 +60,9 @@ $domainName			= 'Canada: Ontario:';
 $lang			    = 'en';
 $offset			    = 0;
 $limit			    = 20;
-if (canUser('edit'))
-	$action			= 'Edit';
-else
-	$action			= 'Display';
 	
 
-if (count($_GET) > 0)
+if (isset($_GET) && count($_GET) > 0)
 {                       // initial invocation from URL
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
@@ -97,8 +93,7 @@ if (count($_GET) > 0)
 	
 		    case 'lang':
 		    {
-				if (strlen($value) >= 2)
-				    $lang			= strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
 				break;
 		    }		// debug handled by common code
 	
@@ -128,11 +123,8 @@ if (count($_GET) > 0)
 		    }
 		}		// check supported parameters
 	}			// loop through all parameters
-	if ($debug)
-	{
-	    $parmsText	    .= "</table>\n";
-	    $warn           .= $parmsText;
-	}
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
 
     // create template
 	$template			= new FtTemplate("Counties$action$lang.html");
@@ -156,10 +148,15 @@ if (count($_GET) > 0)
 	$changedText		= null;
 	$deletedText		= null;
     $addedText	    	= null;
-    $template['summary']->update(null);
+    if (is_null($template['summary']))
+    {
+		print "<p>template=\"Counties$action$lang.html\" does not contain element with id=\"summary\"</p>\n";
+    }
+    else
+        $template['summary']->update(null);
 }                       // initial invocation from URL
 else
-if (count($_POST) > 0)
+if (isset($_POST) && count($_POST) > 0)
 {                       // invoked to process update
 	// organize the parameters as an associative array of instances
 	// of the class County
@@ -190,45 +187,52 @@ if (count($_POST) > 0)
 	
 		    case 'lang':
 		    {
-	            if (strlen($value) >= 2)
-	                $lang       = strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
 				break;
 		    }
 	    }
 	}			            	// loop through all parameters
 	
-	if ($debug)
-	{
-	    $parmsText	    .= "</table>\n";
-	    $warn           .= $parmsText;
-	}
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			    // invoked by method=post
+
+if (canUser('edit'))
+	$action			= 'Edit';
+else
+    $action			= 'Display';
 
     // create template
-	$template			= new FtTemplate("Counties$action$lang.html");
+$template			= new FtTemplate("Counties$action$lang.html");
 
-    $includeSub			= "CountiesDialogs$lang.html";
-    $template->includeSub($includeSub, 'DIALOGS', true);
+$includeSub			= "CountiesDialogs$lang.html";
+$template->includeSub($includeSub, 'DIALOGS', true);
 
     // analyse parameters
-	$domainObj	    = new Domain(array('domain'	    => $domain,
-	           					       'language'	=> 'en'));
-	if ($domainObj->isExisting())
-	{
-	    $cc			= substr($domain, 0, 2);
-	    $prov		= substr($domain, 2, 2);
-	    $domainName	= $domainObj->get('name');
-	}
-	else
-	{
-	    $msg		.= "Domain='$domain' unsupported. ";
-	    $domainName	= 'Unknown';
-	}
-	$countryObj		= new Country(array('code' => $cc));
-	$countryName	= $countryObj->getName();
+$domainObj	        = new Domain(array('domain'	    => $domain,
+           					       'language'	=> 'en'));
+if ($domainObj->isExisting())
+{
+    $cc			    = substr($domain, 0, 2);
+    $prov		    = substr($domain, 2, 2);
+    $domainName	    = $domainObj->get('name');
+}
+else
+{
+    $msg		    .= "Domain='$domain' unsupported. ";
+    $domainName	    = 'Unknown';
+}
+$countryObj		    = new Country(array('code' => $cc));
+$countryName	    = $countryObj->getName();
 
+// apply updates
+if (isset($_POST) && count($_POST) > 0)
+{			        // invoked by method=post
     // loop through the parameters again to apply updates to the County objects
 	foreach($_POST as $key => $value)
 	{				            // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
 		$matches		= array();
 		$fieldLc		= strtolower($key);
 	    if(preg_match('/^(code|name|delete|endyear|startyear|edittownships|editlocation)(.*)$/', $fieldLc, $matches))
@@ -302,6 +306,8 @@ if (count($_POST) > 0)
 		    }			        // unrecognized parameter
 		}           			// act on specific keys
 	}			            	// loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
 	
 	// put last entry into table
 	if ($county)
@@ -379,6 +385,7 @@ if (count($_POST) > 0)
     if ($changeCount == 0)
         $template['summary']->update(null);
 }                       // invoked to process update
+
 if (strlen($msg) == 0)
 {			// no errors detected
 	// execute the query to get the contents of the page

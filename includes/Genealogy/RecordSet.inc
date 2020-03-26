@@ -667,15 +667,10 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 		    $this->query	    = 'SELECT ' . $this->fields .
 									' FROM ' . $this->table . ' ' .
                                     $where;
-            // note the following syntax for counting grouped lines is
-            // MySQL/MariaB specific because other servers only support
-            // a single field for DISTINCT
-            // Portable syntax is:
-            // SELECT COUNT(*) FROM (SELECT $groupby FROM $table 
-            //  $where GROUP BY $groupby)
             if (is_string($groupby) && strlen($groupby) > 0)
-                $countQuery		= "SELECT COUNT(DISTINCT $groupby) FROM " .
-                                  $this->table .  ' ' . $where;
+                $countQuery		= "SELECT COUNT(*) FROM " .
+                                    $this->table .  ' ' . $where . 
+                                    " GROUP BY $groupby";
             else
 		        $countQuery		= "SELECT COUNT(*) FROM " . $this->table . 
 								   ' ' . $where;
@@ -2473,6 +2468,50 @@ require_once __NAMESPACE__ . '/Surname.inc';
             $this->list		= array_merge($newEntry, $this->list);
         $this->information['count']     = count($this->list);
     }		// function RecordSet::push
+
+    /********************************************************************
+     *	function RecordSet::insert  									*
+     *																	*
+     *	Add a new index and record to the RecordSet in the order		*
+     *	defined by the class by method compare.                         *
+     *																	*
+     *	Input:															*
+     *	    $record		record to add.  Note that this must be the		*
+     *					same class as the existing record(s)			*
+     *																	*
+     ********************************************************************/
+    public function insert($newrecord)
+    {
+		global	$debug;
+		global	$warn;
+		global	$connection;
+
+		if ($this->list === null)
+		    $this->list		= array($newrecord->getId() => $newrecord);
+        else
+        {                   // list is not empty
+            $offset         = 0;
+            foreach($this->list as $key => $record)
+            {
+                if ($newrecord->compare($record) < 0)
+                {           // new record sorts before current record
+                    $before     = array_slice($this->list, 0, $offset, true);
+                    $after      = array_slice($this->list, $offset, null, true);
+                    $this->list = $before +
+                                  array($newrecord->getId() => $newrecord) +
+                                  $after;
+                    $newrecord  = null;
+                    break;
+                }
+                $offset++;
+            }
+            if ($newrecord)
+            {               // add to end
+                $this->list[$newrecord->getId()]    = $newrecord;
+            }               // add to end
+        }                   // list is not empty
+        $this->information['count']     = count($this->list);
+    }		// function RecordSet::insert
 
     /********************************************************************
      *	function RecordSet::rewind										*

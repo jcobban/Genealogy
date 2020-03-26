@@ -252,6 +252,7 @@
 			value='$surname' readonly="readonly"
 			class='$surclass white left'
 			size='14' maxlength='120'>
+	      </td>
 	      <td class='$cellclass left'>
 		<input type='text' name='GivenNames$line'
 			value='$givennames'  readonly="readonly"
@@ -528,139 +529,150 @@
 	  <tfoot>
 	    <!--- Put out the column footers -->
 	    <tr>
-	  <th class='colhead1st'>
-	    Line
-	</th>
-	<th class='colhead'>
-	    Fam
-	</th>
-	<th class='colhead'>
-	Surname
-	</th>
-	<th class='colhead'>
-	Given Names
-	</th>
-	<th class='colhead'>
-	Address
-	</th>
-	<th class='colhead'>
-	Sex
-	</th>
-	<th class='colhead'>
-	Relation
-	</th>
-	<th class='colhead'>
-	MSt
-	</th>
-	<th class='colhead'>
-	Line
-	</th>
-	<th class='colhead'>
-	BDate
-	</th>
-	<th class='colhead'>
-	BYear
-	</th>
-	<th class='colhead'>
-	Age
-	</th>
-	<th class='colhead'>
-	Birth Place
-	</th>
-	<th class='colhead'>
-	Imm Year
-	</th>
-	<th class='colhead'>
-	Nat Year
-	</th>
-	<th class='colhead'>
-	Origin
-	</th>
-	<th class='colhead'>
-	Nationality
-	</th>
-	<th class='colhead'>
-	Religion
-	</th>
-	<th class='colhead'>
-	Line
-	</th>
-	<th class='colhead'>
-	Occupation
-	</th>
-	<th class='colhead'>
-	Occ Other</th>
-	<th class='colhead'>
-	E'r</th>
-	<th class='colhead'>
-	E'e</th>
-	<th class='colhead'>
-	OA</th>
-	<th class='colhead'>
-	Where</th>
-	<th class='colhead'>
-	Wks E</th>
-	<th class='colhead'>
-	Wks O</th>
-	<th class='colhead'>
-	H/W E</th>
-	<th class='colhead'>
-	H/W O</th>
-	<th class='colhead'>
-	Income E</th>
-	<th class='colhead'>
-	Income O
-	</th>
-	<th class='colhead'>
-	  Hourly Rate	<!-- col 29 -->
-	</th>
-	<th class='colhead'>
-	  Life Insurance	<!-- col 30 -->
-	</th>
-	<th class='colhead'>
-	  Acc Insurance	<!-- col 31 -->
-	</th>
-	<th class='colhead'>
-	  Cost Insurance	<!-- col 32 -->
-	</th>
-	<th class='colhead'>
-	Line
-	</th>
-	<th class='colhead'>
-	  School Mons	<!-- col 33  -->
-	</th>
-	<th class='colhead'>
-	  Can Read	<!-- col 34 -->
-	</th>
-	<th class='colhead'>
-	  Can Write	<!-- col 35 -->
-	</th>
-	<th class='colhead'>
-	  Language	<!-- col 36 -->
-	</th>
-	<th class='colhead'>
-	  Cost Education	<!-- col 37 -->
-	</th>
-	<th class='colhead'>
-	  Blind		<!-- col 38  -->
-	</th>
-	<th class='colhead'>
-	  Deaf		<!-- col 39 -->
-	</th>
-	<th class='colhead'>
-	  Insane	<!-- col 40 -->
-	</th>
-	<th class='colhead'>
-	  Idiot		<!-- col 41 -->
-	</th>
-	<th class='colhead'>
-	Remarks
-	</th>
-	<th class='colhead'>
-	  Line
-	</th>
-	<th class='colhead'>
-	  FT
+		  <th class='colhead1st'>
+		    Line
+		  </th>
+		  <th class='colhead'>
+		    Fam
+		  </th>
+		  <th class='colhead'>
+		    Surname
+		  </th>
+		  <th class='colhead'>
+		    Given Names
+		  </th>
+		  <th class='colhead'>
+		    Address
+		  </th>
+		  <th class='colhead'>
+		    Sex
+		  </th>
+		  <th class='colhead'>
+		    Relation
+		  </th>
+		  <th class='colhead'>
+		    MSt
+		  </th>
+		  <th class='colhead'>
+		    Line
+		  </th>
+		  <th class='colhead'>
+		    BDate
+		  </th>
+		  <th class='colhead'>
+		    BYear
+		  </th>
+		  <th class='colhead'>
+		    Age
+		  </th>
+		  <th class='colhead'>
+		    Birth Place
+		  </th>
+		  <th class='colhead'>
+		    Imm Year
+		  </th>
+		  <th class='colhead'>
+		    Nat Year
+		  </th>
+		  <th class='colhead'>
+		    Origin
+		  </th>
+		  <th class='colhead'>
+		    Nationality
+		  </th>
+		  <th class='colhead'>
+		    Religion
+		  </th>
+		  <th class='colhead'>
+		    Line
+		  </th>
+		  <th class='colhead'>
+		    Occupation
+		  </th>
+		  <th class='colhead'>
+		    Occ Other
+		  </th>
+		  <th class='colhead'>
+		    E'r
+		  </th>
+		  <th class='colhead'>
+		    E'e
+		  </th>
+		  <th class='colhead'>
+		    OA
+		  </th>
+		  <th class='colhead'>
+		    Where
+		  </th>
+		  <th class='colhead'>
+		  Wks E
+		  </th>
+		  <th class='colhead'>
+		    Wks O
+		  </th>
+		  <th class='colhead'>
+		    H/W E
+		  </th>
+		  <th class='colhead'>
+		    H/W O
+		  </th>
+		  <th class='colhead'>
+		    Income E
+		  </th>
+		  <th class='colhead'>
+		    Income O
+		  </th>
+		  <th class='colhead'>
+		    Hourly Rate  <!-- col 29 -->
+		  </th>
+		  <th class='colhead'>
+		    Life Insurance  <!-- col 30 -->
+		  </th>
+		  <th class='colhead'>
+		    Acc Insurance  <!-- col 31 -->
+		  </th>
+		  <th class='colhead'>
+		    Cost Insurance  <!-- col 32 -->
+		  </th>
+		  <th class='colhead'>
+		    Line
+		  </th>
+		  <th class='colhead'>
+		    School Mons  <!-- col 33  -->
+		  </th>
+		  <th class='colhead'>
+		    Can Read  <!-- col 34 -->
+		  </th>
+		  <th class='colhead'>
+		    Can Write  <!-- col 35 -->
+		  </th>
+		  <th class='colhead'>
+		    Language  <!-- col 36 -->
+		  </th>
+		  <th class='colhead'>
+		    Cost Education  <!-- col 37 -->
+		  </th>
+		  <th class='colhead'>
+		    Blind	  <!-- col 38  -->
+		  </th>
+		  <th class='colhead'>
+		    Deaf	  <!-- col 39 -->
+		  </th>
+		  <th class='colhead'>
+		    Insane  <!-- col 40 -->
+		  </th>
+		  <th class='colhead'>
+		    Idiot	  <!-- col 41 -->
+		  </th>
+		  <th class='colhead'>
+		  Remarks
+		  </th>
+		  <th class='colhead'>
+		    Line
+		  </th>
+		  <th class='colhead'>
+		    FT
+		  </th>
 	    </tr>
 	  </tfoot>
 	</table>

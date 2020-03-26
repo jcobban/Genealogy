@@ -18,9 +18,6 @@ use \Templating\Template;
  *		2012/02/25		use switch for parameter names					*
  *						add support for popup help bubbles				*
  *		2012/07/26		change genOntario.html to genOntario.php		*
- *		2012/08/21		use htmlHeader function to standardize <head>	*
- *		2013/06/01		use pageTop and pageBot to standardize			*
- *						appearance										*
  *		2013/12/07		$msg and $debug initialized by common.inc		*
  *		2014/02/08		standardize appearance of <select>				*
  *		2014/03/14		use CSS rather than tables for layout			*
@@ -44,6 +41,7 @@ use \Templating\Template;
  *		2017/11/19		use CitationSet in place of getCitations		*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -155,8 +153,8 @@ if (count($_GET) > 0)
 
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang           = strtolower(substr($value, 0, 2));
+                $lang       = FtTemplate::validateLang($value);
+                break;
             }
 		}	    // take action on specific parameter
     }		    // loop through all parameters

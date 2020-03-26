@@ -34,8 +34,9 @@ use \Templating\Template;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/05/06      use FtTemplate                                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/DontMergeEntry.inc';
 require_once __NAMESPACE__ . '/DontMergeEntrySet.inc';
@@ -43,14 +44,21 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // get the parameters
-$pattern	        = '';
-$lang               = 'en';
-$offset	            = 0;
-$limit	            = 20;
+$pattern	        			= '';
+$lang               			= 'en';
+$offset	            			= 0;
+$limit	            			= 20;
+
 if (isset($_GET) && count($_GET) > 0)
 {
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
 		switch(strtolower($key))
 		{		// take action based upon key
 		    case 'pattern':
@@ -75,12 +83,13 @@ if (isset($_GET) && count($_GET) > 0)
 
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang           = strtolower(substr($value, 0, 2));
+                $lang       = FtTemplate::validateLang($value);
 				break;
             }
 		}		// take action based upon key
     }
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
 }
 
 $template                   = new FtTemplate("DontMergeEntries$lang.html");

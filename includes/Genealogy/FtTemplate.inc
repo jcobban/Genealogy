@@ -4,6 +4,7 @@ use \Exception;
 use \NumberFormatter;
 use Templating\Template;
 use Templating\TemplateTag;
+use Templating\escape;
 
 /************************************************************************
  *  class FtTemplate									    			*
@@ -20,6 +21,11 @@ use Templating\TemplateTag;
  *      2019/12/23      use class Advertisers to locate next            *
  *                      advertisement                                   *
  *      2020/01/22      add method getFormatter                         *
+ *      2020/03/04      loading of dialog templates for use by          *
+ *                      locationCommon.js and templeCommon.js           *
+ *                      moved to FtTemplate class                       *
+ *      2020/03/12      validate language code passed to tinyMCE        *
+ *                      get date format from translate table            *
  *	    									                            *
  *  Copyright &copy; 2020 James A. Cobban All Rights Reserved			*
  ************************************************************************/
@@ -38,6 +44,7 @@ require_once  'Templating/Template.inc' ;
 include_once  __NAMESPACE__ . '/User.inc';
 include_once  __NAMESPACE__ . '/Language.inc';
 include_once  __NAMESPACE__ . '/Advertiser.inc';
+include_once  __NAMESPACE__ . '/LegacyDate.inc';
 
 class FtTemplate extends Template
 {
@@ -48,13 +55,14 @@ class FtTemplate extends Template
      ********************************************************************/
     private $lang               = 'en';
     private $formatter          = null;
+    private $sateFormatter      = null;
 
     /********************************************************************
      *  FtTemplate::trtemplate                                          *
      *													                *
      *	Instance of Template for translating to language	            *
      ********************************************************************/
-    private $trtremplate        = null;
+    private $trtemplate         = null;
 
     /********************************************************************
      *	function FtTemplate::__construct							    *
@@ -96,9 +104,17 @@ class FtTemplate extends Template
 
         $includebase        = $matches[1];
         $lang               = $matches[2];
+        if (strlen($lang) > 2)
+            $langcode       = substr($lang, 0, 2);
+        else
+            $langcode       = $lang;
         $this->lang         = $lang;
-        $this->formatter    = new \NumberFormatter(str_replace('-','_',$lang),
-                                                   \NumberFormatter::DECIMAL);
+        $locale             = str_replace('-','_',$lang);
+        $this->formatter    = new \NumberFormatter($locale,
+                                            \NumberFormatter::DECIMAL);
+        $this->dateFormatter= new \IntlDateFormatter($locale,
+                                            \IntlDateFormatter::LONG,
+                                            \IntlDateFormatter::NONE);
         $includeSub         = null;
 
     	$tempBase	        = $document_root . '/templates/';
@@ -114,29 +130,29 @@ class FtTemplate extends Template
 			{               // try to find closest match
                 $language   	= new Language(array('code' => $lang));
                 if ($language->isExisting())
-                    $lang       = $language['code'];
+                    $tlang      = $language['code'];
                 else
-                    $lang       = 'en';
-                $langName	    = $language->get('name');
-				$nativeName	    = $language->get('nativename');
+                    $tlang      = 'en';
+                $langName	    = $language->getName();         // English
+				$nativeName	    = $language->getNativeName();   // endonym
 				$sorry  	    = $language->getSorry();
-			    $warn   	    .= str_replace(array('$langName','$nativeName'),
-			                                   array($langName, $nativeName),
-			                                   $sorry);
-				$includeSub     = "$includebase$lang.html";
-		        if (file_exists("$tempBase$includebase$lang.html"))
-				    $includeSub = "$includebase$lang.html";
+
+                if (file_exists("$tempBase$includebase$tlang.html"))
+                {
+                    $includeSub = "$includebase$tlang.html";
+                }
 		        else
-		        if (file_exists("$tempBase$includebase" . "en.html"))
+                if (file_exists("$tempBase{$includebase}en.html"))
+                {
 				    $includeSub = $includebase . "en.html";
+			        $warn   .= str_replace(array('$langName','$nativeName'),
+			                               array($langName, $nativeName),
+                                           $sorry);
+                }
 		        else
-				    throw new Exception ("FtTemplate::__construct: cannot find template file '{$includebase}en.html'");
+				    throw new Exception ("FtTemplate::__construct: cannot find template file '{$includebase}en.html' in $tempBase");
             }               // try to find closest match
 
-            if (strlen($lang) > 2)
-                $langcode       = substr($lang, 0, 2);
-            else
-                $langcode       = $lang;
             if ($dialog)
                 parent::__construct($tempBase . "dialog$langcode.html");
             else
@@ -147,9 +163,16 @@ class FtTemplate extends Template
         }                   // include file name
 
         if (file_exists($tempBase . "Trantab$lang.html"))
-            $this->trtemplate = new Template("${tempBase}Trantab$lang.html");
+            $this->trtemplate   = new Template("${tempBase}Trantab$lang.html");
         else
-            $this->trtemplate = new Template("${tempBase}Trantaben.html");
+        if (file_exists($tempBase . "Trantab$langcode.html"))
+            $this->trtemplate   = new Template("${tempBase}Trantab$langcode.html");
+        else
+            $this->trtemplate   = new Template("${tempBase}Trantaben.html");
+
+        $dateFormat             = $this->trtemplate['dateFormat'];
+        if ($dateFormat)
+            LegacyDate::setTemplate($dateFormat->innerHTML);
     }           // function FtTemplate::__construct
 
     /********************************************************************
@@ -197,6 +220,19 @@ class FtTemplate extends Template
     public function getFormatter()
     {
         return $this->formatter;
+    }           // function getFormatter
+
+    /********************************************************************
+     *	function FtTemplate::getDateFormatter							*
+     *													            	*
+     *	Get the locale specific date formatter                          *
+     *													            	*
+     *	Returns:										            	*
+     *		instance of class DateFormatter					            *
+     ********************************************************************/
+    public function getDateFormatter()
+    {
+        return $this->dateFormatter;
     }           // function getFormatter
 
     /********************************************************************
@@ -399,47 +435,55 @@ class FtTemplate extends Template
                 $warn	.= "<p>FtTemplate::displayBegin: " . __LINE__ .
                 " could not find &lt;h1&gt; to initialize TITLE</p>\n";
         }		// script has not initialized TITLE
+        else
+        {
+            $title                  = $this->fields['TITLE'];
+            $title		            = preg_replace('#<[^>]+>#s', '', $title);
+            $title		            = trim($title);
+            $this->fields['TITLE']  = $title;
+        }
 
         // pick an advertisement to display
-        $getparms               = array('adname' => '!');
-        $advertisers            = new RecordSet('Advertisers',
-                                                $getparms);
-        $info                   = $advertisers->getInformation();
-        $count                  = $info['count'];
-        $counterRec             = new Advertiser(array('adname' => ''));
-        $counterRec->increment('01');   // stats count
-        $index	                = $counterRec['count01'] % $count;
-        $getparms               = array('adname'    => '!',
-                                        'offset'    => $index,
-                                        'limit'     => 1);
-        $advertisers            = new RecordSet('Advertisers',
-                                                $getparms);
-        $advertiser             = $advertisers->rewind();
-        $adname                 = $advertiser['adname'];
-        $adurl	                = "/Advertisements/$adname.html";
-        $date                   = date('m d');
-        $month                  = substr($date, 0, 2);
-        $advertiser->increment($month);
-
-        // the following code is to ensure that the count for
-        // the next month is zero before the month begins
-        // this should be moved to a cron job
-        $day                    = substr($date, -2);
-        if ($day == '28')
-        {                   // move to cron job
-            $month              += 1;
-            if ($month > 12)
-                $month          = $month - 13;
-            if (strlen($month) == 1)
-                $month          = '0' . $month;
-            $advertiser->set("Count$month", 0);
-            $advertiser->save(false);
-        }                   // move to cron job
-
-        // change insertion of ads to not use <iframe>
         $adElement              = $this['advertFrame'];
+        $adurl                  = '';
         if ($adElement)
         {
+	        $getparms               = array('adname' => '!');
+	        $advertisers            = new RecordSet('Advertisers',
+	                                                $getparms);
+	        $info                   = $advertisers->getInformation();
+	        $count                  = $info['count'];
+	        $counterRec             = new Advertiser(array('adname' => ''));
+	        $counterRec->increment('01');   // stats count
+	        $index	                = $counterRec['count01'] % $count;
+	        $getparms               = array('adname'    => '!',
+	                                        'offset'    => $index,
+	                                        'limit'     => 1);
+	        $advertisers            = new RecordSet('Advertisers',
+	                                                $getparms);
+	        $advertiser             = $advertisers->rewind();
+	        $adname                 = $advertiser['adname'];
+	        $adurl	                = "/Advertisements/$adname.html";
+	        $date                   = date('m d');
+	        $month                  = substr($date, 0, 2);
+	        $advertiser->increment($month);
+	
+	        // the following code is to ensure that the count for
+	        // the next month is zero before the month begins
+	        // this should be moved to a cron job
+	        $day                    = substr($date, -2);
+	        if ($day == '28')
+	        {                   // move to cron job
+	            $month              += 1;
+	            if ($month > 12)
+	                $month          = $month - 13;
+	            if (strlen($month) == 1)
+	                $month          = '0' . $month;
+	            $advertiser->set("Count$month", 0);
+	            $advertiser->save(false);
+	        }                   // move to cron job
+	
+	        // change insertion of ads to not use <iframe>
             $adTemplate         = new Template($document_root . $adurl);
             $adDoc              = $adTemplate->getDocument();
             $adBody             = $adDoc->getElementsByTagName('body');
@@ -492,6 +536,21 @@ class FtTemplate extends Template
 
         // set LANG to the requested language code
         $this->set('LANG',		    $this->lang);
+
+        // ensure TinyMCE language is set properly
+        $langtiny                   = str_replace('-','_',$lang);
+        $langBase	                = $document_root . 
+                                '/jscripts/tinymce/js/tinymce/langs/';
+        if (!file_exists($langBase . "$langtiny.js"))
+        {
+            if (strlen($langtiny) > 2)
+            {
+                $langtiny           = substr($langtiny, 0, 2);
+                if (!file_exists($langBase . "$langtiny.js"))
+                    $langtiny       = 'en';
+            }
+        }
+        $this->set('LANGTINY',		$langtiny);
 
         // initialize BREADCRUMBS from <div id='breadcrumbs'>
         if (array_key_exists('BREADCRUMBS', $this->fields))
@@ -639,9 +698,9 @@ class FtTemplate extends Template
             $h1array		            = $this->getElementsByTagName('h1');
             if (count($h1array) > 0)
             {               // at least one <h1> tag in page
-                $h1		                = current($h1array);
+                $h1		                = end($h1array);
                 foreach($h1->childNodes() as $child)
-                {           // loop through children of first <h1>
+                {           // loop through children of last <h1>
                     if ($child->tagName == 'span' &&
                         isset($child->attributes['class']) &&
                         $child->attributes['class'] == 'right')
@@ -650,8 +709,8 @@ class FtTemplate extends Template
                         $apos       = strpos($help, '<a');
                         $apos       = strpos($help, '>', $apos + 1);
                         $help       = substr($help, 0, $apos) .
-                                      ' id="menuhelp" class="menuitem"' .
-                                      substr($help, $apos);
+                                             ' id="menuhelp" class="menuitem"' .
+                                             substr($help, $apos);
                         $help       = str_replace('</a>',
                                                   '</a><br>',
                                                   $help);
@@ -659,6 +718,22 @@ class FtTemplate extends Template
                         $child->update(null);
                     }       // move help section to menu
                 }           // loop through children of first <h1>
+                if (count($h1array) > 1)
+                {
+                    $heading            = $h1->innerHTML;
+                    $heading		    = preg_replace('#<[^>]+>#s', '', $heading);
+                    $heading		    = preg_replace('#\? \w+\s*#s', '', $heading);
+                    $heading            = trim($heading);
+                    if (substr($heading, 0, 1) == '$')
+                    {
+                        $subname        = substr($heading, 1);
+                        if (array_key_exists($subname, $this->fields))
+                            $heading    = $this->fields[$subname];
+                    }
+                    $h1->update(null);
+                    $h1                 = reset($h1array);
+                    $h1->innerHTML      = $heading;
+                }
             }               // at least one <h1> tag in page
             else
             {
@@ -714,6 +789,41 @@ class FtTemplate extends Template
     public function displayEnd()
     {
         global $warn;
+        global $document_root;
+
+        // append location dialog templates if required
+        $locationScript         = strpos($this->page, 
+                            '<script src="/jscripts/locationCommon.js"');
+        if ($locationScript > 0)
+        {
+            $tempBase	        = $document_root . '/templates/';
+            $lang               = $this->lang;
+		    if (file_exists($tempBase . "LocationDialogs$lang.html"))
+		        $dialogName     = $tempBase . "LocationDialogs$lang.html";
+		    else
+                $dialogName     = $tempBase . "LocationDialogsen.html";
+            $endmain            = strpos($this->page, '</main>');
+            $this->page         = substr($this->page, 0, $endmain) . "\n" .
+                                    file_get_contents($dialogName) . "\n" .
+                                    substr($this->page, $endmain);
+        }
+
+        // append temple dialog templates if required
+        $templeScript           = strpos($this->page, 
+                            '<script src="/jscripts/templeCommon.js"');
+        if ($templeScript > 0)
+        {
+            $tempBase	        = $document_root . '/templates/';
+            $lang               = $this->lang;
+		    if (file_exists($tempBase . "TempleDialogs$lang.html"))
+		        $dialogName     = $tempBase . "TempleDialogs$lang.html";
+		    else
+                $dialogName     = $tempBase . "TempleDialogsen.html";
+            $endmain            = strpos($this->page, '</main>');
+            $this->page         = substr($this->page, 0, $endmain) . "\n" .
+                                    file_get_contents($dialogName) . "\n" .
+                                    substr($this->page, $endmain);
+        }
 
         if (strlen($warn) > 0)
         {			// diagnostic messages from Template class

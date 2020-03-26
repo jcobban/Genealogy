@@ -7,7 +7,7 @@ use \Templating\Template;
  *  ToDo.php														    *
  *																	    *
  *  Display a web page containing details of an particular ToDo		    *
- *  from the Legacy database.  If the current user is authorized to		*
+ *  record from the database.  If the current user is authorized to		*
  *  edit the database, this web page supports that.						*
  *																	    *
  *  Parameters:															*
@@ -23,8 +23,9 @@ use \Templating\Template;
  *  History:															*
  *		2019/08/13      created                                         *
  *      2019/11/17      move CSS to <head>                              *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																	    *
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/ToDo.inc';
 require_once __NAMESPACE__ . '/Picture.inc';
@@ -274,8 +275,7 @@ if (count($_POST) > 0)
 
 			case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
                 break;
             }
 	    }		    // act on specific parameter

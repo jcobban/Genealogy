@@ -16,8 +16,9 @@
  *		2018/05/27		add insertion for other style sheets			*
  *      2019/01/29      use menu button                                 *
  *      2019/02/05      remove rightTop button                          *
+ *      2020/03/09      remove facebook                                 *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <meta charset='utf-8'>
     <meta name='author' content='James A. Cobban'>
@@ -30,29 +31,6 @@
   <body>
       
 <script>
-    if (location.host != 'localhost')
-    try {
-	  window.fbAsyncInit = function() {
-	    FB.init({
-	      appId      : '2096433630426301',
-	      cookie     : true,
-	      xfbml      : true,
-	      version    : 'v3.2'
-	    });
-	      
-	    FB.AppEvents.logPageView();   
-	      
-	  };
-	
-	  (function(d, s, id){
-	     var js, fjs = d.getElementsByTagName(s)[0];
-	     if (d.getElementById(id)) {return;}
-	     js = d.createElement(s); js.id = id;
-	     js.src = "https://connect.facebook.net/en_US/sdk.js";
-	     fjs.parentNode.insertBefore(js, fjs);
-	   }(document, 'script', 'facebook-jssdk'));
-    } catch(e) {}
-
    var tinyMCEparms = {
 		selector            : 'textarea',
 	    plugins             : 'link lists image',
@@ -71,11 +49,6 @@
     	<img src="/logo70.gif" id="logo" class="right"
                 height="70" width="70" alt="James Cobban Logo">
           &nbsp;
-        <span class="right" style="width: 360px;" id="facebookSpan">
-      	  <iframe id='facebookFrame' class='facebook' $IECRAP>
-      	  </iframe>
-          &nbsp;
-        </span>
         <span class="right" style="width: 500px;" id="advertSpan">
           <iframe id='advertFrame' class='advert' $IECRAP src='$ADURL'>
           </iframe>

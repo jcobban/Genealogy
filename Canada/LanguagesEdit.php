@@ -18,8 +18,9 @@ use \Exception;
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/04/06      use new FtTemplate::includeSub                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *											                            *
- *  Copyright &copy; 2018 James A. Cobban						        *
+ *  Copyright &copy; 2020 James A. Cobban						        *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Language.inc";
 require_once __NAMESPACE__ . "/RecordSet.inc";
@@ -49,8 +50,7 @@ if (isset($_GET) && count($_GET) > 0)
 			case 'lang':
 			case 'code':
 			{
-			    if (strlen($value) >= 2)
-					$lang		= strtolower(substr($value, 0, 2));
+                $lang       = FtTemplate::validateLang($value);
 			    break;
 			}		// language of presentation
 
@@ -109,8 +109,7 @@ if (isset($_POST) && count($_POST) > 0)
 	    {
 			case 'lang':
 			{
-			    if (strlen($value) >= 2)
-					$lang		= strtolower(substr($value, 0, 2));
+                $lang       = FtTemplate::validateLang($value);
 			}		// language
 
 			case 'code':

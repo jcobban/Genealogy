@@ -21,8 +21,9 @@ use \Exception;
  *  History:															*
  *		2019/05/01      created                                         *
  *      2019/11/17      move CSS to <head>                              *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/CountryName.inc';
@@ -63,8 +64,7 @@ foreach($_GET as $key => $value)
 
         case 'lang':
         {
-            if (strlen($value) >= 2)
-                $lang	= strtolower(substr($value, 0, 2));
+	            $lang       = FtTemplate::validateLang($value);
             break;
         }		// handled by common code
 

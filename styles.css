@@ -122,8 +122,9 @@
  *      2019/11/25      add support for scrollable table body           *
  *      2020/01/09      add style for <main> instead of setting it from *
  *                      JS                                              *
+ *      2020/0216       add right column to page layout                 *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 
    /*********************************************************************
@@ -260,6 +261,19 @@
     *********************************************************************/
     main      { overflow-x:         auto;
                 overflow-y:         auto;
+                width:              80%; 
+                float:              left;
+                }
+
+   /*********************************************************************
+    *   Styles for displaying the right hand column                     *
+    *********************************************************************/
+    div.rightCol {
+                background:         white; 
+                width:              300px; 
+                height:             100%; 
+                float:              right; 
+                border-left:        2px solid black;
                 }
 
    /*********************************************************************
@@ -419,6 +433,7 @@
                 border-left:        3px solid #FFFFFF;
                 border-bottom:      3px solid #C0C0C0;
                 border-right:       3px solid #C0C0C0;
+                z-index:            10;
                 }
 
    /*********************************************************************
@@ -468,7 +483,7 @@
     div.advert {
                 background-color:   white;
                 font-family:        sans-serif;
-                font-size:          180%;
+                font-size:          120%;
                 font-weight:        bold;
                 width:              728px;
                 height:             auto;
@@ -1714,7 +1729,6 @@
     option {
                 font-family:        sans-serif;
                 text-align:         left;
-                float:              left;
                 padding:            0px;
                 -moz-border-radius: 0px;
                 -webkit-border-radius: 0px;
@@ -1723,13 +1737,11 @@
     option.left {
                 font-family:        sans-serif;
                 text-align:         left;
-                float:              left;
                 padding:            0px;
                 }
     option.right {
                 font-family:        sans-serif;
                 text-align:         right;
-                float:              left;
                 padding:            0px;
                 }
 

@@ -470,7 +470,7 @@ class TemplateTag implements Iterator, ArrayAccess
      *	    $name           name of the function to invoke              *
      *	    $value          string parameter to pass to the function    *
      ********************************************************************/
-    public function __set ( string $name , $value )
+    public function __set (string $name , $value )
     {
         global $warn;
 
@@ -479,8 +479,7 @@ class TemplateTag implements Iterator, ArrayAccess
         else
         if ($name == 'innerHTML')
             $this->innerHTML($value);
-        $warn   .= "<p>TemplateTag;;__set('$name', '$value')</p>\n";
-    }
+    }       // public function __set (string $name , $value )
 
     /********************************************************************
      *  function TemplateTag::__get 									*
@@ -507,9 +506,9 @@ class TemplateTag implements Iterator, ArrayAccess
         if ($name == 'childNodes')
             return $this->childNodes();
 
-        $warn   .= "<p>TemplateTag;;__get('$name')</p>\n";
         return null;
-    }
+    }       // public function __get ( string $name )
+
     /********************************************************************
      *  function TemplateTag::getElementsByTagName						*
      *													                *

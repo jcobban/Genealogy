@@ -61,6 +61,7 @@ use \Exception;
  *		2017/08/16		script legacyIndivid.php renamed to Person.php	*
  *		2018/11/05      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -155,8 +156,7 @@ foreach ($_GET as $key => $value)
 
             case 'lang':
             {
-                if (strlen($value) >= 2);
-                    $lang           = strtolower(substr($value,0,2));
+	            $lang               = FtTemplate::validateLang($value);
 			    break;
             }
 	    }		    // act on specific keys

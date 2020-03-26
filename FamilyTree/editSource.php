@@ -61,8 +61,9 @@ use \Templating\Template;
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/04/09      use common internationalization table           *
  *		2019/11/06      do not display 0 in title when creating         *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -105,8 +106,7 @@ if (count($_GET) > 0)
 
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang           = strtolower(substr($value, 0, 2));
+                $lang       = FtTemplate::validateLang($value);
 				break;
             }
 

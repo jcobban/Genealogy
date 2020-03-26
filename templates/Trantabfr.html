@@ -7,10 +7,17 @@
  *		2018/12/27		created											*
  *      2019/04/06      add translate tables used by Person.php         *
  *                      add translate tables used by EditEvent.php      *
+ *      2020/03/12      add date format                                 *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden">
+    <span id="dateFormat">
+        [dd] [Mon] [yyyy][BC]
+    </span>
+    <span id="dateFormatFull">
+        [dd] [Month] [yyyy][BC]
+    </span>
     <div id="Months">
       <span></span>    <!--  0 -->
       <span>Jan</span> <!--  1 -->
@@ -44,120 +51,304 @@
     <!-- general I18N translate table -->
     <div id="tranTab" class="hidden">
       <span data-key=""></span>
-      <span data-key="a[fem]">une</span>
-      <span data-key="a[masc]">un</span>
-      <span data-key="about">environ</span>
-      <span data-key="AD">ap. J.-C.</span>
-      <span data-key="adopted">adopté</span>
-      <span data-key="after">apres</span>
-      <span data-key="an unknown person">une personne inconnue</span>
-      <span data-key="and">et</span>
-      <span data-key="Apr">Avr</span>
-      <span data-key="April">Avril</span>
+      <span data-key="a[fem]">
+		une
+	  </span>
+      <span data-key="a[masc]">
+		un
+	  </span>
+      <span data-key="about">
+		environ
+	  </span>
+      <span data-key="AD">
+		ap. J.-C.</span>
+      <span data-key="adopted">
+		adopté</span>
+      <span data-key="after">
+		apres
+	  </span>
+      <span data-key="an unknown person">
+		une personne inconnue
+	  </span>
+      <span data-key="and">
+		et
+	  </span>
+      <span data-key="Apr">
+		Avr
+	  </span>
+      <span data-key="April">
+		Avril
+	  </span>
       <span data-key="at">à</span>
-      <span data-key="Aug">Aoû</span>
-      <span data-key="August">Août</span>
-      <span data-key="Banns">Banns</span>
-      <span data-key="BC">av. J.-C.</span>
-      <span data-key="BCE">av. EC</span>
-      <span data-key="before 1970">avant 1970</span>
-      <span data-key="before">avant</span>
-      <span data-key="between">entre</span>
-      <span data-key="bic">bic</span>
-      <span data-key="biological">biologique</span>
-      <span data-key="brother">frere</span>
-      <span data-key="calculated as">calculée comme</span>
-      <span data-key="Cancelled">Annullée</span>
-      <span data-key="CE">EC</span>
-      <span data-key="challenged">recusé</span>
-      <span data-key="Child">Enfant</span>
-      <span data-key="child">enfant</span>
-      <span data-key="Children of">Les Enfants de</span>
-      <span data-key="circa">environ</span>
-      <span data-key="cleared">cleared</span>
-      <span data-key="Completed">Fini</span>
+      <span data-key="Aug">
+		Aoû</span>
+      <span data-key="August">
+		Août
+	  </span>
+      <span data-key="Banns">
+		Banns
+	  </span>
+      <span data-key="BC">
+		av. J.-C.</span>
+      <span data-key="BCE">
+		av. EC
+	  </span>
+      <span data-key="before 1970">
+		avant 1970
+	  </span>
+      <span data-key="before">
+		avant
+	  </span>
+      <span data-key="between">
+		entre
+	  </span>
+      <span data-key="bic">
+		bic
+	  </span>
+      <span data-key="biological">
+		biologique
+	  </span>
+      <span data-key="brother">
+		frere
+	  </span>
+      <span data-key="calculated as">
+		calculée comme
+	  </span>
+      <span data-key="Cancelled">
+		Annullée
+	  </span>
+      <span data-key="CE">
+		EC
+	  </span>
+      <span data-key="challenged">
+		recusé</span>
+      <span data-key="Child">
+		Enfant
+	  </span>
+      <span data-key="child">
+		enfant
+	  </span>
+      <span data-key="Children of">
+		Les Enfants de
+	  </span>
+      <span data-key="circa">
+		environ
+	  </span>
+      <span data-key="cleared">
+		cleared
+	  </span>
+      <span data-key="Completed">
+		Fini
+	  </span>
       <span data-key="County">
 		Comté
 	  </span>
       <span data-key="Countys">
 		Comtés
 	  </span>
-      <span data-key="daughter">fille</span>
-      <span data-key="Day Laborer">Journalier</span>
-      <span data-key="Dec">Dec</span>
-      <span data-key="Deceased">Decedée</span>
-      <span data-key="December">Decembre</span>
+      <span data-key="daughter">
+		fille
+	  </span>
+      <span data-key="Day Laborer">
+		Journalier
+	  </span>
+      <span data-key="Dec">
+		Dec
+	  </span>
+      <span data-key="Deceased">
+		Decedée
+	  </span>
+      <span data-key="December">
+		Decembre
+	  </span>
       <span data-key="deleted">
 		écraser
 	  </span>
-      <span data-key="Did not say">n'a dit pas</span>
-      <span data-key="Display">Montrer</span>
-      <span data-key="disproved">réfuté</span>
-      <span data-key="dns/can">dns/can</span>
-      <span data-key="Done">Fait</span>
-      <span data-key="estimated as">estimée comme</span>
+      <span data-key="Did not say">
+		n'a dit pas
+	  </span>
+      <span data-key="Display">
+		Montrer
+	  </span>
+      <span data-key="disproved">
+		réfuté</span>
+      <span data-key="dns/can">
+		dns/can
+	  </span>
+      <span data-key="Done">
+		Fait
+	  </span>
+      <span data-key="estimated as">
+		estimée comme
+	  </span>
       <span data-key="event">
 		evenement
 	  </span>
-      <span data-key="family member">membre de famille</span>
-      <span data-key="Farmer">Agriculteur</span>
-      <span data-key="Farm Laborer">Ouvrier agricole</span>
-      <span data-key="father">père</span>
-      <span data-key="Father">Père</span>
-      <span data-key="Feb">Fev</span>
-      <span data-key="February">Fevrier</span>
-      <span data-key="female">femelle</span>
-      <span data-key="for">pour</span>
-      <span data-key="foster">de lait</span>
-      <span data-key="from">de</span>
-      <span data-key="guardianship">tutelle</span>
-      <span data-key="grand-">grand&nbsp;</span>
-      <span data-key="great-">arrière&nbsp;</span>
-      <span data-key="had">a eu</span>
-      <span data-key="had a Common Law relationship with">a eu une relation Common-Law avec</span>
-      <span data-key="had some other relationship with">a eu quelque autre relation avec</span>
-      <span data-key="had a relationship with">a eu une relation avec</span>
-      <span data-key="has no recorded parents">a aucune parents enregistrés</span>
-      <span data-key="He">Il</span>
-      <span data-key="He/She">Il/Elle</span>
-      <span data-key="husband">l'époux</span>
-      <span data-key="Illegitimate">Naturel</span>
-      <span data-key="illegitimate">naturel</span>
-      <span data-key="in Q">en Quartier</span>
-      <span data-key="in">en</span>
-      <span data-key="in[masc]">au</span>
-      <span data-key="Infant">Bebé</span>
-      <span data-key="Jan">Jan</span>
-      <span data-key="January">Janvier</span>
-      <span data-key="Jul">Jul</span>
-      <span data-key="July">Juillet</span>
-      <span data-key="Jun">Jun</span>
-      <span data-key="June">Juin</span>
-      <span data-key="License">License</span>
-      <span data-key="Laborer">Ouvrier</span>
+      <span data-key="family member">
+		membre de famille
+	  </span>
+      <span data-key="Farmer">
+		Agriculteur
+	  </span>
+      <span data-key="Farm Laborer">
+		Ouvrier agricole
+	  </span>
+      <span data-key="father">
+		père
+	  </span>
+      <span data-key="Father">
+		Père
+	  </span>
+      <span data-key="Feb">
+		Fev
+	  </span>
+      <span data-key="February">
+		Fevrier
+	  </span>
+      <span data-key="female">
+		femelle
+	  </span>
+      <span data-key="for">
+		pour
+	  </span>
+      <span data-key="foster">
+		de lait
+	  </span>
+      <span data-key="from">
+		de
+	  </span>
+      <span data-key="guardianship">
+		tutelle
+	  </span>
+      <span data-key="grand-">
+		grand&nbsp;</span>
+      <span data-key="great-">
+		arrière&nbsp;</span>
+      <span data-key="had">
+		a eu
+	  </span>
+      <span data-key="had a Common Law relationship with">
+		a eu une relation Common-Law avec
+	  </span>
+      <span data-key="had some other relationship with">
+		a eu quelque autre relation avec
+	  </span>
+      <span data-key="had a relationship with">
+		a eu une relation avec
+	  </span>
+      <span data-key="has no recorded parents">
+		a aucune parents enregistrés
+	  </span>
+      <span data-key="He">
+		Il
+	  </span>
+      <span data-key="He/She">
+		Il/Elle
+	  </span>
+      <span data-key="husband">
+		l'époux
+	  </span>
+      <span data-key="Illegitimate">
+		Naturel
+	  </span>
+      <span data-key="illegitimate">
+		naturel
+	  </span>
+      <span data-key="in Q">
+		en Quartier
+	  </span>
+      <span data-key="in">
+		en
+	  </span>
+      <span data-key="in[masc]">
+		au
+	  </span>
+      <span data-key="Infant">
+		Bebé</span>
+      <span data-key="Jan">
+		Jan
+	  </span>
+      <span data-key="January">
+		Janvier
+	  </span>
+      <span data-key="Jul">
+		Jul
+	  </span>
+      <span data-key="July">
+		Juillet
+	  </span>
+      <span data-key="Jun">
+		Jun
+	  </span>
+      <span data-key="June">
+		Juin
+	  </span>
+      <span data-key="License">
+		License
+	  </span>
+      <span data-key="Laborer">
+		Ouvrier
+	  </span>
       <span data-key="mailing">
 		postale
 	  </span>
-      <span data-key="male">mâle</span>
-      <span data-key="Mar">Mar</span>
-      <span data-key="March">Mars</span>
-      <span data-key="married">a marié</span>
-      <span data-key="May">Mai</span>
-      <span data-key="missing">manquant</span>
-      <span data-key="mother">mère</span>
-      <span data-key="Mother">Mère</span>
-      <span data-key="Never married">Jamais marié</span>
-      <span data-key="None">Aucune</span>
-      <span data-key="Not married">Pas marié</span>
-      <span data-key="Nov">Nov</span>
-      <span data-key="November">Novembre</span>
-      <span data-key="Oct">Oct</span>
-      <span data-key="October">Octobre</span>
-      <span data-key="of">de</span>
-      <span data-key="on">le</span>
-      <span data-key="or">ou</span>
-      <span data-key="Private">Privée</span>
-      <span data-key="private">privée</span>
+      <span data-key="male">
+		mâle
+	  </span>
+      <span data-key="Mar">
+		Mar
+	  </span>
+      <span data-key="March">
+		Mars
+	  </span>
+      <span data-key="married">
+		a marié</span>
+      <span data-key="May">
+		Mai
+	  </span>
+      <span data-key="missing">
+		manquant
+	  </span>
+      <span data-key="mother">
+		mère
+	  </span>
+      <span data-key="Mother">
+		Mère
+	  </span>
+      <span data-key="Never married">
+		Jamais marié</span>
+      <span data-key="None">
+		Aucune
+	  </span>
+      <span data-key="Not married">
+		Pas marié</span>
+      <span data-key="Nov">
+		Nov
+	  </span>
+      <span data-key="November">
+		Novembre
+	  </span>
+      <span data-key="Oct">
+		Oct
+	  </span>
+      <span data-key="October">
+		Octobre
+	  </span>
+      <span data-key="of">
+		de
+	  </span>
+      <span data-key="on">
+		le
+	  </span>
+      <span data-key="or">
+		ou
+	  </span>
+      <span data-key="Private">
+		Privée
+	  </span>
+      <span data-key="private">
+		privée
+	  </span>
       <span data-key="[Private]">[Privée]</span>
       <span data-key="Province">
 		Province
@@ -168,15 +359,33 @@
       <span data-key="repository">
 		dépôt
 	  </span>
-      <span data-key="See Notes">Voir Notes</span>
-      <span data-key="sealing">sceau</span>
-      <span data-key="Sep">Sep</span>
-      <span data-key="September">Septembre</span>
-      <span data-key="She">Elle</span>
-      <span data-key="Shoemaker">Cordonnier</span>
-      <span data-key="sibling">frere ou soeur</span>
-      <span data-key="sister">soeur</span>
-      <span data-key="son">fils</span>
+      <span data-key="See Notes">
+		Voir Notes
+	  </span>
+      <span data-key="sealing">
+		sceau
+	  </span>
+      <span data-key="Sep">
+		Sep
+	  </span>
+      <span data-key="September">
+		Septembre
+	  </span>
+      <span data-key="She">
+		Elle
+	  </span>
+      <span data-key="Shoemaker">
+		Cordonnier
+	  </span>
+      <span data-key="sibling">
+		frere ou soeur
+	  </span>
+      <span data-key="sister">
+		soeur
+	  </span>
+      <span data-key="son">
+		fils
+	  </span>
       <span data-key="spouse">
 		épouse ou époux
 	  </span>
@@ -186,33 +395,85 @@
       <span data-key="States">
 		États
 	  </span>
-      <span data-key="step">beau-</span>
-      <span data-key="Stillborn">Mort-née</span>
-      <span data-key="submitted">submitted</span>
-      <span data-key="The cause of death was">La cause de mort etait</span>
-      <span data-key="to">à</span>
-      <span data-key="Twin">Jumeau</span>
-      <span data-key="uncleared">uncleared</span>
-      <span data-key="unexpected null value">unexpected null value</span>
-      <span data-key="Unknown">Inconnu</span>
-      <span data-key="unknown">inconnu</span>
-      <span data-key="Update">Mise à jour</span>
-      <span data-key="was also known as">était également connu comme</span>
-      <span data-key="was never married">etait jamais marié</span>
-      <span data-key="was sealed to">est étanchéité a</span>
-      <span data-key="was sealed to parents">est étanchéité a parents</span>
-      <span data-key="was the[male]">etait le</span>
-      <span data-key="was the[female]">etait la</span>
-      <span data-key="was the[unknown]">etait le</span>
-      <span data-key="was the partner of">etait partenaire de</span>
-      <span data-key="was widowed">est veuve</span>
-      <span data-key="was single">etait celébitaire</span>
-      <span data-key="was a friend [with benefits]">etait un ami [with benefits]</span>
-      <span data-key="WFT estimate">WFT estimée</span>
-      <span data-key="wife">l'épouse</span>
-      <span data-key="Young">Jeune</span>
-
+      <span data-key="step">
+		beau-</span>
+      <span data-key="Stillborn">
+		Mort-née
+	  </span>
+      <span data-key="submitted">
+		Soumis
+	  </span>
+      <span data-key="The cause of death was">
+		La cause de mort etait
+	  </span>
+      <span data-key="The marriage ended">
+		Le mariage a pris fin
+	  </span>
+      <span data-key="They">
+		Ils
+	  </span>
+      <span data-key="to">
+        à
+      </span>
+      <span data-key="Twin">
+		Jumeau
+	  </span>
+      <span data-key="uncleared">
+		uncleared
+	  </span>
+      <span data-key="unexpected null value">
+		unexpected null value
+	  </span>
+      <span data-key="Unknown">
+		Inconnu
+	  </span>
+      <span data-key="unknown">
+		inconnu
+	  </span>
+      <span data-key="Update">
+		Mise à jour
+	  </span>
+      
+	  <span data-key="was also known as">était également connu comme</span>
+      <span data-key="was never married">
+		etait jamais marié</span>
+      <span data-key="was sealed to">
+		est étanchéité a
+	  </span>
+      <span data-key="was sealed to parents">
+		est étanchéité a parents
+	  </span>
+      <span data-key="was the[male]">
+		etait le
+	  </span>
+      <span data-key="was the[female]">
+		etait la
+	  </span>
+      <span data-key="was the[unknown]">
+		etait le
+	  </span>
+      <span data-key="was the partner of">
+		etait partenaire de
+	  </span>
+      <span data-key="was widowed">
+		est veuve
+	  </span>
+      <span data-key="was single">
+		etait celébitaire
+	  </span>
+      <span data-key="was a friend [with benefits]">
+		etait un ami [with benefits]</span>
+      <span data-key="WFT estimate">
+		WFT estimée
+	  </span>
+      <span data-key="wife">
+		l'épouse
+	  </span>
+      <span data-key="Young">
+		Jeune
+	  </span>
     </div>
+
     <div class="hidden" id="srcTypes">`
       <span data-key="1"></span>
       <span data-key="2">Bible</span>
@@ -413,7 +674,7 @@
       <span data-key='34'>[Pronoun] [Description] land [onDate] [Location].[Citations] [Notes]</span>
       <span data-key='35'>[Pronoun] a publié les banns de mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key='36'>[Pronoun] a signé un contract de mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key='37'>[HusbFirstName] et [WifeFirstName] a obtainu un license pour mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key='37'>[Pronoun] a obtenu un license pour mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key='38'>[Pronoun] a publié un intent a marier [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key='39'>[Pronoun] a obtenu un settlement de mariage [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key='40'>[Pronoun] a reçu des attentions medicaux pour [Description] [onDate] [Location].[Citations] [Notes]</span>
@@ -462,6 +723,107 @@
     </div>
 
     <!--*****************************************************************
+     *  'msTypes'														*
+     *																	*
+     *  Translate from IDMS value of a Family record to text            *
+     ******************************************************************-->
+    <div class="hidden" id="msTypes">`
+      <span data-key="1">
+		Pas de statut spécial
+	  </span>
+      <span data-key="2">
+		Annulé
+	  </span>
+      <span data-key="3">
+		Mariage de fait
+	  </span>
+      <span data-key="4">
+		Divorcé[e]
+	  </span>
+      <span data-key="5">
+		Marié[e]
+	  </span>
+      <span data-key="6">
+		Autre
+	  </span>
+      <span data-key="7">
+		Separated
+	  </span>
+      <span data-key="8">
+		Célibataire
+	  </span>
+      <span data-key="9">
+		Divorce
+	  </span>
+      <span data-key="10">
+		Séparation
+	  </span>
+      <span data-key="11">
+		Privé
+	  </span>
+      <span data-key="12">
+		Partenaires
+	  </span>
+      <span data-key="13">
+		Décès d'un conjoint
+	  </span>
+      <span data-key="14">
+		Célibataire
+	  </span>
+      <span data-key="15">
+		Copains
+	  </span>
+    </div>
+
+    <!--*****************************************************************
+     *  'msStmts'														*
+     *																	*
+     *  Translate from IDMS value of a Family record to a sentence.     *
+     ******************************************************************-->
+    <div class="hidden" id="msStmts">`
+      <span data-key="1">
+	  </span>
+      <span data-key="2">
+		Leur mariage a été annulé.
+	  </span>
+      <span data-key="3">
+		Ils étaient en union de fait.
+	  </span>
+      <span data-key="4">
+		Leur mariage s'est terminé par un divorce.
+	  </span>
+      <span data-key="5">
+	  </span>
+      <span data-key="6">
+		Ils étaient dans une relation non spécifiée.
+	  </span>
+      <span data-key="7">
+		Leur mariage s'est terminé par une séparation.
+	  </span>
+      <span data-key="8">
+		Ils n'étaient pas mariés.
+	  </span>
+      <span data-key="9">
+		Ils étaient divorcés.
+	  </span>
+      <span data-key="10">
+		Ils étaient séparés.
+	  </span>
+      <span data-key="11">
+	  </span>
+      <span data-key="12">
+		Ils étaient partenaires.
+	  </span>
+      <span data-key="13">
+		Leur mariage a pris fin avec la mort d'un conjoint.
+	  </span>
+      <span data-key="14">
+	  </span>
+      <span data-key="15">
+		Ce n'étaient que des amis.
+	  </span>
+
+    <!--*****************************************************************
      *  'cpRelType'														*
      *																	*
      *  This table provides a translation from a child to parent        *
@@ -483,6 +845,21 @@
       <span data-key='12'>membre de famille</span>
       <span data-key='13'>naturel</span>
     </div>
+
+    <!--*****************************************************************
+     *  'MarriedNameRule'												*
+     *																	*
+     *  This table provides a translation from the value of             *
+     *  field 'marriednamerule' in class Family.                        *
+     ******************************************************************-->
+    <div id="MarriedNameRule">
+      <span data-key="0">
+		Ne pas générer de noms mariés
+      </span>
+      <span data-key="1">
+		Remplacer le nom de famille de l'épouse par le nom de famille du mari
+      </span>
+    </div>
 	
     <!--*****************************************************************
      *  $personEvents												    *
@@ -494,7 +871,7 @@
      *	type times 1000.												*
      ******************************************************************-->
     <div id="personEvents">
-      <span data-key="0">Choose an event type:</span>
+      <span data-key="0">Choisir une type d'evenement:</span>
       <span data-key="1"></span>
       <span data-key="2">Adoption</span>
       <span data-key="3">Naissance</span>

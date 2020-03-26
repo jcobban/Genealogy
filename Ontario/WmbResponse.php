@@ -48,8 +48,9 @@ use \Templating\Template;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2019/04/29      change name to WmbResponse.php                  *
  *		                use Template                                    *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/MethodistBaptism.inc";
 require_once __NAMESPACE__ . "/MethodistBaptismSet.inc";
@@ -156,8 +157,7 @@ foreach ($_GET as $key => $value)
         {		// language requested
             $npuri		            .= "{$npand}{$key}=" . urlencode($value);
             $npand		            = '&amp;'; 
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value,0,2));
+	            $lang       = FtTemplate::validateLang($value);
             break;
         }		// language requested
 

@@ -1,0 +1,187 @@
+<!--*********************************************************************
+ *  SqlCommand.php														*
+ *																		*
+ *  Issue arbitrary SQL command against the database.					*
+ *																		*
+ *  History:															*
+ *		2020/02/17	    created											*
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+    </div>	
+    <div class='body'>
+      <h1>
+        <span class='right'>
+          <a href='SqlCommandHelpen.html' target='help'>? Help</a>
+        </span>
+        Issue SQL Command
+        <div style='clear: both;'></div>
+      </h1>
+      $TRACE
+      $MSG
+      <p><span class='label'>Command:</span> '$command'
+      </p>
+
+	  <p><span class='label'>Table:</span> '$table'
+	  </p>
+	  <p class='message'>Table '$table' not defined on server.
+	  </p>
+	  <p>The $tablecount defined tables are:</p>
+	  <table>
+	    <tr>
+	      <th style='text-align: left;'>
+	        $tableName
+	      </th>
+	    </tr>
+	    </tr>
+	  </table>
+	  <p><span class='label'>Join:</span> '$join'
+	  <p><span class='label'>Operands:</span> '$operands'
+	  <p><span class='label'>Where:</span> '$where'
+	  <p><span class='label'>GROUP BY:</span> '$groupby'
+	  <p><span class='label'>HAVING:</span> '$having'
+	  <p><span class='label'>ORDER BY:</span> '$orderby'
+	  <p><span class='label'>LIMIT:</span> '$limit'
+	  <p><span class='label'>OFFSET:</span> '$offset'
+	  <p class='message'>$emsg</p>
+	  <p>The $fieldCount defined fields in 
+	      $tableName table are:</p>
+	  <table>
+	      <th style='text-align: left;'>$fieldsName</th>
+	  </table>
+	  <form name='sqlform' action='SqlCommand.php' method='post'>
+	    <input type='hidden' id='debug' name='debug' 
+	              value='Y'>
+	  <p class='warning'>This command will 
+	      <span id="displaystats">display $count rows from</span>
+	      <span id="updatestats">update $count rows in</span> 
+	    the database.
+	  </p>
+	  <p>
+	    <button type='button' id='Submit'>Issue Command</button>
+	    <input type='hidden' id='Confirm' name='Confirm' value=''>
+	    <p>
+	      <label class='label' style='width: 7em;' for='SqlCommand'>
+	          Command:
+	      </label>
+	      <input type='text' name='SqlCommand' id='SqlCommand'
+	              class='white leftnc' size='80'
+	              value='$sqlCommand'>
+	  </form>
+	  <p class='label'>$count rows in response</p>
+	  <table class='summary' cellspacing='0px'>
+	    <thead>
+	      <tr>
+	        <th class='colhead'>$name</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+	        <td class='$cellClass right'>
+	          <a href='/FamilyTree/Person.php?idir=$value' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	        <td class='$cellClass right'>
+	          <a href='/FamilyTree/Location.php?idlr=$value' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	        <td class='$cellClass right'>
+	          <a href='/FamilyTree/Temple.php?idtr=$value' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	        <td class='$cellClass right'>
+	          <a href='/FamilyTree/editMarriages.php?idmr=$value' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	        <td class='$cellClass right'>
+	          <a href='/FamilyTree/editEvent.php?ider=$value' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	  
+	        <td class='$cellClass right'>
+	          <a href='/getRecordXml.php?idcr=$value' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	        <td class='$cellClass right'>
+	          <a href='/FamilyTree/Names.php?idnr=$value&edit=Y' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	        <td class='$cellClass right'>
+	          <a href='/FamilyTree/editName.php?idnx=$value' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	        <td class='$cellClass right'>
+	          <a href='/getRecordXml.php?$fldname=$value' target='_blank'>
+	              $value
+	          </a>
+	        </td>
+	        <td class='$cellClass right'>
+	          <a href='/FamilyTree/Source.php?idsr=$value' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	        <td class='$cellClass right'>
+	          <a href='/FamilyTree/Address.php?idar=$value' target='_blank'>
+	              $value
+	          </a>
+	          =$name
+	        </td>
+	        <td class='$cellClass right'>
+	              $date
+	        </td>
+	        <td class='$cellClass right'>
+	              $value
+	              =$text
+	        </td>
+	        <td class='$cellClass right'>
+	              $value=<span class="$text">$text</span>
+	        </td>
+	        <td class='$cellClass right'>
+	          $value
+	        </td>
+	        <td class='$cellClass'>
+	          $value
+	        </td>
+	        <td class='$cellClass'>
+	          $value
+	        </td>
+	        <td class='$cellClass'>
+	          $soundex
+	        </td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p class='label'>
+	      Updated $sresult rows in the table.
+	  </p>
+	</div>
+	<div class='balloon' id='HelpSqlCommand'>
+	  Use this selection list to limit the response to a single province within 
+	  the census.
+	</div>
+	<div class='balloon' id='HelpSubmit'>
+	  Click on this button to issue the SQL command.
+    </div>
+    <script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+    <script src="/SqlCommand.js" type="application/javaScript">
+    </script>

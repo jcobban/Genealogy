@@ -31,8 +31,9 @@ namespace Genealogy;
  *						include http.js									*
  *		2019/02/16      use class Template                              *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Location.inc";
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -63,8 +64,8 @@ if (count($_GET) > 0)
 
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang        = strtolower(substr($value, 0, 2));
+                $lang       = FtTemplate::validateLang($value);
+                break;
             }
 		}		    // act on specific parameters
 	}			    // loop through all parameters
@@ -106,8 +107,8 @@ if (count($_POST) > 0)
 
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value, 0, 2));
+                $lang       = FtTemplate::validateLang($value);
+                break;
             }
 		}		// act on specific parameters
 	}			// loop through all parameters

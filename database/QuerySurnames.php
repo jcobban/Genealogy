@@ -51,6 +51,8 @@ use \Templating\Template;
  *		                use prepared statements                         *
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/03/23      correct handling of array parameters            *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -177,15 +179,31 @@ foreach ($_GET as $key => $value)
 	    }		// passed for Javascript
 
 	    case 'district':
-	    {		// district
-            if (strlen($value) > 0)
+        {		// district
+            if (is_array($value))
+            {
+                if (count($value) == 1)
+                    $distId         = rewind($value);
+                else
+                    $distId         = $value;
+            }
+            else
+            if (is_string($value) && strlen($value) > 0)
 			    $distId		        = $value;
 			break;
 	    }		// district
 
 	    case 'subdistrict':
 	    {		// subdistrict
-            if (strlen($value) > 0)
+            if (is_array($value))
+            {
+                if (count($value) == 1)
+                    $subdistId      = rewind($value);
+                else
+                    $subdistId      = $value;
+            }
+            else
+            if (is_string($value) && strlen($value) > 0)
 			    $subdistId	        = $value;
 			break;
 	    }		// sub district
@@ -204,8 +222,7 @@ foreach ($_GET as $key => $value)
 
 	    case 'lang':
 	    {		// language selection
-			if (strlen($value) >= 2)
-			    $lang	    = strtolower(substr($value,0,2));
+	            $lang               = FtTemplate::validateLang($value);
 			break;
 	    }		// language selection
 
@@ -314,8 +331,8 @@ if (!is_null($distId))
                                          'id'       => $id));
             if (is_null($district))
             {
-                $district   = $dist;
-                $distName   = $dist->get('name');
+                $district       = $dist;
+                $distName       = $dist->get('name');
                 $template->set('DISTID',    $id);
 	            $template->set('DNAME',	    $distName);
             }
@@ -340,10 +357,11 @@ if (!is_null($distId))
         }                   // at least one valid district in array
     }                       // array of values
     else
+    if (is_string($distId))
     {                       // single value
-        $district   = new District(array('census'   => $census,
-                                         'id'       => $distId));
-        $distName   = $district->get('name');
+        $district               = new District(array('census'   => $census,
+                                                     'id'       => $distId));
+        $distName               = $district->get('name');
 	    $template->set('DISTID',    $distId);
 	    $template->set('DNAME',	    $distName);
         if ($district->isExisting())
@@ -362,15 +380,15 @@ if (!is_null($distId))
     }                       // single value
 }                           // district specified
 else
-{
+{                           // district not specified
 	$template->set('DISTID',    '');
     $template->set('DNAME',	    'ALL');
-}
+}                           // district not specified
 
 // interpret district and subdistrict parameters
 if (!is_null($subdistId))
 {			        // subdistrict 
-    if (!is_array($subdistId))
+    if (is_string($subdistId))
     {
         $subdistlist    = array($subdistId);
         $or             = $and;
@@ -390,16 +408,17 @@ if (!is_null($subdistId))
 	    $d		                = strpos($id, ":");
 	    if ($d == false)
 	    {		            // old form: separator not found
-			if (is_string($distId) ||(is_array($distId) && count($distId)==1))
+			if (is_string($distId))
 			{
                 $where	        .= "{$or}SubDistrict=?";
                 $sqlParms[]     = $id;
                 if (is_null($subdistrict))
                 {
-                    $did            = $distId[0];
                     $parms          = array('census'    => $census,
-                                            'district'  => $district,
+                                            'district'  => $distId,
                                             'id'        => $id);
+                    if (is_string($division))
+                        $parms['division']  = $division;
                     $subdistrict    = new SubDistrict($parms);
                     $firstSdId      = $id;
 	                $template->set('SUBDISTID',	    $subdistrict->get('id'));
@@ -417,8 +436,7 @@ if (!is_null($subdistId))
             if (is_array($distId))
             {
                 $msg	.= $template['multidistSingleSubConflict']->innerHTML();
-                if (count($distId) >= 1)
-                    $did            = $distId[0];
+                $did            = $distId[0];
             }
 			else
                 $msg        .= $template['districtMissing']->innerHTML();
@@ -470,8 +488,8 @@ if (!is_null($division) && strlen($division) > 0)
         $msg	.= $template['divNeedsDistSubdist']->innerHTML();
     }                       // missing mandatory parameters
     else
-    if ((is_array($distId) && count($distId)> 1) || 
-        (is_array($subdistId) && count($subdistId) > 1))
+    if (is_array($distId) || 
+        is_array($subdistId) )
 	{
 	    $warn .= "Division cannot be specified together with multiple selection for either District or SubDistrict.  ";
 	}

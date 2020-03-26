@@ -1,0 +1,143 @@
+<!--*********************************************************************
+ *  ReqUpdatePagesfr.html												*
+ *																		*
+ *  Template to display query to update the Pages database.				*
+ *																		*
+ *  History:				                        					*
+ *		2020/03/08		created         								*
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/genealogy.php?lang=fr">
+          Généalogie
+      </a>:
+      <a href="/genCountry.php?cc=$CC&lang=$LANG">
+		$COUNTRYNAME</a>:
+      <a href="/database/genRecensementes.php?cc=$CC&lang=$LANG">
+        Recensements</a>:
+      <a href="/database/EditRecensementes.php?cc=$CC&lang=$LANG">
+        Gestion des Recensements</a>:
+      <a href="/database/DistForm.php?Recensement=$CENSUSID&Province=$PROVINCE&lang=$LANG">
+	    Gestion des Districts $CENSUSID</a>:
+    <a href="/database/ReqUpdateSubDists.php?Census=$CENSUSID&Province=$PROVINCE&District=$DISTID&ang=$LANG">
+	    Choisir Sous-District</a>:
+    </div> <!-- id="breadcrumbs" -->
+    <div class="body">
+      <h1>
+          Gestion du Recensement: $COUNTRYNAME: $CENSUSYEAR
+            Recensement: Table des Pages $ACTION
+        <span class="right">
+		<a href="ReqUpdatePagesHelpen.html" target="_blank">Aide?</a>
+        </span>
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG 
+      <form action="PageForm.php" name="distForm">
+        <input type="hidden" name="ProvinceCode"
+				value="$PROVINCECODE">
+        <div id="censusRow" class="row">
+          <div class="column1">
+            <label class="column1" for="RecensementSel" style="width: 8em;">
+                Recensement:
+            </label>
+		    <select size="9" name="RecensementSel" id="RecensementSel">
+		        <option value="" $SELECTED[0]>
+		      Choose a Recensement:</option>
+		        <option value="QC1831" $SELECTED[QC][1831]>
+		      1831 Québec</option>
+		        <option value="CA1851" $SELECTED[CA][1851]>
+		      1851/52 Canada</option>
+		        <option value="CA1861" $SELECTED[CA][1861]>
+		      1861 Canada</option>
+		        <option value="CA1871" $SELECTED[CA][1871]>
+		      1871 Canada </option>
+		        <option value="CA1881" $SELECTED[CA][1881]>
+		      1881 Canada </option>
+		        <option value="CA1891" $SELECTED[CA][1891]>
+		      1891 Canada </option>
+		        <option value="CA1901" $SELECTED[CA][1901]>
+		      1901 Canada </option>
+		        <option value="CA1906" $SELECTED[CA][1906]>
+		      1906 provinces des prairies</option>
+		        <option value="CA1911" $SELECTED[CA][1911]>
+		      1911 Canada </option>
+		        <option value="CA1916" $SELECTED[CA][1916]>
+		      1916 provinces des prairies</option>
+		        <option value="CA1921" $SELECTED[CA][1921]>
+		      1921 Canada </option>
+		    </select> 
+		    <input type="hidden" name="Recensement" id="Recensement" value="">
+          </div>
+          <div class="column2">
+            <label class="column1" for="Province" style="width: 8em;">
+				Province:
+            </label>
+		    <select size="9" name="Province">
+		    </select> 
+		  </div>
+          <div style="clear: both;"></div>
+        </div>
+        <div id="distRow" class="row">
+          <div class="column1">
+            <label id="msgCell" class="column1" for="District" style="width: 8em;">
+				District:
+            </label>
+		    <select size="9" name="District">
+		    </select> 
+		  </div>
+          <div class="column2">
+            <label class="column1" for="SubDistrict" style="width: 8em;">
+		      Sous-District:
+            </label>
+		    <select size="9" name="SubDistrict">
+		    </select> 
+		  </div>
+          <div class="column3" style="width: 25em;">
+            <label class="column1" for="Division" style="width: 8em;">
+		      Division:
+            </label>
+            <span id="DivisionCell"></span>
+		  </div>
+          <div style="clear: both;"></div>
+        </div>
+      <button type="submit" id="Submit">Demander Formule</button>
+    </form>
+    </div> <!-- id="body" -->
+    <div class="balloon" id="HelpRecensement">
+		On emploi la liste de sélection du recensement to specify the year of the
+		census enumeration for which you wish to update a Sub-District
+		description.
+    </div>
+    <div class="balloon" id="HelpProvince">
+		La liste de sélection de la province is an alphabetical list of the
+		provinces in the specified census.  It is used if you wish to limit the 
+		displayed list of districts to a specific province.
+    </div>
+    <div class="balloon" id="HelpDistrict">
+		La liste de sélection du district is an alphabetical list of census
+		districts, roughly equivalent to federal electoral ridings.  This tool
+		permits editting the descriptions of the sub-districts within
+		a specified census district. 
+    </div>
+    <div class="balloon" id="HelpSubDistrict">
+		La liste de sélection du sous-district is an alphabetical list of
+		sub-districts 
+		within the selected census district[s].  Each generally represents a
+		city ward, town, or township. 
+    </div>
+    <div class="balloon" id="HelpDivision">
+		Sous-Districts that were too populous to be handled by a single
+		enumerator were sub-divided into enumeration divisions.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+		Click on this button to open the form for viewing and updating
+		the information recorded about individual pages of a sub-district.
+    </div>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= '/database/ReqUpdatePages.js' type="text/javascript">
+    </script>

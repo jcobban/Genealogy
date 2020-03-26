@@ -169,20 +169,25 @@ $getParms	    	= array('language'	=> $lang,
                             'cc'        => $cc);
 $domains	    	= new DomainSet($getParms);
 $optionElt      	= $template['domain$code'];
-$optionText     	= $optionElt->outerHTML();
-$result         	= '';
-foreach($domains as $code => $dom)
+if ($optionElt)
 {
-    $ttemplate  = new Template($optionText);
-    $ttemplate->set('code',         $code);
-    $ttemplate->set('state',        $dom['state']);
-    if ($code == $domain)
-        $ttemplate->set('selected', 'selected="selected"');
-    else
-        $ttemplate->set('selected', '');
-    $ttemplate->set('name',         $dom['name']);
-    $result     .= $ttemplate->compile();
+	$optionText     	= $optionElt->outerHTML();
+	$result         	= '';
+	foreach($domains as $code => $dom)
+	{
+	    $ttemplate  = new Template($optionText);
+	    $ttemplate->set('code',         $code);
+	    $ttemplate->set('state',        $dom['state']);
+	    if ($code == $domain)
+	        $ttemplate->set('selected', 'selected="selected"');
+	    else
+	        $ttemplate->set('selected', '');
+	    $ttemplate->set('name',         $dom['name']);
+	    $result     .= $ttemplate->compile();
+	}
+	$optionElt->update($result);
 }
-$optionElt->update($result);
+else
+    $msg                .= "Cannot find element with id='domain\$code'. ";
 
 $template->display();

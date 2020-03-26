@@ -22,13 +22,14 @@ header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Census.inc";
 require_once __NAMESPACE__ . "/District.inc";
 require_once __NAMESPACE__ . "/RecordSet.inc";
+require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
 // validate parameters
 $census		    = null;
 $province		= null;
 $censusYear		= 9999;
-$lang		    = '';
+$lang		    = 'en';
 
 foreach($_GET as $key => $value)
 {			// loop through all parameters
@@ -55,8 +56,7 @@ foreach($_GET as $key => $value)
 
 	    case 'lang':
 	    {
-            if (strlen($value) >= 2)
-                $lang           = strtolower(substr($value,0,2));
+            $lang           = FtTemplate::validateLang($value);
 			break;
 	    }
 	}		// act on specific parameters
@@ -79,7 +79,7 @@ if (strlen($msg) == 0)
 	$getParms	= array('D_Census'	=> $census);
 	if (strlen($province) == 2)
 	    $getParms['D_Province']	= $province;
-	if ($lang == 'fr')
+	if (substr($lang, 0, 2) == 'fr')
 	    $getParms['order']		= 'D_Nom';
 	else
 	    $getParms['order']		= 'D_Name';
@@ -95,7 +95,7 @@ if (strlen($msg) == 0)
 			$did		= $district->get('d_id');
 			if ($did == floor($did))
 			    $did	= floor($did);
-			if ($lang == 'fr')
+			if (substr($lang, 0, 2) == 'fr')
 			    $Name	= htmlspecialchars($district->get('d_nom')); 
 			else
 			    $Name	= htmlspecialchars($district->get('d_name')); 

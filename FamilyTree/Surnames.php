@@ -19,8 +19,7 @@ use \Templating\Template;
  *																		*
  *  History:															*
  *		2010/10/23		move connection establishment to common.inc		*
- *		2010/11/04		use htmlHeader to generate HTML					*
- *						add help page									*
+ *		2010/11/04		add help page link          					*
  *		2011/10/31		permit clicking with mouse anywhere in table	*
  *						cell											*
  *		2011/11/15		clean up parameter processing					*

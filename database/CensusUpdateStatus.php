@@ -386,8 +386,8 @@ if (is_null($province) || strlen($province) == 0)
     
 	$template->updateTag('provInfo', $provArray);
 	$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
-	$total		= $formatter->format($result['total']),
-	$pop		= $formatter->format($result['pop']),
+	$total		= $formatter->format($result['total']);
+	$pop		= $formatter->format($result['pop']);
 	$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 	$percent	= $formatter->format($percent);
 	$template->updateTag('natStats',

@@ -10,8 +10,7 @@ use \Exception;
  *																		*
  *  History:															*
  *		2010/10/23		add display of userid in header					*
- *		2010/11/04		use htmlHeader									*
- *						add help										*
+ *		2010/11/04		add help    									*
  *		2010/12/03		add tables tblCS, tblCP, tblET, tblAR			*
  *		2010/12/12		add date of birth estimation tool				*
  *		2011/02/05		add reporting tool								*
@@ -53,8 +52,9 @@ use \Exception;
  *		2018/02/17		suppress warning on pendingUsers tag			*
  *						issue warning for unsupported language			*
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
@@ -64,18 +64,28 @@ require_once __NAMESPACE__ . '/common.inc';
  ************************************************************************/
 
 $lang	        = 'en';
-foreach($_GET as $key => $value)
-{
-	switch(strtolower($key))
-	{		// act on specific parameters
-	    case 'lang':
-	    {
-			if (strlen($value) >= 2)
-			    $lang	= strtolower(substr($value, 0, 2));
-			break;
-	    }
-	}		// act on specific parameters
-}
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{		// act on specific parameters
+		    case 'lang':
+		    {
+	                $lang       = FtTemplate::validateLang($value);
+				break;
+		    }
+		}		// act on specific parameters
+	}
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
 // for administrator see if there are any new subscribers
 $pendingUsers	= 0;

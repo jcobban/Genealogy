@@ -43,8 +43,10 @@ use \Exception;
  *		                use code to identify Temple in pref to IDTR     *
  *		                add street address                              *
  *		                merge in update logic from updateTemple.php     *
+ *		2020/02/16      after successful update with no messages to     *
+ *		                display to user, return to display of Temples   *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Temple.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -182,6 +184,16 @@ if (is_object($temple) && $temple->isExisting())
         $temple->save(false);
         if ($debug)
             $warn       .= "<p>" . $temple->getLastSqlCmd() . "</p>\n";
+        else
+        {
+            $name           = $temple['name'];
+            if (strlen($name) > 1)
+                $prefix     = substr($name, 0, 1);
+            else
+                $prefix     = $name;
+            header( "Location: Temples.php?pattern=^$prefix&lang=$lang" );
+            exit ;
+        }
     }                       // apply updates
 
     $template->set('NAME',	                $temple['Name']);

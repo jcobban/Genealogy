@@ -15,8 +15,9 @@ use \Exception;
  *		2019/01/21      add gender field                                *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/05/05      improve parameter validation                    *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Nickname.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -67,8 +68,7 @@ if (count($_GET) > 0)
 
 			case 'lang':
             {	// language choice
-                if (strlen($value) >= 2)
-			        $lang		= strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
 			    break;
 			}	// language choice
 	    }		// take action based upon key
@@ -119,8 +119,7 @@ if (count($_POST) > 0)
 
 			case 'lang':
             {	// language choice
-                if (strlen($value) >= 2)
-			        $lang		            = strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
 			    break;
 			}	// language choice
 

@@ -17,11 +17,13 @@
  *		2019/04/12      fix bug in adding multiple townships            *
  *		                simplify delete                                 *
  *		                validate new township for unique id             *
+ *		2020/02/14      add edit location button                        *
+ *		                use addEventListener                            *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 
-window.onload	= onLoad;
+window.addEventListener('load',	onLoad);
 
 /************************************************************************
  *  function onLoad														*
@@ -56,19 +58,19 @@ function onLoad()
 		    if (element.id.length > 0)
 				trace	+= "id='" + element.id + "' ";
 		    trace	+= ">";
-		    element.onkeydown	= keyDown;
+		    element.addEventListener('keydown',	keyDown);
 
 		    // pop up help balloon if the mouse hovers over a field
 		    // for more than 2 seconds
 		    if (element.parentNode.nodeName == 'TD')
 		    {	// set mouseover on containing cell
-				element.parentNode.onmouseover	= eltMouseOver;
-				element.parentNode.onmouseout	= eltMouseOut;
+				element.parentNode.addEventListener('mouseover', eltMouseOver);
+				element.parentNode.addEventListener('mouseout',	eltMouseOut);
 		    }	// set mouseover on containing cell
 		    else
 		    {	// set mouseover on input element itself
-				element.onmouseover		= eltMouseOver;
-				element.onmouseout		= eltMouseOut;
+				element.addEventListener('mouseover',		eltMouseOver);
+				element.addEventListener('mouseout',		eltMouseOut);
 		    }	// set mouseover on input element itself
 
 		    var name		= element.id;
@@ -86,7 +88,7 @@ function onLoad()
 		    {			// act on column name
 				case 'add':
 				{
-				    element.onclick	    = addTownship;
+				    element.addEventListener('click',	    addTownship);
 				    break;
 				}
 
@@ -109,14 +111,21 @@ function onLoad()
 				case 'delete':
 				{
 				    element.helpDiv	    = 'Delete';
-				    element.onclick	    = deleteTownship;
+				    element.addEventListener('click',	deleteTownship);
+				    break;
+				}
+
+				case 'location':
+				{
+				    element.helpDiv	    = 'Location';
+				    element.addEventListener('click',	showLocation);
 				    break;
 				}
 
 				case 'concessions':
 				{
 				    element.helpDiv	    = 'Concessions';
-				    element.onclick	    = showConcessions;
+				    element.addEventListener('click',	showConcessions);
 				    break;
 				}
 		    }			// act on column name
@@ -132,8 +141,9 @@ function onLoad()
  *																		*
  *  Input:																*
  *		this		<button id='Delete...'>								*
+ *		ev          instance of Javascript click Event                  *
  ************************************************************************/
-function deleteTownship()
+function deleteTownship(ev)
 {
     var	form		    = this.form;
     var	rowid	    	= this.id.substring(6);
@@ -151,6 +161,37 @@ function deleteTownship()
 }		// function deleteTownship
 
 /************************************************************************
+ *  function showLocation												*
+ *																		*
+ *  When a Location button is clicked this function opens a child		*
+ *  dialog to display the Location.                                     *
+ *																		*
+ *  Input:																*
+ *		this		<button id='Location...'>							*
+ *		ev          instance of Javascript click Event                  *
+ ************************************************************************/
+function showLocation(ev)
+{
+    let	form		    = this.form;
+    let	rowid	    	= this.id.substring(8);
+    let	township	    = form.elements['Code' + rowid].value;
+    if (township.substring(township.length - 4) == ' Twp')
+        township        = township.substring(0, township.length - 4);
+    let	name    	    = form.elements['Name' + rowid].value;
+    let stateName       = form.StateName.value;
+    let cc              = form.Domain.value.substr(0,2);
+    if (cc == 'US')
+        cc              = 'USA';
+    else
+    if (cc == 'CA')
+        stateName       = form.Domain.value.substr(2);
+    let countyName      = form.CountyName.value;
+    let locationName    = township + ', ' + countyName + ', ' + stateName + ', ' + cc;
+    window.open("/FamilyTree/Location.php?name=" + encodeURI(locationName),
+				'_blank');
+}		// function showLocation
+
+/************************************************************************
  *  function addTownship												*
  *																		*
  *  When the Add county button is clicked this function adds a row		*
@@ -158,8 +199,9 @@ function deleteTownship()
  *																		*
  *  Input:																*
  *		this		<button id='Add...'>								*
+ *		ev          instance of Javascript click Event                  *
  ************************************************************************/
-function addTownship()
+function addTownship(ev)
 {
     var	form	    	= this.form;
     var	table	    	= document.getElementById("dataTable");
@@ -187,12 +229,12 @@ function addTownship()
     var	codeField   	= form.elements["Code" + numTownships];
     var nameField	    = form.elements["Name" + numTownships];
     var	deleteBtn	    = document.getElementById("Delete" + numTownships);
-    codeField.onchange	= changeCode;
+    codeField.addEventListener('change',	changeCode);
     codeField.checkfunc	= checkCode;
     codeField.focus();
-    nameField.onchange	= change;
+    nameField.addEventListener('change',	change);
     nameField.checkfunc	= checkName;
-    deleteBtn.onclick	= deleteTownship;
+    deleteBtn.addEventListener('click',	    deleteTownship);
 
     return false;
 }		// function addTownship
@@ -204,6 +246,7 @@ function addTownship()
  *																		*
  *  Input:																*
  *		this		<input id='Code...'>								*
+ *		ev          instance of Javascript change Event                 *
  ************************************************************************/
 function changeCode(ev)
 {
@@ -260,8 +303,9 @@ function checkCode()
  *																		*
  *  Input:																*
  *		this		<button id='Concessions...'>						*
+ *		ev          instance of Javascript click Event                  *
  ************************************************************************/
-function showConcessions()
+function showConcessions(ev)
 {
     var	line		= this.id.substring(11);
     var form		= this.form;

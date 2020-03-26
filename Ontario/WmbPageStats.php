@@ -22,6 +22,7 @@ use \NumberFormatter;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *      2020/01/22      use FtTemplate                                  *
  *                      use NumberFormatter                             *
+ *      2020/03/21      replace $key with $name in $_GET loop           *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -43,7 +44,7 @@ if (isset($_GET) && count($_GET) > 0)
 	                        "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $name => $value)
 	{			        // loop through parameters
-	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	    $parmsText  .= "<tr><th class='detlabel'>$name</th>" .
 	                         "<td class='white left'>$value</td></tr>\n"; 
 		switch(strtolower($name))
 		{		        // act on specific parameter

@@ -345,7 +345,6 @@ require_once __NAMESPACE__ . '/common.inc';
     }		// error message to display
 
     if ($person)
-    if ($person)
     {		// child found
 ?>
   <form name="indForm" id="indForm" action="updateParents.php" method="post">

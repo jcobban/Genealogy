@@ -64,8 +64,9 @@ use \Templating\Template;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/10/24		use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2020/03/13      use FtTemplte::validateLang                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -93,68 +94,68 @@ function show($person, $level, $template)
     global $descDepth;
     global $incLocs;
 
-    $elt            = $template->getElementById('descendant');
+    $elt            		    = $template->getElementById('descendant');
     if ($level == 1)
-        $ttemplate  = new Template($elt->innerHTML());
+        $ttemplate  		    = new Template($elt->innerHTML());
     else
-        $ttemplate  = new Template($elt->outerHTML());
+        $ttemplate  		    = new Template($elt->outerHTML());
 
-    $idir	        = $person->getIdir();
+    $idir	        		    = $person->getIdir();
     $ttemplate->set('IDIR',     $idir);
 
     if ($incLocs)
-		$nameOpts	= Person::NAME_INCLUDE_LOCS;
+		$nameOpts			    = Person::NAME_INCLUDE_LOCS;
     else
-		$nameOpts	= Person::NAME_INCLUDE_DATES;
-    $name	        = $person->getName($nameOpts);
+		$nameOpts		    	= Person::NAME_INCLUDE_DATES;
+    $name	        		    = $person->getName($nameOpts);
     $ttemplate->set('NAME',     $name);
 
     if ($person->getGender() == Person::FEMALE)
-		$gclass	= 'female';
+		$gclass			        = 'female';
     else
-        $gclass	= 'male';
+        $gclass			        = 'male';
     $ttemplate->set('GCLASS',   $gclass);
 
-    $families	= $person->getFamilies();
+    $families			        = $person->getFamilies();
     if (count($families) > 0)
     {
-        $num	        = 1;	// counter for children
-        $marriages      = '';   // accumulate output text for marriages
+        $num	        		= 1;	// counter for children
+        $marriages      		= '';   // accumulate output text for marriages
 
 		foreach($families as $fi => $family)
 		{		// loop through marriages
-            $elt            = $template->getElementById('marriage');
-            $mtemplate      = new Template($elt->outerHTML());
+            $elt            		= $template->getElementById('marriage');
+            $mtemplate      		= new Template($elt->outerHTML());
 		    if ($person->getGender() == Person::FEMALE)
 		    {		// female
-				$spsid		= $family->get('idirhusb');
-				$spsclass	= 'male';
+				$spsid				= $family->get('idirhusb');
+				$spsclass			= 'male';
 		    }		// female
 		    else
 		    {		// male
-				$spsid		= $family->get('idirwife');
-				$spsclass	= 'female';
+				$spsid				= $family->get('idirwife');
+				$spsclass			= 'female';
             }		// male
             $mtemplate->set('SPSID',        $spsid);
             $mtemplate->set('SPSCLASS',     $spsclass);
 
 		    // date of marriage
-		    $mdate		    = new LegacyDate($family->get('mard')); 
-		    $mdateTxt		= $mdate->toString($mprivlim);
-		    $idlr		    = $family->get('idlrmar');
-		    $mloc		    = new Location(array('idlr' => $idlr));
-            $mlocTxt		= $mloc->toString();
+		    $mdate		    		= new LegacyDate($family->get('mard')); 
+		    $mdateTxt				= $mdate->toString($mprivlim);
+		    $idlr		    		= $family->get('idlrmar');
+		    $mloc		    		= new Location(array('idlr' => $idlr));
+            $mlocTxt				= $mloc->toString();
             $mtemplate->set('MDATETXT',     $mdateTxt);
 			if ($incLocs && strlen($mlocTxt) > 0)
                 $mtemplate->set('MLOCTXT',      $mlocTxt);
             else
-                $mtemplate->updateTag('marriageLoc', null);
+                $mtemplate['marriageLoc']->update(null);
 
 		    // information about spouse
 		    if ($spsid > 0)
 		    {		// displaying info on spouse:
-				$spouse		= new Person(array('idir' => $spsid));
-                $name		= $spouse->getName($nameOpts);
+				$spouse				= new Person(array('idir' => $spsid));
+                $name				= $spouse->getName($nameOpts);
                 $mtemplate->set('NAME',     $name);
             }
             else
@@ -163,7 +164,7 @@ function show($person, $level, $template)
 		    // limit depth of display
             if ($level <= $descDepth)
             {               // display information about children
-		        $children	= $family->getChildren();
+		        $children			= $family->getChildren();
 		        if (count($children) > 0)
                 {		    // found at least one child record
                     $showChild      = '';
@@ -176,12 +177,12 @@ function show($person, $level, $template)
                     $mtemplate->set('SHOWCHILD', $showChild);
                 }		    // found at least one child record
                 else
-                    $mtemplate->updateTag('children', null);
+                    $mtemplate['children']->update(null);
             }               // display information about children
             else
-                $mtemplate->updateTag('children', null);
+                $mtemplate['children']->update(null);
 
-            $marriages  .= $mtemplate->compile();
+            $marriages              .= $mtemplate->compile();
 		}	            	// loop through families
         $ttemplate->set('MARRIAGES',    $marriages);
     }			            // at least one marriage
@@ -193,19 +194,19 @@ function show($person, $level, $template)
 
 
 // defaults
-$idir		    = null;
-$person		    = null;
-$date		    = getdate();
-$curyear		= $date['year'];
-$bprivlim		= $curyear - 100;	// privacy limit on birth date
-$mprivlim		= $curyear - 80;	// privacy limit on marriage date
-$dprivlim		= $curyear - 50;	// privacy limit on death date
-$descDepth		= 4;
-$incLocs		= false;
-$nameUri		= '';
-$surname		= '';
-$lang		    = 'en';
-$treeName	    = '';
+$idir		    			= null;
+$person		    			= null;
+$date		    			= getdate();
+$curyear					= $date['year'];
+$bprivlim					= $curyear - 105;	// privacy limit birth date
+$mprivlim					= $curyear - 80;	// privacy limit marriage date
+$dprivlim					= $curyear - 50;	// privacy limit death date
+$descDepth					= 4;
+$incLocs					= false;
+$nameUri					= '';
+$surname					= '';
+$lang		    			= 'en';
+$treeName	    			= '';
 
 // check for values saved in cookies on the browser
 foreach($_COOKIE as $key => $value)
@@ -214,13 +215,13 @@ foreach($_COOKIE as $key => $value)
 	{
 	    case 'descDepth':
 	    {		// get the maximum depth of the tree to display
-			$descDepth	= $value;
+			$descDepth	    = $value;
 			break;
 	    }		// get the maximum depth of the tree to display
 
 	    case 'incLocs':
 	    {		// indicator of whether or not to show locations
-			$incLocs	= $value;
+			$incLocs	    = $value;
 			break;
 	    }		// indicator of whether or not to show locations
 	}		// act on specific keys
@@ -233,14 +234,14 @@ foreach($_GET as $key => $value)
 	{
 	    case 'descDepth':
 	    {		// get the maximum depth of the tree to display
-			$descDepth	= $value;
+			$descDepth	    = $value;
 			setcookie('descDepth', $descDepth);
 			break;
 	    }		// get the maximum depth of the tree to display
 
 	    case 'incLocs':
 	    {		// indicator of whether or not to show locations
-			$incLocs	= $value == 1;
+			$incLocs	    = $value == 1;
 			setcookie('incLocs', $incLocs);
 			break;
 	    }		// indicator of whether or not to show locations
@@ -248,61 +249,51 @@ foreach($_GET as $key => $value)
 	    case 'id':
 	    case 'idir':
 	    {		// identification of root individual
-			$idir		= $value;
+			$idir		    = $value;
 			// check if current user is an owner of the record and therefore
 			// permitted to see private information and edit the record
-			try
-			{
-			    $person	= new Person(array('idir' => $idir));
-	
-			    $name	    = $person->getName(Person::NAME_INCLUDE_DATES);
-			    $surname	    = $person->getSurname();
-			    $given  	    = $person->getGivenName();
-			    $nameUri	    = rawurlencode($surname . ', ' . $given);
-			    if (strlen($surname) == 0)
-					$prefix		= '';
-			    else
-			    if (substr($surname,0,2) == 'Mc')
-					$prefix		= 'Mc';
-			    else
-					$prefix		= substr($surname,0,1);
-			    $bdateTxt		= $person->getBirthDate();
-				$treeName	    = $person->getTreeName();
-			}	// try
-			catch(Exception $e)
-			{
-			    $msg	.= 'Invalid parameter: ' .
-						   $e->getMessage();
-			    $title	= "Descendant Tree Failure";
-			}	// catch
+		    $person	        = new Person(array('idir' => $idir));
+
+		    $name	        = $person->getName(Person::NAME_INCLUDE_DATES);
+		    $surname	    = $person->getSurname();
+		    $given  	    = $person->getGivenName();
+		    $nameUri	    = rawurlencode($surname . ', ' . $given);
+		    if (strlen($surname) == 0)
+				$prefix	    = '';
+		    else
+		    if (substr($surname,0,2) == 'Mc')
+				$prefix	    = 'Mc';
+		    else
+				$prefix	    = substr($surname,0,1);
+		    $bdateTxt	    = $person->getBirthDate();
+			$treeName	    = $person->getTreeName();
 			break;
         }		// identification of root individual
 
         case 'lang':
         {
-            if (strlen($value) == 2)
-                $lang           = strtolower($value);
+            $lang           = FtTemplate::validateLang($value);
         }
 	}		// act on specific keys
 }			// loop through all passed parameter
+ 
+// display page
+$template		= new FtTemplate("descendantReport$lang.html", true);
 
 if (is_null($idir))
 {		// missing parameter
-	$title	= "Descendant Tree Failure";
-	$msg	.= 'Missing mandatory parameter idir. ';
+	$title	                = "Descendant Tree Failure";
+	$msg	                .= 'Missing mandatory parameter idir. ';
 }		// missing parameter
 
-// display page
-$template		= new FtTemplate("descendantReport$lang.html", true);
- 
 if (strlen($surname) == 0)
 {
-	$template->updateTag('surnamesPrefix',  null);
-	$template->updateTag('surname',         null);
+	$template['surnamesPrefix']->update(null);
+	$template['surname']->update(null);
 }		// surname present
 
 // pass parameters to template
-$failureText		= $template->getElementById('Failure')->innerHTML();
+$failureText		        = $template['Failure']->innerHTML();
 $template->set('LANG',	        $lang);
 $template->set('IDIR',	        $idir);
 $template->set('DESCDEPTH',	    $descDepth);
@@ -320,12 +311,12 @@ else
 if (strlen($msg) == 0)
 {
 	if (!is_null($person) && $person->isExisting())
-	{		// individual found
+	{		            // individual found
 	    if ($bdateTxt == 'Private')
         {
-            $template->updateTag('surnamesPrefix',  null);
-            $template->updateTag('surname',         null);
-            $template->updateTag('depthForm',       null);
+            $template['surnamesPrefix']->update(null);
+            $template['surname']->update(null);
+            $template['depthForm']->update(null);
             $template->set('DATA',      '');
             $template->set('NAME',      $failureText);
             $template->set('TREENAME',	$treeName);
@@ -334,23 +325,23 @@ if (strlen($msg) == 0)
             $template->set('PREFIX',	'');
 	    }
 	    else
-        {		// display public data
+        {		        // display public data
             $template->set('NAME',	        $name);
             $template->set('NAMEURI',	    $nameUri);
             $template->set('SURNAME',	    $surname);
             $template->set('PREFIX',	    $prefix);
             $template->set('TREENAME',	    $treeName);
-            $template->updateTag('private',         null);
+            $template['private']->update(null);
 			// recursively display ancestor tree
 			$template->set('DATA',       show($person, 1, $template));
-	    }		// display public data
-    }		// individual found
+	    }		        // display public data
+    }		            // individual found
     else
     {
-        $template->updateTag('surnamesPrefix',  null);
-        $template->updateTag('surname',         null);
-        $template->updateTag('depthForm',       null);
-        $template->updateTag('private',         null);
+        $template['surnamesPrefix']->update(null);
+        $template['surname']->update(null);
+        $template['depthForm']->update(null);
+        $template['private']->update(null);
         $template->set('DATA',      '');
         $template->set('NAME',      $failureText);
         $template->set('TREENAME',	$treeName);
@@ -358,13 +349,13 @@ if (strlen($msg) == 0)
         $template->set('SURNAME',	'');
         $template->set('PREFIX',	'');
     }
-}			// success
+}			            // success
 else
 {
-    $template->updateTag('surnamesPrefix',  null);
-    $template->updateTag('surname',         null);
-    $template->updateTag('depthForm',       null);
-    $template->updateTag('private',         null);
+    $template['surnamesPrefix']->update(null);
+    $template['surname']->update(null);
+    $template['depthForm']->update(null);
+    $template['private']->update(null);
     $template->set('DATA',      '');
     $template->set('NAME',      $failureText);
     $template->set('TREENAME',	$treeName);

@@ -62,8 +62,9 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/06/01		add support for lang parameter					*
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/County.inc";
@@ -155,8 +156,7 @@ if (count($_POST) > 0)
     
     	    case 'lang':
     	    {
-    			if (strlen($value) >= 2)
-    			    $lang		= strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
     			break;
     	    }		    // lang
     	}		        // act on specific parameters

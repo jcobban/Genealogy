@@ -447,7 +447,11 @@ $template	    	= new FtTemplate("BlogPost$lang.html");
 $trtemplate         = $template->getTranslate(); 
 
 // internationalization support
-$blogTemplate	    = $template['blogTemplate']->innerHTML();
+$blogTemplate	    = $template['blogTemplate'];
+if ($blogTemplate)
+    $blogTemplate	    = $blogTemplate->innerHTML();
+else
+    error_log("BlogPost.php: " . __LINE__ . " Cannot find 'blogTemplate' in 'BlogPost$lang.html' " . $_SERVER['QUERY_STRING'] . "\n");
 $months 		    = $trtemplate['Months'];
 $lmonths		    = $trtemplate['LMonths'];
 

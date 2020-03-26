@@ -111,8 +111,9 @@ use \Exception;
  *		                if the name is empty                            *
  *		2019/12/21      ensure birth and death dates of children        *
  *		                are updated                                     *
+ *		2020/03/18      add support for generic events                  * 
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Family.inc';
@@ -138,557 +139,592 @@ $idmr							= null;
 $family							= null;     // instace of Family
 $husb		        			= null;     // instance of Person
 $wife		        			= null;     // instance of Person
+$idirhusb		        		= null;     // IDIR of Person
+$idirwife		        		= null;     // IDIR of Person
 $child		        			= null;     // instance of Person
 $childr		        			= null;     // instance of Child
 $childOrder		    			= 0;
 $treename		    			= '';
 $wifemarrsurname                = null;
+$idet                           = null;
+$events                         = array();
+$parms                          = array();
 
 print "    <parms>\n";
-foreach($_POST as $key => $value)
-{		                // loop through parameters
-    if (is_null($value))
-        print "        <$key>null" ;
-    else
-    if (is_string($value))
-        print "        <$key>'" . htmlentities($value, ENT_XML1) . "'";
-    else
-        print "        <$key>" . htmlentities($value, ENT_XML1);
+if (isset($_GET) && count($_GET) > 0)
+{                           // invoked by method=get
+	foreach($_GET as $key => $value)
+	{		                // loop through parameters
+	    if (is_null($value))
+	        print "        <$key>null" ;
+	    else
+	        print "        <$key>" . htmlentities($value, ENT_XML1);
+		print "        </$key>\n";	// close off tag
+	}		                // loop through parameters
+}                           // invoked by method=get
+else
+if (isset($_POST) && count($_POST) > 0)
+{                           // invoked by method=post
+	foreach($_POST as $key => $value)
+	{		                // loop through parameters
+	    if (is_null($value))
+	        print "        <$key>null" ;
+	    else
+	        print "        <$key>" . htmlentities($value, ENT_XML1);
 
-    try {
-	$namePattern     	        = "/([a-zA-Z]+)([0-9]*)/";
-	$rgResult       	        = preg_match($namePattern, $key, $matches);
-	if ($rgResult === 1)
-	{		            // pattern match
-	    $field      	        = strtolower($matches[1]);
-	    $id	        	        = $matches[2];
-	}		            // pattern match
-	else
-	{		            // no match (should not happen)
-	    $field      	        = strtolower($key);
-	    $id	        	        = '';
-    }		            // no match
+	    try {
+		$namePattern     	        = "/([a-zA-Z]+)([0-9]*)/";
+		$rgResult       	        = preg_match($namePattern, $key, $matches);
+		if ($rgResult === 1)
+		{		            // pattern match
+		    $field      	        = strtolower($matches[1]);
+		    $id	        	        = $matches[2];
+		}		            // pattern match
+		else
+		{		            // no match (should not happen)
+		    $field      	        = strtolower($key);
+		    $id	        	        = '';
+	    }		            // no match
 
-	switch($field)
-	{	                // act on each parameter
-	    case 'idmr':
-	    {		        // key of instance of Family to update
-            if (ctype_digit($value))
-            {		    // idmr specified and numeric
-                $idmr           = intval($value);
-                $family	        = new Family(array('idmr' => $idmr));
+		switch($field)
+		{	                // act on each parameter
+		    case 'idmr':
+		    {		        // key of instance of Family to update
+                if (is_string($value) && strlen($value) > 0 &&
+                    ctype_digit($value))
+	            {		    // idmr specified and numeric
+	                $idmr           = intval($value);
+	                $family	        = new Family(array('idmr' => $idmr));
 
-                // checkboxes are special in that if they are unchecked
-                // the field is not passed in the parameters,
-                // so the absence of the field must be treated as not set
-				$family['notmarried']		= 0;
-                $family['nochildren']		= 0;
-            }		    // idmr specified and numeric
-            else
-            {
-            	$msg	        .= "Value of idmr='$idmr' must be numeric key. ";
-            }
-		    break;
-	    }		        // key of instance of Family to update
+	                // checkboxes are special in that if they are unchecked
+	                // the field is not passed in the parameters,
+	                // so the absence of the field must be treated as not set
+					$family['notmarried']		= 0;
+	                $family['nochildren']		= 0;
+	            }		    // idmr specified and numeric
+	            else
+	            {
+	            	$msg	        .= "Value of idmr='$idmr' must be numeric key. ";
+	            }
+			    break;
+		    }		        // key of instance of Family to update
 
-	    case 'idirhusb':
-        case 'husbidir':
-		{               // key of instance of Person for male partner
-			$idirhusb	                = (int)$value;
-		    $family['idirhusb']	        = $idirhusb;
-			if ($idirhusb > 0)
-			{		    // family has a husband
-			    $husb	            = new Person(array('idir' => $idirhusb));
-			    if ($husb->isExisting())
-					$gender	            = $husb->getGender();
-			    else
-			    {
-					$gender		        = Person::MALE;
-                    $husb->setTreename($treename);
-                    $husb['sex']	    = $gender;
-					$husb->set('gender', $gender);
-                }
-			    if ($gender == Person::MALE)
-					$family['idirhusb']	= $idirhusb;
-			}		    // family has a husband
-			else
-			{		    // a husband is optional
-			    $family['idirhusb']		= $idirhusb;
-			    $husb	                = null;
-			}		    // a husband is optional
-			break;
-	    }               // key of instance of Person for male partner
+		    case 'idirhusb':
+	        case 'husbidir':
+			{               // key of instance of Person for male partner
+				$idirhusb	                = (int)$value;
+			    $family['idirhusb']	        = $idirhusb;
+				if ($idirhusb > 0)
+				{		    // family has a husband
+				    $husb	            = new Person(array('idir' => $idirhusb));
+				    if ($husb->isExisting())
+						$gender	            = $husb->getGender();
+				    else
+				    {
+						$gender		        = Person::MALE;
+	                    $husb->setTreename($treename);
+	                    $husb['sex']	    = $gender;
+						$husb->set('gender', $gender);
+	                }
+				    if ($gender == Person::MALE)
+						$family['idirhusb']	= $idirhusb;
+				}		    // family has a husband
+				else
+				{		    // a husband is optional
+				    $family['idirhusb']		= $idirhusb;
+				    $husb	                = null;
+				}		    // a husband is optional
+				break;
+		    }               // key of instance of Person for male partner
 
-	    case 'treename':
-	    {
-		    $treename	        = $value;
-		    break;
-	    }
+		    case 'treename':
+		    {
+			    $treename	        = $value;
+			    break;
+		    }
 
-	    case 'husbgivenname':
-        {               // male partner given name
-            $family['husbgivenname']	= $value;
-			if ($husb)
-			    $husb['givenname']		= $value;
-			else
-			if ($value != '')
-			{
-                $husb	                = new Person();
-			    $husb->setGender(Person::MALE);
-			    $husb['givenname']		= $value;
-            }
-			break;
-	    }               // male partner given name
+		    case 'husbgivenname':
+	        {               // male partner given name
+	            $family['husbgivenname']	= $value;
+				if ($husb)
+				    $husb['givenname']		= $value;
+				else
+				if ($value != '')
+				{
+	                $husb	                = new Person();
+				    $husb->setGender(Person::MALE);
+				    $husb['givenname']		= $value;
+	            }
+				break;
+		    }               // male partner given name
 
-	    case 'husbsurname':
-	    {               // male partner family name
-		    $family['husbsurname']	    = $value;
-            if ($husb)
-            {
-                if ($value != '?')
-                    $husb['surname']	= $value;
-            }
-			else
-			if ($value != '' && $value != '?')
-			{
-			    $husb	        = new Person();
-			    $husb->setGender(Person::MALE);
-			    $husb['surname']		= $value;
-			}
-			break;
-	    }               // male partner family name
+		    case 'husbsurname':
+		    {               // male partner family name
+			    $family['husbsurname']	    = $value;
+	            if ($husb)
+	            {
+	                if ($value != '?')
+	                    $husb['surname']	= $value;
+	            }
+				else
+				if ($value != '' && $value != '?')
+				{
+				    $husb	        = new Person();
+				    $husb->setGender(Person::MALE);
+				    $husb['surname']		= $value;
+				}
+				break;
+		    }               // male partner family name
 
-	    case 'husbmarrsurname':
-	    {
-		    $family['husbmarrsurname']	= $value;
-		    break;
-	    }
+		    case 'husbmarrsurname':
+		    {
+			    $family['husbmarrsurname']	= $value;
+			    break;
+		    }
 
-	    case 'husborder':
-	    {
-	    	$family['husborder']		= $value;
-	    	break;
-	    }
+		    case 'husborder':
+		    {
+		    	$family['husborder']		= $value;
+		    	break;
+		    }
 
-	    case 'husbprefmar':
-	    {
-	    	$family['husbprefmar']		= $value;
-	    	break;
-	    }
+		    case 'husbprefmar':
+		    {
+		    	$family['husbprefmar']		= $value;
+		    	break;
+		    }
 
-	    case 'husbbirthsd':
-	    {
-	    	break;
-	    }
+		    case 'husbbirthsd':
+		    {
+		    	break;
+		    }
 
-	    case 'idirwife':
-	    case 'wifeidir':	// old form
-	    {
-			$idirwife	                    = (int)$value;
-			if ($idirwife > 0)
-			{		// family has a wife
-			    $wife	            = new Person(array('idir' => $idirwife));
-			    $gender	                    = $wife->getGender();
-			    if ($gender == Person::FEMALE)
-			    {
-					$family['idirwife']	    = $idirwife;
-			    }
-			}		// family has a wife
-			else
-			{		// create new wife
-                // for genealogical purposes a family must have a female
-                // partner because a family is defined in terms of children
-			    $wife	                    = new Person();
-			    $wife->setGender(Person::FEMALE);
-                $wife->setTreeName($treename);
-                print "<addwife302/>\n";
-			}		// create new wife
-			break;
-	    }
+		    case 'idirwife':
+		    case 'wifeidir':	// old form
+		    {
+				$idirwife	                    = (int)$value;
+				if ($idirwife > 0)
+				{		// family has a wife
+				    $wife	            = new Person(array('idir' => $idirwife));
+				    $gender	                    = $wife->getGender();
+				    if ($gender == Person::FEMALE)
+				    {
+						$family['idirwife']	    = $idirwife;
+				    }
+				}		// family has a wife
+				else
+				{		// create new wife
+	                // for genealogical purposes a family must have a female
+	                // partner because a family is defined in terms of children
+				    $wife	                    = new Person();
+				    $wife->setGender(Person::FEMALE);
+	                $wife->setTreeName($treename);
+	                print "<addwife302/>\n";
+				}		// create new wife
+				break;
+		    }
 
-	    case 'wifegivenname':
-        {
-            $family['wifegivenname']        = $value;
-            if ($wife)
-            {
-    		    $wife['givenname']		    = $value;
-            }
-			else
-			if ($value != '')
-			{
-			    $wife	                    = new Person();
-			    $wife->setGender(Person::FEMALE);
-			    $wife['givenname']		    = $value;
-            }
-    		break;
-	    }
+		    case 'wifegivenname':
+	        {
+	            $family['wifegivenname']        = $value;
+	            if ($wife)
+	            {
+	    		    $wife['givenname']		    = $value;
+	            }
+				else
+				if ($value != '')
+				{
+				    $wife	                    = new Person();
+				    $wife->setGender(Person::FEMALE);
+				    $wife['givenname']		    = $value;
+	            }
+	    		break;
+		    }
 
-	    case 'wifesurname':
-        {
-            if ($value != '?')
-            {
-                $family['wifesurname']      = $value;
-    		    if ($wife)
-                    $wife['surname']		= $value;
-            }
-    		break;
-	    }
+		    case 'wifesurname':
+	        {
+	            if ($value != '?')
+	            {
+	                $family['wifesurname']      = $value;
+	    		    if ($wife)
+	                    $wife['surname']		= $value;
+	            }
+	    		break;
+		    }
 
-	    case 'wifemarrsurname':
-	    {
-    		$family['wifemarrsurname']		= $value;
-			if ($value != $family->get('husbsurname')) 
-                $wifemarrsurname            = $value;
-			break;
-	    }
+		    case 'wifemarrsurname':
+	        {
+	            if (strlen($value) > 0)
+	            {
+	    		    $family['wifemarrsurname']		= $value;
+				    if ($value != $family->get('husbsurname')) 
+	                    $wifemarrsurname            = $value;
+	            }
+				break;
+		    }
 
-	    case 'wifeorder':
-	    {
-    		$family['wifeorder']		= $value;
-    		break;
-	    }
+		    case 'wifeorder':
+		    {
+	    		$family['wifeorder']		= $value;
+	    		break;
+		    }
 
-	    case 'wifeprefmar':
-	    {
-    		$family['wifeprefmar']		= $value;
-    		break;
-	    }
+		    case 'wifeprefmar':
+		    {
+	    		$family['wifeprefmar']		= $value;
+	    		break;
+		    }
 
-	    case 'wifebirthsd':
-	    {
-    		// cannot change from this dialog
-    		break;
-	    }
+		    case 'wifebirthsd':
+		    {
+	    		// cannot change from this dialog
+	    		break;
+		    }
 
-	    case 'marriednamerule':
-	    {
-    		$family['marriednamerule']	= $value;
-    		break;
-	    }
+		    case 'marriednamerule':
+		    {
+	    		$family['marriednamerule']	= $value;
+	    		break;
+		    }
 
-	    case 'mard':
-        {		// date of marriage
-            if ($family['wifegivenname'] === '' &&
-                $family['wifesurname'] === '')
-                $wife                   = null;
-            if ($wife)
-            {               // may be new wife or wife's name may be changed 
-                $wife->save('mard' . __LINE__);
-			    $idirwife	            = $wife['idir'];
-                $family['idirwife']     = $idirwife;
-            }               // may be new wife or wife's name may be changed 
+		    case 'mard':
+	        {		// date of marriage
+	            if ($family['wifegivenname'] === '' &&
+	                $family['wifesurname'] === '')
+	                $wife                   = null;
+	            if ($wife)
+	            {               // may be new wife or wife's name may be changed 
+	                $wife->save('mard' . __LINE__);
+				    $idirwife	            = $wife['idir'];
+	                $family['idirwife']     = $idirwife;
+	            }               // may be new wife or wife's name may be changed 
 
-    		// this call also sets field 'marsd'
-    		$family['mard']		        = $value;
-    		break;
-	    }		// date of marriage
+	    		// this call also sets field 'marsd'
+	    		$family['mard']		        = $value;
+	    		break;
+		    }		// date of marriage
 
-	    case 'marendd':
-	    {		// end of marriage
-    		// this call also sets field 'marendsd'
-    		$family['marendd']		= $value;
-    		break;
-	    }		// end of marriage
+	        case 'idet':
+            {                       // event type
+                $parms                      = array('idet'  => $value,
+                                                    'idmr'  => $idmr);
+                break;
+	        }                   
 
-	    case 'marloc':
-	    {
-			try
-			{
-			    if ($value && strlen($value) > 0)
-			    {
+	        case 'ider':
+            {                       // key of existing Event
+                $parms['ider']              = $value;
+                break;
+	        }
+
+	        case 'date':
+	        {                       // date of event
+                $parms['eventd']            = $value;
+                break;
+	        }
+
+	        case 'eventloc':
+	        {                       // location of event
+                $event                      = new Event($parms);
+                $event->setLocation($value);
+                $events[]                   = $event;
+                break;
+	        }
+
+		    case 'marendd':
+		    {		// end of marriage
+	    		// this call also sets field 'marendsd'
+	    		$family['marendd']		= $value;
+	    		break;
+		    }		// end of marriage
+
+		    case 'marloc':
+		    {
+				if ($value && strlen($value) > 0)
+				{
 					$marLocation	= new Location(array('location' => $value));
 					if (!$marLocation->isExisting())
 					    $marLocation->save('marloc' . __LINE__);
 					$IDLRMar	    = $marLocation->getId();
-			    }
-			    else
+				}
+				else
 					$IDLRMar	    = 1;
-			}
-			catch(Exception $e)
-			{
-			    $IDLRMar		    = 1;
-			}
-			$family['idlrmar']		= $IDLRMar;
-			break;
-	    }
+				$family['idlrmar']		= $IDLRMar;
+				break;
+		    }
 
-	    case 'seald':
-	    {		// date sealed to parents
-    		// this call also sets field 'sealsd'
-    		$family['seald']		= $value;
-    		break;
-	    }		// date sealed to parents
+		    case 'seald':
+		    {		// date sealed to parents deprecated
+	    		// this call also sets field 'sealsd'
+	    		$family['seald']		= $value;
+	    		break;
+		    }		// date sealed to parents
 
-	    case 'sealloc':
+		    case 'sealloc':
+		    {       // deprecated
+				if ($value && strlen($value) > 0 && ctype_digit($value))
+				{
+					$SealTemple	        = new Temple(array('idtr' => $value));
+					$IDTRSeal	        = $SealTemple->getIdtr();
+				}
+				else
+					$IDTRSeal	        = 1;
+				$family['idtrseal']		= $idtrseal;
+				break;
+		    }
+
+		    case 'idtrseal':
+		    case 'trseal':	// old form
+		    {
+	    		$family['idtrseal']		    = $value;
+	    		break;
+		    }
+
+		    case 'idms':
+		    {
+	    		$family['idms']		        = $value;
+	    		break;
+		    }
+
+		    case 'notes':
+		    {
+	            $family['notes']		    = $value;
+	            print $warn;
+	    		break;
+		    }
+
+		    case 'notmarried':
+		    {
+	    		$family['notmarried']		= 1;
+	    		break;
+		    }
+
+		    case 'nochildren':
+		    {
+	    		$family['nochildren']		= 1;
+	    		break;
+		    }
+
+		    case 'submit':
+		    case 'submit':
+		    case 'idime':
+		    case 'cittype':
+		    case 'addcitation':
+		    case 'addchild':
+		    case 'addnewchild':
+		    {		            // buttons
+	    		break;
+		    }		            // buttons
+
+		    case 'source':
+		    case 'idsx':
+		    case 'page':
+		    case 'editcitation':
+		    case 'delcitation':
+		    {	                // ignore buttons
+				break;
+		    }	                // ignore buttons
+
+		    case 'editchild':
+		    {	                // edit child button
+				// $id contains IDIR of instance of Person
+				break;
+		    }	                // edit child
+
+		    case 'detchild':
+		    {	                // detach child button
+				// $id contains IDCR of instance of Child
+				break;
+		    }	                // detach child button
+
+		    case 'cidir':
+	        {	                // IDIR of child
+				// $id contains rownum from form
+	            // first field in new row
+	            if (strlen($value) > 0)
+	                $idir		                = intval($value);
+	            else
+	                $idir                       = 0;
+	            // $idir is 0 for a new child
+	            // $idir is -1 to delete an old child
+
+	            if ($idir >= 0 && !$family->isExisting())
+	            {                   // possibly true on first child
+	                $family->save('cidir' . __LINE__);
+	                $idmr                       = $family->getIdmr();
+	            }                   // possibly true on first child
+
+	            // complete processing of previous child
+	            // $child is an instance of Person
+				if ($child !== null)
+	            {		            // complete previous child
+	                $isNewChild                 = !$child->isExisting();
+	                $child->save("\tcidir" . __LINE__);
+	                $cidir                      = $child['idir'];
+	                if ($isNewChild)
+	                {
+	                    print "\t\t<idir$oldrow>$cidir</idir$oldrow>\n";
+	                    $birthEvent             = $child->getBirthEvent(true);
+	                    $birthsd                = $birthEvent['eventsd'];
+	                    print "\t\t<birthsd$oldrow>$birthsd</birthsd$oldrow>\n";
+	                }
+
+	                if (is_null($childr))
+	                {               // add new child
+	                    $childr             = new Child(array('idmr' => $idmr,
+	                                                          'idir' => $cidir));
+	                    $errors             = $childr->getErrors();
+	                    if (strlen($errors) > 0)
+	                        print "\n\n<errors>$errors</errors>\n";
+	                }               // add new child
+
+		            if ($childr)
+	                {               // reorder children
+	                    $newChild               = !$childr->isExisting();
+	                    $childr['idmr']         = $idmr;
+	                    $childr['idir']         = $cidir;
+		    			$childr['order']		= $childOrder;
+		    			$childOrder++;
+	                    $childr->save("\tchild" . __LINE__);
+	                    if ($newChild)
+	                    {
+	                        $idcr               = $childr['idcr'];
+	                        print "\t\t<idcr$oldrow>$idcr</idcr$oldrow>\n";
+	                    }
+		            }               // reorder children
+	            }		            // complete previous child
+
+				if ($idir == 0)
+				{		            // new person
+	                $child	                    = new Person();
+	                $child->setTreeName($treename);
+				}		            // new person
+	            else
+	            if ($idir > 0)
+	            {                   // existing person
+	                $child	                = Person::getPerson($idir);
+	                $cidir                  = $idir;
+	            }                   // existing person
+	            else
+	            {                   // negative, detach existing child
+	                $child                  = null;
+	            }                   // negative, detach existing child
+	            if ($child)
+	                $priName                = $child->getPriName();
+	            else
+	                $priName                = null;
+	            if ($child && $child->isExisting())
+	            {
+	                $birthEvent             = $child->getBirthEvent(false);
+	                $deathEvent             = $child->getDeathEvent(false);
+	            }
+	            else
+	            {
+	                $birthEvent             = null;
+	                $deathEvent             = null;
+	            }
+
+	            $childr		                = null; // processed
+	            $oldrow                     = $id;  // row number of child
+				break;
+		    }	                    // IDIR of child
+
+		    case 'cidcr':
+	        {	                    // IDCR of child, zero for new child
+				// $id contains rownum from form
+	            if (strlen($value) > 0)
+	                $idcr		            = intval($value);
+	            else
+	                $idcr                   = 0;
+	            if ($idcr > 0)
+	            {
+		            $childr                 = new Child(array('idcr' => $idcr));
+		            if ($childr->isExisting())
+		            {                   // existing instance of Child
+		                if ($idir < 0)
+		                {               // remove existing Child from Family
+		                    $childr->delete('delete' . __LINE__);
+		                    $childr                 = null;
+		                }               // remove existing Child from Family
+		                else
+		                {               // retain existing Child
+					        if ($childr['idir'] == 0)
+		            		    $childr['idir']     = $idir;
+		                }               // retain existing Child
+		            }                   // instance of Child
+	            }
+				break;
+		    }	// IDCR of child
+
+		    case 'cgender':
+		    {	            // numeric gender of child
+				// $id contains rownum from form
+				if ($child)
+				    $child['gender']		    = $value;
+				break;
+		    }	            // numeric gender of child
+
+		    case 'cgiven':
+		    {	            // given name of child
+				// $id contains rownum from form
+				if ($priName)
+				    $priName['givenname']		= $value;
+				break;
+		    }	            // given name of child
+
+		    case 'csurname':
+		    {	            // surname of child
+				// $id contains rownum from form
+				if ($priName)
+	                $priName['surname']		    = $value;
+				break;
+		    }	            // surname of  child
+
+		    case 'cbirth':
+		    {	            // birth date of child
+				// $id contains rownum from form
+	            if ($child)
+	            {
+	                $child['birthd']	        = $value;
+	                if (!$child->isExisting())
+	                    $child->save('cbirth');
+	                $birthEvent                 = $child->getBirthEvent(true);
+	                $birthEvent['eventd']       = $value;
+	                $birthEvent->save('cbirth');
+	            }
+				break;
+		    }	            // death date of child
+
+		    case 'cdeath':
+		    {	            // death date of child
+				// $id contains rownum from form
+				if ($child)
+	                $child['deathd']		    = $value;
+	            if ($deathEvent)
+	            {
+	                $deathEvent['eventd']       = $value;
+	                $deathEvent->save('cbirth');
+	            }
+				break;
+		    }	            // death date child
+
+		    default:
+		    {		        // ignore any unrecognized parameters
+				print "      <p>ignore $key</p>\n";
+				break;
+		    }		        // ignore any unrecognized parameters
+
+		}	                // act on each supported parameter
+	    } catch(Exception $e)
 	    {
-			try
-			{
-			    if ($value && strlen($value) > 0)
-			    {
-					$SealTemple	= new Temple(array('idtr' => $value));
-					$IDTRSeal	= $SealTemple->getIdtr();
-			    }
-			    else
-					$IDTRSeal	= 1;
-			}
-			catch(Exception $e)
-			{
-			    $IDTRSeal		= 1;
-			}
-			$family['idtrseal']		= $idtrseal;
-			break;
+	        $msg	.= "Global exception " . __LINE__ .": idirhusb=$idirhusb, idirwife=$idirwife, " . $e->getMessage() .
+	            " in " . $e->getFile() . " at " . $e->getLine() . ' trace ' .
+	            $e->getTraceAsString();
+		    print "<msg>$msg</msg>\n";
 	    }
-
-	    case 'idtrseal':
-	    case 'trseal':	// old form
-	    {
-    		$family['idtrseal']		    = $value;
-    		break;
-	    }
-
-	    case 'idms':
-	    {
-    		$family['idms']		        = $value;
-    		break;
-	    }
-
-	    case 'notes':
-	    {
-    		$family['notes']		    = $value;
-    		break;
-	    }
-
-	    case 'notmarried':
-	    {
-    		$family['notmarried']		= 1;
-    		break;
-	    }
-
-	    case 'nochildren':
-	    {
-    		$family['nochildren']		= 1;
-    		break;
-	    }
-
-	    case 'submit':
-	    case 'submit':
-	    case 'idime':
-	    case 'cittype':
-	    case 'addcitation':
-	    case 'addchild':
-	    case 'addnewchild':
-	    {		            // buttons
-    		break;
-	    }		            // buttons
-
-	    case 'source':
-	    case 'idsx':
-	    case 'page':
-	    case 'editcitation':
-	    case 'delcitation':
-	    {	                // ignore buttons
-			break;
-	    }	                // ignore buttons
-
-	    case 'editchild':
-	    {	                // edit child button
-			// $id contains IDIR of instance of Person
-			break;
-	    }	                // edit child
-
-	    case 'detchild':
-	    {	                // detach child button
-			// $id contains IDCR of instance of Child
-			break;
-	    }	                // detach child button
-
-	    case 'cidir':
-        {	                // IDIR of child
-			// $id contains rownum from form
-            // first field in new row
-            if (strlen($value) > 0)
-                $idir		                = intval($value);
-            else
-                $idir                       = 0;
-            // $idir is 0 for a new child
-            // $idir is -1 to delete an old child
-
-            if ($idir >= 0 && !$family->isExisting())
-            {                   // possibly true on first child
-                $family->save('cidir' . __LINE__);
-                $idmr                       = $family->getIdmr();
-            }                   // possibly true on first child
-
-            // complete processing of previous child
-            // $child is an instance of Person
-			if ($child !== null)
-            {		            // complete previous child
-                $isNewChild                 = !$child->isExisting();
-                $child->save("\tcidir" . __LINE__);
-                $cidir                      = $child['idir'];
-                if ($isNewChild)
-                {
-                    print "\t\t<idir$oldrow>$cidir</idir$oldrow>\n";
-                    $birthEvent             = $child->getBirthEvent(true);
-                    $birthsd                = $birthEvent['eventsd'];
-                    print "\t\t<birthsd$oldrow>$birthsd</birthsd$oldrow>\n";
-                }
-	
-                if (is_null($childr))
-                {               // add new child
-                    $childr             = new Child(array('idmr' => $idmr,
-                                                          'idir' => $cidir));
-                    $errors             = $childr->getErrors();
-                    if (strlen($errors) > 0)
-                        print "\n\n<errors>$errors</errors>\n";
-                }               // add new child
-
-	            if ($childr)
-                {               // reorder children
-                    $newChild               = !$childr->isExisting();
-                    $childr['idmr']         = $idmr;
-                    $childr['idir']         = $cidir;
-	    			$childr['order']		= $childOrder;
-	    			$childOrder++;
-                    $childr->save("\tchild" . __LINE__);
-                    if ($newChild)
-                    {
-                        $idcr               = $childr['idcr'];
-                        print "\t\t<idcr$oldrow>$idcr</idcr$oldrow>\n";
-                    }
-	            }               // reorder children
-            }		            // complete previous child
-
-			if ($idir == 0)
-			{		            // new person
-                $child	                    = new Person();
-                $child->setTreeName($treename);
-			}		            // new person
-            else
-            if ($idir > 0)
-            {                   // existing person
-                $child	                = Person::getPerson($idir);
-                $cidir                  = $idir;
-            }                   // existing person
-            else
-            {                   // negative, detach existing child
-                $child                  = null;
-            }                   // negative, detach existing child
-            if ($child)
-                $priName                = $child->getPriName();
-            else
-                $priName                = null;
-            if ($child && $child->isExisting())
-            {
-                $birthEvent             = $child->getBirthEvent(false);
-                $deathEvent             = $child->getDeathEvent(false);
-            }
-            else
-            {
-                $birthEvent             = null;
-                $deathEvent             = null;
-            }
-
-            $childr		                = null; // processed
-            $oldrow                     = $id;  // row number of child
-			break;
-	    }	                    // IDIR of child
-
-	    case 'cidcr':
-        {	                    // IDCR of child, zero for new child
-			// $id contains rownum from form
-            if (strlen($value) > 0)
-                $idcr		            = intval($value);
-            else
-                $idcr                   = 0;
-            if ($idcr > 0)
-            {
-	            $childr                 = new Child(array('idcr' => $idcr));
-	            if ($childr->isExisting())
-	            {                   // existing instance of Child
-	                if ($idir < 0)
-	                {               // remove existing Child from Family
-	                    $childr->delete('delete' . __LINE__);
-	                    $childr                 = null;
-	                }               // remove existing Child from Family
-	                else
-	                {               // retain existing Child
-				        if ($childr['idir'] == 0)
-	            		    $childr['idir']     = $idir;
-	                }               // retain existing Child
-	            }                   // instance of Child
-            }
-			break;
-	    }	// IDCR of child
-
-	    case 'cgender':
-	    {	            // numeric gender of child
-			// $id contains rownum from form
-			if ($child)
-			    $child['gender']		    = $value;
-			break;
-	    }	            // numeric gender of child
-
-	    case 'cgiven':
-	    {	            // given name of child
-			// $id contains rownum from form
-			if ($priName)
-			    $priName['givenname']		= $value;
-			break;
-	    }	            // given name of child
-
-	    case 'csurname':
-	    {	            // surname of child
-			// $id contains rownum from form
-			if ($priName)
-                $priName['surname']		    = $value;
-			break;
-	    }	            // surname of  child
-
-	    case 'cbirth':
-	    {	            // birth date of child
-			// $id contains rownum from form
-            if ($child)
-            {
-                $child['birthd']	        = $value;
-                if (!$child->isExisting())
-                    $child->save('cbirth');
-                $birthEvent                 = $child->getBirthEvent(true);
-                $birthEvent['eventd']       = $value;
-                $birthEvent->save('cbirth');
-            }
-			break;
-	    }	            // death date of child
-
-	    case 'cdeath':
-	    {	            // death date of child
-			// $id contains rownum from form
-			if ($child)
-                $child['deathd']		    = $value;
-            if ($deathEvent)
-            {
-                $deathEvent['eventd']       = $value;
-                $deathEvent->save('cbirth');
-            }
-			break;
-	    }	            // death date child
-
-	    default:
-	    {		        // ignore any unrecognized parameters
-			print "      <p>ignore $key</p>\n";
-			break;
-	    }		        // ignore any unrecognized parameters
-
-	}	                // act on each supported parameter
-    } catch(Exception $e)
-    {
-        $msg	.= "Global exception " . __LINE__ .": " . $e->getMessage() .
-            " in " . $e->getFile() . " at " . $e->getLine() . ' trace ' .
-            $e->getTraceAsString();
-	    print "<msg>$msg</msg>\n";
-    }
-	print "        </$key>\n";	// close off tag
-}		                // loop through parameters
+		print "        </$key>\n";	// close off tag
+	}		                // loop through parameters
+}                       // invoked by method=post
 
 
 print "    </parms>\n";		// close off parms tag
@@ -783,7 +819,16 @@ if (is_object($family))
 	$family->save('family' . __LINE__);
 
 	// include the contents of the updated record	    
-	$family->toXml(null);
+    $family->toXml(null);
+
+    if (count($events) > 0)
+    {               // update generic events
+        foreach($events as $event)
+        {
+            $event['idmr']          = $idmr;
+            $event->save('event' . __LINE__);
+        }
+    }               // update generic events
 }		            // there is an update to make
 
 } catch(Exception $e)

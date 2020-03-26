@@ -5,8 +5,9 @@
  *																		*
  *  History:															*
  *		2018/01/09		created											*
+ *      2020/02/14      pass full state name and country name           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=fr">
@@ -47,11 +48,13 @@
     </p>
     <!--- Put out the response as a table -->
     <form name="countyForm" id="countyForm"
-	action="CountiesEdit.php" 
-	method="post" 
-	autocomplete="off" 
-	enctype="multipart/form-data">
+				action="CountiesEdit.php" 
+				method="post" 
+				autocomplete="off" 
+				enctype="multipart/form-data">
       <input type="hidden" name="Domain" value="$DOMAIN">
+      <input type="hidden" name="CountryName" id="CountryName" value="$COUNTRYNAME">
+      <input type="hidden" name="StateName" id="StateName" value="$STATENAME">
       <input type="hidden" name="Debug" value="$DEBUG">
       <input type="hidden" name="offset" value="$OFFSET">
       <input type="hidden" name="limit" value="$LIMIT">

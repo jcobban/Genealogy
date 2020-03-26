@@ -43,8 +43,9 @@ use \Exception;
  *		2019/05/30      for messages posted to user also send by        *
  *		                email                                           *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/02/24      failed constructors no longer throw exceptions  *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Blog.inc";
@@ -388,9 +389,7 @@ if (strlen($msg) == 0)
 	 	    $blog->save(true);	// update database
             if (strlen($msg) > 0)
             {
-		 	    print "    <msg>\n";
-		 	    print htmlentities($e->getMessage(),ENT_XML1);
-		 	    print "    </msg>\n";
+		 	    print "    <msg>\n$msg</msg>\n";
 			}
 	    }               // loop through keys
 	}                   // create new message and post to selected records

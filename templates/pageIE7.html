@@ -13,8 +13,9 @@
  *	    2018/01/27	    Created						                    *
  *      2019/01/29      use menu button                                 *
  *      2019/02/05      remove rightTop button                          *
+ *		2020/02/16      add right hand notification column              *
  *		                                    							*
- *  Copyright &copy; 2019 James A. Cobban		                		*
+ *  Copyright &copy; 2020 James A. Cobban		                		*
  **********************************************************************-->
     <meta http-equiv='content-type' content='text/html; charset=utf-8'>
     <meta name='author' content='James A. Cobban'>
@@ -27,34 +28,11 @@
   <body>
       
 <script>
-    if (location.host != 'localhost')
-    try {
-	  window.fbAsyncInit = function() {
-	    FB.init({
-	      appId      : '2096433630426301',
-	      cookie     : true,
-	      xfbml      : true,
-	      version    : 'v3.2'
-	    });
-	      
-	    FB.AppEvents.logPageView();   
-	      
-	  };
-	
-	  (function(d, s, id){
-	     var js, fjs = d.getElementsByTagName(s)[0];
-	     if (d.getElementById(id)) {return;}
-	     js = d.createElement(s); js.id = id;
-	     js.src = "https://connect.facebook.net/en_US/sdk.js";
-	     fjs.parentNode.insertBefore(js, fjs);
-	   }(document, 'script', 'facebook-jssdk'));
-    } catch(e) {}
-
    var tinyMCEparms = {
 		selector            : 'textarea',
 	    plugins             : 'link lists image',
 	    menubar             : false,
-        language            : '$LANG',
+        language            : 'en',
         skin                : 'oxide-dark',
 	    toolbar             : "undo redo | styleselect | bold italic | " 
 	                           + "alignleft aligncenter alignright alignjustify | " 
@@ -68,11 +46,6 @@
     	<img src="/logo70.gif" id="logo" class="right"
                 height="70" width="70" alt="James Cobban Logo">
           &nbsp;
-        <span class="right" style="width: 360px;" id="facebookSpan">
-      	  <iframe id='facebookFrame' class='facebook' $IECRAP>
-      	  </iframe>
-          &nbsp;
-        </span>
         <span class="right" style="width: 500px;" id="advertSpan">
           <iframe id='advertFrame' class='advert' $IECRAP src='$ADURL'>
           </iframe>
@@ -99,6 +72,17 @@
 	  </noscript>
 	  $MAIN
     </div> <!-- id="mainSection" -->
+    <div id="rightColumn" class="rightCol">
+        <p id="userWelcome">
+          <b>Welcome $USERID</b>
+        </p>
+        <p>You can publish your family tree on this site in a style
+        which looks like a traditional book, but adds all of the dynamic
+        capabilities of the Web and protects your family from
+        identity theft by ensuring that only people you authorize can see
+        details about anyone less than 105 years old.
+        </p>
+    </div>
     <div class='botcrumbs' id="footSection"> <!-- footer -->
 	  <a href='/contactAuthor.php?idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
 	    Contact Author</a>

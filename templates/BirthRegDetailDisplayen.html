@@ -85,6 +85,7 @@
 		       to initialize the Sex selection list -->
 		  <input type="hidden" name="Debug" id="Debug"
 					  value="$DEBUG"/>
+        </p>
         <div class="row" id="IdentificationRow">
 		  <div class="column1">
 		    <label class="labelSmall" for="RegId">
@@ -182,7 +183,7 @@
 		    <input name="Surname" id="Surname"
 				  type="text" size="24" maxlength="32" 
 				  class="ina white left" readonly="readonly"
-				  value="$qsurname">
+				  value="$surname">
 		  </div>
 		  <div style="clear: both;"></div>
         </div> <!-- id="NamesRow" -->
@@ -454,6 +455,29 @@
         </div> <!-- id="ImageRow" -->
       </form>
    </div> <!-- end of <div id="body"> -->
+    <div class="hidden" id="templates">
+        <span id="omittedRegYear">
+            Registration Year parameter omitted.
+        </span>
+        <span id="invalidRegYear">
+            Registration Year value '$value' is not a number.
+        </span>
+        <span id="rangeRegYear">
+            Registration Year $value must be between 1860 and 2020.
+        </span>
+        <span id="omittedRegNum">
+            Registration Number parameter omitted.
+        </span>
+        <span id="invalidRegNum">
+            Registration Number '$value' is not a number.
+        </span>
+        <span id="invalidItem">
+			Item '$value' is not a number. 
+        </span>
+        <span id="unknownDomain">
+    		Unknown Domain '$domain'.
+        </span>
+    </div>
   <!--  The remainder of the web page consists of divisions containing
   context specific help.  Including this information here ensures
   that the language of the help balloons matches the language of the

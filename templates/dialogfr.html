@@ -12,8 +12,9 @@
  *  History:								                            *
  *      2018/11/28      created                                         *
  *      2019/02/08      remove breadcrumbs from footer                  *
+ *      2020/02/02      add page menu button to body                    *
  *									                                    *
- *  Copyright &copy; 2018 James A. Cobban				                *
+ *  Copyright &copy; 2020 James A. Cobban				                *
  **********************************************************************-->
     <meta charset='utf-8'>
     <meta http-equiv='default-style' content='text/css'>
@@ -51,28 +52,21 @@
           les instructions pour activer JavaScript dans votre navigateur Web</a>.
         </p>
       </noscript>
-  $MAIN
-    </main>
-    <footer id="footSection">
-      <div class='botcrumbs'>
-        <span class='right450'>
-  	    <iframe id='facebookFrame' class='facebook' $IECRAP>
-  	    </iframe>
-  	    &nbsp;
-  	    <img src='/logo70.gif' height='70' width='70' alt='James Cobban Logo'>
-        </span>
-  	  <a href='/contactAuthor.php?lang=fr&amp;idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
-  	    Contacter l'auteur</a>
-        <span id="menuButton" class="left">
+      <div>
+        <span id="menuButton" class="left" style="padding-right: 10px;">
           <div class="menuicon"></div>
           <div class="menuicon"></div>
           <div class="menuicon"></div>
         </span>
         <div class="menu" id="menu">
-          $BREADCRUMBS
+            $BREADCRUMBS
         </div>
-        <div style='clear: both;'></div>
-      </div> <!-- end of page footer -->
+        <h1>$TITLE</h1>
+        <div style="clear: both;"></div>
+      </div>
+      $MAIN
+    </main>
+    <footer id="footSection">
     </footer>
     <div class='hidden' id='UserInfo'>
       <span id='UserInfoUserid'>$USERID</span>
@@ -81,7 +75,7 @@
       <span id='UserInfoSignon'>se Connecter</span>
       <span id='UserInfoAccount'>
           <a href="/Account.php?lang=fr" id="session" target="_blank"
-              title="le Statut de votre Compte">
+              title="le Statut de votre Compte" class="menuitem">
               Compte $USERID
             <span id="gotMail">
                 <img src="/envelope.svg" alt="You have mail" style="display: inline-block; height: 19px;"/>

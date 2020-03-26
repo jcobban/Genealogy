@@ -9,13 +9,13 @@ use \Exception;
  *  of a Census of Canada												*
  *																		*
  *  Parameters (passed by method=get):									*
- *		Census				census identifier CCYYYY					*
+ *		Census			census identifier CCYYYY					    *
  *		Province		two letter code, required on pre-confederation	*
  *						censuses										*
  *		District		district number within census					*
  *		NameWidth		explicit width of name column					*
- *		RemarksWidth		explicit width of remarks column			*
- *		FcAuto				automatic update of frame count, page count	*
+ *		RemarksWidth	explicit width of remarks column			    *
+ *		FcAuto			automatic update of frame count, page count	    *
  *						and population									*
  *																		*
  *  History:															*
@@ -74,7 +74,7 @@ use \Exception;
  *		2018/01/10		split administration and display templates		*
  *		2018/01/24		use SubDistrictSet								*
  *						correct null relative frame number				*
- *		2018/02/03		correct handling of $censusObj['partof']	*
+ *		2018/02/03		correct handling of $censusObj['partof']	    *
  *		2018/05/22		choose display class for id, name, lacreel,		*
  *						ldsreel, and image base to distinguish new		*
  *						from unchanged values							*
@@ -133,6 +133,7 @@ if (count($_GET) > 0)
         switch(strtolower($key))
         {		// act on parameter name
             case 'census':
+            case 'censusid':
             {		// Census Identifier
                 $censusId	        = $value;
                 $censusYear         = substr($censusId, -4);
@@ -171,8 +172,7 @@ if (count($_GET) > 0)
     
             case 'lang':
             {		// debug handled by common code
-                if (strlen($value) >= 2)
-                    $lang		    = strtolower(substr($value,0,2));
+                $lang		    = FtTemplate::validateLang($value);
                 break;
             }		// debug handled by common code
     
@@ -269,11 +269,10 @@ if (count($_POST) > 0)
             }		// automatic update of frame count and page count
     
             case 'lang':
-            {		// debug handled by common code
-                if (strlen($value) >= 2)
-                    $lang		        = strtolower(substr($value,0,2));
+            {		// requested language
+                $lang		    = FtTemplate::validateLang($value);
                 break;
-            }		// debug handled by common code
+            }		// requested language
 
 		    case 'orig_id':
             {

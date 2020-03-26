@@ -111,6 +111,7 @@ use \NumberFormatter;
  *		2019/11/02      use Location to get search name and county      *
  *      2019/11/17      move CSS to <head>                              *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/02/14      add loose check for "name, .*, county..."       *
  *																	    *
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -126,16 +127,16 @@ require_once __NAMESPACE__ . '/common.inc';
 // action depends upon whether the user is authorized to update
 // this specific record
 if (canUser('edit'))
-    $action     = 'Update';
+    $action     			= 'Update';
 else
-    $action     = 'Display';
+    $action     			= 'Display';
 
 // default values of parametets
-$namestart		= '';
-$idlr		    = 0;		// default to create new
-$name		    = '';
-$closeAtEnd		= false;
-$lang		    = 'en';
+$namestart					= '';
+$idlr		    			= 0;		// default to create new
+$name		    			= '';
+$closeAtEnd					= false;
+$lang		    			= 'en';
 
 // get requested parameter values
 foreach($_GET as $key => $value)
@@ -147,34 +148,34 @@ foreach($_GET as $key => $value)
 	    {           // numeric key of location
 			if (strlen($value) > 0 &&
 			    ctype_digit($value))
-			    $idlr	= $value;
+			    $idlr	    = $value;
 			break;
 	    }           // numeric key of location
 
 	    case 'name':
 	    {           // name of location
-			$idlr		= 0;
-			$name		= $value;
+			$idlr		    = 0;
+			$name		    = $value;
 			break;
 	    }           // name of location
 
 	    case 'lang':
 	    {           // user's preferred language
-			$lang	    = FtTemplate::validateLang($value);
+			$lang	        = FtTemplate::validateLang($value);
 			break;
 	    }           // user's preferred language
 
 	    case 'action':
 	    {		    // request to only display the record
 			if (strtolower($value) == 'display')
-			    $action	        = 'Display';
+			    $action	    = 'Display';
 			break;
 	    }		    // request to only display the record
 
 	    case 'closeatend':
 	    {		    // close the frame when finished
 			if (strtolower($value) == 'y')
-			    $closeAtEnd	    = true;
+			    $closeAtEnd	= true;
 			break;
 	    }		    // close the frame when finished
 
@@ -195,34 +196,55 @@ foreach($_GET as $key => $value)
 // get the requested location
 if ($idlr > 0)
 {                   // IDLR of existing record specified
-    $location		= new Location(array('idlr' => $idlr));
-    $name			= $location->getName();
+    $location		        = new Location(array('idlr' => $idlr));
+    $name			        = $location->getName();
 }                   // IDLR of existing record specified
 else
 {                   // IDLR not specified
-    $location		= new Location(array('location' => $name));
+    $location		        = new Location(array('location' => $name));
 }                   // IDLR not specified
 
 if (!$location->isOwner())
-    $action     	= 'Display';
+    $action     	        = 'Display';
 
 // get template
-$template			= new FtTemplate("Location$action$lang.html");
+$template			        = new FtTemplate("Location$action$lang.html");
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => 'Location'));
-$formatter                          = $template->getFormatter();
+$formatter                  = $template->getFormatter();
 
 // customize title
 if ($location->isExisting())
 {
-	$idlr	    	= $location->getIdlr();
-    $title	    	= $template['locationTitle']->innerHTML();
+	$idlr	    	        = $location->getIdlr();
+    $title	    	        = $template['locationTitle']->innerHTML();
 }
 else
-{
-	$idlr	    	= 0;
-    $title	    	= $template['newlocationTitle']->innerHTML();
-}
+if ($idlr == 0)
+{                   // search by name
+    $comma                  = strpos($name, ', ');
+    $search                 = '^' . substr($name, 0, $comma) . ',.*' . 
+                              substr($name, $comma + 2);
+    $locations              = new RecordSet('Locations',
+                                            array('location' => $search));
+    if ($locations->count() == 1)
+    {
+        $location           = $locations->rewind();
+        $idlr               = $location['idlr'];
+        $name               = $location->getName();
+        $title	    	    = $template['locationTitle']->innerHTML();
+    }
+    else
+    {
+	    $idlr	    	    = 0;
+        $title	    	    = $template['newlocationTitle']->innerHTML();
+    }
+}                   // search by name
+else
+{                   // not found
+	$idlr	    	        = 0;
+    $title	    	        = $template['newlocationTitle']->innerHTML();
+}                   // not found
 $title          	= str_replace('$NAME', $name, $title);
 $template->set('TITLE',             $title);
 

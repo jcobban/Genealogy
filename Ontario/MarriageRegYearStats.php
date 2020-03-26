@@ -273,17 +273,14 @@ if ($total == 0)
 }
 else
 {
-	$pctDone	= 50 * $total / ($highest - $lowest + 1);
+	$pctDone	= 100 * $total / ($highest - $lowest + 1);
 	$pctLinked	= 100 * $totalLinked / $total;
 }
-if (strlen($total) > 3)
-	$total	= substr($total, 0, strlen($total) - 3) . ',' .
-			  substr($total, strlen($total) - 3);
 if ($lowest > $highest)
     $lowest		= $highest;
 
 $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
-$template->set('TOTAL',         $total);
+$template->set('TOTAL',         $formatter->format($total));
 $template->set('LOWEST',        $lowest);
 $template->set('HIGHEST',       $highest);
 $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);

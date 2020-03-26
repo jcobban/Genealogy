@@ -113,22 +113,23 @@ if (isset($_GET) && count($_GET) > 0)
 
 			case 'lang':
             {
-                $lang       = FtTemplate::validateLang($value);
+                $lang           = FtTemplate::validateLang($value);
                 break;
             }
 		}	                    // switch
 	}		                    // loop through all parameters
     if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn                   .= $parmsText . "</table>\n";
 }                               // invoked by method=get
 
 if ($user->can('edit'))
-    $action         = 'Update';
+    $action                     = 'Update';
 else
-    $action         = 'Display';
+    $action                     = 'Display';
 
-$template       = new FtTemplate("editName$action$lang.html");
-$types          = $template['types'];
+$template                       = new FtTemplate("editName$action$lang.html",
+                                                 true);
+$types                          = $template['types'];
 $template['otherStylesheets']->update(array('filename'  => 'editName'));
 
 if (is_int($idnx))

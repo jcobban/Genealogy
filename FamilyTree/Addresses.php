@@ -46,6 +46,7 @@ use \Exception;
  *		2019/07/23      use FtTemplate::validateLang                    *
  *		2019/09/26      fix scrolling                                   *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -217,14 +218,13 @@ if (isset($_POST) && count($_POST) > 0)
 	
 		    case 'lang':
 		    {			// user requested language
-				if (strlen($value) >= 2)
-				    $lang	        = strtolower(substr($value, 0, 2));
+				$lang	        = FtTemplate::validateLang($value);
 				break;
 		    }			// user requested language
 	
 		    case 'kind':
 		    {
-				$kind		= $value;
+				$kind		    = $value;
 				break;
 		    }
 	

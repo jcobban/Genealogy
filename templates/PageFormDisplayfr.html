@@ -1,0 +1,272 @@
+<!--*********************************************************************
+ *  PageFormDisplayen.html												*
+ *																		*
+ *  Template to display page to display the Pages database for a single *
+ *  enumeration division.		                                        *
+ *																		*
+ *  History:															*
+ *      2019/11/12      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/genealogy.php?lang=$LANG">
+        Génealogie</a>: 
+      <a href="/genCountry.php?cc=$CC&lang=$LANG">
+		$COUNTRYNAME</a>:
+      <a href="/database/genRecensementes.php?cc=$CC&lang=$LANG">
+        Recensementes</a>:
+      <a href="/database/EditRecensementes.php?cc=$CC&lang=$LANG">
+        Gestion des Recensementes</a>:
+      <a href="/database/DistForm.php?Recensement=$CENSUSID&Province=$PROVINCE&lang=$LANG">
+	    Gestion des Districts $CENSUSID</a>:
+      <a href="/database/ReqUpdateSubDists.php?Recensement=$CENSUSID&Province=$PROVINCE&District=$DISTID&lang=$LANG">
+	    Choisir Sous-District</a>:
+      <a href="SubDistForm.php?Recensement=$CENSUSID&Province=$PROVINCE&District=$DISTID&lang=$LANG">
+	    Gestion des Sous-Districts pour District $DISTID $DISTNAME</a>:
+	  <a href="ReqUpdatePages.php?Recensement=$CENSUSID&Province=$PROVINCE&District=$DISTID&SubDistrict=$SUBDISTID&lang=$LANG">
+	    Choisir Division</a>:
+    </div> <!-- id="breadcrumbs" -->
+    <div class="body" id="transcription"
+            style="overflow: auto; overflow-x: scroll">
+      <h1>
+        Gestion du Recensement: $COUNTRYNAME $CENSUSYEAR,
+        Montre la Table des Pages
+        <span class="right">
+	      <a href="PageFormHelpen.html" target="_blank">
+	        Help?
+	      </a>
+        </span>
+        <div style="clear: both;"></div>
+      </h1>
+	  <p class="warning">
+        La base de données ne sera pas mise à jour car vous n'êtes pas
+        connecté en tant qu'utilisateur autorisé à mettre à jour cette table.
+      </p>
+      $TRACE
+      $MSG
+      <div class="center" id="topBrowse">
+        <span class="left" id="topPrev">
+    	    <a href="PageForm.php$NPPREV">&lt;---</a>
+        </span>
+        <span class="right" id="topNext">
+	        <a href="PageForm.php$NPNEXT">---&gt;</a>
+        </span>
+          Recensement=$CENSUSID, Province=$PROVINCE, Dist $DISTID $DISTNAME,
+          Sous-Dist $SUBDISTID $SUBDISTNAME
+            <span id="topDiv">, Div $DIVISION</span>
+        <span style="clear: both;"></span>
+      </div>
+      <!--- Put out the response as a table -->
+      <form name="censusForm"
+	        action="PageUpdate.php" 
+	        method="post" 
+	        autocomplete="off" 
+	        enctype="multipart/form-data">
+        <!-- parameters identifying the division being editted -->
+        <input type="hidden" name="Recensement" id="Census" 
+            value="$CENSUSID">
+        <input type="hidden" name="Province" id="Province" 
+            value="$PROVINCE">
+        <input type="hidden" name="District" id="District" 
+            value="$DISTID">
+        <input type="hidden" name="SubDistrict" id="SubDistrict" 
+            value="$SUBDISTID">
+        <input type="hidden" name="Division" id="Division" 
+            value="$DIVISION">
+        <input type="hidden" name="Debug" id="Debug" 
+            value="$DEBUG">
+        <table id="dataTable" class="form fixed_header">
+		  <thead><!--- Put out the column headers -->
+			<tr>
+			  <th class="colhead">
+	            Page
+			  </th>
+			  <th class="colhead" style="width: 70px;">
+	            Compte
+			  </th>
+			  <th class="colhead">
+	            Transcripteur
+			  </th>
+			  <th class="colhead">
+	            Redacteur
+			  </th>
+			  <th class="colhead">
+	            Image URL
+			  </th>
+			  <th class="colhead">
+	            Voir
+			  </th>
+			</tr>
+          </thead>
+          <tbody>
+			<tr id="pageRow$page">
+			  <td>
+			    <input type="text" name="PT_Page$page"
+			    		id="PT_Page$page"
+			    		value="$page" readonly="readonly"
+			    		class="ina rightnc" size="3">
+			  </td>
+			  <td>
+			    <input type="text" name="PT_Population$page" 
+			    		id="PT_Population$page" 
+			    		value="$population" readonly="readonly" 
+			    		class="ina rightnc" size="3"
+                        style="width: 70px;">
+			  </td>
+			  <td>
+			    <input type="text" name="PT_Transcriber$page" 
+			    		id="PT_Transcriber$page" 
+			    		value="$transcriber" readonly="readonly" 
+			    		class="ina leftnc" size="10">
+			  </td>
+			  <td>
+			    <input type="text" name="PT_ProofReader$page" 
+			    		id="PT_ProofReader$page" 
+			    		value="$proofreader" readonly="readonly" 
+			    		class="ina leftnc" size="10">
+			  </td>
+			  <td>
+			    <input type="text" name="PT_Image$page" 
+			    		id="PT_Image$page" 
+			    		value="$image" readonly="readonly" 
+			    		class="ina leftnc" size="64">
+			  </td>
+			  <td>
+			    <button type="button" id="View$page">Voir</button>
+			  </td>
+			</tr>
+          </tbody>
+        </table>
+      </form>
+      <div class="center" id="botBrowse">
+        <span class="left" id="botPrev">
+	      <a href="$NPURI$NPPREV">&lt;---</a>
+        </span>
+        <span class="right" id="botNext">
+	      <a href="$NPURI$NPNEXT">---&gt;</a>
+        </span>
+          Recensement=$CENSUSID, Province=$PROVINCE, Dist $DISTID $DISTNAME,
+          Sous-Dist $SUBDISTID $SUBDISTNAME
+            <span id="botDiv">, Div $DIVISION</span>
+        <span style="clear: both;"></span>
+      </div>
+    </div> <!-- end of <div id="body"> -->
+    <!-- templates for dynamic HTML -->
+    <div class="hidden" id="templates">
+        <span id="censusUndefined">
+            Recensement='$CENSUSID' n'est pas défini.
+        </span>  
+        <span id="countryUndefined">
+            Code du pays '$CC' n'est pas défini.
+        </span>  
+        <span id="censusMissing">
+            Recensement identifier parameter is missing.
+        </span>
+        <span id="provinceUndefined">
+            Province '$PROVINCE' not supported for '$CENSUSID' census.
+        </span>  
+        <span id="provinceMissing">
+            Province parameter is missing for Recensement='$CENSUSID'.
+        </span>
+        <span id="districtUndefined">
+            District='$DISTID' is not defined.
+        </span>  
+        <span id="districtInvalid">
+            District identifier '$DISTID' is invalid.
+        </span>  
+        <span id="districtMissing">
+            District identifier parameter is missing.
+        </span>
+        <span id="subdistrictUndefined">
+            Sub-District='$SUBDISTID' is not defined for Recensement='$CENSUSID' District='$DISTID'.
+        </span>  
+        <span id="subdistrictMissing">
+            Sub-District identifier parameter is missing.
+        </span>
+      <!-- no matching names dialog -->
+      <form id="ChangeImageForm$sub">
+        <p class="label">Image URL Changed</p>
+        <p>Increment URLs for Pages Following 
+    	<input type="text" name="Page" value="$page"
+    		size="3" class="white rightnc"> by
+    	<input type="text" name="Increment" value="$increment"
+    		size="3" class="white rightnc">
+        <p>
+  	    <button type="button" id="incrementImage$sub">Increment</button>
+  	    <button type="button" id="closeDlg$sub">Close</button>
+        </p>
+      </form>
+    </div> <!-- id="templates" -->
+    <!-- The remainder of the page consists of context specific help text.
+    -->
+    <div class="balloon" id="HelpRecensement">
+      The census for which you wish to update the Recensement Page description table
+      is identified by selecting the year of the census from this list.
+    </div>
+    <div class="balloon" id="HelpProvince">
+      The province selection list is populated once you have selected a
+      particular census.  This is used to restrict the list of districts
+      displayed to those within the selected province.  For pre-confederation
+      censuses it is mandatory to select a province, because the census was
+      administered separately within each colony.
+    </div>
+    <div class="balloon" id="HelpDistrict">
+      The District selection list is populated once you have selected a
+      particular Recensement, and is modified if you select a province
+      within the Recensement.
+      Select one district.
+    </div>
+    <div class="balloon" id="HelpSubDistrict">
+      The Sub-District selection list is populated once you have selected a
+      particular district.
+    </div>
+    <div class="balloon" id="HelpDivision">
+      If the Sub-District is divided into multiple enumeration divisions, then
+      this selection list is presented to permit you to select the specific
+      division.
+    </div>
+    <div class="balloon" id="HelpPT_Page">
+      This field identifies the page number within the division. 
+      It is not editable.
+    </div>
+    <div class="balloon" id="HelpPT_Population">
+      This field contains the count of the number of individuals enumerated in
+      the image of the original.  For most pages it is the number of rows on
+      the original form.
+      This is a decimal number.
+    </div>
+    <div class="balloon" id="HelpPT_Image">
+      The Image field contains the URL of the original census image as
+      it is available from the Library and Archives of Canada web-site.
+      If you change just the last numeric part of the image, then a dialog
+      pops up to ask if you wish the URLs of the following pages to be
+      adjusted by the same increment you applied to the current image.
+    </div>
+    <div class="balloon" id="HelpPT_Transcriber">
+      The transcriber field contains the user identifier of the individual 
+      responsible for transcribing this page.  It is set to the first user
+      to edit the page.  Once set the page is edittable only by that user,
+      all other users, including the proofreader, can only comment on the 
+      transcription.
+    </div>
+    <div class="balloon" id="HelpPT_ProofReader">
+      The proofreader field contains the user identifier of the individual 
+      responsible for proofreading this page.
+    </div>
+    <div class="balloon" id="HelpView">
+      Click on this button to view the image file identified in the preceding
+      field in a new window.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+      Click on this button to apply the changes to the page table database.
+      alternatively you may use the keyboard shortcut Alt-U.
+    </div>
+    <script src= '/jscripts/CommonForm.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= '/database/PageForm.js' type="text/javascript">
+    </script>

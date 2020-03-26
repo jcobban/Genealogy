@@ -39,8 +39,9 @@ use \Exception;
  *		2017/08/16		script legacyIndivid.php renamed to Person.php	*
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/12/13      remove B_ prefix from file names                *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . '/Birth.inc';
@@ -96,8 +97,7 @@ if (count($_GET) > 0)
 	    {		    // act on specific parameter
 			case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
                 break;
             }
 

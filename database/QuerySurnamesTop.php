@@ -33,6 +33,7 @@ use \Templating\Template;
  *		2018/11/11      use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -110,8 +111,7 @@ foreach ($_GET as $key => $value)
 
 	    case 'lang':
 	    {		        // language selection
-			if (strlen($value) >= 2)
-			    $lang	= strtolower(substr($value,0,2));
+	            $lang               = FtTemplate::validateLang($value);
 			break;
 	    }		        // language selection
 

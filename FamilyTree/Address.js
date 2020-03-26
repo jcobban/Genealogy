@@ -104,7 +104,7 @@ function onLoad()
     // including support for context specific help
     var formElts	= form.elements;
     for (var i = 0; i < formElts.length; ++i)
-    {
+    {		        // loop through all elements in the form
 		var element	= formElts[i];
 
 		var	name;
@@ -114,7 +114,7 @@ function onLoad()
 		    name	= element.id;
 
 		switch(name)
-		{		// act on field name
+		{		    // act on field name
 		    case 'AddrName':
 		    {
 				element.onkeydown	= keyDown;
@@ -174,8 +174,10 @@ function onLoad()
 				element.onkeydown	= keyDown;
 				element.onchange	= change;
 		    }		// all other fields
-		}		// act on field name
-    }		// loop through all elements in the form
+		}		    // act on field name
+    }		        // loop through all elements in the form
+
+    hideRightColumn();
 }		// function onLoad
 
 /************************************************************************

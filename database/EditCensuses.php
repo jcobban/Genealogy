@@ -14,24 +14,26 @@ use \Exception;
  *		2019/02/19      use new FtTemplate constructor                  *
  *		                add support for multiple countries              *
  *		                Delete requested by name='Delete'               *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/CensusSet.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-$lang		    = 'en';
-$cc		        = 'CA';
-$offset         = 0;
-$limit          = 20;
-$getParms		= array();			// all Censuses
+$lang		    		= 'en';
+$cc		        		= 'CA';
+$offset         		= 0;
+$limit          		= 20;
+$getParms				= array();			// default all Censuses
 
 if (isset($_GET) && count($_GET) > 0)
 {			// method=get invoked from URL
-    $census		= null;
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+    $census				= null;
+    $parmsText  		= "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
@@ -44,26 +46,25 @@ if (isset($_GET) && count($_GET) > 0)
             case 'cc':
             {
                 if (strlen($value) >= 2)
-				    $cc		    = strtoupper(substr($value,0,2));
+				    $cc		    		= strtoupper(substr($value,0,2));
 				break;
             }   // country code
 
 		    case 'lang':
             {
-                if (strlen($value) >= 2)
-				    $lang		= strtolower(substr($value,0,2));
+	            $lang                   = FtTemplate::validateLang($value);
 				break;
             }   // language code
 
             case 'offset':
             {
-                $offset         = $value;
+                $offset         		= $value;
                 break;
             }
 
             case 'limit':
             {
-                $limit         = $value;
+                $limit         		    = $value;
                 break;
             }
 		}	    // act on parameter name
@@ -75,21 +76,21 @@ if (isset($_GET) && count($_GET) > 0)
 else
 if (isset($_POST) && count($_POST) > 0)
 {			    // method=post, update
-    $census		= null;
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $census				= null;
+    $parmsText  		= "<p class='label'>\$_POST</p>\n" .
+		                  "<table class='summary'>\n" .
+		                  "<tr><th class='colhead'>key</th>" .
+		                      "<th class='colhead'>value</th></tr>\n";
     foreach ($_POST as $name => $value)
     {		// loop through parameters
-        $parmsText  .= "<tr><th class='detlabel'>$name</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+        $parmsText      .= "<tr><th class='detlabel'>$name</th>" .
+                            "<td class='white left'>$value</td></tr>\n"; 
         if (preg_match("/^([a-zA-Z_]+)(\d*)$/",
     				   $name,
     				   $matches) == 1)
-            $column		    = strtolower($matches[1]);
+            $column		    		= strtolower($matches[1]);
         else
-            $column         = strtolower($name);
+            $column         		= strtolower($name);
 		switch($column)
 		{	    // act on column name
 		    case 'censusid':
@@ -105,7 +106,7 @@ if (isset($_POST) && count($_POST) > 0)
 				    $census		= new Census(array('censusid'   => $value,
                                                    'create'     => true));
                 else
-                    $census     = null;
+                    $census     		= null;
 				break;
 		    }
 
@@ -122,9 +123,9 @@ if (isset($_POST) && count($_POST) > 0)
 		    case 'collective':
 		    {
 				if (strtoupper($value) == 'Y')
-				    $value	= 1;
+				    $value			= 1;
 				else
-				    $value	= 0;
+				    $value	        = 0;
 				$census->set('collective', $value);
 				break;
 		    }
@@ -148,26 +149,25 @@ if (isset($_POST) && count($_POST) > 0)
             case 'cc':
             {
                 if (strlen($value) >= 2)
-				    $cc		    = strtoupper(substr($value,0,2));
+				    $cc		            = strtoupper(substr($value,0,2));
 				break;
             }   // country code
 
 		    case 'lang':
 		    {
-                if (strlen($value) >= 2)
-				    $lang		= strtolower(substr($value,0,2));
+	            $lang                   = FtTemplate::validateLang($value);
 				break;
 		    }
 
             case 'offset':
             {
-                $offset         = $value;
+                $offset                 = $value;
                 break;
             }
 
             case 'limit':
             {
-                $limit         = $value;
+                $limit                  = $value;
                 break;
             }
 		}	    // act on column name
@@ -177,21 +177,21 @@ if (isset($_POST) && count($_POST) > 0)
 }			    // update
 
 // create the template
-$update		    = canUser('admin');
+$update		    			= canUser('admin');
 if ($update)
-    $action		= 'Update';
+    $action					= 'Update';
 else
-    $action		= 'Display';
-$template	    = new FtTemplate("EditCensuses$action$lang.html");
+    $action					= 'Display';
+$template	    			= new FtTemplate("EditCensuses$action$lang.html");
 
 // get the censuses in the correct order
-$getParms       = array('cc'        => $cc,
-                        'offset'    => $offset,
-                        'limit'     => $limit);
-$censuses		= new CensusSet($getParms);
-$info           = $censuses->getInformation();
-$total          = $info['count'];
-$count          = $censuses->count();
+$getParms       			= array('cc'        => $cc,
+                                    'offset'    => $offset,
+                                    'limit'     => $limit);
+$censuses					= new CensusSet($getParms);
+$info           			= $censuses->getInformation();
+$total          			= $info['count'];
+$count          			= $censuses->count();
 $template->set('OFFSET',    $offset);
 $template->set('LIMIT',     $limit);
 $template->set('TOTAL',     $total);

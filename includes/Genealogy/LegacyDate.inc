@@ -114,8 +114,9 @@ use \Iterator;
  *		                are legal                                       *
  *		                use smarter check for external string date      *
  *		                parameter to constructor                        *
+ *		2020/03/12      add support for american dates                  *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 class WorkingDate
@@ -231,7 +232,7 @@ class LegacyDate
      *	tokens as a string.                                             *
      ********************************************************************/
 
-    private	$state		= "doFirstToken";
+    private	$state		        = "doFirstToken";
 
     /********************************************************************
      *  LegacyDate::$debug												*
@@ -363,51 +364,12 @@ class LegacyDate
      ********************************************************************/
     public static function setTemplate($newfmt)
     {
-    	$oldfmt			= self::$template;
+        global  $warn;
+
+    	$oldfmt			    = self::$template;
     	self::$template		= $newfmt;
     	return $oldfmt;
     }		// function LegacyDate::setTemplate
-
-    /********************************************************************
-     *	LegacyDate::$monTab												*
-     *																	*
-     *  Translate English month names and abbreviations to indices on	*
-     *  input. 															*
-     ********************************************************************/
-
-    private static	$monTab	= array(
-    			'Jan'				=> 1,
-    			'Jany'				=> 1,
-    			'January'			=> 1,
-    			'Feb'				=> 2,
-    			'Feby'				=> 2,
-    			'February'			=> 2,
-    			'Mar'				=> 3,
-    			'March'				=> 3,
-    			'Apr'				=> 4,
-    			'Aprl'				=> 4,
-    			'April'				=> 4,
-    			'May'				=> 5,
-    			'Jun' 				=> 6,
-    			'June' 				=> 6,
-    			'Jul'				=> 7,
-    			'July'				=> 7,
-    			'Aug'				=> 8,
-    			'Augt'				=> 8,
-    			'August'			=> 8,
-    			'Sep'				=> 9,
-    			'Sept'				=> 9,
-    			'September'			=> 9,
-    			'Oct'				=> 10,
-    			'Octr'				=> 10,
-    			'October'			=> 10,
-    			'Nov'				=> 11,
-    			'Novr'				=> 11,
-    			'November'			=> 11,
-    			'Dec'				=> 12,
-    			'Decr'				=> 12,
-    			'December'			=> 12
-    			);
 
     /********************************************************************
      *	LegacyDate::$pfxTab												*
@@ -559,7 +521,7 @@ class LegacyDate
             $internal       = strpos('?abcdefghijklmnopqrstuv', $value) !== false;
         else
         if ($len >= 11) 
-            $internal       = strpos(':ghFTMstb<[?', substr($value, 0, 1) !== false; 
+            $internal       = strpos(':ghFTMstb<[?', substr($value, 0, 1)) !== false; 
         if ($len >= 11 && ctype_digit(substr($value, 0, 1)))
             $internal       = strpos(substr($value,1,10), ' ') === false &&
                               strpos(substr($value,1,10), '/') === false;
@@ -654,11 +616,11 @@ class LegacyDate
     	    // if no tokens encountered empty date
     	    if (($this->prefix == '0') &&
     			($this->state == "doFirstToken"))
-    	    {		// still looking for first token
+    	    {		    // still looking for first token
     			$this->date	= '';
     			$this->sortdate	= -99999999;
     			return;
-    	    }		// still looking for first token
+    	    }		    // still looking for first token
 
     	    // if the parse encountered an invalid token
     	    // flag the date as invalid
@@ -673,11 +635,11 @@ class LegacyDate
     			($this->date2->day == 0) &&
     			($this->date2->month == 0) &&
     			($this->date2->year == 0))
-    	    {		// no part of the date interpreted
+    	    {		    // no part of the date interpreted
     			$this->date	= ':' . substr($value, 1);
     			$this->sortdate	= -99999999;
     			return;
-    	    }		// no part of the date interpreted
+    	    }		    // no part of the date interpreted
 
     	    // handle years <= 31
     	    if ($this->date1->year == 0 && 
@@ -697,7 +659,7 @@ class LegacyDate
     	    } 
 
     	    if (LegacyDate::$debug)
-    	    {		// emit XML for parts of date
+    	    {		    // emit XML for parts of date
     			print "<p>Prefix: {$this->prefix}</p>\n";
     			print "<p>Epoch: {$this->epoch}</p>\n";
     			print "<p>date1->epoch: {$this->date1->epoch}</p>\n";
@@ -708,7 +670,7 @@ class LegacyDate
     			print "<p>date2->day: {$this->date2->day}</p>\n";
     			print "<p>date2->month: {$this->date2->month}</p>\n";
     			print "<p>date2->year: {$this->date2->year}</p>\n";
-    	    }		// emit XML for parts of date
+    	    }		    // emit XML for parts of date
 
     	    // handle French republican calendar
     	    if ($this->date1->epoch == 'F')
@@ -718,9 +680,9 @@ class LegacyDate
 
     	    // validate order of dates in a range
     	    if ($this->date2->year > 0)
-    	    {		// range specified, validate order
+    	    {		    // range specified, validate order
     			if ($this->date1->epoch == '0' && $this->date2->epoch == '0')
-    			{	// AD-AD range
+    			{	    // AD-AD range
     			    if ($this->date2->year < $this->date1->year ||
     					($this->date2->year == $this->date1->year &&
     						($this->date2->month < $this->date1->month ||
@@ -731,10 +693,10 @@ class LegacyDate
     						"Second date before first date in range. ";
     					$this->prefix	= ':';
     			    }	// dates out of order
-    			}	// AD-AD range
+    			}	    // AD-AD range
     			else
     			if ($this->date1->epoch == '1' && $this->date2->epoch == '1')
-    			{	// BC-BC range
+    			{	    // BC-BC range
     			    if ($this->date2->year > $this->date1->year ||
     					($this->date2->year == $this->date1->year &&
     						($this->date2->month > $this->date1->month ||
@@ -745,15 +707,15 @@ class LegacyDate
     						"Second date before first date in range. ";
     					$this->prefix	= ':';
     			    }	// dates out of order
-    			}	// BC-BC range
+    			}	    // BC-BC range
     			else
     			if ($this->date1->epoch == '0' && $this->date2->epoch == '1')
-    			{	// AD-BC range
+    			{	    // AD-BC range
     			    $this->msg	.=	
     						"Second date before first date in range. ";
     					$this->prefix	= ':';
-    			}	// AD-BC range
-    	    }		// range specified, validate order
+    			}	    // AD-BC range
+    	    }		    // range specified, validate order
 
     	    // determine epoch indicator for result
     	    $this->epoch	= $this->date1->epoch;
@@ -789,9 +751,9 @@ class LegacyDate
     			$this->date	.= '\\' . substr($value, 1);
 
     	    if (LegacyDate::$debug)
-    	    {		// emit XML for parts of date
+    	    {		    // emit XML for parts of date
     			print "<date>{$this->date}</date>\n";
-    	    }		// emit XML for parts of date
+    	    }		    // emit XML for parts of date
 
     	    // calculate sort date based on first date of range
     	    if (($this->epoch == '0') || ($this->epoch == ' '))
@@ -829,10 +791,10 @@ class LegacyDate
     			$dayc		= $this->date1->day;
     	    }			// day specified
     	    $this->sortdate	= $yearc * 10000 + $monthc * 100 + $dayc;
-    	}			// external format date
+    	}			    // external format date
     	else
     	if (strlen($value) >= 10)
-    	{			// internal format date
+    	{			    // internal format date
     	    $this->date	= $value;
     	    if (is_int(strpos("0123458ghFb[?|", substr($this->date, 0, 1))) && 
     			(strlen($this->date) >= 10))
@@ -850,7 +812,7 @@ class LegacyDate
     			    $this->sortdate	= $yyyy * 10000 + $mm * 100 + $dd;
     			}		// AD date
     	    }			// date includes interpretation
-    	}			// internal format date
+    	}			    // internal format date
     }		// function LegacyDate::__construct
 
     /********************************************************************
@@ -3495,77 +3457,76 @@ class LegacyDate
     	$d2		        = '';		// accumulate second date
 
     	if ($prefix == ':')
-    	{		// date could not be fully interpreted
+    	{		                        // date could not be fully interpreted
     	    // return text just as entered
     	    if ((strlen($this->date) > 18) &&
     		    (substr($this->date, 18, 1) == '\\'))
     		    return substr($this->date, 19);
     	    return substr($this->date, 1);
-    	}		// date could not be fully interpreted
+    	}		                        // date could not be fully interpreted
     	else
     	if (strlen($this->date) >= 18)
-    	{		// starts with encoded date
-
+    	{		                        // starts with encoded date
     	    // format first date of range
-    	    $day	    = intval(substr($this->date, 2, 2));
-    	    $mon	    = intval(substr($this->date, 4, 2));
-    	    $year	    = intval(substr($this->date, 6, 4));
+    	    $day	                = intval(substr($this->date, 2, 2));
+    	    $mon	                = intval(substr($this->date, 4, 2));
+    	    $year	                = intval(substr($this->date, 6, 4));
 
     	    // Gregorian correction
-    	    $gcorr	    = floor($year/100) - floor($year/400) - 2;
-    	    $OSday	    = $day;
-    	    $OSmon	    = $mon;
-    	    $OSyear	    = $year;
+    	    $gcorr	                = floor($year/100) - floor($year/400) - 2;
+    	    $OSday	                = $day;
+    	    $OSmon	                = $mon;
+    	    $OSyear	                = $year;
     	    if ($day > 0 && $year >= 1582 && 
     		    (($bc == ' ') || ($bc == '0')))
-    	    {		// day of month specified
+    	    {		                    // day of month specified
     			if ($day <= $gcorr)
     			{
     			    if (($year % 4) == 0 && $mon == 3)
     				    $leapDay	= 1;
     			    else
     				    $leapDay	= 0;
-    			    $OSday	= $day + self::$monthLens[$mon - 1] +
-    						    $leapDay - $gcorr;
-    			    $OSmon	= $mon - 1;
+    			    $OSday	        = $day + self::$monthLens[$mon - 1] +
+    				        		    $leapDay - $gcorr;
+    			    $OSmon	        = $mon - 1;
     			    if ($OSmon < 1)
     			    {
-    				    $OSmon	+= 12;
-    				    $OSyear	= $year - 1;
+    				    $OSmon	    += 12;
+    				    $OSyear	    = $year - 1;
     			    }
     			}
     			else
     			{
-    			    $OSday	= $day - $gcorr;
+    			    $OSday	        = $day - $gcorr;
     			}
     			// in Old Style year begins on the Feast of the Annunciation,
     			// 25th March, which in England is called "Lady Day".
     			if ($OSmon < 3 || ($OSmon == 3 && $OSday < 25))
     			    $OSyear--;
-    	    }		// day of month specified
+    	    }		                    // day of month specified
 
             $pieces	                = explode('[', self::$template);
             $square                 = count($pieces) > 1;
             if (!$square)
-            {                   // no square brackets found
-                $pieces             = explode('$', self::template);
-            }                   // no square brackets found
+            {                           // no square brackets found
+                $pieces             = explode('$', self::$template);
+            }                           // no square brackets found
     		$d1		                .= $pieces[0];
             for($i = 1; $i < count($pieces); $i++)
-            {		            // loop through pieces of template
+            {		                    // loop through pieces of template
                 $piece              = $pieces[$i];
                 if ($square)
-                {               // square bracket substitutions
+                {                       // square bracket substitutions
                     $result         = preg_match('/^(\w*)]?(.*)/',
                                                  $piece,
                                                  $matches);
-                }               // square bracket substitutions
+                }                       // square bracket substitutions
                 else
-                {               // PERL style substitutions
+                {                       // PERL style substitutions
                     $result         = preg_match('/^(\w*|{\w*})(.*)/',
                                                  $piece,
                                                  $matches);
-                }               // PERL style substitutions
+                }                       // PERL style substitutions
                 $subname            = $matches[1];
                 if (substr($subname, 0, 1) == '{')
                     $subname        = substr($subname, 1, strlen($subname) - 2);
@@ -3575,7 +3536,11 @@ class LegacyDate
 					case 'dd':
 					{
 					    if ($day > 0)
-					    	$d1	.= $day;
+                            $d1	    .= $day;
+                        else
+                            if (strlen($rest) > 0 && 
+                                substr($rest, 0, 1) != ' ')
+                                $rest   = substr($rest, 1);
 					    break;
 					}	                // case 'dd'
 
@@ -3616,6 +3581,10 @@ class LegacyDate
 	
 							}	        // suffix depends upon value
 					    }	            // day present
+                        else
+                            if (strlen($rest) > 0 && 
+                                substr($rest, 0, 1) != ' ')
+                                $rest   = substr($rest, 1);
 					    break;
 					}	                // case 'ddord'
 
@@ -3623,8 +3592,12 @@ class LegacyDate
 					{	// Old style day after 1582
 					    if ($day > 0)
 					    {	// day of month specified
-						    $d1	.= $OSday;
+						    $d1	        .= $OSday;
 					    }	// day of month specified
+                        else
+                            if (strlen($rest) > 0 && 
+                                substr($rest, 0, 1) != ' ')
+                                $rest   = substr($rest, 1);
 					    break;
 					}	// case 'OSddd'
 
@@ -3665,17 +3638,17 @@ class LegacyDate
 					case 'OSMonth':
 					{
 					    if ($OSmon > 0 && $OSmon <= 13)
-						$d1	.= $trantab[self::$lmonths[$OSmon]];
+						    $d1	    .= $trantab[self::$lmonths[$OSmon]];
 					    else
 					    if ($OSmon > 12)
-						$d1	.= '??' . $OSmon . '??';
+						    $d1	    .= '??' . $OSmon . '??';
 					    break;
 					}	// case 'OSMonth'
 
 					case 'yyyy':
 					{
 					    if ($year != 0)
-						$d1	.= $year;
+						    $d1	    .= $year;
 					    break;
 					}	// case 'yyyy'
 
@@ -3683,7 +3656,7 @@ class LegacyDate
 					{
 					    if ($OSyear != 0)
 					    {
-						$d1	.= $OSyear . ' OS';
+						    $d1	    .= $OSyear . ' OS';
 					    }
 					    break;
 					}	// case 'OSyyyy'
@@ -3691,7 +3664,7 @@ class LegacyDate
 					case 'xxxx':
 					{
 					    if ($year != 0)
-						    $d1	.= integerToRoman($year);
+						    $d1	    .= integerToRoman($year);
 					    break;
 					}	// case 'xxxx'
 
@@ -3707,7 +3680,7 @@ class LegacyDate
 					{
 					    if ((strlen(trim($d1)) > 0) && 
 						    (($bc == ' ') || ($bc == '0')))
-						    $d1	.= $trantab['AD'];
+						    $d1	    .= $trantab['AD'];
 					    break;
 					}	// case 'AD'
 
@@ -3715,17 +3688,17 @@ class LegacyDate
 					{
 					    if ((strlen(trim($d1)) > 0) && 
 						    ($bc != ' ') && ($bc != '0'))
-						    $d1	.= $trantab['BCE'];
+						    $d1	    .= $trantab['BCE'];
 					    break;
-					}	// case 'BC'
+					}	// case 'BCE'
 
 					case 'CE':
 					{
 					    if ((strlen(trim($d1)) > 0) && 
 						    (($bc == ' ') || ($bc == '0')))
-						    $d1	.= $trantab['CE'];
+						    $d1	    .= $trantab['CE'];
 					    break;
-					}	// case 'AD'
+					}	// case 'CE'
 
 			    }		// switch on substitute id
 
@@ -3750,13 +3723,18 @@ class LegacyDate
     		    {	        	// loop through pieces of template
     				if ($sub)
     				{       	// piece starts with sub name
-    				    $elts	= explode(']', $piece);
+                        $elts	        = explode(']', $piece);
+                        $rest           = $elts[1];
     				    switch($elts[0])
     				    {		// substitute
     						case 'dd':
     						{
     						    if ($day > 0)
     						    	$d2	.= $day;
+		                        else
+		                            if (strlen($rest) > 0 && 
+		                                substr($rest, 0, 1) != ' ')
+		                                $rest   = substr($rest, 1);
     						    break;
     						}	// case 'ddd'
     		
@@ -3827,7 +3805,7 @@ class LegacyDate
     						}	// case 'CE'
     	
     				    }		// switch on substitute id
-    				    $d2		.= $elts[1];	// add in text
+    				    $d2		.= $rest;	// add in text
     				}	        // piece starts with sub name
     				else
     				{	        // first piece does not start with sub name

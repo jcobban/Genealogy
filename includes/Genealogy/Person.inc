@@ -547,8 +547,9 @@ use \Exception;
  *		                return count from save                          *
  *		2019/11/23      correct implementation of getPerson             *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/03/20      log more information on failed insert           *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -1379,7 +1380,7 @@ class Person extends RecordPic
      *	Get the primary name record for this Person.                    *
      *																	*
      *	Returns:														*
-     *	    instance of Name of null                                    *
+     *	    instance of Name or null                                    *
      ********************************************************************/
     function getPriName()
     {
@@ -1463,9 +1464,9 @@ class Person extends RecordPic
      *	Validate and change the value of gender for this individual.	*
      *																	*
      *  Input:															*
-     *	    $value		Person::MALE        or 'M'						*
-     *	                Person::FEMALE		or 'F'					    *
-     *	                Person::UNKNOWN		or '?'					    *
+     *	    $value		Person::MALE        or 'M' or 'MALE'			*
+     *	                Person::FEMALE		or 'F' or 'FEMALE'		    *
+     *	                Person::UNKNOWN		or '?' or 'UNKNOWN'		    *
      *																	*
      *	Returns:														*
      *	    old value of gender for this individual.					*
@@ -1478,22 +1479,25 @@ class Person extends RecordPic
         if (is_string($value) && ctype_digit($value))
             $value	= intval($value);
         if (is_int($value) &&
-                $value >= Person::MALE &&
-                $value <= Person::UNKNOWN)
+            $value >= Person::MALE &&
+            $value <= Person::UNKNOWN)
         {
             return parent::set('gender', $value);
         }
         else
-        if (strtoupper($value) == 'M' || strtoupper($value) == 'MALE')
-            return parent::set('gender', Person::MALE);
-        else
-        if (strtoupper($value) == 'F' || strtoupper($value) == 'FEMALE')
-            return parent::set('gender', Person::FEMALE);
-        else
-        if (strtoupper($value) == '?' || strtoupper($value) == 'UNKNOWN')
-            return parent::set('gender', Person::UNKNOWN);
-        else
-            $warn	.= "<p>Person::setGender: " . __LINE__ .
+        if (is_string($value))
+        {
+            $value              = strtoupper($value);
+	        if ($value == 'M' || $value == 'MALE')
+	            return parent::set('gender', Person::MALE);
+	        else
+	        if ($value == 'F' || $value == 'FEMALE')
+	            return parent::set('gender', Person::FEMALE);
+	        if ($value == '?' || $value == 'UNKNOWN')
+                return parent::set('gender', Person::UNKNOWN);
+        }
+        
+        $warn	.= "<p>Person::setGender: " . __LINE__ .
                         " invalid value '$value' for field 'gender'</p>\n";
     }		//Person::setGender
 
@@ -2546,10 +2550,13 @@ class Person extends RecordPic
                 $this->save(false);
             }                   // correct bad sort date in Person
             $chrisEvent         = $this->chrisEvent;
-            $chrissd            = $chrisEvent['eventsd'];
-            if ($birthsd > $chrissd)
+            if ($chrisEvent)
             {
-                $event->adjustSortDate($chrissd - 1);
+	            $chrissd            = $chrisEvent['eventsd'];
+	            if ($birthsd > $chrissd)
+	            {
+	                $event->adjustSortDate($chrissd - 1);
+	            }
             }
             $event['idir']      = $this->row['idir'];
         }                       // have existing event
@@ -4442,7 +4449,7 @@ class Person extends RecordPic
         global	$familyTreeCookie;
 
         $retval                 = 0;
-        if ($debug)
+        if ($debug && canUser('all'))
         {
             $backtrace          = debug_backtrace();
             foreach($backtrace as $call)
@@ -4464,6 +4471,12 @@ class Person extends RecordPic
                 exit;
             }
         }
+
+        // records with given name starting with 'Lost Record '
+        // are created only to satisfy IDIR values and should
+        // not be written into the database
+        if (substr($this->row['givenname'], 0, 12) == 'Lost Record ')
+            return 0;
 
         // get current date and time for added and updated fields in record
         // in expected internal format (not SQL date/time)
@@ -4518,10 +4531,16 @@ class Person extends RecordPic
         if ($this->needInsert)
         {			    // create new record
             $fldnames		            = '';
-            $values		                = 'COALESCE(MAX(IDIR), 0) + 1' .
-                                            ', :added, :addedtime' .
-                                            ', :updated, :updatedtime';
             $sqlParms		            = array();
+            if ($this['idir'] == 0)
+                $values		            = 'COALESCE(MAX(IDIR), 0) + 1';
+            else
+            {
+                $values                 = ':idir';
+                $sqlParms['idir']       = $this['idir'];
+            }
+            $values                     .= ', :added, :addedtime' .
+                                            ', :updated, :updatedtime';
             $sqlParms['added']		    = $today;
             $sqlParms['addedtime']	    = $currtime;
             $sqlParms['updated']	    = $today;
@@ -4640,6 +4659,11 @@ class Person extends RecordPic
                 }		        // success
                 else
                 {		        // error performing query
+                    print "<p>Person::save: '$queryText'</p>\n";
+                    if (strlen($query_text) > 100)
+                        $query_text     = substr($query_text, 0, 50) .
+                                          '...' .
+                                          substr($query_text, -47);
                     throw new Exception("Person::save: '$queryText', " .
                                         print_r($stmt->errorInfo(),true));
                 }		        // error performing query
@@ -4665,6 +4689,14 @@ class Person extends RecordPic
                     else
                         $priName->save(false);
                     $cmd                        = $priName->getLastSqlCmd();
+                    if (strlen($cmd) > 500)
+                    {
+                        $len            = strlen($cmd);
+                        $first          = substr($cmd, 0, 100);
+                        $last           = substr($cmd, -100);
+                        $sep            = '...' . ($len - 200) . '...';
+                        $cmd            = "$first$sep$last";
+                    }
                     if (strlen($cmd) > 0)
                         $this->lastSqlCmd       .= ";$cmd";
                 }               // have a valid record
@@ -4672,16 +4704,24 @@ class Person extends RecordPic
             else
             {			        // error inserting record
                 $errorInfo	=  print_r($stmt->errorInfo(),true);
-                $warn	.= "<p>Person::save: " . __LINE__ .
+                if ($stmt->errorInfo()[0] == '23000')
+                {               // fixup
+                    parent::save($xml);
+                }               // fixup
+                else
+                {
+                    print "<p>Person::save: " . __LINE__ .
                                 " insert='$insertText'," .
                                 " errorInfo=$errorInfo<p>\n";
-                error_log("Person.inc: " . __LINE__ .
+                    error_log("Person.inc: " . __LINE__ .
                                 " insert='$insertText', " .
                                 "errorInfo=$errorInfo\n");
-                if (strlen($insert) > 43)
-                    $insert	= substr($insert, 0, 40) . '...';
-                throw new Exception("Person::save:
-                                    '$insertText', " .  $errorInfo);
+                    error_log('Person::save: ' . __LINE__ . " $insertText\n");
+                    if (strlen($insertText) > 43)
+                        $insertText	= substr($insertText, 0, 40) . '...';
+                    throw new Exception("Person::save:
+                        '$insertText', " .  $errorInfo);
+                }
             }			        // error inserting record
 
         }			            // create new record

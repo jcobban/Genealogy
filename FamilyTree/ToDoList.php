@@ -17,7 +17,7 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2017/09/13		class BlogList replaced by Blog::getBlogs		*
  *		2017/10/16		Blog::getBlogs replaced by RecordSet			*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/

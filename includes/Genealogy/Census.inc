@@ -68,8 +68,9 @@ use \Iterator;
  *		2019/04/18      support method getLastSqlCmd                    *
  *		2019/05/18      add $info                                       *
  *		2019/11/28      expand information put into new entry           *
- *		2018/12/-5      do not report SQL error from getStats if        *
+ *		2019/12/05      do not report SQL error from getStats if        *
  *		                Census is not defined in table                  *
+ *		2020/03/08      add method getDomains                           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -152,9 +153,17 @@ class Census extends Record
      *	Census::$domain        											*
      *																	*
      *	This is a reference to the instance of Domain that this         *
-     *	Census enumerates.                                              *
+     *	Census enumerates if it only covers a single Domain.            *
      ********************************************************************/
     protected $domain		            = null;
+
+    /********************************************************************
+     *	Census::$domains        										*
+     *																	*
+     *	This is an array of the instances of Domain that this           *
+     *	Census enumerates.                                              *
+     ********************************************************************/
+    protected $domains		            = null;
 
     /********************************************************************
      *	function Census::__construct									*
@@ -415,7 +424,7 @@ class Census extends Record
      *	                                                                *
      *	Returns:                                                        *
      *	    null if this is a national census, otherwise an instance    *
-     *      of class Domain.                                            &
+     *      of class Domain.                                            *
      ********************************************************************/
     function getDomain()
     {
@@ -428,6 +437,45 @@ class Census extends Record
         $this->domain       = new Domain(array('code' => "$cc$province"));
         return $this->domain;
     }       // function Census::getDomain
+
+    /********************************************************************
+     *	function::Census:getDomains										*
+     *																	*
+     *	Factory method to obtain an array of instances of class Domain  *
+     *	this Census covers.				                                *
+     *	                                                                *
+     *	Input:                                                          *
+     *	    $lang       language for domain names                       *
+     *	                                                                *
+     *	Returns:                                                        *
+     *	    null if this is a sub-national census, otherwise an         *
+     *      array of instances of class Domain.                         *
+     ********************************************************************/
+    function getDomains($lang = 'en')
+    {
+        global  $warn;
+
+        if ($this->domains)
+            return $this->domains;
+
+        $province           = $this['province'];
+        if (is_string($province) && strlen($province) > 0)
+            return null;        // census of single domain
+        $cc                 = $this['countrycode'];
+        $provinces          = $this['provinces'];
+        if ($cc == 'CA' || $cc == 'US')
+            $provinces      = str_split($provinces, 2);
+        else
+            $provinces      = str_split($provinces, 3);
+
+        $domainParm         = array();
+        foreach($provinces as $code)
+            $domainParm[]   = $cc . $code;
+        $this->domains      = new DomainSet(array('domain'  => $domainParm,
+                                                  'cc'      => $cc,
+                                                  'lang'    => $lang));
+        return $this->domains;
+    }       // function Census::getDomains
 
     /********************************************************************
      *	function::Census:get											*
@@ -541,13 +589,18 @@ class Census extends Record
 		global	$warn;
 		global	$connection;
 
-        if (!$this->isExisting())
+        $table		        = $this->get('table');
+        $query              = "SELECT 1 FROM $table LIMIT 1";
+        if ($connection->query($query))
+            $badTable       = false;
+        else
+            $badTable       = true;
+        if (!$this->isExisting() || $badTable)
 		    return array('total'	=> 0,
 						 'pop'		=> 1);	// avoid zero divide
 
-		$table		= $this->get('table');
-		$censusId	= $this->get('censusid');
-        $query  	= "SELECT Count(*) AS Total, ";
+        $censusId	        = $this->get('censusid');
+        $query  	        = "SELECT Count(*) AS Total, ";
 		if ($this->get('collective'))
 		{
 		    $query		    .= "(SELECT SUM(D_Population) FROM Districts ";
@@ -641,4 +694,144 @@ class Census extends Record
 						    ", name='" . $this->row['name'] .
 						    "'}";
     }		//	function Census::__toString
+
+    /********************************************************************
+     *  function Census::save											*
+     *																	*
+     *  Save changes made to the Census record into the					*
+     *  database.														*
+     *																	*
+     *  Parameters:														*
+     *	    $xml		if true diagnostic output is emitted in XML		*
+     *					if a string use it as tag name					*
+     *																	*
+     *	Returns:														*
+     *	    false		if the method was unable to update the database	*
+     *	    1			if the method updated the database record		*
+     *	    0			if the database did not need to be updated		*
+     *																	*
+     *  Throws:															*
+     *	    Exception if user is not authorized to update the database	*
+     ********************************************************************/
+    function save($xml)
+    {
+        if (count($this->changed) > 0)
+        {                   // update
+            foreach($this->changed as $fieldname => $value)
+            {
+                switch($fieldname)
+                {
+                    case 'collective':
+                        if (is_string($value) && strlen($value) == 0)
+                            $this->changed['collective']    = 0;
+                        break;
+                }
+            }
+        }                   // update
+        else
+        {                   // insert
+            foreach($this->row as $fieldname => $value)
+            {
+                switch($fieldname)
+                {
+                    case 'collective':
+                        if (is_string($value) && strlen($value) == 0)
+                            $this->changed['collective']    = 0;
+                        break;
+                }
+            }
+        }                   // insert
+
+		// invoke parent's implementation
+		return parent::save($xml);
+    }		// function Census::save
+
+    /********************************************************************
+     *	function Census::toJson											*
+     *																	*
+     *  Construct and optionally print a JSON representation of the		*
+     *	record.															*
+     *																	*
+     *	Parameters:														*
+     *	    $print		if true print the output, else just return it	*
+     *	    $options	flags to indicate which information to include	*
+     *					(available to derived classes)					*
+     *																	*
+     *	Returns:														*
+     *	    JSON representation of the object as a string				*
+     ********************************************************************/
+    function toJson($print = true,
+				    $options = 0)
+    {
+        global	$debug;
+
+        $lang                   = 'en';
+
+        if (is_array($print))
+        {		        // additional parameters to include
+            $parms              = $print;
+            $print		        = true;
+            foreach($parms as $field => $value)
+            {
+                switch(strtolower($field))
+                {
+                    case 'print':
+                        $print	    = $value;
+                        break;
+
+                    case 'lang':
+                        $lang	    = $value;
+                        break;
+
+                }
+            }
+        }
+
+		$retval		            = '';
+		$comma		            = "{\n";
+		foreach($this->row as $key => $value)
+		{
+		    if (substr($key, 1, 1) == '_')
+				$key		    = substr($key, 2);
+		    else
+		    if (substr($key, 2, 1) == '_')
+				$key		    = substr($key, 3);
+		    if (is_numeric($value))
+		    {
+				if ((strlen($value) == 1 || substr($value, 0, 1) != '0'))
+				    $retval		.= "$comma\t\"$key\":\t$value";
+				else
+				{		// handle values with leading 0
+				    $retval		.= "$comma\t\"$key\":\t\"$value\"";
+				}		// handle values with leading 0
+		    }
+		    else
+		    {
+				$retval		    .= "$comma\t\"$key\":\t" .
+					    		   json_encode($value);
+		    }
+		    $comma		        = ",\n";
+        }
+
+        $domains                = $this->getDomains($lang);
+        if ($domains)
+        {                   // subdomains of census
+            $retval             .= $comma . "\t\"domains\":\t{\n";
+            $comma              = '';
+            foreach($domains as $code => $domain)
+            {
+                $retval         .= "$comma\t\t\"$code\":\t" .
+                                    json_encode($domain['name']);
+                $comma          = ",\n";
+            }
+		    $retval		        .= "\n}\n";
+        }                   // subdomains of census
+
+		if (strlen($retval) > 0)
+		    $retval		        .= "\n}\n";
+		if ($print)
+		    print $retval;
+		return $retval;
+    }		// function Census::toJson
+
 }		// class Census 

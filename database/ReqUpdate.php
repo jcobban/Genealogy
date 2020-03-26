@@ -37,8 +37,9 @@ use \Exception;
  *		2017/09/05		use Country and Domain objects to get			*
  *						information about country and province			*
  *		2017/09/12		use get( and set(								*
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Census.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -77,8 +78,7 @@ if (count($_GET) > 0)
 
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value,0,2));
+	            $lang               = FtTemplate::validateLang($value);
                 break;
             }
 

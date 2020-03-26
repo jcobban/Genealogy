@@ -137,8 +137,10 @@ use \Exception;
  *		2019/02/21      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
  *		2019/12/13      remove B_ prefix from field names               *
+ *		2020/02/23      get error message texts from template           *
+ *		                fix undefined variables                         *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/County.inc';
@@ -156,155 +158,200 @@ require_once __NAMESPACE__ . '/common.inc';
 // set up based upon the user's level of authorization
 if (canUser('edit'))
 {		// user is authorized to edit the database
-	$update	    	= true;
-	$action		    = 'Update';
+	$update	    				= true;
+	$action		    			= 'Update';
 }		// user is authorized to edit the database
 else
 {		// user can only view the contents
-	$update		    = false;
-	$action		    = 'Display';
+	$update		    			= false;
+	$action		    			= 'Display';
 }		// user can only view the contents
 
-//	data base column name prefix
-$dbprefix       	= "";
-
 // validate parameters
-$regYear		    = '';
-$regNum		        = '';
-$volume				= '';
-$page				= '';
-$item				= '';
-$domain				= 'CAON';	// default domain
-$cc					= 'CA';
-$code				= 'ON';
-$countryName		= 'Canada';
-$domainName			= 'Ontario';
-$regCounty			= '';
-$countyName			= '';
-$regTownship		= '';
-$lang       		= 'en';
-$indiv		    	= null;
-$imatches			= null;
+$regYear		    			= '';
+$regYearText		    		= '';
+$regNum		        			= '';
+$regNumText	        			= '';
+$volume							= '';
+$volumeText						= '';
+$page							= '';
+$pageText						= '';
+$item							= '';
+$itemText						= '';
+$surname						= '';
+$givennames						= '';
+$sex							= '';
+$birthdate						= '';
+$idir							= '';
+$regCounty						= '';
+$domain							= 'CAON';	// default domain
+$cc								= 'CA';
+$code							= 'ON';
+$countryName					= 'Canada';
+$domainName						= 'Ontario';
+$regCounty						= '';
+$countyName						= '';
+$regTownship					= '';
+$lang       					= 'en';
+$birth		    				= null;
+$indiv		    				= null;
+$imatches						= null;
 
-foreach($_GET as $key => $value)
-{			// loop through all input parameters
-	switch(strtolower($key))
-	{		// process specific named parameters
-	    case 'regyear':
-	    {
-			$regYear	= $value;
-			break;
-	    }		// RegYear passed
-
-	    case 'regnum':
-	    {
-			$regNum 	= $value - 0;
-			if (preg_match("/^([0-9]{2,7})$/", $regNum) == 0)
-			{
-			    $msg	.= "Registration Number $regNum must be a number. ";
-			}
-			break;
-	    }		// RegNum passed
-
-	    case 'originalvolume':
-	    {
-			$volume		= $value;
-			$numVolume	= preg_replace('/[^0-9]/', '', $value);
-			break;
-	    }		// RegNum passed
-
-	    case 'originalpage':
-	    {
-			if (ctype_digit($value))
-			    $page   	= $value;
-			else
-			    $msg	    .= "Page Number $value must be a number. ";
-			break;
-	    }		// RegNum passed
-
-	    case 'originalitem':
-	    {
-			if (ctype_digit($value))
-			    $item	= $value;
-			else
-			    $msg	.= "Item Number $value must be a number. ";
-			break;
-	    }		// RegNum passed
-
-	    case 'regdomain':
-	    {
-			$domain		     = $value;
-			$domainObj	        = new Domain(array('domain'	    => $domain,
-							                       'language'	=> 'en'));
-			if ($domainObj->isExisting())
-			{
-			    $cc		    	= substr($domain, 0, 2);
-			    $code		    = substr($domain, 2, 2);
-			    $countryObj		= new Country(array('code' => $cc));
-			    $countryName	= $countryObj->getName();
-			    $domainName		= $domainObj->get('name');
-			}
-			else
-			    $domainName		= "Unknown Domain '$domain'";
-			break;
-	    }		// RegDomain
-
-	    case 'showimage':
-	    {
-			break;
-	    }		// handled by JavaScript
-
-	    case 'debug':
-	    {
-			break;
-	    }		// debug set by common code
-
-        case 'lang':
-        {
-            $lang           = FtTemplate::validateLang($value);
-			break;
-        }
-
-	    default:
-	    {
-			$warn	.= "Unexpected parameter $key='$value'. ";
-			break;
-	    }		// any other paramters
-	}		    // process specific named parameters
-}			    // loop through all input parameters
+if (isset($_GET) && count($_GET) > 0)
+{	        	    // invoked by URL to display current status of account
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+			                   "<table class='summary'>\n" .
+			                      "<tr><th class='colhead'>key</th>" .
+			                        "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {			// loop through all input parameters
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>$value</td></tr>\n";
+	    $value                      = trim($value);
+		switch(strtolower($key))
+		{		// process specific named parameters
+		    case 'regyear':
+	        {
+	            if (ctype_digit($value))
+				    $regYear	    = $value;
+	            else
+	                $regYearText    = $value;
+				break;
+		    }		// RegYear passed
+	
+		    case 'regnum':
+	        {
+	            if (ctype_digit($value))
+	                $regNum 	    = $value - 0;
+	            else
+	                $regNumText     = $value;
+				break;
+		    }		// RegNum passed
+	
+		    case 'originalvolume':
+		    {
+				$volume		        = $value;
+				$numVolume	        = preg_replace('/[^0-9]/', '', $value);
+				break;
+		    }		// RegNum passed
+	
+		    case 'originalpage':
+		    {
+				$page   	        = $value;
+				break;
+		    }		// RegNum passed
+	
+		    case 'originalitem':
+		    {
+				if (ctype_digit($value))
+				    $item	        = $value;
+	            else
+	                $itemText       = $value;
+				break;
+		    }		// RegNum passed
+	
+		    case 'regdomain':
+		    {
+				$domain		        = $value;
+				break;
+		    }		// RegDomain
+	
+		    case 'showimage':
+		    {
+				break;
+		    }		// handled by JavaScript
+	
+		    case 'debug':
+		    {
+				break;
+		    }		// debug set by common code
+	
+	        case 'lang':
+	        {
+	            $lang           = FtTemplate::validateLang($value);
+				break;
+	        }
+	
+		    default:
+		    {
+				$warn	.= "Unexpected parameter $key='$value'. ";
+				break;
+		    }		// any other paramters
+		}		    // process specific named parameters
+	}			    // loop through all input parameters
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}	        	    // invoked by URL to display form
 
 // start the template
-$template		= new FtTemplate("BirthRegDetail$action$lang.html");
+$template		        = new FtTemplate("BirthRegDetail$action$lang.html");
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => 'BirthRegDetail'));
-$trtemplate         = $template->getTranslate();
+$trtemplate             = $template->getTranslate();
+$t                      = $trtemplate['tranTab'];
 
 // validate parameters
-if ($regYear == '')
+if (strlen($regYearText) > 0)
 {
-	$msg		.= "RegYear omitted. ";
+    $text               = $template['invalidRegYear']->innerHTML;
+    $msg                .= str_replace('$value', $regYearText, $text);
 }
 else
-if (preg_match("/^([0-9]{4})$/", $regYear) == 0 ||
-    ($regYear < 1860) || ($regYear > 2020))
+if ($regYear == '')
 {
-    $msg	.= "Registration Year $regYear must be a number between 1860 and 2020. ";
+	$msg		        .= $template['omittedRegYear']->innerHTML;
+}
+else
+if (($regYear < 1860) || ($regYear > 2020))
+{
+    $text               = $template['rangeRegYear']->innerHTML;
+    $msg                .= str_replace('$value', $regYear, $text);
 }
 
+$paddedRegNum	        = '';
+if (strlen($regNumText) > 0)
+{
+    $text               = $template['invalidRegNum']->innerHTML;
+    $msg                .= str_replace('$value', $regNumText, $text);
+}
+else
 if ($regNum == '' && $volume == '')
 {
-	$msg		.= "RegNum omitted. ";
+	$msg		        .= $template['omittedRegNum']->innerHTML;
 }
 else
 if ($volume != '' && $page != '' && $item != '')
 {
-	$regNum		= $numVolume .
-				  str_pad($page, 3, '0', STR_PAD_LEFT) .
-				  str_pad($item, 2, '0', STR_PAD_LEFT);
-    $paddedRegNum	= str_pad($regNum,7,"0",STR_PAD_LEFT);
+	$regNum		        = $numVolume .
+         				  str_pad($page, 3, '0', STR_PAD_LEFT) .
+	        			  str_pad($item, 2, '0', STR_PAD_LEFT);
+    $paddedRegNum	    = str_pad($regNum,7,"0",STR_PAD_LEFT);
 }
 else
-    $paddedRegNum	= str_pad($regNum,7,"0",STR_PAD_LEFT);
+    $paddedRegNum	    = str_pad($regNum,7,"0",STR_PAD_LEFT);
+
+if (strlen($itemText) > 0)
+{
+    $text               = $template['invalidItem']->innerHTML;
+    $msg                .= str_replace('$value', $itemText, $text);
+}
+
+// validate Domain code
+$domainObj	            = new Domain(array('domain'	    => $domain,
+				                           'language'	=> $lang));
+if ($domainObj->isExisting())
+{
+    $cc		    		= substr($domain, 0, 2);
+    $code		    	= substr($domain, 2, 2);
+    $countryObj			= new Country(array('code' => $cc));
+    $countryName		= $countryObj->getName();
+    $domainName			= $domainObj->get('name');
+}
+else
+{
+    $text               = $template['unknownDomain']->innerHTML;
+    $msg                .= str_replace('$domain', $domain, $text);
+}
 
 // pass parameters to template
 $template->set('regYear',		$regYear);
@@ -356,6 +403,7 @@ if (strlen($msg) == 0)
     $regCounty              		= $birth->get('regcounty');
 
 	$countyObj              		= new County($domain, $regCounty);
+    $countyName                     = $countyObj->get('name');
 
 	// set $gender to the code used in tblIR
 	// set $genderClass to the CSS class
@@ -525,18 +573,18 @@ if (strlen($msg) == 0)
 	    $template->set('linkedName',   $linkedName);
 	}				// existing link to family tree
 
-	$subject	= "$domainName Birth Registration: number: " . 
-				  $regYear . '-' . $regNum . ', ' . 
-				  $givennames . ' ' . $surname;
+	$subject	        = "$domainName Birth Registration: number: " . 
+            				  "$regYear-$regNum, $givennames $surname";
 }			// no error messages
 else
 {			// error detected
-	$subject	= "$domainName Birth Registration: number: " . 
-				  $regYear . '-' . $regNum ;
+    $subject	        = "$domainName Birth Registration: number: " .
+                                "$regYear-$regNum";
+    $countyName         = 'Unknown';
 }			// error detected
 
-$title  	= "$domainName Birth Registration: " . $action;
-$subject	= rawurlencode($subject);
+$title  	            = "$domainName Birth Registration: " . $action;
+$subject	            = rawurlencode($subject);
 
 // pass substitutions to template
 $template->set('surname',		$surname);
@@ -545,71 +593,118 @@ $template->set('sex',			$sex);
 $template->set('birthDate',		$birthdate);
 $template->set('idir',			$idir);
 $template->set('regCounty',		$regCounty);
-$template->set('countyName',	$countyObj->get('name'));
-$template->set('regTownship',	$birth->get('regtownship'));
+$template->set('countyName',	$countyName);
 $template->set('subject',	    rawurlencode($subject));
 
-$template->set('regDomain',		$birth->get('regdomain'));
-$template->set('regYear',		$birth->get('regyear'));
-$template->set('regNum',		$birth->get('regnum'));
-$template->set('regCounty',		$birth->get('regcounty'));
-$template->set('regTownship',	$birth->get('regtownship'));
-$template->set('msvol',		    $birth->get('msvol'));
-$template->set('qsurname',		$surname);
-$template->set('surnameSoundex',$birth->get('surnamesoundex'));
-if ($sex == 'M')
+if ($birth)
 {
-    $template->set('sexmaleselected',			"selected='selected'");
-    $template->set('sexfemaleselected',			"");
-    $template->set('sexotherselected',			"");
-}
+	$template->set('regTownship',	$birth->get('regtownship'));
+	$template->set('regDomain',		$birth->get('regdomain'));
+	$template->set('regYear',		$birth->get('regyear'));
+	$template->set('regNum',		$birth->get('regnum'));
+	$template->set('regCounty',		$birth->get('regcounty'));
+	$template->set('regTownship',	$birth->get('regtownship'));
+	$template->set('msvol',		    $birth->get('msvol'));
+	$template->set('surname',		$surname);
+	$template->set('surnameSoundex',$birth->get('surnamesoundex'));
+	if ($sex == 'M')
+	{
+	    $template->set('sexmaleselected',			"selected='selected'");
+	    $template->set('sexfemaleselected',			"");
+	    $template->set('sexotherselected',			"");
+	}
+	else
+	if ($sex == 'F')
+	{
+	    $template->set('sexmaleselected',			"");
+	    $template->set('sexfemaleselected',			"selected='selected'");
+	    $template->set('sexotherselected',			"");
+	}
+	else
+	{
+	    $template->set('sexmaleselected',			"");
+	    $template->set('sexfemaleselected',			"");
+	    $template->set('sexotherselected',			"selected='selected'");
+	}
+	
+	$template->set('birthPlace',		$birth->get('birthplace'));
+	$template->set('birthDate',			$birthdate);
+	$template->set('calcbirth',			$birth->get('calcbirth'));
+	$parentsMarried                     = $birth->get('parentsmarried');
+	if ($parentsMarried == 'Y')
+	    $template->set('marriedChecked',"checked='checked'");
+	else
+	    $template->set('marriedChecked',"");
+	$template->set('fatherName',		$birth->get('fathername'));
+	$template->set('fatherOccupation',	$birth->get('fatheroccupation'));
+	$template->set('fatherOccPlace',	$birth->get('fatheroccplace'));
+	$template->set('motherName',		$birth->get('mothername'));
+	$template->set('motherOccupation',	$birth->get('motheroccupation'));
+	$template->set('motherOccPlace',	$birth->get('motheroccplace'));
+	$formerHusband	                	= $birth->get('formerhusband');
+	$template->set('formerHusband',		$formerHusband);
+	$template->set('marriagePlace',		$birth->get('marriageplace'));
+	$template->set('marriageDate',		$birth->get('marriagedate'));
+	$template->set('accoucheur',		$birth->get('accoucheur'));
+	$template->set('informant',			$birth->get('informant'));
+	$template->set('informantRes',		$birth->get('informantres'));
+	$template->set('informantRel',		$birth->get('informantrel'));
+	$template->set('regDate',			$birth->get('regdate'));
+	$template->set('registrar',			$birth->get('registrar'));
+	$remarks			                = $birth->get('remarks');
+	$template->set('remarks',			$remarks);
+	$image			                    = $birth->get('image');
+	$template->set('image',			    $image);
+	$template->set('originalVolume',	$birth->get('originalvolume'));
+	$template->set('originalPage',		$birth->get('originalpage'));
+	$template->set('originalItem',		$birth->get('originalitem'));
+	$template->set('changedBy',			$birth->get('changedby'));
+	$template->set('changeDate',		$birth->get('changedate'));
+}                   // birth record obtained
 else
-if ($sex == 'F')
 {
-    $template->set('sexmaleselected',			"");
-    $template->set('sexfemaleselected',			"selected='selected'");
-    $template->set('sexotherselected',			"");
+	$template->set('regTownship',	    '');
+	$template->set('regDomain',		    '');
+	$template->set('regYear',		    '');
+	$template->set('regNum',		    '');
+	$template->set('regCounty',		    '');
+	$template->set('regTownship',	    '');
+	$template->set('msvol',		        '');
+	$template->set('surname',		    '');
+	$template->set('surnameSoundex',    '');
+	$template->set('sexmaleselected',	"");
+	$template->set('sexfemaleselected',	"");
+	$template->set('sexotherselected',	'selected="selected"');
+	$template->set('birthPlace',		'');
+	$template->set('birthDate',			'');
+	$template->set('calcbirth',			'');
+	$template->set('marriedChecked',    "");
+	$template->set('fatherName',		'');
+	$template->set('fatherOccupation',	'');
+	$template->set('fatherOccPlace',	'');
+	$template->set('motherName',		'');
+	$template->set('motherOccupation',	'');
+	$template->set('motherOccPlace',	'');
+	$template->set('formerHusband',		'');
+	$template->set('marriagePlace',		'');
+	$template->set('marriageDate',		'');
+	$template->set('accoucheur',		'');
+	$template->set('informant',			'');
+	$template->set('informantRes',		'');
+	$template->set('informantRel',		'');
+	$template->set('regDate',			'');
+	$template->set('registrar',			'');
+	$template->set('remarks',			'');
+	$template->set('image',			    '');
+	$template->set('originalVolume',	'');
+	$template->set('originalPage',		'');
+	$template->set('originalItem',		'');
+    $template->set('changedBy',			'');
+	$parentsMarried                     = '';
+    $formerHusband                      = '';
+    $remarks                            = '';
+    $image                              = '';
 }
-else
-{
-    $template->set('sexmaleselected',			"");
-    $template->set('sexfemaleselected',			"");
-    $template->set('sexotherselected',			"selected='selected'");
-}
-
-$template->set('birthPlace',		$birth->get('birthplace'));
-$template->set('birthDate',			$birthdate);
-$template->set('calcbirth',			$birth->get('calcbirth'));
-$parentsMarried                     = $birth->get('parentsmarried');
-if ($parentsMarried == 'Y')
-    $template->set('marriedChecked',"checked='checked'");
-else
-    $template->set('marriedChecked',"");
-$template->set('fatherName',		$birth->get('fathername'));
-$template->set('fatherOccupation',	$birth->get('fatheroccupation'));
-$template->set('fatherOccPlace',	$birth->get('fatheroccplace'));
-$template->set('motherName',		$birth->get('mothername'));
-$template->set('motherOccupation',	$birth->get('motheroccupation'));
-$template->set('motherOccPlace',	$birth->get('motheroccplace'));
-$formerHusband	                	= $birth->get('formerhusband');
-$template->set('formerHusband',		$formerHusband);
-$template->set('marriagePlace',		$birth->get('marriageplace'));
-$template->set('marriageDate',		$birth->get('marriagedate'));
-$template->set('accoucheur',		$birth->get('accoucheur'));
-$template->set('informant',			$birth->get('informant'));
-$template->set('informantRes',		$birth->get('informantres'));
-$template->set('informantRel',		$birth->get('informantrel'));
-$template->set('regDate',			$birth->get('regdate'));
-$template->set('registrar',			$birth->get('registrar'));
-$remarks			                = $birth->get('remarks');
-$template->set('remarks',			$remarks);
-$image			                    = $birth->get('image');
-$template->set('image',			    $image);
-$template->set('originalVolume',	$birth->get('originalvolume'));
-$template->set('originalPage',		$birth->get('originalpage'));
-$template->set('originalItem',		$birth->get('originalitem'));
-$template->set('changedBy',			$birth->get('changedby'));
-$template->set('changeDate',		$birth->get('changedate'));
 
 if ($regNum > 1000000)
     $template->updateTag("hiddenVolPageItem", null);

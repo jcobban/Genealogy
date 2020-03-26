@@ -380,14 +380,24 @@ use \Exception;
  *		2019/11/14      change method get to agree with documentation   *
  *		                in not referencing obsolete fields              *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/02/01      method getEvents now returns all events with    *
+ *		                legacy events inserted before first tblER       *
+ *		                event with a higher event date                  *
+ *		2020/02/23      do not reference non-existent marriage event    *
+ *		2020/03/14      set notes in both Family and marriage Event     *
+ *		                Event field 'desc' has been renamed to 'notes'  *
+ *		2020/03/19      correct construction of events from old         *
+ *		                locations                                       *
+ *		2020/03/25      undefined Event::setIdir                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Child.inc';
 require_once __NAMESPACE__ . '/Event.inc';
 require_once __NAMESPACE__ . '/Name.inc';
+require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/RecOwner.inc';
 
 /************************************************************************
@@ -486,10 +496,10 @@ class Family extends RecordPic
     /********************************************************************
      *  Family::$statusText												*
      *																	*
-     *  This table provides a translation from an marriage status to	*
+     *  This table provides a translation from a marriage status to	    *
      *  the text to display to the user for the pre-defined values.		*
-     *	This saves issuing an SQL query to obtain the text for these	*
-     *	common values.													*
+     *  This is superceded by the $translate['msTypes'] which supports  *
+     *  localization.                                                   *
      ********************************************************************/
     static $statusText	= array(
 						    1 	=> '',
@@ -530,7 +540,7 @@ class Family extends RecordPic
 						   10 	=> 'married',
 						   11 	=> '[Private]',
 						   12 	=> 'was the partner of',
-						   13 	=> 'was widowed',
+						   13 	=> 'married',
 						   14 	=> 'was single',
 						   15 	=> 'was a friend [with benefits]'
 		);
@@ -613,13 +623,13 @@ class Family extends RecordPic
      *	Description of record class                                     *
      ********************************************************************/
     protected static	$info	= array(
-                'table'     => 'tblMR',
-                'name'      => 'Families',
-                'prime'	    => 'idmr',
-	            'srvmg'     => true,
-	            'fldcount'	=> 6,
-                'order'     => 'IDMR',
-                'classname' => 'Family');
+                			'table'     		=> 'tblMR',
+                			'name'      		=> 'Families',
+                			'prime'	    		=> 'idmr',
+	            			'srvmg'     		=> true,
+	            			'fldcount'			=> 6,
+                			'order'     		=> 'IDMR',
+                			'classname' 		=> 'Family');
 
     /********************************************************************
      *	function Family::__construct									*
@@ -629,27 +639,27 @@ class Family extends RecordPic
      *	report the problem and prevent the record from being saved.		*
      *																	*
      *  Input:															*
-     *	    $parms	    o		a database record presented as an		*
-     *							associative array, or					*
-     *					o		array('idmr' => $idmr) to obtain		*
-     *					        the existing record with that key       *
-     *					o		array('id' => $id) to obtain		    *
-     *					        the existing record with that key       *
-     *					        DEPRECATED                              *
-     *					o       array('idirhusb'=> $idir) to add        *
-     *					        a new family for a husband              *
-     *					o       array('idirwife'=> $idir) to add        *
-     *					        a new family for a wife                 *
-     *					o       array('husbsurname'	=> $surname,        *
-     *							'husbmarrsurname' => $surname)          *
-     *							to create a new set of parents for      *
-     *							a child                                 *
-     *					o       note that you cannot obtain an existing *
-     *					        record for a husband/wife pair except   *
-     *					        through new RecordSet('Families')       *
-     *					        array('idirhusb'=> $idir,               *
-     *					              'idirwife'=> $idir) adds a new    *
-     *					        instance of Family                      *
+     *	    $parms	    o	a database record presented as an		    *
+     *						associative array, or					    *
+     *					o	array('idmr' => $idmr) to obtain		    *
+     *					    the existing record with that key           *
+     *					o	array('id' => $id) to obtain		        *
+     *					    the existing record with that key           *
+     *					    DEPRECATED                                  *
+     *					o   array('idirhusb'=> $idir) to add            *
+     *					    a new family for a husband                  *
+     *					o   array('idirwife'=> $idir) to add            *
+     *					    a new family for a wife                     *
+     *					o   array('husbsurname'	=> $surname,            *
+     *							  'husbmarrsurname' => $surname)        *
+     *						to create a new set of parents for          *
+     *						a child                                     *
+     *					o   note that you cannot obtain an existing     *
+     *					    record for a husband/wife pair except       *
+     *					    through new RecordSet('Families')           *
+     *					                array('idirhusb'=> $idir,       *
+     *					                      'idirwife'=> $idir)       *
+     *					    adds a new instance of Family               *
      ********************************************************************/
     function __construct($parms = null)
     {
@@ -1096,8 +1106,16 @@ class Family extends RecordPic
             
         $name		        = '';
         $marEvent           = $this->getMarEvent();
-		$mard		        = $marEvent['eventd'];
-        $idlrmar	        = $marEvent['idlrevent'];
+        if ($marEvent)
+        {
+		    $mard		    = $marEvent['eventd'];
+            $idlrmar	    = $marEvent['idlrevent'];
+        }
+        else
+        {
+		    $mard		    = '';
+            $idlrmar	    = 1;
+        }
 		$husbPriName        = $this->getHusbPriName();
 		$wifePriName        = $this->getWifePriName();
 		if (!is_null($husbPriName))
@@ -1490,22 +1508,24 @@ class Family extends RecordPic
         {
             $person             = $idir;
             $idir               = $person['idir'];
+            if ($debug)
+                $warn           .= "<p>Family::addChild(Person($idir))</p>\n";
         }
-        else
         if (is_string($idir) && ctype_digit(trim($idir)))
             $idir               = intval($idir);
 
         if (is_int($idir))
         {
-            if (is_null($person))
-            {
-                $person         = Person::getPerson($idir);
-                if (!$person->isExisting())
-                    throw new Exception('Family::addChild invoked with invalid IDIR=' . $idir);
-            }
+            $person             = Person::getPerson($idir);
+            if ($debug)
+                $warn           .= "<p>Family::addChild($idir)</p>\n";
         }
         else
-            throw new Exception('Family::addChild invoked with invalid parameter ' . print_r($idir, true));
+            throw new Exception('Family::addChild invoked with invalid parameter ' . var_export($idir, true));
+
+        if (!$person->isExisting())
+            throw new Exception('Family::addChild invoked with invalid IDIR=' . $idir);
+
 		$children	            = $this->getChildren();
 		foreach($children as $ic => $childr)
 		{		// loop through all existing children
@@ -1515,14 +1535,17 @@ class Family extends RecordPic
         $idmr		            = $this->row['idmr'];
 		$childr		            = new Child(array('idmr'	=> $this,
                                                   'idir'	=> $person));
-		// note that the new child does not have an IDCR value because
+        $errors                 = $childr->getErrors();
+        if (strlen($errors) >0)
+            throw new Exception('Family::addChild unable to create Child');
+        // note that the new child does not have an IDCR value because
 		// it is not backed by a record in the database
 		// the IDCR value is assigned when the new record is saved
 		// as part of the process of saving all of the changes to the
 		// Family.  A unique integer index is assigned in the internal
 		// array of the RecordSet but is not reflected in the Child
 		// record itself
-		$this->children[]	= $childr;      // add to end
+		$this->children[]	    = $childr;      // add to end
 		return $childr;
     }		// function Family::addChild
 
@@ -1586,8 +1609,10 @@ class Family extends RecordPic
      ********************************************************************/
     function getMarEvent($create = false)
     {
+        if ($this->events == null)
+            $this->events           = $this->getEvents();
 		$event		                = $this->marEvent;
-		if (is_null($event))
+		if (is_null($event) && $create)
 		{		// not initialized
 		    $trow			        = array();
 		    $trow['idir']		    = $this;
@@ -1595,19 +1620,19 @@ class Family extends RecordPic
 		    $trow['idet']		    = Event::ET_MARRIAGE;
 			$trow['eventd']    	    = $this->row['mard'];
 			$trow['eventsd']   	    = $this->row['marsd'];
-			$trow['idlrevent'] 	    = $this->row['idlrmar'];
+            $trow['idlrevent'] 	    = $this->row['idlrmar'];
 			$trow['idar']	        = $this->row['idar'];
-			$trow['desc']	        = $this->row['notes'];
+			$trow['notes']	        = $this->row['notes'];
 			$trow['description']	= '';
 		    $trow['preferred']		= 1;
 		    if ($create ||
 				$trow['eventsd'] != -99999999 ||
 				$trow['idlrevent'] > 1 ||
-				$trow['desc'] != '')
-		    {		// LDS endow event present
+				$trow['notes'] != '')
+		    {		// marriage event present
 		        $event		        = new Event($trow);
 				$this->marEvent		= $event;
-		    }		// LDS endow event present
+		    }		// marriage event present
 		    else
 				$event			=  null;
 		}		// not initialized
@@ -1628,8 +1653,10 @@ class Family extends RecordPic
      ********************************************************************/
     function getSealEvent($create = false)
     {
+        if ($this->events == null)
+            $this->events           = $this->getEvents();
 		$event		= $this->sealEvent;
-		if (is_null($event))
+		if (is_null($event) && $create)
 		{		// not initialized
 		    $trow			        = array();
 		    $trow['idir']		    = $this;
@@ -1639,14 +1666,14 @@ class Family extends RecordPic
 			$trow['eventsd']   	    = $this->row['sealsd'];
 			$trow['idlrevent'] 	    = $this->row['idtrseal'];
 			$trow['kind']	    	= 1;
-			$trow['desc']	    	= $this->row['sealnote'];
+			$trow['notes']	    	= $this->row['sealnote'];
 			$trow['description']	= '';
 			$trow['ldstempleready'] = $this->row['ldss'];
 		    $trow['preferred']		= 1;
 		    if ($create ||
 				$trow['eventsd'] != -99999999 ||
 				$trow['idlrevent'] > 1 ||
-				$trow['desc'] != '')
+				$trow['notes'] != '')
 		    {		// LDS seal event present
 		        $event		        = new Event($trow);
 				$this->sealEvent	= $event;
@@ -1671,8 +1698,10 @@ class Family extends RecordPic
      ********************************************************************/
     function getMarEndEvent($create = false)
     {
+        if ($this->events == null)
+            $this->events           = $this->getEvents();
 		$event		                = $this->marEndEvent;
-		if (is_null($event))
+		if (is_null($event) && $create)
 		{		// not initialized
 		    $trow			        = array();
 		    $trow['idir']		    = $this;
@@ -1682,13 +1711,13 @@ class Family extends RecordPic
 			$trow['eventsd']   	    = $this->row['marendsd'];
 			$trow['idlrevent'] 	    = 0;
 			$trow['kind']	    	= 1;
-			$trow['desc']	    	= '';
+			$trow['notes']	    	= '';
 			$trow['description']	= '';
 		    $trow['preferred']		= 1;
 		    if ($create ||
 				$trow['eventsd'] != -99999999 ||
 				$trow['idlrevent'] > 1 ||
-				$trow['desc'] != '')
+				$trow['notes'] != '')
 		    {		// LDS endow event present
 		        $event			    = new Event($trow);
 				$this->marEndEvent	= $event;
@@ -1709,7 +1738,12 @@ class Family extends RecordPic
      *	    instance of RecordSet containing instances of Event			*
      *																	*
      *  Side Effects:													*
-     *	    member Family::events is set								*
+     *	    member $this->events is set, however it is recommended      *
+     *	    that the return value be explicitly assigned to             *
+     *	    $this->events for clarity.                                  *
+     *	    Events which are being migrated out of the instance         *
+     *	    of Family into instances of Event are recorded so they      *
+     *	    may be present in either place.                             *
      ********************************************************************/
     function getEvents()
     {
@@ -1720,7 +1754,52 @@ class Family extends RecordPic
 									'idtype'	=> 20);
 		    $this->events	= new RecordSet('Events', $parms);
 
-		}		// need to perform query for first event set
+            // ensure that methods getXxxxEvent return the same
+            // instances as getEvents
+            foreach($this->events as $ider => $event)
+            {               // loop through events
+                switch($event['idet'])
+                {           // switch on event type
+	                case Event::ET_MARRIAGE:
+	                    $this->marEvent	    = $event;
+	                    break;
+	
+	                case Event::ET_MARRIAGE_END:
+	    				$this->marEndEvent	= $event;
+	                    break;
+	
+	                case Event::ET_LDS_SEALED:
+	    				$this->sealEvent	= $event;
+	                    break;
+                }           // switch on event type
+            }               // loop through events
+
+            // add events from Legacy locations
+            if (is_null($this->marEvent))
+            {               // add old version of marriage event
+                $this->marEvent             = $this->getMarEvent(true);
+                $this->events->insert($this->marEvent);
+            }               // add old version of marriage event
+
+		    if (is_null($this->sealEvent))
+		    {		        // add old version of seal event
+                $this->sealEvent            = $this->getSealEvent(false);
+			    if ($this->sealEvent)
+		        {		    // LDS seal event present
+                    $this->events->insert($this->sealEvent);
+                }           // LDS seal event defined
+            }               // add old version of seal event
+
+		    if (is_null($this->marEndEvent))
+		    {		        // add old version of marEnd event
+                $this->marEndEvent            = $this->getMarEndEvent(false);
+			    if ($this->marEndEvent)
+		        {		    // LDS marend event present
+                    $this->events->insert($this->marEndEvent);
+                }           // LDS marend event defined
+            }               // add old version of marEnd event
+
+		}		            // need to perform query for first event set
 		return $this->events;
     }		// function Family::getEvents
 
@@ -2462,6 +2541,8 @@ catch(Exception $e)
      ********************************************************************/
     function get($field)
     {
+        global  $warn;
+
 		$fieldLc	    = strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
@@ -2624,9 +2705,16 @@ catch(Exception $e)
                 if (is_null($this->marEvent))
                     $this->marEvent  = $this->getMarEvent(false);
                 if ($this->marEvent)
-                    return $this->marEvent['desc'];
+                {
+                    if (strlen($this->marEvent['notes']) > 0)
+                        return $this->marEvent['notes'];
+                    else
+                        return $this->row['notes'];
+                }
                 else
-                    return '';
+                {
+                    return $this->row['notes'];
+                }
 		    }                   // notes
 
             case 'marendd':
@@ -2684,7 +2772,7 @@ catch(Exception $e)
                 if (is_null($this->sealEvent))
                     $this->sealEvent  = $this->getSealEvent(false);
                 if ($this->sealEvent)
-                    return $this->sealEvent['desc'];
+                    return $this->sealEvent['notes'];
                 else
                     return '';
             }                   // sealnote
@@ -2914,13 +3002,24 @@ catch(Exception $e)
             }                   // idar
 
             case 'notes':
-		    {
+            {
+                $matches            = array();
+                if (preg_match('#^<p>([^<]*)</p>$#', trim($value), $matches))
+                {
+                    $value          = $matches[1];
+                }
                 if (is_null($this->marEvent))
                     $this->marEvent  = $this->getMarEvent(false);
                 if ($this->marEvent)
-                    return $this->marEvent->set('desc', $value);
+                {
+                    parent::set('notes', $value);
+                    $retval = $this->marEvent->set('notes', $value);
+                    return $retval;
+                }
                 else
-                    return '';
+                {
+                    return parent::set('notes', $value);
+                }
 		    }                   // notes
 
             case 'marendd':
@@ -3030,7 +3129,7 @@ catch(Exception $e)
                 if (is_null($this->sealEvent))
                     $this->sealEvent  = $this->getSealEvent(false);
                 if ($this->sealEvent)
-                    return $this->sealEvent->set('desc', $value);
+                    return $this->sealEvent->set('notes', $value);
                 else
                     return '';
             }                   // sealnote
@@ -3713,7 +3812,7 @@ catch(Exception $e)
 		for ($ie = 0; $ie < count($events); $ie++)
 		{
 		    $event	= $events[$ie];
-		    $event->setIdir($newidmr);
+		    $event->set('idir', $newidmr);
 		    $event->save('p');
 		}		// loop through marriage events/facts
 

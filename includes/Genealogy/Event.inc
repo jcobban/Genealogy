@@ -425,6 +425,7 @@ class Event extends RecordPic
 				68 		=>'elected as',
 				23 		=>'emigrated from',
 				24 		=>'employed as',
+				77 		=>'end of marriage',
 		     16000 		=>'endowed (LDS)',		// obsolete
 				74 		=>'endowed (LDS)',
 				25 		=>'engaged',
@@ -662,7 +663,7 @@ class Event extends RecordPic
 				case 'idmr':
 				{		// special shortcut
 				    $dbrow['idir']		    = $idir;
-				    $dbrow['idtype']		= Event::IDTYPE_FAMILY;
+				    $dbrow['idtype']		= Event::IDTYPE_MAR;
 				    break;
 				}		// special shortcut
 
@@ -784,9 +785,9 @@ class Event extends RecordPic
      *	             or array('ider' => $ider) to construct from        *
      *	                an existing record                              *
      *	             or array('ider' => 0) to create a new record       *
-     *	    $idtype		if $id is 'new' the initial value of 'idtype'	*
+     *	    $idtype		if $parms is 'new' the initial value of 'idtype'*
      *	                deprecated                                      *
-     *	    $idir		if $id is 'new' the initial value of 'idir'		*
+     *	    $idir		if $parms is 'new' the initial value of 'idir'	*
      *					or an instance of Person or Family				*
      *					or Child										*
      *	                deprecated                                      *

@@ -42,8 +42,9 @@ use \Exception;
  *		2018/01/04		remove Template from template file names		*
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/07/22      support ISO format of Domain code               *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -101,8 +102,7 @@ if (count($_GET) > 0)
 	
 		    case 'lang':
 		    {		        // language code
-				if (strlen($value) >= 2)
-				    $lang	= strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
 				break;
 		    }		        // language code
 		}		            // act on specific parameters

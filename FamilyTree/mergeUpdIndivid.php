@@ -85,8 +85,9 @@ use \Templating\Template;
  *						and marriage transcriptions to new IDIR			*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/09/16      use class FtTemplate for output                 *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -275,8 +276,7 @@ if (isset($_POST) && count($_POST) > 0)
 
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                   $lang        = strtolower(substr($value, 0, 2)); 
+                $lang       = FtTemplate::validateLang($value);
 				break;
             }
 		}	        // act on specific parameters

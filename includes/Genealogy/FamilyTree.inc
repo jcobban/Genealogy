@@ -183,8 +183,8 @@ class FamilyTree implements Iterator
     function getFamily($idmr)
     {
         if (!array_key_exists($idmr, $this->familyIndex))
-            $this->familyIndex[$ider]    = new Family(array('idmr' => $ider));
-	    return $this->familyIndex[$ider];
+            $this->familyIndex[$idmr]    = new Family(array('idmr' => $idmr));
+	    return $this->familyIndex[$idmr];
     }           // FamilyTree::getFamily
 
     /********************************************************************

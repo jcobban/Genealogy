@@ -15,8 +15,9 @@
  *      2019/02/05      remove rightTop button                          *
  *      2019/04/14      add Facebook activation                         *
  *      2019/05/03      use classes to style advert and facebook        *
+ *		2020/02/16      add right hand notification column              *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <meta charset='utf-8'>
     <meta name='author' content='James A. Cobban'>
@@ -29,34 +30,11 @@
   <body>
       
 <script>
-    if (location.host != 'localhost')
-    try {
-	  window.fbAsyncInit = function() {
-	    FB.init({
-	      appId      : '2096433630426301',
-	      cookie     : true,
-	      xfbml      : true,
-	      version    : 'v3.2'
-	    });
-	      
-	    FB.AppEvents.logPageView();   
-	      
-	  };
-	
-	  (function(d, s, id){
-	     var js, fjs = d.getElementsByTagName(s)[0];
-	     if (d.getElementById(id)) {return;}
-	     js = d.createElement(s); js.id = id;
-	     js.src = "https://connect.facebook.net/en_US/sdk.js";
-	     fjs.parentNode.insertBefore(js, fjs);
-	   }(document, 'script', 'facebook-jssdk'));
-    } catch(e) {}
-
    var tinyMCEparms = {
 		selector            : 'textarea',
 	    plugins             : 'link lists image',
 	    menubar             : false,
-        language            : '$LANG',
+        language            : '$LANGTINY',
         skin                : 'oxide-dark',
 	    toolbar             : "undo redo | styleselect | bold italic | " 
 	                           + "alignleft aligncenter alignright alignjustify | " 
@@ -70,10 +48,6 @@
     	<img src="/logo70.gif" id="logo" class="right"
                 height="70" width="70" alt="James Cobban Logo">
           &nbsp;
-        <span class="facebook" id="facebookSpan">
-      	  <iframe id='facebookFrame' class='facebook' $IECRAP>
-      	  </iframe>
-        </span>
         <span class="advert" id="advertSpan">
           <iframe id='advertFrame' class='advert' $IECRAP src='$ADURL'>
           </iframe>
@@ -96,10 +70,23 @@
           aktiviert sein.  Hier finden Sie die
           <a href="https://www.enable-javascript.com/" target="_blank">
           Anweisungen zum Aktivieren von JavaScript in Ihrem Webbrowser</a>.
-    </p>
-  </noscript>
-  $MAIN
+        </p>
+      </noscript>
+      $MAIN
     </main>
+    <div id="rightColumn" class="rightCol">
+        <p id="userWelcome">
+          <b>Willkommen $USERID</b>
+        </p>
+        <p>Sie können Ihren Stammbaum auf dieser Website 
+        in einem Stil veröffentlichen, der wie ein traditionelles 
+        Buch aussieht, jedoch alle dynamischen Funktionen des Webs 
+        hinzufügt und Ihre Familie vor Identitätsdiebstahl schützt, 
+        indem sichergestellt wird, dass nur von Ihnen 
+        autorisierte Personen Details zu Personen sehen können, 
+        die kleiner als sind 105 Jahre alt.
+        </p>
+    </div>
     <footer id="footSection">
       <div class='botcrumbs'>
   	    <a href='/contactAuthor.php?lang=de&amp;idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>

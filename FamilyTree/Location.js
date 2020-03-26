@@ -46,8 +46,9 @@
  *		2017/09/09		renamed to Location.js							*
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
+ *		2020/02/17      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -123,7 +124,7 @@ HTTP.get('/Canada/CountiesListJson.php?domain=CAON',
          options);
 
 /************************************************************************
- *  function gotCounties													*
+ *  function gotCounties												*
  *																		*
  *  This method is called when the JSON document representing			*
  *  the list of counties is received from the server.                   *
@@ -307,6 +308,8 @@ function onLoadLocation()
 		    }	        // act on field name
 		}	            // loop through all elements in the form
     }		            // loop through all forms
+
+    hideRightColumn();
 }		// function onLoadLocation
 
 /************************************************************************

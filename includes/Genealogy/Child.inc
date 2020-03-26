@@ -331,7 +331,19 @@ class Child extends Record
         if (is_array($id))
         {
 		    $parms	        = $id;
-            $parmStr        = print_r($id, true);
+            $parmStr        = 'array(';
+            $comma          = '';
+            foreach($id as $key => $value)
+            {
+                $parmStr    .= "$comma'$key'=";
+                if ($value instanceof Record)
+                {
+                    $parmStr    .= get_class($value) . '(' . $value->getName() . ')';
+                }
+                else
+                    $parmStr    .= var_export($value, true);
+                $comma          = ',';
+            }
         }
         else
         {
@@ -383,7 +395,7 @@ class Child extends Record
                         $this->family       = $value;
                         $value              = $this->family['idmr'];
                     }
-                    else
+
 				    if (is_string($value) && ctype_digit($value))
 						$value			    = (int)$value;
 
@@ -396,7 +408,7 @@ class Child extends Record
 				    }
 				    else
                         $warn	.= "<p>Child::__construct: " . __LINE__ .
-                " Field Name 'IDMR' value '$value' unsupported.</p>\n";
+                " Field Name 'IDMR' value " . gettype($value) . "'$value' unsupported.</p>\n";
 				    break;
 				}		                // IDMR identify parents
 
@@ -407,7 +419,7 @@ class Child extends Record
                         $this->person       = $value;
                         $value              = $this->person['idir'];
                     }
-                    else
+
 				    if (is_string($value) && ctype_digit($value))
                         $value			    = (int)$value;
 
@@ -570,7 +582,7 @@ class Child extends Record
 				}		                // error performing query
 		    }			                // existing record
 		    else
-		    if ($idcr === 0)
+		    if ($idcr == 0)
 		    {			                // create a new record
 				// set defaults
 				$dbrow		            = self::$initRow;
@@ -580,7 +592,7 @@ class Child extends Record
 		    {			                // invalid record
 				$this->msg              = "Child::__construct: " .
         								    "Invalid array parameter :" .
-		        						    print_r($parms, true) . '. ';
+		        						    $parmStr . " idcr=$idcr. ";
 		    }		                	// invalid record
 		}		                    	// search parameters
 

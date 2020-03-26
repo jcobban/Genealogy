@@ -41,6 +41,7 @@ use \Templating\Template;
  *		2019/02/21      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
  *      2020/01/22      use NumberFormatter                             *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -60,43 +61,53 @@ $domainName				= 'Canada: Ontario';
 $stateName				= 'Ontario';
 $lang	    			= 'en';
 
-foreach($_GET as $key => $value)
-{				// loop through all input parameters
-	switch(strtolower($key))
-	{			// process specific named parameters
-	    case 'regdomain':
-	    case 'domain':
-	    {
-			$domain		= strtoupper($value);
-			break;
-	    }			// RegDomain
-
-	    case 'code':
-	    {           // province code within Canada
-            $code		= strtoupper($value);
-            $domain     = 'CA' . $code;
-			break;
-        }			// province code
-
-	    case 'lang':
-        {
-            if (strlen($value) >= 2)
-                $lang		= strtolower(substr($value,0,2));
-			break;
-        }			// lang
-
-	    case 'debug':
-	    {			// handled by common code
-			break;
-	    }			// handled by common code 
-
-	    default:
-	    {			// any other parameters
-			$warn	.= "<p>Unexpected parameter $key='$value'.</p>";
-			break;
-	    }			// any other parameters
-	}			// process specific named parameters
-}				// loop through all input parameters
+if (isset($_GET) && count($_GET) > 0)
+{			            // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {				    // loop through all input parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{			    // process specific named parameters
+		    case 'regdomain':
+		    case 'domain':
+		    {
+				$domain		= strtoupper($value);
+				break;
+		    }			// RegDomain
+	
+		    case 'code':
+		    {           // province code within Canada
+	            $code		= strtoupper($value);
+	            $domain     = 'CA' . $code;
+				break;
+	        }			// province code
+	
+		    case 'lang':
+	        {
+	            $lang       = FtTemplate::validateLang($value);
+				break;
+	        }			// lang
+	
+		    case 'debug':
+		    {			// handled by common code
+				break;
+		    }			// handled by common code 
+	
+		    default:
+		    {			// any other parameters
+				$warn	.= "<p>Unexpected parameter $key='$value'.</p>";
+				break;
+		    }			// any other parameters
+		}			    // process specific named parameters
+	}				    // loop through all input parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			            // invoked by method=get
 
 $template		    = new FtTemplate("BirthRegStats$lang.html");
 $template->updateTag('otherStylesheets',	

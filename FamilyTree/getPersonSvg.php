@@ -33,8 +33,9 @@ use \Templating\Template;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *						script renamed to getPersonSvg.php				*
  *		2018/02/10		use Template for internationalization			*
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2018 James Alan Cobban								*
+ *  Copyright &copy; 2020 James Alan Cobban								*
  ************************************************************************/
 header("Content-Type: image/svg+xml");
 require_once __NAMESPACE__ . '/Person.inc';
@@ -452,28 +453,38 @@ function displayParents($person, $x, $y)
 $id			= null;
 $lang		= 'en';
 
-foreach($_GET as $key => $value)
-{			// loop through parameters
-    switch(strtolower($key))
-    {		// act on specific keys
-        case 'id':
-        case 'idir':
-        {
-    		if (ctype_digit($value) && $value > 0)
-    		    $id		= intval($value);
-    		else
-    		    $msg	.= "Invalid value $key='$value'. ";
-    		break;
-        }
-
-        case 'lang':
-        {
-    		if (strlen($value) >= 2)
-    		    $lang	= strtolower(substr($value, 0, 2));
-    		break;
-        }
-    }		// act on specific keys
-}			// loop through parameters
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {			    // loop through parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+	    {		    // act on specific keys
+	        case 'id':
+	        case 'idir':
+	        {
+	    		if (ctype_digit($value) && $value > 0)
+	    		    $id		= intval($value);
+	    		else
+	    		    $msg	.= "Invalid value $key='$value'. ";
+	    		break;
+	        }
+	
+	        case 'lang':
+	        {
+	            $lang       = FtTemplate::validateLang($value);
+	    		break;
+	        }
+	    }		    // act on specific keys
+	}			    // loop through parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
 if (is_null($id))
     $msg	.= 'Missing parameter idir=. ';

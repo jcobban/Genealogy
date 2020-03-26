@@ -62,6 +62,7 @@ use \Exception;
  *		2018/01/04		remove Template from template file names		*
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright 2020 &copy; James A. Cobban								*
  ***********************************************************************/
@@ -97,8 +98,7 @@ foreach ($_GET as $key => $value)
 
 	    case 'lang':
         {		// debug handled by common code
-            if (strlen($value) >= 2)
-			    $lang		    = strtolower(substr($value,0,2));
+	            $lang               = FtTemplate::validateLang($value);
 			break;
 	    }		// debug handled by common code
 

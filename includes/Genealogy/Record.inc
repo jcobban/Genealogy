@@ -212,8 +212,9 @@ use \Iterator;
  *		2019/11/21      correct escaping of apostrophes in debug output *
  *		                add 3rd parameter to debugPrepQuery             *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/01/31      add base implementation of method compare       *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -1722,6 +1723,35 @@ class Record implements Iterator, ArrayAccess
     }		// function Record::delete
 
     /********************************************************************
+     *  function Record::compare										*
+     *																	*
+     *	Compare two instances of Record									*
+     *																	*
+     *	Input:															*
+     *	    $other				another instance of Record				*
+     *																	*
+     *	Returns:														*
+     *	    > 0 if $other is greater than $this by              		*
+     *	    == 0 if $other is equal to $this 					        *
+     *	    < 0 if $other is less than $this 		                    *
+     ********************************************************************/
+    function compare($other)
+    {
+		if ($other instanceof Record)
+        {			// comparing two events
+            $prime      = $this->prime;
+            if (is_string($prime) && array_key_exists($prime, $this->row))
+                $diff   = $this->row[$prime] - $other->row[$prime];
+            else
+                $diff   = 0;
+		    return $diff;
+		}			// comparing two events
+		else
+		    throw new Exception("Record: compare: " .
+							"parameter is not instance of Record");
+    }		// Record::compare
+
+    /********************************************************************
      *	function Record::postCheckCitation								*
      *																	*
      *  Update the citation associated with the post update.			*
@@ -1731,9 +1761,12 @@ class Record implements Iterator, ArrayAccess
      *  Parameters:														*
      *	    $key		key												*
      *	    $value		srcdetail value for citation					*
+     *		$xml		option to generate XML output					*
      ********************************************************************/
-    private function postCheckCitation($key, $value)
+    private function postCheckCitation($key, $value, $xml = false)
     {		// check for citation update
+        global  $warn;
+
 		if (substr($key, 0, 4) == 'Page')
 		{
 		    $idsx		= substr($key, 4);
@@ -1811,7 +1844,7 @@ class Record implements Iterator, ArrayAccess
 								print_r($value, true);
 				}		// matches field in record
 				else
-				    $this->postCheckCitation($key, $value);
+				    $this->postCheckCitation($key, $value, $xml);
 		    }		// not the identifying key of the record
 		}
 		if ($xml)
@@ -1907,6 +1940,7 @@ class Record implements Iterator, ArrayAccess
 
         if (is_array($print))
         {		        // additional parameters to include
+            $parms              = $print;
             $print		        = true;
             foreach($parms as $field => $value)
             {

@@ -47,8 +47,9 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/05/05      use FtTemplate                                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -66,43 +67,54 @@ $eventCount	        = 0;
 $personCount	    = 0;
 
 // check parameters
-foreach ($_GET as $key => $value)
-{		        // loop through all parameters
-	switch(strtolower($key))
-	{	        // act on specific parameter	
-	    case 'id':
-	    case 'idir':
-	    {		// key of instance of Person
-			if (ctype_digit($value))
-			{	// integer value
-			    $idir	    = intval($value);
-			    // note that record 0 in tblIR contains only the next
-			    // available value of IDIR
-			    if ($idir < 1)
-				    $msg	.= "IDIR must be a positive integer. ";
-			}	// integer value
-			break;
-	    }		// key of instance of Person
-
-        case 'lang':
-        {
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value, 0, 2));
-            break;
-        }
-
-	    case 'debug':
-	    {		// handled by common.inc
-			break;
-	    }		// activate debugging
-
-	    default:
-	    {
-			$warn	.= "Unexpected parameter $key='$value'. ";
-			break;
-	    }
-	}	        // act on specific parameter	
-}		        // loop through all parameters
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    $value		= trim($value);
+		switch(strtolower($key))
+		{	        // act on specific parameter	
+		    case 'id':
+		    case 'idir':
+		    {		// key of instance of Person
+				if (ctype_digit($value))
+				{	// integer value
+				    $idir	    = intval($value);
+				    // note that record 0 in tblIR contains only the next
+				    // available value of IDIR
+				    if ($idir < 1)
+					    $msg	.= "IDIR must be a positive integer. ";
+				}	// integer value
+				break;
+		    }		// key of instance of Person
+	
+	        case 'lang':
+	        {
+	            $lang       = FtTemplate::validateLang($value);
+	            break;
+	        }
+	
+		    case 'debug':
+		    {		// handled by common.inc
+				break;
+		    }		// activate debugging
+	
+		    default:
+		    {
+				$warn	.= "Unexpected parameter $key='$value'. ";
+				break;
+		    }
+		}	        // act on specific parameter	
+	}		        // loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
 $template           = new FtTemplate("deleteIndivid$lang.html");
 

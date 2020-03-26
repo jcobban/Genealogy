@@ -85,6 +85,7 @@ use \Templating\Template;
  *		2018/12/27		use class Template                      		*
  *		2019/12/13      remove D_ prefix from field names               *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -309,8 +310,7 @@ foreach ($_GET as $key => $value)
 
 			case 'lang':
 			{
-			    if (strlen($value) >= 2)
-                    $lang           = strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
 			    break;
 			}		//lang
 

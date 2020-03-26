@@ -17,7 +17,7 @@ use Templating\TemplateTag;
  *						query/exec										*
  *		2010/10/11		explicitly set field names to lower case		*
  *		2010/10/23		move connection establishment to common.inc		*
- *		2010/11/30		use htmlHeader and add link to help page		*
+ *		2010/11/30		add link to help page		                    *
  *		2010/12/08		format number of citations						*
  *		2012/01/13		change class names								*
  *		2012/04/01		pad citation number portion less than 1000		*
@@ -51,6 +51,8 @@ use Templating\TemplateTag;
  *		2019/07/22      use Template                                    *
  *		2019/11/06      add translate table to output for Javascript    *
  *		2020/01/22      internationalize numbers                        *
+ *      2020/02/17      'IDST$idst' is not on readonly template         * 
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -99,21 +101,7 @@ if (count($_GET) > 0)
 
 		    case 'lang':
             {
-                if (preg_match('/^([a-zA-Z]{2})(-([a-zA-Z]{2,3})|)$/',
-                               $value,
-                               $matches))
-                {
-                    if (strlen($matches[2]) > 0)
-                        $lang       = strtolower($matches[1]) . '-' .
-                                      strtoupper($matches[3]);
-                    else
-                        $lang       = strtolower($matches[1]);
-                }
-                else
-                {
-                    if (strlen($value) >= 2)
-                        $lang       = strtolower(substr($value, 0, 2));
-                }
+                $lang       = FtTemplate::validateLang($value);
 				break;
 		    }
 		}		// act on specific parameters
@@ -155,16 +143,19 @@ else
     $template->set('DEBUG',         'N');
 
 // pass interpretation of IDST to Javascript
-$rowtag             = $template['IDST$idst'];
-$table              = '';
-foreach($srcTypes as $idst => $name)
+$rowtag                 = $template['IDST$idst'];
+if ($rowtag)
 {
-    $rtemplate      = new Template($rowtag->outerHTML);
-    $rtemplate->set('idst',         $idst);
-    $rtemplate->set('name',         $name);
-    $table          .= $rtemplate->compile();
+	$table              = '';
+	foreach($srcTypes as $idst => $name)
+	{
+	    $rtemplate      = new Template($rowtag->outerHTML);
+	    $rtemplate->set('idst',         $idst);
+	    $rtemplate->set('name',         $name);
+	    $table          .= $rtemplate->compile();
+	}
+	$rowtag->update($table);
 }
-$rowtag->update($table);
 
 // display table of matching sources
 if ($sources->count() == 0)

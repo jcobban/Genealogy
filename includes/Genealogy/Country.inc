@@ -30,8 +30,10 @@ use \Iterator;
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/04/18      support method getLastSqlCmd                    *
  *		2019/05/18      add $info                                       *
+ *		2020/03/12      in getNativeName handle qualified language code *
+ *		                correct handling of special code 'UK'           * 
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/CountryName.inc';
@@ -135,15 +137,15 @@ class Country extends Record
 				    {		    // act on key fields
 						case 'cc':
 						case 'code':
-						{		// country
-                            $code		        = strtoupper($value);
+						{		// country code
+                            $code		        = strtoupper(substr($value,0,2));
                             if ($code == 'UK')
                                 $code           = 'GB';
 						    $where		        .= $and . "Code=:code";
-						    $sqlParms['code']	= $value;
+						    $sqlParms['code']	= $code;
 						    $and		        = ' AND ';
 						    break;
-						}		// country
+						}		// country code
 
 				    }		    // act on key fields
 				}			    // loop through parameters
@@ -223,8 +225,8 @@ class Country extends Record
      ********************************************************************/
     function getName($options	= '')
     {
-        if (is_string($options) && strlen($options) == 2 && 
-            strtolower($options) != 'en')
+        if (is_string($options) && strlen($options) >= 2 && 
+            strtolower(substr($options, 0,2)) != 'en')
 		{
 		    $parms	        = array('cc'	=> $this->row['code'],
 							        'lang'	=> $options);

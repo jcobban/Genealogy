@@ -59,8 +59,9 @@
  *		2019/11/15      normalize locations that have concession before *
  *		                lot to put lot first                            *
  *		2019/11/18      use getLocationJSON.php                         *
+ *		2020/03/04      loading of dialogs moved to FtTemplate          *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -126,110 +127,14 @@ var lang                = 'en';
 var args                = getArgs();
 if ('lang' in args)
     lang                = args.lang;
-var url	= "/LocationDialogsXML.php?lang=" + lang;
-
-HTTP.getXML(url,
-		    gotDialogs,
-		    noDialogs);
 
 /************************************************************************
- *  function gotDialogs													*
- *																		*
- *  This method is called when the HTML document representing			*
- *  the dialog templates is received from the server.                   *
- *																		*
- *  Input:																*
- *		xmlDoc          XHTML document                                  *
- ************************************************************************/
-var topXml          = null;
-var forms           = [];
-
-function gotDialogs(xmlDoc)
-{
-    topXml	    = xmlDoc.documentElement;
-    if (topXml && topXml.nodeName == 'div')
-    {			// valid response
-        for(var elt = topXml.firstChild; elt !== null; elt = elt.nextSibling)
-        {           // loop through children
-            if (elt.nodeType == 1)
-            {       // element
-                var attrs       = elt.attributes;
-                for (var ia = 0; ia < attrs.length; ia++)
-                {
-                    var name                    = attrs[ia].name;
-                    var value                   = attrs[ia].value;
-                    if (name == 'id')
-                    {
-                        elt.id                  = value;
-                        forms[value]            = elt;
-                    }
-                    else
-                    if (name == 'name')
-                        elt.name                = value;
-                }
-                elt.elements                    = [];
-                traverse(elt, elt);
-            }       // element
-        }           // loop through children
-    }			// valid response
-    else
-        alert("locationCommon.js: gotDialogs: " + tagToString(xmlDoc));
-}       // function gotDialogs
-
-/************************************************************************
- *  function traverse    												*
- *																		*
- *  Recursively traverse all of the children of an XML node.            *`
- *																		*
- *  Input:																*
- *		elt         instance of Node                                    *
- *		form        instance of Node at the top of the tree             *
- ************************************************************************/
-function traverse(elt, form)
-{
-    for(var child = elt.firstChild; child !== null; child = child.nextSibling)
-    {           // loop through children
-        if (child.nodeType == 1)
-        {       // element
-            if (child.nodeName == 'input' || 
-                child.nodeName == 'button' ||
-                child.nodeName == 'select' ||
-                child.nodeName == 'textarea')
-            {   // form element
-                child.form      = form.id;
-                var attrs       = child.attributes;
-                for (var ia = 0; ia < attrs.length; ia++)
-                {
-                    if (attrs[ia].name == 'name')
-                    {
-                        child.name              = value;
-                        form.elements[child.name]       = child;
-                    }
-                }
-                traverse(child, form);
-            }   // form element
-        }       // element
-    }           // loop through children
-}       // function traverse
-
-/************************************************************************
- *  function noDialogs 													*
- *																		*
- *  This method is called if there is no response script on the server	*
- ************************************************************************/
-function noDialogs()
-{
-    alert("locationCommon.js: cannot find LocationDialogs");
-}       // function noDialogs
-
-var myform          = null;
-/************************************************************************
- *  function deferSubmit												*
+ *  global flag deferSubmit												*
  *																		*
  *  Common global flag to prevent submit from completing until all		*
  *  required operations to resolve a location are completed.			*
  ************************************************************************/
-var	deferSubmit	= false;
+var	deferSubmit	        = false;
 
 /************************************************************************
  *  function locationChanged											*
@@ -242,9 +147,10 @@ var	deferSubmit	= false;
  *  Location.														    *
  *																		*
  *  Input:																*
- *		this				an instance of <input type='text'>			*
+ *		this			an instance of <input type='text'>			    *
+ *		ev              Javascript change Event                         *
  ************************************************************************/
-function locationChanged()
+function locationChanged(ev)
 {
     var	form			        = this.form;
     var	updateButton		    = document.getElementById('updEvent');
@@ -282,43 +188,44 @@ function locationChanged()
 	    {                   // do not separate
 	    }                   // do not separate
 	    else
-	        value           = value.replace(digalfaRegex, "$1 $2");
+	        value               = value.replace(digalfaRegex, "$1 $2");
     }
-    var alfadigRegex        = /([a-zA-Z])(\d)/g;
-    value                   = value.replace(alfadigRegex, "$1 $2");
+    var alfadigRegex            = /([a-zA-Z])(\d)/g;
+    value                       = value.replace(alfadigRegex, "$1 $2");
 
     // if the location has a concession followed by a lot, switch them
-    var conlotRegex         = /^(con \d+)\s([^,]*lot[^,]*)/;
-    var conres              = conlotRegex.exec(value);
+    var conlotRegex             = /^(con \d+)\s([^,]*lot[^,]*)/;
+    var conres                  = conlotRegex.exec(value);
     if (conres)
     {
-        var len             = conres[0].length;
-        value               = conres[2] +' '+ conres[1] + value.substring(len);
+        var len                 = conres[0].length;
+        value                   = conres[2] + ' ' + conres[1] + 
+                                  value.substring(len);
     }
 
     // return the normalized value to the input form
-    this.value              = value;
+    this.value                  = value;
 
     // if the form has a button named Submit, enable it just in case
     // it was previously disabled
-    var	submitButton	    = document.getElementById('Submit');
+    var	submitButton	        = document.getElementById('Submit');
     if (submitButton)
 		submitButton.disabled	= false;
 
     // if the value is explicitly [blank] accept it
     if (value == '[' || value == '[blank]' || value == '[Blank]')
     {
-		this.value	        = '[Blank]';
+		this.value	            = '[Blank]';
 		return;
     }
 
     // capitalize words in value if presentation style requires it
-    var textTransform	= "";
-    if (this.currentStyle)		// try IE API
-		textTransform	= this.currentStyle.textTransform;
-    else
+    var textTransform	        = "";
     if (window.getComputedStyle)	// W3C API
 		textTransform	= window.getComputedStyle(this, null).textTransform;
+    else
+    if (this.currentStyle)		// try IE API
+		textTransform	        = this.currentStyle.textTransform;
     if (textTransform == "capitalize")
 		capitalize(this);
 
@@ -449,20 +356,20 @@ function gotLocationJSON(response)
 					        "name"	    : name,
 					        "formname"	: formname,
 					        "field"	    : field};
-			displayDialog(forms['NewLocationMsg$template'],
+			displayDialog('NewLocationMsg$template',
 					      parms,
 					      element,		// position
 					      closeNewDialog);	// button closes dialog
 		}		// no matching entries
 		else
 		{		// multiple matching entries
-			var parms	    = { "template"	: "",
-					            "name"	    : name};
-			var dialog      = displayDialog(forms['ChooseLocationMsg$template'],
-							    	        parms,
-							    	        element,	// position
-							    	        null,		// button closes dialog
-							    	        true);		// do not show yet
+			var parms	= { "template"	: "",
+					        "name"	    : name};
+			var dialog  = displayDialog('ChooseLocationMsg$template',
+							    	    parms,
+							    	    element,	// position
+							    	    null,		// button closes dialog
+							    	    true);		// defer show
 
 			// update selection list for choice
             var form        = dialog.getElementsByTagName('form')[0];

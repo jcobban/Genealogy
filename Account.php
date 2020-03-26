@@ -68,34 +68,27 @@ require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-// this script can only be invoked for a user who is signed in
-if (strlen($userid) == 0)
-{			        // redirect to signon
-	header('Location: Signon.php?lang=' . $lang);
-	exit;
-}			        // redirect to signon
-
 // default values of parameters
-$okmsg	            = '';		// positive notices
-$lang		        = 'en';
-$newPassword	    = '';
-$newPassword2	    = '';
-$password		    = '';
-$email		        = '';
-$useEmail		    = null;
-$nohelp		        = null;
+$okmsg	            		= '';		// positive notices
+$lang		        		= 'en';
+$newPassword	    		= '';
+$newPassword2	    		= '';
+$password		    		= '';
+$email		        		= '';
+$useEmail		    		= null;
+$nohelp		                = null;
 
 // if invoked by method=get process the parameters
-if (count($_GET) > 0)
+if (isset($_GET) && count($_GET) > 0)
 {	        	    // invoked by URL to display current status of account
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+			                   "<table class='summary'>\n" .
+			                      "<tr><th class='colhead'>key</th>" .
+			                        "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
     {	            // loop through all parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>$value</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		    // act on specific parameter
 			case 'lang':
@@ -106,21 +99,21 @@ if (count($_GET) > 0)
         }
     }
     if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn               .= $parmsText . "</table>\n";
 }	        	    // invoked by URL to display current status of account
 else
 if (count($_POST) > 0)
 {		            // invoked by submit to update account
 	$useEmail	            = false;
 	$nohelp	                = false;
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText              = "<p class='label'>\$_POST</p>\n" .
+				                  "<table class='summary'>\n" .
+				                  "<tr><th class='colhead'>key</th>" .
+				                      "<th class='colhead'>value</th></tr>\n";
 	foreach($_POST as $key => $value)
 	{	            // loop through all parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>$value</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		    // act on specific parameter
 			case 'userid':
@@ -178,6 +171,13 @@ if (count($_POST) > 0)
     if ($debug)
         $warn   .= $parmsText . "</table>\n";
 }		            // invoked by submit to update account
+
+// this script can only be invoked for a user who is signed in
+if (strlen($userid) == 0)
+{			        // redirect to signon
+	header('Location: Signon.php?lang=' . $lang);
+	exit;
+}			        // redirect to signon
 
 $template		    = new FtTemplate("Account$lang.html");
 

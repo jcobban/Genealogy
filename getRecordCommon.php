@@ -126,14 +126,16 @@ use \Exception;
  *		                if $parms is empty replace with null to get all *
  *		                pass limit and offset values in parms           *
  *		2019/11/28      table=Censuses&id=censusid may create new entry *
+ *		2020/02/16      limit parameter overrides maximum records       *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 global $record;
@@ -169,7 +171,9 @@ $line				= null;
 $options			= 0;		// value passed to method to specify
 						// sub-records to include in response
 $offset				= 0;		// first record to return from result
+$limit				= 100;		// first record to return from result
 $record		        = null;
+$lang               = 'en';
 
 // check authorization
 if (!canUser('edit'))
@@ -309,20 +313,20 @@ require_once __NAMESPACE__ . '/Census.inc';
 			else
 			    $censusId		= $value;
 
-			$censusRec	= new Census(array('censusid'	=> $censusId,
-							   'collective'	=> 0));
+			$censusRec	        = new Census(array('censusid'	=> $censusId,
+							                       'collective'	=> 0));
 			if ($censusRec->isExisting())
 			{    
 			    $parms['censusid']	= $value;
-			    $cc			= substr($censusId, 0, 2);
-			    $censusYear		= intval(substr($censusId, 2));
-			    $countryObj		= new Country(array('code' => $cc));
-			    $countryName	= $countryObj->getName();
+			    $cc			        = substr($censusId, 0, 2);
+			    $censusYear		    = intval(substr($censusId, 2));
+			    $countryObj		    = new Country(array('code' => $cc));
+			    $countryName	    = $countryObj->getName();
 			}		// includes country code
 			else
 			{
-			    $censusRec	= null;
-			    $msg	.= "Census identifier '$value' invalid. ";
+			    $censusRec	        = null;
+			    $msg	            .= "Census identifier '$value' invalid. ";
 			}
 			break;
 	    }		// census year
@@ -471,8 +475,11 @@ require_once __NAMESPACE__ . '/Census.inc';
 	    case 'limit':
         {		// maximum number of records
             $value                  = trim($value);
-			if (ctype_digit($value))
-			    $parms['limit']	    = intval($value);
+            if (ctype_digit($value))
+            {
+                $limit	            = intval($value);
+                $parms['limit']	    = $limit;
+            }
 			else
 			    $msg	        .= "Invalid parameter value $key='$value'. ";
 			break;
@@ -488,6 +495,12 @@ require_once __NAMESPACE__ . '/Census.inc';
 			    $msg	.= "Invalid parameter value $key='$value'. ";
 			break;
 	    }		// options parameter
+
+        case 'lang':
+        {
+            $lang           = FtTemplate::validateLang($value);
+            break;
+        }
 
 	    case 'debug':
 	    {
@@ -1183,7 +1196,7 @@ if (strlen($msg) == 0)
 	if ($count == 0)
 	    $msg	        = 'No matches.';
 	else
-	if ($count > 100)
+	if ($count > $limit)
 	    $msg	        .= "Too many '$extTableName' records to return: " .
                             number_format($count) . ' matches.';
 }

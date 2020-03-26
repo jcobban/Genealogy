@@ -31,11 +31,13 @@ use \Exception;
  *		2015/09/28		migrate from MDB2 to PDO						*
  *		2017/08/16		script legacyIndivid.php renamed to Person.php	*
  *		2017/12/15		use class CensusLine							*
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
     require_once __NAMESPACE__ . '/SubDistrict.inc';
     require_once __NAMESPACE__ . '/CensusLine.inc';
+    require_once __NAMESPACE__ . '/FtTemplate.inc';
     require_once __NAMESPACE__ . '/common.inc';
 
 /************************************************************************
@@ -92,7 +94,7 @@ function checkRow($row)
 	// pattern for matching surnames: 1st two characters and last
 	if (strlen($surname) > 3)
 	    $surPattern	= '^' . substr($surname, 0, 2) . '.*' .
-			  substr($surname, strlen($surname) - 1) . '$';
+					  substr($surname, strlen($surname) - 1) . '$';
 	else
 	    $surPattern	= '^' . $surname . '$';
 
@@ -127,15 +129,15 @@ function checkRow($row)
 	//	   year in the family tree.
 	//	4. Matches on sex
 	$match	= "SELECT Line, Surname, GivenNames, BYear FROM $table " .
-			"WHERE $provinceW District=:district AND " .
-				"SubDistrict=:subDistrict AND " .
-				"Division=:division AND " .
-				"Page=:page AND " .
-				"(SurnameSoundex=LEFT(SOUNDEX(:surname),4) OR ".
-				"Surname REGEXP :surPattern) AND " .
-				"GivenNames REGEXP :partGiven AND " .
-				"ABS(:birthYear - BYear) < 4 " .
-				 $sexTest;
+					"WHERE $provinceW District=:district AND " .
+							"SubDistrict=:subDistrict AND " .
+							"Division=:division AND " .
+							"Page=:page AND " .
+							"(SurnameSoundex=LEFT(SOUNDEX(:surname),4) OR ".
+							"Surname REGEXP :surPattern) AND " .
+							"GivenNames REGEXP :partGiven AND " .
+							"ABS(:birthYear - BYear) < 4 " .
+							 $sexTest;
 	$sqlParms['district']		= $district;
 	$sqlParms['subDistrict']	= $subDistrict;
 	$sqlParms['division']		= $division;
@@ -151,44 +153,44 @@ function checkRow($row)
 	{		// successful query
 	    $mResult	= $stmt->fetchAll(PDO::FETCH_ASSOC);
 	    if ($debug)
-		$warn	.= "<p>matchCitations.php: " . __LINE__ . " $matchText</p>\n";
+			$warn	.= "<p>matchCitations.php: " . __LINE__ . " $matchText</p>\n";
 
 	    // action depends upon how many matches the above
 	    // pattern returned
 	    if (count($mResult) > 1 && strlen($givenName) > 2)
 	    {		// more than one match
-		if ($debug)
-		    $warn	.= '<p>number of rows in result=' .
-				    count($mResult) . "</p>\n";
-		// make given name test more restrictive
-		// look for match on 4 characters instead of just 2
-		// for example on "John" rather than "Jo"
-		if (strlen($givenName) > 4)
-		    $givPattern	= substr($givenName, 0, 4);
-		else
-		    $givPattern	= $givenName;
-		foreach($mResult as $mRow)
-		{		// loop through matches
-		    $rxResult	= preg_match("/$givPattern/i",
-						 $mRow['givennames']);
-		    if ($rxResult == 1)
-			break;
-		    $lastRow	= $mRow;
-		}		// loop through matches
-		if (!$mRow)
-		    $mRow		= $lastRow;
+			if ($debug)
+			    $warn	.= '<p>number of rows in result=' .
+							    count($mResult) . "</p>\n";
+			// make given name test more restrictive
+			// look for match on 4 characters instead of just 2
+			// for example on "John" rather than "Jo"
+			if (strlen($givenName) > 4)
+			    $givPattern	= substr($givenName, 0, 4);
+			else
+			    $givPattern	= $givenName;
+			foreach($mResult as $mRow)
+			{		// loop through matches
+			    $rxResult	= preg_match("/$givPattern/i",
+									 $mRow['givennames']);
+			    if ($rxResult == 1)
+					break;
+			    $lastRow	= $mRow;
+			}		// loop through matches
+			if (!$mRow)
+			    $mRow		= $lastRow;
 	    }		// more than one match
 	    else
 	    if (count($mResult) > 0)
 	    {		// at most one match
-		$mRow		= $mResult[0];
+			$mRow		= $mResult[0];
 	    }		// at most one match
 	    else
-		$mRow		= null;
+			$mRow		= null;
 
 	    if ($mRow)
 	    {
-		$line	= $mRow['line'];
+			$line	= $mRow['line'];
 ?>
     <p>
       <a id='ftlink<?php print $i; ?>' 
@@ -200,22 +202,22 @@ function checkRow($row)
 	    born about <?php print $mRow['byear']; ?>
 	    on line <span id='line<?php print $i; ?>'><?php print $line; ?></span>.
 <?php
-		$cenParms	= array('census'	=> $census,
-					'district'	=> $district,
-					'subdistrict'	=> $subDistrict,
-					'division'	=> $division,
-					'page'		=> $page,
-					'line'		=> $line);
-		$censusLine	= new CensusLine($cenParms);
-		$censusLine->set('idir', $idir);
-		$censusLine->save(false);
+			$cenParms	= array('census'	=> $census,
+								'district'	=> $district,
+								'subdistrict'	=> $subDistrict,
+								'division'	=> $division,
+								'page'		=> $page,
+								'line'		=> $line);
+			$censusLine	= new CensusLine($cenParms);
+			$censusLine->set('idir', $idir);
+			$censusLine->save(false);
 	    }
 
 	}		// successful query
 	else
 	{
 	    $msg	.= "'" . htmlentities($match) . "': " .
-			   print_r($connection->errorInfo(),true);
+					   print_r($connection->errorInfo(),true);
 	}		// error on query
     }			// surname acceptable to SOUNDEX
 }		// function checkRow
@@ -243,143 +245,142 @@ function checkRow($row)
 	    case 'census':
 	    case 'censusid':
 	    {	// census identifier: XXyyyy
-		$census		= $value;
-		$censusYear	= substr($census, 2);
-		$table		= 'Census' . $censusYear;
-		switch($censusYear)
-		{
-		    case '1851':
-		    {
-			$idsr		= 11;
-			$preConfed	= true;
-			break;
-		    }
+			$census		= $value;
+			$censusYear	= substr($census, 2);
+			$table		= 'Census' . $censusYear;
+			switch($censusYear)
+			{
+			    case '1851':
+			    {
+					$idsr		= 11;
+					$preConfed	= true;
+					break;
+			    }
 
-		    case '1861':
-		    {
-			$idsr		= 12;
-			$preConfed	= true;
-			break;
-		    }
+			    case '1861':
+			    {
+					$idsr		= 12;
+					$preConfed	= true;
+					break;
+			    }
 
-		    case '1871':
-		    {
-			$idsr		= 13;
-			$preConfed	= false;
-			break;
-		    }
+			    case '1871':
+			    {
+					$idsr		= 13;
+					$preConfed	= false;
+					break;
+			    }
 
-		    case '1881':
-		    {
-			$idsr		= 16;
-			$preConfed	= false;
-			break;
-		    }
+			    case '1881':
+			    {
+					$idsr		= 16;
+					$preConfed	= false;
+					break;
+			    }
 
-		    case '1891':
-		    {
-			$idsr		= 17;
-			$preConfed	= false;
-			break;
-		    }
+			    case '1891':
+			    {
+					$idsr		= 17;
+					$preConfed	= false;
+					break;
+			    }
 
-		    case '1901':
-		    {
-			$idsr		= 19;
-			$preConfed	= false;
-			break;
-		    }
+			    case '1901':
+			    {
+					$idsr		= 19;
+					$preConfed	= false;
+					break;
+			    }
 
-		    case '1906':
-		    {
-			$idsr		= 224;
-			$preConfed	= false;
-			break;
-		    }
+			    case '1906':
+			    {
+					$idsr		= 224;
+					$preConfed	= false;
+					break;
+			    }
 
-		    case '1911':
-		    {
-			$idsr		= 271;
-			$preConfed	= false;
-			break;
-		    }
+			    case '1911':
+			    {
+					$idsr		= 271;
+					$preConfed	= false;
+					break;
+			    }
 
-		    case '1916':
-		    {
-			$idsr		= 389;
-			$preConfed	= false;
-			break;
-		    } 
+			    case '1916':
+			    {
+					$idsr		= 389;
+					$preConfed	= false;
+					break;
+			    } 
 
-		    case '1921':
-		    {
-			$idsr		= 466;
-			$preConfed	= false;
-			break;
-		    }
+			    case '1921':
+			    {
+					$idsr		= 466;
+					$preConfed	= false;
+					break;
+			    }
 
-		    default:
-		    {
-			$msg	.= "Invalid census year: $censusYear. ";
-			break;
-		    }
+			    default:
+			    {
+					$msg	.= "Invalid census year: $censusYear. ";
+					break;
+			    }
 
-		}
-		break;
+			}
+			break;
 	    }	// census identifier
 
 	    case 'province':
 	    {	// province code (pre-confederation)
-		$province	= $value;
-		break;
+			$province	= $value;
+			break;
 	    }	// province code
 
 	    case 'district':
 	    {	// district identifier
-		$district	= $value;
-		$rxResult	= preg_match("/^[0-9.]+$/", $district);
-		if ($rxResult != 1)
-		    $msg	.= "District value '$district' is invalid. ";
-		break;
+			$district	= $value;
+			$rxResult	= preg_match("/^[0-9.]+$/", $district);
+			if ($rxResult != 1)
+			    $msg	.= "District value '$district' is invalid. ";
+			break;
 	    }	// district identifier
 
 	    case 'subdistrict':
 	    {	// subDistrict identifier
-		$subDistrict	= $value;
-		break;
+			$subDistrict	= $value;
+			break;
 	    }	// subDistrict identifier
 
 	    case 'division':
 	    {	// division identifier
-		$division	= $value;
-		break;
+			$division	= $value;
+			break;
 	    }	// division identifier
 
 	    case 'page':
 	    {	// page number
-		$page		= $value;
-		$rxResult	= preg_match("/^[0-9]+$/", $page);
-		if ($rxResult != 1)
-		    $msg	.= "Page number '$page' is invalid. ";
-		break;
+			$page		= $value;
+			$rxResult	= preg_match("/^[0-9]+$/", $page);
+			if ($rxResult != 1)
+			    $msg	.= "Page number '$page' is invalid. ";
+			break;
 	    }	// page number
 
 	    case 'lang':
 	    {
-		if (strlen($value) >= 2)
-		    $lang		= strtolower(substr($value,0,2));
-		break;
+	            $lang               = FtTemplate::validateLang($value);
+			break;
 	    }
 
 	    case 'debug':
 	    {
-		break;
+			break;
 	    }
 
 	    default:
 	    {
-		$msg	.= "Unexpected parameter: $key=$value. ";
-		break;
+			$msg	.= "Unexpected parameter: $key=$value. ";
+			break;
 	    }
 	}	// act on each specific parameter
     }		// loop through all parameters
@@ -394,9 +395,9 @@ function checkRow($row)
     if (strlen($msg) == 0)
     {		// no errors
 	$subDist	= new SubDistrict(array('SD_Census' => $census,
-						'SD_DistId' => $district,
-						'SD_Id'	    => $subDistrict,
-						'SD_Div'    => $division));;
+									'SD_DistId' => $district,
+									'SD_Id'	    => $subDistrict,
+									'SD_Div'    => $division));;
 	$dName		= $subDist->get('d_name');
 	$subdName	= $subDist->get('sd_name');
 
@@ -404,16 +405,16 @@ function checkRow($row)
 	if ($preConfed)
 	{	// pre-confederation census
 	    if (strlen($division) > 0)
-		$pattern	= "'^$province, dist $district .* subdist $subDistrict .* div $division page +$page$'";
+			$pattern	= "'^$province, dist $district .* subdist $subDistrict .* div $division page +$page$'";
 	    else
-		$pattern	= "'^$province, dist $district .* subdist $subDistrict .* page +$page$'";
+			$pattern	= "'^$province, dist $district .* subdist $subDistrict .* page +$page$'";
 	}	// pre-confederation census
 	else
 	{	// post-confederation census
 	    if (strlen($division) > 0)
-		$pattern	= "'dist $district .* subdist $subDistrict .* div $division page +$page$'";
+			$pattern	= "'dist $district .* subdist $subDistrict .* div $division page +$page$'";
 	    else
-		$pattern	= "'dist $district .* subdist $subDistrict .* page +$page$'";
+			$pattern	= "'dist $district .* subdist $subDistrict .* page +$page$'";
 	}	// post-confederation census
 
 	// query to locate all citations from individuals in the family
@@ -425,57 +426,57 @@ function checkRow($row)
 	// from there, rather than depend upon the fact that contrary
 	// to good database design the birthSD is replicated in tblNX
 	$iquery	= "SELECT DISTINCT IDIME, tblNX.Surname, tblNX.GivenName,
-				   tblIR.BirthSD, tblIR.Gender 
-			  FROM tblSX
-				JOIN tblNX ON tblNX.IDIR=tblSX.IDIME
-				JOIN tblIR ON tblIR.IDIR=tblSX.IDIME
-			  WHERE tblSX.IDSR=$idsr AND
-				tblSX.Type=2 AND
-				tblSX.SrcDetail REGEXP $pattern";
+							   tblIR.BirthSD, tblIR.Gender 
+					  FROM tblSX
+							JOIN tblNX ON tblNX.IDIR=tblSX.IDIME
+							JOIN tblIR ON tblIR.IDIR=tblSX.IDIME
+					  WHERE tblSX.IDSR=$idsr AND
+							tblSX.Type=2 AND
+							tblSX.SrcDetail REGEXP $pattern";
 
 	$stmt		= $connection->query($iquery);
 	if ($stmt)
 	{		// successful query
 	    $iresult	= $stmt->fetchAll(PDO::FETCH_NUM);
 	    if ($debug)
-		$warn	.= "<p>matchCitations.php: " . __LINE__ . ' '. htmlspecialchars($iquery) . "</p>\n";
+			$warn	.= "<p>matchCitations.php: " . __LINE__ . ' '. htmlspecialchars($iquery) . "</p>\n";
 
 	    $equery	= "SELECT DISTINCT tblER.IDIR, tblNX.Surname, tblNX.GivenName,
-				       tblIR.BirthSD, tblIR.Gender 
-			      FROM tblSX 
-				    JOIN tblER ON tblER.IDER=tblSX.IDIME
-				    JOIN tblIR ON tblIR.IDIR=tblER.IDIR
-				    JOIN tblNX ON tblNX.IDIR=tblER.IDIR
-			      WHERE tblSX.IDSR=$idsr AND
-				    tblSX.Type=30 AND
-				    tblSX.SrcDetail REGEXP $pattern";
+							       tblIR.BirthSD, tblIR.Gender 
+					      FROM tblSX 
+							    JOIN tblER ON tblER.IDER=tblSX.IDIME
+							    JOIN tblIR ON tblIR.IDIR=tblER.IDIR
+							    JOIN tblNX ON tblNX.IDIR=tblER.IDIR
+					      WHERE tblSX.IDSR=$idsr AND
+							    tblSX.Type=30 AND
+							    tblSX.SrcDetail REGEXP $pattern";
 
 	    $stmt	= $connection->query($equery);
 	    if ($stmt)
 	    {		// query successful
-		$eresult	= $stmt->fetchAll(PDO::FETCH_NUM);
-		if ($debug)
-		    $warn	.= "<p>matchCitations.php: " . __LINE__ . ' '. htmlspecialchars($equery) . "</p>\n";
+			$eresult	= $stmt->fetchAll(PDO::FETCH_NUM);
+			if ($debug)
+			    $warn	.= "<p>matchCitations.php: " . __LINE__ . ' '. htmlspecialchars($equery) . "</p>\n";
 	    }		// query successful
 	    else
 	    {
-		$msg	.= $equery . ': ' .
-			   print_r($connection->errorInfo(),true);
+			$msg	.= $equery . ': ' .
+					   print_r($connection->errorInfo(),true);
 	    }		// error on query
 	}		// successful query
 	else
 	{
 	    $msg	.= "'$iquery': " .
-			   print_r($connection->errorInfo(),true);
+					   print_r($connection->errorInfo(),true);
 	}		// error on query
     }		// no errors
 
     // start HTML page
     htmlHeader('Census of Canada: Match Citations',
-		array('/jscripts/CommonForm.js',
-		      '/jscripts/util.js',
-		      '/jscripts/js20/http.js',
-		      '/database/matchCitations.js'));
+			array('/jscripts/CommonForm.js',
+			      '/jscripts/util.js',
+			      '/jscripts/js20/http.js',
+			      '/database/matchCitations.js'));
 ?>
 <body>
 <?php
@@ -484,10 +485,10 @@ function checkRow($row)
 	"/Canada/genCountry.php?cc=CA&lang=$lang"	=> "Canada",
 	"/database/genCensuses.php?lang=$lang"	=> "Censuses",
 	"/database/CensusUpdateStatus.php?Census=$censusYear&lang=$lang"
-				=> "Summary",
+							=> "Summary",
 	"/database/CensusUpdateStatusDist.php?Census=$census&amp;Province=$province&amp;District=$district&lang=$lang"		=> "District $district $dName Summary",
 	"/database/CensusUpdateStatusDetails.php?Census=$census&amp;Province=$province&amp;District=$district&amp;SubDistrict=$subDistrict&amp;Division=$division&lang=$lang"
-				=> "Division Details"));
+							=> "Division Details"));
 ?>	
 <div class='body'>
   <h1>Census of Canada: Match Citations
@@ -525,7 +526,7 @@ function checkRow($row)
 ?>
     <p class='message'><?php print $msg; ?></p>
 <?php
-		$msg	= '';
+			$msg	= '';
 	    }		// trace information present
 	    $i++;
 	}	// loop through all results

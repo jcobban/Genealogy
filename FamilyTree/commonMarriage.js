@@ -199,8 +199,10 @@
  *		2019/11/11      correctly add "delete" button when no more      *
  *		                families                                        *
  *		2019/11/15      add language parameter to opening editIndivid   *
+ *		2020/02/12      exploit Template                                *
+ *		2020/03/18      new implementation of adding events             *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -298,7 +300,7 @@ function clickPref()
 		for (var i = 0; i < formElts.length; ++i)
 		{
 		    var element	= formElts[i];
-    
+
 		    // uncheck all other checkboxes in the preference set
 		    if ((element.name.substring(0,4) == 'Pref') && (element != this))
 				element.checked		= false;
@@ -330,47 +332,6 @@ function editFamily()
     else
 		location.href	= location.href + "?idmr=" + idmr;
 }		// function editFamily
-
-/************************************************************************
- *  function insertSealedRow											*
- *																		*
- *  This method is called to insert a row to represent the sealed to	*
- *  spouse event into the displayed page.								*
- ************************************************************************/
-function insertSealedRow(parms)
-{
-    var	newRow		= createFromTemplate('SealedRow$temp',
-								     parms,
-								     null);
-    var	marrRow		= document.getElementById("MarriageRow");
-    var	tbody		= marrRow.parentNode;
-    var	nextRow		= marrRow.nextSibling;
-    tbody.insertBefore(newRow, nextRow);
-    var	button		= document.getElementById('EditIEvent18');
-    button.onclick	= editIEvent;
-    button		= document.getElementById('DelIEvent18');
-    button.onclick	= delIEvent;
-}	// function insertSealedRow
-
-/************************************************************************
- *  function insertEndedRow												*
- *																		*
- *  This method is called to insert a row to represent the marriage		*
- *  ended event into the displayed page.								*
- ************************************************************************/
-function insertEndedRow(parms)
-{
-    var	newRow	= createFromTemplate('EndedRow$temp',
-							     parms,
-							     null);
-    var	nextRow		= document.getElementById("AddEventRow");
-    var	tbody		= nextRow.parentNode;
-    tbody.insertBefore(newRow, nextRow);
-    var	button		= document.getElementById('EditIEvent24');
-    button.onclick	= editIEvent;
-    button		= document.getElementById('DelIEvent24');
-    button.onclick	= delIEvent;
-}	// function insertEndedRow
 
 /************************************************************************
  *  function gotFamily													*
@@ -500,58 +461,19 @@ function gotFamily(xmlDoc)
 						}	// function marloc
 
 						case 'marendd':
-						{
-						    if (famForm.MarEndD)
-						    {	// event already displayed
-							famForm.MarEndD.value	= value;
-						    }	// event already displayed
-						    else
-						    if (value.length > 0)
-						    {	// need to add ended event
-							var	parms	= {"eventd"	: value,
-									   "temp"	: ""};  
-							insertEndedRow(parms)
-						    }	// need to add ended event
+						{           // obsolete and removed
 						    break; 
 						}	// function marendd
 
 						case 'seald':
-						{
-						    if (famForm.SealD)
-						    {	// event already displayed
-							famForm.SealD.value	= value;
-						    }	// event already displayed
-						    else
-						    if (value.length > 0)
-						    {	// need to add sealed to spouse line
-							var	parms	= {"eventd"	: value,
-									   "eventloc"	: "",
-									   "idtrseal"	: "1",
-									   "temp"	: ""};  
-							insertSealedRow(parms)
-						    }	// need to add sealed to spouse line
+						{           // obsolete and removed
 						    break; 
-						}	// function seald
+						}	        // field seald
 
 						case 'idtrseal':
-						{
-						    if (famForm.IDTRSeal)
-						    {	// event already displayed
-							famForm.IDTRSeal.value	= value;
-						    }	// event already displayed
-						    else
-						    if (/\d+/.test(value) &&
-							value > '1')
-						    {	// need to add sealed to spouse line
-							var	parms	= {"eventd"	: "",
-									   "eventloc"	: "",
-									   "idtrseal"	: value,
-									   "temp"	: ""};  
-							insertSealedRow(parms)
-							famForm.IDTRSeal.value	= value;
-						    }	// need to add sealed to spouse line
+						{           // obsolete and removed
 						    break; 
-						}	// function idtrseal
+						}	        // field idtrseal
 
 						case 'idms':
 						{
@@ -574,14 +496,14 @@ function gotFamily(xmlDoc)
 						case 'notmarried':
 						{	// not married indicator
 						    if (value > 0)
-							addNotMarriedRow();
+							    addNotMarriedRow();
 						    break; 
 						}	// not married indicator
 
 						case 'nochildren':
 						{	// no children indicator
 						    if (value > 0)
-							addNoChildrenRow();
+							    addNoChildrenRow();
 						    break; 
 						}	// no children indicator
 
@@ -590,11 +512,11 @@ function gotFamily(xmlDoc)
 						    var numChildren	= node.getAttribute('count');
 						    if (numChildren > 0)
 						    {		// at least one child
-							noChildrenChecked	= false;
-							noChildrenDisabled	= true;
+							    noChildrenChecked	= false;
+							    noChildrenDisabled	= true;
 						    }		// at least one child
 						    else
-							noChildrenDisabled	= false;
+							    noChildrenDisabled	= false;
 						    addChildrenFromXml(node,
 									childTable);
 						    break;
@@ -602,8 +524,8 @@ function gotFamily(xmlDoc)
 
 						case 'events':
 						{
-						    addEventsFromXml(node,
-								     eventSet);
+						    changeEventListsFromXml(node,
+							        	     eventSet);
 						    break;
 						}	// events tag
 				    }	// take action depending upon tag name
@@ -727,32 +649,34 @@ function addChildrenFromXml(node,
 		    }
     
 		    childTable.addChildToPage(parms,
-							      false);
+					    		      false);
 		}	// element node
     }		// loop through children
 }		// function addChildrenFromXml
 
 /************************************************************************
- *  function addEventsFromXml												*
+ *  function changeEventListsFromXml									*
  *																		*
  *  Add rows to the display to represent family events from tblER.		*
  *																		*
  *  Input:																*
- *		node				<events> tag from XML								*
+ *		node			<events> tag from XML							*
  *		fieldSet		<fieldset id='EventSet'> from page				*
  ************************************************************************/
-function addEventsFromXml(node,
+function changeEventListsFromXml(node,
 						  fieldSet)
 {
     var	form		= document.famForm;
+
     // cleanup existing display
-    var	msg		= "";
+    var	msg		        = "";
     for(var member in fieldSet)
-		msg	+= member + ",";
-    var row 		= fieldSet.firstChild;
-    msg			= "";
+		msg	            += member + ",";
+    var row 		    = fieldSet.firstChild;
+    msg			        = "";
     for(var member in row)
-		msg	+= member + ",";
+		msg	            += member + ",";
+
     while(row)
     {
 		var	nextChild	= row.nextSibling;
@@ -792,43 +716,43 @@ function addEventsFromXml(node,
 				parms['description']	= descn;
 		    }
 		     
-		    var	newrow		= createFromTemplate('EventRow$ider',
-									     parms,
-									     null);
+		    var	newrow		    = createFromTemplate('EventRow$ider',
+								        	         parms,
+								            	     null);
 		    fieldSet.insertBefore(newrow, nextRow);
 
 		    // add handlers for added buttons
-		    var	ider		= parms['ider'];
-		    var eltName		= "citType" + ider;
-		    var element		= form.elements[eltName];
+		    var	ider		    = parms['ider'];
+		    var eltName		    = "citType" + ider;
+		    var element		    = form.elements[eltName];
 		    actMouseOverHelp(element);
 
-		    eltName		= "Date" + ider;
-		    element		= form.elements[eltName];
-		    element.abbrTbl	= MonthAbbrs;
+		    eltName		        = "Date" + ider;
+		    element		        = form.elements[eltName];
+		    element.abbrTbl	    = MonthAbbrs;
 		    element.onchange	= dateChanged;
 		    element.checkfunc	= checkDate;
 		    actMouseOverHelp(element);
 
-		    eltName		= "EventLoc" + ider;
-		    element		= form.elements[eltName];
-		    element.abbrTbl	= evtLocAbbrs;
+		    eltName		        = "EventLoc" + ider;
+		    element		        = form.elements[eltName];
+		    element.abbrTbl	    = evtLocAbbrs;
 		    element.onchange	= locationChanged;
 		    actMouseOverHelp(element);
 
-		    eltName		= "EditEvent" + ider;
-		    var button		= document.getElementById(eltName);
-		    button.onclick	= editEvent;    
+		    eltName		        = "EditEvent" + ider;
+		    var button		    = document.getElementById(eltName);
+		    button.onclick	    = editEvent;    
 		    actMouseOverHelp(button);
 
-		    eltName		= "DelEvent" + ider;
-		    button		= document.getElementById(eltName);
-		    button.onclick	= delEvent;    
+		    eltName		        = "DelEvent" + ider;
+		    button		        = document.getElementById(eltName);
+		    button.onclick	    = delEvent;    
 		    actMouseOverHelp(button);
 
 		}	// element node
     }		// loop through children
-}		// function addEventsFromXml
+}		// function changeEventListsFromXml
 
 /************************************************************************
  *  function noFamily													*
@@ -1054,7 +978,7 @@ function marriageDetails()
 }
 
 /************************************************************************
- *  function noteDetails													*
+ *  function noteDetails												*
  *																		*
  *  This method is called when the user requests to edit the 			*
  *  details, including citations, for the note event.					*
@@ -1352,13 +1276,13 @@ function changeChild(parms)
 /************************************************************************
  *  function eventFeedback												*
  *																		*
- *  This is a method of the form object that is called by the script		*
+ *  This is a method of the form object that is called by the script	*
  *  editEvent.php to feedback changes to an event that should be		*
  *  reflected in this form.												*
  *																		*
- *  Parameters:																*
- *		this		<form> object												*
- *		parms		the values of fields from the editEvent.php dialog		*
+ *  Parameters:															*
+ *		this		<form> object										*
+ *		parms		the values of fields from the editEvent.php dialog	*
  ************************************************************************/
 function eventFeedback(parms)
 {
@@ -1373,7 +1297,7 @@ function eventFeedback(parms)
     // update field values in the current dialog based upon values
     // returned from the editEvent.php dialog
     switch(type)
-    {		// source fields changed depend on type of event
+    {		    // source fields changed depend on type of event
 		case STYPE_MAREVENT: // marriage event in tblER
 		{		// marriage event
 		    redisplayFamily();	// refresh to display
@@ -1382,48 +1306,48 @@ function eventFeedback(parms)
 
 		case STYPE_MAR: // Marriage event in tblMR	
 		{		// marriage event 
-		    form.MarD.value	= parms['date'];
+		    form.MarD.value	    = parms['date'];
 		    form.MarLoc.value	= parms['location'];
 		    break;
 		}		// marriage event
 
-		case STYPE_MARNOTE: // Marriage Note
-		{		// marriage event 
+		case STYPE_MARNOTE:
+		{		// marriage note
 		    form.Notes.value	= parms['note'];
 		    break;
-		}		// marriage event
+		}		// marriage note
 
-		case STYPE_MARNEVER:	// Never Married
-		{
-		    var	notMarried	= parms['notmarried'];
+		case STYPE_MARNEVER:
+		{	    // Never Married
+		    var	notMarried	    = parms['notmarried'];
 		    if (notMarried)
 				addNotMarriedRow();
 		    else
 		    if (form.NotMarried)
 				form.NotMarried.checked	= false;
 		    break;
-		}
+		}	    // Never Married
 
-		case STYPE_MARNOKIDS:	// No Children  
-		{
-		    var	noChildren	= parms['nochildren'];
+		case STYPE_MARNOKIDS:
+		{	    // No Children  
+		    var	noChildren	    = parms['nochildren'];
 		    if (noChildren)
 				addNoChildrenRow();
 		    else
 		    if (form.NoChildren)
 				form.NoChildren.checked	= false;
 		    break;
-		}
+		}	    // No Children  
 
-		case STYPE_LDSS: 	// Sealed to Spouse
-		case STYPE_NEVERMARRIED: // Never married 
-		case STYPE_MAREND:	// marriage ended
-		{		// marriage event 
+		case STYPE_LDSS: 	        // Sealed to Spouse
+		case STYPE_NEVERMARRIED:    // Never married 
+		case STYPE_MAREND:	        // marriage ended
+		{		// other marriage event 
 		    redisplayFamily();	// refresh to display
 		    break;
-		}		// marriage event
+		}		// other marriage event
 
-    }		// source fields to refresh depend on type
+    }		    // source fields to refresh depend on type
 }		// function eventFeedback
 
 /************************************************************************
@@ -1703,25 +1627,25 @@ function editChild(ev)
  ************************************************************************/
 function addNewChild()
 {
-    var	form		= this.form;
-    var	childTable	= document.getElementById('children');
-    var	parms	= {
-				'idir'		: 0,
-				'givenname'	: '',
-				'surname'	: '',
-				'birthd'	: '',
-				'birthsd'	: -99999999,
-				'deathd'	: '',
-				'gender'	: 'unknown'};
-    parms.surname		= form.HusbSurname.value;
+    var	form		        = this.form;
+    var	childTable	        = document.getElementById('children');
+    var	parms	            = {
+    							'idir'		: 0,
+	    						'givenname'	: '',
+		    					'surname'	: '',
+			    				'birthd'	: '',
+				    			'birthsd'	: -99999999,
+					    		'deathd'	: '',
+						    	'gender'	: 'unknown'};
+    parms.surname		    = form.HusbSurname.value;
 
-    var	row		= childTable.addChildToPage(parms,
-									    false);
+    var	row		            = childTable.addChildToPage(parms,
+						                			    false);
 
     if (row.id)
     {
-		var	rownum		= row.id.substring(CHILD_PREFIX_LEN);
-		var givenName	= form.elements['CGiven' + rownum];
+		var	rownum		    = row.id.substring(CHILD_PREFIX_LEN);
+		var givenName	    = form.elements['CGiven' + rownum];
 		givenName.onchange	= givenChanged;
 		givenName.focus();		// move the cursor to the new name
     }
@@ -2346,28 +2270,35 @@ function childOrder(first, second)
  *																		*
  *  Input:																*
  *		this	<button id='EditEvent9999'> where the number is the		*
- *				key of an instance of Event.							*
+ *				row number in the display.                              *
+ *		ev      instance of Javascript click Event                      *
  ************************************************************************/
-function editEvent()
+function editEvent(ev)
 {
-    var	form		= this.form;
-    var	ider		= this.id.substring(9);
-
-    var idmr		= form.idmr.value;
-    if (idmr && idmr > 0)
-    {			// existing family
-		var url		= 'editEvent.php?idmr=' + idmr +
-							    '&ider=' + ider +
-							    '&type=31';
-		var eventWindow	= openFrame("eventLeft",
-							    url,
-							    "left");
-    }			// existing family
+    let	form		    = this.form;
+    let	rownum	        = this.id.substring(9);
+    let iderElt         = document.getElementById('ider' + rownum);
+    if (iderElt)
+    {
+        let ider        = iderElt.value;
+	    let idmr		= form.idmr.value;
+	    if (idmr && idmr > 0)
+	    {			// existing family
+			let url		= 'editEvent.php?idmr=' + idmr +
+								    '&ider=' + ider +
+								    '&type=31';
+			let eventWindow	= openFrame("eventLeft",
+								        url,
+								        "left");
+	    }			// existing family
+	    else
+	    {			// family needs to be saved first
+			pendingButton	= this;
+			form.update.click();	// save the family first
+	    }			// family needs to be saved first
+    }
     else
-    {			// family needs to be saved first
-		pendingButton	= this;
-		form.update.click();	// save the family first
-    }			// family needs to be saved first
+        popupAlert("cannot find element id='ider" + rownum + "'", this); 
     return true;
 }	// function editEvent
 
@@ -2382,17 +2313,23 @@ function editEvent()
  *  Parameters:															*
  *		this	<button id='EditIEvent9999'> where the number is 		*
  *				a citation type as defined in Citation.inc				*
+ *		ev      instance of Javascript click Event                      *
  ************************************************************************/
-function editIEvent()
+function editIEvent(ev)
 {
-    var	form		= this.form;
-    var	citType		= this.id.substring(10);
+    var	form		    = this.form;
+    var	citType		    = this.id.substring(10);
 
-    var idmr		= form.idmr.value;
+    var idmr		    = form.idmr.value;
     if (idmr && idmr > 0)
     {			// existing family
-		var url		= 'editEvent.php?idmr=' + idmr +
-							'&type=' + citType;
+		var url		    = 'editEvent.php?idmr=' + idmr +
+						    	'&type=' + citType;
+        if (citType == STYPE_MAR)
+			url	        += "&date=" +
+						   encodeURIComponent(form.MarD.value) +
+						   "&location=" +
+						   encodeURIComponent(form.MarLoc.value);
 		var eventWindow	= openFrame("openLeft",
 							    url,
 							    "left");
@@ -2453,9 +2390,9 @@ function confirmEventDel()
 {
     // get the parameter values hidden in the dialog
     var	form		= this.form;
-    var	ider		= this.id.substr(12);
-    var	formname	= form.elements['formname' + ider].value;
-    var	form		= document.forms[formname];
+    var	rownum		= this.id.substr(12);
+    var iderElt     = document.getElementById('ider' + rownum);
+    var ider        = iderElt.value;
     dialogDiv.style.display	= 'none';
 
 
@@ -2465,6 +2402,7 @@ function confirmEventDel()
 					   "cittype"	: 31};
 
 		// invoke script to update Event and return XML result
+        alert('/FamilyTree/deleteEventXml.php?idime=' + ider + '&cittype=31');
 		popupLoading(this);	// display loading indicator
 		HTTP.post('/FamilyTree/deleteEventXml.php',
 				  parms,
@@ -2615,33 +2553,87 @@ function noDelEvent()
 }		// function noDelEvent
 
 /************************************************************************
- *  function addEvent													*
+ *  function changeEventList											*
  *																		*
- *  This is the onclick method of the "Add Event" button.  				*
- *  It is called when the user requests to add							*
- *  information about a new event to the current family that is			*
- *  recorded by an instance of Event or by a normally hidden			*
- *  event recorded in the instance of Family.							*
+ *  This is the onchange method of the "eventList" selection.  			*
+ *  It is called when the user chooses a new event to add               *
+ *  to the current family that is recorded by an instance of Event      *
  *																		*
  *  Parameters:															*
- *		this		<button id='addEvent'>								*
+ *		this		<select id='eventList'>						        *
+ *		ev          instance of Javascript change Event                 *
  ************************************************************************/
-function addEvent()
+function changeEventList(ev)
 {
-    var	form	= this.form;
-
-    if (form)
+    let	form	                = this.form;
+    let idet                    = this.value;
+    if (idet > 0)
     {
-		var idmr	= form.idmr.value;
-		var url		= 'editEvent.php?idmr=' + idmr + '&ider=0&type=0';
-		var eventWindow	= openFrame("eventLeft",
-							    url,
-							    "left");
+	    let selectedIndex       = this.selectedIndex;
+	    let text                = this.options[selectedIndex].text;
+	    let addEventRow         = this.parentNode;
+	    let fieldset            = addEventRow.parentNode;
+	    let events              = document.getElementById('events');
+	    let rownum              = events.childElementCount;
+	    let template            = document.getElementById('EventRow$rownum');
+        if (template)
+        {
+            template            = template.outerHTML;
+            
+			template			= template.replace(/\$rownum/g, rownum);
+			template			= template.replace(/\$type/g, text);
+			template			= template.replace(/\$ider/g, 0);
+			template			= template.replace(/\$idet/g, idet);
+			template			= template.replace(/\$eventd/g, '');
+			template			= template.replace(/\$eventloc/g, '');
+            events.innerHTML    = events.innerHTML + template;
+            let dateElt         = document.getElementById('Date' + rownum);
+			dateElt.abbrTbl		= MonthAbbrs;
+			dateElt.onchange	= dateChanged;
+			dateElt.checkfunc	= checkDate;
+		    actMouseOverHelp(dateElt);
+            let locElt          = document.getElementById('EventLoc' + rownum);
+			locElt.abbrTbl		= evtLocAbbrs;
+            if (idet == 76)
+			    locElt.onchange		= templeChanged;
+            else
+			    locElt.onchange		= locationChanged;
+		    actMouseOverHelp(locElt);
+        }
+        else
+            alert("no template EventRow$rownum");
     }
-    else
-		alert("commonMarriage.js: addEvent: unable to get form");
-    return true;
-}	// function addEvent
+    this.value                  = 0;    // rest back to "choose"
+    return true;                        // continue propagate event
+}	// function changeEventList
+
+/************************************************************************
+ *  function gotAddEvent												*
+ *																		*
+ *  This method is called when the JSON document representing			*
+ *  an Eventd added to the family is retrieved from the server.			*
+ *																		*
+ *  Parameters:															*
+ *		jsonObj		Event record as a JSON document				        *
+ ************************************************************************/
+function gotAddEvent(jsonObj)
+{
+    hideLoading();	// hide loading indicator
+    alert("gotAddChild: " + JSON.stringify(jsonObj));
+}
+
+/************************************************************************
+ *  function noAddEvent												    *
+ *																		*
+ *  This method is called when the JSON document representing			*
+ *  an Event added to the family is not available from the server.		*
+ *																		*
+ ************************************************************************/
+function noAddEvent()
+{
+    hideLoading();	// hide loading indicator
+    alert('commonMarriage.js: noAddEvent: script addEventJSON.php not found on server');
+}		// function noAddEvent
 
 /************************************************************************
  *  function orderEvents												*
@@ -2812,17 +2804,17 @@ function addChildToPage(parms,
 						updateDb,
 						debug)
 {
-    var msg	= "";
+    var msg	            = "";   // trace message
     for(parm in parms) { msg += parm + "='" + parms[parm] + "',"; }
     //alert("common Marriage.js: addChildToPage(parms={" + msg + "},updateDb=" + updateDb + ")");
     if (parms.givenname === undefined)
 		throw "commonMarriage.js: addChildToPage: parms=" + msg;
     if (parms.idcr === undefined)
-		parms.idcr	= '';
+		parms.idcr	    = '';
     
     // add information about the  child as a visible row in the web page. 
-    var	table		= this;
-    var	famForm		= document.famForm;
+    var	table		    = this;
+    var	famForm		    = document.famForm;
 
     // ensure that No Children checkbox is cleared and disabled
     // so the user cannot accidentally set it
@@ -2833,31 +2825,31 @@ function addChildToPage(parms,
     }
 
     // get the IDMR value for the current family
-    var	idmr		= famForm.idmr.value;
+    var	idmr		    = famForm.idmr.value;
 
     // get the body of the table of children
-    var	tableBody	= table.tBodies[0];
+    var	tableBody	    = table.tBodies[0];
     
     // insert new row of information into the web page 
     // at the end of the body section of the table
-    var	rownum		= tableBody.rows.length;
-    parms.rownum	= rownum;
+    var	rownum		    = tableBody.rows.length + 1;
+    parms.rownum	    = rownum;
     if (parms.gender == 'male')
-		parms.sex	= 0;
+		parms.sex	    = 0;
     else
     if (parms.gender == 'female')
-		parms.sex	= 1;
+		parms.sex	    = 1;
     else
-		parms.sex	= 2;
+		parms.sex	    = 2;
     var	row		= createFromTemplate('child$rownum',
 								     parms,
 								     null,
 								     debug);
     row			= tableBody.appendChild(row);	// add to end of body
     if (parms.idir)
-		row.idir	= parms.idir;
+		row.idir	    = parms.idir;
     if (parms.idcr)
-		row.idcr	= parms.idcr;
+		row.idcr	    = parms.idcr;
     row.changePerson	= changeChild;		// feedback method
     var	inputElements	= row.getElementsByTagName("*");
     for(var ei = 0; ei < inputElements.length; ei++)
@@ -2866,19 +2858,19 @@ function addChildToPage(parms,
 		var	nodeName	= element.nodeName.toLowerCase();
 		var	name;
 		if (element.name && element.name.length > 0)
-		    name	= element.name;
+		    name	    = element.name;
 		else
-		    name	= element.id;
+		    name	    = element.id;
 		if (nodeName != 'input' && nodeName != 'button')
 		    continue;
 
-		var rowNum	= '';
+		var rowNum	    = '';
 		var namePattern	= /^([a-zA-Z_]+)(\d+)$/;
-		var pieces	= namePattern.exec(name);
+		var pieces	    = namePattern.exec(name);
 		if (pieces)
 		{		// separate column and row
-		    name	= pieces[1];
-		    rowNum	= pieces[2];
+		    name	    = pieces[1];
+		    rowNum	    = pieces[2];
 		}		// separate column and row
 
 		// pop up help balloon if the mouse hovers over a field
@@ -2983,14 +2975,14 @@ function editEventMar(type, button)
 
 		    switch(type)
 		    {		// add parameters dependent upon type
-				case 18:
+				case STYPE_LDSS:
 				{	// sealed event
 				    url	+= "&date=" +
 						   encodeURIComponent(form.SealD.value);
 				    break;
 				}	// sealed event
 
-				case 20:
+				case STYPE_MAR:
 				{	// marriage event
 				    url	+= "&date=" +
 						   encodeURIComponent(form.MarD.value) +

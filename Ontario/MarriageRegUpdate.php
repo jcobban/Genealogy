@@ -40,8 +40,9 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/12/23      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Marriage.inc';
 require_once __NAMESPACE__ . '/MarriageParticipant.inc';
@@ -95,8 +96,7 @@ if (count($_POST) > 0)
 	
 		    case 'lang':
             {
-                if (strlen($value) >= 2)
-	    		    $lang	= substr($value,0,2);
+	            $lang               = FtTemplate::validateLang($value);
 	    		break;
 		    }		// registration domain
 	

@@ -12,6 +12,12 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden">
+    <span id="dateFormat">
+        [dd] [Mon] [yyyy][BC]
+    </span>
+    <span id="dateFormatFull">
+        [dd] [Month] [yyyy][BC]
+    </span>
     <div id="Months">
       <span></span>         <!--  0 -->
       <span>Jan</span>      <!--  1 -->
@@ -412,6 +418,12 @@
       <span data-key="The cause of death was">
 		The cause of death was
 	  </span>
+      <span data-key="The marriage ended">
+		The marriage ended
+	  </span>
+      <span data-key="They">
+		They
+	  </span>
       <span data-key="to">
 		to
 	  </span>
@@ -754,7 +766,7 @@
 		[Pronoun] signed a marriage contract [Description] [onDate] [Location].[Citations] [Notes]
 	  </span>
       <span data-key="37">
-		[HusbFirstName] and [WifeFirstName] obtained a marriage license [Description] [onDate] [Location].[Citations] [Notes]
+		[Pronoun] obtained a marriage license [Description] [onDate] [Location].[Citations] [Notes]
 	  </span>
       <span data-key="38">
 		[Pronoun] published an intent to marry [Description] [onDate] [Location].[Citations] [Notes]
@@ -894,6 +906,108 @@
     </div>
 
     <!--*****************************************************************
+     *  'msTypes'														*
+     *																	*
+     *  Translate from IDMS value of a Family record to text            *
+     ******************************************************************-->
+    <div class="hidden" id="msTypes">`
+      <span data-key="1">
+		No special status
+	  </span>
+      <span data-key="2">
+		Annulled
+	  </span>
+      <span data-key="3">
+		Common Law
+	  </span>
+      <span data-key="4">
+		Divorced
+	  </span>
+      <span data-key="5">
+		Married
+	  </span>
+      <span data-key="6">
+		Other
+	  </span>
+      <span data-key="7">
+		Separated
+	  </span>
+      <span data-key="8">
+		Unmarried
+	  </span>
+      <span data-key="9">
+		Divorce
+	  </span>
+      <span data-key="10">
+		Separation
+	  </span>
+      <span data-key="11">
+		Private
+	  </span>
+      <span data-key="12">
+		Partners
+	  </span>
+      <span data-key="13">
+		Death of one spouse
+	  </span>
+      <span data-key="14">
+		Single
+	  </span>
+      <span data-key="15">
+		Friends
+	  </span>
+    </div>
+
+    <!--*****************************************************************
+     *  'msStmts'														*
+     *																	*
+     *  Translate from IDMS value of a Family record to a sentence.     *
+     ******************************************************************-->
+    <div class="hidden" id="msStmts">`
+      <span data-key="1">
+	  </span>
+      <span data-key="2">
+		Their marriage was annulled.
+	  </span>
+      <span data-key="3">
+		They were in a common law relationship.
+	  </span>
+      <span data-key="4">
+		Their marriage ended in divorce.
+	  </span>
+      <span data-key="5">
+	  </span>
+      <span data-key="6">
+		They were in an unspecified relationship.
+	  </span>
+      <span data-key="7">
+		Their marriage ended in a separation.
+	  </span>
+      <span data-key="8">
+		They were unmarried.
+	  </span>
+      <span data-key="9">
+		They were divorced.
+	  </span>
+      <span data-key="10">
+		They were separated.
+	  </span>
+      <span data-key="11">
+	  </span>
+      <span data-key="12">
+		They were partners.
+	  </span>
+      <span data-key="13">
+		Their marriage ended with the death of one spouse.
+	  </span>
+      <span data-key="14">
+	  </span>
+      <span data-key="15">
+		They were just friends.
+	  </span>
+    </div>
+
+    <!--*****************************************************************
      *  'cpRelType'														*
      *																	*
      *  This table provides a translation from a child to parent        *
@@ -914,6 +1028,21 @@
       <span data-key="11">private</span>
       <span data-key="12">family member</span>
       <span data-key="13">illegitimate</span>
+    </div>
+
+    <!--*****************************************************************
+     *  'MarriedNameRule'												*
+     *																	*
+     *  This table provides a translation from the value of             *
+     *  field 'marriednamerule' in class Family.                        *
+     ******************************************************************-->
+    <div id="MarriedNameRule">
+      <span data-key="0">
+		Don't Generate Married Names
+      </span>
+      <span data-key="1">
+		Replace Wife's Surname with Husband's Surname
+      </span>
     </div>
 
     <!--*****************************************************************

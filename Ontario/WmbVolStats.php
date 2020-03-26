@@ -15,6 +15,7 @@ use \NumberFormatter;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2020/01/25      use Template, MethodistBaptismSet, and          *
  *		                NumberFormatter                                 *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -37,8 +38,7 @@ foreach ($_GET as $key => $value)
     {		    // switch on parameter name
         case 'lang':
         {		// language requested
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value,0,2));
+	            $lang       = FtTemplate::validateLang($value);
             break;
         }		// language requested
 

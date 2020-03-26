@@ -67,8 +67,9 @@ use \Exception;
  *		2018/10//20     use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/12/13      remove B_ prefix from file names                *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Birth.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
@@ -96,54 +97,64 @@ $lang           		= 'en';
 $errors         		= 0;
 
 // get key values from parameters
-foreach($_POST as $key => $value)
-{			// loop through all parameters
-	switch(strtolower($key))
-	{		// act on specific parameters
-	    case 'domain':
-	    {
-			$domain	    = $value;
-            if (strlen($value) > 2)
-            {
-                $cc     = substr($value, 0, 2);
-                $code   = substr($value, 2);
-            }
-			break;
-	    }		// domain 
-
-	    case 'regyear':
-	    {
-			$regYear	= $value;
-			break;
-	    }		// registration year
-
-	    case 'regnum':
-	    {
-			$regNum	    = $value;
-			break;
-	    }		// registration number
-
-        case 'regcounty':
-        {
-            $county             = $value;
-            break;
-        }
-
-        case 'regtownship':
-        {
-            $township           = $value;
-            break;
-        }
-
-	    case 'lang':
-	    {
-			if (strlen($value) >= 2)
-                $lang               = strtolower(substr($value,0,2));
-			break;
-	    }		// language
-
-	}		// act on specific parameters
-}			// loop through all parameters
+if (isset($_POST) && count($_POST) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_POST</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_POST as $key => $value)
+    {			    // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+		{		    // act on specific parameters
+		    case 'domain':
+		    {
+				$domain	    = $value;
+	            if (strlen($value) > 2)
+	            {
+	                $cc     = substr($value, 0, 2);
+	                $code   = substr($value, 2);
+	            }
+				break;
+		    }		// domain 
+	
+		    case 'regyear':
+		    {
+				$regYear	= $value;
+				break;
+		    }		// registration year
+	
+		    case 'regnum':
+		    {
+				$regNum	    = $value;
+				break;
+		    }		// registration number
+	
+	        case 'regcounty':
+	        {
+	            $county             = $value;
+	            break;
+	        }
+	
+	        case 'regtownship':
+	        {
+	            $township           = $value;
+	            break;
+	        }
+	
+		    case 'lang':
+		    {
+	                $lang       = FtTemplate::validateLang($value);
+				break;
+		    }		// language
+	
+		}		    // act on specific parameters
+	}			    // loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			        // invoked by method=post
 
 // create page template
 $template		= new FtTemplate("BirthRegUpdate$lang.html");

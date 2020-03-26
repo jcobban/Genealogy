@@ -149,8 +149,10 @@ use \Exception;
  *		2017/12/13		use PersonSet in place of Person::getPersons	*
  *		2018/03/17		correct alignment of registration number		*
  *		2018/05/28		use template									*
+ *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/03/21      fix references to undefined $death              *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Death.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
@@ -194,112 +196,115 @@ $showImage              = false;
 $lang	    			= 'en';
 $imatches			    = null;
 
-$parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
-foreach($_GET as $key => $value)
-{			// loop through all input parameters
-    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-    switch(strtolower($key))
-    {		// process specific named parameters
-        case 'regyear':
-        {
-            $regYear	= $value;
-            if (!preg_match("/^([0-9]{4})$/", $regYear) ||
-                ($regYear < 1860) || ($regYear > 2000))
-            {
-                $msg	.= "Registration Year $regYear must be a number between 1869 and 2000. ";
-            }
-            break;
-        }		// RegYear passed
-
-        case 'regnum':
-        {
-            $regNum	= $value;
-            if (!preg_match("/^([0-9]{2,7})$/", $regNum))
-            {
-                $msg	.= "Registration Number $regNum must be a number. ";
-            }
-            break;
-        }		// RegNum passed
-
-        case 'originalvolume':
-        {
-            $volume		= $value;
-            $numVolume	= preg_replace('/[^0-9]/', '', $value);
-            break;
-        }		// RegNum passed
-
-        case 'originalpage':
-        {
-            if (ctype_digit($value))
-                $page	= $value;
-            else
-                $msg	.= "Page Number $value must be a number. ";
-            break;
-        }		// RegNum passed
-
-        case 'originalitem':
-        {
-            if (ctype_digit($value))
-                $item	= $value;
-            else
-                $msg	.= "Item Number $value must be a number. ";
-            break;
-        }		// RegNum passed
-
-        case 'domain':
-        case 'regdomain':
-        {
-            $domainObj	= new Domain(array('domain'	=> $value,
-                				   'language'	=> 'en'));
-            if ($domainObj->isExisting())
-            {
-                $domain		    = $value;
-                $cc			    = substr($domain, 0, 2);
-                $countryObj		= new Country(array('code' => $cc));
-                $countryName	= $countryObj->getName();
-                $domainName		= $domainObj->get('name');
-            }
-            else
-            {
-                $msg	.= "Domain '$value' is not a supported " .
-                		"two character country code followed by ".
-                		"a state or province code. ";
-                $domainName	= 'Domain : ' . $value;
-            }
-            break;
-        }		// RegDomain
-
-        case 'showimage':
-        {
-            $showImage          = strtolower(substr($value,0,1)) == 'y';
-            break;
-        }		// handled by JavaScript
-
-        case 'lang':
-        {		// language specification
-            if (strlen($value) >= 2)
-                $lang		    = strtolower(substr($value,0,2));
-            break;
-        }		// language specification
-
-        case 'debug':
-        {		// debug handled by common code
-            break;
-        }		// debug handled by common code
-
-        default:
-        {		// any other paramters
-            $warn	.= "Unexpected parameter $key='$value'. ";
-            break;
-        }		// any other paramters
-    }		// process specific named parameters
-}			// loop through all input parameters
-if ($debug)
-    $warn       .= $parmsText . "</table>\n";
+// override from passed parameters
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+	$parmsText  = "<p class='label'>\$_GET</p>\n" .
+	                  "<table class='summary'>\n" .
+	                  "<tr><th class='colhead'>key</th>" .
+	                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{			// loop through all input parameters
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+	    {		// process specific named parameters
+	        case 'regyear':
+	        {
+	            $regYear	= $value;
+	            if (!preg_match("/^([0-9]{4})$/", $regYear) ||
+	                ($regYear < 1860) || ($regYear > 2000))
+	            {
+	                $msg	.= "Registration Year $regYear must be a number between 1869 and 2000. ";
+	            }
+	            break;
+	        }		// RegYear passed
+	
+	        case 'regnum':
+	        {
+	            $regNum	= $value;
+	            if (!preg_match("/^([0-9]{2,7})$/", $regNum))
+	            {
+	                $msg	.= "Registration Number $regNum must be a number. ";
+	            }
+	            break;
+	        }		// RegNum passed
+	
+	        case 'originalvolume':
+	        {
+	            $volume		= $value;
+	            $numVolume	= preg_replace('/[^0-9]/', '', $value);
+	            break;
+	        }		// RegNum passed
+	
+	        case 'originalpage':
+	        {
+	            if (ctype_digit($value))
+	                $page	= $value;
+	            else
+	                $msg	.= "Page Number $value must be a number. ";
+	            break;
+	        }		// RegNum passed
+	
+	        case 'originalitem':
+	        {
+	            if (ctype_digit($value))
+	                $item	= $value;
+	            else
+	                $msg	.= "Item Number $value must be a number. ";
+	            break;
+	        }		// RegNum passed
+	
+	        case 'domain':
+	        case 'regdomain':
+	        {
+	            $domainObj	= new Domain(array('domain'	=> $value,
+	                				   'language'	=> 'en'));
+	            if ($domainObj->isExisting())
+	            {
+	                $domain		    = $value;
+	                $cc			    = substr($domain, 0, 2);
+	                $countryObj		= new Country(array('code' => $cc));
+	                $countryName	= $countryObj->getName();
+	                $domainName		= $domainObj->get('name');
+	            }
+	            else
+	            {
+	                $msg	.= "Domain '$value' is not a supported " .
+	                		"two character country code followed by ".
+	                		"a state or province code. ";
+	                $domainName	= 'Domain : ' . $value;
+	            }
+	            break;
+	        }		// RegDomain
+	
+	        case 'showimage':
+	        {
+	            $showImage          = strtolower(substr($value,0,1)) == 'y';
+	            break;
+	        }		// handled by JavaScript
+	
+	        case 'lang':
+	        {		// language specification
+	            $lang       = FtTemplate::validateLang($value);
+	            break;
+	        }		// language specification
+	
+	        case 'debug':
+	        {		// debug handled by common code
+	            break;
+	        }		// debug handled by common code
+	
+	        default:
+	        {		// any other paramters
+	            $warn	.= "Unexpected parameter $key='$value'. ";
+	            break;
+	        }		// any other paramters
+	    }		// process specific named parameters
+	}			// loop through all input parameters
+	if ($debug)
+	    $warn       .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
 // create Template
 $template		        = new FtTemplate("DeathRegDetail$action$lang.html");
@@ -675,6 +680,66 @@ if (isset($death))
 	$template->set('OCCUPATION',
 	               $death->get('d_occupation'));
 	$marStat	= $death->get('d_marstat');
+	$template->set('BIRTHPLACE',
+	               $death->get('d_birthplace'));
+	$template->set('RESPLACE',
+	               $death->get('d_resplace'));
+	$template->set('RESONT',
+	               $death->get('d_resont'));
+	$template->set('RESCAN',
+	               $death->get('d_rescan'));
+	$template->set('CAUSE',
+	               $death->get('d_cause'));
+	$template->set('DURATION',
+	               $death->get('d_duration'));
+	$template->set('PHYS',
+	               $death->get('d_phys'));
+	$template->set('PHYSADDR',
+	               $death->get('d_physaddr'));
+	$template->set('INFORMANT',
+	               $death->get('d_informant'));
+	$template->set('INFREL',
+	               $death->get('d_infrel'));
+	$template->set('INFOCC',
+	               $death->get('d_infocc'));
+	$template->set('INFRES',
+	               $death->get('d_infres'));
+	$template->set('RELIGION',
+	               $death->get('d_religion'));
+	$template->set('FATHERNAME',
+	               $death->get('d_fathername'));
+	$template->set('FATHERBPLCE',
+	               $death->get('d_fatherbplce'));
+	$template->set('MOTHERNAME',
+	               $death->get('d_mothername'));
+	$template->set('MOTHERBPLCE',
+	               $death->get('d_motherbplce'));
+	$template->set('HUSBANDNAME',
+	               $death->get('d_husbandname'));
+	$template->set('REMARKS',
+	               $death->get('d_remarks'));
+	$template->set('BURPLACE',
+	               $death->get('d_burplace'));
+	$template->set('BURDATE',
+	               $death->get('d_burdate'));
+	$template->set('UNDERTKR',
+	               $death->get('d_undertkr'));
+	$template->set('UNDERTKRADDR',
+	               $death->get('d_undertkraddr'));
+	$template->set('REGDATE',
+	               $death->get('d_regdate'));
+	$template->set('REGISTRAR',
+	               $death->get('d_registrar'));
+	$template->set('RECORDEDBY',
+	               $death->get('d_recordedby'));
+	$template->set('IMAGE',
+	               $death->get('d_image'));
+	$template->set('ORIGINALVOLUME',
+	               $death->get('d_originalvolume'));
+	$template->set('ORIGINALPAGE',
+	               $death->get('d_originalpage'));
+	$template->set('ORIGINALITEM',
+	               $death->get('d_originalitem'));
 }
 else
 {
@@ -685,13 +750,43 @@ else
     $template->set('SURNAMESOUNDEX','');
     $template->set('GIVENNAMES',	'');
 	$template->set('PLACE',		    'Ontario, Canada');
-	$template->set('DATE',		    $regyear);
-	$template->set('CALCDATE',		$regyear);
+	$template->set('DATE',		    $regYear);
+	$template->set('CALCDATE',		$regYear);
 	$template->set('AGE',		    '');
-	$template->set('BIRTHDATE',		$regyear);
+	$template->set('BIRTHDATE',		$regYear);
 	$template->set('CALCBIRTH',		'');
 	$template->set('OCCUPATION',	'');
     $marStat	= '?';
+	$template->set('BIRTHPLACE',	'');
+	$template->set('RESPLACE',		'');
+	$template->set('RESONT',		'');
+	$template->set('RESCAN',		'');
+	$template->set('CAUSE',			'');
+	$template->set('DURATION',		'');
+	$template->set('PHYS',			'');
+	$template->set('PHYSADDR',		'');
+	$template->set('INFORMANT',		'');
+	$template->set('INFREL',		'');
+	$template->set('INFOCC',		'');
+	$template->set('INFRES',		'');
+	$template->set('RELIGION',		'');
+	$template->set('FATHERNAME',	'');
+	$template->set('FATHERBPLCE',	'');
+	$template->set('MOTHERNAME',	'');
+	$template->set('MOTHERBPLCE',	'');
+	$template->set('HUSBANDNAME',	'');
+	$template->set('REMARKS',		'');
+	$template->set('BURPLACE',		'');
+	$template->set('BURDATE',		'');
+	$template->set('UNDERTKR',		'');
+	$template->set('UNDERTKRADDR',	'');
+	$template->set('REGDATE',		'');
+	$template->set('REGISTRAR',		'');
+	$template->set('RECORDEDBY',	'');
+	$template->set('IMAGE',			'');
+	$template->set('ORIGINALVOLUME','');
+	$template->set('ORIGINALPAGE',	'');
+	$template->set('ORIGINALITEM',	'');
 }
 
 if ($sex == 'M')
@@ -806,66 +901,6 @@ switch(strtoupper($marStat))
 
 }
 
-$template->set('BIRTHPLACE',
-               $death->get('d_birthplace'));
-$template->set('RESPLACE',
-               $death->get('d_resplace'));
-$template->set('RESONT',
-               $death->get('d_resont'));
-$template->set('RESCAN',
-               $death->get('d_rescan'));
-$template->set('CAUSE',
-               $death->get('d_cause'));
-$template->set('DURATION',
-               $death->get('d_duration'));
-$template->set('PHYS',
-               $death->get('d_phys'));
-$template->set('PHYSADDR',
-               $death->get('d_physaddr'));
-$template->set('INFORMANT',
-               $death->get('d_informant'));
-$template->set('INFREL',
-               $death->get('d_infrel'));
-$template->set('INFOCC',
-               $death->get('d_infocc'));
-$template->set('INFRES',
-               $death->get('d_infres'));
-$template->set('RELIGION',
-               $death->get('d_religion'));
-$template->set('FATHERNAME',
-               $death->get('d_fathername'));
-$template->set('FATHERBPLCE',
-               $death->get('d_fatherbplce'));
-$template->set('MOTHERNAME',
-               $death->get('d_mothername'));
-$template->set('MOTHERBPLCE',
-               $death->get('d_motherbplce'));
-$template->set('HUSBANDNAME',
-               $death->get('d_husbandname'));
-$template->set('REMARKS',
-               $death->get('d_remarks'));
-$template->set('BURPLACE',
-               $death->get('d_burplace'));
-$template->set('BURDATE',
-               $death->get('d_burdate'));
-$template->set('UNDERTKR',
-               $death->get('d_undertkr'));
-$template->set('UNDERTKRADDR',
-               $death->get('d_undertkraddr'));
-$template->set('REGDATE',
-               $death->get('d_regdate'));
-$template->set('REGISTRAR',
-               $death->get('d_registrar'));
-$template->set('RECORDEDBY',
-               $death->get('d_recordedby'));
-$template->set('IMAGE',
-               $death->get('d_image'));
-$template->set('ORIGINALVOLUME',
-               $death->get('d_originalvolume'));
-$template->set('ORIGINALPAGE',
-               $death->get('d_originalpage'));
-$template->set('ORIGINALITEM',
-               $death->get('d_originalitem'));
 if ($debug)
     $template->set('DEBUG', 'Y');
 else

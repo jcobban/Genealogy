@@ -616,7 +616,6 @@ foreach($eventText as $key => $value)
 }
 $eventTextJs                .= "};\n    </script>\n";
 $template->set('EVENTTEXT',         $eventTextJs);
-$template->includeSub('LocationDialogs.html', 'LOCATIONDIALOGS');
 $template['otherStylesheets']->update(array('filename'  => 'editIndivid'));
 
 $template->set('LANG',              $lang);
@@ -1052,17 +1051,23 @@ if ($person && $person->isExisting())
     $families			        = $person->getFamilies();
     $familiesCount              = count($families);
     $template->set('FAMILIESCOUNT',     $familiesCount);
-    if ($familiesCount > 0)
-        $template['addFamily']->update(null);
-    else
-        $template['editFamilies']->update(null);
+    if ($template['ButtonFields'])
+    {
+	    if ($familiesCount > 0)
+	        $template['addFamily']->update(null);
+	    else
+	        $template['editFamilies']->update(null);
+    }
     $parents			        = $person->getParents();
     $parentsCount               = count($parents);
     $template->set('PARENTSCOUNT',      $parentsCount);
-    if ($parentsCount > 0)
-        $template['addParents']->update(null);
-    else
-        $template['editParents']->update(null);
+    if ($template['ButtonFields'])
+    {
+	    if ($parentsCount > 0)
+	        $template['addParents']->update(null);
+	    else
+	        $template['editParents']->update(null);
+    }
 
     if (count($families) > 0)
     {		// ensure never married indicator is off
@@ -1224,10 +1229,13 @@ $template->set('ID',                $id);
 $template->set('PARENTSIDMR',       $parentsIdmr);
 $template->set('IDCR',              $idcr);
 $template->set('IDAR',              $idar);
-if ($idar)
-    $template['addAddress']->update(null);
-else
-    $template['editAddress']->update(null);
+if ($template['PicturesRow'])
+{
+	if ($idar)
+	    $template['addAddress']->update(null);
+	else
+	    $template['editAddress']->update(null);
+}
 $template->set('FATHERGIVENNAME',   $fatherGivenName);
 $template->set('FATHERSURNAME',     $fatherSurname);
 $template->set('MOTHERGIVENNAME',   $motherGivenName);

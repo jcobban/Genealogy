@@ -20,8 +20,9 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/08/06      use addEventListener                            *
+ *		2020/02/17      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= loadEdit;
@@ -185,6 +186,8 @@ function loadEdit()
 		    }			        // action depends upon element name
 		}			            // loop through all elements in the form
     }				            // loop through all forms in page
+
+    hideRightColumn();
 }		// function loadEdit
 
 /************************************************************************

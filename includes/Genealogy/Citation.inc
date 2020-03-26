@@ -291,7 +291,7 @@ class Citation extends RecordPic
     const STYPE_MARNOTE		        = 21;	// Marriage Note
     const STYPE_MARNEVER	        = 22;	// Never Married	     
     const STYPE_MARNOKIDS	        = 23;	// This couple had no children
-    const STYPE_MAREND				= 24;		// Marriage ended **added**
+    const STYPE_MAREND				= 24;	// Marriage ended **added**
 
     /********************************************************************
      *	IDIME points to Event Record tblER.ider								*
@@ -825,7 +825,7 @@ class Citation extends RecordPic
 			if ($idime != 0 && !is_null($type))
 			{	                // validate IDIME
                 $record		            = $this->getRecord(); // ?
-                if (!$record->isExisting())
+                if ($idime < 1000000000 && !$record->isExisting())
                     $warn               .= "<p>Citation::__construct: " .
                     __LINE__ . " record with " . self::$recType[$type] .
                     "=$idime does not exist</p>" .

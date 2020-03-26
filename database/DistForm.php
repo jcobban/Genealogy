@@ -68,6 +68,7 @@ use \NumberFormatter;
  *		                instead of passing to DistUpdate.php            *
  *		                support deleting Districts                      *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -145,8 +146,8 @@ if (isset($_GET) && count($_GET) > 0)
 
             case 'lang':
             {		// debug handled by common code
-                $lang		= strtolower(substr($value,0,2));
-                if ($lang == 'fr')
+	            $lang       = FtTemplate::validateLang($value);
+                if (substr($lang, 0, 2) == 'fr')
                     $getParms['order']	= 'D_Nom';
                 else
                     $getParms['order']	= 'D_Name';
@@ -172,26 +173,25 @@ if (isset($_GET) && count($_GET) > 0)
 else
 if (count($_POST) > 0)
 {		            // invoked by submit to update account
-    ob_start();
     $parmsText  = "<p class='label'>\$_POST</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
                   "<th class='colhead'>value</th></tr>\n";
-    $district       = null;
+    $district                           = null;
     foreach($_POST as $key => $value)
     {	            // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
         if (preg_match('/^([^\d]+)(\d*)$/', $key, $matches));
         {
-            $fldname        = $matches[1];
-            $rownum         = $matches[2];
+            $fldname                    = $matches[1];
+            $rownum                     = $matches[2];
         }
         switch(strtolower($fldname))
         {		    // act on specific parameter
             case 'census':
             {		// Census Year
-                $censusId	    = $value;
+                $censusId	            = $value;
                 $census   	    = new Census(array('censusid' => $censusId));
                 break;
             }		// Census identifier
@@ -199,27 +199,27 @@ if (count($_POST) > 0)
             case 'state':
             case 'province':
             {		// province code (Canada only)
-                $province	    = $value;
+                $province	            = $value;
                 break;
             }		// province code (mandatory for pre-1867)
 
             case 'offset':
             {
-                $offset         = $value;
+                $offset                 = $value;
                 break;
             }
 
             case 'limit':
             case 'count':
             {
-                $limit          = $value;
+                $limit                  = $value;
                 break;
             }
     
             case 'lang':
             {		// debug handled by common code
-                $lang		    = strtolower(substr($value,0,2));
-                if ($lang == 'fr')
+	            $lang                   = FtTemplate::validateLang($value);
+                if (substr($lang, 0, 2) == 'fr')
                     $getParms['order']	= 'D_Nom';
                 else
                     $getParms['order']	= 'D_Name';
@@ -256,7 +256,7 @@ if (count($_POST) > 0)
                     $district           = null;
                 }
                 if ($district)
-                        $district->set($fldname, $value);
+                    $district->set($fldname, $value);
                 break;
             }		// update fields
 
@@ -264,23 +264,22 @@ if (count($_POST) > 0)
             case 'd_province':
             {
                 if ($district)
-                        $district->set($fldname, $value);
+                    $district->set($fldname, $value);
                 break;
             }		// update fields
         }		    // act on specific parameter
     }	            // loop through all parameters
     if ($debug)
         $warn   .= $parmsText . "</table>\n";
-    $warn       .= ob_get_clean();
 }		            // invoked by submit to update account
 
 // create Template
 if (canUser('admin'))
-    $action     = "Update";
+    $action                     = "Update";
 else
-    $action     = "Display";
-$template		= new FtTemplate("DistForm$action$lang.html");
-$formatter                          = $template->getFormatter();
+    $action                     = "Display";
+$template		                = new FtTemplate("DistForm$action$lang.html");
+$formatter                      = $template->getFormatter();
 
 // notify the invoker if they are not authorized
 

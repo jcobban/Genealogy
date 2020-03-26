@@ -61,8 +61,9 @@ use \Exception;
  *		2018/02/08		translate external table names to internal		*
  *						names in all commands							*
  *		2019/06/15      support subqueries in SELECT                    *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
     require_once __NAMESPACE__ . '/Address.inc';
     require_once __NAMESPACE__ . '/Child.inc';
@@ -1437,11 +1438,11 @@ function parseJoin($join)
 /************************************************************************
  *  Open Code															*
  ************************************************************************/
-$title		    = 'Issue SQL Command';
-$emsg		    = '';
-$sqlCommand		= '';
-$execute		= false;
-$lang           = 'en';
+$title		    			= 'Issue SQL Command';
+$emsg		    			= '';
+$sqlCommand					= '';
+$execute					= false;
+$lang           			= 'en';
 if (count($_POST) > 0)
 {               // interpret parameters passed by POST
     $parmsText  = "<p class='label'>\$_POST</p>\n" .
@@ -1475,8 +1476,7 @@ if (count($_POST) > 0)
 
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($lang, 0, 2));
+	            $lang               = FtTemplate::validateLang($value);
                 break;
             }
 
@@ -1505,14 +1505,13 @@ if (count($_GET) > 0)
         {
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($lang, 0, 2));
+	            $lang               = FtTemplate::validateLang($value);
                 break;
             }
         }
     }			// loop through all parameters
     if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn           .= $parmsText . "</table>\n";
 }		        // parameters passed by method=post
 
 // parse patterns for SQL commands

@@ -147,8 +147,9 @@
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/07/20      insert spaces into death date                   *
  *		2019/11/15      pass requested language to child dialogs        *
+ *		2020/02/17      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= loadEdit;
@@ -370,9 +371,9 @@ function loadEdit()
 				    break;
 				}
 
-				case 'AddEvent':
+				case 'eventList':
 				{
-				    element.onclick		= addEvent;
+				    element.onchange	= changeEventList;
 				    break;
 				}
 
@@ -562,6 +563,7 @@ function loadEdit()
 		}		// element has a nodeName attribute
     }			// loop through all immediate children
 
+    hideRightColumn();
 }		// function loadEdit
 
 /************************************************************************

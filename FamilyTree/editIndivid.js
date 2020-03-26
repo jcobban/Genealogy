@@ -307,8 +307,9 @@
  *		                id of the editName button.                      *
  *		2019/11/07      editName was opened in the wrong frame name     *
  *		2019/11/15      remove alert triggered during merge             *
+ *		2020/02/17      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -532,6 +533,9 @@ addEventHandler(window, "load", loadEdit);
  *  function loadEdit													*
  *																		*
  *  Initialize elements when the page is loaded.						*
+ *																		*
+ *	Input:																*
+ *		this			window											*
  ************************************************************************/
 function loadEdit()
 {
@@ -667,6 +671,8 @@ function loadEdit()
     }		// navigator object defined
     else
 		alert ("editIndivid.js: loadEdit: navigator object not defined");
+
+    hideRightColumn();
 
 }		// function loadEdit
 
@@ -1624,7 +1630,7 @@ function editParents(ev)
             lang            = args.lang;
 
 		// open edit dialog in right half of window
-		var url	= "/FamilyTree/editParents.php?id=" + idir + 
+		var url	= "/FamilyTree/editMarriages.php?child=" + idir + 
 							"&given=" + given + 
 							"&surname=" + surname +
 							"&treename=" + treeName +

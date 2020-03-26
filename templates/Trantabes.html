@@ -7,10 +7,17 @@
  *		2018/09/12		created											*
  *      2019/04/06      add translate tables used by Person.php         *
  *                      add translate tables used by EditEvent.php      *
+ *      2020/03/12      add date format                                 *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden">
+    <span id="dateFormat">
+        [dd] [Mon] [yyyy][BC]
+    </span>
+    <span id="dateFormatFull">
+        [dd] [Month] [yyyy][BC]
+    </span>
     <div id="Months">
       <span></span>    <!--  0 -->
       <span>Ene</span> <!--  1 -->
@@ -381,10 +388,16 @@
 		Nacido muerto
 	  </span>
       <span data-key="submitted">
-		submitted
+		Enviado 
 	  </span>
       <span data-key="The cause of death was">
 		La causa de la muerte fue
+	  </span>
+      <span data-key="The marriage ended">
+		El matrimonio termino
+	  </span>
+      <span data-key="They">
+		Ellos
 	  </span>
       <span data-key="to">
 		hasta
@@ -563,10 +576,10 @@
       <span data-key="22">had education </span>
       <span data-key="68">was elected as</span>
       <span data-key="23">emigrated from </span>
-      <span data-key="24">was employed as</span>
+      <span data-key="24">fue empleado como</span>
       <span data-key="16000">was endowed (LDS)</span>
       <span data-key="74">was endowed (LDS)</span>
-      <span data-key="25">got engaged</span>
+      <span data-key="25">se comprometieron/span>
       <span data-key="36">entered marriage contract</span>
       <span data-key="12">was enumerated in a census</span>
       <span data-key="66">identified with ethnicity</span>
@@ -645,27 +658,27 @@
       <span data-key="15">[Pronoun] was confirmed [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="16">[Pronoun] was confirmed in The Church of Jesus Christ of Latter-day Saints [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="17">[Pronoun] was involved in a court case about [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="18">[Pronoun] was cremated [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="18">[Pronoun] fue incinerado [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="19">[Pronoun] received a degree of [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="20">[Pronoun] were divorced [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="21">[Pronoun] filed for divorce [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="22">[Pronoun] was educated at [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="23">[Pronoun] emigrated [Description] [onDate] [fromLocation].[Citations] [Notes]</span>
+      <span data-key="20">[Pronoun] estaban divorciados [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="21">[Pronoun] solicitaron el divorcio [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="22">[Pronoun] fue educado en [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="23">[Pronoun] emigro [Description] [onDate] [fromLocation].[Citations] [Notes]</span>
       <span data-key="24">[Pronoun] fue empleado como [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="25">[Pronoun] were engaged [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="26">[Pronoun] received First Holy Communion [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="27">[Pronoun] graduated from [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="25">[Pronoun] estaban comprometidos [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="26">[Pronoun] recibió la primera comunión [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="27">[Pronoun] graduó de [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="28">[Pronoun] enjoyed [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="29">[Pronoun] was honoured for [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="30">[Pronoun] was in the hospital for [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="31">[Pronoun] was ill with [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="32">[Pronoun] immigrated [Description] [onDate] [toLocation].[Citations] [Notes]</span>
+      <span data-key="32">[Pronoun] inmigrado [Description] [onDate] [toLocation].[Citations] [Notes]</span>
       <span data-key="33">[Pronoun] was interviewed [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="34">[Pronoun] [Description] land [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="35">[Pronoun] had marriage banns published [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="36">[Pronoun] signed a marriage contract [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="37">[HusbFirstName] and [WifeFirstName] obtained a marriage license [Description] [onDate] [Location].[Citations] [Notes]</span>
-      <span data-key="38">[Pronoun] published an intent to marry [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="37">[Pronoun] obtuvieron una licencia de matrimonio [Description] [onDate] [Location].[Citations] [Notes]</span>
+      <span data-key="38">[Pronoun] publicaron una intención de casarse [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="39">[Pronoun] obtained a marriage settlement [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="40">[Pronoun] received medical attention for [Description] [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="41">[Pronoun] was a member of [Description] [onDate] [Location].[Citations] [Notes]</span>
@@ -711,6 +724,107 @@
       <span data-key="26000">[Pronoun] received LDS Confirmation [onDate] [Location].[Citations] [Notes]</span>
       <span data-key="27000">[Pronoun] received LDS Initiatory [onDate] [Location].[Citations] [Notes]</span>
     </div>
+
+    <!--*****************************************************************
+     *  'msTypes'														*
+     *																	*
+     *  Translate from IDMS value of a Family record to text            *
+     ******************************************************************-->
+    <div class="hidden" id="msTypes">`
+      <span data-key="1">
+		Sin estado especial
+	  </span>
+      <span data-key="2">
+		Anulado
+	  </span>
+      <span data-key="3">
+		Unión de hecho
+	  </span>
+      <span data-key="4">
+		Divorciado/a
+	  </span>
+      <span data-key="5">
+		Casado/a
+	  </span>
+      <span data-key="6">
+		Otro/a
+	  </span>
+      <span data-key="7">
+		Separados
+	  </span>
+      <span data-key="8">
+		Soltero/a
+	  </span>
+      <span data-key="9">
+		Divorcio
+	  </span>
+      <span data-key="10">
+		Separación
+	  </span>
+      <span data-key="11">
+		Privado/a
+	  </span>
+      <span data-key="12">
+		Parejas
+	  </span>
+      <span data-key="13">
+		Muerte de un cónyuge
+	  </span>
+      <span data-key="14">
+		Soltero/a
+	  </span>
+      <span data-key="15">
+		Amigos
+	  </span>
+    </div>
+
+    <!--*****************************************************************
+     *  'msStmts'														*
+     *																	*
+     *  Translate from IDMS value of a Family record to a sentence.     *
+     ******************************************************************-->
+    <div class="hidden" id="msStmts">`
+      <span data-key="1">
+	  </span>
+      <span data-key="2">
+		Su matrimonio fue anulado.
+	  </span>
+      <span data-key="3">
+		Ellos estaban en una relación de derecho común.
+	  </span>
+      <span data-key="4">
+		Su matrimonio terminó en divorcio.
+	  </span>
+      <span data-key="5">
+	  </span>
+      <span data-key="6">
+		Ellos estaban en una relación no especificada.
+	  </span>
+      <span data-key="7">
+		Su matrimonio terminó en una separación.
+	  </span>
+      <span data-key="8">
+		Ellos no estaban casados.
+	  </span>
+      <span data-key="9">
+		Ellos estaban divorciados.
+	  </span>
+      <span data-key="10">
+		Ellos estaban separados.
+	  </span>
+      <span data-key="11">
+	  </span>
+      <span data-key="12">
+		Eran socios.
+	  </span>
+      <span data-key="13">
+		Su matrimonio terminó con la muerte de un cónyuge.
+	  </span>
+      <span data-key="14">
+	  </span>
+      <span data-key="15">
+		Solo eran amigos.
+	  </span>
 	
     <!--*****************************************************************
      *  'cpRelType'														*
@@ -736,7 +850,22 @@
     </div>
 
     <!--*****************************************************************
-     *  $personidualEvents												*
+     *  'MarriedNameRule'												*
+     *																	*
+     *  This table provides a translation from the value of             *
+     *  field 'marriednamerule' in class Family.                        *
+     ******************************************************************-->
+    <div id="MarriedNameRule">
+      <span data-key="0">
+		No generar nombres casados
+      </span>
+      <span data-key="1">
+		Reemplace el apellido de la esposa con el apellido del esposo
+      </span>
+    </div>
+
+    <!--*****************************************************************
+     *  $personEvents												    *
      *																	*
      *  This table is used to create the selection list for				*
      *	events specific to an individual.  Where the event type			*
@@ -745,7 +874,7 @@
      *	type times 1000.												*
      ******************************************************************-->
     <div id="personidualEvents">
-      <span data-key="0">Choose an event type:</span>
+      <span data-key="0">Elige un tipo de evento:</span>
       <span data-key="1"></span>
       <span data-key="2">Adoption</span>
       <span data-key="3">Birth</span>

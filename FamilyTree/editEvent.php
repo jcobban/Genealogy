@@ -5,9 +5,8 @@ use \Exception;
 /************************************************************************
  *  editEvent.php														*
  *																		*
- *  Display a web page for editting one event for an					*
- *  individual from the Legacy database which is represented			*
- *  by an instance of Event (a record in table tblER).					*
+ *  Display a web page for editting one event from the family tree      *
+ *  database which is represented by an instance of Event.				*
  *																		*
  *  Parameters (passed by method="get"):								*
  *		type	numeric type value as used by the Citation			    *
@@ -269,8 +268,9 @@ use \Exception;
  *		2018/11/19      change Help.html to Helpen.html                 *
  *		2019/08/01      support tinyMCE 5.0.3                           *
  *		2019/08/06      use editName.php to handle updates of Names     *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Event.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -280,6 +280,7 @@ require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/CitationSet.inc';
 require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/Picture.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
     /********************************************************************
@@ -387,6 +388,7 @@ require_once __NAMESPACE__ . '/common.inc';
 							38 		=>'was married',
 							69 		=>'married',
 					     20000 		=>'married',			// obsolete
+							77 		=>'marriage ended',
 							70 		=>'',	// type is in description
 							59 		=>'had a medical condition',
 							40 		=>'had a medical event',
@@ -436,7 +438,7 @@ require_once __NAMESPACE__ . '/common.inc';
     }		// getEventType
 
     /********************************************************************
-     *  $personidualEvents												*
+     *  static $personEvents											*
      *																	*
      *  This table is used to create the selection list for				*
      *	events specific to an individual.  Where the event type			*
@@ -445,7 +447,7 @@ require_once __NAMESPACE__ . '/common.inc';
      *	type times 1000.												*
      ********************************************************************/
 
-    static $personidualEvents	= array(
+    static $personEvents	= array(
 						    0			=> 'Choose an event type:',
 						    1			=> '',
 						    2			=> 'Adoption',
@@ -533,7 +535,8 @@ require_once __NAMESPACE__ . '/common.inc';
 						   25			=> 'Engagement',
 						   21			=> 'Filed for Divorce',
 						   36			=> 'Marriage Contract',
-						24000			=> 'Marriage Ended',
+						24000			=> 'Marriage Ended Old',
+						   77			=> 'Marriage Ended',
 						   37			=> 'Marriage License',
 						   38			=> 'Marriage Notice',
 						   72			=> 'Marriage Registered',
@@ -541,8 +544,8 @@ require_once __NAMESPACE__ . '/common.inc';
 						22000			=> 'Never Married',
 						23000			=> 'No Children',
 						   70			=> 'Other Marriage Fact',
-						   76   		=> 'sealed to spouse',
-						18000			=> 'Sealed to Spouse (LDS)'
+						   76   		=> 'Sealed to Spouse',
+						18000			=> 'Sealed to Spouse (LDS) Old'
 						);
 
 
@@ -809,261 +812,280 @@ $readonly			= '';	// attribute value to insert in <input> elements
 $submit				= false;
 
 // process input parameters from the search string passed by method=get
-foreach($_GET as $key => $value)
-{
-    switch($key)
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
     {
-        case 'type':
-        {		// supplied event type
-            if (ctype_digit($value))
-            {
-	            $type	        = (int)$value;
-	            if ($type == 0)
-	                $readonly	= "readonly='readonly'";
-	            // textual description of event type
-	            if (array_key_exists($type, Citation::$intType))
-	                $eventType	= Citation::$intType[$type];
-	            else
-                    $eventType	= 'Invalid event type ' . $type;
-            }
-            break;
-        }		 // supplied event type
-
-        // get the event record identifier if present
-        case 'ider':
-        {
-            if (ctype_digit($value))
-            {               // valid numeric
-	            $ider	= $value;
-	            if ($ider != 0)
-	            {		    // existing event
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    switch(strtolower($key))
+	    {
+	        case 'type':
+	        {		// supplied event type
+	            if (ctype_digit($value))
+	            {
+		            $type	        = (int)$value;
+		            if ($type == 0)
+		                $readonly	= "readonly='readonly'";
+		            // textual description of event type
+		            if (array_key_exists($type, Citation::$intType))
+		                $eventType	= Citation::$intType[$type];
+		            else
+	                    $eventType	= 'Invalid event type ' . $type;
+	            }
+	            break;
+	        }		 // supplied event type
+	
+	        // get the event record identifier if present
+	        case 'ider':
+	        {
+	            if (ctype_digit($value))
+	            {               // valid numeric
+		            $ider	= $value;
+		            if ($ider != 0)
+		            {		    // existing event
+		                try
+		                {
+		                    $event		= new Event(array('ider' 		=> $ider));
+		                    $idet		= $event['idet'];
+		                    if ($event['idtype'] == 0)
+		                    {	// individual event
+		                        $idir	= $event['idir'];
+		                        $type	= 30;
+		                    }	// individual event
+		                    else
+		                    {	// marriage event
+		                        $idmr	= $event['idir'];
+		                        $type	= 31;
+		                    }	// married event
+		                }
+		                catch(Exception $e)
+		                {		// new Event failed
+		                    $event	= null;
+		                    $msg	.= "Invalid event ider=$ider " .
+		                                   $e->getMessage();
+		                    $ider	= null;
+		                }		// new Event failed
+		            }		    // existing event
+		            else
+		            {		    // request to create new event
+		                $event	= null;		// is done later
+	                }		    // request to create new event
+	            }               // valid numeric
+		        break;
+	        }		// ider
+	
+	        // get the event type identifier if present
+	        case 'idet':
+	        {
+	            $idet	= $value;
+	            break;
+	        }		// idet
+	
+	        // get the key of instance of Person
+	        case 'idir':
+	        {
+	            $idir		= intval($value);
+	            if ($debug)
+	                $warn	.= "<p>\$idir set to $idir from \$_GET['idir']</p>\n";
+	            if ($idir < 1)
+	                $msg	.= "Invalid value idir='$value'.  ";
+	            break;
+	        }		// idir
+	
+	        case 'idnx':
+	        {	// get the key of instance of Alternate Name Record tblNX
+	            $idnx	= $value;
+	            if ($idnx < 1)
+	                $msg	.= "Invalid value idnx='$value'.  ";
+	            if (!canUser('edit'))
+	                $msg .= 'You are not authorized to " .
+	                        "edit alternate name events. ';
+	            if (strlen($msg) == 0)
+	            {		// process only if no errors detected
+	            try
+	            {
+	                $altname		= new Name(array('idnx'			=> $idnx));
+	            }
+	            catch(Exception $e)
+	            {		// new Name failed
+	                $altname	= null;
+	                $msg	.= "Invalid name identification idnx=$idnx. " .
+	                               $e->getMessage();
+	                $idnx	= null;
+	            }		// new Name failed
+	            }		// process only if no errors detected
+	            break;
+	        }		//idnx
+	
+	        case 'idcr':
+	        {		// key of instance of Child Record tblCR
+	            $idcr	= $value;
+	            if ($idcr < 1)
+	                $msg	.= "Invalid value idcr='$value'.  ";
+	            if (!canUser('edit'))
+	                $msg .= 'You are not authorized to edit child events. ';
+	
+	            if (strlen($msg) == 0)
+	            {		// process only if no errors detected
 	                try
 	                {
-	                    $event		= new Event(array('ider' 		=> $ider));
-	                    $idet		= $event['idet'];
-	                    if ($event['idtype'] == 0)
-	                    {	// individual event
-	                        $idir	= $event['idir'];
-	                        $type	= 30;
-	                    }	// individual event
-	                    else
-	                    {	// marriage event
-	                        $idmr	= $event['idir'];
-	                        $type	= 31;
-	                    }	// married event
+	                    $child		= new Child(array('idcr' 		=> $idcr));
+	                    $idir		= $child['idir'];
+	                if ($debug)
+	                    $warn	.= "<p>\$idir set to $idir from \$_GET['idcr']=$idcr</p>\n";
+	                    $person		= new Person(array('idir' 		=> $idir));
+	                    $isOwner		= canUser('edit') && 
+	                                  $person->isOwner();
+	                    if (!$isOwner)
+	                        $msg	.= 'You are not authorized to edit " .
+	                                "the events of this child.  ';
+	                    $idmr		= $child['idmr'];
+	                    $family		= new Family(array('idmr' 		=> $idmr));
 	                }
 	                catch(Exception $e)
-	                {		// new Event failed
-	                    $event	= null;
-	                    $msg	.= "Invalid event ider=$ider " .
-	                                   $e->getMessage();
-	                    $ider	= null;
-	                }		// new Event failed
-	            }		    // existing event
-	            else
-	            {		    // request to create new event
-	                $event	= null;		// is done later
-                }		    // request to create new event
-            }               // valid numeric
-	        break;
-        }		// ider
+	                {		// new Child failed
+	                    $child		= null;
+	                    $msg	.= "Invalid child identification idcr=$idcr. " .
+	                               $e->getMessage();
+	                    $idcr		= null;
+	                }		// new Child failed
+	            }		// process only if no errors detected
+	            break;
+	        }		//idcr
+	
+	        case 'idmr':
+	        {		// key of instance of LegacyMarriage Record
+	            $idmr	= $value;
+	            if ($idmr < 1)
+	                $msg	.= "Invalid value idmr='$value'.  ";
+	            if (!canUser('edit'))
+	                $msg .= 'You are not authorized to edit family events. ';
+	            break;
+	        }		//idmr
+	
+	        case 'idtd':
+	        {		// key of instance of To-Do records tblTD.IDTD
+	            $idtd	= $value;
+	            if ($idtd < 1)
+	                $msg	.= "Invalid value idtd='$value'.  ";
+	            if (!canUser('edit'))
+	                $msg .= 'You are not authorized to edit "to do" events. ';
+	            if (strlen($msg) == 0)
+	            {		// process only if no errors detected
+	            //$todo	= new ToDo(array('idtd' 		=> $idtd));
+	                $todo	= null;
+	                $msg	.= "Invalid To Do identification idtd=$idtd. ";
+	            }		// process only if no errors detected
+	            break;
+	        }		// idtd
+	
+	        // individual's name can be explicitly supplied for events
+	        // associated with
+	        // a new individual if that information is not available from the
+	        // database record because it has not been written yet
+	        case 'givenname':
+	        {
+	            $given		= $value;
+	            break;
+	        }		// given name
+	
+	        case 'surname':
+	        {		// surname	
+	            $surname	= $value;
+	            break;
+	        }		// surname
+	
+	        // the date, location, and notes field values in the DB record may
+	        // not be current as a result of user activity
+	        case 'date':
+	        {		// date of event as an external string
+	            $date		= $value;
+	            break;
+	        }		// date
+	
+	        case 'descn':
+	        {		// description of the event
+	            $descn		= $value;
+	            break;
+	        }		// descn
+	
+	        case 'location':
+	        {		// location of the event
+	            $location	= trim($value);
+	            break;
+	        }		// location
+	
+	        case 'idtr':
+	        {		// key of temple
+	            $idtr		= trim($value);
+	            break;
+	        }		// key of temple
+	
+	        case 'rownum':
+	        {		// rownum for feedback about the event
+	            $rownum		= trim($value);
+	            break;
+	        }		// rownum for feedback about the event
+	
+	        case 'notes':
+	        {		// notes about the event
+	            $notes		= trim($value);
+	            break;
+	        }		// notes about the event
+	
+	        case 'submit':
+	        {		// control whether uses AJAX or submit
+	            if (strtoupper($value) == 'Y')
+	                $submit	= true;
+	            break;
+	        }		// control whether uses AJAX or submit
+	
+	        case 'debug':
+	        {		// debug
+	            if (strtoupper($value) == 'Y')
+	                $submit	= true;
+	            break;
+	        }		// debug
+	
+	
+	        case 'lang':
+	        {
+	            $lang       = FtTemplate::validateLang($value);
+	            break;
+	        }
+	
+	        case 'text':
+	        case 'editnotes':
+	        {
+	            break;
+	        }           // used by Javascript
+	
+	        default:
+	        {		    // other parameters
+	            $warn	.= "<p>Unexpected parameter $key='$value'</p>\n";
+	            break;
+	        }		    // other parameters
+	    }	            // switch
+	}		            // loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			            // invoked by method=get
 
-        // get the event type identifier if present
-        case 'idet':
-        {
-            $idet	= $value;
-            break;
-        }		// idet
+if (canUser('edit'))
+    $action                 = 'Update';
+else
+    $action                 = 'Display';
 
-        // get the key of instance of Person
-        case 'idir':
-        {
-            $idir		= intval($value);
-            if ($debug)
-                $warn	.= "<p>\$idir set to $idir from \$_GET['idir']</p>\n";
-            if ($idir < 1)
-                $msg	.= "Invalid value idir='$value'.  ";
-            break;
-        }		// idir
-
-        case 'idnx':
-        {	// get the key of instance of Alternate Name Record tblNX
-            $idnx	= $value;
-            if ($idnx < 1)
-                $msg	.= "Invalid value idnx='$value'.  ";
-            if (!canUser('edit'))
-                $msg .= 'You are not authorized to " .
-                        "edit alternate name events. ';
-            if (strlen($msg) == 0)
-            {		// process only if no errors detected
-            try
-            {
-                $altname		= new Name(array('idnx'			=> $idnx));
-            }
-            catch(Exception $e)
-            {		// new Name failed
-                $altname	= null;
-                $msg	.= "Invalid name identification idnx=$idnx. " .
-                               $e->getMessage();
-                $idnx	= null;
-            }		// new Name failed
-            }		// process only if no errors detected
-            break;
-        }		//idnx
-
-        case 'idcr':
-        {		// key of instance of Child Record tblCR
-            $idcr	= $value;
-            if ($idcr < 1)
-                $msg	.= "Invalid value idcr='$value'.  ";
-            if (!canUser('edit'))
-                $msg .= 'You are not authorized to edit child events. ';
-
-            if (strlen($msg) == 0)
-            {		// process only if no errors detected
-                try
-                {
-                    $child		= new Child(array('idcr' 		=> $idcr));
-                    $idir		= $child['idir'];
-                if ($debug)
-                    $warn	.= "<p>\$idir set to $idir from \$_GET['idcr']=$idcr</p>\n";
-                    $person		= new Person(array('idir' 		=> $idir));
-                    $isOwner		= canUser('edit') && 
-                                  $person->isOwner();
-                    if (!$isOwner)
-                        $msg	.= 'You are not authorized to edit " .
-                                "the events of this child.  ';
-                    $idmr		= $child['idmr'];
-                    $family		= new Family(array('idmr' 		=> $idmr));
-                }
-                catch(Exception $e)
-                {		// new Child failed
-                    $child		= null;
-                    $msg	.= "Invalid child identification idcr=$idcr. " .
-                               $e->getMessage();
-                    $idcr		= null;
-                }		// new Child failed
-            }		// process only if no errors detected
-            break;
-        }		//idcr
-
-        case 'idmr':
-        {		// key of instance of LegacyMarriage Record
-            $idmr	= $value;
-            if ($idmr < 1)
-                $msg	.= "Invalid value idmr='$value'.  ";
-            if (!canUser('edit'))
-                $msg .= 'You are not authorized to edit family events. ';
-            break;
-        }		//idmr
-
-        case 'idtd':
-        {		// key of instance of To-Do records tblTD.IDTD
-            $idtd	= $value;
-            if ($idtd < 1)
-                $msg	.= "Invalid value idtd='$value'.  ";
-            if (!canUser('edit'))
-                $msg .= 'You are not authorized to edit "to do" events. ';
-            if (strlen($msg) == 0)
-            {		// process only if no errors detected
-            //$todo	= new ToDo(array('idtd' 		=> $idtd));
-                $todo	= null;
-                $msg	.= "Invalid To Do identification idtd=$idtd. ";
-            }		// process only if no errors detected
-            break;
-        }		// idtd
-
-        // individual's name can be explicitly supplied for events
-        // associated with
-        // a new individual if that information is not available from the
-        // database record because it has not been written yet
-        case 'givenname':
-        {
-            $given		= $value;
-            break;
-        }		// given name
-
-        case 'surname':
-        {		// surname	
-            $surname	= $value;
-            break;
-        }		// surname
-
-        // the date, location, and notes field values in the DB record may
-        // not be current as a result of user activity
-        case 'date':
-        {		// date of event as an external string
-            $date		= $value;
-            break;
-        }		// date
-
-        case 'descn':
-        {		// description of the event
-            $descn		= $value;
-            break;
-        }		// descn
-
-        case 'location':
-        {		// location of the event
-            $location	= trim($value);
-            break;
-        }		// location
-
-        case 'idtr':
-        {		// key of temple
-            $idtr		= trim($value);
-            break;
-        }		// key of temple
-
-        case 'rownum':
-        {		// rownum for feedback about the event
-            $rownum		= trim($value);
-            break;
-        }		// rownum for feedback about the event
-
-        case 'notes':
-        {		// notes about the event
-            $notes		= trim($value);
-            break;
-        }		// notes about the event
-
-        case 'Submit':
-        case 'submit':
-        {		// control whether uses AJAX or submit
-            if (strtoupper($value) == 'Y')
-                $submit	= true;
-            break;
-        }		// control whether uses AJAX or submit
-
-        case 'Debug':
-        case 'debug':
-        {		// debug
-            if (strtoupper($value) == 'Y')
-                $submit	= true;
-            break;
-        }		// debug
-
-
-        case 'lang':
-        {
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value, 0, 2));
-            break;
-        }
-
-        case 'text':
-        case 'editNotes':
-        {
-            break;
-        }           // used by Javascript
-
-        default:
-        {		    // other parameters
-            $warn	.= "<p>Unexpected parameter $key='$value'</p>\n";
-            break;
-        }		    // other parameters
-    }	            // switch
-}		            // loop through all parameters
+// get template
+$template               = new FtTemplate("editEvent$action$lang.html",
+                                         true);
+$translate              = $template->getTranslate();
+$t                      = $translate['tranTab'];
 
 // get the associated individual record
 if (strlen($msg) == 0 && !is_null($idir))
@@ -1103,721 +1125,716 @@ if (strlen($msg) == 0 && !is_null($idir))
     // get the associated family record
     if (strlen($msg) == 0 && !is_null($idmr))
     {		// process only if no errors detected
-    try
-    {
-        $family		= new Family(array('idmr' 		=> $idmr));
-        $husbname		= $family->getHusbName();
-        $idirhusb		= $family['idirhusb'];
-        $wifename		= $family->getWifeName();
-        $idirwife		= $family['idirwife'];
-        $heading	= "Edit Event for Family of ";
-        $title	= "Edit Event for Family of ";
-        if ($idirhusb > 0)
-        {		// husband identified
-            $heading	.= "<a href=\"Person.php?idir=$idirhusb\">$husbname</a>";
-            $title		.= $husbname;
-            if ($idirwife > 0)
-            {	// both spouses identified
-                $heading	.= " and ";
-                $title	.= " and ";
-            }	// both spouses identified
-        }		// husband identified
-
-        if ($idirwife > 0)
-        {		// wife identified
-            $heading	.= "<a href=\"Person.php?idir=$idirwife\">$wifename</a>";
-            $title		.= $wifename;
-        }		// wife identified
-    }
-    catch(Exception $e)
-    {		// new Family failed
-        $family	= null;
-        $msg	.= "Invalid family identification idmr=$idmr. ".
-                           $e->getMessage();
-        $idmr	= null;
-    }		// new Family failed
-    }		// process only if no errors detected
+        $family		    = new Family(array('idmr' 		=> $idmr));
+        if ($family->isExisting())
+        {
+	        $husbname		= $family->getHusbName();
+	        $idirhusb		= $family['idirhusb'];
+	        $wifename		= $family->getWifeName();
+	        $idirwife		= $family['idirwife'];
+	        $heading	    = "Edit Event for Family of ";
+	        if ($idirhusb > 0)
+	        {		// husband identified
+	            $heading	.= "<a href=\"Person.php?idir=$idirhusb\">$husbname</a>";
+	            if ($idirwife > 0)
+	            {	// both spouses identified
+	                $heading	.= " and ";
+	            }	// both spouses identified
+	        }		// husband identified
+	
+	        if ($idirwife > 0)
+	        {		// wife identified
+	            $heading	.= "<a href=\"Person.php?idir=$idirwife\">$wifename</a>";
+	        }		// wife identified
+	    }           // existing Family record
+        else
+	    {		    // invalid IDMR value
+	        $family	= null;
+	        $msg	.= "Invalid family identification idmr=$idmr. ".
+	                           $e->getMessage();
+	        $idmr	= null;
+	    }		    // invalid IDMR value
+    }		        // process only if no errors detected
 
     // validate the presence of parameters depending upon
     // the value of the type parameter
-    switch($type)
-    {		// take action according to type
-    case Citation::STYPE_UNSPECIFIED:		// 0;
-    {	// type not determined yet
-        // will be either IDIR or IDMR or IDER based event
-        if ($idir && $idir > 0)
-        {		// IDIR based event
-            $idime	= $idir;
-            $title	= "Edit Generic Event for $given $surname";
-            $heading= "Edit Generic Event for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
-        }		// IDIR based event
-        else
-        if ($idmr && $idmr > 0)
-        {		// IDMR based event
-            $idime	= $idmr;
-            $title	= "Edit Generic Event for Marriage of $husbname and $wifename";
-            $heading= "Edit Generic Event for Marriage of <a href=\"Person.php?idir=$idirhusb\">$husbname</a> and <a href=\"Person.php?idir=$idirwife\" class=\"female\">$wifename</a>";
-        }		// IDMR based event
-        else
-        {
-            $msg	.= 'mandatory idir or idmr parameter missing. ';
-        }
-        break;
-    }	// type not determined yet
-
-    //    idir parameter points to Person record
- 	case Citation::STYPE_NAME:		// 1
-    {
-        if (is_null($idir) || $idir == 0)
-        {		        // individual event requires IDIR
-            $msg		.= 'mandatory idir parameter missing. ';
-            $given		= 'Unknown';
-        }		        // individual event requires IDIR
-        else
-        {		        // proceed with edit
-            $name       = new Name(array('idir'     => $idir,
-                                         'order'    => Name::PRIMARY));
-            $idnx       = $name['idnx'];
-            header("Location: /FamilyTree/editName.php?idnx=$idnx");
-            exit;
-
-        }		        // proceed with edit
-        break;
-    }                   // primary name of individual
-
- 	case Citation::STYPE_BIRTH:		    // 2
- 	case Citation::STYPE_CHRISTEN:		// 3
- 	case Citation::STYPE_DEATH:		    // 4
- 	case Citation::STYPE_BURIED:		// 5
- 	case Citation::STYPE_NOTESGENERAL:	// 6
- 	case Citation::STYPE_NOTESRESEARCH:	// 7
- 	case Citation::STYPE_NOTESMEDICAL:	// 8
- 	case Citation::STYPE_DEATHCAUSE:	// 9
- 	case Citation::STYPE_LDSB:		// 15  LDS Baptism
- 	case Citation::STYPE_LDSE:		// 16  LDS Endowment
- 	case Citation::STYPE_LDSC:		// 26  LDS Confirmation
- 	case Citation::STYPE_LDSI:		// 27  LDS Initiatory
-    {
-        if (is_null($idir) || $idir == 0)
-        {		// individual event requires IDIR
-            $msg		.= 'mandatory idir parameter missing. ';
-            $given		= 'Unknown';
-        }		// individual event requires IDIR
-        else
-        {		// proceed with edit
-            $idime		= $idir;	// key for citations
-            $title		= "Edit " . $typeText[$type] .
-                        " for $given $surname";
-            $heading	= "Edit " . $typeText[$type] .
-    " for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
-            if ($type <= Citation::STYPE_BURIED &&
- 		    $type >= Citation::STYPE_BIRTH)
-                $picIdType	= $type - 1;
-        }		// proceed with edit
-        break;
-    }
-
-    //    idnx parameter points to Alternate Name Record tblNX
- 	case Citation::STYPE_ALTNAME:	// 10
-    {
-        if (is_null($idnx) || $idnx == 0)
-            $msg		.= 'Mandatory idnx parameter missing. ';
-        else
-        {
-            header("Location: /FamilyTree/editName.php?idnx=$idnx");
-            exit;
-        }
-        break;
-    }
-
-    //    idcr parameter points to Child Record tblCR
- 	case Citation::STYPE_CHILDSTATUS:	// 11 Child Status	   
- 	case Citation::STYPE_CPRELDAD:		// 12 Relationship to Father  
- 	case Citation::STYPE_CPRELMOM:		// 13 Relationship to Mother  
- 	case Citation::STYPE_LDSP:		// 17 Sealed to Parents
-    {
-        if (is_null($idcr) || $idcr == 0)
-            $msg		.= 'Mandatory idcr parameter missing. ';
-        else
-            $idime	= $idcr;	// key for citations
-        $title	= "Edit " . $typeText[$type] .
-                        " for $given $surname";
-        $heading	= "Edit " . $typeText[$type] .
-            " for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
-        break;
-    }
-
-    //    idmr parameter points to LegacyMarriage Record
- 	case Citation::STYPE_LDSS:		// 18 Sealed to Spouse
- 	case Citation::STYPE_NEVERMARRIED:	// 19 individual never married 
- 	case Citation::STYPE_MAR:		// 20 Marriage	
- 	case Citation::STYPE_MARNOTE:		// 21 Marriage Note
- 	case Citation::STYPE_MARNEVER:		// 22 Never Married
- 	case Citation::STYPE_MARNOKIDS:		// 23 No children  
- 	case Citation::STYPE_MAREND:		// 24 marriage end date
-    {		// event defined in marriage record
-        $title		= "Edit " . $typeText[$type];
-        $heading		= "Edit " . $typeText[$type];
-        if (!$idmr || $idmr == 0)
-        {
-            $msg		.= 'Mandatory idmr parameter missing. ';
-        }
-        else
-        {
-            $idime		= $idmr;	// key for citations
-            if ($family)
-            {		// family specified
-                $title	.= " for $husbname and $wifename";
-                $heading	.= " for <a href=\"Person.php?idir=$idirhusb\">$husbname</a> and <a href=\"Person.php?idir=$idirwife\" class=\"female\">$wifename</a>";
- 		    if ($type == Citation::STYPE_MAR)
-                    $picIdType	= Picture::IDTYPEMar;
-            }		// family specified
-        }
-        break;
-    }		// event defined in marriage record
-
-    //    ider parameter points to Event Record
- 	case Citation::STYPE_EVENT:	// 30 Individual Event
-    {
-        if (is_null($event))
-        {
-            $event	= new Event(array('ider' 		=> 0,
-                              'idir' 		=> $idir));
-        }
-
-        // get the supplied value of the event subtype
-        if ($idet > 1)
-            $event->setIdet($idet);
-
-        $idime	                = $ider;	// key for citations
-        $idir	                = $event['idir'];
-        if ($debug)
-            $warn	.= "<p>\$idir set to $idir from event IDER=$ider</p>\n";
-        try
-        {
-            if (is_null($person))
-                $person	        = Person::getPerson($idir);
-            if ($ider == 0 && $idet > 1)
-            {		// create new individual event
-                $event	        = $person->addEvent();
-                $ider	        = $event['ider'];
-            }		// create new individual event
-
-            // if name of individual not supplied, get it from Person record
-            if (strlen($given) == 0)
-                $given		= $person->getGivenName();
-            if (strlen($surname) == 0)
-                $surname	= $person->getSurname();
-            $typetext	=  $idetTitleText[$idet];	
-            $title	= "Edit $typetext Event for $given $surname";
-            $heading= "Edit $typetext Event for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
-            $picIdType	= Picture::IDTYPEEvent;
-        }		// try creating individual
-        catch(Exception $e)
-        {		// error creating individual
-            $person		= null;
-            $idime		= -1;
-            $given		= '';
-            $surname	= '';
-            $title		= 'Invalid Value of IDIR';
-            $heading	= 'Invalid Value of IDIR';
-            $msg		.= $e->getMessage();
-            $msg		.= ', Unable to create individual event because idir parameter missing or invalid. ';
-        }		// error creating individual
-
-        break;
-    }
-
- 	case Citation::STYPE_MAREVENT:	// 31 Marriage Event
-    {
-        if (is_null($idet))
-            $title	= 'Edit Marriage fact';
-        else
-            $title	= 'Edit ' . ucfirst(Event::$eventText[$idet]) . ' Event';
-        $heading	= $title;
-        if ($family)
-        {		// family specified
-            $title	.= " for $husbname and $wifename";
-            $heading.= " for <a href=\"Person.php?idir=$idirhusb\">$husbname</a> and <a href=\"Person.php?idir=$idirwife\" class=\"female\">$wifename</a>";
-        }		// family specified
-
-        if ($ider == 0)
-        {		// create new marriage event
-            if (!is_null($family))
-            {
-                $event	= $family->addEvent();
-                $ider	= $event['ider'];
-
-                // set the supplied value of the event subtype
-                if (!is_null($idet))
-                    $event->setIdet($idet);
-            }
-            else
-            {
-                $msg	.= 'Unable to create family event because idmr parameter missing or invalid. ';
-            }
-        }		// create new event
-        else
-        {		// existing event
-            $idmr		        = $event['idir'];
-            $family		        = new Family(array('idmr' 		=> $idmr));
-            $tidet		        = $event['idet'];
-            if ($tidet == 70)
-                $title	= 'Edit ' . ucfirst($event['description']) . ' Event';
-            else
-                $title	= 'Edit ' . ucfirst(Event::$eventText[$tidet]) . ' Event';
-
-            $heading	= $title . " for <a href=\"Person.php?idir=$idirhusb\">$husbname</a> and <a href=\"Person.php?idir=$idirwife\" class=\"female\">$wifename</a>";
-            $title		.= " for $husbname and $wifename";
-        }		// existing event
-
-        $idime	= $ider;	// key for citations
-        $picIdType	= Picture::IDTYPEEvent;
-        break;
-    }
-
-    //    idtd parameter points to To-Do records tblTD.IDTD
- 	case Citation::STYPE_TODO:		// 40 To-Do Item
-    {
-        if (is_null($idtd) || $idtd == 0)
-        {
-            $msg		.= 'Mandatory idtd parameter missing. ';
-            $todo		= null;
-            break;
-        }
-        $idime	= $idtd;	// key for citations
-        $title	= "Edit To Do Fact: IDTD=$idtd";
-        $heading	= "Edit To Do Fact: IDTD=$idtd";
-        break;
-    }
-
-    default:
-    {
-        $msg	.= 'Invalid event type ' . $type;
-        $idime	= -1;
-        $title	= 'Invalid Event Type'; 
-        $heading	= 'Invalid Event Type'; 
-    }
-    }		// take action according to type
-
     // identify the fields in the associated record that are
     // updated for each type of event
 
     // default that all fields are unsupported
     if ($ider === 0 & $idet > 1)
     {
-    $event		= new Event(array('ider'			=> 0,
-                              'idet'			=> $idet,
-                              'idir'			=> $idir));
-    $event->save(false);
-    $ider		= $event['ider'];
-    $idime		= $ider;	// key for citations
+	    $event		        = new Event(array('ider'			=> 0,
+	                                          'idet'			=> $idet,
+	                                          'idir'			=> $idir));
+	    $event->save(false);
+	    $ider				= $event['ider'];
+	    $idime				= $ider;	// key for citations
     }
 
-    $etype		= null;
-    //$idet		= null;
-    $order		= null;
-    $idlr		= null;
-    $kind		= null;
-    $prefix		= null;
-    $nametitle		= null;
-    $templeReady	= null;
-    $preferred		= null;
+    $etype					= null;
+    $order					= null;
+    $idlr					= null;
+    $kind					= null;
+    $prefix					= null;
+    $nametitle				= null;
+    $templeReady			= null;
+    $preferred				= null;
+
+    switch($type)
+    {		// take action according to type
+	    case Citation::STYPE_UNSPECIFIED:		// 0;
+	    {	// type not determined yet
+	        // will be either IDCR, IDIR, IDMR, or IDER based event
+	        if (is_int($idcr) && $idcr > 0)
+	        {		// IDCR based event
+                $idime	    = $idcr;
+                $text       = $template['headingGenericChild']->innerHTML;
+                $heading    = str_replace(array('$idir','$lang','$given','$surname'),
+                                          array($idir, $lang, $given, $surname),
+                                          $text);
+	        }		// IDCR based event
+	        else
+	        if (is_int($idir) && $idir > 0)
+	        {		// IDIR based event
+                $idime	    = $idir;
+                $text       = $template['headingGenericPerson']->innerHTML;
+                $heading    = str_replace(array('$idir','$lang','$given','$surname'),
+                                          array($idir, $lang, $given, $surname),
+                                          $text);
+	        }		// IDIR based event
+	        else
+	        if (is_int($idmr) && $idmr > 0)
+	        {		// IDMR based event
+	            $idime	    = $idmr;
+                $text       = $template['headingGenericPerson']->innerHTML;
+                $heading    = str_replace(array('$idirhusb','$idirwife','$lang','$husbname','$wifename'),
+                                          array($idirhusb, $idirwife, $lang, $husbname, $wifename),
+                                          $text);
+	        }		// IDMR based event
+	        else
+	        {
+	            $msg	    .= $template['missingIDIME']->innerHTML;
+	        }
+	        $etype	        = '';
+	        $idet	        = 0;
+	        break;
+	    }	// type not determined yet
+	
+	    //    idir parameter points to Person record
+	 	case Citation::STYPE_NAME:		// 1
+	    {
+	        if (is_null($idir) || $idir == 0)
+	        {		        // individual event requires IDIR
+	            $msg		.= 'mandatory idir parameter missing. ';
+	            $given		= 'Unknown';
+	        }		        // individual event requires IDIR
+	        else
+	        {		        // proceed with edit
+	            $name       = new Name(array('idir'     => $idir,
+	                                         'order'    => Name::PRIMARY));
+	            $idnx       = $name['idnx'];
+	            header("Location: /FamilyTree/editName.php?idnx=$idnx");
+	            exit;
+	
+	        }		        // proceed with edit
+	        break;
+	    }                   // primary name of individual
+	
+	 	case Citation::STYPE_BIRTH:		    // 2
+	 	case Citation::STYPE_CHRISTEN:		// 3
+	 	case Citation::STYPE_DEATH:		    // 4
+	 	case Citation::STYPE_BURIED:		// 5
+	 	case Citation::STYPE_NOTESGENERAL:	// 6
+	 	case Citation::STYPE_NOTESRESEARCH:	// 7
+	 	case Citation::STYPE_NOTESMEDICAL:	// 8
+	 	case Citation::STYPE_DEATHCAUSE:	// 9
+	 	case Citation::STYPE_LDSB:		// 15  LDS Baptism
+	 	case Citation::STYPE_LDSE:		// 16  LDS Endowment
+	 	case Citation::STYPE_LDSC:		// 26  LDS Confirmation
+	 	case Citation::STYPE_LDSI:		// 27  LDS Initiatory
+	    {
+	        if (is_null($idir) || $idir == 0)
+	        {		// individual event requires IDIR
+	            $msg		.= 'mandatory idir parameter missing. ';
+	            $given		= 'Unknown';
+	        }		// individual event requires IDIR
+	        else
+	        {		// proceed with edit
+	            $idime		= $idir;	// key for citations
+	            $heading	= "Edit " . $typeText[$type] .
+	    " for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
+	            if ($type <= Citation::STYPE_BURIED &&
+	 		    $type >= Citation::STYPE_BIRTH)
+	                $picIdType	= $type - 1;
+	        }		// proceed with edit
+	        break;
+	    }
+	
+	    //    idnx parameter points to Alternate Name Record tblNX
+	 	case Citation::STYPE_ALTNAME:	// 10
+	    {
+	        if (is_null($idnx) || $idnx == 0)
+	            $msg		.= 'Mandatory idnx parameter missing. ';
+	        else
+	        {
+	            header("Location: /FamilyTree/editName.php?idnx=$idnx");
+	            exit;
+	        }
+	        break;
+	    }
+	
+	    //    idcr parameter points to Child Record tblCR
+	 	case Citation::STYPE_CHILDSTATUS:	// 11 Child Status	   
+	 	case Citation::STYPE_CPRELDAD:		// 12 Relationship to Father  
+	 	case Citation::STYPE_CPRELMOM:		// 13 Relationship to Mother  
+	 	case Citation::STYPE_LDSP:		// 17 Sealed to Parents
+	    {
+	        if (is_null($idcr) || $idcr == 0)
+	            $msg		.= 'Mandatory idcr parameter missing. ';
+	        else
+	            $idime	= $idcr;	// key for citations
+	        $heading	= "Edit " . $typeText[$type] .
+	            " for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
+	        break;
+	    }
+	
+	    //    idmr parameter points to LegacyMarriage Record
+	 	case Citation::STYPE_LDSS:		// 18 Sealed to Spouse
+	 	case Citation::STYPE_NEVERMARRIED:	// 19 individual never married 
+	 	case Citation::STYPE_MAR:		// 20 Marriage	
+	 	case Citation::STYPE_MARNOTE:		// 21 Marriage Note
+	 	case Citation::STYPE_MARNEVER:		// 22 Never Married
+	 	case Citation::STYPE_MARNOKIDS:		// 23 No children  
+	 	case Citation::STYPE_MAREND:		// 24 marriage end date
+	    {		// event defined in marriage record
+	        $heading		= "Edit " . $typeText[$type];
+	        if (!$idmr || $idmr == 0)
+	        {
+	            $msg		.= 'Mandatory idmr parameter missing. ';
+	        }
+	        else
+	        {
+	            $idime		= $idmr;	// key for citations
+	            if ($family)
+	            {		// family specified
+	                $heading	.= " for <a href=\"Person.php?idir=$idirhusb\">$husbname</a> and <a href=\"Person.php?idir=$idirwife\" class=\"female\">$wifename</a>";
+	 		    if ($type == Citation::STYPE_MAR)
+	                    $picIdType	= Picture::IDTYPEMar;
+	            }		// family specified
+	        }
+	        break;
+	    }		// event defined in marriage record
+	
+	    //    ider parameter points to Event Record
+	 	case Citation::STYPE_EVENT:	// 30 Individual Event
+	    {
+	        if (is_null($event))
+	        {
+	            $event	= new Event(array('ider' 		=> 0,
+	                              'idir' 		=> $idir));
+	        }
+	
+	        // get the supplied value of the event subtype
+	        if ($idet > 1)
+	            $event->setIdet($idet);
+	
+	        $idime	                = $ider;	// key for citations
+	        $idir	                = $event['idir'];
+	        if ($debug)
+	            $warn	.= "<p>\$idir set to $idir from event IDER=$ider</p>\n";
+	        try
+	        {
+	            if (is_null($person))
+	                $person	        = Person::getPerson($idir);
+	            if ($ider == 0 && $idet > 1)
+	            {		// create new individual event
+	                $event	        = $person->addEvent();
+	                $ider	        = $event['ider'];
+	            }		// create new individual event
+	
+	            // if name of individual not supplied, get it from Person record
+	            if (strlen($given) == 0)
+	                $given		= $person->getGivenName();
+	            if (strlen($surname) == 0)
+	                $surname	= $person->getSurname();
+	            $typetext	=  $idetTitleText[$idet];	
+	            $heading= "Edit $typetext Event for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
+	            $picIdType	= Picture::IDTYPEEvent;
+	        }		// try creating individual
+	        catch(Exception $e)
+	        {		// error creating individual
+	            $person		= null;
+	            $idime		= -1;
+	            $given		= '';
+	            $surname	= '';
+	            $heading	= 'Invalid Value of IDIR';
+	            $msg		.= $e->getMessage();
+	            $msg		.= ', Unable to create individual event because idir parameter missing or invalid. ';
+	        }		// error creating individual
+	
+	        break;
+	    }
+	
+	 	case Citation::STYPE_MAREVENT:	// 31 Marriage Event
+	    {
+	        if (is_null($idet))
+	            $heading	= 'Edit Marriage fact';
+	        else
+	            $heading	= 'Edit ' . ucfirst(Event::$eventText[$idet]) . ' Event';
+	        if ($family)
+	        {		// family specified
+	            $heading.= " for <a href=\"Person.php?idir=$idirhusb\">$husbname</a> and <a href=\"Person.php?idir=$idirwife\" class=\"female\">$wifename</a>";
+	        }		// family specified
+	
+	        if ($ider == 0)
+	        {		// create new marriage event
+	            if (!is_null($family))
+	            {
+	                $event	= $family->addEvent();
+	                $ider	= $event['ider'];
+	
+	                // set the supplied value of the event subtype
+	                if (!is_null($idet))
+	                    $event->setIdet($idet);
+	            }
+	            else
+	            {
+	                $msg	.= 'Unable to create family event because idmr parameter missing or invalid. ';
+	            }
+	        }		// create new event
+	        else
+	        {		// existing event
+	            $idmr		        = $event['idir'];
+	            $family		        = new Family(array('idmr' 		=> $idmr));
+	            $tidet		        = $event['idet'];
+	            if ($tidet == 70)
+	                $heading	= 'Edit ' . ucfirst($event['description']) . ' Event';
+	            else
+	                $heading	= 'Edit ' . ucfirst(Event::$eventText[$tidet]) . ' Event';
+	
+	            $heading	    .= " for <a href=\"Person.php?idir=$idirhusb\">$husbname</a> and <a href=\"Person.php?idir=$idirwife\" class=\"female\">$wifename</a>";
+	        }		// existing event
+	
+	        $idime	= $ider;	// key for citations
+	        $picIdType	= Picture::IDTYPEEvent;
+	        break;
+	    }
+	
+	    //    idtd parameter points to To-Do records tblTD.IDTD
+	 	case Citation::STYPE_TODO:		// 40 To-Do Item
+	    {
+	        if (is_null($idtd) || $idtd == 0)
+	        {
+	            $msg		.= 'Mandatory idtd parameter missing. ';
+	            $todo		= null;
+	            break;
+	        }
+	        $idime	        = $idtd;	// key for citations
+	        $heading	    = "Edit To Do Fact: IDTD=$idtd";
+	        break;
+	    }
+	
+	    default:
+	    {
+	        $msg	        .= 'Invalid event type ' . $type;
+	        $idime	        = -1;
+	        $heading	    = 'Invalid Event Type'; 
+	    }
+    }		// take action according to type
 
     switch($type)
     {		// act on major event type
-    case Citation::STYPE_UNSPECIFIED:	// 0
-    {	// to be determined
-        $etype	= '';
-        $idet	= 0;
-        break;
-    }	// to be determined
-
-    case Citation::STYPE_NAME:		// 1
-    {
-        if ($person)
-        {
-            if (is_null($notes))
-            {
-                $notes	= $person['namenote'];
-                if (is_null($notes))
-                    $notes	= '';
-            }
-
-            $prefix	= $person['prefix'];
-            if (is_null($prefix))
-                $prefix	= '';
-
-            $nametitle	= $person['title'];
-            if (is_null($nametitle))
-                $nametitle	= '';
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_BIRTH:		// 2
-    {
-        if ($person)
-        {
-            $event		= $person->getBirthEvent(true);
-            $ider	= $event['ider'];
-            if ($ider > 0)
-            {
-                $idime	= $ider;
-                $type	= Citation::STYPE_EVENT;
-            }
-            getEventInfo($event);
-            $kind		= null;
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_CHRISTEN:		// 3
-    {
-        if ($person)
-        {
-            $event		= $person->getChristeningEvent(true);
-            $ider	= $event['ider'];
-            if ($ider > 0)
-            {
-                $idime	= $ider;
-                $type	= Citation::STYPE_EVENT;
-            }
-            getEventInfo($event);
-            $kind		= null;
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_DEATH:		// 4
-    {
-        if ($person)
-        {
-            $event		= $person->getDeathEvent(true);
-            $ider	= $event['ider'];
-            if ($ider > 0)
-            {
-                $idime	= $ider;
-                $type	= Citation::STYPE_EVENT;
-            }
-            getEventInfo($event);
-            $kind		= null;
-
-            $deathCause	= $person['deathcause'];
-            if (is_null($deathCause))
-                $deathCause	= '';
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_BURIED:		// 5
-    {
-        if ($person)
-        {
-            $event		= $person->getBuriedEvent(true);
-            $ider	= $event['ider'];
-            if ($ider > 0)
-            {
-                $idime	= $ider;
-                $type	= Citation::STYPE_EVENT;
-            }
-            getEventInfo($event);
-            $kind		= null;
-            if ($descn == '')
-            {
-                $descn	= null;
-                $cremated	= false;
-            }
-            else
-            if ($descn == 'cremated')
-            {
-                $descn	= null;
-                $cremated	= true;
-            }
-            else
-                $cremated	= false;
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_NOTESGENERAL:	// 6
-    {
-        if ($person)
-        {
-            if (is_null($notes))
-            {
-                $notes	= $person['notes'];
-                if (is_null($notes))
-                    $notes	= '';
-            }
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_NOTESRESEARCH:	// 7
-    {
-        if ($person)
-        {
-            $date	= null;
-            $location	= null;
-            if (is_null($notes))
-            {
-                $notes	= $person['references'];
-                if (is_null($notes))
-                    $notes	= '';
-            }
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_NOTESMEDICAL:	// 8
-    {
-        if ($person)
-        {
-            if (is_null($notes))
-            {
-                $notes	= $person['medical'];
-                if (is_null($notes))
-                    $notes	= '';
-            }
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_DEATHCAUSE:	// 9
-    {
-        if ($person)
-        {
-            if (is_null($notes))
-            {
-                $notes	= $person['deathcause'];
-                if (is_null($notes))
-                    $notes	= '';
-            }
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_LDSB:		// 15
-    {
-        if ($person)
-        {
-            $event		= $person->getBaptismEvent(true);
-            $ider	= $event['ider'];
-            if ($ider > 0)
-            {
-                $idime	= $ider;
-                $type	= Citation::STYPE_EVENT;
-            }
-            getEventInfo($event);
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_LDSE:		// 16
-    {
-        if ($person)
-        {
-            $event		= $person->getEndowEvent(true);
-            $ider	= $event['ider'];
-            if ($ider > 0)
-            {
-                $idime	= $ider;
-                $type	= Citation::STYPE_EVENT;
-            }
-            getEventInfo($event);
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_LDSC:		// 26
-    {
-        if ($person)
-        {
-            $event		= $person->getConfirmationEvent(true);
-            $ider	= $event['ider'];
-            if ($ider > 0)
-            {
-                $idime	= $ider;
-                $type	= Citation::STYPE_EVENT;
-            }
-            getEventInfo($event);
-        }		// individual defined
-        break;
-    }
-
-    case Citation::STYPE_LDSI:		// 27
-    {
-        if ($person)
-        {
-            $event		= $person->getInitiatoryEvent(true);
-            $ider	= $event['ider'];
-            if ($ider > 0)
-            {
-                $idime	= $ider;
-                $type	= Citation::STYPE_EVENT;
-            }
-            getEventInfo($event);
-        }		// individual defined
-        break;
-    }
-
- 	case Citation::STYPE_ALTNAME:		// 10
-    {
-        $notes	= '';
-        break;
-    }
-
-    //    idcr parameter points to Child Record tblCR
- 	case Citation::STYPE_CHILDSTATUS:	// 11 Child Status	   
-    {
-        if ($child)
-        {
-            $notes	= '';
-        }		// child record present
-        break;
-    }
-
- 	case Citation::STYPE_CPRELDAD:	// 12 Relationship to Father  
-    {
-        if ($child)
-        {
-            $notes	= '';
-        }		// child record present
-        break;
-    }
-
- 	case Citation::STYPE_CPRELMOM:	// 13 Relationship to Mother  
-    {
-        if ($child)
-        {
-            $notes	= '';
-        }		// child record present
-        break;
-    }
-
- 	case Citation::STYPE_LDSP:	// 17 Sealed to Parents
-    {
-        if ($child)
-        {
-            getDateAndLocationLds($child,
-                              1,
-                              'parseald',
-                              'idtrparseal');
-            $notes		= $child['parsealnote'];
-            if (is_null($notes))
-                $notes	= '';
-            $templeReady	= $child['ldsp'];
-        }		// child record present
-        break;
-    }
-
-    //    idmr parameter points to LegacyMarriage Record
- 	case Citation::STYPE_LDSS:	// 18 Sealed to Spouse
-    {
-        if ($family)
-        {
-            getDateAndLocationLds($family,
-                              1,
-                              'seald',
-                              'idtrseal');
-            $templeReady	= $family['ldss'];
-        }		// family defined
-        break;
-    }
-
- 	case Citation::STYPE_NEVERMARRIED:// 19 individual never married 
- 	case Citation::STYPE_MARNEVER:	// 22 Never Married
-    {
-        if ($family)
-        {
-        $notmar	= $family['notmarried'];
-        if ($notmar == '')
-            $notmar	= 0;
-        }		// family defined
-        break;
-    }
-
- 	case Citation::STYPE_MAR:		// 20 Marriage	
-    {
-        if ($family)
-        {
-        getDateAndLocation($family,
-                        'mard',
-                        'idlrmar');
-        }		// family defined
-        break;
-    }
-
- 	case Citation::STYPE_MARNOTE:	// 21 Marriage Note
-    {
-        if (is_null($family && $notes))
-        {
-            $notes	= $family['notes'];
-            if (is_null($notes))
-                $notes	= '';
-        }		// family defined
-        break;
-    }
-
- 	case Citation::STYPE_MARNOKIDS:	// 23 couple had no children  
-    {
-        if ($family)
-        {
-        $nokids	= $family['nochildren'];
-        if ($nokids == '')
-            $nokids	= 0;
-        }		// family defined
-        break;
-    }
-
- 	case Citation::STYPE_MAREND:	// 24 marriage ended date
-    {
-        if ($family)
-        {
-        $date	= new LegacyDate($family['marendd']);
-        $date	= $date->toString();
-        }		// family defined
-        break;
-    }
- 	case Citation::STYPE_EVENT:	// 30 Individual Event
-    {
-        if ($event)
-        {
-            getEventInfo($event);
-            $kind		= null;
-
-            if ($idet == Event::ET_DEATH)
-            {
-                $deathCause	= $person['deathcause'];
-                if (is_null($deathCause))
-                    $deathCause	= '';
-            }
-        }		// event defined
-        break;
-    }	// Citation::STYPE_EVENT
-
- 	case Citation::STYPE_MAREVENT:	// 31 Marriage Event
-    {
-        if ($event)
-        {
-            getEventInfo($event);
-            $kind		= null;
-        }		// event defined
-        break;
-    }	// Citation::STYPE_MAREVENT
-
-    //    idtd parameter points to To-Do records tblTD.IDTD
- 	case Citation::STYPE_TODO:	// 40 To-Do Item
-    {
-        $notes	= '';
-        break;
-    }
-
-    default:				// unsupported values
-    {
-        break;
-    }
+	    case Citation::STYPE_UNSPECIFIED:	// 0
+	    {	// to be determined
+	        break;
+	    }	// to be determined
+	
+	    case Citation::STYPE_NAME:		// 1
+	    {
+	        if ($person)
+	        {
+	            if (is_null($notes))
+	            {
+	                $notes	= $person['namenote'];
+	                if (is_null($notes))
+	                    $notes	= '';
+	            }
+	
+	            $prefix	= $person['prefix'];
+	            if (is_null($prefix))
+	                $prefix	= '';
+	
+	            $nametitle	= $person['title'];
+	            if (is_null($nametitle))
+	                $nametitle	= '';
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_BIRTH:		// 2
+	    {
+	        if ($person)
+	        {
+	            $event		= $person->getBirthEvent(true);
+	            $ider	= $event['ider'];
+	            if ($ider > 0)
+	            {
+	                $idime	= $ider;
+	                $type	= Citation::STYPE_EVENT;
+	            }
+	            getEventInfo($event);
+	            $kind		= null;
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_CHRISTEN:		// 3
+	    {
+	        if ($person)
+	        {
+	            $event		= $person->getChristeningEvent(true);
+	            $ider	= $event['ider'];
+	            if ($ider > 0)
+	            {
+	                $idime	= $ider;
+	                $type	= Citation::STYPE_EVENT;
+	            }
+	            getEventInfo($event);
+	            $kind		= null;
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_DEATH:		// 4
+	    {
+	        if ($person)
+	        {
+	            $event		= $person->getDeathEvent(true);
+	            $ider	= $event['ider'];
+	            if ($ider > 0)
+	            {
+	                $idime	= $ider;
+	                $type	= Citation::STYPE_EVENT;
+	            }
+	            getEventInfo($event);
+	            $kind		= null;
+	
+	            $deathCause	= $person['deathcause'];
+	            if (is_null($deathCause))
+	                $deathCause	= '';
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_BURIED:		// 5
+	    {
+	        if ($person)
+	        {
+	            $event		= $person->getBuriedEvent(true);
+	            $ider	= $event['ider'];
+	            if ($ider > 0)
+	            {
+	                $idime	= $ider;
+	                $type	= Citation::STYPE_EVENT;
+	            }
+	            getEventInfo($event);
+	            $kind		= null;
+	            if ($descn == '')
+	            {
+	                $descn	= null;
+	                $cremated	= false;
+	            }
+	            else
+	            if ($descn == 'cremated')
+	            {
+	                $descn	= null;
+	                $cremated	= true;
+	            }
+	            else
+	                $cremated	= false;
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_NOTESGENERAL:	// 6
+	    {
+	        if ($person)
+	        {
+	            if (is_null($notes))
+	            {
+	                $notes	= $person['notes'];
+	                if (is_null($notes))
+	                    $notes	= '';
+	            }
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_NOTESRESEARCH:	// 7
+	    {
+	        if ($person)
+	        {
+	            $date	= null;
+	            $location	= null;
+	            if (is_null($notes))
+	            {
+	                $notes	= $person['references'];
+	                if (is_null($notes))
+	                    $notes	= '';
+	            }
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_NOTESMEDICAL:	// 8
+	    {
+	        if ($person)
+	        {
+	            if (is_null($notes))
+	            {
+	                $notes	= $person['medical'];
+	                if (is_null($notes))
+	                    $notes	= '';
+	            }
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_DEATHCAUSE:	// 9
+	    {
+	        if ($person)
+	        {
+	            if (is_null($notes))
+	            {
+	                $notes	= $person['deathcause'];
+	                if (is_null($notes))
+	                    $notes	= '';
+	            }
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_LDSB:		// 15
+	    {
+	        if ($person)
+	        {
+	            $event		= $person->getBaptismEvent(true);
+	            $ider	= $event['ider'];
+	            if ($ider > 0)
+	            {
+	                $idime	= $ider;
+	                $type	= Citation::STYPE_EVENT;
+	            }
+	            getEventInfo($event);
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_LDSE:		// 16
+	    {
+	        if ($person)
+	        {
+	            $event		= $person->getEndowEvent(true);
+	            $ider	= $event['ider'];
+	            if ($ider > 0)
+	            {
+	                $idime	= $ider;
+	                $type	= Citation::STYPE_EVENT;
+	            }
+	            getEventInfo($event);
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_LDSC:		// 26
+	    {
+	        if ($person)
+	        {
+	            $event		= $person->getConfirmationEvent(true);
+	            $ider	= $event['ider'];
+	            if ($ider > 0)
+	            {
+	                $idime	= $ider;
+	                $type	= Citation::STYPE_EVENT;
+	            }
+	            getEventInfo($event);
+	        }		// individual defined
+	        break;
+	    }
+	
+	    case Citation::STYPE_LDSI:		// 27
+	    {
+	        if ($person)
+	        {
+	            $event		= $person->getInitiatoryEvent(true);
+	            $ider	= $event['ider'];
+	            if ($ider > 0)
+	            {
+	                $idime	= $ider;
+	                $type	= Citation::STYPE_EVENT;
+	            }
+	            getEventInfo($event);
+	        }		// individual defined
+	        break;
+	    }
+	
+	 	case Citation::STYPE_ALTNAME:		// 10
+	    {
+	        $notes	= '';
+	        break;
+	    }
+	
+	    //    idcr parameter points to Child Record tblCR
+	 	case Citation::STYPE_CHILDSTATUS:	// 11 Child Status	   
+	    {
+	        if ($child)
+	        {
+	            $notes	= '';
+	        }		// child record present
+	        break;
+	    }
+	
+	 	case Citation::STYPE_CPRELDAD:	// 12 Relationship to Father  
+	    {
+	        if ($child)
+	        {
+	            $notes	= '';
+	        }		// child record present
+	        break;
+	    }
+	
+	 	case Citation::STYPE_CPRELMOM:	// 13 Relationship to Mother  
+	    {
+	        if ($child)
+	        {
+	            $notes	= '';
+	        }		// child record present
+	        break;
+	    }
+	
+	 	case Citation::STYPE_LDSP:	// 17 Sealed to Parents
+	    {
+	        if ($child)
+	        {
+	            getDateAndLocationLds($child,
+	                              1,
+	                              'parseald',
+	                              'idtrparseal');
+	            $notes		= $child['parsealnote'];
+	            if (is_null($notes))
+	                $notes	= '';
+	            $templeReady	= $child['ldsp'];
+	        }		// child record present
+	        break;
+	    }
+	
+	    //    idmr parameter points to LegacyMarriage Record
+	 	case Citation::STYPE_LDSS:	// 18 Sealed to Spouse
+	    {
+	        if ($family)
+	        {
+	            getDateAndLocationLds($family,
+	                              1,
+	                              'seald',
+	                              'idtrseal');
+	            $templeReady	= $family['ldss'];
+	        }		// family defined
+	        break;
+	    }
+	
+	 	case Citation::STYPE_NEVERMARRIED:// 19 individual never married 
+	 	case Citation::STYPE_MARNEVER:	// 22 Never Married
+	    {
+	        if ($family)
+	        {
+	        $notmar	= $family['notmarried'];
+	        if ($notmar == '')
+	            $notmar	= 0;
+	        }		// family defined
+	        break;
+	    }
+	
+	 	case Citation::STYPE_MAR:		// 20 Marriage	
+	    {
+	        if ($family)
+	        {
+	        getDateAndLocation($family,
+	                        'mard',
+	                        'idlrmar');
+	        }		// family defined
+	        break;
+	    }
+	
+	 	case Citation::STYPE_MARNOTE:	// 21 Marriage Note
+	    {
+	        if (is_null($family && $notes))
+	        {
+	            $notes	= $family['notes'];
+	            if (is_null($notes))
+	                $notes	= '';
+	        }		// family defined
+	        break;
+	    }
+	
+	 	case Citation::STYPE_MARNOKIDS:	// 23 couple had no children  
+	    {
+	        if ($family)
+	        {
+	        $nokids	= $family['nochildren'];
+	        if ($nokids == '')
+	            $nokids	= 0;
+	        }		// family defined
+	        break;
+	    }
+	
+	 	case Citation::STYPE_MAREND:	// 24 marriage ended date
+	    {
+	        if ($family)
+	        {
+	        $date	= new LegacyDate($family['marendd']);
+	        $date	= $date->toString();
+	        }		// family defined
+	        break;
+	    }
+	 	case Citation::STYPE_EVENT:	// 30 Individual Event
+	    {
+	        if ($event)
+	        {
+	            getEventInfo($event);
+	            $kind		= null;
+	
+	            if ($idet == Event::ET_DEATH)
+	            {
+	                $deathCause	= $person['deathcause'];
+	                if (is_null($deathCause))
+	                    $deathCause	= '';
+	            }
+	        }		// event defined
+	        break;
+	    }	// Citation::STYPE_EVENT
+	
+	 	case Citation::STYPE_MAREVENT:	// 31 Marriage Event
+	    {
+	        if ($event)
+	        {
+	            getEventInfo($event);
+	            $kind		= null;
+	        }		// event defined
+	        break;
+	    }	// Citation::STYPE_MAREVENT
+	
+	    //    idtd parameter points to To-Do records tblTD.IDTD
+	 	case Citation::STYPE_TODO:	// 40 To-Do Item
+	    {
+	        $notes	= '';
+	        break;
+	    }
+	
+	    default:				// unsupported values
+	    {
+	        break;
+	    }
 
     }		// act on major event type
 
@@ -1830,30 +1847,30 @@ if (strlen($msg) == 0 && !is_null($idir))
      ********************************************************************/
     if (!is_null($location))
     {		// location supplied
-    if (is_string($location))
-    {
-        $locName	= $location;
-        $location	= new Location(array('location' 		=> $locName));
-        if (!$location->isExisting())
-            $location->save(false);
-        $idlr	= $location->getIdlr();
-        if ($debug)
-            $warn	.= "<p>\$idlr set to $idlr from location '$locName'</p>\n";
-    }
-    $locName	= str_replace('"','&quot;',$location->getName());
+	    if (is_string($location))
+	    {
+	        $locName	= $location;
+	        $location	= new Location(array('location' 		=> $locName));
+	        if (!$location->isExisting())
+	            $location->save(false);
+	        $idlr	= $location->getIdlr();
+	        if ($debug)
+	            $warn	.= "<p>\$idlr set to $idlr from location '$locName'</p>\n";
+	    }
+	    $locName	= str_replace('"','&quot;',$location->getName());
     }		// location supplied
     else	// location not supplied
-    $locName	= '';
+        $locName	= '';
 
-    htmlHeader($title,
-            array(  '/jscripts/tinymce/js/tinymce/tinymce.js',
-                    '/jscripts/js20/http.js',
-                    '/jscripts/CommonForm.js',
-                    '/jscripts/util.js',
-                    '/jscripts/Cookie.js',
-                    '/jscripts/locationCommon.js',
-                    'editEvent.js'),
-            true);
+    htmlHeader($heading,
+	            array(  '/jscripts/tinymce/js/tinymce/tinymce.js',
+	                    '/jscripts/js20/http.js',
+	                    '/jscripts/CommonForm.js',
+	                    '/jscripts/util.js',
+	                    '/jscripts/Cookie.js',
+	                    '/jscripts/locationCommon.js',
+	                    'editEvent.js'),
+	            true, 'dialog');
 ?>
   <body>
     <div class="body">
@@ -1967,7 +1984,7 @@ debug:
 <?php
             if ($idir)
             {	// event applies to an individual
-                foreach($personidualEvents as $et => $mtype)
+                foreach($personEvents as $et => $mtype)
                 {	// loop through individual events
                     if ($type == 30 && $et > 999)
                         continue;
@@ -2436,9 +2453,10 @@ debug:
       <tfoot>
 		  <tr>
 			<td>
-        <button type="button" id="AddCitation">
-            <u>A</u>dd Citation
-        </button>
+              <button type="button" id="AddCitation">
+                <u>A</u>dd Citation
+              </button>
+            </td>   
 		  </tr>
       </tfoot>
     </table>
@@ -2963,5 +2981,6 @@ showTrace();
 	    Loading...
     </div>
 <?php
+$warn   .= "<p>calling dialogBot</p>\n";
 dialogBot();
 ?>

@@ -31,14 +31,15 @@
  *		2016/02/06		call pageInit on load							*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/02/17      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
  *  Specify the function to get control once the page is loaded.		*
  ************************************************************************/
-window.onload	= loadEdit;
+window.onload	                = loadEdit;
 
 /************************************************************************
  *  childFrameClass														*
@@ -46,29 +47,32 @@ window.onload	= loadEdit;
  *  If this dialog is opened in a half window then any child dialogs	*
  *  are opened in the other half of the window.							*
  ************************************************************************/
-var childFrameClass	    = 'right';
+var childFrameClass	            = 'right';
 
 /************************************************************************
  *  function loadEdit													*
  *																		*
  *  This function is called when the page has been loaded.				*
  *  Initialize elements.												*
+ *																		*
+ *	Input:																*
+ *		this			window											*
  ************************************************************************/
 function loadEdit()
 {
     // determine in which half of the window child frames are opened
     if (window.frameElement)
-    {				// dialog opened in half frame
+    {				    // dialog opened in half frame
 		childFrameClass		= window.frameElement.className;
 		if (childFrameClass == 'left')
 		    childFrameClass	= 'right';
 		else
 		    childFrameClass	= 'left';
-    }				// dialog opened in half frame
+    }				    // dialog opened in half frame
 
     document.body.onkeydown		= ecKeyDown;
     for (var fi = 0; fi < document.forms.length; fi++)
-    {
+    {			        // loop through all forms in the document
 		var	form		= document.forms[fi];
 
 		if (form.name == 'citForm')
@@ -82,7 +86,7 @@ function loadEdit()
 		// including support for context specific help
 		var formElts	= form.elements;
 		for (var i = 0; i < formElts.length; ++i)
-		{
+		{		        // loop through all elements in the form
 		    var element		= formElts[i];
 		    if (element.nodeName.toLowerCase() == 'fieldset')
 				continue;
@@ -93,7 +97,7 @@ function loadEdit()
 				name	= element.id;
 
 		    switch(name)
-		    {	// take action on specific elements
+		    {	        // take action on specific elements
 				case 'IDSR':
 				{		// source selection list
 				    element.addEventListener('click', sourceClick);
@@ -119,9 +123,11 @@ function loadEdit()
 				    break;
 				}
 
-		    }	// take action on specific elements
-		}		// loop through all elements in the form
-    }			// loop through all forms in the document
+		    }	        // take action on specific elements
+		}		        // loop through all elements in the form
+    }			        // loop through all forms in the document
+
+    hideRightColumn();
 }		// function loadEdit
 
 /************************************************************************

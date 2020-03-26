@@ -23,76 +23,50 @@
  *		2016/09/27		check for presence of arg before using			*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/03/08      fix infinite loop                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 // define the function to be called when the page is loaded
 window.onload	= loadDistricts;
 
-// table translating province codes to province names
-var provinceNames	= [];
-
 /************************************************************************
  *  loadDistricts														*
  *																		*
- *  The onload method of the Sub Districts request web page.				*
+ *  The onload method of the Sub Districts request web page.			*
  *  If the user is returning from a previous request the province		*
  *  may be specified as a search argument, in which case only the		*
  *  districts for that province are loaded.								*
+ *																		*
+ *  Input:																*
+ *		this			window                     						*
+ *		ev              Javascript load Event                           *
  ************************************************************************/
-function loadDistricts()
+var lang            = 'en';
+function loadDistricts(ev)
 {
-    // load names of provinces
-    var	divs	= document.getElementsByTagName('div');
-    for(var di = 0; di < divs.length; di++)
-    {			// loop through all <div>s
-		var	element	= divs[di];
-		var	id	= element.id;
-		if ((id.length == 4 || id.length == 6) &&
-		    id.substring(0,4) == 'prov')
-		{
-		    provinceNames[id.substring(4)]	= element.innerHTML.trim();
-		}
-    }			// loop through all <div>s
+    if ('lang' in args)
+        lang        = args.lang;
 
     // scan through all forms and set dynamic functionality
     // for specific elements
     for(var i = 0; i < document.forms.length; i++)
     {
-		var form	= document.forms[i];
+		var form	    = document.forms[i];
 		for(var j = 0; j < form.elements.length; j++)
 		{
-		    var element	= form.elements[j];
+		    var element	        = form.elements[j];
 
 		    element.onkeydown	= keyDown;
-		    var	name	= element.name;
+		    var	name	        = element.name;
 		    if (!name || name.length == 0)
-				name	= element.id;
-
+				name	        = element.id;
 		    switch(name)
 		    {	// act on specific elements
 				case "CensusYear":
 				{
-				    element.selectedIndex	= 0;
 				    element.onchange		= changeCensus;
-				    // check for census identifier passed as a parameter
-				    var	censusId	= form.censusId.value;
-				    if (censusId !== undefined)
-				    {
-					if (censusId.length == 4)
-					    censusId	= "CA" + censusId;
-					var	censusOpts		= element.options;
-					for(var i = 0; i < censusOpts.length; i++)
-					{
-					    if (censusOpts[i].value == censusId)
-					    {	// found matching entry
-						element.selectedIndex	= i;
-						element.onchange();
-						break;
-					    }	// found matching entry
-					}	// search for census to select
-				    }		// Census identifier passed
 				    break;
 				}	// CensusYear
 
@@ -109,111 +83,141 @@ function loadDistricts()
 				    break;
 				}	// CensusYear
 
-		    }	// act on specific elements
-		}	// loop through elements in form
-    }		// loop through all forms
-
-}		// loadDistricts
+		    }	    // act on specific elements
+		}	        // loop through elements in form
+    }		        // loop through all forms
+    // province passed as a parameter
+    let	province		    = ''
+    if ('province' in args)
+		province		    = args.province;
+	let	provSelect		    = document.distForm.Province;
+    provSelect.value        = province;
+    provSelect.onchange();
+}		// function loadDistricts
 
 /************************************************************************
- *  changeCensus														*
+ *  function changeCensus												*
  *																		*
  *  The method called when the Census selection changes.				*
  *																		*
  *  Input:																*
- *		this				<select name='CensusYear'>						*
+ *		this			<select name='CensusYear'>						*
+ *		ev              Javascript change Event                         *
  ************************************************************************/
-function changeCensus()
+function changeCensus(ev)
 {
-    var	censusSelect		= this;
-    var	censusOptions		= this.options;
-    var censusElt		= document.distForm.Census;
-    // province passed as a parameter
-    var	province		= ''
-    if ('province' in args)
-		province		= args['province'];
-    var	censusId;
+    let	censusSelect		= this;
+    let	censusOptions		= this.options;
+    let censusElt		    = document.distForm.censusId;
+	let	provSelect		    = document.distForm.Province;
+	let	distSelect		    = document.distForm.District;
+    let	censusId;
 
-    if (this.selectedIndex >= 0)
+    if (this.selectedIndex > 0)
     {			// option chosen
-		var currCensusOpt	= censusOptions[this.selectedIndex];
-		var censusId		= currCensusOpt.value;
+		let currCensusOpt	= censusOptions[this.selectedIndex];
+		let censusId		= currCensusOpt.value;
 
 		if (censusId.length > 0)
 		{		// non-empty option chosen
 		    censusElt.value		= censusId;
-		    var	provSelect		= document.distForm.Province;
-		    provSelect.options.length	= 0;	// clear the list
-		    var provInfo	= document.censusinfo.elements['Provinces' + censusId].value;
-		    if (censusId == "CA1851" || censusId == "CA1861")
-		    {		// pre-confederation
-				if (province.length == 0)
-				    province		= 'CW';
-		        if (provInfo.indexOf(province) == -1)
-				    province		= 'CW';
-				censusElt.value		= province + censusId.substring(2);
-		    }		// pre-confederation
-		    else
-		    {		// post-confederation
-				provSelect.selectedIndex	= 0;
-		        if (provInfo.indexOf(province) == -1)
-				    province		= '';
-				addOption(provSelect,	'Choose Province', '');
-		    }		// post-confederation
-		    for (var pi = 0; pi < provInfo.length; pi += 2)
-		    {
-				var provCode		= provInfo.substr(pi, 2);
-				addOption(provSelect,	provinceNames[provCode],provCode);
-		    }		// loop through provinces
-		    provSelect.value	= province;
-
-		    // act on province passed as a parameter
-		    if (province.length > 0)
-		    {		// province supplied
-				provSelect.value	= province;
-		    }		// province supplied
-
-		    // update districts 
-		    loadDistsProv(province);	// load districts
-		}		// non-empty census chosen 
-    }			// option chosen
-
-}		// changeCensus
+		    provSelect.options.length	= 1;	// clear the list
+            let options             = {};
+            options.errorHandler    = function() {alert('script getRecordJson.php not found')};
+            HTTP.get('/getRecordJson.php?table=Censuses&id=' + censusId +
+                                            '&lang=' + lang,
+                     gotCensus,
+                     options);
+        }       // non-empty option chosen
+    }           // census chosen
+    else
+    {
+        provSelect.options.length   = 1;
+        distSelect.options.length   = 1;
+    }
+}       // function changeCensus
 
 /************************************************************************
- *  changeProv																*
+ *  function gotCensus  												*
  *																		*
- *  Take action when the user selects a new province.						*
+ *  Take action when the Census object is retrieved from the server.    *
  *																		*
  *  Input:																*
- *		this				<select name='Province'>						*
+ *		census          a Javascript object                             *
+ ************************************************************************/
+function gotCensus(census)
+{
+    let censusId            = census.censusid;
+    let cc                  = censusId.substring(0,2);
+    let censusYear          = censusId.substring(2);
+	let provinces           = census.provinces;   
+    var censusElt		    = document.distForm.censusId;
+	let	provSelect		    = document.distForm.Province;
+    // province passed as a parameter
+    let	province		    = ''
+    if ('province' in args)
+		province		    = args.province;
+    if (censusYear < 1867)
+    {		// pre-confederation
+		if (province.length == 0)
+		    province		= 'CW';
+        if (provinces.indexOf(province) == -1)
+		    province		= 'CW';
+		censusElt.value		= province + censusYear;
+    }		// pre-confederation
+    else
+    {		// post-confederation
+		provSelect.selectedIndex	= 0;
+        if (provinces.indexOf(province) == -1)
+		    province		= '';
+    }		// post-confederation
+	let domains             = census.domains;   
+    for (const code in domains)
+    {
+		let provCode		= code.substring(2);
+		addOption(provSelect,	domains[code], provCode);
+    }		// loop through provinces
+    provSelect.value	    = province;
+
+    // update districts 
+    loadDistsProv(province);	// load districts
+}		// function changeCensus
+
+/************************************************************************
+ *  function changeProv													*
+ *																		*
+ *  Take action when the user selects a new province.					*
+ *																		*
+ *  Input:																*
+ *		this			<select name='Province'>						*
+ *		ev              Javascript change Event                         *
  ************************************************************************/
 function changeProv()
 {
     var	provSelect	= this;
     var	optIndex	= provSelect.selectedIndex;
-    if (optIndex == -1)
+    if (optIndex < 1)
 		return;	// nothing to do
-    var	province	= provSelect.options[optIndex].value;
-    var	censusId	= document.distForm.Census.value;
+    var	province	= provSelect.value;
+    var	censusId	= document.distForm.CensusYear.value;
     var censusYear	= censusId.substring(2);
     if (censusYear < "1867")
 		document.distForm.Census.value = province + censusYear;
     loadDistsProv(province);		// limit the districts selection
-}		// changeProv
+}		// function changeProv
 
 /************************************************************************
- *  loadDistsProv														*
+ *  function loadDistsProv												*
  *																		*
  *  Obtain the list of districts for a specific province				*
  *  in the census as an XML file.										*
  *																		*
  *  Input:																*
- *		prov		two character province code								*
+ *		prov		two character province code							*
  ************************************************************************/
 function loadDistsProv(prov)
 {
-    var	censusId	= document.distForm.Census.value;
+    var	censusId	= document.distForm.CensusYear.value;
     var	censusYear	= censusId.substring(2);
 
     // get the district information file	
@@ -221,16 +225,16 @@ function loadDistsProv(prov)
 					"&Province=" + prov,
 				gotDistFile,
 				noDistFile);
-}		// loadDistsProv
+}		// function loadDistsProv
 
 /************************************************************************
- *  gotDistFile																*
+ *  function gotDistFile												*
  *																		*
- *  This method is called when the XML file containing						*
+ *  This method is called when the XML file containing					*
  *  the districts information is retrieved.								*
  *																		*
  *  Input:																*
- *		xmlDoc		XML from server with districts information				*
+ *		xmlDoc		XML from server with districts information			*
  ************************************************************************/
 function gotDistFile(xmlDoc)
 {
@@ -284,20 +288,20 @@ function gotDistFile(xmlDoc)
     // if required select a specific district 
     if ('district' in args)
 		setDist(args['district']);
-}		// gotDistFile
+}		// function gotDistFile
 
 /************************************************************************
- *  setDist																*
+ *  function setDist													*
  *																		*
  *  This method ensures that the District selection matches				*
- *  a particular value.														*
+ *  a particular value.													*
  *																		*
  *  Input:																*
- *		newDistCode		new district identifier								*
+ *		newDistCode		new district identifier							*
  *																		*
- *  Returns:																*
- *		null if there is no current selected district						*
- *		the former selected district										*
+ *  Returns:															*
+ *		null if there is no current selected district					*
+ *		the former selected district									*
  ************************************************************************/
 function setDist(newDistCode)
 {
@@ -323,14 +327,14 @@ function setDist(newDistCode)
 		}	// found matching entry
     }	// search for district to select
     return oldValue;
-}		// setDist
+}		// function setDist
 
 /************************************************************************
- *  noDistFile																*
+ *  function noDistFile													*
  *																		*
- *  This method is called if there is no census summary file.				*
+ *  This method is called if there is no census summary file.			*
  *  The selection list of districts is cleared and an error message		*
- *  displayed.																*
+ *  displayed.															*
  ************************************************************************/
 function noDistFile()
 {
@@ -342,17 +346,18 @@ function noDistFile()
 									censusId);
     popupAlert(alertTxt,
 		       distSelect);
-}		// noDistFile
+}		// function noDistFile
 
 /************************************************************************
- *  changeDist																*
+ *  function changeDist													*
  *																		*
- *  This method is called when the user selects a new district.				*
+ *  This method is called when the user selects a new district.			*
  *																		*
  *  Input:																*
- *		this				<select name='District'>						*
+ *		this			<select name='District'>						*
+ *		ev              Javascript change Event                         *
  ************************************************************************/
-function changeDist()
+function changeDist(ev)
 {
     // identify the selected district
     var	distSelect	= document.distForm.District;
@@ -361,19 +366,20 @@ function changeDist()
 		optIndex	= 0;		// default to first entry
     var	optVal	= distSelect.options[optIndex].value;
 
-}		// changeDist
+}		// function changeDist
 
 /************************************************************************
- *  showForm																*
+ *  function showForm													*
  *																		*
- *  Show the form for editting the sub-district table.						*
- *  This is invoked by double-clicking on a district in the selection		*
+ *  Show the form for editting the sub-district table.					*
+ *  This is invoked by double-clicking on a district in the selection	*
  *  list.																*
  *																		*
  *  Input:																*
- *		this				<select name='District'>						*
+ *		this			<select name='District'>						*
+ *		ev              Javascript click Event                          *
  ************************************************************************/
-function showForm()
+function showForm(ev)
 {
     document.distForm.submit();
-}		// showForm
+}		// function showForm

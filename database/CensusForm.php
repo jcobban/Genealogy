@@ -78,7 +78,8 @@ use \Templating\Template;
  *		                address performance problem                     *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/04/06      use new FtTemplate::includeSub                  *
- *		2019/12/01      improve parameter checking
+ *		2019/12/01      improve parameter checking                      *
+ *		2020/03/24      correct setting of owner/tenant in 1921         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -580,11 +581,12 @@ if (strlen($msg) == 0)
 
                 case 'ownertenant':
                 {
-                    if (strlen($value) > 0)
-                        $warn   .= "<p>CensusForm.php: " . __LINE__ .
-                        " ownertenant='$value'</p>\n";
+                    if (is_string($value) && strlen($value) > 1)
+                        $value              = substr($value, 0, 1);
                     if (is_null($value))
                         $censusLine->set($field, '');
+                    else
+                        $censusLine->set($field, strtoupper($value));
 					break;
                 }
 
@@ -595,7 +597,7 @@ if (strlen($msg) == 0)
 					break;
                 }
 			}		// act on specific field names
-	    }			// loop through all fields in record
+        }			// loop through all fields in record
         $rtemplate['Row$line']->update($censusLine);
         $data           .= $rtemplate->compile() . "\n";
 	}			// loop through records in page

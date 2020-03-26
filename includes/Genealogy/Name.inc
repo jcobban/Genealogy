@@ -1445,6 +1445,12 @@ class Name extends Record
             return 0;
         }
 
+        // records with given name starting with 'Lost Record '
+        // are created only to satisfy IDIR values and should
+        // not be written into the database
+        if (substr($this->row['givenname'], 0, 12) == 'Lost Record ')
+            return 0;
+
         // if the instance of Name was created using an instance of Person
         // or an instance of Family that had not been inserted into the
         // database at the time the Name was created, check to see if

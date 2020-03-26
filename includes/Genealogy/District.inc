@@ -1208,61 +1208,68 @@ class District extends Record
 		global $warn;
 		global $connection;
 
-		$sqlParms		= array();
-		$censusId		= $this->row['d_census'];
-		$censusYear		= substr($censusId, 2);
-		$id			= $this->row['d_id'];
-		$sqlParms['id']		= $id;
-
-		if ($censusYear < 1867 && $censusYear > 1833)
-		{
-		    $sqlParms['prov']	= $this->row['d_province'];
-		    $doneCmd	= "SELECT SUM(GivenNames != '') as done " .
-						    "FROM Census$censusYear " .
-						    "WHERE District=:id AND Province=:prov";
-		}
-		else
-		    $doneCmd	= "SELECT SUM(GivenNames != '') as done " .
-						    "FROM Census$censusYear " .
-						    "WHERE District=:id";
-		$doneCmdText	= debugPrepQuery($doneCmd, $sqlParms);
-		$stmt		= $connection->prepare($doneCmd);
-		if ($stmt->execute($sqlParms))
-		{			// success
-		    $row		= $stmt->fetch(PDO::FETCH_ASSOC);
-		    if ($debug)
-				$warn	.= "<p>District::synchPopulation: " . __LINE__ .
-							" '$doneCmdText'</p>\n";
-		    if (is_array($row) && $row['done'] > 0)
-				$this->set('d_transcribed', $row['done']);
-
-		    $popCmd		= "SELECT SUM(SD_Population) as pop " .
-							"FROM SubDistricts " .
-							"WHERE SD_Census='$censusId' AND SD_DistId=$id";
-		    $sqlParms		= array('censusId'	=> $censusId,
-								'id'		=> $this->row['d_id']);
-		    $popCmdText		= debugPrepQuery($popCmd, $sqlParms);
-		    $stmt		= $connection->prepare($popCmd);
-		    if ($stmt->execute($sqlParms))
-		    {
-				if ($debug)
-				    $warn	.= "<p>District::synchPopulation: " . __LINE__ .
-							" '$popCmdText'</p>\n";
-				$row		= $stmt->fetch(PDO::FETCH_ASSOC);
-				if ($row['pop'] > 0)
-				    $this->set('d_population', $row['pop']);
-		    }
-		    else
-		    {
-				error_log("District::synchPopulation: $popCmdText, " .
-							print_r($stmt->errorInfo(),true) . "\n");
-		    }
-		}			// success
-		else
-		{			// failure
-		    error_log("District::synchPopulation: $doneCmdText, " .
-							print_r($stmt->errorInfo(),true) . "\n");
-		}			// failure
+		$sqlParms		        = array();
+		$censusId		        = $this->row['d_census'];
+        $censusYear		        = substr($censusId, 2);
+        if (strlen($censusYear) == 4 && ctype_digit($censusYear))
+        {
+			$id			        = $this->row['d_id'];
+			$sqlParms['id']		= $id;
+	
+			if ($censusYear < 1867 && $censusYear > 1833)
+			{
+			    $sqlParms['prov']	= $this->row['d_province'];
+			    $doneCmd	    = "SELECT SUM(GivenNames != '') as done " .
+							        "FROM Census$censusYear " .
+							        "WHERE District=:id AND Province=:prov";
+			}
+			else
+			    $doneCmd	    = "SELECT SUM(GivenNames != '') as done " .
+							        "FROM Census$censusYear " .
+							        "WHERE District=:id";
+			$doneCmdText	    = debugPrepQuery($doneCmd, $sqlParms);
+			$stmt		        = $connection->prepare($doneCmd);
+			if ($stmt->execute($sqlParms))
+			{			// success
+			    $row		    = $stmt->fetch(PDO::FETCH_ASSOC);
+			    if ($debug)
+					$warn	.= "<p>District::synchPopulation: " . __LINE__ .
+								" '$doneCmdText'</p>\n";
+			    if (is_array($row) && $row['done'] > 0)
+					$this->set('d_transcribed', $row['done']);
+	
+			    $popCmd		= "SELECT SUM(SD_Population) as pop " .
+								"FROM SubDistricts " .
+								"WHERE SD_Census='$censusId' AND SD_DistId=$id";
+			    $sqlParms		= array('censusId'	=> $censusId,
+									'id'		=> $this->row['d_id']);
+			    $popCmdText		= debugPrepQuery($popCmd, $sqlParms);
+			    $stmt		    = $connection->prepare($popCmd);
+			    if ($stmt->execute($sqlParms))
+			    {
+					if ($debug)
+					    $warn	.= "<p>District::synchPopulation: " . __LINE__ .
+						    		" '$popCmdText'</p>\n";
+					$row		= $stmt->fetch(PDO::FETCH_ASSOC);
+					if ($row['pop'] > 0)
+					    $this->set('d_population', $row['pop']);
+			    }
+			    else
+			    {
+					error_log("District::synchPopulation: $popCmdText, " .
+								print_r($stmt->errorInfo(),true) . "\n");
+			    }
+			}			// success
+			else
+			{			// failure
+			    error_log("District::synchPopulation: $doneCmdText, " .
+								print_r($stmt->errorInfo(),true) . "\n");
+	        }			// failure
+        }
+        else
+        {
+            error_log("District::synchPopulation: censusId='$censusId'\n");
+        }
     }		// function District::synchPopulation
 
 }		// class District 

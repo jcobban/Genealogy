@@ -170,8 +170,10 @@
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/07/20      insert spaces into death date                   *
  *		2019/11/15      pass requested language to child dialogs        *
+ *		2020/02/17      hide right column                               *
+ *		                missing initGender from editIndivid requests    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= loadEdit;
@@ -270,7 +272,7 @@ function loadEdit()
     
 				case 'Reorder':
 				{		// reorder marriages by date
-				    element.onclick		= marrReorder;
+				    element.onclick		    = marrReorder;
 				    break;
 				}		// reorder marriages by date
 
@@ -298,7 +300,7 @@ function loadEdit()
 
 				case 'MarD':
 				{		// marriage date
-				    element.abbrTbl		= MonthAbbrs;
+				    element.abbrTbl		    = MonthAbbrs;
 				    element.onchange		= dateChanged;
 				    element.checkfunc		= checkDate;
 				    break;
@@ -306,7 +308,7 @@ function loadEdit()
 
 				case 'MarLoc':
 				{		// marriage location
-				    element.abbrTbl		= evtLocAbbrs;
+				    element.abbrTbl		    = evtLocAbbrs;
 				    element.onchange		= locationChanged;
 				    break;
 				}		// marriage location
@@ -344,9 +346,9 @@ function loadEdit()
 				case 'detachHusb':
 				{		// detach husband
 				    if (idir == idirHusb)
-					element.disabled	= true;
+					    element.disabled	= true;
 				    else
-					editChildButtons.push(element);
+					    editChildButtons.push(element);
 				    element.onclick		= detachHusb;
 				    break;
 				}		// detach husband
@@ -354,9 +356,9 @@ function loadEdit()
 				case 'editWife':
 				{		// open dialog to edit Husband
 				    if (idir == idirWife)
-					element.disabled	= true;
+					    element.disabled	= true;
 				    else
-					editChildButtons.push(element);
+					    editChildButtons.push(element);
 				    element.onclick		= editWife;
 				    break;
 				}		// open dialog to edit Husband
@@ -415,9 +417,9 @@ function loadEdit()
 				    break;
 				}
 
-				case 'AddEvent':
+				case 'eventList':
 				{
-				    element.onclick		= addEvent;
+				    element.onchange	= changeEventList;
 				    break;
 				}
 
@@ -603,8 +605,10 @@ function loadEdit()
 				    break;
 				}	// using table for layout
 		    }		// act on node name
-		}		// element has a nodeName attribute
-    }			// loop through all immediate children
+		}		    // element has a nodeName attribute
+    }			    // loop through all immediate children
+
+    hideRightColumn();
 }		// function loadEdit
 
 /************************************************************************
@@ -775,11 +779,16 @@ function editHusb(e)
 		{			// disable all editChild buttons
 		    editChildButtons[ib].disabled	= true;
 		}			// disable all editChild buttons
-		var script	= "editIndivid.php?idir=" + idir + "&rowid=Husb" +
-		    "&initGivenName=" + encodeURIComponent(form.HusbGivenName.value) + 
-		    "&initSurname=" + encodeURIComponent(form.HusbSurname.value) +
-		    '&treeName=' + encodeURIComponent(form.treename.value) +
-            '&lang=' + lang;
+		var script	        = "editIndivid.php?idir=" + idir +
+                              "&rowid=Husb" +
+		                      "&initGivenName=" +
+                        encodeURIComponent(form.HusbGivenName.value) + 
+		                      "&initSurname=" + 
+                        encodeURIComponent(form.HusbSurname.value) +
+		                      '&treeName=' + 
+                        encodeURIComponent(form.treename.value) +
+                              '&initGender=F' +
+                              '&lang=' + lang;
 		var childWindow	    = openFrame("husbFrame",
 						                script,
 						                "left");
@@ -904,6 +913,7 @@ function editWife()
 						encodeURIComponent(form.WifeSurname.value);
 							  '&treeName=' +
 						encodeURIComponent(form.treename.value) +
+                              '&initGender=F' +
                               '&lang=' + lang;
 		var childWindow	    = openFrame("wifeFrame",
 						                script,
@@ -1014,9 +1024,12 @@ function createHusb(e)
         lang                = args.lang;
     var	form		        = this.form;
     var script		        = "editIndivid.php?rowid=Husb&initGender=0" +
-		  "&initGivenName=" + encodeURIComponent(form.HusbGivenName.value) + 
-		  "&initSurname=" + encodeURIComponent(form.HusbSurname.value) + 
-    	  '&treeName=' + encodeURIComponent(form.treename.value) +
+		                      "&initGivenName=" +
+                        encodeURIComponent(form.HusbGivenName.value) + 
+		                      "&initSurname=" + 
+                        encodeURIComponent(form.HusbSurname.value) + 
+    	                      '&treeName=' + 
+                        encodeURIComponent(form.treename.value) +
                               '&lang=' + lang;
     var childWindow	        = openFrame("husbFrame",
 						                script,
@@ -1045,9 +1058,12 @@ function createWife(e)
         lang                = args.lang;
     var	form		        = this.form;
     var script		        = "editIndivid.php?rowid=Wife&initGender=1" +
-		  "&initGivenName=" + encodeURIComponent(form.WifeGivenName.value) + 
-		  "&initSurname=" + encodeURIComponent(form.WifeSurname.value) + 
-    	  '&treeName=' + encodeURIComponent(form.treename.value) +
+		                      "&initGivenName=" +
+                    encodeURIComponent(form.WifeGivenName.value) + 
+		                      "&initSurname=" +
+                    encodeURIComponent(form.WifeSurname.value) + 
+    	                      '&treeName=' +
+                    encodeURIComponent(form.treename.value) +
                               '&lang=' + lang;
     var childWindow	        = openFrame("wifeFrame",
 						                script,

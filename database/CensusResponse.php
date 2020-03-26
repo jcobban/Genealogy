@@ -134,8 +134,10 @@ use \Exception;
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/04/01      do not fail if district not specified           *
  *		2019/12/04      did not set lang parameter on rows              *
+ *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/03/24      use CensusLine pseudo-field 'sexclass'          *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
@@ -405,8 +407,7 @@ foreach ($_GET as $key => $value)
 
 		    case 'lang':
 		    {			// language code
-                if (strlen($value) >= 2)
-                    $lang           = strtolower(substr($value,0,2));
+	            $lang               = FtTemplate::validateLang($value);
 				break;
 		    }			// language code
 
@@ -638,21 +639,13 @@ if (strlen($msg) == 0)
 		}
 		if (!isset($row['province']))
 		    $row['province']	= $province;
-		$district	= $row['district']; 
+		$district	            = $row['district']; 
 		if (substr($district,-2) == '.0')
 		    $row['district']	= substr($district, 0, strlen($district) - 2); 
-		$sex	                = $row['sex'];
-		if ($sex == 'M' || $sex == 'm')
-		    $sex	            = 'male';
-		else
-		if ($sex == 'F' || $sex == 'f')
-		    $sex	            = 'female';
-		else
-		    $sex	            = 'unknown';
-		$row['sex']				= $sex;
 		$idir					= $row['idir'];
 		$givennames				= $row['givennames'];
-		$surname	= $row['surname'];
+		$surname	            = $row['surname'];
+		$sex	                = $row->get('sexclass');
 		if ($idir > 0)
 		    $row['fullname']	= "<a href='/FamilyTree/Person.php?idir=$idir&amp;lang=$lang' target='_blank' class='$sex'>\n" .
 							  "\t    <strong>$surname</strong>,\n" .
@@ -662,7 +655,7 @@ if (strlen($msg) == 0)
 		    $row['fullname']	= "\t    <strong>$surname</strong>,\n" .
             "\t    $givennames\n";
         $row['lang']            = $lang;
-		//$result[$i]		= $row;
+        //$result[$i]		= $row;
     }				// loop through lines of response
     $result->rewind();
 

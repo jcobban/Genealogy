@@ -3,7 +3,7 @@
  *																		*
  *  Stylesheet for the script editMarriages.php							*
  *																		*
- *  History:																*
+ *  History:															*
  *		2014/02/17		created											*
  *		2014/03/06		label class name changed to column1				*
  *		2019/12/16      add styles for width of input fields and        *
@@ -22,6 +22,13 @@
 				width:			    43em;
 				}
 
+    .column1   {
+				width:			    290px;
+                }
+    .column2   {
+				width:			    210px;
+                }
+
 /*	labels of various widths */
     label.column1 {
 				font-family:		sans-serif;
@@ -34,6 +41,7 @@
 				float:			    left;
 				width:			    13em;
 				}
+/* buttons */
     button.button {
 				font-family:		sans-serif;
 				font-weight:		bold;
@@ -67,9 +75,7 @@
 				padding:		    0px 1px 0px 1px;
                 }
 
-    .column1   {
-				width:			    290px;
-                }
-    .column2   {
-				width:			    210px;
+    td.item     {
+                border-right:       thin solid black;
+                background-color:   white;    
                 }

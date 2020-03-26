@@ -95,7 +95,9 @@ else
 	    }
         else
         if ($record instanceof Record || $record instanceof LegacyHeader)
-            $record->toJson(true, $options);
+            $record->toJson(array('print'   => true,
+                                  'lang'    => $lang), 
+                            $options);
         else
             print "{\"record\" : \"$record\"}\n";
 	}

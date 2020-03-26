@@ -45,52 +45,54 @@ $lang           		= 'en';
 $getParms				= array();
 
 // get parameter values
-$parmsText      = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
-foreach($_GET as $key => $value)
-{				// loop through all parameters
-    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-	switch(strtolower($key))
-	{			// act on specific keys
-	    case 'cc':
-	    case 'country':
-        {
-            if (strlen($value) == 2)
-			    $cc	        	= strtoupper($value);
-			break;
-	    }
-
-	    case 'domain':
-	    {
-			$domain	        	= strtoupper($value);
-			break;
-	    }
-
-	    case 'county':
-	    {
-			$county		    	= $value;
-			break;
-	    }
-
-	    case 'township':
-	    {
-			$township			= $value;
-			break;
-	    }
-
-        case 'lang':
-        {
-            if (strlen($value) >= 2)
-                $lang           = strtolower(substr($value,0,2));
-            break;
-        }
-	}			// act on specific keys
-}				// loop through all parameters
-if ($debug)
-    $warn       .= $parmsText . "</table>\n";
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+	$parmsText      = "<p class='label'>\$_GET</p>\n" .
+	                  "<table class='summary'>\n" .
+	                  "<tr><th class='colhead'>key</th>" .
+	                      "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{				// loop through all parameters
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{			// act on specific keys
+		    case 'cc':
+		    case 'country':
+	        {
+	            if (strlen($value) == 2)
+				    $cc	        	= strtoupper($value);
+				break;
+		    }
+	
+		    case 'domain':
+		    {
+				$domain	        	= strtoupper($value);
+				break;
+		    }
+	
+		    case 'county':
+		    {
+				$county		    	= $value;
+				break;
+		    }
+	
+		    case 'township':
+		    {
+				$township			= $value;
+				break;
+		    }
+	
+	        case 'lang':
+	        {
+	            $lang       = FtTemplate::validateLang($value);
+	            break;
+	        }
+		}			// act on specific keys
+	}				// loop through all parameters
+	if ($debug)
+	    $warn       .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
 if (canUser('edit'))
 	$action			= 'Update';
@@ -213,7 +215,7 @@ $data               = '';
 $line               = 1;
 foreach($concessions as $concession)
 {
-    $rtemplate      = new Template($rowHtml);
+    $rtemplate      = new \Templating\Template($rowHtml);
     $rtemplate->set('LINE',     $line);
     $rtemplate->set('CONID',    $concession->get('conid'));
     $rtemplate->set('ORDER',	$concession->get('order'));

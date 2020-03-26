@@ -7,9 +7,10 @@
  *  History:															*
  *		2016/02/20		created											*
  *		2019/02/10      no longer need to call pageInit                 *
- *		2019/04.28      renamed to WmbResponse.js                       *
+ *		2019/04/28      renamed to WmbResponse.js                       *
+ *		2020/01/27      open baptism in named window                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban.								*
+ *  Copyright &copy; 2020 James A. Cobban.								*
  ************************************************************************/
 
 window.onload	= onLoad
@@ -59,7 +60,8 @@ function showReg()
     var	form	= this.form;
     var	recid	= this.id.substring(7);
     // display details
-    window.open('WmbDetail.php?IDMB=' + recid + '&lang=' + lang);
+    window.open('WmbDetail.php?IDMB=' + recid + '&lang=' + lang,
+                'baptism');
     return false;
 }		// showReg
 

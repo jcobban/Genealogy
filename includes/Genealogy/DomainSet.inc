@@ -15,6 +15,8 @@ use \Iterator;
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/11/28      add support for field partof                    *
  *		2019/12/02      if partof is not specified only return top level*
+ *		2020/03/24      correct handling of domain list containing      *
+ *		                empty parameters                                *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -40,7 +42,7 @@ class DomainSet extends RecordSet
     function __construct($parms	= array(),
 						 $order	= "`Name`")
     {
-        foreach($parms as $name=> $value)
+        foreach($parms as $name => $value)
             if (strtolower($name) == 'order')
                 $order      = $value;
 		$parms['order']		= $order;
@@ -69,9 +71,12 @@ class DomainSet extends RecordSet
 		$domain					= null;
 		$state					= null;
 		$partof					= null;
-
+        $parmsText              = "<table>\n";
 		foreach($this->parms as $key 	=> $value)
-		{			// loop through all parameters
+        {			// loop through all parameters
+            $parmsText          .= "    <tr><th>$key</th><td>";
+            $parmsText          .= var_export($value, true);
+            $parmsText          .= "</td></tr>\n";
 		    $fieldLc	        = Domain::getRealFieldName($key);
 		    $matches	        = array();
 		    if (preg_match('/^(.*) AS (.*)$/i', $fieldLc, $matches))
@@ -84,91 +89,95 @@ class DomainSet extends RecordSet
 		    {		// act on specific keys
 				case 'countrycode':
                 {
-                    $cc                 = $value;
 				    if (is_string($cc) && strlen($cc) >= 2)
                     {
-                        if (strtoupper($cc) == 'UK')
-                            $cc         = 'GB';
-						$where			.= $and . $fieldExpr . "=:cc";
+                        $cc                 = strtoupper($value);
+                        if ($cc == 'UK')
+                            $cc             = 'GB';
+						$where			    .= "$and$fieldExpr=:cc";
 						$this->sqlParms['cc']   = $cc;
-						$and			= ' AND ';
+						$and			    = ' AND ';
 				    }
 				    else
-				    {		// or expression
+				    {		// not a string
 						$warn	.= "<p>DomainSet::getWhere: " .
 							       "Unsupported value for `$key`=" .
-                                   print_r($value, true) . "</p>\n";
+                                   var_export($value, true) . "</p>\n";
                         $warn   .= "<p>parms=" . print_r($this->parms, true) .
                                     "</p>\n";
-                        showTrace();
-                        throw new Exception("Unsupported value for `$key`=" .
-                                   print_r($value, true));
-				    }		// or expression
+				    }		// not a string
 				    break;
-				}			// cc
+				}			// countrycode
 
 				case 'state':
-				{
-					$state		    = strtoupper($value);
-				    if (is_string($state) && strlen($state) > 0)
+				{			// state or province
+				    if (is_string($value) && strlen($value) > 0)
 				    {
-						$where		.= $and . $fieldExpr . "=:state";
+					    $state		        = strtoupper($value);
+						$where		        .= "$and$fieldExpr=:state";
 						$this->sqlParms['state']    = $state;
-						$and		= ' AND ';
+						$and		        = ' AND ';
 				    }
 				    else
 				    {		// or expression
 						$warn	.= "<p>DomainSet::getWhere: " .
 							       "Unsupported value for `$key`=" .
-							       print_r($value, true) . "</p>\n";
+							       var_export($value, true) . "</p>\n";
 				    }		// or expression
 				    break;
 				}			// state or province
 
 				case 'partof':
                 {
-				    if (is_string($partof) && strlen($partof) >= 2)
+                    if (is_string($value))
                     {
-                        $partof         = strtoupper($value);
-                        if (substr($partof, 0, 2) == 'UK')
-                            $partof     = 'GB' . substr($partof, 2);
-                        if (strlen($partof) == 2)
-                            $where		.= $and .
-			"(PartOf=:partof OR (LEFT(Domain,2)=:partof AND (PartOf IS NULL OR PartOf='')))";
+                        if (strlen($value) >= 2)
+	                    {
+	                        $partof         = strtoupper($value);
+	                        if (substr($partof, 0, 2) == 'UK')
+	                            $partof     = 'GB' . substr($partof, 2);
+					    }
                         else
-						    $where		.= $and . "PartOf=:partof";
-						$this->sqlParms['partof']   = $partof;
-						$and		= ' AND ';
-				    }
-				    else
-				    {		// or expression
-						$warn	.= "<p>DomainSet::getWhere: " .
-							       "Unsupported value for `$key`=" .
-							       print_r($value, true) . "</p>\n";
-				    }		// or expression
+                        if (strlen($value) != 0)
+						    $warn	.= "<p>DomainSet::getWhere: " . __LINE__ .
+							           " Unsupported value for `$key`=" .
+							           "'$value'</p>\n";
+                    }                   // string
+                    else
+                    if (!is_null($value))
+				    {		            // not a string
+						$warn	.= "<p>DomainSet::getWhere: " . __LINE__ .
+							       " Unsupported value for `$key`=" .
+							       var_export($value, true) . "</p>\n";
+				    }		            // not a string
 				    break;
-				}			// state or province
+				}			            // partof
 
 
 				case 'domain':
 				{
 				    if (is_array($value) && count($value) > 0)
 				    {
-						$where			.= $and;
 						$expr			= '';
                         $or			    = '';
                         $i              = 1;
 						foreach($value as $code)
-						{
-						    $expr		.= $or . "`Domain`=:domain$i";
-						    $this->sqlParms["domain$i"] = $code;
-                            $or			= ' OR ';
-                            $i++;
-						}
-						if (count($value) > 1)
-                            $where		.= "($expr)";
-						$domain			= $value;
-						$and			= ' AND ';
+                        {
+                            if (strlen($code) > 0)
+                            {
+						        $expr		.= $or . "`Domain`=:domain$i";
+						        $this->sqlParms["domain$i"] = $code;
+                                $or			= ' OR ';
+                                $i++;
+                            }
+                        }
+
+                        if ($i > 1)
+                        {
+                            $where		.= "$and($expr)";
+						    $domain			= $value;
+                            $and			= ' AND ';
+                        }
 				    }
 				    else
 				    if (is_string($value) && strlen($value) > 0)
@@ -192,14 +201,15 @@ class DomainSet extends RecordSet
 				    if (is_string($value))
 				    {
 						if ($value == '')
-						    $value	= 'en';
-						$language	= strtolower($value);
+                            $language   = 'en';
+                        else
+						    $language	= strtolower($value);
 				    }
 				    else
 				    {		// or expression
 						$warn	.= "<p>DomainSet::getWhere: " .
 							       "Unsupported value for `$key`=" .
-							       print_r($value, true) . "</p>\n";
+							       var_export($value, true) . "</p>\n";
 				    }		// or expression
 				    break;
 				}			// language
@@ -216,7 +226,7 @@ class DomainSet extends RecordSet
 				    {		// or expression
 						$warn	.= "<p>DomainSet::getWhere: " .
 							       "Unsupported value for `$key`=" .
-							       print_r($value, true) . "</p>\n";
+							       var_export($value, true) . "</p>\n";
 				    }		// or expression
 				    break;
 				}			// Name
@@ -227,14 +237,15 @@ class DomainSet extends RecordSet
 				    {		// or expression
 						$warn	.= "<p>DomainSet::getWhere: " .
 							       "Unrecognized `$key`=" .
-							       print_r($value, true) . "</p>\n";
+							       var_export($value, true) . "</p>\n";
 				    }		// or expression
 				    else
 						$warn	.= "<p>DomainSet::getWhere: " .
 							      "Unrecognized `$key`='$value'.</p>\n";
 				}			// other
 		    }			// act on specific keys
-		}				// loop through all parameters
+        }				// loop through all parameters
+        $parmsText              .= $parmsText . "</table>\n";
 
         // if partof was not specified, limit to top level domains in
         // the country
@@ -243,6 +254,16 @@ class DomainSet extends RecordSet
 			$where		.= $and . "(PartOf=:cc OR (LEFT(Domain,2)=:cc AND (PartOf IS NULL OR PartOf='')))";
             $this->sqlParms['cc']   = $cc;
             $and        = ' AND ';
+        }
+        else
+        {
+            if (strlen($partof) == 2)
+                $where		.= $and .
+"(PartOf=:partof OR (LEFT(Domain,2)=:partof AND (PartOf IS NULL OR PartOf='')))";
+            else
+			    $where		.= $and . "PartOf=:partof";
+			$this->sqlParms['partof']   = $partof;
+			$and	    	= ' AND ';
         }
 
 		// limit the response to one language for a country list

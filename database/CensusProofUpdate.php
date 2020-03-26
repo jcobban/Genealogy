@@ -19,10 +19,12 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2017/11/24		use prepared statement for insert				*
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FieldComment.inc';
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // open code
@@ -42,85 +44,84 @@ foreach($_POST as $key => $value)
     // ignore the common fields, already processed above
     if (ctype_digit($rownum))
     {			// field in individual record
-	if ($rownum != $oldrownum)
-	{ 
-	    if ($comment && canUser('edit'))
-		$comment->save(false);
-	    if (strlen($msg) == 0)
-		$comment	= new FieldComment(array(
-				'fc_census'		=> $census,
-				'fc_distid'		=> $distID,
-				'fc_sdid'		=> $subDistID,
-				'fc_div'		=> $division,
-				'fc_page'		=> $page,
-				'fc_userid'		=> $userid));
-	}		// update database
-	$oldrownum	= $rownum;
+		if ($rownum != $oldrownum)
+		{ 
+		    if ($comment && canUser('edit'))
+				$comment->save(false);
+		    if (strlen($msg) == 0)
+				$comment	= new FieldComment(array(
+								'fc_census'		=> $census,
+								'fc_distid'		=> $distID,
+								'fc_sdid'		=> $subDistID,
+								'fc_div'		=> $division,
+								'fc_page'		=> $page,
+								'fc_userid'		=> $userid));
+		}		// update database
+		$oldrownum	= $rownum;
 
-	// the first part of the key is the column name
-	$fld	= strtolower(substr($key, 0, strlen($key) - 2));
-	$comment->set($fld, $value);
+		// the first part of the key is the column name
+		$fld	= strtolower(substr($key, 0, strlen($key) - 2));
+		$comment->set($fld, $value);
     }			// field in individual record
     else
     {			// global field
-	switch(strtolower($key))
-	{		// act on specific parameters
-	    case 'cc':
-	    {
-		$cc		= $value;
-		break;
-	    }
+		switch(strtolower($key))
+		{		// act on specific parameters
+		    case 'cc':
+		    {
+				$cc		= $value;
+				break;
+		    }
 
-	    case 'census':
-	    {
-		$census		= $value;
-		break;
-	    }
+		    case 'census':
+		    {
+				$census		= $value;
+				break;
+		    }
 
-	    case 'province':
-	    {
-		$province	= $value;
-		break;
-	    }
+		    case 'province':
+		    {
+				$province	= $value;
+				break;
+		    }
 
-	    case 'district':
-	    {
-		$distID		= $value;
-		break;
-	    }
+		    case 'district':
+		    {
+				$distID		= $value;
+				break;
+		    }
 
-	    case 'subdistrict':
-	    {
-		$subDistID	= $value;
-		break;
-	    }
+		    case 'subdistrict':
+		    {
+				$subDistID	= $value;
+				break;
+		    }
 
-	    case 'division':
-	    {
-		$division	= $value;
-		break;
-	    }
+		    case 'division':
+		    {
+				$division	= $value;
+				break;
+		    }
 
-	    case 'page':
-	    {
-		$page		= $value;
-		break;
-	    }
+		    case 'page':
+		    {
+				$page		= $value;
+				break;
+		    }
 
-	    case 'userid':
-	    {
-		$userid		= $value;
-		break;
-	    }
+		    case 'userid':
+		    {
+				$userid		= $value;
+				break;
+		    }
 
-	    case 'lang':
-	    {
-		if (strlen($value) >= 2)
-		    $lang	= strtolower(substr($value,0,2));
-		break;
-	    }
+		    case 'lang':
+		    {
+	            $lang               = FtTemplate::validateLang($value);
+				break;
+		    }
 
-	}		// act on specific parameters
+		}		// act on specific parameters
     }			// global field
 }			// loop through all parameters
 
@@ -137,7 +138,7 @@ else
 if (isset($distID))
 {
     $districtObj	= new District(array('census'	=> $censusObj,
-					     'id'	=> $distID));
+									     'id'	=> $distID));
     $districtName	= $districtObj->getName($lang);
 }
 else
@@ -146,11 +147,11 @@ else
 }
 if (isset($subDistID))
 {
-    $subDistrictObj	= new SubDistrict(array('census'	=> $censusObj,
-					        'distid'	=> $districtObj,
-						'id'		=> $subDistID));
+    $subDistrictObj	    = new SubDistrict(array('census'	=> $censusObj,
+						    			        'distid'	=> $districtObj,
+							    			    'id'		=> $subDistID));
     $subDistrictName	= $subDistrictObj->getName();
-    $bypage		= $subDistrictObj->get('bypage');
+    $bypage		        = $subDistrictObj->get('bypage');
 }
 else
 {
@@ -175,7 +176,7 @@ else
 if (!canUser('edit'))
 {
     $msg	.= "You are not currently authorized to update the database.
-		Sign in and then refresh this page to apply the changes.";
+			Sign in and then refresh this page to apply the changes.";
 }
 
 $template		= new FtTemplate("CensusUpdate$lang.html");

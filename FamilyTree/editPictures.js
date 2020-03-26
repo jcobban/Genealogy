@@ -27,8 +27,9 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/06/29      first parameter of displayDialog removed        *
+ *		2020/02/17      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -121,6 +122,7 @@ function loadEdit()
 		}	// switch on element name
     }		// loop through all elements in the form
 
+    hideRightColumn();
 }		// function loadEdit
 
 /************************************************************************

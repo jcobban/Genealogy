@@ -67,8 +67,10 @@ use \Iterator;
  *		2019/12/19      use named insertion points in method save       *
  *		                truncate values for short string fields and     *
  *		                warn about truncated values in method set       *
+ *		2020/03/24      ownertenant field was handled as numeric        *
+ *		                add pseudo-field 'sexclass'                     *
  *															    		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -611,7 +613,9 @@ class CensusLine extends Record
 				'subdistid'		    => 'subdistrict',
 				'div'			    => 'division',
 				'givenname'		    => 'givennames',
-				'birthplace'		=> 'bplace');
+				'birthplace'		=> 'bplace',
+				'sexclass'		    => 'sexclass',
+				'gender'		    => 'sexclass');
 
     /********************************************************************
      *  CensusLine::$defaultOrder										*
@@ -970,7 +974,7 @@ class CensusLine extends Record
     function get($field)
     {
         global $warn;
-		$fieldLc	= strtolower($field);
+		$fieldLc	    = strtolower($field);
 		if (array_key_exists($fieldLc, self::$translate))
 		    $fieldLc	= self::$translate[$fieldLc];
 		switch($fieldLc)
@@ -1087,22 +1091,41 @@ class CensusLine extends Record
 		    case 'accinsurance':
 		    case 'costinsurance':
 		    case 'schoolmons':
-		    case 'ownertenant':
 		    case 'houserent':
 		    case 'houserooms':
 		    case 'weeksunemp':
 		    case 'weeksill':
 		    case 'numfamilies':
 		    case 'nofamilies':
-		    {			// numeric values only displayed if non-zero
-				$value		= $this->row[$fieldLc];
+            {			    // numeric values only displayed if non-zero
+				$value		        = $this->row[$fieldLc];
 				if ($value == 0)
-				    $retval		= '';
+				    $retval		    = '';
 				else
-				    $retval		= $value;
+				    $retval		    = $value;
                 break;
-		    }			// numeric values only displayed if non-zero
-		   
+		    }			    // numeric values only displayed if non-zero
+
+            case 'sexclass':
+            {               // sex as a CSS class name
+                switch(strtoupper($this->row['sex']))
+                {
+                    case 'M':
+                        $retval     = 'male';
+                        break;
+
+                    case 'F':
+                        $retval     = 'female';
+                        break;
+
+                    default:
+                        $retval     = 'other';
+                        break;
+
+                }           // switch on sex
+                break;
+            }               // sex as a CSS class name
+
 		    default:
 		    {			// other fields
                 if (array_key_exists($fieldLc, $this->row))
@@ -1235,6 +1258,70 @@ class CensusLine extends Record
 				return parent::set('age', $value);
 		    }	                // age field
 
+		    case 'absent':
+		    case 'blind':
+		    case 'canread':
+		    case 'cantread':
+		    case 'cantwrite':
+		    case 'canwrite':
+		    case 'coloured':
+		    case 'deaf':
+		    case 'employee':
+		    case 'employer':
+		    case 'french':
+		    case 'illiterate':
+		    case 'indian':
+		    case 'idiot':
+		    case 'insane':
+		    case 'lunatic':
+		    case 'lunatics':
+		    case 'member':
+		    case 'negro':
+		    case 'ownacct':
+		    case 'ownmeans':
+            case 'spkenglish':
+            case 'ownertenant':
+            case 'houseclass':
+            case 'sex':
+            case 'mstat':
+            case 'emptype':
+            case 'unemployed':
+            {                   // single character fields
+                if (is_string($value))
+                {
+                    if (strlen($value) > 1)
+                    {
+                        $value          = substr($value, 0, 1);
+                        error_log("CensusLine::set('$field','$value')\n");
+                    }
+                }
+                else
+                {
+                    error_log("CensusLine::set('$field'," . 
+                                var_export($value) . ")\n");
+                    $value              = null;
+                }
+				return parent::set($field, $value);
+            }                   // single character fields
+
+            case 'province':
+            {                   // single character fields
+                if (is_string($value))
+                {
+                    if (strlen($value) > 2)
+                    {
+                        $value          = substr($value, 0, 1);
+                        error_log("CensusLine::set('$field','$value')\n");
+                    }
+                }
+                else
+                {
+                    error_log("CensusLine::set('$field'," . 
+                                var_export($value) . ")\n");
+                    $value              = null;
+                }
+				return parent::set($field, $value);
+            }                   // two character fields
 
 		    default:
 		    {		// no validation implemented yet

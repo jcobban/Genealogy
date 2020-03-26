@@ -15,13 +15,14 @@
  *      2019/02/05      remove rightTop button                          *
  *      2019/04/14      add Facebook activation                         *
  *      2019/05/03      use classes to style advert and facebook        *
+ *		2020/02/16      add right hand notification column              *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <meta charset='utf-8'>
     <meta name='author' content='James A. Cobban'>
     <meta name='copyright' content='&copy; 2019 James A. Cobban'>
-    <meta name='keywords' content='genealogy, family, tree, ontario, canada $KEYWORDS'>
+    <meta name='keywords' content='genealogy, family, tree, ontario, canada $KEYWORDS'>/
     <link rel='stylesheet' type='text/css' href='/styles.css'>
     <link rel='stylesheet' type='text/css' href='$filename.css'
             id="otherStylesheets">
@@ -29,34 +30,11 @@
   <body>
       
 <script>
-    if (location.host != 'localhost')
-    try {
-	  window.fbAsyncInit = function() {
-	    FB.init({
-	      appId      : '2096433630426301',
-	      cookie     : true,
-	      xfbml      : true,
-	      version    : 'v3.2'
-	    });
-	      
-	    FB.AppEvents.logPageView();   
-	      
-	  };
-	
-	  (function(d, s, id){
-	     var js, fjs = d.getElementsByTagName(s)[0];
-	     if (d.getElementById(id)) {return;}
-	     js = d.createElement(s); js.id = id;
-	     js.src = "https://connect.facebook.net/en_US/sdk.js";
-	     fjs.parentNode.insertBefore(js, fjs);
-	   }(document, 'script', 'facebook-jssdk'));
-    } catch(e) {}
-
    var tinyMCEparms = {
 		selector            : 'textarea',
 	    plugins             : 'link lists image',
 	    menubar             : false,
-        language            : '$LANG',
+        language            : 'fr_FR',
         skin                : 'oxide-dark',
 	    toolbar             : "undo redo | styleselect | bold italic | " 
 	                           + "alignleft aligncenter alignright alignjustify | " 
@@ -71,11 +49,6 @@
     	<img src="/logo70.gif" id="logo" class="right"
                 height="70" width="70" alt="James Cobban Logo">
           &nbsp;
-        <span class="facebook" id="facebookSpan">
-      	  <iframe id='facebookFrame' class='facebook' $IECRAP>
-      	  </iframe>
-          &nbsp;
-        </span>
         <span class="advert" id="advertSpan">
           <iframe id='advertFrame' class='advert' $IECRAP src='$ADURL'>
           </iframe>
@@ -102,6 +75,18 @@
       </noscript>
       $MAIN
     </main>
+    <div id="rightColumn" class="rightCol">
+        <p id="userWelcome">
+          <b>Bienvenu $USERID</b>
+        </p>Vous pouvez publier votre arbre généalogique sur ce site 
+        dans un style qui ressemble à un livre traditionnel, 
+        mais en ajoutant toutes les capacités dynamiques du Web et 
+        protège votre famille contre le vol d'identité en s'assurant 
+        que seules les personnes que vous autorisez peuvent 
+        voir les détails de toute personne de moins de 105 ans.
+        <p>
+        </p>
+    </div>
     <footer id="footSection">
       <div class='botcrumbs'>
   	    <a href='/contactAuthor.php?lang=fr&idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>

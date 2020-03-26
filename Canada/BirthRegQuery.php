@@ -23,8 +23,9 @@ use \Exception;
  *		2018/10/05      use class Template                              *
  *		2019/02/21      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
     require_once __NAMESPACE__ . "/Domain.inc";
     require_once __NAMESPACE__ . "/Country.inc";
@@ -47,47 +48,49 @@ $domainName				= 'Canada: Ontario';
 $stateName				= 'Ontario';
 $lang	    			= 'en';
 
-$parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
-foreach ($_GET as $key => $value)
-{			    // loop through all parameters
-    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-	switch(strtolower($key))
-	{	    	// act on specific parameters
-	    case 'code':
-	    {		// state postal abbreviation
-			$code		    = $value;
-			$cc		        = 'CA';
-			$domain		    = 'CA' . $code;
-			break;
-	    }		// state postal abbreviation
-
-	    case 'domain':
-	    case 'regdomain':
-        {		// state postal abbreviation
-			$domain		    = $value;
-            if (strlen($value) >= 4)
-            {
-                $cc		    = substr($domain, 0, 2);
-                if ($cc == 'UK')
-                    $cc     = 'GB';
-            }
-			break;
-	    }		// state postal abbreviation
-
-	    case 'lang':
-	    {
-			if (strlen($value) >= 2)
-			    $lang		= strtolower(substr($value,0,2));
-			break;
-	    }
-	}   		// act on specific parameters
-}   			// loop through all parameters
-if ($debug)
-    $warn       .= $parmsText . "</table>\n";
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+	$parmsText  = "<p class='label'>\$_GET</p>\n" .
+	                  "<table class='summary'>\n" .
+	                  "<tr><th class='colhead'>key</th>" .
+	                      "<th class='colhead'>value</th></tr>\n";
+	foreach ($_GET as $key => $value)
+	{			    // loop through all parameters
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{	    	// act on specific parameters
+		    case 'code':
+		    {		// state postal abbreviation
+				$code		    = $value;
+				$cc		        = 'CA';
+				$domain		    = 'CA' . $code;
+				break;
+		    }		// state postal abbreviation
+	
+		    case 'domain':
+		    case 'regdomain':
+	        {		// state postal abbreviation
+				$domain		    = $value;
+	            if (strlen($value) >= 4)
+	            {
+	                $cc		    = substr($domain, 0, 2);
+	                if ($cc == 'UK')
+	                    $cc     = 'GB';
+	            }
+				break;
+		    }		// state postal abbreviation
+	
+		    case 'lang':
+		    {
+	            $lang       = FtTemplate::validateLang($value);
+				break;
+		    }
+		}   		// act on specific parameters
+	}   			// loop through all parameters
+	if ($debug)
+	    $warn       .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
 $template		        = new FtTemplate("BirthRegQuery$lang.html");
 $template->updateTag('otherStylesheets',	

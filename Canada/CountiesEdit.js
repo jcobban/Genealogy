@@ -17,8 +17,10 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/04/07      ensure that the paging lines can be displayed   *
  *		                within the visible portion of the browser.      *
+ *		2020/02/14      except for Canada use full name of state        *
+ *		                in location name for county                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -232,8 +234,15 @@ function editLocation()
 {
     var	form		= this.form;
     var	domain		= form.Domain.value;
-    var	cc		= domain.substring(0,2);
+    var	cc		    = domain.substring(0,2);
+    var	countryName	= form.CountryName.value;
+    var	stateName	= form.StateName.value;
     var	state		= domain.substring(2);
+    if (cc == 'CA')
+        stateName   = state;
+    else
+    if (cc == 'US')
+        cc          = 'USA';
     var	countyCode	= this.id.substring(12);
     var	countyName	= form.elements["Name" + countyCode].value;
     var	lang		= 'en';
@@ -248,9 +257,9 @@ function editLocation()
     if (countyName.substr(countyName.length - 9) == ' District' ||
 		countyName.substr(countyName.length - 3) == ' Co' ||
 		countyName.substr(countyName.length - 7) == ' County')
-		url	+= encodeURIComponent(countyName + ", " + state + ", " + cc);
+		url	+= encodeURIComponent(countyName + ", " + stateName + ", " + cc);
     else
-		url	+= encodeURIComponent(countyName + " Co, " + state + ", " + cc);
+		url	+= encodeURIComponent(countyName + " Co, " + stateName + ", " + cc);
     url		+= "&lang=" + lang;
     window.open(url,
 				"_blank");

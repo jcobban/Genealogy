@@ -14,8 +14,9 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/29      handle clicking on stats where there is no      *
  *		                county or township in the registrations         *
+ *		2020/03/21      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -31,16 +32,20 @@ if ('count' in args)
  *  function onLoad														*
  *																		*
  *  Initialize the dynamic functionality once the page is loaded		*
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        Window                                              *
+ *      ev          Javascript load Event                               *
  ************************************************************************/
-function onLoad()
+function onLoad(ev)
 {
     // activate handling of key strokes in text input fields
     var	element;
     for (var j = 0; j < document.forms.length; j++)
-    {		// loop through all forms in the page
+    {		        // loop through all forms in the page
 		var form	= document.forms[j];
 		for (var i = 0; i < form.elements.length; ++i)
-		{	// loop through all elements in the form
+		{	        // loop through all elements in the form
 		    element		        = form.elements[i];
 		    element.onkeydown	= keyDown;
 
@@ -58,9 +63,10 @@ function onLoad()
 		    {
 				element.onclick	= showByNumber;
 		    }
-		}	// loop through all elements in the form
-    }		// loop through all forms in the page
+		}	        // loop through all elements in the form
+    }		        // loop through all forms in the page
 
+    hideRightColumn();
 }		// function onLoad
 
 /************************************************************************

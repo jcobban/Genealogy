@@ -307,7 +307,14 @@ if (strlen($surname) == 0)
 }                   // empty surname
 else
 {                   // surname provided
-    $title	            = $template['surname']->innerHTML();
+    $surnameElt         = $template['surname'];
+    if ($surnameElt)
+        $title	        = $surnameElt->innerHTML();
+    else
+    {
+        $title          = "Could not find id='surname' template 'Names$action$lang.html'";
+        error_log("Names.php: " . __LINE__ . "Could not find id='surname' template 'Names$action$lang.html'");
+    }
     $surnameRec	        = new Surname(array('surname' => $surname));
     $idnr               = $surnameRec['idnr'];
 

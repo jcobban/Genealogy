@@ -44,8 +44,9 @@ use \Exception;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/02/19      use Template                                    *
  *      2019/11/17      move CSS to <head>                              *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -55,31 +56,42 @@ require_once __NAMESPACE__ . '/common.inc';
 $lang               = 'en';
 $idir               = null;
 
-foreach($_GET as $key => $value)
-{				// loop through all parameters
-	$value		= trim($value);
-	switch(strtolower($key))
-	{			// act on specific parameters
-	    case 'idir':
-	    case 'id':
-	    {			// get the individual by identifier
-			if (is_int($value) || ctype_digit($value))
-			{
-			    $idir		= $value;
-			    $getParms['idir']	= $idir;
-			}
-			else
-			    $msg	.= "Invalid IDIR=$value. ";
-			break;
-	    }			// get the individual by identifier
-
-	    case 'lang':
-	    {
-			$lang		= strtolower(substr($value,0,2));
-			break;
-	    }
-	}			// act on specific parameters
-}				// loop through all parameters
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+	    $value		= trim($value);
+		switch(strtolower($key))
+		{			// act on specific parameters
+		    case 'idir':
+		    case 'id':
+		    {			// get the individual by identifier
+				if (is_int($value) || ctype_digit($value))
+				{
+				    $idir		= $value;
+				    $getParms['idir']	= $idir;
+				}
+				else
+				    $msg	.= "Invalid IDIR=$value. ";
+				break;
+		    }			// get the individual by identifier
+	
+		    case 'lang':
+		    {
+	            $lang       = FtTemplate::validateLang($value);
+				break;
+		    }
+		}			// act on specific parameters
+	}				// loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
 $template		    = new FtTemplate("chooseRelative$lang.html", true);
 $template->updateTag('otherStylesheets',	

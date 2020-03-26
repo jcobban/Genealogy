@@ -132,8 +132,9 @@ use \Exception;
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/11/05      correct search for matching citations           *
  *		2019/12/13      remove M_ prefix from field names               *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . '/County.inc';
@@ -383,8 +384,7 @@ foreach($_GET as $key => $value)
 
         case 'lang':
         {		// preferred language
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value, 0, 2));
+	            $lang       = FtTemplate::validateLang($value);
             break;
         }		// preferred language
 

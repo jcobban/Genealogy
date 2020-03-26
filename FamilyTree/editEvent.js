@@ -157,8 +157,9 @@
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/06/29      first parameter of displayDialog removed        *
  *		2019/08/01      support tinyMCE 5.0.3                           *
+ *		2020/02/17      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -185,6 +186,9 @@ var childFrameClass	    = 'right';
  *  function loadEdit													*
  *																		*
  *  Initialize dynamic functionality of elements.						*
+ *																		*
+ *	Input:																*
+ *		this			window											*
  ************************************************************************/
 function loadEdit()
 {
@@ -410,6 +414,8 @@ function loadEdit()
 		    }			// action depends upon element name
 		}		    	// loop through all elements in the form
     }			    	// loop through all forms in page
+
+    hideRightColumn();
 }		// function loadEdit
 
 /************************************************************************

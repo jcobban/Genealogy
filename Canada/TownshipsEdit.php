@@ -3,7 +3,6 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 use \Templating\Template;
-
 /************************************************************************
  *  TownshipsEdit.php													*
  *																		*
@@ -45,8 +44,9 @@ use \Templating\Template;
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/04/12      merge in TownshipsUpdate.php                    *
  *		                simplify update                                 *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . '/County.inc';
@@ -56,131 +56,130 @@ require_once __NAMESPACE__ . '/TownshipSet.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-$prov		        = 'ON';		    // postal abbreviation for province
-$domainCode		    = 'CAON';	    // administrative domain
-$cc			        = 'CA';
-$countryName	    = 'Canada';
-$domainName		    = 'Ontario';
-$countyCode		    = null;	    	// county abbreviation
-$countyName		    = "Unknown";	// full name
-$lang               = 'en';
-$offset             = 0;
-$limit              = 1000;
+$prov		        			= 'ON';		    // postal abbreviation
+$domainCode		    			= 'CAON';	    // administrative domain
+$cc			        			= 'CA';
+$countryName	    			= 'Canada';
+$domainName		    			= 'Ontario';
+$countyCode		    			= null;	    	// county abbreviation
+$countyName		    			= "Unknown";	// full name
+$lang               			= 'en';
+$offset             			= 0;
+$limit              			= 1000;
 
 if (isset($_GET) && count($_GET) > 0)
 {                   // invoked by method=get
-    $parmsText      = "<p class='label'>\$_GET</p>\n" .
-                      "<table class='summary'>\n" .
-                      "<tr><th class='colhead'>key</th>" .
-                          "<th class='colhead'>value</th></tr>\n";
+    $parmsText                  = "<p class='label'>\$_GET</p>\n" .
+			                      "<table class='summary'>\n" .
+			                      "<tr><th class='colhead'>key</th>" .
+			                          "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{				// loop through all parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+        $parmsText              .= "<tr><th class='detlabel'>$key</th>" .
+                                    "<td class='white left'>$value</td></tr>\n";
 		switch(strtolower($key))
 		{			// act on specific keys
 		    case 'domain':
 		    {
-                $domainCode		    = strtoupper($value);
-                $cc                 = substr($domainCode, 0, 2);
+                $domainCode		= strtoupper($value);
+                $cc             = substr($domainCode, 0, 2);
 				break;
 		    }
 		
 		    case 'prov':
 		    case 'province':
 		    {
-				$prov			    = strtoupper($value);
-				$domainCode			= 'CA' . $prov;
+				$prov			= strtoupper($value);
+				$domainCode		= 'CA' . $prov;
 		    }
 		
 		    case 'state':
 		    {
-				$prov			    = strtoupper($value);
-				$domainCode			= 'US' . $prov;
-                $cc                 = 'US';
+				$prov			= strtoupper($value);
+				$domainCode		= 'US' . $prov;
+                $cc             = 'US';
 		    }
 		
 		    case 'county':
 		    {
-				$countyCode			= $value;
+				$countyCode		= $value;
 				break;
 	        }
 	
 	        case 'lang':
 	        {
-	            if (strlen($value) >= 2)
-	                $lang           = strtolower(substr($value, 0, 2));
+                $lang       = FtTemplate::validateLang($value);
+                break;
 	        }
 		
 		    case 'offset':
 		    {
                 if (ctype_digit($value))
-                    $offset         = intval($value);
+                    $offset     = intval($value);
 				break;
 	        }
 		
 		    case 'limit':
 		    {
                 if (ctype_digit($value))
-                    $limit          = intval($value);
+                    $limit      = intval($value);
 				break;
 	        }
 
 		}			// act on specific keys
 	}				// loop through all parameters
     if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn                   .= $parmsText . "</table>\n";
 }                   // invoked by method=get
 else
 if (isset($_POST) && count($_POST) > 0)
 {                   // invoked by method=post
-	$parmsText      = "<p class='label'>\$_POST</p>\n" .
-	                  "<table class='summary'>\n" .
-	                  "<tr><th class='colhead'>key</th>" .
-	                      "<th class='colhead'>value</th></tr>\n";
+	$parmsText                  = "<p class='label'>\$_POST</p>\n" .
+            	                  "<table class='summary'>\n" .
+            	                  "<tr><th class='colhead'>key</th>" .
+            	                      "<th class='colhead'>value</th></tr>\n";
 	foreach($_POST as $key => $value)
 	{				// loop through all parameters
-	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-	                        "<td class='white left'>$value</td></tr>\n"; 
+	    $parmsText              .= "<tr><th class='detlabel'>$key</th>" .
+	                                "<td class='white left'>$value</td></tr>\n";
 		switch(strtolower($key))
 		{			// act on specific keys
 		    case 'domain':
 		    {			    // administrative domain
-				$domainCode		    = strtoupper($value);
-                $cc                 = substr($domainCode, 0, 2);
+				$domainCode		= strtoupper($value);
+                $cc             = substr($domainCode, 0, 2);
 				break;
 		    }			    // administrative domain
 	
 		    case 'prov':
 		    {			    // administrative domain
-				$domainCode		    = 'CA' . strtoupper($value);
+				$domainCode		= 'CA' . strtoupper($value);
 				break;
 		    }			    // administrative domain
 	
 		    case 'county':
 		    {			    // county abbreviation
-				$countyCode			= $value;
+				$countyCode		= $value;
 				break;
 		    }			    // county abbreviation
 	
 		    case 'lang':
 	        {			    // language code
-	            if (strlen($value) >= 2)
-				    $lang		= strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
 				break;
 		    }			    // language code
 		
 		    case 'offset':
 		    {
                 if (ctype_digit($value))
-                    $offset         = intval($value);
+                    $offset     = intval($value);
 				break;
 	        }
 		
 		    case 'limit':
 		    {
                 if (ctype_digit($value))
-                    $limit          = intval($value);
+                    $limit      = intval($value);
 				break;
 	        }
 	
@@ -215,64 +214,64 @@ if (isset($_POST) && count($_POST) > 0)
 		}		        	// act on specific keys
 	}				        // loop through all parameters
 	if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn               .= $parmsText . "</table>\n";
 }                   // invoked by method=post
 
 // get the template
 if (canUser('edit'))
-	$action			= 'Update';
+	$action					= 'Update';
 else
-	$action			= 'Display';
+	$action					= 'Display';
 
-$template			= new FtTemplate("TownshipsEdit$action$lang.html");
+$template					= new FtTemplate("TownshipsEdit$action$lang.html");
 
 // process domain
-$domain	        = new Domain(array('domain'	    => $domainCode,
-					               'language'	=> $lang));
+$domain	            		= new Domain(array('domain'	    => $domainCode,
+					                   'language'	=> $lang));
 if ($domain->isExisting())
 {
-    $countryObj		= $domain->getCountry();
-    $countryName	= $countryObj->getName();
-    $domainName		= $domain->get('name');
+    $countryObj				= $domain->getCountry();
+    $countryName			= $countryObj->getName();
+    $domainName				= $domain->get('name');
 }
 else
 {
-    $text           = $template['badDomain']->innerHTML();
-    $msg	        .= str_replace('$value', $value, $text);
+    $text           		= $template['badDomain']->innerHTML();
+    $msg	                .= str_replace('$value', $value, $text);
 }
 
 if ($countyCode)
 {                       // interpret county code
-    $county	        = new County(array('domain'     => $domain,
+    $county	        		= new County(array('domain'     => $domain,
                                        'code'       => $countyCode));
-	$countyName	    = $county->get('name');
+	$countyName	    		= $county->get('name');
 }			// no errors
 else
 {
-    $county         = null;
-    $msg            .= $template['noCounty']->innerHTML();
-    $townships      = array();
-    $count          = 0;
+    $county         		= null;
+    $msg                    .= $template['noCounty']->innerHTML();
+    $townships      		= array();
+    $count          		= 0;
 }
 
 // if authorized and requested update the Townships taable
 if (canUser('edit') &&
     isset($_POST) && count($_POST) > 0)
 {                   // apply updates
-    $township		= null;
-    $code		    = null;
-    $oldrownum		= '1';
-    $data           = '';
+    $township	        	= null;
+    $code		            = null;
+    $oldrownum		        = '1';
+    $data                   = '';
     foreach($_POST as $key => $value)
     {			    // loop through all parameters
-		$matches    	= array();
-        $rres	        = preg_match('/^([a-zA-Z]+)([0-9]+)$/', 
-                                     $key, 
-                                     $matches);
+		$matches    	    = array();
+        $rres	            = preg_match('/^([a-zA-Z]+)([0-9]+)$/', 
+                                         $key, 
+                                         $matches);
 		if ($rres == 1)
 		{		    // name includes row number
-		    $colname	= $matches[1];
-		    $rownum	    = $matches[2];
+		    $colname	    = $matches[1];
+		    $rownum	        = $matches[2];
 		    switch(strtolower($colname))
 		    {		// act on column name
 				case 'code':
@@ -316,10 +315,10 @@ if (canUser('edit') &&
 if ($countyCode)
 {           // get set of Townships after update
 	// execute the query to get the contents of the page
-    $getParms       = array('county'    => $county);
-	$townships	    = new TownshipSet($getParms);
-    $info	        = $townships->getInformation();
-    $count		    = $info['count'];
+    $getParms       			= array('county'    => $county);
+	$townships	    			= new TownshipSet($getParms);
+    $info	        			= $townships->getInformation();
+    $count		    			= $info['count'];
 }			// get set of Townships after update
 
 $template->set('CONTACTTABLE',	    'Counties');

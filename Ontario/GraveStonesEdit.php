@@ -41,8 +41,9 @@ use \Exception;
  *		2018/02/17		use Template									*
  *		2019/02/19      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/DomainSet.inc';
@@ -131,8 +132,7 @@ if (count($_GET) > 0)
 			case 'lang':
 			case 'language':
 			{			// language code
-	            if (strlen($value) >= 2)
-	                $lang           = strtolower(substr($value,0,2));
+	            $lang       = FtTemplate::validateLang($value);
 			    break;
 			}			// language code
 	

@@ -60,8 +60,9 @@ use \Exception;
  *		2019/05/18      get search name from cookie or parameters       *
  *		                and display in input field                      *
  *      2019/11/17      move CSS to <head>                              *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -139,8 +140,7 @@ if (count($_GET) > 0)
 	
 		    case 'lang':
             {		// language choice
-                if (strlen($value) >= 2)
-				    $lang		= strtolower(substr($value,0,2));
+                $lang       = FtTemplate::validateLang($value);
 				break;
 		    }		// language choice
 	

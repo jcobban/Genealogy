@@ -1,0 +1,1025 @@
+<!--*********************************************************************
+ *  editMarriagesfr.html											    *
+ *																		*
+ *  Template to display a web page for editing the families for which   *
+ *  a particular Person has the role of spouse from the family tree     *
+ *  database.			                                                *
+ *																		*
+ *  History: 															*
+ * 		2020/01/29      created                                         *
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+			Généalogie
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+			Services
+      </a>:
+      <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+			Noms de famille qui commence avec '$PREFIX'
+      </a>:
+      <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+			Nom de famille '$SURNAME'
+      </a>:
+      <a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG" id="person">
+			$NAME
+      </a>:
+    </div>
+    <div id="bodydiv" class="body">
+	  <h1>
+	    <span class="right">
+		  <a href="editMarriagesHelpen.html" target="help">? Help</a>
+	    </span>
+        $TITLE
+		<div style="clear: both;"></div>
+	  </h1>
+	  $TRACE
+      $MSG
+      <form name="indForm" id="indForm"
+                action="updateMarriages.php" method="post">
+	    <fieldset id="FamiliesSet" class="other">
+		  <legend class="labelSmall">Familles</legend>
+		  <input type="hidden" name="idir" id="idir"
+				value="$IDIR">
+		  <input type="hidden" name="child" id="child" 
+				value="$CHILD">
+		  <input type="hidden" name="sex" id="sex" 
+				value="$SEX">
+		  <input type="hidden" name="debug" id="debug" 
+			    value="$DEBUG">
+		  <table class="details" id="marriageList">
+		    <thead>
+		      <tr>
+		        <th class="colhead">
+			        Date
+		        </th>
+		        <th class="colhead">
+			        Époux
+		        </th>
+		        <th class="colhead">
+			        Épouse
+		        </th>
+		        <th class="colhead">
+			        Pref
+		        </th>
+		        <th class="colhead" colspan="2">
+			        Actions
+		        </th>
+		      </tr>
+		    </thead>
+		    <tbody id="marriageListBody">
+		      <tr id="marriage$idmr">
+		        <td id="mdate$idmr" class="item">
+				    $mdate 
+		        </td>
+		        <td class="item">
+		          <a href="Person.php?id=$husbid&lang=$lang"
+						    class="male" id="husbname$idmr">
+				    $husbName
+		          </a>
+		        </td>
+		        <td class="item">
+		          <a href="Person.php?id=$wifeid&lang=$lang"
+						    class="female" id="wifename$idmr">
+				    $wifeName
+		          </a>
+		        </td>
+		        <td class="center item">
+		          <input type="checkbox" name="Pref$idmr"
+				    $prefchecked>
+		        </td>
+		        <td>
+		          <button type="button" class="button" class="button" 
+						    id="Edit$idmr">
+				    Modifier la famille
+		          </button>
+		        </td>
+		        <td>
+		          <button type="button" class="button" class="button"
+						    id="Delete$idmr">
+				    Supprimer la famille
+		          </button>
+		        </td>
+		      </tr>
+		    </tbody>
+	      </table>
+		  <div class="row">
+		    <label class="column1" for="Add">
+				  Actions:
+		    </label>
+		    <button type="button" class="button" id="Add">
+				  <u>A</u>jouter une Famille
+		    </button>
+		    &nbsp;
+		    <button type="button" class="button" id="Reorder"
+				  style="width: 18em;">
+		      C<u>O</u>mmander les familles par Date
+		    </button>
+		  </div>
+	    </fieldset>
+	  </form> <!-- name="indForm" id="indForm" -->
+	<!--*********************************************************************
+	 *		The current family is displayed in a separate form				*
+	 *																		*
+	 **********************************************************************-->
+	  <form name="famForm" id="famForm"
+		        action="updateMarriageXml.php" method="post">
+		<input type="hidden" name="idmr" id="idmr" value="$IDMR">
+		<input type="hidden" name="treename" id="treename" value="$TREENAME">
+		<fieldset id="HusbandSet" class="male">
+			<legend class="labelSmall">Époux</legend>
+			<div class="row" id="Husb">
+			  <div class="column1">
+			    <label class="column1" for="HusbGivenName`">
+					Nom:
+			    </label>
+			    <input type="hidden" name="IDIRHusb" id="IDIRHusb"
+							value="$IDIRHUSB">
+			    <input type="text" name="HusbGivenName" id="HusbGivenName"
+		                    maxlength="120" class="white left column1"
+		                    value="$HUSBGIVENNAME">
+			    <input type="text" name="HusbSurname" id="HusbSurname"
+		                    maxlength="120" class="white left column2"
+		                    value="$HUSBSURNAME">
+			    <input type="hidden" name="HusbBirthSD" id="HusbBirthSD"
+							value="$HUSBBIRTHSD">
+			    <input type="hidden" name="HusbOrder" id="HusbOrder"
+							value="$HUSBORDER">
+			  </div>
+			  <div>
+			    <button type="button" class="button" id="editHusb">
+					Modifier Époux
+			    </button>
+			  </div>
+			  <div style="clear: both;"></div>
+			</div>
+			<div class="row" id="HusbMarrSurnameRow">
+			  <div class="column1">
+			    <label class="column1" for="HusbMarrSurname">
+					Nom de famille marié:
+			    </label>
+			    <span class="left column1">&nbsp;</span>
+			    <input type="text" name="HusbMarrSurname" id="HusbMarrSurname"
+		                    maxlength="255" class="white left column2"
+		                    value="$HUSBSURNAME">
+			  </div>
+			  <div style="clear: both;"></div>
+			</div>
+			<div class="row" id="SelectHusbandRow">
+			    <label class="column1" for="chooseHusb">
+					Actions:
+			    </label>
+			    <button type="button" id="chooseHusb"
+					class="button">
+					Sélectionner un mari existant
+			    </button>
+			    &nbsp;
+			    <button type="button" id="createHusb"
+					class="button">
+					Créer un nouveau mari
+			    </button>
+			    &nbsp;
+			    <button type="button" id="detachHusb"
+					class="button">
+					Détacher le mari
+			    </button>
+			  <div style="clear: both;"></div>
+			</div> <!-- end of Husband row -->
+		</fieldset> <!-- id="HusbandSet" -->
+		<fieldset id="WifeSet" class="female">
+			<legend class="labelSmall">Épouse</legend>
+			<div class="row" id="Wife">
+			  <div class="column1">
+			    <label class="column1" for="WifeGivenName">
+					Nom:
+			    </label>
+			    <input type="hidden" name="IDIRWife" id="IDIRWife"
+							value="$IDIRWIFE">
+			    <input type="text" name="WifeGivenName" id="WifeGivenName"
+		                    maxlength="120" class="white left column1"
+		                    value="$WIFEGIVENNAME">
+			    <input type="text" name="WifeSurname" id="WifeSurname"
+		                    maxlength="120" class="white left column2"
+		                    value="$WIFESURNAME">
+			    <input type="hidden" name="WifeBirthSD" id="WifeBirthSD"
+							value="$WIFEBIRTHSD">
+			    <input type="hidden" name="WifeOrder" id="WifeOrder"
+							value="$WIFEORDER">
+			  </div>
+			  <div>
+			    <button type="button" class="button" id="editWife">
+					Modifier Épouse
+			    </button>
+			  </div>
+			  <div style="clear: both;"></div>
+			</div>
+			<div class="row" id="WifeMarrSurnameRow">
+			  <div class="column1">
+			    <label class="column1" for="WifeMarrSurname">
+					Nom de famille marié:
+			    </label>
+			    <span class="left column1">&nbsp;</span>
+			    <input type="text" name="WifeMarrSurname" id="WifeMarrSurname"
+		                    maxlength="255" class="white left column2"
+		                    value="$HUSBSURNAME">
+			  </div>
+			  <div style="clear: both;"></div>
+			</div>
+			<div class="row" id="selectWifeRow">
+			    <label class="column1" for="chooseWife">
+					Actions:
+			    </label>
+			    <button type="button" id="chooseWife"
+					    class="button">
+					Sélectionner une marie existant
+			    </button>
+			    &nbsp;
+			    <button type="button" id="createWife"
+					    class="button">
+					Créer une nouvelle marie
+			    </button>
+			    &nbsp;
+			    <button type="button" id="detachWife"
+					    class="button">
+					Détacher la marie
+			    </button>
+			  <div style="clear: both;"></div>
+			</div> <!-- end of Wife row -->
+		</fieldset> <!-- id="WifeSet" -->
+		<fieldset id="EventSet" class="other">
+			<legend class="labelSmall">Événements</legend>
+			$EVENTS
+			<div class="row" id="AddEventRow">
+		        <label class="column1" for="AddEvent">
+				    Actions:
+		        </label>
+			    <button type="button" id="AddEvent"
+					    class="button">
+					Ajouter Événement
+			    </button>
+		</fieldset> <!-- id="EventSet" -->
+		<fieldset id="InformationSet" class="other">
+			<legend class="labelSmall">Information</legend>
+			<div class="row" id="IdmrRow">
+			  <div class="column1">
+			    <label class="column1" for="idmrshow">
+					IDMR:
+			    </label>
+		        <input type="text" name="idmrshow" id="idmrshow"
+		                size="6" class="ina rightnc"
+						readonly="readonly" value="$IDMR">
+			  </div>
+			  <div style="clear: both;"></div>
+			</div>
+			<div class="row" id="StatusRow">
+			  <div class="column1">
+			    <label class="column1" for="IDMS">
+					Statut:
+			    </label>
+			    <select name="IDMS" id="IDMS" size="1" class="white left">
+				  <option id="option$IDMS" value="$IDMS" $SELECTED>
+					$TEXT
+				  </option>
+			    </select>
+			  </div>
+			  <div style="clear: both;"></div>
+			</div> <!-- end of Ending Status row -->
+		
+			<div class="row" id="NameRuleRow">
+			  <label class="column1" for="MarriedNameRule">
+					Règle de nom de famille:
+			  </label>
+			    <select name="MarriedNameRule" id="MarriedNameRule"
+					size="1" class="white left">
+				  <option id="option$MNR" value="$MNR" $SELECTED>
+					$TEXT
+				  </option>
+			    </select>
+			  <div style="clear: both;"></div>
+			</div> <!-- end of Name Rule row -->
+		
+			<div class="row" id="NotesRow">
+			  <label class="column1" for="Notes">
+					Remarques:
+			  </label>
+		<!-- note that when initializing a <textarea>, unlike other tags
+			 the space around the text value becomes part of the value
+			 of the tag, so there can be no space characters between the 
+			 opening and closing tags and the value of the field -->
+			    <textarea name="Notes" id="Notes" cols="60" rows="4"
+					>$NOTES</textarea>
+			  <div style="clear: both;"></div>
+			</div> <!-- end of Notes row -->
+			<div class="row" id="NoteDetailsButtonRow">
+			  <div class="column1">
+			    <label class="column1" for="noteDetails">
+			    </label>
+			  </div>
+			  <div>
+			    <button type="button" class="button" id="noteDetails">
+					Détails
+			    </button>
+			  </div>
+			  <div style="clear: both;"></div>
+			</div> <!-- end of NoteDetailsButton row -->
+			<div class="row" id="InformationActionsRow">
+			    <label class="column1" for="chooseHusb">
+					Actions:
+			    </label>
+			    <button type="button" class="button" id="Pictures">
+					Modifier Images
+			    </button>
+			  <div style="clear: both;"></div>
+			</div> <!-- end of Notes row -->
+		</fieldset> <!-- id="InformationSet" -->
+		<fieldset class="other" id="ChildrenSet">
+			<legend class="labelSmall">Children</legend>
+			<table class="details" id="children">
+			  <thead>
+			   <tr>
+			    <th class="colhead" style="width: 176px;">
+					&nbsp;&nbsp;&nbsp;Prenom&nbsp;&nbsp;&nbsp;
+			    </th>
+			    <th class="colhead" style="width: 116px;">
+					&nbsp;&nbsp;Nom de famille&nbsp;&nbsp;
+			    </th>
+			    <th class="colhead" style="width: 104px;">
+					&nbsp;Naissance&nbsp;
+			    </th>
+			    <th class="colhead" style="width: 104px;">
+					&nbsp;Mort&nbsp;
+			    </th>
+			    <th class="colhead" colspan="2">
+					Actions
+			    </th>
+			   </tr>
+			  </thead>
+			  <tbody id="childrenBody">
+				<tr id="child$rownum">
+				  <td class="name">
+				    <input type="hidden"
+								name="CIdir$rownum" 
+								id="CIdir$rownum"
+								value="$idir">
+				    <input type="hidden"
+								name="CIdcr$rownum" 
+								id="CIdcr$rownum"
+								value="$idcr">
+				    <input type="hidden"
+								name="CGender$rownum" 
+								id="CGender$rownum"
+								value="$sex">
+				    <input class="$gender"
+								name="CGiven$rownum" 
+								id="CGiven$rownum"
+								value="$givenname" 
+								type="text" size="15" maxlength="120">
+				  </td>
+				  <td class="name">
+				    <input class="$genderclass"
+								name="CSurname$rownum"
+								id="CSurname$rownum" 
+								value="$surname"
+								type="text" size="10" maxlength="120">
+				  </td>
+				  <td class="name">
+				    <input class="white left"
+								name="Cbirth$rownum"
+								id="Cbirth$rownum" 
+								value="$birthd" 
+								type="text" size="12" maxlength="100">
+				    <input name="Cbirthsd$rownum"
+								id="Cbirthsd$rownum" 
+								type="hidden" 
+								value="$birthsd">
+				  </td>
+				  <td class="name">
+				    <input class="white left"
+								name="Cdeath$rownum"
+								id="Cdeath$rownum" 
+								value="$deathd"
+								type="text" size="12" maxlength="100">
+				  </td>
+				  <td>
+				    <button type="button" class="button"
+								id="editChild$rownum">
+						Modifier l'enfant
+				    </button>
+				  </td>
+				  <td>
+				    <button type="button" class="button"
+								id="detChild$rownum">
+						Détacher l'enfant
+				    </button>
+				  </td>
+				</tr>
+			  </tbody>
+			</table> <!-- id="children" -->
+			<input type="hidden"
+					name="CIdir99" id="CIdir99"
+					value="-1">
+			<div class="row">
+			  <label class="column1" for="chooseHusb">
+					Actions:
+			  </label>
+			  <button type="button" class="button" id="addChild">
+					Ajouter un enfant <u>E</u>xistant
+			  </button>
+			    &nbsp;
+			  <button type="button" class="button" id="addNewChild">
+					Ajouter un enfant <u>N</u>ouveau
+			  </button>
+			    &nbsp;
+			  <button type="button" class="button" id="orderChildren"
+					style="width: 18em;">
+			        C<u>O</u>mmander les enfants par date de naissance
+			  </button>
+			</div>
+		</fieldset><!-- id="ChildrenSet" -->
+		<div class="row" id="MarrButtonLine">
+		  <button type="submit" class="button" id="Submit">
+			Soumettre la famille
+		  </button>
+		  &nbsp;
+		  <button type="button" class="button" id="update">
+			Mettre à jo<u>U</u>r la famille
+		  </button>
+		  &nbsp;
+		  <button type="button" class="button" id="Finish">
+			Fermer
+		  </button>
+		</div>
+	  </form> <!-- name="famForm" id="famForm" -->
+	</div> <!-- id="bodydiv" -->
+	
+	<div class="balloon" id="HelpPref">
+		Click on the checkbox to make the specified marriage the preferred
+		marriage.
+	</div>
+	<div class="balloon" id="HelpEdit">
+		Edit the marriage on this row.  A dialog is displayed with details 
+		of the marriage.
+	</div>
+	<div class="balloon" id="HelpDelete">
+		Delete the marriage on this row.
+	</div>
+	<div class="balloon" id="HelpAdd">
+		Add a new marriage to the current individual.
+	</div>
+	<div class="balloon" id="HelpFinish">
+	     to the database have already been made.
+	</div>
+	<div class="balloon" id="HelpReorder">
+	    Change the order of the marriages to be in chronological order by
+        marriage date.  If you know the actual order of the marriages,
+        but do not know the exact date of a marriage, it is recommended
+        that you specify a range of dates for the marriage as this will
+        not only permit using this feature to order the marriages correctly,
+        but also give a hint as to which
+		documentary sources to search to complete the information.
+	</div>
+	<div class="balloon" id="Helpidmr">
+	    This read-only field displays the internal numeric identifier of
+		this relationship.
+	</div>
+	<div class="balloon" id="HelpHusbGivenName">
+	    This displays the given names of the husband.
+		If you alter this field it changes the given name of the individual.
+	</div>
+	<div class="balloon" id="HelpHusbSurname">
+	    This displays the family name of the husband. 
+		If you alter this field it changes the family name of the individual.
+	</div>
+	<div class="balloon" id="HelpHusbMarrSurname">
+	    This displays the family name by which the husband was known during this
+		marriage.
+		If the traditional English rule in which the Husband did
+        not change his surname on marriage is in effect this is a
+        read-only field.
+	</div>
+	<div class="balloon" id="HelpWifeGivenName">
+	    This displays the given names of the wife. 
+		If you alter this field it changes the given name of the individual.
+	</div>
+	<div class="balloon" id="HelpWifeSurname">
+	    This displays the family name of the wife. 
+		If you alter this field it changes the family name of the individual.
+	</div>
+	<div class="balloon" id="HelpWifeMarrSurname">
+	    This displays the family name by which the wife was known during this
+        marriage.  If the traditional English rule in which the Wife
+        took her husband's surname on marriage is in effect this
+        is a read-only field.
+	</div>
+	<div class="balloon" id="HelpchooseHusb">
+	    Selecting this button pops up a
+	    <a href="chooseIndividHelpen.html" target="_blank">dialog</a> 
+		that permits you to select an
+        already existing individual from the family tree to assign
+        as the husband in this marriage.
+	</div>
+	<div class="balloon" id="HelpeditHusb">
+	    Selecting this button pops up a
+	    <a href="editIndividHelpen.html" target="_blank">dialog</a> 
+		that permits you to modify information about the individual
+		who is the husband in this marriage.
+	</div>
+	<div class="balloon" id="HelpcreateHusb">
+	    Selecting this button pops up a
+	    <a href="editIndividHelpen.html" target="_blank">dialog</a> 
+		that permits you to create a
+		new individual in the family tree to be the husband in this marriage.
+	</div>
+	<div class="balloon" id="HelpdetachHusb">
+	    Selecting this button detaches the currently assigned husband from this
+		marriage.  It is not necessary to do this before selecting or creating
+		a new husband.
+	</div>
+	<div class="balloon" id="HelpeditWife">
+	    Selecting this button pops up a
+	    <a href="editIndividHelpen.html" target="_blank">dialog</a> 
+		that permits you to modify information about the individual
+		who is the wife in this marriage.
+	</div>
+	<div class="balloon" id="HelpchooseWife">
+	    Selecting this button pops up a
+	    <a href="chooseIndividHelpen.html" target="_blank">dialog</a> 
+		that permits you to select an
+		already existing individual from the family tree to assign as the wife
+		in this marriage.
+	</div>
+	<div class="balloon" id="HelpcreateWife">
+	    Selecting this button pops up a
+	    <a href="editIndividHelpen.html" target="_blank">dialog</a> 
+		that permits you to create a
+		new individual in the family tree to be the wife in this marriage.
+	</div>
+	<div class="balloon" id="HelpdetachWife">
+	    Selecting this button detaches the currently assigned wife from this
+		marriage.  It is not necessary to do this before selecting or creating
+		a new wife.
+	</div>
+	<div class="balloon" id="HelpMarD">
+	  <p>Supply the date of the marriage.  The program understands a wide
+		variety of date formats which are too extensive to be described here.
+        It is suggested that you enter the date of marriage in the form
+        "dd mmm yyyy" where "dd" is the day of the month,
+        "mmm" is a 3 letter abbreviation for the
+		name of the month, and "yyyy" is the year of the marriage.
+	  </p>
+	  <p>See <a href="datesHelpen.html">supported date formats</a> for details.
+	  </p>
+	</div>
+	<div class="balloon" id="HelpMarLoc">
+	    Supply the location of the marriage.  The text you enter is used to
+		select an appropriate Location record.  This is done by first doing a
+        case-insensitive search for a match on the complete text you entered,
+        and if
+		this fails then a search is done for a match on the short name of the
+		location.  If no match is found on either search then a new location is
+        created using exactly the text you entered.  Subsequently the only way 
+        that
+        you can change the appearance of the location is to either select
+        a different
+		location by typing in its name or short name, or by editing the location
+		record itself.
+	</div>
+	<div class="balloon" id="HelpmarriageDetails">
+	    Clicking on this button opens a dialog that permits you to add further
+		details about the marriage and to specify source citations for the fact.
+	</div>
+	<div class="balloon" id="HelpMarEndD">
+	    <p>Supply the date that the marriage or relationship came to an end.
+		If the marriage came to an end as a result of some specific event,
+		for example a divorce, annulment, or legal separation, then you
+		should add an event describing that rather than using this field.
+	    </p>
+	    <p>The program understands a wide
+		variety of date formats which are too extensive to be described here.
+        It is suggested that you enter the date of marriage in the form
+        "dd mmm yyyy"
+        where "dd" is the day of the month, "mmm" is a 3 letter abbreviation
+        for the name of the month, and "yyyy" is the year of the marriage.
+	    </p>
+        <p>See <a href="datesHelpen.html">supported date formats</a>
+        for details.
+	    </p>
+	</div>
+	<div class="balloon" id="HelpSealD">
+	<p>Supply the date that the partners were sealed to each other at a
+		Church of Latter Day Saints temple.  The program understands a wide
+		variety of date formats which are too extensive to be described here.
+        It is suggested that you enter the date of marriage in the form
+        "dd mmm yyyy" where "dd" is the day of the month,
+        "mmm" is a 3 letter abbreviation for the
+		name of the month, and "yyyy" is the year of the marriage.
+	</p>
+	<p>See <a href="datesHelpen.html">supported date formats</a> for details.
+	</p>
+	</div>
+	<div class="balloon" id="HelpSealLoc">
+		This read-only field contains the name of the Church of Latter Day
+		Saints temple where the partners were sealed to each other. 
+		To select a different temple click on the
+	    <span class="button">Details</span> button at the end of this row.
+	</div>
+	<div class="balloon" id="HelpDate">
+		This read-only field displays the date of the family event.
+        To modify the date, or any other information about this event,
+        click on the
+	    <span class="button">Details</span> button at the end of this row.
+	</div>
+	<div class="balloon" id="HelpLoc">
+		This read-only field displays the location of the event.
+        To modify the location, or any other information about this event,
+        click on the <span class="button">Details</span> button
+        at the end of this row.
+	</div>
+	<div class="balloon" id="HelpAddEvent">
+		Selecting this button opens a
+	<a href="editEventHelpen.html" target="_blank">dialog</a> 
+		to edit the detailed information
+		about a new event being added to the marriage.
+	</div>
+	<div class="balloon" id="HelpOrderEvents">
+        Selecting this button reorders the events of this marriage 
+        by their dates.
+	</div>
+	<div class="balloon" id="HelpEditEvent">
+		Selecting this button opens a
+	    <a href="editEventHelpen.html" target="_blank">dialog</a> 
+		to edit the detailed information
+		about the event summarized in this line of the form.
+		In particular you may add source citations for the event.
+	</div>
+	<div class="balloon" id="HelpDelEvent">
+		Selecting this button deletes
+		the event summarized in this line of the form.
+	</div>
+	<div class="balloon" id="HelpIDMS">
+		This selection list permits you to specify the ending or current
+		status of this marriage.
+	</div>
+	<div class="balloon" id="HelpMarriedNameRule">
+		This selection list permits you to specify whether or not the wife
+		took her husband's surname as a result of the marriage.  The default
+		is the traditional practice.
+	</div>
+	<div class="balloon" id="HelpNotMarried">
+		This checkbox is used to indicate that the couple is known to have never
+		been married.  You may remove this fact 
+		by clicking on the checkbox to change its state.
+	</div>
+	<div class="balloon" id="HelpneverMarriedDetails">
+        Click on this button to add additional information about 
+        the never married
+		fact.  In particular you may add source citations for the fact.
+	</div>
+	<div class="balloon" id="HelpNoChildren">
+		This checkbox is used to indicate that the couple is known to have never
+		had children.  You may remove this fact by clicking on the 
+		checkbox to change its state.
+	</div>
+	<div class="balloon" id="HelpnoChildrenDetails">
+		Click on this button to add additional information about the no children
+		fact.  In particular you may add source citations for the fact.
+	</div>
+	<div class="balloon" id="HelpNotes">
+		Supply extended textual notes about the marriage.
+		Note that the text may include HTML markup which will appear in the
+		resulting web page.  For example placing the tags "&lt;b&gt;" and "&lt;/b&gt;"
+		around text makes it bold.  Placing the tags "&lt;a href="Person.php?idir=9999 class="male"&gt;" and "&lt;/a&gt;" around a name, where "9999" is replaced
+		by the appropriate numeric key value and the appropriate gender is specified
+		for "class" highlights the name as a hyperlink to the web page.  You can use
+		this technique to connect the names of witnesses or other participants in the
+		marriage to their records in the family tree.
+		Although you might be tempted to include the text of a newspaper notice
+		about the marriage in this field, it is recommended that you put that
+		text into the citation text field instead.
+	</div>
+	<div class="balloon" id="HelpnoteDetails">
+		Click on this button to add additional information about the marriage notes.
+		In particular you may add source citations for the notes.
+	</div>
+	<div class="balloon" id="HelpaddChild">
+		Selecting this button, or using the keyboard short-cut alt-E, opens a
+	<a href="chooseIndividHelpen.html" target="_blank">dialog</a> 
+		to choose an existing individual
+		in the family tree database to add as a child of this family.
+	</div>
+	<div class="balloon" id="HelpaddNewChild">
+		Selecting this button, or using the keyboard short-cut alt-N, opens a 
+	<a href="editIndividHelpen.html" target="_blank">dialog</a> 
+		to create a new individual in the
+		family tree database that is added as a child of this family.
+	</div>
+	<div class="balloon" id="HelpCGiven">
+		This displays the given names of a child.
+		If you alter this field it changes the given name of the individual.
+		Pressing the Enter key in this field moves the input focus down to the
+		given name field of the next child, adding a new empty child row if needed.
+	</div>
+	<div class="balloon" id="HelpCSurname">
+		This displays the family name of a child.
+		This defaults to the family name of the father.
+		If you alter this field it changes the family name of the child.
+		Pressing the Enter key in this field moves the input focus down to the
+		given name field of the next child, adding a new empty child row if needed.
+	</div>
+	<div class="balloon" id="HelpCbirth">
+		This input field displays the birth date of a child.
+		If you alter this field it changes the birth date of the individual.
+		Pressing the Enter key in this field moves the input focus down to the
+		given name field of the next child, adding a new empty child row if needed.
+	</div>
+	<div class="balloon" id="HelpCdeath">
+		This input field displays the death date of a child.
+		If you alter this field it changes the death date of the individual.
+		Pressing the Enter key in this field moves the input focus down to the
+		given name field of the next child, adding a new empty child row if needed.
+	</div>
+	<div class="balloon" id="Helpupdate">
+		Selecting this button, or using the keyboard short-cuts alt-U or ctl-S, 
+		updates the database to apply all of the pending 
+		changes to the marriage record.  Note that updates to citations and for
+		managing the list of children are applied to the database independently.
+	</div>
+	<div class="balloon" id="HelpSubmit">
+		Selecting this button, or using the keyboard short-cuts alt-U or ctl-S, 
+		updates the database to apply all of the pending 
+		changes to the marriage record.  Note that updates to citations and for
+		managing the list of children are applied to the database independently.
+	</div>
+	<div class="balloon" id="HelporderChildren">
+		Selecting this button, or using the keyboard short-cut alt-O, 
+		reorders the children of this marriage by their
+		dates of birth.
+	</div>
+	<div class="balloon" id="HelpeditChild">
+		Selecting this button opens a
+	    <a href="editIndividHelpen.html" target="_blank">dialog</a> 
+		to edit the detailed information
+		about the child summarized in this line of the form.
+	</div>
+	<div class="balloon" id="HelpdetChild">
+		Selecting this button detaches the child summarized in this line of the
+		form from this family.  You can then go to another family and attach the
+		child there.
+	</div>
+	<div class="balloon" id="HelpPictures">
+		Selecting this button opens a dialog
+		to edit the set of pictures associated with this family.
+	</div>
+	<div class="balloon" id="HelpFamiliesSet">
+		This part of the page lists the marriages.
+	</div>
+	<div class="balloon" id="HelpHusbandSet">
+		This part of the page groups information about the Husband.
+	</div>
+	<div class="balloon" id="HelpWifeSet">
+		This part of the page groups information about the Wife.
+	</div>
+	<div class="balloon" id="HelpEventSet">
+        This part of the page groups information about the events 
+        of the marriage.
+	</div>
+	<div class="balloon" id="HelpInformationSet">
+		This part of the page groups general information about the marriage.
+	</div>
+	<div class="balloon" id="HelpChildrenSet">
+		This part of the page groups information about the children.
+	</div>
+	<div id="loading" class="popup">
+		Loading...
+	</div>
+	<div class="hidden" id="messages">
+        <span id="titleEditFamilies">
+            Modifier les familles pour $GIVEN $SURNAME
+		</span>
+        <span id="titleEditIdmr">
+            Modifier la famille $IDMR
+		</span>
+        <span id="titleEditParents">
+            Modifier les parents pour $GIVEN $SURNAME
+		</span>
+        <span id="titleInvalid">
+            Identification incorrecte de la personne principale
+		</span>
+        <span id="titleMissing">
+            Paramètre manquant ou non valide idir ou child ou idmr 
+		</span>
+		<span id="invalidIdir">
+		    IDIR=$idirtext non valide. 
+		</span>
+		<span id="invalidChild">
+		     Child=$childtext non valide. 
+		</span>
+		<span id="invalidIdmr">
+		    IDMR=$idmrtext non valide. 
+		</span>
+
+	</div>
+	<div class="hidden" id="templates">
+	  <table id="templateRows">
+        $MARRIAGEROWTEMPLATE
+
+        $CHILDROWTEMPLATE
+	  </table>
+	
+	    <!-- template for marriage event row -->
+		<div class="row" id="MarriageRow">
+		  <div class="column1">
+		    <label class="column1" for="MarD">
+				Married:
+		    </label>
+		    <input type="text" name="MarD" id="MarD"
+						size="12" maxlength="100"
+						class="white left" value="$eventd">
+		    <span style="font-weight: bold;">at</span>
+		    <input type="text" name="MarLoc" id="MarLoc"
+						size="36" maxlength="255"
+						class="white leftnc" value="$eventloc">
+		  </div>
+		  <div>
+		    <button type="button" class="button" id="marriageDetails">
+				Details
+		    </button>
+		  </div>
+		  <div style="clear: both;"></div>
+		</div> <!-- end of Marriage row -->
+
+        $EVENTTEMPLATE
+
+	    <!-- template for sealed to spouse event row -->
+		<div class="row" id="SealedRow$temp">
+		  <div class="column1">
+		    <label class="column1" for="SealD">
+				Sealed&nbsp;to&nbsp;Spouse (LDS):
+		    </label>
+		    <input type="text" name="SealD" id="SealD"
+						size="12" maxlength="100"
+						class="white left" value="$eventd">
+		    <span style="font-weight: bold;">at</span>
+		    <select name="IDTRSeal" id="IDTRSeal"
+						size="1" class="white left">
+				<option value="$idtr">
+				    $Name
+				</option>
+		      </select>
+		    </div>
+		    <div>
+		      <button type="button" class="button"
+						id="EditIEvent18$temp">
+				Details
+		      </button>
+		      &nbsp;
+		      <button type="button" class="button" id="DelIEvent18$temp">
+				Delete
+		      </button>
+		    </div>
+		    <div style="clear: both;"></div>
+		</div>
+	  <!-- end of template for sealed to spouse event row -->
+	
+	  <!-- template for marriage ended event row -->
+		<div class="row" id="EndedRow$temp">
+		  <div class="column1">
+		    <label class="column1" for="MrEndD">
+				Marriage&nbsp;Ended:
+		    </label>
+		    <input type="text" name="MarEndD" id="MarEndD"
+						size="12" maxlength="100"
+						class="white left" value="$eventd">
+		  </div>
+		  <div>
+		    <button type="button" class="button"
+						id="EditIEvent24$temp">
+				Details
+		    </button>
+		    &nbsp;
+		    <button type="button" class="button" id="DelIEvent24$temp">
+				Delete
+		    </button>
+		  </div>
+		  <div style="clear: both;"></div>
+		</div>
+	  <!-- end of template for mariage ended event row -->
+	
+	  <!-- template for general marriage event row -->
+		<div class="row" id="EventRow$ider">
+		  <div class="column1">
+		    <label class="column1" for="Date$ider">
+				$type $description:
+		    </label>
+		    <input type="hidden"
+						name="citType$ider"
+						value="$idet">
+		    <input type="text" size="12"
+						name="Date$ider"
+						class="white left"
+						value="$eventd">
+		    <span style="font-weight: bold;">at</span>
+		    <input type="text" size="36"
+						name="EventLoc$ider"
+						class="white leftnc"
+						value="$eventloc" >
+		  </div>
+		  <div>
+		    <button type="button" class="button"
+						id="EditEvent$ider">
+				Details
+		    </button>
+		    &nbsp;
+		    <button type="button" class="button" id="DelEvent$ider">
+				Delete
+		    </button>
+		  </div>
+		  <div style="clear: both;"></div>
+		</div>
+	  <!-- end of template for marriage event row -->
+	
+	  <!-- template for never married fact row -->
+		<div class="row" id="NotMarriedRow$temp">
+		  <div class="column1">
+		    <label class="column1" for="NotMarried">
+				Not Married:
+		    </label>
+		    <input type="checkbox" name="NotMarried$temp" id="NotMarried$temp"
+				checked="checked">
+		  </div>
+		  <div>
+		    <button type="button" class="button" id="neverMarriedDetails$temp">
+				Details
+		    </button>
+		  </div>
+		  <div style="clear: both;"></div>
+		</div>
+	  <!-- end of template for never married fact row -->
+	
+	  <!-- template for no children fact row -->
+		<div class="row" id="NoChildrenRow$temp">
+		  <div class="column1">
+		    <label class="column1" for="NoChildren">
+				No Children:
+		    </label>
+		    <input type="checkbox" name="NoChildren$temp" id="NoChildren$temp"
+						checked="checked">
+		  </div>
+		  <div>
+		    <button type="button" class="button" id="noChildrenDetails$temp">
+				Details
+		    </button>
+		  </div>
+		  <div style="clear: both;"></div>
+		</div>
+	  <!-- end of template for no children fact row -->
+	
+	  $LOCATIONDIALOGS
+	
+	  <!-- template for popup confirming the deletion of an event-->
+	  <form name="ClrInd$template" id="ClrInd$template">
+	    <p class="message">$msg</p>
+	    <p>
+	      <button type="button" id="confirmClear$type">
+		    OK
+	      </button>
+	      <input type="hidden" id="formname$type" name="formname$type"
+				    value="$formname">
+		    &nbsp;
+	      <button type="button" id="cancelDelete$type">
+		    Cancel
+	      </button>
+	    </p>
+	  </form>
+	
+	  <!-- template for popup warning child already being edited -->
+	  <form name="AlreadyEditing$template" id="AlreadyEditing$template">
+	    <p class="message">$givenname $surname is already being edited</p>
+	    <p>
+	      <button type="button" id="justClose$template">
+		    OK
+	      </button>
+	    </p>
+	  </form>
+
+      <span id="EventText$idet">$text</span>
+    </div> <!-- id="templates" -->
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    </script>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/locationCommon.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/Cookie.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/commonMarriage.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/editMarriages.js" type="application/javascript">
+    </script>

@@ -216,8 +216,9 @@ use \Templating\Template;
  *		                add the advertisement to the header             *
  *		2019/05/18      correct parsing of familyTree cookie            *
  *		2019/08/01      htmlHeader did not set $LANG                    *
+ *		2020/02/14      initialize $dbversion                           *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 // identify the SQL server to connect to based upon the URL
 // initializes the global variable $dsn
@@ -252,18 +253,22 @@ if (!isset($warn) || !is_string($warn))
  *		Connect to the database server									*
  *																		*
  ************************************************************************/
-$dburl		= $dsn['phptype'] . 
-    			  ':dbname=' . $dsn['database'] .
-    			  ';host=' . $dsn['hostspec'] .
-    			  ';charset=utf8';
-//print "<p>dburl=$dburl</p>\n";
+$dburl		        = $dsn['phptype'] . 
+            			  ':dbname=' . $dsn['database'] .
+    	        		  ';host=' . $dsn['hostspec'] .
+    			          ';charset=utf8';
 
+$dbversion          = '';
 try {
-	$connection	= new PDO($dburl,
-    				  $dsn['username'], 
-    				  $dsn['password']);
+	$connection	    = new PDO($dburl,
+         	    			  $dsn['username'], 
+    	    	    		  $dsn['password']);
 
-	$connection->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+    $dbversion      = $connection->getAttribute(PDO::ATTR_SERVER_VERSION);
+    $connection->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+    // by default MySQL and MariaDB use quote (") for string literals
+    // but the ANSI standard reserves quote to escape column names
+    $connection->query("SET GLOBAL sql_mode='ANSI_QUOTES'");
 } catch(Exception $e)
 {		// error establishing connection
 	$msg	.= "Unable to connect to database using: " .
@@ -619,19 +624,21 @@ function canUser($function)
  *  Emit common HTML header for web pages.								*
  *																		*
  *  Parameters:															*
- *		title			page title as a string							*
- *		jsIncludes		list of Javascript files to include as array	*
+ *		$title			page title as a string							*
+ *		$jsIncludes		list of Javascript files to include as array	*
  *						defaults to none								*
- *		ownStyleSheet	true if the current script has its own style	*
+ *		$ownStyleSheet	true if the current script has its own style	*
  *						sheet											*
+ *		$base           'page' or 'dialog'                              *
  *																		*
  *	Deprecated: use Template											*
  ************************************************************************/
 $scriptIncludes		= array();
 
 function htmlHeader($title,
-        		    $jsIncludes = array(),
-        		    $ownStyleSheet = false)
+        		    $jsIncludes     = array(),
+                    $ownStyleSheet  = false,
+                    $base           = 'page')
 {
 	global	$browser;
 	global	$directory;
@@ -655,13 +662,13 @@ function htmlHeader($title,
 
 	if ($nohtml5)
 	{		// browser does not support HTML 5, use HTML 4
-		$template	= new Template($tempBase . 'pageIE7.html');
+		$template	= new Template("$tempBase{$base}IE7.html");
 		$template->set('IECRAP',
 			"scrolling='no' frameborder='0' allowTransparency='true'");
     }		// HTML 4
 	else
 	{		// HTML 5
-		$template	= new Template($tempBase . 'page.html');
+		$template	= new Template("$tempBase{$base}en.html");
 		$template->set('IECRAP', '');
     }		// HTML 5
 

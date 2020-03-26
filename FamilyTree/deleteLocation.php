@@ -10,7 +10,6 @@ use \Exception;
  *  History:															*
  *		2010/10/29		created											*
  *		2010/11/05		validate authorization by canUser()				*
- *						use htmlHeader to generate HTML					*
  *						improve error diagnostics						*
  *		2010/12/21		handle exception from new Location				*
  *		2013/06/01		use pageTop and pageBot to standardize			*

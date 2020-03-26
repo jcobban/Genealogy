@@ -29,6 +29,7 @@ use \NumberFormat;
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *		2020/01/22      internationalize numbers                        *
  *		                urlencode parameters to WmbResponse.php         *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -66,8 +67,7 @@ foreach($_GET as $key => $value)
 
         case 'lang':
         {
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value, 0, 2));
+	            $lang       = FtTemplate::validateLang($value);
             break;
         }
     }		    // process specific named parameters

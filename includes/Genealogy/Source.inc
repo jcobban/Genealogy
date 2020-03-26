@@ -262,6 +262,8 @@ class Source extends RecordPic
 						'publisher'				=> 'srcpubl',
 						'text'					=> 'srctext',
 						'note'					=> 'srcnote',
+						'notes'					=> 'srcnote',
+						'comments'				=> 'srcnote',
 						'callnum'				=> 'srccallnum',
 						'tag'					=> 'srctag',
 						'exclude'				=> 'srcexclude',
@@ -302,6 +304,10 @@ class Source extends RecordPic
     const ST_WEB_SITE			= 16;
     const ST_MAX				= 16;	// highest assigned code
 
+    /********************************************************************
+     *	Source::$intType												*
+     *	For internationalization use $translate['srcTypes']             *
+     ********************************************************************/
     static $intType	= array(
 				 1 		=>	'',
 				 2 		=>	'Bible',
@@ -349,6 +355,7 @@ class Source extends RecordPic
      *																	*
      *	    new Source();				create new empty entry			*
      *	    new Source(array('idsr' => 127));							*
+     *	    $familyTree->getSource(127);    factory method              *
      *	    new Source(array('srcname' => 'London, England'));			*
      *	    new Source(array('srcname' => 'Principia Mathematica',		*
      *					     'srcauthor' => 'Isaac Newton',				*

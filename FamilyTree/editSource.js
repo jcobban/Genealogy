@@ -37,8 +37,9 @@
  *		2018/12/02      closing dialog if not in child frame did not    *
  *		                return to Sources menu.                         *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/02/17      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -140,6 +141,8 @@ function onloadEdit()
 		    }		    // take action on specific element
 		}		        // loop through all elements in the form
     }			        // loop through all forms
+
+    hideRightColumn();
 }		// function onloadEdit
 
 /************************************************************************

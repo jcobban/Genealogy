@@ -3,7 +3,7 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  ReqUpdatePages.html													*
+ *  ReqUpdatePages.php													*
  *																		*
  *  Update a page of the Pages database.								*
  *																		*
@@ -119,7 +119,7 @@ if (isset($_GET) && count($_GET) > 0)
 		    {
                 $search             = "$conj$key=$value";
                 $conj               = '&';
-				$district	        = $value;
+				$distid	            = $value;
 				break;
 		    }
 
@@ -127,7 +127,7 @@ if (isset($_GET) && count($_GET) > 0)
 		    {
                 $search             = "$conj$key=$value";
                 $conj               = '&';
-				$subdistrict	    = $value;
+				$subdistid  	    = $value;
 				break;
 		    }
 
@@ -151,13 +151,16 @@ if (isset($_GET) && count($_GET) > 0)
         $warn       .= $parmsText . "</table>\n";
 }	        	    // invoked by URL to display current status of account
 
+$template                   = new FtTemplate("ReqUpdatePages$lang.html");
+$translate                  = $template->getTranslate();
+$t                          = $translate['tranTab'];
+
 // determine whether the invoker can update
 if (canUser('edit'))
-	$action     = "Update";
+	$action     = $t["Update"];
 else
-    $action	    = "Display";
+    $action	    = $t["Display"];
 
-$template       = new FtTemplate("ReqUpdatePages$lang.html");
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => 'ReqUpdatePages'));
 
@@ -172,6 +175,7 @@ $template->set('SUBDISTID',			$subdistId);
 $template->set('DIVISION',			$division);
 $template->set('SELECTED',			$selected);
 $template->set('ACTION',			$action);
+$search                     .= $conj;
 $template->set('SEARCH',			$search);
 
 $template->display();

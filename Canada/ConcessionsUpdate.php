@@ -18,8 +18,9 @@ use \Templating\Template;
  *		2016/06/19		created											*
  *		2017/02/07		use class Country								*
  *		2017/09/12		use get(										*
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/Township.inc';
@@ -44,71 +45,74 @@ $parmsText          = "<p class='label'>\$_POST</p>\n" .
                       "<table class='summary'>\n" .
                       "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
-foreach($_POST as $key => $value)
-{			        	// loop through all parameters
-    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-	switch(strtolower($key))
-	{			        // act on specific keys
-		case 'domain':
-		{		    	// administrative domain
-			$domain	    	    = $value;
-			break;
-		}		    	// administrative domain
-
-		case 'county':
-		{		    	// county abbreviation
-			$county			    = $value;
-			break;
-		}		    	// county abbreviation
-
-		case 'township':
-		{		    	// township abbreviation
-			$township		    = $value;
-			break;
-		}		    	// township abbreviation
-
-        case 'lang':
-        {
-            if (strlen($value) >= 2)
-                $lang           = strtolower(substr($value,0,2));
-        }
-
-		default:
-		{		    	// other input fields
-			$matches	= array();
-			$rres	= preg_match('/^([a-zA-Z]+)([0-9]+)$/', $key, $matches);
-			if ($rres == 1)
-			{	    	// name includes row number
-				$colname	= $matches[1];
-				$rownum	    = $matches[2];
-				switch(strtolower($colname))
-				{		// act on column name
-					case 'conid':
-					case 'oldconid':
-					case 'order':
-					case 'firstlot':
-					case 'lastlot':
-					case 'latitude':
-					case 'longitude':
-					case 'latbylot':
-					case 'longbylot':
-					{
-					    break;
-					}
-
-					default:
-					{	// other keywords
-				    	$msg   .= "Unrecognized parameter $key='$value'. ";
-					    break;
-					}	// other keywords
-				}		// act on column name
-			}		    // name includes row number
-		}			    // other input fields
-	}			        // act on specific keys
-}				        // loop through all parameters
-if ($debug)
-    $warn       .= $parmsText . "</table>\n";
+if (isset($_POST) && count($_POST) > 0)
+{			        // invoked by method=get
+	foreach($_POST as $key => $value)
+	{			        	// loop through all parameters
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{			        // act on specific keys
+			case 'domain':
+			{		    	// administrative domain
+				$domain	    	    = $value;
+				break;
+			}		    	// administrative domain
+	
+			case 'county':
+			{		    	// county abbreviation
+				$county			    = $value;
+				break;
+			}		    	// county abbreviation
+	
+			case 'township':
+			{		    	// township abbreviation
+				$township		    = $value;
+				break;
+			}		    	// township abbreviation
+	
+	        case 'lang':
+	        {
+	                $lang       = FtTemplate::validateLang($value);
+					break;
+	        }
+	
+			default:
+			{		    	// other input fields
+				$matches	= array();
+				$rres	= preg_match('/^([a-zA-Z]+)([0-9]+)$/', $key, $matches);
+				if ($rres == 1)
+				{	    	// name includes row number
+					$colname	= $matches[1];
+					$rownum	    = $matches[2];
+					switch(strtolower($colname))
+					{		// act on column name
+						case 'conid':
+						case 'oldconid':
+						case 'order':
+						case 'firstlot':
+						case 'lastlot':
+						case 'latitude':
+						case 'longitude':
+						case 'latbylot':
+						case 'longbylot':
+						{
+						    break;
+						}
+	
+						default:
+						{	// other keywords
+					    	$msg   .= "Unrecognized parameter $key='$value'. ";
+						    break;
+						}	// other keywords
+					}		// act on column name
+				}		    // name includes row number
+			}			    // other input fields
+		}			        // act on specific keys
+	}				        // loop through all parameters
+	if ($debug)
+	    $warn       .= $parmsText . "</table>\n";
+}			                // invoked by method=post
 
 $domainObj	    = new Domain(array('domain'	    => $value,
 				            	   'language'	=> $lang));

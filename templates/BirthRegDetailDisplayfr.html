@@ -183,7 +183,7 @@
 		  <input name="Surname" id="Surname"
 				type="text" size="24" maxlength="32" 
 				class="ina white left" readonly="readonly"
-				value="$qsurname">
+				value="$surname">
 		</div>
 		<div style="clear: both;"></div>
       </div> <!-- id="NamesRow" -->
@@ -455,6 +455,29 @@
       </div> <!-- id="ImageRow" -->
     </form>
  </div> <!-- end of <div id="body"> -->
+    <div class="hidden" id="templates">
+        <span id="omittedRegYear">
+            Année d'Inscription paramètre omis.
+        </span>
+        <span id="invalidRegYear">
+            Année d'Inscription '$value' n'est pas un nombre.
+        </span>
+        <span id="rangeRegYear">
+            Année d'Inscription $value doit être compris entre 1860 et 2020.
+        </span>
+        <span id="omittedRegNum">
+            Numero d'Inscription paramètre omis.
+        </span>
+        <span id="invalidRegNum">
+            Numero d'Inscription '$value' n'est pas un nombre.
+        </span>
+        <span id="invalidItem">
+			Item '$value' n'est pas un nombre. 
+        </span>
+        <span id="unknownDomain">
+    		Domaine '$domain' inconnue.
+        </span>
+    </div>
 <!--  The remainder of the web page consists of divisions containing
 context specific help.  Including this information here ensures
 that the language of the help balloons matches the language of the

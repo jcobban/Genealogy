@@ -58,6 +58,7 @@ use \Exception;
  *		2019/02/19      pass language to next scripts                   *
  *		                use new FtTemplate constructor                  *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/03/13      use FtTemplate::validateLang                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -71,45 +72,55 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
-$idlr		    = null;
-$limit		    = 25;
-$autodelete		= false;
-$lang		    = 'en';
-$indcount		= 0;
-$marcount		= 0;
-$evtcount		= 0;
+$idlr		    		= null;
+$limit		    		= 25;
+$autodelete				= false;
+$lang		    		= 'en';
+$indcount				= 0;
+$marcount				= 0;
+$evtcount				= 0;
 
-foreach($_GET as $key => $value)
-{			// loop through all parameters
-	switch(strtolower($key))
-	{		// act on parameters
-	    case 'idlr':
-	    {
-			$idlr		    = intval($value);
-			break;
-	    }		// IDLR
-
-	    case 'limit':
-	    {
-			$limit		    = intval($value);
-			break;
-	    }		// Limit
-
-	    case 'lang':
-	    {
-			if (strlen($value) >= 2)
-			    $lang		= strtolower(substr($value, 0, 2));
-			break;
-	    }		// Limit
-
-	    case 'delete':
-	    {
-			if (strtolower($value) == 'yes')
-			    $autodelete	= true;
-			break;
-	    }
-	}		// act on parameters
-}			// loop through all parameters
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {			    // loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n"; 
+		switch(strtolower($key))
+		{		    // act on parameters
+		    case 'idlr':
+		    {
+				$idlr		    = intval($value);
+				break;
+		    }		// IDLR
+	
+		    case 'limit':
+		    {
+				$limit		    = intval($value);
+				break;
+		    }		// Limit
+	
+		    case 'lang':
+		    {
+	            $lang       = FtTemplate::validateLang($value);
+				break;
+		    }		// Limit
+	
+		    case 'delete':
+		    {
+				if (strtolower($value) == 'yes')
+				    $autodelete	= true;
+				break;
+		    }
+		}		    // act on parameters
+	}			    // loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
 if (is_null($idlr))
 {
