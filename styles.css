@@ -122,7 +122,8 @@
  *      2019/11/25      add support for scrollable table body           *
  *      2020/01/09      add style for <main> instead of setting it from *
  *                      JS                                              *
- *      2020/0216       add right column to page layout                 *
+ *      2020/02/16      add right column to page layout                 *
+ *      2020/03/31      remove iframe.advert                            *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -296,16 +297,6 @@
                 height:             80px;
                 display:            inline;
                 float:              left;
-                }
-
-    iframe.advert {     /* container for advertisements */
-                border:             none;
-                overflow:           hidden; 
-                width:              728px; 
-                height:             90px;
-                display:            inline;
-                float:              right;
-                background-color:   white;
                 }
 
     iframe.left {       /* left half of split window */

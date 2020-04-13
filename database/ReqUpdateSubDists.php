@@ -118,7 +118,10 @@ $t                  			= $translate['tranTab'];
 if (canUser('edit'))
     $action                     = $t['Update'];
 else
+{
     $action                     = $t['Display'];
+    $msg                        .= $template['notAuthorized']->innerHTML;
+}
 
 // validate Census ID
 $censusYear	        			= substr($censusId, 2);

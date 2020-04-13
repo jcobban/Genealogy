@@ -151,6 +151,8 @@ use \Exception;
  *		2018/05/28		use template									*
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2020/03/21      fix references to undefined $death              *
+ *		2020/03/27      $idir was not defined                           *
+ *		                calculations failed if RegNum omitted           *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -166,22 +168,6 @@ require_once __NAMESPACE__ . '/CitationSet.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . "/common.inc";
 
-//	data base column name prefix
-$dbprefix	= "d_";
-
-// action depends upon whether the user is authorized to
-// update the database
-if(canUser('edit'))
-{
-    $update				= true;
-    $action				= 'Update';
-}
-else
-{
-    $update				= false;
-    $action				= 'Display';
-}
-
 // validate parameters
 $regYear				= '';
 $regNum		   	    	= '';
@@ -193,6 +179,7 @@ $countryName			= 'Canada';
 $domain	    			= 'CAON';	    // default domain
 $domainName				= 'Ontario';	// default domain name
 $showImage              = false;
+$idir                   = null;
 $lang	    			= 'en';
 $imatches			    = null;
 
@@ -222,7 +209,7 @@ if (isset($_GET) && count($_GET) > 0)
 	
 	        case 'regnum':
 	        {
-	            $regNum	= $value;
+	            $regNum	    = $value;
 	            if (!preg_match("/^([0-9]{2,7})$/", $regNum))
 	            {
 	                $msg	.= "Registration Number $regNum must be a number. ";
@@ -306,6 +293,18 @@ if (isset($_GET) && count($_GET) > 0)
 	    $warn       .= $parmsText . "</table>\n";
 }			        // invoked by method=get
 
+
+if(canUser('edit'))
+{                   // update the record
+    $update				= true;
+    $action				= 'Update';
+}                   // update the record
+else
+{                   // display the record
+    $update				= false;
+    $action				= 'Display';
+}                   // display the record
+
 // create Template
 $template		        = new FtTemplate("DeathRegDetail$action$lang.html");
 $template['otherStylesheets']->update(array('filename' => 'DeathRegDetail'));
@@ -314,11 +313,13 @@ $trtemplate             = $template->getTranslate();
 if ($regYear == '')
 {
     $msg		        .= "RegYear omitted. ";
+    $regYear            = 0;
 }
 
 if ($regNum == '' && $volume == '')
 {
     $msg		        .= "RegNum omitted. ";
+    $regNum             = 0;
 }
 else
 if ($volume != '' && $page != '' && $item != '')

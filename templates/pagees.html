@@ -16,6 +16,7 @@
  *      2019/04/14      add Facebook activation                         *
  *      2019/05/03      use classes to style advert and facebook        *
  *		2020/02/16      add right hand notification column              *
+ *      2020/03/31      change advert iframe to div                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
@@ -49,8 +50,8 @@
                 height="70" width="70" alt="James Cobban Logo">
           &nbsp;
         <span class="advert" id="advertSpan">
-          <iframe id='advertFrame' class='advert' $IECRAP src='$ADURL'>
-          </iframe>
+          <div id="advertFrame" class="advert" data-load="$ADURL">
+          </div>
         </span>
         <span id="menuButton" class="left">
           <div class="menuicon"></div>

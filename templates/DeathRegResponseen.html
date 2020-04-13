@@ -5,8 +5,9 @@
  *																		*
  *  History:															*
  *		2018/12/27      created                                         *
+ *      2020/03/27      div needRegYear was omitted                     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/index.html">Home</a>:
@@ -184,6 +185,9 @@
         </p>
       </form>
     </div> <!-- end of <div id="templates"> -->
+    <div class="hidden" id="needRegYear">
+        Parameter Regnum=$regnum requires that Regyear be specified.
+    </div>
     <div class="hidden" id="regnumNotNumber">
         Parameter Regnum=$regnum is not numeric.
     </div>

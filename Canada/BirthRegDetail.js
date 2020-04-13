@@ -544,8 +544,9 @@ function showImage()
 		args.showimage	= 'yes';	// previous and next request image
 		var imageUrl	= form.Image.value;
 		if (imageUrl.length == 0)
-		    alert("DeathRegDetail.js: showImage: " +
-				  "no image defined for this registration");
+		    popupAlert("DeathRegDetail.js: showImage: " +
+				            "no image defined for this registration",
+                        this);
 		else
 		if (imageUrl.length > 5 &&
 		    (imageUrl.substring(0,5) == "http:" ||

@@ -341,17 +341,18 @@ function newTreeNameChanged()
  *  'includeSpouse', and 'Sex', and it is called by the onchange		*
  *  method for the field 'treeName'.									*
  ************************************************************************/
-var	url	= "/FamilyTree/getIndivNamesXml.php";
-
 function update()
 {
-    var	form	= document.nameForm;
+    var	form	        = document.nameForm;
     if (form)
-    {		// form present
-		url	= "/FamilyTree/getIndivNamesXml.php";
+    {		        // form present
+		let url	        = "/FamilyTree/getIndivNamesJSON.php";
+		let lang	    = 'en';
+		if ('lang' in args)
+		    lang	    = args['lang'];
 
 		for(var j = 0; j < form.elements.length; j++)
-		{		// loop through all input elements
+		{		    // loop through all input elements
 		    var element	= form.elements[j];
 
 		    var	name	= element.name;
@@ -437,8 +438,8 @@ function update()
 
 
 		    }		// switch on element name
-		}		// loop through all input elements
-		url		+= "&limit=50";
+		}		    // loop through all input elements
+		url		                += "&limit=50&lang=" + lang;
 
 		loadcnt++;	// number of outstanding loads
 		if (loadcnt == 1)
@@ -446,24 +447,19 @@ function update()
 
 		if (debug.toLowerCase() == 'y')
 		    alert("nominalIndex.js: update: url='" + url + "'");
+        var trace = "url=" + url + "<br>\n";
+        let para        = document.createElement('P');
+        para.innerHTML  = trace;
+        document.body.appendChild(para);
 		// invoke script to obtain list of names for selection list
-		HTTP.getXML(url,
-				    gotNames,
-				    noNames);
+        var options             = {"timeout"    : false};
+		HTTP.get(url,
+				 gotNames,
+				 options);
 
 		// clear out the old selection list while we are waiting
-		var	select	= form.individ;
-		select.options.length	= 0;
-
-		// put a dummy entry at the top of the selection, otherwise
-		// selecting the first name does not call onchange
-		var	name		= '[choose an individual]';
-		var	option		= new Option(name,
-								     -1,
-								     false,
-								     false);
-		option.innerHTML	= '[choose an individual]';
-		select.appendChild(option);
+		var	select	            = form.individ;
+		select.options.length	= 1;
     }		// form present
 }		// function update
 
@@ -475,213 +471,132 @@ function update()
  *  Repopulate the selection list.										*
  *																		*
  *  Parameters:															*
- *		xmlDoc		returned data from server							*
- *																		*
+ *		obj		    Javascript object returned from server				*
  ************************************************************************/
-function gotNames(xmlDoc)
+function gotNames(obj)
 {
     loadcnt--;		// decrement number of outstanding responses
     if (loadcnt > 0)
 		return;		// do not refresh if more outstanding responses
     hideLoading();	// hide "loading" indicator
 
-    var	form	= document.nameForm;
-    var	select	= form.individ;
-
-    if (xmlDoc == null)
+    var	form	            = document.nameForm;
+    var	select	            = form.individ;
+    var trace               = '';
+    if (obj && typeof(obj) == 'object')
     {
-		popupAlert('nominalIndex.js: gotNames: xmlDoc is null',
-				   form.Name);
-		return;
-    }
+        if ('parms' in obj)
+        {
+            trace           += "parms=" + JSON.stringify(obj.parms) + "<br>";
+        }
+        if ('cmd' in obj)
+        {
+            trace           += "cmd=" + JSON.stringify(obj.cmd) + "<br>";
+        }
+        if ('query' in obj)
+        {
+            trace           += "query=" + JSON.stringify(obj.query) + "<br>";
+        }
+        if ('warn' in obj)
+        {
+            trace           += "warn=" + JSON.stringify(obj.warn) + "<br>";
+        }
+        if ('persons' in obj)
+        {
+		    var	parms	                    = obj.parms;
+            var persons                     = obj.persons;
 
-    var root	= xmlDoc.documentElement;
-    if (debug.toLowerCase() == 'y')
-		traceAlert("nominalIndex.js: gotNames: root=" +
-				tagToString(root));
-    if (root && (root.nodeName == 'names'))
-    {			// valid response
-		var	parms	= {};
+            for (var idir in persons)
+            {
+                var person                  = persons[idir];
+                var gender                  = person.gender;
+                var name                    = person.name;
+                trace += "{idir=" + idir + ",gender=" + gender + ",name=" + name + "}<br>\n";
 
-		// loop through immediate children of root node of XML document
-		for (var i = 0; i < root.childNodes.length; i++)
-		{		// loop through children of root
-		    var	elt	= root.childNodes[i];
+				var option	                = new Option(name,
+                							    	     idir,
+		                						         false,
+				                				         false);
+				option.className	        = gender;
 
-		    // each individual in the response is represented by
-		    // an <indiv id='9999'> node, with subfields represented
-		    // as child nodes containing text
-		    if (elt.nodeType == 1)
-		    {
-				if (elt.nodeName == 'parms')
-				{
-				    parms	= getParmsFromXml(elt);
-				}
-				else
-				if (elt.nodeName == 'indiv')
-				{	// <indiv>
-				    var	id	= elt.getAttribute('id');
-				    var	fields	= getParmsFromXml(elt);
+				// add internal information to option
+				select.appendChild(option);	// add to <select>
+		    }		                    // person
 
-				    name		= fields.surname;
-				    if (fields.maidenname &&
-						fields.maidenname != fields.surname)
-						name	+= ' (' + fields.maidenname + ')';
-				    name		+= ', ' + fields.givenname;
-
-				    var	birthd	= fields.birthd;
-				    var	deathd	= fields.deathd;
-				    if (birthd != '' || deathd != '')
-				    {
-						name	+= ' (' +
-							      birthd + '-' +
-							      deathd + ')';
-				    }
-
-				    var	gender		= fields.gender;
-				    var	dateType	= typeof birthd;
-				    if (dateType != 'string' &&
-						dateType != 'number')
-				    {
-						name	+= " typeof=" + dateType;
-				    }
-				    else
-				    if (dateType == 'number' ||
-						birthd.toLowerCase() != 'private')
-				    {		// user can see information
-						// check for names of parents
-						if (fields.parents && fields.parents.length > 1)
-						{		// parent's names available
-						    if (gender == 0)
-							name	+= ', son of ';
-						    else
-						    if (gender == 1)
-							name	+= ', daughter of ';
-						    else
-							name	+= ', child of ';
-						    name	+= fields.parents;
-						}		// parent's names available
-
-						// check for name of spouse
-						if (fields.families && fields.families.length > 1)
-						{		// parent's names available
-						    if (gender == 0)
-							name	+= ', husband of ';
-						    else
-						    if (gender == 1)
-							name	+= ', wife of ';
-						    else
-							name	+= ', spouse of ';
-						    name	+= fields.families;
-						}		// spouse's name available
-				    }		// user can see information
-
-				    // add entry into selection list
-				    var option	= new Option(name,
-								     id,
-								     false,
-								     false);
-
-				    // set appearance (color) of entry by gender
-				    if (gender == 0)
-						option.className	= 'male';
-				    else
-				    if (gender == 1)
-						option.className	= 'female';
-				    else
-						option.className	= 'unknown';
-
-				    // add internal information to option
-				    option.innerHTML= name;		// should already be set
-				    option.value	= id;		// should already be set
-				    option.surname	= fields.surname;
-				    option.givenname= fields.givenname;
-				    option.birthd	= fields.birthd;
-				    option.deathd	= fields.deathd;
-				    select.appendChild(option);	// add to <select>
-				}	// <indiv>
-		    }		// tag
-		}		// loop through children of root
-
-		// check to make sure we have enough names
-		var	nameCount	= select.options.length;
-		if (nameCount < 51)
-		{
-		    parms.limit			= 51 - nameCount;
-		    if (parms.hasOwnProperty('LastSurname'))
-		    {			// not first query response
-				parms.Surname		= parms.LastSurname;
-		    }			// not first query response
-		    else
-		    {			// after first query
-				// set up for second query
-				parms.LastSurname	= parms.Surname;
-				parms.GivenName		= '';
-		    }			// after first query
-
-		    // adjust delimiting surname
-		    var	char1	= parms.LastSurname.substring(0,1).toUpperCase();
-		    var	char2	= parms.LastSurname.substring(1,2);
-		    if (char2 >= "z")
-		    {		// overflow to next letter
-				if (char1 < "Z")
-				    parms.LastSurname	= 
-						    String.fromCharCode(char1.charCodeAt(0) + 1) +
-						    ' ';
-				else
-				    parms.LastSurname	= null;
-		    }
-		    else
-		    if (char2 < "a")
-		    {		// handle, for example, O' names
-				parms.LastSurname		= char1 + 'a';
-		    }
-		    else
-		    {		// letters 'a' through 'y'
-				parms.LastSurname	= char1 +
-						      String.fromCharCode(char2.charCodeAt(0) + 1);
-		    }		// letters 'a' through 'y'
-
-		    var url	= "/FamilyTree/getIndivNamesXml.php";
-		    var	op	= '?';
-		    for(var name in parms)
-		    {
-				url	+= op + name + '=' + encodeURIComponent(parms[name]);
-				op	= '&';
-		    }
-		    if (debug.toLowerCase() == 'y')
-				traceAlert("nominalIndex.js: gotNames: " + url);
-		    // invoke script to obtain list of names for selection list
-		    if (parms.LastSurname !== null)
-				HTTP.getXML(url,
-						    gotNames,
-						    noNames);
-		}
-    }			// valid response
+			// check to make sure we have enough names
+			var	nameCount	= select.options.length;
+			if (nameCount < 51)
+			{                           // name count < 51
+			    parms.limit			= 51 - nameCount;
+			    if (parms.hasOwnProperty('LastSurname'))
+			    {			// not first query response
+					parms.Surname		= parms.LastSurname;
+			    }			// not first query response
+			    else
+			    {			// after first query
+					// set up for second query
+					parms.LastSurname	= parms.Surname;
+					parms.GivenName		= '';
+			    }			// after first query
+	
+			    // adjust delimiting surname
+			    var	char1	= parms.LastSurname.substring(0,1).toUpperCase();
+			    var	char2	= parms.LastSurname.substring(1,2);
+			    if (char2 >= "z")
+			    {		// overflow to next letter
+					if (char1 < "Z")
+					    parms.LastSurname	= 
+							    String.fromCharCode(char1.charCodeAt(0) + 1) +
+							    ' ';
+					else
+					    parms.LastSurname	= null;
+			    }
+			    else
+			    if (char2 < "a")
+			    {		// handle, for example, O' names
+					parms.LastSurname		= char1 + 'a';
+			    }
+			    else
+			    {		// letters 'a' through 'y'
+					parms.LastSurname	= char1 +
+							      String.fromCharCode(char2.charCodeAt(0) + 1);
+			    }		// letters 'a' through 'y'
+	
+			    var url	= "/FamilyTree/getIndivNamesJSON.php";
+			    var	op	= '?';
+			    for(var name in parms)
+			    {
+					url	+= op + name + '=' + encodeURIComponent(parms[name]);
+					op	= '&';
+			    }
+			    if (debug.toLowerCase() == 'y')
+					traceAlert("nominalIndex.js: gotNames: " + url);
+                trace += "url=" + url + "<br>\n";
+			    // invoke script to obtain list of names for selection list
+			    if (parms.LastSurname !== null)
+                {
+                    var options             = {"timeout"    : false};
+		            HTTP.get(url,
+            				 gotNames,
+			            	 options);
+                }
+		    }                           // name count < 51
+		}		                        // array of persons present
+        let para        = document.createElement('P');
+        para.innerHTML  = trace;
+        document.body.appendChild(para);
+    }               // response object present
     else
-    {			// error
-		var	msg	= "";
-		if (root)
-		{		// XML response
-		    for(var i = 0; i < root.childNodes.length; i++)
-		    {		// loop through children
-				var node	= root.childNodes[i];
-				if (node.nodeValue != null)
-				    msg	+= node.nodeValue;
-		    }		// loop through children
-		}		// XML response
-		else
-		    msg	+= xmlDoc;
-
-		var	form	= document.nameForm;
-		popupAlert(msg, form.Name);
-    }		// error
+    {               // no response object
+		popupAlert('nominalIndex.js: gotNames: object is null',
+				   form.Name);
+    }               // no response object
 }		// function gotNames
 
 /************************************************************************
- *  function noNames														*
+ *  function noNames													*
  *																		*
- *  This method is called if there is no getIndivNamesXml.php script	*
+ *  This method is called if there is no getIndivNamesJSON.php script	*
  *  on the server.														*
  ************************************************************************/
 function noNames()

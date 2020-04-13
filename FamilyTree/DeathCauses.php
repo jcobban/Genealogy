@@ -179,6 +179,14 @@ for ($i = 1; $i <= count($deathcause); $i++)
 				break;
 		    }
 
+		    case 'bilateral':
+		    {
+?>
+		    "bilateral": Occurring on both sides of the body.
+<?php
+				break;
+            }
+
 		    case 'bulbar':
 		    {
 ?>
@@ -1114,7 +1122,8 @@ for ($i = 1; $i <= count($deathcause); $i++)
 				if ($prevword == 'dementia')
 				{
 ?>
-		    Dementia Praecox, literally precocious madness, refers to
+            "Dementia Praecox": literally madness occuring at an unusally 
+            young age, refers to
 		    a deteriorating psychotic condition that begins in the late
 		    teens or early adulthood.  Schizophrenia. 
 <?php

@@ -115,29 +115,35 @@
 	This is a regular expression, as supported by MySQL, which is used
 	to limit the addresses to be displayed.
 	See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer"s regex page</a>.
-  <ul>
-      <li>If the pattern contains no special 
-	characters then only addresses containing that string will be included.
-	For example the pattern "London" will match addresses containing
-	the string "London".  Note that the search ignores case,
-	so that pattern will also match "LONDON" and "london".
-      <li>If the pattern begins with a caret '^' then only addresses that
-	<b>begin</b> with the remainder of the pattern are included.  
-	For example the pattern
-	"^Ba" displays addresses starting with "Ba" (or "ba" or "BA").
-      <li>If the pattern ends with a dollar sign '$', then only addresses that
-	<b>end</b> with the remainder of the pattern are included.  
-	For example the pattern
-	"CA$" matches addresses that end with "CA" (or "ca" or "Ca").
-      <li>In a pattern a period '.' matches any single character.  For example
-	the pattern "B.b" matches any address that contains
-	two letter Bs separated
-	by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
-	anywhere in the address name.
-      <li>In a pattern an asterisk '*' matches zero or more of the preceding
-	character; "bo*b" matches "bb", "bob", and "boob"
-	anywhere in the address name.
     </p>
+    <ul>
+      <li>If the pattern contains no special 
+    	characters then only addresses containing that string will be included.
+    	For example the pattern "London" will match addresses containing
+    	the string "London".  Note that the search ignores case,
+    	so that pattern will also match "LONDON" and "london".
+      </li>
+      <li>If the pattern begins with a caret '^' then only addresses that
+    	<b>begin</b> with the remainder of the pattern are included.  
+    	For example the pattern
+    	"^Ba" displays addresses starting with "Ba" (or "ba" or "BA").
+      </li>
+      <li>If the pattern ends with a dollar sign '$', then only addresses that
+    	<b>end</b> with the remainder of the pattern are included.  
+    	For example the pattern
+    	"CA$" matches addresses that end with "CA" (or "ca" or "Ca").
+      </li>
+      <li>In a pattern a period '.' matches any single character.  For example
+    	the pattern "B.b" matches any address that contains
+    	two letter Bs separated
+    	by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
+    	anywhere in the address name.
+      </li>
+      <li>In a pattern an asterisk '*' matches zero or more of the preceding
+    	character; "bo*b" matches "bb", "bob", and "boob"
+    	anywhere in the address name.
+      </li>
+    </ul>
   </div>
   <div class="balloon" id="Helprepositories">
     <p>
@@ -172,7 +178,11 @@
 	are added in the edit individual dialog.
     </p>
   </div>
-    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+  <div class="balloon" id="HelpDelete">
+	Click on this button to delete an address from the table.
+	Note that although the table row is removed from visibility, 
+	the record is not deleted until you click on the Search button.
+  </div>
     <script src="/jscripts/js20/http.js" type="text/javascript"></script>
     <script src="/jscripts/util.js" type="text/javascript"></script>
     <script src="/jscripts/CommonForm.js" type="text/javascript"></script>

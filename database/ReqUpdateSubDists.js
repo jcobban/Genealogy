@@ -24,6 +24,7 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2020/03/08      fix infinite loop                               *
+ *		2020/04/05      fix reference to undefined element Census       *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -147,40 +148,48 @@ function changeCensus(ev)
  ************************************************************************/
 function gotCensus(census)
 {
-    let censusId            = census.censusid;
-    let cc                  = censusId.substring(0,2);
-    let censusYear          = censusId.substring(2);
-	let provinces           = census.provinces;   
-    var censusElt		    = document.distForm.censusId;
-	let	provSelect		    = document.distForm.Province;
-    // province passed as a parameter
-    let	province		    = ''
-    if ('province' in args)
-		province		    = args.province;
-    if (censusYear < 1867)
-    {		// pre-confederation
-		if (province.length == 0)
-		    province		= 'CW';
-        if (provinces.indexOf(province) == -1)
-		    province		= 'CW';
-		censusElt.value		= province + censusYear;
-    }		// pre-confederation
-    else
-    {		// post-confederation
-		provSelect.selectedIndex	= 0;
-        if (provinces.indexOf(province) == -1)
-		    province		= '';
-    }		// post-confederation
-	let domains             = census.domains;   
-    for (const code in domains)
+    if ('censusid' in census)
     {
-		let provCode		= code.substring(2);
-		addOption(provSelect,	domains[code], provCode);
-    }		// loop through provinces
-    provSelect.value	    = province;
-
-    // update districts 
-    loadDistsProv(province);	// load districts
+	    let censusId            = census.censusid;
+	    let cc                  = censusId.substring(0,2);
+	    let censusYear          = censusId.substring(2);
+		let provinces           = census.provinces;   
+	    var censusElt		    = document.distForm.censusId;
+		let	provSelect		    = document.distForm.Province;
+	    // province passed as a parameter
+	    let	province		    = ''
+	    if ('province' in args)
+			province		    = args.province;
+	    if (censusYear < 1867)
+	    {		// pre-confederation
+			if (province.length == 0)
+			    province		= 'CW';
+	        if (provinces.indexOf(province) == -1)
+			    province		= 'CW';
+			censusElt.value		= province + censusYear;
+	    }		// pre-confederation
+	    else
+	    {		// post-confederation
+			provSelect.selectedIndex	= 0;
+	        if (provinces.indexOf(province) == -1)
+			    province		= '';
+	    }		// post-confederation
+		let domains             = census.domains;   
+	    for (const code in domains)
+	    {
+			let provCode		= code.substring(2);
+			addOption(provSelect,	domains[code], provCode);
+	    }		// loop through provinces
+	    provSelect.value	    = province;
+	
+	    // update districts 
+	    loadDistsProv(province);	// load districts
+    }
+    else
+    if ('msg' in census)
+    {
+        popupAlert(census.msg, document.distForm.CensusYear);
+    }
 }		// function changeCensus
 
 /************************************************************************
@@ -202,7 +211,9 @@ function changeProv()
     var	censusId	= document.distForm.CensusYear.value;
     var censusYear	= censusId.substring(2);
     if (censusYear < "1867")
-		document.distForm.Census.value = province + censusYear;
+		document.distForm.censusId.value = province + censusYear;
+    else
+		document.distForm.censusId.value = censusId;
     loadDistsProv(province);		// limit the districts selection
 }		// function changeProv
 
@@ -217,7 +228,7 @@ function changeProv()
  ************************************************************************/
 function loadDistsProv(prov)
 {
-    var	censusId	= document.distForm.CensusYear.value;
+    var	censusId	= document.distForm.censusId.value;
     var	censusYear	= censusId.substring(2);
 
     // get the district information file	
@@ -340,7 +351,7 @@ function noDistFile()
 {
     var	distSelect	= document.distForm.District;
     distSelect.options.length	= 0;	// clear the selection
-    var	censusId	= document.distForm.Census.value;
+    var	censusId	= document.distForm.censusId.value;
     var	alertTxtElt	= document.getElementById('noDistFileMsg');
     var	alertTxt	= alertTxtElt.innerHTML.replace('$census',
 									censusId);

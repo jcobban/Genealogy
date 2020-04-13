@@ -4,12 +4,13 @@
  *  Template for a web page containing details of an particular			*
  *  birth registration transcription configured for display.            *
  *																		*
- * History:																*
+ *  History:															*
  *		2018/10/02		created                                         *
  *      2019/09/25      checkboxes must be both readonly for appearance *
  *                      and disabled so they cannot be clicked          *
+ *      2020/04/06      image URL must be in an input element           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
 	  <a href="/index.html">Home</a>:
@@ -449,7 +450,10 @@
 		      Image:
 		    </label>
 		    <button type="button" id="ShowImage">Show <u>I</u>mage</button>
-				  $image
+		    <input name="Image" id="Image" type="text" 
+				size="70" maxlength="256" readonly="readonly"
+				value="$image"
+				class="ina white leftwide"/>
 		  </div>
 		  <div style="clear: both;"></div>
         </div> <!-- id="ImageRow" -->

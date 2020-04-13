@@ -162,7 +162,7 @@ $limit					= 20;	    	// default max lines per page
 $offset					= 0;	    	// default start first line of result
 $range					= 1;	    	// default 1 year either side age/byear
 $page					= null;	    	// default any page
-$family					= null;	    	// default any family
+$family					= '';	    	// default any family
 $lang					= 'en';		    // default language
 $orderBy				= 'Name';   	// default order alphabetically
 $SurnameSoundex			= false;    	// check text of surname, not soundex
@@ -180,284 +180,297 @@ $parms					= array();
 // and save their values into local variables, overriding
 // the defaults specified above
 $parmCount	            = 0;		// number of search parameters
-$parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
-foreach ($_GET as $key => $value)
-{				// loop through all parameters
-	if (is_string($value))
-	    $textValue	= $value;
-	else
-	if (is_array($value))
-	    $textValue	.= 'array';
-    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$textValue</td></tr>\n"; 
-    if (is_string($value) && strlen($value) == 0)
-		continue;
-
-    if ((is_string($value) && strlen($value) > 0) ||
-		is_array($value))
-    {
-		$fieldLc			= strtolower($key);
-		switch($fieldLc)
-		{			// switch on parameter name
-		    case 'census':
-		    {			// Census identifier
-				$parms[$fieldLc]	= $value;
-				$parmCount		    ++;
-				$censusId		    = $value;
-				$cc			        = strtoupper(substr($censusId, 0, 2));
-
-				if (strtoupper(substr($censusId,2)) == 'ALL')
-				{		// special census identifier to search all
-				    $censusYear		= 'ALL';
-				    $province		= 'CW';	// for pre-confederation
-				}		// special census identifier
-				else
-				{		// full census identifier
-				    $censusRec	= new Census(array('censusid'	=> $value));
-				    if ($censusRec->isExisting())
-				    {
-						$censusYear	= substr($censusId, 2);
-						$partof		= $censusRec->get('partof');
-						if ($partof)
+if (isset($_GET) && count($_GET) > 0)
+{
+	$parmsText  = "<p class='label'>\$_GET</p>\n" .
+	                  "<table class='summary'>\n" .
+	                  "<tr><th class='colhead'>key</th>" .
+	                      "<th class='colhead'>value</th></tr>\n";
+	foreach ($_GET as $key => $value)
+	{				    // loop through all parameters
+		if (is_string($value))
+		    $textValue	= $value;
+		else
+		if (is_array($value))
+		    $textValue	.= 'array';
+	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+	                        "<td class='white left'>$textValue</td></tr>\n"; 
+	    if (is_string($value) && strlen($value) == 0)
+			continue;
+	
+	    if ((is_string($value) && strlen($value) > 0) ||
+			is_array($value))
+	    {
+			$fieldLc			= strtolower($key);
+			switch($fieldLc)
+			{			// switch on parameter name
+			    case 'census':
+			    {			// Census identifier
+					$parms[$fieldLc]	= $value;
+					$parmCount		    ++;
+					$censusId		    = $value;
+					$cc			        = strtoupper(substr($censusId, 0, 2));
+	
+					if (strtoupper(substr($censusId,2)) == 'ALL')
+					{		// special census identifier to search all
+					    $censusYear		= 'ALL';
+					    $province		= 'CW';	// for pre-confederation
+					}		// special census identifier
+					else
+					{		// full census identifier
+					    $censusRec	= new Census(array('censusid'	=> $value));
+					    if ($censusRec->isExisting())
+					    {
+							$censusYear	= substr($censusId, 2);
+							$partof		= $censusRec->get('partof');
+							if ($partof)
+							{
+							    $province	= $cc;
+							    $cc		= $partof;
+							}
+					    }
+					    else
+							$msg	.= "Census value '$censusId' invalid. ";
+					}		// full census identifier
+					break;
+			    }			// Census identifier
+	
+			    case 'count':
+			    case 'limit':
+			    {			// limit number of rows returned
+					$parms['limit']		= $value;
+					if (ctype_digit($value) && $value >= 5 && $value <= 99)
+					    $limit		= intval($value);
+					else
+					    $msg		.=
+					        "$key '$value' must be number between 5 and 99. ";
+					break;
+			    }			// limit number of rows returned
+	
+			    case 'offset':
+			    {			// starting offset
+					$parms[$fieldLc]		= $value;
+					if (preg_match("/^([0-9]{1,6})$/", $value))
+					    $offset		= (int)$value;
+					else
+					    $msg		.= "Row Offset must be an integer " .
+									   "between 0 and 999,999. ";
+					break;
+			    }			// starting offset
+	
+			    case 'orderby':
+			    {			// Override order of display
+					if ($value == 'Name' || $value == 'Line')
+					    $orderBy	= $value;
+					else
+					    $msg	.= "Invalid value of OrderBy='$value'";
+					break;
+			    }			// Override order of display
+	
+			    case 'byear':
+			    {			// BYear
+					$parms[$fieldLc]		= $value;
+					$parmCount		++;
+					if (preg_match("/^([0-9]{1,4})$/", $value) == 0 ||
+					    $value < 1750 || $value > 2099)
+					    $msg	.= "Birth Year '$value' must be an integer " .
+								"and in the range 1750 to 2099.  ";
+					break;
+			    }			// BYear
+	
+			    case 'range':
+			    {			// Range of ages or birth years
+					$parms[$fieldLc]		= $value;
+					$parmCount		++;
+					if (preg_match("/^([0-9]{1,2})$/", $value) && 
+					    $value >= 0 && $value <= 20)
+					    $range		= intval($value);
+					else
+					    $msg		.= "Range '$value' must be an integer ".
+									   "between 0 and 20";
+					break;
+			    }			// "Range"
+	
+			    case 'page':
+			    {			// "Page"
+					if (preg_match("/^([0-9]{1,4})$/", $value) && 
+					    $value > 0)
+					{
+					    $page		            = (int)$value;
+					    $orderBy		        = 'Line';
+					    $parms[$fieldLc]		= $value;
+					    $parmCount++;
+					}
+					else
+					    $msg		.= "Page number '$value' " .
+									   "must be a positive integer. ";
+					break;
+			    }			// "Page"
+	
+			    case 'family':
+			    {			// Family
+					if (preg_match("/^\w+$/", $value))
+					{
+					    $parms[$fieldLc]		= $value;
+					    $parmCount		++;
+					    // value must not contain a quote/apostrophe
+					    // value is normally a number but there are exceptions
+					    // and the field is stored as a string in the database
+					    $family		    = $value;
+					    $orderBy		= 'Line';
+					}
+                    else
+                    if (strlen($value) > 0)
+					    $msg		    .= "Family value '$value' " .
+									        "contains an invalid character. ";
+					break;
+			    }			// "Family"
+	
+			    case 'surname':
+	            {			// Surname
+	                if (strlen($value) > 0)
+	                {
+					    $parms[$fieldLc]		= $value;
+					    $parmCount++;
+	                    $surname		        = $value;
+	                }
+					break;
+			    }			// match in string
+	
+			    case 'surnamesoundex':
+			    {			// Do soundex comparison of surname
+					$parms[$fieldLc]		    = $value;
+					$parmCount++;
+					$SurnameSoundex		        = true;
+					break;
+			    }			// Do soundex comparison of surname
+	
+			    case 'province':
+			    {			// used only by menu
+					$parmCount++;
+					if (preg_match("/^([A-Z]{2})$/", $value))
+					{
+					    $province		        = $value;
+					    $parms[$fieldLc]		= $value;
+					}
+					else
+					    $msg	.= "Province code '$value' is invalid.  ";
+					break;
+			    }			// used only by menu
+	
+			    case 'district':
+			    {			// district is simple text
+					$parmCount++;
+					if (is_array($value) || is_numeric($value))
+					{
+					    $district	            = $value;
+					    $parms[$fieldLc]		= $value;
+					}
+					else
+					    $msg	.= "District number '$value' is invalid. ";
+					break;
+			    }			// district is simple text
+	
+			    case 'subdistrict':
+			    {			// subdistrict
+					$parmCount		++;
+					if (is_string($value))
+					{
+					    $rxcnt	= preg_match("/^([0-9.]+):([A-Za-z0-9]+)$/",
+									     $value,
+									     $matches);
+					}
+					else
+					    $rxcnt	= 0;
+	
+					if ($rxcnt == 1)
+					{		// district:subdist format
+					    $district	= $matches[1];
+					    $subDistId	= $matches[2];
+					    $parms['district']		= $district;
+					    $parms['subdistrict']	= $subDistId;
+					}		// district:subdist format
+					else
+					{		// subdist format
+					    $subDistId	= $value;
+					    $parms['subdistrict']	= $subDistId;
+					}		// subdist format
+					break;
+			    }			// sub district
+	
+			    case 'division':
+	            {			// Division, usually integer but not always
+	                $matches                = array();
+	                if (preg_match('/\w+/', $value, $matches) == 1)
+	                {
+	                    $division           = $matches[0];
+					    $parms[$fieldLc]	= $division;
+					    $parmCount		    ++;
+	                    $distId			    = $division;
+	                }
+					break;
+			    }			// Division
+	
+			    case 'lang':
+			    {			// language code
+		            $lang               = FtTemplate::validateLang($value);
+					break;
+			    }			// language code
+	
+			    case 'givennames':
+			    case 'occupation':
+			    case 'bplace':
+			    case 'origin':
+			    case 'nationality':
+			    case 'religion':
+			    case 'coverage':
+			    case 'query':
+			    case 'submit':
+			    case 'debug':
+	            {			// no validation
+	                if (strlen($value) > 0)
+	                {
+					    $parms[$fieldLc]		= $value;
+	                    $parmCount++;
+	                }
+					break;
+			    }			// no validation
+	
+			    default:
+	            {			// other parameters simple text comparison
+	                if (strlen($value) > 0)
+	                {
+						$parms[$fieldLc]		= $value;
+						$parmCount	++;
+						if (preg_match("/^[a-zA-Z0-9 ']+$/", $value) == 0)
 						{
-						    $province	= $cc;
-						    $cc		= $partof;
-						}
-				    }
-				    else
-						$msg	.= "Census value '$censusId' invalid. ";
-				}		// full census identifier
-				break;
-		    }			// Census identifier
-
-		    case 'count':
-		    case 'limit':
-		    {			// limit number of rows returned
-				$parms['limit']		= $value;
-				if (ctype_digit($value) && $value >= 5 && $value <= 99)
-				    $limit		= intval($value);
-				else
-				    $msg		.=
-				        "$key '$value' must be number between 5 and 99. ";
-				break;
-		    }			// limit number of rows returned
-
-		    case 'offset':
-		    {			// starting offset
-				$parms[$fieldLc]		= $value;
-				if (preg_match("/^([0-9]{1,6})$/", $value))
-				    $offset		= (int)$value;
-				else
-				    $msg		.= "Row Offset must be an integer " .
-								   "between 0 and 999,999. ";
-				break;
-		    }			// starting offset
-
-		    case 'orderby':
-		    {			// Override order of display
-				if ($value == 'Name' || $value == 'Line')
-				    $orderBy	= $value;
-				else
-				    $msg	.= "Invalid value of OrderBy='$value'";
-				break;
-		    }			// Override order of display
-
-		    case 'byear':
-		    {			// BYear
-				$parms[$fieldLc]		= $value;
-				$parmCount		++;
-				if (preg_match("/^([0-9]{1,4})$/", $value) == 0 ||
-				    $value < 1750 || $value > 2099)
-				    $msg	.= "Birth Year '$value' must be an integer " .
-							"and in the range 1750 to 2099.  ";
-				break;
-		    }			// BYear
-
-		    case 'range':
-		    {			// Range of ages or birth years
-				$parms[$fieldLc]		= $value;
-				$parmCount		++;
-				if (preg_match("/^([0-9]{1,2})$/", $value) && 
-				    $value >= 0 && $value <= 20)
-				    $range		= intval($value);
-				else
-				    $msg		.= "Range '$value' must be an integer ".
-								   "between 0 and 20";
-				break;
-		    }			// "Range"
-
-		    case 'page':
-		    {			// "Page"
-				$parms[$fieldLc]		= $value;
-				$parmCount++;
-				if (preg_match("/^([0-9]{1,4})$/", $value) && 
-				    $value > 0)
-				{
-				    $page		= (int)$value;
-				    $orderBy		= 'Line';
-				}
-				else
-				    $msg		.= "Page number '$value' " .
-								   "must be a positive integer. ";
-				break;
-		    }			// "Page"
-
-		    case 'family':
-		    {			// Family
-				$parms[$fieldLc]		= $value;
-				$parmCount		++;
-				// value must not contain a quote/apostrophe
-				// value is normally a number but there are exceptions
-				// and the field is stored as a string in the database
-				if (preg_match("/^\w+$/", $value))
-				{
-				    $family		    = $value;
-				    $orderBy		= 'Line';
-				}
-				else
-				    $msg		    .= "Family value '$value' " .
-								        "contains an invalid character. ";
-				break;
-		    }			// "Family"
-
-		    case 'surname':
-		    {			// Surname
-				$parms[$fieldLc]		= $value;
-				$parmCount++;
-				$surname		        = $value;
-				break;
-		    }			// match in string
-
-		    case 'surnamesoundex':
-		    {			// Do soundex comparison of surname
-				$parms[$fieldLc]		    = $value;
-				$parmCount++;
-				$SurnameSoundex		        = true;
-				break;
-		    }			// Do soundex comparison of surname
-
-		    case 'province':
-		    {			// used only by menu
-				$parmCount++;
-				if (preg_match("/^([A-Z]{2})$/", $value))
-				{
-				    $province		        = $value;
-				    $parms[$fieldLc]		= $value;
-				}
-				else
-				    $msg	.= "Province code '$value' is invalid.  ";
-				break;
-		    }			// used only by menu
-
-		    case 'district':
-		    {			// district is simple text
-				$parmCount++;
-				if (is_array($value) || is_numeric($value))
-				{
-				    $district	            = $value;
-				    $parms[$fieldLc]		= $value;
-				}
-				else
-				    $msg	.= "District number '$value' is invalid. ";
-				break;
-		    }			// district is simple text
-
-		    case 'subdistrict':
-		    {			// subdistrict
-				$parmCount		++;
-				if (is_string($value))
-				{
-				    $rxcnt	= preg_match("/^([0-9.]+):([A-Za-z0-9]+)$/",
-								     $value,
-								     $matches);
-				}
-				else
-				    $rxcnt	= 0;
-
-				if ($rxcnt == 1)
-				{		// district:subdist format
-				    $district	= $matches[1];
-				    $subDistId	= $matches[2];
-				    $parms['district']		= $district;
-				    $parms['subdistrict']	= $subDistId;
-				}		// district:subdist format
-				else
-				{		// subdist format
-				    $subDistId	= $value;
-				    $parms['subdistrict']	= $subDistId;
-				}		// subdist format
-				break;
-		    }			// sub district
-
-		    case 'division':
-            {			// Division, usually integer but not always
-                $matches                = array();
-                if (preg_match('/\w+/', $value, $matches) == 1)
-                {
-                    $division           = $matches[0];
-				    $parms[$fieldLc]	= $division;
-				    $parmCount		    ++;
-                    $distId			    = $division;
-                }
-				break;
-		    }			// Division
-
-		    case 'lang':
-		    {			// language code
-	            $lang               = FtTemplate::validateLang($value);
-				break;
-		    }			// language code
-
-		    case 'givennames':
-		    case 'occupation':
-		    case 'bplace':
-		    case 'origin':
-		    case 'nationality':
-		    case 'religion':
-		    case 'coverage':
-		    case 'query':
-		    case 'submit':
-		    case 'debug':
-		    {			// no validation
-				$parms[$fieldLc]		= $value;
-				$parmCount	++;
-				break;
-		    }			// no validation
-
-		    default:
-		    {			// other parameters simple text comparison
-				$parms[$fieldLc]		= $value;
-				$parmCount	++;
-				if (preg_match("/^[a-zA-Z0-9 ']+$/", $value) == 0)
-				{
-				    $msg .= $key . " contains invalid character.  ";
-				}
-				break;
-		    }			// ordinary parameter
-		}			// switch on parameter name
-    }				// non-empty string value or array
-}				// foreach parameter
-if ($debug && count($_GET) > 0)
-    $warn       .= $parmsText . "</table>\n";
+						    $msg .= $key . " contains invalid character.  ";
+	                    }
+					}
+					break;
+			    }			// ordinary parameter
+			}			    // switch on parameter name
+	    }				    // non-empty string value or array
+	}				        // foreach parameter
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
+}
 if ($parmCount == 0)
-    $msg	.= 'No parameters passed. ';
+    $msg	        .= 'No parameters passed. ';
 
 // start constructing the forward and back links
-$queryString    = urldecode($_SERVER['QUERY_STRING']);
-$queryString    = preg_replace('/\w+=&/', '', $queryString);
-$queryString    = preg_replace('/&\w+=$/', '', $queryString);
-$queryString    = preg_replace('/OrderBy=\w+&/i', '', $queryString);
-$queryString    = preg_replace('/&Page=\d+/i', '', $queryString);
-$queryString    = preg_replace('/&Family=\d+/i', '', $queryString);
+$queryString    	= urldecode($_SERVER['QUERY_STRING']);
+$queryString    	= preg_replace('/\w+=&/', '', $queryString);
+$queryString    	= preg_replace('/&\w+=$/', '', $queryString);
+$queryString    	= preg_replace('/OrderBy=\w+&/i', '', $queryString);
+$queryString    	= preg_replace('/&Page=\d+/i', '', $queryString);
+$queryString    	= preg_replace('/&Family=\d+/i', '', $queryString);
 if ($debug)
-    $warn       .= "<p>query='$queryString'</p>\n";
-$npuri		    = "CensusResponse.php?$queryString";	// base query
-$npPrev		    = '';		                            // previous selection
-$npNext		    = '';	                                // next selection
-$showLine	    = false;	                            // include line number
+    $warn           .= "<p>query='$queryString'</p>\n";
+$npuri		    	= "CensusResponse.php?$queryString";	// base query
+$npPrev		    	= '';		                        // previous selection
+$npNext		    	= '';	                            // next selection
+$showLine	    	= false;	                        // include line number
 
 // the list of fields to be displayed and the form of the link clause
 // to obtain required information from the Districts and SubDistricts
@@ -514,67 +527,50 @@ if (strlen($msg) == 0)
 {		// no errors in validation
     if (isset($join))
 		$parms['join']	= $join;
-    foreach ($_GET as $key => $val)
-    {			// loop through all parameters
-		if (is_string($val) && strlen($val) > 0)
-		{		// non-empty string parameter
-		    switch(strtolower($key))
-		    {		// switch on parameter name
-				case 'page':
-				{		// "Page"
-				    if ($orderBy == 'Line')
-				    {		// request for whole page
-						$temp	= $val - 1;
-						if ($temp > 0)
-						    $npPrev	= "Page=$temp";
-						$temp	= 1 + $val;	// ensure numeric add
-						$npNext	= "Page=$temp";
-				    }		// request for whole page
-				    break;
-				}		// "Page"
+	if ($page)
+	{		// "Page"
+	    if ($orderBy == 'Line')
+	    {		        // request for whole page
+			$temp	        = $page - 1;
+			if ($temp > 0)
+			    $npPrev	    = "Page=$temp";
+			$temp	        = 1 + $page;	// ensure numeric add
+			$npNext	        = "Page=$temp";
+	    }		        // request for whole page
+	}		            // "Page"
 
-				case 'family':
-				{		// Family
-				    if ($orderBy == "Line")
-				    {		// request for whole family
-						$temp	= $val - 1;
-						if ($temp > 0)
-						    $npPrev	= "Family=$temp";
-						$temp	= 1 + $val;	// ensure numeric add
-						$npNext	= "Family=$temp";
-				    }		// request for whole family
-				    break;
-				}		// "Family"
-
-				default:
-				{		// other parameters simple text comparison
-				    break;
-				}	// ordinary parameter
-		    }		// switch on parameter name
-		}		// non-empty string value
-    }		// foreach parameter
-
+	if (ctype_digit($family))
+	{		            // Family
+	    if ($orderBy == "Line")
+	    {		        // request for whole family
+			$temp	        = $family - 1;
+			if ($temp > 0)
+			    $npPrev	    = "Family=$temp";
+			$temp	        = 1 + $family;	// ensure numeric add
+			$npNext	        = "Family=$temp";
+	    }		        // request for whole family
+	}		            // "Family"
 
     // construct ORDER BY clause
     if ($orderBy == "Line")
     {		// display lines in original order
-		$showLine	= true;
-		$npuri		.= "&OrderBy=Line";
-		$limit		= 99;
+		$showLine	        = true;
+		$npuri		        .= "&OrderBy=Line";
+		$limit		        = 99;
     }		// display lines in original order
     else
     {		// display lines in alphabetical order
-		$showLine	= false;
-		$npuri		.= "&OrderBy=Name";
+		$showLine	        = false;
+		$npuri		        .= "&OrderBy=Name";
 		// URI components for backwards and forwards
 		// browser links
-		$tmp	= $offset - $limit;
+		$tmp	            = $offset - $limit;
 		if ($tmp < 0)
-		    $npPrev	= "";	// no previous link
+		    $npPrev	        = "";	// no previous link
 		else
-		    $npPrev	= "Limit={$limit}&amp;Offset={$tmp}";
-		$tmp	= $offset + $limit;
-		$npNext	= "Limit={$limit}&amp;Offset={$tmp}";
+		    $npPrev	        = "Limit={$limit}&amp;Offset={$tmp}";
+		$tmp	            = $offset + $limit;
+		$npNext	            = "Limit={$limit}&amp;Offset={$tmp}";
     }		// display lines in alphabetical order
 
     // include district information in URIs for previous and next page
@@ -680,7 +676,8 @@ if (strlen($msg) == 0)
 						   "&amp;Division=" . $distId;
 		if ($page)
 		    $search	.= "&amp;Page=" . $page;
-		else
+        else
+        if (strlen($family) > 0)
 		    $search	.= "&amp;Family=" . $family;
 		if ($censusYear < 1867)
 		    $censusId	= $province . $censusYear;
@@ -866,7 +863,7 @@ if ($showLine && $page)
     }
 
     // update the popup for explaining the action taken by arrows
-    if ($family)
+    if (strlen($family) > 0)
     {
 		$template['familyminusonepre']->update(
 						array('family - 1'=> ($family - 1)));

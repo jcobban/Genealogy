@@ -158,6 +158,7 @@ else
     $template		    = new FtTemplate("QueryUnsupported$lang.html");
 
 $includePop 	        = "CensusQueryPopups$lang.html";
+error_log("QueryDetail.php: " . __LINE__ . " includePop='$includePop'</p>\n");
 $template->includeSub($includePop,
 	    		      'POPUPS');
 $template->updateTag('otherStylesheets',	

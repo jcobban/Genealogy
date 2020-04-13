@@ -199,8 +199,9 @@
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/05/24      prevent non-numeric input into numeric fields   *
  *		2019/12/07      do not ripple down invalid values               *
+ *		2020/04/04      pass lang parameter to Person script            *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 // strings for determining and changing the case of letters
@@ -2999,10 +3000,14 @@ function doIdir(event)
         idir		= form.elements[eltName].value - 0;
     else
         alert("CensusForm.js: 2984 form.elements['" + eltName + "' undefined");
+	var	lang	        = 'en';
+    if ('lang' in args)
+	    lang		    = args['lang'];
 
     if (idir > 0)
     {			// have an existing association
-		window.open('/FamilyTree/Person.php?idir=' + idir,
+		window.open('/FamilyTree/Person.php?idir=' + idir +
+                            '&lang=' + lang,
 				    '_blank');
     }			// have an existing association
     else
@@ -3035,9 +3040,6 @@ function doIdir(event)
 		    }		// age in years
 		}		// parse matched
 
-		var	lang	= 'en';
-        if ('lang' in args)
-		    lang		= args['lang'];
 		var url	= "/FamilyTree/getIndivNamesXml.php?Surname=" +
 						encodeURIComponent(surname) +
 						"&GivenName=" + encodeURIComponent(givennames) +

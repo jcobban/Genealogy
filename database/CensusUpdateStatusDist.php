@@ -138,16 +138,12 @@ if (count($_GET) > 0)
 
 // some actions depend upon whether the user can edit the database
 if (canUser('edit'))
-{		            // user can update database
-	$action		        = 'Update';
-}		            // user can updated database
+	$action		            = 'Update';
 else
-{		            // user can only view database
-	$action		        = 'Display';
-}		            // user can only view database
+	$action		            = 'Display';
 
 $template               = new FtTemplate("CensusStatusDist$action$lang.html");
-$formatter                          = $template->getFormatter();
+$formatter                  = $template->getFormatter();
 
 // check for missing parameters
 if (is_null($censusId))
@@ -187,24 +183,24 @@ else
     if ($censusRec->get('collective') == 1)
     {               // collective census must be qualified by province
         if (strlen($province) != 2)
-           $province    = 'CW'; 
-		$censusId	    = $province . $censusYear;
-	    $censusRec	    = new Census(array('censusid'	=> $censusId));
-        $text           = $template['censusCorrected']->innerHTML;
-        $warn           .= '<p>' .
-                            str_replace('$CENSUSID', $censusId, $text) .
+           $province        = 'CW'; 
+		$censusId	        = $province . $censusYear;
+	    $censusRec	        = new Census(array('censusid'	=> $censusId));
+        $text               = $template['censusCorrected']->innerHTML;
+        $warn               .= '<p>' .
+                                str_replace('$CENSUSID', $censusId, $text) .
 	                            "</p>\n";
     }               // collective census must be qualified by province
 }                   // census specified
 
 if ($distId == '')
 {		            // District missing
-    $msg		        .= $template['districtMissing']->innerHTML;
-    $distName           = 'Missing';
+    $msg		            .= $template['districtMissing']->innerHTML;
+    $distName               = 'Missing';
 }		            // District missing
 else
 {                   // district specified
-	$result		        = array();
+	$result		            = array();
     if (preg_match("/^([0-9]+)(\.[05])?$/", $distId, $result) != 1)
     {
         $text               = $template['districtInvalid']->innerHTML;
@@ -213,11 +209,11 @@ else
 	else
 	{
 	    if (count($result) > 2 && $result[2] == '.0')
-			$distId	    = $result[1];	// integral portion only
+			$distId	        = $result[1];	// integral portion only
 	}
 	
-	$district	        = new District(array('census'	=> $censusId,
-					        		         'id'	    => $distId));
+	$district	            = new District(array('census'	=> $censusId,
+					            		         'id'	    => $distId));
 	if (!$district->isExisting())
     {
         $text               = $template['districtUndefined']->innerHTML;

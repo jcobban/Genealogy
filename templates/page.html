@@ -17,6 +17,7 @@
  *      2019/01/29      use menu button                                 *
  *      2019/02/05      remove rightTop button                          *
  *      2020/03/09      remove facebook                                 *
+ *      2020/03/31      change advert iframe to div                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
@@ -50,8 +51,8 @@
                 height="70" width="70" alt="James Cobban Logo">
           &nbsp;
         <span class="right" style="width: 500px;" id="advertSpan">
-          <iframe id='advertFrame' class='advert' $IECRAP src='$ADURL'>
-          </iframe>
+          <div id="advertFrame" class="advert" data-load="$ADURL">
+          </div>
         </span>
         <span id="menuButton" class="left">
           <div class="menuicon"></div>

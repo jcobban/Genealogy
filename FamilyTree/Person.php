@@ -2153,7 +2153,12 @@ $template->updateTag('showAdrDiv$idar',
 ob_start();
 include 'DeathCauses.php';
 $template->set('DEATHCAUSES', ob_get_clean());
-$user	= new User(array('username'	=> $userid));
-$template->set('EMAIL', $user->get('email'));
+if (strlen($userid) > 0)
+{
+    $user	                = new User(array('username'	=> $userid));
+    $template->set('EMAIL', $user->get('email'));
+}
+else
+    $template->set('EMAIL', '');
 
 $template->display();

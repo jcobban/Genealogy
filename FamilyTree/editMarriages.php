@@ -486,7 +486,7 @@ if (isset($indiv) && $indiv->isExisting())
 	$isOwner		        	= canUser('edit') && $indiv->isOwner();
     $priName            		= $indiv->getPriName();
 	if ($given == '')
-	    $given		    		= $priName>getGivenName();
+	    $given		    		= $priName->getGivenName();
 	if ($surname == '')
         $surname				= $priName->getSurname();
     $name               		= $priName->getName($t);

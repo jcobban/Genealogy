@@ -67,105 +67,131 @@ require_once __NAMESPACE__ . "/Language.inc";
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
-// variables
-$lang			= 'en';
-$uidPattern		= '#^[^<>@&]{6,63}$#';
+// parameters
+$lang			            = 'en';
+$uidPattern		            = '#^[^<>@&]{6,63}$#';
+$newuserid					= '';
+$user			            = null;     // instance of User
+$email						= '';
+$password					= '';
+$password2					= '';
+$auth                       = 'pending';
+$noHelp			        	= false;
+$chknohelp		        	= "";
 
-// get parameters
-$newuserid				= '';
-$email					= '';
-$password				= '';
-$password2				= '';
-
-if (count($_POST) > 0)
+if (isset($_POST) && count($_POST) > 0)
 {			    // invoked by POST
-    $useEmail	    	= false;
-    $chkusemail		    = "";
-}			    // invoked by POST
-else
-{			    // invoked by GET
-    $useEmail		    = true;
-    $chkusemail		    = "checked='checked'";
+    $useEmail	    	    = false;
+    $chkusemail		        = "";
+    $parmsText              = "<p class='label'>\$_POST</p>\n" .
+			                   "<table class='summary'>\n" .
+			                      "<tr><th class='colhead'>key</th>" .
+			                        "<th class='colhead'>value</th></tr>\n";
+    foreach($_POST as $key => $value)
+    {			// loop through parameters
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>$value</td></tr>\n"; 
 
+	    switch(strtolower($key))
+	    {		// act on specific parameters
+			case'userid':
+			{
+			    $newuserid	    = $value;
+			    break;
+			}
+
+			case'password':
+			{
+			    $password	    = $value;
+			    break;
+			}
+
+			case'password2':
+			{
+			    $password2	    = $value;
+			    break;
+			}
+
+			case 'email':
+			{
+			    $email		    = $value;
+			    break;
+			}
+
+			case 'usemail':
+			{
+			    $useEmail		= true;
+			    $chkusemail		= "checked='checked'";
+			    break;
+			}
+
+			case 'nohelp':
+			{
+			    $noHelp		    = true;
+			    $chknohelp		= "checked='checked'";
+			    break;
+			}
+
+            case 'auth':
+            {
+                if (strlen($value) > 0)
+                    $auth       = $value;
+                break;
+            }
+
+			case 'lang':
+	        {
+	            $lang           = FtTemplate::validateLang($value);
+			    break;
+			}
+
+	    }		// act on specific parameters
+    }			// loop through parameters
+
+    if (strlen($newuserid) == 0 && strlen($email) > 0)
+        $newuserid              = str_replace(array('@','.'), 
+                                              array('_','_'), 
+                                              $email);
+    if (strlen($password) == 0)
+    {
+        if (strlen($password2) == 0)
+        {
+            $password           = "\000$newuserid"; // hard to enter 
+            $password2          = "\000$newuserid"; // hard to enter
+        }
+    }
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}
+else
+if (isset($_GET))
+{			    // invoked by GET
+    $useEmail		        = true;
+    $chkusemail		        = "checked='checked'";
+
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+			                   "<table class='summary'>\n" .
+			                      "<tr><th class='colhead'>key</th>" .
+			                        "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {
-        if ($debug)
-    		print "<p>\$_GET['$key']='$value'</p>\n";
-
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>$value</td></tr>\n"; 
         switch(strtolower($key))
         {		// act on specific parameters
 			case 'lang':
 	        {
-	            if (strlen($value) >= 2)
-	                $lang       = strtolower(substr($value,0,2));
+	            $lang       = FtTemplate::validateLang($value);
 			    break;
 			}
 
         }		// act on specific parameters
     }           // loop through parameters
-}			    // not invoked by GET
-
-$noHelp			= false;
-$chknohelp		= "";
-
-foreach($_POST as $key => $value)
-{			// loop through parameters
     if ($debug)
-		print "<p>\$_POST['$key']='$value'</p>\n";
+        $warn               .= $parmsText . "</table>\n";
+}			    // invoked by GET
 
-    switch(strtolower($key))
-    {		// act on specific parameters
-		case'userid':
-		{
-		    $newuserid	= $value;
-		    break;
-		}
-
-		case'password':
-		{
-		    $password	= $value;
-		    break;
-		}
-
-		case'password2':
-		{
-		    $password2	= $value;
-		    break;
-		}
-
-		case 'email':
-		{
-		    $email		= $value;
-		    break;
-		}
-
-		case 'usemail':
-		{
-		    $useEmail		= true;
-		    $chkusemail		= "checked='checked'";
-		    break;
-		}
-
-		case 'nohelp':
-		{
-		    $noHelp		= true;
-		    $chknohelp		= "checked='checked'";
-		    break;
-		}
-
-		case 'lang':
-        {
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value,0,2));
-		    break;
-		}
-
-    }		// act on specific parameters
-}			// loop through parameters
-
-$user			= null;
-
-$template		= new FtTemplate("Register$lang.html", true);
+$template		            = new FtTemplate("Register$lang.html", true);
 
 $template->set('CHKUSEMAIL',	$chkusemail);
 $template->set('CHKNOHELP',	    $chknohelp);
@@ -186,23 +212,23 @@ $template['useridInUse']->update( null);
 // validate parameters
 if (strlen($newuserid) > 0 ||
     (strlen($password) > 0 && strlen($password2) > 0))
-{		// new registration supplied
+{		                // new registration supplied
     if (strlen($newuserid) < 6)
 		$template['shortUsername']->update(
-						     array('newuserid' => $newuserid));
+						     array('newuserid'  => $newuserid));
     if (!preg_match($uidPattern, $newuserid))
 		$template['badUsername']->update(
-						     array('newuserid' => $newuserid));
+						     array('newuserid'  => $newuserid));
     if (strlen($password) < 6)
 		$template['shortPassword']->update(
 						     array('newuserid'	=> $newuserid,
-							   'password'	=> $password));
+							       'password'	=> $password));
 
     if ($password != $password2)
 		$template['passwordMismatch']->update(
 						     array('newuserid'	=> $newuserid,
-							   'password'	=> $password,
-							   'password2'	=> $password2));
+							       'password'	=> $password,
+							       'password2'	=> $password2));
 
     if (strlen($email) == 0 && strpos($newuserid, '@') !== false)
 		$email		= $newuserid;
@@ -210,10 +236,10 @@ if (strlen($newuserid) > 0 ||
     if (strlen($email) < 6 || strpos($email, '@') === false)
 		$template['badEmail']->update(
 						     array('newuserid'	=> $newuserid,
-							   'email' => $email));
+						    	   'email'      => $email));
     else
-    {			// validate e-mail
-		$user		= new User(array('email' => $email));
+    {			        // validate e-mail
+		$user		    = new User(array('email'    => $email));
 		if ($user->isExisting())
 		{
 		    $olduser	= $user->get('username');
@@ -221,33 +247,33 @@ if (strlen($newuserid) > 0 ||
 		    {
 				$template['emailInUse']->update(
 							     array('newuserid'	=> $newuserid,
-								   'email'	=> $email));
+								       'email'	    => $email));
 				$user	= null;
 		    }
 		}
 		else
-		{			// check for userid already in use
-		    $user	= new User(array('username' => $newuserid));
+		{			    // check for userid already in use
+		    $user	    = new User(array('username' => $newuserid));
 		    if ($user->isExisting())
 				$template['useridInUse']->update(
 							     array('newuserid' => $newuserid));
-		}			// check for userid already in use
-    }			// validate e-mail
-}		// registration supplied
+		}			    // check for userid already in use
+    }			        // validate e-mail
+}		                // registration supplied
 else
-{		// registration not supplied
+{		                // registration not supplied
     $template['initialPrompt']->update(
 						 array('newuserid' => $newuserid));
-}		// registration not supplied
+}		                // registration not supplied
 
 // if there are no errors in validation, create the new account
 if ($user)
-{		// create new account
+{		                // create new account
     if (!$user->isExisting())
-    {		// user does not already exist
+    {		            // user does not already exist
 		$user->set('password',	$password);
-		$user->set('email',	$email);
-		$user->set('auth',	'pending');
+		$user->set('email',	    $email);
+		$user->set('auth',	    $auth);
 		if ($useEmail)
 		    $user->set('usemail', 1);
 		else
@@ -287,15 +313,15 @@ if ($user)
 		$template['titleComplete']->update( null);
     }
 
-}		// create new account
+}		            // create new account
 else
-{		// first entry with no parameters
+{		            // first entry with no parameters
     $template['titleComplete']->update( null);
     $template['titleAlready']->update( null);
     $template['okmsgRespond']->update( null);
     $template['okmsgAlready']->update( null);
     $template['initialPrompt']->update(array('newuserid'	=> '',
 							                 'email'	    => ''));
-}		// first entry with no parameters
+}		            // first entry with no parameters
 
 $template->display();

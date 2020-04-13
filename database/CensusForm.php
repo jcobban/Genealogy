@@ -80,8 +80,9 @@ use \Templating\Template;
  *		2019/04/06      use new FtTemplate::includeSub                  *
  *		2019/12/01      improve parameter checking                      *
  *		2020/03/24      correct setting of owner/tenant in 1921         *
+ *		2020/03/29      avoid warning when user not authorized          *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -407,47 +408,47 @@ if (strlen($province) == 0)
 }
 if (strlen($division) == 0)
 {
-	$template->updateTag('frontDiv', null);
-	$template->updateTag('backDiv', null);
+	$template['frontDiv']->update(null);
+	$template['backDiv']->update(null);
 }
 $promptTag	= $template->getElementById('ImagePrompt');
 if (strlen($image) == 0)
-	$template->updateTag('ImageButton', null); // hide
+	$template['ImageButton']->update(null); // hide
 else
 if ($promptTag)
 	$promptTag->update(null); // hide
 
 if (strlen($msg) > 0)
 {
-	$template->updateTag('frontPager', null);
-	$template->updateTag('backPager', null);
-	$template->updateTag('censusForm', null);
+	$template['frontPager']->update(null);
+	$template['backPager']->update(null);
+	$template['censusForm']->update(null);
 }
 else
 {			// no errors
 	if (strlen($npPrev) > 0)
 	{
-	    $template->updateTag('npPrevFront', 
+	    $template['npPrevFront']->update(
 						     array('npPrev' => $npPrev));
-	    $template->updateTag('npPrevBack', 
+	    $template['npPrevBack']->update(
 						     array('npPrev' => $npPrev));
 	}
 	else
 	{
-	    $template->updateTag('npPrevFront', null);
-	    $template->updateTag('npPrevBack', null);
+	    $template['npPrevFront']->update(null);
+	    $template['npPrevBack']->update(null);
 	}
 	if (strlen($npNext) > 0)
 	{
-	    $template->updateTag('npNextFront',
+	    $template['npNextFront']->update(
 						     array('npNext' => $npNext));
-	    $template->updateTag('npNextBack', 
+	    $template['npNextBack']->update(
 						    array('npNext' => $npNext));
 	}
 	else
 	{
-	    $template->updateTag('npNextFront', null);
-	    $template->updateTag('npNextBack', null);
+	    $template['npNextFront']->update(null);
+	    $template['npNextBack']->update(null);
 	}
 }			// no errors
 
@@ -574,7 +575,9 @@ if (strlen($msg) == 0)
 					else
 					{
 					    $censusLine->set('idirtext',    'Find');
-                        $rtemplate->updateTag('clearIdir$idirclear', null);
+                        $button         = $rtemplate['clearIdir$idirclear'];
+                        if ($button)
+                            $button->update(null);
 					}
 					break;
 			    }		// idir
@@ -607,11 +610,11 @@ if (strlen($msg) == 0)
 // display field comments
 if ($fcSet && $fcSet->count() > 0)
 {
-	$template->updateTag('comment$index', $fcSet);
+	$template['comment$index']->update($fcSet);
 }
 else
 {
-	$template->updateTag('comments', null);
+	$template['comments']->update(null);
 }
 
 set_time_limit(90);

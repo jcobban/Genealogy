@@ -213,6 +213,8 @@
  *		2020/02/22      include scroll of main section, if any, in      *
  *		                dialog position.                                *
  *		2020/03/09      remove facebook                                 *
+ *		2020/03/31      display advertisement only after loading        *
+ *		                page to speed up page initialization            *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -1191,7 +1193,7 @@ function displayHelp(element)
 
 		// if cannot find division with name prefixed with 'Help'
 		// then try without
-		if (!helpDiv)
+		if (!helpDiv && helpDivName.length > 0)
 		    helpDiv	= document.getElementById(helpDivName);
     }		// first choice not found
 
@@ -2360,8 +2362,34 @@ function commonInit(event)
         }               // page contains pagination row
     }                   // page contains display of tabular results
 
-}		// function commonInit
+    let advertFrame         = document.getElementById('advertFrame');
+    if (advertFrame &&
+        'load' in advertFrame.dataset &&
+        typeof XMLHttpRequest === 'function')
+    {
+        let adurl               = advertFrame.dataset.load;
+        let httpRequest         = new XMLHttpRequest();
+        httpRequest.addEventListener('load', advertLoaded);
+        httpRequest.addEventListener('error', advertError);
+        httpRequest.addEventListener('abort', advertAbort);
+        httpRequest.open('GET', adurl, true);
+        httpRequest.send();
+    }
 
+}		// function commonInit
+function advertLoaded (evt) {
+    let pattern     	= new RegExp('<body[^>]*>([^]*)</body>', 'im');
+    let results     	= this.responseText.match(pattern);
+    let contents    	= results[1];
+    let frame       	= document.getElementById('advertFrame');
+    frame.outerHTML 	= contents;
+}
+function advertError(evt){
+	console.log("advertError: ");
+}
+function advertAbort(evt){
+	console.log("advertAbort: ");
+}
 /************************************************************************
  *  function commonResize												*
  *																		*

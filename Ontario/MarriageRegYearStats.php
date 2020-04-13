@@ -50,6 +50,7 @@ use \NumberFormatter;
  *		2019/07/08      use Template                                    *
  *		2019/12/16      use MarriageSet                                 *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/04/08      correct percentage done for years before 1873   *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -247,7 +248,12 @@ foreach($result as $row)
         ($highest == 0 || 
             ($high - $low) < 2000))
         $highest	        = $high;
-	$todo		            = $high - $low + 1;
+    $todo		            = $high - $low + 1;
+    if ($regYear <= 1872)
+    {
+        $pages              = intdiv($high, 10) - intdiv($low, 10);
+        $todo               = $todo - (7 * $pages);
+    }
 	if ($todo == 0)
 	    $pctDone	        = 0;
 	else
@@ -268,16 +274,26 @@ $dataRowElt->update($data);
 
 if ($total == 0)
 {
-	$pctDone	= 0;
-	$pctLinked	= 0;
+	$pctDone	            = 0;
+	$pctLinked	            = 0;
 }
 else
 {
-	$pctDone	= 100 * $total / ($highest - $lowest + 1);
-	$pctLinked	= 100 * $totalLinked / $total;
+    if ($regYear <= 1872)
+    {
+        $pages              = intdiv($highest, 10) - intdiv($lowest, 10);
+        $todo               = ($pages + 1) * 3;
+    }
+    else
+        $todo	            = $highest - $lowest + 1;
+    if ($todo == 0)
+        $todo               = 1;
+
+	$pctDone	            = 100 * $total / $todo;
+	$pctLinked	            = 100 * $totalLinked / $total;
 }
 if ($lowest > $highest)
-    $lowest		= $highest;
+    $lowest		            = $highest;
 
 $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
 $template->set('TOTAL',         $formatter->format($total));

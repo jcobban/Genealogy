@@ -246,7 +246,10 @@ else
 
 $results        = new MethodistBaptismSet($getParms);
 $info           = $results->getInformation();
-$total          = $info['count'];
+if (array_key_exists('count', $info))
+    $total      = $info['count'];
+else
+    $total      = 0;        // SQL syntax error reported
 
 // variable portion of URI for next and previous links
 if ($orderby == 'IDMB' && 

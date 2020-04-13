@@ -40,6 +40,8 @@ use \Templating\Template;
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/04/06      use new FtTemplate::includeSub                  *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/03/27      simplify parameter handling                     *
+ *		                and fix premature template creation             *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -51,16 +53,19 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
-$domain			    = 'CAON';
-$prov			    = 'ON';
-$cc				    = 'CA';
-$countryName		= 'Canada';
-$stateName			= 'Ontario';
-$domainName			= 'Canada: Ontario:';
-$lang			    = 'en';
-$offset			    = 0;
-$limit			    = 20;
-	
+$domain			    		= 'CAON';
+$prov			    		= 'ON';
+$cc				    		= 'CA';
+$countryName				= 'Canada';
+$stateName					= 'Ontario';
+$domainName					= 'Canada: Ontario:';
+$lang			    		= 'en';
+$offset			    		= 0;
+$limit			    		= 20;
+$changedText				= null;
+$deletedText				= null;
+$addedText	    			= null;
+$get                        = true;
 
 if (isset($_GET) && count($_GET) > 0)
 {                       // initial invocation from URL
@@ -83,39 +88,39 @@ if (isset($_GET) && count($_GET) > 0)
 				}
 				break;
 		    }		// state/province code
-	
+
 		    case 'domain':
 		    {
 				if (preg_match('/[a-zA-Z]{4,5}/', $value) == 1)
 				    $domain			= $value;
 				break;
 		    }		// state/province code
-	
+
 		    case 'lang':
 		    {
                 $lang       = FtTemplate::validateLang($value);
 				break;
 		    }		// debug handled by common code
-	
+
 		    case 'offset':
 		    {
 				if (is_numeric($value) || ctype_digit($value))
 				    $offset			= $value;
 				break;
 		    }
-	
+
 		    case 'limit':
 		    {
 				if (is_numeric($value) || ctype_digit($value))
 				    $limit			= $value;
 				break;
 		    }
-	
+
 		    case 'debug':
 		    {
 				break;
 		    }		// debug handled by common code
-	
+
 		    default:
 		    {
 				$warn	.= "Unexpected parameter $key='$value'. ";
@@ -125,201 +130,166 @@ if (isset($_GET) && count($_GET) > 0)
 	}			// loop through all parameters
     if ($debug)
         $warn   .= $parmsText . "</table>\n";
-
-    // create template
-	$template			= new FtTemplate("Counties$action$lang.html");
-
-	$includeSub			= "CountiesDialogs$lang.html";
-    $template->includeSub($includeSub, 'DIALOGS', true);
-
-    // process parameters    
-	$domainObj			= new Domain(array('domain'	=> $domain,
-		    							   'language'		=> $lang));
-	$cc					= substr($domain, 0, 2);
-	$prov				= substr($domain, 2, 2);
-	$stateName			= $domainObj->getName(0);
-	$domainName			= $domainObj->getName(1);
-	$countryObj			= new Country(array('code' => $cc));
-	$countryName		= $countryObj->getName();
-
-	$changed        	= $template['changed'];
-	$deleted        	= $template['deleted'];
-	$added          	= $template['added'];
-	$changedText		= null;
-	$deletedText		= null;
-    $addedText	    	= null;
-    if (is_null($template['summary']))
-    {
-		print "<p>template=\"Counties$action$lang.html\" does not contain element with id=\"summary\"</p>\n";
-    }
-    else
-        $template['summary']->update(null);
 }                       // initial invocation from URL
 else
 if (isset($_POST) && count($_POST) > 0)
 {                       // invoked to process update
+    $get                        = false;
+
 	// organize the parameters as an associative array of instances
 	// of the class County
-	$counties	        = array();
-	$county	            = null;
-	$parmsText  = "<p class='label'>\$_POST</p>\n" .
-	                  "<table class='summary'>\n" .
-	                  "<tr><th class='colhead'>key</th>" .
-	                      "<th class='colhead'>value</th></tr>\n";
+	$counties	                = array();
+	$county	                    = null;
+	$parmsText                  = "<p class='label'>\$_POST</p>\n" .
+                	                  "<table class='summary'>\n" .
+	                                  "<tr><th class='colhead'>key</th>" .
+	                                  "<th class='colhead'>value</th></tr>\n";
 	foreach($_POST as $key => $value)
 	{				// loop through all parameters
-	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-	                        "<td class='white left'>$value</td></tr>\n"; 
-		switch(strtolower($key))
+	    $parmsText              .= "<tr><th class='detlabel'>$key</th>" .
+	                            "<td class='white left'>$value</td></tr>\n"; 
+		$matches		        = array();
+		$fieldLc		        = strtolower($key);
+	    if(preg_match('/^(code|name|delete|endyear|startyear|edittownships|editlocation)(.*)$/', $fieldLc, $matches))
+	    {
+	        $column             = $matches[1];
+		    $row	            = $matches[2];
+		}
+		else
+		if (preg_match('/^([a-zA-Z]+)(\d*)$/', $fieldLc, $matches))
+		{
+		    $column	            = $matches[1];
+		    $row    	        = $matches[2];
+	    }
+
+		switch(strtolower($column))
 		{		            	// act on specific keys
 		    case 'domain':
 	        {
 	            $domain         = $value;
 				break;
 		    }			            // domain
-	
+
 		    case 'prov':
 		    {
 				$prov		    = $value;
 				$domain		    = 'CA' . $value;
 				break;
 		    }		            // state/province code
-	
-		    case 'lang':
-		    {
-                $lang       = FtTemplate::validateLang($value);
-				break;
-		    }
-	    }
-	}			            	// loop through all parameters
-	
-    if ($debug)
-        $warn   .= $parmsText . "</table>\n";
-}			    // invoked by method=post
 
-if (canUser('edit'))
-	$action			= 'Edit';
-else
-    $action			= 'Display';
-
-    // create template
-$template			= new FtTemplate("Counties$action$lang.html");
-
-$includeSub			= "CountiesDialogs$lang.html";
-$template->includeSub($includeSub, 'DIALOGS', true);
-
-    // analyse parameters
-$domainObj	        = new Domain(array('domain'	    => $domain,
-           					       'language'	=> 'en'));
-if ($domainObj->isExisting())
-{
-    $cc			    = substr($domain, 0, 2);
-    $prov		    = substr($domain, 2, 2);
-    $domainName	    = $domainObj->get('name');
-}
-else
-{
-    $msg		    .= "Domain='$domain' unsupported. ";
-    $domainName	    = 'Unknown';
-}
-$countryObj		    = new Country(array('code' => $cc));
-$countryName	    = $countryObj->getName();
-
-// apply updates
-if (isset($_POST) && count($_POST) > 0)
-{			        // invoked by method=post
-    // loop through the parameters again to apply updates to the County objects
-	foreach($_POST as $key => $value)
-	{				            // loop through all parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-		$matches		= array();
-		$fieldLc		= strtolower($key);
-	    if(preg_match('/^(code|name|delete|endyear|startyear|edittownships|editlocation)(.*)$/', $fieldLc, $matches))
-	    {
-	        $column     = $matches[1];
-		    $row	    = $matches[2];
-		}
-		else
-		if (preg_match('/^([a-zA-Z]+)(\d*)$/', $fieldLc, $matches))
-		{
-		    $column	    = $matches[1];
-		    $row    	= $matches[2];
-	    }
-	
-		switch($column)
-		{		            	// act on specific keys
-		    case 'domain':
-		    case 'prov':
-		    case 'lang':
-		    case 'debug':
-		    {
-				break;
-		    }		            // already handled
-	
 		    case 'code':
 	        {	            	// county by county fields
-				$parms		= array('domain'=> $domainObj,
-		    						'code'	=> strtoupper($value));
-				$county		= new County($parms);
+				$parms		    = array('domain'    => $domain,
+		    					    	'code'	    => strtoupper($value));
+				$county		    = new County($parms);
 	            $counties[$county->get('code')]	= $county;
-	            showTrace();
 				break;
 		    }
-	
+
 		    case 'name':
 		    {
 				$county->set('name', ucfirst($value));
 				break;
 		    }
-	
+
 		    case 'startyear':
 		    {
 				$county->set('startyear', $value);
 				break;
 		    }
-	
+
 		    case 'endyear':
 		    {
-				$county->set('endyear', $value);
+                $county->set('endyear', $value);
+                $county         = null;
 				break;
 		    }
-	
+
 		    case 'offset':
 		    {
 	            if (ctype_digit($value))
 	                $offset     = $value - 0;
 				break;
 		    }
-	
+
 		    case 'limit':
 		    {
 	            if (ctype_digit($value))
 	                $limit       = $value - 0;
 				break;
 		    }
-	
+
+		    case 'lang':
+		    {
+                $lang           = FtTemplate::validateLang($value);
+				break;
+		    }
+
+            case 'countryname':
+            case 'statename':
+            case 'debug':
+                break;
+
 		    default:
 		    {
 				$warn	.= "<p>Unrecognized parameter $key='$value'. </p>\n";
 				break;
 		    }			        // unrecognized parameter
-		}           			// act on specific keys
+	    }
 	}			            	// loop through all parameters
+
     if ($debug)
         $warn   .= $parmsText . "</table>\n";
-	
+}			    // invoked by method=post
+
+if (canUser('edit'))
+	$action			    		= 'Edit';
+else
+    $action			    		= 'Display';
+
+// create template
+$template			    		= new FtTemplate("Counties$action$lang.html");
+
+$includeSub			    		= "CountiesDialogs$lang.html";
+$template->includeSub($includeSub, 'DIALOGS', true);
+
+// analyse parameters
+$domainObj	            		= new Domain(array('domain'	    => $domain,
+           				                	       'language'	=> $lang));
+if ($domainObj->isExisting())
+{
+    $cc			        		= substr($domain, 0, 2);
+    $prov		        		= substr($domain, 2, 2);
+	$stateName					= $domainObj->getName(0);
+    $domainName	        		= $domainObj->getName(1);
+}
+else
+{
+    $msg		                .= "Domain='$domain' unsupported. ";
+    $domainName	        		= 'Unknown';
+    $stateName	        		= 'Unknown';
+}
+$countryObj		        		= new Country(array('code' => $cc));
+$countryName	        		= $countryObj->getName();
+$changed        	    		= $template['changed'];
+$deleted        	    		= $template['deleted'];
+$added          	    		= $template['added'];
+$summary                		= $template['summary'];
+if ($get && !is_null($summary))
+    $summary->update(null);
+
+// apply updates
+if (isset($_POST) && count($_POST) > 0)
+{			        // invoked by method=post
+
 	// put last entry into table
 	if ($county)
 		$counties[$county->get('code')]	= $county;
-	$changed        = $template['changed'];
-	$changedHTML    = $changed->outerHTML();
-	$deleted        = $template['deleted'];
-	$deletedHTML    = $deleted->outerHTML();
-	$added          = $template['added'];
-	$addedHTML      = $added->outerHTML();
-	$data           = '';
-	$changeCount	= 0;
+	$changedHTML    				= $changed->outerHTML();
+	$deletedHTML    				= $deleted->outerHTML();
+	$addedHTML      				= $added->outerHTML();
+	$data           				= '';
+	$changeCount	                = 0;
 	if (canUser('update'))
 	{
 		foreach($counties as $code => $county)
@@ -358,29 +328,29 @@ if (isset($_POST) && count($_POST) > 0)
 	        }                   // update existing county
 	        else
 	        {                   // create new county
-				$count          = $county->save(false);
+				$count              = $county->save(false);
 			    $changeCount++;
-			    $ttemplate      = new Template($addedHTML);
+			    $ttemplate          = new Template($addedHTML);
 				$ttemplate->set('COUNTY',           $county->get('code'));
 				$ttemplate->set('COUNTYNAME',       $county->get('name'));
 				$ttemplate->set('COUNTYSTARTYEAR',  $county->get('startyear'));
 			    $ttemplate->set('COUNTYENDYEAR',    $county->get('endyear'));
-			    $data           .= $ttemplate->compile();
+			    $data               .= $ttemplate->compile();
 	        }                   // create new county
 		}					    // loop through all rows in database
-		
-	
-		$changedText	= null;
-		$deletedText	= null;
-	    $addedText	    = $data;
+
+
+		$changedText				= null;
+		$deletedText				= null;
+	    $addedText	    			= $data;
 	}                   // user can update
 	else
 	{                   // user cannot update
-		$changedText	= null;
-		$deletedText	= null;
-	    $addedText	    = null;
+		$changedText				= null;
+		$deletedText				= null;
+	    $addedText	    			= null;
 	}                   // user cannot update
-	
+
     $template->set('CHANGECOUNT',    $changeCount);
     if ($changeCount == 0)
         $template['summary']->update(null);
