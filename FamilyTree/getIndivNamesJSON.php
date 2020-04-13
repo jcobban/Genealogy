@@ -30,6 +30,7 @@ use \Exception;
  *  History:															*
  *		2020/04/03      created from getIndivNamesXml.php to move       *
  *		                more function to script and return JSON         *
+ *		2020/04/13      correct order of persons                        *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -467,11 +468,13 @@ if (strlen($msg) == 0)
     // iterate through results
     print ",\n    \"persons\" : {\n";
     $comma                          = '';
+    $i                              = 0;
     foreach($result as $idir => $indiv)
     {		// loop through all result rows
         // check if current user is an owner of the record and therefore
         // permitted to see private information and edit the record
         $isOwner	        = $indiv->isOwner();
+        $i++;
 
         // extract fields from individual 
         $surname	        = $indiv->get('indexsurname');
@@ -514,7 +517,7 @@ if (strlen($msg) == 0)
         $private	        = $indiv->get('private');
         if ($isOwner || $private < 2)
         {		// existence of individual visible
-            print "$comma\n    \"$idir\" : {\n        \"idir\" : $idir";
+            print "$comma\n    \"$i\" : {\n        \"idir\" : $idir";
             $comma          = ',';
     		print ",\n        \"gender\" : ";
             switch($gender)

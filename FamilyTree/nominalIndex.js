@@ -448,9 +448,6 @@ function update()
 		if (debug.toLowerCase() == 'y')
 		    alert("nominalIndex.js: update: url='" + url + "'");
         var trace = "url=" + url + "<br>\n";
-        let para        = document.createElement('P');
-        para.innerHTML  = trace;
-        document.body.appendChild(para);
 		// invoke script to obtain list of names for selection list
         var options             = {"timeout"    : false};
 		HTTP.get(url,
@@ -506,9 +503,10 @@ function gotNames(obj)
 		    var	parms	                    = obj.parms;
             var persons                     = obj.persons;
 
-            for (var idir in persons)
+            for (var i in persons)
             {
-                var person                  = persons[idir];
+                var person                  = persons[i];
+                var idir                    = person.idir;
                 var gender                  = person.gender;
                 var name                    = person.name;
                 trace += "{idir=" + idir + ",gender=" + gender + ",name=" + name + "}<br>\n";
@@ -582,9 +580,9 @@ function gotNames(obj)
                 }
 		    }                           // name count < 51
 		}		                        // array of persons present
-        let para        = document.createElement('P');
-        para.innerHTML  = trace;
-        document.body.appendChild(para);
+        // let para        = document.createElement('P');
+        // para.innerHTML  = trace;
+        // document.body.appendChild(para);
     }               // response object present
     else
     {               // no response object
