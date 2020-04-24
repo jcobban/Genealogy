@@ -192,7 +192,6 @@ if (isset($_GET))
 }			    // invoked by GET
 
 $template		            = new FtTemplate("Register$lang.html", true);
-
 $template->set('CHKUSEMAIL',	$chkusemail);
 $template->set('CHKNOHELP',	    $chknohelp);
 $template->set('NEWUSERID',	    $newuserid);
@@ -200,43 +199,39 @@ $template->set('EMAIL',		    $email);
 $template['otherStylesheets']->update(array('filename'	=> '/Register'));
 
 // turn off all messages and then individually re-enable
-$template['shortUsername']->update( null);
-$template['badUsername']->update( null);
-$template['shortPassword']->update( null);
-$template['passwordMismatch']->update( null);
-$template['badEmail']->update( null);
-$template['initialPrompt']->update( null);
-$template['emailInUse']->update( null);
-$template['useridInUse']->update( null);
+$messages                       = array();
+$messages['shortUsername']		= null;
+$messages['badUsername']		= null;
+$messages['shortPassword']		= null;
+$messages['passwordMismatch']	= null;
+$messages['badEmail']		    = null;
+$messages['initialPrompt']		= null;
+$messages['emailInUse']		    = null;
+$messages['useridInUse']		= null;
 
 // validate parameters
 if (strlen($newuserid) > 0 ||
     (strlen($password) > 0 && strlen($password2) > 0))
 {		                // new registration supplied
     if (strlen($newuserid) < 6)
-		$template['shortUsername']->update(
-						     array('newuserid'  => $newuserid));
+		$messages['shortUsername']	= array('newuserid'  => $newuserid);
     if (!preg_match($uidPattern, $newuserid))
-		$template['badUsername']->update(
-						     array('newuserid'  => $newuserid));
+		$messages['badUsername']	= array('newuserid'  => $newuserid);
     if (strlen($password) < 6)
-		$template['shortPassword']->update(
-						     array('newuserid'	=> $newuserid,
-							       'password'	=> $password));
+		$messages['shortPassword']	= array('newuserid'	=> $newuserid,
+							                'password'	=> $password);
 
     if ($password != $password2)
-		$template['passwordMismatch']->update(
-						     array('newuserid'	=> $newuserid,
-							       'password'	=> $password,
-							       'password2'	=> $password2));
+		$messages['passwordMismatch']	= array('newuserid'	=> $newuserid,
+							                    'password'	=> $password,
+							                    'password2'	=> $password2);
 
     if (strlen($email) == 0 && strpos($newuserid, '@') !== false)
 		$email		= $newuserid;
 
     if (strlen($email) < 6 || strpos($email, '@') === false)
-		$template['badEmail']->update(
-						     array('newuserid'	=> $newuserid,
-						    	   'email'      => $email));
+		$messages['badEmail']	    = array('newuserid'	=> $newuserid,
+						    	            'email'      => $email);
     else
     {			        // validate e-mail
 		$user		    = new User(array('email'    => $email));
@@ -245,25 +240,35 @@ if (strlen($newuserid) > 0 ||
 		    $olduser	= $user->get('username');
 		    if ($newuserid != $olduser)
 		    {
-				$template['emailInUse']->update(
-							     array('newuserid'	=> $newuserid,
-								       'email'	    => $email));
-				$user	= null;
-		    }
-		}
+				$messages['emailInUse']	= array('newuserid'	=> $newuserid,
+								                'email'	    => $email);
+                $user	= null;
+                $template->set('TITLE', $template['titleAlready']->innerHTML);
+            }
+            else
+            {           // OK
+                $template->set('TITLE', $template['titleComplete']->innerHTML);
+            }           // OK
+		}               // email defined
 		else
 		{			    // check for userid already in use
 		    $user	    = new User(array('username' => $newuserid));
-		    if ($user->isExisting())
-				$template['useridInUse']->update(
-							     array('newuserid' => $newuserid));
+            if ($user->isExisting())
+            {
+				$messages['useridInUse']	= array('newuserid' => $newuserid);
+                $template->set('TITLE', $template['titleAlready']->innerHTML);
+            }
+            else
+            {           // OK
+                $template->set('TITLE', $template['titleComplete']->innerHTML);
+            }           // OK
 		}			    // check for userid already in use
     }			        // validate e-mail
 }		                // registration supplied
 else
 {		                // registration not supplied
-    $template['initialPrompt']->update(
-						 array('newuserid' => $newuserid));
+    $messages['initialPrompt']	            = array('newuserid' => $newuserid);
+    $template->set('TITLE', $template['titleNew']->innerHTML);
 }		                // registration not supplied
 
 // if there are no errors in validation, create the new account
@@ -320,8 +325,17 @@ else
     $template['titleAlready']->update( null);
     $template['okmsgRespond']->update( null);
     $template['okmsgAlready']->update( null);
-    $template['initialPrompt']->update(array('newuserid'	=> '',
-							                 'email'	    => ''));
+    $messages['initialPrompt']	        = array('newuserid'	=> '',
+							                    'email'	    => '');
 }		            // first entry with no parameters
+
+$template['shortUsername']->update($messages['shortUsername']);
+$template['badUsername']->update($messages['badUsername']);
+$template['shortPassword']->update($messages['shortPassword']);
+$template['passwordMismatch']->update($messages['passwordMismatch']);
+$template['badEmail']->update($messages['badEmail']);
+$template['initialPrompt']->update($messages['initialPrompt']);
+$template['emailInUse']->update($messages['emailInUse']);
+$template['useridInUse']->update($messages['useridInUse']);
 
 $template->display();

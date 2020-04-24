@@ -59,18 +59,19 @@ function onLoad()
 		th.onclick		    = columnClick;
 		th.oncontextmenu	= columnWiden;
     }			// loop through cells of header row
+
+    hideRightColumn();
 }		// function onLoad
 
 /************************************************************************
- *  function linkToTree														*
+ *  function linkToTree													*
  *																		*
- *  When a Link button is clicked a window is opened either to display		*
+ *  When a Link button is clicked a window is opened either to display	*
  *  an existing individual in the tree or to search for a match.		*
  *																		*
  *  Input:																*
- *		$this				<button type=button id='Link....'				*
+ *		$this				<button type=button id='Link....'			*
  ************************************************************************/
-
 function linkToTree()
 {
     var	form		= this.form;

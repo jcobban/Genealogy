@@ -35,6 +35,8 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
+ *		2020/04/16      recovery for missing records is in class        *
+ *		                CountyMarriageSet                               *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -416,7 +418,11 @@ else
 
 	if (strlen($msg) == 0)
 	{		// no errors detected
-	    // execute the query to get the contents of the page
+        // execute the query to get the contents of the page
+        if ($debug)
+            $warn   .= "<p>CountyMarriagesEdit.php: " .__LINE__ .
+                        " new CountyMarriageSet(" . 
+                        var_export($getParms, true) . ")</p>\n";
 	    $reports	= new CountyMarriageSet($getParms);
 	}		// no errors detected
 
@@ -455,19 +461,19 @@ else
 	    $create	= false;
 }			// initial report
 
-$minister	= null;
+$minister	            = null;
 if ($domain && $volume && $reportNo)
 {		// no errors detected
-	$getParms	= array('domain'	=> $domain,
-					'volume'	=> $volume,
-					'reportno'	=> $reportNo);
-	$minister	= new CountyMarriageReport($getParms);
+	$getParms	        = array('domain'	=> $domain,
+            					'volume'	=> $volume,
+			            		'reportno'	=> $reportNo);
+	$minister	        = new CountyMarriageReport($getParms);
 	if (!$minister->isExisting())
-	    $minister	= null;
+	    $minister	    = null;
 }		// no errors detected
 
-$title	= "$countryName: $province: Marriage Report ";
-$crumbs	= array(
+$title	                = "$countryName: $province: Marriage Report ";
+$crumbs	                = array(
 			'/genealogy.php'		=> 'Genealogy',
 			"/genCountry.php?cc=$cc"	=> $countryName,
 			"/Canada/genProvince.php?Domain=$domain"
@@ -475,21 +481,22 @@ $crumbs	= array(
 			"CountyMarriageEditQuery.php"	=> 'County Marriage Query');
 if ($volume)
 {
-	$title	.= "Volume $volume ";
+	$title	            .= "Volume $volume ";
 	$crumbs["CountyMarriageReportEdit.php?RegDomain=$domain&Volume=$volume"]
-				= 'Volume Summary';
+				        = 'Volume Summary';
 }
 if ($reportNo)
 {
-	$title	.= "Report No $reportNoText ";
-	$crumbs["CountyMarriagesEdit.php?Domain=$domain&Volume=$volume&ReportNo=$reportNoText"]		= 'Report';
+	$title	            .= "Report No $reportNoText ";
+    $crumbs["CountyMarriagesEdit.php?Domain=$domain&Volume=$volume&ReportNo=$reportNoText"]		        = 'Report';
+    $crumbs["CountyReportDetails.php?Domain=$domain&Volume=$volume&ReportNo=$reportNoText"]             = 'Minister';
 }
 if ($itemNo)
-	$title	.= "Item $itemNo ";
+	$title	            .= "Item $itemNo ";
 if ($create)
-	$title	.= "Create";
+	$title	            .= "Create";
 else
-	$title	.= "Update";
+	$title	            .= "Update";
 
 htmlHeader($title,
 	       array(	'/jscripts/CommonForm.js',
@@ -729,346 +736,241 @@ if (strlen($msg) == 0)
 <?php
 	    // display the results
 	    $reportNo		= 0;
-	    $page		= 1;
-	    $row		= 0;
+	    $page		    = 1;
+	    $row		    = 0;
 	    $nextRole		= 'G';
 	    $tempRecord		= null;
-	    $date		= '';
+	    $date		    = '';
 	    $licenseType	= 'L';
-	    $last		= end($reports);
-	    $first		= reset($reports);
+	    $last		    = end($reports);
+	    $first		    = reset($reports);
 	    foreach($reports as $record)
 	    {
-			while(true)
-			{
-			    $row++;
-			    if (strlen($row) == 1)
-				$row	= '0' . $row;
-			    $domain		= $record->get('domain'); 
-			    $volume		= $record->get('volume'); 
-			    $reportNo		= $record->get('reportno'); 
-			    if ($reportNo == floor($reportNo))
-				$reportNoText	= intval($reportNo);
-			    else
-				$reportNoText	= floor($reportNo) . '½';
-			    $itemNo		= $record->get('itemno'); 
-			    $role		= $record->get('role');
+			$itemNo		            = $record->get('itemno'); 
+			$role		            = $record->get('role');
+			$givennames		        = $record->get('givennames');
+			$surname		        = $record->get('surname');
+		    $row++;
+		    if ($row < 10)
+			    $row	    = '0' . $row;
+		    $domain		            = $record->get('domain'); 
+		    $volume		            = $record->get('volume'); 
+		    $reportNo		        = $record->get('reportno'); 
+		    if ($reportNo == floor($reportNo))
+			    $reportNoText	    = intval($reportNo);
+		    else
+			    $reportNoText	    = floor($reportNo) . '½';
+		    $itemNo		            = $record->get('itemno'); 
+		    $role		            = $record->get('role');
 
-			    if ($fixup && $role !== $nextRole)
-			    {		// insert missing record
-				$tempRecord		= $record;
-				if ($role == 'G')
-				{	// missing bride from previous marriage
-				    $itemNo		= $itemNo - 1;
-				    // initialize with defaults from Groom's record
-				    $record	= new CountyMarriage(array(
-					'm_regdomain'		=> $domain,
-					'm_volume'		=> $volume,
-					'm_reportno'		=> $reportNo,
-			 		'm_itemno'		=> $itemNo,
-			 		'm_role'		=> $nextRole,
-			 		'm_givennames'		=> '',
-			 		'm_surname'		=> '',
-			 		'm_surnamesoundex'	=> '',
-					'm_residence'		=> '',
-			 		'm_date'		=> $date,
-			 		'm_licensetype'		=> $licenseType,
-			 		'm_witnessname'		=> '',
-					'm_idir'		=> 0,
-					'm_remarks'		=> ''));
-				}	// missing bride from previous marriage
-				else
-				{	// missing groom from current marriage
-				    // get defaults from Bride's record
-				    $residence	= $record->get('residence');
-			 	    $date	= $record->get('date');
-			 	    $licenseType= $record->get('licensetype');
-				    $record	= new CountyMarriage(array(
-					'm_regdomain'		=> $domain,
-					'm_volume'		=> $volume,
-					'm_reportno'		=> $reportNo,
-			 		'm_itemno'		=> $itemNo,
-			 		'm_role'		=> $nextRole,
-			 		'm_givennames'		=> '',
-			 		'm_surname'		=> '',
-			 		'm_surnamesoundex'	=> '',
-					'm_residence'		=> $residence,
-			 		'm_date'		=> $date,
-			 		'm_licensetype'		=> $licenseType,
-			 		'm_witnessname'		=> '',
-					'm_idir'		=> 0,
-					'm_remarks'		=> ''));
-				}	// missing groom from current record
-				$role		= $nextRole;
-			    }		// insert missing record
+		    // get values in a form suitable for presenting in HTML
+		    $givennames				= $record->get('givennames');
+		    $givennames				= str_replace("'","&#39;",$givennames);
+		    $surname				= $record->get('surname');
+		    $surname				= str_replace("'","&#39;",$surname);
+		    $age	    			= $record->get('age'); 
+		    $residence				= $record->get('residence'); 
+		    $residence				= str_replace("'","&#39;",$residence);
+		    $birthplace				= $record->get('birthplace'); 
+		    $birthplace				= str_replace("'","&#39;",$birthplace);
+		    $fathername				= $record->get('fathername'); 
+		    $fathername				= str_replace("'","&#39;",$fathername);
+		    $mothername				= $record->get('mothername'); 
+		    $mothername				= str_replace("'","&#39;",$mothername);
+		    $witness				= $record->get('witnessname');
+		    $witness				= str_replace("'","&#39;",$witness);
+		    $remarks				= $record->get('remarks');
+		    $remarks				= str_replace("'","&#39;",$remarks);
+			$date                   = $record->get('date');
+			$licenseType            = $record->get('licensetype');
+		    $idir	                = $record->get('idir');
 
-			    // get values in a form suitable for presenting in HTML
-			    $givennames	= $record->get('givennames');
-			    $givennames	= str_replace("'","&#39;",$givennames);
-			    $surname	= $record->get('surname');
-			    $surname	= str_replace("'","&#39;",$surname);
-			    $age	= $record->get('age'); 
-			    $residence	= $record->get('residence'); 
-			    $residence	= str_replace("'","&#39;",$residence);
-			    $birthplace	= $record->get('birthplace'); 
-			    $birthplace	= str_replace("'","&#39;",$birthplace);
-			    $fathername	= $record->get('fathername'); 
-			    $fathername	= str_replace("'","&#39;",$fathername);
-			    $mothername	= $record->get('mothername'); 
-			    $mothername	= str_replace("'","&#39;",$mothername);
-			    $witness	= $record->get('witnessname');
-			    $witness	= str_replace("'","&#39;",$witness);
-			    $remarks	= $record->get('remarks');
-			    $remarks	= str_replace("'","&#39;",$remarks);
-			    if ($record->get('date') != '')
-				$date	= $record->get('date');
-			    if ($role == 'G')
-				$licenseType= $record->get('licensetype');
-			    $idir	= $record->get('idir');
-
-			    if ($role == 'G')
-			    {		// groom record
-				$sexclass	= 'male';
-				$nextRole	= 'B';
-				if ($date == '' || $licenseType == '')
-				{	// get marriage date from Bride
-				    $getParms	= array('domain'	=> $domain,	
-								'volume'	=> $volume,
-								'reportNo'	=> $reportNo,
-								'itemNo'	=> $itemNo,
-								'role'		=> 'B');
-				    try {
-					$bride	= new CountyMarriage($getParms);
-					if ($date == '')
-					    $date	= $bride->get('date');
-					if ($licenseType == '')
-					    $licenseType= $bride->get('licensetype');
-				    }
-				    catch(Exception $e) {
-					$warn	.= "<p>get bride failed: " . $e->getMessage() . "</p>\n<p>getParms=" . print_r($getParms, true) . "</p>\n";
-					
-					// stuck with missing date of marriage
-				    }
-				}	// get marriage date from Bride
-			    }		// groom record
-			    else
-			    {
-				$sexclass	= 'female';
-				$nextRole	= 'G';
-			    }
+		    if ($role == 'G')
+		    {		// groom record
+			    $sexclass	            = 'male';
+		    }		// groom record
+		    else
+		    {
+			    $sexclass	            = 'female';
+		    }
 ?>
   <tr id="Row<?php print $row; ?>">
 <?php
-			    if (!$showReport)
-			    {		// display report identification
+		    if (!$showReport)
+		    {		// display report identification
 ?>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="Domain<?php print $row; ?>"
-				id="Domain<?php print $row; ?>"
-				value="<?php print $domain; ?>"
-				class="<?php print $textclass; ?>"
-				size="4" maxlength="6" readonly="readonly">
-	</td>
-	<td class="right <?php print $sexclass; ?>">
-	    <input type="text" name="Volume<?php print $row; ?>"
-				id="Volume<?php print $row; ?>" 
-				value="<?php print $volume; ?>" 
-				class="<?php print $numclass; ?>"
-				<?php print $readonly; ?>
-				size="3" maxlength="5">
-	</td>
-	<td class="right <?php print $sexclass; ?>">
-	    <input type="text" name="ReportNo<?php print $row; ?>"
-				id="ReportNo<?php print $row; ?>" 
-				value="<?php print $reportNoText; ?>" 
-				class="<?php print $numclass; ?>"
-				<?php print $readonly; ?>
-				size="3" maxlength="5">
-	</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="Domain<?php print $row; ?>"
+			id="Domain<?php print $row; ?>"
+			value="<?php print $domain; ?>"
+			class="<?php print $textclass; ?>"
+			size="4" maxlength="6" readonly="readonly">
+</td>
+<td class="right <?php print $sexclass; ?>">
+    <input type="text" name="Volume<?php print $row; ?>"
+			id="Volume<?php print $row; ?>" 
+			value="<?php print $volume; ?>" 
+			class="<?php print $numclass; ?>"
+			<?php print $readonly; ?>
+			size="3" maxlength="5">
+</td>
+<td class="right <?php print $sexclass; ?>">
+    <input type="text" name="ReportNo<?php print $row; ?>"
+			id="ReportNo<?php print $row; ?>" 
+			value="<?php print $reportNoText; ?>" 
+			class="<?php print $numclass; ?>"
+			<?php print $readonly; ?>
+			size="3" maxlength="5">
+</td>
 <?php
-			    }		// display report identification
+		    }		// display report identification
 ?>
-	<td class="right <?php print $sexclass; ?>">
-	    <input type="text" name="ItemNo<?php print $row; ?>"
-				id="ItemNo<?php print $row; ?>"
-				value="<?php print $itemNo; ?>"
-				class="<?php print $numclass; ?>"
-				size="3" maxlength="3" readonly="readonly">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="Role<?php print $row; ?>" 
-				id="Role<?php print $row; ?>" 
-				value="<?php print $role; ?>" 
-				class="<?php print $sexclass; ?>"
-				<?php print $readonly; ?>
-				size="1" maxlength="1">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="GivenNames<?php print $row; ?>"
-				id="GivenNames<?php print $row; ?>" 
-				value="<?php print $givennames; ?>" 
-				class="<?php print $sexclass; ?>"
-				<?php print $readonly; ?>
-				size="16" maxlength="64">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="Surname<?php print $row; ?>"
-				id="Surname<?php print $row; ?>" 
-				value="<?php print $surname; ?>" 
-				class="<?php print $sexclass; ?>"
-				<?php print $readonly; ?>
-				size="16" maxlength="64">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="Age<?php print $row; ?>"
-				id="Age<?php print $row; ?>" 
-				value="<?php print $age; ?>" 
-				class="<?php print $numclass; ?>"
-				<?php print $readonly; ?>
-				size="6" maxlength="16">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="Residence<?php print $row; ?>"
-				id="Residence<?php print $row; ?>" 
-				value="<?php print $residence; ?>" 
-				class="<?php print $textclass; ?>"
-				<?php print $readonly; ?>
-				size="12" maxlength="32">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="BirthPlace<?php print $row; ?>"
-				id="BirthPlace<?php print $row; ?>" 
-				value="<?php print $birthplace; ?>" 
-				class="<?php print $textclass; ?>"
-				<?php print $readonly; ?>
-				size="12" maxlength="32">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="FatherName<?php print $row; ?>"
-				id="FatherName<?php print $row; ?>" 
-				value="<?php print $fathername; ?>" 
-				class="<?php print $textclass; ?>"
-				<?php print $readonly; ?>
-				size="12" maxlength="32">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="MotherName<?php print $row; ?>"
-				id="MotherName<?php print $row; ?>" 
-				value="<?php print $mothername; ?>" 
-				class="<?php print $textclass; ?>"
-				<?php print $readonly; ?>
-				size="12" maxlength="32">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="Date<?php print $row; ?>"
-				id="Date<?php print $row; ?>" 
-				value="<?php print $date; ?>" 
-				class="<?php print $textclass; ?>"
-				<?php print $readonly; ?>
-				size="12" maxlength="32">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="LicenseType<?php print $row; ?>"
-				id="LicenseType<?php print $row; ?>" 
-				value="<?php print $licenseType; ?>"
-				class="<?php print $textclass; ?>"
-				<?php print $readonly; ?>
-				size="1" maxlength="1">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="WitnessName<?php print $row; ?>"
-				id="WitnessName<?php print $row; ?>" 
-				value="<?php print $witness; ?>"
-				class="<?php print $textclass; ?>"
-				<?php print $readonly; ?>
-				size="16" maxlength="64">
-	</td>
-	<td class="left <?php print $sexclass; ?>">
-	    <input type="text" name="Remarks<?php print $row; ?>"
-				id="Remarks<?php print $row; ?>" 
-				value="<?php print $remarks; ?>" 
-				class="<?php print $textclass; ?>"
-				<?php print $readonly; ?>
-				size="16" maxlength="255">
-	</td>
-	<td class="center">
-	    <button type="button" class="button" 
-			id="Details<?php print $row; ?>">
-			Details
-	    </button> 
-	</td>
-	<td class="center">
-	    <button type="button" class="button"
-			id="Delete<?php print $row; ?>" <?php print $disabled; ?>>
-			Delete
-	    </button> 
-	</td>
-	<td class="center" style="white-space: nowrap">
+<td class="right <?php print $sexclass; ?>">
+    <input type="text" name="ItemNo<?php print $row; ?>"
+			id="ItemNo<?php print $row; ?>"
+			value="<?php print $itemNo; ?>"
+			class="<?php print $numclass; ?>"
+			size="3" maxlength="3" readonly="readonly">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="Role<?php print $row; ?>" 
+			id="Role<?php print $row; ?>" 
+			value="<?php print $role; ?>" 
+			class="<?php print $sexclass; ?>"
+			<?php print $readonly; ?>
+			size="1" maxlength="1">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="GivenNames<?php print $row; ?>"
+			id="GivenNames<?php print $row; ?>" 
+			value="<?php print $givennames; ?>" 
+			class="<?php print $sexclass; ?>"
+			<?php print $readonly; ?>
+			size="16" maxlength="64">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="Surname<?php print $row; ?>"
+			id="Surname<?php print $row; ?>" 
+			value="<?php print $surname; ?>" 
+			class="<?php print $sexclass; ?>"
+			<?php print $readonly; ?>
+			size="16" maxlength="64">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="Age<?php print $row; ?>"
+			id="Age<?php print $row; ?>" 
+			value="<?php print $age; ?>" 
+			class="<?php print $numclass; ?>"
+			<?php print $readonly; ?>
+			size="6" maxlength="16">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="Residence<?php print $row; ?>"
+			id="Residence<?php print $row; ?>" 
+			value="<?php print $residence; ?>" 
+			class="<?php print $textclass; ?>"
+			<?php print $readonly; ?>
+			size="12" maxlength="32">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="BirthPlace<?php print $row; ?>"
+			id="BirthPlace<?php print $row; ?>" 
+			value="<?php print $birthplace; ?>" 
+			class="<?php print $textclass; ?>"
+			<?php print $readonly; ?>
+			size="12" maxlength="32">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="FatherName<?php print $row; ?>"
+			id="FatherName<?php print $row; ?>" 
+			value="<?php print $fathername; ?>" 
+			class="<?php print $textclass; ?>"
+			<?php print $readonly; ?>
+			size="12" maxlength="32">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="MotherName<?php print $row; ?>"
+			id="MotherName<?php print $row; ?>" 
+			value="<?php print $mothername; ?>" 
+			class="<?php print $textclass; ?>"
+			<?php print $readonly; ?>
+			size="12" maxlength="32">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="Date<?php print $row; ?>"
+			id="Date<?php print $row; ?>" 
+			value="<?php print $date; ?>" 
+			class="<?php print $textclass; ?>"
+			<?php print $readonly; ?>
+			size="12" maxlength="32">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="LicenseType<?php print $row; ?>"
+			id="LicenseType<?php print $row; ?>" 
+			value="<?php print $licenseType; ?>"
+			class="<?php print $textclass; ?>"
+			<?php print $readonly; ?>
+			size="1" maxlength="1">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="WitnessName<?php print $row; ?>"
+			id="WitnessName<?php print $row; ?>" 
+			value="<?php print $witness; ?>"
+			class="<?php print $textclass; ?>"
+			<?php print $readonly; ?>
+			size="16" maxlength="64">
+</td>
+<td class="left <?php print $sexclass; ?>">
+    <input type="text" name="Remarks<?php print $row; ?>"
+			id="Remarks<?php print $row; ?>" 
+			value="<?php print $remarks; ?>" 
+			class="<?php print $textclass; ?>"
+			<?php print $readonly; ?>
+			size="16" maxlength="255">
+</td>
+<td class="center">
+    <button type="button" class="button" 
+		id="Details<?php print $row; ?>">
+		Details
+    </button> 
+</td>
+<td class="center">
+    <button type="button" class="button"
+		id="Delete<?php print $row; ?>" <?php print $disabled; ?>>
+		Delete
+    </button> 
+</td>
+<td class="center" style="white-space: nowrap">
 <?php
-			    if ($idir > 0)
-			    {		// link to family tree
+		    if ($idir > 0)
+		    {		// link to family tree
 ?>
-	    <button type="button" class="button" id="Link<?php print $row; ?>"
-				style="color: green;">
-			Tree
-	    </button>
-	    <button type="button" class="button" id="Clear<?php print $row; ?>"
-				<?php print $disabled; ?>>
-			Clear
-	    </button>
+    <button type="button" class="button" id="Link<?php print $row; ?>"
+			style="color: green;">
+		Tree
+    </button>
+    <button type="button" class="button" id="Clear<?php print $row; ?>"
+			<?php print $disabled; ?>>
+		Clear
+    </button>
 <?php
-			    }		// link to family tree
-			    else
-			    {		// no link to family tree
+		    }		// link to family tree
+		    else
+		    {		// no link to family tree
 ?>
-	    <button type="button" class="button" id="Link<?php print $row; ?>"
-				<?php print $disabled; ?>>
-			Find
-	    </button>
+    <button type="button" class="button" id="Link<?php print $row; ?>"
+			<?php print $disabled; ?>>
+		Find
+    </button>
 <?php
-			    }		// no link to family tree
+		    }		// no link to family tree
 ?>
-	    <input type="hidden" id="IDIR<?php print $row; ?>"
-			name="IDIR<?php print $row; ?>" value="<?php print $idir; ?>">
-	</td>
+    <input type="hidden" id="IDIR<?php print $row; ?>"
+		name="IDIR<?php print $row; ?>" value="<?php print $idir; ?>">
+</td>
   </tr>
 <?php
-			    // if we still have to process the temporary record
-			    // inserted to correct missing marriage partners
-			    // repeat the above once more with the temporary record
-
-			    if ($record === $last && $role == 'G')
-			    {		// missing bride from last marriage
-				// initialize with defaults from Groom's record
-				$record	= new CountyMarriage(array(
-					'm_regdomain'		=> $domain,
-					'm_volume'		=> $volume,
-					'm_reportno'		=> $reportNo,
-			 		'm_itemno'		=> $itemNo,
-			 		'm_role'		=> 'B',
-			 		'm_givennames'		=> '',
-			 		'm_surname'		=> '',
-			 		'm_surnamesoundex'	=> '',
-					'm_residence'		=> '',
-			 		'm_date'		=> $date,
-			 		'm_licensetype'		=> $licenseType,
-			 		'm_witnessname'		=> '',
-					'm_idir'		=> 0,
-					'm_remarks'		=> ''));
-				$tempRecord	= null;
-				continue;
-			    }		// missing bride from last marriage
-			    else
-			    if (is_null($tempRecord))
-				break;
-			    else
-			    {	// need to make another pass
-				$record		= $tempRecord;
-				$tempRecord	= null;
-				continue;
-			    }	// need to make another pass
-			}	// while looping
-	    }		// process all rows
+	    }		            // process all rows
 ?>
 </tbody>
   </table>

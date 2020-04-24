@@ -289,6 +289,17 @@ function loadEdit()
 				    break;
 				}		// event location
 
+				case 'temple':
+				{		// event temple
+                    alert('editEvent.js: loadEdit: temple');
+				    element.addEventListener('focus', focusLocation);
+				    element.addEventListener('keydown',inputKeyDown);
+				    element.abbrTbl	    = evtLocAbbrs;
+				    element.onchange	= templeChanged;
+				    break;
+				}		// event temple
+
+				case 'templeReady':
 				case 'templeReady':
 				case 'cremated':
 				case 'title':

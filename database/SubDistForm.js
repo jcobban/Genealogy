@@ -238,6 +238,8 @@ function onLoadSub()
     // set the focus to the first element of the first row
     firstElt.focus();
     firstElt.select();
+
+    hideRightColumn();
 }		// onLoadSub
 
 /************************************************************************

@@ -440,6 +440,12 @@ else
     $msg	        .= "Registration Number $regNum must be a number. ";
 
 // the number of the immediately preceding and following registrations
+if (!ctype_digit($regNum))
+{
+    error_log("MarriageRegDetail.php: " . __LINE__ .
+        " \$regNum='$regNum' is not a number)\n");
+    $regNum         = intval($regNum);
+}
 if (!isset($volume) || ($volume == '' && $regNum > 9999))
     $volume	        = floor($regNum/10000);
 if ($regYear <= 1872 && isset($volume)) 
@@ -457,19 +463,19 @@ if ($regYear <= 1872 && isset($volume))
     else
     if ($regNum % 10 == 3)
     {
-        $prevNum	= $regNum - 1;
-        $nextNum	= $regNum + 8;
+        $prevNum	= intval($regNum) - 1;
+        $nextNum	= intval($regNum) + 8;
     }
     else
     {
-        $prevNum	= $regNum - 1;
-        $nextNum	= $regNum + 1;
+        $prevNum	= intval($regNum) - 1;
+        $nextNum	= intval($regNum) + 1;
     }
 }
 else
 {		// sequentially numbered
-    $prevNum	    = $regNum - 1;
-    $nextNum	    = $regNum + 1;
+    $prevNum	    = intval($regNum) - 1;
+    $nextNum	    = intval($regNum) + 1;
 }		// sequentially numbered
 
 // get information about the administrative domain

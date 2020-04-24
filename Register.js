@@ -293,7 +293,7 @@ function scorePassword(pass)
  ************************************************************************/
 function generatePassword()
 {
-    var	randArray	= new Uint32Array(12);
+    var	randArray	= new Uint32Array(32);
     window.crypto.getRandomValues(randArray);
     var	newPass		= [];
     for(var i = 0; i < randArray.length; i++)

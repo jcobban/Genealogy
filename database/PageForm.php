@@ -98,6 +98,8 @@ $province				= null;		    // province for pre-confederation
 $distId		    		= null;
 $subdistId				= null;
 $division				= '';
+$offset                 = 0;
+$limit                  = 20;
 $lang		    	    = 'en';
 $npprev                 = '';
 $npnext                 = '';
@@ -151,6 +153,20 @@ if (isset($_GET) && count($_GET) > 0)
 	    		$division		    = strtoupper($value);
 	    		break;
 	        }		// enumeration division
+
+	        case 'offset':
+            {		// offset in page set
+                if (ctype_digit($value))
+	    		    $offset         = $value;
+	    		break;
+	        }		// starting offset in page set
+
+	        case 'limit':
+	        {		// maximum number of pages to display
+                if (ctype_digit($value))
+	    		    $limit          = $value;
+	    		break;
+	        }		// maximum number of pages to display
 
 	        case 'lang':
 	        {		// language

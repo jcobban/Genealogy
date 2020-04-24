@@ -24,8 +24,9 @@
  *		2019/02/06      session status moved to link in menu            *
  *		2019/02/08      use addEventListener                            *
  *		2019/12/03      change random password generator to exclude "   *
+ *		2020/04/23      increase generated password length to 32        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -361,7 +362,7 @@ function scorePassword(pass)
 var charset     = "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 function generatePassword()
 {
-    var	randArray	    = new Uint32Array(12);
+    var	randArray	    = new Uint32Array(32);
     window.crypto.getRandomValues(randArray);
     var	password		= '';
     for(var i = 0; i < randArray.length; i++)

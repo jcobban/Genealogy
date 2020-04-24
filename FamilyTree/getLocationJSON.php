@@ -48,6 +48,7 @@ use \Exception;
  *		                Javascript function locationChanged             *
  *		2019/11/18      return JSON instead of XML                      *
  *		                correct escaping SQL command in response        *
+ *		2020/04/12      ensure response in name order                   *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -166,9 +167,11 @@ else
                                 str_replace('\\','\\\\',$query)) . "\",\n";
     print "    \"locations\" : {\n    ";
     $comma              = '';
+    $i                  = 0;
     foreach($locations as $idlr => $location)
     {			// run through all matching locations
-        print "$comma\n    \"$idlr\" :\n       ";
+        $i++;
+        print "$comma\n    \"$i\" :\n       ";
         $comma          = ',';
         $location->toJson('location');
     }			// run through all matching locations

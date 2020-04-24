@@ -461,8 +461,11 @@ if (strlen($msg) == 0)
     print "      \"cmd\" : \"new PersonSet($msgParms)\"";
     $result		                    = new PersonSet($getParms);
     $info		                    = $result->getInformation();
-    print ",\n      \"query\" : \"" . $info['query'] . "\"";
-    $count		                    = $info['count'];
+    print ",\n      \"query\" : \"" . str_replace('"', '\\"', $info['query']) . "\"";
+    if (isset($info['count']))
+        $count		                = $info['count'];
+    else
+        $count                      = 0;
     print ",\n      \"count\" : $count";
 
     // iterate through results

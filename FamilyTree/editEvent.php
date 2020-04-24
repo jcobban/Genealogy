@@ -1869,6 +1869,7 @@ if (strlen($msg) == 0 && !is_null($idir))
 	                    '/jscripts/util.js',
 	                    '/jscripts/Cookie.js',
 	                    '/jscripts/locationCommon.js',
+	                    '/jscripts/templeCommon.js',
 	                    'editEvent.js'),
 	            true, 'dialog');
 ?>
@@ -2088,49 +2089,17 @@ debug:
     <div class="row" id="locationRow">
 <?php
         if ($location instanceof Temple)
-        {		// select from list of temples
+        {		// Temple
             $idtr	= $location->getIdtr();
 ?>
       <label class="column1" for="temple">
     Temple:
       </label>
-    <select name="temple" id="temple" class="white left">
+    <input type="text" name="temple" id="temple"
+            class="white leftnc" size="64" maxlength="255"
+            <?php print $readonly; ?> value="<?php print $locName; ?>">
 <?php
-        if ($idtr == 0)
-            $selected	= 'selected="selected"';
-        else
-            $selected	= '';
-?>
-            <option value="0" <?php print $selected;?>>
-                Choose a Temple:
-            </option>
-<?php
-            $temples	= new RecordSet('Temples');
-
-            foreach($temples as $oidtr 	=> $temple)
-            {	// loop through all temples
-                $templeName	= $temple->getName();
-                if ($oidtr == $idtr)
-                {			// selected
-?>
-            <option value="<?php print $oidtr; ?>" selected="selected">
-                <?php print $templeName;?> 
-            </option>
-<?php
-                }			// selected
-                else
-                {			// not selected
-?>
-            <option value="<?php print $oidtr; ?>">
-                <?php print $templeName;?> 
-            </option>
-<?php
-                }			// not selected
-            }	// loop through all temples
-?>
-    </select>
-<?php
-        }		// select from list of temples
+        }		// Temple
         else
         {		// Location
 ?>
@@ -2981,6 +2950,7 @@ showTrace();
 	    Loading...
     </div>
 <?php
-$warn   .= "<p>calling dialogBot</p>\n";
+include $document_root . '/templates/LocationDialogsen.html';
+include $document_root . '/templates/TempleDialogsen.html';
 dialogBot();
 ?>

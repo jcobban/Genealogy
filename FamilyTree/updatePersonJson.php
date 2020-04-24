@@ -201,6 +201,7 @@ require_once __NAMESPACE__ . '/common.inc';
 // start document
 print "{\n";
 $comma                      = '';
+$debug                      = false;
 
 // get original values of some fields in the record
 // in case these fields are not updated by this request
@@ -224,7 +225,7 @@ try {
 
     // provide list of parameters in feedback
     if (count($_POST) > 0)
-	    {
+	{
 	    print "\"parms\":\n\t{\n";
 	
 	    foreach($_POST as $name => $value)
@@ -297,22 +298,16 @@ try {
 	            case 'idcr':
 	            {		// link to parents
 	                $idcr		    = $value;
-	                $olddebug	    = $debug;
-	                $debug		    = false;
 	                if ($idcr > 0)
 	                    $childr	    = new Child(array('idcr' => $idcr));
-	                $debug		    = $olddebug;
 	                break;
 	            }		// idcr
 	
 	            case 'parentsidmr':
 	            {
 	                $idmr		    = $value;
-	                $olddebug	    = $debug;
-	                $debug		    = false;
 	                if ($idmr > 0)
 	                    $family	    = new Family(array('idmr' => $idmr));
-	                $debug	        = $olddebug;
 	                break;
 	            }		// IDMR value of parents
 	
@@ -422,15 +417,20 @@ try {
 	
 	            case 'eventdate':
 	            {			// generic event date
-	                $eventDate		= $value;
+                    $eventDate		= $value;
+                    $dateObj        = new LegacyDate($value);
+                    $string         = $dateObj->toString();
+                    $message        = $dateObj->getMessage();
 	                $clearEvent		= 'event';
-	                if ($event)
-	                    $event->setDate($value);
+                    if ($event)
+                    {
+                        $event->setDate($dateObj);
+                    }
 	                else
 	                {
 	                    error_log('updatePersonJson.php: ' . __LINE__ .
-	                    " $name='$value', \$event is null, " .
-	                    ' $_POST=' . print_r($_POST, true) . "\n");
+	                        " $name='$value', \$event is null, " .
+	                        ' $_POST=' . print_r($_POST, true) . "\n");
 	                }
 	                break;
 	            }			// generic event date

@@ -104,7 +104,7 @@ function onLoad()
     // in the form
     var firstElt	= null;
     var msg		= '';	// accumulate diagnostics for alert
-    var	namePattern	= /^([^0-9]*)([0-9]{2,3})$/
+    var	namePattern	= /^([^0-9]*)([0-9]*)$/
 
     for (var fi = 0; fi < document.forms.length; fi++)
     {			// loop through all forms

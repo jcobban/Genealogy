@@ -60,6 +60,7 @@
  *		                lot to put lot first                            *
  *		2019/11/18      use getLocationJSON.php                         *
  *		2020/03/04      loading of dialogs moved to FtTemplate          *
+ *		2020/04/14      do not include descriptive prefixes in search   *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -150,6 +151,8 @@ var	deferSubmit	        = false;
  *		this			an instance of <input type='text'>			    *
  *		ev              Javascript change Event                         *
  ************************************************************************/
+var housePattern            = new RegExp('^(House|Residence) [a-zA-Z \']*, *');
+
 function locationChanged(ev)
 {
     var	form			        = this.form;
@@ -236,24 +239,33 @@ function locationChanged(ev)
 
     // if possible display a loading indicator to the user so he/she is
     // aware that the location lookup is being performed
-    var loc             = this.value.toLowerCase();
+    var loc                     = this.value.toLowerCase();
     if (loc.length != 0 && loc != '[blank]' && loc != '[n/a]')
-    {		// search only for non-blank location
+    {		                // search only for non-blank location
 		popupLoading(this);
 
 		// get an XML file containing location information from the database
-        var loc         = this.value;
-    var options             = {};
-    options.errorHandler    = function() {alert('script getLocationJSON.php not found on the server')};
-		var url	= "/FamilyTree/getLocationJSON.php?name=" +
-						encodeURIComponent(loc) +
-						"&form=" + this.form.name +
-						"&field=" + this.name;
+        var loc                 = this.value;
+        var results             = housePattern.exec(loc);
+        var locPrefix           = '';
+        if (results !== null)
+        {
+            locPrefix           = results[0];
+            var l               = locPrefix.length;
+            loc                 = loc.substring(l);
+        }
+        var options             = {};
+        options.errorHandler    = function() {alert('script getLocationJSON.php not found on the server')};
+		var url	                = "/FamilyTree/getLocationJSON.php?name=" +
+									encodeURIComponent(loc) +
+									"&form=" + this.form.name +
+									"&field=" + this.name +
+									"&prefix=" + encodeURIComponent(locPrefix);
 		HTTP.get(url,
 				 gotLocationJSON,
 				 options);
         deferSubmit			    = true;
-    }		// search only for non-blank location
+    }		                // search only for non-blank location
     else
         deferSubmit			    = false;
 }		// function locationChanged
@@ -307,106 +319,116 @@ function gotLocationJSON(response)
 		var name	    		= '';		// search argument
         if ('name' in response.parms)
             name                = response.parms.name;
+		var prefix	    		= '';		// location name prefix
+        if ('prefix' in response.parms)
+            prefix              = response.parms.prefix;
 
 		// locate the form containing the element that initiated the request
 		var	form	            = document.forms[formname];
-		if (form === undefined)
-		{		// form not found
+		if (form instanceof HTMLFormElement)
+        {                   // have form
+			// locate the element that initiated the request
+			var	element	        = form.elements[field];
+			if (element instanceof Element)
+            {               // name identifies Element
+				// if there is exactly one location matching the request then
+				// replace the text value of the element with the full location
+				// name from the database
+				if (count == 1)
+				{		    // exactly one matching entry
+				    for(var idlr in response.locations)
+				    {		// examine the one location
+						var loc         = response.locations[idlr];
+		                element.value   = prefix + loc['location'];
+				    }		// examine the one location
+
+				    // location field is updated
+				    deferSubmit			= false;
+				    var	updateButton	= document.getElementById('updEvent');
+				    if (updateButton)
+						updateButton.disabled	= false;
+
+				    // check for action to take after changed
+				    if (element.afterChange)
+						element.afterChange();
+				    else
+						focusNext(element);
+				}		    // exactly one matching location
+				else
+				if (count == 0)
+				{		    // no matching entries
+					var parms           = {"template"	: "",
+		        					        "name"	    : name,
+				        			        "formname"	: formname,
+						        	        "field"	    : field};
+					displayDialog('NewLocationMsg$template',
+							      parms,
+							      element,		    // position
+							      closeNewDialog);	// button closes dialog
+				}		    // no matching entries
+				else
+				{		    // multiple matching entries
+					var parms	            = { "template"	: "",
+		        					            "name"	    : name};
+					var dialog  = displayDialog('ChooseLocationMsg$template',
+									    	    parms,
+									    	    element,	// position
+									    	    null,		// button closes
+									    	    true);		// defer show
+
+					// update selection list for choice
+		            var form            = dialog.getElementsByTagName('form')[0];
+					var	select	        = form.locationSelect;
+					select.onchange	    = locationChosen;
+					select.setAttribute("for", field);
+					select.setAttribute("formname", formname);
+
+				    for(var i in response.locations)
+				    {		    // loop through the locations
+						var loc             = response.locations[i];
+						var	idlr	        = loc.idlr;
+						var	locname	        = loc.location;
+
+						// create option element under select
+						var	option	        = new Option(locname,
+		        					        		     idlr, 
+			        				        		     false, 
+				        			        		     false);
+						// IE<8 does not create option element correctly
+						option.innerHTML	= locname;
+						option.value		= idlr;	
+						select.appendChild(option);
+					}	        // loop through children of top node
+					select.selectedIndex	= 0;
+
+					// make the dialog visible
+					show(msgDiv);
+					// the following is a workaround for a bug in FF 40.0 and
+					// Chromium in which the onchange method of the <select> is
+					// not called when the mouse is clicked on an option
+					for(var io=0; io < select.options.length; io++)
+					{
+					    var option	= select.options[io];
+					    option.addEventListener("click",
+                                                function() 
+                                                {   this.selected = true;
+                                                this.parentNode.onchange();});
+					}
+					select.focus();
+				}		        // multiple matching entries
+            }                   // name identifies Element
+            else
+			{		            // element not found
+			    alert("locationCommon.js: gotLocationJSON: element name='" +
+                        field +
+						"' not found in form");
+			}		            // element not found
+        }                       // have form
+        else
+		{		                // form not found
 		    alert("locationCommon.js: gotLocationJSON: form name='" + formname +
 					"' not found");
-		    return;
-		}		// form not found
-
-		// locate the element that initiated the request
-		var	element	            = form.elements[field];
-		if (element === undefined)
-		{		// element not found
-		    alert("locationCommon.js: gotLocationJSON: element name='" + field +
-					"' not found in form");
-		    return;
-		}		// element not found
-
-		// if there is exactly one location matching the request then
-		// replace the text value of the element with the full location
-		// name from the database
-		if (count == 1)
-		{		// exactly one matching entry
-		    for(var idlr in response.locations)
-		    {		// loop through the one location
-				var loc         = response.locations[idlr];
-                element.value   = loc['location'];
-		    }		// loop through the one location
-
-		    // location field is updated
-		    deferSubmit			    = false;
-		    var	updateButton		= document.getElementById('updEvent');
-		    if (updateButton)
-				updateButton.disabled	= false;
-
-		    // check for action to take after changed
-		    if (element.afterChange)
-				element.afterChange();
-		    else
-				focusNext(element);
-		}		// exactly one matching location
-		else
-		if (count == 0)
-		{		// no matching entries
-			var parms   = {"template"	: "",
-					        "name"	    : name,
-					        "formname"	: formname,
-					        "field"	    : field};
-			displayDialog('NewLocationMsg$template',
-					      parms,
-					      element,		// position
-					      closeNewDialog);	// button closes dialog
-		}		// no matching entries
-		else
-		{		// multiple matching entries
-			var parms	= { "template"	: "",
-					        "name"	    : name};
-			var dialog  = displayDialog('ChooseLocationMsg$template',
-							    	    parms,
-							    	    element,	// position
-							    	    null,		// button closes dialog
-							    	    true);		// defer show
-
-			// update selection list for choice
-            var form        = dialog.getElementsByTagName('form')[0];
-			var	select	    = form.locationSelect;
-			select.onchange	= locationChosen;
-			select.setAttribute("for", field);
-			select.setAttribute("formname", formname);
-			    
-		    for(var idlr in response.locations)
-		    {		// loop through the locations
-				var loc         = response.locations[idlr];
-				var	locname	    = loc['location'];
-
-				// create option element under select
-				var	option	        = new Option(locname,
-        					        		     idlr, 
-	        				        		     false, 
-		        			        		     false);
-				// IE<8 does not create option element correctly
-				option.innerHTML	= locname;
-				option.value		= idlr;	
-				select.appendChild(option);
-			}	                // loop through children of top node
-			select.selectedIndex	= 0;
-
-			// make the dialog visible
-			show(msgDiv);
-			// the following is a workaround for a bug in FF 40.0 and
-			// Chromium in which the onchange method of the <select> is
-			// not called when the mouse is clicked on an option
-			for(var io=0; io < select.options.length; io++)
-			{
-			    var option	= select.options[io];
-			    option.addEventListener("click", function() {this.selected = true; this.parentNode.onchange();});
-			}
-			select.focus();
-		}		                // multiple matching entries
+		}		                // form not found
     }	        		        // valid response
 
     hideLoading();	// hide the "loading" indicator

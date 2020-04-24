@@ -476,6 +476,8 @@ function onLoad()
 		    th.oncontextmenu	= columnWiden;
 		}			// loop through cells of header row
     }
+
+    hideRightColumn();
 }		// function onLoad
 
 /************************************************************************

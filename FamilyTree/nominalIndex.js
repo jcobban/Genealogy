@@ -450,6 +450,7 @@ function update()
         var trace = "url=" + url + "<br>\n";
 		// invoke script to obtain list of names for selection list
         var options             = {"timeout"    : false};
+        console.log('nominalIndex.js: update: url=' + url + "\n");
 		HTTP.get(url,
 				 gotNames,
 				 options);

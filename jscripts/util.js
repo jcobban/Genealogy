@@ -215,6 +215,8 @@
  *		2020/03/09      remove facebook                                 *
  *		2020/03/31      display advertisement only after loading        *
  *		                page to speed up page initialization            *
+ *		2020/04/19      on resize hide right column if not enough room  *
+ *		                or redisplay is there is enough room            *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -2455,6 +2457,47 @@ function commonResize(event)
         }               // page contains pagination row
     }                   // page contains display of tabular results
 
+    var headSection             = document.getElementById('headSection');
+	var mainSection             = document.getElementById('mainSection');
+	var rightColumn             = document.getElementById('rightColumn');
+    if (rightColumn)
+    {                           // right column defined
+	    var windWidth           = window.innerWidth;
+	    var windHeight          = window.innerHeight;
+	    var headHeight          = headSection.offsetHeight;
+	    var headWidth           = headSection.offsetWidth;
+        if (windWidth > 1100)
+        {
+	        mainSection.style.width     = (windWidth - 320) + 'px';
+            rightColumn.style.height    = (windHeight - headHeight - 10) + 'px';
+            rightColumn.style.display   = 'block';
+        }
+        else
+        {
+	        mainSection.style.width     = '100%';
+            rightColumn.style.display   = 'none';
+        }
+
+        var useridElt           = document.getElementById('UserInfoUserid');
+        var userid              = useridElt.innerHTML.trim();
+        if (userid.length > 0)
+        {
+            var collectElt      = document.getElementById('collection');
+            if (collectElt)
+                collectElt.style.display    = 'none';
+        }
+        else
+        {
+            var welcomeElt      = document.getElementById('userWelcome');
+            if (welcomeElt)
+                welcomeElt.style.display    = 'none';
+        }
+
+    }                           // right column defined
+    else
+    {
+	    mainSection.style.width             = '100%';
+    }
 }		// function commonResize
 
 /************************************************************************

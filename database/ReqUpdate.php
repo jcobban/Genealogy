@@ -118,8 +118,15 @@ $provList               = array();
 for($io = 0; $io < strlen($provinces); $io += $cl)
 {		        // loop through provinces
     $province		    = substr($provinces, $io, $cl);
-	$domainObj	        = $domainset["$cc$province"];
-    $provinceName	    = $domainObj->get('name');
+    $domainObj	        = $domainset["$cc$province"];
+    if (is_null($domainObj))
+    {
+        error_log("ReqUpdate.php: " . __LINE__ .
+                    " no entry in \$domainset for '$cc$province'\n");
+        $provinceName   = "$cc$province";
+    }
+    else
+        $provinceName	= $domainObj->get('name');
     if ($census->get('collective'))
         $provList[]     = array('censusid'      => $province . $censusYear,
                                 'province'      => $province,

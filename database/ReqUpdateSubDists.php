@@ -49,6 +49,8 @@ $censusYear					= '';
 $provinces					= '';
 $province					= 'CW';
 $distId				    	= null;
+$lang                       = 'en';
+
 if (isset($_GET) && count($_GET) > 0)
 {	        	        // invoked by URL
     $parmsText              = "<p class='label'>\$_GET</p>\n" .

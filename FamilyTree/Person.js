@@ -177,7 +177,7 @@ var	geocoder	        = null;
  ************************************************************************/
 function onLoad()
 {
-    document.body.onresize	= onWindowResize;
+    addEventHandler(window, "resize", personWindowResize);
 
     // set action methods for form
     var	invoker	            = window.opener;
@@ -392,7 +392,7 @@ function onLoad()
 }		// function onLoad
 
 /************************************************************************
- *  function onWindowResize												*
+ *  function personWindowResize											*
  *																		*
  *  This method is called when the browser window size is changed.		*
  *  If the window is split between the main display and a second		*
@@ -400,12 +400,13 @@ function onLoad()
  *																		*
  *  Input:																*
  *		this		<body> element										*
+ *		ev          Javascript resize Event                             *
  ************************************************************************/
-function onWindowResize()
+function personWindowResize(ev)
 {
     if (iframe)
 		openFrame(iframe.name, null, "right");
-}		// function onWindowResize
+}		// function personWindowResize
 
 /************************************************************************
  *  function initializeMaps												*

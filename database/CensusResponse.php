@@ -136,6 +136,7 @@ use \Exception;
  *		2019/12/04      did not set lang parameter on rows              *
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2020/03/24      use CensusLine pseudo-field 'sexclass'          *
+ *		2020/04/16      move template ahead of validation               *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -151,6 +152,7 @@ require_once __NAMESPACE__ . '/common.inc';
 
 $censusYear				= 1881;		    // census year
 $censusId				= 'CA1881';	
+$censusRec              = null;         // instance of Census
 $cc					    = 'CA';	    	// country code
 $countryName			= 'Canada'; 	// country name
 $province				= 'ON';	    	// province/state code
@@ -164,7 +166,7 @@ $range					= 1;	    	// default 1 year either side age/byear
 $page					= null;	    	// default any page
 $family					= '';	    	// default any family
 $lang					= 'en';		    // default language
-$orderBy				= 'Name';   	// default order alphabetically
+$orderBy				= 'NAME';   	// default order alphabetically
 $SurnameSoundex			= false;    	// check text of surname, not soundex
 $result					= array();
 $respDesc				= '';		
@@ -201,57 +203,42 @@ if (isset($_GET) && count($_GET) > 0)
 	    if ((is_string($value) && strlen($value) > 0) ||
 			is_array($value))
 	    {
-			$fieldLc			= strtolower($key);
+			$fieldLc			            = strtolower($key);
 			switch($fieldLc)
-			{			// switch on parameter name
+			{			                // switch on parameter name
 			    case 'census':
-			    {			// Census identifier
-					$parms[$fieldLc]	= $value;
-					$parmCount		    ++;
-					$censusId		    = $value;
-					$cc			        = strtoupper(substr($censusId, 0, 2));
-	
-					if (strtoupper(substr($censusId,2)) == 'ALL')
-					{		// special census identifier to search all
-					    $censusYear		= 'ALL';
-					    $province		= 'CW';	// for pre-confederation
-					}		// special census identifier
-					else
-					{		// full census identifier
-					    $censusRec	= new Census(array('censusid'	=> $value));
-					    if ($censusRec->isExisting())
-					    {
-							$censusYear	= substr($censusId, 2);
-							$partof		= $censusRec->get('partof');
-							if ($partof)
-							{
-							    $province	= $cc;
-							    $cc		= $partof;
-							}
-					    }
-					    else
-							$msg	.= "Census value '$censusId' invalid. ";
-					}		// full census identifier
+                {			            // Census identifier
+                    if (is_string($value) && strlen($value) >= 4)
+                    {                   // value passed
+                        $censusId		    = $value;
+					    $censusYear         = strtoupper(substr($censusId, 2));
+					    $parms[$fieldLc]	= $censusId;
+					    $parmCount		    ++;
+					    $cc			        = strtoupper(substr($censusId, 0, 2));
+                    }                   // value passed
 					break;
-			    }			// Census identifier
+			    }			            // Census identifier
 	
 			    case 'count':
 			    case 'limit':
-			    {			// limit number of rows returned
-					$parms['limit']		= $value;
-					if (ctype_digit($value) && $value >= 5 && $value <= 99)
-					    $limit		= intval($value);
+			    {			            // limit number of rows returned
+                    if (ctype_digit($value) && $value >= 5 && $value <= 99)
+                    {
+					    $limit		        = intval($value);
+                    }
 					else
-					    $msg		.=
+					    $msg		        .=
 					        "$key '$value' must be number between 5 and 99. ";
 					break;
-			    }			// limit number of rows returned
+			    }			            // limit number of rows returned
 	
 			    case 'offset':
-			    {			// starting offset
-					$parms[$fieldLc]		= $value;
-					if (preg_match("/^([0-9]{1,6})$/", $value))
-					    $offset		= (int)$value;
+			    {			            // starting offset
+                    if (ctype_digit($value) && $value < 999999)
+                    {
+					    $offset		        = (int)$value;
+                        $parms[$fieldLc]	= $offset;
+                    }
 					else
 					    $msg		.= "Row Offset must be an integer " .
 									   "between 0 and 999,999. ";
@@ -259,9 +246,10 @@ if (isset($_GET) && count($_GET) > 0)
 			    }			// starting offset
 	
 			    case 'orderby':
-			    {			// Override order of display
-					if ($value == 'Name' || $value == 'Line')
-					    $orderBy	= $value;
+                {			// Override order of display
+                    $temp                   = strtoupper($value);
+					if ($temp == 'NAME' || $temp == 'LINE')
+					    $orderBy	        = $temp;
 					else
 					    $msg	.= "Invalid value of OrderBy='$value'";
 					break;
@@ -297,7 +285,8 @@ if (isset($_GET) && count($_GET) > 0)
 					    $value > 0)
 					{
 					    $page		            = (int)$value;
-					    $orderBy		        = 'Line';
+                        $orderBy		        = 'LINE';
+                        $limit                  = 99;
 					    $parms[$fieldLc]		= $value;
 					    $parmCount++;
 					}
@@ -317,7 +306,7 @@ if (isset($_GET) && count($_GET) > 0)
 					    // value is normally a number but there are exceptions
 					    // and the field is stored as a string in the database
 					    $family		    = $value;
-					    $orderBy		= 'Line';
+					    $orderBy		= 'LINE';
 					}
                     else
                     if (strlen($value) > 0)
@@ -455,8 +444,43 @@ if (isset($_GET) && count($_GET) > 0)
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
 }
+
+// choose template 
+$showLine	        = $orderBy == "LINE";
+if ($showLine)
+	$showLineFile	= 'Line';
+else
+	$showLineFile	= '';
+if ($censusYear == 'ALL')
+	$file	        = "CensusResponseAll$showLineFile$lang.html";
+else
+	$file	        = "CensusResponse$showLineFile$lang.html";
+$template	= new FtTemplate($file);
+
+// validate parameters
 if ($parmCount == 0)
     $msg	        .= 'No parameters passed. ';
+	
+if ($censusId == 'CAALL')
+{		            // special census identifier to search all Canadian Censuses
+    $province		            = 'CW';	// for pre-confederation
+}		            // special census identifier
+else
+if (ctype_digit($censusYear))
+{		            // specific census identifier
+    $censusRec	                = new Census(array('censusid'	=> $censusId));
+    if ($censusRec->isExisting())
+    {
+		$partof		            = $censusRec->get('partof');
+		if ($partof)
+		{
+		    $province	        = $cc;
+		    $cc		            = $partof;
+		}
+    }
+    else
+		$msg	                .= "Census value '$censusId' invalid. ";
+}		            // specific census identifier
 
 // start constructing the forward and back links
 $queryString    	= urldecode($_SERVER['QUERY_STRING']);
@@ -465,12 +489,10 @@ $queryString    	= preg_replace('/&\w+=$/', '', $queryString);
 $queryString    	= preg_replace('/OrderBy=\w+&/i', '', $queryString);
 $queryString    	= preg_replace('/&Page=\d+/i', '', $queryString);
 $queryString    	= preg_replace('/&Family=\d+/i', '', $queryString);
-if ($debug)
-    $warn           .= "<p>query='$queryString'</p>\n";
+
 $npuri		    	= "CensusResponse.php?$queryString";	// base query
 $npPrev		    	= '';		                        // previous selection
 $npNext		    	= '';	                            // next selection
-$showLine	    	= false;	                        // include line number
 
 // the list of fields to be displayed and the form of the link clause
 // to obtain required information from the Districts and SubDistricts
@@ -524,24 +546,25 @@ else
 // now that the fields have all been validated we can
 // construct the WHERE clause of the query
 if (strlen($msg) == 0)
-{		// no errors in validation
+{		                    // no errors in validation
+    $parms['limit']		        = $limit;
     if (isset($join))
-		$parms['join']	= $join;
+		$parms['join']	        = $join;
 	if ($page)
-	{		// "Page"
-	    if ($orderBy == 'Line')
-	    {		        // request for whole page
-			$temp	        = $page - 1;
+	{		                // display within a Page
+	    if ($orderBy == 'LINE')
+	    {		            // request for whole page
+			$temp	            = $page - 1;
 			if ($temp > 0)
-			    $npPrev	    = "Page=$temp";
-			$temp	        = 1 + $page;	// ensure numeric add
-			$npNext	        = "Page=$temp";
-	    }		        // request for whole page
-	}		            // "Page"
+			    $npPrev	        = "Page=$temp";
+			$temp	            = 1 + $page;	// ensure numeric add
+			$npNext	            = "Page=$temp";
+	    }		            // request for whole page
+	}		                // display within a Page
 
 	if (ctype_digit($family))
 	{		            // Family
-	    if ($orderBy == "Line")
+	    if ($orderBy == "LINE")
 	    {		        // request for whole family
 			$temp	        = $family - 1;
 			if ($temp > 0)
@@ -552,15 +575,13 @@ if (strlen($msg) == 0)
 	}		            // "Family"
 
     // construct ORDER BY clause
-    if ($orderBy == "Line")
+    if ($orderBy == "LINE")
     {		// display lines in original order
-		$showLine	        = true;
 		$npuri		        .= "&OrderBy=Line";
 		$limit		        = 99;
     }		// display lines in original order
     else
     {		// display lines in alphabetical order
-		$showLine	        = false;
 		$npuri		        .= "&OrderBy=Name";
 		// URI components for backwards and forwards
 		// browser links
@@ -600,16 +621,21 @@ if (strlen($msg) == 0)
     }
 
     // execute the query
-    $parms['order']	        = $orderBy;
-    $result		            = new CensusLineSet($parms, $flds);
+    $parms['order']	                = ucfirst(strtolower($orderBy));
     if ($debug)
+		$warn		                .= "<p>CensusResponse.php: " . __LINE__ .
+            " new CensusLineSet(" . var_export($parms, true) .
+                                "," . var_export($flds, true) . ")</p>\n";
+    $result		                    = new CensusLineSet($parms, $flds);
+    $info		                    = $result->getInformation();
+    if (isset($info['query']))
     {
-		$warn		.= "<p>CensusResponse.php: " . __LINE__ .
-							" parms=" . print_r($parms, true) . "</p>\n";
-		$info		= $result->getInformation();
-		$warn		.= "<p>CensusResponse.php: " . __LINE__ .
-							" query='" . $info['query'] . "'</p>\n";
+        if ($debug)
+		    $warn		            .= "<p>CensusResponse.php: " . __LINE__ .
+                                        " query='" . $info['query'] . "'</p>\n";
     }
+    else
+        $msg		                .= "CensusLineSet creation failed. ";
 
     // add additional data to result rows
     $class		= 'odd';
@@ -795,15 +821,6 @@ if ($showLine && $page)
 }		// display whole page
 
     $title	= "$censusYear Census of $countryName Query Response";
-    if ($showLine)
-		$showLineFile	= 'Line';
-    else
-		$showLineFile	= '';
-    if ($censusYear == 'All')
-		$file	= "CensusResponseAll$showLineFile$lang.html";
-    else
-		$file	= "CensusResponse$showLineFile$lang.html";
-    $template	= new FtTemplate($file);
 
     $template->set('CENSUSYEAR', 		$censusYear);
     $template->set('COUNTRYNAME',		$countryName);

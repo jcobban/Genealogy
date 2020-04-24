@@ -182,6 +182,7 @@ foreach ($_GET as $key => $value)
         case 'area':
         case 'residence':
         {		// match anywhere in string
+            $value                  = str_replace('&','.',$value);
             $npuri		            .= "{$npand}{$key}=" . urlencode($value);
             $npand		            = '&amp;'; 
             $orderby	            = 'Surname, GivenName';

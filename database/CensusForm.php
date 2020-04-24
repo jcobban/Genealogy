@@ -406,6 +406,7 @@ if (strlen($province) == 0)
 	if ($tag)
 	    $tag->update(null);
 }
+
 if (strlen($division) == 0)
 {
 	$template['frontDiv']->update(null);
