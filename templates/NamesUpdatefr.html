@@ -6,8 +6,9 @@
  *																		*
  *  History:															*
  *		2018/10/27		created                                         *
+ *      2020/04/25      add message for invalid regular expression      *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
 	<a href="/index.html">Accueil</a>:
@@ -57,7 +58,7 @@
 	      IDNR:
         </label>
         <input type="input" class="ina rightnc" name="idnr" id="idnr"
-	            readonly="readonly"
+	            readonly="readonly" disabled="disabled"
 	            value="$IDNR">
         <div style="clear: both;"></div>
       </div>
@@ -106,6 +107,12 @@
 	  <a href="/FamilyTree/Surnames.php?soundex=$SOUNDEX"
 	  		id="soundexLink">
 	      Noms de famille avec le même Soundex '$SOUNDEX'
+	  </a>
+    </p>
+    <p class="label">
+	  <a href="/FamilyTree/Surnames.php?pattern=$PATTERNU&lang=$LANG"
+	  		id="patternLink">
+	      Noms de famille avec le même motif '$PATTERN'
 	  </a>
     </p>
     <hr>	<!-- start of blog section of page -->
@@ -193,6 +200,10 @@
 	<span id="missing">Liste des Personnes Manquantes Paramètre de Nom de Famille</span>
 	<span id="nosurname">Personnes sans nom de famille</span>
 	<span id="surname">Personnes avec nom de famille '$SURNAME'</span>
+    <span id="invalidPattern">
+        Le modèle $pattern n'est pas une expression régulière
+        prise en charge par le serveur SQL: 
+    </span>
     <div id="tranTab">
 		<span data-key="No">Aucune</span>
 		<span data-key="female">femelle</span>

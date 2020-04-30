@@ -7,9 +7,9 @@ use Templating\TemplateTag;
 use Templating\escape;
 
 /************************************************************************
- *  class FtTemplate									    			*
- *														                *
- *  History:															*
+ *  class FtTemplate                                                    *
+ *                                                                      *
+ *  History:                                                            *
  *      2019/04/08      split off from Template.inc                     *
  *      2019/05/17      change CONTACT... only if not already set       *
  *                      if called with something that is not the        *
@@ -26,15 +26,16 @@ use Templating\escape;
  *                      moved to FtTemplate class                       *
  *      2020/03/12      validate language code passed to tinyMCE        *
  *                      get date format from translate table            *
- *	    									                            *
- *  Copyright &copy; 2020 James A. Cobban All Rights Reserved			*
+ *      2020/03/31      defer loading advertisement                     *
+ *                                                                      *
+ *  Copyright &copy; 2020 James A. Cobban All Rights Reserved           *
  ************************************************************************/
 
 /************************************************************************
- *  class FTTemplate									    			*
- *														                *
- *  Class derived from Template to support pages in the Family Tree		*
- *  web-site that use /templates/pagexxx.html as the base layout.		*
+ *  class FTTemplate                                                    *
+ *                                                                      *
+ *  Class derived from Template to support pages in the Family Tree     *
+ *  web-site that use /templates/pagexxx.html as the base layout.       *
  ************************************************************************/
 
 // the classes User and Language need to be defined in order to execute this
@@ -50,8 +51,8 @@ class FtTemplate extends Template
 {
     /********************************************************************
      *  FtTemplate::lang                                                *
-     *													                *
-     *	The requested ISO language code.                                *
+     *                                                                  *
+     *  The requested ISO language code.                                *
      ********************************************************************/
     private $lang               = 'en';
     private $formatter          = null;
@@ -59,43 +60,43 @@ class FtTemplate extends Template
 
     /********************************************************************
      *  FtTemplate::trtemplate                                          *
-     *													                *
-     *	Instance of Template for translating to language	            *
+     *                                                                  *
+     *  Instance of Template for translating to language                *
      ********************************************************************/
     private $trtemplate         = null;
 
     /********************************************************************
-     *	function FtTemplate::__construct							    *
-     *													                *
-     *	Input:												            *
-     *		$include	a string containing the filename of a		    *
-     *		    	    template file.                      			*
-     *		    	    If this is "...pagell.html" or                  *
-     *		    	    "...dialogll.html" then this is the master      *
-     *		    	    page/dialog template.  Otherwise it is the name *
-     *		            of the language specific main include file.     *
-     *		            This string ends with "ll.html" where "ll"      *
-     *		            is the BCP 47 language code.  This string is a  *
-     *		            file name relative to the common templates      *
-     *		            directory "$document_root/templates/"           * 
-     *													                *
-     *	Examples:											            *
-     *	    $template = new FtTemplate("${tempBase}page$lang.html");    *
-     *		$template = new FtTemplate('genealogypl.html');				*
+     *  function FtTemplate::__construct                                *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $include    a string containing the filename of a           *
+     *                  template file.                                  *
+     *                  If this is "...pagell.html" or                  *
+     *                  "...dialogll.html" then this is the master      *
+     *                  page/dialog template.  Otherwise it is the name *
+     *                  of the language specific main include file.     *
+     *                  This string ends with "ll.html" where "ll"      *
+     *                  is the BCP 47 language code.  This string is a  *
+     *                  file name relative to the common templates      *
+     *                  directory "$document_root/templates/"           *
+     *                                                                  *
+     *  Examples:                                                       *
+     *      $template = new FtTemplate("${tempBase}page$lang.html");    *
+     *      $template = new FtTemplate('genealogypl.html');             *
      ********************************************************************/
     public function __construct($include    = null,
                                 $dialog     = false)
     {
-        global	$debug;
-        global	$warn;
-        global	$msg;
+        global  $debug;
+        global  $warn;
+        global  $msg;
         global  $document_root;
 
         if (!is_string($include))
             throw new Exception("FtTemplate::__construct: " .
                                 "first parameter is not a string");
         if (!preg_match('/(^.*)([a-z]{2,3}-[A-Z]{2,3}|[a-z]{2,3}).html$/',
-                        $include, 
+                        $include,
                         $matches))
         {                   // pass to parent
             parent::__construct($include);
@@ -117,40 +118,40 @@ class FtTemplate extends Template
                                             \IntlDateFormatter::NONE);
         $includeSub         = null;
 
-    	$tempBase	        = $document_root . '/templates/';
+        $tempBase           = $document_root . '/templates/';
 
         if (substr($include,-12,5) == '/page' ||
             substr($include,-14,7) == '/dialog')
             parent::__construct($include);  // master template
         else
         {                   // include file name
-		    if (file_exists($tempBase . $include))
-		        $includeSub     = $include;
-		    else
-			{               // try to find closest match
-                $language   	= new Language(array('code' => $lang));
+            if (file_exists($tempBase . $include))
+                $includeSub     = $include;
+            else
+            {               // try to find closest match
+                $language       = new Language(array('code' => $lang));
                 if ($language->isExisting())
                     $tlang      = $language['code'];
                 else
                     $tlang      = 'en';
-                $langName	    = $language->getName();         // English
-				$nativeName	    = $language->getNativeName();   // endonym
-				$sorry  	    = $language->getSorry();
+                $langName       = $language->getName();         // English
+                $nativeName     = $language->getNativeName();   // endonym
+                $sorry          = $language->getSorry();
 
                 if (file_exists("$tempBase$includebase$tlang.html"))
                 {
                     $includeSub = "$includebase$tlang.html";
                 }
-		        else
+                else
                 if (file_exists("$tempBase{$includebase}en.html"))
                 {
-				    $includeSub = $includebase . "en.html";
-			        $warn   .= str_replace(array('$langName','$nativeName'),
-			                               array($langName, $nativeName),
+                    $includeSub = $includebase . "en.html";
+                    $warn   .= str_replace(array('$langName','$nativeName'),
+                                           array($langName, $nativeName),
                                            $sorry);
                 }
-		        else
-				    throw new Exception ("FtTemplate::__construct: cannot find template file '{$includebase}en.html' in $tempBase");
+                else
+                    throw new Exception ("FtTemplate::__construct: cannot find template file '{$includebase}en.html' in $tempBase");
             }               // try to find closest match
 
             if ($dialog)
@@ -159,7 +160,7 @@ class FtTemplate extends Template
                 parent::__construct($tempBase . "page$langcode.html");
 
             parent::includeSub($tempBase . $includeSub,
-		                       'MAIN');
+                               'MAIN');
         }                   // include file name
 
         if (file_exists($tempBase . "Trantab$lang.html"))
@@ -176,16 +177,16 @@ class FtTemplate extends Template
     }           // function FtTemplate::__construct
 
     /********************************************************************
-     *	static function FtTemplate::validateLang						*
-     *													            	*
-     *	Input:											            	*
-     *		$value          a string provided by an application from    *
-     *		                user input and therefore unreliable	       	*
-     *													            	*
-     *	Returns:										            	*
-     *		An IETF BCP 47 language code possibly country-qualified	    *
-     *		for example 'es-MX'.  If the syntax of the input value      *
-     *		is not consistent with IETF BCP 47 this returns 'en'.       *
+     *  static function FtTemplate::validateLang                        *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $value          a string provided by an application from    *
+     *                      user input and therefore unreliable         *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      An IETF BCP 47 language code possibly country-qualified     *
+     *      for example 'es-MX'.  If the syntax of the input value      *
+     *      is not consistent with IETF BCP 47 this returns 'en'.       *
      ********************************************************************/
     public static function validateLang($value)
     {
@@ -210,12 +211,12 @@ class FtTemplate extends Template
     }           // static function validateLang
 
     /********************************************************************
-     *	function FtTemplate::getFormatter								*
-     *													            	*
-     *	Get the locale specific number formatter                        *
-     *													            	*
-     *	Returns:										            	*
-     *		instance of class NumberFormatter					        *
+     *  function FtTemplate::getFormatter                               *
+     *                                                                  *
+     *  Get the locale specific number formatter                        *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      instance of class NumberFormatter                           *
      ********************************************************************/
     public function getFormatter()
     {
@@ -223,12 +224,12 @@ class FtTemplate extends Template
     }           // function getFormatter
 
     /********************************************************************
-     *	function FtTemplate::getDateFormatter							*
-     *													            	*
-     *	Get the locale specific date formatter                          *
-     *													            	*
-     *	Returns:										            	*
-     *		instance of class DateFormatter					            *
+     *  function FtTemplate::getDateFormatter                           *
+     *                                                                  *
+     *  Get the locale specific date formatter                          *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      instance of class DateFormatter                             *
      ********************************************************************/
     public function getDateFormatter()
     {
@@ -236,12 +237,12 @@ class FtTemplate extends Template
     }           // function getFormatter
 
     /********************************************************************
-     *	function FtTemplate::getTranslate								*
-     *													            	*
-     *	Get the language specific translate table.						*
-     *													            	*
-     *	Returns:										            	*
-     *		instance of class Template					            	*
+     *  function FtTemplate::getTranslate                               *
+     *                                                                  *
+     *  Get the language specific translate table.                      *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      instance of class Template                                  *
      ********************************************************************/
     public function getTranslate()
     {
@@ -249,43 +250,52 @@ class FtTemplate extends Template
     }           // function getTranslate
 
     /********************************************************************
-     *	function FtTemplate::includeSub									*
-     *													                *
-     *	Specify a template file which is to be included and the name    *
-     *	of the insertion point where it is to be inserted.				*
-     *	I would have preferred to call this function "include" but that	*
-     *	is a reserved word in PHP 5.6 although not in PHP 7.			*
-     *													                *
-     *	INPUT:												            *
-     *	    $filename	file name to include							*
-     *	                this name is relative to the application        *
-     *	                template folder rather than being an absolute   *
-     *	                file name as is passed to Template::includeSub  *
-     *	    $submarker	insertion point name.  This is folded to		*
-     *			        upper case before searching the master template.*
-     *	    $after	    default false, means to perform the insertion	*
-     *			        before applying text substitutions specified	*
-     *			        by $template->set or $template->updateTag.		*
-     *			        If true this insertion is done after text		*
-     *			        substitution.  This is required if the include	*
-     *			        file contains references that might be falsely	*
-     *			        identified as insertion points.					*
-     *													                *
-     *	Returns:											            *
-     *	    true if the requested file exists, otherwise false			*
+     *  function FtTemplate::includeSub                                 *
+     *                                                                  *
+     *  Specify a template file which is to be included and the name    *
+     *  of the insertion point where it is to be inserted.              *
+     *  I would have preferred to call this function "include" but that *
+     *  is a reserved word in PHP 5.6 although not in PHP 7.            *
+     *                                                                  *
+     *  INPUT:                                                          *
+     *      $filename   file name to include                            *
+     *                  this name is relative to the application        *
+     *                  template folder rather than being an absolute   *
+     *                  file name as is passed to Template::includeSub  *
+     *      $submarker  insertion point name.  This is folded to        *
+     *                  upper case before searching the master template.*
+     *      $after      default false, means to perform the insertion   *
+     *                  before applying text substitutions specified    *
+     *                  by $template->set or $template->updateTag.      *
+     *                  If true this insertion is done after text       *
+     *                  substitution.  This is required if the include  *
+     *                  file contains references that might be falsely  *
+     *                  identified as insertion points.                 *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      true if the requested file exists, otherwise false          *
      ********************************************************************/
     public function includeSub($filename,
-                               $submarker	= 'SUBPAGE',
+                               $submarker   = 'SUBPAGE',
                                $after       = false)
     {
         global  $document_root;
 
-        $tempBase	        = $document_root . '/templates/';
-        if (substr($filename, -5) == ".html" &&
+        $tempBase           = $document_root . '/templates/';
+        $count              = preg_match('/(\w\w|\w\w-\w\w).html$/',
+                                         $filename,
+                                         $matches);
+        if ($count == 1 &&
             !file_exists($tempBase . $filename))
         {
-            $filename	    = substr($filename, 0, strlen($filename) - 7) .
+            $namelen        = strlen($filename);
+            $suffix         = $matches[0];
+            $suflen         = strlen($suffix);
+            error_log("FtTemplate::includeSub: " . __LINE__ .
+                        " filename='$filename' replaced by ");
+            $filename       = substr($filename, 0, $namelen - $suflen) .
                               'en.html';
+            error_log("'$filename'\n");
         }
 
         return parent::includeSub($tempBase . $filename,
@@ -294,212 +304,196 @@ class FtTemplate extends Template
     }       // function includeSub
 
     /********************************************************************
-     *	function FtTemplate::customization								*
-     *													            	*
-     *	This is the site specific customization of the initialization	*
-     *	of an instance of Template for the Family Tree web-site.		*
-     *	The convention of the Family Tree web-site is that the master	*
-     *	template file is named:											*
-     *		page.html	    English HTML5								*
-     *		pagefr.html	    French HTML5								*
-     *		pagexx.html	    for language code xx HTML5                	*
-     *		pageIE7.html	English IE < 8 (HTML 4)						*
-     *		pagefrIE7.html	French IE < 8 (HTML 4)						*
-     *		pagexxIE7.html	for language code xx IE < 8 (HTML4)			*
+     *  function FtTemplate::customization                              *
+     *                                                                  *
+     *  This is the site specific customization of the initialization   *
+     *  of an instance of Template for the Family Tree web-site.        *
+     *  The convention of the Family Tree web-site is that the master   *
+     *  template file is named:                                         *
+     *      page.html       English HTML5                               *
+     *      pagefr.html     French HTML5                                *
+     *      pagexx.html     for language code xx HTML5                  *
+     *      pageIE7.html    English IE < 8 (HTML 4)                     *
+     *      pagefrIE7.html  French IE < 8 (HTML 4)                      *
+     *      pagexxIE7.html  for language code xx IE < 8 (HTML4)         *
      ********************************************************************/
     public function customization()
     {
-        global		$browser;		// initialized by common.inc
-        global		$debug;			// debugging activated
-        global		$warn;			// tracing and warning output
-        global		$msg;			// error message output
-        global		$dsn;			// information about current server
-        global		$iecrap;		// IE 7 crap
-        global		$userid;		// logged on userid
-        global		$authorized;	// current user authorization string
-        global		$options;		// current user functionality options
+        global      $browser;       // initialized by common.inc
+        global      $debug;         // debugging activated
+        global      $warn;          // tracing and warning output
+        global      $msg;           // error message output
+        global      $dsn;           // information about current server
+        global      $iecrap;        // IE 7 crap
+        global      $userid;        // logged on userid
+        global      $authorized;    // current user authorization string
+        global      $options;       // current user functionality options
 
         if ($debug)
             $warn   .= "<p>FtTemplate::customization: " . __LINE__ .
                         " \$this->main='" . $this->main . "'</p>";
-        $mainlen	        = strlen($this->main) - 5;
-        $matches		    = array();
+        $mainlen            = strlen($this->main) - 5;
+        $matches            = array();
         if (preg_match('/(page|dialog)(\w*).html$/', $this->main, $matches))
         {
-            $lang		    = $matches[2];
-            $langlen	    = strlen($lang);
-            $mainlen	    = $mainlen - $langlen;
+            $lang           = $matches[2];
+            $langlen        = strlen($lang);
+            $mainlen        = $mainlen - $langlen;
             if ($langlen == 0)
                 $lang       = 'en';
         }
         else
         {
-            $lang		    = 'en';
+            $lang           = 'en';
         }
         // $main excludes the language code, if present, and .html
-        $main	            = substr($this->main, 0, $mainlen);
+        $main               = substr($this->main, 0, $mainlen);
 
         // support language specific templates and non-HTML5 compliant browsers
         if ($browser->browser == 'IE' && $browser->majorver < 9)
-        {		        // old browser
+        {               // old browser
             // users who are still trying to run Windows XP with IE6 or IE7
             if (file_exists("{$main}IE7$lang.html"))
-                $this->main	    = "{$main}IE7$lang.html";
+                $this->main     = "{$main}IE7$lang.html";
             else
             if (file_exists("{$main}IE7en.html"))
-                $this->main	= "{$main}IE7en.html";
+                $this->main = "{$main}IE7en.html";
             else
-                $this->main	= "{$main}IE7.html";
-        }		        // old browser
+                $this->main = "{$main}IE7.html";
+        }               // old browser
         else
         {               // W3C compliant browser
             if (file_exists("$main$lang.html"))
-                $this->main	    = "$main$lang.html";
+                $this->main     = "$main$lang.html";
             else
             if (file_exists("{$main}en.html"))
-                $this->main	    = "{$main}en.html";
+                $this->main     = "{$main}en.html";
             else
-                $this->main	    = "{$main}.html";
+                $this->main     = "{$main}.html";
         }               // W3C compliant browser
 
         if ($debug)
-            $this->set('DEBUG',	        'Y');
+            $this->set('DEBUG',         'Y');
         else
-            $this->set('DEBUG',	        'N');
+            $this->set('DEBUG',         'N');
 
-        $this->set('IECRAP',		    $iecrap);	// support IE < 8
+        $this->set('IECRAP',            $iecrap);   // support IE < 8
 
         // run-time can interrogate these values to take action
         // for example the OPTIONS value is used to determine whether or
         // not to use popup help
-        $this->set('USERID',		    $userid);
-        $this->set('AUTHORIZED',	    $authorized);
-        $this->set('OPTIONS',		    $options);
+        $this->set('USERID',            $userid);
+        $this->set('AUTHORIZED',        $authorized);
+        $this->set('OPTIONS',           $options);
 
         if (!array_key_exists('KEYWORDS',       $this->fields))
-			$this->set('KEYWORDS',		'');	// additional meta keywords
+            $this->set('KEYWORDS',      '');    // additional meta keywords
         if (!array_key_exists('CONTACTKEY',     $this->fields))
-			$this->set('CONTACTKEY',	'');	// identify the specific record
+            $this->set('CONTACTKEY',    '');    // identify the specific record
         if (!array_key_exists('CONTACTTABLE',   $this->fields))
-			$this->set('CONTACTTABLE',	'');	// identify the table
+            $this->set('CONTACTTABLE',  '');    // identify the table
         if (!array_key_exists('CONTACTSUBJECT', $this->fields))
-			$this->set('CONTACTSUBJECT',$_SERVER['REQUEST_URI']);
+            $this->set('CONTACTSUBJECT',$_SERVER['REQUEST_URI']);
         $this->set('GOOGLEKEY',         $dsn['googlekey']);
         $this->set('GOOGLECC',          'CA');
 
         // invoke parent functionality
         parent::customization();
-    }		// FtTemplate::customization
+    }       // FtTemplate::customization
 
     /********************************************************************
-     *	function FtTemplate::displayBegin								*
-     *															        *
-     *	This is the site specific customization which is performed		*
-     *	immediately prior to generating the output of the Template.		*
-     *	Prepare to report any issues that have been encountered			*
-     *	during the preparation of the page to the user.					*
-     *	This is deferred until just before the page is displayed.		*
+     *  function FtTemplate::displayBegin                               *
+     *                                                                  *
+     *  This is the site specific customization which is performed      *
+     *  immediately prior to generating the output of the Template.     *
+     *  Prepare to report any issues that have been encountered         *
+     *  during the preparation of the page to the user.                 *
+     *  This is deferred until just before the page is displayed.       *
      ********************************************************************/
     public function displayBegin()
     {
-        global		$debug;
-        global		$warn;		// tracing
-        global		$msg;		// error messages
-        global		$document_root;	// root directory of website
+        global      $debug;
+        global      $warn;      // tracing
+        global      $msg;       // error messages
+        global      $document_root; // root directory of website
 
         $lang                   = $this->lang;
+
+        if ($this->test)
+            print "<p>FtTemplate::displayBegin: {$this->main} </p>\n";
 
         // if the page contains an <h1> tag use that as the default title
         if (!array_key_exists('TITLE', $this->fields) ||
             $this->fields['TITLE'] == '')
-        {		// script has not initialized TITLE
-            $h1array		    = $this->getElementsByTagName('h1');
+        {       // script has not initialized TITLE
+            $h1array            = $this->getElementsByTagName('h1');
             if (count($h1array) > 0)
             {
-                $title		    = current($h1array)->innerHTML();
+                $title          = current($h1array)->innerHTML();
                 // remove tags
-                $spanpos	    = strpos($title, '<span class');
+                $spanpos        = strpos($title, '<span class');
                 if ($spanpos !== false)
                 {
-                    $clospos	= strpos($title, '</span>', $spanpos) + 7;
-                    $title		= substr($title, 0, $spanpos) .
+                    $clospos    = strpos($title, '</span>', $spanpos) + 7;
+                    $title      = substr($title, 0, $spanpos) .
                                   substr($title, $clospos);
                 }
-                $title		    = preg_replace('#<[^>]+>#s', '', $title);
-                $title		    = trim($title);
+                $title          = preg_replace('#<[^>]+>#s', '', $title);
+                $title          = trim($title);
                 // do substitutions into the string and make it the
                 // value of TITLE
                 $this->set('TITLE', $title, true);
             }
             else
-                $warn	.= "<p>FtTemplate::displayBegin: " . __LINE__ .
+                $warn   .= "<p>FtTemplate::displayBegin: " . __LINE__ .
                 " could not find &lt;h1&gt; to initialize TITLE</p>\n";
-        }		// script has not initialized TITLE
+        }       // script has not initialized TITLE
         else
         {
             $title                  = $this->fields['TITLE'];
-            $title		            = preg_replace('#<[^>]+>#s', '', $title);
-            $title		            = trim($title);
+            $title                  = preg_replace('#<[^>]+>#s', '', $title);
+            $title                  = trim($title);
             $this->fields['TITLE']  = $title;
         }
 
         // pick an advertisement to display
-        $adElement              = $this['advertFrame'];
-        $adurl                  = '';
-        if ($adElement)
-        {
-	        $getparms               = array('adname' => '!');
-	        $advertisers            = new RecordSet('Advertisers',
-	                                                $getparms);
-	        $info                   = $advertisers->getInformation();
-	        $count                  = $info['count'];
-	        $counterRec             = new Advertiser(array('adname' => ''));
-	        $counterRec->increment('01');   // stats count
-	        $index	                = $counterRec['count01'] % $count;
-	        $getparms               = array('adname'    => '!',
-	                                        'offset'    => $index,
-	                                        'limit'     => 1);
-	        $advertisers            = new RecordSet('Advertisers',
-	                                                $getparms);
-	        $advertiser             = $advertisers->rewind();
-	        $adname                 = $advertiser['adname'];
-	        $adurl	                = "/Advertisements/$adname.html";
-	        $date                   = date('m d');
-	        $month                  = substr($date, 0, 2);
-	        $advertiser->increment($month);
-	
-	        // the following code is to ensure that the count for
-	        // the next month is zero before the month begins
-	        // this should be moved to a cron job
-	        $day                    = substr($date, -2);
-	        if ($day == '28')
-	        {                   // move to cron job
-	            $month              += 1;
-	            if ($month > 12)
-	                $month          = $month - 13;
-	            if (strlen($month) == 1)
-	                $month          = '0' . $month;
-	            $advertiser->set("Count$month", 0);
-	            $advertiser->save(false);
-	        }                   // move to cron job
-	
-	        // change insertion of ads to not use <iframe>
-            $adTemplate         = new Template($document_root . $adurl);
-            $adDoc              = $adTemplate->getDocument();
-            $adBody             = $adDoc->getElementsByTagName('body');
-            if (count($adBody) > 0)
-            {
-                $adBody         = current($adBody);
-                // the following replaces the <iframe> with the contents of
-                // the <body> of the referenced URL
-                $adElement->update($adBody->innerHTML());
-            }
-            else
-                $warn           .= $adTemplate->getDocument()->show();
-        }
-        else
-            $this->set('ADURL',		    $adurl);
- 
+        $getparms               = array('adname' => '!');
+        $advertisers            = new RecordSet('Advertisers',
+                                                $getparms);
+        $info                   = $advertisers->getInformation();
+        $count                  = $info['count'];
+        $counterRec             = new Advertiser(array('adname' => ''));
+        $counterRec->increment('01');   // stats count
+        $index                  = $counterRec['count01'] % $count;
+        $getparms               = array('adname'    => '!',
+                                        'offset'    => $index,
+                                        'limit'     => 1);
+        $advertisers            = new RecordSet('Advertisers',
+                                                $getparms);
+        $advertiser             = $advertisers->rewind();
+        $adname                 = $advertiser['adname'];
+        $adurl                  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . "/Advertisements/$adname.html";
+        $date                   = date('m d');
+        $month                  = substr($date, 0, 2);
+        $advertiser->increment($month);
+
+        // the following code is to ensure that the count for
+        // the next month is zero before the month begins
+        // this should be moved to a cron job
+        $day                    = substr($date, -2);
+        if ($day == '28')
+        {                   // move to cron job
+            $month              += 1;
+            if ($month > 12)
+                $month          = $month - 13;
+            if (strlen($month) == 1)
+                $month          = '0' . $month;
+            $advertiser->set("Count$month", 0);
+            $advertiser->save(false);
+        }                   // move to cron job
+
+        $this->set('ADURL',         $adurl);
+
         // if the script has not explicitly defined a special stylesheet
         // delete the alternate stylesheet tag
         $noSsSet     = true;
@@ -518,28 +512,28 @@ class FtTemplate extends Template
         if (strlen($warn) > 0)
         {
             ob_start();
-            showTrace();	// common presentation
-            $this->set('TRACE',	ob_get_clean());
-            $warn		= '';
+            showTrace();    // common presentation
+            $this->set('TRACE', ob_get_clean());
+            $warn       = '';
         }
         else
-            $this->set('TRACE',		'');
+            $this->set('TRACE',     '');
 
         // set MSG to a paragraph containing error messages if any
         if (strlen($msg) > 0)
         {
-            $this->set('MSG',		"<p class='message'>$msg</p>\n");
-            $msg		= '';
+            $this->set('MSG',       "<p class='message'>$msg</p>\n");
+            $msg        = '';
         }
         else
-            $this->set('MSG',		'');
+            $this->set('MSG',       '');
 
         // set LANG to the requested language code
-        $this->set('LANG',		    $this->lang);
+        $this->set('LANG',          $this->lang);
 
         // ensure TinyMCE language is set properly
         $langtiny                   = str_replace('-','_',$lang);
-        $langBase	                = $document_root . 
+        $langBase                   = $document_root .
                                 '/jscripts/tinymce/js/tinymce/langs/';
         if (!file_exists($langBase . "$langtiny.js"))
         {
@@ -550,7 +544,7 @@ class FtTemplate extends Template
                     $langtiny       = 'en';
             }
         }
-        $this->set('LANGTINY',		$langtiny);
+        $this->set('LANGTINY',      $langtiny);
 
         // initialize BREADCRUMBS from <div id='breadcrumbs'>
         if (array_key_exists('BREADCRUMBS', $this->fields))
@@ -559,10 +553,10 @@ class FtTemplate extends Template
         }
         else
         {                   // not already defined
-	        $crumbTag		        = $this->getElementById('breadcrumbs');
-	        if ($crumbTag)
-	        {			    // breadcrumbs definition found
-                $breadcrumbs	    = $crumbTag->innerHTML();
+            $crumbTag               = $this->getElementById('breadcrumbs');
+            if ($crumbTag)
+            {               // breadcrumbs definition found
+                $breadcrumbs        = $crumbTag->innerHTML();
                 $anchors            = preg_split('/<a\s/', $breadcrumbs);
                 $breadcrumbs        = $anchors[0];
                 for($i = 1; $i < count($anchors); $i++)
@@ -573,18 +567,18 @@ class FtTemplate extends Template
                                         ' class="menuitem"' .
                                         substr($anchor, $apos);
                 }
-	            $crumbTag->update(null);	// delete the template tag
+                $crumbTag->update(null);    // delete the template tag
             }
-	        else
-	        {			    // tag not found
-	            $includeSub		= current($this->includes);
-	            $warn	.= "<p>FtTemplate::customization: " .
+            else
+            {               // tag not found
+                $includeSub     = current($this->includes);
+                $warn   .= "<p>FtTemplate::customization: " .
                     "no element id='breadcrumbs' in '$includeSub'</p>\n";
                 $breadcrumbs    = '';
-            }			    // tag not found
+            }               // tag not found
         }
 
-	    $menuButton		            = $this->getElementById('menuButton');
+        $menuButton                 = $this->getElementById('menuButton');
         if ($menuButton)
         {                   // new heading style
             $breadcrumbs            = str_replace(':', '<br>', $breadcrumbs);
@@ -596,11 +590,11 @@ class FtTemplate extends Template
                 $atemplate          = new Template($elt->innerHTML());
                 $atemplate->setFields($this->fields);
                 // determine if their are messages queued to the current user
-                $user	            = new User(array("username" => $userid));
-                $blogParms	        = array('keyvalue'	=> $user->get('id'),
-                                            'table'		=> '^Users$');
-                $bloglist	        = new RecordSet('Blogs', $blogParms);
-                $blogCount	        = $bloglist->getInformation()['count'];
+                $user               = new User(array("username" => $userid));
+                $blogParms          = array('keyvalue'  => $user->get('id'),
+                                            'table'     => '^Users$');
+                $bloglist           = new RecordSet('Blogs', $blogParms);
+                $blogCount          = $bloglist->getInformation()['count'];
                 if ($blogCount == 0)
                     $atemplate['gotMail']->update(null);
                 $breadcrumbs        .= $atemplate->compile();
@@ -616,9 +610,9 @@ class FtTemplate extends Template
             }               // not xigned on
 
             // search for additional language support
-            $includeSub		        = current($this->includes);
+            $includeSub             = current($this->includes);
             if (strpos($includeSub, '<') === false)
-            {               // value does not include HTML    
+            {               // value does not include HTML
                 $count          = preg_match("/([^\/]*)([a-z]{2}-[A-Z]{2}|[a-z]{2}).html$/", $includeSub, $matches);
                 if ($count)
                 {
@@ -630,10 +624,10 @@ class FtTemplate extends Template
                 }
                 else
                 {               // this shouldn't happen
-	                $prefix     = substr($includeSub, 0, strlen($includeSub)-7);
-	                $enddir     = strrpos($prefix, '/');
-	                $folder     = substr($prefix, 0, $enddir + 1);
-	                $prefix     = substr($prefix, $enddir + 1);
+                    $prefix     = substr($includeSub, 0, strlen($includeSub)-7);
+                    $enddir     = strrpos($prefix, '/');
+                    $folder     = substr($prefix, 0, $enddir + 1);
+                    $prefix     = substr($prefix, $enddir + 1);
                 }               // this shouldn't
                 $script         = $_SERVER['SCRIPT_NAME'];
                 $query          = $_SERVER['QUERY_STRING'];
@@ -664,7 +658,7 @@ class FtTemplate extends Template
                 {           // search files in template directory
                     if (preg_match("/^$prefix([a-z]{2}-[A-Z]{2}|[a-z]{2}).html$/", $name, $matches))
                     {       // file matches current template
-                        $tlang  	    = $matches[1];
+                        $tlang          = $matches[1];
                         if ($tlang != $lang)
                         {   // not the current language
                             if ($first)
@@ -686,7 +680,7 @@ class FtTemplate extends Template
                             if ($comma !== false)
                                 $native = substr($native, 0, $comma);
                             $native     = ucfirst($native);
-                            $breadcrumbs.= 
+                            $breadcrumbs.=
                                 "<a href=\"$script$nparms{$amp}lang=$tlang\" class=\"menuitem\">$native</a><br>\n";
                         }   // not the current language
                     }       // file matches current template
@@ -695,10 +689,10 @@ class FtTemplate extends Template
 
             // add contents of help section of <h1> tag
             $breadcrumbs                .= '<hr class="menubar">';
-            $h1array		            = $this->getElementsByTagName('h1');
+            $h1array                    = $this->getElementsByTagName('h1');
             if (count($h1array) > 0)
             {               // at least one <h1> tag in page
-                $h1		                = end($h1array);
+                $h1                     = end($h1array);
                 foreach($h1->childNodes() as $child)
                 {           // loop through children of last <h1>
                     if ($child->tagName == 'span' &&
@@ -721,8 +715,8 @@ class FtTemplate extends Template
                 if (count($h1array) > 1)
                 {
                     $heading            = $h1->innerHTML;
-                    $heading		    = preg_replace('#<[^>]+>#s', '', $heading);
-                    $heading		    = preg_replace('#\? \w+\s*#s', '', $heading);
+                    $heading            = preg_replace('#<[^>]+>#s', '', $heading);
+                    $heading            = preg_replace('#\? \w+\s*#s', '', $heading);
                     $heading            = trim($heading);
                     if (substr($heading, 0, 1) == '$')
                     {
@@ -737,7 +731,7 @@ class FtTemplate extends Template
             }               // at least one <h1> tag in page
             else
             {
-                $warn	.= "<p>FtTemplate::customization: " . __LINE__ .
+                $warn   .= "<p>FtTemplate::customization: " . __LINE__ .
                                 " no &lt;h1&gt; on page</p>\n";
                 $warn   .= $this->getDocument()->show();
             }
@@ -773,18 +767,18 @@ class FtTemplate extends Template
             $warn   .= "<p>FtTemplate::displayBegin: breadcrumbs=" .
                         \Templating\escape($breadcrumbs) . "</p>\n";
 
-	    $this->set('BREADCRUMBS',	$breadcrumbs, true);
+        $this->set('BREADCRUMBS',   $breadcrumbs, true);
 
         // invoke parent functionality
         parent::displayBegin();
-    }		// FtTemplate::displayBegin
+    }       // FtTemplate::displayBegin
 
     /********************************************************************
-     *	function FtTemplate::displayEnd									*
-     *													            	*
-     *	This is the site specific customization which is performed		*
-     *	immediately after generating the output of the Template			*
-     *	but before it is returned to the requestor.						*
+     *  function FtTemplate::displayEnd                                 *
+     *                                                                  *
+     *  This is the site specific customization which is performed      *
+     *  immediately after generating the output of the Template         *
+     *  but before it is returned to the requestor.                     *
      ********************************************************************/
     public function displayEnd()
     {
@@ -792,15 +786,15 @@ class FtTemplate extends Template
         global $document_root;
 
         // append location dialog templates if required
-        $locationScript         = strpos($this->page, 
+        $locationScript         = strpos($this->page,
                             '<script src="/jscripts/locationCommon.js"');
         if ($locationScript > 0)
         {
-            $tempBase	        = $document_root . '/templates/';
+            $tempBase           = $document_root . '/templates/';
             $lang               = $this->lang;
-		    if (file_exists($tempBase . "LocationDialogs$lang.html"))
-		        $dialogName     = $tempBase . "LocationDialogs$lang.html";
-		    else
+            if (file_exists($tempBase . "LocationDialogs$lang.html"))
+                $dialogName     = $tempBase . "LocationDialogs$lang.html";
+            else
                 $dialogName     = $tempBase . "LocationDialogsen.html";
             $endmain            = strpos($this->page, '</main>');
             $this->page         = substr($this->page, 0, $endmain) . "\n" .
@@ -809,15 +803,15 @@ class FtTemplate extends Template
         }
 
         // append temple dialog templates if required
-        $templeScript           = strpos($this->page, 
+        $templeScript           = strpos($this->page,
                             '<script src="/jscripts/templeCommon.js"');
         if ($templeScript > 0)
         {
-            $tempBase	        = $document_root . '/templates/';
+            $tempBase           = $document_root . '/templates/';
             $lang               = $this->lang;
-		    if (file_exists($tempBase . "TempleDialogs$lang.html"))
-		        $dialogName     = $tempBase . "TempleDialogs$lang.html";
-		    else
+            if (file_exists($tempBase . "TempleDialogs$lang.html"))
+                $dialogName     = $tempBase . "TempleDialogs$lang.html";
+            else
                 $dialogName     = $tempBase . "TempleDialogsen.html";
             $endmain            = strpos($this->page, '</main>');
             $this->page         = substr($this->page, 0, $endmain) . "\n" .
@@ -826,34 +820,34 @@ class FtTemplate extends Template
         }
 
         if (strlen($warn) > 0)
-        {			// diagnostic messages from Template class
+        {           // diagnostic messages from Template class
             // prefer to insert this at the end of the <main> section
             // which is defined in the standard /templates/page.html
             // but if I cannot find that, insert it before the end of the
             // <body> section, and failing that before the end of the
             // document
-            $position	= strpos($this->page, '</main>');
+            $position   = strpos($this->page, '</main>');
             if ($position === false)
             {
-                $position	= strpos($this->page, '</body>');
+                $position   = strpos($this->page, '</body>');
                 if ($position === false && count($this->dom->children) > 0)
-                {		// insert before the last closing tag
-                    $topTag	= $this->dom->children[0];
-                    $topTagName	= $topTag->tagName;	// handle XML
-                    $position	= strpos($this->page, "</$topTagName>");
+                {       // insert before the last closing tag
+                    $topTag = $this->dom->children[0];
+                    $topTagName = $topTag->tagName; // handle XML
+                    $position   = strpos($this->page, "</$topTagName>");
                     if ($position === false)
-                        $position	= strlen($this->page);
+                        $position   = strlen($this->page);
                 }
             }
 
             // insert the trace output into the generated page
             ob_start();
-            showTrace();	// common presentation
-            $this->page		= substr($this->page, 0, $position) .
-										ob_get_clean() .
-										substr($this->page, $position);
-        }			// diagnostic messages from Template class
+            showTrace();    // common presentation
+            $this->page     = substr($this->page, 0, $position) .
+                                        ob_get_clean() .
+                                        substr($this->page, $position);
+        }           // diagnostic messages from Template class
         // invoke parent functionality
         parent::displayEnd();
-    }		// FtTemplate::displayEnd
-}		// class FtTemplate
+    }       // FtTemplate::displayEnd
+}       // class FtTemplate

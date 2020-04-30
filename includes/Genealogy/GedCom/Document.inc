@@ -2,15 +2,15 @@
 namespace Genealogy\GedCom;
 use \PDO;
 /************************************************************************
- *  Genealogy/Gedcom/Document.inc										*
- *																		*
+ *  Genealogy/Gedcom/Document.inc                                       *
+ *                                                                      *
  *  This file contains the definitions of the Document class for        *
  *  processing a GEDCOM 5.5 genealogy files.                            *
- * 																		*
- *  History: 															*
- *		2018/11/24		created											*
- *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/11/24      created                                         *
+ *                                                                      *
+ *  Copyright &copy; 2018 James A. Cobban                               *
  ************************************************************************/
 require_once "Genealogy/common.inc";
 require_once "Genealogy/GedCom/Tag.inc";
@@ -20,24 +20,24 @@ require_once "Genealogy/GedCom/FamilyTag.inc";
 require_once "Genealogy/GedCom/FtmPlacDefnTag.inc";
 
 /************************************************************************
- *  class Document  													*
- *																		*
- *  This class represents the behavior of a GEDCOM 5.5 document 	    *
+ *  class Document                                                      *
+ *                                                                      *
+ *  This class represents the behavior of a GEDCOM 5.5 document         *
  ************************************************************************/
 class Document
 {
-    private	    $nest;		    // hierarchy of tags
+    private     $nest;          // hierarchy of tags
     private     $lastLevel;     // level of preceding line
     private     $tableName;     // translation table name
 
     /********************************************************************
      *  function Document::__constructor                                *
-     *																	*
-     *	Constructor for an instance of Document.						*
-     *																	*
-     *	Input:															*
-     *	    $filename   file name or array identifier                   *
-     *	    $array      if present an array of lines                    *
+     *                                                                  *
+     *  Constructor for an instance of Document.                        *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $filename   file name or array identifier                   *
+     *      $array      if present an array of lines                    *
      ********************************************************************/
     function __construct($filename, $array = null)
     {
@@ -45,17 +45,17 @@ class Document
         global  $userid;
 
         $matches                = array();
-        $result                 = preg_match('/(\w+).ged/i', 
-                                             $filename, 
+        $result                 = preg_match('/(\w+).ged/i',
+                                             $filename,
                                              $matches);
-        if ($result) 
+        if ($result)
         {                       // filename is something.ged
             $gedname            = $matches[1];
         }                       // filename is something.ged
         else
         {                       // some other filetype
             $result             = preg_match('/(\w+)\.?(\w*)$/i',
-                                             $filename, 
+                                             $filename,
                                              $matches);
             if ($result)
             {                   // include unrecognized file type in name
@@ -66,7 +66,7 @@ class Document
             else
             {                   //  filename does not end with a word char
                 $result         = preg_match('/(\w+)[^\w]*$/i',
-                                            $filename, 
+                                            $filename,
                                             $matches);
                 if ($result)
                 {               // matched last sequence of word chars
@@ -109,7 +109,7 @@ class Document
             $handle             = fopen($filename, 'rb');
             if ($handle)
             {                   // file opened
-                $this->nest	        = array();
+                $this->nest         = array();
                 $this->lastLevel    = 0;
                 while(($line = fgets($handle)) !== false){
                     $this->add($line);
@@ -121,26 +121,26 @@ class Document
                 throw new \Exception("Genealogy\\GedCom\\Document: fopen('$filename') failed: " . print_r(error_get_last(), true));
             }                   // fopen failed
         }
-    }		// function Document::constructor
+    }       // function Document::constructor
 
     /********************************************************************
-     *	function Document::add  										*
-     *																	*
-     *	This factory method creates instances of class Tag.             *
-     *																	*
-     *	Input:															*
-     *	    $line       string                                          *
-     *																	*
-     *	Returns:														*
-     *	    instance of Tag or null										*
-     *																	*
-     *	Side Effects:													*
-     *	    If this method returns an instance of Tag, that instance    *
-     *	    has been inserted into the tag nesting hierarchy.           *
-     *	    If the return value is null then either the line was not    *
-     *	    a GEDCOM tag, or it was a tag with no children that is      *
-     *	    entirely handled by its parent tag, for example 'CONT' and  *
-     *	    'CONC'                                                      *
+     *  function Document::add                                          *
+     *                                                                  *
+     *  This factory method creates instances of class Tag.             *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $line       string                                          *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      instance of Tag or null                                     *
+     *                                                                  *
+     *  Side Effects:                                                   *
+     *      If this method returns an instance of Tag, that instance    *
+     *      has been inserted into the tag nesting hierarchy.           *
+     *      If the return value is null then either the line was not    *
+     *      a GEDCOM tag, or it was a tag with no children that is      *
+     *      entirely handled by its parent tag, for example 'CONT' and  *
+     *      'CONC'                                                      *
      ********************************************************************/
     function add($line)
     {
@@ -159,7 +159,7 @@ class Document
             $parms          = $matches[4];
 
             if($level > ($this->lastLevel + 1))
-                $warn       .= "<p>Level $level out of range &lt;= " . 
+                $warn       .= "<p>Level $level out of range &lt;= " .
                                 ($this->lastLevel + 1) . " line=" .
                                 htmlspecialchars($line) ."</p>\n";
             else
@@ -170,9 +170,9 @@ class Document
                     {           // act on specific tag
                         case 'HEAD':
                         {       // document header
-                            $tag    = new HeaderTag($level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new HeaderTag($level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             break;
@@ -180,9 +180,9 @@ class Document
 
                         case 'INDI':
                         {       // individual in the family tree
-                            $tag    = new IndiTag(  $level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new IndiTag(  $level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             break;
@@ -190,9 +190,9 @@ class Document
 
                         case 'FAM':
                         {       // family
-                            $tag    = new FamilyTag($level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new FamilyTag($level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             break;
@@ -200,9 +200,9 @@ class Document
 
                         case 'OBJE':
                         {       // media object
-                            $tag    = new ObjeTag(  $level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new ObjeTag(  $level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             break;
@@ -210,9 +210,9 @@ class Document
 
                         case 'NOTE':
                         {       // notes
-                            $tag    = new NoteTag(  $level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new NoteTag(  $level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             break;
@@ -220,9 +220,9 @@ class Document
 
                         case 'REPO':
                         {       // repository
-                            $tag    = new RepositoryTag($level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new RepositoryTag($level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             break;
@@ -230,9 +230,9 @@ class Document
 
                         case 'SOUR':
                         {       // source document
-                            $tag    = new SourceTag($level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new SourceTag($level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             break;
@@ -240,9 +240,9 @@ class Document
 
                         case 'SUBM':
                         {       // submitter
-                            $tag    = new SubmitterTag($level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new SubmitterTag($level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             break;
@@ -250,9 +250,9 @@ class Document
 
                         case 'SUBN':
                         {       // submission
-                            $tag    = new SubmissionTag($level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new SubmissionTag($level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             break;
@@ -260,9 +260,9 @@ class Document
 
                         case '_PLAC_DEFN':
                         {       // FTM tag
-                            $tag    = new FtmPlacDefnTag($level, 
-                                                         $xref_id, 
-                                                         $tag_name, 
+                            $tag    = new FtmPlacDefnTag($level,
+                                                         $xref_id,
+                                                         $tag_name,
                                                          $parms,
                                                          $this);
                             break;
@@ -270,9 +270,9 @@ class Document
 
                         case 'TRLR':
                         {       // document trailer
-                            $tag    = new TrailerTag($level, 
-                                                     $xref_id, 
-                                                     $tag_name, 
+                            $tag    = new TrailerTag($level,
+                                                     $xref_id,
+                                                     $tag_name,
                                                      $parms,
                                                      $this);
                             break;
@@ -280,9 +280,9 @@ class Document
 
                         default:
                         {       // unsupported tag
-                            $tag    = new Tag(      $level, 
-                                                    $xref_id, 
-                                                    $tag_name, 
+                            $tag    = new Tag(      $level,
+                                                    $xref_id,
+                                                    $tag_name,
                                                     $parms,
                                                     $this);
                             $tag->diagnostic('Unsupported');
@@ -295,10 +295,10 @@ class Document
                 {               // add the tag onto the immediate parent
                     $tag    = $this->nest[$level - 1]->
                                             add($level,
-				                                $xref_id,
-				                                $tag_name,
-				                                $parms,
-				                                $this->nest[$level - 1]);
+                                                $xref_id,
+                                                $tag_name,
+                                                $parms,
+                                                $this->nest[$level - 1]);
                 }               // add the tag onto the immediate parent
                 $this->nest[$level] = $tag;
             }                   // expected next level
@@ -314,19 +314,19 @@ class Document
     }       // function Document::add
 
     /********************************************************************
-     *	function Document::setId  										*
-     *																	*
-     *	This method sets the internal database record key               *
-     *	associated with a particular GEDCOM cross-reference id.         *
-     *																	*
-     *	Input:															*
-     *	    $xrefId     string                                          *
-     *	    $id         integer                                         *
-     *																	*
-     *	Returns:														*
-     *		true        record inserted									*
-     *		integer     id updated, former value                        *
-     *		false       failed, global $msg contains messages			*
+     *  function Document::setId                                        *
+     *                                                                  *
+     *  This method sets the internal database record key               *
+     *  associated with a particular GEDCOM cross-reference id.         *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $xrefId     string                                          *
+     *      $id         integer                                         *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      true        record inserted                                 *
+     *      integer     id updated, former value                        *
+     *      false       failed, global $msg contains messages           *
      ********************************************************************/
     function setId($xrefId, $id)
     {
@@ -339,41 +339,41 @@ class Document
         $sqlParms       = array('xrefid'    => $xrefId);
         if ($stmt->execute($sqlParms))
         {               // success
-			$result	        = $stmt->fetch(PDO::FETCH_ASSOC);
-			if (is_array($result))
-			{		    // existing record
-			    $oldId      = $result['id'];
+            $result         = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (is_array($result))
+            {           // existing record
+                $oldId      = $result['id'];
                 $update     = 'UPDATE ' . $this->tableName .
                                 ' SET ID=:newid WHERE  `XrefId`=:xrefid';
                 $stmt       = $connection->prepare($update);
                 $sqlParms   = array('xrefid'    => $xrefId,
                                     'newid'     => $id);
-		        if ($stmt->execute($sqlParms))
+                if ($stmt->execute($sqlParms))
                 {       // success
                     return $oldId;
-		        }       // success
-		        else
-		        {       // UPDATE failed
-		            $msg    .= "Document::getId: query='$update', " .
-		                        "SQLparms=array('xrefid'=> $xrefId, 'newid'=> $id), " .
-		                        "error=" . print_r($stmt->errorInfo(),true) .
+                }       // success
+                else
+                {       // UPDATE failed
+                    $msg    .= "Document::getId: query='$update', " .
+                                "SQLparms=array('xrefid'=> $xrefId, 'newid'=> $id), " .
+                                "error=" . print_r($stmt->errorInfo(),true) .
                                 ". ";
                     return false;
                 }       // UPDATE failed
-            }		    // existing record
+            }           // existing record
             else
             {           // create new record
-		        $insert         = 'INSERT INTO ' . $this->tableName .
-		                            ' (`XrefId`,`ID`) VALUES(:xrefid,:id)';
-		        $stmt           = $connection->prepare($insert);
-		        $sqlParms       = array('xrefid'    => $xrefId,
-		                                'id'        => $id);
-		        if ($stmt->execute($sqlParms))
+                $insert         = 'INSERT INTO ' . $this->tableName .
+                                    ' (`XrefId`,`ID`) VALUES(:xrefid,:id)';
+                $stmt           = $connection->prepare($insert);
+                $sqlParms       = array('xrefid'    => $xrefId,
+                                        'id'        => $id);
+                if ($stmt->execute($sqlParms))
                 {       // successful insert
                     return true;
-		        }       // successful insert
-		        else
-		        {       // INSERT failed
+                }       // successful insert
+                else
+                {       // INSERT failed
                     $msg        .= "Document::getId: insert='$insert', " .
                             "SQLparms=array('xrefid'=> $xrefId, 'id'=> $id), " .
                             "error=" . print_r($stmt->errorInfo(),true) . ". ";
@@ -393,16 +393,16 @@ class Document
     }       // function Document::setId
 
     /********************************************************************
-     *	function Document::getId  										*
-     *																	*
-     *	This method returns the internal database record key            *
-     *	associated with a particular GEDCOM cross-reference id.         *
-     *																	*
-     *	Input:															*
-     *	    $xrefId     string                                          *
-     *																	*
-     *	Returns:														*
-     *	    integer or null                                             *
+     *  function Document::getId                                        *
+     *                                                                  *
+     *  This method returns the internal database record key            *
+     *  associated with a particular GEDCOM cross-reference id.         *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $xrefId     string                                          *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      integer or null                                             *
      ********************************************************************/
     function getId($xrefId)
     {
@@ -431,9 +431,9 @@ class Document
 
     /********************************************************************
      *  function Document::drop                                         *
-     *																	*
-     *	Called to drop the translation table of GedCom XrefIds to       *
-     *	SQL record ids once an entire GedCom file has been processed.   * 
+     *                                                                  *
+     *  Called to drop the translation table of GedCom XrefIds to       *
+     *  SQL record ids once an entire GedCom file has been processed.   *
      ********************************************************************/
     function drop()
     {

@@ -379,7 +379,6 @@ use \Exception;
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/Temple.inc';
-require_once __NAMESPACE__ . '/LegacyHeader.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 /************************************************************************

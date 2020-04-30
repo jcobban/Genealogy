@@ -86,7 +86,6 @@
     <form name="surnameForm" id="surnameForm"
 	  action="/FamilyTree/Names.php" method="get">
       <p>
-        <input type="hidden" name="idnr"    value="$IDNR">
         <input type="hidden" name="Surname" value="$SURNAME">
         <input type="hidden" name="Edit"    value="Y">
         <input type="hidden" name="offset"  value="$OFFSET">
@@ -104,6 +103,12 @@
 	  <a href="/FamilyTree/Surnames.php?soundex=$SOUNDEX&lang=$LANG"
 	  		id="soundexLink">
 	      Noms de famille avec le même Soundex '$SOUNDEX'
+	  </a>
+    </p>
+    <p class="label">
+	  <a href="/FamilyTree/Surnames.php?pattern=$PATTERNU&lang=$LANG"
+	  		id="patternLink">
+	      Noms de famille avec le même motif '$PATTERN'
 	  </a>
     </p>
     <hr>	<!-- start of blog section of page -->

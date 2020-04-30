@@ -94,7 +94,7 @@ else
 			print "\n}\n";
 	    }
         else
-        if ($record instanceof Record || $record instanceof LegacyHeader)
+        if ($record instanceof Record || $record instanceof FamilyTree)
             $record->toJson(array('print'   => true,
                                   'lang'    => $lang), 
                             $options);

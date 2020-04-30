@@ -8,8 +8,9 @@
  *		2019/07/22      created                                         *
  *      2019/11/06      add option to create new source                 *
  *                      add translate table for IDST for Javascript     *
+ *      2020/04/29      add fields and buttons for creating new source  *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
 	  <a href="/index.html">Accueil</a>:
@@ -37,6 +38,14 @@
 				    value="$PATTERN">
 		      <div style="clear: both;"></div>
         </div>
+        <div class="row">
+          <label class="label" for="namefld" style="width: 8em;">
+              Nom:
+          </label>
+          <input name="namefld" id="namefld" type="text" size="64"
+                      class="white leftnc" value="">
+          <div style="clear: both"></div>
+        </div>
         <div class="row" id="buttonRow">
 		  <label class="label" for="Search" style="width: 8em;">
 		      Actions:
@@ -44,6 +53,14 @@
 		  <button type="submit" id="Search">
 		      Fouiller
 		  </button>
+          &nbsp;
+          <button type="button" class="button" id="Close" accesskey="c">
+              Fermer
+          </button>
+          &nbsp;
+          <button type="button" class="button" id="CreateNew" accesskey="n">
+              Creer <u>N</u>ouvelle Source
+          </button>
 		  <div style="clear: both;"></div>
         </div>
         <p class="label" id="nomatch">

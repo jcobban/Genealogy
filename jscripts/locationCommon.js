@@ -61,6 +61,7 @@
  *		2019/11/18      use getLocationJSON.php                         *
  *		2020/03/04      loading of dialogs moved to FtTemplate          *
  *		2020/04/14      do not include descriptive prefixes in search   *
+ *		2020/04/26      convert trailing 1/2 into ½                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -175,10 +176,14 @@ function locationChanged(ev)
     // trim off leading and trailing spaces
     var value	                = this.value.trim();
 
+    // convert "1/2" alone or at the end of a number to "½"
+    var halfRegex               = /1\/2([^0-9])/;
+    value               		= value.replace(halfRegex, "½$1");
+
     // insert spaces where they should appear but don't
     var commaRegex      		= /,(\w)/g;
     value               		= value.replace(commaRegex, ", $1");
-    var digalfaRegex    		= /(\d)([a-zA-Z]+)/g;
+    var digalfaRegex    		= /([0-9½])([a-zA-Z]+)/g;
     var results         		= digalfaRegex.exec(value);
     if (results)
     {
@@ -260,7 +265,8 @@ function locationChanged(ev)
 									encodeURIComponent(loc) +
 									"&form=" + this.form.name +
 									"&field=" + this.name +
-									"&prefix=" + encodeURIComponent(locPrefix);
+									"&prefix=" + encodeURIComponent(locPrefix) +
+                                    "&fieldname=" + this.name;
 		HTTP.get(url,
 				 gotLocationJSON,
 				 options);
@@ -302,134 +308,141 @@ function locationChanged(ev)
  ************************************************************************/
 function gotLocationJSON(response)
 {
-    if ('message' in response)
-    {
-        alert(response.message);
-    }
+    if (typeof response == 'object')
+    {                       // response is a JSON object
+	    if ('message' in response)
+	    {
+	        alert(response.message);
+	    }
+	    else
+	    {
+		    var count	    		= response.count;
+		    var cmd	    		    = response.cmd;
+			var field	    		= '';		// initiating field name
+	        if ('field' in response.parms)
+	            field               = response.parms.field;
+			var formname			= '';		// form containing field
+	        if ('form' in response.parms)
+	            formname            = response.parms.form;
+			var name	    		= '';		// search argument
+	        if ('name' in response.parms)
+	            name                = response.parms.name;
+			var prefix	    		= '';		// location name prefix
+	        if ('prefix' in response.parms)
+	            prefix              = response.parms.prefix;
+	
+			// locate the form containing the element that initiated the request
+			var	form	            = document.forms[formname];
+			if (form instanceof HTMLFormElement)
+	        {                   // have form
+				// locate the element that initiated the request
+				var	element	        = form.elements[field];
+				if (element instanceof Element)
+	            {               // name identifies Element
+					// if there is exactly one location matching the request then
+					// replace the text value of the element with the full location
+					// name from the database
+					if (count == 1)
+					{		    // exactly one matching entry
+					    for(var idlr in response.locations)
+					    {		// examine the one location
+							var loc         = response.locations[idlr];
+			                element.value   = prefix + loc['location'];
+					    }		// examine the one location
+	
+					    // location field is updated
+					    deferSubmit			= false;
+					    var	updateButton	= document.getElementById('updEvent');
+					    if (updateButton)
+							updateButton.disabled	= false;
+	
+					    // check for action to take after changed
+					    if (element.afterChange)
+							element.afterChange();
+					    else
+							focusNext(element);
+					}		    // exactly one matching location
+					else
+					if (count == 0)
+					{		    // no matching entries
+						var parms           = {"template"	: "",
+			        					        "name"	    : name,
+					        			        "formname"	: formname,
+							        	        "field"	    : field};
+						displayDialog('NewLocationMsg$template',
+								      parms,
+								      element,		    // position
+								      closeNewDialog);	// button closes dialog
+					}		    // no matching entries
+					else
+					{		    // multiple matching entries
+						var parms	            = { "template"	: "",
+			        					            "name"	    : name};
+						var dialog  = displayDialog('ChooseLocationMsg$template',
+										    	    parms,
+										    	    element,	// position
+										    	    null,		// button closes
+										    	    true);		// defer show
+	
+						// update selection list for choice
+			            var form            = dialog.getElementsByTagName('form')[0];
+						var	select	        = form.locationSelect;
+						select.onchange	    = locationChosen;
+						select.setAttribute("for", field);
+						select.setAttribute("formname", formname);
+	
+					    for(var i in response.locations)
+					    {		    // loop through the locations
+							var loc             = response.locations[i];
+							var	idlr	        = loc.idlr;
+							var	locname	        = loc.location;
+	
+							// create option element under select
+							var	option	        = new Option(locname,
+			        					        		     idlr, 
+				        				        		     false, 
+					        			        		     false);
+							// IE<8 does not create option element correctly
+							option.innerHTML	= locname;
+							option.value		= idlr;	
+							select.appendChild(option);
+						}	        // loop through children of top node
+						select.selectedIndex	= 0;
+	
+						// make the dialog visible
+						show(msgDiv);
+						// the following is a workaround for a bug in FF 40.0 and
+						// Chromium in which the onchange method of the <select> is
+						// not called when the mouse is clicked on an option
+						for(var io=0; io < select.options.length; io++)
+						{
+						    var option	= select.options[io];
+						    option.addEventListener("click",
+	                                                function() 
+	                                                {   this.selected = true;
+	                                                this.parentNode.onchange();});
+						}
+						select.focus();
+					}		    // multiple matching entries
+	            }               // name identifies Element
+	            else
+				{		        // element not found
+				    alert("locationCommon.js: gotLocationJSON: element name='" +
+	                        field +
+							"' not found in form");
+				}		        // element not found
+	        }                   // have form
+	        else
+			{		            // form not found
+			    alert("locationCommon.js: gotLocationJSON: form name='" + formname +
+						"' not found");
+			}		            // form not found
+	    }	        		    // valid response
+    }                           // response is a JSON object
     else
-    {
-	    var count	    		= response.count;
-	    var cmd	    		    = response.cmd;
-		var field	    		= '';		// initiating field name
-        if ('field' in response.parms)
-            field               = response.parms.field;
-		var formname			= '';		// form containing field
-        if ('form' in response.parms)
-            formname            = response.parms.form;
-		var name	    		= '';		// search argument
-        if ('name' in response.parms)
-            name                = response.parms.name;
-		var prefix	    		= '';		// location name prefix
-        if ('prefix' in response.parms)
-            prefix              = response.parms.prefix;
-
-		// locate the form containing the element that initiated the request
-		var	form	            = document.forms[formname];
-		if (form instanceof HTMLFormElement)
-        {                   // have form
-			// locate the element that initiated the request
-			var	element	        = form.elements[field];
-			if (element instanceof Element)
-            {               // name identifies Element
-				// if there is exactly one location matching the request then
-				// replace the text value of the element with the full location
-				// name from the database
-				if (count == 1)
-				{		    // exactly one matching entry
-				    for(var idlr in response.locations)
-				    {		// examine the one location
-						var loc         = response.locations[idlr];
-		                element.value   = prefix + loc['location'];
-				    }		// examine the one location
-
-				    // location field is updated
-				    deferSubmit			= false;
-				    var	updateButton	= document.getElementById('updEvent');
-				    if (updateButton)
-						updateButton.disabled	= false;
-
-				    // check for action to take after changed
-				    if (element.afterChange)
-						element.afterChange();
-				    else
-						focusNext(element);
-				}		    // exactly one matching location
-				else
-				if (count == 0)
-				{		    // no matching entries
-					var parms           = {"template"	: "",
-		        					        "name"	    : name,
-				        			        "formname"	: formname,
-						        	        "field"	    : field};
-					displayDialog('NewLocationMsg$template',
-							      parms,
-							      element,		    // position
-							      closeNewDialog);	// button closes dialog
-				}		    // no matching entries
-				else
-				{		    // multiple matching entries
-					var parms	            = { "template"	: "",
-		        					            "name"	    : name};
-					var dialog  = displayDialog('ChooseLocationMsg$template',
-									    	    parms,
-									    	    element,	// position
-									    	    null,		// button closes
-									    	    true);		// defer show
-
-					// update selection list for choice
-		            var form            = dialog.getElementsByTagName('form')[0];
-					var	select	        = form.locationSelect;
-					select.onchange	    = locationChosen;
-					select.setAttribute("for", field);
-					select.setAttribute("formname", formname);
-
-				    for(var i in response.locations)
-				    {		    // loop through the locations
-						var loc             = response.locations[i];
-						var	idlr	        = loc.idlr;
-						var	locname	        = loc.location;
-
-						// create option element under select
-						var	option	        = new Option(locname,
-		        					        		     idlr, 
-			        				        		     false, 
-				        			        		     false);
-						// IE<8 does not create option element correctly
-						option.innerHTML	= locname;
-						option.value		= idlr;	
-						select.appendChild(option);
-					}	        // loop through children of top node
-					select.selectedIndex	= 0;
-
-					// make the dialog visible
-					show(msgDiv);
-					// the following is a workaround for a bug in FF 40.0 and
-					// Chromium in which the onchange method of the <select> is
-					// not called when the mouse is clicked on an option
-					for(var io=0; io < select.options.length; io++)
-					{
-					    var option	= select.options[io];
-					    option.addEventListener("click",
-                                                function() 
-                                                {   this.selected = true;
-                                                this.parentNode.onchange();});
-					}
-					select.focus();
-				}		        // multiple matching entries
-            }                   // name identifies Element
-            else
-			{		            // element not found
-			    alert("locationCommon.js: gotLocationJSON: element name='" +
-                        field +
-						"' not found in form");
-			}		            // element not found
-        }                       // have form
-        else
-		{		                // form not found
-		    alert("locationCommon.js: gotLocationJSON: form name='" + formname +
-					"' not found");
-		}		                // form not found
-    }	        		        // valid response
+	{                           // response is not JSON
+	    alert(response);
+	}                           // response is not JSON
 
     hideLoading();	// hide the "loading" indicator
 }		// function gotLocationJSON

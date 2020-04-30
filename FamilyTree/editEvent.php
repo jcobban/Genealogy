@@ -275,7 +275,6 @@ use \Exception;
 require_once __NAMESPACE__ . '/Event.inc';
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
-require_once __NAMESPACE__ . '/LegacyHeader.inc';
 require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/CitationSet.inc';
 require_once __NAMESPACE__ . '/Name.inc';

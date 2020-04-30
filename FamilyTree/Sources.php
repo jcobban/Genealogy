@@ -53,6 +53,7 @@ use Templating\TemplateTag;
  *		2020/01/22      internationalize numbers                        *
  *      2020/02/17      'IDST$idst' is not on readonly template         * 
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/04/29      add fields and buttons for creating new source  *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/

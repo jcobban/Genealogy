@@ -1,33 +1,33 @@
 <?php
 namespace Genealogy\GedCom;
 /************************************************************************
- *  class FtmPlacDefnTag												*
- *																	    *
- *  This class represents the behavior specific to the _PLAC_DEFN tag	*
+ *  class FtmPlacDefnTag                                                *
+ *                                                                      *
+ *  This class represents the behavior specific to the _PLAC_DEFN tag   *
  *  at level 0 which is used by Family Tree Maker.                      *
- *																	    *
- *  0 _PLAC_DEFN        												*
- *	 1 PLAC <placename>													*
- *	  2 ABBR <abbreviation>	        									*
- *																	    *
+ *                                                                      *
+ *  0 _PLAC_DEFN                                                        *
+ *   1 PLAC <placename>                                                 *
+ *    2 ABBR <abbreviation>                                             *
+ *                                                                      *
  ************************************************************************/
 class FtmPlacDefnTag extends Tag
 {
     /********************************************************************
      *  function FtmPlacDefnTag::__constructor                          *
-     *																	*
-     *	Constructor for an instance of FtmPlacDefnTag:				    *
-     *																	*
-     *  Input:															*
-     *	    $level  	the level in the hierarchy						*
-     *	    $id			the reference identifier						*
-     *	    $name   	the tag name (type)								*
-     *	    $parms  	any parameters									*
-     *	    $document       containing instance of Document             *
+     *                                                                  *
+     *  Constructor for an instance of FtmPlacDefnTag:                  *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $level      the level in the hierarchy                      *
+     *      $id         the reference identifier                        *
+     *      $name       the tag name (type)                             *
+     *      $parms      any parameters                                  *
+     *      $document       containing instance of Document             *
      ********************************************************************/
     function __construct($level,
-						 $id,
-						 $name,
+                         $id,
+                         $name,
                          $parms,
                          $document,
                          $parent = null)
@@ -36,40 +36,40 @@ class FtmPlacDefnTag extends Tag
         global  $debug;
 
         if ($debug)
-		    $warn   .= "<p>FtmPlacDefnTag::__construct($level," .
-									"  '$id'," .
-									"  '$name'," .
-									"  '$parms')</p>\n";
-		parent::__construct($level,
-						    $id,
-						    $name,
-						    $parms,
+            $warn   .= "<p>FtmPlacDefnTag::__construct($level," .
+                                    "  '$id'," .
+                                    "  '$name'," .
+                                    "  '$parms')</p>\n";
+        parent::__construct($level,
+                            $id,
+                            $name,
+                            $parms,
                             $document,
-						    $parent);
+                            $parent);
         $this->diagnostic('Unsupported');
-    }		// FtmPlacDefnTag::__construct
+    }       // FtmPlacDefnTag::__construct
 
     /********************************************************************
-     *  function FtmPlacDefnTag::add								    *
-     *																	*
-     *	This factory method processes immediate children of the 	    *
-     *	FTM _PLAC_DEFN tag.												*
-     *																	*
-     *  Input:															*
-     *	    $level		the level in the hierarchy		                *
-     *	    $id			the reference identifier		                *
-     *	    $tagname	the tag name (type)	                        	*
-     *	    $parms		any parameters		                            *
-     *																	*
-     *	Returns:														*
-     *	    instance of Tag 		                                    *
+     *  function FtmPlacDefnTag::add                                    *
+     *                                                                  *
+     *  This factory method processes immediate children of the         *
+     *  FTM _PLAC_DEFN tag.                                             *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $level      the level in the hierarchy                      *
+     *      $id         the reference identifier                        *
+     *      $tagname    the tag name (type)                             *
+     *      $parms      any parameters                                  *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      instance of Tag                                             *
      ********************************************************************/
     function add($level, $id, $tagname, $parms)
     {
         $childTag       = null;
-		$tagname		= strtoupper($tagname);
-		switch($tagname)
-		{
+        $tagname        = strtoupper($tagname);
+        switch($tagname)
+        {
             case 'PLAC':
             {           // <placename>
                 $childTag   = new IgnoreSubTags($level,
@@ -79,25 +79,25 @@ class FtmPlacDefnTag extends Tag
                                                 $this->document,
                                                 $this,
                                                 array('ABBR'));
-				$childTag->diagnostic('Unimplemented');
-            	break;
-			}           // <placename>
+                $childTag->diagnostic('Unimplemented');
+                break;
+            }           // <placename>
 
-			default:
-		    {					// all others unexpected
+            default:
+            {                   // all others unexpected
                 $childTag           = new Tag($level,
                                               $this->id,
                                               $tagname,
                                               $parms,
                                               $this->document,
                                               $this);
-				$childTag->diagnostic('Unexpected');
+                $childTag->diagnostic('Unexpected');
                 break;
-		    }					// all others unexpected
-		}		// act on specific next level tags
+            }                   // all others unexpected
+        }       // act on specific next level tags
 
-		$this->register($childTag);
+        $this->register($childTag);
         return $childTag;
-    }		// FtmPlacDefnTag::add
-}		// class FtmPlacDefnTag
+    }       // FtmPlacDefnTag::add
+}       // class FtmPlacDefnTag
 

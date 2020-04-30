@@ -6,159 +6,169 @@ use \ArrayAccess;
 use \Countable;
 use \Iterator;
 /************************************************************************
- *  FamilyTree.inc													    *
- *																		*
+ *  FamilyTree.inc                                                      *
+ *                                                                      *
  *  Definition of a class representing a Family Tree. It primarily      *
  *  exists to provide factory methods.                                  *
- *																		*
- *		$tree       = new FamilyTree();     // done in initialization   *
- *		$person     = $tree->getPerson($idir);                          *
- *		$location   = $tree->getLocation($idlr);                        *
- *		$family     = $tree->getFamily($idmr);                          *
- *		$event      = $tree->getEvent($ider);                           *
- *																		*
+ *                                                                      *
+ *      $tree       = new FamilyTree();     // done in initialization   *
+ *      $person     = $tree->getPerson($idir);                          *
+ *      $location   = $tree->getLocation($idlr);                        *
+ *      $family     = $tree->getFamily($idmr);                          *
+ *      $event      = $tree->getEvent($ider);                           *
+ *                                                                      *
  *  This class also provides access to the information in the table     *
- *  tblHR.				                                                *
- *																		*
- *		CREATE TABLE `tblHR` (											*
- *		   `Item`		VARCHAR(10) NOT NULL DEFAULT '',				*
- *		   `Setting`	VARCHAR(255) DEFAULT NULL,						*
- *		    PRIMARY KEY (`Item`) )										*
- *		ENGINE=InnoDB DEFAULT CHARSET=utf8 								*
- *																		*
- *		$tree		= new FamilyTree();								    *
- *		foreach($tree as $item => $setting) { ...}					    *
- *		$setting	= $tree->get($item);								*
- *																		*
- *																		*
- *  History:															*
- *		2019/11/23      created.                                        *
- *		                See LegacyHeader.inc for previous history.      *
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  tblHR.                                                              *
+ *                                                                      *
+ *      CREATE TABLE `tblHR` (                                          *
+ *         `Item`       VARCHAR(10) NOT NULL DEFAULT '',                *
+ *         `Setting`    VARCHAR(255) DEFAULT NULL,                      *
+ *          PRIMARY KEY (`Item`) )                                      *
+ *      ENGINE=InnoDB DEFAULT CHARSET=utf8                              *
+ *                                                                      *
+ *      $tree       = new FamilyTree();                                 *
+ *      foreach($tree as $item => $setting) { ...}                      *
+ *      $setting    = $tree->get($item);                                *
+ *                                                                      *
+ *                                                                      *
+ *  History:                                                            *
+ *      2010/10/23      connection made global                          *
+ *      2011/02/01      replace call to doQuery                         *
+ *      2012/01/13      rename classes to have upper case character     *
+ *      2013/08/09      correct exception identifier                    *
+ *      2013/11/15      do not construct if no database connection      *
+ *      2014/09/19      add method toXml to support getRecordXml.php    *
+ *      2015/09/28      migrate from MDB2 to PDO                        *
+ *      2016/04/28      change toXML to always return the XML and       *
+ *                      only print it by default                        *
+ *      2017/09/11      implement interface Iterator                    *
+ *      2019/12/19      replace xmlentities with htmlentities           *
+ *      2019/11/23      renamed to FamilyTree.inc.                      *
+ *                                                                      *
+ *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
- *  class FamilyTree													*
- *																		*
+ *  class FamilyTree                                                    *
+ *                                                                      *
  *  Definition of a class implementing behavior for a Family Tree.      *
  ************************************************************************/
 
 class FamilyTree implements Iterator
 {
     /********************************************************************
-     *	tree->table												        *
-     *																	*
-     *	Associative array containing all key/value pairs in header.		*
+     *  tree->table                                                     *
+     *                                                                  *
+     *  Associative array containing all key/value pairs in header.     *
      ********************************************************************/
-    private	$table;
+    private $table;
 
     /********************************************************************
-     *	FamilyTree::$initRow											*
-     *																	*
-     *	Static array containing default values for a new record			*
-     *																	*
-     *	This is not actually used for this class, but is retained for	*
-     *	compatibility with the other classes derived from Record		*
+     *  FamilyTree::$initRow                                            *
+     *                                                                  *
+     *  Static array containing default values for a new record         *
+     *                                                                  *
+     *  This is not actually used for this class, but is retained for   *
+     *  compatibility with the other classes derived from Record        *
      ********************************************************************/
-    public static	$initRow	= array('item'		=> '',
-				                        'setting'	=> '');
+    public static   $initRow    = array('item'      => '',
+                                        'setting'   => '');
 
     /********************************************************************
-     *	FamilyTree::$info										        *
-     *																	*
-     *	Description of record class                                     *
+     *  FamilyTree::$info                                               *
+     *                                                                  *
+     *  Description of record class                                     *
      ********************************************************************/
-    public static	$info	= array(
-                				'table'     	=> 'tblHR',
-                				'name'      	=> 'Header',
-                				'prime'	    	=> 'item',
-	            				'srvmg'     	=> false,
-	            				'fldcount'		=> 2,
-                				'order'     	=> 'Item',
-                                'classname' 	=> 'FamilyTree');
+    public static   $info   = array(
+                                'table'         => 'tblHR',
+                                'name'          => 'Header',
+                                'prime'         => 'item',
+                                'srvmg'         => false,
+                                'fldcount'      => 2,
+                                'order'         => 'Item',
+                                'classname'     => 'FamilyTree');
 
     /********************************************************************
-     *	tree->familyIndex											    *
-     *																	*
-     *	Associative array containing existing instances of Family       *
+     *  tree->familyIndex                                               *
+     *                                                                  *
+     *  Associative array containing existing instances of Family       *
      ********************************************************************/
-    private	$familyIndex    = array();
+    private $familyIndex    = array();
 
     /********************************************************************
-     *	tree->eventIndex											    *
-     *																	*
-     *	Associative array containing existing instances of Event        *
+     *  tree->eventIndex                                                *
+     *                                                                  *
+     *  Associative array containing existing instances of Event        *
      ********************************************************************/
-    private	$eventIndex    = array();
+    private $eventIndex    = array();
 
     /********************************************************************
-     *	tree->templeIndex											    *
-     *																	*
-     *	Associative array containing existing instances of Temple       *
+     *  tree->templeIndex                                               *
+     *                                                                  *
+     *  Associative array containing existing instances of Temple       *
      ********************************************************************/
-    private	$templeIndex    = array();
+    private $templeIndex    = array();
 
     /********************************************************************
-     *	tree->addressIndex											    *
-     *																	*
-     *	Associative array containing existing instances of Address      *
+     *  tree->addressIndex                                              *
+     *                                                                  *
+     *  Associative array containing existing instances of Address      *
      ********************************************************************/
-    private	$addressIndex    = array();
+    private $addressIndex    = array();
 
     /********************************************************************
-     *	tree->sourceIndex											    *
-     *																	*
-     *	Associative array containing existing instances of Source       *
+     *  tree->sourceIndex                                               *
+     *                                                                  *
+     *  Associative array containing existing instances of Source       *
      ********************************************************************/
-    private	$sourceIndex    = array();
+    private $sourceIndex    = array();
 
     /********************************************************************
-     *	tree->citationIndex											    *
-     *																	*
-     *	Associative array containing existing instances of Citation     *
+     *  tree->citationIndex                                             *
+     *                                                                  *
+     *  Associative array containing existing instances of Citation     *
      ********************************************************************/
-    private	$citationIndex    = array();
+    private $citationIndex    = array();
 
     /********************************************************************
-     *	function FamilyTree::__construct								*
-     *																	*
+     *  function FamilyTree::__construct                                *
+     *                                                                  *
      *  Create an instance of FamilyTree                                *
-     *																	*
+     *                                                                  *
      ********************************************************************/
     function __construct()
     {
-		global	$debug;
-		global	$connection;
+        global  $debug;
+        global  $connection;
 
-		// construct the query of the header table
-		$query	            = "SELECT Item, Setting FROM tblHR";
-		
-		// query the database
-		if ($debug)
-		    print "<p>$query</p>";
-		$stmt		        = $connection->query($query);
-		if ($stmt)
-		{		        // success
-		    $this->table	= array();	
-		    $result		    = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		    foreach($result as $dbrow)
-		    {		    // copy all entries into table
-				$this->table[$dbrow['item']]	= $dbrow['setting'];
-		    }		    // copy all entries into table
-		}		        // success
-		else
-		{		        // error retrieving record row
-		    throw new Exception(
-						"FamilyTree::__construct: '$query' result=" . 
-						print_r($connection->errorInfo(),true));
-		}		        // error retrieving record row
-    }		// FamilyTree::__construct
+        // construct the query of the header table
+        $query              = "SELECT Item, Setting FROM tblHR";
+
+        // query the database
+        if ($debug)
+            print "<p>$query</p>";
+        $stmt               = $connection->query($query);
+        if ($stmt)
+        {               // success
+            $this->table    = array();
+            $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach($result as $dbrow)
+            {           // copy all entries into table
+                $this->table[$dbrow['item']]    = $dbrow['setting'];
+            }           // copy all entries into table
+        }               // success
+        else
+        {               // error retrieving record row
+            throw new Exception(
+                        "FamilyTree::__construct: '$query' result=" .
+                        print_r($connection->errorInfo(),true));
+        }               // error retrieving record row
+    }       // FamilyTree::__construct
 
     /********************************************************************
-     *	function FamilyTree::getPerson									*
-     *																	*
-     *	Factory method to get an instance of Person                     *
+     *  function FamilyTree::getPerson                                  *
+     *                                                                  *
+     *  Factory method to get an instance of Person                     *
      ********************************************************************/
     function getPerson($idir)
     {
@@ -166,9 +176,9 @@ class FamilyTree implements Iterator
     }           // FamilyTree::getPerson
 
     /********************************************************************
-     *	function FamilyTree::getLocation								*
-     *																	*
-     *	Factory method to get an instance of Location                   *
+     *  function FamilyTree::getLocation                                *
+     *                                                                  *
+     *  Factory method to get an instance of Location                   *
      ********************************************************************/
     function getLocation($idir)
     {
@@ -176,249 +186,249 @@ class FamilyTree implements Iterator
     }           // FamilyTree::getLocation
 
     /********************************************************************
-     *	function FamilyTree::getFamily									*
-     *																	*
-     *	Factory method to get an instance of Family                     *
+     *  function FamilyTree::getFamily                                  *
+     *                                                                  *
+     *  Factory method to get an instance of Family                     *
      ********************************************************************/
     function getFamily($idmr)
     {
         if (!array_key_exists($idmr, $this->familyIndex))
             $this->familyIndex[$idmr]    = new Family(array('idmr' => $idmr));
-	    return $this->familyIndex[$idmr];
+        return $this->familyIndex[$idmr];
     }           // FamilyTree::getFamily
 
     /********************************************************************
-     *	function FamilyTree::getEvent									*
-     *																	*
-     *	Factory method to get an instance of Event                      *
+     *  function FamilyTree::getEvent                                   *
+     *                                                                  *
+     *  Factory method to get an instance of Event                      *
      ********************************************************************/
     function getEvent($ider)
     {
         if (!array_key_exists($ider, $this->eventIndex))
             $this->eventIndex[$ider]    = new Event(array('ider' => $ider));
-	    return $this->eventIndex[$ider];
+        return $this->eventIndex[$ider];
     }           // FamilyTree::getEvent
 
     /********************************************************************
-     *	function FamilyTree::getTemple									*
-     *																	*
-     *	Factory method to get an instance of Temple                     *
+     *  function FamilyTree::getTemple                                  *
+     *                                                                  *
+     *  Factory method to get an instance of Temple                     *
      ********************************************************************/
     function getTemple($idtr)
     {
         if (!array_key_exists($idtr, $this->templeIndex))
             $this->templeIndex[$idtr]   = new Temple(array('idtr' => $idtr));
-	    return $this->templeIndex[$idtr];
+        return $this->templeIndex[$idtr];
     }           // FamilyTree::getTemple
 
     /********************************************************************
-     *	function FamilyTree::getAddress									*
-     *																	*
-     *	Factory method to get an instance of Address                    *
+     *  function FamilyTree::getAddress                                 *
+     *                                                                  *
+     *  Factory method to get an instance of Address                    *
      ********************************************************************/
     function getAddress($idar)
     {
         if (!array_key_exists($idar, $this->addressIndex))
             $this->addressIndex[$idar]  = new Address(array('idar' => $idar));
-	    return $this->addressIndex[$idar];
+        return $this->addressIndex[$idar];
     }           // FamilyTree::getAddress
 
     /********************************************************************
-     *	function FamilyTree::getSource									*
-     *																	*
-     *	Factory method to get an instance of Source                     *
+     *  function FamilyTree::getSource                                  *
+     *                                                                  *
+     *  Factory method to get an instance of Source                     *
      ********************************************************************/
     function getSource($idsr)
     {
         if (!array_key_exists($idsr, $this->sourceIndex))
             $this->sourceIndex[$idsr]   = new Source(array('idsr' => $idsr));
-	    return $this->sourceIndex[$idsr];
+        return $this->sourceIndex[$idsr];
     }           // FamilyTree::getSource
 
     /********************************************************************
-     *	function FamilyTree::getCitation								*
-     *																	*
-     *	Factory method to get an instance of Citation                   *
+     *  function FamilyTree::getCitation                                *
+     *                                                                  *
+     *  Factory method to get an instance of Citation                   *
      ********************************************************************/
     function getCitation($idsx)
     {
         if (!array_key_exists($idsx, $this->citationIndex))
-            $this->citationIndex[$idsx] = 
+            $this->citationIndex[$idsx] =
                                 new Citation(array('idsx' => $idsx));
-	    return $this->citationIndex[$idsx];
+        return $this->citationIndex[$idsx];
     }           // FamilyTree::getCitation
 
     /********************************************************************
-     *	function FamilyTree::get										*
-     *																	*
-     *	Get the setting value corresponding to an item name.			*
+     *  function FamilyTree::get                                        *
+     *                                                                  *
+     *  Get the setting value corresponding to an item name.            *
      ********************************************************************/
     function get($item)
     {
-		global	$msg;
+        global  $msg;
 
-		// action depends upon type of first parameter
-		if (array_key_exists($item, $this->table))
-		{		// numeric identifier of record
-		    return $this->table[$item];
-		}		// item name
-		else
-		{
-		    $msg	.= "FamilyTree::get: called with item='$item', " .
-						   gettype($item) . ". \n";
-		    return '';
-		}
-    }		// FamilyTree::get
+        // action depends upon type of first parameter
+        if (array_key_exists($item, $this->table))
+        {       // numeric identifier of record
+            return $this->table[$item];
+        }       // item name
+        else
+        {
+            $msg    .= "FamilyTree::get: called with item='$item', " .
+                           gettype($item) . ". \n";
+            return '';
+        }
+    }       // FamilyTree::get
 
     /********************************************************************
-     *	function FamilyTree::toXml									*
-     *																	*
-     *  Emit the contents of the object as XML.							*
-     *																	*
-     *	Parameters:														*
-     *	    $top		tag name as a string for the tag enclosing the	*
-     *					values.											*
-     *					If null, do not enclose the individual values	*
-     *					inside a root node.								*
-     *	    $print		if true print the output, else just return it	*
-     *	    $options	match signature									*
-     *																	*
-     *	Returns:														*
-     *	    XML representation of the object							*
+     *  function FamilyTree::toXml                                      *
+     *                                                                  *
+     *  Emit the contents of the object as XML.                         *
+     *                                                                  *
+     *  Parameters:                                                     *
+     *      $top        tag name as a string for the tag enclosing the  *
+     *                  values.                                         *
+     *                  If null, do not enclose the individual values   *
+     *                  inside a root node.                             *
+     *      $print      if true print the output, else just return it   *
+     *      $options    match signature                                 *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      XML representation of the object                            *
      ********************************************************************/
-    function toXml($top		= 'header',
-				   $print	= true,
-				   $options	= 0)
+    function toXml($top     = 'header',
+                   $print   = true,
+                   $options = 0)
     {
-		global	$debug;
+        global  $debug;
 
-		// ensure that there is a label to use for the top element
-		if (!is_string($top) || strlen($top) == 0)
-		    $top	= 'header';
+        // ensure that there is a label to use for the top element
+        if (!is_string($top) || strlen($top) == 0)
+            $top    = 'header';
 
-		if (is_null($top))
-		    $retval	= '';
-		else
-		    $retval	= "    <$top>\n";
-		foreach($this->table as $key => $value)
-		{
-		    if (substr($key, 1, 1) == '_')
-		    	$key	= substr($key, 2);
-		    $retval	.= "\t<$key>" . xmlentities($value) . "</$key>\n";
-		}
-		if ($top !== null)
-		    $retval	.= "    </$top>\n";
+        if (is_null($top))
+            $retval = '';
+        else
+            $retval = "    <$top>\n";
+        foreach($this->table as $key => $value)
+        {
+            if (substr($key, 1, 1) == '_')
+                $key    = substr($key, 2);
+            $retval .= "\t<$key>" . xmlentities($value) . "</$key>\n";
+        }
+        if ($top !== null)
+            $retval .= "    </$top>\n";
 
-		if ($print)
-		    print $retval;
-		return $retval;
-    }		// FamilyTree::toXml
+        if ($print)
+            print $retval;
+        return $retval;
+    }       // FamilyTree::toXml
 
     /********************************************************************
-     *	function FamilyTree::toJson									    *
-     *																	*
-     *  Emit the contents of the object as JSON.						*
-     *																	*
-     *	Parameters:														*
-     *	    $print		if true print the output, else just return it	*
-     *	    $options	match signature									*
-     *																	*
-     *	Returns:														*
-     *	    XML representation of the object							*
+     *  function FamilyTree::toJson                                     *
+     *                                                                  *
+     *  Emit the contents of the object as JSON.                        *
+     *                                                                  *
+     *  Parameters:                                                     *
+     *      $print      if true print the output, else just return it   *
+     *      $options    match signature                                 *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      XML representation of the object                            *
      ********************************************************************/
-    function toJson($print	= true,
-				    $options	= 0)
+    function toJson($print  = true,
+                    $options    = 0)
     {
-		$retval		= '{';
-		$comma		= '';
-		foreach($this->table as $key => $value)
-		{
-		    if (substr($key, 1, 1) == '_')
-		    	$key	= substr($key, 2);
-		    $retval	.= $comma . "\t\"$key\":\t" . json_encode($value);
-		    $comma	= ",\n";
-		}
-		$retval	.= "\n}\n";
+        $retval     = '{';
+        $comma      = '';
+        foreach($this->table as $key => $value)
+        {
+            if (substr($key, 1, 1) == '_')
+                $key    = substr($key, 2);
+            $retval .= $comma . "\t\"$key\":\t" . json_encode($value);
+            $comma  = ",\n";
+        }
+        $retval .= "\n}\n";
 
-		if ($print)
-		    print $retval;
-		return $retval;
-    }		// FamilyTree::toJson
+        if ($print)
+            print $retval;
+        return $retval;
+    }       // FamilyTree::toJson
 
     /********************************************************************
-     *	function FamilyTree::rewind									    *
-     *																	*
-     *	Part of the implementation of the interface Iterator.			*
-     *	Reposition to the first element of the "array".					*
-     *																	*
-     *  Returns:														*
-     *		    String													*
+     *  function FamilyTree::rewind                                     *
+     *                                                                  *
+     *  Part of the implementation of the interface Iterator.           *
+     *  Reposition to the first element of the "array".                 *
+     *                                                                  *
+     *  Returns:                                                        *
+     *          String                                                  *
      ********************************************************************/
     public function rewind()
     {
-		reset($this->table);
+        reset($this->table);
     }
-  
+
     /********************************************************************
-     *	function FamilyTree::current									*
-     *																	*
-     *	Part of the implementation of the interface Iterator.			*
-     *	Return the value of the current element of the "array"			*
-     *																	*
-     *  Returns:														*
-     *	    String														*
+     *  function FamilyTree::current                                    *
+     *                                                                  *
+     *  Part of the implementation of the interface Iterator.           *
+     *  Return the value of the current element of the "array"          *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      String                                                      *
      ********************************************************************/
     public function current()
     {
-		$row            = current($this->table);
-		return $row;
+        $row            = current($this->table);
+        return $row;
     }
-  
+
     /********************************************************************
-     *	function FamilyTree::key										*
-     *																	*
-     *	Part of the implementation of the interface Iterator.			*
-     *	Return the key of the current element of the "array".			*
-     *																	*
-     *  Returns:														*
-     *	    String														*
+     *  function FamilyTree::key                                        *
+     *                                                                  *
+     *  Part of the implementation of the interface Iterator.           *
+     *  Return the key of the current element of the "array".           *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      String                                                      *
      ********************************************************************/
-    public function key() 
+    public function key()
     {
-		$row            = key($this->table);
-		return $row;
+        $row            = key($this->table);
+        return $row;
     }
-  
+
     /********************************************************************
-     *	function FamilyTree::next										*
-     *																	*
-     *	Part of the implementation of the interface Iterator.			*
-     *	Advance to the next element of the "array".						*
-     *																	*
-     *  Returns:														*
-     *	    String  													*
+     *  function FamilyTree::next                                       *
+     *                                                                  *
+     *  Part of the implementation of the interface Iterator.           *
+     *  Advance to the next element of the "array".                     *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      String                                                      *
      ********************************************************************/
-    public function next() 
+    public function next()
     {
-		$row            = next($this->table);
-		return $row;
+        $row            = next($this->table);
+        return $row;
     }
-  
+
     /********************************************************************
-     *	function FamilyTree::valid									    *
-     *																	*
-     *	Part of the implementation of the interface Iterator.			*
-     *	Returns true if the iterator is valid.							*
-     *																	*
-     *  Returns:														*
-     *	    boolean														*
+     *  function FamilyTree::valid                                      *
+     *                                                                  *
+     *  Part of the implementation of the interface Iterator.           *
+     *  Returns true if the iterator is valid.                          *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      boolean                                                     *
      ********************************************************************/
     public function valid()
     {
-		$key            = key($this->table);
-		$row            = ($key !== NULL && $key !== FALSE);
-		return $row;
+        $key            = key($this->table);
+        $row            = ($key !== NULL && $key !== FALSE);
+        return $row;
     }
 
-}		// class FamilyTree 
+}       // class FamilyTree
 
