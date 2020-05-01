@@ -27,35 +27,19 @@ use \Iterator;
  ************************************************************************/
     // identify database server
     $servers    = array (
-            'backup'    => array(
-                        'phptype'  => 'mysql',
-                        'username' => 'jcobban_webupd',
-                        'password' => 'M1gz_F%^tEo8',
-                        'hostspec' => 'localhost',
-                        'database' => 'jcobban_genealogy',
-                        'googlekey'=> 'AIzaSyAOe2pugQv4Y5uS_T-QQHr8A6ElBMdjGlc'
-                        ),
-            'isp'       => array(
-                        'phptype'  => 'mysql',
-                        'username' => 'jcobban_webupd',
-                        'password' => 'M1gz_F%^tEo8',
-                        'hostspec' => 'localhost',
-                        'database' => 'jcobban_genealogy',
-                        'googlekey'=> 'AIzaSyBapDvSH80xd1AYBdqoxO51lQLnmW5tTPE'
-                        ),
             'remote'    => array(
                         'phptype'  => 'mysql',
-                        'username' => 'jcobban_webupd',
-                        'password' => 'M1gz_F%^tEo8',
-                        'hostspec' => 'jamescobban.net',
-                        'database' => 'jcobban_genealogy',
-                        'googlekey'=> 'AIzaSyBapDvSH80xd1AYBdqoxO51lQLnmW5tTPE'
+                        'username' => 'username',
+                        'password' => '',
+                        'hostspec' => 'url',
+                        'database' => 'genealogy',
+                        'googlekey'=> ''
                         ),
             'original'  => array(
                         'phptype'  => 'mysql',
-                        'username' => 'root',
-                        'password' => 'Spyn12..',
-                        'hostspec' => 'localhost',
+                        'username' => 'username',
+                        'password' => '',
+                        'hostspec' => 'url',
                         'database' => 'genealogy',
                         'googlekey'=> ''
                         )
