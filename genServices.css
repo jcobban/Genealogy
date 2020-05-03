@@ -1,112 +1,112 @@
-/**
- *  genServices.css
- *
- *  Extension stylesheet for the genServices web page to define
- *  table elements suitable for displaying a family tree as a
- *  hierarchy of boxes.
- *
- *  History:
- *	2011/02/12	correct syntax error
- *
- *  Copyright &copy; 2011 James A. Cobban
- **/
+/****************************************************************************
+ *  genServices.css                                                         *
+ *                                                                          *
+ *  Extension stylesheet for the genServices web page to define             *
+ *  table elements suitable for displaying a family tree as a               *
+ *  hierarchy of boxes.                                                     *
+ *                                                                          *
+ *  History:                                                                *
+ *      2011/02/12      correct syntax error                                *
+ *                                                                          *
+ *  Copyright &copy; 2011 James A. Cobban                                   *
+ ****************************************************************************/
   table.famTree {
-	  border-spacing: 0px;
-	}
+                border-spacing: 0px;
+                }
   colgroup.quarter {
-	  width: 25%;
-	}
-  td.top {background-color: #FEFEF0;
-	  border-top: 2px solid brown;	
-	  border-left: 2px solid brown;
-	  border-right: 2px solid brown;
-	  border-bottom-width: 0px;
-	  margin-top: 0px;
-	  margin-bottom: 0px;
-	  font-family: sans-serif;
-	}
-  td.mid {background-color: #FEFEF0;
-	  border-left: 2px solid brown;
-	  border-right: 2px solid brown;
-	  border-top-width: 0px;
-	  border-bottom-width: 0px;
-	  margin-top: 0px;
-	  margin-bottom: 0px;
-	  font-family: sans-serif;
-	  font-size: smaller;
-	}
-  td.midleft {background-color: #FEFEF0;
-	  border-left: 2px solid brown;
-	  border-top-width: 0px;
-	  border-right-width: 0px;
-	  border-bottom-width: 0px;
-	  margin-top: 0px;
-	  margin-bottom: 0px;
-	  font-family: sans-serif;
-	  font-size: smaller;
-	}
-  td.midright {background-color: #FEFEF0;
-	  border-right: 2px solid brown;
-	  border-top-width: 0px;
-	  border-left-width: 0px;
-	  border-bottom-width: 0px;
-	  margin-top: 0px;
-	  margin-bottom: 0px;
-	  font-family: sans-serif;
-	  font-size: smaller;
-	}
-  td.bot {background-color: #FEFEF0;
-	  border-left: 2px solid brown;
-	  border-right: 2px solid brown;
-	  border-bottom: 2px solid brown;	
-	  border-top-width: 0px;
-	  margin-top: 0px;
-	  margin-bottom: 0px;
-	  font-family: sans-serif;
-	  font-size: smaller;
-	}
-  td.botleft { background-color: #FEFEF0;
-	  border-left: 2px solid brown;
-	  border-bottom: 2px solid brown;	
-	  border-top-width: 0px;
-	  border-right-width: 0px;
-	  margin-top: 0px;
-	  margin-bottom: 0px;
-	  font-family: sans-serif;
-	  font-size: smaller;
-	}
+                width: 25%;
+                }
+  td.top {      background-color: #FEFEF0;
+                border-top: 2px solid brown;  
+                border-left: 2px solid brown;
+                border-right: 2px solid brown;
+                border-bottom-width: 0px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                font-family: sans-serif;
+                }
+  td.mid {      background-color: #FEFEF0;
+                border-left: 2px solid brown;
+                border-right: 2px solid brown;
+                border-top-width: 0px;
+                border-bottom-width: 0px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                font-family: sans-serif;
+                font-size: smaller;
+                }
+  td.midleft {  background-color: #FEFEF0;
+                border-left: 2px solid brown;
+                border-top-width: 0px;
+                border-right-width: 0px;
+                border-bottom-width: 0px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                font-family: sans-serif;
+                font-size: smaller;
+                }
+  td.midright { background-color: #FEFEF0;
+                border-right: 2px solid brown;
+                border-top-width: 0px;
+                border-left-width: 0px;
+                border-bottom-width: 0px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                font-family: sans-serif;
+                font-size: smaller;
+                }
+  td.bot {      background-color: #FEFEF0;
+                border-left: 2px solid brown;
+                border-right: 2px solid brown;
+                border-bottom: 2px solid brown;   
+                border-top-width: 0px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                font-family: sans-serif;
+                font-size: smaller;
+                }
+  td.botleft {  background-color: #FEFEF0;
+                border-left: 2px solid brown;
+                border-bottom: 2px solid brown;   
+                border-top-width: 0px;
+                border-right-width: 0px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                font-family: sans-serif;
+                font-size: smaller;
+                }
   td.botright { background-color: #FEFEF0;
-	  border-right: 2px solid brown;
-	  border-bottom: 2px solid brown;
-	  border-top-width: 0px;
-	  border-left-width: 0px;
-	  margin-top: 0px;
-	  margin-bottom: 0px;
-	  font-family: sans-serif;
-	  font-size: smaller;
-	}
-  td.west {border-left: 2px solid black;
-	 border-top-width: 0px;
-	 border-right-width: 0px;
-	 border-bottom-width: 0px;
-		}
-  td.nw {border-top: 2px solid black;
-	 border-left: 2px solid black;
-	 border-right-width: 0px;
-	 border-bottom-width: 0px;
-	}
-  td.north {border-top: 2px solid black;
-	 border-left-width: 0px;
-	 border-right-width: 0px;
-	 border-bottom-width: 0px;
-	}
-  td.sw {border-bottom: 2px solid black;
-	 border-left: 2px solid black;
-	 border-right-width: 0px;
-	 border-top-width: 0px;
-	}
-  td.south {border-bottom: 2px solid black;
-	  border-left-width: 0px;
-	  border-right-width: 0px;
-	  border-top-width: 0px;
-	}
+                border-right: 2px solid brown;
+                border-bottom: 2px solid brown;
+                border-top-width: 0px;
+                border-left-width: 0px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                font-family: sans-serif;
+                font-size: smaller;
+                }
+  td.west {     border-left: 2px solid black;
+                border-top-width: 0px;
+                border-right-width: 0px;
+                border-bottom-width: 0px;
+                }
+  td.nw {       border-top: 2px solid black;
+                border-left: 2px solid black;
+                border-right-width: 0px;
+                border-bottom-width: 0px;
+                }
+  td.north {    border-top: 2px solid black;
+                border-left-width: 0px;
+                border-right-width: 0px;
+                border-bottom-width: 0px;
+                }
+  td.sw {       border-bottom: 2px solid black;
+                border-left: 2px solid black;
+                border-right-width: 0px;
+                border-top-width: 0px;
+                }
+  td.south {    border-bottom: 2px solid black;
+                border-left-width: 0px;
+                border-right-width: 0px;
+                border-top-width: 0px;
+                }

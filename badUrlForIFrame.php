@@ -3,17 +3,16 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  badUrlForIFrame.php							*
- *									*
- *  Handle an attempt to load an insecure page into an <iframe>		*
- *									*
- *  Parameters:								*
- *	src	requested URL						*
- *									*
- *    History:								*
- *	2016/06/23	created						*
+ *  badUrlForIFrame.php                                                 *
+ *                                                                      *
+ *  Handle an attempt to load an insecure page into an <iframe>         *
+ *                                                                      *
+ *  Parameters:                                                         *
+ *      src     requested URL                                           *
+ *                                                                      *
+ *  History:                                                            *
+ *      2016/06/23      created                                         *
  ************************************************************************/
-
 ?>
 <!DOCTYPE HTML >
 <html>

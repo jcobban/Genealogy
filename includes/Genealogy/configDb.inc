@@ -9,6 +9,7 @@ use \Iterator;
  *  configDb.inc                                                        *
  *                                                                      *
  *  Customization of access to the database server                      *
+ *  Note that this is an example file with no real passwords or keys.   *
  *                                                                      *
  *  Sets the following global variables that can be used by any script: *
  *                                                                      *
@@ -61,6 +62,6 @@ use \Iterator;
         $dsn        = reset($servers);  // get first entry
 
     // get the database name from the selected entry
-    if (is_array($dsn))
+    if (is_array($dsn) && array_key_exists('database', $dsn))
         $databaseName   = $dsn['database'];
 

@@ -34,6 +34,7 @@ use \Exception;
  *		2019/02/21      use new FtTemplate constructor                  *
  *		                improve support of non-Canadian Censuses        *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/05/02      wrong index into set of Domains                 *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -71,26 +72,11 @@ foreach($_GET as $key => $value)
 			    $censusId	= 'CA' . $value;
 			    $censusYear	= $value;
 			}
-			else
-			    $censusId	= $value;
-
-			// validate
-			$census	        = new Census(array('censusid'	=> $censusId));
-			if ($census->isExisting())
-			{
-			    $provinces	= $census->get('provinces');
-			    $censusList[$censusId]['selected'] = "selected='selected'";
-			}
-			else
-			{
-			    $warn	    .= "<p>Census '$censusId' is unsupported</p>\n";
-			    $provinces	= '';
-			}
-			$cc		        = $census['cc'];
-			$province	    = $census['province'];
-			$censusYear	    = $census['year'];
-			$country	    = new Country(array('code' => $cc));
-			$countryName	= $country->get('name');
+            else
+            {
+                $censusId	= $value;
+			    $cc		    = strtoupper(substr($censusId,0,2));
+            }
 			break;
 	    }
 
@@ -127,6 +113,14 @@ $template	        = new FtTemplate("ReqUpdateDists$lang.html");
  *																		*
  *		List of censuses to choose from									*
  ************************************************************************/
+if (strlen($censusId) >= 6)
+{
+    $census	        = new Census(array('censusid'	=> $censusId));
+    $cc	            = $census['cc'];
+    if (strlen($census['province']) > 0)
+	    $province	= $census['province'];
+	$censusYear	    = $census['year'];
+}
 $censusList		    = array();
 $getParms		    = array('cc'	=> $cc);
 $censuses		    = new CensusSet($getParms);
@@ -137,6 +131,20 @@ foreach($censuses as $census)
 						    'name'		=> $census->get('name'),
 						    'selected'	=> '');
 }
+
+if ($census->isExisting())
+{
+    $provinces	    = $census->get('provinces');
+    $censusList[$censusId]['selected'] = "selected='selected'";
+}
+else
+{
+    $warn	        .= "<p>Census '$censusId' is unsupported</p>\n";
+    $provinces	    = '';
+}
+$country	        = new Country(array('code' => $cc));
+$countryName	    = $country->get('name');
+
 $template->set('CENSUSYEAR', 	$censusYear);
 $template->set('CC',	        $cc);
 $template->set('COUNTRYNAME',	$countryName);
@@ -158,21 +166,25 @@ if ($censusYear > 1867)
 else
 	$template->updateTag('allProvincesOpt', null);
 
-$getParms	= array('cc' => $cc);
-$domains	= new DomainSet($getParms);
-$provArray	= array();
+$getParms	        = array('cc' => $cc);
+$domains	        = new DomainSet($getParms);
+$provArray	        = array();
 for ($ip = 0; $ip < strlen($provinces); $ip = $ip + 2)
-{			// loop through all provinces
-	$pc			= substr($provinces, $ip, 2);
-	$domainObj		= $domains[$pc];
-	$provinceName	= $domainObj->get('name');
-	$pname		= $provinceName;
+{			    // loop through all provinces
+    $pc			    = substr($provinces, $ip, 2);
+    $domainObj		= $domains["$cc$pc"];
+    if (is_null($domainObj))
+    {
+        error_log("ReqUpdateDists.php: " . __LINE__ . " Province code '$cc$pc' not found in Domains of country code '$cc'\n");
+        $domainObj  = new Domain(array('code' => "$cc$pc"));
+    }
+    $provinceName   = $domainObj->get('name');
 	if ($pc == $province)
 	    $seld		= "selected='selected'";
 	else
-	    $seld		= '';
+        $seld		= '';
 	$provArray[$pc]	= array('pc'		=> $pc,
-						    'name'		=> $pname,
+						    'name'		=> $provinceName,
 						    'selected'	=> $seld);
 }
 $template->updateTag('provinceOpt', $provArray);

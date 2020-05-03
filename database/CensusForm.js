@@ -202,6 +202,7 @@
  *      2020/04/04      pass lang parameter to Person script            *
  *      2020/04/29      present cantread and cantwrite as gender        *
  *                      use addEventListener                            *
+ *                      use new Event and element.dispatchEvent         *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -661,7 +662,7 @@ function changeReplDown()
  *  function changeSex                                                  *
  *                                                                      *
  *  Take action when the user changes the Sex field.                    *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
@@ -691,7 +692,7 @@ function changeSex()
  *  function changeCanRead                                              *
  *                                                                      *
  *  Take action when the user changes the CanRead field.                *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
@@ -716,7 +717,7 @@ function changeCanRead()
  *  function changeCantRead                                             *
  *                                                                      *
  *  Take action when the user changes the CantRead field.               *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
@@ -761,31 +762,31 @@ function changeCantRead()
  *  function changeAddress                                              *
  *                                                                      *
  *  Take action when the user changes the Address or Location field.    *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
+ *      evt         instance of 'change' Event                          *
  ************************************************************************/
-function changeAddress()
+function changeAddress(evt)
 {
     changeElt(this);    // perform common processing
-    var  name   = this.name;
-    var  value  = this.value;
-    var  row    = name.substring(7);
-    if (name.substring(0,8) == 'Location')
-        row  = name.substring(8);
-    //alert("CensusForm.js: changeAddress: row='" + row +
-    //          "', value='" + value + "'");
-    var  form   = this.form;
-    var  field  = form.elements['OwnerTenant' + row];
-    if (field)
-    {           // ResType field present in form
+    var name                = this.name;
+    var result              = /([a-zA-Z_$]+)(\d*)$/.exec(name);
+    var colName             = result[1].toLowerCase();
+    var rowNum              = result[2];
+    var value               = this.value;
+    var form                = this.form;
+    var otColumn            = form.elements['OwnerTenant' + rowNum];
+    if (otColumn)
+    {                   // OwnerTenant field present in form
         if (value.length > 0)
-            field.value  = 'O';
+            otColumn.value  = 'O';  // set to default Owner
         else
-            field.value  = '';
-        field.onchange();
-    }           // ResType field present in form
+            otColumn.value  = '';   // clear
+        evt                 = new Event('change',{'bubbles':true});
+        otColumn.dispatchEvent(evt);
+    }                   // OwnerTenant field present in form
 
     // validate the contents of the field
     if (this.checkfunc)
@@ -796,7 +797,7 @@ function changeAddress()
  *  function changeResType                                              *
  *                                                                      *
  *  Take action when the user changes the residence type field.         *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
@@ -847,7 +848,7 @@ function changeResType()
  *  function changeOwnerTenant                                          *
  *                                                                      *
  *  Take action when the user changes the residence type field.         *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
@@ -910,8 +911,9 @@ function changeOwnerTenant()
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
+ *      evt         instance of 'change' Event                          *
  ************************************************************************/
-function changeSurname()
+function changeSurname(evt)
 {
     changeElt(this);
 
@@ -919,21 +921,21 @@ function changeSurname()
     if ((this.value.length == 0) ||
         this.value.substring(0, 1) == "[")
     {       // surname blanked out
-        var td  = this.parentNode;
-        var col  = td.cellIndex;
-        var tr  = td.parentNode;
-        var row  = tr.rowIndex; // row index of current row
+        var td              = this.parentNode;
+        var col             = td.cellIndex;
+        var tr              = td.parentNode;
+        var row             = tr.rowIndex; // row index of current row
         for (var i = 0; i < tr.cells.length; i++)
         {
-            var cell  = tr.cells[i];
+            var cell        = tr.cells[i];
             if (i != col)
             {       // not surname cell
-                var field  = cell.firstChild;
+                var field   = cell.firstChild;
 
                 // the first child may not be the desired input element
                 // for example if there is some text at beginning of cell
                 while(field && field.nodeType != 1)
-                    field  = field.nextSibling;
+                    field   = field.nextSibling;
                 if (field && field.value)
                     field.value  = "";
             }       // cell exists in this row
@@ -942,7 +944,7 @@ function changeSurname()
 
     this.checkfunc();
 
-    var errpos                  = this.className.indexOf('error');
+    var errpos              = this.className.indexOf('error');
     if (errpos == -1 && this.value.length > 0)
         replDown(this);
 }       // function changeSurname
@@ -951,7 +953,7 @@ function changeSurname()
  *  function changeOccupation                                           *
  *                                                                      *
  *  Take action when the user changes the Occupation field.             *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
@@ -973,7 +975,8 @@ function changeOccupation()
         occupation == 'Farmer')
     {
         oaElement.value      = 'Y';
-        oaElement.onchange();
+        evt                 = new Event('change',{'bubbles':true});
+        oaElement.dispatchEvent(evt);
     }
 
     if (eeElement &&
@@ -981,7 +984,8 @@ function changeOccupation()
          occupation == 'Laborer'))
     {
         eeElement.value      = 'Y';
-        eeElement.onchange();
+        evt                 = new Event('change',{'bubbles':true});
+        eeElement.dispatchEvent(evt);
     }
 
     if (whereElement &&
@@ -998,7 +1002,7 @@ function changeOccupation()
  *  function changeEmpType                                              *
  *                                                                      *
  *  Take action when the user changes the EmpType field.                *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
@@ -1024,7 +1028,7 @@ function changeEmpType()
  *                                                                      *
  *  Take action when the user changes the value of a flag column        *
  *  that displays a gender indicator.                                   *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
@@ -1054,7 +1058,7 @@ function changeGenderFlag()
  *  function changeSchoolMons                                           *
  *                                                                      *
  *  Take action when the user changes the SchoolMons field.             *
- *  This is the onchange member function of the element.                *
+ *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
  *      this        <input type='text'> element                         *
@@ -3418,7 +3422,13 @@ function displaySelectIdir(templateId,
         for(var io=0; io < select.options.length; io++)
         {
             var option  = select.options[io];
-            option.addEventListener("click", function(event) {event.stopPropagation(); this.selected = true; this.parentNode.onchange();});
+            evt             = new Event('change',{'bubbles':true});
+            option.addEventListener("click",
+                                    function(event) {
+                                        event.stopPropagation(); 
+                                        this.selected = true; 
+                                        this.parentNode.dispatchEvent(evt);
+                                    });
         }
         select.focus();
         return true;

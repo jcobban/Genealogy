@@ -1670,8 +1670,8 @@ function givenChanged()
     givenElt        = this;
     var	givenName	= this.value.toLowerCase();
     var options             = {};
-    options.errorHandler    = function() {alert('script getRecordJson.php not found')};
-    var url         = '/getRecordJson.php?table=Nicknames&id=' + givenName.replace(/\s+/g, ',');
+    options.errorHandler    = function() {alert('script getRecordJSON.php not found')};
+    var url         = '/getRecordJSON.php?table=Nicknames&id=' + givenName.replace(/\s+/g, ',');
     HTTP.get(url,
              gotNickname,
              options);

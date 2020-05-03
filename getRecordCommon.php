@@ -7,7 +7,7 @@ use \Exception;
  *                                                                      *
  *  Get the information on an instance of Record.                       *
  *  This is the code shared between getRecordXml.php and                *
- *  getRecordJson.php.                                                  *
+ *  getRecordJSON.php.                                                  *
  *                                                                      *
  *  Parameters (passed by method='GET'):                                *
  *      table                   keys:                                   *

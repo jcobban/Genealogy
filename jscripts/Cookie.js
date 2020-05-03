@@ -1,36 +1,36 @@
 /************************************************************************
- *  Cookie.js															*
- *																		*
- *  This file is copied from "JavaScript: The Definitive Guide", 		*
- *  5th Edition, by David Flanagan, chapter 19							*
- *  Copyright © 2006, 2002, 1998, 1997, 1996 O'Reilly Media, Inc. 		*
- *		All rights reserved.											*
- *																		*
- *  History:															*
- *		2010/12/08		corrected to trim off space between semi-colon	*
- *						and subsequent cookie names						*
- *		2014/07/27		make comments pretty							*
+ *  Cookie.js                                                           *
+ *                                                                      *
+ *  This file is copied from "JavaScript: The Definitive Guide",        *
+ *  5th Edition, by David Flanagan, chapter 19                          *
+ *  Copyright © 2006, 2002, 1998, 1997, 1996 O'Reilly Media, Inc.       *
+ *      All rights reserved.                                            *
+ *                                                                      *
+ *  History:                                                            *
+ *      2010/12/08      corrected to trim off space between semi-colon  *
+ *                      and subsequent cookie names                     *
+ *      2014/07/27      make comments pretty                            *
  ************************************************************************/
 
 /************************************************************************
- *  Cookie																*
- *																		*
- *  This is the Cookie() constructor function.							*
- *																		*
- *  This constructor looks for a cookie with the specified name for the	*
- *  current document.  If one exists, it parses its value into a set of	*
- *  name/value pairs and stores those values as properties of the newly	*
- *  created object.														*
- *																		*
- *  To store new data in the cookie, simply set properties of the		*
- *  Cookie object.  Avoid properties named "store" and "remove" since	*
- *  these are reserved as method names.									*
- *  																	*
- *  To save cookie data in the web browser's local store, call store().	*
- *  To remove cookie data from the browser's store, call remove().		*
- *																		*
- *  The static method Cookie.enabled() returns true if cookies are		*
- *  enabled and returns false otherwise.								*
+ *  Cookie                                                              *
+ *                                                                      *
+ *  This is the Cookie() constructor function.                          *
+ *                                                                      *
+ *  This constructor looks for a cookie with the specified name for the *
+ *  current document.  If one exists, it parses its value into a set of *
+ *  name/value pairs and stores those values as properties of the newly *
+ *  created object.                                                     *
+ *                                                                      *
+ *  To store new data in the cookie, simply set properties of the       *
+ *  Cookie object.  Avoid properties named "store" and "remove" since   *
+ *  these are reserved as method names.                                 *
+ *                                                                      *
+ *  To save cookie data in the web browser's local store, call store(). *
+ *  To remove cookie data from the browser's store, call remove().      *
+ *                                                                      *
+ *  The static method Cookie.enabled() returns true if cookies are      *
+ *  enabled and returns false otherwise.                                *
  ************************************************************************/
 function Cookie(name) {
     this.$name = name;  // Remember the name of this cookie
@@ -42,16 +42,16 @@ function Cookie(name) {
     if (allcookies == "") return;
     // Break the string of all cookies into individual cookie strings
     // Then loop through the cookie strings, looking for our name
-    var cookies		= allcookies.split(';');
-    var cookieval	= null;
+    var cookies     = allcookies.split(';');
+    var cookieval   = null;
     for(var i = 0; i < cookies.length; i++) {
-		var cookieparts	= cookies[i].trim().split('=');
+        var cookieparts = cookies[i].trim().split('=');
         // Does this cookie string begin with the name we want?
         if (cookieparts[0] == name) {
             cookieval = cookieparts[1];
             break;
-        }	// name matches
-    }		// loop through cookies
+        }   // name matches
+    }       // loop through cookies
 
     // If we didn't find a matching cookie, quit now
     if (cookieval == null) return;
@@ -71,32 +71,32 @@ function Cookie(name) {
     // the property value because the store() method encodes it
     for(var i = 0; i < a.length; i++) {
         this[a[i][0]] = decodeURIComponent(a[i][1]);
-    }		// set all properties
-}		// Cookie constructor
+    }       // set all properties
+}       // Cookie constructor
 
 /************************************************************************
- *  store																*
- *																		*
- *  Update the value of the cookie in the browser document.				*
- *																		*
- *  Arguments:															*
- *																		*
- *		daysToLive:		the lifetime of the cookie, in days. If you set	*
- *						this to zero, the cookie will be deleted.  If	*
- *						you set it to null, or omit this argument, the	*
- *						cookie will be a session cookie and will not be	*
- *						retained when the browser exits.  This argument	*
- *						is used to set the max-age attribute of the		*
- *						cookie.											*
- *		path:			the value of the path attribute of the cookie	*
- *		domain:			the value of the domain attribute of the cookie	*
- *		secure:			if true, the secure attribute of the cookie		*
- *						will be set										*
+ *  store                                                               *
+ *                                                                      *
+ *  Update the value of the cookie in the browser document.             *
+ *                                                                      *
+ *  Arguments:                                                          *
+ *                                                                      *
+ *      daysToLive:     the lifetime of the cookie, in days. If you set *
+ *                      this to zero, the cookie will be deleted.  If   *
+ *                      you set it to null, or omit this argument, the  *
+ *                      cookie will be a session cookie and will not be *
+ *                      retained when the browser exits.  This argument *
+ *                      is used to set the max-age attribute of the     *
+ *                      cookie.                                         *
+ *      path:           the value of the path attribute of the cookie   *
+ *      domain:         the value of the domain attribute of the cookie *
+ *      secure:         if true, the secure attribute of the cookie     *
+ *                      will be set                                     *
  ************************************************************************/
 Cookie.prototype.store = function(daysToLive,
-								  path, 
-								  domain, 
-								  secure) 
+                                  path, 
+                                  domain, 
+                                  secure) 
 {
     // First, loop through the properties of the Cookie object and
     // put together the value of the cookie. Since cookies use the
@@ -133,20 +133,20 @@ Cookie.prototype.store = function(daysToLive,
 
     // Now store the cookie by setting the magic Document.cookie property
     document.cookie = cookie;
-}		// function store
+}       // function store
 
 /************************************************************************
- *  function remove														*
- *																		*
- *  This function deletes the properties of the object and removes		*
- *  the cookie from the browser's local store.							*
- * 																		*
- * The arguments to this function are all optional, but to remove a		*
- * cookie you must pass the same values you passed to store().			*
+ *  function remove                                                     *
+ *                                                                      *
+ *  This function deletes the properties of the object and removes      *
+ *  the cookie from the browser's local store.                          *
+ *                                                                      *
+ * The arguments to this function are all optional, but to remove a     *
+ * cookie you must pass the same values you passed to store().          *
  ************************************************************************/
 Cookie.prototype.remove = function(path,
-								   domain, 
-								   secure) 
+                                   domain, 
+                                   secure) 
 {
     // Delete the properties of the cookie
     for(var prop in this)
@@ -157,20 +157,20 @@ Cookie.prototype.remove = function(path,
 
     // Then, store the cookie with a lifetime of 0
     this.store(0, path, domain, secure);
-}		// function remove
+}       // function remove
 
 /************************************************************************
- *  static function enabled												*
- *																		*
- *  This static method attempts to determine whether cookies are		*
- *  enabled on this browser.											*
- *																		*
- *  Returns:															*
- *		true if they appear to be enabled and false otherwise.			*
- *		A return value of true does not guarantee that cookies actually	*
- *		persist.														*
- *		Nonpersistent session cookies may still work even if this		*
- *		method returns false.											*
+ *  static function enabled                                             *
+ *                                                                      *
+ *  This static method attempts to determine whether cookies are        *
+ *  enabled on this browser.                                            *
+ *                                                                      *
+ *  Returns:                                                            *
+ *      true if they appear to be enabled and false otherwise.          *
+ *      A return value of true does not guarantee that cookies actually *
+ *      persist.                                                        *
+ *      Nonpersistent session cookies may still work even if this       *
+ *      method returns false.                                           *
  ************************************************************************/
 Cookie.enabled = function()
 {
@@ -194,5 +194,5 @@ Cookie.enabled = function()
         document.cookie = "testcookie=test; max-age=0";  // Delete cookie
         return Cookie.enabled.cache = true;
     }
-}		// static function enabled
+}       // static function enabled
 
