@@ -58,8 +58,9 @@
  *		2019/04/07      ensure that the paging lines can be displayed   *
  *		                within the visible portion of the browser.      *
  *		2019/06/08      pass language to Pages form                     *
+ *		2020/05/03      correct addition of new enumeration division    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 var lang    = 'en';
 if ('lang' in args)
@@ -557,52 +558,58 @@ function addDiv()
 
     // rownum is the index of the TableRow object within the rows
     // collection of the enclosing table
-    var rownum	= oldRow.rowIndex;
+    var rownum	        = oldRow.rowIndex;
 
     // the name attribute of the button invoking this function consists
     // of the letters "Add" followed by the numeric row number which is
     // usually 2 digits long (padded with '0' if less than 10) but may
     // be 3 digits if there are more than 99 rows.
-    var oLine	= this.id.substring(3);
-    var oNumLen	= oLine.length;	// length of original line number
+    var oLine	                    = this.id.substring(3);
+    var oNumLen	                    = oLine.length;	// length of line number
 
     // generate a new line number to use on the input fields in the
     // added line.  This value is one greater than the current last row
-    var rowNum	= Number(tbl.rows.length).toString(10);
+    var rowNum	                    = Number(tbl.rows.length).toString(10);
     if (rowNum.length == 1)
-		rowNum	= "0" + rowNum;	// pad to at least 2 digits
+		rowNum	                    = "0" + rowNum;	// pad to at least 2 digits
 
     // add new row after the row we are copying
-    var newRow	= tbl.insertRow(rownum + 1);
+    var newRow	                    = tbl.insertRow(rownum + 1);
     newRow.setAttribute("id", "Row" + rowNum);
+    var origDivId                   = null;
 
     for(colnum = 0; colnum < oldRow.cells.length; colnum++)
     {			// loop through columns of old row
-		var	ocell	= oldRow.cells[colnum];
-		var	ncell	= ocell.cloneNode(false);
-
+		var	ocell	                = oldRow.cells[colnum];
+		var	ncell	                = ocell.cloneNode(false);   // shallow
 		// clone the contents of the cell
 		for(var child = ocell.firstChild;
 		    child; 
 		    child = child.nextSibling)
 		{		// loop through all children of the cell
 		    // clone the existing child
-		    var	element	= child.cloneNode(true);
+		    var	element	            = child.cloneNode(true);
 		    if (child.id)
 		    {		// child has a name
 				// change the row number portion of the name
-				colName		= child.id.substring(0, 
-									child.id.length - oNumLen);
+				colName		        = child.id.substring(0, 
+									                child.id.length - oNumLen);
 				element.setAttribute("name", colName + rowNum);
 				element.name		= colName + rowNum;
-				element.id		= colName + rowNum;
+				element.id		    = colName + rowNum;
 				element.onkeydown	= tableKeyDown;
 
 				switch(colName)
 				{	// take action based upon column name
+                    case "Orig_Div":
+                    {
+                        origDivId       = element.id;
+                        break;
+                    }
+
 				    case "SD_Id":
 				    {
-						sdId	= element;
+						sdId	    = element;
 						break;
 				    }	// sub-district identifier
 
@@ -703,11 +710,8 @@ function addDiv()
 						break;
 				    }	// delete a division button
 				}	// take action based upon column name
-		    }		// child has a name
 
-		    // ensure the id value is unique on the page
-		    if (child.id)
-		    {		// child has a id
+		        // ensure the id value is unique on the page
 				// change the row number portion of the id
 				var colId	= child.id.substring(0, 
 									child.id.length - oNumLen);
@@ -715,10 +719,20 @@ function addDiv()
 		    }		// child has a id
 
 		    // add the cloned child into the new row
-		    ncell.appendChild(element);
+		    var nelement    = ncell.appendChild(element);
 		}		// loop through all children of the cell
 		newRow.appendChild(ncell);
     }			// loop through columns of old row
+
+    if (origDivId)
+    {
+        var origDivCell                 = document.getElementById(origDivId);
+        if (origDivCell)
+            origDivCell.value           = 'X';
+        else
+            alert('Cannot find element with id=' + origDivId);
+    }
+    alert(newRow.outerHTML);
 
     return false; 
 }		// addDiv

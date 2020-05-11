@@ -4186,6 +4186,9 @@ class Person extends RecordPic
                 case 'confirmationd':
                 case 'initiatoryd':
                 {                   // text fields preference for first indiv
+                    if (is_array($value2))
+                        print "<p>Person.inc: " . __LINE__ . " field='$field', value2=" . var_export($value2, true) . "</p>\n";
+                    else
                     if (strlen($value) == 0 && strlen($value2) > 0)
                     {               // only replace if no value in first indiv
                         $this->set($field, $value2);

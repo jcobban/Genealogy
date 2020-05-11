@@ -79,8 +79,9 @@ use \Exception;
  *						ldsreel, and image base to distinguish new		*
  *						from unchanged values							*
  *		2019/02/21      use new FtTemplate constructor                  *
+ *		2020/05/03      correct updating of Page1                       *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -210,12 +211,12 @@ if (count($_POST) > 0)
                                  $matches);
         if ($numMatches == 1)
         {
-            $column	                = $matches[1];
+            $column	                = strtolower($matches[1]);
             $rownum	                = $matches[2];
         }
         else
         {
-            $column	                = $key;
+            $column	                = strtolower($key);
 			$rownum                 = '';
 		}
 		if ($column == 'sd_pagei')
@@ -227,7 +228,7 @@ if (count($_POST) > 0)
             $row                    = substr($row, 1);
         }
 
-        switch(strtolower($column))
+        switch($column)
         {		    // act on specific parameter
             case 'census':
             {		// Census Identifier
@@ -329,7 +330,7 @@ if (count($_POST) > 0)
 		    case 'sd_remarks':
 		    {
 				if ($subDistrict)
-				{
+                {
 				    $subDistrict->set($column, $value);
 				}
 				break;

@@ -44,7 +44,7 @@ require_once __NAMESPACE__ . '/common.inc';
 
 $cc			            	= 'CA';
 $countryName				= 'Canada';
-$censusId					= '';
+$censusId					= 'CA1881';
 $censusYear					= '';
 $provinces					= '';
 $province					= 'CW';

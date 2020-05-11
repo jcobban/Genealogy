@@ -1586,7 +1586,7 @@ function checkMStat()
 function checkFlag()
 {
     var element     = this;
-    var re      = /^[ynYN1 ]?$/;
+    var re      = /^[ynYNMF1 ]?$/;
     var flag        = element.value;
     setErrorFlag(element, re.test(flag));
 }       // function checkFlag
@@ -2444,7 +2444,7 @@ function columnClick(event)
     if (event)
         event.stopPropagation();
     var colIndex    = this.cellIndex;
-    var row     = this.parentNode;
+    var row         = this.parentNode;
     var section     = row.parentNode;
     var table       = section.parentNode;
     var body        = table.tBodies[0];
@@ -2498,32 +2498,13 @@ function columnClick(event)
                     if (element.type == 'text')
                     {       // <input type='text'>
                         // hide the text element
-                        newElt      = document.createElement('INPUT');
-                        newElt.type     = 'hidden';
-                        newElt.value        = element.value;
-                        newElt.name     = element.name;
-                        newElt.className    = element.className;
-                        newElt.size     = element.size;
-                        newElt.onchange     = element.onchange;
-                        newElt.checkfunc    = element.checkfunc;
-                        newElt.abbrTbl      = element.abbrTbl;
-                        dataCell.replaceChild(newElt, element);
+                        element.type        = 'hidden';
                     }       // <input type='text'>
                     else
                     if (element.type == 'hidden')
                     {       // <input type='hidden'>
                         // unhide the hidden element
-                        newElt      = document.createElement('INPUT');
-                        newElt.type     = 'text';
-                        newElt.value        = element.value;
-                        newElt.name     = element.name;
-                        newElt.className    = element.className;
-                        newElt.size     = element.size;
-                        newElt.onchange     = element.onchange;
-                        newElt.checkfunc    = element.checkfunc;
-                        newElt.abbrTbl      = element.abbrTbl;
-                        newElt.onkeydown    = tableKeyDown;
-                        dataCell.replaceChild(newElt, element);
+                        element.type        = 'text';
                     }       // <input type='hidden'>
                     break;  // stop searching
                 }       // <input>

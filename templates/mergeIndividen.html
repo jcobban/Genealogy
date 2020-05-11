@@ -1,45 +1,45 @@
 <!--*********************************************************************
- *  mergeIndividen.html	  	  										    *
- *																		*
- *  Display a web page to support merging two individuals				*
- *  in the family tree table of individuals.							*
+ *  mergeIndividen.html                                                 *
  *                                                                      *
- *	History:															*
- *		2019/01/07      created                                         *
+ *  Display a web page to support merging two individuals               *
+ *  in the family tree table of individuals.                            *
+ *                                                                      *
+ *  History:                                                            *
+ *      2019/01/07      created                                         *
  *      2019/09/09      add error messages                              *
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-  	  <a href="/index.html">Home</a>:
+      <a href="/index.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">
-  			Genealogy
+            Genealogy
       </a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">
-  			Services
+            Services
       </a>:
       <a href="/genCountry.php?cc=CA&lang=$LANG">
-  			Canada
+            Canada
       </a>:
       <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
-  			Nominal Index
+            Nominal Index
       </a>:
       <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
-  			Surnames Starting with '$PREFIX'
+            Surnames Starting with '$PREFIX'
       </a>:
       <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
-  			Surname '$SURNAME'
+            Surname '$SURNAME'
       </a>:
       <a href="/FamilyTree/Person.php?idir=$IDIR&lang=$LANG">
-  			$NAME
+            $NAME
       </a>:
     </div>
     <div class="body">
       <h1>
         <span class="right">
-    	  <a href="mergeIndividHelpen.html" target="help">? Help</a>
+          <a href="mergeIndividHelpen.html" target="help">? Help</a>
         </span>
-    	  Merge $NAME with $NAME2
+          Merge $NAME with $NAME2
       </h1>
       $TRACE
       $MSG
@@ -69,287 +69,287 @@
       </div> <!-- error messages -->
       <form name="indForm" action="mergeUpdIndivid.php" method="post">
         <div class="row" id="ButtonRow">
-    	  <button type="submit" id="Submit" $VIEW2DISABLED>
-    	      Merge Persons
-    	  </button>
-    	  &nbsp;
-    	  <button type="button" id="choose">
-    	      Choose Second
-    	  </button>
-    	  &nbsp;
-    	  <button type="button" id="donotmerge" $VIEW2DISABLED>
-    	      Do Not Ever Merge
-    	  </button>
-    	  <div style="clear: both;"></div>
+          <button type="submit" id="Submit" $VIEW2DISABLED>
+              Merge Persons
+          </button>
+          &nbsp;
+          <button type="button" id="choose">
+              Choose Second
+          </button>
+          &nbsp;
+          <button type="button" id="donotmerge" $VIEW2DISABLED>
+              Do Not Ever Merge
+          </button>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="HeaderRow">
-    	  <div class="labelColumn"></div>
-    	  <div class="checkboxColumn"></div>
-    	  <div class="headerColumn">
-    	  		First Person
-    	  </div>
-    	  <div class="checkboxColumn"></div>
-    	  <div class="headerColumn">
-    	  		Second Person
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn"></div>
+          <div class="checkboxColumn"></div>
+          <div class="headerColumn">
+                First Person
+          </div>
+          <div class="checkboxColumn"></div>
+          <div class="headerColumn">
+                Second Person
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="IdirRow">
-    	  <div class="labelColumn">
-    	  		IDIR:
-    	  </div>
-    	  <div class="checkboxColumn"></div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="idir1" id="idir1"
-    	  		  class="ina rightnc"
-    	  		  readonly="readonly" size="6"
-    	  		  value="$IDIR">
-    	    <input type="hidden" name="surname" id="surname"
-    	  		value="$SURNAME">
-    	    <input type="hidden" name="givenpre" id="givenpre"
-    	  		value="$GIVENPRE">
-    	    <input type="hidden" name="treename" id="treename"
-    	  		value="$TREENAME">
-    	    <input type="hidden" name="gender" id="gender"
-    	  		value="$GENDER">
-    	    <input type="hidden" name="birthmin" id="birthmin"
-    	  		value="$BIRTHMIN">
-    	    <input type="hidden" name="birthmax" id="birthmax"
-    	  		value="$BIRTHMAX">
-    	  </div>
-    	  <div class="checkboxColumn"></div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="idir2"
-    	  		  class="ina rightnc"
-    	  		  readonly="readonly" size="6"
-    	  		  value="$IDIR2">
-    	    <button type="button" name="view2" $VIEW2DISABLED>
-    	  		Details
-    	    </button>
-    	    <input type="hidden" name="Sex" value="$GENDER">
-    	    <input type="hidden" name="Debug" value="$DEBUG">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                IDIR:
+          </div>
+          <div class="checkboxColumn"></div>
+          <div class="dataColumn">
+            <input type="text" name="idir1" id="idir1"
+                  class="ina rightnc"
+                  readonly="readonly" size="6"
+                  value="$IDIR">
+            <input type="hidden" name="surname" id="surname"
+                value="$SURNAME">
+            <input type="hidden" name="givenpre" id="givenpre"
+                value="$GIVENPRE">
+            <input type="hidden" name="treename" id="treename"
+                value="$TREENAME">
+            <input type="hidden" name="gender" id="gender"
+                value="$GENDER">
+            <input type="hidden" name="birthmin" id="birthmin"
+                value="$BIRTHMIN">
+            <input type="hidden" name="birthmax" id="birthmax"
+                value="$BIRTHMAX">
+          </div>
+          <div class="checkboxColumn"></div>
+          <div class="dataColumn">
+            <input type="text" name="idir2"
+                  class="ina rightnc"
+                  readonly="readonly" size="6"
+                  value="$IDIR2">
+            <button type="button" name="view2" $VIEW2DISABLED>
+                Details
+            </button>
+            <input type="hidden" name="Sex" value="$GENDER">
+            <input type="hidden" name="Debug" value="$DEBUG">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="SurnameRow">
-    	  <div class="labelColumn">
-    	  		Surname:
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="SurnameCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="Surname1" size="20" class="ina left"
-    	  		  readonly="readonly"
-    	  		  value="$SURNAME">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="SurnameCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="Surname2" size="20" class="ina left"
-    	  		  readonly="readonly"
-    	  		  value="$SURNAME2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Surname:
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="SurnameCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="Surname1" size="20" class="ina left"
+                  readonly="readonly"
+                  value="$SURNAME">
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="SurnameCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="Surname2" size="20" class="ina left"
+                  readonly="readonly"
+                  value="$SURNAME2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="GivenNameRow">
-    	  <div class="labelColumn">
-    	  		Given Names:
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="GivenNameCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="GivenName1" size="32" class="ina left"
-    	  		  readonly="readonly"
-    	  		  value="$GIVEN">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="GivenNameCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="GivenName2" size="32" class="ina left"
-    	  		  readonly="readonly"
-    	  		  value="$GIVEN2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Given Names:
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="GivenNameCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="GivenName1" size="32" class="ina left"
+                  readonly="readonly"
+                  value="$GIVEN">
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="GivenNameCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="GivenName2" size="32" class="ina left"
+                  readonly="readonly"
+                  value="$GIVEN2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="BirthDateRow">
-    	  <div class="labelColumn">
-    	  		Birth Date:
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="BthDateCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="BirthDate1" size="16"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$BIRTHD">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="BthDateCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="BirthDate2" size="16"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$BIRTHD2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Birth Date:
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="BthDateCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="BirthDate1" size="16"
+                  class="ina left" readonly="readonly"
+                  value="$BIRTHD">
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="BthDateCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="BirthDate2" size="16"
+                  class="ina left" readonly="readonly"
+                  value="$BIRTHD2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="BirthLocationRow">
-    	  <div class="labelColumn">
-    	  		Location: 
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="BthLocCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="BirthLocation1" size="32"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$BIRTHLOCATIONNAME">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="BthLocCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="BirthLocation2" size="32"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$BIRTHLOCATIONNAME2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Location: 
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="BthLocCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="BirthLocation1" size="32"
+                  class="ina left" readonly="readonly"
+                  value="$BIRTHLOCATIONNAME">
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="BthLocCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="BirthLocation2" size="32"
+                  class="ina left" readonly="readonly"
+                  value="$BIRTHLOCATIONNAME2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="ChrisDateRow">
-    	  <div class="labelColumn">
-    	  		Christening Date:
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="CrsDateCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="ChrisDate1" size="16"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$CHRISD">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="CrsDateCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="ChrisDate2" size="16"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$CHRISD2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Christening Date:
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="CrsDateCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="ChrisDate1" size="16"
+                  class="ina left" readonly="readonly"
+                  value="$CHRISD">
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="CrsDateCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="ChrisDate2" size="16"
+                  class="ina left" readonly="readonly"
+                  value="$CHRISD2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="ChrisLocationRow">
-    	  <div class="labelColumn">
-    	  		Location:
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="CrsLocCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="ChrisLocation1" size="32"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$CHRISLOCATIONNAME">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="CrsLocCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="ChrisLocation2" size="32"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$CHRISLOCATIONNAME2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Location:
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="CrsLocCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="ChrisLocation1" size="32"
+                  class="ina left" readonly="readonly"
+                  value="$CHRISLOCATIONNAME">
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="CrsLocCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="ChrisLocation2" size="32"
+                  class="ina left" readonly="readonly"
+                  value="$CHRISLOCATIONNAME2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="DeathDateRow">
-    	  <div class="labelColumn">
-    	  		Death Date:
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="DthDateCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="DeathDate1" size="16"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$DEATHD">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="DthDateCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="DeathDate2" size="16"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$DEATHD2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Death Date:
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="DthDateCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="DeathDate1" size="16"
+                  class="ina left" readonly="readonly"
+                  value="$DEATHD">
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="DthDateCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="DeathDate2" size="16"
+                  class="ina left" readonly="readonly"
+                  value="$DEATHD2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="DeathLocationRow">
-    	  <div class="labelColumn">
-    	  		Location:
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="DthLocCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="DeathLocation1" size="32"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$DEATHLOCATIONNAME">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="DthLocCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="DeathLocation2" size="32"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$DEATHLOCATIONNAME2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Location:
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="DthLocCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="DeathLocation1" size="32"
+                  class="ina left" readonly="readonly"
+                  value="$DEATHLOCATIONNAME">
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="DthLocCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="DeathLocation2" size="32"
+                  class="ina left" readonly="readonly"
+                  value="$DEATHLOCATIONNAME2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="BurialDateRow">
-    	  <div class="labelColumn">
-    	  		Burial Date:
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="BurDateCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="BuriedDate1" size="16"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$BURIEDD">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="BurDateCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="BuriedDate2" size="16"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$BURIEDD2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Burial Date:
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="BurDateCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="BuriedDate1" size="16"
+                  class="ina left" readonly="readonly"
+                  value="$BURIEDD">
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="BurDateCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="BuriedDate2" size="16"
+                  class="ina left" readonly="readonly"
+                  value="$BURIEDD2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
         <div class="row" id="BurialLocationRow">
-    	  <div class="labelColumn">
-    	  		Location: 
-    	  </div>
-    	  <div class="checkboxColumn">
-    	    <input type="checkbox" name="BurLocCb1" checked>
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="BuriedLocation1" size="32"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$BURIEDLOCATIONNAME">
-    	  </div>
-    	  <div class="checkboxColumn">
-    	  <input type="checkbox" name="BurLocCb2">
-    	  </div>
-    	  <div class="dataColumn">
-    	    <input type="text" name="BuriedLocation2" size="32"
-    	  		  class="ina left" readonly="readonly"
-    	  		  value="$BURIEDLOCATIONNAME2">
-    	  </div>
-    	  <div style="clear: both;"></div>
+          <div class="labelColumn">
+                Location: 
+          </div>
+          <div class="checkboxColumn">
+            <input type="checkbox" name="BurLocCb1" checked>
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="BuriedLocation1" size="32"
+                  class="ina left" readonly="readonly"
+                  value="$BURIEDLOCATIONNAME">
+          </div>
+          <div class="checkboxColumn">
+          <input type="checkbox" name="BurLocCb2">
+          </div>
+          <div class="dataColumn">
+            <input type="text" name="BuriedLocation2" size="32"
+                  class="ina left" readonly="readonly"
+                  value="$BURIEDLOCATIONNAME2">
+          </div>
+          <div style="clear: both;"></div>
         </div>
       </form>
       </div>  <!-- end of <div id="body"> -->

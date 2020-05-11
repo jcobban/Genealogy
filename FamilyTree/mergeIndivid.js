@@ -50,66 +50,66 @@ window.onload	    = onLoad;
 function onLoad()
 {
     for (var fi = 0; fi < document.forms.length; fi++)
-    {			// loop through all forms
-		var	form		= document.forms[fi];
+    {			                // loop through all forms
+		var	form				    = document.forms[fi];
 
 		// set action methods for form as a whole
 		if (form.name == 'indForm')
-		{		// main form
-		    form.onsubmit		= validateForm;
+		{		                // main form
+		    form.onsubmit			= validateForm;
 		    // feedback from dialog to get IDIR of second individual
-		    form.callidir		= callidir;
-		}
+		    form.callidir			= callidir;
+		}		                // main form
 
 		// activate handling of key strokes in text input fields
 		// including support for context specific help
-		var formElts	= form.elements;
+		var formElts			    = form.elements;
 		for (var i = 0; i < formElts.length; ++i)
-		{		// loop through elements
-		    var element	= formElts[i];
+		{		                // loop through elements
+		    var element			    = formElts[i];
 
 		    // take action on specific elements by name
-		    var	name	= element.name;
+		    var	name			    = element.name;
 		    if (name.length == 0)
-				name	= element.id;
+				name			    = element.id;
 		    switch(name)
-		    {		// switch on name of element
+		    {		            // switch on name of element
 				case 'choose':
-				{	// pop up dialog of matching individuals
+				{	            // pop up dialog of matching individuals
 				    element.onclick	= chooseIndivid;
 				    element.focus();
 				    break;
-				}	// pop up dialog of matching individuals
+				}	            // pop up dialog of matching individuals
 
 				case 'donotmerge':
-				{	// mark to never merge
+				{	            // mark to never merge
 				    element.onclick	= doNotMerge;
 				    break;
-				}	// mark to never merge
+				}	            // mark to never merge
 
 				case 'view2':
-				{	// view details of second individual
+				{	            // view details of second individual
 				    element.onclick	= viewSecond;
 				    break;
-				}	// view details of second individual
+				}	            // view details of second individual
 
 				default:
-				{	// other elements
+				{	            // other elements
 				    if (element.type == 'checkbox')
 				    {
 						element.onclick	= radioButton;
-				    }	// check box
+				    }	        // check box
 				    else
-				    {	// other input element
+				    {	        // other input element
 						element.onkeydown	= keyDown;
 						element.onchange	= change;
-				    }	// other input element
+				    }	        // other input element
 				    break;
-				}	// default
-		    }		// switch on name of element
-		}		// looping through elements
-    }			// loop through all forms
-}			// onLoad
+				}	            // function default
+		    }		            // switch on name of element
+		}		                // looping through elements
+    }			                // loop through all forms
+}			// function onLoad
 
 /************************************************************************
  *  function validateForm												*
@@ -124,14 +124,14 @@ function onLoad()
  ************************************************************************/
 function validateForm()
 {
-    var	form		= this;
+    var	form		            = this;
     if (form.idir2.value.length == 0)
-    {			// second individual not chosen
+    {			            // second individual not chosen
 		 form.Submit.disabled	= true;
 		 return false;
-    }			// second individual not chosen
+    }			            // second individual not chosen
     return true;
-}		// validateForm
+}		// function validateForm
 
 /************************************************************************
  *  function chooseIndivid												*
@@ -145,20 +145,20 @@ function validateForm()
  ************************************************************************/
 function chooseIndivid()
 {
-    var	form		= this.form;
-    var	idir		= form.idir1.value;
+    var	form		            = this.form;
+    var	idir		            = form.idir1.value;
     if (idir)
     {
-		var	surname		= form.surname.value;
-		var	given		= form.givenpre.value;
-		var	treename	= form.treename.value;
-		var	gender		= form.gender.value;
-		var	birthmin	= form.birthmin.value;
-		var	birthmax	= form.birthmax.value;
-        var lang        = 'en';
+		var	surname				= form.surname.value;
+		var	given				= form.givenpre.value;
+		var	treename			= form.treename.value;
+		var	gender				= form.gender.value;
+		var	birthmin			= form.birthmin.value;
+		var	birthmax			= form.birthmax.value;
+        var lang        		= 'en';
         if ('lang' in args)
-            lang        = args.lang;
-		var	url		    = "chooseIndivid.php?idir=" + idir +
+            lang        		= args.lang;
+		var	url		    		= "chooseIndivid.php?idir=" + idir +
 					            		    '&surname=' + surname +
 					            		    '&given=' + given +
 					            		    '&treename=' + treename +
@@ -172,10 +172,10 @@ function chooseIndivid()
 		    popupAlert("mergeIndivid.js: chooseIndivid: url='" + url + "'",
 				       this);
 
-        var target      = 'right';
+        var target              = 'right';
         if (window.frameElement)
         {
-            var frameClass  = window.frameElement.className;
+            var frameClass      = window.frameElement.className;
             if (frameClass == 'right')
                 target  = 'left';
         }
@@ -188,7 +188,7 @@ function chooseIndivid()
 						"unable to get value of idir from form",
 				   this);
     return true;
-}	// function chooseIndivid
+}	    // function chooseIndivid
 
 /************************************************************************
  *  function doNotMerge													*
@@ -203,18 +203,18 @@ function chooseIndivid()
  ************************************************************************/
 function doNotMerge()
 {
-    var	form	= this.form;
-    var	idir1	= form.idir1.value;
-    var	idir2	= form.idir2.value;
+    var	form	            = this.form;
+    var	idir1	            = form.idir1.value;
+    var	idir2	            = form.idir2.value;
     if (idir1 && idir2)
-    {		// idir fields present
+    {		            // idir fields present
 		var parms		    = {"idirleft"  :	idir1,
 							   "idirright" :	idir2};
 		HTTP.post("addDontMergeXml.php",
 				  parms,
 				  gotDoNotMerge,
 				  noDoNotMerge);
-    }		// idir fields present
+    }		            // idir fields present
     else
 		alert("mergeIndivid.js: doNotMerge: unable to get value of idirs from form");
     return true;
@@ -240,7 +240,7 @@ function gotDoNotMerge(xmlDoc)
     }
     var	form		= document.indForm;
 
-    var	root	= xmlDoc.documentElement;
+    var	root	    = xmlDoc.documentElement;
     if (root && root.nodeName == 'added')
     {		// expected root node name
 		window.refresh();
@@ -251,9 +251,9 @@ function gotDoNotMerge(xmlDoc)
 		alert("mergeIndivid.js: gotDoNotMerge: msg=" + root.textContent);
     }		// error message
     else
-		alert("mergeIndivid.js: gotDoNotMerge: unexpected root node <" + 
+		alert("mergeIndivid.js: gotDoNotMerge: unexpected root node <" +
 				root.nodeName + ">");
-}		// gotDoNotMerge
+}		// function gotDoNotMerge
 
 /************************************************************************
  *  function noDoNotMerge												*
@@ -309,8 +309,8 @@ function viewSecond()
  ************************************************************************/
 function callidir(idir)
 {
-    var	form	= this;
-    location.href   = location.href + '&idir2=' + idir;
+    var	form	        = this;
+    location.href       = location.href + '&idir2=' + idir;
 }	// function callidir
 
 /************************************************************************
@@ -320,7 +320,7 @@ function callidir(idir)
  *  to choose one of a pair of values.									*
  *																		*
  *  Input:																*
- *		this	instance of HtmlInputElement							*
+ *		this	    instance of HtmlInputElement						*
  ************************************************************************/
 function radioButton()
 {
@@ -336,11 +336,11 @@ function radioButton()
     this.checked	= true;
     if (col == '1')
     {
-		this.form.elements[set + '2'].checked	= false;	
+		this.form.elements[set + '2'].checked	= false;
     }
     else
     {
-		this.form.elements[set + '1'].checked	= false;	
+		this.form.elements[set + '1'].checked	= false;
     }
 
     return true;

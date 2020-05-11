@@ -136,8 +136,9 @@ use \Genealogy\RecordSet;
  *      2020/04/23  improve handling of invalid HTML and restructure    *
  *                  tag handling into separate startTag and closeTag    *
  *                  functions                                           *
+ *      2020/05/03  fix interaction of set with third parameter         *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban All Rights Reserved           *
+ *  Copyright &copy; 2020 James A. Cobban All Rights Reserved           *
  ************************************************************************/
 require_once __NAMESPACE__ . '/TemplateTag.inc' ;
 
@@ -389,14 +390,18 @@ class Template implements ArrayAccess
      *  INPUT:                                                          *
      *      $field  name to match in the template                       *
      *      $value  value to substitute into the template               *
+     *              this may be an array or an object if the            *
+     *              substitution points include subscripts or           *
+     *              member references                                   *
      *      $doSubs perform substitutions into the value before         *
      *              saving it                                           *
+     *              This is ignored if $value is not a string           *
      ********************************************************************/
     public function set($field, $value, $doSubs=false)
     {
         global  $warn;
 
-        if (strlen($value) > 0 && $doSubs)
+        if (is_string($value) && strlen($value) > 0 && $doSubs)
         {
             $ttemplate              = new Template($value, true);
             $ttemplate->setFields($this->fields);

@@ -50,9 +50,11 @@ use \Exception;
  *		                page table update request page which invoke     *
  *		                the page table update                           *
  *		                use FtTemplate                                  *
+ *		2020/05/03      add default for censusId                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
 require_once __NAMESPACE__ . '/Page.inc';
 require_once __NAMESPACE__ . '/common.inc';
@@ -287,11 +289,11 @@ else
 		$template->set('RELFRAME',	    $subDistrict->get('sd_relFrame'));
 		// setup the links to the preceding and following divisions within
 		// the current district
-		$npprev		                =$subDistrict->getPrevSearch());
+		$npprev		                = $subDistrict->getPrevSearch();
 		$template->set('NPPREV',		$subDistrict->getPrevSearch());
 		$template->set('PREVSD', 	    $subDistrict->getPrevSd());
 		$template->set('PREVDIV',	    $subDistrict->getPrevDiv());
-		$npnext		                =$subDistrict->getNextSearch());
+		$npnext		                = $subDistrict->getNextSearch();
 		$template->set('NPNEXT',		$subDistrict->getNextSearch());
 		$template->set('NEXTSD',		$subDistrict->getNextSd());
 	    $template->set('NEXTDIV',	    $subDistrict->getNextDiv());

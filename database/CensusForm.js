@@ -665,21 +665,37 @@ function changeReplDown()
  *  This is the change event handler of the element.                    *
  *                                                                      *
  *  Input:                                                              *
- *      this        <input type='text'> element                         *
+ *      this        <input type='text' name='Sex99'> element            *
  ************************************************************************/
 function changeSex()
 {
     changeElt(this);    // fold value to upper case if required
-    var row  = this.name.substring(3);
-    var  form       = this.form;
+    var row                 = this.name.substring(3);
+    var form                = this.form;
 
     // if the form includes a relation to head of household column
-    var relation  = form.elements['Relation' + row];
+    var relation            = form.elements['Relation' + row];
     if (relation)
         relation.checkfunc();   // revalidate relation
 
+    // if the form includes a member column
+    var member              = form.elements['Member' + row];
+    if (member)
+    {
+        if (member.value == 'Y' || member.value == '1')
+            member.value    = this.value;
+    }
+
+    // if the form includes a absent column
+    var absent              = form.elements['Absent' + row];
+    if (absent)
+    {
+        if (absent.value == 'Y' || absent.value == '1')
+            absent.value    = this.value;
+    }
+
     // for the 1851 and 1861 censuses if the form includes a born this year
-    var  birthElt   = form.elements['Birth' + row];
+    var  birthElt       = form.elements['Birth' + row];
     if (birthElt && birthElt.value == '?')
         birthElt.value  = this.value;
 
@@ -700,13 +716,23 @@ function changeSex()
 function changeCanRead()
 {
     changeElt(this);    // fold value to upper case if required
+    var result                  = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
+    var colName                 = result[1].toLowerCase();
+    var rowNum                  = result[2];
+    var yes                     = 'Y';
+    var form                    = this.form;
+    var writeElement            = form.elements['CanWrite' + rowNum];
+    var sexElement              = form.elements['Sex' + rowNum];
+    if (sexElement)
+        yes                     = sexElement.value;
+
     if (this.value == '1')
-        this.value  = 'Y';
+        this.value              = yes;
     else
     if (this.value == '0')
-        this.value  = 'N';
-    var  form   = this.form;
-    form.elements['CanWrite' + this.name.substring(7)].value  = this.value;
+        this.value              = 'N';
+    if (writeElement)
+        writeElement.value      = this.value;
 
     // validate the contents of the field
     if (this.checkfunc)
@@ -724,6 +750,7 @@ function changeCanRead()
  ************************************************************************/
 function changeCantRead()
 {
+    var  form                       = this.form;
     changeElt(this);    // fold value to upper case if required
     if (this.value.length > 0)
     {                           // non-empty value
@@ -731,23 +758,24 @@ function changeCantRead()
         var colName                 = result[1].toLowerCase();
         var rowNum                  = result[2];
         var sexElement              = form.elements['Sex' + rowNum];
-        if (this.value == '1')
-            this.value              = 'Y';  // yes the person cannot read
+        var value                   = this.value;
+        if (value == '1')
+            value                   = 'Y';  // yes the person cannot read
         else
-        if (this.value == '0')
-            this.value              = 'N';  // no the person can read
+        if (value == '0')
+            value                   = 'N';  // no the person can read
         if (value == 'Y' && sexElement)
         {                       // sex column present
-            var  sex                    = sexElement.value;
+            var  sex                = sexElement.value;
             if (sex == 'M' || sex == 'F')
-                this.value          = sex;
+                value               = sex;
         }                       // sex column present
-        var  form                   = this.form;
-        var  name                   = 'CantWrite' + this.name.substring(8);
+        this.value                  = value;
+        var  name                   = 'CantWrite' + rowNum;
         var  writeElt               = form.elements[name];
         if (writeElt)
         {                       // can't write column present
-            writeElt.value          = this.value;
+            writeElt.value          = value;
             if (writeElt.checkfunc)
                 writeElt.checkfunc();
         }                       // can't write column present
@@ -1994,11 +2022,11 @@ function addRow(event)
  ************************************************************************/
 function initElement(element, clear)
 {
-    var form  = element.form;
+    var form        = element.form;
 
     var  fldName    = element.name;
     if (fldName === undefined || fldName.length == 0)
-        fldName  = element.id;
+        fldName     = element.id;
 
     if (fldName === undefined)
         return;
@@ -2160,8 +2188,6 @@ function initElement(element, clear)
         case 'lunatic':     // used in 1861
         case 'idiot':       // used in 1911
         case 'unemployed':
-        case 'member':
-        case 'absent':
         case 'spkenglish':
         case 'spkfrench':
         {   // capitalize flag values
@@ -2185,10 +2211,14 @@ function initElement(element, clear)
             break;
         }   // capitalize flag values
 
+        case 'member':
+        case 'absent':
         case 'school':
         case 'illiterate':
         case 'canwrite':
         case 'cantwrite':
+        case 'birth':
+        case 'deathsex':
         {   // capitalize flag values
             if (clear)
                 element.value  = "";
@@ -2198,18 +2228,6 @@ function initElement(element, clear)
             element.checkfunc();
             break;
         }   // capitalize flag values
-
-        case 'birth':
-        case 'deathsex':
-        {   // fields that contain a sex value
-            if (clear)
-                element.value  = "";
-            if (element.addEventListener)
-                element.addEventListener('change', change, false);
-            element.checkfunc  = checkFlagSex;
-            element.checkfunc();
-            break;
-        }   // fields that contain a sex value
 
         case 'canread':
         {   // capitalize and copy to CanWrite
@@ -2502,11 +2520,11 @@ function initElement(element, clear)
         case 'address':
         {   // Address
             if (clear)
-                element.value  = "";
-            element.abbrTbl      = AddrAbbrs;
+                element.value       = "";
+            element.abbrTbl         = AddrAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeAddress, false);
-            element.checkfunc  = checkAddress;
+            element.checkfunc       = checkAddress;
             element.checkfunc();
             break;
         }   // Address
@@ -2515,11 +2533,11 @@ function initElement(element, clear)
         case 'restype':
         {   // capitalize and expand abbreviations for given names
             if (clear)
-                element.value  = "";
-            element.abbrTbl      = ResTypeAbbrs;
+                element.value       = "";
+            element.abbrTbl         = ResTypeAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeResType, false);
-            element.checkfunc  = checkName;
+            element.checkfunc       = checkName;
             element.checkfunc();
             break;
         }   // residence type
@@ -2934,7 +2952,8 @@ function noPrevLine()
  *  function showImage                                                  *
  *                                                                      *
  *  Display the image of the original census page.                      *
- *  This is the onclick method for the button with id 'imageButton'.    *
+ *  This is the click event handler for the button with                 *
+ *  id='imageButton'.                                                   *
  *                                                                      *
  *  Input:                                                              *
  *      this          <button id='imageButton'>                         *
@@ -2995,8 +3014,8 @@ function showImage(event)
  *  function correctImageUrl                                            *
  *                                                                      *
  *  Change the display so the user can modify the Uniform Record Locator*
- *  of the image for this page.  This is the onclick method for the     *
- *  button with id 'correctImage'.                                      *
+ *  of the image for this page.  This is the click event handler for    *
+ *  the button with id 'correctImage'.                                  *
  *                                                                      *
  *  Input:                                                              *
  *      this          <button id='correctImage'>                        *
@@ -3040,7 +3059,7 @@ function correctImageUrl(event)
  *                                                                      *
  *  Match all citations to this page against the individuals in the page*
  *  to set the link to the appropriate entry in the family tree.        *
- *  This is the onclick method for the button with id 'treeMatch'.      *
+ *  This is the click event handler for the button with id 'treeMatch'. *
  *                                                                      *
  *  Input:                                                              *
  *      this        <button id='treeMatch'>                             *

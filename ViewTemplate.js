@@ -5,8 +5,9 @@
  *																		*
  *  History:															*
  *		2019/04/18	    created											*
+ *		2020/05/02      hide new right-hand column                      *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -38,4 +39,6 @@ function onLoad()
 	    hidden.style.marginTop	    = '5px';
 	    hidden.style.display	    = 'block';
     }			// loop through popups
+
+    hideRightColumn();
 }		// function onLoad

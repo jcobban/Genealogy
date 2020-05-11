@@ -426,7 +426,7 @@ class User extends Record
                 $dbrow['confirmid']         = time();
             // check for duplicate email
             $query          = "SELECT * FROM Users WHERE `EMail`=:email";
-            $sqlParms       = array('email'         => $this->row['email']);
+            $sqlParms       = array('email'         => $dbrow['email']);
             $stmt           = $connection->prepare($query);
             $queryText      = debugPrepQuery($query, $sqlParms);
             if ($stmt->execute($sqlParms))

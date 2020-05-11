@@ -1630,13 +1630,14 @@ function addNewChild()
     var	form		        = this.form;
     var	childTable	        = document.getElementById('children');
     var	parms	            = {
-    							'idir'		: 0,
-	    						'givenname'	: '',
-		    					'surname'	: '',
-			    				'birthd'	: '',
-				    			'birthsd'	: -99999999,
-					    		'deathd'	: '',
-						    	'gender'	: 'unknown'};
+    							'idir'			: 0,
+	    						'givenname'		: '',
+		    					'surname'		: '',
+			    				'birthd'		: '',
+				    			'birthsd'		: -99999999,
+					    		'deathd'		: '',
+						    	'genderclass'	: 'unknown',
+						    	'gender'		: 'unknown'};
     parms.surname		    = form.HusbSurname.value;
 
     var	row		            = childTable.addChildToPage(parms,
@@ -3048,15 +3049,15 @@ function childKeyDown(e)
 		{			            // enter key
 		    if (element)
 		    {
-				var	cell	= element.parentNode;
-				var	row	= cell.parentNode;
-				var	body	= row.parentNode;
-				var	rownum	= row.sectionRowIndex;
+				var	cell	        = element.parentNode;
+				var	row	            = cell.parentNode;
+				var	body	        = row.parentNode;
+				var	rownum	        = row.sectionRowIndex;
 				if (rownum < (body.rows.length - 1))
 				{		        // not the last row
 				    rownum++;
-				    row		= body.rows[rownum];
-				    cell	= row.cells[0];
+				    row		        = body.rows[rownum];
+				    cell	        = row.cells[0];
 				    var	children= cell.children;
 				    for(var ic = 0; ic < children.length; ic++)
 				    {		    // loop through children of cell

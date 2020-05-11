@@ -204,15 +204,15 @@ class CensusLineSet extends RecordSet
 
         if ($censusId == 'CAALL')
         {
-            parent::__construct("Census1851," . 
-                                "Census1861," . 
-                                "Census1871," . 
-                                "Census1881," . 
-                                "Census1891," . 
-                                "Census1901," . 
-                                "Census1906," . 
-                                "Census1911," . 
-                                "Census1916," . 
+            parent::__construct("Census1851," .
+                                "Census1861," .
+                                "Census1871," .
+                                "Census1881," .
+                                "Census1891," .
+                                "Census1901," .
+                                "Census1906," .
+                                "Census1911," .
+                                "Census1916," .
                                 "Census1921",
                                 $parms,
                                 $fields);
@@ -320,7 +320,7 @@ class CensusLineSet extends RecordSet
                     {       // regular expression
                         if (mb_substr($name, 0, 1) == '^')
                             $name   = "[[:<:]]" . mb_substr($name, 1);
-                        $where          .= $or . 'GivenNames REGEXP ?'; 
+                        $where          .= $or . 'GivenNames REGEXP ?';
                         $this->sqlParms[]   = $name;
                     }       // regular expression
                     else
@@ -384,7 +384,7 @@ class CensusLineSet extends RecordSet
         $and            = 'WHERE ';
         $this->notPage  = false;
 
-        // obtain information required for comparisons 
+        // obtain information required for comparisons
         foreach($this->parms as $fldname => $value)
         {
             $fieldLc        = strtolower($fldname);
@@ -412,13 +412,13 @@ class CensusLineSet extends RecordSet
                                 $value  = array('ON', 'CW');
                                 break;
                             }
-        
+
                             case 'QC':
                             {
                                 $value  = array('QC', 'CE');
                                 break;
                             }
-        
+
                         }   // support pre-confederation names
                     }
 
@@ -472,8 +472,8 @@ class CensusLineSet extends RecordSet
                     else
                     {
                         $warn   .= "<p>CensusLineSet: " . __LINE__ .
-                               " unexpected value " . 
-                               print_r($value, true) . 
+                               " unexpected value " .
+                               print_r($value, true) .
                                " for subdistrict</p>\n";
                         break;
                     }
@@ -747,7 +747,7 @@ class CensusLineSet extends RecordSet
             $and                    = ' AND ';
         }                   // limit search by year of birth
 
-        if (!$this->notPage && 
+        if (!$this->notPage &&
                     isset($this->district) &&
                     isset($this->subdistrict) &&
                     isset($this->page))
@@ -758,7 +758,7 @@ class CensusLineSet extends RecordSet
         {
             $warn       .= "<p>CensusLineSet::getWhere: " . __LINE__ .
                 " where='$where'</p>\n" .
-                "<p>sqlParms=" . print_r($this->sqlParms, true) . "</p>\n";  
+                "<p>sqlParms=" . print_r($this->sqlParms, true) . "</p>\n";
         }
 
         return $where;
@@ -804,7 +804,7 @@ class CensusLineSet extends RecordSet
         if (is_null($this->subdistObj))
         {
             if ($this->district && $this->subdistrict)
-            {           
+            {
                 $sdistParms         = array('sd_census' => $this->census,
                                             'sd_distid' => $this->district,
                                             'sd_id'     => $this->subdistrict,
@@ -983,12 +983,19 @@ class CensusLineSet extends RecordSet
             return reset($this->list);
     }       // function CensusLineSet::rewind
 
+    /********************************************************************
+     *  private function CensusLineSet::ag11                            *
+     *                                                                  *
+     *  Parse a 1911 Canadian Census transcription from the             *
+     *  AutomatedGenealogy site to initialize a page.                   *
+     ********************************************************************/
     private function getAg11()
     {
         global  $warn;
 
-        $prefix                         = "http://www.automatedgenealogy.com/census11";
-        $agdisturl                      = 
+        $prefix                         =
+                                "http://www.automatedgenealogy.com/census11";
+        $agdisturl                      =
                                 "$prefix/District.jsp?did={$this->district}";
         //$agdistpage                   = file_get_contents($agdisturl);
         $agdist                         = new \Templating\Template($agdisturl);
@@ -1002,7 +1009,7 @@ class CensusLineSet extends RecordSet
         {
             $cells                      = $row->getElementsByTagName('td');
             $subid                      = str_replace('<','&lt;',$cells[0]->innerHTML);
-        
+
             if ($subid == $this->subdistrict)
             {
                 $link                   = $cells[2]->innerHTML;
@@ -1043,47 +1050,47 @@ class CensusLineSet extends RecordSet
                                     if (preg_match('/\d+/',$linecont,$matches))
                                     {           // line number
                                         $linenum    = intval($matches[0]);
-                                        if ($linenum > 0)
+                                        if ($linenum > 0 && $linenum < 60)
                                         {       // valid line number
-                                        $cline      = $this->list[$linenum] ;
-                                        $famnum     = $pgcells[2]->innerHTML;
-                                        $cline['family']    = $famnum;
-                                        $name       = $pgcells[3]->innerHTML;
-                                        $sep        = strpos($name,' ');
-                                        if ($sep)
-                                        {
-                                            $surname    = substr($name, 0, $sep);
-                                            $given      = substr($name, $sep+1);                                        }
-                                        else 
-                                        {
-                                            $surname    = $name;
-                                            $given      = '';
-                                        }
-                                        $cline['surname']       = $surname;
-                                        $cline['givennames']    = $given;
-                                        $addr       = $pgcells[4]->innerHTML;
-                                        $cline['surname']       = $surname;
-                                        $sex        = $pgcells[5]->innerHTML;
-                                        $cline['sex']           = $sex;
-                                        $relation   = $pgcells[6]->innerHTML;
-                                        $cline['relation']      = $relation;
-                                        $mstat      = $pgcells[7]->innerHTML;
-                                        $cline['mstat']         = $mstat;
-                                        $bmon       = $pgcells[8]->innerHTML;
-                                        $cline['bmon']          = $bmon;
-                                        $byear      = $pgcells[9]->innerHTML;
-                                        $age        = $pgcells[10]->innerHTML;
-                                        $cline['age']           = $age;
-                                        if (!ctype_digit($age))
-                                            $age                = 0;
-                                        if (ctype_digit($byear))
-                                            $cline['byeartxt']  = $byear;
-                                        else
-                                            $byear              = 1921 - $age;
-                                        $cline['byear']         = $byear;
+                                            $cline      = $this->list[$linenum] ;
+                                            $famnum     = $pgcells[2]->innerHTML;
+                                            $cline['family']    = $famnum;
+                                            $name       = $pgcells[3]->innerHTML;
+                                            $sep        = strpos($name,' ');
+                                            if ($sep)
+                                            {
+                                                $surname    = substr($name, 0, $sep);
+                                                $given      = substr($name, $sep+1);                                        }
+                                            else
+                                            {
+                                                $surname    = $name;
+                                                $given      = '';
+                                            }
+                                            $cline['surname']       = $surname;
+                                            $cline['givennames']    = $given;
+                                            $addr       = $pgcells[4]->innerHTML;
+                                            $cline['surname']       = $surname;
+                                            $sex        = $pgcells[5]->innerHTML;
+                                            $cline['sex']           = $sex;
+                                            $relation   = $pgcells[6]->innerHTML;
+                                            $cline['relation']      = $relation;
+                                            $mstat      = $pgcells[7]->innerHTML;
+                                            $cline['mstat']         = $mstat;
+                                            $bmon       = $pgcells[8]->innerHTML;
+                                            $cline['bmon']          = $bmon;
+                                            $byear      = $pgcells[9]->innerHTML;
+                                            $age        = $pgcells[10]->innerHTML;
+                                            $cline['age']           = $age;
+                                            if (!ctype_digit($age))
+                                                $age                = 0;
+                                            if (ctype_digit($byear))
+                                                $cline['byeartxt']  = $byear;
+                                            else
+                                                $byear              = 1921 - $age;
+                                            $cline['byear']         = $byear;
                                         }       // valid line number
-                                        else
-                                            error_log("CensusLineSet:getAg11: " . __LINE__ . " invalid line number " . $matches[0] . "\n");
+                                        //else
+                                        //    error_log("CensusLineSet:getAg11: " . __LINE__ . " invalid line number " . $matches[0] . "\n");
                                     }           // line number
                                 }
                             }
