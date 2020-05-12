@@ -3834,11 +3834,8 @@ function getRowNumOf(anElement)
 function eventFeedback(parms)
 {
     // diagnostic output
-    if (debug.toLowerCase() == 'y')
-    {
-        console.log("editIndivid.js: 3839: eventFeedback: parms=" +
+    console.log("editIndivid.js: 3839: eventFeedback: parms=" +
                 JSON.stringify(parms) + "}");
-    }
 
     // remove the windowList entry for iframe in which the event was
     // displayed
@@ -3854,77 +3851,78 @@ function eventFeedback(parms)
     }           // loop through windows
 
     // process parameters
-    var form                    = this;
-    var type                    = 0;
-    var preferred               = 0;
-    var ider                    = 0;
-    var idet                    = 0;
-    var citType                 = 0;
-    var date                    = '';
-    var datesd                  = null;
-    var rownum                  = '';
+    var form                            = this;
+    var type                            = 0;
+    var preferred                       = 0;
+    var ider                            = 0;
+    var idet                            = 0;
+    var citType                         = 0;
+    var date                            = '';
+    var datesd                          = null;
+    var rownum                          = '';
 
     for (var prop in parms)
     {
+        var value                       = parms[prop];
         switch(prop.toLowerCase())
         {
             case 'type':
             {
-                type            = parseInt(parms.type);
+                type                    = parseInt(value);
                 break;
             }               // type
 
             case 'preferred':
             {
-                preferred       = parseInt(parms.preferred);
+                preferred               = parseInt(value);
                 break;
             }               // preferred
 
             case 'ider':
             {
-                ider            = parseInt(parms.ider);
+                ider                    = parseInt(value);
                 break;
             }               // ider
 
             case 'etype':
             {
-                idet            = parseInt(parms.etype);
+                idet                    = parseInt(value);
                 break;
             }               // idet
 
             case 'cittype':
             {
-                citType         = parseInt(parms.citType);
+                citType                 = parseInt(value);
                 break;
             }               // idet
 
             case 'date':
             {
-                date            = parms.date;
+                date                    = parms.value;
                 break;
             }               // date
 
             case 'datesd':
             {
-                datesd          = parseInt(parms.datesd);
+                datesd                  = parseInt(value);
                 break;
             }               // datesd
 
             case 'rownum':
             {
-                rownum          = parms.rownum;
+                rownum                  = value;
                 break;
             }               // rownum
 
             case 'surname':
             {
-                form.Surname.value  = parms.surname;
+                form.Surname.value      = value;
                 break;
             }               // surname
 
             case 'givenname':
             {
-                form.GivenName.value    = parms.givenName;
+                form.GivenName.value    = value;
                 break;
             }               // givenName
 
@@ -4181,34 +4179,34 @@ function eventFeedback(parms)
         }           // have title for new row
     }               // add new row
     else            // update existing row
-        eventRow        		= eventButton.parentNode;
+        eventRow                = eventButton.parentNode;
 
     // identify fields in the row
-    var detailButton    		= null;
-    var deleteButton    		= null;
-    var dateElt         		= null;
-    var sdElt           		= null;
-    var descnElt        		= null;
-    var locationElt     		= null;
-    var labelElt        		= null;
+    var detailButton            = null;
+    var deleteButton            = null;
+    var dateElt                 = null;
+    var sdElt                   = null;
+    var descnElt                = null;
+    var locationElt             = null;
+    var labelElt                = null;
 
-    var dateTrace       		= '';
+    var dateTrace               = '';
     // activate dynamic functionality and update values of
     // fields based upon returned parms
-    var children    		= eventRow.getElementsByTagName('input');
-    for (var ic 		= 0; ic < children.length; ic++)
+    var children            = eventRow.getElementsByTagName('input');
+    for (var ic         = 0; ic < children.length; ic++)
     {               // loop through children
-        var child       		= children[ic];
-        var name        		= child.id;
+        var child               = children[ic];
+        var name                = child.id;
         if (name === undefined)
-            name        		= child.name;
-        var id          		= '';
-        var namePatt    		= /^([a-zA-Z]+)([0-9]*)/;
-        var result      		= namePatt.exec(name);
+            name                = child.name;
+        var id                  = '';
+        var namePatt            = /^([a-zA-Z]+)([0-9]*)/;
+        var result              = namePatt.exec(name);
         if (result)
         {
-            name        		= result[1];
-            id          		= result[2];
+            name                = result[1];
+            id                  = result[2];
         }
 
         if (dateElt === null)

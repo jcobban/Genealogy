@@ -3,9 +3,9 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  GetCitationForImageXml.php                                          *
+ *  getCitationForImageJSON.php                                          *
  *                                                                      *
- *  Generate an XML document with information about the complete        *
+ *  Generate a JSON document with information about the complete        *
  *  citation for a page identified by the URL of the image on the       *
  *  LAC web-site.                                                       *
  *                                                                      *
@@ -21,10 +21,11 @@ use \Exception;
  *      2017/09/14      use class Page                                  *
  *      2017/11/17      use RecordSet instead of Page::getPages         *
  *      2020/05/12      allow mixed case on parameter name              *
+ *                      support JSON                                    *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
-header("Content-Type: text/xml");
+header("Content-Type: application/json");
 require_once __NAMESPACE__ . '/Page.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -54,34 +55,38 @@ if (isset($_GET) && count($_GET) > 0)
 if (is_null($image))
     $msg    = "Did not pass parameter Image by method=get. ";
 
-print("<?xml version='1.0' encoding='UTF-8'?>\n");
 
 // execute the query
 if (strlen($msg) == 0)
 {
     // display the results
     // top node of XML result
-    print("<ident>\n");
-    print "<image>" . htmlspecialchars($image) . "</image>\n";
+    print("{\n");
+    print "\t\"image\" : \"$image\"";
 
     $pages      = new RecordSet('Pages',
-                        array('pt_image'    => $image));
+                                array('pt_image'    => $image));
 
     // report on all matching records
     foreach($pages as $page)
     {       // loop through all result rows
-        print "<page>\n";
+        $pagenum            = $page['page'];
+        print ",\n\t\"page$pagenum\" : {";
+        $comma              = '';
         foreach($page as $key => $value)
         {       // loop through fields in row
-            print "<$key>$value</$key>\n";
+            if (substr($key, 0, 3) == 'pt_')
+                $key        = substr($key, 3);
+            print "$comma\n\t\t\"$key\" : \"$value\"";
+            $comma          = ',';
         }       // loop through fields in row
-        print "</page>\n";
+        print "\n\t}";
     }       // loop through all result rows
 
-    print("</ident>\n");    // close off top node of XML result
+    print("\n}\n");    // close off top node of XML result
 }       // user supplied needed parameters
 else
 {       // error
-    print("<msg>$msg</msg>\n");
+	print "{\"msg\": \"$msg\"\n}\n";
 }       // error
-?>
+

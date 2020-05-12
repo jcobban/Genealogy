@@ -2434,8 +2434,8 @@ function delIEvent(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var	form	= this.form;
-    var	citType	= this.id.substring(9);
+    var	form	    = this.form;
+    var	citType	    = this.id.substring(9);
     var parms		= {"type"	    : citType,
 					   "formname"	: form.name, 
 					   "template"	: "",
@@ -2446,7 +2446,7 @@ function delIEvent(ev)
 	displayDialog('ClrInd$template',
 			      parms,
 			      this,		        // position relative to
-			      confirmClearInd);	// 1st button confirms Delete
+			      confirmDelIEvent);	// 1st button confirms Delete
 }		// function delIEvent
 
 /************************************************************************
@@ -2465,7 +2465,7 @@ function confirmDelIEvent()
     // get the parameter values hidden in the dialog
     var	form		= this.form;
     var	citType		= this.id.substr(12);
-    var	formname	= form.elements['formname' + type].value;
+    var	formname	= form.elements['formname' + citType].value;
     var	form		= document.forms[formname];
 
     dialogDiv.style.display	= 'none';

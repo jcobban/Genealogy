@@ -81,6 +81,7 @@ use \Templating\Template;
  *		2019/12/01      improve parameter checking                      *
  *		2020/03/24      correct setting of owner/tenant in 1921         *
  *		2020/03/29      avoid warning when user not authorized          *
+ *		2020/05/10      hide Find button on blank lines                 *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -100,47 +101,47 @@ ob_start();			// ensure no output before redirection
 // check for abnormal behavior of Internet Explorer
 if ($browser->browser == 'IE' && $browser->majorver < 8)
 {		// IE < 8 does not support CSS replacement of cellspacing
-	$cellspacing		= "cellspacing='0px'";
+	$cellspacing				= "cellspacing='0px'";
 }		// IE < 8 does not support CSS replacement of cellspacing
 else
 {
-	$cellspacing		= "";
+	$cellspacing				= "";
 }
 
 // variables for constructing the main SQL SELECT statement
-$countryName			= 'Canada';
-$provinceName			= '';
-$censusId				= '';
-$censusYear				= 1881;
-$province				= '';
-$distID	    			= '';
-$districtName			= '';
-$subDistrictName		= '';
-$subDistID				= '';
-$division				= '';
-$page		    		= null;
-$lang		    		= 'en';
-$transcriber			= '';
-$proofreader			= '';
-$bypage		        	= 1;
-$npPrev		        	= '';
-$npNext		        	= '';
-$fcSet              	= null;
-$censusRec             	= null;
+$countryName					= 'Canada';
+$provinceName					= '';
+$censusId						= '';
+$censusYear						= 1881;
+$province						= '';
+$distID	    					= '';
+$districtName					= '';
+$subDistrictName				= '';
+$subDistID						= '';
+$division						= '';
+$page		    				= null;
+$lang		    				= 'en';
+$transcriber					= '';
+$proofreader					= '';
+$bypage		        			= 1;
+$npPrev		        			= '';
+$npNext		        			= '';
+$fcSet              			= null;
+$censusRec             			= null;
 
 // get parameter values into local variables
 // validate all parameters passed to the server and construct the
 // various portions of the SQL SELECT statement
-$getParms	= array('order'	=> 'line');
+$getParms	                    = array('order'	=> 'line');
 foreach ($_GET as $key => $value)
 {				// loop through all parameters
-    $value              = trim($value);
+    $value                      = trim($value);
 	switch(strtolower($key))
 	{
 	    case 'census':
 	    case 'censusid':
         {			// supported field name
-            $censusId               = $value;
+            $censusId           = $value;
 			break;
 	    }			// Census Identifier
 
@@ -209,7 +210,7 @@ foreach ($_GET as $key => $value)
 
         case 'lang':
         {
-                $lang       = FtTemplate::validateLang($value);
+                $lang           = FtTemplate::validateLang($value);
         }
 	    case 'showclear':
 	    {			// to clear or not to clear
@@ -225,35 +226,35 @@ foreach ($_GET as $key => $value)
 }				// loop through parameters
 
 // manage transcriber and proofreader status
-$transcriber		    = '';
-$proofreader		    = '';
-$image			        = '';
+$transcriber		            = '';
+$proofreader		            = '';
+$image			                = '';
 if (canUser('all'))
 {
     if (strlen($transcriber) == 0)
-		$transcriber	= $userid;
-    $action		        = 'Update';
+		$transcriber	        = $userid;
+    $action		                = 'Update';
 }
 else
 if (canUser('edit'))
 {
     if ($userid == $transcriber)
-		$action		    = 'Update';
+		$action		            = 'Update';
     else
-		$action		    = 'Proofread';
+		$action		    		= 'Proofread';
 }
 else
-    $action		        = 'Display';
+    $action		        		= 'Display';
 
-$census		            = new Census(array('censusid' => $censusId));
-$censusYear			    = $census->get('year');
+$census		            		= new Census(array('censusid' => $censusId));
+$censusYear			    		= $census->get('year');
 if ($censusYear < 1867 && substr($censusId, 0, 2) == 'CA')
 {
-    $censusId           = $province . $censusYear;
-    $census		        = new Census(array('censusid' => $censusId));
+    $censusId           		= $province . $censusYear;
+    $census		        		= new Census(array('censusid' => $censusId));
 }
 if (strlen($province) == 0)
-    $province		    = $census->get('province');
+    $province		    		= $census->get('province');
 
 // get template
 $warn	        .= ob_get_clean();	// ensure previous output in page
@@ -472,6 +473,7 @@ if (strlen($msg) == 0)
 	foreach($lineSet as $censusLine)
     {
         $rtemplate      			= new Template($rowHtml);
+        $doIdirHidden               = false;
 	    foreach($censusLine as $field => $value)
 	    {
 			switch($field)
@@ -496,8 +498,15 @@ if (strlen($msg) == 0)
 					else
 					{
 					    $censusLine->set('famclass', 'black');
-					    $oldFamily	= $value;
-					}
+					    $oldFamily	    = $value;
+                    }
+                    if (strlen($value) == 0)
+                    {
+                        $button         = $rtemplate['doIdir$line'];
+                        $doIdirHidden   = true;
+                        if ($button)
+                            $button->update(null);
+                    }
 					break;
 				}		// family number
 
@@ -508,8 +517,16 @@ if (strlen($msg) == 0)
 					else
 					{
 					    $censusLine->set('surclass', 'black');
-					    $oldSurname	= $value;
+					    $oldSurname	    = $value;
 					}
+                    if ($doIdirHidden == false && 
+                        strtolower($value) == '[blank]')
+                    {
+                        $button         = $rtemplate['doIdir$line'];
+                        $doIdirHidden   = true;
+                        if ($button)
+                            $button->update(null);
+                    }
 					break;
 				}		// surname
 
