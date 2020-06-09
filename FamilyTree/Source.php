@@ -51,6 +51,7 @@ use \Exception;
  *		2019/09/26      use Address::get in place of obsolete special   *
  *		                get methods                                     *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/05/22      avoid error on missing idsr                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -148,19 +149,37 @@ if (!is_null($name))
 }                   // Name specified
 
 $template->set('IDSR',              $idsr);
-$srcname                            = $source->get('srcname');
-$srctitle                           = $source->get('srctitle');
-$idst                               = $source->get('idst');
-$typetext                           = $source->getTypeText();
-$srcauthor                          = $source->get('srcauthor');
-$srcpubl                            = $source->get('srcpubl');
-$srctext                            = $source->get('srctext');
-$srcnote                            = $source->get('srcnote');
-$srccallnum                         = $source->get('srccallnum');
-$idar                               = $source->get('idar');
-$enteredd                           = $source->get('enteredd');
-$enteredd                           = (new LegacyDate($enteredd))->toString();
-$filingref                          = $source->get('filingref');
+if ($source)
+{
+	$srcname                        = $source->get('srcname');
+	$srctitle                       = $source->get('srctitle');
+	$idst                           = $source->get('idst');
+	$typetext                       = $source->getTypeText();
+	$srcauthor                      = $source->get('srcauthor');
+	$srcpubl                        = $source->get('srcpubl');
+	$srctext                        = $source->get('srctext');
+	$srcnote                        = $source->get('srcnote');
+	$srccallnum                     = $source->get('srccallnum');
+	$idar                           = $source->get('idar');
+	$enteredd                       = $source->get('enteredd');
+	$enteredd                       = (new LegacyDate($enteredd))->toString();
+	$filingref                      = $source->get('filingref');
+}
+else
+{
+	$srcname                        = '';
+	$srctitle                       = '';
+	$idst                           = '';
+	$typetext                       = '';
+	$srcauthor                      = '';
+	$srcpubl                        = '';
+	$srctext                        = '';
+	$srcnote                        = '';
+	$srccallnum                     = '';
+	$idar                           = '';
+	$enteredd                       = '';
+	$enteredd                       = '';
+}
 
 $template->set('NAME',		        $srcname);
 $template->set('SRCNAME',		    $srcname);

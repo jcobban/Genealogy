@@ -516,6 +516,31 @@ foreach ($_GET as $key => $value)
 }			        // loop through all parameters
 if ($debug && count($_GET) > 0)
     $warn       .= $parmsText . "</table>\n";
+
+if (is_string($offset) && !ctype_digit($offset))
+{
+    error_log("MarriageRegResponse.php: " . __LINE__ .
+                            " offset='$offset'\n");
+    $warn               .= "<p>MarriageRegResponse.php: " . __LINE__ .
+                            " offset='$offset'</p>\n";
+    $result             = preg_match('/\d*/',$offset, $matches);
+    $offset             = $matches[0];
+    if (strlen($offset) == 0)
+        $offset         = 0;
+}
+
+if (is_string($limit) && !ctype_digit($limit))
+{
+    error_log("MarriageRegResponse.php: " . __LINE__ .
+                            " limit='$limit'\n");
+    $warn               .= "<p>MarriageRegResponse.php: " . __LINE__ .
+                            " limit='$limit'</p>\n";
+    $result             = preg_match('/\d*/',$limit, $matches);
+    $limit              = $matches[0];
+    if (strlen($limit) == 0)
+        $limit          = 0;
+}
+
 $getparms['limit']	        = $limit;
 $npuri                      .= "$npuri{$npand}Limit=$limit";
 

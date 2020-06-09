@@ -75,8 +75,11 @@ use \Iterator;
  *      2019/12/01      if there are multiple matches to parameters     *
  *                      return new record                               *
  *      2019/12/19      replace xmlentities with htmlentities           *
+ *      2020/06/07      notify user and administrator that the initial  *
+ *                      frame number field has not been initialized.    *
+ *                      correct handling of explicit no division id     *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc' ;
 require_once __NAMESPACE__ . '/Census.inc' ;
@@ -257,6 +260,8 @@ class SubDistrict extends Record
         $division               = self::$initRow['sd_div'];
         $sched                  = self::$initRow['sd_sched'];
 
+        if ($debug)
+            $warn   .= "<p>SubDistrict::__construct(" . var_export($parms, true) . "<p>\n";
         foreach($parms as $field => $value)
         {                           // process parameters
             $fieldLc            = strtolower($field);
@@ -356,7 +361,8 @@ class SubDistrict extends Record
         $this->district         = $this->getDistrict($distId);
 
         // construct the query for an existing record
-        if (!is_null($division) && strlen($division) > 0)
+
+        if (!is_null($division))
         {                   // division included in search
             $sdQuery    = "SELECT * FROM SubDistricts " .
                                 "WHERE SD_Census=:censusId AND " .
@@ -940,6 +946,11 @@ class SubDistrict extends Record
         $censusYear     = substr($censusId, 2);
         $imageBase      = $this->row['sd_imagebase'];
         $relFrame       = $this->row['sd_relframe'];
+        if ($relFrame == 0)
+        {
+            $warn       .= "<p>SubDistrict::getDefaultImage: the initial frame number field in the SubDistrict table for Census=$censusId District=$distId Sub-District=$subdistId Division=$div has not been initialized.</p>\n";
+            error_log("SubDistrict::getDefaultImage: the initial frame number field in the SubDistrict table for Census=$censusId District=$distId Sub-District=$subdistId Division=$div has not been initialized.\n");
+        }
         $page1          = $this->row['sd_page1'];
         $pages          = $this->row['sd_pages'];
         $bypage         = $this->row['sd_bypage'];
@@ -1007,7 +1018,7 @@ class SubDistrict extends Record
                             $frm .
                             '.jpg';
                 break;
-        }   // 1881 census
+            }   // 1881 census
 
             case 1891:
             {
@@ -1073,7 +1084,7 @@ class SubDistrict extends Record
             case 1921:
             {
                 $frm    = $page - $page1 + $relFrame;
-        $image  = "https://www.ancestry.ca/interactive/8991/1921_" .
+                $image  = "https://www.ancestry.ca/interactive/8991/1921_" .
                                 substr('000', 0, 3 - strlen($imageBase)) .
                                 $imageBase .
                                 "-e" .

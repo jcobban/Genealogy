@@ -133,97 +133,108 @@ $censusRec             			= null;
 // validate all parameters passed to the server and construct the
 // various portions of the SQL SELECT statement
 $getParms	                    = array('order'	=> 'line');
-foreach ($_GET as $key => $value)
-{				// loop through all parameters
-    $value                      = trim($value);
-	switch(strtolower($key))
-	{
-	    case 'census':
-	    case 'censusid':
-        {			// supported field name
-            $censusId           = $value;
-			break;
-	    }			// Census Identifier
-
-	    case 'province':
-	    {			// Province code (pre-confederation)
-			$province			= strtoupper($value);
-			break;
-	    }			// Province code
-
-	    case 'district':
-	    {			// District number
-			$distpat	= '/^\d+(\.5|\.0)?$/';
-			if (is_array($value))
-			{
-			    $value			= current($value);
-			    if (count($value) != 1)
-					$msg	.= "Invalid value of District=" . 
-						   print_r($value,true). ". ";
-			}
-			if (preg_match($distpat, $value) == 1)
-			{		// valid district number
-			    $distID			= $value;
-			    $getParms['district']	= $value;
-			}		// valid district number
-			else
-			    $msg	.= "Invalid value of District='$value'. ";
-			break;
-	    }			// District number
-
-	    case 'subdistrict':
-	    {			// subdistrict id
-			$subDistID			            = $value;
-			$getParms['subdistrict']	    = $value;
-			break;
-	    }			// subdistrict id
-
-	    case 'division':
-	    case 'div':
-	    {			// division
-			if (preg_match('/(\d+):(\d+)/', $value, $matches))
-			{
-			    $distID			            = $matches[1];
-			    $subDistID			        = $matches[2];
-			    $getParms['district']	    = $distID;
-			    $getParms['subdistrict']	= $subDistID;
-			}
-            else
-            {
-			    $division			        = $value;
-                $getParms['division']		= $value;
-            }
-			break;
-	    }			// division
-
-	    case 'page':
-	    {			// "Page"
-			if (ctype_digit($value))
-			{
-			    $page			            = $value;
-			    $getParms['page']		    = $page;
-			}
-			else
-			    $msg	                .= "Invalid value of Page='$value'. ";
-			break;
-	    }			// "Page"
-
-        case 'lang':
-        {
-                $lang           = FtTemplate::validateLang($value);
-        }
-	    case 'showclear':
-	    {			// to clear or not to clear
-			// obsolete
-			break;
-	    }			// to clear or not to clear
-
-	    case 'debug':
-	    {			// already handled
-			break;
-	    }			// already handled 
-	}			// already handled
-}				// loop through parameters
+if (isset($_GET) && count($_GET) > 0)
+{                       // invoked by URL to display current status of account
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                               "<table class='summary'>\n" .
+                                  "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
+    foreach ($_GET as $key => $value)
+    {				    // loop through all parameters
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>$value</td></tr>\n";
+	    $value                      = trim($value);
+		switch(strtolower($key))
+		{
+		    case 'census':
+		    case 'censusid':
+	        {			// supported field name
+	            $censusId           = $value;
+				break;
+		    }			// Census Identifier
+	
+		    case 'province':
+		    {			// Province code (pre-confederation)
+				$province			= strtoupper($value);
+				break;
+		    }			// Province code
+	
+		    case 'district':
+		    {			// District number
+				$distpat	= '/^\d+(\.5|\.0)?$/';
+				if (is_array($value))
+				{
+				    $value			= current($value);
+				    if (count($value) != 1)
+						$msg	.= "Invalid value of District=" . 
+							   print_r($value,true). ". ";
+				}
+				if (preg_match($distpat, $value) == 1)
+				{		// valid district number
+				    $distID			= $value;
+				    $getParms['district']	= $value;
+				}		// valid district number
+				else
+				    $msg	.= "Invalid value of District='$value'. ";
+				break;
+		    }			// District number
+	
+		    case 'subdistrict':
+		    {			// subdistrict id
+				$subDistID			            = $value;
+				$getParms['subdistrict']	    = $value;
+				break;
+		    }			// subdistrict id
+	
+		    case 'division':
+		    case 'div':
+		    {			// division
+				if (preg_match('/(\d+):(\d+)/', $value, $matches))
+				{
+				    $distID			            = $matches[1];
+				    $subDistID			        = $matches[2];
+				    $getParms['district']	    = $distID;
+				    $getParms['subdistrict']	= $subDistID;
+				}
+	            else
+	            {
+				    $division			        = $value;
+	                $getParms['division']		= $value;
+	            }
+				break;
+		    }			// division
+	
+		    case 'page':
+		    {			// "Page"
+				if (ctype_digit($value))
+				{
+				    $page			            = $value;
+				    $getParms['page']		    = $page;
+				}
+				else
+				    $msg	                .= "Invalid value of Page='$value'. ";
+				break;
+		    }			// "Page"
+	
+	        case 'lang':
+	        {
+	                $lang           = FtTemplate::validateLang($value);
+	        }
+		    case 'showclear':
+		    {			// to clear or not to clear
+				// obsolete
+				break;
+		    }			// to clear or not to clear
+	
+		    case 'debug':
+		    {			// already handled
+				break;
+		    }			// already handled 
+		}			    // already handled
+	}				    // loop through parameters
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}                       // invoked by URL to display current status of account
 
 // manage transcriber and proofreader status
 $transcriber		            = '';

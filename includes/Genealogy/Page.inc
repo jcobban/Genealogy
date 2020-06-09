@@ -31,8 +31,10 @@ use \Iterator;
  *                      remove static functions                         *
  *                      permit updating identification fields           *
  *      2017/12/18      add support for temporary fields                *
+ *      2020/06/07      do not trust URL if the URL implies a zero      *
+ *                      initial frame number for the SubDistrict        *
  *                                                                      *
- *  Copyright &copy; 2017 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -311,9 +313,15 @@ class Page extends Record
             // if the record does not explicitly specify the associated
             // image, calculate it from information in the
             // SubDistrict record
-            if ($sched == '1' && $dbrow['pt_image'] == '')
+            $image                      = $dbrow['pt_image'];
+            if ($sched == '1' && 
+                ($image == '' ||
+                strpos($image, '00000') !== false))
+            {
+                $image  = $subDistrict->getDefaultImage($page);
                 parent::set('pt_image',
-                                 $subDistrict->getDefaultImage($page));
+                            $image);
+            }
 
             // diagnostic output if debug is set
             $this->dump('Page Record constructed:');

@@ -23,7 +23,32 @@ require_once __NAMESPACE__ . "/common.inc";
 if (array_key_exists('REDIRECT_URL', $_ENV))
     $url            = $_ENV['REDIRECT_URL'];
 else
-    $url            = $_SERVER['REQUEST_URI'];
+{
+    $fullUrl            = 'http';
+    $url                = '';
+    $port               = '';
+    if(isset($_SERVER["HTTPS"]))
+    {
+        if ($_SERVER["HTTPS"] == "on") {
+            $fullUrl    .= "s";
+            if ($_SERVER["SERVER_PORT"] != "443")
+                $port   = $_SERVER["SERVER_PORT"];
+        }
+        else
+        if ($_SERVER["SERVER_PORT"] != "80")
+            $port       = $_SERVER["SERVER_PORT"];
+    }
+    else
+    if ($_SERVER["SERVER_PORT"] != "80")
+        $port           = $_SERVER["SERVER_PORT"];
+    $fullUrl            .= "://";
+    $fullUrl            .= $_SERVER["SERVER_NAME"];
+    if (strlen($port) > 0)
+        $fullUrl        .= ":" . $_SERVER["SERVER_PORT"];
+    $url                = $_SERVER["REQUEST_URI"];
+    $url                .= $_SERVER['QUERY_STRING'];
+    $fullUrl            .= $url;
+}
 
 $lang               = 'en';
 if (preg_match('/(^.*Help)(\w*).html$/', $url, $matches))
@@ -62,7 +87,7 @@ else
 $template	        = new FtTemplate("404page$lang.html");
 
 $template->set('PAGENAME',      $pagename);
-$template->set('URL',           $url);
+$template->set('URL',           $fullUrl);
 $template->set('LANG',          $lang);
 
 $template->display();

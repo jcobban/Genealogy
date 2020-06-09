@@ -107,6 +107,7 @@ use \Templating\Template;
  *                      pattern because it contains no pattern          *
  *                      control characters. '^sm[eiy]+[td]he?$' is      *
  *                      a valid pattern.                                *
+ *      2020/05/20      select for count returned null                  *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -771,7 +772,10 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 
                 // return count in parameter object
                 $row            = $stmt->fetch(PDO::FETCH_NUM);
-                $this->information['count'] = $row[0];
+                if (is_array($row))
+                    $this->information['count'] = $row[0];
+                else
+                    $this->information['count'] = 0;
             }           // success
             else
             {           // error performing query

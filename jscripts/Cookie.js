@@ -128,6 +128,7 @@ Cookie.prototype.store = function(daysToLive,
         cookie += "; path=" + path;
     if (domain) 
         cookie += "; domain=" + domain;
+    cookie += "; samesite=lax";
     if (secure) 
         cookie += "; secure";
 

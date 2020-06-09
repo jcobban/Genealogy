@@ -3420,6 +3420,7 @@ function debugPrepQuery($query, $sqlParms, $escape = true)
     global $warn;
 
     // check for substitutions by indexed values
+    //error_log("debugPrepQuery('$query'," . var_export($sqlParms, true) . ")\n");
     $queryParts                 = explode('?', $query);
     if (count($queryParts) > 1)
     {               // substitutions by indexed values

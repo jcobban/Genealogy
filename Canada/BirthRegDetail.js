@@ -51,8 +51,10 @@
  *						place and add afterChange handler				*
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/18      call element.click() to trigger button click    *
+ *		2020/06/02      correct handling of image URL starting with     *
+ *		                /Images/                                        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoadBirths;
@@ -555,6 +557,11 @@ function showImage()
 				      imageUrl,
 				      "right");
 		else
+        if (imageUrl.substring(0,8) == '/Images/')
+		    openFrame("Images",
+				      'DisplayImage.php?src=' + imageUrl,
+				      "right");
+        else
 		    openFrame("Images",
 				      'DisplayImage.php?src=/Images/' + imageUrl,
 				      "right");

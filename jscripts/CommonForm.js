@@ -140,8 +140,10 @@
  *                      display: block                                  *
  *      2019/12/09      drop support for IE<9                           *
  *                      use popupAlert in place of alert                *
+ *      2020/06/06      add religion abbreviations                      *
+ *      2020/06/09      improve date checking                           *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 
 var givenNames          = [];
@@ -434,7 +436,8 @@ var RlgnAbbrs = {
                 "Men"       : "Mennonite",
                 "Mep"       : "Methodist Episcopal",
                 "Ncm"       : "New Connexion Methodist",
-                "Nc"        : "New Church",
+                "Nc"        : "New (Jerusalem) Church",
+                "Nj"        : "New Jerusalem",
                 "O"         : "Old School Baptist",
                 "Of"        : "of",
                 "Osb"       : "Old School Baptist",
@@ -455,6 +458,7 @@ var RlgnAbbrs = {
                 "Sw"        : "Swedenborgian (New Church)",
                 "U"         : "Unitarian",
                 "The"       : "the",
+                "Ub"        : "United Brethren",
                 "Uc"        : "United Church",
                 "Univ"      : "Universalist",
                 "Up"        : "United Presbyterian",
@@ -1617,52 +1621,61 @@ function checkFlagSex()
  ************************************************************************/
 function checkDate()
 {
-    var element     = this;
-    var re      = /^\[?\s*([A-Za-z]*)\s*([0-9]*)\s*([A-Za-z]*)\s*([0-9]*).*\]?$/;
-    var date        = element.value;
+    var element         = this;
+    var re      = /^([A-Za-z]*)\s*([0-9]*)\s*([A-Za-z]*)\s*([0-9]*)/;
+    var date            = element.value.trim();
+    if (date.substring(0,1) == '[')
+        date            = date.substring(1);
+    if (date.slice(-1) == ']')
+        date            = date.slice(0,-1);
+    date                = date.trim();
     if (date.length == 0)
         return true;
-    var result      = re.exec(date);
-    var matched     = (typeof result === 'object') &&
-                          (result instanceof Array);
+    var result          = re.exec(date);
+    var matched         = (typeof result === 'object') &&
+                              (result instanceof Array);
     var l0, n1, l2, l3, n3, pi, mi;
     if (matched)
     {
-        l0  = result[1].length;
-        pi  = preTab[result[1].toLowerCase()];
+        var pref        = result[1].toLowerCase();  // prefix on date or month
+        l0              = pref.length;
+        pi              = preTab[pref];
         if (pi === undefined)
-            pi  = monTab[result[1].toLowerCase()];
+            pi          = monTab[pref];
 
-        if (result[2].length > 0)
-            n1  = result[2] - 0;
+        var fstnum      = result[2];
+        if (fstnum.length > 0)
+            n1          = fstnum - 0;
         else
-            n1  = 0;
+            n1          = 0;
 
-        l2  = result[3].length;
+        var month       = result[3].toLowerCase();
+        l2              = month.length;
         if (l2 == 0)
-            mi  = pi;
+            mi          = pi;
         else
-            mi  = monTab[result[3].toLowerCase()];
+            mi          = monTab[month];
 
-        l3  = result[4].length;
+        var sndnum      = result[4];
+        l3              = sndnum.length;
         if (l3 > 0)
-            n3  = result[4] - 0;
+            n3          = sndnum - 0;
         else
-            n3  = 0;
+            n3          = 0;
     }
 
     if (matched)
     {
-        matched = (((n1 > 31 && l2 > 0 && n3 <= 31) ||  // yyyy mmm [dd]
-                  (n1 <= 31 && l2 > 0 && n3 > 0) || // [dd] mmmm yyyy
+        matched = (((n1 > 31 && n1 < 2030 && l2 > 0 && n3 <= 31) ||  // yyyy mmm [dd]
+                  (n1 <= 31 && l2 > 0 && n3 > 1000 && n3 < 2030) ||     // [dd] mmmm yyyy
                   (n1 <= 31 && l2 > 0 && l3 == 0) ||    // [dd] mmmm
                   (n1 == 0 && l0 > 0 && n3 <= 31) ||    // mmmm dd
-                  (n1 == 0 && l0 > 0 && n3 == 0) || // mmmm
-                  (n1 > 0 && l2 == 0 && n3 == 0)) &&    // yyyy
-                 pi !== undefined &&
-                 mi !== undefined) ||
-                pi == '5' ||
-                pi == 'F';
+                  (n1 == 0 && l0 > 0 && n3 == 0) ||     // mmmm
+                  (n1 > 1000 && n1 < 2030 && l2 == 0 && n3 == 0)) &&    // yyyy
+                  pi !== undefined &&
+                  mi !== undefined) ||
+                  pi == '5' ||
+                  pi == 'F';
     }
 
     setErrorFlag(element, matched);

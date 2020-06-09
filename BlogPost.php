@@ -20,6 +20,8 @@ use \Templating\TemplateTag;
  *      2018/12/12      change insertion in title to BLOGTITLE          *
  *      2019/02/18      use new FtTemplate constructor                  *
  *      2020/05/02      TABLE and LANG not set in blogTemplate          *
+ *      2020/06/03      fix editing of existing Blogs and posting       *
+ *                      replies to Blogs                                *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -123,6 +125,7 @@ function responses($id  , $indent)
 
 // process input parameters
 $id                 = 0;
+$keyvalue           = 0;
 $lang               = 'en';
 $table              = 'Blogs';
 $keyname            = 'blogid';
@@ -357,7 +360,6 @@ if (isset($_POST) && count($_POST) > 0)
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
-    $edit       = true;
     foreach($_POST as $key => $value)
     {                   // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
@@ -367,12 +369,17 @@ if (isset($_POST) && count($_POST) > 0)
         {               // act on specific parameters
             case 'blogid':
             case 'id':
-            case 'keyvalue':
             {           // identifier of record that message applies to
                 $keyname            = $key;
                 $id                 = trim($value);
                 break;
             }           // message being followed up
+
+            case 'keyvalue':
+            {
+                $keyvalue           = trim($value);
+                break;
+            }
 
             case 'table':
             case 'tablename':
@@ -402,13 +409,6 @@ if (isset($_POST) && count($_POST) > 0)
                 break;
             }       // email address of sender
 
-            case 'update':
-            {
-                if (strtoupper($value) == 'Y')
-                    $update         = true;
-                break;
-            }       // email address of sender
-
             case 'lang':
             {
                 $lang               = FtTemplate::validateLang($value);
@@ -416,42 +416,63 @@ if (isset($_POST) && count($_POST) > 0)
             }
 
         }               // act on specific parameters
+        $update                     = true;
     }                   // loop through all parameters
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
 
+    //$warn   .= "<p>" . __LINE__ . " id=$id, table='$table', update=" .  ($update?'true':'false') . "<p>\n";
     $tableInfo                      = Record::getInformation($table);
     if ($tableInfo)
     {
         if ($table == 'Blogs')
-            $blog   = new Blog(array('bl_index'         => $id,
-                                     'table'            => 'Blogs',
-                                     'keyvalue'         => $id,
-                                     'keyname'          => 'BL_Index',
-                                     'username'         => $userid,
-                                     'blogname'         => $subject,
-                                     'text'             => $message));
+        {
+            if ($update && $id > 0)
+            {
+                $blog               = new Blog(array('bl_index'     => $id));
+                $keyvalue           = $blog['keyvalue'];
+                //$warn   .= "<p>" . __LINE__ .  " new Blog(array('bl_index'     => $id)), " .  " \$keyvalue=$keyvalue</p>\n";
+                if ($userid != $blog['username'])
+                    $msg            .= "You cannot edit another user's post. "; 
+            }
+            else
+            {
+                $blog   = new Blog(array('table'        => 'Blogs',
+                                         'keyvalue'     => $keyvalue,
+                                         'keyname'      => 'bl_index',
+                                         'username'     => $userid,
+                                         'blogname'     => $subject,
+                                         'text'         => $message));
+                $keyvalue           = $id;
+                //$warn   .= "<p>" . __LINE__ .  " new Blog(array('table'        => 'Blogs', 'keyvalue'     => $id, 'keyname'      => 'bl_index', 'username'     => $userid, 'blogname'     => $subject, 'text'         => ...)), " .  " \$keyvalue=$keyvalue</p>\n";
+            }
+        }
         else
-            $blog   = new Blog(array('table'            => $table,
-                                     'keyvalue'         => $id,
-                                     'keyname'          => $tableInfo['prime'],
-                                     'username'         => $userid,
-                                     'blogname'         => $subject,
-                                     'text'             => $message));
+        {
+            $blog       = new Blog(array('table'        => $table,
+                                         'keyvalue'     => $id,
+                                         'keyname'      => $tableInfo['prime'],
+                                         'username'     => $userid,
+                                         'blogname'     => $subject,
+                                         'text'         => $message));
+            $keyvalue               = $id;
+            //$warn   .= "<p>" . __LINE__ .  " new Blog(array('table'        => '$table', 'keyvalue'     => $id, 'keyname'      => '" . $tableInfo['prime'] . "', 'username'     => $userid, 'blogname'     => $subject, 'text'         => ...))," .  " \$keyvalue=$keyvalue</p>\n";
+        }
         $blog->save(false);
-        $warn       .= "<p>Message posted</p>\n";
-        $table      = 'Blogs';
-        $className  = 'Blog';
-        $id         = $blog['bl_index'];
+        //$warn   .= "<p>" . __LINE__ . " bl_index=" . $blog['index'] . "</p>\n";
+        $warn           .= "<p>Message posted</p>\n";
+        $table          = 'Blogs';
+        $className      = 'Blog';
+        $id             = $blog['bl_index'];
     }
 }                       // invoked to update database
 
 // start the template
-$template           = new FtTemplate("BlogPost$lang.html");
-$trtemplate         = $template->getTranslate(); 
+$template               = new FtTemplate("BlogPost$lang.html");
+$trtemplate             = $template->getTranslate(); 
 
 // internationalization support
-$blogTemplate       = $template['blogTemplate'];
+$blogTemplate           = $template['blogTemplate'];
 if ($blogTemplate)
     $blogTemplate       = $blogTemplate->innerHTML();
 else
@@ -481,19 +502,17 @@ if ($tableInfo)
 {
     if ($table != 'Users')
     {
-        $matches            = array();
+        $matches                = array();
         if (is_string($id) &&
             preg_match('/\d+/', $id, $matches) == 1)
         {           // numeric id somewhere in string
-            $id             = (int)$matches[0];
+            $id                 = (int)$matches[0];
         }           // numeric id somewhere in string
         else
-        if (is_int($id) || ctype_digit($id))
-        {
-            $id             = (int)$id;
-        }
+        if (ctype_digit($id))
+            $id                 = (int)$id;
         else
-            $msg            .= "Invalid $keyname=$id. ";
+            $msg                .= "Invalid $keyname=$id. ";
     }
 
     $template['badTable']->update(null);        // remove error message
@@ -537,7 +556,16 @@ $template->set('KEYNAME',           $keyname);
 // other parameters
 $template->set('CONTACTKEY',        $id);
 $template->set('userid',            $userid);
-$template->set('blogid',            $id);
+if ($edit)
+{
+    $template->set('blogid',        $id);
+    $template->set('keyvalue',      $keyvalue);
+}
+else
+{
+    $template->set('blogid',        0);
+    $template->set('keyvalue',      $id);
+}
 $template->set('margin',            '');
 $template->set('LANG',              $lang);
 if ($debug)

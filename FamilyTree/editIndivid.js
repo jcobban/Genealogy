@@ -309,8 +309,9 @@
  *      2019/11/15      remove alert triggered during merge             *
  *      2020/02/17      hide right column                               *
  *      2020/05/09      getRowNumOf did not work with new layout        *
- *                      use console.log instead of alert to report        *
+ *                      use console.log instead of alert to report      *
  *                      errors since only the administrator cares       *
+ *      2020/05/19      correct date calculation for event insertion    *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -1362,6 +1363,13 @@ function gotUpdated(jsonObj)
     {           // valid response
         var srcform     = document.indForm;
         var indiv       = jsonObj.person;
+        if (typeof(indiv) === "undefined")
+        {
+            alert("editIndivid.js: gotUpdated: unexpected object=" +
+                    JSON.stringify(jsonObj));
+        }
+        else
+        {
         // var  msg = "";
         // for(key in indiv)
         //     msg      += key + "='" + indiv[key] + "',";
@@ -1470,7 +1478,7 @@ function gotUpdated(jsonObj)
                 childTable.addChildToPage(indiv,
                                           false);
         }       // adding new child
-
+        }       // person present in object
         // hide the frame containing this dialog
         if (window.frameElement)
             closeFrame();
@@ -3841,8 +3849,8 @@ function eventFeedback(parms)
     // displayed
     for (var iw = 0; iw < windowList.length; iw++)
     {           // loop through windows
-        var iwindow = windowList[iw];
-        var iframe  = iwindow.frameElement;
+        var iwindow                     = windowList[iw];
+        var iframe                      = iwindow.frameElement;
         if (iframe && iframe.name == "event")
         {
             windowList.splice(iw, 1);
@@ -3898,7 +3906,7 @@ function eventFeedback(parms)
 
             case 'date':
             {
-                date                    = parms.value;
+                date                    = value;
                 break;
             }               // date
 
@@ -3961,7 +3969,7 @@ function eventFeedback(parms)
                 {   // form already includes christening date input field
                     form.ChristeningDate.value      = date;
                     form.ChristeningLocation.value  = parms.location;
-                    rownum  = getRowNumOf(form.ChristeningDate);
+                    rownum              = getRowNumOf(form.ChristeningDate);
                 }   // form already includes christening date input field
                 break;
             }   // christening event
@@ -3972,7 +3980,7 @@ function eventFeedback(parms)
                 {   // form already includes death date input field
                     form.DeathDate.value            = date;
                     form.DeathLocation.value        = parms.location;
-                    rownum  = getRowNumOf(form.DeathDate);
+                    rownum              = getRowNumOf(form.DeathDate);
                 }   // form already includes death date input field
                 break;
             }   // death event
@@ -3983,7 +3991,7 @@ function eventFeedback(parms)
                 {   // form already includes buried date input field
                     form.BuriedDate.value           = date;
                     form.BuriedLocation.value       = parms.location;
-                    rownum  = getRowNumOf(form.BuriedDate);
+                    rownum              = getRowNumOf(form.BuriedDate);
                 }   // form already includes buried date input field
                 break;
             }   // buried event
@@ -3992,7 +4000,7 @@ function eventFeedback(parms)
             {
                 if (form.BaptismDate)
                 {   // form already includes LDS baptism date input field
-                    rownum  = getRowNumOf(form.BaptismDate);
+                    rownum              = getRowNumOf(form.BaptismDate);
                 }   // form already includes LDS baptism date input field
                 break;
             }   // LDS baptism event
@@ -4001,7 +4009,7 @@ function eventFeedback(parms)
             {
                 if (form.EndowmentDate)
                 {   // form already includes LDS endowment date input field
-                    rownum  = getRowNumOf(form.EndowmentDate);
+                    rownum              = getRowNumOf(form.EndowmentDate);
                 }   // form already includes LDS endowment date input field
                 break;
             }   // LDS endowment event
@@ -4010,7 +4018,7 @@ function eventFeedback(parms)
             {
                 if (form.ConfirmationDate)
                 {   // form already includes LDS confirmation date
-                    rownum  = getRowNumOf(form.ConfirmationDate);
+                    rownum              = getRowNumOf(form.ConfirmationDate);
                 }   // form already includes LDS confirmation date
                 break;
             }   // LDS confirmation event
@@ -4019,7 +4027,7 @@ function eventFeedback(parms)
             {
                 if (form.InitiatoryDate)
                 {   // form already includes LDS initiatory date
-                    rownum  = getRowNumOf(form.InitiatoryDate);
+                    rownum              = getRowNumOf(form.InitiatoryDate);
                 }   // form already includes LDS initiatory date
                 break;
             }   // LDS initiatory event
@@ -4028,10 +4036,10 @@ function eventFeedback(parms)
         if (rownum === '')
         {       // still not set, add new row
             rownum      = 1;
-            var eventBody   = document.getElementById('EventBody');
+            var eventBody               = document.getElementById('EventBody');
             for(var ic = 0; ic < eventBody.childNodes.length; ic++)
             {       // loop through "rows" of event "table"
-                var rowChild    = eventBody.childNodes[ic];
+                var rowChild            = eventBody.childNodes[ic];
                 if (rowChild.nodeName.toLowerCase() == 'div')
                 {       // a "row" of the event "table"
                     rownum++;
@@ -4039,26 +4047,26 @@ function eventFeedback(parms)
             }       // loop through "rows" of event "table"
         }       // still not set
     }           // row num not supplied by caller
-    parms.rownum    = rownum;
+    parms.rownum                        = rownum;
 
     // ensure sort date key is set in event
     if (datesd === null)
     {           // set default date for sort
-        var dateObj = new Date(date);
-        datesd      = dateObj.getFullYear() * 10000 +
-                          (dateObj.getMonth() + 1) * 100 +
-                          dateObj.getDate();
-        parms.datesd    = datesd
+        var dateObj                     = new Date(date);
+        datesd                          = dateObj.getFullYear() * 10000 +
+                                          (dateObj.getMonth() + 1) * 100 +
+                                           dateObj.getDate();
+        parms.datesd                    = datesd
     }           // set default date for sort
 
     // get a human interpretation of the event type
-    var typeText    = 'Unknown ' + idet;
-    var eventTextElt    = document.getElementById('EventText' + idet);
+    var typeText                        = 'Unknown ' + idet;
+    var eventTextElt            = document.getElementById('EventText' + idet);
     if (eventTextElt)
     {               // have element from web page
-        typeText    = eventTextElt.innerHTML.trim() + ':';
-        typeText    = typeText.substring(0,1).toUpperCase() +
-                                  typeText.substring(1);
+        typeText                        = eventTextElt.innerHTML.trim() + ':';
+        typeText                        = typeText.charAt(0).toUpperCase() +
+                                          typeText.substring(1);
     }               // have element from web page
 
     // update existing row or create new row
@@ -4079,6 +4087,8 @@ function eventFeedback(parms)
         searchForPosition:
         for(var row = table.firstChild; row; row = row.nextSibling)
         {                       // loop through events
+            console.log("editIndivid.js: 4083: datesd=" + datesd +
+                            ", row=" + row.outerHTML);
             if (row.nodeName.toLowerCase() == 'div')
             {                   // an event
                 for (var elt = row.firstChild; elt; elt = elt.nextSibling)
@@ -4257,17 +4267,17 @@ function eventFeedback(parms)
                 }
                 else
                 {
-                var date        = datePatt.exec(dateElt.value);
-
-                if (date === null)
-                {
-                    sdElt.value     = -99999999;
-                }
-                else
-                {
-                    sdElt.value     = (date[0]-0) * 10000 + 615;
-                    sdElt.defaultvalue  = (date[0]-0) * 10000 + 615;
-                }
+	                var date        = datePatt.exec(dateElt.value);
+	
+	                if (date === null)
+	                {
+	                    sdElt.value     = -99999999;
+	                }
+	                else
+	                {
+	                    sdElt.value     = (date[0]-0) * 10000 + 615;
+	                    sdElt.defaultvalue  = (date[0]-0) * 10000 + 615;
+	                }
                 }
                 break;
             }

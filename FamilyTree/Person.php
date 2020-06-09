@@ -292,6 +292,7 @@ use \Templating\TemplateTag;
  *		                add better fixup for lost records for parents   *
  *		                and spouses                                     *
  *		2020/03/19      hide empty marriage events                      *
+ *		2020/06/02      avoid exception on undefined locations          *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -885,23 +886,32 @@ function showLocation($location,
 
     if ($location instanceof Location)
     {
-		$idlr			= $location->getIdlr();
-		$locationTable[$idlr]	= $location;
-		$idprefix		= 'showLoc';
+        if ($location->isExisting())
+        {
+		    $idlr			= $location->getIdlr();
+		    $locationTable[$idlr]	= $location;
+            $idprefix		= 'showLoc';
+        }
     }
     else
     if ($location instanceof Temple)
     {
-		$idtr			= $location->getIdtr();
-		$templeTable[$idtr]	= $location;
-		$idprefix		= 'showTpl';
+        if ($location->isExisting())
+        {
+		    $idtr			= $location->getIdtr();
+		    $templeTable[$idtr]	= $location;
+		    $idprefix		= 'showTpl';
+        }
     }
     else
     if ($location instanceof Address)
     {
-		$idar			= $location->getIdar();
-		$addressTable[$idar]	= $location;
-		$idprefix		= 'showAdr';
+        if ($location->isExisting())
+        {
+		    $idar			= $location->getIdar();
+		    $addressTable[$idar]	= $location;
+		    $idprefix		= 'showAdr';
+        }
     }
     else
 		throw new Exception("Person.php: showLocation: ".

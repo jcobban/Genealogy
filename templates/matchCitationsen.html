@@ -1,0 +1,87 @@
+<!--*********************************************************************
+ *  matchCitationsen.html												*
+ *																		*
+ *  The template for outut from the matchCitations.php script.          *
+ *																		*
+ *  History:															*
+ *		2020/05/13		created											*
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+      <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>:
+      <a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&amp;lang=$LANG">
+  			Summary
+      </a>: 
+      <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;lang=$LANG">
+  			District $DISTRICT $DISTNAME Summary
+      </a>:
+      <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;lang=$LANG">
+  			Division Details
+      </a>:	
+    </div>
+    <div class="body">
+	  <h1>Census of Canada: Match Citations
+	    <span class='right'>
+		<a href='matchCitationsHelpen.html' target='help'>? Help</a>
+	    </span>
+	    <div style='clear: both;'></div>
+	  </h1>
+	  $TRACE
+      $MSG
+      <div id="results">
+	  <p>Checking births:</p>
+	  <p id="birthMatch">
+	      <a id='ftlink$i' 
+        		href='/FamilyTree/Person.php?idir=$idir&lang=$lang'>
+    	    $surname, $givenName
+	      </a>
+	      born $birthYear matched $mRow[surname],
+		    $mRow[givennames]
+		    born about $mRow[byear]
+	        on line <span id='line$i'>$line</span>.
+	  </p>
+	  <p>Checking events:</p>
+	  <p id="eventMatch">
+	      <a id='ftlink$i' 
+        		href='/FamilyTree/Person.php?idir=$idir&lang=$lang'>
+	        $row[1], $givenName
+	      </a>
+	      born $birthYear matched $mRow[surname],
+		    $mRow[givennames]
+		    born about $mRow[byear]
+	        on line <span id='line$i'>$line</span>.
+      </p>
+      </div>
+	</div>
+	<!-- balloons to pop up when mouse moves over forward and back links -->
+	<div class='popup' id='mouseprenpprev'>
+	  <p class='label'>
+		Go to Page $prevpage&nbsp;
+	  </p>
+	</div>
+	<div class='popup' id='mouseprenpnext'>
+	  <p class='label'>
+		Go to Page $nextpage&nbsp;
+	  </p>
+	</div>
+	<div class='popup' id='mousepostnpprev'>
+	  <p class='label'>
+		Go to Page $prevpage&nbsp;
+	  </p>
+	</div>
+	<div class='popup' id='mousepostnpnext'>
+	  <p class='label'>
+		Go to Page $nextpage&nbsp;
+	  </p>
+	</div>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/database/matchCitations.js" type="application/javascript">
+    </script>

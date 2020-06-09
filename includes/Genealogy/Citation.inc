@@ -222,6 +222,10 @@ use Templating\Template;
  *      2019/12/19      replace xmlentities with htmlentities           *
  *      2020/01/10      toHTML did not generate unique id values and    *
  *                      and left many empty lines in the output         *
+ *      2020/05/23      correct toHTML handling of citations where the  *
+ *                      Source has a url                                *
+ *                      add special support for Ontario Historical      *
+ *                      Atlases                                         *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -2021,6 +2025,7 @@ class Citation extends RecordPic
                 'sourceCensusPreConfed' => null,
                 'sourceWesleyanBaptism' => null,
                 'sourcePostOffices'     => null,
+                'sourceTownshipMap'     => null,
                 'sourceCemetery'        => null,
                 'detail'                => null,
                 'hyperlink'             => null,
@@ -2037,6 +2042,9 @@ class Citation extends RecordPic
         $detail             = trim($this->getDetail());
         $text               = trim($this->getDetailText());
         $note               = trim($this->getDetailNote());
+        if ($debug)
+            $warn   .= "<p>Citation::toHTML: " . __LINE__ .
+                    " idsx=$idsx, idsr=$idsr, detail='$detail'</p>\n";
 
         // start the template
         $tempBase           = $document_root . '/templates/';
@@ -2387,10 +2395,41 @@ class Citation extends RecordPic
                 break;
             }       // 'Canada, Post Offices and Postmasters':
 
+			case '1876 Historical Atlas of Oxford County':
+			case '1877 Historical Atlas of Elgin County':
+			case '1877 Historical Atlas of Norfolk County':
+			case '1878 Historical Atlas of Middlesex County':
+			case '1879 Historical Atlas of Huron County':
+			case '1879 Historical Atlas of Perth County':
+			case '1880 Historical Atlas of Lambton County':
+            {       // Historical County Atlases
+                $count          = preg_match('/[0-9]+/',
+                                             $detail,
+                                             $matches);
+                if (substr($detail, 0, 7) == 'map of ' ||
+                    substr($detail, 0, 7) == 'Map of ')
+                {   // detail matches pattern
+                    $township      = substr($detail, 7);
+                    $updates['sourceTownshipMap']   =
+                                  array('TOWNSHIP'  => $township,
+                                        'LANG'      => $lang,
+                                        'DETAIL'    => $detail);
+                }   // detail matches pattern
+                else
+                    $updates['detail'] =
+                                  array('DETAIL'    => $detail);
+                break;
+            }       // Historical County Atlases
+
             default:
             {   // does not match any interpreted pattern
                 $matches            = array();
-                $result             = preg_match('#https?://\S*#', $detail, $matches);
+                $result             = preg_match('#https?://\S*#',
+                                      $detail, 
+                                      $matches);
+                if ($debug)
+                    $warn   .= "<p>Citation::toHTML: " . __LINE__ .
+                            " idsx=$idsx, idsr=$idsr, detail='$detail', result=$result</p>\n";
                 if (substr($title,0,23) == 'Cemetery Transcription,')
                 {
                     $updates['sourceCemetery'] =
@@ -2406,10 +2445,10 @@ class Citation extends RecordPic
                                         'DETAIL'    => $detail);
                 }
                 else
-                if (substr($callnum, 0, 4) == 'http')
+                if (substr($detail, 0, 4) == 'http')
                 {
                     $updates['hyperlink'] =
-                                  array('URL'       => $callnum,
+                                  array('URL'       => $detail,
                                         'DETAIL'    => $detail);
                 }
                 else
@@ -2426,6 +2465,9 @@ class Citation extends RecordPic
                 }
                 break;
             }   // does not match any interpreted pattern
+            if ($debug && isset($updates['hyperlink']))
+                $warn   .= "<p>Citation::toHTML: " . __LINE__ .
+                    " \$updates['hyperlink']=" . var_export($updates['hyperlink'], true) . "</p>\n";
         }       // act on selected sources
 
         // interpret text quotation from source
@@ -2455,6 +2497,7 @@ class Citation extends RecordPic
         }
         $html           = $template->compile();
         $html           = preg_replace('/^[ \t]*[\r\n]+/m', '', $html);
+        showTrace();
         return $html;
     }       // function Citation::toHtml
 

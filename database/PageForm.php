@@ -80,8 +80,10 @@ use \Exception;
  *						database records is moved to class SubDistrict	*
  *						$subdistrict->getPages now returns RecordSet	*
  *		2019/11/13      use Template                                    *
+ *		2020/06/07      correct insertions into undefined SubDistrict   *
+ *		                error message                                   *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
@@ -324,9 +326,11 @@ if ($censusId && $distId && $subdistId)
     else
 	{
         $text	            = $template['subdistrictUndefined']->innerHTML;
-        $text               = str_replace('$censusId', $censusId, $text);
-        $text               = str_replace('$distId', $distId, $text);
-        $text               = str_replace('$subdistId', $subdistId, $text);
+        $text               = str_replace('$CENSUSID', $censusId, $text);
+        $text               = str_replace('$DISTID', $distId, $text);
+        if (strlen($division) > 0)
+            $subdistId      = "$subdistId-$division";
+        $text               = str_replace('$SUBDISTID', $subdistId, $text);
 		$msg	            .= $text;
     }
 }

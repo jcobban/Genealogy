@@ -74,8 +74,9 @@
 *		                if informant is undertaker update undertaker    *
 *		2019/04/12      loosen syntax for age                           *
  *		2019/05/19      call element.click to trigger button click      *
+ *		2020/06/01      correct handling of 9m9d age                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -693,6 +694,15 @@ function changeAge()
             {
                 months      = years;
                 years       = 0;
+                if (results)
+                {
+                    var rest            = results[4];
+                    results             = rey.exec(rest);
+                    if (results)
+                    {
+                        days          = getNumeric(results[2]);
+                    }
+                }
             }
             else
             if (t == 'w')

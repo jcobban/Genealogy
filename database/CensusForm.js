@@ -203,6 +203,8 @@
  *      2020/04/29      present cantread and cantwrite as gender        *
  *                      use addEventListener                            *
  *                      use new Event and element.dispatchEvent         *
+ *      2020/05/18      use common implementation of getOffsetTop and   *
+ *                      getOffsetLeft                                   *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -506,45 +508,6 @@ function onWindowResize()
     if (iframe)
         openFrame(iframe.name, null, "right");
 }       // function onWindowResize
-
-/************************************************************************
- *  function getOffsetLeft                                              *
- *                                                                      *
- *  Get the offsetLeft of an HTML element relative to the page.         *
- *                                                                      *
- *  Input:                                                              *
- *      elt      an element from an HTML form                           *
- ************************************************************************/
-function getOffsetLeft(elt)
-{
-    var  left       = 0;
-    while(elt)
-    {
-        left        += elt.offsetLeft;
-        elt         = elt.offsetParent;
-    }       // increment up to top element
-    return left;
-}   // function getOffsetLeft
-
-/************************************************************************
- *  function getOffsetTop                                               *
- *                                                                      *
- *  Get the offsetTop of an HTML element relative to the page.          *
- *                                                                      *
- *  Input:                                                              *
- *      elt      an element from an HTML form                           *
- ************************************************************************/
-function getOffsetTop(elt)
-{
-    // note that "top" is a reserved word
-    var  y          = 0;
-    while(elt)
-    {
-        y           += elt.offsetTop;
-        elt         = elt.offsetParent;
-    }       // increment up to top element
-    return y;
-}   // function getOffsetTop
 
 /************************************************************************
  *  function setClassByValue                                            *

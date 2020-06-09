@@ -47,6 +47,7 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
  *		2020/02/17      hide right column                               *
+ *		2020/05/28      correct setting of sortedLocation               *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -419,11 +420,13 @@ function locationChanged()
 		    lotnum	= 'lot 0' + lotnum.substring(4);
 
 		// pad out concession number
+		var digit2  = streetname.substring(5,6);
 		if (streetname.substring(0,4) == 'con ' &&
-		    streetname.substring(5,6) == ',')
+		    (digit2 < '0' || digit2 > '9'))
 		    streetname	= 'con 0' + streetname.substring(4);
 		var sortedLocation	= streetname + rest + ', ' +
 					  lotnum + ' ' + part;
+        console.log("sortedLocation='" + sortedLocation + "'");
 		form.SortedLocation.value	= sortedLocation;
     }		// street address
     else		
