@@ -63,6 +63,8 @@ use \Templating\Template;
  *      2019/11/06      do not display 0 in title when creating         *
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/04/29      correct handling of idsr=0 with name            *
+ *      2020/06/14      correct error handling and                      *
+ *                      support i18n for error and warn messages        *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/

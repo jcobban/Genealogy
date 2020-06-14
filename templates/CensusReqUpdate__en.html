@@ -23,8 +23,15 @@
       </h1>
       $TRACE
       $MSG
-    <p class='warning' id="Province$province">
-        Unsupported $province
+    <p class='label' id="Province$province">
+      <a href='CensusUpdateStatus.php?Census=$censusid&Province=$province&lang=$LANG'>
+        Edit $CENSUSYEAR Census for $provincename
+      </a>
+    </p>
+    <p class='label'>
+      <a href='CensusUpdateStatus.php?Census=$CENSUSID&lang=$LANG'>
+        Summary of Completed Transcriptions
+      </a>
     </p>
     </div> <!-- class="body"-->
     <div class='balloon' id='HelpProvince'>

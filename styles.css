@@ -264,6 +264,7 @@
                 overflow-y:         auto;
                 width:              80%; 
                 float:              left;
+                display:            block;  /* fix bug in IE */
                 }
 
    /*********************************************************************

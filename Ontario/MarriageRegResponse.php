@@ -113,8 +113,9 @@ use \Templating\Template;
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/07/08      correct handling of 1870-1872 marriages         *
  *		2019/12/13      remove M_ prefix from field names               *
+ *		2020/06/13      set REGCOUNTY                                   *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
@@ -627,6 +628,7 @@ $template->set('CC',	        $cc);
 $template->set('CODE',	        $code);
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('COUNTYNAME',	$countyName);
+$template->set('REGCOUNTY',	    $regCounty);
 $template->set('REGTOWNSHIP',	$regTownship);
 $template->set('LANG',	        $lang);
 $template->set('REGYEAR',       $regyear);

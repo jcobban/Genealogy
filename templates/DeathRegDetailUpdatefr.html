@@ -6,8 +6,9 @@
  *																		*
  *  History:															*
  *		2018/05/28		convert to template								*
+ *      2020/06/10      use <input type="number"> for original page     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
       <a href="/genealogy.php?lang=fr">
@@ -112,12 +113,12 @@
 					value="$ORIGINALVOLUME"/>
 		  </div>
 		  <div class="right">
-			    <label class="labelSmall6em" for="OriginalPage">
+			<label class="labelSmall6em" for="OriginalPage">
 				Page:
 			</label>
-			        <input name="OriginalPage" id="OriginalPage"
-					type="text" class="black white right"
-					size="3" maxlength="3"
+			<input name="OriginalPage" id="OriginalPage"
+					type="number" class="black white right"
+					size="3" maxlength="3" min="1" max="600"
 					value="$ORIGINALPAGE"/>
 		  </div>
 		</div>

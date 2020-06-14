@@ -68,11 +68,11 @@ require_once __NAMESPACE__ . '/common.inc';
 
 $idsr		            = null;
 $source		            = null;
-$name		            = 'not specified';
+$name		            = null;
 $lang                   = 'en';
 
 // get the parameters
-if (count($_GET) > 0)
+if (isset($_GET) && count($_GET) > 0)
 {	        	    // invoked by URL 
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
@@ -126,27 +126,33 @@ if (!is_null($idsr))
                                        'template'   => $template));
 		$name		= $source->getName();
 	}	// valid identifier
-	else
-        $msg	.= "Invalid value for idsr='$value'. ";
+    else
+    {
+        $text       = $template['InvalidIDSR']->innerHTML;
+        $msg	    .= str_replace('$idsr', $idsr, $text);
+    }
 }                   // IDSR specified
-
+else
 if (!is_null($name))
 {                   // Name specified
 	if (canUser('edit'))
 	{		        // only authorized contributors
-        $source		= new Source(array('srcname'    => $name,
-                                       'template'   => $template));
+        $source		    = new Source(array('srcname'    => $name,
+                                           'template'   => $template));
 	    if (!$source->isExisting())
-	    {
-    		$warn		.= "<p>New Source '$name' created.</p>\n";
+        {
+            $text       = $template['sourceCreated']->innerHTML;
+    		$warn		.= str_replace('$name', $name, $text);
 			$source->set('srctitle', $name);
 	        $source->save(false);
 	    }
-	    $idsr		= $source->getIdsr();
+        $idsr		    = $source->getIdsr();
 	}		        // only authorized contributors
-	else
-	    $msg	.= "Only signed on contributors may use the name parameter since it can cause a new source to be created. ";
+    else
+	    $msg	        .= $template['cannotUseName']->innerHTML;
 }                   // Name specified
+else
+    $msg                .= $template['missingIdsr']->innerHTML;
 
 $template->set('IDSR',              $idsr);
 if ($source)
@@ -164,6 +170,7 @@ if ($source)
 	$enteredd                       = $source->get('enteredd');
 	$enteredd                       = (new LegacyDate($enteredd))->toString();
 	$filingref                      = $source->get('filingref');
+    $repository	                    = $source->getRepository();
 }
 else
 {
@@ -179,6 +186,8 @@ else
 	$idar                           = '';
 	$enteredd                       = '';
 	$enteredd                       = '';
+    $filingref                      = '';
+    $repository                     = null;
 }
 
 $template->set('NAME',		        $srcname);
@@ -218,7 +227,6 @@ if (strlen($srccallnum) > 0)
 }		                // CallNum present in record
 
 // check for repository
-$repository	            = $source->getRepository();
 if ($repository)
 {		// repository reference present in record
 	$repoName		    = $repository['name'];
@@ -297,7 +305,11 @@ if ($repository)
         $template['repoNotesRow']->update(null);
 }		// repository reference present in record
 else
-    $template['repositoryRow']->update('null');
+{
+    $template['repositoryRow']->update(null);
+    $template['homePageRow']->update(null);
+    $template['repoNotesRow']->update(null);
+}
 // display any media files associated with the source
 //$source->displayPictures(Picture::IDTYPESrcMaster);
 

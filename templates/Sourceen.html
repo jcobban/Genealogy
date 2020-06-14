@@ -6,8 +6,9 @@
  *																		*
  *  History:															*
  *		2018/12/02      created                                         *
+ *      2020/06/14      add message texts for i18n                      *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -127,6 +128,16 @@
         <span id="Create">Create New</span>
         <span id="InvalidIDSR">Invalid value idsr='$idsr'. </span>
         <span id="noParms">Missing parameter to identify Source. </span>
+	    <span id="cannotUseName">
+            Only signed on contributors may use the name parameter 
+            since it can cause a new source to be created.
+        </span>
+        <span id="missingIdsr">
+            Neither IDSR nor name parameter specified.
+        </span>
+        <span id="sourceCreated">
+            <p>New Source '$name' created.</p>
+        </span>
     </div><!-- id="messages" -->
     <div class="hidden" id="srcTypes">`
 		<span data-key="1"></span>

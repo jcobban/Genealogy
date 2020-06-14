@@ -1365,15 +1365,15 @@ function validateFieldNames($operands)
 }		// function validateFieldNames
  
 /************************************************************************
- *  function parseJoin														*
+ *  function parseJoin													*
  *																		*
- *  Examine a string containing join clauses								*
+ *  Examine a string containing join clauses							*
  *																		*
- *  Parameters:																*
- *		$join				string containing table JOINs						*
+ *  Parameters:															*
+ *		$join		string containing table JOINs						*
  *																		*
- *  Returns:																*
- *		String containing error message text.								*
+ *  Returns:															*
+ *		String containing error message text.							*
  ************************************************************************/
 function parseJoin($join)
 {
@@ -1515,50 +1515,59 @@ if (count($_GET) > 0)
 }		        // parameters passed by method=post
 
 // parse patterns for SQL commands
-$cmdPattern				= '/^(\w+)\s+(.*)$$/i';
-$deletePattern			= '/^(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
-$insertPattern			= '/^INTO\s+(\w+)\s+(.*)$/i';
-$updatePattern			= '/^(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
+$cmdPattern					= '/^(\w+)\s+(.*)$/i';
+$deletePattern				= '/^(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
+$insertPattern				= '/^INTO\s+(\w+)\s+(.*)$/i';
+$updatePattern				= '/^(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
 
 // results of parse
-$command				= null;
-$table					= null;
-$join					= null;
-$operands				= null;
-$where					= null;
-$count					= null;
-$groupby				= null;
-$having					= null;
-$orderby				= null;
-$limit					= 999999999;
-$offset					= null;
-$query					= false;
+$command					= null;
+$table						= null;
+$join						= null;
+$operands					= null;
+$where						= null;
+$count						= null;
+$groupby					= null;
+$having						= null;
+$orderby					= null;
+$limit						= 999999999;
+$offset						= null;
+$query						= false;
 
-$tables					= array();
-$stmt					= $connection->query("SHOW TABLES");
-$tableRes				= $stmt->fetchAll(PDO::FETCH_NUM);
+$tables						= array();
+$stmt						= $connection->query("SHOW TABLES");
+$tableRes					= $stmt->fetchAll(PDO::FETCH_NUM);
 foreach($tableRes as $row)
 {
-    $ttable			    = $row[0];
+    $ttable			    	= $row[0];
     array_push($tables, $ttable);
-    $colStmt		    = $connection->query("SHOW COLUMNS FROM `$ttable`");
-    $colRes			    = $colStmt->fetchAll(PDO::FETCH_ASSOC);
-    $fieldList		    = array();
+    $colStmt		    	= $connection->query("SHOW COLUMNS FROM `$ttable`");
+    $colRes			    	= $colStmt->fetchAll(PDO::FETCH_ASSOC);
+    $fieldList		    	= array();
     foreach($colRes as $field)
         array_push($fieldList, $field['field']);
-    $fields[$ttable]		= $fieldList;
+    $fields[$ttable]			= $fieldList;
 }
 
 if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
 {			// no errors and work to do
-    $getCount		    = true;
-    $matches	        = array();
-    $sqlCommand         = trim($sqlCommand);
-    $result		        = preg_match($cmdPattern, $sqlCommand, $matches);
+    $getCount		    	= true;
+    $matches	        	= array();
+    $sqlCommand         	= trim($sqlCommand);
+    $explain            	= false;
+    $result		        	= preg_match($cmdPattern, $sqlCommand, $matches);
     if ($result == 1)
     {		// SQL command recognized
-        $command	    = strtoupper($matches[1]);
-        $therest        = trim($matches[2]);
+        $command	    	= strtoupper($matches[1]);
+        $therest        	= trim($matches[2]);
+        if ($command == 'EXPLAIN')
+        {
+            $explain    	= true;
+            $sqlCommand 	= trim($therest);
+            $result			= preg_match($cmdPattern, $sqlCommand, $matches);
+            $command	    = strtoupper($matches[1]);
+            $therest    	= trim($matches[2]);
+        }
 
         switch($command)
         {		// check syntax of command
@@ -2136,7 +2145,7 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
     {		// command valid and includes WHERE clause
         if (strtoupper($operands) == 'COUNT(*)')
         {		// returning only count
-print "<p>$sqlCommand</p>\n";
+            print "<p>$sqlCommand</p>\n";
             $stmt		= $connection->query($sqlCommand);
             if ($stmt === false)
             {
@@ -2198,13 +2207,17 @@ print "<p>$sqlCommand</p>\n";
                     print "<p>before='$before',field='$phpfield',after='$after'</p>\n";
                     $sqlCommand	= $before . $phpfield . $after;
                 }
-                $stmt	= $connection->query($sqlCommand);
+                if ($explain)
+                    $sqlCommand = 'EXPLAIN ' . $sqlCommand;
+                $stmt	        = $connection->query($sqlCommand);
+
                 if ($stmt)
                     $sresult	= $stmt->fetchAll(PDO::FETCH_ASSOC);
                 else
                 {
-                    $msg	.= "query='" . htmlentities($sqlCommand) .
-                                    "', " .  print_r($connection->errorInfo(),true);
+                    $msg	    .= "query='" . htmlentities($sqlCommand) .
+                                    "', " .  
+                                    print_r($connection->errorInfo(),true);
                 }		// error on request
             }	// query not issued yet
         }		// SELECT command, issue query	   

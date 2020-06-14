@@ -7,8 +7,9 @@
  * History:																*
  *		2018/10/02		created                                         *
  *      2019/09/25      missing value for checkbox                      *
+ *      2020/06/10      use <input type="number"> for original page     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
 	  <a href="/index.html">Home</a>:
@@ -134,8 +135,8 @@
 				Page:
 			  </label>
 			  <input name="OriginalPage" id="OriginalPage"
-					type="text" class="black white right"
-					size="3" maxlength="5"
+					type="number" class="black white right"
+					size="3" maxlength="5" min="1" max="600"
 				    value="$originalPage"/>
 	        </div>
 	      </div>
