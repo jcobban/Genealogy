@@ -17,6 +17,7 @@ use \NumberFormatter;
  *						specified using the 'id' parameter.				*
  *		name			specify name of location to display			    *
  *						Primarily for creation of a new record			*
+ *		feedback        name of field in calling page to update         *
  *		closeAtEnd		If set to 'y' or 'Y' then when the location		*
  *						has been updated, leave the frame blank			*
  *																	    *
@@ -112,6 +113,7 @@ use \NumberFormatter;
  *      2019/11/17      move CSS to <head>                              *
  *		2020/01/22      internationalize numbers                        *
  *		2020/02/14      add loose check for "name, .*, county..."       *
+ *		2020/06/30      add feedback parameter                          *
  *																	    *
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -135,6 +137,7 @@ else
 $namestart					= '';
 $idlr		    			= 0;		// default to create new
 $name		    			= '';
+$feedback                   = null;
 $closeAtEnd					= false;
 $lang		    			= 'en';
 
@@ -156,6 +159,12 @@ foreach($_GET as $key => $value)
 	    {           // name of location
 			$idlr		    = 0;
 			$name		    = $value;
+			break;
+	    }           // name of location
+
+	    case 'feedback':
+	    {           // name of feedback field in calling page
+			$feedback	    = $value;
 			break;
 	    }           // name of location
 
@@ -250,6 +259,7 @@ $template->set('TITLE',             $title);
 
 // set up values for displaying in form
 $template->set('IDLR',	            $idlr);
+$template->set('FEEDBACK',	        $feedback);
 $locname			= $location->get('location');
 $template->set('LOCATION',		    str_replace('"','&quote;',$locname));
 $shortName			= $location->getShortName();

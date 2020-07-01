@@ -25,6 +25,7 @@ use \Exception;
  *      2018/02/09      use Template                                    *
  *      2018/10/15      get language apology text from Languages        *
  *      2020/06/03      correct prev and next image links               *
+ *      2020/06/17      moved to top folder                             *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -76,7 +77,7 @@ if (count($_GET) > 0)
 // get the template
 $template           = new FtTemplate("DisplayImage$lang.html", true);
 $template->updateTag('otherStylesheets',    
-                     array('filename'   => '/Canada/DisplayImage'));
+                     array('filename'   => '/DisplayImage'));
 
 if ($src == '')
 {

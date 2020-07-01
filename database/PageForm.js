@@ -27,8 +27,9 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/06/29      first parameter of displayDialog removed        *
  *		2019/11/25      support scrollable body matched to headings     *
+ *		2020/06/17      DisplayImage moved to top folder                *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 var	imagePattern	= /([0-9]+)(\.[a-z]+)$/;
@@ -325,7 +326,7 @@ function showImage()
     var	rownum			= this.id.substring(4);
     var	imageName		= 'PT_Image' + rownum;
     var image			= form.elements[imageName].value;
-    var imageUrl		= "../Canada/DisplayImage.php?src=" +
+    var imageUrl		= "/DisplayImage.php?src=" +
 							  image + "&fldName=" + imageName;
     var	dotPos			= image.lastIndexOf('.');
     if (dotPos >= 0)

@@ -53,6 +53,7 @@
  *		2019/05/18      call element.click() to trigger button click    *
  *		2020/06/02      correct handling of image URL starting with     *
  *		                /Images/                                        *
+ *		                move DisplayImage.php to top of hierarchy       *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -187,7 +188,7 @@ function onLoadBirths()
 				case 'InformantRel':
 				{
 				    element.abbrTbl	= RelAbbrs;
-				    element.onchange	= change;
+				    element.onchange	= changeInformantRel;
 				    element.checkfunc	= checkName;
 				    element.checkfunc();
 				    element.disabled	= form.Surname.readOnly;
@@ -504,6 +505,44 @@ function afterChangeFatherOccPlace()
 }		// afterChangeFatherOccPlace
 
 /************************************************************************
+ *  function changeInformantRel 										*
+ *																		*
+ *  Take special action when the user changes the InformantRelation 	*
+ *  field. If the new value is 'Mother' and the Informant is the same   *
+ *  as the FatherName, then set the Informant to the given name portion *
+ *  of the MotherName plus the Surname.                                 *
+ *																		*
+ *  Input:																*
+ *		$this			<input id='InformantRelation'>					*
+ ************************************************************************/
+function changeInformantRel()
+{
+    capitalize(this);
+    var	form		                = this.form;
+
+    // expand abbreviations in InformantRelation
+    if (this.abbrTbl)
+		expAbbr(this,
+				this.abbrTbl);
+
+    var informant	                = form.Informant.value;
+    if (this.value == 'Mother' &&
+        informant == form.FatherName.value)
+    {                           // changed to 'Mother'
+        var motherName              = form.MotherName.value;
+        var lastSpace               = motherName.lastIndexOf(' ');
+        if (lastSpace > 0)
+        {           
+            var surname             = form.Surname.value;
+            form.Informant.value    = motherName.substring(0, lastSpace) +
+                                      ' ' + surname;
+        }
+    }                           // changed to 'Mother'
+
+    this.checkfunc();           // validate
+}		// changeInformantRel
+
+/************************************************************************
  *  function clearIdir													*
  *																		*
  *  This function is called when the user selects the clearIdir button	*
@@ -559,11 +598,16 @@ function showImage()
 		else
         if (imageUrl.substring(0,8) == '/Images/')
 		    openFrame("Images",
-				      'DisplayImage.php?src=' + imageUrl,
+				      '/DisplayImage.php?src=' + imageUrl,
+				      "right");
+        else
+        if (imageUrl.substring(0,1) == '/')
+		    openFrame("Images",
+				      '/DisplayImage.php?src=/Images' + imageUrl,
 				      "right");
         else
 		    openFrame("Images",
-				      'DisplayImage.php?src=/Images/' + imageUrl,
+				      '/DisplayImage.php?src=/Images/' + imageUrl,
 				      "right");
     }		// Image field defined
     return false;

@@ -19,8 +19,10 @@
  *		                validate new township for unique id             *
  *		2020/02/14      add edit location button                        *
  *		                use addEventListener                            *
+ *		2020/06/30      use new field 'location'                        *
+ *		                pass language selection to child windows        *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.addEventListener('load',	onLoad);
@@ -40,52 +42,52 @@ function onLoad()
     var	element;
     var trace	= '';
     for (var fi = 0; fi < document.forms.length; fi++)
-    {		// loop through all forms
-		var form	= document.forms[fi];
-		trace	+= "<form ";
+    {		                    // loop through all forms
+		var form	                = document.forms[fi];
+		trace	                    += "<form ";
 		if (form.name.length > 0)
-		    trace	+= "name='" + form.name + "' ";
+		    trace	                += "name='" + form.name + "' ";
 		if (form.id.length > 0)
-		    trace	+= "id='" + form.id + "' ";
-		trace	+= ">";
+		    trace	                += "id='" + form.id + "' ";
+		trace	                    += ">";
 
 		for (var i = 0; i < form.elements.length; ++i)
-		{	// loop through all elements of form
-		    element		= form.elements[i];
-		    trace += "<" + element.nodeName + " ";
+		{	                    // loop through all elements of form
+		    element		            = form.elements[i];
+		    trace                   += "<" + element.nodeName + " ";
 		    if (element.name.length > 0)
-				trace	+= "name='" + element.name + "' ";
+				trace	            += "name='" + element.name + "' ";
 		    if (element.id.length > 0)
-				trace	+= "id='" + element.id + "' ";
-		    trace	+= ">";
+				trace	            += "id='" + element.id + "' ";
+		    trace	                += ">";
 		    element.addEventListener('keydown',	keyDown);
 
 		    // pop up help balloon if the mouse hovers over a field
 		    // for more than 2 seconds
 		    if (element.parentNode.nodeName == 'TD')
-		    {	// set mouseover on containing cell
+		    {	                // set mouseover on containing cell
 				element.parentNode.addEventListener('mouseover', eltMouseOver);
 				element.parentNode.addEventListener('mouseout',	eltMouseOut);
-		    }	// set mouseover on containing cell
+		    }	                // set mouseover on containing cell
 		    else
-		    {	// set mouseover on input element itself
+		    {	                // set mouseover on input element itself
 				element.addEventListener('mouseover',		eltMouseOver);
 				element.addEventListener('mouseout',		eltMouseOut);
-		    }	// set mouseover on input element itself
+		    }	                // set mouseover on input element itself
 
-		    var name		= element.id;
+		    var name		        = element.id;
 		    if (name == '')
-				name		= element.name;
-		    var	line		= '';
-		    var regexResult	= /^([a-zA-Z_$]+)(\d*)/.exec(name);
+				name		        = element.name;
+		    var	line		        = '';
+		    var regexResult	        = /^([a-zA-Z_$]+)(\d*)/.exec(name);
 		    if (regexResult)
 		    {
-				name		= regexResult[1];
-				line		= regexResult[2];
+				name		        = regexResult[1];
+				line		        = regexResult[2];
 		    }
 
 		    switch(name.toLowerCase())
-		    {			// act on column name
+		    {			        // act on column name
 				case 'add':
 				{
 				    element.addEventListener('click',	    addTownship);
@@ -128,9 +130,9 @@ function onLoad()
 				    element.addEventListener('click',	showConcessions);
 				    break;
 				}
-		    }			// act on column name
-		}	// loop through all elements in the form
-    }		// loop through all forms
+		    }			        // act on column name
+		}	                    // loop through all elements in the form
+    }		                    // loop through all forms
 }		// function onLoad
 
 /************************************************************************
@@ -172,23 +174,37 @@ function deleteTownship(ev)
  ************************************************************************/
 function showLocation(ev)
 {
+    let lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
     let	form		    = this.form;
     let	rowid	    	= this.id.substring(8);
-    let	township	    = form.elements['Code' + rowid].value;
-    if (township.substring(township.length - 4) == ' Twp')
-        township        = township.substring(0, township.length - 4);
-    let	name    	    = form.elements['Name' + rowid].value;
-    let stateName       = form.StateName.value;
-    let cc              = form.Domain.value.substr(0,2);
-    if (cc == 'US')
-        cc              = 'USA';
+    let	idlr	        = form.elements['IDLR' + rowid].value;
+    if (idlr > 0)
+    {                   // already defined
+	    window.open("/FamilyTree/Location.php?idlr=" + idlr + '&lang=' + lang,
+					'_blank');
+    }                   // already defined
     else
-    if (cc == 'CA')
-        stateName       = form.Domain.value.substr(2);
-    let countyName      = form.CountyName.value;
-    let locationName    = township + ', ' + countyName + ', ' + stateName + ', ' + cc;
-    window.open("/FamilyTree/Location.php?name=" + encodeURI(locationName),
-				'_blank');
+    {                   // search
+	    let	township	    = form.elements['Code' + rowid].value;
+	    if (township.substring(township.length - 4) == ' Twp')
+	        township        = township.substring(0, township.length - 4);
+	    let	name    	    = form.elements['Name' + rowid].value;
+	    let stateName       = form.StateName.value;
+	    let cc              = form.Domain.value.substr(0,2);
+	    if (cc == 'US')
+	        cc              = 'USA';
+	    else
+	    if (cc == 'CA')
+	        stateName       = form.Domain.value.substr(2);
+	    let countyName      = form.CountyName.value;
+	    let locationName    = township + ', ' + countyName + ', ' + stateName + ', ' + cc;
+	    window.open("/FamilyTree/Location.php?name=" + encodeURI(locationName) +
+                                            '&feedback=IDLR' + rowid +
+                                            '&lang=' + lang,
+					'_blank');
+    }                   // search
 }		// function showLocation
 
 /************************************************************************
@@ -307,6 +323,9 @@ function checkCode()
  ************************************************************************/
 function showConcessions(ev)
 {
+    let lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
     var	line		= this.id.substring(11);
     var form		= this.form;
     var	domain		= form.Domain.value;
@@ -314,7 +333,8 @@ function showConcessions(ev)
     var	township	= form.elements['Code' + line].value;
     var	url	    	= 'ConcessionsEdit.php?domain=' + domain +
 								'&county=' + county +
-								'&township=' + township;
+								'&township=' + township +
+                                '&lang=' + lang;
     window.open(url,
 				'_blank');
     return false;

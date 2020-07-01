@@ -43,6 +43,7 @@ use \Templating\Template;
  *      2020/03/27      simplify parameter handling                     *
  *                      and fix premature template creation             *
  *      2020/05/03      update status messages only on update           *
+ *      2020/06/30      delete all update related messages on GET       *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -276,8 +277,6 @@ $changed                        = $template['changed'];
 $deleted                        = $template['deleted'];
 $added                          = $template['added'];
 $summary                        = $template['summary'];
-if ($get && !is_null($summary))
-    $summary->update(null);
 
 // apply updates
 if (isset($_POST) && count($_POST) > 0)
@@ -360,6 +359,14 @@ if (isset($_POST) && count($_POST) > 0)
     if ($changeCount == 0)
         $template['summary']->update(null);
 }                       // invoked to process update
+else
+if ($changed)
+{                       // invoked to display table
+	$changed->update(null);
+	$deleted->update(null);
+	$added->update(null);
+	$summary->update(null);
+}                       // invoked to display table
 
 if (strlen($msg) == 0)
 {           // no errors detected

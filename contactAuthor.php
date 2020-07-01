@@ -120,7 +120,8 @@ foreach($_GET as $name => $value)
 
         default:
         {
-            $about  .= "&$name=$value";
+            if (is_string($value))
+                $about      .= "&$name=$value";
             break;
         }
     }           // act on specific keys

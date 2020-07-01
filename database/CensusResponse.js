@@ -26,8 +26,9 @@
  *		2015/07/08		simplify activation of popups for hyper-links	*
  *						use CommonForm.js								*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/06/17      DisplayImage moved to top folder                *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 window.onload	= onLoad;
 
@@ -122,7 +123,7 @@ function showImage()
 {
     var	form			= this.form;
     var image			= form.image;
-    var imageUrl		= "../Canada/DisplayImage.php?src=" +
+    var imageUrl		= "/DisplayImage.php?src=" +
 							  image.value;
 
     // replace button with copyright notice

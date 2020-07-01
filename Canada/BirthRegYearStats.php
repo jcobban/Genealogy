@@ -323,8 +323,19 @@ else
 	$pctLinked	= 100 * $totalLinked / $total;
 }
 $template->set('REGYEAR',           $regYear);
-$template->set('REGYEARP',          $regYear - 1);
-$template->set('REGYEARN',          $regYear + 1);
+if (is_int($regYear) || 
+    (is_string($regYear) && ctype_digit($regYear)))
+{
+    $template->set('REGYEARP',          $regYear - 1);
+    $template->set('REGYEARN',          $regYear + 1);
+}
+else
+{
+    error_log("BirthRegYearStats.php: " . __LINE__ .
+                " non-numeric regyear='$regyear'");
+    $template->set('REGYEARP',          -1);
+    $template->set('REGYEARN',          1);
+}
 $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
 $template->set('TOTAL',             $formatter->format($total));
 $template->set('LOWEST',            $lowest);

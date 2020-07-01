@@ -23,7 +23,7 @@
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
 
-window.onload           = onloadLocations;
+window.onload                   = onloadLocations;
 
 /************************************************************************
  *  function childFrameClass                                            *
@@ -31,7 +31,7 @@ window.onload           = onloadLocations;
  *  If this dialog is opened in a half window then any child dialogs    *
  *  are opened in the other half of the window.                         *
  ************************************************************************/
-var childFrameClass     = 'right';
+var childFrameClass             = 'right';
 
 /************************************************************************
  *  function onLoadLocations                                            *
@@ -49,6 +49,24 @@ function onloadLocations()
         else
             childFrameClass     = 'left';
     }                       // dialog opened in half frame
+
+    // pass feedback to openet
+    let opener                  = window.opener;
+    if (opener)
+    {                       // opened from another page
+        if ('idlr' in args && args.idlr.length > 0 &&
+            'feedback' in args && args.feedback.length > 0)
+        {                   // feedback field identified
+            let element         = opener.document.getElementById(args.feedback);
+            if (element)
+            {
+                element.value   = args.idlr;
+            }
+            else
+                alert("cannot find input field '" + args.feedback +
+                        "' in the opener page");
+        }                   // feedback field identified
+    }                       // opened from another page
 
     // scan through all forms and set dynamic functionality
     // for specific elements

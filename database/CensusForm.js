@@ -205,6 +205,9 @@
  *                      use new Event and element.dispatchEvent         *
  *      2020/05/18      use common implementation of getOffsetTop and   *
  *                      getOffsetLeft                                   *
+ *      2020/06/17      DisplayImage moved to top folder                *
+ *      2020/06/26      retain display image button so it can be        *
+ *                      reissued after image closed                     *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -2926,32 +2929,34 @@ var imageTypes  = ['jpg', 'jpeg', 'gif', 'png'];
 function showImage(event)
 {
     event.stopPropagation();
-    var  form           = this.form;
-    var image          = form.elements['Image'].value;
-    var  lang           = 'en';
+    var  form               = this.form;
+    var image               = form.elements['Image'].value;
+    var  lang               = 'en';
     if ('lang' in args)
-        lang          = args['lang'];
-    var imageUrl      = "/Canada/DisplayImage.php?src=" + image +
-                                        "&lang=" + lang;
-    var  dotPos         = image.lastIndexOf('.');
+        lang                = args['lang'];
+    var imageUrl            = "/DisplayImage.php?src=" + image +
+                                            "&buttonname=imageButton" +
+                                            "&lang=" + lang;
+    var  dotPos             = image.lastIndexOf('.');
     if (dotPos >= 0)
     {
-        var  imageType  = image.substring(dotPos + 1).toLowerCase();
-        var  imageIndex = imageTypes.indexOf(imageType);
+        var  imageType      = image.substring(dotPos + 1).toLowerCase();
+        var  imageIndex     = imageTypes.indexOf(imageType);
         if (imageIndex == -1)
-            imageUrl      = image;
+            imageUrl        = image;
     }
     else
-        imageUrl      = image;
+        imageUrl            = image;
 
     // replace button with copyright notice
-    var copNotice      = document.getElementById('imageCopyrightNote');
-    if (copNotice)
-    {           // replace button with copyright notice
-        var clone      = copNotice.cloneNode(true);
+    var copNotice           = document.getElementById('imageCopyrightNote');
+    var showNotice           = document.getElementById('showCopyrightNote');
+    if (copNotice && showNotice === null)
+    {           // add copyright notice
+        var clone           = copNotice.cloneNode(true);
+        clone.id            = 'showCopyrightNote';
         var parentNode      = this.parentNode;
-        var nextSibling      = this.nextSibling;
-        parentNode.removeChild(this);
+        var nextSibling     = this.nextSibling;
         parentNode.insertBefore(clone, nextSibling);
         // also remove correct image button
         var corrButton      = document.getElementById('correctImage');
@@ -2961,10 +2966,7 @@ function showImage(event)
             parentNode.removeChild(corrButton);
         }
     }           // replace button with copyright notice
-    else
-    {           // just disable button
-        this.disabled      = true;
-    }           // just disable button
+    this.disabled           = true;
 
     // display the image in the right half of the window
     openFrame("imageFrame",

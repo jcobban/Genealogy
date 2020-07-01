@@ -263,6 +263,10 @@ else
                 setcookie('persistence', 
                           $user->get('persistence'), 
                           time() + 60*60*24*7, '/');
+                error_log("Signon.php: " . __LINE__ . 
+                            " setcookie('persistence', " . 
+                            $user->get('persistence') .
+                            ", seven days, '/')\n"); 
             }           // session persistence
 
 			if ($redirectto == 'POST')

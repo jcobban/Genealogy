@@ -62,6 +62,7 @@
  *      2020/03/04      loading of dialogs moved to FtTemplate          *
  *      2020/04/14      do not include descriptive prefixes in search   *
  *      2020/04/26      convert trailing 1/2 into ½                     *
+ *      2020/06/28      preserve square brackets around location value  *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -347,7 +348,10 @@ function gotLocationJSON(response)
                         for(var idlr in response.locations)
                         {       // examine the one location
                             var loc         = response.locations[idlr];
-                            element.value   = prefix + loc['location'];
+                            if (element.value.charAt(0) == '[')
+                                element.value   = '[' + prefix + loc['location'] + ']';
+                            else
+                                element.value   = prefix + loc['location'];
                         }       // examine the one location
 
                         // location field is updated
@@ -538,7 +542,10 @@ function locationChosen()
         var element     = form.elements[elementName];
         if (element)
         {
-            element.value   = chosenOption.innerHTML;
+            if (element.value.charAt(0) == '[')
+                element.value   = '[' + chosenOption.innerHTML + ']';
+            else
+                element.value   = chosenOption.innerHTML;
 
             // check for action to take after changed
             if (element.afterChange)

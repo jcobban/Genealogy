@@ -62,6 +62,7 @@
  *		2017/07/12		use function locationChanged					*
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/05/19      call element.click to trigger button click      *
+ *		2020/06/17      DisplayImage moved to top folder                *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban.								*
  ************************************************************************/
@@ -555,11 +556,11 @@ function showImage(ev)
 		else
         if (imageUrl.substring(0, 1) == '/')
 		    openFrame("Images",
-				      '/Canada/DisplayImage.php?src=' + imageUrl,
+				      '/DisplayImage.php?src=' + imageUrl,
 				      "right");
         else
 		    openFrame("Images",
-				      '/Canada/DisplayImage.php?src=/Images/' + imageUrl,
+				      '/DisplayImage.php?src=/Images/' + imageUrl,
 				      "right");
     }		// Image field defined
     return false;

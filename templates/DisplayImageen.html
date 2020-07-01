@@ -11,6 +11,7 @@
  *      2019/03/02      add hidden <h1> to satisfy FtTemplate           *
  *		2019/12/12      fix header at top and scroll image such that    *
  *		                the scroll bars are visible all the time        *
+ *      2020/06/17      script moved to top folder                      *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
@@ -48,7 +49,22 @@
                     alt="Cannot Find Document Image $SRC" 
                     style="width: 100%;">
       </div>
+      <span id="msgPosition"></span>
     </div> <!-- end of <div id="body"> -->
+    <div class="hidden" id="templates">
+      <form name="creditForm" id="creditForm">
+        This image is created from microfilm provided by the Ontario Archives.
+        <p>
+          <button type="button" id="closeCredit">Close</button>
+        </p>
+      </form>
+      <form class="balloon" id="creditUrl">
+        This image is provided by $hostname.
+        <p>
+          <button type="button" id="closeCreditUrl">Close</button>
+        </p>
+    </form>
+    </div>
     <div class="balloon" id="Helpplus">
       Click on this button to zoom into the image.
     </div>
@@ -68,5 +84,5 @@
     </script>
     <script src="/jscripts/util.js" type="text/javaScript">
     </script>
-    <script src="/Canada/DisplayImage.js" type="text/javaScript">
+    <script src="/DisplayImage.js" type="text/javaScript">
     </script>

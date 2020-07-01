@@ -8,8 +8,9 @@
  *	    2011/00/27	    created					                        *
  *	    2013/08/01	    defer facebook initialization until after load	*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/06/22      hide right column                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban					            *
+ *  Copyright &copy; 2020 James A. Cobban					            *
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -33,24 +34,40 @@ function onLoad()
             return;
         }                   // found table
     }                       // invoker did not explicitly specify width
+
     // activate handling of key strokes in text input fields
     var	element;
     for (fi = 0; fi < document.forms.length; fi++)
-    {		// loop through all forms
-		var form	= document.forms[fi];
+    {		                // loop through all forms
+		var form	            = document.forms[fi];
 		for (var i = 0; i < form.elements.length; ++i)
-		{	// loop through all elements of form
+		{	                // loop through all elements of form
 		    element		        = form.elements[i];
+            var name;
+            var col             = '';
+            if ('id' in element)
+                name            = element.id;
+            else
+                name            = element.name;
+            var results         = name.match(/^([a-zA-Z_$]+)(\d*)$/);
+            if (results)
+            {
+                name            = results[1];
+                col             = results[2];
+            }
+
 		    element.onkeydown	= keyDown;
     
-		    if (element.id.substring(0, 9) == 'YearStats')
+		    if (name.toLowerCase() == 'yearstats')
 		    {
 			    element.helpDiv	= 'YearStats';
 			    element.onclick	= showYearStats;
 		    }
-		}	// loop through all elements in the form
-    }		// loop through all forms
-}		// onLoad
+		}	                // loop through all elements in the form
+    }		                // loop through all forms
+
+    hideRightColumn();
+}		// function onLoad
 
 /************************************************************************
  *  function showYearStats			                                    *
@@ -68,4 +85,4 @@ function showYearStats()
     location	    = 'MarriageRegYearStats.php?regyear=' + year +
                                                 '&lang=' + lang;
     return false;
-}		// showYearStats
+}		// function showYearStats
