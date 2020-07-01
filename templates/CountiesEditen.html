@@ -8,6 +8,7 @@
  *		2018/01/22		display only part of the table at a time		*
  *      2018/10/08      add id attributes on all <input> elements       *
  *      2020/02/14      pass full state name and country name           *
+ *      2020/07/01      get text of warning messages from locale        *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
@@ -176,6 +177,15 @@
       <button type="button" id="Add">Add New County</button>
     </form>
   </div> <!-- end of <div class="body"> -->
+  <div class="hidden" id="messages">
+      <span id="duplicateCounty">
+          County Code $newCode is already in use.
+      </span>
+      <span id="browserfail">
+          Unable to rename element Code $oldCode to Code $newCode. 
+          Please upgrade your browser.
+      </span>
+  </div>
   <!-- The remainder of the page consists of context specific help text.
   -->
   <div class="balloon" id="HelpCode">
