@@ -425,6 +425,7 @@ class SubDistrict extends Record
                                       "SD_Id<:sdId AND " .
                                       "SD_Sched=:sched " .
                                       "LIMIT 1";
+                    unset($sqlParms['division']);
                 }
                 else
                 {
@@ -467,9 +468,20 @@ class SubDistrict extends Record
                 }       // succeeded
                 else
                 {       // error performing query
-                    print "<p>sql='$prevQueryText'</p>\n" .
+                    if ($stmt->errorInfo()[0] == 'HY093')
+                    {
+                        print "<p>sql='$prevQuery', sqlParms=" .
+                                    var_export($sqlParms,true) . 
+                                    ', error=' .
+                                    var_export($stmt->errorInfo(),true) .
+                                    "</p>\n";
+                    }
+                    else
+                    {
+                        print "<p>sql='$prevQueryText'</p>\n";
+                    }
                     $this->msg  .=" '$prevQueryText' " .
-                                    print_r($stmt->errorInfo(),true);
+                                        var_export($stmt->errorInfo(),true) . '.';
                     $dbrow      = self::$initRow;
                 }       // error performing query
                 $needInsert     = true;
@@ -954,7 +966,7 @@ class SubDistrict extends Record
         $page1          = $this->row['sd_page1'];
         $pages          = $this->row['sd_pages'];
         $bypage         = $this->row['sd_bypage'];
-        $website        = 'http://data2.collectionscanada.ca/';
+        $website        = 'https://data2.collectionscanada.ca/';
 
         $lastpage       = $page1 + $bypage * ($pages - 1);
         if ($page < $page1 ||
@@ -975,13 +987,11 @@ class SubDistrict extends Record
             case 1851:
             {
                 $frm    = floor(($page - $page1) * 2 / $bypage) + $relFrame;
-                $image  = $website . 'e/e' .
-                            substr('000', 0, 3 - strlen($imageBase)) .
-                            $imageBase .
-                            '/e' .
+                $website    = "https://central.bac-lac.gc.ca/";
+                $image  = $website .
+                            '.item/%3Fapp=Census1851%26op=%26id=%26img=e' .
                             substr('000000000', 0, 9 - strlen($frm)) .
-                            $frm .
-                            '.jpg';
+                            $frm;
                 break;
             }   // 1851 census
 

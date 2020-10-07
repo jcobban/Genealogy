@@ -619,7 +619,7 @@ if (canUser('update'))
 else
     $action                 = $tranTab['Display'];
 $template->set('ACTION',        $action);
-$template->set('CONTACTTABLE',		'Births');
+$template->set('CONTACTTABLE',		'Marriage');
 $template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
 
 $template->set('DOMAIN',	    $domain);

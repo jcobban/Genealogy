@@ -42,8 +42,10 @@ use \Templating\Template;
  *		2018/10/31      use class Template                              *
  *		2018/12/26      did not accept surnames starting with O'        *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2020/02/23      $surname and $idnr were not initialized if      *
+ *		                there were no surname matches                   *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Surname.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -56,6 +58,8 @@ $getParms	    = array();
 $initial        = null;
 $soundex        = null;
 $pattern        = null;
+$surname        = null;
+$idnr           = null;
 $lang           = 'en';
 $treename       = '';
 
@@ -91,8 +95,7 @@ foreach($_GET as $key => $value)
 
 	    case 'soundex':
 	    case 'soundslike':
-	    {		// soundex specified
-			$title		= "Surnames with Soundex '$value'";
+        {		// soundex specified
 			$soundex	= substr($value . '000', 0, 4);
 			$getParms['soundslike']	= $soundex;
 			break;
@@ -101,7 +104,6 @@ foreach($_GET as $key => $value)
 	    case 'pattern':
         {		// soundex specified
             $pattern                = $value;
-			$title		            = "Surnames with Pattern '$value'";
 			$getParms['surname']	= $pattern;
 			break;
 	    }		// soundex specified
@@ -156,7 +158,10 @@ if (!is_null($pattern))
     $title  = str_replace('$VALUE', $pattern, $title);
 }
 else
-	$title	= $template['missing']->innerHTML();
+{
+    $title	= $template['missing']->innerHTML();
+    $msg    .= "$title. ";
+}
 $template->set('TITLE',     $title);
 
 // get the matches
@@ -191,13 +196,15 @@ if ($count > 0)
 }		            // some surnames matched
 else
 {		            // no matches
+    $surname            = 'No Match';
+    $idnr               = 0;
     $template['namesTable']->update(null);
 }		            // no matches
 
 $template->set("SURNAME",	        $surname);
+$template->set('CONTACTKEY',		$idnr);
 $template->set('TITLE',	            $title);
 $template->set('LANG',			    $lang);
-$template->set('CONTACTKEY',		$idnr);
 $template->set('CONTACTTABLE',		'Names');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 $template->set('TREENAME',          $treename);

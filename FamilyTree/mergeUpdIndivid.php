@@ -622,6 +622,7 @@ if (strlen($msg) == 0)
     if ($result > 0)
         $template->set('DELETEDNAMES',          $result);
     else
+    if ($template['deletedName'])
         $template['deletedName']->update(null);
 
     // Update nominal index records for merged individual. 

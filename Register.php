@@ -59,8 +59,9 @@ use \Exception;
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
+ *      2020/07/09      title was not set in all cases                  *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/User.inc";
 require_once __NAMESPACE__ . "/Language.inc";
@@ -230,8 +231,11 @@ if (strlen($newuserid) > 0 ||
 		$email		= $newuserid;
 
     if (strlen($email) < 6 || strpos($email, '@') === false)
+    {
 		$messages['badEmail']	    = array('newuserid'	=> $newuserid,
 						    	            'email'      => $email);
+        $template->set('TITLE', $template['titleNew']->innerHTML);
+    }
     else
     {			        // validate e-mail
 		$user		    = new User(array('email'    => $email));

@@ -5,15 +5,17 @@
  *																		*
  *  History:															*
  *		2018/12/03		Created											*
- *      2020/05/23      add Ontario Historical County Atlases           *
+ *      2020/09/12      add tag wrapper around source title             *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
+<span id="source">
   <em>
     <a href="/FamilyTree/Source.php?id=$IDSR&amp;lang=$LANG" target="_blank" id="title">
 		$TITLE 
     </a>
   </em>:
+</span>
     <a href="/Canada/BirthRegDetail.php?RegDomain=CAON&RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG"
 				target="_blank" id="sourceBirth$IDSX">
 		$DETAIL 
@@ -30,6 +32,9 @@
 				target="_blank" id="sourceMarriageVolume$IDSX">
 		$DETAIL
     </a>
+	<span id="sourceMarriageFail$IDSX">
+		$DETAIL
+    </span>
     <a href="/Ontario/CountyMarriagesEdit.php?Volume=$VOLUME&amp;ReportNo=$REPORT&amp;ItemNo=$ITEM&amp;lang=$LANG"
 				target="_blank" id="sourceMarriageCounty$IDSX">
 		$DETAIL

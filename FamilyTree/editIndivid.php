@@ -373,6 +373,7 @@ use \Exception;
  *                      add more information when adding a new Person   *
  *                      based upon initialization parameters            *
  *      2020/01/09      Event::getDesc is renamed to getNotes           *
+ *      2020/07/19      only show death case if requested               *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -1512,7 +1513,7 @@ foreach($events as $ie => $event)
         $etag		            = $template['EventRow$rownum'];
     }		        // standard event contained
 
-    $etemplate      = new \Templating\Template($etag->outerHTML);
+    $etemplate          = new \Templating\Template($etag->outerHTML);
     $etemplate->set('rownum',	            $rownum);
     $etemplate->set('type',	                $type);
     $etemplate->set('ider',	                $ider);
@@ -1534,8 +1535,7 @@ foreach($events as $ie => $event)
     $etemplate->set('changed',				$changed);
     $eventsText         .= $etemplate->compile();
 
-    if ($idet == Event::ET_DEATH && 
-        ($alwaysShowDeathCause || $deathCause != ''))
+    if ($idet == Event::ET_DEATH && $alwaysShowDeathCause)
     {
 		$etag			= $template["DeathCauseRow"];
         $etemplate      = new \Templating\Template($etag->outerHTML);

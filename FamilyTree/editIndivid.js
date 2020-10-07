@@ -312,6 +312,7 @@
  *                      use console.log instead of alert to report      *
  *                      errors since only the administrator cares       *
  *      2020/05/19      correct date calculation for event insertion    *
+ *      2020/09/26      fix failure to refresh for click on new Person  *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -555,11 +556,11 @@ function loadEdit()
     // if there is only one space prior to the date range then there is
     // no name information and a date range containing only an m-dash
     // is an empty date range
-    updateTitle     = title.substring(title.length - 3) == "(\u2014)" &&
-                          (title.match(/ /g)||[]).length <= 1;
+    updateTitle         = title.substring(title.length - 3) == "(\u2014)" &&
+                              (title.match(/ /g)||[]).length <= 1;
     // if updateTitle is true then titlePrefix is whatever text is present
     // preceding the empty date range
-    titlePrefix     = title.substring(0, title.length - 3);
+    titlePrefix         = title.substring(0, title.length - 3);
 
     document.body.onresize  = onWindowResize;
 
@@ -569,49 +570,49 @@ function loadEdit()
 
     // loop through arguments passed to script
     for(var key in args)
-    {       // loop through all arguments
+    {                   // loop through all arguments
         var value   = args[key];
         switch(key.toLowerCase())
         {
             case 'id':
             case 'idir':
-            {   // request to edit an existing individual
+            {           // request to edit an existing individual
                 // note that this requires that elements with names
                 // id or idir must precede the element with
                 // name parentsIdmr within the invoking request or page
                 parmIdir    = parseInt(value);
                 break;
-            }   // request to edit an existing individual
+            }           // request to edit an existing individual
 
             case 'idcr':
-            {   // request to edit an existing child
+            {           // request to edit an existing child
                 if (marriagesButton)
                     marriagesButton.disabled    = true;
                 if (parentsButton)
                     parentsButton.disabled  = true;
                 break;
-            }   // request to edit an existing child
+            }           // request to edit an existing child
 
             case 'rowid':
-            {   // request to edit a spouse
+            {           // request to edit a spouse
                 if (marriagesButton)
                     marriagesButton.disabled    = true;
                 break;
-            }   // request to edit a spouse
+            }           // request to edit a spouse
 
             case 'parentsidmr':
-            {   // request to add a new child
+            {           // request to add a new child
                 parentsIdmr = parseInt(value);
                 if (marriagesButton)
                     marriagesButton.disabled    = true;
                 if (parentsButton)
                     parentsButton.disabled  = true;
                 break;
-            }   // request to add a new child
+            }           // request to add a new child
 
             case 'testsubmit':
             case 'debug':
-            {       // debug by submitting request rather than using AJAX
+            {           // debug by submitting request rather than using AJAX
                 if (value.toUpperCase() == 'Y')
                 {
                     testSubmit  = true;
@@ -619,19 +620,19 @@ function loadEdit()
                           'testSubmit set to true for ' + key + '=' + value);
                 }
                 break;
-            }       // debug by submiting
-        }       // action depends upon parameter name
-    }           // loop through parameters
+            }           // debug by submiting
+        }               // action depends upon parameter name
+    }                   // loop through parameters
 
     document.body.onkeydown     = eiKeyDown;
 
     for (var fi = 0; fi < document.forms.length; fi++)
-    {           // loop through all forms
-        var form        = document.forms[fi];
+    {                   // loop through all forms
+        var form            = document.forms[fi];
 
         // set action methods for form as a whole
         if (form.name == 'indForm')
-        {       // main form
+        {               // main form
             if (!testSubmit)
             {
                 form.onsubmit       = validateForm;
@@ -648,31 +649,31 @@ function loadEdit()
 
             // callback from editEvent.php
             form.eventFeedback      = eventFeedback;
-        }       // main form
+        }               // main form
 
         // activate the dynamic functionality of form elements
         activateElements(form);
-    }           // loop through all forms
+    }                   // loop through all forms
 
     // set up refresh action
     if (parmIdir === null)
     {
-        parmIdir    = 0;
-        newSearch   = "?idir=" + idir +
+        parmIdir            = 0;
+        newSearch           = "?idir=" + idir +
                               "&" + location.search.substring(1);
     }
 
     if (window.navigator)
-    {       // navigator object defined
+    {                   // navigator object defined
         if (/MSIE (\d+\.\d+);/.test(window.navigator.userAgent))
-        { //test for MSIE x.x;
-            ie  = true;
-            ieversion=new Number(RegExp.$1) // capture x.x portion
+        {               // test for MSIE x.x; 
+            ie              = true;
+            ieversion       = new Number(RegExp.$1) // capture x.x portion
             if (ieversion < 9)
                 alert ("editIndivid.js: loadEdit: Running under IE version " +
                         ieversion);
-        }
-    }       // navigator object defined
+        }               // test for MSIE x.x; 
+    }                   // navigator object defined
     else
         alert ("editIndivid.js: loadEdit: navigator object not defined");
 
@@ -1161,34 +1162,36 @@ function validateForm()
  ************************************************************************/
 function refresh()
 {
-    var form        = document.indForm;
+    var form                = document.indForm;
 
     // parms contain every input element with its value
-    var parms       = {};
-    var msg         = "[";
-    var comma       = '';
+    var parms               = {};
+    var msg                 = "[";
+    var comma               = '';
     for (var ei = 0; ei < form.elements.length; ei++)
-    {
+    {                   // loop through form elements
         var element = form.elements[ei]
         if (element.name)
-        {
-            var name            = element.name;
-            msg                 += comma + name + "='" + element.value;
-            comma               = "',";
+        {               // element has a name
+            var name        = element.name;
+            msg             += comma + name + "='" + element.value;
+            comma           = "',";
             if (name.substring(name.length - 2) == '[]')
-            {       // convention for passing an array
-                name            = name.substring(0,name.length - 2);
+            {           // convention for passing an array
+                name        = name.substring(0,name.length - 2);
                 if (element.type != 'checkbox' || element.checked)
                     parms[name] = element.value;
-            }       // convention for passing an array
+            }           // convention for passing an array
             else
-                parms[name]     = element.value;
-        }   // element has a name
-    }
-    msg         = msg + "]";
-    locTrace    += " editIndivid.js: refresh: " + msg;
+                parms[name] = element.value;
+        }               // element has a name
+    }                   // loop through form elements
+    msg                     = msg + "]";
+    locTrace                += " editIndivid.js: refresh: " + msg;
 
-    // invoke script to update Event and return XML result
+    // invoke script to update Event and return JSON result
+    parms['caller']         = 'editIndivid.js: 1192';
+    parms['loctrace']       = locTrace;
     HTTP.post('/FamilyTree/updatePersonJson.php',
               parms,
               gotRefreshed,
@@ -1209,12 +1212,12 @@ function gotRefreshed(jsonObj)
     if (typeof(jsonObj) == "object")
     {
         if (typeof(newSearch) == "string")
-        {       // location to go to
+        {               // location to go to
             location.search = newSearch;
-        }       // location to go to
+        }               // location to go to
         else
         if (typeof(newSearch) == "object")
-        {       // have a pending button click to issue
+        {               // have a pending button click to issue
             var indiv               = jsonObj.person;
             var idir                = indiv.idir;
 
@@ -1245,18 +1248,19 @@ function gotRefreshed(jsonObj)
             else
                 newSearch.click();      // simulate press the button
             newSearch               = location.search;
-        }       // have a pending button click to issue
+        }               // have a pending button click to issue
         else
-        {       // unexpected object
-            console.log("editIndivid.js: gotRefreshed: 1248: typeof(newSearch)=" +
+        {               // unexpected object
+            console.log("editIndivid.js: gotRefreshed: 1248: " +
+                        "typeof(newSearch)=" +
                         typeof(newSearch));
-        }       // unexpected object
+        }               // unexpected object
 
-    }           // valid response
+    }                   // valid response
     else
-    {           // error response
-        console.log("editIndivid.js: gotRefreshed: 1255: " + jsonObj);
-    }           // error response
+    {                   // error response
+        console.log("editIndivid.js: gotRefreshed: 1259: " + jsonObj);
+    }                   // error response
 
 }       // function gotRefreshed
 
@@ -1269,19 +1273,18 @@ function gotRefreshed(jsonObj)
  ************************************************************************/
 function update()
 {
-    console.log("editIndivid.js: update: 1259 update called windowList.length=" + windowList.length);
     // check for open frames
     if (windowList.length > 0)
-    {           // there are incomplete actions pending
-        var text    = '';
-        var comma   = '';
-        var button  = document.getElementById('Submit');
+    {                   // there are incomplete actions pending
+        var text            = '';
+        var comma           = '';
+        var button          = document.getElementById('Submit');
         for (var iw = 0; iw < windowList.length; iw++)
-        {       // loop through open iframes
+        {               // loop through open iframes
             var iwindow     = windowList[iw];
             var idocument   = iwindow.document;
             if (idocument && iwindow.frameElement)
-            {       // window has a document and a frame
+            {           // window has a document and a frame
                 if (idocument.title.length > 0)
                 {
                     text    += comma + idocument.title;
@@ -1299,8 +1302,8 @@ function update()
                     iwindow.frameElement.style.zIndex   = zIndex;
                     iwindow.focus();
                 }       // pop the first open frame to the top
-            }       // window has a document
-        }       // loop through open iframes
+            }           // window has a document
+        }               // loop through open iframes
 
         if (text.length > 2)
         {
@@ -1308,7 +1311,7 @@ function update()
                        button);
             return;
         }
-    }           // there are incomplete actions pending
+    }                   // there are incomplete actions pending
 
     var form                = document.indForm;
 
@@ -1316,27 +1319,29 @@ function update()
     var parms               = {};
     var msg                 = "parms=(";
     for (var ei = 0; ei < form.elements.length; ei++)
-    {           // loop through all form elements
+    {                   // loop through all form elements
         var element         = form.elements[ei]
         if (element.name)
-        {       // element has a name
+        {               // element has a name
             var name        = element.name;
             msg             += name + "='" + element.value + "',";
             if (name.substring(name.length - 2) == '[]')
-            {       // convention for passing an array
+            {           // convention for passing an array
                 name        = name.substring(0, name.length - 2);
                 if (element.type != 'checkbox' || element.checked)
                     parms[name] = element.value;
-            }       // convention for passing an array
+            }           // convention for passing an array
             else
                 parms[name] = element.value;
-        }       // element has a name
-    }           // loop through all form elements
+        }               // element has a name
+    }                   // loop through all form elements
     msg                     = msg.substring(0,msg.length - 2) + "}";
     locTrace                += " editIndivid.js: 1292 update: " + msg;
-    console.log("editIndivid.js:update 1326 locTrace=" + locTrace);
+    console.log("editIndivid.js:update 1338 locTrace=" + locTrace);
 
     // invoke script to update Event and return JSON result
+    parms['caller']         = 'editIndivid.js: 1341';
+    parms['loctrace']       = locTrace;
     HTTP.post('/FamilyTree/updatePersonJson.php',
               parms,
               gotUpdated,

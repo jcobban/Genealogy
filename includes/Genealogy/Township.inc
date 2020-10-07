@@ -18,6 +18,14 @@ use \Iterator;
  *      County      CHAR(3) NOT NULL DEFAULT '',                        *
  *      Code        VARCHAR(64) NOT NULL DEFAULT '',                    *
  *      Name        VARCHAR(64) NOT NULL DEFAULT '',                    *
+ *      Location    INT(10 UNSIGNED DEFAULT NULL,                       *
+ *		PRIMARY KEY (`Prov`, `County`, `Code`),				            *
+ *		UNIQUE KEY `Domain` (`Domain`, `County`, `Code`),				*
+ *		KEY `Name` (`Name`),				                            *
+ *      KEY `Location` (`Location`),				                    *
+ *      CONSTRAINT `Townships_ibfk_1` FOREIGN KEY (`Location`) 			*
+ *          REFERENCES `tblLR` (`IDLR`) 				                *
+ *          ON DELETE SET NULL ON UPDATE CASCADE )				        *
  *                                                                      *
  *  History:                                                            *
  *      2014/09/29      created                                         *
@@ -43,8 +51,9 @@ use \Iterator;
  *      2018/11/11      do not throw exception from constructor for     *
  *                      bad parameters                                  *
  *      2019/04/12      correct handling of county instance of County   *
+ *      2020/06/30      add reference to table of Locations             *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/County.inc';
@@ -70,7 +79,30 @@ class Township extends Record
                 'prov'          => 'ON',
                 'county'        => null,
                 'code'          => null,
-                'name'          => '');
+                'name'          => '',
+                'location'      => null);
+
+    /********************************************************************
+     *  Township::$info                                                 *
+     *                                                                  *
+     *  Description of record class                                     *
+     ********************************************************************/
+    protected static    $info   = array(
+                'table'             => 'Townships',
+                'name'              => 'Townships',
+                'prime'             => array('domain', 'county', 'code'),
+                'srvmg'             => false,
+                'fldcount'          => 6,
+                'order'             => 'Name',
+                'classname'         => 'Township');
+
+    /********************************************************************
+     *  Township::$translate                                            *
+     *                                                                  *
+     *  Define alternate field names                                    *
+     ********************************************************************/
+    protected static $translate = array(
+                'idlr'              => 'location');
 
     /********************************************************************
      *  Township::$defaultOrder                                         *
@@ -116,16 +148,16 @@ class Township extends Record
             $warn   .= "<p>Township.inc " . __LINE__ ." Township::__construct(";
         // validate parameters
         if (is_array($parms))
-        {                   // valid first parameter
+        {                           // valid first parameter
             if ($debug)
-                $warn           .= "array(";
-            $comma              = '';
+                $warn                   .= "array(";
+            $comma                      = '';
             foreach($parms as $fldname => $value)
-            {               // loop through all parameters
+            {                       // loop through all parameters
                 switch(strtolower($fldname))
-                {           // act on specific field names
+                {                   // act on specific field names
                     case 'domain':
-                    {       // registration domain
+                    {               // registration domain
                         if ($value instanceof Domain)
                         {
                             $domainObj  = $value;
@@ -150,12 +182,12 @@ class Township extends Record
                             $this->msg  = "Township::__construct: " .
                                             "Invalid value Domain='$value'. ";
                         break;
-                    }           // registration domain
+                    }               // registration domain
 
                     case 'prov':
-                    {           // province code within Canada
+                    {               // province code within Canada
                         if (is_null($domainObj))
-                        {       // only if domain not already defined
+                        {           // only if domain not already defined
                             $prov       = $value;
                             if ($debug)
                                 $warn   .= $comma . "prov='$value'";
@@ -167,10 +199,10 @@ class Township extends Record
                                                 "Invalid value Prov='$prov'.";
                         }
                         break;
-                    }           // province code within Canada
+                    }               // province code within Canada
 
                     case 'county':
-                    {       // County abbreviation
+                    {               // County abbreviation
                         if ($value instanceof County)
                         {
                             $countyObj      = $value;
@@ -210,29 +242,29 @@ class Township extends Record
                             $county     = '';
                         }
                         break;
-                    }       // County abbreviation
+                    }               // County abbreviation
 
                     case 'code':
                     case 'township':
-                    {       // internal form of township name
-                        $code       = $value;
+                    {               // internal form of township name
+                        $code           = $value;
                         if ($debug)
-                            $warn   .= $comma . "code='$value'";
+                            $warn       .= $comma . "code='$value'";
                         break;
-                    }       // internal form of township name
+                    }               // internal form of township name
 
                     case 'name':
-                    {       // external form of township name
-                        $name       = $value;
+                    {               // external form of township name
+                        $name           = $value;
                         if ($debug)
-                            $warn   .= $comma . "name='$value'";
+                            $warn       .= $comma . "name='$value'";
                         break;
-                    }       // external form of township name
+                    }               // external form of township name
 
-                }       // act on specific field names
-                $comma              = ', ';
-            }           // loop through all parameters
-        }           // valid first parameter
+                }                   // act on specific field names
+                $comma                  = ', ';
+            }                       // loop through all parameters
+        }                           // valid first parameter
         else
             $this->msg  .= "Township::__construct: " .
                             "First parameter is not an associative array, " .
@@ -251,7 +283,7 @@ class Township extends Record
                             "Missing mandatory parameter Code. ";
 
         if (is_null($name))
-        {           // no initializer for name
+        {                           // no initializer for name
             // construct the record from a query
             $query              = "SELECT * FROM Townships  " .
                 "WHERE `Domain`=:domain AND `County`=:county AND `Code`=:code";
@@ -264,22 +296,23 @@ class Township extends Record
                             " Township::__construct: $query, " .
                             "eparms=" . print_r($sqlParms, true) . "</p>\n";
             }
+
             // query the database
             $stmt                       = $connection->prepare($query);
             $queryText                  = debugPrepQuery($query, $sqlParms);
             if ($stmt->execute($sqlParms))
-            {           // successful query
+            {                       // successful query
 
                 $result                 = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $count                  = count($result);
                 if ($count == 1)
-                {       // existing record
+                {                   // existing record
                     $dbrow              = $result[0];
                     $needInsert         = false;
-                }       // existing record
+                }                   // existing record
                 else
                 if ($count == 0)
-                {       // no matching record
+                {                   // no matching record
                     // set defaults
                     $dbrow              = self::$initRow;
                     $dbrow['domain']    = $domain;
@@ -288,28 +321,28 @@ class Township extends Record
                     $dbrow['code']      = $code;
                     $dbrow['name']      = $code;
                     $needInsert         = true;
-                }       // no matching record
+                }                   // no matching record
                 else
                     $this->msg          .= "Township::__construct: " .
     "$count records match Domain='$domain', County='$county', and Code='$code'. ";
-            }           // successful query
+            }                       // successful query
             else
-            {           // error performing query
+            {                       // error performing query
                 $this->msg  .= "Township::__construct: " .
                                 "'$queryText' " .
                                 print_r($stmt->errorInfo(),true) . '. ';
-            }           // error performing query
-        }               // construct the record from a query
+            }                       // error performing query
+        }                           // construct the record from a query
         else
         if (count($parms) == count(self::$initRow))
-        {       // build from explicit array
-            $dbrow              = $parms;
-            $dbrow['domain']    = $domainObj->get('domain');
-            $dbrow['county']    = $countyObj->get('code');
-        }       // build from explicit array
+        {                           // build from explicit array
+            $dbrow                      = $parms;
+            $dbrow['domain']            = $domainObj->get('domain');
+            $dbrow['county']            = $countyObj->get('code');
+        }                           // build from explicit array
         else
             $this->msg  .= "Township::__construct: " .
-                          "Invalid parameter " . print_r($parms, true) . '. ';
+                          "Invalid parameter " . var_export($parms, true) . '. ';
 
         // invoke constructor of base class
         parent::__construct($dbrow,
@@ -342,22 +375,35 @@ class Township extends Record
      ********************************************************************/
     function set($field, $value)
     {
-        $fieldLc    = strtolower($field);
+        global          $msg;
+        $fieldLc                    = strtolower($field);
         if (array_key_exists($fieldLc, self::$translate))
-            $fieldLc    = self::$translate[$fieldLc];
+            $fieldLc                = self::$translate[$fieldLc];
         switch($fieldLc)
-        {           // act on specific fields
+        {                       // act on specific fields
             case 'code':
             case 'name':
             {
                 return parent::set($field, $value);
             }
 
+            case 'location':
+            {
+                if (is_string($value) && ctype_digit($value))
+                    $value          = intval($value);
+                if (is_int($value) && $value > 0)
+                    return parent::set($field, $value);
+                else
+                {               // invalid new value
+                    return $this->row[$fieldLc];
+                }               // invalid new value
+            }                   // location identifier
+
             default:
             {
                 return parent::set($field, $value);
             }
-        }           // act on specific fields
+        }                       // act on specific fields
     }       // function Township::set
 
     /********************************************************************
@@ -387,38 +433,38 @@ class Township extends Record
         }
 
         if (is_string($xml))
-        {           // string tag name
-            $tagname    = $xml;
-            $xml    = true;
-        }           // string tag name
+        {                   // string tag name
+            $tagname            = $xml;
+            $xml                = true;
+        }                   // string tag name
         else
         if ($xml)
-        {           // true
-            $tagname    = 'cmd';
-        }           // true
+        {                   // true
+            $tagname            = 'cmd';
+        }                   // true
 
         if ($this->needInsert)
-        {           // create new record
-            $fldnames       = '';
-            $comma          = '';
-            $values         = '';
-            $sqlParms       = array();
+        {                   // create new record
+            $fldnames           = '';
+            $comma              = '';
+            $values             = '';
+            $sqlParms           = array();
             foreach($this->row as $fieldName => $value)
             {
-                $fldnames   .= $comma . "`$fieldName`";
-                $values     .= $comma . '?';
+                $fldnames       .= $comma . "`$fieldName`";
+                $values         .= $comma . '?';
                 array_push($sqlParms, $value);
-                $comma      = ", ";
-            }           // loop through all fields in record
+                $comma          = ", ";
+            }               // loop through all fields in record
 
             // construct the SQL INSERT command
             $insert = "INSERT INTO Townships ($fldnames) VALUES($values)";
-            $stmt   = $connection->prepare($insert);
-            $insertText = debugPrepQuery($insert, $sqlParms);
+            $stmt               = $connection->prepare($insert);
+            $insertText         = debugPrepQuery($insert, $sqlParms);
             // insert the new record into the database
             if ($stmt->execute($sqlParms))
-            {           // successful insert
-                $count      = $stmt->rowCount();
+            {               // successful insert
+                $count          = $stmt->rowCount();
                 if ($xml)
                     print "<$tagname result='$count'>" . $insertText .
                             "</$tagname>\n";
@@ -435,27 +481,27 @@ class Township extends Record
                 $this->log($insert,
                            $sqlParms,
                            0);      // compound key
-            }           // successful insert
+            }               // successful insert
             else
-            {           // error inserting record
+            {               // error inserting record
                 throw new Exception("Township::save:
                                 '$insertText', " .
                                 print_r($stmt->errorInfo(),true));
-            }           // error inserting record
-        }           // create new record
+            }               // error inserting record
+        }                   // create new record
         else
-        {           // update existing record
+        {                   // update existing record
             if ($this->changed && count($this->changed) > 0)
-            {       // changes made
-                $set        = '';
-                $comma      = '';
-                $sqlParms   = array();
+            {               // changes made
+                $set            = '';
+                $comma          = '';
+                $sqlParms       = array();
                 foreach($this->changed as $fieldName => $value)
                 {
-                    $set    .= $comma . "`$fieldName`=?";
+                    $set        .= $comma . "`$fieldName`=?";
                     array_push($sqlParms, $value);
-                    $comma  = ', ';
-                }       // loop through all fields in record
+                    $comma      = ', ';
+                }           // loop through all fields in record
                 $this->changed  = array();  // reset
 
                 // construct the where clause
@@ -473,13 +519,13 @@ class Township extends Record
                 }
 
                 // assemble the UPDATE command
-                $update     = "UPDATE Townships SET " . $set .
-                                ' WHERE Domain=? AND County=? AND Code=?';
-                $stmt       = $connection->prepare($update);
-                $updateText = debugPrepQuery($update, $sqlParms);
+                $update         = "UPDATE Townships SET " . $set .
+                                    ' WHERE Domain=? AND County=? AND Code=?';
+                $stmt           = $connection->prepare($update);
+                $updateText     = debugPrepQuery($update, $sqlParms);
                 // perform the update
                 if ($stmt->execute($sqlParms))
-                {       // successful update
+                {           // successful update
                     $count      = $stmt->rowCount();
                     if ($xml)
                         print "<$tagname count='$count'>" .
@@ -491,15 +537,15 @@ class Township extends Record
                     $this->log($update,
                                $sqlParms,
                                0);
-                }       // successful update
+                }           // successful update
                 else
-                {       // error updating record
+                {           // error updating record
                     print "<p>query='$updateText'</p>\n";
                     throw new Exception("Township::save: " . __LINE__ . " " .
                                 print_r($stmt->errorInfo(),true));
-                }       // error updating record
-            }           // changes made
-        }           // update existing record
+                }           // error updating record
+            }               // changes made
+        }                   // update existing record
     }       // function Township::save
 
     /********************************************************************
@@ -523,17 +569,17 @@ class Township extends Record
 
         // handle XML output option
         if (is_string($xml))
-            $xmltag = $xml;
+            $xmltag             = $xml;
         else
         if ($xml)
         {
-            $xml    = true;
-            $xmltag = 'cmd';
+            $xml                = true;
+            $xmltag             = 'cmd';
         }
 
         // to simplify expressions
         if (!$this->needInsert)
-        {       // have existing record
+        {                   // have existing record
             $parms              = array($this->row['domain'],
                                         $this->row['county'],
                                         $this->row['code']);
@@ -542,14 +588,14 @@ class Township extends Record
             $stmt               = $connection->prepare($delete);
             $deleteText         = debugPrepQuery($delete, $parms);
             if ($stmt->execute($parms) === false)
-            {       // error updating record
+            {               // error updating record
                 print "<p>$deleteText</p>\n";
                 print "<p class='message'>" . htmlentities(print_r($stmt->errorInfo(),true)) .
                             "</p>\n";
                 return false;
-            }       // error updating record
+            }               // error updating record
 
-            $count  = $stmt->rowCount();
+            $count              = $stmt->rowCount();
             if ($xml)
                 print "<$xmltag count='$count'>$deleteText</$xmltag>\n";
 
@@ -562,10 +608,10 @@ class Township extends Record
             $this->needInsert   = true;
 
             return $count;  // number of records deleted
-        }       // have key value
+        }                   // have key value
 
         // record never written to database
-        return 0;   // nothing to delete
+        return 0;           // nothing to delete
     }       // function Township::delete
 
     /********************************************************************

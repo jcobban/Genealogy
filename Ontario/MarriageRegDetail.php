@@ -134,6 +134,7 @@ use \Exception;
  *      2019/12/13      remove M_ prefix from field names               *
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/07/01      increase birth range for minister               *
+ *      2020/07/03      add parameter Template                          *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -151,7 +152,7 @@ require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
 /************************************************************************
- *  searchpParticipant                                                  *
+ *  function searchParticipant                                          *
  *                                                                      *
  *  Handle the IDIR or IDIR lookup for a participant.                   *
  *                                                                      *
@@ -302,193 +303,203 @@ function searchParticipant($participant)
 // update the database
 if(canUser('edit'))
 {
-    $action         = "Update";
+    $action         			= "Update";
 }
 else
 {
-    $action         = "Display";
+    $action         			= "Display";
 }
 
 // validate parameters
-$regYear            = '';
-$regNum             = '';
-$paddedRegNum       = '0000000';
-$volume             = '';
-$page               = '';
-$item               = '';
-$cc                 = 'CA';         // default country code
-$countryName        = 'Canada';     // default country name
-$domain             = 'CAON';       // default domain
-$domainName         = 'Ontario';    // default domain name
-$countyName         = '';
-$regCounty          = '';
-$regTownship        = '';
-$lang               = 'en';
+$regYear            			= '';
+$regNum             			= '';
+$paddedRegNum       			= '0000000';
+$volume             			= '';
+$page               			= '';
+$item               			= '';
+$cc                 			= 'CA';         // default country code
+$countryName        			= 'Canada';     // default country name
+$domain             			= 'CAON';       // default domain
+$domainName         			= 'Ontario';    // default domain name
+$countyName         			= '';
+$regCounty          			= '';
+$regTownship        			= '';
+$templateName        			= null;
+$lang               			= 'en';
 
-$parmsText      = "<p class='label'>\$_GET</p>\n" .
-                        "<table class='summary'>\n" .
-                        "<tr><th class='colhead'>key</th>" .
-                        "<th class='colhead'>value</th></tr>\n";
+$parmsText      			    = "<p class='label'>\$_GET</p>\n" .
+                                    "<table class='summary'>\n" .
+                                    "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
 foreach($_GET as $key => $value)
-{           // loop through all input parameters
+{                           // loop through all input parameters
     $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                          "<td class='white left'>$value</td></tr>\n";
     switch(strtolower($key))
-    {       // process specific named parameters
+    {                       // process specific named parameters
         case 'regyear':
         {
-            $regYear        = $value;
+            $regYear            = $value;
             break;
-        }       // RegYear passed
+        }                   // RegYear passed
 
         case 'regnum':
         {
-            $regNum         = $value;
+            $regNum         	= $value;
             break;
-        }       // RegNum passed
+        }                   // RegNum passed
 
         case 'originalvolume':
         {
-            $volume         = $value;
-            $numVolume      = preg_replace('/[^0-9]/', '', $value);
+            $volume         	= $value;
+            $numVolume      	= preg_replace('/[^0-9]/', '', $value);
             break;
-        }       // RegNum passed
+        }                   // Original Volume Number
 
         case 'originalpage':
         {
             if (ctype_digit($value))
-                $page       = $value;
+                $page       	= $value;
             else
-                $msg        .= "Page Number $value must be a number. ";
+                $msg            .= "Page Number $value must be a number. ";
             break;
-        }       // RegNum passed
+        }                   // Original Page Number
 
         case 'originalitem':
         {
             if (ctype_digit($value))
-                $item       = $value;
+                $item       	= $value;
             else
                 $msg        .= "Item Number $value must be a number. ";
             break;
-        }       // RegNum passed
+        }                   // Original Item on Page
 
         case 'regdomain':
         case 'domain':
         {
-            $domain         = $value;
+            $domain         	= $value;
             break;
-        }       // RegDomain
+        }                   // Registration Domain
+
+        case 'template':
+        {
+            $templateName       = $value;
+            break;
+        }                   // override default template
 
         case 'showimage':
         {
             break;
-        }       // handled by JavaScript
+        }                   // handled by JavaScript
 
         case 'lang':
-        {       // preferred language
-                $lang       = FtTemplate::validateLang($value);
+        {                   // preferred locale
+            $lang       	    = FtTemplate::validateLang($value);
             break;
-        }       // preferred language
+        }                   // preferred locale
 
 
         case 'debug':
-        {       // handled by common code
+        {                   // handled by common code
             break;
-        }       // debug
+        }                   // debug
 
         default:
         {
             $warn   .= "<p>Unexpected parameter $key='$value'.</p>\n";
             break;
-        }       // any other paramters
-    }           // process specific named parameters
-}               // loop through all input parameters
+        }                   // any other paramters
+    }                       // process specific named parameters
+}                           // loop through all input parameters
 if ($debug)
-    $warn           .= $parmsText . "</table>\n";
+    $warn                       .= $parmsText . "</table>\n";
 
 // create Template
-$template           = new FtTemplate("MarriageRegDetail$action$lang.html");
+if (is_string($templateName) && strlen($templateName) > 0)
+    $template           = new FtTemplate("$templateName$lang.html");
+else
+    $template           = new FtTemplate("MarriageRegDetail$action$lang.html");
 
 // internationalization support
-$translate          = $template->getTranslate();
-$monthNames         = $translate['Months'];
+$translate                      = $template->getTranslate();
+$monthNames                     = $translate['Months'];
 
 // issue error messages
 if ($regYear == '' && $volume == '')
 {
-    $msg            .= "RegYear omitted. ";
+    $msg                        .= "RegYear omitted. ";
 }
 else
 if (!ctype_digit($regYear) ||
     ($regYear < 1800) || ($regYear > 2018))
-    $msg            .= "Registration Year '$regYear' must be a number between 1800 and 2018. ";
+    $msg                        .= "Registration Year '$regYear' must be a number between 1800 and 2018. ";
 
 if ($regNum == '' && $volume == '')
 {
-    $msg            .= "RegNum omitted. ";
+    $msg                        .= "RegNum omitted. ";
 }
 else
 if ($volume != '' && $page != '' && $item != '')
 {
-    $regNum         = $numVolume .
-                        str_pad($page, 3, '0', STR_PAD_LEFT) .
-                      $item;
-    $paddedRegNum   = $regNum;
+    $regNum                     = $numVolume .
+                                    str_pad($page, 3, '0', STR_PAD_LEFT) .
+                                    $item;
+    $paddedRegNum               = $regNum;
 }
 else
 if (ctype_digit($regNum))
-    $paddedRegNum   = str_pad($regNum,7,"0",STR_PAD_LEFT);
+    $paddedRegNum               = str_pad($regNum,7,"0",STR_PAD_LEFT);
 else
-    $msg            .= "Registration Number $regNum must be a number. ";
+    $msg                        .= "Registration Number $regNum must be a number. ";
 
 // the number of the immediately preceding and following registrations
 if (!ctype_digit($regNum))
 {
     error_log("MarriageRegDetail.php: " . __LINE__ .
         " \$regNum='$regNum' is not a number)\n");
-    $regNum         = intval($regNum);
+    $regNum         			= intval($regNum);
 }
 if (!isset($volume) || ($volume == '' && $regNum > 9999))
-    $volume         = floor($regNum/10000);
+    $volume         			= floor($regNum/10000);
 if ($regYear <= 1872 && isset($volume))
 {
     if (!isset($page) || $page == '')
     {
-        $page       = (int)(($regNum % 10000)/10);
-        $item       = $regNum % 10;
+        $page       			= (int)(($regNum % 10000)/10);
+        $item       			= $regNum % 10;
     }
     if ($regNum % 10 == 1)
     {
-        $prevNum    = $regNum - 8;
-        $nextNum    = $regNum + 1;
+        $prevNum    			= $regNum - 8;
+        $nextNum    			= $regNum + 1;
     }
     else
     if ($regNum % 10 == 3)
     {
-        $prevNum    = intval($regNum) - 1;
-        $nextNum    = intval($regNum) + 8;
+        $prevNum    			= intval($regNum) - 1;
+        $nextNum    			= intval($regNum) + 8;
     }
     else
     {
-        $prevNum    = intval($regNum) - 1;
-        $nextNum    = intval($regNum) + 1;
+        $prevNum    			= intval($regNum) - 1;
+        $nextNum    			= intval($regNum) + 1;
     }
 }
 else
 {       // sequentially numbered
-    $prevNum        = intval($regNum) - 1;
-    $nextNum        = intval($regNum) + 1;
+    $prevNum        			= intval($regNum) - 1;
+    $nextNum        			= intval($regNum) + 1;
 }       // sequentially numbered
 
 // get information about the administrative domain
-$domainObj          = new Domain(array('domain'     => $domain,
+$domainObj          			= new Domain(array('domain'     => $domain,
                                        'language'   => 'en'));
 if ($domainObj->isExisting())
 {
-    $cc             = substr($domain, 0, 2);
-    $countryObj     = new Country(array('code' => $cc));
-    $countryName    = $countryObj->getName();
-    $domainName     = $domainObj->get('name');
+    $cc             			= substr($domain, 0, 2);
+    $countryObj     			= new Country(array('code' => $cc));
+    $countryName    			= $countryObj->getName();
+    $domainName     			= $domainObj->get('name');
 }
 else
 {
@@ -513,6 +524,11 @@ $template->set('REGNUM',        $regNum);
 $template->set('PREVNUM',       $prevNum);
 $template->set('NEXTNUM',       $nextNum);
 $template->set('PADDEDREGNUM',  $paddedRegNum);
+
+if (is_string($templateName))
+    $template->set('TEMPLATE',  $templateName);
+else
+    $template->set('TEMPLATE',  '');
 
 // if no error messages Issue the query
 if (strlen($msg) == 0)

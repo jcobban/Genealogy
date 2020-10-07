@@ -1476,6 +1476,8 @@ class Person extends RecordPic
      ********************************************************************/
     function setGender($value)
     {
+        global  $warn;
+
         if (is_string($value) && ctype_digit($value))
             $value  = intval($value);
         if (is_int($value) &&
@@ -2385,12 +2387,12 @@ class Person extends RecordPic
         global $warn;
         global $connection;
 
-        if ($this->needInsert)
+        $idir                       = $this->row['idir'];
+        if ($this->needInsert || $idir == 0)
             return new RecordSet('Families', array());  // empty set
 
         if ($this->families == null)
         {       // need to perform query for families
-            $idir                   = $this->row['idir'];
 
             // construct the query of the marriage table for all marriages
             // in which the current individual is a partner
@@ -4716,10 +4718,9 @@ class Person extends RecordPic
                     print "<p>Person::save: " . __LINE__ .
                                 " insert='$insertText'," .
                                 " errorInfo=$errorInfo<p>\n";
-                    error_log("Person.inc: " . __LINE__ .
+                    error_log("Person.save: " . __LINE__ .
                                 " insert='$insertText', " .
                                 "errorInfo=$errorInfo\n");
-                    error_log('Person::save: ' . __LINE__ . " $insertText\n");
                     if (strlen($insertText) > 43)
                         $insertText = substr($insertText, 0, 40) . '...';
                     throw new Exception("Person::save:

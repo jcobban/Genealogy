@@ -479,10 +479,28 @@ if (strlen($msg) == 0)
     $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
 	$template->set('DONE',              $formatter->format($done)); 
     $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
-	$template->set('PCTCLASSDONE',      pctClass($done * 100 / $totpop, false));
-    $template->set('PCTDONE',           $formatter->format($done * 100 / $totpop)); 
-	$template->set('PCTCLASSLINKED',    pctClass($linked * 100 / $totpop, false));
-    $template->set('PCTLINKED',         $formatter->format($linked * 100 / $totpop)); 
+    if ($totpop > 0)
+    {
+        $template->set('PCTCLASSDONE',      
+                        pctClass($done * 100 / $totpop, false));
+        $template->set('PCTDONE',           
+                        $formatter->format($done * 100 / $totpop)); 
+        $template->set('PCTCLASSLINKED',    
+                        pctClass($linked * 100 / $totpop, false));
+        $template->set('PCTLINKED',         
+                        $formatter->format($linked * 100 / $totpop)); 
+    }
+    else
+    {
+        $template->set('PCTCLASSDONE',      
+                        pctClass(100, false));
+        $template->set('PCTDONE',           
+                        $formatter->format(100)); 
+        $template->set('PCTCLASSLINKED',    
+                        pctClass(100, false));
+        $template->set('PCTLINKED',         
+                        $formatter->format(100)); 
+    }
 	if (count($cleanupPages) > 0 && canUser('edit'))
 	{		        // there are completely blank pages and user is auth'd
 	    $getParms['page']	= $cleanupPages;

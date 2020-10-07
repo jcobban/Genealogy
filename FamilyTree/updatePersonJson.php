@@ -327,6 +327,14 @@ try {
 	
 	            case 'gender':
 	            {
+		            if ($value == Person::FEMALE &&
+		                $person['gender'] == Person::MALE &&
+		                $person['idir'] > 0)
+		            {
+                        error_log('updatePersonJson.php: $_POST=' . 
+                                    print_r($_POST,true), 
+                                  1, 'webmaster@jamescobban.net');
+                    }
 	                $person->setGender($value);
 	                break;
 	            }		// gender	

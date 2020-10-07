@@ -255,6 +255,7 @@ use \Exception;
  *                      dialog.                                         *
  *                      method get invokes getNotes and getDescription  *
  *                      to ensure consistent behavior                   *
+ *      2020/06/12      correct JSON output                             *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -2205,6 +2206,8 @@ class Event extends RecordPic
                 case 'order':
                 case 'idar':
                 {       // fields passed back with no interpretation
+                    if (!is_int($value) && !ctype_digit($value))
+                        $value  = json_encode($value);
                     $retval     .= "$comma\t\"$fld\":\t$value";
                     $comma      = ",\n";
                     break;

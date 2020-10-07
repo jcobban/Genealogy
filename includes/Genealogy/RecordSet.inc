@@ -108,6 +108,10 @@ use \Templating\Template;
  *                      control characters. '^sm[eiy]+[td]he?$' is      *
  *                      a valid pattern.                                *
  *      2020/05/20      select for count returned null                  *
+ *      2020/07/29      improve performance by expanding list of        *
+ *                      surnames matching a regular expression rather   *
+ *                      than passing the regular expression to SQL      *
+ *      2020/09/06      correct handling of surnames containing '       *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -339,75 +343,73 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         global  $msg;
         global  $connection;
 
-        if ($debug)
+        $parmsText                      = "<p>RecordSet:__construct('$tableName', ";
+        if (is_null($parameters))
+            $parmsText                  .= "null";
+        else
+        if (is_array($parameters))
         {
-            $parmsText                      = "<p>RecordSet:__construct('$tableName', ";
-            if (is_null($parameters))
-                $parmsText                  .= "null";
-            else
-            if (is_array($parameters))
+            $parmsText                  .= "array(";
+            $comma                      = '';
+            foreach($parameters as $field => $value)
             {
-                $parmsText                  .= "array(";
-                $comma                      = '';
-                foreach($parameters as $field => $value)
-                {
-                    $parmsText              .= $comma . "`$field`=";
-                    if (is_numeric($value))
-                        $parmsText          .= $value;
-                    else
-                    if (is_null($value))
-                        $parmsText          .= "null";
-                    else
-                    if (is_bool($value))
-                    {
-                        if ($value)
-                            $parmsText      .= "true";
-                        else
-                            $parmsText      .= "false";
-                    }
-                    else
-                    if (is_string($value))
-                        $parmsText          .= htmlspecialchars("'$value'");
-                    else
-                    if ($value instanceof Record)
-                        $parmsText          .= "class " . get_class($value) .
-                                                ' ' .  $value->getName();
-                    else
-                    if ($value instanceof Template)
-                        $parmsText          .= "class Template";
-                    else
-                    if (is_string($value))
-                    {
-                        $parmsText          .= "'$value'";
-                    }
-                    else
-                    {
-                        $parmsText          .= print_r($value, true);
-                    }
-                    $comma                  = ',';
-                }                   // loop through elements of parm 2
-
-                $parmsText                  .= ")";
-            }
-            if ($fields != '*')
-                $parmsText                  .= ",'$fields'";
-            $parmsText                      .= ")</p>\n";
-
-            $trace                          = debug_backtrace();
-            foreach($trace as $call)
-            {
-                if (array_key_exists('class', $call))
-                    $classRef               = $call['class'] . '::';
+                $parmsText              .= $comma . "`$field`=";
+                if (is_numeric($value))
+                    $parmsText          .= $value;
                 else
-                    $classRef               = '';
-                $parmsText   .= "<p>RecordSet::__construct: " . __LINE__ .
+                if (is_null($value))
+                    $parmsText          .= "null";
+                else
+                if (is_bool($value))
+                {
+                    if ($value)
+                        $parmsText      .= "true";
+                    else
+                        $parmsText      .= "false";
+                }
+                else
+                if (is_string($value))
+                    $parmsText          .= htmlspecialchars("'$value'");
+                else
+                if ($value instanceof Record)
+                    $parmsText          .= "class " . get_class($value) .
+                                            ' ' .  $value->getName();
+                else
+                if ($value instanceof Template)
+                    $parmsText          .= "class Template";
+                else
+                if (is_string($value))
+                {
+                    $parmsText          .= "'$value'";
+                }
+                else
+                {
+                    $parmsText          .= print_r($value, true);
+                }
+                $comma                  = ',';
+            }                   // loop through elements of parm 2
 
-                            " function=" . $classRef . $call['function'] .
-                            " called by line=" . $call['line'] .
-                            " in " . $call['file'] . "</p>\n";
-            }
-            $warn                           .= $parmsText;
+            $parmsText                  .= ")";
         }
+        if ($fields != '*')
+            $parmsText                  .= ",'$fields'";
+        $parmsText                      .= ")</p>\n";
+
+        $trace                          = debug_backtrace();
+        foreach($trace as $call)
+        {
+            if (array_key_exists('class', $call))
+                $classRef               = $call['class'] . '::';
+            else
+                $classRef               = '';
+            $parmsText   .= "<p>RecordSet::__construct: " . __LINE__ .
+
+                        " function=" . $classRef . $call['function'] .
+                        " called by line=" . $call['line'] .
+                        " in " . $call['file'] . "</p>\n";
+        }
+        if ($debug)
+            $warn                           .= $parmsText;
 
         // validate parameters
         $orderby                            = '';
@@ -779,14 +781,16 @@ class RecordSet implements Iterator, Countable, ArrayAccess
             }           // success
             else
             {           // error performing query
-                $this->msg  .= "RecordSet::__construct: \"$queryText\", " .
-                    print_r($stmt->errorInfo(),true);
-                print '<p>' . $this->msg . "</p>\n";
-                print "<p>'$countQuery', parms=" . print_r($this->sqlParms,true) . "</p>\n";
+                $this->msg  .= "RecordSet::__construct: \"$queryText\", <br>" .
+                                print_r($stmt->errorInfo(),true) . $parmsText . "<br>" .
+                                ", parms=" . print_r($this->sqlParms,true) . "\n";
             }           // error performing query
         }           // set count to actual number of records
         if (strlen($this->msg) > 0)
+        {
             $msg                .= $this->msg;
+            $this->information['count'] = 0;
+        }
     }       // RecordSet::__construct
 
     /********************************************************************
@@ -1725,6 +1729,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
     protected function getSurnameChk($table,
                                      $surname)
     {
+        global  $connection;
+
         // default is to generate positional insertion points (?)
         // use name insertion points (:name) if either the $refname parameter
         // is passed or the the constructor sets $this->usenames
@@ -1751,6 +1757,30 @@ require_once __NAMESPACE__ . '/Surname.inc';
             $pattern        = $surnameRec->get('pattern');
             if ($pattern != '')
             {           // use pattern match rather than soundex
+                $findSurnames           = 'SELECT Surname FROM tblNR ' .
+                                            "WHERE `Surname` REGEXP ?";
+                $surnParms              = array($pattern);
+                $stmt                   = $connection->prepare($findSurnames);
+                if ($stmt->execute($surnParms))
+                {       // success
+                    $count      = $stmt->rowCount();
+                    if ($count > 0)
+                    {
+                        $retval             = '(';
+                        $op                 = '';
+                        $result = $stmt->fetchAll(PDO::FETCH_NUM);
+                        foreach($result as $row)
+                        {
+                            $nm             = $row[0];
+                            $nm             = str_replace("'","''",$nm);
+                            $retval         .= $op .
+                                                "$table.Surname = '$nm'";
+                            $op             = ' OR ';
+                        }
+                        return $retval . ')';
+                    }
+                }       // success
+
                 if ($refname)
                 {
                     $this->sqlParms['pattern']  = $pattern;
@@ -2561,6 +2591,17 @@ require_once __NAMESPACE__ . '/Surname.inc';
                         " is too many records to read into memory for query '" .
                         htmlspecialchars($this->information['query']) .
                         "' from parms " . print_r($this->parms, true) . ".</p>\n";
+            $callback       = debug_backtrace(false);
+            foreach($callback as $info)
+            {
+                if (array_key_exists('type', $info))
+                    $funcname   = $info['class'] . $info['type'] . $info['function'];
+                else
+                    $funcname   = $info['function'];
+                $file           = $info['file'];
+                $line           = $info['line'];
+                $warn   .= "<p style]'text-indent: 2em;'>$funcname at $file:$line</p>\n";
+            }
             $this->limit    = 0;
         }
 

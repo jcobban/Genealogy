@@ -54,7 +54,6 @@ use \Exception;
  *                      or "99 " if the remainder of the location       *
  *                      identifies a street or concession that is       *
  *                      already in use but with a different lot number  *
- *      2020/04/26      include trailing ½ in lot number                *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -161,13 +160,7 @@ else
 
     if ($count == 0)
     {                       // check for match on street or concession
-        $halfRegex                  = "/1\/2([^0-9])/";
-        if (preg_match($halfRegex, $search, $matches))
-            $search                 = str_replace($search, 
-                                                  $matches[0],
-                                                  "½" . $matches[1]);
-
-        if (preg_match('/^(lot |)[0-9½]+\s+/', $search, $matches))
+        if (preg_match('/^(lot \d+|\d+)\s+/', $search, $matches))
         {                   // starts with '9999' or 'lot 9999'
             $street                 = substr($search, strlen($matches[0]));
             $getParms['location']	= "$street$";   // ending with street/con

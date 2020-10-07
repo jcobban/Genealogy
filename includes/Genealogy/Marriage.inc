@@ -87,8 +87,11 @@ use \Iterator;
  *      2019/12/13      remove M_ prefix from field names               *
  *      2019/12/19      replace xmlentities with htmlentities           *
  *      2020/01/16      OriginalPage changed to VARCHAR                 *
+ *      2020/06/13      undefined $insert                               *
+ *      2020/09/09      support changing primary key of record          *
+ *                      update lastSqlCmd                               *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/MarriageParticipant.inc';
@@ -434,17 +437,18 @@ class Marriage extends Record
 
                 }
 
-                $sel                    .= $and . $fieldLc . '=:' . $field;
-                $and                    = ' AND ';
+                $sel                .= $and . $fieldLc . '=:' . $field;
+                $and                = ' AND ';
             }
 
             // query the database
-            $query                      = "SELECT * FROM Marriage $sel";
-            $stmt                       = $connection->prepare($query);
-            $queryText                  = debugPrepQuery($query, $sqlParms);
+            $query                  = "SELECT * FROM Marriage $sel";
+            $stmt                   = $connection->prepare($query);
+            $queryText              = debugPrepQuery($query, $sqlParms);
+            $this->lastSqlCmd       = $queryText;
             if ($stmt->execute($sqlParms))
             {       // successful query
-                $result                 = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $result             = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($debug)
                 {
                     $warn   .= "<p>Marriage.inc: " . __LINE__ .
@@ -500,6 +504,7 @@ class Marriage extends Record
                                                 'number'    => $number);
                     $stmt               = $connection->prepare($query);
                     $queryText          = debugPrepQuery($query, $sqlParms);
+                    $this->lastSqlCmd   = $queryText;
                     if ($stmt->execute($sqlParms))
                     {       // successful query
                         if ($debug)
@@ -570,8 +575,9 @@ class Marriage extends Record
                                 "year"      => $mregyear,
                                 "number"    => $mregnum);
         $pquery         = "SELECT * FROM MarriageIndi $sel ORDER BY Role";
-        $pstmt          = $connection->prepare($pquery);
-        $pqueryText     = debugPrepQuery($pquery, $sqlParms);
+        $pstmt              = $connection->prepare($pquery);
+        $pqueryText         = debugPrepQuery($pquery, $sqlParms);
+        $this->lastSqlCmd   .= '<br>' . $pqueryText;
         if ($pstmt->execute($sqlParms))
         {       // query successful
             $presults           = $pstmt->fetchAll(PDO::FETCH_ASSOC);
@@ -797,15 +803,20 @@ class Marriage extends Record
         if (array_key_exists($fieldLc, self::$translate))
             $fieldLc    = self::$translate[$fieldLc];
         switch($fieldLc)
-        {       // act on specific field
+        {                       // act on specific field
+            case 'changedby':
+            case 'changedate':
+            {                   // cannot be changed
+                break;
+            }                   // cannot be changed
+
             case 'regdomain':
             case 'regyear':
             case 'regnum':
-            case 'changedby':
-            case 'changedate':
-            {
+            {                   // changing primary key
+                return parent::set($fieldLc, $value);
                 break;
-            }
+            }                   // changing primary key
 
             case 'date':
             {
@@ -847,10 +858,10 @@ class Marriage extends Record
             }
 
             default:
-            {       // other field names
+            {                   // other field names
                 return parent::set($fieldLc, $value);
-            }       // other fields
-        }       // act on specific field
+            }                   // other fields
+        }                       // act on specific field
     }       // function Marriage::set
 
     /********************************************************************
@@ -966,31 +977,31 @@ class Marriage extends Record
         $retval                 = 0;
 
         // determine top level tag name for XML output
-        $indent             = '';
+        $indent             	= '';
         if (is_string($xml))
-        {           // string tag name
-            $matches        = array();
+        {                   // string tag name
+            $matches        	= array();
             if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
             {
-                $indent     = $matches[1];
-                $xml        = $matches[2];
+                $indent     	= $matches[1];
+                $xml        	= $matches[2];
             }
-            $tagname        = $xml;
-            $xml            = true;
-        }           // string tag name
+            $tagname        	= $xml;
+            $xml            	= true;
+        }                   // string tag name
         else
         if ($xml)
-        {           // true
-            $indent         = "    ";
-            $tagname        = 'cmd';
-        }           // true
+        {                   // true
+            $indent         	= "    ";
+            $tagname        	= 'cmd';
+        }                   // true
 
         if ($this->needInsert)
-        {           // create new record
-            $fldnames       = '';
-            $comma          = '';
-            $values         = '';
-            $sqlParms       = array();
+        {                   // create new record
+            $fldnames       	= '';
+            $comma          	= '';
+            $values         	= '';
+            $sqlParms       	= array();
             foreach($this->row as $fld => $value)
             {
                 switch($fld)
@@ -1045,18 +1056,19 @@ class Marriage extends Record
                         $comma          = ", ";
                         break;
                     }       // most fields
-                }       // act on specific fields
-            }           // loop through all fields in record
+                }           // act on specific fields
+            }               // loop through all fields in record
 
             // construct the SQL INSERT command
             $insert     = "INSERT INTO Marriage ($fldnames) VALUES($values)";
 
             // insert the new record into the database
-            $stmt       = $connection->prepare($insert);
-            $insertText = debugPrepQuery($insert, $sqlParms);
+            $stmt               = $connection->prepare($insert);
+            $insertText         = debugPrepQuery($insert, $sqlParms);
+            $this->lastSqlCmd   = $insertText;
             if ($stmt->execute($sqlParms))
-            {           // successful insert
-                $retval     = $stmt->rowCount();
+            {               // successful insert
+                $retval         = $stmt->rowCount();
                 if ($xml)
                     print "$indent<$tagname result='$retval'>" . $insertText .
                             "</$tagname>\n";
@@ -1092,20 +1104,24 @@ class Marriage extends Record
                     }       // XML output
                     else
                         $participant->save(false);
+                    $this->lastSqlCmd       .= '<br>' .
+                                        $participant->getLastSqlCmd();
                 }           // loop through participants
 
                 // clean up internal state
                 $this->changed      = array();  // reset
                 $this->needInsert   = false;
-            }           // successful insert
+            }               // successful insert
             else
-            {           // error inserting record
-                $msg    .= "Marriage::save: " . __LINE__ . " '$insertText', " .
-                                    print_r($stmt->errorInfo(),true) . ".\n";
-            }           // error inserting record
-        }           // create new record
+            {               // error inserting record
+                $msg    .= "Marriage::save: " . __LINE__ .
+                            " '$insertText', " .
+                            print_r($stmt->errorInfo(),true) . ".\n";
+                return $retval; // do not update participant records
+            }               // error inserting record
+        }                   // create new record
         else
-        {           // update existing record
+        {                   // update existing record
             $update     = "UPDATE Marriage SET ";
             $set        = '';
             $comma      = '';
@@ -1113,7 +1129,7 @@ class Marriage extends Record
             foreach($this->changed as $fld => $value)
             {
                 switch($fld)
-                {       // act on specific fields
+                {           // act on specific fields
                     case 'changedby':
                     case 'changedate':
                     {       // ChangedBy, ChangeDate
@@ -1139,17 +1155,28 @@ class Marriage extends Record
                         $comma              = ', ';
                         break;
                     }       // most fields
-                }       // act on specific fields
-            }       // loop through all changed fields in record
+                }           // act on specific fields
+            }               // loop through all changed fields in record
+
+            // permit change key of MarriageParticipant records
+            $newregdomain       = null;
+            $newregyear         = null;
+            $newregnum          = null;
+            if (array_key_exists('regdomain', $this->changed))
+                $newregdomain   = $this->changed['regdomain'];
+            if (array_key_exists('regyear', $this->changed))
+                $newregyear     = $this->changed['regyear'];
+            if (array_key_exists('regnum', $this->changed))
+                $newregnum      = $this->changed['regnum'];
 
             // clean up internal state
-            $this->changed  = array();  // reset
+            $this->changed                  = array();  // reset
 
             if (strlen($set) > 0)
-            {       // changes made
-                $set    .= ',ChangedBy=:userid';
-                $set    .= ',ChangeDate=CURDATE()';
-                $sqlParms['userid'] = $userid;
+            {               // changes made
+                $set                        .= ',ChangedBy=:userid';
+                $set                        .= ',ChangeDate=CURDATE()';
+                $sqlParms['userid']         = $userid;
 
                 // construct the where clause
                 if ($this->former)
@@ -1170,11 +1197,12 @@ class Marriage extends Record
                         ' AND RegYear=:oyear AND RegNum=:onumber';
 
                 // perform the update
-                $stmt           = $connection->prepare($update);
-                $updateText     = debugPrepQuery($update, $sqlParms);
+                $stmt               = $connection->prepare($update);
+                $updateText         = debugPrepQuery($update, $sqlParms);
+                $this->lastSqlCmd   = $updateText;
                 if ($stmt->execute($sqlParms))
-                {       // successful update
-                    $retval     = $stmt->rowCount();
+                {           // successful update
+                    $retval         = $stmt->rowCount();
                     if ($xml)
                         print "$indent<$tagname count='$retval'>" .
                                 $updateText . "</$tagname>\n";
@@ -1188,20 +1216,31 @@ class Marriage extends Record
                                  $retval,
                                  json_encode($this->former),
                                  json_encode($this->row));
-                }       // successful update
+                }           // successful update
                 else
-                {       // error updating record
+                {           // error updating record
                     $msg    .= "Marriage::save: " . __LINE__ .
-                                    " '$updateText', " .
-                                    print_r($stmt->errorInfo(),true) . ".\n";
-                }       // error updating record
-            }       // changes made
+                                " '$updateText', " .
+                                print_r($stmt->errorInfo(),true) . ".\n";
+                    return $retval;
+                }           // error updating record
+            }               // changes made
+            else
+                $this->lastSqlCmd   = '';
 
             // also save associated participant records
             foreach ($this->participants as $role => $participant)
-            {           // loop through participants
+            {               // loop through participant
+                // permit change key of Marriage records
+                if ($newregdomain)
+                    $participant->set('regdomain', $newregdomain);
+                if ($newregyear)
+                    $participant->set('regyear', $newregyear);
+                if ($newregnum)
+                    $participant->set('regnum', $newregnum);
+
                 if ($xml)
-                {       // XML output
+                {           // XML output
                     if ($role == 'B')
                         $participant->save('bride');
                     else
@@ -1212,11 +1251,13 @@ class Marriage extends Record
                         $participant->save('minister');
                     else
                         $participant->save($role);
-                }       // XML output
+                }           // XML output
                 else
                     $participant->save(false);
-            }           // loop through participants
-        }       // update existing record
+                $this->lastSqlCmd   .= '<br>' . 
+                                        $participant->getLastSqlCmd();
+            }               // loop through participants
+        }                   // update existing record
 
         return $retval;
     }       // Marriage::save
@@ -1283,16 +1324,17 @@ class Marriage extends Record
                                    'WHERE RegDomain=:regdomain AND ' .
                                      'RegYear=:regyear AND ' .
                                      'RegNum=:regnum';
-            $stmt   = $connection->prepare($delete);
-            $deleteText = debugPrepQuery($delete, $sqlParms);
+            $stmt               = $connection->prepare($delete);
+            $deleteText         = debugPrepQuery($delete, $sqlParms);
+            $this->lastSqlCmd   = $deleteText;
             if ($stmt->execute($sqlParms))
             {       // successful delete
-                $count      = $stmt->rowCount();
+                $count          = $stmt->rowCount();
                 if ($debug)
-                    $warn   .= "<p>$deleteText</p>\n";
+                    $warn       .= "<p>$deleteText</p>\n";
 
                 if ($xml)
-                    print "$insert<$tagname count='$count'>$deleteText</$tagname>\n";
+                    print "<$tagname count='$count'>$deleteText</$tagname>\n";
 
                 // log the update
                 logSqlUpdate($delete,
@@ -1306,13 +1348,14 @@ class Marriage extends Record
                                       'WHERE RegDomain=:regdomain AND ' .
                                         'RegYear=:regyear AND ' .
                                         'RegNum=:regnum';
-                $stmt       = $connection->prepare($delete);
-                $deleteText = debugPrepQuery($delete, $sqlParms);
+                $stmt               = $connection->prepare($delete);
+                $deleteText         = debugPrepQuery($delete, $sqlParms);
+                $this->lastSqlCmd   = '<br>' . $deleteText;
                 if ($stmt->execute($sqlParms))
                 {       // successful delete
-                    $count      = $stmt->rowCount();
+                    $count          = $stmt->rowCount();
                     if ($xml)
-                        print "$insert<$tagname count='$count'>$deleteText</$tagname>\n";
+                        print "<$tagname count='$count'>$deleteText</$tagname>\n";
                     if ($debug)
                         $warn   .= "<p>$deleteText</p>\n";
 

@@ -140,6 +140,8 @@ use \Iterator;
  *                      expression                                      *
  *      2020/05/28      correct default setting of sortedlocation       *
  *                      for single digit con number                     *
+ *      2020/07/30      do not throw exception in getId/getIdlr for     *
+ *                      new record                                      *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -715,8 +717,8 @@ class Location extends RecordPic
     {
         $idlr       = $this->row['idlr'];
         if ($this->needInsert && $idlr == 0)
-            throw new Exception(
-                "Location::getId: record does not exist in database");
+            error_log("Location.inc: " . __LINE__ . 
+                    " Location::getId called for new record\n");
         return $idlr;
     }       // Location::getId
 
@@ -729,8 +731,8 @@ class Location extends RecordPic
     {
         $idlr       = $this->row['idlr'];
         if ($this->needInsert && $idlr == 0)
-            throw new Exception(
-                "Location::getIdlr: record does not exist in database");
+            error_log("Location.inc: " . __LINE__ . 
+                "Location::getIdlr called for new record\n");
         return $idlr;
     }       // Location::getIdlr
 
@@ -976,6 +978,10 @@ class Location extends RecordPic
         if ($rgxres > 0)
         {       // street address
             $lotnum     = $matches[2];
+            if (strlen($lotnum) > 5)
+                $lot6   = substr($lotnum, 5, 1);
+            else
+                $lot6   = '';
             $con        = $matches[4];
             $digit2     = substr($con, 5, 1);
             if (substr($con, 0, 4) == 'con ' &&
@@ -985,7 +991,7 @@ class Location extends RecordPic
                 $lotnum = substr('000' . $lotnum, strlen($lotnum));
             else
             if (substr($lotnum, 0, 4) == 'lot ' &&
-                strlen($lotnum) == 5)
+                !is_numeric($lot6))
             {       // rural lot < 10
                 $lotnum = 'lot 0' . substr($lotnum, 4);
             }       // rural lot < 10

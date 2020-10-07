@@ -129,7 +129,9 @@ if (count($_GET) > 0)
 		{		// act on specific input key
 		    case 'name':
 		    {		// initial name specified as surname, givenname
-				$name		        = $value;
+                $name		        = $value;
+                if (strpos($name, ',') === false)
+                    $name           = "$name, A";
 				break;
 		    }		// initial name specified as surname, givenname
 
@@ -144,7 +146,7 @@ if (count($_GET) > 0)
 
 		    case 'idir':
 		    {		// initial individual specified by IDIR
-                if (ctype_digit($value))
+                if (ctype_digit($value) && $value > 0)
                     $idir		    = (int)$value;
                 else
                     $idirtext       = $value;

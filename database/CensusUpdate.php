@@ -75,6 +75,7 @@ use \Exception;
  *      2019/12/01      after updating database return to division      *
  *                      status display                                  *
  *      2020/06/07      update birth location in linked person          *
+ *      2020/09/01      support divisions with bypage=2 but even pages  *
  *                                                                      *
  *  Copyright 2020 James A. Cobban                                      *
  ************************************************************************/
@@ -290,9 +291,10 @@ else
     if (ctype_digit($page))
     {
         $page                   = intval($page);
+
         if ($page < $page1 || 
             $page > ($page1 + $bypage * ($pages - 1)) ||
-            ($bypage == 2 && ($page % 2) != 1))
+            ($bypage == 2 && ($page % 2) != ($page1 % 2)))
         {
             $text               = $template['pageRange']->innerHTML;
             $msg                .= str_replace('$page', $page, $text);

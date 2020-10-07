@@ -168,6 +168,8 @@ if (strlen($msg) == 0)
 					     $bloglist);
 }
 
+if ($user['auth'] != 'pending')
+    $template['Pending']->update(null);
 if ($user['usemail'])
     $template['NoEmail']->update(null);
 else

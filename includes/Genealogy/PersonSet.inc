@@ -18,8 +18,9 @@ use \Iterator;
  *                      with new Surname(">=$surname")                  *
  *      2019/03/29      make given name search slightly looser by       *
  *                      ignoring the last character in longer names     *
+ *      2020/07/28      do surname REGEXP against tblNR                 *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -274,7 +275,7 @@ class PersonSet extends RecordSet
                         // value should normally be boolean
                         if (is_string($value))
                         {       // string value
-                            $loose  = strtolower($value) == 'y';
+                            $loose      = strtolower($value) == 'y';
                         }       // string value
                         else
                         if ($value)
@@ -829,7 +830,7 @@ class PersonSet extends RecordSet
                         $where      .= $or;
                         if ($loose)
                         {
-                            $expression = $this->getSurnameChk('tblNX',
+                            $expression = $this->getSurnameChk('tblNR',
                                                             $surname[$i]);
                             $where  .= $expression;
                         }
@@ -849,7 +850,7 @@ class PersonSet extends RecordSet
             {           // surname is string
                 if ($loose)
                 {       // standard loose comparison
-                    $expression = $and . $this->getSurnameChk('tblNX',
+                    $expression = $and . $this->getSurnameChk('tblNR',
                                                               $surname);
                     $where      .= $expression;
                 }       // standard loose comparison

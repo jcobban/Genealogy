@@ -172,6 +172,7 @@
  *		2019/11/15      pass requested language to child dialogs        *
  *		2020/02/17      hide right column                               *
  *		                missing initGender from editIndivid requests    *
+ *		2020/08/26      correct initGender in editHusb                  *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -787,7 +788,7 @@ function editHusb(e)
                         encodeURIComponent(form.HusbSurname.value) +
 		                      '&treeName=' + 
                         encodeURIComponent(form.treename.value) +
-                              '&initGender=F' +
+                              '&initGender=M' +
                               '&lang=' + lang;
 		var childWindow	    = openFrame("husbFrame",
 						                script,
@@ -875,7 +876,7 @@ function gotHusb(xmlDoc)
 /************************************************************************
  *  function noHusb														*
  *																		*
- *  This method is called if there is no husband file.						*
+ *  This method is called if there is no husband file.					*
  ************************************************************************/
 function noHusb()
 {

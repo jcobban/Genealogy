@@ -217,6 +217,8 @@ use \Templating\Template;
  *      2019/05/18      correct parsing of familyTree cookie            *
  *      2019/08/01      htmlHeader did not set $LANG                    *
  *      2020/02/14      initialize $dbversion                           *
+ *      2020/06/09      set secure and samesite=lax on all cookies      *
+ *      2020/06/10      ensure $browser->majorver always set            *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -302,18 +304,19 @@ require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/Blog.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 
-$user               = null;     // instance of User
-$userid             = null;
-$password           = null;
-$newuserid          = '';
-$authorized         = '';
-$familyTreeCookie   = array();
-$signonText         = 'contribute';
+$user               		= null;     // instance of User
+$userid             		= null;
+$password           		= null;
+$newuserid          		= '';
+$authorized         		= '';
+$familyTreeCookie   		= array();
+$signonText         		= 'contribute';
 try {
     // check for existing session
     session_start();
-    if (strlen($msg) == 0 && isset($_SESSION))
+    if (strlen($msg) == 0 && isset($_SESSION) && count($_SESSION) > 0)
     {                       // handle session variables
+        error_log("\$_SESSION=" . var_export($_SESSION,true) . "\n");
         foreach($_SESSION as $key => $value)
         {                   // loop through all session variables
             if ($key == 'userid')
@@ -340,53 +343,69 @@ try {
     }                       // handle session variables
 
     // check cookies
-    foreach($_COOKIE as $key => $value)
-    {           // loop through all cookie variables
-        switch(strtolower($key))
-        {           // act on specific cookies
-            case 'persistence':
-            {
-                if (!isset($userid))
-                {
-                    $user       = new User(array('persistence' => $value));
-                    if ($user->isExisting())
-                        $userid = $user['username'];
-                    else
-                        $user   = null;
-                }
-                setcookie($key, $value, time() + 60*60*24*7, '/');
-                break;
-            }
-
-            case 'rememberme':
-            {
-                unset($_COOKIE[$key]);
-                setcookie($key, '', time() - 3600, '/');
-                break;
-            }
-
-            case 'familytree':
-            {       // family tree information
-                $parts      = explode('&', $value);
-                foreach($parts as $part)
-                {       // process each part
-                    $o          = strpos($part, ':');
-                    $pname      = rawurldecode(substr($part, 0, $o));
-                    $pvalue     = rawurldecode(substr($part, $o+1));
-                    $familyTreeCookie[$pname]   = $pvalue;
-                }       // process each part
-                break;
-            }       // family tree information
-
-            case 'dboptions':
-            {       // obsolete dboptions
-                setcookie('dboptions','', time() - 3600, '/');// delete cookie
-                $value      = '';
-                break;
-            }       // obsolete dboptions
-        }           // act on specific cookies
-
-    }           // loop through all cookie variables
+    if (isset($_COOKIE) && count($_COOKIE) > 0)
+    {                   // handle cookies
+	    error_log("\$_COOKIE=" . var_export($_COOKIE, true) . "\n");
+	    foreach($_COOKIE as $key => $value)
+	    {               // loop through all cookie variables
+	        switch(strtolower($key))
+	        {           // act on specific cookies
+	            case 'persistence':
+	            {
+	                if (!isset($userid))
+	                {
+	                    $user       = new User(array('persistence' => $value));
+	                    if ($user->isExisting())
+	                        $userid = $user['username'];
+	                    else
+	                        $user   = null;
+	                }
+	                setcookie($key, $value,
+	                          [ 'expires'   => time() + 60*60*24*7, 
+	                            'path'      => '/',
+	                            'secure'    => true,
+	                            'samesite'  => 'lax']);
+	                break;
+	            }
+	
+	            case 'rememberme':
+	            {
+	                unset($_COOKIE[$key]);
+	                setcookie($key, '', 
+	                          [ 'expires'   => time() - 3600, 
+	                            'path'      => '/',
+	                            'secure'    => true,
+	                            'samesite'  => 'lax']);
+	                break;
+	            }
+	
+	            case 'familytree':
+	            {       // family tree information
+	                $parts      = explode('&', $value);
+	                foreach($parts as $part)
+	                {       // process each part
+	                    $o          = strpos($part, ':');
+	                    $pname      = rawurldecode(substr($part, 0, $o));
+	                    $pvalue     = rawurldecode(substr($part, $o+1));
+	                    $familyTreeCookie[$pname]   = $pvalue;
+	                }       // process each part
+	                break;
+	            }       // family tree information
+	
+	            case 'dboptions':
+	            {       // obsolete dboptions
+	                setcookie('dboptions','', 
+	                          [ 'expires'   => time() - 3600, 
+	                            'path'      => '/',
+	                            'secure'    => true,
+	                            'samesite'  => 'lax']);
+	                $value      = '';
+	                break;
+	            }       // obsolete dboptions
+	        }           // act on specific cookies
+	
+	    }               // loop through all cookie variables
+    }                   // handle cookies
 
     // record that the user is logged on
     if (!is_null($userid))
@@ -394,32 +413,32 @@ try {
 
     if (strlen($msg) == 0)
     {
-        $url        = $_SERVER["REQUEST_URI"];
-        $pieces     = explode('?', $url);
-        $path       = $pieces[0];
-    }       // no errors
+        $url                = $_SERVER["REQUEST_URI"];
+        $pieces             = explode('?', $url);
+        $path               = $pieces[0];
+    }                   // no errors
 } catch(Exception $e)
-{           // report errors thrown in the session code
+{                       // report errors thrown in the session code
     $msg    .= $e->getMessage();
-}           // report errors thrown in the session code
+}                       // report errors thrown in the session code
 
 // to handle a problem with Apache mod_rewrite get the directory
 // portion of the URL
-$scriptName     = $_SERVER['PHP_SELF'];
-$filePatn       = "#[^/]+\.\w+$#";
-$res            = array();
-$count          = preg_match($filePatn, $scriptName, $res);
+$scriptName                 = $_SERVER['PHP_SELF'];
+$filePatn                   = "#[^/]+\.\w+$#";
+$res                        = array();
+$count                      = preg_match($filePatn, $scriptName, $res);
 if ($count == 1)
-{       // script name matched pattern
-    $scriptNameLen  = strlen($scriptName);
-    $fileNameLen    = strlen($res[0]);
-    $directory      = substr($scriptName,
-                             0,
-                             $scriptNameLen - $fileNameLen);
-}       // script name matched pattern
+{                       // script name matched pattern
+    $scriptNameLen          = strlen($scriptName);
+    $fileNameLen            = strlen($res[0]);
+    $directory              = substr($scriptName,
+                                     0,
+                                     $scriptNameLen - $fileNameLen);
+}                       // script name matched pattern
 else
 {
-    $directory  = '';
+    $directory              = '';
 }
 
 /************************************************************************
@@ -511,53 +530,60 @@ class Browser
     {           // constructor
         if (isset($_SERVER['HTTP_USER_AGENT']))
         {
-            $useragent      = $_SERVER['HTTP_USER_AGENT'];
-            $chromePatn     = "#Chrome/([0-9.]+)#";
-            $firefoxPatn    = "#Firefox/([0-9.]+)#";
-            $konquerorPatn  = "#Konqueror/([0-9.]+)#";
-            $msiePatn       = "#compatible; MSIE ([0-9.]+)#";
-            $res        = array();
+            $useragent      		= $_SERVER['HTTP_USER_AGENT'];
+            $chromePatn     		= "#Chrome/([0-9.]+)#";
+            $firefoxPatn    		= "#Firefox/([0-9.]+)#";
+            $konquerorPatn  		= "#Konqueror/([0-9.]+)#";
+            $msiePatn       		= "#compatible; MSIE ([0-9.]+)#";
+            $res        		    = array();
 
             if (preg_match($chromePatn, $useragent, $res))
-            {       // Chrome browser
-                $this->browser  = 'chrome';
-                $this->version  = $res[1];
+            {       // Chrome browser, including M$ Edge
+                $this->browser  	= 'chrome';
+                $this->version  	= $res[1];
             }       // Chrome browser
             else
             if (preg_match($firefoxPatn, $useragent, $res))
             {       // Firefox browser
 
-                $this->version  = $res[1];
+                $this->version  	= $res[1];
             }       // Firefox browser
             else
             if (preg_match($konquerorPatn, $useragent, $res))
             {       // Konqueror browser
-                $this->browser  = 'konqueror';
-                $this->version  = $res[1];
+                $this->browser  	= 'konqueror';
+                $this->version  	= $res[1];
             }       // Konqueror browser
             else
             if (preg_match($msiePatn, $useragent, $res))
             {       // MSIE browser
-                $this->browser  = 'IE';
-                $this->version  = $res[1];
+                $this->browser  	= 'IE';
+                $this->version  	= $res[1];
             }       // MSIE browser
             else
             {       // other
-                $this->browser  = 'other';
-                $this->version  = '1.0';
+                $this->browser  	= 'other';
+                $this->version  	= '1.0';
             }       // other
 
-            if (preg_match("#([0-9]*)\.([0-9]*)#", $this->version, $res))
+            if (preg_match("#^([0-9]*)[^0-9]?([0-9]*)#", $this->version, $res))
             {
-                $this->majorver = $res[1];
-                $this->minorver = $res[2];
+                $this->majorver 	= $res[1];
+                $this->minorver 	= $res[2];
+            }
+            else
+            {
+                $this->majorver 	= $this->version;
+                $this->minorver 	= '';
             }
 
         }
         else
         {       // not invoked from browser
-            $this->browser  = 'netscape';
-            $this->version  = 0;
+            $this->browser  		= 'netscape';
+            $this->version  		= 0;
+            $this->majorver 		= 0;
+            $this->minorver 		= '';
         }       // not invoked from browser
     }           // constructor
 }   // class Browser

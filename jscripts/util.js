@@ -217,7 +217,6 @@
  *                      page to speed up page initialization            *
  *      2020/04/19      on resize hide right column if not enough room  *
  *                      or redisplay is there is enough room            *
- *      2020/06/30      improve handling of common parameters           *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -289,6 +288,26 @@ var KEY_F11         = 122;
 var KEY_F12         = 123;
 
 /************************************************************************
+ * specify the style for tinyMCE editing                                *
+ ************************************************************************/
+var activateMCE             = true;
+var lang                    = 'en';
+for (var key in args)
+{       // loop through args
+    if (key == 'text')
+        activateMCE = false;
+    else
+    if (key == 'lang')
+        lang                = args.lang;
+}
+
+if (activateMCE && tinyMCEparms && typeof tinyMCE !== 'undefined')
+{
+    // alert("tinyMCEparms=" + JSON.stringify(tinyMCEparms));
+    tinyMCE.init(tinyMCEparms);
+}
+
+/************************************************************************
  *  Global warning that Microsoft Internet Explorer doesn't work        *
  ************************************************************************/
 if (navigator.appName == 'Microsoft Internet Explorer')
@@ -335,6 +354,16 @@ var dy;         // distance from top of dialog to mouse
 var dx;         // distance from left of dialog to mouse
 
 /************************************************************************
+ *  debug                                                               *
+ *                                                                      *
+ *  String containing the setting of the debug option used to control   *
+ *  output of diagnostic information.  This is set by the script        *
+ *  parameter Debug, which can be specified on any script either        *
+ *  by method='get' or method='post'                                    *
+ ************************************************************************/
+var debug       = 'n';  // default to no debug
+
+/************************************************************************
  *  helpDiv                                                             *
  *                                                                      *
  *  The current help division displayed in a popup                      *
@@ -375,22 +404,25 @@ var iframe      = null;
  ************************************************************************/
 function getArgs()
 {
-    var args        = new Object();
-    var query       = location.search.substring(1); // search excluding '?'
-    var pairs       = query.split("&");     // split on ampersands
+    var args    = new Object();
+    var query   = location.search.substring(1); // search excluding '?'
+    var pairs   = query.split("&");     // split on ampersands
     for (var i = 0; i < pairs.length; i++)
     {       // loop through all pairs
-        var pos     = pairs[i].indexOf('=');
+        var pos = pairs[i].indexOf('=');
         if (pos == -1)
             continue;
-
         // argument names are case-insensitive
         var name    = pairs[i].substring(0, pos).toLowerCase();
         var value   = pairs[i].substring(pos + 1);
         value       = decodeURIComponent(value);
         args[name]  = value;
 
+        // set the global diagnostic flag
+        if (name == 'debug')
+            debug   = value;
     }       // loop through all pairs
+
     return args;
 }       // function getArgs
 
@@ -400,54 +432,7 @@ function getArgs()
  *  Make arguments from the search portion of the URL available to all  *
  *  scripts.                                                            *
  ************************************************************************/
-var args                    = getArgs();
-
-/************************************************************************
- * specify the style for tinyMCE editing                                *
- ************************************************************************/
-var activateMCE             = true;
-
-/************************************************************************
- *  lang                                                                *
- *                                                                      *
- *  BCP 47 locale                                                       *
- ************************************************************************/
-var lang                    = 'en';
-
-/************************************************************************
- *  debug                                                               *
- *                                                                      *
- *  String containing the setting of the debug option used to control   *
- *  output of diagnostic information.  This is set by the script        *
- *  parameter Debug, which can be specified on any script either        *
- *  by method='get' or method='post'                                    *
- ************************************************************************/
-var debug                   = 'n';  // default to no debug
-
-for (var key in args)
-{       // loop through args
-    switch(key.toLowerCase())
-    {
-        case 'text':
-            activateMCE         = false;
-            break;
-
-        case 'lang':
-            lang                = args.lang;
-            break;
-
-        case 'debug':
-            debug               = value.toLowerCase();
-            break;
-
-    }               // act on specific values
-}
-
-if (activateMCE && tinyMCEparms && typeof tinyMCE !== 'undefined')
-{
-    // alert("tinyMCEparms=" + JSON.stringify(tinyMCEparms));
-    tinyMCE.init(tinyMCEparms);
-}
+var args    = getArgs();
 
 /************************************************************************
  *  function getHelpPopupOption                                         *
@@ -1396,7 +1381,15 @@ function openSignon(ev)
         server  += "/jamescobban/";
     else
         server  += "/";
-
+    var lang    = 'en';
+    if ('lang' in args)
+    {
+        lang    = args['lang'];
+        if (lang == 'undefined')
+        {
+            lang    = 'en';
+        }
+    }
     window.open(server + "Signon.php?lang=" + lang);
 }       // function openSignon
 
@@ -1416,7 +1409,15 @@ function openAccount(ev)
         server  += "/jamescobban/";
     else
         server  += "/";
-
+    var lang    = 'en';
+    if ('lang' in args)
+    {
+        lang    = args['lang'];
+        if (lang == 'undefined')
+        {
+            lang    = 'en';
+        }
+    }
     window.open(server + "Account.php?lang=" + lang);
 }       // function openAccount
 
@@ -2303,7 +2304,7 @@ function commonInit(event)
         var topt            = optionsElt.textContent.trim() - 0;
         if (topt && 2)
         {           // turn off popup Help
-            if (debug == 'y')
+            if (debug.toLowerCase() == 'y')
                 traceAlert("util.js: pageInit: turn off popup help");
             popupHelpOption = false;
         }           // turn off popup Help
@@ -2521,7 +2522,7 @@ function commonOrientation(ev)
     x           = w.innerWidth || e.clientWidth || g.clientWidth,
     y           = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
-    alert("OrientationChange: width=" + x + ", height=" + y);
+    console.log("OrientationChange: width=" + x + ", height=" + y);
 }       // function commonOrientation
 
 /************************************************************************
@@ -3147,7 +3148,7 @@ function createFromTemplate(template,
     var parmsText   = "";
     for (var name in parms)
         parmsText +=  name + "='" + parms[name] + "', ";
-    if (debug == 'y')
+    if (debug.toLowerCase() == 'y')
     {
         alert("util.js: createFromTemplate: parms=" + parmsText);
     }
@@ -3380,6 +3381,9 @@ function closeFrame(lastChoice)
                 history.back();
             else
             {
+                var lang        = 'en';
+                if ('lang' in args)
+                    lang        = args.lang;
                 if (lastChoice == undefined)
                     location    = "/genealogy.php?lang=" + lang;
                 else

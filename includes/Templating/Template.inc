@@ -1321,16 +1321,15 @@ class Template implements ArrayAccess
                 if ($length > 100)
                     $length     = 100;
                 $contents       = escape(substr($this->page, $tag->start, $length));
-                $this->log("Template::closeTag: " . __LINE__ .
-                                " stray end tag " .
-                                str_replace('<','&lt',$tagText) .
-                                " doesn't match $contents" .
-                                " at {$tag->start}" .
-", template=" . $this->main);
-if (substr($this->main, 0, 7) == 'string ')
-{
-    $warn   .= "<p>template: " . str_replace('&gt;','&gt;<br>', escape($this->page)) . "</p>\n";
-}
+                if (substr($this->main, 0, 7) != 'string ')
+                {
+                    $this->log("Template::closeTag: " . __LINE__ .
+                                    " stray end tag " .
+                                    str_replace('<','&lt',$tagText) .
+                                    " doesn't match $contents" .
+                                    " at {$tag->start}" .
+                                    ", template=" . $this->main);
+                }
                 $peek                   = count($this->tagStack) - 1;
                 if ($peek >= 0)
                 {

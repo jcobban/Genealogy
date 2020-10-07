@@ -787,10 +787,14 @@ $idmr                           = $family->getIdmr();
 // update the male partner if necessary
 if (is_object($husb))
 {		            // have husband
-    $husb->save('husb' . __LINE__);
+    if (!$husb->isExisting())
+        $husb->save('husb' . __LINE__);
     $idirhusb	            = $husb->getIdir();
     $family['idirhusb']		= $idirhusb;
-    $family->setName($husb);
+    if ($husb['gender'] == 0)
+        $family->setName($husb);
+    else
+        print "<msg>Gender of husband changed to female!</p>\n";
 }		            // have husband
 else
 {		            // no husband
@@ -833,7 +837,8 @@ if (is_object($family))
 
 } catch(Exception $e)
 {
-	$msg	.= "Global exception 706: " . $e->getMessage();
+    $msg	.= "Global exception 706: '" . $e->getMessage() . "'" .
+                $e->getTraceAsString();
 	print "<msg>$msg</msg>\n";
 }
 // close off root node

@@ -127,28 +127,6 @@ function onLoadImage()
     else
     if (closeButton)
         closeButton.disabled    = true;
-
-
-    var position            = document.getElementById('msgPosition');
-    if (args.src.substring(0,4) == 'http')
-    {
-        var imageUrl        = new URL(args.src);
-        var hostname        = imageUrl.hostname;
-        if (hostname == 'data2.collectionscanada.ca')
-            hostname        = 'Library and Archives Canada';
-        var parms           = {'hostname'   : hostname};
-        displayDialog('creditUrl',
-                      parms,
-                      position,
-                      hideDialog);
-    }
-    else
-    {
-        displayDialog('creditForm',
-                      {},
-                      position,
-                      hideDialog);
-    }
 }       // function onLoadImage
 
 /************************************************************************

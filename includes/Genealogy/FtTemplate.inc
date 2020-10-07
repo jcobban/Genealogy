@@ -32,7 +32,7 @@ use Templating\escape;
  ************************************************************************/
 
 /************************************************************************
- *  class FTTemplate                                                    *
+ *  class FtTemplate                                                    *
  *                                                                      *
  *  Class derived from Template to support pages in the Family Tree     *
  *  web-site that use /templates/pagexxx.html as the base layout.       *

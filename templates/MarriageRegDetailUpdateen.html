@@ -6,6 +6,7 @@
  *  History:															*
  *		2019/01/23      created                                         *
  *      2020/06/10      use <input type="number"> for original page     *
+ *      2020/07/03      support selecting Ontario Marriage Licence      *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
@@ -79,11 +80,21 @@
           <input name="LicenseTypeTxt" id="LicenseTypeTxt" type="hidden"
                     value="$LICENSETYPE"/>
           <input name="Debug" id="Debug" type="hidden" value="$DEBUG"/>
-          <button type="button" id="previous"><u>P</u>revious</button>
-          &nbsp;
-          <button type="button" id="next"><u>N</u>ext</button>
+          <button type="button" id="previous">
+              <u>P</u>revious
+          </button>
             &nbsp;
-          <button type="button" id="newQuery">New <u>Q</u>uery</button>
+          <button type="button" id="next">
+              <u>N</u>ext
+          </button>
+            &nbsp;
+          <button type="button" id="newQuery">
+              New <u>Q</u>uery
+          </button>
+            &nbsp;
+          <button type="button" id="ontarioLicense">
+              Use Ontario Licence Layout
+          </button>
         </p>
         <fieldset class="other" id="IdentificationSet">
           <legend class="labelSmall">Identification:</legend>
@@ -511,7 +522,7 @@
             <div class="column1">
       	      <label class="labelSmall">Residence:</label>
         	  <input name="MResidence" id="MResidence"
-      		        type="text" size="22" maxlength="64"
+      		        type="text" size="22" maxlength="128    "
       		        class="act leftnc" value="$MINISTERRESIDENCE" />
             </div>
             <div class="column2">

@@ -293,6 +293,7 @@ use \Templating\TemplateTag;
  *		                and spouses                                     *
  *		2020/03/19      hide empty marriage events                      *
  *		2020/06/02      avoid exception on undefined locations          *
+ *		2020/08/22      do not ask for parents or families if IDIR 0    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -890,8 +891,10 @@ function showLocation($location,
         {
 		    $idlr			= $location->getIdlr();
 		    $locationTable[$idlr]	= $location;
-            $idprefix		= 'showLoc';
         }
+        else
+            $idlr           = "new location ";
+        $idprefix		    = 'showLoc';
     }
     else
     if ($location instanceof Temple)
@@ -900,8 +903,10 @@ function showLocation($location,
         {
 		    $idtr			= $location->getIdtr();
 		    $templeTable[$idtr]	= $location;
-		    $idprefix		= 'showTpl';
         }
+        else
+            $idtr           = "new temple ";
+		$idprefix		    = 'showTpl';
     }
     else
     if ($location instanceof Address)
@@ -910,12 +915,18 @@ function showLocation($location,
         {
 		    $idar			= $location->getIdar();
 		    $addressTable[$idar]	= $location;
-		    $idprefix		= 'showAdr';
         }
+        else
+            $idar           = "new address ";
+		$idprefix		    = 'showAdr';
     }
     else
-		throw new Exception("Person.php: showLocation: ".
-						"called with invalid object " . print_r($location, true));
+    {
+	    print "Person.php: showLocation: ".
+                    "called with invalid object " .
+                    print_r($location, true) . ".\n";
+        return;
+    }
 
     $locname	= $location->toString();
     if (strlen($locname) > 0)
@@ -930,7 +941,7 @@ function showLocation($location,
 		}
 		else
 		    print $t[$defPrep];
-		$idime	= $location->getId();
+		$idime	        = $location->getId();
 		print " <span id=\"{$idprefix}{$locindex}_{$idime}\">";
 		$locindex++;
 		print $locname;

@@ -139,6 +139,7 @@ use \Exception;
  *		2019/12/13      remove B_ prefix from field names               *
  *		2020/02/23      get error message texts from template           *
  *		                fix undefined variables                         *
+ *		2020/10/01      erroneously matched to Ontario Death Register   *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -445,7 +446,7 @@ if (strlen($msg) == 0)
 	    }				// citation to birth in old location
 	    else
 	    {				// citation to birth in event
-			$citparms	= array('idsr'		=> 98,
+			$citparms	= array('idsr'		=> 97,
 				                'type'		=> Citation::STYPE_EVENT,
 				                'srcdetail'	=> "^$regYear-0*$regNum"); 
 			$citations	= new CitationSet($citparms);

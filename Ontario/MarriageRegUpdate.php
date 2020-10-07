@@ -52,21 +52,22 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // initial field value defaults
-$regYear				= null;
-$regNum		    		= null;
-$cc                     = 'CA';
-$countryName            = 'Canada';
-$regDomain				= 'CAON';
-$domainName				= 'Ontario';
-$action		    		= 'View';
-$regCounty				= '';
-$regTownship			= '';
-$lang                   = 'en';
+$regYear					= null;
+$regNum		    			= null;
+$cc                     	= 'CA';
+$countryName            	= 'Canada';
+$regDomain					= 'CAON';
+$domainName					= 'Ontario';
+$action		    			= 'View';
+$regCounty					= '';
+$regTownship				= '';
+$templateName               = null;
+$lang                   	= 'en';
 
 // apply updates
 if (count($_POST) > 0)
 {		            // invoked by submit to update account
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
+    $parmsText  	= "<p class='label'>\$_POST</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
@@ -75,30 +76,36 @@ if (count($_POST) > 0)
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
 		switch(strtolower($key))
-		{		// act on specific keys
+		{		                // act on specific keys
 		    case 'regyear':
 		    {
-	    		$regYear	= $value;
+	    		$regYear	    	= $value;
 	    		break;
-		    }		// registration year
+		    }		            // registration year
 	
 		    case 'regnum':
 		    {
-	    		$regNum		= $value;
+	    		$regNum		    	= $value;
 	    		break;
-		    }		// registration number
+		    }		            // registration number
 	
 		    case 'regdomain':
 		    {
-	    		$regDomain	= $value;
+	    		$regDomain	    	= $value;
 	    		break;
-		    }		// registration domain
+		    }		            // registration domain
+	
+		    case 'template':
+		    {
+	    		$templateName		= $value;
+	    		break;
+		    }		            // template name
 	
 		    case 'lang':
             {
 	            $lang               = FtTemplate::validateLang($value);
 	    		break;
-		    }		// registration domain
+		    }		            // locale
 	
 		}		// act on specific keys
 	}			// loop through all parameters
@@ -143,6 +150,10 @@ $template->set('DOMAINNAME',     $domainName);
 $template->set('COUNTRYNAME',    $countryName);
 $template->set('REGYEAR',        $regYear);
 $template->set('REGNUM',         $regNum);
+if (is_string($templateName))
+    $template->set('TEMPLATE',  $templateName);
+else
+    $template->set('TEMPLATE',  '');
 
 if (strlen($msg) == 0)
 {
@@ -285,6 +296,7 @@ if (strlen($msg) == 0)
 			}
 	
 			case 'debug':
+			case 'template':
 			{
 			    break;
 			}		// handled by common code

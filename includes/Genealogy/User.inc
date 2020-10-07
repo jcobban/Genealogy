@@ -74,8 +74,9 @@ use \Iterator;
  *      2019/08/26      add function getName() to override default      *
  *                      add function getId() to override default        *
  *      2019/12/28      change implementation of persistence            *
+ *      2020/07/09      correct creation of pending account             *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -245,28 +246,28 @@ class User extends Record
                                     $value      = 0;
                                 }   // invalid value
                             }       // look for an integer in the value
-                            $keyname            = 'ID';
+                            $keyname            = 'id';
                             $sqlParms['id']     = $value;
                             break 2;    // exit loop
                         }           // record index
 
                         case 'username':
                         {
-                            $keyname            = 'UserName';
+                            $keyname            = 'username';
                             $sqlParms['id']     = trim($value);
                             break 2;    // exit loop
                         }           // user name
 
                         case 'email':
                         {
-                            $keyname            = 'Email';
+                            $keyname            = 'email';
                             $sqlParms['id']     = trim($value);
                             break 2;    // exit loop
                         }           // email address
 
                         case 'persistence':
                         {
-                            $keyname            = 'Persistence';
+                            $keyname            = 'persistence';
                             $sqlParms['id']     = trim($value);
                             break 2;    // exit loop
                         }           // session persistence identifier
@@ -297,6 +298,8 @@ class User extends Record
                         else
                         {           // no matching record
                             $dbrow          = self::$initRow;
+                            if ($keyname != null)
+                                $dbrow[$keyname]    = $sqlParms['id'];
                             $needInsert     = true;
                         }           // no matching record
                     }               // success
@@ -432,7 +435,7 @@ class User extends Record
             if ($stmt->execute($sqlParms))
             {               // success
                 if ($debug)
-                    $warn   .= "<p>User::set: " . __LINE__ .
+                    $warn   .= "<p>User::__construct: " . __LINE__ .
                                             " $queryText</p>";
                 $result     = $stmt->fetch(PDO::FETCH_ASSOC);
                 if (is_array($result))

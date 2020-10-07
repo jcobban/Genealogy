@@ -36,6 +36,8 @@
         </div>
         <div class="center">
           <form name="imageForm">
+            $CREDIT
+            <br>
 	        $IMAGENAME
 	        <button type="button" id="plus">+</button>
 	        <button type="button" id="minus">-</button>
@@ -53,19 +55,17 @@
       <span id="msgPosition"></span>
     </div> <!-- end of <div id="body"> -->
     <div class="hidden" id="templates">
-      <form name="creditForm$template" id="creditForm$template">
-        Cette image est créée à partir d'un microfilm fourni par
-        les Archives de l'Ontario.
-        <p>
-          <button type="button" id="closeCredit">Fermer</button>
-        </p>
-      </form>
-      <form class="balloon" id="creditUrl">
+      <span id="creditOA">
+        Cette image est créée à partir d'un microfilm fourni par les
+        <a href="http://www.archives.gov.on.ca/fr/about/contact.aspx" 
+           target="_blank">Archives publique de l'Ontario</a>.
+      </span>
+      <span id="creditLac">
+        Cette image est fourni par Bibliotheque et Archives Canada.
+      </span>
+      <span id="creditUrl">
         Cette image est fourni par $hostname.
-        <p>
-          <button type="button" id="closeCreditUrl">Fermer</button>
-        </p>
-      </form>
+      </span>
     </div>
     <div class="balloon" id="Helpplus">
       Click on this button to zoom into the image.

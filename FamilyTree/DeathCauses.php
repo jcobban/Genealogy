@@ -260,6 +260,17 @@ for ($i = 1; $i <= count($deathcause); $i++)
 				break;
 		    }
 
+		    case 'compensation':
+		    {
+?>
+        "cardiac compensation": the maintenance of an adequate blood flow 
+        without distressing symptoms, accomplished by such cardiac and 
+        circulatory adjustments as tachycardia, cardiac hypertrophy, and 
+        increase of blood volume by sodium and water retention.
+<?php
+				break;
+		    }
+
 		    case 'consolidation':
 		    {
 ?>
@@ -1285,6 +1296,16 @@ for ($i = 1; $i <= count($deathcause); $i++)
             This membrane lines joints that possess cavities, 
             known as <a href="https://en.wikipedia.org/wiki/Synovial_joint">
             synovial joints</a>. 
+<?php
+				break;
+		    }
+
+		    case 'tabess':
+		    {
+?>
+            "Tabes": also known as "tabes dorsalis", the slowly 
+            progressive degeneration of the spinal cord that occurs 
+            in the late (tertiary) phase of syphilis
 <?php
 				break;
 		    }

@@ -246,42 +246,42 @@ if (isset($_POST) && count($_POST) > 0)
 
 // at least one address type must be selected
 if ($event == 0 && $mailing == 0)
-	$repositories	        = 1;
+	$repositories	= 1;
 
-$prevOffset		            = $offset - $limit;
-$nextOffset	            	= $offset + $limit;
+$prevOffset		= $offset - $limit;
+$nextOffset		= $offset + $limit;
 
 // construct the query
 
-$getParms		            = array('offset'	=> $offset,
-            						'limit'		=> $limit);
-$kindValues		            = array();
+$getParms		= array('offset'	=> $offset,
+						'limit'		=> $limit);
+$kindValues		= array();
 if ($repositories)
-	$kindValues[]	        = 2;
+	$kindValues[]	= 2;
 if ($event)
-	$kindValues[]	        = 1;
+	$kindValues[]	= 1;
 if ($mailing)
-	$kindValues[]	        = 0;
+	$kindValues[]	= 0;
 if (count($kindValues) == 1)
-	$getParms['kind']	    = $kindValues[0];
+	$getParms['kind']	= $kindValues[0];
 else
 if (count($kindValues) > 1)
-	$getParms['kind']	    = $kindValues;
+	$getParms['kind']	= $kindValues;
 
 if (strlen($pattern) > 0)
 	$getParms['addrname']	= $pattern;
 
 
-// get the set of matching Addresses
-$addresses	                = new RecordSet('Addresses',
-                    						$getParms,
-					                    	'AddrName, IDAR');
-$count	                    = $addresses->getInformation()['count'];
+// to avoid a long wait, first check to see how many responses there are
+$addresses	= new RecordSet('Addresses',
+						$getParms,
+						'AddrName, IDAR');
+$count	= $addresses->getInformation()['count'];
 
 if (canUser('edit'))
-	$action		            = 'Edit';
+	$action		= 'Edit';
 else
-	$action		            = 'Display';
+	$action		= 'Display';
 
 $template		= new FtTemplate("Addresses$action$lang.html");
 $template->updateTag('otherStylesheets',	
@@ -334,24 +334,24 @@ if ($count > 0)
                                     'LANG'          => $lang));
 	else
 	    $template->updateTag('topNext', null);
-	$first	                = $offset + 1;
-	$last	                = min($nextOffset, $count);
+	$first	= $offset + 1;
+	$last	= min($nextOffset, $count);
 	$template->updateTag('summary',
 					     array('first'	=> $first,
 						       'last'	=> $last,
 						       'count'	=> $count));
 
-	$addrClass		        = 'odd';
+	$addrClass		= 'odd';
 	foreach($addresses as $idar => $address)
 	{
-	    $kind		        = $address->get('kind'); 
+	    $kind		= $address->get('kind'); 
 	    $address->set('kindtext', $kindToText[$kind]); 
 	    $address->set('addrClass', $addrClass);
 	    $address->set('lang', $lang);
 	    if ($addrClass == 'odd')
-			$addrClass	    = 'even';
+			$addrClass	= 'even';
 	    else
-			$addrClass	    = 'odd';
+			$addrClass	= 'odd';
 	}
 	$template->updateTag('addr$idar',
 					     $addresses);

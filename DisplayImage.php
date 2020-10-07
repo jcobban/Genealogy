@@ -26,6 +26,7 @@ use \Exception;
  *      2018/10/15      get language apology text from Languages        *
  *      2020/06/03      correct prev and next image links               *
  *      2020/06/17      moved to top folder                             *
+ *      2020/07/01      display credit to source                        *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -53,7 +54,9 @@ if (count($_GET) > 0)
         {       // process specific named parameters
             case 'src':
             {
-                $src        = $value;
+                $src        = urldecode($value);
+                print "<p>DisplayImage.php: src='$src'</p>\n";
+                exit;
                 break;
             }       // URL of image
 
@@ -120,6 +123,7 @@ if (strlen($msg) == 0)
     $urldirname                 = $dirname;
     if ($protocol == '' || $protocol == 'file:')
     {           // protocol supported by opendir
+        $credit                 = $template['creditOA']->innerHTML;
         // open the image directory
         if (substr($dirname,0,1) == '/')
             $dirname            = "$document_root$dirname";
@@ -142,14 +146,19 @@ if (strlen($msg) == 0)
             sort($images);
         }           // found images directory
         else
-            $warn               .= "<p>unable to open directory $dirname</p>\n";
+        {
+            $text               = $template['baddir']->innerHTML;
+            $text               = str_replace('$dirname', $dirname, $text);
+            $warn               .= "<p>$text</p>\n";
+        }
 
         for ($i = 0; $i < count($images); $i++)
         {           // loop through images in order
             $filename           = $images[$i];
             if ($filename > $imageName)
             {       // image name not found
-                $warn           .= "<p>Requested image not found.</p>\n";
+                $text           = $template['notfound']->innerHTML;
+                $warn           .= "<p>$text</p>\n";
                 $nextimg        = $filename;
                 break;
             }       // image name not found
@@ -166,6 +175,17 @@ if (strlen($msg) == 0)
     else
     if ($protocol == "http:" || $protocol == "https:")
     {               // assume prev by decrement, next by increment
+        $text                   = $template['creditUrl']->innerHTML;
+        if (preg_match('#//([a-zA-Z0-9_.]+)#', $dirname, $matches))
+        {
+            $hostname           = $matches[1];
+            if ($hostname == 'data2.collectionscanada.ca')
+                $credit         = $template['creditLac']->innerHTML;
+            else
+                $credit         = str_replace('$hostname', $hostname, $text);
+        }
+        else
+            $credit             = str_replace('$hostname', $dirname, $text);
         $dirname                = $protocol . $dirname;
         $urldirname             = $dirname;
         $result = preg_match("#([a-zA-Z]*|\d+_\d+-|\d+_)(\d+)([a-zA-Z]*\.\w+)#",
@@ -195,10 +215,25 @@ else
     $title                      = "Display Image Error";
 }                   // errors detected
 
+/*
+    if (args.src.substring(0,4) == 'http')
+    {
+        var imageUrl        = new URL(args.src);
+        var hostname        = imageUrl.hostname;
+        if (hostname == 
+            hostname        = 'Library and Archives Canada';
+        var parms           = {'hostname'   : hostname};
+        displayDialog('creditUrl',
+                      parms,
+                      position,
+                      hideDialog);
+    }
+ */
 $template->set('TITLE',     $title);
 $template->set('LANG',      $lang);
 $template->set('IMAGENAME', $imageName);
 $template->set('SRC',       $src);
+$template->set('CREDIT',    $credit);
 
 if (strlen($msg) == 0 && strlen($warn) == 0)
     $template->updateTag('head2', null);    // don't show <h2>

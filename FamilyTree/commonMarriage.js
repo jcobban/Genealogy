@@ -2205,6 +2205,7 @@ function orderChildren()
 		{		// child is not yet in database
 		    pendingButton	= this;
 		    this.form.update.click();	// save the family first
+            return;
 		}
 		bodyRows[i]	        = body.rows[i];
     }

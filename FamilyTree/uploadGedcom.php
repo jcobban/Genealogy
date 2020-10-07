@@ -21,9 +21,9 @@ require_once __NAMESPACE__ . "/common.inc";
 /************************************************************************
  *		open code														*
  ***********************************************************************/
-$cc			        = 'CA';
-$countryName	    = 'Canada';
-$lang		        = 'en';		// default english
+$cc			    = 'CA';
+$countryName	= 'Canada';
+$lang		    = 'en';		// default english
 
 // process parameters passed by caller
 // override from passed parameters
@@ -41,7 +41,7 @@ if (isset($_GET) && count($_GET) > 0)
 		{
 		    case 'lang':
 		    {		// requested language
-	            $lang       = FtTemplate::validateLang($value);
+	                $lang       = FtTemplate::validateLang($value);
 				break;
 		    }		// requested language
 	

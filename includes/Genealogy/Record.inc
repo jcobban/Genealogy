@@ -213,6 +213,8 @@ use \Iterator;
  *                      add 3rd parameter to debugPrepQuery             *
  *      2019/12/19      replace xmlentities with htmlentities           *
  *      2020/01/31      add base implementation of method compare       *
+ *      2020/06/14      getInformation did not set srvmg properly for   *
+ *                      classes lacking their own ::$info               *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -1411,14 +1413,14 @@ class Record implements Iterator, ArrayAccess
                 }   // other fields
             }       // loop through all fields in record
 
-            $insert             = "INSERT INTO $table ($fldnames) " .
-                                    "VALUES($values)";
-            $stmt               = $connection->prepare($insert);
-            $insertText         = debugPrepQuery($insert, $parms);
-            $this->lastSqlCmd   = $insertText;
+            $insert                 = "INSERT INTO $table ($fldnames) " .
+                                        "VALUES($values)";
+            $stmt                   = $connection->prepare($insert);
+            $insertText             = debugPrepQuery($insert, $parms);
+            $this->lastSqlCmd       = $insertText;
             if ($stmt->execute($parms))
             {       // successful
-                $count          = $stmt->rowCount();
+                $count              = $stmt->rowCount();
                 if ($xml)
                 {       // XML output
                     print "$indent<$tagname$xmlparms count='$count'>\n" .
@@ -1427,12 +1429,12 @@ class Record implements Iterator, ArrayAccess
                 }       // XML output
 
                 if ($debug)
-                    $warn       .= "<p>$insertText</p>\n";
+                    $warn           .= "<p>$insertText</p>\n";
                 $this->needInsert   = false;
 
                 // if the record has an auto increment primary key then the
                 // value is set by the server
-                $primKey    = $count;
+                $primKey            = $count;
                 if ($srvmg)
                 {       // get value of prime key assigned by server
                     if (is_string($this->prime) && strlen($this->prime) > 0)
@@ -2446,7 +2448,17 @@ class Record implements Iterator, ArrayAccess
         global  $warn;
 
         if ($tableName == '')
+        {
+            if ($debug)
+                $warn   .= "<p>Record::getInformation: " . __LINE__ .
+                            " returns null because tableName is empty</p>\n";
             return null;
+        }
+        else
+        if ($tableName == 'JOIN')
+        {
+            return null;
+        }
 
         $namespace                  = __NAMESPACE__;
 
@@ -2466,10 +2478,15 @@ class Record implements Iterator, ArrayAccess
 
         // get information about the selected table
         $information                = array();
+        $srvmg                      = false;
 
         if (array_key_exists($table, self::$primeKey))
         {                   // class description in base class
+            if ($debug)
+                $warn   .= "<p>Record::getInformation: " . __LINE__ .
+        " array_key_exists('$table', self::\$primeKey) is true</p>\n";
             $information            = self::$primeKey[$table];
+            $srvmg                  = $information['srvmg'];
             $className              = $information['classname'];
             if ($className == '')
             {
@@ -2514,6 +2531,9 @@ class Record implements Iterator, ArrayAccess
         }                   // class description in base class
         else
         {                   // use external name to locate class
+            if ($debug)
+                $warn   .= "<p>Record::getInformation: " . __LINE__ .
+        " array_key_exists('$table', self::\$primeKey) is false</p>\n";
             if (substr($externalName, -3) == 'ies')
                 $className          = substr($externalName, 0, strlen($externalName) - 3) . 'y';
             else
@@ -2543,6 +2563,9 @@ class Record implements Iterator, ArrayAccess
                 include $incname;
             else
             {
+                if ($debug)
+                    $warn   .= "<p>Record::getInformation: " . __LINE__ .
+                                " returns null because unable to load class $className</p>\n";
                 return null;// unable to load class
             }
         }                   // ensure the class is loaded
@@ -2556,6 +2579,9 @@ class Record implements Iterator, ArrayAccess
                     $tinfo['initrow']   = $nsclass::$initRow;
                 if (!array_key_exists('order', $tinfo))
                     $tinfo['order']     = $nsclass::$defaultOrder;
+                if ($debug)
+                    $warn   .= "<p>Record::getInformation: " . __LINE__ .
+                            " returns " . var_export($tinfo,true) . " from class $nsclass</p>\n";
                 return $tinfo;
             }               // static $info is overloaded
             else
@@ -2563,7 +2589,7 @@ class Record implements Iterator, ArrayAccess
             {               // query MySQL for info
                 $tinfo['table']         = $table;
                 $tinfo['name']          = $externalName;
-                $tinfo['srvmg']         = false;
+                $tinfo['srvmg']         = $srvmg;
                 $tinfo['classname']     = $className;
                 $query  = "SHOW KEYS FROM `$table` WHERE Key_name='PRIMARY'";
                 $stmt                   = $connection->query($query);
@@ -2615,6 +2641,9 @@ class Record implements Iterator, ArrayAccess
                                 $tinfo['initrow']   = array();
                         }   // get the very first record in the table
                     }
+                    if ($debug)
+                        $warn   .= "<p>Record::getInformation: " . __LINE__ .
+                            " returns " . var_export($tinfo,true) . "</p>\n";
                     return $tinfo;
                 }
             }               // query MySQL for info
@@ -2651,10 +2680,18 @@ class Record implements Iterator, ArrayAccess
             $information['initrow']     = $initrow;
 
             $information['maxsetsize']  = 1000;
+            if ($debug)
+                $warn   .= "<p>Record::getInformation: " . __LINE__ .
+                        " returns " . var_export($information,true) . "</p>\n";
             return $information;
         }                   // have basic description
         else
+        {
+            if ($debug)
+                $warn   .= "<p>Record::getInformation: " . __LINE__ .
+                            " returns null</p>\n";
             return null;    // unsupported table
+        }
     }       // public static function getInformation
 
     /********************************************************************
