@@ -54,8 +54,9 @@ use \Exception;
  *                      use Template                                    *
  *      2019/02/19      use new FtTemplate constructor                  *
  *      2019/09/09      customize error messages from template          *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -89,7 +90,7 @@ foreach($_GET as $key => $value)
             if (is_int($value) || (is_string($value) && ctype_digit($value)))
                 $idir       = (int)$value;
             else
-                $idirtext   = $value;
+                $idirtext   = htmlspecialchars($value);
             break;
         }           // identifier of individual
 
@@ -98,7 +99,7 @@ foreach($_GET as $key => $value)
             if (is_int($value) || (is_string($value) && ctype_digit($value)))
                 $idir2      = (int)$value;
             else
-                $idir2text  = $value;
+                $idir2text  = htmlspecialchars($value);
             break;
         }           // identifier of individual
 

@@ -7,6 +7,7 @@
  *		2019/01/23      created                                         *
  *      2020/06/10      use <input type="number"> for original page     *
  *      2020/07/03      support selecting Ontario Marriage Licence      *
+ *      2020/11/04      increase maximum size of some input fields      *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
@@ -39,6 +40,9 @@
       <a href="MarriageRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegCounty=$REGCOUNTY&amp;RegTownship=$REGTOWNSHIP&amp;lang=$LANG">
           Status $REGYEAR Township $REGTOWNSHIP
       </a>:
+	  <a href="MarriageRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG">
+	    Display Marriage Registrations in Order
+	  </a>:
     </div>
     <div class="body" style="overflow: auto; overflow-x: scroll">
       <h1>$DOMAINNAME: Marriage Registration Update
@@ -179,7 +183,7 @@
             <div class="column2">
               <label class="labelSmall">Place:</label>
               <input name="Place" id="Place"
-                    type="text" size="20" maxlength="64"
+                    type="text" size="20" maxlength="255"
                     value="$MPLACE" class="act leftnc"  />
             </div>
             <div style="clear: both;"></div>
@@ -203,13 +207,13 @@
             <div class="column1">
               <label class="labelSmall">Given&nbsp;Name:</label>
               <input name="GGivenNames" id="GGivenNames"
-                    type="text" size="22" maxlength="48" 
+                    type="text" size="22" maxlength="120" 
                     class="act left" value="$GROOMGIVENNAMES" />
             </div>
             <div class="column2">
              <label class="labelSmall">Surname:</label>
               <input name="GSurname" id="GSurname"
-                    type="text" size="16" maxlength="32" 
+                    type="text" size="16" maxlength="120" 
                     class="act left" value="$GROOMSURNAME" />
             </div>
             <div style="clear: both;"></div>
@@ -266,13 +270,13 @@
             <div class="column1">
       	      <label class="labelSmall">Residence:</label>
         	  <input name="GResidence" id="GResidence"
-      		        type="text" size="22" maxlength="64"
+      		        type="text" size="22" maxlength="255"
       		        class="act leftnc" value="$GROOMRESIDENCE" />
             </div>
             <div class="column2">
           	  <label class="labelSmall">Birth&nbsp;Place:</label>
         	  <input name="GBirthPlace" id="GBirthPlace"
-      		        type="text" size="22" maxlength="64"
+      		        type="text" size="22" maxlength="255"
       		        class="act leftnc" value="$GROOMBIRTHPLACE" />
             </div>
             <div style="clear: both;"></div>
@@ -323,13 +327,13 @@
             <div class="column1">
               <label class="labelSmall">Given&nbsp;Name:</label>
               <input name="BGivenNames" id="BGivenNames"
-                    type="text" size="22" maxlength="48"
+                    type="text" size="22" maxlength="120"
                     class="act left" value="$BRIDEGIVENNAMES" />
             </div>
             <div class="column2">
               <label class="labelSmall">Surname:</label>
               <input name="BSurname" id="BSurname"
-                    type="text" size="16" maxlength="32"
+                    type="text" size="16" maxlength="120"
                     class="act left" value="$BRIDESURNAME" />
             </div>
             <div style="clear: both;"></div>
@@ -386,13 +390,13 @@
             <div class="column1">
       	      <label class="labelSmall">Residence:</label>
         	  <input name="BResidence" id="BResidence"
-      		        type="text" size="22" maxlength="64"
+      		        type="text" size="22" maxlength="255"
       		        class="act leftnc" value="$BRIDERESIDENCE" />
             </div>
             <div class="column2">
           	  <label class="labelSmall">Birth&nbsp;Place:</label>
         	  <input name="BBirthPlace" id="BBirthPlace"
-      		        type="text" size="22" maxlength="64"
+      		        type="text" size="22" maxlength="255"
       		        class="act leftnc" value="$BRIDEBIRTHPLACE" />
             </div>
             <div style="clear: both;"></div>
@@ -449,7 +453,7 @@
             <div class="column2">
               <label class="labelSmall">Residence:</label>
               <input name="Witness1Res" id="Witness1Res"
-                    type="text" size="22" maxlength="64"
+                    type="text" size="22" maxlength="255"
                     class="act leftnc" value="$WITNESSRES1"/>
             </div>
             <div style="clear: both;"></div>
@@ -464,7 +468,7 @@
             <div class="column2">
               <label class="labelSmall">Residence:</label>
               <input name="Witness2Res" id="Witness2Res"
-                    type="text" size="22" maxlength="64"
+                    type="text" size="22" maxlength="255"
                     class="act left" value="$WITNESSRES2"/>
             </div>
             <div style="clear: both;"></div>
@@ -476,13 +480,13 @@
             <div class="column1">
               <label class="labelSmall">Given&nbsp;Name:</label>
               <input name="MGivenNames" id="MGivenNames"
-                    type="text" size="22" maxlength="48" 
+                    type="text" size="22" maxlength="120" 
                     class="act left" value="$MINISTERGIVENNAMES" />
             </div>
             <div class="column2">
              <label class="labelSmall">Surname:</label>
               <input name="MSurname" id="MSurname"
-                    type="text" size="16" maxlength="32" 
+                    type="text" size="16" maxlength="120" 
                     class="act left" value="$MINISTERSURNAME" />
             </div>
             <div style="clear: both;"></div>
@@ -522,7 +526,7 @@
             <div class="column1">
       	      <label class="labelSmall">Residence:</label>
         	  <input name="MResidence" id="MResidence"
-      		        type="text" size="22" maxlength="128    "
+      		        type="text" size="22" maxlength="255"
       		        class="act leftnc" value="$MINISTERRESIDENCE" />
             </div>
             <div class="column2">
@@ -575,8 +579,8 @@
             <div class="column2">
               <label class="labelSmall">Image:</label>
               <input name="Image" id="Image"
-                    type="text" size="75" maxlength="256"
-                    value="$IMAGE" class="act leftvar" />
+                    type="text" size="75" maxlength="255"
+                    value="$IMAGE" class="act left wide" />
             </div>
             <div style="clear: both;"></div>
           </div> <!-- class="row" -->

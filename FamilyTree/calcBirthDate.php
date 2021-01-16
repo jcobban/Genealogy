@@ -44,7 +44,8 @@ if (count($_GET) > 0)
 	foreach($_GET as $key => $value)
 	{
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+            "<td class='white left'>" .
+            htmlentities($value, ENT_XML1) . "</td></tr>\n"; 
         switch(strtolower($key))
         {		    // act on specific parameter
             case 'lang':

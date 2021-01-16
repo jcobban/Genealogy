@@ -78,7 +78,7 @@ if (isset($_GET) && count($_GET) > 0)
 		{		// act on specific parameters
 		    case 'lang':
 		    {
-	                $lang       = FtTemplate::validateLang($value);
+	            $lang       = FtTemplate::validateLang($value);
 				break;
 		    }
 		}		// act on specific parameters
@@ -88,7 +88,7 @@ if (isset($_GET) && count($_GET) > 0)
 }			        // invoked by method=get
 
 // for administrator see if there are any new subscribers
-$pendingUsers	= 0;
+$pendingUsers	    = 0;
 if (canUser('all'))
 {		        // user can update any database
 	// get information on any pending registrations
@@ -100,15 +100,15 @@ if (canUser('all'))
 
 // determine type of user requesting this dialog
 if (canUser('admin'))
-	$action		= 'Admin';	// administrator
+	$action		    = 'Admin';	// administrator
 else
 if (canUser('edit'))
-	$action		= 'Update';	// contributor
+	$action		    = 'Update';	// contributor
 else
-	$action		= 'Display';	// casual visitor
+	$action		    = 'Display';	// casual visitor
 
 // create the Template
-$template		= new FtTemplate("Services$action$lang.html");
+$template		    = new FtTemplate("Services$action$lang.html");
 
 // set global replacements
 $template->set('DATABASE_NAME',	$databaseName);

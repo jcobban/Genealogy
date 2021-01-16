@@ -17,8 +17,9 @@ use \Exception;
  *		2018/02/04		use class Template								*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2020/12/03      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
     require_once __NAMESPACE__ . '/User.inc';
     require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -61,7 +62,8 @@ $lang			= 'en';
 foreach($_REQUEST as $key => $value)
 {	// loop through all parameters
     if ($debug)
-		$warn	.= "<p>\$_REQUEST['$key']='$value'</p>\n";
+        $warn	.= "<p>\$_REQUEST['$key']='" . 
+                    htmlspecialchars($value) . "'</p>\n";
     switch(strtolower($key))
     {		// act on specific parameter
 		case 'uid':
@@ -77,8 +79,8 @@ foreach($_REQUEST as $key => $value)
 				    $email	= $user->get('email');
 				else
 				{
-				    $msg	.=
-				"Unable to find account record for user '$username'. ";
+				    $msg	.= "Unable to find account record for user '" .
+                                htmlspecialchars($username) . "'. ";
 				    $user	= null;
 				}
 		    }			// userid supplied
@@ -96,7 +98,8 @@ foreach($_REQUEST as $key => $value)
 				    $username	= $user->get('userid');
 				else
 				    $msg	.=
-				"Unable to find account record for address '$email'. ";
+                            "Unable to find account record for address '" .
+                            htmlspecialchars($email) . "'. ";
 		    }			// email supplied
 		    break;
 		}	// email
@@ -112,7 +115,7 @@ foreach($_REQUEST as $key => $value)
 		{
 		    $code	= $value;
 		    if (is_null($user))
-				$msg	.= "Missing valid uid parameter. ";
+				$msg	.= "Missing valid user identification. ";
 		    else
 		    if ($code != $user->get('shapassword'))
 				$msg	.= "Invalid authorization code. ";

@@ -488,58 +488,58 @@ function inputKeyDown(ev)
  ************************************************************************/
 function changeEtype()
 {
-    var	form	= this.form;
-    var ider	= 0;
+    var	form	        = this.form;
+    var ider	        = 0;
     if (form.ider)
-		ider	= form.ider.value - 0;		// IDER
+		ider	        = form.ider.value - 0;		// IDER
 
     // if an existing event is being displayed, no need to expand form
     if (ider > 0 && form.date)
 		return;
 
-    var	idet	= this.value - 0;		// IDET
-    var citType	= form.type.value - 0;		// citation type
+    var	idet	        = this.value - 0;		    // IDET
+    var citType	        = form.type.value - 0;		// citation type
 
     // construct the URL to refresh the page
-    var	url	= 'editEvent.php?';
+    var	url	            = 'editEvent.php?';
 
     // identify the object the event is associated with
     if (form.idir)
-		url	+= 'idir=' + form.idir.value;
+		url	            += 'idir=' + form.idir.value;
     else
     if (form.idmr)
-		url	+= 'idmr=' + form.idmr.value;
+		url	            += 'idmr=' + form.idmr.value;
     else
     if (form.idnx)
-		url	+= 'idnx=' + form.idnx.value;
+		url	            += 'idnx=' + form.idnx.value;
     else
     if (form.idcr)
-		url	+= 'idcr=' + form.idcr.value;
+		url	            += 'idcr=' + form.idcr.value;
     else
     if (form.idtd)
-		url	+= 'idtd=' + form.idtd.value;
+		url	            += 'idtd=' + form.idtd.value;
 
     // add feedback parameter
     if (form.rownum)
-		url	+= '&rownum=' + form.rownum.value;
+		url	            += '&rownum=' + form.rownum.value;
 
     if (debug.toLowerCase() == 'y')
-		url	+= "&debug=" + debug;
+		url	            += "&debug=" + debug;
 
     // add citation type and IDET value to URL
     if (idet > 999)
     {		// events defined in Person or Family
 		citType	= Math.floor(idet/1000);	// citation citType
-		url	+= '&type=' + citType;
+		url	            += '&type=' + citType;
     }		// events defined in Person or Family
     else
     {		// events defined in other records
 		if (citType != 30 && citType != 31)
 		{	// event is not in instance of Event
 		    if (form.idir)
-				url	+= '&ider=0&type=30&idet=' + idet;
+				url	    += '&ider=0&type=30&idet=' + idet;
 		    else
-				url	+= '&ider=0&type=31&idet=' + idet;
+				url	    += '&ider=0&type=31&idet=' + idet;
 		}	// event is not in instance of Event
     }		// events defined in other records
 
@@ -2070,6 +2070,7 @@ function confirmDelete(ev)
 function gotDeleteCit(xmlDoc)
 {
     var	root		= xmlDoc.documentElement;
+    const serializer    = new XMLSerializer();
     if (root && (root.nodeName == 'deleted'))
     {		        // valid XML response
 		var	rownum		= root.getAttribute("rownum");
@@ -2088,10 +2089,16 @@ function gotDeleteCit(xmlDoc)
 				}	// error message
 		    }		// only examine elements at this level
 		}		    // loop through immediate children of root
-		var	row	= document.getElementById("sourceRow" + rownum);
-		var	sect	= row.parentNode;
-		if (row)
+		var	row	    = document.getElementById("sourceRow" + rownum);
+        if (row)
+        {
+		    let	sect	= row.parentNode;
 		    sect.removeChild(row);
+        }
+        else
+        {
+            alert("cannot find sourceRow" + rownum);
+        }
     }		        // valid XML response
     else
     {		        // error unexpected document

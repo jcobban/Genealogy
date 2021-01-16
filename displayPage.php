@@ -28,8 +28,9 @@ use \Templating\TemplateTag;
  *                      customization is performed                      *
  *      2019/02/18      use new FtTemplate constructor                  *
  *      2019/11/17      include relevant CSS                            *
+ *		2021/01/03      correct XSS vulnerability                       *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -165,7 +166,7 @@ if (substr($templateName, 0, 1) == '/')
         $template->includeSub($bodyText, 'MAIN');
     }               // template file exists
     else
-        $msg        .= "Unable to open file $document_root$templateName. ";
+        $msg        .= htmlspecialchars("Unable to open file $document_root$templateName. ");
 }                   // template location relative to document root
 else
 {                   // template location relative to template directory

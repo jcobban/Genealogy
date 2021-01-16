@@ -16,8 +16,9 @@
  *                      the scroll bars are visible all the time        *
  *      2020/06/22      display acknowledgement of owner of image       *
  *                      reenable display image button in caller         *
+ *      2021/01/15      use ES2015 syntax                               *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 window.onload               = onLoadImage;
@@ -32,14 +33,14 @@ function onLoadImage()
 {
     // activate handling of key strokes in text input fields
     // including support for context specific help
-    var element;
-    var closeButton;
+    let element;
+    let closeButton;
 
-    for(var i = 0; i < document.forms.length; i++)
+    for(let i = 0; i < document.forms.length; i++)
     {                   // loop through all forms
-        var form                    = document.forms[i];
+        let form                    = document.forms[i];
 
-        for(var j = 0; j < form.elements.length; j++)
+        for(let j = 0; j < form.elements.length; j++)
         {               // loop through all elements of a form
             element                 = form.elements[j];
 
@@ -49,7 +50,7 @@ function onLoadImage()
             // request to the server is identified by a name= attribute
             // but elements which are used only by this script are
             // identified by an id= attribute
-            var name                = element.name;
+            let name                = element.name;
             if (name.length == 0)
                 name                = element.id;
 
@@ -80,34 +81,36 @@ function onLoadImage()
     }                   // loop through forms in the page
 
     // set size of image viewer
-    var header              = document.getElementById('top');
-    var headerHeight        = header.offsetHeight;
-    var browserHeight       = Math.max(document.documentElement.clientHeight, 
+    let header              = document.getElementById('top');
+    let headerHeight        = header.offsetHeight;
+    let browserHeight       = Math.max(document.documentElement.clientHeight, 
                                        window.innerHeight || 0)
-    var viewer              = document.getElementById('viewport');
+    let viewer              = document.getElementById('viewport');
     viewer.style.height     = (browserHeight - headerHeight) + 'px';
 
     // activate popup help for forward and backward links
     element                 = document.getElementById('goToPrevImg');
-    actMouseOverHelp(element);
+    if (element)
+        actMouseOverHelp(element);
     element                 = document.getElementById('goToNextImg');
-    actMouseOverHelp(element);
+    if (element)
+        actMouseOverHelp(element);
 
     // update the name of the image in the invoking page
-    var opener              = null;
+    let opener              = null;
     if (window.frameElement && window.frameElement.opener)
         opener              = window.frameElement.opener;
     else
         opener              = window.opener;
     if (opener)
     {                   // opened from another window
-        var fldName         = 'Image';  // default
+        let fldName         = 'Image';  // default
         if ('fldname' in args)
             fldName         = args.fldname;
         if ('buttonname' in args)
             displayButton   = opener.document.getElementById(args.buttonname);
 
-        var imageElement    = opener.document.getElementById(fldName);
+        let imageElement    = opener.document.getElementById(fldName);
         if ('src' in args)
         {
             if (imageElement)
@@ -141,7 +144,7 @@ function onLoadImage()
  ************************************************************************/
 function zoomIn()
 {
-    var image           = document.getElementById('image');
+    let image           = document.getElementById('image');
     image.style.height  = 'auto';
     image.style.width   = Math.floor(image.width * 3 / 2) + 'px';
     return false;
@@ -159,7 +162,7 @@ function zoomIn()
  ************************************************************************/
 function zoomOut()
 {
-    var image           = document.getElementById('image');
+    let image           = document.getElementById('image');
     image.style.height  = 'auto';
     image.style.width   = Math.floor(image.width * 2 / 3) + 'px';
     return false;
@@ -178,7 +181,7 @@ function close()
 {
     if (displayButton)
         displayButton.disabled  = false;
-    var opener                  = null;
+    let opener                  = null;
     if (window.frameElement && window.frameElement.opener)
         opener                  = window.frameElement.opener;
     else

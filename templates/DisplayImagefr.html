@@ -12,8 +12,9 @@
  *		2019/12/12      fix header at top and scroll image such that    *
  *		                the scroll bars are visible all the time        *
  *      2020/06/17      script moved to top folder                      *
+ *      2021/01/15      add invalid URL message                         *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php">Genealogy</a>:
@@ -65,6 +66,15 @@
       </span>
       <span id="creditUrl">
         Cette image est fourni par $hostname.
+      </span>
+      <span id="baddir">
+          Impossible d'ouvrir le dossier de fichiers  $dirname.
+      </span>
+      <span id="notfound">
+          Image demandée introuvable.
+      </span>
+      <span id="notfoundURL">
+          L'URL $src n'existe pas.
       </span>
     </div>
     <div class="balloon" id="Helpplus">

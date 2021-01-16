@@ -13,8 +13,9 @@
  *						a report										*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/11/21      show Image moved to shared library              *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -130,7 +131,7 @@ function onLoad()
 
 				case 'displayimage':
 				{
-				    element.onclick	= displayImage;
+				    element.onclick	= showImage;
 				    break;
 				}
 
@@ -291,22 +292,3 @@ function editMarriages()
 				    '_blank');
     return false;
 }		// editMarriages
-
-/************************************************************************
- *  function displayImage												*
- *																		*
- *  When a Show Image button is clicked this function displays the		*
- *  image associated with this record.									*
- *																		*
- *  Input:																*
- *		$this			<button type=button id='DisplayImage....'		*
- ************************************************************************/
-function displayImage()
-{
-    var	form	= this.form;
-    var	rownum	= this.id.substring(this.id.length - 2);
-    var	image	= form.elements['Image' + rownum].value;
-    window.open(image,
-				'_blank');
-    return false;
-}		// displayImage

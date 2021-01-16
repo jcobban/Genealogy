@@ -35,6 +35,7 @@ use \Templating\Template;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/05/06      use FtTemplate                                  *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -48,29 +49,34 @@ $pattern	        			= '';
 $lang               			= 'en';
 $offset	            			= 0;
 $limit	            			= 20;
+$offsettext            			= null;
+$limittext            			= null;
 
 if (isset($_GET) && count($_GET) > 0)
 {
     $parmsText      = "<p class='label'>\$_GET</p>\n" .
-                      "<table class='summary'>\n" .
-                      "<tr><th class='colhead'>key</th>" .
-                          "<th class='colhead'>value</th></tr>\n";
+                        "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                            "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{		// take action based upon key
 		    case 'pattern':
 		    {		// pattern to match against surname
-				$pattern	        = $value;
+				$pattern	        = htmlspecialchars($value);
 				break;
 		    }		// pattern to match against surname
 
 		    case 'offset':
             {		// position within the complete list of responses
                 if (ctype_digit($value))
-				    $offset		    = (int)$value;
+                    $offset		    = (int)$value;
+                else
+                    $offsettext     = htmlspecialchars($value); 
 				break;
 		    }		// position within the complete list of responses
 
@@ -78,6 +84,8 @@ if (isset($_GET) && count($_GET) > 0)
 		    {		// maximum number of entries displayed
                 if (ctype_digit($value))
 				    $limit		    = (int)$value;
+                else
+                    $limittext      = htmlspecialchars($value); 
 				break;
             }		// maximum number of entries displayed
 
@@ -118,28 +126,36 @@ $template->set('LAST',          $last);
 $template->set('COUNT',         $count);
 $template->set('LANG',          $lang);
 
-if ($prevoffset < 0)
-    $template['topPrev']->update(null);
-if ($nextoffset >= $count)
-    $template['topNext']->update(null);
 
 // display the results
-$dataRow            = $template['dataRow'];
-$dataRowText        = $dataRow->outerHTML();
-$data               = '';
-$class              = 'odd';
-foreach($entries as $row)
+if ($count > 0)
 {
-    $row['class']   = $class;
-    $row['lang']    = $lang;
-    $rtemplate      = new Template($dataRowText);
-    $rtemplate['dataRow']->update($row);
-    $data           .= $rtemplate->compile();
-    if ($class == 'odd')
-        $class      = 'even';
-    else
-        $class      = 'odd';
-}	// loop through results
-$dataRow->update($data);
+    if ($prevoffset < 0)
+        $template['topPrev']->update(null);
+    if ($nextoffset >= $count)
+        $template['topNext']->update(null);
+	$dataRow            = $template['dataRow'];
+	$dataRowText        = $dataRow->outerHTML();
+	$data               = '';
+	$class              = 'odd';
+	foreach($entries as $row)
+	{
+	    $row['class']   = $class;
+	    $row['lang']    = $lang;
+	    $rtemplate      = new Template($dataRowText);
+	    $rtemplate['dataRow']->update($row);
+	    $data           .= $rtemplate->compile();
+	    if ($class == 'odd')
+	        $class      = 'even';
+	    else
+	        $class      = 'odd';
+	}	// loop through results
+    $dataRow->update($data);
+}
+else
+{
+    $template['topBrowse']->update(null);
+    $template['dataTable']->update(null);
+}
 
 $template->display();

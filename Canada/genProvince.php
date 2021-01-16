@@ -43,8 +43,10 @@ use \Exception;
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/07/22      support ISO format of Domain code               *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2021/01/16      report and ignore invalid input                 *
+ *		                protect against XSS attacks                     *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -61,63 +63,68 @@ require_once __NAMESPACE__ . '/common.inc';
 // validate all parameters passed to the server and construct the
 // various portions of the SQL SELECT statement
 $code	    	= null;
+$codetext    	= null;
 $cc		    	= 'CA';		            // country code
 $countryName	= 'Canada';         	// country name
 $domain	    	= 'CAON';	        	// domain code
+$domaintext     = null;
 $domainName		= 'Canada: Ontario:';	// domain name
 $stateName		= 'Ontario';        	// state/province name
 $lang		    = 'en';	                // language code
 
 // if invoked by method=get process the parameters
-if (count($_GET) > 0)
-{	        	    // invoked by URL to display current status of account
+if (isset($_GET) && count($_GET) > 0)
+{	        	            // invoked by method GET
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
 	foreach ($_GET as $key => $value)
-	{			            // loop through all parameters
+    {			            // loop through all parameters
+        $valuetext  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$valuetext</td></tr>\n"; 
 		switch(strtolower($key))
 		{		            // act on specific parameters
 		    case 'code':
 		    {		        // state postal abbreviation
-				if (preg_match('/[a-zA-Z]{2,3}/', $value))
-				    $domain		= 'CA' . $value;
+				if (preg_match('/^[a-zA-Z]{2,3}$/', $value))
+                    $domain		= 'CA' . $value;
+                else
+                    $codetext   = htmlspecialchars($value);
 				break;
 		    }		        // state postal abbreviation
 	
 		    case 'domain':
 		    case 'regdomain':
 		    {		        // domain code
-				if (preg_match('/[a-zA-Z]{4,5}/', $value))
+				if (preg_match('/^[a-zA-Z]{4,5}$/', $value))
 	                $domain		= $value;
 	            else
-				if (preg_match('/([a-zA-Z]{2})-([a-zA-Z]{2,3})/', $value, $matches))
-	                $domain		= $matches[1] . $matches[2];
-	
+				if (preg_match('/^([a-zA-Z]{2})-([a-zA-Z]{2,3})$/', $value, $matches))
+                    $domain		= $matches[1] . $matches[2];
+                else
+	                $domaintext = htmlspecialchars($value);
 				break;
 		    }		        // domain code
 	
 		    case 'lang':
 		    {		        // language code
-                $lang       = FtTemplate::validateLang($value);
+                $lang           = FtTemplate::validateLang($value);
 				break;
 		    }		        // language code
 		}		            // act on specific parameters
 	}			            // loop through all parameters
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
-}	        	    // invoked by URL to display current status of account
-print $warn;
+}	        	            // invoked by method GET
 
-$tempBase		= $document_root . '/templates/';
-$includeSub		= "genProvince$domain$lang.html";
+$tempBase		    = $document_root . '/templates/';
+$includeSub		    = "genProvince$domain$lang.html";
 if (!file_exists($tempBase . "genProvince{$domain}en.html"))
-{                   // domain code not supported
-    $includeSub = "genProvince$lang.html";
-}                   // domain code not supported
+{                       // domain code not supported
+    $includeSub     = "genProvince$lang.html";
+}                       // domain code not supported
 
 if (!file_exists($tempBase . $includeSub))
 {	    		            // no template for domain in chosen language
@@ -138,15 +145,22 @@ if (!file_exists($tempBase . $includeSub))
 
 $template		= new FtTemplate($includeSub);
 
+if (is_string($domaintext))
+    $warn       .= "<p>Invalid Domain identifier '$domaintext' ignored.</p>\n";
+if (is_string($codetext))
+    $warn       .= "<p>Invalid province code identifier '$codetext' ignored.</p>\n";
+
 $domainObj		= new Domain(array('domain'	    => $domain,
 								   'language'	=> $lang));
-$cc			    = substr($domain, 0, 2);
-$code		    = substr($domain, 2, 2);
-$countryObj		= new Country(array('code' => $cc));
+$cc			    = $domainObj['cc'];
+$code		    = $domainObj['code'];
+$countryObj		= $domainObj->getCountry();
 $countryName	= $countryObj->getName($lang);
 $stateName		= $domainObj->getName(0);
 $domainName		= $domainObj->getName(1);
 
+if (!$domainObj->isExisting())
+    $warn       .= "<p>Domain identifier '$domain' is not supported.</p>\n";
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('PROVINCENAME',	$stateName);
 $template->set('DOMAINNAME',	$domainName);

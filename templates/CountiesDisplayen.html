@@ -6,8 +6,9 @@
  *  History:															*
  *		2018/01/09		created											*
  *		2018/01/22		display only part of the table at a time		*
+ *      2021/01/13      include message texts                           *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=$LANG">
@@ -151,6 +152,17 @@
       </table>
     </form>
   </div> <!-- end of <div class="body"> -->
+  <div class="hidden">
+    <span id="domainUnsupported">
+        Domain='$domain' unsupported. 
+    </span>
+    <p id="offsetIgnored">
+        Offset=$offset ignored.
+    </p>
+    <p id="limitIgnored">
+        Limit=$offset ignored.
+    </p>
+  </div>
   <!-- The remainder of the page consists of context specific help text.
   -->
   <div class="balloon" id="HelpCode">

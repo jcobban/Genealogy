@@ -82,6 +82,8 @@ use \Templating\Template;
  *		2020/03/24      correct setting of owner/tenant in 1921         *
  *		2020/03/29      avoid warning when user not authorized          *
  *		2020/05/10      hide Find button on blank lines                 *
+ *		2020/10/10      remove field prefix for Pages table             *
+ *		2020/12/01      eliminate XSS vulnerabilities                   *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -142,20 +144,23 @@ if (isset($_GET) && count($_GET) > 0)
     foreach ($_GET as $key => $value)
     {				    // loop through all parameters
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n";
+                                "<td class='white left'>" .
+                                htmlspecialchars($value) . "</td></tr>\n";
 	    $value                      = trim($value);
+	    if (strlen($value) == 0)
+	        continue;
 		switch(strtolower($key))
 		{
 		    case 'census':
 		    case 'censusid':
 	        {			// supported field name
-	            $censusId           = $value;
+	            $censusId           = strtoupper(htmlspecialchars($value));
 				break;
 		    }			// Census Identifier
 	
 		    case 'province':
 		    {			// Province code (pre-confederation)
-				$province			= strtoupper($value);
+				$province			= strtoupper(htmlspecialchars($value));
 				break;
 		    }			// Province code
 	
@@ -171,18 +176,19 @@ if (isset($_GET) && count($_GET) > 0)
 				}
 				if (preg_match($distpat, $value) == 1)
 				{		// valid district number
-				    $distID			= $value;
+				    $distID			        = $value;
 				    $getParms['district']	= $value;
 				}		// valid district number
 				else
-				    $msg	.= "Invalid value of District='$value'. ";
+                    $msg	.= "Invalid value of District='" .
+                                htmlspecialchars($value) . "'. ";
 				break;
 		    }			// District number
 	
 		    case 'subdistrict':
 		    {			// subdistrict id
-				$subDistID			            = $value;
-				$getParms['subdistrict']	    = $value;
+				$subDistID			            = htmlspecialchars($value);
+				$getParms['subdistrict']	    = $subDistID;
 				break;
 		    }			// subdistrict id
 	
@@ -198,8 +204,8 @@ if (isset($_GET) && count($_GET) > 0)
 				}
 	            else
 	            {
-				    $division			        = $value;
-	                $getParms['division']		= $value;
+				    $division			        = htmlspecialchars($value);
+	                $getParms['division']		= $division;
 	            }
 				break;
 		    }			// division
@@ -212,7 +218,8 @@ if (isset($_GET) && count($_GET) > 0)
 				    $getParms['page']		    = $page;
 				}
 				else
-				    $msg	                .= "Invalid value of Page='$value'. ";
+                    $msg	                .= "Invalid value of Page='" .
+                                htmlspecialchars($value) . "'. ";
 				break;
 		    }			// "Page"
 	
@@ -258,14 +265,19 @@ else
     $action		        		= 'Display';
 
 $census		            		= new Census(array('censusid' => $censusId));
-$censusYear			    		= $census->get('year');
-if ($censusYear < 1867 && substr($censusId, 0, 2) == 'CA')
+if ($census->isExisting())
 {
-    $censusId           		= $province . $censusYear;
-    $census		        		= new Census(array('censusid' => $censusId));
+    $censusYear			    		= $census->get('year');
+    if ($censusYear < 1867 && substr($censusId, 0, 2) == 'CA')
+    {
+        $censusId           		= $province . $censusYear;
+        $census		        		= new Census(array('censusid' => $censusId));
+    }
+    if (strlen($province) == 0)
+        $province		    		= $census->get('province');
 }
-if (strlen($province) == 0)
-    $province		    		= $census->get('province');
+else
+    $msg            .= "Census='$censusId' invalid. ";
 
 // get template
 $warn	        .= ob_get_clean();	// ensure previous output in page
@@ -278,7 +290,8 @@ else
     $getParms['censusid']	= $censusId;
 
 if (!($census->isExisting()))
-    $msg	.= "Invalid value of CensusID='$value'. ";
+    $msg	.= "Invalid value of CensusID='" . 
+                htmlspecialchars($value) . "'. ";
 if ($censusYear < 1867 && strlen($province) == 0)
 {		// missing mandatory parameter
 	$msg	.= 'Missing mandatory parameter Province. ';
@@ -312,6 +325,7 @@ if (strlen($subDistID) == 0)
 	$msg	.= 'Missing mandatory parameter SubDistrict. ';
 }		// missing mandatory parameter
 else
+if (strlen($distID) > 0)
 {
 	// get information about the sub-district
 	$parms	= array('sd_census'	=> $census, 
@@ -322,7 +336,10 @@ else
 	$subDistrict	= new SubDistrict($parms);
 	if (!$subDistrict->isExisting())
 	    $msg		.= "Invalid identification of sub-district:".
-	" sd_census=$censusId, sd_distid=$distID, sd_id=$subDistID, sd_div=$division.  ";
+				        " sd_census=" . $censusId .
+				        ", sd_distid=" . htmlspecialchars($distID) . 
+				        ", sd_id=" . htmlspecialchars($subDistID) . 
+				        ", sd_div=" . htmlspecialchars($division);
 	$subDistrictName	= $subDistrict->get('sd_name');
 	if (strlen($subDistrictName) > 48)
         $subDistrictName	= substr($subDistrictName, 0, 45) . '...';
@@ -344,10 +361,10 @@ if (strlen($msg) == 0)
 	// obtain information about the page
 	$pageRec		    = new Page($subDistrict, $page);
 
-	$image			    = $pageRec->get('pt_image');
-	$numLines		    = $pageRec->get('pt_population');
-	$transcriber		= $pageRec->get('pt_transcriber');
-	$proofreader		= $pageRec->get('pt_proofreader');
+	$image			    = $pageRec->get('image');
+	$numLines		    = $pageRec->get('population');
+	$transcriber		= $pageRec->get('transcriber');
+	$proofreader		= $pageRec->get('proofreader');
 
 	if ($page > $page1)
 	{			// not the first page in the division

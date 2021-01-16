@@ -21,6 +21,7 @@ use \Exception;
  *      2017/09/14      use class Page                                  *
  *      2017/11/17      use RecordSet instead of Page::getPages         *
  *      2020/05/12      allow mixed case on parameter name              *
+ *		2020/10/10      remove field prefix for Pages table             *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -65,7 +66,7 @@ if (strlen($msg) == 0)
     print "<image>" . htmlspecialchars($image) . "</image>\n";
 
     $pages      = new RecordSet('Pages',
-                        array('pt_image'    => $image));
+                                array('image'    => $image));
 
     // report on all matching records
     foreach($pages as $page)

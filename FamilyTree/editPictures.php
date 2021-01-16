@@ -49,9 +49,10 @@ use \Exception;
  *		2017/09/28		change class LegacyEvent to class Event			*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2017/10/17		use class RecordSet								*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Picture.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -83,7 +84,8 @@ if (count($_GET) > 0)
 	foreach($_GET as $key => $value)
     {	            // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		    // act on specific parameter
 	        case 'idir':
@@ -91,7 +93,7 @@ if (count($_GET) > 0)
                 if (is_int($value) || ctype_digit($value))
                     $idir   		    = (int)$value;
                 else
-                    $idirtext           = $value;
+                    $idirtext           = htmlspecialchars($value);
 	            break;
 	        }            // idir reference to Person
 	
@@ -100,7 +102,7 @@ if (count($_GET) > 0)
                 if (is_int($value) || ctype_digit($value))
                     $idir   		    = (int)$value;
                 else
-                    $idirtext           = $value;
+                    $idirtext           = htmlspecialchars($value);
 	            $idtypetxt   		    = 'Marriage';
 	            break;
 	        }            // idir reference to Family
@@ -110,7 +112,7 @@ if (count($_GET) > 0)
                 if (is_int($value) || ctype_digit($value))
                     $idir   		    = (int)$value;
                 else
-                    $idirtext           = $value;
+                    $idirtext           = htmlspecialchars($value);
 	            $idtypetxt   		    = 'Event';
 	            break;
 	        }            // idir reference to Event
@@ -120,7 +122,7 @@ if (count($_GET) > 0)
                 if (is_int($value) || ctype_digit($value))
                     $idir   		    = (int)$value;
                 else
-                    $idirtext           = $value;
+                    $idirtext           = htmlspecialchars($value);
 	            $idtypetxt   		    = 'Source';
 	            break;
 	        }            // idir reference to Source
@@ -130,7 +132,7 @@ if (count($_GET) > 0)
                 if (is_int($value) || ctype_digit($value))
                     $idir   		    = (int)$value;
                 else
-                    $idirtext           = $value;
+                    $idirtext           = htmlspecialchars($value);
 	            $idtypetxt   		    = 'Citation';
 	            break;
 	        }            // idir reference to Citation
@@ -140,7 +142,7 @@ if (count($_GET) > 0)
                 if (is_int($value) || ctype_digit($value))
                     $idir   		    = (int)$value;
                 else
-                    $idirtext           = $value;
+                    $idirtext           = htmlspecialchars($value);
 	            $idtypetxt   		    = 'To Do';
 	            break;
 	        }            // idir reference to ToDo
@@ -150,7 +152,7 @@ if (count($_GET) > 0)
                 if (is_int($value) || ctype_digit($value))
                     $idir   		    = (int)$value;
                 else
-                    $idirtext           = $value;
+                    $idirtext           = htmlspecialchars($value);
 	            $idtypetxt   		    = 'Address';
 	            break;
 	        }            // idir reference to Address
@@ -160,7 +162,7 @@ if (count($_GET) > 0)
                 if (is_int($value) || ctype_digit($value))
                     $idir   		    = (int)$value;
                 else
-                    $idirtext           = $value;
+                    $idirtext           = htmlspecialchars($value);
 	            $idtypetxt   		    = 'Location';
 	            break;
 	        }            // idir reference to Location
@@ -170,14 +172,14 @@ if (count($_GET) > 0)
                 if (is_int($value) || ctype_digit($value))
                     $idir   		    = (int)$value;
                 else
-                    $idirtext           = $value;
+                    $idirtext           = htmlspecialchars($value);
 	            $idtypetxt   		    = 'Temple';
 	            break;
 	        }            // idir reference to Temple
 	
 	        case 'idtype':
 	        {            // type identifier
-	            $idtypetxt   		    = $value;
+	            $idtypetxt   		    = htmlspecialchars($value);
 	            break;
             }            // type identifier
 

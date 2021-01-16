@@ -45,6 +45,8 @@ use \Exception;
  *      2019/02/19      use new FtTemplate constructor                  *
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/06/30      support feedback                                *
+ *      2020/12/27      get message texts from template                 *
+ *                      cover XSS vulnerabilities                       *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -53,8 +55,13 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $idlr                       = null;     // primary key
+$idlrtext                   = null;     // key if syntactically invalid
 $location                   = null;     // instance of Location
-$feedback                   = null;     // name of field to update with new IDLR
+$locationName               = null;     // location name
+$latitude                   = null;     // latitude
+$longitude                  = null;     // longitude
+$updates                    = array();  // field updates
+$feedback                   = null;     // name of field to set new IDLR
 $lang                       = 'en';
 $closeAtEnd                 = false;
 
@@ -70,59 +77,39 @@ if (isset($_POST) && count($_POST) > 0)
     {
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n";
-        switch(strtolower($key))
+        $key        = strtolower($key);
+        $value      = trim($value);
+        switch($key)
         {               // act on specific keys
             case 'idlr':
             {           // identifier present
-                $idlr   = $value;
-                if (strlen($idlr) > 0 &&
-                    ctype_digit($idlr))
+                if (ctype_digit($value))
                 {       // positive integer
-                    if ($idlr > 0)
-                    {       // IDLR of existing location
-                        $location   = new Location(array('idlr' => $idlr));
-                    }       // IDLR of existing location
+                    $idlr           = $value;
                 }       // positive integer
                 else
-                    $msg    .= 'Invalid Value of idlr=' . $idlr;
+                    $idlrtext       = htmlspecialchars($value);
                 break;
             }           // identifier present
 
             case 'location':
             {           // location name
-                if (is_null($idlr))
-                {
-                    $msg    .= 'Got to location name handler with IDLR null, which should only happen if the input field for location is before the input field for IDLR in the input form. ';
-                }
-
-                if (strlen($msg) == 0)
-                {       // no errors
-                    if (is_null($location))
-                    {       // create new location
-                        $location   = new Location(array('location' => $value));
-
-                        // make the current user an owner of this location
-                        if (!$location->isExisting())
-                            $location->save(false);
-                        $location->addOwner();
-                    }       // create new location
-                    else
-                        $location->setName($value);
-                }       // no errors
+                if (strlen($value) > 0)
+                    $locationName   = $value;
                 break;
             }           // location name supplied
 
             case 'latitude':
             {
-                if ($location)
-                    $location->setLatitude($value);
+                if (is_numeric($value))
+                    $latitude       = $value;
                 break;
             }           // latitude
 
             case 'longitude':
             {
-                if ($location)
-                    $location->setLongitude($value);
+                if (is_numeric($value))
+                    $longitude      = $value;
                 break;
             }           // longitude
 
@@ -140,8 +127,7 @@ if (isset($_POST) && count($_POST) > 0)
             case 'zoom':
             case 'boundary':
             {
-                if ($location)
-                    $location->set($key, $value);
+                $updates[$key]      = $value;
                 break;
             }           // longitude
 
@@ -169,10 +155,43 @@ if (isset($_POST) && count($_POST) > 0)
         $warn               .= $parmsText . "</table>\n";
 }                       // invoked by method=post
 
+$template               = new FtTemplate("updateLocationError$lang.html");
+
+if (is_string($idlrtext))
+{
+    $text               = $template['invalidIDIR']->innerHTML;
+    $msg                .= str_replace('$idlrtext', $idlrtext, $text);
+}
+
+if ($idlr > 0)
+{       // IDLR of existing location
+    $location   = new Location(array('idlr' => $idlr));
+}       // IDLR of existing location
+else
+if (is_string($locationName))
+{       // create new location
+    $location   = new Location(array('location' => $locationName));
+
+    // make the current user an owner of this location
+    if (!$location->isExisting())
+        $location->save(false);
+    $location->addOwner();
+}       // create new location
+else
+    $msg        .= $template['missingBoth']->innerHTML;
+
 // use possibly updated location name
 // for search pattern
-if ($location)
+if ($location instanceof Location)
 {
+    if (is_string($locationName))
+        $location->setName($locationName);
+    if (is_numeric($latitude))
+        $location->setLatitude($latitude);
+    if (is_numeric($longitude))
+        $location->setLongitude($longitude);
+    foreach($updates as $field => $value)
+        $location[$field]   = $value;
     $pattern                = $location->getName();
     if (strlen($pattern) > 5)
         $pattern            = substr($pattern, 0, 5);
@@ -183,17 +202,11 @@ if ($location)
 else
     $pattern                = '';
 
-if (is_null($idlr))
-{
-    $msg                    .= 'idlr Parameter Missing';
-    $idlr                   = 1;
-}
 
 if (strlen($msg) > 0 || strlen($warn) > 0)
 {
-    $template               = new FtTemplate("updateLocationError$lang.html");
     $template->set('LANG',          $lang);
-    $template->set('NAMESTART',     $pattern);
+    $template->set('NAMESTART',     htmlspecialchars($pattern));
     $template->set('IDLR',          $idlr);
     $template->display();
 }
@@ -203,7 +216,7 @@ else
     {                   // close the dialog
         $template           = new FtTemplate("updateLocationOK$lang.html");
         $template->set('LANG',      $lang);
-        $template->set('NAMESTART', $pattern);
+        $template->set('NAMESTART', htmlspecialchars($pattern));
         $template->set('IDLR',      $idlr);
         $template->display();
     }                   // close the dialog
@@ -215,6 +228,5 @@ else
         if (is_string($feedback) && strlen($feedback) > 0)
            $url .= "&feedback=$feedback";
         header("Location: $url");
-        //header('Location: Locations.php?pattern=^' . urlencode($pattern));
     }                   // redirect to main page for locations
 }                       // update was successful

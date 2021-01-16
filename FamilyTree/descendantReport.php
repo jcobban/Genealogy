@@ -64,7 +64,9 @@ use \Templating\Template;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/10/24		use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
- *		2020/03/13      use FtTemplte::validateLang                     *
+ *		2020/03/13      use FtTemplate::validateLang                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
+ *                      improve error messages                          *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -195,7 +197,8 @@ function show($person, $level, $template)
 
 // defaults
 $idir		    			= null;
-$person		    			= null;
+$idirtext	    			= null;
+$person		    			= null;             // instance of Person
 $date		    			= getdate();
 $curyear					= $date['year'];
 $bprivlim					= $curyear - 105;	// privacy limit birth date
@@ -233,40 +236,38 @@ foreach($_GET as $key => $value)
 	switch($key)
 	{
 	    case 'descDepth':
-	    {		// get the maximum depth of the tree to display
-			$descDepth	    = $value;
-			setcookie('descDepth', $descDepth);
+        {		// get the maximum depth of the tree to display
+            if (ctype_digit($value))
+            {
+                $descDepth	    = $value;
+                setcookie('descDepth', $descDepth);
+            }
+            else
+                $descDepthText  = htmlspecialchars($value);
 			break;
 	    }		// get the maximum depth of the tree to display
 
 	    case 'incLocs':
-	    {		// indicator of whether or not to show locations
-			$incLocs	    = $value == 1;
+        {		// indicator of whether or not to show locations
+            $tvalue         = strtolower($value);
+            if ($tvalue == 1 || $tvalue == 'y' || $tvalue == 'true')
+                $incLocs	    = true;
+            else
+            if ($tvalue == '0' || $tvalue == 'n' || $tvalue == 'false')
+                $incLocs	    = false;
+            else
+                $incLocsText    = htmlspecialchars($value);
 			setcookie('incLocs', $incLocs);
 			break;
 	    }		// indicator of whether or not to show locations
 
 	    case 'id':
 	    case 'idir':
-	    {		// identification of root individual
-			$idir		    = $value;
-			// check if current user is an owner of the record and therefore
-			// permitted to see private information and edit the record
-		    $person	        = new Person(array('idir' => $idir));
-
-		    $name	        = $person->getName(Person::NAME_INCLUDE_DATES);
-		    $surname	    = $person->getSurname();
-		    $given  	    = $person->getGivenName();
-		    $nameUri	    = rawurlencode($surname . ', ' . $given);
-		    if (strlen($surname) == 0)
-				$prefix	    = '';
-		    else
-		    if (substr($surname,0,2) == 'Mc')
-				$prefix	    = 'Mc';
-		    else
-				$prefix	    = substr($surname,0,1);
-		    $bdateTxt	    = $person->getBirthDate();
-			$treeName	    = $person->getTreeName();
+        {		// identification of root individual
+            if (ctype_digit($value))
+                $idir		    = $value;
+            else
+                $idirtext       = htmlspecialchars($value);
 			break;
         }		// identification of root individual
 
@@ -280,38 +281,37 @@ foreach($_GET as $key => $value)
 // display page
 $template		= new FtTemplate("descendantReport$lang.html", true);
 
+if (is_string($idirtext))
+{		// invalid parameter
+    $msg	                .= "Invalid value for idir='$idirtext'. ";
+    $name                   = $idirtext;
+}		// invalid parameter
+else
 if (is_null($idir))
 {		// missing parameter
-	$title	                = "Descendant Tree Failure";
 	$msg	                .= 'Missing mandatory parameter idir. ';
+    $name                   = 'Missing IDIR';
 }		// missing parameter
-
-if (strlen($surname) == 0)
-{
-	$template['surnamesPrefix']->update(null);
-	$template['surname']->update(null);
-}		// surname present
-
-// pass parameters to template
-$failureText		        = $template['Failure']->innerHTML();
-$template->set('LANG',	        $lang);
-$template->set('IDIR',	        $idir);
-$template->set('DESCDEPTH',	    $descDepth);
-if ($incLocs)
-{
-    $template->set('INCLOCS',	    '1');
-    $template->set('INCLOCSCHECKED','checked="checked"');
-}
 else
 {
-    $template->set('INCLOCS',	    '0');
-    $template->set('INCLOCSCHECKED','');
-}
-
-if (strlen($msg) == 0)
-{
-	if (!is_null($person) && $person->isExisting())
-	{		            // individual found
+	// check if current user is an owner of the record and therefore
+	// permitted to see private information and edit the record
+    $person	        = new Person(array('idir' => $idir));
+    if ($person->isExisting())
+    {               // key matches existing Person
+	    $name	        = $person->getName(Person::NAME_INCLUDE_DATES);
+	    $surname	    = $person->getSurname();
+	    $given  	    = $person->getGivenName();
+	    $nameUri	    = rawurlencode($surname . ', ' . $given);
+	    if (strlen($surname) == 0)
+			$prefix	    = '';
+	    else
+	    if (substr($surname,0,2) == 'Mc')
+			$prefix	    = 'Mc';
+	    else
+			$prefix	    = substr($surname,0,1);
+	    $bdateTxt	    = $person->getBirthDate();
+        $treeName	    = $person->getTreeName();
 	    if ($bdateTxt == 'Private')
         {
             $template['surnamesPrefix']->update(null);
@@ -335,34 +335,64 @@ if (strlen($msg) == 0)
 			// recursively display ancestor tree
 			$template->set('DATA',       show($person, 1, $template));
 	    }		        // display public data
-    }		            // individual found
+    }               // key matches existing Person
     else
     {
+        $msg            .= "No existing Person with IDIR=$idir. ";
+        $name           = "Missing Record $idir";
+		$prefix	        = '';
+		$surname	    = '';
         $template['surnamesPrefix']->update(null);
         $template['surname']->update(null);
         $template['depthForm']->update(null);
         $template['private']->update(null);
         $template->set('DATA',      '');
-        $template->set('NAME',      $failureText);
+        $template->set('NAME',      $name);
         $template->set('TREENAME',	$treeName);
         $template->set('NAMEURI',	'');
         $template->set('SURNAME',	'');
         $template->set('PREFIX',	'');
     }
-}			            // success
+}
+
+if (strlen($surname) == 0)
+{
+	$template['surnamesPrefix']->update(null);
+	$template['surname']->update(null);
+}		// surname present
+
+// pass parameters to template
+$failureText		        = $template['Failure']->innerHTML();
+$template->set('LANG',	        $lang);
+$template->set('IDIR',	        $idir);
+$template->set('DESCDEPTH',	    $descDepth);
+if ($incLocs)
+{
+    $template->set('INCLOCS',	    '1');
+    $template->set('INCLOCSCHECKED','checked="checked"');
+}
 else
+{
+    $template->set('INCLOCS',	    '0');
+    $template->set('INCLOCSCHECKED','');
+}
+
+if (strlen($msg) > 0)
 {
     $template['surnamesPrefix']->update(null);
     $template['surname']->update(null);
     $template['depthForm']->update(null);
     $template['private']->update(null);
     $template->set('DATA',      '');
-    $template->set('NAME',      $failureText);
+    $template->set('NAME',      $name);
     $template->set('TREENAME',	$treeName);
     $template->set('NAMEURI',	'');
     $template->set('SURNAME',	'');
     $template->set('PREFIX',	'');
 }
+
+$text           = $template['title']->innerHTML();
+$template->set('TITLE', str_replace('$NAME', $name, $text));
 
 $template->display();
 

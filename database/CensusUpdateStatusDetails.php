@@ -92,6 +92,7 @@ use \NumberFormatter;
  *		2018/11/08      improve parameter error checking                *
  *		2018/11/29      use Template                                    *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/10/10      remove field prefix for Pages table             *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -414,7 +415,7 @@ if (strlen($msg) == 0)
 	    $namecount		    = $row['namecount'];
 	    $agecount		    = $row['agecount'];
 	    $idircount		    = $row['idircount'];
-	    $population	        = $row['pt_population'];
+	    $population	        = $row['population'];
 
         $done               += $namecount;
         $linked             += $idircount;
@@ -432,13 +433,13 @@ if (strlen($msg) == 0)
 		{		// no lines in page, should be deleted
 			$cleanupPages[]	= $page;
 			// clear transcriber for empty page
-			$ptparms	    = array('pt_sdid'	=> $subDistrict,
-							    	'pt_page'	=> $page);
+			$ptparms	    = array('sdid'	=> $subDistrict,
+							    	'page'	=> $page);
 			$pageEntry	    = new Page($ptparms);
-			$pageEntry->set('pt_transcriber', '');
+			$pageEntry->set('transcriber', '');
             $pageEntry->save(false);
-            $row['pt_transcriber']  = '';
-            $row['pt_proofreader']  = '';
+            $row['transcriber']  = '';
+            $row['proofreader']  = '';
 		}		// no lines in page, should be deleted
 
 		// display a row with values from database

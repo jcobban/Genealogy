@@ -65,6 +65,7 @@ use \Templating\Template;
  *      2020/04/29      correct handling of idsr=0 with name            *
  *      2020/06/14      correct error handling and                      *
  *                      support i18n for error and warn messages        *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -76,6 +77,7 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
 $idsr                   = null;
+$idsrtext               = null;
 $name                   = null;
 $source                 = null;         // instance of Source
 $lang                   = 'en';
@@ -90,20 +92,24 @@ if (count($_GET) > 0)
     foreach($_GET as $key => $value)
     {
         $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
         switch(strtolower($key))
         {
             case 'idsr':
             case 'id':
             {
-                $idsr              = $value;
+				if (ctype_digit($value))
+				    $idsr	        = (int)$value;
+                else
+                    $idsrtext       = htmlspecialchars($value);
                 break;
             }       // record id
     
             case 'name':
             case 'srcname':
             {
-                $name              = $value;
+                $name              = htmlspecialchars($value);
                 break;
             }       // source name
 
@@ -177,7 +183,7 @@ if (!is_null($idsr))
     else
     {               // idsr is not an integer
         $text                   = $template['InvalidIDSR']->innerHTML();
-        $msg                    .= str_replace('$idsr', $idsr, $text);
+        $msg                    .= str_replace('$idsr', $idsrtext, $text);
         $idsr                   = '';
     }
 }                   // IDSR specified

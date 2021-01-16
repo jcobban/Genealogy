@@ -1,15 +1,16 @@
 <!--*********************************************************************
- *  CountriesUpdateen.html												*
+ *  CountriesAdminen.html												*
  *																		*
  *  Display form for editting information about				           	*
- *  countries for managing record transcriptions.						*
+ *  countries as an administrator.                                      *
  *																		*
  *  History:															*
  *		2017/10/25		created											*
  *		2018/01/04		remove Template from template file names		*
  *		2018/01/22		display only part of the table at a time		*
+ *      2021/01/13      add support for editing dialing and currency    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
 	<div id='breadcrumbs' class='hidden'>
       <a href="/index.html">Home</a>:
@@ -31,7 +32,7 @@
 	  $TRACE
 	  $MSG
 	    <!--- Put out the response as a table -->
-	    <form name='countryForm'
+	    <form name='countryForm' id='countryForm'
 		        action='CountriesEdit.php' 
 		        method='post' 
 		        autocomplete='off' 
@@ -69,22 +70,28 @@
 	        <thead>
 	          <tr id='hdrRow'>
 		        <th class='colhead'>
-		        ID
+		            ID
 		        </th>
 		        <th class='colhead'>
-		        Name
+		            Name
 		        </th>
 		        <th class='colhead'>
-		        Other Names
+		            Other Names
 		        </th>
 		        <th class='colhead'>
-		        States
+		            States
 		        </th>
 		        <th class='colhead'>
-		        Genealogy
+		            Dialing
 		        </th>
 		        <th class='colhead'>
-		        Delete
+		            Currency
+		        </th>
+		        <th class='colhead'>
+		            Genealogy
+		        </th>
+		        <th class='colhead'>
+		            Delete
 		        </th>
 	          </tr>
 	        </thead>
@@ -92,15 +99,15 @@
 	          <tr id='Row$code'>
 		        <td class='right'>
 		            <input type='text' name='Code$code' id='Code$code'
-					value='$code'
-					class='white code' 
-					size='2' maxlength='2' readonly='readonly'>
+					    value='$code'
+					    class='white code' 
+					    size='2' maxlength='2' readonly='readonly'>
 		        </td>
 		        <td class='left'>
 		            <input type='text' name='Name$code' id='Name$code' 
-					value='$name' 
-					class='white leftnc'
-					size='28' maxlength='64'>
+					    value='$name' 
+					    class='white leftnc'
+					    size='28' maxlength='64'>
 		        </td>
 		        <td class='center'>
 		            <button type='button' id='Names$code'>
@@ -113,10 +120,24 @@
 		            </button> 
 		        </td>
 		        <td class='left'>
+		            <input type='text'
+                        name='DialingCode$code' id='DialingCode$code' 
+					    value='$dialingcode' 
+					    class='white leftnc'
+					    size='4' maxlength='32'>
+		        </td>
+		        <td class='left'>
+		            <input type='text'
+                        name='Currency$code' id='Currency$code' 
+					    value='$currency' 
+					    class='white leftnc'
+					    size='3' maxlength='3'>
+		        </td>
+		        <td class='left'>
 		            <a class='button' 
                         href='/genCountry.php?cc=$code&amp;lang=$LANG'
 			            target='_blank'
-                        style="min-width: 350px; text-align: left;">
+                        style="min-width: 300px; text-align: left;">
 			          $name Genealogy
 		            </a> 
 		        </td>
@@ -164,34 +185,55 @@
 	  have made to the countries list.
 	</div>
 	<div class='hidden' id='templates'>
+	    <!-- message text localization -->
+        <p id='countryDeleted'>Deleted country code '$delcc'</p>
+        <p id='offsetIgnored'>Ignored Offset=$value'</p>
+        <p id='limitIgnored'>Ignored Limit=$value'</p>
+        <span id="ccInvalid">
+            New Country Code '$newCode' must consist of 2 Latin letters
+        </span>
 	    <!-- template for adding a new country -->
 	    <table>
 	      <tr id='Row$country'>
-		<td class='right'>
-		  <input type='text' name='Code$country' id='Code$country'
-					value='$country'
-					class='white code' 
-					size='2' maxlength='2'>
-		</td>
-		<td class='left'>
-		  <input type='text' name='Name$country' 
-					value='' 
-					class='white left'
-					size='28' maxlength='64'>
-		</td>
-		<td class='center'>
-		  <button type='button'
-				id='Delete$country'
-				disabled='disabled'>
-			    Delete
-		  </button> 
-		</td>
-		<td class='center'>
-		  <button type='button' id='EditDomains$country'
-				disabled='disabled'>
-			    States
-		  </button> 
-		</td>
+			<td class='right'>
+			  <input type='text' name='Code$country' id='Code$country'
+						value='$country'
+						class='white code' 
+						size='2' maxlength='2'>
+			</td>
+			<td class='left'>
+			  <input type='text' name='Name$country' 
+						value='' 
+						class='white left'
+						size='28' maxlength='64'>
+			</td>
+			<td class='center'>
+			  <button type='button'
+					id='Delete$country'
+					disabled='disabled'>
+				    Delete
+			  </button> 
+			</td>
+			<td class='center'>
+			  <button type='button' id='EditDomains$country'
+					disabled='disabled'>
+				    States
+			  </button> 
+			</td>
+		        <td class='left'>
+		            <input type='text'
+                        name='DialingCode$country' id='DialingCode$country' 
+					    value='' 
+					    class='white leftnc'
+					    size='4' maxlength='32'>
+		        </td>
+		        <td class='left'>
+		            <input type='text'
+                        name='Currency$country' id='Currency$country' 
+					    value='' 
+					    class='white leftnc'
+					    size='3' maxlength='3'>
+		        </td>
 	      </tr>
 	    </table>
 	</div> <!-- id='templates' -->

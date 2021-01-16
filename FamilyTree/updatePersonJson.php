@@ -210,7 +210,7 @@ try {
     $idir		    		= 0;		// record in tblIR being updated
     $person		    		= null;
     $idcr		    		= 0;		// record in tblCR being updated
-    $idmr		    		= 0;		// record in tblMR for parents of child
+    $idmr		    		= 0;		// record in tblMR for parents
     $ider		    		= 0;		// record in tblER for event
     $nameChanged			= false;
     $event		    		= null;
@@ -224,12 +224,12 @@ try {
     $events		    		= array();
 
     // provide list of parameters in feedback
-    if (count($_POST) > 0)
+    if (isset($_POST) && count($_POST) > 0)
 	{
 	    print "\"parms\":\n\t{\n";
 	
 	    foreach($_POST as $name => $value)
-	    {		        // loop through all parameters
+	    {		                    // loop through all parameters
 	        // provide list of parameters in feedback
 	        print "$comma\"$name\": ";
 	        if (is_numeric($value))
@@ -254,93 +254,94 @@ try {
 	        $namePattern		= "/([a-zA-Z]+)([0-9]*)/";
 	        $rgResult		    = preg_match($namePattern, $name, $matches);
 	        if ($rgResult === 1)
-	        {		    // match
+	        {		                // match
 	            $column		    = strtolower($matches[1]);
 	            $id			    = $matches[2];
-	        }		    // match
+	        }		                // match
 	        else
-	        {		    // no match
+	        {		                // no match
 	            $column		    = strtolower($name);
 	            $id			    = '';
-	        }		    // no match
+	        }		                // no match
 	
 	        if (strlen($msg) == 0)	// ignore parameters if error detected
 	        switch($column)
-	        {		    // switch on column name
+	        {		                // switch on column name
 	            case 'id':
-	            {		// unique identifier of record to update
-	                $person	        = new Person(array('id' => $value));
+	            {		            // unique identifier of record to update
+	                $person	            = new Person(array('id' => $value));
 	                if ($person->isExisting())
 	                {
-	                    $idir	    = $person->getIdir();
-	                    $gender	    = $person->getGender();
+	                    $idir	        = $person->getIdir();
+	                    $gender	        = $person->getGender();
                     }
-                    $priName        = $person->getPriName();
-	                $surname	    = $priName['surname'];
-	                $givenName	    = $priName['givenname'];
+                    $priName            = $person->getPriName();
+	                $surname	        = $priName['surname'];
+	                $givenName	        = $priName['givenname'];
 	                break;
-	            }		// unique identifier of record to update
+	            }		            // unique identifier of record to update
 	
 	            case 'idir':
 	            {
-	                $idir		    = $value;
-	                $person	        = Person::getPerson($idir);
+	                $idir		        = $value;
+	                $person	            = Person::getPerson($idir);
 	                if ($person->isExisting())
 	                {
-	                    $gender	    = $person->getGender();
+	                    $gender	        = $person->getGender();
 	                }
-                    $priName        = $person->getPriName();
-	                $surname	    = $priName['surname'];
-	                $givenName	    = $priName['givenname'];
+                    $priName            = $person->getPriName();
+	                $surname	        = $priName['surname'];
+	                $givenName	        = $priName['givenname'];
 	                break;
-	            }		// idir
+	            }		            // idir
 	
 	            case 'idcr':
-	            {		// link to parents
-	                $idcr		    = $value;
+	            {		            // link to parents
+	                $idcr		        = $value;
 	                if ($idcr > 0)
-	                    $childr	    = new Child(array('idcr' => $idcr));
+	                    $childr	        = new Child(array('idcr' => $idcr));
 	                break;
-	            }		// idcr
+	            }		            // idcr
 	
 	            case 'parentsidmr':
 	            {
-	                $idmr		    = $value;
+	                $idmr		        = $value;
 	                if ($idmr > 0)
-	                    $family	    = new Family(array('idmr' => $idmr));
+	                    $family	        = new Family(array('idmr' =>$idmr));
 	                break;
-	            }		// IDMR value of parents
+	            }		            // IDMR value of parents
 	
 	            case 'surname':
 	            {
 	                $person['surname']      = $value;
 	                $priName['surname']     = $value;
 	                break;
-	            }		// surname
+	            }		            // surname
 	
 	            case 'givenname':
 	            {
 	                $person['givenname']    = $value;
 	                $priName['givenname']   = $value;
 	                break;
-	            }		// given name	
+	            }		            // given name	
 	
 	            case 'gender':
 	            {
 		            if ($value == Person::FEMALE &&
 		                $person['gender'] == Person::MALE &&
 		                $person['idir'] > 0)
-		            {
-                        error_log('updatePersonJson.php: $_POST=' . 
+		            {               // change gender from male to female
+                        error_log('updatePersonJson.php: ' . __LINE__ .
+                                    ' change gender to female $_POST=' . 
                                     print_r($_POST,true), 
                                   1, 'webmaster@jamescobban.net');
-                    }
+                    }               // change gender from male to female
 	                $person->setGender($value);
 	                break;
-	            }		// gender	
+	            }		            // gender	
 	
 	            case 'eventider':
-	            {			// first field in event description
+	            {			        // first field in event description
 	                $ider		    = intval($value);
 	                if ($ider > 0)
 	                    $event      = new Event(array('ider'    => $ider));
@@ -348,88 +349,88 @@ try {
 	                    $event      = new Event(array('idir'    => $idir,
 	                                                  'idtype'  => Event::IDTYPE_INDIV));
 	                break;
-	            }			// first field in event description
+	            }			        // first field in event description
 	
 	            case 'birthdate':
 	            {
-	                $eventDate	= $value;
-	                $event		= $person->getBirthEvent(true);
+	                $eventDate	    	= $value;
+	                $event		    	= $person->getBirthEvent(true);
 	                $event->setDate($value);
-	                $clearEvent	= 'birth';
+	                $clearEvent	    	= 'birth';
 	                break;
 	            }
 	
 	            case 'chrisdate':
 	            case 'christeningdate':
 	            {
-	                $eventDate	= $value;
-	                $event		= $person->getChristeningEvent(true);
+	                $eventDate	    	= $value;
+	                $event		    	= $person->getChristeningEvent(true);
 	                $event->setDate($value);
-	                $clearEvent	= 'chris';
+	                $clearEvent	    	= 'chris';
 	                break;
 	            }
 	
 	            case 'deathdate':
 	            {
-	                $eventDate	= $value;
-	                $event		= $person->getDeathEvent(true);
+	                $eventDate	    	= $value;
+	                $event		    	= $person->getDeathEvent(true);
 	                $event->setDate($value);
-	                $clearEvent	= 'death';
+	                $clearEvent	    	= 'death';
 	                break;
 	            }
 	
 	            case 'burieddate':
 	            {
-	                $eventDate	= $value;
-	                $event		= $person->getBuriedEvent(true);
+	                $eventDate			= $value;
+	                $event				= $person->getBuriedEvent(true);
 	                $event->setDate($value);
-	                $clearEvent	= 'buried';
+	                $clearEvent			= 'buried';
 	                break;
 	            }
 	
 	            case 'baptismdate':
 	            {
-	                $eventDate	= $value;
-	                $event		= $person->getBaptismEvent(true);
+	                $eventDate			= $value;
+	                $event				= $person->getBaptismEvent(true);
 	                $event->setDate($value);
-	                $clearEvent	= 'baptism';
+	                $clearEvent			= 'baptism';
 	                break;
 	            }
 	
 	            case 'endowdate':
 	            {
-	                $eventDate	= $value;
-	                $event		= $person->getEndowEvent(true);
+	                $eventDate			= $value;
+	                $event				= $person->getEndowEvent(true);
 	                $event->setDate($value);
-	                $clearEvent	= 'endow';
+	                $clearEvent			= 'endow';
 	                break;
 	            }
 	
 	            case 'confirmationdate':
 	            {
-	                $eventDate	= $value;
-	                $event		= $person->getConfirmationEvent(true);
+	                $eventDate			= $value;
+	                $event				= $person->getConfirmationEvent(true);
 	                $event->setDate($value);
-	                $clearEvent	= 'confirmation';
+	                $clearEvent			= 'confirmation';
 	                break;
 	            }
 	
 	            case 'initiatorydate':
 	            {
-	                $eventDate	= $value;
-	                $event		= $person->getInitiatoryEvent(true);
+	                $eventDate			= $value;
+	                $event				= $person->getInitiatoryEvent(true);
 	                $event->setDate($value);
-	                $clearEvent	= 'initiatory';
+	                $clearEvent			= 'initiatory';
 	                break;
 	            }
 	
 	            case 'eventdate':
-	            {			// generic event date
-                    $eventDate		= $value;
-                    $dateObj        = new LegacyDate($value);
-                    $string         = $dateObj->toString();
-                    $message        = $dateObj->getMessage();
-	                $clearEvent		= 'event';
+	            {			        // generic event date
+                    $eventDate			= $value;
+                    $dateObj        	= new LegacyDate($value);
+                    $string         	= $dateObj->toString();
+                    $message        	= $dateObj->getMessage();
+	                $clearEvent			= 'event';
                     if ($event)
                     {
                         $event->setDate($dateObj);
@@ -437,11 +438,12 @@ try {
 	                else
 	                {
 	                    error_log('updatePersonJson.php: ' . __LINE__ .
-	                        " $name='$value', \$event is null, " .
-	                        ' $_POST=' . print_r($_POST, true) . "\n");
+	                                " $name='$value', \$event is null, " .
+	                                ' $_POST=' . print_r($_POST, true) . 
+                                    "\n");
 	                }
 	                break;
-	            }			// generic event date
+	            }			        // generic event date
 	
 	            case 'birthlocation':
 	            case 'chrislocation':
@@ -449,42 +451,43 @@ try {
 	            case 'deathlocation':
 	            case 'buriedlocation':
 	            case 'eventlocation':
-	            {			// text of location
-	                $eventLocation		= $value;
+	            {			        // text of location
+	                $eventLocation	    = $value;
 	                if ($event)
 	                    $event->setLocation($value);
 	                else
 	                {
 	                    error_log('updatePersonJson.php: ' . __LINE__ .
-	                    " $name='$value', \$event is null, " .
-	                    ' $_POST=' . print_r($_POST, true) . "\n");
+	                                " $name='$value', \$event is null, " .
+                                    ' $_POST=' . print_r($_POST, true) . 
+                                    "\n");
 	                }
 	                break;
-	            }			// text of location
+	            }			        // text of location
 	
 	            case 'baptismtemple':
 	            case 'endowtemple':
 	            case 'confirmationtemple':
 	            case 'initiatorytemple':
-	            {			// selection list of temples
-	                $eventIdtr		= $value;
+	            {			        // selection list of temples
+	                $eventIdtr		    = $value;
 	                if ($eventIdtr > 0)
 	                {
 	                    $event->set('eventidlr', $eventIdtr);
 	                    $event->set('kind', 1);
 	                }
 	                break;
-	            }			// selection list of temples
+	            }			        // selection list of temples
 	
 	            case 'birthaddress':
 	            case 'chrisaddress':
 	            case 'christeningaddress':
 	            case 'deathaddress':
 	            case 'buriedaddress':
-	            {			// address not currently supported
+	            {			        // address not currently supported
 	                $eventAddress		= $value;
 	                break;
-	            }			// address not currently supported
+	            }			        // address not currently supported
 	
 	            case 'birthnote':
 	            case 'chrisnote':
@@ -496,8 +499,8 @@ try {
 	            case 'confirmationnote':
 	            case 'initiatorynote':
 	            case 'eventdescn':
-	            {
-	                $eventDescn		= $value;
+	            {                   // event notes
+	                $eventDescn		    = $value;
 	                if ($event)
 	                    $event->set('description', $eventDescn);
 	                else
@@ -507,10 +510,10 @@ try {
 	                    ' $_POST=' . print_r($_POST, true) . "\n");
 	                }
 	                break;
-	            }
+	            }                   // event notes
 	
 	            case 'eventpref':
-	            {
+	            {                   // preferred event flag
 	                if (is_string($value) &&
 	                    strlen($value) > 0 &&
 	                    strtolower($value) != 'n')
@@ -518,10 +521,10 @@ try {
 	                else
 	                    $event->set('preferred', 0);
 	                break;
-	            }
+	            }                   // preferred event flag
 	
 	            case 'eventidet':
-	            {
+	            {                   // event type
 	                if (is_int($value) || ctype_digit($value))
 	                {
 	                    switch(intval($value))
@@ -562,38 +565,38 @@ try {
 	                    $event->set('idet', $value);
 	                }
 	                break;
-	            }
+	            }                   // event type
 	
 	            case 'eventcittype':
-	            {
-	                $cittype		= intval($value);
+	            {                   // citation type
+	                $cittype		        = intval($value);
 	                break;
-	            }
+	            }                   // citation type
 	
 	            case 'eventorder':
-	            {
+	            {                   // event sort order
 	                if (is_int($value) || ctype_digit($value))
 	                    if ($event)
 	                        $event->set('order', $value);
 	                break;
-	            }
+	            }                   // event sort order
 	
 	            case 'eventsd':
-	            {			// this is set by Event::setDate
-	                $eventSd		= $value;
+	            {			        // this is set by Event::setDate
+	                $eventSd		        = $value;
 	                break;
-	            }			// this is set by Event::setDate
+	            }			        // this is set by Event::setDate
 	            
 	            case 'eventchanged':
 	            {
 	                if (canUser('edit') && $value != '0')
-	                {		            // user authorized to update database
+	                {		        // user authorized to update database
 	                    if ($person)
 	                        $event->setAssociatedRecord($person);
 	                    if (strlen($eventDate) > 0 ||
 	                        strlen($eventLocation) > 0 ||
 	                        strlen($eventDescn) > 0)
-	                    {	            // have an event
+	                    {	        // have an event
 	                        if ($idir > 0 && !is_null($event))
 	                        {
 	                            $event->save(false);
@@ -603,34 +606,34 @@ try {
 	                            print "$comma\"event$ider\": " .
 	                                            $event->toJson(false);
 	                            if ($clearEvent != '')
-	                            {	    // clear event information in tblIR
+	                            {	// clear event information in tblIR
 	                                $person->clearEvent($clearEvent);
 	                                if ($clearEvent == 'birth')
 	                                {
 	                                    $person->set('birthsd',
 	                                        $event->get('eventsd'));
 	                                }
-	                            }	    // clear event information in tblIR
+	                            }	// clear event information in tblIR
 	                        }
 	                        else
-	                        {	        // defer until IDIR known
+	                        {	    // defer until IDIR known
 	                            $events[]		= $event;	// track
-	                        }	        // defer until IDIR known
-	                    }	            // have an event
+	                        }	    // defer until IDIR known
+	                    }	        // have an event
 	                    else
-	                    {	            // no event information
+	                    {	        // no event information
 	                        if ($ider > 0)
-	                        {	        // existing record in tblER
+	                        {	    // existing record in tblER
 	                            $event->delete(true);
-	                        }	        // existing record in tblER
+	                        }	    // existing record in tblER
 	    
 	                        if ($clearEvent != '')
-	                        {	        // clear event information in tblIR
+	                        {	    // clear event information in tblIR
 	                            $person->clearEvent($clearEvent);
-	                        }	        // clear event information in tblIR
-	                    }	            // no event information
+	                        }	    // clear event information in tblIR
+	                    }	        // no event information
 	
-	                }		            // user authorized to update database
+	                }		        // user authorized to update database
 	
 	                // reset for next event
 	                $event			    = null;
@@ -903,5 +906,5 @@ try {
 if (strlen($msg) > 0)
     print "$comma\"msg\" : \"$msg\"\n";
 
-// close off the XML response file
+// close off the JSON response file
 print "}\n";

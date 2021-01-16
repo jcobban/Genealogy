@@ -41,8 +41,9 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2016/01/21		use class Census to get census information		*
  *		2017/10/25		use class RecordSet								*
+ *		2020/12/01      eliminate XSS vulnerabilities                   *
  *																		*
- * Copyright 2016 &copy; James A. Cobban								*
+ * Copyright 2020 &copy; James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Census.inc';
@@ -64,35 +65,36 @@ $sched		= '1';
 $getParms	= array();
 
 foreach ($_POST as $key => $value)
-{		// loop through district numbers
+{		            // loop through parameters
     // format the parmlist for reply
     if (is_array($value))
     {
         foreach($value as $avalue)
         {
-    		$parmList	.= $amp . $key . '[]=' . $avalue;
+    		$parmList	.= $amp . $key . '[]=' . htmlspecialchars($avalue);
     		$amp		= '&amp;';
         }
     }
     else
-        $parmList	.= $amp . $key . '=' . $value;
+        $parmList	.= $amp . $key . '=' . htmlspecialchars($value);
     $amp	= '&amp;';
 
     switch(strtolower($key))
-    {		// act on specific key
+    {		        // act on specific key
         case 'census':
         {
     		$census	= $value;
     		$censusRec	= new Census(array('censusid'	=> $value,
     						   'collective'	=> 0));
     		if(!$censusRec->isExisting())
-    		    $msg	.= "Census='$value' is invalid. ";
+                $msg	.= "Census='" . htmlspecialshars($value) . 
+                            "' is invalid. ";
     		$getParms['census']	= $census;
     		break;
         }
 
         case 'district':
-        {		// occurs multiple times if multi-selection
+        {		    // occurs multiple times if multi-selection
     		if (is_array($value))
     		    $dists	= $value;
     		else
@@ -107,21 +109,25 @@ foreach ($_POST as $key => $value)
     		}		// District value is an array
     		$distList	= implode(',', $dists);
     		break;
-        }		// occurs multiple times if multi-selection
+        }		    // occurs multiple times if multi-selection
 
         case 'sched':
-        {		// schedule identifier
+        {		    // schedule identifier
     		$sched		= $value;
     		break;
-        }		// schedule identifier
+        }		    // schedule identifier
+
+        case 'debug':
+            break;          // already handled
 
         default:
-        {		// anything else
-    		$msg	.= "Unexpected parameter $key='$value'. ";
+        {		    // anything else
+            $msg	.= "Unexpected parameter $key='" .
+                        htmlspecialchars($value) . "'. ";
     		break;
-        }		// anything else
-    }		// act on specific key
-}		// loop through parameters
+        }		    // anything else
+    }		        // act on specific key
+}		            // loop through parameters
 if (count($getParms) == 0)
     $msg		.= "No parameters passed by method='post'. ";
 $getParms['sched']		= $sched;

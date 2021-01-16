@@ -1,0 +1,647 @@
+<!--*********************************************************************
+ *  reqReportIndividsen.html     										*
+ *																		*
+ *  Prompt the user to enter parameters for a search of the 			*
+ *  Family Tree database.                                               *
+ *																		*
+ *  History:															*
+ *		2020/12/22      use class Template                              *
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+      <div id="breadcrumbs" class="hidden">
+        <a href="/genealogy.php?lang=$LANG">
+            Genealogy</a>:
+        <a href='/FamilyTree/Services.php?lang=$LANG'>
+    	    Services
+        </a>:
+      </div>
+      <div class='body'>
+        <h1>Request Report on Persons in the Family Tree
+          <span class='right'>
+        	<a href='reqReportIndividsHelpen.html' target='_blank'>Help?</a>
+          </span>
+          <div style='clear: both;'></div>
+        </h1>
+        $TRACE
+        $MSG
+      <form action="reportIndivids.php" method="get" id="reqForm">
+		<input type="hidden" name="debug" id="debug" value="$DEBUG">
+	      <div class="row">
+			<div class="column1">
+			  <label class="column1" for="chooseFields">
+			    Fields:
+			  </label>
+			  <select id="chooseFields" size="10" class="white left">
+			    <option value="0">Choose fields to include
+				</option>
+			    <option value="tblIR.IDIR">Link to Details
+				</option>
+			    <option value="tblIR.FSID">
+					Person ID from FamilySearch
+				</option>
+			    <option value="tblIR.Surname">Surname
+				</option>
+			    <option value="tblIR.SoundsLike">Surname Soundex Code
+				</option>
+			    <option value="tblIR.GivenName">GivenName
+				</option>
+			    <option value="tblIR.Prefix">Name Prefix
+				</option>
+			    <option value="tblIR.Title">Name Title
+				</option>
+			    <option value="tblIR.NameNote">Name Note
+				</option>
+			    <option value="tblIR.Gender">Gender
+				</option>
+			    <option value="tblIR.BirthD">Birth Date
+				</option>
+			    <option value="tblIR.IDLRBirth">Birth Location
+				</option>
+			    <option value="tblIR.BirthNote">Birth Note
+				</option>
+			    <option value="tblIR.ChrisD">Christening Date
+				</option>
+			    <option value="tblIR.IDLRChris">Christening Location
+				</option>
+			    <option value="tblIR.ChrisNote">Christening Note
+				</option>
+			    <option value="tblIR.ChrTerm">Christening Term
+				</option>
+			    <option value="tblER.EventD">Event Date
+				</option>
+			    <option value="tblER.Description">Event Description
+				</option>
+			    <option value="tblER.Desc">Event Note
+				</option>
+			    <option value="tblER.IDLREvent">Event Location
+				</option>
+			    <option value="tblIR.DeathD">Death Date
+				</option>
+			    <option value="tblIR.IDLRDeath">Death Location
+				</option>
+			    <option value="tblIR.DeathCause">Cause of Death
+				</option>
+			    <option value="tblIR.DeathNote">Death Note
+				</option>
+			    <option value="tblIR.BuriedD">Buried Date
+				</option>
+			    <option value="tblIR.BuriedNote">Buried Note
+				</option>
+			    <option value="tblIR.IDLRBuried">Buried Location
+				</option>
+			    <option value="tblIR.Cremated">Cremated?
+				</option>
+			    <option value="tblIR.Living">Living
+				</option>
+			    <option value="tblIR.BaptismD">LDS Baptism Date 
+				</option>
+			    <option value="tblIR.BaptismKind">LDS Baptism Kind
+				</option>
+			    <option value="tblIR.IDTRBaptism">LDS Baptism Location
+				</option>
+			    <option value="tblIR.BaptismNote">LDS Baptism Note
+				</option>
+			    <option value="tblIR.LDSB">LDS Baptism Temple Ready
+				</option>
+			    <option value="tblIR.EndowD">LDS Endowment Date
+				</option>
+			    <option value="tblIR.IDTREndow">LDS Endowment Location
+				</option>
+			    <option value="tblIR.LDSE">LDS Endowment Temple Ready
+				</option>
+			    <option value="tblIR.EndowNote">LDS Endowment Note
+				</option>
+			    <option value="tblIR.ConfirmationD">LDS Confirmation Date
+				</option>
+			    <option value="tblIR.ConfirmationKind">LDS Confirmation Date
+				</option>
+			    <option value="tblIR.IDTRConfirmation">LDS Confirmation Location
+				</option>
+			    <option value="tblIR.ConfirmationNote">LDS Confirmation Note
+				</option>
+			    <option value="tblIR.LDSC">LDS Confirmation Temple Ready
+				</option>
+			    <option value="tblIR.InitiatoryD">LDS Initiatory Date
+				</option>
+			    <option value="tblIR.IDTRInitiatory">LDS Initiatory Location
+				</option>
+			    <option value="tblIR.InitiatoryNote">LDS Initiatory Note
+				</option>
+			    <option value="tblIR.LDSI">LDS Initiatory Temple Ready
+				</option>
+			    <option value="tblIR.IDMRPref">Preferred Marriage
+				</option>
+			    <option value="tblIR.IDMRParents">Preferred Parents
+				</option>
+			    <option value="tblIR.IDAR">Mailing Address
+				</option>
+			    <option value="tblIR.AncInterest">Ancestor Interest Level
+				</option>
+			    <option value="tblIR.DecInterest">Descendant Interest Level
+				</option>
+			    <option value="tblIR.Tag1">Tag1
+				</option>
+			    <option value="tblIR.Tag2">Tag2
+				</option>
+			    <option value="tblIR.Tag3">Tag3
+				</option>
+			    <option value="tblIR.Tag4">Tag4
+				</option>
+			    <option value="tblIR.Tag5">Tag5
+				</option>
+			    <option value="tblIR.Tag6">Tag6
+				</option>
+			    <option value="tblIR.Tag7">Tag7
+				</option>
+			    <option value="tblIR.Tag8">Tag8
+				</option>
+			    <option value="tblIR.Tag9">Tag9
+				</option>
+			    <option value="tblIR.TagGroup">TagGroup
+				</option>
+			    <option value="tblIR.TagAnc">TagAnc
+				</option>
+			    <option value="tblIR.TagDec">TagDec
+				</option>
+			    <option value="tblIR.SaveTag">Save Tag
+				</option>
+			    <option value="tblIR.qsTag">qs Tag
+				</option>
+			    <option value="tblIR.SrchTagIGI">Search Tag IGI
+				</option>
+			    <option value="tblIR.SrchTagRG">Search Tag RG
+				</option>
+			    <option value="tblIR.SrchTagFS">Search Tag FS
+				</option>
+			    <option value="tblIR.RGExclude">RG Exclude
+				</option>
+			    <option value="tblIR.ReminderTag">Reminder Tag
+				</option>
+			    <option value="tblIR.ReminderTagDeath">Reminder Tag Death
+				</option>
+			    <option value="tblIR.TreeNum">Tree Number
+				</option>
+			    <option value="tblIR.UserRef">User ID/Number
+				</option>
+			    <option value="tblIR.AncestralRef">Ancestral File Number
+				</option>
+			    <option value="tblIR.Notes">General Notes
+				</option>
+			    <option value="tblIR.References">Research Notes
+				</option>
+			    <option value="tblIR.Medical">Medical Notes
+				</option>
+			    <option value="tblIR.PPCheck">Potential Problems Exist,
+				</option>
+			    <option value="tblIR.Imported">was imported
+				</option>
+			    <option value="tblIR.Added">date record was added
+				</option>
+			    <option value="tblIR.AddedTime">time record was added
+				</option>
+			    <option value="tblIR.Updated">date record was modified
+				</option>
+			    <option value="tblIR.UpdatedTime">time record was modified
+				</option>
+			    <option value="tblIR.Relations">encoded relationship string.
+				</option>
+			    <option value="tblIR.IntelliShare">IntelliShare
+				</option>
+			    <option value="tblIR.NeverMarried">Never Married
+				</option>
+			    <option value="tblIR.DirectLine">Direct Line
+				</option>
+			    <option value="tblIR.ColorTag">Mary Hill ancestor colors
+				</option>
+			    <option value="tblIR.Private">Private
+				</option>
+			    <option value="tblIR.PPExclude">Exclude from Potential Problems Report
+				</option>
+			    <option value="tblIR.DNA">DNA
+				</option>
+			  </select>
+			</div>
+			<div class="column2">
+			  <label class="column2" for="chooseSort" class="label">
+			    Order By:
+			  </label>
+			  <select id="chooseSort" size="10" class="white left">
+			    <option value="tblIR.0">Choose fields to sort on
+				</option>
+			    <option value="tblIR.IDIR">Numeric Key
+				</option>
+			    <option value="tblIR.FSID">
+					Person ID from FamilySearch
+				</option>
+			    <option value="tblIR.Surname">Surname
+				</option>
+			    <option value="tblIR.SoundsLike">Surname Soundex Code
+				</option>
+			    <option value="tblIR.GivenName">GivenName
+				</option>
+			    <option value="tblIR.Prefix">Name Prefix
+				</option>
+			    <option value="tblIR.Title">Name Title
+				</option>
+			    <option value="tblIR.NameNote">Name Note
+				</option>
+			    <option value="tblIR.Gender">Gender
+				</option>
+			    <option value="tblIR.BirthSD">Birth Date
+				</option>
+			    <option value="tblIR.IDLRBirth">Birth Location
+				</option>
+			    <option value="tblIR.ChrisSD">Christening Date
+				</option>
+			    <option value="tblIR.IDLRChris">Christening Location
+				</option>
+			    <option value="tblIR.ChrTerm">Christening Term
+				</option>
+			    <option value="tblER.EventSD">Event Date
+				</option>
+			    <option value="tblER.IDLREvent">Event Location
+				</option>
+			    <option value="tblIR.DeathSD">Death Date
+				</option>
+			    <option value="tblIR.IDLRDeath">Death Location
+				</option>
+			    <option value="tblIR.BuriedSD">Buried Date
+				</option>
+			    <option value="tblIR.IDLRBuried">Buried Location
+				</option>
+			    <option value="tblIR.Cremated">Cremated?
+				</option>
+			    <option value="tblIR.BirthNote">Birth Note
+				</option>
+			    <option value="tblIR.ChrisNote">Christening Note
+				</option>
+			    <option value="tblIR.DeathNote">Death Note
+				</option>
+			    <option value="tblIR.BuriedNote">Buried Note
+				</option>
+			    <option value="tblIR.BaptismNote">LDS Baptism Note
+				</option>
+			    <option value="tblIR.EndowNote">LDS Endowment Note
+				</option>
+			    <option value="tblIR.Living">Living
+				</option>
+			    <option value="tblIR.BaptismSD">LDS Baptism Date 
+				</option>
+			    <option value="tblIR.BaptismKind">LDS Baptism Kind
+				</option>
+			    <option value="tblIR.IDTRBaptism">LDS Baptism Location
+				</option>
+			    <option value="tblIR.LDSB">LDS Baptism Temple Ready
+				</option>
+			    <option value="tblIR.EndowSD">LDS Endowment Date
+				</option>
+			    <option value="tblIR.IDTREndow">LDS Endowment Location
+				</option>
+			    <option value="tblIR.LDSE">LDS Endowment Temple Ready
+				</option>
+			    <option value="tblIR.ConfirmationSD">LDS Confirmation Date
+				</option>
+			    <option value="tblIR.ConfirmationKind">LDS Confirmation Date
+				</option>
+			    <option value="tblIR.IDTRConfirmation">LDS Confirmation Location
+				</option>
+			    <option value="tblIR.ConfirmationNote">LDS Confirmation Note
+				</option>
+			    <option value="tblIR.LDSC">LDS Confirmation Temple Ready
+				</option>
+			    <option value="tblIR.InitiatorySD">LDS Initiatory Date
+				</option>
+			    <option value="tblIR.IDTRInitiatory">LDS Initiatory Location
+				</option>
+			    <option value="tblIR.InitiatoryNote">LDS Initiatory Note
+				</option>
+			    <option value="tblIR.LDSI">LDS Initiatory Temple Ready
+				</option>
+			    <option value="tblIR.IDMRPref">Preferred Marriage
+				</option>
+			    <option value="tblIR.IDMRParents">Preferred Parents
+				</option>
+			    <option value="tblIR.IDAR">Mailing Address
+				</option>
+			    <option value="tblIR.AncInterest">Ancestor Interest Level
+				</option>
+			    <option value="tblIR.DecInterest">Descendant Interest Level
+				</option>
+			    <option value="tblIR.Tag1">Tag1
+				</option>
+			    <option value="tblIR.Tag2">Tag2
+				</option>
+			    <option value="tblIR.Tag3">Tag3
+				</option>
+			    <option value="tblIR.Tag4">Tag4
+				</option>
+			    <option value="tblIR.Tag5">Tag5
+				</option>
+			    <option value="tblIR.Tag6">Tag6
+				</option>
+			    <option value="tblIR.Tag7">Tag7
+				</option>
+			    <option value="tblIR.Tag8">Tag8
+				</option>
+			    <option value="tblIR.Tag9">Tag9
+				</option>
+			    <option value="tblIR.TagGroup">TagGroup
+				</option>
+			    <option value="tblIR.TagAnc">TagAnc
+				</option>
+			    <option value="tblIR.TagDec">TagDec
+				</option>
+			    <option value="tblIR.SaveTag">Save Tag
+				</option>
+			    <option value="tblIR.qsTag">qs Tag
+				</option>
+			    <option value="tblIR.SrchTagIGI">Search Tag IGI
+				</option>
+			    <option value="tblIR.SrchTagRG">Search Tag RG
+				</option>
+			    <option value="tblIR.SrchTagFS">Search Tag FS
+				</option>
+			    <option value="tblIR.RGExclude">RG Exclude
+				</option>
+			    <option value="tblIR.ReminderTag">Reminder Tag
+				</option>
+			    <option value="tblIR.ReminderTagDeath">Reminder Tag Death
+				</option>
+			    <option value="tblIR.TreeNum">Tree Number
+				</option>
+			    <option value="tblIR.UserRef">User ID/Number
+				</option>
+			    <option value="tblIR.AncestralRef">Ancestral File Number
+				</option>
+			    <option value="tblIR.Notes">General Notes
+				</option>
+			    <option value="tblIR.References">Research Notes
+				</option>
+			    <option value="tblIR.Medical">Medical Notes
+				</option>
+			    <option value="tblIR.DeathCause">Cause of Death
+				</option>
+			    <option value="tblIR.PPCheck">Potential Problems Exist,
+				</option>
+			    <option value="tblIR.Imported">was imported
+				</option>
+			    <option value="tblIR.Added">date record was added
+				</option>
+			    <option value="tblIR.AddedTime">time record was added
+				</option>
+			    <option value="tblIR.Updated">date record was modified
+				</option>
+			    <option value="tblIR.UpdatedTime">time record was modified
+				</option>
+			    <option value="tblIR.Relations">encoded relationship string.
+				</option>
+			    <option value="tblIR.IntelliShare">IntelliShare
+				</option>
+			    <option value="tblIR.NeverMarried">Never Married
+				</option>
+			    <option value="tblIR.DirectLine">Direct Line
+				</option>
+			    <option value="tblIR.ColorTag">Mary Hill ancestor colors
+				</option>
+			    <option value="tblIR.Private">Private
+				</option>
+			    <option value="tblIR.PPExclude">Exclude from Potential Problems Report
+				</option>
+			    <option value="tblIR.DNA">DNA
+				</option>
+			  </select>
+			</div>
+			<div style="clear: both;"></div>
+	      </div>
+	      <div class="row">
+			<div class="column1">
+			  <label class="column1" for="fields">Chosen:</label>
+			  <select name="fields[]" id="fields" size="10" multiple="multiple"
+					class="white left">
+			  </select>
+			</div>
+			<div class="column2">
+			  <label class="column2" for="orderby">Chosen:</label>
+			  <select name="orderby[]" id="orderby" size="10" multiple="multiple"
+					class="white left">
+			  </select>
+			</div>
+			<div style="clear: both;"></div>
+	      </div>
+	      <div class="row">
+			<div class="column1">
+			  <label class="column1" for="GivenName">
+			    Given Name:
+			  </label>
+			  <input type="text" size="32" maxlength="120" 
+					name="GivenName" id="GivenName"
+					class="white left">
+			</div>
+			<div class="column2">
+			  <label class="column2" for="Surname">
+			    Surname:
+			  </label>
+			  <input type="text" size="32" maxlength="120" 
+					name="Surname" id="Surname"
+					class="white left">
+			</div>
+			<div style="clear: both;"></div>
+	      </div>
+	      <div class="row">
+			<div class="column1">
+			  <label class="column1" for="Gender">
+			    Gender:
+			  </label>
+			  <select name="Gender" id="Gender" size="1" class="white left">
+			    <option value="">Don't Care
+                </option>
+			    <option value="0">Male
+                </option>
+			    <option value="1">Female
+                </option>
+			    <option value="2">Unknown
+                </option>
+			  </select>
+			</div>
+			<div style="clear: both;"></div>
+	      </div>
+	      <div class="row">
+			<div class="column1">
+			  <label class="column1" for="IDLRBirth">
+			    Birth Place:
+			  </label>
+			  <input type="text" size="32" maxlength="255" 
+					name="IDLRBirth" id="IDLRBirth"
+					class="white left">
+			</div>
+			<div class="column2">
+			  <label class="column2" for="BirthDate">
+			    Date:
+			  </label>
+			  <input type="text" size="12" maxlength="255" 
+					name="BirthDate" id="BirthDate"
+					class="white left">
+			</div>
+			<div style="clear: both;"></div>
+	      </div>
+	      <div class="row">
+			<div class="column1">
+			  <label class="column1" for="IDLRChris">
+			    Christening Place:
+			  </label>
+			  <input type="text" size="32" maxlength="255" 
+					name="IDLRChris" id="IDLRChris"
+					class="white left">
+			</div>
+			<div class="column2">
+			  <label class="column2" for="ChrisDate">
+			    Date:
+			  </label>
+			  <input type="text" size="12" maxlength="255" 
+					name="ChrisDate" id="ChrisDate"
+					class="white left">
+			</div>
+			<div style="clear: both;"></div>
+	      </div>
+	      <div class="row">
+			<div class="column1">
+			  <label class="column1" for="IDLREvent">
+			    Event Place:
+			  </label>
+			  <input type="text" size="32" maxlength="255" 
+					name="IDLREvent" id="IDLREvent"
+					class="white left">
+			</div>
+			<div class="column2">
+			  <label class="column2" for="EventDate">
+			    Date:
+			  </label>
+			  <input type="text" size="12" maxlength="255" 
+					name="EventDate" id="EventDate"
+					class="white left">
+			</div>
+			<div class="column2">
+			  <label class="column2" for="Description">
+			    Description:
+			  </label>
+			  <input type="text" size="12" maxlength="255" 
+					name="Description" id="Description"
+					class="white left">
+			</div>
+			<div style="clear: both;"></div>
+	      </div>
+	      <div class="row">
+			<div class="column1">
+			  <label class="column1" for="IDLRDeath">
+			    Death Place:
+			  </label>
+			  <input type="text" size="32" maxlength="255" 
+					name="IDLRDeath" id="IDLRDeath"
+					class="white left">
+			</div>
+			<div class="column2">
+			  <label class="column2" for="DeathDate">
+			    Date:
+			  </label>
+			  <input type="text" size="12" maxlength="255" 
+					name="DeathDate" id="DeathDate"
+					class="white left">
+			</div>
+			<div class="column2">
+			  <label class="column2" for="DeathCause">
+			    Cause:
+			  </label>
+			  <input type="text" size="12" maxlength="255" 
+					name="DeathCause" id="DeathCause"
+					class="white left">
+			</div>
+			<div style="clear: both;"></div>
+	      </div>
+	      <div class="row">
+			<div class="column1">
+			  <label class="column1" for="IDLRBuried">
+			    Buried Place:
+			  </label>
+			  <input type="text" size="32" maxlength="255"
+					name="IDLRBuried" id="IDLRBuried"
+					class="white left">
+			</div>
+			<div class="column2">
+			  <label class="column2" for="BuriedDate">
+			    Date:
+			  </label>
+			  <input type="text" size="12" maxlength="255" 
+					name="BuriedDate" id="BuriedDate"
+					class="white left">
+			</div>
+			<div style="clear: both;"></div>
+	      </div>
+	      <p>
+			<button type="submit" id="Submit">Request</button>
+	      </p>
+	  </form>
+
+    </div> <!-- end of <div id='body'> -->
+    <div class="balloon" id="HelpchooseFields">
+        Use the mouse to click on those fields that you wish to include in the report. 
+    </div>
+    <div class="balloon" id="Helpfields">
+        List of fields that you have chosen to include in the report.
+    </div>
+    <div class="balloon" id="HelpchooseSort">
+        Use the mouse to click on the fields to be used for sorting the report.
+    </div>
+    <div class="balloon" id="Helporderby">
+        List of fields that you have chosen to use to sort the report.
+    </div>
+    <div class="balloon" id="HelpSurname">
+        If you wish to restrict the report to only include individuals with a
+        particular surname, enter it here.
+    </div>
+    <div class="balloon" id="HelpGivenName">
+        To do GivenName.
+    </div>
+    <div class="balloon" id="HelpGender">
+        To do Gender.
+    </div>
+    <div class="balloon" id="HelpIDLRBirth">
+        To do Birth Place.
+    </div>
+    <div class="balloon" id="HelpBirthDate">
+        To do Birth Date.
+    </div>
+    <div class="balloon" id="HelpIDLRChris">
+        To do Christening Place.
+    </div>
+    <div class="balloon" id="HelpChrisDate">
+        To do Christening Date.
+    </div>
+    <div class="balloon" id="HelpIDLRDeath">
+        To do Death Place.
+    </div>
+    <div class="balloon" id="HelpDeathDate">
+        To do Death Date.
+    </div>
+    <div class="balloon" id="HelpIDLRBuried">
+        To do Buried Place.
+    </div>
+    <div class="balloon" id="HelpEventDate">
+        To do Event Date.
+    </div>
+    <div class="balloon" id="HelpIDLREvent">
+        To do Event Place.
+    </div>
+    <div class="balloon" id="HelpEventDate">
+        To do Event Date.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+        Click on this button with the mouse to request the report, or press the
+        Enter key while in a normal text input field.
+    </div>
+    <!--  The remainder of the web page consists of divisions containing
+        context specific help.  Including this information here ensures -->
+	<script src="/jscripts/js20/http.js" type="text/javascript"></script>
+	<script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+	<script src="/jscripts/util.js" type="text/javascript"></script>
+	<script src="/FamilyTree/reqReportIndivids.js" type="text/javascript"></script>

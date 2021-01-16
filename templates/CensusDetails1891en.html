@@ -5,14 +5,15 @@
  *																		*
  *  History:															*
  *		2018/11/07		created											*
+ *      2020/12/01      message texts moved to common template          *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
     <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
     <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>:
-    <a href="/database/QueryDetail.php?Census=CA1891&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;lang=$LANG">
+    <a href="/database/QueryDetail.php?Census=CA1891&amp;Province=$PROVINCE&amp;lang=$LANG">
 		1891 Census Search
     </a>: 
     <a onclick="history.back(); return false;" href="dummy">
@@ -333,25 +334,7 @@
      </tbody>
     </table>
   </div> <!-- class="body" -->
-  <div class="hidden" id="templates">
-      <span id="invalidCensusId">
-          Invalid value of CensusID='$value'. 
-      </span>
-      <span id="invalidDomainId">
-          '$state' is not a supported province/state identifier
-          for country code '$cc'. 
-      </span>
-      <span id="invalidDistId">
-          District='$value' is not defined within the Census.
-      </span>
-      <span id="invalidSubdistId">
-          SubDistrict='$value' Division='$div'
-          is not defined within the District. 
-      </span>
-      <span id="invalidPage">
-          Page='$value' is not defined within the SubDistrict.
-      </span>
-  </div>
+  $MESSAGES
     <script src="/jscripts/util.js" type="application/javaScript">
     </script>
  

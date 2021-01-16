@@ -29,77 +29,112 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // default parameter values
 $idir                       = null;
+$idirtext                   = null;
 $personName                 = null;
 $pattern	                = '';
 $offset	                    = 0;
+$offsettext                 = null;
 $limit	                    = 20;
+$limittext                  = null;
 $lang                       = 'en';
 
 // get parameter values
-foreach($_GET as $key => $value)
-{                           // loop through parameters
-	switch(strtolower($key))
-    {		                // take action based upon key
-        case 'idir':
-        {
-            if (ctype_digit($value))
-                $idir       = (int)$value;
-            break;
-        }
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{                           // loop through parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
+		switch(strtolower($key))
+	    {		                // take action based upon key
+	        case 'idir':
+	        {
+	            if (ctype_digit($value))
+	                $idir       = (int)$value;
+	            else
+	                $idirtext   = htmlspecialchars($value);
+	            break;
+	        }
+	
+		    case 'pattern':
+		    {
+				$value		    = str_replace('\\','',$value);
+				if (preg_match('/[\w ]*\[[\w ]*$/', $value) == 1)
+				{
+				    $pattern	= str_replace('[','\[',$value);
+				}
+				else
+				    $pattern	= $value;
+				break;
+		    }
+	
+		    case 'offset':
+		    {
+				if (ctype_digit($value))
+				    $offset	    = intval($value);
+				else
+	                $offsettext = htmlspecialchars($value);
+				break;
+		    }
+	
+		    case 'limit':
+		    {
+				if (ctype_digit($value) && $value >= 10)
+				    $limit	    = intval($value);
+				else
+	                $limittext  = htmlspecialchars($value);
+				break;
+	        }
+	
+	        case 'lang':
+	        {                   // preferred language
+	            $lang       = FtTemplate::validateLang($value);
+	            break;
+	        }                   // preferred language
+	
+		}		                // take action based upon key
+	}                           // loop through parameters
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}			            // invoked by method=get
 
-	    case 'pattern':
-	    {
-			$value		    = str_replace('\\','',$value);
-			if (preg_match('/[\w ]*\[[\w ]*$/', $value) == 1)
-			{
-			    $pattern	= str_replace('[','\[',$value);
-			}
-			else
-			    $pattern	= $value;
-			break;
-	    }
+$template		    		= new FtTemplate("ToDos$lang.html");
+$tranTab            		= $template->getTranslate();
+$tr                 		= $tranTab['tranTab'];
+$formatter          		= $template->getFormatter();
 
-	    case 'offset':
-	    {
-			if (ctype_digit($value))
-			    $offset	= intval($value);
-			else
-			    $msg	    .= "Invalid Offset='$value'. ";
-			break;
-	    }
+// report on problems with parameters
+if (is_string($idirtext))
+{
+    $text                   = $template['invalidIdir']->innerHTML;
+    $msg                    .= str_replace('$idirtext',$idirtext, $text);
+} 
+if (is_string($offsettext))
+{
+    $text                   = $template['invalidOffset']->outerHTML;
+    $warn	                .= str_replace('$offsettext',$offsettext, $text);
+} 
+if (is_string($limittext))
+{
+    $text                   = $template['invalidLimit']->outerHTML;
+    $warn	                .= str_replace('$limittext',$limittext, $text);
+} 
 
-	    case 'limit':
-	    {
-			if (ctype_digit($value))
-			    $limit	= intval($value);
-			else
-			    $msg	    .= "Invalid Limit='$value'. ";
-			break;
-        }
-
-        case 'lang':
-        {                   // preferred language
-            if (strlen($value) == 2)
-                $lang       = strtolower($value);
-        }                   // preferred language
-
-	}		                // take action based upon key
-}                           // loop through parameters
-
-$template		= new FtTemplate("ToDos$lang.html");
-$tranTab        = $template->getTranslate();
-$tr             = $tranTab['tranTab'];      // instance of TemplateTag
-$formatter                          = $template->getFormatter();
-
+// set substitutions for the template display
 $template->set('IDIR',          $idir);
-$template->set('PATTERN',       $pattern);
+$template->set('PATTERN',       htmlspecialchars($pattern));
 $template->set('UPATTERN',      urlencode($pattern));
 $template->set('OFFSET',        $offset);
 $template->set('LIMIT',         $limit);
 $template->set('LANG',          $lang);
 
-$prevoffset	= $offset - $limit;
-$nextoffset	= $offset + $limit;
+$prevoffset	                = $offset - $limit;
+$nextoffset	                = $offset + $limit;
 $template->set('PREVOFFSET',    $prevoffset);
 $template->set('NEXTOFFSET',    $nextoffset);
 
@@ -148,11 +183,11 @@ if (strlen($msg) == 0)
 	else
     {			// got some results
         $template->updateTag('nomatches', null);
-        $template->set('COUNT', $formatter->format($count));
-	    $template->set('OFFSET', $offset);
-	    $template->set('FIRST', $offset + 1);
+        $template->set('COUNT',         $formatter->format($count));
+	    $template->set('OFFSET',        $offset);
+	    $template->set('FIRST',         $offset + 1);
 		$last	        = min($nextoffset, $count);
-	    $template->set('LAST', $last);
+	    $template->set('LAST',          $last);
 		if ($prevoffset < 0)
 	    {	// no previous page of output to display
 	        $template->updateTag('topPrev', null);
@@ -163,7 +198,7 @@ if (strlen($msg) == 0)
         }	// no next page of output to display
 
         // display the results
-        $element            = $template['todo$IDTD'];
+        $element            = $template['item$IDTD'];
         $rowHtml            = $element->outerHTML();
         $data               = '';
 		foreach($todos as $idtd => $todo)
@@ -180,8 +215,12 @@ if (strlen($msg) == 0)
                 if ($person->isExisting())
                 {
                     $personName             = $person->getName($tr);
-                    $idir                   = $newidir;
                 }
+                else
+                {
+                    $personName             = 'Undefined';
+                }
+                $idir                       = $newidir;
             }
 		    $rtemplate->set('PERSONNAME',	$personName);
 		    $startd	                        = new LegacyDate($openedd);

@@ -151,6 +151,32 @@
 	    </table>
 	  </form>
 	</div> <!-- end of <div id="body"> -->
+    <div class="hidden" id="messages">
+      <span id="invalidRegYear">
+        RegYear $regyear doit être un numero entre 1860 et 2000. 
+      </span>
+      <span id="missingdRegYear">
+        RegYear parametre omis. 
+      </span>
+      <span id="invalidCode">
+        Le code de province ou état '$code' doit être une chaîne de
+        2 lettres latines. 
+      </span>
+      <span id="invalidDomain">
+        Le domaine '$domain' doit être une chaîne de 4 ou 5 lettres latines. 
+      </span>
+      <span id="unsupportedDomain">
+        Le domaine '$domain' doit être un code de pays à deux caractères
+        pris en charge suivi d'un code d'état ou de province.. 
+      </span>
+      <span id="invalidCounty">
+        L'identifiant de comté '$county' doit être une chaîne de lettres. 
+      </span>
+      <span id="unsupportedCounty">
+        Le code de comté '$county' n'est pas pris en charge
+        pour le domaine '$domain"'. 
+      </span>
+    </div>
 	<div class="balloon" id="HelpTownStats">
 		Cliquez sur ce bouton pour afficher un résumé des naissances
         transcrites pour la ville ou le canton spécifique.

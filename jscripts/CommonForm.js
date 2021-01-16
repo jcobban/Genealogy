@@ -142,15 +142,24 @@
  *                      use popupAlert in place of alert                *
  *      2020/06/06      add religion abbreviations                      *
  *      2020/06/09      improve date checking                           *
+ *      2020/10/14      improve date checking                           *
+ *      2020/11/13      change expansion of location "Us"               *
+ *      2021/01/11      improve URL check and include sample code       *
+ *                      to extract components of the URL                *
+ *      2021/01/12      drop support for IE 9 & 10.  That is browsers   *
+ *                      that or not compatible with ECMA ES6            *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
-var givenNames          = [];
-var options = {"timeout"    : false};
+/************************************************************************
+ *  Initialize nicknames table from server.                             *
+ ************************************************************************/
+var givenNames       = [];
 
 if (typeof HTTP === 'function')
 {                       // load nicknames table from database
+    let options             = {"timeout"    : false};
     HTTP.get('/getRecordJSON.php?table=Nicknames',
              gotNicknames,
              options);
@@ -181,7 +190,7 @@ function gotNicknames(obj)
  *      - for the relation of the informant to the deceased in a death  *
  *        record or to the child in a birth record                      *
  ************************************************************************/
-var RelAbbrs = {
+const RelAbbrs = {
                 "A"         : "Aunt",
                 "Ad"        : "Adopted-Daughter",
                 "As"        : "Adopted-Son",
@@ -232,7 +241,7 @@ var RelAbbrs = {
  *                                                                      *
  *  Table for expanding abbreviations for birth places                  *
  ************************************************************************/
-var BpAbbrs = {
+const  BpAbbrs = {
                 "1/4"       : "¼",
                 "1/3"       : "&#8531;",
                 "1/2"       : "½",
@@ -294,11 +303,11 @@ var BpAbbrs = {
                 "Sl"        : "Switzerland",
                 "Swi"       : "Switzerland",
                 "Sz"        : "Switzerland",
-                "U"         : "U. States",
+                "U"         : "United States of America",
                 "Uc"        : "Upper Canada",
-                "Us"        : "U. States",
-                "Usa"       : "USA",
-                "U.s."      : "U. States",
+                "Us"        : "United States of America",
+                "Usa"       : "United States of America",
+                "U.s."      : "United States of America",
                 "W"         : "Wales",
                 "Wi"        : "West Indies",
                 "["         : "[blank]"
@@ -309,9 +318,9 @@ var BpAbbrs = {
  *                                                                      *
  *  Table for expanding abbreviations for locations in Canada           *
  *  If changing this table also check BpAbbrs for birth places and      *
- *  AddrAbbrs for the addressin census records                          *
+ *  AddrAbbrs for the addresses in census records                       *
  ************************************************************************/
-var LocAbbrs = {
+const  LocAbbrs = {
                 "1/4"       : "¼",
                 "1/3"       : "&#8531;",
                 "1/2"       : "½",
@@ -386,8 +395,9 @@ var LocAbbrs = {
                 "Through"   : "through",
                 "To"        : "to",
                 "Uc"        : "Upper Canada",
-                "Us"        : "USA",
-                "Usa"       : "USA",
+                "U"         : "United States of America",
+                "Us"        : "United States of America",
+                "Usa"       : "United States of America",
                 "["         : "[blank]"
                 };
 
@@ -396,7 +406,7 @@ var LocAbbrs = {
  *                                                                      *
  *  Table for expanding abbreviations for religions                     *
  ************************************************************************/
-var RlgnAbbrs = {
+const  RlgnAbbrs = {
                 "7"         : "7th Day Adventist",
                 "A"         : "Anglican",
                 "An"        : "Anglican",
@@ -473,7 +483,7 @@ var RlgnAbbrs = {
  *                                                                      *
  *  Table for expanding abbreviations for occupations                   *
  ************************************************************************/
-var OccAbbrs = {
+const  OccAbbrs = {
                 "At"        : "at",
                 "And"       : "and",
                 "App"       : "Apprentice",
@@ -558,7 +568,7 @@ var OccAbbrs = {
  *                                                                      *
  *  Table for expanding abbreviations for surnames                      *
  ************************************************************************/
-var SurnAbbrs = {
+const  SurnAbbrs = {
                 "B"         : "Brown",
                 "Came"      : "Cameron",
                 "C"         : "Campbell",
@@ -604,7 +614,7 @@ var SurnAbbrs = {
  *                                                                      *
  *  Table for expanding abbreviations for given names                   *
  ************************************************************************/
-var GivnAbbrs = {
+const  GivnAbbrs = {
                 "A"         : "Annie",
                 "Al"        : "Alexander",
                 "Ad"        : "Archibald",
@@ -671,7 +681,7 @@ var GivnAbbrs = {
  *                                                                      *
  *  Table for expanding abbreviations for ethnic origins                *
  ************************************************************************/
-var OrigAbbrs = {
+const  OrigAbbrs = {
                 "Af"        : "African (Negro)",
                 "Am"        : "American",
                 "Au"        : "Austrian",
@@ -702,7 +712,7 @@ var OrigAbbrs = {
  *                                                                      *
  *  Table for expanding abbreviations for months                        *
  ************************************************************************/
-var MonthAbbrs = {
+const  MonthAbbrs = {
                 "A"         : "Apr",
                 "Ap"        : "Apr",
                 "Au"        : "Aug",
@@ -734,7 +744,7 @@ var MonthAbbrs = {
  *  Table for expanding abbreviations for residence types               *
  *  in pre-confederation census forms.                                  *
  ************************************************************************/
-var ResTypeAbbrs = {
+const  ResTypeAbbrs = {
                 "B"         : "Brick",
                 "F"         : "Frame",
                 "L"         : "Log",
@@ -750,7 +760,7 @@ var ResTypeAbbrs = {
  *                                                                      *
  *  Table for expanding abbreviations for places                        *
  ************************************************************************/
-var AddrAbbrs = {
+const  AddrAbbrs = {
                 "1/4"       : "¼",
                 "1/3"       : "&#8531;",
                 "1/2"       : "½",
@@ -797,7 +807,7 @@ var AddrAbbrs = {
  *  Table for expanding abbreviations for number of stories.  This is   *
  *  mostly to assist with insertion of symbol for 1/2.                  *
  ************************************************************************/
-var StoriesAbbrs = {
+const  StoriesAbbrs = {
                 "1/2"       : "½",
                 "11/2"      : "1½",
                 "21/2"      : "2½",
@@ -811,7 +821,7 @@ var StoriesAbbrs = {
  *  Table for expanding abbreviations for age to standardize            *
  *  representation of fractional ages.                                  *
  ************************************************************************/
-var AgeAbbrs = {
+const  AgeAbbrs = {
                 "1/12"      : "1m",
                 "2/12"      : "2m",
                 "3/12"      : "3m",
@@ -885,7 +895,7 @@ var AgeAbbrs = {
  *  Most of these are to override the default capitalization for        *
  *  prepositions used with surnames.                                    *
  ************************************************************************/
-var surnamePartAbbrs = {
+const  surnamePartAbbrs = {
                         "De"        : "de",
                         "Of"        : "of",
                         "Van"       : "van",
@@ -899,7 +909,7 @@ var surnamePartAbbrs = {
  *  prepositions and conjunctions and articles.  Others are to assist   *
  *  in corekt speling.                                                  *
  ************************************************************************/
-var CauseAbbrs = {
+const  CauseAbbrs = {
                 "1/2"           : "½",
                 "A"             : "a",
                 "Abt"           : "about",
@@ -909,6 +919,7 @@ var CauseAbbrs = {
                 "And"           : "and",
                 "As"            : "as",
                 "At"            : "at",
+                "Be"            : "before",
                 "Before"        : "before",
                 "By"            : "by",
                 "C"             : "Cancer",
@@ -925,6 +936,7 @@ var CauseAbbrs = {
                 "Ha"            : "Haemorrhage",
                 "Inflamation"   : "Inflammation",
                 "In"            : "in",
+                "Is"            : "is",
                 "M"             : "months",
                 "Many"          : "many",
                 "Month"         : "month",
@@ -958,7 +970,7 @@ var CauseAbbrs = {
  *                                                                      *
  *  Translate month names and abbreviations to indices.                 *
  ************************************************************************/
-var monTab  = {
+const  monTab  = {
                 ""          : 0,
                 "ja"        : 1,
                 "jan"       : 1,
@@ -1007,9 +1019,9 @@ var monTab  = {
 /************************************************************************
  *  preTab                                                              *
  *                                                                      *
- *  Prefix value based upon initial reserved word.                      *
+ *  Prefix value for dates based upon initial reserved word.            *
  ************************************************************************/
-var preTab  = {
+const  preTab  = {
                 ""              : 0,
                 'in'            : '0',
                 'on'            : '0',
@@ -1028,7 +1040,8 @@ var preTab  = {
                 'cal'           : 'h',
                 'calculated'    : 'h',
                 'from'          : 'F',
-                'to'            : 'T'
+                'to'            : 'T',
+                'q'             : 'Q'
                 };
 
 /************************************************************************
@@ -1056,9 +1069,9 @@ function capitalize(element)
             needCap     = false;    // do not capitalize rest of word
         }           // only upper case OK
         else
-        {           // any letter OK
+        {           // other letters
             needCap     = " .,;:+".indexOf(tmp.charAt(e)) >= 0;
-        }           // any letter OK
+        }           // other letters
     }               // scan value
     //alert("CommonForm.js: capitalize('" + element.value + "'): " + msg +
     //      ", returns '" + tmp + "'");
@@ -1075,29 +1088,27 @@ function capitalize(element)
  *  Input:                                                              *
  *      element     element to act on                                   *
  *      valid       true if the field value is valid                    *
- *              false if the field value is invalid                     *
+ *                  false if the field value is invalid                 *
  ************************************************************************/
 function setErrorFlag(element, valid)
 {
     var className   = element.className;
     // clear or set the error indicator if required by changing class name
-    var errpos      = className.indexOf('error');
+    var errpos      = className.indexOf(' error');
     if (errpos >= 0)
-    {       // error currently flagged
+    {           // error currently flagged
         // if valid value, clear the flag
         if (valid)
-            element.className   = className.substring(0, errpos) + 'black' +
-                              className.substring(errpos + 5);
-    }       // error currently flagged
+            element.className   = className.substring(0, errpos) +
+                                    className.substring(errpos + 6);
+    }           // error currently flagged
     else
-    {       // error not currently flagged
-        // if in error add flag to class name
+    {           // error not currently flagged
         if (!valid)
-        {
-            var spcpo       = className.indexOf(' ');
-            element.className   = 'error' + className.substring(spcpo);
-        }
-    }       // error not currently flagged
+        {       // if in error add flag to class name
+            element.className   = className + ' error';
+        }       // if in error add flag to class name
+    }           // error not currently flagged
 }       // function setErrorFlag
 
 /************************************************************************
@@ -1300,9 +1311,10 @@ function change()
  *  Take action when the user changes a date field                      *
  *                                                                      *
  *  Input:                                                              *
- *      this            an instance of an HTML input element.           *
+ *      this        an instance of an HTML input element.               *
+ *		ev          instance of 'change' Event                          *
  ************************************************************************/
-function dateChanged()
+function dateChanged(ev)
 {
     var form        = this.form;
 
@@ -1325,8 +1337,9 @@ function dateChanged()
  *                                                                      *
  *  Input:                                                              *
  *      this        an instance of an HTML input element.               *
+ *		ev          instance of 'change' Event                          *
  ************************************************************************/
-function surnameChanged()
+function surnameChanged(ev)
 {
     var form        = this.form;
 
@@ -1366,10 +1379,10 @@ function surnameChanged()
  *  upon the name.                                                      *
  *                                                                      *
  *  Input:                                                              *
- *      this    instance of <input> that invoked this function          *
- *                                                                      *
+ *      this        instance of <input> that invoked this function      *
+ *		ev          instance of 'change' Event                          *
  ************************************************************************/
-function givenChanged()
+function givenChanged(ev)
 {
     var form                                    = this.form;
     var givenName                               = this.value;
@@ -1445,11 +1458,12 @@ function givenChanged()
  *  name, otherwise the new page replaces the current page.             *
  *                                                                      *
  *  Input:                                                              *
- *      this            an instance of an HTML <button> element.        *
+ *      this        an instance of an HTML <button> element.            *
+ *		ev          instance of 'click' Event                           *
  ************************************************************************/
-function goToLink(event)
+function goToLink(ev)
 {
-    event.stopPropagation();
+    ev.stopPropagation();
     if (this.href)
     {       // new URL defined
         if (this.target)
@@ -1472,6 +1486,7 @@ function goToLink(event)
  *  function checkName                                                  *
  *                                                                      *
  *  Validate the current value of a field containing a name.            *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1488,6 +1503,7 @@ function checkName()
  *  function checkProvince                                              *
  *                                                                      *
  *  Validate the current value of a field containing a province code.   *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1503,6 +1519,7 @@ function checkProvince()
  *  function checkOccupation                                            *
  *                                                                      *
  *  Validate the current value of a field containing a occupation.      *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1510,7 +1527,7 @@ function checkProvince()
 function checkOccupation()
 {
     var element     = this;
-    var re      = /^[a-zA-Z\u00c0-\u00ff .'&\-\[\]?]*$/;
+    var re      = /^[a-zA-Z\u00c0-\u00ff\s\.,'&\-\[\]?]*$/;
     var occupation  = element.value;
     setErrorFlag(element, re.test(occupation));
 }       // function checkOccupation
@@ -1519,6 +1536,7 @@ function checkOccupation()
  *  function checkAddress                                               *
  *                                                                      *
  *  Validate the current value of a field containing a address.         *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1535,6 +1553,7 @@ function checkAddress()
  *  function checkText                                                  *
  *                                                                      *
  *  Validate the current value of a field containing text.              *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1551,6 +1570,7 @@ function checkText()
  *  function checkSex                                                   *
  *                                                                      *
  *  Validate the current value of a field containing a sex.             *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1567,6 +1587,7 @@ function checkSex()
  *  function checkMStat                                                 *
  *                                                                      *
  *  Validate the current value of a field containing a mstat.           *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1583,6 +1604,7 @@ function checkMStat()
  *  function checkFlag                                                  *
  *                                                                      *
  *  Validate the current value of a field containing a flag.            *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1599,6 +1621,7 @@ function checkFlag()
  *  function checkFlagSex                                               *
  *                                                                      *
  *  Validate the current value of a field containing a flag or a gender.*
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1615,6 +1638,7 @@ function checkFlagSex()
  *  function checkDate                                                  *
  *                                                                      *
  *  Validate the current value of a field containing a date.            *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1637,6 +1661,7 @@ function checkDate()
     var l0, n1, l2, l3, n3, pi, mi;
     if (matched)
     {
+        console.log('matched: ' + result.toString());
         var pref        = result[1].toLowerCase();  // prefix on date or month
         l0              = pref.length;
         pi              = preTab[pref];
@@ -1649,12 +1674,21 @@ function checkDate()
         else
             n1          = 0;
 
-        var month       = result[3].toLowerCase();
-        l2              = month.length;
-        if (l2 == 0)
-            mi          = pi;
+        if ((pi == 'Q' || result[3].toLowerCase() == 'q') && 
+            n1 >= 1 && n1 <= 4)
+        {
+            mi              = (3 * n1) - 2;
+            l2              = 1;
+        }
         else
-            mi          = monTab[month];
+        {
+	        var month       = result[3].toLowerCase();
+	        l2              = month.length;
+	        if (l2 == 0)
+	            mi          = pi;
+	        else
+	            mi          = monTab[month];
+        }
 
         var sndnum      = result[4];
         l3              = sndnum.length;
@@ -1666,6 +1700,7 @@ function checkDate()
 
     if (matched)
     {
+         console.log('checkDate: l0=' + l0 + ', n1=' + n1 + ', l2=' + l2 + ', l3=' + l3 + ', n3=' + n3 + ', pi=' + pi + ', mi=' + mi);
         matched = (((n1 > 31 && n1 < 2030 && l2 > 0 && n3 <= 31) ||  // yyyy mmm [dd]
                   (n1 <= 31 && l2 > 0 && n3 > 1000 && n3 < 2030) ||     // [dd] mmmm yyyy
                   (n1 <= 31 && l2 > 0 && l3 == 0) ||    // [dd] mmmm
@@ -1690,6 +1725,7 @@ function checkDate()
  *      census district numbers                                         *
  *      pre-confederation marriage registration report numbers          *
  *      pre-confederation number of stories fields in census            *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1714,6 +1750,7 @@ function checkNumber()
  *      census district numbers                                         *
  *      pre-confederation marriage registration report numbers          *
  *      pre-confederation number of stories fields in census            *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1733,6 +1770,7 @@ function checkPositiveNumber()
  *  function checkFamily                                                *
  *                                                                      *
  *  Validate the current value of a field containing a family number.   *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1791,6 +1829,7 @@ function checkFamily()
  *  Validate the current value of a field containing a year.            *
  *  Should be 4 digit numeric year, possibly enclosed in editorial      *
  *  square brackets, a question mark, or [blank].                       *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1810,6 +1849,7 @@ function checkYear()
  *  Validate the current value of an age field.  Should be numeric age  *
  *  in years, age in months (with a suffix 'm'), a question mark,       *
  *  or [blank].                                                         *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1879,6 +1919,7 @@ function getNumeric(number)
  *                                                                      *
  *  Validate the current value of a field containing a Uniform          *
  *  Record Location (URL).                                              *
+ *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
  *      this            an instance of an HTML input element.           *
@@ -1886,8 +1927,11 @@ function getNumeric(number)
 function checkURL()
 {
     var element     = this;
-    var re      = new RegExp("^(http:|https:|ftp:|)(//[A-Za-z0-9_.]*/|)(.*/|)(.+)$");
+    var re      = new RegExp("^(http://|https://|ftp://|)([-A-Za-z0-9_.]*)/(.*/|)(.+)$");
     var url     = element.value;
+    //let result  = re.exec(url);
+    //if (result)
+    //    alert("checkURL: re.exec('" + url + "')=protocol=" + result[1] + ",domain=" + result[2] + ",folder=" + result[3] + ",file=" + result[4]);
     setErrorFlag(element, url.length == 0 ||re.test(url));
 }       // function checkAge
 
@@ -2169,34 +2213,18 @@ function getCellRelCol( curr,
 }       // function getCellRelCol
 
 /************************************************************************
- *  function isChanged                                                  *
- *                                                                      *
- *  Editting state variable used by function tableKeyDown               *
- *  true if the current field has been modified                         *
- ************************************************************************/
-var isChanged   = false;
-
-/************************************************************************
  *  function tableKeyDown                                               *
  *                                                                      *
  *  Handle key strokes in input fields.  The objective is to emulate    *
  *  the behavior of cursor movement keys in a spreadsheet.              *
  *                                                                      *
  *  Input:                                                              *
- *      e       In a W3C compliant browser, the keydown event           *
- *      this    <input> element                                         *
+ *      this        <input> element                                     *
+ *      ev          instance of 'keydown' Event                         *
  ************************************************************************/
-function tableKeyDown(e)
+function tableKeyDown(ev)
 {
-    if (!e)
-        e                       =  window.event;
-    if (!('key' in e))
-    {
-        popupAlert('Upgrade to Internet Explorer 9, or use ANY other browser',
-                   this);
-        return true;
-    }
-    var code                    = e.key;
+    var code                    = ev.key;
 
     // identify the column name and row number of the input element
     var colName                 = this.name;
@@ -2220,14 +2248,12 @@ function tableKeyDown(e)
     {
         case 'Tab':
         {           // go to next cell in row
-            isChanged           = false;
             return true;
         }           // go to next cell in row
 
         case 'Enter':   
         case 'ArrowDown':
         {           // go to same column next row
-            isChanged           = false;
             field               = getCellRelCol(this, 1);
             e.preventDefault();
             if (field === undefined)
@@ -2240,7 +2266,6 @@ function tableKeyDown(e)
 
         case 'End':
         {           // End key
-            isChanged           = false;
             if (e.ctrlKey)
             {       // ctrl-End
                 field           = getCellLastRow(this);
@@ -2256,7 +2281,6 @@ function tableKeyDown(e)
 
         case 'Home':
         {           // Home key
-            isChanged           = false;
             if (e.ctrlKey)
             {       // ctrl-Home
                 field           = getCellFirstRow(this);
@@ -2289,7 +2313,6 @@ function tableKeyDown(e)
 
         case 'ArrowUp':
         {           // arrow up
-            isChanged           = false;
             field               = getCellRelCol(this, -1);
             e.preventDefault();
             if (field === undefined)
@@ -2333,8 +2356,6 @@ function tableKeyDown(e)
                 e.preventDefault();
                 return false;
             }       // alt-C
-            else
-                isChanged   = true;
             break;
         }           // letter 'C'
 
@@ -2349,8 +2370,6 @@ function tableKeyDown(e)
                 e.preventDefault();
                 return false;
             }       // alt-I
-            else
-                isChanged   = true;
             break;
         }           // letter 'I'
 
@@ -2363,8 +2382,6 @@ function tableKeyDown(e)
                 e.preventDefault();
                 return false;
             }       // ctrl-S
-            else
-                isChanged   = true;
             break;
         }           // letter 'S'
 
@@ -2375,8 +2392,6 @@ function tableKeyDown(e)
             {       // alt-U
                 form.submit();
             }       // alt-U
-            else    // letter U
-                isChanged   = true;
             break;
         }           // letter 'U'
 
@@ -2389,8 +2404,6 @@ function tableKeyDown(e)
                 e.preventDefault();
                 return false;
             }       // ctrl-Z
-            else    // letter Z
-                isChanged   = true;
             break;
         }           // letter 'Z'
 
@@ -2402,7 +2415,6 @@ function tableKeyDown(e)
 
         default:
         {           // other keystrokes
-            isChanged   = true;
             break;
         }           // other keystrokes
     }               // switch on key code
@@ -2416,20 +2428,12 @@ function tableKeyDown(e)
  *  Handle key strokes in input fields that only accept integers.       *
  *                                                                      *
  *  Input:                                                              *
- *      e       In a W3C compliant browser, the keydown event           *
- *      this    <input> element                                         *
+ *      this        <input> element                                     *
+ *      ev          a 'keydown' Event                                   *
  ************************************************************************/
-function numericKeyDown(e)
+function numericKeyDown(ev)
 {
-    if (!e)
-        e   =  window.event;
-    if (!('key' in e))
-    {
-        popupAlert('Upgrade to Internet Explorer 9, or use ANY other browser',
-                   this);
-        return true;
-    }
-    var key             = e.key;
+    var key             = ev.key;
     if (/\d/.test(key))
         return true;
     if (key == '+')
@@ -2450,12 +2454,12 @@ function numericKeyDown(e)
  *  Hide or unhide the column.                                          *
  *                                                                      *
  *  Input:                                                              *
- *      this    instance of <th> for which this is the onclick method   *
+ *      this        instance of <th>                                    *
+ *		ev          instance of 'click' Event                           *
  ************************************************************************/
-function columnClick(event)
+function columnClick(ev)
 {
-    if (event)
-        event.stopPropagation();
+    ev.stopPropagation();
     var colIndex    = this.cellIndex;
     var row         = this.parentNode;
     var section     = row.parentNode;
@@ -2532,12 +2536,13 @@ function columnClick(event)
  *  User clicked right button on a column header.  Widen the column.    *
  *                                                                      *
  *  Input:                                                              *
- *      this        instance of <th>                                    *
+ *      this            instance of <th>                                *
+ *		ev              instance of 'click' event                       *
  ************************************************************************/
-function columnWiden()
+function columnWiden(ev)
 {
     var colIndex    = this.cellIndex;
-    var row     = this.parentNode;
+    var row         = this.parentNode;
     var section     = row.parentNode;
     var table       = section.parentNode;
     var body        = table.tBodies[0];
@@ -2580,8 +2585,9 @@ function columnWiden()
  *                                                                      *
  *  Parameters:                                                         *
  *      this            element the mouse moved on to                   *
+ *		ev              instance of 'mouse' event                       *
  ************************************************************************/
-function linkMouseOver()
+function linkMouseOver(ev)
 {
     var msgDiv  = document.getElementById('mouse' + this.id);
     if (msgDiv)
@@ -2608,8 +2614,9 @@ function linkMouseOver()
  *                                                                      *
  *  Parameters:                                                         *
  *      this            element the mouse moved on to                   *
+ *		ev              instance of 'mouse' event                       *
  ************************************************************************/
-function linkMouseOut()
+function linkMouseOut(ev)
 {
     if (helpDiv)
     {

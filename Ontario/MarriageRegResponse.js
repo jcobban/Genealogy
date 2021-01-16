@@ -17,8 +17,9 @@
  *		                through pages of response                       *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/06/29      first parameter of displayDialog removed        *
+ *		2020/12/08      pass lang selection to display detail script    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -86,10 +87,13 @@ function showReg(event)
     var	recid	= this.id.substring(6);
     var regyear	= recid.substring(0,4);
     var regnum	= recid.substring(4);
+    var	lang		= 'en';
+    if ('lang' in args)
+		lang		= args['lang'];
     // display details
     location	= 'MarriageRegDetail.php?Domain=' + domain + 
 						'&RegYear=' + regyear +
-						'&RegNum=' + regnum;
+						'&RegNum=' + regnum + '&lang=' + lang;
     return false;
 }		// function showReg
 

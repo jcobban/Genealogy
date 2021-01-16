@@ -49,7 +49,9 @@
       <span class="right">
 		<a href="ancestorReportHelpen.html" target="help">? Help</a>
       </span>
-      Ancestor Tree $NAME
+      <span id="title">
+        Ancestor Tree $NAME
+      </span>
       <div style="clear: both;"></div>
     </h1>
     $TRACE
@@ -100,7 +102,10 @@
     <span id="Fathers">'s Father</span>
     <span id="Mothers">'s Mother</span>
     <span id="Failure">Failure</span>
+    <span id="Unknown">Unknown</span>
     <span id="direction">CP</span>
+    <span id="missing">There is no existing person with IDIR=$idir. </span>
+    <span id="missingIdir">Missing mandatory parameter idir. </span>
   </div><!-- id="templates" -->
   <div id="HelpancDepth" class="balloon">
 	Specify the number of generations of ancestors to display.

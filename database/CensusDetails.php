@@ -12,8 +12,10 @@ use \Exception;
  *  Parameters (passed by method=get):									*
  *      Census          2 character country code plus 4 digit year      *
  *		Province		2 letter province code (CE, CW, NS, NB, or PI)	*
- *		District		district (County) number within 1851 census		*
- *		SubDistrict		subdistrict (Township) number within district	*
+ *		Domain          4 or 5 character domain identifying a state or  *
+ *		                province within a federal state                 *
+ *		District		district number within census		            *
+ *		SubDistrict		subdistrict identifier within district	        *
  *		Division		optional division number within subdistrict		*
  *		Page			page number									    *
  *		Line			line number containing individual			    *
@@ -62,8 +64,10 @@ use \Exception;
  *		2018/11/05      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/12/01      validate all parameters                         *
+ *		                eliminate XSS vulnerabilities                   *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -75,193 +79,344 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // initial values
-$censusId			= 'CA9999';
+$censusId			= null;
+$censusYear			= '1881';
+$census             = null;     // instance of class Census
+$censusText         = null;
+$province			= null;
+$provinceText       = null;
 $countryName        = 'Canada';
-$table              = null;
-$domainId			= '';
-$distId			    = '';
+$provinceName       = '';
+$table              = null;     // name of database table
+$domainId			= null;
+$distId			    = null;
+$distText		    = null;
 $districtName		= '';
-$subDistId			= '';
+$distObj            = null;     // instance of class District
+$subDistId			= null;
 $subDistrictName	= '';
+$subDistObj			= null;     // instance of class SubDistrict
 $division			= '';
+$page               = null;
+$pageText           = null;
+$pageObj            = null;     // instance of class Page
+$line               = null;
+$lineText           = null;
 $lang			    = 'en';
+$unexparms          = array();
 
 // validate all parameters passed to the server and construct the
 // various portions of the SQL SELECT statement
-foreach ($_GET as $key => $value)
-{			            // loop through all parameters
-	if (strlen($value) > 0)
-	{		            // only process non-empty parameters
+if (isset($_GET) && count($_GET) > 0)
+{                       // invoked by URL to display current status of account
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                               "<table class='summary'>\n" .
+                                  "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
+    foreach ($_GET as $key => $value)
+	{			            // loop through all parameters
+	    $value                      = trim($value);
+	    if (strlen($value) == 0)
+	        continue;
 	    switch(strtolower($key))
-        {		        // act on specific keys
-            case 'census':
-            {
-                $censusId           = $value;
-                $censusYear         = substr($value, 2);
-                $table	            = 'Census' . $censusYear;
-                break;
-            }
-
+	    {		            // act on specific keys
+	        case 'census':
+	        {
+	            if (preg_match('/^[a-zA-Z]{2,4}\d{4}$/',$value))
+	            {
+	                $censusId       = strtoupper($value);
+	                $censusYear     = substr($value, -4);
+	            }
+	            else
+	                $censusText     = htmlspecialchars($value);
+	            break;
+	        }
+	
 			case 'province':
-            {	            // 2 letter province code
-                $domainId           = 'CA' . $value;
-                $province           = $value;
-                if ($censusYear < 1867)
-                    $censusId       = $province . $censusYear;
+	        {	            // 2 letter province code
+	            if (preg_match('/^[a-zA-Z]{2}$/', $value))
+	            {
+	                $province       = strtoupper($value);
+	                $domainId       = 'CA' . $province;
+	            }
+	            else
+	            {
+	                $provinceText   = htmlspecialchars($value);
+	                $cc             = 'CA';
+	            }
 			    break;
 			}		    	// 2 letter province code
-
+	
 			case 'state':
-            {	            // 2 letter state code
-                $domainId           = 'US' . $value;
+	        {	            // 2 letter state code
+	            if (preg_match('/^[a-zA-Z]{2}$/', $value))
+	            {
+	                $province       = strtoupper($value);
+	                $domainId       = 'US' . $province;
+	            }
+	            else
+	            {
+	                $provinceText   = htmlspecialchars($value);
+	                $cc             = 'US';
+	            }
 			    break;
 			}		    	// 2 letter state code
-
+	
 			case 'domain':
-            {	            // 4 letter domain code
-                $domainId           = $value;
-                $province           = substr($value, 2);
+	        {	            // 4 letter domain code
+	            if (preg_match('/^[a-zA-Z]{4,5}$/', $value))
+	            {
+	                $domainId       = strtoupper($value);
+	                $province       = substr($value, 2);
+	            }
+	            else
+	            {
+	                $cc             = htmlspecialchars(substr($value, 0, 2));
+	                $provinceText   = htmlspecialchars(substr($value,2));
+	            }
 			    break;
 			}		    	// 4 letter domain code
-
+	
 			case 'district':
 			{	            // district number
-				$distId             = $value;
+	            if (preg_match('/^\d+(.5|)$/', $value))
+				    $distId         = $value;
+	            else
+	                $distText       = htmlspecialchars($value);
 			    break;
 			}		    	// district number
 	
 			case 'subdistrict':
-			{           // subdistrict within district
+			{               // subdistrict within district
 				$subDistId          = $value;
 			    break;
-			}			// subdistrict within district
-
+			}			    // subdistrict within district
+	
 			case 'division':
-            {	        // optional division number
-                $division           = $value;
+	        {	            // optional division number
+	            $division           = $value;
 			    break;
-			}			// enumeration division
-
+			}			    // enumeration division
+	
 			case 'page':
-			{		    // page number
-				$page		        = $value;
+			{		        // page number
+	            if (preg_match('/^\d+$/', $value))
+				    $page           = $value;
+	            else
+	                $pageText       = htmlspecialchars($value);
 			    break;
-			}	    // Page
-
+			}	            // Page
+	
 			case 'line':
-			{		// line number on page
-				$line		        = $value;
+			{		        // line number on page
+	            if (preg_match('/^\d+$/', $value))
+				    $line           = $value;
+	            else
+	                $lineText       = htmlspecialchars($value);
 			    break;
-			}	    // Line
-
-            case 'lang':
-            {
+			}	            // Line
+	
+	        case 'lang':
+	        {
 	            $lang               = FtTemplate::validateLang($value);
 			    break;
-            }
-	    }		    // act on specific keys
-	}		        // non-empty value
-}		        	// foreach parameter
+	        }
+	
+		    case 'debug':
+		    {			// already handled
+				break;
+		    }			// already handled 
+	
+	        default:
+	        {
+	            $unexparms[]    = array($key, htmlspecialchars($value));
+			    break;
+	        }
+	    }		        // act on specific keys
+	}		        	// foreach parameter
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}                       // invoked by URL to display current status of account
 
 // create template
 $template	    = new FtTemplate("CensusDetails$censusYear$lang.html");
+$template->includeSub("CensusDetailsMessages$lang.html",
+                      'MESSAGES');
 
-// parameters for getting instance of CensusLine
-$getParms                       = array();
+// report unrecoverable errors in parameters
+if (is_string($censusText))
+{
+    $msg        .= $template->fmtMessage('invalidCensusId',
+                                         '$value', 
+                                         $censusText);
+}
+if (is_string($distText))
+{
+    $msg        .= $template->fmtMessage('invalidDistId',
+                                         '$value', 
+                                         $distText);
+}
+if (is_string($pageText))
+{
+    $msg        .= $template->fmtMessage('nonNumericPage',
+                                         '$value', 
+                                         $pageText);
+}
+if (is_string($lineText))
+{
+    $msg        .= $template->fmtMessage('nonNumericLine',
+                                         '$value', 
+                                         $lineText);
+}
+if (is_string($provinceText))
+{
+    $id         = 'invalidDomainId';
+    $matches    = array('$state', '$cc'); 
+    $replace    = array($provinceText, $cc);
+    // getting the message explicitly 
+    $text       = $template->getElementById($id)->innerHTML();
+    $msg       .= str_replace($matches,
+                              $replace,
+                              $text);
+    // getting the message using the new method
+    //$msg        .= $template->fmtMessage($id,
+    //                                     $matches,
+    //                                     $replace);
+}
+
+// report unexpected parameters
+if (count($unexparms) > 0)
+{
+    $text       = $template->getElementById('unexpectedParm')->innerHTML();
+    foreach($unexparms as $entry)
+        $warn       .= str_replace(array('$key','$value'), 
+                                   $entry,
+                                   $text);
+}
 
 // validate CensusID
-$census		= new Census(array('censusid' => $censusId));
-if ($census->isExisting())
-{
-    $partof                     = $census->get('partof');
-    if (is_string($partof) && strlen($partof) == 2)
-    {       // override province value from parameters
-        $domainId		        = $partof . substr($censusId, 0, 2);
-        $cc                     = $partof;
-    }       // override province value from parameters
-    else
-        $cc                     = substr($censusId, 0, 2);
-	$getParms['censusid']	    = $census;
-    $censusYear			        = substr($censusId, -4);
-}
+if (is_null($censusId))
+    $msg        .= $template->getElementById('CensusMissing')->innerHTML();
 else
 {
-    $text       = $template->getElementById('invalidCensusId')->innerHTML();
-    $msg	    .= str_replace('$value', $censusId, $text);
-}
+    if ($censusYear < 1867 && substr($censusId, 0, 2) == 'CA')
+        $censusId       = $province . $censusYear;
+	$census		        = new Census(array('censusid' => $censusId));
+	if ($census->isExisting())
+	{
+	    $partof                     = $census->get('partof');
+	    if (is_string($partof) && strlen($partof) == 2)
+	    {       // override province value from parameters
+	        $domainId		        = $partof . substr($censusId, 0, 2);
+	        $cc                     = $partof;
+	    }       // override province value from parameters
+	    else
+	        $cc                     = substr($censusId, 0, 2);
+	    $censusYear			        = substr($censusId, -4);
+	}
+	else
+	{
+	    $msg    .= $template->fmtMessage('invalidCensusId',
+                                         '$value', 
+                                         $censusId);
+        $census                     = null;
+    }
+}               // census is specified
 
 // validate district
-$distObj            = new District(array('census'   => $census,
-                                         'id'       => $distId));
-if ($distObj->isExisting())
-{			// valid value
-    $districtName               = $distObj->get('name');
-    $getParms['district']       = $distId;
-    $province                   = $distObj->get('province');
-    $domainId                   = $cc . $province;
-}			// valid value
+if (is_null($distId))
+    $msg    .= $template->getElementById('DistrictMissing')->innerHTML();
 else
-{
-    $text       = $template->getElementById('invalidDistId')->innerHTML();
-    $msg	    .= str_replace('$value', $distId, $text);
-}
+if (!is_null($census))
+{               // district is specified
+	$distObj            = new District(array('census'   => $census,
+	                                         'id'       => $distId));
+	if ($distObj->isExisting())
+	{			// valid value
+	    $districtName               = $distObj->get('name');
+	    $province                   = $distObj->get('province');
+	    $domainId                   = $cc . $province;
+	}			// valid value
+	else
+	{
+	    $msg    .= $template->fmtmessage('invalidDistId',
+                                         '$value', 
+                                         htmlspecialchars($distId));
+        $distObj                    = null;
+	}
+}               // district is specified
 
 // validate sub-district
-$subdistObj         = new SubDistrict(array('district'  => $distObj,
-                                            'sd_id'     => $subDistId,
-	 						                'sd_div'  	=> $division,		
-     						                'sd_sched'	=> '1'));
-if ($subdistObj->isExisting())
-{			// valid value
-    $subDistrictName            = $subdistObj->get('name');
-    $getParms['subdistrict']    = $subDistId;
-    $getParms['division']       = $division;
-}			// valid value
+if (is_null($subDistId))
+    $msg    .= $template->getElementById('SubDistrictMissing')->innerHTML();
 else
-{
-    $text       = $template->getElementById('invalidSubdistId')->innerHTML();
-    $msg	    .= str_replace(array('$value', '$div'), 
-                               array($subDistId, $division), 
-                               $text);
-}
+if (!is_null($distObj))
+{               // district is specified
+	$subDistObj     = new SubDistrict(array('district'  => $distObj,
+	                                        'sd_id'     => $subDistId,
+		 						            'sd_div'  	=> $division,		
+	     						            'sd_sched'	=> '1'));
+	if ($subDistObj->isExisting())
+	{			// valid value
+	    $subDistrictName            = $subDistObj->get('name');
+	}			// valid value
+	else
+	{
+	    $msg    .= $template->fmtMessage('invalidSubdistId',
+	                                    array('$value', '$div'), 
+	                                    array(htmlspecialchars($subDistId)));
+        $subDistObj                 = null;
+	}
+}               // district is specified
 
 // validate page
-$pageObj            = new Page($subdistObj,
-                               $page);
-if ($pageObj->isExisting())
-{
-    $lastLine                   = $pageObj->get('population');
-    $getParms['page']           = $page;
-}
+if (is_null($page))
+    $msg    .= $template->getElementById('PageMissing')->innerHTML();
 else
-{
-    $text       = $template->getElementById('invalidPage')->innerHTML();
-    $msg	    .= str_replace('$value', $page, $text);
-}
+if (!is_null($subDistObj))
+{               // subDistrict is specified
+    $pageObj            = $subDistObj->getPage($page);
+	if ($pageObj instanceof Page)
+	{
+	    $lastLine       = $pageObj->get('population');
+	}
+	else
+	{
+	    $text   = $template->getElementById('invalidPage')->innerHTML();
+	    $msg	.= str_replace('$value', htmlspecialchars($page), $text);
+	}
+}               // subDistrict is specified
+
+// validate line
+if (is_null($line))
+    $msg    .= $template->getElementById('LineMissing')->innerHTML();
 
 // validate Domain
-$domainObj	            = new Domain(array('domain' => $domainId));
-$provinceName	        = $domainObj->get('name');
-$province               = substr($domainId, 2);
-$cc                     = substr($domainId, 0, 2);
-
-if ($domainObj->isExisting())
-{			// valid value
-	if (($censusYear - 0) < 1867)
-    {		// pre-confederation
-	    $censusId	                = $province . $censusYear;
-	    $getParms['province']	    = $province;
-    }		// pre-confederation
-    $countryName                    = $domainObj->getCountry()->get('name');
-}			// valid value
+if (is_null($domainId))
+    $msg    .= $template->getElementById('DomainMissing')->innerHTML();
 else
-{
-    $warn       .= "<p>" . __LINE__ . " domainId='$domainId', province='$province'</p>\n";
-    $text       = $template->getElementById('invalidDomainId')->innerHTML();
-    $msg	    .= str_replace(array('$state', '$cc'), 
-                               array($province, $cc),
-                               $text);
-}
+{               // domain identifier is specified
+	$domainObj	            = new Domain(array('domain' => $domainId));
+	$provinceName	        = $domainObj['name'];
+	$province               = $domainObj['state'];
+	$cc                     = $domainObj['cc'];
+	
+	if ($domainObj->isExisting())
+	{			// valid value
+		if ($cc == 'CA' && ($censusYear - 0) < 1867)
+	    {		// pre-confederation
+		    $censusId	            = $province . $censusYear;
+	    }		// pre-confederation
+	    $countryName                = $domainObj->getCountry()->get('name');
+	}			// valid value
+	else
+	{
+	    $text   = $template->getElementById('invalidDomainId')->innerHTML();
+	    $msg	.= str_replace(array('$state', '$cc'), 
+	                           array(htmlspecialchars($province), htmlspecialchars($cc)),
+	                           $text);
+	}
+}               // domain identifier is specified
 
 if (strlen($subDistrictName) > 24)
     $subDistrictName        = substr($subDistrictName, 0, 21) . '...';
@@ -294,9 +449,8 @@ if (strlen($msg) == 0)
     else
         $template->updateTag('topNext',    null);
 
-    $getParms['line']                   = $line;
-    $censusLine                         = new CensusLine($getParms);
-    if ($censusLine->isExisting())
+    $censusLine                         = $pageObj->getLine($line);
+    if ($censusLine instanceof CensusLine && $censusLine->isExisting())
     {
 	    $censusLine->set('CENSUSID',		$censusId);
 	    $censusLine->set('PROVINCE',		$province);
@@ -315,19 +469,19 @@ if (strlen($msg) == 0)
                 $familyIdElt->update(null);
         }
         $censusLine->setGetModeHTML(true);
-        $template->updateTag('dataTable',     array($censusLine));
+        $template->updateTag('dataTable',       array($censusLine));
     }
     else
     {
         $msg        .= "No matching record in transcription. ";
-        $template->updateTag('linksFront',      null);
-        $template->updateTag('dataTable',         null);
+        $template->updateTag('topBrowse',       null);
+        $template->updateTag('dataTable',       null);
     }
 }
 else
 {                   // error message generated
-    $template->updateTag('linksFront',      null);
-    $template->updateTag('dataTable',         null);
+    $template->updateTag('topBrowse',           null);
+    $template->updateTag('dataTable',           null);
 }                   // error message generated
 
 // check for abnormal behavior of Internet Explorer

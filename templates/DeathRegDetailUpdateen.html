@@ -43,13 +43,16 @@
       <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$PREV5REGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE" id="Previous">Skip Back 5</a>:
       <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$NEXTREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE" id="Next">Next</a>:
       <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$NEXT5REGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE" id="Next">Skip Forward 5</a>:
+	  <a href="DeathRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG">
+	    Display Death Registrations in Order
+	  </a>:
     </div> 
     <div class="body">
       <h1>
         <span class="right">
 	  <a href="DeathRegDetailHelpen.html" target="help">? Help</a>
         </span>
-        Ontario Death Registration: Update
+        $DOMAINNAME Death Registration: Update
       </h1>
       $MSG
       $TRACE
@@ -548,7 +551,7 @@
 				Remarks:
 			</label>
 	        <textarea name="Remarks" id="Remarks"
-					type="text" cols="55" rows=3
+					type="text" cols="55" rows=2 style="height: 80px;"
 					class="black white leftnc">$REMARKS</textarea>
             <div style="clear: both"></div>
         </div>
@@ -560,7 +563,7 @@
 			<input name="Image" id="Image"
 					type="text" size="50" maxlength="256"
 					value="$IMAGE"
-					class="same white leftnc40em"> 
+					class="white left wide"> 
           <div style="clear: both"></div>
         </div>
         <div class="row">

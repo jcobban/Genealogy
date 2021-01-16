@@ -228,7 +228,6 @@ function onLoad()
 		    {
 				name	= parts[1];
 		    }
-
 		    // take action specific to the element based on its name
 		    switch(name)
 		    {		// switch on name
@@ -326,6 +325,12 @@ function onLoad()
 				case 'editLoc':
 				{
 				    element.onclick	= editLocation;
+				    break;
+				}
+
+				case 'mbsubmit':
+				{
+				    element.onclick	= submitMbBirth;
 				    break;
 				}
 		    }		// switch on name
@@ -1094,6 +1099,22 @@ function editLocation()
 		      url,
 		      "right");
 }		// function editLocation
+
+/************************************************************************
+ *  function submitMbBirth												*
+ *																		*
+ *  This function is called if the user clicks on a Manitoba birth      *
+ *  registration detail.                                                *
+ *  It submits the containing form.                                     *
+ *																		*
+ *  Input:																*
+ *		this		<button id='submitMbBirth9999'> 					*
+ ************************************************************************/
+function submitMbBirth()
+{
+    var	form		= this.parentElement;
+    form.submit();
+}		// function submitMbBirth
 
 /************************************************************************
  *  function locMouseOver												*

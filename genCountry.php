@@ -13,8 +13,9 @@ use \Exception;
  *      2018/01/25      common functionality moved to class FtTemplate  *
  *      2018/10/15      get language apology text from Languages        *
  *      2019/02/18      use new FtTemplate constructor                  *
+ *		2021/01/03      correct XSS vulnerability                       *
  *                                                                      *
- *  Copyright &copy; 2019 James Alan Cobban                             *
+ *  Copyright &copy; 2021 James Alan Cobban                             *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -25,6 +26,7 @@ require_once __NAMESPACE__ . '/common.inc';
  *      open code                                                       *
  ***********************************************************************/
 $cc                         = 'CA';
+$cctext                     = null;
 $countryName                = 'Canada';
 $lang                       = 'en';     // default english
 
@@ -45,9 +47,14 @@ if (count($_GET) > 0)
             case 'code':
             case 'countrycode':
             {
-                $cc             = strtoupper($value);
-                if ($cc == 'UK')
-                    $cc         = 'GB';
+                if (strlen($value) == 2)
+                {
+                    $cc             = strtoupper($value);
+                    if ($cc == 'UK')
+                        $cc         = 'GB';
+                }
+                else
+                    $cctext         = htmlspecialchars($value);
                 break;
             }
 
@@ -59,7 +66,8 @@ if (count($_GET) > 0)
 
             default:
             {           // unexpected
-                $warn   .= "Unexpected parameter $key='$value'. ";
+                $warn   .= "<p>Unexpected parameter $key=" . 
+                            htmlspecialchars($value) . ".</p>";
                 break;
             }           // unexpected
         }               // switch on parameter name
@@ -78,6 +86,8 @@ if (file_exists($tempBase . $baseName))
 else
     $includeSub     = "genCountry$lang.html";
 $template           = new FtTemplate($includeSub);
+if (is_string($cctext))
+    $warn           .= "<p>Invalid value for cc=$cctext ignored.</p>\n";
 
 $template->set('COUNTRYNAME',   $countryName);
 $template->set('CC',            $cc);

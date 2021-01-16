@@ -70,6 +70,7 @@ $npprev				= '';		// previous selection
 $npnext				= '';		// next selection
 $limit				= 20;
 $domain				= 'CAON';
+$domaintext         = null;
 $code				= 'ON';
 $domainName			= 'Ontario';
 $cc					= 'CA';
@@ -85,14 +86,15 @@ $sqlParms			= array();
 // if invoked by method=get process the parameters
 if (count($_GET) > 0)
 {	        	    // invoked by URL to display current status of account
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText          = "<p class='label'>\$_GET</p>\n" .
+                            "<table class='summary'>\n" .
+                              "<tr><th class='colhead'>key</th>" .
+                                "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
     {	            // loop through all parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+        $valuetext      = htmlspecialchars($value);
+        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$valuetext</td></tr>\n";
 	    switch(strtolower($key))
 	    {		    // act on specific parameter
 			case 'lang':
@@ -104,22 +106,24 @@ if (count($_GET) > 0)
     		case 'regdomain':
     		case 'domain':
     		{		// administrative domain
-                if (strlen($value) > 0)
-    			    $domain		        = $value;
+                if (preg_match('/^[a-zA-Z}{4,5}$/', $value))
+                    $domain		        = $value;
+                else
+                    $domaintext         = htmlspecialchars($value);
     		    break;
     		}		// administrative domain
 
     		case 'count':
     		case 'limit':
             {		// number of rows to display at a time
-                if (strlen($value) > 0)
+                if (ctype_digit($value))
     			    $limit	            = $value;
     		    break;
     		}		// number of rows to display at a time
 
     		case 'offset':
     		{		// starting offset
-                if (strlen($value) > 0)
+                if (ctype_digit($offset))
     			    $offset	            = $value;
     		    break;
     		}		// starting offset
@@ -129,11 +133,11 @@ if (count($_GET) > 0)
     		{		// selection lists
     		    if (strlen($value) > 0 && $value != '?')
     		    {
-    				$sel	.= $and	. '' . $key . '=?' ;
+    				$sel	    .= $and	. '' . $key . '=?' ;
     				array_push($sqlParms, $value);
-    				$npuri	.= "{$npand}{$key}={$value}";
-    				$npand	= '&amp;'; 
-    				$and	= ' AND ';
+    				$npuri	    .= "{$npand}{$key}={$value}";
+    				$npand	    = '&amp;'; 
+    				$and	    = ' AND ';
     		    }   
     		    break;
     		}		// selection lists
@@ -143,8 +147,8 @@ if (count($_GET) > 0)
                 if (strlen($value) > 0)
                 {
     		        $surname	= $value;
-    		        $npuri	.= "{$npand}{$key}={$value}";
-                    $npand	= '&amp;';
+    		        $npuri	    .= "{$npand}{$key}={$value}";
+                    $npand	    = '&amp;';
                 }
     		    break;
     		}
@@ -161,11 +165,11 @@ if (count($_GET) > 0)
     		{		// match anywhere in string
                 if (strlen($value) > 0)
                 {
-	    		    $sel	.= $and . '' . $key . ' REGEXP ?' ;
+	    		    $sel	    .= $and . '' . $key . ' REGEXP ?' ;
 	    		    array_push($sqlParms, $value);
-	    		    $npuri	.= "{$npand}{$key}={$value}";
-	    		    $npand	= '&amp;'; 
-	    		    $and	= ' AND ';
+	    		    $npuri	    .= "{$npand}{$key}={$value}";
+	    		    $npand	    = '&amp;'; 
+	    		    $and	    = ' AND ';
                 }
     		    break;
     		}		// match in string
@@ -175,8 +179,8 @@ if (count($_GET) > 0)
                 if (strlen($value) > 0)
                 {
 	    		    $birthDate	= $value;
-	    		    $npuri	.= "{$npand}{$key}={$value}";
-	    		    $npand	= '&amp;'; 
+	    		    $npuri	    .= "{$npand}{$key}={$value}";
+	    		    $npand  	= '&amp;'; 
                 }
     		    break;
     		}		// birth date
@@ -185,9 +189,9 @@ if (count($_GET) > 0)
     		{
                 if (strlen($value) > 0)
                 {
-	    		    $range	= $value;
-	    		    $npuri	.= "{$npand}{$key}={$value}";
-	    		    $npand	= '&amp;'; 
+	    		    $range	    = $value;
+	    		    $npuri	    .= "{$npand}{$key}={$value}";
+	    		    $npand	    = '&amp;'; 
                 }
     		    break;
     		}		// birth date range in years
@@ -197,8 +201,8 @@ if (count($_GET) > 0)
                 if (strlen($value) > 0)
                 {
     				$surnameSoundex	= true;
-    		        $npuri	.= "{$npand}{$key}={$value}";
-    		        $npand	= '&amp;'; 
+    		        $npuri	    .= "{$npand}{$key}={$value}";
+    		        $npand	    = '&amp;'; 
                 }
     		    break;
     		}		// soundex flag
@@ -212,11 +216,11 @@ if (count($_GET) > 0)
     		{		// ordinary parameter
                 if (strlen($value) > 0)
                 {
-	    		    $sel	.= $and . '' . $key . '=?';
+	    		    $sel	    .= $and . '' . $key . '=?';
 	    		    array_push($sqlParms, $value);
-	    		    $npuri	.= "{$npand}{$key}={$value}";
-	    		    $npand	= '&amp;'; 
-	    		    $and	= ' AND ';
+	    		    $npuri	    .= "{$npand}{$key}={$value}";
+	    		    $npand	    = '&amp;'; 
+	    		    $and	    = ' AND ';
                 }
     		    break;
     		}		// ordinary parameter
@@ -235,17 +239,24 @@ else
 $template		    = new FtTemplate("VitalRegResponse$action$lang.html");
 
 // validation of parameters is left until after the template
-// is allocated so that context specific text can be obtained from the template
-$domainObj    = new Domain(array('domain'       => $domain,
-                                 'language'     => 'en'));
+// is allocated to get context specific message text from template
+
+if (is_string($domaintext))
+{
+    $text           = $template['invalidDomain']->outerHTML;
+    $warn           .= str_replace('$domain', $domaintext, $text);
+}
+
+$domainObj          = new Domain(array('domain'       => $domain,
+                                       'language'     => 'en'));
+$cc                 = $domainObj['cc'];
+$code               = $domainObj['code'];
+$domainName         = $domainObj['name'];
+$countryObj         = $domainObj->getCountry();
+$countryName        = $countryObj->getName();
 if ($domainObj->isExisting())
 {
-    $cc             = substr($domain, 0, 2);
-    $code           = substr($domain, 2, 2);
-    $domainName     = $domainObj->get('name');
-    $countryObj     = new Country(array('code' => $cc));
-    $countryName    = $countryObj->getName();
-    $sel          .= $and . 'RegDomain=?';
+    $sel            .= $and . 'RegDomain=?';
     array_push($sqlParms, $domain);
     $npuri          .= "$npand$key=$domain";
     $npand          = '&amp;';
@@ -253,24 +264,14 @@ if ($domainObj->isExisting())
 }
 else
 {
-    $msg    .= "Domain '$value' must be a supported " .
-           "two character country code followed by " .
-           "a two character state or province code. ";
-    $domainName    = "Domain: " . $domain;
+    $text           = $template['unsupportedDomain']->innerHTML;
+    $msg            .= str_replace('$domain', $domain, $text);
 }
-
-if (preg_match("/^([0-9]{1,2})$/", $limit) == 0)
-    $msg    .='Row count must be number between 0 and 99. ';
-
-if (ctype_digit($offset))
-    $offset    = $offset - 0;
-else
-    $msg    .= 'Row offset must be positive integer. ';
 
 // surname match depends upon both Surname and SurnameSoundex
 if (!is_null($surname))
 {			// surname specified
-    $sel	.= $and;
+    $sel	    .= $and;
     if (preg_match("/[.+*^$]/", $surname))
     {		// match pattern
         $sel	.= 'Surname REGEXP ?'; 
@@ -288,19 +289,19 @@ if (!is_null($surname))
         array_push($sqlParms, $value);
     }		// match exact
         
-    $and	= ' AND ';
+    $and	    = ' AND ';
 }			// surname specified
 
 // birth date match depends upon both BirthDate and Range
 if (!is_null($birthDate))
 {			// birth date specified
-    $date	= new LegacyDate(' ' . $birthDate);
-    $y	= $date->getYear();
-    $m	= $date->getMonth();
-    $d	= $date->getDay();
-    $sel	.= $and . "ABS(DATEDIFF(CalcBirth, '$y-$m-$d')) < " .
+    $date	    = new LegacyDate(' ' . $birthDate);
+    $y	        = $date->getYear();
+    $m	        = $date->getMonth();
+    $d	        = $date->getDay();
+    $sel	    .= $and . "ABS(DATEDIFF(CalcBirth, '$y-$m-$d')) < " .
     				  "(365 * $range)";
-    $and	= ' AND ';
+    $and	    = ' AND ';
 }			// birth date specified
 
 // LIMIT expression depends upon both Limit and Offset parameters
@@ -323,12 +324,18 @@ else
 }			// starting offset omitted
 
 if (strlen($sel) == 0)
-    $msg	.= 'Missing parameters. ';
+    $msg	    .= $template['missingParameters']->innerHTML;
     
 // action taken depends upon whether the user is authorized to
 // update the database
 $action	= 'Details';
 $title	= $domainName . ": Vital Statistics Registration Query";
+$template->set('cc',		        $cc);
+$template->set('code',		        $code);
+$template->set('domain',		    $domain);
+$template->set('domainName',		$domainName);
+$template->set('countryObj',		$countryObj);
+$template->set('countryName',		$countryName);
 
 // if no error messages display the results of the query
 if (strlen($msg) == 0)

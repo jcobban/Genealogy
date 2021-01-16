@@ -12,6 +12,7 @@ use \Exception;
  *		2018/09/25		Created											*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2021/01/03      correct XSS vulnerability                       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -69,20 +70,21 @@ function randomPassword($length)
 $lang			= 'en';
 
 // get parameters
-foreach($_GET as $key => $value)
-{			    // loop through parameters
-    switch(strtolower($key))
-    {			// act on specific parameters
-		case 'lang':
-		{
-		    if (strlen($value) >= 2)
-			    $lang	= strtolower(substr($value,0,2));
-		    break;
-		}
-
-    }			// act on specific parameters
-}			    // loop through parameters
-
+if (isset($_GET) && count($_GET) > 0)
+{
+	foreach($_GET as $key => $value)
+	{			    // loop through parameters
+	    switch(strtolower($key))
+	    {			// act on specific parameters
+			case 'lang':
+			{
+	            $lang           = FtTemplate::validateLang($value);
+			    break;
+			}
+	
+	    }			// act on specific parameters
+	}			    // loop through parameters
+}                       // invoked on web server
 
 $template		= new FtTemplate("ResendConfirmEmail$lang.html");
 

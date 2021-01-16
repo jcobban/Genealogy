@@ -217,181 +217,92 @@
  *                      page to speed up page initialization            *
  *      2020/04/19      on resize hide right column if not enough room  *
  *                      or redisplay is there is enough room            *
+ *      2020/11/21      move function showImage to common library       *
+ *      2020/12/15      correct handling of parms passed by GET         *
+ *      2020/12/26      eliminate duplicate URL parm testing            *
+ *      2021/01/12      drop support for IE 9 & 10                      *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
  *  constants for letter key codes                                      *
- *                                                                      *
- *  Microsoft Internet Explorer release 10 and lower do not support     *
- *  defining constants with the const keyword as defined in EcmaScript  *
- *  6th edition (2015) so these have to be defined as "var"             *
  ************************************************************************/
 // movement keys
-var KEY_BSPACE      =  8;
-var KEY_TAB         =  9;
-var KEY_ENTER       = 13;
-var KEY_SHIFT       = 16;
-var KEY_ESC         = 27;
-var KEY_PAGEUP      = 33;
-var KEY_PAGEDOWN    = 34;
-var KEY_END         = 35;
-var KEY_HOME        = 36;
-var ARROW_LEFT      = 37;
-var ARROW_UP        = 38;
-var ARROW_RIGHT     = 39;
-var ARROW_DOWN      = 40;
-var KEY_INSERT      = 45;
-var KEY_DELETE      = 46;
+const KEY_BSPACE      =  8;
+const KEY_TAB         =  9;
+const KEY_ENTER       = 13;
+const KEY_SHIFT       = 16;
+const KEY_ESC         = 27;
+const KEY_PAGEUP      = 33;
+const KEY_PAGEDOWN    = 34;
+const KEY_END         = 35;
+const KEY_HOME        = 36;
+const ARROW_LEFT      = 37;
+const ARROW_UP        = 38;
+const ARROW_RIGHT     = 39;
+const ARROW_DOWN      = 40;
+const KEY_INSERT      = 45;
+const KEY_DELETE      = 46;
 // alphabetic keys
-var LTR_A           = 65;
-var LTR_B           = 66;
-var LTR_C           = 67;
-var LTR_D           = 68;
-var LTR_E           = 69;
-var LTR_F           = 70;
-var LTR_G           = 71;
-var LTR_H           = 72;
-var LTR_I           = 73;
-var LTR_J           = 74;
-var LTR_K           = 75;
-var LTR_L           = 76;
-var LTR_M           = 77;
-var LTR_N           = 78;
-var LTR_O           = 79;
-var LTR_P           = 80;
-var LTR_Q           = 81;
-var LTR_R           = 82;
-var LTR_S           = 83;
-var LTR_T           = 84;
-var LTR_U           = 85;
-var LTR_V           = 86;
-var LTR_W           = 87;
-var LTR_X           = 88;
-var LTR_Y           = 89;
-var LTR_Z           = 90;
+const LTR_A           = 65;
+const LTR_B           = 66;
+const LTR_C           = 67;
+const LTR_D           = 68;
+const LTR_E           = 69;
+const LTR_F           = 70;
+const LTR_G           = 71;
+const LTR_H           = 72;
+const LTR_I           = 73;
+const LTR_J           = 74;
+const LTR_K           = 75;
+const LTR_L           = 76;
+const LTR_M           = 77;
+const LTR_N           = 78;
+const LTR_O           = 79;
+const LTR_P           = 80;
+const LTR_Q           = 81;
+const LTR_R           = 82;
+const LTR_S           = 83;
+const LTR_T           = 84;
+const LTR_U           = 85;
+const LTR_V           = 86;
+const LTR_W           = 87;
+const LTR_X           = 88;
+const LTR_Y           = 89;
+const LTR_Z           = 90;
 // Windoze button
-var KEY_START       = 91;
+const KEY_START       = 91;
 // Function Keys
-var KEY_F1          = 112;
-var KEY_F2          = 113;
-var KEY_F3          = 114;
-var KEY_F4          = 115;
-var KEY_F5          = 116;
-var KEY_F6          = 117;
-var KEY_F7          = 118;
-var KEY_F8          = 119;
-var KEY_F9          = 120;
-var KEY_F10         = 121;
-var KEY_F11         = 122;
-var KEY_F12         = 123;
+const KEY_F1          = 112;
+const KEY_F2          = 113;
+const KEY_F3          = 114;
+const KEY_F4          = 115;
+const KEY_F5          = 116;
+const KEY_F6          = 117;
+const KEY_F7          = 118;
+const KEY_F8          = 119;
+const KEY_F9          = 120;
+const KEY_F10         = 121;
+const KEY_F11         = 122;
+const KEY_F12         = 123;
 
-/************************************************************************
- * specify the style for tinyMCE editing                                *
- ************************************************************************/
 var activateMCE             = true;
 var lang                    = 'en';
-for (var key in args)
-{       // loop through args
-    if (key == 'text')
-        activateMCE = false;
-    else
-    if (key == 'lang')
-        lang                = args.lang;
-}
 
-if (activateMCE && tinyMCEparms && typeof tinyMCE !== 'undefined')
+/************************************************************************
+ *  Feature Detection                                                   *
+ *                                                                      *
+ *  Determine which features are supported by the implementation        *
+ *  of ECMAScript (JavaScript) in the user's browser.                   *
+ ************************************************************************/
+const unicodeSupported   = isUnicodeSupported();
+
+function isUnicodeSupported()
 {
-    // alert("tinyMCEparms=" + JSON.stringify(tinyMCEparms));
-    tinyMCE.init(tinyMCEparms);
-}
-
-/************************************************************************
- *  Global warning that Microsoft Internet Explorer doesn't work        *
- ************************************************************************/
-if (navigator.appName == 'Microsoft Internet Explorer')
-{
-    var patt    = /MSIE (\d+)/;
-    var result  = patt.exec(navigator.appVersion);
-    if (result === null || result[1] < 9)
-        alert("Microsoft Internet Explorer Version: " +
-              navigator.appVersion +
-      " is non-standard in its implementation and many services may not work. " +
-      "Upgrade to Internet Explorer version 9 or later, or use any other browser.");
-}
-
-/************************************************************************
- *  loaddiv                                                             *
- *                                                                      *
- *  This division contains the "loading" indicator when a script is     *
- *  waiting for an AJAX response from the server.                       *
- ************************************************************************/
-var loaddiv         = null;
-
-/************************************************************************
- *  loadelt                                                             *
- *                                                                      *
- *  This is the element with which the "loading" indicator is           *
- *  associated.                                                         *
- ************************************************************************/
-var loadelt        = null;
-
-/************************************************************************
- *  dialogDiv                                                           *
- *                                                                      *
- *  The current modal dialog division displayed in a popup              *
- ************************************************************************/
-var dialogDiv       = null;
-
-/************************************************************************
- *  global variables used for mouse drag on a dialog                    *
- *                                                                      *
- *  This code does not currently work.                                  *
- ************************************************************************/
-var dragok  = false;    // if true drag in progress
-var dy;         // distance from top of dialog to mouse
-var dx;         // distance from left of dialog to mouse
-
-/************************************************************************
- *  debug                                                               *
- *                                                                      *
- *  String containing the setting of the debug option used to control   *
- *  output of diagnostic information.  This is set by the script        *
- *  parameter Debug, which can be specified on any script either        *
- *  by method='get' or method='post'                                    *
- ************************************************************************/
-var debug       = 'n';  // default to no debug
-
-/************************************************************************
- *  helpDiv                                                             *
- *                                                                      *
- *  The current help division displayed in a popup                      *
- ************************************************************************/
-var helpDiv     = null;
-
-/************************************************************************
- *  helpElt                                                             *
- *                                                                      *
- *  The element for which help is to be displayed when the timer pops   *
- ************************************************************************/
-var helpElt     = null;
-
-/************************************************************************
- *  helpDelayTimer                                                      *
- *                                                                      *
- *  A timer to control when help is displayed as a result of            *
- *  mouse over events                                                   *
- ************************************************************************/
-var helpDelayTimer  = null;
-
-/************************************************************************
- *  iframe                                                              *
- *                                                                      *
- *  Global variable to hold a reference to a displayed dialog in an     *
- *  instance of <iframe> occupying the right hand half of the window.   *
- ************************************************************************/
-var iframe      = null;
+    let re      = new RegExp('\u{61}', 'u');
+    return retval  = 'unicode' in re && re.unicode;
+}           // function isUnicodeSupported();
 
 /************************************************************************
  *  function getArgs                                                    *
@@ -404,23 +315,36 @@ var iframe      = null;
  ************************************************************************/
 function getArgs()
 {
-    var args    = new Object();
-    var query   = location.search.substring(1); // search excluding '?'
-    var pairs   = query.split("&");     // split on ampersands
-    for (var i = 0; i < pairs.length; i++)
+    let args    = new Object();
+    let query   = location.search.substring(1); // search excluding '?'
+    let pairs   = query.split("&");     // split on ampersands
+    for (let i = 0; i < pairs.length; i++)
     {       // loop through all pairs
-        var pos = pairs[i].indexOf('=');
+        let pos = pairs[i].indexOf('=');
         if (pos == -1)
             continue;
         // argument names are case-insensitive
-        var name    = pairs[i].substring(0, pos).toLowerCase();
-        var value   = pairs[i].substring(pos + 1);
+        let name    = pairs[i].substring(0, pos).toLowerCase();
+        let value   = pairs[i].substring(pos + 1);
         value       = decodeURIComponent(value);
         args[name]  = value;
 
         // set the global diagnostic flag
-        if (name == 'debug')
-            debug   = value;
+        switch(name)
+        {
+            case 'debug':
+                debug               = value;
+                break;
+
+            case 'text':
+                activateMCE         = false;
+                break;
+
+            case 'lang':
+                lang                = value;
+                break;
+
+        }
     }       // loop through all pairs
 
     return args;
@@ -435,6 +359,101 @@ function getArgs()
 var args    = getArgs();
 
 /************************************************************************
+ * specify the style for tinyMCE editing                                *
+ ************************************************************************/
+
+if (activateMCE && tinyMCEparms && typeof tinyMCE !== 'undefined')
+{
+    // alert("tinyMCEparms=" + JSON.stringify(tinyMCEparms));
+    tinyMCE.init(tinyMCEparms);
+}
+
+/************************************************************************
+ *  Global warning that Microsoft Internet Explorer doesn't work        *
+ ************************************************************************/
+try {
+    eval('let x = "y";');
+} catch(error)
+{
+    alert("Your Browser: " + navigator.userAgent +
+      " is non-standard in its implementation and many services may not work. " +
+      "Upgrade to Edge version 12 or later, or use ANY other browser. " +
+      "Many scripts on this site will fail or report syntax or other errors. " + error.message);
+}
+
+/************************************************************************
+ *  loaddiv                                                             *
+ *                                                                      *
+ *  This instance of HTMLElement contains the "loading" indicator when  *
+ *  a script is waiting for an AJAX response from the server.           *
+ ************************************************************************/
+var loaddiv          = null;
+
+/************************************************************************
+ *  loadelt                                                             *
+ *                                                                      *
+ *  This is the instance of HTMLElement which is to be updated when     *
+ *  the AJAX response is received from the server.                      *
+ ************************************************************************/
+var loadelt          = null;
+
+/************************************************************************
+ *  dialogDiv                                                           *
+ *                                                                      *
+ *  The current modal dialog division displayed in a popup              *
+ ************************************************************************/
+var dialogDiv        = null;
+
+/************************************************************************
+ *  global variables used for mouse drag on a dialog                    *
+ *                                                                      *
+ *  This code does not currently work.                                  *
+ ************************************************************************/
+var dragok   = false;    // if true drag in progress
+var dy;                  // distance from top of dialog to mouse
+var dx;                  // distance from left of dialog to mouse
+
+/************************************************************************
+ *  debug                                                               *
+ *                                                                      *
+ *  String containing the setting of the debug option used to control   *
+ *  output of diagnostic information.  This is set by the script        *
+ *  parameter Debug, which can be specified on any script either        *
+ *  by method='get' or method='post'                                    *
+ ************************************************************************/
+var debug            = 'n';  // default to no debug
+
+/************************************************************************
+ *  helpDiv                                                             *
+ *                                                                      *
+ *  The current help division displayed in a popup                      *
+ ************************************************************************/
+var helpDiv          = null;
+
+/************************************************************************
+ *  helpElt                                                             *
+ *                                                                      *
+ *  The element for which help is to be displayed when the timer pops   *
+ ************************************************************************/
+var helpElt          = null;
+
+/************************************************************************
+ *  helpDelayTimer                                                      *
+ *                                                                      *
+ *  A timer to control when help is displayed as a result of            *
+ *  mouse over events                                                   *
+ ************************************************************************/
+var helpDelayTimer   = null;
+
+/************************************************************************
+ *  iframe                                                              *
+ *                                                                      *
+ *  Global variable to hold a reference to a displayed dialog in an     *
+ *  instance of HTMLIFrameElement occupying half of the window.         *
+ ************************************************************************/
+var iframe           = null;
+
+/************************************************************************
  *  function getHelpPopupOption                                         *
  *                                                                      *
  *  Determine whether or not this user wishes to see help popups.       *
@@ -445,17 +464,17 @@ var args    = getArgs();
 function getHelpPopupOption()
 {
     // suppress help popup based upon cookie value
-    var allcookies = document.cookie;
+    let allcookies = document.cookie;
     if (allcookies.length == 0)
         return true;
 
     // Break the string of all cookies into individual cookie strings
     // Then loop through the cookie strings, looking for our name
-    var cookies     = allcookies.split(';');
-    var cookieval   = null;
-    for(var i = 0; i < cookies.length; i++)
+    let cookies     = allcookies.split(';');
+    let cookieval   = null;
+    for(let i = 0; i < cookies.length; i++)
     {
-        var cookieparts = cookies[i].trim().split('=');
+        let cookieparts = cookies[i].trim().split('=');
 
         // Does this cookie string begin with the name we want?
         if (cookieparts[0] == 'user')
@@ -468,12 +487,12 @@ function getHelpPopupOption()
     if (cookieval)
     {               // have a user cookie
         // Break user cookie into an array of name/value pairs
-        var a = cookieval.split('&');
+        let a = cookieval.split('&');
 
         // Break each pair into an array with 2 elements
-        for(var i=0; i < a.length; i++)
+        for(let i=0; i < a.length; i++)
         {           // loop through name/value pairs
-            var keyval = a[i].split(':');
+            let keyval = a[i].split(':');
             if (keyval[0] == 'options')
             {
                 // alert("util.js: getHelpPopupOption: returns " +
@@ -513,21 +532,21 @@ if (tempCookies.length > 0)
 {           // cookies passed
     // Break the string of all cookies into individual cookie strings
     // Then loop through the cookie strings, looking for our name
-    var cookiesList = tempCookies.split(';');
-    var txt     = 'util.js: Cookies: length=' + cookiesList.length + ' ';
-    for(var i = 0; i < cookiesList.length; i++)
+    let cookiesList = tempCookies.split(';');
+    let txt     = 'util.js: Cookies: length=' + cookiesList.length + ' ';
+    for(let i = 0; i < cookiesList.length; i++)
     {           // loop through cookies
-        var cookieParts = cookiesList[i].trim().split('=');
+        let cookieParts = cookiesList[i].trim().split('=');
         if (cookieParts.length > 1)
         {       // cookie contains '='
-            var cookieName  = cookieParts[0];
+            let cookieName  = cookieParts[0];
             txt += cookieName + '=[';
-            var cookieVal   = decodeURIComponent(cookieParts[1]);
-            var valParts    = cookieVal.trim().split('&');
-            var valArray    = [];
-            for(var j = 0; j < valParts.length; j++)
+            let cookieVal   = decodeURIComponent(cookieParts[1]);
+            let valParts    = cookieVal.trim().split('&');
+            let valArray    = [];
+            for(let j = 0; j < valParts.length; j++)
             {       // loop through sub-values
-                var t       = valParts[j].trim().split(':');
+                let t       = valParts[j].trim().split(':');
                 if (t.length > 1)
                 {   // name:value
                     valArray[t[0]]  = t[1];
@@ -564,7 +583,7 @@ if (tempCookies.length > 0)
 function addOption(select, text, value)
 {
     // create a new HTML Option object and add it to the Select
-    var newOption       = document.createElement("option");
+    let newOption       = document.createElement("option");
     select.appendChild(newOption);
     newOption.text      = text;     // ie7 demands done after append
     newOption.value     = value;
@@ -587,7 +606,7 @@ function addOption(select, text, value)
  ************************************************************************/
 function createNamedElement(type, name)
 {
-    var element = null;
+    let element = null;
     // Try the IE way; this fails on standards-compliant browsers
     try {
         element = document.createElement('<'+type+' name="'+name+'">');
@@ -629,16 +648,16 @@ function getElt(current, tagName)
         throw new Error("util.js: getElt: parameter is not a document element");
     if (current)
     {       // valid current
-        for (var i = 0; i < current.childNodes.length; i++)
+        for (let i = 0; i < current.childNodes.length; i++)
         {
-            var cNode   = current.childNodes[i];
+            let cNode   = current.childNodes[i];
             if (cNode.nodeType == 1)
             {       // element node
                 if (cNode.nodeName.toUpperCase() == tagName.toUpperCase())
                     return cNode;
                 else
                 {   // search recursively
-                    var element = getElt(cNode, tagName);
+                    let element = getElt(cNode, tagName);
                     if (element)
                         return element;
                 }   // search recursively
@@ -677,9 +696,9 @@ function getElts(current, tagName, retval)
         retval  = [];
     if (current)
     {       // valid current
-        for (var i = 0; i < current.childNodes.length; i++)
+        for (let i = 0; i < current.childNodes.length; i++)
         {
-            var cNode   = current.childNodes[i];
+            let cNode   = current.childNodes[i];
             if (cNode.nodeType == 1)
             {       // element node
                 if (cNode.nodeName.toUpperCase() == tagName.toUpperCase())
@@ -728,12 +747,12 @@ function getText(element)
     if (element.textContent)
         return  element.textContent;
 
-    var     text    = "";
+    let     text    = "";
     if (element.childNodes === undefined)
         throw "util.js: getText: parameter is not a document element";
-    for (var j = 0; j < element.childNodes.length; ++j)
+    for (let j = 0; j < element.childNodes.length; ++j)
     {
-        var sub = element.childNodes[j];
+        let sub = element.childNodes[j];
         if ((sub.nodeType == 3) && (sub.nodeValue))
         {       // text node
             if (text.length > 0)
@@ -757,10 +776,10 @@ function getText(element)
  ************************************************************************/
 function copyChildren(fromNode, toNode)
 {
-    for (var j = 0; j < fromNode.childNodes.length; ++j)
+    for (let j = 0; j < fromNode.childNodes.length; ++j)
     {
-        var sub = parent.childNodes[j];
-        var newNode = sub.cloneNode(true);
+        let sub = parent.childNodes[j];
+        let newNode = sub.cloneNode(true);
         toNode.appendChild(newNode);
     }
 }       // function copyChildren
@@ -791,7 +810,7 @@ function tagToString(node)
         return node.outerHTML;
 
     // otherwise we have to iterate over all of the child nodes
-    var retval;
+    let retval;
     if (node.nodeType == 1)
     {       // element
         retval  = "<" + node.nodeName;
@@ -807,14 +826,14 @@ function tagToString(node)
 
     if (node.attributes)
     {
-        for (var i = 0; i < node.attributes.length; i++)
+        for (let i = 0; i < node.attributes.length; i++)
         {
-            var attrname    = node.attributes[i].name;
+            let attrname    = node.attributes[i].name;
             if (attrname.substr(0,2) == "on")
                 continue;       // ignore event methods
             if (attrname.substr(0,4) == "aria")
                 continue;       // ignore M$ aria attributes
-            var value   = node.attributes[i].value;
+            let value   = node.attributes[i].value;
             if (value.length > 32)
                 value   = value.substr(0,31) + "...";
             retval  += " " + node.attributes[i].name + "=\'"
@@ -833,9 +852,9 @@ function tagToString(node)
 
         if (node.childNodes)
         {
-            for (var i = 0; i < node.childNodes.length; i++)
+            for (let i = 0; i < node.childNodes.length; i++)
             {       // loop through childNOdes
-                var child   = node.childNodes[i];
+                let child   = node.childNodes[i];
                 if (child.nodeType == 1)
                     retval  += tagToString(child);
                 else
@@ -880,7 +899,7 @@ function tagToString(node)
  ************************************************************************/
 function show(id)
 {
-    var element                 = null;
+    let element                 = null;
     if (this instanceof Element)
         element                 = this;
     else
@@ -895,7 +914,7 @@ function show(id)
     // set the focus on the first button in the dialog
     // displayDialog ensures that even if the dialog designer forgot
     // to include any buttons at least one is always present
-    var buttons = element.getElementsByTagName('BUTTON');
+    let buttons = element.getElementsByTagName('BUTTON');
     if (buttons.length > 0)
         buttons[0].focus();
 }   // function show
@@ -913,7 +932,7 @@ function show(id)
  ************************************************************************/
 function hide(id)
 {
-    var element                 = null;
+    let element                 = null;
     if (this instanceof Element)
         element                 = this;
     else
@@ -934,7 +953,7 @@ function hide(id)
  ************************************************************************/
 function getOffsetLeft(elt)
 {
-    var left    = 0;
+    let left    = 0;
     while(elt)
     {
         left    += elt.offsetLeft;
@@ -953,8 +972,8 @@ function getOffsetLeft(elt)
  ************************************************************************/
 function getOffsetRight(elt)
 {
-    var left    = 0;
-    var right   = elt.offsetWidth;
+    let left    = 0;
+    let right   = elt.offsetWidth;
     while(elt)
     {
         left    += elt.offsetLeft;
@@ -974,13 +993,13 @@ function getOffsetRight(elt)
 function getOffsetTop(elt)
 {
     // note that "top" is a reserved word
-    var y           = 0;
+    let y           = 0;
     while(elt)
     {
         y           += elt.offsetTop;
         elt         = elt.offsetParent;
     }       // increment up to top element
-    var main        = document.getElementsByTagName('main');
+    let main        = document.getElementsByTagName('main');
     if (main.length > 0)
     {
         main        = main[0];
@@ -1010,21 +1029,21 @@ function addHelpAbbrs(helpDiv, abbrTable)
 
     // if there is already a <TABLE> tag in this help division, then
     // the abbreviation expansion information has already been added
-    var ptags   = helpDiv.getElementsByTagName("TABLE");
+    let ptags   = helpDiv.getElementsByTagName("TABLE");
     if (ptags.length > 0)
         return;
 
     // add the abbreviation expansion documentation to the help panel
-    var p1  = helpDiv.appendChild(document.createElement('P'));
+    let p1  = helpDiv.appendChild(document.createElement('P'));
     p1.className= 'label';
     p1.appendChild(document.createTextNode(
         "The following abbreviations are expanded:"
                         ));
-    var tbl = helpDiv.appendChild(document.createElement('TABLE'));
-    var numCols = 3;
-    var col = 0;
-    var tr;
-    for(var abbr in abbrTable)
+    let tbl = helpDiv.appendChild(document.createElement('TABLE'));
+    let numCols = 3;
+    let col = 0;
+    let tr;
+    for(let abbr in abbrTable)
     {
         if (col == 0)
         {
@@ -1032,10 +1051,10 @@ function addHelpAbbrs(helpDiv, abbrTable)
             col = numCols;
         }
         col--;
-        var td1 = tr.appendChild(document.createElement('TH'));
+        let td1 = tr.appendChild(document.createElement('TH'));
         td1.className   = "left";
         td1.appendChild(document.createTextNode(abbr));
-        var td2 = tr.appendChild(document.createElement('TD'));
+        let td2 = tr.appendChild(document.createElement('TD'));
         td2.appendChild(document.createTextNode(abbrTable[abbr]));
     }       // run through abbreviations
 }       // function addHelpAbbrs
@@ -1078,7 +1097,7 @@ function keyDown(e)
     {       // browser is not W3C compliant
         e       =  window.event;    // IE
     }       // browser is not W3C compliant
-    var code    = e.key;
+    let code    = e.key;
 
     // hide the help balloon on any keystroke
     if (helpDiv)
@@ -1123,11 +1142,11 @@ function displayHelp(element)
         helpDiv                 = null;
     }       // a help balloon is currently displayed
 
-    var helpDivName             = "";
-    var name                    = element.name;
+    let helpDivName             = "";
+    let name                    = element.name;
     if (name === undefined || name === null || name == '')
         name                    = element.id;
-    var forid                   = element.getAttribute("for");
+    let forid                   = element.getAttribute("for");
     try {
         // the help division name may be supplied by an explicit private
         // attribute "helpDiv"
@@ -1136,7 +1155,7 @@ function displayHelp(element)
         else
         if (name && name.length > 0)
         {   // element has a name
-            var dollar = name.indexOf('$');
+            let dollar = name.indexOf('$');
             if (name.length > 2 &&
                 name.substring(name.length - 2) == "[]")
             {       // multiple selection
@@ -1172,7 +1191,7 @@ function displayHelp(element)
     // updated to use this convention
 
     // accumulate information to be used in diagnostic messages
-    var msg         = tagToString(element);
+    let msg         = tagToString(element);
 
     // 1) try for the div with id='Help<name>'
     // 2) try without any row number at end of <name>
@@ -1182,7 +1201,7 @@ function displayHelp(element)
     {       // first choice not found
         // strip off trailing decimal digits if any representing
         // a row number
-        for (var l = helpDivName.length; l > 1; l--)
+        for (let l = helpDivName.length; l > 1; l--)
         {   // find last non-numeric character
             if (helpDivName[l - 1] < '0' ||
                 helpDivName[l - 1] > '9')
@@ -1204,13 +1223,13 @@ function displayHelp(element)
     {       // have a help division to display
         if (element.maxLength && element.maxLength > 0)
         {
-            var spanId  = helpDivName + 'Maxlen';
-            var oldElt  = document.getElementById(spanId);
+            let spanId  = helpDivName + 'Maxlen';
+            let oldElt  = document.getElementById(spanId);
             if (oldElt === null)
             {       // information not already appended to help
-                var span    = document.createElement('span');
+                let span    = document.createElement('span');
                 span.setAttribute('id', spanId);
-                var text    = document.createTextNode(
+                let text    = document.createTextNode(
                         "A maximum of " + element.maxLength +
                         " characters may be entered in this field.  ");
                 span.appendChild(text);
@@ -1220,7 +1239,7 @@ function displayHelp(element)
 
         // If presentation style requires capitalization,
         // report it in help
-        var textTransform   = "";
+        let textTransform   = "";
         if (element.currentStyle)
         {       // browser supports IE API
             textTransform   = element.currentStyle.textTransform;
@@ -1228,7 +1247,7 @@ function displayHelp(element)
         else
         if (window.getComputedStyle)
         {       // browser supports W3C API
-            var style       = window.getComputedStyle(element, null);
+            let style       = window.getComputedStyle(element, null);
             textTransform   = style.textTransform;
         }       // browser supports W3C API
 
@@ -1250,7 +1269,7 @@ function displayHelp(element)
             addHelpAbbrs(helpDiv, element.abbrTbl);
 
         // display the help balloon in an appropriate place on the page
-        var tableWidth  = window.innerWidth;
+        let tableWidth  = window.innerWidth;
         if (getOffsetLeft(element) < Math.floor(window.innerWidth/2))
             helpDiv.style.left  = (getOffsetLeft(element) + 50) + 'px';
         else
@@ -1320,9 +1339,9 @@ function sizeToFit()
 function copyXmlToHtml(xmlNode,
                        htmlNode)
 {
-    var xmlOld;
-    var htmlNew;
-    var htmlElt = null;
+    let xmlOld;
+    let htmlNew;
+    let htmlElt = null;
 
     for (xmlOld = xmlNode.firstChild; xmlOld; xmlOld = xmlOld.nextSibling)
     {
@@ -1331,9 +1350,9 @@ function copyXmlToHtml(xmlNode,
             case 1: // Element
             {
                 htmlElt = document.createElement(xmlOld.nodeName);
-                for (var i = 0; i < xmlOld.attributes.length; i++)
+                for (let i = 0; i < xmlOld.attributes.length; i++)
                 {   // loop through attributes
-                    var attr    = xmlOld.attributes[i];
+                    let attr    = xmlOld.attributes[i];
                     if (attr.name == 'onclick')
                     {
                         if (attr.value.substring(0,10) == "openSignon")
@@ -1373,7 +1392,7 @@ function copyXmlToHtml(xmlNode,
  ************************************************************************/
 function openSignon(ev)
 {
-    var server  = location.protocol + "//" +
+    let server  = location.protocol + "//" +
                   location.hostname;
     if (location.port.length > 0)
         server  += ":" + location.port;
@@ -1381,7 +1400,7 @@ function openSignon(ev)
         server  += "/jamescobban/";
     else
         server  += "/";
-    var lang    = 'en';
+    let lang    = 'en';
     if ('lang' in args)
     {
         lang    = args['lang'];
@@ -1401,7 +1420,7 @@ function openSignon(ev)
  ************************************************************************/
 function openAccount(ev)
 {
-    var server  = location.protocol + "//" +
+    let server  = location.protocol + "//" +
                   location.hostname;
     if (location.port.length > 0)
         server  += ":" + location.port;
@@ -1409,7 +1428,7 @@ function openAccount(ev)
         server  += "/jamescobban/";
     else
         server  += "/";
-    var lang    = 'en';
+    let lang    = 'en';
     if ('lang' in args)
     {
         lang    = args['lang'];
@@ -1435,14 +1454,14 @@ function openAccount(ev)
 function changeDiv(divNode)
 {
     // locate cell to prompt for page number in
-    var tableNode   = getElt(document.distForm, "TABLE");
-    var tbNode      = getElt(tableNode,"TBODY");
-    var trNode      = document.getElementById("pageRow");
+    let tableNode   = getElt(document.distForm, "TABLE");
+    let tbNode      = getElt(tableNode,"TBODY");
+    let trNode      = document.getElementById("pageRow");
 
     // remove any existing HTML from the table row with id='pageRow'
     if (trNode)
     {       // have <tr id='pageRow'>
-        var tdNode      = document.getElementById("pageCell");
+        let tdNode      = document.getElementById("pageCell");
         if (tdNode)
         {   // have cell containing number of pages
             // remove previous contents of cell, if any
@@ -1450,24 +1469,24 @@ function changeDiv(divNode)
                 tdNode.removeChild(tdNode.firstChild);
 
             // add information from database record
-            var pages       = divNode.getAttribute("pages");
-            var page1       = divNode.getAttribute("page1");
-            var bypage      = divNode.getAttribute("bypage");
+            let pages       = divNode.getAttribute("pages");
+            let page1       = divNode.getAttribute("page1");
+            let bypage      = divNode.getAttribute("bypage");
 
             if ((pages.length > 0) &&
                 (Number(pages) > 0))
             {   // explicit number of pages available from database
                 // create selection element to choose page
-                var select  = document.createElement("select");
+                let select  = document.createElement("select");
                 select.name = "Page";
                 select.size = 1;
-                var pageoff = 0;
+                let pageoff = 0;
                 if ((page1.length > 0) &&
                     (Number(page1) > 0))
                     pageoff = Number(page1) - bypage;
 
                 // add option element for each page in division
-                for(var i = 1; i <= Number(pages); i++)
+                for(let i = 1; i <= Number(pages); i++)
                 {   // loop through pages
                     addOption(select,
                               i*bypage + pageoff,
@@ -1479,7 +1498,7 @@ function changeDiv(divNode)
             else
             {   // explicit number of pages not available from database
                 // use simple text input to obtain page number
-                var input   = document.createElement("input");
+                let input   = document.createElement("input");
                 input.type="text";
                 input.name="Page";
                 input.size=2;
@@ -1514,9 +1533,9 @@ function eltMouseOver()
         if (this.nodeName.toUpperCase() == 'TD' ||
             this.nodeName.toUpperCase() == 'DIV')
         {       // mouseover defined for the cell containing the element
-            for (var i = 0; i < this.childNodes.length; i++)
+            for (let i = 0; i < this.childNodes.length; i++)
             {       // loop through children of this cell
-                var cNode   = this.childNodes[i];
+                let cNode   = this.childNodes[i];
                 if (cNode.nodeType == 1 && (cNode.name || cNode.id))
                 {   // element
                     helpElt = cNode;
@@ -1620,7 +1639,7 @@ function actMouseOverHelp(element)
 function displayMenu(ev)
 {
     ev.stopPropagation();
-    var menu                    = document.getElementById('menu');
+    let menu                    = document.getElementById('menu');
 
     // ensure the menu is hidden before modifying it
     menu.style.display          = 'none';
@@ -1629,11 +1648,11 @@ function displayMenu(ev)
     menu.style.display          = 'block';
 
     // display the menu offset from the main menu button
-    var element                 = document.getElementById('menuButton');
-    var leftOffset              = getOffsetLeft(element);
-    var rightOffset             = getOffsetRight(element);
+    let element                 = document.getElementById('menuButton');
+    let leftOffset              = getOffsetLeft(element);
+    let rightOffset             = getOffsetRight(element);
 
-    var dialogWidth             = menu.clientWidth;
+    let dialogWidth             = menu.clientWidth;
     if (leftOffset - dialogWidth < 10)
         leftOffset              = rightOffset + 10;
     else
@@ -1641,11 +1660,11 @@ function displayMenu(ev)
     menu.style.left             = leftOffset + "px";
     menu.style.top              = (getOffsetTop(element) + 10) + 'px';
 
-    var anchors     = menu.getElementsByTagName('a');
-    var previous    = anchors[anchors.length - 1];
-    for(var i = 0; i < anchors.length; i++)
+    let anchors     = menu.getElementsByTagName('a');
+    let previous    = anchors[anchors.length - 1];
+    for(let i = 0; i < anchors.length; i++)
     {           // loop through children
-        var anchor          = anchors[i];
+        let anchor          = anchors[i];
         previous.nextAnchor = anchor;
         anchor.prevAnchor   = previous;
         previous            = anchor;
@@ -1654,7 +1673,7 @@ function displayMenu(ev)
     menu.style.display          = 'block';
     menu.style.visibility       = 'visible';
     menu.scrollIntoView();
-    var help                    = document.getElementById('menuhelp');
+    let help                    = document.getElementById('menuhelp');
     if (help)
         help.focus();
 
@@ -1707,7 +1726,7 @@ function displayDialog(templateId,
     }               // a dialog balloon is displayed
 
     // the dialog is laid out in a common shared div
-    var dialog  = document.getElementById('msgDiv');
+    let dialog  = document.getElementById('msgDiv');
     if (dialog === null)
     {               // belt and suspenders
         dialog              = document.createElement('div');
@@ -1722,7 +1741,7 @@ function displayDialog(templateId,
     dialog.style.visibility     = 'hidden';
     dialog.style.display        = 'block';
 
-    var template                = null;
+    let template                = null;
     if (typeof templateId == 'string')
         template                = document.getElementById(templateId);
     else
@@ -1749,7 +1768,7 @@ function displayDialog(templateId,
         dialog.innerHTML        = '';
 
         // customize the template
-        var form                = createFromTemplate(template,
+        let form                = createFromTemplate(template,
                                                      parms,
                                                      null);
         form.id                 = '';
@@ -1765,8 +1784,8 @@ function displayDialog(templateId,
 
         // set the onclick action for the first (or only) button
         // in the dialog
-        var buttons             = dialog.getElementsByTagName('BUTTON');
-        var button;
+        let buttons             = dialog.getElementsByTagName('BUTTON');
+        let button;
         if (buttons.length == 0)
         {       // button, button, who's got the button?
             // add a default "Cancel" button
@@ -1781,7 +1800,7 @@ function displayDialog(templateId,
         {
             if (action instanceof Array)
             {       // array of actions
-                for (var i = 0; i < buttons.length; i++)
+                for (let i = 0; i < buttons.length; i++)
                     if (i < action.length)
                         buttons[i].onclick  = action[i];
                     else
@@ -1791,32 +1810,32 @@ function displayDialog(templateId,
             else
             {       // single action for first button
                 buttons[0].onclick  = action;
-                for (var i = 1; i < buttons.length; i++)
+                for (let i = 1; i < buttons.length; i++)
                     buttons[i].onclick  = hideDialog;
             }       // single action for first button
         }
         else
         {       // default action, every button closes dialog
-            for (var i = 0; i < buttons.length; i++)
+            for (let i = 0; i < buttons.length; i++)
                 buttons[i].onclick  = hideDialog;
         }       // default action, every button closes dialog
 
         // display the dialog offset from the requesting button
-        var topOffset           = 0;
-        var leftOffset          = 0;
-        var rightOffset         = 0;
+        let topOffset           = 0;
+        let leftOffset          = 0;
+        let rightOffset         = 0;
         if (element)
         {
             topOffset           = getOffsetTop(element);
             leftOffset          = getOffsetLeft(element);
             rightOffset         = getOffsetRight(element);
         }
-        var pane                = document.getElementById('transcription');
+        let pane                = document.getElementById('transcription');
         if (pane === null)
             pane                = document.body;
 
-        var dialogWidth         = dialog.clientWidth;
-        var dialogHeight        = dialog.clientHeight;
+        let dialogWidth         = dialog.clientWidth;
+        let dialogHeight        = dialog.clientHeight;
         if (leftOffset - dialogWidth < 10)
         {                   // display to right of element
             leftOffset          = rightOffset + 10 - pane.scrollLeft;
@@ -2039,7 +2058,7 @@ function keyDownPaging(e)
     {       // browser is not W3C compliant
         e       =  window.event;    // IE
     }       // browser is not W3C compliant
-    var code                = e.key;
+    let code                = e.key;
 
     // take action based upon code
     switch (code)
@@ -2049,7 +2068,7 @@ function keyDownPaging(e)
         {
             if (e.ctrlKey)
             {
-                var element         = document.getElementById('menuButton');
+                let element         = document.getElementById('menuButton');
                 element.click();
                 e.preventDefault();
                 e.stopPropagation();
@@ -2060,7 +2079,7 @@ function keyDownPaging(e)
 
         case "F10":
         {
-            var element         = document.getElementById('menuButton');
+            let element         = document.getElementById('menuButton');
             element.click();
             e.preventDefault();
             e.stopPropagation();
@@ -2069,10 +2088,10 @@ function keyDownPaging(e)
 
         case "PageDown":    // page down
         {
-            var element     = document.getElementById('topNext');
+            let element     = document.getElementById('topNext');
             if (element)
             {               // topNext exists
-                for(var child   = element.firstChild;
+                for(let child   = element.firstChild;
                     child;
                     child = child.nextSibling)
                 {           // loop through children
@@ -2088,10 +2107,10 @@ function keyDownPaging(e)
 
         case "PageUp":      // page up
         {
-            var element     = document.getElementById('topPrev');
+            let element     = document.getElementById('topPrev');
             if (element)
             {               // topPrev exists
-                for(var child   = element.firstChild;
+                for(let child   = element.firstChild;
                     child;
                     child = child.nextSibling)
                 {           // loop through children
@@ -2124,7 +2143,7 @@ function keyDownMenu(e)
     {       // browser is not W3C compliant
         e       =  window.event;    // IE
     }       // browser is not W3C compliant
-    var code                = e.key;
+    let code                = e.key;
 
     // take action based upon code
     switch (code)
@@ -2203,7 +2222,7 @@ addEventHandler(window, "resize",   commonResize);
 
 function commonInit(event)
 {
-    var w       = window,
+    let w       = window,
     d           = document,
     e           = d.documentElement,
     g           = d.getElementsByTagName('body')[0],
@@ -2214,30 +2233,30 @@ function commonInit(event)
     addEventHandler(document, "keydown", keyDownPaging);
 
     // set onclick action for the menu button
-    var menuButton          = document.getElementById('menuButton');
-    var menuWidth           = 0
+    let menuButton          = document.getElementById('menuButton');
+    let menuWidth           = 0
     if (menuButton)
     {
         addEventHandler(menuButton,'click', displayMenu);
         menuWidth           = menuButton.offsetWidth;
     }
 
-    var logo                = document.getElementById('logo');
-    var logoWidth           = 0
+    let logo                = document.getElementById('logo');
+    let logoWidth           = 0
     if (logo)
     {
         addEventHandler(logo,'click', displayMenu);
         logoWidth           = logo.offsetWidth;
     }
 
-    var advert              = document.getElementById('advertSpan');
-    var advertWidth         = 500
+    let advert              = document.getElementById('advertSpan');
+    let advertWidth         = 500
     if (advert)
     {
         advertWidth         = Math.max(advert.offsetWidth, 500);
     }
 
-    var menusWidth= menuWidth + logoWidth + advertWidth;
+    let menusWidth= menuWidth + logoWidth + advertWidth;
 
     if (typeof(FB) != 'undefined')
         FB.getLoginStatus(function(response) {
@@ -2245,14 +2264,16 @@ function commonInit(event)
         });
 
     // scroll main portion of page if it does not fit without scrolling
-    var headSection             = document.getElementById('headSection');
-    var mainSection             = document.getElementById('mainSection');
-    var mainHeight              = mainSection.offsetHeight;
-    var windHeight              = window.innerHeight;
+    let headSection             = document.getElementById('headSection');
+    let mainSection             = document.getElementById('mainSection');
+    let mainHeight              = mainSection.offsetHeight;
+    let windHeight              = window.innerHeight;
+    let headHeight              = 0;
+    let headWidth               = 0;
     if (headSection)
     {
-        var headHeight          = headSection.offsetHeight;
-        var headWidth           = headSection.offsetWidth;
+        headHeight              = headSection.offsetHeight;
+        headWidth               = headSection.offsetWidth;
         if (mainHeight + headHeight > windHeight)
         {
             mainSection.style.height    = (windHeight - headHeight - 12) + 'px';
@@ -2260,10 +2281,10 @@ function commonInit(event)
         }
     }                           // headSection defined in template
 
-    var rightColumn             = document.getElementById('rightColumn');
+    let rightColumn             = document.getElementById('rightColumn');
     if (rightColumn)
     {                           // right column defined
-        var windWidth           = window.innerWidth;
+        let windWidth           = window.innerWidth;
         if (windWidth > 1100)
         {
             mainSection.style.width     = (windWidth - 320) + 'px';
@@ -2275,17 +2296,17 @@ function commonInit(event)
             rightColumn.style.display   = 'none';
         }
 
-        var useridElt           = document.getElementById('UserInfoUserid');
-        var userid              = useridElt.innerHTML.trim();
+        let useridElt           = document.getElementById('UserInfoUserid');
+        let userid              = useridElt.innerHTML.trim();
         if (userid.length > 0)
         {
-            var collectElt      = document.getElementById('collection');
+            let collectElt      = document.getElementById('collection');
             if (collectElt)
                 collectElt.style.display    = 'none';
         }
         else
         {
-            var welcomeElt      = document.getElementById('userWelcome');
+            let welcomeElt      = document.getElementById('userWelcome');
             if (welcomeElt)
                 welcomeElt.style.display    = 'none';
         }
@@ -2298,10 +2319,10 @@ function commonInit(event)
 
     // if the user has requested it, suppress popup help
     // information about the current user is now available in all pages
-    var optionsElt  = document.getElementById('UserInfoOptions');
+    let optionsElt  = document.getElementById('UserInfoOptions');
     if (optionsElt)
     {               // have info from User instance
-        var topt            = optionsElt.textContent.trim() - 0;
+        let topt            = optionsElt.textContent.trim() - 0;
         if (topt && 2)
         {           // turn off popup Help
             if (debug.toLowerCase() == 'y')
@@ -2314,12 +2335,12 @@ function commonInit(event)
 
     // scan through all forms and set common dynamic functionality
     // for elements
-    for(var i = 0; i < document.forms.length; i++)
+    for(let i = 0; i < document.forms.length; i++)
     {           // iterate through all forms
-        var form    = document.forms[i];
-        for(var j = 0; j < form.elements.length; j++)
+        let form    = document.forms[i];
+        for(let j = 0; j < form.elements.length; j++)
         {       // loop through elements in form
-            var element = form.elements[j];
+            let element = form.elements[j];
 
             // pop up help balloon if the mouse hovers over an element
             // for more than 2 seconds
@@ -2327,15 +2348,15 @@ function commonInit(event)
         }       // loop through elements in form
     }           // iterate through all forms
 
-    var dataTable                   = document.getElementById('dataTable');
+    let dataTable                   = document.getElementById('dataTable');
     if (dataTable)
     {                   // page contains display of tabular results
-        var topBrowse               = document.getElementById('topBrowse');
-        var botBrowse               = document.getElementById('botBrowse');
+        let topBrowse               = document.getElementById('topBrowse');
+        let botBrowse               = document.getElementById('botBrowse');
         if (topBrowse || botBrowse)
         {               // page contains pagination row
-            var dataWidth           = dataTable.offsetWidth;
-            var windowWidth         = document.body.clientWidth - 8;
+            let dataWidth           = dataTable.offsetWidth;
+            let windowWidth         = document.body.clientWidth - 8;
             if (dataWidth > windowWidth)
                 dataWidth           = windowWidth;
             if (topBrowse)
@@ -2406,48 +2427,48 @@ addEventHandler(window, "resize",   commonResize);
 
 function commonResize(event)
 {
-    var w       = window,
+    let w       = window,
     d           = document,
     e           = d.documentElement,
     g           = d.getElementsByTagName('body')[0],
     x           = w.innerWidth || e.clientWidth || g.clientWidth,
     y           = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
-    var topCrumbs           = null;
-    var menuButton          = document.getElementById('menuButton');
-    var menuWidth           = 0
+    let topCrumbs           = null;
+    let menuButton          = document.getElementById('menuButton');
+    let menuWidth           = 0
     if (menuButton)
     {
         topCrumbs           = menuButton.parentNode;
         menuWidth           = menuButton.offsetWidth;
     }
 
-    var logo                = document.getElementById('logo');
-    var logoWidth           = 0
+    let logo                = document.getElementById('logo');
+    let logoWidth           = 0
     if (logo)
     {
         logoWidth           = logo.offsetWidth;
     }
 
-    var advert              = document.getElementById('advertSpan');
-    var advertWidth         = 0
+    let advert              = document.getElementById('advertSpan');
+    let advertWidth         = 0
     if (advert)
     {
         topCrumbs           = advert.parentNode;
         advertWidth         = Math.max(advert.offsetWidth, 500);
     }
 
-    var menusWidth= menuWidth + logoWidth + advertWidth;
+    let menusWidth= menuWidth + logoWidth + advertWidth;
 
-    var dataTable                   = document.getElementById('dataTable');
+    let dataTable                   = document.getElementById('dataTable');
     if (dataTable)
     {                   // page contains display of tabular results
-        var topBrowse               = document.getElementById('topBrowse');
-        var botBrowse               = document.getElementById('botBrowse');
+        let topBrowse               = document.getElementById('topBrowse');
+        let botBrowse               = document.getElementById('botBrowse');
         if (topBrowse || botBrowse)
         {               // page contains pagination row
-            var dataWidth           = dataTable.offsetWidth;
-            var windowWidth         = document.body.clientWidth - 8;
+            let dataWidth           = dataTable.offsetWidth;
+            let windowWidth         = document.body.clientWidth - 8;
             if (dataWidth > windowWidth)
                 dataWidth           = windowWidth;
             if (topBrowse)
@@ -2457,15 +2478,15 @@ function commonResize(event)
         }               // page contains pagination row
     }                   // page contains display of tabular results
 
-    var headSection             = document.getElementById('headSection');
-    var mainSection             = document.getElementById('mainSection');
-    var rightColumn             = document.getElementById('rightColumn');
+    let headSection             = document.getElementById('headSection');
+    let mainSection             = document.getElementById('mainSection');
+    let rightColumn             = document.getElementById('rightColumn');
     if (rightColumn)
     {                           // right column defined
-        var windWidth           = window.innerWidth;
-        var windHeight          = window.innerHeight;
-        var headHeight          = headSection.offsetHeight;
-        var headWidth           = headSection.offsetWidth;
+        let windWidth           = window.innerWidth;
+        let windHeight          = window.innerHeight;
+        let headHeight          = headSection.offsetHeight;
+        let headWidth           = headSection.offsetWidth;
         if (windWidth > 1100)
         {
             mainSection.style.width     = (windWidth - 320) + 'px';
@@ -2478,17 +2499,17 @@ function commonResize(event)
             rightColumn.style.display   = 'none';
         }
 
-        var useridElt           = document.getElementById('UserInfoUserid');
-        var userid              = useridElt.innerHTML.trim();
+        let useridElt           = document.getElementById('UserInfoUserid');
+        let userid              = useridElt.innerHTML.trim();
         if (userid.length > 0)
         {
-            var collectElt      = document.getElementById('collection');
+            let collectElt      = document.getElementById('collection');
             if (collectElt)
                 collectElt.style.display    = 'none';
         }
         else
         {
-            var welcomeElt      = document.getElementById('userWelcome');
+            let welcomeElt      = document.getElementById('userWelcome');
             if (welcomeElt)
                 welcomeElt.style.display    = 'none';
         }
@@ -2515,7 +2536,7 @@ addEventHandler(window, "orientationchange",   commonOrientation);
 
 function commonOrientation(ev)
 {
-    var w       = window,
+    let w       = window,
     d           = document,
     e           = d.documentElement,
     g           = d.getElementsByTagName('body')[0],
@@ -2562,17 +2583,17 @@ function commonScroll(event)
  ************************************************************************/
 function traceAlert(message)
 {
-    var traceDiv            = document.getElementById('debugTrace');
+    let traceDiv            = document.getElementById('debugTrace');
     if (traceDiv == null)
     {                       // no existing trace div
         traceDiv            = document.createElement('div');
         traceDiv.id         = 'debugTrace';
         traceDiv.className  = 'warning';
-        var container       = document.body;
-        var h1s             = container.getElementsByTagName('h1');
+        let container       = document.body;
+        let h1s             = container.getElementsByTagName('h1');
         if (h1s.length > 0)
         {                   // insert after first <h1>
-            var h1          = h1s[0];
+            let h1          = h1s[0];
             container       = h1.parentNode;
             if (h1.nextSibling)
                 container.insertBefore(traceDiv, h1.nextSibling);
@@ -2582,11 +2603,11 @@ function traceAlert(message)
         else
             container.appendChild(traceDiv);
     }                       // no existing trace div
-    var line                = document.createElement('p');
-    var tags                = message.split('>');
+    let line                = document.createElement('p');
+    let tags                = message.split('>');
     if (tags.length > 10)
     {                       // so many > implies XML
-        for(var it = 0; it < tags.length; it++)
+        for(let it = 0; it < tags.length; it++)
         {                   // separate the tags with breaks
             line.appendChild(document.createTextNode(tags[it] + '>'));
             line.appendChild(document.createElement('br'));
@@ -2649,37 +2670,37 @@ function cancelSelection()
 
     if (startCell && endCell)
     {       // have a selection to cancel
-        var firstRowIndex   = startCell.parentNode.rowIndex;
-        var lastRowIndex    = endCell.parentNode.rowIndex;
-        var firstCellIndex  = startCell.cellIndex;
-        var lastCellIndex   = endCell.cellIndex;
+        let firstRowIndex   = startCell.parentNode.rowIndex;
+        let lastRowIndex    = endCell.parentNode.rowIndex;
+        let firstCellIndex  = startCell.cellIndex;
+        let lastCellIndex   = endCell.cellIndex;
         if (firstRowIndex > lastRowIndex)
         {   // swap
-            var tri     = firstRowIndex;
+            let tri     = firstRowIndex;
             firstRowIndex   = lastRowIndex;
             lastRowIndex    = tri;
         }   // swap
         if (firstCellIndex > lastCellIndex)
         {   // swap
-            var tci     = firstCellIndex;
+            let tci     = firstCellIndex;
             firstCellIndex  = lastCellIndex;
             lastCellIndex   = tci;
         }   // swap
 
-        var tableBody   = startCell.parentNode.parentNode;
+        let tableBody   = startCell.parentNode.parentNode;
 
-        for (var ri = firstRowIndex; ri <= lastRowIndex; ri++)
+        for (let ri = firstRowIndex; ri <= lastRowIndex; ri++)
         {   // loop through selected rows
-            var row = tableBody.rows[ri];
-            for (var ci = firstCellIndex; ci <= lastCellIndex; ci++)
+            let row = tableBody.rows[ri];
+            for (let ci = firstCellIndex; ci <= lastCellIndex; ci++)
             {   // loop through selected columns
-                var cell    = row.cells[ci];
+                let cell    = row.cells[ci];
                 // find first element in selected cell
-                var element = cell.firstChild;
+                let element = cell.firstChild;
                 while(element && element.nodeType != 1)
                     element = element.nextSibling;
-                var oldcn   = element.className;
-                var newcn   = oldcn;
+                let oldcn   = element.className;
+                let newcn   = oldcn;
                 if (oldcn.substring(oldcn.length - 8) == "Selected")
                     newcn   = oldcn.substring(0,oldcn.length - 8);
                 element.className   = newcn;
@@ -2707,33 +2728,33 @@ function markSelection()
                 " col=" + endCell.cellIndex + " "  +
                 tagToString(endCell));
 
-        var firstRowIndex   = startCell.parentNode.rowIndex;
-        var lastRowIndex    = endCell.parentNode.rowIndex;
-        var firstCellIndex  = startCell.cellIndex;
-        var lastCellIndex   = endCell.cellIndex;
+        let firstRowIndex   = startCell.parentNode.rowIndex;
+        let lastRowIndex    = endCell.parentNode.rowIndex;
+        let firstCellIndex  = startCell.cellIndex;
+        let lastCellIndex   = endCell.cellIndex;
         if (firstRowIndex > lastRowIndex)
         {   // swap
-            var tri     = firstRowIndex;
+            let tri     = firstRowIndex;
             firstRowIndex   = lastRowIndex;
             lastRowIndex    = tri;
         }   // swap
         if (firstCellIndex > lastCellIndex)
         {   // swap
-            var tci     = firstCellIndex;
+            let tci     = firstCellIndex;
             firstCellIndex  = lastCellIndex;
             lastCellIndex   = tci;
         }   // swap
 
-        var tableBody   = startCell.parentNode.parentNode;
+        let tableBody   = startCell.parentNode.parentNode;
 
-        for (var ri = firstRowIndex; ri <= lastRowIndex; ri++)
+        for (let ri = firstRowIndex; ri <= lastRowIndex; ri++)
         {   // loop through selected rows
-            var row = tableBody.rows[ri];
-            for (var ci = firstCellIndex; ci <= lastCellIndex; ci++)
+            let row = tableBody.rows[ri];
+            for (let ci = firstCellIndex; ci <= lastCellIndex; ci++)
             {   // loop through selected columns
-                var cell    = row.cells[ci];
+                let cell    = row.cells[ci];
                 // find first element in selected cell
-                var element = cell.firstChild;
+                let element = cell.firstChild;
                 while(element && element.nodeType != 1)
                     element = element.nextSibling;
                 element.className   = element.className + "Selected";
@@ -2770,7 +2791,7 @@ function eltMouseDown()
 function eltMouseUp()
 {
     // find first element in selected cell
-    var element = this.firstChild;
+    let element = this.firstChild;
     while(element && element.nodeType != 1)
         element = element.nextSibling;
 
@@ -2833,7 +2854,7 @@ function eltMouseUp()
  ************************************************************************/
 function getParmsFromXml(element)
 {
-    var parms   = {};
+    let parms   = {};
     if (element === undefined)
         throw("util.js: getParmsFromXml: parameter is undefined");
     if (element.item)
@@ -2845,17 +2866,17 @@ function getParmsFromXml(element)
     }       // parameter is a NodeList or HtmlCollection
 
     // store the parameters in an object
-    for (var j = 0; j < element.childNodes.length; j++)
+    for (let j = 0; j < element.childNodes.length; j++)
     {       // loop through elements within XML response
-        var elt = element.childNodes[j];
+        let elt = element.childNodes[j];
         if (elt.nodeType != 1)
             continue;   // ignore text & comments between elements
 
-        var value   = "";
+        let value   = "";
 
-        for (var ic = 0; ic < elt.childNodes.length; ic++)
+        for (let ic = 0; ic < elt.childNodes.length; ic++)
         {   // loop through children of current element
-            var child   = elt.childNodes[ic];
+            let child   = elt.childNodes[ic];
             if (child.nodeType == 3)
             {   // text node
                 value   += child.nodeValue;
@@ -2907,7 +2928,7 @@ function getParmsFromXml(element)
  ************************************************************************/
 function getObjFromXml(element)
 {
-    var parms   = {};
+    let parms   = {};
     if (element.length)
     {       // parameter is a NodeList, HtmlCollection, or Array
         if (element.length > 0)
@@ -2917,18 +2938,18 @@ function getObjFromXml(element)
     }       // parameter is a NodeList, HtmlCollection, or Array
 
     // store the parameters in an object
-    var strValue    = "";
-    var returnString    = true;
+    let strValue    = "";
+    let returnString    = true;
 
-    for (var j = 0; j < element.childNodes.length; j++)
+    for (let j = 0; j < element.childNodes.length; j++)
     {           // loop through children of XML element
-        var child   = element.childNodes[j];
+        let child   = element.childNodes[j];
         if (child.nodeType == 1)
         {       // sub element
             returnString    = false;
 
             // update the value of the named attribute
-            var currValue   = parms[child.nodeName];
+            let currValue   = parms[child.nodeName];
             if (currValue === undefined)
                 currValue   = getObjFromXml(child);
             else
@@ -2980,10 +3001,10 @@ function popupLoading(element)
         // if there is no "loading" division, create a default one
         if (loaddiv === null || loaddiv === undefined)
         {       // create missing division
-            var body        = document.body;
+            let body        = document.body;
             if (body)
             {
-                var div = document.createElement('div');
+                let div = document.createElement('div');
                 div.id      = 'loading';
                 div.className   = 'popup';
                 div.appendChild(document.createTextNode("Loading..."));
@@ -2998,7 +3019,7 @@ function popupLoading(element)
                 element     = loadelt;
             else
                 loadelt     = element;
-            var leftOffset  = getOffsetLeft(element);
+            let leftOffset  = getOffsetLeft(element);
             if (leftOffset > 500)
                 leftOffset  -= 200;
             loaddiv.style.left  = leftOffset + "px";
@@ -3033,8 +3054,8 @@ function popupLoadingText(element,
         // if there is no "loading" division, create a default one
         if (loaddiv === null || loaddiv === undefined)
         {           // create missing division
-            var body        = document.body;
-            var div     = document.createElement('div');
+            let body        = document.body;
+            let div     = document.createElement('div');
             div.id      = 'loading';
             div.className   = 'popup';
             div.appendChild(document.createTextNode("Loading..."));
@@ -3053,7 +3074,7 @@ function popupLoadingText(element,
                 element     = loadelt;
             else
                 loadelt     = element;
-            var leftOffset  = getOffsetLeft(element);
+            let leftOffset  = getOffsetLeft(element);
             if (leftOffset > 500)
                 leftOffset  -= 200;
             loaddiv.style.left  = leftOffset + "px";
@@ -3071,8 +3092,8 @@ function popupLoadingText(element,
  ************************************************************************/
 function hideRightColumn()
 {
-    var mainSection             = document.getElementById('mainSection');
-    var rightColumn             = document.getElementById('rightColumn');
+    let mainSection             = document.getElementById('mainSection');
+    let rightColumn             = document.getElementById('rightColumn');
     if (rightColumn)
         rightColumn.style.display   = 'none';
     if (mainSection)
@@ -3110,7 +3131,7 @@ function hideLoading()
 function popupAlert(msg, element)
 {
     // display the message in a popup
-    var parms   = {"template"   : "",
+    let parms   = {"template"   : "",
                    "msg"        : msg};
     displayDialog('Msg$template',
                   parms,
@@ -3145,18 +3166,18 @@ function createFromTemplate(template,
                             parms,
                             unused)
 {
-    var parmsText   = "";
-    for (var name in parms)
+    let parmsText   = "";
+    for (let name in parms)
         parmsText +=  name + "='" + parms[name] + "', ";
     if (debug.toLowerCase() == 'y')
     {
         alert("util.js: createFromTemplate: parms=" + parmsText);
     }
 
-    var templateName    = template;
+    let templateName    = template;
     if (typeof(template) == "string")
     {
-        var ttemplate   = document.getElementById(template);
+        let ttemplate   = document.getElementById(template);
         if (ttemplate === null || ttemplate.cloneNode === undefined)
             throw("util.js: createFromTemplate: unable to find template with id='" + template + "'");
         template    = ttemplate;
@@ -3170,18 +3191,19 @@ function createFromTemplate(template,
 
     // convert the entire template to an HTML string
     // make all substitutions in the string
-    var text        = template.outerHTML;
+    let text        = template.outerHTML;
     //alert("createFromTemplate: template=" + text);
-    var messages    = '';
+    let messages    = '';
+    let retval;
     if (text.length > 0)
     {           // have something to substitute into
-        var chunks      = text.split('$');
-        var retval      = chunks[0];    // part before first variable
-        for (var i=1; i<chunks.length; i++)
+        let chunks      = text.split('$');
+        retval          = chunks[0];    // part before first variable
+        for (let i=1; i<chunks.length; i++)
         {       // process each chunk
-            var chunk   = chunks[i];
-            var result  = chunk.match(/^\w+/);
-            var varname = result[0];
+            let chunk   = chunks[i];
+            let result  = chunk.match(/^\w+/);
+            let varname = result[0];
             if (typeof parms[varname] != 'undefined')
                 retval  += parms[varname] + chunk.substring(varname.length);
             else
@@ -3196,10 +3218,10 @@ function createFromTemplate(template,
                 " template='" + text + "'" +
                 ' ' + messages +
                 ' parms=' + parmsText);
-    var newdiv;
+    let newdiv;
     if (retval.substring(0,3) == '<tr')
     {
-        var table   = document.createElement("TABLE");
+        let table   = document.createElement("TABLE");
         newdiv      = table.appendChild(document.createElement("TBODY"));
     }
     else
@@ -3238,10 +3260,10 @@ function openFrame(name, url, side)
 
     // locate the window and document instances for the top window
     // of the application
-    var win                 = window;
+    let win                 = window;
     while(win.frameElement)
         win                 = win.parent;
-    var doc                 = win.document;
+    let doc                 = win.document;
 
     // get global information maintained at the top window
     if (!('dialogZindex' in win))
@@ -3282,12 +3304,12 @@ function openFrame(name, url, side)
     }
 
     // get the dimensions of the root window
-    var w                   = doc.documentElement.clientWidth;
-    var h                   = doc.documentElement.clientHeight;
+    let w                   = doc.documentElement.clientWidth;
+    let h                   = doc.documentElement.clientHeight;
 
     if (win.dialogCount == 0)
     {   // resize the main page to only occupy the left half of the window
-        var transcription   = doc.getElementById('transcription');
+        let transcription   = doc.getElementById('transcription');
         if (transcription)
         {           // frame for left side of window
             transcription.style.width   = w/2 + "px";
@@ -3304,7 +3326,7 @@ function openFrame(name, url, side)
         iframe.style.left   = "0px";
     else
         iframe.style.left   = w/2 + "px";
-    var zindex              = win.dialogZindex[side] + 2;
+    let zindex              = win.dialogZindex[side] + 2;
     iframe.style.zIndex     = zindex;   // move iframe to front
     iframe.style.top        = 0 + "px";
     iframe.style.visibility = "visible";
@@ -3329,21 +3351,21 @@ function openFrameError()
  ************************************************************************/
 function closeFrame(lastChoice)
 {
-    var iframe              = window.frameElement;
+    let iframe              = window.frameElement;
     if (iframe)
     {                   // current window is in an iframe
-        var msg             = '';
+        let msg             = '';
 
         // locate the window and document instances for the top window
-        var topwin          = window.top;
-        var doc             = topwin.document;
+        let topwin          = window.top;
+        let doc             = topwin.document;
 
-        var frameInfo       = '';
-        for (var i = 0; i < topwin.frames.length; i++)
+        let frameInfo       = '';
+        for (let i = 0; i < topwin.frames.length; i++)
         {
-            var frame       = topwin.frames[i];
+            let frame       = topwin.frames[i];
             try {
-            var felt        = frame.frameElement;
+            let felt        = frame.frameElement;
             frameInfo       += i + ' name=' + frame.name +
                                 " <" + felt.nodeName +
                                 ' id="' + felt.id + '"> ';
@@ -3353,9 +3375,9 @@ function closeFrame(lastChoice)
         if (topwin.dialogCount == 1)
         {               // closing last dialog
             // resize the display of the transcription
-            var w           = doc.documentElement.clientWidth;
-            var h           = doc.documentElement.clientHeight;
-            var transcription       = doc.getElementById('transcription');
+            let w           = doc.documentElement.clientWidth;
+            let h           = doc.documentElement.clientHeight;
+            let transcription       = doc.getElementById('transcription');
             if (transcription)
             {           // restore main window to full width
                 transcription.style.width   = w + "px";
@@ -3370,7 +3392,7 @@ function closeFrame(lastChoice)
 
         // this has to be done right at the end because iframe is the
         // 'this' parameter of this function
-        var father  = iframe.parentNode;
+        let father  = iframe.parentNode;
         father.removeChild(iframe);
     }                   // current window is in an iframe
     else
@@ -3381,7 +3403,7 @@ function closeFrame(lastChoice)
                 history.back();
             else
             {
-                var lang        = 'en';
+                let lang        = 'en';
                 if ('lang' in args)
                     lang        = args.lang;
                 if (lastChoice == undefined)
@@ -3396,6 +3418,52 @@ function closeFrame(lastChoice)
         }
     }                   // not in an iframe
 }       // function closeFrame
+
+/************************************************************************
+ *  function showImage													*
+ *																		*
+ *  This function is called when the user clicks the ShowImage button	*
+ *  with the mouse or types Alt-I.										*
+ *																		*
+ *  Input:																*
+ *		this			<button id='ShowImage'>							*
+ ************************************************************************/
+function showImage()
+{
+    let	form		    = this.form;
+    if (form.Image)
+    {		// Image field defined
+		args.showimage	= 'yes';	// previous and next request image
+		let imageUrl	= form.Image.value;
+		if (imageUrl.length == 0)
+		    alert("util.js: showImage: " +
+				  "no image defined for this registration");
+		else
+		if (imageUrl.length > 23 &&
+		    (imageUrl.substring(0,23) == "http://www.ancestry.ca/" ||
+		     imageUrl.substring(0,23) == "https://www.ancestry.ca" ||
+		     imageUrl.substring(0,23) == "http://interactive.ance" ||
+		     imageUrl.substring(0,23) == "https://interactive.anc"))
+		    window.open(imageUrl, "_blank");
+		else
+		if (imageUrl.length > 5 &&
+		    (imageUrl.substring(0,5) == "http:" ||
+		     imageUrl.substring(0,6) == "https:"))
+		    openFrame("Images",
+				      imageUrl,
+				      "right");
+		else
+        if (imageUrl.substring(0, 1) == '/')
+		    openFrame("Images",
+				      '/DisplayImage.php?src=' + imageUrl,
+				      "right");
+        else
+		    openFrame("Images",
+				      '/DisplayImage.php?src=/Images/' + imageUrl,
+				      "right");
+    }		// Image field defined
+    return false;
+}		// showImage
 
 /************************************************************************
  *  polyfill for CustomEvent                                            *

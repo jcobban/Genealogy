@@ -26,7 +26,7 @@
       $TRACE
       $MSG
       <!--- Put out the response as a table -->
-      <form name='countryForm'
+      <form name='countryForm' id='countryForm'
           action='CountryNamesEdit.php' 
           method='post' 
           autocomplete='off' 
@@ -89,7 +89,7 @@
           <button type='submit' id='Submit'>Refresh</button>
           &nbsp;
           <button type='button' id='Close'>Close</button>
-        <div>
+        </div>
       </form>
     </div> <!-- class='body' -->
     <!-- The remainder of the page consists of context specific help text. -->
@@ -118,6 +118,14 @@
       Click on this button to update the database to include the changes you
       have made to the countries list.
     </div>
+    <div class="hidden" id="templates">
+        <span id='ccInvalid'>
+            Invalid value for CC='$cc'.
+        </span>
+        <span id='codeInvalid'>
+            Invalid value for code='$cpde'.
+        </span>
+	</div>
     <script src='/jscripts/CommonForm.js' type='text/javascript'>
     </script>
     <script src='/jscripts/util.js' type='text/javascript'>

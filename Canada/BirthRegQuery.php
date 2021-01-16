@@ -24,6 +24,7 @@ use \Exception;
  *		2019/02/21      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/11/28      correct XSS error                               *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -57,7 +58,8 @@ if (isset($_GET) && count($_GET) > 0)
 	foreach ($_GET as $key => $value)
 	{			    // loop through all parameters
 	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-	                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" . 
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{	    	// act on specific parameters
 		    case 'code':

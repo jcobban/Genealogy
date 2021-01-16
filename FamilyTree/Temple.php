@@ -54,11 +54,14 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // process parameters
 $idtr                   = null;
+$idtrtext               = null;
 $code                   = null;
+$codetext               = null;
+$errors                 = array();
 $lang                   = 'en';
 
 // if invoked by method=get process the parameters
-if (count($_GET) > 0)
+if (isset($_GET) && count($_GET) > 0)
 {	        	    // invoked by URL to display current status of temple
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
@@ -72,15 +75,19 @@ if (count($_GET) > 0)
         {		    // act on specific parameter
 			case 'code':
             {
-                if (strlen($value) > 2 && strlen($value) < 6)
+                if (preg_match('#^[a-zA-Z0-9_]{4,6}$#', $value))
                     $code               = strtoupper($value);
+                else
+                    $codetext           = htmlspecialchars($value);
                 break;
             }
 
 			case 'idtr':
             {
-                if (ctype_digit($value))
+                if (ctype_digit($value) && $value > 0)
                     $idtr               = (int)$value;
+                else
+                    $idtrtext           = htmlspecialchars($value);
                 break;
             }
 
@@ -112,15 +119,19 @@ if (count($_POST) > 0)
 	    {		    // act on specific parameter
 			case 'code':
             {
-                if (strlen($value) > 2 && strlen($value) < 6)
+                if (preg_match('#^[a-zA-Z0-9_]{4,6}$#', $value))
                     $code               = strtoupper($value);
+                else
+                    $codetext           = htmlspecialchars($value);
                 break;
             }
 
 			case 'idtr':
             {
-                if (ctype_digit($value))
+                if (ctype_digit($value) && $value > 0)
                     $idtr               = (int)$value;
+                else
+                    $idtrtext           = htmlspecialchars($value);
                 break;
             }
 
@@ -134,11 +145,22 @@ if (count($_POST) > 0)
 		    case 'address':
 		    case 'templestart':
 		    case 'templeend':
+            {
+                if (preg_match('#^[^<>&]*$#', $value))
+                    $newvalues[$fieldLc]    = $value;
+                else
+                    $errors[$key]           = htmlspecialchars($value);
+                break;
+            }
+
 		    case 'used':
 		    case 'tag1':
 		    case 'qstag':
             {
-                $newvalues[$fieldLc]    = $value;
+                if (ctype_digit($value) && $value < 2)
+                    $newvalues[$fieldLc]    = $value;
+                else
+                    $errors[$key]           = htmlspecialchars($value);
                 break;
             }
 
@@ -164,16 +186,38 @@ if ($debug)
 else
     $template->set('DEBUG',                 'N');
 
+// report errors detected in validating input
+if (is_string($idtrtext))
+{
+    $text               = $template['invalidIDTR']->innerHTML;
+    $msg                .= str_replace('$value', $idtrtext, $text);
+}
+if (is_string($codetext))
+{
+    $text               = $template['invalidCode']->innerHTML;
+    $msg                .= str_replace('$value', $codetext, $text);
+}
+foreach ($errors as $key => $value)
+{
+    $text               = $template['invalidValue']->innerHTML;
+    $msg                .= str_replace(array('$key','$value'),
+                                       array($key,$value), 
+                                       $text);
+}
+
 // get the requested temple
-if ($code != null)
-    $temple	                = new Temple(array('code' => $code));
+if (is_string($code))
+    $temple	            = new Temple(array('code' => $code));
 else
-if ($idtr != null)
+if (!is_null($idtr))
 {		// IDTR present and valid
-    $temple	                = new Temple(array('idtr' => $idtr));
+    $temple	            = new Temple(array('idtr' => $idtr));
 }
 else
-    $temple                 = null;
+{
+    $temple             = null;
+    $msg                .= $template['missingKey']->innerHTML;
+}
 
 if (is_object($temple) && $temple->isExisting())
 {
@@ -224,13 +268,18 @@ if (is_object($temple) && $temple->isExisting())
 else
 {		// code missing or invalid
     if ($code)
-        $template->set('NAME',	            "Undefined Temple '$code'");
+    {
+        $text               = $template['undefinedCode']->innerHTML;
+        $template->set('NAME',	        str_replace('$value', $code, $text));
+    }
     else
     if ($idtr)
-        $template->set('NAME',	            "Undefined Temple $idtr");
+    {
+        $text               = $template['undefinedIDTR']->innerHTML;
+        $template->set('NAME',	        str_replace('$value', $idtr, $text));
+    }
     else
-        $template->set('NAME',	            'MISSING');
-    $msg	.= 'Parameter `code` missing or invalid. ';
+        $template->set('NAME',	        $template['missing']->innerHTML);
     $template['locForm']->update(null);
 }		// code missing or invalid
 

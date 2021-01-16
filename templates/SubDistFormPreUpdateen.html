@@ -121,6 +121,11 @@
       <tbody>
 		<tr id="Row$line">
 		  <td class="data right">
+		    <!-- permit modifying the ID of the existing row -->
+		    <input type="text"
+				name="SD_Id$line" id="SD_Id$line"
+		 		value="$id" 
+				class="$idclass rightfixed" size="3" maxlength="6">
 		    <!-- fields to identify existing row in database -->
 		    <input type="hidden"
 				name="Orig_Id$line" id="Orig_Id$line"
@@ -131,11 +136,6 @@
 		    <input type="hidden"
 				name="Orig_Sched$line" id="Orig_Sched$line"
 		 		value="1">
-		    <!-- permit modifying the ID of the existing row -->
-		    <input type="text"
-				name="SD_Id$line" id="SD_Id$line"
-		 		value="$id" 
-				class="$idclass rightfixed" size="3" maxlength="6">
 		  </td>
 		  <td class="data right">
 		    <!-- permit modifying the Div of the existing row -->

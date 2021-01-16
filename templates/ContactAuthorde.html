@@ -1,0 +1,88 @@
+<!--*********************************************************************
+ *  contactAuthoren.html												*
+ *																		*
+ *  Implement contacting the author of a page by using the internal		*
+ *  blog support														*
+ *																		*
+ *  History:															*
+ *		2018/01/28		created											*
+ *		2018/09/07		table name not passed to script					*
+ *      2020/01/04      add cancel button                               *
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+    <div class="hidden" id="breadcrumbs">
+      <a href="/index.html">Startseite</a>:
+      <a href="/genealogy.php?lang=de">
+        Stammbaumforschung
+      </a>:
+        <a href="/FamilyTree/Services.php?lang=de">
+          Familienstammbaum-Datenbankdienste
+        </a>:
+        <a href="/FamilyTree/nominalIndex.php?lang=de" target="_blank">
+          Nominaler Index von Individuen
+        </a>:
+    </div>
+  
+    <div class="body">
+      <h1>
+        <span class="right">
+	      <a href="/contactAuthorHelpen.html" target="help">? Help</a>
+        </span>
+	    Kontakt Autoren über: $ABOUT
+      </h1>
+      $MSG
+      $TRACE
+      <form name="evtForm" 
+	    action="/postBlogXml.php" 
+	    method="post">
+        <p id="promptforemail">
+	    <label class="labelSmall" for="email">
+            Deine <u>E</u>mailadresse:
+	    </label>
+	    <input type="text" name="email" id="email" accessKey="E"
+		    class="white leftnc" size="60" value="">
+        </p>
+	    <input type="hidden" name="email" id="hiddenemail"
+		    value="$EMAIL">
+        <p>
+	    <input type="hidden" name="id" id="id"
+		    class="white rightnc" value="$CONTACTIDS">
+	    <input type="hidden" name="tablename" id="tablename"
+		    class="white leftnc" value="$TABLENAME">
+	    <textarea name="message" 
+		    rows="5" cols="80">Über: $ABOUT 
+$TEXT</textarea>
+        </p>
+        <p>
+	    <button type="button" id="Blog" accessKey="S">
+	      <u>S</u>enden
+	    </button>
+        &nbsp;
+	    <button type="button" id="Cancel" accessKey="N">
+	      Abbrechen<u>n</u>
+	    </button>
+      </p>
+    </form>
+      </div> <!-- class="body" -->
+    <div class="balloon" id="Helpmessage">
+    <p>Bearbeiten Sie die Nachricht, die Sie an die Autoren senden möchten
+    </p>
+    </div>
+    <div class="balloon" id="Helpemail">
+      Als Gast müssen Sie die E-Mail-Adresse angeben, unter der Sie
+      bezüglich dieser Anfrage kontaktiert werden möchten.
+    </div>
+    <div class="balloon" id="HelpBlog">
+      Klicken Sie auf diese Schaltfläche, um eine sichere Nachricht an die Autoren zu senden.
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/CommonForm.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/contactAuthor.js" type="text/javaScript">
+    </script>

@@ -40,13 +40,16 @@
       </a>:
       <a href="DeathRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&RegNum=$PREVREGNUM&lang=fr&ShowImage=$SHOWIMAGE" id="Previous">Précédent</a>:
       <a href="DeathRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&RegNum=$NEXTREGNUM&lang=fr&ShowImage=$SHOWIMAGE" id="Next">Prochain</a>:
+	  <a href="DeathRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG">
+	    Afficher les enregistrements de décès dans l'ordre
+	  </a>:
     </div> 
     <div class="body">
       <h1>
         <span class="right">
 	  <a href="DeathRegDetailHelpfr.html" target="help">? Help</a>
         </span>
-	  Enregistrement de Décès Ontario: Mise a jour
+	  Enregistrement de Décès $DOMAINNAME: Mise a jour
       </h1>
       $MSG
       $TRACE
@@ -549,7 +552,7 @@
 				Remarques:
 			</label>
 		    <textarea name="Remarks" id="Remarks"
-					type="text" cols="55" rows=3
+					type="text" cols="55" rows=2
 					class="black white leftnc">$REMARKS</textarea>
 	      <div style="clear: both"></div>
 	    </div>
@@ -561,7 +564,7 @@
 			<input name="Image" id="Image"
 					type="text" size="50" maxlength="256"
 					value="$IMAGE"
-					class="same white leftnc40em"> 
+					class="white left wide"> 
 	      <div style="clear: both"></div>
 	    </div>
 	    <div class="row">

@@ -41,8 +41,9 @@ use \Exception;
  *      2019/02/18      use new FtTemplate constructor                  *
  *      2019/06/13      support I18N by moving "About :" template       *
  *                      support explicitly sending message to a user    *
+ *      2021/01/02      correct XSS vulnerabilities                     *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/User.inc';
@@ -184,11 +185,11 @@ foreach ($contacts as $ic => $contact)
 $user               = new User(array("username" => $userid));
 $email              = $user->get('email');
 $template->set('USERID',        $userid);
-$template->set('EMAIL',         $email);
+$template->set('EMAIL',         htmlspecialchars($email));
 $template->set('LANG',          $lang);
-$template->set('ABOUT',         $about);
-$template->set('TEXT',          $text);
-$template->set('TABLENAME',     $tableName);
+$template->set('ABOUT',         htmlspecialchars($about));
+$template->set('TEXT',          htmlspecialchars($text));
+$template->set('TABLENAME',     htmlspecialchars($tableName));
 $template->set('CONTACTIDS',    $contactIds);
 
 // for registered users the E-Mail address is a private attribute of

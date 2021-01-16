@@ -19,8 +19,9 @@
  *		2019/04/07      ensure that the paging lines can be displayed   *
  *		                within the visible portion of the browser.      *
  *		2019/06/29      first parameter of displayDialog removed        *
+ *		2020/12/08      pass lang selection to display detail script    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -91,7 +92,7 @@ function showReg()
     if ('lang' in args)
 		lang		= args['lang'];
     location	= 'DeathRegDetail.php?RegYear=' + regyear +
-				  '&RegNum=' + regnum +'&lang=' + lang;
+				  '&RegNum=' + regnum + '&lang=' + lang;
     return false;
 }		// function showReg
 

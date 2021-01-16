@@ -1,11 +1,11 @@
 /************************************************************************
  *  ToDo.js																*
  *																		*
- *  Javascript code to implement dynamic functionality of the				*
+ *  Javascript code to implement dynamic functionality of the			*
  *  page ToDo.php.														*
  *																		*
- *  History:																*
- *		2019/08/14		created												*
+ *  History:															*
+ *		2019/08/14		created											*
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -16,17 +16,17 @@
 window.addEventListener('load', onLoadToDo);
 
 /************************************************************************
- *  function childFrameClass												*
+ *  function childFrameClass											*
  *																		*
- *  If this dialog is opened in a half window then any child dialogs		*
- *  are opened in the other half of the window.								*
+ *  If this dialog is opened in a half window then any child dialogs	*
+ *  are opened in the other half of the window.							*
  ************************************************************************/
 var childFrameClass	= 'right';
 
 /************************************************************************
- *  function onLoadToDo												*
+ *  function onLoadToDo												    *
  *																		*
- *  This function is invoked once the page is completely loaded into		*
+ *  This function is invoked once the page is completely loaded into	*
  *  the browser.  Initialize dynamic behavior of elements.				*
  ************************************************************************/
 function onLoadToDo()
@@ -41,7 +41,7 @@ function onLoadToDo()
 		    childFrameClass	= 'left';
     }				// dialog opened in half frame
 
-    var	form				= document.locForm;
+    var	form				= document.getElementById('todoForm');
 
     // set action methods for form
     form.addEventListener('submit', validateForm);

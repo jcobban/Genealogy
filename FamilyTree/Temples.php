@@ -27,6 +27,7 @@ use \Exception;
  *		2019/04/12      only use pattern if it is not empty             *
  *		                use standard element ids for page scroll        *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -35,12 +36,9 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // get the parameters
-$getParms	    				= array();
 $pattern	    				= '';
 $offset		        			= 0;
-$getParms['offset']				= 0;
 $limit	        				= 20;
-$getParms['limit']				= 20;
 $lang	        				= 'en';
 
 if (isset($_GET) && count($_GET) > 0)
@@ -60,27 +58,24 @@ if (isset($_GET) && count($_GET) > 0)
 	            if (strlen($value) > 0)
 	            {
 				    $pattern		    = $value;
-	                $getParms['temple']	= $pattern;
 	            }
 				break;
 		    }
 	
 		    case 'offset':
 		    {
-	            if (strlen($value) > 0 && ctype_digit($value))
+	            if (ctype_digit($value))
 	            {
 				    $offset			= (int)$value;
-				    $getParms['offset']	= $offset;
 	            }
 				break;
 		    }
 	
 		    case 'limit':
 		    {
-	            if (strlen($value) > 0 && ctype_digit($value))
+	            if (ctype_digit($value))
 	            {
 				    $limit			= (int)$value;
-				    $getParms['limit']	= $limit;
 	            }
 				break;
 		    }
@@ -96,26 +91,24 @@ if (isset($_GET) && count($_GET) > 0)
         $warn   .= $parmsText . "</table>\n";
 }			        // invoked by method=get
 
-$template		= new FtTemplate("Temples$lang.html");
+$template		            = new FtTemplate("Temples$lang.html");
 
 // get the list of matching temples
-$temples		= new RecordSet('Temples',
-				        		$getParms);
-$info		    = $temples->getInformation();
-$count		    = $info['count'];
+$getParms	    			= array();
+if (strlen($pattern) > 0)
+    $getParms['temple']	    = $pattern;
+$getParms['offset']	        = $offset;
+$getParms['limit']	        = $limit;
+$temples					= new RecordSet('Temples',
+				        		            $getParms);
+$info		    			= $temples->getInformation();
+$count		    			= $info['count'];
 
-$prevoffset		= $offset - $limit;
-if ($prevoffset < 0)
-	$template->updateTag('topPrev', null);
-$nextoffset		= $offset + $limit;
-$last		    = $offset + $limit - 1;
-if ($last >= $count)
-{
-    $last       = $count;
-	$template->updateTag('topNext', null);
-}
+$prevoffset					= $offset - $limit;
+$nextoffset		            = $offset + $limit;
+$last		                = $offset + $limit - 1;
 
-$template->set('pattern',		$pattern);
+$template->set('pattern',		htmlspecialchars($pattern));
 
 if ($count > 0)
 {		// query issued
@@ -127,7 +120,7 @@ if ($count > 0)
 	$template->set('last',		    $last);
 	$template->set('count',		    $count);
 	$template->set('lang',		    $lang);
-	$even		    	= 'odd';
+	$even		    	    = 'odd';
 	// display the results
 	foreach($temples as $idtr => $temple)
 	{
@@ -137,13 +130,20 @@ if ($count > 0)
 	    else
 			$even	    	= 'even';
 	}
-	$template->updateTag('temple$idtr', $temples);
+    $template->updateTag('temple$idtr', $temples);
+
+	if ($prevoffset < 0)
+		$template->updateTag('topPrev', null);
+	if ($last >= $count)
+	{
+	    $last                   = $count;
+		$template->updateTag('topNext', null);
+	}
 }	// query issued
 else
 {
 	$template->updateTag('topBrowse', null);
-	$template->updateTag('detail', null);
+	$template->updateTag('dataTable', null);
 }
 
 $template->display();
-showTrace();

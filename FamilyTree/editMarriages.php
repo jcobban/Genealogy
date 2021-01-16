@@ -8,15 +8,15 @@ use \Templating\escape;
  *  editMarriages.php													*
  *																		*
  *  Display a web page for editing the families for which a particular 	*
- *  individual has the role of spouse from the Legacy database			*
+ *  Person has the role of spouse from the Legacy database			    *
  *																		*
  *  Parameters (passed by method=get) 									*
- *		idir			unique numeric key of individual as spouse		*
- *		child			unique numeric key of individual as child		*
- *		given			given name of individual in case that			*
+ *		idir			unique numeric key of Person as spouse		    *
+ *		child			unique numeric key of Person as child		    *
+ *		given			given name of Person in case that			    *
  *						information is not already written to the		*
  *						database										*
- *		surname			surname of individual in case that information	*
+ *		surname			surname of Person in case that information	    *
  *						is not already written to the database			*
  *		idmr			numeric key of specific marriage to initially	*
  *						display											*
@@ -101,7 +101,7 @@ use \Templating\escape;
  *		2014/02/24		use dialog to choose from range of locations	*
  *						instead of inserting <select> into the form		*
  *						location support moved to locationCommon.js		*
- *						rename buttons to choose an existing individual	*
+ *						rename buttons to choose an existing Person	    *
  *						as husband or wife to id="choose..."			*
  *						handle all child rows the same with the fields	*
  *						uniquely identified by the order value of the	*
@@ -118,7 +118,7 @@ use \Templating\escape;
  *		2014/11/14		initialize display of family without requiring	*
  *						AJAX											*
  *		2014/11/16		correct parameter list for new LegacyFamily		*
- *						when adding a new family to an individual		*
+ *						when adding a new family to an Person		    *
  *		2014/11/29		print $warn, which may contain debug trace		*
  *		2014/12/26		response from getFamilies is indexed by idmr	*
  *		2015/02/01		get temple select options from database			*
@@ -133,14 +133,14 @@ use \Templating\escape;
  *						edited when attempt to edit the child for whom	*
  *						a set of parents is being created or edited		*
  *		2015/05/14		handle exception for bad IDLRMarr value			*
- *		2015/06/20		failed if IDMRPref set in individual to bad		*
+ *		2015/06/20		failed if IDMRPref set in Person to bad		    *
  *						family value									*
  *						document action of enter key in child row		*
  *						Make the notes field a rich-text editor.		*
  *		2015/07/02		access PHP includes using include_path			*
  *		2015/08/12		add support for tree division of database		*
  *		2015/08/22		popup dialogs were not defined as <form>s		*
- *		2015/08/23		adding family to new individual gave blank		*
+ *		2015/08/23		adding family to new Person gave blank		    *
  *						primary spouse									*
  *		2016/02/06		use showTrace									*
  *		2016/02/24		handle child record with invalid IDIR			*
@@ -163,6 +163,8 @@ use \Templating\escape;
  *		2020/01/30      use Template                                    *
  *		                display all events in order                     *
  *		2020/03/19      misspelled $urname                              *
+ *      2020/12/05      correct XSS vulnerabilities                     *
+ *      2020/12/12      improve output when errors present              *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -175,28 +177,29 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // get the parameters passed to the script
-$idir				= null;		// individual as primary spouse in family
-$idirtext           = '';
+$idir				= null;		// Person as primary spouse in family
+$idirtext           = null;
 $idmr				= null;		// marriage to display
-$idmrtext           = '';
+$idmrtext           = null;
 $indiv				= null;		// instance of Person
 $family				= null;		// instance of Family
-$child				= null;		// IDIR of individual as child in new family
+$child				= null;		// IDIR of Person as child in new family
 $childObj			= null;		// instance of Person
-$childtext          = '';
+$childtext          = null;
 $sex                = '';
 $isowner			= false;	// current user is an owner of the family
-$given				= '';		// given name of individual
-$surname			= '';		// surname of individual
-$name			    = '';		// name of individual
+$given				= '';		// given name of Person
+$surname			= '';		// surname of Person
+$name			    = '';		// name of Person
 $treename			= '';		// treename of database division
 $prefix				= '';		// initial part of surnames
 $birth				= '';		// birth date as string
 $death				= '';		// death date as string
-$idmrpref			= 0;		// preferred marriage for the individual
+$idmrpref			= 0;		// preferred marriage for the Person
 $lang               = 'en';
 $style              = 'Marriages';
-$new				= false;
+$newfamily			= false;
+$families           = null;
 $submit				= false;
 
 // if invoked by method=get process the parameters
@@ -209,70 +212,69 @@ if (isset($_GET) && count($_GET) > 0)
 	foreach($_GET as $key => $value)
     {	            // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n";
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
         $value      = trim($value);
+	    if (strlen($value) > 0)
 		switch(strtolower($key))
 		{		// take action on specific parameter
 		    case 'id':
 		    case 'idir':
 		    {		// identify primary spouse
-	            if (strlen($value) > 0)
-	            {
-				    if (ctype_digit($value))
-						$idir		= $value;
-				    else
-	                    $idirtext   = $value;
-	            }
+				if (ctype_digit($value))
+					$idir		= $value;
+			    else
+	                $idirtext   = htmlspecialchars($value);
 				break;
 		    }		// identify primary spouse
 
 		    case 'child':
 		    {		// identify child of family
-                if (strlen($value) > 0)
-                {
-				    if (ctype_digit($value))
-						$child		= $value;
-				    else
-                        $childText  = $value;
-                    $style          = 'Parents';
-                }
+				if (ctype_digit($value))
+					$child		= $value;
+			    else
+                    $childText  = htmlspecialchars($value);
+                $style          = 'Parents';
 				break;
 		    }		// identify child of family
 
 		    case 'given':
 		    {
-				$given		        = $value;
+				$given		        = htmlspecialchars($value);
 				break;
-		    }		// default given name of individual
+		    }		// default given name of Person
 
 		    case 'surname':
 		    {
-				$surname	        = $value;
+				$surname	        = htmlspecialchars($value);
 				break;
-		    }		// default surname of individual
+		    }		// default surname of Person
 
 		    case 'treename':
 		    {
-				$treename	        = $value;
+				$treename	        = htmlspecialchars($value);
 				break;
-		    }		// default surname of individual
+		    }		// default surname of Person
 
 		    case 'idmr':
 		    {		// identify specific marriage to select for display
-                if (strlen($value) > 0)
+                if (ctype_digit($value))
                 {
-                    if (ctype_digit($value))
-				        $idmr		= $value;
-				    else
-                        $idmrText	= $value;
+                    $idmr		    = $value;
+                    if ($idmr == 0)
+				        $newfamily	= true;
+			        else
+                        $idmrText	= htmlspecialchars($value);
                 }
+                else
+                    $idmrText	    = htmlspecialchars($value);
 				break;
 		    }		// identify specific marriage
 
 		    case 'new':
 		    {		// add a new family
 				if (strtolower($value) == 'y')
-				    $new	= true;
+				    $newfamily	= true;
 				break;
 		    }		// add a new family
 
@@ -308,23 +310,23 @@ $t                  = $translate['tranTab'];
 $template->updateTag('otherStylesheets',
 		             array('filename'   => '/FamilyTree/editMarriages'));
 
-if (strlen($idirtext) > 0)
+if (is_string($idirtext))
 {
-    $text           = $template['invaliIdir']->innerHTML;
+    $text           = $template['invalidIdir']->innerHTML;
     $msg            .= str_replace('$idirtext',
                                    $idirtext,
                                    $text);
 }
-if (strlen($childtext) > 0)
+if (is_string($childtext))
 {
-    $text           = $template['invaliChild']->innerHTML;
+    $text           = $template['invalidChild']->innerHTML;
     $msg            .= str_replace('$childtext',
                                    $childtext,
                                    $text);
 }
-if (strlen($idmrtext) > 0)
+if (is_string($idmrtext))
 {
-    $text           = $template['invaliIdmr']->innerHTML;
+    $text           = $template['invalidIdmr']->innerHTML;
     $msg            .= str_replace('$idmrtext',
                                    $idmrtext,
                                    $text);
@@ -348,13 +350,14 @@ if (!is_null($idmr))
 		$idir		        = $family['idirwife'];
 
     $indiv		            = $tree->getPerson($idir);
-    $isOwner		        = canUser('edit') && $indiv->isOwner();
-    if ($indiv->isExisting())
+    if ($indiv && $indiv->isExisting())
     {                   // existing Person
+        $isOwner		    = canUser('edit') && $indiv->isOwner();
 		$families	        = $indiv->getFamilies();
     }                   // existing Person
     else
     {
+        $isOwner		    = canUser('edit');
         $text               = $template['titleEditIdmr']->innerHTML;
         $title              = str_replace('$IDMR',
                                           $idmr,
@@ -365,7 +368,7 @@ if (!is_null($idmr))
 }			        // explicit family to view
 else
 if (!is_null($idir))
-{			        // the identified individual is the primary spouse
+{			        // the identified Person is the primary spouse
     $indiv		            = $tree->getPerson($idir);
     $sex                    = $indiv['gender'];
     $isOwner		        = canUser('edit') && $indiv->isOwner();
@@ -380,15 +383,15 @@ if (!is_null($idir))
     }			// correct database error
 
     // choose family to display based upon parameters
-    if ($idmrpref == 0 || $new)
+    if ($idmrpref == 0 || $newfamily)
     {			        // preferred marriage not already set
-		if (count($families) > 0 && !$new)
+		if (count($families) > 0 && !$newfamily)
 		{		        // at least one marriage
 		    $family	        = $families->rewind();
 		    if ($family)
 		    {		    // have first family
 				$idmrpref	= $family->getIdmr();
-				// update field in individual
+				// update field in Person
 				$indiv->set('idmrpref', $idmrpref);
 				$indiv->save(false);
 		    }		    // have first family
@@ -422,9 +425,9 @@ if (!is_null($idir))
 }				// get the requested spouse
 else
 if (!is_null($child))
-{				        // the identified individual is a child
+{				        // the identified Person is a child
 	$childObj		        = $tree->getPerson($child);
-	if ($childObj->isExisting())
+	if ($childObj && $childObj->isExisting())
 	{
 	    $isOwner		    = canUser('edit') && $childObj->isOwner();
 	    $idmrparents		= $childObj['idmrparents'];
@@ -437,7 +440,7 @@ if (!is_null($child))
 			    if ($family)
 			    {		// have first family
 					$idmrparents	= $family->getIdmr();
-					// update field in individual
+					// update field in Person
 					$childObj->set('idmrparents', $idmrparents);
 					$childObj->save(false);
 			    }		// have first family
@@ -470,17 +473,21 @@ if (!is_null($child))
 	    $childObj	        	= null;
 	}		        // error in new Child
 
-	if (!$isOwner)
-	    $msg	                .= 'You are not authorized to edit '.
-		            			$given . ' ' . $surname;
+    if (!$isOwner)
+    {
+	    $text               	= $template['notOwner']->innerHTML;
+	    $msg              	    .= str_replace(array('$GIVEN','$SURNAME'),
+	                                           array($given, $surname),
+	                                           $text);
+    }
 }		// get the requested child
 else
 {		// required parameter missing or invalid
-    $title                  	= $template['titleEditMissing']->innerHTML;
-	$msg		            .= $template['titleEditMissing']->innerHTML . ". ";
+    $title              = $template['titleMissing']->innerHTML;
+	$msg		        .= "$title. ";
 }		// missing required parameter
 
-// get information about the primary individual for use in titles
+// get information about the primary Person for use in titles
 if (isset($indiv) && $indiv->isExisting())
 {                       // existing Person
 	$isOwner		        	= canUser('edit') && $indiv->isOwner();
@@ -524,85 +531,86 @@ if (strtolower(substr($surname, 0, 2)) == 'mc')
 else
     $prefix	                    = substr($surname, 0, 1);
 
-$template->set('TITLE',         $title);        // page title
-$template->set('IDIR',		    $idir);			// individual as spouse
-$template->set('CHILD',		    $child);		// IDIR of individual as child
-$template->set('SEX',		    $sex);		    // gender
-$template->set('GIVEN',		    $given);		// given name of individual
-$template->set('SURNAME',	    $surname);		// surname of individual
-$template->set('NAME',	        $name);		    // name of individual
-$template->set('TREENAME',	    $treename);		// treename of database division
-$template->set('PREFIX',	    $prefix);		// initial part of surnames
-$template->set('BIRTH',		    $birth);		// birth date as string
-$template->set('DEATH',		    $death);		// death date as string
-$template->set('IDMRPREF',	    $idmrpref);		// preferred marriage
+if (strlen($msg) == 0 || $family instanceof Family)
+{
+	$template->set('TITLE',     $title);        // page title
+	$template->set('IDIR',		$idir);			// Person as spouse
+	$template->set('CHILD',		$child);		// IDIR of Person as child
+	$template->set('SEX',		$sex);		    // gender
+	$template->set('GIVEN',		$given);		// given name of Person
+	$template->set('SURNAME',	$surname);		// surname of Person
+	$template->set('NAME',	    $name);		    // name of Person
+	$template->set('TREENAME',	$treename);		// treename 
+	$template->set('PREFIX',	$prefix);		// initial part of surnames
+	$template->set('BIRTH',		$birth);		// birth date as string
+	$template->set('DEATH',		$death);		// death date as string
+	$template->set('IDMRPREF',	$idmrpref);		// preferred marriage
+	
+	$marriageElt                    = $template['marriage$idmr'];
+	$marriageText                   = $marriageElt->outerHTML;
+	$template->set('MARRIAGEROWTEMPLATE',   $marriageText);
+	
+	$marriageEvtElt			        = $template['MarriageRow'];
+	$marriageEvtText                = $marriageEvtElt->outerHTML;
+	
+	$eventElt			        	= $template['EventRow$rownum'];
+	$eventText                      = $eventElt->outerHTML;
+	
+	$sealedElt			        	= $template['SealedRow$temp'];
+	$sealedText                     = $sealedElt->outerHTML;
+	
+	$endedElt			        	= $template['EndedRow$temp'];
+	$endedText                      = $endedElt->outerHTML;
+	
+	$notMarriedElt			    	= $template['NotMarriedRow$temp'];
+	$notMarriedText                 = $notMarriedElt->outerHTML;
+	
+	$noChildrenElt			    	= $template['NoChildrenRow$temp'];
+	$noChildrenText                 = $noChildrenElt->outerHTML;
+	
+	$childElt                       = $template['child$rownum'];
+	$childText                      = $childElt->outerHTML;
+	$template->set('CHILDROWTEMPLATE',      $childText);
+	
+    $data                   	    = '';
+    if ($families)
+	foreach($families as $index => $tfamily)
+	{		// loop through families
+	    $idmr		        		= $tfamily->getIdmr();
+	
+	    $husbName		    		= $tfamily->getHusbName();
+	    $husbid		        		= $tfamily['idirhusb'];
+	    $wifeName		    		= $tfamily->getWifeName();
+	    $wifeid		        		= $tfamily['idirwife'];
+	
+	    // information about husband
+		$husband	        		= $tree->getPerson($husbid);
+	
+	    // information about wife
+		$wife		        		= $tree->getPerson($wifeid);
+	
+	    $mdateo		        		= new LegacyDate($tfamily['mard']);
+	    $mdate		        		= $mdateo->toString();
+	
+	    if (strlen($mdate) == 0)
+	        $mdate	        		= 'Unknown';
+	
+	    $rtemplate          		= new Template($marriageText);
+	    $rtemplate->set('idmr',	            $idmr);
+	    $rtemplate->set('husbName',	        $husbName);
+	    $rtemplate->set('husbid',	        $husbid);
+	    $rtemplate->set('wifeName',	        $wifeName);
+	    $rtemplate->set('wifeid',	        $wifeid);
+	    $rtemplate->set('mdate',	        $mdate);
+	    $rtemplate->set('lang',	            $lang);
+	    if ($idmr == $idmrpref)
+	        $rtemplate->set('prefchecked',  'checked="checked"');
+	    else
+	        $rtemplate->set('prefchecked',  '');
+	    $data                   .= $rtemplate->compile();
+	}		// loop through families
+	$marriageElt->update($data);
 
-$marriageElt                    = $template['marriage$idmr'];
-$marriageText                   = $marriageElt->outerHTML;
-$template->set('MARRIAGEROWTEMPLATE',   $marriageText);
-
-$marriageEvtElt			        = $template['MarriageRow'];
-$marriageEvtText                = $marriageEvtElt->outerHTML;
-
-$eventElt			        	= $template['EventRow$rownum'];
-$eventText                      = $eventElt->outerHTML;
-
-$sealedElt			        	= $template['SealedRow$temp'];
-$sealedText                     = $sealedElt->outerHTML;
-
-$endedElt			        	= $template['EndedRow$temp'];
-$endedText                      = $endedElt->outerHTML;
-
-$notMarriedElt			    	= $template['NotMarriedRow$temp'];
-$notMarriedText                 = $notMarriedElt->outerHTML;
-
-$noChildrenElt			    	= $template['NoChildrenRow$temp'];
-$noChildrenText                 = $noChildrenElt->outerHTML;
-
-$childElt                       = $template['child$rownum'];
-$childText                      = $childElt->outerHTML;
-$template->set('CHILDROWTEMPLATE',      $childText);
-
-$data                   	= '';
-foreach($families as $index => $tfamily)
-{		// loop through families
-    $idmr		        	= $tfamily->getIdmr();
-
-    $husbName		    	= $tfamily->getHusbName();
-    $husbid		        	= $tfamily['idirhusb'];
-    $wifeName		    	= $tfamily->getWifeName();
-    $wifeid		        	= $tfamily['idirwife'];
-
-    // information about husband
-	$husband	        	= $tree->getPerson($husbid);
-
-    // information about wife
-	$wife		        	= $tree->getPerson($wifeid);
-
-    $mdateo		        	= new LegacyDate($tfamily['mard']);
-    $mdate		        	= $mdateo->toString();
-
-    if (strlen($mdate) == 0)
-        $mdate	        	= 'Unknown';
-
-    $rtemplate          	= new Template($marriageText);
-    $rtemplate->set('idmr',	            $idmr);
-    $rtemplate->set('husbName',	        $husbName);
-    $rtemplate->set('husbid',	        $husbid);
-    $rtemplate->set('wifeName',	        $wifeName);
-    $rtemplate->set('wifeid',	        $wifeid);
-    $rtemplate->set('mdate',	        $mdate);
-    $rtemplate->set('lang',	            $lang);
-    if ($idmr == $idmrpref)
-        $rtemplate->set('prefchecked',  'checked="checked"');
-    else
-        $rtemplate->set('prefchecked',  '');
-    $data                   .= $rtemplate->compile();
-}		// loop through families
-$marriageElt->update($data);
-
-if ($family)
-{		// family chosen to display
     $idmr		        	= $family->getIdmr();
     $idms		        	= $family['idms'];
     $namerule		    	= $family['marriednamerule'];
@@ -863,10 +871,13 @@ if ($family)
     {			    // normal, use AJAX
         $template['Submit']->update(null);
     }			    // normal, use AJAX
-}			        // family chosen to display
+}                   // no error messages
 else
-{
+{                   // error messages or no instance of Family selected
+	$template->set('TITLE',     $title);        // page title
     $warn       .= "<p>No family chosen to display</p>\n";
-}
+    $template['indForm']->update(null);
+    $template['famForm']->update(null);
+}                   // error messages or no instance of Family selected
 
 $template->display();

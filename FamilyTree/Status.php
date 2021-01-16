@@ -62,8 +62,8 @@ if (count($_GET) > 0)
         $warn       .= $parmsText . "</table>\n";
 }	        	    // invoked by URL to display current status
 
-$template               = new FtTemplate("Status$lang.html");
-$formatter                          = $template->getFormatter();
+$template                       = new FtTemplate("Status$lang.html");
+$formatter                      = $template->getFormatter();
 
 $template->set('LANG',	        $lang);
 

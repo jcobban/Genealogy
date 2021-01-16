@@ -84,7 +84,8 @@ if (isset($_GET) && count($_GET) > 0)
 	foreach($_GET as $key => $value)
 	{		        // loop through parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    $fieldLc	= strtolower($key);
 	    switch($fieldLc)
 	    {		// act on specific parameter

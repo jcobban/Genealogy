@@ -149,6 +149,29 @@
 	    </table>
 	  </form>
 	</div> <!-- end of <div id="body"> -->
+    <div class="hidden" id="messages">
+      <span id="invalidRegYear">
+        RegYear $regyear must be a number between 1860 and 2000. 
+      </span>
+      <span id="missingRegYear">
+        RegYear parameter omitted. 
+      </span>
+      <span id="invalidCode">
+        Province or state code '$code' must be a string of 2 Latin letters. 
+      </span>
+      <span id="invalidDomain">
+        Domain '$domain' must be a string of 4 or 5 Latin letters. 
+      </span>
+      <span id="unsupportedDomain">
+        Domain '$domain' must be a supported two character country code followed by a state or province code. 
+      </span>
+      <span id="invalidCounty">
+        County identifier '$county' must be a string of letters. 
+      </span>
+      <span id="unsupportedCounty">
+        County code '$county' is not supported for domain '$domain'. 
+      </span>
+    </div>
 	<div class="balloon" id="HelpTownStats">
 		Click on this button to display a summary of the births transcribed
 		for the specific town or township.

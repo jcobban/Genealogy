@@ -57,7 +57,7 @@
         <div style="clear: both;"></div>
       </div> <!-- left and right arrow links -->
       <!--- Put out the response as a table -->
-      <form name="domainForm"
+      <form name="domainForm" id="domainForm"
 	    action="DomainsEdit.php" 
 	    method="post" 
 	    autocomplete="off" 
@@ -152,6 +152,20 @@
 	        <button type="button" id="Close">Close</button>
         </p>
       </form>
+    </div>
+    <div class="hidden">
+        <span id="countryInvalid">
+            cc=$cc unsupported.
+        </span>
+        <span id="partofInvalid">
+            partof=$partof unsupported.
+        </span>
+        <p id="offsetIgnored">
+            Offset=$offset ignored.
+        </p>
+        <p id="limitIgnored">
+            Limit=$limit ignored.
+        </p>
     </div>
     <!-- The remainder of the page consists of context specific help text.
     -->

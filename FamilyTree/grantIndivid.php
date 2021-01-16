@@ -50,6 +50,7 @@ use \Exception;
  *		                add support for username pattern                *
  *      2019/11/17      move CSS to <head>                              *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -61,6 +62,7 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // get parameters
 $idir                   = null;
+$idirtext               = null;
 $pattern                = '';
 $lang                   = 'en';
 $treename    	        = '';
@@ -75,7 +77,9 @@ if (count($_GET) > 0)
 	foreach($_GET as $key => $value)
     {	            // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                            htmlspecialchars($value) . 
+                        "</td></tr>\n"; 
 	    switch(strtolower($key))
         {		    // act on specific parameter
             case 'idir':
@@ -83,12 +87,14 @@ if (count($_GET) > 0)
             {
                 if (ctype_digit($value))
                     $idir       = intval($value);
+                else
+                    $idirtext   = htmlspecialchars($value);
                 break;
             }
 
             case 'pattern':
             {
-                $pattern        = $value;
+                $pattern        = htmlspecialchars($value);
                 break;
             }
 
@@ -112,7 +118,9 @@ if (count($_POST) > 0)
 	foreach($_POST as $key => $value)
 	{	            // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                            htmlspecialchars($value) . 
+                        "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		    // act on specific parameter
             case 'idir':
@@ -120,18 +128,20 @@ if (count($_POST) > 0)
             {
                 if (ctype_digit($value))
                     $idir       = $value;
+                else
+                    $idirtext   = htmlspecialchars($value);
                 break;
             }
 
             case 'pattern':
             {
-                $pattern        = $value;
+                $pattern        = htmlspecialchars($value);
                 break;
             }
 
 			case 'lang':
             {
-                $lang       = FtTemplate::validateLang($value);
+                $lang           = FtTemplate::validateLang($value);
                 break;
             }
         }
@@ -170,7 +180,8 @@ if ($idir > 0)
 	if ($isOwner)
     {		        // OK
         if (strlen($pattern) > 0)
-	        $getParms	= array('username' => array('!' . $userid, $pattern));
+            $getParms	= array('username' => array('!' . $userid,
+                                    htmlspecialchars_decode($pattern)));
         else
 	        $getParms	= array('username' => '!' . $userid);
         $users		= new UserSet($getParms);
@@ -180,13 +191,13 @@ if ($idir > 0)
 }		            // get the requested individual
 else
 {		            // invalid input
-	$name	    	= "Invalid Value of idir=$idir";
+	$name	    	= "Invalid Value of idir=$idirtext";
 	$person	    	= null;
     $surname    	= '';
     $users          = array();
 }		            // invalid input
 
-$template       = new FtTemplate("grantIndivid$action$lang.html");
+$template           = new FtTemplate("grantIndivid$action$lang.html");
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => 'grantIndivid'));
 

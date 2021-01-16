@@ -36,8 +36,7 @@
 	  <form name="nameForm" id="nameForm" action="Names.php">
 	      <div class="row" id="nameRow">
 			<label class="label" for="Name">
-			  <u>N</u>om (Surnom, Prenom type="text/javascript>
-		    </script>
+			  <u>N</u>om (Surnom, Prenom)
 			</label>
 			  <input type="text" name="Name" id="Name" size="44" 
 				class="white left" value="$NAME" accessKey="N">
@@ -122,6 +121,7 @@
 	    <p class="label" id="specialSurnamesRow">
 		  <a href="/FamilyTree/Names.php?Surname=&lang=$LANG">&lt;Aucun Surnom&gt;</a>
 		  <a href="/FamilyTree/Surnames.php?initial=_&lang=$LANG">&lt;Surnom Inconnu&gt;</a>
+		</p>
 	    <p class="label" id="AtoIRow">
 		  <a class="em4" href="/FamilyTree/Surnames.php?initial=A&lang=$LANG">A</a>
 		  <a class="em4" href="/FamilyTree/Surnames.php?initial=B&lang=$LANG">B</a>
@@ -227,7 +227,7 @@
       You can do this to start a new family tree.
 	</div>
 	<div id="HelptreeName" class="balloon">
-	<p>Use this selection list to choose which family tree database to display,
+	  Use this selection list to choose which family tree database to display,
       or to
       start a new family tree database.  Each family tree database is used to organize
       families which are likely to be related to each other, but not to families

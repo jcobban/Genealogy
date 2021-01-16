@@ -6,13 +6,17 @@
  *																		*
  *  History:															*
  *		2018/01/18		created											*
+ *      2021/01/13      add search option to menu                       *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
     <div id='breadcrumbs' class='hidden'>
       <a href="/genealogy.php?lang=fr">Généalogie</a>:
       <a href="/genCountry.php?cc=$CC&amp;lang=fr">$COUNTRYNAME</a>:
       <a href="/database/genCensuses.php?cc=$CC&amp;lang=fr">Recensements</a>:
+      <a href="/database/QueryDetail.php?Census=CA1891&amp;Province=$PROVINCE&amp;lang=$LANG">
+		Rechercher la récensement 1891 du Canada
+      </a>: 
       <a href="$SEARCH">$ACTION $CENSUSYEAR Recensement du $COUNTRYNAME</a>:
     </div>
     <div class='body'>

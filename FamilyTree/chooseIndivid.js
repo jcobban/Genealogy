@@ -67,6 +67,7 @@
  *						selection with one short query after another	*
  *		2016/02/06		call pageInit on load							*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/12/06      form element identified by id attribute         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -77,21 +78,21 @@
  *  This timer is started whenever the user presses a key in the input	*
  *  field and pops if 0.3 second passes without a new keystroke			*
  ************************************************************************/
-var	timer	= null;
+var	timer	            = null;
 
 /************************************************************************
  *  loadcnt																*
  *																		*
  *  This counts the number of outstanding requests to the server		*
  ************************************************************************/
-var	loadcnt	= 0;
+var	loadcnt	            = 0;
 
 /************************************************************************
  *  Initialization code that is executed when this script is loaded.	*
  *																		*
  *  Define the function to be called once the web page is loaded.		*
  ************************************************************************/
-    window.onload	= onLoad;
+window.onload	        = onLoad;
 
 /************************************************************************
  *  function onLoad														*
@@ -150,7 +151,7 @@ function onLoad()
 
     // load the initial list
     update();
-}		// onLoad
+}		// function onLoad
 
 /************************************************************************
  *  gotNames															*
@@ -169,7 +170,7 @@ function gotNames(xmlDoc)
 		return;		// do not refresh if more outstanding responses
     hideLoading();	// hide "loading" indicator
 
-    var	form	= document.indForm;
+    var	form	= document.getElementById('indForm');
     var	select	= form.individ;
     if (xmlDoc == null)
     {
@@ -180,12 +181,12 @@ function gotNames(xmlDoc)
 
     var root	= xmlDoc.documentElement;
     if (root && (root.nodeName == 'names'))
-    {			// valid response
+    {			    // valid response
 		var	parms	= {};
 
 		// loop through immediate children of root node of XML document
 		for (var i = 0; i < root.childNodes.length; i++)
-		{		// loop through children of root
+		{		    // loop through children of root
 		    var	elt	= root.childNodes[i];
 
 		    // each individual in the response is represented by
@@ -270,7 +271,7 @@ function gotNames(xmlDoc)
 				    select.appendChild(option);	// add to <select>
 				}	// <indiv>
 		    }		// tag
-		}		// loop through children of root
+		}		    // loop through children of root
 
 		// check to make sure we have enough names
 		var	nameCount	= select.options.length;
@@ -326,26 +327,26 @@ function gotNames(xmlDoc)
 						    gotNames,
 						    noNames);
 		}
-    }			// valid response
+    }			    // valid response
     else
-    {			// error
+    {			    // error
 		var	msg	= "";
 		if (root)
-		{		// XML response
+		{		    // XML response
 		    for(var i = 0; i < root.childNodes.length; i++)
 		    {		// loop through children
 				var node	= root.childNodes[i];
 				if (node.nodeValue != null)
 				    msg	+= node.nodeValue;
 		    }		// loop through children
-		}		// XML response
+		}		    // XML response
 		else
 		    msg	+= xmlDoc;
 
 		var	form	= document.nameForm;
 		popupAlert(msg, form.Name);
-    }		// error
-}		// gotNames
+    }		        // error
+}		// function gotNames
 
 /************************************************************************
  *  noNames																*
@@ -360,7 +361,7 @@ function noNames()
     hideLoading();	// hide loading indicator
 
     alert('chooseIndivid.js: noNames: No response file from server script getIndivNamesXml.php.');
-}		// noNames
+}		// function noNames
 
 /************************************************************************
  *  changeIndivid														*
@@ -405,7 +406,7 @@ function keyDownName(event)
     if (timer)
 		clearTimeout(timer);
     timer	= setTimeout(update, 500);
-}		// keyDownName
+}		// function keyDownName
 
 /************************************************************************
  *  update																*
@@ -415,7 +416,7 @@ function keyDownName(event)
  ************************************************************************/
 function update()
 {
-    var	form	= document.indForm;
+    let	form	= document.getElementById('indForm');
 
     if (form)
     {			// form present
@@ -430,7 +431,6 @@ function update()
 		    var value	= element.value;
 		    if (name === undefined || name.length == 0)
 				name	= element.id;
-
 		    // take action specific to the element based on its name
 		    switch(name)
 		    {		// switch on name
@@ -478,40 +478,41 @@ function update()
 		// also check command line arguments
 		for(var key in args)
 		{		// loop through command line arguments
-		    var	value	= args[key];
+		    var	value	        = encodeURIComponent(args[key]);
+
 		    switch(key.toLowerCase())
 		    {		// act on specific argument
 				case 'idir':
 				{	// looking for individual to merge with
 				    // this indicates to exclude this individual
-				    url		+= "&idir=" + value;
+				    url		    += "&idir=" + value;
 				    break;
 				}	// individual to merge with
 
 				case 'given':
 				{	// given name to look for
 				    if (!nameSet)
-						url	+= "&GivenName=" + encodeURIComponent(value);
+						url	    += "&GivenName=" + value;
 				    break;
 				}	// given name to look for
 
 				case 'surname':
 				{	// surname to look for
 				    if (!nameSet)
-						url	+= "&Surname=" + encodeURIComponent(value);
+						url	    += "&Surname=" + value;
 				    break;
 				}	// surname to look for
 
 				case 'sex':
 				case 'gender':
 				{	// gender to look for
-				    url		+= "&Sex=" + value;
+				    url		    += "&Sex=" + value;
 				    break;
 				}	// gender to look for
 
 				case 'treename':
 				{	// gender to look for
-				    url		+= "&Treename=" + value;
+				    url		    += "&Treename=" + value;
 				    break;
 				}	// gender to look for
 
@@ -520,18 +521,19 @@ function update()
 				    // id attribute of an element in the invoking page
 				    // to which results are to be delivered by feedback call
 				    if (value == 'Father' || value == 'Husb')
-						url	+= "&Sex=M";
+						url	    += "&Sex=M";
 				    else
 				    if (value == 'Mother' || value == 'Wife')
-						url	+= "&Sex=F";
+						url	    += "&Sex=F";
 				    break;
 				}	// id attribute of invoking element
 		    }		// act on specific argument
 		}		// loop through command line arguments
-
+        
 		// always display parents and spouse
-		url	+= '&includeParents=Y';
-		url	+= '&includeSpouse=Y';
+		url	                    += '&includeParents=Y';
+		url	                    += '&includeSpouse=Y';
+        url                     += '&lang=' + lang;
 
 		// load indicator
 		loadcnt++;	// number of outstanding loads
@@ -551,15 +553,17 @@ function update()
 
 		// put a dummy entry at the top of the selection, otherwise
 		// selecting the first name does not call onchange
-		var	name		= '[choose an individual]';
-		var	option		= new Option(name,
+		var	name		    = '[choose an individual]';
+		var	option		    = new Option(name,
 									     -1,
 									     false,
 									     false);
 		option.innerHTML	= '[choose an individual]';
 		select.appendChild(option);
     }		// form present
-}		// update
+    else
+        alert('chooseIndivid.js: update: Cannot find form indForm');
+}		// function update
 
 /************************************************************************
  *  select																*
@@ -630,16 +634,16 @@ function select()
 						var	childTable	=
 						    callerDoc.getElementById('children');
                         if (childTable == null)
-                           alert("chooseIndivid.js: 633 childTable is null, callerDoc="+callerDoc);
+                           alert("chooseIndivid.js: select: " + 
+                            "childTable is null, callerDoc=" + callerDoc);
 						var	gender	= option.className;
-						var	parms	= {
-									'idir'	: idir,
-									'givenname'	: option.givenname,
-									'surname'	: option.surname,
-									'birthd'	: option.birthd,
-									'birthsd'	: option.birthsd,
-									'deathd'	: option.deathd,
-									'gender'	: gender
+						var	parms	= { 'idir'	    : idir,
+										'givenname'	: option.givenname,
+										'surname'	: option.surname,
+										'birthd'	: option.birthd,
+										'birthsd'	: option.birthsd,
+										'deathd'	: option.deathd,
+										'gender'	: gender
 								       };
 
 						// add row onto table on opener's web page

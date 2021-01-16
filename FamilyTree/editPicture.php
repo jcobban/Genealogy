@@ -81,8 +81,9 @@ use \Exception;
  *		2019/07/26      use Template                                    *
  *		                merge update logic from updatePicture.php       *
  *      2019/11/17      move CSS to <head>                              *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Picture.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -106,7 +107,7 @@ $idir	                = null;
 $picture	            = null;
 $record	                = null;
 $setParms               = null;
-$idbrtext               = "";
+$idbrtext               = null;
 $idtypetext             = "missing";
 $pictypetext            = "0";
 $idirtext               = "missing";
@@ -122,14 +123,16 @@ if (count($_GET) > 0)
 	foreach($_GET as $key => $value)
     {	                // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 		{		        // act on specific parameter
 		    case 'idbr':
 		    {		    // the unique record identifier of existing record
 				if (ctype_digit($value))
                     $idbr	        = (int)$value;
-                $idbrtext           = $value;
+                else
+                    $idbrtext       = htmlspecialchars($value);
 				break;
 		    }		    // the unique record identifier of existing record
 
@@ -138,7 +141,8 @@ if (count($_GET) > 0)
 				if (ctype_digit($value) &&
 				    array_key_exists($value, Picture::$IdTypeNames))
                     $idtype	        = (int)$value;
-                $idtypetext         = $value;
+                else
+                    $idtypetext     = htmlspecialchars($value);
 				break;
 		    }		// identifier of associated record type and event
 
@@ -146,16 +150,18 @@ if (count($_GET) > 0)
 		    {		// type of media
 				if (ctype_digit($value) && $value <= 3 &&
 				    array_key_exists($value, Picture::$PicTypeNames))
-				    $pictype	    = (int)$value;
-                $pictypetext        = $value;
+                    $pictype	    = (int)$value;
+                else
+                    $pictypetext    = htmlspecialchars($value);
 				break;
 		    }		// type of media
 
 		    case 'idir':
 		    {		// key of associated database record
 				if (ctype_digit($value) && $value > 0)
-				    $idir	        = (int)$value;
-                $idirtext           = $value;
+                    $idir	        = (int)$value;
+                else
+                    $idirtext       = htmlspecialchars($value);
 				break;
 		    }		// key of associated database record
 
@@ -174,7 +180,8 @@ if (count($_GET) > 0)
 		    default:
 		    {
 	            $warn	.= "<p>editPicture.php: " . __LINE__ . 
-	                        " Unexpected parameter $key='$value'</p>\n";
+                            " Unexpected parameter $key='" .
+                            htmlspecialchars($value) . "'</p>\n";
 				break;
 		    }
 		}		// switch
@@ -194,16 +201,18 @@ if (count($_POST) > 0)
 	foreach($_POST as $key => $value)
     {	                // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 		{		        // act on specific parameter
 		    case 'idbr':
 		    {			// identifier present
-				$idbrtext	                = $value;
 				if (is_int($value) || ctype_digit($value))
                 {		// existing picture
                     $idbr                   = (int)$value;
 				}		// existing picture
+                else
+                    $idbrtext       = htmlspecialchars($value);
 				break;
 		    }			// IDBR
 
@@ -214,7 +223,8 @@ if (count($_POST) > 0)
                     $idir	                = (int)$value;
                     $setParms['idir']       = $idir;
                 }
-                $idirtext                   = $value;
+                else
+                    $idirtext       = htmlspecialchars($value);
 				break;
 		    }			// reference to associated record
 
@@ -226,7 +236,8 @@ if (count($_POST) > 0)
                     $idtype	                = (int)$value;
                     $setParms['idtype']     = $idtype;
                 }
-                $idtypetext                 = $value;
+                else
+                    $idtypetext       = htmlspecialchars($value);
 				break;
 		    }			// type of event the picture is associated with
 
@@ -238,7 +249,8 @@ if (count($_POST) > 0)
 				    $pictype	            = (int)$value;
                     $setParms['pictype']    = $pictype;
                 }
-                $pictypetext                = $value;
+                else
+                    $pictypetext       = htmlspecialchars($value);
 				break;
 		    }		    // type of media
 

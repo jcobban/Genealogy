@@ -40,10 +40,10 @@ require_once __NAMESPACE__ . '/common.inc';
 print("<?xml version='1.0' encoding='UTF-8'?>\n");
 
 // set default values for parameters
-$idirleft	= null;		// first IDIR
-$indiv1	= null;		// first individual
-$idirright	= null;		// second IDIR
-$indiv2	= null;		// second individual
+$idirleft				= null;		// first IDIR
+$indiv1	    			= null;		// first individual
+$idirright				= null;		// second IDIR
+$indiv2	    			= null;		// second individual
 
 // validate parameters
 $parms	= "  <parms>\n";
@@ -68,7 +68,8 @@ foreach ($_POST as $key => $value)
 				$msg	.= "idirleft=$idirleft does not exist. ";
 			}
 			else
-			    $msg	.= "idirleft='$idirleft' invalid. ";
+                $msg	.= "idirleft='" .
+                            htmlspecialchars($value) . "' invalid. ";
 			break;
 	    }	//
 
@@ -87,7 +88,8 @@ foreach ($_POST as $key => $value)
 				$msg	.= "idirright=$idirright does not exist. ";
 			}
 			else
-			    $msg	.= "idirright='$idirright' invalid. ";
+			    $msg	.= "idirright='" .
+                            htmlspecialchars($value) . "' invalid. ";
 			break;
 	    }	//
 

@@ -54,6 +54,7 @@ use Templating\TemplateTag;
  *      2020/02/17      'IDST$idst' is not on readonly template         * 
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2020/04/29      add fields and buttons for creating new source  *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -89,26 +90,28 @@ if (count($_GET) > 0)
 		    }
 
 		    case 'offset':
-		    {
-				$offset		        = (int)$value;
+            {
+                if (ctype_digit($value))
+				    $offset		    = (int)$value;
 				break;
 		    }
 
 		    case 'limit':
 		    {
-				$limit		        = (int)$value;
+                if (ctype_digit($value) && $value > 10)
+				    $limit		    = (int)$value;
 				break;
 		    }
 
 		    case 'lang':
             {
-                $lang       = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value);
 				break;
 		    }
 		}		// act on specific parameters
     }
     if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn           .= $parmsText . "</table>\n";
 }	        	    // invoked by URL
 
 if (canUser('edit'))
@@ -134,7 +137,7 @@ $information	        = $sources->getInformation();
 // Note: $information['count'] >= $sources->count() <= $limit
 $count		            = $information['count'];
 
-$template->set('PATTERN',           $pattern);
+$template->set('PATTERN',           htmlspecialchars($pattern));
 $template->set('OFFSET',            $offset);
 $template->set('LIMIT',             $limit);
 $template->set('LANG',              $lang);

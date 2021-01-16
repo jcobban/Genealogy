@@ -87,8 +87,9 @@ use \Exception;
  *		                Address::getIdar no longer saves the object     *
  *		                fix display for deleted object                  *
  *      2019/11/17      move CSS to <head>                              *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Address.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -127,26 +128,33 @@ if (isset($_GET) && count($_GET) > 0)
     foreach($_GET as $key => $value)
     {		                    // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{	                    // act on specific key
 		    case 'formname':
 		    {
-				$formname	= $value;
+                if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $value))
+                    $formname	= $value;
+                else
+                    $msg        .= "Formname value '" .
+                                    htmlspecialchars($value) .
+                                    "' invalid. ";
 				break;
 		    }	                // formname
 
 		    case 'idar':
 		    case 'id':	        // backwards compatibility
 		    {
-				if (strlen($value) == 0 ||
-				    !ctype_digit($value))
+				if (ctype_digit($value))
+				    $idar	= intval($value);
+				else
 				{	            // invalid format
-				    $name	= "Invalid Value of idar='$value'";
+				    $name	= "IDAR value '" .
+                                    htmlspecialchars($value) .
+                                    "' invalid";
 				    $msg	.= $name . '. ';
 				}	            // invalid format
-				else
-				    $idar	= intval($value);
 				break;
 		    }	                // idar
 
@@ -156,7 +164,9 @@ if (isset($_GET) && count($_GET) > 0)
 				    $kind	= intval($value);
 				else
 				{	            // invalid format
-				    $name	= "Invalid Value of kind='$value'";
+ 			        $name	= "Kind value '" .
+                                    htmlspecialchars($value) . 
+                                    "' invalid";
 				    $msg	.= $name . '. ';
 				}	            // invalid format
 				break;
@@ -164,19 +174,19 @@ if (isset($_GET) && count($_GET) > 0)
 
 		    case 'given':
 		    {
-				$given		= $value;
+				$given		= htmlspecialchars($value);
 				break;
 		    }	                // given name of associated individual
 
 		    case 'surname':
 		    {
-				$surname	= $value;
+				$surname	= htmlspecialchars($value);
 				break;
 		    }	                // surname of associated individual
 
 		    case 'name':
 		    {
-				$name		= $value;
+				$name		= htmlspecialchars($value);
 				break;
 		    }	                // name of address
 
@@ -194,44 +204,57 @@ if (isset($_GET) && count($_GET) > 0)
 else
 if (isset($_POST) && count($_POST) > 0)
 {		                        // parameters passed by method=post
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText          = "<p class='label'>\$_POST</p>\n" .
+                            "<table class='summary'>\n" .
+                              "<tr><th class='colhead'>key</th>" .
+                                "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {		                    // loop through all parameters
 		if (is_array($value))
             $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>" . print_r($value, true) .
+                            "<td class='white left'>" .
+                            htmlspecialchars(print_r($value, true)) .
                             "</td></tr>\n"; 
 		else
             $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+                            "<td class='white left'>" .
+                            htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{	                    // act on specific key
 		    case 'formname':
-		    {
-				$formname	= $value;
+            {
+                if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $value))
+                    $formname	= $value;
+                else
+                    $msg        .= "Formname value '" .
+                                    htmlspecialchars($value) .
+                                    "' invalid. ";
 				break;
 		    }	                // formname
 
 		    case 'action':
 		    {
-				$action		= strtolower($value);
+                if (preg_match('/^[a-zA-Z]+$/', $value))
+				    $action		= strtolower($value);
+                else
+                    $msg        .= "Action value '" .
+                                    htmlspecialchars($value) .
+                                    "' invalid. ";
 				break;
 		    }	                // action
 
 		    case 'idar':
 		    case 'id':	        // backwards compatibility
 		    {
-				if (strlen($value) == 0 ||
-				    !ctype_digit($value))
+				if (ctype_digit($value))
+				    $idar	= intval($value);
+				else
 				{	            // invalid format
-				    $name	= "Invalid Value of idar='$value'";
+				    $name	= "IDAR value '" .
+                                    htmlspecialchars($value) .
+                                    "' invalid";
 				    $msg	.= $name . '. ';
 				}	            // invalid format
-				else
-				    $idar	= intval($value);
 				break;
 		    }	                // idar
 
@@ -241,7 +264,9 @@ if (isset($_POST) && count($_POST) > 0)
 				    $kind	= intval($value);
 				else
 				{	            // invalid format
-				    $name	= "Invalid Value of kind='$value'";
+				    $name	= "Kind value '" .
+                                    htmlspecialchars($value) .
+                                    "' invalid";
 				    $msg	.= $name . '. ';
 				}	            // invalid format
 				break;

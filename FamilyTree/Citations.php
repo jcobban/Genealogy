@@ -42,6 +42,8 @@ use \Templating\Template;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2020/01/22      internationalize numbers                        *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
+ *                      add additional warnings and messages            *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -92,27 +94,32 @@ static $urlname = array(
 $pattern			= '';
 $count	    		= 0;
 $offset	    		= 0;
+$offsettext         = null;
 $limit	    		= 20;
+$limittext          = null;
 $type	    		= null;		// so it will fail to match on default
+$typetext           = null;
 $idsr	    		= null;		// so it will fail to match on default
+$idsrtext           = null;
 $lang               = 'en';
 $parms	    		= array();
 
 if (count($_GET) > 0)
 {
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+                    "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                        "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {		// loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch($key)
 		{	// take action on specific parameter
 		    case 'pattern':
 		    {
-				$pattern		    = $value;
+				$pattern		    = htmlspecialchars($value);
 				$parms['srcdetail']	= $value;
 				break;
 		    }
@@ -124,6 +131,8 @@ if (count($_GET) > 0)
 				    $type			= (int)$value;
                     $parms['type']	= $type;
                 }
+                else
+                    $typetext       = htmlspecialchars($value);
 				break;
 		    }
 
@@ -134,6 +143,8 @@ if (count($_GET) > 0)
 				    $idsr			= (int)$value;
                     $parms['idsr']	= $idsr;
                 }
+                else
+                    $idsrtext       = htmlspecialchars($value);
 				break;
 		    }
 
@@ -141,6 +152,8 @@ if (count($_GET) > 0)
             {
                 if (ctype_digit($value))
 				    $offset			= (int)$value;
+                else
+                    $offsettext       = htmlspecialchars($value);
 				break;
 		    }
 
@@ -148,6 +161,8 @@ if (count($_GET) > 0)
 		    {
                 if (ctype_digit($value))
 				    $limit			= (int)$value;
+                else
+                    $limittext       = htmlspecialchars($value);
 				break;
             }
 
@@ -171,11 +186,21 @@ $template->updateTag('otherStylesheets',
 $formatter                          = $template->getFormatter();
 
 if (strlen($pattern) == 0)
-	$msg	.= "Please specify a pattern for citations. ";
+    $msg	.= "Please specify a pattern for citations. ";
+if (is_string($idsrtext))
+    $msg    .= "Invalid IDSR value '$idsrtext'. ";
+else
 if (is_null($idsr))
 	$msg	.= "Please identify source. ";
+if (is_string($typetext))
+    $msg    .= "Invalid citation or event type value '$typetext'. ";
+else
 if (is_null($type))
 	$msg	.= "Please identify citation or event type. ";
+if (is_string($offsettext))
+    $warn   .= "<p>Invalid offset=$offsettext ignored.</p>";
+if (is_string($limittext))
+    $warn   .= "<p>Invalid limit=$limittext ignored.</p>";
 
 $prevoffset	    = $offset - $limit;
 $nextoffset	    = $offset + $limit;

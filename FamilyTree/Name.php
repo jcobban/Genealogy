@@ -24,8 +24,9 @@ use \Exception;
  *		2018/11/04      use class Template                              *
  *		2018/12/26      ignore field IDNR in Name record                *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -35,56 +36,63 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // defaults
 $idnx	            = null;         // numeric key of record
+$idnxtext           = null;
 $name	            = null;         // instance of class Name
 $lang	            = 'en';
 
 // process parameters
-foreach($_GET as $key => $value)
-{			// loop through all parameters
-	switch(strtolower($key))
-	{		// act on specific parameters
-	    case 'idnx':
-	    case 'id':
-        {
-            if (is_string($value))
-            {
-                $value          = trim($value);
-			    if (strlen($value) > 0 &&
-                    ctype_digit($value))
-                    $value      = intval($value);
-            }
-
-            if (is_int($value) && $value > 0)
-			    $idnx	        = $value;
-			else
-			    $msg        .= "IDNX value '$value' is not a positive number. ";
-			break;
-	    }
-
-	    case 'debug':
-	    case 'text':
-	    {		// handled by common
-			break;
-	    }		// debug
-
-	    case 'lang':
-        {		// preferred language
-            $lang           = FtTemplate::validateLang($value);
-			break;
-	    }		// preferred language
-
-	    default:
-	    {
-			$warn	.= "<p>Unexpected parameter $key='$value'.</p>\n";
-			break;
-	    }
-	}		// act on specific parameters
-}			// loop through all parameters
+if (isset($_GET) && count($_GET) > 0)
+{			        // invoked by method=get
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{			// loop through all parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
+	    $value          = trim($value);
+		switch(strtolower($key))
+		{		// act on specific parameters
+		    case 'idnx':
+		    case 'id':
+	        {
+	            if (ctype_digit($value))
+	                $idnx           = intval($value);
+                else
+	                $idnxtext       = htmlspecialchars($value);
+	
+				break;
+		    }
+	
+		    case 'debug':
+		    case 'text':
+		    {		// handled by common
+				break;
+		    }		// debug
+	
+		    case 'lang':
+	        {		// preferred language
+	            $lang           = FtTemplate::validateLang($value);
+				break;
+		    }		// preferred language
+	
+		    default:
+		    {
+				$warn	.= "<p>Unexpected parameter $key='$value'.</p>\n";
+				break;
+		    }
+		}		// act on specific parameters
+	}			// loop through all parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>\n";
+}			        // invoked by method=get
 
 // get the requested name record
 if (!is_null($idnx))
 {		// parameter present
-    $name		= new Name(array('idnx' => $idnx));
+    $name		        = new Name(array('idnx' => $idnx));
 
     // action depends upon whether the user is authorized to update
     // this specific record
@@ -100,42 +108,29 @@ else
 }
 
 // get the template
-$template	        = new FtTemplate("Name$action$lang.html");
+$template	            = new FtTemplate("Name$action$lang.html");
+$t                      = $translate['tranTab'];
+$genderText             = array(0 => $t['male'], 
+			                    1 => $t['female'], 
+                                2 => $t['unknown']); 
+
+if (is_string($idnxtext))
+    $msg        .= "IDNX value '$idnxtext' is invalid. ";
 
 // get the requested name record
-if (!is_null($idnx) && $name->isExisting())
+if ($name instanceof Name && $name->isExisting())
 {		// parameter present
-	$surname		    = $name->get('surname');
-	$surnameRec			= new Surname(array('surname' => $surname));
-	$idnr				= $surnameRec->get('idnr');
-	$idir				= $name->get('idir');
-	$person				= new Person(array('idir' => $idir));
-	$tblirName	        = $person->getName(Person::NAME_INCLUDE_DATES);
+	$surname		        = $name->get('surname');
+	$surnameRec		    	= new Surname(array('surname' => $surname));
+	$idnr				    = $surnameRec->get('idnr');
+	$idir				    = $name->get('idir');
+	$person				    = new Person(array('idir' => $idir));
+	$tblirName	            = $person->getName(Person::NAME_INCLUDE_DATES);
 	$template->set('IDNX',		        $idnx);
 	$template->set('IDNR',		        $idnr);
 	$template->set('IDIR',		        $idir);
 	$template->set('TBLIRNAME',		    $tblirName);
-	switch($person->getGender())
-	{
-	    case Person::MALE:
-	    {
-			$sex	= 'male';
-			break;
-	    }
-	
-	    case Person::FEMALE:
-	    {
-			$sex	= 'female';
-			break;
-	    }
-	
-	    default:
-	    {
-			$sex	= 'other';
-			break;
-	    }
-	
-	}
+	$sex	                = $genderText[$person->getGender()];
 	
 	$surname				= $name->get('surname');
 	$soundslike				= $name->get('soundslike');
@@ -157,9 +152,9 @@ if (!is_null($idnx) && $name->isExisting())
 	$template->set('SEX',		    	    $sex);
 	$template->set('NAME',		    	    $name->getName());
 	$template->set('NAMEURI',		    	$nameUri);
-	$template->set('SURNAME',		    	$surname);
+	$template->set('SURNAME',		    	htmlspecialchars($surname));
 	$template->set('SOUNDSLIKE',			$soundslike);
-	$template->set('GIVENNAME',		    	$givenname);
+	$template->set('GIVENNAME',		    	htmlspecialchars($givenname));
 	$template->set('PREFIX',		    	$prefix);
 	$template->set('NAMETITLE',			    $nametitle);
 	$template->set('TREENAME',		    	$person->getTreeName());
@@ -234,7 +229,8 @@ else
 	$template->set('PREFIX',		    	'');
 	$template->set('NAMETITLE',			    '');
 	$template->set('TREENAME',		    	'');
-	$template->set('USERREF',			    '');
+    $template->set('USERREF',			    '');
+    $template['locForm']->update(null);
 }		// idnx missing or invalid
 
 $template->display();

@@ -68,6 +68,7 @@ use \Exception;
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/12/13      remove B_ prefix from file names                *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/11/28      correct XSS error                               *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -106,7 +107,8 @@ if (isset($_POST) && count($_POST) > 0)
     foreach($_POST as $key => $value)
     {			    // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 		{		    // act on specific parameters
 		    case 'domain':
@@ -274,7 +276,8 @@ if (strlen($msg) == 0)
 			default:
 			{
 			    if ($debug)
-				    $warn	.= "<p>\$birth->set('$key','$value')</p>\n";
+                    $warn	.= "<p>\$birth->set('$key', '" .
+                                htmlspecialchars($value) . "')</p>\n";
 			    $birth->set($key, $value);
 			    break;
 			}

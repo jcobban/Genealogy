@@ -569,51 +569,6 @@ function clearIdir()
 }		// clearIdir
 
 /************************************************************************
- *  function showImage													*
- *																		*
- *  This function is called when the user selects the ShowImage button	*
- *  with the mouse.														*
- *																		*
- *  Input:																*
- *		$this		<button id='ShowImage'>								*
- ************************************************************************/
-function showImage()
-{
-    var	form		= this.form;
-    if (form.Image)
-    {		// Image field defined
-		args.showimage	= 'yes';	// previous and next request image
-		var imageUrl	= form.Image.value;
-		if (imageUrl.length == 0)
-		    popupAlert("DeathRegDetail.js: showImage: " +
-				            "no image defined for this registration",
-                        this);
-		else
-		if (imageUrl.length > 5 &&
-		    (imageUrl.substring(0,5) == "http:" ||
-		     imageUrl.substring(0,6) == "https:"))
-		    openFrame("Images",
-				      imageUrl,
-				      "right");
-		else
-        if (imageUrl.substring(0,8) == '/Images/')
-		    openFrame("Images",
-				      '/DisplayImage.php?src=' + imageUrl,
-				      "right");
-        else
-        if (imageUrl.substring(0,1) == '/')
-		    openFrame("Images",
-				      '/DisplayImage.php?src=/Images' + imageUrl,
-				      "right");
-        else
-		    openFrame("Images",
-				      '/DisplayImage.php?src=/Images/' + imageUrl,
-				      "right");
-    }		// Image field defined
-    return false;
-}		// showImage
-
-/************************************************************************
  *  function showPrevious												*
  *																		*
  *  This function is called when the user selects the ShowPrevious		*

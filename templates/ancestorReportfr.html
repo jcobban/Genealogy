@@ -49,7 +49,9 @@
       <span class="right">
 		<a href="ancestorReportHelpfr.html" target="help">? Help</a>
       </span>
-      Arbre des Ancêtres  $NAME
+      <span id="title">
+        Arbre des Ancêtres  $NAME
+      </span>
       <div style="clear: both;"></div>
     </h1>
     $TRACE
@@ -60,7 +62,7 @@
     <form name="depthForm" id="depthForm" action="ancestorReport.php"
 				method="get">
       <div class="row">
-		<label class="column1" for="ancDepth">
+		<label class="column1" for="ancDepth" style="width: 23em;">
 		  Profondeur maximale en générations:
 		</label> 
 		<input type="text" name="ancDepth" id="ancDepth"
@@ -71,7 +73,7 @@
 		<div style="clear: both;"></div>
       </div>  <!-- class="row" -->
       <div class="row">
-		<label class="column1" for="incLocsSet">
+		<label class="column1" for="incLocsSet" style="width: 23em;">
 		  Montrer lieus?
 		</label>
 		<input type="checkbox" name="incLocsSet" id="incLocsSet"
@@ -101,11 +103,15 @@
     <span id="Fathersfemale">Père de la&nbsp;</span>
     <span id="Mothersmale">Mère du&nbsp;</span>
     <span id="Mothersfemale">Mère de la&nbsp;</span>
-    <span id="direction">PC</span>
+    <span id="direction">CP</span>
     <span id="Failure">échec</span>
+    <span id="Unknown">Inconnue</span>
+    <span id="direction">CP</span>
+    <span id="missing">Il n'y a pas de personne avec IDIR=$idir. </span>
+    <span id="missingIdir">Paramètre obligatoire IDIR manquant. </span>
   </div><!-- id="templates" -->
   <div id="HelpancDepth" class="balloon">
-	Specify the number of generations of ancestors to display.
+	Spécifiez le nombre de générations d'ancêtres à afficher.
   </div>
   <div id="HelpincLocsSet" class="balloon">
 	Click on this checkbox to determine whether or not locations are included

@@ -9,7 +9,7 @@ use \Exception;
  *  domains for managing vital statistics records.						*
  *																		*
  *  Parameters (passed by method=get):									*
- *		Domain	2 letter country code + 2/3 letter state/province code	*
+ *		cc	    2 letter country code                                   *
  *																		*
  *  History:															*
  *		2016/05/20		created											*
@@ -27,8 +27,11 @@ use \Exception;
  *		                the top level domains of a country              *
  *		2019/12/05      separate processing of $_GET and $_POST         *
  *		                add support for Category                        *
+ *		2021/01/13      correct XSS vulnerabilities                     *
+ *		                improve parameter validation                    *
+ *		                get message texts from template                 *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/DomainSet.inc";
@@ -39,12 +42,16 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
 $cc			    			= 'CA';
+$cctext   			        = null;
 $partof	    	    		= null;
+$partoftext 	    		= null;
 $countryName				= 'Canada';
 $domainType					= 'Province';
 $lang		    			= 'en';
 $offset		    			= 0;
+$offsettext  			    = null;
 $limit		    			= 20;
+$limittext	    			= null;
 $parmsDebug					= '';
 $newCountry					= false;
 if (isset($_GET) && count($_GET) > 0)
@@ -52,27 +59,32 @@ if (isset($_GET) && count($_GET) > 0)
 	$parmsText      	= "<p class='label'>\$_GET</p>\n" .
 	                          "<table class='summary'>\n" .
 	                            "<tr><th class='colhead'>key</th>" .
-	                            "<th class='colhead'>value</th></tr>\n";
+                                "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{
 	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
 	                        "<td class='white left'>$value</td></tr>\n"; 
 		$key	            = strtolower($key);
-	
+        $value              = trim($value);
+
+        if (strlen($value) > 0)
 		switch($key)
 		{
 		    case 'cc':
 		    {
 				if (preg_match('/^[a-zA-Z]{2}$/', $value) == 1)
-	            {
 				    $cc			    = strtoupper($value);
-				}
+                else
+                    $cctext         = htmlspecialchars($value);
 				break;
 		    }		// country code
 	
 		    case 'partof':
 		    {
-	            $partof			    = strtoupper($value);
+				if (preg_match('/^[a-zA-Z]{2}$/', $value) == 1)
+				    $partof			= strtoupper($value);
+                else
+                    $partoftext     = htmlspecialchars($value);
 				break;
 		    }		// country code
 	
@@ -85,15 +97,19 @@ if (isset($_GET) && count($_GET) > 0)
 	
 		    case 'offset':
 		    {
-				if (strlen($value) > 0 && ctype_digit($value))
-				    $offset	        = $value;
+				if (ctype_digit($value))
+                    $offset	        = $value;
+                else
+                    $offsettext     = htmlspecialchars($value);
 				break;
 		    }
 	
 		    case 'limit':
 		    {
-				if (strlen($value) > 0 && ctype_digit($value))
+				if (ctype_digit($value))
 				    $limit	        = $value;
+                else
+                    $limittext      = htmlspecialchars($value);
 				break;
 		    }
 	
@@ -128,15 +144,18 @@ if (isset($_POST) && count($_POST) > 0)
 		    $code	    = '';
 		    $key	    = strtolower($key);
 		}
-	
+
+        $value              = trim($value);
+
+        if (strlen($value) > 0)
 		switch($key)
 		{
 		    case 'cc':
 		    {
 				if (preg_match('/^[a-zA-Z]{2}$/', $value) == 1)
-	            {
 				    $cc			    = strtoupper($value);
-				}
+                else
+                    $cctext         = htmlspecialchars($value);
 				break;
 		    }		// country code
 	
@@ -226,15 +245,19 @@ if (isset($_POST) && count($_POST) > 0)
 	
 		    case 'offset':
 		    {
-				if (strlen($value) > 0 && ctype_digit($value))
-				    $offset	        = $value;
+				if (ctype_digit($value))
+                    $offset	        = $value;
+                else
+                    $offsettext     = htmlspecialchars($value);
 				break;
 		    }
 	
 		    case 'limit':
 		    {
-				if (strlen($value) > 0 && ctype_digit($value))
-				    $limit	        = $value;
+				if (ctype_digit($value))
+                    $limit	        = $value;
+                else
+                    $limittext     = htmlspecialchars($value);
 				break;
 		    }
 	
@@ -247,10 +270,47 @@ if (isset($_POST) && count($_POST) > 0)
 }                       // invoked by method=post
 
 if (canUser('edit'))
-	$action		= 'Update';
+	$action		        = 'Update';
 else
-	$action		= 'Display';
+    $action		        = 'Display';
+
+$tempBase		        = $document_root . '/templates/';
+$includeSub             = "DomainsEdit$action$cc$lang.html";
+if (!file_exists($tempBase . "DomainsEdit$action{$cc}en.html"))
+{                           // country code not supported
+    $includeSub         = "DomainsEdit{$action}CA$lang.html";      
+}                           // country code not supported
+$template		        = new FtTemplate($includeSub);
+$translate              = $template->getTranslate();
+$t                      = $translate['tranTab'];
+
+if (is_string($cctext))
+{
+    $text               = $template['countryInvalid']->innerHTML;
+    $msg                .= str_replace('$cc', $cctext, $text);
+}
+if (is_string($partoftext))
+{
+    $text               = $template['partofInvalid']->innerHTML;
+    $msg                .= str_replace('$partof', $partoftext, $text);
+}
+if (is_string($offsettext))
+{
+    $text               = $template['offsetIgnored']->outerHTML;
+    $warn               .= str_replace('$offset', $offsettext, $text);
+}
+if (is_string($limittext))
+{
+    $text               = $template['limitIgnored']->outerHTML;
+    $warn               .= str_replace('$limit', $limittext, $text);
+}
+
 $country		        = new Country(array('code' => $cc));
+if (!$country->isExisting())
+{
+    $text               = $template['countryInvalid']->innerHTML;
+    $msg                .= str_replace('$cc', $cc, $text);
+}
 if ($partof)
 {
 	$domain		        = new Domain(array('domain'	    => $partof,
@@ -333,16 +393,6 @@ else
 	$domains	                = array();
 }
 
-$tempBase		                = $document_root . '/templates/';
-$includeSub                     = "DomainsEdit$action$cc$lang.html";
-if (!file_exists($tempBase . "DomainsEdit$action{$cc}en.html"))
-{                           // country code not supported
-    $includeSub                 = "DomainsEdit{$action}CA$lang.html";      
-}                           // country code not supported
-$template		                = new FtTemplate($includeSub);
-$translate                      = $template->getTranslate();
-$t                              = $translate['tranTab'];
-
 $template->set('CONTACTTABLE',	    'Domains');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 $template->set('CC',	            $cc);
@@ -356,36 +406,47 @@ $template->set('DOMAINTYPEPLURAL',	$t[$domainType . 's']);
 $template->set('OFFSET',	        $offset);
 $template->set('LIMIT',	            $limit);
 
-$template->updateTag('languageOpt',
-					 $languageSet);
-
-if (($offset - $limit) >= 0)
-	$template->updateTag('topPrev',
-					     array('cc'		=> $cc,
-                               'lang'	=> $lang,
-                               'partof' => $partof,
-		    				   'offset'	=> $offset - $limit,
-		    				   'limit'	=> $limit));
+if (strlen($msg) == 0)
+{
+	$template->updateTag('languageOpt',
+						 $languageSet);
+	
+	if (($offset - $limit) >= 0)
+		$template->updateTag('topPrev',
+						     array('cc'		=> $cc,
+	                               'lang'	=> $lang,
+	                               'partof' => $partof,
+			    				   'offset'	=> $offset - $limit,
+			    				   'limit'	=> $limit));
+	else
+		$template->updateTag('topPrev', null);
+			
+	if (is_null($partof))
+	    $partof             = '';
+	if (($offset + $limit) < $totcount)
+		$template->updateTag('topNext',
+						     array('cc'		=> $cc,
+			    				   'lang'	=> $lang,
+	                               'partof' => $partof,
+			    				   'offset'	=> $offset + $limit,
+	                               'limit'	=> $limit));
+	else
+		$template->updateTag('topNext', null);
+	
+	$template->updateTag('respdescrows',
+						 array('first'		=> $offset + 1,
+						       'last'		=> min($totcount, $offset+$limit),
+						       'totalrows'	=> $totcount));
+	
+	$template->updateTag('Row$code',
+	                     $domains);
+}
 else
-	$template->updateTag('topPrev', null);
-		
-if (is_null($partof))
-    $partof             = '';
-if (($offset + $limit) < $totcount)
-	$template->updateTag('topNext',
-					     array('cc'		=> $cc,
-		    				   'lang'	=> $lang,
-                               'partof' => $partof,
-		    				   'offset'	=> $offset + $limit,
-                               'limit'	=> $limit));
-else
-	$template->updateTag('topNext', null);
+{
+	$template->updateTag('topBrowse',
+	                     null);
+	$template->updateTag('domainForm',
+	                     null);
+}
 
-$template->updateTag('respdescrows',
-					 array('first'		=> $offset + 1,
-					       'last'		=> min($totcount, $offset+$limit),
-					       'totalrows'	=> $totcount));
-
-$template->updateTag('Row$code',
-					 $domains);
 $template->display();

@@ -113,7 +113,7 @@
       </form>
     </div> <!-- end of <div class="body"> -->
     <div class="map" id="mapDiv">
-    </div>
+    </div> <!-- id="map" --> 
     <!-- a division containing a button to hide the map division -->
     <div class="balloon" id="hideMapDiv">
       <center>
@@ -125,6 +125,28 @@
         <button id="showMapTemplate" class="button">Show Map</button>
         <!-- the following button replaces Show Map -->
         <button id="hideMapTemplate" class="button">Hide Map</button>
+      <span id="invalidIDTR">
+        Invalid value for IDTR='$value'.
+      </span>
+      <span id="invalidCode">
+        Invalid value for Code='$value'.
+      </span>
+      <span id="invalidValue">
+        Invalid value for $name='$value'.
+      </span>
+      <span id="undefinedIDTR">
+        Undefined Temple IDTR='$value'.
+      </span>
+      <span id="undefinedCode">
+        Undefined Temple Code='$value'.
+      </span>
+      <span id="missingKey">
+        You must specify either the numeric IDTR or the Code to 
+        identify the specific temple.
+      </span>
+      <span id="missing">
+        MISSING
+      </span>
     </div>
     <div class="balloon" id="Helpidtr">
       The unique numeric identifier of the temple record in the database.

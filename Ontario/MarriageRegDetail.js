@@ -64,6 +64,7 @@
  *      2019/05/19      call element.click to trigger button click      *
  *      2020/06/17      DisplayImage moved to top folder                *
  *      2020/07/03      add button to select Ontario Marriage License   *
+ *      2020/11/21      move showImage to common utilities script       *
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban.                              *
  ************************************************************************/
@@ -530,46 +531,6 @@ function clearIdir(ev)
         alert ("Cannot find '" + role + "IDIR' id='" + this.id + "'");
     return false;   // suppress any standard functionality
 }       // function clearIdir
-
-/************************************************************************
- *  function showImage                                                  *
- *                                                                      *
- *  This function is called when the user clicks the ShowImage button   *
- *  with the mouse or types Alt-I.                                      *
- *                                                                      *
- *  Input:                                                              *
- *      this        <button id='ShowImage'>                             *
- ************************************************************************/
-function showImage(ev)
-{
-    ev.stopPropagation();
-    var form        = this.form;
-    if (form.Image)
-    {       // Image field defined
-        args.showimage  = 'yes';    // previous and next request image
-        var imageUrl    = form.Image.value;
-        if (imageUrl.length == 0)
-            alert("MarriageRegDetail.js: showImage: " +
-                  "no image defined for this registration");
-        else
-        if (imageUrl.length > 5 &&
-            (imageUrl.substring(0,5) == "http:" ||
-             imageUrl.substring(0,6) == "https:"))
-            openFrame("Images",
-                      imageUrl,
-                      "right");
-        else
-        if (imageUrl.substring(0, 1) == '/')
-            openFrame("Images",
-                      '/DisplayImage.php?src=' + imageUrl,
-                      "right");
-        else
-            openFrame("Images",
-                      '/DisplayImage.php?src=/Images/' + imageUrl,
-                      "right");
-    }       // Image field defined
-    return false;
-}       // function showImage
 
 /************************************************************************
  *  function showPrevious                                               *

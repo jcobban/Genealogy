@@ -424,18 +424,18 @@
 			  <td>
 			    <select name="Source$rownum" id="Source$rownum"
 							class="white leftcit">
-					<option value="$idsr" selected="selected">
+				  <option value="$idsr" selected="selected">
 					    $sourceName
-					</option>
+				  </option>
 			    </select>
 			  </td>
 			  <td>
-					<input type="text" name="Page$rownum" id="Page$rownum"
-							class="white leftnc" value="$detail" size="37">
-					<input type="hidden" name="idime$rownum" id="idime$rownum"
-							value="$idime">
-					<input type="hidden" name="type$rownum" id="type$rownum" 
-							value="$type">
+				<input type="text" name="Page$rownum" id="Page$rownum"
+						class="white leftnc" value="$detail" size="37">
+				<input type="hidden" name="idime$rownum" id="idime$rownum"
+						value="$idime">
+				<input type="hidden" name="type$rownum" id="type$rownum" 
+						value="$type">
 			  </td>
 			</tr>
 			<!-- The following is the template for what a citation looks
@@ -490,9 +490,9 @@
 	  </form>
 	</div> <!-- end of <div id="cittemplates"> -->
 	<div class="hidden" id="internationalization">
-	    <!--*****************************************************************
-	     *  Error messages from parameter verification                      *
-	     ******************************************************************-->
+	    <!--*************************************************************
+	     *  Error messages from parameter verification                  *
+	     **************************************************************-->
         <span id="invalidEventType">
             Invalid event type $type.
         </span>
@@ -515,9 +515,9 @@
             Mandatory IDIR or IDMR or IDCR parameter missing.
         </span>
 
-	    <!--*****************************************************************
-	     *  Headings                                                        *
-	     ******************************************************************-->
+	    <!--*************************************************************
+	     *  Headings                                                    *
+	     **************************************************************-->
         <span id="headingGenericChild">
             Edit Generic Event for Child 
                 <a href="Person.php?idir=$idir&amp;lang=$lang">
@@ -536,14 +536,14 @@
                     $wifename</a>
         </span>
 
-        <!--*****************************************************************
-	     *  $typeText														*
-	     *																	*
-	     *  Events which are implemented by fields inside a record other	*
-	     *  than an instance of Event (tblER), are distinguished			*
-	     *	by the citation type, passed as parameter type.  This table		*
+        <!--*************************************************************
+	     *  $typeText													*
+	     *																*
+	     *  Events which are implemented by fields inside a record other*
+	     *  than an instance of Event (tblER), are distinguished		*
+	     *	by the citation type, passed as parameter type.  This table	*
 	     *	is used to modify the title of the dialog based upon the type.	*
-	     ******************************************************************-->
+	     **************************************************************-->
 	    <div id="typeText">
 			<span>Generic Fact</span>
 			<span>Name Fact</span>
@@ -573,13 +573,14 @@
 			<span>LDS Initiatory Event</span>
 	    </div>
 
-	    <!--*****************************************************************
-	     *  $eventText														*
-	     *																	*
-	     *  This table provides a translation from an event type to the text*
-	     *  to display to the user.  This is ordered alphabetically for use	*
-	     *	constructing a select element in a web page.					*
-	     ******************************************************************-->
+	    <!--*************************************************************
+	     *  $eventText													*
+	     *																*
+	     *  This table provides a translation from an event type to the *
+	     *  text to display to the user.  This is ordered               *
+         *  alphabetically for use constructing a select element        *
+         *  in a web page.					                            *
+	     **************************************************************-->
 	    <div id="eventText">
 			<span data-key="2">was adopted</span>
 			<span data-key="63">also worked as a </span>
@@ -670,15 +671,15 @@
 			<span data-key="0">unused 0</span>
 		</div>
 
-	    <!--*****************************************************************
-	     *  $personEvents												    *
-	     *																	*
-	     *  This table is used to create the selection list for				*
-	     *	events specific to an individual.  Where the event type			*
-	     *	is greater than 999 it indicates an event recorded in the		*
-	     *	Person record itself, and the code is the citation				*
-	     *	type times 1000.												*
-	     ******************************************************************-->
+	    <!--*************************************************************
+	     *  $personEvents											    *
+	     *																*
+	     *  This table is used to create the selection list for			*
+	     *	events specific to an individual.  Where the event type		*
+	     *	is greater than 999 it indicates an event recorded in the	*
+	     *	Person record itself, and the code is the citation			*
+	     *	type times 1000.											*
+	     **************************************************************-->
 	    <div id="personEvents">
 			<span data-key="0">Choose an event type:</span>
 			<span data-key="1"></span>
@@ -751,17 +752,18 @@
 			<span data-key="58">Will</span>
 	    </div>
 
-	    <!--*****************************************************************
-	     *  $marriageEvents													*
-	     *																	*
-	     *  This table is used to create the selection list for				*
-	     *	events specific to a marriage.  Where the event type			*
-	     *	is greater than 999 it indicates an event recorded in the		*
-	     *	Family record itself, and the code is the citation		        *
-	     *	type times 1000.												*
-	     ******************************************************************-->
+	    <!--*************************************************************
+	     *  $marriageEvents												*
+	     *																*
+	     *  This table is used to create the selection list for			*
+	     *	events specific to a marriage.  Where the event type		*
+	     *	is greater than 999 it indicates an event recorded in the	*
+	     *	Family record itself, and the code is the citation		    *
+	     *	type times 1000.											*
+	     **************************************************************-->
 	    <div id="marriageEvents">
-			<span data-key="0" selected="selected">Choose an event type to add:</span>
+			<span data-key="0" selected="selected">
+                Choose an event type to add:</span>
 			<span data-key="69">Marriage</span>
 			<span data-key="7">Annulment</span>
 			<span data-key="20">Divorce</span>
@@ -779,15 +781,15 @@
 			<span data-key="18000">Sealed to Spouse (LDS) deprecated</span>
 	    </div>
 
-	    <!--*****************************************************************
-	     *  $childEvents													*
-	     *																	*
-	     *  This table is used to create the selection list for				*
-	     *	events specific to a Child.  Where the event type			    *
-	     *	is greater than 999 it indicates an event recorded in the		*
-	     *	Family record itself, and the code is the citation		        *
-	     *	type times 1000.												*
-	     ******************************************************************-->
+	    <!--*************************************************************
+	     *  $childEvents												*
+	     *																*
+	     *  This table is used to create the selection list for			*
+	     *	events specific to a Child.  Where the event type		    *
+	     *	is greater than 999 it indicates an event recorded in the	*
+	     *	Family record itself, and the code is the citation		    *
+	     *	type times 1000.											*
+	     **************************************************************-->
 	    <div id="childEvents">
 			<span data-key="0">Choose an event type:</span>
 			<span data-key="2">Adoption (where it should be)</span>
@@ -795,12 +797,12 @@
             <span data-key="17000">Sealed to Parents (LDS) deprecated</span>
 	    </div>
 
-	    <!--*****************************************************************
-	     *  $idetTitleText													*
-	     *																	*
-	     *  This table is used to construct a customized title for events	*
-	     *	represented by a row in table tblER.							*
-	     ******************************************************************-->
+	    <!--*************************************************************
+	     *  $idetTitleText												*
+	     *																*
+	     *  This table is used to construct a customized title for		*
+	     *	events represented by a row in table tblER.					*
+	     **************************************************************-->
 	    <div id="idetTitleText">
 			<span data-key="0"></span>
 			<span data-key="1"></span>

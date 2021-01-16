@@ -45,6 +45,8 @@ use \Exception;
  *		2019/02/19      use Template                                    *
  *      2019/11/17      move CSS to <head>                              *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
+ *                      correct page title                              *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -55,6 +57,8 @@ require_once __NAMESPACE__ . '/common.inc';
 // parameters
 $lang               = 'en';
 $idir               = null;
+$idirtext           = null;
+$name               = '?';
 
 if (isset($_GET) && count($_GET) > 0)
 {			        // invoked by method=get
@@ -65,7 +69,8 @@ if (isset($_GET) && count($_GET) > 0)
     foreach($_GET as $key => $value)
     {
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    $value		= trim($value);
 		switch(strtolower($key))
 		{			// act on specific parameters
@@ -77,8 +82,8 @@ if (isset($_GET) && count($_GET) > 0)
 				    $idir		= $value;
 				    $getParms['idir']	= $idir;
 				}
-				else
-				    $msg	.= "Invalid IDIR=$value. ";
+                else
+                    $idirtext           = htmlspecialchars($value);
 				break;
 		    }			// get the individual by identifier
 	
@@ -97,6 +102,13 @@ $template		    = new FtTemplate("chooseRelative$lang.html", true);
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => 'chooseRelative'));
 
+if (is_string($idirtext))
+{
+    $msg	        .= "Invalid IDIR=$idirtext. ";
+    $name           = $idirtext;
+    $template['indForm']->update(null);
+}
+else
 if ($idir)
 {
     $person	        = new Person(array('idir' => $idir));
@@ -133,9 +145,12 @@ if ($idir)
 }		// default individual specified
 else
 {
-    $msg	.= 'Missing mandatory parameter idir. ';
-    $template->set('NAME',		    'Missing IDIR');
+    $msg	        .= 'Missing mandatory parameter idir. ';
+    $name	        = 'Missing IDIR';
     $template['indForm']->update(null);
 }
+$template->set('NAME',		    $name);
+$text               = $template['title']->innerHTML();
+$template->set('TITLE', str_replace('$NAME', $name, $text));
 
 $template->display();

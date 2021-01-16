@@ -24,6 +24,8 @@ use \Templating\Template;
  *		2019/08/13      created                                         *
  *      2019/11/17      move CSS to <head>                              *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/12/05      cover XSS vulnerabilities                       *
+ *		                improve parameter testing                       *
  *																	    *
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -42,26 +44,38 @@ else
 
 // default values of parametets
 $namestart						= '';
-$idtd		    				= 0;		// default to create new
-$idir		    				= 0;		// default to create new
+$idtd		    				= null;		// default to create new
+$idtdtext	    				= null;
+$todo                           = null;     // instance of ToDo
+$idir		    				= null;		// default to create new
+$idirtext	    				= null;
 $name		    				= '';
 $todotype	    			    = null;
+$todotext	    				= null;
 $idtc	        			    = null;
+$idtctext	    				= null;
 $idtl	        			    = null;
+$idtltext	    				= null;
 $location	        			= null;
 $todoname           			= null;
 $openeddate         			= null;
-$reminderddate      			= null;
+$reminderdate      			    = null;
 $closeddate         			= null;
 $idar	        			    = null;
+$idartext	    				= null;
 $status	        			    = null;
+$statustext	    				= null;
 $priority	    			    = null;
+$prioritytext	    			= null;
 $desc               			= null;
 $results            			= null;
 $filingref          			= null;
 $tag1	        			    = null;
+$tag1text	    				= null;
 $qstag	        			    = null;
+$qstagtext	    				= null;
 $used	        			    = null;
+$usedtext	    				= null;
 			
 $closeAtEnd						= false;
 $lang		    			    = 'en';
@@ -69,6 +83,7 @@ $lang		    			    = 'en';
 // if invoked by method=get process the parameters
 if (count($_GET) > 0)
 {	        	    // invoked by URL to display current status of account
+    $updating       = false;
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
@@ -76,14 +91,17 @@ if (count($_GET) > 0)
 	foreach($_GET as $key => $value)
 	{		        	// loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                            htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{		        // act on specific parameters
 		    case 'idtd':
 		    case 'id':
 		    {           // numeric key of todo
 				if (ctype_digit($value))
-				    $idtd	        = $value;
+                    $idtd	        = $value;
+                else
+                    $idtdtext       = htmlspecialchars($value);
 				break;
 		    }           // numeric key of todo
 	
@@ -91,6 +109,8 @@ if (count($_GET) > 0)
 		    {           // numeric key of Person
 				if (ctype_digit($value))
 				    $idir	        = $value;
+                else
+                    $idirtext       = htmlspecialchars($value);
 				break;
 	        }           // numeric key of Person
 	
@@ -129,7 +149,8 @@ if (count($_GET) > 0)
 	
 		    default:
 		    {
-				$warn	.= "<p>ToDo.php: Unexpected parameter $key='$value'</p>\n";
+                $warn	.= "<p>ToDo.php: Unexpected parameter $key='" .
+                            htmlspecialchars($value) . "'</p>\n";
 				break;
 		    }
 		}		        // act on specific parameters
@@ -138,6 +159,7 @@ if (count($_GET) > 0)
 else
 if (count($_POST) > 0)
 {		            // invoked by submit to update todo item
+    $updating       = true;
     $parmsText  = "<p class='label'>\$_POST</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
@@ -152,6 +174,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $idtd	        = $value;
+                else
+                    $idtdtext       = htmlspecialchars($value);
 				break;
 			}
 
@@ -159,6 +183,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $todotype	    = $value;
+                else
+                    $todotext       = htmlspecialchars($value);
 				break;
 			}
 
@@ -166,6 +192,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $idir	        = $value;
+                else
+                    $idirtext       = htmlspecialchars($value);
 				break;
 			}
 
@@ -173,6 +201,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $idtc	        = $value;
+                else
+                    $idtctext       = htmlspecialchars($value);
 				break;
 			}
 
@@ -180,6 +210,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $idtl	        = $value;
+                else
+                    $idtltext       = htmlspecialchars($value);
 				break;
 			}
 
@@ -203,7 +235,7 @@ if (count($_POST) > 0)
 
 			case 'reminderdate':
 			{
-                $reminderddate      = $value;
+                $reminderdate       = $value;
 				break;
 			}
 
@@ -217,6 +249,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $idar	        = $value;
+                else
+                    $idartext       = htmlspecialchars($value);
 				break;
 			}
 
@@ -224,6 +258,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $status	        = $value;
+                else
+                    $statustext     = htmlspecialchars($value);
 				break;
 			}
 
@@ -231,6 +267,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $priority	    = $value;
+                else
+                    $prioritytext= htmlspecialchars($value);
 				break;
 			}
 
@@ -256,6 +294,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $tag1	        = $value;
+                else
+                    $tag1text       = htmlspecialchars($value);
 				break;
 			}
 
@@ -263,6 +303,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $qstag	        = $value;
+                else
+                    $qstagtext      = htmlspecialchars($value);
 				break;
 			}
 
@@ -270,6 +312,8 @@ if (count($_POST) > 0)
 			{
 				if (ctype_digit($value))
 				    $used	        = $value;
+                else
+                    $usedtext       = htmlspecialchars($value);
 				break;
 			}
 
@@ -284,7 +328,6 @@ if (count($_POST) > 0)
         $warn   .= $parmsText . "</table>\n";
 }		            // invoked by submit to update account
 
-
 // get the requested todo
 if ($idtd > 0)
 {                   // IDTD of existing record specified
@@ -293,14 +336,49 @@ if ($idtd > 0)
     $name			= $todo->getName();
 }                   // IDTD of existing record specified
 else
+if ($idir > 0)
 {                   // IDTD not specified, create new
     $todo		    = new ToDo(array('idir' => $idir));
 }                   // IDTD not specified
 
-if ($todo->isExisting() && !$todo->isOwner())
+if ($todo instanceof ToDo && $todo->isExisting() && !$todo->isOwner())
     $action     	= 'Display';
 
-if ($action == 'Update')
+// get template
+$template			                = new FtTemplate("ToDo$action$lang.html");
+$template->updateTag('otherStylesheets',	
+    		         array('filename'   => 'ToDo'));
+$tranTab                            = $template->getTranslate();
+$tr                                 = $tranTab['tranTab'];
+
+// report issues detected while processing input
+if (is_string($idtdtext))
+    $msg	.= "Invalid value for idtd=$idtdtext. ";
+if (is_string($idirtext))
+    $msg	.= "Invalid value for idir=$idirtext. ";
+if (is_null($idtd) && is_null($idir))
+    $msg    .= "Missing both idtd and idir parameter. ";
+if (is_string($todotext))
+    $msg	.= "Invalid value for todotype=$todotext. ";
+if (is_string($idtctext))
+    $msg	.= "Invalid value for idtc=$idtctext. ";
+if (is_string($idtltext))
+    $msg	.= "Invalid value for idtl=$idtltext. ";
+if (is_string($idartext))
+    $msg	.= "Invalid value for idar=$idartext. ";
+if (is_string($statustext))
+    $msg	.= "Invalid value for status=$statustext. ";
+if (is_string($prioritytext))
+    $msg	.= "Invalid value for priority=$prioritytext. ";
+if (is_string($tag1text))
+    $msg	.= "Invalid value for tag1=$tag1text. ";
+if (is_string($qstagtext))
+    $msg	.= "Invalid value for qstag=$qstagtext. ";
+if (is_string($usedtext))
+    $msg	.= "Invalid value for used=$usedtext. ";
+    
+//
+if ($updating && $todo instanceof ToDo)
 {
 	if ($todotype !== null)
 		$todo['todotype']			= $todotype;
@@ -308,8 +386,7 @@ if ($action == 'Update')
 		$todo['idtc']			    = $idtc;
     if ($location !== null)
     {
-        $locobj                 = new Location(array('location' => $location));
-        print "<p>$msg</p>\n";
+        $locobj             = new Location(array('location' => $location));
         if (!$locobj->isExisting())
             $locobj->save(false);
         $idtl                       = $locobj->getIdlr();
@@ -319,8 +396,8 @@ if ($action == 'Update')
 		$todo['todoname']			= $todoname;
 	if ($openeddate !== null)
 		$todo['openedd']			= $openeddate;
-	if ($reminderddate !== null)
-		$todo['reminderdd']		    = $reminderddate;
+	if ($reminderdate !== null)
+		$todo['reminderdd']		    = $reminderdate;
 	if ($closeddate !== null)
 		$todo['closedd']			= $closeddate;
 	if ($idar !== null)
@@ -346,19 +423,6 @@ if ($action == 'Update')
     $idtd                           = $todo['idtd'];
 }               // update record
 
-// get template
-$template			                = new FtTemplate("ToDo$action$lang.html");
-$template->updateTag('otherStylesheets',	
-    		         array('filename'   => 'ToDo'));
-$tranTab                            = $template->getTranslate();
-$tr                                 = $tranTab['tranTab'];
-
-// customize title
-if ($todo->isExisting())
-{
-	$idtd	    	                = $todo['idtd'];
-}
-
 // set up values for displaying in form
 $template->set('IDTD',	            $idtd);
 for($td = 0; $td <= 2; $td++)
@@ -377,10 +441,12 @@ if ($idir > 0)
 else
     $personname                 = $template['General']->innerHTML;
 
-$template->set('PERSONNAME',		$personname);
-$todotype						= $todo['todotype'];
+$template->set('PERSONNAME',		htmlspecialchars($personname));
+if (is_null($todotype) && $todo instanceof ToDo)
+    $todotype					= $todo['todotype'];
 $template->set('TODOTYPE',			$todotype);
-$idtc			    			= $todo['idtc'];
+if (is_null($idtc) && $todo instanceof ToDo)
+    $idtc			    		= $todo['idtc'];
 $template->set('IDTC',			    $idtc);
 for($tc = 0; $tc <= 20; $tc++)
 {
@@ -389,24 +455,32 @@ for($tc = 0; $tc <= 20; $tc++)
     else
         $template->set("TCSELECTED$tc",		'');
 }
-$idtl			    			= $todo['idtl'];
+
+if (is_null($idtl) && $todo instanceof ToDo)
+    $idtl			    		= $todo['idtl'];
 $template->set('IDTL',			    $idtl);
 $location                       = Location::getLocation($idtl);
 $template->set('LOCATION',			$location->getName());
-$todoname						= $todo['todoname'];
-$template->set('TODONAME',			$todoname);
-$openedd						= $todo['openedd'];
-$date		                    = new LegacyDate($openedd);
+if (is_null($todoname) && $todo instanceof ToDo)
+    $todoname					= $todo['todoname'];
+$template->set('TODONAME',			htmlspecialchars($todoname));
+if (is_null($openeddate) && $todo instanceof ToDo)
+    $openeddate					= $todo['openedd'];
+$date		                    = new LegacyDate($openeddate);
 $template->set('OPENEDDATE',		$date->toString(9999, false, $tr));
-$reminderd						= $todo['reminderd'];
-$date		                    = new LegacyDate($reminderd);
+if (is_null($reminderdate) && $todo instanceof ToDo)
+    $reminderdate					= $todo['reminderd'];
+$date		                    = new LegacyDate($reminderdate);
 $template->set('REMINDERDATE',		$date->toString(9999, false, $tr));
-$closedd						= $todo['closedd'];
-$date		                    = new LegacyDate($closedd);
+if (is_null($closeddate) && $todo instanceof ToDo)
+    $closeddate					= $todo['closedd'];
+$date		                    = new LegacyDate($closeddate);
 $template->set('CLOSEDDATE',		$date->toString(9999, false, $tr));
-$idar			    			= $todo['idar'];
+if (is_null($idar) && $todo instanceof ToDo)
+    $idar			    		= $todo['idar'];
 $template->set('IDAR',			    $idar);
-$status			    			= $todo['status'];
+if (is_null($status) && $todo instanceof ToDo)
+    $status			    		= $todo['status'];
 $template->set('STATUS',			$status);
 if ($status)
     $template->set('STATUSCHECKED',	'checked="checked"');
@@ -417,7 +491,8 @@ for($st = 0; $st <= 1; $st++)
     else
         $template->set("STSELECTED$st",		'');
 }
-$priority						= $todo['priority'];
+if (is_null($priority) && $todo instanceof ToDo)
+    $priority					= $todo['priority'];
 $template->set('PRIORITY',			$priority);
 for($pr = 0; $pr <= 2; $pr++)
 {
@@ -426,25 +501,31 @@ for($pr = 0; $pr <= 2; $pr++)
     else
         $template->set("STSELECTED$pr",		'');
 }
-$desc			    			= $todo['desc'];
-$template->set('DESC',			    $desc);
-$results						= $todo['results'];
-$template->set('RESULTS',			$results);
-$filingref						= $todo['filingref'];
-$template->set('FILINGREF',			$filingref);
-$tag1			    			= $todo['tag1'];
+if (is_null($desc) && $todo instanceof ToDo)
+    $desc			    		= $todo['desc'];
+$template->set('DESC',			    htmlspecialchars($desc));
+if (is_null($results) && $todo instanceof ToDo)
+    $results					= $todo['results'];
+$template->set('RESULTS',			htmlspecialchars($results));
+if (is_null($filingref) && $todo instanceof ToDo)
+    $filingref					= $todo['filingref'];
+$template->set('FILINGREF',			htmlspecialchars($filingref));
+if (is_null($tag1) && $todo instanceof ToDo)
+    $tag1			    		= $todo['tag1'];
 $template->set('TAG1',			    $tag1);
 if ($tag1)
     $template->set('TAG1CHECKED',   'checked="checked"');
 else
     $template->set('TAG1CHECKED',   '');
-$qstag			    			= $todo['qstag'];
+if (is_null($qstag) && $todo instanceof ToDo)
+    $qstag			    		= $todo['qstag'];
 $template->set('QSTAG',			    $qstag);
 if ($qstag)
     $template->set('QSTAGCHECKED',  'checked="checked"');
 else
     $template->set('QSTAGCHECKED',  '');
-$used			    			= $todo['used'];
+if (is_null($used) && $todo instanceof ToDo)
+    $used			    		= $todo['used'];
 $template->set('USED',			    $used);
 if ($used)
     $template->set('USEDCHECKED',   'checked="checked"');
@@ -460,16 +541,24 @@ else
 $picParms	        = array('idir'		=> $idtd,
 					        'idtype'	=> Picture::IDTYPEToDo);
 $picList	        = new RecordSet('Pictures', $picParms);
-$element            = $template->getElementById('templates');
-if (is_null($element))
-    $template->getDocument()->printTag(0);
-$tempText           = $element->innerHTML();
-$pictures           = '';
-foreach($picList as $idbr => $picture)
-{		// loop through all pictures
-    $pictures       .= $picture->toHtml($tempText);	// display the picture
-}		// loop through all pictures
-$template->set('PICTURES',  $pictures);
+$element            = $template['pictureTemplate'];
+if (count($picList) > 0)
+{
+	if (is_null($element))
+	    $template->getDocument()->printTag(0);
+	$tempText           = $element->innerHTML();
+	$pictures           = '';
+	foreach($picList as $idbr => $picture)
+	{		// loop through all pictures
+	    $pictures       .= $picture->toHtml($tempText);	// display 
+	}		// loop through all pictures
+	$template->set('PICTURES',  $pictures);
+}
+else
+{
+    $template->set('PICTURES',  '');
+    $element->update(null);
+}
 
 // if user requested to close the page automatically
 if ($closeAtEnd)

@@ -53,46 +53,66 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // emit the xml header
 print("<?xml version='1.0' encoding='utf-8'?>\n");
-print "<deleted>\n";
 
-print "    <parms>\n";
-$idime		= null;
-$cittype		= 30;	// default individual event in tbler
-foreach($_POST as $key => $value)
-{		// loop through all parameters
-print "\t<$key>$value</$key>\n";
-switch($key)
-{	// act on specific parameter
-    case 'ider':	// old name
-    case 'idime':	// new name
-    {
-	$idime		= $value;
-	break;
-    }	// record identifier
+$idime		            = null;
+$idimetext	            = null;
+$cittype		        = 30;	// default individual event in tbler
+$cittypetext	        = null;	
+$parmsText              = '';
+$parmsCall              = '';
 
-    case 'cittype':
-    {	// class of event
-	$cittype	= $value;
-	break;
-    }	// class of event
-}	// act on specific parameter
-}		// loop through all parameters
-print "    </parms>\n";
+if (isset($_POST) && count($_POST) > 0)
+{		                        // parameters passed by method=post
+    foreach($_POST as $key => $value)
+    {		                    // loop through all parameters
+        $parmsText      .= "    <$key>" .
+                            htmlspecialchars($value) . "</$key>\n";
+        $parmsCall      .= " $key=\"" . htmlspecialchars($value) . '"';
+		switch($key)
+		{	                    // act on specific parameter
+		    case 'ider':	    // old name
+		    case 'idime':	    // new name
+            {
+                if (ctype_digit($value))
+                    $idime		    = $value;
+                else
+                    $idimetext      = htmlspecialchars($value);
+	    		break;
+		    }	                // record identifier
+		
+		    case 'cittype':
+		    {	                // class of event
+                if (ctype_digit($value))
+                    $cittype		    = $value;
+                else
+                    $cittypetext      = htmlspecialchars($value);
+			    break;
+		    }	                // class of event
+		}	                    // act on specific parameter
+    }		                    // loop through all parameters
+}		                        // parameters passed by method=post
+print "<deleted$parmsCall>\n";
+print "    <parms>\n$parmsText</parms>\n";
 		
 // get the updated values of the fields in the record
 
 if (!canUser('edit'))
 {		// not authorized
-$msg	.= 'User not authorized to delete event. ';
+    $msg	    .= 'User not authorized to delete event. ';
 }		// not authorized
 
+if (is_string($idimetext))
+    $msg        .= "Invalid value for IDIME='$idimetext'. ";
+else
 if ($idime == null)
-$msg		.= 'Missing mandatory parameter idime=. ';
+    $msg		.= 'Missing mandatory parameter idime=. ';
+if (is_string($cittypetext))
+    $warn       .= "<p>Invalid value for cittype='$cittypetext' ignored.</p>\n";
 
 // output any trace or warning messages
 if (strlen($warn))
 {
-print "<div class='warning'>$warn</div>\n";
+    print "<div class='warning'>$warn</div>\n";
 }
  
 if (strlen($msg) == 0)
@@ -101,24 +121,25 @@ if (strlen($msg) == 0)
 	{	// act on specific event class
 	    case Citation::STYPE_EVENT:
 	    case Citation::STYPE_MAREVENT:
-	    {		// IDIME points to tblER record
+	    {		            // IDIME points to tblER record
 			// delete the indicated event entry
-			try {
-			    $event		= new Event(array('ider' => $idime));
+            $event		= new Event(array('ider' => $idime));
+            if ($event->isExisting())
+            {
 			    $event->toXml('event');
 			    $event->delete(true);
-			} catch (Exception $e) {
-			    // already deleted
+            }
+            else            // already deleted
 			    $msg	.= "No record for key $idime type $cittype. ";
-			}
 			break;
-	    }		// IDIME points to tblER record
+	    }		            // IDIME points to tblER record
 	
 	    case Citation::STYPE_LDSB:	// 15  Baptism
-	    {		// IDIME points to tblIR record
+	    {		            // IDIME points to tblIR record
 			// clear the event
-			try {
-			    $person	= new Person(array('idir' => $idime));
+			$person	    = new Person(array('idir' => $idime));
+            if ($person->isExisting())
+            {
 			    $person->toXml('indiv');
 			    $person->set('baptismd',	'');
 			    $person->set('baptismsd',	-99999999);
@@ -127,18 +148,18 @@ if (strlen($msg) == 0)
 			    $person->set('baptismnote',	'');
 			    $person->set('ldsb',	0);
 			    $person->save(true);		// write to database
-			} catch (Exception $e) {
-			    // nothing to delete
+            } 
+            else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
-			}
 			break;
 	    }		// LDS Baptism
 	
 	    case Citation::STYPE_LDSE:	// 16  Endowment
 	    {		// IDIME points to tblIR record
 			// clear the event
-			try {
-			    $person	= new Person(array('idir' => $idime));
+			$person	    = new Person(array('idir' => $idime));
+            if ($person->isExisting())
+            {
 			    $person->toXml('indiv');
 			    $person->set('endowd',	'');
 			    $person->set('endowsd',	-99999999);
@@ -146,28 +167,27 @@ if (strlen($msg) == 0)
 			    $person->set('endownote',	'');
 			    $person->set('ldse',	0);
 			    $person->save(true);		// write to database
-			} catch (Exception $e) {
-			    // nothing to delete
+            }
+            else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
-			}
 			break;
 	    }		// LDS Endowment
 	
 	    case Citation::STYPE_LDSS:	// 18  Sealed to Spouse
 	    {		// IDIME points to tblMR record
 			// clear the event
-			try {
-			    $family	= new Family(array('idmr' => $idime));
+			$family	    = new Family(array('idmr' => $idime));
+            if ($family->isExisting())
+            {
 			    $family->toXml('family');
 			    $family->set('seald',	'');
 			    $family->set('sealsd',	-99999999);
 			    $family->set('idtrseal',	1);
 			    $family->set('ldss',	0);
 			    $family->save(true);	// write to database
-			} catch (Exception $e) {
-			    // nothing to delete
+            }
+            else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
-			}
 			break;
 	    }		// LDS Sealed to Spouse
 	
@@ -175,86 +195,86 @@ if (strlen($msg) == 0)
 	    case Citation::STYPE_MARNEVER:	// 22	never married
 	    {		// IDIME points to tblMR record
 			// clear the event
-			try {
-			    $family	= new Family(array('idmr' => $idime));
+			$family	    = new Family(array('idmr' => $idime));
+            if ($family->isExisting())
+            {
 			    $family->toXml('family');
 			    $family->set('notmarried',	0);
 			    $family->save(true);	// write to database
-			} catch (Exception $e) {
-			    // nothing to delete
+            }
+            else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
-			}
 			break;
 	    }		// not married indicator
 	
 	    case Citation::STYPE_MAR:	// 20 marriage event
 	    {		// IDIME points to tblMR record
 			// clear the event
-			try {
-			    $family	= new Family(array('idmr' => $idime));
+			$family	    = new Family(array('idmr' => $idime));
+            if ($family->isExisting())
+            {
 			    $family->toXml('family');
 			    $family->set('mard',	'');
 			    $family->set('marsd',	-99999999);
 			    $family->set('idlrmar',	1);
 			    $family->save(true);	// write to database
-			} catch (Exception $e) {
-			    // nothing to delete
+            } 
+            else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
-			}
 			break;
 	    }		// marriage event
 	
 	    case Citation::STYPE_MARNOTE:	// 21 marriage note
 	    {		// IDIME points to tblMR record
 			// clear the event
-			try {
-			    $family	= new Family(array('idmr' => $idime));
+			$family	    = new Family(array('idmr' => $idime));
+            if ($family->isExisting())
+            {
 			    $family->toXml('family');
 			    $family->set('notes',	'');
 			    $family->save(true);	// write to database
-			} catch (Exception $e) {
-			    // nothing to delete
+            }
+            else    // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
-			}
 			break;
 	    }		// marriage notes
 	
 	    case Citation::STYPE_MARNOKIDS:// 23 no children
 	    {		// IDIME points to tblMR record
-			// clear the event
-			try {
-			    $family	= new Family(array('idmr' => $idime));
+			$family	    = new Family(array('idmr' => $idime));
+            if ($family->isExisting())
+            {
 			    $family->toXml('family');
 			    $family->set('nochildren',		0);
 			    $family->save(true);	// write to database
-			} catch (Exception $e) {
-			    // nothing to delete
-			    $msg	.= "No record for key $idime type $cittype. ";
 			}
+            else    // nothing to delete
+			    $msg	.= "No record for key $idime type $cittype. ";
 			break;
 	    }		// not married indicator
 	
 	    case Citation::STYPE_MAREND:	// 24 marriage ended event
 	    {		// IDIME points to tblMR record
 			// clear the event
-			try {
-			    $family	= new Family(array('idmr' => $idime));
+			$family	    = new Family(array('idmr' => $idime));
+            if ($family->isExisting())
+            {
 			    $family->toXml('family');
 			    $family->set('marendd',		'');
 			    $family->set('marendsd',		-99999999);
 			    $family->save(true);	// write to database
-			} catch (Exception $e) {
-			    // nothing to delete
-			    $msg	.= "No record for key $idime type $cittype. ";
 			}
+            else    // nothing to delete
+			    $msg	.= "No record for key $idime type $cittype. ";
 			break;
 	    }		// marriage ended event
 	
 	    case Citation::STYPE_LDSC:	// 26  Confirmation
 	    {		// IDIME points to tblIR record
 			// clear the event
-			try {
-			    $person	= new Person(array('idir' => $idime));
+			$person	    = new Person(array('idir' => $idime));
+            if ($person->isExisting())
+            {
 			    $person->toXml('indiv');
 			    $person->set('confirmationd',	'');
 			    $person->set('confirmationsd',	-99999999);
@@ -263,18 +283,18 @@ if (strlen($msg) == 0)
 			    $person->set('confirmationnote',	'');
 			    $person->set('ldsc',		0);
 			    $person->save(true);		// write to database
-			} catch (Exception $e) {
-			    // nothing to delete
-			    $msg	.= "No record for key $idime type $cittype. ";
 			}
+            else   // nothing to delete
+			    $msg	.= "No record for key $idime type $cittype. ";
 			break;
 	    }		// LDS Confirmation
 	
 	    case Citation::STYPE_LDSI:	// 27  Initiatory
 	    {		// IDIME points to tblIR record
 			// clear the event
-			try {
-			    $person	= new Person(array('idir' => $idime));
+			$person	    = new Person(array('idir' => $idime));
+            if ($person->isExisting())
+            {
 			    $person->toXml('indiv');
 			    $person->set('initiatoryd',		'');
 			    $person->set('initiatorysd',	-99999999);
@@ -282,9 +302,9 @@ if (strlen($msg) == 0)
 			    $person->set('initiatorynote',	'');
 			    $person->set('ldsi',		0);
 			    $person->save(true);		// write to database
-			} catch (Exception $e) {
+            }
+            else
 			    $msg	.= "No record for key $idime type $cittype. ";
-			}
 			break;
 	    }		// LDS Initiatory
 	

@@ -58,8 +58,9 @@
  *      2020/01/09      resize selection list to match window width     *
  *      2020/05/10      use addEventListener                            *
  *                      hideRightColumn                                 *
+ *      2021/01/01      improve performance of surname searches         *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -247,6 +248,7 @@ function onKeyDownName(event)
     if (timer)
         clearTimeout(timer);
     timer   = setTimeout(update, 900);
+    //alert("nominalIndex.js: onKeyDownName: timer=" + timer)
 }       // function onKeyDownName
 
 /************************************************************************
@@ -347,6 +349,7 @@ function newTreeNameChanged()
  ************************************************************************/
 function update()
 {
+    //alert("nominalIndex.js: update:");
     var form            = document.nameForm;
     if (form)
     {               // form present
@@ -381,7 +384,7 @@ function update()
                             if (value.substring(i, i+1) != ' ')
                                 break;
                             }
-                            url += "&GivenName=" +
+                            url += "&GivenName=>=" +
                         encodeURIComponent(value.substring(i, value.length));
                         }   // comma separator between surname and given
                         else

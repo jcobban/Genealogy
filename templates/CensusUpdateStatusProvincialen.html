@@ -7,13 +7,17 @@
  *  History:															*
  *		2017/11/25		created											*
  *		2018/01/04		remove Template from template file names		*
+ *      2021/01/13      add search option to menu                       *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban				                *
+ *  Copyright &copy; 2021 James A. Cobban				                *
  **********************************************************************-->
     <div id='breadcrumbs' class='hidden'>
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
       <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">$COUNTRYNAME</a>:
-      <a href="/database/genCensuses.php?cc=$cc&amp;lang=$LANG">Censuses</a>:
+      <a href="/database/genCensuses.php?cc=$CC&amp;lang=$LANG">Censuses</a>:
+      <a href="/database/QueryDetail.php?Census=CA1891&amp;Province=$PROVINCE&amp;lang=$LANG">
+		1891 Census of Canada Search
+      </a>: 
       <a href="$SEARCH">$ACTION $CENSUSYEAR Census of $COUNTRYNAME</a>:
     </div>
     <div class='body'>

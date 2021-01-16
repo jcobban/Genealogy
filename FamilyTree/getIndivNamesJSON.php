@@ -31,8 +31,9 @@ use \Exception;
  *		2020/04/03      created from getIndivNamesXml.php to move       *
  *		                more function to script and return JSON         *
  *		2020/04/13      correct order of persons                        *
+ *		2021/01/01      correct poor performance if only 1 surname      *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: application/json");
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -51,7 +52,7 @@ $indiv				= null;		// instance of Person
 $idmr				= 0;		// IDMR of family to add to
 $family				= null;		// instance of Family
 $surname			= '';		// default to start at first surname
-$lastsurname		= null;		// default to start at first surname
+$lastsurname		= null;		// default to end at last surname
 $givenname			= '';		// default to start at first given name 
 $sex				= '';		// default to either sex
 $birthyear			= null;		// default to not checking birth year
@@ -326,9 +327,10 @@ if (strlen($msg) == 0)
     // if the name pattern to search for was not supplied in
     // the parameters, get the name that was used in the last
     // invocation of this script from a cookie
-    if (strlen($surname) == 0 &&
+    if (false && strlen($surname) == 0 &&
         strlen($givenname) == 0 &&
-        count($_COOKIE) > 0)
+        isset($familyTreeCookie) &&
+        count($familyTreeCookie) > 0)
     {		    // parameters did not set name
         // the familyTree cookie is now extracted by common code for
         // all scripts
@@ -353,13 +355,16 @@ if (strlen($msg) == 0)
     $getParms	= array();
     if ($loose)
     {			// loose comparison for names
-        $getParms['loose']		= 'Y';
-        $getParms['surname']	= "$surname";
+        $getParms['loose']		    = 'Y';
+        $getParms['surname']	    = $surname;
     }			// loose comparison for names
     else
     {			// range of surnames
         // starting with the specific name and running to the end
-        $getParms['surname']	= array($surname, $lastsurname);
+        if (is_null($lastsurname))
+            $getParms['surname']	= $surname;
+        else
+            $getParms['surname']	= array($surname, $lastsurname);
     }			// range of surnames
 
     // optional given name for first individual within surname

@@ -32,8 +32,9 @@ use \Exception;
  *						use class SubDistrict							*
  *		2017/10/25		use class RecordSet								*
  *		2017/12/08		output divisions								*
+ *		2020/12/01      eliminate XSS vulnerabilities                   *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Census.inc';
@@ -77,7 +78,8 @@ foreach ($_GET as $key => $value)
     		$censusRec	= new Census(array('censusid'	=> $value,
     						   'collective'	=> 0));
     		if(!$censusRec->isExisting())
-    		    $msg	.= "Census='$value' is invalid. ";
+                $msg	.= "Census='" . htmlspecialchars($value) .
+                            "' is invalid. ";
     		$getParms['census']	= $census;
     		break;
         }
@@ -108,7 +110,8 @@ foreach ($_GET as $key => $value)
 
         default:
         {		// anything else
-    		$msg	.= "Unexpected parameter $key='$value'. ";
+            $msg	.= "Unexpected parameter $key='" .
+                            htmlspecialchars($value) . "'. ";
     		break;
         }		// anything else
     }		// act on specific key
@@ -127,8 +130,9 @@ if (strlen($msg) == 0)
 print("<?xml version='1.0' encoding='UTF-8'?>\n");
 
 // top node of XML result
-print("<select Census='$census' District='$distList'>\n");
-print "<parms>" . $parmList . "</parms>\n";
+print("<select Census='" . htmlspecialchars($census) . 
+            "' District='" . htmlspecialchars($distList) . "'>\n");
+print "<parms>" . htmlspecialchars($parmList, ENT_XML1) . "</parms>\n";
 
 if (strlen($msg) == 0)
 {		// no errors

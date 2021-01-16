@@ -1,0 +1,78 @@
+<!--*********************************************************************
+ *  Messagesen.html														*
+ *																		*
+ *  English language template for the Messages management page			*
+ *																		*
+ *  History:															*
+ *		2020/10/28		Created											*
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Stammbaumforschung</a>:
+    </div>	
+    <div class="body">
+      <h1 class="clear">Verwaltung von Nachrichten
+        <span class="right">
+	      <a href="/MessagesHelpen.html" target="help">?&nbsp;Hilfe</a>
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <form name="blogForm" id="blogform">
+	      <p class="clear">
+			<span class="pad">
+			  <button type="button" id="Close">
+			    S<u>c</u>hließen
+              </button>
+			</span>
+	      </p>
+        <div id="blog$blid">
+          <p class="label">
+	        Um $datetime Benutzer '$username'
+            schrieb
+          </p>
+          <p>
+	        $text 
+          </p>
+          <p>
+	      <!-- Note that any characters that occur between the opening and
+	         closing textarea tags become part of the value of the tag-->
+	        <textarea name="message$blid"
+	            	rows="5" cols="80"></textarea>
+          </p>
+          <p>
+	        <button type="button" id="Delete$blid">
+	          Nachricht löschen
+	        </button>
+	        &nbsp;
+	        <button type="button" id="Reply$blid">
+	          Antwort auf die Nachricht
+	        </button>
+          </p>
+        </div>
+      </form>
+    </div>
+    <div class="balloon" id="HelpClose">
+	  Klicken Sie mit der Maus auf diese Schaltfläche, um den Dialog zu schließen.
+	  Als Abkürzung können Sie den Dialog auch durch Drücken der Taste
+      schließen Tastenkombination Alt-C.
+    </div>
+    <div id="Helpmessage" class="balloon">
+	  Verwenden Sie diesen Textbereich, um eine Antwort auf die Nachricht einzugeben, und klicken Sie dann auf
+Antwortknopf.
+    </div>
+    <div id="HelpDelete" class="balloon">
+	  Klicken Sie auf diese Schaltfläche, um die Nachricht zu löschen.
+    </div>
+    <div id="HelpReply" class="balloon">
+	  Klicken Sie auf diese Schaltfläche, um auf die Nachricht zu antworten.
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    </script>
+    <script src="/jscripts/util.js" type="application/javaScript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="application/javaScript">
+    </script>
+    <script src="/Messages.js" type="application/javaScript">
+    </script>

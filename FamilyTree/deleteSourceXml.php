@@ -25,26 +25,34 @@ header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Source.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
-$idsr	= null;
+$idsr	            = null;
+$idsrtext           = null;
+$parmsText          = '';
 
 // emit the XML header
 print "<?xml version='1.0' encoding='UTF-8'?>\n";
-print "<deleted";
-foreach($_POST as $key => $value)
-{			// include parameters as attributes of top node
-    print " $key='$value'";
-}			// include parameters as attributes of top node
-print ">\n";
+print "<deleted>\n";
+if (isset($_POST) && count($_POST) > 0)
+{		                        // parameters passed by method=post
+    foreach($_POST as $key => $value)
+    {		                    // loop through all parameters
+        $parmsText      .= "    <$key>" .
+                            htmlspecialchars($value) . "</$key>\n"; 
+        switch(strtolower($key))
+        {
+            case 'idsr':
+            {
+                if (ctype_digit($value))
+                    $idsr           = intval($value);
+                else
+                    $idsrtext       = htmlspecialchars($value);
+                break;
+            }
+        }
+    }
+}
 
-// include info on parameters
-print "    <parms>\n";
-foreach($_POST as $key => $value)
-{			// include parameters as tags under <parms>
-    if (strtolower($key) == 'idsr')
-        $idsr	= $value;
-    print "\t<$key>$value</$key>\n";
-}			// include parameters as tags under <parms>
-print "    </parms>\n";
+print "    <parms>\n$parmsText    </parms>\n";
 
 // output trace if debugging
 showTrace();
@@ -56,33 +64,29 @@ if (!canUser('edit'))
 }		// take no action
 
 // validate parameters
+if (is_string($idsrtext))
+    $msg    .= "Invalid value for IDSR='$idsrtext'. ";
+else
 if (is_null($idsr))
     $msg	.= 'Missing mandatory parameter idsr. ';
 else
 {
-    try {
-        $source	= new Source(array('idsr' => $idsr));
+    $source	        = new Source(array('idsr' => $idsr));
+    if ($source->isExisting())
+    {
         $count	= $source->getCitations(0);
         if ($count > 0)
-    		$msg	= "Source not deleted because $count citations refer to it. ";
-    } catch(Exception $e)
+            $msg	.= "Source not deleted because $count citations refer to it. ";
+        else
+            $count	= $source->delete("cmd");
+    }
+    else
     {
-        $msg	= $e->getMessage();
+        $msg	    .= "No existing instance of class Source with IDSR=$idsr. ";
     }
 }
 
-if (strlen($msg) == 0)
-{			// no errors detected in parameters
-
-    try {
-        $source	= new Source(array('idsr' => $idsr));
-        $count	= $source->delete("delete");
-    } catch(Exception $e)
-    {
-        print "<msg>" . $e->getMessage() . "</msg>\n";
-    }
-}			// no errors detected in parameters
-else
+if (strlen($msg) > 0)
 {			// errors detected in parameters
     print "<msg>$msg</msg>\n";
 }			// errors detected in parameters

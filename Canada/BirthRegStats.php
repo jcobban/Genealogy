@@ -42,6 +42,7 @@ use \Templating\Template;
  *      2019/11/17      move CSS to <head>                              *
  *      2020/01/22      use NumberFormatter                             *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/11/28      correct XSS error                               *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -70,7 +71,8 @@ if (isset($_GET) && count($_GET) > 0)
     foreach($_GET as $key => $value)
     {				    // loop through all input parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{			    // process specific named parameters
 		    case 'regdomain':
@@ -100,7 +102,8 @@ if (isset($_GET) && count($_GET) > 0)
 	
 		    default:
 		    {			// any other parameters
-				$warn	.= "<p>Unexpected parameter $key='$value'.</p>";
+				$warn	.= "<p>Unexpected parameter $key='" .
+                                htmlspecialchars($value) . "'.</p>";
 				break;
 		    }			// any other parameters
 		}			    // process specific named parameters

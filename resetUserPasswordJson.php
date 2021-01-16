@@ -12,6 +12,7 @@ use \Templating\Template;
  *																		*
  *  History:															*
  *		2019/04/12		Created											*
+ *		2020/12/03      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -56,7 +57,8 @@ $lang			= 'en';
 foreach($_REQUEST as $key => $value)
 {	        // loop through all parameters
     if ($debug)
-		$warn	.= "<p>\$_REQUEST['$key']='$value'</p>\n";
+        $warn	.= "<p>\$_REQUEST['$key']='" . 
+                    htmlspecialchars($value) . "'</p>\n";
     switch(strtolower($key))
     {		// act on specific parameter
 		case 'uid':
@@ -73,7 +75,8 @@ foreach($_REQUEST as $key => $value)
 				else
 				{
 				    $msg	    .=
-				"Unable to find account record for user '$username'. ";
+                        "Unable to find account record for user '" .
+                        htmlspecialchars($username) . "'. ";
 				    $user	= null;
 				}
 		    }			// userid supplied
@@ -91,15 +94,15 @@ foreach($_REQUEST as $key => $value)
 				    $username	= $user->get('userid');
 				else
 				    $msg	    .=
-				"Unable to find account record for address '$email'. ";
+                            "Unable to find account record for address '" .
+                            htmlspecialchars($email) . "'. ";
 		    }			// email supplied
 		    break;
 		}	// email
 
 		case 'lang':
 		{
-		    if (strlen($value) >= 2)
-				$lang		    = strtolower(substr($value,0,2));
+			$lang		    = FtTemplate::validateLang($value);
 		    break;
 		}
 
@@ -107,7 +110,7 @@ foreach($_REQUEST as $key => $value)
 		{
 		    $code	            = $value;
 		    if (is_null($user))
-				$msg	        .= "Missing valid uid parameter. ";
+				$msg	        .= "Missing valid user identification. ";
 		    else
 		    if ($code != $user->get('shapassword'))
 				$msg	        .= "Invalid authorization code. ";

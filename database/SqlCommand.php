@@ -62,6 +62,7 @@ use \Exception;
  *						names in all commands							*
  *		2019/06/15      support subqueries in SELECT                    *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/11/02      add limited support for SOURCE                  *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -1100,16 +1101,16 @@ define("PHPSOUNDEX",	6);
 $badTables	= array();
  
 /************************************************************************
- *  function validateFieldNames												*
+ *  function validateFieldNames											*
  *																		*
  *  Examine a string containing expressions including field names		*
  *  against the list of valid fields for the current table.				*
  *																		*
- *  Parameters:																*
- *		$operands		string containing field names						*
+ *  Parameters:															*
+ *		$operands		string containing field names					*
  *																		*
- *  Returns:																*
- *		String containing error message text.								*
+ *  Returns:															*
+ *		String containing error message text.							*
  ************************************************************************/
 function validateFieldNames($operands)
 {
@@ -1511,7 +1512,7 @@ if (count($_GET) > 0)
         }
     }			// loop through all parameters
     if ($debug)
-        $warn           .= $parmsText . "</table>\n";
+        $warn               .= $parmsText . "</table>\n";
 }		        // parameters passed by method=post
 
 // parse patterns for SQL commands
@@ -1530,6 +1531,7 @@ $count						= null;
 $groupby					= null;
 $having						= null;
 $orderby					= null;
+$source     				= null;
 $limit						= 999999999;
 $offset						= null;
 $query						= false;
@@ -1550,14 +1552,14 @@ foreach($tableRes as $row)
 }
 
 if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
-{			// no errors and work to do
+{			            // no errors and work to do
     $getCount		    	= true;
     $matches	        	= array();
     $sqlCommand         	= trim($sqlCommand);
     $explain            	= false;
     $result		        	= preg_match($cmdPattern, $sqlCommand, $matches);
     if ($result == 1)
-    {		// SQL command recognized
+    {		            // SQL command recognized
         $command	    	= strtoupper($matches[1]);
         $therest        	= trim($matches[2]);
         if ($command == 'EXPLAIN')
@@ -1570,7 +1572,7 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
         }
 
         switch($command)
-        {		// check syntax of command
+        {		        // check syntax of command
             case 'DELETE':
             {
                 // validate authorization
@@ -1613,7 +1615,7 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 else
                     $msg	.= 'Unsupported syntax for DELETE command. ' . __LINE__;
                 break;
-            }	// delete command
+            }	            // DELETE command
 
             case 'INSERT':
             {
@@ -1641,7 +1643,7 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 else
                     $msg	.= 'Unsupported syntax for INSERT command. ';
                 break;
-            }	// insert command
+            }	            // INSERT command
 
             case 'SELECT':
             {
@@ -1652,12 +1654,12 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 $accum              = '';
                 $afterexpr          = false;
                 foreach ($parms as $parm)
-                {                   // loop through comma separated list
+                {               // loop through comma separated list
                     if ($afterexpr)
-                    {               // reassemble the remainder of the command
+                    {           // reassemble the remainder of the command
                         $therest    .= $comma . $parm;
                         continue;
-                    }               // reassemble the remainder of the command
+                    }           // reassemble the remainder of the command
 
                     $accum                  = trim($accum);
                     if (strlen($accum) > 0)
@@ -2028,9 +2030,9 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 {			// no FROM clause
                     $table		= 'DUAL';
                 }			// no FROM clause
-                $query		= true;
+                $query		    = true;
                 break;
-            }	// select command
+            }	            // SELECT command
 
             case 'UPDATE':
             {
@@ -2058,7 +2060,7 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 else
                     $msg	.= 'Unsupported syntax for UPDATE command. ';
                 break;
-            }	// update command
+            }	            // UPDATE command
 
             case 'SHOW':
             {
@@ -2080,13 +2082,20 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                         $table	= $info['table'];
                         $sqlCommand	= "SHOW CREATE TABLE $table$rest";
                     }
+                    $query		    = true;
+                    $execute		= true;
+                    $getCount		= false;
                 }
-                $query		= true;
-                $execute		= true;
-                $getCount		= false;
+                else
+                {
+                    $warn       .= "<p>Unsupported options 'SHOW $therest'</p>\n";
+                    $query		    = false;
+                    $execute		= false;
+                    $getCount		= false;
+                }
                 $sresult		= null;
                 break;
-            }
+            }               // SHOW
 
             case 'ALTER':
             {
@@ -2110,12 +2119,28 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                         $sqlCommand	= "ALTER TABLE $table$rest";
                     }
                 }
-                $query		= true;
+                $query		    = true;
                 $execute		= true;
                 $getCount		= false;
                 $sresult		= null;
                 break;
-            }
+            }               // ALTER
+
+            case 'SOURCE':
+            {
+                // validate authorization
+                if (!canUser('all'))
+                    $msg	.=
+                        'You are not authorized to use this feature. ';
+                if (!file_exists($therest))
+                    $msg    .= "File $therest does not exist.  ";
+                else
+                    $source = fopen($therest, 'r');
+                $execute    = false;
+                $query      = false;
+                $getCount   = false;
+                break;
+            }               // SOURCE
 
             default:
             {
@@ -2124,8 +2149,8 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 break;
             }
 
-        }		// check syntax of command
-    }		// SQL command recognized
+        }		        // check syntax of command
+    }		            // SQL command recognized
     else
     {
         if (preg_match("/^([^\s]+)/", $sqlCommand, $matches) == 1)
@@ -2142,27 +2167,27 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
     // before actually issuing a new command let the user know
     // how many lines of the database it will effect
     if (strlen($msg) == 0 && $getCount)
-    {		// command valid and includes WHERE clause
+    {		            // command valid and includes WHERE clause
         if (strtoupper($operands) == 'COUNT(*)')
-        {		// returning only count
+        {		        // returning only count
             print "<p>$sqlCommand</p>\n";
-            $stmt		= $connection->query($sqlCommand);
+            $stmt		    = $connection->query($sqlCommand);
             if ($stmt === false)
-            {
-                $msg	.= "query='" . htmlentities($sqlCommand) .
-                                    "', " .  print_r($connection->errorInfo(),true);
-            }		// error on request
+            {           // error on request
+                $msg	    .= __LINE__ . " query='" . htmlentities($sqlCommand) .
+                    "', " .  print_r($connection->errorInfo(),true);
+            }		    // error on request
             else
             {
                 $sresult	= $stmt->fetchAll(PDO::FETCH_NUM);
-                $count	= count($sresult);
+                $count	    = count($sresult);
             }
-        }		// returning only count
+        }		        // returning only count
         else
-        {		// returning actual rows
+        {		        // returning actual rows
             if ($command == 'INSERT' || $command == 'SHOW')
             {
-                $count	= 1;
+                $count	    = 1;
             }
             else
             {
@@ -2170,7 +2195,7 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 $countQuery	= "SELECT COUNT(*) FROM $table $join";
                 if (is_string($where) && strlen($where) > 0)
                     $countQuery	.= " WHERE $where";
-                $stmt	= $connection->query($countQuery);
+                $stmt	    = $connection->query($countQuery);
                 if ($stmt)
                 {
                     $row	= $stmt->fetch(PDO::FETCH_NUM);
@@ -2181,21 +2206,22 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 }
                 else
                 {
-                    $msg	.= "query='" . htmlentities($countQuery) .
-                                        "', " .  print_r($connection->errorInfo(),true);
+                    $msg	.= __LINE__ . " query='" . htmlentities($countQuery) .
+                        "', " .  print_r($connection->errorInfo(),true);
                 }		// error on request
             }
-        }		// returning actual rows
-    }		// command valid and includes WHERE clause
+        }		        // returning actual rows
+    }		            // command valid and includes WHERE clause
 
     // if authorized actually issue the command
     if ($execute)
-    {		// OK to execute command
-        $phpfield		= null; 
+    {		            // OK to execute command
+        $phpfield		    = null; 
         if ($query)
-        {		// SELECT command, issue query
+        {		        // SELECT command, issue query
+            $warn   .= "<p>SqlCommand.php: " . __LINE__ . "</p>\n";
             if (is_null($sresult))
-            {	// query not issued yet
+            {	        // query not issued yet
                 if (preg_match("/(.*)(phpsoundex\(\w+\))(.*)/i", 
                                $sqlCommand, 
                                $parts) == 1)
@@ -2204,7 +2230,6 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                     $phpfield	= substr($parts[2],11);
                     $phpfield	= substr($phpfield, 0, strlen($phpfield) - 1);
                     $after		= $parts[3];
-                    print "<p>before='$before',field='$phpfield',after='$after'</p>\n";
                     $sqlCommand	= $before . $phpfield . $after;
                 }
                 if ($explain)
@@ -2212,25 +2237,27 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 $stmt	        = $connection->query($sqlCommand);
 
                 if ($stmt)
+                {
                     $sresult	= $stmt->fetchAll(PDO::FETCH_ASSOC);
+                }
                 else
                 {
-                    $msg	    .= "query='" . htmlentities($sqlCommand) .
+                    $msg	    .= __LINE__ . " query='" . htmlentities($sqlCommand) .
                                     "', " .  
                                     print_r($connection->errorInfo(),true);
                 }		// error on request
-            }	// query not issued yet
-        }		// SELECT command, issue query	   
+            }	        // query not issued yet
+        }		        // SELECT command, issue query	   
         else
-        {		// DELETE, INSERT, or UPDATE, issue exec
+        {		        // DELETE, INSERT, or UPDATE, issue exec
             $stmt		= $connection->query($sqlCommand);
             if ($stmt === false)
             {
                 $msg	.= "exec='" . htmlentities($sqlCommand) . "', " .
                             print_r($connection->errorInfo(),true);
-            }		// error on request
+            }		    // error on request
             else
-            {		// log that the update has been performed
+            {		    // log that the update has been performed
                 $sresult	= $stmt->rowCount();
                 if ($sresult > 0)
                     logSqlUpdate($sqlCommand,
@@ -2238,10 +2265,58 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                                  0,
                                  '',
                                  '');
-            }		// log that the update has been performed
-        }		// DELETE, INSERT, or UPDATE, issue exec
-    }		// execute command
-}			// no errors and work to do
+            }		    // log that the update has been performed
+        }		        // DELETE, INSERT, or UPDATE, issue exec
+    }		            // execute command
+    else
+    if ($source)
+    {                   // execute a script
+        $execute            = true;
+        $query              = true;
+        $phpfield		    = null; 
+        $sresult            = array();
+        $line               = 1;
+        while(!feof($source))
+        {
+            $sqlCommand     = fgets($source);
+            while(!feof($source) && 
+                  preg_match('/;\s*$/', $sqlCommand) == 0)
+                $sqlCommand .= preg_replace('/--[ a-zA-Z-]+/', '', fgets($source));
+            $sqlCommand     = preg_replace('/;\s*$/', '', $sqlCommand);
+            $result		    = preg_match($cmdPattern, $sqlCommand, $matches);
+            if ($result)
+            {
+                $command	    = strtoupper($matches[1]);
+                $sresult[]      = array('line' => $line, 'cmd' => $sqlCommand, 'error' => '');
+                if ($command == 'UPDATE' || $command == 'INSERT' || $command == 'DELETE')
+                {
+                    $stmt		= $connection->query($sqlCommand);
+                    if ($stmt === false)
+                    {
+                        $sresult[]      = array('line' => '', 'cmd' => 
+                            print_r($connection->errorInfo(),true), 'error' => 'Y');
+                    }		    // error on request
+                    else
+                    {		    // log that the update has been performed
+                        $count      = $stmt->rowCount();
+                        $sresult[]	= array('line' => '', 'cmd' => "Updated $count records", 'error' => '');
+                        if ($count > 0)
+		                    logSqlUpdate($sqlCommand,
+		                                 '',
+		                                 0,
+		                                 '',
+		                                 '');
+                    }
+                }
+                else
+                    $sresult[]      = array('line' => '', 'cmd' => 'Unsupported', 'error' => 'Y');
+            }
+            else
+                $sresult[]      = array('line' => $line, 'cmd' => $sqlCommand, 'error' => 'Y');
+            $line++;
+        }
+    }                   // execute a script
+}			            // no errors and work to do
 
 htmlHeader($title,
             array('/jscripts/util.js',
@@ -2466,72 +2541,69 @@ if (!is_null($count))
     {			// command performed
         if ($query)
         {			// display response to query
-            $firstRow	= true;
-            $cellClass	= 'odd';
-            $count		= count($sresult);
-            if ($count == 0)
-                $count	= 'No';
-?>
-<p class='label'><?php print $count; ?> rows in response</p>
-<?php
+            $firstRow	    = true;
+            $cellClass	    = 'odd';
             if (is_array($sresult))
             {
+                $count		= count($sresult);
+                if ($count == 0)
+                    $count	= 'No';
 ?>
+<p class='label'><?php print $count; ?> rows in response</p>
 <table class='summary' cellspacing='0px'>
 <?php
-            $phpcolumn	= null;
-            foreach($sresult as $row)
-            {		// loop through rows
-                if ($firstRow)
-                {		// first row in table
+	            $phpcolumn	= null;
+	            foreach($sresult as $row)
+	            {		// loop through rows
+                    if ($firstRow)
+                    {		// first row in table
 ?>
   <thead>
     <tr>
 <?php
-                    foreach($row as $name => $value)
-                    {		// loop through fields in row
-                            
+                        foreach($row as $name => $value)
+                        {		// loop through fields in row                
 ?>
       <th class='colhead'><?php print $name; ?></th>
 <?php
-                    }		// loop through fields in row
+                        }		// loop through fields in row
 ?>
     </tr>
   </thead>
   <tbody>
 <?php
+                    }		// first row in table
                     $firstRow	= false;
-                }		// first row in table
 ?>
     <tr>
 <?php
-                // display data
-                foreach($row as $fldname => $value)
-                {		// loop through fields in row
-                    if ($fldname == 'idime' && 
-                        $table == 'tblSX' &&
-                        array_key_exists('type', $row))
-                    {	// translate to specific record key
-                        if (array_key_exists($row['type'],
-                                         Citation::$recType))
-                        { 
-                            $fldname = Citation::$recType[$row['type']];
-                            $fldname = strtolower($fldname);
-                        }
-                    }	// translate to specific record key
-
-                    if (ctype_digit($value))
-                    {	// integer value
-                        switch ($fldname)
-                        {		// act on specific field names
-                            case 'idir':
-                            case 'idirhusb':
-                            case 'idirwife':
-                            case 'd_idir':
-                            case 'm_idir':
-                            {	// IDIR field
-                                $person	= new Person(array('idir'=>$value));
-                                $name	= $person->getName();
+	                // display data
+	                foreach($row as $fldname => $value)
+	                {		// loop through fields in row
+	                    if ($fldname == 'idime' && 
+	                        $table == 'tblSX' &&
+	                        array_key_exists('type', $row))
+	                    {	// translate to specific record key
+	                        if (array_key_exists($row['type'],
+	                                         Citation::$recType))
+	                        { 
+	                            $fldname = Citation::$recType[$row['type']];
+	                            $fldname = strtolower($fldname);
+	                        }
+	                    }	// translate to specific record key
+	
+	                    if (ctype_digit($value))
+	                    {	// integer value
+	                        switch ($fldname)
+	                        {		// act on specific field names
+	                            case 'idir':
+	                            case 'idirhusb':
+	                            case 'idirwife':
+	                            case 'd_idir':
+	                            case 'm_idir':
+	                            {	// IDIR field
+	                                $person	= new Person(array('idir'=>$value));
+	                                $name	= $person->getName();
 ?>
       <td class='<?php print $cellClass; ?> right'>
         <a href='/FamilyTree/Person.php?idir=<?php print $value; ?>' target='_blank'>

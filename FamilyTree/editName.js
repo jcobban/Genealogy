@@ -21,6 +21,7 @@
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/08/06      use addEventListener                            *
  *		2020/02/17      hide right column                               *
+ *		2020/12/28      use updateNameJson.php to apply changes         *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -324,7 +325,7 @@ function updateName(ev)
     // alert("editName.js: updateName: parms=" + msg);
 
     // invoke script to update Name and return XML result
-    HTTP.post('/FamilyTree/updateName.php',
+    HTTP.post('/FamilyTree/updateNameJson.php',
 		      parms,
 		      gotName,
 		      noName);
@@ -333,32 +334,22 @@ function updateName(ev)
 /************************************************************************
  *  function gotName													*
  *																		*
- *  This method is called when the XML file representing				*
- *  an updated name is retrieved from the database.						*
+ *  This method is called when the JSON file representing				*
+ *  an updated name is retrieved from the server.						*
  *																		*
  *  Input:																*
- *		xmlDoc		XML document containing name						*
+ *		jsonObj		JSON document containing name						*
  ************************************************************************/
-function gotName(xmlDoc)
+function gotName(jsonObj)
 {
-    if (xmlDoc === undefined)
+    if (typeof(jsonObj) == 'object')
     {
-		alert("editName.js: gotName: xmlDoc is undefined!");
-		return;
-    }
-    var	form		    = document.nameForm;
+        var	form		    = document.nameForm;
 
-    var	root	        = xmlDoc.documentElement;
-    if (root && root.nodeName == 'update')
-    {
-		//alert("editName.js: gotName: " + tagToString(root));
-		var msgs	    = root.getElementsByTagName("msg");
-		if (msgs.length > 0)
+        if ('msg' in jsonObj && jsonObj.msg.length > 0)
 		{		            // have messages in reply
-		    for(var j = 0; j < msgs.length; j++)
-				alert("editName.js: gotName: msg=" + msgs[j].textContent);
+			alert("editName.js: gotName: msg=" + jsonObj.msg);
 		}		            // have messages in reply
-		var cmds	    = root.getElementsByTagName("cmd");
 
 		var	opener	    = null;
 		if (window.frameElement && window.frameElement.opener)
@@ -395,18 +386,11 @@ function gotName(xmlDoc)
 		}		            // invoked from an existing window
 		else
 		    alert("editName.js: gotName: Not invoked as a dialog");
-    }		// properly constructed XML
+    }                   // have JSON object
     else
-    {		// error
-		var	msg	= "Error: ";
-		if (root)
-		{
-		    msg	+= tagToString(root);
-		}
-		else
-		    msg += xmlDoc;
-		alert ("editName.js: gotName: " + msg);
-    }		// error
+    {
+		alert("editName.js: gotName: jsonObj is undefined!");
+    }
 }		// function gotName
 
 /************************************************************************

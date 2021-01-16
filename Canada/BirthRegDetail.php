@@ -140,6 +140,7 @@ use \Exception;
  *		2020/02/23      get error message texts from template           *
  *		                fix undefined variables                         *
  *		2020/10/01      erroneously matched to Ontario Death Register   *
+ *		2020/11/28      correct XSS errors                              *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -206,9 +207,10 @@ if (isset($_GET) && count($_GET) > 0)
 			                        "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {			// loop through all input parameters
+	    $value              = trim($value);
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n";
-	    $value                      = trim($value);
+                                "<td class='white left'>" .
+                                htmlspecialchars($value) . "</td></tr>\n";
 		switch(strtolower($key))
 		{		// process specific named parameters
 		    case 'regyear':
@@ -216,7 +218,7 @@ if (isset($_GET) && count($_GET) > 0)
 	            if (ctype_digit($value))
 				    $regYear	    = $value;
 	            else
-	                $regYearText    = $value;
+	                $regYearText    = htmlspecialchars($value);
 				break;
 		    }		// RegYear passed
 	
@@ -225,20 +227,20 @@ if (isset($_GET) && count($_GET) > 0)
 	            if (ctype_digit($value))
 	                $regNum 	    = $value - 0;
 	            else
-	                $regNumText     = $value;
+	                $regNumText     = htmlspecialchars($value);
 				break;
 		    }		// RegNum passed
 	
 		    case 'originalvolume':
 		    {
-				$volume		        = $value;
+				$volume		        = htmlspecialchars($value);
 				$numVolume	        = preg_replace('/[^0-9]/', '', $value);
 				break;
 		    }		// RegNum passed
 	
 		    case 'originalpage':
 		    {
-				$page   	        = $value;
+				$page   	        = htmlspecialchars($value);
 				break;
 		    }		// RegNum passed
 	
@@ -247,13 +249,13 @@ if (isset($_GET) && count($_GET) > 0)
 				if (ctype_digit($value))
 				    $item	        = $value;
 	            else
-	                $itemText       = $value;
+	                $itemText       = htmlspecialchars($value);
 				break;
 		    }		// RegNum passed
 	
 		    case 'regdomain':
 		    {
-				$domain		        = $value;
+				$domain		        = htmlspecialchars($value);
 				break;
 		    }		// RegDomain
 	
@@ -275,8 +277,9 @@ if (isset($_GET) && count($_GET) > 0)
 	
 		    default:
 		    {
-				$warn	.= "Unexpected parameter $key='$value'. ";
-				break;
+                $warn	.= "Unexpected parameter $key='" . 
+                            htmlspecialchars($value) . "'. ";
+                break;
 		    }		// any other paramters
 		}		    // process specific named parameters
 	}			    // loop through all input parameters
@@ -342,15 +345,16 @@ $domainObj	            = new Domain(array('domain'	    => $domain,
 				                           'language'	=> $lang));
 if ($domainObj->isExisting())
 {
-    $cc		    		= substr($domain, 0, 2);
-    $code		    	= substr($domain, 2, 2);
-    $countryObj			= new Country(array('code' => $cc));
-    $countryName		= $countryObj->getName();
-    $domainName			= $domainObj->get('name');
+    $domainName			= $domainObj['name'];
+    $code		    	= $domainObj['state'];
+    $countryObj			= $domainObj->getCountry();
+    $cc		    		= $countryObj['code'];
+    $countryName		= $countryObj['name'];
 }
 else
 {
     $text               = $template['unknownDomain']->innerHTML;
+    $domain             = htmlspecialchars($domain); 
     $msg                .= str_replace('$domain', $domain, $text);
 }
 

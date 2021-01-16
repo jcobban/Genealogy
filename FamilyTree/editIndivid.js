@@ -1187,7 +1187,7 @@ function refresh()
         }               // element has a name
     }                   // loop through form elements
     msg                     = msg + "]";
-    locTrace                += " editIndivid.js: refresh: " + msg;
+    locTrace                += " editIndivid.js: refresh: " + msg + "\n";
 
     // invoke script to update Event and return JSON result
     parms['caller']         = 'editIndivid.js: 1192';
@@ -1336,8 +1336,8 @@ function update()
         }               // element has a name
     }                   // loop through all form elements
     msg                     = msg.substring(0,msg.length - 2) + "}";
-    locTrace                += " editIndivid.js: 1292 update: " + msg;
-    console.log("editIndivid.js:update 1338 locTrace=" + locTrace);
+    locTrace                += " editIndivid.js: 1339 update: " + msg + "\n";
+    console.log("editIndivid.js:update 1340 locTrace=" + locTrace);
 
     // invoke script to update Event and return JSON result
     parms['caller']         = 'editIndivid.js: 1341';
@@ -2701,7 +2701,7 @@ function gotDeleteEvent(xmlDoc)
     var root    = xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'deleted')
     {
-        var msglist = root.getElementsByTagName('msg');
+        var msglist     = root.getElementsByTagName('msg');
         var parmslist   = root.getElementsByTagName('parms');
         if (msglist.length == 0)
         {
@@ -4657,7 +4657,7 @@ function eiKeyDown(ev)
     {           // ctrl key shortcuts
         if (code == LTR_S)
         {       // letter 'S'
-            locTrace += " editIndivid.js: eiKeyDown: Ctrl-S";
+            locTrace += " editIndivid.js: eiKeyDown: Ctrl-S\n";
             validateForm();
             return false;   // do not perform standard action
         }       // letter 'S'
@@ -4745,7 +4745,7 @@ function eiKeyDown(ev)
 
             case LTR_U:
             {       // letter 'U' Update
-                locTrace += " editIndivid.js: eiKeyDown: Alt-U";
+                locTrace += " editIndivid.js: eiKeyDown: Alt-U\n";
                 validateForm();
                 return false;   // suppress default action
             }       // letter 'U'

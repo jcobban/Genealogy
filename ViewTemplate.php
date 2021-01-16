@@ -21,8 +21,9 @@ use \Exception;
  *  History:															*
  *		2019/04/16		created											*
  *		2019/07/28      add option to display the document object model *
+ *		2021/01/03      correct XSS vulnerability                       *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
@@ -44,13 +45,13 @@ if (isset($_GET) && count($_GET) > 0)
 	foreach($_GET as $key => $value)
 	{			// loop through parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                         "<td class='white left'>" .
+                            htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {
 			case 'lang':
 			{
-			    if (strlen($value) >= 2)
-					$lang		= strtolower(substr($value, 0, 2));
+	            $lang           = FtTemplate::validateLang($value);
 			    break;
 			}		// language
 
@@ -97,7 +98,7 @@ if ($addLang)
     $templateName       = substr($templateName, 0, $period) . $lang .
                           substr($templateName, $period);
 
-$template->set('TEMPLATENAME',		 $templateName);
+$template->set('TEMPLATENAME',		 htmlspecialchars($templateName));
 $template->set('CONTACTTABLE',	    'Templates');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 $template->set('LANG',              $lang);

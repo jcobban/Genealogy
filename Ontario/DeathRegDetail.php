@@ -153,6 +153,7 @@ use \Exception;
  *		2020/03/21      fix references to undefined $death              *
  *		2020/03/27      $idir was not defined                           *
  *		                calculations failed if RegNum omitted           *
+ *		2020/11/28      fix XSS error                                   *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -186,14 +187,16 @@ $imatches			    = null;
 // override from passed parameters
 if (isset($_GET) && count($_GET) > 0)
 {			        // invoked by method=get
-	$parmsText  = "<p class='label'>\$_GET</p>\n" .
-	                  "<table class='summary'>\n" .
-	                  "<tr><th class='colhead'>key</th>" .
-	                      "<th class='colhead'>value</th></tr>\n";
+	$parmsText              = "<p class='label'>\$_GET</p>\n" .
+	                            "<table class='summary'>\n" .
+	                              "<tr><th class='colhead'>key</th>" .
+	                                "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{			// loop through all input parameters
-	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-	                        "<td class='white left'>$value</td></tr>\n"; 
+	    $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>" .
+                                htmlspecialchars($value) . "</td></tr>\n";
+	    $value                      = trim($value);
 	    switch(strtolower($key))
 	    {		// process specific named parameters
 	        case 'regyear':
@@ -229,7 +232,9 @@ if (isset($_GET) && count($_GET) > 0)
 	            if (ctype_digit($value))
 	                $page	= $value;
 	            else
-	                $msg	.= "Page Number $value must be a number. ";
+                    $msg	.= "Page Number " . 
+                                htmlspecialchars($value) . 
+                                " must be a number. ";
 	            break;
 	        }		// RegNum passed
 	
@@ -238,7 +243,9 @@ if (isset($_GET) && count($_GET) > 0)
 	            if (ctype_digit($value))
 	                $item	= $value;
 	            else
-	                $msg	.= "Item Number $value must be a number. ";
+	                $msg	.= "Item Number " . 
+                                htmlspecialchars($value) . 
+                                " must be a number. ";
 	            break;
 	        }		// RegNum passed
 	
@@ -257,10 +264,12 @@ if (isset($_GET) && count($_GET) > 0)
 	            }
 	            else
 	            {
-	                $msg	.= "Domain '$value' is not a supported " .
+	                $msg	.= "Domain '" . 
+                                htmlspecialchars($value) . 
+                                "' is not a supported " .
 	                		"two character country code followed by ".
 	                		"a state or province code. ";
-	                $domainName	= 'Domain : ' . $value;
+	                $domainName	= 'Domain : ' . htmlspecialchars($value);
 	            }
 	            break;
 	        }		// RegDomain
@@ -284,7 +293,8 @@ if (isset($_GET) && count($_GET) > 0)
 	
 	        default:
 	        {		// any other paramters
-	            $warn	.= "Unexpected parameter $key='$value'. ";
+                $warn	.= "Unexpected parameter $key=" .
+                            htmlspecialchars($value) . "'. ";
 	            break;
 	        }		// any other paramters
 	    }		// process specific named parameters

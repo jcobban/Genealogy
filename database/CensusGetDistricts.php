@@ -26,41 +26,60 @@ require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
 // validate parameters
-$census		    = null;
-$province		= null;
-$censusYear		= 9999;
-$lang		    = 'en';
+$census		    			= null;     // census identifier
+$province					= null;     // province identifier
+$censusYear					= 9999;
+$lang		    			= 'en';
 
-foreach($_GET as $key => $value)
-{			// loop through all parameters
-	switch (strtolower($key))
-	{		// act on specific parameters
-	    case 'census':
-	    {
-			$census		= $value;
-			$censusRec	= new Census(array('censusid'	=> $value));
-			if ($censusRec->isExisting())
-			    $censusYear	= intval(substr($census, 2, 4));
-			else
-			    $msg	.= "Census='$census' not supported. ";
-			break;
-	    }
-
-	    case 'province':
-	    case 'state':
-	    {
-			if (preg_match('/^[A-Z]{2}$/', $value) == 1)
-			    $province	= $value;
-			break;
-	    }
-
-	    case 'lang':
-	    {
-            $lang           = FtTemplate::validateLang($value);
-			break;
-	    }
-	}		// act on specific parameters
-}			// loop through all parameters
+if (isset($_GET) && count($_GET) > 0)
+{                       // invoked by URL to display current status of account
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                               "<table class='summary'>\n" .
+                                  "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
+	foreach($_GET as $key => $value)
+	{			// loop through all parameters
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>" .
+                                htmlspecialchars($value) . "</td></tr>\n";
+	    $value                      = trim($value);
+	    if (strlen($value) == 0)
+	        continue;
+		switch (strtolower($key))
+		{		// act on specific parameters
+		    case 'census':
+		    {
+				$census		= htmlspecialchars($value);
+				$censusRec	= new Census(array('censusid'	=> $value));
+				if ($censusRec->isExisting())
+				    $censusYear	= intval(substr($census, 2, 4));
+				else
+				    $msg	.= "Census='$census' not supported. ";
+				break;
+		    }
+	
+		    case 'province':
+		    case 'state':
+		    {
+				if (preg_match('/^[A-Z]{2}$/', $value) == 1)
+				    $province	= $value;
+				else
+                    $msg	.= "Province='" . 
+                                htmlspecialchars($value) . 
+                                "' invalid. ";
+				break;
+		    }
+	
+		    case 'lang':
+		    {
+	            $lang           = FtTemplate::validateLang($value);
+				break;
+		    }
+		}		// act on specific parameters
+	}			// loop through all parameters
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}                       // invoked by URL to display current status of account
 
 // the invoker must explicitly provide the Census identifier
 if (is_null($census))

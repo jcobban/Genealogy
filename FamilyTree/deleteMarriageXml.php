@@ -35,8 +35,9 @@ use \Exception;
  *		2017/03/19		use preferred parameters for new LegacyFamily	*
  *		2017/09/12		use get( 										*
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 header('Content-Type: text/xml');
 require_once __NAMESPACE__ . '/Family.inc';
@@ -47,78 +48,109 @@ print "<?xml version='1.0' encoding='UTF-8'?>\n";
 print "<deleted>\n";
 
 // include info on parameters
-print "    <parms>\n";
-$idmr		= null;
-$idir		= null;
-$child		= null;
-foreach($_POST as $key => $value)
-{
-    print "\t<$key>$value</$key>\n";
-    switch(strtolower($key))
-    {
-        case 'idmr':
-        {
-    		$idmr		= intval($value);
-    		break;
-        }
+$idmr		    		= null;
+$idir		    		= null;
+$child		    		= null;
+$idmrtext				= null;
+$idirtext				= null;
+$childtext				= null;
+$parmsText              = '';
 
-        case 'idir':
-        {
-    		$idir		= intval($value);
-    		break;
-        }
-
-        case 'child':
-        {
-    		$child		= intval($value);
-    		break;
-        }
-
+if (isset($_POST) && count($_POST) > 0)
+{		                        // parameters passed by method=post
+    foreach($_POST as $key => $value)
+    {		                    // loop through all parameters
+        $parmsText      .= "    <$key>" .
+                            htmlspecialchars($value) . "</$key>\n"; 
+	    switch(strtolower($key))
+	    {
+	        case 'idmr':
+            {
+                if (ctype_digit($value))
+                    $idmr		= intval($value);
+                else
+                if (strlen($value) > 0)
+                    $idmrtext   = htmlspecialchars($value);
+	    		break;
+	        }
+	
+	        case 'idir':
+	        {
+                if (ctype_digit($value))
+	    		    $idir		= intval($value);
+                else
+                if (strlen($value) > 0)
+                    $idirtext   = htmlspecialchars($value);
+	    		break;
+	        }
+	
+	        case 'child':
+	        {
+                if (ctype_digit($value))
+	    		    $child		= intval($value);
+                else
+                if (strlen($value) > 0)
+                    $childtext  = htmlspecialchars($value);
+	    		break;
+	        }
+	
+	    }
     }
 }
-print "    </parms>\n";
+print "    <parms>$parmsText</parms>\n";
 
 // validate parameters
+if (is_string($idmrtext))
+    $msg	    .= "Invalid value for idmr='$idmrtext'. ";
+else
 if (is_null($idmr))
-    $msg	.= 'Missing mandatory parameter idmr. ';
+    $msg	    .= 'Missing mandatory parameter idmr. ';
+if (is_string($idirtext))
+    $msg	    .= "Invalid value for idir='$idirtext'. ";
+if (is_string($childtext))
+    $msg	    .= "Invalid value for child='$childtext'. ";
 
 // current user must be authorized to update the database
 // and must be an owner of the individual records for both
 // the husband and the wife to delete the family record
 $husband		= null;
-$wife		= null;
-try
+$wife		    = null;
+
+if (strlen($msg) == 0)
 {
-    $family	= new Family(array('idmr' => $idmr));
+    $family	    = new Family(array('idmr' => $idmr));
 
-    $idirhusb	= $family->get('idirhusb');
-    if ($idirhusb)
-        $husband	= $family->getHusband();
-    $idirwife	= $family->get('idirwife');
-    if ($idirwife)
-        $wife	= $family->getWife();
-    $isOwner	= (($idirhusb == 0) ||
-    			   RecOwner::chkOwner($idirhusb,
-    					      'tblIR')) &&
-    			  (($idirwife == 0) ||
-    			   RecOwner::chkOwner($idirwife,
-    					       'tblIR'));
-
-    if (!canUser('edit') || !$isOwner)
-    {		// take no action
-        $msg	.= 'User not authorized to delete Family. ';
-    }		// take no action
-}		// try
-catch(Exception $e)
-{		// catch failure of new Family
-    $msg	.= $e->getMessage();
-}		// catch failure of new Family
+	if($family->isExisting())
+	{
+	    $idirhusb	= $family->get('idirhusb');
+	    if ($idirhusb)
+	        $husband	= $family->getHusband();
+	    $idirwife	= $family->get('idirwife');
+	    if ($idirwife)
+	        $wife	= $family->getWife();
+	    $isOwner	= (($idirhusb == 0) ||
+	    			   RecOwner::chkOwner($idirhusb,
+	    					      'tblIR')) &&
+	    			  (($idirwife == 0) ||
+	    			   RecOwner::chkOwner($idirwife,
+	    					       'tblIR'));
+	
+	    if (!canUser('edit') || !$isOwner)
+	    {		// take no action
+	        $msg	.= 'User not authorized to delete Family. ';
+	    }		// take no action
+	}		// try
+	else
+	{		// family not defined
+	    $msg	    .= "No instance of Family defined for idmr=$idmr. ";
+	}		// family not defined
+}
+else
+    $family     = null;
 
 if (strlen($msg) > 0)
 {		// problems detected
-    print "    <msg>\n\t" . 
-          htmlentities($msg,ENT_XML1) . 
-          "\n    </msg>\n";
+    print "    <msg>\n\t$msg\n    </msg>\n";
 }		// problems detected
 else
 {		// OK to delete marriage

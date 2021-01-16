@@ -80,6 +80,8 @@ use \Exception;
  *						from unchanged values							*
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2020/05/03      correct updating of Page1                       *
+ *		2020/10/10      use numeric subdistrict ids for 1851 and 1861   *
+ *		2020/11/25      save changes to last subdistrict                *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -217,10 +219,10 @@ if (count($_POST) > 0)
         else
         {
             $column	                = strtolower($key);
-			$rownum                 = '';
-		}
-		if ($column == 'sd_pagei')
-		    $column	                = 'sd_page1';	// old fixup
+    		$rownum                 = '';
+    	}
+    	if ($column == 'sd_pagei')
+    	    $column	                = 'sd_page1';	// old fixup
         else
         if ($column == 'sd_page' && substr($row, 0, 1) == '1')
         {
@@ -275,8 +277,14 @@ if (count($_POST) > 0)
                 break;
             }		// requested language
 
-		    case 'orig_id':
+    	    case 'sd_id':
             {
+                $sd_id                  = $value;
+    			break;
+    	    }
+
+    	    case 'orig_id':
+    	    {
                 if ($subDistrict)
                 {
                     ob_start();
@@ -284,57 +292,57 @@ if (count($_POST) > 0)
                     $warn               .= ob_get_clean();
                     $subDistrict        = null;
                 }
-				$sdParms['sd_id']	    = $value;
-				break;
-		    }
+    			$sdParms['sd_id']	    = $value;
+    			break;
+    	    }
 
-		    case 'orig_div':
-		    {
-				$sdParms['sd_div']	    = $value;
-				break;
-		    }
+    	    case 'orig_div':
+    	    {
+    			$sdParms['sd_div']	    = $value;
+    			break;
+    	    }
 
-		    case 'orig_sched':
-		    {
+    	    case 'orig_sched':
+    	    {
                 $sdParms['sd_sched']	= $value;
-				$subDistrict		    = new SubDistrict($sdParms);
-				break;
-		    }
+    			$subDistrict		    = new SubDistrict($sdParms);
+    			$subDistrict->set('sd_id', $sd_id);
+    			break;
+    	    }
 
-		    case 'sd_name':
+    	    case 'sd_name':
             {
-				if ($value == '[Delete]')
-				{
+    			if ($value == '[Delete]')
+    			{
                     ob_start();
-				    $subDistrict->delete('p');
+    			    $subDistrict->delete('p');
                     $warn               .= ob_get_clean();
-				    $subDistrict	    = null;
-				}
-				else
-				    $subDistrict->set($column, $value);
-				break;
-		    }
+    			    $subDistrict	    = null;
+    			}
+    			else
+    			    $subDistrict->set($column, $value);
+    			break;
+    	    }
 
-		    case 'sd_id':
-		    case 'sd_div':
-		    case 'sd_sched':
-		    case 'sd_pages':
-		    case 'sd_page1':
-		    case 'sd_population':
-		    case 'sd_lacreel':
-		    case 'sd_ldsreel':
-		    case 'sd_imagebase':
-		    case 'sd_relframe':
-		    case 'sd_framect':
-		    case 'sd_bypage':
-		    case 'sd_remarks':
-		    {
-				if ($subDistrict)
+    	    case 'sd_div':
+    	    case 'sd_sched':
+    	    case 'sd_pages':
+    	    case 'sd_page1':
+    	    case 'sd_population':
+    	    case 'sd_lacreel':
+    	    case 'sd_ldsreel':
+    	    case 'sd_imagebase':
+    	    case 'sd_relframe':
+    	    case 'sd_framect':
+    	    case 'sd_bypage':
+    	    case 'sd_remarks':
+    	    {
+    			if ($subDistrict)
                 {
-				    $subDistrict->set($column, $value);
-				}
-				break;
-		    }
+    			    $subDistrict->set($column, $value);
+    			}
+    			break;
+            }
     
         }		    // act on specific parameter
     }	            // loop through all parameters
@@ -432,168 +440,168 @@ if (strlen($msg) == 0)
 
     $domain		                = new Domain(array('domain' => "$cc$province"));
     $provinceName	            = $domain['name'];
-// load the results into a parameter array
-if (count($subdistList) > 0)
-{			// page already exists in database
-    $line			            = 1;
-    $prevSubDistrict	        = null;
-    $data			            = array();
-    $oldid			            = '';
-    $oldname		            = '';
-    $oldlac			            = '';
-    $oldlds			            = '';
-    $oldbase		            = '';
-    foreach($subdistList as $ip => $subDistrict)
-    {		// loop through all subdistricts
-        $line		            = str_pad($line, 2, "0", STR_PAD_LEFT);
-        $id  		            = $subDistrict['sd_id'];
-        if ($id == $oldid)
-            $idclass	        = 'same';
-        else
-            $idclass	        = 'black';
-        $div  		            = $subDistrict['sd_div'];
-        $name 		            = $subDistrict['sd_name'];
-        if ($name == $oldname)
-            $nameclass	        = 'same';
-        else
-            $nameclass	        = 'black';
-        $pages  				= $subDistrict['sd_pages'];
-        $page1 		   		    = $subDistrict['sd_page1'];
-        $bypage 				= $subDistrict['sd_bypage'];
-        $population 			= $subDistrict['sd_population'];
-        $lacreel  				= $subDistrict['sd_lacreel'];
-        if ($lacreel == $oldlac)
-            $lacclass			= 'same';
-        else
-            $lacclass			= 'black';
-        $ldsreel  				= $subDistrict['sd_ldsreel'];
-        if ($ldsreel == $oldlds)
-            $ldsclass			= 'same';
-        else
-            $ldsclass			= 'black';
-        if ($ldsreel === null || $ldsreel === 'NULL')
-            $ldsreel			= 0;
-        $imagebase  			= $subDistrict['sd_imagebase'];
-        if ($imagebase == $oldbase)
-            $baseclass			= 'same';
-        else
-            $baseclass			= 'black';
-                $relframe  		= $subDistrict['sd_relframe'];
-        $framect				= $subDistrict['sd_framect'];
-        $remarks  				= $subDistrict['sd_remarks'];
-
-        $oldid		   		    = $id;
-        $oldname				= $name;
-        $oldlac		   		    = $lacreel;
-        $oldlds		   		    = $ldsreel;
-        $oldbase				= $imagebase;
-
-        // if requested, calculate the frame count and page count
-        if ($fcAuto && $prevSubDistrict)
-        {		// automatically calculate frame count and page count
-            $framect			= $relframe -	
-                          $prevSubDistrict['sd_relframe'];	
-            if ($censusYear == 1901 ||
-                $censusYear == 1911)
-                $pages			= $framect;
+    // load the results into a parameter array
+    if (count($subdistList) > 0)
+    {			    // page already exists in database
+        $line			            = 1;
+        $prevSubDistrict	        = null;
+        $data			            = array();
+        $oldid			            = '';
+        $oldname		            = '';
+        $oldlac			            = '';
+        $oldlds			            = '';
+        $oldbase		            = '';
+        foreach($subdistList as $ip => $subDistrict)
+        {		    // loop through all subdistricts
+            $line		            = str_pad($line, 2, "0", STR_PAD_LEFT);
+            $id  		            = $subDistrict['sd_id'];
+            if ($id == $oldid)
+                $idclass	        = 'same';
             else
-            if ($censusYear == 1921)
-                $pages			= $framect - 1;
+                $idclass	        = 'black';
+            $div  		            = $subDistrict['sd_div'];
+            $name 		            = $subDistrict['sd_name'];
+            if ($name == $oldname)
+                $nameclass	        = 'same';
             else
-            if (($censusYear == 1851 || $censusYear == 1861))
-                $pages 			= ceil($framect / 2);
+                $nameclass	        = 'black';
+            $pages  				= $subDistrict['sd_pages'];
+            $page1 		   		    = $subDistrict['sd_page1'];
+            $bypage 				= $subDistrict['sd_bypage'];
+            $population 			= $subDistrict['sd_population'];
+            $lacreel  				= $subDistrict['sd_lacreel'];
+            if ($lacreel == $oldlac)
+                $lacclass			= 'same';
             else
-                $pages			= $framect * 2;
-                $population	    = floor(($pages - 0.5) *
-                                        $census['linesperpage']);
-        }		// automatically calculate frame count and page count
-
-        // autocorrect population if the current value is the default
-        if ($censusYear == 1861 && $population == 500) 
-            $population		    = floor(($pages - 0.5) *
-                                        $census['linesperpage']);
-        if ($framect == 0)
-        {			// frame count not initialized yet
-            if ($censusYear == 1901 ||
-                $censusYear == 1911 ||
-                $censusYear == 1921 )
-                $framect	    = $pages;
+                $lacclass			= 'black';
+            $ldsreel  				= $subDistrict['sd_ldsreel'];
+            if ($ldsreel == $oldlds)
+                $ldsclass			= 'same';
             else
-            if (($censusYear == 1851 || $censusYear == 1861))
-                $framect	= $pages * 2;
+                $ldsclass			= 'black';
+            if ($ldsreel === null || $ldsreel === 'NULL')
+                $ldsreel			= 0;
+            $imagebase  			= $subDistrict['sd_imagebase'];
+            if ($imagebase == $oldbase)
+                $baseclass			= 'same';
             else
-                $framect	= ceil($pages / 2);
-        }			// frame count not initialized yet
-        if (is_null($relframe))
-            $relframe	= 0;
-
-        $data[]	= array('line'		=> $line,	
-                        'id'		=> $id,  	
-                        'idclass'	=> $idclass, 	
-                        'div'		=> $div,  	
-                        'name'		=> $name, 	
-                        'nameclass'	=> $nameclass, 	
-                        'pages'		=> $pages,  	
-                        'page1'		=> $page1, 	
-                        'bypage'	=> $bypage, 	
-                        'population'	=> $population, 
-                        'lacreel'	=> $lacreel,  	
-                        'lacclass'	=> $lacclass, 	
-                        'ldsreel'	=> $ldsreel,  	
-                        'ldsclass'	=> $ldsclass, 	
-                        'imagebase'	=> $imagebase,  
-                        'baseclass'	=> $baseclass, 	
-                        'relframe'	=> $relframe,  	
-                        'framect'	=> $framect,	
-                        'nameWidth'	=> $nameWidth,
-                        'remarksWidth'	=> $remarksWidth,
-                        'remarks'	=> $remarks);  	
-        $line++;
-        $prevSubDistrict	= $subDistrict;
-    }		// loop through all subdistricts
-}			// subdistricts already exists in database
-else
-{			// fill in empty district
-    $censusYear	= intval(substr($censusId, 2, 4));
-    $framect	= floor(500 / $census['linesperpage']);
-
-    $lineCt		= 26;	// number of initial entries
-    for ($i = 1; $i <= $lineCt; $i++)
-    {	// loop through simulated sub-districts
-        // ensure that line number is always 2 digits
-        $line	= (string) $i;
-        if (strlen($line) == 1)
-            $line	= "0".$line;
-        if ($censusYear < 1906)
-            $sd_id	= substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-                         $i - 1, 1);
-        else
-            $sd_id	= $i;
-
-        $data[]	= array('line'		=> $line,	
-                        'id'		=> $sd_id,  	
-                            'idclass'	=> 'black',	
-                        'div'		=> '',  	
-                        'name'		=> 'SubDistrict ' . $sd_id,
-                            'nameclass'	=> 'black',	
-                        'pages'		=> '10',  	
-                        'page1'		=> '1', 	
-                        'bypage'	=> '1', 	
-                        'population'	=> 475, 
-                        'lacreel'	=> 'C-9999',  	
-                            'lacclass'	=> 'same',	
-                        'ldsreel'	=> 0,  	
-                            'ldsclass'	=> 'same',	
-                        'imagebase'	=> '0',
-                            'baseclass'	=> 'same',	
-                        'relframe'	=> '0',  	
-                        'framect'	=> $framect,	
-                        'nameWidth'	=> $nameWidth,
-                        'remarksWidth'	=> $remarksWidth,
-                        'remarks'	=> '');
-    }		// loop through simulated sub-districts
-}			// fill in empty district
-}		// no errors in validation
+                $baseclass			= 'black';
+                    $relframe  		= $subDistrict['sd_relframe'];
+            $framect				= $subDistrict['sd_framect'];
+            $remarks  				= $subDistrict['sd_remarks'];
+    
+            $oldid		   		    = $id;
+            $oldname				= $name;
+            $oldlac		   		    = $lacreel;
+            $oldlds		   		    = $ldsreel;
+            $oldbase				= $imagebase;
+    
+            // if requested, calculate the frame count and page count
+            if ($fcAuto && $prevSubDistrict)
+            {		// automatically calculate frame count and page count
+                $framect			= $relframe -	
+                              $prevSubDistrict['sd_relframe'];	
+                if ($censusYear == 1901 ||
+                    $censusYear == 1911)
+                    $pages			= $framect;
+                else
+                if ($censusYear == 1921)
+                    $pages			= $framect - 1;
+                else
+                if (($censusYear == 1851 || $censusYear == 1861))
+                    $pages 			= ceil($framect / 2);
+                else
+                    $pages			= $framect * 2;
+                    $population	    = floor(($pages - 0.5) *
+                                            $census['linesperpage']);
+            }		// automatically calculate frame count and page count
+    
+            // autocorrect population if the current value is the default
+            if ($censusYear == 1861 && $population == 500) 
+                $population		    = floor(($pages - 0.5) *
+                                            $census['linesperpage']);
+            if ($framect == 0)
+            {			// frame count not initialized yet
+                if ($censusYear == 1901 ||
+                    $censusYear == 1911 ||
+                    $censusYear == 1921 )
+                    $framect	    = $pages;
+                else
+                if (($censusYear == 1851 || $censusYear == 1861))
+                    $framect	= $pages * 2;
+                else
+                    $framect	= ceil($pages / 2);
+            }			// frame count not initialized yet
+            if (is_null($relframe))
+                $relframe	    = 0;
+    
+            $data[]		= array('line'		=> $line,	
+                            'id'			=> $id,  	
+                            'idclass'		=> $idclass, 	
+                            'div'			=> $div,  	
+                            'name'			=> $name, 	
+                            'nameclass'		=> $nameclass, 	
+                            'pages'			=> $pages,  	
+                            'page1'			=> $page1, 	
+                            'bypage'		=> $bypage, 	
+                            'population'	=> $population, 
+                            'lacreel'		=> $lacreel,  	
+                            'lacclass'		=> $lacclass, 	
+                            'ldsreel'		=> $ldsreel,  	
+                            'ldsclass'		=> $ldsclass, 	
+                            'imagebase'		=> $imagebase,  
+                            'baseclass'		=> $baseclass, 	
+                            'relframe'		=> $relframe,  	
+                            'framect'		=> $framect,	
+                            'nameWidth'		=> $nameWidth,
+                            'remarksWidth'	=> $remarksWidth,
+                            'remarks'		=> $remarks);  	
+            $line++;
+            $prevSubDistrict	= $subDistrict;
+        }		    // loop through all subdistricts
+    }			    // subdistricts already exists in database
+    else
+    {			    // fill in empty district
+        $censusYear	    = intval(substr($censusId, 2, 4));
+        $framect	    = floor(500 / $census['linesperpage']);
+    
+        $lineCt		    = 26;	// number of initial entries
+        for ($i = 1; $i <= $lineCt; $i++)
+        {	        // loop through simulated sub-districts
+                    // ensure that line number is always 2 digits
+            $line	    = (string) $i;
+            if (strlen($line) == 1)
+                $line	= "0".$line;
+            if ($censusYear >= 1871 && $censusYear < 1906)
+                $sd_id	= substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                             $i - 1, 1);
+            else
+                $sd_id	= $i;
+    
+            $data[]		= array('line'		    => $line,	
+                                'id'			=> $sd_id,  	
+                                'idclass'		=> 'black',	
+                                'div'			=> '',  	
+                                'name'			=> 'SubDistrict ' . $sd_id,
+                                'nameclass'		=> 'black',	
+                                'pages'			=> '10',  	
+                                'page1'			=> '1', 	
+                                'bypage'		=> '1', 	
+                                'population'	=> 475, 
+                                'lacreel'		=> 'C-9999',  	
+                                'lacclass'		=> 'same',	
+                                'ldsreel'		=> 0,  	
+                                'ldsclass'		=> 'same',	
+                                'imagebase'		=> '0',
+                                'baseclass'		=> 'same',	
+                                'relframe'		=> '0',  	
+                                'framect'		=> $framect,	
+                                'nameWidth'		=> $nameWidth,
+                                'remarksWidth'	=> $remarksWidth,
+                                'remarks'		=> '');
+        }		    // loop through simulated sub-districts
+    }			    // fill in empty district
+}		            // no errors in validation
 
 
 // parameters to ReqUpdateSubDists.html

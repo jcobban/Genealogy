@@ -56,8 +56,11 @@ use \Templating\Template;
  *		                highest registration number                     *
  *      2020/01/22      use NumberFormatter                             *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/11/28      correct XSS error                               *
+ *		2021/01/15      improve parameter checking                      *
+ *		                move message texts to template                  *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Birth.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -68,8 +71,11 @@ require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
-$regYear		    = '';
+$regYear		    = null;
+$regyeartext		= null;
 $domain	    	    = 'CAON';	// default domain
+$domaintext         = null;
+$codetext           = null;
 $domainName		    = 'Canada: Ontario';
 $stateName		    = 'Ontario';
 $cc                 = 'CA';
@@ -89,36 +95,45 @@ if (isset($_GET) && count($_GET) > 0)
     foreach($_GET as $key => $value)
     {			    // loop through all input parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{		    // process specific named parameters
 		    case 'regyear':
-		    {
-				$regYear		= $value;
-				$getParms['year']	= $regYear;
-				if (!ctype_digit($regYear) ||
-				    ($regYear < 1860) || ($regYear > 2000))
+            {
+				if (ctype_digit($value) &&
+				    ($value >= 1860) && ($value <= 2030))
 				{
-				    $msg	.=
-				"RegYear $regYear must be a number between 1860 and 2000. ";
-				}
+    				$regYear		    = $value;
+	    			$getParms['year']	= $regYear;
+                }
+                else
+                    $regyeartext        = htmlspecialchars($value);
 				break;
 		    }		// RegYear passed
 	
 		    case 'regdomain':
 		    case 'domain':
-		    {
-	            $domain         	= $value;
-	            $cc                 = substr($domain, 0, 2);
-	            $getParms['domain']	= $value;
+            {
+                if (preg_match('/^[a-zA-Z]{4}$/', $value))
+                {
+                    $domain         	= strtoupper($value);
+                    $cc                 = substr($domain, 0, 2);
+                }
+                else
+                    $domaintext         = htmlspecialchars($value);
 				break;
 		    }		// RegDomain
 	
 		    case 'code':
 		    {
-	            $domain         	= 'CA' . $value;
-	            $cc                 = 'CA';
-	            $getParms['domain']	= $domain;
+                if (preg_match('/^\w\w$/', $value))
+                {
+	                $domain         	= 'CA' . strtoupper($value);
+                    $cc                 = 'CA';
+                }
+                else
+                    $codetext           = htmlspecialchars($value);
 				break;
 		    }		// code
 	
@@ -130,10 +145,10 @@ if (isset($_GET) && count($_GET) > 0)
 	
 		    case 'county':
 		    {
-				if (strlen($value) > 0)
-                {
+				if (preg_match('/^\w+$/', $value))
 	                $county		        = $value;
-                }
+                else
+                    $countytext         = htmlspecialchars($value);
 				break;
 		    }		// county
 	
@@ -144,7 +159,8 @@ if (isset($_GET) && count($_GET) > 0)
 	
 		    default:
 		    {
-				$warn	.= "Unexpected parameter $key='$value'. ";
+				$warn	.= "Unexpected parameter $key='" .
+                                htmlspecialchars($value) . "'. ";
 				break;
 		    }		// any other paramters
 		}		    // process specific named parameters
@@ -155,27 +171,63 @@ if (isset($_GET) && count($_GET) > 0)
 
 $template		= new FtTemplate("BirthRegYearStats$lang.html");
 
-// interpret country code
-$countryObj	    = new Country(array('cc' 	=> $cc));
-$countryName    = $countryObj->getName();
-
-// interpret domain code
-$domainObj	    = new Domain(array('domain' 	=> $domain,
-				    			   'language'	=> 'en'));
-$domainName	    = $domainObj->getName(1);
-$stateName	    = $domainObj->getName(0);
-if (!$domainObj->isExisting())
+if (is_string($regyeartext))
 {
-    $msg	    .= "Domain '$domain' must be a supported two character country code followed by a state or province code. ";
+    $text       = $template['invalidRegYear']->innerHTML;
+    $msg        .= str_replace('$regyear', $regyeartext, $text);
+	$template->set('REGYEAR',               $regyeartext);
+}
+else
+if (is_null($regYear))
+{
+    $msg        .= $template['missingRegYear']->innerHTML;
+	$template->set('REGYEAR',               '');
+}
+else
+{
+	$template->set('REGYEAR',               $regYear);
+	$template->set('REGYEARP',              $regYear - 1);
+    $template->set('REGYEARN',              $regYear + 1);
 }
 
-if ($regYear == '')
+// interpret domain code
+if (is_string($codetext))
 {
-	$msg		.= "RegYear omitted. ";
+    $text       = $template['invalidCode']->innerHTML;
+    $msg        .= str_replace('$code', $codetext, $text);
+}
+if (is_string($domaintext))
+{
+    $text       = $template['invalidDomain']->innerHTML;
+    $msg        .= str_replace('$domain', $domaintext, $text);
+}
+
+if (strlen($msg) == 0)
+{
+	$domainObj	        = new Domain(array('domain' 	=> $domain,
+					        			   'language'	=> 'en'));
+	$domainName	        = $domainObj->getName(1);
+	$stateName	        = $domainObj->getName(0);
+	$countryObj	        = $domainObj->getCountry();
+	$countryName        = $countryObj->getName();
+	if ($domainObj->isExisting())
+	    $getParms['domain']	= $domain;
+    else
+    {
+        $text           = $template['unsupportedDomain']->innerHTML;
+        $msg            .= str_replace('$domain', $domain, $text);
+    }
 }
 
 // validate county code
-if ($county)
+if (is_string($countytext))
+{
+    $text       = $template['invalidCounty']->innerHTML;
+    $msg        .= str_replace('$county', $countytext, $text);
+    $template->set('COUNTYNAME',		$countytext);
+}
+else
+if (is_string($county))
 {
     $getParms['county']	= $county;
     $countyObj		    = new County($domain, $county);
@@ -186,7 +238,10 @@ if ($county)
 	}
 	else
 	{
-	    $msg	.= "County code '$value' is not valid for domain '$domain'. ";
+        $text           = $template['unsupportedCounty']->innerHTML;
+        $msg            .= str_replace(array('$county','$domain'), 
+                                       array($county, $domain), 
+                                       $text);
     }
 
     $template->set('COUNTY',		    $county);
@@ -219,134 +274,112 @@ if (strlen($msg) == 0)
 	    $result	    = $births->getCountyStatistics();
 	else
         $result	    = $births->getStatistics();
+
+	if (!$showTownship)
+	    $template->updateTag('TownshipTH', null);
+	
+	$dataRow            = $template->getElementById('dataRow');
+	$yearHTML           = $dataRow->outerHTML();
+	
+	$total	        	= 0;
+	$totalLinked	    = 0;
+	$rownum		        = 0;
+	$countyObj		    = null;
+	$countyName		    = '';
+	$lowest		        = PHP_INT_MAX;
+	$highest		    = 0;
+	$data               = '';
+	$formatter          = $template->getFormatter();
+	
+	foreach($result as $row)
+	{
+	    $ttemplate          = new Template($yearHTML);
+		$rownum++;
+		$county		        = $row['county'];
+		if (is_null($countyObj) ||
+			$county != $countyObj->get('code'))
+		{		// new county code
+			$countyObj	    = new County($domain, $county);
+			$countyName	    = $countyObj->get('name');
+		}		// new county code
+		if (array_key_exists('township', $row))
+	         $township	    = $row['township'];
+	    else
+	         $township      = '&nbsp;';
+		$count		        = $row['count'];
+		$total		        += $count;
+		$linked		        = $row['linkcount'];
+		if ($count == 0)
+		    $pctLinked	    = 0;
+		else
+		    $pctLinked  	= 100 * $linked / $count;
+		$totalLinked	    += $linked;
+		$low		        = $row['low'];
+	    $high		        = $row['high'];
+	    if (array_key_exists('currhigh', $row))
+		    $currhigh		= $row['currhigh'];
+	    else
+	        $currhigh		= $high;
+	
+		if ($low < $lowest)
+		    $lowest	        = $low;
+		if ($high < ($low + 400000) && $high > $highest)
+		    $highest	    = $high;
+	    $todo		        = $currhigh - $low + 1;
+	    if ($todo < $count)
+	        $todo           = $count;
+		if ($todo == 0)
+		    $pctDone	    = 0;
+		else
+	        $pctDone	    = 100 * $count / $todo;
+	
+	    $ttemplate->set('ROWNUM',       $rownum);
+	    $ttemplate->set('COUNTY',       $county);
+	    $ttemplate->set('COUNTYNAME',   $countyName);
+	    $ttemplate->set('TOWNSHIP',     $township);
+	    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+	    $ttemplate->set('COUNT',        $formatter->format($count));
+	    $ttemplate->set('LOW',          $low);
+	    $ttemplate->set('HIGH',         $high);
+	    $ttemplate->set('LINKED',       $linked);
+	    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+	    $ttemplate->set('PCTDONE',      $formatter->format($pctDone));
+	    $ttemplate->set('PCTDONECLASS', pctClass($pctDone));
+	    $ttemplate->set('PCTLINKED',    $formatter->format($pctLinked));
+	    $ttemplate->set('PCTLINKEDCLASS', pctClass($pctLinked));
+	    if (!$showTownship)
+	        $ttemplate->updateTag('townshipCol', null);
+	    $data           .= $ttemplate->compile();
+	}	            	// process all rows
+    $dataRow->update($data);
+	    
+	if ($total == 0)
+	{
+		$pctDone	= 0;
+		$pctLinked	= 0;
+	}
+	else
+	{
+		$pctDone	= 100 * $total / ($highest - $lowest + 1);
+		$pctLinked	= 100 * $totalLinked / $total;
+	}
+	$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+	$template->set('TOTAL',             $formatter->format($total));
+	$template->set('LOWEST',            $lowest);
+	$template->set('HIGHEST',           $highest);
+	$template->set('TOTALLINKED',       $formatter->format($totalLinked));
+	$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+	$template->set('PCTDONE',           $formatter->format($pctDone));
+	$template->set('PCTDONECLASS',      pctClass($pctDone));
+	$template->set('PCTLINKED',         $formatter->format($pctLinked));
+	$template->set('PCTLINKEDCLASS',    pctClass($pctLinked));
+	if (!$showTownship)
+	    $template->updateTag('CountyCol', null);
 }		// no errors
 else
 {
-    $result         = array();
+    $template['topBrowse']->update(null);
+    $template['display']->update(null);
 }
-
-if (!$showTownship)
-    $template->updateTag('TownshipTH', null);
-
-$dataRow            = $template->getElementById('dataRow');
-$yearHTML           = $dataRow->outerHTML();
-
-$total	        	= 0;
-$totalLinked	    = 0;
-$rownum		        = 0;
-$countyObj		    = null;
-$countyName		    = '';
-$lowest		        = PHP_INT_MAX;
-$highest		    = 0;
-$data               = '';
-$formatter          = $template->getFormatter();
-
-foreach($result as $row)
-{
-    $ttemplate      = new Template($yearHTML);
-	$rownum++;
-	$county		    = $row['county'];
-	try {
-	    if (is_null($countyObj) ||
-		$county != $countyObj->get('code'))
-	    {		// new county code
-		    $countyObj	= new County($domain, $county);
-		    $countyName	= $countyObj->get('name');
-	    }		// 
-	} catch (Exception $e)
-	{
-	    if ($debug)
-		$warn	.= "<p class='message'>" . $e->getMessage() .
-			"</p>\n";
-	    $countyName		= $county;
-	}
-	if (array_key_exists('township', $row))
-         $township	    = $row['township'];
-    else
-         $township      = '&nbsp;';
-	$count		        = $row['count'];
-	$total		        += $count;
-	$linked		        = $row['linkcount'];
-	if ($count == 0)
-	    $pctLinked	    = 0;
-	else
-	    $pctLinked  	= 100 * $linked / $count;
-	$totalLinked	    += $linked;
-	$low		        = $row['low'];
-    $high		        = $row['high'];
-    if (array_key_exists('currhigh', $row))
-	    $currhigh		= $row['currhigh'];
-    else
-        $currhigh		= $high;
-
-	if ($low < $lowest)
-	    $lowest	        = $low;
-	if ($high < ($low + 400000) && $high > $highest)
-	    $highest	    = $high;
-    $todo		        = $currhigh - $low + 1;
-    if ($todo < $count)
-        $todo           = $count;
-	if ($todo == 0)
-	    $pctDone	    = 0;
-	else
-        $pctDone	    = 100 * $count / $todo;
-
-    $ttemplate->set('ROWNUM',       $rownum);
-    $ttemplate->set('COUNTY',       $county);
-    $ttemplate->set('COUNTYNAME',   $countyName);
-    $ttemplate->set('TOWNSHIP',     $township);
-    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
-    $ttemplate->set('COUNT',        $formatter->format($count));
-    $ttemplate->set('LOW',          $low);
-    $ttemplate->set('HIGH',         $high);
-    $ttemplate->set('LINKED',       $linked);
-    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
-    $ttemplate->set('PCTDONE',      $formatter->format($pctDone));
-    $ttemplate->set('PCTDONECLASS', pctClass($pctDone));
-    $ttemplate->set('PCTLINKED',    $formatter->format($pctLinked));
-    $ttemplate->set('PCTLINKEDCLASS', pctClass($pctLinked));
-    if (!$showTownship)
-        $ttemplate->updateTag('townshipCol', null);
-    $data           .= $ttemplate->compile();
-}	            	// process all rows
-
-$dataRow->update($data);
-	    
-if ($total == 0)
-{
-	$pctDone	= 0;
-	$pctLinked	= 0;
-}
-else
-{
-	$pctDone	= 100 * $total / ($highest - $lowest + 1);
-	$pctLinked	= 100 * $totalLinked / $total;
-}
-$template->set('REGYEAR',           $regYear);
-if (is_int($regYear) || 
-    (is_string($regYear) && ctype_digit($regYear)))
-{
-    $template->set('REGYEARP',          $regYear - 1);
-    $template->set('REGYEARN',          $regYear + 1);
-}
-else
-{
-    error_log("BirthRegYearStats.php: " . __LINE__ .
-                " non-numeric regyear='$regyear'");
-    $template->set('REGYEARP',          -1);
-    $template->set('REGYEARN',          1);
-}
-$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
-$template->set('TOTAL',             $formatter->format($total));
-$template->set('LOWEST',            $lowest);
-$template->set('HIGHEST',           $highest);
-$template->set('TOTALLINKED',       $formatter->format($totalLinked));
-$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
-$template->set('PCTDONE',           $formatter->format($pctDone));
-$template->set('PCTDONECLASS',      pctClass($pctDone));
-$template->set('PCTLINKED',         $formatter->format($pctLinked));
-$template->set('PCTLINKEDCLASS',    pctClass($pctLinked));
-if (!$showTownship)
-    $template->updateTag('CountyCol', null);
 
 $template->display();

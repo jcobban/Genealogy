@@ -90,6 +90,7 @@ function onloadSources()
 			    break;
 			}
 
+		    case 'createnew':
 		    case 'new':
 		    {
 				element.onclick     = createSource;

@@ -76,6 +76,8 @@ use \Exception;
  *                      status display                                  *
  *      2020/06/07      update birth location in linked person          *
  *      2020/09/01      support divisions with bypage=2 but even pages  *
+ *		2020/10/10      remove field prefix for Pages table             *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *                                                                      *
  *  Copyright 2020 James A. Cobban                                      *
  ************************************************************************/
@@ -91,18 +93,26 @@ require_once __NAMESPACE__ . '/common.inc';
 // validate the parameters that identify the specific page to
 // be updated
 
-$censusId               	= '';       // XX9999, XX=country code, 9999=year
-$census                 	= null;     // Census record
+$cc                     	= 'CA';     // country code
+$countryName            	= 'Canada'; // country
+$censusId               	= '';       // XX9999, XX=countrycode, 9999=year
+$census                 	= null;     // instance of class Census
 $censusYear             	= 0;        // census year as an integer
-$province               	= '';       // used in pre-confederation censuses
-$distID                 	= '';       // district number, usually integer
-$subDistID              	= '';       // sub-district identifier
-$division               	= '';       // division
-$page                   	= '';       // page number
+$province               	= '';       // used in pre-confed'n censuses
+$domain                     = null;     // instance of class Domain
+$distID                 	= null;     // district number, usually integer
+$district                   = null;     // instance of class District
+$districtName               = null;     // name of District
+$subDistID              	= null;     // sub-district identifier
+$division               	= '';       // division identifier
+$subDist                    = null;     // instance of class SubDistrict
+$subDistrictName        	= null;     // name of SubDistrict
+$page                   	= 0;        // page number
+$pageText                   = null;     // page value if invalid
+$nextPage                   = 0;        // next page number
+$prevPage                   = 0;        // previous page number
 $image                  	= '';       // image URL
-$lang                   	= 'en';     // default language
-$cc                     	= 'CA';     // default country code
-$countryName            	= 'Canada'; // default country
+$lang                   	= 'en';     // selected language code
 $varcount               	= 0;        // number of parameters passed
 $parms                  	= array();
 
@@ -111,19 +121,21 @@ $parms                  	= array();
 if (isset($_POST) && count($_POST) > 0)
 {                       // invoked by URL to display current status of account
     $parmsText              = "<p class='label'>\$_POST</p>\n" .
-                               "<table class='summary'>\n" .
+                              "<table class='summary'>\n" .
                                   "<tr><th class='colhead'>key</th>" .
                                     "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {                   // loop through all parameters
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n";
+                                "<td class='white left'>" .
+                                  htmlspecialchars(print_r($value, true)) .
+                                "</td></tr>\n"; 
         $varcount++;
         switch(strtolower($key))
         {               // act on specific parameter
             case 'census':
             {           // census identifier supplied
-                $censusId       = $value;
+                $censusId           = htmlspecialchars($value);
                 break;
             }           // census identifier supplied
     
@@ -135,16 +147,16 @@ if (isset($_POST) && count($_POST) > 0)
             // District is mandatory and must be numeric
             case 'district':
             {           // District supplied
-                $distID             = $value;
-                $parms['District']  = $value;
+                $distID             = htmlspecialchars($value);
+                $parms['District']  = $distID;
                 break;
             }           // District supplied
     
             // SubDistrict is mandatory
             case 'subdistrict':
             {           // SubDistrict supplied
-                $subDistID          = $value;
-                $parms['SubDistrict']   = $value;
+                $subDistID          = htmlspecialchars($value);
+                $parms['SubDistrict']   = $subDistID;
                 break;
             }           // SubDistrict supplied
     
@@ -152,24 +164,39 @@ if (isset($_POST) && count($_POST) > 0)
             // not officially used in some censuses
             case 'division':
             {           // Division supplied
-                $division           = $value;
-                $parms['Division']  = $value;
+                $division           = htmlspecialchars($value);
+                $parms['Division']  = $division;
                 break;
             }           // Division supplied
     
             // page number is mandatory and must be numeric
             case 'page':
             {           // Page supplied
-                $page               = $value;
-                $parms['Page']      = $value;
+                if (ctype_digit($value))
+                {
+                    $page               = intval($value);
+                    $parms['Page']      = $page;
+                }
+                else
+                    $pageText           = htmlspecialchars($value);
                 break;
             }           // Page supplied
     
             case 'image':
             {           // Image supplied
-                $image              = $value;
-                if (!preg_match("/^[0-9a-zA-Z:_. \-+=\/&?]*$/", $image))
-                    $warn           .= "Image URL '$image' contains invalid characters. ";
+                if (preg_match("#^https://[0-9a-zA-Z:;_. +=/&?-]+$#", $value))
+                {
+                    $image              = $value;
+                }
+                else
+                {
+                    preg_match("#^[0-9a-zA-Z:;_. +=/&?-]+#", $value, $matches);
+                    $image              = htmlspecialchars($value);
+                    if (is_array($matches) && isset($matches[0]))
+                        $warn           .= "Image URL '$image' contains invalid character after '{$matches[0]}'. ";
+                    else
+                        $warn           .= "Image URL '$image' contains invalid characters. ";
+                }
                 break;
             }           // Image supplied
     
@@ -228,12 +255,9 @@ else
     }               // Census undefined
 }                   // censusId specified
 
-if ($distID == '')
-{                   // District not supplied
-    $msg                    .= $template['districtMissing']->innerHTML;
-}                   // District not supplied
-else
+if (!is_null($distID))
 {                   // District supplied
+
     if (preg_match("/^[0-9]+(\.5|\.0)?$/", $distID))
     {               // syntactically correct numeric district ID
         $district           = new District(array('d_census' => $censusId,
@@ -249,61 +273,74 @@ else
         else
         {
             $text           = $template['districtUndefined']->innertHTML;
-            $msg            .= str_replace(array('$distID','$censusId'),
+            $districtName   = str_replace(array('$distID','$censusId'),
                                            array($distID, $censusId),
                                            $text);
+            $msg            .= $districtName . '. ';
         }
     }               // syntactically correct numeric district ID
     else
-        $msg                .= $template['districtInvalid']->innerHTML;
-}                   // District supplied
-
-if ($subDistID == '')
-{                   // SubDistrict not supplied
-    $msg                    .= $template['subDistrictMissing']->innerHTML;
-}                   // SubDistrict not supplied
-else
-{                   // SubDistrict identifier supplied
-    $subDist                = new SubDistrict(array('sd_census' => $census,
-                                                    'sd_distid' => $district,
-                                                    'sd_id'     => $subDistID,
-                                                    'sd_div'    => $division,
-                                                    'sd_sched'  => '1'));
-    $pages                  = intval($subDist->get('sd_pages'));
-    $page1                  = intval($subDist->get('sd_page1'));
-    $bypage                 = intval($subDist->get('sd_bypage'));
-
-    if (!$subDist->isExisting())
     {
-        $text               = $template['subdistrictUndefined']->innertHTML;
-        $msg                .= str_replace(array('$subDistID','$distID'),
-                                           array($subDistI, $distID),
-                                           $text);
+        $districtName       = $template['districtInvalid']->innerHTML;
+        $msg                .= $districtName . '. ';
     }
-}                   // SubDistrict identifier supplied
-
-if ($page == '')
-{                   // Page not supplied
-    $msg                        .= $template['pageMissing']->innerHTML;
-}                   // Page not supplied
+}                   // District supplied
 else
-{
-    if (ctype_digit($page))
-    {
-        $page                   = intval($page);
+{                   // District not supplied
+    $districtName           = $template['districtMissing']->innerHTML;
+    $msg                    .= $districtName . '. ';
+}                   // District not supplied
 
-        if ($page < $page1 || 
-            $page > ($page1 + $bypage * ($pages - 1)) ||
-            ($bypage == 2 && ($page % 2) != ($page1 % 2)))
-        {
-            $text               = $template['pageRange']->innerHTML;
-            $msg                .= str_replace('$page', $page, $text);
-        }
+if (!is_null($subDistID))
+{                   // SubDistrict identifier supplied
+    $subDist            = new SubDistrict(array('sd_census' => $census,
+                                                'sd_distid' => $district,
+                                                'sd_id'     => $subDistID,
+                                                'sd_div'    => $division,
+                                                'sd_sched'  => '1'));
+    if ($subDist->isExisting())
+    {
+	    $subDistrictName    = $subDist->get('sd_name');
+	    $pages              = intval($subDist->get('sd_pages'));
+	    $page1              = intval($subDist->get('sd_page1'));
+	    $bypage             = intval($subDist->get('sd_bypage'));
+	    $lastPage           = $page1 + ($pages - 1) * $bypage;
+	    $nextPage           = $page + $bypage;
+        $prevPage           = $page - $bypage;
     }
     else
     {
-        $text                   = $template['pageInvalid']->innerHTML;
-        $msg                    .= str_replace('$page', $page, $text);
+        $text               = $template['subdistrictUndefined']->innertHTML;
+        $subDistrictName    = str_replace(array('$subDistID','$distID'),
+                                           array($subDistI, $distID),
+                                           $text);
+        $msg                .= $subDistrictName . '. ';
+    }
+}                   // SubDistrict identifier supplied
+else
+{                   // SubDistrict identifier missing
+    $subDistrictName        = $template['subDistrictMissing']->innerHTML;
+    $msg                    .= $subDistrictName . ', ';
+}                   // SubDistrict identifier missing
+
+if (is_string($pageText))
+{
+    $text                   = $template['pageInvalid'];
+    $msg                    .= str_replace('$value', $pageText, $text);
+}
+else
+if ($page == 0)
+{                   // Page not supplied
+    $msg                    .= $template['pageMissing']->innerHTML;
+}                   // Page not supplied
+else
+{
+    if ($page < $page1 || 
+        $page > ($page1 + $bypage * ($pages - 1)) ||
+        ($bypage == 2 && ($page % 2) != ($page1 % 2)))
+    {
+        $text               = $template['pageRange']->innerHTML;
+        $msg                .= str_replace('$page', $page, $text);
     }
 }
 
@@ -311,16 +348,12 @@ else
 // proceed to update the database
 if (strlen($msg) == 0)
 {               // no errors in validating page identification
-    $subDistrictName        	= $subDist->get('sd_name');
-    $lastPage               	= $page1 + ($pages - 1) * $bypage;
-    $nextPage               	= intval($page) + $bypage;
-    $prevPage               	= intval($page) - $bypage;
     if ($nextPage > $lastPage)
         $nextPage           	= 0;    // no next page
     if ($prevPage < $page1)
         $prevPage           	= 0;    // no previous page
-    $ptparms                	= array('pt_sdid'   => $subDist,
-                                    'pt_page'   => $page);
+    $ptparms                	= array('sdid'   => $subDist,
+                                        'page'   => $page);
     $pageEntry              	= new Page($ptparms);
 
     // loop through all of the field values passed from
@@ -446,9 +479,9 @@ if (strlen($msg) == 0)
     }           // inserting new record
 
     // register the update in the Pages table
-    $pageEntry->set('pt_population',$count);
-    $pageEntry->set('pt_transcriber',$userid);
-    $pageEntry->set('pt_image', $image);
+    $pageEntry->set('population',$count);
+    $pageEntry->set('transcriber',$userid);
+    $pageEntry->set('image', $image);
     $pageEntry->save($debug);
 
     // ensure the transcription statistics in the District
@@ -483,7 +516,7 @@ $template->set('NEXTPAGE',          $page + $bypage);
 $template->set('CENSUS',            $censusYear);
 $template->set('CONTACTTABLE',      'Census' . $censusYear);
 $template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
-$template->set('IMAGE',             $image);
+$template->set('IMAGE',             htmlspecialchars($image));
 
 if (strlen($province) == 0)
 {

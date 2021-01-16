@@ -61,7 +61,9 @@ use \Templating\Template;
  *      2019/03/12      Surname record not created if not required      *
  *      2019/05/17      initialize SOUNDEX, FIRST, and LAST             *
  *      2020/04/25      correct search for matching records in Names    *
- *                      add link to surnames with same pattern          * 
+ *                      add link to surnames with same pattern          *
+ *		2020/12/05      correct XSS vulnerabilities                     *
+ *      2020/12/14      blog section removed from display only template * 
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -77,6 +79,7 @@ require_once __NAMESPACE__ . '/common.inc';
 // analyze input parameters
 $prefix                 = '';
 $idnr                   = null;
+$idnrtext               = null;
 $given                  = null;
 $surname                = null;
 $surnameRec             = null;
@@ -102,7 +105,9 @@ if (isset($_GET) && count($_GET) > 0)
 	foreach($_GET as $key => $value)
 	{		                    // loop through parameters
 	    $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
-	                        "<td class='white left'>$value</td></tr>\n"; 
+                            "<td class='white left'>" .
+                            htmlspecialchars($value) . "</td></tr>\n";
+        $value          = trim($value); 
 		switch(strtolower($key))
 		{
 		    case 'surname':
@@ -114,7 +119,9 @@ if (isset($_GET) && count($_GET) > 0)
 		    case 'idnr':
             {		            // IDNR specified, deprecated
                 if (ctype_digit($value))
-	                $idnr           = (int)$value;
+                    $idnr           = (int)$value;
+                else
+                    $idnrtext       = htmlspecialchars($value);
 				break;
 		    }		            // surname specified
 	
@@ -179,7 +186,8 @@ if (isset($_GET) && count($_GET) > 0)
 		    }		            // handled by common
 	
 		    default:
-		    {		            // unexpected
+            {		            // unexpected
+                $value              = htmlspecialchars($value);
 				$warn  .= "<p>Unexpected parameter $key='$value'.</p>";
 				break;
 		    }		            // unexpected
@@ -198,7 +206,8 @@ if (isset($_POST) && count($_POST) > 0)
 	foreach($_POST as $key => $value)
 	{		                    // loop through parameters
 	    $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-	                            "<td class='white left'>$value</td></tr>\n"; 
+                            "<td class='white left'>" .
+                            htmlspecialchars($value) . "</td></tr>\n";
 		switch(strtolower($key))
 		{
 		    case 'surname':
@@ -211,6 +220,8 @@ if (isset($_POST) && count($_POST) > 0)
 	        {		            // IDNR specified, deprecated
                 if (ctype_digit($value))
 	                $idnr           = (int)$value;
+                else
+                    $idnrtext       = htmlspecialchars($value);
 				break;
 		    }		            // idnr specified
 	
@@ -230,8 +241,7 @@ if (isset($_POST) && count($_POST) > 0)
 	
 		    case 'lang':
 	        {                   // requested language of display
-	            if (strlen($value) == 2)
-	                $lang           = strtolower($value);            
+	            $lang               = FtTemplate::validateLang($value);
 				break;
 		    }		            // requested language of display
 	
@@ -263,24 +273,33 @@ if (isset($_POST) && count($_POST) > 0)
         $warn       .= $parmsText . "</table>\n";
 }                               // invoked by method=post
 
+$template                           = new FtTemplate("Names$action$lang.html");
+
 if (strlen($given) > 0)
     $nameUri                        = $surname . ', ' . substr($given, 0, 2);
 else
     $nameUri                        = $surname;
 
-$template                           = new FtTemplate("Names$action$lang.html");
 // I18N
 $translate                          = $template->getTranslate();
-$tranTab                            = $translate['tranTab'];
-$genderText                         = array(0 => $tranTab['male'], 
-				                            1 => $tranTab['female'], 
-				                            2 => $tranTab['unknown']); 
+$t                                  = $translate['tranTab'];
+$genderText                         = array(0 => $t['male'], 
+				                            1 => $t['female'], 
+				                            2 => $t['unknown']); 
 
 // identify prefix of the name, usually the first letter
+if (is_string($idnrtext))
+{
+    $msg                    .= "Invalid value for IDNR='$idnrtext'. ";
+}
+else
 if ($idnr)
 {
-    $surnameRec                     = new Surname(array('idnr' => $idnr));
-    $surname                        = $surnameRec['surname'];
+    $surnameRec             = new Surname(array('idnr' => $idnr));
+    if ($surnameRec->isExisting())
+        $surname            = $surnameRec['surname'];
+    else
+        $msg                .= "IDNR value $idnr does not identify an existing Surname record. ";
 }
 if (is_null($surname))
 {		            // missing mandatory parameter
@@ -327,7 +346,7 @@ $getParms['surname']	    = $surname;
 $soundslike                 = $surnameRec['soundslike'];
 $pattern                    = $surnameRec['pattern'];
 $notes                      = $surnameRec['notes'];
-$template->set("SURNAME",           $surname);
+$template->set("SURNAME",           htmlspecialchars($surname));
 $template->set("PREFIX",            $prefix);
 $template->set('TITLE',             $title, true);
 $template->set("IDNR",              $idnr);
@@ -414,13 +433,12 @@ else
     $template->set('DEBUG',             'N');
 
 // check for notes about family
-$notes                      = $surnameRec->get('notes');
+$notes                          = $surnameRec->get('notes');
 $template->set('NOTES',                 $notes);
 $template->set('SOUNDEX',               $soundslike);
 if ($count == 0)
-    $template->set('COUNT',             $tranTab['No']);
-else
-    $template->set('COUNT',             $count);
+    $count                      = $t['No'];
+$template->set('COUNT',                 $count);
 
 $nxparms                        = array('surname' => "^$surname$");
 $nxlist                         = new RecordSet('Names', $nxparms);
@@ -475,34 +493,38 @@ foreach($personList as $idir => $person)
 $template['entry']->update($data);
 
 // show any blog postings
-if ($surnameRec->isExisting())
+$blogElement                = $template['blogEntry'];
+if ($blogElement)
 {
-    $idnr                   = $surnameRec->get('idnr');
-    $blogParms              = array('keyvalue'	        => $idnr,
-	                                'table'				=> 'tblNR');
-    $bloglist               = new RecordSet('Blogs', $blogParms);
-
-	// display existing blog entries
-	$blogElt                = $template['blogEntry'];
-	$data                   = '';
-	foreach($bloglist as $blid => $blog)
-	{		// loop through all blog entries
-	    $blogTemplate       = new Template($blogElt->innerHTML());
-	    $blogTemplate->set('BLID',      $blid);
-	    $datetime           = $blog->getTime();
-	    $blogTemplate->set('DATETIME',  $datetime);
-	    $username           = $blog->getUser();
-	    $blogTemplate->set('USERNAME',  $username);
-	    $text               = $blog->getText();
-	    $text               = str_replace("\n", "</p>\n<p>", $text);
-	    $blogTemplate->set('TEXT',  $text);
-	    if ($username != $userid)
-	        $blogTemplate['blogActions']->update(null);
-	    $data               .= $blogTemplate->compile();
-	}		// loop through all blog entries
-	$template['blogEntry']->update($data);
+	if ($surnameRec->isExisting())
+	{
+	    $idnr                   = $surnameRec->get('idnr');
+	    $blogParms              = array('keyvalue'	        => $idnr,
+		                                'table'				=> 'tblNR');
+	    $bloglist               = new RecordSet('Blogs', $blogParms);
+	
+		// display existing blog entries
+		$blogElt                = $template['blogEntry'];
+		$data                   = '';
+		foreach($bloglist as $blid => $blog)
+		{		// loop through all blog entries
+		    $blogTemplate       = new Template($blogElt->innerHTML());
+		    $blogTemplate->set('BLID',      $blid);
+		    $datetime           = $blog->getTime();
+		    $blogTemplate->set('DATETIME',  $datetime);
+		    $username           = $blog->getUser();
+		    $blogTemplate->set('USERNAME',  $username);
+		    $text               = $blog->getText();
+		    $text               = str_replace("\n", "</p>\n<p>", $text);
+		    $blogTemplate->set('TEXT',  $text);
+		    if ($username != $userid)
+		        $blogTemplate['blogActions']->update(null);
+		    $data               .= $blogTemplate->compile();
+		}		// loop through all blog entries
+		$blogElement->update($data);
+	}
+	else
+	    $blogElement->update(null);
 }
-else
-	$template['blogEntry']->update(null);
 
 $template->display();

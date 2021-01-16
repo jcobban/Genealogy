@@ -28,27 +28,39 @@ use \Exception;
  *		2016/01/26		add "ascites"									*
  *		2016/06/09		add "carcinoma" and "pyelitis"					*
  *		2016/06/24		add "quinsy"									*
+ *		2020/12/06      issue error message if referenced incorrectly   *
  *																		*
- *  Copyright &copy; 2016 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 global $deathcause;
+if (!isset($deathcause))
+{
+    print "<p class='error'>Script DeathCauses.php must be embedded in another script which defines the array \$deathcause.</p>\n";
+    exit;
+}
+
 for ($i = 1; $i <= count($deathcause); $i++)
 {		// loop through all individuals with cause of death
-    $cause		= $deathcause[$i - 1];
+    $cause		        = $deathcause[$i - 1];
 ?>
   <div class='balloon' id='DeathCauseHelp<?php print $i; ?>'>
     <p class='label'>Cause: <?php print $cause; ?></p>
 <?php
-    $causewords		= explode(' ', $cause);
-    $prevword		= '';
-    $needPara		= true;
+    $causewords		    = explode(' ', $cause);
+    $prevword		    = '';
+    $needPara		    = true;
 
     for ($iw = 0; $iw < count($causewords); $iw++)
     {			// loop through all words in cause of death
-		$word	= strtolower($causewords[$iw]);
-		if (substr($word, strlen($word) - 1, 1) == ',')
-		    $word	= substr($word, 0, strlen($word) - 1);
+        // fold to lower case for search
+        $word	        = strtolower($causewords[$iw]);
+        // remove initial or trailing punctuation character
+		while(ctype_punct(substr($word, -1)))
+            $word	    = substr($word, 0, -1);
+        if (ctype_punct(substr($word, 0, 1)))
+            $word	    = substr($word, 1);
+
 		if ($needPara)
 		    print "<p>\n";
 		$needPara	= true;
@@ -440,9 +452,10 @@ for ($i = 1; $i <= count($deathcause); $i++)
 		    case 'dropsy':
 		    {
 ?>
-		    "dropsy" is an abnormal accumulation of fluid beneath the skin or
+            "dropsy" is an abnormal accumulation of fluid beneath
+            the skin or
 		    in one or more cavities of the body.  This is an obsolete term
-		    replaced by <a href='http://en.wikipedia.org/wiki/Edema'>edema</a>.
+		    replaced by <a href='http://en.wikipedia.org/wiki/Edema'>edema(US) or oedema(UK)</a>.
 <?php
 				break;
 		    }
@@ -494,8 +507,9 @@ for ($i = 1; $i <= count($deathcause); $i++)
 		    case 'oedema':
 		    {
 ?>
-		    "Edema" is an abnormal accumulation of fluid beneath the skin or
-		    in one or more cavities of the body. 
+            "Edema" (usually spelled Oedema in Britain) is an abnormal 
+            accumulation of fluid beneath the skin or
+		    in one or more cavities of the body.  Formerly called "dropsy".
 <?php
 				break;
 		    }
@@ -1046,6 +1060,14 @@ for ($i = 1; $i <= count($deathcause); $i++)
 				break;
 		    }
 
+		    case 'parturition':
+		    {
+?>
+		    "Parturition": the act of giving birth
+<?php
+				break;
+		    }
+
 		    case 'pellagra':
 		    case 'pellegra':
 		    {
@@ -1072,6 +1094,17 @@ for ($i = 1; $i <= count($deathcause); $i++)
 		    when the intestines cannot properly absorb vitamin B12.
 		    The "pernicious" aspect of the disease was its invariably
 		    fatal prognosis prior to the discovery of treatment. 
+<?php
+				break;
+		    }
+
+		    case 'praevia':
+		    case 'previa':
+		    {
+?>
+            "Placenta previa": occurs when a baby's placenta partially
+            or totally covers the mother's cervix — the outlet 
+            for the uterus.
 <?php
 				break;
 		    }
@@ -1415,7 +1448,7 @@ for ($i = 1; $i <= count($deathcause); $i++)
 		    }
 
 		    default:
-		    {		// unrecognized word
+            {		// unrecognized word
 				$needPara	= false;
 				break;
 		    }		// unrecognized word

@@ -63,8 +63,9 @@
  *      2020/04/14      do not include descriptive prefixes in search   *
  *      2020/04/26      convert trailing 1/2 into ½                     *
  *      2020/06/28      preserve square brackets around location value  *
+ *      2021/01/13      use ES2015 syntax                               *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -72,7 +73,7 @@
  *                                                                      *
  *  Table for expanding abbreviations for locations                     *
  ************************************************************************/
-var evtLocAbbrs = {
+const evtLocAbbrs = {
                 "1/4" :         "¼",
                 "1/3" :         "&#8531;",
                 "1/2" :         "½",
@@ -125,12 +126,6 @@ var evtLocAbbrs = {
                 "[" :           "[blank]"
                 };
 
-// get an XML file containing dialog templates from the server
-var lang                = 'en';
-var args                = getArgs();
-if ('lang' in args)
-    lang                = args.lang;
-
 /************************************************************************
  *  global flag deferSubmit                                             *
  *                                                                      *
@@ -157,14 +152,14 @@ var housePattern            = new RegExp('^(House|Residence) [a-zA-Z \']*, *');
 
 function locationChanged(ev)
 {
-    var form                    = this.form;
-    var updateButton            = document.getElementById('updEvent');
+    let form                    = this.form;
+    let updateButton            = document.getElementById('updEvent');
     if (updateButton)
         updateButton.disabled   = true;
 
     // get the name of the input field
-    var name;
-    var ider                    = 0;
+    let name;
+    let ider                    = 0;
 
     if (this.name)
         name                    = this.name;
@@ -175,20 +170,20 @@ function locationChanged(ev)
         name                    = '';
 
     // trim off leading and trailing spaces
-    var value                   = this.value.trim();
+    let value                   = this.value.trim();
 
     // convert "1/2" alone or at the end of a number to "½"
-    var halfRegex               = /1\/2([^0-9])/;
+    let halfRegex               = /1\/2([^0-9])/;
     value                       = value.replace(halfRegex, "½$1");
 
     // insert spaces where they should appear but don't
-    var commaRegex              = /,(\w)/g;
+    let commaRegex              = /,(\w)/g;
     value                       = value.replace(commaRegex, ", $1");
-    var digalfaRegex            = /([0-9½])([a-zA-Z]+)/g;
-    var results                 = digalfaRegex.exec(value);
+    let digalfaRegex            = /([0-9½])([a-zA-Z]+)/g;
+    let results                 = digalfaRegex.exec(value);
     if (results)
     {
-        var letters             = results[2];
+        let letters             = results[2];
         if (letters == 'RN' || letters == 'RS' || letters == 'R' ||
             letters == 'NBTR' || letters == 'RSLR' || 
             letters == 'STR' || letters == 'NTR' ||
@@ -199,15 +194,15 @@ function locationChanged(ev)
         else
             value               = value.replace(digalfaRegex, "$1 $2");
     }
-    var alfadigRegex            = /([a-zA-Z])(\d)/g;
+    let alfadigRegex            = /([a-zA-Z])(\d)/g;
     value                       = value.replace(alfadigRegex, "$1 $2");
 
     // if the location has a concession followed by a lot, switch them
-    var conlotRegex             = /^(con \d+)\s([^,]*lot[^,]*)/;
-    var conres                  = conlotRegex.exec(value);
+    let conlotRegex             = /^(con \d+)\s([^,]*lot[^,]*)/;
+    let conres                  = conlotRegex.exec(value);
     if (conres)
     {
-        var len                 = conres[0].length;
+        let len                 = conres[0].length;
         value                   = conres[2] + ' ' + conres[1] + 
                                   value.substring(len);
     }
@@ -217,7 +212,7 @@ function locationChanged(ev)
 
     // if the form has a button named Submit, enable it just in case
     // it was previously disabled
-    var submitButton            = document.getElementById('Submit');
+    let submitButton            = document.getElementById('Submit');
     if (submitButton)
         submitButton.disabled   = false;
 
@@ -229,7 +224,7 @@ function locationChanged(ev)
     }
 
     // capitalize words in value if presentation style requires it
-    var textTransform           = "";
+    let textTransform           = "";
     if (window.getComputedStyle)    // W3C API
         textTransform   = window.getComputedStyle(this, null).textTransform;
     else
@@ -245,24 +240,24 @@ function locationChanged(ev)
 
     // if possible display a loading indicator to the user so he/she is
     // aware that the location lookup is being performed
-    var loc                     = this.value.toLowerCase();
+    let loc                     = this.value.toLowerCase();
     if (loc.length != 0 && loc != '[blank]' && loc != '[n/a]')
     {                       // search only for non-blank location
         popupLoading(this);
 
         // get an XML file containing location information from the database
-        var loc                 = this.value;
-        var results             = housePattern.exec(loc);
-        var locPrefix           = '';
+        let loc                 = this.value;
+        let results             = housePattern.exec(loc);
+        let locPrefix           = '';
         if (results !== null)
         {
             locPrefix           = results[0];
-            var l               = locPrefix.length;
+            let l               = locPrefix.length;
             loc                 = loc.substring(l);
         }
-        var options             = {};
+        let options             = {};
         options.errorHandler    = function() {alert('script getLocationJSON.php not found on the server')};
-        var url                 = "/FamilyTree/getLocationJSON.php?name=" +
+        let url                 = "/FamilyTree/getLocationJSON.php?name=" +
                                     encodeURIComponent(loc) +
                                     "&form=" + this.form.name +
                                     "&field=" + this.name +
@@ -317,27 +312,27 @@ function gotLocationJSON(response)
         }
         else
         {
-            var count               = response.count;
-            var cmd                 = response.cmd;
-            var field               = '';       // initiating field name
+            let count               = response.count;
+            let cmd                 = response.cmd;
+            let field               = '';       // initiating field name
             if ('field' in response.parms)
                 field               = response.parms.field;
-            var formname            = '';       // form containing field
+            let formname            = '';       // form containing field
             if ('form' in response.parms)
                 formname            = response.parms.form;
-            var name                = '';       // search argument
+            let name                = '';       // search argument
             if ('name' in response.parms)
                 name                = response.parms.name;
-            var prefix              = '';       // location name prefix
+            let prefix              = '';       // location name prefix
             if ('prefix' in response.parms)
                 prefix              = response.parms.prefix;
 
             // locate the form containing the element that initiated the request
-            var form                = document.forms[formname];
+            let form                = document.forms[formname];
             if (form instanceof HTMLFormElement)
             {                   // have form
                 // locate the element that initiated the request
-                var element         = form.elements[field];
+                let element         = form.elements[field];
                 if (element instanceof Element)
                 {               // name identifies Element
                     // if there is exactly one location matching the request then
@@ -345,9 +340,9 @@ function gotLocationJSON(response)
                     // name from the database
                     if (count == 1)
                     {           // exactly one matching entry
-                        for(var idlr in response.locations)
+                        for(let idlr in response.locations)
                         {       // examine the one location
-                            var loc         = response.locations[idlr];
+                            let loc         = response.locations[idlr];
                             if (element.value.charAt(0) == '[')
                                 element.value   = '[' + prefix + loc['location'] + ']';
                             else
@@ -356,7 +351,7 @@ function gotLocationJSON(response)
 
                         // location field is updated
                         deferSubmit         = false;
-                        var updateButton    = document.getElementById('updEvent');
+                        let updateButton    = document.getElementById('updEvent');
                         if (updateButton)
                             updateButton.disabled   = false;
 
@@ -369,7 +364,7 @@ function gotLocationJSON(response)
                     else
                     if (count == 0)
                     {           // no matching entries
-                        var parms           = {"template"   : "",
+                        let parms           = {"template"   : "",
                                                 "name"      : name,
                                                 "formname"  : formname,
                                                 "field"     : field};
@@ -380,29 +375,29 @@ function gotLocationJSON(response)
                     }           // no matching entries
                     else
                     {           // multiple matching entries
-                        var parms               = { "template"  : "",
+                        let parms               = { "template"  : "",
                                                     "name"      : name};
-                        var dialog  = displayDialog('ChooseLocationMsg$template',
+                        let dialog  = displayDialog('ChooseLocationMsg$template',
                                                     parms,
                                                     element,    // position
                                                     null,       // button closes
                                                     true);      // defer show
 
                         // update selection list for choice
-                        var form            = dialog.getElementsByTagName('form')[0];
-                        var select          = form.locationSelect;
+                        let form            = dialog.getElementsByTagName('form')[0];
+                        let select          = form.locationSelect;
                         select.onchange     = locationChosen;
                         select.setAttribute("for", field);
                         select.setAttribute("formname", formname);
 
-                        for(var i in response.locations)
+                        for(let i in response.locations)
                         {           // loop through the locations
-                            var loc             = response.locations[i];
-                            var idlr            = loc.idlr;
-                            var locname         = loc.location;
+                            let loc             = response.locations[i];
+                            let idlr            = loc.idlr;
+                            let locname         = loc.location;
 
                             // create option element under select
-                            var option          = new Option(locname,
+                            let option          = new Option(locname,
                                                              idlr, 
                                                              false, 
                                                              false);
@@ -418,9 +413,9 @@ function gotLocationJSON(response)
                         // the following is a workaround for a bug in FF 40.0 and
                         // Chromium in which the onchange method of the <select> is
                         // not called when the mouse is clicked on an option
-                        for(var io=0; io < select.options.length; io++)
+                        for(let io=0; io < select.options.length; io++)
                         {
-                            var option  = select.options[io];
+                            let option  = select.options[io];
                             option.addEventListener("click",
                                                     function() 
                                                     {   this.selected = true;
@@ -463,22 +458,22 @@ function gotLocationJSON(response)
 function closeNewDialog()
 {
     // no longer displaying the modal dialog popup
-    var msgDiv              = document.getElementById('msgDiv');
+    let msgDiv              = document.getElementById('msgDiv');
     msgDiv.style.display    = 'none';   // hide
     deferSubmit             = false;
-    var updateButton        = document.getElementById('updEvent');
+    let updateButton        = document.getElementById('updEvent');
     if (updateButton)
         updateButton.disabled   = false;
 
-    var myform              = this.form;
+    let myform              = this.form;
     if (myform)
     {                           // the dialog includes a form
-        var formname        = '';
-        var field           = '';
-        var elements        = myform.elements;
-        for(var ie = 0; ie < elements.length; ie++)
+        let formname        = '';
+        let field           = '';
+        let elements        = myform.elements;
+        for(let ie = 0; ie < elements.length; ie++)
         {
-            var element     = elements[ie];
+            let element     = elements[ie];
             switch(element.name)
             {
                 case 'formname':
@@ -496,23 +491,23 @@ function closeNewDialog()
         else
         if (field.length > 0)
         {
-            var mainForm    = document.forms[formname];
-            var element     = mainForm.elements[field];
+            let mainForm    = document.forms[formname];
+            let element     = mainForm.elements[field];
             if (element)
-            {                       // found requested field in invoking form
+            {                   // found requested field in invoking form
                 focusNext(element);
-            }                       // found requested field in invoking form
+            }                   // found requested field in invoking form
             else
-            {                       // issue diagnostic
-                var elementList = '';
-                var comma       = '[';
-                for(var fieldname in mainForm.elements)
+            {                   // issue diagnostic
+                let elementList = '';
+                let comma       = '[';
+                for(let fieldname in mainForm.elements)
                 {
                     elementList += comma + fieldname;
                     comma       = ',';
                 }
                 alert("locationCommon.js: closeNewDialog: cannot find input element with name='" + field + "' in form '" + formname + "' elements=" + elementList + "]");
-            }                       // issue diagnostic
+            }                   // issue diagnostic
         }
         else
             alert("locationCommon.js: closeNewDialog: missing element field: " . myform.outerHTML);
@@ -530,16 +525,17 @@ function closeNewDialog()
  *                                                                      *
  *  Input:                                                              *
  *      this                <select> element                            *
+ *      ev                  instance of 'select' Event                  *
  ************************************************************************/
-function locationChosen()
+function locationChosen(ev)
 {
-    var chosenOption    = this.options[this.selectedIndex];
+    let chosenOption    = this.options[this.selectedIndex];
 
     if (chosenOption.value > 0)
     {       // ordinary entry
-        var form        = document.forms[this.getAttribute("formname")];
-        var elementName = this.getAttribute("for");
-        var element     = form.elements[elementName];
+        let form        = document.forms[this.getAttribute("formname")];
+        let elementName = this.getAttribute("for");
+        let element     = form.elements[elementName];
         if (element)
         {
             if (element.value.charAt(0) == '[')
@@ -571,13 +567,13 @@ function locationChosen()
  ************************************************************************/
 function focusNext(element)
 {
-    var form        = element.form;
-    var elements    = form.elements;
-    var searching   = true;
-    var trace       = '';
-    for (var ie = 0; ie < elements.length; ie++)
+    let form        = element.form;
+    let elements    = form.elements;
+    let searching   = true;
+    let trace       = '';
+    for (let ie = 0; ie < elements.length; ie++)
     {               // loop through form elements
-        var e       = elements[ie];
+        let e       = elements[ie];
         if (searching)
             trace   += ", searching " + e.outerHTML;
         else

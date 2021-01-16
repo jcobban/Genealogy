@@ -56,7 +56,8 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // global variables
-$idir		        = null;		// key of record to delete		
+$idir		        = null;		// key of record to delete
+$idirtext           = null;
 $surname		    = '';		// surname from record
 $treename           = '';
 $prefix             = '';
@@ -70,13 +71,14 @@ $personCount	    = 0;
 if (isset($_GET) && count($_GET) > 0)
 {			        // invoked by method=get
     $parmsText      = "<p class='label'>\$_GET</p>\n" .
-                      "<table class='summary'>\n" .
-                      "<tr><th class='colhead'>key</th>" .
-                          "<th class='colhead'>value</th></tr>\n";
+                        "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                            "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>" .
+                            htmlspecialchars($value) . "</td></tr>\n"; 
 	    $value		= trim($value);
 		switch(strtolower($key))
 		{	        // act on specific parameter	
@@ -90,7 +92,9 @@ if (isset($_GET) && count($_GET) > 0)
 				    // available value of IDIR
 				    if ($idir < 1)
 					    $msg	.= "IDIR must be a positive integer. ";
-				}	// integer value
+                }	// integer value
+                else
+                    $idirtext   = htmlspecialchars($value);
 				break;
 		    }		// key of instance of Person
 	
@@ -106,8 +110,9 @@ if (isset($_GET) && count($_GET) > 0)
 		    }		// activate debugging
 	
 		    default:
-		    {
-				$warn	.= "Unexpected parameter $key='$value'. ";
+            {
+                $value      = htmlspecialchars($value);
+				$warn	    .= "Unexpected parameter $key='$value'. ";
 				break;
 		    }
 		}	        // act on specific parameter	
@@ -120,17 +125,17 @@ $template           = new FtTemplate("deleteIndivid$lang.html");
 
 $nameuri	        = '';
 if (!is_null($idir) && $idir > 0)
-{			// get the requested person
+{			            // get the requested person
 	$person		    = new Person(array('idir' => $idir));
 	if ($person->isExisting())
-	{			// person is defined
+	{			        // person is defined
 	    if (canUser('edit'))
-	    {		// not signed on as a contributor
+	    {		        // signed on as a contributor
 			if (!$person->isOwner())
-			{		// user is not authorized to edit this record
+			{		    // user is not authorized to edit this record
 			    $msg	.= 'Current user is not authorized to delete this person.  Contact the administrator or an existing owner of this family for permission.';
-			}		// user is not authorized to edit this record
-	    }		// not signed on as a contributor
+			}		    // user is not authorized to edit this record
+	    }		        // signed on as a contributor
 	    else
 			$msg	.= 'Please sign on as a contributor to the site. ';
 	     

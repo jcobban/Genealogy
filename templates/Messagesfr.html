@@ -1,0 +1,74 @@
+<!--*********************************************************************
+ *  Messagesen.html														*
+ *																		*
+ *  French language template for the Messages management page			*
+ *																		*
+ *  History:															*
+ *		2020/10/28		Created											*
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=fr">Généalogie</a>:
+    </div>	
+    <div class="body">
+      <h1 class="clear">Gestion des Messages
+        <span class="right">
+		  <a href="/MessagesHelpfr.html" target="help">?&nbsp;Aide</a>
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <form name="blogForm" id="blogform">
+          <p class="clear">
+		    <span class="pad">
+		      <button type="button" id="Close">
+		        Fermer
+		      </button>
+		    </span>
+          </p>
+        <div id="blog$blid">
+          <p class="label">
+		    A $datetime l'usager '$username' 
+		    a écrit:
+          </p>
+          <p>
+		    $text 
+          </p>
+          <p>
+		    <!-- Note that any characters that occur between the opening and
+		         closing textarea tags become part of the value of the tag-->
+		    <textarea name="message$blid"
+			    rows="5" cols="80"></textarea>
+          </p>
+          <p>
+		    <button type="button" id="Delete$blid">
+		      Effacer le Message
+		    </button>
+		    &nbsp;
+		    <button type="button" id="Reply$blid">
+		      Répondre au Message 
+		    </button>
+          </p>
+        </div>
+      </form>
+    </div> <!-- div class="body" -->
+    <div class="balloon" id="HelpClose">
+	  Cliquer sur ce bouton avec la souris pour fermer la boîte de dialogue.
+	  Comme raccourci, vous pouvez également fermer la boîte de dialogue
+      en appuyant sur la combinaison de touches alt-C.
+    </div>
+    <div id="HelpDelete" class="balloon">
+	  Cliquez sur ce bouton pour supprimer le message.
+    </div>
+    <div id="HelpReply" class="balloon">
+	  Cliquez sur ce bouton pour répondre au message.
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="text/javaScript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="text/javaScript">
+    </script>
+    <script src="/Messages.js" type="text/javaScript">
+    </script>

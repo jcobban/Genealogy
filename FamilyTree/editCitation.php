@@ -49,6 +49,7 @@ use \Exception;
  *      2019/07/28      use Template                                    *
  *      2019/07/30      use $record->selected                           *
  *      2019/11/17      move CSS to <head>                              *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
@@ -59,9 +60,11 @@ require_once __NAMESPACE__ . '/common.inc';
 // locate the required citation based upon the parameters passed
 // to the page
 $idsx                   = null;
-$idsxtext               = 'missing';
+$idsxtext               = null;
 $idime                  = null;
+$idimetext              = null;
 $type                   = null;
+$typetext               = null;
 $citation               = null;
 $lang                   = 'en';
 
@@ -75,7 +78,8 @@ if (count($_GET) > 0)
     foreach($_GET as $key => $value)
     {           // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n";
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
         switch(strtolower($key))
         {       // act on specific parameter
             case 'idsx':
@@ -83,7 +87,7 @@ if (count($_GET) > 0)
                 if (ctype_digit($value))
                     $idsx           = (int)$value;
                 else
-                    $idsxtext       = $value;
+                    $idsxtext       = htmlspecialchars($value);
                 break;
             }       // identifier of instance of Citation
 
@@ -91,6 +95,8 @@ if (count($_GET) > 0)
             {
                 if (ctype_digit($value))
                     $idime          = (int)$value;
+                else
+                    $idimetext      = htmlspecialchars($value);
                 break;
             }
 
@@ -98,6 +104,8 @@ if (count($_GET) > 0)
             {
                 if (ctype_digit($value))
                     $type           = (int)$value;
+                else
+                    $typetext      = htmlspecialchars($value);
                 break;
             }
 
@@ -118,6 +126,7 @@ if (count($_GET) > 0)
 
             default:
             {       // anything else
+                $value          = htmlspecialchars($value);
                 $warn           .= "<p>Unexpected parameter $key='$value'.</p>";
                 break;
             }       // anything else
@@ -138,38 +147,68 @@ $template->updateTag('otherStylesheets',
 $translate          = $template->getTranslate();
 $citText            = $translate['typeText'];
 
-if (is_null($idsx))
+if (is_string($idimetext))
+    $msg            .= "Invalid value for IDIME='$idimetext'. ";
+if (is_string($typetext))
+    $msg            .= "Invalid value for type='$typetext'. ";
+if (is_string($idsxtext))
+    $msg            .= "Invalid value for IDSX='$idsxtext'. ";
+
+if (is_null($idsx) && !is_null($idime) && !is_null($type))
     $citation       = new Citation(array('idime'    => $idime,
                                          'type'     => $type));
 else
+if (!is_null($idsx))
     $citation       = new Citation(array('idsx'     => $idsx));
+else
+    $msg            .= 'Missing mandatory parameter to identify citation. ';
 
-$citmsg             = $citation->getErrors();
-if (strlen($citmsg) == 0)
+if ($citation)
 {
-    $template->set('IDSX',              $idsx);
-    $template->set('IDIME',             $citation['idime']);
-    $citType        = $citation['type'];
-    $template->set('CITTYPE',           $citType);
-    $typeText       = $citText[$citType];
-    $template->set('CITTYPETEXT',       $typeText);
-    $name           = $citation->getRecord()->getName() . ', ' . $typeText;
-    $template->set('NAME',              $name);
-    $key            = Citation::$recType[$citation->getCitType()];
-    $template->set('CITKEY',            $key);
-    $template->set('DETAIL',            $citation['srcdetail']);
-    $template->set('DETAILTEXT',        $citation['srcdettext']);
-    $template->set('DETAILNOTE',        $citation['srcdetnote']);
-    $sources                        = new RecordSet('Sources');
-    $citidsr                        = $citation['idsr'];
-    $template->set('IDSR',              $citidsr);
-    $sources[$citidsr]->selected    = true;
-    $template['source$idsr']->update($sources);
+    if ($citation->isExisting())
+	{
+	    $citmsg             = $citation->getErrors();
+		if (strlen($citmsg) == 0)
+		{
+		    $template->set('IDSX',              $idsx);
+		    $template->set('IDIME',             $citation['idime']);
+		    $citType        = $citation['type'];
+		    $template->set('CITTYPE',           $citType);
+		    $typeText       = $citText[$citType];
+		    $template->set('CITTYPETEXT',       $typeText);
+		    $name           = $citation->getRecord()->getName() . ', ' . $typeText;
+		    $template->set('NAME',              $name);
+		    $key            = Citation::$recType[$citation->getCitType()];
+		    $template->set('CITKEY',            $key);
+		    $template->set('DETAIL',            $citation['srcdetail']);
+		    $template->set('DETAILTEXT',        $citation['srcdettext']);
+		    $template->set('DETAILNOTE',        $citation['srcdetnote']);
+		    $sources                        = new RecordSet('Sources');
+		    $citidsr                        = $citation['idsr'];
+		    $template->set('IDSR',              $citidsr);
+		    $sources[$citidsr]->selected    = true;
+		    $template['source$idsr']->update($sources);
+		}
+		else
+		{
+		    $name           = "Invalid";
+		    $template->set('NAME',              $name);
+		    $template['citForm']->update(null);
+	    }
+    }
+    else
+	{
+        $msg        .= "Parameters do not identify an existing instance of Citation. ";
+		$name           = "Invalid";
+	    $template['citForm']->update(null);
+		$template->set('NAME',              $name);
+    }
 }
 else
 {
     $name           = "Invalid";
     $template['citForm']->update(null);
+	$template->set('NAME',              $name);
 }
 
 $template->display();

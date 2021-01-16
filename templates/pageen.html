@@ -27,6 +27,7 @@
     <meta name="author" content="James A. Cobban">
     <meta name="copyright" content="&copy; 2019 James A. Cobban">
     <meta name="keywords" content="genealogy, family, tree, ontario, canada $KEYWORDS">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/styles.css">
     <link rel="stylesheet" type="text/css" href="$filename.css"
             id="otherStylesheets">
@@ -43,6 +44,7 @@
 	    toolbar             : "undo redo | styleselect | bold italic | " 
 	                           + "alignleft aligncenter alignright alignjustify | " 
 	                           + "bullist numlist | link image",
+        height              : "170px",
 	    content_css		    : "/styles.css"
 	};
 	
@@ -108,10 +110,14 @@
           <a href="/Account.php?lang=$LANG" id="session" target="_blank"
               title="Your account status" class="menuitem">
               Account $USERID
+          <br></a>
+          <a href="/Messages.php?lang=$LANG" id="messages" target="_blank"
+              title="Your messages" class="menuitem">
+              Messages
             <span id="gotMail">
                 <img src="/envelope.svg" alt="You have mail" style="display: inline-block; height: 19px;"/>
             </span>
-          </a><br>
+          <br></a>
       </span>
       <span id="UserInfoAbout">About this Site</span>
     </div>

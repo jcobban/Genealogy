@@ -2934,10 +2934,14 @@ function showImage(event)
     var  lang               = 'en';
     if ('lang' in args)
         lang                = args['lang'];
-    var imageUrl            = "/DisplayImage.php?src=" + image +
+    var imageUrl            = "/DisplayImage.php?src=" + encodeURIComponent(image) +
                                             "&buttonname=imageButton" +
                                             "&lang=" + lang;
     var  dotPos             = image.lastIndexOf('.');
+    if (image.substring(0,41) == 'https://central.bac-lac.gc.ca/.item/?app=')
+    {
+    }
+    else
     if (dotPos >= 0)
     {
         var  imageType      = image.substring(dotPos + 1).toLowerCase();
@@ -2950,7 +2954,7 @@ function showImage(event)
 
     // replace button with copyright notice
     var copNotice           = document.getElementById('imageCopyrightNote');
-    var showNotice           = document.getElementById('showCopyrightNote');
+    var showNotice          = document.getElementById('showCopyrightNote');
     if (copNotice && showNotice === null)
     {           // add copyright notice
         var clone           = copNotice.cloneNode(true);
@@ -2969,9 +2973,15 @@ function showImage(event)
     this.disabled           = true;
 
     // display the image in the right half of the window
-    openFrame("imageFrame",
-              imageUrl,
-              "right");
+    if (imageUrl.substring(0,23) == 'https://www.ancestry.ca')
+        window.open(imageUrl, '_blank');
+    else
+    {
+        openFrame("imageFrame",
+                  imageUrl,
+                  "right");
+    }
+
     return false;   // do not perform defaul action for button
 }   // function showImage
 

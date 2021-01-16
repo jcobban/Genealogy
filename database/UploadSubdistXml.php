@@ -25,6 +25,7 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2015/09/28		migrate from MDB2 to PDO						*
  *						use multiple row insert to speed up load		*
+ *		2020/10/10      remove field prefix for Pages table             *
  *																		*
  *  Copyright &copy; 2015 James A. Cobban								*
  ************************************************************************/
@@ -73,7 +74,7 @@ foreach ($_POST as $key => $value)
     			$distId	= $result[1];	// integral portion only
     		}
     		$sel	.= $and . 'District=' . $value;
-    		$ptsel	.= $and . 'PT_DistId=' . $value;
+    		$ptsel	.= $and . 'Pages.DistId=' . $value;
     		$and	= ' AND ';
     		break;
         }		// District number
@@ -104,7 +105,7 @@ foreach ($_POST as $key => $value)
         {	// subdistrict code
     		$subdistId	= $value;
     		$sel	.= $and . 'SubDistrict=' . $connection->quote($value);
-    		$ptsel	.= $and . 'PT_SdId=' . $connection->quote($value);
+    		$ptsel	.= $and . 'Pages.SdId=' . $connection->quote($value);
     		$and	= ' AND ';
     		break;
         }	// subdistrict code
@@ -113,7 +114,7 @@ foreach ($_POST as $key => $value)
         {	// division code
     		$division	= $value;
     		$sel	.= $and . 'Division=' . $connection->quote($value);
-    		$ptsel	.= $and . 'PT_Div=' . $connection->quote($value);
+    		$ptsel	.= $and . 'Pages.`Div`=' . $connection->quote($value);
     		$and	= ' AND ';
     		break;
         }	// division code
@@ -122,7 +123,7 @@ foreach ($_POST as $key => $value)
         {	// page code
     		$page	= $value;
     		$sel	.= $and . 'Page=' . $connection->quote($value);
-    		$ptsel	.= $and . 'PT_Page=' . $connection->quote($value);
+    		$ptsel	.= $and . 'Pages.Page=' . $connection->quote($value);
     		$and	= ' AND ';
     		break;
         }	// page code
@@ -169,7 +170,7 @@ if (strlen($msg) == 0)
     {		// pre-confederation
         $sel	.= $and . 'Province=' . $connection->quote($province);
     }		// pre-confederation
-    $ptsel		.= $and . 'PT_Census=' . $connection->quote($censusId);
+    $ptsel		.= $and . 'Pages.Census=' . $connection->quote($censusId);
 
     // prepare to update the production server
     $dsn		= $servers['remote'];
@@ -320,7 +321,7 @@ if (strlen($msg) == 0)
     			    $stmt	= $connection2->prepare($insert); 
     			}		// create template insert
     			print "<execute>";
-    			print 'page=' . $row['pt_page'];
+    			print 'page=' . $row['page'];
     			print "</execute>\n";
     			if ($stmt->execute($row))
     			{

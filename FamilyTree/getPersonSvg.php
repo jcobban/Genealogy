@@ -34,6 +34,7 @@ use \Templating\Template;
  *						script renamed to getPersonSvg.php				*
  *		2018/02/10		use Template for internationalization			*
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James Alan Cobban								*
  ************************************************************************/
@@ -53,20 +54,20 @@ $seqid	= 1;
  *  parents																*
  *																		*
  *  Input:																*
- *		$id				IDIR of individual								*
+ *		$idir			IDIR of individual							    *
  *		$x				X coordinate of top left corner of space		*
  *		$y				Y coordinate of top left corner of space		*
  ************************************************************************/
-function display($id, $x, $y)
+function display($idir, $x, $y)
 {
     global	$seqid;
     global	$bprivlim;
     global	$dprivlim;
     
-    $person		= new Person(array('idir' => $id));
-    $families	= $person->getFamilies();
-    $allParents	= $person->getParents();
-    $familyCount	= $families->count();
+    $person		        = new Person(array('idir' => $idir));
+    $families	        = $person->getFamilies();
+    $allParents	        = $person->getParents();
+    $familyCount	    = $families->count();
     if ($familyCount > 1)
     {		// at least two marriages
         // display 1st spouse to left of individual
@@ -75,15 +76,15 @@ function display($id, $x, $y)
         if (count($allParents) > 0)
         {	// display first set of parents
             // center prime under parents
-            $mainy		= $y + 200;
+            $mainy		    = $y + 200;
             displayParents($person, $x + 150, $y);
         }	// display first set of parents
         else
         {	// no parents
-            $mainy		= $y;
+            $mainy		    = $y;
         }	// no parents
-        $spousex		= $x;
-        $mainx		= $x + 300;
+        $spousex		    = $x;
+        $mainx		        = $x + 300;
     
         // display prime
         displayBox($person, 
@@ -99,59 +100,59 @@ function display($id, $x, $y)
         if (count($allParents) > 0)
         {	// display first set of parents
             // center prime under parents
-            $mainy		= $y + 200;
-            $mainx		= $x + 150;
+            $mainy		    = $y + 200;
+            $mainx		    = $x + 150;
             displayParents($person, $x, $y);
         }	// display first set of parents
         else
         {	// no parents
-            $mainx	= $x;
-            $mainy	= $y;
+            $mainx	        = $x;
+            $mainy	        = $y;
         }	// no parents
     
         displayBox($person, $mainx, $mainy, 200, 100);
-        $spousex	= $mainx + 300;
+        $spousex	        = $mainx + 300;
     }		// no or only 1 marriage
     
     // show information about families in which this individual 
     // is a spouse or partner
     if ($familyCount > 0)
     {		// show spouses
-        $im		= 1;
-        $cx		= $x;
-        $cy		= $mainy + 200;
+        $im		            = 1;
+        $cx		            = $x;
+        $cy		            = $mainy + 200;
         foreach($families as $fidmr => $family)
         {		// loop through marriages
             if ($person->getGender() == Person::FEMALE)
             {		// female
         		$spsSurname	= $family->get('husbsurname');
         		$spsGiven	= $family->get('husbgivenname');
-        		$spsid	= $family->get('idirhusb');
+        		$spsid	    = $family->get('idirhusb');
             }		// female
             else
             {		// male
         		$spsSurname	= $family->get('wifesurname');
         		$spsGiven	= $family->get('wifegivenname');
-        		$spsid	= $family->get('idirwife');
+        		$spsid	    = $family->get('idirwife');
             }		// male
     
             // information about spouse
             if ($spsid > 0)
             {
-        		$spouse	= new Person(array('idir' => $spsid));
+        		$spouse	        = new Person(array('idir' => $spsid));
         		if ($im > 1 && $spousex < $cx + 300)
         		    $spousex	= $cx + 300;
         		displayBox($spouse, $spousex, $mainy, 200, 100);
             }
     
             // draw connecting line to represent marriage link
-            $starty	= $mainy + 50;
+            $starty	            = $mainy + 50;
             if ($im > 2)
             {
-        		$startx	= $spousex - 50;
-        		$length	= 25*$im;
-        		$horizy	= $starty - $length;
-        		$length	= $startx - $mainx - 200;
+        		$startx	        = $spousex - 50;
+        		$length	        = 25*$im;
+        		$horizy	        = $starty - $length;
+        		$length	        = $startx - $mainx - 200;
 ?>
     <path style='fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none'
             d='m <?php print $startx; ?>,<?php print $starty; ?> 0,-<?php print $length; ?> 0,0'
@@ -160,18 +161,18 @@ function display($id, $x, $y)
             d='m <?php print $startx; ?>,<?php print $horizy; ?> -<?php print $length; ?>,0 0,0'
             id='path<?php print $seqid++; ?>' />
 <?php
-        		$length	= 50;
+        		$length	        = 50;
             }
             else
             if ($spousex > $mainx)
             {
-        		$startx	= $mainx + 200;
-        		$length	= $spousex - $startx;
+        		$startx	        = $mainx + 200;
+        		$length	        = $spousex - $startx;
             }
             else
             {
-        		$startx	= $spousex + 200;
-        		$length	= $mainx - $startx;
+        		$startx	        = $spousex + 200;
+        		$length	        = $mainx - $startx;
             }
 ?>
     <path style='fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none'
@@ -179,11 +180,11 @@ function display($id, $x, $y)
             id='path<?php print $seqid++; ?>' />
 <?php
             // display date of marriage
-            $mdateo	= new LegacyDate($family->get('mard'));
-            $mdate	= $mdateo->toString($dprivlim, false);
-            $textx	= min($startx + 10, 
-        			      max($spousex, $mainx) - 90);
-            $texty	= $starty - 10;
+            $mdateo	            = new LegacyDate($family->get('mard'));
+            $mdate	            = $mdateo->toString($dprivlim, false);
+            $textx	            = min($startx + 10, 
+        			              max($spousex, $mainx) - 90);
+            $texty	            = $starty - 10;
 ?>
     <text id='text<?php print $seqid++; ?>'
             y='<?php print $texty; ?>' x='<?php print $textx; ?>'
@@ -197,27 +198,27 @@ function display($id, $x, $y)
 <?php
     
             // display information about children
-            $children	= $family->getChildren();
-            $numChildren	= $children->count();
+            $children	        = $family->getChildren();
+            $numChildren	    = $children->count();
             if ($numChildren > 0)
             {	// found at least one child record
         		// draw line down to line connecting children
         		if ($spousex > $mainx)
-        		    $vertx	= $spousex - 50;
+        		    $vertx	    = $spousex - 50;
         		else
-        		    $vertx	= $mainx - 50;
-        		$starty	= $mainy + 50;
-        		$length	= 100;
+        		    $vertx	    = $mainx - 50;
+        		$starty	        = $mainy + 50;
+        		$length	        = 100;
 ?>
     <path style='fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none'
             d='m <?php print $vertx; ?>,<?php print $starty; ?> 0,100 0,0'
             id='path<?php print $seqid++; ?>' />
 <?php
         		// draw line connecting children
-        		$startx	= $cx + 100;
-        		$starty	= $mainy + 150;
-        		$length	= max(250 * ($numChildren - 1),
-        				  $vertx - $startx) ;
+        		$startx	        = $cx + 100;
+        		$starty	        = $mainy + 150;
+        		$length	        = max(250 * ($numChildren - 1),
+        				          $vertx - $startx) ;
 ?>
     <path style='fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none'
             d='m <?php print $startx; ?>,<?php print $starty; ?> <?php print $length; ?>,0 0,0'
@@ -227,9 +228,9 @@ function display($id, $x, $y)
         		foreach($children as $cidir => $child)
         		{		// loop through all child records
         		    // draw line from line connecting children to child
-        		    $startx	= $cx + 100;
-        		    $starty	= $mainy + 150;
-        		    $length	= 50;
+        		    $startx	    = $cx + 100;
+        		    $starty	    = $mainy + 150;
+        		    $length	    = 50;
 ?>
     <path
     style='fill:#000000;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none'
@@ -237,19 +238,19 @@ function display($id, $x, $y)
     id='path<?php print $seqid++; ?>' />
 <?php
     
-        		    $child	= $child->getPerson();
+        		    $child	    = $child->getPerson();
         		    displayBox($child, $cx, $cy, 200, 100);
-        		    $cx	+= 250;
+        		    $cx	        += 250;
         		}		// loop through all child records
             }		// found at least one child record
             else
-        		$cx		+= 250;
+        		$cx		        += 250;
             $im++;	// marriage index
     
             if ($spousex == $x)
-        		$spousex	+= 600;
+        		$spousex	    += 600;
             else
-        		$spousex	+= 300;
+        		$spousex	    += 300;
         }		// loop through marriages
     }			// show spouses
 }		// function display
@@ -272,7 +273,7 @@ function displayBox($person, $x, $y, $width, $height)
     global $bprivlim;
     global $dprivlim;
     
-    $id		= $person->getId();
+    $idir		= $person->getId();
     
     $textx		= $x + 15;
     $texty		= $y + 25;
@@ -334,7 +335,7 @@ function displayBox($person, $x, $y, $width, $height)
         		id='rect<?php print $seqid++; ?>'
         		width='<?php print $width; ?>' height='<?php print $height; ?>'
         		x='<?php print $x; ?>' y='<?php print $y; ?>' />
-        <a xlink:href='getPersonSvg.php?id=<?php print $id; ?>'>
+        <a xlink:href='getPersonSvg.php?id=<?php print $idir; ?>'>
           <text id='text<?php print $seqid++; ?>'
         		y='<?php print $texty; ?>' x='<?php print $textx; ?>'
         		style='font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans'
@@ -450,8 +451,9 @@ function displayParents($person, $x, $y)
  *  Open Code															*
  ************************************************************************/
 
-$id			= null;
-$lang		= 'en';
+$idir			    = null;
+$idirtext		    = null;
+$lang		        = 'en';
 
 if (isset($_GET) && count($_GET) > 0)
 {			        // invoked by method=get
@@ -462,16 +464,18 @@ if (isset($_GET) && count($_GET) > 0)
     foreach($_GET as $key => $value)
     {			    // loop through parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                            htmlspecialchars($value) . 
+                        "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		    // act on specific keys
 	        case 'id':
 	        case 'idir':
 	        {
 	    		if (ctype_digit($value) && $value > 0)
-	    		    $id		= intval($value);
-	    		else
-	    		    $msg	.= "Invalid value $key='$value'. ";
+	    		    $idir		        = intval($value);
+                else
+                    $idirtext       = htmlspecialchars($value);
 	    		break;
 	        }
 	
@@ -483,19 +487,30 @@ if (isset($_GET) && count($_GET) > 0)
 	    }		    // act on specific keys
 	}			    // loop through parameters
     if ($debug)
-        $warn   .= $parmsText . "</table>\n";
+        $warn           .= $parmsText . "</table>\n";
 }			        // invoked by method=get
 
-if (is_null($id))
-    $msg	.= 'Missing parameter idir=. ';
+$tempBase		= $document_root . '/templates/';
+$filename		= "getPersonSVG$lang.xml";
+if (!file_exists($tempBase . $filename))
+    $filename	= "getPersonSVGen.xml";
+$template		= new Template($tempBase . $filename);
+$template->set('TITLE', 'Graphical Family Tree');
 
-$width			= 800;
+if (is_string($idirtext))
+    $msg	            .= "Invalid value $key='$value'. ";
+else
+if (is_null($idir))
+    $msg	            .= 'Missing parameter idir=. ';
+
+$width			        = 800;
+
 if (strlen($msg) == 0)
 {			// no errors so far
-    try
+    $person		        = new Person(array('idir' => $idir));
+    if ($person->isExisting())
     {
-        $person		= new Person(array('idir' => $id));
-        $name		= $person->getName();
+        $name		    = $person->getName();
         $totChildren	= 0;
 
         // show information about families in which this individual 
@@ -509,20 +524,14 @@ if (strlen($msg) == 0)
         $width	= max(max(400 + 250 * $totChildren, 700), 
     				500 + 300*$families->count());
     }
-    catch(Exception $e)
+    else
     {
-        $msg	.= $e->getMessage();
+        $msg	        .= "IDIR='$value' does not identify an existing Person in the family tree. ";
     }
 }			// no errors so far
 
 // display the results
 
-$tempBase		= $document_root . '/templates/';
-$filename		= "getPersonSVG$lang.xml";
-if (!file_exists($tempBase . $filename))
-    $filename	= "getPersonSVGen.xml";
-$template		= new Template($tempBase . $filename);
-$template->set('TITLE', 'Graphical Family Tree');
 if (strlen($msg) > 0)
 {		// display error message
     $template->updateTag('text_seqid_1', array('msg'	=> $msg));
@@ -535,17 +544,10 @@ else
 {		// display a box for the individual
     $template->updateTag('text_seqid_1', null);
     $template->updateTag('text_seqid_3', array('name'	=> $name));
-    try {
-        ob_start();
-        display($id, 140, 100);
-        $template->set('TREE', ob_get_clean());
-        $template->updateTag('text_seqid_7', null);
-    } catch (Exception $e)
-    {
-        $eMessage		= $e->getMessage();
-        $template->set('TREE', ob_get_clean());
-        $template->updateTag('text_seqid_7', array('eMessage' => $eMessage));
-    }	// catch
+    ob_start();
+    display($idir, 140, 100);
+    $template->set('TREE', ob_get_clean());
+    $template->updateTag('text_seqid_7', null);
 }		// display a box for the individual
 
 $template->display();

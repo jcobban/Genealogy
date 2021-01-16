@@ -5,7 +5,7 @@ use \Exception;
 /************************************************************************
  *  detChildXml.php														*
  *																		*
- *  Detach a specific individual as a child on a specific family.		*
+ *  Detach a specific individual as a child from a specific family.		*
  *																		*
  *  Parameters:															*
  *		idcr			unique key of child record in tblCR				*
@@ -32,8 +32,10 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2017/08/08		class LegacyChild renamed to class Child		*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
+ *      2020/12/05      correct XSS vulnerabilities                     *
+ *                      improve error handling                          *
  *																		*
- *  Copyright 2017 &copy; James A. Cobban								*
+ *  Copyright 2020 &copy; James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Person.inc";
@@ -44,55 +46,70 @@ require_once __NAMESPACE__ . '/common.inc';
 print("<?xml version='1.0' encoding='UTF-8'?>\n");
 print "<detached>";
 
-$child	= null;
-$idcr	= null;
-$idir	= null;
-$idmr	= null;
+$child  	= null;
+$idcr   	= null;
+$idir   	= null;
+$idmr   	= null;
+$childtext	= null;
+$idcrtext	= null;
+$idirtext	= null;
+$idmrtext	= null;
+$parmsText  = '';
 
 // examine parameters
-    print "    <parms>\n";
-    foreach($_POST as $name => $value)
-    {
-        switch(strtolower($name))
+if (isset($_GET) && count($_GET) > 0)
+{		                        // parameters passed by method=post
+    foreach($_GET as $key => $value)
+    {		                    // loop through all parameters
+        $parmsText      .= "        <$key>" .
+                            htmlspecialchars($value) . "</$key>\n"; 
+		switch(strtolower($key))
         {
     		case 'idcr':
-    		{
-    		    $idcr	= $value;
-    		    if (!ctype_digit($idcr) || $idcr < 1)
-    			$msg	.= "Invalid value of IDCR=$idcr. ";
+            {
+                if (ctype_digit($value))
+    		        $idcr	        = $value;
+                else
+                    $idcrtext       = htmlspecialchars($value);
     		    break;
     		}
     
     		case 'idir':
     		{
-    		    if (strlen($value) > 0)
-    		    {
-    			$idir	= $value;
-    			if (!ctype_digit($idir) || $idir < 1)
-    			    $msg	.= "Invalid value of IDIR=$idir. ";
-    		    }
+                if (ctype_digit($value))
+    		        $idir	        = $value;
+                else
+                    $idirtext       = htmlspecialchars($value);
     		    break;
     		}
     
     		case 'idmr':
     		{
-    		    if (strlen($value) > 0)
-    		    {
-    			$idmr	= $value;
-    			if (!ctype_digit($idmr) || $idmr < 1)
-    			    $msg	.= "Invalid value of IDMR=$idmr. ";
-    		    }
+                if (ctype_digit($value))
+    		        $idmr	        = $value;
+                else
+                    $idmrtext       = htmlspecialchars($value);
     		    break;
     		}
     
         }
-        print "\t<$name>$value</$name>\n";
     }
-    print "    </parms>\n";
+    $parmsText          .= "</table>\n";
+}
+print "    <parms>\n$parmsText    </parms>\n";
 
 // validate parameters
+if (is_string($idcrtext))
+    $msg	        .= "Invalid value of IDCR=$idcrtext. ";
+else
 if ($idcr == null)
-    $msg	.= 'Missing mandatory parameter idcr. ';
+    $msg	        .= 'Missing mandatory parameter idcr. ';
+
+if (is_string($idirtext))
+    $msg	        .= "Invalid value of IDIR=$idirtext. ";
+
+if (is_string($idmrtext))
+    $msg	        .= "Invalid value of IDMR=$idmrtext. ";
 
 if (!canUser('edit'))
 {		// not authorized
@@ -101,22 +118,25 @@ if (!canUser('edit'))
 
 if (strlen($msg) == 0)
 {		// no errors so far
-    try {
-        $child	= new Child(array('idcr' => $idcr));
-        if (!is_null($idir) && $idir != $child->getIdir())
-    		$msg	.= "IDIR " . $child->getIdir() . " in Child record does not match explicit IDIR=$idir. ";
-        if (!is_null($idmr) && $idmr != $child->getIdmr())
-    		$msg	.= "IDMR " . $child->getIdmr() . " in Child record does not match explicit IDMR=$idmr. ";
-        $idir	= $child->getIdir();
-        $person	= new Person(array('idir' => $idir));
+    $child	        = new Child(array('idcr' => $idcr));
+    if ($child->isExisting())
+    {
+        $cidir      = $child['idir'];
+        $cidmr      = $child['idmr'];
+        if (!is_null($idir) && $idir != $cidir)
+    		$msg	.= "IDIR $cidir in Child record does not match explicit IDIR=$idir. ";
+        if (!is_null($idmr) && $idmr != $cidmr)
+    		$msg	.= "IDMR $cidmr in Child record does not match explicit IDMR=$idmr. ";
+        $idir	    = $cidir;
+        $person	    = new Person(array('idir' => $idir));
 
         // determine if permitted to detach child
         if (!$person->isOwner())
     		$msg	.= 'User is not an owner of individual ' . $idir . '. ';
     }
-    catch(Exception $e)
+    else
     {
-        $msg	.= $e->getMessage();
+        $msg	.= "There is no existing Child record with IDCR=$idcr. ";
     }
 }		// no errors so far
 

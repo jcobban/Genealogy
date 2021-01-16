@@ -51,6 +51,7 @@ use \Exception;
  *		                the page table update                           *
  *		                use FtTemplate                                  *
  *		2020/05/03      add default for censusId                        *
+ *		2020/10/10      remove field prefix for Pages table             *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -60,7 +61,7 @@ require_once __NAMESPACE__ . '/Page.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // variables for constructing the main SQL SELECT statement
-$flds	    = "PT_Census, PT_DistId, PT_SdId, PT_Div, PT_Page, PT_Population, PT_Transcriber, PT_ProofReader, PT_Image";
+$flds	    = "Census, DistId, SdId, Div, Page, Population, Transcriber, ProofReader, Image";
 $tbls	    = "Pages";
 
 // identify the specific Division
@@ -235,29 +236,29 @@ if (strlen($msg) == 0)
 		}
 		switch(strtolower($fldname))
 		{	                        // take action on parameter id
-		    case 'pt_page':
+		    case 'page':
 		    {
-				$ptParms	        = array('pt_sdid' => $subDistrict,
-									    	'pt_page' => $value);
+				$ptParms	        = array('sdid' => $subDistrict,
+									    	'page' => $value);
 				$pageEntry	        = new Page($ptParms);
 				break;
-			}						// PT_Page
+			}						// Page
 	
-		    case 'pt_population':
-		    case 'pt_transcriber':
-		    case 'pt_proofreader':
+		    case 'population':
+		    case 'transcriber':
+		    case 'proofreader':
 		    {
 				$pageEntry->set($fldname, $value);
 				break;
-			}						// PT_Xxxx
+			}						// Xxxx
 	
-		    case 'pt_image':
+		    case 'image':
 		    {
 				$pageEntry->set($fldname, $value);
 				$pageEntry->save(false);
 				$pageEntry		= null;
 				break;
-			}						// PT_Image
+			}						// Image
 	
 		}		                    // take action on parameter id
 	}				                // loop through parameters

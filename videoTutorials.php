@@ -14,6 +14,7 @@ use \Exception;
  *		2018/01/31		use class Template								*
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2021/01/03      correct XSS vulnerability                       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -24,7 +25,7 @@ require_once __NAMESPACE__ . "/common.inc";
 // validate parameters
 $lang			= 'en';
 
-if (count($_GET) > 0)
+if (isset($_GET) && count($_GET) > 0)
 {	        	    // invoked by URL to display current status of account
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
@@ -33,13 +34,13 @@ if (count($_GET) > 0)
     foreach($_GET as $key => $value)
     {			// loop through parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                         "<td class='white left'>" .
+                            htmlspecialchars($value) . "</td></tr>\n"; 
         switch(strtolower($key))
         {
     		case 'lang':
     		{
-    		    if (strlen($value) >= 2)
-    			    $lang		= strtolower(substr($value,0,2));
+	            $lang           = FtTemplate::validateLang($value);
     		    break;
     		}		// language
     

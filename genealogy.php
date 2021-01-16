@@ -46,8 +46,9 @@ use \Exception;
  *      2018/11/28      use language specific page layout               *
  *      2019/02/18      use new FtTemplate constructor                  *
  *      2019/05/30      use new common translation table indexes        *
+ *		2020/10/31      default to browser's preferred language         *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -58,7 +59,10 @@ require_once __NAMESPACE__ . "/common.inc";
  ***********************************************************************/
 $cc             = 'CA';
 $countryName    = 'Canada';
-$lang           = 'en';     // default english
+if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+    $lang       = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+else
+    $lang       = 'en';
 
 // process parameters passed by caller
 foreach ($_GET as $key => $value)

@@ -44,8 +44,11 @@ use \Templating\Template;
  *                      and fix premature template creation             *
  *      2020/05/03      update status messages only on update           *
  *      2020/06/30      delete all update related messages on GET       *
+ *      2021/01/13      correct XSS exposures                           *
+ *                      improve parameter validation                    *
+ *                      get message texts from template                 *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -63,7 +66,9 @@ $stateName                  = 'Ontario';
 $domainName                 = 'Canada: Ontario:';
 $lang                       = 'en';
 $offset                     = 0;
+$offsettext                 = null;
 $limit                      = 20;
+$limittext                  = null;
 $changedText                = null;
 $deletedText                = null;
 $addedText                  = null;
@@ -93,8 +98,7 @@ if (isset($_GET) && count($_GET) > 0)
 
             case 'domain':
             {
-                if (preg_match('/[a-zA-Z]{4,5}/', $value) == 1)
-                    $domain         = $value;
+                $domain             = $value;
                 break;
             }       // state/province code
 
@@ -106,15 +110,19 @@ if (isset($_GET) && count($_GET) > 0)
 
             case 'offset':
             {
-                if (is_numeric($value) || ctype_digit($value))
+                if (ctype_digit($value))
                     $offset         = $value;
+                else
+                    $offsettext     = $value;
                 break;
             }
 
             case 'limit':
             {
-                if (is_numeric($value) || ctype_digit($value))
+                if (ctype_digit($value))
                     $limit          = $value;
+                else
+                    $limittext      = $value;
                 break;
             }
 
@@ -125,7 +133,7 @@ if (isset($_GET) && count($_GET) > 0)
 
             default:
             {
-                $warn   .= "Unexpected parameter $key='$value'. ";
+                $warn   .= "<p>Unexpected parameter $key='" . htmlspecialchars($value) . "'.</p>\n";
                 break;
             }
         }       // check supported parameters
@@ -210,14 +218,18 @@ if (isset($_POST) && count($_POST) > 0)
             case 'offset':
             {
                 if (ctype_digit($value))
-                    $offset     = $value - 0;
+                    $offset         = $value - 0;
+                else
+                    $offsettext     = $value;
                 break;
             }
 
             case 'limit':
             {
                 if (ctype_digit($value))
-                    $limit       = $value - 0;
+                    $limit          = $value - 0;
+                else
+                    $limittext      = $value;
                 break;
             }
 
@@ -234,7 +246,7 @@ if (isset($_POST) && count($_POST) > 0)
 
             default:
             {
-                $warn   .= "<p>Unrecognized parameter $key='$value'. </p>\n";
+                $warn   .= "<p>Unexpected parameter $key='" . htmlspecialchars($value) . "'.</p>\n";
                 break;
             }                   // unrecognized parameter
         }
@@ -267,7 +279,12 @@ if ($domainObj->isExisting())
 }
 else
 {
-    $msg                        .= "Domain='$domain' unsupported. ";
+    if (preg_match('/^\w\w/', $domain))
+        $cc                     = strtoupper(substr($domain, 0, 2));
+    $text                       = $template['domainUnsupported']->innerHTML;
+    $msg                        .= str_replace('$domain', 
+                                               htmlspecialchars($domain),
+                                               $text); 
     $domainName                 = 'Unknown';
     $stateName                  = 'Unknown';
 }
@@ -277,6 +294,21 @@ $changed                        = $template['changed'];
 $deleted                        = $template['deleted'];
 $added                          = $template['added'];
 $summary                        = $template['summary'];
+
+if (is_string($offsettext))
+{
+    $text                       = $template['offsetIgnored']->outerHTML;
+    $warn                       .= str_replace('$offset', 
+                                               htmlspecialchars($offsettext),
+                                               $text); 
+}
+if (is_string($limittext))
+{
+    $text                       = $template['limitIgnored']->outerHTML;
+    $warn                       .= str_replace('$limit', 
+                                               htmlspecialchars($limittext),
+                                               $text); 
+}
 
 // apply updates
 if (isset($_POST) && count($_POST) > 0)
@@ -368,15 +400,6 @@ if ($changed)
 	$summary->update(null);
 }                       // invoked to display table
 
-if (strlen($msg) == 0)
-{           // no errors detected
-    // execute the query to get the contents of the page
-    $getParms       = array('domain'    => $domain,
-                            'offset'    => $offset,
-                            'limit'     => $limit);
-    $counties       = new CountySet($getParms);
-}           // no errors detected
-
 $template->set('CONTACTTABLE',      'Counties');
 $template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
 $template->set('DOMAIN',            $domain);
@@ -389,23 +412,35 @@ $template->set('CONTACTTABLE',      'Counties');
 $template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
 $template->set('OFFSET',            $offset);
 $template->set('LIMIT',             $limit);
-$info       = $counties->getInformation();
-$count      = $info['count'];
-$template->set('TOTALROWS',         $count);
-$template->set('FIRST',             $offset + 1);
-$template->set('LAST',              min($count, $offset + $limit));
-if ($offset > 0)
-    $template->set('npPrev', "&offset=" . ($offset-$limit) . "&limit=$limit");
-else
-    $template->updateTag('prenpprev', null);
-if ($offset < $count - $limit)
-    $template->set('npNext', "&offset=" . ($offset+$limit) . "&limit=$limit");
-else
-    $template->updateTag('prenpnext', null);
-if (strlen($msg) > 0)
-    $template->updateTag('countyForm', null);
+if (strlen($msg) == 0)
+{           // no errors detected
+    // execute the query to get the contents of the page
+    $getParms       = array('domain'    => $domain,
+                            'offset'    => $offset,
+                            'limit'     => $limit);
+    $counties       = new CountySet($getParms);
 
-$template->updateTag('Row$code',
-                     $counties);
+    $info       = $counties->getInformation();
+    $count      = $info['count'];
+
+	$template->set('TOTALROWS',         $count);
+	$template->set('FIRST',             $offset + 1);
+	$template->set('LAST',              min($count, $offset + $limit));
+	if ($offset > 0)
+	    $template->set('npPrev', "&domain=$domain&offset=" . ($offset-$limit) . "&limit=$limit");
+	else
+	    $template->updateTag('prenpprev', null);
+	if ($offset < $count - $limit)
+	    $template->set('npNext', "&domain=$domain&offset=" . ($offset+$limit) . "&limit=$limit");
+    else
+        $template->updateTag('prenpnext', null);
+    $template->updateTag('Row$code',
+                         $counties);
+}           // no errors detected
+else
+{
+    $template->updateTag('countyForm', null);
+}
+
 
 $template->display();

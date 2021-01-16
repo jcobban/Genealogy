@@ -46,8 +46,10 @@ use \Templating\Template;
  *                      simplify update                                 *
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/06/30      add location field to Township record           *
+ *      2021/01/16      correct XSS vulnerabilities                     *
+ *                      improve parameter checking                      *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . '/County.inc';
@@ -58,52 +60,73 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $prov                           = 'ON';         // postal abbreviation
+$provtext                       = null;
+$statetext                      = null;
 $domainCode                     = 'CAON';       // administrative domain
+$domaintext                     = null;
 $cc                             = 'CA';
 $countryName                    = 'Canada';
 $domainName                     = 'Ontario';
 $countyCode                     = null;         // county abbreviation
+$countytext                     = null;
 $countyName                     = "Unknown";    // full name
 $lang                           = 'en';
 $offset                         = 0;
-$limit                          = 1000;
+$limit                          = 20;
 
 if (isset($_GET) && count($_GET) > 0)
 {                           // invoked by method=get
-    $parmsText                  = "<p class='label'>\$_GET</p>\n" .
-                                  "<table class='summary'>\n" .
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                                "<table class='summary'>\n" .
                                   "<tr><th class='colhead'>key</th>" .
-                                      "<th class='colhead'>value</th></tr>\n";
+                                    "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {                       // loop through all parameters
-        $parmsText              .= "<tr><th class='detlabel'>$key</th>" .
-                                    "<td class='white left'>$value</td></tr>\n";
+        $valuetext          = htmlspecialchars($value);
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                 "<td class='white left'>$valuetext</td></tr>\n";
         switch(strtolower($key))
         {                   // act on specific keys
             case 'domain':
             {
-                $domainCode     = strtoupper($value);
-                $cc             = substr($domainCode, 0, 2);
+                if (preg_match('/^[a-zA-Z]{4,5}$/', $value))
+                    $domainCode     = strtoupper($value);
+                else
+                    $domaintext     = htmlspecialchars($value);
                 break;
             }
         
             case 'prov':
             case 'province':
             {
-                $prov           = strtoupper($value);
-                $domainCode     = 'CA' . $prov;
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                {
+                    $prov           = strtoupper($value);
+                    $domainCode     = 'CA' . $prov;
+                }
+                else
+                    $provtext       = htmlspecialchars($value);
+                break;
             }
         
             case 'state':
             {
-                $prov           = strtoupper($value);
-                $domainCode     = 'US' . $prov;
-                $cc             = 'US';
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                {
+                    $prov           = strtoupper($value);
+                    $domainCode     = 'US' . $prov;
+                }
+                else
+                    $statetext      = htmlspecialchars($value);
+                break;
             }
         
             case 'county':
             {
-                $countyCode     = $value;
+                if (preg_match('/^[a-zA-Z]{3}$/', $value))
+                    $countyCode     = $value;
+                else
+                    $countytext     = htmlspecialchars($value);
                 break;
             }
     
@@ -147,20 +170,31 @@ if (isset($_POST) && count($_POST) > 0)
         {                   // act on specific keys
             case 'domain':
             {               // administrative domain
-                $domainCode     = strtoupper($value);
-                $cc             = substr($domainCode, 0, 2);
+                if (preg_match('/^[a-zA-Z]{4,5}$/', $value))
+                    $domainCode     = strtoupper($value);
+                else
+                    $domaintext     = htmlspecialchars($value);
                 break;
             }               // administrative domain
     
             case 'prov':
             {               // administrative domain
-                $domainCode     = 'CA' . strtoupper($value);
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                {
+                    $prov           = strtoupper($value);
+                    $domainCode     = 'CA' . $prov;
+                }
+                else
+                    $provtext       = htmlspecialchars($value);
                 break;
             }               // administrative domain
     
             case 'county':
             {               // county abbreviation
-                $countyCode     = $value;
+                if (preg_match('/^[a-zA-Z]{3}$/', $value))
+                    $countyCode     = $value;
+                else
+                    $countytext     = htmlspecialchars($value);
                 break;
             }               // county abbreviation
     
@@ -228,8 +262,25 @@ else
 $template                   = new FtTemplate("TownshipsEdit$action$lang.html");
 
 // process domain
+if (is_string($domaintext))
+{
+    $text                   = $template['invalidDomain']->outerHTML;
+    $warn                   .= str_replace('$domain', $domaintext, $text);
+}
+if (is_string($provtext))
+{
+    $text                   = $template['invalidProv']->outerHTML;
+    $warn                   .= str_replace('$prov', $provtext, $text);
+}
+if (is_string($statetext))
+{
+    $text                   = $template['invalidState']->outerHTML;
+    $warn                   .= str_replace('$state', $statetext, $text);
+}
+
 $domain                     = new Domain(array('domain'     => $domainCode,
-                                       'language'   => $lang));
+                                                'language'   => $lang));
+$cc                         = $domain['cc'];
 if ($domain->isExisting())
 {
     $countryObj             = $domain->getCountry();
@@ -239,14 +290,27 @@ if ($domain->isExisting())
 else
 {
     $text                   = $template['badDomain']->innerHTML();
-    $msg                    .= str_replace('$value', $value, $text);
+    $msg                    .= str_replace('$value', $domainCode, $text);
 }
 
+if (is_string($countytext))
+{
+    $text                   = $template['badCounty']->innerHTML();
+    $msg                    .= str_replace('$value', $countytext, $text);
+}
+else
 if ($countyCode)
 {                       // interpret county code
-    $county                 = new County(array('domain'     => $domain,
-                                       'code'       => $countyCode));
+    $county                 = new County(array('domain' => $domain,
+                                               'code'   => $countyCode));
     $countyName             = $county->get('name');
+    if (!$county->isExisting())
+    {
+        $text               = $template['unknownCounty']->innerHTML();
+        $msg                .= str_replace(array('$county', '$domain'),
+                                           array($countyCode, $domainCode),
+                                           $text);
+    }
 }                       // no errors
 else
 {
@@ -257,7 +321,7 @@ else
 }
 
 // if authorized and requested update the Townships taable
-if (canUser('edit') &&
+if (canUser('edit') && strlen($msg) == 0 &&
     isset($_POST) && count($_POST) > 0)
 {                       // apply updates
     $township               = null;
@@ -277,12 +341,12 @@ if (canUser('edit') &&
             switch(strtolower($colname))
             {           // act on column name
                 case 'code':
-                {
+                {       // first field in row
                     if ($township instanceof Township)
                         $township->save(false);
                     $code       = $value;
                     break;
-                }
+                }       // first field in row
     
                 case 'oldcode':
                 {
@@ -320,7 +384,7 @@ if (canUser('edit') &&
     }                   // loop through all parameters
 }                       // apply updates
 
-if ($countyCode)
+if (is_string($countyCode))
 {                       // get set of Townships after update
     $getParms                   = array('county'    => $county);
     $townships                  = new TownshipSet($getParms);
@@ -339,36 +403,43 @@ $template->set('COUNTYNAME',        $countyName);
 $template->set('LANG',              $lang);
 $template->set('OFFSET',            $offset);
 $template->set('LIMIT',             $limit);
-$template->set('TOTALROWS',         $count);
-$template->set('FIRST',             $offset + 1);
-$template->set('LAST',              min($count, $offset + $limit));
-$template->set('$line',             '$line');
-//if ($offset > 0)
-//  $template->set('npPrev', "&offset=" . ($offset-$limit) . "&limit=$limit");
-//else
-//  $template->updateTag('prenpprev', null);
-//if ($offset < $count - $limit)
-//  $template->set('npNext', "&offset=" . ($offset+$limit) . "&limit=$limit");
-//else
-//  $template->updateTag('prenpnext', null);
-
-$rowElt                     = $template->getElementById('Row$line');
-$rowHtml                    = $rowElt->outerHTML();
-$data                       = '';
-$line                       = 1;
-foreach($townships as $township)
+if (strlen($msg) == 0)
 {
-    $code                   = $township->get('code');
-    $name                   = $township->get('name');
-    $location               = $township->get('location');
-    $rtemplate              = new Template($rowHtml);
-    $rtemplate->set('line',     $line);
-    $rtemplate->set('code',     $code);
-    $rtemplate->set('name',     $name);
-    $rtemplate->set('location', $location);
-    $data                   .= $rtemplate->compile();
-    $line++;
+	$template->set('TOTALROWS',         $count);
+	$template->set('FIRST',             $offset + 1);
+	$template->set('LAST',              min($count, $offset + $limit));
+	$template->set('$line',             '$line');
+	//if ($offset > 0)
+	//  $template->set('npPrev', "&offset=" . ($offset-$limit) . "&limit=$limit");
+	//else
+	//  $template->updateTag('prenpprev', null);
+	//if ($offset < $count - $limit)
+	//  $template->set('npNext', "&offset=" . ($offset+$limit) . "&limit=$limit");
+	//else
+	//  $template->updateTag('prenpnext', null);
+	
+	$rowElt                     = $template->getElementById('Row$line');
+	$rowHtml                    = $rowElt->outerHTML();
+	$data                       = '';
+	$line                       = 1;
+	foreach($townships as $township)
+	{
+	    $code                   = $township->get('code');
+	    $name                   = $township->get('name');
+	    $location               = $township->get('location');
+	    $rtemplate              = new Template($rowHtml);
+	    $rtemplate->set('line',     $line);
+	    $rtemplate->set('code',     $code);
+	    $rtemplate->set('name',     $name);
+	    $rtemplate->set('location', $location);
+	    $data                   .= $rtemplate->compile();
+	    $line++;
+	}
+	$rowElt->update($data);
 }
-$rowElt->update($data);
+else
+{
+    $template['townshipForm']->update(null);
+}
 $template->display();
 

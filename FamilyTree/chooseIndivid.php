@@ -88,8 +88,10 @@ use \Exception;
  *		2018/11/19      change Help.html to Helpen.html                 *
  *		2019/09/09      do not report birthmin -9999 as an error        *
  *		                get message texts from template                 *
+ *      2020/12/05      correct XSS vulnerabilities                     *
+ *                      do not display input form on errors             *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -124,7 +126,8 @@ if (count($_GET) > 0)
     foreach($_GET as $key => $value)
     {			// loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{		// act on specific input key
 		    case 'name':
@@ -149,7 +152,7 @@ if (count($_GET) > 0)
                 if (ctype_digit($value) && $value > 0)
                     $idir		    = (int)$value;
                 else
-                    $idirtext       = $value;
+                    $idirtext       = htmlspecialchars($value);
 				break;
 		    }		// default individual specified
 
@@ -158,7 +161,7 @@ if (count($_GET) > 0)
 			    if (ctype_digit($value) && $value > 1700)
                     $birthyear		= (int)$value;
                 else
-                    $birthyeartext  = $value;
+                    $birthyeartext  = htmlspecialchars($value);
 				break;
 		    }		// birth year specified
 
@@ -167,7 +170,7 @@ if (count($_GET) > 0)
 			    if (preg_match('/^-?\d+$/', $value))
                     $birthmin		= (int)$value;
                 else
-                    $birthmintext   = $value;
+                    $birthmintext   = htmlspecialchars($value);
 				break;
 		    }		// minimum birth year specified
 
@@ -176,7 +179,7 @@ if (count($_GET) > 0)
 			    if (preg_match('/^-?\d+$/', $value))
                     $birthmax		= (int)$value;
                 else
-                    $birthmaxtext   = $value;
+                    $birthmaxtext   = htmlspecialchars($value);
 				break;
 		    }		// maximum birth year specified
 
@@ -185,13 +188,13 @@ if (count($_GET) > 0)
 			    if (ctype_digit($value) && $value <= 99)
                     $range		    = (int)$value;
                 else
-                    $rangetext      = $value;
+                    $rangetext      = htmlspecialchars($value);
 				break;
 		    }		// range of birth years specified
 
 		    case 'treename':
 		    {		// subdivision of database
-				$treename	        = $value;
+				$treename	        = htmlspecialchars($value);
 				break;
             }		// subdivision of database
 
@@ -246,6 +249,7 @@ if ($idir)
 	{	                // error creating individual
         $text                       = $template['noPerson']->innerHTML;
         $msg	                    .= str_replace('$idir', $idir, $text);
+        $template['indForm']->update(null);
 	}	                // error creating individual
 }	                    // syntactically valid
 else
@@ -253,6 +257,7 @@ if (strlen($idirtext) > 0)
 {                       // invalid IDIR value
     $text                           = $template['badIdir']->innerHTML;
     $msg	                        .= str_replace('$idir', $idirtext, $text);
+    $template['indForm']->update(null);
 }                       // invalid IDIR value
 
 // complete processing of IDMR
@@ -337,7 +342,7 @@ if (!is_null($family))
 	}
 }			// get range from parents birth years
 
-$template['otherStylesheets']->update(array('filename', 'chooseIndivid'));
+$template['otherStylesheets']->update(array('filename' => 'chooseIndivid'));
 
 $template->set('NAME',              $name);
 $template->set('GENDER',            $gender);

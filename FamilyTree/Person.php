@@ -294,6 +294,7 @@ use \Templating\TemplateTag;
  *		2020/03/19      hide empty marriage events                      *
  *		2020/06/02      avoid exception on undefined locations          *
  *		2020/08/22      do not ask for parents or families if IDIR 0    *
+ *		2020/12/03      correct XSS issues                              *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -309,7 +310,7 @@ require_once __NAMESPACE__ . '/Picture.inc';
 require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/User.inc';
-require_once 'customization.php';
+//require_once 'customization.php';
 require_once __NAMESPACE__ . '/common.inc';
 
 /************************************************************************
@@ -329,13 +330,13 @@ static	$dateTemplate	= '[dd] [Month] [yyyy][BC]';
 /************************************************************************
 // gender pronouns for the current language								*
  ***********************************************************************/
-$malePronoun		= 'He';
-$femalePronoun		= 'She';
-$otherPronoun		= 'He/She';
-$maleChildRole		= 'son';
-$femaleChildRole	= 'daughter';
-$unknownChildRole	= 'child';
-$deathcause		    = array();
+$malePronoun			= 'He';
+$femalePronoun			= 'She';
+$otherPronoun			= 'He/She';
+$maleChildRole			= 'son';
+$femaleChildRole		= 'daughter';
+$unknownChildRole		= 'child';
+$deathcause		    	= array();
 
 /************************************************************************
  *  $statusText															*
@@ -345,12 +346,12 @@ $deathcause		    = array();
  *	This saves issuing an SQL query to obtain the text for these		*
  *	common values.														*
  ************************************************************************/
-static $statusText	= array();
+static $statusText		= array();
 
 /************************************************************************
  *  $nextFootnote		next footnote number to use						*
  ************************************************************************/
-$nextFootnote	= 1;
+$nextFootnote	        = 1;
 
 /************************************************************************
  *  $citTable			table to map footnote number to citation		*
@@ -361,40 +362,38 @@ $nextFootnote	= 1;
  *		o  an object implementing the method getNotes					*
  *		o  a string														*
  ************************************************************************/
-$citTable	= array();
+$citTable	            = array();
 
 /************************************************************************
  *  $citByVal		table to map displayed unique value to				*
  *					footnote number										*
  ************************************************************************/
-$citByVal	= array();
+$citByVal	            = array();
 
 /************************************************************************
  *  $sourceTable	table to map IDSR to instance of Source				*
  ************************************************************************/
-$sourceTable	= array();
+$sourceTable	        = array();
 
 /************************************************************************
  *  $individTable	table to map IDIR to instance of Person		        *
  ************************************************************************/
-$individTable	= array();
+$individTable	        = array();
 
 /************************************************************************
  *  $locationTable	table to map IDLR to instance of Location   		*
  ************************************************************************/
-$locationTable	= array();
+$locationTable	        = array();
 
 /************************************************************************
  *  $templeTable	table to map IDTR to instance of Temple				*
  ************************************************************************/
-$templeTable	= array();
+$templeTable	        = array();
 
 /************************************************************************
  *  $addressTable		table to map IDAR to instance of Address		*
  ************************************************************************/
-$addressTable	= array();
-
-$tracelog   = "/home/jcobban/public_html/logs/trace.log";
+$addressTable	        = array();
 
 /************************************************************************
  *  function createPopups												*
@@ -626,12 +625,9 @@ function showEvent($pronoun,
     $bprivlim	    = $person->getBPrivLim();
     $dprivlim	    = $person->getDPrivLim();
     if ($debug)
-		$warn	    .= "<p>Person::showEvent: event=" .
-						   $event .
-						   ", indiv=" .
-						   $person . ', ' .
-						   "bprivlim=$bprivlim, " .
-						   "dprivlim=$dprivlim, " .
+		$warn	    .= "<p>Person::showEvent: event=" .  $event['ider'] .
+						   ", person=" .  $person['idir'] . ', ' .
+						   "bprivlim=$bprivlim, dprivlim=$dprivlim, " .
 						   ".</p>\n";
 
     // extract information on event
@@ -668,8 +664,12 @@ function showEvent($pronoun,
 
     if ($debug)
     {
-		$warn	.= "<p>showEvent('$pronoun',$gender,event,'$template')</p>\n" .
-						"<p>citType=$citType, IDET=$idet, date=\"$date\"</p>\n";
+        $warn	.= "<p>showEvent('" . htmlspecialchars($pronoun) . "'," . 
+                    htmlspecialchars($gender) . ",event,'" .
+                    htmlspecialchars($template) . "')</p>\n" .
+					"<p>citType=" . htmlspecialchars($citType) . 
+                    ", IDET=" . htmlspecialchars($idet) . 
+                    ", date='" . htmlspecialchars($date) . "'</p>\n";
     }
 
     // the first letter of the date text string is folded to lower case
@@ -1201,16 +1201,16 @@ function showEvents($person)
 		    switch($ider)
 		    {			// act on specific special entries
 				case 'birth':
-				{		// buried event
+				{		// birth event
 				    $person->displayPictures(Picture::IDTYPEBirth);
 				    break;
-				}		// buried event
+				}		// birth event
 
 				case 'christening':
-				{		// buried event
+				{		// christening event
 				    $person->displayPictures(Picture::IDTYPEChris);
 				    break;
-				}		// buried event
+				}		// christening event
 
 				case 'death':
 				{		// on death event also display cause of death
@@ -1219,15 +1219,15 @@ function showEvents($person)
 
 				    if (strlen($cause) > 0)
 				    {		// death cause present
-					$deathcause[]	= $cause;
-					$deathid	= 'DeathCause' . count($deathcause);
-					print $t['The cause of death was'];
+					    $deathcause[]	= $cause;
+					    $deathid	= 'DeathCause' . count($deathcause);
+					    print $t['The cause of death was'];
 ?>
     <span id="<?php print $deathid; ?>">
 				<?php print $cause; ?>
 <?php
-					showCitations(Citation::STYPE_DEATHCAUSE,
-						      $idir);
+					    showCitations(Citation::STYPE_DEATHCAUSE,
+						              $idir);
 ?>
     </span>.
 <?php
@@ -1245,10 +1245,10 @@ function showEvents($person)
 				}		// buried event
 
 		    }			// act on specific special entries
-		}			// special events
+		}			    // special events
 		else
 		if (is_int($ider))
-		{			// standard events
+		{			    // standard events
 		    switch($idet)
 		    {			// act on specific event types
 				case Event::ET_BIRTH:
@@ -1357,7 +1357,10 @@ function displayEvent($ider,
 			}		    // do not have a spouse
 			
 		    if (strlen($date) > 0)
-		    {
+            {
+                if (ctype_digit($date))
+                    print ' ' . $t['in'] . ' ';
+                else
 			    if (ctype_digit(substr($date,0,1)))
 			        print ' ' . $t['on'] . ' ';
 			    print ' ' . $date;
@@ -1438,8 +1441,8 @@ foreach($_GET as $key => $value)
 			    $idir		= $value;
 			    $getParms['idir']	= $idir;
 			}
-			else
-			    $msg	.= "Invalid IDIR=$value. ";
+            else
+                $msg	.= "Invalid IDIR=" . htmlspecialchars($value) . ". ";
 			break;
 	    }			// get the individual by identifier
 
@@ -1450,7 +1453,8 @@ foreach($_GET as $key => $value)
 			    $getParms['userref']	= $value;
 			}
 			else
-			    $msg	.= "Invalid UserRef=\"$value\". ";
+                $msg	.= "Invalid UserRef='" . 
+                            htmlspecialchars($value) . "'. ";
 			break;
 	    }			// get the individual by user reference
 
@@ -1468,7 +1472,7 @@ $template->updateTag('otherStylesheets',
     		         array('filename'   => 'Person'));
 
 // internationalization support
-$translate             = $template->getTranslate();
+$translate              = $template->getTranslate();
 if ($translate['dateFormatFull'])
     LegacyDate::setTemplate($translate['dateFormatFull']->innerHTML);
 $months	                = $translate['Months'];
@@ -1749,7 +1753,8 @@ if (!is_null($person))
                         $spouse['givenname']    = $spsName['givenname'];
                         $spouse['surname']      = $spsName['surname'];
                         $spouse->save(false);
-                        $warn   .= $spouse->dump('fixup ' . 1718);
+                        if ($debug)
+                            $warn   .= $spouse->dump('fixup Person.php:' . __LINE__);
                     }           // fixup
 				    $individTable[$spsid]	= $spouse;
                 }

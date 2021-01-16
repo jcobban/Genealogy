@@ -52,6 +52,7 @@ use \Exception;
  *		                get methods                                     *
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2020/05/22      avoid error on missing idsr                     *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -67,6 +68,7 @@ require_once __NAMESPACE__ . '/common.inc';
  ************************************************************************/
 
 $idsr		            = null;
+$idsrtext	            = null;
 $source		            = null;
 $name		            = null;
 $lang                   = 'en';
@@ -79,27 +81,30 @@ if (isset($_GET) && count($_GET) > 0)
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
-	{
+	{               // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
 		switch(strtolower($key))
-		{		// act on specific parameters
+		{		    // act on specific parameters
 		    case 'id':
 		    case 'idsr':
-		    {		// numeric identifier of the requested source
-				$idsr		= $value;
+            {		// numeric identifier of the requested source
+                if (ctype_digit($value) && $value > 0)
+				    $idsr		= $value;
+                else
+                    $idsrtext   = htmlspecialchars($value);
 				break;
 		    }		// numeric identifier of the requested source
 
 		    case 'name':
 		    {		// search by name
-				$name		= $value;
+				$name		    = $value;
 				break;
 		    }		// search by name
 
             case 'lang':
             {
-                $lang       = FtTemplate::validateLang($value);
+                $lang           = FtTemplate::validateLang($value);
 				break;
             }
 
@@ -107,46 +112,48 @@ if (isset($_GET) && count($_GET) > 0)
 		    {		// debug handled by common code
 				break;
 		    }		// debug handled by common code
-		}		// act on specific parameters
-    }			// loop through all parameters
+		}		    // act on specific parameters
+    }			    // loop through all parameters
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
-}	        	    // invoked by URL to display current status of account
+}	        	    // invoked by URL
 
 // create instance of Template
 $template		    = new FtTemplate("Source$lang.html", true);
 
 $template['otherStylesheets']->update(array('filename' => 'Source'));
 // validate parameters
+if (is_string($idsrtext))
+{
+    $text           = $template['InvalidIDSR']->innerHTML;
+    $msg	        .= str_replace('$idsr', $idsrtext, $text);
+}
+else
 if (!is_null($idsr))
 {                   // IDSR specified
-	if (preg_match('/^\d+$/', $idsr) == 1)
-	{	// valid identifier
-		$source		= new Source(array('idsr'       => $idsr,
+	$source		    = new Source(array('idsr'       => $idsr,
                                        'template'   => $template));
-		$name		= $source->getName();
-	}	// valid identifier
-    else
-    {
-        $text       = $template['InvalidIDSR']->innerHTML;
-        $msg	    .= str_replace('$idsr', $idsr, $text);
-    }
+	$name		    = $source->getName();
 }                   // IDSR specified
 else
-if (!is_null($name))
+if (is_string($name))
 {                   // Name specified
 	if (canUser('edit'))
 	{		        // only authorized contributors
         $source		    = new Source(array('srcname'    => $name,
                                            'template'   => $template));
-	    if (!$source->isExisting())
+	    if ($source->isExisting())
+            $idsr		= $source->getIdsr();
+        else
         {
             $text       = $template['sourceCreated']->innerHTML;
-    		$warn		.= str_replace('$name', $name, $text);
-			$source->set('srctitle', $name);
-	        $source->save(false);
+            $warn		.= str_replace('$name', 
+                                       htmlspecialchars($name), 
+                                       $text);
+			$source->set('srctitle', htmlspecialchars($name));
+            $source->save(false);
+            $idsr       = 0;
 	    }
-        $idsr		    = $source->getIdsr();
 	}		        // only authorized contributors
     else
 	    $msg	        .= $template['cannotUseName']->innerHTML;
@@ -157,7 +164,7 @@ else
 $template->set('IDSR',              $idsr);
 if ($source)
 {
-	$srcname                        = $source->get('srcname');
+    $srcname                        = $source->get('srcname');
 	$srctitle                       = $source->get('srctitle');
 	$idst                           = $source->get('idst');
 	$typetext                       = $source->getTypeText();
@@ -175,7 +182,7 @@ if ($source)
 else
 {
 	$srcname                        = '';
-	$srctitle                       = '';
+	$srctitle                       = 'Undefined ' . htmlspecialchars($name);
 	$idst                           = '';
 	$typetext                       = '';
 	$srcauthor                      = '';
@@ -189,10 +196,12 @@ else
     $filingref                      = '';
     $repository                     = null;
 }
-
+$srcname                            = htmlspecialchars($srcname);
+$srctitle                           = htmlspecialchars($srctitle);
 $template->set('NAME',		        $srcname);
 $template->set('SRCNAME',		    $srcname);
 $template->set('SRCTITLE',		    $srctitle);
+$template->set('TITLE',		        $srctitle);
 $template->set('IDST',		        $idst);
 $template->set('SRCAUTHOR',		    $srcauthor);
 $template->set('SRCPUBL',		    $srcpubl);

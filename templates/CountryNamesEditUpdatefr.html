@@ -26,7 +26,7 @@
 	  $TRACE
 	  $MSG
 	  <!--- Put out the response as a table -->
-	  <form name='countryForm'
+	  <form name='countryForm' id='countryForm'
 		    action='CountryNamesEdit.php' 
 		    method='post' 
 		    autocomplete='off' 
@@ -125,6 +125,12 @@
 	    have made to the countries list.
 	</div>
 	<div class='hidden' id='templates'>
+        <span id='ccInvalid'>
+            Invalid value for CC='$cc'.
+        </span>
+        <span id='codeInvalid'>
+            Invalid value for code='$cpde'.
+        </span>
 	    <!-- template for adding a new country -->
 	    <table>
 	      <tr id='RowTemplate'>

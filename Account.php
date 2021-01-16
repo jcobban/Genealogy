@@ -60,6 +60,7 @@ use \Exception;
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
  *      2020/01/17      add support for Advertiser                      *
+ *      2020/12/03      fix XSS vulnerabilities                         *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -88,7 +89,8 @@ if (isset($_GET) && count($_GET) > 0)
 	foreach($_GET as $key => $value)
     {	            // loop through all parameters
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n"; 
+                                "<td class='white left'>" .
+                                htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		    // act on specific parameter
 			case 'lang':
@@ -113,7 +115,8 @@ if (count($_POST) > 0)
 	foreach($_POST as $key => $value)
 	{	            // loop through all parameters
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n"; 
+                                "<td class='white left'>" .
+                                htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		    // act on specific parameter
 			case 'userid':
@@ -221,7 +224,9 @@ if (strlen($email) > 0 && $email != $oldemail)
     if ($user2->isExisting())
     {
         $text       = $template['emailInUse']->innerHTML;
-        $msg	    .= str_replace('$email', $email, $text);
+        $msg	    .= str_replace('$email', 
+                                   htmlspecialchars($email), 
+                                   $text);
     }
 }                   // request to change e-mail address
 

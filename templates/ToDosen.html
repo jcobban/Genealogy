@@ -104,13 +104,24 @@
 				$OPENEDDATE
 			</td>
 			<td class="odd center">
-			    $CLOSEDATE
+			    $CLOSEDDATE
 			</td>
 		  </tr>
 		</tbody>
         </table>
       </div> <!-- id="somematches"-->
 	</div>	<!-- end of id="body" -->
+    <div class="hidden" id="templates">
+        <span id="invalidIdir">
+            Invalid idir='$idirtext'. 
+        </span>
+	    <p id="invalidOffset">
+            Invalid offset='$offsettext' ignored.
+        </p>
+	    <p id="invalidLimit">
+            Invalid limit='$limittext' ignored.
+        </p>
+    </div>
 	<div class="balloon" id="Helppattern">
 	  <p>
 		This is a regular expression, as supported by MySQL, which is used to

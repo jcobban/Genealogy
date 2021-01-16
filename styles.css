@@ -124,6 +124,7 @@
  *                      JS                                              *
  *      2020/02/16      add right column to page layout                 *
  *      2020/03/31      remove iframe.advert                            *
+ *      2020/11/19      add .link style                                 *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -211,6 +212,25 @@
                 }
     .grid9 {    display: grid; 
                 grid-template-columns: auto auto auto auto auto auto auto auto auto; 
+                }
+
+   /*********************************************************************
+    *   Styles for displaying tags that have hyperlink behavior         *
+    *********************************************************************/
+    .link    {  color:              rgb(0,0,238);
+                text-decoration:    underline;
+                border:             none;
+                background-color:   transparent;
+                font-size:          100%;
+                font-weight:        normal;
+                }
+    .link:visited    {              
+                color:		        rgb(0,0,128);   /* dark blue */
+                text-decoration:    underline;
+                border:             none;
+                background-color:   transparent;
+                font-size:          100%;
+                font-weight:        normal;
                 }
 
    /*********************************************************************

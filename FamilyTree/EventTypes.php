@@ -32,8 +32,9 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/07/23      use class FtTemplate                            *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/EventType.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -56,7 +57,8 @@ if (count($_GET) > 0)
 	foreach($_GET as $key => $value)
     {	                // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		        // act on specific parameter
 			case 'lang':

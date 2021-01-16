@@ -51,6 +51,7 @@ use \Templating\Template;
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2019/06/15      use ordinal numbering of records                *
  *		2020/01/22      internationalize numbers                        *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -87,7 +88,8 @@ foreach($_GET as $key => $value)
 			if (ctype_digit($value))
 			    $offset	= intval($value);
 			else
-			    $msg	    .= "Invalid Offset='$value'. ";
+                $msg	    .= "Invalid Offset='" . 
+                                htmlspecialchars($value) . "'. ";
 			break;
 	    }
 
@@ -96,30 +98,30 @@ foreach($_GET as $key => $value)
 			if (ctype_digit($value))
 			    $limit	= intval($value);
 			else
-			    $msg	    .= "Invalid Limit='$value'. ";
+			    $msg	    .= "Invalid Limit='" . 
+                                htmlspecialchars($value) . "'. ";
 			break;
         }
 
         case 'lang':
         {                   // preferred language
-            if (strlen($value) == 2)
-                $lang       = strtolower($value);
+            $lang           = FtTemplate::validateLang($value);
         }                   // preferred language
 
 	}		                // take action based upon key
 }                           // loop through parameters
 
-$template		= new FtTemplate("Locations$lang.html");
+$template		                    = new FtTemplate("Locations$lang.html");
 $formatter                          = $template->getFormatter();
 
-$template->set('PATTERN',       $pattern);
+$template->set('PATTERN',       htmlspecialchars($pattern));
 $template->set('UPATTERN',      urlencode($pattern));
 $template->set('OFFSET',        $offset);
 $template->set('LIMIT',         $limit);
 $template->set('LANG',          $lang);
 
-$prevoffset	= $offset - $limit;
-$nextoffset	= $offset + $limit;
+$prevoffset	                        = $offset - $limit;
+$nextoffset	                        = $offset + $limit;
 $template->set('PREVOFFSET',    $prevoffset);
 $template->set('NEXTOFFSET',    $nextoffset);
 

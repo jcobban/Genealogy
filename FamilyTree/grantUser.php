@@ -58,8 +58,9 @@ use \Exception;
  *		2019/07/13      send e-mail to grantor and grantee              *
  *		                grantIndivid now passes id of Grantee instead   *
  *		                of username                                     *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/common.inc';
@@ -284,6 +285,7 @@ function grantParents($person, $rank, $granteeName, $template)
 }		// function grantParents
 
 $idir               = null;
+$idirtext           = null;
 $person             = null;
 $isOwner	        = false;
 $lang               = 'en';
@@ -338,7 +340,9 @@ if (count($_POST) > 0)
 	        case 'idir':
 	        {		        // identifier of root individual
 	            if (ctype_digit($value) && $value > 0)
-			        $idir		    = $value;
+                    $idir		    = $value;
+                else
+                    $idirtext       = htmlspecialchars($value);
 	            break;
 	        }		        // identifier of root individual
 	   
@@ -370,13 +374,13 @@ $grantee                = new User(array('id'     => $granteeId));
 if ($grantee->isExisting())
 {                   // grantee is a registered user
     $granteeName            = $grantee['username'];
-    $template->set('GRANTEENAME',       $granteeName);
+    $template->set('GRANTEENAME',       htmlspecialchars($granteeName));
     $granteeMail            = $grantee['email'];
-    $template->set('GRANTEEMAIL',       $granteeMail);
+    $template->set('GRANTEEMAIL',       htmlspecialchars($granteeMail));
     $userName               = $user['username'];
-    $template->set('USERNAME',          $userName);
+    $template->set('USERNAME',          htmlspecialchars($userName));
     $userMail               = $user['email'];
-    $template->set('USERMAIL',          $userMail);
+    $template->set('USERMAIL',          htmlspecialchars($userMail));
 
     // note that record 0 in tblIR contains only the next available value
     // of IDIR
@@ -427,7 +431,7 @@ if ($grantee->isExisting())
         $template['deniedTitle']->update(null);
         $template['granteeTitle']->update(null);
         $text    	    = $template['invalidIdir']->innerHTML;
-        $msg	    	.= str_replace('$idir', $idir, $text);
+        $msg	    	.= str_replace('$idir', $idirtext, $text);
     }		// invalid input
 }                   // grantee is a registered user
 else

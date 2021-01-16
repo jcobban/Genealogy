@@ -10,6 +10,7 @@ use \Exception;
  *  History:															*
  *		2018/02/01		created											*
  *		2019/02/18      use new FtTemplate constructor                  *
+ *		2021/01/03      correct XSS vulnerability                       *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -19,11 +20,11 @@ require_once __NAMESPACE__ . "/FFttTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
-$getParms		= array();
-$pattern		= '';
-$lang		    = 'en';
-$offset		    = 0;
-$limit		    = 20;
+$getParms				= array();
+$pattern				= '';
+$lang		    		= 'en';
+$offset		    		= 0;
+$limit		    		= 20;
 
 // initial invocation by method='get'
 if (isset($_GET) && count($_GET) > 0)
@@ -35,13 +36,13 @@ if (isset($_GET) && count($_GET) > 0)
 	foreach($_GET as $key => $value)
 	{			// loop through parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                            htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {
 			case 'lang':
 			{
-			    if (strlen($value) >= 2)
-					$lang		= strtolower(substr($value, 0, 2));
+	            $lang           = FtTemplate::validateLang($value);
 			    break;
 			}		// language
 
@@ -82,7 +83,8 @@ if (isset($_POST) && count($_POST) > 0)
 	foreach($_POST as $key => $value)
 	{
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" . 
+                            htmlspecialchars($value) . "</td></tr>\n"; 
 	    $fieldLc		= strtolower($key);
 	    $matches		= array();
 	    if (preg_match('/^([a-zA-Z]+)(\d+)$/', $fieldLc, $matches))
@@ -118,9 +120,9 @@ if (isset($_POST) && count($_POST) > 0)
 
 			case 'lang':
 			{
+	            $lang           = FtTemplate::validateLang($value);
 			    if (strlen($row) > 0)
 			    {
-					$lang		= strtolower(substr($value, 0, 2));
 					$video	    = new Record(array('filename'	=> $filename,
 								                   'lang'	    => $lang),
 							                 'Videos');
@@ -171,10 +173,10 @@ if (isset($_POST) && count($_POST) > 0)
 			}		// debug handled by common code
 
 	    }			// check supported parameters
-	}			// loop through all parameters
+	}			    // loop through all parameters
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
-}		// when submit button is clicked invoked by method='post'
+}		        // when submit button is clicked invoked by method='post'
 
 if (strlen($msg) == 0)
 {			// no errors detected
@@ -195,12 +197,12 @@ else
 $tempBase		= $document_root . '/templates/';
 $template		= new FtTemplate("Videos$action$lang.html");
 
-$template->set('PATTERN',		 $pattern);
+$template->set('PATTERN',		 htmlspecialchars($pattern));
 $template->set('CONTACTTABLE',	'Videos');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 $template->set('LANG',          $lang);
 $template->set('OFFSET',        $offset);
-$template->set('LIMIT', $limit);
+$template->set('LIMIT',         $limit);
 $info	            = $videos->getInformation();
 $count	            = $info['count'];
 $template->set('COUNT',         $count);
@@ -208,17 +210,17 @@ $template->set('FIRST',         $offset + 1);
 $template->set('LAST',          min($count, $offset + $limit));
 if ($offset > 0)
 	$template->updateTag('npprev',
-					     array("offset"	=> ($offset - $limit),
-							   "limit"	=> $limit,
-							   "lang"	=> $lang,
+					     array("offset"	    => ($offset - $limit),
+							   "limit"	    => $limit,
+							   "lang"	    => $lang,
 							   "pattern"	=> $pattern));
 else
 	$template->updateTag('npprev', null);
 if ($offset < $count - $limit)
 	$template->updateTag('npnext',
-					     array("offset"	=> ($offset + $limit),
-							   "limit"	=> $limit,
-							   "lang"	=> $lang,
+					     array("offset"	    => ($offset + $limit),
+							   "limit"	    => $limit,
+							   "lang"	    => $lang,
 							   "pattern"	=> $pattern));
 else
 	$template->updateTag('npnext', null);

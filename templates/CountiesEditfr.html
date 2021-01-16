@@ -7,8 +7,9 @@
  *		2018/01/09		created											*
  *      2020/02/14      pass full state name and country name           *
  *      2020/07/01      get text of warning messages from locale        *
+ *      2021/01/13      include message texts                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=fr">
@@ -186,6 +187,17 @@
           Impossible de renommer l'élément Code $oldCode en Code $newCode.
           Veuillez mettre à jour votre navigateur.
       </span>
+  </div>
+  <div class="hidden">
+    <span id="domainUnsupported">
+        Domain='$domain' non prise en charge. 
+    </span>
+    <p id="offsetIgnored">
+        Offset=$offset ignoré.
+    </p>
+    <p id="limitIgnored">
+        Limit=$offset ignoré.
+    </p>
   </div>
   <!-- The remainder of the page consists of context specific help text.
   -->

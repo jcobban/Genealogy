@@ -22,6 +22,7 @@ use \Exception;
  *      2017/11/17      use RecordSet instead of Page::getPages         *
  *      2020/05/12      allow mixed case on parameter name              *
  *                      support JSON                                    *
+ *		2020/10/10      remove field prefix for Pages table             *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -65,7 +66,7 @@ if (strlen($msg) == 0)
     print "\t\"image\" : \"$image\"";
 
     $pages      = new RecordSet('Pages',
-                                array('pt_image'    => $image));
+                                array('image'    => $image));
 
     // report on all matching records
     foreach($pages as $page)
@@ -75,8 +76,6 @@ if (strlen($msg) == 0)
         $comma              = '';
         foreach($page as $key => $value)
         {       // loop through fields in row
-            if (substr($key, 0, 3) == 'pt_')
-                $key        = substr($key, 3);
             print "$comma\n\t\t\"$key\" : \"$value\"";
             $comma          = ',';
         }       // loop through fields in row

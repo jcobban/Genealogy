@@ -47,6 +47,8 @@ use \Exception;
  *		2019/09/26      fix scrolling                                   *
  *		2020/01/22      internationalize numbers                        *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/12/05      correct XSS vulnerabilities                     *
+ *		                hide summary line if no matches                 *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -77,7 +79,8 @@ if (isset($_GET) && count($_GET) > 0)
     foreach($_GET as $key => $value)
     {
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    $value		= trim($value);
 		switch(strtolower($key))
 		{		// act on specific parameters
@@ -92,7 +95,8 @@ if (isset($_GET) && count($_GET) > 0)
 				if (ctype_digit($value))
 				    $offset	= (int)$value;
 				else
-				    $msg	.= "Offset='$value' invalid. ";
+                    $msg	.= "Offset='" . 
+                                htmlspecialchars($value) . "' invalid. ";
 				break;
 		    }			// offset of first row
 	
@@ -101,7 +105,8 @@ if (isset($_GET) && count($_GET) > 0)
 				if (ctype_digit($value))
 				    $limit	= (int)$value;
 				else
-				    $msg	.= "Limit='$value' invalid. ";
+				    $msg	.= "Limit='" .
+                                htmlspecialchars($value) . "' invalid. ";
 				break;
 		    }			// max number of rows
 	
@@ -110,7 +115,8 @@ if (isset($_GET) && count($_GET) > 0)
 				if (ctype_digit($value))
 				    $repositories	= (int)$value;
 				else
-				    $msg	.= "Repositories='$value' invalid. ";
+				    $msg	.= "Repositories='" .
+                                htmlspecialchars($value) . "' invalid. ";
 				break;
 		    }			// respositories
 	
@@ -119,7 +125,8 @@ if (isset($_GET) && count($_GET) > 0)
 				if (ctype_digit($value))
 				    $event	= (int)$value;
 				else
-				    $msg	.= "Limit='$value' invalid. ";
+				    $msg	.= "Limit='" .
+                                htmlspecialchars($value) . "' invalid. ";
 				break;
 		    }			// event addresses
 	
@@ -135,14 +142,14 @@ if (isset($_GET) && count($_GET) > 0)
                 $lang       = FtTemplate::validateLang($value);
 				break;
 		    }			// user requested language
-		}		    // act on specific parameters
-	}			    // loop through input parameters
+		}		        // act on specific parameters
+	}			        // loop through input parameters
     if ($debug)
         $warn   .= $parmsText . "</table>\n";
-}			        // invoked by method=get
+}			            // invoked by method=get
 else
 if (isset($_POST) && count($_POST) > 0)
-{			        // invoked by method=get
+{			            // invoked by method=post
     $parmsText  = "<p class='label'>\$_POST</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
@@ -150,7 +157,8 @@ if (isset($_POST) && count($_POST) > 0)
 	foreach($_POST as $key => $value)
 	{
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		$matches	= array();
 		if (preg_match('/^([a-zA-Z]+)(\d+)$/',
 						$key,
@@ -178,7 +186,8 @@ if (isset($_POST) && count($_POST) > 0)
 				if (ctype_digit($value))
 				    $offset	= (int)$value;
 				else
-				    $msg	.= "Offset='$value' invalid. ";
+				    $msg	.= "Offset='" .
+                                htmlspecialchars($value) . "' invalid. ";
 				break;
 		    }			// offset of first row
 	
@@ -187,7 +196,8 @@ if (isset($_POST) && count($_POST) > 0)
 				if (ctype_digit($value))
 				    $limit	= (int)$value;
 				else
-				    $msg	.= "Limit='$value' invalid. ";
+				    $msg	.= "Limit='" .
+                                htmlspecialchars($value) . "' invalid. ";
 				break;
 		    }			// max number of rows
 	
@@ -196,7 +206,8 @@ if (isset($_POST) && count($_POST) > 0)
 				if (ctype_digit($value))
 				    $repositories	= (int)$value;
 				else
-				    $msg	.= "Repositories='$value' invalid. ";
+				    $msg	.= "Repositories='" .
+                                htmlspecialchars($value) . "' invalid. ";
 				break;
 		    }			// respositories
 	
@@ -205,7 +216,8 @@ if (isset($_POST) && count($_POST) > 0)
 				if (ctype_digit($value))
 				    $event	= (int)$value;
 				else
-				    $msg	.= "Limit='$value' invalid. ";
+				    $msg	.= "Limit='" .
+                                htmlspecialchars($value) . "' invalid. ";
 				break;
 		    }			// event addresses
 	
@@ -224,7 +236,11 @@ if (isset($_POST) && count($_POST) > 0)
 	
 		    case 'kind':
 		    {
-				$kind		    = $value;
+				if (ctype_digit($value))
+				    $kind	= (int)$value;
+				else
+				    $msg	.= "Kind='$value'" .
+                                htmlspecialchars($value) . "' invalid. ";
 				break;
 		    }
 	
@@ -274,8 +290,8 @@ if (strlen($pattern) > 0)
 
 // to avoid a long wait, first check to see how many responses there are
 $addresses	= new RecordSet('Addresses',
-						$getParms,
-						'AddrName, IDAR');
+						    $getParms,
+						    'AddrName, IDAR');
 $count	= $addresses->getInformation()['count'];
 
 if (canUser('edit'))
@@ -357,6 +373,9 @@ if ($count > 0)
 					     $addresses);
 }		// display the results
 else
-	$template->updateTag('dataTable', null);
+{
+    $template->updateTag('topBrowse', null);
+    $template->updateTag('dataTable', null);
+}
 
 $template->display();

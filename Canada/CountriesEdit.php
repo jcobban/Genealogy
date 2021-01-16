@@ -17,6 +17,9 @@ use \Exception;
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2021/01/13      correct XSS vulnerabilities                     *
+ *		                improve parameter checking                      *
+ *		                report database updates                         *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -31,7 +34,10 @@ $getParms			= array();
 $pattern			= '';
 $lang		    	= 'en';
 $offset		    	= 0;
+$offsettext         = null;
 $limit		    	= 20;
+$limittext          = null;
+$deleted            = array();
 
 // initial invocation by method='get'
 if (isset($_GET) && count($_GET) > 0)
@@ -63,6 +69,8 @@ if (isset($_GET) && count($_GET) > 0)
 			{
 			    if (is_numeric($value) || ctype_digit($value))
 					$offset		    = $value;
+                else
+                    $offsettext     = htmlspecialchars($value);
 			    break;
 			}
 
@@ -70,6 +78,8 @@ if (isset($_GET) && count($_GET) > 0)
 			{
 			    if (is_numeric($value) || ctype_digit($value))
 					$limit		    = $value;
+                else
+                    $limittext      = htmlspecialchars($value);
 			    break;
 			}
 	    }		// act on specific parameters
@@ -90,11 +100,11 @@ if (isset($_POST) && count($_POST) > 0)
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
 	    $matches	= array();
-	    $pres	    = preg_match("/[A-Z]{2}$/", $key, $matches);
+	    $pres	    = preg_match("/^(\w+)([A-Z]{2})$/", $key, $matches);
 	    if ($pres)
 	    {			// last 2 characters are upper case
-			$cc	    = $matches[0];
-			$key	= substr($key, 0, strlen($key) - 2);
+			$key    = $matches[1];
+			$cc	    = $matches[2];
 	    }			// last 2 characters are upper case
 	    else
 	    {
@@ -102,29 +112,35 @@ if (isset($_POST) && count($_POST) > 0)
 	    }
 
 	    switch(strtolower($key))
-	    {
+        {                   // act on specific column names
+            case 'la':
+                if ($cc != 'NG')    // accept 'laNG' or 'LANG'
+                    break;
 			case 'lang':
 			{
-                $lang       = FtTemplate::validateLang($value);
+                $lang           = FtTemplate::validateLang($value);
 			    break;
-			}		// language
+			}		        // language
 
 			case 'code':
 			{
-			    if ($country)
-                    $country->save(null);
-                if (strlen($value) >= 2)
+                if ($country)
                 {
-			        $cc	        = strtoupper($value);
-                    $country	= new Country(array('code'	=> $cc));
+                    $count      = $country->save(null);
+                    if ($count > 0)
+                        $warn   .= "<p>" . $country->getLastSqlCmd() . "</p>\n";
                 }
-                else
-                    $country    = null;
+                $country	    = new Country(array('code'	=> $cc));
+                $messages       = $country->getErrors();
+                if (strlen($messages) > 0)
+                    $warn       .= "<p>new Country(array('code'	=> $cc)) constructor failed $messages</p>\n";
 			    break;
 			}
 
 			case 'name':
-			{
+            {
+                if ($cc == '66')
+                    $warn       .= "<p>138 $country->set('name', $value);</p>\n";
 			    $country->set('name', $value);
 			    break;
 			}
@@ -148,10 +164,8 @@ if (isset($_POST) && count($_POST) > 0)
 			}
 
 			case 'deletecountry':
-			{
-			    $country	= new Country(array('code'	=> $cc));
-			    $country->delete(false);
-			    $warn	    .= "<p>deleted country code '$cc'</p>\n";
+            {
+                $deleted[]          = $cc;
 			    break;
 			}
 
@@ -165,7 +179,9 @@ if (isset($_POST) && count($_POST) > 0)
 			case 'offset':
 			{
 			    if (is_numeric($value) || ctype_digit($value))
-					$offset		    = $value;
+                    $offset		    = $value;
+                else
+                    $offsettext     = htmlspecialchars($value);
 			    break;
 			}
 
@@ -173,14 +189,20 @@ if (isset($_POST) && count($_POST) > 0)
 			{
 			    if (is_numeric($value) || ctype_digit($value))
 					$limit		    = $value;
+                else
+                    $limittext      = htmlspecialchars($value);
 			    break;
 			}
 
 	    }			// check supported parameters
 	}			    // loop through all parameters
 
-	if ($country)
-	    $country->save(null);// apply updates to last country
+    if ($country)
+    {
+        $count      = $country->save(null);
+        if ($count > 0)
+            $warn   .= "<p>" . $country->getLastSqlCmd() . "</p>\n";
+    }
 	if ($debug)
 	    $warn	.= $parmsText . "</table>";
 }		// when submit button is clicked invoked by method='post'
@@ -195,32 +217,58 @@ else
 
 $template		= new FtTemplate("Countries$action$lang.html");
 
-if (strlen($msg) == 0)
-{			// no errors detected
-	$getParms['offset']	= $offset;
-	$getParms['limit']	= $limit;
-	$countries		    = new RecordSet('Countries', $getParms);
-}			// no errors detected
+if (is_string($offsettext))
+{
+    $text       = $template['offsetIgnored']->outerHTML;
+    $warn       .= str_replace('$value', $offsettext, $text);
+}
+if (is_string($limittext))
+{
+    $text       = $template['limitIgnored']->outerHTML;
+    $warn       .= str_replace('$value', $limittext, $text);
+}
 
-$template->set('PATTERN',		$pattern);
+// report on countries deleted by administrator
+$text           = $template['countryDeleted']->outerHTML;
+foreach($deleted as $delcc)
+{
+    $country    = new Country(array('cc' => $delcc));
+    $country->delete(false);
+    $warn       .= "<p>" . $country->getLastSqlCmd() . "</p>\n";
+    $warn	    .= str_replace('$delcc', $delcc, $text);
+}
+
 $template->set('CONTACTTABLE',	'Countries');
 $template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
 $template->set('lang',          $lang);
 $template->set('offset',        $offset);
 $template->set('limit',         $limit);
-$info	= $countries->getInformation();
-$count	= $info['count'];
-$template->set('totalrows',     $count);
-$template->set('first',         $offset + 1);
-$template->set('last',          min($count, $offset + $limit));
-if ($offset > 0)
-	$template->set('npPrev',    "&offset=" . ($offset-$limit) . "&limit=$limit");
+$template->set('PATTERN',		htmlspecialchars($pattern));
+
+if (strlen($msg) == 0)
+{			// no errors detected
+	$getParms['offset']	= $offset;
+	$getParms['limit']	= $limit;
+	$countries		    = new RecordSet('Countries', $getParms);
+
+	$info	            = $countries->getInformation();
+	$count	            = $info['count'];
+	$template->set('totalrows',     $count);
+	$template->set('first',         $offset + 1);
+	$template->set('last',          min($count, $offset + $limit));
+	if ($offset > 0)
+		$template->set('npPrev',    "&offset=" . ($offset-$limit) . "&limit=$limit");
+	else
+		$template->updateTag('prenpprev', null);
+	if ($offset < $count - $limit)
+		$template->set('npNext',    "&offset=" . ($offset+$limit) . "&limit=$limit");
+	else
+	    $template->updateTag('prenpnext', null);
+	$template->updateTag('Row$code',
+						 $countries);
+}			// no errors detected
 else
-	$template->updateTag('prenpprev', null);
-if ($offset < $count - $limit)
-	$template->set('npNext',    "&offset=" . ($offset+$limit) . "&limit=$limit");
-else
-	$template->updateTag('prenpnext', null);
-$template->updateTag('Row$code',
-					 $countries);
+	$template->updateTag('countryForm',
+                         null);
+
 $template->display();

@@ -32,7 +32,7 @@
 		pour mise a jour la base des données.
 	    </p>
 	<!--- Put out the response as a table -->
-	<form name='countryForm'
+	<form name='countryForm' id='countryForm'
 		    action='CountriesEdit.php' 
 		    method='get' 
             autocomplete='off'> 
@@ -161,6 +161,10 @@
 	have made to the countries list.
 	</div>
 	<div class='hidden' id='templates'>
+	    <!-- message text localization -->
+        <p id='countryDeleted'>Deleted country code '$delcc'</p>
+        <p id='offsetIgnored'>Ignored Offset=$value'</p>
+        <p id='limitIgnored'>Ignored Limit=$value'</p>
 	    <!-- template for adding a new country -->
 	    <table>
 	      <tr id='Row$country'>

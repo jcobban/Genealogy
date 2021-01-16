@@ -6,8 +6,9 @@
  *  History:															*
  *		2017/10/25		created											*
  *		2018/01/04		remove Template from template file names		*
+ *      2020/12/01      message texts moved to common template          *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
 <div id="breadcrumbs">
     <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -434,25 +435,7 @@
      </tbody>
     </table>
   </div> <!-- class="body" -->
-  <div class="hidden" id="templates">
-      <span id="invalidCensusId">
-          Invalid value of CensusID='$value'. 
-      </span>
-      <span id="invalidDomainId">
-          '$state' is not a supported province/state identifier
-          for country code '$cc'. 
-      </span>
-      <span id="invalidDistId">
-          District='$value' is not defined within the Census.
-      </span>
-      <span id="invalidSubdistId">
-          SubDistrict='$value' Division='$div'
-          is not defined within the District. 
-      </span>
-      <span id="invalidPage">
-          Page='$value' is not defined within the SubDistrict.
-      </span>
-  </div>
+  $MESSAGES
     <script src="/jscripts/util.js" type="application/javaScript">
     </script>
  

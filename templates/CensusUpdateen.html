@@ -5,8 +5,9 @@
  *																		*
  *  History:															*
  *		2018/01/18		created											*
+ *      2020/12/07      change some messages                            *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -25,7 +26,7 @@
   	    District $DISTRICT $DISTRICTNAME Summary
       </a>:
       <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&lang=$LANG">
-  	Division Details
+  	    Division Details
       </a>:	
     </div>
     <div id="transcription" style="overflow: auto; overflow-x: scroll">
@@ -105,19 +106,21 @@
           Census identifier '$censusId' not defined. 
       </span>
       <span id="districtMissing">
-          District number parameter not supplied. 
+          District number parameter not supplied
       </span>
       <span id="districtInvalid">
-          District number not numeric. 
+          District number not numeric
       </span>
-      <span id="censusUndefined">
-          District identifier '$distID' not defined within Census '$censusId'. 
+      <span id="districtUndefined">
+          District identifier '$distID' not defined
+          within Census '$censusId'
       </span>
       <span id="subDistrictMissing">
-          SubDistrict identifier parameter not supplied. 
+          SubDistrict identifier parameter not supplied
       </span>
-      <span id="censusUndefined">
-          SubDistrict identifier '$subDistID' not defined within District '$distID'. 
+      <span id="subdistrictUndefined">
+          SubDistrict identifier '$subDistID' not defined
+          within District '$distID' 
       </span>
       <span id="pageMissing">
           Page number not supplied. 

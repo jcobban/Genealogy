@@ -41,6 +41,7 @@
 	    toolbar             : "undo redo | styleselect | bold italic | " 
 	                           + "alignleft aligncenter alignright alignjustify | " 
 	                           + "bullist numlist | link image",
+        height              : "170px",
 	    content_css		    : "/styles.css"
 	};
 	
@@ -90,8 +91,12 @@
       <span id='UserInfoSignon'>Sign On</span>
       <span id='UserInfoAccount'>
           <a href="/Account.php?lang=$LANG" id="session" target="_blank"
-              title="el Estado de su Cuenta">
-              Cuenta $USERID
+              title="Your account status">
+              Account $USERID
+          </a><br>
+          <a href="/Messages.php?lang=$LANG" id="messages" target="_blank"
+              title="Your messages" class="menuitem">
+              Messages
             <span id="gotMail">
                 <img src="/envelope.svg" alt="You have mail" style="display: inline-block; height: 19px;"/>
             </span>

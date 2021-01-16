@@ -9,17 +9,25 @@
  *                                                                      *
  *  Copyright &copy; 2018 James A. Cobban                               *
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
-    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>
-    <a href="/FamilyTree/Locations.php?lang=$LANG">Locations</a>
-    <a href="/FamilyTree/Locations.php?pattern=^$NAMESTART&amp;lang=$LANG">
-                Locations starting with '$NAMESTART'</a>
-  </div>
-  <div class="body">
-  <h1>Update Location</h1>
-    $MSG
-    $TRACE
-  </div>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>
+      <a href="/FamilyTree/Locations.php?lang=$LANG">Locations</a>
+      <a href="/FamilyTree/Locations.php?pattern=^$NAMESTART&amp;lang=$LANG">
+                  Locations starting with '$NAMESTART'</a>
+    </div>
+    <div class="body">
+      <h1>Update Location</h1>
+        $MSG
+        $TRACE
+    </div>
+    <div class="hidden" id="templates">
+        <span id="missingBoth">
+            Missing both IDLR and location parameters. 
+        </span>
+        <span id="invalidIDIR">
+            Invalid Value of idlr=$idlrtext.
+        </span>
+    </div>
     <script src="/jscripts/util.js" type="text/javaScript">
     </script>

@@ -13,8 +13,9 @@ use \Exception;
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2021/01/15      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Country.inc";
 require_once __NAMESPACE__ . "/CountryName.inc";
@@ -25,6 +26,9 @@ require_once __NAMESPACE__ . '/common.inc';
 // validate parameters
 $getParms				= array();
 $cc			    		= 'CA';
+$cctext                 = null;
+$code                   = 'en';
+$codetext               = null;
 $countryName			= 'Canada';
 $lang		    		= 'en';
 $article				= '';
@@ -38,25 +42,29 @@ if (isset($_GET) && count($_GET) > 0)
                           "<tr><th class='colhead'>key</th>" .
                           "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
-	{			// loop through parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+    {			// loop through parameters
+        $valuetext      = htmlspecialchars($value);
+        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$valuetext</td></tr>\n";
 	    switch(strtolower($key))
-	    {
-			case 'lang':
-			{			// language code
-                $lang           = FtTemplate::validateLang($value);
-			    break;
-			}			// language code
-
+	    {                   // act on specific parameters
 			case 'cc':
-			{
-			    $cc				= $value;
-			    $getParms['code3166_1']	= $cc;
+            {		        // country code
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                    $cc				= $value;
+                else
+                    $cctext         = htmlspecialchars($value);
 			    break;
-			}		// pattern match
-	    }			// act on specific parameters
-	}			// loop through parameters
+            }		        // country code
+
+			case 'lang':
+			{			    // language code
+                $lang               = FtTemplate::validateLang($value);
+			    break;
+			}			    // language code
+
+	    }			        // act on specific parameters
+	}			        // loop through parameters
     if ($debug)
         $warn           .= $parmsText . "</table>\n";
 
@@ -64,16 +72,17 @@ if (isset($_GET) && count($_GET) > 0)
 else
 if (isset($_POST) && count($_POST) > 0)
 {		// when submit button is clicked invoked by method='post'
-    $parmsText      = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText          = "<p class='label'>\$_POST</p>\n" .
+                            "<table class='summary'>\n" .
+                              "<tr><th class='colhead'>key</th>" .
+                                "<th class='colhead'>value</th></tr>\n";
 	$countryNameObj		= null;
 	foreach($_POST as $key => $value)
 	{
+        $valuetext      = htmlspecialchars($value);
         $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
-	    if (preg_match('/^([a-zA-Z@#$%_]+)(\d*)/', $key, $matches))
+                            "<td class='white left'>$valuetext</td></tr>\n";
+	    if (preg_match('/^([a-zA-Z@#$%_]+)(\d*)$/', $key, $matches))
 	    {			// ends with row number
 			$column	    = strtolower($matches[1]);
 			$code	    = $matches[2];
@@ -88,7 +97,10 @@ if (isset($_POST) && count($_POST) > 0)
 	    {
 			case 'cc':
 			{
-			    $cc				        = $value;
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                    $cc				= strtoupper($value);
+                else
+                    $cctext         = htmlspecialchars($value);
 			    break;
 			}		// country code
 
@@ -100,25 +112,27 @@ if (isset($_POST) && count($_POST) > 0)
 
 			case 'code':
             {                       // language code for name
-                if (canUser('edit') &&
-                    $countryNameObj && 
-                    $countryNameObj->get('name') != '')
+                if (preg_match('/^[a-zA-Z]{2,3}$/', $value))
                 {
-                    $countryNameObj->save(null);
-			        if ($debug)
-                        $warn	.= "<p>CountryNamesEdit.php: " . __LINE__ .
-                            " " . $countryNameObj->getLastSqlCmd() . "</p>\n";
-                }
-                $countryNameObj     = null;
-                if (strlen($value) >= 2)
-                {
-			        $code	        = $value;
-			        $countryNameObj = new CountryName(array('Code3166_1' => $cc,
-								                    	'Code639_1'  => $code));
+                    $code			= strtolower($value);
+	                if (canUser('edit') &&
+	                    $countryNameObj && 
+	                    $countryNameObj->get('name') != '')
+	                {                   // save last instance
+	                    $updated    = $countryNameObj->save(null);
+				        if ($updated && $debug)
+	                        $warn	.= "<p>CountryNamesEdit.php: " . __LINE__ .
+	                            " " . $countryNameObj->getLastSqlCmd() . "</p>\n";
+	                }                   // save last instance
+                    $countryNameObj =
+                        new CountryName(array('Code3166_1' => $cc,
+					                    	  'Code639_1'  => $code));
 			        if ($debug)
 					    $warn	.= "<p>CountryNamesEdit.php: " . __LINE__ .
                     " created new CountryName(array('Code3166_1' => '$cc', 'Code639_1'  => '$code')), </p>\n";
                 }
+                else
+                    $codetext       = htmlspecialchars($value);
 			    break;
 			}                       // language code for name
 
@@ -178,6 +192,29 @@ if (isset($_POST) && count($_POST) > 0)
 	}
 }		// when submit button is clicked invoked by method='post'
 
+if (canUser('edit'))
+{
+	$action		= 'Update';
+}
+else
+{
+	$action		= 'Display';
+}
+
+$template		= new FtTemplate("CountryNamesEdit$action$lang.html");
+
+if (is_string($cctext))
+{
+    $text               = $template['ccInvalid']->innerHTML;
+    $msg                .= str_replace('$cc', $cctext, $text);
+}
+
+if (is_string($codetext))
+{
+    $text               = $template['codeInvalid']->innerHTML;
+    $msg                .= str_replace('$code', $codetext, $text);
+}
+
 $getParms['code3166_1']	= "^$cc$";
 $country		        = new Country(array('code' => $cc));
 $countryNameObj		    = new CountryName(array('cc'	=> $country,
@@ -185,6 +222,12 @@ $countryNameObj		    = new CountryName(array('cc'	=> $country,
 $countryName		    = $countryNameObj->getName();
 $article		        = $countryNameObj->get('article');
 $possessive		        = $countryNameObj->get('possessive');
+
+$template->set('LANG',		        $lang);
+$template->set('CC',		        $cc);
+$template->set('COUNTRYNAME',	    $countryName);
+$template->set('CONTACTTABLE',	    'CountryNames');
+$template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 
 if (strlen($msg) == 0)
 {			// no errors detected
@@ -200,27 +243,15 @@ if (strlen($msg) == 0)
         $record['rownum']   = $rownum;
         $rownum++;
     }
-}			// no errors detected
 
-if (canUser('edit'))
-{
-	$action		= 'Update';
-}
+
+	$template->set('ARTICLE',		    $article);
+	$template->set('POSSESSIVE',	    $possessive);
+}			// no errors detected
 else
 {
-	$action		= 'Display';
+    $template['countryForm']->update(null);
 }
-
-$template		= new FtTemplate("CountryNamesEdit$action$lang.html");
-
-$template->set('LANG',		        $lang);
-$template->set('COUNTRYNAME',	    $countryName);
-$template->set('ARTICLE',		    $article);
-$template->set('POSSESSIVE',	    $possessive);
-$template->set('CC',		        $cc);
-$template->set('LANG',		        $lang);
-$template->set('CONTACTTABLE',	    'CountryNames');
-$template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 
 $template['Row$rownum']->update($names);
 $template->display();

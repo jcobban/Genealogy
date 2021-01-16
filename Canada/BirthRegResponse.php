@@ -101,6 +101,7 @@ use \Templating\Template;
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/12/13      remove B_ prefix from field names               *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/11/28      correct XSS error                               *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -206,7 +207,8 @@ foreach ($_GET as $key => $value)
 	if (strlen($value) > 0)
 	{	        	// only look at non-empty values
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    $fieldLc	= strtolower($key);
 	    switch($fieldLc)
 	    {

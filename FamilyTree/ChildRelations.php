@@ -49,6 +49,7 @@ use \Exception;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/05/05      use FtTemplate                                  *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -170,14 +171,15 @@ else
 
 if (count($_GET) > 0)
 {                   // display table
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                        "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                            "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {	            // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                          htmlspecialchars($value) . "</td></tr>\n"; 
         switch(strtolower($key))
         {		    // act on specific parameter
             case 'lang':
@@ -202,14 +204,15 @@ if (count($_POST))
         $post['tag1']		= 0;
         $post['qstag']		= 0;
         $oldrownum		    = 1;
-        $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                      "<table class='summary'>\n" .
-                      "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+        $parmsText      = "<p class='label'>\$_POST</p>\n" .
+                            "<table class='summary'>\n" .
+                              "<tr><th class='colhead'>key</th>" .
+                                "<th class='colhead'>value</th></tr>\n";
         foreach($_POST as $key => $value)
         {		    // check for table updates
             $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+                            "<td class='white left'>" .
+                              htmlspecialchars($value) . "</td></tr>\n"; 
             $matches	= array();
             $fldnameLc  = strtolower($key);
             if (preg_match('/^([a-zA-Z]+)(\d*)$/', $fldnameLc, $matches))

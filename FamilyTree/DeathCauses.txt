@@ -1,0 +1,434 @@
+
+	"abioptic": Not diagnosed with a sample of tissue from a patient.
+
+	"acute": Short term duration.
+
+	"Addison's Disease": Chronic adrenal insufficiency leading to very
+	    low blood pressure and coma.
+
+	"albuminemia": Deficiency of albumin in the blood.
+
+	"apoplexy": Obsolete terminology for a stroke.
+
+	"epileptic": Subject to seizures that are not related to an infection.
+
+	"arterio-sclerosis":
+	    This is properly <i>atherosclerosis</i>, congestion of the arteries
+	    due to the accumulation of fatty deposits on the lining.
+
+	"ascites": The accumulation of fluid in the peritoneal cavity, 
+		causing abdominal swelling.
+
+	"asthenia": Lack or loss of strength and energy.
+
+	"Ataxia": lack of voluntary control of muscle movements.
+
+	"atelectasis": collapse or closure of the lung
+
+	"Atherosclerosis": Congestion of the arteries
+	    due to the accumulation of fatty deposits on the lining.
+
+	"atheroma": a fatty deposit on the inner lining of an artery
+	    resulting from <i>atherosclerosis</i>.
+
+	"auto-intoxication": Self-poisoning resulting from the absorption
+	    of waste products of metabolism.	
+
+	"bulbar palsy": Impairment of function of cranial nerves.
+
+	"cachexia": weakness and wasting of the body due to severe
+		chronic illness.
+
+	"carbuncle": Abscess larger than a boil.
+
+	"carcinoma": a type of cancer that develops from epithelial cells
+		that line the inner or outer surfaces of the body.
+
+	"catarrh": Disorder of inflammation of the mucous membranes
+	    typically producing phlegm.  Frequently misapplied in the 
+	    19th century.
+
+	"cholecystitis": Inflammation of the gallbladder.
+
+	"cholelithiasis": the presence of one or more calculi (gallstones)
+	    in the gallbladder.
+
+	"cholangitis": inflammation of the bile duct.
+
+	"cyanosis": the appearance of a blue or purple colouration of the
+	    skin or mucous membranes due to low oxygen saturation.
+
+	"Cholera infantum, or, as this form of disease is generally termed, 
+	    "summer complaint," comprises all the various diseases of the 
+	    digestive organs and brain with which children are attacked 
+	    during the summer, and most frequently during dentition, during 
+	    their second summer.' <i>Adolphe Lippe</i> (1812-1888)
+
+	"confinement": The period from the onset of labour to the birth
+	    of a child.  As a cause of death generally 
+	    <a href='http://en.wikipedia.org/wiki/Eclampsia'>eclampsia</a>, 
+	    an acute complication of pregnancy characterized by seizures and 
+	    coma.
+
+	"Brain Congestion" swelling of the brain due to trauma or infection.
+	    The swelling cuts off arterial blood flow to parts of the brain.
+	    Frequently misapplied in the 19th century, for example to ischemic
+	    stroke.
+
+	"Hypostatic Congestion": Congestion caused by poor cirulation and
+	    settling of venous blood in the lower part of an organ. 
+
+	"Congestion" is an abnormal accumulation of a body fluid.
+
+	"consumption": Tuberculosis of the lungs.  Throughout history
+	    the single most deadly disease, particularly of young adults.
+
+	"cystitis": Infection of the bladder.
+
+	"Cardiac decompensation" may refer to the failure of the heart to
+	    maintain adequate blood circulation.
+
+	"Senile dementia" is severe mental deterioration in old age, 
+	    characterized by loss of memory and control of bodily functions.
+
+	"Dementia" is any psychotic disorder.
+
+	"dilatation of the heart": Compensatory enlargement of the 
+	    cavities of the heart, with thinning of its walls.
+
+	"Diphtheria" (Greek διφθέρα (diphthera) "pair of leather scrolls") 
+	    is an upper respiratory tract illness caused by 
+	    <i>Corynebacterium diphtheriae</i>. It is characterized by sore
+	    throat, low fever, and an adherent membrane on the tonsils,
+	    pharynx, and/or nasal cavity
+
+	"Bright's Disease": Historical classification of kidney diseases
+	    that would be described in modern medicine as acute or chronic
+	    nephritis, inflammation of the kidneys.
+
+	"Pott's Disease": A form of tuberculosis that occurs outside
+	    the lungs where the disease attacks the vertebrae.
+	    Also called tuberculous spondylitis.  It has been found in
+	    ancient Egyptian mummies.
+
+	"dropsy" is an abnormal accumulation of fluid beneath the skin or
+	    in one or more cavities of the body.  This is an obsolete term
+	    replaced by <a href='http://en.wikipedia.org/wiki/Edema'>edema</a>.
+
+	"Dysentery" is an inflammatory disorder of the intestine,
+	    especially of the colon, that results in severe diarrhea
+	    containing blood and mucus in the feces with fever and abdominal 
+	    pain, caused by any kind of infection.
+
+	"Dyspepsia", also known as indigestion, is a condition of impaired
+	    digestion.
+
+	"Dystocia" is an abnormal or difficult childbirth or labour. 
+
+	"Eclampsia" is an acute and life-threatening complication of
+	    pregnancy, characterized by the appearance of seizures, usually
+	    in a patient who has developed pre-eclampsia. (Pre-eclampsia and
+	    eclampsia are collectively called Hypertensive disorder of
+	    pregnancy and toxemia of pregnancy.)
+
+	"Edema" is an abnormal accumulation of fluid beneath the skin or
+	    in one or more cavities of the body. 
+
+	"Embolism" is an obstruction in a blood vessel due to a blood
+	    clot or other foreign matter that gets stuck while traveling
+	    through the bloodstream.
+
+	"Embolus" is a mass of clotted blood or other material brought 
+	    by the blood from one vessel and forced into a smaller one,
+	    obstructing the circulation.
+
+	    Emphysema is a long-term lung disease. In people with emphysema, 
+	    the tissues necessary to support the shape and function of the
+	    lungs are destroyed.
+
+	"Encephalitis" is an inflammation of the brain.
+
+	"Enteric Fever" is also known as Typhoid Fever.
+
+	"Enteritis" is an inflammation of the small intestine.
+
+	"Erysipelas" is an acute streptococcus bacterial infection of the 
+	    upper dermis and superficial lymphatics.
+
+	"Excitement" as a medical term refers to the now discredited
+	    theories of the 18th century Scottish medical educator Dr. 
+	    <a href='http://en.wikipedia.org/wiki/William_Cullen'>William
+	    Cullen</a> that supposed that some medical
+	    conditions arose out of an excess or lack of excitation.
+
+	"exophthalmic": characterized by protruding eyeballs.  Symptom of
+	    hyperthyroidism including Graves' disease.
+
+	"fibroid": characterized by fibrous scars.
+
+	"fistula": an abnormal connection or passageway between two 
+	    epithelium-lined organs or vessels.
+
+	"Influenza" is an acute respiratory disease caused by a virus.
+	    The word entered the English language from Spanish as a result of
+	    military secrecy during World War I.  Soldiers on both sides of
+	    the conflict were affected in epidemic numbers but this was not
+	    revealed to the public.  Only in Spain, which was a non-combatant,
+	    was the epidemic reported, so it became known by its Spanish
+	    name.  Previously the symptoms would have been reported as
+	"cattarh" or "la Grippe".
+
+	"Intussusception" is a condition in which part of the intestines 
+	    folds into another section ot intestine.  This can often result
+	    in an obstruction.
+
+	"Gangrene" is a serious and potentially life-threatening condition
+	    that arises when a considerable mass of body tissue dies
+	    (necrosis).
+	"Gas gangrene" (also known as "Clostridial myonecrosis", and
+	    "Myonecrosis") is a bacterial infection that produces gas in
+	    tissues in gangrene.
+
+	"Gastritis" is an inflammation of the lining of the stomach.
+
+	"Glossolaryngeal": having to do with the tongue and larynx.
+
+	"Goitre" is swelling of the thyroid gland, which can lead to a
+	    swelling of the neck or larynx.
+
+	"Graves' disease" is an autoimmune disease. It most commonly
+	    affects the thyroid, frequently causing it to enlarge to twice
+	    its size or more (goitre).
+
+	"Gravel" is a deposit of small calculous concretions, usually of 
+	    uric acid, calcium oxalate, or phosphates, in the 
+	    kidneys and urinary bladder.  Also known as uropsammus.
+
+	"Paris green", or copper(II) acetoarsenite, is a highly toxic
+	    crystalline powder developed as a pesticide but also formerly used
+	    as a pigment.
+
+	"la Grippe": this is the term commonly used prior to
+	    1918 for the disease now known as influenza or the common cold.  
+
+	"Haematemesis" is vomiting up of blood.
+
+	"Haemophilia" is a group of rare hereditary disorders in which
+	    the blood does not clot normally and therefore injuries do not
+	    heal properly.
+
+	"Haemorrhage" is profuse bleeding from ruptured blood vessels.
+
+	"Hemiplegia" is a symptom of stroke in which one side of the body
+	    becomes weak.
+
+	"Hepatic": having to do with the liver.
+
+	"Hepatitis": inflammation of the liver.
+
+	"Hodgkin's Lymphoma" is a type of cancer originating from white
+	    blood cells called lymphocytes which spreads from one lymph node
+	    to another.
+
+	"Hydrocephalus": an abnormal accumulation of cerebro-spinal fluid
+	    in the cavities of the brain.
+
+	"Hyperaemia": engorgement; an excess of blood in an organ.
+
+	"Hypertrophy": excessive enlargement.
+
+	"Uraemic": having to do with kidney failure.
+
+	"Inanition": exhaustion cause by lack of food and water.
+
+	"Infarction": tissue death due to a local lack of oxygen as a 
+	    result of an obstruction of the tissue's blood supply.
+
+	"Ischemia" is an insufficient supply of blood to an organ, 
+	    usually due to a blocked artery.
+
+	"Jaundice": a yellowish pigmentation of the skin and mucous
+	    membranes cause by increased levels of bilirubin in the blood.
+	    Usually associated with liver disease.
+
+	"Milk Leg": Post-partum blood clots in the legs.
+
+	"Encephalitis Lethargica": Between 1915 and 1926 an epidemic
+	    of atypical encephalitis characterized by drowsiness and high
+	    rates of death swept the world.  
+	    It was first described in 1917 by the
+	    neurologist Constantin von Economo and the pathologist
+	    Jean-Rene Cruchet. 
+
+	"Lethargica": characterized by lower level of consciousness.
+
+	"Lethargy": a lowered level of consciousness, with drowsiness,
+	    listlessness, and apathy.
+
+	"Leukemia": a cancer of the blood or bone marrow characterized
+	    by an abnormal increase of immature white blood cells.
+
+	"Lymphadenoma": swelling of lymph nodes.`
+
+	"marasmus": severe malnutrition characterized by a lack of energy.
+
+	"meningitis": inflammation of the protective membranes covering the
+	    brain and spinal cord.
+
+	"mitral valve": the valve in the heart that lies between the
+	    left atrium and the left ventricle.  The name comes from the
+	    similarity in appearance to a mitre.
+
+	"metritis": inflammation of the wall of the uterus.  More commonly
+	    this is now called Pelvic Inflammatory Disease.
+
+	"cholera morbus": used in the 19th and early 20th centuries to
+		describe both non-epidemic cholera and gastrointestinal 
+		diseases that mimicked cholera. In particular it was used for
+		gastro-intestinal diseases suffered by young children
+		during the transition to solid food.
+
+	"Myocardial": having to do with the heart muscle.
+
+	"Myocarditis": inflammation of the heart muscle due to an infection.
+
+	"Nephritis": inflammation of the kidneys.
+
+	"Neuralgia": nerve pain that is not a result of excitation of
+	    healthy pain receptors.
+
+	"Otitis": inflammation of the ear.
+
+	"Paraplegia": impairment in motor or sensory function of the
+	    lower extremities, typically as a result of damage to the
+	    spinal cord.
+
+	"Paresis": a condition typified by a weakness of voluntary
+	    movement.
+
+	"Pellagra": a vitamin deficiency disease most commonly caused by
+	    a chronic lack of niacin in the diet.
+
+	"Peritonitis": inflamation of the tissue that lines the inner wall
+	    of the abdomen and covers most of the abdominal organs.
+
+	"Pernicious Anaemia": a decrease in red blood cells that occurs 
+	    when the intestines cannot properly absorb vitamin B12.
+	    The "pernicious" aspect of the disease was its invariably
+	    fatal prognosis prior to the discovery of treatment. 
+
+	"Phthisis": a disease characterized by the wasting away or atrophy
+	    of the body or a part of the body.  Frequently pulmonary 
+	    tuberculosis.
+
+	"Pleurisy": painful inflammation of the lining of the cavity
+	    surrounding the lungs.
+
+	"Hypostatic pneumonia" usually results from the collection of 
+	    fluid in the back of the lungs and occurs especially 
+	    in those confined to a bed for extended periods.
+
+	"Pneumonia" is an inflammatory infection of the lungs, and in
+	    particular the little air sacs called alveoli.  It is very
+	    common as a complication of other conditions that result in
+	    reduced immune response.
+
+	"Pott's disease": tuberculosis presenting in any other organ
+	    other than the lung, for example in the spine.
+
+	"Dementia Praecox", literally precocious madness, refers to
+	    a deteriorating psychotic condition that begins in the late
+	    teens or early adulthood.  Schizophrenia. 
+
+	"Puerperal fever": a bacterial infection contracted by women
+	    during childbirth or miscarriage.  Prior to the introduction of
+	    antibiotics it would develop into septicaemia which is
+	    frequently fatal.  The typical source of the infection was the
+	    unwashed hands of the doctor or midwife.
+
+	"Pyaemia": a type of septicaemia that leads to widespread
+	    abscesses.
+
+	"Pyelitis": inflammation of the renal pelvis.
+
+	"Pyorrhea": purulent inflamation of the gums and tooth sockets.
+
+	"Pyonephrosis": an infection of the renal collecting system
+	    resulting in the accumulation of pus.
+
+	"Quinsy": is a rare and potentially serious complication of
+	    tonsillitis.  An abscess, a collection of pus, forms between the
+	    tonsil and the wall of the throat.  This can happen when a
+	    bacterial infection spreads from an infected tonsil to the
+	    surrounding tissue.
+	"Remittent Fever": a fever in which the symptoms temporarily abate
+	    at regular intervals, but do not wholly cease.
+	    Causes include typhoid and infectious mononucleosis.
+
+	"Sarcoma": a cancer that arises from transformed cells of 
+	    mesenchymal origin.
+	    resulting in the accumulation of pus.
+
+	"Scarlet Fever":  An infectious disease which most commonly
+	    affects 4 to 8 year old children. Symptoms include sore throat,
+	    fever, and a red rash.
+
+	"Arterio- or Arterial sclerosis":
+	    This is properly <i>atherosclerosis</i>, congestion of the arteries
+	    due to the accumulation of fatty deposits on the lining.
+
+	"Sclerosis": a hardening of tissue, usually caused by a
+	    replacement of the normal organ-specific tissue with
+	    connective tissue.
+
+	"Scrofula": inflammation of the cervical lymph nodes in the neck due
+	    to infection by mycobacteria, frequently a symptom of tuberculosis.
+
+	"Septicaemia": an infection in which large numbers of bacteria are
+	    present in the blood.  It is commonly referred to as
+	    blood poisoning.
+
+	"Softening of the Brain" is mental deterioration in old age, 
+	    characterized by loss of memory and control of bodily functions.
+	    senile dementia.
+
+	"Stenosis": an abnormal narrowing of a blood vessel or other
+	    tubular organ or structure.
+
+	"Tetanus": a medical condition characterized by a prolonged
+	    contraction of skeletal muscle fibers.  This is usually as a
+	    result of contamination of a wound.
+
+	"Thrombosis": the formation of a blood clot inside a blood
+	    vessel, obstructing the flow of blood through the circulatory
+	    system.
+
+	"Thrush": an infection, typically of the mouth, caused by the 
+	    candida fungus, also known as yeast.
+
+	"Toxaemia":  An abnormal condition of pregnancy characterized by
+	    hypertension, edema, and protein in the urine as a result of
+	    the presence of bacterial toxins in the blood.
+
+	"Trismus": reduced opening of the jaws caused by spasm of the
+	    muscles of mastication. 
+
+	"Typhoid Fever":  A common bacterial disease transmitted by
+	    the ingestion of food or water contaminated with the feces of
+	    an infected person.
+
+	"Typhus": any of a number of diseases transmitted by rickettsia
+	    bacteria.  Epidemic typhus is transmitted by lice.
+
+	"Tuberculosis":  A common bacterial disease that typically 
+	    attacks the lungs, but can affect other organs.  Symptoms
+	    include chronic cough, fever, and weight loss.  Tuberculosis
+	    has killed more people throughout human history than any
+	    other disease.
+
+	"Uraemia": the disease accompanying kidney failure.
+
+	"Lupus Vulgaris": painful cutaneous tuberculosis skin lesions
+	    with nodular appearance.
+	    
+

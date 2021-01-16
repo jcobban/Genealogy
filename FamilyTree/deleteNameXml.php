@@ -25,6 +25,7 @@ use \Exception;
  *						Family and Person still exist					*
  *						class Name no longer throws exception for		*
  *						undefined IDNX value, use method isExisting		*
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2017 James A. Cobban								*
  ************************************************************************/
@@ -36,18 +37,36 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
 print "<?xml version='1.0' encoding='UTF-8'?>\n";
-print "<deleted >\n";
 
 // include info on parameters
-$idnx	= null;
-print "    <parms>\n";
-foreach($_POST as $key => $value)
-{
-    if (strtolower($key) == 'idnx')
-        $idnx	= $value;
-    print "\t<$key>$value</$key>\n";
-}
-print "    </parms>\n";
+$idnx	                = null;
+$idnxtext               = null;
+$parmsText              = '';
+$parms                  = '';
+
+if (isset($_POST) && count($_POST) > 0)
+{		                        // parameters passed by method=post
+    foreach($_POST as $key => $value)
+    {		                    // loop through all parameters
+        $parmsText      .= "<$key>" .
+                            htmlspecialchars($value) . "</$key>\n";
+        $parms          .= " $key=\"" . htmlspecialchars($value) . '"'; 
+		switch(strtolower($key))
+        {
+            case 'idnx':
+            {
+				if (ctype_digit($value))
+				    $idnx	        = intval($value);
+                else
+                    $idnxtext       = htmlspecialchars($value);
+                break;
+            }
+        }                       // switch
+    }		                    // loop through all parameters
+    $parmsText          .= "</table>\n";
+}                               // $_POST defined
+print "<deleted $parms>\n";
+print "    <parms>$parmsText</parms>\n";
 
 // determine if permitted to add children
 if (!canUser('edit'))
@@ -56,20 +75,23 @@ if (!canUser('edit'))
 }		// take no action
 
 // validate parameters
+if (is_string($idnxtext))
+    $msg    .= "Invalid value for idnx='$idnxtext'. ";
+else
 if (is_null($idnx))
     $msg	.= 'Missing mandatory parameter idnx. ';
 else
 {			// IDNX specified
-    $name	= new Name(array('idnx'	=> $idnx));
+    $name	        = new Name(array('idnx'	=> $idnx));
     if ($name->isExisting())
     {
-        $idir	= intval($name->get('idir'));
+        $idir	        = $name->get('idir');
         print "<idir>$idir</idir>\n";
-        $givenname	= $name->get('givenname');
+        $givenname	    = $name->get('givenname');
         print "<givenname>$givenname</givenname>\n";
-        $surname	= $name->get('surname');
+        $surname	    = $name->get('surname');
         print "<surname>$surname</surname>\n";
-        $order	= intval($name->get('order'));
+        $order	        = $name->get('order');
         print "<order>$order</order>\n";
         if ($order == 0)
         {			// primary name

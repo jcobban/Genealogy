@@ -26,11 +26,11 @@
       $TRACE
       $MSG
       <!--- Put out the response as a table -->
-      <form name="countryForm"
-	    action="CountryNamesEdit.php" 
-	    method="post" 
-	    autocomplete="off" 
-	    enctype="multipart/form-data">
+      <form name="countryForm" id='countryForm'
+		    action="CountryNamesEdit.php" 
+		    method="post" 
+		    autocomplete="off" 
+		    enctype="multipart/form-data">
         <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
         <input type="hidden" name="CC" id="CC" value="$CC">
         <input type="hidden" name="lang" id="lang" value="$LANG">
@@ -132,6 +132,12 @@
     have made to the countries list.
     </div>
     <div class="hidden" id="templates">
+        <span id='ccInvalid'>
+            Invalid value for CC='$cc'.
+        </span>
+        <span id='codeInvalid'>
+            Invalid value for code='$cpde'.
+        </span>
         <!-- template for adding a new country -->
         <table>
           <tr id="RowTemplate">

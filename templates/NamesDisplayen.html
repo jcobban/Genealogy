@@ -94,9 +94,6 @@
         <input type="hidden" name="lang"    value="$LANG">
         <input type="hidden" name="debug"   value="$DEBUG">
  
-        <button type="submit" id="EditRecordButton">
-	      <u>E</u>dit Surname Record
-        </button>
       </p>
     </form>
   
@@ -112,51 +109,6 @@
 	      Surnames with the Same Pattern '$PATTERN'
 	  </a>
     </p>
-    <hr>	<!-- start of blog section of page -->
-    <h3>Blogs</h3>
-    <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
-	  enctype="multipart/form-data">
-        <div id="blogEntry">
-		    <p class="label">
-			  At $DATETIME user '$USERNAME' 
-			  wrote:
-		    </p>
-		    <p>
-			  $TEXT 
-		    </p>
-		    <p id="blogActions">
-		      <button type="button" id="blEdit$BLID">
-			    Edit Message
-		      </button>
-		      <button type="button" id="blDel$BLID">
-			    Delete Message
-		      </button>
-		    </p>
-        </div> <!-- id="blogEntry" -->
-    <div class="hidden" id="hidden">
-        <input type="hidden" name="userid" id="userid" value="$USERID">
-        <input type="hidden" name="idnr" id="idnr" value="$IDNR">
-        <input type="hidden" name="lang" id="lang" value="$LANG">
-    </div>
-    <p>
-    <textarea name="message" id="message" placeholder="[message]"
-	  rows="5" cols="100"></textarea>
-    </p>
-    <div class="row" id="blogEmailRow">
-    <label class="column1" for="emailAddress">
-	  Your E-Mail Address:
-    </label>
-    <input type="text" class="$EMAILCLASS leftnc" $EMAILREADONLY
-            id="emailAddress" name="emailAddress"
-	  		size="80" value="$EMAILADDRESS">
-    </div>
-    <div class="row" id="blogPostRow">
-    <button type="button" id="PostBlog" accessKey="B">
-	  Post <u>B</u>log
-    </button>
-    </div>
-    </form> <!-- name="blogform" id="blogform" -->
-    <hr>	<!-- start of blog section of page -->
     <p class="label">
 	  $COUNT individuals have the surname '$SURNAME'.
     </p>

@@ -214,7 +214,7 @@ function show($person, $level, $prefix 		= '', $template)
     return  $retval;
 }			// show
 
-
+// open text
 $nameuri			= '';
 $person	    		= null;
 $date	    		= getdate();
@@ -241,14 +241,16 @@ foreach($_COOKIE as $key => $value)
 	switch ($key)
 	{	            // act on specific parameters
 	    case 'ancDepth':
-	    {
-			$ancDepth	= $value;
+        {
+            if (ctype_digit($value))
+			    $ancDepth	= $value;
 			break;
 	    }	        // ancestor display depth
 
 	    case 'incLocs':
 	    {           // indicator of whether or not to show locations
-			$incLocs	= $value;
+            if (is_bool($value) || ctype_digit($value))
+			    $incLocs	= $value;
 			break;
 	    }	        // to show or not to show locations
 	}	            // act on specific parameters
@@ -264,7 +266,8 @@ if (count($_GET) > 0)
     foreach($_GET as $key => $value)
     {		// examine all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch ($key)
 		{	// act on specific parameters
 		    case 'ancDepth':
@@ -275,13 +278,41 @@ if (count($_GET) > 0)
 				    setcookie('ancDepth', $ancDepth);
 				}
 				else
-				    $warn	.= "<p>ancDepth='$value' ignored.</p>\n";
+                    $warn	.= "<p>ancDepth='" .
+                                htmlspecialchars($value) .
+                                "' ignored.</p>\n";
 				break;
 		    }	// ancestor display depth
 	
 		    case 'incLocs':
-		    {    // indicator of whether or not to show locations
-				$incLocs		= $value;
+            {    // indicator of whether or not to show locations
+                $incLocs        = false;
+                switch(strtolower($value))
+                {
+                    case '0':
+                    case 'n':
+                    case 'false':
+                    {
+                        $incLocs        = false;
+                        break;
+                    }
+
+                    case '1':
+                    case 'y':
+                    case 'true':
+                    {
+                        $incLocs        = true;
+                        break;
+                    }
+
+                    default:
+                    {
+                        $warn	.= "<p>incLocs='" .
+                                    htmlspecialchars($value) .
+                                    "' ignored.</p>\n";
+                        break;
+                    }
+                }
 				if ($incLocs)
 				    setcookie('incLocs', $incLocs == 1);
 				break;
@@ -311,22 +342,20 @@ if (count($_GET) > 0)
 						    $prefix	= 'Mc';
 						else
 						    $prefix	= substr($surname,0,1);
-	
-						$title		= "Ancestor Tree for $name";
 				    }		// existing person in tree
 				    else
 				    {
-						$msg		.=
-							"There is no existing person with IDIR=$idir. ";
-						$title		= "Ancestor Tree Failure";
-						$surname	= 'Unknown';
-						$name		= 'Unknown';
+						$text		= $template['missing']->innerHTML();
+						$msg		.= str_replace('$idir', $idir, $text);
+						$surname	= $template['Unknown']->innerHTML();
+						$name		= $template['Failure']->innerHTML();
 						$prefix		= '?';
 				    }
 				}	// syntax OK
 				else
 				{	// not a number
-				    $msg	.= "Invalid parameter IDIR='$value'. ";
+				    $msg	.= "Invalid parameter IDIR='" .
+                                htmlspecialchars($value) . "'.\n";
 				}	// not a number
 				break;
 	        }		// IDIR
@@ -338,25 +367,25 @@ if (count($_GET) > 0)
 		}		    // act on specific parameters
     }			    // examine all parameters
     if ($debug)
-        $warn   .= $parmsText . "</table>\n";
+        $warn           .= $parmsText . "</table>\n";
 }		            // invoked by submit to update account
 
 // display page
-$template		= new FtTemplate("ancestorReport$lang.html", true);
+$template		        = new FtTemplate("ancestorReport$lang.html", true);
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => '/FamilyTree/ancestorReport'));
 
 // check for mandatory parameters
 if (is_null($idir))
 {		// missing parameter
-	$title	        = "Ancestor Tree Failure";
-	$msg	        .= 'Missing mandatory parameter idir. ';
+	$name               = $template['Failure']->innerHTML();
+	$msg	            .= $template['missingIdir']->innerHTML();
 }		// missing parameter
 
 // I18N
-$fatherText		    = $template['Father']->innerHTML();
-$motherText		    = $template['Mother']->innerHTML();
-$elt                = $template['Fathers'];
+$fatherText		        = $template['Father']->innerHTML();
+$motherText		        = $template['Mother']->innerHTML();
+$elt                    = $template['Fathers'];
 if ($elt)
 {
     $fathersmaleText	= $elt->innerHTML();
@@ -367,7 +396,7 @@ else
     $fathersmaleText	= $template['Fathersmale']->innerHTML();
     $fathersfemaleText	= $template['Fathersfemale']->innerHTML();
 }
-$elt                = $template['Mothers'];
+$elt                    = $template['Mothers'];
 if ($elt)
 {
     $mothersmaleText	= $elt->innerHTML();
@@ -405,12 +434,12 @@ if (strlen($msg) == 0)
             $template->updateTag('surnamesPrefix',  null);
             $template->updateTag('surname',         null);
             $template->updateTag('depthForm',       null);
-            $template->set('DATA',      '');
-            $template->set('NAME',      $failureText);
+            $template->set('DATA',          '');
+            $template->set('NAME',          $failureText);
             $template->set('TREENAME',	    $treeName);
-            $template->set('NAMEURI',	'');
-            $template->set('SURNAME',	'');
-            $template->set('PREFIX',	'');
+            $template->set('NAMEURI',	    '');
+            $template->set('SURNAME',	    '');
+            $template->set('PREFIX',	    '');
 	    }
 	    else
         {		// display public data
@@ -430,12 +459,12 @@ if (strlen($msg) == 0)
         $template->updateTag('surname',         null);
         $template->updateTag('depthForm',       null);
         $template->updateTag('private',         null);
-        $template->set('DATA',      '');
-        $template->set('NAME',      $failureText);
+        $template->set('DATA',          '');
+        $template->set('NAME',          $failureText);
         $template->set('TREENAME',	    $treeName);
-        $template->set('NAMEURI',	'');
-        $template->set('SURNAME',	'');
-        $template->set('PREFIX',	'');
+        $template->set('NAMEURI',	    '');
+        $template->set('SURNAME',	    '');
+        $template->set('PREFIX',	    '');
     }
 }			// success
 else
@@ -444,12 +473,15 @@ else
     $template->updateTag('surname',         null);
     $template->updateTag('depthForm',       null);
     $template->updateTag('private',         null);
-    $template->set('DATA',      '');
-    $template->set('NAME',      $failureText);
-    $template->set('TREENAME',	    $treeName);
-    $template->set('NAMEURI',	'');
-    $template->set('SURNAME',	'');
-    $template->set('PREFIX',	'');
+    $template->set('DATA',              '');
+    $template->set('NAME',              $failureText);
+    $template->set('TREENAME',	        $treeName);
+    $template->set('NAMEURI',	        '');
+    $template->set('SURNAME',	        '');
+    $template->set('PREFIX',	    '   ');
 }
+$title          = $template['title']->innerHTML();
+$title          = str_replace('$NAME', $name, $title);
+$template->set('TITLE',	            $title);
 
 $template->display();

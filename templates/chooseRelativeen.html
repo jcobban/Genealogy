@@ -6,8 +6,9 @@
  *																		*
  *  History:															*
  *		2019/02/19		Created											*
+ *      2020/12/06      missing $TRACE and $MSG fields                  *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
 	<a href="/index.html">Home</a>:
@@ -35,9 +36,13 @@
         <span class="right">
 		  <a href="chooseRelativeHelpen.html" target="help">? Help</a>
         </span>
-		Choose Relative for $NAME
+        <span id='title'>
+		  Choose Relative for $NAME
+        </span>
         <div style="clear: both;"></div>
       </h1>
+      $TRACE
+      $MSG
     <form name="indForm" id="indForm"
         action="relationshipCalculator.php" method="get">
       <div class="row">

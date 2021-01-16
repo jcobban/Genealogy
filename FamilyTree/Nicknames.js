@@ -7,8 +7,9 @@
  *  History:															*
  *		2017/12/10		created											*
  *		2019/02/10      no longer need to call pageInit                 *
+ *		2020/11/08      set focus in added row                          *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onloadNicknames;
@@ -94,15 +95,19 @@ function resetForm()
  ************************************************************************/
 function addName()
 {
-    var details		= document.getElementById('dataTable');
-    var	tbody		= details.tBodies[0];
-    var	parms		= {'i'		: tbody.rows.length,
+    let details		        = document.getElementById('dataTable');
+    let	tbody		        = details.tBodies[0];
+    let	newrow		        = tbody.rows.length;
+    let	parms		        = {'i'		: newrow,
 					           'even'	: 'odd'};
-    var template	= document.getElementById("nickname$i");
-    var newRow	    = createFromTemplate("nickname$i",
-						                 parms,
-						                 null);
+    let template	        = document.getElementById("nickname$i");
+    let newRow	            = createFromTemplate("nickname$i",
+						                         parms,
+						                         null);
     tbody.appendChild(newRow);
+    let namefield           = document.getElementById('name' + newrow);
+    namefield.focus();
+
     return true;
 }	// addName
 

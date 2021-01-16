@@ -43,12 +43,13 @@
  *      2018/10/06      change gotCountiesFile to leave first option    *
  *                      in place because it is language specific        *
  *      2018/10/30      use Node.textContent rather than getText        *
+ *      2021/01/13      drop support of IE<11, use ES2015 syntax        *
  *                                                                      *
- *  Copyright &copy; 2018 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 // table for expanding county abbreviations to full names
-var countyNames = {
+const countyNames = {
                 'Alg'   : 'Algoma District',
                 'Brt'   : 'Brant',
                 'Bfd'   : 'Brantford City',
@@ -121,52 +122,52 @@ var countyNames = {
 function gotCountiesFile(xmlDoc)
 {
     if (document.distForm)
-    {       // form present
-        var countySelect    = document.distForm.RegCounty;
+    {                   // form present
+        let countySelect    = document.distForm.RegCounty;
         countySelect.options.length = 1;    // clear the selection
-        var newOptions      = xmlDoc.getElementsByTagName("option");
+        let newOptions      = xmlDoc.getElementsByTagName("option");
 
         // ensure builtin countyNames array matches database
-        countyNames     = [];   // empty out pre-defined contents
+        countyNames         = [];   // empty out pre-defined contents
 
         // add options corresponding to the elements in the XML file
-        for (var i = 0; i < newOptions.length; ++i)
+        for (let i = 0; i < newOptions.length; ++i)
         {
             // get the source "option" node
             // note that although this has the same contents and appearance
             // as an HTML "option" statement, it is an XML Element object,
             // not an HTML Option object.
-            var node    = newOptions[i];
+            let node        = newOptions[i];
 
             // get the text value to display to the user
-            var text    = node.textContent;
+            let text        = node.textContent;
 
             // get the "value" attribute
-            var value   = node.getAttribute("value");
+            let value       = node.getAttribute("value");
             if ((value == null) || (value.length == 0))
-            {       // cover our ass
-            value   = text;
-            }       // cover our ass
+            {           // cover our ass
+                value       = text;
+            }           // cover our ass
 
             // create a new HTML Option object and add it to the Select
-            var newOption   = addOption(countySelect,
+            let newOption   = addOption(countySelect,
                                 text,
                                 value);
 
             // ensure builtin countyNames array matches database
             countyNames[value]  = text;
-        }           // loop through source "option" nodes
+        }               // loop through source "option" nodes
 
         // specify the action for selecting a county
         countySelect.onchange   = changeCounty;
-        var countyTxt   = document.distForm.RegCountyTxt;
+        let countyTxt           = document.distForm.RegCountyTxt;
 
         if (countyTxt)
-        {       // county code text field in basic form
+        {               // county code text field in basic form
             // select the matching entry in the select list
-            var countyCode  = countyTxt.value;
+            let countyCode      = countyTxt.value;
             if (countyCode.length > 0)
-            {       // a county has been specified
+            {           // a county has been specified
                 countySelect.value  = countyCode;
 
                 if (countySelect.selectedIndex == 0)
@@ -176,12 +177,12 @@ function gotCountiesFile(xmlDoc)
                 }       // no match
                 else
                     changeCounty(); // populate township list
-            }       // a county has been specified
+            }           // a county has been specified
             else
                 countySelect.selectedIndex  = 0;
-        }       // county code text field in basic form
-    }       // form present
-}       // gotCountiesFile
+        }               // county code text field in basic form
+    }                   // form present
+}       // function gotCountiesFile
 
 /************************************************************************
  *  function noCountiesFile                                             *
@@ -192,19 +193,19 @@ function gotCountiesFile(xmlDoc)
  ************************************************************************/
 function noCountiesFile()
 {
-    var countySelect    = document.distForm.RegCounty;
+    let countySelect    = document.distForm.RegCounty;
     countySelect.options.length = 0;    // clear the selection
-    var tableNode   = document.getElementById("formTable");
-    var tbNode      = tableNode.tBodies[0];
-    var trNode      = document.getElementById("distRow");
-    var tdNode      = document.getElementById("msgCell");
+    let tableNode       = document.getElementById("formTable");
+    let tbNode          = tableNode.tBodies[0];
+    let trNode          = document.getElementById("distRow");
+    let tdNode          = document.getElementById("msgCell");
     while (tdNode.hasChildNodes())
         tdNode.removeChild(tdNode.firstChild);
     tdNode.setAttribute("class", "label");
     tdNode.className    = "label";
-    var msg     = document.createTextNode("Counties listing missing");
+    let msg     = document.createTextNode("Counties listing missing");
     spanElt.appendChild(msg);
-}       // noCountiesFile
+}       // function noCountiesFile
 
 var defaultPlaceName    = '';
 
@@ -216,18 +217,19 @@ var defaultPlaceName    = '';
  *                                                                      *
  *  Input:                                                              *
  *      this    <select name='RegCounty'>                               *
+ *      ev      instance of 'change' Event                              *
  ************************************************************************/
-function changeCounty()
+function changeCounty(ev)
 {
     // identify the selected county
-    var form        = document.distForm;
+    let form        = document.distForm;
 
     // check for the default place name in an uninitialized form
-    for(var i = 0; i < form.elements.length; i++)
-    {       // loop through all input elements
-        var element = form.elements[i];
+    for(let i = 0; i < form.elements.length; i++)
+    {               // loop through all input elements
+        let element = form.elements[i];
         switch(element.name)
-        {   // look for a field with default place name
+        {           // look for a field with default place name
             case 'InfRes':
             case 'InformantRes':
             {
@@ -237,21 +239,21 @@ function changeCounty()
                 }
                 break;
             }
-        }   // look for a field with default place name
-    }       // loop through all input elements
+        }           // look for a field with default place name
+    }               // loop through all input elements
 
-    var countySelect    = form.RegCounty;
-    var optIndex    = countySelect.selectedIndex;
+    let countySelect    = form.RegCounty;
+    let optIndex        = countySelect.selectedIndex;
     if (optIndex == -1)     // no county selected
         noTownship();       // clear township list
     else
-    {       // county selected
-        var optVal  = countySelect.options[optIndex].value;
+    {               // county selected
+        let optVal  = countySelect.options[optIndex].value;
         if (optVal.length > 0)
-        {   // have a county code
+        {           // have a county code
             // identify the file containing township information for
             // the selected county
-            var subFileName = "/Canada/TownshipsListXml.php?Prov=ON&County=" +
+            let subFileName = "/Canada/TownshipsListXml.php?Prov=ON&County=" +
                                 optVal;
             //alert("changeCounty: subFileName=\"" + subFileName + "\"");
 
@@ -263,9 +265,9 @@ function changeCounty()
                         noTownship);
 
             popupLoading(document.distForm.RegTownship);
-        }   // have a county code
-    }       // county selected
-}       // changeCounty
+        }           // have a county code
+    }               // county selected
+}       // function changeCounty
 
 /************************************************************************
  *  function getDefaultLocation                                         *
@@ -303,7 +305,7 @@ function getDefaultLocation(county, township)
                               county + ", ON, CA";
     else
         return township + ", " + county + ", ON, CA";
-}       // getDefaultLocation
+}       // function getDefaultLocation
 
 /************************************************************************
  *  function gotTownship                                                *
@@ -326,11 +328,11 @@ function gotTownship(xmlDoc)
             alert('Ontario.js: noTownship: xmlDoc is null');
     }
 
-    var regTownship = document.getElementById("RegTownship");
-    var regCounty   = document.getElementById("RegCounty");
-    var form        = regTownship.form;
-    var parentNode  = regTownship.parentNode;
-    var townshipSelect  = null;
+    let regTownship = document.getElementById("RegTownship");
+    let regCounty   = document.getElementById("RegCounty");
+    let form        = regTownship.form;
+    let parentNode  = regTownship.parentNode;
+    let townshipSelect  = null;
 
     if (regTownship &&
         regTownship.nodeType == 1 &&
@@ -341,7 +343,7 @@ function gotTownship(xmlDoc)
     }           // already have select element
     else
     {           // need a select element
-        var nextElement = null;
+        let nextElement = null;
         if (regTownship)
         {
             nextElement = regTownship.nextSibling;
@@ -360,60 +362,60 @@ function gotTownship(xmlDoc)
 
     // create a new HTML Option object to represent the null selection
     // and add it to the selection
-    var newOption   = addOption(townshipSelect,
+    let newOption   = addOption(townshipSelect,
                                 "Choose a Township",
                                 "");
 
     // insert the option entries for the towns, cities and townships in this
     // county from the XML file
-    var newOptions  = xmlDoc.getElementsByTagName("option");
+    let newOptions  = xmlDoc.getElementsByTagName("option");
 
     //alert("newOptions.length=" + newOptions.length);
 
-    for (var i = 0; i < newOptions.length; ++i)
+    for (let i = 0; i < newOptions.length; ++i)
     {
         // get the source "option" node
         // note that although this has the same contents and appearance as an
         // HTML "option" statement, it is an XML Element object, not an HTML
         // Option object.
-        var node    = newOptions[i];
+        let node    = newOptions[i];
 
         // get the text value to display to the user
-        var text    = node.textContent;
+        let text    = node.textContent;
 
         // get the "value" attribute
-        var value   = node.getAttribute("value");
+        let value   = node.getAttribute("value");
         if ((value == null) || (value.length == 0))
         {       // cover our ass
             value       = text;
         }       // cover our ass
 
         // create a new HTML Option object and add it
-        var newOption   = addOption(townshipSelect,
+        let newOption   = addOption(townshipSelect,
                                     text,
                                     value);
     }           // loop through source "option" nodes
 
     // if the form has a township value, select it
     townshipSelect.selectedIndex    = 0;
-    var option;
-    var regTownshipTxt  = document.getElementById("RegTownshipTxt");
+    let option;
+    let regTownshipTxt  = document.getElementById("RegTownshipTxt");
     if (regTownshipTxt)
     {           // have a township text field in form
-        var townshipName    = regTownshipTxt.value;
+        let townshipName    = regTownshipTxt.value;
         townshipSelect.value    = townshipName;
-        var index       = townshipSelect.selectedIndex;
+        let index       = townshipSelect.selectedIndex;
         option          = townshipSelect.options[index];
         if (option.text == '')
         {       // township not found in selection list
             option.text     = townshipName;
         }       // township not found in selection list
 
-        var dfltValue   = getDefaultLocation(form.RegCounty.value,
+        let dfltValue   = getDefaultLocation(form.RegCounty.value,
                                          townshipName);
-        for(var i = 0; i < form.elements.length; i++)
+        for(let i = 0; i < form.elements.length; i++)
         {       // loop through all input elements
-            var element = form.elements[i];
+            let element = form.elements[i];
             switch(element.name)
             {       // act on specific named element
                 case 'Place':
@@ -428,7 +430,7 @@ function gotTownship(xmlDoc)
                 {   // locations
                     if (element.value == '')
                         element.value   = dfltValue;
-                }   // locations
+                }   // function locations
             }       // act on specific named element
         }       // loop through all input elements
     }           // have a township text field in form
@@ -436,7 +438,7 @@ function gotTownship(xmlDoc)
     // intercept changes to township
     parentNode.appendChild(townshipSelect);
     townshipSelect.onchange = changeTownship;
-}       // gotTownship
+}       // function gotTownship
 
 /************************************************************************
  *  function noTownship                                                 *
@@ -454,26 +456,26 @@ function noTownship()
         alert('Ontario.js: noTownship');
 
     // clear out old selection list in the township cell
-    var element     = document.getElementById("RegTownship");
+    let element             = document.getElementById("RegTownship");
     if (element)
     {
-        var container   = element.parentNode;
-        var form        = element.form;
+        let container       = element.parentNode;
+        let form            = element.form;
         container.removeChild(element);
 
         // the field with name RegTownshipTxt
         // contains the name of the township from the database record
-        var twpInput    = document.createElement("input");
+        let twpInput        = document.createElement("input");
         twpInput.type       = "text";
         if (form.RegTownshipTxt)
             twpInput.value  = form.RegTownshipTxt.value;
         twpInput.name       = "RegTownship";
-        twpInput.id     = "RegTownship";
+        twpInput.id         = "RegTownship";
         twpInput.classname  = "act left";
         twpInput.size       = 24;
         container.appendChild(twpInput);
     }
-}       // noTownship
+}       // function noTownship
 
 /************************************************************************
  *  function changeTownship                                             *
@@ -482,26 +484,27 @@ function noTownship()
  *                                                                      *
  *  Input:                                                              *
  *      this        <select name='RegTownship'>                         *
+ *      ev          instance of 'change' Event                          *
  ************************************************************************/
-function changeTownship()
+function changeTownship(ev)
 {
     // identify the selected township
-    var townshipSelect  = this;
-    var theForm     = this.form;
-    var optIndex    = townshipSelect.selectedIndex;
+    let townshipSelect      = this;
+    let theForm             = this.form;
+    let optIndex            = townshipSelect.selectedIndex;
     if (optIndex == -1)     // no township selected
         noTownship();       // clear township list
     else
     {               // township selected
-        var town        = townshipSelect.options[optIndex].value;
+        let town            = townshipSelect.options[optIndex].value;
         theForm.RegTownshipTxt.value    = town;
-        var dfltValue   = getDefaultLocation(theForm.RegCounty.value,
+        let dfltValue       = getDefaultLocation(theForm.RegCounty.value,
                                          town);
-        var twpCell     = document.getElementById("TwpCell");
+        let twpCell         = document.getElementById("TwpCell");
 
         // if the form has not been initialized from a record
         // fill in defaults for a number of fields
-        var nonames =
+        let nonames =
             (theForm.GGivenNames && theForm.GGivenNames.value.length == 0 &&
              theForm.GSurname && theForm.GSurname.value.length == 0 &&
              theForm.BGivenNames && theForm.BGivenNames.value.length == 0 &&
@@ -511,9 +514,9 @@ function changeTownship()
         if (nonames && theForm.Witness1Res)
             defaultPlaceName    = theForm.Witness1Res.value;
 
-        for(var i = 0; i < theForm.elements.length; i++)
+        for(let i = 0; i < theForm.elements.length; i++)
         {           // loop through all input elements
-            var element = theForm.elements[i];
+            let element             = theForm.elements[i];
             switch(element.name)
             {       // act on specific named element
                 case 'RegTownshipTxt':
@@ -550,8 +553,8 @@ function changeTownship()
                     if (element.value != '' &&
                         element.value != defaultPlaceName)
                         break;
-                    var fileOff = location.pathname.lastIndexOf("/") +1;
-                    var pageName    = location.pathname.substring(fileOff);
+                    let fileOff = location.pathname.lastIndexOf("/") +1;
+                    let pageName    = location.pathname.substring(fileOff);
                     if (pageName.substring(0, 5) == 'Birth' &&
                         (theForm.RegYear.value - 0) < 1908)
                         element.value   = 'N/A';

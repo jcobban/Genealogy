@@ -43,6 +43,7 @@ use \Exception;
  *						Person::getPersons								*
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/08/30      use Template                                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -69,7 +70,7 @@ if (count($_GET) > 0)
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
 		switch (strtolower($key))
-		{		// act on individual parameters
+		{		    // act on individual parameters
 		    case 'week':
             {
                 if (strlen($value) > 0)
@@ -78,7 +79,7 @@ if (count($_GET) > 0)
 					    $week	    = (int)$value;
 					else
 	                {
-	                    $weektext   = $value;
+	                    $weektext   = htmlspecialchars($value);
 					    $week	    = 1;
 	                }
                 }
@@ -110,11 +111,12 @@ if (count($_GET) > 0)
 
 		    default:
 		    {
-				$warn	.= "<p>Unexpected parameter $key='$value' ignored.</p>\n";
+                $warn	.= "<p>Unexpected parameter $key='" .
+                    htmlspecialchars($value) . "' ignored.</p>\n";
 				break;
 		    }
-		}		// act on individual parameters
-    }			// loop through all parameters
+		}		    // act on individual parameters
+    }			    // loop through all parameters
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
 }	        	    // invoked by URL to display information

@@ -60,6 +60,7 @@ use \Exception;
  *		2019/02/18      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
  *      2020/07/09      title was not set in all cases                  *
+ *      2020/12/03      correct XSS vulnerability                       *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -91,7 +92,8 @@ if (isset($_POST) && count($_POST) > 0)
     foreach($_POST as $key => $value)
     {			// loop through parameters
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n"; 
+                                "<td class='white left'>" .
+                                htmlspecialchars($value) . "</td></tr>\n"; 
 
 	    switch(strtolower($key))
 	    {		// act on specific parameters
@@ -177,7 +179,8 @@ if (isset($_GET))
     foreach($_GET as $key => $value)
     {
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n"; 
+                                "<td class='white left'>" .
+                                htmlspecialchars($value) . "</td></tr>\n"; 
         switch(strtolower($key))
         {		// act on specific parameters
 			case 'lang':

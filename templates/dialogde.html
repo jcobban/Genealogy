@@ -37,6 +37,7 @@
 	    toolbar             : "undo redo | styleselect | bold italic | " 
 	                           + "alignleft aligncenter alignright alignjustify | " 
 	                           + "bullist numlist | link image",
+        height              : "170px",
 	    content_css		    : "/styles.css"
 	};
 	
@@ -76,10 +77,14 @@
           <a href="/Account.php?lang=de" id="session" target="_blank"
               title="Ihr Kontostatus" class="menuitem">
               Konto $USERID
+          <br></a>
+          <a href="/Messages.php?lang=$LANG" id="messages" target="_blank"
+              title="Your messages" class="menuitem">
+              Messages
             <span id="gotMail">
                 <img src="/envelope.svg" alt="You have mail" style="display: inline-block; height: 19px;"/>
             </span>
-          </a><br>
+          <br></a>
       </span>
       <span id='UserInfoAbout'>Über diese Seite</span>
     </div>

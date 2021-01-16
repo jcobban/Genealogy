@@ -43,6 +43,7 @@ use \Exception;
  *		2018/11/19      change Help.html to Helpen.html                 *
  *		2019/07/07      use Template                                    *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -56,14 +57,15 @@ $lang                   = 'en';
 
 if (count($_GET) > 0)
 {                   // initial display
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                        "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                            "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
     {	            // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		    // act on specific parameter
 			case 'lang':
@@ -79,10 +81,10 @@ if (count($_GET) > 0)
 else
 if (count($_POST) > 0)
 {                   // update table
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                  "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_POST</p>\n" .
+                        "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                            "<th class='colhead'>value</th></tr>\n";
     $used               = 0;
     $tag1               = 0;
     $qstag              = 0;
@@ -91,7 +93,8 @@ if (count($_POST) > 0)
 	foreach($_POST as $key => $value)
 	{	            // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-            "<td class='white left'>$value</td></tr>\n";
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
         $key                    = strtolower($key);
         $result                 = preg_match('/([a-zA-Z_$]+)(\d*)/', $key, $matches);
         $column                 = $matches[1];
@@ -132,31 +135,34 @@ if (count($_POST) > 0)
 			    $tag1               = 0;
 			    $qstag              = 0;
 			    $childstats         = '';
-				$idcs		        = $value;
+                if (ctype_digit($value))
+                    $idcs       = intval($value, 10);
+                else
+                    $idcstext   = htmlspecialchars($value);
 				break;
 		    }
 
 		    case 'used':
 		    {
-				$used		= $value;
+				$used		        = intval($value);
 				break;
 		    }
 
 		    case 'tagi':
 		    {
-				$tag1		= $value;
+				$tag1		        = intval($value);
 				break;
 		    }
 
 		    case 'qstag':
 		    {
-				$qstag		= $value;
+				$qstag		        = intval($value);
 				break;
 		    }
 
 		    case 'childstatus':
 		    {
-				$childstatus	= $value;
+				$childstatus	    = intval($value);
 				break;
 		    }
 
@@ -175,7 +181,7 @@ $template		        = new FtTemplate("ChildStatus$action$lang.html");
 $trtemplate             = $template->getTranslate();
 
 // query the database for details
-$statusSet	= new RecordSet('tblCS');
+$statusSet	            = new RecordSet('tblCS');
 
 $dataRow                = $template['dataRow$IDCS'];
 if ($dataRow === null)

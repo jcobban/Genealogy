@@ -1,5 +1,5 @@
 <!--*********************************************************************
- *  ConcessionsUpdateen.html											*
+ *  ConcessionsUpdateNoten.html											*
  *																		*
  *  Display the results of an update to the Concessions table for       *
  *  a township.                                                         *
@@ -58,6 +58,24 @@
 	  <p id="count0">Updated No concessions.</p>
 	  <p id="count1">Updated 1 concession.</p>
 	  <p id="countmany">Updated $CHANGECOUNT concessions.</p>
+      <span id="CCInvalid">
+          Invalid country code value '$value'. 
+      </span>
+      <span id="domainInvalid">
+          Invalid domain value '$value'. 
+      </span>
+      <span id="countyInvalid">
+          Invalid county '$county' within domain '$domain'.  
+      </span>
+      <span id="countyMissing">
+          Missing mandatory parameter County.
+      </span>
+      <span id="townshipInvalid">
+          Unknown township '$township' within county '$county'.  
+      </span>
+      <span id="townshipMissing">
+          Missing mandatory parameter Township.
+      </span>
     </div><!-- id="templates"-->
   </div><!-- class="body"-->
     <script src="/jscripts/CommonForm.js" type="text/javascript"></script>

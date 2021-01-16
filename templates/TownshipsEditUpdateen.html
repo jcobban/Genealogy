@@ -41,7 +41,7 @@
       $TRACE
       $MSG
     <!--- Put out the response as a table -->
-    <form name="townshipForm"
+    <form name="townshipForm" id="townshipForm"
 		  action="TownshipsEdit.php" 
 		  method="post" 
 		  autocomplete="off" 
@@ -149,8 +149,27 @@
 	  Click on this button to update the database to include the changes you
 	  have made to the townships list for the current county.
     </div>
+    <div class="hidden" id="messages">
+        <span id="badDomain">
+            Domain identifier $value is not supported.
+        </span>
+        <span id="badCounty">
+            County identifier $value is invalid.
+        </span>
+        <span id="noCounty">
+            County identifier not specified.
+        </span>
+        <span id="unknownCounty">
+            County code '$county' is not defined for domain '$domain'. 
+        </span>
+        <p id="invalidDomain">
+            Invalid domain identifier '$domain' ignored
+        </p>
+        <p id="invalidProv">Invalid province code '$prov' ignored</p>
+        <p id="invalidState">Invalid state code '$state' ignored</p>
+    </div>
     <div class="hidden" id="templates">
-		  <!-- template for adding a new township -->
+	  <!-- template for adding a new township -->
       <table>
 		  <tr id="NewTownship$line">
 		    <td class="right">

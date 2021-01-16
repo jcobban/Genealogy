@@ -114,6 +114,7 @@ use \NumberFormatter;
  *		2020/01/22      internationalize numbers                        *
  *		2020/02/14      add loose check for "name, .*, county..."       *
  *		2020/06/30      add feedback parameter                          *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *																	    *
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -136,6 +137,7 @@ else
 // default values of parametets
 $namestart					= '';
 $idlr		    			= 0;		// default to create new
+$idlrtext                   = null;
 $name		    			= '';
 $feedback                   = null;
 $closeAtEnd					= false;
@@ -151,20 +153,22 @@ foreach($_GET as $key => $value)
 	    {           // numeric key of location
 			if (strlen($value) > 0 &&
 			    ctype_digit($value))
-			    $idlr	    = $value;
+                $idlr	    = $value;
+            else
+                $idlrtext   = htmlspecialchars($value);
 			break;
 	    }           // numeric key of location
 
 	    case 'name':
 	    {           // name of location
 			$idlr		    = 0;
-			$name		    = $value;
+			$name		    = htmlspecialchars($value);
 			break;
 	    }           // name of location
 
 	    case 'feedback':
 	    {           // name of feedback field in calling page
-			$feedback	    = $value;
+			$feedback	    = htmlspecialchars($value);
 			break;
 	    }           // name of location
 
@@ -196,7 +200,8 @@ foreach($_GET as $key => $value)
 
 	    default:
 	    {
-			$warn	.= "<p>Location.php: Unexpected parameter $key='$value'</p>\n";
+            $warn	.= "<p>Location.php: Unexpected parameter $key='" .
+                        htmlspecialchars($value) . "'</p>\n";
 			break;
 	    }
 	}		        // act on specific parameters
@@ -254,7 +259,7 @@ else
 	$idlr	    	        = 0;
     $title	    	        = $template['newlocationTitle']->innerHTML();
 }                   // not found
-$title          	= str_replace('$NAME', $name, $title);
+$title          	= str_replace('$NAME', htmlspecialchars($name), $title);
 $template->set('TITLE',             $title);
 
 // set up values for displaying in form
@@ -288,7 +293,7 @@ else
 if (strlen($namestart) == 0)
 	$template->updateTag('nameStart', null);
 else
-    $template->set('NAMESTART',     $namestart);
+    $template->set('NAMESTART',     htmlspecialchars($namestart));
 
 // set up selection lists on form
 $fsresolved		    = $location->get('fsresolved');

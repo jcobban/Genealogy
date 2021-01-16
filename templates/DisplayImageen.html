@@ -12,8 +12,9 @@
  *		2019/12/12      fix header at top and scroll image such that    *
  *		                the scroll bars are visible all the time        *
  *      2020/06/17      script moved to top folder                      *
+ *      2021/01/15      add invalid URL message                         *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
        <a href="/genealogy.php">Genealogy</a>:
@@ -25,17 +26,17 @@
       $TRACE
       <div id="top" class="center header">
         <div class="left" id="goToPrevImg">
-	      <a href="DisplayImage.php?src=$dirname/$previmg&fldName=$fldName&lang=$lang">
+	      <a href="DisplayImage.php?src=$dirname$previmg&fldName=$fldName&lang=$lang">
 	        &lt;---
 	      </a>
         </div>
         <div class="right" id="goToNextImg">
-	      <a href="DisplayImage.php?src=$dirname/$nextimg&fldName=$fldName&lang=$lang">
+	      <a href="DisplayImage.php?src=$dirname$nextimg&fldName=$fldName&lang=$lang">
 	        ---&gt;
 	      </a>
         </div>
         <div class="center">
-          <form name="imageForm">
+          <form name="imageForm" id="imageForm">
             $CREDIT
             <br>
 	        $IMAGENAME
@@ -66,10 +67,13 @@
         This image is provided by $hostname.
       </span>
       <span id="baddir">
-          Unable to open directory $dirname
+          Unable to open directory $dirname.
       </span>
       <span id="notfound">
           Requested image not found.
+      </span>
+      <span id="notfoundURL">
+          URL $src does not exist.
       </span>
     </div>
     <div class="balloon" id="Helpplus">

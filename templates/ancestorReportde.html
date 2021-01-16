@@ -13,7 +13,7 @@
   <div id="breadcrumbs" class="hidden">
 	  <a href="/index.html">Home</a>:
     <a href="/genealogy.php?lang=$LANG">
-		Genealogie
+		Stammbaumforschung
     </a>:
     <a href="/genCountry.php?cc=CA&lang=$LANG">
 		Canada
@@ -49,7 +49,9 @@
       <span class="right">
 		<a href="ancestorReportHelpde.html" target="help">? Help</a>
       </span>
-      Vorfahrenbaum  $NAME
+      <span id="title">
+        Vorfahrenbaum  $NAME
+      </span>
       <div style="clear: both;"></div>
     </h1>
     $TRACE
@@ -99,8 +101,12 @@
     <span id="Mother">Mutter</span>
     <span id="Fathers">s Vater</span>
     <span id="Mothers">s Mutter</span>
+    <span id="Failure">Fehler</span>
     <span id="direction">CP</span>
-    <span id="Failure">échec</span>
+    <span id="Unknown">Unbekannt</span>
+    <span id="direction">CP</span>
+    <span id="missing">Es gibt keine Person mit  IDIR=$idir. </span>
+    <span id="missingIdir">Fehlender obligatorischer Parameter IDIR. </span>
   </div><!-- id="templates" -->
   <div id="HelpancDepth" class="balloon">
 	Specify the number of generations of ancestors to display.

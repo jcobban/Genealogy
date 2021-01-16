@@ -44,6 +44,7 @@ use \Templating\Template;
  *		2019/02/19      use new FtTemplate constructor                  *
  *		2020/02/23      $surname and $idnr were not initialized if      *
  *		                there were no surname matches                   *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -53,24 +54,24 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // default values
-$maxcols	    = 8;
-$getParms	    = array();
-$initial        = null;
-$soundex        = null;
-$pattern        = null;
-$surname        = null;
-$idnr           = null;
-$lang           = 'en';
-$treename       = '';
+$maxcols	    			= 8;
+$getParms	    			= array();
+$initial        			= null;
+$soundex        			= null;
+$pattern        			= null;
+$surname        			= null;
+$idnr           			= null;
+$lang           			= 'en';
+$treename       			= '';
 
 // check all passed parameters
 foreach($_GET as $key => $value)
-{		// loop through all parameters
+{		            // loop through all parameters
 	switch($key)
-	{	// take action depending upon name of parameter
+	{	            // take action depending upon name of parameter
 	    case 'initial':
-	    {		// initial= specified
-			$initial	= ucfirst($value);
+	    {		    // initial= specified
+			$initial	                = ucfirst($value);
 			if (strlen($initial) == 0)
 			{
 			    $msg	.= "Invalid zero length surname prefix.";
@@ -96,71 +97,76 @@ foreach($_GET as $key => $value)
 	    case 'soundex':
 	    case 'soundslike':
         {		// soundex specified
-			$soundex	= substr($value . '000', 0, 4);
-			$getParms['soundslike']	= $soundex;
+			$soundex	                = substr($value . '000', 0, 4);
+			$getParms['soundslike']	    = $soundex;
 			break;
 	    }		// soundex specified
 
 	    case 'pattern':
         {		// soundex specified
-            $pattern                = $value;
-			$getParms['surname']	= $pattern;
+            $pattern                    = $value;
+			$getParms['surname']	    = $pattern;
 			break;
 	    }		// soundex specified
 
 	    case 'maxcols':
 	    {		// maximum number of surnames per row
 			if (ctype_digit($value))
-                $maxcols	        = intval($value);
+                $maxcols	            = intval($value);
             if ($maxcols> 9)
-                $maxcols            = 9;
+                $maxcols                = 9;
 			break;
         }		// maximum number of surnames per row
 
         case 'treename':
         {
-            $treename               = $value;
+            $treename                   = $value;
+			break;
         }
 
         case 'lang':
         {
-            if (strlen($value) == 2)
-                $lang       = strtolower($value);
+            $lang       = FtTemplate::validateLang($value);
+			break;
         }
 	}	// take action depending upon name of parameter
 }		// loop through all parameters
 
-$template	        = new FtTemplate( "Surnames$lang.html");
+$template	            = new FtTemplate( "Surnames$lang.html");
 
 if (!is_null($initial))
 {
 	if (strlen($initial) == 0)
-	    $title	= $template['nosurname']->innerHTML();
+	    $title	        = $template['nosurname']->innerHTML();
 	else
     if (ctype_alpha($initial))
     {
-        $title	= $template['starting']->innerHTML();
-        $title  = str_replace('$INITIAL', $initial, $title);
+        $title	        = $template['starting']->innerHTML();
+        $title          = str_replace('$INITIAL', $initial, $title);
     }
 	else
-	    $title	= $template['invalid']->innerHTML();
+	    $title	        = $template['invalid']->innerHTML();
 }
 else
 if (!is_null($soundex))
 {
-	$title	= $template['soundex']->innerHTML();
-    $title  = str_replace('$VALUE', $soundex, $title);
+	$title	            = $template['soundex']->innerHTML();
+    $title              = str_replace('$VALUE', 
+                                      htmlspecialchars($soundex), 
+                                      $title);
 }
 else
 if (!is_null($pattern))
 {
-	$title	= $template['pattern']->innerHTML();
-    $title  = str_replace('$VALUE', $pattern, $title);
+	$title	            = $template['pattern']->innerHTML();
+    $title              = str_replace('$VALUE', 
+                                      htmlspecialchars($pattern), 
+                                      $title);
 }
 else
 {
-    $title	= $template['missing']->innerHTML();
-    $msg    .= "$title. ";
+    $title	            = $template['missing']->innerHTML();
+    $msg                .= "$title. ";
 }
 $template->set('TITLE',     $title);
 
@@ -207,6 +213,6 @@ $template->set('TITLE',	            $title);
 $template->set('LANG',			    $lang);
 $template->set('CONTACTTABLE',		'Names');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
-$template->set('TREENAME',          $treename);
+$template->set('TREENAME',          htmlspecialchars($treename));
 
 $template->display();

@@ -87,6 +87,7 @@ use \Templating\Template;
  *      2019/09/16      use class FtTemplate for output                 *
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/05/09      set all fields in parameters to feedbackFunc    *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -104,7 +105,9 @@ $surname                = '';
 $nameuri                = '';   // defaults for trail of breadcrumbs
 $prefix                 = '';
 $idir1                  = null;
+$idir1text              = null;
 $idir2                  = null;
+$idir2text              = null;
 $useSurname2            = false;
 $useGivenName2          = false;
 $useBthDate2            = false;
@@ -132,26 +135,36 @@ if (isset($_POST) && count($_POST) > 0)
         {           // act on specific parameters
             case 'idir1':
             {
-                $idir1          = $value;
-                $person1        = new Person(array('idir' => $idir1));
-                $evBirth1       = $person1->getBirthEvent(true);
-                $evChris1       = $person1->getChristeningEvent(true);
-                $evDeath1       = $person1->getDeathEvent(true);
-                $evBuried1      = $person1->getBuriedEvent(true);
-                $isOwner        = $isOwner && $person1->isOwner();
+                if (ctype_digit($value))
+                {
+	                $idir1          = $value;
+	                $person1        = new Person(array('idir' => $idir1));
+	                $evBirth1       = $person1->getBirthEvent(true);
+	                $evChris1       = $person1->getChristeningEvent(true);
+	                $evDeath1       = $person1->getDeathEvent(true);
+	                $evBuried1      = $person1->getBuriedEvent(true);
+                    $isOwner        = $isOwner && $person1->isOwner();
+                }
+                else
+                    $idir1text      = htmlspecialchars($value);
                 break;
             }       // idir1
 
             case 'idir2':
             {
-                $idir2          = $value;
-                $person2        = new Person(array('idir' => $idir2));
-                // only create events if they are recorded
-                $evBirth2       = $person2->getBirthEvent(false);
-                $evChris2       = $person2->getChristeningEvent(false);
-                $evDeath2       = $person2->getDeathEvent(false);
-                $evBuried2      = $person2->getBuriedEvent(false);
-                $isOwner        = $isOwner && $person2->isOwner();
+                if (ctype_digit($value))
+                {
+	                $idir2          = $value;
+	                $person2        = new Person(array('idir' => $idir2));
+	                // only create events if they are recorded
+	                $evBirth2       = $person2->getBirthEvent(false);
+	                $evChris2       = $person2->getChristeningEvent(false);
+	                $evDeath2       = $person2->getDeathEvent(false);
+	                $evBuried2      = $person2->getBuriedEvent(false);
+                    $isOwner        = $isOwner && $person2->isOwner();
+                }
+                else
+                    $idir2text      = htmlspecialchars($value);
                 break;
             }       // idir2
 
@@ -330,7 +343,17 @@ else
     $template->set('NAMEURI',   '');
     $template['titleNames']->update(null);
     $template['crumbsSurname']->update(null);
-    $msg        .= 'Missing mandatory parameters. ';
+    if (is_string($idir1text))
+        $msg    .= "Invalid value for IDIR1=$idir1text. ";
+    if (is_string($idir2text))
+        $msg    .= "Invalid value for IDIR2=$idir1text. ";
+    if (is_int($idir1) && is_int($idir2))
+    {   
+        if ($idir1 == $idir2)
+            $msg    .= "Cannot merge Person with IDIR1=$idir1 with itself. ";
+    }
+    else
+        $msg        .= 'Missing mandatory parameters. ';
 }                   // missing parameter
 
 if (strlen($msg) == 0)

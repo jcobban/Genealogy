@@ -1,7 +1,7 @@
 <!--*********************************************************************
  *  CountriesDisplayen.html												*
  *																		*
- *  Display form for displaying information about			 	              		*
+ *  Display form for displaying information about			 	        *
  *  countries for managing record transcriptions.						*
  *																		*
  *  History:															*
@@ -164,6 +164,10 @@
 	have made to the countries list.
 	</div>
 	<div class="hidden" id="templates">
+	    <!-- message text localization -->
+        <p id='countryDeleted'>Deleted country code '$delcc'</p>
+        <p id='offsetIgnored'>Ignored Offset=$value'</p>
+        <p id='limitIgnored'>Ignored Limit=$value'</p>
 	    <!-- template for adding a new country -->
 	    <table>
 	      <tr id="Row$country">

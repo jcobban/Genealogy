@@ -42,9 +42,10 @@ if (isset($_GET) && count($_GET) > 0)
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
-	{			// loop through parameters
+    {			// loop through parameters
+        $valuetext  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$valuetext</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {
 			case 'lang':
@@ -57,8 +58,8 @@ if (isset($_GET) && count($_GET) > 0)
 			case 'pattern':
 			{
 			    if (strlen($value) > 0)
-			    {
-					$pattern		= $value;
+                {
+					$pattern		    = $value;
 					$getParms['name']	= $value;
 			    }
 			    break;
@@ -86,16 +87,18 @@ else
 if (isset($_POST) && count($_POST) > 0)
 {		// when submit button is clicked invoked by method='post'
     $parmsText      = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+                        "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                            "<th class='colhead'>value</th></tr>\n";
 	$language		= null;
 	foreach($_POST as $key => $value)
 	{
+        $valuetext  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$valuetext</td></tr>\n"; 
 	    $fieldLc		= strtolower($key);
 	    if ($fieldLc == 'debug' ||
+			$fieldLc == 'lang' ||
 			$fieldLc == 'pattern')
 	    {
 	    }
@@ -117,47 +120,67 @@ if (isset($_POST) && count($_POST) > 0)
 			    if ($language instanceof Language)
 			    {
 					$language->save(null);
-			    }
-			    $code   	= $value;
-			    $language	= new Language(array('code'	=> $code));
+                }
+                if (preg_match('/^\w\w$/', $value))
+                {
+			        $code   	= strtolower($value);
+                    $language	= new Language(array('code'	=> $code));
+                }
+                else
+                {
+                    $msg        .= "Invalid language code '" .
+                                    htmlspecialchars($value) .
+                                    "' in parameter $key$code. ";
+                    $language   = null;
+                }
 			    break;
 			}
 
 			case 'name':
-			{
-			    $language->set('name', $value);
+            {
+                if ($language)
+			        $language->set('name', $value);
 			    break;
 			}
 
 			case 'nativename':
 			{
-			    $language->set('nativename', $value);
+                if ($language)
+			        $language->set('nativename', $value);
 			    break;
 			}
 
 			case 'article':
 			{
-			    $language->set('article', $value);
+                if ($language)
+			        $language->set('article', $value);
 			    break;
 			}
 
 			case 'possessive':
 			{
-			    $language->set('possessive', $value);
+                if ($language)
+			        $language->set('possessive', $value);
 			    break;
 			}
 
 			case 'sorry':
 			{
-			    $language->set('sorry', $value);
+                if ($language)
+			        $language->set('sorry', $value);
 			    break;
 			}
 
 			case 'deletecountry':
 			{
 			    $language	= new Language(array('code'	=> $code));
-			    $language->delete(false);
-			    $warn   	.= "<p>deleted language code '$code'</p>\n";
+                $count      = $language->delete(false);
+                if ($count > 0)
+                {
+                    $warn   	.= "<p>Deleted language code '$code'</p>\n";
+                    $warn       .= '<p>' . $language->getLastSqlCmd() .
+                        "</p>\n";
+                }
 			    break;
 			}
 
@@ -198,13 +221,6 @@ if (isset($_POST) && count($_POST) > 0)
 
 }		// when submit button is clicked invoked by method='post'
 
-if (strlen($msg) == 0)
-{			// no errors detected
-	$getParms['offset']	= $offset;
-	$getParms['limit']	= $limit;
-	$languages	    	= new RecordSet('Languages', $getParms);
-}			// no errors detected
-
 if (canUser('edit'))
 	$action		= 'Update';
 else
@@ -223,24 +239,40 @@ $template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
 $template->set('LANG',              $lang);
 $template->set('OFFSET',            $offset);
 $template->set('LIMIT',             $limit);
-$info       	= $languages->getInformation();
-$count	        = $info['count'];
-$template->set('TOTALROWS', $count);
-$template->set('FIRST', $offset + 1);
-$template->set('LAST', min($count, $offset + $limit));
-if ($offset > 0)
-	$template->set('npPrev', "&offset=" . ($offset-$limit) .
-						 "&limit=$limit" .
-						 "&pattern=$pattern");
-else
-	$template->updateTag('prenpprev', null);
-if ($offset < $count - $limit)
-	$template->set('npNext', "&offset=" . ($offset+$limit) .
-						 "&limit=$limit" .
-						 "&pattern=$pattern");
-else
-	$template->updateTag('prenpnext', null);
 
-$template->updateTag('Row$code',
-					 $languages);
+if (strlen($msg) == 0)
+{			// no errors detected
+	$getParms['offset']	= $offset;
+	$getParms['limit']	= $limit;
+	$languages	    	= new RecordSet('Languages', $getParms);
+	
+	$info       	    = $languages->getInformation();
+	$count	            = $info['count'];
+	$template->set('TOTALROWS',     $count);
+	$template->set('FIRST',         $offset + 1);
+	$template->set('LAST',          min($count, $offset + $limit));
+	if ($offset > 0)
+		$template->set('npPrev', "&offset=" . ($offset-$limit) .
+							 "&limit=$limit" .
+							 "&pattern=$pattern");
+	else
+		$template->updateTag('prenpprev', null);
+	if ($offset < $count - $limit)
+		$template->set('npNext', "&offset=" . ($offset+$limit) .
+							 "&limit=$limit" .
+							 "&pattern=$pattern");
+	else
+		$template->updateTag('prenpnext', null);
+	
+    if ($count > 0)
+        $template->updateTag('Row$code', $languages);
+    else
+        $template['dataTable']->update(null);
+}			// no errors detected
+else
+{
+    $template['topBrowse']->update(null);
+    $template['languageForm']->update(null);
+}
+
 $template->display();

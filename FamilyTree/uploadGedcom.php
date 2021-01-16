@@ -41,7 +41,7 @@ if (isset($_GET) && count($_GET) > 0)
 		{
 		    case 'lang':
 		    {		// requested language
-	                $lang       = FtTemplate::validateLang($value);
+	            $lang       = FtTemplate::validateLang($value);
 				break;
 		    }		// requested language
 	

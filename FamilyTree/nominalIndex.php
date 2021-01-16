@@ -61,6 +61,9 @@ use \Exception;
  *		                and display in input field                      *
  *      2019/11/17      move CSS to <head>                              *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/10/31      default to browser's preferred language         *
+ *		2020/12/03      fix XSS errors                                  *
+ *		2020/12/17      correct handling of missing HTTP_ACCEPT_LANGUAGE*
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -72,7 +75,10 @@ $birthmin		= '-10000';
 $birthmax		= '3000';
 $name		    = '';
 $treeName		= '';
-$lang	        = 'en';
+if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+    $lang       = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+else
+    $lang       = 'en';
 
 // check familyTree cookie
 foreach($familyTreeCookie as $key => $value)
@@ -128,13 +134,13 @@ if (count($_GET) > 0)
 		    case 'name':
             {
                 if (strlen($value) > 0)
-                    $name	        = $value;
+                    $name	        = htmlspecialchars($value);
 				break;
 		    }
 	
 		    case 'treename':
 		    {
-				$treeName	    = $value;
+				$treeName	    = htmlspecialchars($value);
 				break;
 		    }
 	

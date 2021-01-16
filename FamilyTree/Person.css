@@ -1,19 +1,19 @@
 /************************************************************************
- *  Person.css								*
- *									*
- *  Stylesheet for the script Person.php				*
- *									*
- *  History:								*
- *	2014/03/17	created						*
- *	2014/05/25	add div.footnote to allow line break on spaces	*
- *	2017/08/16	renamed to Person.css				*
- *									*
- *  Copyright &copy; 2017 James A. Cobban				*
+ *  Person.css								                            *
+ *									                                    *
+ *  Stylesheet for the script Person.php				                *
+ *									                                    *
+ *  History:								                            *
+ *	    2014/03/17  created						                        *
+ *	    2014/05/25	add div.footnote to allow line break on spaces	    *
+ *	    2017/08/16	renamed to Person.css				                *
+ *									                                    *
+ *  Copyright &copy; 2017 James A. Cobban				                *
  ************************************************************************/
 
    /*********************************************************************
-    *	div.footnote							*
-    *	Display information in a footnote in Person.php			*
+    *	div.footnote							                        *
+    *	Display information in a footnote in Person.php			        *
     *********************************************************************/
     div.footnote { }
 

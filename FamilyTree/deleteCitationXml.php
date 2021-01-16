@@ -25,8 +25,10 @@ use \Exception;
  *		2015/01/07		change require to require_once					*
  *		2015/07/02		access PHP includes using include_path			*
  *		2017/07/27		class LegacyCitation renamed to class Citation	*
+ *      2020/12/05      correct XSS vulnerabilities                     *
+ *                      add messages                                    *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 header("content-type: text/xml");
 require_once __NAMESPACE__ . "/Citation.inc";
@@ -34,29 +36,47 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
 print "<?xml version='1.0' encoding='UTF-8'?>\n";
-print "<deleted";
-$idsx	= 0;
-foreach($_POST as $key => $value)
-{			// loop through all parameters
-	print " $key='$value'";
-	switch(strtolower($key))
-	{		// act on specific parameters
-	    case 'idsx':
-	    {
-		$idsx	= $value;
-		break;
-	    }		// IDSX
-	}		// act on specific parameters
-}			// loop through all parameters
-print ">\n";
 
+$idsx	            = 0;
+$idsxtext           = null;
+$rownum             = '';
+$formname           = '';
+$parmsText          = '';
+if (isset($_POST) && count($_POST) > 0)
+{		                        // parameters passed by method=post
+    foreach($_POST as $key => $value)
+    {		                    // loop through all parameters
+        $parmsText      .= "    <$key>" .
+                            htmlspecialchars($value) . "</$key>\n"; 
+		switch(strtolower($key))
+		{		// act on specific parameters
+		    case 'idsx':
+            {
+                if (ctype_digit($value))
+                    $idsx	        = $value;
+                else
+                    $idsxtext       = htmlspecialchars($value);
+			    break;
+            }		// IDSX
+
+            case 'rownum':
+            {
+                $rownum             = htmlspecialchars($value);
+                break;
+            }
+
+            case 'formname':
+            {
+                $formname           = htmlspecialchars($value);
+                break;
+            }
+		}		// act on specific parameters
+	}			// loop through all parameters
+}		                        // parameters passed by method=post
+
+print "<deleted idsx='$idsx' rownum='$rownum' formname='$formname'>\n";
 // include info on parameters
-print "    <parms>\n";
-foreach($_POST as $key => $value)
-{
-	print "\t<$key>$value</$key>\n";
-}
-print "    </parms>\n";
+print "    <parms>\n$parmsText</parms>\n";
 
 // determine if permitted to add children
 if (!canUser('edit'))
@@ -65,19 +85,21 @@ if (!canUser('edit'))
 }		// take no action
 
 // validate parameters
-if ($idsx == 0)
-	$msg	.= 'Missing mandatory parameter idsx. ';
+if (is_string($idsxtext))
+    $msg	.= "IDSX value '$idsxtext' is invalid. ";
+else
+if (is_null($idsx))
+	$msg	.= 'Missing mandatory parameter idsx. ' . $idsxtext;
 
 showTrace();
 
 if (strlen($msg) > 0)
 {
 	print "<msg>$msg</msg>\n";
-	print "</deleted>\n";
-	exit;
 }
-
-$citation	= new Citation(array('idsx' => $idsx));
-$citation->delete("cmd");
- 
+else
+{                       // delete requested record
+    $citation	    = new Citation(array('idsx' => $idsx));
+    $citation->delete("cmd");
+}                       // delete requested record 
 print "</deleted>\n";

@@ -11,8 +11,10 @@
  *		2019/04/07      ensure that the paging lines can be displayed   *
  *		                within the visible portion of the browser.      *
  *		2019/07/22      open sub-forms in right half of window          *
+ *		2021/01/13      document that Event passed to all handlers      *
+ *		                remove support for ES5                          *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -21,99 +23,104 @@ window.onload	= onLoad;
  *  function onLoad														*
  *																		*
  *  Initialize the dynamic functionality once the page is loaded		*
+ *																		*
+ *  Input:																*
+ *		this		instance of window                                  *
+ *		ev          instance of 'load' Event                            *
  ************************************************************************/
-function onLoad()
+function onLoad(ev)
 {
     // activate handling of key strokes in text input fields
     // including support for context specific help
-    var	element;
-    var trace	= '';
-    for (var fi = 0; fi < document.forms.length; fi++)
-    {		// loop through all forms
-		var form	= document.forms[fi];
-		trace	+= "<form ";
+    let	element;
+    let trace	                = '';
+    for (let fi = 0; fi < document.forms.length; fi++)
+    {		            // loop through all forms
+		let form	            = document.forms[fi];
+		trace	                += "<form ";
 		if (form.name.length > 0)
-		    trace	+= "name='" + form.name + "' ";
+		    trace	            += "name='" + form.name + "' ";
 		if (form.id.length > 0)
-		    trace	+= "id='" + form.id + "' ";
-		trace	+= ">";
+		    trace	            += "id='" + form.id + "' ";
+		trace	                += ">";
 
-		for (var i = 0; i < form.elements.length; ++i)
-		{	// loop through all elements of form
-		    element		= form.elements[i];
-		    trace += "<" + element.nodeName + " ";
+		for (let i = 0; i < form.elements.length; ++i)
+		{	            // loop through all elements of form
+		    element		        = form.elements[i];
+		    trace               += "<" + element.nodeName + " ";
 		    if (element.name.length > 0)
-				trace	+= "name='" + element.name + "' ";
+				trace	        += "name='" + element.name + "' ";
 		    if (element.id.length > 0)
-				trace	+= "id='" + element.id + "' ";
-		    trace	+= ">";
-		    element.onkeydown	= keyDown;
+				trace	        += "id='" + element.id + "' ";
+		    trace	            += ">";
+		    element.onkeydown	= keyDown;  // common
 
 		    // pop up help balloon if the mouse hovers over a field
 		    // for more than 2 seconds
 		    if (element.parentNode.nodeName == 'TD')
-		    {	// set mouseover on containing cell
+		    {	        // set mouseover on containing cell
 				element.parentNode.onmouseover	= eltMouseOver;
 				element.parentNode.onmouseout	= eltMouseOut;
-		    }	// set mouseover on containing cell
+		    }	        // set mouseover on containing cell
 		    else
-		    {	// set mouseover on input element itself
-				element.onmouseover		= eltMouseOver;
-				element.onmouseout		= eltMouseOut;
-		    }	// set mouseover on input element itself
+		    {	        // set mouseover on input element itself
+				element.onmouseover		        = eltMouseOver;
+				element.onmouseout		        = eltMouseOut;
+		    }	        // set mouseover on input element itself
 
-		    var	name	= element.name;
+		    let	name	= element.name;
 		    if (name.length == 0)
 				name	= element.id;
-		    var	column	= name.substring(0, name.length - 2).toLowerCase();
-		    var	code	= name.substring(name.length - 2).toUpperCase();
+		    let	column	= name.substring(0, name.length - 2).toLowerCase();
+		    let	code	= name.substring(name.length - 2).toUpperCase();
 
 		    switch (column)
-		    {		// act on a field from a table row
+		    {		    // act on a field from a table row
 				case 'code':
-				{	// ISO country code
-				    element.helpDiv	= 'Code';
+				{	    // ISO country code
+				    element.helpDiv			= 'Code';
 				    break;
-				}	// ISO country code
+				}	    // ISO country code
 
 				case 'name':
-				{	// Name in English
-				    element.helpDiv	= 'Name';
-				    element.change	= change;
+				{	    // Name in English
+				    element.helpDiv			= 'Name';
+				    element.change			= change;
 				    break;
-				}	// Name in English
+				}	    // Name in English
 
 				case 'names':
-				{	// names in other languages
-				    element.helpDiv	= 'Names';
-				    element.onclick	= showNames;
+				{	    // names in other languages
+				    element.helpDiv			= 'Names';
+				    element.onclick			= showNames;
 				    break;
-				}	// names in other languages
+				}	    // names in other languages
 
 				case 'editdomains':
-				{	// edit states/provinces of the country
-				    element.helpDiv	= 'EditDomains';
-				    element.onclick	= showDomains;
+				{	    // edit states/provinces of the country
+				    element.helpDiv			= 'EditDomains';
+				    element.onclick			= showDomains;
 				    break;
-				}	// edit states/provinces of the country
+				}	    // edit states/provinces of the country
 
 				case 'delete':
-				{	// delete this country
-				    element.helpDiv	= 'Delete';
-				    element.onclick	= deleteCountry;
+				{	    // delete this country
+				    element.helpDiv			= 'Delete';
+				    element.onclick			= deleteCountry;
 				    break;
-				}	// delete this country
+				}	    // delete this country
 
-				default:
+                case 'a':
 				{
-				    if (element.id == 'Add')
+				    if (code == 'DD')
 				    {
-						element.onclick	= addCountry;
+						element.onclick	    = addCountry;
 				    }
+				    break;
 				}
 		    }			// act on a field
-		}			// loop through all elements in the form
-    }				// loop through all forms
+		}			    // loop through all elements in the form
+    }				    // loop through all forms
 
 }		// function onLoad
 
@@ -123,64 +130,67 @@ function onLoad()
  *  Take action when the user changes the country code.					*
  *																		*
  *  Input:																*
- *		$this			instance of <input name='Code...'>				*
+ *		this		instance of <input name='Code...'>				    *
+ *		ev          instance of 'change' Event                          *
  ************************************************************************/
-function changeCode()
+function changeCode(ev)
 {
-    changeElt(this);
-    var	oldCode	= this.name.substring(4);
-    var newCode	= this.value;
-    var	form	= this.form;
-    this.name					= 'Code' + newCode;
-    if (form.elements['Code' + newCode])
-    {		// successfully renamed the current element
-		// alert("changeCode: oldCode='" + oldCode + "', newCode='" + newCode + "'" +
-		//	tagToString(this.parentNode.parentNode));
-		form.elements['Name' + oldCode].name		= 'Name' + newCode;
-		form.elements['StartYear' + oldCode].name	= 'StartYear' + newCode;
-		form.elements['EndYear' + oldCode].name		= 'EndYear' + newCode;
-		var deleteBtn	= document.getElementById('Delete' + oldCode);
-		deleteBtn.id					= 'Delete' + newCode;
-		deleteBtn.onclick				= deleteCountry;
-		deleteBtn.disabled				= false;
-		var domainBtn	= document.getElementById('EditDomains' + oldCode);
-		domainBtn.id			= 'EditDomains' + newCode;
-		domainBtn.onclick				= showDomains;
-		domainBtn.disabled				= false;
-		var addBtn	= document.getElementById('Add');
-		addBtn.disabled					= false;
-    }		// successfully renamed the current element
+    changeElt(this);        // common functionality
+    let	oldCode	                = this.name.substring(4);
+    let newCode	                = this.value;
+    if (/^[a-zA-Z]{2}$/.test(newCode))
+        newCode                 = newCode.toUpperCase();
     else
-    {		// unable to rename, probably some back level of IE!
-		alert('Unable to rename element Code' + oldCode + ' to Code' + newCode);
-    }		// unable to rename, probably some back level of IE!
-}		// changeCode
+    {
+        let text        = document.getElementById('ccInvalid').innerHTML;
+        alert(text.replace('$newCode', newCode));
+        return;
+    }
+    let	form	                = this.form;
+    this.id					    = 'Code' + newCode;
+    this.name			        = 'Code' + newCode;
+	let nameInput	= form.elements['Name' + oldCode];
+	nameInput.id					= 'Name' + newCode;
+	nameInput.name					= 'Name' + newCode;
+	let deleteBtn	= document.getElementById('Delete' + oldCode);
+	deleteBtn.id					= 'Delete' + newCode;
+	deleteBtn.onclick				= deleteCountry;
+	deleteBtn.disabled				= false;
+	let domainBtn	= document.getElementById('EditDomains' + oldCode);
+	domainBtn.id			        = 'EditDomains' + newCode;
+	domainBtn.onclick				= showDomains;
+	domainBtn.disabled				= false;
+	let addBtn	    = document.getElementById('Add');
+		addBtn.disabled					= false;
+}		// function changeCode
 
 /************************************************************************
  *  function deleteCountry												*
  *																		*
  *  When a Delete button is clicked this function removes the			*
- *  row from the table.													*
+ *  row from the table.  When the form is submitted the associated      *
+ *  instance of Country is removed from the Countries table.            *
  *																		*
  *  Input:																*
- *		$this			<button type=button id='Delete....'				*
+ *		this			<button type=button id='Delete....'				*
+ *		ev              instance of 'click' event                       *
  ************************************************************************/
-function deleteCountry()
+function deleteCountry(ev)
 {
-    var	cc	= this.id.substring(6);
-    var	form	= this.form;
-    var	cell	= this.parentNode;
-    var	row	= cell.parentNode;
-    var	section	= row.parentNode;
+    let	cc	        	= this.id.substring(6);
+    let	form	    	= this.form;
+    let	cell	    	= this.parentNode;
+    let	row	        	= cell.parentNode;
+    let	section	    	= row.parentNode;
     section.removeChild(row);
-    var	operator	= document.createElement('input');
-    operator.type	= 'hidden';
-    operator.name	= 'deleteCountry' + cc;
-    operator.value	= 'deleteCountry' + cc;
+    let	operator		= document.createElement('input');
+    operator.type		= 'hidden';
+    operator.name		= 'deleteCountry' + cc;
+    operator.value		= 'deleteCountry' + cc;
     form.appendChild(operator);
 
     return false;
-}		// deleteCountry
+}		// function deleteCountry
 
 /************************************************************************
  *  function showNames													*
@@ -189,13 +199,14 @@ function deleteCountry()
  *  edit dialog for the list of other names of a country.				*
  *																		*
  *  Input:																*
- *		$this			<button type=button id='Names....'				*
+ *		this		<button type=button id='Names....'				    *
+ *		ev          instance of 'click' Event                           *
  ************************************************************************/
-function showNames()
+function showNames(ev)
 {
-    var	form		= this.form;
-    var	cc		= this.id.substring(this.id.length - 2);
-    var	lang		= 'en';
+    let	form		= this.form;
+    let	cc		    = this.id.substring(this.id.length - 2);
+    let	lang		= 'en';
 
     if (form.lang)
 		lang		= form.lang.value;
@@ -207,7 +218,7 @@ function showNames()
               'CountryNamesEdit.php?cc=' + cc + '&lang=' + lang,
 		      "right");
     return false;
-}		// showNames
+}		// function showNames
 
 /************************************************************************
  *  function showDomains												*
@@ -216,25 +227,26 @@ function showNames()
  *  edit dialog for the list of domains in a country.					*
  *																		*
  *  Input:																*
- *		$this				<button type=button id='Edit....'			*
+ *		this		<button type=button id='Edit....'			        *
+ *		ev          instance of 'click' Event                           *
  ************************************************************************/
-function showDomains()
+function showDomains(ev)
 {
-    var	form		= this.form;
-    var	cc		    = this.id.substring(this.id.length - 2);
-    var	lang		= 'en';
+    let	form		    = this.form;
+    let	cc		        = this.id.substring(this.id.length - 2);
+    let	lang		    = 'en';
 
     if (form.lang)
-		lang		= form.lang.value;
+		lang		    = form.lang.value;
     else 
     if ('lang' in args)
-		lang		= args['lang'];
+		lang		    = args['lang'];
 
     openFrame("source",
               'DomainsEdit.php?cc=' + cc + '&lang=' + lang,
 		      "right");
     return false;
-}		// showDomains
+}		// function showDomains
 
 /************************************************************************
  *  function addCountry													*
@@ -243,26 +255,27 @@ function showDomains()
  *  into the table.														*
  *																		*
  *  Input:																*
- *		$this		<button type=button id='Add'>						*
+ *		this		<button type=button id='Add'>						*
+ *		ev          instance of 'click' Event                           *
  ************************************************************************/
-function addCountry()
+function addCountry(ev)
 {
-    this.disabled	= true;	// only permit one row to be added
-    var	form		= this.form;
-    var	parms	= {"country"	: "XX"};
-    var	template	= document.getElementById("Row$country");
-    var	newRow		= createFromTemplate(template,
-									     parms,
-									     null);
-    var	table		= document.getElementById("dataTable");
-    var	tbody		= table.tBodies[0];
+    this.disabled   	= true;	// only permit one row to be added
+    let	form		    = this.form;
+    let	parms	        = {"country"	: "XX"};
+    let	template	    = document.getElementById("Row$country");
+    let	newRow		    = createFromTemplate(template,
+						    			     parms,
+							    		     null);
+    let	table		    = document.getElementById("dataTable");
+    let	tbody		    = table.tBodies[0];
     tbody.appendChild(newRow);
 
     // take action when the user changes the code of the added country
-    var	codeElt		= form.CodeXxx;
+    let	codeElt		    = form.CodeXX;
     codeElt.focus();
     codeElt.select();
     codeElt.onchange	= changeCode;
 
     return false;
-}		// addCountry
+}		// function addCountry

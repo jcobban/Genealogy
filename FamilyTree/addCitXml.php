@@ -522,7 +522,7 @@ function marriageCitation($page, $idmr, $type)
     						   "originalPage=$originalPage, " .
     						   "originalItem=$originalItem</p>\n";
     			$getParms		= array(
-    						'domain'		=> 'CAON',
+    						'domain'		    => 'CAON',
     						'originalVolume'	=> $originalVolume,
     						'originalPage'		=> $originalPage,
     						'originalItem'		=> $originalItem);
@@ -779,7 +779,8 @@ foreach ($_POST as $key => $value)
 			}	// validate syntax of parameter
 			else
 			if (strlen($value) > 0)
-					$msg	.= "Invalid value of IDSR=$value. "; 
+                $msg	    .= "Invalid value of IDSR=" .
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		// master source identifier
 
@@ -792,13 +793,18 @@ foreach ($_POST as $key => $value)
 			}	// validate syntax of parameter 
 			else
 			if (strlen($value))
-			    $msg	.= "Invalid value of Citation Type=$value. "; 
+			    $msg	.= "Invalid value of Citation Type=" . 
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		// Citation Type
 
 	    case 'formname':
-	    {		// 
-			$formname	 = $value;
+        {		//
+            if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $value) == 1) 
+			    $formname	 = $value;
+			else
+			    $msg	.= "Invalid value of FormName=" . 
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		//
 
@@ -810,7 +816,8 @@ foreach ($_POST as $key => $value)
 			}		// validate syntax of parameter 
 			else
 			if (strlen($value) > 0)
-			    $msg	.= "Invalid value of IDIME=$value. ";
+			    $msg	.= "Invalid value of IDIME=" .
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		// generic key
 
@@ -831,7 +838,8 @@ foreach ($_POST as $key => $value)
 			}	// validate syntax of parameter 
 			else
 			if (strlen($value) > 0)
-			    $msg	.= "Invalid value of IDIR=$value. "; 
+			    $msg	.= "Invalid value of IDIR=" .
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		// key of tblIR
 
@@ -852,7 +860,8 @@ foreach ($_POST as $key => $value)
 			}	// validate syntax of parameter 
 			else
 			if (strlen($value))
-			    $msg	.= "Invalid value of IDMR. "; 
+			    $msg	.= "Invalid value of IDMR=" . 
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		//key of tblMR
 
@@ -872,7 +881,8 @@ foreach ($_POST as $key => $value)
 			}	// validate syntax of parameter 
 			else
 			if (strlen($value))
-			    $msg	.= "Invalid value of IDCR=$value. "; 
+			    $msg	.= "Invalid value of IDCR=" . 
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		// key of tblCR
 
@@ -891,7 +901,8 @@ foreach ($_POST as $key => $value)
 			}	// validate syntax of parameter 
 			else
 			if (strlen($value))
-			    $msg	.= "Invalid value of IDNX=$value. "; 
+			    $msg	.= "Invalid value of IDNX=" . 
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		// key of tblNX
 
@@ -908,7 +919,8 @@ foreach ($_POST as $key => $value)
 			}	// validate syntax of parameter 
 			else
 			if (strlen($value))
-			    $msg	.= "Invalid value of IDER=$value. "; 
+			    $msg	.= "Invalid value of IDER=" . 
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		// key of tblER
 
@@ -920,20 +932,26 @@ foreach ($_POST as $key => $value)
 			}	// validate syntax of parameter 
 			else
 			if (strlen($value))
-			    $msg	.= "Invalid value of IDET=$value. "; 
+			    $msg	.= "Invalid value of IDET=" . 
+                                htmlspecialchars($value) . ". "; 
 			break;
 	    }		// event type in tblER
 
 	    case 'page':
-	    {		// page number
-			$page	= $value;
+        {		// page number
+			$page	        = htmlspecialchars($value);
 			break;
 	    }		// page number
 
 	    case 'row':
 	    {		// row number
 			// get the row identifier within the table in the web page
-			$rownum	= $value;
+			if ((is_int($value) || ctype_digit($value)) && $value >= 0)
+			    $rownum	    = $value;
+			else
+			if (strlen($value))
+			    $msg	    .= "Invalid value of row=" . 
+                                    htmlspecialchars($value) . ". "; 
 			break;
 	    }		// row number
 
@@ -959,7 +977,8 @@ foreach ($_POST as $key => $value)
 			}	// validate syntax of parameter 
 			else
 			if (strlen($value))
-			    $msg	.= "Invalid value of Surety=$value. "; 
+			    $msg	.= "Invalid value of Surety=" . 
+                                    htmlspecialchars($value) . ". "; 
 			break;
 	    }		// quality
 	}		    // act on keys
@@ -988,13 +1007,13 @@ if (strlen($msg) > 0)
 else
 {		// add the citation
 	// add the citation to the database
-	$citParms	= array('idime'		=> $idime,
-						'type'		=> $type,
-						'idsr'		=> $idsr,
-						'srcdetail'	=> $page,
+	$citParms	= array('idime'		    => $idime,
+						'type'		    => $type,
+						'idsr'		    => $idsr,
+						'srcdetail'	    => $page,
 						'srcdettext'	=> $text,
 						'srcdetnote'	=> $note,
-						'srcsurety'	=> $surety);
+						'srcsurety'	    => $surety);
 
 	$citation	= new Citation($citParms);
 	$citation->save(true);	// write into the database

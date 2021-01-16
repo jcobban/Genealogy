@@ -431,15 +431,19 @@ $alwaysShowDeathCause		= false;
 $alwaysShowBuried			= true;
 
 // process parameters looking for identifier of individual
-$idir						= 0;		// IDIR of existing individual to edit
-$parentsIdmr				= 0;		// IDMR of family to add new child
-$idcr						= 0;		// IDCR of existing child of family
-$rowid                      = '';       // id of row of family form
-$person						= null;		// instance of Person
-$childr						= null;		// instance of Child
-$family						= null;		// instance of Family
-$genderFixed				= '';		// pre-selected gender
+$idir						= null;		// IDIR of instance of Person
 $idirset					= false;	// idir provided and non-zero
+$idirtext                   = null;
+$person						= null;		// instance of class Person
+
+$parentsIdmr				= 0;		// IDMR of Family to add new child
+$idmrtext                   = null;
+$family						= null;		// instance of Family
+$idcr						= 0;		// IDCR of existing child of family
+$idcrtext                   = null;
+$childr						= null;		// instance of Child
+$rowid                      = '';       // id of row of family form
+$genderFixed				= '';		// pre-selected gender
 $fathGivenName				= '';
 $fathSurname				= '';
 $fatherName					= '';
@@ -455,102 +459,110 @@ $lang                       = 'en';
 // if invoked by method=get process the parameters
 if (count($_GET) > 0)
 {	                // invoked by URL to display current status of account
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                        "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                            "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n";
+        $value                      = trim($value); 
         switch(strtolower($key))
         {
             case 'id':
             case 'idir':
             {		// identifier of individual
-                if (strlen($value) > 0 &&
-                    ctype_digit($value))
+                if (ctype_digit($value))
                 {	// valid number
-                    $idir		= $value;
-                    $idirset	= $idir > 0;
+                    $idir		    = intval($value);
+                    $idirset	    = $idir > 0;
                 }	// valid number
                 else
                 {	// invalid
-                    $msg	.= "Unexpected value '$value' for IDIR. ";
+                    $idirtext       = htmlspecialchars($value);
                 }	// invalid
                 break;
             }		// identifier of individual
     
             case 'idcr':
             {		// identifier of child relationship record
-                if (strlen($value) > 0 &&
-                    ctype_digit($value) &&
-                    $value > 0)
+                if (ctype_digit($value))
                 {	// valid number
-                    $idcr		= $value;
-                    $showHdrFtr	= false;
+                    if ($value > 0)
+                    {
+                        $idcr		= intval($value);
+                        $showHdrFtr	= false;
+                    }
                 }	// valid number
+                else
+                    $idcrtext       = htmlspecialchars($value);
                 break;
             }		// identifier of child relationship record
     
             case 'parentsidmr':
+            case 'idmr':
             {		// identifier of parents family
-                if (strlen($value) > 0 && 
-                    ctype_digit($value) &&
-                    $value > 0)
+                if (ctype_digit($value))
                 {
-                    $parentsIdmr		= $value;
-                    $showHdrFtr		    = false;
+                    if ($value > 0)
+                    {
+                        $parentsIdmr= intval($value);
+                        $showHdrFtr	= false;
+                    }
                 }
+                else
+                    $idmrtext       = htmlspecialchars($value);
                 break;
             }		// identifier of parent's family
     
             case 'rowid':
             {		// role of parent in family
-                $rowid                  = strtolower($value);
-                $showHdrFtr				= false;
+                $rowid              = htmlspecialchars(strtolower($value));
+                $showHdrFtr			= false;
                 break;
             }		// role of parent in family
     
             case 'fathgivenname':
             {		// explicit father's given name
-                $fathGivenName			= $value;
+                $fathGivenName		= htmlspecialchars(strtolower($value));
                 break;
             }		// explicit father's given name
     
             case 'fathsurname':
             {		// explicit father's surname
-                $fathSurname			= $value;
+                $fathSurname		= htmlspecialchars(strtolower($value));
                 break;
             }		// explicit father's given name
     
             case 'mothgivenname':
             {		// explicit mother's given name
-                $mothGivenName			= $value;
+                $mothGivenName		= htmlspecialchars(strtolower($value));
                 break;
             }		// explicit mother's given name
     
             case 'mothsurname':
             {		// explicit mother's surname
-                $mothSurname			= $value;
+                $mothSurname		= htmlspecialchars(strtolower($value));
                 break;
             }		// explicit mother's given name
     
             case 'treename':
             {		// tree to create individual in
-                $treeName				= $value;
+                $treeName			= htmlspecialchars(strtolower($value));
                 break;
             }		// tree to create individual in
 
             case 'lang':
             {
-                $lang                   = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value);
             }
         }	// switch on parameter name
     }		// loop through all parameters
 
     if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn                       .= $parmsText . "</table>\n";
 }	                // invoked by URL to display current status of account
 
 // override default mother's and father's names if required
@@ -568,15 +580,15 @@ if (canUser('edit'))
 {                       // current user can edit the database
 	if ($idirset)
 	{		            // get the requested individual
-	    $person		            = new Person(array('idir' => $idir));
-	    $isOwner			    = $person->isOwner();
-	    $treeName			    = $person->getTreeName();
+	    $person		        = new Person(array('idir' => $idir));
+	    $isOwner			= $person->isOwner();
+	    $treeName			= $person->getTreeName();
 	}		            // get the requested individual
 	else
 	{		            // create new individual with defaults
 	    // create an instance of Person for the new individual
-	    $person				    = new Person();
-	    $idir                   = null;
+	    $person				= new Person();
+	    $idir               = null;
 	    //$person->setTreeName($treeName);
 	    $isOwner				= true;
 	}		            // create new individual
@@ -585,12 +597,12 @@ else
 {                       // current user can only view
 	if ($idirset)
 	{		            // get the requested individual
-	    $person		            = new Person(array('idir' => $idir));
-	    $treeName			    = $person->getTreeName();
+	    $person		        = new Person(array('idir' => $idir));
+	    $treeName			= $person->getTreeName();
 	}		            // get the requested individual
 	else
-        $person                 = null;
-    $isOwner                    = false;
+        $person             = null;
+    $isOwner                = false;
 }                       // current user can only view
 
 if ($isOwner)
@@ -603,9 +615,13 @@ if ($isOwner)
 else
     $action                 = 'Display';
 
+// now have enough information to select template file
 $template                   = new FtTemplate("editIndivid$action$lang.html");
 $translate                  = $template->getTranslate();
 $t                          = $translate['tranTab'];
+$template['otherStylesheets']->update(array('filename'  => 'editIndivid'));
+
+// create table eventText which is used by Javascript
 $eventText                  = $translate['eventText'];
 $eventTextJs                = "    <script>\n      var eventText = {\n";
 $comma                      = "\t\t";
@@ -616,8 +632,16 @@ foreach($eventText as $key => $value)
 }
 $eventTextJs                .= "};\n    </script>\n";
 $template->set('EVENTTEXT',         $eventTextJs);
-$template['otherStylesheets']->update(array('filename'  => 'editIndivid'));
 
+// report errors detected in parameters
+if (is_string($idirtext))
+    $msg	                .= "Unexpected value '$idirtext' for IDIR. ";
+if (is_string($idcrtext))
+    $msg	                .= "Unexpected value '$idcrtext' for IDCR. ";
+if (is_string($idmrtext))
+    $msg	                .= "Unexpected value '$idmrtext' for ParentsIDMR. ";
+
+// pass parameters to template
 $template->set('LANG',              $lang);
 if ($idir)
     $template->set('IDIR',          $idir);
@@ -626,7 +650,6 @@ else
     $template['person']->update(null);
     $template->set('IDIR',          0);
 }
-$template->set('NAMEURI',           $nameuri);
 
 // make sure the internal events structure of the individual is initialized
 if ($person && $idir > 0)
@@ -641,32 +664,7 @@ $prefix						= '';
 $name						= '';
 $idar						= 0;
 $nameuri					= '';
-if ($person && $person->isExisting())
-{                       // existing Person
-    $given					= $person->get('givenname');
-    $surname				= $person->get('surname');
-	$evBirth				= $person->getBirthEvent(true);	
-	$evChristen				= $person->getChristeningEvent(false);	
-	$evBaptism				= $person->getBaptismEvent(false);
-	$evEndow				= $person->getEndowEvent(false);
-	$evConfirm				= $person->getConfirmationEvent(false);
-	$evInitiat				= $person->getInitiatoryEvent(false);
-	$evDeath				= $person->getDeathEvent(false);
-	$evBuried				= $person->getBuriedEvent(false);
-}                       // existing Person
-else
-{                       // new Person
-    $given					= '';
-    $surname				= '';
-	$evBirth				= null;
-	$evChristen				= null;
-	$evBaptism				= null;
-	$evEndow				= null;
-	$evConfirm				= null;
-	$evInitiat				= null;
-	$evDeath				= null;
-	$evBuried				= null;
-}                       // new Person
+
 $birthChanged				= 0;		// birth event
 $christenChanged			= 0;		// traditional christening event
 $baptismChanged				= 0;		// LDS Baptism event
@@ -676,312 +674,271 @@ $initiatChanged				= 0;		// LDS Initiatory event
 $deathChanged				= 0;		// death event
 $buriedChanged				= 0;		// buried event
 
-if ($debug)
-    $warn	.= "<p>editIndivid.php: " . __LINE__ .
-                " Initialize from parameters</p>\n";
 
 // loop through parameters again to update Person
-foreach($_GET as $key => $value)
-{			// loop through parameters
-    $fieldLc            = strtolower($key);
-    if (substr($fieldLc,0,4) == 'init')
-    {			// initialize field in database record
-        $fieldLc	= substr($fieldLc, 4);
-        switch($fieldLc)
-        {
-            case 'surname':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    $surname	    = $value;
-                    $person->setSurname($value);
-                }		// value supplied
-                break;
-            }	// surname
+if ($person instanceof Person)
+{                   // $person initialized
+    if ($debug)
+        $warn	.= "<p>editIndivid.php: " . __LINE__ .
+                        " Initialize from parameters</p>\n";
+	if ($person->isExisting())
+	{                       // existing Person
+	    $given					= $person->get('givenname');
+	    $surname				= $person->get('surname');
+		$evBirth				= $person->getBirthEvent(true);	
+		$evChristen				= $person->getChristeningEvent(false);	
+		$evBaptism				= $person->getBaptismEvent(false);
+		$evEndow				= $person->getEndowEvent(false);
+		$evConfirm				= $person->getConfirmationEvent(false);
+		$evInitiat				= $person->getInitiatoryEvent(false);
+		$evDeath				= $person->getDeathEvent(false);
+		$evBuried				= $person->getBuriedEvent(false);
+	}                       // existing Person
+	else
+	{                       // new Person
+	    $given					= '';
+	    $surname				= '';
+		$evBirth				= null;
+		$evChristen				= null;
+		$evBaptism				= null;
+		$evEndow				= null;
+		$evConfirm				= null;
+		$evInitiat				= null;
+		$evDeath				= null;
+		$evBuried				= null;
+	}                       // new Person
 
-            case 'givenname':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    $given		= $value;
-                    $person->set($fieldLc, $value);
-                }		// value supplied
-                break;
-            }	// surname
-
-            case 'birthdate':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evBirth))
-                        $evBirth	= $person->getBirthEvent(true);
-                    $evBirth->setDate(' ' . $value);
-                    $birthChanged	= 1;
-                }		// value supplied
-                break;
-            }
-
-            case 'deathdate':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evDeath))
-                        $evDeath	= $person->getDeathEvent(true);
-                    $evDeath->setDate(' ' . $value);
-                    $deathChanged		= 1;
-                }		// value supplied
-                break;
-            }
-
-            case 'chrisdate':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evChristen))
-                        $evChristen	= $person->getChristeningEvent(true);
-                    $evChristen->setDate(' ' . $value);
-                    $christenChanged	= 1;
-                }		// value supplied
-                break;
-            }
-
-            case 'burieddate':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evBuried))
-                        $evBuried	= $person->getBuriedEvent(true);
-                    $evBuried->setDate(' ' . $value);
-                    $buriedChanged		= 1;
-                }		// value supplied
-                break;
-            }
-
-            case 'baptismdate':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evBaptism))
-                        $evBaptism	= $person->getBaptismEvent(true);
-                    $evBaptism->setDate(' ' . $value);
-                    $baptismChanged		= 1;
-                }		// value supplied
-                break;
-            }
-
-            case 'confirmationdate':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evConfirm))
-                        $evConfirm	= $person->getConfirmationEvent(true);
-                    $evConfirm->setDate(' ' . $value);
-                    $confirmChanged		= 1;
-                }		// value supplied
-                break;
-            }
-
-            case 'endowdate':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evEndow))
-                        $evEndow	= $person->getEndowEvent(true);
-                    $evEndow->setDate(' ' . $value);
-                    $endowChanged		= 1;
-                }		// value supplied
-                break;
-            }
-
-            case 'initiatorydate':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evInitiat))
-                        $evInitiat	= $person->getInitiatoryEvent(true);
-                    $evInitiat->setDate(' ' . $value);
-                    $initiatChanged		= 1;
-                }		// value supplied
-                break;
-            }
-
-            case 'birthlocation':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    $loc		= new Location(array('location' => $value));
-                    if (!$loc->isExisting())
-                        $loc->save(false);	// get IDLR
-                    if (is_null($evBirth))
-                        $evBirth	= $person->getBirthEvent(true);
-                    $evBirth->set('idlrevent', $loc->getIdlr());
-                    $birthChanged		= 1;
-                }		// value supplied
-                break;
-            }	// location fields
-
-            case 'chrislocation':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evChristen))
-                        $evChristen	= $person->getChristeningEvent(true);
-                    $loc		= new Location(array('location' => $value));
-                    if (!$loc->isExisting())
-                        $loc->save(false);	// get IDLR
-                    $evChristen->set('idlrevent', $loc->getIdlr());
-                    $chrisChanged		= 1;
-                }		// value supplied
-                break;
-            }	// location fields
-
-            case 'deathlocation':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evDeath))
-                        $evDeath	= $person->getDeathEvent(true);
-                    $loc		= new Location(array('location' => $value));
-                    if (!$loc->isExisting())
-                        $loc->save(false);	// get IDLR
-                    $evDeath->set('idlrevent', $loc->getIdlr());
-                    $deathChanged		= 1;
-                }		// value supplied
-                break;
-            }	// location fields
-
-            case 'buriedlocation':
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evBuried))
-                        $evBuried	= $person->getBuriedEvent(true);
-                    $loc		= new Location(array('location' => $value));
-                    if (!$loc->isExisting())
-                        $loc->save(false);	// get IDLR
-                    $evBuried->set('idlrevent', $loc->getIdlr());
-                    $buriedChanged		= 1;
-                }		// value supplied
-                break;
-            }	// location fields
-
-            case 'baptismtemple':
-            {	// LDS temple fields
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evBaptism))
-                        $evBaptism	= $person->getBaptismEvent(true);
-                    try {
-                        $loc	= new Temple(array('idtr' => $value));
-                        $evBaptism->set('idlrevent', $loc->getIdtr());
-                        $baptismChanged	= 1;
-                    } catch(Exception $e) {
-                        $msg	.= "Invalid Baptism Temple " .
-                                   $e->getMessage() . ". ";
-                    }
-                }		// value supplied
-                break;
-            }	// LDS temple fields
-
-            case 'confirmationtemple':
-            {	// LDS temple fields
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evConfirm))
-                        $evConfirm	= $person->getConfirmationEvent(true);
-                    try {
-                        $loc	= new Temple(array('idtr' => $value));
-                        $evConfirm->set('idlrevent',
-                                $loc->getIdtr());
-                        $confirmChanged	= 1;
-                    } catch(Exception $e) {
-                        $msg	.= "Invalid Confirmation Temple " .
-                                   $e->getMessage() . ". ";
-                    }
-                }		// value supplied
-                break;
-            }	// LDS temple fields
-
-            case 'endowtemple':
-            {	// LDS temple fields
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evEndow))
-                        $evEndow	= $person->getEndowEvent(true);
-                    try {
-                        $loc	= new Temple(array('idtr' => $value));
-                        $evEndow->set('idlrevent', $loc->getIdtr());
-                        $endowChanged	= 1;
-                    } catch(Exception $e) {
-                        $msg	.= "Invalid Endow Temple " .
-                                   $e->getMessage() . ". ";
-                    }
-                }		// value supplied
-                break;
-            }	// LDS temple fields
-
-            case 'initiatorytemple':
-            {	// LDS temple fields
-                if (strlen($value) > 0 && $person)
-                {
-                    if (is_null($evInitiat))
-                        $evInitiat	= $person->getInitiatoryEvent(true);
-                    try {
-                        $loc	= new Temple(array('idtr' => $value));
-                        $evInitiat->set('idlrevent',
-                                $loc->getIdtr());
-                        $initiatChanged	= 1;
-                    } catch(Exception $e) {
-                        $msg	.= "Invalid Initiatory Temple " .
-                                   $e->getMessage() . ". ";
-                    }
-                }		// value supplied
-                break;
-            }		// LDS temple fields
-
-            case 'gender':
-            {		// set gender
-                if (strlen($value) > 0 && $person)
-                {
-                    $value	= strtolower($value);
-                    if ($value == 1 || $value == 'f' ||
-                        strpos($value, 'female') !== false)
-                        $person->set('gender', 'female');
-                    else
-                    if ($value == 0 || $value == 'm' ||
-                        strpos($value, 'male') !== false)
-                        $person->set('gender', 'male');
-                    else
-                        $person->set('gender', 'unknown');
-                    $genderFixed	= 'readonly="readonly"';
-                }		// value supplied
-                break;
-            }		    // set gender
-
-            case 'lang':
-            {
-                $lang           = FtTemplate::validateLang($value);
-            }
-
-            case 'text':
-            {           // handled by javascript
-                break;
-            }           // handled by javascript
-
-            default:
-            {
-                if (strlen($value) > 0 && $person)
-                {
-                    // note that if $fieldLc is not a field name in the
-                    // record this will create a temporary field
-                    $person->set($fieldLc, $value);
-                }		// value supplied
-                break;
-            }		    // no special handling
-
-        }		        // switch on field name
-    }			        // initialize field in database record
-}			            // loop through parameters
+	foreach($_GET as $key => $value)
+	{			    // loop through parameters
+	    $fieldLc            = strtolower($key);
+	    if (substr($fieldLc,0,4) == 'init')
+	    {			// initialize field in database record
+	        $fieldLc	    = substr($fieldLc, 4);
+	        $value          = htmlspecialchars(trim($value));
+	        if (strlen($value) == 0)
+	            continue;
+	        switch($fieldLc)
+	        {
+	            case 'surname':
+	            {
+	                $surname	    = $value;
+	                $person->setSurname($value);
+	                break;
+	            }	                // surname
+	
+	            case 'givenname':
+	            {
+	                $given		    = $value;
+	                $person->set($fieldLc, $value);
+	                break;
+	            }	                // givenname
+	
+	            case 'birthdate':
+	            {
+	                if (is_null($evBirth))
+	                    $evBirth	    = $person->getBirthEvent(true);
+	                $evBirth->setDate(' ' . $value);
+	                $birthChanged	    = 1;
+	                break;
+	            }                   // birthdate
+	
+	            case 'deathdate':
+	            {
+	                if (is_null($evDeath))
+	                    $evDeath	    = $person->getDeathEvent(true);
+	                $evDeath->setDate(' ' . $value);
+	                $deathChanged		= 1;
+	                break;
+	            }                   // deathdate
+	
+	            case 'chrisdate':
+	            {
+	                if (is_null($evChristen))
+	                    $evChristen	    = $person->getChristeningEvent(true);
+	                $evChristen->setDate(' ' . $value);
+	                $christenChanged	= 1;
+	                break;
+	            }                   // chrisdate
+	
+	            case 'burieddate':
+	            {
+	                if (is_null($evBuried))
+	                    $evBuried	    = $person->getBuriedEvent(true);
+	                $evBuried->setDate(' ' . $value);
+	                $buriedChanged		= 1;
+	                break;
+	            }                   // burieddate
+	
+	            case 'baptismdate':
+	            {
+	                if (is_null($evBaptism))
+	                    $evBaptism	    = $person->getBaptismEvent(true);
+	                $evBaptism->setDate(' ' . $value);
+	                $baptismChanged		= 1;
+	                break;
+	            }                   // baptismdate
+	
+	            case 'confirmationdate':
+	            {
+	                if (is_null($evConfirm))
+	                    $evConfirm	    = $person->getConfirmationEvent(true);
+	                $evConfirm->setDate(' ' . $value);
+	                $confirmChanged		= 1;
+	                break;
+	            }                   // confirmationdate
+	
+	            case 'endowdate':
+	            {
+	                if (is_null($evEndow))
+	                    $evEndow	    = $person->getEndowEvent(true);
+	                $evEndow->setDate(' ' . $value);
+	                $endowChanged		= 1;
+	                break;
+	            }                   // endowdate
+	
+	            case 'initiatorydate':
+	            {
+	                if (is_null($evInitiat))
+	                    $evInitiat	    = $person->getInitiatoryEvent(true);
+	                $evInitiat->setDate(' ' . $value);
+	                $initiatChanged		= 1;
+	                break;
+	            }                   // initiatorydate
+	
+	            case 'birthlocation':
+	            {                   // birth location name
+	                $loc	    = new Location(array('location' => $value));
+	                if (!$loc->isExisting())
+	                    $loc->save(false);	// get IDLR
+	                if (is_null($evBirth))
+	                    $evBirth	    = $person->getBirthEvent(true);
+	                $evBirth->set('idlrevent', $loc->getIdlr());
+	                $birthChanged		= 1;
+	                break;
+	            }	                // birth location name
+	
+	            case 'chrislocation':
+	            {                   // christening location name
+	                $loc	    = new Location(array('location' => $value));
+	                if (!$loc->isExisting())
+	                    $loc->save(false);	// get IDLR
+	                if (is_null($evChristen))
+	                    $evChristen	    = $person->getChristeningEvent(true);
+	                $evChristen->set('idlrevent', $loc->getIdlr());
+	                $chrisChanged		= 1;
+	                break;
+	            }	                // christening location name
+	
+	            case 'deathlocation':
+	            {
+	                $loc		= new Location(array('location' => $value));
+	                if (!$loc->isExisting())
+	                    $loc->save(false);	// get IDLR
+	                if (is_null($evDeath))
+	                    $evDeath	    = $person->getDeathEvent(true);
+	                $evDeath->set('idlrevent', $loc->getIdlr());
+	                $deathChanged		= 1;
+	                break;
+	            }	                // death location name
+	
+	            case 'buriedlocation':
+	            {
+	                $loc		= new Location(array('location' => $value));
+	                if (!$loc->isExisting())
+	                    $loc->save(false);	// get IDLR
+	                if (is_null($evBuried))
+	                    $evBuried	        = $person->getBuriedEvent(true);
+	                    $evBuried->set('idlrevent', $loc->getIdlr());
+	                    $buriedChanged		= 1;
+	                break;
+	            }	                // buriedlocation
+	
+	            case 'baptismtemple':
+	            {	// LDS temple fields
+	                $loc	        = new Temple(array('idtr' => $value));
+	                if (!$loc->isExisting())
+	                    $msg	    .= "Invalid Baptism Temple $value";
+	                if (is_null($evBaptism))
+	                    $evBaptism	        = $person->getBaptismEvent(true);
+	                $evBaptism->set('idlrevent', $loc->getIdtr());
+	                $baptismChanged	        = 1;
+	                break;
+	            }	                // LDS baptismtemple
+	
+	            case 'confirmationtemple':
+	            {	// LDS temple fields
+	                $loc	        = new Temple(array('idtr' => $value));
+	                if (!$loc->isExisting())
+	                    $msg	    .= "Invalid Confirmation Temple $value";
+	                if (is_null($evConfirm))
+	                    $evConfirm	    = $person->getConfirmationEvent(true);
+	                $evConfirm->set('idlrevent', $loc->getIdtr());
+	                $confirmChanged	    = 1;
+	                break;
+	            }	                // LDS confirmationtemple
+	
+	            case 'endowtemple':
+	            {	// LDS temple fields
+	                $loc	        = new Temple(array('idtr' => $value));
+	                if (!$loc->isExisting())
+	                    $msg	    .= "Invalid Endowment Temple $value";
+	                if (is_null($evEndow))
+	                    $evEndow	        = $person->getEndowEvent(true);
+	                $evEndow->set('idlrevent', $loc->getIdtr());
+	                $endowChanged	        = 1;
+	                break;
+	            }	// LDS temple fields
+	
+	            case 'initiatorytemple':
+	            {	// LDS temple fields
+	                $loc	        = new Temple(array('idtr' => $value));
+	                if (!$loc->isExisting())
+	                    $msg	    .= "Invalid Initiatory Temple $value";
+	                if (is_null($evInitiat))
+	                    $evInitiat	        = $person->getInitatoryEvent(true);
+	                $evInitiat->set('idlrevent', $loc->getIdtr());
+	                $initiatChanged	        = 1;
+	                break;
+	            }		// LDS temple fields
+	
+	            case 'gender':
+	            {		// set gender
+	                $value	= strtolower($value);
+	                if ($value == 1 || $value == 'f' ||
+	                    strpos($value, 'female') !== false)
+	                    $person->set('gender', 'female');
+	                else
+	                if ($value == 0 || $value == 'm' ||
+	                    strpos($value, 'male') !== false)
+	                    $person->set('gender', 'male');
+	                else
+	                    $person->set('gender', 'unknown');
+	                $genderFixed	= 'readonly="readonly"';
+	                break;
+	            }		    // set gender
+	
+	            case 'lang':
+	            {
+	                $lang           = FtTemplate::validateLang($value);
+	            }
+	
+	            case 'text':
+	            {           // handled by javascript
+	                break;
+	            }           // handled by javascript
+	
+	            default:
+	            {
+	                // note that if $fieldLc is not a field name in the
+	                // record this will create a temporary field
+	                $person->set($fieldLc, $value);
+	                break;
+	            }		    // no special handling
+	
+	        }		        // switch on field name
+	    }			        // initialize field in database record
+    }			            // loop through parameters
+}                   // $person initialized
 
 // extract information from the instance of Person
 if ($debug)
@@ -1580,4 +1537,3 @@ $template->set('USERREF',		            $person->get('userref'));
 $template->set('ANCESTRALREF',		        $person->get('ancestralref'));
 
 $template->display();
-exit;

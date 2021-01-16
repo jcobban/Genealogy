@@ -6,8 +6,10 @@
  *																		*
  *  History:															*
  *		2018/11/01	    created											*
+ *      2020/12/06      add more message texts                          *
+ *                      close <li> tags                                 *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
 	<a href="/index.html">Accueil</a>:
@@ -33,14 +35,20 @@
     <p class='label'id="nomatches">No matches</p>
   </div> <!-- class="body" -->
   <div id="templates" class="hidden">
+	  <span id="missingIdsr">
+          Paramètre de "idsr" non fourni. 
+          Veuillez identifier le cimetière.
+      </span>
+	  <span id="invalidIdsr">
+          IDSR value '$value' is invalid.
+      </span>
       <span id="Cemetery">Cimetière</span>
       <span id="missingPlot">
           Paramètre de "plot" non fourni. 
           Veuillez spécifier un identifiant de parcelle. 
       </span>
-	  <span id="missingIdsr">
-          Paramètre de "idsr" non fourni. 
-          Veuillez identifier le cimetière.
+	  <span id="invalidPlot">
+          Plot value '$value' is invalid.
       </span>
   </div>
   <div class='balloon' id='Helppattern'>
@@ -56,22 +64,27 @@
             For example the pattern "London" will match locations containing
             the string "London".  Note that the search ignores case, so that
             pattern will also match "LONDON" and "london".
+        </li>
         <li>If the pattern begins with a caret '^' then only locations that
             <b>begin</b> with the remainder of the pattern are included.  
             For example the pattern
             "^Ba" displays locations starting with "Ba" (or "ba" or "BA").
+        </li>
         <li>If the pattern ends with a dollar sign '$', then only locations that
             <b>end</b> with the remainder of the pattern are included.  
             For example the pattern
             "CA$" matches locations that end with "CA" (or "ca" or "Ca").
+        </li>
         <li>In a pattern a period '.' matches any single character.  For example
             the pattern "B.b" matches any location that contains 
             two letter Bs separated
             by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
             anywhere in the location name.
+        </li>
         <li>In a pattern an asterisk '*' matches zero or more of the preceding
             character; "bo*b" matches "bb", "bob", and "boob"
             anywhere in the location name.
+        </li>
     </ul>
   </div>
   <div class='balloon' id='Helptype'>

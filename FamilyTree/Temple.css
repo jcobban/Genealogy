@@ -1,47 +1,47 @@
 /************************************************************************
- *  Temple.css								*
- *									*
- *  Stylesheet for the script Temple.php				*
- *									*
- *  History:								*
- *	2014/03/10	created						*
- *									*
- *  Copyright &copy; 2014 James A. Cobban				*
+ *  Temple.css								                            *
+ *									                                    *
+ *  Stylesheet for the script Temple.php				                *
+ *									                                    *
+ *  History:								                            *
+ *	    2014/03/10	    created						                    *
+ *									                                    *
+ *  Copyright &copy; 2014 James A. Cobban				                *
  ************************************************************************/
 
 /*	column containers */
-    div.column1	{float:		left;
-		margin-top:	1px;
-		margin-right:	3px;
-		width:		25em;
-		}
+    div.column1	{   float:		    left;
+            		margin-top:	    1px;
+		            margin-right:	3px;
+		            width:		    25em;
+		        }
 
-    div.column2	{float:		left;
-		margin-top:	1px;
-		margin-right:	3px;
-		width:		25em;
-		}
+    div.column2	{   float:		    left;
+            		margin-top:	    1px;
+            		margin-right:	3px;
+            		width:		    25em;
+        		}
 
 /*	labels of various widths */
     label.column1 {
-		font-family:	sans-serif;
-		font-weight:	bold;
-		font-size:	smaller;
-		text-align:	right;
-		vertical-align:	top;
-		padding:	0px 3px 0px 3px;
-		margin-top:	1px;
-		float:		left;
-		width:		10em;
-		}
+					font-family:	sans-serif;
+					font-weight:	bold;
+					font-size:	    smaller;
+					text-align:	    right;
+					vertical-align:	top;
+					padding:	    0px 3px 0px 3px;
+					margin-top:	    1px;
+					float:		    left;
+					width:		    10em;
+		        }
     label.column2 {
-		font-family:	sans-serif;
-		font-weight:	bold;
-		font-size:	smaller;
-		text-align:	right;
-		vertical-align:	top;
-		padding:	0px 3px 0px 3px;
-		margin-top:	1px;
-		float:		left;
-		width:		10em;
-		}
+					font-family:	sans-serif;
+					font-weight:	bold;
+					font-size:	    smaller;
+					text-align:	    right;
+					vertical-align:	top;
+					padding:	    0px 3px 0px 3px;
+					margin-top:	    1px;
+					float:		    left;
+					width:		    10em;
+        		}

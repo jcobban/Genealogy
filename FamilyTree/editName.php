@@ -11,8 +11,8 @@ use \Templating\Template;
  *  by an instance of Name (a record in table tblNX).					*
  *																		*
  *  Parameters (passed by method="get"):								*
- *      $idir   unique numeric key of the instance of Person            *
  *		idnx	unique numeric key of instance of Name		            *
+ *      idir    unique numeric key of the instance of Person            *
  *		form	name of the form in the invoking page					*
  * 																		*
  *  History: 															*
@@ -36,8 +36,9 @@ use \Templating\Template;
  *		2018/11/19      change Help.html to Helpen.html                 *
  *		2019/08/06      use FtTemplate                                  *
  *		2019/08/13      given name was not initialized                  *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -70,50 +71,49 @@ if (isset($_GET) && count($_GET) > 0)
 	foreach($_GET as $key => $value)
 	{
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
+	    if (strlen($value) == 0)
+            continue;
 	    switch(strtolower($key))
 		{
 		    case 'idnx':
 	        {	                // get the key of instance of Name
 	            if (ctype_digit($value) & $value > 0)
-	                $idnx	    = intval($value);
+	                $idnx	        = intval($value);
 	            else
-	                $idnxText       = $value;
+	                $idnxText       = htmlspecialchars($value);
 				break;
 		    }		            //idnx
 	
 		    case 'form':
 	        {
-	            if (strlen($value) > 0)
-				    $formname	    = $value;
+				$formname	        = htmlspecialchars($value);
 				break;
             }		            // form name
 
             case 'given':
             case 'givenname':
 	        {
-	            if (strlen($value) > 0)
-				    $givenname	    = $value;
+				$givenname	        = htmlspecialchars($value);
 				break;
             }		            // given name
 
             case 'surname':
 	        {
-	            if (strlen($value) > 0)
-				    $surname	    = $value;
+				$surname	        = htmlspecialchars($value);
 				break;
             }		            // surname
 
             case 'treename':
 	        {
-	            if (strlen($value) > 0)
-				    $treename	    = $value;
+				$treename	        = htmlspecialchars($value);
 				break;
             }		            // tree name
 
 			case 'lang':
             {
-                $lang           = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value);
                 break;
             }
 		}	                    // switch

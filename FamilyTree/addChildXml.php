@@ -82,27 +82,23 @@ if ($debug)
 {
 	print "  <div class='warning'>\n";
 	print $warn;
-}
+}               // don't close
 
 // determine if permitted to update database
 if (strlen($msg) == 0)
 {				// parameters syntactically valid
-	try {
-	    $child	= new Person(array('idir' => $idir));
-	    if (!$child->isExisting())
-			$msg	.= "No matching Person record for IDIR=$idir. ";
-	    else
-	    if (!$child->isOwner())
-			$msg	.= "User $userid not authorized to modify record IDIR=$idir. ";
-	} catch(Exception $e) {
-	    $msg	.= "For IDIR: " . $e->getMessage() . "\n";
-	}			// validate IDIR
+	$child	    = new Person(array('idir' => $idir));
+	if (!$child->isExisting())
+		$msg	.= "No matching Person record for IDIR=$idir. ";
+	else
+    if (!$child->isOwner())
+		$msg	.= "User $userid not authorized to modify record IDIR=$idir. ";
 	$family		= new Family(array('idmr' => $idmr));
 	if (!$family->isExisting())
 	{
 	    $msg	.= "No matching Family record for IDMR=$idmr\n";
 	}			// validate IDMR
-}			// parameters syntactically valid
+}			    // parameters syntactically valid
 
 // close off debugging output
 if ($debug)

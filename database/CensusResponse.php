@@ -137,6 +137,8 @@ use \Exception;
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/03/24      use CensusLine pseudo-field 'sexclass'          *
  *      2020/04/16      move template ahead of validation               *
+ *		2020/10/10      remove field prefix for Pages table             *
+ *		2020/12/01      eliminate XSS vulnerabilities                   *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -232,7 +234,8 @@ if (isset($_GET) && count($_GET) > 0)
                     }
                     else
                         $msg                .=
-                            "$key '$value' must be number between 5 and 99. ";
+                                "$key '" . htmlspecialchars($value) . 
+                                "' must be number between 5 and 99. ";
                     break;
                 }                       // limit number of rows returned
 
@@ -255,7 +258,8 @@ if (isset($_GET) && count($_GET) > 0)
                     if ($temp == 'NAME' || $temp == 'LINE')
                         $orderBy            = $temp;
                     else
-                        $msg    .= "Invalid value of OrderBy='$value'";
+                        $msg    .= "Invalid value of OrderBy='" .
+                                    htmlspecialchars($value) . "'";
                     break;
                 }           // Override order of display
 
@@ -265,8 +269,10 @@ if (isset($_GET) && count($_GET) > 0)
                     $parmCount      ++;
                     if (preg_match("/^([0-9]{1,4})$/", $value) == 0 ||
                         $value < 1750 || $value > 2099)
-                        $msg    .= "Birth Year '$value' must be an integer " .
-                                "and in the range 1750 to 2099.  ";
+                        $msg    .= "Birth Year '" .
+                                    htmlspecialchars($value) .
+                                    "' must be an integer " .
+                                    "and in the range 1750 to 2099.  ";
                     break;
                 }           // BYear
 
@@ -278,7 +284,9 @@ if (isset($_GET) && count($_GET) > 0)
                         $value >= 0 && $value <= 20)
                         $range      = intval($value);
                     else
-                        $msg        .= "Range '$value' must be an integer ".
+                        $msg        .= "Range '" .
+                                        htmlspecialchars($value) . 
+                                        "' must be an integer ".
                                        "between 0 and 20";
                     break;
                 }           // "Range"
@@ -295,7 +303,8 @@ if (isset($_GET) && count($_GET) > 0)
                         $parmCount++;
                     }
                     else
-                        $msg        .= "Page number '$value' " .
+                        $msg        .= "Page number '" . 
+                                        htmlspecialchars($value) . "' " .
                                        "must be a positive integer. ";
                     break;
                 }           // "Page"
@@ -314,7 +323,8 @@ if (isset($_GET) && count($_GET) > 0)
                     }
                     else
                     if (strlen($value) > 0)
-                        $msg            .= "Family value '$value' " .
+                        $msg            .= "Family value '" .
+                                htmlspecialchars($value) . "' " .
                                             "contains an invalid character. ";
                     break;
                 }           // "Family"
@@ -347,7 +357,9 @@ if (isset($_GET) && count($_GET) > 0)
                         $parms[$fieldLc]        = $value;
                     }
                     else
-                        $msg    .= "Province code '$value' is invalid.  ";
+                        $msg    .= "Province code '" . 
+                                    htmlspecialchars($value) . 
+                                    "' is invalid.  ";
                     break;
                 }           // used only by menu
 
@@ -360,7 +372,8 @@ if (isset($_GET) && count($_GET) > 0)
                         $parms[$fieldLc]        = $value;
                     }
                     else
-                        $msg    .= "District number '$value' is invalid. ";
+                        $msg    .= "District number '" .
+                        htmlspecialchars($value) . "' is invalid. ";
                     break;
                 }           // district is simple text
 
@@ -483,7 +496,9 @@ if (ctype_digit($censusYear))
         }
     }
     else
-        $msg                    .= "Census value '$censusId' invalid. ";
+        $msg                    .= "Census value '" . 
+                                    htmlspecialchars($censusId) . 
+                                    "' invalid. ";
 }                   // specific census identifier
 
 // start constructing the forward and back links
@@ -852,7 +867,7 @@ if ($showLine && $page)
     if ($showLine && $page)
     {       // display whole page
         $pageRec    = new Page($subDistrict, $page);
-        $image      = $pageRec->get('pt_image');
+        $image      = $pageRec->get('image');
         $template->set('IMAGE', $image);
     }
     else

@@ -42,9 +42,10 @@ use \Exception;
  *		2017/08/16		legacyIndivid.php renamed to Person.php			*
  *		2017/09/12		use get( and set(								*
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
+ *		2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/common.inc';
@@ -361,169 +362,177 @@ function chkAncestors($person, $degree, $chkspouses = true)
     return '';	// no relationship found in this branch
 }	// chkAncestors
 
-    // gender class for hyper-links
-    $genderClass	= array('male', 'female', 'male');
+// gender class for hyper-links
+$genderClass	= array('male', 'female', 'male');
 
-    // validate input
-    $idir		= null;
-    $name		= null;
-    $idir1		= null;
-    $person1		= null;
-    $name1		= '';
-    $surname1		= '';
-    $nameuri		= '';
-    $prefix		= '';
-    $gender1		= 0;
-    $idir2		= null;
-    $person2		= null;
-    $name2		= '';
-    $surname2		= '';
-    $nameuri		= '';
-    $prefix		= '';
-    $gender2		= 0;
-    $isOwner		= true;
+// validate input
+$idir		    			= null;
+$idirtext	    			= null;
+$name		    			= null;
+$idir1		    			= null;
+$idir1text	    			= null;
+$person1					= null;
+$name1		    			= '';
+$surname1					= '';
+$nameuri					= '';
+$prefix		    			= '';
+$gender1					= 0;
+$idir2		    			= null;
+$idir2text	    			= null;
+$person2					= null;
+$name2		    			= '';
+$surname2					= '';
+$nameuri					= '';
+$prefix		    			= '';
+$gender2					= 0;
+$isOwner					= true;
 
-    foreach($_GET as $key => $value)
-    {
-      switch($key)
-      {
+foreach($_GET as $key => $value)
+{
+  switch($key)
+  {
 		case 'idir1':
-		{
-		    $idir1	= $value;
-		    try
-		    {
-				$person1		= new Person(array('idir' => $idir1));
-				$isOwner	= $isOwner && $person1->isOwner();
-				$name1		= $person1->getName(Person::NAME_INCLUDE_DATES);
-				$surname1	= $person1->getSurname();
-				$nameuri	= rawurlencode($name1);
-				if (strlen($surname1) == 0)
-				    $prefix	= '';
-				else
-				if (substr($surname1, 0, 2) == 'Mc')
-				    $prefix	= 'Mc';
-				else
-				    $prefix	= substr($surname1, 0, 1);
-				$gender1	= $person1->getGender();
-		    }
-		    catch(Exception $e)
-		    {
-				$name1	= "Identification Failure for IDIR1=$idir1";
-				$msg	.= $e->getMessage();
-		    }		// exception caught
+        {
+            if (ctype_digit($value) && $value > 0)
+                $idir1	        = intval($value);
+            else
+                $idir1text      = htmlspecialchars($value);
 		    break;
 		}		// idir1
 
 		case 'idir2':
 		{
-		    $idir2	= $value;
-		    try
-		    {
-				$person2		= new Person(array('idir' => $idir2));
-				$isOwner	= $isOwner && $person2->isOwner();
-				$name2		= $person2->getName(Person::NAME_INCLUDE_DATES);
-				$surname2	= $person2->getSurname();
-				if (strlen($surname2) == 0)
-				    $prefix	= '';
-				else
-				if (substr($surname2, 0, 2) == 'Mc')
-				    $prefix	= 'Mc';
-				else
-				    $prefix	= substr($surname2, 0, 1);
-				$gender2	= $person2->getGender();
-		    }
-		    catch(Exception $e)
-		    {
-				$name2	= "Identification Failure for IDIR2=$idir2";
-				$msg	.= $e->getMessage();
-		    }		// exception caught
+            if (ctype_digit($value) && $value > 0)
+                $idir2	        = intval($value);
+            else
+                $idir2text      = htmlspecialchars($value);
 		    break;
-		}		// idir1
+		}		    // idir2
 
 		case 'Name':
 		{
-		    $name	= $value;
+		    $name	        = $value;
 		    break;
-		}		// Name
-      }			// switch on key
-    }			// loop through all parameters
-    
-    $title	= "Relationship of $name1 to $name2";
+		}		    // Name
+    }			    // switch on key
+}			        // loop through all parameters
 
+if (is_string($idir1text))
+    $msg            .= "Invalid value for IDIR1=$idir1text. ";
+else
+if (is_int($idir1))
+{
+	$person1		= new Person(array('idir' => $idir1));
+	$isOwner	    = $isOwner && $person1->isOwner();
+	$name1		    = $person1->getName(Person::NAME_INCLUDE_DATES);
+	$surname1	    = $person1->getSurname();
+	$nameuri	    = rawurlencode($name1);
+	if (strlen($surname1) == 0)
+	    $prefix	    = '';
+	else
+	if (substr($surname1, 0, 2) == 'Mc')
+	    $prefix	    = 'Mc';
+	else
+	    $prefix	    = substr($surname1, 0, 1);
+	$gender1	    = $person1->getGender();
+}
+else
+{
+	$name1	        = "Missing parameter IDIR1";
+	$msg	        = "Missing parameter IDIR1. ";
+}		            // missing idir1
 
-    if (is_null($person1))
-		$msg		.= "Missing parameter idir1. ";
+if (is_string($idir2text))
+    $msg            .= "Invalid value for IDIR2=$idir2text. ";
+else
+if (is_int($idir2))
+{
+	$person2		= new Person(array('idir' => $idir2));
+	$isOwner	    = $isOwner && $person2->isOwner();
+	$name2		    = $person2->getName(Person::NAME_INCLUDE_DATES);
+	$surname2	    = $person2->getSurname();
+	$nameuri	    = rawurlencode($name2);
+	if (strlen($surname2) == 0)
+	    $prefix	    = '';
+	else
+	if (substr($surname2, 0, 2) == 'Mc')
+	    $prefix	    = 'Mc';
+	else
+	    $prefix	    = substr($surname2, 0, 1);
+	$gender2	    = $person2->getGender();
+}
+else
+{
+	$name2	    = "Missing parameter IDIR2";
+	$msg	    .= "Missing parameter IDIR2. ";
+}		            // missing idir2
 
-    if (is_null($person2))
-    {
+$title	        = "Relationship of $name1 to $name2";
+
+if ($person1 instanceof Person && is_null($person2))
+{
 		if (!is_null($name))
-		{		// redirect to search menu 
+    {		// redirect to search menu
+        $name       = urlencode($name); 
 		    header("Location: chooseRelative.php?name=$name&idir=$idir1");
 		    exit;
 		}		// redirect to search menu 
-		$msg		.= "Missing parameter idir2. ";
-    }
+}
 
-    if (strlen($msg) == 0)
-    {			// no errors
-    //	create a representation of the relationship of the first
-    //	individual to all ancestors and ancestors of spouses
-    //
-    //	Examples:
-    //	    $ancestors[n] = 3 means individual n is great-grand-parent
-    //	    $ancestors[n] = 0x8000 + 1 means individual is father/mother-in-law
-    $ancestors	= array();
-    $ancestors[$idir1]	= 0;	// identify self
-    setAncestors($person1, 1);	// identify ancestors
-
-    $families	= $person1->getFamilies();
-    foreach($families as $if => $family)
-    {		// loop through marriages
-		try {
-		    if ($person1->getGender() == Person::MALE)
-				$spouseIdir	= $family->get('idirwife');
-		    else
-				$spouseIdir	= $family->get('idirhusb');
-		    if ($spouseIdir > 0)
-		    {
-				$spouse	= new Person(array('idir' => $spouseIdir));
-				$ancestors[$spouseIdir]	= 0x8000;	// spouse
-				setAncestors($spouse, 0x8000 + 1);		// in-laws
-		    }
-		}
-		catch (Exception $e)
-		{
-		    print "<p class='message'>" . $e->getMessage() . "</p>\n";
-		}
-    }		// loop through marriages
-
-    $commonAncestor	= null;
-    $relation	= chkAncestors($person2, 0);
-    if (strlen($relation) == 0)
+if (strlen($msg) == 0)
+{			// no errors
+	//	create a representation of the relationship of the first
+	//	individual to all ancestors and ancestors of spouses
+	//
+	//	Examples:
+	//	    $ancestors[n] = 3 means individual n is great-grand-parent
+	//	    $ancestors[n] = 0x8000 + 1 means individual is father/mother-in-law
+	$ancestors	        = array();
+	$ancestors[$idir1]	= 0;	// identify self
+	setAncestors($person1, 1);	// identify ancestors
+	
+	$families	        = $person1->getFamilies();
+	foreach($families as $if => $family)
+	{		// loop through marriages
+	    if ($person1->getGender() == Person::MALE)
+			$spouseIdir	= $family->get('idirwife');
+	    else
+			$spouseIdir	= $family->get('idirhusb');
+	    if ($spouseIdir > 0)
+	    {
+			$spouse	    = new Person(array('idir' => $spouseIdir));
+			$ancestors[$spouseIdir]	= 0x8000;	// spouse
+			setAncestors($spouse, 0x8000 + 1);		// in-laws
+	    }
+	}		// loop through marriages
+	
+	$commonAncestor	    = null;
+	$relation	        = chkAncestors($person2, 0);
+	if (strlen($relation) == 0)
 		$relation	= ' no known relation to';
-    else
-    {		// adjust for sex of first individual
+	else
+	{		// adjust for sex of first individual
 		if ($person1->getGender() == Person::MALE)
 		{
 		    $relation	= str_replace(
-				array('child', 'spouse', 'sibling', 'parent', 'uncle', 'nephew'),
-				array('son', 'husband', 'brother', 'father', 'uncle', 'nephew'),
-				$relation);
+					array('child', 'spouse', 'sibling', 'parent', 'uncle', 'nephew'),
+					array('son', 'husband', 'brother', 'father', 'uncle', 'nephew'),
+					$relation);
 		}		// 1st individual is male
 		else
 		{
 		    $relation	= str_replace(
-				array('child', 'spouse', 'sibling', 'parent', 'uncle', 'nephew'),
-				array('daughter', 'wife', 'sister', 'mother', 'aunt', 'niece'),
-				$relation);
+					array('child', 'spouse', 'sibling', 'parent', 'uncle', 'nephew'),
+					array('daughter', 'wife', 'sister', 'mother', 'aunt', 'niece'),
+					$relation);
 		}		// 1st individual is female
-    }		// adjust for sex of first individual
-    }			// no errors
+	}		// adjust for sex of first individual
+}			// no errors
 
-    htmlHeader($title,
-				array(	'/jscripts/js20/http.js',
-					'/jscripts/util.js',
-  			'relationshipCalculator.js'));
+htmlHeader($title,
+			array(	'/jscripts/js20/http.js',
+				    '/jscripts/util.js',
+  			        'relationshipCalculator.js'));
 ?>
 <body>
   <div class="body">

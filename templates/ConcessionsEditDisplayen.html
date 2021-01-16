@@ -6,8 +6,9 @@
  *																		*
  *  History:															*
  *		2018/10/24		created											*
+ *      2021/01/13      add messages                                    *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
       <a href="/genealogy.php?lang=$LANG">
@@ -47,7 +48,7 @@
     	to update the database.
       </p>
       <!--- Put out the response as a table -->
-      <form name="concessionForm"
+      <form name="concessionForm" id='concessionForm'
     		action="ConcessionsUpdate.php" 
     		method="post" 
     		autocomplete="off" 
@@ -184,35 +185,27 @@
     <div class="balloon" id="HelpConID">
       The identifier of the concession.  This must be unique within the
       township.  For exanple "con 7".
-    </p>
     </div>
     <div class="balloon" id="HelpFirstLot">
       The lowest lot number in the concession.
-    </p>
     </div>
     <div class="balloon" id="HelpLastLot">
       The highest lot number in the concession.
-    </p>
     </div>
     <div class="balloon" id="HelpLatitude">
       The latitude of the center of the first lot of the concession.
-    </p>
     </div>
     <div class="balloon" id="HelpLongitude">
       The longitude of the center of the first lot of the concession.
-    </p>
     </div>
     <div class="balloon" id="HelpLatByLot">
       The change in latitude for each successive lot number.
-    </p>
     </div>
     <div class="balloon" id="HelpLongByLot">
       The change in longitude for each successive lot number
-    </p>
     </div>
     <div class="balloon" id="HelpDelete">
       This button is used to delete a concession record from the list.
-    </p>
     </div>
     <div class="balloon" id="HelpPlot">
       Click on this button to display a Google map which you use to locate the
@@ -230,19 +223,22 @@
       have made to the concessions list for the current county.
     </div><!-- id="HelpSubmit" -->
     <div class="hidden" id="templates">
-      <span id="unknownDomain">
-          Unknown domain value '$value'. 
+      <span id="CCInvalid">
+          Invalid country code value '$value'. 
       </span>
-      <span id="unknownCounty">
-          Unknown county '$county' within domain '$domain'.  
+      <span id="domainInvalid">
+          Invalid domain value '$value'. 
       </span>
-      <span id="missingCounty">
+      <span id="countyInvalid">
+          Invalid county '$county' within domain '$domain'.  
+      </span>
+      <span id="countyMissing">
           Missing mandatory parameter County.
       </span>
-      <span id="unknownTownship">
+      <span id="townshipInvalid">
           Unknown township '$township' within county '$county'.  
       </span>
-      <span id="missingTownship">
+      <span id="townshipMissing">
           Missing mandatory parameter Township.
       </span>
       <!-- template for requesting the addition of concessions -->

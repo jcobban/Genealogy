@@ -1,0 +1,658 @@
+<!--*********************************************************************
+ *  DeathCausesen.html      											*
+ *																		*
+ *  Generate a customized popup division to explain the contents of the	*
+ *  cause of death for an individual.  This template is included by any	*
+ *  page, for example Person.php that wishes to support popping			*
+ *  up an explanation of a cause of death.                              *
+ * 																		*
+ *  History: 															*
+ *		2020/12/29		created											*
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+<template>
+	<p id='abioptic'>
+		    "abioptic": Not diagnosed with a sample of tissue from a patient.
+	</p>
+	<p id='acute'>
+		    "acute": Short term duration.
+	</p>
+	<p id="addison's||addisons">
+		    "Addison's Disease": Chronic adrenal insufficiency leading to very low blood pressure and coma.
+	</p>
+	<p id='albumaemia||albuminaria||albuminarea||albuminemia'>
+		    "albuminemia": Deficiency of albumin in the blood.
+	</p>
+	<p id='apoplexy'>
+		    "apoplexy": Obsolete terminology for a stroke.
+	</p>
+	<p id='appelectic'>
+		    "epileptic": Subject to seizures that are not related to an infection.
+	</p>
+	<p id='arterio-sclerosis||arteriosclerosis'>
+		    "arterio-sclerosis":
+		    This is properly <i>atherosclerosis</i>, congestion of the arteries
+		    due to the accumulation of fatty deposits on the lining.
+	</p>
+	<p id='ascites'>
+		    "ascites": The accumulation of fluid in the peritoneal cavity, 
+					causing abdominal swelling.
+	</p>
+	<p id='asthenia'>
+		    "asthenia": Lack or loss of strength and energy.
+	</p>
+	<p id='ataxia'>
+		    "Ataxia": lack of voluntary control of muscle movements.
+	</p>
+	<p id='atelestosis'>
+		    "atelectasis": collapse or closure of the lung
+	</p>
+	<p id='atherosclerosis'>
+		    "Atherosclerosis": Congestion of the arteries
+		    due to the accumulation of fatty deposits on the lining.
+	</p>
+	<p id='atheroma'>
+		    "atheroma": a fatty deposit on the inner lining of an artery
+		    resulting from <i>atherosclerosis</i>.
+	</p>
+	<p id='auto-intoxication'>
+		    "auto-intoxication": Self-poisoning resulting from the absorption
+		    of waste products of metabolism.	
+	</p>
+	<p id='bilateral'>
+		    "bilateral": Occurring on both sides of the body.
+	</p>
+	<p id='bulbar'>
+		    "bulbar palsy": Impairment of function of cranial nerves.
+	</p>
+	<p id='cachexia'>
+		    "cachexia": weakness and wasting of the body due to severe
+				chronic illness.
+	</p>
+	<p id='carbuncle'>
+		    "carbuncle": Abscess larger than a boil.
+	</p>
+	<p id='carcinoma'>
+            "carcinoma": a type of cancer that develops from epithelial
+            cells that line the inner or outer surfaces of the body.
+	</p>
+	<p id='catarrh||catarrhal'>
+		    "catarrh": Disorder of inflammation of the mucous membranes
+		    typically producing phlegm.  Frequently misapplied in the 
+		    19th century.
+	</p>
+	<p id='cholecystitis'>
+		    "cholecystitis": Inflammation of the gallbladder.
+	</p>
+	<p id='cholelithiasis'>
+            "cholelithiasis": the presence of one or more calculi
+            (gallstones) in the gallbladder.
+	</p>
+	<p id='cholanguitis||cholangitis'>
+		    "cholangitis": inflammation of the bile duct.
+	</p>
+	<p id='compensation'>
+        "cardiac compensation": the maintenance of an adequate blood flow 
+        without distressing symptoms, accomplished by such cardiac and 
+        circulatory adjustments as tachycardia, cardiac hypertrophy, and 
+        increase of blood volume by sodium and water retention.
+	</p>
+	<p id='consolidation'>
+        "pulmonary consolidation": is a region of lung tissue that has
+        filled with liquid instead of air so it is not compressible.
+	</p>
+	<p id='cyanosis'>
+            "cyanosis": the appearance of a blue or purple colouration
+            of the skin or mucous membranes due to low oxygen saturation.
+	</p>
+	<p id='infantum'>
+		    '"Cholera infantum, or, as this form of disease is generally termed, 
+		    "summer complaint," comprises all the various diseases of the 
+		    digestive organs and brain with which children are attacked 
+		    during the summer, and most frequently during dentition, during 
+		    their second summer.' <i>Adolphe Lippe (1812-1888)</i>
+	</p>
+	<p id='confinement'>
+		    "confinement": The period from the onset of labour to the birth
+		    of a child.  As a cause of death generally 
+		    <a href='http://en.wikipedia.org/wiki/Eclampsia'>eclampsia</a>, 
+		    an acute complication of pregnancy characterized by seizures and 
+		    coma.
+	</p>
+	<p id='congestion'>
+		<span value='brain'>
+		    "Brain Congestion" swelling of the brain due to trauma or infection.
+		    The swelling cuts off arterial blood flow to parts of the brain.
+		    Frequently misapplied in the 19th century, for example to ischemic
+		    stroke.
+	    </span>
+		<span value='hypostatic'>
+		    "Hypostatic Congestion": Congestion caused by poor cirulation and
+		    settling of venous blood in the lower part of an organ. 
+	    </span>
+	    <span>
+		    "Congestion" is an abnormal accumulation of a body fluid.
+	    </span>
+	</p>
+	<p id='consumption'>
+		    "consumption": Tuberculosis of the lungs.  Throughout history
+		    the single most deadly disease, particularly of young adults.
+	</p>
+	<p id='cystitis'>
+		    "cystitis": Infection of the bladder.
+	</p>
+	<p id='decompensated||decompensation'>
+		    Cardiac decompensation may refer to the failure of the heart to
+		    maintain adequate blood circulation.
+	</p>
+	<p id='dementia'>
+		<span value='senile'>
+		    Senile dementia is severe mental deterioration in old age, 
+		    characterized by loss of memory and control of bodily functions.
+	    </span>
+		<span>
+		    Dementia is any psychotic disorder.
+	    </span>
+	</p>
+	</p>
+	<p id='dilatation||dilatative||dilated'>
+		    "dilatation of the heart": Compensatory enlargement of the 
+		    cavities of the heart, with thinning of its walls.
+	</p>
+	<p id='diphtheria'>
+		    Diphtheria (Greek διφθέρα (diphthera) "pair of leather scrolls") 
+		    is an upper respiratory tract illness caused by 
+		    <i>Corynebacterium diphtheriae</i>. It is characterized by sore
+		    throat, low fever, and an adherent membrane on the tonsils,
+		    pharynx, and/or nasal cavity
+	</p>
+	<p id='disease'>
+		<span value="brights||bright||bright's">
+		    "Bright's Disease": Historical classification of kidney diseases
+		    that would be described in modern medicine as acute or chronic
+            nephritis, inflammation of the kidneys.
+        </span>
+		<span value="potts||pott||pott's">
+		    "Pott's Disease": A form of tuberculosis that occurs outside
+		    the lungs where the disease attacks the vertebrae.
+		    Also called tuberculous spondylitis.  It has been found in
+		    ancient Egyptian mummies.
+        </span>
+	</p>
+	<p id='dropsy'>
+            "dropsy" is an abnormal accumulation of fluid beneath
+            the skin or
+		    in one or more cavities of the body.  This is an obsolete term
+		    replaced by <a href='http://en.wikipedia.org/wiki/Edema'>edema(US) or oedema(UK)</a>.
+	</p>
+	<p id='dysentery'>
+		    "Dysentery" is an inflammatory disorder of the intestine,
+		    especially of the colon, that results in severe diarrhea
+		    containing blood and mucus in the feces with fever and abdominal 
+		    pain, caused by any kind of infection.
+	</p>
+	<p id='dyspepsia'>
+		    "Dyspepsia", also known as indigestion, is a condition of impaired
+		    digestion.
+	</p>
+	<p id='dystacia||dystocia||dystosia'>
+		    "Dystocia" is an abnormal or difficult childbirth or labour. 
+	</p>
+	<p id='ecelampsia||eclampsia'>
+		    "Eclampsia" is an acute and life-threatening complication of
+		    pregnancy, characterized by the appearance of seizures, usually
+		    in a patient who has developed pre-eclampsia. (Pre-eclampsia and
+		    eclampsia are collectively called Hypertensive disorder of
+		    pregnancy and toxemia of pregnancy.)
+	</p>
+	<p id='edema'>
+	<p id='oedema'>
+            "Edema" (usually spelled Oedema in Britain) is an abnormal 
+            accumulation of fluid beneath the skin or
+		    in one or more cavities of the body.  Formerly called "dropsy".
+	</p>
+	<p id='embolism'>
+		    "Embolism" is an obstruction in a blood vessel due to a blood
+		    clot or other foreign matter that gets stuck while traveling
+		    through the bloodstream.
+	</p>
+	<p id='embolus'>
+		    "Embolus" is a mass of clotted blood or other material brought 
+		    by the blood from one vessel and forced into a smaller one,
+		    obstructing the circulation.
+	</p>
+	<p id='emphyacemia||emphysema'>
+		    Emphysema is a long-term lung disease. In people with emphysema, 
+		    the tissues necessary to support the shape and function of the
+		    lungs are destroyed.
+	</p>
+	<p id='encephalitis'>
+		    "Encephalitis" is an inflammation of the brain.
+	</p>
+	<p id='enteric'>
+		    "Enteric Fever" is also known as Typhoid Fever.
+	</p>
+	<p id='enteritis'>
+		    "Enteritis" is an inflammation of the small intestine.
+	</p>
+	<p id='erisypelas||erysipelas||erysypelas'>
+		    "Erysipelas" is an acute streptococcus bacterial infection of the 
+		    upper dermis and superficial lymphatics.
+	</p>
+	<p id='excitement'>
+		    "Excitement" as a medical term refers to the now discredited
+		    theories of the 18th century Scottish medical educator Dr. 
+		    <a href='http://en.wikipedia.org/wiki/William_Cullen'>William
+		    Cullen</a> that supposed that some medical
+		    conditions arose out of an excess or lack of excitation.
+	</p>		// excitement
+	<p id='exophthalmic'>
+		    "exophthalmic": characterized by protruding eyeballs.  Symptom of
+		    hyperthyroidism including Graves' disease.
+	</p>
+	<p id='fibroid'>
+		    "fibroid": characterized by fibrous scars.
+	</p>
+	<p id='fistula'>
+		    "fistula": an abnormal connection or passageway between two 
+		    epithelium-lined organs or vessels.
+	</p>
+	<p id='flu||flue||influenza||influenzal||influenzic'>
+		    "Influenza" is an acute respiratory disease caused by a virus.
+            The word entered the English language from Spanish.
+            It was popularized as a result of
+		    military secrecy during World War I.  Soldiers on both sides of
+		    the conflict were affected in epidemic numbers but this was not
+            revealed to the public.  Only in Spain, which was a
+            non-combatant,
+		    was the epidemic reported, so it became known by its Spanish
+		    name.  Previously the symptoms would have been reported as
+		    "cattarh" or "la Grippe".
+	</p>
+	<p id='intussusception'>
+		    "Intussusception" is a condition in which part of the intestines 
+		    folds into another section ot intestine.  This can often result
+		    in an obstruction.
+	</p>
+	<p id='gangrene||grangrene'>
+		    "Gangrene" is a serious and potentially life-threatening condition
+		    that arises when a considerable mass of body tissue dies
+		    (necrosis).
+		<span value='gas'>
+		    "Gas gangrene" (also known as "Clostridial myonecrosis", and
+		    "Myonecrosis") is a bacterial infection that produces gas in
+		    tissues in gangrene.
+	    </span>
+	</p>
+	<p id='gastritis'>
+		    "Gastritis" is an inflammation of the lining of the stomach.
+	</p>
+	<p id='glossolaryngeal'>
+		    "Glossolaryngeal": having to do with the tongue and larynx.
+	</p>
+	<p id='goitre||goiter'>
+		    "Goitre" is swelling of the thyroid gland, which can lead to a
+		    swelling of the neck or larynx.
+	</p>
+	<p id="grave's||graves'||graves">
+		    "Graves' disease" is an autoimmune disease. It most commonly
+		    affects the thyroid, frequently causing it to enlarge to twice
+		    its size or more (goitre).
+	</p>
+	<p id="gravel">
+		    "Gravel" is a deposit of small calculous concretions, usually of 
+		    uric acid, calcium oxalate, or phosphates, in the 
+		    kidneys and urinary bladder.  Also known as uropsammus.
+	</p>
+	<p id='green'>
+		<span value='paris'>
+		    "Paris green", or copper(II) acetoarsenite, is a highly toxic
+		    crystalline power developed as a pesticide but also formerly used
+            as a pigment.
+        </span> 
+	</p>
+	<p id='grippe'>
+		    "la Grippe": this is the term most commonly used prior to
+		    1918 for the disease now known as influenza or the common cold.  
+	</p>
+	<p id='haematemesis||hematemesis'>
+		    "Haematemesis" is vomiting up of blood.
+	</p>
+	<p id='haemophilia||hemophilia'>
+		    "Haemophilia" is a group of rare hereditary disorders in which
+		    the blood does not clot normally and therefore injuries do not
+		    heal properly.
+	</p>
+	<p id='haemorrage||haemorrhage||hemorrage||hemmorage||hemorrhage||hemmorrhage'>
+		    "Haemorrhage" is profuse bleeding from ruptured blood vessels.
+	</p>
+	<p id='hemiplegia'>
+            "Hemiplegia" is a symptom of stroke in which one side of
+            the body becomes weak.
+	</p>
+	<p id='hepatic'>
+		    "Hepatic": having to do with the liver.
+	</p>
+	<p id='hepatitis'>
+		    "Hepatitis": inflammation of the liver.
+	</p>
+	<p id="hodgkins'||hodgkin's||hodgkin||hodgkins||hodgkinsons">
+		    "Hodgkin's Lymphoma" is a type of cancer originating from white
+		    blood cells called lymphocytes which spreads from one lymph node
+		    to another.
+	</p>
+	<p id='hydrocephalus||hydrocephaly'>
+		    "Hydrocephalus": an abnormal accumulation of cerebro-spinal fluid
+		    in the cavities of the brain.
+	</p>
+	<p id='hyperemia||hyperaemia'>
+		    "Hyperaemia": engorgement; an excess of blood in an organ.
+	</p>
+	<p id='hypertrophy||hypertropy||hyportrophy'>
+		    "Hypertrophy": excessive enlargement.
+	</p>
+	<p id='ilraemic||uraemic||uremic'>
+				"Uraemic": having to do with kidney failure.
+	</p>
+	<p id='inanition'>
+		    "Inanition": exhaustion cause by lack of food and water.
+	</p>
+	<p id='infarct||infarction'>
+		    "Infarction": tissue death due to a local lack of oxygen as a 
+		    result of an obstruction of the tissue's blood supply.
+	</p>
+	<p id='ischemia||ischemic'>
+		    "Ischemia" is an insufficient supply of blood to an organ, 
+		    usually due to a blocked artery.
+	</p>
+	<p id='jaundice'>
+		    "Jaundice": a yellowish pigmentation of the skin and mucous
+		    membranes cause by increased levels of bilirubin in the blood.
+		    Usually associated with liver disease.
+	</p>
+	<p id='leg'>
+		<span value='milk'>
+		    "Milk Leg": Post-partum blood clots in the legs.
+	    </span>
+	</p>
+	<p id='lethargica'>
+		<span value='encephalitis'>
+		    "Encephalitis Lethargica": Between 1915 and 1926 an epidemic
+		    of atypical encephalitis characterized by drowsiness and high
+		    rates of death swept the world.  
+		    It was first described in 1917 by the
+		    neurologist Constantin von Economo and the pathologist
+		    Jean-Rene Cruchet. 
+	    </span>
+		<span>
+		    "Lethargica": characterized by lower level of consciousness.
+	    </span>
+	</p>
+	<p id='lethargia||lethargy'>
+		    "Lethargy": a lowered level of consciousness, with drowsiness,
+		    listlessness, and apathy.
+	</p>
+	<p id='leukaemia||leukemia'>
+		    "Leukemia": a cancer of the blood or bone marrow characterized
+		    by an abnormal increase of immature white blood cells.
+	</p>
+	<p id='lymphadenoma||lymphadenopathy'>
+		    "Lymphadenoma": swelling of lymph nodes.`
+	</p>
+	<p id='marasmus'>
+		    "marasmus": severe malnutrition characterized by a lack of energy.
+	</p>
+	<p id='mediastinum'>
+            "mediastinum": The central compartment of the thoracic cavity
+            enclosing the heart, thymus, esophagus, trachea and 
+            associated vessels.
+	</p>
+	<p id='meningitis'>
+            "meningitis": inflammation of the protective membranes
+            covering the brain and spinal cord.
+	</p>
+	<p id='mitral'>
+		    "mitral valve": the valve in the heart that lies between the
+		    left atrium and the left ventricle.  The name comes from the
+		    similarity in appearance to a mitre.
+	</p>
+	<p id='metritis'>
+            "metritis": inflammation of the wall of the uterus.
+            More commonly this is now called Pelvic Inflammatory Disease.
+	</p>
+	<p id='morbus'>
+		<span value='cholera'>
+		    "cholera morbus": used in the 19th and early 20th centuries to
+				describe both non-epidemic cholera and gastrointestinal 
+				diseases that mimicked cholera. In particular it was used for
+				gastro-intestinal diseases suffered by young children
+				during the transition to solid food.
+	    </span>
+	</p>
+	<p id='myocardial'>
+		    "Myocardial": having to do with the heart muscle.
+	</p>
+	<p id='myocarditis'>
+		    "Myocarditis": inflammation of the heart muscle due to an infection.
+	</p>
+	<p id='nephritis'>
+		    "Nephritis": inflammation of the kidneys.
+	</p>
+	<p id='neuralgia'>
+		    "Neuralgia": nerve pain that is not a result of excitation of
+		    healthy pain receptors.
+	</p>
+	<p id='otitis'>
+		    "Otitis": inflammation of the ear.
+	</p>
+	<p id='paraplegia'>
+		    "Paraplegia": impairment in motor or sensory function of the
+		    lower extremities, typically as a result of damage to the
+		    spinal cord.
+	</p>
+	<p id='paresis'>
+		    "Paresis": a condition typified by a weakness of voluntary
+		    movement.
+	</p>
+	<p id='parturition'>
+		    "Parturition": the act of giving birth
+	</p>
+	<p id='pellagra||pellegra'>
+		    "Pellagra": a vitamin deficiency disease most commonly caused by
+		    a chronic lack of niacin in the diet.
+	</p>
+	<p id='peritonitis'>
+            "Peritonitis": inflamation of the tissue that lines the inner
+            wall of the abdomen and covers most of the abdominal organs.
+	</p>
+	<p id='pernicious'>
+		    "Pernicious Anaemia": a decrease in red blood cells that occurs 
+		    when the intestines cannot properly absorb vitamin B12.
+		    The "pernicious" aspect of the disease was its invariably
+		    fatal prognosis prior to the discovery of treatment. 
+	</p>
+	<p id='praevia||previa'>
+            "Placenta previa": a complication of birth which
+            occurs when a baby's placenta partially
+            or totally covers the mother's cervix — the outlet 
+            for the uterus.
+	</p>
+	<p id='phthisis'>
+            "Phthisis": a disease characterized by the wasting away
+            or atrophy of the body or a part of the body. 
+            Frequently due to pulmonary tuberculosis.
+	</p>
+	<p id='pleurisy||pleuritis'>
+		    "Pleurisy": painful inflammation of the lining of the cavity
+		    surrounding the lungs.
+	</p>
+	<p id='pneumonia'>
+		<span value='hypostatic'>
+		    "Hypostatic pneumonia" usually results from the collection of 
+		    fluid in the back of the lungs and occurs especially 
+		    in those confined to a bed for extended periods.
+	    </span>
+		<span>
+		    "Pneumonia" is an inflammatory infection of the lungs, and in
+		    particular the little air sacs called alveoli.  It is very
+		    common as a complication of other conditions that result in
+		    reduced immune response.
+	    </span>
+	</p>
+	<p id="pott"> <p id="pott's">
+		    "Pott's disease": tuberculosis presenting in any other organ
+		    other than the lung, for example in the spine.
+	</p>
+	<p id='praecox'>
+		<span value='dementia'>
+            "Dementia Praecox": literally madness occuring at an unusally 
+            young age, refers to
+		    a deteriorating psychotic condition that begins in the late
+            teens or early adulthood.  Schizophrenia. 
+        </span>
+    </p>
+	<p id='puerperal||purperal'>
+		    "Puerperal fever": a bacterial infection contracted by women
+		    during childbirth or miscarriage.  Prior to the introduction of
+		    antibiotics it would develop into septicaemia which is
+		    frequently fatal.  The typical source of the infection was the
+            unwashed hands of the doctor.  Prior to the acceptance of
+            the theories of Ignaz Semmelweis (1818&mdash;1865) and
+            Florence Nightingale (1820&mdash;1910) doctors did
+            not wash their hands between activities.  Midwives were much
+            more likely to because they were also housewives who spent most
+            of their days washing and had practical experience with the
+            food spoilage that occurred if containers and working surfaces
+            were not rigorously cleaned.
+            <q>In the mid-19th century, about five women in 1,000 died 
+                in deliveries performed by midwives or at home. Yet when 
+                doctors working in the best maternity hospitals in Europe 
+                and America performed deliveries, the maternal death rate 
+                was often 10 to 20 times greater.</q>
+            <a href="https://www.pbs.org/newshour/health/ignaz-semmelweis-doctor-prescribed-hand-washing">PBS Newshour</a>.
+	</p>
+	<p id='pyaemia||pyemia'>
+		    "Pyaemia": a type of septicaemia that leads to widespread
+		    abscesses.
+	</p>
+	<p id='pyelitis||pyelites'>
+		    "Pyelitis": inflammation of the renal pelvis.
+	</p>
+	<p id='pyorrhea||pyorrhoea'>
+		    "Pyorrhea": purulent inflamation of the gums and tooth sockets.
+	</p>
+	<p id='pyonephrosis'>
+		    "Pyonephrosis": an infection of the renal collecting system
+		    resulting in the accumulation of pus.
+	</p>
+	<p id='quinsy||quinsey'>
+		    "Quinsy": is a potentially serious complication of
+		    tonsillitis.  An abscess, a collection of pus, forms between the
+		    tonsil and the wall of the throat.  This can happen when a
+		    bacterial infection spreads from an infected tonsil to the
+		    surrounding tissue.
+	</p>
+	<p id='remittent'>
+            "Remittent Fever": a fever in which the symptoms temporarily
+            abate at regular intervals, but do not wholly cease.
+		    Causes include typhoid and infectious mononucleosis.
+	</p>
+	<p id='sarcoma'>
+		    "Sarcoma": a cancer that arises from transformed 
+            mesenchymal cells, that is cells that develop into 
+            connective tissue, blood vessels, and lymphatic tissue,
+		    resulting in the accumulation of pus.
+	</p>
+	<p id='scarlatina||scarlet'>
+		    "Scarlet Fever":  An infectious disease which most commonly
+		    affects 4 to 8 year old children. Symptoms include sore throat,
+		    fever, and a red rash.
+	</p>
+	<p id='sclerosis'>
+		<span value='arterio||arterial'>
+		    "Arterio- or Arterial sclerosis":
+            This is more recently called <i>atherosclerosis</i>, 
+            congestion of the arteries
+            due to the accumulation of fatty deposits on the lining.
+        </span>
+        <span>
+		    "Sclerosis": a hardening of tissue, usually caused by a
+		    replacement of the normal organ-specific tissue with
+		    connective tissue.
+        </span>
+	</p>
+	<p id='scrofula'>
+            "Scrofula": inflammation of the cervical lymph nodes in the
+            neck due to infection by mycobacteria. 
+            Frequently a symptom of tuberculosis.
+	</p>
+	<p id='sepsis||septicaemia||septicemia'>
+            "Septicaemia": an infection in which large numbers of bacteria
+            are present in the blood.  It is commonly referred to as
+		    blood poisoning.
+	</p>
+	<p id='stenosis'>
+		    "Stenosis": an abnormal narrowing of a blood vessel or other
+		    tubular organ or structure.
+	</p>
+	<p id='synovitis'>
+            "Synovitis":  inflammation of the synovial membrane.
+            This membrane lines joints that possess cavities, 
+            known as <a href="https://en.wikipedia.org/wiki/Synovial_joint">
+            synovial joints</a>. 
+	</p>
+	<p id='tabess||tabes'>
+            "Tabes": also known as "tabes dorsalis", the slowly 
+            progressive degeneration of the spinal cord that occurs 
+            in the late (tertiary) phase of syphilis
+	</p>
+	<p id='tetanus'>
+		    "Tetanus": a medical condition characterized by a prolonged
+		    contraction of skeletal muscle fibers.  This is usually as a
+		    result of contamination of a wound.
+	</p>
+	<p id='thrombosis'>
+		    "Thrombosis": the formation of a blood clot inside a blood
+		    vessel, obstructing the flow of blood through the circulatory
+		    system.
+	</p>
+	<p id='thrush'>
+		    "Thrush": an infection, typically of the mouth, caused by the 
+		    candida fungus, also known as yeast.
+	</p>
+	<p id='toxaemia||toxemia'>
+		    "Toxaemia":  An abnormal condition of pregnancy characterized by
+		    hypertension, edema, and protein in the urine as a result of
+		    the presence of bacterial toxins in the blood.
+	</p>
+	<p id='trismus'>
+		    "Trismus": reduced opening of the jaws caused by spasm of the
+		    muscles of mastication. 
+	</p>
+	<p id='typhoid'>
+		    "Typhoid Fever":  A common bacterial disease transmitted by
+		    the ingestion of food or water contaminated with the feces of
+		    an infected person.
+	</p>
+	<p id='typhus'>
+		    "Typhus": any of a number of diseases transmitted by rickettsia
+		    bacteria.  Epidemic typhus is transmitted by lice.
+	</p>
+	<p id='tuberculosis'>
+		    "Tuberculosis":  A common bacterial disease that typically 
+		    attacks the lungs, but can affect other organs.  Symptoms
+		    include chronic cough, fever, and weight loss.  Tuberculosis
+		    has killed more people throughout human history than any
+		    other disease.
+	</p>
+	<p id='uraemia||uremia||uraemic||uremic'>
+		    "Uraemia": the disease accompanying kidney failure.
+	</p>
+	<p id='vulgaris'>
+		<span value='lupus'>
+		    "Lupus Vulgaris": painful cutaneous tuberculosis skin lesions
+		    with nodular appearance.
+		 </span>   
+	</p>
+</template>

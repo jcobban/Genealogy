@@ -16,8 +16,10 @@ use \Exception;
  *      2018/10/15      get language apology text from Languages        *
  *      2019/02/18      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
+ *		2021/01/03      correct XSS vulnerability                       *
+ *		                improve support for multiple languages          *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -30,7 +32,7 @@ $username       = null;     // name
 $email          = null;     // e-mail address
 $lang           = 'en';
 
-if (count($_POST) > 0)
+if (isset($_POST) && count($_POST) > 0)
 {                   // invoked by post
     $parmsText  = "<p class='label'>\$_POST</p>\n" .
                   "<table class='summary'>\n" .
@@ -40,27 +42,13 @@ if (count($_POST) > 0)
     {   // loop through all parameters
         if ($debug)
             $warn   .= "<p>\$_POST['$key']='$value'</p>\n";
+        $value                      = trim($value);
         switch(strtolower($key))
         {       // act on specific parameter
             case 'userid':
             case 'username':
             {
-                if (strlen($value) > 0)
-                {           // userid supplied
-                    $username       = trim($value);
-                    // get existing account details
-                    $user           = new User(array("username" => $username));
-                    if ($user->isExisting())
-                    {
-                        $email          = $user->get('email');
-                        $shapassword    = $user->get('shapassword');
-                    }
-                    else
-                    {
-                        $msg    .=
-                        "Unable to find account record for user '$username'. ";
-                    }
-                }           // signed on
+                $username           = trim($value);
                 break;
             }               // userid
 
@@ -68,21 +56,6 @@ if (count($_POST) > 0)
             {
                 if (is_null($email))
                     $email              = $value;
-                if (strlen($email) > 0)
-                {           // email supplied
-                    // get existing account details
-                    $user               = new User(array("email" => $email));
-                    if ($user->isExisting())
-                    {
-                        $username       = $user->get('username');
-                        $shapassword    = $user->get('shapassword');
-                    }
-                    else
-                    {
-                        $msg    .=
-                        "Unable to find account record for email '$email'. ";
-                    }
-                }           // signed on
                 break;
             }               // email
 
@@ -99,16 +72,56 @@ if (count($_POST) > 0)
 }               // invoked by post 
 else
 {
-    $msg            .= "Not invoked by method=POST. ";
     $shapassword    = null;
 }
 
 $template       = new FtTemplate("forgotPassword$lang.html");
+$translate      = $template->getTranslate();
+$t              = $translate['tranTab'];
 $template->updateTag('otherStylesheets',    
                      array('filename'   => 'forgotPassword'));
+if (!isset($_POST) || count($_POST) == 0)
+    $msg            .= $template['notPost']->innerHTML;
 
-$template->set('USERID',    $username);
-$template->set('EMAIL',     $email);
+// get existing account details
+if (is_string($username))
+{
+    $user           = new User(array("username" => $username));
+    if ($user->isExisting())
+    {
+        $email          = $user->get('email');
+        $shapassword    = $user->get('shapassword');
+    }
+    else
+    {
+        $text   = $template['noAccountUser']->innerHTML;
+        $msg    .= str_replace('$username', htmlspecialchars($username));
+    }
+}
+else
+if (is_string($email))
+{
+    // get existing account details
+    $user               = new User(array("email" => $email));
+    if ($user->isExisting())
+    {
+        $username       = $user->get('username');
+        $shapassword    = $user->get('shapassword');
+    }
+    else
+    {
+        $text   = $template['noAccountEmail']->innerHTML;
+        $msg    .= str_replace('$email', htmlspecialchars($email));
+    }
+}
+else
+{
+    $username   = $t['Unknown'];
+    $email      = $t['Unknown'];
+}
+
+$template->set('USERID',    htmlspecialchars($username));
+$template->set('EMAIL',     htmlspecialchars($email));
 $template->set('LANG',      $lang);
 
 if ($user)
@@ -121,7 +134,7 @@ $proto      = $_SERVER['REQUEST_SCHEME'];
 $headers    = "MIME-Version: 1.0" . "\r\n" .
                       "Content-type:text/html;charset=UTF-8" . "\r\n" .
                       'From: <webmaster@jamescobban.net>' . "\r\n";
-$tag        = $template->getElementById('emailsubject');
+$tag        = $template['emailsubject'];
 if ($tag)
 {
     $emailSubject   = str_replace('$username',

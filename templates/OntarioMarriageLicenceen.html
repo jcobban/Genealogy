@@ -1,0 +1,831 @@
+<!--*********************************************************************
+ *  OntarioMarriageLicenceeen.html                                  	*
+ *																		*
+ *  Form to update a Marriage record based upon an Ontario Marriage     *
+ *  Licence form from 1911 on.                                          *
+ *																		*
+ *  History:															*
+ *      2020/07/03      created                                         *
+ *																		*
+ *  Copyright &copy; 2020 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/index.html">Home</a>:
+      <a href="/genealogy.php?lang=$LANG">
+          Genealogy
+      </a>:
+      <a href="/Canada/CountriesEdit.php?lang=fr">
+          List of Supported Countries
+      </a>:
+      <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">
+          $COUNTRYNAME
+      </a>:
+      <a href="/Canada/genProvince.php?Domain=$DOMAIN&amp;lang=$LANG">
+          $DOMAINNAME
+      </a>:
+        <a href="MarriageRegQuery.php?domain=$DOMAIN&amp;lang=$LANG">
+          Marriage Query
+      </a>:
+      <a href="MarriageRegStats.php?RegDomain=$DOMAIN&amp;lang=$LANG">
+          $DOMAINNAME Status
+      </a>:
+      <a href="MarriageRegYearStats.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;lang=$LANG">
+          $DOMAINNAME Status $REGYEAR
+      </a>:
+      <a href="MarriageRegYearStats.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;County=$REGCOUNTY&amp;lang=$LANG">
+          Status $REGYEAR $COUNTYNAME
+      </a>:
+      <a href="MarriageRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegCounty=$REGCOUNTY&amp;RegTownship=$REGTOWNSHIP&amp;lang=$LANG">
+          Status $REGYEAR Township $REGTOWNSHIP
+      </a>:
+    </div>
+    <div class="body" style="overflow: auto; overflow-x: scroll">
+      <h1>$DOMAINNAME: Marriage Registration Update
+        <span class="right">
+          <a href="MarriageRegDetailHelpen.html" target="help">? Help</a>
+        </span>
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG 
+      <form action="MarriageRegUpdate.php"
+                name="distForm" id="distForm"
+                method="post">
+        <p>
+          <!-- the following 3 elements store the URLs of the actions
+            for the buttons: id="previous", id="next", and id="newQuery" -->
+          <input type="hidden" name="previousHref" id="previousHref"
+			        disabled="disabled"
+                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$PREVNUM">
+          <input type="hidden" name="nextHref" id="nextHref"
+			        disabled="disabled"
+                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$NEXTNUM" >
+          <input type="hidden" name="newQueryHref" id="newQueryHref"
+			        disabled="disabled"
+                    value="MarriageRegQuery.html">
+          <!-- the following stores the textual value of the county name in
+              the web page so it can be used by the Javascript code 
+              to initialize the RegCounty select tag -->
+          <input type="hidden" name="RegCountyTxt" id="RegCountyTxt"
+                    value="$REGCOUNTY" disabled="disabled"/>
+          <!-- the following stores the textual value of the township name in
+              the web page so it can be used by the Javascript code 
+              to initialize the RegTownship select tag -->
+          <input type="hidden" name="RegTownshipTxt" id="RegTownshipTxt"
+                    value="$REGTOWNSHIP"/>
+          <!-- the following stores the textual value of the marriage type in
+              the web page so it can be used by the Javascript code 
+              to initialize the LicenseType select tag -->
+          <input name="LicenseTypeTxt" id="LicenseTypeTxt" type="hidden"
+                    value="$LICENSETYPE"/>
+          <input type="hidden" name="template" id="template"
+                    value="$TEMPLATE"/>
+          <input name="Debug" id="Debug" type="hidden" value="$DEBUG"/>
+          <button type="button" id="previous"><u>P</u>revious</button>
+          &nbsp;
+          <button type="button" id="next"><u>N</u>ext</button>
+            &nbsp;
+          <button type="button" id="newQuery">New <u>Q</u>uery</button>
+        </p>
+        <fieldset class="other" id="IdentificationSet">
+          <legend class="labelSmall">Identification:</legend>
+          <div class="row" >
+            <div class="column1">
+              <div style="float: left;">
+              <label class="labelSmall">Year:</label>
+                <input name="RegYear" id="RegYear" 
+                        type="text" class="ina rightnc"
+                        maxlength="4" readonly="readonly"
+                        value="$REGYEAR"/>
+              <input name="RegDomain" id="RegDomain" type="hidden"
+                    value="$DOMAIN">
+              </div>
+              <div class="right">
+                <label class="labelSmall">Number:</label>
+                  <input name="RegNum" id="RegNum"
+                        type="text" class="ina rightnc"
+                        style="width: 5em" maxlength="6" readonly="readonly"
+                        value="$REGNUM"/>
+              </div>
+            </div>
+            <div class="column2">
+              <label class="labelSmall">MS 932 Reel:</label>
+                <input name="MsVol" id="MsVol"
+                          type="text" size="4" maxlength="4" 
+                          class="act right" value="$MSVOL"/>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" >
+            <div class="column1">
+              <label class="labelSmall" for="OriginalVolume">Volume:</label>
+              <input name="OriginalVolume" id="OriginalVolume"
+                    type="text" class="act right"
+                    size="3" maxlength="5" 
+                    value="$ORIGINALVOLUME"/>
+            </div>
+            <div class="column2">
+              <label class="labelSmall" for="OriginalPage">
+                  Page:
+              </label>
+              <input name="OriginalPage" id="OriginalPage"
+                    type="number" class="act right"
+                    size="3" maxlength="3" min="0" max="900" 
+                    value="$ORIGINALPAGE"/>
+            </div>
+            <div class="column2">
+              <label class="labelSmall" for="OriginalItem">Item:</label>
+              <input name="OriginalItem" id="OriginalItem"
+                    type="text" class="act right"
+                    size="3" maxlength="3" 
+                    value="$ORIGINALITEM"/>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row"  id="RegRow">
+            <div class="column1">
+              <label class="labelSmall">County:</label>
+              <select name="RegCounty" id="RegCounty"
+                    size="1" class="act left">
+              </select>
+            </div>
+            <div class="column2">
+              <label class="labelSmall">Township:</label>
+              <input name="RegTownship" id="RegTownship"
+                    type="text" size="20" maxlength="64"
+                    value="$REGTOWNSHIP" class="act leftnc"  />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+        </fieldset><!-- id="IdentificationSet"-->
+          <div class="row" id="GroomNameRow">
+            <div class="column1">
+              <label class="labelSmall">Groom&nbsp;Name:</label>
+              <input name="GGivenNames" id="GGivenNames"
+                    type="text" size="22" maxlength="48" 
+                    class="act left" value="$GROOMGIVENNAMES" />
+            </div>
+            <div class="column2">
+             <label class="labelSmall">Surname:</label>
+              <input name="GSurname" id="GSurname"
+                    type="text" size="16" maxlength="32" 
+                    class="act left" value="$GROOMSURNAME" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- id="GroomNameRow" class="row" -->
+          <div class="row" id="GroomLinkRow">
+            <div class="column2">
+              <label  class="labelSmall" for="GIDIR">Link:</label>
+              <a href="/FamilyTree/Person.php?idir=$GROOMIDIR&lang=$LANG"
+                    target="_blank" class="male"
+                    id="GroomShowLink">
+                    $GROOMNAME
+              </a>
+              <input name="GIDIR" id="GIDIR"
+                    type="hidden" value="$GROOMIDIR"/>
+            </div>
+            <button id="ClearG" type="button">
+                Clear
+            </button>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="GChooseRow">
+            <div class="column2">
+      	    <label  class="labelSmall">Link:</label>
+      	      <select name="GIDIR" id="GIDIR"
+      		        rows="1" class="act left">
+      	        <option value="0" class="unknown">
+		          Possible matches to this registration:
+                </option>
+    	        <option value="$iidir" class="$sexclass" id="GOption$iidir">
+	    	        $iname
+    	        </option>
+    	      </select>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="BrideNameRow">
+            <div class="column1">
+              <label class="labelSmall">Bride&nbsp;Name:</label>
+              <input name="BGivenNames" id="BGivenNames"
+                    type="text" size="22" maxlength="48"
+                    class="act left" value="$BRIDEGIVENNAMES" />
+            </div>
+            <div class="column2">
+              <label class="labelSmall">Surname:</label>
+              <input name="BSurname" id="BSurname"
+                    type="text" size="16" maxlength="32"
+                    class="act left" value="$BRIDESURNAME" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- id="BrideNameRow" class="row" -->
+          <div class="row" id="BrideLinkRow">
+            <div class="column2">
+              <label  class="labelSmall" for="BIDIR">Link:</label>
+              <a href="/FamilyTree/Person.php?idir=$BRIDEIDIR&lang=$LANG"
+                    target="_blank" class="female"
+                    id="BrideShowLink">
+                        $BRIDENAME
+              </a>
+              <input name="BIDIR" id="BIDIR"
+                    type="hidden" value="$BRIDEIDIR"/>
+            </div>
+            <button id="ClearB" type="button">
+                Clear
+            </button>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="BChooseRow">
+            <div class="column2">
+      	      <label  class="labelSmall">Link:</label>
+      	      <select name="BIDIR" id="BIDIR"
+      		        rows="1" class="act left">
+      	        <option value="0" class="unknown">
+		        Possible matches to this registration:
+                </option>
+    	        <option value="$iidir" class="$sexclass" id="BOption$iidir">
+	    	        $iname
+    	        </option>
+    	      </select>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+        <fieldset class="other" id="MarriageSet">
+          <legend class="labelSmall">Marriage:</legend>
+          <div class="row" >
+            <div class="column1">
+              <label class="labelSmall">Date:</label>
+              <input name="Date" id="Date"
+                  type="text" size="10" maxlength="16"
+                  value="$MDATE" class="act leftnc"  />
+            </div>
+            <div class="column2">
+              <label class="labelSmall">Place:</label>
+              <input name="Place" id="Place"
+                    type="text" size="20" maxlength="64"
+                    value="$MPLACE" class="act leftnc"  />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" >
+            <div class="column1">
+              <label class="labelSmall">Type:</label>
+              <select name="LicenseType" id="LicenseType"
+                  size="1" class="act left">
+                <option value="L">License</option>
+                <option value="B">Banns</option>
+                <option value="D">Dispensation</option>
+              </select>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+        </fieldset><!-- id="MarriageSet"-->
+          <div class="row" id="HeaderRow">
+            <div class="column1">
+      	      <label class="label">Groom:</label>
+            </div>
+            <div class="column2">
+      	      <label class="label">Bride:</label>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="OccupationRow">
+            <div class="column1">
+      	      <label class="labelSmall">Occupation:</label>
+        	  <input name="GOccupation" id="GOccupation"
+      		        type="text" size="22" maxlength="64"
+      		        class="act leftnc" value="$GROOMOCCUPATION" />
+            </div>
+            <div class="column1">
+      	      <label class="labelSmall"></label>
+        	  <input name="BOccupation" id="BOccupation"
+      		        type="text" size="22" maxlength="64"
+      		        class="act leftnc" value="$BRIDEOCCUPATION" />
+            </div>
+          </div> <!-- id="OccupationRow" class="row" -->
+          <div class="row" id="MarStatRow">
+            <div class="column1">
+      	      <label class="labelSmall">Marital&nbsp;Status:</label>
+        	  <input name="GMarStat" id="GMarStat"
+      		        type="text" size="1" maxlength="1"
+      		        class="act left1em" value="$GROOMMARSTAT" />
+            </div>
+            <div class="column1">
+      	      <label class="labelSmall"></label>
+        	  <input name="BMarStat" id="BMarStat"
+      		        type="text" size="1" maxlength="1"
+      		        class="act left1em" value="$BRIDEMARSTAT" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- id="MarStatRow" class="row" -->
+          <div class="row" id="AgeRow">
+            <div class="column1">
+              <label class="labelSmall">Age:</label>
+              <input name="GAge" id="GAge"
+                    type="text" size="5" maxlength="7" 
+                    class="act right" value="$GROOMAGE" />
+            </div>
+            <div class="column1">
+      	      <label class="labelSmall"></label>
+              <input name="BAge" id="BAge"
+                    type="text" size="5" maxlength="7"
+                    class="act right" value="$BRIDEAGE" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- id="AgeRow" class="row" -->
+          <div class="row" id="BirthRow">
+            <div class="column1">
+              <label class="labelSmall">Birth&nbsp;Year:</label>
+              <span id="GBirthYearText">
+                $GROOMBIRTHYEAR
+              </span>
+              <input name="GBirthYear" id="GBirthYear" 
+                    type="hidden" value="$GROOMBIRTHYEAR">
+            </div>
+            <div class="column2">
+      	      <label class="labelSmall"></label>
+              <span id="BBirthYearText">
+                $BRIDEBIRTHYEAR
+              </span>
+              <input name="BBirthYear" id="BBirthYear" 
+                    type="hidden" value="$BRIDEBIRTHYEAR">
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- id="BirthRow" class="row" -->
+          <div class="row" id="ReligionRow">
+            <div class="column1">
+      	      <label class="labelSmall">Religion:</label>
+        	  <input name="GReligion" id="GReligion"
+      		        type="text" size="16" maxlength="64"
+      		        class="act leftnc" value="$GROOMRELIGION" />
+            </div>
+            <div class="column1">
+      	      <label class="labelSmall"></label>
+        	  <input name="BReligion" id="BReligion"
+      		        type="text" size="16" maxlength="64"
+      		        class="act leftnc" value="$BRIDERELIGION" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="ResidenceRow">
+            <div class="column1">
+      	      <label class="labelSmall">Residence:</label>
+        	  <input name="GResidence" id="GResidence"
+      		        type="text" size="22" maxlength="64"
+      		        class="act leftnc" value="$GROOMRESIDENCE" />
+            </div>
+            <div class="column2">
+      	      <label class="labelSmall"></label>
+        	  <input name="BResidence" id="BResidence"
+      		        type="text" size="22" maxlength="64"
+      		        class="act leftnc" value="$BRIDERESIDENCE" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="BirthPlaceRow">
+            <div class="column1">
+          	  <label class="labelSmall">Birth&nbsp;Place:</label>
+        	  <input name="GBirthPlace" id="GBirthPlace"
+      		        type="text" size="22" maxlength="64"
+      		        class="act leftnc" value="$GROOMBIRTHPLACE" />
+            </div>
+            <div class="column2">
+      	      <label class="labelSmall"></label>
+        	  <input name="BBirthPlace" id="BBirthPlace"
+      		        type="text" size="22" maxlength="64"
+      		        class="act leftnc" value="$BRIDEBIRTHPLACE" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+	      <div class="row" id="FathersRow">
+	        <div class="column1">
+		      <label class="labelSmall">Father:</label>
+	  	      <input name="GFatherName" id="GFatherName"
+			        type="text" size="22" maxlength="64"
+			        class="act left" value="$GROOMFATHERNAME" />
+	        </div>
+	        <div class="column2">
+      	      <label class="labelSmall"></label>
+	  	      <input name="BFatherName" id="BFatherName"
+			        type="text" size="22" maxlength="64"
+			        class="act left" value="$BRIDEFATHERNAME" />
+	        </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+	      <div class="row" id="MothersRow">
+	        <div class="column1">
+		      <label class="labelSmall">Mother:</label>
+	  	      <input name="GMotherName" id="GMotherName"
+			        type="text" size="22" maxlength="64"
+			        class="act left" value="$GROOMMOTHERNAME" />
+	        </div>
+	        <div class="column2">
+      	      <label class="labelSmall"></label>
+	  	      <input name="BMotherName" id="BMotherName"
+			        type="text" size="22" maxlength="64"
+			        class="act left" value="$BRIDEMOTHERNAME" />
+	        </div>
+	        <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+        <fieldset class="other" id="WitnessSet">
+          <legend class="labelSmall">Witnesses:</legend>
+          <div class="row" >
+            <div class="column1">
+              <label class="labelSmall">Name:</label>
+              <input name="Witness1" id="Witness1"
+                    type="text" size="22" maxlength="64"
+                    class="act left" value="$WITNESSNAME1"/>
+            </div>
+            <div class="column2">
+              <label class="labelSmall">Residence:</label>
+              <input name="Witness1Res" id="Witness1Res"
+                    type="text" size="22" maxlength="64"
+                    class="act leftnc" value="$WITNESSRES1"/>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" >
+            <div class="column1">
+              <label class="labelSmall">Name:</label>
+              <input name="Witness2" id="Witness2" 
+                    type="text" size="22" maxlength="64"
+                    class="act left" value="$WITNESSNAME2"/>
+            </div>
+            <div class="column2">
+              <label class="labelSmall">Residence:</label>
+              <input name="Witness2Res" id="Witness2Res"
+                    type="text" size="22" maxlength="64"
+                    class="act left" value="$WITNESSRES2"/>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+        </fieldset><!-- id="WitnessSet"-->
+        <fieldset class="other" id="MinisterSet">
+          <legend class="labelSmall">Minister: </legend>
+          <div class="row" id="MinisterNameRow">
+            <div class="column1">
+              <label class="labelSmall">Given&nbsp;Name:</label>
+              <input name="MGivenNames" id="MGivenNames"
+                    type="text" size="22" maxlength="48" 
+                    class="act left" value="$MINISTERGIVENNAMES" />
+            </div>
+            <div class="column2">
+             <label class="labelSmall">Surname:</label>
+              <input name="MSurname" id="MSurname"
+                    type="text" size="16" maxlength="32" 
+                    class="act left" value="$MINISTERSURNAME" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="MinisterLinkRow">
+            <div class="column2">
+              <label  class="labelSmall" for="MIDIR">Link:</label>
+              <a href="/FamilyTree/Person.php?idir=$MINISTERIDIR&lang=$LANG"
+                    target="_blank" class="male"
+                    id="MinisterShowLink">
+                    $MINISTERNAME
+              </a>
+              <input name="MIDIR" id="MIDIR"
+                    type="hidden" value="$MINISTERIDIR"/>
+            </div>
+            <button id="ClearM" type="button">
+                Clear
+            </button>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="MChooseRow">
+            <div class="column2">
+      	      <label  class="labelSmall">Link:</label>
+      	      <select name="MIDIR" id="MIDIR"
+      		        rows="1" class="act left">
+      	        <option value="0" class="unknown">
+		          Possible matches to this registration:
+                </option>
+    	        <option value="$iidir" class="$sexclass" id="MOption$iidir">
+	    	        $iname
+    	        </option>
+    	      </select>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="MinisterResidenceRow">
+            <div class="column1">
+      	      <label class="labelSmall">Residence:</label>
+        	  <input name="MResidence" id="MResidence"
+      		        type="text" size="22" maxlength="64"
+      		        class="act leftnc" value="$MINISTERRESIDENCE" />
+            </div>
+            <div class="column2">
+      	      <label class="labelSmall">Occupation:</label>
+        	  <input name="MOccupation" id="MOccupation"
+      		        type="text" size="22" maxlength="64"
+      		        class="act leftnc" value="$MINISTEROCCUPATION" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" id="MinisterReligionRow">
+            <div class="column1">
+      	      <label class="labelSmall">Religion:</label>
+        	  <input name="MReligion" id="MReligion"
+      		        type="text" size="16" maxlength="64"
+      		        class="act leftnc" value="$MINISTERRELIGION" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+        </fieldset><!-- id="MinisterSet"-->
+        <fieldset class="other" id="RegistrationSet">
+          <legend class="labelSmall">Registration:</legend>
+          <div class="row">
+            <div class="column1">
+              <label class="labelSmall" for="RegDate">
+                Date:
+              </label>
+              <input name="RegDate" id="RegDate"
+                  type="text" size="16" maxlength="16"
+                  value="$REGDATE" class="act left"/>
+            </div>
+            <div class="column2">
+              <label class="labelSmall" for="Registrar">
+              Registrar:
+              </label>
+              <input name="Registrar" id="Registrar"
+                  type="text" size="24" maxlength="128"
+                  value="$REGISTRAR" class="act left"/>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" >
+            <label class="labelSmall">Remarks:</label>
+            <textarea name="Remarks" id="Remarks"
+                  cols="65" rows=4 class="act leftnc" 
+                  >$REMARKS</textarea>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" >
+            <div class="column2">
+              <label class="labelSmall">Image:</label>
+              <input name="Image" id="Image"
+                    type="text" size="75" maxlength="256"
+                    value="$IMAGE" class="act leftvar" />
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+          <div class="row" >
+            <div class="column2">
+              <label class="labelSmall"></label>
+              <button type="button" id="ShowImage" $IMAGEDISABLED>
+                Show <u>I</u>mage
+              </button>
+            </div>
+            <div style="clear: both;"></div>
+          </div> <!-- class="row" -->
+        </fieldset><!-- id="RegistrationSet"-->
+        <p>
+          <button type="submit" id="Update">
+            <u>U</u>pdate
+          </button>
+          &nbsp;
+          <button type="button" id="Reset">
+            <u>C</u>lear Form
+          </button>
+        </p>
+      </form>
+    </div> <!-- class="body" -->
+    <div class="hidden" id="I18n">
+        <span id="childof">, child of </span>
+        <span id="defaultMinOcc">Minister</span>
+    </div>
+    <!--  The remainder of the web page consists of divisions containing
+    context specific help.  These divisions are only displayed if the user
+    requests help by pressing F1.  Including this information here ensures
+    that the language of the help balloons matches the language of the
+    input form.
+    -->
+    <div class="balloon" id="HelpRegTownship">
+      The township where the marriage was registered.
+    </div>
+    <div class="balloon" id="HelpRegTownshipTxt">
+      The township where the marriage was registered.
+    </div>
+    <div class="balloon" id="HelpDate">
+      The date the marriage took place.
+      It is recommended that, for consistency, this be entered as day, month, and
+      year, with the month abbreviated to the first 3 characters.
+    </div>
+    <div class="balloon" id="HelpPlace">
+      The place where the marriage took place.
+    </div>
+    <div class="balloon" id="HelpLicenseType">
+      'L' if the marriage was by License, or 'B' if it was by Banns.
+    </div>
+    <div class="balloon" id="HelpGGivenNames">
+      The given names of the groom.
+    </div>
+    <div class="balloon" id="HelpBGivenNames">
+      The given names of the bride.
+    </div>
+    <div class="balloon" id="HelpMGivenNames">
+      The given names of the minister.
+    </div>
+    <div class="balloon" id="HelpGSurname">
+      The surname of the groom.
+    </div>
+    <div class="balloon" id="HelpBSurname">
+      The surname of the bride.
+    </div>
+    <div class="balloon" id="HelpMSurname">
+      The surname of the minister.
+    </div>
+    <div class="balloon" id="HelpGIDIR">
+      This is a link to the groom's record in the family tree or 
+      a selection list of individuals from the family tree
+      who may match the groom.
+    </div>
+    <div class="balloon" id="HelpBIDIR">
+      This is a link to the bride's record in the family tree or 
+      a selection list of individuals from the family tree
+      who may match the bride.
+    </div>
+    <div class="balloon" id="HelpMIDIR">
+      This is a link to the minister's record in the family tree or 
+      a selection list of individuals from the family tree
+      who may match the minister.
+    </div>
+    <div class="balloon" id="HelpClearG">
+      Click on this button to clear the current association between the
+      Groom in this marriage registration and a record in the family tree.
+    </div>
+    <div class="balloon" id="HelpClearB">
+      Click on this button to clear the current association between the
+      Groom in this marriage registration and a record in the family tree.
+    </div>
+    <div class="balloon" id="HelpGResidence">
+      The current residence of the groom.
+    </div>
+    <div class="balloon" id="HelpBResidence">
+      The current residence of the bride.
+    </div>
+    <div class="balloon" id="HelpMResidence">
+      The current residence of the minister.
+    </div>
+    <div class="balloon" id="HelpGAge">
+      The age of the groom in years.
+      When you set this the approximate birth year of the groom is calculated
+      by subtracting the age from the registration year.
+    </div>
+    <div class="balloon" id="HelpBAge">
+      The age of the bride in years.
+      When you set this the approximate birth year of the bride is calculated
+      by subtracting the age from the registration year.
+    </div>
+    <div class="balloon" id="HelpMAge">
+      The age of the minister in years.
+      When you set this the approximate birth year of the minister is calculated
+      by subtracting the age from the registration year.
+    </div>
+    <div class="balloon" id="HelpGBirthYear">
+      This read-only field displays the calculated birth year of the groom.
+    </div>
+    <div class="balloon" id="HelpBBirthYear">
+      This read-only field displays the calculated birth year of the bride.
+    </div>
+    <div class="balloon" id="HelpMBirthYear">
+      This read-only field displays the calculated birth year of the minister.
+    </div>
+    <div class="balloon" id="HelpGBirthPlace">
+      The birth place of the groom.
+    </div>
+    <div class="balloon" id="HelpBBirthPlace">
+      The birth place of the bride.
+    </div>
+    <div class="balloon" id="HelpMBirthPlace">
+      The birth place of the minister.
+    </div>
+    <div class="balloon" id="HelpGOccupation">
+      The occupation of the groom.
+    </div>
+    <div class="balloon" id="HelpBOccupation">
+      The occupation of the bride.
+    </div>
+    <div class="balloon" id="HelpMOccupation">
+      The occupation of the minister.
+    </div>
+    <div class="balloon" id="HelpGMarStat">
+      The marital status of the groom.
+      This should be specified as 'M', 'W', 'D', or 'S'.
+    </div>
+    <div class="balloon" id="HelpBMarStat">
+      The marital status of the bride.
+      This should be specified as 'M', 'W', 'D', or 'S'.
+    </div>
+    <div class="balloon" id="HelpGReligion">
+      The religion of the groom.
+    </div>
+    <div class="balloon" id="HelpBReligion">
+      The religion of the bride.
+    </div>
+    <div class="balloon" id="HelpMReligion">
+      The religion of the minister.
+    </div>
+    <div class="balloon" id="HelpGFatherName">
+      The name of the Father of the groom.
+    </div>
+    <div class="balloon" id="HelpBFatherName">
+      The name of the Father of the bride.
+    </div>
+    <div class="balloon" id="HelpGMotherName">
+      The name of the Mother of the groom.
+    </div>
+    <div class="balloon" id="HelpBMotherName">
+      The name of the Mother of the bride.
+    </div>
+    <div class="balloon" id="HelpWitness1">
+      The name of a formal witness to the marriage.
+    </div>
+    <div class="balloon" id="HelpWitness2">
+      The name of a formal witness to the marriage.
+    </div>
+    <div class="balloon" id="HelpWitness1Res">
+      The residence of a formal witness to the marriage.
+    </div>
+    <div class="balloon" id="HelpWitness2Res">
+      The residence of a formal witness to the marriage.
+    </div>
+    <div class="balloon" id="HelpRemarks">
+        <p>This field is used to record any comments by the registrar or clerk.
+      You may use this field to record your own comments by enclosing them in
+      editorial square brackets.
+        </p>
+    </div>
+    <div class="balloon" id="HelpUpdate">
+      Clicking on this button commits the changes you have made to the database.
+    </div>
+    <div class="balloon" id="HelpReset">
+      Clicking on this button resets the values of some fields to their defaults.
+    </div>
+    <div class="balloon" id="Helpprevious">
+      Clicking on this button displays the marriage registration with the next
+      lower registration number:
+          RegDomain=$DOMAIN, RegYear=$REGYEAR,
+          RegNum=$PREVNUM
+    </div>
+    <div class="balloon" id="Helpnext">
+      Clicking on this button displays the marriage registration with the next
+      higher registration number:
+          RegDomain=$DOMAIN, RegYear=$REGYEAR,
+          RegNum=$NEXTNUM
+    </div>
+    <div class="balloon" id="HelpnewQuery">
+      Clicking on this button displays the dialog for searching for marriage
+      registrations.
+    </div>
+    <div class="balloon" id="HelpRegYear">
+      This read-only field displays the year in which this marriage was
+      registered.
+    </div>
+    <div class="balloon" id="HelpRegNum">
+      This read-only field displays the registration number assigned by
+      the Registrar of Ontario within the registration year.
+    </div>
+    <div class="balloon" id="HelpRegDate">
+      This field displays the date on which the marriage was registered/
+    </div>
+    <div class="balloon" id="HelpRegistrar">
+      This field displays the name of the registrar who recorded the
+      marriage registration.
+    </div>
+    <div class="balloon" id="HelpMsVol">
+      This read-only field displays the number of the reel of microfilm
+      containing the original image of this registration.
+    </div>
+    <div class="balloon" id="HelpRegCounty">
+      This selection list is used to choose the county for a new registration
+      or to display the county for an existing registration.
+    </div>
+    <div class="balloon" id="HelpOriginalVolume">
+      This field contains the identification of the original bound volume
+      containing the marriage registrations or certificates.
+    </div>
+    <div class="balloon" id="HelpOriginalPage">
+      This field contains the page number containing the original
+      marriage registrations or certificate.
+    </div>
+    <div class="balloon" id="HelpOriginalItem">
+      Where there are more than one marriage registration on the page this field 
+      contains the ordinal position of the specific registration on the page.
+    </div>
+    <div class="balloon" id="HelpImage">
+      This field is used to supply the Uniform Record Location (URL) of an image
+      file for this registration.
+    </div>
+    <div class="balloon" id="HelpShow`:w
+        Image">
+      Click on this button to see the original image of the registration.
+    </div>
+	<script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="text/javascript"></script>
+    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+    <script src="/jscripts/Ontario.js" type="text/javascript"></script>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="/jscripts/locationCommon.js" type="text/javascript"></script>
+    <script src="MarriageRegDetail.js" type="text/javascript"></script>

@@ -10,6 +10,7 @@
  *      2010/12/08      corrected to trim off space between semi-colon  *
  *                      and subsequent cookie names                     *
  *      2014/07/27      make comments pretty                            *
+ *      2021/01/13      use ES2015 syntax                               *
  ************************************************************************/
 
 /************************************************************************
@@ -33,22 +34,22 @@
  *  enabled and returns false otherwise.                                *
  ************************************************************************/
 function Cookie(name) {
-    this.$name = name;  // Remember the name of this cookie
+    this.$name          = name;  // Remember the name of this cookie
 
     // First, get a list of all cookies that pertain to this document
     // We do this by reading the magic Document.cookie property
     // If there are no cookies, we don't have anything to do 
-    var allcookies = document.cookie;
+    let allcookies      = document.cookie;
     if (allcookies == "") return;
     // Break the string of all cookies into individual cookie strings
     // Then loop through the cookie strings, looking for our name
-    var cookies     = allcookies.split(';');
-    var cookieval   = null;
-    for(var i = 0; i < cookies.length; i++) {
-        var cookieparts = cookies[i].trim().split('=');
+    let cookies         = allcookies.split(';');
+    let cookieval       = null;
+    for(let i = 0; i < cookies.length; i++) {
+        let cookieparts = cookies[i].trim().split('=');
         // Does this cookie string begin with the name we want?
         if (cookieparts[0] == name) {
-            cookieval = cookieparts[1];
+            cookieval   = cookieparts[1];
             break;
         }   // name matches
     }       // loop through cookies
@@ -62,14 +63,14 @@ function Cookie(name) {
     // other by ampersands, and the individual names and values are
     // separated from each other by colons. We use the split() method
     // to parse everything.
-    var a = cookieval.split('&'); // Break it into an array of name/value pairs
-    for(var i=0; i < a.length; i++)  // Break each pair into an array
+    let a = cookieval.split('&'); // Break it into an array of name/value pairs
+    for(let i=0; i < a.length; i++)  // Break each pair into an array
         a[i] = a[i].split(':');
 
     // Now that we've parsed the cookie value, set all the names and values
     // as properties of this Cookie object. Note that we decode
     // the property value because the store() method encodes it
-    for(var i = 0; i < a.length; i++) {
+    for(let i = 0; i < a.length; i++) {
         this[a[i][0]] = decodeURIComponent(a[i][1]);
     }       // set all properties
 }       // Cookie constructor
@@ -105,8 +106,8 @@ Cookie.prototype.store = function(daysToLive,
     // within a single cookie value. Note that we encode the value
     // of each property in case it contains punctuation or other
     // illegal characters.
-    var cookieval = "";
-    for(var prop in this) {
+    let cookieval = "";
+    for(let prop in this) {
         // Ignore properties with names that begin with '$' and also methods
         if ((prop.charAt(0) == '$') || ((typeof this[prop]) == 'function')) 
             continue;
@@ -118,7 +119,7 @@ Cookie.prototype.store = function(daysToLive,
     // Now that we have the value of the cookie, put together the 
     // complete cookie string, which includes the name and the various
     // attributes specified when the Cookie object was created
-    var cookie = this.$name + '=' + cookieval;
+    let cookie = this.$name + '=' + cookieval;
     if (daysToLive || daysToLive == 0) 
     { 
         cookie += "; max-age=" + (daysToLive*24*60*60);
@@ -150,7 +151,7 @@ Cookie.prototype.remove = function(path,
                                    secure) 
 {
     // Delete the properties of the cookie
-    for(var prop in this)
+    for(let prop in this)
     {
         if (prop.charAt(0) != '$' && typeof this[prop] != 'function') 
             delete this[prop];
@@ -185,7 +186,7 @@ Cookie.enabled = function()
     document.cookie = "testcookie=test; max-age=10000";  // Set cookie
 
     // Now see if that cookie was saved
-    var cookies = document.cookie;
+    let cookies     = document.cookie;
     if (cookies.indexOf("testcookie=test") == -1) {
         // The cookie was not saved
         return Cookie.enabled.cache = false;

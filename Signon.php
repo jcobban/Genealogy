@@ -82,8 +82,9 @@ use \Templating\TemplateTag;
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
  *		2019/12/22      use new message for missing password            *
+ *		2020/12/03      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/User.inc";
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -109,7 +110,8 @@ if (count($_GET) > 0)
 	foreach($_GET as $key => $value)
 	{
 	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-	                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{
 		    case 'redirect':
@@ -151,7 +153,8 @@ if (count($_POST) > 0)
 	foreach($_POST as $key => $value)
 	{	            // loop through all parameters
 	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-	                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{		// act on specific parameter
 		    case 'userid':
@@ -238,7 +241,8 @@ $template->updateTag('otherStylesheets',
 
 if ($debug)
     $warn   .= "<p>Signon.php: " . __LINE__ .
-            " newuserid='$newuserid', password='$password'</p>\n";
+                " newuserid='" . htmlspecialchars($newuserid) . 
+                "', password='" . htmlspecialchars($password) . "'</p>\n";
 if (strlen($newuserid) == 0)
     $msg            .= $template['specify']->innerHTML();
 else
@@ -288,8 +292,13 @@ else
         {
             if ($debug)
                 $warn   .= "<p>Signon.php: " . __LINE__ .
-            " newuserid='$newuserid', password='$password', hashpw='$hashpw', shapassword='".$user->get('shapassword')."'</p>\n";
-            $msg            .= $template['incorrect']->innerHTML();
+                            " newuserid='" . htmlspecialchars($newuserid) . 
+                            "', password='" . htmlspecialchars($password) . 
+                            "', hashpw='" . htmlspecialchars($hashpw) . 
+                            "', shapassword='" . 
+                            htmlspecialchars($user->get('shapassword')) .
+                            "'</p>\n";
+                $msg            .= $template['incorrect']->innerHTML();
 	    }
 	}                   // userid matches
 	else

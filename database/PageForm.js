@@ -347,9 +347,12 @@ function showImage()
     this.disabled		= true;
 
     // display the image in the right half of the window
-    openFrame("imageFrame",
-		      imageUrl,
-		      "right");
+    if (imageUrl.substring(0,23) == 'https://www.ancestry.ca')
+        window.open(imageUrl, '_blank');
+    else
+        openFrame("imageFrame",
+		          imageUrl,
+		          "right");
     return false;	// do not perform default action for button
 }	// function showImage
 

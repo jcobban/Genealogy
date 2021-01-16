@@ -24,31 +24,31 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // get the parameters
-$getParms	    	= array();
-$pattern	    	= '';
-$offset		        = 0;
-$getParms['offset']	= 0;
-$limit	        	= 20;
-$getParms['limit']	= 20;
-$lang       		= 'en';
+$getParms	    				= array();
+$pattern	    				= '';
+$offset		        			= 0;
+$getParms['offset']				= 0;
+$limit	        				= 20;
+$getParms['limit']				= 20;
+$lang       					= 'en';
 
 if (count($_GET) > 0)
 {			    // invoked by method=get
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                              "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{		    // loop through parameters
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$value</td></tr>\n";
+        $value                      = trim($value); 
 	    switch($key)
 	    {		// take action based upon key
 			case 'pattern':
 			{
-			    $pattern		= $value;
-			    if (strlen($pattern) > 0)
-					$getParms['nickname']	= $pattern;
+			    $pattern		    = $value;
+				$getParms['nickname']	= $pattern;
 			    break;
 			}
 
@@ -68,7 +68,7 @@ if (count($_GET) > 0)
 
 			case 'lang':
             {	// language choice
-                $lang       = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value);
 			    break;
 			}	// language choice
 	    }		// take action based upon key
@@ -85,41 +85,41 @@ if (count($_POST) > 0)
                       "<th class='colhead'>value</th></tr>\n";
 	foreach($_POST as $key => $value)
 	{		    // loop through parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-	    $matches	= array();
+        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$value</td></tr>\n"; 
+	    $matches	                    = array();
 	    if (preg_match('/^([a-zA-Z]+)(\d+)$/', $key, $matches))
 	    {
-			$key		= $matches[1];
-			$row		= $matches[2];
-	    }
+			$key		                = $matches[1];
+			$row		                = $matches[2];
+        }
+        $value                          = trim($value);
 	    switch($key)
 	    {		// take action based upon key
 			case 'pattern':
 			{
-			    $pattern			        = $value;
-			    if (strlen($pattern) > 0)
-					$getParms['nickname']	= $pattern;
+			    $pattern			    = $value;
+				$getParms['nickname']	= $pattern;
 			    break;
 			}
 
 			case 'offset':
             {
                 if (ctype_digit($value))
-			        $offset			        = (int)$value;
+			        $offset			    = (int)$value;
 			    break;
 			}
 
 			case 'limit':
 			{
                 if (ctype_digit($value))
-			        $limit			        = (int)$value;
+			        $limit			    = (int)$value;
 			    break;
 			}
 
 			case 'lang':
             {	// language choice
-                $lang       = FtTemplate::validateLang($value);
+                $lang                   = FtTemplate::validateLang($value);
 			    break;
 			}	// language choice
 
@@ -165,7 +165,7 @@ if (count($_POST) > 0)
 	    }		// take action based upon key
 	}		    // loop through parameters
     if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn           .= $parmsText . "</table>\n";
 }			    // invoked by method=post
 
 $getParms['offset']	    = $offset;
@@ -175,22 +175,22 @@ $nextoffset	            = $offset + $limit;
 $last	                = $offset + $limit;
 
 if (canUser('edit'))
-	$action		= 'Update';
+	$action		        = 'Update';
 else
-	$action		= 'Display';
+	$action		        = 'Display';
+
+$template		        = new FtTemplate("Nicknames$action$lang.html");
 
 // get the list of matching nicknames
 if ($debug)
-	$warn	    .= "<p>\$nicknames	= new RecordSet('Nicknames'," .
-							print_r($getParms,true) . ")</p>\n";
-$nicknames		= new RecordSet('Nicknames',
-									$getParms);
-$info		    = $nicknames->getInformation();
-$count		    = $info['count'];
+	$warn	            .= "<p>\$nicknames	= new RecordSet('Nicknames'," .
+						        	print_r($getParms,true) . ")</p>\n";
+$nicknames		        = new RecordSet('Nicknames',
+				        				$getParms);
+$info		            = $nicknames->getInformation();
+$count		            = $info['count'];
 if ($last > $count)
-    $last       = $count;
-
-$template		= new FtTemplate("Nicknames$action$lang.html");
+    $last               = $count;
 
 $template->set('CONTACTSUBJECT',	$_SERVER['REQUEST_URI']);
 $template->set('PATTERN',		    $pattern);

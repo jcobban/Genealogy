@@ -59,6 +59,7 @@
  *		                within the visible portion of the browser.      *
  *		2019/06/08      pass language to Pages form                     *
  *		2020/05/03      correct addition of new enumeration division    *
+ *		2020/10/10      support numeric subdistrict ids for 1851,1861   *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -124,6 +125,12 @@ function onLoadSub()
 		    }
 		    switch(colName)
 		    {		// identify change action for each cell
+				case "SD_Id":
+				{	// replicates to subsequent rows
+				    element.addEventListener('change', changeSdId);
+				    break;
+				}	// SD_Id
+
 				case "SD_Name":
 				{	// replicates to subsequent rows
 				    element.onchange	= changeReplDown;
@@ -131,7 +138,7 @@ function onLoadSub()
 							    rowNum, 
 							    form.elements);
 				    element.checkfunc	= checkText;
-				    element.abbrTbl	= LocAbbrs;
+				    element.abbrTbl	    = LocAbbrs;
 				    element.checkfunc();
 				    break;
 				}	// SD_Name
@@ -241,7 +248,7 @@ function onLoadSub()
     firstElt.select();
 
     hideRightColumn();
-}		// onLoadSub
+}		// function onLoadSub
 
 /************************************************************************
  *  function getFieldByColRow											*
@@ -325,6 +332,59 @@ function setClassByValue(colName,
 }	// setClassByValue
 
 /************************************************************************
+ *  function changeSdId 												*
+ *																		*
+ *  Take action when the user changes a field whose value is			*
+ *  replicated into subsequent fields in the same column whose			*
+ *  value has not yet been explicitly set.								*
+ *																		*
+ *  Input:																*
+ *		this			instance of HtmlInputElement					*
+ *		e               instance of Event                               *
+ ************************************************************************/
+function changeSdId(e)
+{
+    let sdId        = Number.parseInt(this.value, 10);
+    if (isNaN(sdId) || sdId == 0)
+    {
+        return;
+    }
+
+    // update the presented values of this field in subsequent rows
+    var	cell		= this.parentNode;
+    if (cell.nodeName != "TD")
+		throw new Error("SubDistForm.js: changeSdId: this is child of <" +
+						cell.nodeName + ">");
+    var	column		= cell.cellIndex;
+    var	row		    = cell.parentNode;
+    if (row.nodeName != "TR")
+		throw new Error("SubDistForm.js: changeSdId: cell is child of <" + 
+						row.nodeName + ">");
+    var rowNum		= row.sectionRowIndex;
+    var	tbody		= row.parentNode;
+    if (tbody.nodeName != "TBODY")
+		throw new Error("SubDistForm.js: changeSdId: row is child of <" + 
+						tbody.nodeName + ">");
+    var	newValue	= this.value;
+
+    for (rowNum++; rowNum < tbody.rows.length; rowNum++)
+    {           // update remaining rows of table
+		row		    = tbody.rows[rowNum];
+		cell		= row.cells[column];
+		// field is first element under cell
+		var field	= cell.firstChild;
+		while(field && field.nodeType != 1)
+		    field	= field.nextSibling;
+
+		if (field === undefined)
+		    throw new Error("SubDistForm.js: changeSdId: row.cells[" + 
+							column + "] is undefined");
+        ++sdId;
+		field.value	= sdId;
+    }           // update remaining rows of table
+}       // function changeSdId
+
+/************************************************************************
  *  function changeReplDown												*
  *																		*
  *  Take action when the user changes a field whose value is			*
@@ -332,7 +392,7 @@ function setClassByValue(colName,
  *  value has not yet been explicitly set.								*
  *																		*
  *  Input:																*
- *		$this			instance of <input>								*
+ *		$this			instance of HtmlInputElement					*
  ************************************************************************/
 function changeReplDown()
 {
@@ -398,7 +458,7 @@ function changeReplDown()
  *  the field.															*
  *																		*
  *  Input:																*
- *		$this			instance of <input>								*
+ *		$this			instance of HtmlInputElement				    *
  ************************************************************************/
 function changeDefault()
 {

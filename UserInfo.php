@@ -55,7 +55,8 @@ if (count($_GET) > 0)
     foreach($_GET as $key => $value)
     {		    	// loop through parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
         switch(strtolower($key))
         {
     		case 'lang':
@@ -78,7 +79,8 @@ if (count($_POST) > 0)
     foreach($_POST as $key => $value)
     {		    	// loop through parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
         switch(strtolower($key))
         {
     		case 'lang':

@@ -9,93 +9,76 @@
  *		2015/09/28		add input.actleftncerror and					*
  *						input.inaleftncerror							*
  *		2018/03/17		increase width of labelSmall to 12em			*
- *		2019/12/10      separate input styling from color and bg        * 
+ *		2019/12/10      separate input styling from color and bg        *
+ *		2021/01/10      add input.wide for image field                  * 
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 /*	column containers */
-    div.column1	{float:		left;
-		width:		26em;
-		margin-top:	1px;
-		margin-right:	3px;
-		}
-    div.column2	{float:	left;
-		margin-top:	1px;
-		margin-right:	3px;
-		}
-    div.column3	{float:	left;
-		margin-top:	1px;
-		margin-right:	3px;
-		}
+    div.column1	{   float:		    left;
+					width:		    26em;
+					margin-top:	    1px;
+					margin-right:	3px;
+		            }
+    div.column2	{   float:	        left;
+					margin-top:	    1px;
+					margin-right:	3px;
+		            }
+    div.column3	{   float:	        left;
+					margin-top:	    1px;
+					margin-right:	3px;
+		            }
 /*	labels of various widths */
     label.labelSmall {
-		font-family:	sans-serif;
-		font-weight:	bold;
-		font-size:	smaller;
-		text-align:	right;
-		vertical-align:	top;
-		padding:	0px 3px 0px 3px;
-		margin-top:	1px;
-		float:		left;
-		width:		12em;
-		}
+					font-family:	sans-serif;
+					font-weight:	bold;
+					font-size:	    smaller;
+					text-align:	    right;
+					vertical-align:	top;
+					padding:	    0px 3px 0px 3px;
+					margin-top:	    1px;
+					float:		    left;
+					width:		    12em;
+		            }
     label.labelSmall6em {
-		font-family:	sans-serif;
-		font-weight:	bold;
-		font-size:	smaller;
-		text-align:	right;
-		vertical-align:	top;
-		padding:	0px 3px 0px 3px;
-		margin-top:	1px;
-		float:		left;
-		width:		6em;
-		}
+					font-family:	sans-serif;
+					font-weight:	bold;
+					font-size:	    smaller;
+					text-align:	    right;
+					vertical-align:	top;
+					padding:	    0px 3px 0px 3px;
+					margin-top:	    1px;
+					float:		    left;
+					width:		    6em;
+		            }
 
     input.left {
-		font-family:	sans-serif;
-		text-align:	    left;
-		text-transform:	capitalize;
-		padding:	    0px;
-		border-top:	    1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		    16em;
-		margin-bottom:	2px;
-		}
+					width:		    16em;
+					margin-bottom:	2px;
+		            }
+    input.wide {
+					width:		    40em;
+                    text-transform: none;
+		            }
     input.leftnc {
-		font-family:	sans-serif;
-		text-align:	    left;
-		padding:	    0px;
-		border-top:	    1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		width:		    16em;
-		margin-bottom:	2px;
-		}
-    input.leftvar {
-		font-family:	sans-serif;
-		text-align:	    left;
-		padding:	    0px;
-		border-top:	    1px solid black;
-		border-left:	1px solid black;
-		border-bottom:	1px solid white;
-		border-right:	1px solid white;
-		margin-bottom:	2px;
-		}
-
-    select.leftwide {
-		font-family:	sans-serif;
-		text-align:	    left;
-		padding:	    0px;
-		width:		    18em;
-		margin-bottom:	2px;
-		}
+					font-family:	sans-serif;
+					text-align:	    left;
+					padding:	    0px;
+					border-top:	    1px solid black;
+					border-left:	1px solid black;
+					border-bottom:	1px solid white;
+					border-right:	1px solid white;
+					width:		    16em;
+					margin-bottom:	2px;
+		            }
+    select.wide {
+					width:		    18em;
+                    text-transform: none;
+		            }
     select.left {
-		font-family:	sans-serif;
-		text-align:	    left;
-		padding:	    0px;
-		margin-bottom:	2px;
-		}
+					font-family:	sans-serif;
+					text-align:	    left;
+					padding:	    0px;
+					margin-bottom:	2px;
+		            }

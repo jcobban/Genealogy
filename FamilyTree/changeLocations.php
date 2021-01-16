@@ -32,6 +32,7 @@ namespace Genealogy;
  *		2019/02/16      use class Template                              *
  *		2019/02/18      use new FtTemplate constructor                  *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2020/12/06      fix XSS vulnerabilities                         *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -39,28 +40,35 @@ require_once __NAMESPACE__ . "/Location.inc";
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-if (!canUser('edit'))
-{			// take no action
-	$msg	.= 'Not authorized to update database. ';
-}			// take no action
-
 // interpret patterns
-$from	        = null;
-$to		        = null;
-$lang           = 'en';
+$from	            = null;
+$to		            = null;
+$lang               = 'en';
 
 if (count($_GET) > 0)
 {		            // invoked by submit to update account
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                        "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                            "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{			// loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                        htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
-		{		// act on specific parameters
+        {		// act on specific parameters
+            case 'from':
+            {
+                $from		= htmlspecialchars($value);
+                break;
+            }
+
+            case 'to':
+            {
+                $to		    = htmlspecialchars($value);
+                break;
+            }
 
             case 'lang':
             {
@@ -75,14 +83,15 @@ if (count($_GET) > 0)
 else
 if (count($_POST) > 0)
 {		            // invoked by submit to update account
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_POST</p>\n" .
+                        "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                            "<th class='colhead'>value</th></tr>\n";
 	foreach($_POST as $key => $value)
 	{			// loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>" .
+                          htmlspecialchars($value) . "</td></tr>\n"; 
 		switch(strtolower($key))
 		{		// act on specific parameters
 		    case 'pattern':
@@ -90,7 +99,7 @@ if (count($_POST) > 0)
 				if (strlen($value) > 0)
 				{		// search pattern specified
 				    setcookie('pattern', $value);
-				    $from		= $value;
+				    $from		= htmlspecialchars($value);
 				}		// search pattern specified
 				break;
 		    }
@@ -100,7 +109,7 @@ if (count($_POST) > 0)
 				if (strlen($value) > 0)
 				{		// search pattern specified
 				    setcookie('replace', $value);
-				    $to			= $value;
+				    $to			= htmlspecialchars($value);
 				}		// search pattern specified
 				break;
 		    }
@@ -113,12 +122,22 @@ if (count($_POST) > 0)
 		}		// act on specific parameters
 	}			// loop through all parameters
     if ($debug)
-        $warn   .= $parmsText . "</table>\n";
+        $warn       .= $parmsText . "</table>\n";
 }		            // invoked by submit to update account
 
+// get page layout
+$template		    = new FtTemplate("changeLocations$lang.html");
+$translate                          = $template->getTranslate();
+$t                                  = $translate['tranTab'];
+
+if (!canUser('edit'))
+{			// take no action
+    $msg	        .= $template['cannotUpdate']->innerHTML;
+    $template['locForm']->update(null);
+}			// take no action
 
 // check for missing parameters
-if (is_null($from) || is_null($to))
+if (is_null($from) || is_null($to) || count($_GET) > 0)
 {			// skip update, go direct to prompt
 	if (is_null($from))
 	{
@@ -140,30 +159,32 @@ if (is_null($from) || is_null($to))
 else
 if (strlen($msg) == 0)
 {		// no errors detected
-	$locations	= new RecordSet('Locations',
-	    						array('Location'	=> $from));
+	$locations	        = new RecordSet('Locations',
+	    				        		array('Location'	=> $from));
 	// strip off opening caret if preset
 	if (substr($from, 0, 1) == '^')
-	    $from	= substr($from, 1);
+	    $from	        = substr($from, 1);
 	// strip off closing dollar sign if present
 	if (substr($from, -1) == '$')
-	    $from	= substr($from, 0, strlen($from)-1);
+	    $from	        = substr($from, 0, strlen($from)-1);
 
-	$set		= array('Location'	    => array($from, $to),
-						'SortedLocation'=> array($from, $to));
-	$result		= $locations->update($set,
-					    		     false,
-						    	     false);
+	$set		        = array('Location'	    => array($from, $to),
+						        'SortedLocation'=> array($from, $to));
+	$result		        = $locations->update($set,
+					            		     false,
+						    	             false);
 }		// something to do
 else
-    $result     = 0;
-
-$template		= new FtTemplate("changeLocations$lang.html");
+    $result             = 0;
 
 if (is_null($result))
     $template['resultLine']->update(null);
 else
+{
+    if ($result == 0)
+        $result         = $t['No'];
     $template->set('RESULT',    $result);
+}
 $template->set('FROM',          $from);
 $template->set('TO',            $to);
 

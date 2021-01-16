@@ -21,8 +21,10 @@ use \Templating\Template;
  *		2018/02/24		undefined $list									*
  *		2018/11/01      use class Template                              *
  *		2019/02/19      use new FtTemplate constructor                  *
+ *		2020/12/06      fix XSS vulnerabilities                         *
+ *		                get more message texts from template            *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/CitationSet.inc';
@@ -32,62 +34,90 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // default parameter values
-$idsr			= null;
-$source			= null;
-$cemeteryName	= 'Cemetery';
-$plot			= '';	
-$lang   		= 'en';
-$parms			= array();
+$idsr						= null;
+$idsrtext                   = null;
+$plot						= null;	
+$plottext                   = null;
+$source						= null;     // instance of class Source
+$cemeteryName				= 'Cemetery';
+$lang   					= 'en';
+$parms						= array();  // parameters for CitationSet
 
 // get the parameters
 foreach($_GET as $key => $value)
 {	            	// loop through all parameters
+    $value                          = trim($value);
 	switch(strtolower($key))
 	{	            // take action on specific parameter
 	    case 'idsr':
-	    {           // identify cemetery transcription source
-			$idsr			    = (int)$value;
-			$parms['idsr']		= $idsr;
-			try {
-                $source	        = new Source(array('idsr' => $idsr));
-                // all cemetery transcription source names start with
+        {           // identify cemetery transcription source
+            if (ctype_digit($value))
+            {
+				$idsr			    = (int)$value;
+				$parms['idsr']		= $idsr;
+	            $source	            = new Source(array('idsr' => $idsr));
+	            // all cemetery transcription source names start with
                 // 'Cemetery Transcription: '
-			    $cemeteryName   = substr($source->getName(), 23);
-			} catch(Exception $e) { }
+                $srcName            = $source->getName();
+                if (substr($srcName, 0, 22) == 'Cemetery Transcription')
+                    $cemeteryName   = substr($srcName, 24);
+                else
+                {
+                    $idsrtext       = "$value Source='$srcName'";
+                    $cemeteryName   = $srcName;
+                }
+            }
+            else
+                $idsrtext           = htmlspecialchars($value);
 			break;
 	    }           // identify cemetery transcription source
 
 	    case 'plot':
 	    {           // plot identification
-			$plot			= trim($value);
-			if (preg_match('/^[-\w]+$/', $plot) == 1)
+			$count      = preg_match('/^[a-zA-Z0-9\s.,-]+$/', $value);
+			if ($count == 1)
 			{
+			    $plot			    = trim($value);
 			    $parms['srcdetail']	= $plot;
 			}
 			else
-			{
-			    $msg	.= "Unexpected value of plot = '$plot'. ";
+            {
+                $plottext           = htmlspecialchars($value);
 			}
 			break;
 	    }           // plot identification
 
         case 'lang':
         {
-            if (strlen($value) == 2)
-                $lang           = strtolower($value);
+            $lang           = FtTemplate::validateLang($value);
+			break;
         }
 	}	            // take action on specific parameter
 }		            // loop through all parameters
 
-$template		= new FtTemplate("CemeteryReference$lang.html");
+$template		    = new FtTemplate("CemeteryReference$lang.html");
 
-if (strlen($plot) == 0)
-    $msg	.= $template->getElementById('missingPlot')->innerHTML();
+// issue customized messages
+if (is_string($idsrtext))
+{
+    $text	    = $template->getElementById('invalidIdsr')->innerHTML();
+    $msg	    .= str_replace('$value', $idsrtext, $text);
+}
+else
 if (is_null($idsr))
 {
     $msg	        .=  $template->getElementById('missingIdsr')->innerHTML();
     $cemeteryName   = $template->getElementById('Cemetery')->innerHTML();
 }
+
+if (is_string($plottext))
+{
+    $text	    = $template->getElementById('invalidPlot')->innerHTML();
+    $msg	    .= str_replace('$value', $plottext, $text);
+}
+else
+if (is_null($plot))
+    $msg	.= $template->getElementById('missingPlot')->innerHTML();
 
 if (strlen($msg) == 0)
 {			// get the matching citations
@@ -113,7 +143,7 @@ if ($count > 0)
     $data               = '';
 	foreach($list as $idsx => $citation)
 	{		            // loop through results
-	    $person	= $citation->getPerson();
+	    $person	        = $citation->getPerson();
 	    if ($person)
 	    {		        // instance of Person
 			$idir	    = $person->getIdir();
@@ -137,7 +167,7 @@ else
     $element->update(null);
 }
 $title          = $template->getElementById('Cemetery')->innerHTML();
-$template->set('TITLE',			    "$title  $cemeteryName: $plot");
+$template->set('TITLE',			    "$title $cemeteryName: $plot");
 $template->set('LANG',			    $lang);
 $template->set('IDSR',		        $idsr);
 $template->set('CONTACTKEY',		$idsr);

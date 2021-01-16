@@ -15,14 +15,10 @@
  *                                                                      *
  *  History:                                                            *
  *      2020/03/04      created                                         *
+ *      2021/01/13      use ES2015 syntax                               *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
-
-var lang                = 'en';
-var args                = getArgs();
-if ('lang' in args)
-    lang                = args.lang;
 
 /************************************************************************
  *  global flag deferSubmit                                             *
@@ -47,15 +43,10 @@ var deferSubmit         = false;
  *      ev              Javascript change Event                         *
  ************************************************************************/
 function templeChanged(ev)
-{
-    var form                    = this.form;
-    var updateButton            = document.getElementById('updEvent');
-    if (updateButton)
-        updateButton.disabled   = true;
 
     // get the name of the input field
-    var name;
-    var ider                    = 0;
+    let name;
+    let ider                    = 0;
 
     if (this.name)
         name                    = this.name;
@@ -66,10 +57,10 @@ function templeChanged(ev)
         name                    = '';
 
     // trim off leading and trailing spaces
-    var value                   = this.value.trim();
+    let value                   = this.value.trim();
 
     // insert space after comma if omitted
-    var commaRegex              = /,(\w)/g;
+    let commaRegex              = /,(\w)/g;
     value                       = value.replace(commaRegex, ", $1");
 
     // return the normalized value to the input form
@@ -77,7 +68,7 @@ function templeChanged(ev)
 
     // if the form has a button named Submit, enable it just in case
     // it was previously disabled
-    var submitButton            = document.getElementById('Submit');
+    let submitButton            = document.getElementById('Submit');
     if (submitButton)
         submitButton.disabled   = false;
 
@@ -89,7 +80,7 @@ function templeChanged(ev)
     }
 
     // capitalize words in value if presentation style requires it
-    var textTransform           = "";
+    let textTransform           = "";
     if (window.getComputedStyle)    // W3C API
         textTransform   = window.getComputedStyle(this, null).textTransform;
     else
@@ -100,16 +91,16 @@ function templeChanged(ev)
 
     // if possible display a loading indicator to the user so he/she is
     // aware that the temple lookup is being performed
-    var loc             = this.value.toLowerCase();
+    let loc             = this.value.toLowerCase();
     if (loc.length != 0 && loc != '[blank]' && loc != '[n/a]')
     {       // search only for non-blank temple
         popupLoading(this);
 
         // get an JSON file containing temple information from the database
-        var loc         = this.value;
-    var options             = {};
+        let loc         = this.value;
+    let options             = {};
     options.errorHandler    = function() {alert('script getTempleJSON.php not found on the server')};
-        var url = "/FamilyTree/getTempleJSON.php?name=" +
+        let url = "/FamilyTree/getTempleJSON.php?name=" +
                         encodeURIComponent(loc) +
                         "&form=" + this.form.name +
                         "&field=" + this.name;
@@ -163,20 +154,20 @@ function gotTempleJSON(response)
     }
     else
     {
-        var count               = response.count;
-        var cmd                 = response.cmd;
-        var field               = '';       // initiating field name
+        let count               = response.count;
+        let cmd                 = response.cmd;
+        let field               = '';       // initiating field name
         if ('field' in response.parms)
             field               = response.parms.field;
-        var formname            = '';       // form containing field
+        let formname            = '';       // form containing field
         if ('form' in response.parms)
             formname            = response.parms.form;
-        var name                = '';       // search argument
+        let name                = '';       // search argument
         if ('name' in response.parms)
             name                = response.parms.name;
 
         // locate the form containing the element that initiated the request
-        var form                = document.forms[formname];
+        let form                = document.forms[formname];
         if (form === undefined)
         {       // form not found
             alert("templeCommon.js: gotTempleJSON: form name='" + formname +
@@ -185,7 +176,7 @@ function gotTempleJSON(response)
         }       // form not found
 
         // locate the element that initiated the request
-        var element             = form.elements[field];
+        let element             = form.elements[field];
         if (element === undefined)
         {       // element not found
             alert("templeCommon.js: gotTempleJSON: element name='" + field +
@@ -198,15 +189,15 @@ function gotTempleJSON(response)
         // name from the database
         if (count == 1)
         {       // exactly one matching entry
-            for(var code in response.temples)
+            for(let code in response.temples)
             {       // loop through the one temple
-                var loc         = response.temples[code];
+                let loc         = response.temples[code];
                 element.value   = loc['temple'];
             }       // loop through the one temple
 
             // temple field is updated
             deferSubmit             = false;
-            var updateButton        = document.getElementById('updEvent');
+            let updateButton        = document.getElementById('updEvent');
             if (updateButton)
                 updateButton.disabled   = false;
 
@@ -219,7 +210,7 @@ function gotTempleJSON(response)
         else
         if (count == 0)
         {       // no matching entries
-            var parms   = {"template"   : "",
+            let parms   = {"template"   : "",
                             "name"      : name,
                             "formname"  : formname,
                             "field"     : field};
@@ -230,28 +221,28 @@ function gotTempleJSON(response)
         }       // no matching entries
         else
         {       // multiple matching entries
-            var parms   = { "template"  : "",
+            let parms   = { "template"  : "",
                             "name"      : name};
-            var dialog  = displayDialog('ChooseTempleMsg$template',
+            let dialog  = displayDialog('ChooseTempleMsg$template',
                                         parms,
                                         element,    // position
                                         null,       // button closes dialog
                                         true);      // defer show
 
             // update selection list for choice
-            var form        = dialog.getElementsByTagName('form')[0];
-            var select      = form.templeSelect;
+            let form        = dialog.getElementsByTagName('form')[0];
+            let select      = form.templeSelect;
             select.onchange = templeChosen;
             select.setAttribute("for", field);
             select.setAttribute("formname", formname);
 
-            for(var idlr in response.temples)
+            for(let idlr in response.temples)
             {       // loop through the temples
-                var loc         = response.temples[idlr];
-                var locname     = loc['temple'];
+                let loc         = response.temples[idlr];
+                let locname     = loc['temple'];
 
                 // create option element under select
-                var option          = new Option(locname,
+                let option          = new Option(locname,
                                                  idlr, 
                                                  false, 
                                                  false);
@@ -267,9 +258,9 @@ function gotTempleJSON(response)
             // the following is a workaround for a bug in FF 40.0 and
             // Chromium in which the onchange method of the <select> is
             // not called when the mouse is clicked on an option
-            for(var io=0; io < select.options.length; io++)
+            for(let io=0; io < select.options.length; io++)
             {
-                var option  = select.options[io];
+                let option  = select.options[io];
                 option.addEventListener("click", function() {this.selected = true; this.parentNode.onchange();});
             }
             select.focus();
@@ -291,22 +282,22 @@ function gotTempleJSON(response)
 function closeNewTempleDialog()
 {
     // no longer displaying the modal dialog popup
-    var msgDiv              = document.getElementById('msgDiv');
+    let msgDiv              = document.getElementById('msgDiv');
     msgDiv.style.display    = 'none';   // hide
     deferSubmit             = false;
-    var updateButton        = document.getElementById('updEvent');
+    let updateButton        = document.getElementById('updEvent');
     if (updateButton)
         updateButton.disabled   = false;
 
-    var myform              = this.form;
+    let myform              = this.form;
     if (myform)
     {                           // the dialog includes a form
-        var formname        = '';
-        var field           = '';
-        var elements        = myform.elements;
-        for(var ie = 0; ie < elements.length; ie++)
+        let formname        = '';
+        let field           = '';
+        let elements        = myform.elements;
+        for(let ie = 0; ie < elements.length; ie++)
         {
-            var element     = elements[ie];
+            let element     = elements[ie];
             switch(element.name)
             {
                 case 'formname':
@@ -324,17 +315,17 @@ function closeNewTempleDialog()
         else
         if (field.length > 0)
         {
-            var mainForm    = document.forms[formname];
-            var element     = mainForm.elements[field];
+            let mainForm    = document.forms[formname];
+            let element     = mainForm.elements[field];
             if (element)
             {                   // found requested field in invoking form
                 focusNext(element);
             }                   // found requested field in invoking form
             else
             {                   // issue diagnostic
-                var elementList = '';
-                var comma       = '[';
-                for(var fieldname in mainForm.elements)
+                let elementList = '';
+                let comma       = '[';
+                for(let fieldname in mainForm.elements)
                 {
                     elementList += comma + fieldname;
                     comma       = ',';
@@ -361,13 +352,13 @@ function closeNewTempleDialog()
  ************************************************************************/
 function templeChosen()
 {
-    var chosenOption    = this.options[this.selectedIndex];
+    let chosenOption    = this.options[this.selectedIndex];
 
     if (chosenOption.value > 0)
     {       // ordinary entry
-        var form        = document.forms[this.getAttribute("formname")];
-        var elementName = this.getAttribute("for");
-        var element     = form.elements[elementName];
+        let form        = document.forms[this.getAttribute("formname")];
+        let elementName = this.getAttribute("for");
+        let element     = form.elements[elementName];
         if (element)
         {
             element.value   = chosenOption.innerHTML;

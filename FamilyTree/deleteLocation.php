@@ -31,10 +31,11 @@ use \Exception;
  *		2017/12/12		use PersonSet instead of Person::getPersons		*
  *						format count of events							*
  *		2018/02/03		change breadcrumbs to new standard				*
- *		2018/11/19      change Helpen.html to Helpen.html                 *
+ *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/02/18      use new FtTemplate constructor                  *
+ *      2020/12/05      correct XSS vulnerabilities                     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Location.inc";
 require_once __NAMESPACE__ . "/Person.inc";
@@ -51,7 +52,9 @@ if (!canUser('edit'))
 
 // validate parameters
 $idlr               = null;
+$idlrtext           = null;
 $lang               = 'en';
+$namePref           = '';
 
 if (isset($_POST) && count($_POST) > 0)
 {		            // parameters passed by method=post
@@ -87,9 +90,9 @@ if (isset($_POST) && count($_POST) > 0)
                     $idlr	= intval($value);
                 }
 				else
-				{	// invalid format
-				    $name	= "Invalid Value of idlr='$value'";
-				    $msg	.= $name . '. ';
+                {	// invalid format
+                    $idlrtext       = htmlspecialchars($value);
+				    $name	= "Invalid Value of idlr='$idlrtext'";
 				}	// invalid format
 				break;
 		    }	    // idlr
@@ -97,29 +100,33 @@ if (isset($_POST) && count($_POST) > 0)
     }		        // loop through all parameters
     if ($debug)
         $warn   .= $parmsText . "</table>\n";
-}		        // parameters passed by method=post
+}		            // parameters passed by method=post
 
-$template       = new FtTemplate("deleteLocation$lang.html");
+$template           = new FtTemplate("deleteLocation$lang.html");
 
+if (is_string($idlrtext))
+    $msg	        = "Invalid Value of idlr='$idlrtext'";
+else
 if (is_null($idlr))
 {
-    $msg	    .= 'Missing mandatory parameter idlr. ';
-    $name       = 'IDLR not Specified';
-    $namePref   = 'IDLR';
+    $msg	        .= 'Missing mandatory parameter idlr. ';
+    $name           = 'IDLR not Specified';
+    $namePref       = 'IDLR';
 }
 
 if (strlen($msg) == 0)
 {		        // no problems encountered
-    $location	= new Location(array('IDLR' => $idlr));
-    $name	    = $location->getName();
-    $namePref	= substr($name, 0, 5); 
+    $location	    = new Location(array('IDLR' => $idlr));
+    $name	        = $location->getName();
+    $namePref	    = substr($name, 0, 5); 
 
 	// search for matches in tblIR
-	$indParms	    = array(array('idlrbirth' => $idlr,
-	    					      'idlrchris' => $idlr,
-	       					      'idlrdeath' => $idlr,
-		    				      'idlrburied' => $idlr),
-			    			'order'		=> 'Surname, GivenName, BirthSD, DeathSD');
+	$indParms	    = array(array('idlrbirth'   => $idlr,
+	    					      'idlrchris'   => $idlr,
+	       					      'idlrdeath'   => $idlr,
+		    				      'idlrburied'  => $idlr),
+                                  'order'		=>
+                            'Surname, GivenName, BirthSD, DeathSD');
 	
 	$persons	    = new PersonSet($indParms,
 	       							'Surname, GivenName, BirthSD, DeathSD');
