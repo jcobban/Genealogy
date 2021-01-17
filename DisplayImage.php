@@ -43,41 +43,41 @@ $title                  = '';
 $credit                 = '';
 
 // if invoked by method=get process the parameters
-if (count($_GET) > 0)
-{                   // invoked by URL to display current status of account
+if (isset($_GET) && count($_GET) > 0)
+{                   // invoked by method GET
     $parmsText              = "<p class='label'>\$_GET</p>\n" .
                                 "<table class='summary'>\n" .
                                   "<tr><th class='colhead'>key</th>" .
                                     "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
-    {           // loop through all input parameters
+    {                   // loop through all input parameters
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
                                 "<td class='white left'>" .
                                 htmlspecialchars($value) . "</td></tr>\n";
         switch(strtolower($key))
-        {       // process specific named parameters
+        {               // process specific named parameters
             case 'src':
             {
                 $src        = urldecode($value);
                 break;
-            }       // URL of image
+            }           // URL of image
 
             case 'fldname':
-            {       // field name to update in invoking dialog
+            {           // field name to update in invoking dialog
                 $fldName    = $value;
                 break;
-            }       // field name to update in invoking dialog
+            }           // field name to update in invoking dialog
 
             case 'lang':
-            {       // field name to update in invoking dialog
+            {           // preferred language
                 $lang       = FtTemplate::validateLang($value);
                 break;
-            }       // field name to update in invoking dialog
-        }       // process specific named parameters
-    }           // loop through all input parameters
+            }           // preferred language
+        }               // process specific named parameters
+    }                   // loop through all input parameters
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
-}                   // invoked by URL to display current status of account
+}                       // invoked by method GET 
 
 // get the template
 $template           = new FtTemplate("DisplayImage$lang.html", true);
@@ -106,7 +106,7 @@ else
 }                       // separate protocol from file name
 
 if (strlen($msg) == 0)
-{           // no errors
+{                       // no errors
     $previmg                    = null;
     $nextimg                    = null;
     $images                     = array();
@@ -122,7 +122,7 @@ if (strlen($msg) == 0)
 
     $urldirname                 = $dirname . '/';
     if ($protocol == '' || $protocol == 'file:')
-    {           // protocol supported by opendir
+    {                   // protocol supported by opendir
         $credit                 = $template['creditOA']->innerHTML;
         // open the image directory
         if (substr($dirname,0,1) == '/')
@@ -140,9 +140,9 @@ if (strlen($msg) == 0)
         $dh                     = opendir($dirname);
         $dirname                = "$dirname/";
         if ($dh)
-        {           // found images directory
+        {               // found images directory
             while (($filename = readdir($dh)) !== false)
-            {       // loop through files
+            {           // loop through files
                 $lastdot        = strrpos($filename, '.');
                 if ($lastdot === false)
                     $filetype   = '';
@@ -151,9 +151,9 @@ if (strlen($msg) == 0)
                 if ($filetype == 'jpg' || $filetype == 'jpeg' ||
                     $filetype == 'gif' || $filetype == 'png')
                     $images[]   = $filename;
-            }       // loop through files
+            }           // loop through files
             sort($images);
-        }           // found images directory
+        }               // found images directory
         else
         {
             $text               = $template['baddir']->innerHTML;
@@ -163,101 +163,99 @@ if (strlen($msg) == 0)
         }
 
         for ($i = 0; $i < count($images); $i++)
-        {           // loop through images in order
+        {               // loop through images in order
             $filename           = $images[$i];
             if ($filename > $imageName)
-            {       // image name not found
+            {           // image name not found
                 $text           = $template['notfound']->innerHTML;
                 $msg            .= "$text/ \n";
                 $nextimg        = $filename;
                 break;
-            }       // image name not found
+            }           // image name not found
             else
             if ($filename == $imageName)
-            {       // found the file we are looking for
+            {           // found the file we are looking for
                 if ($i < count($images) - 1)
                     $nextimg    = $images[$i + 1];
                 break;
-            }       // found the file we are looking for
+            }           // found the file we are looking for
             $previmg            = $filename;
-        }           // loop through images in order
-    }               // protocol supported by opendir
+        }               // loop through images in order
+    }                   // protocol supported by opendir
     else
     if ($protocol == "http:" || $protocol == "https:")
-    {               // assume prev by decrement, next by increment
+    {                   // assume prev by decrement, next by increment
         $headers                = get_headers($src);
         if ($headers && stripos($headers[0], '200 OK'))
-        {           // valid URL
-        $text                   = $template['creditUrl']->innerHTML;
-        if (preg_match('#//([a-zA-Z0-9_.-]+)#', $dirname, $matches))
-        {
-            $hostname           = $matches[1];
-            if ($hostname == 'data2.collectionscanada.ca' ||
-                $hostname == 'central.bac-lac.gc.ca')
-                $credit         = $template['creditLac']->innerHTML;
-            else
-                $credit         = str_replace('$hostname', $hostname, $text);
-        }
+        {               // valid URL
+	        $text                   = $template['creditUrl']->innerHTML;
+	        if (preg_match('#//([a-zA-Z0-9_.-]+)#', $dirname, $matches))
+	        {
+	            $hostname           = $matches[1];
+	            if ($hostname == 'data2.collectionscanada.ca' ||
+	                $hostname == 'central.bac-lac.gc.ca')
+	                $credit         = $template['creditLac']->innerHTML;
+	            else
+	                $credit         = str_replace('$hostname', $hostname, $text);
+	        }
+	        else
+	            $credit             = str_replace('$hostname', $dirname, $text);
+	        $dirname                = $protocol . $dirname;
+	        $result = preg_match("#([a-zA-Z]*|\d+_\d+-|\d+_)(\d+)([a-zA-Z]*\.\w+)#",
+	                             $imageName,
+	                             $matches);
+	        if ($result === 1)
+	        {           // successful match
+	            $urldirname         = $dirname . '/';
+	            $prefix             = $matches[1];
+	            $seqnum             = $matches[2];
+	            $suffix             = $matches[3];
+	            $lnum               = strlen($seqnum);
+	            $previmg            = $seqnum - 1;
+	            $previmg            = $prefix .
+	                                    substr('0000000000', 0,
+	                                           $lnum - strlen($previmg)) .
+	                                    $previmg . $suffix;
+	            $nextimg            = $seqnum + 1;
+	            $nextimg            = $prefix .
+	                                  substr('0000000000', 0,
+	                                         $lnum - strlen($nextimg)) .
+	                                  $nextimg . $suffix;
+	        }           // successful match
+	        else
+	        {           // not a simple file
+	            $result = preg_match("#(.*e)(\d+)#",
+	                                 $imageName,
+	                                 $matches);
+	            if ($result == 1)
+	            {
+	                $urldirname     = $dirname;
+	                $prefix         = urlencode($matches[1]);
+	                $seqnum         = $matches[2];
+	                $suffix         = '';
+	                $lnum           = strlen($seqnum);
+	                $previmg        = $seqnum - 1;
+	                $previmg        = $prefix .
+	                                    substr('0000000000', 0,
+	                                           $lnum - strlen($previmg)) .
+	                                    $previmg . $suffix;
+	                $nextimg        = $seqnum + 1;
+	                $nextimg        = $prefix .
+	                                  substr('0000000000', 0,
+	                                         $lnum - strlen($nextimg)) .
+	                                  $nextimg . $suffix;
+	            }
+	            else
+	                $warn   .= "<p>imageName='" . 
+	                            htmlspecialchars($imageName) . "'</p>\n";
+	        }           // not a simple file
+        }               // good URL
         else
-            $credit             = str_replace('$hostname', $dirname, $text);
-        $dirname                = $protocol . $dirname;
-        $result = preg_match("#([a-zA-Z]*|\d+_\d+-|\d+_)(\d+)([a-zA-Z]*\.\w+)#",
-                             $imageName,
-                             $matches);
-        $msg   .= __LINE__ . " dirname='$dirname'";
-        if ($result === 1)
-        {           // successful match
-            $urldirname         = $dirname . '/';
-            $prefix             = $matches[1];
-            $seqnum             = $matches[2];
-            $suffix             = $matches[3];
-            $lnum               = strlen($seqnum);
-            $previmg            = $seqnum - 1;
-            $previmg            = $prefix .
-                                    substr('0000000000', 0,
-                                           $lnum - strlen($previmg)) .
-                                    $previmg . $suffix;
-            $nextimg            = $seqnum + 1;
-            $nextimg            = $prefix .
-                                  substr('0000000000', 0,
-                                         $lnum - strlen($nextimg)) .
-                                  $nextimg . $suffix;
-        }           // successful match
-        else
-        {           // not a simple file
-            $result = preg_match("#(.*e)(\d+)#",
-                                 $imageName,
-                                 $matches);
-            if ($result == 1)
-            {
-                $urldirname     = $dirname;
-                $prefix         = urlencode($matches[1]);
-                $seqnum         = $matches[2];
-                $suffix         = '';
-                $lnum           = strlen($seqnum);
-                $previmg        = $seqnum - 1;
-                $previmg        = $prefix .
-                                    substr('0000000000', 0,
-                                           $lnum - strlen($previmg)) .
-                                    $previmg . $suffix;
-                $nextimg        = $seqnum + 1;
-                $nextimg        = $prefix .
-                                  substr('0000000000', 0,
-                                         $lnum - strlen($nextimg)) .
-                                  $nextimg . $suffix;
-            }
-            else
-                $warn   .= "<p>imageName='" . 
-                            htmlspecialchars($imageName) . "'</p>\n";
-        }           // not a simple file
-        $msg   .= __LINE__ . " urldirname='$urldirname'";
-        }           // good URL
-        else
-        {           // bad URL
-            $text       = $template['notfoundURL']->innerHTML;
-            $msg        .= str_replace('$src', $src, $text);
-        }           // bad URL
-    }               // assume prev by decrement, next by increment
+        {               // bad URL
+            $text           = $template['notfoundURL']->innerHTML;
+            $msg            .= str_replace('$src', $src, $text);
+        }               // bad URL
+    }                   // assume prev by decrement, next by increment
     else
     {
         $msg        .= "DisplayImage.php: " . __LINE__ . " protocol=$protocol. ";
